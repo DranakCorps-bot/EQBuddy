@@ -93,17 +93,21 @@ public static partial class LogParser
     [GeneratedRegex(@"^Your (?<spell>.+?) spell fizzles!$")]
     private static partial Regex FizzleRx();
 
-    // Third-party combat (group members / nearby fights) — used only as a combat-time signal:
+    // Third-party combat (group members, the player's pet, nearby fights):
     // "Orc centurion hits Lizzid for 4 points of damage." / "Lizzid tries to frenzy on orc centurion, but misses!"
     // "Orc centurion has taken 1 damage from Disease Cloud by Lizzid."
-    [GeneratedRegex(@"^.+? (?:hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|frenzies on) .+? for \d+ points? of damage\.$")]
+    [GeneratedRegex(@"^(?<attacker>.+?) (?:hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|frenzies on) (?<target>.+?) for (?<dmg>\d+) points? of damage\.$")]
     private static partial Regex ThirdMeleeRx();
 
-    [GeneratedRegex(@"^.+? tries to \w+(?: on)? .+?, but .+!$")]
+    [GeneratedRegex(@"^(?<attacker>.+?) tries to \w+(?: on)? .+?, but .+!$")]
     private static partial Regex ThirdMissRx();
 
-    [GeneratedRegex(@"^.+? has taken \d+ damage from .+? by .+?\.$")]
+    [GeneratedRegex(@"^(?<target>.+?) has taken (?<dmg>\d+) damage from (?<spell>.+?) by (?<caster>.+?)\.$")]
     private static partial Regex ThirdDotRx();
+
+    // Jibekn told you, 'Attacking orc centurion Master.'
+    [GeneratedRegex(@"^(?<pet>\S+) (?:tells|told) you, 'Attacking .+ Master\.'$")]
+    private static partial Regex PetClaimRx();
 
     [GeneratedRegex(@"^Your target resisted the (?<spell>.+?) spell\.$")]
     private static partial Regex ResistRx();
@@ -226,9 +230,21 @@ public static partial class LogParser
         if ((r = ResistRx().Match(msg)).Success)
             return new ResistEvent(ts);
 
-        // Third-party combat lines (checked last — every specific pattern above wins first).
-        if (ThirdMeleeRx().IsMatch(msg) || ThirdMissRx().IsMatch(msg) || ThirdDotRx().IsMatch(msg))
-            return new CombatTickEvent(ts);
+        // Pet announcement and third-party combat (checked last — specific patterns above win).
+        if ((r = PetClaimRx().Match(msg)).Success)
+            return new PetClaimEvent(ts, r.Groups["pet"].Value);
+
+        if ((r = ThirdMeleeRx().Match(msg)).Success)
+            return new ThirdMeleeEvent(ts, r.Groups["attacker"].Value.Trim(),
+                Normalize(r.Groups["target"].Value), int.Parse(r.Groups["dmg"].Value));
+
+        if ((r = ThirdDotRx().Match(msg)).Success)
+            return new ThirdDotEvent(ts, r.Groups["caster"].Value.Trim(),
+                Normalize(r.Groups["target"].Value), int.Parse(r.Groups["dmg"].Value),
+                r.Groups["spell"].Value);
+
+        if ((r = ThirdMissRx().Match(msg)).Success)
+            return new ThirdMissEvent(ts, r.Groups["attacker"].Value.Trim());
 
         if ((r = ZoneRx().Match(msg)).Success)
         {

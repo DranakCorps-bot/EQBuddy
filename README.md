@@ -50,11 +50,17 @@ Notes:
 ## How DPS is measured
 
 Session DPS = your damage ÷ time actually **in combat**, so downtime never dilutes it.
-The combat clock opens when *you* act (hit, miss, or get hit) and stays open while anyone
-nearby is fighting — group members swinging or being hit keep it running, so slow-swinging
-melee and casters between casts aren't penalized mid-fight. It closes after 10 quiet
-seconds (nobody hitting anybody) and idle time in busy zones never starts it. The Combat
-detail view shows total time-in-combat so you can see the denominator.
+
+- **Your pet counts.** EQBuddy learns your pet's name from its "Attacking X Master."
+  chatter and credits its melee and spell damage to you (shown as "Pet (Name)" in the
+  damage breakdown). Pet kills count as your kills.
+- The combat clock opens when *you* act — hit, miss, pet attack, or getting hit — and
+  stays open while your group keeps fighting, so slow-swinging melee and casters between
+  casts aren't penalized mid-fight.
+- Others' fighting only keeps your clock running for ~20 s past your last action:
+  tagging one mob doesn't charge you for the whole group fight, and idle time in a busy
+  zone never counts. The clock closes after 10 quiet seconds.
+- The Combat detail view shows total time-in-combat so you can see the denominator.
 
 ## What it tracks
 

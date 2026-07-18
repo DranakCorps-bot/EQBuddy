@@ -13,6 +13,10 @@ public sealed class SessionStats
     // attacks still counts as in-combat while the fight rages, but true downtime
     // (nobody hitting anybody) never dilutes DPS.
     private static readonly TimeSpan CombatGap = TimeSpan.FromSeconds(10);
+    // Bystander activity may keep the clock alive only this long after the player's
+    // (or their pet's) last own action — brief participation in a group fight must not
+    // inherit the whole fight's duration.
+    private static readonly TimeSpan BystanderGrace = TimeSpan.FromSeconds(20);
 
     private readonly object _lock = new();
 
@@ -53,6 +57,8 @@ public sealed class SessionStats
     // Combat-window tracking for DPS
     private double _closedCombatSeconds; private long _closedCombatDamage;
     private DateTime? _combatStart; private DateTime? _combatLast; private long _combatDamage;
+    private DateTime? _lastOwnAction;
+    private string? _petName;
 
     public event Action? SessionRolledOver;
 
@@ -70,7 +76,7 @@ public sealed class SessionStats
 
             switch (e)
             {
-                case KillEvent k when k.Killer == "You":
+                case KillEvent k when k.Killer == "You" || IsPet(k.Killer):
                     Bump(_yourKills, k.Target);
                     TrackCombat(k.Time);
                     break;
@@ -79,8 +85,27 @@ public sealed class SessionStats
                     Bump(_partyKillsByKiller, k.Killer);
                     TrackCombat(k.Time, canStart: false);
                     break;
-                case CombatTickEvent ct:
-                    TrackCombat(ct.Time, canStart: false);
+                case PetClaimEvent pc:
+                    _petName = pc.PetName;
+                    TrackCombat(pc.Time);
+                    break;
+                case ThirdMeleeEvent tm when IsPet(tm.Attacker):
+                    AddPetDamage(tm.Time, tm.Amount, DamageKind.Melee, tm.Target);
+                    break;
+                case ThirdDotEvent td when IsPet(td.Caster):
+                    AddPetDamage(td.Time, td.Amount, DamageKind.Spell, td.Target);
+                    break;
+                case ThirdMissEvent tm2 when IsPet(tm2.Attacker):
+                    TrackCombat(tm2.Time);
+                    break;
+                case ThirdMeleeEvent tm3:
+                    TrackCombat(tm3.Time, canStart: false);
+                    break;
+                case ThirdDotEvent td2:
+                    TrackCombat(td2.Time, canStart: false);
+                    break;
+                case ThirdMissEvent tm4:
+                    TrackCombat(tm4.Time, canStart: false);
                     break;
                 case DeathEvent d:
                     _deaths.Add((d.Time, d.Killer));
@@ -151,16 +176,41 @@ public sealed class SessionStats
         }
     }
 
+    private bool IsPet(string name) =>
+        _petName is not null && string.Equals(name, _petName, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Pet damage is the player's damage, reported under a "Pet (Name)" source.</summary>
+    private void AddPetDamage(DateTime t, int amount, DamageKind kind, string target)
+    {
+        _damageDealt += amount;
+        if (kind == DamageKind.Melee) _meleeDamage += amount; else _spellDamage += amount;
+        var label = $"Pet ({_petName})";
+        if (amount > _maxHit) { _maxHit = amount; _maxHitDesc = $"{label} on {target}"; }
+        var src = _damageBySource.TryGetValue(label, out var s) ? s : (0, 0L);
+        _damageBySource[label] = (src.Item1 + 1, src.Item2 + amount);
+        TrackCombat(t, amount);
+    }
+
     /// <summary>
-    /// canStart=false marks bystander activity (group members / nearby fights): it keeps an
-    /// already-open combat window alive but never opens one, so idling in a busy zone
-    /// doesn't count as combat. Your own attacks, misses, and damage taken open windows.
+    /// canStart=false marks bystander activity (group members / nearby fights): it never
+    /// opens a window (idling in a busy zone isn't combat) and keeps one alive only within
+    /// BystanderGrace of the player's/pet's own last action, so tagging one mob doesn't
+    /// inherit the whole group fight. Own attacks, misses, pet actions, and damage taken
+    /// open and extend windows freely.
     /// </summary>
     private void TrackCombat(DateTime t, int dmg = 0, bool canStart = true)
     {
         if (_combatLast is { } cl && t - cl > CombatGap)
             CloseCombatLocked();
-        if (_combatStart is null && !canStart) return;
+        if (!canStart)
+        {
+            if (_combatStart is null) return;
+            if (_lastOwnAction is not { } own || t - own > BystanderGrace) return;
+        }
+        else
+        {
+            _lastOwnAction = t;
+        }
         _combatStart ??= t;
         _combatLast = t;
         _combatDamage += dmg;
@@ -197,6 +247,7 @@ public sealed class SessionStats
         _fizzles = 0; _resists = 0;
         _closedCombatSeconds = 0; _closedCombatDamage = 0;
         _combatStart = null; _combatLast = null; _combatDamage = 0;
+        _lastOwnAction = null; _petName = null;
     }
 
     private static void Bump(Dictionary<string, int> d, string key) =>
