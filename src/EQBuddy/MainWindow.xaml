@@ -8,6 +8,12 @@
     <Border Background="{StaticResource BgBrush}" CornerRadius="10"
             BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
             MouseLeftButtonDown="OnDrag">
+        <Border.ContextMenu>
+            <ContextMenu>
+                <MenuItem x:Name="VersionMenuItem" Header="EQBuddy" IsEnabled="False"/>
+                <MenuItem Header="Check for updates" Click="OnCheckUpdates"/>
+            </ContextMenu>
+        </Border.ContextMenu>
         <StackPanel Margin="10">
 
             <!-- ============ MINI DASHBOARD MODE ============ -->
@@ -71,6 +77,14 @@
                     <Run Text=" Type "/><Run FontFamily="Consolas" Foreground="{StaticResource AccentBrush}" Text="/log"/>
                     <Run Text=" in the game's chat window. (EQBuddy enables it automatically for future game launches.)"/>
                 </TextBlock>
+            </Border>
+
+            <!-- Update available -->
+            <Border x:Name="UpdateBanner" Background="#337FBF5F" CornerRadius="6" Padding="8,6"
+                    Margin="0,8,0,0" Visibility="Collapsed" Cursor="Hand"
+                    MouseLeftButtonDown="OnUpdateBannerClick">
+                <TextBlock x:Name="UpdateText" TextWrapping="Wrap" FontSize="12"
+                           Foreground="{StaticResource GoodBrush}" FontWeight="SemiBold"/>
             </Border>
 
             <!-- Session line -->

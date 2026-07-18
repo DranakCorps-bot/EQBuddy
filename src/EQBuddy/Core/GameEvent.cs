@@ -19,4 +19,6 @@ public record FactionEvent(DateTime Time, string Faction, int Delta) : GameEvent
 public record ZoneEvent(DateTime Time, string Zone) : GameEvent(Time);
 public record CraftEvent(DateTime Time, string Item) : GameEvent(Time);
 public record FizzleEvent(DateTime Time) : GameEvent(Time);
+/// <summary>Combat is happening near the player (someone hit/missed someone), used only to keep the combat clock running.</summary>
+public record CombatTickEvent(DateTime Time) : GameEvent(Time);
 public record ResistEvent(DateTime Time) : GameEvent(Time);

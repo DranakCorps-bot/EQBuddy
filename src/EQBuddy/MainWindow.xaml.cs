@@ -16,6 +16,10 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _uiTimer;
     private DateTime _lastCharScan = DateTime.MinValue;
     private DateTime _lastJanitorRun = DateTime.MinValue;
+    private DateTime _lastUpdateCheck = DateTime.MinValue;
+    private UpdateInfo? _pendingUpdate;
+    private DateTime _upToDateNoticeUntil = DateTime.MinValue;
+    private bool _installingUpdate;
 
     private static readonly string[] MiniStatOrder = ["kills", "dps", "loot", "money", "xp", "deaths"];
 
@@ -33,6 +37,8 @@ public partial class MainWindow : Window
         Opacity = _settings.Opacity;
         Topmost = _settings.AlwaysOnTop;
         PinBtn.IsChecked = _settings.AlwaysOnTop;
+
+        VersionMenuItem.Header = $"EQBuddy v{UpdateChecker.CurrentVersion}";
 
         foreach (var (key, star) in StarButtons())
             star.IsChecked = _settings.MiniStats.Contains(key);
@@ -89,6 +95,13 @@ public partial class MainWindow : Window
             FollowActiveCharacter();
         }
 
+        // Every 6 h (and shortly after startup): look for a newer installer in OneDrive.
+        if (DateTime.Now - _lastUpdateCheck > TimeSpan.FromHours(6))
+        {
+            _lastUpdateCheck = DateTime.Now;
+            CheckForUpdates(manual: false);
+        }
+
         // Every 10 min: sweep stale logs and re-assert Log=1 (skipped while game runs).
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
@@ -101,6 +114,13 @@ public partial class MainWindow : Window
         }
 
         UpdateLoggingStatus();
+
+        if (_upToDateNoticeUntil != DateTime.MinValue && DateTime.Now > _upToDateNoticeUntil &&
+            _pendingUpdate is null && !_installingUpdate)
+        {
+            UpdateBanner.Visibility = Visibility.Collapsed;
+            _upToDateNoticeUntil = DateTime.MinValue;
+        }
 
         if (_watcher.LastError is { } err)
             App.LogError(err);
@@ -133,9 +153,11 @@ public partial class MainWindow : Window
         {
             var acc = s.HitCount + s.MissCount > 0
                 ? (double)s.HitCount / (s.HitCount + s.MissCount) * 100 : 0;
+            var combatTime = TimeSpan.FromSeconds(s.CombatSeconds);
             CombatSummary.Text =
                 $"Dealt {s.DamageDealt:N0} ({s.MeleeDamage:N0} melee / {s.SpellDamage:N0} spell) · " +
                 $"{s.CritCount} crits · {acc:0}% accuracy\n" +
+                $"In combat {(int)combatTime.TotalMinutes}m {combatTime.Seconds}s this session\n" +
                 $"Biggest hit: {s.MaxHit:N0} ({s.MaxHitDesc})\n" +
                 $"Taken {s.DamageTaken:N0} · avoided {s.AvoidedIncoming} attacks\n" +
                 $"Healing done {s.HealingDone:N0} · received {s.HealingReceived:N0}" +
@@ -294,6 +316,66 @@ public partial class MainWindow : Window
 
     private void OnMinimize(object sender, RoutedEventArgs e) => SetMode(true);
     private void OnRestore(object sender, RoutedEventArgs e) => SetMode(false);
+
+    private void OnCheckUpdates(object sender, RoutedEventArgs e)
+    {
+        _lastUpdateCheck = DateTime.Now;
+        CheckForUpdates(manual: true);
+    }
+
+    private void CheckForUpdates(bool manual)
+    {
+        Task.Run(() =>
+        {
+            var folder = UpdateChecker.FindUpdateFolder(_settings.UpdateFolder);
+            var info = folder is null ? null : UpdateChecker.Check(folder);
+            Dispatcher.Invoke(() =>
+            {
+                if (_installingUpdate) return;
+                if (info is not null && UpdateChecker.IsNewer(info))
+                {
+                    _pendingUpdate = info;
+                    UpdateText.Text = $"Update v{info.Latest} is ready — click here to install.";
+                    UpdateBanner.Visibility = Visibility.Visible;
+                }
+                else if (manual)
+                {
+                    _pendingUpdate = null;
+                    UpdateText.Text = folder is null
+                        ? "Update folder not found (set UpdateFolder in settings.json)."
+                        : $"You're up to date (v{UpdateChecker.CurrentVersion}).";
+                    UpdateBanner.Visibility = Visibility.Visible;
+                    _upToDateNoticeUntil = DateTime.Now.AddSeconds(6);
+                }
+            });
+        });
+    }
+
+    private void OnUpdateBannerClick(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        if (_pendingUpdate is not { } info || _installingUpdate) return;
+        _installingUpdate = true;
+        UpdateText.Text = "Installing update — EQBuddy will restart itself…";
+        Task.Run(() =>
+        {
+            try
+            {
+                var staged = UpdateChecker.StageForInstall(info);
+                System.Diagnostics.Process.Start(staged, "/SILENT");
+                Dispatcher.Invoke(() => Application.Current.Shutdown());
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+                Dispatcher.Invoke(() =>
+                {
+                    _installingUpdate = false;
+                    UpdateText.Text = "Update failed to start — see error.log.";
+                });
+            }
+        });
+    }
 
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         int max = 12, Func<string, Brush>? valueBrush = null)

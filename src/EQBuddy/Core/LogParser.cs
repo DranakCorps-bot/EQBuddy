@@ -93,6 +93,18 @@ public static partial class LogParser
     [GeneratedRegex(@"^Your (?<spell>.+?) spell fizzles!$")]
     private static partial Regex FizzleRx();
 
+    // Third-party combat (group members / nearby fights) — used only as a combat-time signal:
+    // "Orc centurion hits Lizzid for 4 points of damage." / "Lizzid tries to frenzy on orc centurion, but misses!"
+    // "Orc centurion has taken 1 damage from Disease Cloud by Lizzid."
+    [GeneratedRegex(@"^.+? (?:hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|frenzies on) .+? for \d+ points? of damage\.$")]
+    private static partial Regex ThirdMeleeRx();
+
+    [GeneratedRegex(@"^.+? tries to \w+(?: on)? .+?, but .+!$")]
+    private static partial Regex ThirdMissRx();
+
+    [GeneratedRegex(@"^.+? has taken \d+ damage from .+? by .+?\.$")]
+    private static partial Regex ThirdDotRx();
+
     [GeneratedRegex(@"^Your target resisted the (?<spell>.+?) spell\.$")]
     private static partial Regex ResistRx();
 
@@ -213,6 +225,10 @@ public static partial class LogParser
 
         if ((r = ResistRx().Match(msg)).Success)
             return new ResistEvent(ts);
+
+        // Third-party combat lines (checked last — every specific pattern above wins first).
+        if (ThirdMeleeRx().IsMatch(msg) || ThirdMissRx().IsMatch(msg) || ThirdDotRx().IsMatch(msg))
+            return new CombatTickEvent(ts);
 
         if ((r = ZoneRx().Match(msg)).Success)
         {

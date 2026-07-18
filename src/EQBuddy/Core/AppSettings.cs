@@ -6,6 +6,8 @@ namespace EQBuddy.Core;
 public sealed class AppSettings
 {
     public string? LogFolder { get; set; }
+    /// <summary>Folder holding EQBuddySetup.exe for updates; null = auto-detect OneDrive.</summary>
+    public string? UpdateFolder { get; set; }
     public bool AlwaysOnTop { get; set; } = true;
     public bool Minimized { get; set; }
     public List<string> MiniStats { get; set; } = ["kills", "dps"];

@@ -24,6 +24,15 @@ Mini dashboard:
   always-on-top pill (e.g. `💀 12  ⚔ 34 dps`). Great while actually fighting.
 - Double-click the pill (or click ⤢) to expand back to the full view.
 
+Updates (automatic, no internet service involved):
+- EQBuddy checks the family's shared **EQBuddyDownload** OneDrive folder at startup and
+  every 6 hours. When a newer version is there, a green banner appears — click it and
+  EQBuddy installs the update silently and restarts itself.
+- Right-click the widget → **Check for updates** to check on demand.
+- On a family PC where the shared folder syncs to a different path, EQBuddy auto-finds a
+  folder named `EQBuddyDownload` under that PC's OneDrive; if it can't, set `UpdateFolder`
+  in `%AppData%\EQBuddy\settings.json`.
+
 Log cleanup (automatic):
 - Because logging is always on, EQBuddy empties any character log that has been quiet
   for 60+ minutes (a finished play session), so files never grow across sessions.
@@ -38,11 +47,20 @@ Notes:
 - A "session" is a contiguous stretch of play. After 60+ minutes of no log activity,
   the next activity starts a fresh session automatically.
 
+## How DPS is measured
+
+Session DPS = your damage ÷ time actually **in combat**, so downtime never dilutes it.
+The combat clock opens when *you* act (hit, miss, or get hit) and stays open while anyone
+nearby is fighting — group members swinging or being hit keep it running, so slow-swinging
+melee and casters between casts aren't penalized mid-fight. It closes after 10 quiet
+seconds (nobody hitting anybody) and idle time in busy zones never starts it. The Combat
+detail view shows total time-in-combat so you can see the denominator.
+
 ## What it tracks
 
 | Section | Summary stat | Click-in details |
 |---|---|---|
-| Combat | Session DPS (+ live fight DPS) | Damage by attack/spell, crits, accuracy, biggest hit, damage taken per mob, healing, fizzles/resists |
+| Combat | Session DPS (+ live fight DPS) | Damage by attack/spell, crits, accuracy, biggest hit, time in combat, damage taken per mob, healing, fizzles/resists |
 | Kills | Your kills (+ group kills) | Count per creature type, kills/hour, group-member kill counts |
 | Loot | Items looted (+ items made) | Every item with counts, items created by merging |
 | Money | Coin earned (p/g/s/c) | Drop count, biggest drop, money per hour |
@@ -59,7 +77,11 @@ Notes:
 - `src/EQBuddy/Core/EqConfig.cs` — log hygiene: forces `Log=1` in eqclient.ini and truncates
   stale (60+ min quiet) logs; both are skipped while `eqgame.exe` is running.
 - Publish: `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o dist/publish`
-- Installer: Inno Setup — `ISCC.exe installer/EQBuddy.iss` → `dist/EQBuddySetup.exe`.
+- Release: `scripts\release.ps1` — reads the version from the csproj, publishes, signs both
+  exes (self-signed cert; create once with `scripts\new-cert.ps1`), compiles the installer
+  with the matching version stamp, and copies to the OneDrive family folder. Pass
+  `-Tag vX.Y.Z` to also publish a GitHub release. Bump `<Version>` in the csproj first —
+  the in-app updater compares it against the version stamped into the shared setup exe.
 - Settings live in `%AppData%\EQBuddy\settings.json`; errors in `%AppData%\EQBuddy\error.log`.
 - Debug: set `EQBUDDY_EXPAND=1` to launch with all sections expanded plus a state dump
   in `%AppData%\EQBuddy\debug.txt`.

@@ -7,7 +7,12 @@ namespace EQBuddy.Core;
 public sealed class SessionStats
 {
     public static readonly TimeSpan SessionGap = TimeSpan.FromMinutes(60);
-    private static readonly TimeSpan FightGap = TimeSpan.FromSeconds(8);
+    // Combat stays "live" while ANY nearby combat signal arrives within this window:
+    // your hits/misses, damage you take, group members hitting or being hit, kills.
+    // This keeps slow-swinging melee and medding casters honest: time between your own
+    // attacks still counts as in-combat while the fight rages, but true downtime
+    // (nobody hitting anybody) never dilutes DPS.
+    private static readonly TimeSpan CombatGap = TimeSpan.FromSeconds(10);
 
     private readonly object _lock = new();
 
@@ -45,9 +50,9 @@ public sealed class SessionStats
     private readonly List<(DateTime Time, string Zone)> _zones = new();
     private int _fizzles, _resists;
 
-    // Fight tracking for DPS
-    private double _closedFightSeconds; private long _closedFightDamage;
-    private DateTime? _fightStart; private DateTime? _fightLast; private long _fightDamage;
+    // Combat-window tracking for DPS
+    private double _closedCombatSeconds; private long _closedCombatDamage;
+    private DateTime? _combatStart; private DateTime? _combatLast; private long _combatDamage;
 
     public event Action? SessionRolledOver;
 
@@ -67,10 +72,15 @@ public sealed class SessionStats
             {
                 case KillEvent k when k.Killer == "You":
                     Bump(_yourKills, k.Target);
+                    TrackCombat(k.Time);
                     break;
                 case KillEvent k:
                     Bump(_partyKillsByTarget, k.Target);
                     Bump(_partyKillsByKiller, k.Killer);
+                    TrackCombat(k.Time, canStart: false);
+                    break;
+                case CombatTickEvent ct:
+                    TrackCombat(ct.Time, canStart: false);
                     break;
                 case DeathEvent d:
                     _deaths.Add((d.Time, d.Killer));
@@ -83,18 +93,21 @@ public sealed class SessionStats
                     if (dd.Amount > _maxHit) { _maxHit = dd.Amount; _maxHitDesc = $"{dd.Source} on {dd.Target}"; }
                     var src = _damageBySource.TryGetValue(dd.Source, out var s) ? s : (0, 0L);
                     _damageBySource[dd.Source] = (src.Item1 + 1, src.Item2 + dd.Amount);
-                    TrackFight(dd.Time, dd.Amount);
+                    TrackCombat(dd.Time, dd.Amount);
                     break;
-                case MissEvent { Outgoing: true }:
+                case MissEvent { Outgoing: true } m:
                     _missCount++;
+                    TrackCombat(m.Time);
                     break;
-                case MissEvent { Outgoing: false }:
+                case MissEvent m:
                     _avoidedIncoming++;
+                    TrackCombat(m.Time);
                     break;
                 case DamageTakenEvent dt:
                     _damageTaken += dt.Amount;
                     var atk = _damageByAttacker.TryGetValue(dt.Attacker, out var a) ? a : (0, 0L);
                     _damageByAttacker[dt.Attacker] = (atk.Item1 + 1, atk.Item2 + dt.Amount);
+                    TrackCombat(dt.Time);
                     break;
                 case HealEvent { Outgoing: true } h:
                     _healingDone += h.Amount; _healCount++;
@@ -138,23 +151,29 @@ public sealed class SessionStats
         }
     }
 
-    private void TrackFight(DateTime t, int dmg)
+    /// <summary>
+    /// canStart=false marks bystander activity (group members / nearby fights): it keeps an
+    /// already-open combat window alive but never opens one, so idling in a busy zone
+    /// doesn't count as combat. Your own attacks, misses, and damage taken open windows.
+    /// </summary>
+    private void TrackCombat(DateTime t, int dmg = 0, bool canStart = true)
     {
-        if (_fightLast is { } fl && t - fl > FightGap)
-            CloseFightLocked();
-        _fightStart ??= t;
-        _fightLast = t;
-        _fightDamage += dmg;
+        if (_combatLast is { } cl && t - cl > CombatGap)
+            CloseCombatLocked();
+        if (_combatStart is null && !canStart) return;
+        _combatStart ??= t;
+        _combatLast = t;
+        _combatDamage += dmg;
     }
 
-    private void CloseFightLocked()
+    private void CloseCombatLocked()
     {
-        if (_fightStart is { } fs && _fightLast is { } fl)
+        if (_combatStart is { } cs && _combatLast is { } cl)
         {
-            _closedFightSeconds += Math.Max(1, (fl - fs).TotalSeconds);
-            _closedFightDamage += _fightDamage;
+            _closedCombatSeconds += Math.Max(1, (cl - cs).TotalSeconds);
+            _closedCombatDamage += _combatDamage;
         }
-        _fightStart = null; _fightLast = null; _fightDamage = 0;
+        _combatStart = null; _combatLast = null; _combatDamage = 0;
     }
 
     public void Reset()
@@ -176,8 +195,8 @@ public sealed class SessionStats
         _xpPercent = 0; _xpTicks = 0; _levels.Clear();
         _skills.Clear(); _faction.Clear(); _zones.Clear();
         _fizzles = 0; _resists = 0;
-        _closedFightSeconds = 0; _closedFightDamage = 0;
-        _fightStart = null; _fightLast = null; _fightDamage = 0;
+        _closedCombatSeconds = 0; _closedCombatDamage = 0;
+        _combatStart = null; _combatLast = null; _combatDamage = 0;
     }
 
     private static void Bump(Dictionary<string, int> d, string key) =>
@@ -187,20 +206,20 @@ public sealed class SessionStats
     {
         lock (_lock)
         {
-            double fightSeconds = _closedFightSeconds;
-            long fightDamage = _closedFightDamage;
+            double combatSeconds = _closedCombatSeconds;
+            long combatDamage = _closedCombatDamage;
             double currentDps = 0;
-            if (_fightStart is { } fs && _fightLast is { } fl)
+            if (_combatStart is { } cs && _combatLast is { } cl)
             {
-                var dur = Math.Max(1, (fl - fs).TotalSeconds);
-                fightSeconds += dur;
-                fightDamage += _fightDamage;
+                var dur = Math.Max(1, (cl - cs).TotalSeconds);
+                combatSeconds += dur;
+                combatDamage += _combatDamage;
                 // Only advertise a "current" DPS while the fight is actually live
                 // (log timestamps are local time, so wall clock is comparable).
-                if (DateTime.Now - fl <= FightGap + TimeSpan.FromSeconds(2))
-                    currentDps = _fightDamage / dur;
+                if (DateTime.Now - cl <= CombatGap + TimeSpan.FromSeconds(2))
+                    currentDps = _combatDamage / dur;
             }
-            var sessionDps = fightSeconds > 0 ? fightDamage / fightSeconds : 0;
+            var sessionDps = combatSeconds > 0 ? combatDamage / combatSeconds : 0;
             var elapsed = _sessionStart is { } ss && _lastEventTime is { } le
                 ? (le - ss) : TimeSpan.Zero;
             var hours = Math.Max(elapsed.TotalHours, 1.0 / 60);
@@ -232,6 +251,7 @@ public sealed class SessionStats
                     .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total)).ToList(),
                 SessionDps = sessionDps,
                 CurrentDps = currentDps,
+                CombatSeconds = combatSeconds,
                 DamageTaken = _damageTaken,
                 AvoidedIncoming = _avoidedIncoming,
                 DamageByAttacker = _damageByAttacker.OrderByDescending(kv => kv.Value.Total)
@@ -296,6 +316,7 @@ public sealed class StatsSnapshot
     public List<SourceDamage> DamageBySource { get; init; } = [];
     public double SessionDps { get; init; }
     public double CurrentDps { get; init; }
+    public double CombatSeconds { get; init; }
     public long DamageTaken { get; init; }
     public int AvoidedIncoming { get; init; }
     public List<SourceDamage> DamageByAttacker { get; init; } = [];
