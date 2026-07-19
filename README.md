@@ -6,6 +6,9 @@ faction changes, deaths, and zones visited. Click any section to drill into deta
 
 **Download:** grab `EQBuddySetup.exe` from the
 [latest release](https://github.com/DranakCorps-bot/EQBuddy/releases/latest).
+EQBuddy checks for new releases itself (at startup, every 6 hours, and via
+right-click → "Check for updates") and shows a banner linking to the latest
+download when one is available.
 
 ## For players (family install guide)
 

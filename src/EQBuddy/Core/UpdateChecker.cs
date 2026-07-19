@@ -1,19 +1,34 @@
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Reflection;
+using System.Text.Json;
 
 namespace EQBuddy.Core;
 
-public sealed record UpdateInfo(Version Latest, string SetupPath);
+/// <summary>SetupPath is null for web (GitHub) updates — the banner links to the release page instead of installing.</summary>
+public sealed record UpdateInfo(Version Latest, string? SetupPath);
 
 /// <summary>
 /// Local-first update checker: looks for a newer EQBuddySetup.exe in the family's
-/// synced OneDrive folder (no internet API involved — OneDrive does the distribution).
+/// synced OneDrive folder (OneDrive does the distribution). When no update folder
+/// exists (public installs from GitHub), falls back to the GitHub Releases API.
 /// </summary>
 public static class UpdateChecker
 {
     private const string FolderName = "EQBuddyDownload";
     private const string SetupName = "EQBuddySetup.exe";
+    private const string GitHubLatestApi = "https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases/latest";
+    public const string GitHubLatestPage = "https://github.com/DranakCorps-bot/EQBuddy/releases/latest";
+
+    private static readonly HttpClient Http = CreateClient();
+
+    private static HttpClient CreateClient()
+    {
+        var c = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+        c.DefaultRequestHeaders.UserAgent.ParseAdd("EQBuddy-Updater");
+        return c;
+    }
 
     public static Version CurrentVersion
     {
@@ -77,12 +92,30 @@ public static class UpdateChecker
 
     public static bool IsNewer(UpdateInfo info) => info.Latest > CurrentVersion;
 
+    /// <summary>Latest released version tag on GitHub, or null if unreachable/unparseable.</summary>
+    public static async Task<Version?> CheckGitHubAsync()
+    {
+        try
+        {
+            var json = await Http.GetStringAsync(GitHubLatestApi);
+            using var doc = JsonDocument.Parse(json);
+            var tag = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
+            return Version.TryParse(tag.TrimStart('v', 'V'), out var v) ? Normalize(v) : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     /// <summary>
     /// Copy the setup out of OneDrive into %TEMP% (forces hydration of cloud-only files,
     /// and survives OneDrive sync touching the original), then return the staged path.
     /// </summary>
     public static string StageForInstall(UpdateInfo info)
     {
+        if (info.SetupPath is null)
+            throw new InvalidOperationException("Web updates are installed via the browser, not staged.");
         var staged = Path.Combine(Path.GetTempPath(), SetupName);
         File.Copy(info.SetupPath, staged, overwrite: true);
         return staged;

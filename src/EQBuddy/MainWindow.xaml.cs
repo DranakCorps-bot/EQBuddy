@@ -400,24 +400,31 @@ public partial class MainWindow : Window
 
     private void CheckForUpdates(bool manual)
     {
-        Task.Run(() =>
+        Task.Run(async () =>
         {
+            // Local (OneDrive) update folder is authoritative when present; otherwise
+            // fall back to the GitHub Releases feed for public installs.
             var folder = UpdateChecker.FindUpdateFolder(_settings.UpdateFolder);
             var info = folder is null ? null : UpdateChecker.Check(folder);
+            if (info is null && await UpdateChecker.CheckGitHubAsync() is { } webLatest)
+                info = new UpdateInfo(webLatest, SetupPath: null);
+
             Dispatcher.Invoke(() =>
             {
                 if (_installingUpdate) return;
                 if (info is not null && UpdateChecker.IsNewer(info))
                 {
                     _pendingUpdate = info;
-                    UpdateText.Text = $"Update v{info.Latest} is ready — click here to install.";
+                    UpdateText.Text = info.SetupPath is not null
+                        ? $"Update v{info.Latest} is ready — click here to install."
+                        : $"Update v{info.Latest} is available — click to open the download page.";
                     UpdateBanner.Visibility = Visibility.Visible;
                 }
                 else if (manual)
                 {
                     _pendingUpdate = null;
-                    UpdateText.Text = folder is null
-                        ? "Update folder not found (set UpdateFolder in settings.json)."
+                    UpdateText.Text = info is null && folder is null
+                        ? "Couldn't check for updates (no update folder, GitHub unreachable)."
                         : $"You're up to date (v{UpdateChecker.CurrentVersion}).";
                     UpdateBanner.Visibility = Visibility.Visible;
                     _upToDateNoticeUntil = DateTime.Now.AddSeconds(6);
@@ -430,6 +437,26 @@ public partial class MainWindow : Window
     {
         e.Handled = true;
         if (_pendingUpdate is not { } info || _installingUpdate) return;
+
+        if (info.SetupPath is null)
+        {
+            // Web update: send the user to the GitHub release page.
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                    UpdateChecker.GitHubLatestPage) { UseShellExecute = true });
+                _pendingUpdate = null;
+                UpdateText.Text = "Download page opened — run the new EQBuddySetup.exe to update.";
+                _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+                UpdateText.Text = $"Couldn't open browser — visit {UpdateChecker.GitHubLatestPage}";
+            }
+            return;
+        }
+
         _installingUpdate = true;
         UpdateText.Text = "Installing update — EQBuddy will restart itself…";
         Task.Run(() =>
