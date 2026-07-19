@@ -17,6 +17,9 @@ public sealed class AppSettings
     public double UiScale { get; set; } = 1.0;
     /// <summary>Opacity of the widget's background panel only — text stays fully opaque.</summary>
     public double BackgroundOpacity { get; set; } = 0.95;
+    /// <summary>Empty finished-session logs automatically. Off = logs grow forever
+    /// (for players who upload their logs elsewhere).</summary>
+    public bool TruncateLogs { get; set; } = true;
 
     private static string FilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

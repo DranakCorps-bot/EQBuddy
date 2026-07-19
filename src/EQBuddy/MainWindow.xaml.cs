@@ -58,11 +58,14 @@ public partial class MainWindow : Window
         // Log hygiene at startup: force Log=1 and wipe finished-session logs
         // (both no-ops while the game is running).
         if (_settings.LogFolder is { } lf)
+        {
+            var prune = _settings.TruncateLogs;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(lf);
-                EqConfig.TruncateStaleLogs(lf, SessionStats.SessionGap);
+                if (prune) EqConfig.TruncateStaleLogs(lf, SessionStats.SessionGap);
             });
+        }
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1")
             foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
@@ -106,6 +109,14 @@ public partial class MainWindow : Window
     }
 
     public double BackgroundOpacityValue => _settings.BackgroundOpacity;
+
+    public bool TruncateLogsValue => _settings.TruncateLogs;
+
+    public void SetTruncateLogs(bool enabled)
+    {
+        _settings.TruncateLogs = enabled;
+        _settings.Save();
+    }
 
     public void SetBackgroundOpacity(double opacity)
     {
@@ -217,10 +228,11 @@ public partial class MainWindow : Window
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
             _lastJanitorRun = DateTime.Now;
+            var prune = _settings.TruncateLogs;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(folder);
-                EqConfig.TruncateStaleLogs(folder, SessionStats.SessionGap);
+                if (prune) EqConfig.TruncateStaleLogs(folder, SessionStats.SessionGap);
             });
         }
 

@@ -45,6 +45,14 @@
                     IsSnapToTickEnabled="True" Margin="0,4,0,4"
                     ValueChanged="OnOpacityChanged"/>
 
+            <CheckBox x:Name="TruncateCheck" Margin="0,12,0,0"
+                      Checked="OnTruncateChanged" Unchecked="OnTruncateChanged">
+                <TextBlock Text="Auto-empty finished-session logs" FontSize="12"
+                           Foreground="{StaticResource TextBrush}"/>
+            </CheckBox>
+            <TextBlock Text="Turn off if you upload your log files elsewhere — they will grow forever, so clean them up yourself occasionally."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+
             <TextBlock Text="Size also scales all text. Changes apply instantly and are saved."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,8,0,0"/>
         </StackPanel>

@@ -45,10 +45,13 @@ Updates (automatic, no internet service involved):
   folder named `EQBuddyDownload` under that PC's OneDrive; if it can't, set `UpdateFolder`
   in `%AppData%\EQBuddy\settings.json`.
 
-Log cleanup (automatic):
+Log cleanup (automatic, optional):
 - Because logging is always on, EQBuddy empties any character log that has been quiet
   for 60+ minutes (a finished play session), so files never grow across sessions.
   Cleanup runs at EQBuddy startup and every 10 minutes — but never while the game is open.
+- If you keep your logs (to upload to another parser, for example), turn off
+  **"Auto-empty finished-session logs"** in ⚙ Options — EQBuddy then never touches your
+  log files, but they'll grow forever, so clean them up yourself occasionally.
 
 Custom install locations:
 - EQBuddy finds the game via the installer's registry entry, so non-default install paths

@@ -16,8 +16,15 @@ public partial class OptionsWindow : Window
         ScaleSlider.Value = main.UiScale;
         OpacitySlider.Value = main.Opacity;
         BgOpacitySlider.Value = main.BackgroundOpacityValue;
+        TruncateCheck.IsChecked = main.TruncateLogsValue;
         UpdateLabels();
         _ready = true;
+    }
+
+    private void OnTruncateChanged(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _main.SetTruncateLogs(TruncateCheck.IsChecked == true);
     }
 
     private void UpdateLabels()
