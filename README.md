@@ -57,9 +57,12 @@ Notes:
 
 Session DPS = your damage ÷ time actually **in combat**, so downtime never dilutes it.
 
-- **Your pet counts.** EQBuddy learns your pet's name from its "Attacking X Master."
-  chatter and credits its melee and spell damage to you (shown as "Pet (Name)" in the
-  damage breakdown). Pet kills count as your kills.
+- **Your pet counts — summoned or charmed.** EQBuddy learns your pet's name from its
+  "Attacking X Master." chatter and credits its melee and spell damage to you (shown as
+  "Pet (Name)" in the damage breakdown). Pet kills count as your kills. A charm landing
+  ("an asp blinks.") claims the creature provisionally — its damage shows as
+  "Pet? (Name)" until a Master message confirms it, then merges into "Pet (Name)".
+  If a pet ever damages you (charm broke), it stops being credited.
 - The combat clock opens when *you* act — hit, miss, pet attack, or getting hit — and
   stays open while your group keeps fighting, so slow-swinging melee and casters between
   casts aren't penalized mid-fight.

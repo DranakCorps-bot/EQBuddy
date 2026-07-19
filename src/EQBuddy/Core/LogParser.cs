@@ -19,8 +19,8 @@ public static partial class LogParser
     [GeneratedRegex(@"^You have been slain by (?<killer>.+)!$")]
     private static partial Regex YouDiedRx();
 
-    // You slash orc pawn for 10 points of damage. (Critical)
-    [GeneratedRegex(@"^You (?<verb>slash|hit|kick|bash|pierce|crush|punch|backstab|bite|claw|maul|gore|sting|strike|slice|cleave|smash|rend|slam|shoot|frenzy on|frenzies on) (?<target>.+?) for (?<dmg>\d+) points? of damage\.(?<crit> \(Critical\))?$")]
+    // You slash orc pawn for 10 points of damage. (Critical) / (Double Bow Shot) / etc.
+    [GeneratedRegex(@"^You (?<verb>slash|hit|kick|bash|pierce|crush|punch|backstab|bite|claw|maul|gore|sting|strike|slice|cleave|smash|rend|slam|shoot|frenzy on|frenzies on) (?<target>.+?) for (?<dmg>\d+) points? of damage\.(?: \((?<note>[^)]+)\))?$")]
     private static partial Regex MeleeOutRx();
 
     // You try to slash orc pawn, but miss! / but orc pawn dodges! etc.
@@ -28,15 +28,15 @@ public static partial class LogParser
     private static partial Regex MeleeMissRx();
 
     // Orc centurion has taken 10 damage from your Poison Bolt.
-    [GeneratedRegex(@"^(?<target>.+?) has taken (?<dmg>\d+) damage from your (?<spell>.+?)\.(?<crit> \(Critical\))?$")]
+    [GeneratedRegex(@"^(?<target>.+?) has taken (?<dmg>\d+) damage from your (?<spell>.+?)\.(?: \((?<note>[^)]+)\))?$")]
     private static partial Regex DotOutRx();
 
     // You hit orc pawn for 20 points of non-melee damage.
-    [GeneratedRegex(@"^You hit (?<target>.+?) for (?<dmg>\d+) points? of non-melee damage\.(?<crit> \(Critical\))?$")]
+    [GeneratedRegex(@"^You hit (?<target>.+?) for (?<dmg>\d+) points? of non-melee damage\.(?: \((?<note>[^)]+)\))?$")]
     private static partial Regex NukeOutRx();
 
     // You hit orc centurion for 13 points of fire damage by Burn.
-    [GeneratedRegex(@"^You hit (?<target>.+?) for (?<dmg>\d+) points? of \w+ damage by (?<spell>.+?)\.(?<crit> \(Critical\))?$")]
+    [GeneratedRegex(@"^You hit (?<target>.+?) for (?<dmg>\d+) points? of \w+ damage by (?<spell>.+?)\.(?: \((?<note>[^)]+)\))?$")]
     private static partial Regex SchoolNukeOutRx();
 
     // ice boned skeleton hit you for 20 points of cold damage by Ice Bone Frost Burst.
@@ -56,7 +56,7 @@ public static partial class LogParser
     private static partial Regex ThirdSchoolRx();
 
     // Orc centurion hits YOU for 4 points of damage.
-    [GeneratedRegex(@"^(?<attacker>.+?) (?<verb>hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|shoots|frenzies on) YOU for (?<dmg>\d+) points? of damage\.$")]
+    [GeneratedRegex(@"^(?<attacker>.+?) (?<verb>hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|shoots|frenzies on) YOU for (?<dmg>\d+) points? of damage\.(?: \([^)]+\))?$")]
     private static partial Regex MeleeInRx();
 
     // Orc centurion tries to hit YOU, but misses! / but YOU dodge!
@@ -128,7 +128,7 @@ public static partial class LogParser
     // Third-party combat (group members, the player's pet, nearby fights):
     // "Orc centurion hits Lizzid for 4 points of damage." / "Lizzid tries to frenzy on orc centurion, but misses!"
     // "Orc centurion has taken 1 damage from Disease Cloud by Lizzid."
-    [GeneratedRegex(@"^(?<attacker>.+?) (?:hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|shoots|frenzies on) (?<target>.+?) for (?<dmg>\d+) points? of damage\.$")]
+    [GeneratedRegex(@"^(?<attacker>.+?) (?:hits|slashes|kicks|bashes|pierces|crushes|punches|backstabs|bites|claws|mauls|gores|stings|strikes|slices|cleaves|smashes|rends|slams|shoots|frenzies on) (?<target>.+?) for (?<dmg>\d+) points? of damage\.(?: \([^)]+\))?$")]
     private static partial Regex ThirdMeleeRx();
 
     [GeneratedRegex(@"^(?<attacker>.+?) tries to \w+(?: on)? .+?, but .+!$")]
@@ -141,6 +141,10 @@ public static partial class LogParser
     // A puma told you, 'Attacking a ghoul Master.'   (charmed creatures have multi-word names)
     [GeneratedRegex(@"^(?<pet>.+?) (?:tells|told) you, 'Attacking .+ Master\.'$")]
     private static partial Regex PetClaimRx();
+
+    // "an asp blinks." — shown at the moment a charm lands; provisional pet signal.
+    [GeneratedRegex(@"^(?<name>.+?) blinks\.$")]
+    private static partial Regex PetBlinkRx();
 
     [GeneratedRegex(@"^Your target resisted the (?<spell>.+?) spell\.$")]
     private static partial Regex ResistRx();
@@ -203,22 +207,22 @@ public static partial class LogParser
         if ((r = SchoolNukeOutRx().Match(msg)).Success)
             return new DamageDealtEvent(ts, Normalize(r.Groups["target"].Value),
                 int.Parse(r.Groups["dmg"].Value), DamageKind.Spell, r.Groups["spell"].Value,
-                r.Groups["crit"].Success);
+                IsCritNote(r));
 
         if ((r = NukeOutRx().Match(msg)).Success)
             return new DamageDealtEvent(ts, Normalize(r.Groups["target"].Value),
                 int.Parse(r.Groups["dmg"].Value), DamageKind.Spell, "Direct spell",
-                r.Groups["crit"].Success);
+                IsCritNote(r));
 
         if ((r = MeleeOutRx().Match(msg)).Success)
             return new DamageDealtEvent(ts, Normalize(r.Groups["target"].Value),
                 int.Parse(r.Groups["dmg"].Value), DamageKind.Melee,
-                VerbToSkill(r.Groups["verb"].Value), r.Groups["crit"].Success);
+                VerbToSkill(r.Groups["verb"].Value), IsCritNote(r));
 
         if ((r = DotOutRx().Match(msg)).Success)
             return new DamageDealtEvent(ts, Normalize(r.Groups["target"].Value),
                 int.Parse(r.Groups["dmg"].Value), DamageKind.Spell,
-                r.Groups["spell"].Value, r.Groups["crit"].Success);
+                r.Groups["spell"].Value, IsCritNote(r));
 
         if ((r = MeleeMissRx().Match(msg)).Success)
             return new MissEvent(ts, Outgoing: true);
@@ -288,6 +292,9 @@ public static partial class LogParser
         if ((r = PetClaimRx().Match(msg)).Success)
             return new PetClaimEvent(ts, r.Groups["pet"].Value);
 
+        if ((r = PetBlinkRx().Match(msg)).Success)
+            return new PetBlinkEvent(ts, r.Groups["name"].Value);
+
         if ((r = ThirdMeleeRx().Match(msg)).Success)
             return new ThirdMeleeEvent(ts, r.Groups["attacker"].Value.Trim(),
                 Normalize(r.Groups["target"].Value), int.Parse(r.Groups["dmg"].Value));
@@ -315,6 +322,14 @@ public static partial class LogParser
         }
 
         return null;
+    }
+
+    /// <summary>A trailing "(...)" note that means the hit was a critical.</summary>
+    private static bool IsCritNote(Match m)
+    {
+        var note = m.Groups["note"];
+        return note.Success &&
+               (note.Value is "Critical" or "Crippling Blow");
     }
 
     private static long ParseCoins(string coins)

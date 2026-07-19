@@ -23,6 +23,8 @@ public record CraftEvent(DateTime Time, string Item) : GameEvent(Time);
 public record FizzleEvent(DateTime Time) : GameEvent(Time);
 /// <summary>The player's pet announced itself ("<Pet> told you, 'Attacking X Master.'").</summary>
 public record PetClaimEvent(DateTime Time, string PetName) : GameEvent(Time);
+/// <summary>A creature blinked ("an asp blinks.") — the charm-spell tell; treated as a provisional pet claim.</summary>
+public record PetBlinkEvent(DateTime Time, string Name) : GameEvent(Time);
 /// <summary>Someone other than the player landed a melee hit (may be the player's pet).</summary>
 public record ThirdMeleeEvent(DateTime Time, string Attacker, string Target, int Amount) : GameEvent(Time);
 /// <summary>Spell/DoT damage from someone other than the player (may be the player's pet).</summary>

@@ -62,7 +62,8 @@ public sealed class SessionStats
     private double _closedCombatSeconds; private long _closedCombatDamage;
     private DateTime? _combatStart; private DateTime? _combatLast; private long _combatDamage;
     private DateTime? _lastOwnAction;
-    private string? _petName;
+    private string? _petName;        // normalized (article stripped, capitalized)
+    private bool _petConfirmed;      // false = blink-only (charm suspected, no "Master" tell yet)
 
     public event Action? SessionRolledOver;
 
@@ -90,8 +91,13 @@ public sealed class SessionStats
                     TrackCombat(k.Time, canStart: false);
                     break;
                 case PetClaimEvent pc:
-                    _petName = pc.PetName;
+                    ConfirmPet(LogParser.Normalize(pc.PetName));
                     TrackCombat(pc.Time);
+                    break;
+                case PetBlinkEvent pb:
+                    // Charm just landed (probably) — provisionally claim this creature.
+                    _petName = LogParser.Normalize(pb.Name);
+                    _petConfirmed = false;
                     break;
                 case ThirdMeleeEvent tm when IsPet(tm.Attacker):
                     AddPetDamage(tm.Time, tm.Amount, DamageKind.Melee, tm.Target);
@@ -207,14 +213,30 @@ public sealed class SessionStats
     }
 
     private bool IsPet(string name) =>
-        _petName is not null && string.Equals(name, _petName, StringComparison.OrdinalIgnoreCase);
+        _petName is not null &&
+        string.Equals(LogParser.Normalize(name), _petName, StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>Pet damage is the player's damage, reported under a "Pet (Name)" source.</summary>
+    /// <summary>A "Master" tell proves the pet is ours — upgrade any provisional damage.</summary>
+    private void ConfirmPet(string name)
+    {
+        _petName = name;
+        if (_petConfirmed) return;
+        _petConfirmed = true;
+        if (_damageBySource.Remove($"Pet? ({name})", out var provisional))
+        {
+            var label = $"Pet ({name})";
+            var cur = _damageBySource.TryGetValue(label, out var c) ? c : (0, 0L);
+            _damageBySource[label] = (cur.Item1 + provisional.Count, cur.Item2 + provisional.Total);
+        }
+    }
+
+    /// <summary>Pet damage is the player's damage, reported under a "Pet (Name)" source
+    /// ("Pet? (Name)" while the charm is only suspected from a blink).</summary>
     private void AddPetDamage(DateTime t, int amount, DamageKind kind, string target)
     {
         _damageDealt += amount;
         if (kind == DamageKind.Melee) _meleeDamage += amount; else _spellDamage += amount;
-        var label = $"Pet ({_petName})";
+        var label = _petConfirmed ? $"Pet ({_petName})" : $"Pet? ({_petName})";
         if (amount > _maxHit) { _maxHit = amount; _maxHitDesc = $"{label} on {target}"; }
         var src = _damageBySource.TryGetValue(label, out var s) ? s : (0, 0L);
         _damageBySource[label] = (src.Item1 + 1, src.Item2 + amount);
@@ -278,7 +300,7 @@ public sealed class SessionStats
         _fizzles = 0; _resists = 0;
         _closedCombatSeconds = 0; _closedCombatDamage = 0;
         _combatStart = null; _combatLast = null; _combatDamage = 0;
-        _lastOwnAction = null; _petName = null;
+        _lastOwnAction = null; _petName = null; _petConfirmed = false;
     }
 
     private static void Bump(Dictionary<string, int> d, string key) =>
