@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>EQBuddy.Avalonia</AssemblyName>
+    <RootNamespace>EQBuddy.Avalonia</RootNamespace>
+    <Version>1.5.1</Version>
+    <ApplicationIcon>..\EQBuddy\Assets\EQBuddy.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EQBuddy.Core\EQBuddy.Core.csproj" />
+  </ItemGroup>
+
+</Project>

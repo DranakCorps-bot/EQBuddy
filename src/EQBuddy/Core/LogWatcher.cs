@@ -47,31 +47,38 @@ public sealed class LogWatcher : IDisposable
     {
         // The Daybreak installer records the install location in the uninstall registry
         // key, so custom install paths are found without any user configuration.
-        foreach (var hive in new[] { Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.LocalMachine })
-        foreach (var subkey in new[]
+        if (OperatingSystem.IsWindows())
         {
-            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
-            @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
-        })
-        {
-            try
+            foreach (var hive in new[] { Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.LocalMachine })
+            foreach (var subkey in new[]
             {
-                using var key = hive.OpenSubKey(subkey);
-                var marker = key?.GetValue("UninstallString") as string
-                             ?? key?.GetValue("DisplayIcon") as string;
-                if (marker is null) continue;
-                var root = Path.GetDirectoryName(marker.Trim('"'));
-                if (root is null) continue;
-                var logs = Path.Combine(root, "Logs");
-                if (Directory.Exists(logs)) return logs;
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
+            })
+            {
+                try
+                {
+                    using var key = hive.OpenSubKey(subkey);
+                    var marker = key?.GetValue("UninstallString") as string
+                                 ?? key?.GetValue("DisplayIcon") as string;
+                    if (marker is null) continue;
+                    var root = Path.GetDirectoryName(marker.Trim('"'));
+                    if (root is null) continue;
+                    var logs = Path.Combine(root, "Logs");
+                    if (Directory.Exists(logs)) return logs;
+                }
+                catch { /* registry access denied — fall through */ }
             }
-            catch { /* registry access denied — fall through */ }
         }
 
         string[] candidates =
         [
             @"C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs",
             @"C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest\Logs",
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".local", "share", "Daybreak Game Company", "Installed Games",
+                "EverQuest Legends", "Logs"),
         ];
         return candidates.FirstOrDefault(Directory.Exists);
     }

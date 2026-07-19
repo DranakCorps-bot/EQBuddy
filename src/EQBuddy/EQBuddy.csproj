@@ -14,4 +14,12 @@
     <ApplicationIcon>Assets\EQBuddy.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Core\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EQBuddy.Core\EQBuddy.Core.csproj" />
+  </ItemGroup>
+
 </Project>

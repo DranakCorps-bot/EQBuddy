@@ -103,7 +103,14 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 
 ## For developers
 
-- `src/EQBuddy` — WPF app (.NET 10, `net10.0-windows`). Build: `dotnet build -c Release`.
+- `src/EQBuddy` — WPF app (.NET 10, `net10.0-windows`). Build on Windows:
+  `dotnet build src/EQBuddy/EQBuddy.csproj -c Release`. From non-Windows machines,
+  add `-p:EnableWindowsTargeting=true`.
+- `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10). Build:
+  `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
+- `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
+  The existing Core source files still live under `src/EQBuddy/Core` so the diff stays
+  easy to review; both UI projects consume them through this project.
 - `src/EQBuddy/Core/LogParser.cs` — one regex per log-line type; add new patterns here.
 - `src/EQBuddy/Core/SessionStats.cs` — aggregation + DPS fight tracking + session rollover.
 - `src/EQBuddy/Core/LogWatcher.cs` — file tailing (500 ms polls, offset-based, truncation-safe).
