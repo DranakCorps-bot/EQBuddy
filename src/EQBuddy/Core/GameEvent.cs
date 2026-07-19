@@ -12,6 +12,8 @@ public record DamageDealtEvent(DateTime Time, string Target, int Amount, DamageK
 public record DamageTakenEvent(DateTime Time, string Attacker, int Amount, bool Melee) : GameEvent(Time);
 public record MissEvent(DateTime Time, bool Outgoing) : GameEvent(Time);
 public record HealEvent(DateTime Time, string Target, int Amount, string Spell, bool Outgoing, string Healer = "") : GameEvent(Time);
+/// <summary>"Your wounds begin to heal." — a regen/hymn tick; the log gives no amount, so we can only count them.</summary>
+public record RegenTickEvent(DateTime Time) : GameEvent(Time);
 public record LootEvent(DateTime Time, string Item, string Source, string? UpgradeResult) : GameEvent(Time);
 /// <summary>Vendor=true means a merchant sale (Item = what was sold); otherwise corpse coin or split.</summary>
 public record MoneyEvent(DateTime Time, long Copper, bool Vendor = false, string? Item = null) : GameEvent(Time);

@@ -41,6 +41,17 @@ public sealed class SessionStats
     private long _healingDone; private int _healCount;
     private long _healingReceived;
     private readonly Dictionary<string, (int Count, long Total)> _healsByHealer = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, (int Count, long Total)> _healsBySpell = new(StringComparer.OrdinalIgnoreCase);
+    private int _regenTicks;
+    private string? _characterName;
+
+    /// <summary>The watched character's name — needed to recognize self-heals
+    /// ("You healed Douglas ..." appears in Douglas's own log).</summary>
+    public string? CharacterName
+    {
+        get { lock (_lock) return _characterName; }
+        set { lock (_lock) _characterName = value; }
+    }
 
     private readonly Dictionary<string, (int Count, string LastSource)> _loot = new(StringComparer.OrdinalIgnoreCase);
     private int _lootCount;
@@ -161,6 +172,17 @@ public sealed class SessionStats
                     break;
                 case HealEvent { Outgoing: true } h:
                     _healingDone += h.Amount; _healCount++;
+                    var sp = _healsBySpell.TryGetValue(h.Spell, out var spv) ? spv : (0, 0L);
+                    _healsBySpell[h.Spell] = (spv.Item1 + 1, spv.Item2 + h.Amount);
+                    // Self-heals appear as "You healed <own name>" — count as received too.
+                    if (_characterName is { } me &&
+                        string.Equals(h.Target, me, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _healingReceived += h.Amount;
+                        var self = _healsByHealer.TryGetValue("Yourself", out var sv2) ? sv2 : (0, 0L);
+                        _healsByHealer["Yourself"] = (self.Item1 + 1, self.Item2 + h.Amount);
+                    }
+                    TrackCombat(h.Time, canStart: false);
                     break;
                 case HealEvent h:
                     _healingReceived += h.Amount;
@@ -169,6 +191,9 @@ public sealed class SessionStats
                         var hv = _healsByHealer.TryGetValue(h.Healer, out var hc) ? hc : (0, 0L);
                         _healsByHealer[h.Healer] = (hv.Item1 + 1, hv.Item2 + h.Amount);
                     }
+                    break;
+                case RegenTickEvent:
+                    _regenTicks++;
                     break;
                 case LootEvent l:
                     var cur = _loot.TryGetValue(l.Item, out var lv) ? lv : (0, l.Source);
@@ -306,7 +331,8 @@ public sealed class SessionStats
         _hitCount = _critCount = _missCount = 0; _maxHit = 0; _maxHitDesc = "";
         _damageBySource.Clear(); _specialHits.Clear();
         _damageTaken = 0; _avoidedIncoming = 0; _damageByAttacker.Clear();
-        _healingDone = 0; _healCount = 0; _healingReceived = 0; _healsByHealer.Clear();
+        _healingDone = 0; _healCount = 0; _healingReceived = 0;
+        _healsByHealer.Clear(); _healsBySpell.Clear(); _regenTicks = 0;
         _loot.Clear(); _lootCount = 0; _crafted.Clear();
         _copper = 0; _coinDrops = 0; _biggestDrop = 0;
         _vendorCopper = 0; _salesCount = 0; _soldItems.Clear();
@@ -382,6 +408,10 @@ public sealed class SessionStats
                 HealingReceived = _healingReceived,
                 HealsByHealer = _healsByHealer.OrderByDescending(kv => kv.Value.Total)
                     .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total)).ToList(),
+                HealsBySpell = _healsBySpell.OrderByDescending(kv => kv.Value.Total)
+                    .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total)).ToList(),
+                Hps = combatSeconds > 0 ? _healingDone / combatSeconds : 0,
+                RegenTicks = _regenTicks,
                 LootTotal = _lootCount,
                 Loot = _loot.OrderByDescending(kv => kv.Value.Count)
                     .Select(kv => new LootDetail(kv.Key, kv.Value.Count, kv.Value.LastSource)).ToList(),
@@ -460,6 +490,9 @@ public sealed class StatsSnapshot
     public long HealingDone { get; init; }
     public long HealingReceived { get; init; }
     public List<SourceDamage> HealsByHealer { get; init; } = [];
+    public List<SourceDamage> HealsBySpell { get; init; } = [];
+    public double Hps { get; init; }
+    public int RegenTicks { get; init; }
     public int LootTotal { get; init; }
     public List<LootDetail> Loot { get; init; } = [];
     public List<NameCount> Crafted { get; init; } = [];

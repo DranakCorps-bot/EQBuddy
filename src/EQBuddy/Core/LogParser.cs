@@ -99,6 +99,9 @@ public static partial class LogParser
     [GeneratedRegex(@"^.+? resisted your (?<spell>.+?)!$")]
     private static partial Regex ResistAltRx();
 
+    [GeneratedRegex(@"^Your wounds begin to heal\.$")]
+    private static partial Regex RegenTickRx();
+
     [GeneratedRegex(@"(?<n>\d+) (?<unit>platinum|gold|silver|copper)")]
     private static partial Regex CoinPartRx();
 
@@ -246,6 +249,9 @@ public static partial class LogParser
 
         if ((r = HealInRx().Match(msg)).Success)
             return new HealEvent(ts, "You", int.Parse(r.Groups["amount"].Value), "Unknown", Outgoing: false);
+
+        if (RegenTickRx().IsMatch(msg))
+            return new RegenTickEvent(ts);
 
         if ((r = HealInByRx().Match(msg)).Success)
             return new HealEvent(ts, "You", int.Parse(r.Groups["amount"].Value),

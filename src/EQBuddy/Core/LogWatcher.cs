@@ -97,6 +97,7 @@ public sealed class LogWatcher : IDisposable
         {
             _timer.Stop();
             _path = path;
+            _stats.CharacterName = CharacterLog.FromPath(path)?.Character;
             _offset = 0;
             _remainder.Clear();
             InitialIngestDone = false;

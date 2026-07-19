@@ -123,7 +123,29 @@
                     <TextBlock Text="Damage by attack" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"/>
                     <ItemsControl x:Name="DamageSourceList" Margin="0,2,0,4"/>
                     <TextBlock Text="Damage taken from" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"/>
-                    <ItemsControl x:Name="DamageTakenList" Margin="0,2,0,4"/>
+                    <ItemsControl x:Name="DamageTakenList" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Expander>
+
+            <Expander x:Name="HealingSection" Style="{StaticResource Section}">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="&#x2695;&#xFE0F; Healing" FontSize="13"/>
+                        <TextBlock x:Name="HealingHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 hps"/>
+                        <ToggleButton x:Name="StarHps" Grid.Column="2" Style="{StaticResource StarToggle}"
+                                      Tag="hps" Click="OnStarChanged" ToolTip="Show HPS in mini dashboard"/>
+                    </Grid>
+                </Expander.Header>
+                <StackPanel>
+                    <TextBlock x:Name="HealingSummary" Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,4"/>
+                    <TextBlock x:Name="HealSpellsLabel" Text="Heals cast" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{StaticResource GoodBrush}" Visibility="Collapsed"/>
+                    <ItemsControl x:Name="HealSpellList" Margin="0,2,0,4"/>
                     <TextBlock x:Name="HealersLabel" Text="Healed by" FontSize="11" FontWeight="SemiBold"
                                Foreground="{StaticResource GoodBrush}" Visibility="Collapsed"/>
                     <ItemsControl x:Name="HealerList" Margin="0,2,0,0"/>

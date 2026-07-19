@@ -21,7 +21,7 @@ public partial class MainWindow : Window
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
 
-    private static readonly string[] MiniStatOrder = ["kills", "dps", "loot", "money", "xp", "deaths"];
+    private static readonly string[] MiniStatOrder = ["kills", "dps", "hps", "loot", "money", "xp", "deaths"];
 
     public MainWindow()
     {
@@ -60,8 +60,8 @@ public partial class MainWindow : Window
             });
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1")
-            foreach (var ex in new[] { CombatSection, KillsSection, LootSection, MoneySection,
-                         ProgressSection, FactionSection, MiscSection })
+            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
+                         MoneySection, ProgressSection, FactionSection, MiscSection })
                 ex.IsExpanded = true;
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
@@ -266,7 +266,6 @@ public partial class MainWindow : Window
                 $"In combat {(int)combatTime.TotalMinutes}m {combatTime.Seconds}s this session\n" +
                 $"Biggest hit: {s.MaxHit:N0} ({s.MaxHitDesc})\n" +
                 $"Taken {s.DamageTaken:N0} · avoided {s.AvoidedIncoming} attacks\n" +
-                $"Healing done {s.HealingDone:N0} · received {s.HealingReceived:N0}" +
                 (s.SpecialHits.Count > 0
                     ? "\n" + string.Join(" · ", s.SpecialHits.Select(x => $"{x.Name} {x.Count}"))
                     : "") +
@@ -275,6 +274,17 @@ public partial class MainWindow : Window
                 (d.Name, $"{d.Total:N0} · {d.Hits} hit{(d.Hits == 1 ? "" : "s")} · avg {(double)d.Total / d.Hits:0.#}")));
             FillList(DamageTakenList, s.DamageByAttacker.Select(d =>
                 (d.Name, $"{d.Total:N0} · {d.Hits} hit{(d.Hits == 1 ? "" : "s")} · avg {(double)d.Total / d.Hits:0.#}")));
+        }
+
+        HealingHeader.Text = s.Hps > 0 ? $"{s.Hps:0.#} hps" : $"{s.HealingDone:N0} healed";
+        if (HealingSection.IsExpanded)
+        {
+            HealingSummary.Text =
+                $"Done {s.HealingDone:N0} · received {s.HealingReceived:N0}" +
+                (s.RegenTicks > 0 ? $"\n{s.RegenTicks} regen/hymn ticks (game logs no amounts for these)" : "");
+            HealSpellsLabel.Visibility = s.HealsBySpell.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            FillList(HealSpellList, s.HealsBySpell.Select(h =>
+                (h.Name, $"{h.Total:N0} · {h.Hits} cast{(h.Hits == 1 ? "" : "s")} · avg {(double)h.Total / h.Hits:0.#}")));
             HealersLabel.Visibility = s.HealsByHealer.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             FillList(HealerList, s.HealsByHealer.Select(h =>
                 (h.Name, $"{h.Total:N0} · {h.Hits} heal{(h.Hits == 1 ? "" : "s")}")));
@@ -370,6 +380,7 @@ public partial class MainWindow : Window
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
         yield return ("dps", StarDps);
+        yield return ("hps", StarHps);
         yield return ("kills", StarKills);
         yield return ("loot", StarLoot);
         yield return ("money", StarMoney);
@@ -420,6 +431,7 @@ public partial class MainWindow : Window
             {
                 "kills" => $"\U0001F480 {s.YourKillCount}",
                 "dps" => s.CurrentDps > 0 ? $"⚔ {s.CurrentDps:0} dps" : $"⚔ {s.SessionDps:0} dps",
+                "hps" => $"✚ {s.Hps:0.#} hps",
                 "loot" => $"\U0001F392 {s.LootTotal}",
                 "money" => $"\U0001F4B0 {StatsSnapshot.FormatCoin(s.Copper)}",
                 "xp" => $"\U0001F4C8 {s.XpPercent:0.0}%" +
