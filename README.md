@@ -38,6 +38,12 @@ Log cleanup (automatic):
   for 60+ minutes (a finished play session), so files never grow across sessions.
   Cleanup runs at EQBuddy startup and every 10 minutes — but never while the game is open.
 
+Custom install locations:
+- EQBuddy finds the game via the installer's registry entry, so non-default install paths
+  are usually detected automatically. If yours isn't, **right-click the widget →
+  "Choose log folder…"** and pick the game's `Logs` folder (picking the install folder
+  itself also works). "Auto-detect log folder" reverts to automatic detection.
+
 Notes:
 - The title bar shows which character EQBuddy is following. It always tracks whoever is
   actively playing (the log file that's currently growing) and switches automatically

@@ -31,6 +31,8 @@ public partial class MainWindow : Window
         MaxHeight = SystemParameters.WorkArea.Height - 20;
         SectionScroll.MaxHeight = SystemParameters.WorkArea.Height - 160;
 
+        if (_settings.LogFolder is { } saved && !System.IO.Directory.Exists(saved))
+            _settings.LogFolder = null; // stale saved path (game moved) — re-detect
         _settings.LogFolder ??= LogWatcher.FindDefaultLogFolder();
         if (!double.IsNaN(_settings.WindowLeft)) { Left = _settings.WindowLeft; Top = _settings.WindowTop; }
         else { Left = SystemParameters.WorkArea.Right - 360; Top = 40; }
@@ -65,18 +67,50 @@ public partial class MainWindow : Window
         _uiTimer.Start();
     }
 
+    private void OnChooseLogFolder(object sender, RoutedEventArgs e)
+    {
+        var dlg = new Microsoft.Win32.OpenFolderDialog
+        {
+            Title = "Pick the EverQuest Legends Logs folder (contains eqlog_*.txt files)",
+            InitialDirectory = _settings.LogFolder is { } cur && System.IO.Directory.Exists(cur)
+                ? cur : Environment.GetFolderPath(Environment.SpecialFolder.MyComputer),
+        };
+        if (dlg.ShowDialog(this) != true) return;
+
+        var picked = dlg.FolderName;
+        // Accept the install root too — quietly step down into its Logs subfolder.
+        var logsSub = System.IO.Path.Combine(picked, "Logs");
+        if (!System.IO.Directory.EnumerateFiles(picked, "eqlog_*.txt").Any() &&
+            System.IO.Directory.Exists(logsSub))
+            picked = logsSub;
+
+        _settings.LogFolder = picked;
+        _settings.Save();
+        _lastCharScan = DateTime.MinValue;
+        FollowActiveCharacter();
+    }
+
+    private void OnAutoDetectLogFolder(object sender, RoutedEventArgs e)
+    {
+        _settings.LogFolder = LogWatcher.FindDefaultLogFolder();
+        _settings.Save();
+        _lastCharScan = DateTime.MinValue;
+        FollowActiveCharacter();
+    }
+
     /// <summary>Switch to whoever is actively playing: the most recently written log.</summary>
     private void FollowActiveCharacter()
     {
+        ChooseLogFolderItem.ToolTip = _settings.LogFolder ?? "(no folder found)";
         if (_settings.LogFolder is null)
         {
-            CharLabel.Text = "game logs not found";
+            CharLabel.Text = "logs not found — right-click, Choose log folder";
             return;
         }
         var active = LogWatcher.MostRecentlyActive(_settings.LogFolder);
         if (active is null)
         {
-            CharLabel.Text = "looking for a character…";
+            CharLabel.Text = "waiting for a character to log in…";
             return;
         }
         if (!string.Equals(active.FilePath, _watcher.CurrentPath, StringComparison.OrdinalIgnoreCase))

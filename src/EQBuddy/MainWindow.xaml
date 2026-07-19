@@ -12,6 +12,9 @@
             <ContextMenu>
                 <MenuItem x:Name="VersionMenuItem" Header="EQBuddy" IsEnabled="False"/>
                 <MenuItem Header="Check for updates" Click="OnCheckUpdates"/>
+                <Separator/>
+                <MenuItem x:Name="ChooseLogFolderItem" Header="Choose log folder…" Click="OnChooseLogFolder"/>
+                <MenuItem Header="Auto-detect log folder" Click="OnAutoDetectLogFolder"/>
             </ContextMenu>
         </Border.ContextMenu>
         <StackPanel Margin="10">
