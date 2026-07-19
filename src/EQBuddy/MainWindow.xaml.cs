@@ -39,6 +39,7 @@ public partial class MainWindow : Window
         Opacity = _settings.Opacity;
         Topmost = _settings.AlwaysOnTop;
         PinBtn.IsChecked = _settings.AlwaysOnTop;
+        ApplyUiScale(_settings.UiScale);
 
         VersionMenuItem.Header = $"EQBuddy v{UpdateChecker.CurrentVersion}";
 
@@ -75,6 +76,40 @@ public partial class MainWindow : Window
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _uiTimer.Tick += (_, _) => RefreshUi();
         _uiTimer.Start();
+    }
+
+    public double UiScale => _settings.UiScale;
+
+    public void SetUiScale(double scale)
+    {
+        _settings.UiScale = Math.Clamp(scale, 0.5, 2.0);
+        ApplyUiScale(_settings.UiScale);
+        _settings.Save();
+    }
+
+    private void ApplyUiScale(double scale) =>
+        RootBorder().LayoutTransform = Math.Abs(scale - 1.0) < 0.001
+            ? null
+            : new System.Windows.Media.ScaleTransform(scale, scale);
+
+    public void SetWindowOpacity(double opacity)
+    {
+        _settings.Opacity = Math.Clamp(opacity, 0.3, 1.0);
+        Opacity = _settings.Opacity;
+        _settings.Save();
+    }
+
+    private OptionsWindow? _optionsWindow;
+
+    private void OnOptions(object sender, RoutedEventArgs e)
+    {
+        if (_optionsWindow is { IsLoaded: true })
+        {
+            _optionsWindow.Activate();
+            return;
+        }
+        _optionsWindow = new OptionsWindow(this);
+        _optionsWindow.Show();
     }
 
     private void OnGear(object sender, RoutedEventArgs e)
@@ -200,9 +235,9 @@ public partial class MainWindow : Window
             ? $"{s.LootTotal} items (+{s.CraftedTotal} made)"
             : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
         MoneyHeader.Text = StatsSnapshot.FormatCoin(s.Copper);
-        ProgressHeader.Text = s.Levels.Count > 0
-            ? $"{s.XpPercent:0.0}% xp, +{s.Levels.Count} lvl"
-            : $"{s.XpPercent:0.0}% xp";
+        ProgressHeader.Text = $"{s.XpPercent:0.0}% xp"
+            + (s.Levels.Count > 0 ? $", +{s.Levels.Count} lvl" : "")
+            + (s.AaGained > 0 ? $", +{s.AaGained} aa" : "");
         FactionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "—";
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
 
@@ -262,6 +297,9 @@ public partial class MainWindow : Window
         {
             ProgressSummary.Text =
                 $"{s.XpTicks} xp gains · {s.XpPerHour:0.0}%/hr · {s.SkillUpTotal} skill-ups" +
+                (s.AaGained > 0
+                    ? $"\n{s.AaGained} AA point{(s.AaGained == 1 ? "" : "s")} · {s.AaPerHour:0.0} AA/hr (now {s.AaTotal} unspent)"
+                    : "") +
                 (s.HoursToLevel is { } eta ? $"\nNext level in {FormatEta(eta)} at this pace" : "") +
                 (s.Levels.Count > 0
                     ? "\n" + string.Join(", ", s.Levels.Select(l => $"{l.Text} at {l.Time:h:mm tt}"))

@@ -53,6 +53,9 @@ Notes:
   within a few seconds when you swap characters.
 - The ↻ button clears the session and starts counting from now.
 - The 📌 button toggles always-on-top. Drag anywhere on the widget to move it.
+- ⚙ (or right-click) → **Options…** has sliders for widget size (scales everything,
+  fonts included, 80–160%) and opacity — changes apply live and are remembered.
+- Loot that the game auto-sells on pickup counts as both loot and merchant income.
 - A "session" is a contiguous stretch of play. After 60+ minutes of no log activity,
   the next activity starts a fresh session automatically.
 
@@ -82,7 +85,7 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 | Kills | Your kills incl. pet (+ group kills) | Count per creature type, kills/hour, group-member kill counts |
 | Loot | Items looted (+ items made) | Every item with counts, items created by merging |
 | Money | Coin earned (p/g/s/c) | Corpse coin vs merchant-sale income, items sold with prices, biggest drop, money per hour |
-| Progress | XP % gained | XP ticks, %/hour, estimated time to next level, level-ups with times, skill-ups per skill |
+| Progress | XP % gained (+ levels, + AA) | XP ticks, %/hour, AA points gained with AA/hour, estimated time to next level, level-ups with times, skill-ups per skill |
 | Faction | Factions touched | Net standing change per faction |
 | Travels & Deaths | Death count | Each death (what killed you, when), zones visited with times |
 

@@ -14,6 +14,7 @@ public sealed class AppSettings
     public double WindowLeft { get; set; } = double.NaN;
     public double WindowTop { get; set; } = double.NaN;
     public double Opacity { get; set; } = 0.96;
+    public double UiScale { get; set; } = 1.0;
 
     private static string FilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

@@ -106,6 +106,15 @@ public static partial class LogParser
     [GeneratedRegex(@"^You gain (?<party>party )?experience!(?: \((?<pct>[\d.]+)%\))?$")]
     private static partial Regex XpRx();
 
+    // You have gained an ability point!  You now have 6 ability points.
+    [GeneratedRegex(@"^You have gained an ability point! +You now have (?<total>\d+) ability points?\.$")]
+    private static partial Regex AaRx();
+
+    // You looted a Snake Egg from an asp's corpse and sold it for 4 copper.
+    // You looted 2 Spider Silk from a giant spider's corpse and sold it for 2 gold, 8 silver and 6 copper.
+    [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and sold it for (?<coins>.+?)\.$")]
+    private static partial Regex AutoSellRx();
+
     [GeneratedRegex(@"^You have gained a level! Welcome to level (?<level>\d+)!$")]
     private static partial Regex LevelRx();
 
@@ -243,6 +252,11 @@ public static partial class LogParser
                 r.Groups["spell"].Success ? r.Groups["spell"].Value : "Unknown",
                 Outgoing: false, Healer: r.Groups["healer"].Value);
 
+        if ((r = AutoSellRx().Match(msg)).Success)
+            return new AutoSellEvent(ts, r.Groups["item"].Value,
+                r.Groups["n"].Success ? int.Parse(r.Groups["n"].Value) : 1,
+                Normalize(r.Groups["source"].Value), ParseCoins(r.Groups["coins"].Value));
+
         if ((r = LootUpgradeRx().Match(msg)).Success)
             return new LootEvent(ts, r.Groups["item"].Value, Normalize(r.Groups["source"].Value),
                 r.Groups["result"].Value);
@@ -269,6 +283,9 @@ public static partial class LogParser
 
         if ((r = LevelRx().Match(msg)).Success)
             return new LevelEvent(ts, int.Parse(r.Groups["level"].Value));
+
+        if ((r = AaRx().Match(msg)).Success)
+            return new AaEvent(ts, int.Parse(r.Groups["total"].Value));
 
         if ((r = SkillUpRx().Match(msg)).Success)
             return new SkillUpEvent(ts, r.Groups["skill"].Value, int.Parse(r.Groups["value"].Value));

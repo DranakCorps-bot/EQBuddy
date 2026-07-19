@@ -52,6 +52,7 @@ public sealed class SessionStats
 
     private double _xpPercent; private int _xpTicks;
     private double _xpSinceLevel;
+    private int _aaGained; private int _aaTotal;
     private readonly List<(DateTime Time, int Level)> _levels = new();
 
     private readonly Dictionary<string, (int Ups, int Value)> _skills = new(StringComparer.OrdinalIgnoreCase);
@@ -197,6 +198,17 @@ public sealed class SessionStats
                     _levels.Add((lv2.Time, lv2.Level));
                     _xpSinceLevel = 0;
                     break;
+                case AaEvent aa:
+                    _aaGained++; _aaTotal = aa.TotalPoints;
+                    break;
+                case AutoSellEvent asell:
+                    var lcur = _loot.TryGetValue(asell.Item, out var lval) ? lval : (0, asell.Source);
+                    _loot[asell.Item] = (lcur.Item1 + asell.Count, asell.Source);
+                    _lootCount += asell.Count;
+                    _vendorCopper += asell.Copper; _salesCount++;
+                    var scur = _soldItems.TryGetValue(asell.Item, out var sval) ? sval : (0, 0L);
+                    _soldItems[asell.Item] = (scur.Item1 + asell.Count, scur.Item2 + asell.Copper);
+                    break;
                 case SkillUpEvent su:
                     var sk = _skills.TryGetValue(su.Skill, out var skv) ? skv : (0, 0);
                     _skills[su.Skill] = (sk.Item1 + 1, Math.Max(sk.Item2, su.Value));
@@ -299,6 +311,7 @@ public sealed class SessionStats
         _copper = 0; _coinDrops = 0; _biggestDrop = 0;
         _vendorCopper = 0; _salesCount = 0; _soldItems.Clear();
         _xpPercent = 0; _xpTicks = 0; _xpSinceLevel = 0; _levels.Clear();
+        _aaGained = 0; _aaTotal = 0;
         _skills.Clear(); _faction.Clear(); _zones.Clear();
         _fizzles = 0; _resists = 0;
         _closedCombatSeconds = 0; _closedCombatDamage = 0;
@@ -390,6 +403,9 @@ public sealed class SessionStats
                 HoursToLevel = _xpPercent / hours > 0.05
                     ? Math.Max(0, 100 - Math.Min(_xpSinceLevel, 100)) / (_xpPercent / hours)
                     : null,
+                AaGained = _aaGained,
+                AaTotal = _aaTotal,
+                AaPerHour = _aaGained / hours,
                 Levels = _levels.Select(l => new TimedDetail(l.Time, $"Level {l.Level}")).ToList(),
                 SkillUps = _skills.OrderByDescending(kv => kv.Value.Ups)
                     .Select(kv => new SkillDetail(kv.Key, kv.Value.Ups, kv.Value.Value)).ToList(),
@@ -461,6 +477,9 @@ public sealed class StatsSnapshot
     public double XpPerHour { get; init; }
     /// <summary>Estimated hours to next level at this session's XP rate; null when the rate is negligible. Exact when a level-up was seen this session, otherwise an upper bound.</summary>
     public double? HoursToLevel { get; init; }
+    public int AaGained { get; init; }
+    public int AaTotal { get; init; }
+    public double AaPerHour { get; init; }
     public List<TimedDetail> Levels { get; init; } = [];
     public List<SkillDetail> SkillUps { get; init; } = [];
     public int SkillUpTotal { get; init; }

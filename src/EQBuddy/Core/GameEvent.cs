@@ -16,6 +16,10 @@ public record LootEvent(DateTime Time, string Item, string Source, string? Upgra
 /// <summary>Vendor=true means a merchant sale (Item = what was sold); otherwise corpse coin or split.</summary>
 public record MoneyEvent(DateTime Time, long Copper, bool Vendor = false, string? Item = null) : GameEvent(Time);
 public record XpEvent(DateTime Time, double Percent, bool Party) : GameEvent(Time);
+/// <summary>"You have gained an ability point!  You now have N ability points."</summary>
+public record AaEvent(DateTime Time, int TotalPoints) : GameEvent(Time);
+/// <summary>Loot auto-sold on pickup: counts as loot AND vendor income.</summary>
+public record AutoSellEvent(DateTime Time, string Item, int Count, string Source, long Copper) : GameEvent(Time);
 public record LevelEvent(DateTime Time, int Level) : GameEvent(Time);
 public record SkillUpEvent(DateTime Time, string Skill, int Value) : GameEvent(Time);
 public record FactionEvent(DateTime Time, string Faction, int Delta) : GameEvent(Time);
