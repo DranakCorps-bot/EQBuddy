@@ -26,10 +26,21 @@
                     ValueChanged="OnScaleChanged"/>
 
             <Grid>
-                <TextBlock Text="Opacity" FontSize="12"/>
+                <TextBlock Text="Background see-through" FontSize="12"/>
+                <TextBlock x:Name="BgOpacityLabel" Text="95%" FontSize="12" HorizontalAlignment="Right"
+                           Foreground="{StaticResource AccentBrush}"/>
+            </Grid>
+            <TextBlock Text="Only the dark panel fades — text stays sharp." Style="{StaticResource Dim}"/>
+            <Slider x:Name="BgOpacitySlider" Minimum="0.15" Maximum="1.0" TickFrequency="0.05"
+                    IsSnapToTickEnabled="True" Margin="0,4,0,12"
+                    ValueChanged="OnBgOpacityChanged"/>
+
+            <Grid>
+                <TextBlock Text="Whole-widget opacity" FontSize="12"/>
                 <TextBlock x:Name="OpacityLabel" Text="96%" FontSize="12" HorizontalAlignment="Right"
                            Foreground="{StaticResource AccentBrush}"/>
             </Grid>
+            <TextBlock Text="Fades everything, text included." Style="{StaticResource Dim}"/>
             <Slider x:Name="OpacitySlider" Minimum="0.5" Maximum="1.0" TickFrequency="0.02"
                     IsSnapToTickEnabled="True" Margin="0,4,0,4"
                     ValueChanged="OnOpacityChanged"/>

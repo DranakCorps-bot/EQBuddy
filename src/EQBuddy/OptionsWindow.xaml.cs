@@ -15,6 +15,7 @@ public partial class OptionsWindow : Window
         Owner = main;
         ScaleSlider.Value = main.UiScale;
         OpacitySlider.Value = main.Opacity;
+        BgOpacitySlider.Value = main.BackgroundOpacityValue;
         UpdateLabels();
         _ready = true;
     }
@@ -23,6 +24,14 @@ public partial class OptionsWindow : Window
     {
         ScaleLabel.Text = $"{ScaleSlider.Value:P0}";
         OpacityLabel.Text = $"{OpacitySlider.Value:P0}";
+        BgOpacityLabel.Text = $"{BgOpacitySlider.Value:P0}";
+    }
+
+    private void OnBgOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_ready) return;
+        _main.SetBackgroundOpacity(BgOpacitySlider.Value);
+        UpdateLabels();
     }
 
     private void OnScaleChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

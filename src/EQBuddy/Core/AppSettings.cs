@@ -15,6 +15,8 @@ public sealed class AppSettings
     public double WindowTop { get; set; } = double.NaN;
     public double Opacity { get; set; } = 0.96;
     public double UiScale { get; set; } = 1.0;
+    /// <summary>Opacity of the widget's background panel only — text stays fully opaque.</summary>
+    public double BackgroundOpacity { get; set; } = 0.95;
 
     private static string FilePath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

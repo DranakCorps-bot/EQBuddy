@@ -40,6 +40,7 @@ public partial class MainWindow : Window
         Topmost = _settings.AlwaysOnTop;
         PinBtn.IsChecked = _settings.AlwaysOnTop;
         ApplyUiScale(_settings.UiScale);
+        ApplyBackgroundOpacity(_settings.BackgroundOpacity);
 
         VersionMenuItem.Header = $"EQBuddy v{UpdateChecker.CurrentVersion}";
 
@@ -98,6 +99,19 @@ public partial class MainWindow : Window
         Opacity = _settings.Opacity;
         _settings.Save();
     }
+
+    public double BackgroundOpacityValue => _settings.BackgroundOpacity;
+
+    public void SetBackgroundOpacity(double opacity)
+    {
+        _settings.BackgroundOpacity = Math.Clamp(opacity, 0.15, 1.0);
+        ApplyBackgroundOpacity(_settings.BackgroundOpacity);
+        _settings.Save();
+    }
+
+    private void ApplyBackgroundOpacity(double opacity) =>
+        RootBorder().Background = new SolidColorBrush(
+            Color.FromArgb((byte)(opacity * 255), 0x1C, 0x19, 0x17));
 
     private OptionsWindow? _optionsWindow;
 

@@ -54,7 +54,9 @@ Notes:
 - The ↻ button clears the session and starts counting from now.
 - The 📌 button toggles always-on-top. Drag anywhere on the widget to move it.
 - ⚙ (or right-click) → **Options…** has sliders for widget size (scales everything,
-  fonts included, 80–160%) and opacity — changes apply live and are remembered.
+  fonts included, 80–160%), background see-through (only the dark panel fades — text
+  stays sharp so you can watch the game through the widget), and whole-widget opacity.
+  Changes apply live and are remembered.
 - Loot that the game auto-sells on pickup counts as both loot and merchant income.
 - A "session" is a contiguous stretch of play. After 60+ minutes of no log activity,
   the next activity starts a fresh session automatically.
