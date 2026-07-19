@@ -92,19 +92,7 @@ internal static class AppTheme
         Foreground = AccentBrush,
     };
 
-    public static Expander Section(Control header, Control content) => new()
-    {
-        Header = header,
-        Content = new Border
-        {
-            Padding = new Thickness(10, 0, 10, 8),
-            Child = content,
-        },
-        Background = PanelBrush,
-        Foreground = TextBrush,
-        Margin = new Thickness(0, 2, 0, 0),
-        Padding = new Thickness(10, 7),
-    };
+    public static SectionPanel Section(Control header, Control content) => new(header, content);
 
     public static TextBlock Heading(string text, IBrush? brush = null) => new()
     {
@@ -115,4 +103,73 @@ internal static class AppTheme
     };
 
     public static IBrush Brush(string color) => new SolidColorBrush(Color.Parse(color));
+}
+
+internal sealed class SectionPanel : Border
+{
+    private readonly Border _body;
+    private readonly TextBlock _chevron;
+
+    public bool IsExpanded
+    {
+        get => _body.IsVisible;
+        set
+        {
+            _body.IsVisible = value;
+            _chevron.Text = value ? "v" : ">";
+        }
+    }
+
+    public SectionPanel(Control header, Control content)
+    {
+        Background = AppTheme.PanelBrush;
+        CornerRadius = new CornerRadius(6);
+        Margin = new Thickness(0, 2, 0, 0);
+
+        _chevron = new TextBlock
+        {
+            Text = ">",
+            Foreground = AppTheme.DimBrush,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(6, 0, 0, 0),
+        };
+
+        var headerGrid = new Grid();
+        headerGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+        headerGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+        headerGrid.Children.Add(header);
+        Grid.SetColumn(_chevron, 1);
+        headerGrid.Children.Add(_chevron);
+
+        var headerBorder = new Border
+        {
+            Background = Brushes.Transparent,
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(10, 7),
+            Cursor = new Cursor(StandardCursorType.Hand),
+            Child = headerGrid,
+        };
+        headerBorder.PointerPressed += (_, args) =>
+        {
+            if (args.Source is Button or ToggleButton) return;
+            IsExpanded = !IsExpanded;
+            args.Handled = true;
+        };
+
+        _body = new Border
+        {
+            Padding = new Thickness(10, 0, 10, 8),
+            Child = content,
+            IsVisible = false,
+        };
+
+        Child = new StackPanel
+        {
+            Children =
+            {
+                headerBorder,
+                _body,
+            },
+        };
+    }
 }

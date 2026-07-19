@@ -68,7 +68,7 @@ public sealed class MainWindow : Window
     private readonly ToggleButton _pinBtn = AppTheme.IconToggle("P", "Always on top");
     private readonly Button _gearBtn = AppTheme.IconButton("...", "Settings");
     private readonly Dictionary<string, ToggleButton> _stars = new();
-    private readonly List<Expander> _sections = new();
+    private readonly List<SectionPanel> _sections = new();
     private TextBlock _dmgOutSortTotal = null!;
     private TextBlock _dmgOutSortHits = null!;
     private TextBlock _dmgOutSortAvg = null!;
@@ -292,7 +292,7 @@ public sealed class MainWindow : Window
         panel.Children.Add(TrackSection(AppTheme.Section(Header(title, value, star), content)));
     }
 
-    private Expander TrackSection(Expander section)
+    private SectionPanel TrackSection(SectionPanel section)
     {
         _sections.Add(section);
         return section;
