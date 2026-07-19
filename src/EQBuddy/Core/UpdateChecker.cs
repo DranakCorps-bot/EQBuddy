@@ -34,7 +34,8 @@ public static class UpdateChecker
     {
         get
         {
-            var v = Assembly.GetExecutingAssembly().GetName().Version ?? new Version(0, 0, 0);
+            var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+            var v = assembly.GetName().Version ?? new Version(0, 0, 0);
             return Normalize(v);
         }
     }
