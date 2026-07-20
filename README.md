@@ -64,7 +64,8 @@ Notes:
   actively playing (the log file that's currently growing) and switches automatically
   within a few seconds when you swap characters.
 - The ↻ button clears the session and starts counting from now.
-- The 📌 button toggles always-on-top. Drag anywhere on the widget to move it.
+- The widget always stays on top of the game. Drag anywhere on it to move it;
+  its position is remembered.
 - ⚙ (or right-click) → **Options…** has sliders for widget size (scales everything,
   fonts included, 80–160%), background see-through (only the dark panel fades — text
   stays sharp so you can watch the game through the widget), and whole-widget opacity.

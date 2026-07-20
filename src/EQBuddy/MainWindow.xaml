@@ -65,14 +65,11 @@
                            ToolTip="Follows whoever is actively playing (log file growth)"/>
                 <Button x:Name="GearBtn" Grid.Column="2" Style="{StaticResource IconButton}"
                         Content="&#x2699;&#xFE0F;" ToolTip="Settings" Click="OnGear"/>
-                <ToggleButton x:Name="PinBtn" Grid.Column="3" Style="{StaticResource IconToggle}"
-                              Content="&#x1F4CC;" ToolTip="Always on top" IsChecked="True"
-                              Checked="OnPinChanged" Unchecked="OnPinChanged"/>
-                <Button Grid.Column="4" Style="{StaticResource IconButton}" Content="&#x21BB;"
+                <Button Grid.Column="3" Style="{StaticResource IconButton}" Content="&#x21BB;"
                         ToolTip="Reset session stats" Click="OnReset"/>
-                <Button Grid.Column="5" Style="{StaticResource IconButton}" Content="&#x2013;"
+                <Button Grid.Column="4" Style="{StaticResource IconButton}" Content="&#x2013;"
                         ToolTip="Minimize to dashboard (starred stats only)" Click="OnMinimize"/>
-                <Button Grid.Column="6" Style="{StaticResource IconButton}" Content="&#x2715;"
+                <Button Grid.Column="5" Style="{StaticResource IconButton}" Content="&#x2715;"
                         ToolTip="Close" Click="OnClose"/>
             </Grid>
 

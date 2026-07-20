@@ -42,8 +42,7 @@ public partial class MainWindow : Window
         if (!double.IsNaN(_settings.WindowLeft)) { Left = _settings.WindowLeft; Top = _settings.WindowTop; }
         else { Left = SystemParameters.WorkArea.Right - 360; Top = 40; }
         Opacity = _settings.Opacity;
-        Topmost = _settings.AlwaysOnTop;
-        PinBtn.IsChecked = _settings.AlwaysOnTop;
+        Topmost = true;
         ApplyUiScale(_settings.UiScale);
         ApplyBackgroundOpacity(_settings.BackgroundOpacity);
 
@@ -649,13 +648,6 @@ public partial class MainWindow : Window
             return;
         }
         if (e.ButtonState == MouseButtonState.Pressed) DragMove();
-    }
-
-    private void OnPinChanged(object sender, RoutedEventArgs e)
-    {
-        Topmost = PinBtn.IsChecked == true;
-        _settings.AlwaysOnTop = Topmost;
-        _settings.Save();
     }
 
     private void OnReset(object sender, RoutedEventArgs e) => _stats.Reset();
