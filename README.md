@@ -126,3 +126,8 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 Log folder auto-detected at
 `C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs`
 (`eqlog_<Character>_<server>.txt`).
+
+## License
+
+MIT — see [LICENSE](LICENSE). Contributions welcome; parser fixes go fastest when the
+issue or PR includes the raw log lines involved.
