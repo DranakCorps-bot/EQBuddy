@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj" />
+    <Project Path="src/EQBuddy.Core/EQBuddy.Core.csproj" />
+    <Project Path="src/EQBuddy/EQBuddy.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EQBuddy.Tests/EQBuddy.Tests.csproj" />
+  </Folder>
+</Solution>
