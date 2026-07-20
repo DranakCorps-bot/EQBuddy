@@ -7,8 +7,4 @@
     <RootNamespace>EQBuddy.Core</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="..\EQBuddy\Core\**\*.cs" Link="Core\%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
-
 </Project>

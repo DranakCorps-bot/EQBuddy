@@ -113,12 +113,11 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 - `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10). Build:
   `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
 - `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
-  The existing Core source files still live under `src/EQBuddy/Core` so the diff stays
-  easy to review; both UI projects consume them through this project.
-- `src/EQBuddy/Core/LogParser.cs` — one regex per log-line type; add new patterns here.
-- `src/EQBuddy/Core/SessionStats.cs` — aggregation + DPS fight tracking + session rollover.
-- `src/EQBuddy/Core/LogWatcher.cs` — file tailing (500 ms polls, offset-based, truncation-safe).
-- `src/EQBuddy/Core/EqConfig.cs` — log hygiene: forces `Log=1` in eqclient.ini and truncates
+  Both UI projects reference this; UI-independent code goes here.
+- `src/EQBuddy.Core/LogParser.cs` — one regex per log-line type; add new patterns here.
+- `src/EQBuddy.Core/SessionStats.cs` — aggregation + DPS fight tracking + session rollover.
+- `src/EQBuddy.Core/LogWatcher.cs` — file tailing (500 ms polls, offset-based, truncation-safe).
+- `src/EQBuddy.Core/EqConfig.cs` — log hygiene: forces `Log=1` in eqclient.ini and truncates
   stale (60+ min quiet) logs; both are skipped while `eqgame.exe` is running.
 - Publish: `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o dist/publish`
 - Release: `scripts\release.ps1` — reads the version from the csproj, publishes, signs both
