@@ -72,9 +72,9 @@ Encounters, mob farming, and stances:
 - Combat shows your **recent fights** (creature, duration, per-fight DPS) and, when your
   class uses stances, a **By stance** breakdown of damage, combat time, and DPS with the
   current stance named in the summary.
-- Kills shows **per-creature farming**: average fight length, coin, and XP per creature.
-  Session history adds **observed personal drop rates** — always with the kill count
-  shown as the denominator (these are your rates, not the game's).
+- Kills shows **per-creature farming**: average fight length, coin, and XP per creature,
+  plus each creature's observed drops with your personal drop % (the History window
+  shows the full x/y kill counts behind each rate — these are your rates, not the game's).
 - Watch rules aren't just loot anymore: a rule can watch **Loot, Kills (creature name),
   Skill-ups, Deaths, or Milestones** (levels/AA) — same counters, chips, and alerts.
 - History window: **Ctrl-click two sessions to compare** their rates side-by-side, and
@@ -146,7 +146,7 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 |---|---|---|
 | Combat | Session DPS (+ live fight DPS) | Damage per attack/spell/song with totals, hit counts and averages (sortable by total/hits/avg); crit rate, accuracy, melee avoidance %, biggest hit, time in combat, damage taken per mob, fizzles/resists |
 | Healing | HPS (healing ÷ time in combat) | Healing done and received, heals cast per spell with totals/casts/averages, who healed you, hymn/regen tick counts (the log gives no amounts for those) |
-| Kills | Your kills incl. pet (+ group kills) | Count per creature type, kills/hour, group-member kill counts; per-creature farming: avg fight length, coin, XP, and observed drops with your personal rate (e.g. `×2 · 2/9 kills`) |
+| Kills | Your kills incl. pet (+ group kills) | Count per creature type, kills/hour, group-member kill counts; per-creature farming: avg fight length, coin, XP, and observed drops with your personal rate (e.g. `×2 · 22%`) |
 | Loot | Items looted (+ items made) | Every item with counts, items created by merging |
 | Money | Coin earned (p/g/s/c) | Corpse coin vs merchant-sale income, items sold with prices, biggest drop, money per hour |
 | Progress | XP % gained (+ levels, + AA) | XP ticks, %/hour, AA points gained with AA/hour, estimated time to next level, level-ups with times, skill-ups per skill |

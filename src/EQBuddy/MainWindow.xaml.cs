@@ -410,7 +410,8 @@ public partial class MainWindow : Window
                 farmRows.Add((m.Name,
                     $"avg {m.AvgFightSeconds:0}s · {StatsSnapshot.FormatCoin(m.Copper)} · {m.XpPercent:0.0}% xp"));
                 foreach (var l in m.Loot)
-                    farmRows.Add(($"      {l.Item}", $"×{l.Count} · {l.Count}/{m.Kills} kills"));
+                    farmRows.Add(($"      {l.Item}",
+                        l.DropRatePct is { } pct ? $"×{l.Count} · {pct:0}%" : $"×{l.Count}"));
             }
             FillList(FarmingList, farmRows);
             var showParty = s.PartyKillsByKiller.Count > 0;
