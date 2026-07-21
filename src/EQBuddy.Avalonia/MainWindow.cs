@@ -81,8 +81,8 @@ public sealed class MainWindow : Window
     private readonly ItemsControl _farmingList = new();
     private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
     private readonly ItemsControl _markerList = new();
-    private readonly Button _gearBtn = AppTheme.IconButton("...", "Settings");
-    private readonly Dictionary<string, ToggleButton> _stars = new();
+    private readonly Button _gearBtn = AppTheme.IconButton(AppIcon.Settings, "Settings");
+    private readonly Dictionary<string, Button> _stars = new();
     private readonly Dictionary<string, SectionPanel> _sections = new(StringComparer.OrdinalIgnoreCase);
     private readonly StackPanel _sectionsPanel = new();
     private TextBlock _dmgOutSortTotal = null!;
@@ -134,8 +134,6 @@ public sealed class MainWindow : Window
         RestorePosition();
         ApplyUiScale(_settings.UiScale);
         ApplyBackgroundOpacity(_settings.BackgroundOpacity);
-        foreach (var (key, star) in _stars)
-            star.IsChecked = _settings.MiniStats.Contains(key);
         UpdateStarVisuals();
         ApplySectionLayout();
         SetMode(_settings.Minimized);
@@ -247,12 +245,12 @@ public sealed class MainWindow : Window
         _miniRoot.Children.Add(_miniDot);
         Grid.SetColumn(_miniChips, 1);
         _miniRoot.Children.Add(_miniChips);
-        var restore = AppTheme.IconButton("[]", "Expand");
+        var restore = AppTheme.IconButton(AppIcon.Expand, "Expand");
         restore.Click += (_, _) => SetMode(false);
         restore.Margin = new Thickness(8, 0, 0, 0);
         Grid.SetColumn(restore, 2);
         _miniRoot.Children.Add(restore);
-        var close = AppTheme.IconButton("x", "Close");
+        var close = AppTheme.IconButton(AppIcon.Close, "Close");
         close.Click += (_, _) => Close();
         Grid.SetColumn(close, 3);
         _miniRoot.Children.Add(close);
@@ -302,15 +300,15 @@ public sealed class MainWindow : Window
         _gearBtn.Click += OnGear;
         Grid.SetColumn(_gearBtn, 2);
         grid.Children.Add(_gearBtn);
-        var reset = AppTheme.IconButton("R", "Reset session stats");
+        var reset = AppTheme.IconButton(AppIcon.Refresh, "Reset session stats");
         reset.Click += (_, _) => _stats.Reset();
         Grid.SetColumn(reset, 3);
         grid.Children.Add(reset);
-        var mini = AppTheme.IconButton("-", "Minimize to dashboard");
+        var mini = AppTheme.IconButton(AppIcon.Minimize, "Minimize to dashboard");
         mini.Click += (_, _) => SetMode(true);
         Grid.SetColumn(mini, 4);
         grid.Children.Add(mini);
-        var close = AppTheme.IconButton("x", "Close");
+        var close = AppTheme.IconButton(AppIcon.Close, "Close");
         close.Click += (_, _) => Close();
         Grid.SetColumn(close, 5);
         grid.Children.Add(close);
@@ -344,13 +342,13 @@ public sealed class MainWindow : Window
 
     private void AddSection(string sectionKey, string starKey, string title, TextBlock value, Control content, string tip)
     {
-        var star = AppTheme.StarToggle(starKey, tip);
+        var star = AppTheme.StarButton(starKey, tip);
         star.Click += OnStarChanged;
         _stars[starKey] = star;
         _sections[sectionKey] = AppTheme.Section(Header(title, value, star), content);
     }
 
-    private static Grid Header(string title, TextBlock value, ToggleButton? star = null)
+    private static Grid Header(string title, TextBlock value, Button? star = null)
     {
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
@@ -1010,15 +1008,15 @@ public sealed class MainWindow : Window
 
     private void OnStarChanged(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
-        var btn = (ToggleButton)sender!;
+        var btn = (Button)sender!;
         var key = (string)btn.Tag!;
-        if (btn.IsChecked == true)
+        if (_settings.MiniStats.Contains(key))
         {
-            if (!_settings.MiniStats.Contains(key)) _settings.MiniStats.Add(key);
+            _settings.MiniStats.Remove(key);
         }
         else
         {
-            _settings.MiniStats.Remove(key);
+            _settings.MiniStats.Add(key);
         }
         UpdateStarVisuals();
         _settings.Save();
@@ -1028,8 +1026,8 @@ public sealed class MainWindow : Window
     {
         foreach (var star in _stars.Values)
         {
-            star.Content = star.IsChecked == true ? "*" : "☆";
-            star.Foreground = star.IsChecked == true ? AppTheme.AccentBrush : AppTheme.DimBrush;
+            var isSelected = _settings.MiniStats.Contains((string)star.Tag!);
+            star.Content = AppTheme.Icon(isSelected ? AppIcon.StarFilled : AppIcon.Star, isSelected ? AppTheme.AccentBrush : AppTheme.DimBrush, 13);
         }
     }
 
