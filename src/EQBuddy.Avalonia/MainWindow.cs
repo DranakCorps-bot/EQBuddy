@@ -100,6 +100,8 @@ public sealed class MainWindow : Window
     private UpdateInfo? _pendingUpdate;
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
+    private bool _clickThrough;
+    private X11HotkeyService? _hotkeys;
     private HistoryWindow? _historyWindow;
     private OptionsWindow? _optionsWindow;
     private StatSort _dmgOutSort = StatSort.Total;
@@ -152,6 +154,7 @@ public sealed class MainWindow : Window
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _uiTimer.Tick += (_, _) => RefreshUi();
         _uiTimer.Start();
+        Loaded += (_, _) => RegisterGlobalHotkeys();
     }
 
     public double UiScale => _settings.UiScale;
@@ -870,6 +873,7 @@ public sealed class MainWindow : Window
         _settings.Minimized = mini;
         _miniRoot.IsVisible = mini;
         _normalRoot.IsVisible = !mini;
+        Topmost = true;
         _settings.Save();
         if (mini) UpdateMiniChips(CurrentSnapshot());
     }
@@ -955,6 +959,51 @@ public sealed class MainWindow : Window
         var s = CurrentSnapshot();
         _stats.AddMarker($"Marker {s.Markers.Count + 1}" +
             (s.CurrentZone.Length > 0 ? $" - {s.CurrentZone}" : ""));
+    }
+
+    private void RegisterGlobalHotkeys()
+    {
+        if (_hotkeys is not null) return;
+        try
+        {
+            _hotkeys = new X11HotkeyService(
+            [
+                (_settings.HotkeyToggleOverlay, ToggleOverlayVisibility),
+                (_settings.HotkeyClickThrough, ToggleClickThrough),
+                (_settings.HotkeyMiniMode, () => SetMode(!_settings.Minimized)),
+                (_settings.HotkeyCampMarker, DropCampMarker),
+            ]);
+        }
+        catch (Exception ex)
+        {
+            App.LogError($"Global hotkeys disabled: {ex.Message}");
+        }
+    }
+
+    private void ToggleOverlayVisibility()
+    {
+        if (IsVisible)
+        {
+            Hide();
+        }
+        else
+        {
+            Show();
+            Topmost = true;
+            Activate();
+        }
+    }
+
+    private void ToggleClickThrough()
+    {
+        var next = !_clickThrough;
+        if (!X11ClickThrough.Set(this, next)) return;
+        _clickThrough = next;
+        _root.BorderBrush = _clickThrough ? AppTheme.WarnBrush : AppTheme.BorderBrush;
+        Topmost = true;
+        ToolTip.SetTip(_root, _clickThrough
+            ? $"Click-through ON - press {_settings.HotkeyClickThrough} to interact again"
+            : null);
     }
 
     private void OnGear(object? sender, EventArgs e) => _root.ContextMenu?.Open(_root);
@@ -1193,6 +1242,9 @@ public sealed class MainWindow : Window
         _settings.WindowLeft = Position.X;
         _settings.WindowTop = Position.Y;
         _settings.Save();
+        if (_clickThrough)
+            X11ClickThrough.Set(this, enabled: false);
+        _hotkeys?.Dispose();
         _archiver.FinalizeActiveSync(CurrentSnapshot(), "ApplicationExit");
         _watcher.Dispose();
         _repo.Dispose();
