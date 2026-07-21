@@ -130,7 +130,8 @@
                         <TextBlock Text="Damage by attack" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <TextBlock Text="sort:" FontSize="10" Foreground="{StaticResource DimBrush}" Margin="0,0,4,0"/>
-                            <TextBlock x:Name="DmgOutSortTotal" Text="total" FontSize="10" Cursor="Hand" Tag="total"
+                            <TextBlock x:Name="DmgOutSortTotal" Text="dps" FontSize="10" Cursor="Hand" Tag="total"
+                                       ToolTip="Sort by damage share (same order as total damage)"
                                        Foreground="{StaticResource AccentBrush}" MouseLeftButtonDown="OnSortDmgOut"/>
                             <TextBlock x:Name="DmgOutSortHits" Text="hits" FontSize="10" Cursor="Hand" Tag="hits" Margin="6,0,0,0"
                                        Foreground="{StaticResource DimBrush}" MouseLeftButtonDown="OnSortDmgOut"/>

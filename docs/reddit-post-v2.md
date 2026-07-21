@@ -86,7 +86,7 @@ Per-section gallery (for an album or comment thread):
 
 | File | Caption suggestion |
 |---|---|
-| `section-combat.png` | Combat: session + last-15m DPS, crit/accuracy/avoidance, damage by attack incl. pets, damage taken per mob, recent fights, stance breakdown |
+| `section-combat.png` | Combat: Details!-style damage breakdown (share bars, per-ability DPS and crit %), damage taken per mob, recent fights, stance breakdown |
 | `section-healing.png` | Healing: HPS, heals cast per spell with averages, who healed you, regen/hymn tick counts |
 | `section-kills-loot.png` | Kills: per-creature counts and kills/hour, farming stats with observed drop % per item |
 | `section-loot.png` | Loot: every item with counts, plus items created by merging |

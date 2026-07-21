@@ -31,7 +31,7 @@ public sealed class SessionStats
     private long _damageDealt, _meleeDamage, _spellDamage;
     private int _hitCount, _critCount, _missCount;
     private int _maxHit; private string _maxHitDesc = "";
-    private readonly Dictionary<string, (int Count, long Total)> _damageBySource = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, (int Count, long Total, int Crits)> _damageBySource = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, int> _specialHits = new(StringComparer.OrdinalIgnoreCase);
 
     private long _damageTaken;
@@ -228,8 +228,9 @@ public sealed class SessionStats
                             Bump(_specialHits, note);
                     }
                     if (dd.Amount > _maxHit) { _maxHit = dd.Amount; _maxHitDesc = $"{dd.Source} on {dd.Target}"; }
-                    var src = _damageBySource.TryGetValue(dd.Source, out var s) ? s : (0, 0L);
-                    _damageBySource[dd.Source] = (src.Item1 + 1, src.Item2 + dd.Amount);
+                    var src = _damageBySource.TryGetValue(dd.Source, out var s) ? s : default;
+                    _damageBySource[dd.Source] =
+                        (src.Count + 1, src.Total + dd.Amount, src.Crits + (dd.Critical ? 1 : 0));
                     TrackCombat(dd.Time, dd.Amount);
                     TouchFight(dd.Target, dd.Time, dmgOut: dd.Amount);
                     if (_currentStance is { } st1)
@@ -387,8 +388,9 @@ public sealed class SessionStats
         if (_damageBySource.Remove($"Pet? ({name})", out var provisional))
         {
             var label = $"Pet ({name})";
-            var cur = _damageBySource.TryGetValue(label, out var c) ? c : (0, 0L);
-            _damageBySource[label] = (cur.Item1 + provisional.Count, cur.Item2 + provisional.Total);
+            var cur = _damageBySource.TryGetValue(label, out var c) ? c : default;
+            _damageBySource[label] = (cur.Count + provisional.Count,
+                cur.Total + provisional.Total, cur.Crits + provisional.Crits);
         }
     }
 
@@ -400,8 +402,9 @@ public sealed class SessionStats
         if (kind == DamageKind.Melee) _meleeDamage += amount; else _spellDamage += amount;
         var label = _petConfirmed ? $"Pet ({_petName})" : $"Pet? ({_petName})";
         if (amount > _maxHit) { _maxHit = amount; _maxHitDesc = $"{label} on {target}"; }
-        var src = _damageBySource.TryGetValue(label, out var s) ? s : (0, 0L);
-        _damageBySource[label] = (src.Item1 + 1, src.Item2 + amount);
+        // Pet crit annotations aren't in third-party log lines, so pet crits stay 0.
+        var src = _damageBySource.TryGetValue(label, out var s) ? s : default;
+        _damageBySource[label] = (src.Count + 1, src.Total + amount, src.Crits);
         TrackCombat(t, amount);
         TouchFight(target, t, dmgOut: amount);
     }
@@ -683,7 +686,8 @@ public sealed class SessionStats
                 MaxHit = _maxHit,
                 MaxHitDesc = _maxHitDesc,
                 DamageBySource = _damageBySource.OrderByDescending(kv => kv.Value.Total)
-                    .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total)).ToList(),
+                    .Select(kv => new SourceDamage(kv.Key, kv.Value.Count, kv.Value.Total,
+                        kv.Value.Crits)).ToList(),
                 SpecialHits = _specialHits.OrderByDescending(kv => kv.Value)
                     .Select(kv => new NameCount(kv.Key, kv.Value)).ToList(),
                 SessionDps = sessionDps,
@@ -777,7 +781,7 @@ public record NameCount(string Name, int Count);
 public record RecentRates(TimeSpan Window, bool HasFullWindow, double XpPercent, double XpPerHour,
     int Kills, long Copper, double Dps, double Hps);
 public record TimedDetail(DateTime Time, string Text);
-public record SourceDamage(string Name, int Hits, long Total);
+public record SourceDamage(string Name, int Hits, long Total, int Crits = 0);
 public record LootDetail(string Item, int Count, string LastSource);
 public record SkillDetail(string Skill, int Ups, int Value);
 public record SoldDetail(string Item, int Count, long Copper);

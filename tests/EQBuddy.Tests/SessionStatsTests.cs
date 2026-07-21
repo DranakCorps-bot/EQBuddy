@@ -158,6 +158,18 @@ public class SessionStatsTests
     }
 
     [Fact]
+    public void DamageBySourceTracksPerSourceCrits()
+    {
+        var s = Replay("Kaybek",
+            At(0, 0, "You slash orc pawn for 10 points of damage. (Critical)"),
+            At(0, 1, "You slash orc pawn for 10 points of damage."),
+            At(0, 2, "You kick orc pawn for 5 points of damage.")).Snapshot();
+        var slash = s.DamageBySource.Single(d => d.Name == "Slash");
+        Assert.Equal((2, 1), (slash.Hits, slash.Crits));
+        Assert.Equal(0, s.DamageBySource.Single(d => d.Name == "Kick").Crits);
+    }
+
+    [Fact]
     public void AutoSellCountsAsLootAndVendorIncome()
     {
         var s = Replay("Douglas",

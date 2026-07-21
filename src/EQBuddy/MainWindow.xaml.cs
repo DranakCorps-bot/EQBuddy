@@ -369,7 +369,7 @@ public partial class MainWindow : Window
                     : "") +
                 (s.Fizzles + s.Resists > 0 ? $"\nFizzles {s.Fizzles} · resists {s.Resists}" : "") +
                 (s.CurrentStance.Length > 0 ? $"\nStance: {s.CurrentStance}" : "");
-            FillStatList(DamageSourceList, s.DamageBySource, _dmgOutSort, "hit");
+            FillDamageBreakdown(DamageSourceList, s.DamageBySource, _dmgOutSort, s.CombatSeconds);
             FillStatList(DamageTakenList, s.DamageByAttacker, _dmgInSort, "hit");
             RecentFightsLabel.Visibility = s.RecentEncounters.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             FillList(RecentFightsList, s.RecentEncounters.Select(f =>
@@ -867,6 +867,62 @@ public partial class MainWindow : Window
                 });
             }
         });
+    }
+
+    /// <summary>Details!-style damage breakdown: proportional share bar behind each row,
+    /// "% of total · per-source dps · crit%" up front; total/hits/avg in the tooltip.</summary>
+    private void FillDamageBreakdown(ItemsControl list, IEnumerable<SourceDamage> stats,
+        StatSort sort, double combatSeconds)
+    {
+        var sorted = (sort switch
+        {
+            StatSort.Hits => stats.OrderByDescending(d => d.Hits),
+            StatSort.Avg => stats.OrderByDescending(d => (double)d.Total / d.Hits),
+            _ => stats.OrderByDescending(d => d.Total),
+        }).ToList();
+        list.Items.Clear();
+        if (sorted.Count == 0) return;
+        var grand = Math.Max(1, sorted.Sum(d => d.Total));
+        var top = Math.Max(1, sorted.Max(d => d.Total));
+        var secs = Math.Max(1, combatSeconds);
+        var accent = ((SolidColorBrush)FindResource("AccentBrush")).Color;
+        var barBrush = new SolidColorBrush(Color.FromArgb(0x2E, accent.R, accent.G, accent.B));
+
+        foreach (var d in sorted)
+        {
+            var frac = Math.Clamp((double)d.Total / top, 0.004, 1.0);
+            var row = new Grid { Margin = new Thickness(0, 1, 0, 0) };
+            var bar = new Border
+            {
+                Background = barBrush, CornerRadius = new CornerRadius(2),
+                HorizontalAlignment = HorizontalAlignment.Left, Width = 0,
+            };
+            // Star columns collapse under infinite measure, so size the bar explicitly.
+            row.SizeChanged += (_, se) => bar.Width = Math.Max(0, se.NewSize.Width * frac);
+            row.Children.Add(bar);
+
+            var content = new Grid { Margin = new Thickness(4, 1, 0, 1) };
+            content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            content.Children.Add(new TextBlock
+            {
+                Text = d.Name, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis,
+                Foreground = (Brush)FindResource("TextBrush"),
+            });
+            var critPart = d.Crits > 0 ? $" · {100.0 * d.Crits / Math.Max(1, d.Hits):0}% crit" : "";
+            var right = new TextBlock
+            {
+                Text = $"{100.0 * d.Total / grand:0}% · {d.Total / secs:0.#} dps{critPart}",
+                FontSize = 12, Foreground = (Brush)FindResource("DimBrush"),
+                Margin = new Thickness(8, 0, 2, 0),
+            };
+            Grid.SetColumn(right, 1);
+            content.Children.Add(right);
+            row.Children.Add(content);
+            row.HorizontalAlignment = HorizontalAlignment.Stretch;
+            row.ToolTip = $"{d.Total:N0} total · {d.Hits} hit{(d.Hits == 1 ? "" : "s")} · avg {(double)d.Total / Math.Max(1, d.Hits):0.#}";
+            list.Items.Add(row);
+        }
     }
 
     /// <summary>Render a Total/Count/Avg stat list in the chosen sort order.</summary>
