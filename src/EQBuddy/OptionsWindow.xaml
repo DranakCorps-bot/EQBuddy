@@ -80,6 +80,8 @@
             </Grid>
             <TextBlock x:Name="SoundFileNote" Style="{StaticResource Dim}" TextWrapping="Wrap"
                        Visibility="Collapsed"/>
+            <TextBlock Text="While Options is open, the ★ alert banner tile is visible — drag it to where alerts should appear. During play it's click-through and never steals focus."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,4,0,0"/>
 
             <TextBlock Text="Overlay cards" FontSize="12" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" Margin="0,14,0,2"/>

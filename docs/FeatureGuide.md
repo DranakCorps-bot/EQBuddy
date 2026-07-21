@@ -98,8 +98,11 @@ total, per-item breakdown, per-hour rates (wall-clock + active-time), last-match
 Rules are evaluated over the whole session journal, so editing a rule mid-session
 recalculates history, and alerts never fire during startup ingest or character switch.
 
-**Alerts:** 🔔 banner (auto-dismisses ~6 s, shows in mini mode too), 🔊 sound, per
-rule; 5 s per-rule cooldown. Sound is global in Options: seven named Windows Media
+**Alerts:** 🔔 banner + 🔊 sound per rule, 5 s per-rule cooldown. The banner is a
+**floating tile**, independent of the widget: always on top, permanently
+click-through, never takes focus, auto-dismisses ~6 s. Position it by opening
+Options — the tile appears in placement mode ("drag me") and saves its spot on
+close; in play, clicks pass straight through it to the game. Sound is global in Options: seven named Windows Media
 sounds or a custom .wav/.mp3, with a ▶ preview. (Linux: sound backend TBD.)
 
 **Verify:** create a Loot rule matching an item in your fixture, append the loot line

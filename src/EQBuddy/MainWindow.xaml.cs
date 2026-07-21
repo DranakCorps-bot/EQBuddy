@@ -191,7 +191,11 @@ public partial class MainWindow : Window
             return;
         }
         _optionsWindow = new OptionsWindow(this);
+        // While Options is open, the alert tile shows in placement mode (draggable,
+        // click-through off) so the user can position where alerts appear.
+        _optionsWindow.Closed += (_, _) => _alertWindow?.ExitPlacement();
         _optionsWindow.Show();
+        AlertTile.EnterPlacement();
     }
 
     private void OnGear(object sender, RoutedEventArgs e)
@@ -300,12 +304,6 @@ public partial class MainWindow : Window
         {
             UpdateBanner.Visibility = Visibility.Collapsed;
             _upToDateNoticeUntil = DateTime.MinValue;
-        }
-
-        if (_alertUntil != DateTime.MinValue && DateTime.Now > _alertUntil)
-        {
-            AlertBanner.Visibility = Visibility.Collapsed;
-            _alertUntil = DateTime.MinValue;
         }
 
         if (_watcher.LastError is { } err)
@@ -503,7 +501,10 @@ public partial class MainWindow : Window
     private readonly Dictionary<string, int> _ruleBaseline = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTime> _ruleLastAlert = new(StringComparer.OrdinalIgnoreCase);
     private string? _alertBaselinePath;
-    private DateTime _alertUntil = DateTime.MinValue;
+    private AlertWindow? _alertWindow;
+
+    /// <summary>The floating alert tile — created on first use, owned by the widget.</summary>
+    internal AlertWindow AlertTile => _alertWindow ??= new AlertWindow(_settings) { Owner = this };
 
     private void RenderTracked(StatsSnapshot s)
     {
@@ -597,11 +598,7 @@ public partial class MainWindow : Window
             _ruleLastAlert[r.Name] = DateTime.Now;
 
             if (rule.AlertBanner)
-            {
-                AlertText.Text = $"★ {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" ×{delta}" : "")}";
-                AlertBanner.Visibility = Visibility.Visible;
-                _alertUntil = DateTime.Now.AddSeconds(6);
-            }
+                AlertTile.ShowAlert($"★ {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" ×{delta}" : "")}");
             if (rule.AlertSound)
                 PlayAlertSound();
         }

@@ -26,6 +26,9 @@ public sealed class AppSettings
     /// <summary>Alert sound: a built-in name (Ding, Notify, Chimes, Chord, Tada,
     /// Exclamation, Alarm) or the full path of a custom .wav/.mp3 file.</summary>
     public string AlertSound { get; set; } = "Ding";
+    /// <summary>Position of the floating alert tile; NaN = above the widget.</summary>
+    public double AlertLeft { get; set; } = double.NaN;
+    public double AlertTop { get; set; } = double.NaN;
     /// <summary>Overlay card order (section keys); missing keys append in default order.</summary>
     public List<string> SectionOrder { get; set; } = [];
     /// <summary>Hidden overlay cards (still collect data — OVERLAY acceptance).</summary>

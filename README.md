@@ -61,7 +61,9 @@ Tracked loot & alerts:
   active-play). 📌 pins a chip to the mini dashboard; 🔔/🔊 fire a focus-safe banner
   and/or sound the moment a matching item drops. A rule has a short *name* and a
   *match text* — if you only fill in the name, it doubles as the match text, so
-  typing just `Ghoul` on a Kill rule works. Alert banners appear in mini mode too.
+  typing just `Ghoul` on a Kill rule works. The alert banner is a **floating tile**
+  you position anywhere (open Options and drag it); during play it's click-through
+  and never steals focus, so it can sit right over the action.
 - **Alert sound** (Options, under the rules): pick from seven distinct built-in
   sounds (Ding, Notify, Chimes, Chord, Tada, Exclamation, Alarm) or your own
   `.wav`/`.mp3` file; ▶ previews it.

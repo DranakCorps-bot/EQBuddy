@@ -1,0 +1,13 @@
+<Window x:Class="EQBuddy.AlertWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EQBuddy Alert" WindowStyle="None" AllowsTransparency="True"
+        Background="Transparent" Topmost="True" ShowInTaskbar="False"
+        ShowActivated="False" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        MouseLeftButtonDown="OnDrag">
+    <Border Background="#F01E1A14" BorderBrush="{StaticResource AccentBrush}"
+            BorderThickness="1" CornerRadius="8" Padding="12,8" MaxWidth="380">
+        <TextBlock x:Name="AlertText" FontSize="13" FontWeight="SemiBold"
+                   Foreground="{StaticResource AccentBrush}" TextWrapping="Wrap"/>
+    </Border>
+</Window>

@@ -22,13 +22,6 @@
         </Border.ContextMenu>
         <StackPanel Margin="10">
 
-            <!-- Tracked-rule alert (outside NormalRoot so it also shows in mini mode) -->
-            <Border x:Name="AlertBanner" Background="#44E3B341" CornerRadius="6" Padding="8,6"
-                    Margin="0,0,0,8" Visibility="Collapsed">
-                <TextBlock x:Name="AlertText" TextWrapping="Wrap" FontSize="12"
-                           Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold"/>
-            </Border>
-
             <!-- ============ MINI DASHBOARD MODE ============ -->
             <Grid x:Name="MiniRoot" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
