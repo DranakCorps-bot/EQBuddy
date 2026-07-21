@@ -1089,13 +1089,13 @@ public sealed class MainWindow : Window
 
     internal static readonly (string Name, string File)[] AlertSounds =
     [
-        ("Ding", "Windows Ding.wav"),
-        ("Notify", "Windows Notify.wav"),
-        ("Chimes", "chimes.wav"),
-        ("Chord", "chord.wav"),
-        ("Tada", "tada.wav"),
-        ("Exclamation", "Windows Exclamation.wav"),
-        ("Alarm", "Alarm01.wav"),
+        ("Ding", "bell.oga"),
+        ("Notify", "message-new-instant.oga"),
+        ("Chimes", "service-login.oga"),
+        ("Chord", "device-added.oga"),
+        ("Tada", "complete.oga"),
+        ("Exclamation", "dialog-warning.oga"),
+        ("Alarm", "alarm-clock-elapsed.oga"),
     ];
 
     internal void PlayAlertSound()
@@ -1111,10 +1111,10 @@ public sealed class MainWindow : Window
                 { } other => other,
             };
             var named = Array.Find(AlertSounds, x => x.Name == choice);
-            var file = named.File is { } ? "" : choice;
+            var file = named.File is { } systemFile ? FindFreeDesktopSound(systemFile) : choice;
             if (file.Length > 0 && File.Exists(file))
             {
-                if (TryStart("paplay", file) || TryStart("aplay", file))
+                if (TryStart("pw-play", file) || TryStart("paplay", file) || TryStart("aplay", file))
                     return;
             }
             Console.Beep();
@@ -1122,11 +1122,35 @@ public sealed class MainWindow : Window
         catch (Exception ex) { App.LogError(ex); }
     }
 
+    private static string FindFreeDesktopSound(string fileName)
+    {
+        var dataDirs = new List<string>();
+        var userData = Environment.GetEnvironmentVariable("XDG_DATA_HOME");
+        if (!string.IsNullOrWhiteSpace(userData))
+            dataDirs.Add(userData);
+        else
+            dataDirs.Add(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share"));
+
+        var systemData = Environment.GetEnvironmentVariable("XDG_DATA_DIRS");
+        dataDirs.AddRange(string.IsNullOrWhiteSpace(systemData)
+            ? ["/usr/local/share", "/usr/share"]
+            : systemData.Split(':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        foreach (var dataDir in dataDirs)
+        {
+            var path = System.IO.Path.Combine(dataDir, "sounds", "freedesktop", "stereo", fileName);
+            if (File.Exists(path)) return path;
+        }
+        return "";
+    }
+
     private static bool TryStart(string command, string file)
     {
         try
         {
-            Process.Start(new ProcessStartInfo(command, file) { UseShellExecute = false });
+            var start = new ProcessStartInfo(command) { UseShellExecute = false };
+            start.ArgumentList.Add(file);
+            Process.Start(start);
             return true;
         }
         catch { return false; }
