@@ -73,9 +73,22 @@ Happy hunting!
 
 **Screenshot files to attach** (in `docs\screenshots\`):
 
+Hero shots:
+
 | File | Caption suggestion |
 |---|---|
 | `widget-expanded.png` | Full drill-down: damage per skill with averages, recent fights with per-fight DPS, damage by stance |
 | `widget-tracked.png` | Watch rules with per-hour rates + per-creature farming with observed drop % |
 | `widget-mini-alert.png` | Mini mode — starred stats, pinned watch chips, and an alert banner firing |
 | `history-window.png` | Automatic session history: search, notes, tags, compare, import, export |
+
+Per-section gallery (for an album or comment thread):
+
+| File | Caption suggestion |
+|---|---|
+| `section-combat.png` | Combat: session + last-15m DPS, crit/accuracy/avoidance, damage by attack incl. pets, damage taken per mob, recent fights, stance breakdown |
+| `section-healing.png` | Healing: HPS, heals cast per spell with averages, who healed you, regen/hymn tick counts |
+| `section-kills-loot.png` | Kills: per-creature counts and kills/hour, farming stats with observed drop % per item |
+| `section-loot.png` | Loot: every item with counts, plus items created by merging |
+| `section-tracked-money.png` | Tracked watch rules with per-hour rates; Money: corpse coin vs merchant sales, everything sold with prices |
+| `section-progress.png` | Progress: XP/hour, AA, time-to-level estimate; faction standings; zones visited |
