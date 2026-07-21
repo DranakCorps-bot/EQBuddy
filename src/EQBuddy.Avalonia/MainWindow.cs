@@ -19,6 +19,9 @@ public sealed class MainWindow : Window
     private readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
     private readonly LogWatcher _watcher;
+    private readonly SessionRepository _repo = new(SessionRepository.DefaultDbPath);
+    private readonly SessionArchiver _archiver;
+    private DateTime _lastCheckpoint = DateTime.MinValue;
     private readonly DispatcherTimer _uiTimer;
     private readonly Border _root = new();
     private readonly Grid _miniRoot = new();
@@ -29,6 +32,8 @@ public sealed class MainWindow : Window
     private readonly TextBlock _charLabel = AppTheme.DimText("looking for a character...");
     private readonly ScrollViewer _sectionScroll = new();
     private readonly Border _logBanner = Banner(AppTheme.WarnBrush);
+    private readonly Border _alertBanner = Banner(AppTheme.AccentBrush);
+    private readonly TextBlock _alertText = new() { FontSize = 12, Foreground = AppTheme.AccentBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly Border _updateBanner = Banner(AppTheme.GoodBrush);
     private readonly TextBlock _updateText = new() { FontSize = 12, Foreground = AppTheme.GoodBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _zoneText = AppTheme.DimText("-");
@@ -37,6 +42,7 @@ public sealed class MainWindow : Window
     private readonly TextBlock _healingHeader = AppTheme.StatValue("0 hps");
     private readonly TextBlock _killsHeader = AppTheme.StatValue("0");
     private readonly TextBlock _lootHeader = AppTheme.StatValue("0 items");
+    private readonly TextBlock _trackedHeader = AppTheme.StatValue("0");
     private readonly TextBlock _moneyHeader = AppTheme.StatValue("0c");
     private readonly TextBlock _progressHeader = AppTheme.StatValue("0% xp");
     private readonly TextBlock _factionHeader = AppTheme.StatValue("-");
@@ -53,6 +59,7 @@ public sealed class MainWindow : Window
     private readonly ItemsControl _killList = new();
     private readonly ItemsControl _partyKillList = new();
     private readonly ItemsControl _lootList = new();
+    private readonly StackPanel _trackedPanel = new();
     private readonly ItemsControl _craftedList = new();
     private readonly ItemsControl _soldList = new();
     private readonly ItemsControl _skillList = new();
@@ -65,9 +72,18 @@ public sealed class MainWindow : Window
     private readonly TextBlock _partyKillsLabel = AppTheme.Heading("Group kills");
     private readonly TextBlock _craftedLabel = AppTheme.Heading("Created by merging");
     private readonly TextBlock _soldLabel = AppTheme.Heading("Sold to merchants");
+    private readonly TextBlock _recentFightsLabel = AppTheme.Heading("Recent fights");
+    private readonly ItemsControl _recentFightsList = new();
+    private readonly TextBlock _stanceLabel = AppTheme.Heading("By stance");
+    private readonly ItemsControl _stanceList = new();
+    private readonly TextBlock _farmingLabel = AppTheme.Heading("Farming (per creature)");
+    private readonly ItemsControl _farmingList = new();
+    private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
+    private readonly ItemsControl _markerList = new();
     private readonly Button _gearBtn = AppTheme.IconButton("...", "Settings");
     private readonly Dictionary<string, ToggleButton> _stars = new();
-    private readonly List<SectionPanel> _sections = new();
+    private readonly Dictionary<string, SectionPanel> _sections = new(StringComparer.OrdinalIgnoreCase);
+    private readonly StackPanel _sectionsPanel = new();
     private TextBlock _dmgOutSortTotal = null!;
     private TextBlock _dmgOutSortHits = null!;
     private TextBlock _dmgOutSortAvg = null!;
@@ -83,6 +99,7 @@ public sealed class MainWindow : Window
     private UpdateInfo? _pendingUpdate;
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
+    private HistoryWindow? _historyWindow;
     private OptionsWindow? _optionsWindow;
     private StatSort _dmgOutSort = StatSort.Total;
     private StatSort _dmgInSort = StatSort.Total;
@@ -95,6 +112,8 @@ public sealed class MainWindow : Window
     public MainWindow()
     {
         _watcher = new LogWatcher(_stats);
+        _archiver = new SessionArchiver(_repo);
+        _stats.SessionEnding += snap => _archiver.FinalizeActive(snap, "IdleTimeout");
         Title = "EQBuddy";
         SizeToContent = SizeToContent.WidthAndHeight;
         WindowDecorations = global::Avalonia.Controls.WindowDecorations.None;
@@ -115,6 +134,7 @@ public sealed class MainWindow : Window
         foreach (var (key, star) in _stars)
             star.IsChecked = _settings.MiniStats.Contains(key);
         UpdateStarVisuals();
+        ApplySectionLayout();
         SetMode(_settings.Minimized);
         FollowActiveCharacter();
 
@@ -137,6 +157,31 @@ public sealed class MainWindow : Window
     public double WidgetOpacity => Opacity;
     public double BackgroundOpacityValue => _settings.BackgroundOpacity;
     public bool TruncateLogsValue => _settings.TruncateLogs;
+    public AppSettings Settings => _settings;
+    public void PersistSettings() => _settings.Save();
+
+    internal static readonly (string Key, string Title)[] SectionCatalog =
+    [
+        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
+        ("tracked", "Tracked"), ("money", "Money"), ("progress", "Progress"),
+        ("faction", "Faction"), ("misc", "Travels & Deaths"),
+    ];
+
+    public void ApplySectionLayout()
+    {
+        var order = _settings.SectionOrder.Where(_sections.ContainsKey).ToList();
+        foreach (var (key, _) in SectionCatalog)
+            if (!order.Contains(key)) order.Add(key);
+
+        _sectionsPanel.Children.Clear();
+        foreach (var key in order)
+        {
+            var section = _sections[key];
+            _sectionsPanel.Children.Add(section);
+            if (key != "tracked")
+                section.IsVisible = !_settings.HiddenSections.Contains(key);
+        }
+    }
 
     public void SetTruncateLogs(bool enabled)
     {
@@ -177,10 +222,13 @@ public sealed class MainWindow : Window
             Margin = new Thickness(10),
             Children =
             {
+                _alertBanner,
                 BuildMiniRoot(),
                 BuildNormalRoot(),
             },
         };
+        _alertBanner.Child = _alertText;
+        _alertBanner.Margin = new Thickness(0, 0, 0, 8);
         return _root;
     }
 
@@ -277,30 +325,24 @@ public sealed class MainWindow : Window
 
     private Control BuildSections()
     {
-        var panel = new StackPanel();
-        AddSection(panel, "dps", "Combat", _combatHeader, BuildCombatSection(), "Show DPS in mini dashboard");
-        AddSection(panel, "hps", "Healing", _healingHeader, BuildHealingSection(), "Show HPS in mini dashboard");
-        AddSection(panel, "kills", "Kills", _killsHeader, BuildKillsSection(), "Show kills in mini dashboard");
-        AddSection(panel, "loot", "Loot", _lootHeader, BuildLootSection(), "Show loot count in mini dashboard");
-        AddSection(panel, "money", "Money", _moneyHeader, BuildMoneySection(), "Show money in mini dashboard");
-        AddSection(panel, "xp", "Progress", _progressHeader, BuildProgressSection(), "Show XP in mini dashboard");
-        panel.Children.Add(TrackSection(AppTheme.Section(Header("Faction", _factionHeader), _factionList)));
-        AddSection(panel, "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
-        return panel;
+        AddSection("combat", "dps", "Combat", _combatHeader, BuildCombatSection(), "Show DPS in mini dashboard");
+        AddSection("healing", "hps", "Healing", _healingHeader, BuildHealingSection(), "Show HPS in mini dashboard");
+        AddSection("kills", "kills", "Kills", _killsHeader, BuildKillsSection(), "Show kills in mini dashboard");
+        AddSection("loot", "loot", "Loot", _lootHeader, BuildLootSection(), "Show loot count in mini dashboard");
+        _sections["tracked"] = AppTheme.Section(Header("Tracked", _trackedHeader), _trackedPanel);
+        AddSection("money", "money", "Money", _moneyHeader, BuildMoneySection(), "Show money in mini dashboard");
+        AddSection("progress", "xp", "Progress", _progressHeader, BuildProgressSection(), "Show XP in mini dashboard");
+        _sections["faction"] = AppTheme.Section(Header("Faction", _factionHeader), _factionList);
+        AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
+        return _sectionsPanel;
     }
 
-    private void AddSection(Panel panel, string starKey, string title, TextBlock value, Control content, string tip)
+    private void AddSection(string sectionKey, string starKey, string title, TextBlock value, Control content, string tip)
     {
         var star = AppTheme.StarToggle(starKey, tip);
         star.Click += OnStarChanged;
         _stars[starKey] = star;
-        panel.Children.Add(TrackSection(AppTheme.Section(Header(title, value, star), content)));
-    }
-
-    private SectionPanel TrackSection(SectionPanel section)
-    {
-        _sections.Add(section);
-        return section;
+        _sections[sectionKey] = AppTheme.Section(Header(title, value, star), content);
     }
 
     private static Grid Header(string title, TextBlock value, ToggleButton? star = null)
@@ -329,6 +371,12 @@ public sealed class MainWindow : Window
         panel.Children.Add(_damageSourceList);
         panel.Children.Add(SortHeader("Damage taken from", out _dmgInSortTotal, out _dmgInSortHits, out _dmgInSortAvg, OnSortDmgIn));
         panel.Children.Add(_damageTakenList);
+        _recentFightsLabel.Margin = new Thickness(0, 6, 0, 0);
+        panel.Children.Add(_recentFightsLabel);
+        panel.Children.Add(_recentFightsList);
+        _stanceLabel.Margin = new Thickness(0, 6, 0, 0);
+        panel.Children.Add(_stanceLabel);
+        panel.Children.Add(_stanceList);
         return panel;
     }
 
@@ -351,6 +399,9 @@ public sealed class MainWindow : Window
         _killsSummary.Margin = new Thickness(0, 2, 0, 4);
         panel.Children.Add(_killsSummary);
         panel.Children.Add(_killList);
+        _farmingLabel.Margin = new Thickness(0, 6, 0, 0);
+        panel.Children.Add(_farmingLabel);
+        panel.Children.Add(_farmingList);
         _partyKillsLabel.Margin = new Thickness(0, 6, 0, 0);
         panel.Children.Add(_partyKillsLabel);
         panel.Children.Add(_partyKillList);
@@ -394,6 +445,9 @@ public sealed class MainWindow : Window
         panel.Children.Add(_deathList);
         panel.Children.Add(AppTheme.Heading("Zones visited"));
         panel.Children.Add(_zoneList);
+        _markersLabel.Margin = new Thickness(0, 6, 0, 0);
+        panel.Children.Add(_markersLabel);
+        panel.Children.Add(_markerList);
         return panel;
     }
 
@@ -441,6 +495,10 @@ public sealed class MainWindow : Window
         check.Click += (_, _) => { _lastUpdateCheck = DateTime.Now; CheckForUpdates(manual: true); };
         var options = new MenuItem { Header = "Options... (size, opacity)" };
         options.Click += OnOptions;
+        var marker = new MenuItem { Header = "Drop camp marker" };
+        marker.Click += (_, _) => DropCampMarker();
+        var history = new MenuItem { Header = "Session history..." };
+        history.Click += OnHistory;
         var choose = new MenuItem { Header = "Choose log folder..." };
         choose.Click += OnChooseLogFolder;
         var detect = new MenuItem { Header = "Auto-detect log folder" };
@@ -454,6 +512,8 @@ public sealed class MainWindow : Window
         menu.Items.Add(version);
         menu.Items.Add(check);
         menu.Items.Add(options);
+        menu.Items.Add(marker);
+        menu.Items.Add(history);
         menu.Items.Add(new Separator());
         menu.Items.Add(choose);
         menu.Items.Add(detect);
@@ -504,10 +564,17 @@ public sealed class MainWindow : Window
         }
         if (!string.Equals(active.FilePath, _watcher.CurrentPath, StringComparison.OrdinalIgnoreCase))
         {
+            if (_watcher.CurrentPath is not null)
+                _archiver.FinalizeActive(CurrentSnapshot(), "CharacterChanged");
             _watcher.Select(active.FilePath);
+            _archiver.SetIdentity(_stats.ServerName, _stats.CharacterName);
             _charLabel.Text = active.Display;
         }
     }
+
+    private StatsSnapshot CurrentSnapshot() =>
+        _stats.Snapshot(TimeSpan.FromMinutes(Math.Max(1, _settings.RecentWindowMinutes)),
+            _settings.TrackedRules);
 
     private void RefreshUi()
     {
@@ -538,13 +605,25 @@ public sealed class MainWindow : Window
             _updateBanner.IsVisible = false;
             _upToDateNoticeUntil = DateTime.MinValue;
         }
+        if (_alertUntil != DateTime.MinValue && DateTime.Now > _alertUntil)
+        {
+            _alertBanner.IsVisible = false;
+            _alertUntil = DateTime.MinValue;
+        }
         if (_watcher.LastError is { } err) App.LogError(err);
 
-        var s = _stats.Snapshot();
+        var s = CurrentSnapshot();
+        ProcessTrackedAlerts(s);
+        if (DateTime.Now - _lastCheckpoint > TimeSpan.FromMinutes(5))
+        {
+            _lastCheckpoint = DateTime.Now;
+            _archiver.Checkpoint(s);
+        }
         if (_miniRoot.IsVisible) UpdateMiniChips(s);
         _zoneText.Text = s.CurrentZone.Length > 0 ? s.CurrentZone : "-";
+        var active = TimeSpan.FromSeconds(s.ActiveSeconds);
         _sessionText.Text = s.SessionStart is { } start
-            ? $"session {(int)s.Elapsed.TotalHours}:{s.Elapsed.Minutes:D2} (since {start:h:mm tt})"
+            ? $"session {(int)s.Elapsed.TotalHours}:{s.Elapsed.Minutes:D2} - active {(int)active.TotalMinutes}m (since {start:h:mm tt})"
             : "waiting for log activity...";
         _combatHeader.Text = s.CurrentDps > 0 ? $"{s.SessionDps:0} dps (now {s.CurrentDps:0})" : $"{s.SessionDps:0} dps";
         _killsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
@@ -558,7 +637,7 @@ public sealed class MainWindow : Window
 
     private void RefreshExpandedSections(StatsSnapshot s)
     {
-        if (_sections[0].IsExpanded)
+        if (_sections["combat"].IsExpanded)
         {
             var acc = s.HitCount + s.MissCount > 0 ? (double)s.HitCount / (s.HitCount + s.MissCount) * 100 : 0;
             var critRate = s.HitCount > 0 ? (double)s.CritCount / s.HitCount * 100 : 0;
@@ -569,17 +648,26 @@ public sealed class MainWindow : Window
                 $"Dealt {s.DamageDealt:N0} ({s.MeleeDamage:N0} melee / {s.SpellDamage:N0} spell)\n" +
                 $"{s.CritCount} crits ({critRate:0.#}% rate) - {acc:0}% accuracy\n" +
                 $"In combat {(int)combatTime.TotalMinutes}m {combatTime.Seconds}s this session\n" +
+                (s.Recent is { } rc ? $"Last {(int)rc.Window.TotalMinutes}m: {rc.Dps:0.#} dps{(rc.HasFullWindow ? "" : " (partial window)")}\n" : "") +
                 $"Biggest hit: {s.MaxHit:N0} ({s.MaxHitDesc})\n" +
                 $"Taken {s.DamageTaken:N0} - avoided {s.AvoidedIncoming} of {incomingSwings} melee attacks ({avoidance:0}%)" +
                 (s.SpecialHits.Count > 0 ? "\n" + string.Join(" - ", s.SpecialHits.Select(x => $"{x.Name} {x.Count}")) : "") +
-                (s.Fizzles + s.Resists > 0 ? $"\nFizzles {s.Fizzles} - resists {s.Resists}" : "");
+                (s.Fizzles + s.Resists > 0 ? $"\nFizzles {s.Fizzles} - resists {s.Resists}" : "") +
+                (s.CurrentStance.Length > 0 ? $"\nStance: {s.CurrentStance}" : "");
             FillStatList(_damageSourceList, s.DamageBySource, _dmgOutSort, "hit");
             FillStatList(_damageTakenList, s.DamageByAttacker, _dmgInSort, "hit");
+            _recentFightsLabel.IsVisible = s.RecentEncounters.Count > 0;
+            FillList(_recentFightsList, s.RecentEncounters.Select(f =>
+                (f.Name, $"{f.DurationSeconds:0}s - {f.Dps:0.#} dps{(f.Outcome == "Timeout" ? " - ?" : "")}")));
+            _stanceLabel.IsVisible = s.Stances.Count > 0;
+            FillList(_stanceList, s.Stances.Select(x =>
+                (x.Name, $"{x.Damage:N0} dmg - {(int)x.CombatSeconds}s - {x.Dps:0.#} dps")));
         }
         _healingHeader.Text = s.Hps > 0 ? $"{s.Hps:0.#} hps" : $"{s.HealingDone:N0} healed";
-        if (_sections[1].IsExpanded)
+        if (_sections["healing"].IsExpanded)
         {
             _healingSummary.Text = $"Done {s.HealingDone:N0} - received {s.HealingReceived:N0}" +
+                (s.Recent is { Hps: > 0 } rh ? $"\nLast {(int)rh.Window.TotalMinutes}m: {rh.Hps:0.#} hps" : "") +
                 (s.RegenTicks > 0 ? $"\n{s.RegenTicks} regen/hymn ticks (game logs no amounts for these)" : "");
             var showSpells = s.HealsBySpell.Count > 0;
             _healSpellsLabel.IsVisible = showSpells;
@@ -588,42 +676,148 @@ public sealed class MainWindow : Window
             _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
             FillList(_healerList, s.HealsByHealer.Select(h => (h.Name, $"{h.Total:N0} - {h.Hits} heal{(h.Hits == 1 ? "" : "s")}")));
         }
-        if (_sections[2].IsExpanded)
+        if (_sections["kills"].IsExpanded)
         {
-            _killsSummary.Text = $"{s.KillsPerHour:0.0} kills/hr";
+            _killsSummary.Text = $"{s.KillsPerHour:0.0} kills/hr - {s.KillsPerActiveHour:0.0} active" +
+                (s.Recent is { } rk ? $" - last {(int)rk.Window.TotalMinutes}m: {rk.Kills}" : "");
             FillList(_killList, s.YourKills.Select(k => (k.Name, $"x{k.Count}")));
+            var farmed = s.Mobs.Where(m => m.Kills > 0).ToList();
+            _farmingLabel.IsVisible = farmed.Count > 0;
+            var farmRows = new List<(string, string)>();
+            foreach (var m in farmed)
+            {
+                farmRows.Add((m.Name,
+                    $"avg {m.AvgFightSeconds:0}s - {StatsSnapshot.FormatCoin(m.Copper)} - {m.XpPercent:0.0}% xp"));
+                foreach (var l in m.Loot)
+                    farmRows.Add(($"      {l.Item}", l.DropRatePct is { } pct ? $"x{l.Count} - {pct:0}%" : $"x{l.Count}"));
+            }
+            FillList(_farmingList, farmRows);
             _partyKillsLabel.IsVisible = s.PartyKillsByKiller.Count > 0;
             FillList(_partyKillList, s.PartyKillsByKiller.Select(k => (k.Name, $"x{k.Count}")));
         }
-        if (_sections[3].IsExpanded)
+        if (_sections["loot"].IsExpanded)
         {
             FillList(_lootList, s.Loot.Select(l => (l.Item, $"x{l.Count}")));
             _craftedLabel.IsVisible = s.Crafted.Count > 0;
             FillList(_craftedList, s.Crafted.Select(c => (c.Name, $"x{c.Count}")));
         }
-        if (_sections[4].IsExpanded)
+        RenderTracked(s);
+        if (_sections["money"].IsExpanded)
         {
             _moneySummary.Text = $"Corpses {StatsSnapshot.FormatCoin(s.CorpseCopper)} ({s.CoinDrops} drops, biggest {StatsSnapshot.FormatCoin(s.BiggestDrop)})\n" +
                 $"Merchant sales {StatsSnapshot.FormatCoin(s.VendorCopper)} ({s.SalesCount} sales)\n" +
-                $"{StatsSnapshot.FormatCoin(s.CopperPerHour)} per hour";
+                $"{StatsSnapshot.FormatCoin(s.CopperPerHour)} per hour - {StatsSnapshot.FormatCoin(s.CopperPerActiveHour)} per active hour" +
+                (s.Recent is { } rm ? $"\nLast {(int)rm.Window.TotalMinutes}m: {StatsSnapshot.FormatCoin(rm.Copper)}" : "");
             _soldLabel.IsVisible = s.SoldItems.Count > 0;
             FillList(_soldList, s.SoldItems.Select(i => ($"{i.Item}{(i.Count > 1 ? $" x{i.Count}" : "")}", StatsSnapshot.FormatCoin(i.Copper))));
         }
-        if (_sections[5].IsExpanded)
+        if (_sections["progress"].IsExpanded)
         {
-            _progressSummary.Text = $"{s.XpTicks} xp gains - {s.XpPerHour:0.0}%/hr - {s.SkillUpTotal} skill-ups" +
+            _progressSummary.Text = $"{s.XpTicks} xp gains - {s.XpPerHour:0.0}%/hr - {s.XpPerActiveHour:0.0}% active - {s.SkillUpTotal} skill-ups" +
+                (s.Recent is { } rx ? $"\nLast {(int)rx.Window.TotalMinutes}m: {rx.XpPerHour:0.0}%/hr" : "") +
                 (s.AaGained > 0 ? $"\n{s.AaGained} AA point{(s.AaGained == 1 ? "" : "s")} - {s.AaPerHour:0.0} AA/hr (now {s.AaTotal} unspent)" : "") +
                 (s.HoursToLevel is { } eta ? $"\nNext level in {FormatEta(eta)} at this pace" : "") +
                 (s.Levels.Count > 0 ? "\n" + string.Join(", ", s.Levels.Select(l => $"{l.Text} at {l.Time:h:mm tt}")) : "");
             FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
         }
-        if (_sections[6].IsExpanded)
+        if (_sections["faction"].IsExpanded)
             FillList(_factionList, s.Faction.Select(f => (f.Faction, $"{(f.Net >= 0 ? "+" : "")}{f.Net}")),
                 valueBrush: f => f.StartsWith('-') ? AppTheme.BadBrush : AppTheme.GoodBrush);
-        if (_sections[7].IsExpanded)
+        if (_sections["misc"].IsExpanded)
         {
             FillList(_deathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
             FillList(_zoneList, s.Zones.Select(z => (z.Text, z.Time.ToString("h:mm tt"))));
+            _markersLabel.IsVisible = s.Markers.Count > 0;
+            FillList(_markerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
+        }
+    }
+
+    private readonly Dictionary<string, int> _ruleBaseline = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, DateTime> _ruleLastAlert = new(StringComparer.OrdinalIgnoreCase);
+    private string? _alertBaselinePath;
+    private DateTime _alertUntil = DateTime.MinValue;
+
+    private void RenderTracked(StatsSnapshot s)
+    {
+        var haveRules = _settings.TrackedRules.Count > 0 && !_settings.HiddenSections.Contains("tracked");
+        if (_sections.TryGetValue("tracked", out var section))
+            section.IsVisible = haveRules;
+        if (!haveRules) return;
+
+        _trackedHeader.Text = s.Tracked.Sum(t => t.TotalQuantity).ToString();
+        if (!_sections["tracked"].IsExpanded) return;
+
+        _trackedPanel.Children.Clear();
+        foreach (var r in s.Tracked)
+        {
+            var head = new Grid { Margin = new Thickness(0, 4, 0, 0) };
+            head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+            head.Children.Add(new TextBlock
+            {
+                Text = r.Name.ToUpperInvariant(),
+                FontSize = 11,
+                FontWeight = FontWeight.SemiBold,
+                Foreground = AppTheme.AccentBrush,
+            });
+            var rate = AppTheme.DimText($"{r.TotalQuantity} total - {r.PerHour:0.#}/hr - {r.PerActiveHour:0.#}/active hr");
+            Grid.SetColumn(rate, 1);
+            head.Children.Add(rate);
+            _trackedPanel.Children.Add(head);
+
+            foreach (var item in r.Items)
+                _trackedPanel.Children.Add(new TextBlock
+                {
+                    Text = $"{item.Name}   x{item.Count}",
+                    FontSize = 12,
+                    Foreground = AppTheme.TextBrush,
+                    Margin = new Thickness(6, 1, 0, 0),
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                });
+            _trackedPanel.Children.Add(AppTheme.DimText(
+                r.LastMatch is { } lm ? $"last match {FormatAge(DateTime.Now - lm)} ago" : "no matches yet",
+                new Thickness(6, 1, 0, 2)));
+        }
+    }
+
+    private static string FormatAge(TimeSpan age) => age.TotalMinutes < 1
+        ? $"{Math.Max(0, (int)age.TotalSeconds)}s"
+        : age.TotalHours < 1 ? $"{(int)age.TotalMinutes}m" : $"{(int)age.TotalHours}h {age.Minutes}m";
+
+    private void ProcessTrackedAlerts(StatsSnapshot s)
+    {
+        if (!_watcher.InitialIngestDone) return;
+        if (_alertBaselinePath != _watcher.CurrentPath)
+        {
+            _alertBaselinePath = _watcher.CurrentPath;
+            _ruleBaseline.Clear();
+            foreach (var r in s.Tracked) _ruleBaseline[r.Name] = r.TotalQuantity;
+            return;
+        }
+
+        foreach (var r in s.Tracked)
+        {
+            var baseline = _ruleBaseline.TryGetValue(r.Name, out var b) ? b : 0;
+            if (r.TotalQuantity <= baseline)
+            {
+                _ruleBaseline[r.Name] = r.TotalQuantity;
+                continue;
+            }
+            var delta = r.TotalQuantity - baseline;
+            _ruleBaseline[r.Name] = r.TotalQuantity;
+            var rule = _settings.TrackedRules.FirstOrDefault(x =>
+                string.Equals(x.Name.Length > 0 ? x.Name : x.Pattern, r.Name, StringComparison.OrdinalIgnoreCase));
+            if (rule is null) continue;
+            var last = _ruleLastAlert.TryGetValue(r.Name, out var la) ? la : DateTime.MinValue;
+            if (DateTime.Now - last < TimeSpan.FromSeconds(5)) continue;
+            _ruleLastAlert[r.Name] = DateTime.Now;
+            if (rule.AlertBanner)
+            {
+                _alertText.Text = $"* {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" x{delta}" : "")}";
+                _alertBanner.IsVisible = true;
+                _alertUntil = DateTime.Now.AddSeconds(6);
+            }
+            if (rule.AlertSound) PlayAlertSound();
         }
     }
 
@@ -648,7 +842,7 @@ public sealed class MainWindow : Window
         _miniRoot.IsVisible = mini;
         _normalRoot.IsVisible = !mini;
         _settings.Save();
-        if (mini) UpdateMiniChips(_stats.Snapshot());
+        if (mini) UpdateMiniChips(CurrentSnapshot());
     }
 
     private void UpdateMiniChips(StatsSnapshot s)
@@ -683,6 +877,21 @@ public sealed class MainWindow : Window
                 Margin = new Thickness(0, 0, 12, 0),
             });
         }
+        foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
+        {
+            var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
+            var result = s.Tracked.FirstOrDefault(t =>
+                string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase));
+            _miniChips.Children.Add(new TextBlock
+            {
+                Text = $"Target {name} {result?.TotalQuantity ?? 0}",
+                FontSize = 13,
+                FontWeight = FontWeight.SemiBold,
+                Foreground = AppTheme.AccentBrush,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 12, 0),
+            });
+        }
     }
 
     private static string FormatEta(double hours) => hours >= 1
@@ -698,6 +907,25 @@ public sealed class MainWindow : Window
         }
         _optionsWindow = new OptionsWindow(this);
         _optionsWindow.Show(this);
+    }
+
+    private void OnHistory(object? sender, EventArgs e)
+    {
+        _archiver.CheckpointSync(CurrentSnapshot());
+        if (_historyWindow is { IsVisible: true })
+        {
+            _historyWindow.Activate();
+            return;
+        }
+        _historyWindow = new HistoryWindow(_repo);
+        _historyWindow.Show();
+    }
+
+    private void DropCampMarker()
+    {
+        var s = CurrentSnapshot();
+        _stats.AddMarker($"Marker {s.Markers.Count + 1}" +
+            (s.CurrentZone.Length > 0 ? $" - {s.CurrentZone}" : ""));
     }
 
     private void OnGear(object? sender, EventArgs e) => _root.ContextMenu?.Open(_root);
@@ -757,6 +985,51 @@ public sealed class MainWindow : Window
                 }
             });
         });
+    }
+
+    internal static readonly (string Name, string File)[] AlertSounds =
+    [
+        ("Ding", "Windows Ding.wav"),
+        ("Notify", "Windows Notify.wav"),
+        ("Chimes", "chimes.wav"),
+        ("Chord", "chord.wav"),
+        ("Tada", "tada.wav"),
+        ("Exclamation", "Windows Exclamation.wav"),
+        ("Alarm", "Alarm01.wav"),
+    ];
+
+    internal void PlayAlertSound()
+    {
+        try
+        {
+            var choice = _settings.AlertSound switch
+            {
+                "Asterisk" or "" => "Ding",
+                "Beep" => "Chord",
+                "Hand" => "Chimes",
+                "Question" => "Notify",
+                { } other => other,
+            };
+            var named = Array.Find(AlertSounds, x => x.Name == choice);
+            var file = named.File is { } ? "" : choice;
+            if (file.Length > 0 && File.Exists(file))
+            {
+                if (TryStart("paplay", file) || TryStart("aplay", file))
+                    return;
+            }
+            Console.Beep();
+        }
+        catch (Exception ex) { App.LogError(ex); }
+    }
+
+    private static bool TryStart(string command, string file)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(command, file) { UseShellExecute = false });
+            return true;
+        }
+        catch { return false; }
     }
 
     private void OnUpdateBannerClick(object? sender, PointerPressedEventArgs e)
@@ -891,7 +1164,9 @@ public sealed class MainWindow : Window
         _settings.WindowLeft = Position.X;
         _settings.WindowTop = Position.Y;
         _settings.Save();
+        _archiver.FinalizeActiveSync(CurrentSnapshot(), "ApplicationExit");
         _watcher.Dispose();
+        _repo.Dispose();
         base.OnClosed(e);
         Shutdown();
     }
