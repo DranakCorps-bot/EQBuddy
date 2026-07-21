@@ -107,6 +107,7 @@ public sealed class MainWindow : Window
     private StatSort _dmgOutSort = StatSort.Total;
     private StatSort _dmgInSort = StatSort.Total;
     private StatSort _healSort = StatSort.Total;
+    private readonly bool _expandForTesting = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1";
 
     private static readonly string[] MiniStatOrder = ["kills", "dps", "hps", "loot", "money", "xp", "deaths"];
 
@@ -137,6 +138,9 @@ public sealed class MainWindow : Window
         UpdateStarVisuals();
         ApplySectionLayout();
         SetMode(_settings.Minimized);
+        if (_expandForTesting)
+            foreach (var section in _sections.Values)
+                section.IsExpanded = true;
         FollowActiveCharacter();
 
         if (_settings.LogFolder is { } lf)
@@ -745,6 +749,20 @@ public sealed class MainWindow : Window
             FillList(_zoneList, s.Zones.Select(z => (z.Text, z.Time.ToString("h:mm tt"))));
             _markersLabel.IsVisible = s.Markers.Count > 0;
             FillList(_markerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
+        }
+
+        if (_expandForTesting)
+        {
+            try
+            {
+                var dump = $"dmgSrc={_damageSourceList.Items.Count} dmgTaken={_damageTakenList.Items.Count} " +
+                    $"kills={_killList.Items.Count} party={_partyKillList.Items.Count} loot={_lootList.Items.Count} " +
+                    $"crafted={_craftedList.Items.Count} skills={_skillList.Items.Count} faction={_factionList.Items.Count} " +
+                    $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} " +
+                    $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
+                File.WriteAllText(AppPaths.File("debug.txt"), dump);
+            }
+            catch { }
         }
     }
 
