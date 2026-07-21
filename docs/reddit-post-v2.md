@@ -35,6 +35,10 @@ drill in.
   per-creature farming stats — average fight length, coin, XP, and **your observed drop
   rates** (e.g. `High Quality Cat Pelt ×2 · 18%`). These are *your* numbers from *your*
   kills, not wiki drop tables.
+- **Details!-style combat breakdown.** Damage by attack/spell/pet with share bars,
+  per-ability DPS (damage ÷ the time each ability was actually in use), crit rates,
+  and sortable columns where the bars follow the sort — same treatment for healing,
+  and the same rows in every saved session. If you've used Details!, you know.
 - **Stance breakdown.** If your class uses stances, damage/time/DPS are split per stance,
   with the current one shown in the Combat summary.
 - **Recent-window and active-time rates.** "Last 15m" figures next to session averages,
@@ -86,8 +90,8 @@ Per-section gallery (for an album or comment thread):
 
 | File | Caption suggestion |
 |---|---|
-| `section-combat.png` | Combat: Details!-style damage breakdown — share bars with total, hits, average, and crit % per row — damage taken per mob, recent fights with DPS bars, stance breakdown |
-| `section-healing.png` | Healing: HPS, heals cast per spell with averages, who healed you, regen/hymn tick counts |
+| `section-combat.png` | Combat: Details!-style damage breakdown — share bars with total, hits, average, per-ability DPS, and crit % per row — damage taken per mob, recent fights with DPS bars, stance breakdown |
+| `section-healing.png` | Healing: HPS, heals cast per spell with share bars, averages, and per-spell HPS; who healed you; regen/hymn tick counts |
 | `section-kills-loot.png` | Kills: per-creature counts and kills/hour, farming stats with observed drop % per item |
 | `section-loot.png` | Loot: every item with counts, plus items created by merging |
 | `section-tracked-money.png` | Tracked watch rules with per-hour rates; Money: corpse coin vs merchant sales, everything sold with prices |
