@@ -158,8 +158,11 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 - `src/EQBuddy` — WPF app (.NET 10, `net10.0-windows`). Build on Windows:
   `dotnet build src/EQBuddy/EQBuddy.csproj -c Release`. From non-Windows machines,
   add `-p:EnableWindowsTargeting=true`.
-- `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10). Build:
-  `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
+- `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10), created and
+  maintained by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) —
+  including the X11 global-hotkey and click-through implementations. It may trail
+  the WPF app by a few releases; a linux-x64 build is attached to GitHub releases.
+  Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
 - `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
   Both UI projects reference this; UI-independent code goes here.
 - `src/EQBuddy.Core/LogParser.cs` — one regex per log-line type; add new patterns here.
