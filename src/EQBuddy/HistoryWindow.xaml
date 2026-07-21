@@ -47,9 +47,22 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="DetailText" FontSize="12" TextWrapping="Wrap"
-                           Foreground="{StaticResource TextBrush}" FontFamily="Consolas"
-                           Text="Select a session."/>
+                <StackPanel>
+                    <TextBlock x:Name="DetailText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource TextBrush}" FontFamily="Consolas"
+                               Text="Select a session."/>
+                    <TextBlock x:Name="DamageVisualLabel" Text="Top damage sources" FontSize="12"
+                               FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"
+                               Margin="0,6,0,2" Visibility="Collapsed"/>
+                    <ItemsControl x:Name="DamageVisualList" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="HealVisualLabel" Text="Top heals" FontSize="12"
+                               FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}"
+                               Margin="0,8,0,2" Visibility="Collapsed"/>
+                    <ItemsControl x:Name="HealVisualList" Margin="0,0,8,0"/>
+                    <TextBlock x:Name="DetailRest" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource TextBrush}" FontFamily="Consolas"
+                               Margin="0,8,0,0" Visibility="Collapsed"/>
+                </StackPanel>
             </ScrollViewer>
             <StackPanel Grid.Row="1" Margin="0,8,0,0">
                 <Grid>

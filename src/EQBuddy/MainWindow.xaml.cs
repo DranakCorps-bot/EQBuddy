@@ -377,9 +377,9 @@ public partial class MainWindow : Window
             {
                 // Bars compare per-fight DPS against the hottest recent fight.
                 var topFightDps = Math.Max(0.1, s.RecentEncounters.Max(f => f.Dps));
-                var fightBrush = AccentBarBrush();
+                var fightBrush = BreakdownRows.BarBrush(this);
                 foreach (var f in s.RecentEncounters)
-                    RecentFightsList.Items.Add(BarRow(f.Name,
+                    RecentFightsList.Items.Add(BreakdownRows.Row(this, f.Name,
                         $"{f.DurationSeconds:0}s · {f.Dps:0.#} dps{(f.Outcome == "Timeout" ? " · ?" : "")}",
                         f.Dps / topFightDps, fightBrush,
                         $"{f.DamageOut:N0} damage over {f.DurationSeconds:0}s"));
@@ -906,7 +906,7 @@ public partial class MainWindow : Window
             _ => d => d.Total,
         };
         var topMetric = Math.Max(1e-9, sorted.Max(metric));
-        var barBrush = AccentBarBrush();
+        var barBrush = BreakdownRows.BarBrush(this);
 
         foreach (var d in sorted)
         {
@@ -915,48 +915,8 @@ public partial class MainWindow : Window
             var value = $"{d.Total:N0} · ×{d.Hits} · avg {Avg(d):0.#}{ratePart}{critPart}";
             var tooltip = $"{100.0 * d.Total / grand:0.#}% of total" +
                 (d.ActiveSeconds > 0 ? $" · {rateLabel} = total ÷ ~{d.ActiveSeconds:0}s this ability was in use" : "");
-            list.Items.Add(BarRow(d.Name, value, metric(d) / topMetric, barBrush, tooltip));
+            list.Items.Add(BreakdownRows.Row(this, d.Name, value, metric(d) / topMetric, barBrush, tooltip));
         }
-    }
-
-    /// <summary>One breakdown row: a share bar sized to frac behind "name … value".</summary>
-    private Grid BarRow(string name, string value, double frac, Brush barBrush, string? tooltip)
-    {
-        frac = Math.Clamp(frac, 0.004, 1.0);
-        var row = new Grid { Margin = new Thickness(0, 1, 0, 0), HorizontalAlignment = HorizontalAlignment.Stretch };
-        var bar = new Border
-        {
-            Background = barBrush, CornerRadius = new CornerRadius(2),
-            HorizontalAlignment = HorizontalAlignment.Left, Width = 0,
-        };
-        // Star columns collapse under infinite measure, so size the bar explicitly.
-        row.SizeChanged += (_, se) => bar.Width = Math.Max(0, se.NewSize.Width * frac);
-        row.Children.Add(bar);
-
-        var content = new Grid { Margin = new Thickness(4, 1, 0, 1) };
-        content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        content.Children.Add(new TextBlock
-        {
-            Text = name, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis,
-            Foreground = (Brush)FindResource("TextBrush"),
-        });
-        var right = new TextBlock
-        {
-            Text = value, FontSize = 11, Foreground = (Brush)FindResource("DimBrush"),
-            Margin = new Thickness(8, 1, 2, 0),
-        };
-        Grid.SetColumn(right, 1);
-        content.Children.Add(right);
-        row.Children.Add(content);
-        if (tooltip is not null) row.ToolTip = tooltip;
-        return row;
-    }
-
-    private SolidColorBrush AccentBarBrush()
-    {
-        var accent = ((SolidColorBrush)FindResource("AccentBrush")).Color;
-        return new SolidColorBrush(Color.FromArgb(0x2E, accent.R, accent.G, accent.B));
     }
 
     /// <summary>Render a Total/Count/Avg stat list in the chosen sort order.</summary>

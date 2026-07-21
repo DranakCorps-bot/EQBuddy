@@ -151,10 +151,13 @@ session-start) never inserts twice — restarts with auto-empty off and repeated
 imports update the existing row.
 
 History window: character filter, live search (zone, loot, creature, notes, tags,
-snapshot content), full per-session breakdown, notes + tags, copy summary, JSON
-export, delete (confirmed), **Ctrl-click two sessions to compare** rates
-side-by-side, **Import log…** replays any eqlog into history (ImportedBoundary
-sessions).
+snapshot content), full per-session breakdown — Top damage sources and Top heals
+render with the same bar rows as the live widget (total · ×hits · avg · dps/hps ·
+crit%), falling back to text-only for sessions stored before active-time tracking —
+notes + tags, copy summary (plain text with `█` share bars), JSON export, delete
+(confirmed), **Ctrl-click two sessions to compare** rates side-by-side,
+**Import log…** replays any eqlog into history (ImportedBoundary sessions;
+re-importing the same file updates rows instead of duplicating).
 
 **Verify:** fixture with an old block + live block → exactly one finished row + one
 in-progress row; relaunch → still exactly those rows (dedup); import the same file
