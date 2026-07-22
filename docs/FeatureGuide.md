@@ -24,6 +24,16 @@ You don't need the game (or Windows) to exercise almost everything:
 - `docs/screenshots/` shows the current WPF rendering of each section for side-by-side
   comparison (regenerated with each release that changes visuals).
 
+## Quick tutorial
+
+A six-page tour shown at every launch until finished or dismissed ("Never show
+again", or the Options checkbox "Show quick tutorial at launch"; right-click →
+Quick tutorial… reopens it on demand). Page 1 is the **log-truncation consent
+question** — while the tour is still enabled, the startup janitor defers log
+truncation, so a new user's logs are never emptied before they've answered.
+"Skip for now" shows it again next launch; Finish and Never both stop the
+auto-show (the last page says how to get it back).
+
 ## The widget (main window)
 
 Always-on-top, borderless, draggable anywhere on its surface; position persists.

@@ -53,6 +53,12 @@
             <TextBlock Text="Turn off if you upload your log files elsewhere — they will grow forever, so clean them up yourself occasionally."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
 
+            <CheckBox x:Name="TutorialCheck" Margin="0,10,0,0"
+                      Checked="OnTutorialToggled" Unchecked="OnTutorialToggled">
+                <TextBlock Text="Show quick tutorial at launch" FontSize="12"
+                           Foreground="{StaticResource TextBrush}"/>
+            </CheckBox>
+
             <Grid Margin="0,12,0,0">
                 <TextBlock Text="Recent-rate window" FontSize="12"/>
                 <ComboBox x:Name="WindowCombo" HorizontalAlignment="Right" Width="90" FontSize="12"
@@ -63,11 +69,16 @@
 
             <TextBlock Text="Watch rules" FontSize="12" FontWeight="SemiBold"
                        Foreground="{StaticResource AccentBrush}" Margin="0,14,0,2"/>
-            <TextBlock Text="Watch loot, kills, skill-ups, deaths, milestones, or your spells wearing off (SpellFade — the mez/charm-break alarm). Match is a substring, e.g. 'mote' or 'Befriend'. 📌 pins a mini-dashboard chip; 🔔 banner and 🔊 sound alert on each match."
+            <TextBlock Text="Watch loot, kills, skill-ups, deaths, milestones, or your spells wearing off (SpellFade — the mez/charm-break alarm). Match is a substring, e.g. 'mote' or 'Befriend'. 🔔 banner and 🔊 sound alert on each match."
                        Style="{StaticResource Dim}" TextWrapping="Wrap"/>
             <StackPanel x:Name="RulesPanel" Margin="0,4,0,0"/>
-            <Button x:Name="AddRuleBtn" Content="+ Add tracked item" Style="{StaticResource IconButton}"
+            <Button x:Name="AddRuleBtn" Content="+ Add watch rule" Style="{StaticResource IconButton}"
                     HorizontalAlignment="Left" FontSize="12" Click="OnAddRule"/>
+            <CheckBox x:Name="PinChipsCheck" Margin="0,6,0,0"
+                      Checked="OnPinChipsChanged" Unchecked="OnPinChipsChanged">
+                <TextBlock Text="📌 Show watch chips in the mini dashboard" FontSize="12"
+                           Foreground="{StaticResource TextBrush}"/>
+            </CheckBox>
 
             <Grid Margin="0,8,0,0">
                 <TextBlock Text="Alert sound" FontSize="12" VerticalAlignment="Center"/>

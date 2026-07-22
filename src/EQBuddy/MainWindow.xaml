@@ -13,6 +13,7 @@
                 <MenuItem x:Name="VersionMenuItem" Header="EQBuddy" IsEnabled="False"/>
                 <MenuItem Header="Check for updates" Click="OnCheckUpdates"/>
                 <MenuItem Header="Options… (size, opacity, watch rules)" Click="OnOptions"/>
+                <MenuItem Header="Quick tutorial…" Click="OnTutorial"/>
                 <MenuItem Header="Drop camp marker" Click="OnCampMarker"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
                 <Separator/>

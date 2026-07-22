@@ -37,6 +37,9 @@ public partial class OptionsWindow : Window
         SoundCombo.SelectedIndex = idx >= 0 ? idx : SoundNames.Length;   // custom slot
         UpdateSoundFileNote();
 
+        PinChipsCheck.IsChecked = main.Settings.PinWatchChips;
+        TutorialCheck.IsChecked = main.Settings.ShowTutorial;
+
         BuildRulesEditor();
         BuildCardsEditor();
         HotkeyNote.Text =
@@ -113,6 +116,20 @@ public partial class OptionsWindow : Window
 
     private void OnSoundTest(object sender, RoutedEventArgs e) => _main.PlayAlertSound();
 
+    private void OnTutorialToggled(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _main.Settings.ShowTutorial = TutorialCheck.IsChecked == true;
+        _main.PersistSettings();
+    }
+
+    private void OnPinChipsChanged(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _main.Settings.PinWatchChips = PinChipsCheck.IsChecked == true;
+        _main.PersistSettings();
+    }
+
     private void OnAddRule(object sender, RoutedEventArgs e)
     {
         _main.Settings.TrackedRules.Add(new EQBuddy.Core.TrackedRule { Name = "", Pattern = "" });
@@ -155,11 +172,9 @@ public partial class OptionsWindow : Window
             System.Windows.Controls.Grid.SetColumn(pattern, 2);
             row.Children.Add(pattern);
 
-            row.Children.Add(RuleToggle("📌", "Pin to mini dashboard", 3, rule.Pinned,
-                v => rule.Pinned = v));
-            row.Children.Add(RuleToggle("🔔", "Banner alert on match", 4, rule.AlertBanner,
+            row.Children.Add(RuleToggle("🔔", "Banner alert on match", 3, rule.AlertBanner,
                 v => rule.AlertBanner = v));
-            row.Children.Add(RuleToggle("🔊", "Sound alert on match", 5, rule.AlertSound,
+            row.Children.Add(RuleToggle("🔊", "Sound alert on match", 4, rule.AlertSound,
                 v => rule.AlertSound = v));
 
             var del = new System.Windows.Controls.Button
@@ -172,7 +187,7 @@ public partial class OptionsWindow : Window
                 _main.PersistSettings();
                 BuildRulesEditor();
             };
-            System.Windows.Controls.Grid.SetColumn(del, 6);
+            System.Windows.Controls.Grid.SetColumn(del, 5);
             row.Children.Add(del);
 
             RulesPanel.Children.Add(row);

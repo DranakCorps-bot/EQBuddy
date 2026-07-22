@@ -42,6 +42,10 @@ public partial class MainWindow : Window
         MaxHeight = SystemParameters.WorkArea.Height - 20;
         SectionScroll.MaxHeight = SystemParameters.WorkArea.Height - 160;
 
+        // Migration: any per-rule pin from older versions turns on the group pin.
+        if (!_settings.PinWatchChips && _settings.TrackedRules.Any(r => r.Pinned))
+            _settings.PinWatchChips = true;
+
         if (_settings.LogFolder is { } saved && !System.IO.Directory.Exists(saved))
             _settings.LogFolder = null; // stale saved path (game moved) — re-detect
         _settings.LogFolder ??= LogWatcher.FindDefaultLogFolder();
@@ -61,11 +65,18 @@ public partial class MainWindow : Window
 
         FollowActiveCharacter();
 
+        // The quick tour shows at every launch until disabled ("Never show again"
+        // in the tour, or the Options checkbox).
+        if (_settings.ShowTutorial)
+            Loaded += (_, _) => new TutorialWindow(this).Show();
+
         // Log hygiene at startup: force Log=1 and wipe finished-session logs
-        // (both no-ops while the game is running).
+        // (both no-ops while the game is running). Truncation waits while the tour
+        // is enabled — its first page is the consent question; the 10-minute
+        // periodic janitor handles it afterwards.
         if (_settings.LogFolder is { } lf)
         {
-            var prune = _settings.TruncateLogs;
+            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(lf);
@@ -652,6 +663,8 @@ public partial class MainWindow : Window
         catch (Exception ex) { App.LogError(ex); }
     }
 
+    private void OnTutorial(object sender, RoutedEventArgs e) => new TutorialWindow(this).Show();
+
     private void OnCampMarker(object sender, RoutedEventArgs e) => DropCampMarker();
 
     private HistoryWindow? _historyWindow;
@@ -765,8 +778,10 @@ public partial class MainWindow : Window
             });
         }
 
-        // Pinned tracked-loot rules get their own chips (TRACK-006).
-        foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
+        // One pin for the whole watch group: chips for every enabled rule (TRACK-006).
+        foreach (var rule in _settings.PinWatchChips
+                     ? _settings.TrackedRules.Where(r => r.Enabled)
+                     : [])
         {
             var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
             var result = s.Tracked.FirstOrDefault(t =>

@@ -29,6 +29,14 @@ public sealed class AppSettings
     /// <summary>Position of the floating alert tile; NaN = above the widget.</summary>
     public double AlertLeft { get; set; } = double.NaN;
     public double AlertTop { get; set; } = double.NaN;
+    /// <summary>One pin for the whole watch group: show all enabled rules as mini
+    /// chips (replaces per-rule Pinned, which is kept for settings compatibility
+    /// and migrated on load).</summary>
+    public bool PinWatchChips { get; set; }
+    /// <summary>Show the quick tour at every launch. Turned off by the tutorial's
+    /// "Never show again" button or the Options checkbox. While on, the startup
+    /// janitor defers log truncation — the tour's first page is its consent question.</summary>
+    public bool ShowTutorial { get; set; } = true;
     /// <summary>Overlay card order (section keys); missing keys append in default order.</summary>
     public List<string> SectionOrder { get; set; } = [];
     /// <summary>Hidden overlay cards (still collect data — OVERLAY acceptance).</summary>
@@ -41,12 +49,21 @@ public sealed class AppSettings
 
     private static string FilePath => AppPaths.File("settings.json");
 
+    // NaN is a legitimate value here ("not placed yet" window positions), and the
+    // default serializer refuses it — which made Save() throw and silently drop
+    // every settings change on profiles with an unplaced window.
+    private static readonly JsonSerializerOptions JsonOpts = new()
+    {
+        WriteIndented = true,
+        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals,
+    };
+
     public static AppSettings Load()
     {
         try
         {
             if (File.Exists(FilePath))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new();
+                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath), JsonOpts) ?? new();
         }
         catch (Exception ex)
         {
@@ -60,8 +77,7 @@ public sealed class AppSettings
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(this,
-                new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(FilePath, JsonSerializer.Serialize(this, JsonOpts));
         }
         catch (Exception ex)
         {

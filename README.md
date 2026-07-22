@@ -24,7 +24,10 @@ download when one is available.
 ## For players (family install guide)
 
 1. Run **EQBuddySetup.exe** and click through the installer (no admin needed).
-2. Launch **EQBuddy** from the Start Menu or desktop shortcut.
+2. Launch **EQBuddy** from the Start Menu or desktop shortcut. A **quick tutorial**
+   walks you through the key features — its first page asks whether EQBuddy may
+   auto-empty finished-session logs (say no if you upload logs elsewhere; nothing is
+   touched until you answer). Reopen it any time: right-click → **Quick tutorial…**
 3. Start EverQuest Legends and log into your character.
 4. Play! The widget updates live. Click a section (Combat, Kills, Loot, …) to expand details.
    - EQBuddy turns the game's logging on permanently (it sets `Log=1` in `eqclient.ini`
