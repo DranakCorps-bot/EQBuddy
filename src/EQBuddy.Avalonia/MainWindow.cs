@@ -130,6 +130,10 @@ public sealed class MainWindow : Window
         Opacity = _settings.Opacity;
         Content = BuildRoot();
 
+        // Migration: any old per-rule pin enables the replacement group pin.
+        if (!_settings.PinWatchChips && _settings.TrackedRules.Any(r => r.Pinned))
+            _settings.PinWatchChips = true;
+
         if (_settings.LogFolder is { } saved && !Directory.Exists(saved))
             _settings.LogFolder = null;
         _settings.LogFolder ??= LogWatcher.FindDefaultLogFolder();
@@ -146,7 +150,9 @@ public sealed class MainWindow : Window
 
         if (_settings.LogFolder is { } lf)
         {
-            var prune = _settings.TruncateLogs;
+            // Page one of the launch tour is the log-truncation consent question.
+            // Leave existing logs untouched until the user has answered it.
+            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(lf);
@@ -161,6 +167,8 @@ public sealed class MainWindow : Window
         {
             UpdateWindowHeightLimit();
             RegisterGlobalHotkeys();
+            if (_settings.ShowTutorial)
+                new TutorialWindow(this).Show(this);
         };
     }
 
@@ -514,6 +522,8 @@ public sealed class MainWindow : Window
         check.Click += (_, _) => { _lastUpdateCheck = DateTime.Now; CheckForUpdates(manual: true); };
         var options = new MenuItem { Header = "Options... (size, opacity, watch rules)" };
         options.Click += OnOptions;
+        var tutorial = new MenuItem { Header = "Quick tutorial..." };
+        tutorial.Click += OnTutorial;
         var marker = new MenuItem { Header = "Drop camp marker" };
         marker.Click += (_, _) => DropCampMarker();
         var history = new MenuItem { Header = "Session history..." };
@@ -531,6 +541,7 @@ public sealed class MainWindow : Window
         menu.Items.Add(version);
         menu.Items.Add(check);
         menu.Items.Add(options);
+        menu.Items.Add(tutorial);
         menu.Items.Add(marker);
         menu.Items.Add(history);
         menu.Items.Add(new Separator());
@@ -629,7 +640,7 @@ public sealed class MainWindow : Window
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
             _lastJanitorRun = DateTime.Now;
-            var prune = _settings.TruncateLogs;
+            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(folder);
@@ -952,7 +963,9 @@ public sealed class MainWindow : Window
                 Margin = new Thickness(0, 0, 12, 0),
             });
         }
-        foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
+        foreach (var rule in _settings.PinWatchChips
+                     ? _settings.TrackedRules.Where(r => r.Enabled)
+                     : [])
         {
             var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
             var result = s.Tracked.FirstOrDefault(t =>
@@ -985,6 +998,8 @@ public sealed class MainWindow : Window
         _optionsWindow.Show(this);
         AlertTile.EnterPlacement();
     }
+
+    private void OnTutorial(object? sender, EventArgs e) => new TutorialWindow(this).Show(this);
 
     private void OnHistory(object? sender, EventArgs e)
     {

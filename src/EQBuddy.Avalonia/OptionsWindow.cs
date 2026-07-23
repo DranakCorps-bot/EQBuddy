@@ -20,6 +20,8 @@ public sealed class OptionsWindow : Window
     private readonly Slider _bgOpacitySlider = Slider(0.15, 1.0, 0.05);
     private readonly Slider _opacitySlider = Slider(0.5, 1.0, 0.02);
     private readonly CheckBox _truncateCheck = new() { Margin = new Thickness(0, 12, 0, 0) };
+    private readonly CheckBox _tutorialCheck = new() { Margin = new Thickness(0, 10, 0, 0) };
+    private readonly CheckBox _pinChipsCheck = new() { Margin = new Thickness(0, 6, 0, 0) };
     private readonly ComboBox _windowCombo = new() { Width = 90, FontSize = 12 };
     private readonly ComboBox _soundCombo = new() { Width = 120, FontSize = 12 };
     private readonly TextBlock _soundFileNote = AppTheme.DimText("");
@@ -67,6 +69,34 @@ public sealed class OptionsWindow : Window
         _truncateCheck.IsCheckedChanged += (_, _) =>
         {
             if (_ready) _main.SetTruncateLogs(_truncateCheck.IsChecked == true);
+        };
+
+        _tutorialCheck.Content = new TextBlock
+        {
+            Text = "Show quick tutorial at launch",
+            FontSize = 12,
+            Foreground = AppTheme.TextBrush,
+        };
+        _tutorialCheck.IsChecked = main.Settings.ShowTutorial;
+        _tutorialCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (!_ready) return;
+            _main.Settings.ShowTutorial = _tutorialCheck.IsChecked == true;
+            _main.PersistSettings();
+        };
+
+        _pinChipsCheck.Content = new TextBlock
+        {
+            Text = "📌 Show watch chips in the mini dashboard",
+            FontSize = 12,
+            Foreground = AppTheme.TextBrush,
+        };
+        _pinChipsCheck.IsChecked = main.Settings.PinWatchChips;
+        _pinChipsCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (!_ready) return;
+            _main.Settings.PinWatchChips = _pinChipsCheck.IsChecked == true;
+            _main.PersistSettings();
         };
 
         foreach (var m in (int[])[5, 15, 30]) _windowCombo.Items.Add($"{m} min");
@@ -125,14 +155,15 @@ public sealed class OptionsWindow : Window
         panel.Children.Add(AppTheme.DimText(
             "Turn off if you upload your log files elsewhere - they will grow forever, so clean them up yourself occasionally.",
             new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(_tutorialCheck);
 
         panel.Children.Add(Row("Recent-rate window", _windowCombo, new Thickness(0, 12, 0, 0)));
         panel.Children.Add(AppTheme.DimText("The Last Xm figures on Combat, Kills, Money, and Progress."));
 
         panel.Children.Add(Heading("Watch rules", new Thickness(0, 14, 0, 2)));
-        panel.Children.Add(AppTheme.DimText("Watch loot, kills, skill-ups, deaths, milestones, or your spells wearing off (SpellFade — the mez/charm-break alarm). Match is a case-insensitive substring, e.g. 'mote' or 'Befriend'; when empty, the display name is used. P pins a mini chip, B shows a banner, and S plays a sound."));
+        panel.Children.Add(AppTheme.DimText("Watch loot, kills, skill-ups, deaths, milestones, or your spells wearing off (SpellFade — the mez/charm-break alarm). Match is a case-insensitive substring, e.g. 'mote' or 'Befriend'; when empty, the display name is used. B shows a banner and S plays a sound."));
         panel.Children.Add(_rulesPanel);
-        var add = AppTheme.IconButton("+ Add tracked item", "Add tracked item");
+        var add = AppTheme.IconButton("+ Add watch rule", "Add watch rule");
         add.HorizontalAlignment = HorizontalAlignment.Left;
         add.FontSize = 12;
         add.Click += (_, _) =>
@@ -142,6 +173,7 @@ public sealed class OptionsWindow : Window
             BuildRulesEditor();
         };
         panel.Children.Add(add);
+        panel.Children.Add(_pinChipsCheck);
 
         var soundRow = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
         soundRow.Children.Add(_soundCombo);
@@ -174,7 +206,7 @@ public sealed class OptionsWindow : Window
             row.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(92)));
             row.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(115)));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 3; i++)
                 row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
 
             var kind = new ComboBox { FontSize = 11, Margin = new Thickness(0, 0, 4, 0) };
@@ -203,9 +235,8 @@ public sealed class OptionsWindow : Window
             Grid.SetColumn(pattern, 2);
             row.Children.Add(pattern);
 
-            row.Children.Add(RuleToggle("P", "Pin to mini dashboard", 3, rule.Pinned, v => rule.Pinned = v));
-            row.Children.Add(RuleToggle("B", "Banner alert on match", 4, rule.AlertBanner, v => rule.AlertBanner = v));
-            row.Children.Add(RuleToggle("S", "Sound alert on match", 5, rule.AlertSound, v => rule.AlertSound = v));
+            row.Children.Add(RuleToggle("B", "Banner alert on match", 3, rule.AlertBanner, v => rule.AlertBanner = v));
+            row.Children.Add(RuleToggle("S", "Sound alert on match", 4, rule.AlertSound, v => rule.AlertSound = v));
 
             var del = AppTheme.IconButton("x", "Delete rule");
             del.Click += (_, _) =>
@@ -214,7 +245,7 @@ public sealed class OptionsWindow : Window
                 _main.PersistSettings();
                 BuildRulesEditor();
             };
-            Grid.SetColumn(del, 6);
+            Grid.SetColumn(del, 5);
             row.Children.Add(del);
             _rulesPanel.Children.Add(row);
         }

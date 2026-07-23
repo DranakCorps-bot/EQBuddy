@@ -20,4 +20,9 @@
     <ProjectReference Include="..\EQBuddy.Core\EQBuddy.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AvaloniaResource Include="..\EQBuddy\Assets\tutorial\*.png"
+                      Link="Assets\tutorial\%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>
