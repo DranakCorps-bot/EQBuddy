@@ -1,0 +1,149 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="using:EQBuddy.UI.Shared"
+        x:Class="EQBuddy.Avalonia.HistoryWindow"
+        x:DataType="shared:HistoryViewModel"
+        Title="EQBuddy - Session History"
+        Width="860" Height="560"
+        MinWidth="640" MinHeight="400"
+        Background="#FF1C1917"
+        WindowStartupLocation="CenterScreen">
+
+  <Window.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#FFEDE4D3" />
+    </Style>
+    <Style Selector="TextBlock.dim">
+      <Setter Property="Foreground" Value="#FF9C927F" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="TextBox.dark">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Padding" Value="6,4" />
+      <Setter Property="Background" Value="#FF2A251F" />
+      <Setter Property="Foreground" Value="#FFEDE4D3" />
+      <Setter Property="BorderBrush" Value="#66C9A227" />
+      <Setter Property="CaretBrush" Value="#FFE3B341" />
+      <Setter Property="SelectionBrush" Value="#77E3B341" />
+    </Style>
+    <Style Selector="ComboBox.dark">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="#FF2A251F" />
+      <Setter Property="Foreground" Value="#FFEDE4D3" />
+      <Setter Property="BorderBrush" Value="#66C9A227" />
+    </Style>
+    <Style Selector="Button.action">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#FF9C927F" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.action:pointerover">
+      <Setter Property="Background" Value="#33FFD98C" />
+      <Setter Property="Foreground" Value="#FFEDE4D3" />
+    </Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Foreground" Value="#FFD9634F" />
+    </Style>
+    <Style Selector="ListBoxItem">
+      <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="Padding" Value="8,6" />
+      <Setter Property="Background" Value="#552A251F" />
+      <Setter Property="BorderBrush" Value="#66C9A227" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+    <Style Selector="ListBoxItem:pointerover">
+      <Setter Property="Background" Value="#772F2A22" />
+    </Style>
+    <Style Selector="ListBoxItem:selected">
+      <Setter Property="Background" Value="#885A4513" />
+      <Setter Property="BorderBrush" Value="#FFE3B341" />
+    </Style>
+  </Window.Styles>
+
+  <Grid Margin="10" RowDefinitions="Auto,*" ColumnDefinitions="330,*">
+    <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,8"
+          ColumnDefinitions="180,*,Auto,Auto">
+      <ComboBox x:Name="CharFilter"
+                Classes="dark"
+                ItemsSource="{Binding Filters}"
+                SelectedItem="{Binding SelectedFilter}"
+                SelectionChanged="OnFilterChanged" />
+      <TextBox x:Name="SearchBox"
+               Grid.Column="1"
+               Classes="dark"
+               Margin="8,0,0,0"
+               Text="{Binding SearchText}"
+               TextChanged="OnSearchChanged"
+               PlaceholderText="Search"
+               ToolTip.Tip="Search character, zone, notes, tags, loot, or creature names" />
+      <TextBlock Grid.Column="2"
+                 Classes="dim"
+                 VerticalAlignment="Center"
+                 Margin="8,0,0,0"
+                 Text="{Binding CountText}" />
+      <Button Grid.Column="3"
+              Classes="action"
+              Margin="8,0,0,0"
+              Content="Import log..."
+              Click="OnImportLog"
+              ToolTip.Tip="Parse an existing eqlog file into session history" />
+    </Grid>
+
+    <ListBox x:Name="SessionList"
+             Grid.Row="1"
+             ItemsSource="{Binding Sessions}"
+             SelectionMode="Multiple"
+             SelectionChanged="OnSessionSelected"
+             Background="#441C1917"
+             BorderThickness="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="shared:HistorySessionItem">
+          <TextBlock Text="{Binding DisplayText}"
+                     FontSize="12"
+                     TextWrapping="Wrap" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <Grid Grid.Row="1" Grid.Column="1" Margin="10,0,0,0" RowDefinitions="*,Auto">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <TextBlock FontSize="12"
+                   TextWrapping="Wrap"
+                   Foreground="#FFEDE4D3"
+                   FontFamily="Consolas, monospace"
+                   Text="{Binding DetailText}" />
+      </ScrollViewer>
+
+      <StackPanel Grid.Row="1" Margin="0,8,0,0">
+        <Grid ColumnDefinitions="Auto,*">
+          <TextBlock Classes="dim" Text="Notes:"
+                     VerticalAlignment="Center" Margin="0,0,6,0" />
+          <TextBox x:Name="NoteBox"
+                   Grid.Column="1"
+                   Classes="dark"
+                   Text="{Binding Note}" />
+        </Grid>
+        <Grid Margin="0,4,0,0" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="dim" Text="Tags:"
+                     VerticalAlignment="Center" Margin="0,0,6,0" />
+          <TextBox x:Name="TagsBox"
+                   Grid.Column="1"
+                   Classes="dark"
+                   Text="{Binding Tags}"
+                   ToolTip.Tip="Comma-separated, e.g. solo, basement, new weapon" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <Button Classes="action" Content="Save notes" Click="OnSaveMeta" />
+          <Button Classes="action" Content="Copy summary" Click="OnCopySummary" Margin="8,0,0,0" />
+          <Button Classes="action" Content="Export JSON" Click="OnExportJson" Margin="8,0,0,0" />
+          <Button Classes="action danger" Content="Delete session" Click="OnDelete" Margin="24,0,0,0" />
+        </StackPanel>
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>
