@@ -33,8 +33,6 @@ public sealed class MainWindow : Window
     private readonly TextBlock _charLabel = AppTheme.DimText("looking for a character...");
     private readonly ScrollViewer _sectionScroll = new();
     private readonly Border _logBanner = Banner(AppTheme.WarnBrush);
-    private readonly Border _alertBanner = Banner(AppTheme.AccentBrush);
-    private readonly TextBlock _alertText = new() { FontSize = 12, Foreground = AppTheme.AccentBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly Border _updateBanner = Banner(AppTheme.GoodBrush);
     private readonly TextBlock _updateText = new() { FontSize = 12, Foreground = AppTheme.GoodBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _zoneText = AppTheme.DimText("-");
@@ -106,6 +104,7 @@ public sealed class MainWindow : Window
     private X11HotkeyService? _hotkeys;
     private HistoryWindow? _historyWindow;
     private OptionsWindow? _optionsWindow;
+    private AlertWindow? _alertWindow;
     private StatSort _dmgOutSort = StatSort.Total;
     private StatSort _dmgInSort = StatSort.Total;
     private StatSort _healSort = StatSort.Total;
@@ -131,6 +130,10 @@ public sealed class MainWindow : Window
         Opacity = _settings.Opacity;
         Content = BuildRoot();
 
+        // Migration: any old per-rule pin enables the replacement group pin.
+        if (!_settings.PinWatchChips && _settings.TrackedRules.Any(r => r.Pinned))
+            _settings.PinWatchChips = true;
+
         if (_settings.LogFolder is { } saved && !Directory.Exists(saved))
             _settings.LogFolder = null;
         _settings.LogFolder ??= LogWatcher.FindDefaultLogFolder();
@@ -147,7 +150,9 @@ public sealed class MainWindow : Window
 
         if (_settings.LogFolder is { } lf)
         {
-            var prune = _settings.TruncateLogs;
+            // Page one of the launch tour is the log-truncation consent question.
+            // Leave existing logs untouched until the user has answered it.
+            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(lf);
@@ -162,6 +167,8 @@ public sealed class MainWindow : Window
         {
             UpdateWindowHeightLimit();
             RegisterGlobalHotkeys();
+            if (_settings.ShowTutorial)
+                new TutorialWindow(this).Show(this);
         };
     }
 
@@ -235,13 +242,10 @@ public sealed class MainWindow : Window
             Margin = new Thickness(10),
             Children =
             {
-                _alertBanner,
                 BuildMiniRoot(),
                 BuildNormalRoot(),
             },
         };
-        _alertBanner.Child = _alertText;
-        _alertBanner.Margin = new Thickness(0, 0, 0, 8);
         return _scaleRoot;
     }
 
@@ -479,8 +483,9 @@ public sealed class MainWindow : Window
         sortBar.HorizontalAlignment = HorizontalAlignment.Right;
         sortBar.Children.Add(AppTheme.DimText("sort:", new Thickness(0, 0, 4, 0)));
         total = SortLink("total", "total", handler, selected: true);
+        var rateSubject = title.Contains("Heal", StringComparison.OrdinalIgnoreCase) ? "spell" : "ability";
         rate = rateText is null ? null : SortLink(rateText, "rate", handler,
-            tip: $"Per-ability {rateText}: total divided by the time that ability was in use");
+            tip: $"Per-{rateSubject} {rateText}: that {rateSubject}'s total divided by total time in combat");
         hits = SortLink(title.Contains("Heal", StringComparison.OrdinalIgnoreCase) ? "casts" : "hits", "hits", handler);
         avg = SortLink("avg", "avg", handler);
         sortBar.Children.Add(total);
@@ -515,8 +520,10 @@ public sealed class MainWindow : Window
         var version = new MenuItem { Header = $"EQBuddy v{UpdateChecker.CurrentVersion}", IsEnabled = false };
         var check = new MenuItem { Header = "Check for updates" };
         check.Click += (_, _) => { _lastUpdateCheck = DateTime.Now; CheckForUpdates(manual: true); };
-        var options = new MenuItem { Header = "Options... (size, opacity, tracked loot)" };
+        var options = new MenuItem { Header = "Options... (size, opacity, watch rules)" };
         options.Click += OnOptions;
+        var tutorial = new MenuItem { Header = "Quick tutorial..." };
+        tutorial.Click += OnTutorial;
         var marker = new MenuItem { Header = "Drop camp marker" };
         marker.Click += (_, _) => DropCampMarker();
         var history = new MenuItem { Header = "Session history..." };
@@ -534,6 +541,7 @@ public sealed class MainWindow : Window
         menu.Items.Add(version);
         menu.Items.Add(check);
         menu.Items.Add(options);
+        menu.Items.Add(tutorial);
         menu.Items.Add(marker);
         menu.Items.Add(history);
         menu.Items.Add(new Separator());
@@ -632,7 +640,7 @@ public sealed class MainWindow : Window
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
             _lastJanitorRun = DateTime.Now;
-            var prune = _settings.TruncateLogs;
+            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
             Task.Run(() =>
             {
                 EqConfig.EnsureLoggingEnabled(folder);
@@ -645,11 +653,6 @@ public sealed class MainWindow : Window
         {
             _updateBanner.IsVisible = false;
             _upToDateNoticeUntil = DateTime.MinValue;
-        }
-        if (_alertUntil != DateTime.MinValue && DateTime.Now > _alertUntil)
-        {
-            _alertBanner.IsVisible = false;
-            _alertUntil = DateTime.MinValue;
         }
         if (_watcher.LastError is { } err) App.LogError(err);
 
@@ -697,7 +700,7 @@ public sealed class MainWindow : Window
                 (s.SpecialHits.Count > 0 ? "\n" + string.Join(" - ", s.SpecialHits.Select(x => $"{x.Name} {x.Count}")) : "") +
                 (s.Fizzles + s.Resists > 0 ? $"\nFizzles {s.Fizzles} - resists {s.Resists}" : "") +
                 (s.CurrentStance.Length > 0 ? $"\nStance: {s.CurrentStance}" : "");
-            FillBreakdown(_damageSourceList, s.DamageBySource, _dmgOutSort, "dps");
+            FillBreakdown(_damageSourceList, s.DamageBySource, _dmgOutSort, s.CombatSeconds, "dps");
             FillStatList(_damageTakenList, s.DamageByAttacker, _dmgInSort, "hit");
             _recentFightsLabel.IsVisible = s.RecentEncounters.Count > 0;
             var topFightDps = Math.Max(0.1, s.RecentEncounters.Count > 0
@@ -721,7 +724,7 @@ public sealed class MainWindow : Window
             var showSpells = s.HealsBySpell.Count > 0;
             _healSpellsLabel.IsVisible = showSpells;
             _healSortBar.IsVisible = showSpells;
-            FillBreakdown(_healSpellList, s.HealsBySpell, _healSort, "hps");
+            FillBreakdown(_healSpellList, s.HealsBySpell, _healSort, s.CombatSeconds, "hps");
             _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
             FillList(_healerList, s.HealsByHealer.Select(h => (h.Name, $"{h.Total:N0} - {h.Hits} heal{(h.Hits == 1 ? "" : "s")}")));
         }
@@ -819,7 +822,9 @@ public sealed class MainWindow : Window
     private readonly Dictionary<string, int> _ruleBaseline = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTime> _ruleLastAlert = new(StringComparer.OrdinalIgnoreCase);
     private string? _alertBaselinePath;
-    private DateTime _alertUntil = DateTime.MinValue;
+
+    /// <summary>The floating alert tile, created on first use and owned by the widget.</summary>
+    internal AlertWindow AlertTile => _alertWindow ??= new AlertWindow(_settings, this);
 
     private void RenderTracked(StatsSnapshot s)
     {
@@ -896,11 +901,7 @@ public sealed class MainWindow : Window
             if (DateTime.Now - last < TimeSpan.FromSeconds(5)) continue;
             _ruleLastAlert[r.Name] = DateTime.Now;
             if (rule.AlertBanner)
-            {
-                _alertText.Text = $"* {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" x{delta}" : "")}";
-                _alertBanner.IsVisible = true;
-                _alertUntil = DateTime.Now.AddSeconds(6);
-            }
+                AlertTile.ShowAlert($"★ {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" ×{delta}" : "")}");
             if (rule.AlertSound) PlayAlertSound();
         }
     }
@@ -962,7 +963,9 @@ public sealed class MainWindow : Window
                 Margin = new Thickness(0, 0, 12, 0),
             });
         }
-        foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
+        foreach (var rule in _settings.PinWatchChips
+                     ? _settings.TrackedRules.Where(r => r.Enabled)
+                     : [])
         {
             var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
             var result = s.Tracked.FirstOrDefault(t =>
@@ -991,8 +994,12 @@ public sealed class MainWindow : Window
             return;
         }
         _optionsWindow = new OptionsWindow(this);
+        _optionsWindow.Closed += (_, _) => _alertWindow?.ExitPlacement();
         _optionsWindow.Show(this);
+        AlertTile.EnterPlacement();
     }
+
+    private void OnTutorial(object? sender, EventArgs e) => new TutorialWindow(this).Show(this);
 
     private void OnHistory(object? sender, EventArgs e)
     {
@@ -1228,11 +1235,15 @@ public sealed class MainWindow : Window
         });
     }
 
+    /// <summary>Details-style breakdown whose displayed rate follows parser convention:
+    /// source total divided by total combat time. The source's active-time burst rate
+    /// remains available in the row tooltip.</summary>
     private void FillBreakdown(ItemsControl list, IEnumerable<SourceDamage> stats,
-        StatSort sort, string rateLabel)
+        StatSort sort, double combatSeconds, string rateLabel)
     {
+        var secs = Math.Max(1, combatSeconds);
         static double Avg(SourceDamage d) => (double)d.Total / Math.Max(1, d.Hits);
-        static double Rate(SourceDamage d) => d.Total / Math.Max(1, d.ActiveSeconds);
+        double Rate(SourceDamage d) => d.Total / secs;
         var sorted = (sort switch
         {
             StatSort.Hits => stats.OrderByDescending(d => d.Hits),
@@ -1261,11 +1272,10 @@ public sealed class MainWindow : Window
             var critPart = d.Crits > 0
                 ? $" - {100.0 * d.Crits / Math.Max(1, d.Hits):0}% crit"
                 : "";
-            var ratePart = d.ActiveSeconds > 0 ? $" - {Rate(d):0.#} {rateLabel}" : "";
-            var value = $"{d.Total:N0} - ×{d.Hits} - avg {Avg(d):0.#}{ratePart}{critPart}";
-            var tooltip = $"{100.0 * d.Total / grand:0.#}% of total" +
+            var value = $"{d.Total:N0} - ×{d.Hits} - avg {Avg(d):0.#} - {Rate(d):0.#} {rateLabel}{critPart}";
+            var tooltip = $"{100.0 * d.Total / grand:0.#}% of total - {rateLabel} = total / {secs:0}s in combat" +
                 (d.ActiveSeconds > 0
-                    ? $" - {rateLabel} = total / ~{d.ActiveSeconds:0}s this ability was in use"
+                    ? $" - burst {d.Total / Math.Max(1, d.ActiveSeconds):0.#}/s over the ~{d.ActiveSeconds:0}s it was in use"
                     : "");
             return BarRow(d.Name, value, metric(d) / topMetric, barBrush, tooltip);
         }).ToList();
@@ -1416,6 +1426,7 @@ public sealed class MainWindow : Window
         if (_clickThrough)
             X11ClickThrough.Set(this, enabled: false);
         _hotkeys?.Dispose();
+        _alertWindow?.Close();
         _archiver.FinalizeActiveSync(CurrentSnapshot(), "ApplicationExit");
         _watcher.Dispose();
         _repo.Dispose();
