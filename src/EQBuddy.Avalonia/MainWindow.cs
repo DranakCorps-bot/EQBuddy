@@ -512,7 +512,7 @@ public sealed class MainWindow : Window
         var version = new MenuItem { Header = $"EQBuddy v{UpdateChecker.CurrentVersion}", IsEnabled = false };
         var check = new MenuItem { Header = "Check for updates" };
         check.Click += (_, _) => { _lastUpdateCheck = DateTime.Now; CheckForUpdates(manual: true); };
-        var options = new MenuItem { Header = "Options... (size, opacity, tracked loot)" };
+        var options = new MenuItem { Header = "Options... (size, opacity, watch rules)" };
         options.Click += OnOptions;
         var marker = new MenuItem { Header = "Drop camp marker" };
         marker.Click += (_, _) => DropCampMarker();

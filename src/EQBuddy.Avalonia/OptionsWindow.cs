@@ -129,8 +129,8 @@ public sealed class OptionsWindow : Window
         panel.Children.Add(Row("Recent-rate window", _windowCombo, new Thickness(0, 12, 0, 0)));
         panel.Children.Add(AppTheme.DimText("The Last Xm figures on Combat, Kills, Money, and Progress."));
 
-        panel.Children.Add(Heading("Tracked loot", new Thickness(0, 14, 0, 2)));
-        panel.Children.Add(AppTheme.DimText("Choose what to watch and give the rule a display name. Match text is an optional case-insensitive filter; when empty, the display name is used. P pins a mini chip, B shows a banner, and S plays a sound."));
+        panel.Children.Add(Heading("Watch rules", new Thickness(0, 14, 0, 2)));
+        panel.Children.Add(AppTheme.DimText("Watch loot, kills, skill-ups, deaths, milestones, or your spells wearing off (SpellFade — the mez/charm-break alarm). Match is a case-insensitive substring, e.g. 'mote' or 'Befriend'; when empty, the display name is used. P pins a mini chip, B shows a banner, and S plays a sound."));
         panel.Children.Add(_rulesPanel);
         var add = AppTheme.IconButton("+ Add tracked item", "Add tracked item");
         add.HorizontalAlignment = HorizontalAlignment.Left;
