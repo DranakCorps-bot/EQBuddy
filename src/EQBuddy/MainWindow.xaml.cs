@@ -118,11 +118,7 @@ public partial class MainWindow : Window
     public void PersistSettings() => _settings.Save();
 
     internal static readonly (string Key, string Title)[] SectionCatalog =
-    [
-        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
-        ("tracked", "Tracked"), ("money", "Money"), ("progress", "Progress"),
-        ("faction", "Faction"), ("misc", "Travels & Deaths"),
-    ];
+        EQBuddy.UI.Shared.OverlaySections.Catalog;
 
     private Dictionary<string, UIElement> SectionMap() => new()
     {
@@ -617,19 +613,11 @@ public partial class MainWindow : Window
 
     private System.Windows.Media.MediaPlayer? _alertPlayer;
 
-    /// <summary>Named alert sounds → distinct files in C:\Windows\Media. SystemSounds is
-    /// useless here: most of its entries share one "ding" in the default scheme and
-    /// Question is typically unassigned (silent).</summary>
+    /// <summary>Named alert sounds → distinct files in C:\Windows\Media (shared
+    /// catalog). SystemSounds is useless here: most of its entries share one "ding"
+    /// in the default scheme and Question is typically unassigned (silent).</summary>
     internal static readonly (string Name, string File)[] AlertSounds =
-    [
-        ("Ding", "Windows Ding.wav"),
-        ("Notify", "Windows Notify.wav"),
-        ("Chimes", "chimes.wav"),
-        ("Chord", "chord.wav"),
-        ("Tada", "tada.wav"),
-        ("Exclamation", "Windows Exclamation.wav"),
-        ("Alarm", "Alarm01.wav"),
-    ];
+        EQBuddy.UI.Shared.AlertSoundCatalog.Sounds;
 
     /// <summary>Play the configured alert sound: a named built-in, or a custom
     /// .wav/.mp3 path. Unknown/missing values fall back to the system Asterisk.</summary>
@@ -638,14 +626,7 @@ public partial class MainWindow : Window
         try
         {
             // Legacy SystemSounds names from earlier settings map onto the palette.
-            var choice = _settings.AlertSound switch
-            {
-                "Asterisk" or "" => "Ding",
-                "Beep" => "Chord",
-                "Hand" => "Chimes",
-                "Question" => "Notify",
-                { } other => other,
-            };
+            var choice = EQBuddy.UI.Shared.AlertSoundCatalog.Normalize(_settings.AlertSound);
             var named = Array.Find(AlertSounds, x => x.Name == choice);
             var file = named.File is { } f
                 ? System.IO.Path.Combine(

@@ -1,50 +1,44 @@
 using System.Windows;
 using System.Windows.Input;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
+/// <summary>
+/// Thin WPF view over the shared OptionsViewModel (EQBuddy.UI.Shared) — all
+/// mappings/mutations live there; this class builds controls, forwards input, and
+/// applies the visual side effects (scale/opacity/layout) to the main window.
+/// </summary>
 public partial class OptionsWindow : Window
 {
     private readonly MainWindow _main;
+    private readonly OptionsViewModel _vm;
     private bool _ready;
 
     public OptionsWindow(MainWindow main)
     {
         InitializeComponent();
         _main = main;
+        _vm = new OptionsViewModel(main.Settings, main.PersistSettings);
         Owner = main;
-        ScaleSlider.Value = main.UiScale;
-        OpacitySlider.Value = main.Opacity;
-        BgOpacitySlider.Value = main.BackgroundOpacityValue;
-        TruncateCheck.IsChecked = main.TruncateLogsValue;
 
-        foreach (var m in (int[])[5, 15, 30])
-            WindowCombo.Items.Add($"{m} min");
-        WindowCombo.SelectedIndex = main.Settings.RecentWindowMinutes switch
-        {
-            5 => 0, 30 => 2, _ => 1,
-        };
+        ScaleSlider.Value = _vm.UiScale;
+        OpacitySlider.Value = _vm.Opacity;
+        BgOpacitySlider.Value = _vm.BackgroundOpacity;
+        TruncateCheck.IsChecked = _vm.TruncateLogs;
+        PinChipsCheck.IsChecked = _vm.PinWatchChips;
+        TutorialCheck.IsChecked = _vm.ShowTutorial;
 
-        foreach (var name in SoundNames) SoundCombo.Items.Add($"{name}{(name == "Ding" ? " (default)" : "")}");
-        SoundCombo.Items.Add("Custom file…");
-        var current = main.Settings.AlertSound switch
-        {
-            // legacy SystemSounds names saved by earlier builds
-            "Asterisk" or "" => "Ding", "Beep" => "Chord", "Hand" => "Chimes", "Question" => "Notify",
-            { } other => other,
-        };
-        var idx = Array.IndexOf(SoundNames, current);
-        SoundCombo.SelectedIndex = idx >= 0 ? idx : SoundNames.Length;   // custom slot
+        foreach (var choice in OptionsViewModel.WindowChoices) WindowCombo.Items.Add(choice);
+        WindowCombo.SelectedIndex = _vm.RecentWindowIndex;
+
+        foreach (var choice in OptionsViewModel.SoundChoices) SoundCombo.Items.Add(choice);
+        SoundCombo.SelectedIndex = _vm.SoundIndex;
         UpdateSoundFileNote();
-
-        PinChipsCheck.IsChecked = main.Settings.PinWatchChips;
-        TutorialCheck.IsChecked = main.Settings.ShowTutorial;
 
         BuildRulesEditor();
         BuildCardsEditor();
-        HotkeyNote.Text =
-            $"{main.Settings.HotkeyToggleOverlay} show/hide · {main.Settings.HotkeyClickThrough} click-through · " +
-            $"{main.Settings.HotkeyMiniMode} mini · {main.Settings.HotkeyCampMarker} camp marker";
+        HotkeyNote.Text = _vm.HotkeyNote;
 
         UpdateLabels();
         _ready = true;
@@ -63,35 +57,63 @@ public partial class OptionsWindow : Window
         };
     }
 
-    private void OnTruncateChanged(object sender, RoutedEventArgs e)
+    private void UpdateLabels()
+    {
+        ScaleLabel.Text = _vm.ScaleLabel;
+        OpacityLabel.Text = _vm.OpacityLabel;
+        BgOpacityLabel.Text = _vm.BackgroundOpacityLabel;
+    }
+
+    private void OnScaleChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (!_ready) return;
-        _main.SetTruncateLogs(TruncateCheck.IsChecked == true);
+        _vm.UiScale = ScaleSlider.Value;
+        _main.SetUiScale(_vm.UiScale);
+        UpdateLabels();
+    }
+
+    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_ready) return;
+        _vm.Opacity = OpacitySlider.Value;
+        _main.SetWindowOpacity(_vm.Opacity);
+        UpdateLabels();
+    }
+
+    private void OnBgOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (!_ready) return;
+        _vm.BackgroundOpacity = BgOpacitySlider.Value;
+        _main.SetBackgroundOpacity(_vm.BackgroundOpacity);
+        UpdateLabels();
+    }
+
+    private void OnTruncateChanged(object sender, RoutedEventArgs e)
+    {
+        if (_ready) _vm.TruncateLogs = TruncateCheck.IsChecked == true;
+    }
+
+    private void OnTutorialToggled(object sender, RoutedEventArgs e)
+    {
+        if (_ready) _vm.ShowTutorial = TutorialCheck.IsChecked == true;
+    }
+
+    private void OnPinChipsChanged(object sender, RoutedEventArgs e)
+    {
+        if (_ready) _vm.PinWatchChips = PinChipsCheck.IsChecked == true;
     }
 
     private void OnWindowChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (!_ready) return;
-        _main.Settings.RecentWindowMinutes = WindowCombo.SelectedIndex switch { 0 => 5, 2 => 30, _ => 15 };
-        _main.PersistSettings();
-    }
-
-    private static readonly string[] SoundNames =
-        Array.ConvertAll(MainWindow.AlertSounds, x => x.Name);
-
-    private void UpdateSoundFileNote()
-    {
-        var custom = Array.IndexOf(SoundNames, _main.Settings.AlertSound) < 0;
-        SoundFileNote.Text = custom ? $"Custom: {_main.Settings.AlertSound}" : "";
-        SoundFileNote.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        if (_ready) _vm.RecentWindowIndex = WindowCombo.SelectedIndex;
     }
 
     private void OnSoundChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (!_ready) return;
-        if (SoundCombo.SelectedIndex < SoundNames.Length)
+        if (!_vm.IsCustomSoundIndex(SoundCombo.SelectedIndex))
         {
-            _main.Settings.AlertSound = SoundNames[SoundCombo.SelectedIndex];
+            _vm.SelectNamedSound(SoundCombo.SelectedIndex);
         }
         else
         {
@@ -101,74 +123,62 @@ public partial class OptionsWindow : Window
                 Filter = "Sound files (*.wav;*.mp3)|*.wav;*.mp3|All files (*.*)|*.*",
             };
             if (dlg.ShowDialog(this) == true)
+                _vm.SetCustomSound(dlg.FileName);
+            else if (!_vm.IsCustomSoundIndex(_vm.SoundIndex))
             {
-                _main.Settings.AlertSound = dlg.FileName;
-            }
-            else if (Array.IndexOf(SoundNames, _main.Settings.AlertSound) is >= 0 and var prev)
-            {
-                _ready = false; SoundCombo.SelectedIndex = prev; _ready = true;   // cancelled — revert
+                _ready = false; SoundCombo.SelectedIndex = _vm.SoundIndex; _ready = true;   // cancelled — revert
             }
         }
-        _main.PersistSettings();
         UpdateSoundFileNote();
         _main.PlayAlertSound();   // instant feedback on the new choice
     }
 
     private void OnSoundTest(object sender, RoutedEventArgs e) => _main.PlayAlertSound();
 
-    private void OnTutorialToggled(object sender, RoutedEventArgs e)
+    private void UpdateSoundFileNote()
     {
-        if (!_ready) return;
-        _main.Settings.ShowTutorial = TutorialCheck.IsChecked == true;
-        _main.PersistSettings();
-    }
-
-    private void OnPinChipsChanged(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.PinWatchChips = PinChipsCheck.IsChecked == true;
-        _main.PersistSettings();
+        SoundFileNote.Text = _vm.SoundFileNote;
+        SoundFileNote.Visibility = _vm.SoundFileNote.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void OnAddRule(object sender, RoutedEventArgs e)
     {
-        _main.Settings.TrackedRules.Add(new EQBuddy.Core.TrackedRule { Name = "", Pattern = "" });
-        _main.PersistSettings();
+        _vm.AddRule();
         BuildRulesEditor();
     }
 
     private void BuildRulesEditor()
     {
         RulesPanel.Children.Clear();
-        foreach (var rule in _main.Settings.TrackedRules)
+        foreach (var rule in _vm.Rules)
         {
             var row = new System.Windows.Controls.Grid { Margin = new Thickness(0, 3, 0, 0) };
             row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(58) });
             row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(60) });
             row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 3; i++)
                 row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
 
             var kind = new System.Windows.Controls.ComboBox { FontSize = 11, ToolTip = "What this rule watches" };
-            foreach (var k in Enum.GetNames<EQBuddy.Core.WatchKind>()) kind.Items.Add(k);
+            foreach (var k in OptionsViewModel.KindNames) kind.Items.Add(k);
             kind.SelectedIndex = (int)rule.Kind;
             kind.SelectionChanged += (_, _) =>
             {
                 if (!_ready || kind.SelectedIndex < 0) return;
                 rule.Kind = (EQBuddy.Core.WatchKind)kind.SelectedIndex;
-                _main.PersistSettings();
+                _vm.Persist();
             };
             row.Children.Add(kind);
 
             var name = DarkBox(rule.Name, "name");
             name.Margin = new Thickness(4, 0, 0, 0);
-            name.LostFocus += (_, _) => { rule.Name = name.Text.Trim(); _main.PersistSettings(); };
+            name.LostFocus += (_, _) => { rule.Name = name.Text.Trim(); _vm.Persist(); };
             System.Windows.Controls.Grid.SetColumn(name, 1);
             row.Children.Add(name);
 
             var pattern = DarkBox(rule.Pattern, "match text (uses the name if left empty; optional for Death/Milestone)");
             pattern.Margin = new Thickness(4, 0, 0, 0);
-            pattern.LostFocus += (_, _) => { rule.Pattern = pattern.Text.Trim(); _main.PersistSettings(); };
+            pattern.LostFocus += (_, _) => { rule.Pattern = pattern.Text.Trim(); _vm.Persist(); };
             System.Windows.Controls.Grid.SetColumn(pattern, 2);
             row.Children.Add(pattern);
 
@@ -183,8 +193,7 @@ public partial class OptionsWindow : Window
             };
             del.Click += (_, _) =>
             {
-                _main.Settings.TrackedRules.Remove(rule);
-                _main.PersistSettings();
+                _vm.RemoveRule(rule);
                 BuildRulesEditor();
             };
             System.Windows.Controls.Grid.SetColumn(del, 5);
@@ -202,8 +211,8 @@ public partial class OptionsWindow : Window
             Content = glyph, ToolTip = tip, IsChecked = initial, FontSize = 11,
             Style = (Style)FindResource("IconToggle"),
         };
-        t.Checked += (_, _) => { apply(true); _main.PersistSettings(); };
-        t.Unchecked += (_, _) => { apply(false); _main.PersistSettings(); };
+        t.Checked += (_, _) => { apply(true); _vm.Persist(); };
+        t.Unchecked += (_, _) => { apply(false); _vm.Persist(); };
         System.Windows.Controls.Grid.SetColumn(t, column);
         return t;
     }
@@ -221,36 +230,32 @@ public partial class OptionsWindow : Window
     private void BuildCardsEditor()
     {
         CardsPanel.Children.Clear();
-        var order = _main.Settings.SectionOrder.ToList();
-        foreach (var (key, _) in MainWindow.SectionCatalog)
-            if (!order.Contains(key)) order.Add(key);
-        _main.Settings.SectionOrder = order;
-
-        foreach (var key in order)
+        foreach (var card in _vm.Cards)
         {
-            var title = MainWindow.SectionCatalog.First(c => c.Key == key).Title;
             var row = new System.Windows.Controls.Grid { Margin = new Thickness(0, 2, 0, 0) };
             row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             for (var i = 0; i < 3; i++)
                 row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
 
-            var hidden = _main.Settings.HiddenSections.Contains(key);
             row.Children.Add(new System.Windows.Controls.TextBlock
             {
-                Text = title, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
-                Foreground = (System.Windows.Media.Brush)FindResource(hidden ? "DimBrush" : "TextBrush"),
+                Text = card.Title, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
+                Foreground = (System.Windows.Media.Brush)FindResource(card.Hidden ? "DimBrush" : "TextBrush"),
             });
 
-            row.Children.Add(CardButton("↑", "Move up", 1, () => MoveCard(key, -1)));
-            row.Children.Add(CardButton("↓", "Move down", 2, () => MoveCard(key, +1)));
-            row.Children.Add(CardButton(hidden ? "🙈" : "👁", hidden ? "Show card" : "Hide card (data still collected)", 3, () =>
-            {
-                if (!_main.Settings.HiddenSections.Remove(key))
-                    _main.Settings.HiddenSections.Add(key);
-                ApplyCards();
-            }));
+            row.Children.Add(CardButton("↑", "Move up", 1, () => { _vm.MoveCard(card.Key, -1); ApplyCards(); }));
+            row.Children.Add(CardButton("↓", "Move down", 2, () => { _vm.MoveCard(card.Key, +1); ApplyCards(); }));
+            row.Children.Add(CardButton(card.Hidden ? "🙈" : "👁",
+                card.Hidden ? "Show card" : "Hide card (data still collected)", 3,
+                () => { _vm.ToggleCard(card.Key); ApplyCards(); }));
             CardsPanel.Children.Add(row);
         }
+    }
+
+    private void ApplyCards()
+    {
+        _main.ApplySectionLayout();
+        BuildCardsEditor();
     }
 
     private System.Windows.Controls.Button CardButton(string glyph, string tip, int column, Action action)
@@ -258,61 +263,16 @@ public partial class OptionsWindow : Window
         var b = new System.Windows.Controls.Button
         {
             Content = glyph, ToolTip = tip, FontSize = 11,
-            Style = (Style)FindResource("IconButton"),
+            Style = (Style)FindResource("IconButton"), Margin = new Thickness(6, 0, 0, 0),
         };
         b.Click += (_, _) => action();
         System.Windows.Controls.Grid.SetColumn(b, column);
         return b;
     }
 
-    private void MoveCard(string key, int delta)
-    {
-        var order = _main.Settings.SectionOrder;
-        var i = order.IndexOf(key);
-        var j = i + delta;
-        if (i < 0 || j < 0 || j >= order.Count) return;
-        (order[i], order[j]) = (order[j], order[i]);
-        ApplyCards();
-    }
-
-    private void ApplyCards()
-    {
-        _main.PersistSettings();
-        _main.ApplySectionLayout();
-        BuildCardsEditor();
-    }
-
-    private void UpdateLabels()
-    {
-        ScaleLabel.Text = $"{ScaleSlider.Value:P0}";
-        OpacityLabel.Text = $"{OpacitySlider.Value:P0}";
-        BgOpacityLabel.Text = $"{BgOpacitySlider.Value:P0}";
-    }
-
-    private void OnBgOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _main.SetBackgroundOpacity(BgOpacitySlider.Value);
-        UpdateLabels();
-    }
-
-    private void OnScaleChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _main.SetUiScale(ScaleSlider.Value);
-        UpdateLabels();
-    }
-
-    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _main.SetWindowOpacity(OpacitySlider.Value);
-        UpdateLabels();
-    }
-
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {
-        if (e.ButtonState == MouseButtonState.Pressed) DragMove();
+        if (e.ChangedButton == MouseButton.Left) DragMove();
     }
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();

@@ -1,0 +1,5 @@
+# PRs touching these paths auto-request review from the right owner.
+# See CONTRIBUTING.md for the ownership model.
+*                          @DranakCorps-bot
+/src/EQBuddy.Avalonia/     @DonThompson
+/src/EQBuddy.UI.Shared/    @DranakCorps-bot @DonThompson

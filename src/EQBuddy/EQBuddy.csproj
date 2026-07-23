@@ -8,7 +8,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>EQBuddy</AssemblyName>
     <RootNamespace>EQBuddy</RootNamespace>
-    <Version>1.8.14</Version>
+    <Version>1.8.15</Version>
     <!-- Do NOT enable InvariantGlobalization: WPF binding culture lookup
          (XmlLanguage.GetSpecificCulture) throws under it. -->
     <ApplicationIcon>Assets\EQBuddy.ico</ApplicationIcon>
