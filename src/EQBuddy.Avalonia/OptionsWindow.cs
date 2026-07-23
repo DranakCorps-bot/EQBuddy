@@ -151,6 +151,9 @@ public sealed class OptionsWindow : Window
         soundRow.Children.Add(test);
         panel.Children.Add(Row("Alert sound", soundRow, new Thickness(0, 8, 0, 0)));
         panel.Children.Add(_soundFileNote);
+        panel.Children.Add(AppTheme.DimText(
+            "While Options is open, the ★ alert banner tile is visible — drag it to where alerts should appear. During play it's click-through and never steals focus.",
+            new Thickness(0, 4, 0, 0)));
 
         panel.Children.Add(Heading("Overlay cards", new Thickness(0, 14, 0, 2)));
         panel.Children.Add(_cardsPanel);

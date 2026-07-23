@@ -33,8 +33,6 @@ public sealed class MainWindow : Window
     private readonly TextBlock _charLabel = AppTheme.DimText("looking for a character...");
     private readonly ScrollViewer _sectionScroll = new();
     private readonly Border _logBanner = Banner(AppTheme.WarnBrush);
-    private readonly Border _alertBanner = Banner(AppTheme.AccentBrush);
-    private readonly TextBlock _alertText = new() { FontSize = 12, Foreground = AppTheme.AccentBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly Border _updateBanner = Banner(AppTheme.GoodBrush);
     private readonly TextBlock _updateText = new() { FontSize = 12, Foreground = AppTheme.GoodBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _zoneText = AppTheme.DimText("-");
@@ -106,6 +104,7 @@ public sealed class MainWindow : Window
     private X11HotkeyService? _hotkeys;
     private HistoryWindow? _historyWindow;
     private OptionsWindow? _optionsWindow;
+    private AlertWindow? _alertWindow;
     private StatSort _dmgOutSort = StatSort.Total;
     private StatSort _dmgInSort = StatSort.Total;
     private StatSort _healSort = StatSort.Total;
@@ -235,13 +234,10 @@ public sealed class MainWindow : Window
             Margin = new Thickness(10),
             Children =
             {
-                _alertBanner,
                 BuildMiniRoot(),
                 BuildNormalRoot(),
             },
         };
-        _alertBanner.Child = _alertText;
-        _alertBanner.Margin = new Thickness(0, 0, 0, 8);
         return _scaleRoot;
     }
 
@@ -647,11 +643,6 @@ public sealed class MainWindow : Window
             _updateBanner.IsVisible = false;
             _upToDateNoticeUntil = DateTime.MinValue;
         }
-        if (_alertUntil != DateTime.MinValue && DateTime.Now > _alertUntil)
-        {
-            _alertBanner.IsVisible = false;
-            _alertUntil = DateTime.MinValue;
-        }
         if (_watcher.LastError is { } err) App.LogError(err);
 
         var s = CurrentSnapshot();
@@ -820,7 +811,9 @@ public sealed class MainWindow : Window
     private readonly Dictionary<string, int> _ruleBaseline = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, DateTime> _ruleLastAlert = new(StringComparer.OrdinalIgnoreCase);
     private string? _alertBaselinePath;
-    private DateTime _alertUntil = DateTime.MinValue;
+
+    /// <summary>The floating alert tile, created on first use and owned by the widget.</summary>
+    internal AlertWindow AlertTile => _alertWindow ??= new AlertWindow(_settings, this);
 
     private void RenderTracked(StatsSnapshot s)
     {
@@ -897,11 +890,7 @@ public sealed class MainWindow : Window
             if (DateTime.Now - last < TimeSpan.FromSeconds(5)) continue;
             _ruleLastAlert[r.Name] = DateTime.Now;
             if (rule.AlertBanner)
-            {
-                _alertText.Text = $"* {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" x{delta}" : "")}";
-                _alertBanner.IsVisible = true;
-                _alertUntil = DateTime.Now.AddSeconds(6);
-            }
+                AlertTile.ShowAlert($"★ {r.Name}: {r.LastItem ?? "match"}{(delta > 1 ? $" ×{delta}" : "")}");
             if (rule.AlertSound) PlayAlertSound();
         }
     }
@@ -992,7 +981,9 @@ public sealed class MainWindow : Window
             return;
         }
         _optionsWindow = new OptionsWindow(this);
+        _optionsWindow.Closed += (_, _) => _alertWindow?.ExitPlacement();
         _optionsWindow.Show(this);
+        AlertTile.EnterPlacement();
     }
 
     private void OnHistory(object? sender, EventArgs e)
@@ -1420,6 +1411,7 @@ public sealed class MainWindow : Window
         if (_clickThrough)
             X11ClickThrough.Set(this, enabled: false);
         _hotkeys?.Dispose();
+        _alertWindow?.Close();
         _archiver.FinalizeActiveSync(CurrentSnapshot(), "ApplicationExit");
         _watcher.Dispose();
         _repo.Dispose();
