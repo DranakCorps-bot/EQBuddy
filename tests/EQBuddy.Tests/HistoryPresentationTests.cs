@@ -39,6 +39,24 @@ public sealed class HistoryPresentationTests
     }
 
     [Fact]
+    public void DetailSplitsOverviewAndBuildsNativeBreakdownRows()
+    {
+        var detail = HistoryPresentation.BuildDetail(Row(), Snapshot());
+
+        // Header + rest carry the text sections; breakdowns become structured rows.
+        Assert.Contains("Duration", detail.HeaderText);
+        Assert.DoesNotContain("Top damage sources:", detail.HeaderText);
+        Assert.Contains("Kills by creature:", detail.RestText);
+        Assert.NotEmpty(detail.DamageRows);
+        var top = detail.DamageRows[0];
+        Assert.Equal(1.0, top.Fraction, 3);              // top source spans the full bar
+        Assert.Contains("avg", top.Value);
+        Assert.Contains("dps", top.Value);
+        Assert.Contains("% of total", top.Tooltip);
+        Assert.All(detail.DamageRows, r => Assert.InRange(r.Fraction, 0, 1));
+    }
+
+    [Fact]
     public void OverviewAndComparisonContainSharedReportSections()
     {
         var snapshot = Snapshot();

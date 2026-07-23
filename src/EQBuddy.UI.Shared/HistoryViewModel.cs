@@ -60,6 +60,11 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
     }
 
     public bool HasSelectedSession => _selectedRow is not null && _selectedSnapshot is not null;
+    /// <summary>The single selected session's row (null in comparison/empty states).</summary>
+    public SessionRow? SelectedRow => _selectedRow;
+    /// <summary>Structured detail for views that render native breakdown bars;
+    /// null in comparison/import/empty states (render DetailText instead).</summary>
+    public HistoryDetail? SelectedDetail { get; private set; }
     public string? SelectedSummary => HasSelectedSession
         ? HistoryPresentation.BuildOverview(_selectedRow!, _selectedSnapshot!)
         : null;
@@ -127,6 +132,7 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
 
     public async Task ImportAsync(string path, CancellationToken cancellationToken = default)
     {
+        SelectedDetail = null;
         DetailText = HistoryPresentation.BuildImporting(path);
         var result = await _importService.ImportAsync(path, cancellationToken);
         RefreshFilters();
@@ -138,6 +144,7 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
     {
         _selectedRow = null;
         _selectedSnapshot = null;
+        SelectedDetail = null;
 
         if (_selectionOrder.Count == 2)
         {
@@ -170,6 +177,9 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
         DetailText = _selectedSnapshot is null
             ? HistoryPresentation.MissingSessionText
             : HistoryPresentation.BuildOverview(latest.Row, _selectedSnapshot);
+        SelectedDetail = _selectedSnapshot is null
+            ? null
+            : HistoryPresentation.BuildDetail(latest.Row, _selectedSnapshot);
         NotifyCommandState();
     }
 
@@ -178,6 +188,7 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
         _selectionOrder.Clear();
         _selectedRow = null;
         _selectedSnapshot = null;
+        SelectedDetail = null;
         Note = "";
         Tags = "";
         DetailText = HistoryPresentation.SelectSessionText;
@@ -187,6 +198,8 @@ public sealed class HistoryViewModel : INotifyPropertyChanged
 
     private void NotifyCommandState()
     {
+        OnPropertyChanged(nameof(SelectedDetail));
+        OnPropertyChanged(nameof(SelectedRow));
         OnPropertyChanged(nameof(HasSelectedSession));
         OnPropertyChanged(nameof(SelectedSummary));
         OnPropertyChanged(nameof(ExportFileName));

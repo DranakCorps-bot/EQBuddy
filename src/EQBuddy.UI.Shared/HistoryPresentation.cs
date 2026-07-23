@@ -14,6 +14,19 @@ public sealed record HistorySessionItem(SessionRow Row, string DisplayText);
 
 public sealed record HistoryImportResult(string FileName, int ImportedSessions, string Message);
 
+/// <summary>A breakdown row a view can render natively: a share bar sized to
+/// Fraction behind "Name … Value", with an optional tooltip.</summary>
+public sealed record HistoryBreakdownRow(string Name, string Value, double Fraction, string? Tooltip);
+
+/// <summary>Structured session detail: text header, native-renderable breakdown rows
+/// for damage and heals, and the remaining text sections. The plain-text rendition
+/// (BuildOverview) stays available for copy-summary and text-only views.</summary>
+public sealed record HistoryDetail(
+    string HeaderText,
+    IReadOnlyList<HistoryBreakdownRow> DamageRows,
+    IReadOnlyList<HistoryBreakdownRow> HealRows,
+    string RestText);
+
 public static class HistoryPresentation
 {
     public const string SelectSessionText = "Select a session.";
@@ -40,21 +53,7 @@ public static class HistoryPresentation
     public static string BuildOverview(SessionRow row, StatsSnapshot snapshot)
     {
         var text = new StringBuilder();
-        var duration = TimeSpan.FromSeconds(row.ElapsedSeconds);
-        var active = TimeSpan.FromSeconds(row.ActiveSeconds);
-        text.AppendLine($"{row.Character} ({row.Server}) - {row.StartLocal:dddd MMM d, h:mm tt}");
-        text.AppendLine($"Duration {(int)duration.TotalHours}h {duration.Minutes}m - active {(int)active.TotalMinutes}m - ended: {row.EndReason}");
-        text.AppendLine();
-        text.AppendLine($"Kills      {snapshot.YourKillCount} (+{snapshot.PartyKillCount} group) - {snapshot.KillsPerHour:0.0}/hr");
-        text.AppendLine($"XP         {snapshot.XpPercent:0.0}% - {snapshot.XpPerHour:0.0}%/hr" +
-                        (snapshot.Levels.Count > 0 ? $" - {string.Join(", ", snapshot.Levels.Select(level => level.Text))}" : "") +
-                        (snapshot.AaGained > 0 ? $" - {snapshot.AaGained} AA" : ""));
-        text.AppendLine($"Damage     {snapshot.DamageDealt:N0} dealt - {snapshot.SessionDps:0.0} dps - taken {snapshot.DamageTaken:N0}");
-        if (snapshot.HealingDone > 0)
-            text.AppendLine($"Healing    {snapshot.HealingDone:N0} done - {snapshot.Hps:0.#} hps");
-        text.AppendLine($"Money      {StatsSnapshot.FormatCoin(snapshot.Copper)} ({StatsSnapshot.FormatCoin(snapshot.CopperPerHour)}/hr)");
-        text.AppendLine($"Deaths     {snapshot.Deaths.Count}");
-        text.AppendLine();
+        AppendHeader(text, row, snapshot);
 
         if (snapshot.DamageBySource.Count > 0)
         {
@@ -82,6 +81,31 @@ public static class HistoryPresentation
             text.AppendLine();
         }
 
+        AppendRest(text, snapshot);
+        return text.ToString();
+    }
+
+    private static void AppendHeader(StringBuilder text, SessionRow row, StatsSnapshot snapshot)
+    {
+        var duration = TimeSpan.FromSeconds(row.ElapsedSeconds);
+        var active = TimeSpan.FromSeconds(row.ActiveSeconds);
+        text.AppendLine($"{row.Character} ({row.Server}) - {row.StartLocal:dddd MMM d, h:mm tt}");
+        text.AppendLine($"Duration {(int)duration.TotalHours}h {duration.Minutes}m - active {(int)active.TotalMinutes}m - ended: {row.EndReason}");
+        text.AppendLine();
+        text.AppendLine($"Kills      {snapshot.YourKillCount} (+{snapshot.PartyKillCount} group) - {snapshot.KillsPerHour:0.0}/hr");
+        text.AppendLine($"XP         {snapshot.XpPercent:0.0}% - {snapshot.XpPerHour:0.0}%/hr" +
+                        (snapshot.Levels.Count > 0 ? $" - {string.Join(", ", snapshot.Levels.Select(level => level.Text))}" : "") +
+                        (snapshot.AaGained > 0 ? $" - {snapshot.AaGained} AA" : ""));
+        text.AppendLine($"Damage     {snapshot.DamageDealt:N0} dealt - {snapshot.SessionDps:0.0} dps - taken {snapshot.DamageTaken:N0}");
+        if (snapshot.HealingDone > 0)
+            text.AppendLine($"Healing    {snapshot.HealingDone:N0} done - {snapshot.Hps:0.#} hps");
+        text.AppendLine($"Money      {StatsSnapshot.FormatCoin(snapshot.Copper)} ({StatsSnapshot.FormatCoin(snapshot.CopperPerHour)}/hr)");
+        text.AppendLine($"Deaths     {snapshot.Deaths.Count}");
+        text.AppendLine();
+    }
+
+    private static void AppendRest(StringBuilder text, StatsSnapshot snapshot)
+    {
         if (snapshot.YourKills.Count > 0)
         {
             text.AppendLine("Kills by creature:");
@@ -120,7 +144,41 @@ public static class HistoryPresentation
             text.AppendLine("Zones: " + string.Join(" -> ", snapshot.Zones.Select(zone => zone.Text)));
         if (snapshot.Markers.Count > 0)
             text.AppendLine("Markers: " + string.Join(" - ", snapshot.Markers.Select(marker => $"{marker.Text} ({marker.Time:h:mm tt})")));
-        return text.ToString();
+    }
+
+    /// <summary>Structured detail for views that render native breakdown bars.</summary>
+    public static HistoryDetail BuildDetail(SessionRow row, StatsSnapshot snapshot)
+    {
+        var header = new StringBuilder();
+        AppendHeader(header, row, snapshot);
+        var rest = new StringBuilder();
+        AppendRest(rest, snapshot);
+        return new HistoryDetail(
+            header.ToString().TrimEnd(),
+            BuildBreakdownRows(snapshot.DamageBySource, snapshot.CombatSeconds, "dps", 10),
+            BuildBreakdownRows(snapshot.HealsBySpell, snapshot.CombatSeconds, "hps", 6),
+            rest.ToString().Trim());
+    }
+
+    /// <summary>The standard ability-row columns ("total · ×hits · avg · rate (· crit%)")
+    /// with fractions relative to the top entry — mirrors the live widget's rows.</summary>
+    public static IReadOnlyList<HistoryBreakdownRow> BuildBreakdownRows(
+        IReadOnlyList<SourceDamage> stats, double combatSeconds, string rateLabel, int max = int.MaxValue)
+    {
+        if (stats.Count == 0) return [];
+        var grand = Math.Max(1, stats.Sum(d => d.Total));
+        var top = Math.Max(1, stats.Max(d => d.Total));
+        var secs = Math.Max(1, combatSeconds);
+        return stats.Take(max).Select(d => new HistoryBreakdownRow(
+            d.Name,
+            $"{d.Total:N0} · ×{d.Hits} · avg {(double)d.Total / Math.Max(1, d.Hits):0.#}" +
+                $" · {d.Total / secs:0.#} {rateLabel}" +
+                (d.Crits > 0 ? $" · {100.0 * d.Crits / Math.Max(1, d.Hits):0}% crit" : ""),
+            (double)d.Total / top,
+            $"{100.0 * d.Total / grand:0.#}% of total · {rateLabel} = total ÷ {secs:0}s in combat" +
+                (d.ActiveSeconds > 0
+                    ? $" · burst {d.Total / Math.Max(1, d.ActiveSeconds):0.#}/s over the ~{d.ActiveSeconds:0}s it was in use"
+                    : ""))).ToList();
     }
 
     public static string BuildComparison(SessionRow firstRow, StatsSnapshot? firstSnapshot,

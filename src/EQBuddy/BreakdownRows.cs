@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -47,6 +48,16 @@ internal static class BreakdownRows
         row.Children.Add(content);
         if (tooltip is not null) row.ToolTip = tooltip;
         return row;
+    }
+
+    /// <summary>Render pre-built shared-presentation rows (HistoryPresentation).</summary>
+    public static void FillRows(FrameworkElement resources, ItemsControl list,
+        IEnumerable<HistoryBreakdownRow> rows)
+    {
+        list.Items.Clear();
+        var barBrush = BarBrush(resources);
+        foreach (var r in rows)
+            list.Items.Add(Row(resources, r.Name, r.Value, r.Fraction, barBrush, r.Tooltip));
     }
 
     /// <summary>Fill an ItemsControl with ability rows (ordered by total): the standard
