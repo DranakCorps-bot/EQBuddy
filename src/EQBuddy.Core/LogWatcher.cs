@@ -45,6 +45,13 @@ public sealed class LogWatcher : IDisposable
     /// pipeline (its entries are short-lived, so replay mostly proves them expired).</summary>
     public MezTracker? Mez { get; set; }
 
+    /// <summary>Optional fourth consumer: the experimental party-DPS tracker (temporary —
+    /// see PartyDpsTracker for why it's kept separate from SessionStats). Unlike the other
+    /// three consumers, it deliberately does NOT see the startup replay (below) — its whole
+    /// point is "what's happening right now," and a replay of the day's whole log would
+    /// dump hours of stale damage into it in one burst.</summary>
+    public PartyDpsTracker? PartyDps { get; set; }
+
     public LogWatcher(SessionStats stats)
     {
         _stats = stats;
@@ -180,6 +187,7 @@ public sealed class LogWatcher : IDisposable
                             _stats.Apply(evt);
                             Spawns?.Apply(evt);
                             Mez?.Apply(evt);
+                            if (InitialIngestDone) PartyDps?.Apply(evt);
                         }
                         // Every line, parsed or not: a Text watch rule matches the line's
                         // words, not whatever event we did or didn't make of it.

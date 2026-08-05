@@ -48,6 +48,7 @@ public partial class MainWindow : Window
         _mezTracker.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "mez-durations.json"));
         _watcher = new LogWatcher(_stats);
         _watcher.Mez = _mezTracker;
+        _watcher.PartyDps = _partyDpsTracker;
         // Spawn timers ride the watcher's event stream — wired before the first Select so
         // the startup replay re-derives countdowns from kills already in the log.
         var spawnCatalog = SpawnCatalog.LoadEmbedded();
@@ -380,6 +381,8 @@ public partial class MainWindow : Window
     private SpawnChipsWindow? _chipsWindow;
     private MezChipsWindow? _mezWindow;
     private readonly MezTracker _mezTracker = new();
+    private readonly PartyDpsTracker _partyDpsTracker = new();
+    private PartyDpsWindow? _partyDpsWindow;
 
     private readonly EqlWikiItemService _wikiItems =
         new(System.IO.Path.Combine(Core.AppPaths.Dir, "wiki-cache", "items"));
@@ -1270,6 +1273,17 @@ public partial class MainWindow : Window
         }
         _historyWindow = new HistoryWindow(_repo);
         _historyWindow.Show();
+    }
+
+    private void OnPartyDps(object sender, RoutedEventArgs e)
+    {
+        if (_partyDpsWindow is { IsLoaded: true })
+        {
+            _partyDpsWindow.Activate();
+            return;
+        }
+        _partyDpsWindow = new PartyDpsWindow(this, _partyDpsTracker);
+        _partyDpsWindow.Show();
     }
 
     private void DropCampMarker()

@@ -21,6 +21,7 @@
                 <MenuItem Header="Quick tutorial…" Click="OnTutorial"/>
                 <MenuItem Header="Drop camp marker" Click="OnCampMarker"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
+                <MenuItem Header="Party DPS…" Click="OnPartyDps"/>
                 <MenuItem Header="Spawn timers…" Click="OnSpawnsWindow"/>
                 <MenuItem x:Name="TrackSpawnsItem" Header="Track spawns (named respawn timers)"
                           IsCheckable="True" Click="OnTrackSpawns"/>
