@@ -243,4 +243,67 @@ public class PartyDpsTrackerTests
         var totals = tracker.TotalsSnapshot(T(0, 1), roster);
         Assert.Empty(totals.Rows);
     }
+
+    [Fact]
+    public void YouIsAlwaysClassifiedAsPlayer()
+    {
+        var tracker = Replay(At(0, 0, "You slash orc pawn for 10 points of damage."));
+        Assert.Equal(AttackerCategory.Player, tracker.CategoryOf("You"));
+    }
+
+    /// <summary>Something that hit you directly is unambiguously hostile, regardless of
+    /// whether its name carries EQ's "a/an/the" creature article.</summary>
+    [Fact]
+    public void AttackerThatHitYouDirectlyIsClassifiedAsEnemy()
+    {
+        var tracker = Replay(At(0, 0, "Orc centurion hits YOU for 4 points of damage."));
+        Assert.Equal(AttackerCategory.Enemy, tracker.CategoryOf("Orc centurion"));
+    }
+
+    /// <summary>Many named EQ raid/group mobs ("Elite dragoon", "Knight of Innoruuk") carry
+    /// no leading article — with no other evidence, an unrecognized attacker must default to
+    /// Enemy, not Player, or every named add in a raid reads as a person (field report
+    /// 2026-08-05).</summary>
+    [Fact]
+    public void UnrecognizedArticleLessAttackerDefaultsToEnemyNotPlayer()
+    {
+        var tracker = Replay(
+            At(0, 0, "Knight of Innoruuk reaves Lizzid for 7 points of damage."));
+        Assert.Equal(AttackerCategory.Enemy, tracker.CategoryOf("Knight of Innoruuk"));
+    }
+
+    /// <summary>The field-reported tell: an article-style ("generic creature") name caught
+    /// attacking something already confirmed hostile is a charmed pet, not a second wild
+    /// mob — real mobs essentially never fight each other.</summary>
+    [Fact]
+    public void ArticleStyleAttackerOfAConfirmedEnemyIsClassifiedAsPet()
+    {
+        var tracker = Replay(
+            At(0, 0, "Orc centurion hits YOU for 4 points of damage."), // confirms the enemy
+            At(0, 1, "a shadowed man reaves orc centurion for 5 points of damage."));
+        Assert.Equal(AttackerCategory.Pet, tracker.CategoryOf("a shadowed man"));
+    }
+
+    /// <summary>Regression guard: a real player fighting alongside you is, by definition,
+    /// also attacking whatever you've confirmed hostile — that must not by itself land them
+    /// in the Pet bucket (the article gate on pet-detection is what prevents it).</summary>
+    [Fact]
+    public void RealPlayerFightingAConfirmedEnemyIsNotClassifiedAsPet()
+    {
+        var tracker = Replay(
+            At(0, 0, "Orc centurion hits YOU for 4 points of damage."), // confirms the enemy
+            At(0, 1, "Lizzid reaves orc centurion for 7 points of damage."));
+        Assert.NotEqual(AttackerCategory.Pet, tracker.CategoryOf("Lizzid"));
+    }
+
+    /// <summary>A confirmed hostile choosing to attack a no-article (proper-named) target is
+    /// good positive evidence that target is a real player, not just "unrecognized."</summary>
+    [Fact]
+    public void ArticleLessTargetOfAConfirmedEnemyIsClassifiedAsPlayer()
+    {
+        var tracker = Replay(
+            At(0, 0, "Orc centurion hits YOU for 4 points of damage."),   // confirms the enemy
+            At(0, 1, "Orc centurion hits Lizzid for 6 points of damage.")); // it also hits a groupmate
+        Assert.Equal(AttackerCategory.Player, tracker.CategoryOf("Lizzid"));
+    }
 }

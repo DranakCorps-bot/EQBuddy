@@ -1,5 +1,13 @@
 namespace EQBuddy.Core;
 
+/// <summary>Best-effort classification of an attacker name — see PartyDpsTracker's
+/// CategoryOf for the heuristic. Not a verified roster; a same-named collision (a charmed
+/// pet sharing a hostile mob's exact name) can still misclassify, and an attacker with no
+/// positive evidence either way defaults to Enemy (most named EQ raid/group mobs — "Elite
+/// dragoon", "Knight of Innoruuk" — carry no leading article, so "no article" alone isn't a
+/// safe signal for Player; unrecognized names are far more often mobs than people).</summary>
+public enum AttackerCategory { Player, Pet, Enemy }
+
 /// <summary>Snapshot of party DPS for the current pull.</summary>
 /// <param name="Active">True while the 10-second idle gap hasn't elapsed since the last hit.</param>
 /// <param name="DurationSeconds">Seconds since the pull's first hit (at least 1).</param>
@@ -18,8 +26,12 @@ public record PartyDpsSnapshot(bool Active, double DurationSeconds, long TotalDa
 /// attacker, whether it's landing hits on you or a groupmate. Treat this as "nearby damage,"
 /// not a roster feature.
 ///
-/// A charmed pet is not special-cased (that state lives inside SessionStats's own charm
-/// tracking) — it simply shows up under its own creature name like any other attacker.
+/// Your own client's charm state (SessionStats's own tracking) isn't consulted here — a
+/// GROUPMATE's charmed pet is invisible to that anyway. Instead, <see cref="CategoryOf"/>
+/// gives a best-effort Player/Pet/Enemy grouping from log evidence alone (field report
+/// 2026-08-05: a global pull clock that never idled out because a groupmate's charmed pet
+/// kept fighting on its own schedule) — see the AttackerCategory doc and the private fields
+/// below for exactly what evidence drives it.
 ///
 /// Pull boundary: any hit more than <see cref="PullGap"/> after the previous one starts a
 /// fresh pull, clearing the live per-pull rows — the same idle-gap rule EncounterGrouping
@@ -59,6 +71,32 @@ public sealed class PartyDpsTracker
     private double _totalsActiveSeconds;
     private DateTime? _totalsSegmentStart;
 
+    // Best-effort Player/Pet/Enemy classification (see CategoryOf).
+    //
+    // _hasArticle: EQ creature names conventionally carry a leading article ("a shadowed
+    // man", "an orc pawn") that real player names never do — captured from the RAW attacker
+    // text before Normalize() strips it. Many named mobs (raid adds, unique NPCs) DON'T use
+    // an article though, so this alone only ever helps confirm "generic creature," never
+    // "definitely a player" — see CategoryOf's default.
+    //
+    // _confirmedEnemies: unambiguous hostiles only — something that hit you, or something
+    // you hit. Never populated from a Third* event's target, since that could just as
+    // easily be a groupmate.
+    //
+    // _confirmedPets: the field-reported tell — an article-style name caught attacking
+    // something already in _confirmedEnemies is a charmed pet, not a second hostile mob
+    // (real mobs essentially never fight each other). Gated on the attacker ALSO being
+    // article-style, or a real player fighting alongside you (who is, by definition,
+    // attacking the same confirmed enemies you are) would land here too.
+    //
+    // _attackedByConfirmedEnemy: a weak positive signal for Player — something a known
+    // hostile chose to attack that ISN'T itself article-style is very likely a person (mobs
+    // predominantly aggro onto players, not other mobs' pets).
+    private readonly HashSet<string> _hasArticle = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _confirmedEnemies = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _confirmedPets = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _attackedByConfirmedEnemy = new(StringComparer.OrdinalIgnoreCase);
+
     // LogWatcher calls Apply() from its background polling timer/thread, while the window
     // reads Snapshot()/TotalsSnapshot() from its own UI-thread DispatcherTimer — same
     // cross-thread shape SessionStats and MezTracker already guard with a lock.
@@ -71,15 +109,21 @@ public sealed class PartyDpsTracker
             switch (evt)
             {
                 case DamageDealtEvent d:
+                    // You hit it, so it's unambiguously hostile — feeds the pet-detection
+                    // rule below, not just display.
+                    _confirmedEnemies.Add(LogParser.Normalize(d.Target));
                     Add("You", d.Time, d.Amount, d.Critical);
                     break;
                 case ThirdMeleeEvent tm:
+                    NoteThirdPartyAttacker(tm.Attacker, tm.Target);
                     Add(tm.Attacker, tm.Time, tm.Amount, tm.Critical);
                     break;
                 case ThirdDotEvent td:
+                    NoteThirdPartyAttacker(td.Caster, td.Target);
                     Add(td.Caster, td.Time, td.Amount, td.Critical);
                     break;
                 case ThirdSchoolEvent ts:
+                    NoteThirdPartyAttacker(ts.Attacker, ts.Target);
                     Add(ts.Attacker, ts.Time, ts.Amount, ts.Critical);
                     break;
                 case ThirdMissEvent tmiss:
@@ -101,9 +145,58 @@ public sealed class PartyDpsTracker
                 // source that's non-melee with no Ability set; every other source
                 // (melee, or spell/DoT with a known caster) keeps one or the other.
                 case DamageTakenEvent { Self: false } dt when dt.Melee || dt.Ability.Length > 0:
+                    // It hit you, so it's unambiguously hostile.
+                    _confirmedEnemies.Add(dt.Attacker); // already Normalize()-d by LogParser
                     Add(dt.Attacker, dt.Time, dt.Amount, false);
                     break;
             }
+        }
+    }
+
+    /// <summary>Records the leading-article tell and checks the pet-detection and
+    /// attacked-by-enemy rules for a Third* attacker. Must run before Add() normalizes the
+    /// name away.</summary>
+    private void NoteThirdPartyAttacker(string rawAttacker, string normalizedTarget)
+    {
+        var key = LogParser.Normalize(rawAttacker);
+        var hasArticle = StartsWithArticle(rawAttacker);
+        if (hasArticle) _hasArticle.Add(key);
+        // Only a generic-named attacker fighting a confirmed enemy is pet evidence — a real
+        // player fighting alongside you is, by definition, also attacking things you've
+        // confirmed hostile, and must not be swept into this bucket too.
+        if (hasArticle && _confirmedEnemies.Contains(normalizedTarget)) _confirmedPets.Add(key);
+        if (_confirmedEnemies.Contains(key)) _attackedByConfirmedEnemy.Add(normalizedTarget);
+    }
+
+    private static bool StartsWithArticle(string raw)
+    {
+        var t = raw.TrimStart();
+        foreach (var article in (string[])["a ", "an ", "the "])
+            if (t.Length > article.Length && t.StartsWith(article, StringComparison.OrdinalIgnoreCase))
+                return true;
+        return false;
+    }
+
+    /// <summary>Best-effort Player/Pet/Enemy classification for the window's grouped
+    /// display — see the class remarks on <see cref="_hasArticle"/> and friends for the
+    /// heuristic. Not a verified roster.</summary>
+    public AttackerCategory CategoryOf(string name)
+    {
+        lock (_lock)
+        {
+            var key = LogParser.Normalize(name);
+            if (string.Equals(key, "You", StringComparison.OrdinalIgnoreCase)) return AttackerCategory.Player;
+            if (_confirmedPets.Contains(key)) return AttackerCategory.Pet;
+            if (_confirmedEnemies.Contains(key)) return AttackerCategory.Enemy;
+            // A known hostile chose to attack this name — likely a person, unless it's
+            // ALSO a generic creature name, in which case it reads more like a pet caught
+            // in the crossfire than a player.
+            if (_attackedByConfirmedEnemy.Contains(key))
+                return _hasArticle.Contains(key) ? AttackerCategory.Pet : AttackerCategory.Player;
+            // No positive evidence either way: default to Enemy. Most unrecognized names in
+            // group/raid combat are mobs, named or not (see AttackerCategory's remarks) —
+            // "no article" alone isn't reliable enough to default to Player.
+            return AttackerCategory.Enemy;
         }
     }
 

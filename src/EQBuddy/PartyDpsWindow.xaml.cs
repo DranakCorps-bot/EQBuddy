@@ -113,7 +113,10 @@ public partial class PartyDpsWindow : Window
 
     /// <summary>Same row rendering as BreakdownRows.FillAbilityRows (total/hits/avg/rate/
     /// crit%, share bar), built locally instead of through that shared helper so each row
-    /// can carry a track/untrack click and context menu, and a ✓ prefix once tracked.</summary>
+    /// can carry a track/untrack click and context menu, and a ✓ prefix once tracked. Grouped
+    /// into Players/Pets/NPCs (PartyDpsTracker.CategoryOf's best-effort read of the log) so a
+    /// long fight against several named mobs doesn't read as one flat undifferentiated list —
+    /// field request 2026-08-05.</summary>
     private void FillTrackablePullRows(IReadOnlyList<SourceDamage> stats, double combatSeconds)
     {
         PullRowsList.Items.Clear();
@@ -121,28 +124,46 @@ public partial class PartyDpsWindow : Window
         var top = Math.Max(1, stats.Max(d => d.Total));
         var secs = Math.Max(1, combatSeconds);
         var barBrush = BreakdownRows.BarBrush(this);
-        foreach (var d in stats)
+
+        void Section(string title, AttackerCategory category)
         {
-            var tracked = _tracked.Contains(d.Name);
-            var critPart = d.Crits > 0 ? $" · {100.0 * d.Crits / Math.Max(1, d.Hits):0}% crit" : "";
-            var value = $"{d.Total:N0} · ×{d.Hits} · avg {(double)d.Total / Math.Max(1, d.Hits):0.#}" +
-                        $" · {d.Total / secs:0.#} dps{critPart}";
-            var tooltip = (tracked ? "Tracked — click to stop. " : "Click to track. ") +
-                $"dps = total ÷ {secs:0}s in combat";
-            var name = (tracked ? "✓ " : "") + d.Name;
-            var row = BreakdownRows.Row(this, name, value, (double)d.Total / top, barBrush, tooltip);
-            row.Cursor = Cursors.Hand;
-            // Stop this from bubbling to the Border's OnDrag (MouseLeftButtonDown) — otherwise
-            // a click here starts a DragMove and the click never reaches MouseLeftButtonUp below.
-            row.MouseLeftButtonDown += (_, e2) => e2.Handled = true;
-            row.MouseLeftButtonUp += (_, _) => ToggleTracked(d.Name);
-            var menu = new ContextMenu();
-            var item = new MenuItem { Header = tracked ? $"Stop tracking {d.Name}" : $"Track {d.Name}" };
-            item.Click += (_, _) => ToggleTracked(d.Name);
-            menu.Items.Add(item);
-            row.ContextMenu = menu;
-            PullRowsList.Items.Add(row);
+            // Order within a section is preserved from `stats`, which is already sorted by
+            // total damage descending — so each group stays highest-first too.
+            var rows = stats.Where(d => _tracker.CategoryOf(d.Name) == category).ToList();
+            if (rows.Count == 0) return;
+            PullRowsList.Items.Add(new TextBlock
+            {
+                Text = title, FontSize = 10, FontWeight = FontWeights.SemiBold, Opacity = 0.6,
+                Margin = new Thickness(0, 4, 0, 1),
+            });
+            foreach (var d in rows)
+            {
+                var tracked = _tracked.Contains(d.Name);
+                var critPart = d.Crits > 0 ? $" · {100.0 * d.Crits / Math.Max(1, d.Hits):0}% crit" : "";
+                var value = $"{d.Total:N0} · ×{d.Hits} · avg {(double)d.Total / Math.Max(1, d.Hits):0.#}" +
+                            $" · {d.Total / secs:0.#} dps{critPart}";
+                var tooltip = (tracked ? "Tracked — click to stop. " : "Click to track. ") +
+                    $"dps = total ÷ {secs:0}s in combat";
+                var name = (tracked ? "✓ " : "") + d.Name;
+                var row = BreakdownRows.Row(this, name, value, (double)d.Total / top, barBrush, tooltip);
+                row.Cursor = Cursors.Hand;
+                // Stop this from bubbling to the Border's OnDrag (MouseLeftButtonDown) —
+                // otherwise a click here starts a DragMove and the click never reaches
+                // MouseLeftButtonUp below.
+                row.MouseLeftButtonDown += (_, e2) => e2.Handled = true;
+                row.MouseLeftButtonUp += (_, _) => ToggleTracked(d.Name);
+                var menu = new ContextMenu();
+                var item = new MenuItem { Header = tracked ? $"Stop tracking {d.Name}" : $"Track {d.Name}" };
+                item.Click += (_, _) => ToggleTracked(d.Name);
+                menu.Items.Add(item);
+                row.ContextMenu = menu;
+                PullRowsList.Items.Add(row);
+            }
         }
+
+        Section("Players", AttackerCategory.Player);
+        Section("Pets", AttackerCategory.Pet);
+        Section("NPCs", AttackerCategory.Enemy);
     }
 
     private void ToggleTracked(string name)
