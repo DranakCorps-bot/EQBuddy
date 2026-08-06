@@ -125,25 +125,25 @@ public class PartyDpsTrackerTests
     {
         var tracker = Replay(
             At(0, 0, "Lizzid reaves orc legionnaire for 7 points of damage."),
-            At(0, 9, "A puma tries to slash a ghoul, but misses!"),
-            At(0, 17, "Lizzid reaves orc legionnaire for 5 points of damage."));
+            At(0, 2, "A puma tries to slash a ghoul, but misses!"),
+            At(0, 4, "Lizzid reaves orc legionnaire for 5 points of damage."));
 
-        // 17s separates the two damage hits, but the miss at 9s bridges the gap
-        // (9s and 8s, both under the 10s pull boundary) — same pull, totals accumulate.
-        var snap = tracker.Snapshot(T(0, 17));
+        // 4s separates the two damage hits, but the miss at 2s bridges the gap
+        // (2s and 2s, both under the 3s pull boundary) — same pull, totals accumulate.
+        var snap = tracker.Snapshot(T(0, 4));
         var lizzid = Assert.Single(snap.Rows);
         Assert.Equal(2, lizzid.Hits);
         Assert.Equal(12, lizzid.Total);
     }
 
     [Fact]
-    public void AGapOverTenSecondsStartsAFreshPull()
+    public void AGapOverThePullWindowStartsAFreshPull()
     {
         var tracker = Replay(
             At(0, 0, "Lizzid reaves orc legionnaire for 7 points of damage."),
-            At(0, 15, "Lizzid reaves orc legionnaire for 5 points of damage."));
+            At(0, 5, "Lizzid reaves orc legionnaire for 5 points of damage."));
 
-        var snap = tracker.Snapshot(T(0, 15));
+        var snap = tracker.Snapshot(T(0, 5));
         var lizzid = Assert.Single(snap.Rows);
         // Only the second hit survives — the first pull's total was cleared at the gap.
         Assert.Equal(1, lizzid.Hits);
@@ -155,8 +155,8 @@ public class PartyDpsTrackerTests
     {
         var tracker = Replay(At(0, 0, "Lizzid reaves orc legionnaire for 7 points of damage."));
 
-        // Nothing else ever happens — 11 quiet seconds later the pull is over.
-        var snap = tracker.Snapshot(T(0, 11));
+        // Nothing else ever happens — 4 quiet seconds later the pull is over.
+        var snap = tracker.Snapshot(T(0, 4));
         Assert.False(snap.Active);
         Assert.Empty(snap.Rows);
     }
@@ -169,16 +169,16 @@ public class PartyDpsTrackerTests
     {
         var tracker = Replay(
             At(0, 0, "Lizzid reaves orc legionnaire for 7 points of damage."),
-            At(0, 15, "Lizzid reaves orc legionnaire for 5 points of damage."));
+            At(0, 5, "Lizzid reaves orc legionnaire for 5 points of damage."));
 
         var roster = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Lizzid" };
-        var totals = tracker.TotalsSnapshot(T(0, 15), roster);
+        var totals = tracker.TotalsSnapshot(T(0, 5), roster);
         var lizzid = Assert.Single(totals.Rows);
         Assert.Equal(2, lizzid.Hits);
         Assert.Equal(12, lizzid.Total);
 
         // Meanwhile the live per-pull view did reset at the gap.
-        var pull = tracker.Snapshot(T(0, 15));
+        var pull = tracker.Snapshot(T(0, 5));
         Assert.Equal(1, Assert.Single(pull.Rows).Hits);
     }
 
@@ -189,17 +189,17 @@ public class PartyDpsTrackerTests
     {
         var tracker = Replay(
             At(0, 0, "Lizzid reaves orc legionnaire for 7 points of damage."),
-            At(0, 5, "Lizzid reaves orc legionnaire for 3 points of damage."),
-            // 20s of nothing — past the 10s pull gap — then a second pull.
-            At(0, 25, "Lizzid reaves orc legionnaire for 7 points of damage."),
-            At(0, 30, "Lizzid reaves orc legionnaire for 3 points of damage."));
+            At(0, 2, "Lizzid reaves orc legionnaire for 3 points of damage."),
+            // 8s of nothing — past the 3s pull gap — then a second pull.
+            At(0, 10, "Lizzid reaves orc legionnaire for 7 points of damage."),
+            At(0, 12, "Lizzid reaves orc legionnaire for 3 points of damage."));
 
         var roster = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Lizzid" };
-        var totals = tracker.TotalsSnapshot(T(0, 30), roster);
+        var totals = tracker.TotalsSnapshot(T(0, 12), roster);
 
-        // Two 5-second pulls = 10s of actual combat, not the 30s of wall-clock time
+        // Two 2-second pulls = 4s of actual combat, not the 12s of wall-clock time
         // that elapsed between the first hit and the last.
-        Assert.Equal(10, totals.DurationSeconds, 3);
+        Assert.Equal(4, totals.DurationSeconds, 3);
         Assert.Equal(20, totals.TotalDamage);
     }
 
@@ -305,5 +305,33 @@ public class PartyDpsTrackerTests
             At(0, 0, "Orc centurion hits YOU for 4 points of damage."),   // confirms the enemy
             At(0, 1, "Orc centurion hits Lizzid for 6 points of damage.")); // it also hits a groupmate
         Assert.Equal(AttackerCategory.Player, tracker.CategoryOf("Lizzid"));
+    }
+
+    /// <summary>Field report 2026-08-06: several named raid adds ("Knight of Innoruuk",
+    /// "Sage of Innoruuk"...) all read as Pets of their own leader ("Champion of Innoruuk").
+    /// EQ mobs occasionally clip each other via fear/confusion/pathing without either one
+    /// being charmed — that must never override direct evidence that an attacker is
+    /// independently hostile, regardless of which order the two facts arrive in. This case:
+    /// clip happens BEFORE the independent confirmation.</summary>
+    [Fact]
+    public void HostileAddThatClipsAnotherHostileIsStillEnemyWhenLaterConfirmedDirectly()
+    {
+        var tracker = Replay(
+            At(0, 0, "Champion of Innoruuk hits YOU for 4 points of damage."),           // confirms Champion
+            At(0, 1, "Knight of Innoruuk reaves Champion of Innoruuk for 5 points of damage."), // Knight clips Champion
+            At(0, 2, "Knight of Innoruuk hits YOU for 3 points of damage."));            // Knight independently confirmed too
+        Assert.Equal(AttackerCategory.Enemy, tracker.CategoryOf("Knight of Innoruuk"));
+    }
+
+    /// <summary>Same scenario, reversed order: the independent confirmation happens BEFORE
+    /// the clip, exercising the add-time gate instead of the read-time priority.</summary>
+    [Fact]
+    public void HostileAddThatClipsAnotherHostileIsStillEnemyWhenAlreadyConfirmedDirectly()
+    {
+        var tracker = Replay(
+            At(0, 0, "Champion of Innoruuk hits YOU for 4 points of damage."),           // confirms Champion
+            At(0, 1, "Knight of Innoruuk hits YOU for 3 points of damage."),             // Knight confirmed hostile first
+            At(0, 2, "Knight of Innoruuk reaves Champion of Innoruuk for 5 points of damage.")); // then clips Champion
+        Assert.Equal(AttackerCategory.Enemy, tracker.CategoryOf("Knight of Innoruuk"));
     }
 }

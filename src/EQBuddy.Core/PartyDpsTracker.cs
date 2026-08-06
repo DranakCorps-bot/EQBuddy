@@ -9,7 +9,8 @@ namespace EQBuddy.Core;
 public enum AttackerCategory { Player, Pet, Enemy }
 
 /// <summary>Snapshot of party DPS for the current pull.</summary>
-/// <param name="Active">True while the 10-second idle gap hasn't elapsed since the last hit.</param>
+/// <param name="Active">True while the idle gap (PartyDpsTracker.PullGap) hasn't elapsed
+/// since the last hit.</param>
 /// <param name="DurationSeconds">Seconds since the pull's first hit (at least 1).</param>
 /// <param name="TotalDamage">Sum of every row's <see cref="SourceDamage.Total"/>.</param>
 /// <param name="Rows">Per-attacker totals, sorted by damage descending.</param>
@@ -42,7 +43,13 @@ public record PartyDpsSnapshot(bool Active, double DurationSeconds, long TotalDa
 /// </summary>
 public sealed class PartyDpsTracker
 {
-    private static readonly TimeSpan PullGap = TimeSpan.FromSeconds(10);
+    // Short on purpose (was 10s): every attacker sharing this ONE global clock means a
+    // groupmate's charmed pet fighting on its own schedule could keep a fight alive
+    // indefinitely, and a narrower window also shrinks the odds that a charmed pet and a
+    // same-named hostile mob are both mid-swing in the same pull, which is what actually
+    // causes their damage to merge into one row (categorization only sorts a name into a
+    // section — it can't split one name's row apart). Field report 2026-08-05.
+    private static readonly TimeSpan PullGap = TimeSpan.FromSeconds(3);
 
     private sealed class Row
     {
@@ -163,8 +170,14 @@ public sealed class PartyDpsTracker
         if (hasArticle) _hasArticle.Add(key);
         // Only a generic-named attacker fighting a confirmed enemy is pet evidence — a real
         // player fighting alongside you is, by definition, also attacking things you've
-        // confirmed hostile, and must not be swept into this bucket too.
-        if (hasArticle && _confirmedEnemies.Contains(normalizedTarget)) _confirmedPets.Add(key);
+        // confirmed hostile, and must not be swept into this bucket too. Also gated on NOT
+        // already being independently confirmed hostile itself: hostile mobs occasionally
+        // clip each other in the log (fear/confusion effects, AI pathing bumping into a
+        // neighbor) without either one being charmed — that's noise, not a charm tell, and
+        // must never override direct evidence (field report 2026-08-06: several named
+        // "Innoruuk" adds swinging at their own leader all read as pets).
+        if (hasArticle && !_confirmedEnemies.Contains(key) && _confirmedEnemies.Contains(normalizedTarget))
+            _confirmedPets.Add(key);
         if (_confirmedEnemies.Contains(key)) _attackedByConfirmedEnemy.Add(normalizedTarget);
     }
 
@@ -186,8 +199,12 @@ public sealed class PartyDpsTracker
         {
             var key = LogParser.Normalize(name);
             if (string.Equals(key, "You", StringComparison.OrdinalIgnoreCase)) return AttackerCategory.Player;
-            if (_confirmedPets.Contains(key)) return AttackerCategory.Pet;
+            // Direct evidence (it hit you, or you hit it) always wins over the pet-detection
+            // rule, checked first here because the two can be added in either order — e.g. a
+            // hostile add clips another hostile early in the fight (flagging it as a
+            // "pet") and only later hits the player directly (confirming it hostile).
             if (_confirmedEnemies.Contains(key)) return AttackerCategory.Enemy;
+            if (_confirmedPets.Contains(key)) return AttackerCategory.Pet;
             // A known hostile chose to attack this name — likely a person, unless it's
             // ALSO a generic creature name, in which case it reads more like a pet caught
             // in the crossfire than a player.
