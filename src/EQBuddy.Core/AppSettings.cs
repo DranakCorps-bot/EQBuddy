@@ -94,6 +94,8 @@ public sealed class AppSettings
     // system-wide, so EQBuddy ate Ctrl+Shift+T — reopen browser tab — from every app on
     // the machine). Old settings.json files still carrying Hotkey* keys deserialize fine;
     // unknown properties are ignored and dropped on the next save.
+    /// <summary>Persistent Plane of Sky quest turn-in checklist shown in the overlay.</summary>
+    public List<SkyQuestChecklistItem> SkyQuestChecklist { get; set; } = [];
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";
@@ -239,7 +241,10 @@ public sealed class AppSettings
         // assigned at construction, and persisting them NOW is what makes the id stable
         // across restarts rather than re-rolled every launch until some unrelated edit
         // happens to save settings.
-        if (settings.ApplyDefaultRules() | settings.TrackedRules.Any(r => r.IdWasGenerated))
+        var changed = settings.ApplyDefaultRules();
+        changed |= settings.ApplyDefaultSectionLayout();
+        changed |= settings.ApplyDefaultSkyQuestChecklist();
+        if (changed | settings.TrackedRules.Any(r => r.IdWasGenerated))
             settings.Save();
         return settings;
     }
@@ -277,6 +282,71 @@ public sealed class AppSettings
         return true;
     }
 
+    private static readonly string[] DefaultSectionOrder =
+    [
+        "combat", "healing", "kills", "loot", "motes", "sky", "tracked",
+        "money", "progress", "faction", "misc",
+    ];
+
+    public bool ApplyDefaultSectionLayout()
+    {
+        var changed = false;
+        var order = SectionOrder
+            .Where(k => DefaultSectionOrder.Contains(k, StringComparer.Ordinal))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        changed |= order.Count != SectionOrder.Count || !order.SequenceEqual(SectionOrder);
+
+        foreach (var key in DefaultSectionOrder)
+        {
+            if (order.Contains(key, StringComparer.Ordinal))
+                continue;
+
+            var defaultIndex = Array.IndexOf(DefaultSectionOrder, key);
+            var insertAt = order.Count;
+
+            for (var i = defaultIndex - 1; i >= 0; i--)
+            {
+                var previous = order.IndexOf(DefaultSectionOrder[i]);
+                if (previous >= 0)
+                {
+                    insertAt = previous + 1;
+                    break;
+                }
+            }
+
+            order.Insert(insertAt, key);
+            changed = true;
+        }
+
+        var hidden = HiddenSections
+            .Where(k => DefaultSectionOrder.Contains(k, StringComparer.Ordinal))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+        changed |= hidden.Count != HiddenSections.Count || !hidden.SequenceEqual(HiddenSections);
+
+        SectionOrder = order;
+        HiddenSections = hidden;
+        return changed;
+    }
+
+    public bool ApplyDefaultSkyQuestChecklist()
+    {
+        SkyQuestChecklist ??= [];
+        var changed = false;
+        foreach (var item in SkyQuestDefaults.Items)
+        {
+            if (SkyQuestChecklist.Any(i => string.Equals(i.Id, item.Id, StringComparison.Ordinal)))
+                continue;
+
+            SkyQuestChecklist.Add(item.Clone());
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public void Save()
     {
         try
@@ -289,4 +359,26 @@ public sealed class AppSettings
             CoreLog.Error(ex); // non-fatal, but visible
         }
     }
+}
+
+public sealed class SkyQuestChecklistItem
+{
+    public string Id { get; set; } = "";
+    public string ClassName { get; set; } = "";
+    public string Npc { get; set; } = "";
+    public string Reward { get; set; } = "";
+    public string QuestItem { get; set; } = "";
+    public string Source { get; set; } = "";
+    public bool Acquired { get; set; }
+
+    public SkyQuestChecklistItem Clone() => new()
+    {
+        Id = Id,
+        ClassName = ClassName,
+        Npc = Npc,
+        Reward = Reward,
+        QuestItem = QuestItem,
+        Source = Source,
+        Acquired = Acquired,
+    };
 }

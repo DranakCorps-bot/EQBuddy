@@ -379,6 +379,76 @@
                 </StackPanel>
             </Expander>
 
+            <Expander x:Name="SkyQuestSection" Style="{StaticResource Section}">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="&#x2601; Sky Quest" FontSize="13"/>
+                        <TextBlock x:Name="SkyQuestHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0/0"/>
+                    </Grid>
+                </Expander.Header>
+                <TabControl x:Name="SkyQuestTabs" Margin="0,2,0,0"
+                            Background="{DynamicResource PanelBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            Foreground="{DynamicResource TextBrush}">
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem">
+                            <Setter Property="Foreground" Value="{DynamicResource DimBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+                            <Setter Property="Padding" Value="7,4"/>
+                            <Setter Property="FontSize" Value="10"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TabItem">
+                                        <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                                CornerRadius="4,4,0,0" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter ContentSource="Header"
+                                                              HorizontalAlignment="Center"
+                                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PanelHoverBrush}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="bd" Property="Background" Value="{DynamicResource PopupBrush}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TabControl.Resources>
+                    <TabControl.Template>
+                        <ControlTemplate TargetType="TabControl">
+                            <Grid KeyboardNavigation.TabNavigation="Local">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                              VerticalScrollBarVisibility="Disabled">
+                                    <TabPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1"/>
+                                </ScrollViewer>
+                                <Border Grid.Row="1" Background="{DynamicResource PopupBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                        CornerRadius="0,0,4,4" Padding="6">
+                                    <ContentPresenter x:Name="PART_SelectedContentHost"
+                                                      ContentSource="SelectedContent"/>
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </TabControl.Template>
+                </TabControl>
+            </Expander>
+
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">
                 <Expander.Header>
                     <Grid>

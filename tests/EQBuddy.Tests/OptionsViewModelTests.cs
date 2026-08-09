@@ -52,6 +52,7 @@ public sealed class OptionsViewModelTests
         Assert.Equal("kills", s.SectionOrder[0]);
         Assert.Equal(OverlaySections.Catalog.Length, s.SectionOrder.Count);
         Assert.DoesNotContain("bogus", s.SectionOrder);
+        Assert.Contains(vm.Cards, c => c.Key == "sky" && c.Title == "Sky Quest");
 
         vm.MoveCard("kills", -1);                        // top can't move up
         Assert.Equal("kills", s.SectionOrder[0]);
@@ -90,5 +91,38 @@ public sealed class OptionsViewModelTests
         Assert.Equal("200%", vm.ChipScaleLabel);
         vm.ChipScale = 0.1;
         Assert.Equal(0.5, s.ChipScale);
+    }
+
+    [Fact]
+    public void SectionLayoutAddsSkyToExistingOrder()
+    {
+        var settings = new AppSettings
+        {
+            SectionOrder = ["combat", "tracked", "bogus"],
+            HiddenSections = ["loot", "bogus"],
+        };
+
+        Assert.True(settings.ApplyDefaultSectionLayout());
+        Assert.Contains("sky", settings.SectionOrder);
+        Assert.True(settings.SectionOrder.IndexOf("sky") < settings.SectionOrder.IndexOf("tracked"));
+        Assert.DoesNotContain("bogus", settings.SectionOrder);
+        Assert.Equal(["loot"], settings.HiddenSections);
+    }
+
+    [Fact]
+    public void SkyQuestDefaultsMergeOnce()
+    {
+        var settings = new AppSettings();
+
+        Assert.True(settings.ApplyDefaultSkyQuestChecklist());
+        Assert.Contains(settings.SkyQuestChecklist, i => i.ClassName == "Monk" && i.Reward == "Wu's Fist of Mastery");
+        Assert.Contains(settings.SkyQuestChecklist, i => i.ClassName == "Shaman" && i.QuestItem == "Efreeti War Club");
+        Assert.Contains(settings.SkyQuestChecklist, i => i.ClassName == "Shadow Knight" && i.Reward == "Pearlescent Pauldrons");
+        var count = settings.SkyQuestChecklist.Count;
+
+        settings.SkyQuestChecklist[0].Acquired = true;
+        Assert.False(settings.ApplyDefaultSkyQuestChecklist());
+        Assert.Equal(count, settings.SkyQuestChecklist.Count);
+        Assert.True(settings.SkyQuestChecklist[0].Acquired);
     }
 }

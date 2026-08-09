@@ -115,6 +115,7 @@ public static class OverlaySections
     [
         ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
         ("motes", "Motes"),
+        ("sky", "Sky Quest"),
         // Key stays "tracked" — it's persisted in SectionOrder/HiddenSections. Only the
         // label follows the feature's rename from tracked loot to watch rules (#5).
         ("tracked", "Watch"), ("money", "Money"), ("progress", "Progress"),

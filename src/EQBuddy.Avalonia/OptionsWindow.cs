@@ -546,7 +546,9 @@ public sealed class OptionsWindow : Window
     private void BuildCardsEditor()
     {
         _cardsPanel.Children.Clear();
-        var order = _main.Settings.SectionOrder.ToList();
+        var order = _main.Settings.SectionOrder
+            .Where(k => MainWindow.SectionCatalog.Any(c => c.Key == k))
+            .ToList();
         foreach (var (key, _) in MainWindow.SectionCatalog)
             if (!order.Contains(key)) order.Add(key);
         _main.Settings.SectionOrder = order;

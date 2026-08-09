@@ -31,6 +31,7 @@ public partial class MainWindow : Window
     private readonly SpawnTimers _spawnTimers;
     private readonly EQBuddy.UI.Shared.SpawnsViewModel _spawnsVm;
     private SpawnsWindow? _spawnsWindow;
+    private readonly Dictionary<string, int> _skyQuestLootSeen = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly string[] MiniStatOrder = ["kills", "dps", "hps", "pet", "loot", "motes", "money", "xp", "deaths"];
 
@@ -146,8 +147,8 @@ public partial class MainWindow : Window
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1")
             foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
-                         MotesSection, TrackedSection, MoneySection, ProgressSection, FactionSection,
-                         MiscSection })
+                         MotesSection, SkyQuestSection, TrackedSection, MoneySection,
+                         ProgressSection, FactionSection, MiscSection })
                 ex.IsExpanded = true;
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_CCLOG") == "1")
@@ -268,7 +269,8 @@ public partial class MainWindow : Window
     private Dictionary<string, UIElement> SectionMap() => new()
     {
         ["combat"] = CombatSection, ["healing"] = HealingSection, ["kills"] = KillsSection,
-        ["loot"] = LootSection, ["motes"] = MotesSection, ["tracked"] = TrackedSection,
+        ["loot"] = LootSection, ["motes"] = MotesSection, ["sky"] = SkyQuestSection,
+        ["tracked"] = TrackedSection,
         ["money"] = MoneySection,
         ["progress"] = ProgressSection, ["faction"] = FactionSection, ["misc"] = MiscSection,
     };
@@ -1017,6 +1019,7 @@ public partial class MainWindow : Window
             : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
         var motes = Motes.Summarize(s.Loot, s.Elapsed);
         MotesHeader.Text = motes.Total > 0 ? $"{motes.Total} · {motes.PerHour:0.#}/hr" : "0";
+        UpdateSkyQuestChecklist(s);
         MoneyHeader.Text = StatsSnapshot.FormatCoin(s.Copper);
         ProgressHeader.Text = $"{s.XpPercent:0.0}% xp"
             + (s.Levels.Count > 0 ? $", +{s.Levels.Count} lvl" : "")
@@ -1169,6 +1172,9 @@ public partial class MainWindow : Window
             FillList(MotesList, motes.Tiers.Select(t => (t.Item, $"×{t.Count}")),
                 onNameClick: ShowItemInfo, tooltip: ItemHoverStats);
         }
+
+        if (SkyQuestSection.IsExpanded)
+            RenderSkyQuestChecklist();
 
         if (MoneySection.IsExpanded)
         {
@@ -1339,6 +1345,156 @@ public partial class MainWindow : Window
     private static string FormatAge(TimeSpan age) => age.TotalMinutes < 1
         ? $"{Math.Max(0, (int)age.TotalSeconds)}s"
         : age.TotalHours < 1 ? $"{(int)age.TotalMinutes}m" : $"{(int)age.TotalHours}h {age.Minutes}m";
+
+    private void UpdateSkyQuestChecklist(StatsSnapshot s)
+    {
+        var changed = AutoCheckSkyQuestLoot(s);
+        UpdateSkyQuestHeaderOnly();
+        if (changed) _settings.Save();
+    }
+
+    private bool AutoCheckSkyQuestLoot(StatsSnapshot s)
+    {
+        var changed = false;
+        var lootByName = s.Loot
+            .GroupBy(l => l.Item, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.Sum(l => l.Count), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var key in _skyQuestLootSeen.Keys.ToList())
+            if (!lootByName.ContainsKey(key))
+                _skyQuestLootSeen[key] = 0;
+
+        foreach (var (name, count) in lootByName)
+        {
+            _skyQuestLootSeen.TryGetValue(name, out var seen);
+            if (count <= seen)
+            {
+                _skyQuestLootSeen[name] = count;
+                continue;
+            }
+
+            var newlyLooted = count - seen;
+            _skyQuestLootSeen[name] = count;
+            foreach (var item in _settings.SkyQuestChecklist
+                         .Where(i => !i.Acquired && string.Equals(i.QuestItem, name, StringComparison.OrdinalIgnoreCase))
+                         .Take(newlyLooted))
+            {
+                item.Acquired = true;
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    private void RenderSkyQuestChecklist()
+    {
+        var selectedClass = (SkyQuestTabs.SelectedItem as TabItem)?.Tag as string;
+        SkyQuestTabs.Items.Clear();
+
+        foreach (var classGroup in _settings.SkyQuestChecklist.GroupBy(i => i.ClassName).OrderBy(g => g.Key))
+        {
+            var classTotal = classGroup.Count();
+            var classDone = classGroup.Count(i => i.Acquired);
+            var panel = new StackPanel { Margin = new Thickness(0, 4, 0, 0) };
+
+            foreach (var rewardGroup in classGroup.GroupBy(i => i.Reward).OrderBy(g => g.Key))
+            {
+                panel.Children.Add(new TextBlock
+                {
+                    Text = rewardGroup.Key,
+                    FontSize = 11,
+                    FontWeight = FontWeights.SemiBold,
+                    Foreground = (Brush)FindResource("AccentBrush"),
+                    Margin = new Thickness(0, panel.Children.Count == 0 ? 0 : 6, 0, 1),
+                    TextTrimming = TextTrimming.CharacterEllipsis,
+                    ToolTip = $"{rewardGroup.Key} - {rewardGroup.First().Npc}",
+                });
+
+                foreach (var item in rewardGroup.OrderBy(i => i.QuestItem))
+                {
+                    var text = new StackPanel();
+                    text.Children.Add(new TextBlock
+                    {
+                        Text = item.QuestItem,
+                        FontSize = 12,
+                        Foreground = (Brush)FindResource("TextBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                    });
+                    text.Children.Add(new TextBlock
+                    {
+                        Text = item.Source,
+                        FontSize = 10,
+                        Foreground = (Brush)FindResource("DimBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                    });
+
+                    var check = new CheckBox
+                    {
+                        IsChecked = item.Acquired,
+                        Content = text,
+                        Margin = new Thickness(0, 1, 0, 1),
+                        ToolTip = $"{item.Reward}: {item.QuestItem} ({item.Source})",
+                    };
+                    check.Checked += (_, _) =>
+                    {
+                        item.Acquired = true;
+                        _settings.Save();
+                        UpdateSkyQuestHeaderOnly();
+                    };
+                    check.Unchecked += (_, _) =>
+                    {
+                        item.Acquired = false;
+                        _settings.Save();
+                        UpdateSkyQuestHeaderOnly();
+                    };
+                    panel.Children.Add(check);
+                }
+            }
+
+            var tab = new TabItem
+            {
+                Header = $"{ClassAbbrev(classGroup.Key)} {classDone}/{classTotal}",
+                Tag = classGroup.Key,
+                Content = panel,
+                ToolTip = classGroup.Key,
+            };
+            SkyQuestTabs.Items.Add(tab);
+            if (string.Equals(selectedClass, classGroup.Key, StringComparison.Ordinal))
+                SkyQuestTabs.SelectedItem = tab;
+        }
+
+        if (SkyQuestTabs.SelectedIndex < 0 && SkyQuestTabs.Items.Count > 0)
+            SkyQuestTabs.SelectedIndex = 0;
+    }
+
+    private void UpdateSkyQuestHeaderOnly()
+    {
+        var total = _settings.SkyQuestChecklist.Count;
+        var acquired = _settings.SkyQuestChecklist.Count(i => i.Acquired);
+        SkyQuestHeader.Text = $"{acquired}/{total}";
+    }
+
+    private static string ClassAbbrev(string className) => className switch
+    {
+        "Bard" => "BRD",
+        "Beastlord" => "BST",
+        "Berserker" => "BER",
+        "Cleric" => "CLR",
+        "Druid" => "DRU",
+        "Enchanter" => "ENC",
+        "Magician" => "MAG",
+        "Monk" => "MNK",
+        "Necromancer" => "NEC",
+        "Paladin" => "PAL",
+        "Ranger" => "RNG",
+        "Rogue" => "ROG",
+        "Shadow Knight" => "SHD",
+        "Shaman" => "SHM",
+        "Warrior" => "WAR",
+        "Wizard" => "WIZ",
+        _ => className,
+    };
 
     /// <summary>
     /// Fire banner/sound alerts when a tracked rule's total grows. Baselines are reset
