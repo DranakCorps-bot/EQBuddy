@@ -510,7 +510,7 @@ public static partial class LogParser
         // Buff/HoT wear-off flavor lines never name their spell — the catalog does.
         // Exact-message dictionary lookup: one hash probe per line, no regex cost.
         if (FadeMessageCatalog.Default.Find(msg) is { } fade)
-            return new BuffFadeEvent(ts, fade.Label, fade.Spells);
+            return new BuffFadeEvent(ts, fade.Label, fade.Spells, fade.Category);
 
         if ((r = PetSpellWornOffRx().Match(msg)).Success)
             return new SpellWornOffEvent(ts, r.Groups["spell"].Value,

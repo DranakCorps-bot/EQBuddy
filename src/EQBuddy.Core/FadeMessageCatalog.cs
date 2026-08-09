@@ -30,17 +30,44 @@ public sealed class FadeMessageCatalog
     }
 
     private readonly Dictionary<string, Entry> _byMessage;
+    private readonly Dictionary<string, Entry> _bySpell;
+    private readonly string[] _buffSpellChoices;
 
-    public FadeMessageCatalog(IEnumerable<Entry> entries) =>
-        _byMessage = entries.Where(e => e.Message.Length > 0)
-            .ToDictionary(e => e.Message, e => e, StringComparer.OrdinalIgnoreCase);
+    public FadeMessageCatalog(IEnumerable<Entry> entries)
+    {
+        var list = entries.Where(e => e.Message.Length > 0).ToList();
+        _byMessage = list.ToDictionary(e => e.Message, e => e, StringComparer.OrdinalIgnoreCase);
+        _bySpell = list
+            .SelectMany(e => e.Spells.Select(spell => (Spell: SpellCatalog.BaseName(spell), Entry: e)))
+            .Where(x => x.Spell.Length > 0)
+            .GroupBy(x => x.Spell, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First().Entry, StringComparer.OrdinalIgnoreCase);
+        _buffSpellChoices = list
+            .Where(e => IsBeneficialCategory(e.Category))
+            .SelectMany(e => e.Spells.Append(e.Label))
+            .Select(SpellCatalog.BaseName)
+            .Where(s => s.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(s => s, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
 
     public int Count => _byMessage.Count;
 
     public IEnumerable<Entry> Entries => _byMessage.Values;
 
+    public IReadOnlyList<string> BuffSpellChoices => _buffSpellChoices;
+
     public Entry? Find(string message) =>
         _byMessage.TryGetValue(message, out var e) ? e : null;
+
+    public Entry? FindBySpell(string spell) =>
+        _bySpell.TryGetValue(SpellCatalog.BaseName(spell), out var e) ? e : null;
+
+    public static bool IsBeneficialCategory(string category) => category is
+        "Buff" or "StatBuff" or "Protection" or "Haste" or "Movement" or "Clarity"
+        or "Regen" or "DamageShield" or "Rune" or "Illusion" or "Invisibility"
+        or "HealOverTime";
 
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true };
 

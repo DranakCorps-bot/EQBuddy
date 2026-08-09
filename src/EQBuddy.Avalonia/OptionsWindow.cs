@@ -351,7 +351,7 @@ public sealed class OptionsWindow : Window
             row.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(92)));
             row.ColumnDefinitions.Add(new ColumnDefinition(new GridLength(115)));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
-            for (var i = 0; i < 6; i++)   // pin, banner, color, sound, delay, delete
+            for (var i = 0; i < 7; i++)   // pin, banner, color, speech, sound, delay, delete
                 row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
 
             var kind = new ComboBox { FontSize = 11, Margin = new Thickness(0, 0, 4, 0) };
@@ -396,13 +396,49 @@ public sealed class OptionsWindow : Window
             Grid.SetColumn(pattern, 1);
             matchArea.Children.Add(pattern);
 
+            var spellName = new AutoCompleteBox
+            {
+                Text = rule.Pattern,
+                ItemsSource = FadeMessageCatalog.Default.BuffSpellChoices,
+                FilterMode = AutoCompleteFilterMode.ContainsOrdinal,
+                MinimumPrefixLength = 0,
+                IsTextCompletionEnabled = true,
+                PlaceholderText = "Buff/spell name",
+                FontSize = 12,
+                Margin = new Thickness(0, 0, 4, 0),
+                MinWidth = 120,
+                MaxDropDownHeight = 260,
+            };
+            ToolTip.SetTip(spellName,
+                "Start typing a known buff/spell fade, then pick one. Free typing still works.");
+            spellName.TextChanged += (_, _) =>
+            {
+                if (!_ready) return;
+                rule.Pattern = (spellName.Text ?? "").Trim();
+                pattern.Text = rule.Pattern;
+                _main.PersistSettings();
+            };
+            spellName.SelectionChanged += (_, _) =>
+            {
+                if (!_ready || spellName.SelectedItem is not string picked) return;
+                rule.Pattern = picked;
+                spellName.Text = picked;
+                pattern.Text = picked;
+                _main.PersistSettings();
+            };
+            Grid.SetColumn(spellName, 1);
+            matchArea.Children.Add(spellName);
+
             void SyncMatchArea()
             {
                 var isFade = rule.Kind == WatchKind.SpellFade;
                 var byName = rule.SpellFilter == SpellFilter.ByName;
                 spellFilter.IsVisible = isFade;
-                pattern.IsVisible = !isFade || byName;
+                pattern.IsVisible = !isFade;
+                spellName.IsVisible = isFade && byName;
                 Grid.SetColumnSpan(spellFilter, isFade && !byName ? 2 : 1);
+                if (isFade && byName) spellName.Text = rule.Pattern;
+                else pattern.Text = rule.Pattern;
             }
             SyncMatchArea();
 
@@ -449,6 +485,9 @@ public sealed class OptionsWindow : Window
             Grid.SetColumn(colorDot, 5);
             row.Children.Add(colorDot);
 
+            row.Children.Add(RuleToggle("S", "Speak this alert with the Windows voice", 6,
+                rule.AlertSpeech, v => rule.AlertSpeech = v));
+
             // Per-rule sound, replacing the old on/off toggle. Telling rules apart by ear is
             // the entire point — and it matters most for delayed alerts, where the usual
             // setup is two rules on one match ("heard it" now, "cast now" later) that are
@@ -494,7 +533,7 @@ public sealed class OptionsWindow : Window
                 if (AlertSoundCatalog.Resolve(rule, _main.Settings.AlertSound) is { } preview)
                     _main.PlayAlertSound(preview);
             };
-            Grid.SetColumn(sound, 6);
+            Grid.SetColumn(sound, 7);
             row.Children.Add(sound);
 
             // Seconds to hold the alert back — 0 (or empty) is the immediate behaviour.
@@ -514,7 +553,7 @@ public sealed class OptionsWindow : Window
                 delay.Text = DelayText.Format(rule.AlertDelaySeconds);
                 _main.PersistSettings();
             };
-            Grid.SetColumn(delay, 7);
+            Grid.SetColumn(delay, 8);
             row.Children.Add(delay);
 
             var del = AppTheme.IconButton("x", "Delete rule");
@@ -524,7 +563,7 @@ public sealed class OptionsWindow : Window
                 _main.PersistSettings();
                 BuildRulesEditor();
             };
-            Grid.SetColumn(del, 8);
+            Grid.SetColumn(del, 9);
             row.Children.Add(del);
             _rulesPanel.Children.Add(row);
         }

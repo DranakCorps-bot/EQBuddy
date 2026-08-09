@@ -248,12 +248,13 @@ public class OptionsRenderTests : IDisposable
             Assert.Equal(Enum.GetValues<SpellFilter>().Length, picker.Items.Count));
         Assert.Equal(2, filterPickers.Count(picker => picker.IsVisible));
 
-        var namedPattern = options.GetVisualDescendants().OfType<TextBox>()
+        var namedPattern = options.GetVisualDescendants().OfType<AutoCompleteBox>()
             .Single(t => t.Text == "Befriend");
-        var classPattern = options.GetVisualDescendants().OfType<TextBox>()
+        var classPattern = options.GetVisualDescendants().OfType<AutoCompleteBox>()
             .Single(t => t.Text == "keep this");
         Assert.True(namedPattern.IsVisible);
         Assert.False(classPattern.IsVisible);
+        Assert.Contains("Spirit of the Puma", namedPattern.ItemsSource!.Cast<string>());
 
         var kindPickers = options.GetVisualDescendants().OfType<ComboBox>()
             .Where(c => c.Items.Contains(OptionsViewModel.KindNames[0]))
@@ -274,7 +275,7 @@ public class OptionsRenderTests : IDisposable
         var filterPicker = options.GetVisualDescendants().OfType<ComboBox>()
             .Where(c => c.Items.Contains(OptionsViewModel.SpellFilterNames[0]))
             .Single(c => c.SelectedIndex == (int)SpellFilter.ByName && c.IsVisible);
-        var pattern = options.GetVisualDescendants().OfType<TextBox>()
+        var pattern = options.GetVisualDescendants().OfType<AutoCompleteBox>()
             .Single(t => t.Text == "Befriend");
 
         filterPicker.SelectedIndex = (int)SpellFilter.Charm;

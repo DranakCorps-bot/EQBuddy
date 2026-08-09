@@ -16,6 +16,7 @@ public class WatchRuleShareTests
         Kind = WatchKind.Text,
         AlertBanner = true,
         AlertSound = true,
+        AlertSpeech = true,
         AlertSoundName = "Alarm",
         AlertColor = "Purple",
         AlertDelaySeconds = 2.5,
@@ -35,6 +36,7 @@ public class WatchRuleShareTests
         Assert.Equal(WatchKind.Text, r.Kind);
         Assert.True(r.AlertBanner);
         Assert.True(r.AlertSound);
+        Assert.True(r.AlertSpeech);
         Assert.Equal("Alarm", r.AlertSoundName);
         Assert.Equal("Purple", r.AlertColor);
         Assert.Equal(2.5, r.AlertDelaySeconds);

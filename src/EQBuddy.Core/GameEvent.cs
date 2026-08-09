@@ -66,7 +66,7 @@ public record SpellWornOffEvent(DateTime Time, string Spell, string Target, bool
 /// <summary>A buff/HoT wear-off flavor line ("The echo of healing fades away.") mapped
 /// through <see cref="FadeMessageCatalog"/>: the log names no spell, so the event
 /// carries every candidate that shares the message plus a display label.</summary>
-public record BuffFadeEvent(DateTime Time, string Label, string[] Spells) : GameEvent(Time);
+public record BuffFadeEvent(DateTime Time, string Label, string[] Spells, string Category = "") : GameEvent(Time);
 public record LevelEvent(DateTime Time, int Level) : GameEvent(Time);
 public record SkillUpEvent(DateTime Time, string Skill, int Value) : GameEvent(Time);
 /// <summary>"You will now use Round Kick instead of Kick while attacking." — an ability that

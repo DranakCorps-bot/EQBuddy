@@ -1633,6 +1633,8 @@ public partial class MainWindow : Window
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
             PlayAlertSound(sound, coalesce: true);
+        if (rule.AlertSpeech)
+            EQBuddy.UI.Shared.SpokenAlerts.Speak(label);
     }
 
     /// <summary>
@@ -1751,8 +1753,7 @@ public partial class MainWindow : Window
             // doesn't look like a fresh burst later.
             if (rule.Kind == WatchKind.Text) continue;
 
-            AlertOrCue(rule, r.Name,
-                $"{r.LastItem ?? "match"}{(delta > 1 ? $" ×{delta}" : "")}",
+            AlertOrCue(rule, r.Name, EQBuddy.UI.Shared.WatchAlertText.MatchLabel(rule, r, delta),
                 TimeSpan.FromSeconds(5));   // ALERT-008 cooldown
         }
     }

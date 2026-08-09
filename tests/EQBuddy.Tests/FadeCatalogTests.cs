@@ -20,6 +20,19 @@ public class FadeCatalogTests
         var evt = Assert.IsType<BuffFadeEvent>(LogParser.Parse(Ts + "The spirit of the puma departs."));
         Assert.Contains("Spirit of the Puma", evt.Spells);
         Assert.Equal("Spirit of the Puma", evt.Label);
+        Assert.Equal("Buff", evt.Category);
+    }
+
+    [Fact]
+    public void PumaCanBeFoundBySpellName() =>
+        Assert.Equal("Spirit of the Puma",
+            FadeMessageCatalog.Default.FindBySpell("Spirit of the Puma")?.Label);
+
+    [Fact]
+    public void BuffSpellChoicesIncludeKnownBuffNamesAndLabels()
+    {
+        Assert.Contains("Spirit of the Puma", FadeMessageCatalog.Default.BuffSpellChoices);
+        Assert.Contains("Haste", FadeMessageCatalog.Default.BuffSpellChoices);
     }
 
     // Every catalogued message must actually reach the catalog lookup: an entry whose

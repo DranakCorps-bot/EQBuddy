@@ -934,6 +934,23 @@ public class SpellTrackingTests
     }
 
     [Fact]
+    public void BuffFilterCatchesPumaButNotADebuffFade()
+    {
+        var buff = new TrackedRule
+        {
+            Name = "Buff dropped", Kind = WatchKind.SpellFade, SpellFilter = SpellFilter.Buff,
+        };
+        var s = Replay(
+            At(0, 0, "The spirit of the puma departs."),
+            At(0, 3, "The darkness fades.")
+        ).Snapshot(recentWindow: null, rules: [buff]);
+
+        var tracked = Assert.Single(s.Tracked);
+        Assert.Equal(1, tracked.TotalQuantity);
+        Assert.Contains(tracked.Items, i => i.Name == "Spirit of the Puma");
+    }
+
+    [Fact]
     public void ByNameFilterKeepsTheOriginalSubstringBehaviour()
     {
         var rule = new TrackedRule { Name = "Charm only", Pattern = "Befriend", Kind = WatchKind.SpellFade };

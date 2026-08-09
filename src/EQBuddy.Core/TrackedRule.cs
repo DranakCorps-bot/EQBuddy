@@ -50,6 +50,9 @@ public enum SpellFilter
     /// the "recast it" moment. HoTs are learned from their own tick lines, so the rule
     /// keeps up with new spells and ranks like the CC filters do.</summary>
     HealOverTime = 8,
+    /// <summary>Beneficial buffs from the fade-message catalog: stat buffs, protections,
+    /// movement, clarity, haste and similar self/ally buffs.</summary>
+    Buff = 9,
 }
 
 /// <summary>
@@ -101,6 +104,9 @@ public sealed class TrackedRule
     public bool Pinned { get; set; } = true;
     public bool AlertBanner { get; set; } = true;
     public bool AlertSound { get; set; }
+    /// <summary>Speak the alert text with the system voice. Separate from sound: a rule
+    /// can ding, speak, both, or neither.</summary>
+    public bool AlertSpeech { get; set; }
 
     /// <summary>Banner tint by palette name (AlertColors); "" = theme accent. Color is
     /// the identification channel when sounds are off or quiet (Chaosrah, 2026-08-06).</summary>

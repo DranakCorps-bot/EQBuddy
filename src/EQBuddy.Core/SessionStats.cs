@@ -872,8 +872,22 @@ public sealed class SessionStats
     {
         SpellFilter.ByName => rule.Matches(spell),
         SpellFilter.AnySpell => true,
+        SpellFilter.Buff => FadeMessageCatalog.Default.FindBySpell(spell) is { } fade
+            && FadeMessageCatalog.IsBeneficialCategory(fade.Category),
         SpellFilter.AnyCrowdControl => _spells.IsCrowdControl(spell),
         _ => rule.FilterCategory is { } wanted && _spells.Classify(spell) == wanted,
+    };
+
+    private bool BuffFadeMatches(TrackedRule rule, BuffFadeEvent fade) => rule.SpellFilter switch
+    {
+        SpellFilter.ByName => rule.Matches(fade.Label)
+            || fade.Spells.Any(sp => rule.Matches(sp)),
+        SpellFilter.AnySpell => true,
+        SpellFilter.Buff => FadeMessageCatalog.IsBeneficialCategory(fade.Category),
+        SpellFilter.AnyCrowdControl => false,
+        _ => rule.FilterCategory is { } wanted
+            && (string.Equals(fade.Category, wanted.ToString(), StringComparison.OrdinalIgnoreCase)
+                || fade.Spells.Any(sp => _spells.Classify(sp) == wanted)),
     };
 
     /// <summary>
@@ -1421,8 +1435,7 @@ public sealed class SessionStats
                             // time an NPC's stun on HIM wore off. ByName/AnySpell/HoT
                             // still hear self-fades — watching your own buffs is their job.
                             (WatchKind.SpellFade, BuffFadeEvent bf)
-                                when !IsCcFilter(rule.SpellFilter)
-                                     && bf.Spells.Any(sp => SpellFadeMatches(rule, sp))
+                                when !IsCcFilter(rule.SpellFilter) && BuffFadeMatches(rule, bf)
                                 => (bf.Label, 1),
                             // Re-matched here rather than trusted from ingest: the journal
                             // holds lines kept for ANY text rule, so each rule still has to
