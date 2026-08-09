@@ -1486,7 +1486,15 @@ public partial class MainWindow : Window
             {
                 Header = $"{ClassAbbrev(classGroup.Key)} {classDone}/{classTotal}",
                 Tag = classGroup.Key,
-                Content = panel,
+                Content = new ScrollViewer
+                {
+                    Content = panel,
+                    MaxHeight = SkyQuestListMaxHeight(),
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                    PanningMode = PanningMode.VerticalOnly,
+                    Padding = new Thickness(0, 0, 4, 0),
+                },
                 ToolTip = classGroup.Key,
             };
             SkyQuestTabs.Items.Add(tab);
@@ -1496,6 +1504,12 @@ public partial class MainWindow : Window
 
         if (SkyQuestTabs.SelectedIndex < 0 && SkyQuestTabs.Items.Count > 0)
             SkyQuestTabs.SelectedIndex = 0;
+    }
+
+    private double SkyQuestListMaxHeight()
+    {
+        var available = SectionScroll.MaxHeight > 0 ? SectionScroll.MaxHeight - 220 : 260;
+        return Math.Clamp(available, 180, 320);
     }
 
     private static string SkyRewardKey(string className, string reward) => className + "|" + reward;
