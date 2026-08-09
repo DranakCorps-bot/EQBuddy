@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Sagar's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 22
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Sagar's Animation Summon|Sagar's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 22 [[Sagar's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 14.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

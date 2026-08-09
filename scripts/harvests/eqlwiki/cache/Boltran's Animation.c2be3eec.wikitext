@@ -1,4 +1,5 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpage|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Boltran's Animation
 | spellicon = 38
@@ -7,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 31
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Boltran's Animation Summon|Boltran's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 28 [[Boltran's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -18,7 +19,7 @@
 | recast_time = 18.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

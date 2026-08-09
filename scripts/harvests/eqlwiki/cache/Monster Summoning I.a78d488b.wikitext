@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 30
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Monster Summoning I Summon|Monster Summoning I]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 29 [[Monster Summoning I Summon|Monster]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

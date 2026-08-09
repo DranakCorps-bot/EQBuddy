@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Frenzied_Spirit_Summon|Frenzied Spirit]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 36 [[Frenzied_Spirit_Summon|Spirit Wolf]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Kilan's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 9 (Autogranted)
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Kilan's Animation Summon|Kilan's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 11 [[Kilan's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 8.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

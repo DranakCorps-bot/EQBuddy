@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Kintaz's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 48
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Kintaz's Animation Summon|Kintaz's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 39 [[Kintaz's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 24.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

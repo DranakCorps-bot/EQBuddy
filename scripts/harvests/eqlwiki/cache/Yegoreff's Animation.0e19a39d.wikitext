@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Yegoreff's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 41
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Yegoreff's Animation Summon|Yegoreff's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 34 [[Yegoreff's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 22.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

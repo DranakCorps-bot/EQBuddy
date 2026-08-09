@@ -16,7 +16,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Companion_Spirit_Summon|Companion Spirit]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 26 [[Companion_Spirit_Summon|Spirit Wolf]] }}
 
 | other =
 

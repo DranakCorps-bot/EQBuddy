@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Spirit of Kashek
 | spellicon = 144
@@ -13,7 +13,7 @@
 
 | slots = 
 
-{{SpellSlotRowSmart | 1 | Summon Warder: [[Spirit_of_Kashek_Summon|Spirit of Kashek]]  | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 1 | Summon Pet: Level 39 [[Spirit_of_Kashek_Summon|Warder]]  | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 | other =
 

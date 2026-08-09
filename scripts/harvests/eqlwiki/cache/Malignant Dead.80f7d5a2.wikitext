@@ -1,4 +1,5 @@
-{{Spellpage|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Malignant Dead
 | spellicon = 91
@@ -11,7 +12,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon [[Malignant Dead Summon|Skeleton Pet]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 33 [[Malignant Dead Summon|Skeleton Pet]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -22,7 +23,7 @@
 | recast_time = 1.50
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

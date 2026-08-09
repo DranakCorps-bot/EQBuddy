@@ -1,4 +1,4 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Cavorting Bones
@@ -12,7 +12,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon [[Cavorting Bones Summon|Skeletal Pet]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 1 [[Cavorting Bones Summon|Skeletal Pet]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -24,7 +24,7 @@
 | duration = Instant
 | target_type = Self
 | target_table = Summon
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

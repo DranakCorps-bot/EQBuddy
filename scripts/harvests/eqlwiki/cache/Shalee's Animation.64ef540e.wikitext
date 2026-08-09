@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Shalee's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 14 (Autogranted)
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Shalee's Animation Summon|Shalee's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 16 [[Shalee's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 10.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Mircyl's Animation
 | spellicon = 38
@@ -8,7 +8,7 @@
 | classes = * [[Enchanter]] - Level 7 (Autogranted)
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Mircyl's Animation Summon|Mircyl's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 9 [[Mircyl's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -19,7 +19,7 @@
 | recast_time = 6.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

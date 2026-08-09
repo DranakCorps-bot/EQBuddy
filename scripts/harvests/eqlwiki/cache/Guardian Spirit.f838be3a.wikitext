@@ -17,7 +17,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Guardian_Spirit_Summon|Guardian Spirit]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 32 [[Guardian_Spirit_Summon|Spirit Wolf]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

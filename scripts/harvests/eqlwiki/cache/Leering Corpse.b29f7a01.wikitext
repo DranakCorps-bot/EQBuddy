@@ -12,7 +12,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon [[Leering Corpse Summon|Skeletal Pet]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 5 [[Leering Corpse Summon|Skeletal Pet]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -23,7 +23,7 @@
 | recast_time = 9.50
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 

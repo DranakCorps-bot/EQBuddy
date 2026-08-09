@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Spirit of Sharik
 | spellicon = 144
@@ -13,7 +13,7 @@
 
 | slots = 
 
-{{SpellSlotRowSmart | 1 | Summon Warder: [[Spirit_of_Sharik_Summon|Spirit of Sharik]]  | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 1 | Summon Pet: Level 9 [[Spirit_of_Sharik_Summon|Warder]]  | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 | other =
 

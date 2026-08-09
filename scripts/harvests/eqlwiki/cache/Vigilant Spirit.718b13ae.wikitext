@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Vigilant_Spirit_Summon|Vigilant Spirit]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 29 [[Vigilant_Spirit_Summon|Spirit Wolf]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

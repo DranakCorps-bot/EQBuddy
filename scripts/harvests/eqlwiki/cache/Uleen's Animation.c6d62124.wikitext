@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Uleen's Animation
 | spellicon = 38
@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Uleen's Animation Summon|Uleen's Animation]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 25 [[Uleen's Animation Summon|Animation]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -22,7 +22,7 @@
 | recast_time = 16.00
 | duration = Instant
 | target_type = Self
-| spell_type = Beneficial
+| spell_type = Pet
 | resist = Unresistable
 
 | other = 
