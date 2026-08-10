@@ -97,8 +97,16 @@ public record FizzleEvent(DateTime Time, string Spell = "") : GameEvent(Time);
 public record SpellCastEvent(DateTime Time, string Spell, bool Song = false) : GameEvent(Time);
 /// <summary>"Your X spell is interrupted." — a started cast that never landed.</summary>
 public record SpellInterruptedEvent(DateTime Time, string Spell) : GameEvent(Time);
-/// <summary>The player's pet announced itself ("<Pet> told you, 'Attacking X Master.'").</summary>
-public record PetClaimEvent(DateTime Time, string PetName) : GameEvent(Time);
+/// <summary>The player's pet announced itself — the attack order ("<Pet> told you,
+/// 'Attacking X Master.'") or the leader query ("<Pet> says, 'My leader is Vataro.'").
+/// Only pet lines that prove ownership are parsed into this event.</summary>
+/// <param name="Leader">The owner the pet named, from the leader query only; null for
+/// the attack order, which is a tell addressed to us and so needs no name. When present
+/// it must be checked: a name that isn't the watched character disproves the claim.</param>
+/// <param name="Fighting">False for the leader query: it answers a question in or out of
+/// combat, so unlike the attack order it is no evidence that a fight is underway.</param>
+public record PetClaimEvent(DateTime Time, string PetName, string? Leader = null,
+    bool Fighting = true) : GameEvent(Time);
 /// <summary>A creature blinked ("an asp blinks.") — the charm-spell tell; treated as a provisional pet claim.</summary>
 /// <param name="Weak">"X moans." — the necro charm landing (eqlwiki, all three undead
 /// charms). Unlike blinks, moaning is plausible ambient flavor, so a weak signal acts

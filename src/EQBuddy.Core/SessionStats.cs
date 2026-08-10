@@ -474,10 +474,20 @@ public sealed class SessionStats
                     }
                     break;
                 case PetClaimEvent pc:
+                    // "My leader is X." rides the broadcast say channel, so a nearby player's
+                    // pet answering THEIR /pet leader lands in our log too — the name is what
+                    // separates them, and it has to be ours. An unknown character name can't
+                    // check it, and an unverifiable claim is not one we take: _petName is a
+                    // single slot, so a wrong one swaps our pet's damage out for a stranger's.
+                    // (The attack order names nobody and needs none — it is a tell addressed
+                    // to us, which no bystander's pet ever sends.)
+                    if (pc.Leader is { } leader
+                        && !string.Equals(leader, _characterName, StringComparison.OrdinalIgnoreCase))
+                        break;
                     // A blink/charmed line that followed an unrecognised cast, now proven
                     // ours: that cast was a charm spell, so remember it — permanently, via
-                    // the attached store. The tell must name the same creature the line
-                    // did; a tell about a different pet proves nothing about that cast.
+                    // the attached store. The claim must name the same creature the line
+                    // did; a claim about a different pet proves nothing about that cast.
                     var claimed = LogParser.Normalize(pc.PetName);
                     if (_charmCandidate is { } cand && pc.Time - cand.Time <= BlinkToClaim
                         && string.Equals(cand.Pet, claimed, StringComparison.OrdinalIgnoreCase))
@@ -486,7 +496,9 @@ public sealed class SessionStats
                         _charmCandidate = null;
                     }
                     ConfirmPet(claimed);
-                    TrackCombat(pc.Time);
+                    // Only the attack order proves a fight; the leader response would
+                    // otherwise open a combat span while camped.
+                    if (pc.Fighting) TrackCombat(pc.Time);
                     break;
                 case PetBlinkEvent pb:
                     // Charm just landed. If one of our charm casts is still in flight the

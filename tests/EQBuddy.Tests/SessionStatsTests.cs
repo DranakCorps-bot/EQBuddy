@@ -161,6 +161,54 @@ public class SessionStatsTests
         Assert.Equal(23, pet.Total);
     }
 
+    /// <summary>The leader response claims the pet before it ever swings — the point of
+    /// parsing it, since it can be macro'd into the summon — but it is not a fight, so it
+    /// must not open a combat window and dilute DPS with idle seconds.</summary>
+    [Fact]
+    public void PetLeaderClaimsTheDamageWithoutStartingCombat()
+    {
+        var stats = Replay("Vataro", At(0, 0, "Genektik says, 'My leader is Vataro.'"));
+        Assert.Equal(0, stats.Snapshot().CombatSeconds);   // claimed, but nothing is fighting
+
+        stats.Apply(LogParser.Parse(At(0, 30, "Genektik hits orc centurion for 12 points of damage."))!);
+        var s = stats.Snapshot();
+        var pet = Assert.Single(s.DamageBySource, d => d.Name == "Pet (Genektik)");
+        Assert.Equal(12, pet.Total);
+        Assert.Equal(1, s.CombatSeconds);   // the swing, not the half-minute back to the claim
+    }
+
+    /// <summary>The leader line rides the broadcast say channel, so a nearby player's pet
+    /// answering their own /pet leader lands in our log too — the owner's name is the only
+    /// thing separating them. _petName is a single slot: honouring a stranger's line would
+    /// swap our pet's damage out for theirs.</summary>
+    [Fact]
+    public void PetLeaderClaimsOnlyForTheWatchedCharacter()
+    {
+        var s = Replay("Vataro",
+            At(0, 0, "Genektik says, 'My leader is Vataro.'"),
+            At(0, 2, "Genektik hits orc centurion for 12 points of damage."),
+            At(0, 4, "Xykon says, 'My leader is Kaybek.'"),   // a groupmate's pet
+            At(0, 6, "Xykon hits a gnoll for 99 points of damage."),
+            At(0, 8, "Genektik hits orc centurion for 8 points of damage.")).Snapshot();
+
+        var pet = Assert.Single(s.DamageBySource, d => d.Name == "Pet (Genektik)");
+        Assert.Equal(20, pet.Total);
+        Assert.DoesNotContain(s.DamageBySource, d => d.Name.Contains("Xykon"));
+        Assert.Equal(20, s.DamageDealt);   // the stranger's 99 stayed out
+    }
+
+    /// <summary>Without a character name to check against there is nothing to verify, and
+    /// an unverifiable claim is not one we take.</summary>
+    [Fact]
+    public void PetLeaderIsIgnoredWhenTheCharacterIsUnknown()
+    {
+        var s = Replay(null,
+            At(0, 0, "Genektik says, 'My leader is Vataro.'"),
+            At(0, 2, "Genektik hits orc centurion for 12 points of damage.")).Snapshot();
+
+        Assert.DoesNotContain(s.DamageBySource, d => d.Name.Contains("Genektik"));
+    }
+
     [Fact]
     public void CharmBlinkIsProvisionalUntilMasterTellThenMerges()
     {

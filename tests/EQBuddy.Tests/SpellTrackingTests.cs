@@ -377,6 +377,25 @@ public class SpellTrackingTests
         Assert.Single(stats.Snapshot().DamageBySource, d => d.Name == "Pet (Scorched zombie)");
     }
 
+    /// <summary>The leader response teaches the catalog the same way the attack tell does,
+    /// and it arrives without waiting for the attack button — which is the whole point of
+    /// parsing it. Naming the watched character is what makes it safe to write something
+    /// this durable on a bystander-audible channel.</summary>
+    [Fact]
+    public void AnUnknownCharmSpellIsLearnedFromTheCharmedLinePlusLeaderResponse()
+    {
+        var stats = Replay(
+            At(0, 0, "You begin casting Word of Submission."),   // not in any seed/family
+            At(0, 2, "an orc legionnaire has been charmed."),    // records the candidate only
+            At(0, 9, "An orc legionnaire says, 'My leader is Douglas.'"),   // teaches
+            At(1, 0, "Your Word of Submission spell has worn off of an orc legionnaire."),
+            At(2, 0, "You begin casting Word of Submission."),
+            At(2, 2, "a scorched zombie has been charmed."),     // now instant — no tell yet
+            At(2, 4, "A scorched zombie hits gnoll for 15 points of damage."));
+
+        Assert.Single(stats.Snapshot().DamageBySource, d => d.Name == "Pet (Scorched zombie)");
+    }
+
     /// <summary>A tell about a DIFFERENT creature proves nothing about the held cast —
     /// without the name match, a bystander's charm near our unknown cast plus our real
     /// (summoned) pet's tell would poison the catalog.</summary>

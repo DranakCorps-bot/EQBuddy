@@ -136,7 +136,32 @@ public class LogParserTests
     {
         var e = Parse<PetClaimEvent>(msg);
         Assert.Equal(pet, e.PetName);
+        Assert.True(e.Fighting);
+        Assert.Null(e.Leader);
     }
+
+    /// <summary>The leader response is the only pet line that names its owner, and the only
+    /// one usable out of combat — the game writes it on say, but a client that tells it is
+    /// no less ours.</summary>
+    [Theory]
+    [InlineData("Genektik says, 'My leader is Vataro.'")]
+    [InlineData("Genektik tells you, 'My leader is Vataro.'")]
+    public void PetLeaderNamesOwner(string msg)
+    {
+        var e = Parse<PetClaimEvent>(msg);
+        Assert.Equal(("Genektik", "Vataro", false), (e.PetName, e.Leader, e.Fighting));
+    }
+
+    /// <summary>Only pet lines that prove ownership are claims. "Following you, Master."
+    /// names nobody and the game writes it on the broadcast channel, so a nearby player's
+    /// pet ordered to follow is indistinguishable from ours; the attack order proves
+    /// ownership only by being a tell, so a say-channel copy proves nothing either.</summary>
+    [Theory]
+    [InlineData("Genektik says, 'Following you, Master.'")]
+    [InlineData("Genektik tells you, 'Following you, Master.'")]
+    [InlineData("Genektik says, 'Attacking orc centurion Master.'")]
+    public void UnprovenPetChatterIsNotAClaim(string msg) =>
+        Assert.Null(LogParser.Parse($"[Sat Jul 18 15:00:00 2026] {msg}"));
 
     [Fact]
     public void CharmBlink()

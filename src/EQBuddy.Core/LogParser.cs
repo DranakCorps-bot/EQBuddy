@@ -287,10 +287,32 @@ public static partial class LogParser
     [GeneratedRegex(@"^(?<target>.+?) has taken (?<dmg>\d+) damage from (?<spell>.+?) by (?<caster>.+?)\.(?: \((?<note>[^)]+)\))?$")]
     private static partial Regex ThirdDotRx();
 
+    // Pet responses split across two channels, and the split is by which response it is,
+    // not by content (David's log, 2026-08-10): the attack order comes back as a directed
+    // tell, EVERY other pet response comes back on say. Only two of them can prove the pet
+    // is ours, and only those two are parsed:
+    //
+    //   - the attack order is a tell, addressed to us — a bystander's pet never tells us
+    //     anything, so the speaker is ours by construction;
+    //   - the leader response names its owner outright, which holds up even on say.
+    //
+    // "Following you, Master." is deliberately NOT parsed. It would be the most useful of
+    // the three (out of combat, macro-able into the summon) but it names nobody and rides
+    // the broadcast channel, so a nearby player's pet ordered to follow is indistinguishable
+    // from our own — and _petName is a single slot, so honouring it could swap our pet's
+    // damage out for a stranger's.
+    //
     // Jibekn told you, 'Attacking orc centurion Master.'
     // A puma told you, 'Attacking a ghoul Master.'   (charmed creatures have multi-word names)
     [GeneratedRegex(@"^(?<pet>.+?) (?:tells|told) you, 'Attacking .+ Master\.'$")]
     private static partial Regex PetClaimRx();
+
+    // Genektik says, 'My leader is Vataro.'
+    // Both channels parse — the log writes this one on say, but a client that tells it
+    // instead is no less ours. Leader is a player name: one word, no spaces. SessionStats
+    // claims only when that name is the watched character.
+    [GeneratedRegex(@"^(?<pet>.+?) (?:(?:tells|told) you|says), 'My leader is (?<leader>[A-Za-z]+)\.'$")]
+    private static partial Regex PetLeaderRx();
 
     // "an asp blinks." — the landing line for every druid/shaman animal charm AND
     // Beguile Plants (eqlwiki msg_cast_on_other, verified 2026-08-04); provisional
@@ -621,6 +643,12 @@ public static partial class LogParser
         // Pet announcement and third-party combat (checked last — specific patterns above win).
         if ((r = PetClaimRx().Match(msg)).Success)
             return new PetClaimEvent(ts, r.Groups["pet"].Value);
+
+        // The leader response answers a question, in or out of combat — no attack happened,
+        // so it is no evidence of a fight.
+        if ((r = PetLeaderRx().Match(msg)).Success)
+            return new PetClaimEvent(ts, r.Groups["pet"].Value,
+                Leader: r.Groups["leader"].Value, Fighting: false);
 
         if ((r = CharmedRx().Match(msg)).Success)
             return new CharmedEvent(ts, r.Groups["name"].Value);
