@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 13
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Elemental: Earth Summon|Elemental: Earth]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 12 [[Elemental: Earth Summon|Earth Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 
@@ -24,7 +24,7 @@
 
 | other = 
 
-* '''Reagent:''' [[Malachite]] (Blue and Green)
+* '''Reagent:''' [[Malachite]]
 * '''Focus:''' [[Shovel of Ponz]]
 
 | msg_cast_on_you =  

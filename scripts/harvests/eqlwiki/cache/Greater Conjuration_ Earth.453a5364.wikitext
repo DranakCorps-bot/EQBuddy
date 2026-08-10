@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 46
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Greater Conjuration: Earth Summon|Greater Conjuration: Earth]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 41 [[Greater Conjuration: Earth Summon|Earth Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

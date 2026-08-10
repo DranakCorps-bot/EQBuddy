@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 19
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Lesser Summoning: Fire Summon|Lesser Summoning: Fire]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 20 [[Lesser Summoning: Fire Summon|Fire Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

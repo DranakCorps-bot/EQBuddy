@@ -43,7 +43,7 @@ Test of Smash
 <li>{{:Dagas}}
   <ul>
   <li><span style="font-weight: bold">{{:Wind Rune Jaka}}</span> (Plane of Sky Trash Mobs)
-  <li>{{:Gem of Invigoration}}
+  <li>'''Island 7''' - {{:Gem of Invigoration}} ([[a fatestealer drake]], [[heartsbane drake]], [[a windrider drake]], [[a greater sphinx]], [[undine spirit]])
   <li>'''Island 7''' - <span style="font-weight: bold">{{:Djinni War Blade}}</span> ('''[[Sister of the Spire]]''')
   </ul>
 </ul>
@@ -52,7 +52,7 @@ Test of Think
 <li>{{:Belt of the Four Winds}}
   <ul>
   <li><span style="font-weight: bold">{{:Wind Rune Fana}}</span> (Plane of Sky Trash Mobs)
-  <li>'''Islands 5+''' - <span style="font-weight: bold">{{:Wind Tablet}}</span> ('''[[Bazzt Zzzt]]''', '''[[Spiroc Lord]]''')
+  <li>'''Islands 5+''' - <span style="font-weight: bold">{{:Wind Tablet}}</span> ('''[[Bazzt Zzzt]]''')
   <li>'''Islands 1.5, 4, 8''' - <span style="font-weight: bold">{{:Efreeti Belt}}</span> ('''[[Noble Dojorn]]''', '''[[Overseer of Air]]''', '''[[the Hand of Veeshan]]''')
   </ul>
 </ul>
@@ -139,7 +139,7 @@ You say, 'smash'
 |-
 | [[Wind Rune Jaka]] || Trash Mobs || Any Island
 |-
-| [[Gem of Invigoration]] || [[Protector of Sky]] || Island 2 Boss
+| [[Gem of Invigoration]] || [[a fatestealer drake]], [[heartsbane drake]], [[a windrider drake]], [[a greater sphinx]], [[undine spirit]] || Island 7
 |-
 | [[Djinni War Blade]] || [[Sister of the Spire]] || Island 7 Boss
 |}

@@ -1,65 +1,195 @@
 # Knowledge refresh report
 
-- Window: `2026-08-09T15:23:06Z` → `2026-08-09T16:11:24Z`
-- Changed wiki pages: 46
-- Changed templates: 0
-- Cache evictions: 38
+- Window: `2026-08-09T16:07:18Z` → `2026-08-10T10:12:53Z`
+- Changed wiki pages: 171
+- Changed templates: 1
+- Cache evictions: 77
 
 ## Promoted catalogs
 
 - `FadeMessages.json`: unchanged
-- `QuestCatalog.json`: unchanged
+- `QuestCatalog.json`: UPDATED
 - `ZoneGraph.json`: unchanged
 
 ## Curated catalogs (never auto-written — review these)
 
-- No curated catalog mentions a changed page.
+- `SpawnCatalog.json` mentions changed pages: Akksstaff, Elial Brook, Lord Bergurgle, Plane of Sky
+- `AaCatalog.json` mentions changed pages: Bard, Druid, Enchanter, (the Alternate Advancement page itself)
+
+## Changed templates (parser shapes may have moved)
+
+- Template:Build Guide Preload
 
 ## Changed pages
 
-- Aanya's Animation
-- Animate Dead
+- A Goblin Magician
+- A Magician
+- A Shovel
+- A Torch
+- Akksstaff
+- Alternate Advancement
+- An alluring siren
+- An isle goblin shaman
 - Antonian Javelin
-- Boltran's Animation
-- Bone Walk
-- Cackling Bones
-- Cavorting Bones
-- Companion Spirit
-- Convoke Shadow
-- Frenzied Spirit
-- Frenzied Spirit Summon
-- Guardian Spirit
+- Bard
+- Berill Gladeleaper
+- Blessed Oil
+- Blessed Oil Quest
+- Bone Walk Summon
+- Broom of Trilon
+- Bug Collection
+- Build Guides
+- Burning Soul of the Pestilent
+- Burning Soul of the Pious
+- Burning Soul of the Virtuous
+- Cleric Plane of Sky Tests
+- Column of Lightning
+- Conjuration: Air
+- Conjuration: Air Summon
+- Conjuration: Earth
+- Conjuration: Earth Summon
+- Conjuration: Fire
+- Conjuration: Fire Summon
+- Conjuration: Water
+- Conjuration: Water Summon
+- Crown Of Elemental Mastery
+- Cure for Lempeck Hargrin
+- Dark-boned skeleton
+- Druid
+- Druid Plane of Sky Tests
+- Elemental: Air
+- Elemental: Air Summon
+- Elemental: Earth
+- Elemental: Earth Summon
+- Elemental: Fire
+- Elemental: Fire Summon
+- Elemental: Water
+- Elemental: Water Summon
+- Elementaling: Air
+- Elementaling: Air Summon
+- Elementaling: Earth
+- Elementaling: Earth Summon
+- Elementaling: Fire
+- Elementaling: Fire Summon
+- Elementaling: Water
+- Elementaling: Water Summon
+- Elementalkin: Air
+- Elementalkin: Air Summon
+- Elementalkin: Earth
+- Elementalkin: Earth Summon
+- Elementalkin: Fire
+- Elementalkin: Fire Summon
+- Elementalkin: Water
+- Elementalkin: Water Summon
+- Elial Brook
+- Enchanter
+- Est Treewalker
+- Greater Conjuration: Air
+- Greater Conjuration: Air Summon
+- Greater Conjuration: Earth
+- Greater Conjuration: Earth Summon
+- Greater Conjuration: Fire
+- Greater Conjuration: Fire Summon
+- Greater Conjuration: Water
+- Greater Conjuration: Water Summon
+- Greater Summoning: Air
+- Greater Summoning: Air Summon
+- Greater Summoning: Earth
+- Greater Summoning: Earth Summon
+- Greater Summoning: Fire
+- Greater Summoning: Fire Summon
+- Greater Summoning: Water
+- Greater Summoning: Water Summon
+- Guard Reskin
 - Guardian Spirit Summon
-- Haunting Corpse
-- Invoke Death
-- Invoke Shadow
-- Invoke Shadow Summon
-- Juli's Animation
-- Kilan's Animation
-- Kintaz's Animation
-- Leering Corpse
-- Malignant Dead
-- Merchant Earlyn
-- Merchant Jewyln
-- Mircyl's Animation
-- Monster Summoning I
+- Hasten Bootstrutter and Brother Zephyl Cycle
+- Heretic Battle
+- Kobold Molars (Evil)
+- Kobold Molars (Good)
+- Large Block of Clay
+- Leering Corpse Summon
+- Lesser Conjuration: Air
+- Lesser Conjuration: Air Summon
+- Lesser Conjuration: Earth
+- Lesser Conjuration: Earth Summon
+- Lesser Conjuration: Fire
+- Lesser Conjuration: Fire Summon
+- Lesser Conjuration: Water
+- Lesser Conjuration: Water Summon
+- Lesser Summoning: Air
+- Lesser Summoning: Air Summon
+- Lesser Summoning: Earth
+- Lesser Summoning: Earth Summon
+- Lesser Summoning: Fire
+- Lesser Summoning: Fire Summon
+- Lesser Summoning: Water
+- Lesser Summoning: Water Summon
+- Lord Bergurgle
+- Magician Plane of Sky Tests
+- Merchant Lyssia
+- Merchants of AkAnon
+- Minor Conjuration: Air
+- Minor Conjuration: Earth
+- Minor Conjuration: Earth Summon
+- Minor Conjuration: Fire
+- Minor Conjuration: Water
+- Minor Conjuration: Water Summon
+- Minor Summoning: Air
+- Minor Summoning: Air Summon
+- Minor Summoning: Earth
+- Minor Summoning: Earth Summon
+- Minor Summoning: Fire
+- Minor Summoning: Fire Summon
+- Minor Summoning: Water
+- Minor Summoning: Water Summon
 - Monster Summoning II
-- Pendril's Animation
+- Paladin Plane of Sky Tests
 - Pet Guide
-- Restless Bones
-- Sagar's Animation
-- Shalee's Animation
+- Plane of Sky
+- Porra
+- Potential of the Void
+- Ranger Plane of Sky Tests
+- Recharge Prayer Beads
+- Rogue Plane of Sky Tests
+- Rubicite Armor Set
+- Selo's Accelerando
+- Shadow Knight Plane of Sky Tests
 - Sisna's Animation
-- Spirit of Herikol
-- Spirit of Kashek
-- Spirit of Keshuval
-- Spirit of Khaliz
-- Spirit of Sharik
-- Spirit of Yekan
-- Summon Dead
-- Tame Spirit
-- Uleen's Animation
-- Vigilant Spirit
-- Vigilant Spirit Summon
-- Wild Spirit
-- Yegoreff's Animation
+- Skill Wild Rampage
+- Small Block of Clay
+- Small Brick of High Quality Ore
+- Solusek's Flower
+- SoulFire
+- Spirit of Herikol Summon
+- Spirit of Khaliz Summon
+- Spirit of Sharik Summon
+- Spirit of Yekan Summon
+- Stances & Invocations
+- Stein (of Water)
+- Summoning: Air
+- Summoning: Air Summon
+- Summoning: Earth
+- Summoning: Earth Summon
+- Summoning: Fire
+- Summoning: Fire Summon
+- Summoning: Water
+- Summoning: Water Summon
+- Tame Spirit Summon
+- Tesch Val Scrolls
+- The Clothspinner Sisters (good)
+- The Etched Stone (Spell: Life Leech)
+- The Torrid Corruptor
+- Torn Page of Mastery Earth
+- Torn Page of Mastery Fire
+- Torn Page of Mastery Water
+- Torn Page of Mastery Wind
+- Torrid Corruptor
+- VerifiedPages
+- Void-Touched Potential
+- Warrior Plane of Sky Tests
+- Whysia Flock
+- Wild Spirit Summon
+- Winds of Karana
+- Wizard Plane of Sky Tests
+- Xista Finder
+- Zimel's Blades (SoulFire)

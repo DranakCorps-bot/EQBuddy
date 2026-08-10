@@ -73,10 +73,36 @@ If you click your burning soul, and it still gives you text, you have not comple
 </div>
 :{{exp}}
 *Loot the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] with 1 charge of [[Vampiric Curse]]. There is another [[Pestilence Scythe]] of the same name with no charges that isn't required for this quest.
-
-;Burning Soul of the Virtuous
 *Next part requires [[Heretics]] Warmly Faction.
 **You can gain [[Heretics]] faction by killing Kobolds in [[The Warrens]]. Take about ~2 rounds of killing the entire zone.
+*Go to [[Paineel]] and find [[Jotayi Ibupran]] (726, 856, -54) in the Necromancer guild's, The Abbatoir, on the third floor balcony overlooking the courtyard.
+*Turn in the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] (with charges, not uncharged) to Jotayi Ibupran.
+**:Jotayi Ibupran says, 'My master has sent you? Such is the will of Cazic-Thule. I beseech you to be my vengeance. Before the war, I was friend to a paladin named Inte Akera, a man who could not let go of his sense of zeal. In our last battle, I fell to his blade, leaving me now the grim image you see before you. I believe he must have left Norrath some time ago, as I can no longer sense his life force anymore. It would bring my soul to rest to see his face beyond the veil. '
+<div class='facblock'>
+:* Your faction standing with [[Heretics]] has been adjusted by (+?).
+:* Your faction standing with [[Deepwater Knights]] has been adjusted by (-100).
+:* Your faction standing with [[Gate Callers]] has been adjusted by (-100).
+:* Your faction standing with [[Craftkeepers]] has been adjusted by (-100).
+:* Your faction standing with [[Crimson Hands]] has been adjusted by (-100).
+:* Your faction standing with [[Kerra Isle]] has been adjusted by (-10).
+</div>
+:{{exp}}
+*You will receive an unclickable version of [[Burning Soul of the Pestilent]].
+
+;Burning Soul of the Virtuous
+*Get yourself keyed access to the [[Plane of Sky|Plane of Sky's]] island 4, the one with the flying horses and griffins. Careful of the [[An Essence Carrier|an essence carrier]] mobs as they are scowls, ready to attack. Make sure you have a safe path from island 1 up to inside island 4's windmill. You can use invisibility to go unnoticed.
+*Next, go to the quest room from island 1, with all the Efreeti's. You can either leave the instance and renter, jump off a island, or cycle up past island 8: Veeshan's Island to get back to island 1 to be able to enter the quest island. 
+*Find [[Dason Goldblade]] and prepare for a fight.
+*Give Dason Goldblade 500 platinum and this will spawn [[Inte Akera]], a level 55 Paladin, inside island 4's windmill. He will only stay up a limited time. Hurry up to island 4's windmill and you will see him sitting down inside the windmill. If you still have the faction he will consider you an ally and when you hail him he will say:
+**:Inte Akera says, 'Greetings, _____.  I am Inte Akera.   I have retired to the Plane of Sky after a long life toiling on Norrath's soil.  Have you retreated here as well, or are you merely visiting?'
+*Kill him.
+<div class='facblock'>
+:* Your faction standing with [[Deepwater Knights]] has been adjusted by (-750).
+:* Your faction standing with [[High Council of Erudin]] has been adjusted by (-112).
+:* Your faction standing with [[Heretics]] has been adjusted by (+?).
+:* Your faction standing with [[Kerra Isle]] has been adjusted by (+10).
+</div>
+*Loot the [[Burning Soul of the Virtuous]]
 
 ;Torrid Corruptor
 

@@ -15165,7 +15165,7 @@
    "modifier": 0
   },
   "range_raw": "200",
-  "description": "Creates a column of lightning, causing between 128 and 136 damage to several (up to 4) creatures in the vicinity of your target. Single target mana efficiency of 0.985 to 1.05.\n<br>\n<br>\nThis is a '''recommended''' quad-kiting spell for Wizards, being replaced by [[Circle of Force]].",
+  "description": "Creates a column of lightning, causing between 128 and 136 damage to several (up to 4) creatures in the vicinity of your target.",
   "slot_effects": [
    {
     "slot": 1,
@@ -15765,7 +15765,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Conjuration: Air Summon"
+    "effect": "Summon Pet: Level 37 [[Conjuration: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -15808,7 +15808,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Conjuration: Earth Summon"
+    "effect": "Summon Pet: Level 37 [[Conjuration: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -15851,7 +15851,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Conjuration: Fire Summon"
+    "effect": "Summon Pet: Level 37 [[Conjuration: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -15894,7 +15894,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Conjuration: Water Summon"
+    "effect": "Summon Pet: Level 37 [[Conjuration: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -21907,7 +21907,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elemental: Air Summon"
+    "effect": "Summon Pet: Level 12 [[Elemental: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -21950,7 +21950,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elemental: Earth Summon"
+    "effect": "Summon Pet: Level 12 [[Elemental: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -21993,7 +21993,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elemental: Fire Summon"
+    "effect": "Summon Pet: Level 12 [[Elemental: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22036,7 +22036,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elemental: Water Summon"
+    "effect": "Summon Pet: Level 12 [[Elemental: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22079,7 +22079,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementaling: Air Summon"
+    "effect": "Summon Pet: Level 9 [[Elementaling: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22122,7 +22122,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementaling: Earth Summon"
+    "effect": "Summon Pet: Level 9 [[Elementaling: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22165,7 +22165,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementaling: Fire Summon"
+    "effect": "Summon Pet: Level 9 [[Elementaling: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22208,7 +22208,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementaling: Water Summon"
+    "effect": "Summon Pet: Level 9 [[Elementaling: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22251,7 +22251,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementalkin: Air Summon"
+    "effect": "Summon Pet: Level 5 [[Elementalkin: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22294,7 +22294,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementalkin: Earth Summon"
+    "effect": "Summon Pet: Level 5 [[Elementalkin: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22337,7 +22337,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementalkin: Fire Summon"
+    "effect": "Summon Pet: Level 5 [[Elementalkin: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -22380,7 +22380,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Elementalkin: Water Summon"
+    "effect": "Summon Pet: Level 5 [[Elementalkin: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33052,7 +33052,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Conjuration: Air Summon"
+    "effect": "Summon Pet: Level 41 [[Greater Conjuration: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33095,7 +33095,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Conjuration: Earth Summon"
+    "effect": "Summon Pet: Level 41 [[Greater Conjuration: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33138,7 +33138,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Conjuration: Fire Summon"
+    "effect": "Summon Pet: Level 41 [[Greater Conjuration: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33181,7 +33181,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Conjuration: Water Summon"
+    "effect": "Summon Pet: Level 41 [[Greater Conjuration: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33567,7 +33567,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Summoning: Air Summon"
+    "effect": "Summon Pet: Level 26 [[Greater Summoning: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33610,7 +33610,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Summoning: Earth Summon"
+    "effect": "Summon Pet: Level 26 [[Greater Summoning: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33653,7 +33653,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Summoning: Fire Summon"
+    "effect": "Summon Pet: Level 26 [[Greater Summoning: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -33696,7 +33696,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Greater Summoning: Water Summon"
+    "effect": "Summon Pet: Level 26 [[Greater Summoning: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -43694,7 +43694,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Conjuration: Air Summon"
+    "effect": "Summon Pet: Level 33 [[Lesser Conjuration: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -43737,7 +43737,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Conjuration: Earth Summon"
+    "effect": "Summon Pet: Level 33 [[Lesser Conjuration: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -43780,7 +43780,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Conjuration: Fire Summon"
+    "effect": "Summon Pet: Level 33 [[Lesser Conjuration: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -43823,7 +43823,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Conjuration: Water Summon"
+    "effect": "Summon Pet: Level 33 [[Lesser Conjuration: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -44077,7 +44077,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Summoning: Air Summon"
+    "effect": "Summon Pet: Level 20 [[Lesser Summoning: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -44120,7 +44120,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Summoning: Earth Summon"
+    "effect": "Summon Pet: Level 20 [[Lesser Summoning: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -44163,7 +44163,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Summoning: Fire Summon"
+    "effect": "Summon Pet: Level 20 [[Lesser Summoning: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -44206,7 +44206,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Lesser Summoning: Water Summon"
+    "effect": "Summon Pet: Level 20 [[Lesser Summoning: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -49534,7 +49534,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Conjuration: Air Summon"
+    "effect": "Summon Pet: Level 29 [[Minor Conjuration: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -49577,7 +49577,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Conjuration: Earth Summon"
+    "effect": "Summon Pet: Level 29 [[Minor Conjuration: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -49620,7 +49620,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Conjuration: Fire Summon"
+    "effect": "Summon Pet: Level 29 [[Minor Conjuration: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -49663,7 +49663,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Conjuration: Water Summon"
+    "effect": "Summon Pet: Level 29 [[Minor Conjuration: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -50007,7 +50007,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Summoning: Air Summon"
+    "effect": "Summon Pet: Level 17 [[Minor Summoning: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -50050,7 +50050,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Summoning: Earth Summon"
+    "effect": "Summon Pet: Level 17 [[Minor Summoning: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -50093,7 +50093,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Summoning: Fire Summon"
+    "effect": "Summon Pet: Level 17 [[Minor Summoning: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -50136,7 +50136,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Minor Summoning: Water Summon"
+    "effect": "Summon Pet: Level 17 [[Minor Summoning: Water Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -76587,7 +76587,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Summoning: Air Summon"
+    "effect": "Summon Pet: Level 23 [[Summoning: Air Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -76630,7 +76630,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Summoning: Earth Summon"
+    "effect": "Summon Pet: Level 23 [[Summoning: Earth Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -76673,7 +76673,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Summoning: Fire Summon"
+    "effect": "Summon Pet: Level 23 [[Summoning: Fire Summon"
    }
   ],
   "msg_cast_on_you": null,
@@ -76716,7 +76716,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Summon Pet: [[Summoning: Water Summon"
+    "effect": "Summon Pet: Level 23 [[Summoning: Water Summon"
    }
   ],
   "msg_cast_on_you": null,

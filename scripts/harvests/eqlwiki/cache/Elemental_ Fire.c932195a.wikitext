@@ -13,7 +13,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Elemental: Fire Summon|Elemental: Fire]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 12 [[Elemental: Fire Summon|Fire Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

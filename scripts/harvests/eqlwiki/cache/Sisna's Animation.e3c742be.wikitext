@@ -24,7 +24,7 @@
 
 | other = 
 
-* '''Reagent:''' 3 x [[Tiny Dagger]]
+* '''Reagent:''' 1 x [[Tiny Dagger]]
 
 | msg_cast_on_you =  
 | msg_cast_on_other =  

@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Greater Conjuration: Water Summon|Greater Conjuration: Water]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 41 [[Greater Conjuration: Water Summon|Water Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

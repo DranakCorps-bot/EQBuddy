@@ -163,7 +163,7 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
   - Per-rank numbers: 1/3/5
 
 ### Unbound Alacrity (Monk; 3 rank(s), cost 0)
-*Requirements: level 12/30/?.*
+*Requirements: level 12/30/50.*
 
 - Keywords `haste`:
   > Gives a passive 3/6/10% increase in your current and maximum haste value.

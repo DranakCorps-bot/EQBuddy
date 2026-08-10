@@ -1,4 +1,8 @@
-'''Note:''' For the older versions of the rewards for these quest (prior to the 7/24/11 patch) see [[Plane of Sky Quests (Old)]].
+'''Note:''' Most quests in the Plane of Sky require two items. One of those items will be a wind rune and can be found on any mob as a random drop in the Plane of Sky. The second item you need is from an island boss, they are rare drops. Some quests require a third ''Efreeti'' weapon which is also attained from island bosses in the Plane of Sky.
+
+'''To reach the quest room find the ('''[[Key Master]]''') near where you zoned in on island 1 and purchase an [[Efreeti's Key]]. It is free and looks like a [[Jade]]. After you have the key left click on the teleportation pad at the North point of the island, around {{Loc|Plane of Sky| 1600, 520}}.''' You only need to buy the key one time and it will be saved to your character.
+
+'''Find Ranger Spirit and Hail him. He will tell you about the quests he has to offer. Reading his dialogue is optional and you can simply hand him your quest items.'''
 
 == Checklist ==
 Bold items are No Drop, while bold NPC names indicate island bosses.{{CheckboxList}}<ul>

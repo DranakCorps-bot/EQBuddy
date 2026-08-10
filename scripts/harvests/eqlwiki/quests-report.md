@@ -1,11 +1,11 @@
 # Quest harvest report
 
-- Quest Items category members: 4002
-- Pages enumerated: 916
-- Parsed: 916 (empty pages: 0)
-- With turn-in items: 596
+- Quest Items category members: 4003
+- Pages enumerated: 917
+- Parsed: 917 (empty pages: 0)
+- With turn-in items: 595
 - Unique turn-in item names: 2263
-- Missing quest giver: 33
+- Missing quest giver: 35
 - Backoff events: 0
 
 ## Quests with no turn-in items parsed (review these)
@@ -32,7 +32,9 @@
 - Bracers of Erollisi Quest
 - Broken Lute
 - Bug Collection
+- Burning Soul of the Pestilent
 - Burning Soul of the Pious
+- Burning Soul of the Virtuous
 - Burynai Bundt Cake
 - Bvellos' Bounty
 - Cabilis Pale Ale (Firiona Vie)
@@ -335,7 +337,9 @@
 - All Positive Faction Quests
 - Bone Chips Quests
 - Bread Shipment Quests
+- Burning Soul of the Pestilent
 - Burning Soul of the Pious
+- Burning Soul of the Virtuous
 - Class Race Quest List
 - Cleric Plane of Sky Tests
 - Cougarskin Boots Quest

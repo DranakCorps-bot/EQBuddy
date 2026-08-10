@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 28
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Greater Summoning: Air Summon|Greater Summoning: Air]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 26 [[Greater Summoning: Air Summon|Air Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

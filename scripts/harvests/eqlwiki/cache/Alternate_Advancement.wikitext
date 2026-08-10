@@ -283,7 +283,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Rapid Feign || 3 || 3/6/9 || This passive ability reduces the reuse time of your Feign Death skill by 1/3/5 second(s). Requirements: level 17.
 |-
-| Unbound Alacrity || 3 || 0 || Gives a passive 3/6/10% increase in your current and maximum haste value. Requirements: level 12/30/?.
+| Unbound Alacrity || 3 || 0 || Gives a passive 3/6/10% increase in your current and maximum haste value. Requirements: level 12/30/50.
 |}
 
 === Necromancer Class AAs ===
@@ -385,7 +385,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Cannibalization || 1 || 5 || Ability Activation ID: 47 - Refresh Time: 0:03:00 - Ability Timer(s): 2. Cannibalization I, when activated, consumes 1924 health to restore 1066 mana. Requirements: level 40, Mental Clarity at level 3.
 |-
-| Unbound Cascade || 3 || 0 || This passive ability increases the damage dealt by your critical damage over time spells by 10/20/30%. Requirements: level 12.
+| Unbound Cascade || 3 || 0 || This passive ability increases the damage dealt by your critical damage over time spells by 10/20/30%. Requirements: level 12/30/50.
 |}
 
 === Warrior Class AAs ===

@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Greater Summoning: Earth Summon|Greater Summoning: Earth]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 26 [[Greater Summoning: Earth Summon|Earth Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

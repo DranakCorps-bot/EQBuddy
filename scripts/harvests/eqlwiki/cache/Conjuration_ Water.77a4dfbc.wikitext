@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 41
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Conjuration: Water Summon|Conjuration: Water]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 37 [[Conjuration: Water Summon|Water Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

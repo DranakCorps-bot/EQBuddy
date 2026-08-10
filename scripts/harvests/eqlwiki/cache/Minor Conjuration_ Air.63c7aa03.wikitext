@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 33
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Minor Conjuration: Air Summon|Minor Conjuration: Air]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 29 [[Minor Conjuration: Air Summon|Air Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

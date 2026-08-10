@@ -35,5 +35,6 @@
 
 <ul>
 <li>[[Bard#Song_Vendors|Bard Song Vendors]]</li>
+<li>[[Winds of Karana]] quest
 </ul>
 }}

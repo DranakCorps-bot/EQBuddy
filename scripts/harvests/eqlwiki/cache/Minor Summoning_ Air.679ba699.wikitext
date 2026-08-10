@@ -11,7 +11,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Minor Summoning: Air Summon|Minor Summoning: Air]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 17 [[Minor Summoning: Air Summon|Air Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

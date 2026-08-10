@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 5
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Elementalkin: Earth Summon|Elementalkin: Earth]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 5 [[Elementalkin: Earth Summon|Earth Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

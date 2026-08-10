@@ -890,7 +890,7 @@ These are the various class quests, and in general, completing all of these ques
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Crown Of Elemental Mastery]]}}''' (7-Trash)</li>
+<li>'''{{SkyNoDrop|[[Crown of Elemental Mastery]]}}''' (7-Trash)</li>
 <li>'''{{SkyNoDrop|[[Large Opal]]}}''' (8-EoV)</li>
 <li>'''{{SkyNoDrop|[[Djinni Stave]]}}''' (7-SotS)</li>
 </ul>

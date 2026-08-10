@@ -8,7 +8,7 @@
 | classes = * [[Magician]] - Level 6 (Autogranted)
 | slots = 
 
-{{SpellSlotRow | 1 | Summon Pet: [[Elementaling: Water Summon|Elementaling: Water]] }}
+{{SpellSlotRow | 1 | Summon Pet: Level 9 [[Elementaling: Water Summon|Water Elemental]] }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

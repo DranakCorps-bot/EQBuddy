@@ -2,10 +2,7 @@
 
 | spellname = Column of Lightning
 | spellicon = M
-| description = Creates a column of lightning, causing between 128 and 136 damage to several (up to 4) creatures in the vicinity of your target. Single target mana efficiency of 0.985 to 1.05.
-<br>
-<br>
-This is a '''recommended''' quad-kiting spell for Wizards, being replaced by [[Circle of Force]].
+| description = Creates a column of lightning, causing between 128 and 136 damage to several (up to 4) creatures in the vicinity of your target.
 
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}

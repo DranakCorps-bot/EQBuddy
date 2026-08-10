@@ -1,6 +1,6 @@
 
 <onlyinclude>{{Itempage
-|notes       = {{Item Lore | Once the soul of a cleric who brought benevolence to gnolls..b }}
+|notes       = {{Item Lore | Once the soul of a cleric who brought benevolence to gnolls.. }}
 |itemname    = Burning Soul of the Pious
 |lucy_img_ID = 
 |statsblock  = 

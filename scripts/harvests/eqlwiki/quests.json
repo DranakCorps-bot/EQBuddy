@@ -2941,15 +2941,9 @@
   "items": [],
   "rewards": [
    "Bracelet of Beetlekind",
-   "Fire Beetle Eye",
-   "Giant Fire Beetle Leg",
-   "Giant Scarab Egg Sack",
-   "Giant Wasp Wing",
    "Potion of Poison Warding",
    "Silver Bracelet",
    "Spider Venom",
-   "Spiderling Eye",
-   "Spiderling Silk",
    "Stalking Probe"
   ],
   "categories": [
@@ -3033,6 +3027,24 @@
   "repeatable": false
  },
  {
+  "name": "Burning Soul of the Pestilent",
+  "url": "https://eqlwiki.com/Burning_Soul_of_the_Pestilent",
+  "startZone": "",
+  "questGiver": "",
+  "minLevel": 0,
+  "classes": "",
+  "items": [],
+  "rewards": [],
+  "categories": [
+   "Paladin Quests",
+   "Shadow Knight Quests",
+   "Southern Karana"
+  ],
+  "relatedZones": [],
+  "era": "",
+  "repeatable": false
+ },
+ {
   "name": "Burning Soul of the Pious",
   "url": "https://eqlwiki.com/Burning_Soul_of_the_Pious",
   "startZone": "",
@@ -3043,6 +3055,24 @@
   "rewards": [],
   "categories": [
    "Paladin Quests",
+   "Shadow Knight Quests"
+  ],
+  "relatedZones": [],
+  "era": "",
+  "repeatable": false
+ },
+ {
+  "name": "Burning Soul of the Virtuous",
+  "url": "https://eqlwiki.com/Burning_Soul_of_the_Virtuous",
+  "startZone": "",
+  "questGiver": "",
+  "minLevel": 0,
+  "classes": "",
+  "items": [],
+  "rewards": [],
+  "categories": [
+   "Paladin Quests",
+   "Plane of Sky",
    "Shadow Knight Quests"
   ],
   "relatedZones": [],
@@ -4121,32 +4151,26 @@
    }
   ],
   "rewards": [
-   "Adumbrate Globe",
    "Aegis of the Wind",
-   "Dark Wood",
    "Djinni Aura",
    "Efreeti Mace",
    "Efreeti Standard",
-   "Faintly Glowing Diamond",
-   "Glowing Sapphire",
-   "Gold Disc",
-   "Manna Nectar",
    "Mithril Bands",
    "Necklace of Resolution",
-   "Ochre Tessera",
    "Pauldrons of Piety",
-   "Saffron Spiroc Feather",
-   "Shimmering Topaz",
    "Shiny Pauldrons",
    "Silver Hoop",
    "Silvered Spiroc Necklace",
-   "Sky Emerald",
    "Small Shield",
-   "Spiroc Healing Totem",
-   "Spiroc Statuette",
    "Theurgist's Star",
    "Truewind Earring",
-   "Truwian Baton"
+   "Truwian Baton",
+   "Wind Rune Caza",
+   "Wind Rune Ena",
+   "Wind Rune Kala",
+   "Wind Rune Lena",
+   "Wind Rune Meda",
+   "Wind Rune Neza"
   ],
   "categories": [
    "Cleric Quests",
@@ -14469,13 +14493,14 @@
    "Ringmail Armor"
   ],
   "categories": [
-   "Paineel"
+   "Paineel",
+   "Repeatable Turn-in Quests"
   ],
   "relatedZones": [
    "The Warrens"
   ],
   "era": "Classic",
-  "repeatable": false
+  "repeatable": true
  },
  {
   "name": "Kobold Molars (Good)",
@@ -14494,13 +14519,14 @@
    "Ringmail Armor"
   ],
   "categories": [
-   "Erudin"
+   "Erudin",
+   "Repeatable Turn-in Quests"
   ],
   "relatedZones": [
    "The Warrens"
   ],
   "era": "Classic",
-  "repeatable": false
+  "repeatable": true
  },
  {
   "name": "Kobold Shaman Artifacts",
@@ -27889,44 +27915,6 @@
   "repeatable": false
  },
  {
-  "name": "The Etched Stone (Spell: Life Leech)",
-  "url": "https://eqlwiki.com/The_Etched_Stone_%28Spell%3A_Life_Leech%29",
-  "startZone": "Rathe Mountains",
-  "questGiver": "Kazzel D`Leryt",
-  "minLevel": 46,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Crystalline Orb",
-    "qty": 1
-   },
-   {
-    "name": "Monstrous Zombie Heart",
-    "qty": 1
-   },
-   {
-    "name": "Pulsating Hyacinth Telesm",
-    "qty": 1
-   },
-   {
-    "name": "White Gold Necklace",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Life Leech",
-   "Prickly Pear",
-   "Pulsating Hyacinth Telesm"
-  ],
-  "categories": [
-   "Rathe Mountains",
-   "Shadow Knight Quests"
-  ],
-  "relatedZones": [],
-  "era": "Classic",
-  "repeatable": false
- },
- {
   "name": "The Falchion",
   "url": "https://eqlwiki.com/The_Falchion",
   "startZone": "Felwithe",
@@ -32688,7 +32676,7 @@
   "classes": "All",
   "items": [],
   "rewards": [
-   "Jaxan's Jig o' Vigor"
+   "Selo's Accelerando"
   ],
   "categories": [
    "Southern Karana"

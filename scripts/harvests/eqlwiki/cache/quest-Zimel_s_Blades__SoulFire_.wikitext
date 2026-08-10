@@ -78,13 +78,13 @@ Your final turn-in will be a note, your own Paladin Testimony, the [[Glowing Swo
 ;Your Paladin Testimony
 *Acquire [[A Spider Venom Sac]]. This can be achieved by killing any run-of-the-mill giant spider.
 *Acquire a medium-sized [[Cloth Shirt]] (buy it from a vendor). Find [[Altunic Jartin]] in EC. His shop is the lone hut across the road from inn3 (the inn right before WC), but he wanders the zone. If he's missing, just wait for him to come back (or hunt him down if you really want to). Hand him the cloth shirt. He will give you the [[Token of Generosity]]. (Doesn't work at Indifferently, Worked at Amiably)
-** If you need faction with Altunic Jartin see [[Werewolf Hunters]]. About ~100 [[Silver Bar|Silver Bars]].
+** <s>If you need faction with Altunic Jartin see [[Werewolf Hunters]]. About ~100 [[Silver Bar|Silver Bars]].</s> (This doesn't appear to have any affect at all)
+** Killing a few guards in Freeport (the corrupt militia he hates so much) will get you to amiable. Just choose the lower level guards inside and not the stacked 50s at the gate.
 <div class='facblock'>
+:* Your faction standing with [[The Freeport Militia]] has been adjusted by (-50).
+:* Your faction standing wiht [[Coalition of Tradefolk]] Underground has been adjusted by (-7).
 :* Your faction standing with [[Knights of Truth]] has been adjusted by (+5).
-:* Your faction standing with [[Dismal Rage]] has been adjusted by (-1).
-:* Your faction standing with [[The Freeport Militia]] has been adjusted by (-1).
 :* Your faction standing with [[Priests of Marr]] has been adjusted by (+5).
-:* Your faction standing with [[Steel Warriors]] has been adjusted by (+5).
 </div>
 *Go to [[Merko Quetalis]] in the courtyard of the Hall of Truth in North Freeport. Hand him the spider venom sac and receive the [[Token of Bravery]]. Now hand in both the tokens. Follow the wall that leads to the moat. There is an opening to the freeport sewers. By turning in the tokens, you have spawned [[Guard Willia]], a low level militia guard just inside the sewer. Kill him fast, because he's on a timer to run away. Loot the [[Token of Truth]].
 <div class='facblock'>

@@ -1123,8 +1123,8 @@
       "ranks_raw": "3",
       "cost_per_rank_raw": "0",
       "level_requirement": 12,
-      "requirements_raw": "Requirements: level 12/30/?.",
-      "effect_text": "Gives a passive 3/6/10% increase in your current and maximum haste value. Requirements: level 12/30/?."
+      "requirements_raw": "Requirements: level 12/30/50.",
+      "effect_text": "Gives a passive 3/6/10% increase in your current and maximum haste value. Requirements: level 12/30/50."
     },
     {
       "name": "Dead Mesmerization",
@@ -1453,8 +1453,8 @@
       "ranks_raw": "3",
       "cost_per_rank_raw": "0",
       "level_requirement": 12,
-      "requirements_raw": "Requirements: level 12.",
-      "effect_text": "This passive ability increases the damage dealt by your critical damage over time spells by 10/20/30%. Requirements: level 12."
+      "requirements_raw": "Requirements: level 12/30/50.",
+      "effect_text": "This passive ability increases the damage dealt by your critical damage over time spells by 10/20/30%. Requirements: level 12/30/50."
     },
     {
       "name": "Area Taunt",
