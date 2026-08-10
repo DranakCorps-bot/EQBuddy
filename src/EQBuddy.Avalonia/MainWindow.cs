@@ -1667,13 +1667,14 @@ public sealed class MainWindow : Window
     // menu + the amber 🔒 unlock chip, mirroring WPF (#7): a menu can't be reached
     // through a transparent window, so the chip is the one solid thing left to click.
 
-    /// <summary>Menu toggle for click-through. Engages only if the X11 input-shape
-    /// call actually succeeds — on Wayland or a missing XFixes the state must not
-    /// flip, or the menu would lie about what clicks do (X11ClickThrough logs why).</summary>
+    /// <summary>Menu toggle for click-through. Engages only if the platform call actually
+    /// succeeds — on Wayland, a missing XFixes, or a backend with no implementation the
+    /// state must not flip, or the menu would lie about what clicks do (the backend
+    /// logs why).</summary>
     private void SetClickThrough(bool on)
     {
-        if (on && !X11ClickThrough.Set(this, enabled: true)) return;
-        if (!on) X11ClickThrough.Set(this, enabled: false);
+        if (on && !ClickThrough.Set(this, enabled: true)) return;
+        if (!on) ClickThrough.Set(this, enabled: false);
         _clickThrough = on;
         _root.BorderBrush = on ? AppTheme.WarnBrush : AppTheme.BorderBrush;
         ToolTip.SetTip(_root, on ? "Click-through ON — click the \U0001F512 chip to interact again" : null);
@@ -2237,7 +2238,7 @@ public sealed class MainWindow : Window
         _settings.WindowTop = Position.Y;
         _settings.Save();
         if (_clickThrough)
-            X11ClickThrough.Set(this, enabled: false);
+            ClickThrough.Set(this, enabled: false);
         _alertWindow?.Close();
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)
         _stats.AaStore?.Flush();

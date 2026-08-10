@@ -393,9 +393,14 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   add `-p:EnableWindowsTargeting=true`.
 - `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10), created and
   maintained by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) —
-  including the X11 global-hotkey and click-through implementations. It may trail
-  the WPF app by a few releases; a linux-x64 build is attached to GitHub releases.
+  including the X11 click-through implementation. It may trail the WPF app by a few
+  releases; a linux-x64 build is attached to GitHub releases.
   Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
+  It also builds and runs on macOS with no extra dependencies (the .NET 10 SDK is
+  enough), which is useful when the game itself runs under CrossOver. Click-through
+  (`ClickThrough.cs` dispatches to X11 input shapes or NSWindow `ignoresMouseEvents`)
+  and spoken alerts (`say`) are implemented there; log-folder auto-detection is not,
+  so point EQBuddy at the log folder yourself. No macOS build is published.
 - `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
   Both UI projects reference this; UI-independent code goes here.
 - `src/EQBuddy.Core/LogParser.cs` — one regex per log-line type; add new patterns here.

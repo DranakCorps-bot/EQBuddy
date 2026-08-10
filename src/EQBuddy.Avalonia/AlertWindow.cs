@@ -8,8 +8,8 @@ using EQBuddy.Core;
 namespace EQBuddy.Avalonia;
 
 /// <summary>
-/// Floating tracked-rule alert tile. During play it never activates and its X11 input
-/// region is empty; while Options is open it becomes a draggable placement target.
+/// Floating tracked-rule alert tile. During play it never activates and it is excluded
+/// from hit-testing; while Options is open it becomes a draggable placement target.
 /// </summary>
 public sealed class AlertWindow : Window
 {
@@ -141,6 +141,6 @@ public sealed class AlertWindow : Window
     private void ApplyClickThrough(bool enabled)
     {
         if (TryGetPlatformHandle() is null) return;
-        X11ClickThrough.Set(this, enabled);
+        ClickThrough.Set(this, enabled);
     }
 }
