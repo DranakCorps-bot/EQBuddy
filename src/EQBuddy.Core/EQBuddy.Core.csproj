@@ -12,7 +12,7 @@
     <!-- Direct reference overriding the transitive 2.1.11, which carries the
          high-severity GHSA-2m69-gcr7-jv3q (NU1903 on every release build).
          Drop this once Microsoft.Data.Sqlite itself depends on >= 2.1.12. -->
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
   </ItemGroup>
 
   <ItemGroup>
