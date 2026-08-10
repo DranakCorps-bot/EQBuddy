@@ -397,10 +397,10 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   releases; a linux-x64 build is attached to GitHub releases.
   Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
   It also builds and runs on macOS with no extra dependencies (the .NET 10 SDK is
-  enough), which is useful when the game itself runs under CrossOver. Click-through
-  (`ClickThrough.cs` dispatches to X11 input shapes or NSWindow `ignoresMouseEvents`)
-  and spoken alerts (`say`) are implemented there; log-folder auto-detection is not,
-  so point EQBuddy at the log folder yourself. No macOS build is published.
+  enough), which is useful when the game itself runs under a Windows compatibility
+  layer. Click-through (`ClickThrough.cs` dispatches to X11 input shapes or NSWindow
+  `ignoresMouseEvents`), spoken alerts (`say`), and log-folder auto-detection are
+  implemented there. No macOS build is published.
 - `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
   Both UI projects reference this; UI-independent code goes here.
 - `src/EQBuddy.Core/LogParser.cs` — one regex per log-line type; add new patterns here.
@@ -431,7 +431,13 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 
 Log folder auto-detected at
 `C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs`
-(`eqlog_<Character>_<server>.txt`).
+(`eqlog_<Character>_<server>.txt`), or wherever the installer recorded it in the
+registry. On macOS the game runs under a Windows compatibility layer, so the same
+path is searched inside each Wine prefix it can find: `$WINEPREFIX`, osxEQL, every
+CrossOver bottle, every Whisky bottle, PlayOnMac, and `~/.wine`. When more than one
+turns up, the install whose character log was written most recently wins — a prefix
+you have stopped using keeps its (empty) `Logs` folder forever, and existence alone
+would let it outrank the one you actually play.
 
 ## License
 

@@ -16,6 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Log-folder detection picks between candidate installs, which is only testable by
+         building real directory trees and reaching the selector directly. Test-only:
+         nothing else references this. -->
+    <InternalsVisibleTo Include="EQBuddy.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Data\SpawnCatalog.json" />
     <EmbeddedResource Include="Data\FadeMessages.json" />
     <EmbeddedResource Include="Data\WhatsNew.json" />

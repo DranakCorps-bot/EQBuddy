@@ -1,4 +1,5 @@
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -60,44 +61,137 @@ public sealed class LogWatcher : IDisposable
         _timer.Elapsed += (_, _) => Poll();
     }
 
+    /// <summary>The installed-game folder names, newest product first: a "EverQuest Legends"
+    /// install and a plain "EverQuest" one can sit side by side under the same publisher
+    /// directory.</summary>
+    private static readonly string[] GameFolders = ["EverQuest Legends", "EverQuest"];
+
     public static string? FindDefaultLogFolder()
     {
-        // The Daybreak installer records the install location in the uninstall registry
-        // key, so custom install paths are found without any user configuration.
-        if (OperatingSystem.IsWindows())
-        {
-            foreach (var hive in new[] { Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.LocalMachine })
-            foreach (var subkey in new[]
-            {
-                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
-                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
-            })
-            {
-                try
-                {
-                    using var key = hive.OpenSubKey(subkey);
-                    var marker = key?.GetValue("UninstallString") as string
-                                 ?? key?.GetValue("DisplayIcon") as string;
-                    if (marker is null) continue;
-                    var root = Path.GetDirectoryName(marker.Trim('"'));
-                    if (root is null) continue;
-                    var logs = Path.Combine(root, "Logs");
-                    if (Directory.Exists(logs)) return logs;
-                }
-                catch { /* registry access denied — fall through */ }
-            }
-        }
+        if (OperatingSystem.IsWindows() && FindLogFolderInRegistry() is { } installed)
+            return installed;
 
-        string[] candidates =
-        [
-            @"C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest Legends\Logs",
-            @"C:\Users\Public\Daybreak Game Company\Installed Games\EverQuest\Logs",
-            Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                ".local", "share", "Daybreak Game Company", "Installed Games",
-                "EverQuest Legends", "Logs"),
-        ];
-        return candidates.FirstOrDefault(Directory.Exists);
+        return PickLogFolder(CandidateLogFolders());
+    }
+
+    /// <summary>The Daybreak installer records the install location in the uninstall registry
+    /// key, so custom install paths are found without any user configuration.</summary>
+    [SupportedOSPlatform("windows")]
+    private static string? FindLogFolderInRegistry()
+    {
+        foreach (var hive in new[] { Microsoft.Win32.Registry.CurrentUser, Microsoft.Win32.Registry.LocalMachine })
+        foreach (var subkey in new[]
+        {
+            @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
+            @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\DGC-EverQuest Legends",
+        })
+        {
+            try
+            {
+                using var key = hive.OpenSubKey(subkey);
+                var marker = key?.GetValue("UninstallString") as string
+                             ?? key?.GetValue("DisplayIcon") as string;
+                if (marker is null) continue;
+                var root = Path.GetDirectoryName(marker.Trim('"'));
+                if (root is null) continue;
+                var logs = Path.Combine(root, "Logs");
+                if (Directory.Exists(logs)) return logs;
+            }
+            catch { /* registry access denied — fall through */ }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// The candidate that looks most like the install actually being played: the one whose
+    /// newest character log was written most recently.
+    ///
+    /// Existence alone is too weak a signal once several candidates are in play. A Mac with
+    /// two Wine wrappers installed has two complete game trees, each with a Logs folder the
+    /// installer created — but only the one that has been played holds any `eqlog_*.txt`,
+    /// and someone who moved from one wrapper to the other leaves the abandoned tree behind
+    /// forever. Falls back to the first existing folder when nothing has been played yet,
+    /// which is the pre-existing behaviour for a fresh install.
+    /// </summary>
+    internal static string? PickLogFolder(IEnumerable<string> candidates)
+    {
+        var existing = candidates.Where(Directory.Exists).ToList();
+        return existing
+            .Select(folder => (folder, played: NewestLogWrite(folder)))
+            .Where(c => c.played is not null)
+            .OrderByDescending(c => c.played)
+            .Select(c => c.folder)
+            .FirstOrDefault()
+            ?? existing.FirstOrDefault();
+    }
+
+    /// <summary>When this folder last saw play, or null if it holds no character logs.</summary>
+    private static DateTime? NewestLogWrite(string folder)
+    {
+        // DiscoverCharacters already orders by write time, so the head is the newest.
+        if (DiscoverCharacters(folder).FirstOrDefault() is not { } newest) return null;
+        try { return File.GetLastWriteTimeUtc(newest.FilePath); }
+        catch (IOException) { return null; }
+    }
+
+    private static IEnumerable<string> CandidateLogFolders()
+    {
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        foreach (var game in GameFolders)
+            yield return Path.Combine(@"C:\Users\Public\Daybreak Game Company\Installed Games", game, "Logs");
+
+        yield return Path.Combine(home, ".local", "share", "Daybreak Game Company",
+            "Installed Games", "EverQuest Legends", "Logs");
+
+        if (!OperatingSystem.IsMacOS()) yield break;
+
+        foreach (var prefix in WinePrefixRoots(home))
+        foreach (var game in GameFolders)
+            yield return Path.Combine(prefix, "drive_c", "users", "Public",
+                "Daybreak Game Company", "Installed Games", game, "Logs");
+    }
+
+    /// <summary>
+    /// Directories that may hold a Wine `drive_c` on macOS. EverQuest Legends has no Mac
+    /// build, so a Mac player is running it under some Windows compatibility wrapper, and
+    /// each wrapper parks its prefix somewhere different. Bottle names are the user's own
+    /// words (CrossOver) or a generated id (Whisky), so bottle containers are enumerated
+    /// rather than guessed at.
+    /// </summary>
+    private static IEnumerable<string> WinePrefixRoots(string home)
+    {
+        var appSupport = Path.Combine(home, "Library", "Application Support");
+
+        // An explicit WINEPREFIX wins: whoever set it means it, and it is the only way to
+        // find hand-rolled prefixes and Game Porting Toolkit setups, which have no fixed home.
+        if (Environment.GetEnvironmentVariable("WINEPREFIX") is { Length: > 0 } chosen)
+            yield return chosen;
+
+        yield return Path.Combine(appSupport, "osxEQL", "prefix");
+        yield return Path.Combine(home, ".wine");
+
+        foreach (var container in new[]
+        {
+            Path.Combine(appSupport, "CrossOver", "Bottles"),
+            Path.Combine(home, "Library", "Containers", "com.isaacmarovitz.Whisky", "Bottles"),
+            Path.Combine(home, "Library", "PlayOnMac", "wineprefix"),
+        })
+        foreach (var bottle in ChildDirectories(container))
+            yield return bottle;
+    }
+
+    private static IEnumerable<string> ChildDirectories(string parent)
+    {
+        try
+        {
+            return Directory.Exists(parent) ? Directory.EnumerateDirectories(parent) : [];
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            CoreLog.Error(ex);
+            return [];
+        }
     }
 
     public static List<CharacterLog> DiscoverCharacters(string logFolder)
