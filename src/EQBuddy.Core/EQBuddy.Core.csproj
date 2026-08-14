@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
     <!-- Direct reference overriding the transitive 2.1.11, which carries the
          high-severity GHSA-2m69-gcr7-jv3q (NU1903 on every release build).
          Drop this once Microsoft.Data.Sqlite itself depends on >= 2.1.12. -->

@@ -15,7 +15,7 @@
     <PackageReference Include="Avalonia.Headless" Version="12.1.1" />
     <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.1" />
     <PackageReference Include="Avalonia.Skia" Version="12.1.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <!-- xunit v3, not the v2 the Core test project uses: Avalonia.Headless.XUnit 12
          depends on xunit.v3, and having both in one project is an ambiguous-type error. -->
     <PackageReference Include="xunit.v3" Version="3.2.2" />
