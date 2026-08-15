@@ -24,9 +24,41 @@ internal static class WineFonts
     public static void ApplyIfNeeded(ResourceDictionary appResources)
     {
         if (!IsWine()) return;
+        if (PrefixSegoeDrawsIcons()) return;
         appResources["AppFontFamily"] = new FontFamily(
             new Uri("pack://application:,,,/"),
             "./Fonts/#EQBuddy Sans, Segoe UI Variable Text, Segoe UI");
+    }
+
+    /// <summary>A prefix whose installed "Segoe UI Variable Text" can draw the
+    /// widget's icons gets the authentic look instead of the bundled stand-in —
+    /// Wine players who go to the trouble of installing a Segoe(-alike) with icon
+    /// coverage shouldn't be overruled by it. Two deliberate strictnesses: the
+    /// check names the PRIMARY family specifically, because Wine's DirectWrite
+    /// never walks past the first family in a list, so "Segoe UI" alone would
+    /// still box; and it demands a real icon glyph (💀, the canary), because a
+    /// genuine Segoe copied in without icon coverage would bring the empty boxes
+    /// back — that prefix keeps the bundled font.</summary>
+    private static bool PrefixSegoeDrawsIcons()
+    {
+        try
+        {
+            foreach (var family in Fonts.SystemFontFamilies)
+            {
+                if (!string.Equals(family.Source, "Segoe UI Variable Text",
+                        StringComparison.OrdinalIgnoreCase)) continue;
+                foreach (var typeface in family.GetTypefaces())
+                    if (typeface.TryGetGlyphTypeface(out var glyphs) &&
+                        glyphs.CharacterToGlyphMap.ContainsKey(0x1F480))
+                        return true;
+                return false;
+            }
+        }
+        catch
+        {
+            // Font cosmetics must never stop startup.
+        }
+        return false;
     }
 
     /// <summary>The canonical Wine check: ntdll exports wine_get_version under
