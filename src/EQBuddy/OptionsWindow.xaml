@@ -378,6 +378,14 @@
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
             <WrapPanel x:Name="BreakoutsPanel"/>
 
+            <CheckBox x:Name="DoubleClickChipsCheck" Margin="0,10,0,0"
+                      Checked="OnDoubleClickChipsToggled" Unchecked="OnDoubleClickChipsToggled">
+                <TextBlock Text="Double-click a mini-pill chip to open/close its breakout" FontSize="12"
+                           Foreground="{DynamicResource TextBrush}"/>
+            </CheckBox>
+            <TextBlock Text="With this on, double-click the 🎒 Loot, ⚔ dps, ✚ hps, 🐾 pet or 🎯 watch chip to pop its window up or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings it right back."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
+
             <CheckBox x:Name="TargetDropsCheck" Margin="0,12,0,0"
                       Checked="OnTargetDropsToggled" Unchecked="OnTargetDropsToggled">
                 <TextBlock Text="🎯 Show target drops in the Loot card" FontSize="12"

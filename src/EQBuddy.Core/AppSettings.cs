@@ -370,6 +370,14 @@ public sealed class AppSettings
     /// (Frankthetankk, discussion #45 — ✕-until-next-minimize made the window a
     /// whack-a-mole).</summary>
     public List<string> DisabledBreakouts { get; set; } = [];
+
+    /// <summary>Double-click a mini-pill chip (dps, hps, pet, loot, watch) to open or
+    /// close its breakout window on demand. Opt-in, off by default. While it's on, a
+    /// breakout closed with its ✕ stays silent — no "hidden, re-enable in Options" alert —
+    /// because a double-click brings it right back (asked for: pop the Loot or DPS window
+    /// up only when you want it, without the nag).</summary>
+    public bool DoubleClickChipsToggleBreakouts { get; set; }
+
     public double BreakoutDamageLeft { get; set; } = double.NaN;
     public double BreakoutDamageTop { get; set; } = double.NaN;
     public string BreakoutDamageScope { get; set; } = "fight";

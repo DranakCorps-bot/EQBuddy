@@ -53,6 +53,7 @@ public partial class OptionsWindow : Window
         SpawnGrowUpCheck.IsChecked = _vm.SpawnChipsGrowUp;
         MezGrowUpCheck.IsChecked = _vm.MezChipsGrowUp;
         MezChipsCheck.IsChecked = _main.Settings.MezChipsEnabled;
+        DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
         SlowAlertCheck.IsChecked = _main.Settings.SlowAlertEnabled;
         SlowSpokenCheck.IsChecked = _main.Settings.SlowAlertSpoken;
         SlowRaidOnlyCheck.IsChecked = _main.Settings.SlowAlertRaidOnly;
@@ -194,6 +195,13 @@ public partial class OptionsWindow : Window
     {
         if (!_ready) return;
         _main.Settings.MezChipsEnabled = MezChipsCheck.IsChecked == true;
+        _main.Settings.Save();
+    }
+
+    private void OnDoubleClickChipsToggled(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _main.Settings.DoubleClickChipsToggleBreakouts = DoubleClickChipsCheck.IsChecked == true;
         _main.Settings.Save();
     }
 
