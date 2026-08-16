@@ -1764,8 +1764,38 @@ public partial class MainWindow : Window
     {
         _settings.LootSort = (string)((FrameworkElement)sender).Tag;
         _settings.Save();
-        RefreshUi();
+        // Reorder just the loot list from the snapshot we already have — a full RefreshUi
+        // here recomputed nothing new (the memo would hand back the same snapshot) yet
+        // repainted every card, both breakouts and the whole mobile projection. The sort
+        // is microseconds; the repaint was the cost.
+        if (_latestSnapshot is { } s) RenderLoot(s);
         e.Handled = true;
+    }
+
+    /// <summary>Paints the Loot card from a snapshot: the Count/Name/Recent sort visuals,
+    /// the list itself, crafted items, and the target-drops panel. Split out of RefreshUi
+    /// so a sort click can repaint this one card instead of the entire widget.</summary>
+    private void RenderLoot(StatsSnapshot s)
+    {
+        var mode = _settings.LootSort;
+        LootSortBar.Visibility = s.Loot.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        LootSortCount.Foreground = (Brush)FindResource(mode == "name" || mode == "recent" ? "DimBrush" : "AccentBrush");
+        LootSortName.Foreground = (Brush)FindResource(mode == "name" ? "AccentBrush" : "DimBrush");
+        LootSortRecent.Foreground = (Brush)FindResource(mode == "recent" ? "AccentBrush" : "DimBrush");
+        // "recent" is the raw arrival order, not a re-sort of the totals — the whole
+        // point is that 200 Lion Skins stay 200 rows' worth of history rather than
+        // one row that hides the pelt (#160). Runs collapse; different items don't.
+        var rows = mode == "recent"
+            ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot)
+            : (mode == "name"
+                    ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
+                    : s.Loot)
+                .Select(l => (l.Item, $"×{l.Count}")).ToList();
+        FillList(LootList, rows, onNameClick: ShowItemInfo,
+            tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
+        CraftedLabel.Visibility = s.Crafted.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        FillList(CraftedList, s.Crafted.Select(c => (c.Name, $"×{c.Count}")));
+        RenderTargetDrops(s);
     }
 
     private void OnPetAbilitiesToggled(object sender, MouseButtonEventArgs e)
@@ -2455,27 +2485,7 @@ public partial class MainWindow : Window
         }
 
         if (LootSection.IsExpanded)
-        {
-            var mode = _settings.LootSort;
-            LootSortBar.Visibility = s.Loot.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-            LootSortCount.Foreground = (Brush)FindResource(mode == "name" || mode == "recent" ? "DimBrush" : "AccentBrush");
-            LootSortName.Foreground = (Brush)FindResource(mode == "name" ? "AccentBrush" : "DimBrush");
-            LootSortRecent.Foreground = (Brush)FindResource(mode == "recent" ? "AccentBrush" : "DimBrush");
-            // "recent" is the raw arrival order, not a re-sort of the totals — the whole
-            // point is that 200 Lion Skins stay 200 rows' worth of history rather than
-            // one row that hides the pelt (#160). Runs collapse; different items don't.
-            var rows = mode == "recent"
-                ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot)
-                : (mode == "name"
-                        ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
-                        : s.Loot)
-                    .Select(l => (l.Item, $"×{l.Count}")).ToList();
-            FillList(LootList, rows, onNameClick: ShowItemInfo,
-                tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
-            CraftedLabel.Visibility = s.Crafted.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            FillList(CraftedList, s.Crafted.Select(c => (c.Name, $"×{c.Count}")));
-            RenderTargetDrops(s);
-        }
+            RenderLoot(s);
 
         if (MotesSection.IsExpanded)
         {

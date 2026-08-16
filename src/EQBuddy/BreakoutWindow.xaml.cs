@@ -38,6 +38,7 @@ public partial class BreakoutWindow : Window
 
     private bool _fightScope;
     private string _signature = "";
+    private StatsSnapshot? _lastSnapshot;
 
     public BreakoutWindow(AppSettings settings, BreakoutKind kind)
     {
@@ -347,6 +348,7 @@ public partial class BreakoutWindow : Window
 
     public void Update(StatsSnapshot s)
     {
+        _lastSnapshot = s;   // kept so a sort click can repaint now, not on the next tick
         ApplyBackgroundOpacity();
         if (_kind == BreakoutKind.Watch) { UpdateWatch(s); return; }
         if (_kind == BreakoutKind.Loot) { UpdateLoot(s); return; }
@@ -1010,7 +1012,10 @@ public partial class BreakoutWindow : Window
         _settings.LootSort = (string)((FrameworkElement)sender).Tag;
         _settings.Save();
         ApplyLootSortVisual();
-        _signature = "";   // repaint in the new order on the next tick
+        _signature = "";
+        // Repaint now from the last snapshot rather than waiting up to a second for the
+        // next tick — the reorder should feel instant.
+        if (_lastSnapshot is { } s) UpdateLoot(s);
         e.Handled = true;
     }
 
