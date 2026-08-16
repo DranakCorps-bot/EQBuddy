@@ -24,6 +24,16 @@ public partial class MainWindow : Window
     private DateTime _lastCheckpoint = DateTime.MinValue;
     private readonly DispatcherTimer _uiTimer;
     private readonly DispatcherTimer _companionPump;
+    // Window-level double-click state for the mini-bar breakout chips (see MiniChip): the
+    // chips are rebuilt every tick, so per-element ClickCount can't be trusted. Threshold
+    // reads the user's own Windows double-click speed; add a floor for a stray zero.
+    private BreakoutKind? _lastChipClickKind;
+    private DateTime _lastChipClickAt = DateTime.MinValue;
+    private static readonly TimeSpan DoubleClickWindow =
+        TimeSpan.FromMilliseconds(Math.Max(200, GetDoubleClickTime()));
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDoubleClickTime();
     private DateTime _lastCharScan = DateTime.MinValue;
     private DateTime _lastJanitorRun = DateTime.MinValue;
     private DateTime _lastUpdateCheck = DateTime.MinValue;
@@ -3663,20 +3673,35 @@ public partial class MainWindow : Window
         if (breakout is { } kind && _settings.DoubleClickChipsToggleBreakouts)
         {
             // Transparent (not null) so the gaps between glyph and value are hit-testable
-            // too. Handle EVERY click on the chip (not just the second): the bar's OnDrag
-            // starts a window DragMove on the FIRST click, and that modal drag captured the
-            // mouse and stole the second click, so the double-click never completed — the
-            // cursor flickering into drag mode was the tell. Eating the click here keeps
-            // OnDrag out of it entirely; the widget is still dragged from any non-chip part
-            // of the bar. When the opt-in is off the chip stays inert and a double-click
-            // expands the widget as before.
+            // too. Two things conspired against WPF's own double-click here, so we detect it
+            // ourselves at the window level:
+            //   1. The bar's OnDrag starts a modal window DragMove on the FIRST left-click
+            //      anywhere on the bar; that capture disrupted the click sequence and the
+            //      cursor flickered into drag mode (the tell). Eating the click stops it.
+            //   2. UpdateMiniChips rebuilds these panels every 1s tick, so a rebuild landing
+            //      between the two clicks left the second click on a brand-new element and
+            //      reset ClickCount to 1 — an intermittent miss.
+            // Keying the double-click on (kind, time) on the window survives both: the panel
+            // can be replaced mid-gesture and the second click still lands. The widget is
+            // still dragged from any non-chip part of the bar; when the opt-in is off the
+            // chip stays inert and a double-click expands the widget as before.
             panel.Background = System.Windows.Media.Brushes.Transparent;
             panel.Cursor = System.Windows.Input.Cursors.Hand;
             panel.ToolTip = $"Double-click to show or hide the {kind} breakout";
             panel.MouseLeftButtonDown += (_, e) =>
             {
                 e.Handled = true;
-                if (e.ClickCount == 2) ToggleBreakout(kind);
+                var now = DateTime.Now;
+                if (_lastChipClickKind == kind && now - _lastChipClickAt <= DoubleClickWindow)
+                {
+                    _lastChipClickKind = null;   // consume, so a third click starts fresh
+                    ToggleBreakout(kind);
+                }
+                else
+                {
+                    _lastChipClickKind = kind;
+                    _lastChipClickAt = now;
+                }
             };
         }
         panel.Children.Add(new TextBlock
