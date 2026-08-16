@@ -361,6 +361,7 @@ public sealed class SpawnTimers
     {
         lock (_lock)
         {
+            _dueSeenAt.Remove(Key(Server, zone, name));
             if (_timers.Remove(Key(Server, zone, name))) SavePersisted();
         }
     }
@@ -370,9 +371,23 @@ public sealed class SpawnTimers
     /// away from cleans up after itself instead of nagging.</summary>
     public static readonly TimeSpan DueLinger = TimeSpan.FromSeconds(60);
 
+    /// <summary>A timer whose due moment slid further back than this while nobody was
+    /// looking never revives as DUE: past an hour the camp is ancient history, and a
+    /// restart (or a laptop waking from a long sleep) should clean it up silently
+    /// instead of flashing DUE for something long gone.</summary>
+    public static readonly TimeSpan DueRevivalCap = TimeSpan.FromHours(1);
+
+    /// <summary>When each due timer was FIRST returned as due. The linger runs from
+    /// observation, not from the due moment alone: the UI ticks once a second while
+    /// the process is actually scheduling, and a gap longer than the linger (laptop
+    /// sleep, an OS-throttled background process) used to prune a timer that came
+    /// due mid-gap before any snapshot ever showed it DUE — the chip vanished
+    /// silently and the due alert never fired. In-memory only.</summary>
+    private readonly Dictionary<string, DateTime> _dueSeenAt = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>Current timers for this server, expired ones pruned. A due timer shows
-    /// DUE for <see cref="DueLinger"/>, then drops on its own — if nobody clicked it
-    /// away within a minute, they've moved on.</summary>
+    /// DUE for <see cref="DueLinger"/> from the first snapshot that saw it due, then
+    /// drops on its own — if nobody clicked it away within a minute, they've moved on.</summary>
     public List<SpawnTimerState> Snapshot(DateTime now)
     {
         lock (_lock)
@@ -380,22 +395,34 @@ public sealed class SpawnTimers
             var stale = _timers.Values.Where(t => IsStale(t, now)).ToList();
             if (stale.Count > 0)
             {
-                foreach (var t in stale) _timers.Remove(Key(t.Server, t.Zone, t.Name));
+                foreach (var t in stale)
+                {
+                    _timers.Remove(Key(t.Server, t.Zone, t.Name));
+                    _dueSeenAt.Remove(Key(t.Server, t.Zone, t.Name));
+                }
                 SavePersisted();
             }
-            return _timers.Values
+            var list = _timers.Values
                 .Where(t => string.Equals(t.Server, Server, StringComparison.OrdinalIgnoreCase))
                 .OrderBy(t => t.DueAt ?? DateTime.MaxValue)
                 .ToList();
+            foreach (var t in list)
+                if (t.IsDue(now)) _dueSeenAt.TryAdd(Key(t.Server, t.Zone, t.Name), now);
+            return list;
         }
     }
 
-    private static bool IsStale(SpawnTimerState t, DateTime now)
+    private bool IsStale(SpawnTimerState t, DateTime now)
     {
         if (t.DueAt is not { } due)
             // No duration known: the row only says "killed N ago" — keep it a day.
             return now - t.KilledAt > TimeSpan.FromHours(24);
-        return now - due > DueLinger;
+        if (now - due <= DueLinger) return false;      // the normal linger, always honored
+        if (now - due > DueRevivalCap) return true;    // ancient — never revives
+        // Past the linger but inside the cap: only prune once the DUE state has been
+        // VISIBLE for a full linger, so a tick gap can't swallow the chip and alert.
+        return _dueSeenAt.TryGetValue(Key(t.Server, t.Zone, t.Name), out var seen)
+            && now - seen > DueLinger;
     }
 
     private static string Key(string server, string zone, string name) => $"{server}|{zone}|{name}";
@@ -428,6 +455,9 @@ public sealed class SpawnTimers
             if (t.KilledAt < existing.KilledAt) return;
         }
         _timers[key] = t;
+        // A fresh countdown starts unobserved — the previous cycle's DUE sighting
+        // must not shorten this one's linger.
+        _dueSeenAt.Remove(key);
         SavePersisted();
     }
 

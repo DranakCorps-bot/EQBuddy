@@ -88,6 +88,9 @@ public class CountdownTests
     [InlineData(492, "8:12")]
     [InlineData(61, "1:01")]
     [InlineData(60, "1:00")]
+    // A live clock crosses the minute at 59.98s-ish every cycle: rounding that up
+    // must read "1:00", never "60s" — which looked like the countdown stalling.
+    [InlineData(59.98, "1:00")]
     [InlineData(59, "59s")]
     [InlineData(2.4, "3s")]
     [InlineData(0, "1s")]

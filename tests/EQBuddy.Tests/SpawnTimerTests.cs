@@ -378,8 +378,9 @@ public class SpawnTimerTests
         Assert.Equal(timer.KilledAt.AddDays(3), Assert.Single(t.Snapshot(DateTime.Now)).DueAt);
     }
 
-    /// <summary>DUE shows for one minute, then the timer clears itself — if nobody
-    /// clicked it away, they've moved on and a stale DUE tells them nothing.</summary>
+    /// <summary>DUE shows for one minute from the first snapshot that saw it, then
+    /// the timer clears itself — if nobody clicked it away, they've moved on and a
+    /// stale DUE tells them nothing.</summary>
     [Fact]
     public void DueTimersShowForAMinuteThenDrop()
     {
@@ -388,8 +389,34 @@ public class SpawnTimerTests
         t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));    // 27 min timer
 
         var due = T0.AddSeconds(1620);
+        Assert.Single(t.Snapshot(due.AddSeconds(1)));     // the 1 Hz tick sees it due
         Assert.Single(t.Snapshot(due.AddSeconds(30)));    // DUE, within the minute
-        Assert.Empty(t.Snapshot(due.AddSeconds(61)));     // cleaned itself up
+        Assert.Empty(t.Snapshot(due.AddSeconds(62)));     // cleaned itself up
+    }
+
+    /// <summary>The gap the linger now guards against: no snapshot ran while the
+    /// timer came due (laptop sleep, an OS-throttled background process). The first
+    /// look after the gap still shows DUE — and keeps it a full linger from that
+    /// look — instead of pruning the camp before anyone ever saw it, which also
+    /// swallowed the due alert.</summary>
+    [Fact]
+    public void ADueTimerSurvivesATickGapUntilItHasBeenSeen()
+    {
+        var t = Tracker();
+        t.Apply(new ZoneEvent(T0, "Lower Guk"));
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));    // due T0+1620s
+
+        var due = T0.AddSeconds(1620);
+        var wake = due.AddMinutes(10);                    // first tick after the gap
+        Assert.True(Assert.Single(t.Snapshot(wake)).IsDue(wake));
+        Assert.Single(t.Snapshot(wake.AddSeconds(59)));   // a full linger from the look
+        Assert.Empty(t.Snapshot(wake.AddSeconds(61)));
+
+        // Past the revival cap the camp is ancient history: silent cleanup.
+        var t2 = Tracker();
+        t2.Apply(new ZoneEvent(T0, "Lower Guk"));
+        t2.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        Assert.Empty(t2.Snapshot(due.AddHours(2)));
     }
 
     [Fact]

@@ -21,6 +21,11 @@ public sealed class SpawnChipsWindow : Window
     private readonly AppSettings _settings;
     private readonly StackPanel _panel = new();
     private readonly List<TextBlock> _countdowns = [];
+    // The gauge fills live here so the per-tick refresh can advance them: rebuilds
+    // only happen on a signature change (zone|name|due|icon), and a fill painted
+    // only at rebuild froze at whatever fraction that moment saw — WPF's audit
+    // finding 14, fixed there and in MezChipsWindow but hand-copied stale here.
+    private readonly List<(Grid Track, Border Fill)> _gauges = [];
     private List<SpawnChip> _chips = [];
     private string _signature = "";
     // Fallback placements must never persist (#117): where the window was placed at
@@ -116,13 +121,21 @@ public sealed class SpawnChipsWindow : Window
         }
 
         for (var i = 0; i < _chips.Count && i < _countdowns.Count; i++)
+        {
             _countdowns[i].Text = _chips[i].IsDue ? "DUE" : _chips[i].CountdownText;
+            // DUE fills solid at rebuild (IsDue is in the signature); running chips
+            // advance their elapsed-share fill every tick.
+            if (i < _gauges.Count && _gauges[i].Fill is { } fill && !_chips[i].IsDue
+                && _chips[i].Fraction is { } frac)
+                fill.Width = Math.Max(0, _gauges[i].Track.Bounds.Width * frac);
+        }
     }
 
     private void Rebuild()
     {
         _panel.Children.Clear();
         _countdowns.Clear();
+        _gauges.Clear();
         foreach (var chip in _chips)
         {
             var row = new Grid();
@@ -176,7 +189,9 @@ public sealed class SpawnChipsWindow : Window
                 var frac = chip.IsDue ? 1.0 : chip.Fraction!.Value;
                 track.SizeChanged += (_, se) => fill.Width = Math.Max(0, se.NewSize.Width * frac);
                 host.Children.Add(track);
+                _gauges.Add((track, fill));
             }
+            else _gauges.Add(default);
             var border = new Border
             {
                 Child = host,
