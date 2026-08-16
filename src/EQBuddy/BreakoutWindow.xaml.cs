@@ -108,6 +108,7 @@ public partial class BreakoutWindow : Window
             // SESSION has yielded (David, 2026-08-06).
             ScopeFight.Text = "Target";
             ScopeSession.Text = "Session";
+            ApplyLootSortVisual();   // the bar itself is shown by UpdateLoot (Session + >1 item)
         }
         ApplyScopeVisual();
     }
@@ -498,6 +499,10 @@ public partial class BreakoutWindow : Window
     private void UpdateLoot(StatsSnapshot s)
     {
         TitleText.Text = "🎒 Loot";
+        // The Count/Name/Recent bar belongs to the Session view, and only earns its row
+        // once there's more than one item to order — same rule the Loot card uses.
+        LootSortBar.Visibility = !_fightScope && s.Loot.Count > 1
+            ? Visibility.Visible : Visibility.Collapsed;
         List<(string Name, string Value)> rows;
         List<(string Name, string Value)> crafted = [];
         string emptyText;
@@ -516,14 +521,21 @@ public partial class BreakoutWindow : Window
             // "+N made" echoes the card header, so the two views agree at a glance (#131).
             SubText.Text = $"Session · {s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")} looted"
                 + (s.CraftedTotal > 0 ? $" · +{s.CraftedTotal} made" : "");
-            var loot = _settings.LootSort == "name"
-                ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
-                : s.Loot;
-            rows = loot.Take(12).Select(l => (l.Item, $"×{l.Count}")).ToList();
+            // Exactly the Loot card's three sorts (MainWindow ~2452), uncapped so a rare
+            // drop can't be truncated past the fold — the lag TropicMike/wizen saw. Recent
+            // is arrival order with runs collapsed, so a new drop surfaces at the top the
+            // instant it lands instead of sinking to the bottom of a count-sorted list.
+            var mode = _settings.LootSort;
+            rows = mode == "recent"
+                ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot).Select(r => (r.Item, r.Detail)).ToList()
+                : (mode == "name"
+                        ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
+                        : s.Loot)
+                    .Select(l => (l.Item, $"×{l.Count}")).ToList();
             // Made items ride the Session scope only: crafts are session-cumulative, and
             // Target scope is a different axis entirely — what a creature can drop —
             // where an item nobody drops would misstate the view (#131, TropicMike).
-            crafted = s.Crafted.Take(12).Select(c => (c.Name, $"×{c.Count}")).ToList();
+            crafted = s.Crafted.Select(c => (c.Name, $"×{c.Count}")).ToList();
             emptyText = "No loot seen yet.";
         }
 
@@ -537,7 +549,7 @@ public partial class BreakoutWindow : Window
             return;
         }
 
-        var sig = $"loot|{_fightScope}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}"
+        var sig = $"loot|{_fightScope}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}"
             + $"|made:{string.Join(",", crafted.Select(c => c.Name + c.Value))}";
         if (sig == _signature) return;
         _signature = sig;
@@ -989,6 +1001,30 @@ public partial class BreakoutWindow : Window
     private void OnScopeSession(object sender, MouseButtonEventArgs e)
     {
         _fightScope = false; SetScopeSetting("session"); ApplyScopeVisual(); e.Handled = true;
+    }
+
+    /// <summary>Count / Name / Recent for the Loot Session view — writes the same
+    /// _settings.LootSort the main Loot card reads, so the two windows stay in lockstep.</summary>
+    private void OnLootSortClick(object sender, MouseButtonEventArgs e)
+    {
+        _settings.LootSort = (string)((FrameworkElement)sender).Tag;
+        _settings.Save();
+        ApplyLootSortVisual();
+        _signature = "";   // repaint in the new order on the next tick
+        e.Handled = true;
+    }
+
+    private void ApplyLootSortVisual()
+    {
+        // "count" is the default: anything that isn't name/recent lights it, matching the
+        // Loot card's own read of the shared setting.
+        var mode = _settings.LootSort;
+        LootSortCount.SetResourceReference(TextBlock.ForegroundProperty,
+            mode is "name" or "recent" ? "DimBrush" : "AccentBrush");
+        LootSortName.SetResourceReference(TextBlock.ForegroundProperty,
+            mode == "name" ? "AccentBrush" : "DimBrush");
+        LootSortRecent.SetResourceReference(TextBlock.ForegroundProperty,
+            mode == "recent" ? "AccentBrush" : "DimBrush");
     }
 
     private void OnDismiss(object sender, MouseButtonEventArgs e)

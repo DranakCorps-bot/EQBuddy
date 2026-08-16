@@ -67,6 +67,21 @@
                 <TextBlock x:Name="SortRate" Text="dps" FontSize="10" Cursor="Hand"
                            Tag="rate" MouseLeftButtonDown="OnSortClick"/>
             </StackPanel>
+            <!-- Loot Session scope only: the same Count / Name / Recent sorts as the main
+                 Loot card, sharing _settings.LootSort so both surfaces agree. Recent is the
+                 run-collapsing arrival view (RawLootView) — the reason a rare drop no longer
+                 hides behind a common one, and why this view stops lagging new drops. -->
+            <StackPanel Grid.Row="2" x:Name="LootSortBar" Orientation="Horizontal"
+                        HorizontalAlignment="Right" Margin="0,0,2,3" Visibility="Collapsed">
+                <TextBlock Text="sort:" FontSize="10" Margin="0,0,4,0"
+                           Foreground="{DynamicResource DimBrush}"/>
+                <TextBlock x:Name="LootSortCount" Text="count" FontSize="10" Cursor="Hand"
+                           Tag="count" MouseLeftButtonDown="OnLootSortClick" Margin="0,0,6,0"/>
+                <TextBlock x:Name="LootSortName" Text="name" FontSize="10" Cursor="Hand"
+                           Tag="name" MouseLeftButtonDown="OnLootSortClick" Margin="0,0,6,0"/>
+                <TextBlock x:Name="LootSortRecent" Text="recent" FontSize="10" Cursor="Hand"
+                           Tag="recent" MouseLeftButtonDown="OnLootSortClick"/>
+            </StackPanel>
             <ScrollViewer Grid.Row="3" x:Name="RowsScroll" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
                 <StackPanel>
