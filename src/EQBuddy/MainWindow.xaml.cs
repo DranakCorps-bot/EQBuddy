@@ -3663,17 +3663,20 @@ public partial class MainWindow : Window
         if (breakout is { } kind && _settings.DoubleClickChipsToggleBreakouts)
         {
             // Transparent (not null) so the gaps between glyph and value are hit-testable
-            // too; Handled on the second click keeps it from reaching OnDrag's expand. When
-            // the opt-in is off the chip stays inert here and a double-click expands the
-            // widget as before.
+            // too. Handle EVERY click on the chip (not just the second): the bar's OnDrag
+            // starts a window DragMove on the FIRST click, and that modal drag captured the
+            // mouse and stole the second click, so the double-click never completed — the
+            // cursor flickering into drag mode was the tell. Eating the click here keeps
+            // OnDrag out of it entirely; the widget is still dragged from any non-chip part
+            // of the bar. When the opt-in is off the chip stays inert and a double-click
+            // expands the widget as before.
             panel.Background = System.Windows.Media.Brushes.Transparent;
             panel.Cursor = System.Windows.Input.Cursors.Hand;
             panel.ToolTip = $"Double-click to show or hide the {kind} breakout";
             panel.MouseLeftButtonDown += (_, e) =>
             {
-                if (e.ClickCount != 2) return;
                 e.Handled = true;
-                ToggleBreakout(kind);
+                if (e.ClickCount == 2) ToggleBreakout(kind);
             };
         }
         panel.Children.Add(new TextBlock
