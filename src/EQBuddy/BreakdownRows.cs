@@ -30,7 +30,8 @@ internal static class BreakdownRows
     /// is the headline and sits hard-right in semibold; the rest reads dim beside it.
     /// Callers keep the same signature — every card and breakout upgrades at once.</summary>
     public static Grid Row(FrameworkElement resources, string name, string value, double frac,
-        Brush barBrush, string? tooltip, Brush? nameBrush = null, UIElement? nameBadge = null)
+        Brush barBrush, string? tooltip, Brush? nameBrush = null, UIElement? nameBadge = null,
+        string? nameNote = null)
     {
         frac = Math.Clamp(frac, 0.01, 1.0);
         var row = new Grid { Margin = new Thickness(0, 2, 0, 3), HorizontalAlignment = HorizontalAlignment.Stretch };
@@ -46,11 +47,23 @@ internal static class BreakdownRows
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-        content.Children.Add(new TextBlock
+        var nameBlock = new TextBlock
         {
-            Text = name, FontSize = 11.5, TextTrimming = TextTrimming.CharacterEllipsis,
+            FontSize = 11.5, TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = nameBrush ?? (Brush)resources.FindResource("TextBrush"),
-        });
+        };
+        // A muted inline note after the name (e.g. "(Foraged)") — a separate run, so the
+        // name it stands beside is unchanged for click/lookup.
+        if (nameNote is { Length: > 0 })
+        {
+            nameBlock.Inlines.Add(new System.Windows.Documents.Run(name));
+            nameBlock.Inlines.Add(new System.Windows.Documents.Run($" {nameNote}")
+            {
+                FontSize = 10.5, Foreground = (Brush)resources.FindResource("DimBrush"),
+            });
+        }
+        else nameBlock.Text = name;
+        content.Children.Add(nameBlock);
         if (nameBadge is not null)
         {
             Grid.SetColumn(nameBadge, 1);

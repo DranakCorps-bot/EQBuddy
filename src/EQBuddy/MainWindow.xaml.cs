@@ -1780,25 +1780,23 @@ public partial class MainWindow : Window
     private void RenderLoot(StatsSnapshot s)
     {
         var mode = _settings.LootSort;
+        var view = _settings.LootView;   // all | looted | made
         var hasLoot = s.Loot.Count > 0;
         var hasMade = s.Crafted.Count > 0;
-        // Never blank the card (CLAUDE.md: cards always show): if the chosen slice is empty
-        // but the other has rows, fall back to "all" — which shows whatever is present.
-        var view = _settings.LootView;   // all | looted | made
-        var effective = (view == "made" && !hasMade) || (view == "looted" && !hasLoot) ? "all" : view;
 
-        // The show toggle only earns its row when there's actually a choice to make — both
-        // a looted and a made list present. Otherwise it's noise over a single list.
-        LootViewBar.Visibility = hasLoot && hasMade ? Visibility.Visible : Visibility.Collapsed;
+        // The show toggle stays up whenever the card holds ANY loot, even when one slice is
+        // empty — otherwise a player with only looted items can't tell the filter is there
+        // (LW, 2026-08-17). It hides only when there's nothing at all.
+        LootViewBar.Visibility = hasLoot || hasMade ? Visibility.Visible : Visibility.Collapsed;
         LootViewAll.Foreground = (Brush)FindResource(view is "looted" or "made" ? "DimBrush" : "AccentBrush");
         LootViewLooted.Foreground = (Brush)FindResource(view == "looted" ? "AccentBrush" : "DimBrush");
         LootViewMade.Foreground = (Brush)FindResource(view == "made" ? "AccentBrush" : "DimBrush");
 
         // Sort follows the visible items; "recent" is a looted-only idea (made items carry
         // no arrival order), so it's hidden in the made-only view.
-        var itemCount = effective switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
+        var itemCount = view switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
         LootSortBar.Visibility = itemCount > 1 ? Visibility.Visible : Visibility.Collapsed;
-        LootSortRecent.Visibility = effective != "made" ? Visibility.Visible : Visibility.Collapsed;
+        LootSortRecent.Visibility = view != "made" ? Visibility.Visible : Visibility.Collapsed;
         LootSortCount.Foreground = (Brush)FindResource(mode == "name" || mode == "recent" ? "DimBrush" : "AccentBrush");
         LootSortName.Foreground = (Brush)FindResource(mode == "name" ? "AccentBrush" : "DimBrush");
         LootSortRecent.Foreground = (Brush)FindResource(mode == "recent" ? "AccentBrush" : "DimBrush");
@@ -1806,10 +1804,32 @@ public partial class MainWindow : Window
         // One list: under "all" looted and made are mixed and ordered together, so a made
         // item's big stack sorts among the looted ones rather than after a heading. Made
         // items are real items with wiki pages (and quest turn-ins), so they get the same
-        // click / hover / quest-badge treatment as loot. The separate crafted list is gone.
-        var rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, effective, mode);
-        FillList(LootList, rows, onNameClick: ShowItemInfo,
-            tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
+        // click / hover / quest-badge treatment as loot.
+        var rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, view, mode);
+        if (rows.Count == 0 && (hasLoot || hasMade))
+        {
+            // The chosen slice is empty but the card isn't — name the empty slice rather
+            // than blanking (or silently showing a different one).
+            LootList.Items.Clear();
+            var note = new TextBlock
+            {
+                Text = view == "made" ? "No made items yet." : "No looted items yet.",
+                FontSize = 12, Margin = new Thickness(0, 1, 0, 1),
+            };
+            note.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            LootList.Items.Add(note);
+        }
+        else
+        {
+            // Foraged items are tagged inline (a muted "(Foraged)") so provenance is clear
+            // without becoming part of the name (LW, 2026-08-17).
+            var foraged = new HashSet<string>(
+                s.Loot.Where(l => l.LastSource == "Forage").Select(l => l.Item),
+                StringComparer.OrdinalIgnoreCase);
+            FillList(LootList, rows, onNameClick: ShowItemInfo,
+                tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true,
+                foraged: foraged.Count > 0 ? foraged.Contains : null);
+        }
         CraftedLabel.Visibility = Visibility.Collapsed;
         CraftedList.Items.Clear();
 
@@ -3976,7 +3996,7 @@ public partial class MainWindow : Window
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         Func<string, Brush>? valueBrush = null, Action<string>? onNameClick = null,
         Func<string, string?>? tooltip = null, Func<string, Brush?>? nameBrush = null,
-        bool questBadges = false)
+        bool questBadges = false, Func<string, bool>? foraged = null)
     {
         var items = rows.ToList();
         list.Items.Clear();
@@ -3988,10 +4008,21 @@ public partial class MainWindow : Window
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var left = new TextBlock
             {
-                Text = name, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis,
+                FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis,
                 Foreground = nameBrush?.Invoke(name) ?? (Brush)FindResource("TextBrush"),
                 Margin = new Thickness(0, 1, 8, 1),
             };
+            // Provenance rides inline as a muted "(Foraged)" after the name — a separate
+            // run, not part of the name, so the click still looks up the base item.
+            if (foraged?.Invoke(name) == true)
+            {
+                left.Inlines.Add(new System.Windows.Documents.Run(name));
+                left.Inlines.Add(new System.Windows.Documents.Run(" (Foraged)")
+                {
+                    FontSize = 11, Foreground = (Brush)FindResource("DimBrush"),
+                });
+            }
+            else left.Text = name;
             if (tooltip?.Invoke(name) is { Length: > 0 } tip)
             {
                 var tipText = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = 340 };

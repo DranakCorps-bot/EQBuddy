@@ -70,4 +70,17 @@ public class LootRowsTests
     [Fact]
     public void CountRowsCarryTheStackValue() =>
         Assert.Equal("×5", LootRows.Build(Loot, Crafted, Recent, "looted", "count")[0].Value);
+
+    [Fact]
+    public void CountTiesBreakAlphabetically()
+    {
+        // A page of one-of-each drops should read alphabetically, not in arrival order.
+        var loot = new List<LootDetail>
+        {
+            new("Zebra Hide", 1, "x"), new("apple", 1, "x"), new("Mango", 1, "x"),
+        };
+        Assert.Equal(
+            new[] { "apple", "Mango", "Zebra Hide" },
+            LootRows.Build(loot, [], [], "looted", "count").Select(r => r.Item).ToArray());
+    }
 }

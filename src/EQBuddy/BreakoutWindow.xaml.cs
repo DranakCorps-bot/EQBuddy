@@ -524,22 +524,25 @@ public partial class BreakoutWindow : Window
                 + (s.CraftedTotal > 0 ? $" · +{s.CraftedTotal} made" : "");
 
             // Same show filter and row order as the Loot card, via the shared builder: all
-            // (looted + made mixed) / looted (incl. forage) / made. Never-blank fallback to
-            // "all" when the chosen slice is empty. Uncapped — a rare drop can't be truncated.
+            // (looted + made mixed) / looted (incl. forage) / made. Uncapped — a rare drop
+            // can't be truncated.
             var mode = _settings.LootSort;
             var view = _settings.LootView;
             var hasLoot = s.Loot.Count > 0;
             var hasMade = s.Crafted.Count > 0;
-            var effective = (view == "made" && !hasMade) || (view == "looted" && !hasLoot) ? "all" : view;
 
-            LootViewBar.Visibility = hasLoot && hasMade ? Visibility.Visible : Visibility.Collapsed;
-            var itemCount = effective switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
+            // The show toggle stays up whenever there's ANY loot, so the filter is
+            // discoverable even with only one kind of item (LW, 2026-08-17).
+            LootViewBar.Visibility = hasLoot || hasMade ? Visibility.Visible : Visibility.Collapsed;
+            var itemCount = view switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
             LootSortBar.Visibility = itemCount > 1 ? Visibility.Visible : Visibility.Collapsed;
             // Recent is a looted-only idea (made items carry no arrival order).
-            LootSortRecent.Visibility = effective != "made" ? Visibility.Visible : Visibility.Collapsed;
+            LootSortRecent.Visibility = view != "made" ? Visibility.Visible : Visibility.Collapsed;
 
-            rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, effective, mode);
-            emptyText = "No loot seen yet.";
+            rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, view, mode);
+            emptyText = (hasLoot || hasMade)
+                ? (view == "made" ? "No made items yet." : "No looted items yet.")   // slice empty, card isn't
+                : "No loot seen yet.";
         }
 
         EmptyText.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -557,14 +560,21 @@ public partial class BreakoutWindow : Window
 
         Rows.Items.Clear();
         var barBrush = BreakdownRows.BarBrush(this);
+        // Foraged items wear a muted "(Foraged)" — but only in the Session list; Target
+        // rows are a creature's possible drops, not things you looted.
+        var foraged = _fightScope
+            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            : new HashSet<string>(
+                s.Loot.Where(l => l.LastSource == "Forage").Select(l => l.Item),
+                StringComparer.OrdinalIgnoreCase);
         foreach (var (name, value) in rows)
-            Rows.Items.Add(BuildItemRow(name, value, barBrush));
+            Rows.Items.Add(BuildItemRow(name, value, barBrush, foraged.Contains(name)));
     }
 
     /// <summary>An item row wired the way David specced the breakout: hover = the eqlwiki
     /// item info, fetched on the spot if the cache is empty (the tooltip live-updates
     /// from "Looking up…"); click = the eqlwiki page in the browser.</summary>
-    private Grid BuildItemRow(string name, string value, Brush barBrush)
+    private Grid BuildItemRow(string name, string value, Brush barBrush, bool foraged = false)
     {
         var cachedTip = Main?.CachedItemStats(name);
 
@@ -592,7 +602,8 @@ public partial class BreakoutWindow : Window
             };
         }
 
-        var row = BreakdownRows.Row(this, name, value, 0, barBrush, null, nameBadge: badge);
+        var row = BreakdownRows.Row(this, name, value, 0, barBrush, null, nameBadge: badge,
+            nameNote: foraged ? "(Foraged)" : null);
         var tipText = new TextBlock
         {
             Text = cachedTip ?? "Looking up on eqlwiki…",

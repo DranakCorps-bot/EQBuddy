@@ -37,12 +37,14 @@ public static class LootRows
             return Looted(loot, recentLoot, "recent").Concat(Made(crafted, "count")).ToList();
 
         // count / name: fold both into one sequence and order it as a whole, so a made
-        // item with a big count sorts among the looted stacks instead of after them.
+        // item with a big count sorts among the looted stacks instead of after them. Count
+        // ties break alphabetically — a page of ×1 drops reads as an ordered list, not a
+        // pile in arrival order.
         var combined = loot.Select(l => (Item: l.Item, l.Count))
             .Concat(crafted.Select(c => (Item: c.Name, c.Count)));
         combined = mode == "name"
             ? combined.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
-            : combined.OrderByDescending(x => x.Count);
+            : combined.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
         return combined.Select(x => (x.Item, $"×{x.Count}")).ToList();
     }
 
@@ -50,15 +52,16 @@ public static class LootRows
         IReadOnlyList<LootDetail> loot, IReadOnlyList<LootPickup> recentLoot, string mode) =>
         mode == "recent"
             ? RawLootView.Rows(recentLoot).Select(r => (r.Item, r.Detail))
+            // count ties break alphabetically (a row of ×1 drops stays ordered).
             : (mode == "name"
                     ? loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase)
-                    : loot.AsEnumerable())   // snapshot hands loot back count-desc already
+                    : loot.OrderByDescending(l => l.Count).ThenBy(l => l.Item, StringComparer.OrdinalIgnoreCase))
                 .Select(l => (l.Item, $"×{l.Count}"));
 
     private static IEnumerable<(string Item, string Value)> Made(
         IReadOnlyList<NameCount> crafted, string mode) =>
         (mode == "name"
                 ? crafted.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                : crafted.AsEnumerable())    // count-desc already; "recent" has no made order
+                : crafted.OrderByDescending(c => c.Count).ThenBy(c => c.Name, StringComparer.OrdinalIgnoreCase))
             .Select(c => (c.Name, $"×{c.Count}"));
 }
