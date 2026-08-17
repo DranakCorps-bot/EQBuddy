@@ -2,66 +2,92 @@ using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
+/// <summary>One loot row: the item, its value column, and an optional provenance tag
+/// ("Foraged" / "Crafted" / "Merged" / "Parcel") the UI renders muted after the name.
+/// A null tag is plain corpse loot.</summary>
+public sealed record LootRow(string Item, string Value, string? Tag);
+
 /// <summary>
-/// Builds the Loot card's (and its breakout's) row list from a snapshot's looted and made
-/// items, honoring the show filter (all / looted / made) and the sort mode
-/// (count / name / recent). One place, so the two surfaces can never drift apart.
+/// Builds the Loot card's (and its breakout's) rows from a snapshot, honoring the show
+/// filter (all / looted / other) and the sort mode (count / name / recent). One place, so
+/// the two surfaces can't drift.
 ///
-/// The "show" axis (David's two-list layout was looted-then-made; LW, 2026-08-16, wanted a
-/// filter instead):
-///   - "looted": corpse + foraged items only.
-///   - "made":   combine results only.
-///   - "all":    the two MIXED into a single list — not stacked with a heading, because the
-///               "made" filter already gives you the made-only list on its own.
+/// The "show" axis:
+///   - "looted": corpse drops only.
+///   - "other":  everything else you acquired — foraged, crafted, merged, parcel.
+///   - "all":    the two mixed into one ordered list.
 ///
-/// The "recent" sort is a looted-only idea — it is arrival order (see <see cref="RawLootView"/>)
-/// and made items carry no timestamp — so under "made" it falls back to count, and under
-/// "all" the recent looted rows come first with the made rows appended by count.
+/// Provenance drives both the filter and the muted inline tag. Corpse loot is untagged;
+/// forage and parcel ride the loot list (LootDetail.LastSource); crafted (fashioned) and
+/// merged come in as their own lists. "recent" is arrival order (see <see cref="RawLootView"/>)
+/// and only looted/foraged/parcel carry a timestamp, so under "recent" the made rows
+/// (crafted+merged) append by count.
 /// </summary>
 public static class LootRows
 {
-    public static List<(string Item, string Value)> Build(
+    public const string ForageSource = "Forage";
+    public const string ParcelSource = "Parcel";
+
+    private static bool IsOther(string source) => source == ForageSource || source == ParcelSource;
+    private static string? LootTag(string source) =>
+        source == ForageSource ? "Foraged" : source == ParcelSource ? "Parcel" : null;
+
+    public static List<LootRow> Build(
         IReadOnlyList<LootDetail> loot,
-        IReadOnlyList<NameCount> crafted,
+        IReadOnlyList<NameCount> merged,      // snapshot's Crafted — the "(Merged)" provenance
+        IReadOnlyList<NameCount> fashioned,   // snapshot's Fashioned — the "(Crafted)" provenance
         IReadOnlyList<LootPickup> recentLoot,
         string view,
         string mode)
     {
-        if (view == "looted") return Looted(loot, recentLoot, mode).ToList();
-        if (view == "made") return Made(crafted, mode).ToList();
+        var lootFor = view switch
+        {
+            "looted" => loot.Where(l => !IsOther(l.LastSource)),
+            "other" => loot.Where(l => IsOther(l.LastSource)),
+            _ => loot.AsEnumerable(),
+        };
+        var includeMade = view != "looted";   // crafted + merged live under other / all
 
-        // "all" — mix looted and made.
         if (mode == "recent")
-            // Crafts have no arrival time, so they can't interleave into the timeline;
-            // show the recent looted view, then the made rows by count.
-            return Looted(loot, recentLoot, "recent").Concat(Made(crafted, "count")).ToList();
+        {
+            var picks = (view switch
+            {
+                "looted" => recentLoot.Where(p => !IsOther(p.Source)),
+                "other" => recentLoot.Where(p => IsOther(p.Source)),
+                _ => recentLoot.AsEnumerable(),
+            }).ToList();
+            var sourceByName = picks
+                .GroupBy(p => p.Item, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().Source, StringComparer.OrdinalIgnoreCase);
+            var rows = RawLootView.Rows(picks)
+                .Select(r => new LootRow(r.Item, r.Detail,
+                    sourceByName.TryGetValue(r.Item, out var src) ? LootTag(src) : null))
+                .ToList();
+            if (includeMade) rows.AddRange(Made(merged, fashioned, "count"));
+            return rows;
+        }
 
-        // count / name: fold both into one sequence and order it as a whole, so a made
-        // item with a big count sorts among the looted stacks instead of after them. Count
-        // ties break alphabetically — a page of ×1 drops reads as an ordered list, not a
-        // pile in arrival order.
-        var combined = loot.Select(l => (Item: l.Item, l.Count))
-            .Concat(crafted.Select(c => (Item: c.Name, c.Count)));
-        combined = mode == "name"
-            ? combined.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
-            : combined.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
-        return combined.Select(x => (x.Item, $"×{x.Count}")).ToList();
+        // count / name: fold looted (+ made under other/all) into one sequence and order it
+        // as a whole. Count ties break alphabetically so a page of ×1 drops reads ordered.
+        var items = lootFor.Select(l => (Item: l.Item, l.Count, Tag: LootTag(l.LastSource)));
+        if (includeMade)
+            items = items
+                .Concat(merged.Select(m => (Item: m.Name, m.Count, Tag: (string?)"Merged")))
+                .Concat(fashioned.Select(f => (Item: f.Name, f.Count, Tag: (string?)"Crafted")));
+        items = mode == "name"
+            ? items.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
+            : items.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
+        return items.Select(x => new LootRow(x.Item, $"×{x.Count}", x.Tag)).ToList();
     }
 
-    private static IEnumerable<(string Item, string Value)> Looted(
-        IReadOnlyList<LootDetail> loot, IReadOnlyList<LootPickup> recentLoot, string mode) =>
-        mode == "recent"
-            ? RawLootView.Rows(recentLoot).Select(r => (r.Item, r.Detail))
-            // count ties break alphabetically (a row of ×1 drops stays ordered).
-            : (mode == "name"
-                    ? loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase)
-                    : loot.OrderByDescending(l => l.Count).ThenBy(l => l.Item, StringComparer.OrdinalIgnoreCase))
-                .Select(l => (l.Item, $"×{l.Count}"));
-
-    private static IEnumerable<(string Item, string Value)> Made(
-        IReadOnlyList<NameCount> crafted, string mode) =>
-        (mode == "name"
-                ? crafted.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                : crafted.OrderByDescending(c => c.Count).ThenBy(c => c.Name, StringComparer.OrdinalIgnoreCase))
-            .Select(c => (c.Name, $"×{c.Count}"));
+    private static IEnumerable<LootRow> Made(
+        IReadOnlyList<NameCount> merged, IReadOnlyList<NameCount> fashioned, string mode)
+    {
+        var items = merged.Select(m => (Item: m.Name, m.Count, Tag: "Merged"))
+            .Concat(fashioned.Select(f => (Item: f.Name, f.Count, Tag: "Crafted")));
+        items = mode == "name"
+            ? items.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
+            : items.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
+        return items.Select(x => new LootRow(x.Item, $"×{x.Count}", x.Tag));
+    }
 }

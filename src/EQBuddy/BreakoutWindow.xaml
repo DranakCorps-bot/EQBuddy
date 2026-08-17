@@ -93,8 +93,8 @@
                            Tag="all" MouseLeftButtonDown="OnLootViewClick" Margin="0,0,6,0"/>
                 <TextBlock x:Name="LootViewLooted" Text="looted" FontSize="10" Cursor="Hand"
                            Tag="looted" MouseLeftButtonDown="OnLootViewClick" Margin="0,0,6,0"/>
-                <TextBlock x:Name="LootViewMade" Text="made" FontSize="10" Cursor="Hand"
-                           Tag="made" MouseLeftButtonDown="OnLootViewClick"/>
+                <TextBlock x:Name="LootViewOther" Text="other" FontSize="10" Cursor="Hand"
+                           Tag="other" MouseLeftButtonDown="OnLootViewClick"/>
             </StackPanel>
             <ScrollViewer Grid.Row="3" x:Name="RowsScroll" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">

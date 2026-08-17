@@ -157,6 +157,9 @@ public sealed partial class SessionStats
     private readonly Dictionary<string, (int Count, string LastSource)> _loot = new(StringComparer.OrdinalIgnoreCase);
     private int _lootCount;
     private readonly Dictionary<string, int> _crafted = new(StringComparer.OrdinalIgnoreCase);
+    // Tradeskill "fashioned" combines (potions, elixirs) — the "(Crafted)" provenance, kept
+    // apart from _crafted (which is item-MERGES, the "(Merged)" provenance).
+    private readonly Dictionary<string, int> _fashioned = new(StringComparer.OrdinalIgnoreCase);
     // Loot-merge RESULTS ("looted a Belt +2 ... to create a Belt +5"): the consumed
     // item lands in _loot, but the created "+5" appeared nowhere in the snapshot —
     // and reaching a wished tier via loot-merge is the Gear card's main auto-done
@@ -1129,6 +1132,11 @@ public sealed partial class SessionStats
                     if (!StoresSuppressed)
                         QuestStore?.RecordConsumed(AaCharacterKey, c.Item, 1, c.Time);
                     break;
+                case FashionEvent f:
+                    Bump(_fashioned, f.Item);   // a tradeskill combine (potions, elixirs)
+                    if (!StoresSuppressed)
+                        QuestStore?.RecordConsumed(AaCharacterKey, f.Item, 1, f.Time);
+                    break;
                 case ItemDestroyedEvent d:
                     _lastDestroyed = (d.Item, d.Count, d.Time);
                     if (!StoresSuppressed)
@@ -1849,7 +1857,7 @@ public sealed partial class SessionStats
         _trackedAccs = null; _trackedAccFingerprint = null; _trackedScanIndex = 0;
         _runeGainCount = 0; _runeGainPoints = 0;
         _runeBlockStreak = 0; _runeBlockStreakMax = 0; _runeBlockCount = 0;
-        _loot.Clear(); _lootCount = 0; _crafted.Clear(); _upgraded.Clear();
+        _loot.Clear(); _lootCount = 0; _crafted.Clear(); _fashioned.Clear(); _upgraded.Clear();
         _copper = 0; _coinDrops = 0; _biggestDrop = 0;
         _vendorCopper = 0; _salesCount = 0; _soldItems.Clear();
         _xpPercent = 0; _xpTicks = 0; _xpSinceLevel = 0; _levels.Clear();
@@ -2129,6 +2137,9 @@ public sealed partial class SessionStats
                 Crafted = _crafted.OrderByDescending(kv => kv.Value)
                     .Select(kv => new NameCount(kv.Key, kv.Value)).ToList(),
                 CraftedTotal = _crafted.Values.Sum(),
+                Fashioned = _fashioned.OrderByDescending(kv => kv.Value)
+                    .Select(kv => new NameCount(kv.Key, kv.Value)).ToList(),
+                FashionedTotal = _fashioned.Values.Sum(),
                 Upgraded = _upgraded.OrderByDescending(kv => kv.Value)
                     .Select(kv => new NameCount(kv.Key, kv.Value)).ToList(),
                 Copper = _copper + _vendorCopper,
@@ -2352,8 +2363,14 @@ public sealed class StatsSnapshot
     public List<LootDetail> Loot { get; init; } = [];
     /// <summary>Every drop, newest first, capped — see SessionStats.MaxRecentLoot.</summary>
     public List<LootPickup> RecentLoot { get; init; } = [];
+    /// <summary>Item-MERGE results ("successfully merged two items … : Belt +5") — the
+    /// "(Merged)" provenance. Named Crafted for history.</summary>
     public List<NameCount> Crafted { get; init; } = [];
     public int CraftedTotal { get; init; }
+    /// <summary>Tradeskill "fashioned" combines (potions, elixirs) — the "(Crafted)"
+    /// provenance. Separate from <see cref="Crafted"/> (which is merges).</summary>
+    public List<NameCount> Fashioned { get; init; } = [];
+    public int FashionedTotal { get; init; }
     /// <summary>Loot-merge results by created name ("... to create a Belt +5" → Belt +5).
     /// Not part of CraftedTotal — the merge consumed a held item, nothing new was "made";
     /// the Gear card's auto-done is the consumer (reaching a wished "+N" tier).</summary>

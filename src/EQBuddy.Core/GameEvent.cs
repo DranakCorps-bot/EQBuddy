@@ -121,7 +121,13 @@ public record SkillSubstitutionEvent(DateTime Time, string Ability, string Repla
 public record FactionEvent(DateTime Time, string Faction, int Delta, bool Capped = false,
     bool CappedDown = false) : GameEvent(Time);
 public record ZoneEvent(DateTime Time, string Zone) : GameEvent(Time);
+/// <summary>"You have successfully merged two items together to create a new item: X" —
+/// the item-merge/augment. Named CraftEvent for history; it is the "(Merged)" provenance.</summary>
 public record CraftEvent(DateTime Time, string Item) : GameEvent(Time);
+/// <summary>"You have fashioned the items together to create something new: X." — a
+/// tradeskill combine (potions, elixirs). The "(Crafted)" provenance, kept apart from the
+/// merge above so the two read as different things on the loot card.</summary>
+public record FashionEvent(DateTime Time, string Item) : GameEvent(Time);
 /// <summary>"Your Polished Mithril Mask (Exaltation) feels alive with power." — an item
 /// (or invocation vehicle) proc firing; the proc's damage line follows within a beat
 /// (Kerdude's spellblade snippet, #85).</summary>

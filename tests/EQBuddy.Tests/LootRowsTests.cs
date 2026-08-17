@@ -5,82 +5,86 @@ using Xunit;
 namespace EQBuddy.Tests;
 
 /// <summary>The loot row builder shared by the Loot card and its breakout: the show filter
-/// (all/looted/made), the sort modes, and — the part that used to live untested inside two
-/// WPF windows — how "all" mixes looted and made into one ordered list.</summary>
+/// (all / looted / other), the sort modes, the provenance tags, and how "all" mixes the
+/// slices into one ordered list.</summary>
 public class LootRowsTests
 {
-    // Snapshot hands these back count-desc already, so mirror that here.
+    // Snapshot hands loot back count-desc; sources: a mob = corpse (untagged), "Forage",
+    // "Parcel". Crafted (merges) and Fashioned (crafts) come as their own lists.
     private static readonly List<LootDetail> Loot =
     [
         new("Bone Chips", 5, "a decaying skeleton"),
         new("Vegetables", 3, "Forage"),
         new("HQ Lion Skin", 2, "a lion"),
+        new("Short Sword of the Ykesha", 1, "Parcel"),
     ];
 
-    private static readonly List<NameCount> Crafted =
-    [
-        new("Fine Steel Dagger", 4),
-        new("Crushbone Belt +5", 1),
-    ];
+    private static readonly List<NameCount> Merged = [new("Crushbone Belt +5", 1)];   // s.Crafted
+    private static readonly List<NameCount> Fashioned = [new("Elixir of Concentration", 4)];
 
     private static readonly List<LootPickup> Recent =
     [
-        new(new DateTime(2026, 8, 16, 17, 3, 0), "Vegetables", 1, "Forage"),
-        new(new DateTime(2026, 8, 16, 17, 2, 0), "HQ Lion Skin", 1, "a lion"),
+        new(new DateTime(2026, 8, 16, 17, 3, 0), "Short Sword of the Ykesha", 1, "Parcel"),
+        new(new DateTime(2026, 8, 16, 17, 2, 0), "Vegetables", 1, "Forage"),
         new(new DateTime(2026, 8, 16, 17, 1, 0), "Bone Chips", 2, "a decaying skeleton"),
     ];
 
+    private static List<LootRow> Build(string view, string mode) =>
+        LootRows.Build(Loot, Merged, Fashioned, Recent, view, mode);
+
     private static string[] Items(string view, string mode) =>
-        LootRows.Build(Loot, Crafted, Recent, view, mode).Select(r => r.Item).ToArray();
+        Build(view, mode).Select(r => r.Item).ToArray();
 
     [Fact]
-    public void LootedCountKeepsTheCountDescOrder_AndIncludesForage() =>
-        Assert.Equal(new[] { "Bone Chips", "Vegetables", "HQ Lion Skin" }, Items("looted", "count"));
+    public void LootedIsCorpseDropsOnly_NoForageOrParcelOrMade() =>
+        Assert.Equal(new[] { "Bone Chips", "HQ Lion Skin" }, Items("looted", "count"));
 
     [Fact]
-    public void MadeShowsOnlyCrafts() =>
-        Assert.Equal(new[] { "Fine Steel Dagger", "Crushbone Belt +5" }, Items("made", "count"));
-
-    [Fact]
-    public void AllCountMixesLootedAndMadeByCount()
+    public void OtherIsForageParcelCraftedMerged()
     {
-        // 5 Bone Chips, 4 Fine Steel Dagger, 3 Vegetables, 2 HQ Lion Skin, 1 Crushbone Belt.
+        // 5? no — Elixir ×4, Vegetables ×3, Belt+5 ×1, Short Sword ×1 (ties alphabetical).
         Assert.Equal(
-            new[] { "Bone Chips", "Fine Steel Dagger", "Vegetables", "HQ Lion Skin", "Crushbone Belt +5" },
-            Items("all", "count"));
+            new[] { "Elixir of Concentration", "Vegetables", "Crushbone Belt +5", "Short Sword of the Ykesha" },
+            Items("other", "count"));
     }
 
     [Fact]
-    public void AllNameSortsTheWholeMixedListAlphabetically() =>
+    public void AllMixesEveryThingByCount() =>
         Assert.Equal(
-            new[] { "Bone Chips", "Crushbone Belt +5", "Fine Steel Dagger", "HQ Lion Skin", "Vegetables" },
-            Items("all", "name"));
+            new[] { "Bone Chips", "Elixir of Concentration", "Vegetables", "HQ Lion Skin",
+                    "Crushbone Belt +5", "Short Sword of the Ykesha" },
+            Items("all", "count"));
+
+    [Theory]
+    [InlineData("Vegetables", "Foraged")]
+    [InlineData("Short Sword of the Ykesha", "Parcel")]
+    [InlineData("Crushbone Belt +5", "Merged")]
+    [InlineData("Elixir of Concentration", "Crafted")]
+    [InlineData("Bone Chips", null)]
+    public void EachItemCarriesItsProvenanceTag(string item, string? tag) =>
+        Assert.Equal(tag, Build("all", "count").First(r => r.Item == item).Tag);
 
     [Fact]
-    public void LootedRecentIsArrivalOrderNewestFirst() =>
-        Assert.Equal(new[] { "Vegetables", "HQ Lion Skin", "Bone Chips" }, Items("looted", "recent"));
+    public void LootedRecentIsArrivalOrder_TaggedBySource()
+    {
+        var rows = Build("looted", "recent");
+        Assert.Equal(new[] { "Bone Chips" }, rows.Select(r => r.Item).ToArray());   // only corpse has arrival here
+        Assert.Null(rows[0].Tag);
+    }
 
     [Fact]
-    public void AllRecentIsRecentLootedThenMadeByCount() =>
-        // Crafts carry no timestamp, so they can't interleave — recent looted first, made appended.
+    public void OtherRecentIsForageParcelArrivalThenMadeByCount() =>
+        // Parcel + forage in arrival order (newest first), then crafted/merged by count.
         Assert.Equal(
-            new[] { "Vegetables", "HQ Lion Skin", "Bone Chips", "Fine Steel Dagger", "Crushbone Belt +5" },
-            Items("all", "recent"));
-
-    [Fact]
-    public void CountRowsCarryTheStackValue() =>
-        Assert.Equal("×5", LootRows.Build(Loot, Crafted, Recent, "looted", "count")[0].Value);
+            new[] { "Short Sword of the Ykesha", "Vegetables", "Elixir of Concentration", "Crushbone Belt +5" },
+            Items("other", "recent"));
 
     [Fact]
     public void CountTiesBreakAlphabetically()
     {
-        // A page of one-of-each drops should read alphabetically, not in arrival order.
-        var loot = new List<LootDetail>
-        {
-            new("Zebra Hide", 1, "x"), new("apple", 1, "x"), new("Mango", 1, "x"),
-        };
+        var loot = new List<LootDetail> { new("Zebra Hide", 1, "x"), new("apple", 1, "x"), new("Mango", 1, "x") };
         Assert.Equal(
             new[] { "apple", "Mango", "Zebra Hide" },
-            LootRows.Build(loot, [], [], "looted", "count").Select(r => r.Item).ToArray());
+            LootRows.Build(loot, [], [], [], "looted", "count").Select(r => r.Item).ToArray());
     }
 }

@@ -1780,40 +1780,46 @@ public partial class MainWindow : Window
     private void RenderLoot(StatsSnapshot s)
     {
         var mode = _settings.LootSort;
-        var view = _settings.LootView;   // all | looted | made
-        var hasLoot = s.Loot.Count > 0;
-        var hasMade = s.Crafted.Count > 0;
+        var view = _settings.LootView == "made" ? "other" : _settings.LootView;   // all | looted | other
+
+        // Provenance split: corpse drops are "looted"; forage/parcel (in s.Loot) plus merges
+        // (s.Crafted) and crafts (s.Fashioned) are "other".
+        static bool IsOther(string src) => src is "Forage" or "Parcel";
+        var hasLooted = s.Loot.Any(l => !IsOther(l.LastSource));
+        var hasOther = s.Loot.Any(l => IsOther(l.LastSource))
+                       || s.Crafted.Count > 0 || s.Fashioned.Count > 0;
 
         // The show toggle stays up whenever the card holds ANY loot, even when one slice is
-        // empty — otherwise a player with only looted items can't tell the filter is there
-        // (LW, 2026-08-17). It hides only when there's nothing at all.
-        LootViewBar.Visibility = hasLoot || hasMade ? Visibility.Visible : Visibility.Collapsed;
-        LootViewAll.Foreground = (Brush)FindResource(view is "looted" or "made" ? "DimBrush" : "AccentBrush");
+        // empty — otherwise a player can't tell the filter is there (LW, 2026-08-17).
+        LootViewBar.Visibility = hasLooted || hasOther ? Visibility.Visible : Visibility.Collapsed;
+        LootViewAll.Foreground = (Brush)FindResource(view is "looted" or "other" ? "DimBrush" : "AccentBrush");
         LootViewLooted.Foreground = (Brush)FindResource(view == "looted" ? "AccentBrush" : "DimBrush");
-        LootViewMade.Foreground = (Brush)FindResource(view == "made" ? "AccentBrush" : "DimBrush");
+        LootViewOther.Foreground = (Brush)FindResource(view == "other" ? "AccentBrush" : "DimBrush");
 
-        // Sort follows the visible items; "recent" is a looted-only idea (made items carry
-        // no arrival order), so it's hidden in the made-only view.
-        var itemCount = view switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
-        LootSortBar.Visibility = itemCount > 1 ? Visibility.Visible : Visibility.Collapsed;
-        LootSortRecent.Visibility = view != "made" ? Visibility.Visible : Visibility.Collapsed;
+        var rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.Fashioned, s.RecentLoot, view, mode);
+
+        // Sort follows the visible list; "recent" only means something when the view holds
+        // timestamped items (looted/foraged/parcel) — crafted/merged carry no arrival order.
+        var hasTimeline = view switch
+        {
+            "looted" => hasLooted,
+            "other" => s.Loot.Any(l => IsOther(l.LastSource)),
+            _ => s.Loot.Count > 0,
+        };
+        LootSortBar.Visibility = rows.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        LootSortRecent.Visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;
         LootSortCount.Foreground = (Brush)FindResource(mode == "name" || mode == "recent" ? "DimBrush" : "AccentBrush");
         LootSortName.Foreground = (Brush)FindResource(mode == "name" ? "AccentBrush" : "DimBrush");
         LootSortRecent.Foreground = (Brush)FindResource(mode == "recent" ? "AccentBrush" : "DimBrush");
 
-        // One list: under "all" looted and made are mixed and ordered together, so a made
-        // item's big stack sorts among the looted ones rather than after a heading. Made
-        // items are real items with wiki pages (and quest turn-ins), so they get the same
-        // click / hover / quest-badge treatment as loot.
-        var rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, view, mode);
-        if (rows.Count == 0 && (hasLoot || hasMade))
+        if (rows.Count == 0 && (hasLooted || hasOther))
         {
             // The chosen slice is empty but the card isn't — name the empty slice rather
             // than blanking (or silently showing a different one).
             LootList.Items.Clear();
             var note = new TextBlock
             {
-                Text = view == "made" ? "No made items yet." : "No looted items yet.",
+                Text = view == "looted" ? "No looted items yet." : "Nothing else yet.",
                 FontSize = 12, Margin = new Thickness(0, 1, 0, 1),
             };
             note.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
@@ -1821,14 +1827,13 @@ public partial class MainWindow : Window
         }
         else
         {
-            // Foraged items are tagged inline (a muted "(Foraged)") so provenance is clear
-            // without becoming part of the name (LW, 2026-08-17).
-            var foraged = new HashSet<string>(
-                s.Loot.Where(l => l.LastSource == "Forage").Select(l => l.Item),
-                StringComparer.OrdinalIgnoreCase);
-            FillList(LootList, rows, onNameClick: ShowItemInfo,
+            // Provenance rides inline as a muted "(Foraged)"/"(Crafted)"/"(Merged)"/"(Parcel)"
+            // so it's clear without becoming part of the name (LW, 2026-08-17).
+            var tagByName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var r in rows) if (r.Tag is { } t) tagByName[r.Item] = $"({t})";
+            FillList(LootList, rows.Select(r => (r.Item, r.Value)), onNameClick: ShowItemInfo,
                 tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true,
-                foraged: foraged.Count > 0 ? foraged.Contains : null);
+                noteFor: tagByName.Count > 0 ? n => tagByName.GetValueOrDefault(n) : null);
         }
         CraftedLabel.Visibility = Visibility.Collapsed;
         CraftedList.Items.Clear();
@@ -2330,8 +2335,9 @@ public partial class MainWindow : Window
         KpiLoot.Text = $"{s.LootTotal}";
         KpiXp.Text = $"{s.XpPerHour:0.#}%";
         KillsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
-        LootHeader.Text = s.CraftedTotal > 0
-            ? $"{s.LootTotal} items (+{s.CraftedTotal} made)"
+        var madeTotal = s.CraftedTotal + s.FashionedTotal;   // merges + crafts
+        LootHeader.Text = madeTotal > 0
+            ? $"{s.LootTotal} items (+{madeTotal} made)"
             : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
         var motes = Motes.Summarize(s.Loot, s.Elapsed);
         MotesHeader.Text = motes.Total > 0 ? $"{motes.Total} · {motes.PerHour:0.#}/hr" : "0";
@@ -3996,7 +4002,7 @@ public partial class MainWindow : Window
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         Func<string, Brush>? valueBrush = null, Action<string>? onNameClick = null,
         Func<string, string?>? tooltip = null, Func<string, Brush?>? nameBrush = null,
-        bool questBadges = false, Func<string, bool>? foraged = null)
+        bool questBadges = false, Func<string, string?>? noteFor = null)
     {
         var items = rows.ToList();
         list.Items.Clear();
@@ -4012,12 +4018,12 @@ public partial class MainWindow : Window
                 Foreground = nameBrush?.Invoke(name) ?? (Brush)FindResource("TextBrush"),
                 Margin = new Thickness(0, 1, 8, 1),
             };
-            // Provenance rides inline as a muted "(Foraged)" after the name — a separate
-            // run, not part of the name, so the click still looks up the base item.
-            if (foraged?.Invoke(name) == true)
+            // Provenance rides inline as a muted "(Foraged)"/"(Crafted)"/… after the name —
+            // a separate run, not part of the name, so the click still looks up the base item.
+            if (noteFor?.Invoke(name) is { Length: > 0 } note)
             {
                 left.Inlines.Add(new System.Windows.Documents.Run(name));
-                left.Inlines.Add(new System.Windows.Documents.Run(" (Foraged)")
+                left.Inlines.Add(new System.Windows.Documents.Run($" {note}")
                 {
                     FontSize = 11, Foreground = (Brush)FindResource("DimBrush"),
                 });

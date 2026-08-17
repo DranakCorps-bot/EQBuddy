@@ -502,7 +502,7 @@ public partial class BreakoutWindow : Window
     private void UpdateLoot(StatsSnapshot s)
     {
         TitleText.Text = "🎒 Loot";
-        List<(string Name, string Value)> rows;
+        List<EQBuddy.UI.Shared.LootRow> rows;
         string emptyText;
         if (_fightScope)   // = Target scope for this kind
         {
@@ -512,36 +512,43 @@ public partial class BreakoutWindow : Window
             var (header, targetRows) = Main?.TargetDropsContent(s) ?? ("", []);
             var hasTarget = header.Length > 0;
             SubText.Text = hasTarget ? header.Replace("🎯 Fighting: ", "🎯 ") : "No target";
-            rows = targetRows;
+            rows = targetRows.Select(t => new EQBuddy.UI.Shared.LootRow(t.Name, t.Value, null)).ToList();
             emptyText = hasTarget
                 ? Main?.TargetEmptyNote(s) ?? "Nothing known for this creature yet."
                 : "Swing at something — or /consider it — and its\npossible drops appear here.";
         }
         else
         {
-            // "+N made" echoes the card header, so the two views agree at a glance (#131).
+            // "+N made" echoes the card header (merges + crafts), so the two agree (#131).
+            var madeTotal = s.CraftedTotal + s.FashionedTotal;
             SubText.Text = $"Session · {s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")} looted"
-                + (s.CraftedTotal > 0 ? $" · +{s.CraftedTotal} made" : "");
+                + (madeTotal > 0 ? $" · +{madeTotal} made" : "");
 
-            // Same show filter and row order as the Loot card, via the shared builder: all
-            // (looted + made mixed) / looted (incl. forage) / made. Uncapped — a rare drop
-            // can't be truncated.
+            // Same show filter and row order as the Loot card, via the shared builder:
+            // all / looted (corpse) / other (foraged, crafted, merged, parcel). Uncapped.
             var mode = _settings.LootSort;
-            var view = _settings.LootView;
-            var hasLoot = s.Loot.Count > 0;
-            var hasMade = s.Crafted.Count > 0;
+            var view = _settings.LootView == "made" ? "other" : _settings.LootView;
+            static bool IsOther(string src) => src is "Forage" or "Parcel";
+            var hasLooted = s.Loot.Any(l => !IsOther(l.LastSource));
+            var hasOther = s.Loot.Any(l => IsOther(l.LastSource))
+                           || s.Crafted.Count > 0 || s.Fashioned.Count > 0;
 
             // The show toggle stays up whenever there's ANY loot, so the filter is
             // discoverable even with only one kind of item (LW, 2026-08-17).
-            LootViewBar.Visibility = hasLoot || hasMade ? Visibility.Visible : Visibility.Collapsed;
-            var itemCount = view switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
-            LootSortBar.Visibility = itemCount > 1 ? Visibility.Visible : Visibility.Collapsed;
-            // Recent is a looted-only idea (made items carry no arrival order).
-            LootSortRecent.Visibility = view != "made" ? Visibility.Visible : Visibility.Collapsed;
+            LootViewBar.Visibility = hasLooted || hasOther ? Visibility.Visible : Visibility.Collapsed;
+            rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.Fashioned, s.RecentLoot, view, mode);
+            var hasTimeline = view switch
+            {
+                "looted" => hasLooted,
+                "other" => s.Loot.Any(l => IsOther(l.LastSource)),
+                _ => s.Loot.Count > 0,
+            };
+            LootSortBar.Visibility = rows.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+            // Recent means nothing without timestamped items (crafted/merged carry none).
+            LootSortRecent.Visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;
 
-            rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, view, mode);
-            emptyText = (hasLoot || hasMade)
-                ? (view == "made" ? "No made items yet." : "No looted items yet.")   // slice empty, card isn't
+            emptyText = (hasLooted || hasOther)
+                ? (view == "looted" ? "No looted items yet." : "Nothing else yet.")
                 : "No loot seen yet.";
         }
 
@@ -554,27 +561,21 @@ public partial class BreakoutWindow : Window
             return;
         }
 
-        var sig = $"loot|{_fightScope}|{_settings.LootView}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}";
+        var sig = $"loot|{_fightScope}|{_settings.LootView}|{_settings.LootSort}|{SubText.Text}|"
+            + string.Join(",", rows.Select(r => r.Item + r.Value + r.Tag));
         if (sig == _signature) return;
         _signature = sig;
 
         Rows.Items.Clear();
         var barBrush = BreakdownRows.BarBrush(this);
-        // Foraged items wear a muted "(Foraged)" — but only in the Session list; Target
-        // rows are a creature's possible drops, not things you looted.
-        var foraged = _fightScope
-            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            : new HashSet<string>(
-                s.Loot.Where(l => l.LastSource == "Forage").Select(l => l.Item),
-                StringComparer.OrdinalIgnoreCase);
-        foreach (var (name, value) in rows)
-            Rows.Items.Add(BuildItemRow(name, value, barBrush, foraged.Contains(name)));
+        foreach (var r in rows)
+            Rows.Items.Add(BuildItemRow(r.Item, r.Value, barBrush, r.Tag));
     }
 
     /// <summary>An item row wired the way David specced the breakout: hover = the eqlwiki
     /// item info, fetched on the spot if the cache is empty (the tooltip live-updates
     /// from "Looking up…"); click = the eqlwiki page in the browser.</summary>
-    private Grid BuildItemRow(string name, string value, Brush barBrush, bool foraged = false)
+    private Grid BuildItemRow(string name, string value, Brush barBrush, string? tag = null)
     {
         var cachedTip = Main?.CachedItemStats(name);
 
@@ -603,7 +604,7 @@ public partial class BreakoutWindow : Window
         }
 
         var row = BreakdownRows.Row(this, name, value, 0, barBrush, null, nameBadge: badge,
-            nameNote: foraged ? "(Foraged)" : null);
+            nameNote: tag is { Length: > 0 } ? $"({tag})" : null);
         var tipText = new TextBlock
         {
             Text = cachedTip ?? "Looking up on eqlwiki…",
@@ -1045,13 +1046,13 @@ public partial class BreakoutWindow : Window
 
     private void ApplyLootViewVisual()
     {
-        var view = _settings.LootView;
+        var view = _settings.LootView == "made" ? "other" : _settings.LootView;
         LootViewAll.SetResourceReference(TextBlock.ForegroundProperty,
-            view is "looted" or "made" ? "DimBrush" : "AccentBrush");
+            view is "looted" or "other" ? "DimBrush" : "AccentBrush");
         LootViewLooted.SetResourceReference(TextBlock.ForegroundProperty,
             view == "looted" ? "AccentBrush" : "DimBrush");
-        LootViewMade.SetResourceReference(TextBlock.ForegroundProperty,
-            view == "made" ? "AccentBrush" : "DimBrush");
+        LootViewOther.SetResourceReference(TextBlock.ForegroundProperty,
+            view == "other" ? "AccentBrush" : "DimBrush");
     }
 
     private void OnDismiss(object sender, MouseButtonEventArgs e)

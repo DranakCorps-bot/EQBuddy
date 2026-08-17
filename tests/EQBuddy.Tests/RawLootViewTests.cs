@@ -169,6 +169,24 @@ public class RawLootViewTests
     }
 
     [Fact]
+    public void AFashionedItemIsAFashionEvent()
+    {
+        var evt = Assert.IsType<FashionEvent>(LogParser.Parse(
+            "[Sat Aug 15 17:17:46 2026] You have fashioned the items together to create something new: Elixir of Greater Concentration."));
+        Assert.Equal("Elixir of Greater Concentration", evt.Item);
+    }
+
+    [Fact]
+    public void AParcelDeliveryIsLootedWithParcelSourceAndCount()
+    {
+        var evt = Assert.IsType<LootEvent>(LogParser.Parse(
+            "[Sun Aug 16 14:47:14 2026] You have received a new parcel delivery containing 3 Blackburrow Stout from Rodrigo!"));
+        Assert.Equal("Blackburrow Stout", evt.Item);
+        Assert.Equal("Parcel", evt.Source);
+        Assert.Equal(3, evt.Count);
+    }
+
+    [Fact]
     public void AFailedForageIsNotAnEvent()
     {
         // A miss is not an acquisition and must not reach the loot card.

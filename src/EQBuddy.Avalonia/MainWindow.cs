@@ -1892,7 +1892,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _kpiLoot.Text = $"{s.LootTotal}";
         _kpiXp.Text = $"{s.XpPerHour:0.#}%";
         _killsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
-        _lootHeader.Text = s.CraftedTotal > 0 ? $"{s.LootTotal} items (+{s.CraftedTotal} made)" : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
+        _lootHeader.Text = s.CraftedTotal + s.FashionedTotal > 0 ? $"{s.LootTotal} items (+{s.CraftedTotal + s.FashionedTotal} made)" : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
         var motes = Motes.Summarize(s.Loot, s.Elapsed);
         _motesHeader.Text = motes.Total > 0 ? $"{motes.Total} · {motes.PerHour:0.#}/hr" : "0";
         // A session rollover empties the loot lists lazily, inside the same batch

@@ -272,6 +272,18 @@ public static partial class LogParser
     [GeneratedRegex(@"^You have successfully merged two items together to create a new item: (?<item>.+?)\.?$")]
     private static partial Regex MergeRx();
 
+    // You have fashioned the items together to create something new: Elixir of Concentration.
+    // Tradeskill combine (potions/elixirs) — the "(Crafted)" provenance, distinct from a merge.
+    [GeneratedRegex(@"^You have fashioned the items together to create something new: (?<item>.+?)\.?$")]
+    private static partial Regex FashionRx();
+
+    // You have received a new parcel delivery containing 1 Short Sword of the Ykesha from Rodrigo!
+    // An NPC/courier handed you an item — the one NPC-give the game names (a direct trade or
+    // turn-in logs only "You complete the trade", with no item). Routed like forage: a
+    // LootEvent with "Parcel" as its source, so it counts and can tick a quest.
+    [GeneratedRegex(@"^You have received a new parcel delivery containing (?<n>\d+) (?<item>.+?) from .+?!$")]
+    private static partial Regex ParcelRx();
+
     [GeneratedRegex(@"^Your (?<spell>.+?) spell fizzles!$")]
     private static partial Regex FizzleRx();
 
@@ -600,6 +612,14 @@ public static partial class LogParser
 
         if ((r = ForageRx().Match(msg)).Success)
             return new LootEvent(ts, r.Groups["item"].Value, "Forage", null);
+
+        if ((r = ParcelRx().Match(msg)).Success)
+            return new LootEvent(ts, r.Groups["item"].Value, "Parcel", null,
+                Count: int.Parse(r.Groups["n"].Value));
+
+        // Fashioned combines sit with the other acquisitions (loot/forage/parcel).
+        if ((r = FashionRx().Match(msg)).Success)
+            return new FashionEvent(ts, r.Groups["item"].Value);
 
         if ((r = MoneyRx().Match(msg)).Success)
         {

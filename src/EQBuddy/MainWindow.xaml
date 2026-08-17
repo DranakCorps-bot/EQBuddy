@@ -456,9 +456,9 @@
                 <StackPanel>
                     <!-- View filter on the left, sort on the right, one row. -->
                     <Grid Margin="0,0,2,1">
-                        <!-- Show: all / looted (incl. forage) / made — pick the slice you
-                             care about. Looted and made were already two stacked lists;
-                             this lets you collapse to either. -->
+                        <!-- Show: all / looted / other — pick the slice you care about.
+                             Looted is corpse drops; other is everything else you acquired
+                             (foraged, crafted, merged, parcel), each tagged in the list. -->
                         <StackPanel x:Name="LootViewBar" Orientation="Horizontal"
                                     HorizontalAlignment="Left">
                             <TextBlock Text="show:" FontSize="10" Foreground="{DynamicResource DimBrush}"
@@ -467,10 +467,10 @@
                                        Tag="all" MouseLeftButtonDown="OnLootView" Margin="0,0,6,0"/>
                             <TextBlock x:Name="LootViewLooted" Text="looted" FontSize="10" Cursor="Hand"
                                        Tag="looted" MouseLeftButtonDown="OnLootView" Margin="0,0,6,0"
-                                       ToolTip="Items you looted from corpses or foraged."/>
-                            <TextBlock x:Name="LootViewMade" Text="made" FontSize="10" Cursor="Hand"
-                                       Tag="made" MouseLeftButtonDown="OnLootView"
-                                       ToolTip="Items you created by combining."/>
+                                       ToolTip="Items you looted from corpses."/>
+                            <TextBlock x:Name="LootViewOther" Text="other" FontSize="10" Cursor="Hand"
+                                       Tag="other" MouseLeftButtonDown="OnLootView"
+                                       ToolTip="Everything else: foraged, crafted, merged, or parcel."/>
                         </StackPanel>
                         <!-- Sort toggle (Klona11, discussion #43): count keeps the original
                              biggest-stacks-first order; name is alphabetical. -->

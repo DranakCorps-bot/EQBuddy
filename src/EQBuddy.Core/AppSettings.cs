@@ -346,9 +346,9 @@ public sealed class AppSettings
     /// "name" (alphabetical — Klona11's ask, discussion #43).</summary>
     public string LootSort { get; set; } = "count";
 
-    /// <summary>Which slice of the loot card to show: "all" (looted list then the made
-    /// list, the original two-list layout), "looted" (corpse + foraged only), or "made"
-    /// (combine results only). Shared by the Loot card and its breakout.</summary>
+    /// <summary>Which slice of the loot card to show: "all", "looted" (corpse drops only),
+    /// or "other" (everything else acquired — foraged, crafted, merged, parcel). Shared by
+    /// the Loot card and its breakout. Legacy "made" is read as "other".</summary>
     public string LootView { get; set; } = "all";
 
     /// <summary>Player-supplied hp-per-tick for the regen healing estimate (0 = use the
