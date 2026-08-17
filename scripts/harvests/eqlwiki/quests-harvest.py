@@ -281,6 +281,22 @@ def parse_quest(title, wikitext, quest_item_set, widened=False):
     reward_section = re.search(r"=+\s*Rewards?\s*=+([^=]*)", wikitext, re.IGNORECASE)
     if reward_section:
         rewards |= {n.strip() for n in re.findall(LINK, reward_section.group(1))}
+    # …and the rows of any wikitable in that section. The capture above ends at the
+    # next "=" character, which a table hits on its own opening line ({| class="…"),
+    # so a rewards list written as a table was read as no rewards at all: Soldier's
+    # Brooch Quest lost all eight of them on 2026-08-17 when the wiki reformatted
+    # its bullet list into a stat-comparison table. Deliberately additive — the
+    # narrative capture is left exactly as it was, because pages do also name real
+    # rewards in prose (Bulthar Trunks' gems, Rathmana's spell list), and a rule
+    # tight enough to drop the prose junk drops those with it.
+    full_section = re.search(r"=+\s*Rewards?\s*=+[^\n]*\n(.*?)(?=\n=+[^=\n]|\Z)",
+                             wikitext, re.IGNORECASE | re.DOTALL)
+    if full_section:
+        for table in re.findall(r"^\{\|.*?^\|\}", full_section.group(1),
+                                re.DOTALL | re.MULTILINE):
+            for row in table.splitlines():
+                if row.startswith("|") and not row.startswith("|}"):
+                    rewards |= {n.strip() for n in re.findall(LINK, row)}
     for gearset in re.findall(r"\{\{\s*Gear\s*Set\s*\|(.*?)\}\}", wikitext, re.DOTALL):
         rewards |= {p.strip() for p in gearset.split("|") if p.strip()}
     q["rewards"] = sorted(r for r in rewards if r)

@@ -34413,7 +34413,16 @@
   "minLevel": 30,
   "classes": "All",
   "items": [],
-  "rewards": [],
+  "rewards": [
+   "Soldier's Brooch of the Arcane",
+   "Soldier's Brooch of the Corrupt",
+   "Soldier's Brooch of the Darkened",
+   "Soldier's Brooch of the Robust",
+   "Soldier's Brooch of the Spirited",
+   "Soldier's Brooch of the Stalwart",
+   "Soldier's Brooch of the Stealthy",
+   "Soldier's Brooch of the Virtuous"
+  ],
   "categories": [],
   "relatedZones": [
    "Rathe Mountains"
