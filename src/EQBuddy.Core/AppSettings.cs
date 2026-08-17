@@ -346,6 +346,11 @@ public sealed class AppSettings
     /// "name" (alphabetical — Klona11's ask, discussion #43).</summary>
     public string LootSort { get; set; } = "count";
 
+    /// <summary>Which slice of the loot card to show: "all" (looted list then the made
+    /// list, the original two-list layout), "looted" (corpse + foraged only), or "made"
+    /// (combine results only). Shared by the Loot card and its breakout.</summary>
+    public string LootView { get; set; } = "all";
+
     /// <summary>Player-supplied hp-per-tick for the regen healing estimate (0 = use the
     /// wiki base value). The log can't see instrument resonance or spell ranks; the
     /// player's own health bar can — their number wins (David, 2026-08-06).</summary>

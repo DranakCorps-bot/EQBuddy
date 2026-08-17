@@ -454,22 +454,41 @@
                     </Grid>
                 </Expander.Header>
                 <StackPanel>
-                    <!-- Sort toggle (Klona11, discussion #43): count keeps the original
-                         biggest-stacks-first order; name is alphabetical. -->
-                    <StackPanel x:Name="LootSortBar" Orientation="Horizontal"
-                                HorizontalAlignment="Right" Margin="0,0,2,1">
-                        <TextBlock Text="sort:" FontSize="10" Foreground="{DynamicResource DimBrush}"
-                                   Margin="0,0,4,0"/>
-                        <TextBlock x:Name="LootSortCount" Text="count" FontSize="10" Cursor="Hand"
-                                   Tag="count" MouseLeftButtonDown="OnLootSort" Margin="0,0,6,0"/>
-                        <TextBlock x:Name="LootSortName" Text="name" FontSize="10" Cursor="Hand"
-                                   Tag="name" MouseLeftButtonDown="OnLootSort" Margin="0,0,6,0"/>
-                        <!-- Every drop in arrival order, not the totals (#160, wizen):
-                             the way to spot the one rare thing among 200 of the same. -->
-                        <TextBlock x:Name="LootSortRecent" Text="recent" FontSize="10" Cursor="Hand"
-                                   Tag="recent" MouseLeftButtonDown="OnLootSort"
-                                   ToolTip="Every drop as it happened, newest first — how you catch the one unusual thing in a long farm. Runs of the same item collapse into a single row."/>
-                    </StackPanel>
+                    <!-- View filter on the left, sort on the right, one row. -->
+                    <Grid Margin="0,0,2,1">
+                        <!-- Show: all / looted (incl. forage) / made — pick the slice you
+                             care about. Looted and made were already two stacked lists;
+                             this lets you collapse to either. -->
+                        <StackPanel x:Name="LootViewBar" Orientation="Horizontal"
+                                    HorizontalAlignment="Left">
+                            <TextBlock Text="show:" FontSize="10" Foreground="{DynamicResource DimBrush}"
+                                       Margin="0,0,4,0"/>
+                            <TextBlock x:Name="LootViewAll" Text="all" FontSize="10" Cursor="Hand"
+                                       Tag="all" MouseLeftButtonDown="OnLootView" Margin="0,0,6,0"/>
+                            <TextBlock x:Name="LootViewLooted" Text="looted" FontSize="10" Cursor="Hand"
+                                       Tag="looted" MouseLeftButtonDown="OnLootView" Margin="0,0,6,0"
+                                       ToolTip="Items you looted from corpses or foraged."/>
+                            <TextBlock x:Name="LootViewMade" Text="made" FontSize="10" Cursor="Hand"
+                                       Tag="made" MouseLeftButtonDown="OnLootView"
+                                       ToolTip="Items you created by combining."/>
+                        </StackPanel>
+                        <!-- Sort toggle (Klona11, discussion #43): count keeps the original
+                             biggest-stacks-first order; name is alphabetical. -->
+                        <StackPanel x:Name="LootSortBar" Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <TextBlock Text="sort:" FontSize="10" Foreground="{DynamicResource DimBrush}"
+                                       Margin="0,0,4,0"/>
+                            <TextBlock x:Name="LootSortCount" Text="count" FontSize="10" Cursor="Hand"
+                                       Tag="count" MouseLeftButtonDown="OnLootSort" Margin="0,0,6,0"/>
+                            <TextBlock x:Name="LootSortName" Text="name" FontSize="10" Cursor="Hand"
+                                       Tag="name" MouseLeftButtonDown="OnLootSort" Margin="0,0,6,0"/>
+                            <!-- Every drop in arrival order, not the totals (#160, wizen):
+                                 the way to spot the one rare thing among 200 of the same. -->
+                            <TextBlock x:Name="LootSortRecent" Text="recent" FontSize="10" Cursor="Hand"
+                                       Tag="recent" MouseLeftButtonDown="OnLootSort"
+                                       ToolTip="Every drop as it happened, newest first — how you catch the one unusual thing in a long farm. Runs of the same item collapse into a single row."/>
+                        </StackPanel>
+                    </Grid>
                     <ItemsControl x:Name="LootList"/>
                     <TextBlock x:Name="CraftedLabel" Text="Created by merging" Style="{StaticResource SectionLabel}" Margin="0,6,0,0" Visibility="Collapsed"/>
                     <ItemsControl x:Name="CraftedList" Margin="0,2,0,0"/>

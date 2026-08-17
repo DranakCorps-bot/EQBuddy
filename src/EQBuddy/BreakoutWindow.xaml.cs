@@ -109,7 +109,8 @@ public partial class BreakoutWindow : Window
             // SESSION has yielded (David, 2026-08-06).
             ScopeFight.Text = "Target";
             ScopeSession.Text = "Session";
-            ApplyLootSortVisual();   // the bar itself is shown by UpdateLoot (Session + >1 item)
+            ApplyLootSortVisual();   // the bars themselves are shown by UpdateLoot
+            ApplyLootViewVisual();
         }
         ApplyScopeVisual();
     }
@@ -501,15 +502,14 @@ public partial class BreakoutWindow : Window
     private void UpdateLoot(StatsSnapshot s)
     {
         TitleText.Text = "🎒 Loot";
-        // The Count/Name/Recent bar belongs to the Session view, and only earns its row
-        // once there's more than one item to order — same rule the Loot card uses.
-        LootSortBar.Visibility = !_fightScope && s.Loot.Count > 1
-            ? Visibility.Visible : Visibility.Collapsed;
         List<(string Name, string Value)> rows;
         List<(string Name, string Value)> crafted = [];
         string emptyText;
         if (_fightScope)   // = Target scope for this kind
         {
+            // The show/sort bars belong to the Session view; Target is a different axis.
+            LootViewBar.Visibility = Visibility.Collapsed;
+            LootSortBar.Visibility = Visibility.Collapsed;
             var (header, targetRows) = Main?.TargetDropsContent(s) ?? ("", []);
             var hasTarget = header.Length > 0;
             SubText.Text = hasTarget ? header.Replace("🎯 Fighting: ", "🎯 ") : "No target";
@@ -523,21 +523,46 @@ public partial class BreakoutWindow : Window
             // "+N made" echoes the card header, so the two views agree at a glance (#131).
             SubText.Text = $"Session · {s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")} looted"
                 + (s.CraftedTotal > 0 ? $" · +{s.CraftedTotal} made" : "");
+
+            // Same show filter as the Loot card: all / looted (incl. forage) / made, with
+            // the never-blank fallback when the chosen slice is empty but the other isn't.
+            var view = _settings.LootView;
+            var hasLoot = s.Loot.Count > 0;
+            var hasMade = s.Crafted.Count > 0;
+            var showLooted = view != "made";
+            var showMade = view != "looted";
+            if (view == "made" && !hasMade && hasLoot) showLooted = true;
+            if (view == "looted" && !hasLoot && hasMade) showMade = true;
+
+            LootViewBar.Visibility = hasLoot && hasMade ? Visibility.Visible : Visibility.Collapsed;
+            var sortCount = showLooted ? s.Loot.Count : s.Crafted.Count;
+            LootSortBar.Visibility = sortCount > 1 ? Visibility.Visible : Visibility.Collapsed;
+            // Recent is a looted-only idea (made items carry no arrival order).
+            LootSortRecent.Visibility = showLooted ? Visibility.Visible : Visibility.Collapsed;
+
             // Exactly the Loot card's three sorts (MainWindow ~2452), uncapped so a rare
             // drop can't be truncated past the fold — the lag TropicMike/wizen saw. Recent
             // is arrival order with runs collapsed, so a new drop surfaces at the top the
             // instant it lands instead of sinking to the bottom of a count-sorted list.
             var mode = _settings.LootSort;
-            rows = mode == "recent"
-                ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot).Select(r => (r.Item, r.Detail)).ToList()
-                : (mode == "name"
-                        ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
-                        : s.Loot)
-                    .Select(l => (l.Item, $"×{l.Count}")).ToList();
+            rows = showLooted
+                ? (mode == "recent"
+                    ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot).Select(r => (r.Item, r.Detail)).ToList()
+                    : (mode == "name"
+                            ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
+                            : s.Loot)
+                        .Select(l => (l.Item, $"×{l.Count}")).ToList())
+                : [];
             // Made items ride the Session scope only: crafts are session-cumulative, and
             // Target scope is a different axis entirely — what a creature can drop —
-            // where an item nobody drops would misstate the view (#131, TropicMike).
-            crafted = s.Crafted.Select(c => (c.Name, $"×{c.Count}")).ToList();
+            // where an item nobody drops would misstate the view (#131, TropicMike). No
+            // arrival order for crafts, so "recent" falls back to count-desc here.
+            crafted = showMade
+                ? (mode == "name"
+                        ? s.Crafted.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                        : s.Crafted.AsEnumerable())
+                    .Select(c => (c.Name, $"×{c.Count}")).ToList()
+                : [];
             emptyText = "No loot seen yet.";
         }
 
@@ -551,7 +576,7 @@ public partial class BreakoutWindow : Window
             return;
         }
 
-        var sig = $"loot|{_fightScope}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}"
+        var sig = $"loot|{_fightScope}|{_settings.LootView}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}"
             + $"|made:{string.Join(",", crafted.Select(c => c.Name + c.Value))}";
         if (sig == _signature) return;
         _signature = sig;
@@ -562,10 +587,16 @@ public partial class BreakoutWindow : Window
             Rows.Items.Add(BuildItemRow(name, value, barBrush));
         if (crafted.Count > 0)
         {
-            // Same label text as the Loot card — one vocabulary for merges everywhere.
-            var label = new TextBlock { Text = "Created by merging" };
-            label.Style = (Style)FindResource("SectionLabel");
-            Rows.Items.Add(label);
+            // The "Created by merging" label is a separator between two lists — it only
+            // earns its place when looted rows are above it. In the made-only view the
+            // crafts stand alone and need no heading.
+            if (rows.Count > 0)
+            {
+                // Same label text as the Loot card — one vocabulary for merges everywhere.
+                var label = new TextBlock { Text = "Created by merging" };
+                label.Style = (Style)FindResource("SectionLabel");
+                Rows.Items.Add(label);
+            }
             // Crafted items are real items with wiki pages, so they get the same
             // hover/click affordances as loot rows.
             foreach (var (name, value) in crafted)
@@ -1030,6 +1061,29 @@ public partial class BreakoutWindow : Window
             mode == "name" ? "AccentBrush" : "DimBrush");
         LootSortRecent.SetResourceReference(TextBlock.ForegroundProperty,
             mode == "recent" ? "AccentBrush" : "DimBrush");
+    }
+
+    /// <summary>all / looted / made for the Loot Session view — writes the same
+    /// _settings.LootView the main Loot card reads, so the two windows stay in step.</summary>
+    private void OnLootViewClick(object sender, MouseButtonEventArgs e)
+    {
+        _settings.LootView = (string)((FrameworkElement)sender).Tag;
+        _settings.Save();
+        ApplyLootViewVisual();
+        _signature = "";
+        if (_lastSnapshot is { } s) UpdateLoot(s);   // repaint now, not next tick
+        e.Handled = true;
+    }
+
+    private void ApplyLootViewVisual()
+    {
+        var view = _settings.LootView;
+        LootViewAll.SetResourceReference(TextBlock.ForegroundProperty,
+            view is "looted" or "made" ? "DimBrush" : "AccentBrush");
+        LootViewLooted.SetResourceReference(TextBlock.ForegroundProperty,
+            view == "looted" ? "AccentBrush" : "DimBrush");
+        LootViewMade.SetResourceReference(TextBlock.ForegroundProperty,
+            view == "made" ? "AccentBrush" : "DimBrush");
     }
 
     private void OnDismiss(object sender, MouseButtonEventArgs e)

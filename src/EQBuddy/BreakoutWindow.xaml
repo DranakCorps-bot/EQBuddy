@@ -82,6 +82,20 @@
                 <TextBlock x:Name="LootSortRecent" Text="recent" FontSize="10" Cursor="Hand"
                            Tag="recent" MouseLeftButtonDown="OnLootSortClick"/>
             </StackPanel>
+            <!-- Loot Session scope only: show all / looted (incl. forage) / made, the same
+                 slice toggle as the main Loot card, sharing _settings.LootView. Left edge of
+                 the same row the sort links right-align in. -->
+            <StackPanel Grid.Row="2" x:Name="LootViewBar" Orientation="Horizontal"
+                        HorizontalAlignment="Left" Margin="0,0,2,3" Visibility="Collapsed">
+                <TextBlock Text="show:" FontSize="10" Margin="0,0,4,0"
+                           Foreground="{DynamicResource DimBrush}"/>
+                <TextBlock x:Name="LootViewAll" Text="all" FontSize="10" Cursor="Hand"
+                           Tag="all" MouseLeftButtonDown="OnLootViewClick" Margin="0,0,6,0"/>
+                <TextBlock x:Name="LootViewLooted" Text="looted" FontSize="10" Cursor="Hand"
+                           Tag="looted" MouseLeftButtonDown="OnLootViewClick" Margin="0,0,6,0"/>
+                <TextBlock x:Name="LootViewMade" Text="made" FontSize="10" Cursor="Hand"
+                           Tag="made" MouseLeftButtonDown="OnLootViewClick"/>
+            </StackPanel>
             <ScrollViewer Grid.Row="3" x:Name="RowsScroll" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
                 <StackPanel>

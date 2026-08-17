@@ -1772,30 +1772,77 @@ public partial class MainWindow : Window
         e.Handled = true;
     }
 
-    /// <summary>Paints the Loot card from a snapshot: the Count/Name/Recent sort visuals,
-    /// the list itself, crafted items, and the target-drops panel. Split out of RefreshUi
-    /// so a sort click can repaint this one card instead of the entire widget.</summary>
+    /// <summary>Paints the Loot card from a snapshot: the show/sort visuals, the looted
+    /// and made lists (filtered by the show toggle), and the target-drops panel. Split out
+    /// of RefreshUi so a sort or view click repaints this one card, not the whole widget.</summary>
     private void RenderLoot(StatsSnapshot s)
     {
         var mode = _settings.LootSort;
-        LootSortBar.Visibility = s.Loot.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        var view = _settings.LootView;   // all | looted | made
+        var hasLoot = s.Loot.Count > 0;
+        var hasMade = s.Crafted.Count > 0;
+        var showLooted = view != "made";
+        var showMade = view != "looted";
+        // Never blank the card (CLAUDE.md: cards always show): if the chosen slice is empty
+        // but the other has rows, fall back to showing what's there.
+        if (view == "made" && !hasMade && hasLoot) showLooted = true;
+        if (view == "looted" && !hasLoot && hasMade) showMade = true;
+
+        // The show toggle only earns its row when there's actually a choice — both a looted
+        // and a made list present. Otherwise it's noise over a single list.
+        LootViewBar.Visibility = hasLoot && hasMade ? Visibility.Visible : Visibility.Collapsed;
+        LootViewAll.Foreground = (Brush)FindResource(view is "looted" or "made" ? "DimBrush" : "AccentBrush");
+        LootViewLooted.Foreground = (Brush)FindResource(view == "looted" ? "AccentBrush" : "DimBrush");
+        LootViewMade.Foreground = (Brush)FindResource(view == "made" ? "AccentBrush" : "DimBrush");
+
+        // Sort applies to whichever list is on screen. Recent is a looted-only idea (made
+        // items carry no arrival order), so it's hidden in the made-only view.
+        var sortCount = showLooted ? s.Loot.Count : s.Crafted.Count;
+        LootSortBar.Visibility = sortCount > 1 ? Visibility.Visible : Visibility.Collapsed;
+        LootSortRecent.Visibility = showLooted ? Visibility.Visible : Visibility.Collapsed;
         LootSortCount.Foreground = (Brush)FindResource(mode == "name" || mode == "recent" ? "DimBrush" : "AccentBrush");
         LootSortName.Foreground = (Brush)FindResource(mode == "name" ? "AccentBrush" : "DimBrush");
         LootSortRecent.Foreground = (Brush)FindResource(mode == "recent" ? "AccentBrush" : "DimBrush");
-        // "recent" is the raw arrival order, not a re-sort of the totals — the whole
-        // point is that 200 Lion Skins stay 200 rows' worth of history rather than
-        // one row that hides the pelt (#160). Runs collapse; different items don't.
-        var rows = mode == "recent"
-            ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot)
-            : (mode == "name"
-                    ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
-                    : s.Loot)
-                .Select(l => (l.Item, $"×{l.Count}")).ToList();
-        FillList(LootList, rows, onNameClick: ShowItemInfo,
-            tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
-        CraftedLabel.Visibility = s.Crafted.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        FillList(CraftedList, s.Crafted.Select(c => (c.Name, $"×{c.Count}")));
+
+        // Looted list. "recent" is arrival order, not the totals — the whole point is that
+        // 200 Lion Skins stay 200 rows of history rather than one row that hides the pelt
+        // (#160). Runs collapse; different items don't. Foraged items ride here too.
+        if (showLooted)
+        {
+            var rows = mode == "recent"
+                ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot)
+                : (mode == "name"
+                        ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
+                        : s.Loot)
+                    .Select(l => (l.Item, $"×{l.Count}")).ToList();
+            FillList(LootList, rows, onNameClick: ShowItemInfo,
+                tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
+        }
+        else LootList.Items.Clear();
+
+        // Made list. Under "all" it keeps the "Created by merging" separator; on its own it
+        // stands without one. Made items are real items with wiki pages and can be quest
+        // turn-ins, so give them the same click / hover / quest-badge treatment as loot.
+        if (showMade && hasMade)
+        {
+            var made = mode == "name"
+                ? s.Crafted.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                : s.Crafted.AsEnumerable();   // count-desc already; recent has no made order
+            CraftedLabel.Visibility = showLooted ? Visibility.Visible : Visibility.Collapsed;
+            FillList(CraftedList, made.Select(c => (c.Name, $"×{c.Count}")), onNameClick: ShowItemInfo,
+                tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
+        }
+        else { CraftedLabel.Visibility = Visibility.Collapsed; CraftedList.Items.Clear(); }
+
         RenderTargetDrops(s);
+    }
+
+    private void OnLootView(object sender, MouseButtonEventArgs e)
+    {
+        _settings.LootView = (string)((FrameworkElement)sender).Tag;
+        _settings.Save();
+        if (_latestSnapshot is { } s) RenderLoot(s);
+        e.Handled = true;
     }
 
     private void OnPetAbilitiesToggled(object sender, MouseButtonEventArgs e)
