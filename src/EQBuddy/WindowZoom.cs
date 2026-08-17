@@ -16,10 +16,17 @@ namespace EQBuddy;
 /// </summary>
 internal static class WindowZoom
 {
-    public static void Attach(Window window, string key, AppSettings settings)
+    /// <summary><paramref name="baseWidth"/> makes the WINDOW shrink with its content,
+    /// not just the text inside it. Without it a zoomed-out fixed-width window keeps its
+    /// full footprint and merely renders smaller type in the same rectangle — which is
+    /// why "there is no way for me to shrink the window" was a fair description of a
+    /// window that already had a zoom (#186, Kemble-Kemble). Pass the XAML Width.</summary>
+    public static void Attach(Window window, string key, AppSettings settings,
+        double baseWidth = double.NaN)
     {
         if (window.Content is not FrameworkElement root) return;
         Apply(root, settings.WindowZooms.TryGetValue(key, out var saved) ? saved : 1.0);
+        ApplyWidth(window, baseWidth, settings.WindowZooms.TryGetValue(key, out var w) ? w : 1.0);
         window.PreviewMouseWheel += (_, e) =>
         {
             if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
@@ -28,8 +35,15 @@ internal static class WindowZoom
             var next = WindowZoomMath.Step(current, e.Delta);
             settings.WindowZooms[key] = next;
             Apply(root, next);
+            ApplyWidth(window, baseWidth, next);
             settings.Save();
         };
+    }
+
+    private static void ApplyWidth(Window window, double baseWidth, double zoom)
+    {
+        if (double.IsNaN(baseWidth)) return;
+        window.Width = Math.Round(baseWidth * zoom);
     }
 
     /// <summary>For windows whose scale already lives in a named setting: wheel just

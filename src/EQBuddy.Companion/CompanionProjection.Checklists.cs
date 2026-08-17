@@ -10,8 +10,10 @@ namespace EQBuddy.Companion;
 public static partial class CompanionProjection
 {
     /// <summary>A row the auto-tick placed without being able to pick a class shows
-    /// the desktop's marker, so "why is that ticked" reads the same on both screens.</summary>
-    private const string UnassignedMark = " *";
+    /// the desktop's marker, so "why is that ticked" reads the same on both screens.
+    /// Taken from Core rather than spelled again here: for a while this was the ONLY
+    /// surface drawing it, and the desktops silently showed a bare tick (#184).</summary>
+    private const string UnassignedMark = QuestChecklistLayout.UnassignedMark;
 
     private static CompanionChecklistSection BuildEpics(AppSettings? settings)
     {

@@ -17,13 +17,18 @@ namespace EQBuddy.Avalonia;
 /// </summary>
 internal static class WindowZoom
 {
-    public static void Attach(Window window, string key, AppSettings settings)
+    /// <summary><paramref name="baseWidth"/> makes the WINDOW shrink with its content
+    /// rather than rendering smaller type in the same rectangle (#186). Pass the
+    /// window's declared Width.</summary>
+    public static void Attach(Window window, string key, AppSettings settings,
+        double baseWidth = double.NaN)
     {
         if (window.Content is not Control root) return;
         window.Content = null;   // a control can't have two logical parents
         var host = new LayoutTransformControl { Child = root };
         window.Content = host;
         Apply(host, settings.WindowZooms.TryGetValue(key, out var saved) ? saved : 1.0);
+        ApplyWidth(window, baseWidth, saved);
         // Tunnel = WPF's PreviewMouseWheel: the zoom wins over any ScrollViewer beneath.
         window.AddHandler(InputElement.PointerWheelChangedEvent, (_, e) =>
         {
@@ -33,8 +38,15 @@ internal static class WindowZoom
             var next = WindowZoomMath.Step(current, Math.Sign(e.Delta.Y));
             settings.WindowZooms[key] = next;
             Apply(host, next);
+            ApplyWidth(window, baseWidth, next);
             settings.Save();
         }, RoutingStrategies.Tunnel);
+    }
+
+    private static void ApplyWidth(Window window, double baseWidth, double zoom)
+    {
+        if (double.IsNaN(baseWidth)) return;
+        window.Width = Math.Round(baseWidth * zoom);
     }
 
     /// <summary>For windows whose scale already lives in a named setting: wheel just

@@ -16,6 +16,7 @@
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="*"/>
           <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="16,16,16,6">
@@ -39,7 +40,9 @@
             <!-- Class lens, on EVERY tab (David, 2026-08-15). A 486-row Epic list is
                  exactly where narrowing to one of your three classes matters most, and
                  the old filter row was hidden on those tabs entirely. -->
-            <StackPanel x:Name="ClassStrip" Orientation="Horizontal" Margin="0,0,0,7"/>
+            <!-- Wraps, because the strip lists whatever the ⚙ picker holds and that can
+                 be all sixteen: a fixed-width window clipped it at NEC (#184). -->
+            <WrapPanel x:Name="ClassStrip" Margin="0,0,0,7"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -138,7 +141,31 @@
             <StackPanel x:Name="QuestsPanel" Margin="0,0,6,0"/>
         </ScrollViewer>
 
-        <StackPanel Grid.Row="3" Margin="16,8,16,14">
+        <!-- Undo (#184, bjstrange: "An errant click will clear an item without any real
+             feedback. I've mis-clicked on 3 items and now have to figure out what was
+             checked before"). A tick is one click and saves immediately, so the only
+             honest answer is to say what just changed and offer it back. Hidden until
+             there is something to undo. -->
+        <Border x:Name="UndoBar" Grid.Row="3" Visibility="Collapsed" Margin="16,4,16,0"
+                Background="{DynamicResource PopupBrush}" CornerRadius="6"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                Padding="10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="UndoText" Grid.Column="0" FontSize="11.5"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextBrush}"/>
+                <Button x:Name="UndoBtn" Grid.Column="1" Content="↶ undo"
+                        Style="{StaticResource ActionButton}" FontSize="11" Padding="8,2"
+                        Margin="8,0,0,0" Click="OnUndo"
+                        ToolTip="Put the last tick back the way it was (Ctrl+Z)"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="4" Margin="16,8,16,14">
             <TextBlock Style="{StaticResource Dim}" TextWrapping="Wrap"
                        Text="Counts what you loot, minus what the log sees leave (sales, merges, destroys), plus whatever ⧉ scan bags reads from your bags and bank. Hand-ins aren't in the log — click ✔ ready when you turn in, or right-click an item row to clear it. Click a quest name for the full wiki walkthrough."/>
             <!-- The accuracy contract, said plainly (David, 2026-08-11): we mirror the

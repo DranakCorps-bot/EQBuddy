@@ -98,11 +98,26 @@ public sealed class QuestsWindow : Window
     /// Session-scoped like the search box: a sticky lens reads as a broken tracker
     /// tomorrow when you have swapped classes.</summary>
     private string? _classLens;
-    private readonly StackPanel _classStrip = new()
-    {
-        Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 4),
-    };
+    // Wraps, because the strip lists whatever the picker holds and that can be all
+    // sixteen: a fixed-width window clipped it (#184).
+    private readonly WrapPanel _classStrip = new() { Margin = new Thickness(0, 0, 0, 4) };
     private readonly List<(Border Chip, TextBlock Label, string? Class)> _classChips = [];
+
+    // ---- undo (#184) ----
+    // A tick is one click and saves at once, so without this a mis-click is unrecoverable
+    // except from memory — bjstrange lost three and had to work out what had been checked.
+    private readonly Stack<(string Label, bool Was, Action<bool> Set)> _undo = new();
+    private readonly TextBlock _undoText = new()
+    {
+        FontSize = 11.5, TextTrimming = TextTrimming.CharacterEllipsis,
+        VerticalAlignment = VerticalAlignment.Center,
+    };
+    private readonly Border _undoBar = new()
+    {
+        IsVisible = false, Margin = new Thickness(16, 4, 16, 0),
+        CornerRadius = new CornerRadius(6), BorderThickness = new Thickness(1),
+        Padding = new Thickness(10, 5),
+    };
     /// <summary>The Epic tab's classic-era lens, which followed the widget's Epic card
     /// here. Persisted, because EQBuddy Mobile's Epic tab honors the same setting.</summary>
     private readonly CheckBox _classicOnlyCheck = new()
@@ -130,7 +145,8 @@ public sealed class QuestsWindow : Window
         _classBtn.Padding = new Thickness(8, 2);
         ToolTip.SetTip(_classBtn, "Pick your class(es) — quests any of them can do stay visible");
         Content = BuildContent();
-        WindowZoom.Attach(this, "quests", _settings);
+        // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
+        WindowZoom.Attach(this, "quests", _settings, baseWidth: Width);
         BuildClassChecks();
         _eraCombo.Items.Add("Any era");
         foreach (var era in QuestEraLadder.Eras) _eraCombo.Items.Add($"≤ {era}");
@@ -311,17 +327,22 @@ public sealed class QuestsWindow : Window
             "Creature marks wiki-unknown drops in red with a paste-ready page edit.",
             new Thickness(0, 6, 0, 0)));
 
+        BuildUndoBar();
+
         var layout = new Grid();
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Star));
+        layout.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         layout.Children.Add(header);
         Grid.SetRow(entry, 1);
         layout.Children.Add(entry);
         Grid.SetRow(_bodyScroll, 2);
         layout.Children.Add(_bodyScroll);
-        Grid.SetRow(footer, 3);
+        Grid.SetRow(_undoBar, 3);
+        layout.Children.Add(_undoBar);
+        Grid.SetRow(footer, 4);
         layout.Children.Add(footer);
         // Same chrome family as Spawns: the body scrolls, the title row stays reachable.
         return new Border
@@ -484,41 +505,42 @@ public sealed class QuestsWindow : Window
     /// on the desktop to say "I already have that".</summary>
     private void RenderChecklist(QuestTab tab, string filter, List<string> classes)
     {
-        var rows = tab == QuestTab.Epic
-            ? _settings.EpicQuestChecklist
-                .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic)
-                .Select(i =>
-                    (i.ClassName, Group: i.Section.Length > 0 ? i.Section : "Checklist",
-                     Title: i.QuestName.Length > 0 ? i.QuestName : i.Reward,
-                     Detail: i.QuestItem, i.Acquired, Set: (Action<bool>)(done =>
-                     {
-                         i.Acquired = done;
-                         // The player deciding IS the resolution of an unassigned
-                         // auto-tick, exactly as the old card's toggle treated it.
-                         i.AcquiredUnassigned = false;
-                     })))
-            : _settings.SkyQuestChecklist.Select(i =>
-                (i.ClassName, Group: i.Npc.Length > 0 ? i.Npc : "Sky",
-                 Title: i.Reward, Detail: i.QuestItem, i.Acquired, Set: (Action<bool>)(done =>
-                 {
-                     i.Acquired = done;
-                     i.AcquiredUnassigned = false;
-                 })));
+        // Grouping, ordering and the detail line come from Core so this window, the WPF
+        // one and EQBuddy Mobile cannot disagree about what a checklist row says (#184).
+        var groups = tab == QuestTab.Epic
+            ? QuestChecklistLayout.Epic(_settings.EpicQuestChecklist
+                .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic))
+            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted);
+
+        var setters = tab == QuestTab.Epic
+            ? _settings.EpicQuestChecklist.ToDictionary(i => i.Id, i => (Action<bool>)(done =>
+            {
+                i.Acquired = done;
+                // The player deciding IS the resolution of an unassigned auto-tick,
+                // exactly as the old card's toggle treated it.
+                i.AcquiredUnassigned = false;
+            }), StringComparer.Ordinal)
+            : _settings.SkyQuestChecklist.ToDictionary(i => i.Id, i => (Action<bool>)(done =>
+            {
+                i.Acquired = done;
+                i.AcquiredUnassigned = false;
+            }), StringComparer.Ordinal);
 
         // The picker chooses WHICH classes are in view — including ones you don't play,
         // because "we may be helping a friend" (David, 2026-08-15). The chips then narrow
         // to one of them. An empty pick means every class, never an empty window.
-        var matching = rows
-            .Where(r => classes.Count == 0
-                || classes.Contains(r.ClassName, StringComparer.OrdinalIgnoreCase))
-            .Where(r => _classLens is null
-                || r.ClassName.Equals(_classLens, StringComparison.OrdinalIgnoreCase))
-            .Where(r => filter.Length == 0
-                || r.Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || r.Detail.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || r.ClassName.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || r.Group.Contains(filter, StringComparison.OrdinalIgnoreCase))
+        var matching = groups
+            .Where(g => classes.Count == 0
+                || classes.Contains(g.ClassName, StringComparer.OrdinalIgnoreCase))
+            .Where(g => _classLens is null
+                || g.ClassName.Equals(_classLens, StringComparison.OrdinalIgnoreCase))
+            .Select(g => filter.Length == 0 || Hit(g.Heading)
+                ? g
+                : g with { Rows = [.. g.Rows.Where(r => Hit(r.Title) || Hit(r.Detail))] })
+            .Where(g => g.Rows.Count > 0)
             .ToList();
+
+        bool Hit(string s) => s.Contains(filter, StringComparison.OrdinalIgnoreCase);
 
         if (matching.Count == 0)
         {
@@ -534,25 +556,34 @@ public sealed class QuestsWindow : Window
             return;
         }
 
-        foreach (var group in matching
-                     .GroupBy(r => (r.ClassName, r.Group))
-                     .OrderBy(g => g.Key.ClassName, StringComparer.OrdinalIgnoreCase)
-                     .ThenBy(g => g.Key.Group, StringComparer.OrdinalIgnoreCase))
+        foreach (var group in matching)
         {
-            var done = group.Count(r => r.Acquired);
-            _questsPanel.Children.Add(new TextBlock
+            // The heading opens the wiki page for the reward it names — the "way to view
+            // details of sky quests" #184 asked back for.
+            var rewardName = group.Heading.Split('·').Last().Trim();
+            var headingText = new TextBlock
             {
-                Text = $"{group.Key.ClassName} · {group.Key.Group}   {done}/{group.Count()}",
+                Text = $"{group.Heading}   {group.Done}/{group.Total}"
+                       + (group.Note is { } n ? $"  · {n}" : ""),
                 FontSize = 11.5, FontWeight = FontWeight.SemiBold,
+                TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(2, 8, 0, 3), Foreground = AppTheme.AccentBrush,
-            });
+                Cursor = new Cursor(StandardCursorType.Hand),
+            };
+            ToolTip.SetTip(headingText, "Open the wiki page for this quest");
+            headingText.PointerReleased += (_, _) => OpenUrl(EqlWiki.PageUrl(rewardName));
+            _questsPanel.Children.Add(headingText);
 
-            foreach (var row in group.OrderBy(r => r.Title, StringComparer.OrdinalIgnoreCase))
+            foreach (var row in group.Rows)
             {
+                if (!setters.TryGetValue(row.Id, out var set)) continue;
                 var text = new TextBlock
                 {
                     FontSize = 12, TextWrapping = TextWrapping.Wrap,
-                    Text = row.Detail.Length > 0 ? $"{row.Title}  —  {row.Detail}" : row.Title,
+                    // The drop location on every row, and the * on a tick EQBuddy placed
+                    // itself — both were in the model and neither was drawn.
+                    Text = (row.Detail.Length > 0 ? $"{row.Title}   {row.Detail}" : row.Title)
+                           + (row.Unassigned ? QuestChecklistLayout.UnassignedMark : ""),
                     Foreground = row.Acquired ? AppTheme.DimBrush : AppTheme.TextBrush,
                 };
                 var check = new CheckBox
@@ -561,7 +592,11 @@ public sealed class QuestsWindow : Window
                     IsChecked = row.Acquired,
                     Margin = new Thickness(10, 1, 0, 1),
                 };
-                var set = row.Set;
+                if (row.Unassigned)
+                    ToolTip.SetTip(check,
+                        "EQBuddy ticked this itself — several classes want this item and the "
+                        + "log couldn't say which one earned it. Move the tick if it's on the "
+                        + "wrong class; either way, toggling it settles the question.");
                 var was = row.Acquired;
                 check.IsCheckedChanged += (_, _) =>
                 {
@@ -569,6 +604,7 @@ public sealed class QuestsWindow : Window
                     if (now == was) return;   // our own repaint, not a click
                     set(now);
                     _settings.Save();
+                    PushUndo(row.Title, now, set);
                     Refresh(force: true);
                 };
                 _questsPanel.Children.Add(check);
@@ -698,13 +734,58 @@ public sealed class QuestsWindow : Window
         Refresh(force: true);
     }
 
-    private void UpdateClassButton(List<string> selected) =>
-        _classBtn.Content = selected.Count switch
+    private void BuildUndoBar()
+    {
+        _undoBar.Background = AppTheme.PopupBrush;
+        _undoBar.BorderBrush = AppTheme.BorderBrush;
+        _undoText.Foreground = AppTheme.TextBrush;
+        var btn = new Button { Content = "↶ undo", FontSize = 11, Padding = new Thickness(8, 2), Margin = new Thickness(8, 0, 0, 0) };
+        ToolTip.SetTip(btn, "Put the last tick back the way it was (Ctrl+Z)");
+        btn.Click += (_, _) => Undo();
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+        grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+        grid.Children.Add(_undoText);
+        Grid.SetColumn(btn, 1);
+        grid.Children.Add(btn);
+        _undoBar.Child = grid;
+
+        // Ctrl+Z, because the undo button promises it. Not while typing in the search box.
+        KeyDown += (_, e) =>
         {
-            0 => "Any class",
-            1 => selected[0],
-            _ => string.Join(" · ", selected.Select(QuestClassFilter.Abbrev)),
+            if (e.Key != Key.Z || !e.KeyModifiers.HasFlag(KeyModifiers.Control)) return;
+            if (FocusManager?.GetFocusedElement() is TextBox) return;
+            e.Handled = true;
+            Undo();
         };
+    }
+
+    private void PushUndo(string label, bool done, Action<bool> set)
+    {
+        _undo.Push((label, !done, set));
+        _undoText.Text = $"{(done ? "Ticked" : "Cleared")} {label}";
+        _undoBar.IsVisible = true;
+    }
+
+    private void Undo()
+    {
+        if (!_undo.TryPop(out var last)) { _undoBar.IsVisible = false; return; }
+        last.Set(last.Was);
+        _settings.Save();
+        if (_undo.Count == 0) _undoBar.IsVisible = false;
+        else _undoText.Text = $"Undid {last.Label}";
+        Refresh(force: true);
+    }
+
+    // Capped in UI.Shared so this window cannot disagree with the WPF one: an uncapped
+    // face grew with the selection and pushed the mode strip off the window (#184).
+    private void UpdateClassButton(List<string> selected)
+    {
+        _classBtn.Content = ClassFilterLabel.For(selected);
+        ToolTip.SetTip(_classBtn, selected.Count > ClassFilterLabel.MaxNamed
+            ? "Showing: " + string.Join(", ", selected)
+            : "Pick your class(es) — quests any of them can do stay visible");
+    }
 
     /// <summary>Load the character's saved classes into the checkboxes (character
     /// switches included — the selection follows the ledger, not the window).</summary>

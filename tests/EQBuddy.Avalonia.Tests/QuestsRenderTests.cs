@@ -249,8 +249,15 @@ public sealed class QuestsRenderTests : IDisposable
         window.Show();
         window.SetTab(QuestTab.Sky);
 
+        // The REWARD is the group heading and the piece is the row (#184): one turn-in
+        // NPC hands out every sky reward for a class, so grouping by NPC put them all in
+        // one undifferentiated list. The row carries the NPC and the drop location.
+        var headings = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains(headings, t => t.Contains("Cape of the Wind"));
+
         var titles = ChecklistTitles(window);
-        Assert.Contains(titles, t => t.Contains("Cape of the Wind"));
+        Assert.Contains(titles, t => t.Contains("Wind Fragment") && t.Contains("Noble Dojorn"));
         // A checklist tab is not the catalog: the general list's quests must not leak in.
         Assert.DoesNotContain(titles, t => t.Contains("The Falchion"));
 

@@ -1,5 +1,19 @@
 [
  {
+  "version": "1.88.4",
+  "date": "2026-08-17",
+  "highlights": [
+   "THE PLANE OF SKY TAB SHOWS YOUR QUESTS AGAIN, ONE PER REWARD (discussion #184, thanks bjstrange). Folding the widget's Sky card into the Quest Tracker last release re-grouped the tab by the TURN-IN NPC - and one NPC hands out every sky reward for a class, so all fourteen landed in a single undifferentiated list and \"which pieces does this one still need\" stopped being answerable. Rows now group by the reward you're working toward, each with its own count and a ready / in progress / done note, and the heading opens that quest's wiki page. Your ticks are untouched; only the arrangement changed.",
+   "AND EVERY ROW NAMES WHERE THE ITEM DROPS AGAIN (same report). \"Isle 3: Gorgalosk\" was sitting in EQBuddy's own data the whole time and simply wasn't being drawn - the old card showed it, the new tab didn't. The turn-in NPC and the drop location are both back, on every row, on Windows, Linux and macOS.",
+   "A MIS-CLICKED TICK CAN BE TAKEN BACK (same report - bjstrange lost three and had to work out from memory what had been checked). Ticking a checklist row saves immediately and said nothing, so a stray click was unrecoverable. A bar now names what just changed and offers ↶ undo, Ctrl+Z works too, and it steps back through as many as you need.",
+   "ITEMS EQBUDDY TICKED FOR YOU ARE MARKED (same report: \"all are checked with no indication of anything needing manual adjustments\"). When several classes want the same drop, the loot auto-tick has to pick one and can't know which of yours earned it - so it picks and flags the row. EQBuddy Mobile has been showing that * for months; both desktop builds were quietly drawing a bare tick. They now show it too, with a tooltip saying why, and moving the tick settles it.",
+   "THE CLASS FILTER STOPS EATING THE WINDOW when you tick more than a few classes. Selecting all sixteen turned the button into \"BRD · BST · BER · CLR · DRU · ENC · MAG · MNK · NEC · PAL · RNG · ROG · SHD · SHM · WAR · WIZ\", which pushed the mine/zone/held/done/all strip clean off the edge, and the chip row beside it was clipped mid-list. The button now reads \"All classes\" or \"7 classes\" past three (hover for the full list), and the chips wrap onto a second line.",
+   "FIXED (discussion #186, thanks Kemble-Kemble) - THE QUEST TRACKER WAS CUT OFF ON A SECOND MONITOR AND COULDN'T BE SHRUNK. Its height was capped against your PRIMARY screen, so dragging it to a smaller one left it taller than that screen with no way back. The cap now follows whichever monitor the window is actually on, and re-applies as you drag it between them. Ctrl + mouse wheel also resizes the window itself now rather than only the text inside it - that shortcut works on every EQBuddy window and is worth knowing.",
+   "QUEST REWARDS WRITTEN AS A TABLE COUNT AS REWARDS. The wiki reformatted the Soldier's Brooch page from a bullet list into a stat-comparison table, and this week's catalog refresh promoted the quest with an empty reward list - all eight class brooches gone. Our reader stopped at the table's first \"=\" sign. Fixed at the source and re-harvested.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: ⚙ → Help → Send feedback."
+  ]
+ },
+ {
   "version": "1.88.3",
   "date": "2026-08-16",
   "highlights": [

@@ -9,6 +9,13 @@ public sealed class QuestItemNeed
     public int Qty { get; set; } = 1;
 }
 
+/// <summary>Article URLs on eqlwiki, built the one way the harvester builds them.</summary>
+public static class EqlWiki
+{
+    public static string PageUrl(string title) =>
+        "https://eqlwiki.com/" + Uri.EscapeDataString(title.Trim().Replace(' ', '_'));
+}
+
 /// <summary>One quest from the shipped catalog (harvested from eqlwiki Category:Quests;
 /// scripts/harvests/eqlwiki/quests-harvest.py).</summary>
 public sealed class QuestEntry
