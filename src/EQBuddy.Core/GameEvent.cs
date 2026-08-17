@@ -4,7 +4,12 @@ public enum DamageKind { Melee, Spell }
 
 public abstract record GameEvent(DateTime Time);
 
-public record KillEvent(DateTime Time, string Target, string Killer) : GameEvent(Time);
+/// <summary><paramref name="ProperName"/> is decided HERE, at parse time, because
+/// <see cref="LogParser.Normalize"/> strips the leading article that decides it — a
+/// downstream reader holding "Skeleton" can no longer tell it was "a skeleton"
+/// (discussion #185). See <see cref="NamedMobHeuristic"/>.</summary>
+public record KillEvent(DateTime Time, string Target, string Killer, bool ProperName = false)
+    : GameEvent(Time);
 public record DeathEvent(DateTime Time, string Killer) : GameEvent(Time);
 /// <summary>IsAux marks automatic damage (damage shields) excluded from hit/accuracy counters.
 /// Note is the raw trailing annotation ("Riposte", "Double Bow Shot", …) when present.

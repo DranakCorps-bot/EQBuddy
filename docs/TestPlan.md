@@ -90,6 +90,9 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | Class restrictions are resolved by Core's `QuestClassFilter` at index build — the page checks membership, never parses class text | **Auto** — `CompanionQuestsTests` |
 | A device's 📌 and class-picker taps land on the same `QuestLedgerStore` the desktop writes; repeats are not changes | **Auto** — `CompanionQuestsTests` |
 | Epic/Sky rows inside the quest surface still tick under their old surface names | **Auto** — `CompanionQuestsTests`, `CompanionSurfaceTests` |
+| A proper-named kill outside the catalog starts tracking; its SECOND kill measures the cycle | **Auto** — `DiscoveredNamedTests` |
+| Discovery never fires for articled trash, someone else's kill, or a catalogued family's siblings | **Auto** — `DiscoveredNamedTests`, `NamedMobHeuristicTests` |
+| The named/trash verdict is taken from the RAW name at parse time, before `Normalize` strips the article | **Auto** — `NamedMobHeuristicTests` |
 | Sky groups by REWARD (not by turn-in NPC), with ready/in-progress/done and a per-reward count | **Auto** — `QuestChecklistLayoutTests` |
 | Every checklist row names the turn-in NPC and the drop location; Epic prefers its source | **Auto** — `QuestChecklistLayoutTests` |
 | A tick the loot auto-checker placed itself wears `*` on **all three** surfaces, not just mobile | **Auto** — `QuestChecklistLayoutTests`, `CompanionProjectionTests` |

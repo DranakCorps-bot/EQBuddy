@@ -28,6 +28,15 @@ public sealed class SpawnOverride
     /// zones change, wikis lag, and a family member camping something undocumented
     /// shouldn't have to wait for a release.</summary>
     public bool Custom { get; set; }
+
+    /// <summary>True when EQBUDDY added this entry, not the player: a proper-named mob
+    /// the log saw die that the curated catalog does not list (discussion #185, elderbit
+    /// — every named in The Hole, Chief Goonda in West Karana). It lives here in the
+    /// LEARNED store and never in the shipped catalog, which is still only ever written
+    /// by hand. Kept distinct from <see cref="Custom"/> so the UI can say which of you
+    /// put it there, and so a discovery can be discarded without touching the player's
+    /// own additions.</summary>
+    public bool Discovered { get; set; }
     /// <summary>True when <see cref="RespawnSeconds"/> was tightened automatically from
     /// an observed re-kill gap rather than typed by the player. Learned values may keep
     /// tightening as more kills come in; a manual edit (Learned=false with a value) is

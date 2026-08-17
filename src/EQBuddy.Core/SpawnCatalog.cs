@@ -264,6 +264,24 @@ public sealed class SpawnCatalog
         return WithinEditDistance(a, b, budget);
     }
 
+    /// <summary>Two names from one mob FAMILY: every word shared but the last, which
+    /// differs outright — "CWG Model XA" beside "CWG Model EXG". #181 learned this the
+    /// expensive way (the siblings were bridging onto the named's clock); auto-discovery
+    /// needs the same fact for the opposite reason. A serial-named trash clockwork has
+    /// no article and reads as a proper name, so the article convention alone would time
+    /// every one of them — but the catalog listing the family's NAMED is a statement that
+    /// the rest of the family is trash.</summary>
+    public static bool SharesNameFamily(string a, string b)
+    {
+        a = Fold(a).ToLowerInvariant();
+        b = Fold(b).ToLowerInvariant();
+        var aCut = a.LastIndexOf(' ');
+        var bCut = b.LastIndexOf(' ');
+        if (aCut < 0 || bCut < 0) return false;
+        if (!a[..aCut].Equals(b[..bCut], StringComparison.Ordinal)) return false;
+        return !a[(aCut + 1)..].Equals(b[(bCut + 1)..], StringComparison.Ordinal);
+    }
+
     private static string Fold(string s)
     {
         s = s.Trim().Replace("`", "").Replace("'", "");

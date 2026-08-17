@@ -122,7 +122,18 @@ public sealed class SpawnsViewModel
             && (o?.RespawnSeconds is null || o.Learned);
         if (!hasTimer && suppressedInstance) countdown = "instance";
 
-        var detail = entry is null ? "Added by you" : string.Join(" · ", new[]
+        // "Added by you" would be a lie for a row EQBuddy discovered itself (#185) —
+        // and the player has to be able to tell, because a discovery is a guess from
+        // the log's own naming convention and deleting it must feel allowed.
+        var detail = entry is null
+            ? o is { Discovered: true }
+                ? "Found by EQBuddy — the log named this mob without an article, which "
+                  + "is how EverQuest writes a named. It isn't in the shipped catalog, so "
+                  + "its respawn is measured from your own kills: no countdown until the "
+                  + "second one. Type a duration to override it, or remove the row if it "
+                  + "isn't a named."
+                : "Added by you"
+            : string.Join(" · ", new[]
         {
             suppressedInstance
                 ? "Raid instance: a fresh instance brings its own copy (daily per "

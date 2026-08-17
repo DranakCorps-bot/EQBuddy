@@ -266,11 +266,20 @@ public sealed class SpawnTimers
                     if (!Matches(name, k.Target, fuzzy)
                         && !Matches(o.Placeholder ?? "", k.Target, fuzzy)) continue;
                     var (ccy, ccx) = CampFor(zone.Zone, name, k.Time);
-                    Upsert(new SpawnTimerState(Server, zone.Zone, name, k.Time, o.RespawnSeconds)
+                    var seconds = o.Discovered
+                        ? LearnDiscovered(zone.Zone, name, o, k.Time)
+                        : o.RespawnSeconds;
+                    Upsert(new SpawnTimerState(Server, zone.Zone, name, k.Time, seconds)
                         { CampLocY = ccy, CampLocX = ccx, KilledName = k.Target });
                     return;
                 }
             }
+
+            // Nothing in the catalog and nothing the player added — but the log itself
+            // says this was a NAMED mob (discussion #185, elderbit: the curated list will
+            // always have gaps, and "Chief Goonda" versus "a skeleton" is the game's own
+            // convention). Record it so its SECOND death can measure the cycle.
+            DiscoverNamed(zone, k);
         }
 
         static bool Matches(string catalogName, string killed, bool fuzzy) =>
@@ -283,6 +292,70 @@ public sealed class SpawnTimers
         static bool MatchesAnyPlaceholder(string placeholders, string killed, bool fuzzy) =>
             placeholders.Length > 0 && placeholders.Split('/')
                 .Any(p => p.Trim() is { Length: > 0 } ph && Matches(ph, killed, fuzzy));
+    }
+
+    /// <summary>The widest re-kill gap a DISCOVERED named will accept as a spawn cycle.
+    /// Above this the gap is far likelier to be "you went to bed and came back" than a
+    /// respawn, and a discovery has no catalog value to be sanity-checked against the
+    /// way <see cref="LearnFromRekill"/> does. Six hours comfortably covers the long
+    /// dungeon named while refusing an overnight gap.</summary>
+    public const double MaxDiscoverSeconds = 6 * 60 * 60;
+
+    /// <summary>
+    /// A proper-named mob the catalog doesn't know (discussion #185). Recorded on its
+    /// first death with NO duration — a chip that says "killed 4m ago" and nothing more
+    /// is honest, and the second death is what measures the cycle.
+    ///
+    /// Only YOUR OWN kills seed one. That single gate removes the whole class elderbit
+    /// warned about without needing a pet registry: a pet or a player dying arrives as
+    /// "X has been slain by Y", never as "You have slain X!", so neither can be mistaken
+    /// for a named. It costs group kills where someone else lands the blow, which is the
+    /// right way to be wrong here — a missing timer is recoverable, an invented one
+    /// teaches you to walk to a camp that isn't up.
+    /// </summary>
+    private void DiscoverNamed(SpawnZone zone, KillEvent k)
+    {
+        if (!k.ProperName || k.Killer != "You") return;
+        if (_overrides.Find(zone.Zone, k.Target) is not null) return;   // already known here
+
+        // A serial-named trash mob reads exactly like a named: "CWG Model XA" has no
+        // article either. But the catalog listing CWG Model EXG and not his siblings IS
+        // the statement that the siblings are trash — the same family fact #181 needed
+        // to stop them bridging onto his clock. Without this, farming Sol A's clockworks
+        // invents a timer per serial number.
+        foreach (var entry in zone.Named)
+        {
+            if (SpawnCatalog.SharesNameFamily(entry.Name, k.Target)) return;
+            if (entry.Aliases.Any(a => SpawnCatalog.SharesNameFamily(a, k.Target))) return;
+        }
+
+        var ov = _overrides.GetOrAdd(zone.Zone, k.Target);
+        ov.Custom = true;          // so CustomFor() finds it on the next kill
+        ov.Discovered = true;      // ...and the UI can say EQBuddy added it, not you
+        _overrides.Save();
+        var (cy, cx) = CampFor(zone.Zone, k.Target, k.Time);
+        Upsert(new SpawnTimerState(Server, zone.Zone, k.Target, k.Time, null)
+            { CampLocY = cy, CampLocX = cx, KilledName = k.Target });
+    }
+
+    /// <summary>The second death of a discovered named measures its cycle. Same
+    /// never-loosens discipline as <see cref="LearnFromRekill"/>: a later, shorter gap
+    /// tightens the value, a longer one is ignored as "you weren't watching".</summary>
+    private double? LearnDiscovered(string zone, string name, SpawnOverride o, DateTime killedAt)
+    {
+        // A player who typed a duration outranks anything measured here.
+        if (o is { Learned: false, RespawnSeconds: not null }) return o.RespawnSeconds;
+
+        var previous = _timers.TryGetValue(Key(Server, zone, name), out var t) ? t.KilledAt : (DateTime?)null;
+        if (previous is not { } was) return o.RespawnSeconds;
+        var elapsed = (killedAt - was).TotalSeconds;
+        if (elapsed < MinLearnSeconds || elapsed > MaxDiscoverSeconds) return o.RespawnSeconds;
+        if (o.RespawnSeconds is { } current && elapsed >= current) return o.RespawnSeconds;
+
+        o.RespawnSeconds = Math.Floor(elapsed);
+        o.Learned = true;
+        _overrides.Save();
+        return o.RespawnSeconds;
     }
 
     /// <summary>A MEASURED timer (entry or zone clock) outranks re-kill learning:

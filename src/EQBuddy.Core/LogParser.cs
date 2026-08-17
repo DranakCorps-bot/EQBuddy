@@ -458,11 +458,15 @@ public static partial class LogParser
         if (YouDiedPlainRx().IsMatch(msg))
             return new DeathEvent(ts, "");
 
+        // The RAW target decides ProperName — Normalize is about to destroy the article
+        // that answers it (#185).
         if ((r = YouSlainRx().Match(msg)).Success)
-            return new KillEvent(ts, Normalize(r.Groups["target"].Value), "You");
+            return new KillEvent(ts, Normalize(r.Groups["target"].Value), "You",
+                NamedMobHeuristic.LooksProperName(r.Groups["target"].Value));
 
         if ((r = OtherSlainRx().Match(msg)).Success)
-            return new KillEvent(ts, Normalize(r.Groups["target"].Value), r.Groups["killer"].Value);
+            return new KillEvent(ts, Normalize(r.Groups["target"].Value), r.Groups["killer"].Value,
+                NamedMobHeuristic.LooksProperName(r.Groups["target"].Value));
 
         if ((r = MeleeInRx().Match(msg)).Success)
             return new DamageTakenEvent(ts, Normalize(r.Groups["attacker"].Value),
