@@ -277,11 +277,14 @@ public static partial class LogParser
     [GeneratedRegex(@"^You have fashioned the items together to create something new: (?<item>.+?)\.?$")]
     private static partial Regex FashionRx();
 
-    // You have received a new parcel delivery containing 1 Short Sword of the Ykesha from Rodrigo!
-    // An NPC/courier handed you an item — the one NPC-give the game names (a direct trade or
-    // turn-in logs only "You complete the trade", with no item). Routed like forage: a
-    // LootEvent with "Parcel" as its source, so it counts and can tick a quest.
-    [GeneratedRegex(@"^You have received a new parcel delivery containing (?<n>\d+) (?<item>.+?) from .+?!$")]
+    // Laitia hands you the Short Sword of the Ykesha that was sent from Rodrigo.
+    // The parcel PICKUP — the item actually enters your bags here. NOT the earlier
+    // "You have received a new parcel delivery containing …" line, which only announces a
+    // parcel is WAITING at the merchant (unretrieved, so it must not count). Routed like
+    // forage: a LootEvent with "Parcel" as its source, so it counts and can tick a quest.
+    // The NPC name is a plain name (letters/space/apostrophe) so a chat line quoting the
+    // phrase — which carries "tells", digits and commas — can't be mistaken for a pickup.
+    [GeneratedRegex(@"^(?<npc>[A-Za-z' ]+?) hands you the (?<item>.+?) that was sent from .+?\.$")]
     private static partial Regex ParcelRx();
 
     [GeneratedRegex(@"^Your (?<spell>.+?) spell fizzles!$")]
@@ -614,8 +617,7 @@ public static partial class LogParser
             return new LootEvent(ts, r.Groups["item"].Value, "Forage", null);
 
         if ((r = ParcelRx().Match(msg)).Success)
-            return new LootEvent(ts, r.Groups["item"].Value, "Parcel", null,
-                Count: int.Parse(r.Groups["n"].Value));
+            return new LootEvent(ts, r.Groups["item"].Value, "Parcel", null);   // one pickup = one item
 
         // Fashioned combines sit with the other acquisitions (loot/forage/parcel).
         if ((r = FashionRx().Match(msg)).Success)

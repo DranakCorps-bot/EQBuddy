@@ -177,13 +177,22 @@ public class RawLootViewTests
     }
 
     [Fact]
-    public void AParcelDeliveryIsLootedWithParcelSourceAndCount()
+    public void APickedUpParcelIsLootedWithParcelSource()
     {
         var evt = Assert.IsType<LootEvent>(LogParser.Parse(
-            "[Sun Aug 16 14:47:14 2026] You have received a new parcel delivery containing 3 Blackburrow Stout from Rodrigo!"));
-        Assert.Equal("Blackburrow Stout", evt.Item);
+            "[Sun Aug 16 14:47:14 2026] Laitia hands you the Short Sword of the Ykesha that was sent from Rodrigo."));
+        Assert.Equal("Short Sword of the Ykesha", evt.Item);
         Assert.Equal("Parcel", evt.Source);
-        Assert.Equal(3, evt.Count);
+        Assert.Equal(1, evt.Count);
+    }
+
+    [Fact]
+    public void AWaitingParcelNotificationDoesNotCount()
+    {
+        // Announces a parcel is waiting at the merchant — the item isn't in your bags yet,
+        // so it must not reach the loot list until the pickup line above.
+        Assert.Null(LogParser.Parse(
+            "[Sun Aug 16 14:47:14 2026] You have received a new parcel delivery containing 1 Efreeti War Spear from Ivan!"));
     }
 
     [Fact]
