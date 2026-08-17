@@ -526,9 +526,11 @@ public partial class BreakoutWindow : Window
 
             // Same show filter and row order as the Loot card, via the shared builder:
             // all / looted (corpse) / other (foraged, crafted, merged, parcel). Uncapped.
+            // Auto-sells never reach the snapshot's loot at all (LW, 2026-08-17).
             var mode = _settings.LootSort;
             var view = _settings.LootView == "made" ? "other" : _settings.LootView;
-            static bool IsOther(string src) => src is "Forage" or "Parcel";
+            static bool IsOther(string src) =>
+                src is EQBuddy.UI.Shared.LootRows.ForageSource or EQBuddy.UI.Shared.LootRows.ParcelSource;
             var hasLooted = s.Loot.Any(l => !IsOther(l.LastSource));
             var hasOther = s.Loot.Any(l => IsOther(l.LastSource))
                            || s.Crafted.Count > 0 || s.Fashioned.Count > 0;

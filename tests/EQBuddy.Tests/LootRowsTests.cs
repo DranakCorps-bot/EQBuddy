@@ -6,7 +6,8 @@ namespace EQBuddy.Tests;
 
 /// <summary>The loot row builder shared by the Loot card and its breakout: the show filter
 /// (all / looted / other), the sort modes, the provenance tags, and how "all" mixes the
-/// slices into one ordered list.</summary>
+/// slices into one ordered list. Auto-sold pickups never appear in any of it — the
+/// snapshot excludes them before these rows are built (see SessionStatsTests).</summary>
 public class LootRowsTests
 {
     // Snapshot hands loot back count-desc; sources: a mob = corpse (untagged), "Forage",

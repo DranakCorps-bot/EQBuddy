@@ -1205,9 +1205,12 @@ public sealed partial class SessionStats
                     if (!_invocationAgg.ContainsKey(inv.Invocation)) _invocationAgg[inv.Invocation] = (0, 0);
                     break;
                 case AutoSellEvent asell:
-                    var lcur = _loot.TryGetValue(asell.Item, out var lval) ? lval : (0, asell.Source);
-                    _loot[asell.Item] = (lcur.Item1 + asell.Count, asell.Source);
-                    _lootCount += asell.Count;
+                    // Vendor income + the creature's drop ledger, NOT session loot: an
+                    // auto-sold pickup was dismissed at the corpse and never reached your
+                    // bags, so it has no business on the Loot card (LW, 2026-08-17 — after
+                    // trying a (Sold) tag and finding the views "way too crowded"). The
+                    // wiki/target-drops ledger below still records that the mob drops it,
+                    // and the coin lands with the other vendor sales.
                     var mobLoot = Mob(asell.Source).Loot;
                     mobLoot[asell.Item] = mobLoot.TryGetValue(asell.Item, out var mlc) ? mlc + asell.Count : asell.Count;
                     Mob(asell.Source).LootLast[asell.Item] = asell.Time;
@@ -1887,8 +1890,9 @@ public sealed partial class SessionStats
     private static void Bump(Dictionary<string, int> d, string key) =>
         d[key] = d.TryGetValue(key, out var v) ? v + 1 : 1;
 
-    /// <summary>Net items gained since <paramref name="since"/> — loot in, auto-sells /
-    /// destroys / vendor sales out — the live overlay the inventory views lay over a
+    /// <summary>Net items gained since <paramref name="since"/> — loot in, destroys /
+    /// vendor sales out (auto-sells are net zero: never in the bags at all) — the live
+    /// overlay the inventory views lay over a
     /// /outputfile dump (David, 2026-08-11: the dump is a baseline, the log keeps it
     /// current). Keys are base item names. Loot events are journal-retained whole
     /// session, so a dump older than the session is adjusted by everything the
@@ -1908,7 +1912,9 @@ public sealed partial class SessionStats
                 switch (e)
                 {
                     case LootEvent l: Add(l.Item, Math.Max(1, l.Count)); break;
-                    case AutoSellEvent a: Add(a.Item, -Math.Max(1, a.Count)); break;
+                    // No AutoSellEvent case: an auto-sold pickup never entered the bags,
+                    // so its net inventory effect is zero — subtracting it here told the
+                    // inventory overlay an item LEFT that was never counted in.
                     case ItemDestroyedEvent x: Add(x.Item, -Math.Max(1, x.Count)); break;
                     // Vendor sales name one item per line; counts aren't logged, so
                     // one per line is the honest floor.
@@ -2133,6 +2139,10 @@ public sealed partial class SessionStats
                 // the timeline (they carry "Fashion"/"Merge" as their source, which the row
                 // builder maps to the (Crafted)/(Merged) tags). Without this they showed in
                 // the count view but never in "recent" (LW, 2026-08-17).
+                // Auto-sells (AutoSellEvent) are deliberately absent: dismissed at the
+                // corpse, they are vendor income and a mob-ledger drop, never session
+                // loot — the aggregate above skips them for the same reason, so the
+                // views stay in agreement (LW, 2026-08-17).
                 RecentLoot = _journal
                     .Where(e => e is LootEvent or FashionEvent or CraftEvent)
                     .Reverse().Take(MaxRecentLoot)

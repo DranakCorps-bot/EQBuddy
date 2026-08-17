@@ -482,14 +482,46 @@ public class SessionStatsTests
     }
 
     [Fact]
-    public void AutoSellCountsAsLootAndVendorIncome()
+    public void AutoSellIsVendorIncomeAndAMobDropButNeverSessionLoot()
     {
+        // "Looted … and sold it for …" means the pickup was dismissed at the corpse:
+        // it never reached the bags, so it is not session loot (LW, 2026-08-17 — a
+        // (Sold) tag + show filter was tried first and crowded the views). The coin
+        // is vendor income and the creature's drop ledger still records the drop.
         var s = Replay("Douglas",
             At(0, 0, "You looted 2 Spider Silk from a giant spider's corpse and sold it for 2 gold, 8 silver and 6 copper.")).Snapshot();
-        Assert.Equal(2, s.LootTotal);
+        Assert.Equal(0, s.LootTotal);
+        Assert.Empty(s.Loot);
+        Assert.Empty(s.RecentLoot);
         Assert.Equal(286, s.VendorCopper);
         Assert.Equal(286, s.Copper);
-        Assert.Equal(("Spider Silk", 2), (Assert.Single(s.Loot).Item, Assert.Single(s.Loot).Count));
+        var sold = Assert.Single(s.SoldItems);
+        Assert.Equal(("Spider Silk", 2), (sold.Item, sold.Count));
+        Assert.Contains(s.Mobs.Single(m => m.Name == "Giant spider").Loot,
+            ml => ml.Item == "Spider Silk" && ml.Count == 2);
+    }
+
+    [Fact]
+    public void RecentLootCarriesEveryKeptAcquisitionKindInArrivalOrder()
+    {
+        // The recent view must agree with the count view about WHAT counts as loot —
+        // kept corpse loot, auto-stored loot, and crafts all ride the timeline; the
+        // auto-sold spear is absent from BOTH, not just one (the original bug was the
+        // views disagreeing — LW's kobold session, 2026-08-17).
+        var s = Replay("Robin",
+            At(0, 0, "--You have looted a Death Cap from a greater kobold's corpse.--"),
+            At(0, 30, "You looted a Fine Steel Spear from a greater kobold's corpse and sold it for 4 platinum, 5 gold, 7 silver and 1 copper."),
+            At(1, 0, "You looted a Mote of Lesser Potential from a greater kobold's corpse and stored it in your currency"),
+            At(1, 30, "You have fashioned the items together to create something new: Cloudy Potion.")).Snapshot();
+
+        Assert.Equal(
+            ["Cloudy Potion", "Mote of Lesser Potential", "Death Cap"],
+            s.RecentLoot.Select(p => p.Item).ToList());
+        Assert.DoesNotContain(s.Loot, l => l.Item == "Fine Steel Spear");
+        // The dismissal is view-side only — the per-creature drop ledger (wiki packs,
+        // target drops) still credits the kobold with the auto-sold drop.
+        Assert.Contains(s.Mobs.Single(m => m.Name == "Greater kobold").Loot,
+            ml => ml.Item == "Fine Steel Spear");
     }
 
     [Fact]

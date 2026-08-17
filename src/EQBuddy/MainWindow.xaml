@@ -458,7 +458,9 @@
                     <Grid Margin="0,0,2,1">
                         <!-- Show: all / looted / other — pick the slice you care about.
                              Looted is corpse drops; other is everything else you acquired
-                             (foraged, crafted, merged, parcel), each tagged in the list. -->
+                             (foraged, crafted, merged, parcel), each tagged in the list.
+                             Auto-sold pickups appear nowhere here — dismissed at the corpse
+                             means not loot; their coin lives in the money tracker. -->
                         <StackPanel x:Name="LootViewBar" Orientation="Horizontal"
                                     HorizontalAlignment="Left">
                             <TextBlock Text="show:" FontSize="10" Foreground="{DynamicResource DimBrush}"

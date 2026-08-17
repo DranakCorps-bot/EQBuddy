@@ -1783,8 +1783,10 @@ public partial class MainWindow : Window
         var view = _settings.LootView == "made" ? "other" : _settings.LootView;   // all | looted | other
 
         // Provenance split: corpse drops are "looted"; forage/parcel (in s.Loot) plus merges
-        // (s.Crafted) and crafts (s.Fashioned) are "other".
-        static bool IsOther(string src) => src is "Forage" or "Parcel";
+        // (s.Crafted) and crafts (s.Fashioned) are "other". Auto-sells never reach s.Loot
+        // or s.RecentLoot at all — dismissed at the corpse is not loot (LW, 2026-08-17).
+        static bool IsOther(string src) =>
+            src is EQBuddy.UI.Shared.LootRows.ForageSource or EQBuddy.UI.Shared.LootRows.ParcelSource;
         var hasLooted = s.Loot.Any(l => !IsOther(l.LastSource));
         var hasOther = s.Loot.Any(l => IsOther(l.LastSource))
                        || s.Crafted.Count > 0 || s.Fashioned.Count > 0;

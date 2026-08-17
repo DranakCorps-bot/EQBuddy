@@ -17,6 +17,11 @@ public sealed record LootRow(string Item, string Value, string? Tag);
 ///   - "other":  everything else you acquired — foraged, crafted, merged, parcel.
 ///   - "all":    the two mixed into one ordered list.
 ///
+/// Auto-sold pickups ("looted … and sold it for …") never reach these rows at all:
+/// dismissed at the corpse means not interesting as loot (LW, 2026-08-17 — a (Sold)
+/// tag + filter was tried first and crowded the views). They are vendor income and a
+/// per-creature drop-ledger entry; the snapshot's Loot/RecentLoot exclude them.
+///
 /// Provenance drives both the filter and the muted inline tag. Corpse loot is untagged;
 /// forage and parcel ride the loot list (LootDetail.LastSource); crafted (fashioned) and
 /// merged come in as their own lists. "recent" is arrival order (see <see cref="RawLootView"/>)

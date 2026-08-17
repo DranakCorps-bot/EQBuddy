@@ -53,6 +53,12 @@ public class InventoryFileTests
         // Only loot AFTER the dump counts.
         Assert.Empty(stats.ItemsGainedSince(new DateTime(2026, 8, 11, 9, 30, 0)));
 
+        // An auto-sold pickup is net ZERO for the bags: it never entered them, so it
+        // must neither add nor subtract. (It used to subtract — telling the overlay an
+        // item left that was never counted in.)
+        Line(20, "You looted a Bone Chips from a decaying skeleton's corpse and sold it for 4 copper.");
+        Assert.Equal(2, stats.ItemsGainedSince(dumpTime)["Bone Chips"]);
+
         // Sells floor at zero rather than going negative.
         var oversold = snap.WithChanges(new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
             { ["Cracked Staff"] = -5 });
