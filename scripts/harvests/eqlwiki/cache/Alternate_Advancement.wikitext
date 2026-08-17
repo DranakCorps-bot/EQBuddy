@@ -108,7 +108,7 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Healing Adept || 3 || 2/4/6 || This passive ability increases the effectiveness of your instant-duration healing spells by 2/5/10%. Requirements: level 1.
 |-
-| Healing Boon || 3 || 3/6/9 || This passive ability increased chance that your heal-over-time spells will exceptionally heal their target by 3/6/9%. An exceptional heal does double healing value of the spell for that 6 second interval. Requirements: level 1.
+| Healing Boon || 3 || 3/6/9 || This passive ability increased chance that your heal-over-time spells will exceptionally heal their target by 3/6/10%. An exceptional heal does double healing value of the spell for that 6 second interval. Requirements: level 1.
 |-
 | Healing Gift || 3 || 2/4/6 || This passive ability grants your instant-duration healing spells a 3%/6%/10% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: level 1.
 |-
@@ -140,7 +140,7 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Quick Damage || 3 || 3/6/9 || This passive ability reduces the base cast time of direct damage spells that have an initial cast time of 3 seconds or more by 2/5/10%. Requirements: level 1.
 |-
-| Rampage || 1 || 5 || Ability Activation ID: 109 - Refresh Time: 0:10:00 - Ability Timer(s): 81. This ability, when activated, performs a single primary slot combat round on all creatures within a 40 foot radius. Requirements: level 30.
+| Rampage || 1 || 5 || Ability Activation ID: 109 - Refresh Time: 0:10:00 - Ability Timer(s): 81. This ability, when activated, performs a single primary slot combat round on all creatures within a 40 foot radius. The cooldown for this ability is reduced by 1 minute each time Frenzy or Cleave is used. The reduction is only 40 seconds if the player is in Berserker Stance. Requirements: level 30, No previous ability requirements.
 |-
 | Spell Casting Deftness || 3 || 2/4/6 || This passive ability reduces the cast time of beneficial spells that have a duration and an initial cast time of at least 3 seconds by 10/25/50%. Requirements: level 1. Requirements: level 1.
 |-
@@ -219,7 +219,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Divine Aura || 1 || 6 || Ability Activation ID: 39 - Refresh Time: 0:10:00 - Ability Timer(s): 4. Divine Aura I, when activated, instantly renders you invulnerable to most attacks but also unable to attack and heals 5000 health every 6 seconds for 0:00:18. Requirements: level 50.
 |-
-| Divine Aura || 1 || 0 || Grants the Cleric a 5% bonus to most direct healing spells. Requirements: level 1.
+| Innate Divine Healing || 1 || 0 || Grants the Cleric a 5% bonus to most direct healing spells. Requirements: level 1.
 |-
 | Purify Soul || 1 || 5 || Ability Activation ID: 41 - Refresh Time: 0:30:00 - Ability Timer(s): 7. This ability, when activated, cures a target up to 100 feet away of 72 poison, disease, and curse counters and has a 95% chance to remove up to 6 detrimental effects. Requirements: level 15, Healing Gift level 3.
 |-

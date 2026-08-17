@@ -9,7 +9,7 @@ __NOTOC__
 | [[Romar Sunto]]
 |-
 ! ''' Minimum Level: '''
-| 35 (to start, 44 to use)
+| 35 (to start, 41 to use)
 |-
 ! ''' Classes: '''
 | [[Enchanter]]

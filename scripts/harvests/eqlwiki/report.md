@@ -1,220 +1,205 @@
-# eqlwiki.com spell harvest report
+# EQL Wiki AA Harvest Report
 
-Harvested: 2026-08-16 13:55 local, via MediaWiki API at https://eqlwiki.com/api.php
+Harvested: 2026-08-06 from https://eqlwiki.com/wiki/Alternate_Advancement (MediaWiki API)
 
-## Enumeration
+## Discovery route
 
-`list=embeddedin` on `Template:Spellpage` worked; a second page-level template,
-`Template:Spellpagesmart`, was also found (Template-namespace prefix search) and harvested.
+- `list=embeddedin` for Template:AApage / Template:AAPage / Template:AA: **empty**
+- `list=categorymembers` for Category:Alternate Advancement / Category:AAs: **empty**
+- `list=search` for "Alternate Advancement": **1 hit** - the single page `Alternate Advancement` (pageid 56762, 38,550 bytes)
 
-- Template:Spellpage: 2035 pages
-- Template:Spellpagesmart: 1029 pages
-- Unique spell pages: 2035
-- Parsed spells: 2002
+**eqlwiki has no per-AA pages.** The whole catalog is 19 uniform wikitables (`Name / Ranks / Cost / Description`) on that one page, sectioned as General, Archetype, one table per class (16 classes), and Special. This report parses those tables.
 
-Template message field names verified on real pages (Mesmerize, Color Flux, Root, Charm):
-`msg_cast_on_you`, `msg_cast_on_other`, `msg_wears_off` — exactly as guessed, no variants found.
+## Totals
 
-## Counts per class
+- **Total abilities: 144**
+  - General: 31
+  - Archetype: 34
+  - Class: 78
+  - Special: 1
+  - Per class: Bard 7, Beastlord 5, Berserker 4, Cleric 6, Druid 3, Enchanter 2, Magician 5, Monk 5, Necromancer 5, Paladin 7, Ranger 4, Rogue 6, Shadow Knight 6, Shaman 2, Warrior 6, Wizard 5
 
-- Bard: 91
-- Beastlord: 77
-- Cleric: 207
-- Druid: 268
-- Enchanter: 239
-- Magician: 202
-- Necromancer: 192
-- Paladin: 91
-- Ranger: 92
-- Rogue: 9
-- Shadow Knight: 75
-- Shadowknight: 15
-- Shaman: 211
-- Wizard: 235
-- (no parseable class list): 546
+Cost and effect numbers are slash-separated per rank exactly as the wiki gives them; `?` means the wiki itself doesn't know the value (unconfirmed ranks). Nothing is invented.
 
-## Message field coverage
+## AAs with DURATION / TIMING effects
 
-- msg_cast_on_you: 1426 / 2002
-- msg_cast_on_other: 1576 / 2002
-- msg_wears_off: 1034 / 2002
+Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, charm, root, snare, lull, buff, tick, recast, reuse, faster, haste, regen.
+**27 abilities matched.** Exact effect sentences quoted; per-rank numbers pulled from each quoted sentence.
 
-## Distinct msg_cast_on_other for stun/mez/root/charm/lull spells
+### Adamant Will (General; 4 rank(s), cost 2/4/6/9)
+*Requirements: level 1.*
 
-Family membership inferred from name/description/slot effects (keyword match, listed per family).
+- Keywords `mesmeri, charm`:
+  > This passive ability grants you an additional 20/40/60/80% chance to resist charm, and 15/30/45/60% chance to resist mesmerization spells.
+  - Per-rank numbers: 20/40/60/80%; 15/30/45/60%
 
-### stun (66 distinct messages)
+### Circular Breathing (General; 4 rank(s), cost 2/3/4/5)
+*Requirements: level 1.*
 
-- `Soandso is struck by a shock of lightning.` — Lightning Call
-- `Someone  begins to spin from one hundred blows.` — One Hundred Blows
-- `Someone  begins to weep.` — Largarn`s Lamentation
-- `Someone  convulses.` — Denon's Bereavement
-- `Someone  doubles over in pain as the noxious poison enters their lungs.` — Ceticious Cloud
-- `Someone  gapes in reverent awe.` — Enforced Reverence
-- `Someone  gathers glowing blue strands of mana.` — Harvest
-- `Someone  has been engulfed in the maelstrom.` — Storm Strike
-- `Someone  has been force struck.` — Force Shock, Force Strike
-- `Someone  has been mesmerized.` — Sathir's Mesmerization
-- `Someone  has been poisoned.` — System Shock I, System Shock II, System Shock III, System Shock IV, System Shock V
-- `Someone  has been struck by lightning.` — Fury of Air
-- `Someone  has been struck by the force of Ykesha.` — Ykesha
-- `Someone  has been thunder struck.` — Thunderclap
-- `Someone  has been thunder-stunned.` — Thunderbold
-- `Someone  is assaulted by the wrath of nature.` — Nature's Holy Wrath
-- `Someone  is blasted by energy laden winds.` — Force Spiral of Al'Kabor
-- `Someone  is blasted by freezing winds.` — Wrath of Ap'Sagor
-- `Someone  is blasted by the Vengeance of Al'Kabor.` — Vengeance of Al`Kabor
-- `Someone  is burnt by the wrath of the heavens.` — Holy Shock
-- `Someone  is caught in a torrent of reckless magic.` — Draught of Jiva
-- `Someone  is covered with a light layer of stone.` — Stone Breath
-- `Someone  is crushed by a wall of water.` — Tsunami
-- `Someone  is dazzled by scintillating colors.` — Color Slant
-- `Someone  is deafened.` — Shrieking Howl
-- `Someone  is entombed in ice.` — Entomb in Ice
-- `Someone  is slammed by a pulse of static energy.` — Jyll`s Static Pulse
-- `Someone  is slammed by an intense gust of wind.` — Breath of Karana, Dizzying Wind, Whirling Wind
-- `Someone  is struck by a sudden force.` — Force, Markar`s Clash, Markar`s Discord, Stun Command, Tishan's Clash, Tishan`s Discord …
-- `Someone  is struck down.` — Divine Wrath
-- `Someone  is stunned by scintillating colors.` — Color Flux, Color Shift, Color Skew
-- `Someone  is stunned.` — Holy Might, Sound of Force, Stun
-- `Someone  is surrounded by fluxing strands of chaos.` — Chaos Flux
-- `Someone  lets out a high pitched scream.` — Sonic Scream
-- `Someone  looks delirious.` — Sanity Warp
-- `Someone  reels from a stunning blow.` — Stunning Blow
-- `Someone  reels in pain.` — Brusco's Bombastic Bellow
-- `Someone  reels.` — Envenomed Heal
-- `Someone  shrieks as their bones are set ablaze.` — Incinerate Bones
-- `Someone  staggers with intense pain.` — Stun Breath
-- `Someone  stands rigid in pain.` — Fist of Sentience
-- `Someone  writhes and staggers.` — The Unspoken Word
-- `Someone 's body spasms as the lightning bolt arcs through them.` — Lightning Bolt
-- `Someone 's bones freezes and crack.` — Conglaciation of Bone
-- `Someone 's brain begins to melt.` — Discordant Mind
-- `Someone 's brain begins to smolder.` — Chaotic Feedback
-- `Someone 's mind warps.` — Dementia
-- `Someone 's skin burns away.` — Ignite Bones
-- `Someone 's skin burns.` — Wave of Flame
-- `Someone 's skin freezes and cracks off.` — Chill Bones
-- `Someone 's skin is torn by the Judgment of Ice.` — Judgment of Ice
-- `Someone 's weapons gleam.` — Call of Fire
-- `Someone 's world dissolves into anarchy.` — Anarchy
-- `Someone Gates.` — Song of Highsun
-- `Someone has been struck by a Thunder Bolt.` — Thunder Strike
-- `Someone is covered with a light layer of stone.` — Stone Spider Stun
-- `Someone is knocked backwards by a concussion of air.` — Call of Sky Strike
-- `Someone is smothered in a rolling wave of flame.` — Call of Fire Strike
-- `Someone is struck by a sudden force.` — Monkey Stun
-- `Someone is stunned by a gust of air.` — Air Elemental Attack
-- `Someone staggers as spirits of frost slam against them.` — Blast of Frost, Frost Dagger, Frost Shard, Ice Spear
-- `Someone staggers back.` — Static Strike
-- `Target has been force struck.` — Force Snap
-- `begins to sway!` — Stunning Strike, Stunning Venom
-- `is consumed in a magic pulse.` — Static
-- `is struck by a sudden force.` — Cease, Desist, Sacred Word
+- Keywords `regen`:
+  > This passive ability increases your endurance regeneration by 1/2/3/4 point(s).
+  - Per-rank numbers: 1/2/3/4
 
-### mez (15 distinct messages)
+### Innate Regeneration (General; 7 rank(s), cost 1/1/1/2/3/5/5)
+*Requirements: level 1.*
 
-- `Player gawks at the glowing lights.` — Entrancing Lights
-- `Someone  begins to scream.` — Screaming Terror
-- `Someone  has been enthralled.` — Enthrall
-- `Someone  has been entranced.` — Entrance
-- `Someone  has been fascinated.` — Fascination
-- `Someone  has been mesmerized by an eerie melody.` — Melodious Befuddlement
-- `Someone  has been mesmerized by the Glamour of Kintaz.` — Glamour of Kintaz
-- `Someone  has been mesmerized.` — Dazzle, Mesmerization, Mesmerize, Sathir's Mesmerization
-- `Someone  is surrounded by a cloud of silence.` — Mesmerizing Breath
-- `Someone  looks peaceful.` — Harpy Voice
-- `Someone  stumbles toward you.` — Song of Twilight
-- `Someone  swoons in raptured bliss.` — Rapture
-- `Someone 's eyes glaze over.` — Crission's Pixie Strike
-- `Someone 's head nods.` — Kelin's Lucid Lullaby
-- `Target's eyes glaze over.` — Sionachie's Dreams
+- Keywords `regen`:
+  > This passive ability increases your health regeneration by 1/1/1/2/3/5/5 point(s).
+  - Per-rank numbers: 1/1/1/2/3/5/5
 
-### root (18 distinct messages)
+### Permanent Illusion (General; 1 rank(s), cost 5)
+*Requirements: level 1.*
 
-- `'s feet won't budge!` — Grounding Strike
-- `Someone  begins to scream.` — Screaming Terror
-- `Someone  glances nervously about.` — Wind of Tishanian
-- `Someone  is entrapped by roots.` — Entrapping Roots
-- `Someone  is stuck to the ground as they begin to regenerate.` — Stalwart Regeneration
-- `Someone  is trapped within a whirling wind.` — Whirl Bolt, Whirlbolt
-- `Someone  sinks into the ground.` — EarthElementalAttack
-- `Someone  stumbles.` — GelatRot, Ghoul Root
-- `Someone  turns into a tree.` — Spirit of Oak, Treeform
-- `Someone 's feet adhere to the ground.` — Fetter, Instill, Paralyzing Earth, Root
-- `Someone 's feet become entangled.` — Engorging Roots
-- `Someone 's feet become entwined.` — Engulfing Roots, Enveloping Roots, Grasping Roots
-- `Someone 's feet sink into the ground.` — Hungry Earth
-- `Someone 's image shimmers.` — Illusion: Tree
-- `Someone sinks into the ground.` — Earth Elemental Attack
-- `Someone's feet adhere to the ground.` — Immobilize
-- `Someone's feet become entwined.` — Ensnaring Roots
-- `Target is entombed by elemental ice.` — Elnerick's Entombment of Ice
+- Keywords `duration, extend`:
+  > This passive ability extends the duration of your beneficial illusion spells to 16.6 hours and allows them to persist when zoning.
 
-### charm (5 distinct messages)
+### Healing Adept (Archetype; 3 rank(s), cost 2/4/6)
+*Requirements: level 1.*
 
-- `Someone  blinks.` — Allure of the Wild, Befriend Animal, Beguile Animals, Beguile Plants, Call of Karana, Charm Animals …
-- `Someone  glances nervously about.` — Wind of Tishanian
-- `Someone  has been charmed.` — Alluring Whispers, Beguile, Boltran's Agacerie, Cajoling Whispers, Charm, Dictate …
-- `Someone  moans.` — Beguile Undead, Cajole Undead, Dominate Undead, Enslave Death, Thrall of Bones
-- `Someone 's eyes glaze over.` — Solon's Bravura, Solon's Song of the Sirens
+- Keywords `duration`:
+  > This passive ability increases the effectiveness of your instant-duration healing spells by 2/5/10%.
+  - Per-rank numbers: 2/5/10%
 
-### lull (14 distinct messages)
+### Healing Gift (Archetype; 3 rank(s), cost 2/4/6)
+*Requirements: level 1.*
 
-- `Player takes on a non-threatening visage.` — Calming Visage
-- `Someone  drinks an elixir of clarity.` — Elixir of Clarity IV, Elixir of Clarity VI
-- `Someone  glances nervously about.` — Wind of Tishanian
-- `Someone  looks ambivalent.` — Numb the Dead, Rest the Dead
-- `Someone  looks less aggressive.` — Calm, Calm Animal, Lull, Pacify, Soothe, Wake of Tranquility
-- `Someone  looks peaceful.` — Symphonic Harmony
-- `Someone  looks sad.` — Kelin's Lugubrious Lament
-- `Someone  looks tranquil.` — Boon of the Clear Mind, Clarity
-- `Someone  looks very tranquil.` — Clarity II, Gift of Pure Thought
-- `Someone  sighs in tranquility.` — Breeze
-- `Someone  stumbles toward you.` — Song of Twilight
-- `Someone 's eyes glaze over.` — Crission's Pixie Strike
-- `Someone 's head nods.` — Kelin's Lucid Lullaby
-- `Target's eyes glaze over.` — Sionachie's Dreams
+- Keywords `duration`:
+  > This passive ability grants your instant-duration healing spells a 3%/6%/10% chance to score an exceptional heal.
+  - Per-rank numbers: 3%/6%/10%
 
-## Failures
+### Mass Group Buff (Archetype; 1 rank(s), cost 9)
+*Requirements: level 50.*
 
-No fetch failures.
+- Keywords `buff`:
+  > This ability, when activated, doubles the mana cost of your next spell or ability that can be affected by the Mass Group Buff and causes it to land on all allies within the spell's radius.
 
-Pages where no Spellpage/Spellpagesmart template could be parsed (33):
-- Bryrym
-- Zyerek Onyxblood
-- Vyldin Flamereaver
-- Quellod Earthspirit
-- Malteor Flamecaller
-- Kalkar of the Maelstrom
-- Carx`Vean
-- Gra`Vloren
-- Hsrek
-- Kal`Vunar
-- Kedrak
-- Lurian
-- Mazrien
-- Nir`Tan
-- Vukuz
-- Yrrindor Emerald Claw
-- Yendilor the Cerulean Wing
-- Ajorek the Crimson Fang
-- A Lava Defender
-- A Sky Defender
-- An Emerald Defender
-- An Onyx Defender
-- Beldion Icewind
-- Belijor the Emerald Eye
-- Cyndor Lightningfang
-- Degta`Glis
-- Dktan`Nirsl
-- Nelaarn the Ebon Claw
-- Rlinf`Tae
-- Sarek`Relan
-- Velcra`Dron
-- Wel`Wnas
-- Zed`Renzicd
+### Mental Clarity (Archetype; 4 rank(s), cost 2/3/4/5)
+*Requirements: level 1.*
 
-## Throttling / backoff
+- Keywords `regen`:
+  > This passive ability increases your mana regeneration by 1 points per rank.
 
-No throttling encountered; requests paced at ~1/second throughout.
+### Pet Affinity (Archetype; 1 rank(s), cost 2)
+*Requirements: level 1.<br>NOTE: This AA is not required for Quick Buff to affect your pet for single-target spells. This AA is required for "group" spells to affect your pet.*
+
+- Keywords `buff`:
+  > Requirements: level 1.<br>NOTE: This AA is not required for Quick Buff to affect your pet for single-target spells.
+
+### Spell Casting Deftness (Archetype; 3 rank(s), cost 2/4/6)
+*Requirements: level 1. Requirements: level 1.*
+
+- Keywords `duration`:
+  > This passive ability reduces the cast time of beneficial spells that have a duration and an initial cast time of at least 3 seconds by 10/25/50%.
+  - Per-rank numbers: 10/25/50%
+
+### Spell Casting Reinforcement (Archetype; 4 rank(s), cost 2/4/6/8)
+*Requirements: level 1.*
+
+- Keywords `duration`:
+  > This passive ability increases the duration of beneficial spells that you cast by 5/15/30/50%.
+  - Per-rank numbers: 5/15/30/50%
+
+### Thief's Intuition (Archetype; 4 rank(s), cost 3)
+*Requirements: level 1.*
+
+- Keywords `reuse`:
+  > This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1 second.
+
+### Reaching Notes (Bard; 6 rank(s), cost 2/4/6/?/?/?)
+*Requirements: level 1.*
+
+- Keywords `extend`:
+  > When enabled, this passive ability extends the radius of your beneficial area songs by 10%.
+
+### Hobble of Spirits (Beastlord; 1 rank(s), cost 5)
+*Requirements: level 30.*
+
+- Keywords `snare`:
+  > This ability, when activated, grants your pet's melee attacks a chance (with a 150% bonus) to trigger Hobble of Spirits Snare I which reduces its target's movement speed by 40% for 24 seconds.
+- Keywords `duration, buff`:
+  > This buff has a permanent duration and a 3 second cast time.
+
+### Paragon of Spirit (Beastlord; 1 rank(s), cost 6)
+
+- Keywords `regen`:
+  > Paragon of Spirit I, when activated, shares your natural attunement with all group members within a 200 foot radius, increasing health regeneration by 200 points and mana regeneration by 80 points for 0:00:36.
+
+### Enhanced Root (Druid; 1 rank(s), cost 5)
+*Requirements: level 1.*
+
+- Keywords `root`:
+  > This passive ability reduces the chance that an NPC target entangled by your root spells will break free when struck by a non-melee attack by 50%.
+
+### Tricksters Misdirection (Enchanter; 1 rank(s), cost 9)
+*Requirements: Level 50.*
+
+- Keywords `buff`:
+  > When triggered, casts Tricksters Misdirection, a defensive proc buff lasting 1 minute, with 1 charge.
+
+### Unbound Clarity (Enchanter; 3 rank(s), cost 0)
+*Requirements: Level 12/30/50.*
+
+- Keywords `regen`:
+  > This passive increases the Enchanters mana regeneration by 2/4/6 points.
+  - Per-rank numbers: 2/4/6
+
+### Companion's Fury (Magician; 1 rank(s), cost 6)
+*Requirements: level 15.*
+
+- Keywords `haste`:
+  > Frenzied Burnout I increases your pet's armor class by 75 points, overhaste by 15%, strength by 20 points, attack power by 200 points, chance to perform a flurry of attacks on a successful double attack by 5%, and accuracy by 10%.
+
+### Purify Body (Monk; 1 rank(s), cost 9)
+*Requirements: level 15.*
+
+- Keywords `charm`:
+  > Purification I, when activated, instantly cures you of up to 20 detrimental effects (excluding charm, fear, resurrection, and revival sickness).
+
+### Rapid Feign (Monk; 3 rank(s), cost 3/6/9)
+*Requirements: level 17.*
+
+- Keywords `reuse`:
+  > This passive ability reduces the reuse time of your Feign Death skill by 1/3/5 second(s).
+  - Per-rank numbers: 1/3/5
+
+### Unbound Alacrity (Monk; 3 rank(s), cost 0)
+*Requirements: level 12/30/50.*
+
+- Keywords `haste`:
+  > Gives a passive 3/6/10% increase in your current and maximum haste value.
+  - Per-rank numbers: 3/6/10%
+
+### Dead Mesmerization (Necromancer; 1 rank(s), cost 3)
+*Requirements: level 40.*
+
+- Keywords `mesmeri`:
+  > Dead Mesmerization I, when activated, mesmerizes up to 12 level 59 or lower undead creatures within a 35 foot radius of your target for 0:00:36.
+
+### Unbound Lethality (Rogue; 3 rank(s), cost 0)
+*Requirements: ?.*
+
+- Keywords `duration`:
+  > Gives a passive 10/15/20% bonus to the duration of all poisons.
+  - Per-rank numbers: 10/15/20%
+
+### Warrior's Endurance (Warrior; 1 rank(s), cost 6)
+*Requirements: level 30.*
+
+- Keywords `regen`:
+  > This passive ability increases your hit point regeneration by 1% per 6 seconds.
+
+### Improved Familiar (Wizard; 1 rank(s), cost 6)
+*Requirements: level 45.*
+
+- Keywords `regen`:
+  > Improved Familiar I, which when activated, triggers Summon Improved Familiar I, the physical manifestation of your familiar, increases the damage dealt by your critical direct damage spells by 3%, the casting levels of your spells by 9, your cold, disease, fire, magic, and poison resistances by 25 points, your mana regeneration by 6 points, your maximum mana by 200 points, and allows you to see invisible creatures.
+
+### Strong Root (Wizard; 1 rank(s), cost 5)
+*Requirements: level 35.*
+
+- Keywords `root`:
+  > This ability, when activated, roots your target in place for up to 48 seconds with a 300 point resist modifier and a 2 second cast time.
+
+## Unparseable rows
+
+None - every table row parsed cleanly into the 4-column schema.

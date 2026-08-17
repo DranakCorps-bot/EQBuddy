@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_Trantor_Everhot.png|frame|Trantor Everhot]]
+[[File:npc_trantor_everhot.png|frame|Trantor Everhot]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]

@@ -1,6 +1,6 @@
 # Buff-duration catalog report
 
-- 361 buffs across 207 landing lines (51 shared)
+- 360 buffs across 207 landing lines (51 shared)
 
 ## Shared landing lines (cast correlation resolves; unresolved = est)
 
@@ -8,10 +8,10 @@
 - 'You drink the potion.': 11 spells
 - 'You begin to regenerate.': 10 spells
 - 'You feel stronger.': 10 spells
-- 'You feel your skin tingle.': 7 spells
 - 'An aura of spiritualism envelops you.': 6 spells
 - 'You are surrounded by a thorny barrier.': 6 spells
 - 'You feel very fast.': 6 spells
+- 'You feel your skin tingle.': 6 spells
 - 'Your mind begins to clear.': 6 spells
 - 'Your eyes tingle.': 5 spells
 - 'A mystic symbol flashes before your eyes.': 4 spells

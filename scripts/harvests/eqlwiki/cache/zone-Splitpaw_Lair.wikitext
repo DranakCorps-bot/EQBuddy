@@ -24,7 +24,7 @@
 |paw
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|22:00
+|6:30
 |-
 ! '''Succor/Evacuate:'''
 | -122, 63 (Zone line to South Karana)
