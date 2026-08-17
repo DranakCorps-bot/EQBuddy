@@ -55,6 +55,18 @@ fi
 CXVER="$(defaults read "$CX_APP/Contents/Info" CFBundleShortVersionString)"
 echo "CrossOver $CXVER detected."
 
+# CodeWeavers names the source tarball with a three-part version (crossover-sources-26.3.0),
+# but the bundle's CFBundleShortVersionString drops a trailing zero ("26.3"). Pad it back or
+# the download 404s — which looks exactly like a network problem and isn't one.
+source_version() {
+    case "$1" in
+        *.*.*) echo "$1" ;;
+        *.*)   echo "$1.0" ;;
+        *)     echo "$1.0.0" ;;
+    esac
+}
+CXSRCVER="$(source_version "$CXVER")"
+
 # There is deliberately NO prebuilt fast path. This script replaces a library inside
 # your CrossOver installation, and EQBuddy is not going to ask you to trust a binary you
 # cannot read for that — especially not one shipped by a log-reading widget. Everything
@@ -66,20 +78,40 @@ xcode-select -p >/dev/null 2>&1 || fail "Xcode command-line tools not found. Run
 
 echo "Building winemac.so from CrossOver $CXVER source (a few minutes)…"
 mkdir -p "$WORK"
-TARBALL="$WORK/crossover-sources-$CXVER.tar.gz"
+TARBALL="$WORK/crossover-sources-$CXSRCVER.tar.gz"
 SRC="$WORK/src-$CXVER"
 if [ ! -d "$SRC/sources/wine" ]; then
-    [ -f "$TARBALL" ] || curl -fL --progress-bar \
-        "https://media.codeweavers.com/pub/crossover/source/crossover-sources-$CXVER.tar.gz" -o "$TARBALL" \
-        || fail "Could not download CrossOver $CXVER source. Check the version / your connection."
+    # --remove-on-error: without it a 404 or a dropped connection leaves a stub behind,
+    # and the next run takes the [ -f ] cache hit and tries to untar an error page.
+    [ -f "$TARBALL" ] || curl -fL --progress-bar --remove-on-error \
+        "https://media.codeweavers.com/pub/crossover/source/crossover-sources-$CXSRCVER.tar.gz" -o "$TARBALL" \
+        || fail "Could not download CrossOver $CXSRCVER source. Check the version / your connection."
     mkdir -p "$SRC" && tar -xzf "$TARBALL" -C "$SRC"
 fi
 WINESRC="$SRC/sources/wine"
 [ -f "$WINESRC/configure" ] || fail "Unexpected source layout — no $WINESRC/configure."
 
+# "Already applied" and "offsets moved, nothing applied" are the SAME patch(1) exit code,
+# and only the first is benign — so judge by the state of the tree, not by the status. Every
+# file the patch touches must carry the new symbol: a PARTIAL application must not pass.
+patch_is_applied() {
+    [ "$(grep -l topmost_float_over_fullscreen \
+        "$WINESRC/dlls/winemac.drv/macdrv_cocoa.h" \
+        "$WINESRC/dlls/winemac.drv/macdrv_main.c" \
+        "$WINESRC/dlls/winemac.drv/cocoa_window.m" 2>/dev/null | wc -l)" -eq 3 ]
+}
+
 echo "Applying the overlay patch…"
-( cd "$WINESRC" && patch -p1 --forward < "$PATCH" ) || \
-    echo "  (patch already applied or offsets differ — continuing)"
+if patch_is_applied; then
+    echo "  (already applied — continuing)"
+else
+    # Checked afterwards, so don't let a nonzero status abort under `set -e`. Any .rej
+    # files a real failure leaves behind are the diagnostic, so they are not cleaned up.
+    ( cd "$WINESRC" && patch -p1 --forward --no-backup-if-mismatch < "$PATCH" ) || true
+    patch_is_applied || fail "The overlay patch does not apply to CrossOver $CXVER source
+    (see the .rej files under $WINESRC/dlls/winemac.drv). winemac.drv has probably moved
+    on — $PATCH needs refreshing against this version."
+fi
 
 BUILD="$WORK/build-$CXVER"
 mkdir -p "$BUILD"
@@ -99,9 +131,14 @@ fi
 
 echo "Building winemac.so…"
 MOLTENVK="$CX_APP/Contents/SharedSupport/CrossOver/lib64/libMoltenVK.dylib"
+# The doubled backslashes are load-bearing. CFLAGS reaches the compiler via make, which
+# runs each recipe through /bin/sh — so one level of quoting is eaten there. Passing a
+# plain \" leaves clang with -DSONAME_LIBVULKAN=libMoltenVK.dylib, and win32u/vulkan.c
+# fails to build on "use of undeclared identifier 'libMoltenVK'". \\\" survives the shell
+# and gives the preprocessor the string literal it needs.
 ( cd "$BUILD" && PATH="/opt/homebrew/opt/bison/bin:$PATH" \
     make dlls/winemac.drv/winemac.so -j"$(sysctl -n hw.ncpu)" \
-    "CFLAGS=-g -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -DSONAME_LIBVULKAN=\"$(basename "$MOLTENVK")\"" ) \
+    "CFLAGS=-g -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 -DSONAME_LIBVULKAN=\\\"$(basename "$MOLTENVK")\\\"" ) \
     || fail "build failed."
 
 BUILT="$BUILD/dlls/winemac.drv/winemac.so"
