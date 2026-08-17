@@ -2128,9 +2128,21 @@ public sealed partial class SessionStats
                 // question — "did anything unusual land while I was grinding the same
                 // thing 200 times" — and a count that ticked from 41 to 42 cannot show
                 // that (#160, wizen). Capped because it feeds a scrolling card, not a log.
-                RecentLoot = _journal.OfType<LootEvent>()
+                // Recent = every ACQUISITION in arrival order, not just corpse/forage/parcel
+                // loot: fashioned crafts and item-merges are acquisitions too and belong on
+                // the timeline (they carry "Fashion"/"Merge" as their source, which the row
+                // builder maps to the (Crafted)/(Merged) tags). Without this they showed in
+                // the count view but never in "recent" (LW, 2026-08-17).
+                RecentLoot = _journal
+                    .Where(e => e is LootEvent or FashionEvent or CraftEvent)
                     .Reverse().Take(MaxRecentLoot)
-                    .Select(l => new LootPickup(l.Time, l.Item, Math.Max(1, l.Count), l.Source))
+                    .Select(e => e switch
+                    {
+                        LootEvent l => new LootPickup(l.Time, l.Item, Math.Max(1, l.Count), l.Source),
+                        FashionEvent f => new LootPickup(f.Time, f.Item, 1, "Fashion"),
+                        CraftEvent c => new LootPickup(c.Time, c.Item, 1, "Merge"),
+                        _ => throw new InvalidOperationException(),
+                    })
                     .ToList(),
                 Loot = _loot.OrderByDescending(kv => kv.Value.Count)
                     .Select(kv => new LootDetail(kv.Key, kv.Value.Count, kv.Value.LastSource)).ToList(),

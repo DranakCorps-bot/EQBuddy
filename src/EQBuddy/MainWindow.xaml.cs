@@ -1798,13 +1798,13 @@ public partial class MainWindow : Window
 
         var rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.Fashioned, s.RecentLoot, view, mode);
 
-        // Sort follows the visible list; "recent" only means something when the view holds
-        // timestamped items (looted/foraged/parcel) — crafted/merged carry no arrival order.
+        // Every acquisition now carries a timestamp (crafts/merges included, via RecentLoot),
+        // so "recent" is meaningful for any non-empty view.
         var hasTimeline = view switch
         {
             "looted" => hasLooted,
-            "other" => s.Loot.Any(l => IsOther(l.LastSource)),
-            _ => s.Loot.Count > 0,
+            "other" => hasOther,
+            _ => hasLooted || hasOther,
         };
         LootSortBar.Visibility = rows.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         LootSortRecent.Visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;

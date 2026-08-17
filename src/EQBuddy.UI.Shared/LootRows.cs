@@ -27,10 +27,20 @@ public static class LootRows
 {
     public const string ForageSource = "Forage";
     public const string ParcelSource = "Parcel";
+    public const string FashionSource = "Fashion";   // crafts, in the recent timeline
+    public const string MergeSource = "Merge";        // item-merges, in the recent timeline
 
-    private static bool IsOther(string source) => source == ForageSource || source == ParcelSource;
-    private static string? LootTag(string source) =>
-        source == ForageSource ? "Foraged" : source == ParcelSource ? "Parcel" : null;
+    // Everything that isn't a corpse drop is "other".
+    private static bool IsOther(string source) =>
+        source is ForageSource or ParcelSource or FashionSource or MergeSource;
+    private static string? LootTag(string source) => source switch
+    {
+        ForageSource => "Foraged",
+        ParcelSource => "Parcel",
+        FashionSource => "Crafted",
+        MergeSource => "Merged",
+        _ => null,   // corpse loot
+    };
 
     public static List<LootRow> Build(
         IReadOnlyList<LootDetail> loot,
@@ -59,12 +69,12 @@ public static class LootRows
             var sourceByName = picks
                 .GroupBy(p => p.Item, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(g => g.Key, g => g.First().Source, StringComparer.OrdinalIgnoreCase);
-            var rows = RawLootView.Rows(picks)
+            // Crafts and merges are already in recentLoot (source Fashion/Merge), so they
+            // ride the arrival timeline here with their timestamps — no separate append.
+            return RawLootView.Rows(picks)
                 .Select(r => new LootRow(r.Item, r.Detail,
                     sourceByName.TryGetValue(r.Item, out var src) ? LootTag(src) : null))
                 .ToList();
-            if (includeMade) rows.AddRange(Made(merged, fashioned, "count"));
-            return rows;
         }
 
         // count / name: fold looted (+ made under other/all) into one sequence and order it
@@ -78,16 +88,5 @@ public static class LootRows
             ? items.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
             : items.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
         return items.Select(x => new LootRow(x.Item, $"×{x.Count}", x.Tag)).ToList();
-    }
-
-    private static IEnumerable<LootRow> Made(
-        IReadOnlyList<NameCount> merged, IReadOnlyList<NameCount> fashioned, string mode)
-    {
-        var items = merged.Select(m => (Item: m.Name, m.Count, Tag: "Merged"))
-            .Concat(fashioned.Select(f => (Item: f.Name, f.Count, Tag: "Crafted")));
-        items = mode == "name"
-            ? items.OrderBy(x => x.Item, StringComparer.OrdinalIgnoreCase)
-            : items.OrderByDescending(x => x.Count).ThenBy(x => x.Item, StringComparer.OrdinalIgnoreCase);
-        return items.Select(x => new LootRow(x.Item, $"×{x.Count}", x.Tag));
     }
 }

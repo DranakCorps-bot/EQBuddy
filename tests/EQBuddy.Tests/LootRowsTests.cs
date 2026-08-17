@@ -22,11 +22,15 @@ public class LootRowsTests
     private static readonly List<NameCount> Merged = [new("Crushbone Belt +5", 1)];   // s.Crafted
     private static readonly List<NameCount> Fashioned = [new("Elixir of Concentration", 4)];
 
+    // Recent is every acquisition in arrival order (newest first), crafts/merges included
+    // — they ride the timeline with source "Fashion"/"Merge".
     private static readonly List<LootPickup> Recent =
     [
+        new(new DateTime(2026, 8, 16, 17, 4, 0), "Elixir of Concentration", 1, "Fashion"),
         new(new DateTime(2026, 8, 16, 17, 3, 0), "Short Sword of the Ykesha", 1, "Parcel"),
         new(new DateTime(2026, 8, 16, 17, 2, 0), "Vegetables", 1, "Forage"),
         new(new DateTime(2026, 8, 16, 17, 1, 0), "Bone Chips", 2, "a decaying skeleton"),
+        new(new DateTime(2026, 8, 16, 17, 0, 0), "Crushbone Belt +5", 1, "Merge"),
     ];
 
     private static List<LootRow> Build(string view, string mode) =>
@@ -73,11 +77,22 @@ public class LootRowsTests
     }
 
     [Fact]
-    public void OtherRecentIsForageParcelArrivalThenMadeByCount() =>
-        // Parcel + forage in arrival order (newest first), then crafted/merged by count.
+    public void OtherRecentIsEveryNonCorpseAcquisitionInArrivalOrder()
+    {
+        // Newest first: Elixir (craft), Short Sword (parcel), Vegetables (forage), Belt (merge).
+        var rows = Build("other", "recent");
         Assert.Equal(
-            new[] { "Short Sword of the Ykesha", "Vegetables", "Elixir of Concentration", "Crushbone Belt +5" },
-            Items("other", "recent"));
+            new[] { "Elixir of Concentration", "Short Sword of the Ykesha", "Vegetables", "Crushbone Belt +5" },
+            rows.Select(r => r.Item).ToArray());
+        Assert.Equal("Crafted", rows[0].Tag);   // the crafted elixir shows in recent, tagged
+    }
+
+    [Fact]
+    public void AllRecentInterleavesEverythingByTime() =>
+        Assert.Equal(
+            new[] { "Elixir of Concentration", "Short Sword of the Ykesha", "Vegetables",
+                    "Bone Chips", "Crushbone Belt +5" },
+            Items("all", "recent"));
 
     [Fact]
     public void CountTiesBreakAlphabetically()

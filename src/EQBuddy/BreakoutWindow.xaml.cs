@@ -537,11 +537,12 @@ public partial class BreakoutWindow : Window
             // discoverable even with only one kind of item (LW, 2026-08-17).
             LootViewBar.Visibility = hasLooted || hasOther ? Visibility.Visible : Visibility.Collapsed;
             rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.Fashioned, s.RecentLoot, view, mode);
+            // Crafts/merges now carry timestamps too, so recent works for any non-empty view.
             var hasTimeline = view switch
             {
                 "looted" => hasLooted,
-                "other" => s.Loot.Any(l => IsOther(l.LastSource)),
-                _ => s.Loot.Count > 0,
+                "other" => hasOther,
+                _ => hasLooted || hasOther,
             };
             LootSortBar.Visibility = rows.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
             // Recent means nothing without timestamped items (crafted/merged carry none).
