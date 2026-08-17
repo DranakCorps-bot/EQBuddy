@@ -29,17 +29,34 @@ public sealed class OptionsViewModelTests
     [Fact]
     public void SoundSelectionHandlesLegacyNamesAndCustomPaths()
     {
+        // Index 0 is now the "(Disabled)" slot, so built-ins sit one higher and the custom
+        // slot is Names.Length + 1.
         var (vm, s, _) = Create(new AppSettings { AlertSound = "Question" });
-        Assert.Equal(Array.IndexOf(AlertSoundCatalog.Names, "Notify"), vm.SoundIndex);   // legacy maps
+        Assert.Equal(Array.IndexOf(AlertSoundCatalog.Names, "Notify") + 1, vm.SoundIndex);   // legacy maps
         Assert.Equal("", vm.SoundFileNote);
 
         vm.SetCustomSound(@"C:\sounds\gong.wav");
-        Assert.Equal(AlertSoundCatalog.Names.Length, vm.SoundIndex);                     // custom slot
+        Assert.Equal(AlertSoundCatalog.Names.Length + 1, vm.SoundIndex);                     // custom slot
         Assert.Contains("gong.wav", vm.SoundFileNote);
 
-        vm.SelectNamedSound(0);
+        vm.SelectNamedSound(1);                                                              // first built-in
         Assert.Equal(AlertSoundCatalog.Names[0], s.AlertSound);
-        Assert.True(vm.IsCustomSoundIndex(AlertSoundCatalog.Names.Length));
+        Assert.True(vm.IsCustomSoundIndex(AlertSoundCatalog.Names.Length + 1));
+    }
+
+    [Fact]
+    public void DisabledSoundChoiceSilencesAlerts()
+    {
+        var (vm, s, _) = Create(new AppSettings { AlertSound = "Ding" });
+
+        vm.SelectNamedSound(0);   // the "(Disabled)" slot
+        Assert.Equal(AlertSoundCatalog.OffChoice, s.AlertSound);
+        Assert.Equal(0, vm.SoundIndex);
+        Assert.True(vm.IsDisabledSoundIndex(0));
+
+        // And a settings.json already holding "Off" lands back on the Disabled slot.
+        var (vm2, _, _) = Create(new AppSettings { AlertSound = "Off" });
+        Assert.Equal(0, vm2.SoundIndex);
     }
 
     [Fact]

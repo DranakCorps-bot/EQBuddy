@@ -260,26 +260,42 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
     }
 
     // ---- alert sound ----
+    /// <summary>First entry of the sound picker: no alert sound at all. The volume slider
+    /// floors at 10%, so this is the only way to silence alerts outright — and it's the
+    /// honest choice on a platform whose built-in sound files aren't present (Wine ships
+    /// none of the Windows Media clips, so every built-in there plays nothing anyway).
+    /// Stored as AlertSoundCatalog.OffChoice, which the sound planner already reads as
+    /// "play nothing".</summary>
+    public const string DisabledSoundChoice = "(Disabled)";
     public const string CustomSoundChoice = "Custom file…";
     public static readonly string[] SoundChoices =
-        [.. AlertSoundCatalog.Names.Select(n => n == "Ding" ? $"{n} (default)" : n), CustomSoundChoice];
+        [DisabledSoundChoice, .. AlertSoundCatalog.Names.Select(n => n == "Ding" ? $"{n} (default)" : n), CustomSoundChoice];
 
-    /// <summary>Index into SoundChoices for the current setting (the custom slot for paths).</summary>
+    // Picker layout: 0 = Disabled, 1..Names.Length = built-ins, last = Custom.
+    private static bool IsOff(string? choice) =>
+        string.Equals((choice ?? "").Trim(), AlertSoundCatalog.OffChoice, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Index into SoundChoices for the current setting (0 = Disabled, last = the
+    /// custom slot for paths).</summary>
     public int SoundIndex
     {
         get
         {
+            if (IsOff(_settings.AlertSound)) return 0;
             var i = Array.IndexOf(AlertSoundCatalog.Names, AlertSoundCatalog.Normalize(_settings.AlertSound));
-            return i >= 0 ? i : AlertSoundCatalog.Names.Length;
+            return i >= 0 ? i + 1 : AlertSoundCatalog.Names.Length + 1;
         }
     }
 
-    public bool IsCustomSoundIndex(int index) => index >= AlertSoundCatalog.Names.Length;
+    public bool IsDisabledSoundIndex(int index) => index == 0;
+    public bool IsCustomSoundIndex(int index) => index >= AlertSoundCatalog.Names.Length + 1;
 
     public void SelectNamedSound(int index)
     {
         if (IsCustomSoundIndex(index)) return;
-        _settings.AlertSound = AlertSoundCatalog.Names[index];
+        _settings.AlertSound = IsDisabledSoundIndex(index)
+            ? AlertSoundCatalog.OffChoice
+            : AlertSoundCatalog.Names[index - 1];
         PersistAnd(nameof(SoundFileNote));
     }
 
