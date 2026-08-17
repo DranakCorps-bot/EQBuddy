@@ -23,6 +23,105 @@ public class MezTrackerTests
         return t;
     }
 
+    /// <summary>
+    /// #183, TheLethean: "when I mez multiple mobs with the same name, and then wake one
+    /// by attacking it, the chips for all of the same-named mobs disappear."
+    ///
+    /// ONE break prints TWO lines, and each of them dropped a chip:
+    ///   Your Mesmerization spell has worn off of a skeleton.
+    ///   A skeleton has been awakened by Dorr.
+    /// so every wake cost two. His second log counts it exactly — one wake, two chips —
+    /// and note the ORDER: the fade line comes FIRST, which is why the existing
+    /// "did the awake ledger just move" guard could not see it.
+    /// </summary>
+    [Fact]
+    public void OneWakeCostsOneChipEvenThoughTheGamePrintsTwoLines()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerization."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a putrid skeleton has been mesmerized."),
+            // One skeleton woken: the pair, fade first, exactly as his log has it.
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(5, "A skeleton has been awakened by Dorr."));
+
+        var chips = t.Snapshot(T0.AddSeconds(6));
+        Assert.Equal(3, chips.Count);
+        Assert.Equal(2, chips.Count(c => c.Target == "Skeleton"));
+        Assert.Single(chips, c => c.Target == "Putrid skeleton");
+    }
+
+    /// <summary>The same pair in the other order — a log that prints the break line
+    /// first must not double-drop either.</summary>
+    [Fact]
+    public void ThePairIsCoalescedWhicheverHalfArrivesFirst()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerization."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(5, "A skeleton has been awakened by Dorr."),
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."));
+
+        Assert.Equal(2, t.Snapshot(T0.AddSeconds(6)).Count);
+    }
+
+    /// <summary>Pairing must stay 1:1. Two mobs genuinely broken at once print two of
+    /// EACH line, and both breaks still have to count — otherwise the fix would trade
+    /// vanishing chips for chips that never leave.</summary>
+    [Fact]
+    public void TwoRealBreaksInTheSameSecondStillDropTwoChips()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerization."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(5, "A skeleton has been awakened by Dorr."),
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(5, "A skeleton has been awakened by Dorr."));
+
+        Assert.Equal(2, t.Snapshot(T0.AddSeconds(6)).Count);
+    }
+
+    /// <summary>A break of ONE name says nothing about another. The putrid skeleton in
+    /// his log kept its chip throughout, and must.</summary>
+    [Fact]
+    public void ABreakPairNeverReachesADifferentlyNamedMob()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerization."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a putrid skeleton has been mesmerized."),
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(5, "A skeleton has been awakened by Dorr."));
+
+        Assert.Single(t.Snapshot(T0.AddSeconds(6)), c => c.Target == "Putrid skeleton");
+    }
+
+    /// <summary>A genuine LATER break still drops its chip — the token must not linger
+    /// and swallow the next one.</summary>
+    [Fact]
+    public void ALaterBreakOfTheSameNameIsNotSwallowedByAnEarlierPair()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerization."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(1, "a skeleton has been mesmerized."),
+            Ev(5, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(5, "A skeleton has been awakened by Dorr."),
+            Ev(12, "Your Mesmerization spell has worn off of a skeleton."),
+            Ev(12, "A skeleton has been awakened by Dorr."));
+
+        Assert.Single(t.Snapshot(T0.AddSeconds(13)));
+    }
+
     [Fact]
     public void OwnMezCastPlusLandingStartsACountdown()
     {

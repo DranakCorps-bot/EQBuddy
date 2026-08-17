@@ -61,6 +61,39 @@ public sealed class MezTracker
     /// Refreshed by activity; long enough to cover a fight, short enough that a name
     /// doesn't stay break-immune forever (issue #35).</summary>
     public static readonly TimeSpan AwakeMemory = TimeSpan.FromSeconds(45);
+
+    /// <summary>ONE break prints TWO lines. Waking a mezzed mob logs both
+    ///   "Your Mesmerization spell has worn off of a skeleton."
+    ///   "A skeleton has been awakened by Dorr."
+    /// and each of them used to drop a chip, so every wake cost two — which with a
+    /// stack of same-named mobs reads exactly as "the chips for all of them disappear"
+    /// (#183, TheLethean, whose second log counts it precisely: one wake, two chips).
+    ///
+    /// The lines are paired, not summed. Whichever arrives first drops the chip and
+    /// leaves a token here; its partner spends the token instead of dropping another.
+    /// The order is not fixed — his log has the fade FIRST — so both sides check.
+    ///
+    /// Two mobs genuinely broken in the same second still print two of EACH line, so
+    /// pairing stays 1:1 and both breaks are counted. The window only has to cover
+    /// message lag splitting a pair across a second boundary.</summary>
+    private static readonly TimeSpan BreakPairWindow = TimeSpan.FromSeconds(2);
+    private readonly Dictionary<string, (int Count, DateTime At)> _unpairedBreaks =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>True when this line is the OTHER half of a break already counted, in
+    /// which case it must not drop a second chip. Otherwise the caller drops one and
+    /// this leaves the token for the partner line.</summary>
+    private bool BreakAlreadyCounted(string name, DateTime now)
+    {
+        if (_unpairedBreaks.TryGetValue(name, out var p)
+            && p.Count > 0 && (now - p.At).Duration() <= BreakPairWindow)
+        {
+            _unpairedBreaks[name] = (p.Count - 1, p.At);
+            return true;
+        }
+        _unpairedBreaks[name] = (1, now);
+        return false;
+    }
     /// <summary>EQ effects run on 6-second server ticks, and the worn-off message fires
     /// at the tick boundary — up to several seconds AFTER the mez actually released.
     /// True durations are tick multiples, so rounding an observation DOWN to the tick
@@ -303,6 +336,10 @@ public sealed class MezTracker
     {
         // Among same-named entries the longest-asleep one fades first.
         var name = LogParser.Normalize(wo.Target);
+        // ...unless the game's explicit "has been awakened by" line already counted this
+        // same break (#183). Then this is its partner, not a second creature: drop no
+        // chip, and learn nothing either — a break is not a measurement of the duration.
+        if (BreakAlreadyCounted(name, wo.Time)) return false;
         var entry = _active
             .Where(m => m.Target.Equals(name, StringComparison.OrdinalIgnoreCase))
             .OrderBy(m => m.LandedAt)
@@ -358,6 +395,8 @@ public sealed class MezTracker
     {
         var name = LogParser.Normalize(awakened.Target);
         _awake[name] = ((_awake.TryGetValue(name, out var prev) ? prev.Count : 0) + 1, awakened.Time);
+        // The awake knowledge above is recorded either way — only the chip is paired.
+        if (BreakAlreadyCounted(name, awakened.Time)) return false;
         var victim = _active
             .Where(m => m.Target.Equals(name, StringComparison.OrdinalIgnoreCase))
             .OrderBy(m => m.ExpiresAt ?? DateTime.MaxValue)

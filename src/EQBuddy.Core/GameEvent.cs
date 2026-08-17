@@ -164,6 +164,11 @@ public record PetClaimEvent(DateTime Time, string PetName, string? Leader = null
 /// ONLY when one of our casts is in flight; it never sets the provisional pet on its
 /// own.</param>
 public record PetBlinkEvent(DateTime Time, string Name, bool Weak = false) : GameEvent(Time);
+
+/// <summary>The pet's own reply to /pet hold, which names it. A HELD pet does not start
+/// attacks — so a same-named creature swinging at you while yours is held is a second
+/// creature, not your pet turning on you (#135, bjstrange's charm6.txt).</summary>
+public record PetHoldEvent(DateTime Time, string PetName, bool Holding) : GameEvent(Time);
 /// <summary>Someone other than the player landed a melee hit (may be the player's pet).
 /// Skill is the attack verb mapped to the same label the player's own hits use ("bashes" → Bash).
 /// Critical comes from the same trailing annotation your own hits carry — third-party lines

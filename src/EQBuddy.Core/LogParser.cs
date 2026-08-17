@@ -351,6 +351,14 @@ public static partial class LogParser
     [GeneratedRegex(@"^(?<pet>.+?) (?:(?:tells|told) you|says), 'My leader is (?<leader>[A-Za-z]+)\.'$")]
     private static partial Regex PetLeaderRx();
 
+    // Bzzazzt says, 'Now holding, Master.  I will not start attacks until ordered.'
+    // Bzzazzt says, 'No longer holding, Master.'
+    // The pet's OWN reply to /pet hold, so it names the pet — the player-side "The pet
+    // hold mode has been set to on." carries no name and cannot say whose. A held pet
+    // does not start attacks, which is what makes this worth parsing (#135, charm6.txt).
+    [GeneratedRegex(@"^(?<pet>.+?) (?:(?:tells|told) you|says), '(?<no>No longer )?(?:Now )?[Hh]olding, Master")]
+    private static partial Regex PetHoldRx();
+
     // "an asp blinks." — the landing line for every druid/shaman animal charm AND
     // Beguile Plants (eqlwiki msg_cast_on_other, verified 2026-08-04); provisional
     // pet signal.
@@ -744,6 +752,11 @@ public static partial class LogParser
         if ((r = PetLeaderRx().Match(msg)).Success)
             return new PetClaimEvent(ts, r.Groups["pet"].Value,
                 Leader: r.Groups["leader"].Value, Fighting: false);
+
+        // Hold is checked before the generic claim lines: it is also a pet response, and
+        // its extra fact (the pet will not attack) is the whole point.
+        if ((r = PetHoldRx().Match(msg)).Success)
+            return new PetHoldEvent(ts, r.Groups["pet"].Value, Holding: !r.Groups["no"].Success);
 
         if ((r = CharmedRx().Match(msg)).Success)
             return new CharmedEvent(ts, r.Groups["name"].Value);

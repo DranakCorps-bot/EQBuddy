@@ -373,6 +373,18 @@ public sealed partial class SessionStats
     // and suppressing that would keep crediting a creature that is now hitting you.
     private const int SameNameProofSeconds = 30;
     private DateTime? _sameNameProofAt;
+    // Since when your pet has been on HOLD, from its own reply ("Now holding, Master. I
+    // will not start attacks until ordered."). A held pet does not initiate attacks, so
+    // a same-named creature swinging at you while yours is held is a DIFFERENT creature —
+    // the second, independent proof of a duplicate, and the one #135's fifth log needed.
+    //
+    // charm6.txt: Bzzazzt charmed at 01:25:21, told to hold at 01:25:28, and at 01:25:36
+    // "Bzzazzt" lands a full five-hit round on the player. The 1.87.0 guard could not
+    // help, because its only proof is a creature attacking something of its own name and
+    // the two Bzzazzts never fought each other — one fought the player, the charmed one
+    // fought (and killed) Eye of Veeshan. So the claim died 15 seconds into a 3:28 charm
+    // and the wear-off at 01:28:49 had no landing left to measure.
+    private DateTime? _petHeldSince;
     private int _castsStarted, _castsInterrupted;
     private long _dotDamage, _directSpellDamage;
 
@@ -733,6 +745,17 @@ public sealed partial class SessionStats
                     // otherwise open a combat span while camped.
                     if (pc.Fighting) TrackCombat(pc.Time);
                     break;
+                case PetHoldEvent ph:
+                    // Only for the creature the line names, and only when that is our
+                    // pet: a nearby charmer's pet answering THEIR hold order rides the
+                    // same say channel, and taking it would excuse a genuine break by
+                    // ours. Same name test the leader line uses.
+                    if (_petName is not null
+                        && string.Equals(_petName, LogParser.Normalize(ph.PetName),
+                            StringComparison.OrdinalIgnoreCase))
+                        _petHeldSince = ph.Holding ? ph.Time : null;
+                    break;
+
                 case PetBlinkEvent pb:
                     // Charm just landed. If one of our charm casts is still in flight the
                     // claim is certain, so skip the provisional "Pet?" state entirely.
@@ -1318,8 +1341,16 @@ public sealed partial class SessionStats
     /// same-named attacker hitting us proves nothing, and the claim survives until the
     /// wear-off line settles it (#135 — see <see cref="SameNameProofSeconds"/>).</summary>
     private bool SameNameDuplicateKnown(DateTime at) =>
-        _sameNameProofAt is { } seen
-        && at >= seen && (at - seen).TotalSeconds <= SameNameProofSeconds;
+        (_sameNameProofAt is { } seen
+            && at >= seen && (at - seen).TotalSeconds <= SameNameProofSeconds)
+        || PetHeldAt(at);
+
+    /// <summary>Was the pet under a HOLD order at this moment? Then it did not start this
+    /// attack, so a same-named attacker is someone else (#135, charm6.txt). Unlike the
+    /// attacked-its-own-name proof this does not expire on a timer — hold is a state the
+    /// pet stays in until released, and the release line says so.</summary>
+    private bool PetHeldAt(DateTime at) =>
+        _petHeldSince is { } since && at >= since;
 
     private void RecordCharmBreak(DateTime at)
     {
@@ -1327,6 +1358,7 @@ public sealed partial class SessionStats
         _charmHold = null;
         _charmProvisional = null;
         _sameNameProofAt = null;
+        _petHeldSince = null;   // the hold belonged to the pet we just stopped claiming
         if (landed is not { } l) return;
         var held = (at - l).TotalSeconds;
         if (held <= 0) return;

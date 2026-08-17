@@ -1563,6 +1563,72 @@ public class SpellTrackingTests
         Assert.Contains("held 0:32", tracked.LastItem);
     }
 
+    /// <summary>
+    /// #135 round FIVE, from bjstrange's charm6.txt on v1.88.3 — a second creature of
+    /// the same name that never fights the first one.
+    ///
+    /// His Plane of Sky log: Bzzazzt charmed at 01:25:21, told to hold at 01:25:28, and
+    /// at 01:25:36 "Bzzazzt" lands a full five-hit round on him. The 1.87.0 guard could
+    /// not help, because its ONLY proof is a creature attacking something of its own
+    /// name — and the two Bzzazzts never fought each other. The charmed one fought (and
+    /// killed) Eye of Veeshan; the other one fought the player. So the claim died 15
+    /// seconds into a 3:28 charm and the wear-off had nothing left to measure.
+    ///
+    /// The pet had already said what settles it: "Now holding, Master. I will not start
+    /// attacks until ordered." A HELD pet does not initiate attacks, so a same-named
+    /// attacker while yours is held is a different creature.
+    /// </summary>
+    [Fact]
+    public void AHeldPetDidNotStartThisAttackSoTheAttackerIsSomebodyElse()
+    {
+        var settings = new AppSettings();
+        settings.ApplyDefaultRules();
+        var stats = Replay(
+            At(0, 0, "You begin casting Befriend Animal."),
+            At(0, 4, "a puma blinks."),                             // charm lands 0:04
+            At(0, 11, "A puma says, 'Now holding, Master.  I will not start attacks until ordered.'"),
+            // 15s in — well past the settle window, and no same-name-fights-same-name
+            // line anywhere in the log. This is the OTHER puma.
+            At(0, 19, "A puma hits YOU for 103 points of damage."),
+            At(0, 21, "A puma hits YOU for 58 points of damage."));
+
+        Assert.Equal(new DateTime(2026, 7, 18, 15, 0, 4), stats.Snapshot().CharmedSince);
+
+        stats.Apply(LogParser.Parse(At(3, 32, "Your Befriend Animal spell has worn off of a puma."))!);
+        var tracked = Assert.Single(
+            stats.Snapshot(recentWindow: null, rules: settings.TrackedRules).Tracked);
+        Assert.Contains("held 3:28", tracked.LastItem);
+    }
+
+    /// <summary>Releasing the hold gives the excuse back. A pet told to attack again and
+    /// then hitting YOU has genuinely turned, and must break the claim like any other.</summary>
+    [Fact]
+    public void ReleasingTheHoldRestoresTheOrdinaryBreakRule()
+    {
+        var stats = Replay(
+            At(0, 0, "You begin casting Befriend Animal."),
+            At(0, 4, "a puma blinks."),
+            At(0, 11, "A puma says, 'Now holding, Master.  I will not start attacks until ordered.'"),
+            At(0, 20, "A puma says, 'No longer holding, Master.'"),
+            At(0, 30, "A puma hits YOU for 103 points of damage."));
+
+        Assert.Null(stats.Snapshot().CharmedSince);
+    }
+
+    /// <summary>A NEARBY charmer's pet answering their own hold order rides the same say
+    /// channel. Taking it would excuse a genuine break by ours.</summary>
+    [Fact]
+    public void SomebodyElsesPetGoingOnHoldIsNotOurExcuse()
+    {
+        var stats = Replay(
+            At(0, 0, "You begin casting Befriend Animal."),
+            At(0, 4, "a puma blinks."),
+            At(0, 11, "A greater ice bones says, 'Now holding, Master.  I will not start attacks until ordered.'"),
+            At(0, 19, "A puma hits YOU for 103 points of damage."));
+
+        Assert.Null(stats.Snapshot().CharmedSince);
+    }
+
     /// <summary>The busy-elsewhere guard must expire. A pet that stopped fighting
     /// anything else and is now only hitting YOU really has turned, and the claim has
     /// to drop without waiting for the fade line.</summary>
