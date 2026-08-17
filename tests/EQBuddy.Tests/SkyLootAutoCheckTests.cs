@@ -18,6 +18,45 @@ public class SkyLootAutoCheckTests
         new() { ClassName = "Wizard", QuestItem = "Wind Rune Azia", Reward = "Test of Frost" },
     ];
 
+    /// <summary>
+    /// #193, wizen: "Sky Quest Tracker falsely reporting data ... it shows me as having
+    /// looted a bunch of things I did not loot."
+    ///
+    /// With NO class filter and NO active tab, the predicate treated an empty tab as a
+    /// WILDCARD, so one physical Wind Rune Azia ticked Druid, Monk AND Wizard. It was
+    /// survivable while the widget's Sky card kept the tab populated; the 2026-08-16
+    /// consolidation deleted that card, and AppSettings.SkyQuestClass has had no writer
+    /// since — so for anyone who had not set classes in the ⚙ picker the wildcard was
+    /// permanently on. No test covered this case, which is how it shipped.
+    ///
+    /// One rune is one rune: park a single tick and flag it, don't invent three.
+    /// </summary>
+    [Fact]
+    public void WithNoFilterAndNoTabASharedItemTicksOnceNotOncePerClass()
+    {
+        var list = Checklist();
+        var changed = SkyLootAutoCheck.Apply(list, "Wind Rune Azia", 1, [], activeTab: "");
+
+        Assert.True(changed);
+        var runes = list.Where(i => i.QuestItem == "Wind Rune Azia").ToList();
+        Assert.Single(runes, i => i.Acquired);
+        // ...and it wears the * so the player can move it to the class that earned it.
+        Assert.True(runes.Single(i => i.Acquired).AcquiredUnassigned);
+    }
+
+    [Fact]
+    public void WithNoFilterAndNoTabAnUnambiguousItemStillTicksItsOnlyClass()
+    {
+        // Rule 2 is untouched: exactly one class wants the Great Staff, so there is
+        // nothing to guess and nothing to flag.
+        var list = Checklist();
+        SkyLootAutoCheck.Apply(list, "Great Staff", 1, [], activeTab: "");
+
+        var staff = list.Single(i => i.QuestItem == "Great Staff");
+        Assert.True(staff.Acquired);
+        Assert.False(staff.AcquiredUnassigned);
+    }
+
     [Fact]
     public void ASingleClassItemTicksItsClassWhateverTabIsActive()
     {

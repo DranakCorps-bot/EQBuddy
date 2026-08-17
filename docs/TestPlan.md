@@ -94,6 +94,7 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | Releasing the hold restores the ordinary break rule; another player's pet holding is not our excuse | **Auto** — `SpellTrackingTests` |
 | One mez break costs ONE chip, though the game prints both a fade and an awakened line | **Auto** — `MezTrackerTests` |
 | Two real breaks in the same second still drop two chips (pairing stays 1:1) | **Auto** — `MezTrackerTests` |
+| With no class filter and no tab, a shared drop ticks ONCE and is flagged — never once per class | **Auto** — `SkyLootAutoCheckTests`, `EpicLootAutoCheckTests` |
 | A proper-named kill outside the catalog starts tracking; its SECOND kill measures the cycle | **Auto** — `DiscoveredNamedTests` |
 | Discovery never fires for articled trash, someone else's kill, or a catalogued family's siblings | **Auto** — `DiscoveredNamedTests`, `NamedMobHeuristicTests` |
 | The named/trash verdict is taken from the RAW name at parse time, before `Normalize` strips the article | **Auto** — `NamedMobHeuristicTests` |

@@ -33,9 +33,13 @@ public static class EpicLootAutoCheck
         if (newlyLooted <= 0) return false;
         var looted = QuestCatalog.BaseItemName(itemName);
 
+        // NO lens at all means no class passes — NOT every class passes. Same defect and
+        // same reasoning as SkyLootAutoCheck (#193): an empty tab was a wildcard, and
+        // AppSettings.EpicQuestClass has had no writer since the 2026-08-16
+        // consolidation deleted the widget's Epic card.
         bool ClassTicks(string className) => myClasses.Count > 0
             ? myClasses.Any(c => c.Equals(className, StringComparison.OrdinalIgnoreCase))
-            : activeTab.Length == 0 || string.Equals(className, activeTab, StringComparison.Ordinal);
+            : activeTab.Length > 0 && string.Equals(className, activeTab, StringComparison.Ordinal);
 
         var slots = checklist
             .Where(i => i.ItemNames.Any(n => n.Equals(looted, StringComparison.OrdinalIgnoreCase)))

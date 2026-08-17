@@ -26,6 +26,22 @@ public class EpicLootAutoCheckTests
                 ItemNames = [] },
     ];
 
+    /// <summary>#193's Epic half: with no filter and no tab, an empty tab was a
+    /// wildcard, so one Red Dragon Scales drop ticked BOTH the Bard and Warrior epics.
+    /// AppSettings.EpicQuestClass has had no writer since the 2026-08-16 consolidation
+    /// deleted the widget's Epic card, so this was permanently on.</summary>
+    [Fact]
+    public void WithNoFilterAndNoTabAMultiClassItemTicksOnceAndIsFlagged()
+    {
+        var list = Checklist();
+        var changed = EpicLootAutoCheck.Apply(list, "Red Dragon Scales", 1, [], activeTab: "");
+
+        Assert.True(changed);
+        var scales = list.Where(i => i.ItemNames.Contains("Red Dragon Scales")).ToList();
+        Assert.Single(scales, i => i.Acquired);
+        Assert.True(scales.Single(i => i.Acquired).AcquiredUnassigned);
+    }
+
     [Fact]
     public void ASingleClassItemTicksItsEarliestStepWhateverTabIsActive()
     {

@@ -34,9 +34,22 @@ public static class SkyLootAutoCheck
     {
         if (newlyLooted <= 0) return false;
 
+        // NO lens at all means no class passes — NOT every class passes (#193, wizen:
+        // "it shows me as having looted a bunch of things I did not loot"). This read
+        // `activeTab.Length == 0 || …`, so an empty tab was a wildcard, and one looted
+        // Wind Rune Azia ticked a slot for all five classes that want it.
+        //
+        // It was survivable while the widget's Sky card kept activeTab populated. The
+        // 2026-08-16 consolidation deleted that card and nothing has written
+        // AppSettings.SkyQuestClass since — the only assignment left in the codebase is
+        // its own `= ""` initializer — so for any player who had not set classes in the
+        // ⚙ picker the wildcard was permanently on.
+        //
+        // Falling through to rule 3 is the honest answer: the item WAS looted, so park
+        // one tick and flag it for the player to move, rather than invent sixteen.
         bool ClassTicks(string className) => myClasses.Count > 0
             ? myClasses.Any(c => c.Equals(className, StringComparison.OrdinalIgnoreCase))
-            : activeTab.Length == 0 || string.Equals(className, activeTab, StringComparison.Ordinal);
+            : activeTab.Length > 0 && string.Equals(className, activeTab, StringComparison.Ordinal);
 
         var looted = QuestCatalog.BaseItemName(itemName);
         var slots = checklist
