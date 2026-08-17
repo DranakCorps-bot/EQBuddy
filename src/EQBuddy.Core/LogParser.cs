@@ -129,7 +129,10 @@ public static partial class LogParser
     // which is the whole reason to route it here rather than invent a second path.
     // The failure line ("You fail to locate any food nearby.") is deliberately ignored
     // — a miss is not an event anyone wants counted.
-    [GeneratedRegex(@"^You have scrounged up an? (?<item>.+?)\.$")]
+    // The article is OPTIONAL: most foraged items are mass nouns or plurals with none —
+    // "You have scrounged up Vegetables." / "Berries." / "Pod of Water." / "Roots." —
+    // and requiring "a"/"an" dropped every one of them (LW, 130 forages, all missed).
+    [GeneratedRegex(@"^You have scrounged up (?:an? )?(?<item>.+?)\.$")]
     private static partial Regex ForageRx();
 
     // You looted a Crushbone Belt +2 from orc centurion's corpse to create a Crushbone Belt +5

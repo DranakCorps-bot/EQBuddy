@@ -503,7 +503,6 @@ public partial class BreakoutWindow : Window
     {
         TitleText.Text = "🎒 Loot";
         List<(string Name, string Value)> rows;
-        List<(string Name, string Value)> crafted = [];
         string emptyText;
         if (_fightScope)   // = Target scope for this kind
         {
@@ -524,51 +523,27 @@ public partial class BreakoutWindow : Window
             SubText.Text = $"Session · {s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")} looted"
                 + (s.CraftedTotal > 0 ? $" · +{s.CraftedTotal} made" : "");
 
-            // Same show filter as the Loot card: all / looted (incl. forage) / made, with
-            // the never-blank fallback when the chosen slice is empty but the other isn't.
+            // Same show filter and row order as the Loot card, via the shared builder: all
+            // (looted + made mixed) / looted (incl. forage) / made. Never-blank fallback to
+            // "all" when the chosen slice is empty. Uncapped — a rare drop can't be truncated.
+            var mode = _settings.LootSort;
             var view = _settings.LootView;
             var hasLoot = s.Loot.Count > 0;
             var hasMade = s.Crafted.Count > 0;
-            var showLooted = view != "made";
-            var showMade = view != "looted";
-            if (view == "made" && !hasMade && hasLoot) showLooted = true;
-            if (view == "looted" && !hasLoot && hasMade) showMade = true;
+            var effective = (view == "made" && !hasMade) || (view == "looted" && !hasLoot) ? "all" : view;
 
             LootViewBar.Visibility = hasLoot && hasMade ? Visibility.Visible : Visibility.Collapsed;
-            var sortCount = showLooted ? s.Loot.Count : s.Crafted.Count;
-            LootSortBar.Visibility = sortCount > 1 ? Visibility.Visible : Visibility.Collapsed;
+            var itemCount = effective switch { "looted" => s.Loot.Count, "made" => s.Crafted.Count, _ => s.Loot.Count + s.Crafted.Count };
+            LootSortBar.Visibility = itemCount > 1 ? Visibility.Visible : Visibility.Collapsed;
             // Recent is a looted-only idea (made items carry no arrival order).
-            LootSortRecent.Visibility = showLooted ? Visibility.Visible : Visibility.Collapsed;
+            LootSortRecent.Visibility = effective != "made" ? Visibility.Visible : Visibility.Collapsed;
 
-            // Exactly the Loot card's three sorts (MainWindow ~2452), uncapped so a rare
-            // drop can't be truncated past the fold — the lag TropicMike/wizen saw. Recent
-            // is arrival order with runs collapsed, so a new drop surfaces at the top the
-            // instant it lands instead of sinking to the bottom of a count-sorted list.
-            var mode = _settings.LootSort;
-            rows = showLooted
-                ? (mode == "recent"
-                    ? EQBuddy.UI.Shared.RawLootView.Rows(s.RecentLoot).Select(r => (r.Item, r.Detail)).ToList()
-                    : (mode == "name"
-                            ? s.Loot.OrderBy(l => l.Item, StringComparer.OrdinalIgnoreCase).AsEnumerable()
-                            : s.Loot)
-                        .Select(l => (l.Item, $"×{l.Count}")).ToList())
-                : [];
-            // Made items ride the Session scope only: crafts are session-cumulative, and
-            // Target scope is a different axis entirely — what a creature can drop —
-            // where an item nobody drops would misstate the view (#131, TropicMike). No
-            // arrival order for crafts, so "recent" falls back to count-desc here.
-            crafted = showMade
-                ? (mode == "name"
-                        ? s.Crafted.OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                        : s.Crafted.AsEnumerable())
-                    .Select(c => (c.Name, $"×{c.Count}")).ToList()
-                : [];
+            rows = EQBuddy.UI.Shared.LootRows.Build(s.Loot, s.Crafted, s.RecentLoot, effective, mode);
             emptyText = "No loot seen yet.";
         }
 
-        var empty = rows.Count == 0 && crafted.Count == 0;
-        EmptyText.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
-        if (empty)
+        EmptyText.Visibility = rows.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (rows.Count == 0)
         {
             EmptyText.Text = emptyText;
             Rows.Items.Clear();
@@ -576,8 +551,7 @@ public partial class BreakoutWindow : Window
             return;
         }
 
-        var sig = $"loot|{_fightScope}|{_settings.LootView}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}"
-            + $"|made:{string.Join(",", crafted.Select(c => c.Name + c.Value))}";
+        var sig = $"loot|{_fightScope}|{_settings.LootView}|{_settings.LootSort}|{SubText.Text}|{string.Join(",", rows.Select(r => r.Name + r.Value))}";
         if (sig == _signature) return;
         _signature = sig;
 
@@ -585,23 +559,6 @@ public partial class BreakoutWindow : Window
         var barBrush = BreakdownRows.BarBrush(this);
         foreach (var (name, value) in rows)
             Rows.Items.Add(BuildItemRow(name, value, barBrush));
-        if (crafted.Count > 0)
-        {
-            // The "Created by merging" label is a separator between two lists — it only
-            // earns its place when looted rows are above it. In the made-only view the
-            // crafts stand alone and need no heading.
-            if (rows.Count > 0)
-            {
-                // Same label text as the Loot card — one vocabulary for merges everywhere.
-                var label = new TextBlock { Text = "Created by merging" };
-                label.Style = (Style)FindResource("SectionLabel");
-                Rows.Items.Add(label);
-            }
-            // Crafted items are real items with wiki pages, so they get the same
-            // hover/click affordances as loot rows.
-            foreach (var (name, value) in crafted)
-                Rows.Items.Add(BuildItemRow(name, value, barBrush));
-        }
     }
 
     /// <summary>An item row wired the way David specced the breakout: hover = the eqlwiki

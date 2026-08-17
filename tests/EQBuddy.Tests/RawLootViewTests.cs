@@ -149,6 +149,25 @@ public class RawLootViewTests
         Assert.Equal("Apple", evt.Item);
     }
 
+    // The real game rarely uses an article — most foraged items are mass nouns or plurals
+    // ("Vegetables", "Berries", "Pod of Water", "Roots"). Requiring "a"/"an" dropped every
+    // one of them; these are lifted verbatim from LW's log (130 forages, all missed).
+    [Theory]
+    [InlineData("You have scrounged up Vegetables.", "Vegetables")]
+    [InlineData("You have scrounged up Berries.", "Berries")]
+    [InlineData("You have scrounged up Pod of Water.", "Pod of Water")]
+    [InlineData("You have scrounged up Rabbit Meat.", "Rabbit Meat")]
+    [InlineData("You have scrounged up Roots.", "Roots")]
+    [InlineData("You have scrounged up Fishing Grubs.", "Fishing Grubs")]
+    public void AForagedItemWithNoArticleParses(string line, string item)
+    {
+        var evt = Assert.IsType<LootEvent>(LogParser.Parse($"[Sun Aug 16 16:45:20 2026] {line}"));
+
+        Assert.Equal(item, evt.Item);
+        Assert.Equal("Forage", evt.Source);
+        Assert.Equal(1, evt.Count);
+    }
+
     [Fact]
     public void AFailedForageIsNotAnEvent()
     {
