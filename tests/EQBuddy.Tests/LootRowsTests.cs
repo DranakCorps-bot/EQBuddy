@@ -95,6 +95,22 @@ public class LootRowsTests
             Items("all", "recent"));
 
     [Fact]
+    public void RecentKeepsOneRowPerAcquisition_NoRunCollapse()
+    {
+        // Three separate Bone Chips loots stay three timestamped rows (aggregating is the
+        // count view's job) — the raw timeline, not RawLootView's run-collapse.
+        var picks = new List<LootPickup>
+        {
+            new(new DateTime(2026, 8, 16, 17, 3, 0), "Bone Chips", 1, "a skeleton"),
+            new(new DateTime(2026, 8, 16, 17, 2, 0), "Bone Chips", 1, "a skeleton"),
+            new(new DateTime(2026, 8, 16, 17, 1, 0), "Bone Chips", 1, "a skeleton"),
+        };
+        var rows = LootRows.Build([], [], [], picks, "all", "recent");
+        Assert.Equal(3, rows.Count);
+        Assert.All(rows, r => Assert.Equal("Bone Chips", r.Item));
+    }
+
+    [Fact]
     public void CountTiesBreakAlphabetically()
     {
         var loot = new List<LootDetail> { new("Zebra Hide", 1, "x"), new("apple", 1, "x"), new("Mango", 1, "x") };

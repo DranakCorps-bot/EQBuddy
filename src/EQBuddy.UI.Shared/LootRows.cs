@@ -60,20 +60,18 @@ public static class LootRows
 
         if (mode == "recent")
         {
-            var picks = (view switch
+            var picks = view switch
             {
                 "looted" => recentLoot.Where(p => !IsOther(p.Source)),
                 "other" => recentLoot.Where(p => IsOther(p.Source)),
                 _ => recentLoot.AsEnumerable(),
-            }).ToList();
-            var sourceByName = picks
-                .GroupBy(p => p.Item, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First().Source, StringComparer.OrdinalIgnoreCase);
-            // Crafts and merges are already in recentLoot (source Fashion/Merge), so they
-            // ride the arrival timeline here with their timestamps — no separate append.
-            return RawLootView.Rows(picks)
-                .Select(r => new LootRow(r.Item, r.Detail,
-                    sourceByName.TryGetValue(r.Item, out var src) ? LootTag(src) : null))
+            };
+            // The raw timeline: ONE row per acquisition with its own timestamp, newest first
+            // (RecentLoot order) — deliberately NOT run-collapsed like RawLootView.Rows.
+            // Aggregating multiples is what the count view is for (LW, 2026-08-17). Crafts and
+            // merges ride here too (source Fashion/Merge → the (Crafted)/(Merged) tag).
+            return picks
+                .Select(p => new LootRow(p.Item, RawLootView.Detail(p), LootTag(p.Source)))
                 .ToList();
         }
 
