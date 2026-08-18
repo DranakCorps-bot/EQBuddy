@@ -74,16 +74,14 @@ internal static class EqCardRows
     {
         if (context.QuestAwareTooltip(item, context.ItemHoverStats(item)) is { Length: > 0 } tip)
         {
-            var text = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = TipWidth };
+            var text = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = DesignTokens.TipWidth };
             // Multi-line tips are stat blocks — monospace keeps their columns readable.
             if (tip.Contains('\n')) text.FontFamily = MainWindow.MonoFamily;
             name.ToolTip = new ToolTip { Content = text };
         }
-        name.Cursor = Cursors.Hand;
-        // Swallow the down so it can't start a window DragMove and eat the Up — the
-        // discussion #46 failure mode.
-        name.MouseLeftButtonDown += (_, e) => e.Handled = true;
-        name.MouseLeftButtonUp += (_, _) => context.ShowItemInfo(item);
+        // The press-guarded contract (#46 + the mid-gesture rebuild race) — one home
+        // for every clickable list element, LootCardView's rows included.
+        DesignSystem.WireClick(name, () => context.ShowItemInfo(item));
     }
 
     /// <summary>The quest marker beside an item: click for the Quest Tracker filtered to
@@ -104,7 +102,4 @@ internal static class EqCardRows
     private static readonly double MetadataSize =
         DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size;
 
-    /// <summary>The width at which a monospace stat block stops being a column and starts
-    /// being a paragraph.</summary>
-    private const double TipWidth = 340;
 }

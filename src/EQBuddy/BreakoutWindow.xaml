@@ -44,14 +44,16 @@
                            Visibility="Collapsed" MouseLeftButtonDown="OnOpenTimeline"
                            Ink="DimBrush"
                            ToolTip="Fight timeline: the whole pull, a lane per skill — every hit, miss and resist, plus DPS over time."/>
+                <!-- Filled in code with the compact segmented strip — the same control
+                     the Loot strips use, so the highlight is rounded inside this
+                     border's own rounding (LW, 2026-08-18: the old square TextBlock
+                     wash poked outside the pill).
+                     Rebase note: LW's branch predates this file joining
+                     DesignRatchetTests.Migrated, so its literal 6 / 6,0,6,0 are the
+                     token resources here. Same geometry, held to the scale. -->
                 <Border Grid.Column="4" x:Name="ScopeBorder" CornerRadius="{DynamicResource CornerCard}" BorderThickness="1"
                         Margin="{DynamicResource FlankS}" VerticalAlignment="Center">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock x:Name="ScopeFight" Text="Fight" FontSize="{DynamicResource FontMetadata}" Padding="{DynamicResource PadScope}"
-                                   Cursor="Hand" MouseLeftButtonDown="OnScopeFight"/>
-                        <TextBlock x:Name="ScopeSession" Text="Session" FontSize="{DynamicResource FontMetadata}" Padding="{DynamicResource PadScope}"
-                                   Cursor="Hand" MouseLeftButtonDown="OnScopeSession"/>
-                    </StackPanel>
+                    <StackPanel x:Name="ScopeHost" Orientation="Horizontal"/>
                 </Border>
                 <local:EqIcon Grid.Column="5" Glyph="Close" Size="11" VerticalAlignment="Center"
                            Cursor="Hand" Margin="{DynamicResource FlankXxs}" MouseLeftButtonDown="OnDismiss"

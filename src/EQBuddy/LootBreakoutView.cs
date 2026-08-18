@@ -49,7 +49,9 @@ internal sealed class LootBreakoutView
         {
             Margin = new Thickness(0, 0, DesignTokens.SpaceXxs, DesignTokens.SpaceXxs),
         };
-        _viewGroup.Margin = new Thickness(0, 0, DesignTokens.SpaceL, 0);
+        // SpaceM, not the card's SpaceL: horizontal room is this window's scarcest
+        // resource, and the group frames already separate the two strips.
+        _viewGroup.Margin = new Thickness(0, 0, DesignTokens.SpaceM, 0);
         strips.Children.Add(_viewGroup);
         strips.Children.Add(_sortGroup);
         Strips = strips;
@@ -73,15 +75,30 @@ internal sealed class LootBreakoutView
     private static EqSegmentedStrip BuildStrip(Panel group, string label,
         IReadOnlyList<LootPresentation.Option> options, Action<string> onPick)
     {
-        var caption = DesignSystem.Text(DesignTokens.TypeRole.Caption, label);
+        // Compact segments in the Target|Session toggle's own vocabulary (LW,
+        // 2026-08-18): the card-scale pill crowded this ~270px window, and the window's
+        // chrome already established what a dense toggle looks like here — flush
+        // segments inside one hairline frame, the selected one washed and accented.
+        var caption = DesignSystem.Text(ChipStyle.CompactLabelRole, label);
+        // Semibold: "show:" and "sort:" are labels, and at metadata size the weight is
+        // what separates them from the options they govern (LW, 2026-08-18).
+        caption.FontWeight = FontWeights.SemiBold;
         caption.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
         caption.VerticalAlignment = VerticalAlignment.Center;
         group.Children.Add(caption);
 
         var host = new StackPanel { Orientation = Orientation.Horizontal };
-        group.Children.Add(host);
+        var frame = new Border
+        {
+            Child = host,
+            CornerRadius = new CornerRadius(ChipStyle.CompactRadius),
+            BorderThickness = new Thickness(ChipStyle.BorderThickness),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        frame.SetResourceReference(Border.BorderBrushProperty, "HairlineBrush");
+        group.Children.Add(frame);
 
-        var strip = new EqSegmentedStrip(host);
+        var strip = new EqSegmentedStrip(host, compact: true);
         foreach (var option in options)
         {
             var key = option.Key;
@@ -158,32 +175,26 @@ internal sealed class LootBreakoutView
         _w.Signature = sig;
 
         _w.Rows.Items.Clear();
-        var barBrush = BreakdownRows.BarBrush(_w);
-        foreach (var r in rows) _w.Rows.Items.Add(BuildRow(r, barBrush));
+        foreach (var r in rows) _w.Rows.Items.Add(BuildRow(r));
     }
 
     /// <summary>An item row wired the way David specced this window: hover = the eqlwiki
     /// item info, fetched on the spot when the cache is empty (the tooltip live-updates
-    /// from "Looking up…"); click = the page in the browser. The quest badge is the Loot
-    /// card's, vector and all — one item wanted by one quest must not look like two
-    /// different things in two windows.</summary>
-    private Grid BuildRow(LootRow r, Brush barBrush)
+    /// from "Looking up…"); click = the page in the browser. The row itself IS the
+    /// card's (LootCardView.ItemRow — LW, 2026-08-18): flat, badge against the value,
+    /// no underline track, so one item cannot look like two different things in two
+    /// windows. Only what hover and click DO differs.</summary>
+    private Grid BuildRow(LootRow r)
     {
         var cachedTip = _w.Main?.CachedItemStats(r.Item);
-        var badge = _w.Main is { } main ? EqCardRows.QuestBadge(main, r.Item) : null;
-
-        var row = BreakdownRows.Row(_w, r.Item, r.Value, 0, barBrush, null,
-            nameBadge: badge, nameNote: LootPresentation.Note(r.Tag));
-
         var tipText = new TextBlock
         {
             Text = cachedTip ?? "Looking up on eqlwiki…",
             TextWrapping = TextWrapping.Wrap,
-            MaxWidth = TipWidth,
+            MaxWidth = DesignTokens.TipWidth,
             FontFamily = MainWindow.MonoFamily,
         };
         var tip = new ToolTip { Content = tipText };
-        row.ToolTip = tip;
 
         var fetched = false;
         tip.Opened += async (_, _) =>
@@ -195,14 +206,12 @@ internal sealed class LootBreakoutView
             tipText.Text = text ?? (cachedTip ?? "Not on the wiki.");
         };
 
-        row.Cursor = Cursors.Hand;
-        row.MouseLeftButtonDown += (_, e) => e.Handled = true;   // don't start a window drag
-        row.MouseLeftButtonUp += (_, _) => MainWindow.OpenWikiPage(r.Item);
+        var row = LootCardView.ItemRow(_w.Main, r.Item, r.Value, LootPresentation.Note(r.Tag),
+            tip, item => MainWindow.OpenWikiPage(item));
+        // A whisper of right inset the card never needs: these rows sit against the
+        // window's own scrollbar when the list overflows.
+        row.Margin = new Thickness(0, 0, DesignTokens.SpaceXxs, 0);
         return row;
     }
 
-    /// <summary>How wide a stat-block tooltip may get before it wraps — the width at which
-    /// a monospace item block stops being a column and starts being a paragraph, not a
-    /// rhythm value.</summary>
-    private const double TipWidth = 340;
 }

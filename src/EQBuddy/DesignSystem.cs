@@ -171,6 +171,28 @@ internal static class DesignSystem
         return icon;
     }
 
+    /// <summary>The clickable list-element contract, in one home for rows and badges:
+    /// swallow the mouse-down so it can't start a window DragMove and eat the up (#46),
+    /// and act on the up ONLY if this element saw the press — a mouse-down handler
+    /// elsewhere (a fold header, a chip) can rebuild the list mid-gesture and drop the
+    /// up on a brand-new element that was never pressed (LW's live report, 2026-08-17).
+    /// The up is Handled even when unmatched: an element's release is never any
+    /// ancestor's business.</summary>
+    public static void WireClick(FrameworkElement element, Action onClick)
+    {
+        var pressed = false;
+        element.Cursor = Cursors.Hand;
+        element.MouseLeftButtonDown += (_, e) => { pressed = true; e.Handled = true; };
+        element.MouseLeave += (_, _) => pressed = false;
+        element.MouseLeftButtonUp += (_, e) =>
+        {
+            e.Handled = true;
+            if (!pressed) return;
+            pressed = false;
+            onClick();
+        };
+    }
+
     /// <summary>An icon that behaves like a button but reads like a glyph — the close /
     /// pin / report family. A real <see cref="Button"/>, so it is keyboard-reachable and
     /// has a hit area, rather than the click-handled TextBlocks these used to be.</summary>
@@ -221,17 +243,27 @@ internal sealed class EqChip : Border
 {
     private readonly TextBlock _label;
     private readonly TextBlock? _badge;
+    private readonly bool _compact;
 
     /// <summary>What this chip selects — a mode string, a QuestTab, a class name.
     /// Compared by the strip, never interpreted here.</summary>
     public object Key { get; }
 
     public EqChip(string text, object key, string? badge = null, string? tip = null,
-        Action? onClick = null)
+        Action? onClick = null, bool compact = false)
     {
         Key = key;
-        var content = new StackPanel { Orientation = Orientation.Horizontal };
-        _label = DesignSystem.Text(ChipStyle.LabelRole, text);
+        _compact = compact;
+        // Centered both ways inside the padding box — a segment whose text sits high
+        // or leans left reads as misaligned the moment a divider gives it edges.
+        var content = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        _label = DesignSystem.Text(compact ? ChipStyle.CompactLabelRole : ChipStyle.LabelRole, text);
+        _label.VerticalAlignment = VerticalAlignment.Center;
         content.Children.Add(_label);
         if (badge is { Length: > 0 })
         {
@@ -240,11 +272,15 @@ internal sealed class EqChip : Border
             content.Children.Add(_badge);
         }
         Child = content;
-        CornerRadius = new CornerRadius(ChipStyle.Radius);
-        Padding = new Thickness(ChipStyle.Padding.Left, ChipStyle.Padding.Top,
-            ChipStyle.Padding.Right, ChipStyle.Padding.Bottom);
-        Margin = new Thickness(0, 0, ChipStyle.Gap.Right, ChipStyle.Gap.Bottom);
-        BorderThickness = new Thickness(ChipStyle.BorderThickness);
+        // Compact is the scope toggle's shape: flush segments (no gap, no edge of
+        // their own) inside the strip's shared hairline frame.
+        CornerRadius = new CornerRadius(compact ? ChipStyle.CompactRadius : ChipStyle.Radius);
+        var pad = compact ? ChipStyle.CompactPadding : ChipStyle.Padding;
+        Padding = new Thickness(pad.Left, pad.Top, pad.Right, pad.Bottom);
+        Margin = compact
+            ? new Thickness(0)
+            : new Thickness(0, 0, ChipStyle.Gap.Right, ChipStyle.Gap.Bottom);
+        BorderThickness = new Thickness(compact ? 0 : ChipStyle.BorderThickness);
         Cursor = Cursors.Hand;
         if (tip is not null) ToolTip = tip;
         // Handled, or the window's own drag-to-move swallows the click.
@@ -255,20 +291,28 @@ internal sealed class EqChip : Border
 
     public void SetSelected(bool on)
     {
-        var ink = ChipStyle.For(on);
-        SetResourceReference(BackgroundProperty, ink.Background);
-        SetResourceReference(BorderBrushProperty, ink.Border);
+        var ink = _compact ? ChipStyle.ForCompact(on) : ChipStyle.For(on);
+        Paint(this, BackgroundProperty, ink.Background);
+        Paint(this, BorderBrushProperty, ink.Border);
         _label.Ink(ink.Label);
         if (_badge is null) return;
         _badge.Ink(ink.Badge);
         _badge.Opacity = ink.BadgeOpacity;
+
+        // ChipStyle.None means no brush at all — the compact segments' unfilled state;
+        // a resource reference would look the empty key up and paint nothing forever.
+        static void Paint(Border b, DependencyProperty prop, string key)
+        {
+            if (key == ChipStyle.None) b.SetValue(prop, Brushes.Transparent);
+            else b.SetResourceReference(prop, key);
+        }
     }
 }
 
 /// <summary>A row of <see cref="EqChip"/> where exactly one is selected — the segmented
 /// control. Owns the "which one is on" bookkeeping every hand-built strip wrote its own
 /// copy of, usually as a foreach over a list of tuples.</summary>
-internal sealed class EqSegmentedStrip(Panel host)
+internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
 {
     private readonly List<EqChip> _chips = [];
 
@@ -283,7 +327,25 @@ internal sealed class EqSegmentedStrip(Panel host)
     public EqChip Add(string text, object key, string? badge = null, string? tip = null,
         Action? onClick = null)
     {
-        var chip = new EqChip(text, key, badge, tip, onClick);
+        var chip = new EqChip(text, key, badge, tip, onClick, compact);
+        if (compact && _chips.Count > 0)
+        {
+            // The hairline divider between segments (LW, 2026-08-18) — the split the
+            // group frame implies, drawn, inset so it never touches the frame's
+            // rounded corners. Its visibility FOLLOWS its segment's: a strip that
+            // withholds a segment (the Loot card withholds "recent") must not strand
+            // a doubled divider where it stood.
+            var divider = new Border
+            {
+                Width = ChipStyle.BorderThickness,
+                Margin = new Thickness(0, ChipStyle.CompactDividerInset,
+                    0, ChipStyle.CompactDividerInset),
+            };
+            divider.SetResourceReference(Border.BackgroundProperty, "HairlineBrush");
+            divider.SetBinding(UIElement.VisibilityProperty,
+                new System.Windows.Data.Binding(nameof(Visibility)) { Source = chip });
+            host.Children.Add(divider);
+        }
         host.Children.Add(chip);
         _chips.Add(chip);
         return chip;

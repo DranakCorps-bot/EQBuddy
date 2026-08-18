@@ -101,6 +101,14 @@ public static class DesignTokens
     /// no — this is a rounded rect at the height of one, not a capsule.</summary>
     public const double RadiusPill = 11;
 
+    // ---- content bounds — widths that cap CONTENT, not rhythm values ----
+
+    /// <summary>How wide a stat-block tooltip may get before it wraps — the width at
+    /// which a monospace item block stops being a column and starts being a paragraph.
+    /// It was declared as a private 340 in four files at once (review catch,
+    /// 2026-08-18), and the magic-number scan can't see MaxWidth.</summary>
+    public const double TipWidth = 340;
+
     // ---- control sizes ----
 
     public const double RowHeight = 24;
