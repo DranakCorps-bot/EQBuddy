@@ -31,6 +31,7 @@ public partial class SpawnChipsWindow : Window
     public SpawnChipsWindow(MainWindow main, SpawnsViewModel vm)
     {
         InitializeComponent();
+        NoActivate.Attach(this);
         _main = main;
         _vm = vm;
         _settings = main.Settings;
