@@ -49,6 +49,132 @@ public class CharmTrackerTests
         Assert.Equal(["Puma"], confirmed);
     }
 
+    /// <summary>Review catch, 2026-08-18: a KNOWN charm whose strong blink arrives after
+    /// the spell's own arm window (lag, or a re-cast off a resisted first attempt) must
+    /// degrade to the provisional claim the code's own comment promised — not to
+    /// nothing. Nothing meant CharmedSince stayed null down this path, and the eventual
+    /// fade had no landing time to measure a "held M:SS" from (#135's symptom).</summary>
+    [Fact]
+    public void AStrongBlinkPastTheArmWindowIsProvisionalNotNothing()
+    {
+        var charm = New(out _);
+        // "Charm" carries a real cast time in the wiki charm catalog, so its arm window
+        // is a few seconds; 20 s later is inside CastToBlink but well past the window.
+        charm.OnBlink(new PetBlinkEvent(At(0, 20), "a puma"), ("Charm", At(0, 0)));
+        Assert.Equal(At(0, 20), charm.CharmedSince);   // provisional — the clock started
+        // The tell keeps the original landing time rather than restarting the clock.
+        charm.OnPetClaim(new PetClaimEvent(At(0, 25), "a puma"), "Douglas");
+        Assert.Equal(At(0, 20), charm.CharmedSince);
+    }
+
+    /// <summary>Round-2 review catch: OnBlink renames the pet unconditionally at its
+    /// bottom, so a chain-charm's late blink onto a DIFFERENT creature must move the
+    /// provisional clock with the name — or the label says wolf while the landing time
+    /// says puma. A repeat late blink for the SAME pet still must not restart it.</summary>
+    [Fact]
+    public void AChainCharmsLateBlinkMovesTheClockWithTheName()
+    {
+        var charm = New(out _);
+        charm.OnBlink(new PetBlinkEvent(At(0, 20), "a puma"), ("Charm", At(0, 0)));
+        // A repeat late blink for the same pet: the running clock holds.
+        charm.OnBlink(new PetBlinkEvent(At(0, 25), "a puma"), ("Charm", At(0, 6)));
+        Assert.Equal(At(0, 20), charm.CharmedSince);
+        // A different creature: the clock follows the rename.
+        charm.OnBlink(new PetBlinkEvent(At(1, 0), "a wolf"), ("Charm", At(0, 40)));
+        Assert.Equal(At(1, 0), charm.CharmedSince);
+    }
+
+    /// <summary>Round-3 review catches, both in the message-skew shapes this file
+    /// documents: a chain-charm whose predecessor's fade line never reached the parser
+    /// must not leave the CONFIRMED hold answering for the old pet (CharmedSince
+    /// prefers _hold, so the wolf's eventual break would measure from the puma's
+    /// landing); and a refresh blink for the held pet must be a true no-op — not a
+    /// demotion of a confirmed identity back to "Pet?".</summary>
+    [Fact]
+    public void AChainCharmDropsTheOldPetsHoldAndARefreshBlinkDemotesNothing()
+    {
+        var charm = Charmed(out _);              // confirmed hold on "a puma" at 0:00
+        Assert.Equal("Pet (Puma)", charm.SourceLabel);
+
+        // Refresh blink for the same pet, late and strong: identity and clock hold.
+        charm.OnBlink(new PetBlinkEvent(At(0, 30), "a puma"), ("Charm", At(0, 15)));
+        Assert.Equal("Pet (Puma)", charm.SourceLabel);
+        Assert.Equal(At(0, 0), charm.CharmedSince);
+
+        // Chain-charm onto a wolf with no puma fade line seen: the stale hold goes,
+        // and the clock is the wolf's landing, not the puma's.
+        charm.OnBlink(new PetBlinkEvent(At(1, 10), "a wolf"), ("Charm", At(0, 50)));
+        Assert.Equal(At(1, 10), charm.CharmedSince);
+    }
+
+    /// <summary>Codex review, 2026-08-18 (both rounds): a chain-charm must end the old
+    /// pet's WHOLE tenure — in particular, the old pet's /pet hold order must not
+    /// suppress real break detection on the new pet (PetHeldAt compares no names, so a
+    /// stale timestamp excuses every future attack forever).</summary>
+    [Fact]
+    public void AChainCharmEndsTheOldTenureCompletely()
+    {
+        var charm = Charmed(out _);   // confirmed hold on the puma at 0:00
+        charm.OnPetHold(new PetHoldEvent(At(0, 10), "a puma", Holding: true));
+
+        charm.OnBlink(new PetBlinkEvent(At(1, 10), "a wolf"), ("Charm", At(0, 50)));
+        Assert.Equal(At(1, 10), charm.CharmedSince);
+
+        // The wolf genuinely turning on us IS a break: the puma's hold order is gone
+        // with its tenure and cannot excuse it.
+        Assert.True(charm.OnIncomingHit(new DamageTakenEvent(At(1, 40), "a wolf", 50, Melee: true)));
+        Assert.Null(charm.CharmedSince);
+    }
+
+    /// <summary>Codex round 2: the rename must NOT arm the name-agnostic fade-echo —
+    /// doing so swallowed the NEW pet's own real fade for ten seconds and labeled it
+    /// with the old pet's hold. The accepted, narrower cost (the old charm's delayed
+    /// TARGETLESS fade closing the new clock early) is documented on
+    /// EndTenureIfRenaming.</summary>
+    [Fact]
+    public void ANewPetsRealFadeRightAfterAChainCharmStillBreaks()
+    {
+        var charm = Charmed(out _);   // confirmed hold on the puma at 0:00
+        charm.OnBlink(new PetBlinkEvent(At(1, 10), "a wolf"), ("Charm", At(0, 50)));
+        Assert.Equal(At(1, 10), charm.CharmedSince);
+
+        Assert.True(charm.OnCharmFade(new SpellWornOffEvent(At(1, 15), "Charm", "a wolf")));
+        Assert.Null(charm.CharmedSince);
+    }
+
+    /// <summary>Codex review, 2026-08-18: the tell is the one certain proof, so a tell
+    /// naming a NEW pet ends the old tenure even though the landing path conservatively
+    /// ignored the swap — CharmedSince must not keep answering with the old pet's
+    /// landing time for a pet now labeled with the new name.</summary>
+    [Fact]
+    public void ATellNamingANewPetEndsTheOldTenure()
+    {
+        var charm = Charmed(out _);   // confirmed hold on the puma at 0:00
+        charm.OnPetClaim(new PetClaimEvent(At(2, 0), "a wolf"), "Douglas");
+        Assert.Equal("Pet (Wolf)", charm.SourceLabel);
+        // Honest null, not the puma's landing: the wolf's landing was never trusted,
+        // so there is no clock to lend it.
+        Assert.Null(charm.CharmedSince);
+    }
+
+    /// <summary>Codex review, 2026-08-18: a pet confirmed by tell AFTER its no-cast
+    /// candidate aged out has no clock at all — the next known-charm refresh blink
+    /// supplies one instead of no-op'ing back to a pet that can never say "held".</summary>
+    [Fact]
+    public void ARefreshBlinkSuppliesTheClockATellOnlyConfirmationLacked()
+    {
+        var charm = New(out _);
+        charm.OnBlink(new PetBlinkEvent(At(0, 0), "a puma"), null);   // item-clicky shape
+        // The tell arrives past BlinkToClaim: pet confirmed, but no landing survives.
+        charm.OnPetClaim(new PetClaimEvent(At(1, 30), "a puma"), "Douglas");
+        Assert.Equal("Pet (Puma)", charm.SourceLabel);
+        Assert.Null(charm.CharmedSince);
+
+        charm.OnBlink(new PetBlinkEvent(At(2, 0), "a puma"), ("Charm", At(1, 40)));
+        Assert.Equal(At(2, 0), charm.CharmedSince);
+        Assert.Equal("Pet (Puma)", charm.SourceLabel);   // still confirmed — no demote
+    }
+
     // ---- a landing line is never proof on its own ----
 
     [Fact]

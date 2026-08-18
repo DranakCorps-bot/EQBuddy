@@ -199,6 +199,7 @@ internal sealed class CharmTracker(SpellCatalog spells)
             // bystander's charm.
             if (category == SpellCategory.Charm && ch.Time - cast.Time <= ArmWindow(cast.Spell))
             {
+                EndTenureIfRenaming(name, ch.Time);   // a chain-charm ends the old tenure whole
                 ConfirmPet(name);
                 _hold = (name, ch.Time);   // #130
                 return true;
@@ -251,6 +252,7 @@ internal sealed class CharmTracker(SpellCatalog spells)
         // provisional — the attack-order tell confirms and merges, never loses.
         if (glazed.Time - cast.Time <= ArmWindow(cast.Spell))
         {
+            EndTenureIfRenaming(glazed.Target, glazed.Time);
             ConfirmPet(glazed.Target);
             _hold = (glazed.Target, glazed.Time);   // #130
             return true;
@@ -281,6 +283,7 @@ internal sealed class CharmTracker(SpellCatalog spells)
             // cast completed gets the provisional treatment below instead.
             if (category == SpellCategory.Charm && pb.Time - cast.Time <= ArmWindow(cast.Spell))
             {
+                EndTenureIfRenaming(blinked, pb.Time);
                 ConfirmPet(blinked);
                 _hold = (blinked, pb.Time);   // #130
                 return new BlinkOutcome(ConsumedCast: true, Ambient: true);
@@ -290,6 +293,35 @@ internal sealed class CharmTracker(SpellCatalog spells)
             // the provisional state.
             if (category == SpellCategory.Charm && pb.Weak)
                 return new BlinkOutcome(false, Ambient: true);
+            // Outside the window but our charm cast IS still recent: the strong blink
+            // degrades to the provisional "Pet?" state — the landing path's own contract,
+            // and what the comment above always promised. The assignment was missing
+            // (review catch, 2026-08-18): CharmedSince stayed null down this path, so the
+            // eventual fade had no landing time to measure a hold from. This method
+            // RENAMES the pet unconditionally below, so the clock has to move with the
+            // name — see EndTenureIfRenaming for the whole of what that means.
+            if (category == SpellCategory.Charm)
+            {
+                if (_petName is not null
+                    && string.Equals(_petName, blinked, StringComparison.OrdinalIgnoreCase))
+                {
+                    // A refresh blink for the pet we ALREADY track: with a clock running
+                    // it is a true no-op — the clock holds and a confirmed identity is
+                    // not re-doubted (the tail would demote it to "Pet?" and misfile its
+                    // damage until the next tell re-proved what was never in question).
+                    // WITHOUT a clock (a tell-only confirmation whose candidate aged
+                    // out — Codex, 2026-08-18) it supplies the missing landing time.
+                    if (CharmedSince is null) _provisional = (blinked, pb.Time);
+                    return new BlinkOutcome(false, Ambient: true);
+                }
+                // A chain-charm onto a DIFFERENT creature: the old tenure ends first —
+                // whole, echo-armed — then the new clock starts at this landing (#130).
+                EndTenureIfRenaming(blinked, pb.Time);
+                _provisional = (blinked, pb.Time);
+                _petName = blinked;
+                _petConfirmed = false;
+                return new BlinkOutcome(false, Ambient: false);
+            }
             // Unrecognised spell: hold onto it so a following "Master" tell can teach us
             // it was a charm.
             if (category == SpellCategory.Unknown)
@@ -304,9 +336,15 @@ internal sealed class CharmTracker(SpellCatalog spells)
         else
         {
             // A strong blink with no cast behind it: the item-clicky case again (#135).
-            // Remembered, not claimed — the tell decides.
+            // Remembered, not claimed — the tell decides. Tenure bookkeeping FIRST: a
+            // candidate still naming the OLD pet would block this landing's candidacy
+            // (Codex, round 2).
+            EndTenureIfRenaming(blinked, pb.Time);
             _candidate ??= (null, pb.Time, blinked);
         }
+        // These branches rename too (upstream's tail, kept): a DIFFERENT name still
+        // ends the old tenure first, or the old hold answers for the new name.
+        EndTenureIfRenaming(blinked, pb.Time);
         _petName = blinked;
         _petConfirmed = false;
         return new BlinkOutcome(false, Ambient: false);
@@ -346,6 +384,11 @@ internal sealed class CharmTracker(SpellCatalog spells)
                 // rows say "Pet?" precisely because they might be wrong.
                 _petName = null;
                 _petConfirmed = false;
+                // The whole tenure ends with the disproof — a surviving /pet hold or
+                // same-name proof from the disproved pet would suppress real break
+                // detection on whatever we charm next (Codex, round 2).
+                _petHeldSince = null;
+                _sameNameProofAt = null;
                 if (_hold is { } hold && string.Equals(
                         hold.Pet, disproved, StringComparison.OrdinalIgnoreCase))
                     _hold = null;
@@ -366,6 +409,12 @@ internal sealed class CharmTracker(SpellCatalog spells)
         // The claim must name the same creature the line did; a claim about a different
         // pet proves nothing about that cast.
         var claimed = LogParser.Normalize(pc.PetName);
+        // The tell names OUR pet with certainty. If we tracked a DIFFERENT creature,
+        // the landing path conservatively ignored the swap (a landing line is
+        // bystander-visible), so this is where the old tenure ends (Codex, 2026-08-18)
+        // — before the promotions below, which must not hand the new pet the old
+        // pet's landing time through their `_hold ??=`.
+        EndTenureIfRenaming(claimed, pc.Time);
         if (_candidate is { } cand && pc.Time - cand.Time <= BlinkToClaim
             && string.Equals(cand.Pet, claimed, StringComparison.OrdinalIgnoreCase))
         {
@@ -414,6 +463,37 @@ internal sealed class CharmTracker(SpellCatalog spells)
 
     /// <summary>Attacker AND target share the pet's name: there are two of them.</summary>
     public void NoteSameNameProof(DateTime at) => _sameNameProofAt = at;
+
+    /// <summary>A line is about to rename the pet to a DIFFERENT creature — a landing,
+    /// a chain-charm's blink, a candidate swap, a tell naming a new pet. The old pet's
+    /// tenure state ends FIRST, as one group: hold, provisional, same-name proof, the
+    /// /pet hold order, and a candidate still naming the old pet (which could never be
+    /// promoted honestly and would block the new landing's own candidacy). Two
+    /// independent reviews converged here from opposite directions (2026-08-18): five
+    /// hand-scoped partial cleanups at rename sites each missed fields that belong
+    /// together — a stale /pet hold from the old pet even suppressed real break
+    /// detection on the new one forever, since PetHeldAt compares no names.
+    ///
+    /// Deliberately NOT RecordBreak: a rename-created ledger entry armed the fade-echo
+    /// window, which is name-agnostic — it swallowed the NEW pet's own real fade for
+    /// ten seconds and labeled it with the old pet's hold (Codex, round 2). The cost of
+    /// this direction is narrower and documented: the OLD charm's delayed TARGETLESS
+    /// fade (Befriend Animal's shape, inside the skew window, mid-chain-charm) can
+    /// close the new clock early. That wrong self-corrects on the next landing; the
+    /// other wrong silently kept claiming a pet that had left.</summary>
+    private void EndTenureIfRenaming(string newName, DateTime at)
+    {
+        if (_petName is null
+            || string.Equals(_petName, newName, StringComparison.OrdinalIgnoreCase))
+            return;
+        _hold = null;
+        _provisional = null;
+        _sameNameProofAt = null;
+        _petHeldSince = null;
+        if (_candidate is { } stale
+            && string.Equals(stale.Pet, _petName, StringComparison.OrdinalIgnoreCase))
+            _candidate = null;
+    }
 
     /// <summary>Is this wear-off line the end of OUR charm? Two shapes: one naming the
     /// pet, and Befriend Animal's, which names no target at all ("Your charm spell has
