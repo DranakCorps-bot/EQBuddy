@@ -51,6 +51,7 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | **A charm cast from an ITEM still reports how long it held**: a clicky prints no casting line, so the per-spell arm window has nothing to key on — the pet's own caster-only "Master" tell starts the clock at the landing (#135, charm7.txt, the sixth distinct cause in that thread) | **Auto** — `SpellTrackingTests` |
 | **The landing line alone still claims nothing**: "has been charmed." names no caster and prints for a bystander's charm, so it is remembered and never believed until the tell names the same creature | **Auto** — `SpellTrackingTests` |
 | **An auto-sold pickup ("looted … and sold it for …") is not session loot**: dismissed at the corpse, it appears in no loot view and never touches the inventory overlay — it is vendor income, and the per-creature drop ledger (wiki packs, Target drops) still credits the mob. Watch rules still count it: a watched pattern is explicit interest | **Auto** — `SessionStatsTests`, `InventoryFileTests`, `JournalTests` |
+| **Both builds' Progress cards say the same thing**: header ("12.3% xp, +1 lvl (3 new), +2 aa") and pace summary come from one builder (`UI.Shared/ProgressText`); each ding is paced from the previous one, and the "(N new)" cue is omitted when a level unlocked nothing | **Auto** — `ProgressTextTests` |
 | **Every one of the sixteen classes can produce class evidence**, so an inference can always be argued back down (#120) | **Auto** — `ClassInferenceTests` |
 | Class evidence decays with a 10-minute half-life: a swap converges on what is being played now, and silence alone never flips a reading | **Auto** — `ClassInferenceTests` |
 | A class is named only from 3+ sightings, with two distinct spells where an item could have cast them, and a 2× lead — otherwise **no** inference | **Auto** — `ClassInferenceTests` |
@@ -149,6 +150,8 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | **Nothing on a timer may change the widget's measured size.** The title-bar CPU/memory readout formats to a fixed shape and its label reserves a fixed width, so a new sample repaints and never asks the windowing system to resize | **Auto** — `PerfReadoutTests`, `WidgetRenderTests` (#173) |
 | The readout stays off by default and costs no title-bar width until it is turned on | **Auto** — `WidgetRenderTests` (#112) |
 | That an always-on-top widget resizing does not disturb a fullscreen game underneath | **Manual** — §6 item 10; no headless test can see it |
+| **The breakout windows never take focus when the minimize pass shows them** — the star was clicked minutes ago; the show happens mid-fight, so both UIs' breakouts declare `ShowActivated` false like every other unprompted surface | **Auto** — `OverlayActivationTests` (source scan, both UIs) |
+| Clicking or dragging a WPF chip stack does not activate it either (`WS_EX_NOACTIVATE`, as the alert tile has always had) | **Manual** — the ex-style is applied in `NoActivate.cs`; only a live desktop shows focus |
 
 ## 4e. The design system
 

@@ -1900,7 +1900,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         UpdateGearChecklist(s);
         UpdateEpicQuestChecklist(s);
         _moneyHeader.Text = StatsSnapshot.FormatCoin(s.Copper);
-        _progressHeader.Text = $"{s.XpPercent:0.0}% xp" + (s.Levels.Count > 0 ? $", +{s.Levels.Count} lvl" : "") + (s.AaGained > 0 ? $", +{s.AaGained} aa" : "");
+        // The ding cue in the header, same as WPF now — this build's header predated
+        // the cue even though its card body has listed the unlocks all along.
+        _progressHeader.Text = ProgressText.Header(s, DingUnlocks(s).Count);
         _factionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "-";
         _miscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
     }
@@ -2085,18 +2087,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         if (_sections["progress"].IsExpanded)
         {
-            _progressSummary.Text = $"{s.XpTicks} xp gains - {s.XpPerHour:0.0}%/hr - {s.XpPerActiveHour:0.0}% active - {s.SkillUpTotal} skill-ups" +
-                (s.Recent is { } rx ? $"\nLast {(int)rx.Window.TotalMinutes}m: {rx.XpPerHour:0.0}%/hr" : "") +
-                (s.AaGained > 0 ? $"\n{s.AaGained} AA point{(s.AaGained == 1 ? "" : "s")} - {s.AaPerHour:0.0} AA/hr (now {s.AaTotal} unspent)" : "") +
-                (s.HoursToLevel is { } eta ? $"\nNext level in {FormatEta(eta)} at this pace" : "") +
-                (s.Levels.Count > 0
-                    ? "\n" + string.Join(", ", s.Levels.Select((l, i) =>
-                    {
-                        var from = i == 0 ? s.SessionStart : s.Levels[i - 1].Time;
-                        var mins = from is { } f ? (int)(l.Time - f).TotalMinutes : 0;
-                        return $"{l.Text} at {l.Time:h:mm tt} ({mins}m)";
-                    }))
-                    : "");
+            // The shared builder with this build's plain-ASCII separator ("-", the
+            // file's own convention under fonts Wine/Linux may lack).
+            _progressSummary.Text = ProgressText.Summary(s, " - ");
             // Ding: the AA group in its category order (labeled, not guessed — the wiki
             // doesn't say which classes they cover); the Spells grouping follows, its
             // rows marked "… spell".
@@ -2132,9 +2125,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show
             // newly learned this session?" — yes, now it is): session-new AAs lead,
             // the full ledger folds behind a click, same idiom as Pet abilities.
-            var newAas = s.SessionStart is { } sess
-                ? s.AaAbilities.Where(a => a.Time >= sess).ToList()
-                : [];
+            var newAas = ProgressText.SessionNewAas(s);
             _aaNewLabel.IsVisible = newAas.Count > 0;
             _aaNewList.IsVisible = _aaNewLabel.IsVisible;
             FillList(_aaNewList, newAas.Select(a =>
@@ -3176,10 +3167,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_miniChips.Children.Count == 0)
             _miniChips.Children.Add(AppTheme.DimText("* star stats in full view"));
     }
-
-    // The shared one, as WPF already did. This was a verbatim copy — identical today,
-    // which is exactly when a duplicate is cheapest to remove and hardest to notice.
-    private static string FormatEta(double hours) => ProgressPresentation.FormatEta(hours);
 
     private void OnOptions(object? sender, EventArgs e)
     {
