@@ -676,13 +676,29 @@ public sealed class MapWindow : Window
         foreach (var (el, _, _, _, _) in _campPins) _canvas.Children.Remove(el);
         _campPins.Clear();
 
-        var header = new TextBlock
+        // One mark per meaning (David, 2026-08-19): a respawn countdown is the STOPWATCH
+        // the spawn chips wear, here and there and nowhere else. This heading and the
+        // chips are the same idea and used to be the same emoji; when the chips became
+        // vectors the emoji left behind here would have been a second picture for one
+        // thing — and it is the picture that fails to render under Wine.
+        // Two columns, not a StackPanel: the zone name trims (trap 14).
+        var header = new Grid { Margin = new Thickness(0, 2, 0, 4) };
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        var mark = DesignSystem.Icon("Timer", "AccentBrush",
+            size: EQBuddy.UI.Shared.DesignTokens.IconInline);
+        mark.Margin = new Thickness(0, 0, EQBuddy.UI.Shared.DesignTokens.SpaceXs, 0);
+        header.Children.Add(mark);
+        var headerText = new TextBlock
         {
-            Text = zone.Length > 0 ? $"⏳ Named — {zone}" : "⏳ Named",
-            FontSize = 11, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 2, 0, 4),
+            Text = zone.Length > 0 ? $"Named — {zone}" : "Named",
+            FontSize = 11, FontWeight = FontWeights.SemiBold,
             TextTrimming = TextTrimming.CharacterEllipsis,
+            VerticalAlignment = VerticalAlignment.Center,
         };
-        header.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        headerText.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        Grid.SetColumn(headerText, 1);
+        header.Children.Add(headerText);
         _namedPanel.Children.Add(header);
 
         if (timers.Count == 0)

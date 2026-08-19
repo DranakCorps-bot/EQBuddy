@@ -9,7 +9,7 @@ namespace EQBuddy;
 
 /// <summary>
 /// The spawn-countdown chicklet stack (SPAWN-005, David's design): while timers run,
-/// each shows as a small movable chip — "⏳ Asaka L`Rei 3:12" — and the full zone list
+/// each shows as a small movable chip — a stopwatch, "Asaka L`Rei", "3:12" — and the zone list
 /// only exists behind a double-click. At zero a chip flips to a warn-colored DUE for
 /// one minute, then clears itself — click it away sooner if you're watching. The stack shows every
 /// running timer on the server regardless of zone: a Befallen camp timer keeps counting

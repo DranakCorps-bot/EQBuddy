@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
@@ -44,7 +44,7 @@ public sealed class ChipStackTests
         var window = new MezChipsWindow(settings, _ =>
         [
             new SpawnChip("", "Slowed 55% · disease 1", countdown, false,
-                "Togor's Insects · landed 3:00:00 pm", "Hourglass") { Fraction = 0.4 },
+                "Togor's Insects · landed 3:00:00 pm", "ChevronsDown") { Fraction = 0.4 },
         ]);
         window.RefreshChips(DateTime.Now);
         window.Show();
@@ -57,10 +57,13 @@ public sealed class ChipStackTests
         Assert.Contains("1:30", text);
         // Parse the expected side too: Avalonia re-serializes a parsed geometry, so the
         // string off a PathIcon is a normalized form of the one that went in.
-        var hourglass = global::Avalonia.Media.StreamGeometry
-            .Parse(IconPaths.Path("Hourglass")).ToString();
+        // Slowed reads as a DEBUFF ARROW, not a clock. It was an hourglass for a few
+        // hours and David's first look killed it: respawn already means an hourglass, so
+        // two unrelated things wore one picture (2026-08-19).
+        var slowMark = global::Avalonia.Media.StreamGeometry
+            .Parse(IconPaths.Path("ChevronsDown")).ToString();
         Assert.Contains(window.GetVisualDescendants().OfType<PathIcon>(),
-            icon => icon.Data?.ToString() == hourglass);
+            icon => icon.Data?.ToString() == slowMark);
         // The chip carries its gauge track under the row.
         Assert.Contains(window.GetVisualDescendants().OfType<Grid>(), g => g.Height == 2.5);
         // The scale host is in place, so ChipScale.Apply has a transform target.

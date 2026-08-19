@@ -657,13 +657,27 @@ public sealed class MapWindow : Window
         _campPins.Clear();
 
         var zone = _host.CurrentZoneName;
-        var header = new TextBlock
+        // Same mark as the WPF map and the spawn chips: a respawn countdown is the
+        // stopwatch, everywhere. Two columns rather than a StackPanel so the zone name
+        // trims instead of being clipped (trap 14).
+        var header = new Grid
         {
-            Text = zone.Length > 0 ? $"⏳ Named — {zone}" : "⏳ Named",
-            FontSize = 11, FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 2, 0, 4),
+            ColumnDefinitions = new ColumnDefinitions("Auto,*"),
+            Margin = new Thickness(0, 2, 0, 4),
+        };
+        var mark = DesignSystem.Icon("Timer", "AccentBrush", size: DesignTokens.IconInline);
+        mark.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+        header.Children.Add(mark);
+        var headerText = new TextBlock
+        {
+            Text = zone.Length > 0 ? $"Named — {zone}" : "Named",
+            FontSize = 11, FontWeight = FontWeight.SemiBold,
             TextTrimming = TextTrimming.CharacterEllipsis,
+            VerticalAlignment = VerticalAlignment.Center,
             Foreground = AppTheme.AccentBrush,
         };
+        Grid.SetColumn(headerText, 1);
+        header.Children.Add(headerText);
         _namedPanel.Children.Add(header);
 
         var now = DateTime.Now;

@@ -109,6 +109,8 @@ public static class IconPaths
         // thing a slow actually does. Meaning lives in the words; the icon separates the
         // kinds.
         ["Moon"] = "M12.5 2A10 10 0 1 0 22 15.2 8.5 8.5 0 0 1 12.5 2Z",
+        ["ChevronsDown"] = "M3.9 2.2 1.8 4.3 12 12.5 22.2 4.3l-2.1-2.1L12 8.3Z"
+                         + "M3.9 11.4 1.8 13.5 12 21.7l10.2-8.2-2.1-2.1L12 17.5Z",
         ["Hourglass"] = "M6 2v2l5 6-5 6v2h12v-2l-5-6 5-6V2H6Z",
 
         ["Target"] = "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06ZM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7Z",

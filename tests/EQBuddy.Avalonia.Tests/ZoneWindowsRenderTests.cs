@@ -3,9 +3,11 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using Path = System.IO.Path;
 
 namespace EQBuddy.Avalonia.Tests;
@@ -76,7 +78,13 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         var text = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
         Assert.Contains(text, t => t?.StartsWith("befallen — type /loc in game") == true);
         Assert.Contains("Test Label", text);                 // POI label, underscores unfolded
-        Assert.Contains("⏳ Named — Befallen", text);        // side panel follows the zone
+        // The side panel follows the zone. The heading's mark is the STOPWATCH vector the
+        // spawn chips wear — a respawn countdown is one picture everywhere, and it used
+        // to be an emoji hourglass here while the chips had moved on (2026-08-19).
+        Assert.Contains("Named — Befallen", text);
+        var stopwatch = StreamGeometry.Parse(IconPaths.Path("Timer")).ToString();
+        Assert.Contains(window.GetVisualDescendants().OfType<PathIcon>(),
+            icon => icon.Data?.ToString() == stopwatch);
         // Marker + spawn-circle halo/ring + POI dot at minimum.
         Assert.True(window.GetVisualDescendants().OfType<Ellipse>().Count() >= 4);
 

@@ -3417,7 +3417,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 Detail: "Placement preview: mez and slow chips will stack at this "
                     + "spot. Drag it where you'll notice them; it disappears when "
                     + "Options closes.",
-                Icon: "Hourglass"));
+                Icon: "ChevronsDown"));
         return chips;
     }
 
@@ -3442,7 +3442,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             return new SpawnChip(
                 Zone: "", Name: EQBuddy.UI.Shared.SlowChipText.Label(s),
                 CountdownText: remaining is { } r ? $"{(int)r / 60}:{(int)r % 60:00}" : "?",
-                IsDue: false, Detail: detail, Icon: "Hourglass")
+                IsDue: false, Detail: detail, Icon: "ChevronsDown")
             {
                 Fraction = s.ExpiresAt is { } exp && (exp - s.LandedAt).TotalSeconds is > 0 and var dur
                     ? Math.Clamp((now - s.LandedAt).TotalSeconds / dur, 0, 1)

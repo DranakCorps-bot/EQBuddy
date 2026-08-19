@@ -651,7 +651,7 @@ public sealed class OptionsWindow : Window
             _main.Settings.TrackSpawns, on => _main.SetTrackSpawns(on));
         panel.Children.Add(_trackSpawnsCheck);
         panel.Children.Add(AppTheme.DimText(
-            "Kill a named — or its placeholder — and a small countdown chicklet appears (⏳ Asaka L`Rei 3:12). Chicklets stack, drag anywhere as one, show every timer you have running in any zone, and flip to DUE for a minute (click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the full zone list, which follows you zone to zone. We captured the respawn times we could from community sources — if you notice a discrepancy in game, type over the duration: your number wins and survives updates.",
+            "Kill a named — or its placeholder — and a small countdown chicklet appears — a stopwatch, the name, and the time left (\"Asaka L`Rei 3:12\"). Chicklets stack, drag anywhere as one, show every timer you have running in any zone, and flip to DUE for a minute (click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the full zone list, which follows you zone to zone. We captured the respawn times we could from community sources — if you notice a discrepancy in game, type over the duration: your number wins and survives updates.",
             new Thickness(20, 2, 0, 0)));
 
         _spawnGrowUpCheck = Check("Spawn chips grow upward",
