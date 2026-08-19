@@ -55,6 +55,11 @@ $Shots = [ordered]@{
     # of the same keys SectionMap uses.
     'loot-card'       = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'loot' }; Set = @{} }
     'kills-card'      = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'kills' }; Set = @{} }
+    # The two remaining heavy card bodies (Gate 5b). Shot before and after their lift so
+    # a refactor that changes what a player SEES shows up as a diff in the picture —
+    # behaviour-preserving is a claim, and these are how it gets checked.
+    'combat-card'     = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'combat' }; Set = @{} }
+    'healing-card'    = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'healing' }; Set = @{} }
     # Gate 5b batch one, on one screen: motes and money take ICardContext (their rows are
     # items), faction takes none.
     'value-cards'     = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'motes,money,faction' }; Set = @{} }

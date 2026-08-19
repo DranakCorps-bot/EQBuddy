@@ -38,20 +38,37 @@ internal sealed class EqIcon : System.Windows.Controls.ContentControl
 
     /// <summary>An <see cref="IconPaths"/> name. Unknown names fall back to a neutral
     /// marker rather than throwing: a mistyped icon should look plain, not take the widget
-    /// down at startup — and <c>IconGeometryTests</c> is what actually catches the typo.</summary>
+    /// down at startup — and <c>IconGeometryTests</c> is what actually catches the typo.
+    ///
+    /// **A DependencyProperty, and that is what unblocked Gate 5d.** The last glyphs in the
+    /// app live inside shared <c>ControlTemplates</c> in Theme.xaml — the expander chevron
+    /// that flips ▸/▾, the star that fills ☆/★ — and they are swapped by template TRIGGERS.
+    /// A <c>Setter</c> can only target a DependencyProperty, so as a plain CLR property
+    /// this control could replace a static glyph and not a stateful one, which is most of
+    /// them. Same shape as the EqCardRows lookups that unblocked the card bodies: the
+    /// migration was not stuck on effort, it was stuck on a missing capability.</summary>
+    public static readonly DependencyProperty GlyphProperty =
+        DependencyProperty.Register(nameof(Glyph), typeof(string), typeof(EqIcon),
+            new PropertyMetadata("Info", (d, _) => ((EqIcon)d).Apply()));
+
     public string Glyph
     {
-        get;
-        set { field = value; Apply(); }
-    } = "Info";
+        get => (string)GetValue(GlyphProperty);
+        set => SetValue(GlyphProperty, value);
+    }
 
     /// <summary>A <see cref="ThemePalettes"/> key. Live through a theme switch: a fetched
     /// brush is a snapshot and would keep the old theme's colour.</summary>
+    public static readonly DependencyProperty InkProperty =
+        DependencyProperty.Register(nameof(Ink), typeof(string), typeof(EqIcon),
+            new PropertyMetadata("DimBrush", (d, e) =>
+                ((EqIcon)d)._path.SetResourceReference(Shape.FillProperty, (string)e.NewValue)));
+
     public string Ink
     {
-        get;
-        set { field = value; _path.SetResourceReference(Shape.FillProperty, value); }
-    } = "DimBrush";
+        get => (string)GetValue(InkProperty);
+        set => SetValue(InkProperty, value);
+    }
 
     /// <summary>Square size in device-independent units. Defaults to the inline-icon
     /// token; the chrome's larger touch targets say so explicitly.</summary>

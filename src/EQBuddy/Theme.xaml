@@ -1,5 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:EQBuddy">
 
     <!-- Color palette lives in Themes/*.xaml (swapped at runtime by ThemeManager);
          everything below only references brush keys, via DynamicResource so a theme
@@ -166,9 +167,8 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <ContentPresenter/>
-                                <TextBlock Grid.Column="1" Text="&#x2197;"
-                                           Foreground="{DynamicResource DimBrush}"
-                                           VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                <local:EqIcon Grid.Column="1" Glyph="ArrowUpRight"
+                                              VerticalAlignment="Center" Margin="{DynamicResource LinkArrowInset}"/>
                             </Grid>
                         </Border>
                     </Border>
@@ -205,9 +205,8 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <ContentPresenter Content="{Binding Header, RelativeSource={RelativeSource AncestorType=Expander}}"/>
-                                                <TextBlock x:Name="chev" Grid.Column="1" Text="&#x25B8;"
-                                                           Foreground="{DynamicResource DimBrush}"
-                                                           VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                                <local:EqIcon x:Name="chev" Grid.Column="1" Glyph="ChevronRight"
+                                                              VerticalAlignment="Center" Margin="{DynamicResource LinkArrowInset}"/>
                                             </Grid>
                                         </Border>
                                         <ControlTemplate.Triggers>
@@ -215,7 +214,7 @@
                                                 <Setter TargetName="hb" Property="Background" Value="{DynamicResource PanelHoverBrush}"/>
                                             </Trigger>
                                             <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="chev" Property="Text" Value="&#x25BE;"/>
+                                                <Setter TargetName="chev" Property="local:EqIcon.Glyph" Value="ChevronDown"/>
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -296,9 +295,9 @@
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Border Background="{DynamicResource ComboBoxBrush}" CornerRadius="5"
                                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1">
-                                        <TextBlock Text="&#x25BE;" Foreground="{DynamicResource DimBrush}"
-                                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                   Margin="0,0,8,0"/>
+                                        <local:EqIcon Glyph="ChevronDown"
+                                                      HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                      Margin="{DynamicResource ComboArrowInset}"/>
                                     </Border>
                                 </ControlTemplate>
                             </ToggleButton.Template>
@@ -356,9 +355,8 @@
                     </Grid.ColumnDefinitions>
                     <ContentPresenter ContentSource="Header" VerticalAlignment="Center"
                                       TextElement.Foreground="{TemplateBinding Foreground}"/>
-                    <TextBlock Grid.Column="1" Text="&#x25B8;" Margin="12,0,0,0"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource DimBrush}"/>
+                    <local:EqIcon Grid.Column="1" Glyph="ChevronRight"
+                                  Margin="{DynamicResource SubmenuArrowInset}" VerticalAlignment="Center"/>
                 </Grid>
             </Border>
             <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="2" VerticalOffset="-6"
@@ -434,16 +432,15 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
                     <Border Background="Transparent" Padding="2,0">
-                        <TextBlock x:Name="star" Text="&#x2606;" FontSize="{TemplateBinding FontSize}"
-                                   Foreground="{TemplateBinding Foreground}" VerticalAlignment="Center"/>
+                        <local:EqIcon x:Name="star" Glyph="Star" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="star" Property="Text" Value="&#x2605;"/>
-                            <Setter TargetName="star" Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="star" Property="local:EqIcon.Glyph" Value="StarFilled"/>
+                            <Setter TargetName="star" Property="local:EqIcon.Ink" Value="AccentBrush"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="star" Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                            <Setter TargetName="star" Property="local:EqIcon.Ink" Value="AccentBrush"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -36,6 +36,12 @@ public static class IconPaths
         ["Refresh"] = "M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 5.08h-2.16A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h8V3l-3.35 3.35Z",
         ["Minimize"] = "M5 12h14v2H5z",
         ["Expand"] = "M5 5h6v2H8.41l3.3 3.29-1.42 1.42L7 8.41V11H5V5Zm14 14h-6v-2h2.59l-3.3-3.29 1.42-1.42L17 15.59V13h2v6Z",
+        // A single north-east arrow: "this LEAVES rather than unfolds" — the meaning the
+        // SectionLink card carried as "↗" before Gate 5d. Distinct from "Expand", whose
+        // two arrows point APART and mean "make this bigger"; substituting one for the
+        // other reads as a resize handle, which is what the first cut of 5d shipped into
+        // a screenshot.
+        ["ArrowUpRight"] = "M6.4 17.6 15.99 8H10V6h9v9h-2V9.41L7.41 19 6.4 17.6Z",
         ["Close"] = "M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6 6.4 5Z",
         ["Star"] = "M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73-1.64 7.03L12 17.27 18.18 21l-1.63-7.03L22 9.24ZM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4Z",
         ["StarFilled"] = "M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27Z",

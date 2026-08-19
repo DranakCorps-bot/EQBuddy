@@ -53,6 +53,13 @@ internal static class DesignSystem
         d["PadWindow"] = new Thickness(DesignTokens.SpaceXl);
         d["GapXs"] = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
         d["GapS"] = new Thickness(0, 0, DesignTokens.SpaceS, 0);
+        // Theme.xaml's two template arrows (Gate 5d). Named rather than typed inline
+        // because they live in shared ControlTemplates and belong to no single card.
+        d["ComboArrowInset"] = new Thickness(0, 0, DesignTokens.SpaceM, 0);
+        d["SubmenuArrowInset"] = new Thickness(DesignTokens.SpaceL, 0, 0, 0);
+        // The SectionLink arrow sits to the RIGHT of its text, so its air is on the LEFT.
+        // Reaching for GapS (a right margin) instead jammed it against "Sky 0/222".
+        d["LinkArrowInset"] = new Thickness(DesignTokens.SpaceS, 0, 0, 0);
         d["StackXs"] = new Thickness(0, 0, 0, DesignTokens.SpaceXs);
         d["StackS"] = new Thickness(0, 0, 0, DesignTokens.SpaceS);
         d["StackM"] = new Thickness(0, 0, 0, DesignTokens.SpaceM);
