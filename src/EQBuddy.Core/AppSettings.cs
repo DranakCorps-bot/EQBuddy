@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 
 namespace EQBuddy.Core;
@@ -19,6 +19,12 @@ public sealed class AppSettings
     public double ChipScale { get; set; } = 1.0;
     public double QuestsLeft { get; set; } = double.NaN;
     public double QuestsTop { get; set; } = double.NaN;
+    /// <summary>The Progress window's saved spot (the PROGRESS THEME, docs/Themes.md).
+    /// NaN until it has been opened and moved, like the Quest Tracker's pair above —
+    /// WindowPlacement.PositionToPersist is what stops an unmoved fallback overwriting
+    /// a real saved position (#117).</summary>
+    public double ProgressLeft { get; set; } = double.NaN;
+    public double ProgressTop { get; set; } = double.NaN;
     /// <summary>Quest Tracker era ceiling ("" = any): quests after this era are hidden
     /// (discussion #62). Persisted app-wide — the world's era isn't per character.</summary>
     public string QuestEraFilter { get; set; } = "";
@@ -487,7 +493,12 @@ public sealed class AppSettings
         // Fold the two old quest cards onto one BEFORE the gear default runs — gear
         // anchors itself to the quests slot.
         changed |= settings.MigrateQuestSections();
+        // And the five Progress-theme cards onto one, the same way and for the same
+        // reason (docs/Themes.md step 5). After the gear default, because gear anchors
+        // itself to the quests slot and must not be pushed around by a fold that happens
+        // to land nearby; before nothing else, because nothing else reads SectionOrder.
         changed |= settings.ApplyDefaultGearSection();
+        changed |= settings.MigrateProgressSections();
         changed |= settings.MigrateSkyRewardRenames();
         changed |= settings.ApplyDefaultSkyQuestChecklist();
         changed |= settings.ApplyDefaultEpicQuestChecklist();

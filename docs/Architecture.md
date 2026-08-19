@@ -105,11 +105,25 @@ is the worked example on that side).
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,355 | 4,355 | 4,790 | 435 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,324 | 4,324 | 4,756 | 432 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,187 | 5,639 | 452 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,291 | 5,639 | 348 |
+
+**A theme fold buys much less headroom than a lift does, and the 2026-08-19 Progress
+theme is the measurement.** The WPF widget came down 31 lines — `RenderRaids` left for
+`RaidsCardView.cs` and four more card views stopped being fields there — because the fold
+also ADDED ~75 lines of window plumbing (`ShowProgressWindow`, `NewProgressSurfaces`,
+`SetMiniStat`), which is where that file already keeps every satellite's launcher. The
+surfaces move; the doors to them stay.
+
+Its Avalonia twin went the other way, 5,127 → 5,291, and was deliberately not re-baselined.
+The WPF fold moved five card VIEWS into a window; the Avalonia one only re-parented five
+card BODIES, which are still built and rendered in `MainWindow.cs` with an `IProgressHost`
+implementation new on top. That was the right call for the fold — it keeps "the tabs draw
+what the cards drew" literally true, with no rewrite to review — but it is not
+decomposition, and the table should not read as though it were.
 
 **`SessionStats` is a GLOB entry as of 2026-08-18, and that is the interesting half.** It
 was a literal path, and `SessionStats` is a partial class — so `SessionStats.Tracked.cs`

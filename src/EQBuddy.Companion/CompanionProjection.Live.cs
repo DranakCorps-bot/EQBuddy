@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
@@ -123,9 +123,12 @@ public static partial class CompanionProjection
     }
 
     private static CompanionProgressSection BuildProgress(
-        StatsSnapshot? s, int? level, LevelUnlockSet? unlocks)
+        StatsSnapshot? s, int? level, LevelUnlockSet? unlocks, RaidKillLedger? raids)
     {
         unlocks ??= LevelUnlockSet.Empty;
+        var stats = s ?? new StatsSnapshot();
+        var catalog = RaidTargetCatalog.Default;
+        var defeated = raids?.DefeatedCount() ?? 0;
         return new CompanionProgressSection(
             XpPercent: s?.XpPercent ?? 0,
             XpPerHour: s?.XpPerHour ?? 0,
@@ -142,6 +145,66 @@ public static partial class CompanionProjection
                     .Select(a => new CompanionUnlockRow(a.Name, LevelUnlockText.RowValue(a))),
                 .. unlocks.Spells.Take(MaxRows)
                     .Select(sp => new CompanionUnlockRow(sp.Name, LevelUnlockText.SpellRowValue(sp))),
-            ]);
+            ],
+            // The tab strip, from Core's ProgressSurface and UI.Shared's ProgressTheme —
+            // the SAME two the desktop window reads. Sending it rather than rebuilding it
+            // on the page is the #210 fix applied before the bug: the phone can't name a
+            // different tab, order them differently, or compute a different badge.
+            Tabs: [.. ProgressTheme
+                .Tabs(stats, unlocks.Count, defeated, catalog.BossCount)
+                .Select(t => new CompanionProgressTab(t.Key, t.Label, t.Value))],
+            Wealth: BuildWealth(stats),
+            Faction: [.. stats.Faction.Take(MaxRows)
+                .Select(f => new CompanionCountRow(f.Faction, f.Net))],
+            Raids: BuildRaids(raids, catalog));
+    }
+
+    /// <summary>Coin and motes. Coin arrives PRE-FORMATTED because the phone cannot do
+    /// better than the app's own FormatCoin, and two formatters for one number is exactly
+    /// how a phone and a window start disagreeing about how much plat you made.</summary>
+    private static CompanionWealthBlock BuildWealth(StatsSnapshot s)
+    {
+        var motes = Motes.Summarize(s.Loot, s.Elapsed);
+        return new CompanionWealthBlock(
+            Total: StatsSnapshot.FormatCoin(s.Copper),
+            Corpses: StatsSnapshot.FormatCoin(s.CorpseCopper),
+            Sales: StatsSnapshot.FormatCoin(s.VendorCopper),
+            PerHour: StatsSnapshot.FormatCoin(s.CopperPerHour),
+            CoinDrops: s.CoinDrops,
+            SalesCount: s.SalesCount,
+            // Sold items are drops too (#74) — the same rows the desktop's Money surface
+            // lists, with the count folded into the value column.
+            Sold: [.. s.SoldItems.Take(MaxRows).Select(i => new CompanionCountRow(i.Item, i.Count))],
+            MotesSummary: MotesPresentation.Summary(motes),
+            Motes: [.. motes.Tiers.Take(MaxRows).Select(t => new CompanionCountRow(t.Item, t.Count))]);
+    }
+
+    /// <summary>Raid targets per zone. The row DETAIL is built here rather than on the
+    /// page for the reason the desktop card states: the badge is the highest difficulty
+    /// PROVEN by a witnessed kill, and a page that assembled its own could show a tier the
+    /// ledger never recorded.</summary>
+    private static CompanionRaidsBlock BuildRaids(RaidKillLedger? raids, RaidTargetCatalog catalog)
+    {
+        if (raids is null) return new CompanionRaidsBlock(0, catalog.BossCount, []);
+        var zones = new List<CompanionRaidZone>();
+        foreach (var zone in catalog.Zones)
+        {
+            var bosses = new List<CompanionRaidBoss>();
+            foreach (var boss in zone.Bosses)
+            {
+                var rec = raids.For(boss);
+                var cleared = rec is { } r && (r.Kills > 0 || r.AchievementComplete);
+                var badge = rec?.HighestDifficulty() is { } hd ? $"D{hd} · " : "";
+                bosses.Add(new CompanionRaidBoss(boss, cleared, rec switch
+                {
+                    { Kills: > 0 } k => $"{badge}{(k.Kills > 1 ? $"×{k.Kills} · " : "")}last {k.LastKill:MMM d}",
+                    { AchievementComplete: true } => "cleared (from achievements)",
+                    _ => "",
+                }));
+            }
+            zones.Add(new CompanionRaidZone(zone.Zone, bosses.Count(b => b.Cleared),
+                zone.Bosses.Length, bosses));
+        }
+        return new CompanionRaidsBlock(raids.DefeatedCount(), catalog.BossCount, zones);
     }
 }

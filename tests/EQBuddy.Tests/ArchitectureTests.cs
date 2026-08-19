@@ -88,7 +88,17 @@ public class ArchitectureTests
         // freed and not claimed quietly refills. The card took its two unlock MEMOS with
         // it rather than leaving them behind as internals, which is the difference
         // between lifting a surface and moving some lines.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4355),
+        //
+        // Then lowered 4355 → 4324 on 2026-08-19 with the PROGRESS THEME (docs/Themes.md):
+        // RenderRaids left for RaidsCardView.cs and the other four Progress-theme cards
+        // stopped being fields here entirely, since ProgressWindow builds its own.
+        //
+        // **Only 31 lines, and the small number is the honest part.** The fold removed
+        // ~150 and added back ~75 of window plumbing — ShowProgressWindow,
+        // NewProgressSurfaces, SetMiniStat — because that is where this file already keeps
+        // every satellite's launcher. Consolidating cards buys much less headroom than
+        // lifting one does; the surfaces move, the doors to them stay.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4324),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
@@ -120,6 +130,16 @@ public class ArchitectureTests
         // entry gets. It should come down the way SessionStats did — the widget's card
         // bodies here have never been lifted, and LootCardView.cs is the worked example
         // of doing it (the Avalonia card that was a whole feature behind, Gate 4).
+        //
+        // NOT bumped for the Progress theme on 2026-08-19, and worth saying why, because
+        // the file GREW: 5,127 → 5,291, still legal inside the 10% grant. Its twin came
+        // down 31 lines for the same change and this went up 164, because the WPF fold
+        // moved five card VIEWS to a window while this one only re-parented five card
+        // BODIES — the bodies are still built and rendered here, and the IProgressHost
+        // implementation is new on top. That was the right call for the fold itself (it
+        // keeps "the tabs draw what the cards drew" literally true, with no rewrite to
+        // review) but it is not decomposition, and this entry should not be allowed to
+        // read as though it were. The headroom this file has left is now ~350 lines.
         (@"EQBuddy.Avalonia/MainWindow.cs", 5127),
     ];
 

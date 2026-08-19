@@ -95,11 +95,19 @@ became one theme, three tabs, one definition in Core. Five more follow:
 | Theme | Absorbs | Order |
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
-| **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | 1st — highest value, lowest risk |
-| **Loot & Items** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | 2nd — unblocks #174 |
-| **Progress** | Progress, Money, Motes, Faction, Raids | 3rd — where all-time stats plug in |
-| **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | 4th — biggest lift |
-| **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | 5th — heaviest mobile parity |
+| **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
+| **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | next — needs `RenderBuffs` lifted first |
+| **Loot & Items** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | then — unblocks #174 |
+| **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | biggest lift |
+| **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity |
+
+**Progress went before Alerts, and the reason is worth keeping.** The order above was set
+on 2026-08-17, before Gate 5b lifted four card bodies onto the `IWidgetCard` seam — which
+left Progress with four of its five cards already portable and Alerts with one of two.
+Measured again on 2026-08-19: Progress bought 14 cards → 10 for one lift, Alerts would buy
+14 → 13 for a harder one (`RenderBuffs` is 107 lines tangled into the buff-set evaluator).
+**Re-measure that readiness before starting any theme** rather than trusting this column;
+the work done since a plan was written changes what the plan should say.
 
 **One theme per release**, each with its settings-key folding, its mobile parity and a
 lowered hotspot baseline in the same commit. Two rules from the plan that decide arguments

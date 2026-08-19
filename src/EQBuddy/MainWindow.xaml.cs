@@ -72,13 +72,18 @@ public partial class MainWindow : Window, ICardContext
     // before it: a surface migrated INSIDE MainWindow is guarded by no ratchet.
     private LootCardView _loot = null!;
 
-    // Cards on the IWidgetCard seam (Gate 5b). Kills and Faction take no context at all;
-    // Motes and Money take the six-method one, never this window.
+    // Cards on the IWidgetCard seam (Gate 5b). Kills takes no context at all.
+    //
+    // The PROGRESS THEME's five — Progress, Money, Motes, Faction, Raids — are no longer
+    // fields here at all: they are not on the widget any more, and ProgressWindow builds
+    // its own instances through NewProgressSurfaces() below. A UIElement has one parent,
+    // so a shared instance would be torn out of whichever host drew it last.
     private readonly KillsCardView _kills = new();
-    private readonly FactionCardView _faction = new();
-    private ProgressCardView _progress = null!;   // built in the ctor, before any XAML runs
-    private MotesCardView _motes = null!;
-    private MoneyCardView _money = null!;
+    /// <summary>What opened up at this level and the next. The Progress card used to hold
+    /// this memo, and three callers still need the answer with no card in sight — the
+    /// launcher summary, the buff suggestions and the Progress breakout. Shared with the
+    /// Avalonia widget, which had a hand-copied twin of it (UI.Shared/LevelUnlockMemo).</summary>
+    private LevelUnlockMemo _unlocks = null!;
     // Watch takes the seam plus one thing no snapshot can answer: when each rule's cue
     // is due. That is scheduled by the alert path, not by the session, so it is handed
     // in rather than reached for — and ICardContext stays six methods wide.
@@ -123,15 +128,12 @@ public partial class MainWindow : Window, ICardContext
         _loot = new LootCardView(this, _settings);
         LootBody.Content = _loot.Body;
         KillsBody.Content = _kills.Body;
-        _faction.Attach(); FactionBody.Content = _faction.Body;
-        _motes = new MotesCardView(this); _motes.Attach(); MotesBody.Content = _motes.Body;
-        _money = new MoneyCardView(this); _money.Attach(); MoneyBody.Content = _money.Body;
-        _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
-        TrackedBody.Content = _watch.Body;
-        _progress = new ProgressCardView(this, _settings,
+        _unlocks = new LevelUnlockMemo(
             s => BuffSetClassSource(s).Classes,
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
-        ProgressBody.Content = _progress.Body;
+        _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
+        TrackedBody.Content = _watch.Body;
+
         BuildSortStrips();
         GearByZoneCheck.IsChecked = _settings.GearGroupByZone;
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -197,6 +199,9 @@ public partial class MainWindow : Window, ICardContext
                 BuffLosses = () => _buffLossLog.Snapshot(),
                 HopsFromHere = zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops,
                 Progress = () => (CurrentSnapshot().LastLevel, ProgressDingUnlocks(CurrentSnapshot())),
+                // The Progress theme's Raids tab, wired in the same change as the desktop
+                // fold — both surfaces or neither (#210).
+                Raids = _raidLedger,
                 CampFor = t => UI.Shared.CampLocations.Resolve(
                     t, EnsureMobLookup, n => WikiMobResult(n)?.Mob?.LocYX),
                 Quests = () => new Companion.CompanionQuestRequest
@@ -321,8 +326,7 @@ public partial class MainWindow : Window, ICardContext
         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
         if (expand == "1")
             foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
-                         MotesSection, GearSection, TrackedSection, MoneySection,
-                         ProgressSection, FactionSection, MiscSection })
+                         GearSection, TrackedSection, MiscSection })
                 ex.IsExpanded = true;
         else if (!string.IsNullOrWhiteSpace(expand))
         {
@@ -380,6 +384,16 @@ public partial class MainWindow : Window, ICardContext
                 if (questsMode.Split(':')[0] is "sky" or "epic") _questsWindow?.SetTab(questsMode);
                 else if (questsMode is "zone" or "all") _questsWindow?.SetMode(questsMode);
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
+        // Same family. The Progress window is where five card BODIES went, and a card
+        // body has never been photographable except through a hook — so without this the
+        // theme's four tabs could not be reviewed, and a surface nobody can review reads
+        // as "reviewed" anyway (trap 22). "1" opens it on Experience; a tab key
+        // (wealth / faction / raids) opens it there.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_PROGRESS") is { Length: > 0 } progressTab)
+            Loaded += (_, _) => Dispatcher.BeginInvoke(
+                () => ShowProgressWindow(progressTab == "1" ? null : progressTab),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         // Same family, and the one that was missing: the Spawns window deliberately stays
         // hidden until a countdown exists, so scripts/shoot.ps1 could never capture it and
@@ -561,11 +575,14 @@ public partial class MainWindow : Window, ICardContext
     private Dictionary<string, UIElement> SectionMap() => new()
     {
         ["combat"] = CombatSection, ["healing"] = HealingSection, ["kills"] = KillsSection,
-        ["loot"] = LootSection, ["motes"] = MotesSection, ["quests"] = QuestsSection,
+        ["loot"] = LootSection, ["quests"] = QuestsSection,
         ["gear"] = GearSection, ["tracked"] = TrackedSection,
-        ["buffs"] = BuffsSection, ["raids"] = RaidsSection,
-        ["money"] = MoneySection,
-        ["progress"] = ProgressSection, ["faction"] = FactionSection, ["misc"] = MiscSection,
+        ["buffs"] = BuffsSection,
+        // One key for the whole Progress theme, and it is deliberately "progress" — one
+        // OF the five it absorbs rather than a new name, so a player who had dragged that
+        // card somewhere keeps the slot instead of finding the theme appended to the
+        // bottom of their list (AppSettings.MigrateProgressSections).
+        ["progress"] = ProgressSection, ["misc"] = MiscSection,
     };
 
     /// <summary>Apply saved card order + hidden set (OVERLAY-001..003). Hidden cards keep collecting.</summary>
@@ -1260,12 +1277,12 @@ public partial class MainWindow : Window, ICardContext
     /// the CARD now: the memo moved with the surface that computes it (Gate 5b), so this
     /// is a forward rather than a second copy — two memos over one catalog scan is the
     /// "one entry, two sources" trap with a performance bill attached.</summary>
-    internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => _progress.DingUnlocks(s);
+    internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => _unlocks.Ding(s);
 
     /// <summary>The next-milestone preview, likewise forwarded. The card and the breakout
     /// must agree on where "At N:" starts (trap 4).</summary>
     internal (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s) =>
-        _progress.NextUnlockPreview(s);
+        _unlocks.Next(s);
 
     // The three static unlock helpers that used to live here moved to
     // UI.Shared/LevelUnlockRows.cs. They were pure functions on a WINDOW class, which is
@@ -1312,129 +1329,6 @@ public partial class MainWindow : Window, ICardContext
                     : null,
             };
         }).ToList();
-    }
-
-    /// <summary>
-    /// The Raids card: every raid target the game's own achievements list names, per
-    /// zone, with the personal record — witnessed kills with dates, or the imported
-    /// Conqueror achievement for clears from before EQBuddy. No difficulty tiers on
-    /// purpose: neither the log nor the dump names the instance tier, and a badge the
-    /// data can't back would be decoration, not information. Hidden until something
-    /// is defeated (or Options unhides it) — a fresh character owes nobody a zero.
-    /// </summary>
-    private void RenderRaids()
-    {
-        if (_settings.HiddenSections.Contains("raids")) return;   // layout collapsed it
-        RaidsSection.Visibility = Visibility.Visible;
-        var defeated = _raidLedger.DefeatedCount();
-        var catalog = RaidTargetCatalog.Default;
-        RaidsHeader.Text = $"{defeated} / {catalog.BossCount}";
-        if (!RaidsSection.IsExpanded) return;
-        // Wherever the card names the command, the command is one click (David,
-        // 2026-08-14) — copy, paste in game chat, then Import achievements… reads
-        // the file the game wrote.
-        Button CopyAchievementsCmd()
-        {
-            var b = Theming.WireCopyCommand(Theming.Button(""),
-                EQBuddy.UI.Shared.GameCommands.OutputfileAchievements);
-            b.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
-            b.HorizontalAlignment = HorizontalAlignment.Left;
-            b.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-            b.ToolTip = "Copies the command — paste it into the game's chat and the game " +
-                "writes its achievements dump beside its own folders; right-click → " +
-                "Data & imports → Import achievements… reads it.";
-            return b;
-        }
-        if (defeated == 0)
-        {
-            RaidsPanel.Children.Clear();
-            RaidsPanel.Children.Add(EmptyCardLine(
-                "Nothing defeated yet — kills your log witnesses land here, and importing " +
-                $"{EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} marks clears from before EQBuddy."));
-            RaidsPanel.Children.Add(CopyAchievementsCmd());
-            return;
-        }
-
-        RaidsPanel.Children.Clear();
-        foreach (var zone in catalog.Zones)
-        {
-            var records = zone.Bosses.Select(b => (Boss: b, Rec: _raidLedger.For(b))).ToList();
-            var done = records.Count(x => x.Rec is { } r && (r.Kills > 0 || r.AchievementComplete));
-            RaidsPanel.Children.Add(new TextBlock
-            {
-                Text = $"{zone.Zone} — {done}/{zone.Bosses.Length}",
-                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
-                FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, Tok.SpaceXs, 0, 1),
-                Foreground = (Brush)FindResource(done == zone.Bosses.Length ? "GoodBrush" : "AccentBrush"),
-            });
-            foreach (var (boss, rec) in records)
-            {
-                var cleared = rec is { } rr && (rr.Kills > 0 || rr.AchievementComplete);
-                // The badge is the highest difficulty PROVEN by a witnessed kill —
-                // instance tiers come off the zone-enter line (#109 data). Kills from
-                // before tiers existed carry no tier and earn no badge; honesty over
-                // flattery.
-                var badge = rec?.HighestDifficulty() is { } hd ? $"D{hd} · " : "";
-                var detail = rec switch
-                {
-                    { Kills: > 0 } k =>
-                        $"{badge}{(k.Kills > 1 ? $"×{k.Kills} · " : "")}last {k.LastKill:MMM d}",
-                    { AchievementComplete: true } => "cleared (from achievements)",
-                    _ => "",
-                };
-                // Two columns rather than a tick typed into the string: the mark is a
-                // vector, and the boss name keeps the star column so a long one trims
-                // with an ellipsis instead of being clipped beside it (trap 14). The
-                // uncleared state keeps its "·" — that is a typographic mark holding the
-                // column open, not an icon, and the ratchet allows it as one.
-                var row = new Grid { Margin = new Thickness(Tok.SpaceS, 0, 0, 0) };
-                row.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(Tok.IconInlineHit),
-                });
-                row.ColumnDefinitions.Add(new ColumnDefinition
-                {
-                    Width = new GridLength(1, GridUnitType.Star),
-                });
-                if (cleared)
-                {
-                    var tick = DesignSystem.Icon("Check", "GoodBrush", size: Tok.IconInline);
-                    tick.HorizontalAlignment = HorizontalAlignment.Left;
-                    row.Children.Add(tick);
-                }
-                else
-                {
-                    var bullet = DesignSystem.Text(Tok.TypeRole.BodySecondary, "·");
-                    row.Children.Add(bullet);
-                }
-                var bossText = new TextBlock
-                {
-                    Text = $"{boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
-                    FontSize = Tok.Spec(Tok.TypeRole.BodySecondary).Size,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Foreground = (Brush)FindResource(cleared ? "TextBrush" : "DimBrush"),
-                };
-                Grid.SetColumn(bossText, 1);
-                row.Children.Add(bossText);
-                if (rec is { TierKills.Count: > 0 } tk)
-                    row.ToolTip = "Kills by difficulty: " + string.Join(" · ",
-                        new[] { "d4", "d3", "d2", "d1", "d0", "open", "instance", "unknown" }
-                            .Where(k => tk.TierKills.ContainsKey(k))
-                            .Select(k => $"{(k.StartsWith('d') ? k.ToUpperInvariant() : k)} ×{tk.TierKills[k]}"))
-                        + (tk.Kills > tk.TierKills.Values.Sum()
-                            ? $" · {tk.Kills - tk.TierKills.Values.Sum()} earlier kill(s) predate tier tracking"
-                            : "");
-                RaidsPanel.Children.Add(row);
-            }
-        }
-        RaidsPanel.Children.Add(new TextBlock
-        {
-            Text = $"Kills count when your log sees the boss die; import {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} to mark older clears.",
-            FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
-            TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
-            Foreground = (Brush)FindResource("DimBrush"),
-        });
-        RaidsPanel.Children.Add(CopyAchievementsCmd());
     }
 
     /// <summary>
@@ -1917,6 +1811,73 @@ public partial class MainWindow : Window, ICardContext
         _wikiPackWindow.Activate();
     }
 
+    private ProgressWindow? _progressWindow;
+
+    private void OnProgressWindow(object sender, RoutedEventArgs e) => ShowProgressWindow();
+
+    /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
+    /// the only way to reach five surfaces that used to be five cards.</summary>
+    internal void ShowProgressWindow(string? tab = null)
+    {
+        if (_progressWindow is not { IsLoaded: true })
+        {
+            _progressWindow = new ProgressWindow(this);
+            _progressWindow.Show();
+        }
+        if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
+        _progressWindow.Activate();
+    }
+
+    /// <summary>The five surfaces the Progress window hosts, freshly built for IT.
+    ///
+    /// The window cannot borrow the widget's — the widget has none any more — and even
+    /// when it did, a UIElement has one parent, so a shared instance would be torn out of
+    /// whichever host painted it last. This is the payoff for putting them on the
+    /// <see cref="IWidgetCard"/> seam: "paint yourself from this snapshot" is a contract
+    /// a second host can satisfy, and a view that took MainWindow could not have moved.
+    ///
+    /// One method rather than five, so this window's whole reach into the widget is one
+    /// name. The seam's own warning applies (see <see cref="ICardContext"/>): if THIS
+    /// starts growing, something is being pushed through the window that belongs in
+    /// UI.Shared.</summary>
+    internal ProgressSurfaceSet NewProgressSurfaces()
+    {
+        var motes = new MotesCardView(this); motes.Attach();
+        var money = new MoneyCardView(this); money.Attach();
+        var faction = new FactionCardView(); faction.Attach();
+        return new ProgressSurfaceSet(
+            Experience: new ProgressCardView(this, _settings,
+                s => BuffSetClassSource(s).Classes,
+                () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null),
+            Money: money,
+            Motes: motes,
+            Faction: faction,
+            Raids: new RaidsCardView(() => _raidLedger));
+    }
+
+    /// <summary>How many unlocks this session's ding opened — the Experience tab's badge
+    /// needs the count, and the memo that answers it lives here.</summary>
+    internal int ProgressDingUnlockCount(StatsSnapshot s) => ProgressDingUnlocks(s).Count;
+
+    /// <summary>Turn a mini-dashboard stat on or off from somewhere that is not a star on
+    /// a card header. The Progress theme took the xp, money and motes stars off the
+    /// widget with their cards, and this is what the window's own stars call — the same
+    /// two lines <see cref="OnStarChanged"/> runs, so there is one rule for what a star
+    /// does and the breakouts still follow it.</summary>
+    internal void SetMiniStat(string key, bool on)
+    {
+        if (on)
+        {
+            if (!_settings.MiniStats.Contains(key)) _settings.MiniStats.Add(key);
+        }
+        else
+        {
+            _settings.MiniStats.Remove(key);
+        }
+        _settings.Save();
+        UpdateBreakouts(CurrentSnapshot());
+    }
+
     private void OnQuestsWindow(object sender, RoutedEventArgs e) => ShowQuestsWindow();
 
     /// <summary>Open (or front) the Quest Tracker; with an item, jump straight to that
@@ -2218,6 +2179,7 @@ public partial class MainWindow : Window, ICardContext
         // Spawn timers crossing zero: banner always, sound only if one is chosen. Runs
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsLoaded: true, IsVisible: true } qw) qw.MaybeRefresh();
+        if (_progressWindow is { IsLoaded: true, IsVisible: true } pw) pw.MaybeRefresh();
         if (_dropsWindow is { IsLoaded: true, IsVisible: true } dw) dw.MaybeRefresh();
         if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsLoaded: true, IsVisible: true } mapw) mapw.MaybeRefresh();
@@ -2392,8 +2354,6 @@ public partial class MainWindow : Window, ICardContext
         // reports the same two numbers from the same place, so they cannot disagree.
         LootHeader.Text = EQBuddy.UI.Shared.LootPresentation.Header(
             s.LootTotal, s.CraftedTotal + s.FashionedTotal);
-        var motes = Motes.Summarize(s.Loot, s.Elapsed);
-        MotesHeader.Text = motes.Total > 0 ? $"{motes.Total} · {motes.PerHour:0.#}/hr" : "0";
         // A session rollover empties the loot lists lazily, inside the same batch
         // that may carry the new session's first loot — inferring the reset from
         // emptied lists can miss that first same-name drop. The session identity
@@ -2407,7 +2367,6 @@ public partial class MainWindow : Window, ICardContext
         UpdateSkyQuestChecklist(s);
         UpdateGearChecklist(s);
         UpdateEpicQuestChecklist(s);
-        MoneyHeader.Text = StatsSnapshot.FormatCoin(s.Copper);
         // Remember the announced level per character — the "At N:" preview must survive
         // restarts and log truncation, and the log only says the number at the ding.
         if (s.LastLevel is { } announced && QuestLedger is { } lg && QuestCharacterKey.Length > 0
@@ -2417,8 +2376,12 @@ public partial class MainWindow : Window, ICardContext
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in
         // UI.Shared so the Progress breakout says exactly the same thing.
-        ProgressHeader.Text = ProgressText.Header(s, ProgressDingUnlocks(s).Count);
-        FactionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "—";
+        // ONE line for five folded cards. Every number those five headers carried is in
+        // it, which is the whole bargain of the fold: the glance survives, the five slots
+        // do not. Assembled in UI.Shared so the Avalonia widget and EQBuddy Mobile say the
+        // same thing (#210 — parity by shared module, never by feature list).
+        ProgressHeader.Text = ProgressTheme.LauncherSummary(
+            s, ProgressDingUnlocks(s).Count, _raidLedger.DefeatedCount());
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
 
@@ -2518,8 +2481,6 @@ public partial class MainWindow : Window, ICardContext
         if (LootSection.IsExpanded)
             _loot.Render(s);
 
-        if (MotesSection.IsExpanded) _motes.Render(s);
-
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         QuestsHeader.Text = _quests.SummaryLine();
@@ -2529,12 +2490,6 @@ public partial class MainWindow : Window, ICardContext
             RenderGearChecklist();
             _gearChecklistDirty = false;
         }
-
-        if (MoneySection.IsExpanded) _money.Render(s);
-
-        if (ProgressSection.IsExpanded) _progress.Render(s);
-
-        if (FactionSection.IsExpanded) _faction.Render(s);
 
         if (MiscSection.IsExpanded)
         {
@@ -2547,10 +2502,16 @@ public partial class MainWindow : Window, ICardContext
 
         RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
         RenderBuffs(s);     // per-tick: the countdowns ARE the content
-        if (fullRender) RenderRaids();   // changes on kills and imports only
         UpdatePerfStats();  // #112: self-measurement, every few seconds, off by default
 
-        if (Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1")
+        // Any non-empty EQBUDDY_EXPAND writes the dump, not just "1". The named form
+        // (EQBUDDY_EXPAND=raids) is the ONLY way to open a card the review set leaves
+        // closed — Raids and Buffs both default to Collapsed — so while the gate read
+        // "1" those two cards were the two the E2E suite could not assert on at all.
+        // That is exactly backwards: Raids is the surface about to be lifted, and the
+        // WPF layer has no unit tests (docs/TestPlan.md §5). A shot's throwaway profile
+        // getting a debug.txt it does not read costs nothing.
+        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("EQBUDDY_EXPAND")))
         {
             try
             {
@@ -2558,7 +2519,19 @@ public partial class MainWindow : Window, ICardContext
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
                     $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} loot={_loot.RowCount} " +
-                    $"skills={_progress.SkillRows} faction={_faction.RowCount} " +
+
+                    // The PROGRESS THEME's launcher card (docs/Themes.md). It replaced
+                    // five cards whose row counts used to be asserted here; what a reader
+                    // sees now is one line, so that is what this pins — the card is
+                    // present, and folding five cards into it kept their numbers on
+                    // screen rather than quietly losing the glance. Exactly the shape
+                    // questsCard/questsSummaryLen took when the quest cards folded.
+                    //
+                    // The ROWS moved with the surfaces, into ProgressWindow.DebugFacts()
+                    // below, where the same E2E assertions read them.
+                    $"progressCard={(ProgressSection.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"progressSummaryLen={ProgressHeader.Text.Length} " +
+                    $"raidsDefeated={_raidLedger.DefeatedCount()} " +
                     $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
@@ -2577,12 +2550,6 @@ public partial class MainWindow : Window, ICardContext
                     // a level was announced this session), the next-milestone preview
                     // (hidden until a level is known at all, and folded behind a setting)
                     // and the AA split into session-new vs the full ledger.
-                    $"dingShown={(_progress.DingShown ? 1 : 0)} " +
-                    $"dingRows={_progress.DingRows} " +
-                    $"nextShown={(_progress.NextShown ? 1 : 0)} " +
-                    $"nextRows={_progress.NextRows} " +
-                    $"aaNew={_progress.AaNewRows} " +
-                    $"aaAll={_progress.AaAllRows} " +
                     $"watchRows={_watch.RowCount} " +
                     $"watchStrip={(_watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={_settings.WatchSortMode} " +
@@ -2609,6 +2576,11 @@ public partial class MainWindow : Window, ICardContext
                     // pane — is only assertable from a launched app. The window formats
                     // its own facts; this just carries them.
                     (_questsWindow is { IsLoaded: true } qwin ? qwin.DebugFacts() + " " : "") +
+                    // The Progress WINDOW, when EQBUDDY_PROGRESS opened one. The five
+                    // surfaces it hosts were pinned on the widget before the fold; this
+                    // is where those same numbers come out now, and the point of the
+                    // assertion is that they are the SAME numbers.
+                    (_progressWindow is { IsLoaded: true } pwin ? pwin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={_companionPumpTicks} " +
@@ -3321,9 +3293,6 @@ public partial class MainWindow : Window, ICardContext
         yield return ("procs", StarProcs);
         yield return ("kills", StarKills);
         yield return ("loot", StarLoot);
-        yield return ("motes", StarMotes);
-        yield return ("money", StarMoney);
-        yield return ("xp", StarXp);
         yield return ("deaths", StarDeaths);
         yield return ("buffs", StarBuffs);
     }

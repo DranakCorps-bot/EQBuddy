@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -416,8 +416,8 @@ public class WidgetRenderTests : IDisposable
     /// <summary>The fold heading carrying these words. EqFoldLabel is internal and the
     /// test project has InternalsVisibleTo, so the chevron's direction is assertable
     /// directly rather than through the text it no longer lives in.</summary>
-    private static EqFoldLabel Fold(MainWindow window, string text) =>
-        window.GetVisualDescendants().OfType<EqFoldLabel>().Single(f => f.Text == text);
+    private static EqFoldLabel Fold(global::Avalonia.Visual root, string text) =>
+        root.GetVisualDescendants().OfType<EqFoldLabel>().Single(f => f.Text == text);
 
     [AvaloniaFact]
     public void PendingCueCountsDownInTheTrackedCardHeading()
@@ -509,12 +509,18 @@ public class WidgetRenderTests : IDisposable
     }
 
     /// <summary>AA display since the 2026-08-11 rethink: session-new AAs lead, the full
-    /// character ledger folds behind the ▸ label (Pet-abilities idiom, WPF parity).</summary>
+    /// character ledger folds behind the ▸ label (Pet-abilities idiom, WPF parity).
+    ///
+    /// The surface moved to the Progress window's Experience tab when the PROGRESS THEME
+    /// folded five cards into one (docs/Themes.md) — so the assertion moved with it, and
+    /// that is the whole point of keeping it: the fold's claim is that the tabs draw what
+    /// the cards drew, and this is the only headless place that can check it.</summary>
     [AvaloniaFact]
     public void ProgressCardFoldsTheAaLedgerBehindAToggle()
     {
         var window = new MainWindow();
         window.Show();
+        window.ShowProgressWindow("progress");   // Experience
         var snapshot = new StatsSnapshot
         {
             SessionStart = new DateTime(2026, 8, 8),
@@ -528,7 +534,7 @@ public class WidgetRenderTests : IDisposable
         window.Settings.ShowAllAAs = false;
         window.RenderSnapshotForTest(snapshot);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        var text = window.GetVisualDescendants().OfType<TextBlock>()
+        var text = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         // Learned this session: leads unfolded; the pre-session AA stays folded away.
         Assert.Contains("AA learned this session", text);
@@ -536,16 +542,17 @@ public class WidgetRenderTests : IDisposable
         Assert.Contains("rank 3", text);
         Assert.Contains("All AA abilities (2)", text);
         Assert.DoesNotContain("Natural Durability", text);
-        Assert.False(Fold(window, "All AA abilities (2)").Open);
+        Assert.False(Fold(window.ProgressWindowForTests!, "All AA abilities (2)").Open);
 
         window.Settings.ShowAllAAs = true;
         window.RenderSnapshotForTest(snapshot);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        text = window.GetVisualDescendants().OfType<TextBlock>()
+        text = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains("All AA abilities", text);
         Assert.Contains("Natural Durability", text);
-        Assert.True(Fold(window, "All AA abilities").Open);
+        Assert.True(Fold(window.ProgressWindowForTests!, "All AA abilities").Open);
+        window.ProgressWindowForTests?.Close();
         window.Close();
     }
 
@@ -675,10 +682,17 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
-    /// <summary>Buffs and Raids cards stay where Options put them, with honest empty
-    /// states instead of vanishing (David's 1.66.2 verdict).</summary>
+    /// <summary>Buffs stays where Options put it, with an honest empty state instead of
+    /// vanishing (David's 1.66.2 verdict), and Raids says the same thing from the Progress
+    /// window's Raids tab — where it went when the PROGRESS THEME folded five cards into
+    /// one (docs/Themes.md).
+    ///
+    /// Raids is checked through the WINDOW rather than deleted from this test, because the
+    /// empty state is the thing most easily lost in a move: it is what a fresh character
+    /// sees, and the rule that a card never hides itself is exactly what a re-host
+    /// forgets.</summary>
     [AvaloniaFact]
-    public void BuffsAndRaidsCardsShowHonestEmptyStates()
+    public void BuffsAndRaidsShowHonestEmptyStates()
     {
         var window = new MainWindow();
         window.Show();
@@ -689,8 +703,46 @@ public class WidgetRenderTests : IDisposable
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains("Buffs", text);   // vector icon + word since Gate 5
         Assert.Contains(text, t => t.StartsWith("Nothing running"));
-        Assert.Contains("Raids", text);   // vector icon + word since Gate 5
-        Assert.Contains(text, t => t.StartsWith("Nothing defeated yet"));
+        // The launcher that replaced the five cards, on the widget itself.
+        Assert.Contains("Progress", text);
+
+        window.ShowProgressWindow("raids");
+        var raids = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Raids", raids);
+        Assert.Contains(raids, t => t.StartsWith("Nothing defeated yet"));
+        // Close the SATELLITE first. A Progress window left open outlives its test — it
+        // is a separate top-level window, and MainWindow.Close() does not take it with
+        // it — so a later test's Dispatcher.RunJobs() renders a window nobody owns, at
+        // whatever size it happens to have. That surfaces as headless Avalonia's
+        // "Size should be >= (1,1)" in an UNRELATED test, which is a miserable thing to
+        // debug from a CI log.
+        window.ProgressWindowForTests?.Close();
+        window.Close();
+    }
+
+    /// <summary>The PROGRESS THEME's strip: four tabs, in Core's order, with Experience
+    /// selected by default. Built from ProgressSurface so this build, the WPF window and
+    /// EQBuddy Mobile cannot end up offering different tabs (#184, #210).</summary>
+    [AvaloniaFact]
+    public void ProgressWindowShowsTheFourThemeTabs()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.ShowProgressWindow();
+
+        var text = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        foreach (var tab in Enum.GetValues<ProgressTab>())
+            Assert.Contains(ProgressSurface.LabelFor(tab), text);
+        Assert.Equal(ProgressTab.Experience, window.ProgressWindowForTests!.Tab);
+        // Close the SATELLITE first. A Progress window left open outlives its test — it
+        // is a separate top-level window, and MainWindow.Close() does not take it with
+        // it — so a later test's Dispatcher.RunJobs() renders a window nobody owns, at
+        // whatever size it happens to have. That surfaces as headless Avalonia's
+        // "Size should be >= (1,1)" in an UNRELATED test, which is a miserable thing to
+        // debug from a CI log.
+        window.ProgressWindowForTests?.Close();
         window.Close();
     }
 

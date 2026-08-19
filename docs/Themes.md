@@ -83,13 +83,39 @@ idle" does pass the deadline test. If that gets built it is a chip, not a meter.
 and David uses the damage breakout — so this is a defaults-and-home change, not a
 deletion.
 
-### 3. Progress
+### 3. Progress — **BUILT 2026-08-19, and it went first**
 **Tabs:** Experience · Wealth · Faction · Raids
 **Absorbs:** Progress card (xp/hr, time to level), Money card, Motes card, Faction
 card, Raids card
 **Surface:** phone + desktop. Entirely retrospective — this is the theme the
 all-time-stats direction (#168/#159) plugs into, and Wealth is where the mote
 weighting from #154 belongs.
+
+**Shipped as:** `Core/ProgressSurface.cs` (tabs, labels, keys, absorbed-card list),
+`UI.Shared/ProgressTheme.cs` (badges + the launcher line), `EQBuddy/ProgressWindow.xaml`
+and `EQBuddy.Avalonia/ProgressWindow.cs`, `AppSettings.MigrateProgressSections`, and the
+four-tab `CompanionProgressSection` on the phone. 14 cards → 10.
+
+**What the build taught, beyond the recipe:**
+
+- **The launcher line has to FIT, and only a screenshot says whether it does.** Passing the
+  tab badges straight through rendered `16.0% xp, +1 aa · 5p 1g 4s 8c · 1 mot…` — clipped
+  mid-word, faction lost off the end. The launcher takes each part's headline; the tabs
+  carry the detail. A summary that replaces five headers and then truncates has not kept
+  the glance, it has hidden the loss.
+- **The tab strip must WRAP.** A horizontal `StackPanel` measures with infinite width, so
+  the fourth chip was simply clipped off the window with nothing to say so — trap 14 with
+  chips instead of text, and the same bug #184 hit at NEC. Found by looking at the first
+  screenshot, where Raids was not on screen at all.
+- **Check what still WRITES every setting the folded cards owned** (trap 20). Three cards
+  here carried the only `MiniStats` writers for `xp`, `money` and `motes`. They moved into
+  the window rather than onto the launcher — three identical stars in one card header say
+  nothing about which is which, and a `ToggleButton` nested in a `Button` bubbles its
+  `Click` to the button's handler, so every star press would also have opened the window.
+- **Shot names are not identities.** Four shots now share the window title
+  `EQBuddy Progress`, and a previous shot's app that has not finished exiting is a perfect
+  match for the next shot's request — which filed a Faction tab as `progress-wealth.png`.
+  `shot.ps1` takes `-OwnerPid` now.
 
 ### 4. Alerts
 **Tabs:** Watch rules · Buffs · Spawns · Mez/Charm
@@ -126,12 +152,21 @@ behind it.
 
 Ordered by value per unit of risk, not by size.
 
-1. **Alerts** — highest value, lowest risk. It is mostly a settings surface, the chips
-   it configures already work, and `AlertSoundPlan` is already shared and tested.
-   Also closes the "settings live in Options except where they don't" seam.
-2. **Loot & Items** — unblocks #174, which is already approved and waiting.
-3. **Progress** — pure aggregation over data already computed; the natural home for
-   all-time stats.
+**This list was written on 2026-08-17 and Progress went first anyway. Re-measure before
+picking the next one.** The order below ranked value against risk correctly for the
+codebase as it stood — but Gate 5b then lifted four card bodies onto the `IWidgetCard`
+seam, which is most of the work a theme fold does. Measured again on 2026-08-19: Progress
+had 4 of its 5 cards already portable and bought 14 cards → 10; Alerts had 1 of 2 and
+would have bought 14 → 13, with `RenderBuffs` (107 lines, tangled into the buff-set
+evaluator) to lift first. **The right question is not "what does the plan say next" but
+"which theme is most nearly built already".**
+
+1. ~~**Progress**~~ — **done 2026-08-19.** Pure aggregation over data already computed;
+   the natural home for all-time stats.
+2. **Alerts** — mostly a settings surface, the chips it configures already work, and
+   `AlertSoundPlan` is already shared and tested. Also closes the "settings live in
+   Options except where they don't" seam. Needs `RenderBuffs` lifted first.
+3. **Loot & Items** — unblocks #174, which is already approved and waiting.
 4. **Live Meters** — biggest MainWindow lift, so the most E2E pinning needed first.
 5. **World** — the map is the heaviest surface and the one with the most mobile
    parity work; do it when the recipe is boring.

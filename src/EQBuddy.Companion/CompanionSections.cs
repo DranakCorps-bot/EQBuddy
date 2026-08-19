@@ -1,4 +1,4 @@
-namespace EQBuddy.Companion;
+﻿namespace EQBuddy.Companion;
 
 // The wire shape of every surface. One file so the protocol reads top to bottom;
 // each record is pre-chewed for a phone (numbers already formatted where the phone
@@ -320,6 +320,21 @@ public sealed record CompanionQuestNeed(string N, int Q);
 
 // ---------------- progress ----------------
 
+/// <summary>
+/// The PROGRESS THEME on a phone (docs/Themes.md): the same four tabs the desktop window
+/// shows — Experience, Wealth, Faction, Raids — from the same
+/// <see cref="EQBuddy.Core.ProgressSurface"/> definition and the same
+/// <see cref="EQBuddy.UI.Shared.ProgressTheme"/> badges.
+///
+/// It grew the three new blocks in the SAME change as the desktop fold, which is the whole
+/// lesson of #210: EQBuddy Mobile went on building the cross-class ready list for two days
+/// after the desktop had lost it, and restoring the desktop immediately created the mirror
+/// risk. Parity by feature list drifts; parity by shared module does not.
+///
+/// <see cref="Tabs"/> rides the wire rather than being rebuilt on the page, so the phone
+/// cannot end up naming different tabs, ordering them differently, or computing a
+/// different badge than the window it mirrors.
+/// </summary>
 public sealed record CompanionProgressSection(
     double XpPercent,
     double XpPerHour,
@@ -330,6 +345,39 @@ public sealed record CompanionProgressSection(
     double AaPerHour,
     int? Level,
     string? UnlocksLabel,
-    IReadOnlyList<CompanionUnlockRow> Unlocks);
+    IReadOnlyList<CompanionUnlockRow> Unlocks,
+    IReadOnlyList<CompanionProgressTab> Tabs,
+    CompanionWealthBlock Wealth,
+    IReadOnlyList<CompanionCountRow> Faction,
+    CompanionRaidsBlock Raids);
+
+/// <summary>One tab, already labelled and badged by Core + UI.Shared. <see cref="Key"/> is
+/// the stable wire key, so a device's saved tab survives a rename of the label.</summary>
+public sealed record CompanionProgressTab(string Key, string Label, string? Badge);
+
+/// <summary>Coin and motes — the tab that merges two cards, because motes are currency in
+/// Legends and "what was the trip worth" should not require knowing which card held which
+/// half. Coin values are pre-formatted: the phone cannot do better than the app's own
+/// FormatCoin, and two formatters for one number is how they drift.</summary>
+public sealed record CompanionWealthBlock(
+    string Total,
+    string Corpses,
+    string Sales,
+    string PerHour,
+    int CoinDrops,
+    int SalesCount,
+    IReadOnlyList<CompanionCountRow> Sold,
+    string MotesSummary,
+    IReadOnlyList<CompanionCountRow> Motes);
+
+/// <summary>Raid targets, per zone. <see cref="CompanionRaidZone.Done"/> over its boss
+/// count is the desktop's own zone heading; <see cref="CompanionRaidBoss.Detail"/> is its
+/// row text, built desktop-side so a difficulty badge cannot be invented here.</summary>
+public sealed record CompanionRaidsBlock(
+    int Defeated, int Total, IReadOnlyList<CompanionRaidZone> Zones);
+
+public sealed record CompanionRaidZone(string Zone, int Done, int Total, IReadOnlyList<CompanionRaidBoss> Bosses);
+
+public sealed record CompanionRaidBoss(string Name, bool Cleared, string Detail);
 
 public sealed record CompanionUnlockRow(string Name, string Value);

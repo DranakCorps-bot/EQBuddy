@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using EQBuddy.Core;
 
@@ -114,7 +114,6 @@ public static class OverlaySections
     public static readonly (string Key, string Title)[] Catalog =
     [
         ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
-        ("motes", "Motes"),
         // One card for every quest surface (David, 2026-08-16). It replaced the separate
         // "Sky Quest" and "Epics" cards, which each carried a full tabbed checklist on the
         // widget — a review surface, not a glance one, and now a click away in the Quest
@@ -122,8 +121,14 @@ public static class OverlaySections
         ("quests", "Quests"), ("gear", "Gear"),
         // Key stays "tracked" — it's persisted in SectionOrder/HiddenSections. Only the
         // label follows the feature's rename from tracked loot to watch rules (#5).
-        ("tracked", "Watch"), ("buffs", "Buffs"), ("raids", "Raids"), ("money", "Money"), ("progress", "Progress"),
-        ("faction", "Faction"), ("misc", "Travels & Deaths"),
+        ("tracked", "Watch"), ("buffs", "Buffs"),
+        // One card for every progress surface — the PROGRESS THEME (docs/Themes.md,
+        // David ruled themes a direction 2026-08-19). It replaced the separate Money,
+        // Motes, Faction and Raids cards, which are now tabs in the Progress window.
+        // AppSettings.MigrateProgressSections folds the four old keys onto this one, and
+        // ProgressSurface.AbsorbedCardKeys is the list it reads — so what disappears is
+        // spelled ONCE, not again here.
+        ("progress", "Progress"), ("misc", "Travels & Deaths"),
     ];
 
     /// <summary>The card's icon, by section key — one table both widgets read (Gate 5).
@@ -149,10 +154,7 @@ public static class OverlaySections
         ["gear"] = "Gear",
         ["tracked"] = "Target",
         ["buffs"] = "Timer",
-        ["raids"] = "Group",
-        ["money"] = "Coin",
         ["progress"] = "Chart",
-        ["faction"] = "Scales",
         ["misc"] = "Location",
     };
 

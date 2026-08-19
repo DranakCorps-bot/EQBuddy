@@ -18,6 +18,10 @@ public static class CompanionSurfaces
     public const string Combat = "combat";
     public const string Session = "session";
     public const string Loot = "loot";
+    /// <summary>The four-tab progress surface (Experience · Wealth · Faction · Raids) —
+    /// the PROGRESS THEME (docs/Themes.md, 2026-08-19). It was XP and AA alone until the
+    /// desktop folded five cards into one window; the phone grew the other three tabs in
+    /// the SAME change, which is #210's whole lesson.</summary>
     public const string Progress = "progress";
     /// <summary>The three-tab quest surface (General · Epic 1.0 · Plane of Sky) —
     /// the consolidation David asked for (2026-08-15). It REPLACED the separate
@@ -45,7 +49,7 @@ public static class CompanionSurfaces
         Combat => "Damage, healing & pet",
         Session => "Session stats",
         Loot => "Loot & watches",
-        Progress => "XP & AA",
+        Progress => "Progress",
         Quests => "Quest tracker",
         Gear => "Gear checklist",
         _ => surface,
@@ -62,7 +66,8 @@ public static class CompanionSurfaces
         Combat => "Ability breakdowns for damage, healing and your pet, last fight and session.",
         Session => "Kills, xp/hr, session length, dps.",
         Loot => "Session loot, what you've made, and your watch counters.",
-        Progress => "XP and AA rates, and what unlocked at your level.",
+        Progress => "XP and AA rates and what unlocked at your level, coin and motes, " +
+                    "faction standing, and the raid targets you have cleared.",
         Quests => "Your quest tracker — the searchable catalog with your progress and pins, " +
                   "plus the Epic and Plane of Sky checklists, tappable from EQBuddy Mobile.",
         Gear => "Your gear checklist, by slot and by farm zone.",

@@ -1,0 +1,88 @@
+<Window x:Class="EQBuddy.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EQBuddy Progress" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Width="520" WindowStartupLocation="Manual">
+    <!-- The PROGRESS THEME (docs/Themes.md; David ruled themes a direction on
+         2026-08-19: "part of the major UX revamp that organizes everything much
+         better... just as we did with quests"). Five widget cards — Progress, Money,
+         Motes, Faction, Raids — become four tabs here, and one launcher line on the
+         widget.
+
+         Why a window and not an overlay: every one of these is RETROSPECTIVE. Nothing
+         on these tabs has a deadline attached, so by CLAUDE.md's surface rule none of
+         it earns space over the running game. What it earns instead is room to be read.
+
+         QuestsWindow is the template, and deliberately so — David: "I really want to
+         use the approach for Quests as a guide for how we integrate." Same chrome, same
+         EqSegmentedStrip tab row, same drag/close/zoom wiring. There is no LIST+DETAIL
+         split here because there is nothing to select: each tab is one surface, already
+         built, already lifted onto the IWidgetCard seam.
+
+         Nothing below carries a literal size, radius or spacing value — every number
+         resolves out of the token dictionary DesignSystem.Tokens() composes from
+         EQBuddy.UI.Shared.DesignTokens. DesignRatchetTests fails the build if a literal
+         reappears. -->
+    <Border Background="{DynamicResource BgBrush}" CornerRadius="{DynamicResource CornerPanel}"
+            BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="1"
+            MouseLeftButtonDown="OnDrag">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title row. The icon is a vector (DesignSystem.Icon), never a glyph — emoji
+             box outright in the Wine prefixes the Linux and macOS builds run under
+             (#148, #166). -->
+        <Grid Grid.Row="0" Margin="{DynamicResource PadCard}">
+            <StackPanel x:Name="TitleRow" Orientation="Horizontal" VerticalAlignment="Center"/>
+            <Button x:Name="CloseBtn" Style="{StaticResource EqIconButton}" ToolTip="Close"
+                    HorizontalAlignment="Right" Click="OnClose"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Margin="{DynamicResource PadCard}">
+            <!-- Labels, order and keys come from Core's ProgressSurface, and the badges
+                 beside them from UI.Shared's ProgressTheme, so this window, the Avalonia
+                 widget and EQBuddy Mobile cannot end up naming four different tabs or
+                 reporting four different numbers (#184, #210). -->
+            <!-- WRAPS, and it has to. A horizontal StackPanel measures its children with
+                 INFINITE width, so nothing ever reaches a boundary to wrap at — the
+                 fourth chip is simply clipped at the panel's edge, silently, with no
+                 ellipsis to say so. That is trap 14 with chips instead of text, and it is
+                 the same bug #184 hit when the class strip clipped at NEC. Found here by
+                 looking at the first screenshot: the strip showed Experience, Wealth and
+                 Faction, and Raids was not on screen at all. These badges carry real
+                 sentences ("16.0% xp, +1 lvl (2 new), +1 aa"), so four of them will not
+                 fit one 520px row and were never going to. -->
+            <WrapPanel x:Name="TabStrip" Margin="{DynamicResource StackS}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" x:Name="BodyScroll" VerticalScrollBarVisibility="Auto"
+                      Margin="{DynamicResource PadCard}">
+            <!-- The active tab's surface. It carries no Visibility and no Margin of its
+                 own: the lifted control owns both (trap 15 — a control that hides itself
+                 inside a host that also hides itself has two switches for one state, and
+                 only one of them is ever wired). -->
+            <ContentControl x:Name="TabBody"/>
+        </ScrollViewer>
+
+        <!-- The three mini-dashboard stars that used to sit on the Progress, Money and
+             Motes card headers. They come here rather than onto the launcher card for
+             two reasons: three identical stars in one card header say nothing about
+             which is which, and nesting a ToggleButton inside a Button makes its Click
+             bubble to the Button's own handler, so every star press would also open this
+             window. Here they get the words they never had on the widget.
+
+             They had to go SOMEWHERE. The star is the only writer MiniStats has for
+             these three keys, and a fold that drops the last writer of a setting is
+             exactly the shape of #204/#209, #210 and #212 (CLAUDE.md trap 20). -->
+        <StackPanel Grid.Row="3" x:Name="MiniRow" Orientation="Horizontal"
+                    Margin="{DynamicResource PadCard}" VerticalAlignment="Center"/>
+      </Grid>
+    </Border>
+</Window>

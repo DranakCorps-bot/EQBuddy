@@ -1,5 +1,19 @@
 [
  {
+  "version": "1.96.0",
+  "date": "2026-08-19",
+  "highlights": [
+   "THE WIDGET IS FIVE CARDS SHORTER. Progress, Money, Motes, Faction and Raids are now one Progress card that opens a window with four tabs — Experience, Wealth, Faction, Raids. Fourteen cards became ten. This is the same move the Quest Tracker made, and the reason is the same: none of those five has a deadline attached, so none of them earns a permanent slot on the one window that sits over your game. They earn room to be read instead.",
+   "The card's one line still carries what all five headers carried — \"16.0% xp · 5p 1g 4s 8c · 5 factions\" — so the glance survives the fold. Nothing was deleted: every number, list and control from those five cards is on a tab, drawing exactly what it drew before.",
+   "Wealth merges coin and motes on purpose. Motes are currency in Legends, and \"what was this trip worth\" should not depend on knowing which of two cards held which half.",
+   "The stars that put XP, money and motes in the mini dashboard moved into the window, where they finally have words next to them instead of being three identical stars on three card headers.",
+   "EQBuddy Mobile got the same four tabs in the same update — its Progress screen was XP and AA alone, and now carries Wealth, Faction and Raids too. Same tab names, same order, same numbers as the PC, because both read one shared definition rather than two hand-kept lists.",
+   "Your card order and your hidden cards are preserved. The Progress card lands in the first slot any of the five occupied, so if you had dragged Money to the top you will find Progress at the top; and it only starts hidden if you had hidden all five.",
+   "FIXED, LINUX AND MACOS ONLY — the Quest Tracker opened at zero width the first time you used it, before you had ever Ctrl+wheeled it. The window-zoom code on those builds had drifted from the Windows original and multiplied the window's width by a missing setting. Windows was never affected. Please tell us if you still see a window open too narrow to read.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: ⚙ → Help → Send feedback."
+  ]
+ },
+ {
   "version": "1.95.0",
   "date": "2026-08-19",
   "highlights": [

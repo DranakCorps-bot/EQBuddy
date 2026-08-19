@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -50,6 +50,7 @@ public class DeadSettingTests
         // The second half of a tuple deconstruction — "(s.WindowLeft, s.WindowTop) = …".
         ["WindowTop"] = "written with WindowLeft by tuple deconstruction",
         ["QuestsTop"] = "written with QuestsLeft by tuple deconstruction",
+        ["ProgressTop"] = "written with ProgressLeft by tuple deconstruction",
         ["SpawnTop"] = "written with SpawnLeft by tuple deconstruction",
         ["TimelineTop"] = "written with TimelineLeft by tuple deconstruction",
 

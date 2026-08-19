@@ -20,7 +20,7 @@ using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 
 namespace EQBuddy.Avalonia;
 
-public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost
+public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost, IProgressHost
 {
     private readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
@@ -99,14 +99,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _killsHeader = AppTheme.StatValue("0");
     private readonly TextBlock _lootHeader = AppTheme.StatValue("0 items");
     private readonly TextBlock _trackedHeader = AppTheme.StatValue("0");
-    private readonly TextBlock _motesHeader = AppTheme.StatValue("0");
     private readonly TextBlock _motesSummary = AppTheme.DimText("");
     private readonly ItemsControl _motesList = new();
     private readonly TextBlock _gearHeader = AppTheme.StatValue("0/0");
     private readonly TextBlock _gearListName = AppTheme.DimText("");
     private readonly CheckBox _gearByZoneCheck = new() { Content = "Group by farm zone" };
     private readonly StackPanel _gearChecklistPanel = new();
-    private readonly TextBlock _raidsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _raidsPanel = new();
     private readonly TextBlock _buffsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _buffsPanel = new();
@@ -173,9 +171,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         Text = "0", FontSize = DesignSystem.Size(Role.Metric), FontWeight = FontWeight.SemiBold,
         Foreground = accent ? AppTheme.AccentBrush : AppTheme.TextBrush,
     };
-    private readonly TextBlock _moneyHeader = AppTheme.StatValue("0c");
     private readonly TextBlock _progressHeader = AppTheme.StatValue("0% xp");
-    private readonly TextBlock _factionHeader = AppTheme.StatValue("-");
     private readonly TextBlock _miscHeader = AppTheme.StatValue("0 deaths");
     private readonly TextBlock _combatSummary = AppTheme.DimText("");
     // The fight in front of you, above the session aggregate — see ShowLastFight. The
@@ -440,6 +436,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 ShowQuestsWindow();
                 if (questsMode is "zone" or "all") _questsWindow?.SetMode(questsMode);
             }, DispatcherPriority.ApplicationIdle);
+
+        // Same family as EQBUDDY_QUESTS. The Progress window is where five card BODIES
+        // went, and a body has never been reviewable except through a hook — a surface
+        // with no way to be photographed reads as "reviewed" anyway (trap 22). "1" opens
+        // it on Experience; a tab key (wealth / faction / raids) opens it there.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_PROGRESS") is { Length: > 0 } progressTab)
+            Loaded += (_, _) => Dispatcher.UIThread.Post(
+                () => ShowProgressWindow(progressTab == "1" ? null : progressTab),
+                DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
             Loaded += (_, _) => OnOptions(this, EventArgs.Empty);
@@ -871,7 +876,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         AddSection("healing", "hps", "Healing", _healingHeader, BuildHealingSection(), "Show HPS in mini dashboard");
         AddSection("kills", "kills", "Kills", _killsHeader, BuildKillsSection(), "Show kills in mini dashboard");
         AddSection("loot", "loot", "Loot", _lootHeader, BuildLootSection(), "Show loot count in mini dashboard");
-        AddSection("motes", "motes", "Motes", _motesHeader, BuildMotesSection(), "Show motes in mini dashboard");
         // ONE card for every quest surface (David, 2026-08-16). It replaced the "Sky
         // Quest" and "Epics" cards, each of which carried a full tabbed checklist on the
         // widget — a review surface by the rule in CLAUDE.md, not a glance one. The Quest
@@ -893,10 +897,25 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         buffsStar.Click += OnStarChanged;
         _stars["buffs"] = buffsStar;
         _sections["buffs"] = AppTheme.Section(Header("buffs", "Buffs", _buffsHeader, buffsStar), _buffsPanel);
-        _sections["raids"] = AppTheme.Section(Header("raids", "Raids", _raidsHeader), _raidsPanel);
-        AddSection("money", "money", "Money", _moneyHeader, BuildMoneySection(), "Show money in mini dashboard");
-        AddSection("progress", "xp", "Progress", _progressHeader, BuildProgressSection(), "Show XP in mini dashboard");
-        _sections["faction"] = AppTheme.Section(Header("faction", "Faction", _factionHeader), _factionList);
+        // ONE card for every progress surface — the PROGRESS THEME (docs/Themes.md,
+        // David ruled themes a direction 2026-08-19), in the same change as the WPF twin.
+        // It replaced the Progress, Money, Motes, Faction and Raids cards. All five are
+        // retrospective, so by CLAUDE.md's surface rule they are review surfaces and earn
+        // a window rather than five slots on the thing that sits over the running game.
+        //
+        // The BODIES are still built here and still rendered here — the window hosts them
+        // through IProgressHost.ProgressTabBody. The fold re-parents surfaces instead of
+        // rewriting them, which is what makes "the tabs draw what the cards drew" checkable
+        // rather than merely claimed.
+        _progressTabBodies[ProgressTab.Experience] = BuildProgressSection();
+        _progressTabBodies[ProgressTab.Wealth] = BuildWealthSection();
+        _progressTabBodies[ProgressTab.Faction] = _factionList;
+        _progressTabBodies[ProgressTab.Raids] = _raidsPanel;
+        _sections["progress"] = AppTheme.SectionLink(
+            Header("progress", "Progress", _progressHeader), () => ShowProgressWindow());
+        ToolTip.SetTip(_sections["progress"],
+            "Open Progress - experience and AAs, coin and motes, faction standing, and "
+            + "the raid targets you've cleared");
         AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
         return _sectionsPanel;
     }
@@ -1157,6 +1176,20 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _soldLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         panel.Children.Add(_soldLabel);
         panel.Children.Add(_soldList);
+        return panel;
+    }
+
+    /// <summary>The Wealth tab: the two cards it merges, each under its own label. The
+    /// merge is the whole reason this tab exists rather than two — motes are currency in
+    /// Legends, and "what was the trip worth" should not require knowing which of two
+    /// cards held which half.</summary>
+    private Control BuildWealthSection()
+    {
+        var panel = new StackPanel();
+        panel.Children.Add(AppTheme.SectionLabel("Coin"));
+        panel.Children.Add(BuildMoneySection());
+        panel.Children.Add(AppTheme.SectionLabel("Motes"));
+        panel.Children.Add(BuildMotesSection());
         return panel;
     }
 
@@ -1725,6 +1758,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // Spawn timers crossing zero: banner always, sound only if one is chosen. Runs
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsVisible: true } qw) qw.MaybeRefresh();
+        if (_progressWindow is { IsVisible: true } pw) pw.MaybeRefresh();
         if (_dropsWindow is { IsVisible: true } dw) dw.MaybeRefresh();
         if (_wikiPackWindow is { IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsVisible: true } mapw) mapw.MaybeRefresh();
@@ -1895,8 +1929,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _kpiXp.Text = $"{s.XpPerHour:0.#}%";
         _killsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
         _lootHeader.Text = LootPresentation.Header(s.LootTotal, s.CraftedTotal + s.FashionedTotal);
-        var motes = Motes.Summarize(s.Loot, s.Elapsed);
-        _motesHeader.Text = motes.Total > 0 ? $"{motes.Total} · {motes.PerHour:0.#}/hr" : "0";
         // A session rollover empties the loot lists lazily, inside the same batch
         // that may carry the new session's first loot — inferring the reset from
         // emptied lists can miss that first same-name drop. The session identity
@@ -1911,11 +1943,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         UpdateSkyQuestChecklist(s);
         UpdateGearChecklist(s);
         UpdateEpicQuestChecklist(s);
-        _moneyHeader.Text = StatsSnapshot.FormatCoin(s.Copper);
-        // The ding cue in the header, same as WPF now — this build's header predated
-        // the cue even though its card body has listed the unlocks all along.
-        _progressHeader.Text = ProgressText.Header(s, DingUnlocks(s).Count);
-        _factionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "-";
+        // ONE line for five folded cards — every number those five headers carried, so
+        // the glance survives the fold even though the five slots do not. Assembled in
+        // UI.Shared so this build, the WPF widget and EQBuddy Mobile say the same thing
+        // (#210: parity by shared module, never by feature list).
+        _progressHeader.Text = ProgressTheme.LauncherSummary(
+            s, DingUnlocks(s).Count, _raidLedger.DefeatedCount());
         _miscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
     }
 
@@ -2063,7 +2096,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _loot.Render(s);
             RenderTargetDrops(s);
         }
-        if (_sections["motes"].IsExpanded)
+        if (ProgressTabShowing(ProgressTab.Wealth))
         {
             var motes = Motes.Summarize(s.Loot, s.Elapsed);
             _motesSummary.Text = motes.Total > 0
@@ -2081,7 +2114,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             RenderGearChecklist();
             _gearChecklistDirty = false;
         }
-        if (_sections["money"].IsExpanded)
+        if (ProgressTabShowing(ProgressTab.Wealth))
         {
             _moneySummary.Text = $"Corpses {StatsSnapshot.FormatCoin(s.CorpseCopper)} ({s.CoinDrops} drops, biggest {StatsSnapshot.FormatCoin(s.BiggestDrop)})\n" +
                 $"Merchant sales {StatsSnapshot.FormatCoin(s.VendorCopper)} ({s.SalesCount} sales)\n" +
@@ -2097,7 +2130,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 onNameClick: ShowItemInfo,
                 tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
         }
-        if (_sections["progress"].IsExpanded)
+        if (ProgressTabShowing(ProgressTab.Experience))
         {
             // The shared builder with this build's plain-ASCII separator ("-", the
             // file's own convention under fonts Wine/Linux may lack).
@@ -2153,7 +2186,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
                     tooltip: name => AaCatalog.Find(name)?.Effect);
         }
-        if (_sections["faction"].IsExpanded)
+        if (ProgressTabShowing(ProgressTab.Faction))
             FillList(_factionList, s.Faction.Select(f => (f.Faction, EQBuddy.UI.Shared.FactionFormat.Net(f))),
                 valueBrush: f => f.StartsWith('-') ? AppTheme.BadBrush : AppTheme.GoodBrush);
         if (_sections["misc"].IsExpanded)
@@ -2954,12 +2987,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// </summary>
     private void RenderRaids()
     {
-        if (_settings.HiddenSections.Contains("raids")) return;   // layout collapsed it
-        _sections["raids"].IsVisible = true;
         var defeated = _raidLedger.DefeatedCount();
         var catalog = RaidTargetCatalog.Default;
-        _raidsHeader.Text = $"{defeated} / {catalog.BossCount}";
-        if (!_sections["raids"].IsExpanded) return;
+        if (!ProgressTabShowing(ProgressTab.Raids)) return;
         if (defeated == 0)
         {
             _raidsPanel.Children.Clear();
@@ -3317,6 +3347,80 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // gear locker, fight timeline — all reuse-if-open, mirroring WPF ----
 
     private QuestsWindow? _questsWindow;
+    private ProgressWindow? _progressWindow;
+
+    /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
+    /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
+    private readonly Dictionary<ProgressTab, Control> _progressTabBodies = new();
+
+    /// <summary>The Progress window, for the headless render tests — the four surfaces it
+    /// hosts have no other place to be asserted on since the fold, and this build has no
+    /// E2E suite at all (docs/TestPlan.md).</summary>
+    internal ProgressWindow? ProgressWindowForTests => _progressWindow;
+
+    /// <summary>Is the Progress window open and showing this tab? The render guards ask
+    /// this where they used to ask "is this card expanded" — same rule either way: a
+    /// surface nobody is looking at costs nothing.</summary>
+    private bool ProgressTabShowing(ProgressTab tab) =>
+        _progressWindow is { IsVisible: true } w && w.Tab == tab;
+
+    // ---- IProgressHost ----
+    Control IProgressHost.ProgressTabBody(ProgressTab tab) => _progressTabBodies[tab];
+
+    IReadOnlyList<ProgressTabHeader> IProgressHost.ProgressTabs(StatsSnapshot s) =>
+        ProgressTheme.Tabs(s, DingUnlocks(s).Count,
+            _raidLedger.DefeatedCount(), RaidTargetCatalog.Default.BossCount);
+
+    IReadOnlyList<(string Key, Control Star, string Label, string Tip)> IProgressHost.ProgressMiniStars()
+    {
+        // Registered in _stars and wired to OnStarChanged, so a click still toggles the
+        // setting, repaints EVERY star and re-decides the breakouts. A star this window
+        // owned instead would be a second mechanism for one piece of state.
+        var made = new List<(string, Control, string, string)>();
+        foreach (var (key, label, tip) in new[]
+        {
+            ("xp", "XP", "Show XP in the mini dashboard - and, while minimized, open the Progress breakout"),
+            ("money", "Money", "Show money in the mini dashboard"),
+            ("motes", "Motes", "Show motes in the mini dashboard"),
+        })
+        {
+            var star = AppTheme.StarButton(key, tip);
+            star.Click += OnStarChanged;
+            _stars[key] = star;
+            made.Add((key, star, label, tip));
+        }
+        UpdateStarVisuals();
+        return made;
+    }
+
+    /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
+    /// the only way to reach five surfaces that used to be five cards.</summary>
+    internal void ShowProgressWindow(string? tab = null)
+    {
+        // Same reopen contract as every satellite here: a null field means closed for
+        // real (Avalonia's Show() throws on a closed window).
+        if (_progressWindow is null)
+        {
+            var window = new ProgressWindow(this);
+            window.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_progressWindow, window)) _progressWindow = null;
+                // The stars went with it. Leaving dead controls in the table would have
+                // UpdateStarVisuals painting buttons in a torn-down window forever.
+                foreach (var key in new[] { "xp", "money", "motes" }) _stars.Remove(key);
+            };
+            _progressWindow = window;
+        }
+        _progressWindow.Show();
+        if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
+        _progressWindow.Activate();
+        // Paint the tab NOW rather than on the next tick: opening a surface and staring
+        // at an empty one is the field report that made the WPF widget render on expand.
+        var snap = CurrentSnapshot();
+        _progressWindow.Refresh();   // picks the tab, so the guards below know which one
+        RefreshExpandedSections(snap);
+        RenderRaids();
+    }
     private DropsWindow? _dropsWindow;
     private WikiPackWindow? _wikiPackWindow;
     private MapWindow? _mapWindow;

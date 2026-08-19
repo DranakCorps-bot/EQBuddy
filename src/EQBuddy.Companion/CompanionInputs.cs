@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Companion;
 
@@ -48,6 +48,12 @@ public sealed record CompanionInputs
     /// class list and the memoized lookup).</summary>
     public LevelUnlockSet? Unlocks { get; init; }
     public int? Level { get; init; }
+
+    /// <summary>This character's raid clears, for the Progress theme's Raids tab. The
+    /// LEDGER rather than a pre-built block: the projection needs to ask it per boss, and
+    /// it is per character and rebuilt when the followed character changes, so a snapshot
+    /// taken once would answer for the wrong one.</summary>
+    public RaidKillLedger? Raids { get; init; }
 
     /// <summary>The live palette. Not gateable — see CompanionSnapshot.Theme.</summary>
     public CompanionThemeSection? Theme { get; init; }

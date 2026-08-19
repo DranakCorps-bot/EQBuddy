@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -27,8 +27,15 @@ internal static class WindowZoom
         window.Content = null;   // a control can't have two logical parents
         var host = new LayoutTransformControl { Child = root };
         window.Content = host;
-        Apply(host, settings.WindowZooms.TryGetValue(key, out var saved) ? saved : 1.0);
-        ApplyWidth(window, baseWidth, saved);
+        var zoom = settings.WindowZooms.TryGetValue(key, out var saved) ? saved : 1.0;
+        Apply(host, zoom);
+        // `zoom`, not `saved`. TryGetValue leaves `saved` at 0.0 when the key is absent,
+        // so passing it raw made the FIRST open of a baseWidth window compute
+        // Width = baseWidth x 0 — the Quest Tracker opened at zero width on Linux and
+        // macOS for anyone who had never Ctrl+wheeled it, and never on Windows, because
+        // the WPF twin does a second lookup with its own ": 1.0" fallback. Found on
+        // 2026-08-19 by the Progress window failing to render headlessly at all.
+        ApplyWidth(window, baseWidth, zoom);
         // Tunnel = WPF's PreviewMouseWheel: the zoom wins over any ScrollViewer beneath.
         window.AddHandler(InputElement.PointerWheelChangedEvent, (_, e) =>
         {

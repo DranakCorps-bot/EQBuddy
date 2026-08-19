@@ -51,6 +51,11 @@ internal sealed class MotesCardView(ICardContext context) : IWidgetCard
     public string Key => "motes";
     public UIElement Body { get; } = new StackPanel();
 
+    /// <summary>Rendered row count, for the <c>EQBUDDY_EXPAND</c> dump E2E asserts on —
+    /// pinned before the Progress theme absorbed this card, so the tab that inherits it
+    /// has to produce the same number.</summary>
+    public int RowCount => _rows.Items.Count;
+
     public void Attach()
     {
         var body = (StackPanel)Body;
@@ -76,6 +81,12 @@ internal sealed class MoneyCardView(ICardContext context) : IWidgetCard
 
     public string Key => "money";
     public UIElement Body { get; } = new StackPanel();
+
+    /// <summary>Sold-item row count and whether the "sold" block is up, for the
+    /// <c>EQBUDDY_EXPAND</c> dump. The block appears only when something was sold, which
+    /// is the kind of condition a move drops without anything else changing.</summary>
+    public int RowCount => _sold.Items.Count;
+    public bool SoldShown => _soldLabel.Visibility == Visibility.Visible;
 
     public void Attach()
     {

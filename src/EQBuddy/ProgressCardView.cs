@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -33,6 +33,7 @@ internal sealed class ProgressCardView : IWidgetCard
     private readonly AppSettings _settings;
     private readonly Func<StatsSnapshot, IReadOnlyList<string>> _classes;
     private readonly Func<int?> _storedLevel;
+    private readonly LevelUnlockMemo _unlocks;
     private readonly StackPanel _panel = new();
 
     private readonly TextBlock _summary = DesignSystem.Text(Tok.TypeRole.BodySecondary);
@@ -71,6 +72,7 @@ internal sealed class ProgressCardView : IWidgetCard
         _settings = settings;
         _classes = classes;
         _storedLevel = storedLevel;
+        _unlocks = new LevelUnlockMemo(classes, storedLevel);
 
         _summary.TextWrapping = TextWrapping.Wrap;
         _summary.Margin = (Thickness)Application.Current.FindResource("ListBlock");
@@ -136,48 +138,16 @@ internal sealed class ProgressCardView : IWidgetCard
     // these on the tick, and the catalog scan's answer only moves on a ding, a ledger
     // level or a class pick (perf audit #1's rule).
 
-    private int? _dingLevelMemo;
-    private string _dingClassesMemo = "";
-    private LevelUnlockSet _dingUnlocks = LevelUnlockSet.Empty;
-
     /// <summary>What the session's most recent ANNOUNCED level opened up. Empty until the
     /// log has actually said "Welcome to level N" — a ding list built from a remembered
-    /// level would claim something just happened when nothing did.</summary>
-    public LevelUnlockSet DingUnlocks(StatsSnapshot s)
-    {
-        if (s.LastLevel is not { } level) return LevelUnlockSet.Empty;
-        var classes = _classes(s);
-        var key = string.Join(",", classes);
-        if (_dingLevelMemo != level || _dingClassesMemo != key)
-        {
-            _dingLevelMemo = level;
-            _dingClassesMemo = key;
-            _dingUnlocks = LevelUnlocks.UnlocksAt(classes, level);
-        }
-        return _dingUnlocks;
-    }
+    /// level would claim something just happened when nothing did.
+    ///
+    /// What opened up at this level, and what opens at the next — memoized in
+    /// <see cref="LevelUnlockMemo"/>, which is shared with the Avalonia widget (it had a
+    /// hand-copied twin) and with the window host that no longer owns a card view.</summary>
+    public LevelUnlockSet DingUnlocks(StatsSnapshot s) => _unlocks.Ding(s);
 
-    private int? _nextLevelMemo;
-    private string _nextClassesMemo = "";
-    private (int Level, LevelUnlockSet Unlocks)? _nextUnlocks;
-
-    /// <summary>The next-milestone preview, anchored to the last level the log announced,
-    /// else the ledger's persisted one; null while no level is KNOWN at all. One
-    /// computation site for the card and the breakout — the two must agree on where
-    /// "At N:" starts (trap 4: one fact, two derivations, silent drift).</summary>
-    public (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s)
-    {
-        var knownLevel = s.LastLevel ?? _storedLevel();
-        var classes = _classes(s);
-        var key = string.Join(",", classes);
-        if (_nextLevelMemo != knownLevel || _nextClassesMemo != key)
-        {
-            _nextLevelMemo = knownLevel;
-            _nextClassesMemo = key;
-            _nextUnlocks = knownLevel is { } kl ? LevelUnlocks.Next(classes, kl) : null;
-        }
-        return _nextUnlocks;
-    }
+    public (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s) => _unlocks.Next(s);
 
     public void Render(StatsSnapshot s)
     {

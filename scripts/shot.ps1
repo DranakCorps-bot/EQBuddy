@@ -1,7 +1,16 @@
-param(
+﻿param(
   [Parameter(Mandatory)][string]$TitleLike,
   [Parameter(Mandatory)][string]$Out,
-  [int]$Pad = 0
+  [int]$Pad = 0,
+  # Which process the window must belong to. Optional, and it should not be: a title is
+  # not an identity. CLAUDE.md already records this costing two captures (release.ps1
+  # relaunches the real app, and a title match photographed David's live profile), and
+  # the Progress theme made it far easier to hit — FOUR shots now share the title
+  # "EQBuddy Progress", so a previous shot's app that has not finished exiting is a
+  # perfect match for the next shot's request. That produced a Faction tab filed as
+  # progress-wealth.png on 2026-08-19, which looks exactly like a correct screenshot of
+  # the wrong feature.
+  [int]$OwnerPid = 0
 )
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
@@ -11,6 +20,7 @@ public class Win {
   public delegate bool EnumProc(IntPtr h, IntPtr l);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
   [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr h, StringBuilder s, int n);
+  [DllImport("user32.dll")] public static extern int GetWindowThreadProcessId(IntPtr h, ref int pid);
   [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int a, out RECT r, int cb);
   // PrintWindow asks the window to render ITSELF into a DC, so whatever happens to be
   // stacked over it is irrelevant. PW_RENDERFULLCONTENT (2) is what makes it work for
@@ -28,12 +38,22 @@ $cb = [Win+EnumProc]{ param($h, $l)
   if ([Win]::IsWindowVisible($h)) {
     $sb = New-Object System.Text.StringBuilder 256
     [Win]::GetWindowText($h, $sb, 256) | Out-Null
-    if ($sb.ToString() -like "*$TitleLike*") { $script:hit = $h; return $false }
+    if ($sb.ToString() -like "*$TitleLike*") {
+      if ($OwnerPid -gt 0) {
+        $owner = 0
+        [Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
+        if ($owner -ne $OwnerPid) { return $true }   # right title, wrong app
+      }
+      $script:hit = $h; return $false
+    }
   }
   return $true
 }
 [Win]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
-if ($hit -eq [IntPtr]::Zero) { throw "no visible window matching '$TitleLike'" }
+if ($hit -eq [IntPtr]::Zero) {
+  throw "no visible window matching '$TitleLike'" +
+        $(if ($OwnerPid -gt 0) { " in process $OwnerPid" } else { "" })
+}
 $r = [Win]::Frame($hit)
 $x = $r.L - $Pad; $y = $r.T - $Pad
 $w = ($r.R - $r.L) + 2 * $Pad; $h2 = ($r.B - $r.T) + 2 * $Pad

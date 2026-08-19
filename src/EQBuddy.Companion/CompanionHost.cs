@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -23,6 +23,12 @@ public sealed record CompanionSources
     /// <summary>Zone → hops from here, for the gear checklist's by-zone view.</summary>
     public Func<string, int?>? HopsFromHere { get; init; }
     public Func<(int? Level, LevelUnlockSet Unlocks)>? Progress { get; init; }
+
+    /// <summary>This character's raid clears — the Progress theme's Raids tab
+    /// (docs/Themes.md). Wired in the same change as the desktop fold: a surface that
+    /// exists on two screens gets one decision, and the two days EQBuddy Mobile spent
+    /// ahead of the desktop on #210 is the reason that rule is written down.</summary>
+    public RaidKillLedger? Raids { get; init; }
 
     /// <summary>Where a running timer's named camps, and whether that came from the
     /// wiki rather than your own /loc at kill time. The desktop owns this because the
@@ -259,6 +265,7 @@ public sealed class CompanionHost : IDisposable
                 : null,
             Level = progress?.Level,
             Unlocks = progress?.Unlocks,
+            Raids = On(CompanionSurfaces.Progress) ? _sources.Raids : null,
             Quests = quests,
             QuestIndex = quests is null ? null : _questIndex,
         };

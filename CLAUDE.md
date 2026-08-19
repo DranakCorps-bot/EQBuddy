@@ -405,6 +405,36 @@ Read this list before touching the areas it names. Every entry cost a release.
     the app uses — the cache filename rule and the template field name are part of the
     staging, not implementation detail.
 
+24. **A window TITLE is not an identity, and `shot.ps1` matched on one.** The Progress
+    theme gave four shots the same title (`EQBuddy Progress`), and a previous shot's app
+    that has not finished exiting is a perfect match for the next shot's request — so a
+    Faction tab was captured and filed as `progress-wealth.png`. It looks exactly like a
+    correct screenshot of the wrong feature, which is trap 23's failure mode arriving by a
+    different road. Two earlier captures had already been lost this way (`release.ps1`
+    relaunches the real app; one shot came back reading David's live character name).
+    → **Now guarded:** `shot.ps1` takes `-OwnerPid` and `shoot.ps1` always passes the
+    process it launched. If you add a shot that shares a title with another, that is the
+    thing keeping them apart.
+
+25. **A horizontal `StackPanel` clips a CHIP STRIP exactly as it clips text (trap 14).**
+    The Progress window's four tabs were built into a `StackPanel`; a stack measures with
+    infinite width in the stacking direction, so the fourth chip was clipped at the panel's
+    edge — no ellipsis, no overflow, simply not on screen. The strip was CORRECT and one
+    quarter of it was invisible, on every launch. Same bug #184 hit when the class strip
+    clipped at NEC.
+    → **A strip whose contents are not fixed-width belongs in a `WrapPanel`**, and the
+    badges make them not fixed-width: "16.0% xp, +1 lvl (2 new), +1 aa" is a tab label.
+    Nothing in a diff, a unit test or a build shows this; the first screenshot does.
+
+26. **Folding cards away is where the last WRITER of a setting goes missing (trap 20's
+    other half).** The Progress theme absorbed the three card headers that carried the only
+    `MiniStats` writers for `xp`, `money` and `motes` — `DeadSettingTests` could not have
+    caught it, because `MiniStats` still has writers for the other seven keys. They moved
+    into the window with the surfaces they belong to.
+    → **When you fold a surface, list every control on it and say where each one went.**
+    "The data survived and the write path did not" is the same sentence as #204, #210 and
+    #212; a fold is precisely the event that produces it.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

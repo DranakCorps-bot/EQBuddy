@@ -103,6 +103,13 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | Theme reaches the page for every `var(--x)` it uses | **Auto** — `CompanionThemeTests` |
 | The widget's Quests card shows, opens the Quest Tracker, and keeps both checklists' counts on screen | **Auto** — `EndToEndTests` (EQBUDDY_EXPAND) |
 | The old `sky`/`epic` card keys fold onto `quests`, keeping position; hidden only if BOTH were hidden | **Auto** — `OptionsViewModelTests` |
+| **The widget's Progress card shows, opens the Progress window, and keeps all five folded headers' numbers on one line** — the PROGRESS THEME (docs/Themes.md) | **Auto** — `EndToEndTests` |
+| The old `money`/`motes`/`faction`/`raids` keys fold onto `progress`, keeping position; hidden only if ALL were hidden; and the fold is idempotent, because `progress` is both a surviving and an absorbed key | **Auto** — `ProgressSectionFoldTests` |
+| **The four Progress tabs draw exactly what their five cards drew**: 29 raid rows over 6 zones, 24 sold items with the sold block up, the motes row, five factions — the same numbers pinned on the widget BEFORE the fold | **Auto** — `EndToEndTests` (EQBUDDY_PROGRESS) |
+| The ding list appears only once a level is ANNOUNCED, the next-milestone preview once one is KNOWN, and its rows stay folded — unchanged across two moves of that surface | **Auto** — `EndToEndTests` |
+| The Progress theme's tabs, labels and badges come from Core's `ProgressSurface` and UI.Shared's `ProgressTheme`; EQBuddy Mobile offers the same four in the same order with the same badges | **Auto** — `SurfaceParityTests`, `ProgressSurfaceTests`, `WidgetRenderTests` |
+| Wealth carries BOTH cards it absorbed — coin and motes, in the badge and in the body | **Auto** — `SurfaceParityTests` |
+| **A window whose zoom was never saved keeps its full width** — `TryGetValue`'s `out` default is 0.0, and multiplying by it opened the Quest Tracker at zero width on Linux and macOS | **Auto** — `WindowZoomTests` (Avalonia) |
 | The quest surface's tab strip comes from Core's `QuestSurface`; General carries no badge | **Auto** — `CompanionQuestsTests` |
 | The quest catalog index ships once per device by stamp, and re-ships when any field changes | **Auto** — `CompanionQuestsTests` |
 | The general list's membership and order are Core's `QuestMatcher`'s; dismissed and completed non-repeatables are excluded | **Auto** — `CompanionQuestsTests` |
@@ -191,6 +198,8 @@ guards below are the deliverable and not a nicety.
 | A captured surface is reviewed as a real render, on a seeded session, over a plain backdrop | **Manual** — `pwsh scripts/shoot.ps1` |
 | A single card BODY can be photographed without opening every card: `EQBUDDY_EXPAND` takes card keys (`EQBUDDY_EXPAND=loot`) as well as `1` | **Manual** — `pwsh scripts/shoot.ps1 -Shot loot-card` |
 | **A card whose body only exists once there is DATA is staged, not shot empty** — the Watch strip needs two rules, the Raids rows need a clear | **Manual** — `pwsh scripts/shoot.ps1 -Shot tracked-card,raids-card` |
+| A surface that moved into a WINDOW keeps a way to be photographed: `EQBUDDY_PROGRESS` opens the Progress window on a named tab, as `EQBUDDY_QUESTS` does for the tracker | **Manual** — `pwsh scripts/shoot.ps1 -Shot progress-wealth` |
+| **A shot names a PROCESS, not just a title** — four Progress shots share the title `EQBuddy Progress`, and a previous shot's app that is still exiting matches it | **Auto** — `shoot.ps1` passes `-OwnerPid` |
 
 ## 4d. Settings, and who is allowed to write them
 

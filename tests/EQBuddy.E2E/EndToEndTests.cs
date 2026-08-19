@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.E2E;
 
@@ -83,19 +83,28 @@ public sealed class EndToEndTests
         app.WaitForDump("watchStrip", 0, "no sort strip above a single rule");
     }
 
-    /// <summary>The Progress card DRAWS its three lists, not merely holds their data.
+    /// <summary>The Progress surface DRAWS its three lists, not merely holds their data.
     ///
-    /// Pinned from the outside because that surface is being lifted into its own file and
-    /// the WPF layer has no unit tests (docs/TestPlan.md §5) — the same reason, and the
-    /// same week, as the Watch assertions above. The three easy-to-lose conditions are all
-    /// here: the ding list appears only once a level is ANNOUNCED, the next-milestone
-    /// preview appears once a level is merely KNOWN but keeps its rows folded until the
-    /// setting says otherwise, and the AA ledger splits into session-new and the whole
-    /// list rather than showing one of them twice.</summary>
+    /// Pinned from the outside because that surface keeps moving and the WPF layer has no
+    /// unit tests (docs/TestPlan.md §5) — the same reason, and the same week, as the Watch
+    /// assertions above. The three easy-to-lose conditions are all here: the ding list
+    /// appears only once a level is ANNOUNCED, the next-milestone preview appears once a
+    /// level is merely KNOWN but keeps its rows folded until the setting says otherwise,
+    /// and the AA ledger splits into session-new and the whole list rather than showing
+    /// one of them twice.
+    ///
+    /// It has now survived two moves without a single assertion changing: the card's lift
+    /// into ProgressCardView, and the PROGRESS THEME folding that card into the Progress
+    /// window's Experience tab. The only line that changed is the one that opens the
+    /// window — which is what a good outside-in assertion is supposed to look like when
+    /// the inside is rearranged.</summary>
     [Fact]
     public void ProgressCard_DrawsItsUnlockListsOnADing()
     {
-        using var app = new AppHarness();
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "1",   // Experience, where these three lists now live
+        });
         app.Launch();
 
         // Before any level is known, neither list can honestly say anything.
@@ -278,6 +287,83 @@ public sealed class EndToEndTests
         app.Launch();   // waits for killsTotal > 0; a window that never built never gets there
 
         Assert.Equal(1, app.DumpValue("questsCard"));
+    }
+
+    /// <summary>
+    /// The PROGRESS THEME's Raids tab (docs/Themes.md), and the number that makes this
+    /// assertion worth having: <b>29</b>.
+    ///
+    /// It was pinned first against the Raids CARD on the widget — 6 zone headings, 21 boss
+    /// rows, the provenance note and the /outputfile button — and then had to come back
+    /// unchanged from three different places in turn: the card, <c>RaidsCardView</c> after
+    /// the lift, and the Progress window's tab after the fold. A consolidation's whole
+    /// claim is that the tabs draw what the cards drew, and the WPF layer has no unit test
+    /// project (docs/TestPlan.md §5), so this is the only thing that can check it.
+    ///
+    /// Raids needed new machinery on both sides. Its rows live in raid-kills.json rather
+    /// than settings.json, so an empty ledger renders the one-line empty state and an
+    /// assertion on THAT proves nothing about the rows (trap 22) — hence
+    /// <see cref="AppHarness.SeedRaids"/>. And only the ACTIVE tab paints, which is why
+    /// each tab gets its own launch here rather than one test reading all four.
+    /// </summary>
+    [Fact]
+    public void TheProgressThemesRaidsTabDrawsWhatTheRaidsCardDrew()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "raids",
+        });
+        // Two clears in two different shapes, because the surface renders them
+        // differently: a witnessed kill carries a difficulty badge and a date, an imported
+        // achievement carries neither. One of each makes the "honesty over flattery" rule
+        // visible to an assertion.
+        app.SeedRaids(("Phinigel Autropos", 3, false), ("Lord Nagafen", 0, true));
+        app.Launch();
+
+        Assert.Equal(2, app.DumpValue("progressRaidsDefeated"));
+        Assert.Equal(6 + 21 + 2, app.DumpValue("progressRaidsRows"));
+        // The launcher that replaced five cards. A hidden one is an unreachable window.
+        Assert.Equal(1, app.DumpValue("progressCard"));
+        Assert.True(app.DumpValue("progressSummaryLen") > 0,
+            "the launcher should summarise the theme; dump was: " + app.Artifacts());
+    }
+
+    /// <summary>
+    /// The Wealth tab — the one tab that absorbs TWO cards, and therefore the one that
+    /// could be half built and still look finished.
+    ///
+    /// Both halves are pinned: the 24 sold rows the Money card drew, the sold BLOCK being
+    /// up (its label appears only when something was sold, and a heading that stops
+    /// appearing is invisible in a diff), and the Motes card's row.
+    /// </summary>
+    [Fact]
+    public void TheWealthTabDrawsBothCardsItAbsorbed()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "wealth",
+        });
+        app.Launch();
+
+        Assert.Equal(24, app.DumpValue("progressMoneySold"));
+        Assert.Equal(1, app.DumpValue("progressMoneySoldShown"));
+        Assert.Equal(1, app.DumpValue("progressMotesRows"));
+    }
+
+    /// <summary>The Faction tab, which the widget's own header reported as five for this
+    /// fixture and which the tab has to keep reporting as five.</summary>
+    [Fact]
+    public void TheFactionTabDrawsWhatTheFactionCardDrew()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "faction",
+        });
+        app.Launch();
+
+        Assert.Equal(5, app.DumpValue("progressFaction"));
+        Assert.Equal("faction", app.DumpText("progressTab"));
+        Assert.Equal(4, app.DumpValue("progressTabs"));
     }
 
     /// <summary>

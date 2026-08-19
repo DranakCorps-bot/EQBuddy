@@ -1,4 +1,4 @@
-# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #
@@ -60,9 +60,12 @@ $Shots = [ordered]@{
     # behaviour-preserving is a claim, and these are how it gets checked.
     'combat-card'     = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'combat' }; Set = @{} }
     'healing-card'    = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'healing' }; Set = @{} }
-    # Gate 5b batch one, on one screen: motes and money take ICardContext (their rows are
-    # items), faction takes none.
-    'value-cards'     = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'motes,money,faction' }; Set = @{} }
+    # The PROGRESS THEME's four tabs (docs/Themes.md). These replaced 'value-cards'
+    # (motes,money,faction) and the widget half of 'raids-card': those five cards are one
+    # launcher now, and their bodies live in the Progress window, which only EQBUDDY_PROGRESS
+    # can open. A surface with no way to be photographed reads as reviewed anyway (trap 22).
+    'progress-wealth' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'wealth' }; Set = @{} }
+    'progress-faction' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'faction' }; Set = @{} }
     # The breakout needs no hook of its own: it shows whenever the widget is minimized and
     # its stat is starred, and both are plain settings. Session scope is the one with the
     # filter strips on it (Target is a different axis and hides them).
@@ -160,8 +163,8 @@ $Shots = [ordered]@{
     # count), one marked from an achievements import (no badge — honesty over flattery),
     # and the rest still open, so the tick, the bullet and the "0/n" heading all appear on
     # one screen.
-    'raids-card'      = @{ Title = 'EQBuddy'
-                           Env = @{ EQBUDDY_EXPAND = 'raids' }
+    'raids-card'      = @{ Title = 'EQBuddy Progress'
+                           Env = @{ EQBUDDY_PROGRESS = 'raids' }
                            Set = @{}
                            Raids = @{
                                'testchar_test|phinigel autropos' = @{
@@ -211,8 +214,8 @@ $Shots = [ordered]@{
     # none — so without the append below this shoots a card with an empty ding list and
     # proves nothing about the rows the lift actually moved. ShowNextUnlocks unfolds the
     # preview, which is collapsed by default and would otherwise be a label alone.
-    'progress-card'   = @{ Title = 'EQBuddy'
-                           Env = @{ EQBUDDY_EXPAND = 'progress' }
+    'progress-card'   = @{ Title = 'EQBuddy Progress'
+                           Env = @{ EQBUDDY_PROGRESS = '1' }
                            Append = @('You have gained a level! Welcome to level 12!')
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
@@ -439,7 +442,10 @@ try {
             Start-Sleep -Seconds $Settle
 
             $png = Join-Path $Out "$name.png"
-            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png | Write-Host
+            # -OwnerPid, so a previous shot's app that is still exiting cannot be
+            # photographed under this shot's name: four Progress-theme shots share the
+            # title 'EQBuddy Progress', and a title is not an identity.
+            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png -OwnerPid $proc.Id | Write-Host
             $taken += $png
         }
         finally {

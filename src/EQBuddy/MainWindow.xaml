@@ -460,26 +460,6 @@
                 <ContentControl x:Name="LootBody"/>
             </Expander>
 
-            <!-- Motes (discussion #49, flipwon): the Potential upgrade-currency ladder as a
-                 first-class card — the Loot list keeps showing them too; this is the
-                 at-a-glance view with the per-hour rate farmers actually watch. -->
-            <Expander x:Name="MotesSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Sparkle" Text="Motes"/>
-                        <TextBlock x:Name="MotesHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0"/>
-                        <ToggleButton x:Name="StarMotes" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="motes" Click="OnStarChanged" ToolTip="Show motes in mini dashboard"/>
-                    </Grid>
-                </Expander.Header>
-                <ContentControl x:Name="MotesBody"/>
-            </Expander>
-
             <!-- ONE card for every quest surface (David, 2026-08-16). It replaced the
                  "Sky Quest" and "Epics" cards, each of which carried a full tabbed
                  checklist on the widget — a review surface by the rule in CLAUDE.md, not
@@ -544,20 +524,6 @@
                 <ContentControl x:Name="TrackedBody"/>
             </Expander>
 
-            <Expander x:Name="RaidsSection" Style="{StaticResource Section}" Visibility="Collapsed">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Group" Text="Raids"/>
-                        <TextBlock x:Name="RaidsHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0"/>
-                    </Grid>
-                </Expander.Header>
-                <StackPanel x:Name="RaidsPanel"/>
-            </Expander>
-
             <Expander x:Name="BuffsSection" Style="{StaticResource Section}" Visibility="Collapsed">
                 <Expander.Header>
                     <Grid>
@@ -578,57 +544,48 @@
                 <StackPanel x:Name="BuffsPanel"/>
             </Expander>
 
-            <Expander x:Name="MoneySection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Coin" Text="Money"/>
-                        <TextBlock x:Name="MoneyHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0c"/>
-                        <ToggleButton x:Name="StarMoney" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="money" Click="OnStarChanged" ToolTip="Show money in mini dashboard"/>
-                    </Grid>
-                </Expander.Header>
-                <ContentControl x:Name="MoneyBody"/>
-            </Expander>
+            <!-- ONE card for every progress surface — the PROGRESS THEME
+                 (docs/Themes.md; David ruled themes a direction on 2026-08-19: "part of
+                 the major UX revamp that organizes everything much better... just as we
+                 did with quests"). It replaced the Progress, Money, Motes, Faction and
+                 Raids cards, five separate expanders carrying five headers between them.
 
-            <Expander x:Name="ProgressSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Chart" Text="Progress"/>
-                        <TextBlock x:Name="ProgressHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0% xp"/>
-                        <ToggleButton x:Name="StarXp" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="xp" Click="OnStarChanged" ToolTip="Show XP in mini dashboard"/>
-                    </Grid>
-                </Expander.Header>
-                <!-- Lifted to ProgressCardView.cs (Gate 5b) — the host carries no
-                     Visibility and no Margin of its own; the lifted control owns both
-                     (trap 15: a control that hides itself inside a host that also
-                     hides itself has two switches for one state). -->
-                <ContentControl x:Name="ProgressBody"/>
-            </Expander>
+                 Every one of those was RETROSPECTIVE — nothing on them has a deadline
+                 attached — so by CLAUDE.md's surface rule they are review surfaces, and
+                 a review surface earns a window rather than five slots on the one thing
+                 that is always over the running game. The Progress window owns that job
+                 on its own four tabs (Experience · Wealth · Faction · Raids), and this
+                 card is the way in.
 
-            <Expander x:Name="FactionSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Scales" Text="Faction"/>
-                        <TextBlock x:Name="FactionHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="—"/>
-                    </Grid>
-                </Expander.Header>
-                <ContentControl x:Name="FactionBody"/>
-            </Expander>
+                 The header still reports all of them (ProgressTheme.LauncherSummary), so
+                 the glance five headers used to carry survives the fold — the same rule
+                 the Quests card above follows, and the same reason its header still says
+                 "Epic 0/486 · Sky 0/222".
+
+                 The three mini-dashboard stars these cards carried (xp, money, motes)
+                 moved INTO the window, where they finally have words beside them. They
+                 could not stay here: a ToggleButton nested in a Button bubbles its Click
+                 to the Button's handler, so every star press would also open the window. -->
+            <Button x:Name="ProgressSection" Style="{StaticResource SectionLink}" Click="OnProgressWindow"
+                    ToolTip="Open Progress — experience and AAs, coin and motes, faction standing, and the raid targets you've cleared">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <local:EqCardTitle Icon="Chart" Text="Progress"/>
+                    <!-- Trimmed, and the summary column is the STAR one: both widgets are
+                         SizeToContent, so a label whose string changes width IS window
+                         geometry (trap 12). This line carries up to four parts and moves
+                         with the xp tick, which is exactly the shape that cost #173 a
+                         player's keyboard on X11. Auto/* rather than */Auto so the title
+                         holds its size and the summary is the half that gives. -->
+                    <TextBlock x:Name="ProgressHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Margin="{DynamicResource IndentM}"
+                               TextTrimming="CharacterEllipsis" Text=""/>
+                </Grid>
+            </Button>
 
             <Expander x:Name="MiscSection" Style="{StaticResource Section}">
                 <Expander.Header>

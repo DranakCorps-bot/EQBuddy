@@ -124,6 +124,38 @@ internal sealed class AppHarness : IDisposable
             Artifacts);
     }
 
+    /// <summary>
+    /// Seeds the raid-kill ledger, which lives in its own file rather than in
+    /// settings.json — so a scenario that wants the Raids surface to have ROWS cannot
+    /// get there through <c>configureSettings</c>. Trap 22: with an empty ledger the
+    /// surface is a one-line empty state, and asserting on that proves nothing about
+    /// the rows underneath.
+    ///
+    /// Keys are <c>"{character}_{server}|{boss}"</c>, lowercased, exactly as
+    /// <see cref="RaidKillLedger"/> writes them — the same shape scripts/shoot.ps1
+    /// stages for the <c>raids-card</c> shot. Call before <see cref="Launch"/>.
+    /// </summary>
+    public void SeedRaids(params (string Boss, int Kills, bool Achievement)[] bosses)
+    {
+        var records = bosses.ToDictionary(
+            b => $"{Character.ToLowerInvariant()}_{Server}|{b.Boss.ToLowerInvariant()}",
+            b => new Dictionary<string, object?>
+            {
+                ["Kills"] = b.Kills,
+                ["FirstKill"] = b.Kills > 0 ? "2026-07-02T21:15:00" : null,
+                ["LastKill"] = b.Kills > 0 ? "2026-08-09T22:40:00" : null,
+                ["AchievementComplete"] = b.Achievement,
+                ["TierKills"] = b.Kills > 0
+                    ? new Dictionary<string, int> { ["d2"] = b.Kills } : new Dictionary<string, int>(),
+            });
+        File.WriteAllText(Path.Combine(ProfileDir, "raid-kills.json"),
+            JsonSerializer.Serialize(new
+            {
+                Records = records,
+                HighWater = "2026-08-01T00:00:00",
+            }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
     /// <summary>Appends messages to the character log with live timestamps, the way the
     /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.</summary>
     public void AppendLogLines(params string[] messages)

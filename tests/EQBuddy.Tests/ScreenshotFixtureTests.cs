@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using EQBuddy.Companion;
 using EQBuddy.Core;
 using Xunit;
@@ -193,6 +193,83 @@ public class ScreenshotFixtureTests
         Assert.NotNull(snap.Quests);
         Assert.NotNull(snap.Quests!.Catalog);
         Assert.NotEmpty(snap.Quests.Mine);
+        Directory.Delete(dir, true);
+    }
+
+    /// <summary>
+    /// The PROGRESS THEME's four tabs, through the real projection, for driving the
+    /// shipped page in scripts/mobile-harness.ps1.
+    ///
+    /// It exists because the theme grew three whole blocks on the phone in one change
+    /// (Wealth, Faction, Raids) and the page's own layout rules have bitten this repo four
+    /// times — a flex `margin: 0 auto` collapsing a column, a CSS class beating a
+    /// presentation attribute, a layout class carrying behaviour, a headless viewport that
+    /// was not the CSS viewport. None of those were visible to a unit test, and all of them
+    /// were visible the moment the real page was driven with a real snapshot.
+    ///
+    ///   dotnet test --filter FullyQualifiedName~ScreenshotFixture -e EQBUDDY_SHOOT=1 \
+    ///     -e EQBUDDY_SHOOT_PROGRESS=&lt;path.json&gt;
+    /// </summary>
+    [Fact]
+    public void WriteProgressSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_PROGRESS");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 8, 14, 21, 12, 0);
+        var dir = Path.Combine(Path.GetTempPath(), "eqb-prog-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        // A real ledger, taught the way the app teaches it — one witnessed kill and one
+        // imported achievement, so the Raids tab shows both row shapes rather than one.
+        var raids = new RaidKillLedger(Path.Combine(dir, "raid-kills.json"))
+        {
+            CharacterKey = () => "testchar_test",
+        };
+        raids.Apply(new KillEvent(now.AddHours(-2), "Phinigel Autropos", "you"));
+        // The dump's own shape — section "EverQuest: Raids", a "Conqueror of …" entry, and
+        // the boss as a completed CRITERION. Written from RaidKillLedger.MarkAchievements
+        // rather than guessed: a plausible-looking entry it silently ignores would have
+        // produced a snapshot with one clear instead of two, which is a real state and
+        // therefore an invisible fixture bug (trap 23).
+        raids.MarkAchievements([new AchievementEntry(
+            "EverQuest: Raids", "Conqueror of Nagafen's Lair", true,
+            [("Lord Nagafen", true)])]);
+
+        var stats = new StatsSnapshot
+        {
+            SessionStart = now.AddHours(-1),
+            XpPercent = 16.0,
+            XpPerHour = 14.2,
+            AaGained = 1,
+            AaTotal = 8,
+            Copper = 51408,
+            CorpseCopper = 13401,
+            VendorCopper = 38007,
+            CoinDrops = 30,
+            SalesCount = 55,
+            Faction = [new FactionDetail("Knights of Truth", 4, 80)],
+        };
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Testchar",
+            AppVersion = "test",
+            Stats = stats,
+            Offered = [CompanionSurfaces.Progress],
+            Raids = raids,
+            Level = 12,
+            Theme = CompanionTheme.Project("midnight",
+                EQBuddy.UI.Shared.CustomTheme.PaletteFor(new AppSettings { Theme = "midnight" })),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // Predicted before the run (trap 23): four tabs, the catalog's own boss total, and
+        // two clears in two different shapes.
+        Assert.Equal(4, snap.Progress!.Tabs.Count);
+        Assert.Equal(RaidTargetCatalog.Default.BossCount, snap.Progress.Raids.Total);
+        Assert.Equal(2, snap.Progress.Raids.Defeated);
         Directory.Delete(dir, true);
     }
 }

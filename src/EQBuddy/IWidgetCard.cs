@@ -69,3 +69,23 @@ internal interface ICardContext
     /// after the player changes one of its own filters.</summary>
     StatsSnapshot CurrentSnapshot();
 }
+
+/// <summary>
+/// The five surfaces the PROGRESS THEME hosts (docs/Themes.md), handed to
+/// <see cref="ProgressWindow"/> as one value.
+///
+/// A record rather than five factory methods, so the window's whole reach into
+/// <c>MainWindow</c> is a single name — the same discipline <see cref="ICardContext"/>
+/// applies to what a CARD may ask for, one level up.
+/// </summary>
+/// <param name="Experience">XP, AAs, skill-ups, dings and what they unlocked.</param>
+/// <param name="Money">Coin, and the items the log saw sold (#74).</param>
+/// <param name="Motes">The Potential upgrade-currency ladder (#49, flipwon).</param>
+/// <param name="Faction">Standing, per faction, with the per-kill deltas.</param>
+/// <param name="Raids">Raid targets cleared — witnessed, or imported from achievements.</param>
+internal sealed record ProgressSurfaceSet(
+    ProgressCardView Experience,
+    MoneyCardView Money,
+    MotesCardView Motes,
+    FactionCardView Faction,
+    RaidsCardView Raids);

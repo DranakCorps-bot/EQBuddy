@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Companion;
 
@@ -51,7 +51,7 @@ public static partial class CompanionProjection
                     SessionDps: stats?.SessionDps ?? 0)
                 : null,
             Loot = On(CompanionSurfaces.Loot) ? BuildLoot(stats) : null,
-            Progress = On(CompanionSurfaces.Progress) ? BuildProgress(stats, input.Level, input.Unlocks) : null,
+            Progress = On(CompanionSurfaces.Progress) ? BuildProgress(stats, input.Level, input.Unlocks, input.Raids) : null,
             Quests = On(CompanionSurfaces.Quests)
                 ? BuildQuests(input.Settings, input.Quests, input.QuestIndex) : null,
             Gear = On(CompanionSurfaces.Gear) ? BuildGear(input.Settings, input.HopsFromHere) : null,
@@ -155,8 +155,18 @@ public static partial class CompanionProjection
                 Join(lt.Items, i => $"{i.Name}={i.Count}"),
                 Join(lt.Watch, w => $"{w.Name}={w.Total}"));
 
+        // The theme's four tabs in one fingerprint. Coin, motes, faction and raid clears
+        // all move in STEPS (a drop, a sale, a kill), so they belong here — but the
+        // per-hour rates and the xp fraction drift every tick, and including one would
+        // wake every paired device once a second (trap 8). XpPercent is truncated to a
+        // whole number for exactly that reason and stays that way.
         if (snap.Progress is { } pr)
-            map[CompanionSurfaces.Progress] = $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}";
+            map[CompanionSurfaces.Progress] = Fold(
+                $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}",
+                pr.Wealth.Total + "/" + pr.Wealth.MotesSummary,
+                Join(pr.Wealth.Sold, i => $"{i.Name}={i.Count}"),
+                Join(pr.Faction, f => $"{f.Name}={f.Count}"),
+                pr.Raids.Defeated.ToString());
 
         // Quests: everything here is a step change (a loot, a pin, a tick) — no clock
         // drifts through it, so nothing needs excluding. The catalog itself rides only

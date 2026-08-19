@@ -179,4 +179,63 @@ public class SurfaceParityTests
         Assert.Equal(desktop.Sum(g => g.Done), Sky(s).Done);
         Assert.Equal(desktop.Sum(g => g.Total), Sky(s).Total);
     }
+
+    // ---- the PROGRESS THEME (docs/Themes.md) ----
+    //
+    // Five widget cards became four tabs in a desktop window, and the phone's "XP & AA"
+    // surface became the same four tabs in the same change. That simultaneity is the
+    // point: the four days it would have taken to notice a divergence are exactly what
+    // #210 cost. So the projection is asserted against ProgressSurface itself, which is
+    // the module both windows and the page read.
+
+    private static CompanionProgressSection Progress(StatsSnapshot? stats = null) =>
+        CompanionProjection.Build(new CompanionInputs
+        {
+            Stats = stats ?? new StatsSnapshot(),
+            Offered = [CompanionSurfaces.Progress],
+        }, DateTime.Now).Progress!;
+
+    [Fact]
+    public void ThePhoneOffersTheSameProgressTabsInTheSameOrder()
+    {
+        var expected = Enum.GetValues<ProgressTab>().Select(ProgressSurface.KeyFor).ToList();
+
+        Assert.Equal(expected, Progress().Tabs.Select(t => t.Key).ToList());
+    }
+
+    [Fact]
+    public void ThePhoneUsesTheSameTabLabelsAsTheDesktop()
+    {
+        // Labels, not just keys: a phone that renamed "Wealth" to "Money" would look
+        // fine on its own and be a different product beside the window.
+        Assert.All(Progress().Tabs, t =>
+            Assert.Equal(ProgressSurface.LabelFor(ProgressSurface.TabForKey(t.Key)!.Value), t.Label));
+    }
+
+    [Fact]
+    public void ThePhoneCarriesBothHalvesOfTheWealthMerge()
+    {
+        // Wealth is the one tab that absorbs TWO cards, so it is the one that can be half
+        // built and still look finished. The badge names both halves, and the block
+        // carries both bodies.
+        var stats = new StatsSnapshot { Copper = 51408 };
+        var wealth = Progress(stats).Wealth;
+
+        Assert.Equal(StatsSnapshot.FormatCoin(stats.Copper), wealth.Total);
+        Assert.NotNull(wealth.MotesSummary);
+        Assert.Equal(EQBuddy.UI.Shared.ProgressTheme.Wealth(stats),
+            Progress(stats).Tabs.Single(t => t.Key == "wealth").Badge);
+    }
+
+    [Fact]
+    public void ThePhonesRaidsTabNamesEveryCatalogTarget()
+    {
+        // With no ledger there are no clears to show, but the TOTAL is still the
+        // catalog's — a phone reporting "0 / 0" would read as "there are no raid targets"
+        // rather than "you have cleared none of them".
+        var raids = Progress().Raids;
+
+        Assert.Equal(RaidTargetCatalog.Default.BossCount, raids.Total);
+        Assert.Equal(0, raids.Defeated);
+    }
 }

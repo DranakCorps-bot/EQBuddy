@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Tests;
@@ -73,16 +73,21 @@ public sealed class OptionsViewModelTests
         Assert.Contains(vm.Cards, c => c.Key == "gear" && c.Title == "Gear");
         // The two cards "quests" replaced are gone from the catalog for good.
         Assert.DoesNotContain(vm.Cards, c => c.Key is "sky" or "epic");
+        // And the four "progress" replaced, the same way — the PROGRESS THEME
+        // (docs/Themes.md). Options is the only place a player can see the card list, so
+        // a folded key left in it would offer a card that no longer exists.
+        Assert.Contains(vm.Cards, c => c.Key == "progress" && c.Title == "Progress");
+        Assert.DoesNotContain(vm.Cards, c => c.Key is "money" or "motes" or "faction" or "raids");
 
         vm.MoveCard("kills", -1);                        // top can't move up
         Assert.Equal("kills", s.SectionOrder[0]);
         vm.MoveCard("kills", +1);
         Assert.Equal("kills", s.SectionOrder[1]);
 
-        vm.ToggleCard("money");
-        Assert.True(vm.Cards.Single(c => c.Key == "money").Hidden);
-        vm.ToggleCard("money");
-        Assert.False(vm.Cards.Single(c => c.Key == "money").Hidden);
+        vm.ToggleCard("progress");
+        Assert.True(vm.Cards.Single(c => c.Key == "progress").Hidden);
+        vm.ToggleCard("progress");
+        Assert.False(vm.Cards.Single(c => c.Key == "progress").Hidden);
     }
 
     [Fact]

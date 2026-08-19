@@ -448,7 +448,7 @@ const SURFACE_META = {
   combat:   { label: "Damage, healing & pet" },
   session:  { label: "Session stats" },
   loot:     { label: "Loot & watches" },
-  progress: { label: "XP & AA" },
+  progress: { label: "Progress" },
   quests:   { label: "Quests", wide: true },
   gear:     { label: "Gear checklist" },
 };
@@ -916,8 +916,45 @@ function boot() {
   }
   const countRows = items => rowList(items, i => ({ name: i.name, right: "×" + i.count }));
 
-  // ---------- progress ----------
+  // ---------- progress (the PROGRESS THEME) ----------
+  //
+  // Four tabs — Experience, Wealth, Faction, Raids — mirroring the desktop's Progress
+  // window, which replaced five separate widget cards (docs/Themes.md). The strip ARRIVES
+  // on the wire, labels and badges already decided by Core's ProgressSurface and
+  // UI.Shared's ProgressTheme: this page does not get to name a tab or compute a badge,
+  // which is precisely the freedom that let the quest checklists drift here for two days
+  // before #210.
+  //
+  // The picked tab is per device and remembered, like the quest surface's.
+  const progressTab = new Map();
   function renderProgress(p, s) {
+    const tabs = s.tabs || [];
+    let tab = progressTab.get("progress") || (tabs[0] && tabs[0].key) || "progress";
+    if (!tabs.some(t => t.key === tab)) tab = (tabs[0] && tabs[0].key) || "progress";
+
+    const wrap = el("div");
+    if (tabs.length) {
+      const row = el("div", "qtabs");
+      for (const t of tabs) {
+        const tile = el("div", "qtab" + (t.key === tab ? " on" : ""));
+        tile.append(el("span", null, t.label));
+        if (t.badge) tile.append(el("span", "badge", t.badge));
+        tile.onclick = () => { progressTab.set("progress", t.key); renderProgress(p, s); };
+        row.appendChild(tile);
+      }
+      wrap.appendChild(row);
+    }
+
+    if (tab === "wealth") wrap.appendChild(wealthBody(s.wealth));
+    else if (tab === "faction") wrap.appendChild(factionBody(s.faction));
+    else if (tab === "raids") wrap.appendChild(raidsBody(s.raids));
+    else wrap.appendChild(experienceBody(s));
+
+    p.head.textContent = s.level != null ? "level " + s.level : "";
+    p.body.replaceChildren(wrap);
+  }
+
+  function experienceBody(s) {
     const wrap = el("div");
     const grid = el("div", "stats");
     const stats = [
@@ -939,8 +976,69 @@ function boot() {
       card.appendChild(rowList(s.unlocks, u => ({ name: u.name, right: u.value })));
       wrap.appendChild(card);
     }
-    p.head.textContent = s.level != null ? "level " + s.level : "";
-    p.body.replaceChildren(wrap);
+    return wrap;
+  }
+
+  // Coin AND motes, because that merge is why "Wealth" exists rather than two tabs:
+  // motes are currency in Legends, and "what was this trip worth" should not require
+  // knowing which of two cards held which half.
+  function wealthBody(w) {
+    const wrap = el("div");
+    if (!w) return wrap;
+    const grid = el("div", "stats");
+    for (const [v, k] of [[w.total, "total"], [w.corpses, "corpses"],
+                          [w.sales, "sales"], [w.perHour, "per hour"]]) {
+      const d = el("div", "stat");
+      d.append(el("div", "v", v), el("div", "k", k));
+      grid.appendChild(d);
+    }
+    wrap.appendChild(grid);
+    const card = el("div", "card");
+    card.style.marginTop = "10px";
+    card.appendChild(el("div", "note",
+      w.coinDrops + " coin drop" + (w.coinDrops === 1 ? "" : "s") + " · "
+      + w.salesCount + " sale" + (w.salesCount === 1 ? "" : "s")));
+    if (w.sold && w.sold.length) {
+      card.appendChild(el("h3", "group", "Sold"));
+      card.appendChild(countRows(w.sold));
+    }
+    card.appendChild(el("h3", "group", "Motes"));
+    card.appendChild(el("div", "note", w.motesSummary || ""));
+    if (w.motes && w.motes.length) card.appendChild(countRows(w.motes));
+    wrap.appendChild(card);
+    return wrap;
+  }
+
+  function factionBody(rows) {
+    const card = el("div", "card");
+    if (!rows || !rows.length) {
+      card.replaceChildren(el("div", "empty",
+        "No faction moved this session — kills that change standing land here."));
+      return card;
+    }
+    // The net comes pre-signed from the desktop's own FactionFormat, so "up" and "down"
+    // are decided in one place rather than by a phone re-reading a number.
+    card.appendChild(rowList(rows, r => ({ name: r.name, right: String(r.count) })));
+    return card;
+  }
+
+  function raidsBody(r) {
+    const card = el("div", "card");
+    if (!r || !r.defeated) {
+      card.replaceChildren(el("div", "empty",
+        "Nothing defeated yet — kills your log witnesses land here, and importing "
+        + "/outputfile achievements marks clears from before EQBuddy."));
+      return card;
+    }
+    for (const z of r.zones || []) {
+      card.appendChild(el("h3", "group", z.zone + " — " + z.done + "/" + z.total));
+      card.appendChild(rowList(z.bosses,
+        b => ({ name: (b.cleared ? "✓ " : "· ") + b.name, right: b.detail || "" })));
+    }
+    card.appendChild(el("div", "note",
+      "Kills count when your log sees the boss die; import /outputfile achievements to "
+      + "mark older clears."));
+    return card;
   }
 
   // ---------- checklists (gear, and the quest surface's Epic/Sky tabs) ----------
