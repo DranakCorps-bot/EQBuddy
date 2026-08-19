@@ -8,6 +8,101 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## State: THEMES is the direction now — Progress is first, half-built (2026-08-19 evening)
+
+`main` clean and pushed at `06ab1cc`, CI green. **2,142 unit + 243 Avalonia + 12 E2E.**
+1.95.0 is the released version; everything below it is unreleased source.
+
+### THE FRAME — read this before picking anything up
+
+**David ruled on 2026-08-19: themes are a DIRECTION, not a proposal.**
+*"I do want to move to themes, this is part of the major UX revamp that organizes
+everything much better. it's not a proposal, it's a direction we need to go, just as we
+did with quests."* [docs/Themes.md](docs/Themes.md) is the plan and the six-step recipe;
+`ROADMAP.md` now carries the theme table. **The gates restyle what exists; themes change
+what exists.** 14 cards → 6.
+
+**And he named the guide: "I really want to use the approach for Quests as a guide for how
+we integrate."** So copy `QuestSurface.cs`, `QuestsWindow`, `MigrateQuestSections` — do not
+invent a second way to do this.
+
+### PROGRESS THEME — steps 1 and 5 done, 2/3/4/6 are the work
+
+**Why Progress and not Alerts, which the plan lists first:** the plan was ordered on
+2026-08-17, BEFORE Gate 5b lifted four card bodies. Measured 2026-08-19 and David chose
+accordingly. Readiness, and this table is the thing to re-check before starting any theme:
+
+| Theme | Absorbs | Already lifted | Result |
+|---|---|---|---|
+| **Progress** | progress, money, motes, faction, raids | **4 of 5** (only Raids inline) | 14 → 10 cards |
+| Alerts | tracked, buffs | 1 of 2 — `RenderBuffs` is 107 lines into the buff-set evaluator | 14 → 13 |
+| Loot & Items | loot, gear | 1 of 2 | |
+| Live Meters | combat, healing, kills | 1 of 3 | |
+| World | misc (Travels & Deaths) | 0 of 1 | |
+
+**Done (`06ab1cc`):**
+- `Core/ProgressSurface.cs` — step 1. Four tabs (Experience · Wealth · Faction · Raids),
+  labels, stable keys, `AbsorbedCardKeys`, `ThemeCardKey`, `LauncherSummary`. 22 tests.
+- `AppSettings.MigrateProgressSections` — step 5, generalised from `MigrateQuestSections`.
+  9 tests. **Its idempotence test caught a real bug**: `progress` is both the surviving key
+  AND an absorbed key, so a folded profile re-folded every load — same order out, but
+  reporting a change, which forces a settings save each launch (trap 13 rewrites the whole
+  file). It returns early now unless a non-theme key remains.
+
+**Remaining, in order:**
+1. **Lift Raids** — `RenderRaids` (MainWindow ~line 1325) into `RaidsCardView.cs`. The
+   only one of the five not on the seam. `WatchCardView`/`ProgressCardView` are the pattern.
+2. **Step 4 — `ProgressWindow`**, tabs inside, hosting the five already-lifted views.
+   `QuestsWindow` is the template; use `EqChip`/`EqSegmentedStrip` for the strip, never
+   hand-build one.
+3. **Step 3 — the launcher card.** Five `Expander`s (`ProgressSection`, `MoneySection`,
+   `MotesSection`, `FactionSection`, `RaidsSection`) become ONE `Button` with
+   `Style="{StaticResource SectionLink}"`, exactly like `QuestsSection` at
+   `MainWindow.xaml:490`. Wire `MigrateProgressSections` into the load path.
+4. **Step 6 — Mobile, in the same change.** `CompanionProjection` — #210's whole lesson.
+5. **Pin in E2E BEFORE the move** (facts into `EQBUDDY_EXPAND`), then **lower the hotspot
+   baseline in the same commit**.
+
+**David wants BEFORE/AFTER screenshots of the consolidation.** Shoot `widget-cards` before
+touching the XAML, and again after. `scripts/shoot.ps1` — and **close the real EQBuddy
+first**, which bit twice today.
+
+### Waiting on David
+
+- **The Gate 5d chevron.** Before/after sent; he has not commented. The card-header
+  chevron is now a vector and is noticeably bigger than the `▸` it replaced (which read as
+  a faint tick). If he dislikes it, drop `DesignTokens.IconInline` at that one call site.
+- **1.96.0.** Not cut. He said *"if all is good, we can push live"* and then asked for the
+  consolidation first. Unreleased: the Avalonia widget (30 glyphs → vectors, 91 sizes →
+  tokens), the Progress card lift, Gate 5d, and the two theme surfaces.
+
+### Rules learned or re-learned today
+
+- **CLAUDE.md trap 23** — fixture staging in the wrong SHAPE renders a REAL state, so the
+  shot looks correct and is a picture of something else. **Predict a shot's numbers before
+  running it.**
+- **`release.ps1` relaunches the real EQBuddy, and `shot.ps1` matches on window TITLE.**
+  Cost two wrong captures today, one of them of David's live profile.
+- **A capture surface needs profile isolation MORE than an assertion does** — its entire
+  output is a picture of whatever profile it finds (`WidgetSheetTests`).
+- **Migrations that survive their own second run.** See the fold bug above.
+- **David is Windows-only** (*"others will need to give feedback there"*). Avalonia changes
+  can never be verified before a release — ship on headless evidence, name the
+  Linux/macOS changes in the notes, ask those reporters to look.
+- **Standing: post GitHub replies for finished work without asking**, always signed
+  `— Dranak (Claude Code)`. Releases still need his explicit go.
+
+### Still blocked, correctly
+
+**`/consider` rare-creature signal** (#185 n3cr0nk1tt3n, #217 Frankthetankk). Neither has
+pasted the verbatim con line; we are last comment on both. `ConsiderRx` is
+`^(?<name>…)(verb).*\(Lvl: N\)$` — the `.*` already swallows anything before the tail, so
+rarity text BEFORE it is a one-line capture-group addition and AFTER it breaks the `$` and
+needs a second pattern. **That is the entire question. Do not reconstruct the line (#206).**
+David approved the feature in principle. `LogParser.cs` has 25 lines of ratchet room.
+
+---
+
 ## State: 1.95.0 LIVE and verified (2026-08-19 midday)
 
 Tag `v1.95.0`, **7 assets** (both Mac builds + the Linux tarball), OneDrive updated, both

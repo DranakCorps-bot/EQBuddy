@@ -17,6 +17,22 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 
+
+### Wiki pack should not suggest motes as creature drops
+- **Priority:** waiting (David's call)
+- **Place:** wiki contribution pack. Desktop contribution surface, not Gate 5.
+- **Source:** #217 Frankthetankk Aug 19, 12:58 PM CT. Old thread — did not reply.
+- **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
+- **Already shipped:** unknown whether the pack currently emits motes.
+- **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
+
+### Wiki edit summaries should not say EQBuddy
+- **Priority:** waiting (Ask 4; Claude's last #217 reply covered 1-3 and did not take this)
+- **Place:** wiki pack paste text. Desktop contribution surface, not Gate 5.
+- **Source:** #217 Frankthetankk original ask 4 + follow-up Aug 19, 12:07 PM CT. Old thread — did not reply.
+- **Ask:** drop "EQBuddy" from suggested edit summaries for now.
+- **Checked:** `src/EQBuddy.Core/WikiContribution.cs:195` writes `Suggested edit summary: EQBuddy-observed drops (...)`. That string is the data source.
+
 ### Wiki pack should pool full session history
 - **Priority:** waiting (David's scope call)
 - **Place:** the all-time stats direction (#168 / #159) — a query over archives already on disk. Fits where that plan is already heading. Not Gate 5.
@@ -26,15 +42,17 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Where it might live:** hypothesis — a roll-up over stored Session History rows, not new collection.
 
 ### /consider rarity word (wiki + spawn timers)
-- **Priority:** waiting (blocked on one pasted con line; David's scope call)
+- **Priority:** waiting (ready when unparked — David parked /consider this morning. Verbatim lines are in; not approved to ship.)
 - **Place:** log parse. Serves wiki confirmed-rare and #185 named-vs-townsfolk spawn chips. Not Gate 5 UI.
-- **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n follow-up Aug 18, 10:06 PM CT. Did not reply — Claude already answered both.
-- **Ask (Frankthetankk):** use /consider text `a rare creature` as a confirmed rarity flag for the wiki pack (`rare=true`), outranking kill-count band suggestions.
-- **Ask (n3cr0nk1tt3n):** same signal to avoid spawn chips on townsfolk — only track when a con says it is a rare creature. Also: kill-to-kill is not the respawn duration (the timer is set before the mob spawns); manual override remains the authority.
+- **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n; **verbatim lines #185 bjstrange Aug 19, 11:58 AM CT.** Did not reply — old thread, Claude already asked for the line.
+- **Ask:** use /consider text `a rare creature` as a confirmed rarity flag (wiki `rare=true`; spawn chips only for con-confirmed rares).
+- **Evidence (bjstrange, pasted whole):**
+  `[Thu Aug 06 21:42:47 2026] Magus Rokyl - a rare creature - scowls at you, ready to attack -- looks like it would wipe the floor with you! (Lvl: 51)`
+  `[Sun Aug 09 20:26:53 2026] Lesser blade fiend - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 19)`
+  `[Sun Aug 16 13:09:47 2026] A ghoul executioner - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)`
 - **Already shipped:** /consider is parsed for name and level only.
-- **Checked:** `src/EQBuddy.Core/GameEvent.cs:47` `record ConsiderEvent(DateTime Time, string Name, int Level)`. `LogParser.cs:173` ConsiderRx captures name and level, with `.*` before `(Lvl: N)` — no rarity group. SpawnTimers.cs has a ConsiderEvent case; do not assert what it does without a further quote.
-- **Waiting on:** one verbatim full con line (rarity text relative to the `(Lvl: N)` tail).
-
+- **Checked:** `src/EQBuddy.Core/GameEvent.cs:47` `record ConsiderEvent(DateTime Time, string Name, int Level)`. `LogParser.cs:173` ConsiderRx is `^(?<name>.+?) (?:scowls at you|...) .*\(Lvl: (?<level>\d+)\)$`. On the pasted line, the first ` scowls` sits after `creature -`, so the name group would swallow ` - a rare creature -` unless a rarity group is added. Rarity sits BEFORE scowls and BEFORE `(Lvl: N)`, not after the tail.
+- **Where it might live:** hypothesis — a capture group on ` - a rare creature -` between name and the faction phrase. The three lines are the same shape.
 ### Spawn-timer mega-thread
 - **Priority:** waiting (David's call)
 - **Place:** catalog maintenance. Curated spawn timers are never auto-written. Not a feature gate.
@@ -137,12 +155,12 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Where it might live:** settings write/overwrite on update. No implementation until that next-update log arrives.
 
 ### Mobile loot and watches refresh loop
-- **Priority:** waiting
-- **Source:** #202 bjstrange (Aug 17, 4:28 PM CT) + screen recording
-- **Ask:** Mobile loot and watches card constantly refreshes and hides watched loot.
-- **Already shipped:** four questions asked. Loot fingerprint has no clock, so that hypothesis is dead.
-- **Where it might live:** unknown. Waiting on him.
-
+- **Priority:** must-fix (still happening in a release that contains the supposed fix)
+- **Place:** mobile loot/watches card. Not Gate 5 widget.
+- **Source:** #202 bjstrange (opened Aug 17) + follow-up Aug 19, 11:47 AM CT. Old thread — did not reply.
+- **Ask:** "This is still happening in v1.94.1. Same behavior, same frequency." Card constantly refreshes and hides watched loot.
+- **Already shipped:** Claude's fingerprint fix (`fcdc412` "#202: the phone and the PC disagreed about what changed means") is in the 1.94.1 history (that commit sits under `ef2a30a` 1.94.1). Page was supposed to ignore clock-driven `/hr` the same way the PC does.
+- **Where it might live:** hypothesis, unchecked — a second clock still reaching that card, or the 1.94.1 binary the reporter has is not the one that contains the page change. Do not assert either without a quote from the shipped mobile page.
 ### charm4.txt still reports no held time
 - **Priority:** someday (reporter said more time is optional)
 - **Source:** #135 bjstrange; found while extracting CharmTracker (Aug 18)
