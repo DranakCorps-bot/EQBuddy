@@ -139,11 +139,19 @@ public sealed class SpawnChipsWindow : Window
         foreach (var chip in _chips)
         {
             var row = new Grid();
+            row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+            // chip.Icon is an IconPaths name, not a glyph — and this is the lane the
+            // change is FOR: the emoji it replaces are the ones that render as boxes
+            // under Wine (#148, #166), so the three chip kinds were indistinguishable on
+            // exactly the platforms this build exists to serve.
+            var kind = DesignSystem.Icon(chip.Icon, "TextBrush", size: DesignTokens.IconInline);
+            kind.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+            row.Children.Add(kind);
             var name = new TextBlock
             {
-                Text = $"{chip.Icon} {chip.Name}",
+                Text = chip.Name,
                 FontSize = 11,
                 FontWeight = FontWeight.SemiBold,
                 Foreground = AppTheme.TextBrush,
@@ -152,6 +160,7 @@ public sealed class SpawnChipsWindow : Window
                 Margin = new Thickness(0, 0, 9, 0),
                 VerticalAlignment = VerticalAlignment.Center,
             };
+            Grid.SetColumn(name, 1);
             row.Children.Add(name);
             var countdown = new TextBlock
             {
@@ -161,7 +170,7 @@ public sealed class SpawnChipsWindow : Window
                 Foreground = chip.IsDue ? AppTheme.WarnBrush : AppTheme.AccentBrush,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            Grid.SetColumn(countdown, 1);
+            Grid.SetColumn(countdown, 2);
             row.Children.Add(countdown);
             _countdowns.Add(countdown);
 

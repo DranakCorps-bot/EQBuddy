@@ -28,6 +28,16 @@ public class WidgetRenderTests : IDisposable
     private readonly string _profile =
         Directory.CreateTempSubdirectory("eqbuddy-render-").FullName;
 
+    /// <summary>"Is this the icon called X?" — comparing to <c>IconPaths.Path(name)</c>
+    /// directly does NOT work: Avalonia re-serializes a parsed geometry, so the string
+    /// coming back off a PathIcon is a normalized form of the one that went in. Parse the
+    /// expected side too and both go through the same normalization.</summary>
+    private static Func<PathIcon, bool> IsIcon(string name)
+    {
+        var expected = StreamGeometry.Parse(IconPaths.Path(name)).ToString();
+        return icon => icon.Data?.ToString() == expected;
+    }
+
     public WidgetRenderTests()
     {
         // Isolate settings/history: constructing the widget opens a SQLite history db and
@@ -227,14 +237,20 @@ public class WidgetRenderTests : IDisposable
         Assert.NotNull(chips.CaptureRenderedFrame());
         var text = chips.GetVisualDescendants().OfType<TextBlock>()
             .Select(block => block.Text ?? "").ToList();
-        Assert.Contains("⏳ Asaka L`Rei", text);
+        // The name alone — the chip kind's mark is a vector beside it, not a glyph glued
+        // to the front of the name (#148, #166: those emoji do not render under Wine, so
+        // the three chip kinds were three identical boxes on the platform this build is
+        // for).
+        Assert.Contains("Asaka L`Rei", text);
+        var isTimer = IsIcon("Timer");
+        Assert.Contains(chips.GetVisualDescendants().OfType<PathIcon>(), icon => isTimer(icon));
         Assert.Contains(text, value => value.StartsWith("3:"));
 
         var active = Assert.Single(new SpawnsViewModel(catalog, overrides, timers).Chips(DateTime.Now));
         chips.DismissChip(active);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         Assert.DoesNotContain(chips.GetVisualDescendants().OfType<TextBlock>(),
-            block => block.Text == "⏳ Asaka L`Rei");
+            block => block.Text == "Asaka L`Rei");
 
         // The drag flag, not a coordinate delta, is the persistence signal (#117).
         chips.MarkUserMovedForTests();
@@ -265,10 +281,12 @@ public class WidgetRenderTests : IDisposable
         Assert.NotNull(chips.CaptureRenderedFrame());
         var text = chips.GetVisualDescendants().OfType<TextBlock>()
             .Select(block => block.Text ?? "").ToList();
-        Assert.Contains("💤 an orc centurion (1)", text);
-        Assert.Contains("💤 an orc centurion (2)", text);
+        Assert.Contains("an orc centurion (1)", text);
+        Assert.Contains("an orc centurion (2)", text);
         Assert.Contains("0:20", text);
-        Assert.Contains("💤 an orc oracle", text);
+        Assert.Contains("an orc oracle", text);
+        // The mez mark is the crescent, drawn once per chip.
+        Assert.Equal(3, chips.GetVisualDescendants().OfType<PathIcon>().Count(IsIcon("Moon")));
         Assert.Contains("?", text);
 
         // A USER drag persists; a merely programmatic Position write must not

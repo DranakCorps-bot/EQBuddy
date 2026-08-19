@@ -144,6 +144,27 @@ $Shots = [ordered]@{
     # the card is a one-line empty state and its sort strip does not exist at all (it
     # appears only above two or more rules). "Spider parts" is deliberately a rule with
     # three kinds under it, so the "all N kinds" fold shows too.
+    # The Raids card with clears in it: one boss with a witnessed tiered kill (badge and
+    # count), one marked from an achievements import (no badge — honesty over flattery),
+    # and the rest still open, so the tick, the bullet and the "0/n" heading all appear on
+    # one screen.
+    'raids-card'      = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'raids' }
+                           Set = @{}
+                           Raids = @{
+                               'testchar_test|phinigel autropos' = @{
+                                   Kills = 3
+                                   FirstKill = '2026-07-02T21:15:00'
+                                   LastKill = '2026-08-09T22:40:00'
+                                   AchievementComplete = $false
+                                   TierKills = @{ d2 = 2; open = 1 }
+                               }
+                               'testchar_test|lord nagafen' = @{
+                                   Kills = 0
+                                   AchievementComplete = $true
+                                   TierKills = @{}
+                               }
+                           } }
     # NOT called watch-card: docs/screenshots/watch-card.png is a hand-taken shot that
     # docs/WatchListGuide.md embeds, and a shot name IS its filename — this would have
     # quietly overwritten a guide's illustration with the fixture's three rules.
@@ -230,6 +251,18 @@ function Write-Ledger([hashtable]$ledger) {
         Set-Content $path -Encoding UTF8
 }
 
+# Raid clears live in raid-kills.json, not settings.json, and the card's body only exists
+# once something is defeated — with an empty ledger it is a one-line empty state, so the
+# boss rows (the tick, the difficulty badge, the trimming) could not be photographed at
+# all. Keys are "{character}_{server}|{boss}" lowercased; for the fixture the character
+# half is fixed. Kills are high-water gated on replay, so seeded records survive it.
+function Write-Raids([hashtable]$records) {
+    $path = Join-Path $profileDir 'raid-kills.json'
+    if ($null -eq $records) { Remove-Item $path -ErrorAction SilentlyContinue; return }
+    @{ Records = $records; HighWater = '2026-08-01T00:00:00' } | ConvertTo-Json -Depth 6 |
+        Set-Content $path -Encoding UTF8
+}
+
 # --- the backdrop ------------------------------------------------------------------
 # A plain maximized form, NOT topmost, so the app's own always-on-top windows stay above
 # it. This is what stops a rounded corner photographing the desktop.
@@ -252,6 +285,7 @@ try {
         Write-Host "`n=== $name → $($spec.Title) ==="
         Write-Settings $spec.Set
         Write-Ledger $spec.Ledger
+        Write-Raids $spec.Raids
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false

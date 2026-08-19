@@ -92,17 +92,25 @@ public partial class SpawnChipsWindow : Window
         foreach (var chip in _chips)
         {
             var row = new Grid { Margin = new Thickness(0, 1, 0, 1) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
+            // chip.Icon is an IconPaths NAME now, not a glyph pasted onto the front of
+            // the name. Its own column, so a long chip name still trims against the star
+            // column instead of pushing the mark off (trap 14).
+            var kind = DesignSystem.Icon(chip.Icon, "TextBrush", size: DesignTokens.IconInline);
+            kind.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+            row.Children.Add(kind);
+
             var name = new TextBlock
             {
-                Text = $"{chip.Icon} {chip.Name}", FontSize = 11, FontWeight = FontWeights.SemiBold,
+                Text = chip.Name, FontSize = 11, FontWeight = FontWeights.SemiBold,
                 Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center,
                 TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = 180,
             };
             name.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-            Grid.SetColumn(name, 0);
+            Grid.SetColumn(name, 1);
             row.Children.Add(name);
 
             var countdown = new TextBlock
@@ -112,7 +120,7 @@ public partial class SpawnChipsWindow : Window
                 VerticalAlignment = VerticalAlignment.Center,
             };
             countdown.SetResourceReference(TextBlock.ForegroundProperty, chip.IsDue ? "WarnBrush" : "AccentBrush");
-            Grid.SetColumn(countdown, 1);
+            Grid.SetColumn(countdown, 2);
             row.Children.Add(countdown);
             _countdowns.Add(countdown);
 

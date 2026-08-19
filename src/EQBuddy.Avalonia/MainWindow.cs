@@ -2847,7 +2847,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             if (italic) run.FontStyle = FontStyle.Italic;
             line.Inlines?.Add(run);
         }
-        Add("⚠ missing: ", missing, AppTheme.WarnBrush);
+        // Same wording as the WPF widget: three parallel states, none of them wearing a
+        // glyph the word and the ink don't already carry.
+        Add("missing: ", missing, AppTheme.WarnBrush);
         Add("expiring: ", expiring, AppTheme.AccentBrush);
         Add("not seen: ", notSeen, AppTheme.DimBrush, italic: true);
         _buffsPanel.Children.Add(line);
@@ -3412,10 +3414,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (chips.Count == 0 && _optionsWindow is { IsVisible: true })
             chips.Add(new SpawnChip(Zone: "", Name: "drag me — chips appear here",
                 CountdownText: "", IsDue: false,
-                Detail: "Placement preview: 💤 mez and 🐌 slow chips will stack at this "
+                Detail: "Placement preview: mez and slow chips will stack at this "
                     + "spot. Drag it where you'll notice them; it disappears when "
                     + "Options closes.",
-                Icon: "🐌"));
+                Icon: "Hourglass"));
         return chips;
     }
 
@@ -3440,7 +3442,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             return new SpawnChip(
                 Zone: "", Name: EQBuddy.UI.Shared.SlowChipText.Label(s),
                 CountdownText: remaining is { } r ? $"{(int)r / 60}:{(int)r % 60:00}" : "?",
-                IsDue: false, Detail: detail, Icon: "🐌")
+                IsDue: false, Detail: detail, Icon: "Hourglass")
             {
                 Fraction = s.ExpiresAt is { } exp && (exp - s.LandedAt).TotalSeconds is > 0 and var dur
                     ? Math.Clamp((now - s.LandedAt).TotalSeconds / dur, 0, 1)

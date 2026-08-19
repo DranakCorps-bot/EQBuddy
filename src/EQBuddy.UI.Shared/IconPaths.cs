@@ -98,6 +98,19 @@ public static class IconPaths
         ["Paw"] = "M8.35 10.5a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Zm7.3 0a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2ZM4.1 15.4a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6Zm15.8 0a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6ZM12 12.2c-2.6 0-5.6 2.6-5.6 5.2 0 1.7 1.3 2.6 2.9 2.6 1.1 0 1.9-.5 2.7-.5s1.6.5 2.7.5c1.6 0 2.9-.9 2.9-2.6 0-2.6-3-5.2-5.6-5.2Z",
         ["Phone"] = "M17 1H7a2 2 0 0 0-2 2v18a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm0 18H7V5h10v14Zm-5 3.2a1.2 1.2 0 1 1 0-2.4 1.2 1.2 0 0 1 0 2.4Z",
 
+        // The fight-side chip stack. Three kinds share one window and told themselves
+        // apart by emoji — ⏳ a spawn countdown, 💤 a mez, 🐌 a slow — which is the
+        // #148/#166 failure on the one surface a player watches mid-pull.
+        //
+        // The spawn chip takes the stopwatch it already had; sleep becomes a crescent.
+        // The snail did NOT survive as a snail: a spiral shell legible at 12px is more
+        // drawing than this table should carry, and the chip's own label already says
+        // what it is ("Turgur's Insects 75%") — so slow is an hourglass, which is the
+        // thing a slow actually does. Meaning lives in the words; the icon separates the
+        // kinds.
+        ["Moon"] = "M12.5 2A10 10 0 1 0 22 15.2 8.5 8.5 0 0 1 12.5 2Z",
+        ["Hourglass"] = "M6 2v2l5 6-5 6v2h12v-2l-5-6 5-6V2H6Z",
+
         ["Target"] = "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06ZM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7Z",
     };
 

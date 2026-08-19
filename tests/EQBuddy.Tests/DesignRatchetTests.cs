@@ -49,6 +49,15 @@ public class DesignRatchetTests
         "EQBuddy/MainWindow.xaml",
         "EQBuddy/BreakoutWindow.xaml",
         "EQBuddy/BreakoutWindow.xaml.cs",
+        // The 4,471-line hotspot, and the file §11.8 predicted could not join: it carried
+        // ~74 glyphs, most of them inside user-facing STRINGS. Measuring rather than
+        // guessing is what moved it — 56 were in COMMENTS (exempt, they never render),
+        // and of what was left the largest group was CONTROLS that happen to be quoted:
+        // icon-table entries, expander chevrons, a menu header. The genuinely editorial
+        // remainder — text that NAMES a control, "click the 🗺", "under ⚙ Options" — was
+        // reworded, because a tooltip that draws the glyph it is explaining draws it as
+        // a box on the prefixes where the explanation is most needed.
+        "EQBuddy/MainWindow.xaml.cs",
     ];
 
     public static TheoryData<string> MigratedFiles()

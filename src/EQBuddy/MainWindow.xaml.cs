@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -630,7 +630,11 @@ public partial class MainWindow : Window, ICardContext
     internal string? QuestAwareTooltip(string name, string? baseTip)
     {
         if (!IsActiveQuestItem(name)) return baseTip;
-        const string marker = "🗺 Part of a quest — click the 🗺 to see its quests in the Quest Tracker.";
+        // Names the badge in WORDS rather than reproducing it. A tooltip that draws the
+        // glyph it points at is drawing it on the Wine prefixes where it renders as a
+        // box — twice, in the same sentence, in what is supposed to be the explanation.
+        const string marker =
+            "Part of a quest — click the green map pin to see its quests in the Quest Tracker.";
         return baseTip is { Length: > 0 } ? marker + "\n" + baseTip : marker;
     }
 
@@ -1297,7 +1301,7 @@ public partial class MainWindow : Window, ICardContext
                 Zone: "", Name: dupe ? $"{m.Target} ({n})" : m.Target, CountdownText: text,
                 IsDue: remaining is <= 6,
                 Detail: $"{m.Spell} by {m.Caster} · landed {m.LandedAt:h:mm:ss tt}",
-                Icon: "💤")
+                Icon: "Moon")
             {
                 // Elapsed share for the gauge; the mez view draws the REMAINING side
                 // (a draining bar, like a buff), so 1 - this.
@@ -1376,14 +1380,40 @@ public partial class MainWindow : Window, ICardContext
                     { AchievementComplete: true } => "cleared (from achievements)",
                     _ => "",
                 };
-                var row = new TextBlock
+                // Two columns rather than a tick typed into the string: the mark is a
+                // vector, and the boss name keeps the star column so a long one trims
+                // with an ellipsis instead of being clipped beside it (trap 14). The
+                // uncleared state keeps its "·" — that is a typographic mark holding the
+                // column open, not an icon, and the ratchet allows it as one.
+                var row = new Grid { Margin = new Thickness(Tok.SpaceS, 0, 0, 0) };
+                row.ColumnDefinitions.Add(new ColumnDefinition
                 {
-                    Text = $"{(cleared ? "✓" : "·")} {boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
+                    Width = new GridLength(Tok.IconInlineHit),
+                });
+                row.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = new GridLength(1, GridUnitType.Star),
+                });
+                if (cleared)
+                {
+                    var tick = DesignSystem.Icon("Check", "GoodBrush", size: Tok.IconInline);
+                    tick.HorizontalAlignment = HorizontalAlignment.Left;
+                    row.Children.Add(tick);
+                }
+                else
+                {
+                    var bullet = DesignSystem.Text(Tok.TypeRole.BodySecondary, "·");
+                    row.Children.Add(bullet);
+                }
+                var bossText = new TextBlock
+                {
+                    Text = $"{boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
                     FontSize = Tok.Spec(Tok.TypeRole.BodySecondary).Size,
-                    Margin = new Thickness(Tok.SpaceS, 0, 0, 0),
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     Foreground = (Brush)FindResource(cleared ? "TextBrush" : "DimBrush"),
                 };
+                Grid.SetColumn(bossText, 1);
+                row.Children.Add(bossText);
                 if (rec is { TierKills.Count: > 0 } tk)
                     row.ToolTip = "Kills by difficulty: " + string.Join(" · ",
                         new[] { "d4", "d3", "d2", "d1", "d0", "open", "instance", "unknown" }
@@ -1670,7 +1700,7 @@ public partial class MainWindow : Window, ICardContext
                 + "not seen = no landing line this session — it may still be up from before "
                 + "EQBuddy was watching; the log can't tell, so this stays a separate state. "
                 + "The set is assembled from your active classes' picks plus (any class). "
-                + "Edit it in Options → Alerts & chips, or in the ⏳ Buff set breakout.",
+                + "Edit it in Options → Alerts & chips, or in the Buff set breakout.",
         };
         void Add(string label, List<string> names, string brush, bool italic = false)
         {
@@ -1686,7 +1716,12 @@ public partial class MainWindow : Window, ICardContext
             run.SetResourceReference(TextElement.ForegroundProperty, brush);
             line.Inlines.Add(run);
         }
-        Add("⚠ missing: ", missing, "WarnBrush");
+        // No warning sign in front of "missing". The three labels are parallel states of
+        // one line and only this one wore a glyph, so it read as a fourth channel that
+        // said nothing the word and the warn ink did not already say — and it is a box on
+        // a Wine prefix. An InlineUIContainer could carry a vector here, but not one that
+        // stays aligned through a wrap.
+        Add("missing: ", missing, "WarnBrush");
         Add("expiring: ", expiring, "AccentBrush");
         Add("not seen: ", notSeen, "DimBrush", italic: true);
         BuffsPanel.Children.Add(line);
@@ -1711,35 +1746,35 @@ public partial class MainWindow : Window, ICardContext
                 FontStyle = FontStyles.Italic, TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center,
                 ToolTip = "Your level-up made this buff available (the Progress card's "
-                    + "\"New at level\" list). ✓ adds it to that class's set bucket; "
-                    + "✕ never asks again for this character. A new RANK of a buff "
+                    + "\"New at level\" list). The tick adds it to that class's set bucket; "
+                    + "the cross never asks again for this character. A new RANK of a buff "
                     + "already in your set folds into the same slot and is never "
                     + "suggested — only genuinely new lines appear here.",
             };
             text.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
             row.Children.Add(text);
-            row.Children.Add(SuggestionTick("✓", "GoodBrush",
+            row.Children.Add(SuggestionTick("Check", "GoodBrush",
                 $"Add {sug.Spell} to your {sug.Class} set", 1, () => AcceptBuffSuggestion(sug)));
-            row.Children.Add(SuggestionTick("✕", "DimBrush",
+            row.Children.Add(SuggestionTick("Close", "DimBrush",
                 "Dismiss — never suggest this buff for this character again", 2,
                 () => DismissBuffSuggestion(sug)));
             BuffsPanel.Children.Add(row);
         }
     }
 
-    private static TextBlock SuggestionTick(string glyph, string brush, string tip, int column, Action act)
+    /// <summary>Accept / dismiss on a buff-suggestion row.
+    ///
+    /// A real <see cref="DesignSystem.InlineIconButton"/> rather than a click-handled
+    /// glyph: the tick and the cross were TextBlocks, which hit-test across their whole
+    /// layout rect, and the drawn strokes of a vector do not — that is #211 exactly, on a
+    /// pair of controls where a missed click either adds a buff you didn't want or fails
+    /// to silence a suggestion you're tired of. The button also makes them
+    /// keyboard-reachable, which the TextBlocks never were.</summary>
+    private static Button SuggestionTick(string icon, string brush, string tip, int column, Action act)
     {
-        var t = new TextBlock
-        {
-            Text = glyph, FontSize = Tok.Spec(Tok.TypeRole.Body).Size, Cursor = Cursors.Hand,
-            Padding = new Thickness(Tok.SpaceS, 0, Tok.SpaceXxs, 0),
-            VerticalAlignment = VerticalAlignment.Center,
-            ToolTip = tip,
-        };
-        t.SetResourceReference(TextBlock.ForegroundProperty, brush);
-        t.MouseLeftButtonDown += (_, e) => { e.Handled = true; act(); };
-        Grid.SetColumn(t, column);
-        return t;
+        var button = DesignSystem.InlineIconButton(icon, tip, (_, _) => act(), brush);
+        Grid.SetColumn(button, column);
+        return button;
     }
 
     /// <summary>Everything the fight-side chip stack shows: mez chips and slow chips,
@@ -1755,10 +1790,10 @@ public partial class MainWindow : Window, ICardContext
         if (chips.Count == 0 && _optionsWindow is { IsLoaded: true })
             chips.Add(new SpawnChip(Zone: "", Name: "drag me — chips appear here",
                 CountdownText: "", IsDue: false,
-                Detail: "Placement preview: 💤 mez and 🐌 slow chips will stack at this "
+                Detail: "Placement preview: mez and slow chips will stack at this "
                     + "spot. Drag it where you'll notice them; it disappears when "
                     + "Options closes.",
-                Icon: "🐌"));
+                Icon: "Hourglass"));
         return chips;
     }
 
@@ -1783,7 +1818,7 @@ public partial class MainWindow : Window, ICardContext
             return new SpawnChip(
                 Zone: "", Name: EQBuddy.UI.Shared.SlowChipText.Label(s),
                 CountdownText: remaining is { } r ? $"{(int)r / 60}:{(int)r % 60:00}" : "?",
-                IsDue: false, Detail: detail + " · right-click to dismiss", Icon: "🐌")
+                IsDue: false, Detail: detail + " · right-click to dismiss", Icon: "Hourglass")
             {
                 Fraction = s.ExpiresAt is { } exp && (exp - s.LandedAt).TotalSeconds is > 0 and var dur
                     ? Math.Clamp((now - s.LandedAt).TotalSeconds / dur, 0, 1)
@@ -2026,18 +2061,23 @@ public partial class MainWindow : Window, ICardContext
         ClearGearAutoCheckSeen();
         if (pick is not null) _watcher.Select(path, pick.StartOffset, pick.EndOffset);
         else _watcher.Select(path);
-        ReviewLogItem.Header = "✓ Reviewing an archive — return to live log";
+        // A MenuItem has an Icon slot; the tick belongs in it rather than typed onto the
+        // front of the header, where it is a glyph in a string and reads as part of the
+        // words on a screen reader.
+        ReviewLogItem.Header = "Reviewing an archive — return to live log";
+        ReviewLogItem.Icon = DesignSystem.Icon("Check", "GoodBrush", size: Tok.IconInline);
         var when = pick is not null ? $" ({pick.Start:MMM d HH:mm})" : "";
         CharLabel.Text = $"REVIEWING {Path.GetFileName(path)}{when} — click here to go live";
         CharLabel.Foreground = (Brush)FindResource("WarnBrush");
         CharLabel.Cursor = Cursors.Hand;
-        CharLabel.ToolTip = "Replaying a saved log. Drops by Creature and ✦ Copy for wiki " +
+        CharLabel.ToolTip = "Replaying a saved log. Drops by Creature and Copy for wiki " +
             "show the reviewed session. Click to return to the live log.";
     }
 
     private void ExitReview()
     {
         ReviewLogItem.Header = "Review an archived log…";
+        ReviewLogItem.Icon = null;
         CharLabel.Foreground = (Brush)FindResource("DimBrush");
         CharLabel.Cursor = null;
         CharLabel.ToolTip = "Follows whoever is actively playing (log file growth)";
@@ -2544,7 +2584,7 @@ public partial class MainWindow : Window, ICardContext
         }
         }   // end fullRender gate
 
-        RenderTracked(s);   // per-tick: live ⏳ cue countdowns and "last: … ago" ages
+        RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
         RenderBuffs(s);     // per-tick: the countdowns ARE the content
         if (fullRender) RenderRaids();   // changes on kills and imports only
         UpdatePerfStats();  // #112: self-measurement, every few seconds, off by default
@@ -2645,7 +2685,7 @@ public partial class MainWindow : Window, ICardContext
             _trackedRowRefs.Clear();
             TrackedPanel.Children.Clear();
             TrackedPanel.Children.Add(EmptyCardLine(
-                "No watch rules yet — add one under ⚙ Options (or pick a recent log line there)."));
+                "No watch rules yet — add one in Options (or pick a recent log line there)."));
             return;
         }
 
@@ -2680,9 +2720,10 @@ public partial class MainWindow : Window, ICardContext
             {
                 var row = _trackedRowRefs[i];
                 var r = orderedResults[i];
-                row.Head.Text = dueNow.TryGetValue(row.RuleId, out var due)
-                    ? $"{row.RuleName.ToUpperInvariant()} ⏳ {EQBuddy.UI.Shared.Countdown.Format(due - DateTime.Now)}"
-                    : row.RuleName.ToUpperInvariant();
+                // The name is in the signature, so it cannot have changed here — only the
+                // countdown beside it moves.
+                if (row.Cue is { } cue && dueNow.TryGetValue(row.RuleId, out var due))
+                    cue.Text = EQBuddy.UI.Shared.Countdown.Format(due - DateTime.Now);
                 row.Rate.Text = $"{r.TotalQuantity} total · {r.PerHour:0.#}/hr · {r.PerActiveHour:0.#}/active hr";
                 if (row.LastLine is { } lastLine && r.LastMatch is { } lm && r.LastItem is { } li)
                     lastLine.Text = $"last: {li} · {FormatAge(DateTime.Now - lm)} ago";
@@ -2727,25 +2768,53 @@ public partial class MainWindow : Window, ICardContext
             var head = new Grid { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             // A rule with a cue counting down says so in its heading, so you can watch the
             // respawn timer you set without opening Options to remember what it was.
+            //
+            // The hourglass that used to sit inside this string is a vector in its own
+            // column now, which also splits the countdown off into its own TextBlock —
+            // the per-tick path below writes THAT rather than rebuilding the name every
+            // second. The name keeps the star column and its trimming: a rule called
+            // "Ancient Cyclops placeholder" beside an icon in a horizontal StackPanel
+            // would be clipped with no ellipsis to say so (trap 14).
             var counting = dueNow.TryGetValue(r.Id, out var dueAt);
             var headText = new TextBlock
             {
-                Text = counting
-                    ? $"{r.Name.ToUpperInvariant()} ⏳ {EQBuddy.UI.Shared.Countdown.Format(dueAt - DateTime.Now)}"
-                    : r.Name.ToUpperInvariant(),
+                Text = r.Name.ToUpperInvariant(),
                 FontSize = Tok.Spec(Tok.TypeRole.Caption).Size, FontWeight = FontWeights.SemiBold,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Center,
                 Foreground = (Brush)FindResource(counting ? "WarnBrush" : "AccentBrush"),
             };
             head.Children.Add(headText);
+            TextBlock? headCountdown = null;
+            if (counting)
+            {
+                var cue = DesignSystem.Icon("Timer", "WarnBrush", size: Tok.IconInline);
+                cue.Margin = new Thickness(Tok.SpaceS, 0, Tok.SpaceXs, 0);
+                Grid.SetColumn(cue, 1);
+                head.Children.Add(cue);
+                headCountdown = new TextBlock
+                {
+                    Text = EQBuddy.UI.Shared.Countdown.Format(dueAt - DateTime.Now),
+                    FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                    FontWeight = FontWeights.SemiBold,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, Tok.SpaceS, 0),
+                };
+                headCountdown.SetResourceReference(TextBlock.ForegroundProperty, "WarnBrush");
+                Grid.SetColumn(headCountdown, 2);
+                head.Children.Add(headCountdown);
+            }
             var rate = new TextBlock
             {
                 Text = $"{r.TotalQuantity} total · {r.PerHour:0.#}/hr · {r.PerActiveHour:0.#}/active hr",
                 FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
                 Foreground = (Brush)FindResource("DimBrush"),
             };
-            Grid.SetColumn(rate, 1);
+            Grid.SetColumn(rate, 3);
             head.Children.Add(rate);
             TrackedPanel.Children.Add(head);
 
@@ -2772,7 +2841,7 @@ public partial class MainWindow : Window, ICardContext
                     Foreground = (Brush)FindResource("DimBrush"),
                     Margin = new Thickness(Tok.SpaceS, 1, 0, Tok.SpaceXxs),
                 });
-            _trackedRowRefs.Add(new TrackedRowRefs(r.Id, r.Name, headText, rate, lastLine));
+            _trackedRowRefs.Add(new TrackedRowRefs(r.Id, r.Name, headText, headCountdown, rate, lastLine));
 
             if (r.Items.Count > 1)
             {
@@ -2787,14 +2856,20 @@ public partial class MainWindow : Window, ICardContext
                             Margin = new Thickness(Tok.SpaceL, 1, 0, 0),
                             TextTrimming = TextTrimming.CharacterEllipsis,
                         });
-                var toggle = new TextBlock
+                // The eighth fold in the widget, and the last one still typing its own
+                // chevron. Transparent ground, not null: a StackPanel with no background
+                // only hit-tests where its children are painted, so the gaps between the
+                // chevron and the words would have been click-through (trap 16).
+                var toggle = new EqFoldLabel
                 {
-                    Text = expanded ? "▾ less" : $"▸ all {r.Items.Count} kinds",
-                    FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                    // The look the widget's other folds wear ("Pet abilities", "All AA
+                    // abilities"): a dim semibold heading over the list it opens.
+                    Section = true,
                     Cursor = System.Windows.Input.Cursors.Hand,
-                    Foreground = (Brush)FindResource("DimBrush"),
+                    Background = System.Windows.Media.Brushes.Transparent,
                     Margin = new Thickness(Tok.SpaceS, 0, 0, Tok.SpaceXxs),
                 };
+                toggle.Set(expanded, expanded ? "less" : $"all {r.Items.Count} kinds");
                 var id = r.Id;
                 toggle.MouseLeftButtonDown += (_, e) =>
                 {
@@ -2816,8 +2891,12 @@ public partial class MainWindow : Window, ICardContext
     /// rate / age text in place instead of rebuilding the panel's element tree.
     /// Row refs are parallel to the signature's rule order.</summary>
     private string _trackedSignature = "";
+    /// <param name="Cue">The cue countdown, or null when this rule has none. Its
+    /// PRESENCE is part of the signature above, so within the text-in-place path it
+    /// never appears or vanishes — only its digits move.</param>
     private sealed record TrackedRowRefs(
-        string RuleId, string RuleName, TextBlock Head, TextBlock Rate, TextBlock? LastLine);
+        string RuleId, string RuleName, TextBlock Head, TextBlock? Cue,
+        TextBlock Rate, TextBlock? LastLine);
     private readonly List<TrackedRowRefs> _trackedRowRefs = [];
 
     private static string FormatAge(TimeSpan age) => age.TotalMinutes < 1
@@ -3168,7 +3247,11 @@ public partial class MainWindow : Window, ICardContext
         if (!_ruleCooldowns.ShouldFire(rule, label, cooldown, DateTime.Now)) return;
 
         if (rule.AlertBanner)
-            AlertTile.ShowAlert($"★ {ruleName}: {label}",
+            // No leading star: the banner is a bare TextBlock, so a glyph in front of the
+            // rule name is drawn text with nothing controlling its size or weight — and
+            // it is a box on a Wine prefix. The tile already identifies itself by the
+            // rule's own colour (Chaosrah, 2026-08-06) and by naming the rule.
+            AlertTile.ShowAlert($"{ruleName}: {label}",
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
             PlayAlertSound(sound, coalesce: true);
@@ -3565,8 +3648,8 @@ public partial class MainWindow : Window, ICardContext
                         // (David lost his DPS breakout to exactly that, 2026-08-08). A
                         // permanent, hard-to-reverse state change must announce itself.
                         if (_settings.DoubleClickChipsToggleBreakouts) return;
-                        AlertTile.ShowAlert($"{k} breakout hidden — re-enable in ⚙ Options → Breakout windows");
-                        CoreLog.Error($"{k} breakout hidden via its ✕ (re-enable: Options → Breakout windows)");
+                        AlertTile.ShowAlert($"{k} breakout hidden — re-enable in Options → Breakout windows");
+                        CoreLog.Error($"{k} breakout hidden via its close button (re-enable: Options → Breakout windows)");
                     };
                 }
                 if (!w.IsVisible) w.Show();
@@ -3719,11 +3802,22 @@ public partial class MainWindow : Window, ICardContext
         // used to return early when no stats were starred, which meant someone who pinned
         // watch rules but starred nothing got the hint instead of their chips.
         if (MiniChips.Children.Count == 0)
-            MiniChips.Children.Add(new TextBlock
+        {
+            // The hollow star is the CONTROL it points at — the one beside every card
+            // header — so it is the same vector those wear rather than a lookalike glyph.
+            // Safe as a StackPanel: one short line that never wraps (trap 14).
+            var hint = new StackPanel
             {
-                Text = "☆ star stats in full view", FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
-                Foreground = (Brush)FindResource("DimBrush"), VerticalAlignment = VerticalAlignment.Center,
-            });
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            var star = DesignSystem.Icon("Star", "DimBrush", size: Tok.IconInline);
+            star.Margin = new Thickness(0, 0, Tok.SpaceS, 0);
+            hint.Children.Add(star);
+            hint.Children.Add(DesignSystem.Text(Tok.TypeRole.Body, "star stats in full view")
+                .Ink("DimBrush"));
+            MiniChips.Children.Add(hint);
+        }
     }
 
 
@@ -3952,10 +4046,20 @@ public partial class MainWindow : Window, ICardContext
         ShowQuestsWindow();
     }
 
+    /// <summary>The plain name/value list the un-migrated card BODIES still draw with —
+    /// the breakdown lists, the ding unlocks, deaths and zones. <c>EqCardRows</c> is what
+    /// replaced it for every card that has been through the seam; the rest is a later
+    /// batch (docs/DesignSystem.md §11.9).
+    ///
+    /// It used to take a <c>questBadges</c> flag that hung a quest map-pin on each item
+    /// row. Nothing has passed it since the Loot card moved onto <c>EqCardRows</c>, which
+    /// draws that badge itself — so the branch was unreachable, and it was unreachable in
+    /// the #211 shape: a bare clickable vector with holes you could click through. Dead
+    /// code carrying a bug already paid for is worse than no code.</summary>
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         Func<string, Brush>? valueBrush = null, Action<string>? onNameClick = null,
         Func<string, string?>? tooltip = null, Func<string, Brush?>? nameBrush = null,
-        bool questBadges = false, Func<string, string?>? noteFor = null)
+        Func<string, string?>? noteFor = null)
     {
         var items = rows.ToList();
         list.Items.Clear();
@@ -3963,7 +4067,6 @@ public partial class MainWindow : Window, ICardContext
         {
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var left = new TextBlock
             {
@@ -4003,34 +4106,12 @@ public partial class MainWindow : Window, ICardContext
                 left.MouseLeftButtonDown += (_, ev) => ev.Handled = true;
                 left.MouseLeftButtonUp += (_, _) => onNameClick(clickName);
             }
-            if (questBadges && IsActiveQuestItem(name))
-            {
-                // 🗺 next to quest loot → the Quest Tracker, filtered to this item's
-                // quests; each card's name opens the wiki walkthrough from there
-                // (David's final shape, 2026-08-07: item click = item page, 🗺 = tracker).
-                var badgeName = name;
-                var badge = new TextBlock
-                {
-                    Text = "🗺", FontSize = 11, Margin = new Thickness(0, 1, 6, 1),
-                    Cursor = System.Windows.Input.Cursors.Hand,
-                    ToolTip = "Part of a quest — click for its quest info",
-                };
-                badge.SetResourceReference(TextBlock.ForegroundProperty, "GoodBrush");
-                badge.MouseLeftButtonDown += (_, ev) => ev.Handled = true;
-                badge.MouseLeftButtonUp += (_, ev) =>
-                {
-                    ev.Handled = true;
-                    OpenQuestInfoForItem(badgeName);
-                };
-                Grid.SetColumn(badge, 1);
-                grid.Children.Add(badge);
-            }
             var right = new TextBlock
             {
                 Text = value, FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
                 Foreground = valueBrush?.Invoke(value) ?? (Brush)FindResource("DimBrush"),
             };
-            Grid.SetColumn(right, 2);
+            Grid.SetColumn(right, 1);
             grid.Children.Add(left);
             grid.Children.Add(right);
             list.Items.Add(grid);
@@ -4401,7 +4482,7 @@ public partial class MainWindow : Window, ICardContext
         // Visible but unobtrusive state indicator (INPUT-012).
         RootBorder().BorderBrush = (Brush)FindResource(_clickThrough ? "WarnBrush" : "HairlineBrush");
         RootBorder().ToolTip = _clickThrough
-            ? "Click-through ON — click the 🔒 chip to interact again"
+            ? "Click-through ON — click the padlock chip beside the widget to interact again"
             : null;
         ClickThroughItem.IsChecked = _clickThrough;
         // The way back: a transparent widget can't be clicked, so a tiny normal-hit-test

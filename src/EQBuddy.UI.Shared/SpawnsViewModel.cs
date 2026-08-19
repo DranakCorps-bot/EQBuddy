@@ -2,12 +2,17 @@ using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
-/// <summary>One chicklet in the minimized spawn-countdown stack.</summary>
-/// <summary>One row in the chip stack. Icon distinguishes chip kinds sharing the stack:
-/// "⏳" spawn countdowns, "💤" active mezzes (Zone is "" for those — they belong to no
-/// zone list and their due-click clears nothing).</summary>
+/// <summary>One row in the chip stack. <paramref name="Icon"/> distinguishes the kinds
+/// that share the stack: <c>Timer</c> spawn countdowns, <c>Moon</c> active mezzes and
+/// <c>Hourglass</c> slows (Zone is "" for the last two — they belong to no zone list and
+/// their due-click clears nothing).
+///
+/// It is an <see cref="IconPaths"/> NAME, not a glyph. It used to be "⏳"/"💤"/"🐌",
+/// which the three chip windows printed straight into a TextBlock — so on the Wine
+/// prefixes where those do not render (#148, #166), the one surface a player watches
+/// mid-pull told its three kinds apart with three identical boxes.</summary>
 public sealed record SpawnChip(string Zone, string Name, string CountdownText, bool IsDue, string Detail,
-    string Icon = "⏳")
+    string Icon = "Timer")
 {
     /// <summary>Elapsed share of the countdown, 0..1 — the chip's bottom progress
     /// track (2026-08-11 modernization): a stack of chips reads as a stack of

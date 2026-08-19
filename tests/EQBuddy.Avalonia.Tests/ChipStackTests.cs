@@ -44,15 +44,23 @@ public sealed class ChipStackTests
         var window = new MezChipsWindow(settings, _ =>
         [
             new SpawnChip("", "Slowed 55% · disease 1", countdown, false,
-                "Togor's Insects · landed 3:00:00 pm", "🐌") { Fraction = 0.4 },
+                "Togor's Insects · landed 3:00:00 pm", "Hourglass") { Fraction = 0.4 },
         ]);
         window.RefreshChips(DateTime.Now);
         window.Show();
 
         var text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(block => block.Text ?? "").ToList();
-        Assert.Contains("🐌 Slowed 55% · disease 1", text);
+        // The name alone: the kind's mark is a vector in its own column now, not a glyph
+        // concatenated onto the front of the name (#148, #166).
+        Assert.Contains("Slowed 55% · disease 1", text);
         Assert.Contains("1:30", text);
+        // Parse the expected side too: Avalonia re-serializes a parsed geometry, so the
+        // string off a PathIcon is a normalized form of the one that went in.
+        var hourglass = global::Avalonia.Media.StreamGeometry
+            .Parse(IconPaths.Path("Hourglass")).ToString();
+        Assert.Contains(window.GetVisualDescendants().OfType<PathIcon>(),
+            icon => icon.Data?.ToString() == hourglass);
         // The chip carries its gauge track under the row.
         Assert.Contains(window.GetVisualDescendants().OfType<Grid>(), g => g.Height == 2.5);
         // The scale host is in place, so ChipScale.Apply has a transform target.

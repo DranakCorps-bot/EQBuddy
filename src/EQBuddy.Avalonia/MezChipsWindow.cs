@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Layout;
@@ -118,7 +118,7 @@ public sealed class MezChipsWindow : Window
                 ? $"{(int)seconds / 60}:{(int)seconds % 60:00}"
                 : "?";
             return new SpawnChip("", name, countdown, remaining is <= 6,
-                $"{mez.Spell} by {mez.Caster} · landed {mez.LandedAt:h:mm:ss tt}", "💤")
+                $"{mez.Spell} by {mez.Caster} · landed {mez.LandedAt:h:mm:ss tt}", "Moon")
             {
                 // Elapsed share for the gauge; the mez view draws the REMAINING side
                 // (a draining bar, like a buff), so 1 - this.
@@ -161,10 +161,15 @@ public sealed class MezChipsWindow : Window
         _gauges.Clear();
         foreach (var chip in _chips)
         {
-            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-            row.Children.Add(new TextBlock
+            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*,Auto") };
+            // The mez moon / slow hourglass as a vector, in its own column — the same
+            // shape SpawnChipsWindow draws, from the same table.
+            var kind = DesignSystem.Icon(chip.Icon, "TextBrush", size: DesignTokens.IconInline);
+            kind.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+            row.Children.Add(kind);
+            var name = new TextBlock
             {
-                Text = $"{chip.Icon} {chip.Name}",
+                Text = chip.Name,
                 FontSize = 11,
                 FontWeight = FontWeight.SemiBold,
                 Foreground = AppTheme.TextBrush,
@@ -172,7 +177,9 @@ public sealed class MezChipsWindow : Window
                 MaxWidth = 190,
                 Margin = new Thickness(0, 0, 9, 0),
                 VerticalAlignment = VerticalAlignment.Center,
-            });
+            };
+            Grid.SetColumn(name, 1);
+            row.Children.Add(name);
             var countdown = new TextBlock
             {
                 Text = chip.CountdownText,
@@ -181,7 +188,7 @@ public sealed class MezChipsWindow : Window
                 Foreground = chip.IsDue ? AppTheme.WarnBrush : AppTheme.AccentBrush,
                 VerticalAlignment = VerticalAlignment.Center,
             };
-            Grid.SetColumn(countdown, 1);
+            Grid.SetColumn(countdown, 2);
             row.Children.Add(countdown);
             _countdowns.Add(countdown);
 
