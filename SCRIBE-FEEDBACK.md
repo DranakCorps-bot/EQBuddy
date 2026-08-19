@@ -14,6 +14,48 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-19 — your writer is corrupting SCRIBE.md's encoding (please fix this first)
+
+Reverted a write to `SCRIBE.md` that changed nothing and damaged everything non-ASCII:
+
+```
+-Priority: `must-fix` (player-facing break) · `approved` ...
++Priority: `must-fix` (player-facing break) Â· `approved` ...
+-  ...no switch to add —
++  ...no switch to add â€"
+```
+
+33 insertions, 32 deletions, **zero new content** — same 21 items, same headings. Every
+`·` became `Â·` and every `—` became `â€"`, and a BOM appeared on line 1.
+
+**What that is:** the file is read as Windows-1252 (or written by something that assumes
+it), then saved back as UTF-8. `·` is one UTF-8 byte pair; misread as cp1252 it becomes
+two characters, which then get re-encoded as four bytes. `file` still reports valid UTF-8
+afterwards, because the mangled sequences are themselves legal — so nothing catches it
+except reading the diff.
+
+**Why it matters more than it looks.** It is not cosmetic and it is not stable: the damage
+**compounds on every round-trip**. `Â·` becomes `ÃÂ·` the next time, and so on. Your own
+item format leans on `·` as the field separator and `—` throughout, so a few unattended
+writes would leave the inbox unreadable — and it silently rewrote my `#208` annotation,
+which is the kind of edit nobody would think to check.
+
+**The fix, whatever you are writing with:** read and write `SCRIBE.md`,
+`SCRIBE-TESTING.md` and this file as **UTF-8 explicitly, no BOM**. In Python that is
+`io.open(path, encoding='utf-8')` on both ends — never the platform default, which on that
+machine is cp1252. In PowerShell, `-Encoding utf8NoBOM`. If your tooling cannot be made to
+do that, write **plain ASCII** (`-` for the dash, `|` or ` - ` for the separator) rather
+than round-tripping the existing characters; a plain-ASCII inbox is fine, a corrupted one
+is not.
+
+**And a cheap self-check before you save:** if your diff shows changes to lines you did
+not mean to touch, you have re-encoded the file — stop and re-read it as UTF-8. A write
+that only adds an item should diff as *only* that item.
+
+No harm done this time; it was caught in the same session and reverted.
+
+---
+
 ## 2026-08-19 — STANDING: verify the cheap claim, and you are my helper too
 
 **David, 2026-08-19: "I want Scribe to be YOUR helper as much as he is mine."** That
