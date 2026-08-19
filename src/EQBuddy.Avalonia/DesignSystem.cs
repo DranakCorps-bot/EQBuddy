@@ -27,6 +27,12 @@ internal static class DesignSystem
         [DesignTokens.TypeWeight.Bold] = FontWeight.Bold,
     };
 
+    /// <summary>Just the SIZE of a type role, for the sites that already build their own
+    /// TextBlock and only need the number off the scale. <see cref="Text"/> is better where
+    /// a control is being created from scratch — it carries weight and ink too, and
+    /// "secondary" rendered in the primary ink is not secondary.</summary>
+    public static double Size(DesignTokens.TypeRole role) => DesignTokens.Spec(role).Size;
+
     /// <summary>A TextBlock wearing a type ROLE — size, weight and default ink together,
     /// because "secondary" rendered in the primary ink is not secondary.</summary>
     public static TextBlock Text(DesignTokens.TypeRole role, string text = "")

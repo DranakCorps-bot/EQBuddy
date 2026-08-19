@@ -16,6 +16,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
+using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 
 namespace EQBuddy.Avalonia;
 
@@ -90,7 +91,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly ScrollViewer _sectionScroll = new();
     private readonly Border _logBanner = Banner(AppTheme.WarnWashBrush);
     private readonly Border _updateBanner = Banner(AppTheme.GoodWashBrush);
-    private readonly TextBlock _updateText = new() { FontSize = 12, Foreground = AppTheme.GoodBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
+    private readonly TextBlock _updateText = new() { FontSize = DesignSystem.Size(Role.Body), Foreground = AppTheme.GoodBrush, FontWeight = FontWeight.SemiBold, TextWrapping = TextWrapping.Wrap };
     private readonly TextBlock _zoneText = AppTheme.DimText("-");
     private readonly TextBlock _sessionText = AppTheme.DimText("session 0:00");
     private readonly TextBlock _combatHeader = AppTheme.StatValue("0 dps");
@@ -123,8 +124,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // refreshed every few seconds when on.
     private readonly TextBlock _perfLabel = new()
     {
-        FontSize = 10, Foreground = AppTheme.DimBrush, IsVisible = false,
-        VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 6, 0),
+        FontSize = DesignSystem.Size(Role.Metadata), Foreground = AppTheme.DimBrush, IsVisible = false,
+        VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, DesignTokens.SpaceS, 0),
         // Fixed width, not measured width — see PerfReadout. This label lives in an
         // Auto column of a SizeToContent window, so letting it measure its own text
         // would resize the native window every few seconds (#173).
@@ -132,7 +133,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         TextAlignment = global::Avalonia.Media.TextAlignment.Right,
         TextTrimming = TextTrimming.CharacterEllipsis,
     };
-    private readonly Grid _combatSparkHost = new() { Height = 34, Margin = new Thickness(0, 2, 0, 4), IsVisible = false };
+    private readonly Grid _combatSparkHost = new() { Height = 34, Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs), IsVisible = false };
     private readonly Polyline _combatSpark = new()
     {
         StrokeThickness = 1.8, StrokeJoin = PenLineJoin.Round, StrokeLineCap = PenLineCap.Round,
@@ -169,7 +170,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private static TextBlock Kpi(bool accent = false) => new()
     {
-        Text = "0", FontSize = 17, FontWeight = FontWeight.SemiBold,
+        Text = "0", FontSize = DesignSystem.Size(Role.Metric), FontWeight = FontWeight.SemiBold,
         Foreground = accent ? AppTheme.AccentBrush : AppTheme.TextBrush,
     };
     private readonly TextBlock _moneyHeader = AppTheme.StatValue("0c");
@@ -621,7 +622,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildRoot()
     {
         _scaleRoot.Child = _root;
-        _root.CornerRadius = new CornerRadius(10);
+        _root.CornerRadius = new CornerRadius(DesignTokens.RadiusPanel);
         // Hairline, not the full border tone (the 2026-08-11 modernization):
         // the widget's edge should whisper.
         _root.BorderBrush = AppTheme.HairlineBrush;
@@ -630,7 +631,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _root.PointerPressed += OnDrag;
         _root.Child = new StackPanel
         {
-            Margin = new Thickness(10),
+            Margin = new Thickness(DesignTokens.SpaceL),
             Children =
             {
                 BuildMiniRoot(),
@@ -646,13 +647,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _miniRoot.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         _miniRoot.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         _miniRoot.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-        _miniDot.Margin = new Thickness(2, 0, 8, 0);
+        _miniDot.Margin = new Thickness(DesignTokens.SpaceXxs, 0, DesignTokens.SpaceM, 0);
         _miniRoot.Children.Add(_miniDot);
         Grid.SetColumn(_miniChips, 1);
         _miniRoot.Children.Add(_miniChips);
         var restore = AppTheme.IconButton(AppIcon.Expand, "Expand");
         restore.Click += (_, _) => SetMode(false);
-        restore.Margin = new Thickness(8, 0, 0, 0);
+        restore.Margin = new Thickness(DesignTokens.SpaceM, 0, 0, 0);
         Grid.SetColumn(restore, 2);
         _miniRoot.Children.Add(restore);
         var close = AppTheme.IconButton(AppIcon.Close, "Close");
@@ -669,13 +670,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             Text = "Logging looks off. Type /log in the game's chat window. EQBuddy enables it automatically for future game launches.",
             TextWrapping = TextWrapping.Wrap,
-            FontSize = 12,
+            FontSize = DesignSystem.Size(Role.Body),
             Foreground = AppTheme.WarnBrush,
         };
-        _logBanner.Margin = new Thickness(0, 8, 0, 0);
+        _logBanner.Margin = new Thickness(0, DesignTokens.SpaceM, 0, 0);
         _normalRoot.Children.Add(_logBanner);
         _updateBanner.Child = _updateText;
-        _updateBanner.Margin = new Thickness(0, 8, 0, 0);
+        _updateBanner.Margin = new Thickness(0, DesignTokens.SpaceM, 0, 0);
         _updateBanner.Cursor = new Cursor(StandardCursorType.Hand);
         _updateBanner.PointerPressed += OnUpdateBannerClick;
         _normalRoot.Children.Add(_updateBanner);
@@ -699,7 +700,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         foreach (var (label, value) in new[]
                  { ("dps", _kpiDps), ("kills", _kpiKills), ("loot", _kpiLoot), ("xp/hr", _kpiXp) })
         {
-            var cell = new StackPanel { Margin = new Thickness(11, 6, 4, 7) };
+            var cell = new StackPanel
+            {
+                Margin = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceS,
+                    DesignTokens.SpaceXs, DesignTokens.SpaceS),
+            };
             var caption = AppTheme.SectionLabel(label);
             caption.Margin = new Thickness(0);
             cell.Children.Add(caption);
@@ -719,8 +724,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         return new Border
         {
-            Margin = new Thickness(0, 0, 0, 7),
-            CornerRadius = new CornerRadius(10),
+            Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS),
+            CornerRadius = new CornerRadius(DesignTokens.RadiusPanel),
             BorderBrush = AppTheme.HairlineBrush,
             BorderThickness = new Thickness(1),
             Background = AppTheme.PanelBrush,
@@ -736,7 +741,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var hint = new Border
         {
             Height = 2.5, CornerRadius = new CornerRadius(1.25),
-            Margin = new Thickness(18, 0, 18, 2),
+            Margin = new Thickness(DesignTokens.SpaceXl, 0, DesignTokens.SpaceXl, DesignTokens.SpaceXxs),
             VerticalAlignment = VerticalAlignment.Bottom,
             Background = AppTheme.AccentBrush,
             Opacity = 0,
@@ -744,7 +749,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var grip = new global::Avalonia.Controls.Primitives.Thumb
         {
             Height = 12,
-            Margin = new Thickness(12, 0, 12, 0),
+            Margin = new Thickness(DesignTokens.SpaceL, 0, DesignTokens.SpaceL, 0),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             Cursor = new Cursor(StandardCursorType.SizeNorthSouth),
             Template = new FuncControlTemplate<global::Avalonia.Controls.Primitives.Thumb>((_, _) =>
@@ -790,11 +795,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         for (var i = 0; i < 5; i++) grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         var title = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
-        _statusDot.Margin = new Thickness(2, 0, 7, 0);
+        _statusDot.Margin = new Thickness(DesignTokens.SpaceXxs, 0, DesignTokens.SpaceS, 0);
         title.Children.Add(_statusDot);
-        title.Children.Add(new TextBlock { Text = "EQBuddy", FontWeight = FontWeight.Bold, FontSize = 14, Foreground = AppTheme.AccentBrush });
+        title.Children.Add(new TextBlock { Text = "EQBuddy", FontWeight = FontWeight.Bold, FontSize = DesignSystem.Size(Role.TitleWindow), Foreground = AppTheme.AccentBrush });
         grid.Children.Add(title);
-        _charLabel.Margin = new Thickness(10, 0, 6, 0);
+        _charLabel.Margin = new Thickness(DesignTokens.SpaceM, 0, DesignTokens.SpaceS, 0);
         // NoWrap is load-bearing, not tidiness. This sits in the STAR column, and
         // AppTheme.DimText wraps by default — a wrapping TextBlock in a star column has
         // no natural minimum width, so under SizeToContent it will happily collapse to
@@ -851,7 +856,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private Control BuildSessionLine()
     {
-        var grid = new Grid { Margin = new Thickness(2, 8, 2, 4) };
+        var grid = new Grid { Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceM, DesignTokens.SpaceXxs, DesignTokens.SpaceXs) };
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         grid.Children.Add(_zoneText);
@@ -899,7 +904,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildMotesSection()
     {
         var panel = new StackPanel();
-        _motesSummary.Margin = new Thickness(0, 2, 0, 4);
+        _motesSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         panel.Children.Add(_motesSummary);
         panel.Children.Add(_motesList);
         return panel;
@@ -908,14 +913,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildGearSection()
     {
         var panel = new StackPanel();
-        _gearListName.Margin = new Thickness(0, 2, 0, 4);
+        _gearListName.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         _gearListName.TextWrapping = TextWrapping.Wrap;
         panel.Children.Add(_gearListName);
         // The checklist says WHAT; this says WHERE (#122abd6). Off by default — the
         // slot view is the one people import for.
         _gearByZoneCheck.IsChecked = _settings.GearGroupByZone;
-        _gearByZoneCheck.FontSize = 11;
-        _gearByZoneCheck.Margin = new Thickness(0, 0, 0, 2);
+        _gearByZoneCheck.FontSize = DesignSystem.Size(Role.Caption);
+        _gearByZoneCheck.Margin = new Thickness(0, 0, 0, DesignTokens.SpaceXxs);
         ToolTip.SetTip(_gearByZoneCheck,
             "Pivot the same wishes to where you'd farm them — nearest zone first once "
             + "the log has seen you zone in. An item that drops in several zones is listed "
@@ -927,7 +932,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             MaxHeight = 320,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            Padding = new Thickness(0, 0, 4, 0),
+            Padding = new Thickness(0, 0, DesignTokens.SpaceXs, 0),
             Content = _gearChecklistPanel,
         });
         return panel;
@@ -985,21 +990,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _combatSparkHost.Children.Add(_combatSpark);
         _combatSparkHost.Children.Add(_combatSparkPeak);
         panel.Children.Add(_combatSparkHost);
-        _combatFightText.Margin = new Thickness(0, 1, 0, 2);
+        _combatFightText.Margin = new Thickness(0, 1, 0, DesignTokens.SpaceXxs);
         _combatFightBody.Children.Add(_combatFightText);
         _combatFightBody.Children.Add(_combatFightSplit);
         _combatFightBody.Children.Add(_combatFightOutLabel);
         _combatFightBody.Children.Add(_combatFightList);
-        _combatFightInLabel.Margin = new Thickness(0, 2, 0, 0);
+        _combatFightInLabel.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
         _combatFightBody.Children.Add(_combatFightInLabel);
         _combatFightBody.Children.Add(_combatFightInList);
         _combatFightLabel.Click += (_, _) =>
             ToggleSubsection(v => _settings.ShowCombatFight = v, _settings.ShowCombatFight);
         _combatFightCopy.IsVisible = false;
-        _combatFightCopy.Margin = new Thickness(6, 0, 0, 0);
+        _combatFightCopy.Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0);
         _combatFightCopy.Click += OnCopyFight;
         _combatFightTimeline.IsVisible = false;
-        _combatFightTimeline.Margin = new Thickness(4, 0, 0, 0);
+        _combatFightTimeline.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
         _combatFightTimeline.Click += (_, _) => OpenFightTimeline();
         panel.Children.Add(new StackPanel
         {
@@ -1013,7 +1018,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(_combatSessionLabel);
 
         var body = _combatSessionBody;
-        _combatSummary.Margin = new Thickness(0, 2, 0, 4);
+        _combatSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         body.Children.Add(_combatSummary);
         body.Children.Add(SortHeader("Damage by attack", SortStrip.ForDamage,
             m => { _dmgOutSort = Sort(m); _dmgOutStrip.Select(m); RefreshUi(); }, out _dmgOutStrip));
@@ -1034,17 +1039,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         body.Children.Add(SortHeader("Damage taken from", SortStrip.ForDamageTaken,
             m => { _dmgInSort = Sort(m); _dmgInStrip.Select(m); RefreshUi(); }, out _dmgInStrip));
         body.Children.Add(_damageTakenList);
-        _recentFightsLabel.Margin = new Thickness(0, 6, 0, 0);
+        _recentFightsLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         body.Children.Add(_recentFightsLabel);
         body.Children.Add(_recentFightsList);
-        _areaSpellLabel.Margin = new Thickness(0, 6, 0, 0);
+        _areaSpellLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         _areaSpellLabel.IsVisible = false;
         body.Children.Add(_areaSpellLabel);
         body.Children.Add(_areaSpellList);
         // Procs per combat-minute (#85, Kerdude): same denominator as DPS, so
         // downtime doesn't flatter the weapon. The ⚡ star rides the label row —
         // one place to say what you watch when minimized (the pet-star rule).
-        var procHeader = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, 6, 0, 0) };
+        var procHeader = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0) };
         _procLabel.IsVisible = false;
         ToolTip.SetTip(_procLabel,
             "Spell damage that fired without a cast — weapon procs, poisons, item effects. "
@@ -1057,10 +1062,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         procHeader.Children.Add(procStar);
         body.Children.Add(procHeader);
         body.Children.Add(_procList);
-        _stanceLabel.Margin = new Thickness(0, 6, 0, 0);
+        _stanceLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         body.Children.Add(_stanceLabel);
         body.Children.Add(_stanceList);
-        _invocationLabel.Margin = new Thickness(0, 6, 0, 0);
+        _invocationLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         body.Children.Add(_invocationLabel);
         body.Children.Add(_invocationList);
         panel.Children.Add(body);
@@ -1095,7 +1100,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildHealingSection()
     {
         var panel = new StackPanel();
-        _healFightText.Margin = new Thickness(0, 1, 0, 2);
+        _healFightText.Margin = new Thickness(0, 1, 0, DesignTokens.SpaceXxs);
         _healFightBody.Children.Add(_healFightText);
         _healFightBody.Children.Add(_healFightList);
         _healFightLabel.Click += (_, _) =>
@@ -1108,7 +1113,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(_healSessionLabel);
 
         var body = _healSessionBody;
-        _healingSummary.Margin = new Thickness(0, 2, 0, 4);
+        _healingSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         body.Children.Add(_healingSummary);
         var sort = SortHeader("Heals cast", SortStrip.ForHealing,
             m => { _healSort = Sort(m); _healStrip.Select(m); RefreshUi(); }, out _healStrip,
@@ -1124,13 +1129,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildKillsSection()
     {
         var panel = new StackPanel();
-        _killsSummary.Margin = new Thickness(0, 2, 0, 4);
+        _killsSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         panel.Children.Add(_killsSummary);
         panel.Children.Add(_killList);
-        _farmingLabel.Margin = new Thickness(0, 6, 0, 0);
+        _farmingLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         panel.Children.Add(_farmingLabel);
         panel.Children.Add(_farmingList);
-        _partyKillsLabel.Margin = new Thickness(0, 6, 0, 0);
+        _partyKillsLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         panel.Children.Add(_partyKillsLabel);
         panel.Children.Add(_partyKillList);
         return panel;
@@ -1149,7 +1154,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         var panel = new StackPanel();
         panel.Children.Add(_moneySummary);
-        _soldLabel.Margin = new Thickness(0, 6, 0, 0);
+        _soldLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         panel.Children.Add(_soldLabel);
         panel.Children.Add(_soldList);
         return panel;
@@ -1158,17 +1163,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Control BuildProgressSection()
     {
         var panel = new StackPanel();
-        _progressSummary.Margin = new Thickness(0, 2, 0, 4);
+        _progressSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         panel.Children.Add(_progressSummary);
         // Ding, and the card answers "what did I just get?" — AAs first (labeled, not
         // guessed: the wiki doesn't say which classes they cover), then spells.
-        _levelUnlocksLabel.Margin = new Thickness(0, 4, 0, 0);
+        _levelUnlocksLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
         _levelUnlocksLabel.IsVisible = false;
         panel.Children.Add(_levelUnlocksLabel);
         _levelUnlocksList.IsVisible = false;
         panel.Children.Add(_levelUnlocksList);
         // "What do I get at N?" without waiting for a ding — click to fold.
-        _nextUnlocksLabel.Margin = new Thickness(0, 4, 0, 0);
+        _nextUnlocksLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
         _nextUnlocksLabel.IsVisible = false;
         _nextUnlocksLabel.Cursor = new Cursor(StandardCursorType.Hand);
         ToolTip.SetTip(_nextUnlocksLabel,
@@ -1187,12 +1192,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(_skillList);
         // Session-new AAs lead (Reddit, 2026-08-11); the full character ledger folds
         // behind the ▸ label, Pet-abilities style.
-        _aaNewLabel.Margin = new Thickness(0, 4, 0, 0);
+        _aaNewLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
         _aaNewLabel.IsVisible = false;
         panel.Children.Add(_aaNewLabel);
         _aaNewList.IsVisible = false;
         panel.Children.Add(_aaNewList);
-        _aaAbilitiesLabel.Margin = new Thickness(0, 4, 0, 0);
+        _aaAbilitiesLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
         _aaAbilitiesLabel.Cursor = new Cursor(StandardCursorType.Hand);
         ToolTip.SetTip(_aaAbilitiesLabel,
             "Everything the log's history (plus the durable ledger) says this character owns — "
@@ -1216,7 +1221,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(_deathList);
         panel.Children.Add(AppTheme.Heading("Zones visited"));
         panel.Children.Add(_zoneList);
-        _markersLabel.Margin = new Thickness(0, 6, 0, 0);
+        _markersLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
         panel.Children.Add(_markersLabel);
         panel.Children.Add(_markerList);
         return panel;
@@ -1434,8 +1439,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// and the line says what will fill it.</summary>
     private static TextBlock EmptyCardLine(string text) => new()
     {
-        Text = text, FontSize = 11, TextWrapping = TextWrapping.Wrap,
-        Margin = new Thickness(0, 2, 0, 2),
+        Text = text, FontSize = DesignSystem.Size(Role.Caption), TextWrapping = TextWrapping.Wrap,
+        Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXxs),
         Foreground = AppTheme.DimBrush,
     };
 
@@ -2265,7 +2270,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             // when the hourglass stopped being a glyph welded into the name — added as a
             // third CHILD of a two-column grid it silently defaults to column 0 and draws
             // straight on top of the rule name, which is what the first capture showed.
-            var head = new Grid { Margin = new Thickness(0, 4, 0, 0) };
+            var head = new Grid { Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0) };
             head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
@@ -2273,7 +2278,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             head.Children.Add(new TextBlock
             {
                 Text = r.Name.ToUpperInvariant(),
-                FontSize = 11,
+                FontSize = DesignSystem.Size(Role.Caption),
                 FontWeight = FontWeight.SemiBold,
                 Foreground = counting ? AppTheme.WarnBrush : AppTheme.AccentBrush,
             });
@@ -2310,7 +2315,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 r.LastMatch is { } lm && !string.IsNullOrWhiteSpace(r.LastItem)
                     ? $"last: {r.LastItem} · {FormatAge(now - lm)} ago"
                     : "no matches yet",
-                new Thickness(6, 1, 0, 2)));
+                new Thickness(DesignTokens.SpaceS, 1, 0, DesignTokens.SpaceXxs)));
 
             if (r.Items.Count > 1)
             {
@@ -2320,9 +2325,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         _trackedPanel.Children.Add(new TextBlock
                         {
                             Text = $"{item.Name}   x{item.Count}",
-                            FontSize = 12,
+                            FontSize = DesignSystem.Size(Role.Body),
                             Foreground = AppTheme.TextBrush,
-                            Margin = new Thickness(12, 1, 0, 0),
+                            Margin = new Thickness(DesignTokens.SpaceL, 1, 0, 0),
                             TextTrimming = TextTrimming.CharacterEllipsis,
                         });
 
@@ -2680,7 +2685,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             var name = new TextBlock
             {
-                Text = b.Label, FontSize = 12,
+                Text = b.Label, FontSize = DesignSystem.Size(Role.Body),
                 Foreground = AppTheme.TextBrush,
                 TextTrimming = TextTrimming.CharacterEllipsis,
             };
@@ -2695,7 +2700,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             var remaining = b.RemainingSeconds(now);
             var clock = new TextBlock
             {
-                Text = BuffClockText(remaining, b.Estimated), FontSize = 12,
+                Text = BuffClockText(remaining, b.Estimated), FontSize = DesignSystem.Size(Role.Body),
                 Foreground = remaining is < 60 ? AppTheme.WarnBrush : AppTheme.DimBrush,
             };
             Grid.SetColumn(clock, 1);
@@ -2858,9 +2863,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (missing.Count == 0 && notSeen.Count == 0 && expiring.Count == 0) return;
         var line = new TextBlock
         {
-            FontSize = 11,
+            FontSize = DesignSystem.Size(Role.Caption),
             TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, 3, 0, 0),
+            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
         };
         ToolTip.SetTip(line,
             "Your buff set. missing = EQBuddy saw it fade this session (or its timer ran out). "
@@ -2894,14 +2899,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         foreach (var sug in suggestions)
         {
-            var row = new Grid { Margin = new Thickness(0, 3, 0, 0) };
+            var row = new Grid { Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0) };
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             var text = new TextBlock
             {
                 Text = $"new buff at your level — add {sug.Spell} to {sug.Class}?",
-                FontSize = 11,
+                FontSize = DesignSystem.Size(Role.Caption),
                 FontStyle = FontStyle.Italic,
                 TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -2973,7 +2978,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _raidsPanel.Children.Add(new TextBlock
             {
                 Text = $"{zone.Zone} — {done}/{zone.Bosses.Length}",
-                FontSize = 11, FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, 4, 0, 1),
+                FontSize = DesignSystem.Size(Role.Caption), FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 1),
                 Foreground = done == zone.Bosses.Length ? AppTheme.GoodBrush : AppTheme.AccentBrush,
             });
             foreach (var (boss, rec) in records)
@@ -3025,7 +3030,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             Text = "Kills count when your log sees the boss die; import " +
                 $"{EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} to mark older clears.",
-            FontSize = 10, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0),
+            FontSize = DesignSystem.Size(Role.Metadata), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
             Foreground = AppTheme.DimBrush,
         });
         _raidsPanel.Children.Add(CopyAchievementsCmd());
@@ -3041,9 +3046,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             "Copies the command — paste it into the game's chat and the game " +
             "writes its achievements dump beside its own folders; right-click → " +
             "Data & imports → Import achievements… reads it.");
-        b.FontSize = 10.5;
+        b.FontSize = DesignSystem.Size(Role.Metadata);
         b.HorizontalAlignment = HorizontalAlignment.Left;
-        b.Margin = new Thickness(0, 3, 0, 0);
+        b.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
         b.Click += async (_, _) =>
         {
             try
@@ -3160,7 +3165,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// rule still announces itself by color alone.</summary>
     private static StackPanel MiniChip(string iconName, string value, IBrush valueBrush)
     {
-        var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 10, 0) };
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Margin = new Thickness(0, 0, DesignTokens.SpaceL, 0),
+        };
         // A vector, not a glyph — and this lane is the one where a glyph can fail to
         // render outright (#148, #166), on the surface that is up the whole session.
         var icon = DesignSystem.Icon(iconName, "AccentBrush",
@@ -3170,13 +3179,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(icon);
         panel.Children.Add(new TextBlock
         {
-            Text = value, FontSize = 12.5, FontWeight = FontWeight.SemiBold,
+            Text = value, FontSize = DesignSystem.Size(Role.TitleSection), FontWeight = FontWeight.SemiBold,
             Foreground = valueBrush,
             VerticalAlignment = VerticalAlignment.Center,
         });
         panel.Children.Add(new Border
         {
-            Width = 1, Margin = new Thickness(10, 2, 0, 2),
+            Width = 1, Margin = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXxs),
             Background = AppTheme.HairlineBrush,
         });
         return panel;
@@ -3748,11 +3757,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Background = AppTheme.BgBrush,
         };
-        var panel = new StackPanel { Margin = new Thickness(10) };
+        var panel = new StackPanel { Margin = new Thickness(DesignTokens.SpaceL) };
         void Add(string text, IBrush brush, bool bold = false) =>
             panel.Children.Add(new TextBlock
             {
-                Text = text, FontSize = 12, TextWrapping = TextWrapping.Wrap,
+                Text = text, FontSize = DesignSystem.Size(Role.Body), TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 1, 0, 1),
                 FontWeight = bold ? FontWeight.SemiBold : FontWeight.Normal,
                 Foreground = brush,
@@ -3791,7 +3800,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             Orientation = Orientation.Horizontal,
             HorizontalAlignment = HorizontalAlignment.Right,
-            Margin = new Thickness(10),
+            Margin = new Thickness(DesignTokens.SpaceL),
         };
         var apply = ZoneTheming.Button($"Apply ({fresh.Count})", isDefault: true);
         apply.IsEnabled = fresh.Count > 0;
@@ -3802,7 +3811,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             win.Close();
         };
         var cancel = ZoneTheming.Button("Cancel", isCancel: true);
-        cancel.Margin = new Thickness(8, 0, 0, 0);
+        cancel.Margin = new Thickness(DesignTokens.SpaceM, 0, 0, 0);
         buttons.Children.Add(apply);
         buttons.Children.Add(cancel);
 
@@ -4122,10 +4131,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private static TextBlock GearGroupHeading(string heading) => new()
     {
         Text = heading,
-        FontSize = 11,
+        FontSize = DesignSystem.Size(Role.Caption),
         FontWeight = FontWeight.SemiBold,
         Foreground = AppTheme.AccentBrush,
-        Margin = new Thickness(0, 8, 0, 2),
+        Margin = new Thickness(0, DesignTokens.SpaceM, 0, DesignTokens.SpaceXxs),
     };
 
     private CheckBox GearRow(GearChecklistItem item)
@@ -4134,13 +4143,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         text.Children.Add(new TextBlock
         {
             Text = item.Slot,
-            FontSize = 10,
+            FontSize = DesignSystem.Size(Role.Metadata),
             Foreground = AppTheme.DimBrush,
             TextTrimming = TextTrimming.CharacterEllipsis,
         });
         var itemName = new TextBlock
         {
-            FontSize = 12,
+            FontSize = DesignSystem.Size(Role.Body),
             Foreground = AppTheme.TextBrush,
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
@@ -4151,7 +4160,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (itemText.EffectSuffix.Length > 0)
             itemName.Inlines?.Add(new Run(itemText.EffectSuffix)
             {
-                FontSize = 10,
+                FontSize = DesignSystem.Size(Role.Metadata),
                 Foreground = AppTheme.DimBrush,
             });
         text.Children.Add(itemName);
@@ -4159,7 +4168,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             text.Children.Add(new TextBlock
             {
                 Text = item.Source,
-                FontSize = 10,
+                FontSize = DesignSystem.Size(Role.Metadata),
                 Foreground = AppTheme.DimBrush,
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
@@ -4168,7 +4177,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             IsChecked = item.Acquired,
             Content = text,
-            Margin = new Thickness(0, 2, 0, 2),
+            Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXxs),
         };
         ToolTip.SetTip(check, EQBuddy.UI.Shared.GearChecklistPresentation.Tooltip(item));
         check.IsCheckedChanged += (box, _) => OnGearToggled(item, ((CheckBox)box!).IsChecked == true);
@@ -4860,29 +4869,29 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var bar = new Border
         {
             Background = barBrush,
-            CornerRadius = new CornerRadius(2),
+            CornerRadius = new CornerRadius(DesignTokens.SpaceXxs),
             HorizontalAlignment = HorizontalAlignment.Left,
             Width = 0,
         };
         row.SizeChanged += (_, args) => bar.Width = Math.Max(0, args.NewSize.Width * fraction);
         row.Children.Add(bar);
 
-        var content = new Grid { Margin = new Thickness(4, 1, 0, 1) };
+        var content = new Grid { Margin = new Thickness(DesignTokens.SpaceXs, 1, 0, 1) };
         content.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         content.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         content.Children.Add(new TextBlock
         {
             Text = name,
-            FontSize = 12,
+            FontSize = DesignSystem.Size(Role.Body),
             TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = AppTheme.TextBrush,
         });
         var right = new TextBlock
         {
             Text = value,
-            FontSize = 11,
+            FontSize = DesignSystem.Size(Role.Caption),
             Foreground = AppTheme.DimBrush,
-            Margin = new Thickness(8, 1, 2, 0),
+            Margin = new Thickness(DesignTokens.SpaceM, 1, DesignTokens.SpaceXxs, 0),
         };
         Grid.SetColumn(right, 1);
         content.Children.Add(right);
@@ -4943,10 +4952,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             var left = new TextBlock
             {
                 Text = row.Name,
-                FontSize = 12,
+                FontSize = DesignSystem.Size(Role.Body),
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Foreground = AppTheme.TextBrush,
-                Margin = new Thickness(0, 1, 8, 1),
+                Margin = new Thickness(0, 1, DesignTokens.SpaceM, 1),
             };
             if (tooltip?.Invoke(row.Name) is { Length: > 0 } tip)
             {
@@ -4999,7 +5008,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             var right = new TextBlock
             {
                 Text = row.Value,
-                FontSize = 12,
+                FontSize = DesignSystem.Size(Role.Body),
                 Foreground = valueBrush?.Invoke(row.Value) ?? AppTheme.DimBrush,
             };
             Grid.SetColumn(right, 2);
@@ -5171,8 +5180,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private static Border Banner(IBrush brush) => new()
     {
         Background = brush,
-        CornerRadius = new CornerRadius(6),
-        Padding = new Thickness(8, 6),
+        CornerRadius = new CornerRadius(DesignTokens.SpaceS),
+        Padding = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceS),
         IsVisible = false,
     };
 }

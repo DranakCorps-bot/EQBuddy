@@ -105,11 +105,11 @@ is the worked example on that side).
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,422 | 4,422 | 4,864 | 442 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,422 | 4,446 | 4,864 | 418 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,173 | 5,639 | 466 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,187 | 5,639 | 452 |
 
 **`SessionStats` is a GLOB entry as of 2026-08-18, and that is the interesting half.** It
 was a literal path, and `SessionStats` is a partial class — so `SessionStats.Tracked.cs`

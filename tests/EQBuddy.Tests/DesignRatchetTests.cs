@@ -66,6 +66,18 @@ public class DesignRatchetTests
         "EQBuddy/WikiPackWindow.xaml",
         "EQBuddy/WikiPackWindow.xaml.cs",
         "EQBuddy.Avalonia/WikiPackWindow.cs",
+        // Gate 5, the other widget: 5,127 lines, 30 glyphs and 91 literal sizes, and the
+        // build that actually runs under Wine — where PRs #148/#166 record emoji failing
+        // to render AT ALL. Windows gave its glyphs up in 5c and this side kept them for
+        // a fortnight, which is the parity gap CLAUDE.md's "neither surface is allowed to
+        // quietly fall behind" is about.
+        //
+        // Two off-scale tuples were SNAPPED rather than re-decided, by copying the choice
+        // the WPF twin already made: the hand-nudged KPI cell (11,6,4,7) and the grip
+        // hairline (18,0,18,2). A migration that invents its own answer to a question the
+        // other surface already settled is how the two drift again.
+        "EQBuddy.Avalonia/MainWindow.cs",
+        "EQBuddy.Avalonia/EqFoldLabel.cs",
     ];
 
     public static TheoryData<string> MigratedFiles()
