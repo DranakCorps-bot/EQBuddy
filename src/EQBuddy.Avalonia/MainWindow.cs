@@ -146,7 +146,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         Stroke = AppTheme.BgBrush, StrokeThickness = 1.5,
         HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top,
     };
-    private readonly TextBlock _procLabel = AppTheme.Heading("⚡ Procs");
+    private readonly StackPanel _procLabel = DesignSystem.IconLabel("Bolt", "Procs", "AccentBrush");
     private readonly ItemsControl _procList = new();
     private readonly TextBlock _aaNewLabel = AppTheme.Heading("AA learned this session");
     // #813c82d: "what did I just unlock?" — the ding list, and the always-on preview
@@ -156,10 +156,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _nextUnlocksLabel = AppTheme.Heading("");
     private readonly ItemsControl _nextUnlocksList = new();
     private readonly ItemsControl _aaNewList = new();
-    private readonly Button _combatFightCopy = AppTheme.IconButton("⧉",
+    private readonly Button _combatFightCopy = DesignSystem.IconButton("Copy",
         "Copy this fight as Discord-ready text (a monospace block — the official Discord blocks images, "
         + "so the parse travels as text). Your numbers only, from your log.");
-    private readonly Button _combatFightTimeline = AppTheme.IconButton("⧗",
+    private readonly Button _combatFightTimeline = DesignSystem.IconButton("Timeline",
         "Fight timeline: the whole pull on one canvas — a lane per skill, every hit, miss and resist, "
         + "with a DPS-over-time graph. Scroll to zoom, drag to pan.");
     // Perf audit #1: the version last painted into the expanded sections, and the
@@ -200,7 +200,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _moneySummary = AppTheme.DimText("");
     private readonly TextBlock _progressSummary = AppTheme.DimText("");
     private readonly StackPanel _damageSourceList = new();
-    private readonly TextBlock _petAbilityLabel = AppTheme.Heading("Pet abilities");
+    // A fold heading, not a heading with a chevron typed into its text (Gate 5).
+    private readonly EqFoldLabel _petAbilityLabel = new() { Section = true };
     private readonly StackPanel _petAbilityList = new();
     private readonly ItemsControl _damageTakenList = new();
     private readonly StackPanel _healSpellList = new();
@@ -213,7 +214,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly StackPanel _trackedPanel = new();
     private readonly ItemsControl _soldList = new();
     private readonly ItemsControl _skillList = new();
-    private readonly TextBlock _aaAbilitiesLabel = AppTheme.Heading("AA abilities");
+    private readonly EqFoldLabel _aaAbilitiesLabel = new() { Section = true };
     private readonly ItemsControl _aaAbilityList = new();
     private readonly ItemsControl _factionList = new();
     private readonly ItemsControl _deathList = new();
@@ -264,6 +265,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly MenuItem _clickThroughItem = new()
     {
         Header = "Click-through (game clicks pass through)",
+        // Checkable, so the state is drawn by the toolkit rather than by prepending a
+        // tick glyph to the header — matching the WPF twin's IsCheckable.
+        ToggleType = MenuItemToggleType.CheckBox,
     };
     private ClickThroughChip? _unlockChip;
     private AlertWindow? _alertWindow;
@@ -879,7 +883,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
         var buffsStar = AppTheme.StarButton("buffs",
-            "Open the ⏳ Buff set window while minimized — the set per class, live states, "
+            "Open the Buff set window while minimized — the set per class, live states, "
             + "and what you lost this session");
         buffsStar.Click += OnStarChanged;
         _stars["buffs"] = buffsStar;
@@ -1297,7 +1301,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // A closed menu can't flip to ✓, so the header says exactly what the click
         // does instead (David, 2026-08-14): whatever offers the import offers the
         // command too.
-        data.Items.Add(Item($"⧉ Copy {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements}",
+        data.Items.Add(Item($"Copy {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements}",
             OnCopyAchievementsCommand,
             "Puts the command on your clipboard — paste it into the game's chat, the game writes its achievements dump, then Import achievements… reads it"));
         _reviewLogItem.Click += (s, _) => OnReviewLog(s, EventArgs.Empty);
@@ -1525,7 +1529,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ClearGearAutoCheckSeen();
         if (pick is not null) _watcher.Select(path, pick.StartOffset, pick.EndOffset);
         else _watcher.Select(path);
-        _reviewLogItem.Header = "✓ Reviewing an archive — return to live log";
+        _reviewLogItem.Header = "Reviewing an archive — return to live log";
         var when = pick is not null ? $" ({pick.Start:MMM d HH:mm})" : "";
         _charLabel.Text = $"REVIEWING {System.IO.Path.GetFileName(path)}{when} — click here to go live";
         _charLabel.Foreground = AppTheme.WarnBrush;
@@ -1633,7 +1637,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal string? QuestAwareTooltip(string name, string? baseTip)
     {
         if (!IsActiveQuestItem(name)) return baseTip;
-        const string marker = "🗺 Part of a quest — click the 🗺 to see its quests in the Quest Tracker.";
+        const string marker = "Part of a quest — click the green map pin to see its quests in the Quest Tracker.";
         return baseTip is { Length: > 0 } ? marker + "\n" + baseTip : marker;
     }
 
@@ -1867,7 +1871,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _lastFullRender = DateTime.Now;
             RefreshExpandedSections(s);
         }
-        RenderTracked(s);   // per-tick: live ⏳ cue countdowns and "last: … ago" ages
+        RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
         RenderBuffs(s);     // per-tick: the countdowns ARE the content
         if (fullRender) RenderRaids();   // changes on kills and imports only
         UpdatePerfStats();  // #112: self-measurement, every few seconds, off by default
@@ -1971,9 +1975,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             // The overall Pet row is already visible above, so keep this potentially long
             // per-ability list folded until the player asks for it.
             _petAbilityLabel.IsVisible = s.PetAbilities.Count > 0;
-            _petAbilityLabel.Text = _settings.ShowPetAbilities
-                ? "▾ Pet abilities"
-                : $"▸ Pet abilities ({s.PetAbilities.Count})";
+            _petAbilityLabel.Set(_settings.ShowPetAbilities, _settings.ShowPetAbilities
+                ? "Pet abilities"
+                : $"Pet abilities ({s.PetAbilities.Count})");
             _petAbilityList.IsVisible = _settings.ShowPetAbilities && s.PetAbilities.Count > 0;
             if (_petAbilityList.IsVisible)
                 FillBreakdown(_petAbilityList, s.PetAbilities, _dmgOutSort, s.CombatSeconds, "dps");
@@ -2135,9 +2139,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
                 tooltip: name => AaCatalog.Find(name)?.Effect);
             _aaAbilitiesLabel.IsVisible = s.AaAbilities.Count > 0;
-            _aaAbilitiesLabel.Text = _settings.ShowAllAAs
-                ? "▾ All AA abilities"
-                : $"▸ All AA abilities ({s.AaAbilities.Count})";
+            _aaAbilitiesLabel.Set(_settings.ShowAllAAs, _settings.ShowAllAAs
+                ? "All AA abilities"
+                : $"All AA abilities ({s.AaAbilities.Count})");
             _aaAbilityList.IsVisible = _settings.ShowAllAAs;
             if (_settings.ShowAllAAs)
                 FillList(_aaAbilityList, s.AaAbilities.Select(a =>
@@ -2212,7 +2216,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             _trackedPanel.Children.Clear();
             _trackedPanel.Children.Add(EmptyCardLine(
-                "No watch rules yet — add one under ⚙ Options (or pick a recent log line there)."));
+                "No watch rules yet — add one in Options (or pick a recent log line there)."));
             return;
         }
 
@@ -2257,21 +2261,48 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var dueByRule = dueOverride ?? _delayedAlerts.NextDueByRule(now);
         foreach (var r in ordered)
         {
+            // Three lanes: name, the pending cue, the rate. The cue got its own column
+            // when the hourglass stopped being a glyph welded into the name — added as a
+            // third CHILD of a two-column grid it silently defaults to column 0 and draws
+            // straight on top of the rule name, which is what the first capture showed.
             var head = new Grid { Margin = new Thickness(0, 4, 0, 0) };
+            head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
             head.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             var counting = dueByRule.TryGetValue(r.Id, out var dueAt);
             head.Children.Add(new TextBlock
             {
-                Text = counting
-                    ? $"{r.Name.ToUpperInvariant()} ⏳ {EQBuddy.UI.Shared.Countdown.Format(dueAt - now)}"
-                    : r.Name.ToUpperInvariant(),
+                Text = r.Name.ToUpperInvariant(),
                 FontSize = 11,
                 FontWeight = FontWeight.SemiBold,
                 Foreground = counting ? AppTheme.WarnBrush : AppTheme.AccentBrush,
             });
+            // The cue as an icon plus its own countdown, the shape WatchCardView already
+            // uses on Windows — rather than an hourglass glyph welded into the heading.
+            if (counting)
+            {
+                var cue = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(DesignTokens.SpaceS, 0, DesignTokens.SpaceS, 0),
+                };
+                var icon = DesignSystem.Icon("Timer", "WarnBrush", DesignTokens.IconInline);
+                icon.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+                cue.Children.Add(icon);
+                cue.Children.Add(new TextBlock
+                {
+                    Text = EQBuddy.UI.Shared.Countdown.Format(dueAt - now),
+                    FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+                    FontWeight = FontWeight.SemiBold,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = AppTheme.WarnBrush,
+                });
+                Grid.SetColumn(cue, 1);
+                head.Children.Add(cue);
+            }
             var rate = AppTheme.DimText($"{r.TotalQuantity} total - {r.PerHour:0.#}/hr - {r.PerActiveHour:0.#}/active hr");
-            Grid.SetColumn(rate, 1);
+            Grid.SetColumn(rate, 2);
             head.Children.Add(rate);
             _trackedPanel.Children.Add(head);
 
@@ -2296,10 +2327,16 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         });
 
                 var ruleId = r.Id;
-                var toggle = AppTheme.DimText(
-                    expanded ? "▾ less" : $"▸ all {r.Items.Count} kinds",
-                    new Thickness(6, 1, 0, 2));
-                toggle.Cursor = new Cursor(StandardCursorType.Hand);
+                // The look the widget's other folds wear, and the same primitive — see
+                // EQBuddy/WatchCardView.cs, which made this exact conversion on Windows.
+                var toggle = new EqFoldLabel
+                {
+                    Section = true,
+                    Cursor = new Cursor(StandardCursorType.Hand),
+                    Background = Brushes.Transparent,
+                    Margin = new Thickness(DesignTokens.SpaceS, 1, 0, DesignTokens.SpaceXxs),
+                };
+                toggle.Set(expanded, expanded ? "less" : $"all {r.Items.Count} kinds");
                 toggle.PointerPressed += (_, e) =>
                 {
                     if (!_watchExpandedRules.Remove(ruleId))
@@ -2389,7 +2426,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (!_ruleCooldowns.ShouldFire(rule, label, cooldown, DateTime.Now)) return;
 
         if (rule.AlertBanner)
-            AlertTile.ShowAlert($"★ {ruleName}: {label}",
+            AlertTile.ShowAlert($"{ruleName}: {label}",
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
             PlayAlertSound(sound, coalesce: true);
@@ -2831,7 +2868,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             + "not seen = no landing line this session — it may still be up from before "
             + "EQBuddy was watching; the log can't tell, so this stays a separate state. "
             + "The set is assembled from your active classes' picks plus (any class). "
-            + "Edit it in Options → Alerts & chips, or in the ⏳ Buff set breakout.");
+            + "Edit it in Options → Alerts & chips, or in the Buff set breakout.");
         void Add(string label, List<string> names, IBrush brush, bool italic = false)
         {
             if (names.Count == 0) return;
@@ -2872,35 +2909,31 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             };
             ToolTip.SetTip(text,
                 "Your level-up made this buff available (the Progress card's "
-                + "\"New at level\" list). ✓ adds it to that class's set bucket; "
-                + "✕ never asks again for this character. A new RANK of a buff "
+                + "\"New at level\" list). The tick adds it to that class's set bucket; "
+                + "the cross never asks again for this character. A new RANK of a buff "
                 + "already in your set folds into the same slot and is never "
                 + "suggested — only genuinely new lines appear here.");
             row.Children.Add(text);
-            row.Children.Add(SuggestionTick("✓", AppTheme.GoodBrush,
+            row.Children.Add(SuggestionTick("Check", "GoodBrush",
                 $"Add {sug.Spell} to your {sug.Class} set", 1, () => AcceptBuffSuggestion(sug)));
-            row.Children.Add(SuggestionTick("✕", AppTheme.DimBrush,
+            row.Children.Add(SuggestionTick("Close", "DimBrush",
                 "Dismiss — never suggest this buff for this character again", 2,
                 () => DismissBuffSuggestion(sug)));
             _buffsPanel.Children.Add(row);
         }
     }
 
-    private static TextBlock SuggestionTick(string glyph, IBrush brush, string tip, int column, Action act)
+    /// <summary>Trap 16: a vector only hit-tests where it is PAINTED, while the TextBlock
+    /// this replaced responded across its whole layout rect. So it is an
+    /// InlineIconButton — the drawn size stays small and the target grows to
+    /// DesignTokens.IconInlineHit.</summary>
+    private static Control SuggestionTick(string icon, string colorKey, string tip, int column, Action act)
     {
-        var t = new TextBlock
-        {
-            Text = glyph,
-            FontSize = 12,
-            Cursor = new Cursor(StandardCursorType.Hand),
-            Padding = new Thickness(6, 0, 2, 0),
-            VerticalAlignment = VerticalAlignment.Center,
-            Foreground = brush,
-        };
-        ToolTip.SetTip(t, tip);
-        t.PointerPressed += (_, e) => { e.Handled = true; act(); };
-        Grid.SetColumn(t, column);
-        return t;
+        var button = DesignSystem.InlineIconButton(icon, tip, act, colorKey);
+        button.VerticalAlignment = VerticalAlignment.Center;
+        button.Margin = new Thickness(DesignTokens.SpaceS, 0, DesignTokens.SpaceXxs, 0);
+        Grid.SetColumn(button, column);
+        return button;
     }
 
     private static string BuffClockText(double? remaining, bool estimated) => remaining is { } r
@@ -2954,13 +2987,29 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     { AchievementComplete: true } => "cleared (from achievements)",
                     _ => "",
                 };
-                var row = new TextBlock
+                // A fixed lane for the mark, so the boss names line up whether or not
+                // one is cleared — mirrors the WPF twin. The "·" stays as TEXT (the
+                // ratchet allows it): it holds the column open and is not an icon.
+                var row = new Grid { Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0) };
+                row.ColumnDefinitions.Add(new ColumnDefinition(
+                    new GridLength(DesignTokens.IconInlineHit)));
+                row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+                if (cleared)
                 {
-                    Text = $"{(cleared ? "✓" : "·")} {boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
-                    FontSize = 11.5, Margin = new Thickness(6, 0, 0, 0),
+                    var tick = DesignSystem.Icon("Check", "GoodBrush", DesignTokens.IconInline);
+                    tick.HorizontalAlignment = HorizontalAlignment.Left;
+                    row.Children.Add(tick);
+                }
+                else row.Children.Add(DesignSystem.Text(DesignTokens.TypeRole.BodySecondary, "·"));
+                var bossText = new TextBlock
+                {
+                    Text = $"{boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
+                    FontSize = DesignTokens.Spec(DesignTokens.TypeRole.BodySecondary).Size,
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     Foreground = cleared ? AppTheme.TextBrush : AppTheme.DimBrush,
                 };
+                Grid.SetColumn(bossText, 1);
+                row.Children.Add(bossText);
                 if (rec is { TierKills.Count: > 0 } tk)
                     ToolTip.SetTip(row, "Kills by difficulty: " + string.Join(" · ",
                         new[] { "d4", "d3", "d2", "d1", "d0", "open", "instance", "unknown" }
@@ -2988,7 +3037,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private Button CopyAchievementsCmd()
     {
         var b = AppTheme.IconButton(
-            $"⧉ copy  {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements}",
+            $"copy  {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements}",
             "Copies the command — paste it into the game's chat and the game " +
             "writes its achievements dump beside its own folders; right-click → " +
             "Data & imports → Import achievements… reads it.");
@@ -3002,7 +3051,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 if (TopLevel.GetTopLevel(this)?.Clipboard is { } cb)
                 {
                     await cb.SetTextAsync(EQBuddy.UI.Shared.GameCommands.OutputfileAchievements);
-                    b.Content = "✓ copied — paste in game chat";
+                    b.Content = "copied — paste in game chat";
                 }
             }
             catch (Exception ex) { App.LogError(ex); }   // clipboard momentarily held by another app
@@ -3085,8 +3134,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         if (!_settings.DisabledBreakouts.Contains(dismissed.ToString()))
                             _settings.DisabledBreakouts.Add(dismissed.ToString());
                         _settings.Save();
-                        AlertTile.ShowAlert($"{dismissed} breakout hidden — re-enable in ⚙ Options → Breakout windows");
-                        CoreLog.Error($"{dismissed} breakout hidden via its ✕ (re-enable: Options → Breakout windows)");
+                        AlertTile.ShowAlert($"{dismissed} breakout hidden — re-enable in Options → Breakout windows");
+                        CoreLog.Error($"{dismissed} breakout hidden via its close button (re-enable: Options → Breakout windows)");
                     };
                     _breakouts[kind] = window;
                 }
@@ -3718,7 +3767,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         foreach (var m in matches)
         {
             var already = !fresh.Contains(m);
-            Add($"  ✓ {m.ClassName} — {m.Reward}" + (already ? "   (already marked)" : ""),
+            Add($"  {m.ClassName} — {m.Reward}" + (already ? "   (already marked)" : ""),
                 already ? AppTheme.DimBrush : AppTheme.GoodBrush);
         }
         if (autoGranted.Count > 0)
@@ -3728,7 +3777,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 "reward criteria complete without the items ever existing (#101) — so these " +
                 "prove nothing and are never imported. Turn them in for real and the Sky " +
                 "card tracks them the normal way.", AppTheme.DimBrush);
-            foreach (var g in autoGranted) Add($"  ⊘ {g}", AppTheme.DimBrush);
+            foreach (var g in autoGranted) Add($"  (not applied) {g}", AppTheme.DimBrush);
         }
         if (unmatched.Count > 0)
         {
@@ -4223,7 +4272,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _clickThrough = on;
         _root.BorderBrush = on ? AppTheme.WarnBrush : AppTheme.HairlineBrush;
         ToolTip.SetTip(_root, on ? "Click-through ON — click the \U0001F512 chip to interact again" : null);
-        _clickThroughItem.Header = (on ? "✓ " : "") + "Click-through (game clicks pass through)";
+        // A real checkable menu item, like the WPF twin's IsCheckable — not a tick
+        // welded onto the header string.
+        _clickThroughItem.IsChecked = on;
         if (on)
         {
             _unlockChip ??= new ClickThroughChip(() => SetClickThrough(false));
@@ -4929,13 +4980,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 // quests; each card's name opens the wiki walkthrough from there
                 // (David's final shape, 2026-08-07: item click = item page, 🗺 = tracker).
                 var badgeName = row.Name;
-                var badge = new TextBlock
-                {
-                    Text = "🗺", FontSize = 11, Margin = new Thickness(0, 1, 6, 1),
-                    Cursor = new Cursor(StandardCursorType.Hand),
-                    Foreground = AppTheme.GoodBrush,
-                };
-                ToolTip.SetTip(badge, "Part of a quest — click for its quest info");
+                // A BUTTON rather than a handled vector, so the whole square is clickable
+                // (#211, n3cr0nk1tt3n): the map pin has a gap between its folds you could
+                // click straight through. Same conversion LootCardView already made.
+                var badge = DesignSystem.InlineIconButton("Map",
+                    "Part of a quest — click for its quest info",
+                    () => OpenQuestInfoForItem(badgeName), "GoodBrush");
+                badge.Margin = new Thickness(0, 1, DesignTokens.SpaceS, 1);
                 badge.PointerPressed += (_, e) =>
                 {
                     if (!e.GetCurrentPoint(badge).Properties.IsLeftButtonPressed) return;

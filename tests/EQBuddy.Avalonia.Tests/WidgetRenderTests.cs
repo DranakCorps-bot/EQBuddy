@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -412,6 +413,12 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+    /// <summary>The fold heading carrying these words. EqFoldLabel is internal and the
+    /// test project has InternalsVisibleTo, so the chevron's direction is assertable
+    /// directly rather than through the text it no longer lives in.</summary>
+    private static EqFoldLabel Fold(MainWindow window, string text) =>
+        window.GetVisualDescendants().OfType<EqFoldLabel>().Single(f => f.Text == text);
+
     [AvaloniaFact]
     public void PendingCueCountsDownInTheTrackedCardHeading()
     {
@@ -430,10 +437,14 @@ public class WidgetRenderTests : IDisposable
             ],
         }, new Dictionary<string, DateTime> { [rule.Id] = dueAt });
 
-        var heading = window.GetVisualDescendants().OfType<TextBlock>()
-            .Single(t => t.Text?.StartsWith("RESPAWN ⏳") == true);
-        Assert.Matches(@"RESPAWN ⏳ (7:5\d|8:00)", heading.Text!);
+        // Gate 5: the hourglass is a Timer VECTOR beside its own countdown now, so the
+        // heading is the rule name alone and the countdown is a sibling. Both still go
+        // WarnBrush — a cue that counts down in the body ink says nothing.
+        var texts = window.GetVisualDescendants().OfType<TextBlock>().ToList();
+        var heading = texts.Single(t => t.Text == "RESPAWN");
         Assert.Same(AppTheme.WarnBrush, heading.Foreground);
+        var countdown = texts.Single(t => Regex.IsMatch(t.Text ?? "", @"^(7:5\d|8:00)$"));
+        Assert.Same(AppTheme.WarnBrush, countdown.Foreground);
 
         window.Close();
     }
@@ -459,7 +470,7 @@ public class WidgetRenderTests : IDisposable
         var text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains(text, t => t.StartsWith("last: Haste · ") && t.EndsWith(" ago"));
-        Assert.Contains("▸ all 2 kinds", text);
+        Assert.Contains("all 2 kinds", text);
         Assert.DoesNotContain("Haste   x2", text);
 
         window.Close();
@@ -479,15 +490,20 @@ public class WidgetRenderTests : IDisposable
         window.RenderSnapshotForTest(snapshot);
         var text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
-        Assert.Contains("▸ Pet abilities (1)", text);
+        Assert.Contains("Pet abilities (1)", text);
         Assert.DoesNotContain("Slash", text);
+        // The open/shut state moved OUT of the text and into the chevron when the "▾"/"▸"
+        // glyphs became vectors, so assert it where it now lives — otherwise the
+        // conversion silently drops the only coverage of which way the fold points.
+        Assert.False(Fold(window, "Pet abilities (1)").Open);
 
         window.Settings.ShowPetAbilities = true;
         window.RenderSnapshotForTest(snapshot);
         text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
-        Assert.Contains("▾ Pet abilities", text);
+        Assert.Contains("Pet abilities", text);
         Assert.Contains("Slash", text);
+        Assert.True(Fold(window, "Pet abilities").Open);
 
         window.Close();
     }
@@ -518,16 +534,18 @@ public class WidgetRenderTests : IDisposable
         Assert.Contains("AA learned this session", text);
         Assert.Contains("Spell Casting Mastery", text);
         Assert.Contains("rank 3", text);
-        Assert.Contains("▸ All AA abilities (2)", text);
+        Assert.Contains("All AA abilities (2)", text);
         Assert.DoesNotContain("Natural Durability", text);
+        Assert.False(Fold(window, "All AA abilities (2)").Open);
 
         window.Settings.ShowAllAAs = true;
         window.RenderSnapshotForTest(snapshot);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
-        Assert.Contains("▾ All AA abilities", text);
+        Assert.Contains("All AA abilities", text);
         Assert.Contains("Natural Durability", text);
+        Assert.True(Fold(window, "All AA abilities").Open);
         window.Close();
     }
 

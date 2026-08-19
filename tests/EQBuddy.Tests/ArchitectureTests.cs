@@ -102,6 +102,19 @@ public class ArchitectureTests
         (@"EQBuddy.Core/SessionStats*.cs", 2375),
         (@"EQBuddy/OptionsWindow.xaml.cs", 1547),
         (@"EQBuddy.Core/LogParser.cs", 853),
+        // THE LARGEST FILE IN THE REPO, and until 2026-08-19 the only big one with no
+        // ratchet at all — 5,127 lines, ~700 more than the WPF widget this list was
+        // written for. It was missed because the hotspots were chosen while the WPF
+        // decomposition was the work in front of us, and nothing since has looked at the
+        // list itself: the Avalonia twin grew unwatched the whole time the Windows one
+        // was being pulled apart.
+        //
+        // Entered at its CURRENT size rather than at some aspirational number, because a
+        // ratchet's job is to stop growth today; the 10% is the same grant every other
+        // entry gets. It should come down the way SessionStats did — the widget's card
+        // bodies here have never been lifted, and LootCardView.cs is the worked example
+        // of doing it (the Avalonia card that was a whole feature behind, Gate 4).
+        (@"EQBuddy.Avalonia/MainWindow.cs", 5127),
     ];
 
     private const double AllowedGrowth = 1.10;

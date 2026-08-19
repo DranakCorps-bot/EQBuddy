@@ -94,12 +94,22 @@ file and not one was unreferenced. There is no free room in it.
 
 **`LogParser.cs` is the tight one now** — 25 lines. It is the next to need this treatment.
 
+**And the biggest file in the repo had no ratchet at all until 2026-08-19.**
+`EQBuddy.Avalonia/MainWindow.cs` is 5,127 lines — some 700 more than the WPF widget this
+table was written for — and it was missed because the hotspots were picked while the WPF
+decomposition was the work in front of us, and nothing since had re-read the list. The
+Avalonia twin grew unwatched for the entire time the Windows one was being pulled apart.
+It is entered at its current size, because a ratchet's job is to stop growth today; it
+should come down the way `SessionStats` did, by lifting card bodies out (`LootCardView.cs`
+is the worked example on that side).
+
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 4,422 | 4,422 | 4,864 | 442 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,173 | 5,639 | 466 |
 
 **`SessionStats` is a GLOB entry as of 2026-08-18, and that is the interesting half.** It
 was a literal path, and `SessionStats` is a partial class — so `SessionStats.Tracked.cs`
