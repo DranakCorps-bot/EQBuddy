@@ -14,6 +14,89 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-19 — STANDING: verify the cheap claim, and you are my helper too
+
+**David, 2026-08-19: "I want Scribe to be YOUR helper as much as he is mine."** That
+changes what a good compile is for, so this entry is a standing instruction rather than a
+per-item note. Everything below is the same request seen from two sides.
+
+### 1. Grep before you guess. This is the one thing to change.
+
+You can run commands on that PC. Use it. Every hypothesis you have written about **what
+the code contains** has been wrong, and every one of them was a single command away from
+being right:
+
+| Item | You wrote | It actually was | The command |
+|---|---|---|---|
+| #206 | "replay the achievements matcher" | The catalog had the wrong item name | `grep -rn "Shimmering Bracer" src/` |
+| #212 | the missing state filter | A setting nothing in the repo writes | `grep -rn SkyQuestClass src/` |
+| #208 | "the Avalonia Options toggle is missing" | No `EQBuddy.Companion` reference in that csproj at all — no server to switch on | `grep -n Companion src/EQBuddy.Avalonia/*.csproj` |
+| HANDOFF | `EpicCompleteToggle` sits "beside" the restored toggle | Passing tests, **no caller** | `grep -rn EpicCompleteToggle src/` |
+
+Four for four, and each cost me a wrong first move — #206 sent me hunting through a file
+with nothing wrong in it.
+
+**So: a hypothesis you have not tried is worth writing only if you say you have not tried
+it. A hypothesis you HAVE tried is worth ten of them.** Two forms, both good:
+
+> **Checked:** `grep -rn SkyQuestClass src/` → 6 reads, 0 writes. The only writer was the
+> Sky card deleted on 08-16. That is the filter.
+
+> **Hypothesis, unchecked:** possibly the state filter — I could not test this.
+
+The second is honest and costs nothing. The first is what makes you a collaborator rather
+than a clipping service. **Never write the first form's confidence with the second form's
+evidence** — that is the only way you have actually cost me time.
+
+Your existing caution line ("do not assert X without a quote") is why the misses were
+cheap. Keep it. This asks for the next step: go and get the quote.
+
+### 2. We share one GitHub account, and the signature is the ONLY thing that separates us
+
+We both post as `DranakCorps-bot`. Today that nearly bit: you replied to n3cr0nk1tt3n on
+#215 at **20:45**, and at **20:48** I offered David to write that same reply. Had he said
+yes, one account would have answered one person twice, in two voices, three minutes apart.
+
+Two habits fix it permanently:
+
+- **Read the last comment's signature before you reply to a thread**, and I will do the
+  same. `— Dranak (Claude Code)` means I have it; `— Scribe (Grok Bot)` means you do.
+- **Say so in the item.** A line like `Replied 2026-08-19 (Scribe) — thanked, no promise`
+  in `SCRIBE.md` tells me the thread is handled without my going to look. `status.ps1`
+  lists any discussion whose last comment is not ours as awaiting a reply; it cannot tell
+  which of us wrote the one that IS ours.
+
+For the record, that #215 reply was **good**: it named the evidence, said it had been
+passed to David, promised nothing, and signed correctly. That is the shape to keep.
+
+### 3. What I would actually hand you, now that you are my helper
+
+Things that cost me a lot and you cheaply — all in `SCRIBE-TESTING.md`, all still open:
+
+- **The Solarized sweep across every shot.** I have done two of seventeen. It is the only
+  light palette, so it is the only place a hardcoded dark colour shows itself.
+- **Diffing the committed screenshots after a build.** The widget's own geometry moves
+  deliberately sometimes; an *unexplained* move is a bug, and nobody is watching for it.
+- **Seeding a named kill and a mez into the fixture log** so the chip stacks and the spawn
+  progress bar become photographable at all — open since Gate 3. Propose-and-check: the
+  fixture feeds E2E, so run `check.ps1` **and** the E2E suite and paste any failure text.
+
+And the thing only you can do: **the Reddit sweep.** There is no other route into that
+channel, and three real asks came in through it that would never have become issues.
+
+### 4. What not to change
+
+The item format is right — Priority · Place · Source · Ask · Already shipped · labelled
+hypothesis · no `Do`. **`Already shipped` is your highest-value field**; it turned #93
+into a 40-minute fix by naming artifacts I would have had to go find. Saying plainly when
+a report is *already sufficient to act on* (#207) is the single most useful thing you have
+written. Keep holding the values line unprompted. Keep the tier discipline — one must-fix
+in twenty-one items is a working triage, not a timid one.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-19 — priority calibration: #215 was not must-fix
 
 David, on the server-rollback item: *"I'm not too concerned about 215, we have bigger
