@@ -42,17 +42,16 @@ internal static class BreakdownRows
         var primary = sep < 0 ? value : value[..sep];
         var context = sep < 0 ? "" : value[(sep + 3)..];
 
-        // Name and context are BOTH flexible, the name outweighing the context
-        // (BreakdownRowLayout, #182). The context used to be Auto, which meant it took
-        // whatever it wanted and the name — the only star column — got the remainder:
-        // on a long stat line that remainder was a few pixels, and all that rendered was
-        // the ellipsis. Rows literally read "." and "..".
+        // The name is sized to its CONTENT and capped; the context takes what is left
+        // (BreakdownRowLayout, #182 and its over-correction). Two defects, one column
+        // pair: the context was once Auto and starved the name to "." and ".."; then both
+        // were proportional and a five-letter name held two thirds of the row while the
+        // stat line was cut mid-number. Auto + NameCap is the shape that has neither.
         var content = new Grid();
-        content.ColumnDefinitions.Add(new ColumnDefinition
-            { Width = new GridLength(BreakdownRowLayout.NameWeight, GridUnitType.Star) });
+        content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         content.ColumnDefinitions.Add(new ColumnDefinition
-            { Width = new GridLength(BreakdownRowLayout.ContextWeight, GridUnitType.Star) });
+            { Width = new GridLength(1, GridUnitType.Star) });
         content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         var nameBlock = new TextBlock
         {
@@ -70,6 +69,11 @@ internal static class BreakdownRows
             });
         }
         else nameBlock.Text = name;
+        // The cap, applied as the row learns how wide it is. Safe against a layout loop:
+        // the content Grid is stretched by its parent, so its width is decided above this
+        // and setting a child's MaxWidth cannot feed back into it.
+        content.SizeChanged += (_, e) =>
+            nameBlock.MaxWidth = BreakdownRowLayout.NameCap(e.NewSize.Width);
         content.Children.Add(nameBlock);
         if (nameBadge is not null)
         {

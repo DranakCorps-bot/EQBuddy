@@ -49,6 +49,35 @@ public class BreakdownRowLayoutTests
     public void TheNameOutweighsTheContext() =>
         Assert.True(BreakdownRowLayout.NameWeight > BreakdownRowLayout.ContextWeight);
 
+    /// <summary>The cap is a CEILING, not an allocation — the half #182's fix was missing.
+    /// A proportional column takes its share whether it needs it or not, so "Slash" held
+    /// two thirds of the row while the stat line beside it was cut mid-number, with a
+    /// visible gap next to the name doing nothing (David, 2026-08-19, from a real fight).
+    /// The name is content-sized now and only stopped when it would starve the context.</summary>
+    [Theory]
+    [InlineData(600)]
+    [InlineData(443)]   // the width David's breakout opened at
+    [InlineData(272)]
+    [InlineData(120)]
+    public void TheNameCapLeavesRoomForTheContextAtEveryWidth(double rowWidth)
+    {
+        var cap = BreakdownRowLayout.NameCap(rowWidth);
+        Assert.True(cap < rowWidth,
+            $"a name could take the whole {rowWidth:0.#}px row — the context can be starved again");
+        Assert.True(cap >= rowWidth / 2,
+            $"the cap is only {cap:0.#} of {rowWidth:0.#} — a long name trims earlier than #182 allows");
+    }
+
+    /// <summary>An unmeasured row must not cap anything. A Grid raises its first size
+    /// change before layout has settled, and a cap of 0 there would render every name as
+    /// an ellipsis on the first frame — #182's screenshot, arriving by a new route.</summary>
+    [Fact]
+    public void AnUnmeasuredRowImposesNoCap()
+    {
+        Assert.Equal(double.PositiveInfinity, BreakdownRowLayout.NameCap(0));
+        Assert.Equal(double.PositiveInfinity, BreakdownRowLayout.NameCap(-40));
+    }
+
     /// <summary>The resize band on a frameless window has to be findable by a hand. Six
     /// device-independent pixels of unmarked edge is not — which is why "drag only works
     /// on the bottom edge" was reported of a window that has resized from every edge

@@ -36,6 +36,30 @@ public static class BreakdownRowLayout
     public static double NameWidth(double flexibleWidth) =>
         flexibleWidth <= 0 ? 0 : flexibleWidth * NameWeight / (NameWeight + ContextWeight);
 
+    /// <summary>
+    /// The name's MAXIMUM width on a row this wide — the cap, not the allocation.
+    ///
+    /// **The #182 fix over-corrected, and this is the half that was missing** (David,
+    /// 2026-08-19, from a real fight): making both columns proportional stopped a long
+    /// name being starved, but a proportional column takes its share whether it needs it
+    /// or not. "Slash" is five characters and was handed two thirds of the row, so the
+    /// stat line beside it — "×19 · avg 32.6 · 15.9 dps · 16% crit · 14% miss" — was cut
+    /// to "×19 · avg 32.6 · 15.9 d…" while a visible gap sat next to the name doing
+    /// nothing. He had to widen the window a long way to read numbers there was room for.
+    ///
+    /// So the name column is sized to its CONTENT and capped here. Short name → the
+    /// context gets everything left over. Long name → it stops at this cap and trims,
+    /// which is the #182 guarantee restored: the context can never be squeezed away, and
+    /// neither can the name.
+    ///
+    /// Computed from the row rather than from the exact flexible remainder, deliberately:
+    /// a cap does not need to be precise, it needs to be neither zero nor everything, and
+    /// measuring the remainder would mean depending on a layout pass that has not
+    /// happened yet. <see cref="NameWidth"/> is the ratio, finally with a caller.
+    /// </summary>
+    public static double NameCap(double rowWidth) =>
+        rowWidth <= 0 ? double.PositiveInfinity : NameWidth(rowWidth);
+
     /// <summary>How wide the invisible resize band on a frameless window is.
     ///
     /// It was 6, and 6 device-independent pixels of unmarked edge is not something a

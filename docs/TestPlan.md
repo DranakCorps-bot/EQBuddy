@@ -169,7 +169,7 @@ guards below are the deliverable and not a nicety.
 | Every one of the ~11k shipped items resolves to a real reward silhouette, dirty catalog slots included | **Auto** — `DesignSystemTests` |
 | A weapon's SKILL outranks its slot, so a 2H Blunt is never drawn as a sword | **Auto** — `DesignSystemTests` |
 | Screenshot capture makes only the window GROUND opaque, never a tint, and is off unless asked | **Auto** — `DesignSystemTests` (`EQBUDDY_OPAQUE`) |
-| **A breakdown row's NAME outranks the stat line beside it**: both columns flex and the name takes the larger share, so a long stat line can never squeeze a row down to its ellipsis (#182 — rows that read "." and "..") | **Auto** — `BreakdownRowLayoutTests` |
+| **A breakdown row's NAME outranks the stat line beside it**: the name is content-sized and CAPPED, so a long stat line can never squeeze a row to its ellipsis (#182 — rows reading "." and "..") **and a short name can never hoard room the stat line needs** (David, 2026-08-19) | **Auto** — `BreakdownRowLayoutTests`; **Shot** — `shoot.ps1 -Shot damage-breakout` |
 | **Hovering a breakdown row returns the full name, the full stat line, and the caller's own tooltip** — trimming stays, unreadability doesn't | **Auto** — `BreakdownRowLayoutTests` |
 | **The frameless resize band is wide enough to hit**, and still leaves the title row's controls their hit areas | **Auto** — `BreakdownRowLayoutTests`, `ResizeZonesTests` |
 | **Every window follows the widget when it auto-hides**, by default — the exceptions are named, so a window added later follows without anyone remembering (#189) | **Auto** — `FocusHideTests` |

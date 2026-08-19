@@ -55,19 +55,22 @@ internal static class BreakdownRows
         var primary = sep < 0 ? value : value[..sep];
         var context = sep < 0 ? "" : value[(sep + 3)..];
 
-        // Name and context are BOTH flexible, the name outweighing the context
-        // (BreakdownRowLayout, #182): an Auto context took whatever it wanted and starved
-        // the name to its ellipsis. Same defect, same fix, same change.
+        // The name is sized to its CONTENT and capped; the context takes what is left
+        // (BreakdownRowLayout, #182 and its over-correction). Same defect, same fix, same
+        // change — both UIs had both versions of this bug.
         var content = new Grid
         {
-            ColumnDefinitions = new ColumnDefinitions(
-                $"{BreakdownRowLayout.NameWeight}*,Auto,{BreakdownRowLayout.ContextWeight}*,Auto"),
+            ColumnDefinitions = new ColumnDefinitions("Auto,Auto,*,Auto"),
         };
         var nameBlock = new TextBlock
         {
             Text = name, FontSize = 11.5, TextTrimming = TextTrimming.CharacterEllipsis,
             Foreground = nameBrush ?? AppTheme.TextBrush,
         };
+        // The cap, applied as the row learns how wide it is. No layout loop: the content
+        // Grid is stretched by its parent, so a child's MaxWidth cannot feed back into it.
+        content.SizeChanged += (_, e) =>
+            nameBlock.MaxWidth = BreakdownRowLayout.NameCap(e.NewSize.Width);
         content.Children.Add(nameBlock);
         if (nameBadge is not null)
         {
