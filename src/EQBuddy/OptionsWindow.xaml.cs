@@ -561,6 +561,7 @@ public partial class OptionsWindow : Window
                         BreakoutKind.Pet => "🐾 Pet",
                         BreakoutKind.Watch => "🎯 Watch",
                         BreakoutKind.Buffs => "⏳ Buff set",
+                        BreakoutKind.Progress => "📈 Progress",
                         _ => "🎒 Loot",
                     },
                     FontSize = 12,

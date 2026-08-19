@@ -3,8 +3,8 @@ using EQBuddy.Core;
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// The Progress card's header and summary text, shared so the WPF and Avalonia cards
-/// always say the same thing (the LootRows precedent: one builder,
+/// The Progress card's header and summary text, shared so the card and the Progress
+/// breakout window always say the same thing (the LootRows precedent: one builder,
 /// two surfaces). LevelUnlocks/LevelUnlockText cover the unlock rows; this covers
 /// the prose.
 /// </summary>
@@ -31,9 +31,20 @@ public static class ProgressText
         string.Join("\n", ProgressPresentation.SummaryLines(s)
             .Select(line => line.Replace(" · ", sep)));
 
+    /// <summary>Whether the Progress surface has anything at all to show — its empty
+    /// test, kept beside the header so the two can never disagree: every counter the
+    /// header can name (xp ticks, AA points, dings) plus the body's own lists must
+    /// count here, or a window says "+2 aa" above "nothing seen yet" (the round-3
+    /// review catch — AaGained accrues with no xp tick and no purchase). AaAbilities
+    /// is the character's whole durable ledger, deliberately: a veteran with a quiet
+    /// session still has their All-AA fold to read, which is content, not emptiness.</summary>
+    public static bool HasContent(StatsSnapshot s) =>
+        s.XpTicks > 0 || s.AaGained > 0 || s.Levels.Count > 0
+        || s.SkillUps.Count > 0 || s.AaAbilities.Count > 0;
+
     /// <summary>Which AAs count as "learned this session": announced at or after the
     /// session's start (the ledger holds the character's whole history). One rule for
-    /// both UIs — two filters would drift (the trap-4 lesson).</summary>
+    /// the card and the breakout — two filters would drift (the trap-4 lesson).</summary>
     public static List<AaAbilityInfo> SessionNewAas(StatsSnapshot s) =>
         s.SessionStart is { } sess
             ? s.AaAbilities.Where(a => a.Time >= sess).ToList()

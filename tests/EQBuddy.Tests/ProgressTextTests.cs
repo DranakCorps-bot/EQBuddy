@@ -4,8 +4,8 @@ using EQBuddy.UI.Shared;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// The Progress card's header and summary prose, shared by both UIs' cards — one
-/// builder so the two surfaces can never drift apart. These pin the
+/// The Progress card's header and summary prose, shared with the Progress breakout
+/// window — one builder so the two surfaces can never drift apart. These pin the
 /// words; LevelUnlocks/LevelUnlockText cover the unlock rows separately.
 /// </summary>
 public class ProgressTextTests
@@ -104,6 +104,23 @@ public class ProgressTextTests
         Assert.Equal(
             $"You have reached level 30! at {T0.AddMinutes(40):h:mm tt} (40m), " +
             $"You have reached level 31! at {T0.AddMinutes(95):h:mm tt} (55m)", last);
+    }
+
+    [Fact]
+    public void EveryCounterTheHeaderCanNameCountsAsContent()
+    {
+        // The empty test must cover every fact the header can announce, or the window
+        // contradicts itself — "+2 aa" above "nothing seen yet" was the review catch:
+        // AA points accrue with no xp tick, no purchase, no ding.
+        Assert.False(ProgressText.HasContent(new StatsSnapshot()));
+        Assert.True(ProgressText.HasContent(new StatsSnapshot { XpTicks = 1 }));
+        Assert.True(ProgressText.HasContent(new StatsSnapshot { AaGained = 2 }));
+        Assert.True(ProgressText.HasContent(new StatsSnapshot
+            { Levels = [new TimedDetail(T0, "You have reached level 30!")] }));
+        Assert.True(ProgressText.HasContent(new StatsSnapshot
+            { SkillUps = [new SkillDetail("Meditate", Ups: 1, Value: 100)] }));
+        Assert.True(ProgressText.HasContent(new StatsSnapshot
+            { AaAbilities = [new AaAbilityInfo("Adamant Will", 1, T0)] }));
     }
 
     [Fact]

@@ -22,6 +22,7 @@ public static class BreakoutPresentation
     public const string Watch = "watch";
     public const string Loot = "loot";
     public const string Buffs = "buffs";
+    public const string Progress = "progress";
 
     /// <summary>Kind → an <see cref="IconPaths"/> name. Damage, healing, pet and loot
     /// deliberately reuse the minimized bar's icons for the same stat.</summary>
@@ -33,6 +34,8 @@ public static class BreakoutPresentation
         Watch => "Target",
         Loot => "Bag",
         Buffs => "Timer",
+        // The minimized bar's xp icon, like damage/healing/pet/loot reuse theirs.
+        Progress => "Chart",
         _ => "Info",
     };
 
@@ -47,6 +50,7 @@ public static class BreakoutPresentation
         Watch => "Watch list",
         Loot => "Loot",
         Buffs => "Buff set",
+        Progress => "Progress",
         _ => "",
     };
 
