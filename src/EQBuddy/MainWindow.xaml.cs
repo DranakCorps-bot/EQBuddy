@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using LevelUnlockText = EQBuddy.UI.Shared.LevelUnlockText;
 using ProgressText = EQBuddy.UI.Shared.ProgressText;
 using SpawnChip = EQBuddy.UI.Shared.SpawnChip;
@@ -1304,31 +1305,17 @@ public partial class MainWindow : Window, ICardContext
     /// with its memo; the breakout reads through this seam.</summary>
     internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => DingUnlocks(s);
 
-    /// <summary>Unlock rows for FillList: the AA group in its category order, then
-    /// the Spells grouping — same list, rows told apart by their value column.</summary>
-    internal static IEnumerable<(string Name, string Value)> UnlockRows(LevelUnlockSet set) =>
-        set.Aas.Select(a => (a.Name, LevelUnlockText.RowValue(a)))
-            .Concat(set.Spells.Select(sp => (sp.Name, LevelUnlockText.SpellRowValue(sp))));
-
-    /// <summary>Where the wiki's AA facts live: one page of tables, no per-ability
-    /// pages — so an AA row's click has exactly one honest destination.</summary>
-    internal const string AaWikiPage = "Alternate Advancement";
+    // The three static unlock helpers that used to live here moved to
+    // UI.Shared/LevelUnlockRows.cs. They were pure functions on a WINDOW class, which is
+    // why the Progress breakout had to call MainWindow.UnlockRows to draw its own list —
+    // §11.9's "lifting files without moving dependencies" in miniature. They are
+    // unit-tested now (LevelUnlockRowsTests), which nothing here could be.
 
     /// <summary>Click handler for a merged unlock list (the Loot rows' click = wiki
-    /// idiom): a spell row opens its own page, an AA row opens the AA page.</summary>
+    /// idiom). Only the NAVIGATION stays in the window; which page to open is
+    /// <see cref="LevelUnlockRows.WikiPageFor"/>'s decision.</summary>
     internal static Action<string> UnlockClick(LevelUnlockSet set) =>
-        name => OpenWikiPage(
-            set.Spells.Any(sp => sp.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                ? name : AaWikiPage);
-
-    /// <summary>Tooltip lookup for a merged unlock list: spell rows show which classes
-    /// get the spell and when (catalog facts, never invented effect text); AA rows keep
-    /// the wiki effect prose. Resolved per set, since only it knows which group a name
-    /// came from.</summary>
-    internal static Func<string, string?> UnlockTooltip(LevelUnlockSet set) =>
-        name => set.Spells.Any(sp => sp.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ? LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find(name))
-            : AaCatalog.Find(name)?.Effect;
+        name => OpenWikiPage(LevelUnlockRows.WikiPageFor(set, name));
 
     private void OnOpenWebsite(object sender, RoutedEventArgs e) =>
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
@@ -2598,7 +2585,7 @@ public partial class MainWindow : Window, ICardContext
             if (ding.Count > 0 && s.LastLevel is { } dingLevel)
             {
                 LevelUnlocksLabel.Text = LevelUnlockText.NewAtLevelLabel(dingLevel);
-                FillList(LevelUnlocksList, UnlockRows(ding), tooltip: UnlockTooltip(ding));
+                FillList(LevelUnlocksList, LevelUnlockRows.Rows(ding), tooltip: LevelUnlockRows.Tooltip(ding));
             }
 
             // "What do I get at N?" without waiting for a ding — the next milestone
@@ -2613,7 +2600,7 @@ public partial class MainWindow : Window, ICardContext
                     nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count, _settings.ShowNextUnlocks);
                 NextUnlocksList.Visibility = _settings.ShowNextUnlocks ? Visibility.Visible : Visibility.Collapsed;
                 if (_settings.ShowNextUnlocks)
-                    FillList(NextUnlocksList, UnlockRows(nx.Unlocks), tooltip: UnlockTooltip(nx.Unlocks));
+                    FillList(NextUnlocksList, LevelUnlockRows.Rows(nx.Unlocks), tooltip: LevelUnlockRows.Tooltip(nx.Unlocks));
             }
             else NextUnlocksList.Visibility = Visibility.Collapsed;
 
@@ -2674,6 +2661,19 @@ public partial class MainWindow : Window, ICardContext
                     // between that move and a silent regression. Row count, whether the
                     // sort strip is up (it appears only above two or more rules), and
                     // which sort is lit.
+                    // The PROGRESS card's rendered shape, for the same reason and in the
+                    // same week: it is the next surface being lifted out. "skills" above
+                    // proves the data arrived; these prove the card drew the three lists
+                    // that are easy to lose in a move — the ding unlocks (shown only when
+                    // a level was announced this session), the next-milestone preview
+                    // (hidden until a level is known at all, and folded behind a setting)
+                    // and the AA split into session-new vs the full ledger.
+                    $"dingShown={(LevelUnlocksLabel.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"dingRows={LevelUnlocksList.Items.Count} " +
+                    $"nextShown={(NextUnlocksLabel.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"nextRows={NextUnlocksList.Items.Count} " +
+                    $"aaNew={AaNewList.Items.Count} " +
+                    $"aaAll={AaAbilityList.Items.Count} " +
                     $"watchRows={_watch.RowCount} " +
                     $"watchStrip={(_watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={_settings.WatchSortMode} " +

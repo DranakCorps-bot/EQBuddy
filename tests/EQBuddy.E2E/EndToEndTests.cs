@@ -83,6 +83,35 @@ public sealed class EndToEndTests
         app.WaitForDump("watchStrip", 0, "no sort strip above a single rule");
     }
 
+    /// <summary>The Progress card DRAWS its three lists, not merely holds their data.
+    ///
+    /// Pinned from the outside because that surface is being lifted into its own file and
+    /// the WPF layer has no unit tests (docs/TestPlan.md §5) — the same reason, and the
+    /// same week, as the Watch assertions above. The three easy-to-lose conditions are all
+    /// here: the ding list appears only once a level is ANNOUNCED, the next-milestone
+    /// preview appears once a level is merely KNOWN but keeps its rows folded until the
+    /// setting says otherwise, and the AA ledger splits into session-new and the whole
+    /// list rather than showing one of them twice.</summary>
+    [Fact]
+    public void ProgressCard_DrawsItsUnlockListsOnADing()
+    {
+        using var app = new AppHarness();
+        app.Launch();
+
+        // Before any level is known, neither list can honestly say anything.
+        app.WaitForDump("dingShown", 0, "no ding list before a level is announced");
+        app.WaitForDump("nextShown", 0, "no next-milestone preview before a level is known");
+
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+
+        app.WaitForDump("dingShown", 1, "the ding list to appear once a level lands");
+        // A level being known also unlocks the preview — the two are driven by different
+        // facts (announced vs known) and a refactor that conflates them shows up here.
+        app.WaitForDump("nextShown", 1, "the next-milestone preview once a level is known");
+        // Folded by default: the label offers it, the rows wait to be asked for.
+        app.WaitForDump("nextRows", 0, "the preview's rows to stay folded by default");
+    }
+
     /// <summary>Two rules bring the sort strip up, and it starts on the stored default.
     /// The strip is a shared control now (UI.Shared.SortStrip.ForWatchRules) and a key
     /// spelled differently in one lane would paint four options with none selected —

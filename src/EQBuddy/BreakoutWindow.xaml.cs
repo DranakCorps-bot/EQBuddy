@@ -671,7 +671,7 @@ public partial class BreakoutWindow : Window
                     + "click to expand or fold",
                 () => _dingOpen = !_dingOpen);
             if (_dingOpen)
-                AddNameValueRows(MainWindow.UnlockRows(ding), MainWindow.UnlockTooltip(ding),
+                AddNameValueRows(LevelUnlockRows.Rows(ding), LevelUnlockRows.Tooltip(ding),
                     MainWindow.UnlockClick(ding));
         }
 
@@ -706,7 +706,7 @@ public partial class BreakoutWindow : Window
             if (_sessionAasOpen)
                 AddNameValueRows(newAas.Select(a => (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
                     name => AaCatalog.Find(name)?.Effect,
-                    _ => MainWindow.OpenWikiPage(MainWindow.AaWikiPage));
+                    _ => MainWindow.OpenWikiPage(LevelUnlockRows.AaWikiPage));
         }
 
         if (s.AaAbilities.Count > 0)
@@ -720,7 +720,7 @@ public partial class BreakoutWindow : Window
             if (_settings.ShowAllAAs)
                 AddNameValueRows(s.AaAbilities.Select(a => (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
                     name => AaCatalog.Find(name)?.Effect,
-                    _ => MainWindow.OpenWikiPage(MainWindow.AaWikiPage));
+                    _ => MainWindow.OpenWikiPage(LevelUnlockRows.AaWikiPage));
         }
 
         if (next is { } nx)
@@ -731,7 +731,7 @@ public partial class BreakoutWindow : Window
                     + "click to expand or fold",
                 () => { _settings.ShowNextUnlocks = !_settings.ShowNextUnlocks; _settings.Save(); });
             if (_settings.ShowNextUnlocks)
-                AddNameValueRows(MainWindow.UnlockRows(nx.Unlocks), MainWindow.UnlockTooltip(nx.Unlocks),
+                AddNameValueRows(LevelUnlockRows.Rows(nx.Unlocks), LevelUnlockRows.Tooltip(nx.Unlocks),
                     MainWindow.UnlockClick(nx.Unlocks));
         }
     }
