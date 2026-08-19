@@ -8,7 +8,87 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## State: Gate 5c is FINISHED (2026-08-19). 1.93.2 is live; main is clean and pushed
+## State: 1.94.1 live, every thread answered, nothing in flight (2026-08-19 morning)
+
+`main` clean and pushed, CI green. **2,029 unit + 237 Avalonia + 11 E2E.** No open PRs.
+`status.ps1` reads *"none — all 25 open threads have our reply last."* Nothing is
+half-done and nothing is waiting on a decision that was already made.
+
+**Hotspot headroom** — `MainWindow*.xaml.cs` 4,422 / 4,864 (442 left, after the Watch
+lift). **`LogParser.cs` is the tight one now: 913 / 938, 25 lines.** It is the next file
+that will refuse a change, and CLAUDE.md's rule applies to it too — lift, don't split.
+
+### THE NEXT TASK — the `/consider` rare-creature signal
+
+**Two reporters arrived at the same log line from opposite directions in one week, and
+the parse site already exists.** That combination is why this is first rather than the
+bigger asks below.
+
+- **#185 (n3cr0nk1tt3n)** wants it to SUPPRESS: article-less names include townsfolk, and
+  he does not want a spawn chip for every NPC with a proper name.
+- **#217 (Frankthetankk)** wants it to CONFIRM: rarity for wiki contributions is currently
+  guessed from kill count against published bands, while `/consider` states it outright.
+  He took the `known_loot` / `common_loot` question to the wiki admins and came back with
+  an answer from the template source — a wiki admin is explicitly supportive of an
+  in-game-sourced `rare=true` flag and offered CSS for it.
+
+**Measured, not assumed:** `LogParser.ConsiderRx()` already parses `/consider` — it pulls
+`name` and `(Lvl: N)` for the level-range work. **Nothing in the repo reads a rarity
+word.** So this is a field we stand next to and do not pick up, and one parse serves both
+features.
+
+**Blocked on one thing, and both were asked for it in-thread: the verbatim con line.**
+Frankthetankk quotes `a rare creature` from his own log. The existing regex is anchored on
+a trailing `(Lvl: N)`, so where the rarity text sits relative to that decides whether it is
+one pattern or two. **Do not reconstruct the line** — that is how #206 went wrong. If
+neither has replied, the honest move is to wait, or ask again; #192 and #207 both went
+report → fix in one step precisely because the exact string arrived first.
+
+When it does arrive: the parse belongs in Core, the "observation beats heuristic" rule
+already exists (typed spawn timers), and a con-confirmed `rare` should outrank a
+kill-count band while an unconfirmed band stays a suggestion.
+
+### Then, in order
+
+1. **#217 Ask 1 — move the wiki contribution pack out of Drops by Creature** into
+   Data & imports and rename it. **David has not ruled on this**; it was flagged as the
+   default plan and he has seen the reply. Confirm before building. Asks 2 (pool across
+   full history) and 3 (the rare flag) are scope decisions that are his, and the reply
+   says so — do not treat the thread as approval.
+2. **#108 — item-grouped Sky search**, "who wants this drop?" as one row per class under
+   the item. This is now the ENTIRE remaining scope of #210, verified against the code:
+   the other six asks shipped in 1.92.0/1.93.0. liminalwarmth was asked whether to narrow
+   #210 to this or close it and carry #108 alone — check for his answer first.
+3. **#208 — the Linux/macOS Mobile port.** Approved, and bigger than its inbox entry:
+   `CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/` and that csproj has **no
+   reference to `EQBuddy.Companion` at all**. There is no switch to add. Its own session.
+   sbaum23 was also promised consideration of a per-window "don't fight to be topmost"
+   opt-out, which is small and does not depend on Wayland cooperating — that is the part
+   to do first if the port is too big for the day.
+4. **Gate 5 continues**: `EQBuddy.Avalonia/MainWindow.cs` (~39 glyphs, ~104 sizes, and at
+   5,100 lines the largest file in the repo — it is NOT on the hotspot ratchet, which is
+   worth fixing while you are in there), then the three heavy card bodies, then 5d
+   (`Theme.xaml`'s templates).
+5. **#191 configurable mini bar** — approved, and unblocked now Gate 5c is done.
+
+### Waiting on someone else — do not start these
+
+- **#153** (adndmike) — needs liminalwarmth's volume test with EQ closed.
+- **#193** (wizen / n3cr0nk1tt3n) — needs a quested vs token-unlocked achievements export
+  PAIR. Asked again this morning.
+- **#202** (bjstrange) — fixed in 1.94.1, but he should confirm the flicker is gone.
+- **#215** — server rollback. David: *"bigger fish to fry"*, `someday`.
+
+### Five stale-ish trackers worth a look, not a close
+
+`#7 #50 #53 #58 #66` are Don Thompson's own Avalonia parity issues, untouched since
+15 August while that lane moved a lot — #213 landed there, and the Companion finding above
+is news to it. They are his to close, not ours. A status note would be welcome; do not
+close them.
+
+---
+
+## Earlier: Gate 5c FINISHED (2026-08-19). 1.93.2 was live at the time
 
 **2,000 unit + 231 Avalonia + 10 E2E green.** All four widget files are on
 `DesignRatchetTests.Migrated` — `MainWindow.xaml`, both `BreakoutWindow` files, and now
