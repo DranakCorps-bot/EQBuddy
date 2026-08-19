@@ -238,9 +238,10 @@ screenshots and a use-case cookbook for every rule kind:
 
 Spawn timers (on by default):
 - Kill a named — or its known **placeholder** — and a small **countdown chicklet**
-  appears: `⏳ Asaka L`Rei 3:12`. Chicklets stack, drag anywhere as one, keep counting
+  appears: a stopwatch, the name, and the time left — `Asaka L`Rei 3:12`. Chicklets
+  stack, drag anywhere as one, keep counting
   **every timer you have running in any zone**, survive an app restart, and flip to a
-  **DUE** badge at zero (with a sound, if that named's 🔔 is on) for one minute before
+  **DUE** badge at zero (with a sound, if that named's bell is on) for one minute before
   tidying themselves away — click sooner to dismiss.
 - **Double-click a chicklet** (or right-click → **Spawn timers…**) for the full zone
   list, which follows you zone to zone (pick another zone from the dropdown to plan
@@ -265,7 +266,9 @@ Spawn timers (on by default):
   re-alerting at startup.
 
 Mez timers (crowd control you can trust):
-- Land a mez and a **💤 chip** counts down until the target wakes — numbered separately
+- Land a mez and a **crescent-marked chip** counts down until the target wakes (a slow
+  wears a debuff arrow, a spawn timer the stopwatch — one mark per kind, so a stack of
+  mixed chips reads at a glance) — numbered separately
   for same-named mobs ("orc pawn (2)"), warning tint in the final seconds, draggable as
   a stack. The log never states mez durations, so EQBuddy **learns them from your own
   fades**: the gap between landing and a clean wear-off becomes that spell's clock, and
@@ -511,7 +514,7 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   If a pet ever damages you (charm broke), it stops being credited. A **Pet abilities**
   list under the damage breakdown splits that row by what the pet used — melee skills and
   the spells the log names — so you can see what it is actually doing, per fight and per
-  session. Star 🐾 at the top of the Combat card and the pet gets its own breakout
+  session. Star the paw at the top of the Combat card and the pet gets its own breakout
   window while minimized.
 - The combat clock opens when *you* act — hit, miss, pet attack, or getting hit — and
   stays open while your group keeps fighting, so slow-swinging melee and casters between
@@ -596,6 +599,65 @@ turns up, the install whose character log was written most recently wins — a p
 you have stopped using keeps its (empty) `Logs` folder forever, and existence alone
 would let it outrank the one you actually play.
 
+## Credits — who built this
+
+EQBuddy is one person's widget that a lot of other people made good. Everyone below
+either wrote code that shipped or handed over the one fact that turned a guess into a
+fix. If you're missing from this list, that's a bug — open a discussion and it gets
+corrected.
+
+### Code
+
+- **[Don Thompson](https://github.com/DonThompson)** — created and maintains
+  **`EQBuddy.Avalonia`**, the entire cross-platform build, including the X11
+  click-through implementation, and carried it through release after release of parity
+  work. Linux and macOS exist because Don built them.
+- **[Liminal Warmth](https://github.com/liminalwarmth)** — the Wine font work that made
+  text and icons render at all in a prefix (#148, #166), the opt-in macOS/Wine overlay
+  that floats the widget over fullscreen EverQuest (#178), potion buffs in the buff
+  tracker (#171, #179), spawn timers that survive tick gaps and stop learning a cycle
+  from the wrong mob (#181, #201), loot provenance with the all/looted/other filter
+  (#198), the mini-bar double-click gesture (#199), a **(Disabled)** alert sound (#200),
+  and the breakout restyle with three live-found charm-tracking holes (#213).
+- **[quasarj](https://github.com/quasarj)** — macOS support end to end (#90): click-through
+  via NSWindow, spoken alerts through `say`, and Wine/CrossOver/Whisky log-folder
+  auto-detection. Also `/pet leader` claiming (#92), window improvements (#103), Avalonia
+  parity (#149), the CrossOver overlay script (#194), and the Buff Sets breakout and
+  editor.
+- **[dandrews2930](https://github.com/dandrews2930)** — the Plane of Sky checklist (#70)
+  and its scrolling (#78), the buff fade picker and spoken alerts (#71), the EQ Legends
+  Tools gear shopping-list import (#113), Sky turn-in NPCs and state counts (#127), and
+  the Epic checklist (#128).
+- **[ahaselden](https://github.com/ahaselden)** — the whole colour-theme system (#18) and
+  its Avalonia half (#20), banner tints (#21), auto-download-and-install updates (#23),
+  drag-the-corner resizing (#25), and rune absorption tracking (#54).
+- **[theFlammHammer](https://github.com/theFlammHammer)** — socketed exaltations in the
+  gear checklist, grouped and effect-aware (#134).
+
+### Reported, tested, argued with, and corrected
+
+Bugs get fixed fastest when someone attaches the log line, the screenshot, or the
+achievements export. Several entries in the release notes exist because one of these
+people did exactly that — and more than one of them talked me out of a wrong diagnosis
+I had already published.
+
+adndmike · AkevoTheBard · Amatyr · anyhow188 · aodgizmo · badly-developed ·
+BenthamAutoIcon · Bigmatt500 · bjstrange · brucealeg · Chaosrah · chrstahl ·
+crydeevisions-arch · DeusSilvam · elderbit · EzraSmith · Fedarov · Fennec-Halas ·
+flclfool · Frankthetankk · gl_tchd · hstahl76 · Imaginary-Narwhal · jeremycranfill ·
+jlcrisp · JoeyAlain · joeymavity · joma65 · Kemble-Kemble · KentCarmine · Kerdude ·
+knaackville · KoboldCoterie · Ladylag · LeBigNasty · n3cr0nk1tt3n · pmcginn · rahvynn ·
+sa-m3talh3ad · sahaq · sbaum23 · skwayb · Snagglefern · Taendar · Techsteps ·
+TheLethean · themadpoet-dotcom · TheMegaSage · TropicMike · tvongaza · twidget76 ·
+twill713 · typical-usual-chaos · Vellum670 · wizen
+
+And the [r/EQLegends](https://www.reddit.com/r/EQLegends/) regulars whose threads shaped
+features without ever becoming an issue number.
+
+**Every player-visible fix names its reporter in
+[What's New](src/EQBuddy.Core/Data/WhatsNew.json), with the discussion number.** That is
+the durable record; this section is the roll call.
+
 ## License — use freely, credit visibly
 
 MIT — see [LICENSE](LICENSE). Use the code, port it, build on it, ship your own
@@ -608,7 +670,7 @@ line in your README or about screen, naming what you took.
 Ideas — spawn timers that learn from your kills, the /loc breadcrumb trail, the
 camp-pin map, the log-only principle — can't be licensed, and we wouldn't want
 to: reimplement anything. But if EQBuddy's designs shaped your tool, say so by
-name, the same way the credits below name everyone whose work shaped EQBuddy.
+name, the same way the credits above name everyone whose work shaped EQBuddy.
 
 Contributions welcome; parser fixes go fastest when the issue or PR includes the
 raw log lines involved.
