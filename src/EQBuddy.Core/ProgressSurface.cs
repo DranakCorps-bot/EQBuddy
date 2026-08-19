@@ -1,0 +1,129 @@
+namespace EQBuddy.Core;
+
+/// <summary>
+/// The four progress surfaces, in the order every UI shows them — the Progress THEME
+/// (docs/Themes.md; David ruled themes a direction on 2026-08-19, and this one goes first
+/// because Gate 5b had already lifted four of its five cards).
+///
+/// **Entirely retrospective, which is why it is a window and not an overlay.** Nothing on
+/// these tabs has a deadline attached: how much plat this camp has made, what the mote
+/// ladder looks like, where faction stands, which raid targets are cleared. By the surface
+/// rule that puts all of it on the phone and the desktop and none of it over the game —
+/// and it is the theme the all-time-stats direction (#168/#159) plugs into, because
+/// "across sessions" is the same question one level up.
+///
+/// Ordering and labels live here for the reason <see cref="QuestSurface"/> exists: one
+/// definition of what the tabs ARE, or the three surfaces drift (#122, #152, #184).
+/// </summary>
+public enum ProgressTab
+{
+    /// <summary>XP rate, time to level, what a ding unlocked, skill-ups, AAs.</summary>
+    Experience,
+    /// <summary>Coin and motes — the two things a session accumulates that spend.</summary>
+    Wealth,
+    /// <summary>Standing, per faction, with the honest per-kill deltas.</summary>
+    Faction,
+    /// <summary>Raid targets cleared, witnessed or imported.</summary>
+    Raids,
+}
+
+/// <summary>A tab as a UI should draw it. <see cref="Value"/> is the tab's headline —
+/// "14.2% xp", "5p 1g", "0 / 21" — the number its card used to carry in its header, kept
+/// so the tab strip answers at a glance what five separate card headers used to.</summary>
+public sealed record ProgressTabHeader(ProgressTab Tab, string Label, string Key, string? Value);
+
+/// <summary>
+/// Builds the tab strip shared by the desktop Progress window and EQBuddy Mobile. Pure:
+/// takes the already-computed headlines, returns headers.
+/// </summary>
+public static class ProgressSurface
+{
+    /// <summary>The canonical label for each tab.
+    ///
+    /// "Wealth" rather than "Money": the tab carries motes as well as coin, and motes are
+    /// currency in Legends — a player who wants to know what the trip was worth should not
+    /// have to know which of two cards held which half. That merge is the whole reason
+    /// this tab exists rather than two.</summary>
+    public static string LabelFor(ProgressTab tab) => tab switch
+    {
+        ProgressTab.Experience => "Experience",
+        ProgressTab.Wealth => "Wealth",
+        ProgressTab.Faction => "Faction",
+        ProgressTab.Raids => "Raids",
+        _ => tab.ToString(),
+    };
+
+    /// <summary>The wire/DOM key — lowercase and stable, so a saved tab choice survives a
+    /// rename of the human-facing label.
+    ///
+    /// Experience keeps <c>progress</c>, the key the Progress card has always used in
+    /// <c>SectionOrder</c>, <c>HiddenSections</c> and <c>EQBUDDY_EXPAND</c>. Step 5 of the
+    /// recipe is "fold the old keys, PRESERVING position and hidden state": the theme
+    /// inherits the card slot a player already placed rather than appearing at the bottom
+    /// of their list, and a player who had Progress hidden still has it hidden.</summary>
+    public static string KeyFor(ProgressTab tab) => tab switch
+    {
+        ProgressTab.Experience => "progress",
+        ProgressTab.Wealth => "wealth",
+        ProgressTab.Faction => "faction",
+        ProgressTab.Raids => "raids",
+        _ => tab.ToString().ToLowerInvariant(),
+    };
+
+    public static ProgressTab? TabForKey(string? key) => key?.Trim().ToLowerInvariant() switch
+    {
+        "progress" or "experience" or "xp" => ProgressTab.Experience,
+        // The two cards Wealth absorbs both resolve to it, so an old saved choice lands
+        // somewhere true rather than nowhere.
+        "wealth" or "money" or "motes" => ProgressTab.Wealth,
+        "faction" => ProgressTab.Faction,
+        "raids" => ProgressTab.Raids,
+        _ => null,
+    };
+
+    /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
+    /// reads this so the list of what disappears lives in ONE place rather than being
+    /// spelled again in each UI's settings migration.</summary>
+    public static readonly IReadOnlyList<string> AbsorbedCardKeys =
+        ["progress", "money", "motes", "faction", "raids"];
+
+    /// <summary>The key the folded theme takes — the one card slot the five collapse into.
+    /// Deliberately one OF the absorbed keys rather than a new one; see
+    /// <see cref="KeyFor"/>.</summary>
+    public const string ThemeCardKey = "progress";
+
+    public static IReadOnlyList<ProgressTabHeader> Tabs(
+        string? experience = null, string? wealth = null,
+        string? faction = null, string? raids = null)
+    {
+        return
+        [
+            Header(ProgressTab.Experience, experience),
+            Header(ProgressTab.Wealth, wealth),
+            Header(ProgressTab.Faction, faction),
+            Header(ProgressTab.Raids, raids),
+        ];
+
+        static ProgressTabHeader Header(ProgressTab tab, string? value) =>
+            new(tab, LabelFor(tab), KeyFor(tab), string.IsNullOrWhiteSpace(value) ? null : value);
+    }
+
+    /// <summary>The launcher card's one-line summary — step 3 of the recipe, and the line
+    /// that has to justify replacing five card headers with one. Modelled on the Quests
+    /// card's "Epic 0/486 · Sky 0/222": carry the numbers those headers carried, so the
+    /// glance they answered still works without opening anything.
+    ///
+    /// XP leads because it is the one that moves every fight. A part that has nothing to
+    /// say is omitted rather than printed as a zero — five zeros would be noise on a fresh
+    /// character, which is exactly who is looking at a fresh widget.</summary>
+    public static string LauncherSummary(
+        string? xp = null, string? coin = null, int factions = 0, int raidsCleared = 0)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(xp)) parts.Add(xp!);
+        if (!string.IsNullOrWhiteSpace(coin)) parts.Add(coin!);
+        if (factions > 0) parts.Add($"{factions} faction{(factions == 1 ? "" : "s")}");
+        if (raidsCleared > 0) parts.Add($"{raidsCleared} raid{(raidsCleared == 1 ? "" : "s")}");
+        return parts.Count > 0 ? string.Join(" · ", parts) : "no progress yet";
+    }
+}

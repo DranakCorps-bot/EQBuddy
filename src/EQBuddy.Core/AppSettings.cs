@@ -633,6 +633,63 @@ public sealed class AppSettings
         return changed;
     }
 
+    /// <summary>Fold the five Progress-theme cards into one, preserving position and
+    /// hidden state — step 5 of docs/Themes.md's recipe, and the step the plan names as
+    /// where silent data loss lives.
+    ///
+    /// Generalised from <see cref="MigrateQuestSections"/>, which did the same for
+    /// sky+epic → quests; the card list and the surviving key come from
+    /// <see cref="ProgressSurface"/> so they are not spelled twice.
+    ///
+    /// Two rules worth stating, both conservative on purpose:
+    /// <list type="bullet">
+    /// <item>The theme lands in the FIRST slot any of its cards occupied, so a player who
+    /// dragged Money to the top still finds the theme at the top rather than appended to
+    /// the bottom.</item>
+    /// <item>It is hidden only if EVERY absorbed card was hidden. Showing a card that was
+    /// hidden is one click to undo; hiding one the player wanted is invisible, and they
+    /// would have to suspect the update to find it.</item>
+    /// </list></summary>
+    public bool MigrateProgressSections()
+    {
+        var absorbed = ProgressSurface.AbsorbedCardKeys;
+        var theme = ProgressSurface.ThemeCardKey;
+
+        // Is there anything left to fold? The theme key is itself one of the absorbed
+        // keys, so without this the migration re-folds a already-folded profile on EVERY
+        // load: the order comes out identical but it reports a change, which forces a
+        // settings SAVE each launch — and a save rewrites the whole file from the
+        // startup snapshot (trap 13). Idempotence here is not tidiness, it is the
+        // difference between running once and running forever.
+        var stale = absorbed.Where(k => !k.Equals(theme, StringComparison.OrdinalIgnoreCase))
+            .Any(k => SectionOrder.Contains(k, StringComparer.OrdinalIgnoreCase)
+                   || HiddenSections.Contains(k));
+        if (!stale) return false;
+
+        var firstSlot = -1;
+        for (var i = 0; i < SectionOrder.Count && firstSlot < 0; i++)
+            if (absorbed.Contains(SectionOrder[i], StringComparer.OrdinalIgnoreCase)) firstSlot = i;
+
+        // Count BEFORE removing: "were they all hidden" is a question about the old state.
+        var present = absorbed.Count(k => SectionOrder.Contains(k, StringComparer.OrdinalIgnoreCase));
+        var hidden = absorbed.Count(k => HiddenSections.Contains(k));
+        var changed = false;
+        foreach (var key in absorbed) changed |= HiddenSections.Remove(key);
+
+        if (firstSlot >= 0)
+        {
+            SectionOrder.RemoveAll(k => absorbed.Contains(k, StringComparer.OrdinalIgnoreCase));
+            if (!SectionOrder.Contains(theme))
+                SectionOrder.Insert(Math.Min(firstSlot, SectionOrder.Count), theme);
+            changed = true;
+        }
+        // Every card this theme owns was hidden, so the theme is too. `present > 0` keeps a
+        // profile that never had these cards at all from acquiring a hidden one.
+        if (present > 0 && hidden >= present && !HiddenSections.Contains(theme))
+            HiddenSections.Add(theme);
+        return changed;
+    }
+
     public bool ApplyDefaultGearSection()
     {
         if (SectionOrder.Count == 0 || SectionOrder.Contains("gear")) return false;
