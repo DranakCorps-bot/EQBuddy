@@ -439,6 +439,25 @@ desktop, and puts a plain backdrop behind everything. `-List` names the shots; `
 takes any palette (shoot `Solarized` at least once — it is the only light one, so it is
 where a hardcoded dark colour shows up).
 
+**`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe`. The Linux/macOS widget
+is photographed from its own test project instead, which until 2026-08-19 it could not be
+at all:
+
+```bash
+dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release --filter FullyQualifiedName~WidgetSheet -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_OUT=<dir>
+```
+
+`WidgetSheetTests` (opt-in, like `IconSheetTests`) seeds a snapshot and captures the widget
+with the cards open. It earned itself twice within ten minutes of existing: its first
+capture photographed **David's live profile** — a real character name in the title bar,
+about to be committed — and its second showed a rule name and its countdown drawn on top of
+each other, because a new child of a two-column `Grid` silently defaults to column 0.
+
+→ **A capture surface needs `EQBUDDY_APPDATA` isolation MORE than an assertion does**, since
+its entire output is a picture of whatever profile it finds. Mirror `WidgetRenderTests`'
+constructor. And note `EQBUDDY_EXPAND` is **not** at parity: WPF takes card keys
+(`loot,motes`), Avalonia takes only `1`.
+
 ## Working on EQBuddy Mobile
 
 The page can be driven without a phone, a PC or a live log:

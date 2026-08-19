@@ -72,6 +72,40 @@ would have surfaced the Ask 1/Ask 2 coupling), and **check the release notes bef
 "already shipped"**. David, 2026-08-19: *"please keep providing feedback to Scribe so he can
 get better at supporting you."*
 
+### 3. Gate 5 — the Avalonia widget is DONE (and the biggest file finally has a ratchet)
+
+`EQBuddy.Avalonia/MainWindow.cs` is on **both** ratchets now: 30 glyphs → 0, 91 literal
+sizes → 0, `DesignRatchetTests.Migrated`, and a hotspot entry it never had.
+
+**Two findings worth carrying:**
+
+- **It was the LARGEST file in the repo (5,127 lines, ~700 more than the WPF widget) with
+  no ratchet at all.** Missed because the hotspot list was written while the WPF
+  decomposition was the work in front of us, and nothing since re-read the list. Worth
+  asking of any ratchet: is the list itself still the right list?
+- **Off-scale values were snapped by COPYING the WPF twin's answer** (the hand-nudged KPI
+  cell, the grip hairline, the KPI font size), never re-decided. A migration that invents
+  its own answer to a settled question is how two builds drift apart again.
+
+**`WidgetSheetTests` is new and is the point:** the Avalonia lane had NO way to look at its
+own widget, so every screenshot lesson this repo has paid for was learned where it could
+not be checked on the side that ships to Wine. Opt-in, like `IconSheetTests` — the command
+is in CLAUDE.md. It caught two things in its first ten minutes: a capture of **David's live
+profile** (a real character name, about to be committed) and a rule name drawn on top of
+its own countdown. Neither was visible to 241 passing tests.
+
+**Gate 5 remains:** the three heavy card BODIES (sparkline, breakdown lists, ding unlocks —
+these are what buy hotspot headroom on both sides), then **5d**, `Theme.xaml`'s 6 glyphs
+inside shared `ControlTemplates`. And the Avalonia hotspot entry should come DOWN the way
+`SessionStats` did — by lifting card bodies out, `LootCardView.cs` being the worked example
+on that side.
+
+**One parity gap found and NOT fixed:** `EQBUDDY_EXPAND` takes card keys on WPF
+(`loot,motes`) and only `1` on Avalonia, so a single Avalonia card cannot be photographed
+alone. Small, and it would make the new capture surface sharper.
+
+---
+
 ### STILL THE NEXT TASK — the `/consider` rare-creature signal, still blocked
 
 **Nothing changed here and that is correct.** Neither #185 (n3cr0nk1tt3n) nor #217
