@@ -4144,8 +4144,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private static string SkyRewardKey(string className, string reward) => className + "|" + reward;
 
+    /// <summary>Case-insensitively — see the WPF twin. A plain List.Contains is
+    /// case-sensitive and disagreed with every other reader of this list (#216).</summary>
     private bool IsSkyRewardCompleted(string className, string reward) =>
-        _settings.SkyQuestCompleted.Contains(SkyRewardKey(className, reward));
+        _settings.SkyQuestCompleted.Contains(SkyRewardKey(className, reward),
+            StringComparer.OrdinalIgnoreCase);
 
     private void OnOpenWebsite(object? sender, EventArgs e)
     {

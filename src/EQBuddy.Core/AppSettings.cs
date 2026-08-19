@@ -581,6 +581,18 @@ public sealed class AppSettings
         var renames = new (string Class, string From, string To)[]
         {
             ("Rogue", "Scintillating Bracer of Protection", "Shimmering Bracer of Protection"),
+            // #216 (Snagglefern): the wiki page is Staff_of_The_Magister with a capital
+            // T, and eqlwiki does NOT redirect the lower-case form — it 404s (verified
+            // both spellings, 200 vs 404). So the link off three Magician Sky rows was
+            // dead. Our own harvested QuestCatalog.json already had the capital; only
+            // SkyQuestDefaults disagreed, which made it uniquely wrong.
+            //
+            // A case-only rename should no longer be able to strand a turn-in — the two
+            // readers that used a case-SENSITIVE List.Contains were fixed with it — but
+            // this entry stays anyway, because it also normalises what is already
+            // written in settings.json rather than relying on every future reader
+            // remembering the comparer.
+            ("Magician", "Staff of the Magister", "Staff of The Magister"),
         };
 
         var changed = false;

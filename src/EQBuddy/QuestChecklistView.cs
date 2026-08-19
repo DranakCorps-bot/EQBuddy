@@ -277,8 +277,15 @@ internal sealed class QuestChecklistView
 
     private static string SkyRewardKey(string className, string reward) => className + "|" + reward;
 
+    /// <summary>Case-INSENSITIVELY, like every other reader of this list
+    /// (QuestChecklistLayout.Sky and SkyCompleteToggle both use OrdinalIgnoreCase).
+    /// A plain List.Contains is case-sensitive, so this one site disagreed with the
+    /// rest — and a catalog correction that changes only capitalisation (#216, the
+    /// Magister's capital T) would have stranded a turn-in here while the shared
+    /// layout still found it. One fact, one comparison.</summary>
     private bool IsSkyRewardCompleted(string className, string reward) =>
-        _settings.SkyQuestCompleted.Contains(SkyRewardKey(className, reward));
+        _settings.SkyQuestCompleted.Contains(SkyRewardKey(className, reward),
+            StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Reward turned in (#73): completing checks the reward's items too —
     /// they were acquired and then handed over. Unchecking reopens the quest but
