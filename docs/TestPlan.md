@@ -191,6 +191,8 @@ and it was silent with two, which is what made #169 so hard to place.
 | One EQBuddy per profile on **every** platform; a second launch surfaces the running copy rather than starting a twin | **Auto** — `SingleInstanceTests` (#169) |
 | An isolated `EQBUDDY_APPDATA` profile still runs alongside a normal install | **Auto** — `SingleInstanceTests` |
 | A stale lock that nobody answers never stops EQBuddy from launching | **Auto** — `SingleInstanceTests` |
+| **The guard holds across BUILDS, not just within one**: the WPF widget and the Avalonia widget cannot both run on one profile, in either order. A guard implemented per toolkit — a named mutex on one side, a lock file on the other — guards nothing (2026-08-19) | **Manual** — launch both builds at one `EQBUDDY_APPDATA` and confirm the second exits 0 in silence |
+| **Standing down is an EXIT, not a crash**: the Avalonia build claims the profile before Avalonia is built, because `Shutdown()` before the main loop threw an unhandled `InvalidOperationException` where the intent was to leave quietly | **Manual** — same launch, check the exit code and stderr |
 | A save that is about to overwrite another writer's changes says so in `error.log` instead of reverting in silence | **Auto** — `SettingsClobberTests` (#169) |
 | …and says it once per process, not once per save | **Auto** — `SettingsClobberTests` |
 | The two hide-the-widget tick-boxes survive a real click, a reopened Options window, and a restart | **Auto** — `OptionsRenderTests` (#169) |

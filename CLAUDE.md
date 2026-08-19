@@ -271,6 +271,17 @@ Read this list before touching the areas it names. Every entry cost a release.
     → **Now guarded:** `UI.Shared/SingleInstance.cs` (one copy per profile everywhere, and
     a stale lock can never stop a launch), and `AppSettings.Save` logs once when it is
     about to overwrite a file that changed underneath it.
+    → **And the guard itself had the same hole one level up, until 2026-08-19.** Adding
+    `SingleInstance` to Avalonia left WPF on its named mutex, so there were TWO guards and
+    neither could see the other: on Windows the WPF widget and the Avalonia widget both
+    ran on one profile, tailing the same log twice, racing on `settings.json`, and both
+    wanting the EQBuddy Mobile port. David's `error.log` carried all three symptoms — the
+    overwrite warning above fired twice, each time directly after a line only the Avalonia
+    build writes, with the companion's "Only one usage of each socket address" at the same
+    timestamps. **A guard that is implemented per TOOLKIT does not guard the profile.**
+    Both builds now take the same lock, and both claim it before their UI framework
+    starts. Verified by launching the two builds against one profile in both orders and
+    against a stale lock — not by the tests passing, which they did throughout.
 14. **`TextWrapping` does nothing inside a horizontal `StackPanel`.** A stack measures its
     children with *infinite* width in the stacking direction, so the text never reaches a
     boundary to wrap at — it is CLIPPED at the panel's edge instead, silently, with no

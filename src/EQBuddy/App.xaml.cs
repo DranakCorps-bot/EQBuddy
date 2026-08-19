@@ -10,8 +10,9 @@ public partial class App : Application
 {
     private static readonly string ErrorLog = Core.AppPaths.File("error.log");
 
-    private Mutex? _instanceLock;
-    private EventWaitHandle? _showRequest;
+    /// <summary>Held for the process's lifetime — releasing it is what lets the next
+    /// launch claim the profile.</summary>
+    private IDisposable? _instanceLock;
 
     public static void LogError(object? ex)
     {
@@ -31,31 +32,36 @@ public partial class App : Application
     ///
     /// Keyed on the profile directory, not the machine, so an isolated EQBUDDY_APPDATA
     /// instance still runs alongside a normal one — that's how the app gets tested.
+    ///
+    /// **This was a named mutex, and a named mutex is invisible to the other build.**
+    /// The Avalonia app guards the same profile with <see cref="SingleInstance"/>'s lock
+    /// FILE, so on Windows the two mechanisms could not see each other and both widgets
+    /// ran at once: two tailers on one log, two whole-file writers racing on
+    /// settings.json, and two servers wanting the EQBuddy Mobile port. David's error.log
+    /// has all three — the settings-overwrite warning of trap 13 fired twice, each time
+    /// directly after a line only the Avalonia build writes, and the companion's
+    /// "Only one usage of each socket address" sits at the same timestamps (2026-08-19).
+    ///
+    /// One mechanism now, the shared one, so the guard is per PROFILE and not per
+    /// toolkit. The running copy picks the request up on its own tick (MainWindow), so
+    /// there is no waiter thread and no mutex.
     /// </summary>
     private bool ClaimSingleInstance()
     {
         try
         {
-            var key = Convert.ToHexString(SHA256.HashData(
-                Encoding.UTF8.GetBytes(Core.AppPaths.Dir.ToLowerInvariant())))[..16];
-            _instanceLock = new Mutex(initiallyOwned: true, $"Local\\EQBuddy_{key}", out var isFirst);
-            _showRequest = new EventWaitHandle(false, EventResetMode.AutoReset, $"Local\\EQBuddyShow_{key}");
+            _instanceLock = EQBuddy.UI.Shared.SingleInstance.TryClaim(Core.AppPaths.Dir);
+            if (_instanceLock is not null) return true;
 
-            if (!isFirst)
-            {
-                _showRequest.Set();   // ask the running copy to surface, then stand down
+            // Held — but only stand down if a live copy actually ANSWERS. A stale lock
+            // file must never be the reason EQBuddy won't launch: a widget that will not
+            // start is a far worse bug than two of them.
+            if (EQBuddy.UI.Shared.SingleInstance.AskRunningCopyToShow(
+                    Core.AppPaths.Dir, TimeSpan.FromSeconds(4)))
                 return false;
-            }
 
-            // Background waiter: no UI thread cost while idle.
-            var waiter = new Thread(() =>
-            {
-                while (_showRequest.WaitOne())
-                    Dispatcher.BeginInvoke(() =>
-                        (MainWindow as MainWindow)?.RestoreFromAnotherInstance());
-            })
-            { IsBackground = true, Name = "EQBuddy single-instance listener" };
-            waiter.Start();
+            Core.CoreLog.Error("Another EQBuddy holds this profile's lock but did not " +
+                "answer a show request; starting anyway.");
             return true;
         }
         catch (Exception ex)

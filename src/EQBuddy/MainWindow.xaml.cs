@@ -2189,6 +2189,7 @@ public partial class MainWindow : Window, ICardContext
 
     private void RefreshUi()
     {
+        AnswerSecondLaunch();
         UpdateFocusHide();
         ReassertTopmost();
         _stats.RegenPerTickOverride = _settings.RegenPerTickOverride;
@@ -4261,6 +4262,21 @@ public partial class MainWindow : Window, ICardContext
     /// certainly what they wanted, since the usual reason to relaunch is that the widget
     /// is hidden or buried behind a fullscreen game.
     /// </summary>
+    /// <summary>A second launch left a request in the profile directory rather than
+    /// starting a twin (see <see cref="EQBuddy.UI.Shared.SingleInstance"/>). Answering it
+    /// is also what TELLS that launch somebody is home — a request nobody consumes times
+    /// out and the second copy starts normally, so this must run on every tick and not
+    /// only while the widget is visible.
+    ///
+    /// This replaces a background thread parked on a named EventWaitHandle. The handle
+    /// was a Windows facility and the Avalonia build guards the same profile with a lock
+    /// file, so the two builds could not see each other and both ran (2026-08-19).</summary>
+    private void AnswerSecondLaunch()
+    {
+        if (EQBuddy.UI.Shared.SingleInstance.ConsumeShowRequest(AppPaths.Dir))
+            RestoreFromAnotherInstance();
+    }
+
     internal void RestoreFromAnotherInstance()
     {
         try
