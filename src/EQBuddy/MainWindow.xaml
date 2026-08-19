@@ -539,7 +539,7 @@
                         <TextBlock x:Name="TrackedHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0"/>
                     </Grid>
                 </Expander.Header>
-                <StackPanel x:Name="TrackedPanel"/>
+                <ContentControl x:Name="TrackedBody"/>
             </Expander>
 
             <Expander x:Name="RaidsSection" Style="{StaticResource Section}" Visibility="Collapsed">

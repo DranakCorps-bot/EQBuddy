@@ -399,6 +399,13 @@ Read this list before touching the areas it names. Every entry cost a release.
   the file as a real newline and break a C# string literal, and box-drawing characters
   mangle through pipes. All three happened in one session. Heredocs are fine for running
   code; they are a poor way to author it.
+- **After `release.ps1`, `shoot.ps1` photographs the WRONG WINDOW.** The release installs
+  the new build and relaunches the real app, and `shot.ps1` matches on window TITLE — so
+  the capture is your live profile, character name and all, not the throwaway fixture.
+  It looks like a fixture bug ("why is the Watch card empty?") and it is not; it is a
+  different app. Worse, it would commit a real character name into `docs/screenshots/`.
+  → **Close the real EQBuddy before shooting, or check the captured title first.** Caught
+  on 2026-08-19 by a shot that came back reading `Dranak (freeport)`.
 - **PowerShell-tool failures are not always real.** It has returned a bare exit 1 with no
   output for every command, mid-session. Run scripts as `pwsh -NoProfile -File …` through
   Bash instead, and never read a silent failure as "nothing happened" — check the side

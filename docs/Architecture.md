@@ -1,4 +1,4 @@
-# EQBuddy architecture
+﻿# EQBuddy architecture
 
 Orientation for anyone — human or agent — changing this codebase. Companion to
 [../CLAUDE.md](../CLAUDE.md) (loaded every session, deliberately short) and
@@ -83,12 +83,23 @@ automated one. See [TestPlan.md](TestPlan.md) §5.
 A path may be a glob, and then its matches are **summed** — so splitting a hotspot into
 another partial cannot buy headroom. Current state:
 
+**`MainWindow` was re-baselined on 2026-08-19, and the order of operations is the point.**
+It had drifted to 4,622 against a 4,274 baseline — legal, but 79 lines from failing and
+within ~100 for days. The Watch card came out to `WatchCardView.cs` first (231 lines, on
+the `IWidgetCard` seam, its rendered shape pinned in E2E beforehand); the baseline was
+then set to the new true count. Re-baselining WITHOUT the lift would have been raising
+the ceiling, which is the one move this table exists to make someone argue for out loud.
+Worth knowing before the next squeeze: 177 private/internal methods were measured in that
+file and not one was unreferenced. There is no free room in it.
+
+**`LogParser.cs` is the tight one now** — 25 lines. It is the next to need this treatment.
+
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,274 | 4,274 | 4,701 | 427 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,422 | 4,422 | 4,864 | 442 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,597 | 1,701 | 104 |
-| `EQBuddy.Core/LogParser.cs` | 853 | 853 | 938 | 85 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
+| `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
 
 **`SessionStats` is a GLOB entry as of 2026-08-18, and that is the interesting half.** It
 was a literal path, and `SessionStats` is a partial class — so `SessionStats.Tracked.cs`

@@ -25,6 +25,20 @@ internal static class CardParts
         text.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         return text;
     }
+
+    /// <summary>The one-line body of a card that has nothing yet. The card stays where
+    /// Options put it (David's verdict: "show what I've selected to see") and this says
+    /// what will fill it — a card that hid itself would read as a missing feature.
+    ///
+    /// The same line <c>MainWindow.EmptyCardLine</c> draws; shared here so a lifted card
+    /// does not have to reach back into the window for a TextBlock.</summary>
+    public static TextBlock EmptyLine(string text)
+    {
+        var line = DesignSystem.Text(DesignTokens.TypeRole.Caption, text);
+        line.TextWrapping = TextWrapping.Wrap;
+        line.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXxs);
+        return line;
+    }
 }
 
 /// <summary>The Motes card (Gate 5b). Its rows are ITEMS, so this is the first card to
