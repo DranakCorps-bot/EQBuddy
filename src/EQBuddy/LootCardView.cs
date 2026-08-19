@@ -206,8 +206,8 @@ internal sealed class LootCardView
             tip ?? "Click for item info (eqlwiki)", _w.ShowItemInfo);
     }
 
-    /// <summary>THE item row — one builder for the Loot card and the Loot breakout
-    /// (LW, 2026-08-18: "the more we bring the two windows together
+    /// <summary>THE item row — one builder for the Loot card, the Loot breakout and the
+    /// Progress breakout (LW, 2026-08-18: "the more we bring the two windows together
     /// visually and operate from the same source, the better"). Name + provenance run +
     /// quest badge + dim value, flat: no share bar — these rows state facts, and the
     /// underline track under every breakout row read as clutter next to the card. What

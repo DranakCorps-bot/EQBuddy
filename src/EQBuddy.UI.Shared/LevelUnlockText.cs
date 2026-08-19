@@ -12,17 +12,33 @@ public static class LevelUnlockText
     /// <summary>Section label over the ding's list: "New at level 30".</summary>
     public static string NewAtLevelLabel(int level) => $"New at level {level}";
 
-    /// <summary>Fold label for the next-milestone preview, counting each group it
-    /// holds in list order: "▸ At level 35: 2 new AA abilities, 3 new spells".</summary>
-    public static string NextLabel(int level, int aaCount, int spellCount, bool expanded)
+    /// <summary>The next-milestone preview's WORDS, counting each group it holds in list
+    /// order: "At level 35: 2 new AA abilities, 3 new spells". No chevron — a surface
+    /// that draws its own (<c>EqFoldLabel</c>) must not be handed one in the string.</summary>
+    public static string NextWords(int level, int aaCount, int spellCount)
     {
         var parts = new List<string>(2);
         if (aaCount > 0)
             parts.Add($"{aaCount} new AA " + (aaCount == 1 ? "ability" : "abilities"));
         if (spellCount > 0)
             parts.Add($"{spellCount} new spell" + (spellCount == 1 ? "" : "s"));
-        return $"{(expanded ? "▾" : "▸")} At level {level}: " + string.Join(", ", parts);
+        return $"At level {level}: " + string.Join(", ", parts);
     }
+
+    /// <summary>The same label with a typed chevron in front, for the two card surfaces
+    /// that still draw this fold as a plain TextBlock.
+    ///
+    /// **This is a hole in the glyph ratchet and it is worth knowing about.**
+    /// `DesignRatchetTests` scans SOURCE, so a glyph laundered through a shared string
+    /// helper reaches a migrated file invisibly: `MainWindow.xaml.cs` is on the ratchet
+    /// and assigns this to `NextUnlocksLabel.Text` at runtime. Gate 5c converted seven
+    /// folds to `EqFoldLabel` and missed this one for exactly that reason.
+    ///
+    /// The Progress breakout uses <see cref="NextWords"/> and draws the chevron as a
+    /// vector. The two cards should follow; until they do, this keeps them unchanged
+    /// rather than silently dropping their arrow.</summary>
+    public static string NextLabel(int level, int aaCount, int spellCount, bool expanded) =>
+        $"{(expanded ? "▾" : "▸")} " + NextWords(level, aaCount, spellCount);
 
     /// <summary>Right-column value: where the row comes from — its class, or its
     /// class-agnostic category (Archetype rows are labeled, never guessed per class:

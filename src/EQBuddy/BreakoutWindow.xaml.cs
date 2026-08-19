@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -7,10 +7,11 @@ using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
-/// <summary>Which stat a breakout window tracks. Each kind is one singleton window with its
-/// own remembered position and Fight/Session scope (Watch, Loot and Buffs have no scope —
-/// their content is session/target/class shaped, so the toggle is hidden).</summary>
-public enum BreakoutKind { Damage, Healing, Pet, Watch, Loot, Buffs }
+/// <summary>Which stat a breakout window tracks. Each kind is one singleton window with
+/// its own remembered position and Fight/Session scope (Watch, Loot, Buffs and Progress
+/// have no scope — their content is session/target/class shaped, so the toggle is
+/// hidden).</summary>
+public enum BreakoutKind { Damage, Healing, Pet, Watch, Loot, Buffs, Progress }
 
 /// <summary>
 /// A small floating bar-chart window for one stat — your damage, your healing, or the pet's
@@ -39,6 +40,7 @@ public partial class BreakoutWindow : Window
 
     private bool _fightScope;
     private string _signature = "";
+    private StatsSnapshot? _lastSnapshot;
 
     /// <summary>The Loot kind's own surface, lifted out for Gate 4 — the window keeps the
     /// chrome all six kinds share and this owns everything Loot-specific.</summary>
@@ -55,7 +57,6 @@ public partial class BreakoutWindow : Window
     /// <summary>The tick this window last painted from, so a filter click repaints now
     /// rather than up to a second later.</summary>
     internal StatsSnapshot? LastSnapshot => _lastSnapshot;
-    private StatsSnapshot? _lastSnapshot;
 
     public BreakoutWindow(AppSettings settings, BreakoutKind kind)
     {
@@ -75,7 +76,8 @@ public partial class BreakoutWindow : Window
         EmptyText.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
 
         // Sort links only make sense for ability-stat rows.
-        SortBar.Visibility = _kind is BreakoutKind.Watch or BreakoutKind.Loot or BreakoutKind.Buffs
+        SortBar.Visibility = _kind is BreakoutKind.Watch or BreakoutKind.Loot
+            or BreakoutKind.Buffs or BreakoutKind.Progress
             ? Visibility.Collapsed : Visibility.Visible;
         if (_kind == BreakoutKind.Healing) SortRate.Text = "hps";
         _sort = ParseSort(SortSetting());
@@ -85,11 +87,16 @@ public partial class BreakoutWindow : Window
         if (ScreenGuard.OnScreen(left, top, Width, 120)) { Left = left; Top = top; }
         else
         {
-            // Default column on the work area's right edge, staggered per kind so three
-            // fresh windows never open on top of each other.
+            // Default position staggered per kind so fresh windows never open on top
+            // of each other: a column down the work area's right edge, six slots tall
+            // (slot seven of a 1080p work area is off the bottom), then a second
+            // column to its left — a plain modulo wrap would land kind 6 exactly on
+            // kind 0's spot, hiding one window behind the other. Clamped to the work
+            // area's left edge: on a narrow (portrait) monitor the second column's
+            // arithmetic would otherwise walk the window clean off the screen.
             var area = SystemParameters.WorkArea;
-            Left = area.Right - Width - 40;
-            Top = area.Top + 80 + 150 * (int)kind;
+            Left = Math.Max(area.Left + 10, area.Right - Width - 40 - (Width + 30) * ((int)kind / 6));
+            Top = area.Top + 80 + 150 * ((int)kind % 6);
         }
 
         // Auto-size mode still caps the list so a 40-item session can't run the window
@@ -111,7 +118,8 @@ public partial class BreakoutWindow : Window
             CopyFight.Visibility = Visibility.Visible;
             OpenTimeline.Visibility = Visibility.Visible;
         }
-        if (_kind == BreakoutKind.Watch) ScopeBorder.Visibility = Visibility.Collapsed;
+        if (_kind is BreakoutKind.Watch or BreakoutKind.Progress)
+            ScopeBorder.Visibility = Visibility.Collapsed;
         if (_kind == BreakoutKind.Buffs)
         {
             // No Fight/Session axis here — the axis is the class combination, named
@@ -124,6 +132,14 @@ public partial class BreakoutWindow : Window
         {
             _lootView = new LootBreakoutView(this, settings);
             LootStrips.Content = _lootView.Strips;   // shown by the view's own render
+        }
+        if (_kind == BreakoutKind.Progress)
+        {
+            // This kind's subheader IS its header line — "Session · 12.3% xp, +1 lvl" is
+            // the card header relocated, not a dim caption under one (LW's design pass,
+            // 2026-08-17): accent + semibold, the StatValue treatment.
+            SubText.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+            SubText.FontWeight = FontWeights.SemiBold;
         }
 
         // The scope toggle, on the same compact segmented strip as the Loot filters —
@@ -183,6 +199,7 @@ public partial class BreakoutWindow : Window
         BreakoutKind.Pet => (_settings.BreakoutPetLeft, _settings.BreakoutPetTop),
         BreakoutKind.Watch => (_settings.BreakoutWatchLeft, _settings.BreakoutWatchTop),
         BreakoutKind.Buffs => (_settings.BreakoutBuffsLeft, _settings.BreakoutBuffsTop),
+        BreakoutKind.Progress => (_settings.BreakoutProgressLeft, _settings.BreakoutProgressTop),
         _ => (_settings.BreakoutLootLeft, _settings.BreakoutLootTop),
     };
 
@@ -235,6 +252,7 @@ public partial class BreakoutWindow : Window
         BreakoutKind.Pet => (_settings.BreakoutPetWidth, _settings.BreakoutPetHeight),
         BreakoutKind.Watch => (_settings.BreakoutWatchWidth, _settings.BreakoutWatchHeight),
         BreakoutKind.Buffs => (_settings.BreakoutBuffsWidth, _settings.BreakoutBuffsHeight),
+        BreakoutKind.Progress => (_settings.BreakoutProgressWidth, _settings.BreakoutProgressHeight),
         _ => (_settings.BreakoutLootWidth, _settings.BreakoutLootHeight),
     };
 
@@ -252,6 +270,8 @@ public partial class BreakoutWindow : Window
                 _settings.BreakoutWatchWidth = w; _settings.BreakoutWatchHeight = h; break;
             case BreakoutKind.Buffs:
                 _settings.BreakoutBuffsWidth = w; _settings.BreakoutBuffsHeight = h; break;
+            case BreakoutKind.Progress:
+                _settings.BreakoutProgressWidth = w; _settings.BreakoutProgressHeight = h; break;
             default:
                 _settings.BreakoutLootWidth = w; _settings.BreakoutLootHeight = h; break;
         }
@@ -365,6 +385,8 @@ public partial class BreakoutWindow : Window
                 _settings.BreakoutWatchLeft = Left; _settings.BreakoutWatchTop = Top; break;
             case BreakoutKind.Buffs:
                 _settings.BreakoutBuffsLeft = Left; _settings.BreakoutBuffsTop = Top; break;
+            case BreakoutKind.Progress:
+                _settings.BreakoutProgressLeft = Left; _settings.BreakoutProgressTop = Top; break;
             default:
                 _settings.BreakoutLootLeft = Left; _settings.BreakoutLootTop = Top; break;
         }
@@ -396,6 +418,7 @@ public partial class BreakoutWindow : Window
         if (_kind == BreakoutKind.Watch) { UpdateWatch(s); return; }
         if (_kind == BreakoutKind.Loot) { UpdateLoot(s); return; }
         if (_kind == BreakoutKind.Buffs) { UpdateBuffs(s); return; }
+        if (_kind == BreakoutKind.Progress) { UpdateProgress(s); return; }
         _lastFight = s.LastFight;
         _deaths = s.Deaths;
         _resists = MainWindow.SpellResistLookup(s);
@@ -549,6 +572,250 @@ public partial class BreakoutWindow : Window
         TitleText.Text = BreakoutPresentation.Title(BreakoutPresentation.Loot);
         TitleIcon.Glyph = BreakoutPresentation.Icon(BreakoutPresentation.Loot);
         _lootView?.Render(s);
+    }
+
+    // ---- the Progress breakout (LW, 2026-08-17) ----
+
+    private DateTime _lastProgressRender = DateTime.MinValue;
+    /// <summary>The live summary block, kept so the 10 s heartbeat can refresh its
+    /// drifting rates in place instead of rebuilding every row (the clocks idiom).</summary>
+    private TextBlock? _progressSummaryBlock;
+
+    /// <summary>The Progress breakout: the expanded Progress card as a floating window —
+    /// the pace summary, the ding's "New at level N" list, skill-ups, session AAs, and
+    /// the card's two ▸ folds (All AA abilities, the next-milestone preview), sharing
+    /// ShowAllAAs/ShowNextUnlocks so the two surfaces agree the way Loot's view/sort
+    /// toggles do. No Fight/Session axis — xp and skill-ups are session-shaped.</summary>
+    private void UpdateProgress(StatsSnapshot s)
+    {
+        TitleText.Text = BreakoutPresentation.Title(BreakoutPresentation.Progress);
+        TitleIcon.Glyph = BreakoutPresentation.Icon(BreakoutPresentation.Progress);
+        var ding = Main?.ProgressDingUnlocks(s) ?? LevelUnlockSet.Empty;
+        SubText.Text = "Session · " + ProgressText.Header(s, ding.Count);
+        var next = Main?.NextUnlockPreview(s);
+
+        var empty = !ProgressText.HasContent(s) && next is null;
+        EmptyText.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+        if (empty)
+        {
+            EmptyText.Text = "No xp, skill-ups or AAs seen yet.";
+            Rows.Items.Clear();
+            _signature = "";
+            return;
+        }
+
+        // The family's signature idiom: sign on the DISPLAYED facts, never on
+        // s.Version — that counter moves on every parsed log line, so mid-combat it
+        // would force a full rebuild each tick for a window about xp and AAs. The
+        // drifting rates in the summary stay OUT of the signature (trap 8); the 10 s
+        // heartbeat keeps them honest in place, below. The AA ledger signs as
+        // count + rank-sum (a purchase adds a row, a rank-up raises the sum) —
+        // joining hundreds of ledger rows per tick just to conclude "nothing
+        // changed" was the allocation this idiom exists to avoid. The class key
+        // rides along because a Quest Tracker class pick reshapes the unlock lists
+        // without touching the log, and this window should follow it as fast as
+        // the card does.
+        var classKey = Main is { } m ? string.Join(",", m.BuffSetClassSource(s).Classes) : "";
+        // SessionStart rides along so a session rollover can never alias: a new
+        // session that happens to reach the same aggregate counts is still a new
+        // session, and yesterday's skill-up rows must not survive it (review catch).
+        var sig = $"progress|{s.SessionStart?.Ticks}"
+            + $"|{s.XpTicks}:{s.XpPercent:0.0}:{s.AaGained}:{s.Levels.Count}:{s.LastLevel}"
+            + $"|{s.SkillUpTotal}:{s.SkillUps.Count}"
+            + $"|{s.AaAbilities.Count}:{s.AaAbilities.Sum(a => a.Rank)}"
+            + $"|{ding.Count}:{next?.Level}:{next?.Unlocks.Count}"
+            + $"|{_settings.ShowAllAAs}|{_settings.ShowNextUnlocks}"
+            + $"|{_dingOpen}|{_sessionAasOpen}|{_skillUpsOpen}|{classKey}";
+        var now = DateTime.Now;
+        if (sig == _signature)
+        {
+            // Facts unchanged: the heartbeat refreshes the drifting rates by writing
+            // the one TextBlock that shows them (the UpdateBuffs clocks idiom) —
+            // tearing down every row to repaint a line of text is not a refresh.
+            if (now - _lastProgressRender >= TimeSpan.FromSeconds(10)
+                && _progressSummaryBlock is { } live)
+            {
+                // Trap 12: this window is SizeToContent until manually resized, and a
+                // rate crossing a digit boundary can re-wrap the paragraph — so the
+                // block's height only ratchets up. A timer may cost one settling grow
+                // when a line genuinely fills; it may never shrink-and-grow the
+                // window's geometry over the game every ten seconds.
+                live.MinHeight = Math.Max(live.MinHeight, live.ActualHeight);
+                live.Text = ProgressText.Summary(s);
+                _lastProgressRender = now;
+            }
+            return;
+        }
+        _signature = sig;
+        _lastProgressRender = now;
+
+        Rows.Items.Clear();
+        var summary = new TextBlock
+        {
+            // Tokens, not literals: this file joined DesignRatchetTests.Migrated while
+            // the PR was open, so LW's 11 / (1,1,2,3) become the scale's own values.
+            Text = ProgressText.Summary(s),
+            FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(1, 1, DesignTokens.SpaceXxs, DesignTokens.SpaceXs),
+        };
+        summary.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+        _progressSummaryBlock = summary;
+        Rows.Items.Add(summary);
+
+        if (ding.Count > 0 && s.LastLevel is { } dingLevel)
+        {
+            var dingLabel = LevelUnlockText.NewAtLevelLabel(dingLevel);
+            AddFoldLabel(_dingOpen, _dingOpen ? dingLabel : $"{dingLabel} ({ding.Count})",
+                "AAs and spells that just became available at this session's level-up — "
+                    + "click to expand or fold",
+                () => _dingOpen = !_dingOpen);
+            if (_dingOpen)
+                AddNameValueRows(MainWindow.UnlockRows(ding), MainWindow.UnlockTooltip(ding),
+                    MainWindow.UnlockClick(ding));
+        }
+
+        // Foldable once there is anything to fold (LW's design pass); the bare label
+        // stays when empty, like the card's static header — a session with xp but no
+        // skill-ups reads "none yet" from the empty space.
+        if (s.SkillUps.Count > 0)
+        {
+            // SkillUpTotal, not the distinct-skill row count: the summary above says
+            // "3 skill-ups" for Meditate ×3, and one window must not carry two
+            // different numbers for the same fact.
+            AddFoldLabel(_skillUpsOpen, _skillUpsOpen ? "Skill-ups" : $"Skill-ups ({s.SkillUpTotal})",
+                "Skills that went up this session — click to expand or fold",
+                () => _skillUpsOpen = !_skillUpsOpen);
+            if (_skillUpsOpen)
+                AddNameValueRows(s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")),
+                    tooltip: null);
+        }
+        else AddSectionLabel("Skill-ups");
+
+        var newAas = ProgressText.SessionNewAas(s);
+        if (newAas.Count > 0)
+        {
+            // Foldable like its neighbors (LW's design pass, 2026-08-17) — open by
+            // default because session-new AAs are the headline, and window-local
+            // because the card has no fold here to stay in step with.
+            AddFoldLabel(_sessionAasOpen, _sessionAasOpen
+                    ? "AA learned this session"
+                    : $"AA learned this session ({newAas.Count})",
+                "AA abilities the log announced this session — click to expand or fold",
+                () => _sessionAasOpen = !_sessionAasOpen);
+            if (_sessionAasOpen)
+                AddNameValueRows(newAas.Select(a => (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
+                    name => AaCatalog.Find(name)?.Effect,
+                    _ => MainWindow.OpenWikiPage(MainWindow.AaWikiPage));
+        }
+
+        if (s.AaAbilities.Count > 0)
+        {
+            AddFoldLabel(_settings.ShowAllAAs, _settings.ShowAllAAs
+                    ? "All AA abilities"
+                    : $"All AA abilities ({s.AaAbilities.Count})",
+                "Everything the log's history (plus the durable ledger) says this character "
+                    + "owns — click to expand or fold",
+                () => { _settings.ShowAllAAs = !_settings.ShowAllAAs; _settings.Save(); });
+            if (_settings.ShowAllAAs)
+                AddNameValueRows(s.AaAbilities.Select(a => (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
+                    name => AaCatalog.Find(name)?.Effect,
+                    _ => MainWindow.OpenWikiPage(MainWindow.AaWikiPage));
+        }
+
+        if (next is { } nx)
+        {
+            AddFoldLabel(_settings.ShowNextUnlocks, LevelUnlockText.NextWords(
+                    nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count),
+                "Spells and AA abilities that open up at your next milestone level — "
+                    + "click to expand or fold",
+                () => { _settings.ShowNextUnlocks = !_settings.ShowNextUnlocks; _settings.Save(); });
+            if (_settings.ShowNextUnlocks)
+                AddNameValueRows(MainWindow.UnlockRows(nx.Unlocks), MainWindow.UnlockTooltip(nx.Unlocks),
+                    MainWindow.UnlockClick(nx.Unlocks));
+        }
+    }
+
+    /// <summary>Fold states for "New at level N", "Skill-ups" and "AA learned this
+    /// session" — window-local (the card has no folds here to share a setting with),
+    /// open by default: all three are the session's own news.</summary>
+    private bool _dingOpen = true;
+    private bool _sessionAasOpen = true;
+    private bool _skillUpsOpen = true;
+
+    private void AddSectionLabel(string text)
+    {
+        var label = new TextBlock { Text = text, Style = (Style)FindResource("SectionLabel") };
+        // Accent (gold in the default theme) over the style's dim: this window stacks
+        // several sections in one scroll, and dim headers between dim values made the
+        // seams invisible (LW's design pass, 2026-08-17 — the Loot window's color lesson).
+        label.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        Rows.Items.Add(label);
+    }
+
+    /// <summary>A clickable ▸/▾ fold header — the toggle flips (and, for the folds the
+    /// card shares, saves) its own state; then repaint in place (a fold that waits for
+    /// the next tick reads as a silent no-op). Folds act on the DOWN, the card's own
+    /// idiom; anything that ACTS on content (opens a page) must use
+    /// DesignSystem.WireClick instead, precisely because a fold's on-down rebuild can
+    /// strand the matching up on an element that never saw the press.</summary>
+    /// <summary>A fold heading: the chevron says which way the click goes, the words say
+    /// what it opens.
+    ///
+    /// Rebase note (2026-08-19): LW's branch typed "▾"/"▸" into the label text, which is
+    /// how every fold in the app used to do it. This file joined
+    /// <c>DesignRatchetTests.Migrated</c> while the PR was open, so the glyphs are now
+    /// <see cref="EqFoldLabel"/>'s vector — the same control the widget's own folds wear,
+    /// and the reason it exists (a glyph is tofu on a Wine prefix, #148/#166). The caller
+    /// passes <paramref name="open"/> and the WORDS; it no longer draws the arrow.</summary>
+    private void AddFoldLabel(bool open, string text, string tooltip, Action toggle)
+    {
+        var label = new EqFoldLabel
+        {
+            Section = true,
+            Ink = "AccentBrush",
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = tooltip,
+            // Transparent, not null: a StackPanel only hit-tests where its children are
+            // painted, so the gaps would be click-through (trap 16).
+            Background = System.Windows.Media.Brushes.Transparent,
+        };
+        label.Set(open, text);
+        label.MouseLeftButtonDown += (_, e) =>
+        {
+            e.Handled = true;   // a fold click is not a window drag
+            toggle();
+            _signature = "";
+            if (_lastSnapshot is { } snap) UpdateProgress(snap);
+        };
+        Rows.Items.Add(label);
+    }
+
+    /// <summary>The card's own row for Progress content (LootCardView.ItemRow — LW's
+    /// 2026-08-18 direction: breakouts read like the cards; share bars and underline
+    /// tracks belong to the comparison kinds). Tooltips attach wrapped — a plain-string
+    /// tooltip would let a long AA effect run the screen's width — and clicks ride the
+    /// press-guarded contract, so a fold's on-down rebuild can't hand a fresh row a
+    /// stray mouse-up.</summary>
+    private void AddNameValueRows(IEnumerable<(string Name, string Value)> rows,
+        Func<string, string?>? tooltip, Action<string>? onClick = null)
+    {
+        foreach (var (name, value) in rows)
+        {
+            object? tip = null;
+            if (tooltip?.Invoke(name) is { Length: > 0 } text)
+            {
+                var tipText = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, MaxWidth = 340 };
+                // Multi-line tips are stat blocks — monospace keeps their columns readable.
+                if (text.Contains('\n')) tipText.FontFamily = MainWindow.MonoFamily;
+                tip = new System.Windows.Controls.ToolTip { Content = tipText };
+            }
+            var row = LootCardView.ItemRow(Main, name, value, note: null, tip, onClick);
+            // The same whisper of right inset the Loot breakout's rows carry: these sit
+            // against the window's own scrollbar when the list overflows.
+            row.Margin = new Thickness(0, 0, DesignTokens.SpaceXxs, 0);
+            Rows.Items.Add(row);
+        }
     }
 
     // ---- the Buff Set breakout (#120 stage 2, Frankthetankk) ----

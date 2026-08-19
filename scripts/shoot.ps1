@@ -66,6 +66,13 @@ $Shots = [ordered]@{
     'damage-breakout' = @{ Title = 'Damage breakout'
                            Env = @{}
                            Set = @{ Minimized = $true; MiniStats = @('dps'); BreakoutDamageScope = 'session' } }
+    # The Progress breakout (#214, Liminal Warmth). Same staging as the others: starred
+    # while minimized is what opens it. Its folds default open so one shot shows the
+    # ding list, the skill-ups and the session AAs rather than three closed headings.
+    'progress-breakout' = @{ Title = 'Progress breakout'
+                           Env = @{}
+                           Set = @{ Minimized = $true; MiniStats = @('xp')
+                                    ShowAllAAs = $true; ShowNextUnlocks = $true } }
     'loot-breakout'   = @{ Title = 'Loot breakout'
                            Env = @{}
                            Set = @{ Minimized = $true; MiniStats = @('loot'); BreakoutLootScope = 'session' } }

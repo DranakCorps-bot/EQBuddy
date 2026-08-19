@@ -1263,17 +1263,59 @@ public partial class MainWindow : Window, ICardContext
     /// assembly (#120 stage 2) reads the same source via BuffSetClassSource.</summary>
     private IReadOnlyList<string> UnlockClasses(StatsSnapshot s) => BuffSetClassSource(s).Classes;
 
+    // Memoized like DingUnlocks above and for the same reason: the Progress breakout
+    // reads this on the 1 s tick, and the catalog scan's answer only moves on a ding,
+    // a ledger level, or a class pick (perf audit #1's rule).
+    private int? _nextLevelMemo;
+    private string _nextClassesMemo = "";
+    private (int Level, LevelUnlockSet Unlocks)? _nextUnlocks;
+
+    /// <summary>The next-milestone preview, anchored to the last level the log
+    /// announced, else the ledger's persisted one; null while no level is known. One
+    /// computation site for the card and the Progress breakout — the two must agree on
+    /// where "At N:" starts (the trap-4 lesson: one fact, two derivations, silent drift).</summary>
+    internal (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s)
+    {
+        int? knownLevel = s.LastLevel;
+        if (knownLevel is null && QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var stored)
+            knownLevel = stored;
+        var classes = UnlockClasses(s);
+        var key = string.Join(",", classes);
+        if (_nextLevelMemo != knownLevel || _nextClassesMemo != key)
+        {
+            _nextLevelMemo = knownLevel;
+            _nextClassesMemo = key;
+            _nextUnlocks = knownLevel is { } kl ? LevelUnlocks.Next(classes, kl) : null;
+        }
+        return _nextUnlocks;
+    }
+
+    /// <summary>The Progress breakout's ding pull — DingUnlocks itself stays private
+    /// with its memo; the breakout reads through this seam.</summary>
+    internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => DingUnlocks(s);
+
     /// <summary>Unlock rows for FillList: the AA group in its category order, then
     /// the Spells grouping — same list, rows told apart by their value column.</summary>
-    private static IEnumerable<(string Name, string Value)> UnlockRows(LevelUnlockSet set) =>
+    internal static IEnumerable<(string Name, string Value)> UnlockRows(LevelUnlockSet set) =>
         set.Aas.Select(a => (a.Name, LevelUnlockText.RowValue(a)))
             .Concat(set.Spells.Select(sp => (sp.Name, LevelUnlockText.SpellRowValue(sp))));
+
+    /// <summary>Where the wiki's AA facts live: one page of tables, no per-ability
+    /// pages — so an AA row's click has exactly one honest destination.</summary>
+    internal const string AaWikiPage = "Alternate Advancement";
+
+    /// <summary>Click handler for a merged unlock list (the Loot rows' click = wiki
+    /// idiom): a spell row opens its own page, an AA row opens the AA page.</summary>
+    internal static Action<string> UnlockClick(LevelUnlockSet set) =>
+        name => OpenWikiPage(
+            set.Spells.Any(sp => sp.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                ? name : AaWikiPage);
 
     /// <summary>Tooltip lookup for a merged unlock list: spell rows show which classes
     /// get the spell and when (catalog facts, never invented effect text); AA rows keep
     /// the wiki effect prose. Resolved per set, since only it knows which group a name
     /// came from.</summary>
-    private static Func<string, string?> UnlockTooltip(LevelUnlockSet set) =>
+    internal static Func<string, string?> UnlockTooltip(LevelUnlockSet set) =>
         name => set.Spells.Any(sp => sp.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
             ? LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find(name))
             : AaCatalog.Find(name)?.Effect;
@@ -2395,7 +2437,7 @@ public partial class MainWindow : Window, ICardContext
         // The ding's cue rides the header, visible while the card is closed: the header
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in
-        // UI.Shared so the Avalonia build's header says exactly the same thing.
+        // UI.Shared so the Progress breakout says exactly the same thing.
         ProgressHeader.Text = ProgressText.Header(s, DingUnlocks(s).Count);
         FactionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "—";
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
@@ -2533,10 +2575,7 @@ public partial class MainWindow : Window, ICardContext
             // that unlocks anything, anchored to the last level the log ever announced
             // (persisted per character, so it works across restarts). Hidden until a
             // level is known: previewing from an unknown level would be a guess.
-            int? knownLevel = s.LastLevel;
-            if (knownLevel is null && QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var stored)
-                knownLevel = stored;
-            var next = knownLevel is { } kl ? LevelUnlocks.Next(UnlockClasses(s), kl) : null;
+            var next = NextUnlockPreview(s);
             NextUnlocksLabel.Visibility = next is not null ? Visibility.Visible : Visibility.Collapsed;
             if (next is { } nx)
             {
@@ -3619,6 +3658,9 @@ public partial class MainWindow : Window, ICardContext
                            BreakoutKind.Healing => _settings.MiniStats.Contains("hps"),
                            BreakoutKind.Pet => _settings.MiniStats.Contains("pet"),
                            BreakoutKind.Loot => _settings.MiniStats.Contains("loot"),
+                           // The Progress card's star is the xp one — same key gates
+                           // its chip, so star + minimize opens this like the others.
+                           BreakoutKind.Progress => _settings.MiniStats.Contains("xp"),
                            // "buffs" never renders a mini chip (MiniStatOrder skips
                            // it) — the Buffs card's star gates this window alone.
                            BreakoutKind.Buffs => _settings.MiniStats.Contains("buffs"),
@@ -3767,7 +3809,8 @@ public partial class MainWindow : Window, ICardContext
                 "hps" => BreakoutKind.Healing,
                 "pet" => BreakoutKind.Pet,
                 "loot" => BreakoutKind.Loot,
-                _ => null,   // kills/procs/motes/money/xp/deaths have no breakout
+                "xp" => BreakoutKind.Progress,
+                _ => null,   // kills/procs/motes/money/deaths have no breakout
             };
             MiniChips.Children.Add(
                 MiniChip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout));
