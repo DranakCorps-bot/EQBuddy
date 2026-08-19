@@ -339,6 +339,24 @@ Read this list before touching the areas it names. Every entry cost a release.
     and six more are deliberate edit-the-JSON knobs. **When you fold a surface, check what
     still writes each setting it owned.**
 
+21. **A shot name IS a filename, and `shoot.ps1` overwrites without asking.** Adding a
+    `watch-card` shot for the Watch card would have replaced
+    `docs/screenshots/watch-card.png` — a hand-taken illustration that
+    `docs/WatchListGuide.md` embeds — with the fixture's three rules. Caught only because
+    `git status` said "M" on a file the shot had supposedly created.
+    → **Check `docs/screenshots/` and `grep` the docs for the name before adding a shot.**
+    The one that landed is `tracked-card`.
+
+22. **A surface with no fixture state cannot be reviewed, and reads as "reviewed" anyway.**
+    The Watch card's sort strip appears only above two or more rules and the Raids card's
+    body only once something is defeated — so on the default profile both are one-line
+    empty states, and a screenshot of them proves nothing about the rows underneath. This
+    is the same shape as the Gate 3 note about the spawn progress bar being unit-tested and
+    never seen.
+    → **Stage the state in `scripts/shoot.ps1` as part of the change**, not later.
+    `tracked-card` seeds rules the fixture log actually matches; `raids-card` seeds
+    `raid-kills.json` (`Raids = @{…}`, keyed `"{character}_{server}|{boss}"` lowercased).
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

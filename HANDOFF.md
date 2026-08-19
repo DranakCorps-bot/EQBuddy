@@ -8,6 +8,44 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## State: Gate 5c is FINISHED (2026-08-19). 1.93.2 is live; main is clean and pushed
+
+**2,000 unit + 231 Avalonia + 10 E2E green.** All four widget files are on
+`DesignRatchetTests.Migrated` — `MainWindow.xaml`, both `BreakoutWindow` files, and now
+**`MainWindow.xaml.cs`**, the 4,571-line hotspot that §11.8 predicted could not join.
+Full write-up in `docs/DesignSystem.md` **§11.10**; the two new traps are CLAUDE.md 21–22.
+
+**Unreleased player-visible work exists now** — chip icons, the Watch card's sort strip,
+the alert banner's lost ★, reworded tooltips. Whatever release ships next needs a
+`WhatsNew.json` entry covering it. Nothing has been released; source only, as always.
+
+### NEXT — in this order
+
+1. **`EQBuddy.Avalonia/MainWindow.cs`** — the other 4.5k-line widget, ~39 glyphs and ~104
+   literal sizes. Two of its glyph sites were already fixed in passing (the mez/slow chip
+   icons and the buff-set "missing" label) because the parity rule required it, so the
+   count is slightly lower than the last measurement. Same two-pass shape: sizes, look,
+   glyphs, look. Its own screenshot path is `tests/EQBuddy.Avalonia.Tests` render tests
+   plus `CaptureRenderedFrame`, not `shoot.ps1`.
+2. **The three heavy card BODIES** — sparkline, breakdown lists, ding unlocks. These want
+   their own session and they are the ones that buy hotspot headroom (§11.9's seam).
+   `FillList` is the shared drawing routine they all still use; `EqCardRows` is what
+   replaced it everywhere else.
+3. **5d — `Theme.xaml`'s 6 glyphs**, inside shared `ControlTemplates`, so they belong to
+   no single card.
+
+**Hotspot headroom is down to 130 lines** (`MainWindow*.xaml.cs` 4,571 against a 4,274
+baseline, limit 4,701). Pass 2 spent ~100 of it, nearly all on comments. The next change
+in that file should be a LIFT, not an addition — see CLAUDE.md's note on why another
+partial buys nothing.
+
+**Open in `SCRIBE.md`, still untaken:** item-grouped Sky search (#108/#210, "who wants
+this drop?"). **#191** (configurable mini bar) is approved and was deferred until Gate 5
+finished — Gate 5c is done, so it is unblocked as soon as 5d lands; it reworks the bar
+`MiniBarPresentation` now owns.
+
+---
+
 ## Run things in the form the allowlist grants
 
 ```bash
@@ -111,7 +149,13 @@ seen to pass for the wrong reason, and deleted.
 
 ---
 
-## Gate 5a is built; 5b–5d are the rest. Full write-up in `docs/DesignSystem.md` §11.8
+## Gate 5a–5b history. Full write-up in `docs/DesignSystem.md` §11.8–§11.9
+
+**Superseded in part by the section at the top of this file: 5c is finished.** The
+prediction below that `MainWindow.xaml.cs` "probably cannot" join the ratchet was wrong,
+and §11.10 records why — the count was mostly comments, and the concession that looked
+reasonable (exempt string literals) would have exempted the rule's own target.
+
 
 **Gate 5 does not fit in one change.** Measured before starting: **473 ratchet violations**
 across the two widget files and their Avalonia twin — 127 literal font sizes, 174 spacing

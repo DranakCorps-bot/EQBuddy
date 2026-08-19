@@ -174,8 +174,11 @@ guards below are the deliverable and not a nicety.
 | **The frameless resize band is wide enough to hit**, and still leaves the title row's controls their hit areas | **Auto** — `BreakdownRowLayoutTests`, `ResizeZonesTests` |
 | **Every window follows the widget when it auto-hides**, by default — the exceptions are named, so a window added later follows without anyone remembering (#189) | **Auto** — `FocusHideTests` |
 | **The sound picker offers every format the OS plays**, from one list both UIs compose their own picker from (#197) | **Auto** — `AlertSoundPlanTests` |
+| **A watch-rule sort strip offers the same four options in both UIs, and the stored default lights one of them** — a key spelled differently in one lane would paint a strip with nothing selected | **Auto** — `SortStripTests` |
+| **The fight-side chip stack tells its three kinds apart by VECTOR** — a spawn stopwatch, a mez crescent, a slow hourglass — not by an emoji that renders as a box under Wine | **Auto** — `ChipStackTests`, `WidgetRenderTests` |
 | A captured surface is reviewed as a real render, on a seeded session, over a plain backdrop | **Manual** — `pwsh scripts/shoot.ps1` |
 | A single card BODY can be photographed without opening every card: `EQBUDDY_EXPAND` takes card keys (`EQBUDDY_EXPAND=loot`) as well as `1` | **Manual** — `pwsh scripts/shoot.ps1 -Shot loot-card` |
+| **A card whose body only exists once there is DATA is staged, not shot empty** — the Watch strip needs two rules, the Raids rows need a clear | **Manual** — `pwsh scripts/shoot.ps1 -Shot tracked-card,raids-card` |
 
 ## 4d. Settings, and who is allowed to write them
 

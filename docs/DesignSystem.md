@@ -532,7 +532,7 @@ a rework that absorbs every open bug stops being a rework.
 | **2b** | **Lift `EqChip` / `EqSegmentedStrip` out of `QuestsWindow`** | **done** — `UI.Shared/ChipStyle.cs` + one control per UI; the Quests window now spends it. Render verified byte-for-byte unchanged |
 | 3 | Spawns + timers | **built** — `UI.Shared/TimerView.cs` is `EqTimer` + `EqProgress`; both windows rebuilt on it. reviewed; see §11.6 |
 | **4** | **Loot card + Loot breakout** | **built** — see §11.7; moved up because #198 concentrated the debt here |
-| **5** | **Main widget** | was 4 — **5a built**, see §11.8; it needs staging |
+| **5** | **Main widget** | was 4 — staged. **5a** §11.8, **5b** §11.9 (seam + three batches), **5c done** §11.10: all four widget files on the ratchet. **5d** (`Theme.xaml` templates) is what remains |
 | 6 | Mini mode + chips | carries #190, #191, #199's gesture |
 | 7 | Map | unchanged |
 | 8 | Remaining windows | Gear, Drops, History, Travel, Options (+#197), breakouts (+#182) |
@@ -766,3 +766,76 @@ from the spacing scale now.
 
 **Definition of done for the rest of 5b:** `MainWindow.xaml.cs` under ~800 lines of host
 logic, each card ≤300, both ratchets green, every card testable headless.
+
+---
+
+## 11.10 Gate 5c, finished — all four widget files on the ratchet (2026-08-19)
+
+`MainWindow.xaml`, both `BreakoutWindow` files and finally **`MainWindow.xaml.cs`** are on
+`DesignRatchetTests.Migrated`. §11.8 said the code-behind probably could not join, and the
+reason it was wrong is worth keeping.
+
+### The glyph count was mostly not glyphs
+
+~74 were counted. **56 were in COMMENTS**, where the rule's argument does not reach — a
+glyph in a comment never renders, so it cannot render at the wrong size or fail to render
+at all. Exempting them removed most of the number and, more usefully, stopped the real
+offences hiding among them.
+
+Of what was left, the tempting concession was to exempt STRING LITERALS too, on the
+grounds that CLAUDE.md permits emoji in user-facing text. Measuring killed that: the
+largest single group of quoted glyphs was not prose but **controls that happen to be
+quoted** — `AppTheme.IconButton("⧉", …)`, the mini-bar icon table, expander chevrons, a
+menu header. Exempting strings would have exempted the rule's own target.
+
+What survived was a small editorial set — text that NAMES a control. Those were
+**reworded**, not exempted, because a tooltip that draws the glyph it is explaining
+("click the 🗺 to see its quests") draws a box on exactly the prefixes where the
+explanation matters most, and that one did it twice in one sentence.
+
+**The decision is recorded in `DesignRatchetTests`' own doc comment.** It is the kind of
+rule that gets relitigated every time it is inconvenient.
+
+### Three conversions worth more than the count
+
+1. **The buff-suggestion tick and cross were click-handled TextBlocks** — #211 waiting to
+   happen. A TextBlock hit-tests across its whole layout rect and a vector only where it is
+   painted, so a naive swap ships two controls with holes in them, on a pair where a missed
+   click either adds a buff you did not want or fails to silence a suggestion you are tired
+   of. `DesignSystem.InlineIconButton`, and keyboard-reachable for the first time.
+2. **`FillList`'s quest-badge branch was dead, in that same shape.** Nothing has passed
+   `questBadges` since the Loot card moved onto `EqCardRows`, which draws that badge itself.
+   Deleted rather than converted: dead code carrying a bug already paid for is worse than
+   no code, because the next caller inherits it.
+3. **`SpawnChip.Icon` was a glyph, and all three chip windows printed it into a TextBlock.**
+   So on the Wine prefixes of #148/#166 the fight-side stack distinguished its three kinds
+   with three identical boxes — on the surface a player watches mid-pull, on the platform
+   this build exists to serve. It is an `IconPaths` name now, drawn in its own column by
+   `SpawnChipsWindow`, `MezChipsWindow` and both Avalonia twins.
+
+   **The snail did not survive as a snail.** A spiral shell legible at 12px is more drawing
+   than `IconPaths` should carry, and the chip's own label already says what it is
+   ("Slowed 55% · disease 1"). Slow is an hourglass, mez a crescent, a spawn the stopwatch
+   it already was. Meaning lives in the words; the icon separates the kinds.
+
+### The Watch card's strip was a shared decision, not a paint job
+
+Both UIs held the same four `(mode, label)` tuples inline and compared them to a STRING
+setting. A key spelled differently in one lane lights no chip at all — a segmented control
+offering four options with none selected, which is the silent no-op with the switch on the
+other side. `UI.Shared/SortStrip.ForWatchRules` owns them, both UIs render it through their
+own `EqSegmentedStrip`, and `SortStripTests` asserts every key is one the render code
+branches on and that the stored default selects one.
+
+### Two things the screenshot review needed staging for
+
+Neither the Watch card's strip nor the Raids card's boss rows could be photographed at all:
+the strip appears only above two or more rules, and the Raids body only once something is
+defeated. `shoot.ps1` gains **`tracked-card`** (three rules the fixture actually matches,
+one of them with three kinds under it so the fold shows) and **`raids-card`** (a seeded
+`raid-kills.json` with a witnessed tiered clear, an achievements-only clear with no badge,
+and the open bosses under them).
+
+**A shot name is a filename.** The Watch shot was nearly called `watch-card`, which would
+have silently overwritten `docs/screenshots/watch-card.png` — a hand-taken illustration
+that `docs/WatchListGuide.md` embeds — with the fixture's three rules.
