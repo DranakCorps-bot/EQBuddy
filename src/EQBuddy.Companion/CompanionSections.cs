@@ -215,12 +215,19 @@ public sealed record CompanionChecklistSection(
 /// ★ Ready band names rewards, and its row ids are reward keys that no tick action
 /// accepts. It rendered checkboxes anyway, so every one of them was a silent no-op, and
 /// "silent no-ops are broken" is a house rule (#212, bjstrange).</param>
+/// <param name="Title">The reward (Sky) or section (Epic) WITHOUT the class — the same
+/// split <see cref="EQBuddy.Core.QuestChecklistGroup.Title"/> carries, and for the same
+/// reason: the page's item-grouped search (#108) needs the reward on its own, and
+/// recovering it by splitting <paramref name="Heading"/> on the separator is one fact
+/// stored in one place and read out of another (trap 4) — it breaks on the first reward
+/// whose name contains the separator.</param>
 public sealed record CompanionChecklistGroup(
     string Heading,
     string? Note,
     IReadOnlyList<CompanionChecklistRow> Rows,
     string? Class = null,
-    bool Tickable = true);
+    bool Tickable = true,
+    string? Title = null);
 
 /// <summary><see cref="Id"/> is what a tap sends back to tick the row — the stored
 /// item's own id for Epics/Sky, slot|item for Gear (which has no id of its own).</summary>

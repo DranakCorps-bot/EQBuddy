@@ -72,6 +72,10 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | The contribution pack surface says what it pooled — this session, named character — rather than copying a silent scope | **Auto** — `WikiPackPresentationTests` (rule), `WikiPackRenderTests` (on screen); **Visual** — `shoot.ps1 -Shot wiki-pack` |
 | Copy is offered only when there is something to paste, and a disabled Copy LOOKS disabled | **Auto** — `WikiPackPresentationTests`, `WikiPackRenderTests` (trap 17) |
 | What the pack window lists is what the clipboard export contains | **Auto** — `WikiPackPresentationTests` — both read the same observations |
+| **Searching a checklist groups by ITEM, so one drop several classes want is one block and not one section per class** | **Auto** — `QuestChecklistSearchTests` (#108, regressed by the Gate 2 rebuild); **Visual** — `shoot.ps1 -Shot sky-item-search` |
+| A checklist search crosses every class and ignores the class picker and state lens — and says so on screen, because those controls stay visible | **Auto** — `QuestChecklistSearchTests` |
+| The mobile page's checklist search carries the same scope wording as Core | **Auto** — `QuestChecklistSearchTests` — the page mirrors the rule in JS, so the strings are pinned equal |
+| Item-grouped results stay tickable, and the Sky ready band is never searched as though its rewards were items | **Auto** — `QuestChecklistSearchTests` (#212's lesson) |
 | Zone-knowledge share strings round-trip; imports preview every change; wild timers arrive flagged | **Auto** — `SpawnPointLedgerTests` |
 | Fuzzy kill matching never bridges name-family siblings: a shared prefix with a different last word is another mob unless one truncates the other | **Auto** — `SpawnTimerTests` (Sol A CWG models, 2026-08-16) |
 | Spawn timers only learn from the named's own kills and sightings — a placeholder death restarts the clock but a gap or elapsed measured from it teaches nothing | **Auto** — `SpawnTimerTests` (the 93-second EXG, 2026-08-16) |

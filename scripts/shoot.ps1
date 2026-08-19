@@ -185,6 +185,22 @@ $Shots = [ordered]@{
                                    @{ Id = 'shot-kills'; Name = 'Giant spiders'
                                       Pattern = 'giant spider'; Kind = 1 }
                                ) } }
+    # "Who wants this drop?" (#108, liminalwarmth) — the item-grouped search. Trap 22: this
+    # layout EXISTS ONLY WHILE A QUERY IS LIVE, so with no staged search the tab shows the
+    # ordinary per-class list and a shot of it proves nothing about the feature. The query
+    # rides in on EQBUDDY_QUESTS after the colon.
+    #
+    # "Wind Rune Azia" is the case the ask was about: SEVEN classes want that one drop, so
+    # before this it was seven sections to scroll between. Two are pre-ticked so the
+    # "N of 7 in hand" count has something to say, and one of the seven belongs to a class
+    # the fixture does not play — which is the point, since search crosses the class picker.
+    'sky-item-search' = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'sky:Wind Rune Azia' }
+                           Ledger = @{ Classes = @('Warrior', 'Bard') }
+                           Set = @{ SkyQuestChecklist = @(
+                                   @{ Id = 'sky-002'; Acquired = $true }   # Bard
+                                   @{ Id = 'sky-199'; Acquired = $true }   # Warrior
+                               ) } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }

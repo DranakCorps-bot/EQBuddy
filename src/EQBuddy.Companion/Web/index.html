@@ -949,10 +949,92 @@ function boot() {
   // names the desktop still applies. opts.filter narrows rows by text and
   // opts.classes drops groups naming a class outside the pick, both exactly as the
   // desktop quest window filters its own checklist tabs.
+  // The item-grouped search result: one heading per ITEM, and under it every class that
+  // wants it, each still a live tick. See the note in checklistBody — Core owns the rule.
+  function checklistSearchBody(surface, data, opts, filter) {
+    const wrap = el("div", "card");
+    const hit = t => (t || "").toLowerCase().includes(filter);
+    const tickable = !!opts.tickable;
+    const byItem = new Map();
+    for (const g of data.groups || []) {
+      // A SUMMARY group's rows are not items — the Sky ready band names REWARDS and its
+      // ids are reward keys no tick accepts (#212). Searching them would list a reward
+      // as though it were a drop.
+      if (g.tickable === false) continue;
+      const groupHit = hit(g.title) || hit(g.heading);
+      for (const r of g.rows || []) {
+        if (!(groupHit || hit(r.text) || hit(r.detail))) continue;
+        const key = (r.text || "").toLowerCase();
+        let m = byItem.get(key);
+        if (!m) byItem.set(key, m = { title: r.text, wanters: [] });
+        m.wanters.push({ row: r, cls: g.class || "", reward: g.title || g.heading || "" });
+      }
+    }
+    const matches = [...byItem.values()].map(m => {
+      m.wanters.sort((a, b) => (a.cls + a.reward).localeCompare(b.cls + b.reward));
+      m.classes = new Set(m.wanters.map(w => (w.cls || "").toLowerCase())).size;
+      m.held = m.wanters.filter(w => w.row.done).length;
+      return m;
+    }).sort((a, b) => b.classes - a.classes || a.title.localeCompare(b.title));
+
+    if (!matches.length) {
+      wrap.replaceChildren(el("div", "empty",
+        "Nothing on this checklist matches that search. It looks at item names, reward "
+        + "names and drop locations, across every class — so this is the whole checklist "
+        + "saying no, not a filter narrowing it."));
+      return wrap;
+    }
+
+    // Mirrors QuestChecklistLayout.SearchScopeNote, which is the authority — the class
+    // chips and the state filter stay on screen above these results and no longer narrow
+    // them, so without this they are controls that look live and do nothing.
+    // QuestChecklistSearchTests pins the two strings equal.
+    wrap.appendChild(el("div", "note",
+      "Searching every class — the class picker and the state filter don't narrow this."));
+    for (const m of matches) {
+      const h = el("h3", "group");
+      h.append(el("span", null, m.title));
+      // The one line #108 asked for in as many words: who wants this drop.
+      h.append(el("span", "note",
+        (m.classes === 1 ? "1 class wants this" : m.classes + " classes want this")
+        + " · " + m.held + " of " + m.wanters.length + " in hand"));
+      wrap.appendChild(h);
+      const ul = el("ul", "rows");
+      for (const w of m.wanters) {
+        const r = w.row;
+        const li = el("li", (r.done ? "done " : "") + (tickable ? "tickable" : ""));
+        const rn = el("div", "rn", (w.cls ? w.cls + " · " : "") + w.reward);
+        if (r.detail) rn.appendChild(el("span", "sub", r.detail));
+        if (tickable) {
+          const cb = el("input");
+          cb.type = "checkbox"; cb.checked = !!r.done;
+          cb.onchange = () => {
+            r.done = cb.checked;
+            li.classList.toggle("done", cb.checked);
+            sendTick(surface, r.id, cb.checked);
+          };
+          li.appendChild(cb);
+        }
+        li.appendChild(rn);
+        ul.appendChild(li);
+      }
+      wrap.appendChild(ul);
+    }
+    return wrap;
+  }
+
   function checklistBody(surface, data, opts) {
     opts = opts || {};
     const filter = (opts.filter || "").toLowerCase();
     const wrap = el("div", "card");
+    // SEARCHING IS NOT FILTERING (#108, liminalwarmth). A query rearranges the list by
+    // ITEM and crosses every class — "who wants this drop" cannot be answered inside one
+    // class's pick — so it runs before the class scope below and returns its own layout.
+    // Core's QuestChecklistLayout.SearchByItem is the AUTHORITY for this rule; this is a
+    // mirror of it, because search runs on the phone (no round trip per keystroke) and
+    // the page cannot call into Core. Keep the two in step: same match fields, same
+    // most-wanted-first order.
+    if (filter) return checklistSearchBody(surface, data, opts, filter);
     let any = false;
     for (const g of data.groups) {
       if (opts.classes && opts.classes.length && g.class

@@ -763,22 +763,26 @@ public sealed class QuestsWindow : Window
         RenderReadyBand(tab, inScope);
         RenderClassCounts(tab, inScope);
 
-        var matching = QuestChecklistLayout.InState(inScope, _state)
-            .Select(g => filter.Length == 0 || Hit(g.Heading)
-                ? g
-                : g with { Rows = [.. g.Rows.Where(r => Hit(r.Title) || Hit(r.Detail))] })
-            .Where(g => g.Rows.Count > 0)
-            .ToList();
+        // SEARCHING IS NOT FILTERING (#108, liminalwarmth). A query rearranges the screen
+        // by ITEM and crosses every class — "who wants this drop" is unanswerable inside
+        // one class's filter — so it reads `groups`, not `inScope`, and skips the state
+        // lens entirely. See the WPF twin: 1.69.0 shipped it under that rule and the
+        // Gate 2 rebuild lost it. Clearing the box brings the class layout back.
+        if (filter.Length > 0)
+        {
+            RenderItemMatches(QuestChecklistLayout.SearchByItem(groups, filter), setters, tab);
+            return;
+        }
 
-        bool Hit(string s) => s.Contains(filter, StringComparison.OrdinalIgnoreCase);
+        var matching = QuestChecklistLayout.InState(inScope, _state).ToList();
 
         if (matching.Count == 0)
         {
             // NAME what emptied the list. "Nothing matches" over a checklist that is
             // merely filtered reads as a broken tracker.
+            // (A search never reaches here — it returns above with its own empty state.)
             _questsPanel.Children.Add(EmptyState(
-                filter.Length > 0 ? "Nothing on this checklist matches that search."
-                : _state != QuestChecklistLayout.StateAny
+                _state != QuestChecklistLayout.StateAny
                     ? $"Nothing here is “{_state}” right now — the state filter "
                       + "above is narrowing the list."
                 : groups.Count > 0
@@ -888,6 +892,92 @@ public sealed class QuestsWindow : Window
                     set(now);
                     _settings.Save();
                     PushUndo(row.Title, now, set);
+                    Refresh(force: true);
+                };
+                _questsPanel.Children.Add(check);
+            }
+        }
+    }
+
+    /// <summary>The item-grouped search result (#108): one heading per ITEM, and under it
+    /// every class that wants it, each still a live tick. The arrangement IS the answer —
+    /// a drop three classes are queuing for is one block here and was three sections you
+    /// had to scroll between before.</summary>
+    private void RenderItemMatches(
+        IReadOnlyList<QuestChecklistLayout.ChecklistItemMatch> matches,
+        Dictionary<string, Action<bool>> setters,
+        QuestTab tab)
+    {
+        if (matches.Count == 0)
+        {
+            _questsPanel.Children.Add(EmptyState(
+                "Nothing on this checklist matches that search. It looks at item names, "
+                + "reward names and drop locations, across every class — so this is the "
+                + "whole checklist saying no, not a filter narrowing it."));
+            return;
+        }
+
+        var scope = DesignSystem.Text(Role.Caption, QuestChecklistLayout.SearchScopeNote);
+        scope.TextWrapping = TextWrapping.Wrap;
+        scope.Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceXs, 0, 0);
+        _questsPanel.Children.Add(scope);
+
+        foreach (var match in matches)
+        {
+            var itemName = match.Title;
+            var heading = DesignSystem.Text(Role.TitleSection, itemName);
+            heading.TextWrapping = TextWrapping.Wrap;
+            heading.Margin = new Thickness(
+                DesignTokens.SpaceXxs, DesignTokens.SpaceL, 0, DesignTokens.SpaceXxs);
+            heading.Foreground = AppTheme.AccentBrush;
+            ToolTip.SetTip(heading, "Open the wiki page for this item");
+            OnClick(heading, () => OpenUrl(EqlWiki.PageUrl(itemName)));
+            _questsPanel.Children.Add(heading);
+
+            // The one line #108 asked for in as many words: who wants this drop.
+            var summary = DesignSystem.Text(Role.Caption, match.Classes == 1
+                ? $"1 class wants this · {match.Held} of {match.Total} in hand"
+                : $"{match.Classes} classes want this · {match.Held} of {match.Total} in hand");
+            summary.Margin = new Thickness(
+                DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs);
+            _questsPanel.Children.Add(summary);
+
+            foreach (var wanter in match.Wanters)
+            {
+                if (!setters.TryGetValue(wanter.RowId, out var set)) continue;
+                var line = wanter.ClassName + " · " + wanter.Reward
+                    + (wanter.Detail.Length > 0 ? "   " + wanter.Detail : "")
+                    + (wanter.RewardCompleted ? "   turned in" : "");
+                var text = DesignSystem.Text(Role.Body, line);
+                text.TextWrapping = TextWrapping.Wrap;
+                text.Foreground = wanter.Acquired ? AppTheme.DimBrush : AppTheme.TextBrush;
+
+                var check = new CheckBox
+                {
+                    Content = text,
+                    IsChecked = wanter.Acquired,
+                    Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
+                };
+                // Same lock as the class layout: a class whose epic is marked complete has
+                // rows that must not move, or the master check's undo would discard them.
+                if (tab == QuestTab.Epic
+                    && EpicCompleteToggle.IsComplete(_settings, wanter.ClassName))
+                {
+                    check.IsEnabled = false;
+                    check.Opacity = 0.5;    // trap 17: IsEnabled alone is invisible
+                    ToolTip.SetTip(check, $"{wanter.ClassName}'s epic is marked complete. "
+                        + "Clear the search and reopen it to change individual steps.");
+                }
+
+                var was = wanter.Acquired;
+                var label = itemName + " (" + wanter.ClassName + ")";
+                check.IsCheckedChanged += (_, _) =>
+                {
+                    var now = check.IsChecked == true;
+                    if (now == was) return;   // our own repaint, not a click
+                    set(now);
+                    _settings.Save();
+                    PushUndo(label, now, set);
                     Refresh(force: true);
                 };
                 _questsPanel.Children.Add(check);

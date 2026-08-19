@@ -43,7 +43,8 @@ public static partial class CompanionProjection
                             i.QuestItem.Length > 0 ? i.QuestItem : i.Reward,
                             Detail(i),
                             i.Acquired)),
-                ]))
+                ],
+                Title: g.Key.Section))
             .ToList();
 
         return new CompanionChecklistSection(scoped.Count(i => i.Acquired), scoped.Count, groups);
@@ -125,7 +126,8 @@ public static partial class CompanionProjection
                 r.Title,
                 r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
                 r.Acquired))],
-            Class: g.ClassName)));
+            Class: g.ClassName,
+            Title: g.Title)));
 
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);

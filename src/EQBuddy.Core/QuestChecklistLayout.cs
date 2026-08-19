@@ -253,6 +253,111 @@ public static class QuestChecklistLayout
     /// thing on every screen.</summary>
     public static string RewardKey(string className, string reward) => className + "|" + reward;
 
+    // ---- "who wants this drop?" (#108, liminalwarmth) --------------------------------
+    //
+    // The original ask was "clicking through each class scrolling for a drop is tedious",
+    // and 1.69.0 answered it: type part of an item name and every class's matching rows
+    // appear AT ONCE, grouped by ITEM, across all classes and ignoring the state filter.
+    //
+    // The Gate 2 rebuild kept a search box and lost both halves of that. Searching now
+    // narrows rows INSIDE the per-class reward sections — so a drop three classes want
+    // is three sections you still have to scroll between, which is the tedium the ask
+    // named — and the query is applied AFTER the class picker, the class lens and the
+    // state lens, so a match outside the current filters simply is not there. Same shape
+    // as the write-only settings in trap 20: the data survived the move, the capability
+    // did not, and nothing could see it.
+    //
+    // It lands HERE rather than in a window for the #184 reason: grouping and ordering
+    // are this file's job, and the two desktops plus EQBuddy Mobile have to agree.
+
+    /// <summary>Said on every surface that draws an item-grouped result, because the
+    /// screenshot review found the gap the rule creates: the class lens and the state
+    /// combo are still on screen above the results and no longer narrow them, so without
+    /// this they are controls that look live and do nothing — "silent no-ops are broken",
+    /// with the switch on the other side. The search box's own tooltip already promised
+    /// this behaviour; the results have to say it too, where it is being relied on.</summary>
+    public const string SearchScopeNote =
+        "Searching every class — the class picker and the state filter don't narrow this.";
+
+    /// <summary>One class that wants a given item, and where it wants it.</summary>
+    /// <param name="RowId">The checklist row, so a view can wire the SAME tick it would
+    /// wire in the normal layout — an item-grouped result is a different arrangement of
+    /// the rows, not a read-only report.</param>
+    public sealed record ChecklistItemWanter(
+        string RowId,
+        string ClassName,
+        string Reward,
+        string Detail,
+        bool Acquired,
+        bool RewardCompleted);
+
+    /// <summary>An item, and every class whose checklist asks for it.</summary>
+    public sealed record ChecklistItemMatch(
+        string Title,
+        IReadOnlyList<ChecklistItemWanter> Wanters)
+    {
+        public int Held => Wanters.Count(w => w.Acquired);
+        public int Total => Wanters.Count;
+
+        /// <summary>"3 classes want this" is the answer #108 asked for; one class is a
+        /// statement about that class instead.</summary>
+        public int Classes => Wanters
+            .Select(w => w.ClassName)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+    }
+
+    /// <summary>Search a checklist by item, across every class.
+    ///
+    /// <para><b>Pass the UNFILTERED groups.</b> Search deliberately ignores the class
+    /// picker, the class lens and the state lens — "filters shape the tabs, never the
+    /// search", the same rule the General tab already follows and the rule 1.69.0
+    /// shipped this under. A cross-class question answered inside one class's filter is
+    /// not answered at all.</para>
+    ///
+    /// <para>A query matching a REWARD name pulls in all of that reward's rows, because
+    /// "any part of an item (or reward) name" is what the search box has always
+    /// promised.</para>
+    /// </summary>
+    /// <returns>Empty when the query is blank — the caller draws its normal layout.</returns>
+    public static IReadOnlyList<ChecklistItemMatch> SearchByItem(
+        IEnumerable<QuestChecklistGroup> groups, string? query)
+    {
+        if (string.IsNullOrWhiteSpace(query)) return [];
+        var q = query.Trim();
+
+        var wanters = new List<(string Title, ChecklistItemWanter Wanter)>();
+        foreach (var group in groups)
+        {
+            var rewardHit = Hit(group.Title) || Hit(group.ClassName + " · " + group.Title);
+            foreach (var row in group.Rows)
+                if (rewardHit || Hit(row.Title) || Hit(row.Detail))
+                    wanters.Add((row.Title, new ChecklistItemWanter(
+                        row.Id, row.ClassName, group.Title, row.Detail,
+                        row.Acquired, group.Completed)));
+        }
+
+        return
+        [
+            .. wanters
+                .GroupBy(w => w.Title, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new ChecklistItemMatch(
+                    g.First().Title,
+                    [
+                        .. g.Select(x => x.Wanter)
+                            .OrderBy(w => w.ClassName, StringComparer.OrdinalIgnoreCase)
+                            .ThenBy(w => w.Reward, StringComparer.OrdinalIgnoreCase),
+                    ]))
+                // Most-wanted first: the whole point is "who wants this drop", so the
+                // item three classes are queuing for outranks the one only a bard needs.
+                // Then alphabetical, so a repeated search lands in the same place.
+                .OrderByDescending(m => m.Classes)
+                .ThenBy(m => m.Title, StringComparer.OrdinalIgnoreCase),
+        ];
+
+        bool Hit(string s) => s.Contains(q, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>"Cilin Spellsinger · Isle 6: Bazzt Zzzt" — whichever halves exist. The
     /// drop location is the half #184 asked for back, and the half that was never drawn.</summary>
     private static string Detail(string npc, string source)

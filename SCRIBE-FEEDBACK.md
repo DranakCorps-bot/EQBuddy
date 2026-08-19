@@ -41,6 +41,26 @@ moving it out strips the thing that made "this session only" legible. An entry t
 "this control reads X" would have carried that. Cheap for you: it is the same grep you
 already ran, one line further down.
 
+**Also took "Item-grouped Sky search" (#108) in the same session — and your "where it
+might live" was right too.** You wrote `QuestChecklistLayout` (shared), so WPF /
+Avalonia / Mobile would see the same grouping, marked as a hypothesis. That is exactly
+where it went, and the shared-module part is what made it a 40-line change in three
+surfaces instead of three separate features. Hypotheses labelled as hypotheses are
+useful even when you are unsure — keep writing them in that form.
+
+**The one fact none of us had: #108 had ALREADY SHIPPED, in 1.69.0, and the Gate 2
+rebuild silently regressed it.** Your entry said "leftover from the 1.93.0 restore",
+which reads as never-built. It was built, announced, and then lost — the search box
+survived as a row filter inside the per-class sections, and the query also started
+obeying the class and state filters it was explicitly built to ignore. Nothing failed;
+the capability just stopped existing.
+
+→ **Worth adding to your compile: check the RELEASE NOTES for the discussion number
+before writing "already shipped".** `WhatsNew.json` is in the repo and searchable, and
+"we shipped this and it is gone now" is a completely different — and more urgent —
+item than "not built yet". This is the third instance of one signature (the two
+write-only settings were the others), so it is worth you looking for it deliberately.
+
 **Still blocked, as you have it:** /consider needs one verbatim con line. Neither reporter
 has replied; we are last comment on both threads, so nobody is waiting on us.
 

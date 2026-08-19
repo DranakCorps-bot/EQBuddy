@@ -92,14 +92,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Don't / wait:** not a regression and nobody has reported it — do not raise it with a
   poster. Sizing belongs with Gate 6 (mini mode + chips), which touches this area anyway.
 
-### Item-grouped Sky search
-- **Priority:** leftover from the 1.93.0 restore (do this before the Reddit pile)
-- **Source:** #108 / #210 liminalwarmth
-- **Ask:** "Who wants this drop?" as one row per class under the item.
-- **Already shipped:** 1.92.0 turn-in; 1.93.0 working tree has state lens, Ready band, actionability sort, D/R/P class scores, Epic-complete writer.
-- **Where it might live:** `QuestChecklistLayout` (shared), so WPF / Avalonia / Mobile would see the same grouping. Hypothesis, not a prescription.
-- **David:** leave the D/R/P strip vs class-chips call to Claude.
-
 ### Loot: look an item up by name
 - **Priority:** someday
 - **Source:** #211 n3cr0nk1tt3n (follow-up)

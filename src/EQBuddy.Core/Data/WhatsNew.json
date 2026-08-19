@@ -7,7 +7,9 @@
    "It now SHOWS you what it is about to copy, and says out loud that it covers THIS SESSION only. The old button copied whatever the Drops window was filtered to — obvious while you stood in front of that list, invisible from anywhere else. Pooling your whole logged history is the next step and is being scoped.",
    "A creature whose wiki page could not be read says \"not checked yet\" and is kept out of the pack — never quietly counted as \"nothing new\". And if the wiki already has everything you looted, it says so: that is the wiki being in good shape, not EQBuddy finding nothing.",
    "Drops by Creature keeps its live view exactly as it was — it answers \"is this trip worth it\", which is a different question. The ✦ marker stays on the rows, and clicking one now opens the pack instead of silently filling your clipboard.",
-   "Linux and macOS get the same window in the same build, composed from the same shared module as Windows rather than a second implementation."
+   "Linux and macOS get the same window in the same build, composed from the same shared module as Windows rather than a second implementation.",
+   "FIXED — \"WHO WANTS THIS DROP?\" IS BACK. Searching the Plane of Sky or Epic checklist groups the results by ITEM again, with every class that wants it listed underneath and still tickable: \"Wind Rune Azia · 7 classes want this · 2 of 7 in hand\", one block instead of seven sections to scroll between. This shipped in 1.69.0 for liminalwarmth (#108) and the Quest Tracker rebuild quietly lost it — the box survived as a row filter inside the per-class sections, which is the exact tedium the original ask was about.",
+   "And searching crosses every class again, ignoring the class picker and the state filter the way it always promised to — a cross-class question answered inside one class's filter is not answered at all. The results say so on screen, since those controls stay visible above them. Phone included: EQBuddy Mobile's checklist search got the same rearrangement in the same update."
   ]
  },
  {
