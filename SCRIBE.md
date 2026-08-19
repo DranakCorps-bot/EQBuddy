@@ -16,6 +16,15 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Server rollback leaves archives ahead of the world
+- **Priority:** must-fix
+- **Place:** session archives / the all-time stats direction. Not Gate 5 UI.
+- **Source:** #215 n3cr0nk1tt3n Aug 18, 8:20 PM CT. Footer: EQBuddy 1.93.2 · Windows 26200. Thanked.
+- **Ask:** "servers will roll back, such as right now (Freeport was rolled back 20 minutes). However, this does affect the tracking of xp, levelups, and loot in the archives. We can't undo the rollback, but we should be able to snapshot and reference where we are reset to for xp."
+- **Already shipped:** nothing known that marks a rollback. Do not assert archive format without a quote.
+- **Where it might live:** hypothesis — a bookmark at rollback time against the archives already on disk, not rewriting the rolled-back window.
+
+
 ### Linux build has no Mobile companion switch
 - **Priority:** approved (mobile and desktop are both first-class; Linux is a desktop surface)
 - **Place:** companion enable on Avalonia/Linux. Not Gate 5.
