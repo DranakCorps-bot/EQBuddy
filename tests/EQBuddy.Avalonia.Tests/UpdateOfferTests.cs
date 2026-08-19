@@ -1,12 +1,14 @@
 using EQBuddy.Core;
+using Desktop = EQBuddy.Avalonia.UpdateOffer.Desktop;
 
 namespace EQBuddy.Avalonia.Tests;
 
 /// <summary>
-/// Pins the platform routing of the update banner (issues #30 and #56): Windows installs
-/// or is sent to the installer, Linux is pointed at the tarball asset — never at
-/// EQBuddySetup.exe. Pure-function tests; the real click handler feeds these outputs to
-/// Process.Start and the banner TextBlock verbatim.
+/// Pins the platform routing of the update banner (issues #30, #56 and #93): Windows
+/// installs or is sent to the installer, Linux is pointed at the tarball, macOS at its
+/// own zip — and none of them is ever shown EQBuddySetup.exe or each other's artifact.
+/// Pure-function tests; the real click handler feeds these outputs to Process.Start and
+/// the banner TextBlock verbatim.
 /// </summary>
 public class UpdateOfferTests
 {
@@ -15,7 +17,9 @@ public class UpdateOfferTests
     private static UpdateInfo FullRelease => new(V, SetupPath: null,
         DownloadUrl: "https://gh/EQBuddySetup.exe",
         Sha256Url: "https://gh/EQBuddySetup.exe.sha256",
-        LinuxTarballUrl: "https://gh/EQBuddy-linux-x64.tar.gz");
+        LinuxTarballUrl: "https://gh/EQBuddy-linux-x64.tar.gz",
+        MacArm64Url: "https://gh/EQBuddy-osx-arm64.zip",
+        MacX64Url: "https://gh/EQBuddy-osx-x64.zip");
 
     private static UpdateInfo WindowsOnlyRelease => new(V, SetupPath: null,
         DownloadUrl: "https://gh/EQBuddySetup.exe",
@@ -28,42 +32,101 @@ public class UpdateOfferTests
     [Fact]
     public void WindowsAutoInstallsFromGitHubOrOneDrive()
     {
-        Assert.True(UpdateOffer.CanAutoInstall(FullRelease, isWindows: true));
-        Assert.True(UpdateOffer.CanAutoInstall(OneDriveUpdate, isWindows: true));
-        Assert.Contains("click here to install", UpdateOffer.OfferText(FullRelease, isWindows: true));
+        Assert.True(UpdateOffer.CanAutoInstall(FullRelease, Desktop.Windows));
+        Assert.True(UpdateOffer.CanAutoInstall(OneDriveUpdate, Desktop.Windows));
+        Assert.Contains("click here to install", UpdateOffer.OfferText(FullRelease, Desktop.Windows));
     }
 
-    // ---- Linux never touches the installer ----
+    // ---- Nothing off Windows touches the installer ----
+
+    /// <summary>Looped rather than a [Theory]: Desktop is internal to the Avalonia
+    /// assembly (this project sees it through InternalsVisibleTo), and an internal type
+    /// cannot appear in a public test signature. The platform is named in each assert so
+    /// a failure still says which one.</summary>
+    private static readonly Desktop[] OffWindows =
+        [Desktop.Linux, Desktop.MacArm64, Desktop.MacX64];
 
     [Fact]
-    public void LinuxNeverAutoInstalls()
+    public void NoDesktopOffWindowsAutoInstalls()
     {
-        Assert.False(UpdateOffer.CanAutoInstall(FullRelease, isWindows: false));
-        Assert.False(UpdateOffer.CanAutoInstall(OneDriveUpdate, isWindows: false));
+        foreach (var platform in OffWindows)
+        {
+            Assert.False(UpdateOffer.CanAutoInstall(FullRelease, platform), $"{platform}");
+            Assert.False(UpdateOffer.CanAutoInstall(OneDriveUpdate, platform), $"{platform}");
+            Assert.DoesNotContain("EQBuddySetup.exe", UpdateOffer.OfferText(FullRelease, platform));
+            Assert.DoesNotContain("EQBuddySetup.exe", UpdateOffer.OpenedText(FullRelease, platform));
+        }
     }
 
-    /// <summary>The heart of issue #56: the click on Linux must land on the tarball asset,
-    /// and nothing user-visible may mention the Windows installer.</summary>
+    /// <summary>The heart of issue #56: the click on Linux lands on the tarball asset.</summary>
     [Fact]
     public void LinuxIsPointedAtTheTarballAsset()
     {
         Assert.Equal("https://gh/EQBuddy-linux-x64.tar.gz",
-            UpdateOffer.BrowserTarget(FullRelease, isWindows: false));
-
-        Assert.Contains("EQBuddy-linux-x64.tar.gz", UpdateOffer.OfferText(FullRelease, isWindows: false));
-        Assert.DoesNotContain("EQBuddySetup.exe", UpdateOffer.OfferText(FullRelease, isWindows: false));
-        Assert.DoesNotContain("EQBuddySetup.exe", UpdateOffer.OpenedText(FullRelease, isWindows: false));
+            UpdateOffer.BrowserTarget(FullRelease, Desktop.Linux));
+        Assert.Contains("EQBuddy-linux-x64.tar.gz", UpdateOffer.OfferText(FullRelease, Desktop.Linux));
     }
 
-    /// <summary>A fresh release may not have its tarball yet (CI attaches it minutes after
-    /// publish). Linux still learns about the update and gets the release page.</summary>
+    /// <summary>#93 (Amatyr): a Mac was offered the LINUX tarball, because every decision
+    /// here took a single bool and "not Windows" meant Linux. Each Mac architecture gets
+    /// its own zip — the native builds have been on every release since the workflow that
+    /// makes them was added for this very discussion.</summary>
     [Fact]
-    public void LinuxFallsBackToTheReleasePageWhenTheTarballIsMissing()
+    public void MacIsPointedAtItsOwnBuild()
     {
-        Assert.Equal(UpdateChecker.GitHubLatestPage,
-            UpdateOffer.BrowserTarget(WindowsOnlyRelease, isWindows: false));
-        Assert.Contains("download page", UpdateOffer.OfferText(WindowsOnlyRelease, isWindows: false));
-        Assert.Contains("EQBuddy-linux-x64.tar.gz", UpdateOffer.OpenedText(WindowsOnlyRelease, isWindows: false));
+        (Desktop Platform, string Url, string Asset)[] cases =
+        [
+            (Desktop.MacArm64, "https://gh/EQBuddy-osx-arm64.zip", "EQBuddy-osx-arm64.zip"),
+            (Desktop.MacX64, "https://gh/EQBuddy-osx-x64.zip", "EQBuddy-osx-x64.zip"),
+        ];
+        foreach (var (platform, url, asset) in cases)
+        {
+            Assert.Equal(url, UpdateOffer.BrowserTarget(FullRelease, platform));
+            Assert.Contains(asset, UpdateOffer.OfferText(FullRelease, platform));
+            Assert.Contains(asset, UpdateOffer.OpenedText(FullRelease, platform));
+        }
+    }
+
+    /// <summary>The regression itself, stated as the thing that must never come back: no
+    /// Mac string and no Mac URL may mention the Linux tarball.</summary>
+    [Fact]
+    public void MacIsNeverOfferedTheLinuxTarball()
+    {
+        foreach (var platform in new[] { Desktop.MacArm64, Desktop.MacX64 })
+        {
+            Assert.DoesNotContain("linux", UpdateOffer.BrowserTarget(FullRelease, platform),
+                StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("linux", UpdateOffer.OfferText(FullRelease, platform),
+                StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("linux", UpdateOffer.OpenedText(FullRelease, platform),
+                StringComparison.OrdinalIgnoreCase);
+            // And the fallback path stays clean too — that is the one Amatyr would have
+            // hit in the minutes after a release, before CI attaches the platform builds.
+            Assert.DoesNotContain("linux", UpdateOffer.OpenedText(WindowsOnlyRelease, platform),
+                StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>A fresh release may not have its platform build yet (CI attaches it
+    /// minutes after publish). Every desktop still learns about the update and gets the
+    /// release page rather than a link that 404s.</summary>
+    [Fact]
+    public void AMissingPlatformBuildFallsBackToTheReleasePage()
+    {
+        (Desktop Platform, string Asset)[] cases =
+        [
+            (Desktop.Linux, "EQBuddy-linux-x64.tar.gz"),
+            (Desktop.MacArm64, "EQBuddy-osx-arm64.zip"),
+            (Desktop.MacX64, "EQBuddy-osx-x64.zip"),
+        ];
+        foreach (var (platform, asset) in cases)
+        {
+            Assert.Equal(UpdateChecker.GitHubLatestPage,
+                UpdateOffer.BrowserTarget(WindowsOnlyRelease, platform));
+            Assert.Contains("download page", UpdateOffer.OfferText(WindowsOnlyRelease, platform));
+            // It still NAMES the file to look for — the whole value of the fallback.
+            Assert.Contains(asset, UpdateOffer.OpenedText(WindowsOnlyRelease, platform));
+        }
     }
 
     /// <summary>#119: a portable Windows copy must never silent-install — the installer
@@ -72,23 +135,39 @@ public class UpdateOfferTests
     [Fact]
     public void PortableWindowsCopiesNeverAutoInstall()
     {
-        Assert.False(UpdateOffer.CanAutoInstall(FullRelease, isWindows: true, isInstalled: false));
+        Assert.False(UpdateOffer.CanAutoInstall(FullRelease, Desktop.Windows, isInstalled: false));
         Assert.Contains("EQBuddy-portable.zip",
-            UpdateOffer.OfferText(FullRelease, isWindows: true, isInstalled: false));
+            UpdateOffer.OfferText(FullRelease, Desktop.Windows, isInstalled: false));
         Assert.Contains("EQBuddy-portable.zip",
-            UpdateOffer.OpenedText(FullRelease, isWindows: true, isInstalled: false));
+            UpdateOffer.OpenedText(FullRelease, Desktop.Windows, isInstalled: false));
         Assert.Equal(UpdateChecker.GitHubLatestPage,
-            UpdateOffer.BrowserTarget(FullRelease, isWindows: true));
+            UpdateOffer.BrowserTarget(FullRelease, Desktop.Windows));
     }
 
     /// <summary>Windows without a verifiable installer (fail-closed path) is browser-bound
-    /// too, but goes to the release page, not the Linux tarball.</summary>
+    /// too, but goes to the release page, not to somebody else's artifact.</summary>
     [Fact]
     public void WindowsWithoutAnInstallerGetsTheReleasePage()
     {
-        var noInstaller = new UpdateInfo(V, SetupPath: null, LinuxTarballUrl: "https://gh/EQBuddy-linux-x64.tar.gz");
-        Assert.False(UpdateOffer.CanAutoInstall(noInstaller, isWindows: true));
-        Assert.Equal(UpdateChecker.GitHubLatestPage, UpdateOffer.BrowserTarget(noInstaller, isWindows: true));
-        Assert.Contains("EQBuddySetup.exe", UpdateOffer.OpenedText(noInstaller, isWindows: true));
+        var noInstaller = new UpdateInfo(V, SetupPath: null,
+            LinuxTarballUrl: "https://gh/EQBuddy-linux-x64.tar.gz",
+            MacArm64Url: "https://gh/EQBuddy-osx-arm64.zip");
+        Assert.False(UpdateOffer.CanAutoInstall(noInstaller, Desktop.Windows));
+        Assert.Equal(UpdateChecker.GitHubLatestPage,
+            UpdateOffer.BrowserTarget(noInstaller, Desktop.Windows));
+        Assert.Contains("EQBuddySetup.exe", UpdateOffer.OpenedText(noInstaller, Desktop.Windows));
+    }
+
+    /// <summary>The platform mapping itself. It cannot be asserted against a fixed answer
+    /// — the suite runs on all three — so it is checked for CONSISTENCY with the runtime,
+    /// which is what a wrong branch would break.</summary>
+    [Fact]
+    public void CurrentAgreesWithTheRunningOperatingSystem()
+    {
+        var current = UpdateOffer.Current();
+        if (OperatingSystem.IsWindows()) Assert.Equal(Desktop.Windows, current);
+        else if (OperatingSystem.IsMacOS())
+            Assert.True(current is Desktop.MacArm64 or Desktop.MacX64, $"macOS resolved to {current}");
+        else Assert.Equal(Desktop.Linux, current);
     }
 }

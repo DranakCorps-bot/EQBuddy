@@ -4466,7 +4466,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 if (info is not null && UpdateChecker.IsNewer(info))
                 {
                     _pendingUpdate = info;
-                    _updateText.Text = UpdateOffer.OfferText(info, OperatingSystem.IsWindows(),
+                    _updateText.Text = UpdateOffer.OfferText(info, UpdateOffer.Current(),
                         UpdateChecker.IsInstalledCopy);
                     _updateBanner.IsVisible = true;
                 }
@@ -4695,14 +4695,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         e.Handled = true;
         if (_pendingUpdate is not { } info || _installingUpdate) return;
 
-        if (!UpdateOffer.CanAutoInstall(info, OperatingSystem.IsWindows(), UpdateChecker.IsInstalledCopy))
+        if (!UpdateOffer.CanAutoInstall(info, UpdateOffer.Current(), UpdateChecker.IsInstalledCopy))
         {
-            var target = UpdateOffer.BrowserTarget(info, OperatingSystem.IsWindows());
+            var target = UpdateOffer.BrowserTarget(info, UpdateOffer.Current());
             try
             {
                 Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });
                 _pendingUpdate = null;
-                _updateText.Text = UpdateOffer.OpenedText(info, OperatingSystem.IsWindows(),
+                _updateText.Text = UpdateOffer.OpenedText(info, UpdateOffer.Current(),
                     UpdateChecker.IsInstalledCopy);
                 _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
             }

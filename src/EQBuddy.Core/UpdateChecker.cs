@@ -12,7 +12,9 @@ namespace EQBuddy.Core;
 /// release's EQBuddy-linux-x64.tar.gz asset when one is attached: nothing here stages or runs
 /// it, the Linux UI just hands it to the browser so users land on the right file instead of a
 /// Windows installer (issue #56).</summary>
-public sealed record UpdateInfo(Version Latest, string? SetupPath, string? DownloadUrl = null, string? Sha256Url = null, string? LinuxTarballUrl = null);
+public sealed record UpdateInfo(Version Latest, string? SetupPath, string? DownloadUrl = null,
+    string? Sha256Url = null, string? LinuxTarballUrl = null,
+    string? MacArm64Url = null, string? MacX64Url = null);
 
 /// <summary>
 /// Local-first update checker: looks for a newer EQBuddySetup.exe in the family's
@@ -24,6 +26,13 @@ public static class UpdateChecker
     private const string FolderName = "EQBuddyDownload";
     private const string SetupName = "EQBuddySetup.exe";
     public const string LinuxTarballName = "EQBuddy-linux-x64.tar.gz";
+    /// <summary>The native macOS builds. They have been attached to every release since
+    /// the workflow that builds them was added FOR discussion #93 — and until 2026-08-19
+    /// nothing pointed at them, so the update banner sent Mac users to the Linux tarball
+    /// (#93 again, Amatyr). Artifacts existing and nothing writing the link is the same
+    /// shape as trap 20, one lane over.</summary>
+    public const string MacArm64Name = "EQBuddy-osx-arm64.zip";
+    public const string MacX64Name = "EQBuddy-osx-x64.zip";
     private const string GitHubLatestApi = "https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases/latest";
     public const string GitHubLatestPage = "https://github.com/DranakCorps-bot/EQBuddy/releases/latest";
 
@@ -178,6 +187,7 @@ public static class UpdateChecker
         if (!Version.TryParse(tag.TrimStart('v', 'V'), out var v)) return null;
 
         string? downloadUrl = null, sha256Url = null, linuxTarballUrl = null;
+        string? macArm64Url = null, macX64Url = null;
         foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
         {
             var name = asset.GetProperty("name").GetString() ?? "";
@@ -185,6 +195,8 @@ public static class UpdateChecker
             if (name.Equals(SetupName, StringComparison.OrdinalIgnoreCase)) downloadUrl = url;
             else if (name.Equals(SetupName + ".sha256", StringComparison.OrdinalIgnoreCase)) sha256Url = url;
             else if (name.Equals(LinuxTarballName, StringComparison.OrdinalIgnoreCase)) linuxTarballUrl = url;
+            else if (name.Equals(MacArm64Name, StringComparison.OrdinalIgnoreCase)) macArm64Url = url;
+            else if (name.Equals(MacX64Name, StringComparison.OrdinalIgnoreCase)) macX64Url = url;
         }
 
         // Fail closed: an installer we can't verify is not one we'll download and run
@@ -196,7 +208,8 @@ public static class UpdateChecker
         // the browser — the same trust as clicking the asset on the release page.
         if (sha256Url is null) downloadUrl = null;
 
-        return new UpdateInfo(Normalize(v), SetupPath: null, downloadUrl, sha256Url, linuxTarballUrl);
+        return new UpdateInfo(Normalize(v), SetupPath: null, downloadUrl, sha256Url, linuxTarballUrl,
+            macArm64Url, macX64Url);
     }
 
     /// <summary>

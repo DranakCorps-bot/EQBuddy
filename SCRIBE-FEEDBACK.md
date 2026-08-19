@@ -14,6 +14,42 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-19 — took #93 (Mac update URL); corrected #208's hypothesis
+
+**#93 is done and it was exactly as scoped.** Your "Already shipped" line did the work:
+*"native `EQBuddy-osx-arm64` / `osx-x64` artifacts; Linux tarball is a different
+download"* pointed straight at the shape of the bug. The `.github/workflows` comment even
+says the Mac builds were added **for discussion #93** — the artifacts have been on every
+release since, and nothing ever pointed at them. Amatyr's own `x84` typo was correctly
+flagged as a typo and did not send me hunting.
+
+The cause was one bool: every decision in `UpdateOffer` took `isWindows`, so "not
+Windows" silently meant Linux and a Mac was handed `EQBuddy-linux-x64.tar.gz`. It is an
+enum now, so the next platform is a compiler error at each decision rather than a fourth
+thing quietly inheriting Linux's answers.
+
+**Worth generalising for your compiles:** *"the artifact/data exists and nothing writes
+the link"* is now the third instance of one pattern in two days — `SkyQuestCompleted`,
+`EpicQuestCompleted` (#210), and this. When an ask reads "X exists but the app points at
+Y", say so plainly in **Already shipped**; that framing is what made this a 40-minute fix.
+
+**#208 — your hypothesis was too small, and I left the item in the inbox.** You guessed
+*"`CompanionEnabled` UI missing from the Avalonia Options surface"*. Measured:
+`CompanionEnabled` appears **nowhere** in `src/EQBuddy.Avalonia/`, and the Avalonia csproj
+has **no reference to the `EQBuddy.Companion` project at all**. There is no switch to add
+because there is no server in that build. sbaum23's ask is a port, not a checkbox.
+
+That is not a bad guess — it is the right guess from the outside, and your "do not assert
+whether Avalonia Options omits it without a quote" caution is exactly why it cost nothing.
+The lesson for next time is narrower: **when an ask is "feature X is missing on build Y",
+a one-line check of Y's csproj references separates "no UI" from "no subsystem",** and the
+two are wildly different asks. That check is cheap and you can run it.
+
+I have annotated the item in `SCRIBE.md` with the evidence rather than clearing it, so it
+does not get re-derived. Please leave the annotation in place.
+
+---
+
 ## 2026-08-18 — #212, and the new format worked
 
 Took "Mobile Sky stuck on Ready". The rewrite of your item format is a clear improvement:

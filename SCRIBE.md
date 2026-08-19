@@ -16,13 +16,21 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
-### Mac in-app update points at the Linux tarball
-- **Priority:** must-fix
-- **Place:** in-app update / download URL. Native Mac builds already exist. Not Gate 5.
-- **Source:** #93 Amatyr Aug 18, 6:33 PM CT. Old thread — did not reply.
-- **Ask:** "the link in app to download the update points to EQBuddy-linux-x84.tar.gz — if it can't point to the Mac download, how about it just opens the releases page?"
-- **Already shipped:** native `EQBuddy-osx-arm64` / `osx-x64` artifacts; Linux tarball is a different download. They wrote `x84` (likely `x64`).
-- **Where it might live:** hypothesis — the Avalonia/macOS update URL or platform detector. Do not assert which file without a quote.
+### Linux build has no Mobile companion switch
+- **Priority:** approved (mobile and desktop are both first-class; Linux is a desktop surface)
+- **Place:** companion enable on Avalonia/Linux. Not Gate 5.
+- **Source:** #208 sbaum23 follow-up Aug 18, 7:37 PM CT. Same old thread — did not reply.
+- **Ask:** "I don't see the EQ Mobile option in the Linux version. Is there a way to start the mobile version from Linux?"
+- **Already shipped:** Companion exists on Windows. Do not assert whether Avalonia Options omits it without a quote.
+- **Where it might live:** hypothesis — `CompanionEnabled` UI missing from the Avalonia Options surface.
+- **Claude, 2026-08-19 — measured, and it is BIGGER than the hypothesis.** Not a missing
+  toggle: `CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/`, and
+  `EQBuddy.Avalonia.csproj` has **no ProjectReference to `EQBuddy.Companion` at all**. The
+  host, the tick and the projection feed are all absent, so there is no switch to add —
+  the server does not exist in that build. sbaum23 is right and the ask is a port, not a
+  checkbox. Left in the inbox deliberately: it is its own session, and it is worth doing,
+  because the two things CLAUDE.md calls EQBuddy's only uncontested ground — the phone and
+  the Linux/macOS build — currently cannot be used together.
 
 
 ### Token/primary unlock ticks Sky as quested
@@ -63,10 +71,12 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ### Chips and alerts ignore the parked monitor
 - **Priority:** must-fix
-- **Source:** #208 sbaum23 (Aug 17, 11:24 PM CT) — Linux / Wayland
-- **Ask:** Widget is on the non-EQ monitor (Wayland cannot overlay the game). Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.
-- **Already shipped:** he can move and save positions; restore is what fails.
-- **Where it might live:** Avalonia chip/alert window restore vs re-anchor to primary / game monitor. Hypothesis. He already accepted a second monitor — this is not "overlay fullscreen Wayland."
+- **Place:** Avalonia chip/alert restore vs Wayland compositor placement. Not overlay-over-fullscreen.
+- **Source:** #208 sbaum23 (opened Aug 17) + follow-up Aug 18, 7:37 PM CT. Old thread — did not reply.
+- **Ask:** Widget is on the non-EQ monitor. Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.
+- **New evidence (follow-up):** PopOS Cosmic / Wayland. `settings.json` DID write second-monitor coords (`AlertLeft` 3753 / `AlertTop` 228; `MezChipsLeft` 3131 / `MezChipsTop` 88 / `MezChipsBottom` 291; first monitor 2560×1440). Screenshot: Options lives on monitor 2; after close, a mez chip appears on EQ's main monitor (behind EQ, not at the dragged location). Extra: if nothing else is on the EQ screen, chips overlay EQ, FPS tanks, game loses focus until click; if another window is behind EQ, the EQ window disappears when chips show. Also asked that EQBuddy not fight to be the top window when parked on the second screen.
+- **Already shipped:** he can move and save positions; the write path is no longer the missing fact.
+- **Where it might live:** hypothesis — Wayland compositor ignores requested chip/alert coordinates (Claude already said this if the settings wrote). Do not assert Avalonia source without a quote.
 
 ### Custom alert volume is still contested
 - **Priority:** waiting (need a fact, not a fix)
