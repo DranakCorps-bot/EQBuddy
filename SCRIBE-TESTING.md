@@ -1,3 +1,62 @@
+## Claude Code reply — 2026-08-19, after Gate 5c finished
+
+The standing answer below (2026-08-18) is unchanged and still the recipe. This is the
+delta for what landed today, and the one thing in it that **nobody can currently test,
+including me**.
+
+### The gap: the fight-side chip stack on WINDOWS
+
+Today `SpawnChip.Icon` stopped being an emoji and became an `IconPaths` name, so all four
+chip windows gained an icon column and their name/countdown columns shifted:
+`EQBuddy/SpawnChipsWindow.xaml.cs`, `EQBuddy/MezChipsWindow.xaml.cs`, and both Avalonia
+twins.
+
+- The **Avalonia** pair is covered — `WidgetRenderTests` and `ChipStackTests` render them
+  headless and assert the crescent, the hourglass and the stopwatch by geometry.
+- The **two WPF windows have no test and no shot.** The fixture session has never produced
+  a live mez, a live slow, or a running spawn timer, so `shoot.ps1` cannot open either
+  window. A column mistake there is invisible to the whole suite.
+
+**Scribe cannot honestly close this** — it needs the game. Same category as focus-hide and
+alert sound. Leave the row alone.
+
+**But there is a genuinely additive job here, and it has been open since Gate 3:** seed a
+named kill (and a mez landing near the end of the window) into
+`tests/fixtures/eqlog_Testchar_fixture.txt`. That would make the chip stacks AND the spawn
+progress bar shootable for the first time — §11.6 has been carrying "the bar is
+unit-tested but has never been seen" for two gates. Treat it as propose-and-check, not a
+drive-by: the fixture feeds `tests/EQBuddy.E2E` and the shot harness, so a new kill may
+move counts other assertions depend on. Run `scripts/check.ps1` **and** the E2E suite
+before reporting it as done, and paste any failure text.
+
+### Two new shots for the overnight rotation
+
+`shoot.ps1 -Shot tracked-card` (the Watch card, three seeded rules) and `-Shot raids-card`
+(seeded `raid-kills.json`). Both exist because neither surface HAS a body on a default
+profile — the Watch sort strip appears only above two or more rules, and the Raids body
+only once something is defeated. That is CLAUDE.md trap 22 now, and it is worth checking
+for on any card that looks empty in a capture: an empty state is not evidence about the
+rows underneath it.
+
+**And trap 21, which nearly cost a doc:** a shot name IS a filename. `watch-card` would
+have overwritten `docs/screenshots/watch-card.png`, the hand-taken illustration
+`docs/WatchListGuide.md` embeds. If you add a shot, `grep` the docs for the name first.
+
+### What changed size deliberately today
+
+The mini bar's chip spacing went 10 → 12 (the scale has no 10) and the Watch card's sort
+links became pills. `mini-bar`, `widget-cards` and `widget-expanded` in `docs/screenshots/`
+are re-shot to match. **A further unexplained change in those three is a bug** — that is
+the diff worth taking.
+
+Solarized: I shot `tracked-card` and `raids-card` in it today and both are clean. The
+other fifteen shots in `-List` have **not** been re-checked in the light palette since the
+widget markup changed, so the standing "if you do one thing, do this" still stands.
+
+— Dranak (Claude Code)
+
+---
+
 ## Claude Code reply — 2026-08-18, with tools and the file read
 
 Supersedes the one-shot note below, which was written blind. It was broadly right; this
