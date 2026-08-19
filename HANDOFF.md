@@ -1,10 +1,76 @@
-# EQBuddy — handoff
+﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (23) and the
+the non-negotiable rules, the where-things-live index, the trap list (26) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
+
+---
+
+## State: 1.96.0 is LIVE and SIGNED — the first trusted release (2026-08-19 evening)
+
+`main` clean and pushed at `c4bad7e`, tag `v1.96.0`, **7 assets**, both workflows green.
+**2,147 unit + 246 Avalonia + 15 E2E.**
+
+### Publishing changed, permanently
+
+**Every release is signed, and there is no path that isn't** (David, 2026-08-19: *"note
+this is the way we need to publish going forward"*). `release.ps1` signs through
+`scripts/signing.ps1` — Azure Artifact Signing, `CN=FlossworksCross-Stitch`, issued by
+`Microsoft ID Verified CS EOC CA 03`. The self-signed cert and `new-cert.ps1` are gone.
+
+- **The only human step is `az login`** when the session expires. The dlib restores itself.
+- `artifact-signing.json` (repo root) and `tools/` are gitignored — absent on a fresh clone.
+- **Verified independently, not just reported:** `Get-AuthenticodeSignature` returns
+  **`Valid`** on `EQBuddy.exe`, `EQBuddySetup.exe` and the OneDrive copy, and the
+  downloaded GitHub asset hash-matches its published `.sha256`. The old path could only
+  ever say "signature embedded".
+- **The certificate is valid for THREE DAYS** (2026-08-19 → 08-22). The countersigned
+  timestamp is the only reason a release stays verifiable afterwards — never drop it.
+- **Do not add a `-SkipSign` or a warn-and-continue.** That is exactly how the old path
+  could ship unsigned while reporting success. CLAUDE.md carries this as a hard rule.
+
+Announced in [#123](https://github.com/DranakCorps-bot/EQBuddy/discussions/123), the thread
+that had been promised this update since 2026-08-14. **SmartScreen reputation starts at
+zero for a new publisher** — say honestly that warnings fade rather than stop dead. The
+DONATIONS half of that thread is still deliberately unbuilt and I promised no date.
+
+### What shipped in 1.96.0
+
+The **Progress theme** (`638ee68`) — the second theme, and the first since themes became
+the frame. Progress, Money, Motes, Faction and Raids became one launcher card and one
+window with four tabs (Experience · Wealth · Faction · Raids). **14 cards → 10**, on the
+WPF widget, the Avalonia widget and EQBuddy Mobile in one change.
+
+- Core `ProgressSurface` owns the tabs; UI.Shared `ProgressTheme` owns the badges and the
+  launcher line; all three surfaces read them (#210's rule).
+- **E2E pinned BEFORE the move** and the numbers came back identical three times — from
+  the card, from `RaidsCardView` after the lift, from the window after the fold: 29 raid
+  rows, 24 sold items, 1 motes row, 5 factions. MainWindow baseline lowered 4355 → 4324.
+- **Four things only a screenshot could say**, all fixed: the launcher line truncated
+  mid-word; the tab strip was a `StackPanel` so the Raids chip was clipped off the window
+  entirely (trap 14 with chips — the #184 bug); four shots now share one window title so
+  `shot.ps1` photographed the wrong app (it takes `-OwnerPid` now); "1 factions".
+- **Linux/macOS bug found on the way:** Avalonia's `WindowZoom` passed `TryGetValue`'s
+  `out` value (0.0 when absent) into the width calculation, so the Quest Tracker opened at
+  **zero width** the first time, before any Ctrl+wheel was saved. Windows was never
+  affected — the WPF twin does a second lookup with its own fallback. `WindowZoomTests`
+  pins it. **Ask the Linux/macOS reporters to confirm**; David is Windows-only.
+- CLAUDE.md gained traps 24–26.
+
+### Next
+
+**Alerts is next by the plan — but re-measure first.** ROADMAP.md and docs/Themes.md now
+say why Progress jumped the queue: the ordering predated Gate 5b lifting four card bodies.
+Alerts needs `RenderBuffs` (107 lines, into the buff-set evaluator) lifted before it buys
+anything, and would only take 14 → 13. The right question is "which theme is most nearly
+built already", not "what does the plan say next".
+
+**Still waiting on David:** the Gate 5d chevron (before/after sent 2026-08-19, no comment).
+
+**Still blocked, correctly:** `/consider` rare word (#185, #217) — neither reporter has
+pasted the verbatim line and we are last comment on both. Do not reconstruct it (#206).
 
 ---
 
