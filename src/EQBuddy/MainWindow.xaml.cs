@@ -2636,6 +2636,17 @@ public partial class MainWindow : Window, ICardContext
                     $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
+                    // The Watch card's RENDERED shape, not just its total. The total
+                    // above proves the data arrived; these prove the card drew it, and
+                    // they exist because this surface is about to be lifted into a file
+                    // of its own — the WPF layer has no unit tests (docs/TestPlan.md §5),
+                    // so an assertion from a launched app is the only thing standing
+                    // between that move and a silent regression. Row count, whether the
+                    // sort strip is up (it appears only above two or more rules), and
+                    // which sort is lit.
+                    $"watchRows={TrackedPanel.Children.Count} " +
+                    $"watchStrip={(TrackedPanel.Children.Count > 0 && TrackedPanel.Children[0] is WrapPanel ? 1 : 0)} " +
+                    $"watchSort={_settings.WatchSortMode} " +
                     $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
                     // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
                     // but only a launched app can show that its answer actually reaches

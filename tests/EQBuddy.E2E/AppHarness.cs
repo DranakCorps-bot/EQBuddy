@@ -154,6 +154,27 @@ internal sealed class AppHarness : IDisposable
             $"{reason} (debug.txt {key} to reach {expected}; last seen {DumpValue(key)})",
             Artifacts);
 
+    /// <summary>The same wait for a fact that is a WORD rather than a count — a sort
+    /// mode, a state name. The dump is space-separated <c>key=value</c>, so the value
+    /// may not contain a space.</summary>
+    public void WaitForDump(string key, string expected, string reason) =>
+        Wait.Until(() => DumpText(key) == expected, AssertTimeout,
+            $"{reason} (debug.txt {key} to read '{expected}'; last seen '{DumpText(key)}')",
+            Artifacts);
+
+    /// <summary>The raw value for a key, or "" when the dump has not appeared yet.</summary>
+    public string DumpText(string key)
+    {
+        try
+        {
+            foreach (var pair in File.ReadAllText(DebugDumpPath).Split(' '))
+                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
+                    return pair[(key.Length + 1)..];
+        }
+        catch (IOException) { }
+        return "";
+    }
+
     /// <summary>Closes the main window (WM_CLOSE — the same path as the user's ✕) and
     /// waits for the process to exit, so shutdown-time persistence has run.</summary>
     public void CloseGracefully()

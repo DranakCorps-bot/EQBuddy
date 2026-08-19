@@ -72,6 +72,44 @@ public sealed class EndToEndTests
             "--You have looted a Harness Test Widget from a training dummy's corpse.--");
 
         app.WaitForDump("tracked", 1, "the watch rule's total to increment on the match");
+
+        // The card DREW it, not merely counted it. One rule renders a heading and a
+        // "last:" line and no sort strip — the strip appears only above two or more
+        // rules, which is a rule easy to lose in a refactor and invisible to every
+        // other test. Pinned here because the Watch surface is being lifted into its
+        // own file and the WPF layer has no unit tests to catch the difference
+        // (docs/TestPlan.md §5).
+        app.WaitForDump("watchRows", 2, "a heading and a last-match line for the one rule");
+        app.WaitForDump("watchStrip", 0, "no sort strip above a single rule");
+    }
+
+    /// <summary>Two rules bring the sort strip up, and it starts on the stored default.
+    /// The strip is a shared control now (UI.Shared.SortStrip.ForWatchRules) and a key
+    /// spelled differently in one lane would paint four options with none selected —
+    /// the silent no-op this pins from the outside.</summary>
+    [Fact]
+    public void TwoWatchRules_BringUpTheSortStrip()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.TrackedRules.Add(new TrackedRule
+            {
+                Name = "Harness Test Widget", Kind = WatchKind.Loot, AlertBanner = false,
+            });
+            settings.TrackedRules.Add(new TrackedRule
+            {
+                Name = "Harness Test Trinket", Kind = WatchKind.Loot, AlertBanner = false,
+            });
+        });
+        app.Launch();
+
+        app.AppendLogLines(
+            "--You have looted a Harness Test Widget from a training dummy's corpse.--",
+            "--You have looted a Harness Test Trinket from a training dummy's corpse.--");
+
+        app.WaitForDump("tracked", 2, "both rules to count their match");
+        app.WaitForDump("watchStrip", 1, "the sort strip to appear above two rules");
+        app.WaitForDump("watchSort", "manual", "the strip to start on the stored default");
     }
 
     [Fact]
