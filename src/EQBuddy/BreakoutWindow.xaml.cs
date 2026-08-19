@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -652,8 +652,12 @@ public partial class BreakoutWindow : Window
         Rows.Items.Clear();
         var summary = new TextBlock
         {
-            Text = ProgressText.Summary(s), FontSize = 11,
-            TextWrapping = TextWrapping.Wrap, Margin = new Thickness(1, 1, 2, 3),
+            // Tokens, not literals: this file joined DesignRatchetTests.Migrated while
+            // the PR was open, so LW's 11 / (1,1,2,3) become the scale's own values.
+            Text = ProgressText.Summary(s),
+            FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(1, 1, DesignTokens.SpaceXxs, DesignTokens.SpaceXs),
         };
         summary.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
         _progressSummaryBlock = summary;
@@ -662,7 +666,7 @@ public partial class BreakoutWindow : Window
         if (ding.Count > 0 && s.LastLevel is { } dingLevel)
         {
             var dingLabel = LevelUnlockText.NewAtLevelLabel(dingLevel);
-            AddFoldLabel(_dingOpen ? $"▾ {dingLabel}" : $"▸ {dingLabel} ({ding.Count})",
+            AddFoldLabel(_dingOpen, _dingOpen ? dingLabel : $"{dingLabel} ({ding.Count})",
                 "AAs and spells that just became available at this session's level-up — "
                     + "click to expand or fold",
                 () => _dingOpen = !_dingOpen);
@@ -679,7 +683,7 @@ public partial class BreakoutWindow : Window
             // SkillUpTotal, not the distinct-skill row count: the summary above says
             // "3 skill-ups" for Meditate ×3, and one window must not carry two
             // different numbers for the same fact.
-            AddFoldLabel(_skillUpsOpen ? "▾ Skill-ups" : $"▸ Skill-ups ({s.SkillUpTotal})",
+            AddFoldLabel(_skillUpsOpen, _skillUpsOpen ? "Skill-ups" : $"Skill-ups ({s.SkillUpTotal})",
                 "Skills that went up this session — click to expand or fold",
                 () => _skillUpsOpen = !_skillUpsOpen);
             if (_skillUpsOpen)
@@ -694,9 +698,9 @@ public partial class BreakoutWindow : Window
             // Foldable like its neighbors (LW's design pass, 2026-08-17) — open by
             // default because session-new AAs are the headline, and window-local
             // because the card has no fold here to stay in step with.
-            AddFoldLabel(_sessionAasOpen
-                    ? "▾ AA learned this session"
-                    : $"▸ AA learned this session ({newAas.Count})",
+            AddFoldLabel(_sessionAasOpen, _sessionAasOpen
+                    ? "AA learned this session"
+                    : $"AA learned this session ({newAas.Count})",
                 "AA abilities the log announced this session — click to expand or fold",
                 () => _sessionAasOpen = !_sessionAasOpen);
             if (_sessionAasOpen)
@@ -707,9 +711,9 @@ public partial class BreakoutWindow : Window
 
         if (s.AaAbilities.Count > 0)
         {
-            AddFoldLabel(_settings.ShowAllAAs
-                    ? "▾ All AA abilities"
-                    : $"▸ All AA abilities ({s.AaAbilities.Count})",
+            AddFoldLabel(_settings.ShowAllAAs, _settings.ShowAllAAs
+                    ? "All AA abilities"
+                    : $"All AA abilities ({s.AaAbilities.Count})",
                 "Everything the log's history (plus the durable ledger) says this character "
                     + "owns — click to expand or fold",
                 () => { _settings.ShowAllAAs = !_settings.ShowAllAAs; _settings.Save(); });
@@ -721,8 +725,8 @@ public partial class BreakoutWindow : Window
 
         if (next is { } nx)
         {
-            AddFoldLabel(LevelUnlockText.NextLabel(
-                    nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count, _settings.ShowNextUnlocks),
+            AddFoldLabel(_settings.ShowNextUnlocks, LevelUnlockText.NextWords(
+                    nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count),
                 "Spells and AA abilities that open up at your next milestone level — "
                     + "click to expand or fold",
                 () => { _settings.ShowNextUnlocks = !_settings.ShowNextUnlocks; _settings.Save(); });
@@ -755,14 +759,28 @@ public partial class BreakoutWindow : Window
     /// idiom; anything that ACTS on content (opens a page) must use
     /// DesignSystem.WireClick instead, precisely because a fold's on-down rebuild can
     /// strand the matching up on an element that never saw the press.</summary>
-    private void AddFoldLabel(string text, string tooltip, Action toggle)
+    /// <summary>A fold heading: the chevron says which way the click goes, the words say
+    /// what it opens.
+    ///
+    /// Rebase note (2026-08-19): LW's branch typed "▾"/"▸" into the label text, which is
+    /// how every fold in the app used to do it. This file joined
+    /// <c>DesignRatchetTests.Migrated</c> while the PR was open, so the glyphs are now
+    /// <see cref="EqFoldLabel"/>'s vector — the same control the widget's own folds wear,
+    /// and the reason it exists (a glyph is tofu on a Wine prefix, #148/#166). The caller
+    /// passes <paramref name="open"/> and the WORDS; it no longer draws the arrow.</summary>
+    private void AddFoldLabel(bool open, string text, string tooltip, Action toggle)
     {
-        var label = new TextBlock
+        var label = new EqFoldLabel
         {
-            Text = text, Style = (Style)FindResource("SectionLabel"),
-            Cursor = System.Windows.Input.Cursors.Hand, ToolTip = tooltip,
+            Section = true,
+            Ink = "AccentBrush",
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = tooltip,
+            // Transparent, not null: a StackPanel only hit-tests where its children are
+            // painted, so the gaps would be click-through (trap 16).
+            Background = System.Windows.Media.Brushes.Transparent,
         };
-        label.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        label.Set(open, text);
         label.MouseLeftButtonDown += (_, e) =>
         {
             e.Handled = true;   // a fold click is not a window drag
@@ -795,7 +813,7 @@ public partial class BreakoutWindow : Window
             var row = LootCardView.ItemRow(Main, name, value, note: null, tip, onClick);
             // The same whisper of right inset the Loot breakout's rows carry: these sit
             // against the window's own scrollbar when the list overflows.
-            row.Margin = new Thickness(0, 0, 2, 0);
+            row.Margin = new Thickness(0, 0, DesignTokens.SpaceXxs, 0);
             Rows.Items.Add(row);
         }
     }
