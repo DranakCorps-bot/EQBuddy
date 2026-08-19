@@ -1,7 +1,13 @@
 # Themes: consolidating the surfaces
 
-**Status: proposal, 2026-08-17.** Nothing here is built. It exists so the next
-consolidation is a repeat of a known move rather than a fresh design argument.
+**Status: ACCEPTED DIRECTION.** David, 2026-08-19: *"I do want to move to themes, this
+is part of the major UX revamp that organizes everything much better. it's not a proposal,
+it's a direction we need to go, just as we did with quests."*
+
+Written 2026-08-17 as a proposal; ruled on 2026-08-19. **Quests is built and is the
+template. The other five are the work**, in the sequencing below — not a menu to pick
+from, and not something to re-argue. What is still open is HOW each one lands, never
+whether.
 
 The Quest Tracker is the worked example. Three separate things — the widget's "Sky
 Quest" card, its "Epics" card, and a general quest catalog — became one theme with

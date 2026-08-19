@@ -78,9 +78,35 @@ everywhere it appears, so later gates spend the primitive instead of minting ano
 | 3 | Spawns + timers | done |
 | 4 | Loot card + Loot breakout | done |
 | **5** | **The main widget** | **in progress** — see below |
-| 6 | Mini mode + chips | next; carries #190, #191, #199's gesture |
+| 6 | Mini mode + chips | carries #190, #191, #199's gesture |
 | 7 | Map | not started |
 | 8 | Remaining windows | Gear, Drops, History, Travel, Options, breakouts |
+
+### And then THEMES — 14 cards into 6 (David, 2026-08-19)
+
+**The gates above restyle what exists. Themes changes what exists**, and it is the larger
+half of the UX revamp: *"this is part of the major UX revamp that organizes everything
+much better. it's not a proposal, it's a direction we need to go, just as we did with
+quests."* [docs/Themes.md](docs/Themes.md) is the plan and the recipe.
+
+The Quest Tracker already did it once — the Sky card, the Epics card and a general catalog
+became one theme, three tabs, one definition in Core. Five more follow:
+
+| Theme | Absorbs | Order |
+|---|---|---|
+| **Quests** | Sky + Epics + catalog | **done — the template** |
+| **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | 1st — highest value, lowest risk |
+| **Loot & Items** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | 2nd — unblocks #174 |
+| **Progress** | Progress, Money, Motes, Faction, Raids | 3rd — where all-time stats plug in |
+| **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | 4th — biggest lift |
+| **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | 5th — heaviest mobile parity |
+
+**One theme per release**, each with its settings-key folding, its mobile parity and a
+lowered hotspot baseline in the same commit. Two rules from the plan that decide arguments
+before they start: **fewer cards is not the goal, fewer DEFINITIONS is** — one window with
+three renderers still disagreeing has bought nothing — and **consolidation that hides a
+deadline is a regression**; if a tab buries something needed within seconds, the answer is
+a chip, not a tab.
 
 ### Gate 5, in flight
 
