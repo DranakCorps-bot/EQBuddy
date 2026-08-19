@@ -19,7 +19,6 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBox x:Name="FilterBox" Style="{StaticResource InputBox}" TextChanged="OnFilterChanged"
                      ToolTip="Filter by creature or item name"/>
@@ -31,9 +30,6 @@
                     ToolTip="Copy everything shown as CSV for a spreadsheet"/>
             <Button x:Name="SaveCsvBtn" Grid.Column="3" Content="Save CSV…" Style="{StaticResource ActionButton}"
                     Margin="6,0,0,0" Padding="8,3" Click="OnSaveCsv"/>
-            <Button x:Name="CopyWikiBtn" Grid.Column="4" Content="✦ Copy for wiki" Style="{StaticResource ActionButton}"
-                    Margin="6,0,0,0" Padding="8,3" Click="OnCopyWiki"
-                    ToolTip="Copy paste-ready eqlwiki edits for everything marked ✦ — each with a direct edit link. Nothing publishes automatically; you review and save on the wiki."/>
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -41,7 +37,6 @@
         </ScrollViewer>
 
         <TextBlock x:Name="FooterText" Grid.Row="2" Style="{StaticResource Dim}"
-                   TextWrapping="Wrap" Margin="0,8,0,0"
-                   Text="Observed personal drop rates this session — the kill count is the denominator, so thin data looks thin. Exports include exactly what the filter shows. ✦ marks drops eqlwiki doesn't know yet — Copy for wiki prepares the paste."/>
+                   TextWrapping="Wrap" Margin="0,8,0,0"/>
     </Grid>
 </Window>

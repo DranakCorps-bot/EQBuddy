@@ -189,6 +189,46 @@ $Shots = [ordered]@{
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
+    # The wiki contribution pack (#217 Ask 1). Trap 22: with an empty profile every row
+    # is "not checked yet", because the pack's state comes from the WIKI LOOKUP and not
+    # from the log — a shot of that proves nothing about the rows underneath and reads as
+    # reviewed anyway. So the wiki page cache is seeded below, which also keeps the shot
+    # offline and deterministic: without it the app would fetch eqlwiki for real and the
+    # picture would change with the wiki.
+    #
+    # The spread is deliberate — one page with no loot at all, two pages missing drops,
+    # and the rest complete so the "already on eqlwiki" count has something to say.
+    # PageMissing and Pending are NOT staged: both need a lookup that fails, which cannot
+    # be forced from a cache file. WikiPackRenderTests covers those two.
+    'wiki-pack'       = @{ Title = 'Wiki contribution pack'
+                           Env = @{ EQBUDDY_WIKIPACK = '1' }
+                           Set = @{}
+                           # KEYS ARE THE NAMES EQBUDDY STORES, not the names the log
+                           # writes: the parser strips the article and capitalises, so the
+                           # lookup (and therefore the cache filename) is "Asp", never
+                           # "an asp". Seeding the log spelling silently misses, the app
+                           # falls through to a real fetch, and the shot quietly becomes a
+                           # picture of whatever eqlwiki says today — which is exactly what
+                           # the first run of this shot did.
+                           Wiki = @{
+                               # Page exists, records no loot: everything looted is news.
+                               'Orc pawn' = @()
+                               # Pages that know some of it but not all.
+                               'Puma' = @('Chunk of Meat')
+                               'Giant spider' = @('Spider Silk', 'Spider Legs')
+                               # Complete pages — no contribution, but they are what makes
+                               # a small pack read as "the wiki is in good shape here".
+                               'Skeleton' = @('Bone Chips', 'Rusty Scimitar')
+                               'Asp' = @('Giant Snake Fang', 'Giant Snake Rattle', 'Snake Meat')
+                               'Large rattlesnake' = @('Snake Egg', 'Snake Fang')
+                               'Rattlesnake' = @('Snake Fang')
+                               'Willowisp' = @('Burned Out Lightstone')
+                               'Young kodiak' = @('Bear Meat', 'Chunk of Meat', 'Thick Grizzly Bear Skin')
+                               'Zombie' = @('Cloth Cape', 'Zombie Skin')
+                               'Ghoul' = @('Mote of Infinitesimal Potential')
+                               'Lesser mummy' = @('Rusty Morning Star', 'Splintering Club')
+                               'Plains cat' = @('Ruined Cat Pelt')
+                           } }
 }
 
 if ($List) {
@@ -270,6 +310,38 @@ function Write-Raids([hashtable]$records) {
         Set-Content $path -Encoding UTF8
 }
 
+# The wiki page cache, which is where the contribution pack's state actually comes from
+# (EqlWikiMobService's 7-day disk cache, under <profile>/wiki-cache/mobs). A seeded entry
+# is served without a fetch, so the shot is offline and deterministic; an unseeded
+# creature would go to the live wiki and photograph whatever it says today.
+#
+# Format is the service's own CacheEntry: Title, Wikitext, FetchedAt. Drops are the
+# wiki's {{:Item}} transclusions, which is what its parser reads.
+function Write-WikiCache([hashtable]$pages) {
+    $dir = Join-Path $profileDir 'wiki-cache/mobs'
+    if ($null -eq $pages) { Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue; return }
+    New-Item -ItemType Directory -Force $dir | Out-Null
+    foreach ($title in $pages.Keys) {
+        # The service's own filename rule: non-alphanumerics become underscores, lowercased.
+        $file = ((($title.ToCharArray() | ForEach-Object {
+            if ([char]::IsLetterOrDigit($_)) { [char]::ToLowerInvariant($_) } else { '_' }
+        }) -join '') + '.json')
+        # Drops are read from the {{Namedmobpage}} template's known_loot field, NOT from
+        # free wikitext — EqlWikiMobs.Parse only ever looks inside known_loot/common_loot.
+        # Free "== Loot ==" prose parses to a page with no drops at all, which is a real
+        # state (PageHasNoLoot) and therefore renders perfectly plausibly: the first run
+        # of this staging showed all thirteen creatures as "page lists no loot" and looked
+        # like a correct screenshot of a wrong app.
+        $loot = (($pages[$title] | ForEach-Object { "{{:$_}}" }) -join ' ')
+        $wikitext = "{{Namedmobpage`n|name=$title`n|zone=Test Zone`n|known_loot=$loot`n}}"
+        @{
+            Title = $title
+            Wikitext = $wikitext
+            FetchedAt = (Get-Date).ToUniversalTime().ToString('o')
+        } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir $file) -Encoding UTF8
+    }
+}
+
 # --- the backdrop ------------------------------------------------------------------
 # A plain maximized form, NOT topmost, so the app's own always-on-top windows stay above
 # it. This is what stops a rounded corner photographing the desktop.
@@ -293,6 +365,7 @@ try {
         Write-Settings $spec.Set
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
+        Write-WikiCache $spec.Wiki
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false

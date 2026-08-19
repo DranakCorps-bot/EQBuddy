@@ -363,6 +363,10 @@ public partial class MainWindow : Window, ICardContext
             Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnDropsWindow(this, new RoutedEventArgs()),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        if (Environment.GetEnvironmentVariable("EQBUDDY_WIKIPACK") == "1")
+            Loaded += (_, _) => Dispatcher.BeginInvoke(ShowWikiPackWindow,
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_QUESTS") is { Length: > 0 } questsMode)
             Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
             {
@@ -1935,6 +1939,7 @@ public partial class MainWindow : Window, ICardContext
 
     private QuestsWindow? _questsWindow;
     private DropsWindow? _dropsWindow;
+    private WikiPackWindow? _wikiPackWindow;
 
     private void OnDropsWindow(object sender, RoutedEventArgs e)
     {
@@ -1943,6 +1948,24 @@ public partial class MainWindow : Window, ICardContext
         _dropsWindow.Update(_stats.Snapshot());
         _dropsWindow.Show();
         _dropsWindow.Activate();
+    }
+
+    /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under
+    /// Data &amp; imports now, not a button inside Drops by Creature. Drops keeps its live
+    /// view — "is this trip worth it" is a different question from "what can I give the
+    /// wiki".</summary>
+    private void OnWikiPackWindow(object sender, RoutedEventArgs e) => ShowWikiPackWindow();
+
+    /// <summary>Also reached from the ✦ marker on a Drops by Creature row, which used to
+    /// copy the pack straight to the clipboard. Opening the surface instead is the point
+    /// of the move: the marker says "there is something here", and the window says what.</summary>
+    internal void ShowWikiPackWindow()
+    {
+        if (_wikiPackWindow is not { IsLoaded: true })
+            _wikiPackWindow = new WikiPackWindow(this);
+        _wikiPackWindow.Update(_stats.Snapshot());
+        _wikiPackWindow.Show();
+        _wikiPackWindow.Activate();
     }
 
     private void OnQuestsWindow(object sender, RoutedEventArgs e) => ShowQuestsWindow();
@@ -2119,7 +2142,7 @@ public partial class MainWindow : Window, ICardContext
         CharLabel.Text = $"REVIEWING {Path.GetFileName(path)}{when} — click here to go live";
         CharLabel.Foreground = (Brush)FindResource("WarnBrush");
         CharLabel.Cursor = Cursors.Hand;
-        CharLabel.ToolTip = "Replaying a saved log. Drops by Creature and Copy for wiki " +
+        CharLabel.ToolTip = "Replaying a saved log. Drops by Creature and the wiki pack " +
             "show the reviewed session. Click to return to the live log.";
     }
 
@@ -2247,6 +2270,7 @@ public partial class MainWindow : Window, ICardContext
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsLoaded: true, IsVisible: true } qw) qw.MaybeRefresh();
         if (_dropsWindow is { IsLoaded: true, IsVisible: true } dw) dw.MaybeRefresh();
+        if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsLoaded: true, IsVisible: true } mapw) mapw.MaybeRefresh();
 
         if (_settings.TrackSpawns)

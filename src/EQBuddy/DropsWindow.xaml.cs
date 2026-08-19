@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -24,6 +25,13 @@ public partial class DropsWindow : Window
         InitializeComponent();
         _main = main;
         WindowZoom.Attach(this, "drops", main.Settings);
+        // The pack moved to its own window (#217 Ask 1). The marker stays — this view
+        // still answers "is this trip worth it" — but the footer says where the paste
+        // went, so the button leaving is a signpost rather than a disappearance.
+        FooterText.Text =
+            "Observed personal drop rates this session — the kill count is the " +
+            "denominator, so thin data looks thin. Exports include exactly what the " +
+            "filter shows. " + WikiPackPresentation.MovedHint;
     }
 
     /// <summary>Called on open and from MainWindow's tick while visible.</summary>
@@ -183,14 +191,15 @@ public partial class DropsWindow : Window
                 ToolTip = why + " You're holding knowledge eqlwiki.com doesn't have.\n" +
                     "\n" +
                     "To sync it to the wiki (takes about a minute):\n" +
-                    "  1. Click this ✦ (or the ✦ Copy for wiki button up top) — a paste-ready\n" +
-                    "     edit lands on your clipboard, built from your observed drops and rates.\n" +
+                    "  1. Click this ✦ to open the Wiki contribution pack — it lists everything\n" +
+                    "     the wiki is missing this session and copies paste-ready edits, built\n" +
+                    "     from your observed drops and rates. (Data & imports opens it too.)\n" +
                     "  2. Click the creature's name to open its wiki page, then Edit (create the\n" +
                     "     page if it doesn't exist — the export includes the full page skeleton).\n" +
                     "  3. Paste, save, done. The whole community's tracker gets smarter.",
             };
             star.SetResourceReference(TextBlock.ForegroundProperty, "BadBrush");
-            star.MouseLeftButtonUp += (_, e) => { e.Handled = true; OnCopyWiki(star, new RoutedEventArgs()); };
+            star.MouseLeftButtonUp += (_, e) => { e.Handled = true; _main.ShowWikiPackWindow(); };
             row.Children.Add(star);
         }
 
@@ -218,14 +227,6 @@ public partial class DropsWindow : Window
 
     private void OnCopyCsv(object sender, RoutedEventArgs e) =>
         TryClipboard(DropsReport.ToCsv(Filtered()));
-
-    private void OnCopyWiki(object sender, RoutedEventArgs e)
-    {
-        var (character, server) = _main.Identity;
-        TryClipboard(WikiContribution.BuildExport(
-            Filtered().Select(m => new WikiContribution.MobObservation(m, _main.WikiMobResult(m.Name))),
-            character, server, _main.CurrentZoneName, DateTime.Now));
-    }
 
     private static void TryClipboard(string text)
     {

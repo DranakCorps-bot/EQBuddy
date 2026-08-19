@@ -16,6 +16,33 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+
+### Wiki pack should pool full session history
+- **Priority:** waiting (David's scope call)
+- **Place:** the all-time stats direction (#168 / #159) — a query over archives already on disk. Fits where that plan is already heading. Not Gate 5.
+- **Source:** #217 Frankthetankk Aug 19, 5:26 AM CT, ask 2. Did not reply — Claude already answered.
+- **Ask:** Wiki export reads full Session History by default, not the live session. No per-session vs all-time toggle. Concrete miss: three 4-kill sessions never cross the 10-kill rarity bar despite 12 real kills. Same thinning on money/faction samples and con-derived level ranges. Open questions he named: pool across characters on the account, or stay per-character; any "since" filter for zone retunes.
+- **Already shipped:** session-scoped export; archived-log review (#74) replays one file at a time.
+- **Where it might live:** hypothesis — a roll-up over stored Session History rows, not new collection.
+
+### /consider rarity word (wiki + spawn timers)
+- **Priority:** waiting (blocked on one pasted con line; David's scope call)
+- **Place:** log parse. Serves wiki confirmed-rare and #185 named-vs-townsfolk spawn chips. Not Gate 5 UI.
+- **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n follow-up Aug 18, 10:06 PM CT. Did not reply — Claude already answered both.
+- **Ask (Frankthetankk):** use /consider text `a rare creature` as a confirmed rarity flag for the wiki pack (`rare=true`), outranking kill-count band suggestions.
+- **Ask (n3cr0nk1tt3n):** same signal to avoid spawn chips on townsfolk — only track when a con says it is a rare creature. Also: kill-to-kill is not the respawn duration (the timer is set before the mob spawns); manual override remains the authority.
+- **Already shipped:** /consider is parsed for name and level only.
+- **Checked:** `src/EQBuddy.Core/GameEvent.cs:47` `record ConsiderEvent(DateTime Time, string Name, int Level)`. `LogParser.cs:173` ConsiderRx captures name and level, with `.*` before `(Lvl: N)` — no rarity group. SpawnTimers.cs has a ConsiderEvent case; do not assert what it does without a further quote.
+- **Waiting on:** one verbatim full con line (rarity text relative to the `(Lvl: N)` tail).
+
+### Spawn-timer mega-thread
+- **Priority:** waiting (David's call)
+- **Place:** catalog maintenance. Curated spawn timers are never auto-written. Not a feature gate.
+- **Source:** #185 n3cr0nk1tt3n Aug 18, 10:06 PM CT. Did not reply — Claude already answered.
+- **Ask:** a mega-thread for the community to add and update spawn timers, because catalogs lag and kill-to-kill does not determine duration.
+- **Already shipped:** manual duration override ("your number wins and survives updates"); add-a-mob on the Spawns window.
+- **Where it might live:** hypothesis — a discussion that feeds the existing override, not an auto-write into the curated catalog.
+
 ### Server rollback leaves archives ahead of the world
 - **Priority:** someday (**David, 2026-08-19: "not too concerned — bigger fish to fry.
   It can go on the 'when we've got nothing else to work on' list."** Filed must-fix; his

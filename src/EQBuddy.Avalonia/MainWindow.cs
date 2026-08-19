@@ -1290,6 +1290,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         menu.Items.Add(new Separator());
 
         var data = new MenuItem { Header = "Data & imports" };
+        data.Items.Add(Item("Wiki contribution pack…", (_, _) => ShowWikiPack(),
+            "Paste-ready eqlwiki edits built from your own loot log — creatures with no page, pages that list no loot, and drops missing from a page. Nothing publishes automatically; you open each edit link, review and save."));
         data.Items.Add(Item("Import achievements…", OnImportAchievements,
             $"Read the game's {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} dump and pre-mark Sky quest rewards (and raid clears) you completed before EQBuddy — preview first, adds only, never unticks"));
         // A closed menu can't flip to ✓, so the header says exactly what the click
@@ -1300,7 +1302,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             "Puts the command on your clipboard — paste it into the game's chat, the game writes its achievements dump, then Import achievements… reads it"));
         _reviewLogItem.Click += (s, _) => OnReviewLog(s, EventArgs.Empty);
         ToolTip.SetTip(_reviewLogItem,
-            "Replay a saved log read-only — Drops by Creature and ✦ Copy for wiki work against that session");
+            "Replay a saved log read-only — Drops by Creature and the wiki contribution pack work against that session");
         data.Items.Add(_reviewLogItem);
         _chooseLogFolderItem.Click += OnChooseLogFolder;
         data.Items.Add(_chooseLogFolderItem);
@@ -1528,7 +1530,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _charLabel.Text = $"REVIEWING {System.IO.Path.GetFileName(path)}{when} — click here to go live";
         _charLabel.Foreground = AppTheme.WarnBrush;
         _charLabel.Cursor = new Cursor(StandardCursorType.Hand);
-        ToolTip.SetTip(_charLabel, "Replaying a saved log. Drops by Creature and ✦ Copy for wiki " +
+        ToolTip.SetTip(_charLabel, "Replaying a saved log. Drops by Creature and the wiki pack " +
             "show the reviewed session. Click to return to the live log.");
     }
 
@@ -1715,6 +1717,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsVisible: true } qw) qw.MaybeRefresh();
         if (_dropsWindow is { IsVisible: true } dw) dw.MaybeRefresh();
+        if (_wikiPackWindow is { IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsVisible: true } mapw) mapw.MaybeRefresh();
 
         if (_settings.TrackSpawns)
@@ -3257,6 +3260,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private QuestsWindow? _questsWindow;
     private DropsWindow? _dropsWindow;
+    private WikiPackWindow? _wikiPackWindow;
     private MapWindow? _mapWindow;
     private TravelWindow? _travelWindow;
     private InventoryWindow? _inventoryWindow;
@@ -3302,6 +3306,26 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _dropsWindow.Update(CurrentSnapshot());
         _dropsWindow.Show();
         _dropsWindow.Activate();
+    }
+
+    /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under
+    /// Data &amp; imports now, not a button inside Drops by Creature. Also reached from the
+    /// ✦ marker on a Drops row, which used to copy the pack straight to the clipboard —
+    /// opening the surface is the point of the move.</summary>
+    public void ShowWikiPack()
+    {
+        if (_wikiPackWindow is null)
+        {
+            var window = new WikiPackWindow(this);
+            window.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_wikiPackWindow, window)) _wikiPackWindow = null;
+            };
+            _wikiPackWindow = window;
+        }
+        _wikiPackWindow.Update(CurrentSnapshot());
+        _wikiPackWindow.Show();
+        _wikiPackWindow.Activate();
     }
 
     private void OnZoneMap(object? sender, EventArgs e)

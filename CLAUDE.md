@@ -388,6 +388,23 @@ Read this list before touching the areas it names. Every entry cost a release.
     `tracked-card` seeds rules the fixture log actually matches; `raids-card` seeds
     `raid-kills.json` (`Raids = @{…}`, keyed `"{character}_{server}|{boss}"` lowercased).
 
+23. **Fixture staging in the wrong SHAPE renders a state that is real, so the screenshot
+    looks correct and is a picture of something else.** Trap 22 says stage the state;
+    this is its second half, and it cost two wrong screenshots in one sitting on the
+    `wiki-pack` shot. First the seeded wiki cache was keyed on the names the LOG writes
+    ("an asp") when the lookup uses the names EQBuddy STORES ("Asp"), so most entries
+    missed and the app quietly fetched the live wiki — a plausible picture of whatever
+    eqlwiki said that minute. Then the seeded wikitext put drops in free prose when
+    `EqlWikiMobs.Parse` only ever reads `{{Namedmobpage}}`'s `known_loot`/`common_loot`,
+    so all thirteen creatures rendered "page lists no loot" — which is a REAL state the
+    surface is supposed to show, and therefore looked like a correct screenshot of a
+    broken app rather than a broken fixture.
+    → **A shot whose numbers you did not predict in advance has not been reviewed.**
+    Write down what the staging should produce BEFORE running it, and treat a mismatch as
+    a fixture bug until proven otherwise. Seed through the same key and the same parser
+    the app uses — the cache filename rule and the template field name are part of the
+    staging, not implementation detail.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

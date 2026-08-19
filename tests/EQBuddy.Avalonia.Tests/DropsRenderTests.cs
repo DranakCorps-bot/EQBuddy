@@ -29,6 +29,8 @@ public sealed class DropsRenderTests
         public void EnsureMobLookup(string name) => LookupsFired.Add(name);
         public bool IsActiveQuestItem(string name) => QuestItems.Contains(name);
         public void OpenQuestInfoForItem(string itemName) { }
+        public int WikiPackOpened { get; private set; }
+        public void ShowWikiPack() => WikiPackOpened++;
     }
 
     private static StatsSnapshot Snapshot() => new()

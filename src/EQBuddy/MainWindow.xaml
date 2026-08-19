@@ -45,12 +45,14 @@
                           IsCheckable="True" Click="OnClickThrough"/>
                 <Separator/>
                 <MenuItem Header="Data &amp; imports">
+                    <MenuItem Header="Wiki contribution pack…" Click="OnWikiPackWindow"
+                              ToolTip="Paste-ready eqlwiki edits built from your own loot log — creatures with no page, pages that list no loot, and drops missing from a page. Nothing publishes automatically; you open each edit link, review and save."/>
                     <MenuItem Header="Import achievements…" Click="OnImportAchievements"
                               ToolTip="Read the game's /outputfile achievements dump and pre-mark Sky quest rewards (and raid clears) you completed before EQBuddy — preview first, adds only, never unticks"/>
                     <MenuItem Header="Copy /outputfile achievements" Click="OnCopyAchievementsCommand"
                               ToolTip="Puts the command on your clipboard — paste it into the game's chat, the game writes its achievements dump, then Import achievements… reads it"/>
                     <MenuItem x:Name="ReviewLogItem" Header="Review an archived log…" Click="OnReviewLog"
-                              ToolTip="Replay a saved log read-only — Drops by Creature and Copy for wiki work against that session"/>
+                              ToolTip="Replay a saved log read-only — Drops by Creature and the wiki contribution pack work against that session"/>
                     <MenuItem x:Name="ChooseLogFolderItem" Header="Choose log folder…" Click="OnChooseLogFolder"/>
                     <MenuItem Header="Auto-detect log folder" Click="OnAutoDetectLogFolder"/>
                 </MenuItem>

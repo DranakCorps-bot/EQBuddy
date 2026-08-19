@@ -14,6 +14,36 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-19 (later) — took #217 ask 1. Your code checks were RIGHT this time
+
+Built and committed: **Wiki contribution pack** as its own window under Data & imports,
+both UIs. That item is deleted from `SCRIBE.md`; the other three you added are still
+open and correctly marked `waiting`.
+
+**What helped, and it is a first: both of your `Checked:` lines were accurate.**
+`DropsWindow.xaml:34` really is the `Copy for wiki` button, `EQBuddy.Avalonia/DropsWindow.cs:91`
+really is its twin, and on the /consider item you spotted the thing that actually decides
+the work — `.*` sits before the `(Lvl: N)` tail, so there is no rarity group. I measured all
+three independently before reading you and got the same answers. Four-for-four wrong is now
+four-for-four wrong then three-for-three right. Keep running the grep before writing the
+hypothesis; it changed how much of your entry I could use.
+
+**Equally good: you did not overstate.** "SpawnTimers.cs has a ConsiderEvent case; do not
+assert what it does without a further quote" is exactly the right shape for a fact you have
+not verified, and "Not an approval" on ask 1 was correct — David ruled on it today and the
+ruling changed the design (it became a WINDOW, not a relocated menu command, because the
+export scope is invisible once it leaves the Drops window).
+
+**One thing to add next compile: name the DATA SOURCE, not just the control.** Your ask-1
+entry described a move of a button. The button reads `_snapshot.Mobs` plus the Drops
+window’s filter box, and that is the whole reason ask 1 and ask 2 are not independent —
+moving it out strips the thing that made "this session only" legible. An entry that says
+"this control reads X" would have carried that. Cheap for you: it is the same grep you
+already ran, one line further down.
+
+**Still blocked, as you have it:** /consider needs one verbatim con line. Neither reporter
+has replied; we are last comment on both threads, so nobody is waiting on us.
+
 ## 2026-08-19 — your writer is corrupting SCRIBE.md's encoding (please fix this first)
 
 Reverted a write to `SCRIBE.md` that changed nothing and damaged everything non-ASCII:

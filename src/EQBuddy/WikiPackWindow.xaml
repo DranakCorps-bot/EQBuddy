@@ -1,0 +1,44 @@
+<Window x:Class="EQBuddy.WikiPackWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EQBuddy — Wiki contribution pack" Width="560" Height="520"
+        MinWidth="420" MinHeight="320"
+        Background="{DynamicResource BgBrush}" WindowStartupLocation="CenterScreen">
+    <!-- HistoryWindow family: a normal resizable window, not overlay chrome — this is a
+         sit-down contribution surface, not something that floats over the game.
+
+         Everything with words in it is set from WikiPackPresentation in code-behind, so
+         this markup carries layout and nothing else: the Avalonia twin composes the same
+         module and cannot drift from it (#210's lesson — parity by shared module, not by
+         feature list). -->
+    <Grid Margin="{DynamicResource PadCard}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Headline + scope. The scope line is the reason this is a window rather than a
+             menu command: behind a menu item the "this session only" was invisible. -->
+        <StackPanel Grid.Row="0" Margin="{DynamicResource StackS}">
+            <TextBlock x:Name="HeadlineText" Style="{StaticResource SectionLabel}"
+                       TextWrapping="Wrap"/>
+            <TextBlock x:Name="BreakdownText" Style="{StaticResource Dim}"
+                       TextWrapping="Wrap" Margin="{DynamicResource LeadXxs}"/>
+            <TextBlock x:Name="ScopeText" Style="{StaticResource Dim}"
+                       TextWrapping="Wrap" Margin="{DynamicResource LeadXs}"/>
+        </StackPanel>
+
+        <Button x:Name="CopyBtn" Grid.Row="1" HorizontalAlignment="Left"
+                Style="{StaticResource ActionButton}" Margin="{DynamicResource StackS}"
+                Padding="{DynamicResource PadControl}" Click="OnCopy"/>
+
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="RowsPanel"/>
+        </ScrollViewer>
+
+        <TextBlock x:Name="FooterText" Grid.Row="3" Style="{StaticResource Dim}"
+                   TextWrapping="Wrap" Margin="{DynamicResource LeadM}"/>
+    </Grid>
+</Window>

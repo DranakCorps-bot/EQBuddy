@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Avalonia;
 
@@ -27,6 +28,9 @@ public interface IDropsHost
     void EnsureMobLookup(string name);
     bool IsActiveQuestItem(string name);
     void OpenQuestInfoForItem(string itemName);
+    /// <summary>#217 Ask 1: the contribution pack has its own window under Data &amp;
+    /// imports now, and the row marker opens it instead of copying silently.</summary>
+    void ShowWikiPack();
 }
 
 /// <summary>
@@ -76,7 +80,7 @@ public sealed class DropsWindow : Window
         var topRow = new Grid
         {
             Margin = new Thickness(0, 0, 0, 8),
-            ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"),
+            ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"),
         };
         ToolTip.SetTip(_filterBox, "Filter by creature or item name");
         _filterBox.TextChanged += (_, _) => { _signature = ""; Render(); };
@@ -88,10 +92,6 @@ public sealed class DropsWindow : Window
                 OnCopyText),
             ("Copy CSV", "Copy everything shown as CSV for a spreadsheet", OnCopyCsv),
             ("Save CSV…", null, OnSaveCsv),
-            ("✦ Copy for wiki",
-                "Copy paste-ready eqlwiki edits for everything marked ✦ — each with a direct " +
-                "edit link. Nothing publishes automatically; you review and save on the wiki.",
-                OnCopyWiki),
         };
         for (var i = 0; i < buttons.Length; i++)
         {
@@ -120,10 +120,13 @@ public sealed class DropsWindow : Window
             Content = _mobsPanel,
         };
 
+        // The pack moved to its own window (#217 Ask 1). The marker stays — this view
+        // still answers "is this trip worth it" — but the footer says where the paste
+        // went, so the button leaving is a signpost rather than a disappearance.
         var footer = AppTheme.DimText(
             "Observed personal drop rates this session — the kill count is the denominator, " +
-            "so thin data looks thin. Exports include exactly what the filter shows. ✦ marks " +
-            "drops eqlwiki doesn't know yet — Copy for wiki prepares the paste.",
+            "so thin data looks thin. Exports include exactly what the filter shows. " +
+            WikiPackPresentation.MovedHint,
             new Thickness(0, 8, 0, 0));
 
         var layout = new Grid { Margin = new Thickness(10) };
@@ -271,12 +274,13 @@ public sealed class DropsWindow : Window
             ToolTip.SetTip(star, why + " You're holding knowledge eqlwiki.com doesn't have.\n" +
                 "\n" +
                 "To sync it to the wiki (takes about a minute):\n" +
-                "  1. Click this ✦ (or the ✦ Copy for wiki button up top) — a paste-ready\n" +
-                "     edit lands on your clipboard, built from your observed drops and rates.\n" +
+                "  1. Click this ✦ to open the Wiki contribution pack — it lists everything\n" +
+                "     the wiki is missing this session and copies paste-ready edits, built\n" +
+                "     from your observed drops and rates. (Data & imports opens it too.)\n" +
                 "  2. Click the creature's name to open its wiki page, then Edit (create the\n" +
                 "     page if it doesn't exist — the export includes the full page skeleton).\n" +
                 "  3. Paste, save, done. The whole community's tracker gets smarter.");
-            OnClick(star, OnCopyWiki);
+            OnClick(star, _main.ShowWikiPack);
             row.Children.Add(star);
         }
 
@@ -295,14 +299,6 @@ public sealed class DropsWindow : Window
     }
 
     private void OnCopyCsv() => TryClipboard(DropsReport.ToCsv(Filtered()));
-
-    private void OnCopyWiki()
-    {
-        var (character, server) = _main.Identity;
-        TryClipboard(WikiContribution.BuildExport(
-            Filtered().Select(m => new WikiContribution.MobObservation(m, _main.WikiMobResult(m.Name))),
-            character, server, _main.CurrentZoneName, DateTime.Now));
-    }
 
     private async void TryClipboard(string text)
     {

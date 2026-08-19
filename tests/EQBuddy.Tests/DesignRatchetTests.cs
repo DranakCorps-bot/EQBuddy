@@ -58,6 +58,14 @@ public class DesignRatchetTests
         // reworded, because a tooltip that draws the glyph it is explaining draws it as
         // a box on the prefixes where the explanation is most needed.
         "EQBuddy/MainWindow.xaml.cs",
+        // #217 Ask 1: the wiki contribution pack as its own surface. Built on the system
+        // rather than migrated onto it, so it joins on the day it lands — the ✦ marker it
+        // inherited from the old button is a vector here (IconPaths "Sparkle"), which is
+        // exactly the dingbat that PRs #148/#166 exist because of.
+        "EQBuddy.UI.Shared/WikiPackPresentation.cs",
+        "EQBuddy/WikiPackWindow.xaml",
+        "EQBuddy/WikiPackWindow.xaml.cs",
+        "EQBuddy.Avalonia/WikiPackWindow.cs",
     ];
 
     public static TheoryData<string> MigratedFiles()

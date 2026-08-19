@@ -1,5 +1,16 @@
 [
  {
+  "version": "1.95.0",
+  "date": "2026-08-19",
+  "highlights": [
+   "NEW WINDOW: Wiki contribution pack (right-click → Data & imports). Everything eqlwiki doesn't know from this session in one place — creatures with no page at all, pages that record no loot, and drops missing from a page that exists — with the paste-ready edits and their direct edit links one click away. Frankthetankk's ask (#217): this stopped being a loot feature several releases ago and was still hiding behind a button inside Drops by Creature, findable only if you happened to be thinking about loot.",
+   "It now SHOWS you what it is about to copy, and says out loud that it covers THIS SESSION only. The old button copied whatever the Drops window was filtered to — obvious while you stood in front of that list, invisible from anywhere else. Pooling your whole logged history is the next step and is being scoped.",
+   "A creature whose wiki page could not be read says \"not checked yet\" and is kept out of the pack — never quietly counted as \"nothing new\". And if the wiki already has everything you looted, it says so: that is the wiki being in good shape, not EQBuddy finding nothing.",
+   "Drops by Creature keeps its live view exactly as it was — it answers \"is this trip worth it\", which is a different question. The ✦ marker stays on the rows, and clicking one now opens the pack instead of silently filling your clipboard.",
+   "Linux and macOS get the same window in the same build, composed from the same shared module as Windows rather than a second implementation."
+  ]
+ },
+ {
   "version": "1.94.1",
   "date": "2026-08-19",
   "highlights": [
