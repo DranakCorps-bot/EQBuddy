@@ -1,10 +1,118 @@
 # EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (20) and the
+the non-negotiable rules, the where-things-live index, the trap list (23) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
+
+---
+
+## State: 1.95.0 LIVE and verified (2026-08-19 midday)
+
+Tag `v1.95.0`, **7 assets** (both Mac builds + the Linux tarball), OneDrive updated, both
+workflows green. `main` clean and pushed. **2,073 unit + 240 Avalonia + 11 E2E.**
+`status.ps1`: *"none — all 25 open threads have our reply last."*
+
+Two things shipped in it, both from the previous handoff's ordered list.
+
+### 1. #217 Ask 1 — the wiki contribution pack is its own window (David ruled today)
+
+Under Data & imports, both UIs, `UI.Shared/WikiPackPresentation.cs` owning every word.
+
+**The finding worth keeping:** the old `✦ Copy for wiki` button read `_snapshot.Mobs`
+*plus the Drops window's filter box*, so the only thing making "this session only" legible
+was standing in front of that list. A relocated menu command would have copied a silent
+scope — which is why it became a WINDOW that states what it pooled, and why **Asks 1 and 2
+were never independent**. Neither the thread nor Scribe's entry said so.
+
+Drops by Creature keeps its live view. Its ✦ now OPENS the pack instead of copying.
+
+### 2. #108 — "who wants this drop?" restored, and it had SHIPPED once already
+
+`QuestChecklistLayout.SearchByItem`, in Core, called by both desktops **and Mobile**.
+
+**This is the third instance of one signature** (after `SkyQuestCompleted` #204/#209 and
+`EpicQuestCompleted` #210): 1.69.0 shipped item-grouped cross-class search for
+liminalwarmth, the Gate 2 rebuild kept the *box* and lost the *behaviour* — it became a row
+filter inside the per-class sections, and started obeying the class and state filters it was
+built to ignore. `DeadSettingTests` catches the SETTINGS shape of this. Nothing catches the
+BEHAVIOUR shape. `QuestChecklistSearchTests` holds this one specifically.
+
+→ **When a feature reads as "never built", grep `WhatsNew.json` for the discussion number
+first.** "We shipped this and it is gone" is a different and more urgent item.
+
+**#210 IS NOW COMPLETE — all seven asks.** liminalwarmth was asked whether to narrow it to
+#108 or close it and never answered; the question is moot. **A closing note is owed and was
+NOT posted** — David approved the #217 reply only, and permission is per-action. Ask before
+posting.
+
+### New traps and tools
+
+- **CLAUDE.md trap 23** — fixture staging in the wrong SHAPE renders a state that is REAL,
+  so the shot looks correct and is a picture of something else. Cost two wrong screenshots
+  in one sitting: the wiki cache keyed on log names (`an asp`) when lookups use stored names
+  (`Asp`), so the app quietly fetched the LIVE wiki; then wikitext as free prose when
+  `EqlWikiMobs.Parse` reads only `{{Namedmobpage}}`'s `known_loot`, so all thirteen creatures
+  read "page lists no loot". **Predict the shot's numbers before running it.**
+- **Two new shots:** `wiki-pack` (seeds `wiki-cache/mobs`, offline and deterministic) and
+  `sky-item-search` (`EQBUDDY_QUESTS=sky:<query>` — the hook now takes a search after the
+  colon, because the item layout exists only while a query is live). Both reviewed in
+  ParchmentBrass and Solarized.
+- **`quest-search.png` in `docs/screenshots/` is a hand-taken orphan** — no shot writes it
+  and no doc embeds it. Do not reuse that name (trap 21).
+
+### Scribe is getting better — say so
+
+Its `Checked:` lines were accurate for the first time (3/3, verified independently), and its
+"where it might live: `QuestChecklistLayout` (shared)" hypothesis for #108 was exactly right.
+Both taken items are deleted from `SCRIBE.md` and written up in `SCRIBE-FEEDBACK.md`, with
+the two asks for next compile: **name the DATA SOURCE, not just the control** (that is what
+would have surfaced the Ask 1/Ask 2 coupling), and **check the release notes before writing
+"already shipped"**. David, 2026-08-19: *"please keep providing feedback to Scribe so he can
+get better at supporting you."*
+
+### STILL THE NEXT TASK — the `/consider` rare-creature signal, still blocked
+
+**Nothing changed here and that is correct.** Neither #185 (n3cr0nk1tt3n) nor #217
+(Frankthetankk) has pasted the verbatim con line; we are last comment on both, so nobody is
+waiting on us. Asked again in the #217 reply posted today.
+
+**The block is smaller than it sounds, and now measured precisely.** `ConsiderRx` is
+`^(?<name>…)(verb).*\(Lvl: (?<level>\d+)\)$` — the `.*` already swallows anything between
+verb and tail. So:
+
+- rarity text **before** `(Lvl: N)` → a one-line change to capture a group already matched
+  and thrown away;
+- rarity text **after** it → the `$` anchor breaks and it is a second pattern.
+
+**That is the entire question.** Do not reconstruct the line (#206). David approved the
+feature in principle today: a con-confirmed `rare` outranks a kill-count band, an
+unconfirmed band stays a suggestion. **`LogParser.cs` has 25 lines of ratchet room — lift,
+don't split.**
+
+### Then, in order
+
+1. **#217 Ask 2 — pool the full logged history** into the wiki pack. **David approved in
+   principle today**, account-wide, no per-session toggle. The open question is COST across
+   a large archive; if it is felt, the answer is "pool, and say what it pooled", which the
+   new window already does. `WikiPackPresentation.ScopeLine` is the one line that changes.
+2. **#208 — the Linux/macOS Mobile port.** Its own session. `CompanionEnabled` appears
+   nowhere in `src/EQBuddy.Avalonia/` and that csproj has **no reference to
+   `EQBuddy.Companion` at all**. Small first step: the per-window "don't fight to be
+   topmost" opt-out promised to sbaum23.
+3. **Gate 5 continues** — `EQBuddy.Avalonia/MainWindow.cs` (~5,100 lines, the largest file
+   in the repo and NOT on the hotspot ratchet, worth fixing while in there), then the three
+   heavy card bodies, then 5d (`Theme.xaml` templates).
+4. **#191 configurable mini bar** — approved, unblocked.
+
+### Waiting on someone else — do not start these
+
+- **#153** (adndmike) — needs liminalwarmth's volume test with EQ closed.
+- **#193** (wizen / n3cr0nk1tt3n) — needs a quested vs token-unlocked achievements export PAIR.
+- **#202** (bjstrange) — fixed in 1.94.1; he should confirm the flicker is gone.
+- **#215** — server rollback. David: *"bigger fish to fry"*, `someday`.
+- **#7 #50 #53 #58 #66** — Don Thompson's Avalonia parity issues. His to close, not ours.
 
 ---
 
