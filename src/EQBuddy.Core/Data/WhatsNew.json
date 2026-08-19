@@ -1,5 +1,14 @@
 [
  {
+  "version": "1.94.1",
+  "date": "2026-08-19",
+  "highlights": [
+   "FIXED (discussion #202, thanks bjstrange) - EQBUDDY MOBILE'S LOOT & WATCHES CARD REBUILT ITSELF SEVERAL TIMES A SECOND. It flickered constantly and kept hiding the watched loot you were trying to read. Your four answers cracked it, and one in particular: \"a couple times a second, sometimes once a second\". The PC only sends once a second, so nothing on the wire can beat that - which meant the fault was on the phone, not the connection. The PC and the page were answering \"has anything changed?\" two different ways. The PC deliberately ignores numbers that move on a clock, or every phone would be woken every second forever; the page compared everything, and a watch rule's /hr and /active hr have TIME in the denominator, so they drift while nothing at all is happening. The PC said \"nothing to report\" and the page rebuilt the card anyway. It now ignores exactly what the PC ignores. The rates are still there and still shown - they were never the problem, and hiding them would have \"fixed\" this by deleting what you were watching.",
+   "FIXED (discussion #216, thanks Snagglefern) - THE PLANE OF SKY LINK FOR STAFF OF THE MAGISTER WENT NOWHERE. You spotted that the capital T matters, and it does: the wiki serves Staff_of_The_Magister and returns a dead page for the lower-case spelling, with no redirect between them. Three Magician rows carried the wrong one. Our own quest catalog already had it right, so the Sky list was the only place in EQBuddy that disagreed - which is the kind of wrong worth fixing fastest. If you had already marked that reward turned in, it carries across on first launch; you will not lose it.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: ⚙ → Help → Send feedback."
+  ]
+ },
+ {
   "version": "1.94.0",
   "date": "2026-08-19",
   "highlights": [
