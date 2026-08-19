@@ -459,6 +459,13 @@ const TICKABLE = { quests: 1, gear: 1 };
 // else repaints only when its data actually changed, which is what keeps a scrolled
 // loot list scrolled and a half-ticked checklist from jumping under your thumb.
 const TICKING = { spawns: 1, mez: 1, session: 1, map: 1 };
+// Fields the repaint gate must NOT look at, because they move on a clock rather than on
+// an event — the mirror of what CompanionProjection.SectionFingerprints leaves out of
+// the PC's own change detection. A value in here still RENDERS; it just cannot be the
+// reason a panel is torn down and rebuilt (#202). `catalog` is here for a different
+// reason: 1,200 quests stringified once a second was the page's biggest single cost.
+const DRIFT_KEYS = new Set(["perHour", "perActiveHour", "catalog"]);
+const DRIFTS = (k, v) => (DRIFT_KEYS.has(k) ? undefined : v);
 // The picks a device starts with, before anyone touches the ⚙. Measured against the
 // viewport (the layout breakpoint's own measure), not the window, so a fullscreen or
 // Home-Screen launch is judged by the room it actually has.
@@ -692,10 +699,16 @@ function boot() {
       // The quest catalog is compared by its stamp, never by content: it rides every
       // carried-forward snapshot, and stringifying 1,200 quests once a second would
       // be the page's biggest cost by far.
-      const key = refused ? "gated"
-        : name === "quests" && data
-          ? JSON.stringify(data, (k, v) => k === "catalog" ? undefined : v)
-          : JSON.stringify(data);
+      // What counts as "changed" must be the SAME question the PC asked when it decided
+      // whether to wake us (CompanionProjection.SectionFingerprints). It was not, and
+      // that is #202 (bjstrange): the PC excludes values that drift every tick — a watch
+      // rule's /hr and /active hr have TIME in the denominator, so they move even when
+      // nothing happens — while this gate stringified the whole payload and saw a
+      // different key every render. The PC correctly said "nothing to report"; the page
+      // repainted anyway, on its own 1 s timer AND on each push, which is the "couple
+      // times a second, sometimes once a second" he measured. Loot was the only card
+      // affected because it is the only non-TICKING surface carrying a drifting number.
+      const key = refused ? "gated" : data ? JSON.stringify(data, DRIFTS) : JSON.stringify(data);
       if (!TICKING[name] && painted[name] === key) continue;
       painted[name] = key;
       p.head.textContent = "";
