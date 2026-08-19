@@ -78,6 +78,9 @@ public class DesignRatchetTests
         // other surface already settled is how the two drift again.
         "EQBuddy.Avalonia/MainWindow.cs",
         "EQBuddy.Avalonia/EqFoldLabel.cs",
+        // Gate 5b: the first of the three heavy card BODIES to leave MainWindow. Built on
+        // the system as it moved, so it joins on the day it lands rather than later.
+        "EQBuddy/ProgressCardView.cs",
     ];
 
     public static TheoryData<string> MigratedFiles()

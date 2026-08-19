@@ -609,35 +609,11 @@
                                       Tag="xp" Click="OnStarChanged" ToolTip="Show XP in mini dashboard"/>
                     </Grid>
                 </Expander.Header>
-                <StackPanel>
-                    <TextBlock x:Name="ProgressSummary" Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="{DynamicResource ListBlock}"/>
-                    <!-- The ding's answer: AAs and spells that just became available,
-                         always shown while the session holds the level-up — a card
-                         line, never a popup. AA tooltips carry the wiki effect text;
-                         spell tooltips the classes that get the spell and when. -->
-                    <TextBlock x:Name="LevelUnlocksLabel" Style="{StaticResource SectionLabel}" Visibility="Collapsed"/>
-                    <ItemsControl x:Name="LevelUnlocksList" Margin="{DynamicResource ListBlock}" Visibility="Collapsed"/>
-                    <TextBlock Text="Skill-ups" Style="{StaticResource SectionLabel}"/>
-                    <ItemsControl x:Name="SkillList" Margin="{DynamicResource LeadXxs}"/>
-                    <!-- Session-new AAs lead (Reddit, 2026-08-11); the full character
-                         ledger folds behind the ▸ label, Pet-abilities style. -->
-                    <TextBlock x:Name="AaNewLabel" Text="AA learned this session" Style="{StaticResource SectionLabel}" Margin="{DynamicResource LeadXs}"
-                               Visibility="Collapsed"/>
-                    <ItemsControl x:Name="AaNewList" Margin="{DynamicResource LeadXxs}" Visibility="Collapsed"/>
-                    <local:EqFoldLabel x:Name="AaAbilitiesLabel" Text="All AA abilities" Open="False"
-                               Section="True" Margin="{DynamicResource LeadXs}"
-                               Visibility="Collapsed" Cursor="Hand" MouseLeftButtonDown="OnAaAllToggled"
-                               ToolTip="Everything the log's history (plus the durable ledger) says this character owns — click to expand or fold"/>
-                    <ItemsControl x:Name="AaAbilityList" Margin="{DynamicResource LeadXxs}" Visibility="Collapsed"/>
-                    <!-- "What do I get at N?" any time — the next milestone with new
-                         AAs or spells, folded behind the ▸ label, All-AA-abilities
-                         style. Hidden until the log has ever announced a level for
-                         this character. -->
-                    <TextBlock x:Name="NextUnlocksLabel" Style="{StaticResource SectionLabel}" Margin="{DynamicResource LeadXs}"
-                               Visibility="Collapsed" Cursor="Hand" MouseLeftButtonDown="OnNextUnlocksToggled"
-                               ToolTip="Spells and AA abilities that open up at your next milestone level — click to expand or fold"/>
-                    <ItemsControl x:Name="NextUnlocksList" Margin="{DynamicResource LeadXxs}" Visibility="Collapsed"/>
-                </StackPanel>
+                <!-- Lifted to ProgressCardView.cs (Gate 5b) — the host carries no
+                     Visibility and no Margin of its own; the lifted control owns both
+                     (trap 15: a control that hides itself inside a host that also
+                     hides itself has two switches for one state). -->
+                <ContentControl x:Name="ProgressBody"/>
             </Expander>
 
             <Expander x:Name="FactionSection" Style="{StaticResource Section}">

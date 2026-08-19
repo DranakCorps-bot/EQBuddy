@@ -22,14 +22,27 @@ namespace EQBuddy;
 /// </summary>
 internal static class EqCardRows
 {
+    /// <param name="tooltip">Hover text per row, or null. A LOOKUP rather than a field on
+    /// <see cref="CardRow"/> on purpose: the answer is resolved per SET, not per row — in
+    /// a merged unlock list the same name means one thing among the spells and another
+    /// among the AAs, and only the set it came from can say which
+    /// (<see cref="UI.Shared.LevelUnlockRows.Tooltip"/>). A field would have to be filled
+    /// in by whoever built the rows, which is the same knowledge in two places.</param>
+    /// <param name="onNameClick">Click per row, or null — same reasoning. This pair is what
+    /// <c>MainWindow.FillList</c> had and this did not, and it is the whole reason the
+    /// Progress, Combat and Healing bodies could not move onto this routine.</param>
     public static void Fill(ItemsControl list, IEnumerable<CardRow> rows,
-        ICardContext? context = null)
+        ICardContext? context = null,
+        Func<string, string?>? tooltip = null,
+        Action<string>? onNameClick = null)
     {
         list.Items.Clear();
-        foreach (var row in rows) list.Items.Add(Build(row, context));
+        foreach (var row in rows) list.Items.Add(Build(row, context, tooltip, onNameClick));
     }
 
-    public static Grid Build(CardRow row, ICardContext? context = null)
+    public static Grid Build(CardRow row, ICardContext? context = null,
+        Func<string, string?>? tooltip = null,
+        Action<string>? onNameClick = null)
     {
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -54,6 +67,24 @@ internal static class EqCardRows
         name.ToolTip = row.Name;
 
         if (row.Item && context is not null) MakeItem(name, row.Name, context);
+
+        // An explicit lookup wins over the trimmed-name fallback, and is applied AFTER
+        // MakeItem so a caller that knows more than the item stats can say so. A null or
+        // empty answer leaves whatever was there — "no tooltip for this row" must not
+        // silently delete the full-name hover that #182 exists for.
+        if (tooltip?.Invoke(row.Name) is { Length: > 0 } rowTip)
+        {
+            var text = new TextBlock
+            {
+                Text = rowTip, TextWrapping = TextWrapping.Wrap, MaxWidth = DesignTokens.TipWidth,
+            };
+            name.ToolTip = new ToolTip { Content = text };
+        }
+        if (onNameClick is { } click)
+        {
+            name.Cursor = System.Windows.Input.Cursors.Hand;
+            DesignSystem.WireClick(name, () => click(row.Name));
+        }
         grid.Children.Add(name);
 
         if (row.Item && context is { } ctx && QuestBadge(ctx, row.Name) is { } badge)

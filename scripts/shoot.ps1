@@ -201,6 +201,15 @@ $Shots = [ordered]@{
                                    @{ Id = 'sky-002'; Acquired = $true }   # Bard
                                    @{ Id = 'sky-199'; Acquired = $true }   # Warrior
                                ) } }
+    # The Progress card, lifted into ProgressCardView.cs (Gate 5b). Trap 22: its two most
+    # interesting lists exist ONLY in response to a level-up, and the shared fixture has
+    # none — so without the append below this shoots a card with an empty ding list and
+    # proves nothing about the rows the lift actually moved. ShowNextUnlocks unfolds the
+    # preview, which is collapsed by default and would otherwise be a label alone.
+    'progress-card'   = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'progress' }
+                           Append = @('You have gained a level! Welcome to level 12!')
+                           Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
@@ -277,6 +286,21 @@ $updateDir = New-Item -ItemType Directory -Force (Join-Path $root 'updates')
 
 Write-Host "Profile: $profileDir"
 & (Join-Path $PSScriptRoot 'make-test-session.ps1') -Out $logsDir.FullName | Write-Host
+
+# Extra log lines for one shot, stamped NOW so the replay treats them as the newest
+# events. Some surfaces exist only in response to a line the shared fixture does not
+# carry — the Progress card's ding list needs "Welcome to level N" — and the fixture
+# CANNOT simply gain one: tests/EQBuddy.E2E replays the same file, and one E2E case
+# asserts that the ding list is absent BEFORE it appends its own level-up. Per-shot
+# appends give a shot the state it needs without making the fixture lie to a test.
+function Append-Log([string[]]$lines) {
+    if (-not $lines -or $lines.Count -eq 0) { return }
+    $log = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
+    if (-not $log) { throw "No fixture log to append to in $($logsDir.FullName)" }
+    # The game's own stamp shape, e.g. [Mon Jul 20 19:03:34 2026].
+    $stamp = (Get-Date).ToString("[ddd MMM d HH:mm:ss yyyy]", [Globalization.CultureInfo]::InvariantCulture)
+    foreach ($line in $lines) { Add-Content -Path $log.FullName -Value "$stamp $line" -Encoding utf8 }
+}
 
 function Write-Settings([hashtable]$extra) {
     $s = @{
@@ -382,6 +406,7 @@ try {
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-WikiCache $spec.Wiki
+        Append-Log $spec.Append
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false

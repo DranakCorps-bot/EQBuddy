@@ -82,7 +82,13 @@ public class ArchitectureTests
         //
         // Measured before reaching for the lift: 177 private/internal methods in that
         // file and not one unreferenced. There was no free room to find.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4422),
+        //
+        // Then lowered 4422 → 4355 on 2026-08-19 with the Progress card's lift into
+        // ProgressCardView.cs — in the SAME commit as the lift, because room that is
+        // freed and not claimed quietly refills. The card took its two unlock MEMOS with
+        // it rather than leaving them behind as internals, which is the difference
+        // between lifting a surface and moving some lines.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4355),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

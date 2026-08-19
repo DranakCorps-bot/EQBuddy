@@ -76,6 +76,7 @@ public partial class MainWindow : Window, ICardContext
     // Motes and Money take the six-method one, never this window.
     private readonly KillsCardView _kills = new();
     private readonly FactionCardView _faction = new();
+    private ProgressCardView _progress = null!;   // built in the ctor, before any XAML runs
     private MotesCardView _motes = null!;
     private MoneyCardView _money = null!;
     // Watch takes the seam plus one thing no snapshot can answer: when each rule's cue
@@ -127,6 +128,10 @@ public partial class MainWindow : Window, ICardContext
         _money = new MoneyCardView(this); _money.Attach(); MoneyBody.Content = _money.Body;
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
+        _progress = new ProgressCardView(this, _settings,
+            s => BuffSetClassSource(s).Classes,
+            () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
+        ProgressBody.Content = _progress.Body;
         BuildSortStrips();
         GearByZoneCheck.IsChecked = _settings.GearGroupByZone;
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -191,7 +196,7 @@ public partial class MainWindow : Window, ICardContext
                     .Select(sec => (sec.Class, (IReadOnlyList<BuffSetEntryState>)sec.Entries))],
                 BuffLosses = () => _buffLossLog.Snapshot(),
                 HopsFromHere = zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops,
-                Progress = () => (CurrentSnapshot().LastLevel, DingUnlocks(CurrentSnapshot())),
+                Progress = () => (CurrentSnapshot().LastLevel, ProgressDingUnlocks(CurrentSnapshot())),
                 CampFor = t => UI.Shared.CampLocations.Resolve(
                     t, EnsureMobLookup, n => WikiMobResult(n)?.Mob?.LocYX),
                 Quests = () => new Companion.CompanionQuestRequest
@@ -1246,64 +1251,21 @@ public partial class MainWindow : Window, ICardContext
         RefreshUi();
     }
 
-    // Memoized per (level, classes) — the header cue reads this every UI tick, and the
-    // answer only changes on a ding or a class pick (perf audit #1's rule: steady-state
-    // ticks allocate nothing they don't have to).
-    private int? _dingLevelMemo;
-    private string _dingClassesMemo = "";
-    private LevelUnlockSet _dingUnlocks = LevelUnlockSet.Empty;
-
-    /// <summary>AAs and spells newly available at the session's latest level-up;
-    /// empty when the session hasn't leveled.</summary>
-    private LevelUnlockSet DingUnlocks(StatsSnapshot s)
-    {
-        if (s.LastLevel is not { } level) return LevelUnlockSet.Empty;
-        var classes = UnlockClasses(s);
-        var key = string.Join(",", classes);
-        if (_dingLevelMemo != level || _dingClassesMemo != key)
-        {
-            _dingLevelMemo = level;
-            _dingClassesMemo = key;
-            _dingUnlocks = LevelUnlocks.UnlocksAt(classes, level);
-        }
-        return _dingUnlocks;
-    }
-
     /// <summary>Classes for level-unlock filtering: the Quest Tracker's picked classes,
     /// falling back to the combat-inferred class — the Gear Locker rule (#104). Buff-set
     /// assembly (#120 stage 2) reads the same source via BuffSetClassSource.</summary>
     private IReadOnlyList<string> UnlockClasses(StatsSnapshot s) => BuffSetClassSource(s).Classes;
 
-    // Memoized like DingUnlocks above and for the same reason: the Progress breakout
-    // reads this on the 1 s tick, and the catalog scan's answer only moves on a ding,
-    // a ledger level, or a class pick (perf audit #1's rule).
-    private int? _nextLevelMemo;
-    private string _nextClassesMemo = "";
-    private (int Level, LevelUnlockSet Unlocks)? _nextUnlocks;
+    /// <summary>The Progress breakout's ding pull, and the header cue's. Both go through
+    /// the CARD now: the memo moved with the surface that computes it (Gate 5b), so this
+    /// is a forward rather than a second copy — two memos over one catalog scan is the
+    /// "one entry, two sources" trap with a performance bill attached.</summary>
+    internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => _progress.DingUnlocks(s);
 
-    /// <summary>The next-milestone preview, anchored to the last level the log
-    /// announced, else the ledger's persisted one; null while no level is known. One
-    /// computation site for the card and the Progress breakout — the two must agree on
-    /// where "At N:" starts (the trap-4 lesson: one fact, two derivations, silent drift).</summary>
-    internal (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s)
-    {
-        int? knownLevel = s.LastLevel;
-        if (knownLevel is null && QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var stored)
-            knownLevel = stored;
-        var classes = UnlockClasses(s);
-        var key = string.Join(",", classes);
-        if (_nextLevelMemo != knownLevel || _nextClassesMemo != key)
-        {
-            _nextLevelMemo = knownLevel;
-            _nextClassesMemo = key;
-            _nextUnlocks = knownLevel is { } kl ? LevelUnlocks.Next(classes, kl) : null;
-        }
-        return _nextUnlocks;
-    }
-
-    /// <summary>The Progress breakout's ding pull — DingUnlocks itself stays private
-    /// with its memo; the breakout reads through this seam.</summary>
-    internal LevelUnlockSet ProgressDingUnlocks(StatsSnapshot s) => DingUnlocks(s);
+    /// <summary>The next-milestone preview, likewise forwarded. The card and the breakout
+    /// must agree on where "At N:" starts (trap 4).</summary>
+    internal (int Level, LevelUnlockSet Unlocks)? NextUnlockPreview(StatsSnapshot s) =>
+        _progress.NextUnlockPreview(s);
 
     // The three static unlock helpers that used to live here moved to
     // UI.Shared/LevelUnlockRows.cs. They were pure functions on a WINDOW class, which is
@@ -1697,7 +1659,7 @@ public partial class MainWindow : Window, ICardContext
     /// (rank-folded identity everywhere) and never appears here.</summary>
     internal List<BuffSuggestion> BuffSuggestionsFor(StatsSnapshot s, List<string> assembled) =>
         BuffSetKey is { Length: > 0 } key
-            ? BuffSuggestions.Compute(DingUnlocks(s).Spells, assembled,
+            ? BuffSuggestions.Compute(ProgressDingUnlocks(s).Spells, assembled,
                 BuffSuggestions.DismissedFor(_settings.BuffSuggestionDismissed, key))
             : [];
 
@@ -2455,7 +2417,7 @@ public partial class MainWindow : Window, ICardContext
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in
         // UI.Shared so the Progress breakout says exactly the same thing.
-        ProgressHeader.Text = ProgressText.Header(s, DingUnlocks(s).Count);
+        ProgressHeader.Text = ProgressText.Header(s, ProgressDingUnlocks(s).Count);
         FactionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "—";
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
@@ -2570,60 +2532,7 @@ public partial class MainWindow : Window, ICardContext
 
         if (MoneySection.IsExpanded) _money.Render(s);
 
-        if (ProgressSection.IsExpanded)
-        {
-            ProgressSummary.Text = string.Join(Environment.NewLine,
-                EQBuddy.UI.Shared.ProgressPresentation.SummaryLines(s));
-            // The ding's answer: what just became available at the session's latest
-            // level, always shown while the level-up is on the card — same idiom as
-            // "AA learned this session". AA class rows lead; Archetype rows are
-            // labeled, not guessed (the wiki doesn't say which classes they cover);
-            // the Spells grouping follows, its rows marked "… spell".
-            var ding = DingUnlocks(s);
-            LevelUnlocksLabel.Visibility = ding.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            LevelUnlocksList.Visibility = LevelUnlocksLabel.Visibility;
-            if (ding.Count > 0 && s.LastLevel is { } dingLevel)
-            {
-                LevelUnlocksLabel.Text = LevelUnlockText.NewAtLevelLabel(dingLevel);
-                FillList(LevelUnlocksList, LevelUnlockRows.Rows(ding), tooltip: LevelUnlockRows.Tooltip(ding));
-            }
-
-            // "What do I get at N?" without waiting for a ding — the next milestone
-            // that unlocks anything, anchored to the last level the log ever announced
-            // (persisted per character, so it works across restarts). Hidden until a
-            // level is known: previewing from an unknown level would be a guess.
-            var next = NextUnlockPreview(s);
-            NextUnlocksLabel.Visibility = next is not null ? Visibility.Visible : Visibility.Collapsed;
-            if (next is { } nx)
-            {
-                NextUnlocksLabel.Text = LevelUnlockText.NextLabel(
-                    nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count, _settings.ShowNextUnlocks);
-                NextUnlocksList.Visibility = _settings.ShowNextUnlocks ? Visibility.Visible : Visibility.Collapsed;
-                if (_settings.ShowNextUnlocks)
-                    FillList(NextUnlocksList, LevelUnlockRows.Rows(nx.Unlocks), tooltip: LevelUnlockRows.Tooltip(nx.Unlocks));
-            }
-            else NextUnlocksList.Visibility = Visibility.Collapsed;
-
-            FillList(SkillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
-            // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show
-            // newly learned this session?" — yes, now it is): session-new AAs lead,
-            // the full ledger folds behind a click, same idiom as Pet abilities.
-            var newAas = ProgressText.SessionNewAas(s);
-            AaNewLabel.Visibility = newAas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            AaNewList.Visibility = AaNewLabel.Visibility;
-            FillList(AaNewList, newAas.Select(a =>
-                    (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
-                tooltip: name => AaCatalog.Find(name)?.Effect);
-            AaAbilitiesLabel.Visibility = s.AaAbilities.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            AaAbilitiesLabel.Set(_settings.ShowAllAAs, _settings.ShowAllAAs
-                ? "All AA abilities"
-                : $"All AA abilities ({s.AaAbilities.Count})");
-            AaAbilityList.Visibility = _settings.ShowAllAAs ? Visibility.Visible : Visibility.Collapsed;
-            if (_settings.ShowAllAAs)
-                FillList(AaAbilityList, s.AaAbilities.Select(a =>
-                        (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
-                    tooltip: name => AaCatalog.Find(name)?.Effect);
-        }
+        if (ProgressSection.IsExpanded) _progress.Render(s);
 
         if (FactionSection.IsExpanded) _faction.Render(s);
 
@@ -2649,7 +2558,7 @@ public partial class MainWindow : Window, ICardContext
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
                     $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} loot={_loot.RowCount} " +
-                    $"skills={SkillList.Items.Count} faction={_faction.RowCount} " +
+                    $"skills={_progress.SkillRows} faction={_faction.RowCount} " +
                     $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
@@ -2668,12 +2577,12 @@ public partial class MainWindow : Window, ICardContext
                     // a level was announced this session), the next-milestone preview
                     // (hidden until a level is known at all, and folded behind a setting)
                     // and the AA split into session-new vs the full ledger.
-                    $"dingShown={(LevelUnlocksLabel.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"dingRows={LevelUnlocksList.Items.Count} " +
-                    $"nextShown={(NextUnlocksLabel.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"nextRows={NextUnlocksList.Items.Count} " +
-                    $"aaNew={AaNewList.Items.Count} " +
-                    $"aaAll={AaAbilityList.Items.Count} " +
+                    $"dingShown={(_progress.DingShown ? 1 : 0)} " +
+                    $"dingRows={_progress.DingRows} " +
+                    $"nextShown={(_progress.NextShown ? 1 : 0)} " +
+                    $"nextRows={_progress.NextRows} " +
+                    $"aaNew={_progress.AaNewRows} " +
+                    $"aaAll={_progress.AaAllRows} " +
                     $"watchRows={_watch.RowCount} " +
                     $"watchStrip={(_watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={_settings.WatchSortMode} " +

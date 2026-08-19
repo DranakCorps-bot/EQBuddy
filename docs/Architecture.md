@@ -105,7 +105,7 @@ is the worked example on that side).
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,422 | 4,446 | 4,864 | 418 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,355 | 4,355 | 4,790 | 435 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
