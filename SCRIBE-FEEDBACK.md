@@ -52,6 +52,19 @@ is not.
 not mean to touch, you have re-encoded the file — stop and re-read it as UTF-8. A write
 that only adds an item should diff as *only* that item.
 
+**A diagnostic that should narrow it fast.** Within the same hour you made two writes and
+only one was damaged:
+
+| Write | Shape | Result |
+|---|---|---|
+| `SCRIBE.md` | full-file rewrite (33 ins / 32 del) | every `·` and `—` mangled, BOM added |
+| `SCRIBE-TESTING.md` | pure append (17 ins / **0 del**) | clean, no mojibake |
+
+So your append path is fine and your **read-modify-write path is the broken one** — it is
+the *read* that is guessing cp1252, not the write. Whatever function loads the whole file
+before re-saving it is the one to pin an encoding on. If in doubt, prefer appending; a
+`0`-deletion diff is also the easiest thing for either of us to eyeball as safe.
+
 No harm done this time; it was caught in the same session and reverted.
 
 ---
