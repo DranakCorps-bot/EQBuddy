@@ -106,6 +106,53 @@ alone. Small, and it would make the new capture surface sharper.
 
 ---
 
+### 4. Gate 5b — WHY the three heavy card bodies are still in MainWindow
+
+Measured 2026-08-19, and this is the finding: it is not that nobody got to them. **`CardRow`
+cannot model what they need.**
+
+`EqCardRows.Fill` is what replaced `FillList` everywhere else, and `CardRow` is name, value,
+indent, note, item-ness and value ink. The Progress/Combat/Healing bodies need two things it
+has no field for: a **per-row tooltip** (an AA row shows the wiki effect, a spell row shows
+which classes get it and when) and a **per-row click** (a spell row opens its own page, an AA
+row opens the single AA page). So they still call `MainWindow.FillList`, which has
+`tooltip:` and `onNameClick:` parameters — and that is the real reason those bodies cannot
+move: the surface would have to reach back into the window for its drawing routine, which is
+exactly the dependency the seam exists to cut.
+
+**The decision to make before lifting any of them** (do not just start the lift):
+
+- **Extend `CardRow`** with `Tooltip` and `Click` — touches the shared row model that four
+  surfaces already use, so it is the honest fix but wants care; OR
+- **give `EqCardRows.Fill` optional lookups** (`Func<string,string?> tooltip`,
+  `Action<string> onClick`) mirroring `FillList`'s signature, leaving `CardRow` alone.
+
+The second is smaller and keeps the row model a pure data record; the first puts the fact on
+the row that owns it. Either way it lands BEFORE the bodies move, not during.
+
+**Already done and safe to build on:** the Progress card's reach-backs are gone
+(`LevelUnlockRows` in UI.Shared, 8 unit tests), and its rendered shape is pinned from a
+launched app — `EQBUDDY_EXPAND` dumps `dingShown/dingRows/nextShown/nextRows/aaNew/aaAll`
+and `ProgressCard_DrawsItsUnlockListsOnADing` asserts the three conditions a move could
+silently drop. That assertion passed against the OLD code first. The safety net is installed;
+only the `CardRow` decision is in the way.
+
+### Releasing: David cannot test Avalonia, so do not wait for him to
+
+**David, 2026-08-19: *"I can't run Linux or macOS. I only have Windows. others will need to
+give feedback there."*** So Avalonia changes are never verified BEFORE a release — only
+after, by Linux/macOS reporters (DonThompson, KoboldCoterie, quasarj, sbaum23). Holding a
+release for Avalonia verification is waiting for something that cannot arrive.
+
+→ Ship on the headless evidence that exists (`WidgetRenderTests`, a `WidgetSheetTests`
+capture, CI's Linux build), **say plainly in the release notes which changes are
+Linux/macOS-side, and ask those reporters to look.** Getting it in front of them IS the
+verification step. The unreleased Avalonia work (30 glyphs → vectors, 91 sizes → tokens) is
+waiting only on Gate 5 being a complete capability, which was his call: *"I'm okay waiting
+for a complete capability if we're still midstream."*
+
+---
+
 ### STILL THE NEXT TASK — the `/consider` rare-creature signal, still blocked
 
 **Nothing changed here and that is correct.** Neither #185 (n3cr0nk1tt3n) nor #217
