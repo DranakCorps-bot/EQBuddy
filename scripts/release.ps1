@@ -5,6 +5,7 @@ param([string]$Tag)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
+. "$PSScriptRoot\signing.ps1"
 
 # Version comes from Directory.Build.props (single source for BOTH apps — issue #30:
 # a separate Avalonia version shipped stale Linux builds) so the apps, installer, and
@@ -30,6 +31,12 @@ if (-not $entry) {
 $releaseNotes = ($entry.highlights | ForEach-Object { "- $_" }) -join "`n"
 $releaseNotes = "## What's new in $version`n`n$releaseNotes`n"
 
+# Resolve the signing toolchain BEFORE the build. Signing used to be discovered at
+# the moment of use and to warn-and-continue when it wasn't there, which is how an
+# unsigned installer could reach OneDrive with the release reporting success. Now a
+# broken toolchain costs one second instead of a 172 MB publish, and it stops the run.
+Initialize-EqSigning -Repo $repo
+
 # The kill is loud on purpose (v1.39.0 shipped mid-fight and the widget just
 # vanished); the /SILENT install at the end brings the app back — on the NEW build.
 Get-Process EQBuddy -ErrorAction SilentlyContinue | Stop-Process -Force
@@ -39,26 +46,17 @@ dotnet publish "$repo\src\EQBuddy\EQBuddy.csproj" -c Release -r win-x64 --self-c
     -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "$repo\dist\publish"
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 
-# Sign with the self-signed EQBuddy cert if present (create once with scripts\new-cert.ps1).
-$cert = Get-ChildItem Cert:\CurrentUser\My -CodeSigningCert |
-    Where-Object { $_.Subject -like '*EQBuddy*' } | Select-Object -First 1
-function Sign-File($path) {
-    if (-not $cert) { Write-Warning "No EQBuddy code-signing cert found; skipping signature for $path"; return }
-    $r = Set-AuthenticodeSignature -FilePath $path -Certificate $cert `
-        -HashAlgorithm SHA256 -TimestampServer 'http://timestamp.digicert.com'
-    # Self-signed cert => Status is UnknownError (untrusted root) on machines that
-    # haven't imported dist\EQBuddy-publisher.cer; the signature itself is embedded.
-    $ok = $r.SignerCertificate -ne $null
-    Write-Host "Signed $(Split-Path $path -Leaf): $(if ($ok) { 'signature embedded' } else { $r.Status })"
-}
-Sign-File "$repo\dist\publish\EQBuddy.exe"
+# Sign the app before Inno Setup packages it, so the installer carries a signed
+# payload as well as being signed itself. Invoke-EqSign throws on anything short of a
+# verified, timestamped signature (scripts\signing.ps1).
+Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
 
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
           "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
 if (-not $iscc) { throw 'Inno Setup (ISCC.exe) not found' }
 & $iscc "/DAppVersion=$version" "$repo\installer\EQBuddy.iss"
 if ($LASTEXITCODE -ne 0) { throw 'installer compile failed' }
-Sign-File "$repo\dist\EQBuddySetup.exe"
+Invoke-EqSign "$repo\dist\EQBuddySetup.exe"
 
 Compress-Archive -Path "$repo\dist\publish\EQBuddy.exe", "$repo\README.md" `
     -DestinationPath "$repo\dist\EQBuddy-portable.zip" -Force

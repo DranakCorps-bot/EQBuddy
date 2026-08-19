@@ -7,3 +7,5 @@ dist/
 
 scripts/harvests/eqlwiki/cache/items-wikitext.jsonl
 __pycache__/
+tools/
+artifact-signing.json

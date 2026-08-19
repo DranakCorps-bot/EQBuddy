@@ -128,13 +128,19 @@ auto-empty finished-session logs, and nothing is touched until you answer:
 - **Fail closed:** if a GitHub release has no published hash, the updater
   refuses to download at all and points you at the release page instead. The
   same verification runs on installers taken from the OneDrive/family folder.
-- Installers are currently signed with a **self-signed certificate**, which
-  is why Windows SmartScreen/Defender sometimes grumbles (see the README's
-  security note). A publicly trusted certificate (Azure Trusted Signing) is
-  in identity validation now; once it lands, releases ship fully signed, and
-  the updater is slated to additionally validate the publisher identity on
-  staged installers — hash verification proves the file is the published one,
-  signature validation will prove who published it.
+- Installers and the app executable are signed with a **publicly trusted
+  certificate** via Azure Artifact Signing, as `CN=FlossworksCross-Stitch`,
+  chaining to a Microsoft public CA. Releasing cannot skip this: `scripts\release.ps1`
+  resolves the signing toolchain before it builds anything and aborts unless every
+  artifact comes back with a signature that verifies and carries a timestamp.
+  SmartScreen reputation still accrues over time, so warnings fade rather than
+  stop dead (see the README's security note).
+- Signatures are **timestamped** (`timestamp.acs.microsoft.com`). Artifact Signing
+  certificates are valid for three days by design; the countersigned timestamp is
+  what keeps an installer you downloaded last month verifiable today.
+- The updater is slated to additionally validate the publisher identity on staged
+  installers — hash verification proves the file is the published one, signature
+  validation will prove who published it.
 
 ## Reporting a vulnerability
 

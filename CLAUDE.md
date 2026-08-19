@@ -88,6 +88,23 @@ returning a bare exit 1 with no output. **A silent failure is not proof nothing
 happened** — check `git tag`, `gh release list`, and the OneDrive timestamp before
 retrying, because a killed run may already have built, signed and copied.
 
+**Signing is automatic and non-negotiable** (`scripts/signing.ps1`, since 2026-08-19).
+Releases are signed with a publicly trusted certificate through Azure Artifact Signing
+as `CN=FlossworksCross-Stitch`; the old self-signed certificate — and the script that
+created it — are gone. `release.ps1` resolves the toolchain *before* it builds and throws unless every
+artifact comes back verified and timestamped — there is no warn-and-continue path, on
+purpose. It restores the signing dlib itself, so the **one** thing it can ever need from
+a human is an expired Azure session, and it says so in as many words:
+
+```bash
+az login
+```
+
+Two machine-local files are gitignored and therefore absent on a fresh clone:
+`artifact-signing.json` (repo root — endpoint, account, certificate profile) and
+`tools/` (auto-restored). The `Endpoint` region must match the account's region or
+signing fails with a bare 403.
+
 ## Rules that are not up for renegotiation
 
 - **Never measure other players.** EQBuddy is not a group monitoring tool and never
@@ -96,6 +113,16 @@ retrying, because a killed run may already have built, signed and copied.
   invite a fork. This is a values line, not a technical one. Do not file these asks
   as requirements.
 - **Hold releases** until David explicitly says ship. Commit and push source freely.
+- **Nothing ships unsigned, ever.** Every artifact a player can run — `EQBuddy.exe`,
+  `EQBuddySetup.exe`, anything added to them later — is signed through Azure Artifact
+  Signing and *verified* before it reaches OneDrive, the GitHub release, or the update
+  channel. `release.ps1` enforces this and throws; **do not add a bypass, a `-SkipSign`
+  switch, or a warn-and-continue path**, and do not hand-build an installer around it.
+  If signing fails, the release stops and the fix is the toolchain — never the check.
+  The publisher identity is the one thing a player cannot verify for themselves by
+  reading the source, so it is the one thing that must never be conditional. Signing
+  broke silently once already: the old self-signed path warned and carried on, which is
+  precisely how an unsigned installer reaches people while the run reports success.
 - **Every player-noticeable change needs a `WhatsNew.json` entry** in the release that
   ships it. A user-visible fix landing after a tag earns its own release. Credit
   reporters by name and discussion number.
@@ -434,6 +461,25 @@ Read this list before touching the areas it names. Every entry cost a release.
     → **When you fold a surface, list every control on it and say where each one went.**
     "The data survived and the write path did not" is the same sentence as #204, #210 and
     #212; a fold is precisely the event that produces it.
+
+27. **Git Bash rewrites a leading-slash ARGUMENT into a filesystem path, and the tool
+    you called blames you for the flag you plainly passed.** MSYS path conversion turned
+    `signtool sign /fd SHA256 …` into a signtool that reported *"No file digest algorithm
+    specified. Please specify the digest algorithm with the /fd flag"* — with `/fd SHA256`
+    sitting in the command line being quoted back. Nothing in the error names the shell,
+    so the obvious reading is that the argument is wrong rather than eaten.
+    → **Invoke Windows tools that take `/flag` arguments from `pwsh`, not Bash.** That is
+    why `scripts/signing.ps1` exists as PowerShell and why `release.ps1` calls it directly.
+    The same trap is waiting for any `/`-flagged tool: `msiexec`, `robocopy`, `reg`.
+
+28. **A signing tool's exit code is not evidence that the signature will validate.**
+    `signtool` returns 0 for signatures whose chain a player's machine will reject, and
+    an Artifact Signing certificate is valid for **three days** — so an untimestamped
+    signature verifies on the machine that made it and goes invalid by the weekend, on
+    everyone who already installed it. Neither failure is visible at release time.
+    → **Verify what you just signed, in the same breath as signing it.** `Invoke-EqSign`
+    asserts `Get-AuthenticodeSignature` returns `Valid` *and* that a
+    `TimeStamperCertificate` is present, and throws otherwise.
 
 ## Tooling notes that cost time when ignored
 

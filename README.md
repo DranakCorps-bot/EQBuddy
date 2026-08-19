@@ -78,13 +78,18 @@ page instead.
 
 ## For players (install guide)
 
-> **Windows security note.** Windows Defender or SmartScreen may warn about
-> `EQBuddySetup.exe` — occasionally even flagging it as a threat. That's a false
-> positive, and a predictable one: EQBuddy is a free community tool signed with a
-> self-signed certificate rather than a paid publisher certificate, so Windows has no
-> "reputation" history for it, and single-file installers from unknown publishers are
-> exactly what Defender's heuristics are tuned to distrust. You don't have to take
-> our word for it:
+> **Windows security note.** EQBuddy is now signed with a **publicly trusted
+> certificate** (Azure Artifact Signing). The publisher reads
+> **"FlossworksCross-Stitch"** — that's David's small business, which funds the
+> certificate personally, and yes, he also cross-stitches. The "unknown publisher"
+> prompt is gone.
+>
+> SmartScreen may still warn for a while yet. Reputation is built per publisher and
+> it accrues over downloads and time, so a brand-new certificate starts at zero no
+> matter how legitimate it is; single-file installers are also exactly what Defender's
+> heuristics are tuned to distrust. Expect the warnings to fade over the coming
+> releases rather than vanish overnight. You don't have to take our word for any of
+> it:
 >
 > - The **full source code is public** in this repository — what you see is what gets built.
 > - Every release publishes a **SHA-256 hash** (`EQBuddySetup.exe.sha256`) beside the
@@ -106,13 +111,10 @@ page instead.
 > run with read-only permissions by default. What the app touches on disk and
 > on the network — all of it — is written down in [SECURITY.md](SECURITY.md).
 >
-> **This is being fixed for real.** A publicly trusted signing certificate (Azure
-> Artifact Signing, ~$10/month) is set up and in identity validation now, funded
-> personally by EQBuddy's maintainer through his small business — so the publisher
-> on signed installers will read **"FlossworksCross-Stitch"** (that's David's
-> company, and yes, he also cross-stitches). Once validation completes, releases
-> ship fully signed and these warnings age out as Windows builds reputation for
-> the certificate.
+> **How to check the signature yourself.** Right-click `EQBuddySetup.exe` →
+> **Properties** → **Digital Signatures**. It should name FlossworksCross-Stitch and
+> chain to a Microsoft certificate authority. If it doesn't, you did not get the file
+> we published — don't run it.
 
 1. Run **EQBuddySetup.exe** and click through the installer (no admin needed).
 2. Launch **EQBuddy** from the Start Menu or desktop shortcut. A **quick tutorial**
@@ -569,8 +571,8 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   stale (60+ min quiet) logs; both are skipped while `eqgame.exe` is running.
 - Publish: `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o dist/publish`
 - Release: `scripts\release.ps1` — reads the version from `Directory.Build.props` (the
-  single source for every project), publishes, signs both exes (self-signed cert; create
-  once with `scripts\new-cert.ps1`), compiles the installer with the matching version
+  single source for every project), publishes, signs both exes (Azure Artifact Signing —
+  see `scripts\signing.ps1`), compiles the installer with the matching version
   stamp, and copies the artifacts to the update channel. Pass `-Tag vX.Y.Z` to push,
   tag, and publish a GitHub release (CI attaches the Linux tarball and the macOS
   `.app` bundles). Bump `<Version>`
