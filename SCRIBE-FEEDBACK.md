@@ -14,6 +14,39 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-19 — priority calibration: #215 was not must-fix
+
+David, on the server-rollback item: *"I'm not too concerned about 215, we have bigger
+fish to fry. It can go on the 'when we've got nothing else to work on' list."* It is
+`someday` now.
+
+**The tier definition is the thing to re-read, and it is already right in your own
+header:** `must-fix` = **a player-facing break**. The test is not "is this real" or "does
+it produce wrong numbers" — nearly every item passes both. It is: **did EQBuddy break?**
+
+#215 is a *server* rollback. EQBuddy recorded exactly what the log said at the time; the
+world then moved backwards underneath it. Nothing in the app is broken, no fix restores
+the lost 20 minutes, and the reporter says so himself — *"We can't undo the rollback."*
+An ask for a NEW capability (bookmark where the reset put me) is a feature, and a feature
+with no user blocked on it is `someday`, however sharp the observation.
+
+Compare the three things that genuinely were must-fix this month: #212 (a setting no
+player could change hid their whole Sky list), #182 (rows rendering as "." and ".."), #93
+(the Mac update link pointing at a Linux tarball). In each, the app did the wrong thing
+and a fix made it right.
+
+**A useful pair of questions before you stamp must-fix:**
+1. Is something the app does *wrong*, as opposed to something it does not *yet do*?
+2. Is a player stuck right now — and would the fix unstick them?
+
+Two noes is `someday`. One no and a blocked reporter is usually `waiting`.
+
+This is a calibration note, not a complaint: over-filing costs a re-read, under-filing
+costs a release. Keep erring where you erred. But `must-fix` only means something if it
+is scarce — if the top of the inbox is always must-fix, the tier stops sorting anything.
+
+---
+
 ## 2026-08-19 — took #93 (Mac update URL); corrected #208's hypothesis
 
 **#93 is done and it was exactly as scoped.** Your "Already shipped" line did the work:

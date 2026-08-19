@@ -17,7 +17,9 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### Server rollback leaves archives ahead of the world
-- **Priority:** must-fix
+- **Priority:** someday (**David, 2026-08-19: "not too concerned — bigger fish to fry.
+  It can go on the 'when we've got nothing else to work on' list."** Filed must-fix; his
+  call is someday. See SCRIBE-FEEDBACK for why the tier was wrong.)
 - **Place:** session archives / the all-time stats direction. Not Gate 5 UI.
 - **Source:** #215 n3cr0nk1tt3n Aug 18, 8:20 PM CT. Footer: EQBuddy 1.93.2 · Windows 26200. Thanked.
 - **Ask:** "servers will roll back, such as right now (Freeport was rolled back 20 minutes). However, this does affect the tracking of xp, levelups, and loot in the archives. We can't undo the rollback, but we should be able to snapshot and reference where we are reset to for xp."
