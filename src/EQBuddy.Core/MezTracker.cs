@@ -246,6 +246,7 @@ public sealed class MezTracker
                     _lastCastOf.Clear();
                     _awake.Clear();
                     _recentMezResists.Clear();
+                    _unpairedBreaks.Clear();
                     break;
             }
             Prune(evt.Time);
@@ -470,6 +471,13 @@ public sealed class MezTracker
                      .Where(kv => now - kv.Value > CastToLand)
                      .Select(kv => kv.Key).ToList())
             _recentMezResists.Remove(stale);
+        // A pairing token outside its 2 s window is dead by definition — without this
+        // sweep the ledger kept one entry per mob name for the PROCESS lifetime, the
+        // one dictionary in this class nothing ever emptied (review catch, 2026-08-18).
+        foreach (var stale in _unpairedBreaks
+                     .Where(kv => (now - kv.Value.At).Duration() > BreakPairWindow)
+                     .Select(kv => kv.Key).ToList())
+            _unpairedBreaks.Remove(stale);
         // Entries are RETAINED well past their visible expiry (Snapshot hides them
         // after ExpiryLinger): a rank-lengthened mez can fade long after the base
         // duration, and the natural-fade line must still find its entry to learn

@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using EQBuddy.Core;
 using LevelUnlockText = EQBuddy.UI.Shared.LevelUnlockText;
+using ProgressText = EQBuddy.UI.Shared.ProgressText;
 using SpawnChip = EQBuddy.UI.Shared.SpawnChip;
 // An alias rather than a `using EQBuddy.UI.Shared` — this file already aliases two types
 // out of that namespace one at a time, because importing the whole of it collides with
@@ -2391,15 +2392,11 @@ public partial class MainWindow : Window, ICardContext
         if (s.LastLevel is { } announced && QuestLedger is { } lg && QuestCharacterKey.Length > 0
             && lg.LevelFor(QuestCharacterKey) != announced)
             lg.SetLevel(QuestCharacterKey, announced);
-        ProgressHeader.Text = $"{s.XpPercent:0.0}% xp"
-            + (s.Levels.Count > 0
-                ? $", +{s.Levels.Count} lvl"
-                  // The ding's cue, visible while the card is closed: the header is the
-                  // only Progress surface that always shows, and clicking it opens the
-                  // card where the "New at level N" list waits (never a popup).
-                  + (DingUnlocks(s).Count > 0 ? $" ({DingUnlocks(s).Count} new)" : "")
-                : "")
-            + (s.AaGained > 0 ? $", +{s.AaGained} aa" : "");
+        // The ding's cue rides the header, visible while the card is closed: the header
+        // is the only Progress surface that always shows, and clicking it opens the
+        // card where the "New at level N" list waits (never a popup). Text built in
+        // UI.Shared so the Avalonia build's header says exactly the same thing.
+        ProgressHeader.Text = ProgressText.Header(s, DingUnlocks(s).Count);
         FactionHeader.Text = s.Faction.Count > 0 ? $"{s.Faction.Count} factions" : "—";
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
@@ -2555,9 +2552,7 @@ public partial class MainWindow : Window, ICardContext
             // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show
             // newly learned this session?" — yes, now it is): session-new AAs lead,
             // the full ledger folds behind a click, same idiom as Pet abilities.
-            var newAas = s.SessionStart is { } sess
-                ? s.AaAbilities.Where(a => a.Time >= sess).ToList()
-                : [];
+            var newAas = ProgressText.SessionNewAas(s);
             AaNewLabel.Visibility = newAas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             AaNewList.Visibility = AaNewLabel.Visibility;
             FillList(AaNewList, newAas.Select(a =>
@@ -3821,9 +3816,6 @@ public partial class MainWindow : Window, ICardContext
         }
     }
 
-
-    private static string FormatEta(double hours) =>
-        EQBuddy.UI.Shared.ProgressPresentation.FormatEta(hours);
 
     private void OnMinimize(object sender, RoutedEventArgs e) => SetMode(true);
     private void OnRestore(object sender, RoutedEventArgs e) => SetMode(false);

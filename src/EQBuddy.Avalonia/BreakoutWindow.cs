@@ -71,6 +71,11 @@ public sealed class BreakoutWindow : Window
         Background = Brushes.Transparent;
         Topmost = true;
         ShowInTaskbar = false;
+        // Auto-shown on the minimize pass, not by a click — without this, the first
+        // Show() activates the window and yanks keyboard focus off the game mid-fight
+        // (same bug the WPF chip stacks carried; every other auto-shown overlay
+        // already declares it).
+        ShowActivated = false;
         CanResize = false;
 
         _title.FontSize = 13;

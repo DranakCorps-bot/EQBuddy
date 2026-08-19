@@ -283,12 +283,17 @@ public sealed class SpawnsWindow : Window
             // regress week-long raid targets.
             var duration = DarkBox(row.DurationText,
                 "Respawn time: 22 (minutes), 90s, 12h, 3d, 3d 12h, 6:40 — your edit persists and outranks the catalog");
-            duration.LostFocus += (_, _) =>
+            void CommitDuration()
             {
                 if ((duration.Text ?? "").Trim() == row.DurationText) return;
                 _vm.SetDuration(row.Zone, row.Name, duration.Text ?? "");
                 Kick();
-            };
+            }
+            duration.LostFocus += (_, _) => CommitDuration();
+            // Enter commits too, as it always has on Windows — alt-tabbing back to the
+            // game without clicking elsewhere must not silently drop the typed value
+            // (review catch, 2026-08-18).
+            duration.KeyDown += (_, e) => { if (e.Key == Key.Enter) CommitDuration(); };
             Grid.SetColumn(duration, 2);
             grid.Children.Add(duration);
 

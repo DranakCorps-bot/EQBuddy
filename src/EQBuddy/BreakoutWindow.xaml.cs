@@ -122,14 +122,37 @@ public partial class BreakoutWindow : Window
         }
         if (_kind == BreakoutKind.Loot)
         {
-            // Same toggle chrome, different axis: what the TARGET can drop vs what the
-            // SESSION has yielded (David, 2026-08-06).
-            ScopeFight.Text = "Target";
-            ScopeSession.Text = "Session";
             _lootView = new LootBreakoutView(this, settings);
             LootStrips.Content = _lootView.Strips;   // shown by the view's own render
         }
+
+        // The scope toggle, on the same compact segmented strip as the Loot filters —
+        // its hand-rolled predecessor washed the selected TextBlock square, which poked
+        // outside ScopeBorder's own rounded corners (LW, 2026-08-18). Loot rides the
+        // same chrome on a different axis: TARGET drops vs the SESSION's yield
+        // (David, 2026-08-06).
+        _scope = new EqSegmentedStrip(ScopeHost, compact: true);
+        var loot = _kind == BreakoutKind.Loot;
+        _scope.Add(loot ? "Target" : "Fight", true,
+            tip: loot ? "What the creature you're fighting — or last /considered — can drop"
+                : "The current (or last) pull's numbers",
+            onClick: () => SetScope(fight: true));
+        _scope.Add("Session", false,
+            tip: loot ? "Everything this session has yielded" : "The whole session's numbers",
+            onClick: () => SetScope(fight: false));
         ApplyScopeVisual();
+    }
+
+    private EqSegmentedStrip? _scope;
+
+    private void SetScope(bool fight)
+    {
+        _fightScope = fight;
+        SetScopeSetting(fight ? "fight" : "session");
+        ApplyScopeVisual();
+        // Repaint now, not on the next tick — the old toggle waited up to a second,
+        // which is long enough to read as a click that did nothing.
+        if (_lastSnapshot is { } s) Update(s);
     }
 
     private string ScopeSetting() => _kind switch
@@ -904,26 +927,8 @@ public partial class BreakoutWindow : Window
 
     private void ApplyScopeVisual()
     {
-        Highlight(ScopeFight, _fightScope);
-        Highlight(ScopeSession, !_fightScope);
-        _signature = "";
-
-        void Highlight(TextBlock t, bool on)
-        {
-            t.SetResourceReference(TextBlock.ForegroundProperty, on ? "AccentBrush" : "DimBrush");
-            if (on) t.SetResourceReference(TextBlock.BackgroundProperty, "ToggleHighlightBrush");
-            else t.Background = Brushes.Transparent;
-        }
-    }
-
-    private void OnScopeFight(object sender, MouseButtonEventArgs e)
-    {
-        _fightScope = true; SetScopeSetting("fight"); ApplyScopeVisual(); e.Handled = true;
-    }
-
-    private void OnScopeSession(object sender, MouseButtonEventArgs e)
-    {
-        _fightScope = false; SetScopeSetting("session"); ApplyScopeVisual(); e.Handled = true;
+        _scope?.Select(_fightScope);
+        _signature = "";   // force a repaint in the new scope on the next tick
     }
 
     private void OnDismiss(object sender, MouseButtonEventArgs e)

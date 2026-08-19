@@ -27,6 +27,7 @@ public partial class MezChipsWindow : Window
         Action<double>? setChipScale = null)
     {
         InitializeComponent();
+        NoActivate.Attach(this);
         _settings = settings;
         _source = source;
         ChipScale.Apply(this, _settings.ChipScale);

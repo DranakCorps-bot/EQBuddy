@@ -40,6 +40,42 @@ public static class ChipStyle
     /// must not compete with the content it filters.</summary>
     public const DesignTokens.TypeRole LabelRole = DesignTokens.TypeRole.Caption;
 
+    /// <summary>The dense variant for the breakout windows, and it is NOT a shrunken
+    /// pill: it is the Target|Session toggle's own vocabulary, the compact segmented
+    /// control that chrome already established (LW, 2026-08-18 — "use the style
+    /// already used by target/session"). Segments sit flush inside one hairline
+    /// group frame; unselected wears no fill at all; selected gets the toggle
+    /// highlight wash with accent text. Same bookkeeping, same tooltips, a fraction
+    /// of the card pill's weight — right for a ~270px window where the strip must
+    /// not compete with the rows it filters.</summary>
+    public static readonly (double Left, double Top, double Right, double Bottom) CompactPadding =
+        (DesignTokens.SpaceS, 1, DesignTokens.SpaceS, 1);
+
+    /// <summary>Compact chips label in Metadata — the size the scope toggle's own
+    /// segments render at, so the two controls read as one family.</summary>
+    public const DesignTokens.TypeRole CompactLabelRole = DesignTokens.TypeRole.Metadata;
+
+    /// <summary>The group frame's (and each segment highlight's) radius — the scope
+    /// toggle's own.</summary>
+    public const double CompactRadius = DesignTokens.RadiusControl;
+
+    /// <summary>"No brush at all" — a compact segment paints no fill and no edge of
+    /// its own; the group's shared hairline frame is the only chrome. Each UI maps
+    /// this to its transparent brush.</summary>
+    public const string None = "";
+
+    /// <summary>Compact ink: the scope toggle's states. Selected = the toggle
+    /// highlight wash under accent text (the one thing on the strip carrying accent,
+    /// §2.1's discipline); unselected = dim text on nothing.</summary>
+    public static Ink ForCompact(bool selected) => selected
+        ? new("ToggleHighlightBrush", None, "AccentBrush", "AccentBrush", 0.85)
+        : new(None, None, "DimBrush", "DimBrush", 1.0);
+
+    /// <summary>Hairline dividers between compact segments (LW, 2026-08-18): the split
+    /// the frame's own border implies, drawn — inset from the frame's rounded corners
+    /// by this much so a divider never touches the curve.</summary>
+    public const double CompactDividerInset = DesignTokens.SpaceXxs;
+
     /// <summary>The optional trailing count ("0 / 486").</summary>
     public const DesignTokens.TypeRole BadgeRole = DesignTokens.TypeRole.Metadata;
 

@@ -39,6 +39,9 @@ public class OverlayActivationTests
         "EQBuddy/ClickThroughChip.cs",
         "EQBuddy/CursorRingWindow.cs",
         "EQBuddy/GridOverlayWindow.cs",
+        // The breakouts pop on the minimize pass — the star was clicked minutes ago,
+        // the show happens mid-fight.
+        "EQBuddy/BreakoutWindow.xaml",
         // Linux / macOS
         "EQBuddy.Avalonia/MezChipsWindow.cs",
         "EQBuddy.Avalonia/SpawnChipsWindow.cs",
@@ -46,6 +49,7 @@ public class OverlayActivationTests
         "EQBuddy.Avalonia/ClickThroughChip.cs",
         "EQBuddy.Avalonia/CursorRingWindow.cs",
         "EQBuddy.Avalonia/GridOverlayWindow.cs",
+        "EQBuddy.Avalonia/BreakoutWindow.cs",
     ];
 
     [Theory]

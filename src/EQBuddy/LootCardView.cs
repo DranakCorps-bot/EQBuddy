@@ -113,6 +113,9 @@ internal sealed class LootCardView
         IReadOnlyList<LootPresentation.Option> options, Action<string> onPick)
     {
         var caption = DesignSystem.Text(DesignTokens.TypeRole.Caption, label);
+        // Semibold, matching the breakout's strips: these are labels, and the weight
+        // is what separates them from the options they govern (LW, 2026-08-18).
+        caption.FontWeight = FontWeights.SemiBold;
         caption.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
         caption.VerticalAlignment = VerticalAlignment.Center;
         group.Children.Add(caption);
@@ -191,6 +194,30 @@ internal sealed class LootCardView
     /// (#148, #166) — as this test just proved by refusing the comment that said so.</summary>
     private Grid BuildRow(LootRow row)
     {
+        object? tip = null;
+        if (_w.QuestAwareTooltip(row.Item, _w.ItemHoverStats(row.Item)) is { Length: > 0 } text)
+        {
+            var tipText = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, MaxWidth = DesignTokens.TipWidth };
+            // Multi-line tips are stat blocks — monospace keeps their columns readable.
+            if (text.Contains('\n')) tipText.FontFamily = MainWindow.MonoFamily;
+            tip = new ToolTip { Content = tipText };
+        }
+        return ItemRow(_w, row.Item, row.Value, LootPresentation.Note(row.Tag),
+            tip ?? "Click for item info (eqlwiki)", _w.ShowItemInfo);
+    }
+
+    /// <summary>THE item row — one builder for the Loot card and the Loot breakout
+    /// (LW, 2026-08-18: "the more we bring the two windows together
+    /// visually and operate from the same source, the better"). Name + provenance run +
+    /// quest badge + dim value, flat: no share bar — these rows state facts, and the
+    /// underline track under every breakout row read as clutter next to the card. What
+    /// hover and click DO stays each caller's own (the card opens the in-app item info,
+    /// the breakouts open the wiki); clicks ride <see cref="DesignSystem.WireClick"/>'s
+    /// press-guard, because a breakout fold header rebuilds its list on mouse-down and
+    /// an unguarded name would catch the stray up.</summary>
+    internal static Grid ItemRow(MainWindow? w, string item, string value, string? note,
+        object? tip, Action<string>? onNameClick)
+    {
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -199,42 +226,33 @@ internal sealed class LootCardView
         var name = DesignSystem.Text(DesignTokens.TypeRole.Body);
         name.TextTrimming = TextTrimming.CharacterEllipsis;
         name.Margin = new Thickness(0, 1, DesignTokens.SpaceM, 1);
-        if (LootPresentation.Note(row.Tag) is { } note)
+        if (note is { Length: > 0 })
         {
             // Provenance is a separate run, not part of the name, so a click still looks
             // the base item up (LW, 2026-08-17).
-            name.Inlines.Add(new Run(row.Item));
+            name.Inlines.Add(new Run(item));
             var tag = new Run($" {note}") { FontSize = MetadataSize };
             tag.SetResourceReference(TextElement.ForegroundProperty, "DimBrush");
             name.Inlines.Add(tag);
         }
-        else name.Text = row.Item;
-
-        if (_w.QuestAwareTooltip(row.Item, _w.ItemHoverStats(row.Item)) is { Length: > 0 } tip)
+        else name.Text = item;
+        if (tip is not null) name.ToolTip = tip;
+        if (onNameClick is not null)
         {
-            var tipText = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = TipWidth };
-            // Multi-line tips are stat blocks — monospace keeps their columns readable.
-            if (tip.Contains('\n')) tipText.FontFamily = MainWindow.MonoFamily;
-            name.ToolTip = new ToolTip { Content = tipText };
+            var clicked = item;
+            DesignSystem.WireClick(name, () => onNameClick(clicked));
         }
-        var item = row.Item;
-        name.Cursor = Cursors.Hand;
-        name.ToolTip ??= "Click for item info (eqlwiki)";
-        // Swallow the down so it can't start a window DragMove and eat the Up (the
-        // discussion #46 failure mode, same fix as the breakout rows).
-        name.MouseLeftButtonDown += (_, e) => e.Handled = true;
-        name.MouseLeftButtonUp += (_, _) => _w.ShowItemInfo(item);
         grid.Children.Add(name);
 
-        if (EqCardRows.QuestBadge(_w, row.Item) is { } badge)
+        if (w is not null && EqCardRows.QuestBadge(w, item) is { } badge)
         {
             Grid.SetColumn(badge, 1);
             grid.Children.Add(badge);
         }
 
-        var value = DesignSystem.Text(DesignTokens.TypeRole.Body, row.Value).Ink("DimBrush");
-        Grid.SetColumn(value, 2);
-        grid.Children.Add(value);
+        var valueBlock = DesignSystem.Text(DesignTokens.TypeRole.Body, value).Ink("DimBrush");
+        Grid.SetColumn(valueBlock, 2);
+        grid.Children.Add(valueBlock);
         return grid;
     }
 
@@ -260,8 +278,4 @@ internal sealed class LootCardView
     private static readonly double MetadataSize =
         DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size;
 
-    /// <summary>How wide a stat-block tooltip may get before it wraps. Not a rhythm value
-    /// — it is the width at which a monospace item block stops being a column and starts
-    /// being a paragraph.</summary>
-    private const double TipWidth = 340;
 }

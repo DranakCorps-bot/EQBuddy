@@ -203,7 +203,7 @@ internal sealed class LootCardView
             {
                 Text = tip,
                 TextWrapping = TextWrapping.Wrap,
-                MaxWidth = TipWidth,
+                MaxWidth = DesignTokens.TipWidth,
                 Foreground = AppTheme.BrushFor("TextBrush"),
             };
             // Multi-line tips are stat blocks — monospace keeps their columns readable.
@@ -260,7 +260,4 @@ internal sealed class LootCardView
     private static readonly double MetadataSize =
         DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size;
 
-    /// <summary>How wide a stat-block tooltip may get before it wraps — the width at which
-    /// a monospace item block stops being a column and starts being a paragraph.</summary>
-    private const double TipWidth = 340;
 }
