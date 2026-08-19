@@ -15,9 +15,26 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 **`MainWindow.xaml.cs`**, the 4,571-line hotspot that §11.8 predicted could not join.
 Full write-up in `docs/DesignSystem.md` **§11.10**; the two new traps are CLAUDE.md 21–22.
 
+**Then four fixes landed on top of it, all from David testing the build (2026-08-19):**
+
+| What | Why it is worth reading |
+|---|---|
+| **Slow chip stops wearing the respawn hourglass** | He spotted one picture doing two jobs. The real repair was `IconSheetTests` — nothing in the repo could SHOW an icon, which is why the snail got cut on a guess the day before. It renders every icon at 12px and 24px now; the snail really does die at 12px, and there is a picture proving it |
+| **#93 — the Mac update banner handed out the Linux tarball** | `UpdateOffer` took a single `bool isWindows`, so "not Windows" silently meant Linux. The Mac artifacts have been on every release since the workflow added FOR that discussion. It is an enum now, so a fourth platform is a compiler error rather than a silent inheritance |
+| **A five-letter ability name stopped hoarding two thirds of the row** | #182's fix over-corrected: proportional columns take their share whether they need it or not. `BreakdownRowLayout.NameCap` caps instead of allocating — and `NameWidth`, which it uses, **had unit tests and no caller**. Trap 20, third time in three days |
+| **The WPF and Avalonia builds can no longer both run on one profile** | The cause of his port error. A guard implemented per TOOLKIT guards nothing: WPF had a named mutex, Avalonia had a lock file, neither could see the other. Standing down was also a *crash* on the Avalonia side and had been since the guard landed. See trap 13's second arrow |
+
 **Unreleased player-visible work exists now** — chip icons, the Watch card's sort strip,
-the alert banner's lost ★, reworded tooltips. Whatever release ships next needs a
-`WhatsNew.json` entry covering it. Nothing has been released; source only, as always.
+the alert banner's lost ★, reworded tooltips, the breakdown row widths, the Mac update
+link, and the single-instance fix. Whatever release ships next needs a `WhatsNew.json`
+entry covering the lot, crediting **Amatyr (#93)** and **sbaum23/David** where due. Nothing
+has been released; source only, as always.
+
+**Still open from that testing round, and NOT fixed:** the fight-side chip stack has never
+been seen on Windows — no fixture produces a live mez, slow or spawn timer, so the two WPF
+chip windows have no test and no shot. `SCRIBE-TESTING.md` names the job that would close
+it (seed a named kill and a mez into the fixture log; propose-and-check, because the
+fixture feeds E2E).
 
 ### NEXT — in this order
 
@@ -43,6 +60,14 @@ partial buys nothing.
 this drop?"). **#191** (configurable mini bar) is approved and was deferred until Gate 5
 finished — Gate 5c is done, so it is unblocked as soon as 5d lands; it reworks the bar
 `MiniBarPresentation` now owns.
+
+**And one that is bigger than its inbox entry: #208, the Linux Mobile switch.** Scribe
+guessed "the toggle is missing from Avalonia Options". Measured 2026-08-19:
+`CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/`, and that csproj has **no
+reference to `EQBuddy.Companion` at all** — there is no server in that build to switch on.
+It is a port, not a checkbox, and it deserves its own session. Worth doing: the two things
+CLAUDE.md calls EQBuddy's only uncontested ground — the phone and the Linux/macOS build —
+currently cannot be used together.
 
 ---
 
