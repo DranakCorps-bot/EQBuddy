@@ -2224,41 +2224,29 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
         _trackedPanel.Children.Clear();
 
-        // Sort links (#105, wizen): manual follows the Options list order (arrange
-        // with ▲▼ there); the rest re-order the display without touching the rules.
+        // Sort strip (#105, wizen): the same four options the WPF widget offers, from the
+        // same list — UI.Shared.SortStrip.ForWatchRules. Both UIs held their own copy of
+        // the tuples and their own copy of the "rearrange with ▲▼" tooltip, which is
+        // precisely the shape of drift CLAUDE.md's parity rule exists to stop.
         if (s.Tracked.Count > 1)
         {
-            var sortBar = new StackPanel
+            var sortBar = new WrapPanel
             {
-                Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 2, 2, 0),
+                Margin = new Thickness(0, DesignTokens.SpaceXxs, DesignTokens.SpaceXxs, 0),
             };
-            sortBar.Children.Add(AppTheme.DimText("sort:", new Thickness(0, 0, 4, 0)));
-            foreach (var (mode, label) in new[]
-                     { ("manual", "manual"), ("alpha", "a–z"), ("total", "total"), ("recent", "recent") })
+            var strip = new EqSegmentedStrip(sortBar);
+            foreach (var option in SortStrip.ForWatchRules)
             {
-                var active = _settings.WatchSortMode == mode;
-                var link = new TextBlock
+                var picked = option.Key;
+                strip.Add(option.Label, option.Key, tip: option.Tip, onClick: () =>
                 {
-                    Text = label, FontSize = 10, Cursor = new Cursor(StandardCursorType.Hand),
-                    Margin = new Thickness(0, 0, 6, 0),
-                    FontWeight = active ? FontWeight.SemiBold : FontWeight.Normal,
-                    Foreground = active ? AppTheme.AccentBrush : AppTheme.DimBrush,
-                };
-                if (mode == "manual")
-                    ToolTip.SetTip(link,
-                        "The Options list order — rearrange rules with ▲▼ in Options → watch rules");
-                var picked = mode;
-                link.PointerPressed += (_, e) =>
-                {
-                    e.Handled = true;
                     _settings.WatchSortMode = picked;
                     _settings.Save();
                     RenderTracked(CurrentSnapshot());
-                };
-                sortBar.Children.Add(link);
+                });
             }
+            strip.Select(_settings.WatchSortMode);
             _trackedPanel.Children.Add(sortBar);
         }
 

@@ -54,6 +54,31 @@ public static class SortStrip
     public static IReadOnlyList<Option> ForDamageTaken { get; } =
         [.. ForDamage.Where(o => o.Metric != Metric.Rate)];
 
+    /// <summary>An option on a strip that orders ROWS rather than a metric column — the
+    /// Watch card's manual / a–z / total / recent. Its key is the stored setting value,
+    /// because unlike <see cref="Metric"/> these were never an enum: both UIs held the
+    /// same four <c>(mode, label)</c> tuples inline and compared them to
+    /// <c>AppSettings.WatchSortMode</c> by string.</summary>
+    /// <param name="Key">The value persisted in <c>AppSettings.WatchSortMode</c>.</param>
+    /// <param name="Label">The chip's word — lower case; a strip is navigation.</param>
+    /// <param name="Tip">Hover copy, or null.</param>
+    public readonly record struct ModeOption(string Key, string Label, string? Tip);
+
+    /// <summary>What a strip over WATCH RULES offers (#105, wizen).
+    ///
+    /// "manual" is the odd one and is the reason this needs a tooltip at all: it is not a
+    /// sort the card performs, it is the order the rules already sit in over in Options.
+    /// The wording says where to change it, and says it WITHOUT naming a glyph — the
+    /// arrows it used to point at are tofu on a Wine prefix (#148, #166).</summary>
+    public static IReadOnlyList<ModeOption> ForWatchRules { get; } =
+    [
+        new("manual", "manual",
+            "The order your rules sit in over in Options — reorder them there"),
+        new("alpha", "a–z", null),
+        new("total", "total", null),
+        new("recent", "recent", "Most recently matched first; never-matched rules sink"),
+    ];
+
     /// <summary>The caption a strip carries when it needs one.
     ///
     /// It does NOT always need one, and Gate 5's first screenshot is why: on the widget a

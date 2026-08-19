@@ -8,6 +8,10 @@ using System.Windows.Threading;
 using EQBuddy.Core;
 using LevelUnlockText = EQBuddy.UI.Shared.LevelUnlockText;
 using SpawnChip = EQBuddy.UI.Shared.SpawnChip;
+// An alias rather than a `using EQBuddy.UI.Shared` — this file already aliases two types
+// out of that namespace one at a time, because importing the whole of it collides with
+// Core here. Tok reads at the call site the way DesignTokens does everywhere else.
+using Tok = EQBuddy.UI.Shared.DesignTokens;
 
 namespace EQBuddy;
 
@@ -1076,12 +1080,13 @@ public partial class MainWindow : Window, ICardContext
     /// <summary>The one-line body of a card that has nothing yet — the card stays
     /// where Options put it (David's verdict: "show what I've selected to see"),
     /// and the line says what will fill it.</summary>
-    private TextBlock EmptyCardLine(string text) => new()
+    private static TextBlock EmptyCardLine(string text)
     {
-        Text = text, FontSize = 11, TextWrapping = TextWrapping.Wrap,
-        Margin = new Thickness(0, 2, 0, 2),
-        Foreground = (Brush)FindResource("DimBrush"),
-    };
+        var line = DesignSystem.Text(Tok.TypeRole.Caption, text);
+        line.TextWrapping = TextWrapping.Wrap;
+        line.Margin = new Thickness(0, Tok.SpaceXxs, 0, Tok.SpaceXxs);
+        return line;
+    }
 
     /// <summary>The grip's tooltip states what a drag can actually do RIGHT NOW —
     /// with every card already visible, dragging down is a no-op, and a control
@@ -1326,9 +1331,9 @@ public partial class MainWindow : Window, ICardContext
         {
             var b = Theming.WireCopyCommand(Theming.Button(""),
                 EQBuddy.UI.Shared.GameCommands.OutputfileAchievements);
-            b.FontSize = 10.5;
+            b.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
             b.HorizontalAlignment = HorizontalAlignment.Left;
-            b.Margin = new Thickness(0, 3, 0, 0);
+            b.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
             b.ToolTip = "Copies the command — paste it into the game's chat and the game " +
                 "writes its achievements dump beside its own folders; right-click → " +
                 "Data & imports → Import achievements… reads it.";
@@ -1352,7 +1357,8 @@ public partial class MainWindow : Window, ICardContext
             RaidsPanel.Children.Add(new TextBlock
             {
                 Text = $"{zone.Zone} — {done}/{zone.Bosses.Length}",
-                FontSize = 11, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 4, 0, 1),
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, Tok.SpaceXs, 0, 1),
                 Foreground = (Brush)FindResource(done == zone.Bosses.Length ? "GoodBrush" : "AccentBrush"),
             });
             foreach (var (boss, rec) in records)
@@ -1373,7 +1379,8 @@ public partial class MainWindow : Window, ICardContext
                 var row = new TextBlock
                 {
                     Text = $"{(cleared ? "✓" : "·")} {boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
-                    FontSize = 11.5, Margin = new Thickness(6, 0, 0, 0),
+                    FontSize = Tok.Spec(Tok.TypeRole.BodySecondary).Size,
+                    Margin = new Thickness(Tok.SpaceS, 0, 0, 0),
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     Foreground = (Brush)FindResource(cleared ? "TextBrush" : "DimBrush"),
                 };
@@ -1391,7 +1398,8 @@ public partial class MainWindow : Window, ICardContext
         RaidsPanel.Children.Add(new TextBlock
         {
             Text = $"Kills count when your log sees the boss die; import {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} to mark older clears.",
-            FontSize = 10, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0),
+            FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
+            TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
             Foreground = (Brush)FindResource("DimBrush"),
         });
         RaidsPanel.Children.Add(CopyAchievementsCmd());
@@ -1480,7 +1488,7 @@ public partial class MainWindow : Window, ICardContext
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var name = new TextBlock
             {
-                Text = b.Label, FontSize = 12,
+                Text = b.Label, FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
                 Foreground = (Brush)FindResource("TextBrush"),
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 ToolTip = (b.Candidates.Length > 1
@@ -1492,7 +1500,11 @@ public partial class MainWindow : Window, ICardContext
             };
             row.Children.Add(name);
             var remaining = b.RemainingSeconds(now);
-            var clock = new TextBlock { Text = ClockText(remaining, b.Estimated), FontSize = 12 };
+            var clock = new TextBlock
+            {
+                Text = ClockText(remaining, b.Estimated),
+                FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
+            };
             clock.SetResourceReference(TextBlock.ForegroundProperty,
                 remaining is < 60 ? "WarnBrush" : "DimBrush");
             Grid.SetColumn(clock, 1);
@@ -1651,8 +1663,8 @@ public partial class MainWindow : Window, ICardContext
         if (missing.Count == 0 && notSeen.Count == 0 && expiring.Count == 0) return;
         var line = new TextBlock
         {
-            FontSize = 11, TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, 3, 0, 0),
+            FontSize = Tok.Spec(Tok.TypeRole.Caption).Size, TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
             ToolTip = "Your buff set. missing = EQBuddy saw it fade this session (or its timer ran out). "
                 + "expiring = still up, inside the warn window. "
                 + "not seen = no landing line this session — it may still be up from before "
@@ -1688,14 +1700,15 @@ public partial class MainWindow : Window, ICardContext
     {
         foreach (var sug in suggestions)
         {
-            var row = new Grid { Margin = new Thickness(0, 3, 0, 0) };
+            var row = new Grid { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var text = new TextBlock
             {
                 Text = $"new buff at your level — add {sug.Spell} to {sug.Class}?",
-                FontSize = 11, FontStyle = FontStyles.Italic, TextWrapping = TextWrapping.Wrap,
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                FontStyle = FontStyles.Italic, TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center,
                 ToolTip = "Your level-up made this buff available (the Progress card's "
                     + "\"New at level\" list). ✓ adds it to that class's set bucket; "
@@ -1718,8 +1731,9 @@ public partial class MainWindow : Window, ICardContext
     {
         var t = new TextBlock
         {
-            Text = glyph, FontSize = 12, Cursor = Cursors.Hand,
-            Padding = new Thickness(6, 0, 2, 0), VerticalAlignment = VerticalAlignment.Center,
+            Text = glyph, FontSize = Tok.Spec(Tok.TypeRole.Body).Size, Cursor = Cursors.Hand,
+            Padding = new Thickness(Tok.SpaceS, 0, Tok.SpaceXxs, 0),
+            VerticalAlignment = VerticalAlignment.Center,
             ToolTip = tip,
         };
         t.SetResourceReference(TextBlock.ForegroundProperty, brush);
@@ -2680,51 +2694,37 @@ public partial class MainWindow : Window, ICardContext
 
         TrackedPanel.Children.Clear();
 
-        // Sort links (#105, wizen): manual follows the Options list order (arrange
-        // with ▲▼ there); the rest re-order the display without touching the rules.
+        // Sort strip (#105, wizen): the fifth hand-built segmented control in this file,
+        // now THE chip (docs/DesignSystem.md §11.2). A WrapPanel rather than a StackPanel
+        // because four pills are wider than four text links and the widget is 342px at
+        // its narrowest — a horizontal stack would push the last one off the card.
+        // No "sort:" caption: one strip beside the list it orders does not need one, and
+        // Gate 5a's first screenshot is why (UI.Shared.SortStrip.Caption).
         if (s.Tracked.Count > 1)
         {
-            var sortBar = new StackPanel
+            var sortBar = new WrapPanel
             {
-                Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Margin = new Thickness(0, 2, 2, 0),
+                Margin = new Thickness(0, Tok.SpaceXxs, Tok.SpaceXxs, 0),
             };
-            sortBar.Children.Add(new TextBlock
+            var strip = new EqSegmentedStrip(sortBar);
+            foreach (var option in EQBuddy.UI.Shared.SortStrip.ForWatchRules)
             {
-                Text = "sort:", FontSize = 10, Margin = new Thickness(0, 0, 4, 0),
-                Foreground = (Brush)FindResource("DimBrush"),
-            });
-            foreach (var (mode, label) in new[]
-                     { ("manual", "manual"), ("alpha", "a–z"), ("total", "total"), ("recent", "recent") })
-            {
-                var active = _settings.WatchSortMode == mode;
-                var link = new TextBlock
+                var picked = option.Key;
+                strip.Add(option.Label, option.Key, tip: option.Tip, onClick: () =>
                 {
-                    Text = label, FontSize = 10, Cursor = Cursors.Hand,
-                    Margin = new Thickness(0, 0, 6, 0),
-                    FontWeight = active ? FontWeights.SemiBold : FontWeights.Normal,
-                    Foreground = (Brush)FindResource(active ? "AccentBrush" : "DimBrush"),
-                    ToolTip = mode == "manual"
-                        ? "The Options list order — rearrange rules with ▲▼ in Options → watch rules"
-                        : null,
-                };
-                var picked = mode;
-                link.MouseLeftButtonDown += (_, e) =>
-                {
-                    e.Handled = true;
                     _settings.WatchSortMode = picked;
                     _settings.Save();
                     RenderTracked(CurrentSnapshot());
-                };
-                sortBar.Children.Add(link);
+                });
             }
+            strip.Select(_settings.WatchSortMode);
             TrackedPanel.Children.Add(sortBar);
         }
 
         foreach (var r in orderedResults)
         {
-            var head = new Grid { Margin = new Thickness(0, 4, 0, 0) };
+            var head = new Grid { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             // A rule with a cue counting down says so in its heading, so you can watch the
@@ -2735,14 +2735,15 @@ public partial class MainWindow : Window, ICardContext
                 Text = counting
                     ? $"{r.Name.ToUpperInvariant()} ⏳ {EQBuddy.UI.Shared.Countdown.Format(dueAt - DateTime.Now)}"
                     : r.Name.ToUpperInvariant(),
-                FontSize = 11, FontWeight = FontWeights.SemiBold,
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size, FontWeight = FontWeights.SemiBold,
                 Foreground = (Brush)FindResource(counting ? "WarnBrush" : "AccentBrush"),
             };
             head.Children.Add(headText);
             var rate = new TextBlock
             {
                 Text = $"{r.TotalQuantity} total · {r.PerHour:0.#}/hr · {r.PerActiveHour:0.#}/active hr",
-                FontSize = 11, Foreground = (Brush)FindResource("DimBrush"),
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                Foreground = (Brush)FindResource("DimBrush"),
             };
             Grid.SetColumn(rate, 1);
             head.Children.Add(rate);
@@ -2756,8 +2757,10 @@ public partial class MainWindow : Window, ICardContext
             {
                 lastLine = new TextBlock
                 {
-                    Text = $"last: {li} · {FormatAge(DateTime.Now - lm)} ago", FontSize = 12,
-                    Foreground = (Brush)FindResource("TextBrush"), Margin = new Thickness(6, 1, 0, 2),
+                    Text = $"last: {li} · {FormatAge(DateTime.Now - lm)} ago",
+                    FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
+                    Foreground = (Brush)FindResource("TextBrush"),
+                    Margin = new Thickness(Tok.SpaceS, 1, 0, Tok.SpaceXxs),
                     TextTrimming = TextTrimming.CharacterEllipsis,
                 };
                 TrackedPanel.Children.Add(lastLine);
@@ -2765,8 +2768,9 @@ public partial class MainWindow : Window, ICardContext
             else
                 TrackedPanel.Children.Add(new TextBlock
                 {
-                    Text = "no matches yet", FontSize = 11,
-                    Foreground = (Brush)FindResource("DimBrush"), Margin = new Thickness(6, 1, 0, 2),
+                    Text = "no matches yet", FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                    Foreground = (Brush)FindResource("DimBrush"),
+                    Margin = new Thickness(Tok.SpaceS, 1, 0, Tok.SpaceXxs),
                 });
             _trackedRowRefs.Add(new TrackedRowRefs(r.Id, r.Name, headText, rate, lastLine));
 
@@ -2777,15 +2781,19 @@ public partial class MainWindow : Window, ICardContext
                     foreach (var item in r.Items)
                         TrackedPanel.Children.Add(new TextBlock
                         {
-                            Text = $"{item.Name}   ×{item.Count}", FontSize = 12,
-                            Foreground = (Brush)FindResource("TextBrush"), Margin = new Thickness(12, 1, 0, 0),
+                            Text = $"{item.Name}   ×{item.Count}",
+                            FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
+                            Foreground = (Brush)FindResource("TextBrush"),
+                            Margin = new Thickness(Tok.SpaceL, 1, 0, 0),
                             TextTrimming = TextTrimming.CharacterEllipsis,
                         });
                 var toggle = new TextBlock
                 {
                     Text = expanded ? "▾ less" : $"▸ all {r.Items.Count} kinds",
-                    FontSize = 11, Cursor = System.Windows.Input.Cursors.Hand,
-                    Foreground = (Brush)FindResource("DimBrush"), Margin = new Thickness(6, 0, 0, 2),
+                    FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    Foreground = (Brush)FindResource("DimBrush"),
+                    Margin = new Thickness(Tok.SpaceS, 0, 0, Tok.SpaceXxs),
                 };
                 var id = r.Id;
                 toggle.MouseLeftButtonDown += (_, e) =>
@@ -2851,7 +2859,7 @@ public partial class MainWindow : Window, ICardContext
             GearChecklistList.Items.Add(new TextBlock
             {
                 Text = "No gear list imported.",
-                FontSize = 11,
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
                 Foreground = (Brush)FindResource("DimBrush"),
                 TextWrapping = TextWrapping.Wrap,
             });
@@ -2894,7 +2902,7 @@ public partial class MainWindow : Window, ICardContext
             GearChecklistList.Items.Add(new TextBlock
             {
                 Text = "Everything on the list is acquired — nothing left to farm.",
-                FontSize = 11,
+                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
                 Foreground = (Brush)FindResource("DimBrush"),
                 TextWrapping = TextWrapping.Wrap,
             });
@@ -2912,10 +2920,10 @@ public partial class MainWindow : Window, ICardContext
     private TextBlock GearGroupHeading(string heading) => new()
     {
         Text = heading,
-        FontSize = 11,
+        FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
         FontWeight = FontWeights.SemiBold,
         Foreground = (Brush)FindResource("AccentBrush"),
-        Margin = new Thickness(0, 8, 0, 2),
+        Margin = new Thickness(0, Tok.SpaceM, 0, Tok.SpaceXxs),
     };
 
     private CheckBox GearRow(GearChecklistItem item)
@@ -2924,13 +2932,13 @@ public partial class MainWindow : Window, ICardContext
         text.Children.Add(new TextBlock
         {
             Text = item.Slot,
-            FontSize = 10,
+            FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
             Foreground = (Brush)FindResource("DimBrush"),
             TextTrimming = TextTrimming.CharacterEllipsis,
         });
         var itemName = new TextBlock
         {
-            FontSize = 12,
+            FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
             Foreground = (Brush)FindResource("TextBrush"),
             TextTrimming = TextTrimming.CharacterEllipsis,
         };
@@ -2940,7 +2948,7 @@ public partial class MainWindow : Window, ICardContext
         {
             itemName.Inlines.Add(new System.Windows.Documents.Run(itemText.EffectSuffix)
             {
-                FontSize = 10,
+                FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
                 Foreground = (Brush)FindResource("DimBrush"),
             });
         }
@@ -2950,7 +2958,7 @@ public partial class MainWindow : Window, ICardContext
             text.Children.Add(new TextBlock
             {
                 Text = item.Source,
-                FontSize = 10,
+                FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
                 Foreground = (Brush)FindResource("DimBrush"),
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
@@ -2960,7 +2968,7 @@ public partial class MainWindow : Window, ICardContext
         {
             IsChecked = item.Acquired,
             Content = text,
-            Margin = new Thickness(0, 2, 0, 2),
+            Margin = new Thickness(0, Tok.SpaceXxs, 0, Tok.SpaceXxs),
             ToolTip = EQBuddy.UI.Shared.GearChecklistPresentation.Tooltip(item),
         };
         check.Checked += (_, _) => OnGearToggled(item, true);
@@ -3594,7 +3602,11 @@ public partial class MainWindow : Window, ICardContext
     private StackPanel MiniChip(string iconName, string value, string valueBrush, string? edgeBrush = null,
         BreakoutKind? breakout = null)
     {
-        var panel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 10, 0) };
+        var panel = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Margin = new Thickness(0, 0, Tok.SpaceL, 0),
+        };
         if (breakout is { } kind && _settings.DoubleClickChipsToggleBreakouts)
         {
             // Transparent (not null) so the gaps between glyph and value are hit-testable
@@ -3638,12 +3650,17 @@ public partial class MainWindow : Window, ICardContext
         panel.Children.Add(icon);
         var v = new TextBlock
         {
-            Text = value, FontSize = 12.5, FontWeight = FontWeights.SemiBold,
+            Text = value, FontSize = Tok.Spec(Tok.TypeRole.TitleSection).Size,
+            FontWeight = FontWeights.SemiBold,
             VerticalAlignment = VerticalAlignment.Center,
         };
         v.SetResourceReference(TextBlock.ForegroundProperty, edgeBrush ?? valueBrush);
         panel.Children.Add(v);
-        var divider = new Border { Width = 1, Margin = new Thickness(10, 2, 0, 2) };
+        var divider = new Border
+        {
+            Width = 1,
+            Margin = new Thickness(Tok.SpaceL, Tok.SpaceXxs, 0, Tok.SpaceXxs),
+        };
         divider.SetResourceReference(Border.BackgroundProperty, "HairlineBrush");
         panel.Children.Add(divider);
         return panel;
@@ -3704,7 +3721,7 @@ public partial class MainWindow : Window, ICardContext
         if (MiniChips.Children.Count == 0)
             MiniChips.Children.Add(new TextBlock
             {
-                Text = "☆ star stats in full view", FontSize = 12,
+                Text = "☆ star stats in full view", FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
                 Foreground = (Brush)FindResource("DimBrush"), VerticalAlignment = VerticalAlignment.Center,
             });
     }
@@ -3950,9 +3967,10 @@ public partial class MainWindow : Window, ICardContext
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             var left = new TextBlock
             {
-                FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis,
+                FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
+                TextTrimming = TextTrimming.CharacterEllipsis,
                 Foreground = nameBrush?.Invoke(name) ?? (Brush)FindResource("TextBrush"),
-                Margin = new Thickness(0, 1, 8, 1),
+                Margin = new Thickness(0, 1, Tok.SpaceM, 1),
             };
             // Provenance rides inline as a muted "(Foraged)"/"(Crafted)"/… after the name —
             // a separate run, not part of the name, so the click still looks up the base item.
@@ -3961,7 +3979,8 @@ public partial class MainWindow : Window, ICardContext
                 left.Inlines.Add(new System.Windows.Documents.Run(name));
                 left.Inlines.Add(new System.Windows.Documents.Run($" {note}")
                 {
-                    FontSize = 11, Foreground = (Brush)FindResource("DimBrush"),
+                    FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+                    Foreground = (Brush)FindResource("DimBrush"),
                 });
             }
             else left.Text = name;
@@ -4008,7 +4027,7 @@ public partial class MainWindow : Window, ICardContext
             }
             var right = new TextBlock
             {
-                Text = value, FontSize = 12,
+                Text = value, FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
                 Foreground = valueBrush?.Invoke(value) ?? (Brush)FindResource("DimBrush"),
             };
             Grid.SetColumn(right, 2);

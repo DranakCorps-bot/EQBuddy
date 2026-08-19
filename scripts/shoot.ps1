@@ -140,6 +140,23 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
+    # The Watch card with rules that the fixture session actually matches — without them
+    # the card is a one-line empty state and its sort strip does not exist at all (it
+    # appears only above two or more rules). "Spider parts" is deliberately a rule with
+    # three kinds under it, so the "all N kinds" fold shows too.
+    # NOT called watch-card: docs/screenshots/watch-card.png is a hand-taken shot that
+    # docs/WatchListGuide.md embeds, and a shot name IS its filename — this would have
+    # quietly overwritten a guide's illustration with the fixture's three rules.
+    'tracked-card'    = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'tracked' }
+                           Set = @{ TrackedRules = @(
+                                   @{ Id = 'shot-spider'; Name = 'Spider parts'
+                                      Pattern = 'Spider'; Kind = 0 }
+                                   @{ Id = 'shot-bone'; Name = 'Bone chips'
+                                      Pattern = 'Bone Chips'; Kind = 0 }
+                                   @{ Id = 'shot-kills'; Name = 'Giant spiders'
+                                      Pattern = 'giant spider'; Kind = 1 }
+                               ) } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
