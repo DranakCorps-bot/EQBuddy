@@ -116,7 +116,7 @@ is the worked example on that side).
 | `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,455 | 5,639 | 184 |
 
 Re-measured 2026-08-20. The WPF widget came down 110 lines when the Gear card body was
-lifted into `GearCardView.cs` for the Loot &amp; Items theme, and its baseline came down
+lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one
 way this table stops meaning anything. `OptionsWindow` is the tight one now: it took the
 mez-duration editor and the breakout rewrite this week, and the editor was lifted straight

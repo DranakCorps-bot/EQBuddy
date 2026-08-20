@@ -152,7 +152,7 @@ an action, which is exactly what earns that space. What consolidates is the
 sound" become one. `UI.Shared/AlertSoundPlan.cs` already owns the decision; this gives
 it one front door.
 
-### 5. Loot & Items
+### 5. Gear & Loot
 **Tabs:** Session loot · Drops by creature · Item lookup · Gear
 **Absorbs:** Loot card, Gear card, `DropsWindow`, `ItemInfoWindow`, `InventoryWindow`,
 `GearLockerWindow`
@@ -191,7 +191,7 @@ evaluator) to lift first. **The right question is not "what does the plan say ne
 2. **Alerts** — mostly a settings surface, the chips it configures already work, and
    `AlertSoundPlan` is already shared and tested. Also closes the "settings live in
    Options except where they don't" seam. Needs `RenderBuffs` lifted first.
-3. **Loot & Items** — unblocks #174, which is already approved and waiting.
+3. **Gear & Loot** — unblocks #174, which is already approved and waiting.
 4. **Live Meters** — biggest MainWindow lift, so the most E2E pinning needed first.
 5. **World** — the map is the heaviest surface and the one with the most mobile
    parity work; do it when the recipe is boring.

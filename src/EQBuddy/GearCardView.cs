@@ -11,7 +11,7 @@ namespace EQBuddy;
 /// The widget's Gear card: an imported EQ Legends Tools shopping list as a checklist,
 /// grouped either by kind (gear vs exaltations) or by the zone you would farm it in.
 ///
-/// Lifted out of <c>MainWindow</c> for the Loot &amp; Items theme (docs/Themes.md), and it
+/// Lifted out of <c>MainWindow</c> for the Gear &amp; Loot theme (docs/Themes.md), and it
 /// is the clean case CLAUDE.md describes: the whole surface touched settings, five named
 /// controls and one repaint flag, with the grouping and the rollup already living in
 /// UI.Shared where they are tested. Its rendered shape was pinned in
@@ -35,7 +35,7 @@ internal sealed class GearCardView : IWidgetCard
     private readonly Func<string, object> _brush;
 
     // Built here, not handed in. A card that takes its host's controls can only ever
-    // live in one host — and this one has to live in two, because the Loot & Items
+    // live in one host — and this one has to live in two, because the Gear & Loot
     // theme puts it in a window as well as on the widget. A UIElement has one parent,
     // so each host gets its OWN instance (MainWindow.NewProgressSurfaces' rule).
     private readonly ItemsControl _list = new();

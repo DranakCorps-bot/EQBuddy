@@ -20,6 +20,30 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### reliably shows what quest an item is for
+- **Priority:** waiting (desktop loot surfaces already have this; ask is reliability / whether they can find it)
+- **Place:** Loot & Items theme (in progress). Fits the loot to quest link of the chain. Phone lists item lookup as a looking-away surface.
+- **Source:** Reddit r/EQLegends [EQ Buddy? thread](https://old.reddit.com/r/EQLegends/comments/1vt47d5/eq_buddy/p4ucvli/) u/Sarah-Rien ~10:38 AM CT Aug 20. Harvest only; did not reply.
+- **Ask:** "Any of them has something that reliable shows what quest an item is for? So I don't have to look it up to avoid missing something important."
+- **Already shipped:** WhatsNew.json:876: "a small 🗺 next to the name is the quest marker now, and it's on EVERY loot surface: the Loot card, target drops, the minimized Loot breakout, and Drops by Creature. Click the 🗺 → its quests in the Quest Tracker." WhatsNew.json:918: "green means a real quest wants that item... Click the 🗺 to see exactly which quests."
+- **Checked:** those WhatsNew lines. Hypothesis, unchecked -- whether Mobile loot shows the same 🗺, and whether an item lookup that is not on a loot list has a quest list of its own.
+
+### Mobile page doesn't allow refresh when only 1 card is selected
+- **Priority:** must-fix
+- **Place:** EQBuddy Mobile. Not Gate 5.
+- **Source:** #222 bjstrange Aug 20, 10:56 AM CT. Replied 2026-08-20 (Scribe).
+- **Ask:** pull-down refresh should work when only one card is selected, the same as with two or more. Any single card.
+- **Already shipped:** pull-down refresh works with 2+ cards.
+- **Checked:** not grepped this run. Hypothesis, unchecked -- data source is the single-card layout scroll container, not the refresh handler (it works once a second card is on).
+
+### Mobile "New at level" lists quest-filter classes, not the class in play
+- **Priority:** waiting (David's call: live character class vs Quest Tracker class selection). Helm asking David 2026-08-20; not authorized.
+- **Place:** Mobile Progress card. Phone surface.
+- **Source:** #223 bjstrange Aug 20, 10:59 AM CT. Replied 2026-08-20 (Scribe).
+- **Ask:** "New at level xx" on Mobile Progress should list unlocks for the class currently being played, not the classes selected on the Quest Tracker.
+- **Already shipped:** desktop Progress has New-at-level / level-up unlocks (WhatsNew). Unknown whether desktop already uses current class.
+- **Checked:** not grepped this run. Hypothesis, unchecked -- data source is the Quest class filter, not the live character class.
+
 ### Instance charges timer on the widget
 - **Priority:** waiting (blocked on one verbatim log line from the reporter — Claude asked 2026-08-19)
 - **Place:** overlay chip vocabulary (Gate 6), IF the log carries it at all.
@@ -174,6 +198,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Place:** mobile loot/watches card. Not Gate 5 widget.
 - **Source:** #202 bjstrange (opened Aug 17) + follow-up Aug 19, 11:47 AM CT. Old thread — did not reply.
 - **Ask:** "This is still happening in v1.94.1. Same behavior, same frequency." Card constantly refreshes and hides watched loot.
+- **Follow-up Aug 20, 10:55 AM CT:** still happens with Loot & Watches as the only card. 3 looted, 3 watched. Footer was 1.96.1 earlier today; still churns after closing tab and browser and opening from a bookmark. Did not reply (old thread; Claude is in it).
 - **Already shipped:** Claude's fingerprint fix (`fcdc412` "#202: the phone and the PC disagreed about what changed means") is in the 1.94.1 history (that commit sits under `ef2a30a` 1.94.1). Page was supposed to ignore clock-driven `/hr` the same way the PC does.
 - **Where it might live:** hypothesis, unchecked — a second clock still reaching that card, or the 1.94.1 binary the reporter has is not the one that contains the page change. Do not assert either without a quote from the shipped mobile page.
 ### charm4.txt still reports no held time

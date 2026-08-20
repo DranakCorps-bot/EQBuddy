@@ -25,6 +25,12 @@ public sealed class AppSettings
     /// a real saved position (#117).</summary>
     public double ProgressLeft { get; set; } = double.NaN;
     public double ProgressTop { get; set; } = double.NaN;
+
+    /// <summary>The Gear &amp; Loot window's spot. NaN until it has been placed once —
+    /// WindowPlacement.PositionToPersist keeps an unmoved fallback from overwriting a
+    /// real saved position (#117).</summary>
+    public double GearLootLeft { get; set; } = double.NaN;
+    public double GearLootTop { get; set; } = double.NaN;
     /// <summary>Quest Tracker era ceiling ("" = any): quests after this era are hidden
     /// (discussion #62). Persisted app-wide — the world's era isn't per character.</summary>
     public string QuestEraFilter { get; set; } = "";
@@ -671,7 +677,7 @@ public sealed class AppSettings
         ProgressSurface.AbsorbedCardKeys, ProgressSurface.ThemeCardKey);
 
     /// <summary>
-    /// The Loot &amp; Items fold: the Loot and Gear cards become one launcher (step 5 of
+    /// The Gear &amp; Loot fold: the Loot and Gear cards become one launcher (step 5 of
     /// docs/Themes.md's recipe). Same two conservative rules as
     /// <see cref="MigrateProgressSections"/>, and the same idempotence trap guarded the
     /// same way — the theme key is itself one of the absorbed keys, so without the stale

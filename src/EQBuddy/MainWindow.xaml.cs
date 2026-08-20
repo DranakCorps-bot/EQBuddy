@@ -441,6 +441,16 @@ public partial class MainWindow : Window, ICardContext
             Loaded += (_, _) => OnFeedback(this, new RoutedEventArgs());
 
 
+        // Same family as EQBUDDY_PROGRESS / EQBUDDY_QUESTS: a theme window that can only
+        // be opened from a menu cannot be reviewed, and a surface nobody can review reads
+        // as reviewed anyway (trap 22). "1" opens it on Loot; a tab key opens it there.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOOT") is { Length: > 0 } glTab)
+            Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
+            {
+                ShowGearLootWindow();
+                if (LootSurface.TabForKey(glTab) is { } t) _gearLootWindow?.SetTab(t);
+            }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_HISTORY") == "1")
             Loaded += async (_, _) =>
             {
@@ -2203,6 +2213,7 @@ public partial class MainWindow : Window, ICardContext
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsLoaded: true, IsVisible: true } qw) qw.MaybeRefresh();
         if (_progressWindow is { IsLoaded: true, IsVisible: true } pw) pw.MaybeRefresh();
+        if (_gearLootWindow is { IsLoaded: true, IsVisible: true } glw) glw.MaybeRefresh();
         if (_dropsWindow is { IsLoaded: true, IsVisible: true } dw) dw.MaybeRefresh();
         if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsLoaded: true, IsVisible: true } mapw) mapw.MaybeRefresh();
@@ -2578,7 +2589,7 @@ public partial class MainWindow : Window, ICardContext
                     $"watchSort={_settings.WatchSortMode} " +
                     // The GEAR card's rendered shape, pinned for the same reason and in
                     // the same way as the two above: it is the next surface to be lifted
-                    // out (the Loot & Items theme), and the WPF layer has no unit tests,
+                    // out (the Gear & Loot theme), and the WPF layer has no unit tests,
                     // so an assertion from a launched app is the only thing standing
                     // between that move and a silent regression.
                     //
@@ -2620,6 +2631,10 @@ public partial class MainWindow : Window, ICardContext
                     // is where those same numbers come out now, and the point of the
                     // assertion is that they are the SAME numbers.
                     (_progressWindow is { IsLoaded: true } pwin ? pwin.DebugFacts() + " " : "") +
+                    // The Gear & Loot WINDOW, when EQBUDDY_GEARLOOT opened one. Its gear
+                    // numbers are the ones pinned on the widget before the lift; the
+                    // point of the assertion is that they are the SAME numbers.
+                    (_gearLootWindow is { IsLoaded: true } glwin ? glwin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={_companionPumpTicks} " +
@@ -2708,11 +2723,25 @@ public partial class MainWindow : Window, ICardContext
     /// <summary>The Gear card, lifted into <see cref="GearCardView"/> for the Loot &amp;
     /// Items theme. Built here because it needs the widget's zone and hop lookup, and
     /// nothing else in this file needs it back.</summary>
+    private GearLootWindow? _gearLootWindow;
+
+    /// <summary>The Gear &amp; Loot theme's window. One instance, raised if it is already
+    /// up — the same shape every other theme window uses.</summary>
+    internal void ShowGearLootWindow()
+    {
+        if (_gearLootWindow is { IsLoaded: true } open) { open.Activate(); return; }
+        _gearLootWindow = new GearLootWindow(this) { Owner = this };
+        _gearLootWindow.Closed += (_, _) => _gearLootWindow = null;
+        _gearLootWindow.Show();
+    }
+
+    private void OnGearLootWindow(object sender, RoutedEventArgs e) => ShowGearLootWindow();
+
     private GearCardView Gear => _gear ??= NewGearCard();
 
     private GearCardView? _gear;
 
-    /// <summary>A fresh Gear card. The Loot &amp; Items theme's window wants one too, and
+    /// <summary>A fresh Gear card. The Gear &amp; Loot theme's window wants one too, and
     /// a UIElement has one parent — so each host builds its own rather than sharing an
     /// instance that would be torn out of whichever drew it last.</summary>
     internal GearCardView NewGearCard() => new(

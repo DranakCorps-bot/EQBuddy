@@ -308,6 +308,24 @@ $Shots = [ordered]@{
     'tour-watch'      = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '5' }; Set = @{} }
     'tour-mini'       = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '7' }; Set = @{} }
     'tour-history'    = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '8' }; Set = @{} }
+    # The GEAR & LOOT theme's window, one shot per tab. Trap 22 on the gear one: the
+    # shared fixture imports no gear list, so without seeding it that tab is a one-line
+    # empty state and the shot proves nothing about the rows.
+    'gearloot-loot'   = @{ Title = 'Gear & Loot'
+                           Env = @{ EQBUDDY_GEARLOOT = 'loot' }
+                           Set = @{} }
+    'gearloot-gear'   = @{ Title = 'Gear & Loot'
+                           Env = @{ EQBUDDY_GEARLOOT = 'gear' }
+                           Set = @{
+                               GearChecklistName = 'Kael push'
+                               GearChecklist = @(
+                                   @{ Slot = 'HEAD'; Item = 'Crown of Narandi'; Source = 'Kael Drakkel' }
+                                   @{ Slot = 'HANDS'; Item = 'Gloves of Dark Embers'; Source = 'Sebilis'; Acquired = $true }
+                                   @{ Slot = 'PRIMARY'; Item = 'Blade of Carnage'; Source = 'Kael Drakkel' }
+                                   @{ Slot = 'NECK'; Item = 'Silver Chain of Dread'; Source = 'Plane of Fear' }
+                                   @{ Slot = 'HEAD'; Item = 'Exquisite Velium Shard'; IsExaltation = $true
+                                      ExaltationEffect = '+15 hp'; Source = 'Kael Drakkel' }
+                               ) } }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
     # The quick tour's last page illustrates this window. Trap 22 applies hard: history

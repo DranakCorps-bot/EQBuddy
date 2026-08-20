@@ -1,7 +1,10 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>
-/// The Loot &amp; Items theme's tabs, in the order every UI shows them (docs/Themes.md).
+/// The GEAR &amp; LOOT theme's tabs, in the order every UI shows them (docs/Themes.md).
+///
+/// Named "Gear &amp; Loot" by David on 2026-08-20, over the plan's "Loot &amp; Items":
+/// it names the two things actually in it, and "Items" was always the vaguer half.
 ///
 /// **The chain, in one window.** This is the theme that carries what CLAUDE.md calls the
 /// differentiator: loot → quest → item → mob → camp → route. What did I just get, what
@@ -43,9 +46,9 @@ public sealed record LootTabHeader(LootTab Tab, string Label, string Key, string
 /// </summary>
 public static class LootSurface
 {
-    /// <summary>Single words, parallel with the Progress tabs. The theme is called "Loot
-    /// &amp; Items" in the plan because that is what it COVERS; the tabs are named for
-    /// what a player is trying to do when they reach for one.</summary>
+    /// <summary>Single words, parallel with the Progress tabs. The theme is named for the
+    /// two things in it; the tabs are named for what a player is trying to do when they
+    /// reach for one.</summary>
     public static string LabelFor(LootTab tab) => tab switch
     {
         LootTab.Loot => "Loot",

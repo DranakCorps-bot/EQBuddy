@@ -1,9 +1,9 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
-/// What the LOOT &amp; ITEMS theme's tabs say in their badges, and what its launcher card
+/// What the GEAR &amp; LOOT theme's tabs say in their badges, and what its launcher card
 /// says on the widget (docs/Themes.md, step 3).
 ///
 /// <see cref="LootSurface"/> in Core owns which tabs exist, their order, their labels and
@@ -25,11 +25,13 @@ public static class LootTheme
             ? $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")} (+{s.CraftedTotal} made)"
             : $"{s.LootTotal} item{(s.LootTotal == 1 ? "" : "s")}";
 
-    /// <summary>The Gear badge — acquired over total, which is the whole question that
-    /// card answered. An em dash when nothing is imported: "0/0" invites the reader to
-    /// wonder what they did wrong, and the tab body already explains itself.</summary>
+    /// <summary>The Gear badge — acquired over total, which is the whole question that card
+    /// answered. **Blank until there is a list** (David, 2026-08-20): "0/0" reads as a
+    /// score you are losing, and an em dash reads as a glyph that failed to load. The body
+    /// underneath already says "No gear list imported" in words, so the badge has nothing
+    /// left to add and says nothing.</summary>
     public static string Gear(IReadOnlyCollection<GearChecklistItem> checklist) =>
-        checklist.Count == 0 ? "—" : $"{checklist.Count(i => i.Acquired)}/{checklist.Count}";
+        checklist.Count == 0 ? "" : $"{checklist.Count(i => i.Acquired)}/{checklist.Count}";
 
     /// <summary>The full strip, badges included — what the window's tab row and the
     /// mobile page's tab row both build from.</summary>

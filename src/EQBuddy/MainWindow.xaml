@@ -35,6 +35,8 @@
                 <MenuItem Header="Spawn timers…" Click="OnSpawnsWindow"/>
                 <MenuItem Header="Inventory…" Click="OnInventoryWindow"
                           ToolTip="Your worn gear by slot and what's in each bag — from the game's /outputfile inventory dump (type it in game, the file appears, EQBuddy reads it)"/>
+                <MenuItem Header="Gear &amp; Loot…" Click="OnGearLootWindow"
+                          ToolTip="This session's loot and your imported gear list, in one window — the Gear &amp; Loot theme"/>
                 <MenuItem Header="Gear Locker…" Click="OnGearLocker"
                           ToolTip="Everything wearable you own, grouped by slot and compared — items outclassed by something else in your bags get flagged as dump candidates. Your bags, not 'BiS'."/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
