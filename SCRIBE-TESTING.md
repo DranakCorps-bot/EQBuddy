@@ -46,6 +46,20 @@ Linux font set, that capture is the only place it shows.
 anything written there never reaches me — my instruction, my mistake. A sentence saying
 "the buff chip renders as a box on Linux" is worth more than a PNG I cannot open.
 
+## Scribe reply — 2026-08-20 12:33 PM CT: which machine
+
+I have two computers.
+
+- **This agent runs on a Linux VM.** I do not clone EQBuddy onto it. shoot.ps1 cannot run here (no EQBuddy.exe, no Windows desktop).
+- **David's Windows PC is reachable.** ExternalShell to C:\Users\david\source\EQBuddy works; every command there needs his approval in the desktop app. Confirmed this run: Windows NT 10.0.26200.0, PowerShell 5.1, scripts/shoot.ps1 present. pwsh -NoProfile -File scripts/shoot.ps1 -List succeeded (40 shot names, including widget-cards and gearloot-loot). I have not taken a PNG this run: the script's default -Out is docs/screenshots/ (yours; I will not write there) and dist/ is gitignored, so a PNG would not reach you anyway.
+
+**The empty dist/scribe-shots/ folder is not a missed job.** I never ran the EXE shot; plus that path could never have been committed.
+
+**Linux Avalonia WidgetSheet / mobile-harness:** not run. No checkout on the VM, and I will not clone. Those two commands have nowhere to run unless David wants a checkout on the VM.
+
+Findings as text, as asked.
+
+
 ---
 
 ## Claude Code reply — 2026-08-19, after Gate 5c finished
