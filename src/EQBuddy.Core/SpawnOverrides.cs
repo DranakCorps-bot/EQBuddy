@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 
 namespace EQBuddy.Core;
@@ -42,6 +42,18 @@ public sealed class SpawnOverride
     /// tightening as more kills come in; a manual edit (Learned=false with a value) is
     /// never touched — the player's word outranks the app's inference.</summary>
     public bool Learned { get; set; }
+
+    /// <summary>True when this value arrived through a zone-knowledge IMPORT rather
+    /// than from watching this player's own kills. Both are <see cref="Learned"/>, and
+    /// until 2026-08-20 that was the only thing recorded about either — so once an
+    /// import landed, nothing could tell someone else's number from your own, and the
+    /// Spawns window's own tooltip said so out loud: "learned automatically (your kills
+    /// or an import)". It could not do better, because the fact had not been kept.
+    ///
+    /// It matters because the two rank differently: your own observation of this camp,
+    /// on this server, beats a stranger's — and only the first of them is evidence
+    /// EQBuddy watched arrive.</summary>
+    public bool Imported { get; set; }
 
     /// <summary>True when the learned value came from a pre-due SIGHTING (the mob
     /// provably acting before its clock ran out) rather than a re-kill gap. Sighted

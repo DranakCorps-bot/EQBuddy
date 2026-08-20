@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 
 namespace EQBuddy.Core;
@@ -18,6 +18,25 @@ public sealed record SpawnTimerState(
     /// deserialize null. Values are the /loc's own (Y, X) order.</summary>
     public double? CampLocY { get; init; }
     public double? CampLocX { get; init; }
+
+    /// <summary>Which continuous stay in the zone this kill happened during — a
+    /// counter bumped on every zone-enter line, never a wall clock. Two kills sharing
+    /// it means the player never left between them.
+    ///
+    /// It is NOT persisted (see the <c>JsonIgnore</c>), for the same reason
+    /// <see cref="KilledName"/> answers null across a restart: a timer recovered from
+    /// disk carries no evidence about where the player was, and no evidence must never
+    /// read as agreement.
+    ///
+    /// Only the no-known-duration paths consult it, and deliberately. A cross-stay gap
+    /// is still a TRUE upper bound — the mob died, and was dead again, so it respawned
+    /// in between — and wherever a duration already exists the <c>gap &lt; d</c> rule
+    /// keeps such a gap harmless: it can only tighten toward the truth. But with no
+    /// duration to check it against, the first accepted gap BECOMES the countdown, and
+    /// "killed it, went to Freeport, came back five hours later" prints a confident
+    /// five-hour timer that nothing on screen contradicts.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int? ZoneStay { get; init; }
 
     /// <summary>The creature whose death actually started this clock, as the kill
     /// line named it — the named itself, an alias, or a placeholder. Learning needs
@@ -58,6 +77,9 @@ public sealed class SpawnTimers
     /// here start no automatic countdowns; see SpawnCatalog.IsInstancedZoneName.</summary>
     private bool _currentZoneInstanced;
     private LocationEvent? _lastLoc;
+    /// <summary>Which continuous stay in a zone we are on, bumped by every zone-enter
+    /// line. Stamped onto each new timer as <see cref="SpawnTimerState.ZoneStay"/>.</summary>
+    private int _zoneStay;
 
     /// <summary>A /loc within this window of a kill counts as the camp's position —
     /// long enough for "tap the hotbutton, pull, kill", short enough that a stale
@@ -98,6 +120,11 @@ public sealed class SpawnTimers
                     _currentZone = _catalog.FindZone(z.Zone);
                     _currentZoneInstanced = SpawnCatalog.IsInstancedZoneName(z.Zone);
                     _lastLoc = null;
+                    // Every zone line ends the current stay, including one that names
+                    // the zone you are already in: a zone-enter line you did not travel
+                    // for is a gate, a boat or a summon, and either way the player was
+                    // somewhere else for the gap that follows.
+                    _zoneStay++;
                 }
                 break;
             case LocationEvent loc:
@@ -194,6 +221,7 @@ public sealed class SpawnTimers
         ov.RespawnSeconds = Math.Floor(elapsed);
         ov.Learned = true;
         ov.Sighted = true;
+        ov.Imported = false;   // your own eyes, on this camp — no longer a stranger's number
         _overrides.Save();
     }
 
@@ -257,7 +285,7 @@ public sealed class SpawnTimers
                         duration = LearnFromRekill(zone, entry, k.Time, duration);
                     var (cy, cx) = CampFor(zone.Zone, entry.Name, k.Time);
                     Upsert(new SpawnTimerState(Server, zone.Zone, entry.Name, k.Time, duration)
-                        { CampLocY = cy, CampLocX = cx, KilledName = k.Target });
+                        { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay });
                     return;
                 }
 
@@ -270,7 +298,7 @@ public sealed class SpawnTimers
                         ? LearnDiscovered(zone.Zone, name, o, k.Time)
                         : o.RespawnSeconds;
                     Upsert(new SpawnTimerState(Server, zone.Zone, name, k.Time, seconds)
-                        { CampLocY = ccy, CampLocX = ccx, KilledName = k.Target });
+                        { CampLocY = ccy, CampLocX = ccx, KilledName = k.Target, ZoneStay = _zoneStay });
                     return;
                 }
             }
@@ -294,11 +322,52 @@ public sealed class SpawnTimers
                 .Any(p => p.Trim() is { Length: > 0 } ph && Matches(ph, killed, fuzzy));
     }
 
-    /// <summary>The widest re-kill gap a DISCOVERED named will accept as a spawn cycle.
+    /// <summary>
+    /// The first duration a named gets from watching, when nothing — catalog entry, zone
+    /// default, player edit — has ever said how long its cycle is. Returns null when this
+    /// gap must not become one.
+    ///
+    /// Two named have no duration to check a gap against: one EQBuddy discovered itself
+    /// (#185), and one the catalog lists WITHOUT a respawn in a zone with no default.
+    /// There are 126 of the latter shipped today, including all 38 in High Keep and 47 in
+    /// Western Wastes — Princess Lenia among them. Until now they behaved worse than an
+    /// unlisted mob: a discovered named measures its cycle on the second kill, while
+    /// being in the catalog with a blank respawn meant never learning one at all, because
+    /// <see cref="LearnFromRekill"/> returns before it starts when there is no current
+    /// duration. Being known was worse than being unknown.
+    ///
+    /// The two bounds are what stand in for the missing sanity check:
+    ///
+    /// <b>Same stay.</b> Both kills during one continuous visit to the zone. A gap across
+    /// a zone trip is still a true upper bound, but here it BECOMES the countdown with
+    /// nothing to contradict it, so "killed it, went to Freeport, came back five hours
+    /// later" would print a confident five-hour timer. Where a duration already exists
+    /// this is not required, and must not be: there the <c>gap &lt; d</c> rule already
+    /// keeps a loose bound harmless, and refusing it would throw away real evidence.
+    ///
+    /// <b>Inside the floor and the ceiling.</b> <see cref="MinLearnSeconds"/> below (that
+    /// is multi-spawn noise) and <see cref="MaxDiscoverSeconds"/> above.
+    /// </summary>
+    private double? FirstDurationFromGap(string zone, string name, DateTime killedAt)
+    {
+        if (!_timers.TryGetValue(Key(Server, zone, name), out var prev)) return null;
+        // Null on either side is no evidence, and no evidence must not read as
+        // agreement — a timer recovered from the persist file has no stay.
+        if (prev.ZoneStay is not { } stay || stay != _zoneStay) return null;
+        var gap = (killedAt - prev.KilledAt).TotalSeconds;
+        if (gap < MinLearnSeconds || gap > MaxDiscoverSeconds) return null;
+        return Math.Floor(gap);
+    }
+
+    /// <summary>The widest re-kill gap a named with NO known duration will accept as a
+    /// spawn cycle.
     /// Above this the gap is far likelier to be "you went to bed and came back" than a
-    /// respawn, and a discovery has no catalog value to be sanity-checked against the
-    /// way <see cref="LearnFromRekill"/> does. Six hours comfortably covers the long
-    /// dungeon named while refusing an overnight gap.</summary>
+    /// respawn, and there is no catalog value to sanity-check it against the way
+    /// <see cref="LearnFromRekill"/> does once a duration exists. Six hours comfortably
+    /// covers the long dungeon named while refusing an overnight gap — and paired with
+    /// the same-stay rule in <see cref="FirstDurationFromGap"/> it now means something
+    /// stronger than it used to: a five-hour gap is only accepted from a player who
+    /// actually sat in the zone for five hours.</summary>
     public const double MaxDiscoverSeconds = 6 * 60 * 60;
 
     /// <summary>
@@ -335,7 +404,7 @@ public sealed class SpawnTimers
         _overrides.Save();
         var (cy, cx) = CampFor(zone.Zone, k.Target, k.Time);
         Upsert(new SpawnTimerState(Server, zone.Zone, k.Target, k.Time, null)
-            { CampLocY = cy, CampLocX = cx, KilledName = k.Target });
+            { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay });
     }
 
     /// <summary>The second death of a discovered named measures its cycle. Same
@@ -346,14 +415,12 @@ public sealed class SpawnTimers
         // A player who typed a duration outranks anything measured here.
         if (o is { Learned: false, RespawnSeconds: not null }) return o.RespawnSeconds;
 
-        var previous = _timers.TryGetValue(Key(Server, zone, name), out var t) ? t.KilledAt : (DateTime?)null;
-        if (previous is not { } was) return o.RespawnSeconds;
-        var elapsed = (killedAt - was).TotalSeconds;
-        if (elapsed < MinLearnSeconds || elapsed > MaxDiscoverSeconds) return o.RespawnSeconds;
+        if (FirstDurationFromGap(zone, name, killedAt) is not { } elapsed) return o.RespawnSeconds;
         if (o.RespawnSeconds is { } current && elapsed >= current) return o.RespawnSeconds;
 
-        o.RespawnSeconds = Math.Floor(elapsed);
+        o.RespawnSeconds = elapsed;
         o.Learned = true;
+        o.Imported = false;
         _overrides.Save();
         return o.RespawnSeconds;
     }
@@ -381,16 +448,28 @@ public sealed class SpawnTimers
     /// </summary>
     private double? LearnFromRekill(SpawnZone zone, SpawnEntry entry, DateTime killedAt, double? currentDuration)
     {
-        if (currentDuration is not { } d) return currentDuration;
         if (!_timers.TryGetValue(Key(Server, zone.Zone, entry.Name), out var prev)) return currentDuration;
         if (!StartedByNamedKill(prev, entry)) return currentDuration;
-        var gap = (killedAt - prev.KilledAt).TotalSeconds;
-        if (gap < MinLearnSeconds || gap >= d) return currentDuration;
+
+        double learned;
+        if (currentDuration is { } d)
+        {
+            var gap = (killedAt - prev.KilledAt).TotalSeconds;
+            if (gap < MinLearnSeconds || gap >= d) return currentDuration;
+            learned = Math.Floor(gap);
+        }
+        // Nothing has ever said how long this cycle is — the catalog lists the named
+        // with a blank respawn and its zone has no default. Measure it the way a
+        // discovered named is measured, under the stricter bounds that stand in for the
+        // sanity check a known duration would have provided.
+        else if (FirstDurationFromGap(zone.Zone, entry.Name, killedAt) is { } first) learned = first;
+        else return currentDuration;
 
         var o = _overrides.GetOrAdd(zone.Zone, entry.Name);
         if (o.RespawnSeconds is not null && !o.Learned) return currentDuration; // manual edit wins
-        o.RespawnSeconds = Math.Floor(gap);
+        o.RespawnSeconds = learned;
         o.Learned = true;
+        o.Imported = false;   // measured here, from these kills
         _overrides.Save();
         return o.RespawnSeconds;
     }
@@ -416,7 +495,7 @@ public sealed class SpawnTimers
             // word always wins. Their attested kill counts as the named's own.
             _timers.Remove(Key(Server, zone, name));
             Upsert(new SpawnTimerState(Server, zone, name, DateTime.Now - elapsed, durationSeconds)
-                { KilledName = name });
+                { KilledName = name, ZoneStay = _zoneStay });
         }
     }
 

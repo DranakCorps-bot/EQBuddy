@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -166,10 +166,23 @@ public sealed class SpawnsViewModel
                   + "timer to count down. Type a respawn time here if you want your "
                   + "own reminder anyway."
                 : "",
-            // "Learned" covers both sources of automatic values: re-kill gaps from
-            // your own play AND an accepted zone-knowledge import — either way it
-            // may keep tightening, and your typed edit always outranks it.
-            o is { Learned: true } ? "timer learned automatically (your kills or an import)" : "",
+            // Which of the two automatic sources this came from. The pair used to be
+            // one line reading "your kills or an import", because nothing recorded
+            // which — the fact was not kept, so the tooltip could only name both and
+            // let the player guess. A stranger's number and your own camp are not the
+            // same claim, and the one you watched arrive is the stronger of them.
+            o switch
+            {
+                { Learned: true, Imported: true } =>
+                    "timer imported from shared zone knowledge — your own kills here will "
+                    + "replace it, and your typed edit outranks both",
+                { Learned: true, Sighted: true } =>
+                    "timer learned from seeing this named up before its clock ran out",
+                { Learned: true } =>
+                    "timer learned from your own kills — it keeps tightening, and your "
+                    + "typed edit outranks it",
+                _ => "",
+            },
             entry.Variance.Length > 0 ? $"variance {entry.Variance}" : "",
             entry.Note,
             entry.Source.Length > 0 ? $"source: {entry.Source}" : "",

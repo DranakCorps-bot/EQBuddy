@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -463,6 +463,101 @@ public class ZoneShareTests
                 Mobs = { [mob] = new SpawnPointLedger.MobSeen { Kills = kills, LastKill = T0 } },
             });
         return a;
+    }
+
+    /// <summary>An imported timer is recorded as SOMEONE ELSE'S number, and this
+    /// player's own kills replace it and stop claiming to be theirs.
+    ///
+    /// Both an import and a re-kill gap set Learned, and until 2026-08-20 that was all
+    /// either of them recorded — so the moment an import landed there was no way to tell
+    /// a stranger's number from what you measured here. The Spawns window said as much
+    /// out loud, because it could not do better: "learned automatically (your kills or an
+    /// import)". The two do not rank the same, and now they do not look the same.</summary>
+    [Fact]
+    public void AnImportIsRecordedAsSomeoneElsesNumberUntilYourOwnKillsReplaceIt()
+    {
+        var zone = Befallen();
+        var sharer = new SpawnOverrides();
+        sharer.GetOrAdd("Befallen", "Marnek the Sage").RespawnSeconds = 300;
+
+        var mine = new SpawnOverrides();
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Befallen" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine)!;
+        ZoneShare.Apply(preview, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine, includeFlagged: true);
+
+        var o = mine.Find("Befallen", "Marnek the Sage")!;
+        Assert.Equal(300, o.RespawnSeconds);
+        Assert.True(o.Learned);
+        Assert.True(o.Imported);      // ...and now we can say whose it is
+
+        // Camp it yourself, measure it shorter, and it becomes yours.
+        var catalog = new SpawnCatalog { Zones = [zone] };
+        var t = new SpawnTimers(catalog, mine) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "Befallen"));
+        t.Apply(new KillEvent(T0, "Marnek the Sage", "You"));
+        t.Apply(new KillEvent(T0.AddSeconds(240), "Marnek the Sage", "You"));
+
+        var after = mine.Find("Befallen", "Marnek the Sage")!;
+        Assert.Equal(240, after.RespawnSeconds);
+        Assert.True(after.Learned);
+        Assert.False(after.Imported);
+    }
+
+    /// <summary>An import cannot smuggle a stale Sighted flag onto a stranger's number.
+    /// Sighted exempts a value from the self-heal that purges re-kill noise — it means
+    /// "I watched this mob act before its clock ran out", which is never true of a
+    /// number that arrived over the wire.</summary>
+    [Fact]
+    public void AnImportClearsTheSightedFlagItIsOverwriting()
+    {
+        var zone = Befallen();
+        var sharer = new SpawnOverrides();
+        sharer.GetOrAdd("Befallen", "Marnek the Sage").RespawnSeconds = 300;
+
+        var mine = new SpawnOverrides();
+        var was = mine.GetOrAdd("Befallen", "Marnek the Sage");
+        was.RespawnSeconds = 280;
+        was.Learned = true;
+        was.Sighted = true;
+
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Befallen" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine)!;
+        ZoneShare.Apply(preview, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine, includeFlagged: true);
+
+        var o = mine.Find("Befallen", "Marnek the Sage")!;
+        Assert.Equal(300, o.RespawnSeconds);
+        Assert.True(o.Imported);
+        Assert.False(o.Sighted);
+    }
+
+    /// <summary>And an import still never touches a typed duration — unchanged, and the
+    /// one rule in this file that is not allowed to move.</summary>
+    [Fact]
+    public void AnImportNeverOverwritesATypedDuration()
+    {
+        var zone = Befallen();
+        var sharer = new SpawnOverrides();
+        sharer.GetOrAdd("Befallen", "Marnek the Sage").RespawnSeconds = 300;
+
+        var mine = new SpawnOverrides();
+        var typed = mine.GetOrAdd("Befallen", "Marnek the Sage");
+        typed.RespawnSeconds = 195;
+        typed.Learned = false;        // the player typed it
+
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Befallen" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine)!;
+        ZoneShare.Apply(preview, new SpawnPointLedger.ZoneArchive { Zone = "Befallen" },
+            zone, mine, includeFlagged: true);
+
+        var o = mine.Find("Befallen", "Marnek the Sage")!;
+        Assert.Equal(195, o.RespawnSeconds);
+        Assert.False(o.Learned);
+        Assert.False(o.Imported);
     }
 
     [Fact]

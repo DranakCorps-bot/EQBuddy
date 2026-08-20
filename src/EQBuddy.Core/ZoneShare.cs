@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 
@@ -216,6 +216,13 @@ public static class ZoneShare
             var o = overrides.GetOrAdd(preview.Payload.Zone, diff.Name);
             o.RespawnSeconds = diff.IncomingSeconds;
             o.Learned = true;
+            // Someone else's number, and now recorded as such: an import used to be
+            // indistinguishable from what your own kills taught the moment it landed.
+            o.Imported = true;
+            // Whatever this entry had SIGHTED is not true of the incoming value, and a
+            // stale flag here would exempt a stranger's number from the self-heal that
+            // exists to purge re-kill noise.
+            o.Sighted = false;
             // A sharer's player-added named arrives as a custom named here too —
             // without the flag, a name the catalog doesn't know never starts a timer.
             if (existing is null && zone?.Named.Any(e => SpawnCatalog.NameMatches(e.Name, diff.Name)) != true)

@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -31,6 +31,18 @@ public class SpawnTimerTests
             {
                 Zone = "Permafrost Keep",
                 Named = [new SpawnEntry { Name = "Lady Vox", RespawnSeconds = 604800, Variance = "±8h" }],
+            },
+            // A zone shaped like the ones the shipped catalog actually has trouble with:
+            // named listed, respawn blank, and NO NamedDefaultSeconds to fall back on.
+            // 126 entries ship this way — all 38 in High Keep, 47 in Western Wastes.
+            new SpawnZone
+            {
+                Zone = "High Keep",
+                Named =
+                [
+                    new SpawnEntry { Name = "Princess Lenia" },
+                    new SpawnEntry { Name = "Mistress Anna", Placeholder = "a guard" },
+                ],
             },
         ],
     };
@@ -436,6 +448,189 @@ public class SpawnTimerTests
             Assert.Equal("froglok ghoul lord", timer.KilledName);
         }
         finally { File.Delete(path); }
+    }
+
+    // ---- named the catalog lists with NO respawn (2026-08-20) ----
+
+    /// <summary>The 126 shipped named whose respawn is blank in a zone with no default.
+    /// They used to be worse off than a mob the catalog had never heard of: a DISCOVERED
+    /// named measures its cycle on the second kill, while these could never learn one at
+    /// all, because LearnFromRekill returned before it started when there was no current
+    /// duration to compare a gap against. Being known was worse than being unknown.</summary>
+    [Fact]
+    public void ACatalogNamedWithNoRespawnLearnsFromItsSecondKill()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+
+        // First kill: a chip that says how long ago, and honestly nothing more.
+        Assert.Null(Assert.Single(t.Snapshot(T0.AddMinutes(1))).DurationSeconds);
+        Assert.Null(overrides.Find("High Keep", "Princess Lenia")?.RespawnSeconds);
+
+        t.Apply(new KillEvent(T0.AddMinutes(22), "Princess Lenia", "You"));
+
+        var o = overrides.Find("High Keep", "Princess Lenia");
+        Assert.NotNull(o);
+        Assert.True(o!.Learned);
+        Assert.False(o.Imported);
+        Assert.Equal(1320, o.RespawnSeconds);
+        Assert.Equal(1320, Assert.Single(t.Snapshot(T0.AddMinutes(23))).DurationSeconds);
+    }
+
+    /// <summary>...and it still only ever tightens, exactly like a named that came with
+    /// a duration.</summary>
+    [Fact]
+    public void ANoRespawnNamedKeepsTighteningButNeverLoosens()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+        t.Apply(new KillEvent(T0.AddMinutes(22), "Princess Lenia", "You"));
+        Assert.Equal(1320, overrides.Find("High Keep", "Princess Lenia")!.RespawnSeconds);
+
+        t.Apply(new KillEvent(T0.AddMinutes(40), "Princess Lenia", "You"));   // 18m - tighter
+        Assert.Equal(1080, overrides.Find("High Keep", "Princess Lenia")!.RespawnSeconds);
+        t.Apply(new KillEvent(T0.AddMinutes(90), "Princess Lenia", "You"));   // 50m - you were slow
+        Assert.Equal(1080, overrides.Find("High Keep", "Princess Lenia")!.RespawnSeconds);
+    }
+
+    /// <summary>A typed duration outranks the new path like it outranks every other.</summary>
+    [Fact]
+    public void ATypedDurationOnANoRespawnNamedIsNeverMeasuredOver()
+    {
+        var overrides = new SpawnOverrides();
+        var vm = new EQBuddy.UI.Shared.SpawnsViewModel(TestCatalog(), overrides,
+            new SpawnTimers(TestCatalog(), overrides));
+        vm.SetDuration("High Keep", "Princess Lenia", "30");
+
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+        t.Apply(new KillEvent(T0.AddMinutes(22), "Princess Lenia", "You"));
+
+        var o = overrides.Find("High Keep", "Princess Lenia")!;
+        Assert.Equal(1800, o.RespawnSeconds);
+        Assert.False(o.Learned);
+    }
+
+    // ---- the same-stay rule (2026-08-20) ----
+
+    /// <summary>With NO known duration the first accepted gap BECOMES the countdown, so
+    /// nothing on screen can contradict it. "Killed it, went to Freeport, came back five
+    /// hours later and killed it" is a true upper bound and a useless one, and it would
+    /// print a confident five-hour timer. Both kills must fall in one continuous stay.</summary>
+    [Fact]
+    public void ANoRespawnNamedRefusesAGapAcrossAZoneTrip()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(5), "Lower Guk"));       // off to sell
+        t.Apply(new ZoneEvent(T0.AddHours(5), "High Keep"));         // ...back at teatime
+        t.Apply(new KillEvent(T0.AddHours(5).AddMinutes(1), "Princess Lenia", "You"));
+
+        Assert.Null(overrides.Find("High Keep", "Princess Lenia")?.RespawnSeconds);
+        // The clock still restarts on the kill - only the LEARNING is refused.
+        var timer = Assert.Single(t.Snapshot(T0.AddHours(5).AddMinutes(2)));
+        Assert.Equal(T0.AddHours(5).AddMinutes(1), timer.KilledAt);
+        Assert.Null(timer.DurationSeconds);
+    }
+
+    /// <summary>A discovered named is the other half of the same hole.</summary>
+    [Fact]
+    public void ADiscoveredNamedRefusesAGapAcrossAZoneTrip()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0, "Chief Goonda", "You") { ProperName = true });
+        t.Apply(new ZoneEvent(T0.AddMinutes(5), "Permafrost Keep"));
+        t.Apply(new ZoneEvent(T0.AddHours(3), "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0.AddHours(3).AddMinutes(1), "Chief Goonda", "You") { ProperName = true });
+
+        var o = overrides.Find("Lower Guk", "Chief Goonda");
+        Assert.NotNull(o);
+        Assert.True(o!.Discovered);
+        Assert.Null(o.RespawnSeconds);
+    }
+
+    /// <summary>And the rule is deliberately NOT applied where a duration already exists.
+    /// A cross-stay gap is a true upper bound - the mob died and was dead again, so it
+    /// respawned in between - and there the gap-under-duration rule already keeps a loose
+    /// one harmless: it can only tighten toward the truth. Refusing it would throw away
+    /// real evidence to guard against a problem that path does not have.</summary>
+    [Fact]
+    public void AKnownDurationStillLearnsAcrossAZoneTrip()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));                 // catalog: 1620s
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Permafrost Keep"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(15), "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0.AddMinutes(20), "froglok ghoul lord", "You"));   // 1200s < 1620s
+
+        Assert.Equal(1200, overrides.Find("Lower Guk", "a froglok ghoul lord")!.RespawnSeconds);
+    }
+
+    /// <summary>A timer recovered from the persist file carries no stay, and no evidence
+    /// must never read as agreement - the same rule KilledName follows across a restart.
+    /// Without this, every restart would hand the no-duration path a free anchor whose
+    /// provenance nobody knows.</summary>
+    [Fact]
+    public void ATimerRecoveredFromDiskAnchorsNoFirstDuration()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"spawn-timers-{Guid.NewGuid():N}.json");
+        try
+        {
+            var overrides = new SpawnOverrides();
+            var t = new SpawnTimers(TestCatalog(), overrides, path) { Server = "freeport" };
+            t.Apply(new ZoneEvent(T0, "High Keep"));
+            t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+
+            var reborn = new SpawnTimers(TestCatalog(), overrides, path) { Server = "freeport" };
+            reborn.Apply(new ZoneEvent(T0.AddMinutes(20), "High Keep"));
+            reborn.Apply(new KillEvent(T0.AddMinutes(22), "Princess Lenia", "You"));
+
+            Assert.Null(overrides.Find("High Keep", "Princess Lenia")?.RespawnSeconds);
+        }
+        finally { File.Delete(path); }
+    }
+
+    /// <summary>The floor and the ceiling still apply on the new path: below the floor is
+    /// multi-spawn noise, above the ceiling is "you went to bed" - and thanks to the
+    /// same-stay rule the ceiling now means a player who really did sit there.</summary>
+    [Theory]
+    [InlineData(1, false)]        // under MinLearnSeconds
+    [InlineData(22, true)]
+    [InlineData(60 * 7, false)]   // over MaxDiscoverSeconds
+    public void TheNoRespawnPathKeepsItsFloorAndCeiling(int gapMinutes, bool learns)
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "Princess Lenia", "You"));
+        t.Apply(new KillEvent(T0.AddMinutes(gapMinutes), "Princess Lenia", "You"));
+
+        Assert.Equal(learns, overrides.Find("High Keep", "Princess Lenia")?.RespawnSeconds is not null);
+    }
+
+    /// <summary>A placeholder death on either end is still walk time between two different
+    /// mobs, not a cycle - the new path must not have reopened the door #181 closed.</summary>
+    [Fact]
+    public void APlaceholderDeathNeverMeasuresANoRespawnNamed()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "High Keep"));
+        t.Apply(new KillEvent(T0, "a guard", "You"));                            // placeholder
+        t.Apply(new KillEvent(T0.AddMinutes(22), "Mistress Anna", "You"));        // the named
+
+        Assert.Null(overrides.Find("High Keep", "Mistress Anna")?.RespawnSeconds);
     }
 
     /// <summary>Timers tighten themselves from play: a re-kill sooner than the timer
