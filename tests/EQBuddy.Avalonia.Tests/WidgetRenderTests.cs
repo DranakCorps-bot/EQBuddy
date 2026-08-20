@@ -131,17 +131,67 @@ public class WidgetRenderTests : IDisposable
 
     /// <summary>The Gear card's WHERE-TO-GO pivot (#122abd6) reached this UI: the
     /// toggle has to exist in the tree, or the by-zone view is unreachable here even
-    /// though the rollup it draws is shared and tested.</summary>
+    /// though the rollup it draws is shared and tested.
+    ///
+    /// It is a TAB now — the GEAR &amp; LOOT theme (docs/Themes.md) — so the window has to
+    /// be open for the surface to exist at all. Same assertion, new host, which is the
+    /// whole point of having had it before the fold: this suite is the only cover this
+    /// build has for that surface, and it caught the fold's first attempt (an empty
+    /// collection) when the window existed on Windows and not here.</summary>
     [AvaloniaFact]
     public void TheGearCardOffersTheByZonePivot()
     {
         var window = new MainWindow();
         window.Show();
+        window.ShowGearLootWindow("gear");
 
-        var checks = window.GetLogicalDescendants().OfType<CheckBox>()
+        var checks = window.GearLootWindowForTests!.GetLogicalDescendants().OfType<CheckBox>()
             .Select(c => c.Content as string ?? "").ToList();
 
         Assert.Contains(checks, c => c.Contains("Group by farm zone"));
+        window.GearLootWindowForTests?.Close();
+        window.Close();
+    }
+
+    /// <summary>The launcher that replaced the two cards. It has one line to carry what
+    /// both card headers carried, and the tab strip beside it has to name both surfaces —
+    /// #219 is the release where a fold trimmed a number out of a summary line and the
+    /// player who used it turned up within the hour.</summary>
+    [AvaloniaFact]
+    public void TheGearAndLootCardLeavesForItsWindowAndSummarisesBoth()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.Settings.GearChecklist =
+        [
+            new GearChecklistItem { Slot = "Feet", Item = "Golden Efreeti Boots", Acquired = true },
+            new GearChecklistItem { Slot = "Head", Item = "Circlet of Shadow" },
+        ];
+
+        var snapshot = new StatsSnapshot
+        {
+            Loot = [new LootDetail("Rusty Dagger", 3, "a gnoll")],
+            Crafted = [new NameCount("Iron Ration", 1)],
+        };
+        window.RenderSnapshotForTest(snapshot);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var text = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Gear & Loot", text);
+        Assert.Contains("↗", text);   // this card leaves rather than unfolds
+        // The exact line the shared formatter produces — asserted through it rather than
+        // spelled again here, so the two windows and the phone cannot drift apart.
+        Assert.Contains(LootTheme.LauncherSummary(snapshot, window.Settings.GearChecklist), text);
+
+        // And the window names both tabs, with the badges the two headers used to carry.
+        window.ShowGearLootWindow();
+        var tabs = window.GearLootWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Loot", tabs);
+        Assert.Contains("Gear", tabs);
+        Assert.Contains("1/2", tabs);
+        window.GearLootWindowForTests?.Close();
         window.Close();
     }
 

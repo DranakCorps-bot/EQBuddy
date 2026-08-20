@@ -125,10 +125,7 @@ public partial class MainWindow : Window, ICardContext
         // 1.84.0, leaving a process with no window (#158, twidget76). Anything the
         // XAML can call must exist before the XAML is touched.
         _quests = new QuestChecklistView(this, _settings, () => _raidLedger);
-        _loot = new LootCardView(this, _settings);
-        LootBody.Content = _loot.Body;
         KillsBody.Content = _kills.Body;
-        GearBody.Content = Gear.Body;
         _unlocks = new LevelUnlockMemo(
             s => BuffSetClassSource(s).Classes,
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
@@ -330,8 +327,8 @@ public partial class MainWindow : Window, ICardContext
         // and the review is an acceptance criterion, not a nicety (Gate 3's §11.6).
         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
         if (expand == "1")
-            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
-                         GearSection, TrackedSection, MiscSection })
+            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection,
+                         TrackedSection, MiscSection })
                 ex.IsExpanded = true;
         else if (!string.IsNullOrWhiteSpace(expand))
         {
@@ -603,8 +600,11 @@ public partial class MainWindow : Window, ICardContext
     private Dictionary<string, UIElement> SectionMap() => new()
     {
         ["combat"] = CombatSection, ["healing"] = HealingSection, ["kills"] = KillsSection,
-        ["loot"] = LootSection, ["quests"] = QuestsSection,
-        ["gear"] = GearSection, ["tracked"] = TrackedSection,
+        ["quests"] = QuestsSection,
+        // One key for the whole GEAR & LOOT theme, and deliberately "loot" — one OF the
+        // two it absorbs rather than a new name, so a player who dragged that card keeps
+        // its slot through the fold (LootSurface.ThemeCardKey).
+        ["loot"] = LootSection, ["tracked"] = TrackedSection,
         ["buffs"] = BuffsSection,
         // One key for the whole Progress theme, and it is deliberately "progress" — one
         // OF the five it absorbs rather than a new name, so a player who had dragged that
@@ -2511,19 +2511,15 @@ public partial class MainWindow : Window, ICardContext
 
         if (KillsSection.IsExpanded) _kills.Render(s);
 
-        if (LootSection.IsExpanded)
-            _loot.Render(s);
+        // The Gear & Loot card is a launcher, not a list: its one line carries what
+        // BOTH card headers carried, so the glance survives the fold rather than being
+        // traded for a click. The rows happen in the window.
+        LootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
 
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         QuestsHeader.Text = _quests.SummaryLine();
 
-        if (GearSection.IsExpanded && _gearChecklistDirty)
-        {
-            Gear.Render();
-            UpdateGearBadge();
-            _gearChecklistDirty = false;
-        }
 
         if (MiscSection.IsExpanded)
         {
@@ -2552,7 +2548,7 @@ public partial class MainWindow : Window, ICardContext
                 // Row counts say "a new name appeared"; the snapshot totals say "the
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
-                    $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} loot={_loot.RowCount} " +
+                    $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} " +
 
                     // The PROGRESS THEME's launcher card (docs/Themes.md). It replaced
                     // five cards whose row counts used to be asserted here; what a reader
@@ -2593,16 +2589,11 @@ public partial class MainWindow : Window, ICardContext
                     // so an assertion from a launched app is the only thing standing
                     // between that move and a silent regression.
                     //
-                    // Rows rather than items, because the list interleaves GROUP HEADINGS
-                    // with rows and the headings are half of what the by-zone pivot is
-                    // for — a lift that kept every item and lost the headings would leave
-                    // this count unchanged if it counted items alone.
-                    $"gearRows={Gear.DebugRowCount} " +
-                    $"gearTotal={_settings.GearChecklist.Count} " +
-                    $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
-                    $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
-                    $"gearPivotShown={(Gear.DebugPivotShown ? 1 : 0)} " +
-                    $"gearListNameLen={Gear.DebugListNameLength} " +
+                    // The gear numbers themselves moved with the surface, into
+                    // GearLootWindow.DebugFacts() below — same keys, new host, which is
+                    // exactly what the E2E assertions are for.
+                    $"lootCard={(LootSection.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"lootSummaryLen={LootHeader.Text.Length} " +
                     $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
                     // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
                     // but only a launched app can show that its answer actually reaches
@@ -2706,7 +2697,6 @@ public partial class MainWindow : Window, ICardContext
         _settings.GearChecklistName = import.Name;
         _settings.Save();
         _gearChecklistDirty = true;
-        UpdateGearBadge();
         RefreshUi();
     }
 
@@ -2716,7 +2706,6 @@ public partial class MainWindow : Window, ICardContext
         _settings.GearChecklistName = "";
         _settings.Save();
         _gearChecklistDirty = true;
-        UpdateGearBadge();
         RefreshUi();
     }
 
@@ -2751,14 +2740,9 @@ public partial class MainWindow : Window, ICardContext
         () => _gearChecklistDirty = true,
         FindResource);
 
-    /// <summary>The card header's badge, from the shared theme so the widget and the
-    /// theme window's tab cannot come to different numbers.</summary>
-    private void UpdateGearBadge() => GearHeader.Text = Gear.Badge;
-
     private void UpdateGearChecklist(StatsSnapshot s)
     {
         var changed = AutoCheckGearLoot(s);
-        UpdateGearBadge();
         if (changed)
         {
             _gearChecklistDirty = true;   // rebuild next tick: checked box, list-name count
@@ -3214,7 +3198,6 @@ public partial class MainWindow : Window, ICardContext
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
         yield return ("kills", StarKills);
-        yield return ("loot", StarLoot);
         yield return ("deaths", StarDeaths);
         yield return ("buffs", StarBuffs);
     }
@@ -4091,7 +4074,6 @@ public partial class MainWindow : Window, ICardContext
         {
             _gearChecklistDirty = true;
             _settings.Save();
-            UpdateGearBadge();
         }
     }
 

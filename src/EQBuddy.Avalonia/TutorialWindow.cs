@@ -54,14 +54,15 @@ public sealed class TutorialWindow : Window
         // The tour predated the windows and still told people every card "drills into
         // details", which stopped being true the moment a card became a launcher.
         new("Cards that open windows",
-            "Two cards are doors. QUESTS opens the Quest Tracker — every quest searchable by " +
+            "Three cards are doors. QUESTS opens the Quest Tracker — every quest searchable by " +
             "the reward you want, plus your Epic 1.0 and Plane of Sky checklists. PROGRESS " +
             "opens four tabs: Experience, Wealth (coin AND motes, with the per-hour rate), " +
-            "Faction, and Raids.\n\n" +
-            "Both replaced several smaller cards, so if you are looking for one that used to " +
-            "be on the widget — Money, Motes, Faction, Raids, Sky Quest, Epics — it is a tab " +
-            "inside one of these now. Options → Cards & windows names which, under the " +
-            "card that absorbed it.\n\n" +
+            "Faction, and Raids. GEAR & LOOT opens two: everything this session picked up, " +
+            "and what is still missing off your imported gear list.\n\n" +
+            "All three replaced smaller cards, so if you are looking for one that used to " +
+            "be on the widget — Money, Motes, Faction, Raids, Sky Quest, Epics, Gear — it " +
+            "is a tab inside one of these now. Options → Cards & windows names which, under " +
+            "the card that absorbed it.\n\n" +
             "The card's own line still carries the numbers worth glancing at while you play, " +
             "so you only open the window when you actually want to read something.",
             null),

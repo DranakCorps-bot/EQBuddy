@@ -113,12 +113,23 @@ public static class OverlaySections
 {
     public static readonly (string Key, string Title)[] Catalog =
     [
-        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
+        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"),
         // One card for every quest surface (David, 2026-08-16). It replaced the separate
         // "Sky Quest" and "Epics" cards, which each carried a full tabbed checklist on the
         // widget — a review surface, not a glance one, and now a click away in the Quest
         // Tracker window. AppSettings.MigrateQuestSections folds the two old keys onto it.
-        ("quests", "Quests"), ("gear", "Gear"),
+        ("quests", "Quests"),
+        // One card for the GEAR & LOOT theme (docs/Themes.md, David 2026-08-20). It
+        // replaced the separate Loot and Gear cards, which are tabs in that window now;
+        // AppSettings.MigrateLootSections folds the old keys onto this one, and
+        // LootSurface.AbsorbedCardKeys is the list it reads — so what disappears is
+        // spelled ONCE, not again here.
+        //
+        // A card removed from this catalog must also leave MainWindow.SectionMap, and
+        // vice versa: ApplySectionLayout appends every catalog key that is not already in
+        // SectionOrder and then looks each one up in the map, so a key in one and not the
+        // other throws on STARTUP, for everybody. E2E caught exactly that here.
+        ("loot", "Gear & Loot"),
         // Key stays "tracked" — it's persisted in SectionOrder/HiddenSections. Only the
         // label follows the feature's rename from tracked loot to watch rules (#5).
         ("tracked", "Watch"), ("buffs", "Buffs"),
@@ -182,15 +193,23 @@ public static class OverlaySections
         ["quests"] = ["Sky Quest", "Epics"],
         // 2026-08-19: the PROGRESS THEME (docs/Themes.md).
         ["progress"] = ["Money", "Motes", "Faction", "Raids"],
+        // 2026-08-20: the GEAR & LOOT theme (docs/Themes.md).
+        ["loot"] = ["Gear"],
     };
 
     /// <summary>The one-line "these live in here now" note for a card, or null for a card
     /// that never absorbed anything. Add a line to <see cref="AbsorbedTitles"/> in the
     /// same change as any future fold — it is step 3's other half.</summary>
-    public static string? AbsorbedNote(string key) =>
-        AbsorbedTitles.TryGetValue(key, out var titles)
-            ? string.Join(" · ", titles) + " are tabs in here now"
-            : null;
+    public static string? AbsorbedNote(string key)
+    {
+        if (!AbsorbedTitles.TryGetValue(key, out var titles) || titles.Length == 0) return null;
+        // "Gear are tabs in here now" — the sentence was written when every fold absorbed
+        // several cards, and the Gear & Loot theme is the first to absorb exactly one.
+        // The line's whole job is to be READ by someone hunting for a card that vanished;
+        // a player who finds it ungrammatical has been given one more reason to doubt it.
+        var verb = titles.Length == 1 ? " is a tab in here now" : " are tabs in here now";
+        return string.Join(" · ", titles) + verb;
+    }
 }
 
 /// <param name="Absorbed">"Money · Motes · Faction · Raids are tabs in here now", or null.

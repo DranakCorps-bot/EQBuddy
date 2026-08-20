@@ -49,6 +49,7 @@ public partial class GearLootWindow : Window
 
         _tabs = new EqSegmentedStrip(TabStrip);
         BuildStaticChrome();
+        BuildMiniStar();
 
         var restored = ScreenGuard.OnScreen(_settings.GearLootLeft, _settings.GearLootTop, Width, 200);
         if (restored) { Left = _settings.GearLootLeft; Top = _settings.GearLootTop; }
@@ -89,6 +90,48 @@ public partial class GearLootWindow : Window
         CloseBtn.Content = DesignSystem.Icon("Close");
     }
 
+    /// <summary>
+    /// The mini-dashboard star the Loot card header used to carry.
+    ///
+    /// It is the ONLY writer <c>MiniStats</c> has for "loot", so folding that card away
+    /// without rehoming it would have left a setting only readers touch — the exact
+    /// signature CLAUDE.md trap 20 names, and the one that produced #204/#209, #210 and
+    /// #212. It also gates the Loot breakout window, so losing it would have silently
+    /// taken that away too. Here it finally gets a word beside it.
+    /// </summary>
+    private void BuildMiniStar()
+    {
+        var intro = DesignSystem.Text(Role.Caption, "Show in mini dashboard:");
+        intro.Ink("DimBrush");
+        intro.VerticalAlignment = VerticalAlignment.Center;
+        MiniRow.Children.Add(intro);
+
+        var star = new System.Windows.Controls.Primitives.ToggleButton
+        {
+            Style = (Style)FindResource("StarToggle"),
+            Tag = "loot",
+            IsChecked = _settings.MiniStats.Contains("loot"),
+            ToolTip = "Show loot count in the mini dashboard — and, while minimized, open the Loot breakout",
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        star.Click += (_, _) =>
+        {
+            if (star.IsChecked == true)
+            {
+                if (!_settings.MiniStats.Contains("loot")) _settings.MiniStats.Add("loot");
+            }
+            else _settings.MiniStats.Remove("loot");
+            _settings.Save();
+            _main.SyncStarsFromSettings();
+        };
+        MiniRow.Children.Add(star);
+
+        var label = DesignSystem.Text(Role.Caption, "Loot");
+        label.Ink("TextBrush");
+        label.VerticalAlignment = VerticalAlignment.Center;
+        MiniRow.Children.Add(label);
+    }
+
     private void UpdateHeightCap()
     {
         var height = MonitorMetrics.WorkAreaFor(this) is { } work
@@ -118,7 +161,11 @@ public partial class GearLootWindow : Window
         // stacked and hidden — a hidden panel still measures on every layout pass, and a
         // gear list can be forty rows of it.
         TabBody.Content = _tab == LootTab.Gear ? _gear.Body : _loot.Body;
-        if (_tab == LootTab.Gear) _gear.Render(); else _loot.Render(s);
+        // Both render, not just the visible one. The inactive tab's BADGE has to stay
+        // true — it is the number the player uses to decide whether to switch — and the
+        // E2E dump reads both surfaces' facts from this one window.
+        _loot.Render(s);
+        _gear.Render();
     }
 
     /// <summary>Build the strip from Core's <see cref="LootSurface"/> and UI.Shared's
@@ -158,7 +205,16 @@ public partial class GearLootWindow : Window
     public string DebugFacts() =>
         $"gearLootTab={LootSurface.KeyFor(_tab)} " +
         $"gearLootTabs={_tabs.Count} " +
-        $"gearLootRows={(_tab == LootTab.Gear ? _gear.DebugRowCount : _loot.RowCount)}";
+        $"lootRows={_loot.RowCount} " +
+        // The SAME keys the widget's Gear card reported before the fold, deliberately —
+        // E2E pinned them there first, and the point of the assertion is that they come
+        // out of the new host unchanged.
+        $"gearRows={_gear.DebugRowCount} " +
+        $"gearTotal={_settings.GearChecklist.Count} " +
+        $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
+        $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
+        $"gearPivotShown={(_gear.DebugPivotShown ? 1 : 0)} " +
+        $"gearListNameLen={_gear.DebugListNameLength}";
 
     private void OnDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {

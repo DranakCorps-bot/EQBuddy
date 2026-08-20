@@ -1,4 +1,4 @@
-<Window x:Class="EQBuddy.GearLootWindow"
+﻿<Window x:Class="EQBuddy.GearLootWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Gear &amp; Loot" SizeToContent="Height"
@@ -30,6 +30,7 @@
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Title row. The icon is a vector (DesignSystem.Icon), never a glyph — emoji
@@ -64,6 +65,14 @@
                  only one of them is ever wired). -->
             <ContentControl x:Name="TabBody"/>
         </ScrollViewer>
+        <!-- The mini-dashboard star the Loot card header used to carry.
+             It HAD to come somewhere. That star is the only writer MiniStats has for
+             "loot", and a fold that drops the last writer of a setting is exactly the
+             shape of #204/#209, #210 and #212 (CLAUDE.md trap 20) — DeadSettingTests
+             would have failed the build, and before that test existed it cost three
+             player-facing bugs. Here it gets the words it never had on the widget. -->
+        <StackPanel Grid.Row="3" x:Name="MiniRow" Orientation="Horizontal"
+                    Margin="{DynamicResource PadCard}" VerticalAlignment="Center"/>
       </Grid>
     </Border>
 </Window>

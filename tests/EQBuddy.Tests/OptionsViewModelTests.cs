@@ -70,9 +70,13 @@ public sealed class OptionsViewModelTests
         Assert.Equal(OverlaySections.Catalog.Length, s.SectionOrder.Count);
         Assert.DoesNotContain("bogus", s.SectionOrder);
         Assert.Contains(vm.Cards, c => c.Key == "quests" && c.Title == "Quests");
-        Assert.Contains(vm.Cards, c => c.Key == "gear" && c.Title == "Gear");
         // The two cards "quests" replaced are gone from the catalog for good.
         Assert.DoesNotContain(vm.Cards, c => c.Key is "sky" or "epic");
+        // And the one "loot" replaced — the GEAR & LOOT theme (docs/Themes.md). The card
+        // KEEPS the "loot" key and takes a new title: a player who dragged Loot somewhere
+        // keeps that slot through the fold (LootSurface.ThemeCardKey).
+        Assert.Contains(vm.Cards, c => c.Key == "loot" && c.Title == "Gear & Loot");
+        Assert.DoesNotContain(vm.Cards, c => c.Key == "gear");
         // And the four "progress" replaced, the same way — the PROGRESS THEME
         // (docs/Themes.md). Options is the only place a player can see the card list, so
         // a folded key left in it would offer a card that no longer exists.
@@ -99,8 +103,14 @@ public sealed class OptionsViewModelTests
         foreach (var gone in new[] { "Money", "Motes", "Faction", "Raids" })
             Assert.Contains(gone, progress);
         Assert.Contains("Sky Quest", vm.Cards.Single(c => c.Key == "quests").Absorbed!);
-        // A card that never absorbed anything says nothing.
-        Assert.Null(vm.Cards.Single(c => c.Key == "loot").Absorbed);
+        // The GEAR & LOOT theme absorbs exactly ONE card, which is the case the sentence
+        // was never written for: it read "Gear are tabs in here now" until 2026-08-20.
+        // A line whose whole job is to be read by someone hunting a vanished card cannot
+        // afford to look wrong.
+        Assert.Equal("Gear is a tab in here now",
+            vm.Cards.Single(c => c.Key == "loot").Absorbed);
+        // A card that never absorbed anything still says nothing.
+        Assert.Null(vm.Cards.Single(c => c.Key == "combat").Absorbed);
     }
 
     [Fact]

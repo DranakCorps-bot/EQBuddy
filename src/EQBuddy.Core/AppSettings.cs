@@ -505,12 +505,10 @@ public sealed class AppSettings
         // to land nearby; before nothing else, because nothing else reads SectionOrder.
         changed |= settings.ApplyDefaultGearSection();
         changed |= settings.MigrateProgressSections();
-        // MigrateLootSections is NOT called yet, deliberately. It is written and tested
-        // (LootSurfaceTests), but the window it folds into does not exist: running it now
-        // would take the Gear card out of the slot a player positioned it in and append it
-        // at the bottom, buying them nothing. docs/Themes.md — the fold lands in the same
-        // change as the theme, and "do not consolidate on the way to a release" is about
-        // exactly this half-state. Wire it up when the window ships.
+        // The window exists now, so the fold runs (docs/Themes.md step 5). It was written
+        // and held back deliberately for two commits — a migration that rearranges a
+        // player's widget before the surface it folds into exists buys them nothing.
+        changed |= settings.MigrateLootSections();
         changed |= settings.MigrateSkyRewardRenames();
         changed |= settings.ApplyDefaultSkyQuestChecklist();
         changed |= settings.ApplyDefaultEpicQuestChecklist();

@@ -1,5 +1,17 @@
 ﻿[
  {
+  "version": "1.98.0",
+  "date": "2026-08-20",
+  "highlights": [
+   "THE LOOT AND GEAR CARDS ARE NOW ONE CARD, GEAR & LOOT, THAT OPENS A WINDOW. They were two of the tallest things on the widget - a full loot list with its own filter and sort strips, and a gear checklist that can run forty rows - both sitting on the one surface that shares your monitor with the game. Neither is a deadline: what did I pick up, and what am I still missing, are questions you look away for. So they are two tabs in a window now, and the widget keeps one line carrying what BOTH card headers carried - the item count, what you crafted, and how far through your gear list you are - so the glance survives and you only open the window when you actually want to read something.",
+   "Your card keeps the slot you put it in. If you had dragged Loot somewhere on the widget, or hidden it, the Gear & Loot card is in that same place with that same setting - it is not appended to the bottom of your list. Options - Cards & windows says \"Gear is a tab in here now\" under it, and the quick tour's \"Cards that open windows\" page names all three doors instead of two.",
+   "The star that decides whether the Loot breakout window opens moved into the window along with the card, and finally has the word \"Loot\" beside it rather than being an unlabelled star on a card header.",
+   "The Gear tab keeps everything the card had, including the by-farm-zone pivot - and its badge now says nothing at all until you have imported a list, instead of \"0/0\", which read as a score you were losing.",
+   "LINUX AND macOS GET THIS IN THE SAME RELEASE, not a few behind. The window, the launcher card and the migration are all in the Avalonia build too. The fold sat finished-but-unmerged for two days rather than ship a Windows-only half: the code that folds the two cards is shared by both builds, so releasing Windows alone would have taken the Gear card off the Linux widget with nowhere for it to go.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+  ]
+ },
+ {
   "version": "1.97.0",
   "date": "2026-08-20",
   "highlights": [

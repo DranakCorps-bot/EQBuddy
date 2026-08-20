@@ -20,7 +20,8 @@ using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 
 namespace EQBuddy.Avalonia;
 
-public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost, IProgressHost
+public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost,
+    IProgressHost, IGearLootHost
 {
     private readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
@@ -123,7 +124,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _trackedHeader = AppTheme.StatValue("0");
     private readonly TextBlock _motesSummary = AppTheme.DimText("");
     private readonly ItemsControl _motesList = new();
-    private readonly TextBlock _gearHeader = AppTheme.StatValue("0/0");
     private readonly TextBlock _gearListName = AppTheme.DimText("");
     private readonly CheckBox _gearByZoneCheck = new() { Content = "Group by farm zone" };
     private readonly StackPanel _gearChecklistPanel = new();
@@ -521,6 +521,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (Environment.GetEnvironmentVariable("EQBUDDY_PROGRESS") is { Length: > 0 } progressTab)
             Loaded += (_, _) => Dispatcher.UIThread.Post(
                 () => ShowProgressWindow(progressTab == "1" ? null : progressTab),
+                DispatcherPriority.ApplicationIdle);
+
+        // Same family as EQBUDDY_PROGRESS. "1" opens the window on Loot; a tab key
+        // (loot / gear) opens it there. A surface with no way to be photographed reads as
+        // "reviewed" anyway (trap 22), and these two bodies have no other way in now.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOOT") is { Length: > 0 } lootTab)
+            Loaded += (_, _) => Dispatcher.UIThread.Post(
+                () => ShowGearLootWindow(lootTab == "1" ? null : lootTab),
                 DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
@@ -968,7 +976,20 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         AddSection("combat", "dps", "Combat", _combatHeader, BuildCombatSection(), "Show DPS in mini dashboard");
         AddSection("healing", "hps", "Healing", _healingHeader, BuildHealingSection(), "Show HPS in mini dashboard");
         AddSection("kills", "kills", "Kills", _killsHeader, BuildKillsSection(), "Show kills in mini dashboard");
-        AddSection("loot", "loot", "Loot", _lootHeader, BuildLootSection(), "Show loot count in mini dashboard");
+        // ONE card for the GEAR & LOOT theme (docs/Themes.md), in the same change as
+        // the WPF twin. It replaced the Loot and Gear cards: what did I get, and what am
+        // I still missing. Both are questions you look AWAY for, so by CLAUDE.md's surface
+        // rule they earn a window rather than two slots on the thing that sits over the
+        // running game.
+        //
+        // The BODIES are still built here and still rendered here — GearLootWindow hosts
+        // them through IGearLootHost.LootTabBody, the way ProgressWindow hosts its four.
+        _lootTabBodies[LootTab.Loot] = BuildLootSection();
+        _sections["loot"] = AppTheme.SectionLink(
+            Header("loot", "Gear & Loot", _lootHeader), () => ShowGearLootWindow());
+        ToolTip.SetTip(_sections["loot"],
+            "Open Gear & Loot - everything this session picked up, and what is left on "
+            + "your imported gear list");
         // ONE card for every quest surface (David, 2026-08-16). It replaced the "Sky
         // Quest" and "Epics" cards, each of which carried a full tabbed checklist on the
         // widget — a review surface by the rule in CLAUDE.md, not a glance one. The Quest
@@ -980,7 +1001,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ToolTip.SetTip(_sections["quests"],
             "Open the Quest Tracker — search every quest by reward, item, quest giver or "
             + "zone, and work your Epic 1.0 and Plane of Sky checklists");
-        _sections["gear"] = AppTheme.Section(Header("gear", "Gear", _gearHeader), BuildGearSection());
+        _lootTabBodies[LootTab.Gear] = BuildGearSection();
         _sections["tracked"] = AppTheme.Section(Header("tracked", "Watch", _trackedHeader), _trackedPanel);
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
@@ -1856,6 +1877,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // off the shared tick so a hidden window can't silence a camp.
         if (_questsWindow is { IsVisible: true } qw) qw.MaybeRefresh();
         if (_progressWindow is { IsVisible: true } pw) pw.MaybeRefresh();
+        if (_gearLootWindow is { IsVisible: true } gw) gw.MaybeRefresh();
         if (_dropsWindow is { IsVisible: true } dw) dw.MaybeRefresh();
         if (_wikiPackWindow is { IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsVisible: true } mapw) mapw.MaybeRefresh();
@@ -2037,7 +2059,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _kpiLoot.Text = $"{s.LootTotal}";
         _kpiXp.Text = $"{s.XpPerHour:0.#}%";
         _killsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
-        _lootHeader.Text = LootPresentation.Header(s.LootTotal, s.CraftedTotal + s.FashionedTotal);
+        // The Gear & Loot card is a launcher, not a list: its one line carries what BOTH
+        // card headers carried, so the glance survives the fold rather than being traded
+        // for a click (#219's lesson, taken in advance). The rows happen in the window.
+        _lootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
         // A session rollover empties the loot lists lazily, inside the same batch
         // that may carry the new session's first loot — inferring the reset from
         // emptied lists can miss that first same-name drop. The session identity
@@ -2199,7 +2224,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _partyKillsLabel.IsVisible = s.PartyKillsByKiller.Count > 0;
             FillList(_partyKillList, s.PartyKillsByKiller.Select(k => (k.Name, $"x{k.Count}")));
         }
-        if (_sections["loot"].IsExpanded)
+        if (LootTabShowing(LootTab.Loot))
         {
             _loot.Render(s);
             RenderTargetDrops(s);
@@ -2217,7 +2242,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         _questsHeader.Text = QuestsSummaryLine();
-        if (_sections["gear"].IsExpanded && _gearChecklistDirty)
+        if (LootTabShowing(LootTab.Gear) && _gearChecklistDirty)
         {
             RenderGearChecklist();
             _gearChecklistDirty = false;
@@ -2310,7 +2335,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             try
             {
                 var dump = $"dmgSrc={_damageSourceList.Children.Count} dmgTaken={_damageTakenList.Items.Count} " +
-                    $"kills={_killList.Items.Count} party={_partyKillList.Items.Count} loot={_loot.RowCount} " +
+                    $"kills={_killList.Items.Count} party={_partyKillList.Items.Count} " +
+                    // The Gear & Loot launcher's one line, by length — the thing that
+                    // moves if the fold silently drops one of the two cards' numbers.
+                    $"lootSummaryLen={_lootHeader.Text?.Length ?? 0} " +
                     $"skills={_skillList.Items.Count} faction={_factionList.Items.Count} " +
                     $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} " +
                     $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
@@ -3538,6 +3566,71 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         RefreshExpandedSections(snap);
         RenderRaids();
     }
+    private GearLootWindow? _gearLootWindow;
+
+    /// <summary>The two Gear &amp; Loot tab bodies, built by BuildSections() when these were
+    /// two cards and still rendered by the same code. GearLootWindow hosts them.</summary>
+    private readonly Dictionary<LootTab, Control> _lootTabBodies = new();
+
+    /// <summary>The Gear &amp; Loot window, for the headless render tests — the two surfaces
+    /// it hosts have no other place to be asserted on since the fold, and this build has no
+    /// E2E suite at all (docs/TestPlan.md).</summary>
+    internal GearLootWindow? GearLootWindowForTests => _gearLootWindow;
+
+    /// <summary>Is the window open and showing this tab? The render guards ask this where
+    /// they used to ask "is this card expanded" — same rule either way.</summary>
+    private bool LootTabShowing(LootTab tab) =>
+        _gearLootWindow is { IsVisible: true } w && w.Tab == tab;
+
+    // ---- IGearLootHost ----
+    Control IGearLootHost.LootTabBody(LootTab tab) => _lootTabBodies[tab];
+
+    IReadOnlyList<LootTabHeader> IGearLootHost.LootTabs(StatsSnapshot s) =>
+        LootTheme.Tabs(s, _settings.GearChecklist);
+
+    IReadOnlyList<(string Key, Control Star, string Label, string Tip)> IGearLootHost.LootMiniStars()
+    {
+        // Registered in _stars and wired to OnStarChanged, so a click still toggles the
+        // setting, repaints EVERY star and re-decides the breakouts. A star the window
+        // owned instead would be a second mechanism for one piece of state.
+        const string tip = "Show loot count in the mini dashboard - and, while minimized, "
+            + "open the Loot breakout";
+        var star = AppTheme.StarButton("loot", tip);
+        star.Click += OnStarChanged;
+        _stars["loot"] = star;
+        UpdateStarVisuals();
+        return [("loot", star, "Loot", tip)];
+    }
+
+    /// <summary>Open (or front) the Gear &amp; Loot window — the theme's two tabs, and the
+    /// only way to reach two surfaces that used to be two cards.</summary>
+    internal void ShowGearLootWindow(string? tab = null)
+    {
+        // Same reopen contract as every satellite here: a null field means closed for
+        // real (Avalonia's Show() throws on a closed window).
+        if (_gearLootWindow is null)
+        {
+            var window = new GearLootWindow(this);
+            window.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_gearLootWindow, window)) _gearLootWindow = null;
+                // The star went with it. Leaving a dead control in the table would have
+                // UpdateStarVisuals painting a button in a torn-down window forever.
+                _stars.Remove("loot");
+            };
+            _gearLootWindow = window;
+        }
+        _gearLootWindow.Show();
+        if (tab is { Length: > 0 }) _gearLootWindow.SetTab(tab);
+        _gearLootWindow.Activate();
+        // Paint the tab NOW rather than on the next tick: opening a surface and staring at
+        // an empty one is the field report that made the widget render on expand.
+        var snap = CurrentSnapshot();
+        _gearLootWindow.Refresh();   // picks the tab, so the guards below know which one
+        _gearChecklistDirty = true;
+        RefreshExpandedSections(snap);
+    }
+
     private DropsWindow? _dropsWindow;
     private WikiPackWindow? _wikiPackWindow;
     private MapWindow? _mapWindow;
@@ -4189,7 +4282,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void UpdateGearChecklist(StatsSnapshot s)
     {
         var changed = AutoCheckGearLoot(s);
-        UpdateGearHeaderOnly();
         if (changed)
         {
             _gearChecklistDirty = true;   // rebuild next tick: checked box, list-name count
@@ -4260,8 +4352,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             _gearChecklistDirty = true;
             _settings.Save();
-            UpdateGearHeaderOnly();
-        }
+            }
     }
 
     // ---- the imported gear checklist card (#113) ----
@@ -4287,7 +4378,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal void RefreshGearCard()
     {
         _gearChecklistDirty = true;
-        UpdateGearHeaderOnly();
         RefreshUi();
     }
 
@@ -4301,15 +4391,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             _gearListName.Text = "Import an EQ Legends Tools shopping-list HTML in Options.";
             _gearChecklistPanel.Children.Add(EmptyCardLine("No gear list imported."));
-            UpdateGearHeaderOnly();
-            return;
+                return;
         }
 
         UpdateGearListName();
         if (_settings.GearGroupByZone) RenderGearByZone();
         else RenderGearBySlot();
 
-        UpdateGearHeaderOnly();
     }
 
     private void RenderGearBySlot()
@@ -4409,7 +4497,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         item.Acquired = acquired;
         _settings.Save();
-        UpdateGearHeaderOnly();
         UpdateGearListName();
         // The zone view excludes acquired rows and repeats a multi-zone item under
         // each zone it drops in — its checkbox twins must repaint, next tick.
@@ -4423,7 +4510,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
         _settings.GearGroupByZone = value;
         _settings.Save();
-        if (_sections["gear"].IsExpanded)
+        if (LootTabShowing(LootTab.Gear))
         {
             RenderGearChecklist();
             _gearChecklistDirty = false;
@@ -4437,13 +4524,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void UpdateGearListName() =>
         _gearListName.Text = EQBuddy.UI.Shared.GearChecklistPresentation.ListName(
             _settings.GearChecklistName, _settings.GearChecklist);
-
-    private void UpdateGearHeaderOnly()
-    {
-        var total = _settings.GearChecklist.Count;
-        var acquired = _settings.GearChecklist.Count(i => i.Acquired);
-        _gearHeader.Text = $"{acquired}/{total}";
-    }
 
     private static string SkyRewardKey(string className, string reward) => className + "|" + reward;
 

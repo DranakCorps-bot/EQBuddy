@@ -222,7 +222,7 @@ guards below are the deliverable and not a nicety.
 | Unticking stops the window and leaves the star, so a mini-pill cell never vanishes as a side effect | **Auto** — `OptionsRenderTests` |
 | **Which star opens which window is one table in UI.Shared**, read by both widgets' gates AND by Options — the two answered it separately, which is how a tick box came to exist that could not turn anything on | **Auto** — `OptionsRenderTests` |
 | A captured surface is reviewed as a real render, on a seeded session, over a plain backdrop | **Manual** — `pwsh scripts/shoot.ps1` |
-| A single card BODY can be photographed without opening every card: `EQBUDDY_EXPAND` takes card keys (`EQBUDDY_EXPAND=loot`) as well as `1` | **Manual** — `pwsh scripts/shoot.ps1 -Shot loot-card` |
+| A single card BODY can be photographed without opening every card: `EQBUDDY_EXPAND` takes card keys (`EQBUDDY_EXPAND=kills`) as well as `1` | **Manual** — `pwsh scripts/shoot.ps1 -Shot kills-card` |
 | **A card whose body only exists once there is DATA is staged, not shot empty** — the Watch strip needs two rules, the Raids rows need a clear | **Manual** — `pwsh scripts/shoot.ps1 -Shot tracked-card,raids-card` |
 | A surface that moved into a WINDOW keeps a way to be photographed: `EQBUDDY_PROGRESS` opens the Progress window on a named tab, as `EQBUDDY_QUESTS` does for the tracker | **Manual** — `pwsh scripts/shoot.ps1 -Shot progress-wealth` |
 | **A shot names a PROCESS, not just a title** — four Progress shots share the title `EQBuddy Progress`, and a previous shot's app that is still exiting matches it | **Auto** — `shoot.ps1` passes `-OwnerPid` |

@@ -468,33 +468,29 @@
                 <ContentControl x:Name="KillsBody"/>
             </Expander>
 
-            <Expander x:Name="LootSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Bag" Text="Loot"/>
-                        <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 items"/>
-                        <TextBlock Grid.Column="2" Text="&#x1F5FA;" FontSize="{DynamicResource FontBody}" Cursor="Hand"
-                                   Margin="{DynamicResource IndentM}" VerticalAlignment="Center"
-                                   Foreground="{DynamicResource DimBrush}"
-                                   ToolTip="Open the Quest Tracker"
-                                   MouseLeftButtonUp="OnLootQuestMap"/>
-                        <ToggleButton x:Name="StarLoot" Grid.Column="3" Style="{StaticResource StarToggle}"
-                                      Tag="loot" Click="OnStarChanged" ToolTip="Show loot count in mini dashboard"/>
-                    </Grid>
-                </Expander.Header>
-                <!-- The card BODY is built in code by LootCardView (Gate 4,
-                     docs/DesignSystem.md §11.5): the show/sort filters are the app's
-                     EqSegmentedStrip rather than the sixteenth hand-built copy, and the
-                     ratchet holds the file to the scale — which it cannot do here, because
-                     MainWindow.xaml does not join DesignRatchetTests until Gate 5. -->
-                <ContentControl x:Name="LootBody"/>
-            </Expander>
+            <!-- The GEAR & LOOT theme's launcher (docs/Themes.md step 3). The Loot and
+                 Gear cards became two tabs in GearLootWindow; this line carries what both
+                 headers carried, so the glance survives the fold rather than being traded
+                 for a click. Same shape as the Quests and Progress launchers.
+
+                 Auto/* rather than */Auto so the TITLE holds its size and the summary is
+                 the half that gives: both widgets are SizeToContent, so a label whose
+                 string changes width IS window geometry (trap 12), and this line moves
+                 with every drop. -->
+            <Button x:Name="LootSection" Style="{StaticResource SectionLink}" Click="OnGearLootWindow"
+                    ToolTip="Open Gear &amp; Loot — everything this session picked up, and what is left on your imported gear list">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <local:EqCardTitle Icon="Bag" Text="Gear &amp; Loot"/>
+                    <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Margin="{DynamicResource IndentM}"
+                               TextTrimming="CharacterEllipsis" Text=""/>
+                </Grid>
+            </Button>
 
             <!-- ONE card for every quest surface (David, 2026-08-16). It replaced the
                  "Sky Quest" and "Epics" cards, each of which carried a full tabbed
@@ -515,23 +511,6 @@
                 </Grid>
             </Button>
 
-            <Expander x:Name="GearSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Gear" Text="Gear"/>
-                        <TextBlock x:Name="GearHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0/0"/>
-                    </Grid>
-                </Expander.Header>
-                <!-- The body is GearCardView's, built in code: the Loot & Items theme
-                     puts this same card in a window as well as here, and a UIElement has
-                     one parent — so each host gets its own instance. No Visibility and no
-                     Margin here; the lifted control carries both (trap 15). -->
-                <ContentControl x:Name="GearBody"/>
-            </Expander>
 
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">
                 <Expander.Header>

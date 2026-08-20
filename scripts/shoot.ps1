@@ -63,7 +63,9 @@ $Shots = [ordered]@{
     # One card, opened by name: a card's expanded state is not persisted, so a body can
     # only be photographed through this hook. EQBUDDY_EXPAND takes a comma-separated list
     # of the same keys SectionMap uses.
-    'loot-card'       = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'loot' }; Set = @{} }
+    # 'loot-card' is gone: the Loot card is a LAUNCHER now (the Gear & Loot theme), so
+    # EQBUDDY_EXPAND = 'loot' would photograph a one-line button. The rows it used to
+    # show are 'gearloot-loot' below, and the launcher line itself is in 'widget-cards'.
     'kills-card'      = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'kills' }; Set = @{} }
     # The two remaining heavy card bodies (Gate 5b). Shot before and after their lift so
     # a refactor that changes what a player SEES shows up as a diff in the picture —

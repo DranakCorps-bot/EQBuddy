@@ -38,7 +38,13 @@ public sealed class EndToEndTests
     [Fact]
     public void TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone()
     {
-        using var app = new AppHarness(s =>
+        // The card is a TAB now (the Gear & Loot theme), so the window has to be open for
+        // its surface to exist. Same assertions, same numbers, new host — which is the
+        // entire point of having pinned them before the fold.
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_GEARLOOT"] = "gear",
+        }, configureSettings: s =>
         {
             s.GearChecklistName = "Harness list";
             s.GearChecklist =
@@ -74,6 +80,17 @@ public sealed class EndToEndTests
         // "Harness list - 1/4": the name AND the progress count, which is the line
         // that says which shopping list this is and how far through it you are.
         app.WaitForDump("gearListNameLen", "Harness list - 1/4".Length, "the list's name and progress");
+
+        // And the LAUNCHER kept the glance. It replaced two card headers with one line,
+        // so the line has to carry what both carried — loot count, what was crafted, and
+        // the gear fraction. #219 is what happens when a fold quietly drops one of them.
+        app.WaitForDump("lootCard", 1, "the Gear & Loot launcher card to be on the widget");
+        // The line the shared formatter would produce for this fixture and this seeded
+        // list, asserted by LENGTH because that is what the dump can carry — and the
+        // length is the thing that moves if a part is silently dropped.
+        app.WaitForDump("lootSummaryLen",
+            LootSurface.LauncherSummary(items: 39, crafted: 4, gearTotal: 4, gearAcquired: 1).Length,
+            "the launcher line to carry both cards' numbers");
     }
 
     /// <summary>With nothing imported the card says so in one line and hides the pivot —
@@ -81,7 +98,10 @@ public sealed class EndToEndTests
     [Fact]
     public void AnEmptyGearCardSaysSoAndOffersNoPivot()
     {
-        using var app = new AppHarness();
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_GEARLOOT"] = "gear",
+        });
         app.Launch();
 
         app.WaitForDump("gearTotal", 0, "no gear list on the shared fixture");
@@ -108,18 +128,25 @@ public sealed class EndToEndTests
     [Fact]
     public void KillThenLoot_ShowsUpOnTheLootSurface()
     {
-        using var app = new AppHarness();
+        // The loot ROWS are a tab now (the Gear & Loot theme), so the window has to be
+        // open for them to exist. The COUNT still lives on the widget — it is half of the
+        // launcher's one line — which is the split this assertion now pins: the number a
+        // player glances at stayed put, the list moved.
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_GEARLOOT"] = "loot",
+        });
         app.Launch();
 
         var lootTotal = app.DumpValue("lootTotal");
-        var lootRows = app.DumpValue("loot");
+        var lootRows = app.DumpValue("lootRows");
         Assert.True(lootTotal > 0, "fixture replay should land loot");
 
         app.AppendLogLines(MeleeHit, Kill,
             "--You have looted a Harness Test Trinket from a training dummy's corpse.--");
 
         app.WaitForDump("lootTotal", lootTotal + 1, "the looted item to reach the widget");
-        app.WaitForDump("loot", lootRows + 1, "the new item to get its own loot row");
+        app.WaitForDump("lootRows", lootRows + 1, "the new item to get its own loot row");
     }
 
     [Fact]
