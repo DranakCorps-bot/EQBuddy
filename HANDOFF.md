@@ -89,6 +89,54 @@ source are still 4-for-4 wrong, so treat one as a place to look.
 
 ## What is actually next — pick one, they are independent
 
+**0. DAVID ASKED FOR THIS DIRECTLY (2026-08-20, after 1.98.0 shipped) — do it first.**
+
+> *"the gear tab should give me the copy button for /outputfile inventory … right now it's
+> telling me to import it but not telling me how or giving me the tool with which to do it.
+> That needs to be applied for every instance of needing the user to execute a command in
+> game for an output file."* — and, pointing at the pattern to copy: *"Raids has this
+> implemented, for example."*
+
+**The rule already exists and is already his** (`GameCommands`, David 2026-08-14: *"every
+surface that names one offers a one-click ⧉ copy"*). What is new is that the rule is not
+being ENFORCED where it matters, and the Gear tab is the proof.
+
+**The worked example is `EQBuddy/RaidsCardView.cs`** — `CopyAchievementsCmd()`, which is
+`Theming.WireCopyCommand(Theming.Button(""), GameCommands.OutputfileAchievements)` plus a
+tooltip saying what to do with it, appended BOTH to the empty state and to the populated
+one. Copy that shape; do not invent a second one.
+
+**What is actually wrong on the Gear tab, and it is two things, not one:**
+
+1. **No copy button.** `EQBuddy/GearCardView.cs` and the Avalonia gear section never
+   reference `GameCommands` at all — the Gear Locker window next door does. The gear
+   checklist auto-ticks from the inventory dump (`AutoCheckGearFromInventory`), which needs
+   `/outputfile inventory`, and the surface never says so.
+2. **The empty state names a task with no route.** It reads *"Import an EQ Legends Tools
+   shopping-list HTML in Options."* — which is a DIFFERENT import from the `/outputfile`
+   one, is a website export rather than a game command, and tells a player to go somewhere
+   without saying where. **A copy button alone does not fix that sentence.** It needs to say
+   both: where the shopping list comes from, and that `/outputfile inventory` is what makes
+   the ticks happen by themselves.
+
+**And the general fix, which is the half that stops this recurring.** `GameCommandsTests`
+today only forbids a copy source carrying its own literal — it cannot notice a surface that
+ASKS for an output file and offers nothing. That is exactly the hole the Gear tab fell
+through. Add the positive assertion: a curated list of surfaces that require an in-game
+command, each asserted to reference `GameCommands` and to wire a copy, with a reason per
+entry the way `DeadSettingTests.Known` does. A list is code that cannot be type-checked, so
+it has to be written down and reviewed — but it turns "we remembered" into "the build
+remembered".
+
+**Sweep every instance**, per his wording, in both UIs in the same change: gear checklist,
+Sky/achievements import, inventory, gear locker, the map's `/loc` social. Check the
+POPULATED states too, not just the empty ones — Raids puts the button in both, because the
+player who needs it most is the one whose import went stale.
+
+**One thing to ASK rather than assume:** EQBuddy Mobile. The phone's clipboard cannot paste
+into the game on the PC, so a copy button there is a dead end — but showing the command as
+selectable text is not. Use the question tool.
+
 **1. The Avalonia widget has ~100 lines of ratchet room, and this is the real constraint.**
 `EQBuddy.Avalonia/MainWindow.cs` is 5,539 against a 5,127 baseline (limit 5,640). Two folds
 in a row COST it ~90 lines each rather than freeing any, because a fold moves surfaces and

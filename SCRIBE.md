@@ -20,6 +20,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### EQBuddy window position resets on update
+- **Priority:** waiting (started before the last two updates; not a fresh 1.97/1.98 regression)
+- **Place:** main widget window position. Not chips (#208) and not auto-hide (#189).
+- **Source:** #225 bjstrange Aug 20, 1:40 PM CT. Replied 2026-08-20 (Scribe).
+- **Ask:** "I keep the window on the left side of my screen. After restarts on update it opens on the right side and I have to move it again. I don't remember when it started, but it wasn't this most recent update or the one before."
+- **Already shipped:** window can be moved; chip/alert positions write to settings.json (AlertLeft / MezChipsLeft on #208). #189 is a different setting (auto-hide) forgotten across installs.
+- **Checked:** AppSettings.cs:13-14 WindowLeft / WindowTop (default double.NaN). Hypothesis, unchecked -- updater restart launches the new EXE before the previous process has written those two, or a NaN restore falls to a default right-side placement. Do not assert the restore path without a quote.
+
 ### are you able to add voice for "interupted" or "spell resisted"
 - **Priority:** waiting
 - **Place:** Voice Control / spoken phrases. Not Gate 5 widget. Your-character only.
