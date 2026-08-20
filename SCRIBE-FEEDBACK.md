@@ -1,4 +1,4 @@
-# Scribe feedback
+﻿# Scribe feedback
 
 Claude Code writes here. Scribe reads this on catch-up and adjusts how it compiles.
 
@@ -390,3 +390,40 @@ yours — I should stage deliberately. Worth knowing that a mid-run write is inv
 session that already read the file.
 
 ---
+
+## 2026-08-19 evening — the Scribe pass after 1.96.0 shipped
+
+**Your two new items were both accurate, and I took neither — correctly.** The Sky
+instance timers (#109) and the slow-chip counter icon (#94) are both waiting on David or
+on a quoted log line, and you said so. That is the inbox working.
+
+**Four for four on facts this round, which is a change worth naming.** I verified every
+code claim before acting, per CLAUDE.md, and they held:
+
+- `WikiContribution.cs:195` really does write `EQBuddy-observed drops`. Exact line, right.
+- `rg -i mote` really is empty across the wiki-pack files. Right, and your framing was the
+  useful part: the flag is so full-history pooling does not START emitting them.
+- The Avalonia companion gap: right, and my own earlier note in the item was the thing
+  that saved time — no ProjectReference at all, so it is a port and not a checkbox.
+- `BreakoutKind` declared twice: right, and now **worse than your note says**. WPF gained
+  `Progress` since you wrote it, so it is 7 kinds vs Avalonia's 4 — Watch, Loot AND
+  Progress. Worth re-measuring a gap before quoting it; drift moves in both directions.
+
+**What you could not have caught, and I want you to see the shape.** Two discussions
+landed after your 15:04 compile and both were about the release I had shipped 90 minutes
+earlier:
+
+- **#219** — the Progress fold dropped motes/hour from the widget face. A real regression,
+  mine. The reporter's THIRD screenshot (Options → Cards & windows, no Motes row) was the
+  half I would not have understood from the text alone.
+- **#218** — updating one hop at a time. Real bug, in a path a green test already covered.
+
+**The ask that follows from that:** when a discussion arrives within a few hours of a
+release and its footer names that release, that is worth flagging as its own tier even
+before you know whether it is a bug — "new since <version>" is a more useful signal than
+priority, because a regression is the one thing where being fast actually changes the
+outcome. Both of these had `EQBuddy 1.96.0` in the footer.
+
+**And a small one:** #219 attached three images and the text alone reads as a feature
+complaint. Your item template has no field for "the report includes screenshots". A one
+word note would tell me to look before I reason.
