@@ -557,8 +557,36 @@ public partial class MainWindow : Window, ICardContext
         _companionPumpTicks++;
         if (!_companionGate.ShouldPush(_companion.HasClients, _stats.CurrentVersion)) return;
         _companionPushes++;
-        _companion.Tick(_stats.Snapshot(), _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
+        // BuildSnapshot(), not _stats.Snapshot(). The argument-less overload passes no
+        // rules, and a snapshot built without rules has an EMPTY Tracked list — so this
+        // pump was pushing watch:[] to the phone between the UI ticks that pushed the real
+        // one. #202: bjstrange's loot card rebuilding several times a second, for months.
+        _companion.Tick(BuildSnapshot(), _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
     }
+
+    /// <summary>
+    /// THE snapshot this app runs on — a recent window from settings, and the watch rules.
+    ///
+    /// Every caller goes through here, because the two arguments are not decoration: a
+    /// snapshot built without <c>rules</c> comes back with <c>Tracked</c> EMPTY, and one
+    /// built without a window has no recent rates. Two callers using different arguments
+    /// do not produce a stale answer and a fresh one — they produce two DIFFERENT ANSWERS,
+    /// both current, and whichever pushed last wins.
+    ///
+    /// That is #202, and it is trap 10 with the knobs being arguments instead of settings:
+    /// the low-latency companion pump called the argument-less overload while RefreshUi
+    /// called this one, so EQBuddy Mobile's loot card - the only surface carrying the watch
+    /// rows - was told the watch list had emptied 20 times a second and refilled once a
+    /// second. The page's change detection was right the whole time. The data really was
+    /// changing.
+    ///
+    /// It is also free: the snapshot memo is keyed on (version, window, rules), so a second
+    /// caller with the SAME arguments gets the cached instance. Diverging arguments were
+    /// costing a full rebuild every 50 ms as well as being wrong.
+    /// </summary>
+    private StatsSnapshot BuildSnapshot() =>
+        _stats.Snapshot(TimeSpan.FromMinutes(Math.Max(1, _settings.RecentWindowMinutes)),
+            _settings.TrackedRules);
 
     // For the EQBUDDY_EXPAND dump: how many times the pump ran, and how many of those
     // did any work. E2E asserts the second is zero while no device is paired — the
@@ -658,7 +686,7 @@ public partial class MainWindow : Window, ICardContext
     /// <summary>The current stats snapshot for windows that refresh on their own
     /// cadence: this tick's shared instance, or a fresh build when a window opens
     /// before RefreshUi has ever ticked.</summary>
-    internal StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? _stats.Snapshot();
+    internal StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? BuildSnapshot();
 
     /// <summary>The 🗺 badge signal: a known quest's turn-in OR a member of the wiki's
     /// Quest Items category (back to the broad set once the loud green retired — a
@@ -2323,8 +2351,7 @@ public partial class MainWindow : Window, ICardContext
         if (_watcher.LastError is { } err)
             App.LogError(err);
 
-        var s = _stats.Snapshot(TimeSpan.FromMinutes(Math.Max(1, _settings.RecentWindowMinutes)),
-            _settings.TrackedRules);
+        var s = BuildSnapshot();
         _latestSnapshot = s;   // satellites reuse this tick's snapshot (perf audit #12)
 
         ProcessTrackedAlerts(s);

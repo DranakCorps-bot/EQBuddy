@@ -577,6 +577,25 @@ Read this list before touching the areas it names. Every entry cost a release.
     (`CompanionPageUpdateTests`). **Before diagnosing any page-side report, ask what the
     footer on THEIR device says** — not what version their PC is on.
 
+33. **Two callers with DIFFERENT ARGUMENTS do not produce a stale answer and a fresh one —
+    they produce two different answers, both current, and whichever ran last wins.** This
+    is trap 10 with the knobs being arguments rather than settings, and it is #202:
+    `SessionStats.Snapshot()` (no rules) returns a snapshot whose `Tracked` list is EMPTY,
+    while `Snapshot(window, rules)` fills it. The widget pushed to EQBuddy Mobile from two
+    places — `RefreshUi` once a second with rules, and the 50 ms low-latency pump without —
+    so the phone was told the watch list had emptied twenty times a second and refilled
+    once a second. The loot card is the only surface carrying the watch rows, so the loot
+    card is the one that flickered, for three releases and two wrong diagnoses from here.
+    **The page's change detection was correct throughout; the data really was changing.**
+    → **When a value has two producers, give them one builder.** `MainWindow.BuildSnapshot()`
+    (WPF) and `CurrentSnapshot()` (Avalonia) are it, and `CompanionSnapshotArgumentTests`
+    scans both widgets' source so a third push site cannot pick the other overload. It was
+    also costing a full snapshot rebuild every 50 ms: the memo is keyed on the arguments,
+    so agreeing made the fast path free as well as right.
+    → **And the diagnostic is what solved it, not the reasoning.** Two `?debug=1` captures
+    from the reporter, nine seconds apart and exact mirror images, said in one line what
+    three sessions of hypothesis had not. Ship the instrument before the third theory.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

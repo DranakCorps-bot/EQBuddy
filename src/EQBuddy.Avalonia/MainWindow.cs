@@ -4818,7 +4818,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void PumpCompanion()
     {
         if (!_companionGate.ShouldPush(_companion.HasClients, _stats.CurrentVersion)) return;
-        _companion.Tick(_stats.Snapshot(), _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
+        // CurrentSnapshot(), not _stats.Snapshot(). The argument-less overload passes no
+        // rules, and a snapshot built without rules has an EMPTY Tracked list - so this
+        // pump was pushing watch:[] to the phone between the UI ticks that pushed the real
+        // one (#202). Same bug as the WPF pump, arrived at by being copied from it.
+        _companion.Tick(CurrentSnapshot(), _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
     }
 
     internal void OpenCompanionWindow()
