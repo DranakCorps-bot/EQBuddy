@@ -8,6 +8,94 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## START HERE — the next session's work: EQBuddy Mobile does not exist on Linux/macOS
+
+**This is the item to open a full session on** (David, 2026-08-19: *"note this for the
+next handoff prompt so we can start it with a full session"*). It is approved, it is
+scoped below, and it is big enough that it should not be squeezed onto the end of
+something else.
+
+**What was reported:** #208 (sbaum23) — *"I don't see the EQ Mobile option in the Linux
+version. Is there a way to start the mobile version from Linux?"* Scribe filed it as a
+missing checkbox.
+
+**What it actually is — measured, not assumed:** a PORT, not a toggle.
+`src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj` has ProjectReferences to **Core and
+UI.Shared only** — there is no reference to `EQBuddy.Companion` at all. `CompanionEnabled`
+appears nowhere in that project. The host, the pump, the projection feed and the Options
+surface are all absent, so there is no switch to add: the server does not exist in that
+build. sbaum23 is right.
+
+**Why it is worth a whole session:** CLAUDE.md names two things as EQBuddy's only
+uncontested ground — the phone/tablet second screen, and the Linux/macOS build. **Right
+now they cannot be used together.** Every competitor has an overlay and a DPS meter and
+none has a phone; a Linux player is exactly the person most likely to want one.
+
+**What the WPF side does, to port from** (`src/EQBuddy/MainWindow.xaml.cs`): builds a
+`CompanionSources` record (~20 `Func`s — timers, mezzes, buff sets, quests, hops, raids,
+progress, camp lookup), hands it to `CompanionHost`, and ticks `MaybeRefresh` off the
+shared UI tick. The projection itself is already framework-free in `EQBuddy.Companion`, so
+this is wiring plus an Options surface, not new protocol work. Watch for: the single-
+instance port claim (trap 13 — two builds on one profile both wanted the port), and
+`CompanionSources.Raids`/`Progress`, which the Progress theme added on 2026-08-19 and
+which a port written from an older mental model would silently omit.
+
+**Related gap found while measuring, same lane:** `BreakoutKind` is declared twice and the
+two do not agree — `EQBuddy/BreakoutWindow.xaml.cs` has
+`{ Damage, Healing, Pet, Watch, Loot, Buffs, Progress }` and
+`EQBuddy.Avalonia/BreakoutWindow.cs` has `{ Damage, Healing, Pet, Buffs }`. So a
+Linux/macOS player who stars Watch, Loot or Progress while minimized gets nothing where a
+Windows player gets a window. Nobody has reported it; do not raise it with a poster.
+
+---
+
+## State: 1.96.1 is LIVE and SIGNED — a same-day regression fix (2026-08-19 late)
+
+`main` clean and pushed at `1a185c5`, tag `v1.96.1`, 7 assets, workflows green.
+**2,153 unit + 246 Avalonia + 15 E2E.** Signed and verified end to end
+(`Get-AuthenticodeSignature` = `Valid`, issuer `Microsoft ID Verified CS EOC CA 03`, the
+published asset hash-matches its `.sha256` after download).
+
+### What 1.96.1 fixed, and the lesson in each
+
+- **#219 (typical-usual-chaos) — motes/hour vanished from the widget, and it was MINE.**
+  Reported 90 minutes after 1.96.0. The Progress fold put the Motes card into the Wealth
+  tab and my own launcher edit dropped the RATE to stop the line truncating — so it
+  survived only inside a tab, two clicks away, and Options no longer listed Motes so it
+  could not be put back. His third screenshot (Options → Cards & windows, no Motes row)
+  was the half the text alone did not convey. **The launcher now carries what MOVES WHILE
+  YOU PLAY** — xp, coin, mote rate — with faction and raids moved to their own tab badges.
+  → **Every gate was green when that shipped, because nothing asked what the line said.**
+  `ProgressThemeTests` now does. When a fold changes a STRING a player reads, pin the
+  string.
+- **A long zone name printed straight THROUGH the session timer.** `ZoneText` and
+  `SessionText` were both children of a `Grid` with no `ColumnDefinitions`, so they shared
+  one cell and overprinted — trap 14's family. The Avalonia twin has had the two-column
+  grid all along. **Nobody ever reported it**; the fixture's zone names are far too short
+  to show it, which is why every capture ever taken here missed it. New `long-zone` shot.
+- **#218 (n3cr0nk1tt3n) — updating went one hop at a time.** `FindBestAsync` kept an early
+  return: "if the shared folder beats what is INSTALLED, take it and skip the network", so
+  a folder one release behind hid every release after it.
+  → **`UpdateCheckerTests` already asserted this exact rule and stayed green, because the
+  caller never reached `PickBest`.** A decision function can be correct, and tested, and
+  bypassed. When a rule matters, ask who is allowed NOT to call it. **Still open with the
+  reporter:** I could not confirm he even has a shared folder, and said so rather than
+  closing it — if he answers "no", something else is going on.
+- **#217 ask 4 (Frankthetankk) — the wiki edit summary no longer says "EQBuddy"** (David
+  approved). Now `observed drops (2 items, 12 kills)`. The pack's own HEADER still names
+  EQBuddy and should: that is the app titling a document for its reader, not text going
+  onto someone else's wiki. The first test asserted the whole pack contained no "EQBuddy"
+  and failed on that header — which is exactly the distinction the ask is about.
+
+### Standing rules reconfirmed tonight
+
+- **Publishing is `release.ps1` and it signs — there is no other way** (David: *"this is
+  the way we need to publish going forward"*). `az login` is the only human step.
+- Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+  Releases wait for David's explicit go; he gave it for both 1.96.0 and 1.96.1.
+
+---
+
 ## State: 1.96.0 is LIVE and SIGNED — the first trusted release (2026-08-19 evening)
 
 `main` clean and pushed at `c4bad7e`, tag `v1.96.0`, **7 assets**, both workflows green.

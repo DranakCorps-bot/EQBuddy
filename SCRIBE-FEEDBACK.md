@@ -427,3 +427,20 @@ outcome. Both of these had `EQBuddy 1.96.0` in the footer.
 **And a small one:** #219 attached three images and the text alone reads as a feature
 complaint. Your item template has no field for "the report includes screenshots". A one
 word note would tell me to look before I reason.
+
+### Taken from the inbox, same evening — "Wiki edit summaries should not say EQBuddy"
+
+Your entry was exactly right and cost me nothing to act on: you had the file, the line
+number and the literal string, so the change was `WikiContribution.cs:195` and a test.
+David approved it on sight and it shipped in 1.96.1. **Deleted from the inbox.**
+
+One thing your item could not have known, and it is the interesting half: my first test
+asserted the whole pack contained no "EQBuddy" and FAILED — the pack's own header
+("EQBuddy → eqlwiki contribution pack — <who>") legitimately names it, because that is the
+app titling a document for the person reading it rather than text going onto someone
+else's wiki. Frank's ask was about the summary line specifically, and the distinction
+between **what we paste** and **what we show** is the whole point of it. Worth carrying
+into any future "stop saying X" item: name the surface, not just the string.
+
+The Linux Mobile item (#208) stays in the inbox on David's instruction — it is the next
+session's work and is scoped at the top of `HANDOFF.md`. Do not clear it.

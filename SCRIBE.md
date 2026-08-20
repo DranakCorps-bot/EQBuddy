@@ -20,6 +20,22 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Updater one-hops through older releases
+- **Priority:** waiting (Claude claims fixed in next build; needs n3cr0nk1tt3n to confirm an update folder / OneDrive EQBuddyDownload -- if they have neither, the GitHub path still has a bug)
+- **Place:** updater. Not Gate 5.
+- **Source:** #218 n3cr0nk1tt3n Aug 19, 6:54 PM CT. Did not reply -- Claude already answered 8:03 PM CT.
+- **Ask:** Updating should install the newest release, not the next release after whatever build you are on. Reporter has to update multiple times at session start to reach current.
+- **Already shipped:** GitHub feed already asks for newest. Claude 8/19: shared-folder shortcut installed anything newer than current and skipped GitHub, so a folder one release behind hid later GitHub releases. Fix (unreleased): ask both, take the highest; folder still wins a tie.
+- **Checked:** not grepped this run. Hypothesis, unchecked -- UpdateOffer / family-channel path is the data source, not the What's-new popup.
+
+### What's-new should cover skipped versions
+- **Priority:** waiting (David's call. Claude noted it on #218 so it is not lost.)
+- **Place:** What's-new popup after an update. Not Gate 5.
+- **Source:** #218 n3cr0nk1tt3n Aug 19, 6:54 PM CT, second sentence. Did not reply -- Claude already answered.
+- **Ask:** when an update jumps more than one version, show a single stitched What's-new of every entry between the previous build and the latest, not only the build just installed. Reporter's reason for the hop behavior was possibly batched notes; they still want the missed notes if the hop is gone.
+- **Already shipped:** What's-new shows the entry for the build you just installed (Claude on #218).
+- **Where it might live:** hypothesis -- WhatsNew.json is already a versioned list; the popup currently selects one entry. Data source is the versions between previous and current, not a new notes file.
+
 ### Sky instance timers, bee chain, and Spiroc DUE
 - **Priority:** waiting (needs one Sky instance `You have entered` line; David's call on non-timer spawn types)
 - **Place:** spawn timers / catalog. Not Gate 5.
@@ -43,17 +59,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
 - **Already shipped:** unknown whether the pack currently emits motes.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
-
-### Wiki edit summaries should not say EQBuddy
-- **Priority:** waiting (Ask 4; Claude's last #217 reply covered 1-3 and did not take this)
-- **Place:** wiki pack paste text. Desktop contribution surface, not Gate 5.
-- **Source:** #217 Frankthetankk original ask 4 + follow-up Aug 19, 12:07 PM CT. Old thread — did not reply.
-- **Ask:** drop "EQBuddy" from suggested edit summaries for now.
-- **Checked:** `src/EQBuddy.Core/WikiContribution.cs:195` writes `Suggested edit summary: EQBuddy-observed drops (...)`. That string is the data source.
-- **Claude, 2026-08-19 — line confirmed, and it is a one-line change. Held for David:**
-  it is the only place EQBuddy names itself in text a player pastes onto someone else's
-  wiki, so what it should say instead is an attribution question, not an engineering one.
-  Frank asked for the name simply dropped ("observed drops (12 kills)"). Needs a yes.
 
 ### Wiki pack should pool full session history
 - **Priority:** waiting (David's scope call)
@@ -109,6 +114,13 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
   checkbox. Left in the inbox deliberately: it is its own session, and it is worth doing,
   because the two things CLAUDE.md calls EQBuddy's only uncontested ground — the phone and
   the Linux/macOS build — currently cannot be used together.
+- **David, 2026-08-19: scheduled as the NEXT session's work.** Scoped at the top of
+  `HANDOFF.md` — what the WPF side wires (`CompanionSources`, ~20 Funcs, into
+  `CompanionHost`, ticked off the shared UI tick), and the two traps waiting for a port
+  written from an older mental model: the single-instance port claim (CLAUDE.md trap 13,
+  where two builds on one profile both wanted the port), and `CompanionSources.Raids` /
+  `Progress`, which the Progress theme only added on 2026-08-19. **Scribe: leave this item
+  in place until that session lands.**
 
 
 ### Token/primary unlock ticks Sky as quested
