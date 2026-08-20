@@ -8,7 +8,45 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-20 (evening): 1.97.0 SHIPPED, and the Loot & Items theme is under way
+## 2026-08-20 (night): the Gear & Loot fold is WRITTEN AND REVERTED — read this first
+
+The window is built, committed and live on `main` (`05de9e1`). **The fold is not**, and the
+reason matters more than the code: I built it, the Avalonia test suite failed, and the
+failure was right.
+
+**`MigrateLootSections` lives in Core, so it folds BOTH widgets — and only WPF has the
+window.** Switching it on removes `gear` from `SectionOrder` for everyone, and the
+Linux/macOS widget still renders its own Gear card from its own `SectionMap`. Result: that
+card silently disappears on Linux with nothing to replace it. Renaming the shared
+`OverlaySections.Catalog` entry did the same damage one level up — `WidgetRenderTests.
+TheGearCardOffersTheByZonePivot` went to an empty collection immediately.
+
+That is "both UIs in the same change" (CLAUDE.md) and "one theme per release, WITH its
+mobile parity" (docs/Themes.md) being enforced by the tests rather than by me remembering.
+
+**The whole fold is saved as `docs/pending-gearloot-fold.patch`** — 513 lines, applies to
+`05de9e1`. It contains, all working and all verified before the revert:
+
+- the widget's Loot card as a LAUNCHER (`SectionLink` button, `LootHeader` carrying
+  `LootTheme.LauncherSummary`), and the Gear card removed from the XAML
+- the `loot` star rehomed into `GearLootWindow` — it is the ONLY writer `MiniStats` has for
+  "loot" and it also gates the Loot breakout, so losing it was trap 20 twice over
+- `OverlaySections.Catalog`: `("loot", "Gear & Loot")`, `gear` removed
+- `AbsorbedTitles["loot"] = ["Gear"]` **plus a real grammar fix** — the note read
+  *"Gear are tabs in here now"*, because every previous fold absorbed several cards and
+  this is the first to absorb one. `AbsorbedNote` now picks the verb.
+- `MigrateLootSections()` switched on in `AppSettings.Load`
+- the gear E2E facts moved into `GearLootWindow.DebugFacts()` and both tests repointed at
+  it via `EQBUDDY_GEARLOOT=gear`, plus a new pin on the launcher line's length
+- `ApplySectionLayout` crash found by E2E: a key in `OverlaySections.Catalog` with no entry
+  in `MainWindow.SectionMap` throws on STARTUP for everybody. Worth hardening on its own.
+
+**The order to land it in:** build the Avalonia `GearLootWindow` twin first, fold that
+widget in the same commit, then apply this patch. Not the other way round.
+
+---
+
+## 2026-08-20 (evening): 1.97.0 SHIPPED, and the Gear & Loot theme is under way
 
 **1.97.0 is live and signed** — 7 assets, `Get-AuthenticodeSignature` = `Valid`, issuer
 `Microsoft ID Verified CS EOC CA 03`, timestamped, published hash matches the local

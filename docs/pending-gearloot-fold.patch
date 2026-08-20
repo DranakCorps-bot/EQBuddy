@@ -1,0 +1,513 @@
+diff --git a/SCRIBE.md b/SCRIBE.md
+index 98d5add..52daa7b 100644
+--- a/SCRIBE.md
++++ b/SCRIBE.md
+@@ -199,6 +199,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
+ - **Source:** #202 bjstrange (opened Aug 17) + follow-up Aug 19, 11:47 AM CT. Old thread — did not reply.
+ - **Ask:** "This is still happening in v1.94.1. Same behavior, same frequency." Card constantly refreshes and hides watched loot.
+ - **Follow-up Aug 20, 10:55 AM CT:** still happens with Loot & Watches as the only card. 3 looted, 3 watched. Footer was 1.96.1 earlier today; still churns after closing tab and browser and opening from a bookmark. Did not reply (old thread; Claude is in it).
++- **Follow-up Aug 20, 11:10 AM CT:** two ?debug=1 screenshots on 1.97.0 (Xyrid). Footer is 1.97.0. Did not reply. Shot A (~2:45:13): loot x69, last repaint loot, was watch:[] now watch:[{Motes...}]. Shot B (~2:45:09): loot x60, last repaint loot, was watch:[{Motes...}] now watch:[]. Watch list is oscillating empty vs populated on loot repaints. https://github.com/DranakCorps-bot/EQBuddy/discussions/202#discussioncomment-18095911
+ - **Already shipped:** Claude's fingerprint fix (`fcdc412` "#202: the phone and the PC disagreed about what changed means") is in the 1.94.1 history (that commit sits under `ef2a30a` 1.94.1). Page was supposed to ignore clock-driven `/hr` the same way the PC does.
+ - **Where it might live:** hypothesis, unchecked — a second clock still reaching that card, or the 1.94.1 binary the reporter has is not the one that contains the page change. Do not assert either without a quote from the shipped mobile page.
+ ### charm4.txt still reports no held time
+diff --git a/src/EQBuddy.Core/AppSettings.cs b/src/EQBuddy.Core/AppSettings.cs
+index a920dd6..aa30a93 100644
+--- a/src/EQBuddy.Core/AppSettings.cs
++++ b/src/EQBuddy.Core/AppSettings.cs
+@@ -505,12 +505,10 @@ public sealed class AppSettings
+         // to land nearby; before nothing else, because nothing else reads SectionOrder.
+         changed |= settings.ApplyDefaultGearSection();
+         changed |= settings.MigrateProgressSections();
+-        // MigrateLootSections is NOT called yet, deliberately. It is written and tested
+-        // (LootSurfaceTests), but the window it folds into does not exist: running it now
+-        // would take the Gear card out of the slot a player positioned it in and append it
+-        // at the bottom, buying them nothing. docs/Themes.md — the fold lands in the same
+-        // change as the theme, and "do not consolidate on the way to a release" is about
+-        // exactly this half-state. Wire it up when the window ships.
++        // The window exists now, so the fold runs (docs/Themes.md step 5). It was written
++        // and held back deliberately for two commits — a migration that rearranges a
++        // player's widget before the surface it folds into exists buys them nothing.
++        changed |= settings.MigrateLootSections();
+         changed |= settings.MigrateSkyRewardRenames();
+         changed |= settings.ApplyDefaultSkyQuestChecklist();
+         changed |= settings.ApplyDefaultEpicQuestChecklist();
+diff --git a/src/EQBuddy.UI.Shared/OptionsViewModel.cs b/src/EQBuddy.UI.Shared/OptionsViewModel.cs
+index 4bb5f72..70d6b7c 100644
+--- a/src/EQBuddy.UI.Shared/OptionsViewModel.cs
++++ b/src/EQBuddy.UI.Shared/OptionsViewModel.cs
+@@ -113,12 +113,23 @@ public static class OverlaySections
+ {
+     public static readonly (string Key, string Title)[] Catalog =
+     [
+-        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"), ("loot", "Loot"),
++        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"),
+         // One card for every quest surface (David, 2026-08-16). It replaced the separate
+         // "Sky Quest" and "Epics" cards, which each carried a full tabbed checklist on the
+         // widget — a review surface, not a glance one, and now a click away in the Quest
+         // Tracker window. AppSettings.MigrateQuestSections folds the two old keys onto it.
+-        ("quests", "Quests"), ("gear", "Gear"),
++        ("quests", "Quests"),
++        // One card for the GEAR & LOOT theme (docs/Themes.md, David 2026-08-20). It
++        // replaced the separate Loot and Gear cards, which are tabs in that window now;
++        // AppSettings.MigrateLootSections folds the old keys onto this one, and
++        // LootSurface.AbsorbedCardKeys is the list it reads — so what disappears is
++        // spelled ONCE, not again here.
++        //
++        // A card removed from this catalog must also leave MainWindow.SectionMap, and
++        // vice versa: ApplySectionLayout appends every catalog key that is not already in
++        // SectionOrder and then looks each one up in the map, so a key in one and not the
++        // other throws on STARTUP, for everybody. E2E caught exactly that here.
++        ("loot", "Gear & Loot"),
+         // Key stays "tracked" — it's persisted in SectionOrder/HiddenSections. Only the
+         // label follows the feature's rename from tracked loot to watch rules (#5).
+         ("tracked", "Watch"), ("buffs", "Buffs"),
+@@ -182,15 +193,23 @@ public static class OverlaySections
+         ["quests"] = ["Sky Quest", "Epics"],
+         // 2026-08-19: the PROGRESS THEME (docs/Themes.md).
+         ["progress"] = ["Money", "Motes", "Faction", "Raids"],
++        // 2026-08-20: the GEAR & LOOT theme (docs/Themes.md).
++        ["loot"] = ["Gear"],
+     };
+ 
+     /// <summary>The one-line "these live in here now" note for a card, or null for a card
+     /// that never absorbed anything. Add a line to <see cref="AbsorbedTitles"/> in the
+     /// same change as any future fold — it is step 3's other half.</summary>
+-    public static string? AbsorbedNote(string key) =>
+-        AbsorbedTitles.TryGetValue(key, out var titles)
+-            ? string.Join(" · ", titles) + " are tabs in here now"
+-            : null;
++    public static string? AbsorbedNote(string key)
++    {
++        if (!AbsorbedTitles.TryGetValue(key, out var titles) || titles.Length == 0) return null;
++        // "Gear are tabs in here now" — the sentence was written when every fold absorbed
++        // several cards, and the Gear & Loot theme is the first to absorb exactly one.
++        // The line's whole job is to be READ by someone hunting for a card that vanished;
++        // a player who finds it ungrammatical has been given one more reason to doubt it.
++        var verb = titles.Length == 1 ? " is a tab in here now" : " are tabs in here now";
++        return string.Join(" · ", titles) + verb;
++    }
+ }
+ 
+ /// <param name="Absorbed">"Money · Motes · Faction · Raids are tabs in here now", or null.
+diff --git a/src/EQBuddy/GearLootWindow.xaml b/src/EQBuddy/GearLootWindow.xaml
+index c7c338c..7e45292 100644
+--- a/src/EQBuddy/GearLootWindow.xaml
++++ b/src/EQBuddy/GearLootWindow.xaml
+@@ -1,4 +1,4 @@
+-<Window x:Class="EQBuddy.GearLootWindow"
++﻿<Window x:Class="EQBuddy.GearLootWindow"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         Title="EQBuddy Gear &amp; Loot" SizeToContent="Height"
+@@ -30,6 +30,7 @@
+           <RowDefinition Height="Auto"/>
+           <RowDefinition Height="Auto"/>
+           <RowDefinition Height="*"/>
++          <RowDefinition Height="Auto"/>
+         </Grid.RowDefinitions>
+ 
+         <!-- Title row. The icon is a vector (DesignSystem.Icon), never a glyph — emoji
+@@ -64,6 +65,14 @@
+                  only one of them is ever wired). -->
+             <ContentControl x:Name="TabBody"/>
+         </ScrollViewer>
++        <!-- The mini-dashboard star the Loot card header used to carry.
++             It HAD to come somewhere. That star is the only writer MiniStats has for
++             "loot", and a fold that drops the last writer of a setting is exactly the
++             shape of #204/#209, #210 and #212 (CLAUDE.md trap 20) — DeadSettingTests
++             would have failed the build, and before that test existed it cost three
++             player-facing bugs. Here it gets the words it never had on the widget. -->
++        <StackPanel Grid.Row="3" x:Name="MiniRow" Orientation="Horizontal"
++                    Margin="{DynamicResource PadCard}" VerticalAlignment="Center"/>
+       </Grid>
+     </Border>
+ </Window>
+diff --git a/src/EQBuddy/GearLootWindow.xaml.cs b/src/EQBuddy/GearLootWindow.xaml.cs
+index 588b911..70d043d 100644
+--- a/src/EQBuddy/GearLootWindow.xaml.cs
++++ b/src/EQBuddy/GearLootWindow.xaml.cs
+@@ -49,6 +49,7 @@ public partial class GearLootWindow : Window
+ 
+         _tabs = new EqSegmentedStrip(TabStrip);
+         BuildStaticChrome();
++        BuildMiniStar();
+ 
+         var restored = ScreenGuard.OnScreen(_settings.GearLootLeft, _settings.GearLootTop, Width, 200);
+         if (restored) { Left = _settings.GearLootLeft; Top = _settings.GearLootTop; }
+@@ -89,6 +90,48 @@ public partial class GearLootWindow : Window
+         CloseBtn.Content = DesignSystem.Icon("Close");
+     }
+ 
++    /// <summary>
++    /// The mini-dashboard star the Loot card header used to carry.
++    ///
++    /// It is the ONLY writer <c>MiniStats</c> has for "loot", so folding that card away
++    /// without rehoming it would have left a setting only readers touch — the exact
++    /// signature CLAUDE.md trap 20 names, and the one that produced #204/#209, #210 and
++    /// #212. It also gates the Loot breakout window, so losing it would have silently
++    /// taken that away too. Here it finally gets a word beside it.
++    /// </summary>
++    private void BuildMiniStar()
++    {
++        var intro = DesignSystem.Text(Role.Caption, "Show in mini dashboard:");
++        intro.Ink("DimBrush");
++        intro.VerticalAlignment = VerticalAlignment.Center;
++        MiniRow.Children.Add(intro);
++
++        var star = new System.Windows.Controls.Primitives.ToggleButton
++        {
++            Style = (Style)FindResource("StarToggle"),
++            Tag = "loot",
++            IsChecked = _settings.MiniStats.Contains("loot"),
++            ToolTip = "Show loot count in the mini dashboard — and, while minimized, open the Loot breakout",
++            VerticalAlignment = VerticalAlignment.Center,
++        };
++        star.Click += (_, _) =>
++        {
++            if (star.IsChecked == true)
++            {
++                if (!_settings.MiniStats.Contains("loot")) _settings.MiniStats.Add("loot");
++            }
++            else _settings.MiniStats.Remove("loot");
++            _settings.Save();
++            _main.SyncStarsFromSettings();
++        };
++        MiniRow.Children.Add(star);
++
++        var label = DesignSystem.Text(Role.Caption, "Loot");
++        label.Ink("TextBrush");
++        label.VerticalAlignment = VerticalAlignment.Center;
++        MiniRow.Children.Add(label);
++    }
++
+     private void UpdateHeightCap()
+     {
+         var height = MonitorMetrics.WorkAreaFor(this) is { } work
+@@ -118,7 +161,11 @@ public partial class GearLootWindow : Window
+         // stacked and hidden — a hidden panel still measures on every layout pass, and a
+         // gear list can be forty rows of it.
+         TabBody.Content = _tab == LootTab.Gear ? _gear.Body : _loot.Body;
+-        if (_tab == LootTab.Gear) _gear.Render(); else _loot.Render(s);
++        // Both render, not just the visible one. The inactive tab's BADGE has to stay
++        // true — it is the number the player uses to decide whether to switch — and the
++        // E2E dump reads both surfaces' facts from this one window.
++        _loot.Render(s);
++        _gear.Render();
+     }
+ 
+     /// <summary>Build the strip from Core's <see cref="LootSurface"/> and UI.Shared's
+@@ -158,7 +205,16 @@ public partial class GearLootWindow : Window
+     public string DebugFacts() =>
+         $"gearLootTab={LootSurface.KeyFor(_tab)} " +
+         $"gearLootTabs={_tabs.Count} " +
+-        $"gearLootRows={(_tab == LootTab.Gear ? _gear.DebugRowCount : _loot.RowCount)}";
++        $"lootRows={_loot.RowCount} " +
++        // The SAME keys the widget's Gear card reported before the fold, deliberately —
++        // E2E pinned them there first, and the point of the assertion is that they come
++        // out of the new host unchanged.
++        $"gearRows={_gear.DebugRowCount} " +
++        $"gearTotal={_settings.GearChecklist.Count} " +
++        $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
++        $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
++        $"gearPivotShown={(_gear.DebugPivotShown ? 1 : 0)} " +
++        $"gearListNameLen={_gear.DebugListNameLength}";
+ 
+     private void OnDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
+     {
+diff --git a/src/EQBuddy/MainWindow.xaml b/src/EQBuddy/MainWindow.xaml
+index a411d4d..50ae621 100644
+--- a/src/EQBuddy/MainWindow.xaml
++++ b/src/EQBuddy/MainWindow.xaml
+@@ -468,33 +468,29 @@
+                 <ContentControl x:Name="KillsBody"/>
+             </Expander>
+ 
+-            <Expander x:Name="LootSection" Style="{StaticResource Section}">
+-                <Expander.Header>
+-                    <Grid>
+-                        <Grid.ColumnDefinitions>
+-                            <ColumnDefinition Width="*"/>
+-                            <ColumnDefinition Width="Auto"/>
+-                            <ColumnDefinition Width="Auto"/>
+-                            <ColumnDefinition Width="Auto"/>
+-                        </Grid.ColumnDefinitions>
+-                        <local:EqCardTitle Icon="Bag" Text="Loot"/>
+-                        <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 items"/>
+-                        <TextBlock Grid.Column="2" Text="&#x1F5FA;" FontSize="{DynamicResource FontBody}" Cursor="Hand"
+-                                   Margin="{DynamicResource IndentM}" VerticalAlignment="Center"
+-                                   Foreground="{DynamicResource DimBrush}"
+-                                   ToolTip="Open the Quest Tracker"
+-                                   MouseLeftButtonUp="OnLootQuestMap"/>
+-                        <ToggleButton x:Name="StarLoot" Grid.Column="3" Style="{StaticResource StarToggle}"
+-                                      Tag="loot" Click="OnStarChanged" ToolTip="Show loot count in mini dashboard"/>
+-                    </Grid>
+-                </Expander.Header>
+-                <!-- The card BODY is built in code by LootCardView (Gate 4,
+-                     docs/DesignSystem.md §11.5): the show/sort filters are the app's
+-                     EqSegmentedStrip rather than the sixteenth hand-built copy, and the
+-                     ratchet holds the file to the scale — which it cannot do here, because
+-                     MainWindow.xaml does not join DesignRatchetTests until Gate 5. -->
+-                <ContentControl x:Name="LootBody"/>
+-            </Expander>
++            <!-- The GEAR & LOOT theme's launcher (docs/Themes.md step 3). The Loot and
++                 Gear cards became two tabs in GearLootWindow; this line carries what both
++                 headers carried, so the glance survives the fold rather than being traded
++                 for a click. Same shape as the Quests and Progress launchers.
++
++                 Auto/* rather than */Auto so the TITLE holds its size and the summary is
++                 the half that gives: both widgets are SizeToContent, so a label whose
++                 string changes width IS window geometry (trap 12), and this line moves
++                 with every drop. -->
++            <Button x:Name="LootSection" Style="{StaticResource SectionLink}" Click="OnGearLootWindow"
++                    ToolTip="Open Gear &amp; Loot — everything this session picked up, and what is left on your imported gear list">
++                <Grid>
++                    <Grid.ColumnDefinitions>
++                        <ColumnDefinition Width="Auto"/>
++                        <ColumnDefinition Width="*"/>
++                    </Grid.ColumnDefinitions>
++                    <local:EqCardTitle Icon="Bag" Text="Gear &amp; Loot"/>
++                    <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}"
++                               HorizontalAlignment="Right" VerticalAlignment="Center"
++                               Margin="{DynamicResource IndentM}"
++                               TextTrimming="CharacterEllipsis" Text=""/>
++                </Grid>
++            </Button>
+ 
+             <!-- ONE card for every quest surface (David, 2026-08-16). It replaced the
+                  "Sky Quest" and "Epics" cards, each of which carried a full tabbed
+@@ -515,23 +511,6 @@
+                 </Grid>
+             </Button>
+ 
+-            <Expander x:Name="GearSection" Style="{StaticResource Section}">
+-                <Expander.Header>
+-                    <Grid>
+-                        <Grid.ColumnDefinitions>
+-                            <ColumnDefinition Width="*"/>
+-                            <ColumnDefinition Width="Auto"/>
+-                        </Grid.ColumnDefinitions>
+-                        <local:EqCardTitle Icon="Gear" Text="Gear"/>
+-                        <TextBlock x:Name="GearHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0/0"/>
+-                    </Grid>
+-                </Expander.Header>
+-                <!-- The body is GearCardView's, built in code: the Loot & Items theme
+-                     puts this same card in a window as well as here, and a UIElement has
+-                     one parent — so each host gets its own instance. No Visibility and no
+-                     Margin here; the lifted control carries both (trap 15). -->
+-                <ContentControl x:Name="GearBody"/>
+-            </Expander>
+ 
+             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">
+                 <Expander.Header>
+diff --git a/src/EQBuddy/MainWindow.xaml.cs b/src/EQBuddy/MainWindow.xaml.cs
+index 50e795d..dd94559 100644
+--- a/src/EQBuddy/MainWindow.xaml.cs
++++ b/src/EQBuddy/MainWindow.xaml.cs
+@@ -125,10 +125,7 @@ public partial class MainWindow : Window, ICardContext
+         // 1.84.0, leaving a process with no window (#158, twidget76). Anything the
+         // XAML can call must exist before the XAML is touched.
+         _quests = new QuestChecklistView(this, _settings, () => _raidLedger);
+-        _loot = new LootCardView(this, _settings);
+-        LootBody.Content = _loot.Body;
+         KillsBody.Content = _kills.Body;
+-        GearBody.Content = Gear.Body;
+         _unlocks = new LevelUnlockMemo(
+             s => BuffSetClassSource(s).Classes,
+             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
+@@ -330,8 +327,8 @@ public partial class MainWindow : Window, ICardContext
+         // and the review is an acceptance criterion, not a nicety (Gate 3's §11.6).
+         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
+         if (expand == "1")
+-            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection, LootSection,
+-                         GearSection, TrackedSection, MiscSection })
++            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection,
++                         TrackedSection, MiscSection })
+                 ex.IsExpanded = true;
+         else if (!string.IsNullOrWhiteSpace(expand))
+         {
+@@ -603,8 +600,11 @@ public partial class MainWindow : Window, ICardContext
+     private Dictionary<string, UIElement> SectionMap() => new()
+     {
+         ["combat"] = CombatSection, ["healing"] = HealingSection, ["kills"] = KillsSection,
+-        ["loot"] = LootSection, ["quests"] = QuestsSection,
+-        ["gear"] = GearSection, ["tracked"] = TrackedSection,
++        ["quests"] = QuestsSection,
++        // One key for the whole GEAR & LOOT theme, and deliberately "loot" — one OF the
++        // two it absorbs rather than a new name, so a player who dragged that card keeps
++        // its slot through the fold (LootSurface.ThemeCardKey).
++        ["loot"] = LootSection, ["tracked"] = TrackedSection,
+         ["buffs"] = BuffsSection,
+         // One key for the whole Progress theme, and it is deliberately "progress" — one
+         // OF the five it absorbs rather than a new name, so a player who had dragged that
+@@ -2511,19 +2511,15 @@ public partial class MainWindow : Window, ICardContext
+ 
+         if (KillsSection.IsExpanded) _kills.Render(s);
+ 
+-        if (LootSection.IsExpanded)
+-            _loot.Render(s);
++        // The Gear & Loot card is a launcher, not a list: its one line carries what
++        // BOTH card headers carried, so the glance survives the fold rather than being
++        // traded for a click. The rows happen in the window.
++        LootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
+ 
+         // The Quests card is a launcher, not a checklist: its one line reports both
+         // checklists so the glance survives, and the work happens in the window.
+         QuestsHeader.Text = _quests.SummaryLine();
+ 
+-        if (GearSection.IsExpanded && _gearChecklistDirty)
+-        {
+-            Gear.Render();
+-            UpdateGearBadge();
+-            _gearChecklistDirty = false;
+-        }
+ 
+         if (MiscSection.IsExpanded)
+         {
+@@ -2552,7 +2548,7 @@ public partial class MainWindow : Window, ICardContext
+                 // Row counts say "a new name appeared"; the snapshot totals say "the
+                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
+                 var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
+-                    $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} loot={_loot.RowCount} " +
++                    $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} " +
+ 
+                     // The PROGRESS THEME's launcher card (docs/Themes.md). It replaced
+                     // five cards whose row counts used to be asserted here; what a reader
+@@ -2593,16 +2589,11 @@ public partial class MainWindow : Window, ICardContext
+                     // so an assertion from a launched app is the only thing standing
+                     // between that move and a silent regression.
+                     //
+-                    // Rows rather than items, because the list interleaves GROUP HEADINGS
+-                    // with rows and the headings are half of what the by-zone pivot is
+-                    // for — a lift that kept every item and lost the headings would leave
+-                    // this count unchanged if it counted items alone.
+-                    $"gearRows={Gear.DebugRowCount} " +
+-                    $"gearTotal={_settings.GearChecklist.Count} " +
+-                    $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
+-                    $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
+-                    $"gearPivotShown={(Gear.DebugPivotShown ? 1 : 0)} " +
+-                    $"gearListNameLen={Gear.DebugListNameLength} " +
++                    // The gear numbers themselves moved with the surface, into
++                    // GearLootWindow.DebugFacts() below — same keys, new host, which is
++                    // exactly what the E2E assertions are for.
++                    $"lootCard={(LootSection.Visibility == Visibility.Visible ? 1 : 0)} " +
++                    $"lootSummaryLen={LootHeader.Text.Length} " +
+                     $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
+                     // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
+                     // but only a launched app can show that its answer actually reaches
+@@ -2706,7 +2697,6 @@ public partial class MainWindow : Window, ICardContext
+         _settings.GearChecklistName = import.Name;
+         _settings.Save();
+         _gearChecklistDirty = true;
+-        UpdateGearBadge();
+         RefreshUi();
+     }
+ 
+@@ -2716,7 +2706,6 @@ public partial class MainWindow : Window, ICardContext
+         _settings.GearChecklistName = "";
+         _settings.Save();
+         _gearChecklistDirty = true;
+-        UpdateGearBadge();
+         RefreshUi();
+     }
+ 
+@@ -2751,14 +2740,9 @@ public partial class MainWindow : Window, ICardContext
+         () => _gearChecklistDirty = true,
+         FindResource);
+ 
+-    /// <summary>The card header's badge, from the shared theme so the widget and the
+-    /// theme window's tab cannot come to different numbers.</summary>
+-    private void UpdateGearBadge() => GearHeader.Text = Gear.Badge;
+-
+     private void UpdateGearChecklist(StatsSnapshot s)
+     {
+         var changed = AutoCheckGearLoot(s);
+-        UpdateGearBadge();
+         if (changed)
+         {
+             _gearChecklistDirty = true;   // rebuild next tick: checked box, list-name count
+@@ -3214,7 +3198,6 @@ public partial class MainWindow : Window, ICardContext
+         yield return ("pet", StarPet);
+         yield return ("procs", StarProcs);
+         yield return ("kills", StarKills);
+-        yield return ("loot", StarLoot);
+         yield return ("deaths", StarDeaths);
+         yield return ("buffs", StarBuffs);
+     }
+@@ -4091,7 +4074,6 @@ public partial class MainWindow : Window, ICardContext
+         {
+             _gearChecklistDirty = true;
+             _settings.Save();
+-            UpdateGearBadge();
+         }
+     }
+ 
+diff --git a/tests/EQBuddy.E2E/EndToEndTests.cs b/tests/EQBuddy.E2E/EndToEndTests.cs
+index dd929d4..23574e8 100644
+--- a/tests/EQBuddy.E2E/EndToEndTests.cs
++++ b/tests/EQBuddy.E2E/EndToEndTests.cs
+@@ -38,7 +38,13 @@ public sealed class EndToEndTests
+     [Fact]
+     public void TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone()
+     {
+-        using var app = new AppHarness(s =>
++        // The card is a TAB now (the Gear & Loot theme), so the window has to be open for
++        // its surface to exist. Same assertions, same numbers, new host — which is the
++        // entire point of having pinned them before the fold.
++        using var app = new AppHarness(environment: new Dictionary<string, string>
++        {
++            ["EQBUDDY_GEARLOOT"] = "gear",
++        }, configureSettings: s =>
+         {
+             s.GearChecklistName = "Harness list";
+             s.GearChecklist =
+@@ -74,6 +80,17 @@ public sealed class EndToEndTests
+         // "Harness list - 1/4": the name AND the progress count, which is the line
+         // that says which shopping list this is and how far through it you are.
+         app.WaitForDump("gearListNameLen", "Harness list - 1/4".Length, "the list's name and progress");
++
++        // And the LAUNCHER kept the glance. It replaced two card headers with one line,
++        // so the line has to carry what both carried — loot count, what was crafted, and
++        // the gear fraction. #219 is what happens when a fold quietly drops one of them.
++        app.WaitForDump("lootCard", 1, "the Gear & Loot launcher card to be on the widget");
++        // The line the shared formatter would produce for this fixture and this seeded
++        // list, asserted by LENGTH because that is what the dump can carry — and the
++        // length is the thing that moves if a part is silently dropped.
++        app.WaitForDump("lootSummaryLen",
++            LootSurface.LauncherSummary(items: 39, crafted: 4, gearTotal: 4, gearAcquired: 1).Length,
++            "the launcher line to carry both cards' numbers");
+     }
+ 
+     /// <summary>With nothing imported the card says so in one line and hides the pivot —
+@@ -81,7 +98,10 @@ public sealed class EndToEndTests
+     [Fact]
+     public void AnEmptyGearCardSaysSoAndOffersNoPivot()
+     {
+-        using var app = new AppHarness();
++        using var app = new AppHarness(environment: new Dictionary<string, string>
++        {
++            ["EQBUDDY_GEARLOOT"] = "gear",
++        });
+         app.Launch();
+ 
+         app.WaitForDump("gearTotal", 0, "no gear list on the shared fixture");
+diff --git a/tests/EQBuddy.Tests/OptionsViewModelTests.cs b/tests/EQBuddy.Tests/OptionsViewModelTests.cs
+index 9066a51..3242757 100644
+--- a/tests/EQBuddy.Tests/OptionsViewModelTests.cs
++++ b/tests/EQBuddy.Tests/OptionsViewModelTests.cs
+@@ -99,8 +99,14 @@ public sealed class OptionsViewModelTests
+         foreach (var gone in new[] { "Money", "Motes", "Faction", "Raids" })
+             Assert.Contains(gone, progress);
+         Assert.Contains("Sky Quest", vm.Cards.Single(c => c.Key == "quests").Absorbed!);
+-        // A card that never absorbed anything says nothing.
+-        Assert.Null(vm.Cards.Single(c => c.Key == "loot").Absorbed);
++        // The GEAR & LOOT theme absorbs exactly ONE card, which is the case the sentence
++        // was never written for: it read "Gear are tabs in here now" until 2026-08-20.
++        // A line whose whole job is to be read by someone hunting a vanished card cannot
++        // afford to look wrong.
++        Assert.Equal("Gear is a tab in here now",
++            vm.Cards.Single(c => c.Key == "loot").Absorbed);
++        // A card that never absorbed anything still says nothing.
++        Assert.Null(vm.Cards.Single(c => c.Key == "combat").Absorbed);
+     }
+ 
+     [Fact]
