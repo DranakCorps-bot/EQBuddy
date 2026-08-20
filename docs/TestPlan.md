@@ -200,7 +200,7 @@ guards below are the deliverable and not a nicety.
 | **A card whose body only exists once there is DATA is staged, not shot empty** — the Watch strip needs two rules, the Raids rows need a clear | **Manual** — `pwsh scripts/shoot.ps1 -Shot tracked-card,raids-card` |
 | A surface that moved into a WINDOW keeps a way to be photographed: `EQBUDDY_PROGRESS` opens the Progress window on a named tab, as `EQBUDDY_QUESTS` does for the tracker | **Manual** — `pwsh scripts/shoot.ps1 -Shot progress-wealth` |
 | **A shot names a PROCESS, not just a title** — four Progress shots share the title `EQBuddy Progress`, and a previous shot's app that is still exiting matches it | **Auto** — `shoot.ps1` passes `-OwnerPid` |
-| **A running EQBuddy is stood down before shooting and relaunched afterwards** — it is always-on-top, holds the same titles, and a capture of it would commit a real character name. Closed gracefully, so the live session still finalizes into `history.db` | **Auto** — `shoot.ps1` |
+| **A running EQBuddy is stood down before shooting and relaunched afterwards** — it is always-on-top and holds the same titles, so a capture of it is the wrong app in whatever unseeded state it happens to be in. Closed gracefully, so the live session still finalizes into `history.db` | **Auto** — `shoot.ps1` |
 
 ## 4d. Settings, and who is allowed to write them
 

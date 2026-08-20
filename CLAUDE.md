@@ -496,11 +496,15 @@ Read this list before touching the areas it names. Every entry cost a release.
   mangle through pipes. All three happened in one session. Heredocs are fine for running
   code; they are a poor way to author it.
 - **`shoot.ps1` used to photograph the WRONG WINDOW when the real app was running.** It
-  is always-on-top and holds the same window titles, so the capture was your live profile,
-  character name and all — it looks like a fixture bug ("why is the Watch card empty?")
-  and it is a different app, and it would commit a real character name into
-  `docs/screenshots/`. Caught 2026-08-19 by a shot reading `Dranak (freeport)`, and again
-  by a Faction tab filed as `progress-wealth.png`.
+  is always-on-top and holds the same window titles, so the capture was your live profile —
+  it looks like a fixture bug ("why is the Watch card empty?") and it is a different app,
+  showing whatever state that profile happened to be in rather than the seeded one the
+  shot is about. Caught 2026-08-19 by a shot reading `Dranak (freeport)`, and again by a
+  Faction tab filed as `progress-wealth.png`.
+  **The tell was the character name, but the name itself is not the problem** — David,
+  2026-08-19: *"I don't mind my character name being displayed, I'm not trying to be
+  anonymous… if it slips in, that's fine."* Do not scrub names from committed shots and do
+  not treat one as a defect; the thing worth catching is the wrong, non-repeatable state.
   → **Now guarded, and there is nothing to remember:** `shoot.ps1` stands the running
   EQBuddy down before it shoots and relaunches it in its `finally`, so an interrupted run
   still gives the app back. It closes it **gracefully** (`CloseMainWindow`, force only as
@@ -533,9 +537,11 @@ dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Releas
 
 `WidgetSheetTests` (opt-in, like `IconSheetTests`) seeds a snapshot and captures the widget
 with the cards open. It earned itself twice within ten minutes of existing: its first
-capture photographed **David's live profile** — a real character name in the title bar,
-about to be committed — and its second showed a rule name and its countdown drawn on top of
-each other, because a new child of a two-column `Grid` silently defaults to column 0.
+capture photographed **David's live profile** — spotted by the character name in the title
+bar, though the name is fine (see above); what made it wrong is that a capture surface was
+photographing an arbitrary, unseeded profile — and its second showed a rule name and its
+countdown drawn on top of each other, because a new child of a two-column `Grid` silently
+defaults to column 0.
 
 → **A capture surface needs `EQBUDDY_APPDATA` isolation MORE than an assertion does**, since
 its entire output is a picture of whatever profile it finds. Mirror `WidgetRenderTests`'

@@ -15,7 +15,7 @@ with a full session"* and *"flag that for the next session as part of a handoff 
 the other I noted"*. They are independent; do them in either order.
 
 1. **EQBuddy Mobile does not exist on Linux/macOS** — approved, a port not a toggle.
-2. **The quick-tour images ship a real character name and predate the whole UI rework.**
+2. **The quick-tour images predate the whole UI rework** — they show an app that no longer exists.
 
 ---
 
@@ -31,23 +31,26 @@ so **one refresh fixes both UIs** — do not make a second copy.
 
 | Image | State |
 |---|---|
-| `t-widget.png` | **Real character: "Douglas (qeynos)".** Emoji card icons; "Tracked" not "Watch"; no KPI strip; no Quests or Gear card; Money/Progress/Faction still separate cards |
-| `t-history.png` | **Real character: "Douglas (qeynos)"**, with dates and a full session breakdown |
-| `t-combat.png` | No name. Pre-Gate-1 card chrome |
-| `t-watch.png` | No name. "Tracked" heading, emoji icons |
-| `t-mini.png` | No name. Old mini pill, emoji chips |
+| `t-widget.png` | Emoji card icons; "Tracked" not "Watch"; no KPI strip; no Quests or Gear card; Money/Progress/Faction still separate cards |
+| `t-history.png` | Pre-rework History window chrome |
+| `t-combat.png` | Pre-Gate-1 card chrome |
+| `t-watch.png` | "Tracked" heading, emoji icons |
+| `t-mini.png` | Old mini pill, emoji chips |
 
-**Two of the five carry a family member's character name and server, and they ship inside
-the installer** — every new player sees them on first launch. That is the same class of
-mistake CLAUDE.md already records twice for `shoot.ps1` captures; these predate that
-harness and were never re-checked. It is the reason to do this rather than leave it.
+**Two of them show David's own character, and that is fine** — he ruled on it 2026-08-19:
+*"I don't mind my character name being displayed, I'm not trying to be anonymous… if it
+slips in, that's fine."* Do not scrub names, and do not treat one as a defect. (The reason
+captures still use the throwaway fixture is determinism, not privacy: a live profile is
+whatever state it happens to be in, which may not include the thing under review.)
 
-They also advertise the failure mode the app spent Gate 5 removing: **emoji icons**, which
-box outright under Wine (#148, #166) on the builds where the tour matters most.
+**The reason to do this is that they are pictures of an app that no longer exists** — and
+one part is actively counterproductive: they show **emoji card icons**, the failure mode
+Gate 5 removed because emoji box outright under Wine (#148, #166), on exactly the builds
+where a first-run tour matters most.
 
-**Four of the five can be regenerated with shots that already exist** — and against the
-throwaway fixture profile, which is exactly what makes the character-name problem go away
-(`Testchar (test)`):
+**Four of the five can be regenerated with shots that already exist**, against the
+throwaway fixture profile — which matters because that profile is seeded and repeatable,
+not because of what it is called:
 
 - `t-widget` → `shoot.ps1 -Shot widget-cards`
 - `t-combat` → `-Shot combat-card`
@@ -396,7 +399,8 @@ sizes → 0, `DesignRatchetTests.Migrated`, and a hotspot entry it never had.
 own widget, so every screenshot lesson this repo has paid for was learned where it could
 not be checked on the side that ships to Wine. Opt-in, like `IconSheetTests` — the command
 is in CLAUDE.md. It caught two things in its first ten minutes: a capture of **David's live
-profile** (a real character name, about to be committed) and a rule name drawn on top of
+profile** (an arbitrary, unseeded one — spotted by the character name, which is itself
+fine) and a rule name drawn on top of
 its own countdown. Neither was visible to 241 passing tests.
 
 **Gate 5 remains:** the three heavy card BODIES (sparkline, breakdown lists, ding unlocks —
