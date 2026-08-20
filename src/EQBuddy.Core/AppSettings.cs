@@ -499,6 +499,12 @@ public sealed class AppSettings
         // to land nearby; before nothing else, because nothing else reads SectionOrder.
         changed |= settings.ApplyDefaultGearSection();
         changed |= settings.MigrateProgressSections();
+        // MigrateLootSections is NOT called yet, deliberately. It is written and tested
+        // (LootSurfaceTests), but the window it folds into does not exist: running it now
+        // would take the Gear card out of the slot a player positioned it in and append it
+        // at the bottom, buying them nothing. docs/Themes.md — the fold lands in the same
+        // change as the theme, and "do not consolidate on the way to a release" is about
+        // exactly this half-state. Wire it up when the window ships.
         changed |= settings.MigrateSkyRewardRenames();
         changed |= settings.ApplyDefaultSkyQuestChecklist();
         changed |= settings.ApplyDefaultEpicQuestChecklist();
@@ -661,17 +667,32 @@ public sealed class AppSettings
     /// hidden is one click to undo; hiding one the player wanted is invisible, and they
     /// would have to suspect the update to find it.</item>
     /// </list></summary>
-    public bool MigrateProgressSections()
-    {
-        var absorbed = ProgressSurface.AbsorbedCardKeys;
-        var theme = ProgressSurface.ThemeCardKey;
+    public bool MigrateProgressSections() => FoldThemeSections(
+        ProgressSurface.AbsorbedCardKeys, ProgressSurface.ThemeCardKey);
 
-        // Is there anything left to fold? The theme key is itself one of the absorbed
-        // keys, so without this the migration re-folds a already-folded profile on EVERY
-        // load: the order comes out identical but it reports a change, which forces a
-        // settings SAVE each launch — and a save rewrites the whole file from the
-        // startup snapshot (trap 13). Idempotence here is not tidiness, it is the
-        // difference between running once and running forever.
+    /// <summary>
+    /// The Loot &amp; Items fold: the Loot and Gear cards become one launcher (step 5 of
+    /// docs/Themes.md's recipe). Same two conservative rules as
+    /// <see cref="MigrateProgressSections"/>, and the same idempotence trap guarded the
+    /// same way — the theme key is itself one of the absorbed keys, so without the stale
+    /// check this would report a change on every load and force a settings SAVE each
+    /// launch, and a save rewrites the whole file from the startup snapshot (trap 13).
+    ///
+    /// The two rules, restated because they are the ones that decide whether a fold loses
+    /// something: the theme lands in the FIRST slot either card occupied, so a player who
+    /// dragged Loot to the top still finds it at the top; and it is hidden only if BOTH
+    /// cards were hidden, because showing a card someone hid is one click to undo while
+    /// hiding one they wanted is invisible.
+    /// </summary>
+    public bool MigrateLootSections() => FoldThemeSections(
+        LootSurface.AbsorbedCardKeys, LootSurface.ThemeCardKey);
+
+    /// <summary>The fold itself, shared by the themes. Extracted when the second one
+    /// arrived: two copies of a settings migration is two chances to lose a card
+    /// slot, and the Progress version had already been through one round of bug-fixing
+    /// that a hand-copy would not have inherited.</summary>
+    private bool FoldThemeSections(IReadOnlyList<string> absorbed, string theme)
+    {
         var stale = absorbed.Where(k => !k.Equals(theme, StringComparison.OrdinalIgnoreCase))
             .Any(k => SectionOrder.Contains(k, StringComparer.OrdinalIgnoreCase)
                    || HiddenSections.Contains(k));
