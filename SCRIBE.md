@@ -20,6 +20,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### are you able to add voice for "interupted" or "spell resisted"
+- **Priority:** waiting
+- **Place:** Voice Control / spoken phrases. Not Gate 5 widget. Your-character only.
+- **Source:** #224 afmedic12 Aug 20, 1:01 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.97.0 · Windows 26200.
+- **Ask:** "are you able to add voice for character cast spells,  "interupted" or "spell resisted""
+- **Already shipped:** WhatsNew: VOICE CONTROL with voice picker, rate, volume, and per-rule spoken phrases. CombatPresentation already prints interrupted / fizzled / resisted counts. LogParser already has Your (?<spell>.+?) spell is interrupted. and Your target resisted the (?<spell>.+?) spell. GameEvent has SpellInterruptedEvent.
+- **Checked:** those parser/event quotes. Hypothesis, unchecked -- SpokenAlerts is called from Watch rules plus a hardcoded Slowed line; no grep hit connecting SpellInterruptedEvent or ResistRx to SpokenAlerts.Speak.
+
 ### reliably shows what quest an item is for
 - **Priority:** waiting (desktop loot surfaces already have this; ask is reliability / whether they can find it)
 - **Place:** Loot & Items theme (in progress). Fits the loot to quest link of the chain. Phone lists item lookup as a looking-away surface.

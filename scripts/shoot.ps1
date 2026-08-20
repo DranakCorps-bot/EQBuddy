@@ -328,6 +328,18 @@ $Shots = [ordered]@{
                                    @{ Slot = 'HEAD'; Item = 'Exquisite Velium Shard'; IsExaltation = $true
                                       ExaltationEffect = '+15 hp'; Source = 'Kael Drakkel' }
                                ) } }
+    # The post-update popup, which no shot covered until 2026-08-20 - and it is the ONE
+    # surface every player sees on every release, on every platform. It opens by itself
+    # when LastSeenVersion differs from the running build, so the fixture just has to lie
+    # about which version was last seen; there is no env hook and it does not need one.
+    #
+    # 1.96.1 rather than "the previous release", deliberately: it makes the popup render
+    # BOTH shipped versions, so a shot shows the MOVED badge next to ordinary bullets
+    # rather than in isolation. A badge photographed alone proves it draws; a badge
+    # photographed beside a bullet proves it reads as different (David, 2026-08-20).
+    'whats-new'       = @{ Title = "What's new in EQBuddy"
+                           Env = @{}
+                           Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
     # The quick tour's last page illustrates this window. Trap 22 applies hard: history
