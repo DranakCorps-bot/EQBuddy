@@ -390,6 +390,31 @@ function Write-WikiCache([hashtable]$pages) {
     }
 }
 
+# --- stand the real EQBuddy down, and put it back afterwards ------------------------
+# The running app is a worse problem than a mismatched capture. It is always-on-top, it
+# holds the very window titles these shots ask for, and a capture of it would commit a
+# real character name into docs/screenshots/. That has bitten three times: twice after
+# release.ps1 reinstalled and relaunched it, and once as a Faction tab filed under
+# another shot's name. -OwnerPid (shot.ps1) stops the wrong window being photographed;
+# this stops the wrong window being on screen at all.
+#
+# CLOSED GRACEFULLY, not killed. EQBuddy finalizes the session into history.db on
+# ApplicationExit, so a hard kill would throw away whatever the player was in the middle
+# of — the cost of a screenshot must never be someone's session record. Force is the
+# fallback for a window that will not go, not the opening move.
+$relaunch = @()
+foreach ($proc in @(Get-Process EQBuddy -ErrorAction SilentlyContinue)) {
+    $path = try { $proc.Path } catch { $null }   # Access denied on a process we can't read
+    if ($path) { $relaunch += $path }
+    Write-Host "Standing down the running EQBuddy (pid $($proc.Id)) — it will be relaunched."
+    try {
+        if (-not $proc.CloseMainWindow()) { $proc.Kill($true) }
+        if (-not $proc.WaitForExit(15000)) { $proc.Kill($true); $proc.WaitForExit(5000) | Out-Null }
+    }
+    catch { }   # already gone between the enumerate and the close
+}
+$relaunch = @($relaunch | Select-Object -Unique)
+
 # --- the backdrop ------------------------------------------------------------------
 # A plain maximized form, NOT topmost, so the app's own always-on-top windows stay above
 # it. This is what stops a rounded corner photographing the desktop.
@@ -459,6 +484,17 @@ finally {
     $backdropForm.Dispose()
     if ($KeepProfile) { Write-Host "`nProfile kept at $root" }
     else { Remove-Item -Recurse -Force $root -ErrorAction SilentlyContinue }
+    # In the finally, so a thrown shot or a Ctrl+C still gives the app back. Start-Process
+    # inherits THIS process's environment, and nothing here sets EQBUDDY_APPDATA globally
+    # — the throwaway profile rides on each child's ProcessStartInfo — so the relaunched
+    # app finds the real profile. If that ever changes, this line starts pointing the live
+    # app at a directory that is deleted three lines above.
+    foreach ($path in $relaunch) {
+        if (Test-Path $path) {
+            Write-Host "Relaunching $path"
+            Start-Process $path
+        }
+    }
 }
 
 Write-Host "`n$($taken.Count) shot(s):"

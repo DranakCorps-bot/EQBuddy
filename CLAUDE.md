@@ -1,4 +1,4 @@
-# EQBuddy — working notes for AI agents
+﻿# EQBuddy — working notes for AI agents
 
 This file is loaded automatically at the start of every session. It exists so an agent
 does not spend its first hour rediscovering the codebase. Keep it **short and true** —
@@ -439,8 +439,11 @@ Read this list before touching the areas it names. Every entry cost a release.
     correct screenshot of the wrong feature, which is trap 23's failure mode arriving by a
     different road. Two earlier captures had already been lost this way (`release.ps1`
     relaunches the real app; one shot came back reading David's live character name).
-    → **Now guarded:** `shot.ps1` takes `-OwnerPid` and `shoot.ps1` always passes the
-    process it launched. If you add a shot that shares a title with another, that is the
+    → **Now guarded, on both sides:** `shot.ps1` takes `-OwnerPid` and `shoot.ps1` always
+    passes the process it launched, so a title alone can no longer pick a window. And
+    `shoot.ps1` stands the REAL EQBuddy down first (gracefully — it finalizes its session
+    on exit) and relaunches it in its `finally`, so the app that caused this is not on
+    screen at all. If you add a shot that shares a title with another, `-OwnerPid` is the
     thing keeping them apart.
 
 25. **A horizontal `StackPanel` clips a CHIP STRIP exactly as it clips text (trap 14).**
@@ -492,13 +495,18 @@ Read this list before touching the areas it names. Every entry cost a release.
   the file as a real newline and break a C# string literal, and box-drawing characters
   mangle through pipes. All three happened in one session. Heredocs are fine for running
   code; they are a poor way to author it.
-- **After `release.ps1`, `shoot.ps1` photographs the WRONG WINDOW.** The release installs
-  the new build and relaunches the real app, and `shot.ps1` matches on window TITLE — so
-  the capture is your live profile, character name and all, not the throwaway fixture.
-  It looks like a fixture bug ("why is the Watch card empty?") and it is not; it is a
-  different app. Worse, it would commit a real character name into `docs/screenshots/`.
-  → **Close the real EQBuddy before shooting, or check the captured title first.** Caught
-  on 2026-08-19 by a shot that came back reading `Dranak (freeport)`.
+- **`shoot.ps1` used to photograph the WRONG WINDOW when the real app was running.** It
+  is always-on-top and holds the same window titles, so the capture was your live profile,
+  character name and all — it looks like a fixture bug ("why is the Watch card empty?")
+  and it is a different app, and it would commit a real character name into
+  `docs/screenshots/`. Caught 2026-08-19 by a shot reading `Dranak (freeport)`, and again
+  by a Faction tab filed as `progress-wealth.png`.
+  → **Now guarded, and there is nothing to remember:** `shoot.ps1` stands the running
+  EQBuddy down before it shoots and relaunches it in its `finally`, so an interrupted run
+  still gives the app back. It closes it **gracefully** (`CloseMainWindow`, force only as
+  a fallback) because the app finalizes its session into `history.db` on exit — the cost
+  of a screenshot must never be someone's session record. `shot.ps1` also takes
+  `-OwnerPid` now, so a title alone can no longer pick the wrong process.
 - **PowerShell-tool failures are not always real.** It has returned a bare exit 1 with no
   output for every command, mid-session. Run scripts as `pwsh -NoProfile -File …` through
   Bash instead, and never read a silent failure as "nothing happened" — check the side
