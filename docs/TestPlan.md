@@ -89,7 +89,9 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 
 | Expectation | Held by |
 |---|---|
-| Off by default: a fresh install opens no socket | **Auto** — `CompanionEnableTests` |
+| Off by default: a fresh install opens no socket | **Auto** — `CompanionEnableTests`, and through the Avalonia widget that constructs the host — `CompanionWiringTests` |
+| **The Linux/macOS build hosts it too** (#208): every source `CompanionSources` declares is wired there, so no surface arrives empty on one platform and full on the other | **Auto** — `CompanionWiringTests` |
+| The pairing QR rasterizes with the spec's quiet zone, from one shared constant, in both UIs | **Auto** — `CompanionWiringTests` (`QrRaster`) |
 | Turning it on is the only thing that opens the port; a token is minted and rides the URL fragment | **Auto** — `CompanionEnableTests` |
 | A tick with nobody paired builds no projection | **Auto** — `CompanionEnableTests` |
 | A device receives only the surfaces the desktop offers **and** it subscribed to | **Auto** — `CompanionSurfaceTests`, `CompanionServerTests` |

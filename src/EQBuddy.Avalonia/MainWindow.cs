@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -57,6 +57,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly BuffTracker _buffTracker = new();
     private readonly BuffLossLog _buffLossLog = new();
     private readonly RaidKillLedger _raidLedger;
+    /// <summary>EQBuddy Mobile's desktop side. Constructed with its data sources but
+    /// silent — no socket at all — until the player turns CompanionEnabled on.</summary>
+    private readonly EQBuddy.Companion.CompanionHost _companion;
+    internal EQBuddy.Companion.CompanionHost Companion => _companion;
+    /// <summary>The record handed to the host, kept so a test can see it. Every phone
+    /// surface reads through one of its callbacks and a missing one is not a compile
+    /// error — it is a screen that arrives EMPTY on this build and full on Windows,
+    /// which is the failure #210 spent two days in. `CompanionSourceParityTests` asserts
+    /// none of them is null, so adding a source to the record without wiring it here
+    /// fails the build instead of a player's tablet.</summary>
+    internal EQBuddy.Companion.CompanionSources CompanionSources { get; }
+    private CompanionWindow? _companionWindow;
     private readonly EqlWikiItemService _wikiItems =
         new(System.IO.Path.Combine(AppPaths.Dir, "wiki-cache", "items"));
     private ItemInfoWindow? _itemInfoWindow;
@@ -80,6 +92,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // does elsewhere — the checklist re-renders only when a box actually changed.
     private bool _gearChecklistDirty = true;
     private readonly DispatcherTimer _uiTimer;
+    private readonly DispatcherTimer _companionPump;
+    /// <summary>Whether a pump tick has anything to do. The decision lives in UI.Shared
+    /// so the "free when idle" claim is unit-tested rather than trusted — and so both
+    /// widgets answer it the same way.</summary>
+    private readonly EQBuddy.UI.Shared.CompanionPumpGate _companionGate = new();
     private readonly LayoutTransformControl _scaleRoot = new();
     private readonly Border _root = new();
     private readonly Grid _miniRoot = new();
@@ -237,6 +254,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
     private readonly ItemsControl _markerList = new();
     private readonly Button _gearBtn = AppTheme.IconButton(AppIcon.Settings, "Settings");
+    private readonly Button _mobileBtn = AppTheme.IconButton(AppIcon.Phone,
+        "EQBuddy Mobile (Beta) - show EQBuddy on a phone or tablet on your Wi-Fi");
     private readonly Dictionary<string, Button> _stars = new();
     private readonly Dictionary<string, SectionCard> _sections = new(StringComparer.OrdinalIgnoreCase);
     private readonly StackPanel _sectionsPanel = new();
@@ -325,6 +344,54 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _spawnPoints = new SpawnPointLedger(
             System.IO.Path.Combine(AppPaths.Dir, "zone-spawns"), spawnCatalog);
         _watcher.SpawnPoints = _spawnPoints;
+        // EQBuddy Mobile — the same host, the same sources and the same 20-callback
+        // record the WPF widget builds (#208, sbaum23: "I don't see the EQ Mobile option
+        // in the Linux version"). It is deliberately a copy of MainWindow.xaml.cs's
+        // block rather than a reduced one: every phone surface reads through these
+        // callbacks, so a missing member is not a compile error, it is a screen that
+        // arrives empty on Linux and full on Windows. `CompanionWiringTests` asserts
+        // none of them is null for exactly that reason.
+        //
+        // The port claim needs no guard of its own: SingleInstance (Program.cs, and
+        // App.xaml.cs on the WPF side) is keyed on the PROFILE, not the toolkit, so the
+        // two builds can no longer both reach this constructor against one settings.json
+        // and race for CompanionPort — which is what trap 13 cost.
+        CompanionSources = new EQBuddy.Companion.CompanionSources
+        {
+            TimerZone = () => _spawnTimers.CurrentZone?.Zone ?? SpawnCatalog.StripTierVariant(CurrentZoneName),
+            SpawnPoints = _spawnPoints,
+            Mezzes = now => _mezTracker.Snapshot(now),
+            BuffSets = now => [.. BuffSetSectionStates(CurrentSnapshot(), now)
+                .Select(sec => (sec.Class, (IReadOnlyList<BuffSetEntryState>)sec.Entries))],
+            BuffLosses = () => _buffLossLog.Snapshot(),
+            HopsFromHere = zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops,
+            Progress = () => (CurrentSnapshot().LastLevel, DingUnlocks(CurrentSnapshot())),
+            // The Progress theme's Raids tab, added to the record on 2026-08-19 —
+            // both surfaces or neither (#210).
+            Raids = _raidLedger,
+            CampFor = t => EQBuddy.UI.Shared.CampLocations.Resolve(
+                t, EnsureMobLookup, n => WikiMobResult(n)?.Mob?.LocYX),
+            Quests = () => new EQBuddy.Companion.CompanionQuestRequest
+            {
+                Catalog = QuestCatalog,
+                Owned = QuestLedger?.For(QuestCharacterKey)
+                    ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase),
+                Tracked = QuestLedger?.TrackedFor(QuestCharacterKey)
+                    ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                Hidden = QuestLedger?.HiddenFor(QuestCharacterKey)
+                    ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                Completed = QuestLedger?.CompletedFor(QuestCharacterKey)
+                    ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
+                InferredClass = CurrentSnapshot().InferredClass,
+            },
+            QuestLedger = QuestLedger,
+            QuestCharacterKey = () => QuestCharacterKey,
+        };
+        _companion = new EQBuddy.Companion.CompanionHost(
+            _settings, UpdateChecker.CurrentVersion.ToString(), CompanionSources);
+        AppTheme.PaletteApplied += _companion.SetTheme;
+        _companion.SurfaceEdited += OnCompanionSurfaceEdited;
         _spawnOverrides = spawnOverrides;
         _spawnCatalog = spawnCatalog;
         // Before any tailing: the initial full-log ingest has to know which text rules to
@@ -490,6 +557,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _uiTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _uiTimer.Tick += (_, _) => RefreshUi();
         _uiTimer.Start();
+
+        // EQBuddy Mobile's own cadence, same 50 ms as the WPF widget. The desktop
+        // redraws once a second because that is how often a human wants a card to change
+        // under their eyes; a phone showing a mez breaking wants to hear about it as
+        // soon as the log does. The gate below is what keeps it free while nobody is
+        // paired — one field read per tick and nothing else.
+        _companionPump = new DispatcherTimer(TimeSpan.FromMilliseconds(50),
+            DispatcherPriority.Send, (_, _) => PumpCompanion());
+        _companionPump.Start();
         Loaded += (_, _) =>
         {
             UpdateWindowHeightLimit();
@@ -798,7 +874,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var grid = new Grid();
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
-        for (var i = 0; i < 5; i++) grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+        for (var i = 0; i < 6; i++) grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         var title = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
         _statusDot.Margin = new Thickness(DesignTokens.SpaceXxs, 0, DesignTokens.SpaceS, 0);
         title.Children.Add(_statusDot);
@@ -824,8 +900,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             "EQBuddy's own CPU (all cores) and memory — enable/disable under Options → Behavior");
         Grid.SetColumn(_perfLabel, 2);
         grid.Children.Add(_perfLabel);
+        // EQBuddy Mobile lives IN the title bar (David: "should probably be its own
+        // button on the dashboard, not buried in the options") — it is a thing you open
+        // at the start of a session, not a setting. Drawn, never a glyph: an emoji phone
+        // is exactly what boxes under Wine and on a bare Linux font set (#148/#166).
+        _mobileBtn.Click += (_, _) => OpenCompanionWindow();
+        Grid.SetColumn(_mobileBtn, 3);
+        grid.Children.Add(_mobileBtn);
         _gearBtn.Click += OnGear;
-        Grid.SetColumn(_gearBtn, 3);
+        Grid.SetColumn(_gearBtn, 4);
         grid.Children.Add(_gearBtn);
         var reset = AppTheme.IconButton(AppIcon.Refresh, ResetPrompt.Tooltip(_settings.ArchiveLogs));
         reset.Click += async (_, _) =>
@@ -846,15 +929,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 });
             _stats.Reset();
         };
-        Grid.SetColumn(reset, 4);
+        Grid.SetColumn(reset, 5);
         grid.Children.Add(reset);
         var mini = AppTheme.IconButton(AppIcon.Minimize, "Minimize to dashboard");
         mini.Click += (_, _) => SetMode(true);
-        Grid.SetColumn(mini, 5);
+        Grid.SetColumn(mini, 6);
         grid.Children.Add(mini);
         var close = AppTheme.IconButton(AppIcon.Close, "Close");
         close.Click += (_, _) => Close();
-        Grid.SetColumn(close, 6);
+        Grid.SetColumn(close, 7);
         grid.Children.Add(close);
         return grid;
     }
@@ -1314,6 +1397,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         menu.Items.Add(Item("Options…", OnOptions,
             "Size, theme, alerts, watch rules, cards, hotkeys — now in tabs"));
         menu.Items.Add(new Separator());
+        // First in the windows list because it is the one you reach for at the start of
+        // a session, not a setting you visit once — same place as the WPF menu's.
+        menu.Items.Add(Item("EQBuddy Mobile (Beta)…", (_, _) => OpenCompanionWindow(),
+            "Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."));
         menu.Items.Add(Item("Zone map…", OnZoneMap,
             "Your zone's map with your last /log position — type /loc in game to update the marker"));
         menu.Items.Add(Item("Travel route…", OnTravelRoute,
@@ -1877,6 +1964,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // this tick's losses, not last tick's.
         ObserveBuffLosses(s);
         UpdateBreakouts(s);
+
+        // EQBuddy Mobile rides the same shared snapshot as every desktop card, and must
+        // keep flowing while the widget hides for focus — the phone is exactly the
+        // screen you look at then, so this sits ABOVE the return below. Free unless a
+        // device is actually connected.
+        //
+        // The latency path is PumpCompanion, which pushes as soon as the session moves.
+        // This call is the reconciliation one: it keeps ForcedPushInterval running
+        // through a camp so quiet that nothing bumps the version at all. Record the
+        // version it covered, so the pump doesn't immediately repeat this push.
+        _companionGate.Observe(s.Version);
+        _companion.Tick(s, _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
 
         // Hidden while the game is unfocused: everything the player can't see stops
         // here — alerts, chips, timers, and checkpoints above already ran (perf
@@ -4606,6 +4705,50 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private void OnGear(object? sender, EventArgs e) => _root.ContextMenu?.Open(_root);
 
+    /// <summary>
+    /// Push to paired devices as soon as the session actually moves, instead of waiting
+    /// for the next desktop redraw.
+    ///
+    /// This does NOT replace the tick inside <see cref="RefreshUi"/>. That one still
+    /// runs every second and is what drives the host's forced-push reconciliation, so
+    /// the correctness path is untouched and this is purely a latency path. Countdowns
+    /// are unaffected either way: they are computed on the device from authoritative
+    /// timestamps, and are deliberately excluded from the section fingerprints — a
+    /// ticking clock is not news, and including one would wake every phone every pump.
+    /// </summary>
+    private void PumpCompanion()
+    {
+        if (!_companionGate.ShouldPush(_companion.HasClients, _stats.CurrentVersion)) return;
+        _companion.Tick(_stats.Snapshot(), _spawnTimers, _stats.CharacterName ?? "", DateTime.Now);
+    }
+
+    internal void OpenCompanionWindow()
+    {
+        if (_companionWindow is { IsVisible: true } open) { open.Activate(); return; }
+        _companionWindow = new CompanionWindow(_companion);
+        _companionWindow.Closed += (_, _) => _companionWindow = null;
+        _companionWindow.Show(this);
+    }
+
+    /// <summary>A paired device ticked a checklist row. The host already wrote it to the
+    /// same settings list a click on the card writes to, and raised this on the tick
+    /// thread — so all that's left is the repaint cue the card's own toggle sets.</summary>
+    private void OnCompanionSurfaceEdited(string surface)
+    {
+        switch (surface)
+        {
+            // A tablet ticking an Epic or Sky row edits the same settings list the Quest
+            // Tracker window is drawing from, so the window is what needs the nudge —
+            // the widget's Quests card only carries counts, and those refresh on the tick.
+            case EQBuddy.Companion.CompanionSurfaces.Quests:
+            case EQBuddy.Companion.CompanionSurfaces.Epics:
+            case EQBuddy.Companion.CompanionSurfaces.Sky:
+                _questsWindow?.MaybeRefresh();
+                break;
+            case EQBuddy.Companion.CompanionSurfaces.Gear: _gearChecklistDirty = true; break;
+        }
+    }
+
     private void OnStarChanged(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
     {
         var btn = (Button)sender!;
@@ -5234,6 +5377,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     protected override void OnClosed(EventArgs e)
     {
         _uiTimer.Stop();
+        _companionPump.Stop();   // before the host: no pump into a disposed listener
+        AppTheme.PaletteApplied -= _companion.SetTheme;
+        _companion.Dispose();    // stop the LAN listener with the app, not after it
         _trayIcon?.Dispose();   // a ghost tray icon outliving its process reads as a crash
         _gridOverlay?.Close();
         _cursorRing?.Close();

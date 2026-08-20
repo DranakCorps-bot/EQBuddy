@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- EQBuddy Mobile. The server was written UI-toolkit-free from day one precisely so
+         this lane could host it (EQBuddy.Companion's own header says so, and
+         ArchitectureTests.SharedLayersReferenceNoUiToolkit holds it to that) — but the
+         reference itself was never added, so the phone existed only on Windows and #208
+         (sbaum23) is a Linux player asking where it went. -->
+    <ProjectReference Include="..\EQBuddy.Companion\EQBuddy.Companion.csproj" />
     <ProjectReference Include="..\EQBuddy.Core\EQBuddy.Core.csproj" />
     <ProjectReference Include="..\EQBuddy.UI.Shared\EQBuddy.UI.Shared.csproj" />
   </ItemGroup>

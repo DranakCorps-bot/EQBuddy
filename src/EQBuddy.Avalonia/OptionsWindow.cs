@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -1751,6 +1751,23 @@ public sealed class OptionsWindow : Window
     private void InitBehavior()
     {
         var panel = _behaviorPanel;
+        // FIRST in the tab, not buried at the bottom — the primary way in is the
+        // title-bar phone button; this is the explanation that sits beside it. Same
+        // position, same words, as the WPF Behavior tab's.
+        panel.Children.Add(new TextBlock
+        {
+            Text = "EQBuddy Mobile (Beta)", FontSize = 12, FontWeight = FontWeight.SemiBold,
+            Foreground = AppTheme.AccentBrush,
+        });
+        panel.Children.Add(AppTheme.DimText(
+            "Show EQBuddy on a phone or tablet on your Wi-Fi: scan the code once, then pick which windows that device shows. LAN-only and off by default — nothing leaves your network. The phone button in the title bar opens it any time.",
+            new Thickness(0, 2, 0, 4)));
+        var mobileBtn = AppTheme.ActionButton("EQBuddy Mobile…");
+        mobileBtn.HorizontalAlignment = HorizontalAlignment.Left;
+        mobileBtn.Margin = new Thickness(0, 0, 0, 14);
+        mobileBtn.Click += (_, _) => _main.OpenCompanionWindow();
+        panel.Children.Add(mobileBtn);
+
         _hideUnfocusedCheck = Check("Hide the widget while the game is running but not focused",
             _vm.HideWhenGameUnfocused, on => _vm.HideWhenGameUnfocused = on, new Thickness(0));
         panel.Children.Add(_hideUnfocusedCheck);

@@ -60,11 +60,22 @@ public class WidgetSheetTests : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>**Pin the palette, or the capture is not of the theme you asked for.**
+    /// `AppTheme`'s brushes are static singletons shared by every test in this collection,
+    /// and `AppThemeTests.EveryCatalogThemeAppliesCleanly` walks the whole catalog — so
+    /// whichever theme ran last leaks into whatever renders next. The first companion
+    /// capture came back in someone else's turquoise while `settings.json` said
+    /// ParchmentBrass: a real palette, correctly applied, and not the one under review.
+    /// Same shape as trap 23 — a picture of a state that is genuinely rendered and is not
+    /// the state the shot is about.</summary>
+    private static void PinTheme() => AppTheme.Apply("ParchmentBrass");
+
     [AvaloniaFact]
     public void WriteWidgetSheet()
     {
         if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
 
+        PinTheme();
         var window = new MainWindow();
         window.Show();
 
@@ -102,5 +113,53 @@ public class WidgetSheetTests : IDisposable
         Assert.True(File.Exists(path), $"No sheet written to {path}");
 
         window.Close();
+    }
+
+    /// <summary>A picture of the EQBuddy Mobile pairing window (#208), which is entirely
+    /// new on this lane and is the one surface here with a control that is neither text
+    /// nor a box — the QR code a phone has to scan.
+    ///
+    /// It turns the host ON first, on a port of its own. A pairing window with the
+    /// feature off is an intro paragraph and a tick box: a real state, and one that says
+    /// nothing about the surface underneath it — trap 22, the same reason `tracked-card`
+    /// seeds rules. Opt-in like its sibling above, so `check.ps1` never binds a socket.
+    ///
+    /// **Predicted before running** (trap 23): a code, a URL beginning
+    /// <c>http://</c> and ending <c>#</c>+token, "No device connected yet.", and one
+    /// tick box per entry in <c>CompanionSurfaces.All</c>, all ticked — a fresh profile
+    /// hides nothing.</summary>
+    [AvaloniaFact]
+    public void WriteCompanionSheet()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+
+        PinTheme();
+        var main = new MainWindow();
+        main.Show();
+        // Port 0, not the shipped 47859: the server resolves an ephemeral port and reports
+        // the real one back through PairingUrl (`CompanionServer.Start`), which is the
+        // same trick `CompanionServerTests` uses. A fixed port would collide with the
+        // developer's own EQBuddy Mobile if it happens to be on — and a bind failure here
+        // photographs as a bug in the window rather than as a busy port.
+        main.Settings.CompanionPort = 0;
+        main.Companion.SetEnabled(true);
+
+        var window = new CompanionWindow(main.Companion);
+        window.Show();
+        Assert.True(main.Companion.Running, main.Companion.LastError ?? "host did not start");
+
+        var frame = window.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+
+        var dir = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_OUT")
+                  ?? Path.Combine(Path.GetTempPath(), "eqbuddy-widget");
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, "avalonia-companion.png");
+        frame!.Save(path);
+        Assert.True(File.Exists(path), $"No sheet written to {path}");
+
+        main.Companion.SetEnabled(false);   // give the port back before the next test
+        window.Close();
+        main.Close();
     }
 }

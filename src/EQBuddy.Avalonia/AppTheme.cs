@@ -105,30 +105,39 @@ internal static class AppTheme
     /// <summary>Repaints every control holding one of the brushes above. An unrecognized
     /// key (e.g. from an older settings.json) falls back to the first theme rather than
     /// throwing — same behavior as the WPF app's ThemeManager.</summary>
-    public static void Apply(string themeKey) => ApplyPalette(ThemePalettes.For(themeKey));
+    public static void Apply(string themeKey) => ApplyPalette(themeKey, ThemePalettes.For(themeKey));
 
     /// <summary>Settings-aware overload: applies the Custom theme's derived palette when
     /// it's selected (colors are edited in either UI's Options; both follow the stored
     /// values), otherwise the selected catalog theme.</summary>
-    public static void Apply(Core.AppSettings settings) => ApplyPalette(CustomTheme.PaletteFor(settings));
+    public static void Apply(Core.AppSettings settings) =>
+        ApplyPalette(settings.Theme, CustomTheme.PaletteFor(settings));
 
-    private static void ApplyPalette(IEnumerable<(string Key, string Hex)> palette)
+    /// <summary>Raised after every swap with the theme key and its full palette (the
+    /// derived tones included) — the WPF ThemeManager's event, same name and same
+    /// payload. EQBuddy Mobile listens so a paired phone repaints with the desktop
+    /// instead of waiting for a reconnect; nothing else subscribes yet.</summary>
+    public static event Action<string, IReadOnlyList<(string Key, string Hex)>>? PaletteApplied;
+
+    private static void ApplyPalette(string themeKey, IEnumerable<(string Key, string Hex)> palette)
     {
         // No-op unless EQBUDDY_OPAQUE=1 (scripts/shoot.ps1): makes the window ground
         // opaque so a capture photographs the UI, not the desktop behind it. Same call,
         // same place, as the WPF ThemeManager — the fix has to reach both UIs or it is
         // a second product (CLAUDE.md).
-        foreach (var (key, hex) in CaptureTheme.IfEnabled(palette))
+        var rows = CaptureTheme.IfEnabled(palette).ToList();
+        foreach (var (key, hex) in rows)
             if (ByKey.TryGetValue(key, out var brush)) brush.Color = Color.Parse(hex);
 
-        var accent = AccentBrush.Color;
-        var panel = PanelBrush.Color;
-        HairlineBrush.Color = Color.FromArgb(0x26, accent.R, accent.G, accent.B);
-        TrackBrush.Color = Color.FromArgb(0x1E, accent.R, accent.G, accent.B);
-        RaisedBrush.Color = Color.FromArgb(
-            (byte)Math.Min(255, panel.A * 3 / 2), panel.R, panel.G, panel.B);
-        AccentDeepBrush.Color = Color.FromArgb(accent.A,
-            (byte)(accent.R * 6 / 10), (byte)(accent.G * 6 / 10), (byte)(accent.B * 6 / 10));
+        // The four derived tones come from UI.Shared rather than being recomputed here.
+        // They were an inline copy of ThemeTones.Derive's arithmetic until the phone
+        // needed the same list to ship — and a hand-copied twin of a shared decision is
+        // the exact shape of the bug that carried #122 and #152 to Linux (CLAUDE.md).
+        var derived = ThemeTones.Derive(rows).ToList();
+        foreach (var (key, hex) in derived)
+            if (Derived.TryGetValue(key, out var brush)) brush.Color = Color.Parse(hex);
+
+        PaletteApplied?.Invoke(themeKey, [.. rows, .. derived]);
     }
 
     // Tint comes from the current theme's BgBrush rather than a fixed color, so this
@@ -305,27 +314,15 @@ internal static class AppTheme
 
     private static PathIcon CreateIcon(AppIcon icon, IBrush brush, double size = 14)
     {
-        var data = icon switch
-        {
-            AppIcon.Settings => "M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1a7.28 7.28 0 0 0-1.69-.98L14.5 2.42A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42L9.12 5.07c-.61.23-1.18.56-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.05.32-.07.65-.07.98s.02.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.51.4 1.08.74 1.69.98l.38 2.65a.5.5 0 0 0 .5.42h4a.5.5 0 0 0 .5-.42l.38-2.65c.61-.23 1.18-.56 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z",
-            AppIcon.Refresh => "M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.45 5.08h-2.16A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h8V3l-3.35 3.35Z",
-            AppIcon.Minimize => "M5 12h14v2H5z",
-            AppIcon.Expand => "M5 5h6v2H8.41l3.3 3.29-1.42 1.42L7 8.41V11H5V5Zm14 14h-6v-2h2.59l-3.3-3.29 1.42-1.42L17 15.59V13h2v6Z",
-            AppIcon.Close => "M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6 6.4 5Z",
-            AppIcon.Star => "M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73-1.64 7.03L12 17.27 18.18 21l-1.63-7.03L22 9.24ZM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4Z",
-            AppIcon.StarFilled => "M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27Z",
-            AppIcon.ChevronRight => "M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41Z",
-            AppIcon.ChevronDown => "M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41Z",
-            // Glyphs for the ported feature windows (map/quests/gear/timeline/tray/charts)
-            // so those views draw from one catalog instead of ad-hoc emoji.
-            AppIcon.Map => "M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5ZM15 19l-6-2.11V5l6 2.11V19Z",
-            AppIcon.Quest => "M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6Z",
-            AppIcon.Gear => "M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8Z",
-            AppIcon.Timeline => "M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C19.02 8.35 19 8.18 19 8c0-1.1.9-2 2-2s2 .9 2 2Z",
-            AppIcon.Tray => "M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H5V5h14v10Z",
-            AppIcon.Chart => "M5 9.2h3V19H5V9.2ZM10.6 5h2.8v14h-2.8V5Zm5.6 8H19v6h-2.8v-6Z",
-            _ => throw new ArgumentOutOfRangeException(nameof(icon), icon, null),
-        };
+        // The path data comes from UI.Shared's IconPaths, by name — the enum member IS
+        // the key. It was a hand-copied table here until 2026-08-20, byte-identical to
+        // the shared one across all fifteen entries, which is the twin that "if a fix
+        // exists in UI.Shared, both UIs must use it" (CLAUDE.md) is written about: the
+        // Avalonia chip stacks shipped an older copy of the WPF anchor and carried #122
+        // and #152 to Linux after Windows had already paid for both. Path() throws on an
+        // unknown name rather than drawing nothing, which is what a missing enum arm
+        // used to do here anyway.
+        var data = IconPaths.Path(icon.ToString());
 
         return new PathIcon
         {
@@ -354,6 +351,10 @@ internal enum AppIcon
     Timeline,
     Tray,
     Chart,
+    /// <summary>The title bar's EQBuddy Mobile button. Gate 5c drew this vector for
+    /// exactly that control and it went unused, because the button it was drawn for was
+    /// invisible on Windows and absent here.</summary>
+    Phone,
 }
 
 /// <summary>What the widget's card stack is allowed to hold. Cards differ in what a

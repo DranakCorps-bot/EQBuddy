@@ -27,13 +27,17 @@ Measured 2026-08-14 at v1.82.0.
       (the widget)        (Linux/macOS)          (EQBuddy Mobile, LAN)
 ```
 
+Sizes re-measured 2026-08-20 (`.cs` under each project, excluding `obj/` and `bin/`);
+the previous set had drifted far enough to mislead — UI.Shared had doubled and the
+Avalonia build tripled since they were written.
+
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 65 | 14,507 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
-| `EQBuddy.UI.Shared` | 35 | 3,612 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
-| `EQBuddy.Companion` | 14 | 2,921 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose**, so Avalonia can host it too. |
-| `EQBuddy` | 37 | 14,432 | The WPF widget and its windows. |
-| `EQBuddy.Avalonia` | 22 | 6,423 | Cross-platform build, trails by a few releases. |
+| `EQBuddy.Core` | 75 | 16,980 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
+| `EQBuddy.UI.Shared` | 69 | 7,047 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Companion` | 16 | 3,462 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
+| `EQBuddy` | 55 | 18,176 | The WPF widget and its windows. |
+| `EQBuddy.Avalonia` | 49 | 19,703 | Cross-platform build, trails by a few releases. Now the largest project in the repo — see the ratchet note on `MainWindow.cs`. |
 
 ## 2. Load-bearing invariants
 
@@ -220,7 +224,10 @@ clock is not news, and including one would wake every device on every pump.
   breadcrumb trail is the last minute of movement and needs two crumbs 25+ units apart.
 - Browsers refuse a wake lock over plain HTTP, so the mobile page cannot hold a screen
   awake; it says so rather than pretending.
-- Windows Firewall prompts on first listen and a dismissed prompt fails silently from
-  the device's side.
-- Avalonia trails WPF by a few releases and does not host EQBuddy Mobile yet, though
-  the seam is deliberately there.
+- A firewall prompts on first listen and a dismissed prompt fails silently from the
+  device's side. Windows asks; macOS asks once and remembers; most Linux desktops need
+  the port opened by hand, and the pairing window says so per platform.
+- Avalonia trails WPF by a few releases. It **does** host EQBuddy Mobile as of 1.96.2
+  (#208): same `CompanionHost`, same `CompanionSources` record, same 50 ms pump gated by
+  `CompanionPumpGate`, and `CompanionWiringTests` fails the build if a source the record
+  declares is left unwired here.

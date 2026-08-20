@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -35,7 +35,7 @@ public sealed class CompanionWindow : Window
     public CompanionWindow(CompanionHost host)
     {
         _host = host;
-        Title = "EQBuddy Mobile (Beta)";
+        Title = EQBuddy.UI.Shared.CompanionPairingText.Title;
         Width = 430;
         SizeToContent = SizeToContent.Height;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
@@ -44,18 +44,16 @@ public sealed class CompanionWindow : Window
 
         var root = new StackPanel { Margin = new Thickness(14, 10, 14, 12) };
 
-        var intro = Dim(
-            "Turn a phone or tablet on the same Wi-Fi into a live EQBuddy display: scan " +
-            "the code, the browser opens, and your timers, map and checklists follow you " +
-            "around the house. Everything stays on your own network — nothing is hosted, " +
-            "nothing is uploaded, and it's off unless you turn it on. Beta: it works, it " +
-            "just hasn't been through as many camps as the rest of EQBuddy.");
+        var intro = Dim(EQBuddy.UI.Shared.CompanionPairingText.Intro);
         intro.Margin = new Thickness(0, 0, 0, 10);
         root.Children.Add(intro);
 
         _enable = new CheckBox
         {
-            Content = new TextBlock { Text = "Enable EQBuddy Mobile", FontSize = 12 },
+            Content = new TextBlock
+            {
+                Text = EQBuddy.UI.Shared.CompanionPairingText.EnableLabel, FontSize = 12,
+            },
             IsChecked = _host.Running,
         };
         ((TextBlock)_enable.Content).SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
@@ -69,8 +67,7 @@ public sealed class CompanionWindow : Window
         _qrImage.HorizontalAlignment = HorizontalAlignment.Center;
         RenderOptions.SetBitmapScalingMode(_qrImage, BitmapScalingMode.NearestNeighbor);
         _pairPanel.Children.Add(_qrImage);
-        var urlHint = Dim("Scanning not cooperating? Type this address in the device's browser " +
-            "instead — the part after # is the pairing code, keep it:");
+        var urlHint = Dim(EQBuddy.UI.Shared.CompanionPairingText.UrlHint);
         urlHint.Margin = new Thickness(0, 4, 0, 0);
         _pairPanel.Children.Add(urlHint);
         _urlBox.SetResourceReference(Control.ForegroundProperty, "AccentBrush");
@@ -78,14 +75,12 @@ public sealed class CompanionWindow : Window
         _statusLine.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         _pairPanel.Children.Add(_statusLine);
 
-        var chrome = Dim("Propping a tablet beside the monitor? Once the page is open, use the " +
-            "browser's \"Add to Home Screen\" — it launches EQBuddy Mobile in its own window " +
-            "with no address bar, and remembers the pairing code. The ⛶ button at the top of " +
-            "the page does the same for one visit.");
+        var chrome = Dim(EQBuddy.UI.Shared.CompanionPairingText.HomeScreenHint);
         chrome.Margin = new Thickness(0, 6, 0, 0);
         _pairPanel.Children.Add(chrome);
 
-        var regen = Theming.Button("New code (disconnects every paired device)");
+        var regen = Theming.Button(EQBuddy.UI.Shared.CompanionPairingText.RegenerateLabel);
+        regen.ToolTip = EQBuddy.UI.Shared.CompanionPairingText.RegenerateTip;
         regen.Margin = new Thickness(0, 6, 0, 0);
         regen.HorizontalAlignment = HorizontalAlignment.Left;
         regen.Click += (_, _) => { _host.RegenerateToken(); Refresh(); };
@@ -94,13 +89,12 @@ public sealed class CompanionWindow : Window
         // ---- desktop gate: which screens this PC is willing to send ----
         var gateHead = new TextBlock
         {
-            Text = "Screens offered to devices", FontSize = 12,
+            Text = EQBuddy.UI.Shared.CompanionPairingText.GateHeading, FontSize = 12,
             FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 12, 0, 2),
         };
         gateHead.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
         _pairPanel.Children.Add(gateHead);
-        _pairPanel.Children.Add(Dim("Untick anything you'd rather never leave this PC. " +
-            "Each device then picks its own screens (the ⚙ on the page) from what's offered."));
+        _pairPanel.Children.Add(Dim(EQBuddy.UI.Shared.CompanionPairingText.GateHint));
         // The list is long enough now to need its own scroll rather than a window
         // taller than a laptop screen.
         var gateList = new StackPanel();
@@ -127,12 +121,10 @@ public sealed class CompanionWindow : Window
         });
 
         // ---- the honest firewall talk (see CompanionServer's header comment) ----
-        var fw = Dim(
-            "First time on, Windows Firewall usually asks whether to allow EQBuddy — say yes " +
-            "for private networks. If the page never loads on your device: that prompt was " +
-            "missed (Windows Security → Firewall → Allow an app), or your Wi-Fi keeps devices " +
-            "apart (guest networks often do — use the main network). Best check: open the " +
-            "address above in that device's browser right now.");
+        // Chosen by OPERATING SYSTEM in UI.Shared rather than written here, so the
+        // Avalonia twin cannot end up telling a Linux player to open a Windows dialog —
+        // which is exactly what a hand-copied port of this paragraph did (#208).
+        var fw = Dim(EQBuddy.UI.Shared.CompanionPairingText.Firewall);
         fw.Margin = new Thickness(0, 12, 0, 0);
         _pairPanel.Children.Add(fw);
 
@@ -162,12 +154,7 @@ public sealed class CompanionWindow : Window
     }
 
     private void UpdateStatus() =>
-        _statusLine.Text = _host.ClientCount switch
-        {
-            0 => "No device connected yet.",
-            1 => "1 device connected.",
-            var n => $"{n} devices connected.",
-        };
+        _statusLine.Text = EQBuddy.UI.Shared.CompanionPairingText.Status(_host.ClientCount);
 
     private static TextBlock Dim(string text)
     {
@@ -178,23 +165,22 @@ public sealed class CompanionWindow : Window
 }
 
 /// <summary>QR module matrix → a crisp WPF bitmap: black on white (scanners want
-/// contrast, not theming) with the spec's 4-module quiet zone baked in.</summary>
+/// contrast, not theming). The spec's quiet zone comes from UI.Shared so the Avalonia
+/// widget's renderer cannot drift from this one.</summary>
 internal static class QrBitmap
 {
-    public static BitmapSource Render(bool[,] modules, int quietZone = 4)
+    public static BitmapSource Render(bool[,] modules)
     {
-        var n = modules.GetLength(0);
-        var size = n + quietZone * 2;
+        var padded = EQBuddy.UI.Shared.QrRaster.WithQuietZone(modules);
+        var size = padded.GetLength(0);
         var stride = (size + 7) / 8;
         var pixels = new byte[stride * size];
         // BlackWhite format: 1 = white. Start all white, punch the dark modules.
         Array.Fill(pixels, (byte)0xFF);
-        for (var r = 0; r < n; r++)
-            for (var c = 0; c < n; c++)
+        for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
             {
-                if (!modules[r, c]) continue;
-                var x = c + quietZone;
-                var y = r + quietZone;
+                if (!padded[y, x]) continue;
                 pixels[y * stride + x / 8] &= (byte)~(0x80 >> (x % 8));
             }
         var bmp = BitmapSource.Create(size, size, 96, 96, PixelFormats.BlackWhite, null, pixels, stride);
