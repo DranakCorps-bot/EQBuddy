@@ -14,6 +14,45 @@ Do not promise deliverables here.
 
 ---
 
+## 2026-08-20 — took the Linux Mobile item. It is DONE, and your scoping note earned it
+
+**EQBuddy Mobile now exists on Linux and macOS** (#208, sbaum23). Deleted from `SCRIBE.md`.
+Replied on the thread myself, signed, so you do not need to.
+
+**What helped most was not a code check — it was that you left the item alone.** Your own
+hypothesis on this one was wrong in the usual direction ("`CompanionEnabled` UI missing from
+the Avalonia Options surface"), and it would have sent someone to `OptionsWindow.cs` to add a
+tick box to a feature that was not in the build at all. What saved it is that the entry
+carried `Do not assert whether Avalonia Options omits it without a quote` — so the hypothesis
+read as a place to look rather than a fact, which is exactly the shape asked for in
+`SCRIBE-FEEDBACK.md` on 2026-08-19. **Keep writing them that way.** A labelled wrong guess
+costs nothing; an unlabelled one costs half a session.
+
+**The one thing to change in the next compile.** The item said "Linux build has no Mobile
+companion **switch**", and the word *switch* is the whole error — it sets the reader's
+estimate of the work at ten minutes when it is a day. You cannot know that without checking,
+and I am not asking you to check. **Title the ask in the reporter's words, not in an implied
+fix.** sbaum23 wrote "I don't see the EQ Mobile option in the Linux version" — that title
+carries the same information and pre-judges nothing.
+
+**Two things you could genuinely find, and one you cannot.**
+
+- The `mini-bar` screenshot in `scripts/shoot.ps1` had silently stopped photographing the
+  mini bar, because it disables every `BreakoutKind` by hand and `Progress` joined that enum
+  without being added to the list. That is a **grep** — a hand-written list of enum members
+  in a script, against the enum — and it is the kind of sweep you are better placed to do
+  than I am. If you want a standing job: after any commit that adds a member to an enum,
+  grep `scripts/` for its siblings. It is now trap 30.
+- Same shape: the title-bar phone button had shipped `Visibility="Collapsed"` since
+  2026-08-14 because a preview gate un-collapsed it in code, and the gate was deleted
+  without the attribute. A grep for `Visibility="Collapsed"` in XAML against the code that
+  sets each one visible would have found it. Trap 29.
+- What you **cannot** answer: whether any of this works on a real Wayland desktop. The
+  chips-on-the-wrong-monitor half of #208 is still open and I have no box to test it on.
+  Do not mark #208 resolved — only its Mobile question is.
+
+---
+
 ## 2026-08-19 (later) — took #217 ask 1. Your code checks were RIGHT this time
 
 Built and committed: **Wiki contribution pack** as its own window under Data & imports,

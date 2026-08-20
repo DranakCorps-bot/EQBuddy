@@ -1,131 +1,104 @@
 ﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (26) and the
+the non-negotiable rules, the where-things-live index, the trap list (31) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
 
 ---
 
-## Overnight, 2026-08-19 → 20: one fix landed, nothing else moved
+## 2026-08-20: both scoped items landed, and both were bigger than the ask
 
-**#193/#101 — a token-unlocked class no longer imports as quested.** wizen posted the
-three-way control set that had been missing since 2026-08-11, and it is in
-`AchievementsImportTests` verbatim. There are TWO ways to get a class unlock without
-questing and each announces itself with a different completed criterion — `will
-autocomplete…` for a confirmed primary, `can be bypassed using a … Token` for a token.
-1.57.3 shipped only the first, so #101 read as fixed while wizen's #193 symptom continued;
-**both were true at once.** Verified the new test fails against the old guard before
-claiming it catches anything.
+`main` clean and pushed at `1937270`. Gates green — **2,154 unit + 250 Avalonia + 15 E2E**.
+1.96.2 is still **prepared, not released**: version bumped, `WhatsNew.json` written (dated
+2026-08-20 now, since most of its content is from today), waiting on David's go.
 
-**Rolled into 1.96.2**, which is still prepared-not-released. Nothing else arrived: #65 was
-closed by Frank himself.
+### 1. EQBuddy Mobile exists on Linux and macOS (#208, sbaum23) — `e4825ca`
 
-⚠️ **One thing to confirm with David before acting on it:** Frank's closing note on #65
-describes the wiki pack's Ask 2 (full history, account-wide, no per-session toggle) as
-*"approved in principle"*. I have **not** treated that as authorization — it is a reporter
-summarising, and `SCRIBE.md` still has it as David's scope call. Get his own word first.
+The port, not a toggle, exactly as scoped. Same `CompanionHost`, same `CompanionSources`
+record copied whole rather than reduced, same 50 ms pump gated by `CompanionPumpGate`, same
+1 Hz reconciliation tick, a `CompanionWindow` twin, the title-bar button, the menu entry and
+the Options block. **Replied on the thread, signed.**
 
----
+- **`CompanionWiringTests` is the guard that matters.** It reflects over `CompanionSources`
+  and fails if this lane leaves one unwired — verified by dropping `Raids` and watching it
+  fail, which is the exact omission the handoff warned a port would make. A missing source
+  is not a compile error; it is a surface that arrives empty on Linux and full on Windows.
+- **Trap 13 needed nothing.** `SingleInstance` is keyed on the profile, not the toolkit, so
+  the two builds can no longer both reach the constructor and race for the port.
+- **`CompanionPairingText` (UI.Shared) now owns the window's copy for both widgets**, and
+  picks the firewall paragraph by OPERATING SYSTEM. My own hand-ported copy told a Cosmic
+  player to open "Windows Security → Firewall" and named the page's fullscreen control with
+  a glyph that draws tofu in a default Linux font set. One window wrong, invisible to every
+  gate — which is the argument for the shared module, made by me, against me.
+- Also: `QrRaster` (UI.Shared) owns the QR quiet zone for both renderers, and Avalonia's
+  `AppTheme` stopped carrying a byte-identical hand-copy of all fifteen `IconPaths` entries.
 
-## START HERE — the next session has TWO items, both scoped below
+**Two live WPF defects fell out of it.** The title-bar phone button had never once been
+visible — `Visibility="Collapsed"` from 2026-08-14, un-collapsed by a preview gate that was
+later deleted while the menu entry's `Visibility` was removed and the button's was not. And
+the gear beside it asked for the emoji variation selector three lines under a comment
+explaining that colour emoji ignore `Foreground`. Both drawn now. **Trap 29.**
 
-David, 2026-08-19, on both: *"note this for the next handoff prompt so we can start it
-with a full session"* and *"flag that for the next session as part of a handoff along with
-the other I noted"*. They are independent; do them in either order.
+### 2. The quick tour shows the app that ships, and can be looked at — `1937270`
 
-1. **EQBuddy Mobile does not exist on Linux/macOS** — approved, a port not a toggle.
-2. **The quick-tour images predate the whole UI rework** — they show an app that no longer exists.
+All five images retaken. The real deliverable is that the tour is now **reviewable**:
+`EQBUDDY_TOUR=<page>` opens it on any page and `shoot.ps1` has a shot per illustrated page
+(`tour-widget`, `tour-combat`, `tour-watch`, `tour-mini`, `tour-history`). They went a month
+stale because seeing page 4 meant installing the app and clicking Next three times.
 
----
+- `t-watch` uses a new `watch-solo` shot that hides the other cards through
+  `HiddenSections` — **a real state, not a pixel crop**, because a crop is a number that
+  keeps producing a picture of the wrong part as soon as a card gains a row.
+- `t-combat` is the **damage breakout**, because the Combat card is 994 px tall today and
+  arrives 109 px wide in the tour's 528×320 frame. One sentence added to that page so the
+  words and the picture agree. The old image was a chromeless hand-crop.
+- `t-history`: `EQBUDDY_HISTORY` already existed (the handoff said it didn't) — what was
+  missing was DATA. Sessions only reach `history.db` when one ENDS and the fixture
+  compresses every idle gap into one live session, so `shoot.ps1` **primes** it: run the
+  app, close it gracefully, once on a prefix of the log under another character so the two
+  sessions differ. The window now opens on the newest session instead of on "Select a
+  session.", which was half an empty screen.
+- **`mini-bar` had silently stopped photographing the mini bar** — it disables every
+  `BreakoutKind` by hand and `Progress` joined that enum without being added, so it was
+  shooting the Progress breakout. Re-running it would have overwritten a correct committed
+  screenshot with the wrong window. **Trap 30.**
+- Captures now pin their palette (**trap 31**): `AppTheme`'s brushes are process-wide
+  singletons and `AppThemeTests` walks the catalog, so the first EQBuddy Mobile capture came
+  back in Turquoise while its settings said ParchmentBrass.
 
-## Item 2 — the tutorial images (audited 2026-08-19; the TEXT is already fixed)
+### Left undone deliberately
 
-**The text is current as of `763512d`** — the tour no longer claims every card "drills
-into details", and it has a new "Cards that open windows" page naming what moved. **Only
-the pictures are left**, and one thing in them raises this above cosmetic.
-
-**Five PNGs, `src/EQBuddy/Assets/tutorial/`, all dated 20–21 July 2026.** The Avalonia
-csproj links that same folder (`AvaloniaResource Include="..\EQBuddy\Assets	utorial\*.png"`),
-so **one refresh fixes both UIs** — do not make a second copy.
-
-| Image | State |
-|---|---|
-| `t-widget.png` | Emoji card icons; "Tracked" not "Watch"; no KPI strip; no Quests or Gear card; Money/Progress/Faction still separate cards |
-| `t-history.png` | Pre-rework History window chrome |
-| `t-combat.png` | Pre-Gate-1 card chrome |
-| `t-watch.png` | "Tracked" heading, emoji icons |
-| `t-mini.png` | Old mini pill, emoji chips |
-
-**Two of them show David's own character, and that is fine** — he ruled on it 2026-08-19:
-*"I don't mind my character name being displayed, I'm not trying to be anonymous… if it
-slips in, that's fine."* Do not scrub names, and do not treat one as a defect. (The reason
-captures still use the throwaway fixture is determinism, not privacy: a live profile is
-whatever state it happens to be in, which may not include the thing under review.)
-
-**The reason to do this is that they are pictures of an app that no longer exists** — and
-one part is actively counterproductive: they show **emoji card icons**, the failure mode
-Gate 5 removed because emoji box outright under Wine (#148, #166), on exactly the builds
-where a first-run tour matters most.
-
-**Four of the five can be regenerated with shots that already exist**, against the
-throwaway fixture profile — which matters because that profile is seeded and repeatable,
-not because of what it is called:
-
-- `t-widget` → `shoot.ps1 -Shot widget-cards`
-- `t-combat` → `-Shot combat-card`
-- `t-watch` → `-Shot tracked-card` (already the renamed Watch card, three seeded rules)
-- `t-mini` → `-Shot mini-bar`
-- `t-history` → **no shot exists.** Needs an `EQBUDDY_HISTORY` hook in the
-  `EQBUDDY_QUESTS`/`EQBUDDY_PROGRESS` family, plus seeded history rows. Or drop the image
-  and let that page run text-only, which `Pages` already supports (`null`).
-
-**Watch for:** the tutorial images are CROPPED tighter than a full-window capture, so a raw
-shot may need trimming — decide whether the tour pages want the whole widget or a detail,
-and say so in the shot rather than hand-cropping. `shoot.ps1 -Out` can target
-`src/EQBuddy/Assets/tutorial` directly; names do not collide with `docs/screenshots`
-(trap 21) because it is a different directory, but check before adding any new shot name.
+- **The tour frame's `MaxHeight` is still 320.** The widget is 488 px tall now, so it renders
+  at 221 px wide — legible, but smaller than the July image was. Raising the cap would make
+  the tour window taller, and I could not verify that it still fits a 768-tall laptop.
+- **#208's actual subject is still open.** Chips and alerts land on the wrong monitor under
+  Cosmic/Wayland; the Mobile port sidesteps it for the review surfaces and fixes nothing
+  about the deadline ones. sbaum23 is building locally and testing — the top-window opt-out
+  described in the thread is the piece worth doing and he was asked to say so before going
+  far, so we don't both write it.
+- **`BreakoutKind` still disagrees across the two UIs** (WPF has Watch/Loot/Progress,
+  Avalonia doesn't). Still in `SCRIBE.md`, still unreported, still don't raise it with a
+  poster.
 
 ---
 
-## Item 1 — EQBuddy Mobile does not exist on Linux/macOS
+## Still open from before, unchanged
 
-It is approved, it is scoped below, and it is big enough that it should not be squeezed
-onto the end of something else — which is why it is a session of its own rather than a
-task in another one.
+- **#202 (bjstrange)** — EQBuddy Mobile's loot & watches card rebuilding several times a
+  second in a build that CONTAINS the fingerprint fix. Marked must-fix. Not touched today.
+  Either a second clock reaches that card or the reporter's binary isn't what we think;
+  don't assert either without a quote from the shipped page.
+- **Waiting on reporters — do not chase, do not close.** #218 n3cr0nk1tt3n (does he have an
+  update folder? the fix only bites that path). #221 NeONDaRoO (a verbatim instance-charge
+  log line; if the game doesn't log it, that is the honest answer). #101/#193 (the
+  token-unlock half needs a token-side achievements dump — do NOT implement from one file).
 
-**What was reported:** #208 (sbaum23) — *"I don't see the EQ Mobile option in the Linux
-version. Is there a way to start the mobile version from Linux?"* Scribe filed it as a
-missing checkbox.
-
-**What it actually is — measured, not assumed:** a PORT, not a toggle.
-`src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj` has ProjectReferences to **Core and
-UI.Shared only** — there is no reference to `EQBuddy.Companion` at all. `CompanionEnabled`
-appears nowhere in that project. The host, the pump, the projection feed and the Options
-surface are all absent, so there is no switch to add: the server does not exist in that
-build. sbaum23 is right.
-
-**Why it is worth a whole session:** CLAUDE.md names two things as EQBuddy's only
-uncontested ground — the phone/tablet second screen, and the Linux/macOS build. **Right
-now they cannot be used together.** Every competitor has an overlay and a DPS meter and
-none has a phone; a Linux player is exactly the person most likely to want one.
-
-**What the WPF side does, to port from** (`src/EQBuddy/MainWindow.xaml.cs`): builds a
-`CompanionSources` record (~20 `Func`s — timers, mezzes, buff sets, quests, hops, raids,
-progress, camp lookup), hands it to `CompanionHost`, and ticks `MaybeRefresh` off the
-shared UI tick. The projection itself is already framework-free in `EQBuddy.Companion`, so
-this is wiring plus an Options surface, not new protocol work. Watch for: the single-
-instance port claim (trap 13 — two builds on one profile both wanted the port), and
-`CompanionSources.Raids`/`Progress`, which the Progress theme added on 2026-08-19 and
-which a port written from an older mental model would silently omit.
-
-**Related gap found while measuring, same lane:** `BreakoutKind` is declared twice and the
-two do not agree — `EQBuddy/BreakoutWindow.xaml.cs` has
-`{ Damage, Healing, Pet, Watch, Loot, Buffs, Progress }` and
-`EQBuddy.Avalonia/BreakoutWindow.cs` has `{ Damage, Healing, Pet, Buffs }`. So a
-Linux/macOS player who stars Watch, Loot or Progress while minimized gets nothing where a
-Windows player gets a window. Nobody has reported it; do not raise it with a poster.
+⚠️ **Still to confirm with David:** Frank's closing note on #65 describes the wiki pack's
+Ask 2 (full history, account-wide, no per-session toggle) as *"approved in principle"*. That
+is a reporter summarising, not authorization, and `SCRIBE.md` still has it as his scope call.
+Get his own word first.
 
 ---
 

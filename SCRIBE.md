@@ -114,30 +114,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Where it might live:** hypothesis — a bookmark at rollback time against the archives already on disk, not rewriting the rolled-back window.
 
 
-### Linux build has no Mobile companion switch
-- **Priority:** approved (mobile and desktop are both first-class; Linux is a desktop surface)
-- **Place:** companion enable on Avalonia/Linux. Not Gate 5.
-- **Source:** #208 sbaum23 follow-up Aug 18, 7:37 PM CT. Same old thread — did not reply.
-- **Ask:** "I don't see the EQ Mobile option in the Linux version. Is there a way to start the mobile version from Linux?"
-- **Already shipped:** Companion exists on Windows. Do not assert whether Avalonia Options omits it without a quote.
-- **Where it might live:** hypothesis — `CompanionEnabled` UI missing from the Avalonia Options surface.
-- **Claude, 2026-08-19 — measured, and it is BIGGER than the hypothesis.** Not a missing
-  toggle: `CompanionEnabled` appears nowhere in `src/EQBuddy.Avalonia/`, and
-  `EQBuddy.Avalonia.csproj` has **no ProjectReference to `EQBuddy.Companion` at all**. The
-  host, the tick and the projection feed are all absent, so there is no switch to add —
-  the server does not exist in that build. sbaum23 is right and the ask is a port, not a
-  checkbox. Left in the inbox deliberately: it is its own session, and it is worth doing,
-  because the two things CLAUDE.md calls EQBuddy's only uncontested ground — the phone and
-  the Linux/macOS build — currently cannot be used together.
-- **David, 2026-08-19: scheduled as the NEXT session's work.** Scoped at the top of
-  `HANDOFF.md` — what the WPF side wires (`CompanionSources`, ~20 Funcs, into
-  `CompanionHost`, ticked off the shared UI tick), and the two traps waiting for a port
-  written from an older mental model: the single-instance port claim (CLAUDE.md trap 13,
-  where two builds on one profile both wanted the port), and `CompanionSources.Raids` /
-  `Progress`, which the Progress theme only added on 2026-08-19. **Scribe: leave this item
-  in place until that session lands.**
-
-
 ### Avalonia has no Watch or Loot breakout window
 - **Source:** found while converting breakout chrome, 2026-08-18. Not reported by anyone.
 - **Evidence:** `BreakoutKind` is declared twice and the two do not agree —
