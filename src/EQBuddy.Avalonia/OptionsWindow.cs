@@ -62,6 +62,7 @@ public sealed class OptionsWindow : Window
     private readonly TextBox _buffWarnBox;
     private CheckBox _mezChipsCheck = null!;
     private readonly StackPanel _mezDurationList = new();
+    private readonly TextBlock _breakoutsBlurb = AppTheme.DimText("", new Thickness(0, 0, 0, 2));
     private CheckBox _trackSpawnsCheck = null!;
     private CheckBox _spawnGrowUpCheck = null!;
     private CheckBox _mezGrowUpCheck = null!;
@@ -1565,6 +1566,7 @@ public sealed class OptionsWindow : Window
         BuildCardsEditor();
 
         panel.Children.Add(Heading("Breakout windows", new Thickness(0, 14, 0, 2)));
+        panel.Children.Add(_breakoutsBlurb);
         panel.Children.Add(AppTheme.DimText(
             "Which floating windows may open while minimized (each still needs its ⭐ star — or a 📌 pinned rule for Watch). Unticking one here is the same as its ✕.",
             new Thickness(0, 0, 0, 2)));
@@ -1654,37 +1656,63 @@ public sealed class OptionsWindow : Window
     private void BuildBreakoutChecks()
     {
         _breakoutsPanel.Children.Clear();
+        _breakoutsBlurb.Text = BreakoutPresentation.Blurb;
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
-            var name = kind.ToString();
+            var name = kind.ToString();                 // the DisabledBreakouts key
+            var pk = BreakoutPresentation.Kind(kind);   // the shared table's key
+
+            // Drawn, never an emoji: this is the screen a Wine player opens to find out
+            // why a window will not appear, and ⚔ ⚕ 🐾 are exactly what boxes there
+            // (#148/#166). Two columns rather than a horizontal stack (trap 14).
+            var content = new StackPanel { Orientation = Orientation.Horizontal };
+            content.Children.Add(new Border
+            {
+                Child = AppTheme.Icon(BreakoutPresentation.Icon(pk), AppTheme.DimBrush, 12),
+                Margin = new Thickness(0, 0, 5, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = BreakoutPresentation.Title(pk), FontSize = 12,
+                Foreground = AppTheme.TextBrush, VerticalAlignment = VerticalAlignment.Center,
+            });
+
             var check = new CheckBox
             {
-                IsChecked = !_main.Settings.DisabledBreakouts.Contains(name),
+                IsChecked = IsBreakoutOn(name, pk),
                 Margin = new Thickness(0, 2, 14, 0),
-                Content = new TextBlock
-                {
-                    Text = name switch
-                    {
-                        "Damage" => "⚔ Damage",
-                        "Healing" => "⚕ Healing",
-                        "Pet" => "🐾 Pet",
-                        "Watch" => "🎯 Watch",
-                        _ => "🎒 Loot",
-                    },
-                    FontSize = 12,
-                    Foreground = AppTheme.TextBrush,
-                },
+                Content = content,
             };
+            ToolTip.SetTip(check, BreakoutPresentation.StarKey(pk) is null
+                ? BreakoutPresentation.WatchNote
+                : "Opens while the widget is minimised. Ticking this also stars the stat, "
+                  + "so it shows in the mini pill too.");
             check.IsCheckedChanged += (_, _) =>
             {
                 if (!_ready) return;
-                if (check.IsChecked == true) _main.Settings.DisabledBreakouts.Remove(name);
+                if (check.IsChecked == true)
+                {
+                    _main.Settings.DisabledBreakouts.Remove(name);
+                    // The half that was missing — without it, ticking this box did
+                    // nothing at all and the player had to find a star on a card.
+                    if (BreakoutPresentation.StarKey(pk) is { } star
+                        && !_main.Settings.MiniStats.Contains(star))
+                        _main.Settings.MiniStats.Add(star);
+                }
                 else if (!_main.Settings.DisabledBreakouts.Contains(name))
                     _main.Settings.DisabledBreakouts.Add(name);
                 _vm.Persist();
+                _main.SyncStarsFromSettings();
             };
             _breakoutsPanel.Children.Add(check);
         }
+
+        // Ticked means "this window may open", which needs BOTH halves to be true.
+        bool IsBreakoutOn(string name, string pk) =>
+            !_main.Settings.DisabledBreakouts.Contains(name)
+            && (BreakoutPresentation.StarKey(pk) is not { } star
+                || _main.Settings.MiniStats.Contains(star));
     }
 
     private void UpdateGearImportStatus()

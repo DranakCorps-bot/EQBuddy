@@ -296,7 +296,8 @@ $Shots = [ordered]@{
                                     WindowZooms = @{ options = 0.55 } } }
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
-                           Set = @{ OptionsTab = 'cards' } }
+                           Set = @{ OptionsTab = 'cards'
+                                    WindowZooms = @{ options = 0.55 } } }
     # The quick tour itself, page by page. Its five illustrations went a month out of date
     # showing an app that no longer existed — emoji card icons, a card called "Tracked",
     # no KPI strip — and nothing caught it, because seeing page 4 meant installing the app

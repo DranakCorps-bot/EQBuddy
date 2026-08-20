@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -208,6 +208,18 @@ internal static class AppTheme
 
     public static PathIcon Icon(AppIcon icon, IBrush? brush = null, double size = 14) =>
         CreateIcon(icon, brush ?? DimBrush, size);
+
+    /// <summary>An icon by its <see cref="IconPaths"/> NAME, for the shared tables that
+    /// name their own icons (<see cref="BreakoutPresentation.Icon"/>). The enum covers
+    /// this UI's own chrome; a shared table cannot reach it and should not have to.</summary>
+    public static PathIcon Icon(string iconName, IBrush? brush = null, double size = 14) =>
+        new()
+        {
+            Data = StreamGeometry.Parse(IconPaths.Path(iconName)),
+            Foreground = brush ?? DimBrush,
+            Width = size,
+            Height = size,
+        };
 
     public static TextBlock DimText(string text, Thickness? margin = null) => new()
     {

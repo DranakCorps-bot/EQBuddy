@@ -3243,6 +3243,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         (BreakoutKind.Buffs, "buffs"),
     ];
 
+    /// <summary>Re-read every ★ from settings. Options can now set one — ticking a
+    /// breakout window stars the stat that opens it — and the widget sits behind that
+    /// dialog showing the old state until someone tells it.</summary>
+    internal void SyncStarsFromSettings() => UpdateStarVisuals();
+
     private void UpdateBreakouts(StatsSnapshot snapshot)
     {
         // Avalonia refuses Show(owner) while the owner itself isn't visible — and the
@@ -3251,10 +3256,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // "can't reopen"). The 1-second tick calls back the moment we're actually up.
         // A focus-hide is the exception: then the pass runs solely to HIDE breakouts.
         if (!IsVisible && !_hiddenForFocus) return;
-        foreach (var (kind, star) in BreakoutStars)
+        foreach (var (kind, _) in BreakoutStars)
         {
+            // Which star opens which window comes from UI.Shared, not from the table
+            // below: Options offers a tick box for the same question, and when the two
+            // answered it separately the tick box could not actually turn anything on.
+            var star = BreakoutPresentation.StarKey(BreakoutPresentation.Kind(kind));
             var wanted = _settings.Minimized && !_hiddenForFocus
-                && _settings.MiniStats.Contains(star)
+                && star is not null && _settings.MiniStats.Contains(star)
                 && !_settings.DisabledBreakouts.Contains(kind.ToString())
                 && !_dismissedBreakouts.Contains(kind);
             _breakouts.TryGetValue(kind, out var window);

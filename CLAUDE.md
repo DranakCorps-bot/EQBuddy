@@ -105,6 +105,27 @@ Two machine-local files are gitignored and therefore absent on a fresh clone:
 `tools/` (auto-restored). The `Endpoint` region must match the account's region or
 signing fails with a bare 403.
 
+## When you need a decision from David, ASK — don't bury it in prose
+
+**David, 2026-08-20:** *"if you need guidance or clarification from me as you go, please
+ask me questions directly so I can respond to them there. your outputs in CLI are quite
+long and sometimes I miss where you need clarifications from me or need me to make a
+call."*
+
+Use the **question tool**, which renders as its own prompt he can answer, rather than a
+paragraph in a long message. A question in the middle of a wall of text is a question that
+does not get answered — and the usual result is worse than a delay: work carries on under
+a guess, and the guess is discovered three commits later.
+
+- **Ask at the moment the answer changes what you do next**, not in the summary at the end.
+- **One question, with the real options as choices**, and say which you would pick and why.
+  He is answering about EverQuest and about his players; the technical framing is yours to
+  supply.
+- **A finished piece of work with an open question in it is not finished.** Either ask, or
+  state the assumption plainly at the TOP of the reply where it cannot be missed.
+- This does not mean ask more often. It means the ones worth asking are unmissable, and
+  everything else is a call you make yourself and report.
+
 ## Rules that are not up for renegotiation
 
 - **Never measure other players.** EQBuddy is not a group monitoring tool and never

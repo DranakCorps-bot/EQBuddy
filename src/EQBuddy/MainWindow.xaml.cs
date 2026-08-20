@@ -3319,8 +3319,17 @@ public partial class MainWindow : Window, ICardContext
         yield return ("buffs", StarBuffs);
     }
 
-    /// <summary>The 🐾/⚡ glyphs beside their stars: clicking the glyph must toggle the
-    /// star, not fall through to the section expander (David's live catch, 1.59.0).</summary>
+    /// <summary>Re-read every ★ from settings. Options can now set one — ticking a
+    /// breakout window stars the stat that opens it — and the widget sits behind that
+    /// dialog showing the old state until someone tells it.</summary>
+    internal void SyncStarsFromSettings()
+    {
+        foreach (var (key, star) in StarButtons())
+            star.IsChecked = _settings.MiniStats.Contains(key);
+    }
+
+    /// <summary>The paw/bolt glyphs beside their stars: clicking the glyph must toggle
+    /// the star, not fall through to the section expander (David's live catch, 1.59.0).</summary>
     private void OnStarGlyphClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
@@ -3376,21 +3385,15 @@ public partial class MainWindow : Window, ICardContext
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
             var want = _settings.Minimized && !_hiddenForFocus &&
-                       !_settings.DisabledBreakouts.Contains(kind.ToString()) && kind switch
-                       {
-                           BreakoutKind.Damage => _settings.MiniStats.Contains("dps"),
-                           BreakoutKind.Healing => _settings.MiniStats.Contains("hps"),
-                           BreakoutKind.Pet => _settings.MiniStats.Contains("pet"),
-                           BreakoutKind.Loot => _settings.MiniStats.Contains("loot"),
-                           // The Progress card's star is the xp one — same key gates
-                           // its chip, so star + minimize opens this like the others.
-                           BreakoutKind.Progress => _settings.MiniStats.Contains("xp"),
-                           // "buffs" never renders a mini chip (MiniStatOrder skips
-                           // it) — the Buffs card's star gates this window alone.
-                           BreakoutKind.Buffs => _settings.MiniStats.Contains("buffs"),
-                           _ => _settings.PinWatchChips &&
-                                _settings.TrackedRules.Any(r => r.Enabled && r.Pinned),
-                       };
+                       !_settings.DisabledBreakouts.Contains(kind.ToString())
+                       // Which star opens which window comes from UI.Shared, not from a
+                       // switch here. It was a switch here, and Options grew a tick box
+                       // for the same question that could not answer it — so a player
+                       // ticking "Pet" changed nothing and went to ask on Reddit.
+                       && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(kind)) is { } star
+                           ? _settings.MiniStats.Contains(star)
+                           : _settings.PinWatchChips
+                             && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
             _breakouts.TryGetValue(kind, out var w);
             if (want)
             {

@@ -217,6 +217,10 @@ guards below are the deliverable and not a nicety.
 | **The sound picker offers every format the OS plays**, from one list both UIs compose their own picker from (#197) | **Auto** — `AlertSoundPlanTests` |
 | **A watch-rule sort strip offers the same four options in both UIs, and the stored default lights one of them** — a key spelled differently in one lane would paint a strip with nothing selected | **Auto** — `SortStripTests` |
 | **The fight-side chip stack tells its three kinds apart by VECTOR** — a spawn stopwatch, a mez crescent, a slow hourglass — not by an emoji that renders as a box under Wine | **Auto** — `ChipStackTests`, `WidgetRenderTests` |
+| **Ticking a breakout window in Options turns it ON** — it stars the stat that opens it, instead of only clearing the ✕-dismissal while the real switch sat unadvertised on a card (the recurring "how do I get the pet damage window" question) | **Auto** — `OptionsRenderTests`; **Shot** — `shoot.ps1 -Shot options-cards` |
+| The box reports whether the window would actually OPEN, not merely whether it was dismissed | **Auto** — `OptionsRenderTests` |
+| Unticking stops the window and leaves the star, so a mini-pill cell never vanishes as a side effect | **Auto** — `OptionsRenderTests` |
+| **Which star opens which window is one table in UI.Shared**, read by both widgets' gates AND by Options — the two answered it separately, which is how a tick box came to exist that could not turn anything on | **Auto** — `OptionsRenderTests` |
 | A captured surface is reviewed as a real render, on a seeded session, over a plain backdrop | **Manual** — `pwsh scripts/shoot.ps1` |
 | A single card BODY can be photographed without opening every card: `EQBUDDY_EXPAND` takes card keys (`EQBUDDY_EXPAND=loot`) as well as `1` | **Manual** — `pwsh scripts/shoot.ps1 -Shot loot-card` |
 | **A card whose body only exists once there is DATA is staged, not shot empty** — the Watch strip needs two rules, the Raids rows need a clear | **Manual** — `pwsh scripts/shoot.ps1 -Shot tracked-card,raids-card` |

@@ -386,8 +386,8 @@
             <StackPanel x:Name="CardsPanel"/>
             <TextBlock Text="Breakout windows" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
-            <TextBlock Text="Which floating windows may open while minimized (each still needs its ⭐ star — or a 📌 pinned rule for Watch). Unticking one here is the same as its ✕."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
+            <TextBlock x:Name="BreakoutsBlurb" Style="{StaticResource Dim}"
+                       TextWrapping="Wrap" Margin="0,0,0,2"/>
             <WrapPanel x:Name="BreakoutsPanel"/>
 
             <CheckBox x:Name="DoubleClickChipsCheck" Margin="0,10,0,0"

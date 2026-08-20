@@ -53,7 +53,9 @@ public partial class OptionsWindow : Window
         SpawnGrowUpCheck.IsChecked = _vm.SpawnChipsGrowUp;
         MezGrowUpCheck.IsChecked = _vm.MezChipsGrowUp;
         MezChipsCheck.IsChecked = _main.Settings.MezChipsEnabled;
-        BuildMezDurations();
+        _mezDurations = new MezDurationsView(
+            MezDurationList, MezDurationsBlurb, _main.MezTracker, _main.MezDurations);
+        _mezDurations.Render();
         DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
         SlowAlertCheck.IsChecked = _main.Settings.SlowAlertEnabled;
         SlowSpokenCheck.IsChecked = _main.Settings.SlowAlertSpoken;
@@ -540,48 +542,89 @@ public partial class OptionsWindow : Window
         if (_ready) _vm.HideWhenGameNotRunning = HideNotRunningCheck.IsChecked == true;
     }
 
-    /// <summary>One checkbox per breakout kind — the re-enable path for a window that was
-    /// ✕-closed (discussion #45: the star should keep its chip without forcing the
-    /// window).</summary>
+    /// <summary>
+    /// One checkbox per breakout kind, and ticking one now actually TURNS IT ON.
+    ///
+    /// It used to only clear the ✕-dismissal (discussion #45), while the switch that
+    /// decides whether the window ever opens was the ★ on a card — so someone who came
+    /// here, found "🐾 Pet", ticked it and saw nothing had to go and ask. That question
+    /// kept coming back on Reddit (David, 2026-08-20), and the answer was always "yes,
+    /// but also star it somewhere else", which is a tick box that lies.
+    ///
+    /// Unticking is deliberately NOT symmetric: it stops the window and leaves the star
+    /// alone. For every kind but Buffs that same key is also a cell in the minimised
+    /// pill, and quietly removing someone's pill cell because they closed a window would
+    /// be a second silent surprise in the opposite direction.
+    /// </summary>
     private void BuildBreakoutChecks()
     {
         BreakoutsPanel.Children.Clear();
+        BreakoutsBlurb.Text = BreakoutPresentation.Blurb;
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
-            var name = kind.ToString();
+            var name = kind.ToString();               // the DisabledBreakouts key
+            var pk = BreakoutPresentation.Kind(kind);   // the shared table's key
+            var label = new System.Windows.Controls.TextBlock
+            {
+                Text = BreakoutPresentation.Title(pk), FontSize = 12,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            label.SetResourceReference(
+                System.Windows.Controls.TextBlock.ForegroundProperty, "TextBrush");
+
+            // Two columns, never a horizontal StackPanel (trap 14) — and drawn, never an
+            // emoji, since this is the screen a Wine player opens to find out why a
+            // window will not appear (#148/#166).
+            var content = new System.Windows.Controls.StackPanel
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal,
+            };
+            content.Children.Add(new EqIcon
+            {
+                Glyph = BreakoutPresentation.Icon(pk), Size = 12,
+                Margin = new Thickness(0, 0, 5, 0),
+            });
+            content.Children.Add(label);
+
             var check = new System.Windows.Controls.CheckBox
             {
-                IsChecked = !_main.Settings.DisabledBreakouts.Contains(name),
+                IsChecked = IsBreakoutOn(name),
                 Margin = new Thickness(0, 2, 14, 0),
-                Content = new System.Windows.Controls.TextBlock
-                {
-                    Text = kind switch
-                    {
-                        BreakoutKind.Damage => "⚔ Damage",
-                        BreakoutKind.Healing => "⚕ Healing",
-                        BreakoutKind.Pet => "🐾 Pet",
-                        BreakoutKind.Watch => "🎯 Watch",
-                        BreakoutKind.Buffs => "⏳ Buff set",
-                        BreakoutKind.Progress => "📈 Progress",
-                        _ => "🎒 Loot",
-                    },
-                    FontSize = 12,
-                },
+                Content = content,
+                ToolTip = BreakoutPresentation.StarKey(pk) is null
+                    ? BreakoutPresentation.WatchNote
+                    : "Opens while the widget is minimised. Ticking this also stars the "
+                      + "stat, so it shows in the mini pill too.",
             };
-            ((System.Windows.Controls.TextBlock)check.Content).SetResourceReference(
-                System.Windows.Controls.TextBlock.ForegroundProperty, "TextBrush");
             check.Checked += (_, _) => SetBreakout(name, enabled: true);
             check.Unchecked += (_, _) => SetBreakout(name, enabled: false);
             BreakoutsPanel.Children.Add(check);
         }
 
+        // Ticked means "this window may open", which needs BOTH halves to be true.
+        bool IsBreakoutOn(string name) =>
+            !_main.Settings.DisabledBreakouts.Contains(name)
+            && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is not { } star
+                || _main.Settings.MiniStats.Contains(star));
+
         void SetBreakout(string name, bool enabled)
         {
             if (!_ready) return;
-            if (enabled) _main.Settings.DisabledBreakouts.Remove(name);
+            if (enabled)
+            {
+                _main.Settings.DisabledBreakouts.Remove(name);
+                // The half that was missing. Watch has no star to set — it opens for a
+                // pinned rule, which is the player's pick to make.
+                if (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is { } star
+                    && !_main.Settings.MiniStats.Contains(star))
+                    _main.Settings.MiniStats.Add(star);
+            }
             else if (!_main.Settings.DisabledBreakouts.Contains(name))
                 _main.Settings.DisabledBreakouts.Add(name);
             _vm.Persist();
+            // The card's own ★ is the same setting seen from the other side; if the
+            // widget is open behind Options it must not go on showing the old one.
+            _main.SyncStarsFromSettings();
         }
     }
 
@@ -1617,76 +1660,9 @@ public partial class OptionsWindow : Window
         if (e.ChangedButton == MouseButton.Left) DragMove();
     }
 
-    /// <summary>
-    /// The mez-duration rows: spell, an editable duration, and one line saying where the
-    /// number came from. Rows come from <see cref="MezDurationRows"/> so this window and
-    /// the Avalonia one cannot come to different words about the precedence (#210's rule).
-    /// </summary>
-    private void BuildMezDurations()
-    {
-        MezDurationsBlurb.Text = MezDurationRows.Blurb;
-        var panel = new StackPanel();
-        foreach (var row in MezDurationRows.Build(_main.MezTracker))
-        {
-            var grid = new Grid { Margin = new Thickness(0, 6, 0, 0) };
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-            // Two columns, never a horizontal StackPanel: a stack measures with infinite
-            // width in the stacking direction, so a long spell name would be CLIPPED
-            // against the box with no ellipsis to say so (trap 14).
-            var name = new TextBlock
-            {
-                Text = row.Spell, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
-                TextTrimming = TextTrimming.CharacterEllipsis, ToolTip = row.SourceNote,
-            };
-            name.SetResourceReference(TextBlock.ForegroundProperty,
-                row.Source == MezDurationSource.Typed ? "AccentBrush" : "TextBrush");
-            grid.Children.Add(name);
-
-            var box = new TextBox
-            {
-                Text = row.DurationText, Width = 76, FontSize = 12, Tag = row.Spell,
-                HorizontalContentAlignment = HorizontalAlignment.Right,
-                ToolTip = "A bare number here is SECONDS — \"44\" is 44 seconds, because "
-                        + "mezzes are short. Clear the box to hand this spell back to EQBuddy.",
-            };
-            box.LostFocus += OnMezDurationCommitted;
-            box.KeyDown += OnMezDurationKey;
-            Grid.SetColumn(box, 1);
-            grid.Children.Add(box);
-            panel.Children.Add(grid);
-
-            var note = new TextBlock
-            {
-                Text = row.SourceNote, FontSize = 11, TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(0, 1, 0, 0),
-            };
-            note.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-            panel.Children.Add(note);
-        }
-        MezDurationList.Content = panel;
-    }
-
-    private void OnMezDurationKey(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Enter) CommitMezDuration(sender as TextBox);
-    }
-
-    private void OnMezDurationCommitted(object sender, RoutedEventArgs e) =>
-        CommitMezDuration(sender as TextBox);
-
-    /// <summary>A typed duration lands on commit, like every other editor here. An empty
-    /// box CLEARS it — the spell goes back to whatever EQBuddy has learned since, or the
-    /// catalog. Rebuilding is what re-labels the row and its source line.</summary>
-    private void CommitMezDuration(TextBox? box)
-    {
-        if (box is not { Tag: string spell }) return;
-        var typed = MezDurationText.Parse(box.Text);
-        if (typed == _main.MezDurations.Find(spell)) return;   // nothing moved; don't churn the file
-        _main.MezDurations.Set(spell, typed);
-        BuildMezDurations();
-    }
+    /// <summary>The mez-duration editor, lifted into its own file — OptionsWindow is a
+    /// ratchet hotspot and that surface touches nothing else in this window.</summary>
+    private MezDurationsView? _mezDurations;
 
     private void OnSecondScreen(object sender, RoutedEventArgs e) => _main.OpenCompanionWindow();
 

@@ -209,6 +209,67 @@ public class OptionsRenderTests : IDisposable
         main.Close();
     }
 
+    /// <summary>
+    /// Ticking a breakout window in Options actually TURNS IT ON.
+    ///
+    /// It used to only clear the ✕-dismissal, while the switch that decides whether the
+    /// window ever opens was a ★ on a card — so someone who came here, found the pet row,
+    /// ticked it and saw nothing had to go and ask, repeatedly, on Reddit (relayed by
+    /// David, 2026-08-20). A tick box that needs a second, unadvertised step is the
+    /// "silent no-ops are broken" rule with the switch on the other side.
+    /// </summary>
+    [AvaloniaFact]
+    public void TickingABreakoutWindowStarsTheStatThatOpensIt()
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Settings.OptionsTab = "cards";
+        main.Settings.MiniStats.Remove("pet");
+        var options = new OptionsWindow(main);
+        options.Show();
+
+        var pet = options.GetVisualDescendants().OfType<CheckBox>()
+            .Single(c => c.Content is StackPanel sp
+                && sp.Children.OfType<TextBlock>().Any(t => t.Text == "Pet damage"));
+        Assert.False(pet.IsChecked);          // not starred, so not on — and it SAYS so
+
+        pet.IsChecked = true;
+        Assert.Contains("pet", main.Settings.MiniStats);
+        Assert.DoesNotContain("Pet", main.Settings.DisabledBreakouts);
+
+        // Unticking stops the window and LEAVES the star: that same key is a cell in the
+        // minimised pill, and quietly removing someone's pill cell because they closed a
+        // window would be a second surprise in the opposite direction.
+        pet.IsChecked = false;
+        Assert.Contains("Pet", main.Settings.DisabledBreakouts);
+        Assert.Contains("pet", main.Settings.MiniStats);
+
+        options.Close();
+        main.Close();
+    }
+
+    /// <summary>A row whose stat is already starred opens ticked — the box reports the
+    /// real state rather than only whether it has been dismissed.</summary>
+    [AvaloniaFact]
+    public void ABreakoutRowReportsWhetherItWouldActuallyOpen()
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Settings.OptionsTab = "cards";
+        if (!main.Settings.MiniStats.Contains("pet")) main.Settings.MiniStats.Add("pet");
+        main.Settings.DisabledBreakouts.Remove("Pet");
+        var options = new OptionsWindow(main);
+        options.Show();
+
+        var pet = options.GetVisualDescendants().OfType<CheckBox>()
+            .Single(c => c.Content is StackPanel sp
+                && sp.Children.OfType<TextBlock>().Any(t => t.Text == "Pet damage"));
+        Assert.True(pet.IsChecked);
+
+        options.Close();
+        main.Close();
+    }
+
     /// <summary>Commit a duration box the way a player does. LostFocus carries
     /// FocusChangedEventArgs and cannot be synthesised from a bare RoutedEventArgs, so
     /// this drives the OTHER commit path the editor offers — which is a real user path,

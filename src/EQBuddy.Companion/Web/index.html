@@ -464,6 +464,45 @@ const TICKING = { spawns: 1, mez: 1, session: 1, map: 1 };
 // the PC's own change detection. A value in here still RENDERS; it just cannot be the
 // reason a panel is torn down and rebuilt (#202). `catalog` is here for a different
 // reason: 1,200 quests stringified once a second was the page's biggest single cost.
+// ?debug=1 — a repaint log, on screen, for a card that will not sit still.
+//
+// #202 (bjstrange) is a loot card rebuilding several times a second on a page that is
+// provably current, and two confident diagnoses from here have now been wrong: the gate
+// holds still against the payload the PC sends, and nothing withholds a loot section
+// mid-push. What is missing is not another theory, it is HIS data — and the page is the
+// only thing standing where the problem happens.
+//
+// So it counts repaints per section and shows what actually differed between the old key
+// and the new one. A screenshot of that names the field, and the field names the bug.
+// Query string, not the fragment: the pairing token lives in the fragment and must not
+// have to be retyped to turn this on.
+const DEBUG = /(?:^|[?&])debug=1(?:&|$)/.test(location.search);
+const debugCounts = {};
+let debugBox = null;
+function noteRepaint(name, before, after) {
+  debugCounts[name] = (debugCounts[name] || 0) + 1;
+  if (!debugBox) {
+    debugBox = el("div");
+    debugBox.style.cssText = "position:fixed;left:0;right:0;bottom:0;z-index:9999;"
+      + "max-height:38vh;overflow:auto;background:#000c;color:#0f0;font:11px/1.35 monospace;"
+      + "padding:6px;white-space:pre-wrap;word-break:break-all";
+    document.body.appendChild(debugBox);
+  }
+  // Where the two keys first differ, with a little either side — enough to read the
+  // field name without dumping a whole payload onto a phone screen.
+  let at = 0;
+  const a = before == null ? "" : before, b = after == null ? "" : after;
+  while (at < a.length && at < b.length && a[at] === b[at]) at++;
+  const from = Math.max(0, at - 40);
+  const tally = Object.keys(debugCounts).sort()
+    .map(k => k + " x" + debugCounts[k]).join("   ");
+  debugBox.textContent = tally
+    + "\n\nlast repaint: " + name
+    + (before == null ? "  (first paint)" : "")
+    + "\n  was: ..." + a.slice(from, at + 60)
+    + "\n  now: ..." + b.slice(from, at + 60);
+}
+
 const DRIFT_KEYS = new Set(["perHour", "perActiveHour", "catalog"]);
 const DRIFTS = (k, v) => (DRIFT_KEYS.has(k) ? undefined : v);
 // The picks a device starts with, before anyone touches the ⚙. Measured against the
@@ -748,6 +787,7 @@ function boot() {
       // affected because it is the only non-TICKING surface carrying a drifting number.
       const key = refused ? "gated" : data ? JSON.stringify(data, DRIFTS) : JSON.stringify(data);
       if (!TICKING[name] && painted[name] === key) continue;
+      if (DEBUG && !TICKING[name]) noteRepaint(name, painted[name], key);
       painted[name] = key;
       p.head.textContent = "";
       if (refused) {
