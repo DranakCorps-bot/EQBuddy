@@ -554,6 +554,7 @@ function boot() {
       if (msg.kind === "heartbeat") { refreshStale(); return; }
       if (msg.kind === "notice") { notice(msg.text); return; }
       if (msg.kind !== "snapshot" || msg.protocol !== PROTOCOL) return;
+      if (msg.identity && staleAfterUpdate(msg.identity.appVersion)) return;
       // Sticky sections: the server sends theme and map geometry once and then stops.
       // Carry forward what it withheld so the page never blanks between pushes.
       if (!msg.theme && latest && latest.theme) msg.theme = latest.theme;
@@ -626,6 +627,43 @@ function boot() {
   // Every write the tablet makes gets an answer, including "nothing changed" — the PC
   // composes the sentence, so the phone and the desktop status bar say the same thing.
   let noticeTimer = 0;
+  // ---------- a page kept open across a PC update ----------
+  //
+  // THIS PAGE NEVER RE-FETCHES ITSELF. The socket reconnects forever with backoff, so
+  // updating EQBuddy on the PC restarts the server, the phone reconnects — and goes on
+  // running the JAVASCRIPT it downloaded whenever the tab was first opened. `no-store`
+  // does not help: nothing ever asks for the HTML again.
+  //
+  // That is not an edge case, it is how this feature is meant to be used — propped on a
+  // desk, added to the Home Screen, left alone for days. And it makes a whole class of
+  // bug unkillable from the PC side: a page-side fix ships, the player updates, the
+  // symptom continues, and both sides are looking at different code while comparing
+  // version numbers that agree. Suspected in #202 (bjstrange), where the repaint-gate
+  // fix is provably present in the build he named and the card still churned for him.
+  //
+  // The envelope already carries the PC's version; it was only ever printed in the
+  // footer. Now a change from the version this page booted with reloads it once.
+  let bootVersion = null;
+  const RELOADED_FOR = "eqb-reloaded-for";
+  function staleAfterUpdate(version) {
+    if (!version) return false;
+    if (bootVersion === null) { bootVersion = version; return false; }
+    if (version === bootVersion) return false;
+    // Reload ONCE per server version. If we come back still mismatched — a cache we
+    // cannot see, a proxy, a Home Screen snapshot — say so instead of reloading in a
+    // loop, which would be a worse bug than the one being fixed.
+    let already = null;
+    try { already = sessionStorage.getItem(RELOADED_FOR); } catch {}
+    if (already === version) {
+      notice("EQBuddy updated to " + version + " — close and reopen this page to finish.");
+      bootVersion = version;   // stop asking on every push
+      return false;
+    }
+    try { sessionStorage.setItem(RELOADED_FOR, version); } catch {}
+    location.reload();
+    return true;   // this snapshot belongs to the next page, not this one
+  }
+
   function notice(text) {
     if (!text) return;
     const el = $("notice");

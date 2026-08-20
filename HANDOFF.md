@@ -1,7 +1,7 @@
 ﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (31) and the
+the non-negotiable rules, the where-things-live index, the trap list (32) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
@@ -86,10 +86,33 @@ stale because seeing page 4 meant installing the app and clicking Next three tim
 
 ## Still open from before, unchanged
 
-- **#202 (bjstrange)** — EQBuddy Mobile's loot & watches card rebuilding several times a
-  second in a build that CONTAINS the fingerprint fix. Marked must-fix. Not touched today.
-  Either a second clock reaches that card or the reporter's binary isn't what we think;
-  don't assert either without a quote from the shipped page.
+### 3. #202 (bjstrange) — the page could never have received the fix
+
+Looked at it with the room left over, and the handoff's own framing was the thing to test:
+*"either a second clock reaches that card or the reporter's binary isn't what we think."*
+Neither. **The fix is genuinely in `v1.94.1`** (`fcdc412` is an ancestor of the tag), the
+exclusion list is keyed for the camelCase the wire actually uses, and the gate lifted
+verbatim out of the shipped page holds still against a real loot payload when only the
+rates move and still repaints on an actual drop.
+
+**The page never re-fetches itself.** The socket reconnects forever, so updating EQBuddy
+restarts the server and the phone reconnects — still running the JavaScript it downloaded
+when the tab was first opened. `no-store` is irrelevant; nothing asks for the HTML again.
+His PC had the fix; his page almost certainly did not, and both were reporting 1.94.1.
+**Trap 32**, and it would have quietly explained every future page-side fix the same way.
+
+`identity.appVersion` was already in every envelope and only ever printed in the footer.
+The page now reloads itself once when it changes, and records what it reloaded FOR so a
+cache it cannot see becomes a message instead of a loop. Verified by running the guard
+under node — reloads exactly once, never loops, ignores a missing version — and
+`CompanionPageUpdateTests` fails against the old page.
+
+⚠️ **This is a diagnosis, not a confirmation.** Nobody has reproduced bjstrange's card
+churning with a page that is definitely current. **Ask him what the FOOTER on his device
+says** — not what version his PC is on — and whether a hard refresh changes anything. If
+it churns on a page whose footer reads 1.96.2, the cause is something else and this fix is
+still worth having. He has not been replied to yet: I would rather ask that one question
+than announce a fix for a symptom I cannot see.
 - **Waiting on reporters — do not chase, do not close.** #218 n3cr0nk1tt3n (does he have an
   update folder? the fix only bites that path). #221 NeONDaRoO (a verbatim instance-charge
   log line; if the game doesn't log it, that is the honest answer). #101/#193 (the

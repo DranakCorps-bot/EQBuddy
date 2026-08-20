@@ -103,6 +103,8 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | An edit made on a device appears on the PC map (via the ledger's `Revision`) | **Auto** — `CompanionCurationTests` |
 | The page's fade constants match `TrailFade` | **Auto** — pinned by reading the shipped page |
 | Theme reaches the page for every `var(--x)` it uses | **Auto** — `CompanionThemeTests` |
+| **A page left open across a PC update reloads itself once** — it never re-fetches otherwise, so the phone would run the JavaScript it downloaded when the tab was opened while both sides report the same version | **Auto** — `CompanionPageUpdateTests` |
+| A reload that does not take says so rather than looping | **Auto** — `CompanionPageUpdateTests` |
 | The widget's Quests card shows, opens the Quest Tracker, and keeps both checklists' counts on screen | **Auto** — `EndToEndTests` (EQBUDDY_EXPAND) |
 | The old `sky`/`epic` card keys fold onto `quests`, keeping position; hidden only if BOTH were hidden | **Auto** — `OptionsViewModelTests` |
 | **The widget's Progress card shows, opens the Progress window, and keeps all five folded headers' numbers on one line** — the PROGRESS THEME (docs/Themes.md) | **Auto** — `EndToEndTests` |

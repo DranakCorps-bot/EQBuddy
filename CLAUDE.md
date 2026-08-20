@@ -522,6 +522,24 @@ Read this list before touching the areas it names. Every entry cost a release.
     entire output is a picture of whatever global state it found.** `WidgetSheetTests`
     calls `AppTheme.Apply` before it shoots.
 
+32. **The EQBuddy Mobile page NEVER re-fetches itself, so a page-side fix does not reach
+    an open phone.** The socket reconnects forever with backoff; updating the PC restarts
+    the server, the phone reconnects, and the browser goes on executing the JavaScript it
+    downloaded when the tab was first opened — possibly weeks earlier. `Cache-Control:
+    no-store` does nothing, because nothing ever asks for the HTML again. And this is the
+    NORMAL way the feature is used: propped on a desk, added to the Home Screen, left alone.
+    → **A page-side fix ships, the player updates, the symptom continues, and both sides
+    compare version numbers that AGREE while running different code.** That is the leading
+    suspect in #202, where the repaint-gate fix is provably in the build bjstrange named
+    (verified: the commit is an ancestor of `v1.94.1`, the exclusion list is keyed for the
+    camelCase the wire actually uses, and the gate holds still against a real loot payload
+    when only the rates move) and his card still churned.
+    → **Now guarded:** the envelope's `identity.appVersion` was only ever printed in the
+    footer; the page compares it to the version it booted with and reloads once, recording
+    what it reloaded FOR so a cache it cannot see becomes a message rather than a loop
+    (`CompanionPageUpdateTests`). **Before diagnosing any page-side report, ask what the
+    footer on THEIR device says** — not what version their PC is on.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
