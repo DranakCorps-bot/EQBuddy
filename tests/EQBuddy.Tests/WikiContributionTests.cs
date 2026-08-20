@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 
@@ -111,7 +111,19 @@ public class WikiContributionTests
         // #65 round four (Frankthetankk): the edit summary is summary-field-sized,
         // the itemized detail lives in the log reference, dated — a session can
         // span midnight, so a bare clock time is ambiguous.
-        Assert.Contains("Suggested edit summary: EQBuddy-observed drops (1 item, 12 kills).", text);
+        Assert.Contains("Suggested edit summary: observed drops (1 item, 12 kills).", text);
+        // The SUMMARY LINE does not name EQBuddy (#217 ask 4, approved 2026-08-19): the
+        // edit goes up under the player's account, so it describes what they observed
+        // rather than advertising the tool. Pinned because "put the name back" is an easy
+        // accident.
+        //
+        // Scoped to that line on purpose. The pack's own header — "EQBuddy → eqlwiki
+        // contribution pack — <who>" — SHOULD say it: that is the app titling a document
+        // for the person reading it, not text going onto someone else's wiki. Asserting
+        // the whole pack has no "EQBuddy" in it fails on the header, and the distinction
+        // between "what we paste" and "what we show" is the whole point of the ask.
+        var summaryLine = text.Split('\n').Single(l => l.StartsWith("Suggested edit summary:"));
+        Assert.DoesNotContain("EQBuddy", summaryLine);
         Assert.Contains("Log reference (for your own records, not the wiki) — Sat Aug 8 2026:", text);
         Assert.Contains("Black Heart ×5 in 12 kills (41.7%) — last at 13:03:12", text);
         // …and the item page's dropsfrom list gets its own edit link and paste line.

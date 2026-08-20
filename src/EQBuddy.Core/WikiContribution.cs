@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 
 namespace EQBuddy.Core;
 
@@ -192,7 +192,14 @@ public static class WikiContribution
         // Summary-field-sized summary (#65 round four, Frankthetankk: the itemized
         // list was "much longer than what a summary field is meant to hold") — the
         // detail lives in the log reference below instead.
-        sb.AppendLine("Suggested edit summary: EQBuddy-observed drops " +
+        //
+        // It does NOT name EQBuddy (#217 ask 4, Frankthetankk; David approved 2026-08-19).
+        // This is the one string the app puts into text a player pastes onto someone
+        // else's wiki, under their account and their name — the edit is theirs, and the
+        // summary should describe what they observed rather than advertise the tool that
+        // helped them read their log. Anyone who wants to credit EQBuddy can still say so;
+        // the point is that it is their choice to make, in their own words.
+        sb.AppendLine("Suggested edit summary: observed drops " +
             $"({news.Count} item{(news.Count == 1 ? "" : "s")}, {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")}).");
         sb.AppendLine();
         // Full itemization + last-seen LOG TIMES WITH DATES (a session can span
