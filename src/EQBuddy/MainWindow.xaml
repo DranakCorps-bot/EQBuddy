@@ -1,4 +1,4 @@
-<Window x:Class="EQBuddy.MainWindow"
+﻿<Window x:Class="EQBuddy.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:EQBuddy"
@@ -524,24 +524,11 @@
                         <TextBlock x:Name="GearHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0/0"/>
                     </Grid>
                 </Expander.Header>
-                <StackPanel>
-                    <CheckBox x:Name="GearByZoneCheck"
-                              Margin="{DynamicResource ListBlock}"
-                              Checked="OnGearByZoneToggled"
-                              Unchecked="OnGearByZoneToggled"
-                              Content="Group by farm zone"
-                              FontSize="{DynamicResource FontMetadata}"
-                              Foreground="{DynamicResource DimBrush}"/>
-                    <TextBlock x:Name="GearListName" Style="{StaticResource Dim}"
-                               TextWrapping="Wrap" Margin="{DynamicResource ListBlock}"/>
-                    <ScrollViewer MaxHeight="320"
-                                  VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled"
-                                  PanningMode="VerticalOnly"
-                                  Padding="{DynamicResource GapXs}">
-                        <ItemsControl x:Name="GearChecklistList"/>
-                    </ScrollViewer>
-                </StackPanel>
+                <!-- The body is GearCardView's, built in code: the Loot & Items theme
+                     puts this same card in a window as well as here, and a UIElement has
+                     one parent — so each host gets its own instance. No Visibility and no
+                     Margin here; the lifted control carries both (trap 15). -->
+                <ContentControl x:Name="GearBody"/>
             </Expander>
 
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">

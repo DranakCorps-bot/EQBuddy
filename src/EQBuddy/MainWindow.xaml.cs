@@ -128,6 +128,7 @@ public partial class MainWindow : Window, ICardContext
         _loot = new LootCardView(this, _settings);
         LootBody.Content = _loot.Body;
         KillsBody.Content = _kills.Body;
+        GearBody.Content = Gear.Body;
         _unlocks = new LevelUnlockMemo(
             s => BuffSetClassSource(s).Classes,
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
@@ -135,7 +136,6 @@ public partial class MainWindow : Window, ICardContext
         TrackedBody.Content = _watch.Body;
 
         BuildSortStrips();
-        GearByZoneCheck.IsChecked = _settings.GearGroupByZone;
         // Before the watcher's startup replay, so already-logged charms classify with
         // everything learned in earlier sessions (issue #29).
         AttachSpellStore();
@@ -2510,6 +2510,7 @@ public partial class MainWindow : Window, ICardContext
         if (GearSection.IsExpanded && _gearChecklistDirty)
         {
             Gear.Render();
+            UpdateGearBadge();
             _gearChecklistDirty = false;
         }
 
@@ -2585,12 +2586,12 @@ public partial class MainWindow : Window, ICardContext
                     // with rows and the headings are half of what the by-zone pivot is
                     // for — a lift that kept every item and lost the headings would leave
                     // this count unchanged if it counted items alone.
-                    $"gearRows={GearChecklistList.Items.Count} " +
+                    $"gearRows={Gear.DebugRowCount} " +
                     $"gearTotal={_settings.GearChecklist.Count} " +
                     $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
                     $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
-                    $"gearPivotShown={(GearByZoneCheck.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"gearListNameLen={GearListName.Text.Length} " +
+                    $"gearPivotShown={(Gear.DebugPivotShown ? 1 : 0)} " +
+                    $"gearListNameLen={Gear.DebugListNameLength} " +
                     $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
                     // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
                     // but only a launched app can show that its answer actually reaches
@@ -2690,7 +2691,7 @@ public partial class MainWindow : Window, ICardContext
         _settings.GearChecklistName = import.Name;
         _settings.Save();
         _gearChecklistDirty = true;
-        Gear.UpdateHeaderOnly();
+        UpdateGearBadge();
         RefreshUi();
     }
 
@@ -2700,30 +2701,35 @@ public partial class MainWindow : Window, ICardContext
         _settings.GearChecklistName = "";
         _settings.Save();
         _gearChecklistDirty = true;
-        Gear.UpdateHeaderOnly();
+        UpdateGearBadge();
         RefreshUi();
     }
 
     /// <summary>The Gear card, lifted into <see cref="GearCardView"/> for the Loot &amp;
     /// Items theme. Built here because it needs the widget's zone and hop lookup, and
     /// nothing else in this file needs it back.</summary>
-    private GearCardView Gear => _gear ??= new GearCardView(
-        _settings, GearChecklistList, GearListName, GearByZoneCheck, GearHeader,
+    private GearCardView Gear => _gear ??= NewGearCard();
+
+    private GearCardView? _gear;
+
+    /// <summary>A fresh Gear card. The Loot &amp; Items theme's window wants one too, and
+    /// a UIElement has one parent — so each host builds its own rather than sharing an
+    /// instance that would be torn out of whichever drew it last.</summary>
+    internal GearCardView NewGearCard() => new(
+        _settings,
         () => CurrentZoneName,
         (from, to) => ZoneGraph.Distance(from, to)?.Hops,
         () => _gearChecklistDirty = true,
         FindResource);
 
-    private GearCardView? _gear;
-
-    private void OnGearByZoneToggled(object sender, RoutedEventArgs e) =>
-        Gear.SetGroupByZone(GearByZoneCheck.IsChecked == true,
-            GearSection.IsExpanded, () => _gearChecklistDirty = false);
+    /// <summary>The card header's badge, from the shared theme so the widget and the
+    /// theme window's tab cannot come to different numbers.</summary>
+    private void UpdateGearBadge() => GearHeader.Text = Gear.Badge;
 
     private void UpdateGearChecklist(StatsSnapshot s)
     {
         var changed = AutoCheckGearLoot(s);
-        Gear.UpdateHeaderOnly();
+        UpdateGearBadge();
         if (changed)
         {
             _gearChecklistDirty = true;   // rebuild next tick: checked box, list-name count
@@ -4056,7 +4062,7 @@ public partial class MainWindow : Window, ICardContext
         {
             _gearChecklistDirty = true;
             _settings.Save();
-            Gear.UpdateHeaderOnly();
+            UpdateGearBadge();
         }
     }
 

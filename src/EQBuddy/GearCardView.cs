@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
@@ -26,43 +26,84 @@ namespace EQBuddy;
 /// own".</item>
 /// </list>
 /// </summary>
-internal sealed class GearCardView
+internal sealed class GearCardView : IWidgetCard
 {
     private readonly AppSettings _settings;
-    private readonly ItemsControl _list;
-    private readonly TextBlock _listName;
-    private readonly CheckBox _byZone;
-    private readonly TextBlock _header;
     private readonly Func<string> _currentZone;
     private readonly Func<string, string, int?> _hops;
     private readonly Action _markDirty;
     private readonly Func<string, object> _brush;
 
+    // Built here, not handed in. A card that takes its host's controls can only ever
+    // live in one host — and this one has to live in two, because the Loot & Items
+    // theme puts it in a window as well as on the widget. A UIElement has one parent,
+    // so each host gets its OWN instance (MainWindow.NewProgressSurfaces' rule).
+    private readonly ItemsControl _list = new();
+    private readonly TextBlock _listName;
+    private readonly CheckBox _byZone;
+
+    public string Key => LootSurface.KeyFor(LootTab.Gear);
+    public UIElement Body { get; }
+
     public GearCardView(
         AppSettings settings,
-        ItemsControl list, TextBlock listName, CheckBox byZone, TextBlock header,
         Func<string> currentZone, Func<string, string, int?> hops,
         Action markDirty, Func<string, object> brush)
     {
         _settings = settings;
-        _list = list;
-        _listName = listName;
-        _byZone = byZone;
-        _header = header;
         _currentZone = currentZone;
         _hops = hops;
         _markDirty = markDirty;
         _brush = brush;
+
+        _byZone = new CheckBox
+        {
+            Content = "Group by farm zone",
+            Margin = (Thickness)_brush("ListBlock"),
+            FontSize = Tok.Spec(Tok.TypeRole.Metadata).Size,
+            Foreground = (Brush)_brush("DimBrush"),
+            IsChecked = settings.GearGroupByZone,
+        };
+        _byZone.Checked += (_, _) => SetGroupByZone(true);
+        _byZone.Unchecked += (_, _) => SetGroupByZone(false);
+
+        _listName = new TextBlock
+        {
+            FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+            Foreground = (Brush)_brush("DimBrush"),
+            TextWrapping = TextWrapping.Wrap,
+            Margin = (Thickness)_brush("ListBlock"),
+        };
+
+        var panel = new StackPanel();
+        panel.Children.Add(_byZone);
+        panel.Children.Add(_listName);
+        panel.Children.Add(new ScrollViewer
+        {
+            MaxHeight = 320,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            PanningMode = PanningMode.VerticalOnly,
+            Padding = new Thickness(Tok.SpaceXs),
+            Content = _list,
+        });
+        Body = panel;
     }
 
-    /// <summary>Just the header's "3/12" — cheap enough for every tick, and the one part
-    /// that must stay true while the card is collapsed.</summary>
-    public void UpdateHeaderOnly()
-    {
-        var total = _settings.GearChecklist.Count;
-        var acquired = _settings.GearChecklist.Count(i => i.Acquired);
-        _header.Text = $"{acquired}/{total}";
-    }
+    // The E2E dump's window into this card. The WPF layer has no unit tests, so a
+    // launched app asserting these is the only coverage the surface has — and they were
+    // written against the widget's own controls before the lift, which is exactly why
+    // they still read the same numbers now that the controls live here.
+    internal int DebugRowCount => _list.Items.Count;
+    internal bool DebugPivotShown => _byZone.Visibility == Visibility.Visible;
+    internal int DebugListNameLength => _listName.Text.Length;
+
+    /// <summary>The card's header badge — "3/12", or an em dash with nothing imported.
+    /// The STRING comes from <see cref="LootTheme"/>, because the widget's card header and
+    /// the theme window's tab badge must not be two different answers (#210).</summary>
+    public string Badge => LootTheme.Gear(_settings.GearChecklist);
+
+    public void Render(StatsSnapshot snapshot) => Render();
 
     public void Render()
     {
@@ -74,7 +115,6 @@ internal sealed class GearCardView
         {
             _listName.Text = "Import an EQ Legends Tools shopping-list HTML in Options.";
             _list.Items.Add(Dim("No gear list imported."));
-            UpdateHeaderOnly();
             return;
         }
 
@@ -83,8 +123,6 @@ internal sealed class GearCardView
 
         if (_settings.GearGroupByZone) RenderByZone();
         else RenderByKind();
-
-        UpdateHeaderOnly();
     }
 
     /// <summary>Gear, then Exaltations. It was called <c>RenderGearBySlot</c> and grouped
@@ -195,7 +233,7 @@ internal sealed class GearCardView
     {
         item.Acquired = acquired;
         _settings.Save();
-        UpdateHeaderOnly();
+        _markDirty();          // the host repaints its own header from Badge
         _listName.Text = GearChecklistPresentation.ListName(
             _settings.GearChecklistName, _settings.GearChecklist);
         // The zone view excludes acquired rows and repeats a multi-zone item under each
@@ -203,15 +241,16 @@ internal sealed class GearCardView
         if (_settings.GearGroupByZone) _markDirty();
     }
 
-    /// <summary>The by-zone toggle. Repaints now when the card is open, and otherwise
-    /// leaves a note for the next tick — rebuilding a collapsed list is work nobody can
-    /// see.</summary>
-    public void SetGroupByZone(bool value, bool cardIsOpen, Action clearDirty)
+    /// <summary>The by-zone toggle, owned by the card now that the checkbox is its own.
+    /// Repaints immediately: the control that changed is inside this body, so the body is
+    /// on screen by definition — the old "is the card open" question belonged to the
+    /// widget, which was asking on behalf of a checkbox it did not own.</summary>
+    private void SetGroupByZone(bool value)
     {
         if (_settings.GearGroupByZone == value) return;
         _settings.GearGroupByZone = value;
         _settings.Save();
-        if (cardIsOpen) { Render(); clearDirty(); }
-        else _markDirty();
+        Render();
+        _markDirty();
     }
 }
