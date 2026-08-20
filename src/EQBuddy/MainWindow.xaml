@@ -178,10 +178,27 @@
                            Foreground="{DynamicResource GoodBrush}" FontWeight="SemiBold"/>
             </Border>
 
-            <!-- Session line -->
+            <!-- Session line.
+                 TWO COLUMNS, and it has to be. These were both children of a Grid with no
+                 ColumnDefinitions, so they shared one cell — zone left, session right —
+                 and a long zone name drew straight THROUGH the session text: "The Plane
+                 of Fear 4 (Refine[sed]sion 0:11 · active 11m". Not clipped, not
+                 ellipsized, overprinted, because nothing ever told the zone where the
+                 other text starts. Trap 14's family: the fix is a real column, and the
+                 trimming only works once there is one.
+                 Spotted in a screenshot attached to #219 about something else entirely;
+                 nobody has ever reported it. The Avalonia twin has had the two-column
+                 grid all along (MainWindow.cs BuildSessionLine) — this is the Windows
+                 side catching up, not a new idea. -->
             <Grid Margin="{DynamicResource KpiRow}">
-                <TextBlock x:Name="ZoneText" Style="{StaticResource Dim}" Text="—"/>
-                <TextBlock x:Name="SessionText" Style="{StaticResource Dim}" HorizontalAlignment="Right" Text="session 0:00"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="ZoneText" Style="{StaticResource Dim}" Text="—"
+                           TextTrimming="CharacterEllipsis"/>
+                <TextBlock x:Name="SessionText" Grid.Column="1" Style="{StaticResource Dim}"
+                           HorizontalAlignment="Right" Text="session 0:00"/>
             </Grid>
 
             <!-- KPI strip (2026-08-11 modernization): the headline numbers before any

@@ -1947,8 +1947,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // the glance survives the fold even though the five slots do not. Assembled in
         // UI.Shared so this build, the WPF widget and EQBuddy Mobile say the same thing
         // (#210: parity by shared module, never by feature list).
-        _progressHeader.Text = ProgressTheme.LauncherSummary(
-            s, DingUnlocks(s).Count, _raidLedger.DefeatedCount());
+        _progressHeader.Text = ProgressTheme.LauncherSummary(s);
         _miscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
     }
 

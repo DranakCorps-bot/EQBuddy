@@ -1,4 +1,15 @@
-[
+﻿[
+ {
+  "version": "1.96.1",
+  "date": "2026-08-19",
+  "highlights": [
+   "FIXED (discussion #219, thanks typical-usual-chaos) - MOTES/HOUR IS BACK ON THE WIDGET. Yesterday's Progress card consolidation folded the Motes card into the Progress window, and the rate went with it - it survived only inside the Wealth tab, two clicks away, and Options no longer listed Motes so there was no way to put it back. You were right, and it was the one number on that card worth glancing at: the Progress card now reads \"16.0% xp - 5p 1g 4s 8c - 0.9 motes/hr\" whenever motes are dropping, and the Wealth tab's own label carries the count and the rate together.",
+   "The Progress card's line now carries what MOVES while you play - xp, coin, and the mote rate. The faction tally and the lifetime raid count moved off it and onto their own tabs, which is where they were already shown. That is what makes room for the rate without the line running off the edge of the card.",
+   "FIXED - a long zone name used to print straight through the session timer. \"The Plane of Fear 4 (Refined)\" and \"session 0:11 - active 11m\" were drawn on top of each other instead of the zone name shortening with an ellipsis. It has been that way for a long time and nobody reported it; it turned up in a screenshot attached to something else.",
+   "FIXED (discussion #218, thanks n3cr0nk1tt3n) - UPDATING NOW GOES STRAIGHT TO THE NEWEST BUILD. If you use the shared family folder and it was running a release behind, EQBuddy would install from it and only then notice a newer release on GitHub - so you updated, restarted, and were offered another. It now asks both sources every time and takes the highest, while still preferring the local file when the two are level so there is no download to wait for.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+  ]
+ },
  {
   "version": "1.96.0",
   "date": "2026-08-19",

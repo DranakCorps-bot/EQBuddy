@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
@@ -142,10 +142,18 @@ public static class UpdateChecker
         var folder = FindUpdateFolder(configuredFolder);
         var local = folder is null ? null : Check(folder);
 
-        // A local folder holding a genuine update is the cheapest possible install: take it
-        // and skip the network entirely, which is the point of the family/LAN channel.
-        if (local is not null && IsNewer(local)) return local;
-
+        // BOTH sources, always. This used to short-circuit — "if the local folder holds
+        // anything newer than what is installed, take it and skip the network" — which is
+        // the same veto the paragraph above says was removed, just narrower: local only had
+        // to beat the INSTALLED build, not the published one. A folder sitting one release
+        // behind therefore hid every release after it, one hop at a time, and the player
+        // updated, relaunched, and was offered another (#218, n3cr0nk1tt3n: "I have to
+        // update multiple times when starting up a session because it did not update to
+        // the most modern build").
+        //
+        // The family/LAN channel loses nothing. PickBest still gives local the tie, so an
+        // equally-new file on disk is still installed without a download — and the check
+        // that now always runs is a small API probe with a short timeout, not the 45 MB.
         return PickBest(local, await CheckGitHubAsync());
     }
 

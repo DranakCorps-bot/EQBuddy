@@ -2380,8 +2380,7 @@ public partial class MainWindow : Window, ICardContext
         // it, which is the whole bargain of the fold: the glance survives, the five slots
         // do not. Assembled in UI.Shared so the Avalonia widget and EQBuddy Mobile say the
         // same thing (#210 — parity by shared module, never by feature list).
-        ProgressHeader.Text = ProgressTheme.LauncherSummary(
-            s, ProgressDingUnlocks(s).Count, _raidLedger.DefeatedCount());
+        ProgressHeader.Text = ProgressTheme.LauncherSummary(s);
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
 

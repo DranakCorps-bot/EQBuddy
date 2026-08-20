@@ -1,4 +1,4 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>
 /// The four progress surfaces, in the order every UI shows them — the Progress THEME
@@ -113,15 +113,30 @@ public static class ProgressSurface
     /// card's "Epic 0/486 · Sky 0/222": carry the numbers those headers carried, so the
     /// glance they answered still works without opening anything.
     ///
-    /// XP leads because it is the one that moves every fight. A part that has nothing to
-    /// say is omitted rather than printed as a zero — five zeros would be noise on a fresh
-    /// character, which is exactly who is looking at a fresh widget.</summary>
+    /// **The line carries what MOVES WHILE YOU PLAY, and the tab badges carry the rest.**
+    /// XP leads because it changes every fight; coin and the mote rate change every drop.
+    /// Faction and raid clears are review-time facts — they still badge their own tabs,
+    /// which is one click and no scrolling. That split is not a width trick, it is what a
+    /// glance is FOR, and it was learned the hard way twice in one day: first the line was
+    /// long enough to truncate mid-word, then it was trimmed by dropping the mote rate —
+    /// and #219 (typical-usual-chaos) arrived within the hour saying motes/hr "was the
+    /// most useful stat and the main reason I opened EQBuddy". A summary that replaces
+    /// five card headers gets to choose WHICH numbers, not to quietly lose one.
+    ///
+    /// A part that has nothing to say is omitted rather than printed as a zero — five
+    /// zeros would be noise on a fresh character, which is exactly who is looking at a
+    /// fresh widget. That is also what keeps this line short for the players who are not
+    /// farming motes.</summary>
     public static string LauncherSummary(
-        string? xp = null, string? coin = null, int factions = 0, int raidsCleared = 0)
+        string? xp = null, string? coin = null, int factions = 0, int raidsCleared = 0,
+        string? motes = null)
     {
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(xp)) parts.Add(xp!);
         if (!string.IsNullOrWhiteSpace(coin)) parts.Add(coin!);
+        // Straight after coin: motes ARE currency in Legends, and a farmer watches the
+        // rate the way everyone else watches xp/hr.
+        if (!string.IsNullOrWhiteSpace(motes)) parts.Add(motes!);
         if (factions > 0) parts.Add($"{factions} faction{(factions == 1 ? "" : "s")}");
         if (raidsCleared > 0) parts.Add($"{raidsCleared} raid{(raidsCleared == 1 ? "" : "s")}");
         return parts.Count > 0 ? string.Join(" · ", parts) : "no progress yet";

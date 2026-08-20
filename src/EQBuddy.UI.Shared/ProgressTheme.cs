@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -34,10 +34,21 @@ public static class ProgressTheme
     public static string Wealth(StatsSnapshot s)
     {
         var coin = StatsSnapshot.FormatCoin(s.Copper);
+        return MoteRate(s) is { } motes ? $"{coin} · {motes}" : coin;
+    }
+
+    /// <summary>The mote headline: count AND rate, the two halves the Motes card's own
+    /// header carried ("3 · 0.9/hr"). Null when nothing has dropped.
+    ///
+    /// The RATE is the point and it is the half that went missing in 1.96.0 — #219
+    /// (typical-usual-chaos): "Where'd motes/hour go? That was the most useful stat and
+    /// the main reason I opened EQBuddy." A farmer is measuring a camp against the clock,
+    /// so a running total answers a different question than the one being asked.</summary>
+    public static string? MoteRate(StatsSnapshot s)
+    {
         var motes = Motes.Summarize(s.Loot, s.Elapsed);
-        return motes.Total > 0
-            ? $"{coin} · {motes.Total} mote{(motes.Total == 1 ? "" : "s")}"
-            : coin;
+        if (motes.Total <= 0) return null;
+        return $"{motes.Total} mote{(motes.Total == 1 ? "" : "s")} · {motes.PerHour:0.#}/hr";
     }
 
     /// <summary>The Faction badge — the Faction card's own header, with the plural fixed.
@@ -70,23 +81,30 @@ public static class ProgressTheme
     /// <summary>The launcher card's one line — the line that has to justify replacing
     /// five card headers with one. Delegates the assembly (and the "omit a part that has
     /// nothing to say" rule) to <see cref="ProgressSurface.LauncherSummary"/>, which is
-    /// unit-tested in Core; this only decides which numbers go in.</summary>
+    /// unit-tested in Core; this only decides which numbers go in.
+    /// </summary>
     /// <remarks>
-    /// The parts here are SHORTER than the tab badges they come from, and that was found
-    /// by looking at the card rather than by reasoning about it: the first version passed
-    /// <see cref="Experience"/> and <see cref="Wealth"/> straight through and the widget
-    /// rendered "16.0% xp, +1 aa · 5p 1g 4s 8c · 1 mot…" — clipped mid-word, with the
-    /// faction count lost off the end entirely. A summary that replaces five card headers
-    /// and then truncates has not kept the glance; it has just hidden the loss.
+    /// **It carries what MOVES WHILE YOU PLAY: xp, coin, and the mote rate.** Faction and
+    /// raid clears are review-time facts and badge their own tabs instead — one click,
+    /// no scrolling.
     ///
-    /// So the launcher takes the headline of each part and the TABS carry the detail: the
-    /// AA and level counts belong to Experience's badge, the mote count to Wealth's. Four
-    /// short parts fit the widget's width; four full ones do not.
+    /// That rule was arrived at twice, both times by looking at the card rather than
+    /// reasoning about it. Passing the tab badges through verbatim rendered
+    /// "16.0% xp, +1 aa · 5p 1g 4s 8c · 1 mot…" — clipped mid-word, faction lost off the
+    /// end. Trimming each part to a headline then fitted, but the part dropped to make it
+    /// fit was the mote rate, and #219 (typical-usual-chaos) arrived within the hour of
+    /// 1.96.0: "Where'd motes/hour go? That was the most useful stat and the main reason I
+    /// opened EQBuddy."
+    ///
+    /// So the line is chosen by what changes while you are playing, not by what happens to
+    /// fit. A lifetime raid count and a faction TALLY ("5 factions" names neither which nor
+    /// how much) are the two weakest things that were on it; the mote rate is why a farmer
+    /// has the widget open at all.
     /// </remarks>
-    public static string LauncherSummary(StatsSnapshot s, int dingUnlocks, int raidsDefeated) =>
+    public static string LauncherSummary(StatsSnapshot s) =>
         ProgressSurface.LauncherSummary(
             xp: $"{s.XpPercent:0.0}% xp",
             coin: StatsSnapshot.FormatCoin(s.Copper),
-            factions: s.Faction.Count,
-            raidsCleared: raidsDefeated);
+            motes: Motes.Summarize(s.Loot, s.Elapsed) is { Total: > 0 } m
+                ? $"{m.PerHour:0.#} motes/hr" : null);
 }

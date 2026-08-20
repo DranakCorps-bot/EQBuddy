@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
@@ -23,7 +23,17 @@ public class UpdateCheckerTests : IDisposable
     /// <summary>The bug this exists to prevent: a synced-but-stale local installer is a
     /// perfectly good answer, just not a new one. It used to stop the GitHub feed from being
     /// consulted at all, so a family member whose OneDrive hadn't caught up never heard about
-    /// the release — and a restart didn't help, because startup took the same path.</summary>
+    /// the release — and a restart didn't help, because startup took the same path.
+    ///
+    /// **And it went on shipping while this test was green (#218).** The rule was right and
+    /// asserted here; the CALLER never reached it. <c>FindBestAsync</c> kept an early
+    /// return — "if local beats what is INSTALLED, take it and skip the network" — which is
+    /// the same veto one level up, narrower and therefore harder to see: local only had to
+    /// beat the installed build, not the published one, so a folder one release behind hid
+    /// every release after it and the player updated a hop at a time.
+    ///
+    /// Worth remembering as a shape: a decision function can be correct, and tested, and
+    /// bypassed. When a rule matters, ask who is allowed NOT to call it.</summary>
     [Fact]
     public void AStaleLocalFolderDoesNotHideANewerRelease() =>
         Assert.Equal(new Version(1, 15, 0), UpdateChecker.PickBest(Local(14), Web(15))!.Latest);

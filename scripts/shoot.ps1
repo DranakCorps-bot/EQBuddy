@@ -50,6 +50,16 @@ if ($Out -eq '') { $Out = Join-Path $repo 'docs/screenshots' }
 $Shots = [ordered]@{
     'widget-cards'    = @{ Title = 'EQBuddy'; Env = @{}; Set = @{} }
     'widget-expanded' = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = '1' }; Set = @{} }
+    # The title area with a LONG zone name. The zone and the session line shared one grid
+    # cell with no columns, so a long name overprinted the session text rather than
+    # trimming — "The Plane of Fear 4 (Refine[sed]sion 0:11 · active 11m". Found in a
+    # screenshot attached to #219, which was about something else; nobody reported it.
+    # The fixture's own zones ("West Commonlands") are far too short to show it, which is
+    # exactly why it survived every capture this repo has taken.
+    'long-zone'       = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           Append = @('You have entered The Plane of Fear 4 (Refined).')
+                           Set = @{} }
     # One card, opened by name: a card's expanded state is not persisted, so a body can
     # only be photographed through this hook. EQBUDDY_EXPAND takes a comma-separated list
     # of the same keys SectionMap uses.
