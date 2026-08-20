@@ -8,6 +8,27 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## Overnight, 2026-08-19 → 20: one fix landed, nothing else moved
+
+**#193/#101 — a token-unlocked class no longer imports as quested.** wizen posted the
+three-way control set that had been missing since 2026-08-11, and it is in
+`AchievementsImportTests` verbatim. There are TWO ways to get a class unlock without
+questing and each announces itself with a different completed criterion — `will
+autocomplete…` for a confirmed primary, `can be bypassed using a … Token` for a token.
+1.57.3 shipped only the first, so #101 read as fixed while wizen's #193 symptom continued;
+**both were true at once.** Verified the new test fails against the old guard before
+claiming it catches anything.
+
+**Rolled into 1.96.2**, which is still prepared-not-released. Nothing else arrived: #65 was
+closed by Frank himself.
+
+⚠️ **One thing to confirm with David before acting on it:** Frank's closing note on #65
+describes the wiki pack's Ask 2 (full history, account-wide, no per-session toggle) as
+*"approved in principle"*. I have **not** treated that as authorization — it is a reporter
+summarising, and `SCRIBE.md` still has it as David's scope call. Get his own word first.
+
+---
+
 ## START HERE — the next session has TWO items, both scoped below
 
 David, 2026-08-19, on both: *"note this for the next handoff prompt so we can start it
