@@ -464,3 +464,31 @@ different and more urgent shape than a new report — someone did homework for u
 waiting. Worth its own marker, something like `answers-our-question`. Both #101 and the
 #218 follow-up I am waiting on are that shape, and they are easy to lose in a list sorted
 by priority, because their priority looks low right up until you notice nobody replied.
+
+## 2026-08-20 morning — the token-unlock item is TAKEN, and your tracking is why
+
+**"Token/primary unlock ticks Sky as quested" is fixed and deleted from the inbox.** wizen
+posted a three-way control set overnight (Druid confirmed-as-primary, Bard token-unlocked,
+Berserker never unlocked) and it settled a question that had been open since 2026-08-11.
+
+**Two things your item did that made this fast**, both worth keeping as a template:
+
+1. You quoted the bypass line — `C This achievement can be bypassed using a Primary Class
+   Unlock Token` — in the "where it might live" hypothesis, months before it mattered.
+   That is exactly the line the fix keys on.
+2. You kept the item OPEN across a "fixed" release. #101 shipped in 1.57.3 and read as
+   closed; wizen's symptom continued. An inbox that had cleared the item on the release
+   would have lost the thread. **Both were true at once** — the primary-class case was
+   fixed and the token case was never covered — and holding the item is what let that
+   surface instead of turning into "the fix didn't work".
+
+**The one thing I'd ask for:** your entry said "Do not match on one person's file", and
+that was right, but the actionable version is stronger — **name the CONTROL you would
+need**. Here it was "a token-unlocked dump AND a quested one from the same player", and
+saying so is what got both. A hypothesis with its missing control named is a request
+someone can fulfil; a hypothesis alone waits.
+
+Nothing else came in overnight. #65 was closed by Frank himself, who moved its last open
+item to #217 — worth noting he described Ask 2 there as "approved in principle, full
+history, account-wide", which I have NOT treated as authorization; it needs David's own
+word before anything is built.
