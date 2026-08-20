@@ -450,6 +450,122 @@ public class SpawnTimerTests
         finally { File.Delete(path); }
     }
 
+    // ---- instances are copies, not the same zone later (David, 2026-08-20) ----
+
+    /// <summary>David's own sequence: log out beside the camp, log back in at D0 where
+    /// the named is up, kill it, take a private instance and run to the spawn point -
+    /// where it is up again, because the instance was built that moment. Killing it
+    /// there used to "measure" a twelve-minute respawn.
+    ///
+    /// A gap across an instance change is not a loose upper bound like a trip to the
+    /// bank. It is NO bound: the mob never respawned, a different copy of it was
+    /// standing there. Every instance of a zone shares one timer key, which is what let
+    /// the two kills look like one cycle.</summary>
+    [Fact]
+    public void AKillInANewInstanceNeverMeasuresACycleAgainstTheOldOne()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk - Solo"));            // D0
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(5), "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new KillEvent(T0.AddMinutes(12), "froglok ghoul lord", "You"));
+
+        // Nothing learned - and nothing to learn FROM, because the old copy's countdown
+        // went with the old copy.
+        Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
+        var timer = Assert.Single(t.Snapshot(T0.AddMinutes(13)));
+        Assert.Equal(T0.AddMinutes(12), timer.KilledAt);
+        Assert.Equal(1620, timer.DurationSeconds);      // the catalog's, untouched
+    }
+
+    /// <summary>Taking an instance throws away the countdown it invalidates, rather than
+    /// leaving a chip insisting "not for another fifteen minutes" while the player looks
+    /// straight at the spawn point.</summary>
+    [Fact]
+    public void EnteringADifferentInstanceDropsThatZonesCountdowns()
+    {
+        var t = Tracker();
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));                   // open world
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        Assert.Single(t.Snapshot(T0.AddMinutes(1)));
+
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "The Ruins of Old Guk 4 (Refined)"));
+        Assert.Empty(t.Snapshot(T0.AddMinutes(3)));
+    }
+
+    /// <summary>...but only that zone's. A countdown running somewhere else is no
+    /// business of a Guk instance.</summary>
+    [Fact]
+    public void TakingAnInstanceLeavesOtherZonesCountdownsAlone()
+    {
+        var t = Tracker();
+        t.Apply(new ZoneEvent(T0, "Permafrost Keep"));
+        t.Apply(new KillEvent(T0, "Lady Vox", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(1), "The Ruins of Old Guk 2 (Adaptive)"));
+
+        var timer = Assert.Single(t.Snapshot(T0.AddMinutes(2)));
+        Assert.Equal("Permafrost Keep", timer.Zone);
+    }
+
+    /// <summary>A trip out of an OPEN-WORLD zone and back is not an instance change -
+    /// there is only one copy of the open world - so its countdown survives and its gap
+    /// still teaches. This is the case the instance rule must not swallow.</summary>
+    [Fact]
+    public void AnOpenWorldRoundTripKeepsItsCountdownAndStillLearns()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Permafrost Keep"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(15), "The Ruins of Old Guk"));
+        Assert.Single(t.Snapshot(T0.AddMinutes(16)));
+
+        t.Apply(new KillEvent(T0.AddMinutes(20), "froglok ghoul lord", "You"));
+        Assert.Equal(1200, overrides.Find("Lower Guk", "a froglok ghoul lord")!.RespawnSeconds);
+    }
+
+    /// <summary>Re-entering the SAME tier is not evidence either way - it may be the
+    /// instance you kept or a fresh one, and the zone line does not say. The countdown
+    /// is left alone, because throwing away a camp timer on a guess is the expensive
+    /// mistake; the LEARNING is refused, because inventing a cycle is the dangerous one.
+    /// That asymmetry is the whole rule: cost a measurement, never a camp.</summary>
+    [Fact]
+    public void ReEnteringTheSameTierKeepsTheCountdownButRefusesToLearn()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen 2 (Adaptive)"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(4), "The Ruins of Old Guk 2 (Adaptive)"));
+
+        Assert.Single(t.Snapshot(T0.AddMinutes(5)));     // still counting
+        t.Apply(new KillEvent(T0.AddMinutes(10), "froglok ghoul lord", "You"));
+        Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
+    }
+
+    /// <summary>A sighting in a fresh instance still completes the chip - the creature
+    /// really is up where the player is standing, and the alert is the point - but it
+    /// teaches nothing, because it is a different copy from the one that died.</summary>
+    [Fact]
+    public void ASightingAcrossAnInstanceChangeCompletesTheChipButNeverLearns()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));          // 1620s clock
+        // Same tier, so the countdown survives the trip (see above).
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen 2 (Adaptive)"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(4), "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new DamageDealtEvent(T0.AddSeconds(1500), "froglok ghoul lord", 30,
+            DamageKind.Melee, "Slash", false));
+
+        Assert.True(Assert.Single(t.Snapshot(T0.AddSeconds(1501))).IsDue(T0.AddSeconds(1501)));
+        Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
+    }
+
     // ---- named the catalog lists with NO respawn (2026-08-20) ----
 
     /// <summary>The 126 shipped named whose respawn is blank in a zone with no default.

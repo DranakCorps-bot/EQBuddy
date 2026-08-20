@@ -63,6 +63,21 @@ varies, and a player who was in the kitchen. No statistic over gaps can tell tho
 retained sightings can. Today `LearnFromSighting` applies the value and discards the
 event.
 
+**Instances are copies, and a gap across one is not evidence** (David, 2026-08-20 — shipped
+in the fix before this design, not deferred to it). Every instance of a zone shares one
+timer key, so killing a named in D0 and again in a fresh private instance used to measure
+a respawn that never happened. This is a different failure from the loose-bound one above:
+a cross-stay gap in the open world is TRUE and merely weak, while a cross-instance gap is
+not a bound in either direction. Taking an instance now drops that zone's countdowns, and
+learning refuses any gap it cannot prove stayed inside one copy of the zone.
+
+**What the log cannot say, and what we do about it.** The zone line states the difficulty,
+so D0 → D2 is proof of a different instance. Re-entering the SAME difficulty is not proof
+either way — it may be the instance you kept or a fresh one. There the countdown is kept
+and the LEARNING is refused, which is the asymmetry the whole subsystem runs on: **cost a
+measurement, never a camp.** If it turns out that instance membership is always lost on
+zoning out, that case can be tightened to a clear; see the open question below.
+
 **Camp-specific learning: no** (concluded from the code, 2026-08-20). `CampFor` only pins
 a camp when a `/loc` landed within `CampLocWindow` (3 minutes) of the kill. Players type
 `/loc` rarely, so most observations would carry no camp and fall straight back to today's
@@ -105,7 +120,16 @@ malformed overrides file does: lose the evidence, never the player's edits.
 - A variable spawn can be shown as the range it is instead of a single number that is
   wrong in a different way every cycle.
 
-## Open question for David
+## Open questions for David
+
+**Does an instance survive zoning out while you stay logged in?** If you are camping in a
+D2 Guk, step out to the adjacent zone and come straight back, is it the same D2 — or a new
+one? The zone line looks identical either way, so EQBuddy cannot tell. Today that case
+keeps the countdown and refuses to learn from it. If the answer is "always a new one", the
+countdown should be cleared there too and the rule gets simpler; if it is "the same one
+while you are online", today's behaviour is exactly right and should stay.
+
+
 
 `ZoneShare.Export` currently exports any timer with a value, **including one you imported
 from someone else and never verified**. That makes shared knowledge self-reinforcing

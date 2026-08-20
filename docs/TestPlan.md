@@ -83,6 +83,10 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | **Where nothing has ever said how long a cycle is, both kills must fall in ONE continuous stay in the zone** — a cross-stay gap is a true upper bound but there it BECOMES the countdown, so "back five hours later" would print a confident five-hour timer | **Auto** — `SpawnTimerTests` |
 | ...and that rule is deliberately NOT applied where a duration already exists: there `gap < duration` already keeps a loose bound harmless, and refusing it would discard real evidence | **Auto** — `SpawnTimerTests` |
 | A timer recovered from the persist file anchors no first measurement — it carries no stay, and no evidence must never read as agreement | **Auto** — `SpawnTimerTests` |
+| **A gap that crosses an INSTANCE change teaches nothing** — every instance of a zone shares one timer key, so "kill it in D0, take a private instance, kill it again" is two copies of the mob and not a respawn at all | **Auto** — `SpawnTimerTests` |
+| Taking an instance drops that zone's countdowns — and only that zone's — rather than counting down for a copy of the world the player has left | **Auto** — `SpawnTimerTests` |
+| Re-entering the SAME difficulty keeps the countdown but refuses to learn across it: the zone line cannot say whether it is the same instance, so it costs a measurement rather than a camp | **Auto** — `SpawnTimerTests` |
+| A sighting across an instance change still completes the chip (the creature IS up where the player stands) and still teaches nothing | **Auto** — `SpawnTimerTests` |
 | **An imported timer is recorded as someone else's number**, your own kills replace it, and it cannot smuggle in a stale `Sighted` flag | **Auto** — `ZoneShareTests` |
 | A manual ▶ start always replaces a running timer, even backdated | **Auto** — `SpawnTimerTests` |
 | A timer coming due during a tick gap (sleep, throttling) still shows DUE for a full linger on the next look — within a 1-hour revival cap | **Auto** — `SpawnTimerTests` |
