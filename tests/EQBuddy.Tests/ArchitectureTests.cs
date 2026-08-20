@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -98,7 +98,10 @@ public class ArchitectureTests
         // NewProgressSurfaces, SetMiniStat — because that is where this file already keeps
         // every satellite's launcher. Consolidating cards buys much less headroom than
         // lifting one does; the surfaces move, the doors to them stay.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4324),
+        // 4,324 → 4,214 on 2026-08-20: the Gear card body lifted into GearCardView.cs
+        // for the Loot & Items theme. Lowered in the same commit as the lift, or the
+        // room quietly refills — which is the whole contract above.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4214),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

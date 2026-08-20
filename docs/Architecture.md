@@ -109,11 +109,19 @@ is the worked example on that side).
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,324 | 4,324 | 4,756 | 432 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,214 | 4,635 | 421 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,604 | 1,702 | 98 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,670 | 1,702 | 32 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,291 | 5,639 | 348 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,455 | 5,639 | 184 |
+
+Re-measured 2026-08-20. The WPF widget came down 110 lines when the Gear card body was
+lifted into `GearCardView.cs` for the Loot &amp; Items theme, and its baseline came down
+with it in the same commit — an unlowered baseline is refilled headroom, which is the one
+way this table stops meaning anything. `OptionsWindow` is the tight one now: it took the
+mez-duration editor and the breakout rewrite this week, and the editor was lifted straight
+back out into `MezDurationsView.cs` when it crossed the line rather than the baseline being
+raised to fit it.
 
 **A theme fold buys much less headroom than a lift does, and the 2026-08-19 Progress
 theme is the measurement.** The WPF widget came down 31 lines — `RenderRaids` left for
