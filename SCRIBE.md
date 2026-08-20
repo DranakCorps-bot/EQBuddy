@@ -53,7 +53,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Checked:** not grepped this run. Hypothesis, unchecked -- data source is the single-card layout scroll container, not the refresh handler (it works once a second card is on).
 
 ### Mobile "New at level" lists quest-filter classes, not the class in play
-- **Priority:** waiting (David's call: live character class vs Quest Tracker class selection). Helm asking David 2026-08-20; not authorized.
+- **Priority:** waiting (David's call: live character class vs Quest Tracker class selection). Helm asked 2026-08-20; David skipped the prompt. Not authorized. Do not ping.
 - **Place:** Mobile Progress card. Phone surface.
 - **Source:** #223 bjstrange Aug 20, 10:59 AM CT. Replied 2026-08-20 (Scribe).
 - **Ask:** "New at level xx" on Mobile Progress should list unlocks for the class currently being played, not the classes selected on the Quest Tracker.
