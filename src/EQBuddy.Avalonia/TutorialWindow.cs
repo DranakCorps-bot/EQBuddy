@@ -39,15 +39,15 @@ public sealed class TutorialWindow : Window
             "never grow forever.\n\n" +
             "If you keep your logs because you run GINA or GamParse, or upload them to another " +
             "parser, turn that off below. Cleanup never runs while the game, GINA, or GamParse " +
-            "is open. You can change this any time in ⚙ Options.",
+            "is open. You can change this any time in Options.",
             null, TruncationChoice: true),
 
         new("The widget",
             "An always-on-top stack of cards that follows whoever is playing. Most cards open " +
             "downward when you click them; a few have an ↗ instead, and those open a full " +
             "window — there is more to say than a card can hold. Drag anywhere to move it. " +
-            "The dot is green while the log is live. ↻ restarts the session count; " +
-            "– minimizes to the mini pill; ⚙ opens Options.",
+            "The dot is green while the log is live. The round arrow restarts the session " +
+            "count, the dash minimizes to the mini pill, and the gear opens Options.",
             "t-widget.png"),
 
         // Added 2026-08-19 with the Progress theme, in the same change as the WPF twin.
@@ -60,7 +60,7 @@ public sealed class TutorialWindow : Window
             "Faction, and Raids.\n\n" +
             "Both replaced several smaller cards, so if you are looking for one that used to " +
             "be on the widget — Money, Motes, Faction, Raids, Sky Quest, Epics — it is a tab " +
-            "inside one of these now. ⚙ Options → Cards & windows names which, under the " +
+            "inside one of these now. Options → Cards & windows names which, under the " +
             "card that absorbed it.\n\n" +
             "The card's own line still carries the numbers worth glancing at while you play, " +
             "so you only open the window when you actually want to read something.",
@@ -70,23 +70,26 @@ public sealed class TutorialWindow : Window
             "Damage by attack with share bars: total · hits · average · per-ability DPS · crit " +
             "rate. Click the sort labels to re-rank (the bars follow the sorted column). Below: " +
             "damage taken per mob, your recent fights with per-fight DPS, and a stance " +
-            "breakdown. Healing gets the same treatment.",
+            "breakdown. Healing gets the same treatment.\n\n" +
+            "Star ★ the card and minimize, and that same board pops out as its own small " +
+            "window you can park anywhere — which is what the picture shows.",
             "t-combat.png"),
 
         new("Watch rules & alerts",
             "EQBuddy starts with one rule already on: when any of your crowd-control spells " +
             "breaks — charm, mez, root, lull or stun — you get a banner and a sound. Turn " +
-            "either off, or delete the rule, in ⚙ Options → Watch rules. Add your own to " +
+            "either off, or delete the rule, in Options → Watch rules. Add your own to " +
             "watch Loot ('mote'), Kills, Skill-ups, Deaths, Milestones, spells wearing off, " +
             "or any text in the log. Set a Delay and the alert lands that many seconds " +
             "later, turning a rule into a cue. " +
-            "Matches count on the 🎯 Watch card with per-hour rates. The banner tile is " +
+            "Matches count on the Watch card with per-hour rates. The banner tile is " +
             "click-through and movable — drag it while Options is open.",
             "t-watch.png"),
 
         new("Spawn timers",
             "Kill a named mob - or its placeholder - and a compact countdown chip appears: " +
-            "⏳ Asaka L`Rei 3:12. Chips stack, drag anywhere as one, and keep every timer " +
+            "a stopwatch, the name, and the time left - \"Asaka L`Rei 3:12\". Chips stack, " +
+            "drag anywhere as one, and keep every timer " +
             "running across zones. At zero a chip turns DUE for one minute, with a sound if " +
             "that named's bell is enabled, then clears itself. Double-click a chip - or use " +
             "right-click -> Spawn timers - for the full " +
@@ -104,7 +107,7 @@ public sealed class TutorialWindow : Window
             "Right-click → Session history: search anything, add notes and tags, Ctrl-click " +
             "two sessions to compare rates, import old log files, export JSON.\n\n" +
             "That's the tour — happy hunting! Finishing turns off this launch tour; get it " +
-            "back any time via right-click → Quick tutorial…, or re-enable it in ⚙ Options.",
+            "back any time via right-click → Quick tutorial…, or re-enable it in Options.",
             "t-history.png"),
     ];
 

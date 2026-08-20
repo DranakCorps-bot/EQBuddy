@@ -69,6 +69,33 @@ $Shots = [ordered]@{
     # a refactor that changes what a player SEES shows up as a diff in the picture —
     # behaviour-preserving is a claim, and these are how it gets checked.
     'combat-card'     = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'combat' }; Set = @{} }
+    # The same card, ALONE. The quick tour's Combat page wants the board and nothing else,
+    # and the tour frame scales an image to fit 528x320 — a full widget with ten cards and
+    # one of them open is 994px tall, which arrives 109px wide and unreadable.
+    #
+    # Hidden cards, not a pixel crop. A crop is a number that rots the moment a card gains
+    # a row: it keeps producing a picture, of the wrong part, with nothing on screen to
+    # say so (trap 23). HiddenSections is the app's own setting, so this shot is a real
+    # state a player can also have.
+    'combat-solo'     = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'combat' }
+                           Set = @{ HiddenSections = @(
+                               'healing','kills','loot','quests','gear','tracked',
+                               'buffs','progress','misc') } }
+    # The Watch card alone, same reason, with the same three seeded rules as tracked-card.
+    'watch-solo'      = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'tracked' }
+                           Set = @{ HiddenSections = @(
+                                       'combat','healing','kills','loot','quests','gear',
+                                       'buffs','progress','misc')
+                                    TrackedRules = @(
+                                   @{ Id = 'shot-spider'; Name = 'Spider parts'
+                                      Pattern = 'Spider'; Kind = 0 }
+                                   @{ Id = 'shot-bone'; Name = 'Bone chips'
+                                      Pattern = 'Bone Chips'; Kind = 0 }
+                                   @{ Id = 'shot-kills'; Name = 'Giant spiders'
+                                      Pattern = 'giant spider'; Kind = 1 }
+                               ) } }
     'healing-card'    = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'healing' }; Set = @{} }
     # The PROGRESS THEME's four tabs (docs/Themes.md). These replaced 'value-cards'
     # (motes,money,faction) and the widget half of 'raids-card': those five cards are one
@@ -162,8 +189,14 @@ $Shots = [ordered]@{
                            # Every breakout OFF: starring dps/hps/pet/loot while minimized
                            # is exactly what opens those windows, and the capture matches
                            # on title — so without this it photographs a breakout instead.
+                           # EVERY kind in BreakoutKind, and the list has to grow with the
+                           # enum: Progress joined it on 2026-08-19 and was not added here,
+                           # so this shot silently stopped photographing the mini bar and
+                           # started photographing the Progress breakout — same title, real
+                           # window, wrong feature (trap 24). Re-running it would have
+                           # overwritten a correct committed screenshot with that.
                            Set = @{ Minimized = $true
-                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Progress')
                                     MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
     # The Watch card with rules that the fixture session actually matches — without them
     # the card is a one-line empty state and its sort strip does not exist at all (it
@@ -190,6 +223,22 @@ $Shots = [ordered]@{
                                    TierKills = @{}
                                }
                            } }
+    # The mini bar as the quick tour's page describes it — "a tiny pill shows just those,
+    # plus watch-rule chips" — rather than as mini-bar shoots it, which is every cell up so
+    # all ten icons can be reviewed at once. Two stats and two PINNED rules: pinning is
+    # what puts a rule on the bar, so without it the chips the sentence promises are absent
+    # and the picture quietly contradicts the words beside it.
+    'mini-tour'       = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Progress')
+                                    MiniStats = @('kills','dps','loot')
+                                    TrackedRules = @(
+                                        @{ Id = 'shot-mote'; Name = 'Motes'
+                                           Pattern = 'mote'; Kind = 0; Pinned = $true }
+                                        @{ Id = 'shot-ghoul'; Name = 'Ghouls'
+                                           Pattern = 'ghoul'; Kind = 1; Pinned = $true }
+                                    ) } }
     # NOT called watch-card: docs/screenshots/watch-card.png is a hand-taken shot that
     # docs/WatchListGuide.md embeds, and a shot name IS its filename — this would have
     # quietly overwritten a guide's illustration with the fixture's three rules.
@@ -238,8 +287,29 @@ $Shots = [ordered]@{
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards' } }
+    # The quick tour itself, page by page. Its five illustrations went a month out of date
+    # showing an app that no longer existed — emoji card icons, a card called "Tracked",
+    # no KPI strip — and nothing caught it, because seeing page 4 meant installing the app
+    # and clicking Next three times. These are what make the tour reviewable at all; shoot
+    # them whenever an image under Assets/tutorial changes.
+    'tour-widget'     = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '2' }; Set = @{} }
+    'tour-combat'     = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '4' }; Set = @{} }
+    'tour-watch'      = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '5' }; Set = @{} }
+    'tour-mini'       = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '7' }; Set = @{} }
+    'tour-history'    = @{ Title = 'Welcome to EQBuddy'; Env = @{ EQBUDDY_TOUR = '8' }; Set = @{} }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
+    # The quick tour's last page illustrates this window. Trap 22 applies hard: history
+    # rows come from FINISHED sessions, and make-test-session.ps1 deliberately compresses
+    # every idle gap so the fixture is ONE live session — so an unseeded profile shows an
+    # empty list and a shot of it says nothing about the surface. Pre-runs below.
+    'history-window'  = @{ Title = 'Session History'
+                           Env = @{ EQBUDDY_HISTORY = '1' }
+                           Set = @{}
+                           Prime = @(
+                               @{ Character = 'Aludra'; Fraction = 0.45 }
+                               @{}
+                           ) }
     # The wiki contribution pack (#217 Ask 1). Trap 22: with an empty profile every row
     # is "not checked yet", because the pack's state comes from the WIKI LOOKUP and not
     # from the log — a shot of that proves nothing about the rows underneath and reads as
@@ -447,6 +517,55 @@ $backdropForm.ShowInTaskbar = $false
 $backdropForm.Show()
 $backdropForm.Refresh()
 
+# Sessions only reach history.db when a session ENDS, and the fixture never ends one —
+# every idle gap is compressed so the whole log reads as one live session. A shot that
+# needs history rows therefore has to make some: run the app, let it replay, and close it
+# GRACEFULLY, because EQBuddy finalizes the active session into history.db on
+# ApplicationExit and the capture loop below kills its app instead (deliberately — that
+# one is a throwaway). Each prime run is one real archived session, with the fixture's own
+# numbers rather than invented ones.
+function Invoke-PrimeRun([object[]]$runs) {
+    $i = 0
+    foreach ($run in $runs) {
+        $i++
+        Write-Host "  priming history ($i/$($runs.Count))…"
+        # A second run over the SAME log does not mint a second session — the archiver
+        # recognises the replay and updates the row it already has (#74). So a prime run
+        # that wants a DISTINCT session writes a distinct log: another character, and a
+        # prefix of the fixture rather than all of it, which gives that session its own
+        # duration and its own numbers instead of a suspiciously identical twin.
+        $extraLog = $null
+        if ($run.Character) {
+            $source = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
+            $lines = Get-Content $source.FullName
+            $fraction = if ($run.Fraction) { $run.Fraction } else { 1.0 }
+            $take = [Math]::Max(1, [int]($lines.Count * $fraction))
+            $extraLog = Join-Path $logsDir.FullName "eqlog_$($run.Character)_test.txt"
+            $lines[0..($take - 1)] | Set-Content $extraLog -Encoding utf8
+        }
+        $psi = New-Object Diagnostics.ProcessStartInfo $exe
+        $psi.UseShellExecute = $false
+        $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
+        $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
+        $proc = [Diagnostics.Process]::Start($psi)
+        $deadline = (Get-Date).AddSeconds(60)
+        while ((Get-Date) -lt $deadline -and $proc.MainWindowHandle -eq 0) {
+            Start-Sleep -Milliseconds 400
+            if ($proc.HasExited) { break }
+            $proc.Refresh()
+        }
+        # The replay has to finish before the close, or the session archived is a partial
+        # one — the numbers in the picture would then be smaller than the fixture's and
+        # nothing on screen would say why.
+        Start-Sleep -Seconds $Settle
+        if (-not $proc.HasExited) { $proc.CloseMainWindow() | Out-Null }
+        if (-not $proc.WaitForExit(20000)) { $proc.Kill($true); $proc.WaitForExit(5000) | Out-Null }
+        # Removed before the capture run: two logs in the folder means the widget follows
+        # whichever grew last, and the shot's own character would flip under it.
+        if ($extraLog) { Remove-Item $extraLog -Force -ErrorAction SilentlyContinue }
+    }
+}
+
 New-Item -ItemType Directory -Force $Out | Out-Null
 $taken = @()
 try {
@@ -458,6 +577,7 @@ try {
         Write-Raids $spec.Raids
         Write-WikiCache $spec.Wiki
         Append-Log $spec.Append
+        if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false

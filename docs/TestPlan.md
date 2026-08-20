@@ -203,6 +203,9 @@ guards below are the deliverable and not a nicety.
 | A surface that moved into a WINDOW keeps a way to be photographed: `EQBUDDY_PROGRESS` opens the Progress window on a named tab, as `EQBUDDY_QUESTS` does for the tracker | **Manual** — `pwsh scripts/shoot.ps1 -Shot progress-wealth` |
 | **A shot names a PROCESS, not just a title** — four Progress shots share the title `EQBuddy Progress`, and a previous shot's app that is still exiting matches it | **Auto** — `shoot.ps1` passes `-OwnerPid` |
 | **A running EQBuddy is stood down before shooting and relaunched afterwards** — it is always-on-top and holds the same titles, so a capture of it is the wrong app in whatever unseeded state it happens to be in. Closed gracefully, so the live session still finalizes into `history.db` | **Auto** — `shoot.ps1` |
+| **The quick tour's illustrations show the app that ships** — every page can be opened directly (`EQBUDDY_TOUR=<page>`, 1-based) so the pictures can be looked at without installing and clicking Next. They were a month stale, showing emoji card icons, a card called "Tracked" and no KPI strip, for exactly that reason | **Manual** — `pwsh scripts/shoot.ps1 -Shot tour-widget,tour-combat,tour-watch,tour-mini,tour-history` |
+| **A shot's staging list that enumerates an enum by hand grows with it** — `mini-bar` disables every `BreakoutKind`, and when `Progress` joined the enum the shot silently began photographing the Progress breakout instead of the mini bar | **Manual** — `pwsh scripts/shoot.ps1 -Shot mini-bar`; the capture must be the wide pill, not a window |
+| **A capture pins the palette it is shooting** — `AppTheme`'s brushes are process-wide singletons and `AppThemeTests` walks the whole catalog, so an unpinned capture renders in whatever theme ran last | **Auto** — `WidgetSheetTests` |
 
 ## 4d. Settings, and who is allowed to write them
 

@@ -441,7 +441,20 @@ public partial class MainWindow : Window, ICardContext
             {
                 await Task.Delay(4000); // let initial ingest finish
                 OnHistory(this, new RoutedEventArgs());
+                // Opened on the newest session rather than on "Select a session.": the
+                // detail pane is most of this window and an empty one photographs as a
+                // window that exists and holds nothing (trap 22).
+                _historyWindow?.SelectNewest();
             };
+
+        // The quick tour, on a page of your choosing (1-based). Same family, same reason
+        // as the rest: without it the tour's five illustrations could not be reviewed
+        // without a human installing the app and clicking Next, which is how they came to
+        // be a month out of date with nobody noticing.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_TOUR") is { Length: > 0 } tourPage)
+            Loaded += (_, _) => Dispatcher.BeginInvoke(
+                () => new TutorialWindow(this, int.TryParse(tourPage, out var n) ? n : 1).Show(),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             Loaded += (_, _) =>

@@ -484,6 +484,44 @@ Read this list before touching the areas it names. Every entry cost a release.
     asserts `Get-AuthenticodeSignature` returns `Valid` *and* that a
     `TimeStamperCertificate` is present, and throws otherwise.
 
+29. **When a feature gate is deleted, the controls it USED to un-hide stay hidden.** The
+    title-bar EQBuddy Mobile button shipped `Visibility="Collapsed"` on 2026-08-14 because
+    `CompanionPreview.Enabled` made it visible in code. The gate was removed the same week;
+    the MENU entry lost its `Visibility` attribute and the BUTTON did not, so the one-click
+    way into the feature David had specifically asked for was never once on screen. Six
+    days, several releases, and nothing could see it: not a compile (the XAML is valid),
+    not a test (the WPF layer has none), not a diff (the attribute was already there), and
+    **not a screenshot — an absent control photographs as an unremarkable title bar.**
+    → **Deleting a gate means finding every control the gate switched**, not just the code
+    that read it. Grep the removed flag in HISTORY (`git log -S`), not in the working tree,
+    because the thing you are looking for is what is no longer there. The same event leaves
+    a second mark: Gate 5c drew the `Phone` vector FOR that button and left the emoji in
+    place, because the control being converted was invisible — an unused entry in
+    `IconPaths` is worth a look for the same reason a written-never-read setting is
+    (trap 20).
+
+30. **A staging list that enumerates an enum BY HAND stops covering it the day the enum
+    grows.** `shoot.ps1`'s `mini-bar` shot disables every `BreakoutKind` so that starring
+    ten stats while minimized does not open ten windows over the capture. `Progress` joined
+    `BreakoutKind` on 2026-08-19 and was not added to that list, so the shot silently began
+    photographing the **Progress breakout** — a real window, correctly rendered, under the
+    filename of a different feature. Re-running it would have overwritten a correct
+    committed screenshot with the wrong picture; it is trap 24 arriving through the shot's
+    own staging rather than through a title match.
+    → **When you add a member to an enum, grep `scripts/` for its siblings.** A staging
+    list is code that cannot be type-checked, so the enum has to be checked by hand — and
+    the failure mode is never an error, it is a plausible picture of something else.
+
+31. **A capture surface must pin its own theme.** `AppTheme`'s brushes are process-wide
+    singletons and `AppThemeTests.EveryCatalogThemeAppliesCleanly` applies every theme in
+    the catalog, so a headless capture renders in whichever palette ran last — the first
+    EQBuddy Mobile capture came back in Turquoise while its seeded `settings.json` said
+    ParchmentBrass. Correctly rendered, real palette, wrong state, and only obvious if you
+    happen to know what the theme under review looks like.
+    → Same family as the profile isolation those captures already needed: **a capture's
+    entire output is a picture of whatever global state it found.** `WidgetSheetTests`
+    calls `AppTheme.Apply` before it shoots.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

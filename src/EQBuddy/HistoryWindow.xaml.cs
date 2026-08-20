@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using EQBuddy.Core;
@@ -310,6 +310,16 @@ public partial class HistoryWindow : Window
         if (selected.Count >= 2)
             _vm.SelectSession(selected[^1].Row.Id, additive: true);
         _syncing = false;
+    }
+
+    /// <summary>Open on the newest session rather than on "Select a session." The detail
+    /// pane is where everything this window is FOR actually lives, and with nothing
+    /// selected it is an empty half-screen — a screenshot of that says the window exists
+    /// and nothing about what it holds (trap 22). Used by the EQBUDDY_HISTORY hook.</summary>
+    internal void SelectNewest()
+    {
+        if (SessionList.Items.Count == 0) return;
+        SessionList.SelectedIndex = 0;
     }
 
     private void OnSaveMeta(object sender, RoutedEventArgs e)
