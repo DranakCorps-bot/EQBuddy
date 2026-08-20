@@ -19,20 +19,6 @@ public sealed record SpawnTimerState(
     public double? CampLocY { get; init; }
     public double? CampLocX { get; init; }
 
-    /// <summary>Which copy of the zone this kill happened in, as
-    /// <see cref="InstanceTier"/> decodes it from the zone line — open world, D0..D4, or
-    /// an instance whose adjective this build does not know. Persisted, because it is a
-    /// fact about the kill (like <see cref="KilledName"/>) rather than about where the
-    /// player is now; null on timers written before the field existed.
-    ///
-    /// It exists because **a gap across an instance change is not a loose upper bound,
-    /// it is no bound at all.** Every instance of a zone shares one timer key, so
-    /// "kill the named in D0, take a private instance, run to the camp and kill it
-    /// again" looks exactly like a twelve-minute respawn — and the mob never respawned:
-    /// a different copy of it was standing there when the instance was made (David,
-    /// 2026-08-20).</summary>
-    public int? InstanceTier { get; init; }
-
     /// <summary>Which continuous stay in the zone this kill happened during — a
     /// counter bumped on every zone-enter line, never a wall clock. Two kills sharing
     /// it means the player never left between them.
@@ -94,10 +80,6 @@ public sealed class SpawnTimers
     /// <summary>Which continuous stay in a zone we are on, bumped by every zone-enter
     /// line. Stamped onto each new timer as <see cref="SpawnTimerState.ZoneStay"/>.</summary>
     private int _zoneStay;
-    /// <summary>Which copy of the current zone we are standing in, as the zone line
-    /// stated it. <see cref="InstanceTier.Unknown"/> until a zone line has been seen.</summary>
-    private int _currentTier = InstanceTier.Unknown;
-
     /// <summary>A /loc within this window of a kill counts as the camp's position —
     /// long enough for "tap the hotbutton, pull, kill", short enough that a stale
     /// reading from across the zone doesn't pin the wrong hillside.</summary>
@@ -136,9 +118,6 @@ public sealed class SpawnTimers
                 {
                     _currentZone = _catalog.FindZone(z.Zone);
                     _currentZoneInstanced = SpawnCatalog.IsInstancedZoneName(z.Zone);
-                    var tier = InstanceTier.FromZoneName(z.Zone);
-                    DropTimersFromAnotherCopyOfTheZone(_currentZone?.Zone, tier);
-                    _currentTier = tier;
                     _lastLoc = null;
                     // Every zone line ends the current stay, including one that names
                     // the zone you are already in: a zone-enter line you did not travel
@@ -216,7 +195,7 @@ public sealed class SpawnTimers
                 // been up the whole time (Sol A, 2026-08-16), so its elapsed teaches
                 // nothing; and across an instance boundary the creature acting now is a
                 // different copy from the one that died, so neither does that.
-                if (StartedByNamedKill(t, entry) && CanSpanToNow(t))
+                if (StartedByNamedKill(t, entry) && NeverLeftSince(t))
                     LearnFromSighting(zone, t.Name, elapsed);
                 return;
             }
@@ -308,7 +287,7 @@ public sealed class SpawnTimers
                         duration = LearnFromRekill(zone, entry, k.Time, duration);
                     var (cy, cx) = CampFor(zone.Zone, entry.Name, k.Time);
                     Upsert(new SpawnTimerState(Server, zone.Zone, entry.Name, k.Time, duration)
-                        { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay, InstanceTier = _currentTier });
+                        { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay });
                     return;
                 }
 
@@ -321,7 +300,7 @@ public sealed class SpawnTimers
                         ? LearnDiscovered(zone.Zone, name, o, k.Time)
                         : o.RespawnSeconds;
                     Upsert(new SpawnTimerState(Server, zone.Zone, name, k.Time, seconds)
-                        { CampLocY = ccy, CampLocX = ccx, KilledName = k.Target, ZoneStay = _zoneStay, InstanceTier = _currentTier });
+                        { CampLocY = ccy, CampLocX = ccx, KilledName = k.Target, ZoneStay = _zoneStay });
                     return;
                 }
             }
@@ -346,59 +325,38 @@ public sealed class SpawnTimers
     }
 
     /// <summary>
-    /// Entering a copy of a zone that provably is not the one a countdown was set in
-    /// throws that countdown away. A private instance is built fresh, so the named is
-    /// standing there whatever the old clock says — and a chip insisting "not for
-    /// another fifteen minutes" while you are looking at the spawn point is worse than
-    /// no chip at all (David, 2026-08-20).
+    /// True when nothing has happened between this timer starting and now that could
+    /// make the two ends different mobs — which comes down to one question: **did the
+    /// player leave the zone?**
     ///
-    /// Only a PROVABLE change counts: the zone line states a difficulty, so D0 → D2 is
-    /// evidence, and open world → any instance is evidence. Re-entering the same tier is
-    /// NOT evidence either way — it may be the instance you kept or a brand new one, and
-    /// the line does not say. Those are left alone here and handled by refusing to LEARN
-    /// across them, which costs a measurement rather than a camp.
+    /// Two quite different failures collapse into that one rule.
     ///
-    /// Zone timers are dropped only for the zone being entered. A Befallen countdown is
-    /// no business of a Guk instance.
+    /// **Instances.** Every difficulty of a zone shares one timer key, so killing a named
+    /// at D0, changing to your own instance and killing it at the spawn point looks like
+    /// a twelve-minute respawn — and the mob never respawned at all, a different copy of
+    /// it was standing there (David, 2026-08-20). Changing instance means zoning, so this
+    /// catches it without EQBuddy having to reason about which copy is which, or pretend
+    /// the zone line names one when it does not.
+    ///
+    /// **Gaps that simply are not evidence.** "Killed it, went to sell, came back an hour
+    /// later, killed it" bounds the respawn at an hour, which is true and worth nothing.
+    ///
+    /// It costs the one honest case it also refuses — a bank trip in a zone with no
+    /// instances at all, where the gap really is a true upper bound. That is a small loss
+    /// by construction: such a gap has a whole errand added to it, so it is rarely the
+    /// tightest bound seen and rarely the one that would have won. And it errs the right
+    /// way. The whole subsystem runs on one asymmetry: **cost a measurement, never a
+    /// camp.**
+    ///
+    /// A timer recovered from the persist file has no stay at all, and no evidence must
+    /// never read as agreement — the same rule <see cref="SpawnTimerState.KilledName"/>
+    /// follows across a restart.
+    ///
+    /// Note this decides only what may be LEARNED. Countdowns keep running across a zone
+    /// line, because they are still true: the named goes on respawning while you are at
+    /// the bank, and your own instance keeps its state while you are away.
     /// </summary>
-    private void DropTimersFromAnotherCopyOfTheZone(string? previousZone, int newTier)
-    {
-        if (_currentTier == newTier) return;                 // same copy, or nothing known yet
-        if (_currentTier == InstanceTier.Unknown) return;    // first zone line of the session
-        var entered = _catalog.FindZone(ZoneNameForTier())?.Zone ?? previousZone;
-        if (entered is null) return;
-
-        var doomed = _timers
-            .Where(kv => string.Equals(kv.Value.Zone, entered, StringComparison.OrdinalIgnoreCase)
-                      && string.Equals(kv.Value.Server, Server, StringComparison.OrdinalIgnoreCase)
-                      // A timer with no recorded tier predates the field. No evidence is
-                      // not evidence of sameness — the same rule KilledName follows.
-                      && kv.Value.InstanceTier != newTier)
-            .Select(kv => kv.Key)
-            .ToList();
-        if (doomed.Count == 0) return;
-        foreach (var key in doomed) { _timers.Remove(key); _dueSeenAt.Remove(key); }
-        SavePersisted();
-    }
-
-    /// <summary>The zone whose timers a tier change is about: the one we were already
-    /// in, since a tier change without a zone change is the case this guards.</summary>
-    private string? ZoneNameForTier() => _currentZone?.Zone;
-
-    /// <summary>True when the gap between this timer and a kill happening now can be
-    /// read as one respawn cycle at all.
-    ///
-    /// Inside one continuous stay it always can. Across a zone line it depends on
-    /// whether the zone has COPIES: the open world has one, so a gap spanning a trip to
-    /// the bank is still a true upper bound (the mob died, and was dead again, so it
-    /// respawned in between) and refusing it would throw away real evidence. An
-    /// INSTANCE has as many copies as anyone cares to make, and the zone line does not
-    /// name which one you are in — so a gap that spans a re-entry may be measuring two
-    /// different copies of the mob, and that is not a bound in either direction.
-    /// </summary>
-    private bool CanSpanToNow(SpawnTimerState prev) =>
-        prev.ZoneStay == _zoneStay
-        || (prev.InstanceTier == InstanceTier.OpenWorld && _currentTier == InstanceTier.OpenWorld);
+    private bool NeverLeftSince(SpawnTimerState prev) => prev.ZoneStay == _zoneStay;
 
     /// <summary>
     /// The first duration a named gets from watching, when nothing — catalog entry, zone
@@ -429,11 +387,7 @@ public sealed class SpawnTimers
     private double? FirstDurationFromGap(string zone, string name, DateTime killedAt)
     {
         if (!_timers.TryGetValue(Key(Server, zone, name), out var prev)) return null;
-        // Null on either side is no evidence, and no evidence must not read as
-        // agreement — a timer recovered from the persist file has no stay. Here the
-        // SAME stay is required outright, open world or not: with no duration to check
-        // it against, even a true-but-loose bound becomes the countdown.
-        if (prev.ZoneStay is not { } stay || stay != _zoneStay) return null;
+        if (!NeverLeftSince(prev)) return null;
         var gap = (killedAt - prev.KilledAt).TotalSeconds;
         if (gap < MinLearnSeconds || gap > MaxDiscoverSeconds) return null;
         return Math.Floor(gap);
@@ -484,7 +438,7 @@ public sealed class SpawnTimers
         _overrides.Save();
         var (cy, cx) = CampFor(zone.Zone, k.Target, k.Time);
         Upsert(new SpawnTimerState(Server, zone.Zone, k.Target, k.Time, null)
-            { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay, InstanceTier = _currentTier });
+            { CampLocY = cy, CampLocX = cx, KilledName = k.Target, ZoneStay = _zoneStay });
     }
 
     /// <summary>The second death of a discovered named measures its cycle. Same
@@ -537,7 +491,7 @@ public sealed class SpawnTimers
             // Not merely loose — meaningless. Every instance of a zone shares one timer
             // key, so a gap spanning an instance change measures two different copies
             // of the mob (David, 2026-08-20).
-            if (!CanSpanToNow(prev)) return currentDuration;
+            if (!NeverLeftSince(prev)) return currentDuration;
             var gap = (killedAt - prev.KilledAt).TotalSeconds;
             if (gap < MinLearnSeconds || gap >= d) return currentDuration;
             learned = Math.Floor(gap);
@@ -579,7 +533,7 @@ public sealed class SpawnTimers
             // word always wins. Their attested kill counts as the named's own.
             _timers.Remove(Key(Server, zone, name));
             Upsert(new SpawnTimerState(Server, zone, name, DateTime.Now - elapsed, durationSeconds)
-                { KilledName = name, ZoneStay = _zoneStay, InstanceTier = _currentTier });
+                { KilledName = name, ZoneStay = _zoneStay });
         }
     }
 

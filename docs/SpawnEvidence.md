@@ -63,20 +63,32 @@ varies, and a player who was in the kitchen. No statistic over gaps can tell tho
 retained sightings can. Today `LearnFromSighting` applies the value and discards the
 event.
 
-**Instances are copies, and a gap across one is not evidence** (David, 2026-08-20 — shipped
-in the fix before this design, not deferred to it). Every instance of a zone shares one
-timer key, so killing a named in D0 and again in a fresh private instance used to measure
-a respawn that never happened. This is a different failure from the loose-bound one above:
-a cross-stay gap in the open world is TRUE and merely weak, while a cross-instance gap is
-not a bound in either direction. Taking an instance now drops that zone's countdowns, and
-learning refuses any gap it cannot prove stayed inside one copy of the zone.
+**A gap only teaches if the player never left the zone** (David, 2026-08-20 — shipped
+alongside this design, not deferred to it). Two failures collapse into that one rule.
 
-**What the log cannot say, and what we do about it.** The zone line states the difficulty,
-so D0 → D2 is proof of a different instance. Re-entering the SAME difficulty is not proof
-either way — it may be the instance you kept or a fresh one. There the countdown is kept
-and the LEARNING is refused, which is the asymmetry the whole subsystem runs on: **cost a
-measurement, never a camp.** If it turns out that instance membership is always lost on
-zoning out, that case can be tightened to a clear; see the open question below.
+*Instances.* Every difficulty of a zone shares one timer key, so killing a named at D0,
+changing to your own instance and killing it at the spawn point looked like a
+twelve-minute respawn — and the mob never respawned, a different copy of it was standing
+there. Changing instance means zoning, so the rule catches it without EQBuddy having to
+decide which copy is which or pretend the zone line names one.
+
+*Gaps that are not evidence.* "Killed it, went to sell, came back an hour later, killed
+it" bounds the respawn at an hour, which is true and worth nothing.
+
+Two earlier and more clever versions of this were tried and dropped, which is worth
+recording so they are not reinvented. The first dropped a zone's countdowns on a
+difficulty change; that is wrong because zoning in lands you at D0 *before* you rejoin
+your own instance, so every trip out and back passes through another difficulty and the
+rule would have deleted the camp timer of anyone who stepped out for two minutes. The
+second kept countdowns but treated the difficulty as the copy's identity, learning across
+a same-difficulty trip because an instance keeps its state. That one is defensible and
+still lost: it buys a rare, low-quality measurement in exchange for reasoning nobody can
+hold in their head, and the simple rule refuses only gaps that had a whole errand added to
+them — rarely the tightest bound seen, rarely the one that would have won.
+
+**Learning is what stops at the zone line, never the countdown.** The named goes on
+respawning while you are at the bank and your instance keeps its state while you are away,
+so the clock stays true. Cost a measurement, never a camp.
 
 **Camp-specific learning: no** (concluded from the code, 2026-08-20). `CampFor` only pins
 a camp when a `/loc` landed within `CampLocWindow` (3 minutes) of the kill. Players type
@@ -120,16 +132,7 @@ malformed overrides file does: lose the evidence, never the player's edits.
 - A variable spawn can be shown as the range it is instead of a single number that is
   wrong in a different way every cycle.
 
-## Open questions for David
-
-**Does an instance survive zoning out while you stay logged in?** If you are camping in a
-D2 Guk, step out to the adjacent zone and come straight back, is it the same D2 — or a new
-one? The zone line looks identical either way, so EQBuddy cannot tell. Today that case
-keeps the countdown and refuses to learn from it. If the answer is "always a new one", the
-countdown should be cleared there too and the rule gets simpler; if it is "the same one
-while you are online", today's behaviour is exactly right and should stay.
-
-
+## Open question for David
 
 `ZoneShare.Export` currently exports any timer with a value, **including one you imported
 from someone else and never verified**. That makes shared knowledge self-reinforcing

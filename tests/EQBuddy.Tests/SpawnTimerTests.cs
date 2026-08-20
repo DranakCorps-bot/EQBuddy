@@ -479,19 +479,38 @@ public class SpawnTimerTests
         Assert.Equal(1620, timer.DurationSeconds);      // the catalog's, untouched
     }
 
-    /// <summary>Taking an instance throws away the countdown it invalidates, rather than
-    /// leaving a chip insisting "not for another fifteen minutes" while the player looks
-    /// straight at the spawn point.</summary>
+    /// <summary>Stepping out does NOT cost you your camp timer. An instance keeps its
+    /// state (David, 2026-08-20), so the named goes on respawning in your D2 while you
+    /// are at the bank — and since zoning back in lands you at D0 before you rejoin,
+    /// a rule that dropped countdowns whenever the difficulty changed would delete the
+    /// timer of anyone who stepped out for two minutes.</summary>
     [Fact]
-    public void EnteringADifferentInstanceDropsThatZonesCountdowns()
+    public void SteppingOutOfAnInstanceKeepsItsCountdownRunning()
     {
         var t = Tracker();
-        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));                   // open world
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
         t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
-        Assert.Single(t.Snapshot(T0.AddMinutes(1)));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen"));
 
-        t.Apply(new ZoneEvent(T0.AddMinutes(2), "The Ruins of Old Guk 4 (Refined)"));
-        Assert.Empty(t.Snapshot(T0.AddMinutes(3)));
+        var timer = Assert.Single(t.Snapshot(T0.AddMinutes(3)));
+        Assert.Equal(T0.AddSeconds(1620), timer.DueAt);
+    }
+
+    /// <summary>Passing through D0 on the way back to your own instance does not let a
+    /// kill there measure anything either - it is a different copy of the zone, and the
+    /// player zoned to reach it.</summary>
+    [Fact]
+    public void AKillAtD0OnTheWayBackIsNotMeasuredAgainstYourInstance()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(4), "The Ruins of Old Guk - Solo"));   // D0
+        t.Apply(new KillEvent(T0.AddMinutes(6), "froglok ghoul lord", "You"));
+
+        Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
     }
 
     /// <summary>...but only that zone's. A countdown running somewhere else is no
@@ -508,40 +527,36 @@ public class SpawnTimerTests
         Assert.Equal("Permafrost Keep", timer.Zone);
     }
 
-    /// <summary>A trip out of an OPEN-WORLD zone and back is not an instance change -
-    /// there is only one copy of the open world - so its countdown survives and its gap
-    /// still teaches. This is the case the instance rule must not swallow.</summary>
+    /// <summary>Zoning stops the LEARNING, never the countdown. The named goes on
+    /// respawning while you are at the bank, and your own instance keeps its state while
+    /// you are away, so the clock is still true - and losing a camp timer every time
+    /// someone stepped out would be worse than the bug this rule exists for.</summary>
     [Fact]
-    public void AnOpenWorldRoundTripKeepsItsCountdownAndStillLearns()
+    public void ZoningDuringACountdownLeavesTheCountdownAlone()
     {
-        var overrides = new SpawnOverrides();
-        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+        var t = Tracker();
         t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
         t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
         t.Apply(new ZoneEvent(T0.AddMinutes(2), "Permafrost Keep"));
-        t.Apply(new ZoneEvent(T0.AddMinutes(15), "The Ruins of Old Guk"));
-        Assert.Single(t.Snapshot(T0.AddMinutes(16)));
 
-        t.Apply(new KillEvent(T0.AddMinutes(20), "froglok ghoul lord", "You"));
-        Assert.Equal(1200, overrides.Find("Lower Guk", "a froglok ghoul lord")!.RespawnSeconds);
+        var timer = Assert.Single(t.Snapshot(T0.AddMinutes(3)));
+        Assert.Equal(T0.AddSeconds(1620), timer.DueAt);
     }
 
-    /// <summary>Re-entering the SAME tier is not evidence either way - it may be the
-    /// instance you kept or a fresh one, and the zone line does not say. The countdown
-    /// is left alone, because throwing away a camp timer on a guess is the expensive
-    /// mistake; the LEARNING is refused, because inventing a cycle is the dangerous one.
-    /// That asymmetry is the whole rule: cost a measurement, never a camp.</summary>
+    /// <summary>An OPEN-WORLD countdown survives a trip into an instance of the same
+    /// zone — the open world has one copy and that mob is still due when it is due — but
+    /// a kill inside the instance must not be measured against it: the timer is
+    /// legitimate and the gap to it still spans two different copies of the mob.</summary>
     [Fact]
-    public void ReEnteringTheSameTierKeepsTheCountdownButRefusesToLearn()
+    public void AnOpenWorldCountdownSurvivesAnInstanceButIsNeverMeasuredInsideOne()
     {
         var overrides = new SpawnOverrides();
         var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
-        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));                  // open world
         t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
-        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen 2 (Adaptive)"));
-        t.Apply(new ZoneEvent(T0.AddMinutes(4), "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "The Ruins of Old Guk 2 (Adaptive)"));
 
-        Assert.Single(t.Snapshot(T0.AddMinutes(5)));     // still counting
+        Assert.Single(t.Snapshot(T0.AddMinutes(3)));     // the open world is still ticking
         t.Apply(new KillEvent(T0.AddMinutes(10), "froglok ghoul lord", "You"));
         Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
     }
@@ -554,11 +569,10 @@ public class SpawnTimerTests
     {
         var overrides = new SpawnOverrides();
         var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
-        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk 2 (Adaptive)"));
-        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));          // 1620s clock
-        // Same tier, so the countdown survives the trip (see above).
-        t.Apply(new ZoneEvent(T0.AddMinutes(2), "Befallen 2 (Adaptive)"));
-        t.Apply(new ZoneEvent(T0.AddMinutes(4), "The Ruins of Old Guk 2 (Adaptive)"));
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));               // open world, 1620s
+        t.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        // Open world, so the countdown survives into the instance (see above).
+        t.Apply(new ZoneEvent(T0.AddMinutes(2), "The Ruins of Old Guk 2 (Adaptive)"));
         t.Apply(new DamageDealtEvent(T0.AddSeconds(1500), "froglok ghoul lord", 30,
             DamageKind.Melee, "Slash", false));
 
@@ -674,13 +688,15 @@ public class SpawnTimerTests
         Assert.Null(o.RespawnSeconds);
     }
 
-    /// <summary>And the rule is deliberately NOT applied where a duration already exists.
-    /// A cross-stay gap is a true upper bound - the mob died and was dead again, so it
-    /// respawned in between - and there the gap-under-duration rule already keeps a loose
-    /// one harmless: it can only tighten toward the truth. Refusing it would throw away
-    /// real evidence to guard against a problem that path does not have.</summary>
+    /// <summary>The rule is the same wherever a duration is known: leave the zone during
+    /// a countdown and that countdown's gap teaches nothing. It costs the honest case
+    /// too - a bank trip in a zone with no instances, where the gap really is a true
+    /// upper bound - and that is a deliberate, cheap trade. Such a gap has a whole errand
+    /// added to it, so it is rarely the tightest bound seen and rarely the one that would
+    /// have won; and refusing it costs a measurement, while accepting the instance case
+    /// it cannot be told apart from costs a camp.</summary>
     [Fact]
-    public void AKnownDurationStillLearnsAcrossAZoneTrip()
+    public void AKnownDurationRefusesAGapAcrossAZoneTrip()
     {
         var overrides = new SpawnOverrides();
         var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
@@ -690,7 +706,9 @@ public class SpawnTimerTests
         t.Apply(new ZoneEvent(T0.AddMinutes(15), "The Ruins of Old Guk"));
         t.Apply(new KillEvent(T0.AddMinutes(20), "froglok ghoul lord", "You"));   // 1200s < 1620s
 
-        Assert.Equal(1200, overrides.Find("Lower Guk", "a froglok ghoul lord")!.RespawnSeconds);
+        Assert.Null(overrides.Find("Lower Guk", "a froglok ghoul lord")?.RespawnSeconds);
+        // The kill still restarts the clock on the catalog's own number.
+        Assert.Equal(1620, Assert.Single(t.Snapshot(T0.AddMinutes(21))).DurationSeconds);
     }
 
     /// <summary>A timer recovered from the persist file carries no stay, and no evidence
