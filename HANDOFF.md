@@ -8,12 +8,68 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## START HERE — the next session's work: EQBuddy Mobile does not exist on Linux/macOS
+## START HERE — the next session has TWO items, both scoped below
 
-**This is the item to open a full session on** (David, 2026-08-19: *"note this for the
-next handoff prompt so we can start it with a full session"*). It is approved, it is
-scoped below, and it is big enough that it should not be squeezed onto the end of
-something else.
+David, 2026-08-19, on both: *"note this for the next handoff prompt so we can start it
+with a full session"* and *"flag that for the next session as part of a handoff along with
+the other I noted"*. They are independent; do them in either order.
+
+1. **EQBuddy Mobile does not exist on Linux/macOS** — approved, a port not a toggle.
+2. **The quick-tour images ship a real character name and predate the whole UI rework.**
+
+---
+
+## Item 2 — the tutorial images (audited 2026-08-19; the TEXT is already fixed)
+
+**The text is current as of `763512d`** — the tour no longer claims every card "drills
+into details", and it has a new "Cards that open windows" page naming what moved. **Only
+the pictures are left**, and one thing in them raises this above cosmetic.
+
+**Five PNGs, `src/EQBuddy/Assets/tutorial/`, all dated 20–21 July 2026.** The Avalonia
+csproj links that same folder (`AvaloniaResource Include="..\EQBuddy\Assets	utorial\*.png"`),
+so **one refresh fixes both UIs** — do not make a second copy.
+
+| Image | State |
+|---|---|
+| `t-widget.png` | **Real character: "Douglas (qeynos)".** Emoji card icons; "Tracked" not "Watch"; no KPI strip; no Quests or Gear card; Money/Progress/Faction still separate cards |
+| `t-history.png` | **Real character: "Douglas (qeynos)"**, with dates and a full session breakdown |
+| `t-combat.png` | No name. Pre-Gate-1 card chrome |
+| `t-watch.png` | No name. "Tracked" heading, emoji icons |
+| `t-mini.png` | No name. Old mini pill, emoji chips |
+
+**Two of the five carry a family member's character name and server, and they ship inside
+the installer** — every new player sees them on first launch. That is the same class of
+mistake CLAUDE.md already records twice for `shoot.ps1` captures; these predate that
+harness and were never re-checked. It is the reason to do this rather than leave it.
+
+They also advertise the failure mode the app spent Gate 5 removing: **emoji icons**, which
+box outright under Wine (#148, #166) on the builds where the tour matters most.
+
+**Four of the five can be regenerated with shots that already exist** — and against the
+throwaway fixture profile, which is exactly what makes the character-name problem go away
+(`Testchar (test)`):
+
+- `t-widget` → `shoot.ps1 -Shot widget-cards`
+- `t-combat` → `-Shot combat-card`
+- `t-watch` → `-Shot tracked-card` (already the renamed Watch card, three seeded rules)
+- `t-mini` → `-Shot mini-bar`
+- `t-history` → **no shot exists.** Needs an `EQBUDDY_HISTORY` hook in the
+  `EQBUDDY_QUESTS`/`EQBUDDY_PROGRESS` family, plus seeded history rows. Or drop the image
+  and let that page run text-only, which `Pages` already supports (`null`).
+
+**Watch for:** the tutorial images are CROPPED tighter than a full-window capture, so a raw
+shot may need trimming — decide whether the tour pages want the whole widget or a detail,
+and say so in the shot rather than hand-cropping. `shoot.ps1 -Out` can target
+`src/EQBuddy/Assets/tutorial` directly; names do not collide with `docs/screenshots`
+(trap 21) because it is a different directory, but check before adding any new shot name.
+
+---
+
+## Item 1 — EQBuddy Mobile does not exist on Linux/macOS
+
+It is approved, it is scoped below, and it is big enough that it should not be squeezed
+onto the end of something else — which is why it is a session of its own rather than a
+task in another one.
 
 **What was reported:** #208 (sbaum23) — *"I don't see the EQ Mobile option in the Linux
 version. Is there a way to start the mobile version from Linux?"* Scribe filed it as a
