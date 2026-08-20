@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -61,6 +61,7 @@ public sealed class OptionsWindow : Window
     private CheckBox _buffExpiringOnlyCheck = null!;
     private readonly TextBox _buffWarnBox;
     private CheckBox _mezChipsCheck = null!;
+    private readonly StackPanel _mezDurationList = new();
     private CheckBox _trackSpawnsCheck = null!;
     private CheckBox _spawnGrowUpCheck = null!;
     private CheckBox _mezGrowUpCheck = null!;
@@ -646,6 +647,20 @@ public sealed class OptionsWindow : Window
         panel.Children.Add(AppTheme.DimText(
             "Untick if your class never mezzes — the stack stops appearing entirely.",
             new Thickness(20, 2, 0, 0)));
+
+        // Mez durations, the same contract spawn durations have: your number outranks
+        // anything EQBuddy works out. Under the mez chips box because that is where
+        // someone whose mez chip is wrong already goes.
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Mez durations", FontSize = 12, FontWeight = FontWeight.SemiBold,
+            Foreground = AppTheme.AccentBrush, Margin = new Thickness(20, 12, 0, 0),
+        });
+        panel.Children.Add(AppTheme.DimText(
+            EQBuddy.UI.Shared.MezDurationRows.Blurb, new Thickness(20, 2, 0, 4)));
+        _mezDurationList.Margin = new Thickness(20, 0, 0, 0);
+        panel.Children.Add(_mezDurationList);
+        BuildMezDurations();
 
         _trackSpawnsCheck = Check("🕒 Track spawns (named respawn timers)",
             _main.Settings.TrackSpawns, on => _main.SetTrackSpawns(on));
@@ -1744,6 +1759,69 @@ public sealed class OptionsWindow : Window
             App.LogError(ex);
             _gearImportStatus.Text = $"Could not open EQ Legends Tools: {ex.Message}";
         }
+    }
+
+    /// <summary>
+    /// The mez-duration rows: spell, an editable duration, and one line saying where the
+    /// number came from. Rows come from <see cref="EQBuddy.UI.Shared.MezDurationRows"/>,
+    /// the same builder the WPF window uses, so the two cannot come to different words
+    /// about the precedence (#210's rule).
+    /// </summary>
+    private void BuildMezDurations()
+    {
+        _mezDurationList.Children.Clear();
+        foreach (var row in EQBuddy.UI.Shared.MezDurationRows.Build(_main.MezTracker))
+        {
+            // Two columns, never a horizontal StackPanel: a stack measures with infinite
+            // width in the stacking direction, so a long spell name would be CLIPPED
+            // against the box with no ellipsis to say so (trap 14).
+            var grid = new Grid { Margin = new Thickness(0, 6, 0, 0) };
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+
+            var name = new TextBlock
+            {
+                Text = row.Spell, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                Foreground = row.Source == MezDurationSource.Typed
+                    ? AppTheme.AccentBrush : AppTheme.TextBrush,
+            };
+            ToolTip.SetTip(name, row.SourceNote);
+            grid.Children.Add(name);
+
+            var spell = row.Spell;   // one capture per row, not the loop variable's last
+            var box = new TextBox
+            {
+                Text = row.DurationText, Width = 76, FontSize = 12,
+                HorizontalContentAlignment = HorizontalAlignment.Right,
+                Background = AppTheme.ComboBoxBrush, Foreground = AppTheme.TextBrush,
+                BorderBrush = AppTheme.BorderBrush,
+            };
+            ToolTip.SetTip(box, "A bare number here is SECONDS — \"44\" is 44 seconds, "
+                + "because mezzes are short. Clear the box to hand this spell back to EQBuddy.");
+            box.LostFocus += (_, _) => CommitMezDuration(spell, box.Text);
+            box.KeyDown += (_, e) =>
+            {
+                if (e.Key == global::Avalonia.Input.Key.Enter) CommitMezDuration(spell, box.Text);
+            };
+            Grid.SetColumn(box, 1);
+            grid.Children.Add(box);
+            _mezDurationList.Children.Add(grid);
+
+            var note = AppTheme.DimText(row.SourceNote, new Thickness(0, 1, 0, 0));
+            note.TextWrapping = TextWrapping.Wrap;
+            _mezDurationList.Children.Add(note);
+        }
+    }
+
+    /// <summary>A typed duration lands on commit. An empty box CLEARS it — the spell goes
+    /// back to whatever EQBuddy has learned since, or the catalog.</summary>
+    private void CommitMezDuration(string spell, string? text)
+    {
+        var typed = EQBuddy.UI.Shared.MezDurationText.Parse(text);
+        if (typed == _main.MezDurations.Find(spell)) return;   // nothing moved
+        _main.MezDurations.Set(spell, typed);
+        BuildMezDurations();
     }
 
     // ---------------------------------------------------------------- Behavior

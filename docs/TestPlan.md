@@ -161,6 +161,18 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | Ctrl+wheel resizes the Quest Tracker WINDOW, and a saved zoom survives reopening it | **Manual** — zoom out, close, reopen; layout must be identical, only smaller |
 | Layout: solo panel fills the viewport; chrome shrinks in fullscreen; nothing scrolls sideways | **Manual** — §6, or the harness |
 
+### Mez durations
+
+| Expectation | Held by |
+|---|---|
+| **A typed mez duration outranks both the learned value and the catalog** — the spawn-timer contract, applied to mezzes (Reddit ask, 2026-08-20) | **Auto** — `MezDurationOverrideTests` |
+| Learning continues under a typed value but can never win, so clearing the box lands on what has been observed SINCE rather than what was known that day | **Auto** — `MezDurationOverrideTests` |
+| One typed value covers every rank of that spell | **Auto** — `MezDurationOverrideTests` |
+| Typed values persist, and are never put through the learned store's healing pass — a player saying "mine is shorter than the book" is allowed to say it | **Auto** — `MezDurationOverrideTests` |
+| A corrupt overrides file costs the typed values and nothing else | **Auto** — `MezDurationOverrideTests` |
+| **A bare number in a mez box is SECONDS** ("44" = 44s), while a bare number in a spawn box is still MINUTES — the two parsers mean different things on purpose | **Auto** — `MezDurationOverrideTests` |
+| The editor exists on BOTH widgets, from one row builder, with the provenance line | **Auto** — `OptionsRenderTests` (Avalonia); **Shot** — `shoot.ps1 -Shot options-mez` |
+
 ## 4b. The widget's geometry
 
 | Expectation | Held by |

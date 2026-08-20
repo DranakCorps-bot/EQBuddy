@@ -1,9 +1,13 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 
 namespace EQBuddy.Core;
 
 /// <summary>One entry in the embedded mez catalog (Data/MezSpells.json).</summary>
+/// <summary>Which of the three sources a mez countdown's length came from — the
+/// precedence the player sees explained in Options.</summary>
+public enum MezDurationSource { Unknown, Catalog, Learned, Typed }
+
 public sealed class MezSpellInfo
 {
     public string Name { get; set; } = "";
@@ -383,10 +387,47 @@ public sealed class MezTracker
         return true;
     }
 
+    /// <summary>Where a chip's countdown comes from, in precedence order: what the
+    /// player TYPED, then what EQBuddy learned from a clean fade, then what the catalog
+    /// ships. The same order spawn timers have always used, and for the same reason —
+    /// the player watched the mez; EQBuddy only read about it.</summary>
     private double? DurationFor(string spell) =>
-        _learned.TryGetValue(spell, out var learned) ? learned
+        _overrides?.Find(spell) is { } typed ? typed
+        : _learned.TryGetValue(spell, out var learned) ? learned
         : _catalog.TryGetValue(SpellCatalog.BaseName(spell), out var info) ? info.DurationSeconds
         : null;
+
+    /// <summary>The typed-duration store. Learning goes on while one is set — it simply
+    /// cannot win — so clearing a typed value falls back to what has been observed SINCE
+    /// it was typed rather than to what was known on the day.</summary>
+    public void AttachOverrides(MezOverrides overrides)
+    {
+        lock (_lock) _overrides = overrides;
+    }
+
+    private MezOverrides? _overrides;
+
+    /// <summary>Effective duration and where it came from, for the Options editor. Kept
+    /// here rather than recomputed by the UI so the editor cannot disagree with the chip
+    /// it is explaining.</summary>
+    public (double? Seconds, MezDurationSource Source) ResolveDuration(string spell)
+    {
+        lock (_lock)
+        {
+            if (_overrides?.Find(spell) is { } typed) return (typed, MezDurationSource.Typed);
+            if (_learned.TryGetValue(spell, out var learned)) return (learned, MezDurationSource.Learned);
+            if (_catalog.TryGetValue(SpellCatalog.BaseName(spell), out var info) && info.DurationSeconds is { } c)
+                return (c, MezDurationSource.Catalog);
+            return (null, MezDurationSource.Unknown);
+        }
+    }
+
+    /// <summary>Every mez spell the catalog ships, base names, in catalog order — the
+    /// rows the editor offers.</summary>
+    public IReadOnlyList<MezSpellInfo> CatalogSpells
+    {
+        get { lock (_lock) return [.. _catalog.Values]; }
+    }
 
     /// <summary>The explicit break line: "X has been awakened by Y." Always drops
     /// exactly one chip (earliest expiry — the likeliest-awake one) and records the

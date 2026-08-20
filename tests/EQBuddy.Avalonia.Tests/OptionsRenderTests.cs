@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Input;
@@ -145,6 +145,80 @@ public class OptionsRenderTests : IDisposable
         options.Close();
         main.Close();
     }
+
+    /// <summary>
+    /// The mez-duration editor exists on THIS lane too, with a row per catalog spell and
+    /// the same provenance line the WPF window shows.
+    ///
+    /// The rows come from `UI.Shared.MezDurationRows`, so what this really pins is that
+    /// the Avalonia Options window still CALLS it. A surface that exists on two screens
+    /// and is built twice is #210's failure, and the way it shows up is one lane quietly
+    /// not having the feature at all — which is exactly what #208 turned out to be.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheAlertsTabEditsMezDurations()
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Settings.OptionsTab = "alerts";   // the tab they live on
+        var options = new OptionsWindow(main);
+        options.Show();
+
+        var texts = options.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Mez durations", texts);
+        Assert.Contains("Mesmerize", texts);
+        // The provenance line, not just the name — a row that cannot say where its number
+        // came from is the thing this feature exists to fix.
+        Assert.Contains(texts, t => t.Contains("as documented"));
+
+        // A box per catalog spell, holding the effective duration.
+        var boxes = options.GetVisualDescendants().OfType<TextBox>()
+            .Where(b => b.Text is "24s" or "48s" or "6s").ToList();
+        Assert.NotEmpty(boxes);
+
+        options.Close();
+        main.Close();
+    }
+
+    /// <summary>Typing a duration writes it through as the player's own, and clearing the
+    /// box hands the spell back. The precedence itself is `MezDurationOverrideTests`'
+    /// business; this is the wiring between the box and the store.</summary>
+    [AvaloniaFact]
+    public void TypingAMezDurationSticksAndClearingItGivesItBack()
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Settings.OptionsTab = "alerts";   // the tab they live on
+        var options = new OptionsWindow(main);
+        options.Show();
+
+        var box = options.GetVisualDescendants().OfType<TextBox>().First(b => b.Text == "24s");
+        box.Text = "44";
+        PressEnter(box);
+        Assert.Equal(44, main.MezDurations.Find("Mesmerize"));
+        Assert.Equal(MezDurationSource.Typed, main.MezTracker.ResolveDuration("Mesmerize").Source);
+
+        var typed = options.GetVisualDescendants().OfType<TextBox>().First(b => b.Text == "44s");
+        typed.Text = "";
+        PressEnter(typed);
+        Assert.Null(main.MezDurations.Find("Mesmerize"));
+        Assert.Equal(MezDurationSource.Catalog, main.MezTracker.ResolveDuration("Mesmerize").Source);
+
+        options.Close();
+        main.Close();
+    }
+
+    /// <summary>Commit a duration box the way a player does. LostFocus carries
+    /// FocusChangedEventArgs and cannot be synthesised from a bare RoutedEventArgs, so
+    /// this drives the OTHER commit path the editor offers — which is a real user path,
+    /// not a test-only door.</summary>
+    private static void PressEnter(TextBox box) =>
+        box.RaiseEvent(new global::Avalonia.Input.KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Key = global::Avalonia.Input.Key.Enter,
+        });
 
     [AvaloniaFact]
     public void LongOptionsContentHasABoundedScrollableViewport()

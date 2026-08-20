@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -53,6 +53,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private SpawnChipsWindow? _spawnChipsWindow;
     private MezChipsWindow? _mezChipsWindow;
     private readonly MezTracker _mezTracker = new();
+    private MezOverrides _mezDurations = new();
+    /// <summary>The mez tracker and the durations the player typed over it — the Options
+    /// editor reads both (typed &gt; learned &gt; catalog, the spawn contract).</summary>
+    internal MezTracker MezTracker => _mezTracker;
+    internal MezOverrides MezDurations => _mezDurations;
     private readonly SlowTracker _slowTracker = new();
     private readonly BuffTracker _buffTracker = new();
     private readonly BuffLossLog _buffLossLog = new();
@@ -305,6 +310,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         AttachSpellStore();
         _stats.AaStore = new AaLedgerStore(AppPaths.File("aa-ledger.json"));
         _mezTracker.AttachStore(AppPaths.File("mez-durations.json"));
+        // Typed mez durations live apart from the learned ones: that store is a
+        // self-healing cache that discards itself when it cannot be parsed, and a
+        // player's correction must not ride on a cache's housekeeping (MezOverrides).
+        _mezDurations = MezOverrides.Load(AppPaths.File("mez-overrides.json"));
+        _mezTracker.AttachOverrides(_mezDurations);
         // Quest ledger rides the same replay: the catalog decides what's worth keeping,
         // the store's time high-water mark keeps the replay from double-counting.
         QuestCatalog = QuestCatalog.LoadEmbedded();

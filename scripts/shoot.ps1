@@ -284,6 +284,16 @@ $Shots = [ordered]@{
     # saying where it went. The "… are tabs in here now" lines under the folded cards only
     # exist on this tab, and the tab is a SETTING rather than a hook, so it has to be
     # staged or the shot photographs "Look" and proves nothing.
+    # Options -> Alerts & chips, scrolled to the mez-duration editor. A row that is a
+    # label, a box and a source line is exactly the shape traps 14 and 19 bite: a name
+    # clipped against its box, or a heading that resolves to nothing and renders as body
+    # text. Neither shows in a diff or a render test.
+    # Zoomed out, because the rows sit below the fold of a tab this long and the window
+    # scrolls: at 100% the shot is a picture of the buff-set editor above them.
+    'options-mez'     = @{ Title = 'Options'
+                           Env = @{ EQBUDDY_OPTIONS = '1' }
+                           Set = @{ OptionsTab = 'alerts'
+                                    WindowZooms = @{ options = 0.55 } } }
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards' } }
