@@ -8,6 +8,48 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-20 (later): spawn-tracking quality pass — 3 fixes in, evidence store designed
+
+David brought a ChatGPT-authored upgrade plan for spawn tracking and asked for a review
+before implementing. The audit is in `104b1e2`'s message and in
+[docs/SpawnEvidence.md](docs/SpawnEvidence.md); **read that file before touching spawn
+learning**, it carries the decisions and the reasoning behind them.
+
+**Landed (`104b1e2`), each proven by watching its tests fail against the old code first:**
+
+1. **126 catalog named could never learn a timer.** `LearnFromRekill` returns before it
+   starts when there is no current duration — and 126 shipped named have a blank respawn
+   in a zone with no default (all 38 in High Keep, Princess Lenia among them; 47 in
+   Western Wastes). Being listed without a number was strictly worse than being absent,
+   since a DISCOVERED named measures its cycle on the second kill. They now do too.
+2. **The same-stay rule**, scoped to the no-known-duration path only. **I had this wrong
+   at first and said so:** a cross-stay gap is a TRUE upper bound, and where a duration
+   exists `gap < d` already keeps it harmless. It only bites where the first accepted gap
+   BECOMES the countdown. A test pins the deliberate non-application to the other path.
+3. **An import is someone else's number and now says so.** Both an import and a re-kill
+   set `Learned` and nothing else was recorded, so the Spawns window's tooltip literally
+   read "your kills or an import" — it could not do better. Marked now, cleared by your
+   own kills, and an import can no longer carry a stale `Sighted` flag.
+
+**Decided with David, for the next gate (all in docs/SpawnEvidence.md):**
+
+- The real prize is that **learning is a one-way ratchet with no path back** — 3 `Trusted`
+  entries in 1,414 means 99.7% of the catalog has no recovery from one bad sample. The
+  evidence store is what makes the minimum recomputable.
+- **Not standard deviation** — the data is one-sided and SD is most sensitive to exactly
+  the outlier it would be used to find. Robust spread instead: count within a tolerance of
+  the tightest observation.
+- **DUE stays at the earliest observed, with the typical shown beside it** (David's call).
+- **Sightings are the clean measurement** — no reaction-time term — and are the only way to
+  tell a variable spawn from an inattentive camper. Currently applied and discarded.
+- **Camp-specific learning: no**, concluded from the code — `/loc` is too rare.
+
+⚠️ **One open question for David** (in the doc's last section): `ZoneShare.Export` re-exports
+timers you IMPORTED and never verified, which makes community data self-reinforcing without
+new evidence. One-line change either way; it is a community call, not a technical one.
+
+---
+
 ## 2026-08-20: both scoped items landed, and both were bigger than the ask
 
 `main` clean and pushed at `1937270`. Gates green — **2,154 unit + 250 Avalonia + 15 E2E**.
