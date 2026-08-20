@@ -8,6 +8,55 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-20 (evening): 1.97.0 SHIPPED, and the Loot & Items theme is under way
+
+**1.97.0 is live and signed** — 7 assets, `Get-AuthenticodeSignature` = `Valid`, issuer
+`Microsoft ID Verified CS EOC CA 03`, timestamped, published hash matches the local
+artifact, OneDrive updated, both workflows green. Shipped as a MINOR (David's call): the
+entry had been staged as 1.96.2 for one fix and ended up carrying 14 highlights including
+a whole new platform for EQBuddy Mobile.
+
+⚠️ **One thing to remember about releasing:** immediately after publish the release had
+only 4 assets — no Linux or macOS builds — on the release whose headline is Linux/macOS
+support. Those come from the `Release assets` WORKFLOW, which starts when the tag lands and
+takes a couple of minutes; `release.ps1` prints "published" before it finishes. **Wait for
+that workflow and re-check the asset list before telling anyone it shipped.**
+
+### Loot & Items: three steps done, the window is next
+
+Chosen over Alerts by re-measuring (see ROADMAP.md, which now records why). Landed:
+
+- **Step 1 + 5 — `Core/LootSurface.cs`** (`a3c7e57`). All four tabs named so the keys are
+  settled once; only Loot and Gear `Hosted`, because a tab with nothing behind it reads as
+  broken rather than not-yet-arrived. The fold is written and TESTED and deliberately
+  **not called yet** — see below.
+- **Step 3 — `UI.Shared/LootTheme.cs`** (`bd4d555`). Badges and the launcher line.
+- **Gear on the two-host seam** (`bd4d555`). `GearCardView` builds its own body and
+  implements `IWidgetCard`; the widget hosts it through a bare `ContentControl` and asks
+  for instances via `MainWindow.NewGearCard()`.
+
+⚠️ **`MigrateLootSections()` IS WRITTEN AND MUST NOT BE CALLED until the window ships.**
+Wiring it into `AppSettings.Load` was the obvious next line and I did it, then checked what
+it would do to a player *tomorrow*: cards missing from `SectionOrder` are appended rather
+than hidden, so nothing would be lost — but every player who positioned their Gear card
+would find it at the bottom of the widget, in exchange for a window that does not exist.
+The comment in `AppSettings` says so at the call site. **The fold goes in with the window.**
+
+### What is left in this theme
+
+Step 4 (the window with its tab strip, both UIs), step 6 (mobile), step 7 (the absorbed
+note + the tour), then wire the fold, pin E2E on the window, lower the ratchet, shoot it.
+
+`ProgressWindow.xaml.cs` is the template to copy — `EqSegmentedStrip` for the tabs,
+`NewProgressSurfaces()` for the per-host card instances, `DebugFacts()` for the E2E channel.
+**Watch the tab strip: it must WRAP**, not sit in a horizontal `StackPanel` (trap 25 — the
+Progress theme lost its fourth chip off the window that way).
+
+⚠️ **`OptionsWindow.xaml.cs` has 32 lines of ratchet headroom.** It took the mez editor and
+the breakout rewrite this week. Anything else landing there needs a lift, not a bump.
+
+---
+
 ## 2026-08-20 (later): spawn-tracking quality pass — 3 fixes in, evidence store designed
 
 David brought a ChatGPT-authored upgrade plan for spawn tracking and asked for a review
