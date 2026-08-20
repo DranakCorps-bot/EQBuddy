@@ -96,7 +96,7 @@ became one theme, three tabs, one definition in Core. Five more follow:
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
 | **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
-| **Gear & Loot** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | **next (2026-08-20)** — unblocks #174 |
+| **Gear & Loot** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | **first pass done 2026-08-20 (1.98.0)** — the window exists, Loot and Gear are tabs 1 and 2 on both desktops. Drops and Items are named in `LootSurface` and not yet `Hosted`; a tab with nothing behind it reads as broken, so they arrive in a second pass — unblocks #174 |
 | **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | then — needs `RenderBuffs` lifted first; lands as its own WINDOW with tabs (David, 2026-08-20) |
 | **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | biggest lift |
 | **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity |

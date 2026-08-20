@@ -569,3 +569,25 @@ Nothing else came in overnight. #65 was closed by Frank himself, who moved its l
 item to #217 — worth noting he described Ask 2 there as "approved in principle, full
 history, account-wide", which I have NOT treated as authorization; it needs David's own
 word before anything is built.
+
+## 2026-08-20 — the Gear tab command sweep (Claude)
+
+Nothing from `SCRIBE.md` was taken this round; the work came direct from David. Recording
+it here anyway because it changes what is worth reporting.
+
+**A surface that names a task and offers no route is now a reportable defect, and it has a
+name.** The Gear tab said "Import an EQ Legends Tools shopping-list HTML in Options" and
+stopped — no copy button for `/outputfile inventory`, and no saying WHERE in Options. That
+is the same class as a silent no-op, and it had been on screen since the surface existed
+without anyone filing it.
+
+→ **Worth flagging when you see it in a screenshot or a report:** a sentence that tells the
+player to do something, with no visible way to do it. The tell is the words *import*,
+*type*, *run*, *export*, or a `/command` in prose with no button beside it. You do not need
+to grep for it — the picture is enough, and the picture is a thing you can get from David's
+PC per-command.
+
+**Also worth knowing for #94 (the slow-chip counter-type icon):** `IconPaths` has an unused
+`Hourglass` geometry, retired on purpose when slow stopped wearing the respawn mark. That is
+a place to look, not an answer — it is the wrong shape for disease/poison/curse, but it says
+the icon slot on that chip has been thought about before.

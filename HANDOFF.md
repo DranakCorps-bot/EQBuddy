@@ -1,14 +1,74 @@
 ﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (33) and the
+the non-negotiable rules, the where-things-live index, the trap list (35) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
 
 ---
 
-## 2026-08-20 (late): 1.98.0 IS LIVE AND SIGNED — start here
+## 2026-08-20 (latest): the command sweep is DONE and 1.98.1 is STAGED, NOT RELEASED
+
+**`main` clean and pushed at `b8077a7`. `Directory.Build.props` says 1.98.1 and
+`WhatsNew.json` has its entry — the release itself is waiting for David's go**, which he
+has not given. The 1.98.0 go does not carry forward.
+
+### What landed
+
+David's ask, verbatim: *"the gear tab should give me the copy button for /outputfile
+inventory … right now it's telling me to import it but not telling me how or giving me the
+tool with which to do it. That needs to be applied for every instance of needing the user to
+execute a command in game for an output file."*
+
+Both halves of the Gear tab are fixed, on both desktops. The ⧉ copy is built **outside
+`Render()` and outside the scroller**, so it belongs to the surface rather than to a state
+of it — no branch can forget it, and it is on the populated tab as well as the empty one.
+The empty state names both routes once each (the EQ Legends Tools export *and* `Options →
+Cards & windows → Import gear list…`), from one string in `UI.Shared`, and the row that used
+to repeat itself underneath is gone — E2E's `gearRows` pin moved 1 → 0 with it.
+
+**The sweep found no other gap.** Gear Locker, Inventory, the Quests window, Raids, the
+achievements menu and the map's `/loc` social all already had theirs, in both UIs. The gear
+checklist was the only surface missing one, which is why the general fix matters more than
+the fix.
+
+### The general fix, and the two new traps
+
+`GameCommandsTests` forbade a copy source from carrying its own literal — which says nothing
+about a surface carrying **no copy source at all**. That is the hole this fell through, green
+the whole time. `SurfacesNeedingACommand` is now a curated list, a reason per row, asserted
+positively, written the way `DeadSettingTests.Known` is. **Verified by checking the two rows
+for the broken surfaces fail on the pre-fix tree**, not merely that they pass on this one.
+→ CLAUDE.md trap 34: *a guard that forbids the wrong thing cannot see a missing thing.*
+
+**EQBuddy Mobile got selectable text, not a button — David's call, asked as its own
+question.** A phone's clipboard cannot reach the game on the PC, so a ⧉ there is a silent
+no-op wearing a working control's clothes. The command travels on the wire
+(`CompanionCommandPrompt`) rather than being spelled in `index.html`; the two `/outputfile`
+literals that were in the page are gone, and `GameCommandsTests` now forbids the page from
+carrying one. Gear and Raids both, both states. → trap 35.
+
+### Verified rather than assumed
+
+Screenshots dark **and** Solarized with the contents predicted before the run (trap 23); a
+new `gearloot-gear-empty` shot, because the empty state is the one David was looking at and
+nothing photographed it; the **real shipped `index.html`** driven through
+`mobile-harness.ps1` on a new `WriteGearSnapshot` fixture, populated and empty; binaries
+grepped for the new strings before trusting any capture (trap 18). 2,236 unit + 256 Avalonia
++ 17 E2E.
+
+### One number moved
+
+**`EQBuddy.Avalonia/MainWindow.cs` spent 25 of its ~100 ratchet lines — 76 left**
+(5,564 / 5,640). The gear-checklist lift is still the next move on that build and is now
+more urgent, not less. Note it is also the surface that just changed, so the `WidgetRenderTests`
+pin written for this change (`TheGearCardHandsOverTheInventoryCommand`) is part of the
+before-the-move coverage CLAUDE.md asks for.
+
+---
+
+## 2026-08-20 (late): 1.98.0 IS LIVE AND SIGNED
 
 `main` clean and pushed at the tag. **1.98.0 released, signed as
 `CN=FlossworksCross-Stitch`, valid and timestamped**, on OneDrive and GitHub, installed
@@ -89,7 +149,8 @@ source are still 4-for-4 wrong, so treat one as a place to look.
 
 ## What is actually next — pick one, they are independent
 
-**0. DAVID ASKED FOR THIS DIRECTLY (2026-08-20, after 1.98.0 shipped) — do it first.**
+**0. ~~DAVID ASKED FOR THIS DIRECTLY~~ — DONE 2026-08-20, see the section at the top of this
+file. Kept below because the reasoning is the durable part; nothing in it is a to-do.**
 
 > *"the gear tab should give me the copy button for /outputfile inventory … right now it's
 > telling me to import it but not telling me how or giving me the tool with which to do it.
@@ -167,6 +228,41 @@ purpose yet**, and the labels ("Loot & watches", "Gear checklist") do not come f
 David, recorded in `docs/SpawnEvidence.md`. Unchanged.
 
 **5. The spawn evidence store (Gate 2)** — designed in `docs/SpawnEvidence.md`, not built.
+
+**6. Small things a repo sweep turned up on 2026-08-20 that are in nobody's inbox.** None is
+a player-facing bug; all four are the kind of thing that only a deliberate scan finds. In
+descending order of worth:
+
+- **The build has 22 warnings and nothing gates them, so a real signal cannot be seen.**
+  Two are the compiler telling us about dead state: `MainWindow._gearChecklistDirty` (WPF) is
+  set in **eight** places and read in **none** — the Gear & Loot fold left the write path and
+  took the reader, exactly the trap-20 shape, and it is harmless only because
+  `GearLootWindow.MaybeRefresh` repaints the gear tab every second unconditionally. The
+  Avalonia twin still reads its flag, so the two builds do different amounts of work for the
+  same result. `_dmgOutSortDps` and `_healSortHps` (Avalonia) are never used at all — free
+  lines on the file with 76 left. **`DeadSettingTests` covers settings; nothing covers
+  fields, and the compiler already knows.**
+- **A stale git worktree**, `.claude/worktrees/compassionate-euler-6085c2`, on branch
+  `claude/compassionate-euler-6085c2` at `2b7c241` from 2026-08-07 ("Linux updater points at
+  the tarball asset"). **Unmerged, but its content is superseded** — `UpdateOffer.cs` and
+  `UpdateChecker.LinuxTarballName` are on `main` and have since grown a macOS fix the old
+  commit never had. Nothing is lost by removing the worktree and the branch; left in place
+  because deleting someone's branch is their call.
+- **`ROADMAP.md`'s theme table said Gear & Loot was "next"** after it shipped in 1.98.0.
+  Corrected in this commit, with the second pass (Drops, Items) named so the row is not
+  wrong again the moment those land. CLAUDE.md says keep that table true because it is the
+  one doc a non-engineer reads.
+- **Three `IconPaths` geometries are drawn and never used**: `Hourglass`, `Scales`, `Tray`.
+  `Hourglass` is deliberate — `1325b29`, *"One mark per meaning: slow stops wearing the
+  respawn hourglass (David)"* — and is arguably the natural home for the slow-chip
+  counter-type icon Frank asks for in `SCRIBE.md` (#94). The other two have no such story.
+  Trap 29 says an unused `IconPaths` entry is worth a look for the same reason a
+  written-never-read setting is.
+- Clean results worth recording so nobody re-runs them: **no TODO/FIXME/HACK anywhere in
+  `src`**, no leftover `.patch` files, no untracked stragglers, and **no trap-29 repeats** —
+  every control declared `Visibility="Collapsed"` in XAML is un-hidden by something. One doc
+  link has rotted: `docs/ImplementationPlan.md` cites `Core/SessionJournal.cs`, which does
+  not exist.
 
 ### Waiting on reporters — do not chase, do not close
 
