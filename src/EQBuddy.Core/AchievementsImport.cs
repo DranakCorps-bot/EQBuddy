@@ -1,4 +1,4 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>One achievement from `/outputfile achievements` — a C/I flag, a name, and
 /// flagged criteria lines beneath it.</summary>
@@ -76,8 +76,27 @@ public static class AchievementsImport
                 c.ClassName.Equals(className, StringComparison.OrdinalIgnoreCase)).ToList();
             if (rewards.Count == 0) continue;
 
-            var wasAutoGranted = a.Complete && a.Criteria.Any(c =>
-                c.Complete && c.Text.Contains("will autocomplete", StringComparison.OrdinalIgnoreCase));
+            // TWO ways to get a class unlock without doing the quests, and the dump marks
+            // the Obtain criteria complete for BOTH. Each announces itself with its own
+            // completed criterion:
+            //
+            //   confirmed as your primary  →  "will autocomplete…"            C
+            //   bought with a token        →  "can be bypassed using a … Token"  C
+            //
+            // 1.57.3 shipped only the first, which is why #101 read as fixed and #193
+            // (wizen) stayed broken: he bought Primary Class Unlock TOKENS, so his Bard
+            // unlock has the autocomplete line INCOMPLETE and the bypass line complete —
+            // the guard never fired and six rewards he had never obtained imported as
+            // turned in. His own three-way dump (2026-08-20) is what settles it, and it is
+            // pinned verbatim in AchievementsImportTests: Druid confirmed-as-primary,
+            // Bard token-unlocked, Berserker untouched.
+            //
+            // `a.Complete` still gates everything, so an unfinished unlock keeps its
+            // per-criterion trust — the game tracks those flags honestly, and the
+            // Berserker case proves it (every line I, nothing skipped, nothing imported).
+            var wasAutoGranted = a.Complete && a.Criteria.Any(c => c.Complete
+                && (c.Text.Contains("will autocomplete", StringComparison.OrdinalIgnoreCase)
+                 || c.Text.Contains("can be bypassed", StringComparison.OrdinalIgnoreCase)));
 
             foreach (var (text, complete) in a.Criteria)
             {

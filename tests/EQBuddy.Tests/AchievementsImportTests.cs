@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -85,6 +85,73 @@ public class AchievementsImportTests
         Assert.DoesNotContain(matches, m => m.Reward == "Girdle of Faith");
         Assert.Contains(autoGranted, g => g.Contains("Girdle of Faith"));
         Assert.Contains(matches, m => m is { ClassName: "Bard", Reward: "Amulet of the Fae" });
+    }
+
+    /// <summary>
+    /// #193 (wizen) — the OTHER way to get a class unlock without doing the quests.
+    ///
+    /// 1.57.3 guarded the primary-class auto-grant and #101 read as fixed, but wizen kept
+    /// reporting ticked Bard rewards he had never obtained. He bought **Primary Class
+    /// Unlock Tokens**, and a token unlock announces itself with a different completed
+    /// criterion: the "will autocomplete" line stays INCOMPLETE and the "can be bypassed
+    /// using a Primary Class Unlock Token" line is the one flagged complete. The guard
+    /// looked only at the first, so the token case walked straight through it.
+    ///
+    /// The three cases below are wizen's own achievements dump, pasted on 2026-08-20,
+    /// verbatim and unedited — and it is a genuine control set rather than one example,
+    /// which is what makes it safe to key on (CLAUDE.md: never match on one person's file):
+    ///
+    ///   Druid      confirmed as primary  autocomplete C, bypass I  → skip
+    ///   Bard       bought with a token   autocomplete I, bypass C  → skip
+    ///   Berserker  never unlocked        everything I              → untouched
+    ///
+    /// The Berserker row is the one that keeps this honest: it proves the fix does not
+    /// simply skip every class unlock it sees.
+    /// </summary>
+    [Fact]
+    public void TokenUnlockedClassNeverImports()
+    {
+        var checklist = new List<SkyQuestChecklistItem>
+        {
+            new() { Id = "1", ClassName = "Druid", Reward = "Shillelagh", QuestItem = "a" },
+            new() { Id = "2", ClassName = "Bard", Reward = "Mask of Song", QuestItem = "b" },
+            new() { Id = "3", ClassName = "Bard", Reward = "Amulet of the Fae", QuestItem = "c" },
+            new() { Id = "4", ClassName = "Berserker", Reward = "Skycleaver", QuestItem = "d" },
+        };
+        var lines = new[]
+        {
+            "Untapped Potential: Classes",
+            // 1. Confirmed as primary — the case 1.57.3 already handled.
+            "C	Primary Class Unlock - Druid",
+            "C		Obtain Shillelagh.",
+            "C		This achievement will autocomplete if you chose to confirm your Primary Class as a Druid.",
+            "I		This achievement can be bypassed using a Primary Class Unlock Token.",
+            // 2. Bought with a token — the case that was still importing.
+            "C	Primary Class Unlock - Bard",
+            "C		Obtain Mask of Song.",
+            "C		Obtain Amulet of the Fae.",
+            "I		This achievement will autocomplete if you chose to confirm your Primary Class as a Bard.",
+            "C		This achievement can be bypassed using a Primary Class Unlock Token.",
+            // 3. Never unlocked — nothing to skip and nothing to import.
+            "I	Primary Class Unlock - Berserker",
+            "I		Obtain Skycleaver",
+            "I		This achievement will autocomplete if you chose to confirm your Primary Class as a Berserker.",
+            "I		This achievement can be bypassed using a Primary Class Unlock Token.",
+        };
+
+        var (matches, _, autoGranted) =
+            AchievementsImport.SkyRewards(AchievementsImport.Parse(lines), checklist);
+
+        // Nothing from either granted class is imported…
+        Assert.DoesNotContain(matches, m => m.ClassName is "Druid" or "Bard");
+        // …and both are REPORTED rather than silently dropped, which is what lets a
+        // player see why their rewards did not tick.
+        Assert.Contains(autoGranted, g => g.Contains("Shillelagh"));
+        Assert.Contains(autoGranted, g => g.Contains("Mask of Song"));
+        Assert.Contains(autoGranted, g => g.Contains("Amulet of the Fae"));
+        // The unearned class is untouched by all of it.
+        Assert.DoesNotContain(autoGranted, g => g.Contains("Skycleaver"));
+        Assert.DoesNotContain(matches, m => m.ClassName == "Berserker");
     }
 
     [Fact]
