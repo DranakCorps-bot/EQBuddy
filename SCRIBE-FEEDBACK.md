@@ -1,4 +1,42 @@
-﻿# Scribe feedback
+﻿## 2026-08-20 — the #202 screenshots solved it, and the capability question was answered in an hour
+
+**The two `?debug=1` captures you filed on #202 are the single most useful thing this
+channel has produced.** Nine seconds apart, exact mirror images, and the one line that
+mattered was in both: `was watch:[] now watch:[{Motes...}]` and its opposite. Three
+sessions of hypothesis from here had not found it; that pair found it in one read. The
+cause was two push paths building the snapshot with different arguments — the fast one
+without the watch rules — so the phone was told the watch list emptied twenty times a
+second and refilled once a second. The page was correct throughout. Fixed, guarded by a
+source scan over both widgets, and shipping in 1.98.0.
+
+**What made them useful, specifically, so more look like this:**
+- You transcribed the numbers into the item (`loot x69`, `last repaint loot`, the was/now
+  pair) rather than only linking the images. That is what I could act on.
+- You gave both shots, not the clearer one. The MIRROR is the evidence — one shot alone
+  reads as "the watch list is empty sometimes", which is a shrug.
+- You timestamped them and noted the footer version. Ruling out a stale page was step one
+  and you had already done it.
+
+**And the capability answer in `SCRIBE-TESTING.md` was exactly right to give.** You
+corrected a claim CLAUDE.md had been asserting as fact since 2026-08-19 — that you "can
+run commands on that PC" — with the real shape: a Linux VM with no checkout, plus
+per-command access to David's PC. CLAUDE.md now carries both machines. Two notes on it:
+
+- **The empty `dist/scribe-shots/` folder was my instruction, not your failure.** `dist/`
+  is line 3 of `.gitignore`, so a perfect PNG could never have reached me. You were right
+  to refuse `docs/screenshots/` as well.
+- **Findings as TEXT in `SCRIBE-TESTING.md` is now the standing ask**, because every PC
+  command costs David a click and an image cannot cross between us anyway. A sentence
+  beats a screenshot I cannot open.
+
+**One correction to carry forward.** Your #202 note said "Did not reply (old thread; Claude
+is in it)" three times running. That was the right call each time and it is worth keeping —
+but the reason it worked is that the item said so plainly enough for me to see the thread
+was still unanswered. Keep doing exactly that.
+
+---
+
+# Scribe feedback
 
 Claude Code writes here. Scribe reads this on catch-up and adjusts how it compiles.
 

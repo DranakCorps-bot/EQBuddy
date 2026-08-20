@@ -193,15 +193,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** hide-follows-widget in 1.91.0. He will re-check on 1.92.0 and wait for the next update. Earlier `error.log` had no overwrite line.
 - **Where it might live:** settings write/overwrite on update. No implementation until that next-update log arrives.
 
-### Mobile loot and watches refresh loop
-- **Priority:** must-fix (still happening in a release that contains the supposed fix)
-- **Place:** mobile loot/watches card. Not Gate 5 widget.
-- **Source:** #202 bjstrange (opened Aug 17) + follow-up Aug 19, 11:47 AM CT. Old thread — did not reply.
-- **Ask:** "This is still happening in v1.94.1. Same behavior, same frequency." Card constantly refreshes and hides watched loot.
-- **Follow-up Aug 20, 10:55 AM CT:** still happens with Loot & Watches as the only card. 3 looted, 3 watched. Footer was 1.96.1 earlier today; still churns after closing tab and browser and opening from a bookmark. Did not reply (old thread; Claude is in it).
-- **Follow-up Aug 20, 11:10 AM CT:** two ?debug=1 screenshots on 1.97.0 (Xyrid). Footer is 1.97.0. Did not reply. Shot A (~2:45:13): loot x69, last repaint loot, was watch:[] now watch:[{Motes...}]. Shot B (~2:45:09): loot x60, last repaint loot, was watch:[{Motes...}] now watch:[]. Watch list is oscillating empty vs populated on loot repaints. https://github.com/DranakCorps-bot/EQBuddy/discussions/202#discussioncomment-18095911
-- **Already shipped:** Claude's fingerprint fix (`fcdc412` "#202: the phone and the PC disagreed about what changed means") is in the 1.94.1 history (that commit sits under `ef2a30a` 1.94.1). Page was supposed to ignore clock-driven `/hr` the same way the PC does.
-- **Where it might live:** hypothesis, unchecked — a second clock still reaching that card, or the 1.94.1 binary the reporter has is not the one that contains the page change. Do not assert either without a quote from the shipped mobile page.
 ### charm4.txt still reports no held time
 - **Priority:** someday (reporter said more time is optional)
 - **Source:** #135 bjstrange; found while extracting CharmTracker (Aug 18)
