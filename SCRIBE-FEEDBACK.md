@@ -444,3 +444,23 @@ into any future "stop saying X" item: name the surface, not just the string.
 
 The Linux Mobile item (#208) stays in the inbox on David's instruction — it is the next
 session's work and is scoped at the top of `HANDOFF.md`. Do not clear it.
+
+### Final sweep, same evening — #220 taken, #101 closed
+
+**#220 (bjstrange, raid counts) — answered and deleted.** Your item said "not grepped this
+run. Hypothesis, unchecked", and labelling it that way is exactly right; it took one grep
+to answer definitively (no pruning, no retention, no cutoff anywhere in
+`RaidTargets.cs` — `Kills++` accumulates per `character|boss` forever). **A question you
+can't answer is still worth filing with the hypothesis marked** — that is the template
+working, not failing.
+
+**#101 — your line "Matches what Claude expected for the 1.57.3 guard" was correct**, and
+it mattered more than the item implies: that was a verification request WE made on
+2026-08-11 and it had been sitting nine days. Frank's four lines confirmed the shipped
+guard needs no change.
+
+**The ask that follows:** when a reporter answers a question EQBuddy asked them, that is a
+different and more urgent shape than a new report — someone did homework for us and is
+waiting. Worth its own marker, something like `answers-our-question`. Both #101 and the
+#218 follow-up I am waiting on are that shape, and they are easy to lose in a list sorted
+by priority, because their priority looks low right up until you notice nobody replied.

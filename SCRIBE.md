@@ -20,6 +20,21 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Instance charges timer on the widget
+- **Priority:** waiting (blocked on one verbatim log line from the reporter — Claude asked 2026-08-19)
+- **Place:** overlay chip vocabulary (Gate 6), IF the log carries it at all.
+- **Source:** #221 NeONDaRoO Aug 19, 9:36 PM CT. **Claude replied.**
+- **Ask:** show the instance-charge regen timer on the widget so you can spend a charge before capping and wasting one.
+- **Claude, 2026-08-19 — it PASSES the surface rule, and that is the unusual part.** "You
+  are about to cap and waste a charge" is a deadline with an action, so it earns overlay
+  space the way spawn and mez chips do, and would be a chip rather than a card.
+- **Checked:** `rg -i "instance charge|charges|instance manager"` over `LogParser.cs` and
+  `GameEvent.cs` — **no hits**; no fixture log contains the word either. EQBuddy has never
+  seen a charge line, so this is only buildable if the game writes one. Asked him to search
+  his own log and paste it verbatim, or confirm it is empty. **Do not infer the timer from
+  time-since-login** — a drifting timer is worse than none, because he would stop checking
+  the instance manager and lose the charge anyway. Told him that in as many words.
+
 ### Updater one-hops through older releases
 - **Priority:** waiting (Claude claims fixed in next build; needs n3cr0nk1tt3n to confirm an update folder / OneDrive EQBuddyDownload -- if they have neither, the GitHub path still has a bug)
 - **Place:** updater. Not Gate 5.
@@ -130,6 +145,17 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask (wizen):** Bought Primary Class Unlock tokens; EQBuddy treats Bard obtain-steps as completed because the achievements file marks them `C`. "unlocking one or two and intending on questing for the rest." Minimal suggestion: a per-class Unlocked (didn't quest it) switch.
 - **n3cr0nk1tt3n:** "The Achievement window counts your primary class (or unlocked with a Primary Class Token) as complete without actually doing the turn ins, which might confuse the tracker as well."
 - **Already shipped:** original empty-filter false-tick fixed in 1.88.4. Claude already asked for side-by-side files.
+- **Evidence (#101 Frank Aug 19, 8:42 PM CT):** pasted Primary Class Unlock - Paladin from his dump. Autocomplete criterion is C, same as the four Obtain lines; only the bypass-token line is I. Matches what Claude expected for the 1.57.3 guard. Did not reply (old thread).
+- **Claude, 2026-08-19 — verified and REPLIED on #101.** The shipped guard is
+  `a.Complete && criteria.Any(c => c.Complete && c.Text.Contains("will autocomplete"))`
+  (`AchievementsImport.cs:79`), so Frank's case is covered as written and needs no second
+  detector. That closes a verification request we opened 2026-08-11.
+  **What it opens is the TOKEN half of wizen's ask:** Frank's bypass-token criterion is
+  `I` because he confirmed a primary class rather than spending a token. If a token unlock
+  leaves that line `C` while the autocomplete line stays `I`, the guard never fires — which
+  is exactly wizen's symptom — and the fix is the same rule reading one more criterion.
+  **Still blocked on a token-side dump**; do not implement from Frank's file alone
+  (CLAUDE.md: never match on one person's file; #206's lesson).
 - **Where it might live:** hypothesis — the bypass line in wizen's paste (`C This achievement can be bypassed using a Primary Class Unlock Token`) vs a quested file. Do not match on one person's file.
 
 
