@@ -88,6 +88,19 @@ public sealed class OptionsViewModelTests
         Assert.True(vm.Cards.Single(c => c.Key == "progress").Hidden);
         vm.ToggleCard("progress");
         Assert.False(vm.Cards.Single(c => c.Key == "progress").Hidden);
+
+        // A folded card says where its cards went, ON THIS SCREEN — #219
+        // (typical-usual-chaos) went to Options looking for Motes, found no row, and
+        // reasonably concluded the feature had been deleted. A fold is invisible by
+        // construction: the row that would explain it is the row that was removed.
+        var progress = vm.Cards.Single(c => c.Key == "progress").Absorbed;
+        Assert.NotNull(progress);
+        // By the words a player is scanning for, not by key.
+        foreach (var gone in new[] { "Money", "Motes", "Faction", "Raids" })
+            Assert.Contains(gone, progress);
+        Assert.Contains("Sky Quest", vm.Cards.Single(c => c.Key == "quests").Absorbed!);
+        // A card that never absorbed anything says nothing.
+        Assert.Null(vm.Cards.Single(c => c.Key == "loot").Absorbed);
     }
 
     [Fact]

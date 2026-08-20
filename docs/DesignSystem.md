@@ -1,4 +1,4 @@
-# The UI/UX rework — audit, system, and gate log
+﻿# The UI/UX rework — audit, system, and gate log
 
 **Gate 1 (§1–§8): accepted 2026-08-17.**
 **Gate 2 (§10): Quests, both UIs, built 2026-08-17.**
@@ -829,7 +829,7 @@ branches on and that the stored default selects one.
 
 ### Two things the screenshot review needed staging for
 
-Neither the Watch card's strip nor the Raids card's boss rows could be photographed at all:
+Neither the Watch card's strip nor the Raids surface's boss rows could be photographed at all:
 the strip appears only above two or more rules, and the Raids body only once something is
 defeated. `shoot.ps1` gains **`tracked-card`** (three rules the fixture actually matches,
 one of them with three kinds under it so the fold shows) and **`raids-card`** (a seeded

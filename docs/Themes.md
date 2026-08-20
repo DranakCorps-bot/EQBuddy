@@ -1,4 +1,4 @@
-# Themes: consolidating the surfaces
+﻿# Themes: consolidating the surfaces
 
 **Status: ACCEPTED DIRECTION.** David, 2026-08-19: *"I do want to move to themes, this
 is part of the major UX revamp that organizes everything much better. it's not a proposal,
@@ -38,8 +38,9 @@ not a product, and three specific costs are already being paid:
 
 ## The recipe
 
-Six steps, in this order. The quest consolidation did all six; the class names below
-are the precedent to copy.
+Seven steps, in this order. The quest consolidation did the first six; step 7 was added
+on 2026-08-19 after the Progress theme shipped without it and a player lost a stat inside
+the hour. The class names below are the precedent to copy.
 
 | # | Step | Precedent |
 |---|---|---|
@@ -49,6 +50,21 @@ are the precedent to copy.
 | 4 | **One window, tabs inside, filters shared across tabs.** | `QuestsWindow` — class lens, era, state, mode strip |
 | 5 | **Fold the old settings keys**, preserving position and hidden state. | `sky`/`epic` → `quests`, pinned by `OptionsViewModelTests` |
 | 6 | **Mobile in the same change**, reading the Core definitions from step 1–2. | `CompanionProjection.Checklists` |
+| 7 | **Say that it moved**, in the app and in the tour. | `OverlaySections.AbsorbedNote`, the "Cards that open windows" tutorial page |
+
+**Step 7 is not politeness, it is the one step a fold cannot do for itself.** A
+consolidation is invisible by construction: the thing that would have told you where a
+card went is the card that was removed. #219 (typical-usual-chaos) is the worked example —
+the Motes card became a tab, he went to **Options → Cards & windows**, which is the one
+screen in the app whose entire job is to list every card, found no Motes row and nothing
+anywhere saying why, and filed *"now I can't get it back"*. From where he stood the
+feature had been deleted, and he was not wrong to say so.
+
+So the surviving card names the cards it absorbed, **by their old titles**, on that
+screen — "Money · Motes · Faction · Raids are tabs in here now" — because those are the
+words someone is scanning for. `OverlaySections.AbsorbedTitles` is the one table; add a
+line to it in the same commit as the fold. And re-read the tour: it told people every card
+"drills into details" for three months after the first card became a launcher.
 
 **Pin behaviour in E2E before the move**, not after — facts into the `EQBUDDY_EXPAND`
 dump, asserted from `tests/EQBuddy.E2E`. With no unit tests in the WPF layer that

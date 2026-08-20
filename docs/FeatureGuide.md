@@ -1,4 +1,4 @@
-# EQBuddy Feature Guide & Manual Verification
+﻿# EQBuddy Feature Guide & Manual Verification
 
 A per-feature description of everything UI-surfaced, with how to verify each by hand.
 Written for cross-platform parity work (issue #4): if a change touches a feature here,
@@ -367,16 +367,21 @@ Exaltations follows, item sources remain with their own rows, effect text is sma
 and parenthetical, and toggling a checkbox updates the Gear-card count and persists
 after restart. Import a gear-only export as a compatibility check.
 
-### Money card
+### Wealth tab — Progress window (was the Money card)
+*Folded into the Progress theme 2026-08-19 (docs/Themes.md); the widget's Progress card
+opens it, and its line carries the coin total and the mote rate while you play.*
+
 Corpse coin vs merchant income, drops count, biggest drop, per-hour rates (wall +
 active), everything sold with per-item totals.
 
-### Progress card
+### Experience tab — Progress window (was the Progress card)
 XP gains + %/hr (session and recent window), AA points + AA/hr, estimated time to
 next level (exact after a level-up this session, else an upper bound), level-ups with
 **time-in-level**, skill-ups per skill.
 
-### Faction / Travels & Deaths cards
+### Faction tab — Progress window · Travels & Deaths card
+*Faction folded into the Progress theme 2026-08-19. Travels & Deaths is still a card.*
+
 Net faction standing per faction. A standing at the cap shows **maxed** — the game
 says `Your faction standing with X could not possibly get any better.` and EQBuddy
 passes that on rather than letting a farmed faction look stuck (a faction that moved

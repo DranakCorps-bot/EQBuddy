@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -33,10 +33,30 @@ public partial class TutorialWindow : Window
             null, TruncationChoice: true),
 
         new("The widget",
-            "An always-on-top card that follows whoever is playing. Click any section to drill " +
-            "into details, drag anywhere to move it. The dot is green while the log is live. " +
-            "↻ restarts the session count; – minimizes to the mini pill; ⚙ opens Options.",
+            "An always-on-top stack of cards that follows whoever is playing. Most cards open " +
+            "downward when you click them; a few have an ↗ instead, and those open a full " +
+            "window — there is more to say than a card can hold. Drag anywhere to move it. " +
+            "The dot is green while the log is live. ↻ restarts the session count; " +
+            "– minimizes to the mini pill; ⚙ opens Options.",
             "t-widget.png"),
+
+        // Added 2026-08-19 with the Progress theme. The tour predated the windows
+        // entirely and still told people every card "drills into details" — which stopped
+        // being true the moment a card became a launcher. #219 is what a player does when
+        // a surface moves and nothing tells them: they go looking in Options, find
+        // nothing, and reasonably conclude the feature was removed.
+        new("Cards that open windows",
+            "Two cards are doors. QUESTS opens the Quest Tracker — every quest searchable by " +
+            "the reward you want, plus your Epic 1.0 and Plane of Sky checklists. PROGRESS " +
+            "opens four tabs: Experience, Wealth (coin AND motes, with the per-hour rate), " +
+            "Faction, and Raids.\n\n" +
+            "Both replaced several smaller cards, so if you are looking for one that used to " +
+            "be on the widget — Money, Motes, Faction, Raids, Sky Quest, Epics — it is a tab " +
+            "inside one of these now. ⚙ Options → Cards & windows names which, under the " +
+            "card that absorbed it.\n\n" +
+            "The card's own line still carries the numbers worth glancing at while you play, " +
+            "so you only open the window when you actually want to read something.",
+            null),
 
         new("Combat, Details!-style",
             "Damage by attack with share bars: total · hits · average · per-ability DPS · crit " +

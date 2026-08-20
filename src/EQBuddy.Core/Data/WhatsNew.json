@@ -1,5 +1,14 @@
 ﻿[
  {
+  "version": "1.96.2",
+  "date": "2026-08-19",
+  "highlights": [
+   "THE APP NOW TELLS YOU WHERE A CARD WENT. As cards get folded into windows with tabs, Options - Cards & windows lists what each one absorbed, under the card that absorbed it: \"Money - Motes - Faction - Raids are tabs in here now\" under Progress, \"Sky Quest - Epics are tabs in here now\" under Quests. This is the screen you open when a card is missing, and until now it was the one screen that could not answer the question - a consolidation hides itself, because the row that would explain it is the row that was removed.",
+   "The quick tour has a new page, \"Cards that open windows\", and no longer claims every card just opens downward - some carry an arrow and open a full window instead. That sentence had been wrong since the first card became a launcher.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+  ]
+ },
+ {
   "version": "1.96.1",
   "date": "2026-08-19",
   "highlights": [

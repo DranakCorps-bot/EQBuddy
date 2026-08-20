@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -1596,6 +1596,22 @@ public sealed class OptionsWindow : Window
                 card.Hidden ? "Show card" : "Hide card (data still collected)", 3,
                 () => { _vm.ToggleCard(card.Key); ApplyCards(); }));
             _cardsPanel.Children.Add(row);
+
+            // "Money · Motes · Faction · Raids are tabs in here now" — #219. A fold is
+            // invisible by construction: the row that would have told you where a card
+            // went is the row that was removed, and this is the screen someone opens when
+            // a card is missing. Same words as the WPF twin, from the same shared table.
+            if (card.Absorbed is { } absorbed)
+            {
+                _cardsPanel.Children.Add(new TextBlock
+                {
+                    Text = absorbed,
+                    FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 0, 0, 2),
+                    Foreground = AppTheme.DimBrush,
+                });
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -1508,6 +1508,24 @@ public partial class OptionsWindow : Window
                 card.Hidden ? "Show card" : "Hide card (data still collected)", 3,
                 () => { _vm.ToggleCard(card.Key); ApplyCards(); }));
             CardsPanel.Children.Add(row);
+
+            // "Money · Motes · Faction · Raids are tabs in here now" — #219. A fold is
+            // invisible by construction: the row that would have told you where a card
+            // went is the row that was removed, and this is the screen someone opens when
+            // a card is missing. Metadata weight, under the card it belongs to.
+            if (card.Absorbed is { } absorbed)
+            {
+                var note = new System.Windows.Controls.TextBlock
+                {
+                    Text = absorbed,
+                    FontSize = EQBuddy.UI.Shared.DesignTokens.Spec(
+                        EQBuddy.UI.Shared.DesignTokens.TypeRole.Metadata).Size,
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 0, 0, 2),
+                };
+                note.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "DimBrush");
+                CardsPanel.Children.Add(note);
+            }
         }
     }
 

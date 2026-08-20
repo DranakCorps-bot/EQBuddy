@@ -230,6 +230,14 @@ $Shots = [ordered]@{
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
+    # Options → Cards & windows, which is the screen a player opens when a card has gone
+    # missing — #219 (typical-usual-chaos) went looking for Motes here and found nothing
+    # saying where it went. The "… are tabs in here now" lines under the folded cards only
+    # exist on this tab, and the tab is a SETTING rather than a hook, so it has to be
+    # staged or the shot photographs "Look" and proves nothing.
+    'options-cards'   = @{ Title = 'Options'
+                           Env = @{ EQBUDDY_OPTIONS = '1' }
+                           Set = @{ OptionsTab = 'cards' } }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
     # The wiki contribution pack (#217 Ask 1). Trap 22: with an empty profile every row

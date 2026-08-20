@@ -159,9 +159,44 @@ public static class OverlaySections
     };
 
     public static string Icon(string key) => Icons.GetValueOrDefault(key, "Info");
+
+    /// <summary>
+    /// What a THEMED card absorbed, in the words the absorbed cards used to carry.
+    ///
+    /// This exists because of #219 (typical-usual-chaos). The Progress theme folded the
+    /// Motes card into a tab, and he went to Options → Cards & windows to switch it back
+    /// on — the one place in the app whose whole job is to list every card. There was no
+    /// Motes row, and nothing anywhere on that screen said where it had gone. He filed
+    /// "now I can't get it back", and he was right: from where he stood, the feature had
+    /// been deleted.
+    ///
+    /// A fold is invisible by construction — the thing that would tell you about it is
+    /// the thing that was removed. So the surviving card carries the names of the cards it
+    /// replaced, at the exact screen someone goes to when a card is missing. Keyed by the
+    /// SURVIVING card and listing the absorbed ones by their old titles, because those are
+    /// the words a player is searching the screen for.
+    /// </summary>
+    private static readonly Dictionary<string, string[]> AbsorbedTitles = new(StringComparer.Ordinal)
+    {
+        // 2026-08-16: the Sky Quest and Epics cards became tabs in the Quest Tracker.
+        ["quests"] = ["Sky Quest", "Epics"],
+        // 2026-08-19: the PROGRESS THEME (docs/Themes.md).
+        ["progress"] = ["Money", "Motes", "Faction", "Raids"],
+    };
+
+    /// <summary>The one-line "these live in here now" note for a card, or null for a card
+    /// that never absorbed anything. Add a line to <see cref="AbsorbedTitles"/> in the
+    /// same change as any future fold — it is step 3's other half.</summary>
+    public static string? AbsorbedNote(string key) =>
+        AbsorbedTitles.TryGetValue(key, out var titles)
+            ? string.Join(" · ", titles) + " are tabs in here now"
+            : null;
 }
 
-public sealed record OptionsCardRow(string Key, string Title, bool Hidden);
+/// <param name="Absorbed">"Money · Motes · Faction · Raids are tabs in here now", or null.
+/// The answer to "where did my card go?" at the screen where that question is asked —
+/// see <see cref="OverlaySections.AbsorbedNote"/> and #219.</param>
+public sealed record OptionsCardRow(string Key, string Title, bool Hidden, string? Absorbed = null);
 
 /// <summary>
 /// Framework-neutral Options logic: every mapping, mutation, and derived label the
@@ -478,7 +513,8 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
         [.. _settings.SectionOrder.Select(key => new OptionsCardRow(
             key,
             OverlaySections.Catalog.First(c => c.Key == key).Title,
-            _settings.HiddenSections.Contains(key)))];
+            _settings.HiddenSections.Contains(key),
+            OverlaySections.AbsorbedNote(key)))];
 
     public void MoveCard(string key, int delta)
     {
