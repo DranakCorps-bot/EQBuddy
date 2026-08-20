@@ -75,6 +75,10 @@ public sealed class EndToEndTests
         // The pivot toggle only exists once there is a list to pivot — with none it
         // would be a silent no-op, so it is hidden rather than dead.
         app.WaitForDump("gearPivotShown", 1, "the by-zone toggle to appear for a real list");
+        // POPULATED too, not only empty — the player likeliest to need the dump is the one
+        // whose import has gone stale, which is RaidsCardView's own rule.
+        app.WaitForDump("gearCopyCmd", 1,
+            "the ⧉ copy of /outputfile inventory to survive a populated list");
         // The named list is what tells you WHICH shopping list this is; a lift that
         // dropped the line would still render every row.
         // "Harness list - 1/4": the name AND the progress count, which is the line
@@ -94,7 +98,12 @@ public sealed class EndToEndTests
     }
 
     /// <summary>With nothing imported the card says so in one line and hides the pivot —
-    /// the empty state is a real state and the lift must keep it.</summary>
+    /// the empty state is a real state and the lift must keep it.
+    ///
+    /// It is also the state a NEW PLAYER meets, which is why David met it (2026-08-20) and
+    /// found it naming an import with no route and no tool. So it now asserts the two ways
+    /// out as well as the absence of rows: the shopping-list route in the line, and the
+    /// ⧉ copy of the in-game command that makes the ticks happen by themselves.</summary>
     [Fact]
     public void AnEmptyGearCardSaysSoAndOffersNoPivot()
     {
@@ -105,8 +114,15 @@ public sealed class EndToEndTests
         app.Launch();
 
         app.WaitForDump("gearTotal", 0, "no gear list on the shared fixture");
-        app.WaitForDump("gearRows", 1, "the one-line empty state");
+        // 0, not 1. The empty state is the LIST NAME line — "export one from EQ Legends
+        // Tools, then Options → …" — and the row that used to sit under it said the same
+        // thing again in less useful words (David, 2026-08-20).
+        app.WaitForDump("gearRows", 0, "no rows under the route line");
         app.WaitForDump("gearPivotShown", 0, "no list, so nothing to pivot");
+        // The state a new player meets is the state the complaint was about (David,
+        // 2026-08-20): the tab named an import and handed over no way to run it.
+        app.WaitForDump("gearCopyCmd", 1,
+            "the ⧉ copy of /outputfile inventory to be on the EMPTY tab");
     }
 
     [Fact]

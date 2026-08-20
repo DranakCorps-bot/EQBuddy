@@ -1,5 +1,6 @@
 using EQBuddy.Companion;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -242,6 +243,27 @@ public class CompanionSurfaceTests
         Assert.Equal(1, gear.Done);
         var row = gear.Groups.SelectMany(g => g.Rows).First(r => r.Text.StartsWith("Fungi"));
         Assert.Equal("Chest|Fungi Tunic", row.Id);
+    }
+
+    /// <summary>The phone's half of David's 2026-08-20 ask. A ⧉ copy is a dead end on a
+    /// device whose clipboard cannot reach the game on the PC, so he chose selectable text
+    /// — but the phone must not be the one surface that names an import and offers
+    /// nothing, so the command travels on the wire from GameCommands and the page draws it.
+    ///
+    /// Asserted on a POPULATED checklist on purpose: the prompt does not belong to the
+    /// empty state, it belongs to the surface, and the player whose import has gone stale
+    /// is the one holding a full list.</summary>
+    [Fact]
+    public void GearCarriesTheInGameCommandAndItsOwnEmptyRoute()
+    {
+        var gear = Build(new CompanionInputs { Settings = Checklists() }).Gear!;
+        Assert.NotNull(gear.Prompt);
+        Assert.Equal(GameCommands.OutputfileInventory, gear.Prompt!.Command);
+        Assert.Equal(CommandPrompts.GearInventory.Lead, gear.Prompt.Lead);
+        Assert.NotEmpty(gear.Prompt.Note);
+        // The OTHER import — a website export behind a named Options page. Naming one and
+        // not the other is what made the old sentence useless on every surface.
+        Assert.Equal(GearChecklistPresentation.EmptyRoute, gear.Empty);
     }
 
     [Fact]

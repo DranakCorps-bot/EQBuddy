@@ -152,7 +152,14 @@ public static partial class CompanionProjection
                 .Select(g => new CompanionChecklistGroup(g.Heading, null, [.. g.Items.Select(Row)]))
                 .ToList();
 
-        return new CompanionChecklistSection(items.Count(i => i.Acquired), items.Count, groups);
+        // Sent in BOTH states, empty and populated — the phone's half of the rule the
+        // desktop cards keep (the player likeliest to need the dump is the one whose
+        // import has gone stale). The page decides where to draw it; the command itself
+        // is never spelled on that side.
+        return new CompanionChecklistSection(
+            items.Count(i => i.Acquired), items.Count, groups,
+            Prompt(CommandPrompts.GearInventory),
+            GearChecklistPresentation.EmptyRoute);
 
         static CompanionChecklistRow Row(GearChecklistItem i)
         {
@@ -168,4 +175,10 @@ public static partial class CompanionProjection
     /// <summary>Gear rows carry no id of their own, so slot|item is the identity a tap
     /// comes back with. Stable enough: the same slot can't hold the same item twice.</summary>
     internal static string GearRowId(GearChecklistItem item) => item.Slot + "|" + item.Item;
+
+    /// <summary>UI.Shared's prompt onto the wire shape. A copy rather than a reference
+    /// because the envelope is the PROTOCOL and must not move when a presentation helper
+    /// does — the same reason CompanionSections lives in this project at all.</summary>
+    internal static CompanionCommandPrompt Prompt(CommandPrompt p) =>
+        new(p.Lead, p.Command, p.Note);
 }

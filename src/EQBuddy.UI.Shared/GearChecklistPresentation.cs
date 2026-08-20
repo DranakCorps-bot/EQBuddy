@@ -10,6 +10,33 @@ public static class GearChecklistPresentation
     public sealed record Group(string Heading, IReadOnlyList<GearChecklistItem> Items);
     public sealed record ItemText(string Name, string EffectSuffix);
 
+    /// <summary>The empty state, and the reason this file now carries prose at all.
+    /// David, 2026-08-20: <i>"right now it's telling me to import it but not telling me
+    /// how or giving me the tool with which to do it."</i> The old line was
+    /// <c>"Import an EQ Legends Tools shopping-list HTML in Options."</c> — a task with
+    /// no route, naming neither where the export comes from nor where in Options the
+    /// import lives. Both halves are named here, and it is ONE string so the two UIs
+    /// and the phone cannot drift into three different sets of directions.</summary>
+    public const string EmptyRoute =
+        "No shopping list yet — export one from EQ Legends Tools, then "
+        + "Options → Cards & windows → Import gear list…";
+
+    /// <summary>Said in BOTH states, never only the empty one (the rule
+    /// <c>RaidsCardView</c> works): the player likeliest to need the dump is the one
+    /// whose import has gone stale, and that player's list is populated. The ticks are
+    /// the whole reason the command matters here — the checklist auto-marks what the
+    /// dump says you already own, and nothing on the surface used to say so.</summary>
+    public static readonly string AutoTickNote =
+        $"Type {GameCommands.OutputfileInventory} in game and EQBuddy ticks off what "
+        + "your bags and bank already hold.";
+
+    /// <summary>The ⧉ button's tooltip. Says what the click does AND what happens next,
+    /// because a copied command with no next step is half an instruction.</summary>
+    public static readonly string AutoTickTip =
+        $"Copies {GameCommands.OutputfileInventory} — paste it into the game's chat and "
+        + "the game writes the dump beside its own folders; EQBuddy reads it on its own "
+        + "and ticks anything on this list you already own.";
+
     public static IReadOnlyList<Group> BuildGroups(IReadOnlyList<GearChecklistItem> items)
     {
         var groups = new List<Group>(2);

@@ -328,6 +328,17 @@ $Shots = [ordered]@{
                                    @{ Slot = 'HEAD'; Item = 'Exquisite Velium Shard'; IsExaltation = $true
                                       ExaltationEffect = '+15 hp'; Source = 'Kael Drakkel' }
                                ) } }
+    # The EMPTY gear tab, which is the state David was actually looking at on 2026-08-20
+    # when he said the surface "is telling me to import it but not telling me how or giving
+    # me the tool with which to do it". Trap 22 says a surface with no fixture state cannot
+    # be reviewed - but here the empty state IS the state under review, and it is the only
+    # one a new player ever sees. So it gets its own shot rather than being the accident of
+    # an unseeded profile: same tab, deliberately nothing seeded, and the review question is
+    # whether both routes out of it are legible (the shopping-list import, and the in-game
+    # command that makes the ticks happen by themselves).
+    'gearloot-gear-empty' = @{ Title = 'Gear & Loot'
+                           Env = @{ EQBUDDY_GEARLOOT = 'gear' }
+                           Set = @{} }
     # The post-update popup, which no shot covered until 2026-08-20 - and it is the ONE
     # surface every player sees on every release, on every platform. It opens by itself
     # when LastSeenVersion differs from the running build, so the fixture just has to lie

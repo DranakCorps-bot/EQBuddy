@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
@@ -41,6 +41,7 @@ internal sealed class GearCardView : IWidgetCard
     private readonly ItemsControl _list = new();
     private readonly TextBlock _listName;
     private readonly CheckBox _byZone;
+    private readonly Button _copyCmd;
 
     public string Key => LootSurface.KeyFor(LootTab.Gear);
     public UIElement Body { get; }
@@ -75,6 +76,20 @@ internal sealed class GearCardView : IWidgetCard
             Margin = (Thickness)_brush("ListBlock"),
         };
 
+        // David, 2026-08-20: the tab told him to import something and handed him no way
+        // to do it. The checklist auto-ticks from the game's own inventory dump
+        // (MainWindow.AutoCheckGearFromInventory), so this surface REQUIRES an in-game
+        // command — and every surface that names one offers a one-click ⧉ copy of the
+        // exact text (David, 2026-08-14). Shape copied from RaidsCardView, deliberately
+        // not reinvented; GameCommandsTests now asserts this file references
+        // GameCommands so the affordance cannot go missing again unnoticed.
+        _copyCmd = Theming.WireCopyCommand(
+            Theming.Button(""), GameCommands.OutputfileInventory);
+        _copyCmd.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
+        _copyCmd.HorizontalAlignment = HorizontalAlignment.Left;
+        _copyCmd.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        _copyCmd.ToolTip = GearChecklistPresentation.AutoTickTip;
+
         var panel = new StackPanel();
         panel.Children.Add(_byZone);
         panel.Children.Add(_listName);
@@ -87,6 +102,13 @@ internal sealed class GearCardView : IWidgetCard
             Padding = new Thickness(Tok.SpaceXs),
             Content = _list,
         });
+        // OUTSIDE the ScrollViewer and outside Render(), which is the whole point: the
+        // note and the button belong to the SURFACE, not to a state of it, so neither
+        // can be scrolled away and neither has a branch that could forget to draw it.
+        var note = Dim(GearChecklistPresentation.AutoTickNote);
+        note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        panel.Children.Add(note);
+        panel.Children.Add(_copyCmd);
         Body = panel;
     }
 
@@ -97,6 +119,11 @@ internal sealed class GearCardView : IWidgetCard
     internal int DebugRowCount => _list.Items.Count;
     internal bool DebugPivotShown => _byZone.Visibility == Visibility.Visible;
     internal int DebugListNameLength => _listName.Text.Length;
+    /// <summary>1 when the ⧉ copy of /outputfile inventory is on screen. Pinned in E2E
+    /// for BOTH the empty and the populated state — an absent control photographs as an
+    /// unremarkable panel (trap 29), so a picture could never have caught this one.</summary>
+    internal bool DebugCopyCommandShown =>
+        _copyCmd.Visibility == Visibility.Visible && _copyCmd.Parent is not null;
 
     /// <summary>The card's header badge — "3/12", or an em dash with nothing imported.
     /// The STRING comes from <see cref="LootTheme"/>, because the widget's card header and
@@ -113,8 +140,12 @@ internal sealed class GearCardView : IWidgetCard
         _byZone.Visibility = total > 0 ? Visibility.Visible : Visibility.Collapsed;
         if (total == 0)
         {
-            _listName.Text = "Import an EQ Legends Tools shopping-list HTML in Options.";
-            _list.Items.Add(Dim("No gear list imported."));
+            // The route line above IS the empty state now, so the list stays empty. It
+            // used to add "No gear list imported." underneath, which said the same thing
+            // a second time and in less useful words — and the second sentence is exactly
+            // the space the two real routes needed (David, 2026-08-20). E2E's gearRows
+            // pin moved from 1 to 0 with this, deliberately.
+            _listName.Text = GearChecklistPresentation.EmptyRoute;
             return;
         }
 

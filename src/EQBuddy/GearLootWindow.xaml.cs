@@ -214,6 +214,11 @@ public partial class GearLootWindow : Window
         $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
         $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
         $"gearPivotShown={(_gear.DebugPivotShown ? 1 : 0)} " +
+        // The ⧉ copy of /outputfile inventory (David, 2026-08-20). Reported because an
+        // ABSENT control photographs as an unremarkable panel (trap 29) — a screenshot
+        // review could never have caught this one, and a launched app asserting it is the
+        // only cover the WPF layer has.
+        $"gearCopyCmd={(_gear.DebugCopyCommandShown ? 1 : 0)} " +
         $"gearListNameLen={_gear.DebugListNameLength}";
 
     private void OnDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -605,6 +605,37 @@ Read this list before touching the areas it names. Every entry cost a release.
     from the reporter, nine seconds apart and exact mirror images, said in one line what
     three sessions of hypothesis had not. Ship the instrument before the third theory.
 
+34. **A guard that forbids the WRONG thing cannot see a MISSING thing, and it reads as
+    coverage either way.** `GameCommandsTests` enforced "every surface that names a command
+    offers a ⧉ copy" by forbidding any copy source from carrying its own literal. That is a
+    real rule, it passed for months, and it was blind to the only failure that mattered: a
+    surface with **no copy source at all**. The Gear tab told the player to import something
+    and handed over no way to do it — on both widgets, for as long as the surface existed —
+    while the file named after the rule sat green (David, 2026-08-20). Same shape as trap 20:
+    the thing you are looking for is what is *not there*, and nothing that scans for a wrong
+    token can find it.
+    → **Pair every "no X may do Y" with a curated list of "these must do Y", each row
+    carrying its reason.** `GameCommandsTests.SurfacesNeedingACommand` is it, written the way
+    `DeadSettingTests.Known` is written; adding a surface that asks for an output file means
+    adding its row. Verified by checking that the two rows for the broken surfaces fail on
+    the pre-fix tree, not merely that they pass on this one.
+    → **And the same absence hides from a screenshot** (trap 29): a control that was never
+    drawn photographs as an unremarkable panel. So `gearCopyCmd` goes into `EQBUDDY_EXPAND`
+    for WPF and `WidgetRenderTests` asserts the Avalonia twin — a picture can confirm the
+    affordance reads well, but only an assertion can say it exists.
+
+35. **An affordance the phone cannot honour is not parity, it is a lie with the right
+    shape.** The desktop rule is "name a command, offer a ⧉ copy". Copying that literally to
+    EQBuddy Mobile puts the command on the phone's clipboard, which cannot reach the game
+    running on the PC — a button that does exactly nothing useful, which is "silent no-ops
+    are broken" with the switch on the other side. David's answer (2026-08-20, asked as its
+    own question) was **selectable text plus "on your PC"**: same fact, same
+    `GameCommands` source, an affordance the device can actually keep.
+    → **When porting a rule to another surface, port the INTENT and re-pick the control.**
+    The wire carries the command (`CompanionCommandPrompt`) rather than `index.html`
+    spelling it, because trap 32 means a page-side literal can sit on an open phone for
+    weeks after the PC has moved on.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

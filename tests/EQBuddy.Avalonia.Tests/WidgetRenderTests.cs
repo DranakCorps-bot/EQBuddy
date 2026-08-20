@@ -153,6 +153,40 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+    /// <summary>The gear checklist auto-ticks from the game's own inventory dump, and for
+    /// as long as the surface has existed it never said so and offered no way to produce
+    /// one — David, 2026-08-20: <i>"telling me to import it but not telling me how or
+    /// giving me the tool with which to do it."</i>
+    ///
+    /// Asserted on the EMPTY profile deliberately. That is the state a new player meets,
+    /// it is the state the complaint was about, and the control is built outside
+    /// <c>RenderGearChecklist</c> precisely so no state can lose it — which is a claim only
+    /// a test that looks at the empty tree can make. This build has no E2E suite, so this
+    /// is the only cover the affordance has here (CLAUDE.md: pin it before it moves — the
+    /// gear checklist is the named candidate for the next lift out of MainWindow).</summary>
+    [AvaloniaFact]
+    public void TheGearCardHandsOverTheInventoryCommand()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.ShowGearLootWindow("gear");
+
+        var text = string.Join("\n", window.GearLootWindowForTests!.GetLogicalDescendants()
+            .OfType<TextBlock>().Select(t => t.Text ?? ""));
+        var buttons = window.GearLootWindowForTests!.GetLogicalDescendants()
+            .OfType<Button>().Select(b => b.Content as string ?? "").ToList();
+
+        // The route out of the empty state — both halves, because they are two different
+        // imports and naming one is what made the old sentence useless.
+        Assert.Contains(GearChecklistPresentation.EmptyRoute, text);
+        Assert.Contains(GearChecklistPresentation.AutoTickNote, text);
+        // And the command itself, one click away, from GameCommands and not a literal.
+        Assert.Contains(buttons, b => b.Contains(GameCommands.OutputfileInventory));
+
+        window.GearLootWindowForTests?.Close();
+        window.Close();
+    }
+
     /// <summary>The launcher that replaced the two cards. It has one line to carry what
     /// both card headers carried, and the tab strip beside it has to name both surfaces —
     /// #219 is the release where a fold trimmed a number out of a summary line and the

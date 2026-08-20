@@ -147,6 +147,25 @@
   .empty { color:var(--dim); text-align:center; padding:28px 10px; font-size:15px; }
   .gated { color:var(--dim); text-align:center; padding:16px 10px; font-size:14px; font-style:italic; }
 
+  /* ---- in-game command prompt (David, 2026-08-20) ----
+     The phone can't paste into the game on the PC, so this is SELECTABLE TEXT and not a
+     copy button: `user-select:all` makes one tap-and-hold grab the whole command instead
+     of a word of it, and the monospace box says "this is literal text you retype".
+     Colours are tokens, so it follows the desktop's palette like everything else. */
+  .cmd { margin:10px 0 2px; }
+  .cmd .lead { color:var(--dim); font-size:12.5px; }
+  .cmd code {
+    display:block; margin:5px 0; padding:9px 11px;
+    background:var(--panel); border:1px solid var(--hairline); border-radius:9px;
+    color:var(--accent); font-size:14px; line-height:1.35;
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    -webkit-user-select:all; user-select:all;
+    /* A long command must scroll inside its own box rather than widening the card —
+       the page body never scrolls sideways (trap 5's neighbourhood). */
+    overflow-x:auto; white-space:pre;
+  }
+  .cmd .after { color:var(--dim); font-size:12px; }
+
   /* ---- session strip ---- */
   .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
   .stats .stat { background:var(--panel); border:1px solid var(--hairline); border-radius:12px; padding:10px 4px; text-align:center; }
@@ -1100,12 +1119,33 @@ function boot() {
     return card;
   }
 
+  // A surface that needs an in-game command shows the command, because the alternative
+  // is naming a task with no route (David, 2026-08-20 — the desktop Gear tab, which told
+  // him to import something and handed him no way to do it). NOT a copy button: this
+  // device's clipboard cannot reach the game on the PC, and a control that does nothing
+  // useful is the "silent no-ops are broken" rule with the switch on the other side.
+  // Every string here arrives on the wire from GameCommands — the page never spells a
+  // command, because trap 32 means a page-side literal can outlive the PC's by weeks.
+  function cmdPrompt(p) {
+    if (!p || !p.command) return null;
+    const box = el("div", "cmd");
+    if (p.lead) box.appendChild(el("div", "lead", p.lead));
+    box.appendChild(el("code", null, p.command));
+    if (p.note) box.appendChild(el("div", "after", p.note));
+    return box;
+  }
+  function appendCmdPrompt(card, p) {
+    const box = cmdPrompt(p);
+    if (box) card.appendChild(box);
+  }
+
   function raidsBody(r) {
     const card = el("div", "card");
     if (!r || !r.defeated) {
       card.replaceChildren(el("div", "empty",
-        "Nothing defeated yet — kills your log witnesses land here, and importing "
-        + "/outputfile achievements marks clears from before EQBuddy."));
+        "Nothing defeated yet — kills your log witnesses land here, and the game's "
+        + "achievements dump marks clears from before EQBuddy."));
+      appendCmdPrompt(card, r && r.prompt);
       return card;
     }
     for (const z of r.zones || []) {
@@ -1113,9 +1153,12 @@ function boot() {
       card.appendChild(rowList(z.bosses,
         b => ({ name: (b.cleared ? "✓ " : "· ") + b.name, right: b.detail || "" })));
     }
+    // Populated too, never only empty: the player likeliest to need the dump is the one
+    // whose import has gone stale, which is the desktop Raids card's own rule.
     card.appendChild(el("div", "note",
-      "Kills count when your log sees the boss die; import /outputfile achievements to "
-      + "mark older clears."));
+      "Kills count when your log sees the boss die; the achievements dump marks "
+      + "older clears."));
+    appendCmdPrompt(card, r.prompt);
     return card;
   }
 
@@ -1254,7 +1297,14 @@ function boot() {
     if (!any)
       wrap.replaceChildren(el("div", "empty", filter
         ? "Nothing on this checklist matches that search."
-        : "Nothing on this checklist yet — set it up on the PC."));
+        // data.empty is the SURFACE's own sentence when the generic one would name a
+        // task with no route — Gear's list is a website export behind a named Options
+        // page, and "set it up on the PC" is not directions.
+        : (data.empty || "Nothing on this checklist yet — set it up on the PC.")));
+    // Both states, deliberately. Gear auto-ticks from the inventory dump, and the player
+    // likeliest to need that command is the one whose import has gone stale — whose list
+    // is therefore full. Null prompt (Epics, Sky) draws nothing at all.
+    appendCmdPrompt(wrap, data.prompt);
     return wrap;
   }
   function checklist(surface) {

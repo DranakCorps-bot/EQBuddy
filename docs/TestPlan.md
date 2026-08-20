@@ -232,6 +232,31 @@ guards below are the deliverable and not a nicety.
 | **A shot's staging list that enumerates an enum by hand grows with it** — `mini-bar` disables every `BreakoutKind`, and when `Progress` joined the enum the shot silently began photographing the Progress breakout instead of the mini bar | **Manual** — `pwsh scripts/shoot.ps1 -Shot mini-bar`; the capture must be the wide pill, not a window |
 | **A capture pins the palette it is shooting** — `AppTheme`'s brushes are process-wide singletons and `AppThemeTests` walks the whole catalog, so an unpinned capture renders in whatever theme ran last | **Auto** — `WidgetSheetTests` |
 
+## 4f. Surfaces that ask you to run an in-game command
+
+David, 2026-08-14: **every surface that names an in-game command offers a one-click ⧉ copy
+of the exact text**, and the text lives once in `UI.Shared/GameCommands.cs`. Restated
+2026-08-20 with the case that proved it was not being enforced — the Gear tab told him to
+import something and handed him no way to do it: *"That needs to be applied for every
+instance of needing the user to execute a command in game for an output file."*
+
+The rule had **one** guard, and it was the wrong shape. `GameCommandsTests` forbade a copy
+source from carrying its own literal — which says nothing at all about a surface carrying
+no copy source. The gear checklist fell straight through that hole, on both widgets, for as
+long as the surface had existed. **A negative assertion cannot see an absence**, so the list
+of surfaces is now written down and asserted positively.
+
+| Expectation | Held by |
+|---|---|
+| Each command has exactly one definition, and it is the text the game expects | **Auto** — `GameCommandsTests` |
+| No copy source anywhere in `src` carries its own slash-command literal | **Auto** — `GameCommandsTests` |
+| **Every surface that NEEDS a command names it, off `GameCommands`** — a curated list with a reason per entry, both UIs, the way `DeadSettingTests.Known` is curated. Adding a surface that asks for an output file means adding its row | **Auto** — `GameCommandsTests` |
+| The ⧉ button is on the POPULATED state too, not only the empty one — the player likeliest to need a fresh dump is the one whose import has gone stale | **Auto** — `EndToEndTests` (`gearCopyCmd`), `WidgetRenderTests` |
+| **The button is really on screen, not merely referenced** — an absent control photographs as an unremarkable panel, so it is pinned where controls can be seen rather than reviewed in a picture | **Auto** — `EndToEndTests` (WPF has no unit tests), `WidgetRenderTests` (Avalonia has no E2E) |
+| A surface that names an import names **where the import comes from and where to run it** — the gear empty state carries both routes, and the shopping-list one is not the `/outputfile` one | **Auto** — `WidgetRenderTests`; **Shot** — `shoot.ps1 -Shot gearloot-gear-empty` |
+| **EQBuddy Mobile shows the command as selectable text, never a copy button** (David, 2026-08-20, asked directly) — a phone's clipboard cannot reach the game on the PC, so a button there is a silent no-op wearing a working control's clothes | **Auto** — `GameCommandsTests`, `CompanionSurfaceTests` |
+| The phone never spells a command itself: it arrives on the wire from `GameCommands`. A page-side literal can outlive the PC's by weeks (trap 32 — the page never re-fetches itself) | **Auto** — `GameCommandsTests` |
+
 ## 4d. Settings, and who is allowed to write them
 
 A save serialises the **whole** `AppSettings` from the snapshot loaded at startup, so any

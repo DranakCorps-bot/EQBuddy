@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
@@ -185,7 +185,9 @@ public static partial class CompanionProjection
     /// ledger never recorded.</summary>
     private static CompanionRaidsBlock BuildRaids(RaidKillLedger? raids, RaidTargetCatalog catalog)
     {
-        if (raids is null) return new CompanionRaidsBlock(0, catalog.BossCount, []);
+        if (raids is null)
+            return new CompanionRaidsBlock(0, catalog.BossCount, [],
+                Prompt(CommandPrompts.RaidsAchievements));
         var zones = new List<CompanionRaidZone>();
         foreach (var zone in catalog.Zones)
         {
@@ -205,6 +207,7 @@ public static partial class CompanionProjection
             zones.Add(new CompanionRaidZone(zone.Zone, bosses.Count(b => b.Cleared),
                 zone.Bosses.Length, bosses));
         }
-        return new CompanionRaidsBlock(raids.DefeatedCount(), catalog.BossCount, zones);
+        return new CompanionRaidsBlock(raids.DefeatedCount(), catalog.BossCount, zones,
+            Prompt(CommandPrompts.RaidsAchievements));
     }
 }

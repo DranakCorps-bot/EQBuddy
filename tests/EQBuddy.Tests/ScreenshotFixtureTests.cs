@@ -272,4 +272,68 @@ public class ScreenshotFixtureTests
         Assert.Equal(2, snap.Progress.Raids.Defeated);
         Directory.Delete(dir, true);
     }
+
+    /// <summary>
+    /// The GEAR checklist on the phone, for driving the shipped page in
+    /// scripts/mobile-harness.ps1. It had no fixture at all, which is why the phone's
+    /// half of David's 2026-08-20 report ("telling me to import it but not telling me
+    /// how") could not be looked at before it was written.
+    ///
+    /// Pass <c>-e EQBUDDY_SHOOT_GEAR_EMPTY=1</c> for the state a new player meets — the one
+    /// the complaint was about. The populated state is the default because it is the one
+    /// that proves the prompt does not belong to the empty branch: the player whose import
+    /// has gone stale is holding a full list.
+    ///
+    ///   dotnet test --filter FullyQualifiedName~ScreenshotFixture -e EQBUDDY_SHOOT=1 \
+    ///     -e EQBUDDY_SHOOT_GEAR=&lt;path.json&gt;
+    /// </summary>
+    [Fact]
+    public void WriteGearSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_GEAR");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+        var empty = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_GEAR_EMPTY") == "1";
+
+        var now = new DateTime(2026, 8, 20, 21, 12, 0);
+        // The same list shoot.ps1 seeds for the desktop's gearloot-gear shot, on purpose:
+        // the two surfaces are then photographs of the same data, and a difference between
+        // them is a difference in the SURFACES rather than in what they were handed.
+        var settings = new AppSettings
+        {
+            GearChecklistName = empty ? "" : "Kael push",
+            GearChecklist = empty ? [] :
+            [
+                new GearChecklistItem { Slot = "HEAD", Item = "Crown of Narandi", Source = "Kael Drakkel" },
+                new GearChecklistItem { Slot = "HANDS", Item = "Gloves of Dark Embers", Source = "Sebilis", Acquired = true },
+                new GearChecklistItem { Slot = "PRIMARY", Item = "Blade of Carnage", Source = "Kael Drakkel" },
+                new GearChecklistItem { Slot = "NECK", Item = "Silver Chain of Dread", Source = "Plane of Fear" },
+                new GearChecklistItem
+                {
+                    Slot = "HEAD", Item = "Exquisite Velium Shard", IsExaltation = true,
+                    ExaltationEffect = "+15 hp", Source = "Kael Drakkel",
+                },
+            ],
+        };
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Testchar",
+            AppVersion = "test",
+            Stats = new StatsSnapshot { CurrentZone = "Kael Drakkel" },
+            Offered = [CompanionSurfaces.Gear],
+            Settings = settings,
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // Predicted before the run (trap 23). The prompt rides BOTH states — that is the
+        // fact under review, so it is asserted rather than looked for in the picture.
+        Assert.Equal(empty ? 0 : 5, snap.Gear!.Total);
+        Assert.Equal(empty ? 0 : 1, snap.Gear.Done);
+        Assert.Equal(EQBuddy.UI.Shared.GameCommands.OutputfileInventory, snap.Gear.Prompt!.Command);
+        Assert.Equal(EQBuddy.UI.Shared.GearChecklistPresentation.EmptyRoute, snap.Gear.Empty);
+    }
 }

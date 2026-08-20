@@ -1,4 +1,4 @@
-﻿namespace EQBuddy.Companion;
+namespace EQBuddy.Companion;
 
 // The wire shape of every surface. One file so the protocol reads top to bottom;
 // each record is pre-chewed for a phone (numbers already formatted where the phone
@@ -206,7 +206,25 @@ public sealed record CompanionWatchRow(
 public sealed record CompanionChecklistSection(
     int Done,
     int Total,
-    IReadOnlyList<CompanionChecklistGroup> Groups);
+    IReadOnlyList<CompanionChecklistGroup> Groups,
+    /// <summary>The in-game command this checklist depends on, when it depends on one —
+    /// Gear auto-ticks from the inventory dump; Epics and Sky don't and send null.
+    /// Null is omitted from the JSON, so a checklist with no command costs nothing.</summary>
+    CompanionCommandPrompt? Prompt = null,
+    /// <summary>This checklist's own empty-state sentence, when the page's generic
+    /// "set it up on the PC" would name a task with no route — Gear's list is a website
+    /// export behind a particular Options page, and saying so is the other half of the
+    /// same defect the ⧉ buttons fix (David, 2026-08-20). Null keeps the generic line.</summary>
+    string? Empty = null);
+
+/// <summary>An in-game command shown as SELECTABLE TEXT rather than offered as a ⧉ copy
+/// (David, 2026-08-20): the phone's clipboard cannot paste into the game on the PC, so a
+/// button there would be a silent no-op wearing a working control's clothes. Comes over
+/// the wire rather than being spelled in index.html, for the same reason the desktops
+/// read <c>GameCommands</c> — the page holding its own copy of a command is exactly the
+/// drift the constant exists to prevent, and trap 32 means a page-side literal can sit on
+/// an open phone for weeks after the PC has moved on.</summary>
+public sealed record CompanionCommandPrompt(string Lead, string Command, string Note);
 
 /// <summary><see cref="Class"/> is the group's class when it has exactly one (Epic and
 /// Sky groups do; Gear's and Sky's cross-class ★ Ready group don't) — the quest
@@ -374,7 +392,11 @@ public sealed record CompanionWealthBlock(
 /// count is the desktop's own zone heading; <see cref="CompanionRaidBoss.Detail"/> is its
 /// row text, built desktop-side so a difficulty badge cannot be invented here.</summary>
 public sealed record CompanionRaidsBlock(
-    int Defeated, int Total, IReadOnlyList<CompanionRaidZone> Zones);
+    int Defeated, int Total, IReadOnlyList<CompanionRaidZone> Zones,
+    /// <summary>The achievements dump, for the same reason the desktop Raids card carries
+    /// a ⧉ button in both its states — the page named the command in prose and offered
+    /// nothing.</summary>
+    CompanionCommandPrompt? Prompt = null);
 
 public sealed record CompanionRaidZone(string Zone, int Done, int Total, IReadOnlyList<CompanionRaidBoss> Bosses);
 

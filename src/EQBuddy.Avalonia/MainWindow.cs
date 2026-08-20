@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -1068,6 +1068,22 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             Padding = new Thickness(0, 0, DesignTokens.SpaceXs, 0),
             Content = _gearChecklistPanel,
         });
+        // The checklist auto-ticks from the game's own inventory dump and never said so,
+        // and offered no way to produce one (David, 2026-08-20). Built HERE rather than in
+        // RenderGearChecklist, and outside the scroller: the note and the button belong to
+        // the surface, not to one of its states, so neither can be scrolled away and no
+        // render branch can forget to draw them. WPF's GearCardView is the twin.
+        panel.Children.Add(new TextBlock
+        {
+            Text = GearChecklistPresentation.AutoTickNote,
+            FontSize = DesignSystem.Size(Role.Caption),
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = AppTheme.DimBrush,
+            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
+        });
+        panel.Children.Add(CopyCommandButton(
+            EQBuddy.UI.Shared.GameCommands.OutputfileInventory,
+            GearChecklistPresentation.AutoTickTip));
         return panel;
     }
 
@@ -3205,13 +3221,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>The Raids card names the achievements dump in both its empty and its
     /// populated state, so both offer the one-click copy (David, 2026-08-14) — every
     /// surface that names a command hands it over without retyping.</summary>
-    private Button CopyAchievementsCmd()
+    private Button CopyAchievementsCmd() => CopyCommandButton(
+        EQBuddy.UI.Shared.GameCommands.OutputfileAchievements,
+        "Copies the command — paste it into the game's chat and the game " +
+        "writes its achievements dump beside its own folders; right-click → " +
+        "Data & imports → Import achievements… reads it.");
+
+    /// <summary>ONE builder for every ⧉ command button on this widget. It was
+    /// <c>CopyAchievementsCmd</c> with the command baked in, so the Gear checklist — which
+    /// needs <c>/outputfile inventory</c> and had no button at all (David, 2026-08-20) —
+    /// could not reuse it without a second copy of the same twenty lines. The command is
+    /// an ARGUMENT and never a literal: GameCommands is the only source, pinned by
+    /// GameCommandsTests.</summary>
+    private Button CopyCommandButton(string command, string tip)
     {
-        var b = AppTheme.IconButton(
-            $"copy  {EQBuddy.UI.Shared.GameCommands.OutputfileAchievements}",
-            "Copies the command — paste it into the game's chat and the game " +
-            "writes its achievements dump beside its own folders; right-click → " +
-            "Data & imports → Import achievements… reads it.");
+        var b = AppTheme.IconButton($"copy  {command}", tip);
         b.FontSize = DesignSystem.Size(Role.Metadata);
         b.HorizontalAlignment = HorizontalAlignment.Left;
         b.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
@@ -3221,7 +3245,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             {
                 if (TopLevel.GetTopLevel(this)?.Clipboard is { } cb)
                 {
-                    await cb.SetTextAsync(EQBuddy.UI.Shared.GameCommands.OutputfileAchievements);
+                    await cb.SetTextAsync(command);
                     b.Content = "copied — paste in game chat";
                 }
             }
@@ -4389,9 +4413,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _gearByZoneCheck.IsVisible = total > 0;
         if (total == 0)
         {
-            _gearListName.Text = "Import an EQ Legends Tools shopping-list HTML in Options.";
-            _gearChecklistPanel.Children.Add(EmptyCardLine("No gear list imported."));
-                return;
+            // The route line IS the empty state; a second "No gear list imported."
+            // underneath said the same thing in less useful words. WPF's twin.
+            _gearListName.Text = GearChecklistPresentation.EmptyRoute;
+            return;
         }
 
         UpdateGearListName();
