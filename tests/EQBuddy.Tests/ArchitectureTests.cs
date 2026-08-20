@@ -143,6 +143,16 @@ public class ArchitectureTests
         // keeps "the tabs draw what the cards drew" literally true, with no rewrite to
         // review) but it is not decomposition, and this entry should not be allowed to
         // read as though it were. The headroom this file has left is now ~350 lines.
+        //
+        // 2026-08-20: the GEAR & LOOT fold took the same shape and cost another ~90 lines
+        // (IGearLootHost, the launcher, ShowGearLootWindow), so the headroom is ~100 and
+        // this note is the warning the next fold needs. **The next theme on this build must
+        // be preceded by a LIFT, not followed by one.** The obvious candidate is already
+        // named by its WPF twin: the gear checklist here is ~275 contiguous lines
+        // (BuildGearSection, RenderGearChecklist, GearRow, the auto-check high-water marks)
+        // and Windows lifted exactly that into GearCardView.cs. Note this build has no E2E
+        // suite, so CLAUDE.md's "pin the behaviour before the move" has to be paid in
+        // WidgetRenderTests instead — write the assertions first.
         (@"EQBuddy.Avalonia/MainWindow.cs", 5127),
     ];
 
