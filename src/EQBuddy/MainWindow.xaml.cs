@@ -2575,6 +2575,22 @@ public partial class MainWindow : Window, ICardContext
                     $"watchRows={_watch.RowCount} " +
                     $"watchStrip={(_watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={_settings.WatchSortMode} " +
+                    // The GEAR card's rendered shape, pinned for the same reason and in
+                    // the same way as the two above: it is the next surface to be lifted
+                    // out (the Loot & Items theme), and the WPF layer has no unit tests,
+                    // so an assertion from a launched app is the only thing standing
+                    // between that move and a silent regression.
+                    //
+                    // Rows rather than items, because the list interleaves GROUP HEADINGS
+                    // with rows and the headings are half of what the by-zone pivot is
+                    // for — a lift that kept every item and lost the headings would leave
+                    // this count unchanged if it counted items alone.
+                    $"gearRows={GearChecklistList.Items.Count} " +
+                    $"gearTotal={_settings.GearChecklist.Count} " +
+                    $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
+                    $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
+                    $"gearPivotShown={(GearByZoneCheck.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"gearListNameLen={GearListName.Text.Length} " +
                     $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
                     // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
                     // but only a launched app can show that its answer actually reaches

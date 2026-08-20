@@ -135,6 +135,15 @@ four-tab `CompanionProgressSection` on the phone. 14 cards → 10.
 
 ### 4. Alerts
 **Tabs:** Watch rules · Buffs · Spawns · Mez/Charm
+
+**Where the configuration lands: ONE ALERTS WINDOW, with tabs, like Progress and Quests**
+(David, 2026-08-20, asked before the work rather than during it). This is the one theme
+whose home was genuinely open, because "settings live in Options" is a standing rule and
+alert configuration is settings — so the recipe and the rule pointed different ways. The
+window wins: four places to say *"alert me, at this volume, with this sound"* is the
+problem being solved, and moving three of them into a fourth tab of Options would leave
+the per-named bells in the Spawns window out in the cold anyway. Options keeps what is
+genuinely global; the window owns what belongs to a rule, a buff, a named or a mez.
 **Absorbs:** Watch card, Buffs card, and the *management* of `SpawnChipsWindow`,
 `MezChipsWindow`, `AlertWindow`
 **Surface:** the **chips stay on the overlay** — every one of them is a deadline with

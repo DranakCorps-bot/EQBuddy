@@ -96,8 +96,8 @@ became one theme, three tabs, one definition in Core. Five more follow:
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
 | **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
-| **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | next — needs `RenderBuffs` lifted first |
-| **Loot & Items** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | then — unblocks #174 |
+| **Loot & Items** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | **next (2026-08-20)** — unblocks #174 |
+| **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | then — needs `RenderBuffs` lifted first; lands as its own WINDOW with tabs (David, 2026-08-20) |
 | **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | biggest lift |
 | **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity |
 
@@ -108,6 +108,16 @@ Measured again on 2026-08-19: Progress bought 14 cards → 10 for one lift, Aler
 14 → 13 for a harder one (`RenderBuffs` is 107 lines tangled into the buff-set evaluator).
 **Re-measure that readiness before starting any theme** rather than trusting this column;
 the work done since a plan was written changes what the plan should say.
+
+**And on 2026-08-20 it did again**, which is why Loot & Items now sits above Alerts.
+Measured that day: both themes have one of their two cards already lifted, and both buy
+10 cards → 9 — but the remaining lifts are not comparable. The Gear card body is ~70 lines
+touching `_settings` and its own controls, with `GearChecklistPresentation` already shared:
+the `QuestChecklistView` shape CLAUDE.md holds up as the clean case. `RenderBuffs` has
+grown to ~175 lines and reaches `_breakouts`, `_buffClocks`, `_buffTracker`,
+`_buffsSignature`, `_optionsWindow`, `_server` and `_stats` — eight collaborators including
+the breakout windows and the companion server. Same reward, very different risk, and Loot
+also unblocks #174, which is approved and waiting.
 
 **One theme per release**, each with its settings-key folding, its mobile parity and a
 lowered hotspot baseline in the same commit. Two rules from the plan that decide arguments

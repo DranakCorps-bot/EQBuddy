@@ -21,6 +21,74 @@ public sealed class EndToEndTests
     private const string MeleeHit = "You crush a training dummy for 25 points of damage.";
     private const string Kill = "You have slain a training dummy!";
 
+    /// <summary>
+    /// The GEAR card's rendered shape, pinned before the Loot &amp; Items theme lifts it
+    /// out of MainWindow.
+    ///
+    /// Trap 22 governs this test: the shared fixture imports no gear list, so the card is
+    /// a one-line "No gear list imported." and a shot or an assertion against it would
+    /// prove nothing about the rows underneath. The list is seeded here instead — and
+    /// seeded across two slots and two zones, because the thing most easily lost in a
+    /// lift is not the ITEMS but the GROUP HEADINGS between them, and the by-zone pivot
+    /// exists entirely to change what those headings say.
+    ///
+    /// The WPF layer has no unit tests (docs/TestPlan.md §5), so this is the only thing
+    /// standing between that move and a silent regression.
+    /// </summary>
+    [Fact]
+    public void TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone()
+    {
+        using var app = new AppHarness(s =>
+        {
+            s.GearChecklistName = "Harness list";
+            s.GearChecklist =
+            [
+                new GearChecklistItem { Slot = "HEAD", Item = "Crown of Narandi", Source = "Kael Drakkel" },
+                new GearChecklistItem { Slot = "HEAD", Item = "Helm of Rile", Source = "Kael Drakkel" },
+                new GearChecklistItem { Slot = "HANDS", Item = "Gloves of Dark Embers", Source = "Sebilis", Acquired = true },
+                // The second group. Without one the Exaltations heading never renders
+                // and a lift could drop it with every assertion still green.
+                new GearChecklistItem
+                {
+                    Slot = "HEAD", Item = "Exquisite Velium Shard", IsExaltation = true,
+                    ExaltationEffect = "+15 hp", Source = "Kael Drakkel",
+                },
+            ];
+        });
+        app.Launch();
+
+        // The grouping is Gear vs EXALTATIONS — not by slot, whatever the render
+        // method is called (the slot rides on the row, not the heading). Predicting
+        // five rows and getting four is what taught me that, and it is exactly the
+        // kind of fact a lift can quietly lose: one heading, three gear rows, a
+        // second heading, one exaltation row.
+        app.WaitForDump("gearTotal", 4, "the seeded gear list to load");
+        app.WaitForDump("gearAcquired", 1, "the one acquired item to count");
+        app.WaitForDump("gearRows", 6, "two group headings above four item rows");
+        app.WaitForDump("gearByZone", 0, "the card to start on the by-slot grouping");
+        // The pivot toggle only exists once there is a list to pivot — with none it
+        // would be a silent no-op, so it is hidden rather than dead.
+        app.WaitForDump("gearPivotShown", 1, "the by-zone toggle to appear for a real list");
+        // The named list is what tells you WHICH shopping list this is; a lift that
+        // dropped the line would still render every row.
+        // "Harness list - 1/4": the name AND the progress count, which is the line
+        // that says which shopping list this is and how far through it you are.
+        app.WaitForDump("gearListNameLen", "Harness list - 1/4".Length, "the list's name and progress");
+    }
+
+    /// <summary>With nothing imported the card says so in one line and hides the pivot —
+    /// the empty state is a real state and the lift must keep it.</summary>
+    [Fact]
+    public void AnEmptyGearCardSaysSoAndOffersNoPivot()
+    {
+        using var app = new AppHarness();
+        app.Launch();
+
+        app.WaitForDump("gearTotal", 0, "no gear list on the shared fixture");
+        app.WaitForDump("gearRows", 1, "the one-line empty state");
+        app.WaitForDump("gearPivotShown", 0, "no list, so nothing to pivot");
+    }
+
     [Fact]
     public void SessionGoesLive_AndFreshKillUpdatesLiveStats()
     {
