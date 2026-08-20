@@ -1,17 +1,148 @@
 ﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (32) and the
+the non-negotiable rules, the where-things-live index, the trap list (33) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
 
 ---
 
-## 2026-08-20 (night): the Gear & Loot fold is WRITTEN AND REVERTED — read this first
+## 2026-08-20 (late): 1.98.0 IS LIVE AND SIGNED — start here
 
-The window is built, committed and live on `main` (`05de9e1`). **The fold is not**, and the
-reason matters more than the code: I built it, the Avalonia test suite failed, and the
+`main` clean and pushed at the tag. **1.98.0 released, signed as
+`CN=FlossworksCross-Stitch`, valid and timestamped**, on OneDrive and GitHub, installed
+locally. All gates green: 2,220 unit + 255 Avalonia + 17 E2E.
+
+**Nothing is half-finished.** Four things landed and every one is complete, released and
+answered. Read the three short notes below and then pick from "What is actually next".
+
+### 1. #202 is SOLVED, and it was never the phone
+
+Three releases, two confident wrong diagnoses from here, and the answer was one missing
+argument. **EQBuddy pushes to a paired device from two places** — `RefreshUi` once a second
+and the 50 ms low-latency pump — **and they built their snapshots differently.**
+`SessionStats.Snapshot()` passes no rules, and the rules block in `BuildSnapshotLocked` is
+gated on `rules is not null`, so that overload returns a snapshot whose `Tracked` list is
+EMPTY. The loot section is the only surface carrying the watch rows.
+
+So the phone was told the watch list had emptied twenty times a second and refilled once a
+second. **Its change detection was correct throughout — the data really was changing.**
+That is why the 1.94.1 fingerprint fix could not help: it taught the page to ignore values
+that drift on a CLOCK, and this one was not drifting, it was flipping.
+
+Both widgets had it; Avalonia's pump was copied from WPF's. One builder each now
+(`BuildSnapshot()` / `CurrentSnapshot()`), and `CompanionSnapshotArgumentTests` scans both
+files' source so a third push site cannot pick the other overload. **I verified that guard
+fails on the pre-fix tree**, not just that it passes on this one. Side effect: the memo is
+keyed on the arguments, so agreeing made the fast path free instead of rebuilding
+everything every 50 ms.
+
+Replied on the thread. CLAUDE.md trap 33 — and its second half is the transferable part:
+**the instrument found this, not the reasoning.** Two `?debug=1` screenshots from bjstrange,
+nine seconds apart and exact mirror images, said in one line what three sessions of
+hypothesis had not. Ship the diagnostic before the third theory.
+
+### 2. Gear & Loot shipped on both widgets, in one commit
+
+`docs/pending-gearloot-fold.patch` is applied and the file deleted. The Avalonia twin
+(`GearLootWindow.cs` + `IGearLootHost`) was built first, so both builds folded together —
+which is exactly what the two-day wait was for. Screenshots reviewed before commit, dark
+and Solarized. David approved the visuals.
+
+### 3. The MOVED badge (David asked for it directly)
+
+*"please explicitly note, maybe in a different color, when things move from accessing one
+way to another."* A `"MOVED: "` prefix on a `WhatsNew.json` highlight now renders as a badge
+in `WarnBrush`/`WarnWashBrush` instead of a bullet. `Core/WhatsNewHighlight.cs` does the
+split; both windows call it.
+
+**The test asserts the COUNT of moves, not that some exist** (currently 3). That is
+deliberate: the badge keeps its force only while it means one thing, so a release that
+starts badging ordinary changes fails and has to be re-read. **When you add a move note,
+update that number and say why in the commit.** Deliberately NOT tagged, as worked
+examples: a new capability is not a relocation; a help affordance *about* moves is not one;
+a control that was never visible was never somewhere else.
+
+New shot: `whats-new`, seeded `LastSeenVersion = 1.96.1` so the popup renders two releases
+and the badge is photographed BESIDE an ordinary bullet. A badge shot alone proves it
+draws; beside a bullet it proves it reads as different.
+
+### 4. Scribe — the capability question is ANSWERED, and CLAUDE.md was wrong
+
+CLAUDE.md asserted Scribe "can run commands on that PC". David doubted it. **Scribe answered
+in `SCRIBE-TESTING.md` within the hour and the truth is both:** its agent runs on a **Linux
+VM with no checkout** and it will not clone one, but **David's Windows PC IS reachable
+per-command**, each approved in the desktop app — `shoot.ps1 -List` ran there and returned
+40 shot names.
+
+So the Windows screenshot work was buildable all along, and **the shots never arrived
+because of our instruction, not its behaviour**: `SCRIBE-TESTING.md` asked for output in
+`dist/scribe-shots/`, and `dist/` is line 3 of `.gitignore`. It declined `docs/screenshots/`
+because that is ours — correctly.
+
+→ **Ask for findings as TEXT in `SCRIBE-TESTING.md`.** Every PC command costs David a click,
+and an image cannot cross between us. Its channel work is excellent; its guesses about
+source are still 4-for-4 wrong, so treat one as a place to look.
+
+---
+
+## What is actually next — pick one, they are independent
+
+**1. The Avalonia widget has ~100 lines of ratchet room, and this is the real constraint.**
+`EQBuddy.Avalonia/MainWindow.cs` is 5,539 against a 5,127 baseline (limit 5,640). Two folds
+in a row COST it ~90 lines each rather than freeing any, because a fold moves surfaces and
+leaves the doors. **The next theme on that build must be preceded by a lift, not followed by
+one.** The candidate is named in the ratchet comment: the gear checklist, ~275 contiguous
+lines (`BuildGearSection`, `RenderGearChecklist`, `GearRow`, the auto-check high-water
+marks) — precisely what WPF already lifted into `GearCardView.cs`. **Caveat that makes it
+harder here: no E2E suite on this build**, so CLAUDE.md's "pin the behaviour before the
+move" has to be paid in `WidgetRenderTests`. Write the assertions first.
+
+Two other files are tight and worth a glance: `OptionsWindow.xaml.cs` (32 left) and
+`LogParser.cs` (25 left).
+
+**2. Gear & Loot's second pass: Drops and Items as tabs 3 and 4.** `LootSurface` already
+names all four; `Hosted` lists the two that are real. `DropsWindow` and `ItemInfoWindow`
+exist, so this is a fold of windows rather than of cards — a different shape from the first
+pass, and worth doing one at a time for the same reason.
+
+**3. EQBuddy Mobile's Gear & Loot parity is an open DESIGN question, not a bug.** The phone
+keeps `loot` and `gear` as two separately-selectable screens, and that is probably RIGHT —
+a phone screen picker is not a widget card list, and folding two screens into one tabbed
+screen would make the phone worse. CLAUDE.md says the phone is first-class in both
+directions, not that it must copy the desktop's shape. **But nothing has decided this on
+purpose yet**, and the labels ("Loot & watches", "Gear checklist") do not come from
+`LootSurface.LabelFor`. Worth asking David rather than guessing.
+
+**4. `ZoneShare.Export` re-exports imported-but-unverified timers** — an open question for
+David, recorded in `docs/SpawnEvidence.md`. Unchanged.
+
+**5. The spawn evidence store (Gate 2)** — designed in `docs/SpawnEvidence.md`, not built.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered and can be closed if bjstrange confirms.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go** — he gave it for 1.98.0 and that go does not carry
+forward. Both UIs in the same change. David is Windows-only; never hold a release to verify
+Avalonia. When a decision is his to make, use the question tool rather than burying it in
+prose.
+
+
+---
+
+## 2026-08-20 (night): why the Gear & Loot fold waited two days — SUPERSEDED, kept for the reason
+
+**SUPERSEDED 2026-08-20 late: the fold shipped in 1.98.0, and `docs/pending-gearloot-fold.patch`
+is applied and deleted. Nothing below is a to-do.** It is kept because the REASON the fold
+waited is the durable part, and the next theme will meet it again.
+
+The window was built, committed and live on `main` (`05de9e1`). **The fold was not**, and the
+reason mattered more than the code: I built it, the Avalonia test suite failed, and the
 failure was right.
 
 **`MigrateLootSections` lives in Core, so it folds BOTH widgets — and only WPF has the
