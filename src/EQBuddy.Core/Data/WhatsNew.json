@@ -1,6 +1,6 @@
 ﻿[
  {
-  "version": "1.96.2",
+  "version": "1.97.0",
   "date": "2026-08-20",
   "highlights": [
    "EQBUDDY MOBILE NOW WORKS ON LINUX AND macOS (discussion #208, thanks sbaum23). The phone/tablet second screen had never existed outside Windows - not a hidden setting, the server simply was not part of that build - so the two things EQBuddy does that nothing else does could not be used together. It is there now: the phone button in the title bar, the first entry in the right-click menu, and its own block at the top of Options - Behavior, same as Windows. Same QR pairing, same LAN-only and off-by-default, same per-device choice of screens, and every surface the Windows one serves - map, timers, quests, gear, loot, raids, progress - not a reduced set. The firewall advice is written for YOUR platform now instead of sending you to a Windows dialog that does not exist.",
