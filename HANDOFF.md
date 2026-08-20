@@ -110,9 +110,10 @@ under node — reloads exactly once, never loops, ignores a missing version — 
 ⚠️ **This is a diagnosis, not a confirmation.** Nobody has reproduced bjstrange's card
 churning with a page that is definitely current. **Ask him what the FOOTER on his device
 says** — not what version his PC is on — and whether a hard refresh changes anything. If
-it churns on a page whose footer reads 1.96.2, the cause is something else and this fix is
-still worth having. He has not been replied to yet: I would rather ask that one question
-than announce a fix for a symptom I cannot see.
+it churns on a freshly opened page, the cause is something else and this fix is still worth
+having. **Replied and asked him exactly that** — the footer on his device, and whether
+fully closing and reopening the page stops it. Do not close #202 on this; it is a
+diagnosis waiting on one answer.
 - **Waiting on reporters — do not chase, do not close.** #218 n3cr0nk1tt3n (does he have an
   update folder? the fix only bites that path). #221 NeONDaRoO (a verbatim instance-charge
   log line; if the game doesn't log it, that is the honest answer). #101/#193 (the
