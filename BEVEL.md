@@ -34,7 +34,7 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ## Things worth knowing before reviewing this codebase
 
-- `CLAUDE.md` is the orientation and carries a **37-entry trap list**, every entry a bug
+- `CLAUDE.md` is the orientation and carries a **38-entry trap list**, every entry a bug
   that reached a release. Read it before asserting anything about how the app behaves.
 - **Both UIs, always.** WPF (`src/EQBuddy`) and Avalonia (`src/EQBuddy.Avalonia`) ship
   together; a fix on one lane only is how #122 and #152 reached Linux.

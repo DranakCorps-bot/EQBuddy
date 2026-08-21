@@ -548,8 +548,18 @@ function noteRepaint(name, before, after) {
     + "\n  now: ..." + b.slice(from, at + 60);
 }
 
-const DRIFT_KEYS = new Set(["perHour", "perActiveHour", "catalog"]);
-const DRIFTS = (k, v) => (DRIFT_KEYS.has(k) ? undefined : v);
+const DRIFT_KEYS = new Set(["perHour", "perActiveHour"]);
+// `catalog` is not a drifting value, and it is handled separately: 1,200 quests
+// stringified once a second was the page's biggest single cost, so its CONTENT stays out
+// of the key — but dropping it entirely made the gate blind to the one transition that
+// decides whether the surface works at all. A quests panel painted WITHOUT a catalog can
+// only be filled by a repaint, because setCatalog is a side effect of the paint; with the
+// catalog invisible to the key, the payload that finally brought one changed nothing the
+// gate could see and the panel sat on "Waiting for the quest catalog from the PC…" for
+// the life of the page (David, 2026-08-21). Its PRESENCE costs one character to watch.
+// The stamp is already in the key, so a rebuilt catalog still repaints on its own.
+const DRIFTS = (k, v) =>
+  DRIFT_KEYS.has(k) ? undefined : k === "catalog" ? (v ? 1 : 0) : v;
 // The picks a device starts with, before anyone touches the ⚙. Measured against the
 // viewport (the layout breakpoint's own measure), not the window, so a fullscreen or
 // Home-Screen launch is judged by the room it actually has.

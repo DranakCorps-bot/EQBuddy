@@ -103,6 +103,18 @@ public sealed record CompanionSnapshot
     {
         var snap = ForSubscription(surfaces);
 
+        // A sticky payload is held by the device only while its SECTION keeps arriving.
+        // The page carries the withheld copy forward off the PREVIOUS payload, so a
+        // payload that omitted the section left it nothing to copy from — and this memo
+        // said "already sent" regardless, withholding it for the life of the connection.
+        // That is David's 2026-08-21 phone: Quests stuck forever on "Waiting for the
+        // quest catalog from the PC…". Two doors, both real — the ⚙ Screens picker
+        // adding a surface the connect push had already spent the payload on, and the
+        // desktop gating a surface off and back on under a device that never moved.
+        // Forgetting here costs one re-send; not forgetting costs the surface.
+        if (!state.HeldQuests) state.QuestCatalogStamp = null;
+        if (!state.HeldMap) state.MapGeometryStamp = null;
+
         if (snap.Theme is { } theme)
         {
             if (theme.Stamp == state.ThemeStamp) snap = snap with { Theme = null };
@@ -125,6 +137,11 @@ public sealed record CompanionSnapshot
                 snap = snap with { Quests = quests with { Catalog = null } };
             else state.QuestCatalogStamp = quests.CatalogStamp;
         }
+
+        // What this device is holding after this message — the question the stamps
+        // above are only meaningful against.
+        state.HeldQuests = snap.Quests is not null;
+        state.HeldMap = snap.Map is not null;
         return snap;
     }
 
@@ -147,6 +164,13 @@ public sealed class CompanionClientState
     public string? ThemeStamp { get; set; }
     public string? MapGeometryStamp { get; set; }
     public string? QuestCatalogStamp { get; set; }
+
+    /// <summary>Whether the LAST message to this device carried the section at all.
+    /// A stamp only says "this device was sent it once"; the page can only still hold
+    /// it if the section has been on every payload since, because that is where it
+    /// carries the copy forward from. False re-ships on the next push.</summary>
+    public bool HeldQuests { get; set; }
+    public bool HeldMap { get; set; }
 }
 
 /// <summary>Who and where the data comes from — the page's header line.</summary>

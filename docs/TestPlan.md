@@ -122,6 +122,8 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | **A window whose zoom was never saved keeps its full width** — `TryGetValue`'s `out` default is 0.0, and multiplying by it opened the Quest Tracker at zero width on Linux and macOS | **Auto** — `WindowZoomTests` (Avalonia) |
 | The quest surface's tab strip comes from Core's `QuestSurface`; General carries no badge | **Auto** — `CompanionQuestsTests` |
 | The quest catalog index ships once per device by stamp, and re-ships when any field changes | **Auto** — `CompanionQuestsTests` |
+| **A sticky payload is re-shipped when the device stops holding it** — "sent once" is about the device, but the page carries the copy forward off the PREVIOUS payload, so adding a surface in ⚙ Screens (or the desktop gating one off and back on) left Quests on "Waiting for the quest catalog from the PC…" forever, and the map blank in the same zone | **Auto** — `CompanionQuestsTests`, `CompanionSurfaceTests` |
+| **The repaint gate can see a catalog ARRIVE** — its content stays out of the key (1,200 quests), its presence does not, because `setCatalog` is a side effect of the paint | **Auto** — `CompanionRepaintGateTests` |
 | The general list's membership and order are Core's `QuestMatcher`'s; dismissed and completed non-repeatables are excluded | **Auto** — `CompanionQuestsTests` |
 | Class restrictions are resolved by Core's `QuestClassFilter` at index build — the page checks membership, never parses class text | **Auto** — `CompanionQuestsTests` |
 | A device's 📌 and class-picker taps land on the same `QuestLedgerStore` the desktop writes; repeats are not changes | **Auto** — `CompanionQuestsTests` |

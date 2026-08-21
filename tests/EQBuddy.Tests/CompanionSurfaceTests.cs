@@ -400,4 +400,30 @@ public class CompanionSurfaceTests
         // A fresh device is told everything, which is what a reconnect must do.
         Assert.NotNull(snap.ForClient([CompanionSurfaces.Map], new CompanionClientState()).Theme);
     }
+
+    // The quest catalog's bug (CompanionQuestsTests, David's phone 2026-08-21) is the
+    // map's bug too, and the same rule closes both: the page carries the withheld
+    // geometry forward off the PREVIOUS payload, so dropping the map from the picks
+    // throws the picture away. Re-adding it in the SAME zone used to be answered with
+    // a stamp and no geometry — a map surface that could never draw.
+    [Fact]
+    public void ReAddingTheMapInTheSameZoneShipsTheGeometryAgain()
+    {
+        var geometry = new CompanionMapGeometry("geo-1", 0, 0, 100, 100,
+            [new CompanionMapStroke("#AAAAAA", [0, 0, 10, 10])], [], false);
+        var snap = Build(new CompanionInputs
+        {
+            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", geometry, null, null, [], [], []),
+        });
+        var state = new CompanionClientState();
+
+        Assert.NotNull(snap.ForClient([CompanionSurfaces.Map], state).Map!.Geometry);
+
+        // The map comes off the ⚙ Screens picks: no section, so nothing to carry.
+        Assert.Null(snap.ForClient([CompanionSurfaces.Spawns], state).Map);
+
+        // Back on, same zone, and the picture goes out again.
+        Assert.NotNull(snap.ForClient([CompanionSurfaces.Map], state).Map!.Geometry);
+        Assert.Null(snap.ForClient([CompanionSurfaces.Map], state).Map!.Geometry);  // then held
+    }
 }

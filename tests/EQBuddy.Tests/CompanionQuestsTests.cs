@@ -212,6 +212,57 @@ public class CompanionQuestsTests
         Assert.NotNull(snap.ForClient([CompanionSurfaces.Quests], new CompanionClientState()).Quests!.Catalog);
     }
 
+    // The bug David hit on his phone on 2026-08-21: Quests stuck forever on "Waiting
+    // for the quest catalog from the PC...". The device is charged for a catalog it
+    // never got to keep.
+    //
+    // The page carries the withheld catalog forward off the PREVIOUS payload, so it
+    // holds the catalog only while the quests SECTION keeps arriving. A payload that
+    // omits the section leaves nothing to copy from -- and the server's memo said
+    // "already sent" regardless, so the catalog was withheld for the life of the
+    // connection and the surface never loaded.
+    //
+    // Two doors onto it, both real: the phone's first-run picks are spawns+session, so
+    // the connect push (unsubscribed = everything) spends the catalog before the page
+    // narrows; and the desktop can gate the surface off and back on under a device that
+    // never changed its picks at all.
+    [Fact]
+    public void AddingTheQuestSurfaceLaterShipsTheCatalogAgain()
+    {
+        var snap = Build(new CompanionQuestRequest { Catalog = Catalog() });
+        var state = new CompanionClientState();
+
+        // Connect: the page has not subscribed yet, so this push carries everything.
+        Assert.NotNull(snap.ForClient(null, state).Quests!.Catalog);
+
+        // The device's saved picks arrive and they do not include Quests. The section
+        // is gone from the payload, so the page's carried-forward copy goes with it.
+        Assert.Null(snap.ForClient([CompanionSurfaces.Spawns], state).Quests);
+
+        // Now the player adds Quests in the (gear) Screens picker.
+        var added = snap.ForClient([CompanionSurfaces.Spawns, CompanionSurfaces.Quests], state);
+        Assert.NotNull(added.Quests!.Catalog);
+
+        // ...and it is still sent only once while the surface stays picked.
+        Assert.Null(snap.ForClient(
+            [CompanionSurfaces.Spawns, CompanionSurfaces.Quests], state).Quests!.Catalog);
+    }
+
+    [Fact]
+    public void GatingTheSurfaceOffAndBackOnShipsTheCatalogAgain()
+    {
+        var snap = Build(new CompanionQuestRequest { Catalog = Catalog() });
+        var state = new CompanionClientState();
+        Assert.NotNull(snap.ForClient(null, state).Quests!.Catalog);
+
+        // The desktop stops offering the surface: no section at all, for anyone.
+        var gated = Build(new CompanionQuestRequest()) with { Quests = null };
+        Assert.Null(gated.ForClient(null, state).Quests);
+
+        // Back on, and the device that lost the section is told the catalog again.
+        Assert.NotNull(snap.ForClient(null, state).Quests!.Catalog);
+    }
+
     // ---------------- taps ----------------
 
     [Fact]

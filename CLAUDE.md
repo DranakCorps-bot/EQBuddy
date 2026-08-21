@@ -678,6 +678,31 @@ Read this list before touching the areas it names. Every entry cost a release.
     fact to the host's own chrome or move it ABOVE the scrolling content, which is what the
     Drops tab did — orientation text is read on arrival, so the top is where it belongs.
 
+38. **"Sent once" is a claim about the DEVICE; what the page actually holds is a claim
+    about the LAST PAYLOAD.** `CompanionSnapshot.ForClient` withholds the big static
+    payloads — the quest catalog, the zone's map geometry — from any device whose recorded
+    stamp matches, and the page compensates by copying them forward off the PREVIOUS
+    payload. Those two rules only agree while the SECTION keeps arriving. Drop the section
+    (a `subscribe` that narrows the picks, or the desktop gating the surface off) and the
+    page has nothing to copy from, while the server goes on believing the device is holding
+    it — so the payload never comes again and the surface waits forever. David's phone,
+    2026-08-21: Quests stuck on "Waiting for the quest catalog from the PC…", reached by the
+    ordinary act of ticking Quests in ⚙ Screens, because the phone's first-run picks are
+    spawns+session and the unsubscribed connect push had already spent the catalog on a
+    page that was not showing the surface. The map had the identical hole in the same zone.
+    → **A sticky payload's memo must record what the last message CARRIED, not what was
+    ever sent.** `CompanionClientState.HeldQuests`/`HeldMap` are that, and forgetting costs
+    one re-send where not forgetting costs the surface.
+    → **And the repaint gate is the second half.** `setCatalog` is a side effect of a
+    PAINT, and the gate (#202) excluded `catalog` from its key to avoid stringifying 1,200
+    quests — so the payload that finally brought a catalog changed nothing the gate could
+    see and the panel could never be filled on that page load, even by a correct server.
+    **When a render has a side effect, the thing that decides whether to render must be
+    able to see what the side effect needs.** Presence, not content: `catalog ? 1 : 0`.
+    → Both halves were reproduced in `scripts/mobile-harness.ps1` driving the shipped page
+    through the real ⚙ picker, before and after. The reasoning had the mechanism right and
+    the second half missing; the harness is what found it.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
