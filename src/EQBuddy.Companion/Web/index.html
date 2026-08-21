@@ -767,8 +767,38 @@ function boot() {
   // browser goes on running whatever HTML it downloaded when the tab was first opened
   // (trap 32). So this gesture is worth having even on a page whose data is already live.
   (function pullToRefresh() {
-    const TRIGGER = 70;               // px of travel before a release will reload
+    const TRIGGER = 70;               // px of travel before a release acts
     let startY = null, scroller = null, pulled = 0;
+
+    // ASK THE PC FOR A FRESH SNAPSHOT, rather than reloading the page.
+    //
+    // Bevel's review of the first cut (2026-08-21) and it is right: on a page whose data
+    // is already pushed live, "refresh" means "give me the current numbers", and a reload
+    // is a heavy way to get them — white flash, socket reconnect, and the map's pan and
+    // zoom thrown away. The server already answers this with no change at all: a
+    // "subscribe" message re-sends the latest snapshot immediately (CompanionServer's
+    // client dispatch), which is the same path the ⚙ Screens picker uses.
+    //
+    // A reload is still the RIGHT answer when the socket is not open, and it is the only
+    // thing that can fix a page running weeks-old JavaScript (trap 32) — so that is what
+    // a disconnected pull does. Two situations, two different right answers.
+    function refreshNow() {
+      try {
+        if (ws && ws.readyState === 1) {
+          ws.send(JSON.stringify({ kind: "subscribe", surfaces: picked() }));
+          notice("refreshed");
+          return;
+        }
+      } catch (e) { /* fall through to the reload */ }
+      location.reload();
+    }
+
+    // The lone panel that DRAWS ITSELF (the map) owns vertical drag for panning — but
+    // excluding it outright, as the first cut did, left a map-only player with no refresh
+    // at all (Bevel). Its CHROME is not the map: a pull that starts on the card's heading
+    // is unambiguous, so the gesture lives there and pan keeps the body.
+    const chromeStart = (target) =>
+        target instanceof Element && target.closest("section.surface > h2") !== null;
 
     const tab = () => document.getElementById("pull");
     const show = (dist) => {
@@ -789,18 +819,23 @@ function boot() {
     document.addEventListener("touchstart", (e) => {
       reset();
       if (!document.body.classList.contains("solo") || e.touches.length !== 1) return;
-      // The lone panel that DRAWS ITSELF (the map) owns vertical drag for panning; a
-      // refresh gesture there would fight it every time someone moves the map.
-      if (document.querySelector("section.surface.fills")) return;
-      scroller = document.querySelector("section.surface > .body");
-      if (!scroller || scroller.scrollTop > 0) { scroller = null; return; }
+      const fills = document.querySelector("section.surface.fills");
+      if (fills) {
+        // Map-only: the heading is the handle. Pan wins everywhere else.
+        if (!chromeStart(e.target)) return;
+        scroller = fills;                 // never scrolls; only the guard below reads it
+      } else {
+        scroller = document.querySelector("section.surface > .body");
+        if (!scroller || scroller.scrollTop > 0) { scroller = null; return; }
+      }
       startY = e.touches[0].clientY;
     }, { passive: true });
 
     document.addEventListener("touchmove", (e) => {
       if (startY === null || !scroller) return;
       // Any upward move, or a scroller that has left the top, ends the attempt: the
-      // player is reading, not refreshing.
+      // player is reading, not refreshing. (A `fills` panel never scrolls, so this is
+      // always false for the map and the pull is governed by the chrome check alone.)
       if (scroller.scrollTop > 0) { reset(); return; }
       pulled = e.touches[0].clientY - startY;
       if (pulled <= 0) { reset(); return; }
@@ -810,7 +845,7 @@ function boot() {
     document.addEventListener("touchend", () => {
       const go = pulled >= TRIGGER;
       reset();
-      if (go) location.reload();
+      if (go) refreshNow();
     }, { passive: true });
 
     document.addEventListener("touchcancel", reset, { passive: true });
