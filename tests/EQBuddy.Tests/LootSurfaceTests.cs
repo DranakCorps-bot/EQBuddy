@@ -46,7 +46,6 @@ public class LootSurfaceTests
     [InlineData("loot", LootTab.Loot)]
     [InlineData("session", LootTab.Loot)]
     [InlineData("GEAR", LootTab.Gear)]
-    [InlineData(" drops ", LootTab.Drops)]
     [InlineData("lookup", LootTab.Items)]
     public void ASavedTabChoiceResolves(string key, LootTab expected) =>
         Assert.Equal(expected, LootSurface.TabForKey(key));

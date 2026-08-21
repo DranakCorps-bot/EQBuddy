@@ -6,6 +6,11 @@ namespace EQBuddy.Core;
 /// Named "Gear &amp; Loot" by David on 2026-08-20, over the plan's "Loot &amp; Items":
 /// it names the two things actually in it, and "Items" was always the vaguer half.
 ///
+/// **Drops LEFT this theme on 2026-08-20** for <see cref="CreatureSurface"/>. It had been
+/// named here and unhosted since the theme shipped, and it never belonged: Gear &amp; Loot
+/// is about your BAGS — what you picked up, what you want, what you have — and Drops is
+/// about the MOB. David's "Kills and Drops should be … Kills and Drops" made that obvious.
+///
 /// **The chain, in one window.** This is the theme that carries what CLAUDE.md calls the
 /// differentiator: loot → quest → item → mob → camp → route. What did I just get, what
 /// drops it, what is it actually for, and what am I still missing. Those were four
@@ -24,9 +29,6 @@ public enum LootTab
 {
     /// <summary>What this session has picked up, made and sold.</summary>
     Loot,
-
-    /// <summary>Drops by creature — your own observed rates, per mob.</summary>
-    Drops,
 
     /// <summary>Look an item up: stats, what wants it, where it comes from.</summary>
     Items,
@@ -62,7 +64,6 @@ public static class LootSurface
     public static string LabelFor(LootTab tab) => tab switch
     {
         LootTab.Loot => "Loot",
-        LootTab.Drops => "Drops",
         LootTab.Items => "Items",
         // "Gear" read as "my gear" and delivered a wishlist — David, 2026-08-20:
         // "I guess I figured Gear would show me what gear I had." It sat one tab away
@@ -84,7 +85,6 @@ public static class LootSurface
     public static string KeyFor(LootTab tab) => tab switch
     {
         LootTab.Loot => "loot",
-        LootTab.Drops => "drops",
         LootTab.Items => "items",
         LootTab.Gear => "gear",
         LootTab.Inventory => "inventory",
@@ -94,7 +94,6 @@ public static class LootSurface
     public static LootTab? TabForKey(string? key) => key?.Trim().ToLowerInvariant() switch
     {
         "loot" or "session" => LootTab.Loot,
-        "drops" or "targetdrops" => LootTab.Drops,
         "items" or "item" or "lookup" => LootTab.Items,
         // "wishlist" answers too: the label is what a player types into EQBUDDY_GEARLOOT
         // or reads in a menu, and a key that only accepts the old word would make the
