@@ -469,6 +469,37 @@
                 </Grid>
             </Button>
 
+            <!-- MOTES IS A CARD AGAIN (David, 2026-08-21), and it ships HIDDEN -
+                 AppSettings.MigrateMotesCard puts it in HiddenSections once, so nobody's
+                 widget grows a row on update and the eye in Options is the switch.
+
+                 It was folded into Progress → Wealth on 2026-08-19 and two reports
+                 followed. #219 wanted the RATE back and got it on the Progress launcher
+                 line in 1.96.1; #228 and Scribe's item wanted the CARD, "behind a setting
+                 if needed". Motes are the upgrade currency and a farmer watches the rate
+                 the way a raider watches dps — it earns a slot for the people who ask.
+
+                 The star is HERE, on the header, where every other card's is. That matters
+                 beyond convenience: the mini-dashboard cell for motes had no other switch
+                 once the card was folded away (the Progress window's copy is the same
+                 setting seen from inside the thing people could not find). -->
+            <Expander x:Name="MotesSection" Style="{StaticResource Section}">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:EqCardTitle Icon="Sparkle" Text="Motes"/>
+                        <TextBlock x:Name="MotesHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text=""/>
+                        <ToggleButton x:Name="StarMotes" Grid.Column="2" Style="{StaticResource StarToggle}"
+                                      Tag="motes" Click="OnStarChanged" ToolTip="Show motes in mini dashboard"/>
+                    </Grid>
+                </Expander.Header>
+                <ContentControl x:Name="MotesBody"/>
+            </Expander>
+
             <!-- The GEAR & LOOT theme's launcher (docs/Themes.md step 3). The Loot and
                  Gear cards became two tabs in GearLootWindow; this line carries what both
                  headers carried, so the glance survives the fold rather than being traded

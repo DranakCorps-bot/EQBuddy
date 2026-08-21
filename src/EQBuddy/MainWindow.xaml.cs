@@ -129,6 +129,12 @@ public partial class MainWindow : Window, ICardContext
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
+        // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
+        // The Progress window builds a second instance from NewProgressSurfaces: a
+        // UIElement has one parent, so two hosts mean two instances — the rule
+        // NewGearCard records.
+        _motesCard = new MotesCardView(this); _motesCard.Attach();
+        MotesBody.Content = _motesCard.Body;
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -653,7 +659,12 @@ public partial class MainWindow : Window, ICardContext
         // OF the five it absorbs rather than a new name, so a player who had dragged that
         // card somewhere keeps the slot instead of finding the theme appended to the
         // bottom of their list (AppSettings.MigrateProgressSections).
-        ["progress"] = ProgressSection, ["misc"] = MiscSection,
+        ["progress"] = ProgressSection,
+        // Back in the catalog since 2026-08-21, so it MUST be here: ApplySectionLayout
+        // appends every catalog key and then looks each one up in this map, and a key in
+        // one and not the other throws on STARTUP, for everybody.
+        ["motes"] = MotesSection,
+        ["misc"] = MiscSection,
     };
 
     /// <summary>Apply saved card order + hidden set (OVERLAY-001..003). Hidden cards keep collecting.</summary>
@@ -2583,6 +2594,15 @@ public partial class MainWindow : Window, ICardContext
         QuestsHeader.Text = _quests.SummaryLine();
 
 
+        // The card is hidden for everyone who has not ticked it, and a hidden card is
+        // never expanded — so this costs nothing for the people the fold was for, and
+        // gives the rate to the people who asked for it back.
+        if (MotesSection.IsExpanded) _motesCard.Render(s);
+        // The SAME string the Progress launcher and the Wealth badge use — one
+        // formatter, so the card, the theme and the phone cannot report three answers
+        // (#210's rule). Blank until something drops.
+        MotesHeader.Text = ProgressTheme.MoteRate(s) ?? "";
+
         if (MiscSection.IsExpanded)
         {
             FillList(DeathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
@@ -2810,6 +2830,11 @@ public partial class MainWindow : Window, ICardContext
     private GearCardView Gear => _gear ??= NewGearCard();
 
     private GearCardView? _gear;
+
+    /// <summary>The widget's Motes card. Hidden unless the player ticks it in Options, and
+    /// rendered only while expanded — it is the same view the Progress window's Wealth tab
+    /// uses, reading the same numbers.</summary>
+    private readonly MotesCardView _motesCard;
 
     /// <summary>A fresh Gear card. The Gear &amp; Loot theme's window wants one too, and
     /// a UIElement has one parent — so each host builds its own rather than sharing an
@@ -3332,6 +3357,7 @@ public partial class MainWindow : Window, ICardContext
 
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
+        yield return ("motes", StarMotes);
         yield return ("dps", StarDps);
         yield return ("hps", StarHps);
         yield return ("pet", StarPet);

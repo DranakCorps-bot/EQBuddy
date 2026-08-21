@@ -150,6 +150,7 @@ public sealed class EndToEndTests
         app.Launch();
 
         // The fixture kills things and loots them, so there is something to group.
+        app.WaitForWindow("dropsMobs", "the Kills & Drops window to open on Drops");
         Wait.Until(() => app.DumpValue("dropsMobs") > 0, TimeSpan.FromSeconds(45),
             "the fixture replay to land at least one creature with a drop");
 
@@ -181,12 +182,7 @@ public sealed class EndToEndTests
 
         var kills = app.DumpValue("killsTotal");
         Assert.True(kills > 0, "fixture replay should land kills");
-        // WAIT FOR THE WINDOW before taking a row baseline. It opens at ApplicationIdle
-        // after Launch() returns, so for a tick or two the dump has no "kills" key at all
-        // and DumpValue answers -1 — which then makes the assertion below wait forever for
-        // a row count of zero. Flaky one run in three until this line.
-        Wait.Until(() => app.DumpValue("kills") >= 0, TimeSpan.FromSeconds(45),
-            "the Kills & Drops window to open and report its rows", app.Artifacts);
+        app.WaitForWindow("kills", "the Kills & Drops window to open and report its rows");
         var killRows = app.DumpValue("kills");
         Assert.Equal(1, app.DumpValue("killsCard"));   // the door is on the widget
         Assert.True(app.DumpValue("killsSummaryLen") > 0,
@@ -213,10 +209,7 @@ public sealed class EndToEndTests
 
         var lootTotal = app.DumpValue("lootTotal");
         Assert.True(lootTotal > 0, "fixture replay should land loot");
-        // Same window-open race as the kills test above, latent here since the Gear & Loot
-        // fold and fixed in the same change that found it.
-        Wait.Until(() => app.DumpValue("lootRows") >= 0, TimeSpan.FromSeconds(45),
-            "the Gear & Loot window to open and report its rows", app.Artifacts);
+        app.WaitForWindow("lootRows", "the Gear & Loot window to open and report its rows");
         var lootRows = app.DumpValue("lootRows");
 
         app.AppendLogLines(MeleeHit, Kill,
@@ -492,8 +485,15 @@ public sealed class EndToEndTests
         app.SeedRaids(("Phinigel Autropos", 3, false), ("Lord Nagafen", 0, true));
         app.Launch();
 
-        Assert.Equal(2, app.DumpValue("progressRaidsDefeated"));
-        Assert.Equal(6 + 21 + 2, app.DumpValue("progressRaidsRows"));
+        app.WaitForWindow("progressRaidsDefeated", "the Progress window to open on Raids");
+        // POLLED, not read once. Launch() returns when the replay has landed its first
+        // KILL, which is early — faction standings, vendor sales and raid clears arrive
+        // later in the same replay, so a bare Assert.Equal here is a race against the log
+        // ingest. It failed about one run in three once the Kills fold shifted startup
+        // timing by a few hundred milliseconds; the assertion was always this fragile and
+        // had simply been getting away with it.
+        app.WaitForDump("progressRaidsDefeated", 2, "the two seeded raid clears");
+        app.WaitForDump("progressRaidsRows", 6 + 21 + 2, "the raid target rows");
         // The launcher that replaced five cards. A hidden one is an unreachable window.
         Assert.Equal(1, app.DumpValue("progressCard"));
         Assert.True(app.DumpValue("progressSummaryLen") > 0,
@@ -517,9 +517,16 @@ public sealed class EndToEndTests
         });
         app.Launch();
 
-        Assert.Equal(24, app.DumpValue("progressMoneySold"));
-        Assert.Equal(1, app.DumpValue("progressMoneySoldShown"));
-        Assert.Equal(1, app.DumpValue("progressMotesRows"));
+        app.WaitForWindow("progressMoneySold", "the Progress window to open on Wealth");
+        // POLLED, not read once. Launch() returns when the replay has landed its first
+        // KILL, which is early — faction standings, vendor sales and raid clears arrive
+        // later in the same replay, so a bare Assert.Equal here is a race against the log
+        // ingest. It failed about one run in three once the Kills fold shifted startup
+        // timing by a few hundred milliseconds; the assertion was always this fragile and
+        // had simply been getting away with it.
+        app.WaitForDump("progressMoneySold", 24, "the 24 sold rows the Money card drew");
+        app.WaitForDump("progressMoneySoldShown", 1, "the sold block's heading");
+        app.WaitForDump("progressMotesRows", 1, "the Motes card's row");
     }
 
     /// <summary>The Faction tab, which the widget's own header reported as five for this
@@ -533,9 +540,16 @@ public sealed class EndToEndTests
         });
         app.Launch();
 
-        Assert.Equal(5, app.DumpValue("progressFaction"));
-        Assert.Equal("faction", app.DumpText("progressTab"));
-        Assert.Equal(4, app.DumpValue("progressTabs"));
+        app.WaitForWindow("progressFaction", "the Progress window to open on Faction");
+        // POLLED, not read once. Launch() returns when the replay has landed its first
+        // KILL, which is early — faction standings, vendor sales and raid clears arrive
+        // later in the same replay, so a bare Assert.Equal here is a race against the log
+        // ingest. It failed about one run in three once the Kills fold shifted startup
+        // timing by a few hundred milliseconds; the assertion was always this fragile and
+        // had simply been getting away with it.
+        app.WaitForDump("progressFaction", 5, "the five factions the card reported");
+        app.WaitForDump("progressTab", "faction", "the window to open on the Faction tab");
+        app.WaitForDump("progressTabs", 4, "all four Progress tabs");
     }
 
     /// <summary>

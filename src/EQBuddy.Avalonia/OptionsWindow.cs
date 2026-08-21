@@ -1565,6 +1565,21 @@ public sealed class OptionsWindow : Window
         panel.Children.Add(_cardsPanel);
         BuildCardsEditor();
 
+        // The mini dashboard's contents, listed for the first time on 2026-08-21. A
+        // stat's only switch used to be the star on its card header, so when the themes
+        // folded cards into windows the switches went with them — and this screen could
+        // only reach a star through its BREAKOUT box, which exists for six kinds. Motes,
+        // coin and kills have none, so their stars were reachable ONLY by opening the
+        // window a player was complaining about (#228). WPF's twin, same change.
+        panel.Children.Add(Heading("Mini dashboard", new Thickness(0, 14, 0, 2)));
+        panel.Children.Add(AppTheme.DimText(
+            "Which stats show in the pill while EQBuddy is minimised. Each of these is the "
+            + "same switch as the star on the card header — two views of one setting, not two "
+            + "settings.",
+            new Thickness(0, 0, 0, 2)));
+        panel.Children.Add(_miniStatsPanel);
+        BuildMiniStatChecks();
+
         panel.Children.Add(Heading("Breakout windows", new Thickness(0, 14, 0, 2)));
         panel.Children.Add(_breakoutsBlurb);
         panel.Children.Add(AppTheme.DimText(
@@ -1647,6 +1662,43 @@ public sealed class OptionsWindow : Window
     {
         _main.ApplySectionLayout();
         BuildCardsEditor();
+    }
+
+    private readonly WrapPanel _miniStatsPanel = new();
+
+    /// <summary>Every mini-dashboard cell, as a tick box — the route that went missing
+    /// when the themes folded five card headers (and their stars) into windows. It is the
+    /// SAME setting as the star, not a parallel one, so ticking here lights the card's star
+    /// and the breakout list below re-reads it.</summary>
+    private void BuildMiniStatChecks()
+    {
+        _miniStatsPanel.Children.Clear();
+        foreach (var key in MiniBarPresentation.Order)
+        {
+            var check = new CheckBox
+            {
+                IsChecked = _main.Settings.MiniStats.Contains(key),
+                Margin = new Thickness(0, 4, 14, 0),
+                Content = new TextBlock
+                {
+                    Text = MiniBarPresentation.Names.GetValueOrDefault(key, key),
+                    FontSize = 12,
+                    Foreground = AppTheme.TextBrush,
+                    VerticalAlignment = VerticalAlignment.Center,
+                },
+            };
+            ToolTip.SetTip(check, "Show this in the minimised pill. Same switch as the star "
+                + "on the card header.");
+            check.IsCheckedChanged += (_, _) =>
+            {
+                if (!_ready) return;
+                _main.SetMiniStat(key, check.IsChecked == true);
+                // The breakout list reads MiniStats to decide whether a window can open,
+                // so it has to be rebuilt or it goes on showing the old answer.
+                BuildBreakoutChecks();
+            };
+            _miniStatsPanel.Children.Add(check);
+        }
     }
 
     /// <summary>One checkbox per breakout kind — the re-enable path for a window that was

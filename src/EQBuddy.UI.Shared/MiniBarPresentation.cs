@@ -40,6 +40,31 @@ public static class MiniBarPresentation
     public static readonly IReadOnlyList<string> Order =
         ["kills", "dps", "hps", "pet", "procs", "loot", "motes", "money", "xp", "deaths"];
 
+    /// <summary>What each cell is CALLED, for the one screen that lists them.
+    ///
+    /// It had no such screen until 2026-08-21, and that was the hole. A stat's only switch
+    /// was the star on its card header, so when the themes folded five cards into windows
+    /// the switches went with them — and Options could only reach a star through its
+    /// BREAKOUT checkbox, which exists for six kinds. Motes, money and kills have no
+    /// breakout, so their stars became reachable only by opening the very window a player
+    /// was complaining about ("hidden behind too much other junk I don't care about" -
+    /// #228, daetien-lab). Same family as trap 20: the writers survived the fold, the ROUTE
+    /// to them did not.</summary>
+    public static readonly IReadOnlyDictionary<string, string> Names =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["kills"] = "Kills",
+            ["dps"] = "Damage per second",
+            ["hps"] = "Healing per second",
+            ["pet"] = "Pet damage",
+            ["procs"] = "Weapon procs",
+            ["loot"] = "Loot",
+            ["motes"] = "Motes",
+            ["money"] = "Coin",
+            ["xp"] = "Experience",
+            ["deaths"] = "Deaths",
+        };
+
     /// <summary>Stat key → <see cref="IconPaths"/> name.</summary>
     public static readonly IReadOnlyDictionary<string, string> Icons =
         new Dictionary<string, string>(StringComparer.Ordinal)

@@ -81,7 +81,15 @@ public sealed class OptionsViewModelTests
         // (docs/Themes.md). Options is the only place a player can see the card list, so
         // a folded key left in it would offer a card that no longer exists.
         Assert.Contains(vm.Cards, c => c.Key == "progress" && c.Title == "Progress");
-        Assert.DoesNotContain(vm.Cards, c => c.Key is "money" or "motes" or "faction" or "raids");
+        Assert.DoesNotContain(vm.Cards, c => c.Key is "money" or "faction" or "raids");
+        // MOTES IS THE EXCEPTION, and it came BACK on 2026-08-21 (David, answering #228 and
+        // Scribe's item). It is a card again and therefore listed here again - which is the
+        // whole point: Options is the only place a player can see the card list, so a card
+        // that exists and is not listed is a card that cannot be switched on.
+        //
+        // It arrives HIDDEN for existing profiles (AppSettings.MigrateMotesCard), so being
+        // in this list is exactly the difference between "off" and "gone".
+        Assert.Contains(vm.Cards, c => c.Key == "motes" && c.Title == "Motes");
 
         vm.MoveCard("kills", -1);                        // top can't move up
         Assert.Equal("kills", s.SectionOrder[0]);
@@ -100,8 +108,15 @@ public sealed class OptionsViewModelTests
         var progress = vm.Cards.Single(c => c.Key == "progress").Absorbed;
         Assert.NotNull(progress);
         // By the words a player is scanning for, not by key.
-        foreach (var gone in new[] { "Money", "Motes", "Faction", "Raids" })
+        foreach (var gone in new[] { "Money", "Faction", "Raids" })
             Assert.Contains(gone, progress);
+        // MOTES IS NOT IN THAT SENTENCE ANY MORE, and this is the assertion for why: it
+        // came back as a card on 2026-08-21, so it is two rows above this note in the same
+        // list. The note answers "where did the card I am hunting for go" — naming a card
+        // that is right there sends someone into the window looking for it, which is worse
+        // than saying nothing. It is still a Wealth-tab block too; being in two places is
+        // not the same as having moved.
+        Assert.DoesNotContain("Motes", progress);
         Assert.Contains("Sky Quest", vm.Cards.Single(c => c.Key == "quests").Absorbed!);
         // The GEAR & LOOT theme absorbs exactly ONE card, which is the case the sentence
         // was never written for: it read "Gear are tabs in here now" until 2026-08-20.

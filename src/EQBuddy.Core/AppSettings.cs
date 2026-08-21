@@ -502,6 +502,9 @@ public sealed class AppSettings
             CoreLog.Error(ex); // corrupted settings — start fresh, but say so
             settings = new AppSettings();
         }
+        // Whether this profile had a settings.json at all. Only one migration cares, and
+        // it cares a lot: see MigrateMotesCard.
+        var hadFile = settings._fileStamp is not null;
         settings._fileStamp = StampOf(FilePath);
         // Non-short-circuiting on purpose: rules saved before ids existed get theirs
         // assigned at construction, and persisting them NOW is what makes the id stable
@@ -521,6 +524,10 @@ public sealed class AppSettings
         // and held back deliberately for two commits — a migration that rearranges a
         // player's widget before the surface it folds into exists buys them nothing.
         changed |= settings.MigrateLootSections();
+        // The Motes card came back on 2026-08-21 and must arrive HIDDEN, or every player
+        // who never asked for it gets a taller widget on update. Runs after the folds
+        // because it reads what they left behind.
+        changed |= settings.MigrateMotesCard(hadFile);
         changed |= settings.MigrateSkyRewardRenames();
         changed |= settings.ApplyDefaultSkyQuestChecklist();
         changed |= settings.ApplyDefaultEpicQuestChecklist();
@@ -702,6 +709,47 @@ public sealed class AppSettings
     /// </summary>
     public bool MigrateLootSections() => FoldThemeSections(
         LootSurface.AbsorbedCardKeys, LootSurface.ThemeCardKey);
+
+    /// <summary>Whether the reinstated Motes card has been offered to this profile yet.
+    /// A one-shot flag, not a preference: it exists so the hide below happens exactly once
+    /// and a player who then SHOWS the card is never quietly re-hidden on the next launch.
+    /// Without it the migration would fire on every load, which also forces a settings
+    /// SAVE each launch — and a save rewrites the whole file from the startup snapshot
+    /// (trap 13).</summary>
+    public bool MotesCardOffered { get; set; }
+
+    /// <summary>
+    /// Motes is a top-level card again (David, 2026-08-21), and it starts HIDDEN.
+    ///
+    /// The Progress theme absorbed it on 2026-08-19 and two separate reports followed:
+    /// #219 wanted the RATE back on the widget (fixed in 1.96.1 — it is on the Progress
+    /// launcher line), and #228 plus Scribe's item wanted the card itself back, "behind a
+    /// setting if needed". This is that setting, and it is the one the app already has:
+    /// HiddenSections plus the eye in Options → Cards & windows. No bespoke toggle, no
+    /// second mechanism for one piece of state.
+    ///
+    /// Hidden by default because the fold happened for a reason — the widget shares the
+    /// monitor with the game, and a card nobody asked for is a row nobody asked for. The
+    /// player who wants it ticks it once.
+    ///
+    /// **Existing profiles only get hidden ONCE.** The flag is what makes showing it
+    /// stick; see <see cref="MotesCardOffered"/>.
+    /// </summary>
+    public bool MigrateMotesCard(bool hadFile)
+    {
+        if (MotesCardOffered) return false;
+        MotesCardOffered = true;
+        if (!HiddenSections.Contains("motes")) HiddenSections.Add("motes");
+        // The hiding above happens either way. Only the WRITE is conditional: a
+        // profile with no settings.json yet has nothing to preserve, and forcing a
+        // save here made every fresh Load() a file writer. SettingsClobberTests
+        // deletes settings.json and asserts that nothing else touches it, so that
+        // turned a green suite into one that failed intermittently, a different one
+        // of its four cases each run. The migration was right; the write was
+        // gratuitous. The flag persists with the next real save, and until then the
+        // in-memory state is already correct.
+        return hadFile;
+    }
 
     /// <summary>The fold itself, shared by the themes. Extracted when the second one
     /// arrived: two copies of a settings migration is two chances to lose a card

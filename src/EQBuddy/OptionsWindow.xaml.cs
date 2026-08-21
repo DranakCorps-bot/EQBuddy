@@ -89,11 +89,15 @@ public partial class OptionsWindow : Window
         SpeechVolumeLabel.Text = _vm.SpeechVolumeLabel;
 
         BuildRulesEditor();
-        BuildCardsEditor();
         BuildBuffSetPanel();
         UpdateGearImportStatus();
         UpdateCustomColorsPanel();
-        BuildBreakoutChecks();
+        // The Cards & windows tab's three editors, lifted into OptionsCardsView.cs when
+        // the mini-dashboard list pushed this file past its ratchet — CLAUDE.md's rule is
+        // to lift a surface, never to raise the ceiling.
+        _cardsView = new OptionsCardsView(_main, _vm, () => _ready,
+            CardsPanel, MiniStatsPanel, BreakoutsPanel, BreakoutsBlurb, FindResource);
+        _cardsView.RenderAll();
 
         // Restore the examples panel without persisting — this isn't the user changing it.
         ApplyGuideOpen(_main.Settings.ShowWatchGuide, persist: false);
@@ -556,77 +560,6 @@ public partial class OptionsWindow : Window
     /// pill, and quietly removing someone's pill cell because they closed a window would
     /// be a second silent surprise in the opposite direction.
     /// </summary>
-    private void BuildBreakoutChecks()
-    {
-        BreakoutsPanel.Children.Clear();
-        BreakoutsBlurb.Text = BreakoutPresentation.Blurb;
-        foreach (var kind in Enum.GetValues<BreakoutKind>())
-        {
-            var name = kind.ToString();               // the DisabledBreakouts key
-            var pk = BreakoutPresentation.Kind(kind);   // the shared table's key
-            var label = new System.Windows.Controls.TextBlock
-            {
-                Text = BreakoutPresentation.Title(pk), FontSize = 12,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            label.SetResourceReference(
-                System.Windows.Controls.TextBlock.ForegroundProperty, "TextBrush");
-
-            // Two columns, never a horizontal StackPanel (trap 14) — and drawn, never an
-            // emoji, since this is the screen a Wine player opens to find out why a
-            // window will not appear (#148/#166).
-            var content = new System.Windows.Controls.StackPanel
-            {
-                Orientation = System.Windows.Controls.Orientation.Horizontal,
-            };
-            content.Children.Add(new EqIcon
-            {
-                Glyph = BreakoutPresentation.Icon(pk), Size = 12,
-                Margin = new Thickness(0, 0, 5, 0),
-            });
-            content.Children.Add(label);
-
-            var check = new System.Windows.Controls.CheckBox
-            {
-                IsChecked = IsBreakoutOn(name),
-                Margin = new Thickness(0, 2, 14, 0),
-                Content = content,
-                ToolTip = BreakoutPresentation.StarKey(pk) is null
-                    ? BreakoutPresentation.WatchNote
-                    : "Opens while the widget is minimised. Ticking this also stars the "
-                      + "stat, so it shows in the mini pill too.",
-            };
-            check.Checked += (_, _) => SetBreakout(name, enabled: true);
-            check.Unchecked += (_, _) => SetBreakout(name, enabled: false);
-            BreakoutsPanel.Children.Add(check);
-        }
-
-        // Ticked means "this window may open", which needs BOTH halves to be true.
-        bool IsBreakoutOn(string name) =>
-            !_main.Settings.DisabledBreakouts.Contains(name)
-            && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is not { } star
-                || _main.Settings.MiniStats.Contains(star));
-
-        void SetBreakout(string name, bool enabled)
-        {
-            if (!_ready) return;
-            if (enabled)
-            {
-                _main.Settings.DisabledBreakouts.Remove(name);
-                // The half that was missing. Watch has no star to set — it opens for a
-                // pinned rule, which is the player's pick to make.
-                if (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(name)) is { } star
-                    && !_main.Settings.MiniStats.Contains(star))
-                    _main.Settings.MiniStats.Add(star);
-            }
-            else if (!_main.Settings.DisabledBreakouts.Contains(name))
-                _main.Settings.DisabledBreakouts.Add(name);
-            _vm.Persist();
-            // The card's own ★ is the same setting seen from the other side; if the
-            // widget is open behind Options it must not go on showing the old one.
-            _main.SyncStarsFromSettings();
-        }
-    }
 
     private void OnRegenPerTickChanged(object sender, RoutedEventArgs e)
     {
@@ -721,7 +654,7 @@ public partial class OptionsWindow : Window
         // The card rows pick Foreground (dim vs. normal) via FindResource at construction
         // time rather than a binding, so they need an explicit rebuild to pick up the new
         // palette — everything else in the window repaints on its own via DynamicResource.
-        BuildCardsEditor();
+        _cardsView?.BuildCards();
         UpdateCustomColorsPanel();
         _main.RefreshTheme();
     }
@@ -770,7 +703,7 @@ public partial class OptionsWindow : Window
             _main.PersistSettings();
             hexBox.Text = hex;
             ThemeManager.Apply(_vm.Settings);
-            BuildCardsEditor();
+            _cardsView?.BuildCards();
             _main.RefreshTheme();
         }
 
@@ -1528,56 +1461,6 @@ public partial class OptionsWindow : Window
         return box;
     }
 
-    private void BuildCardsEditor()
-    {
-        CardsPanel.Children.Clear();
-        foreach (var card in _vm.Cards)
-        {
-            var row = new System.Windows.Controls.Grid { Margin = new Thickness(0, 2, 0, 0) };
-            row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            for (var i = 0; i < 3; i++)
-                row.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
-
-            // Since 1.66.3 every unhidden card shows (with an empty state when it has
-            // nothing yet) — Options is the whole truth, no self-hiding asterisks.
-            row.Children.Add(new System.Windows.Controls.TextBlock
-            {
-                Text = card.Title, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
-                Foreground = (System.Windows.Media.Brush)FindResource(card.Hidden ? "DimBrush" : "TextBrush"),
-            });
-
-            row.Children.Add(CardButton("↑", "Move up", 1, () => { _vm.MoveCard(card.Key, -1); ApplyCards(); }));
-            row.Children.Add(CardButton("↓", "Move down", 2, () => { _vm.MoveCard(card.Key, +1); ApplyCards(); }));
-            row.Children.Add(CardButton(card.Hidden ? "🙈" : "👁",
-                card.Hidden ? "Show card" : "Hide card (data still collected)", 3,
-                () => { _vm.ToggleCard(card.Key); ApplyCards(); }));
-            CardsPanel.Children.Add(row);
-
-            // "Money · Motes · Faction · Raids are tabs in here now" — #219. A fold is
-            // invisible by construction: the row that would have told you where a card
-            // went is the row that was removed, and this is the screen someone opens when
-            // a card is missing. Metadata weight, under the card it belongs to.
-            if (card.Absorbed is { } absorbed)
-            {
-                var note = new System.Windows.Controls.TextBlock
-                {
-                    Text = absorbed,
-                    FontSize = EQBuddy.UI.Shared.DesignTokens.Spec(
-                        EQBuddy.UI.Shared.DesignTokens.TypeRole.Metadata).Size,
-                    TextWrapping = TextWrapping.Wrap,
-                    Margin = new Thickness(0, 0, 0, 2),
-                };
-                note.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "DimBrush");
-                CardsPanel.Children.Add(note);
-            }
-        }
-    }
-
-    private void ApplyCards()
-    {
-        _main.ApplySectionLayout();
-        BuildCardsEditor();
-    }
 
     private void UpdateGearImportStatus()
     {
@@ -1643,22 +1526,15 @@ public partial class OptionsWindow : Window
         UpdateGearImportStatus();
     }
 
-    private System.Windows.Controls.Button CardButton(string glyph, string tip, int column, Action action)
-    {
-        var b = new System.Windows.Controls.Button
-        {
-            Content = glyph, ToolTip = tip, FontSize = 11,
-            Style = (Style)FindResource("IconButton"), Margin = new Thickness(6, 0, 0, 0),
-        };
-        b.Click += (_, _) => action();
-        System.Windows.Controls.Grid.SetColumn(b, column);
-        return b;
-    }
 
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left) DragMove();
     }
+
+    /// <summary>The Cards &amp; windows editors, lifted into their own file for the same
+    /// reason as the mez one below.</summary>
+    private OptionsCardsView? _cardsView;
 
     /// <summary>The mez-duration editor, lifted into its own file — OptionsWindow is a
     /// ratchet hotspot and that surface touches nothing else in this window.</summary>

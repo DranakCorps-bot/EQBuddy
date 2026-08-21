@@ -384,6 +384,18 @@
             <TextBlock x:Name="GearImportStatus" Style="{StaticResource Dim}" TextWrapping="Wrap"
                        Margin="0,4,0,0"/>
             <StackPanel x:Name="CardsPanel"/>
+            <!-- The mini dashboard's contents, listed for the first time on 2026-08-21.
+                 A stat's only switch used to be the star on its card header, so when the
+                 themes folded cards into windows the switches went with them — and this
+                 screen could only reach a star through its BREAKOUT checkbox, which exists
+                 for six kinds. Motes, coin and kills have no breakout, so their stars were
+                 reachable ONLY by opening the window a player was complaining about. -->
+            <TextBlock Text="Mini dashboard" FontSize="12" FontWeight="SemiBold"
+                       Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
+            <TextBlock Text="Which stats show in the pill while EQBuddy is minimised. Each of these is the same switch as the star on the card header — two views of one setting, not two settings."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
+            <WrapPanel x:Name="MiniStatsPanel"/>
+
             <TextBlock Text="Breakout windows" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
             <TextBlock x:Name="BreakoutsBlurb" Style="{StaticResource Dim}"

@@ -181,6 +181,18 @@ internal sealed class AppHarness : IDisposable
         return -1;
     }
 
+    /// <summary>Wait until a key EXISTS in the dump.
+    ///
+    /// A theme window opens at ApplicationIdle AFTER Launch() returns, so for a tick
+    /// or two the dump has none of its keys and DumpValue answers -1. A test that
+    /// reads a value in that gap either asserts against -1 or takes -1 as a baseline
+    /// and then waits forever for -1 + 1. It cost one flaky run in three the day the
+    /// Kills fold landed, and the Progress tests had carried the same race silently
+    /// since their own fold — so it lives HERE rather than in each test.</summary>
+    public void WaitForWindow(string key, string reason) =>
+        Wait.Until(() => DumpValue(key) >= 0, AssertTimeout,
+            $"{reason} (debug.txt has no {key} yet)", Artifacts);
+
     public void WaitForDump(string key, int expected, string reason) =>
         Wait.Until(() => DumpValue(key) == expected, AssertTimeout,
             $"{reason} (debug.txt {key} to reach {expected}; last seen {DumpValue(key)})",

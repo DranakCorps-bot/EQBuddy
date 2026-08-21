@@ -66,6 +66,13 @@ $Shots = [ordered]@{
     # 'loot-card' is gone: the Loot card is a LAUNCHER now (the Gear & Loot theme), so
     # EQBUDDY_EXPAND = 'loot' would photograph a one-line button. The rows it used to
     # show are 'gearloot-loot' below, and the launcher line itself is in 'widget-cards'.
+    # MOTES, which ships HIDDEN (AppSettings.MigrateMotesCard) — so the default profile
+    # photographs a widget with no Motes card at all, which says nothing about the surface
+    # (trap 22). MotesCardOffered is set here too, or the migration hides it again before
+    # the window is drawn.
+    'motes-card'      = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'motes' }
+                           Set = @{ MotesCardOffered = $true; HiddenSections = @() } }
     # The widget's Kills & Drops LAUNCHER since the 2026-08-21 fold, not a card body -
     # the name is kept because docs/TestPlan.md cites it and the surface is still "what
     # the kills slot on the widget looks like". EQBUDDY_EXPAND stays for the debug dump;

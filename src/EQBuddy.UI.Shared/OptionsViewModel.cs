@@ -146,7 +146,26 @@ public static class OverlaySections
         // AppSettings.MigrateProgressSections folds the four old keys onto this one, and
         // ProgressSurface.AbsorbedCardKeys is the list it reads — so what disappears is
         // spelled ONCE, not again here.
-        ("progress", "Progress"), ("misc", "Travels & Deaths"),
+        ("progress", "Progress"),
+        // MOTES IS A CARD AGAIN, and hidden by default (David, 2026-08-21, answering
+        // Scribe's "bring motes back as its own top-level card, behind a setting if
+        // needed" and #228's "I simply want to track my mote drops in the main window").
+        //
+        // It needs no new setting: HiddenSections IS the setting, and Options is where it
+        // lives — "cards always show unless you hid them; the switch is in Options" is the
+        // rule this app already runs on. AppSettings.MigrateMotesCard hides it ONCE for
+        // existing profiles so nobody's widget silently grows a row, and after that the
+        // eye in Cards & windows is the whole mechanism.
+        //
+        // The Progress → Wealth tab keeps its Motes block either way. They read the same
+        // numbers; this is a second VIEW of them on the surface a farmer is actually
+        // looking at, not a fold being undone.
+        //
+        // A card in this catalog MUST also be in MainWindow.SectionMap on BOTH widgets, or
+        // ApplySectionLayout throws on startup for everybody — the crash the Gear & Loot
+        // fold found. Both have it.
+        ("motes", "Motes"),
+        ("misc", "Travels & Deaths"),
     ];
 
     /// <summary>The card's icon, by section key — one table both widgets read (Gate 5).
@@ -199,7 +218,13 @@ public static class OverlaySections
         // 2026-08-16: the Sky Quest and Epics cards became tabs in the Quest Tracker.
         ["quests"] = ["Sky Quest", "Epics"],
         // 2026-08-19: the PROGRESS THEME (docs/Themes.md).
-        ["progress"] = ["Money", "Motes", "Faction", "Raids"],
+        //
+        // MOTES LEFT THIS LIST on 2026-08-21, when it became a card again. The note answers
+        // "where did the card I am hunting for go", so naming a card that is two rows above
+        // it in the same list is worse than saying nothing — it sends someone looking in the
+        // window for a card that is right there. It is still a Wealth-tab block as well;
+        // being in two places is not the same as having moved.
+        ["progress"] = ["Money", "Faction", "Raids"],
         // 2026-08-20: the GEAR & LOOT theme (docs/Themes.md).
         ["loot"] = ["Gear"],
         // 2026-08-21: the KILLS & DROPS theme. "Drops by creature" was never a CARD —

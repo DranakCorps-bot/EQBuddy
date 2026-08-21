@@ -147,6 +147,47 @@ public class LootSurfaceTests
         Assert.Empty(s.HiddenSections);
     }
 
+    /// <summary>MOTES CAME BACK as a card on 2026-08-21 (David, answering #228 and Scribe's
+    /// item), and it has to arrive HIDDEN or every player who never asked for it gets a
+    /// taller widget on update — which is the opposite of the complaint.
+    ///
+    /// No new preference: HiddenSections IS the setting and Options is where it lives. This
+    /// pins the two halves that make that work — it hides exactly once, and a player who
+    /// then SHOWS the card is never quietly re-hidden on the next launch.</summary>
+    [Fact]
+    public void TheMotesCardComesBackHiddenAndStaysHowThePlayerLeavesIt()
+    {
+        var s = new AppSettings { SectionOrder = ["combat", "progress"] };
+
+        // An existing profile: hide it, and say so, because that needs writing down.
+        Assert.True(s.MigrateMotesCard(hadFile: true));
+        Assert.Contains("motes", s.HiddenSections);
+        Assert.True(s.MotesCardOffered);
+
+        // The player shows it. The next launch must LEAVE IT ALONE — a migration that
+        // re-hides is the "my tick-boxes won't stay ticked" shape (#169) with the app
+        // itself as the second writer.
+        s.HiddenSections.Remove("motes");
+        Assert.False(s.MigrateMotesCard(hadFile: true));
+        Assert.DoesNotContain("motes", s.HiddenSections);
+    }
+
+    /// <summary>A BRAND-NEW profile gets the same hidden card and NO write.
+    ///
+    /// The write is what mattered: returning true here made every fresh AppSettings.Load()
+    /// a file writer, and SettingsClobberTests — which deletes settings.json and asserts
+    /// nothing else touches it — began failing intermittently, a different one of its four
+    /// cases each run. The state is identical either way; only the save is skipped.</summary>
+    [Fact]
+    public void ABrandNewProfileHidesMotesWithoutForcingASave()
+    {
+        var s = new AppSettings();
+
+        Assert.False(s.MigrateMotesCard(hadFile: false));
+        Assert.Contains("motes", s.HiddenSections);
+        Assert.True(s.MotesCardOffered);
+    }
+
     /// <summary>The two folds share one implementation now, so the Progress theme has to
     /// keep behaving exactly as it did — its own tests cover it, and this is the reminder
     /// that they are testing shared code.</summary>

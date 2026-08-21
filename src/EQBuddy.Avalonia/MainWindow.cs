@@ -122,8 +122,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _killsHeader = AppTheme.StatValue("0");
     private readonly TextBlock _lootHeader = AppTheme.StatValue("0 items");
     private readonly TextBlock _trackedHeader = AppTheme.StatValue("0");
+    private readonly TextBlock _motesHeader = AppTheme.StatValue("");
+    // TWO SETS, because motes are drawn in two places now: the Progress window's Wealth
+    // tab and (since 2026-08-21) the widget's own Motes card. A Control has ONE parent,
+    // so a single set would be silently re-parented by whichever host was built last -
+    // and the Wealth tab, built first, would simply lose its motes. Nothing shows that:
+    // it compiles, it renders, and the tab is just missing a block. Same rule the WPF
+    // twin obeys by building a second MotesCardView instance.
     private readonly TextBlock _motesSummary = AppTheme.DimText("");
     private readonly ItemsControl _motesList = new();
+    private readonly TextBlock _cardMotesSummary = AppTheme.DimText("");
+    private readonly ItemsControl _cardMotesList = new();
     private readonly StackPanel _raidsPanel = new();
     private readonly TextBlock _buffsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _buffsPanel = new();
@@ -1049,16 +1058,41 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ToolTip.SetTip(_sections["progress"],
             "Open Progress - experience and AAs, coin and motes, faction standing, and "
             + "the raid targets you've cleared");
+        // MOTES IS A CARD AGAIN (David, 2026-08-21), hidden by default -
+        // AppSettings.MigrateMotesCard puts it in HiddenSections once, so nobody's widget
+        // grows a row on update and the eye in Options is the switch. Its star comes back
+        // to the header with it, which is the half that mattered: once the card folded
+        // into Progress the mini-dashboard cell for motes had no switch Options could
+        // reach at all (#228, and MiniBarPresentation.Names carries the rest of that note).
+        AddSection("motes", "motes", "Motes", _motesHeader,
+            BuildMotesSection(_cardMotesSummary, _cardMotesList), "Show motes in mini dashboard");
         AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
         return _sectionsPanel;
     }
 
-    private Control BuildMotesSection()
+    /// <summary>The motes block, for a NAMED pair of controls. It takes them rather than
+    /// closing over one pair because two hosts draw motes now and a Control has one parent
+    /// — see the field comment.</summary>
+    /// <summary>Motes into one pair of controls. ONE renderer for both hosts, so the
+    /// widget's card and the Progress window's Wealth tab cannot end up saying different
+    /// things about the same numbers (#210's rule, one level down).</summary>
+    private void RenderMotes(StatsSnapshot s, TextBlock summary, ItemsControl list)
+    {
+        var motes = Motes.Summarize(s.Loot, s.Elapsed);
+        summary.Text = motes.Total > 0
+            ? $"{motes.PerHour:0.#} motes/hr this session"
+            : "No motes yet this session — every Mote of … Potential you loot " +
+              "(or store as currency) lands here.";
+        FillList(list, motes.Tiers.Select(t => (t.Item, $"x{t.Count}")),
+            onNameClick: ShowItemInfo, tooltip: ItemHoverStats);
+    }
+
+    private static Control BuildMotesSection(TextBlock summary, ItemsControl list)
     {
         var panel = new StackPanel();
-        _motesSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
-        panel.Children.Add(_motesSummary);
-        panel.Children.Add(_motesList);
+        summary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
+        panel.Children.Add(summary);
+        panel.Children.Add(list);
         return panel;
     }
 
@@ -1294,7 +1328,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(AppTheme.SectionLabel("Coin"));
         panel.Children.Add(BuildMoneySection());
         panel.Children.Add(AppTheme.SectionLabel("Motes"));
-        panel.Children.Add(BuildMotesSection());
+        panel.Children.Add(BuildMotesSection(_motesSummary, _motesList));
         return panel;
     }
 
@@ -2222,17 +2256,20 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         if (ProgressTabShowing(ProgressTab.Wealth))
         {
-            var motes = Motes.Summarize(s.Loot, s.Elapsed);
-            _motesSummary.Text = motes.Total > 0
-                ? $"{motes.PerHour:0.#} motes/hr this session"
-                : "No motes yet this session — every Mote of … Potential you loot " +
-                  "(or store as currency) lands here.";
-            FillList(_motesList, motes.Tiers.Select(t => (t.Item, $"x{t.Count}")),
-                onNameClick: ShowItemInfo, tooltip: ItemHoverStats);
+            RenderMotes(s, _motesSummary, _motesList);
         }
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         _questsHeader.Text = QuestsSummaryLine();
+        // The SAME string the Progress launcher and the Wealth badge use — one
+        // formatter, so the card, the theme and the phone cannot report three answers
+        // (#210's rule). Blank until something drops.
+        _motesHeader.Text = ProgressTheme.MoteRate(s) ?? "";
+        // The card is hidden for everyone who has not ticked it, and a hidden card is
+        // never expanded — so this costs nothing for the people the fold was for, and gives
+        // the rate back to the people who asked for it.
+        if (_sections["motes"].IsExpanded)
+            RenderMotes(s, _cardMotesSummary, _cardMotesList);
         if (LootTabShowing(LootTab.Gear) && _gearChecklistDirty)
         {
             Gear.Render();
@@ -4838,14 +4875,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         var btn = (Button)sender!;
         var key = (string)btn.Tag!;
-        if (_settings.MiniStats.Contains(key))
+        SetMiniStat(key, !_settings.MiniStats.Contains(key));
+    }
+
+    /// <summary>Turn a mini-dashboard stat on or off from somewhere that is not a star on a
+    /// card header — the Progress, Gear &amp; Loot and Kills &amp; Drops windows' own stars, and
+    /// since 2026-08-21 the list in Options. ONE rule for what a star does, so a stat
+    /// switched on from Options behaves exactly as if its card header had been clicked
+    /// (the WPF twin has carried this since the Progress fold).</summary>
+    internal void SetMiniStat(string key, bool on)
+    {
+        if (on)
         {
-            _settings.MiniStats.Remove(key);
+            if (!_settings.MiniStats.Contains(key)) _settings.MiniStats.Add(key);
         }
-        else
-        {
-            _settings.MiniStats.Add(key);
-        }
+        else _settings.MiniStats.Remove(key);
         UpdateStarVisuals();
         _settings.Save();
     }
