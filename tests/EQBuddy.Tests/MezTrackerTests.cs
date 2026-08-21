@@ -436,7 +436,7 @@ public class MezTrackerTests
     /// Which is the reported symptom exactly: chips alternating between a contaminated short
     /// value and the honest long one as breaks and clean fades interleave, with nothing on
     /// screen to explain either.</summary>
-    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    [Fact]
     public void AnEarlyBreakOnAHighRankDoesNotPoisonItEither()
     {
         // A clean fade teaches rank X's real duration: 44s raw, tick-floored to 42.
@@ -460,7 +460,7 @@ public class MezTrackerTests
     /// shorten": a genuinely shorter duration must stay learnable, or a stale long value
     /// could never heal. TWO agreeing observations do it, because two identical breaks are
     /// far less likely than one.</summary>
-    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    [Fact]
     public void TwoAgreeingShortFadesDoReviseTheDurationDown()
     {
         var t = Replay(
@@ -486,7 +486,7 @@ public class MezTrackerTests
     /// spans several casts) and breaks deflate, so the two directions are not symmetric and
     /// must not be guarded as though they were — an upgraded rank should be believed the
     /// first time it is measured.</summary>
-    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    [Fact]
     public void ALongerFadeIsStillBelievedImmediately()
     {
         var t = Replay(
@@ -537,13 +537,22 @@ public class MezTrackerTests
 
     /// <summary>Discussions #68/#69: chain-mez artifacts wrote inflated durations into
     /// the learned store, and "only ever learn longer" made them immortal (Taendar's
-    /// 1:10 chip on a 24s mez); the ×2 ceiling that briefly replaced it clipped genuine
+    /// 1:10 chip on a 24s mez); the x2 ceiling that briefly replaced it clipped genuine
     /// mote-upgraded durations (rahvynn's 44s Mesmerization shrank to base 24). Truth:
-    /// a Legends mez holds fixed duration unless damage breaks it, and broken chips
-    /// never reach the learner — so the latest CLEAN observation wins, both directions,
-    /// and any poison heals on the very next honest fade.</summary>
+    /// a Legends mez holds fixed duration unless damage breaks it, so a poison must heal
+    /// from honest observation rather than from a rule about which direction is allowed.
+    ///
+    /// **It heals on the SECOND clean fade now, not the first, and that is a cost David
+    /// accepted on 2026-08-21 rather than a regression.** #228 is the other side: an early
+    /// break on a high rank reads SHORT and used to overwrite a duration the caster had
+    /// measured honestly, because the break guard's floor is the BASE spell's duration and
+    /// ranks only lengthen. The two are numerically identical — a 26s break tick-floors to
+    /// exactly 24, which is also what an honest heal-to-base reads — so a shorter reading
+    /// has to be corroborated, and that necessarily costs the artifact one extra cycle.
+    /// An inflated chip still self-corrects; a measurement the player watched happen is no
+    /// longer thrown away by one break. See MezTracker.LearnFromCleanFade.</summary>
     [Fact]
-    public void ChainMezPoisonHealsOnTheFirstCleanFade()
+    public void ChainMezPoisonHealsOnTheSecondCleanFade()
     {
         var path = Path.Combine(Path.GetTempPath(), $"eqbuddy-mez-{Guid.NewGuid():N}.json");
         try
@@ -554,10 +563,17 @@ public class MezTrackerTests
             // The stale 72 loads (nothing better is known yet)…
             Assert.Equal(72, t.LearnedDurations["Mesmerization V"]);
 
-            // …and the first clean land→fade at 24s replaces it outright.
+            // …the first clean land→fade at 24s is recorded but not yet believed:
+            // on its own it is indistinguishable from an early break.
             t.Apply(Ev(0, "You begin casting Mesmerization V."));
             t.Apply(Ev(2, "a farmer has been mesmerized."));
             t.Apply(Ev(26, "Your Mesmerization V spell has worn off of a farmer."));
+            Assert.Equal(72, t.LearnedDurations["Mesmerization V"], 0);
+
+            // …and the second, agreeing with it, replaces the artifact outright.
+            t.Apply(Ev(100, "You begin casting Mesmerization V."));
+            t.Apply(Ev(102, "a farmer has been mesmerized."));
+            t.Apply(Ev(126, "Your Mesmerization V spell has worn off of a farmer."));
             Assert.Equal(24, t.LearnedDurations["Mesmerization V"], 0);
         }
         finally { File.Delete(path); }
@@ -579,9 +595,11 @@ public class MezTrackerTests
         finally { File.Delete(path); }
     }
 
-    /// <summary>A chain-mez artifact learned live (a clicky re-mez logs no cast line,
-    /// so the fade measures against the original anchor) is wrong for one cycle —
-    /// then the next clean fade heals it. Self-correcting beats permanently wrong.</summary>
+    /// <summary>A chain-mez artifact learned live (a clicky re-mez logs no cast line, so
+    /// the fade measures against the original anchor) is wrong for TWO cycles now, then
+    /// heals. Self-correcting still beats permanently wrong; the second cycle is what buys
+    /// #228's protection against a single break flattening a real measurement, and David
+    /// took that trade on 2026-08-21. See MezTracker.LearnFromCleanFade.</summary>
     [Fact]
     public void LiveChainArtifactHealsItself()
     {
@@ -590,11 +608,16 @@ public class MezTrackerTests
             Ev(2, "a farmer has been mesmerized."),
             // Unexplained clicky re-mezzes kept the t=2 anchor: 72s measured.
             Ev(74, "Your Mesmerization V spell has worn off of a farmer."),
-            // The next honest single mez corrects the record.
+            // One honest single mez is not yet enough — it could be a break.
             Ev(100, "You begin casting Mesmerization V."),
             Ev(102, "a rat has been mesmerized."),
             Ev(126, "Your Mesmerization V spell has worn off of a rat."));
+        Assert.Equal(72, t.LearnedDurations["Mesmerization V"], 0);
 
+        // The second agreeing fade corrects the record.
+        t.Apply(Ev(200, "You begin casting Mesmerization V."));
+        t.Apply(Ev(202, "a rat has been mesmerized."));
+        t.Apply(Ev(226, "Your Mesmerization V spell has worn off of a rat."));
         Assert.Equal(24, t.LearnedDurations["Mesmerization V"], 0);
     }
 

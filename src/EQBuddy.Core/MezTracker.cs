@@ -374,33 +374,90 @@ public sealed class MezTracker
         // latest-clean-wins on the next honest cycle.
         var recastAfterLanding = _lastCastOf.TryGetValue(entry.Spell, out var lastCast)
             && lastCast > entry.LandedAt.AddSeconds(1);
-        // KNOWN GAP, unfixed on purpose (#228, joeymavity 2026-08-21): "mezz timers seem
-        // to vary from 26 seconds to a minute with no explanation (I have mezz x)."
-        //
-        // The floor above is the BASE spell's duration, because the catalog stores one
-        // duration per base name — but ranks only lengthen, so for a rank-X mez the floor
-        // is still 24s while the real duration is far longer. An early break anywhere above
-        // 24s walks through every guard here and overwrites an honest longer value.
-        //
-        // Requiring a second agreeing observation before believing a SHORTER reading fixes
-        // it, and breaks #68/#69: a chain-mez artifact would then need two clean fades to
-        // heal instead of one, and Taendar's 1:10 chip on a 24s mez is the report that made
-        // one-fade healing the rule. The two cases are not separable by value — a 26s break
-        // tick-floors to exactly 24, which is also what an honest heal-to-base reads — so
-        // this is a trade between two real reports and David's call, not an oversight.
-        // MezTrackerTests carries three skipped tests that reproduce it.
+        // The guards above catch every break they can SEE. The one they cannot is an early
+        // break on a HIGH RANK - see LearnFromCleanFade, which is where the asymmetry that
+        // covers it lives (#228, and David's call on the trade it makes).
         //
         // Latest clean observation wins, longer OR shorter (see class summary): a
         // chain-mez artifact heals on the next single mez, a stale short value heals
         // on the next upgraded cast — either way one honest fade fixes the chip.
         if (observed is > 3 and < 600 && observed >= baseFloor && !brokeRecently
-            && !recastAfterLanding
-            && (!_learned.TryGetValue(entry.Spell, out var known) || Math.Abs(observed - known) > 0.5))
-        {
-            _learned[entry.Spell] = Math.Round(observed, 1);
-            SaveStore();
-        }
+            && !recastAfterLanding)
+            LearnFromCleanFade(entry.Spell, observed);
         return true;
+    }
+
+    /// <summary>The last SHORTER-than-known observation that has not been corroborated,
+    /// per exact (ranked) spell name. In memory only: it is a corroboration buffer, not a
+    /// fact about the world, and a reading nobody confirmed should not survive a restart.</summary>
+    private readonly Dictionary<string, double> _pendingShort =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Fold one clean observation into what we know. **The two directions are deliberately
+    /// not symmetric**, and the asymmetry is the whole mechanism.
+    ///
+    /// The guards in OnWornOff remove the breaks they can SEE: an explicit "awakened by"
+    /// line, a fade right after one, a chain of visible re-casts, and anything shorter than
+    /// the catalog base. What none of them can see is an early break on a HIGH RANK. The
+    /// catalog stores one duration per base name and ranks only lengthen, so the floor for a
+    /// rank-X mez is still the base 24s while its real duration is far longer — and a break
+    /// anywhere above 24s walks through every guard and overwrites a longer value the caster
+    /// measured honestly. joeymavity reported the symptom it produces (#228):
+    /// <i>"mezz timers seem to vary from 26 seconds to a minute with no explanation (I have
+    /// mezz x)."</i> Alternating values, no explanation, because the chip was alternating
+    /// between a poisoned reading and an honest one.
+    ///
+    /// So: **contamination inflates and breaks deflate.** A chain-mez fade spans several
+    /// casts and reads LONG; an early break reads SHORT. A longer observation is believed
+    /// immediately — an upgraded rank should not have to argue — while a shorter one must be
+    /// seen twice before it replaces what we know. Two identical breaks are far less likely
+    /// than one, and the second reading is the only thing that tells them apart: a 26s break
+    /// tick-floors to exactly 24, which is also precisely what an honest heal-to-base reads,
+    /// so no test on the VALUE can separate them.
+    ///
+    /// **What this costs, chosen knowingly (David, 2026-08-21).** #68/#69 made "a poison
+    /// heals on the very next honest fade" the rule, after Taendar's 1:10 chip on a 24s mez.
+    /// A chain artifact now needs TWO clean fades to heal, so it is wrong for two cycles
+    /// instead of one. That was the trade on the table and this is the side David took: an
+    /// honest measurement the player watched happen should not be thrown away by a single
+    /// break, and an inflated chip still self-corrects.
+    ///
+    /// A fade that AGREES with the known value clears any pending short, because a
+    /// full-length fade is direct evidence against it.
+    /// </summary>
+    private void LearnFromCleanFade(string spell, double observed)
+    {
+        var value = Math.Round(observed, 1);
+        if (!_learned.TryGetValue(spell, out var known))
+        {
+            // Nothing known yet: the first clean fade is all the evidence there is.
+            _learned[spell] = value;
+            _pendingShort.Remove(spell);
+            SaveStore();
+            return;
+        }
+        if (Math.Abs(value - known) <= 0.5)
+        {
+            _pendingShort.Remove(spell);
+            return;
+        }
+        if (value > known)
+        {
+            _learned[spell] = value;
+            _pendingShort.Remove(spell);
+            SaveStore();
+            return;
+        }
+        // Shorter than what we know. Corroborate before believing it.
+        if (_pendingShort.TryGetValue(spell, out var pending) && Math.Abs(value - pending) <= 0.5)
+        {
+            _learned[spell] = value;
+            _pendingShort.Remove(spell);
+            SaveStore();
+            return;
+        }
+        _pendingShort[spell] = value;
     }
 
     /// <summary>Where a chip's countdown comes from, in precedence order: what the
