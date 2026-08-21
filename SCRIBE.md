@@ -16,6 +16,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Mobile page doesn't allow refresh when only 1 card is selected
+- **Priority:** must-fix
+- **Place:** EQBuddy Mobile. Not Gate 5. Hypothesis -- the one-card / solo fill surface, not a new card.
+- **Source:** #222 bjstrange Aug 20, 10:56 AM CT. Replied 2026-08-20 (Scribe). Bounce Aug 21, 1:58 PM CT (Keel / Helm design QA). Did not post on GitHub. Did not restore as a new heading.
+- **Ask:** pull-down refresh should work when only one card is selected, the same as with two or more. Any single card, including map-as-only-card.
+- **Already shipped:** pull-down refresh works with 2+ cards. Claude took this 8:52 AM CT and answered #222 as on main, not released. Current main is not the #222 ship.
+- **Bounce (same ticket, not a new item):** two misses only. Do not pair #227, #223, motes, or Progress. Keep solo fill. (1) Release/pull must ask the PC for a fresh snapshot of the visible surface. `location.reload()` is the wrong verb. Do not replace it by painting `latest` again. Leave staleAfterUpdate reload alone (version-change job, not the pull). (2) Map as the only card still needs a pull. Pan wins on the map. Chrome (header / ZONE MAP title) owns the pull. Do not skip PTR because pan exists. Do not disable pan to make PTR work. Hypothesis, unchecked against the app -- the fills early-return is the miss. Verify; do not treat this wording as the patch.
+
 ### mez timers vary from 26 seconds to a minute
 - **Priority:** waiting
 - **Place:** mez chips / MezTracker duration. Overlay deadline. Not Gate 5 widget cards.
