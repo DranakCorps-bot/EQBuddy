@@ -124,6 +124,72 @@ public class OutputfileAutoImportTests
         Assert.Null(outcome.Undo);
     }
 
+    /// <summary>The AUTOMATIC import obeys the auto-grant guard, asserted here rather
+    /// than inferred from the fact that both paths happen to call one method today.
+    ///
+    /// Frankthetankk asked exactly this on #101 (2026-08-21): the guard was built against
+    /// the manual "Import achievements…" menu action, and 1.98.1 then added an automatic
+    /// path that reads the dump the moment the game announces it. His question is the
+    /// right one — "does the automatic path route through this same guard, or is it a
+    /// separate mechanism that could bypass the token/confirm check?" It routes through
+    /// it. Nothing said so, and nothing would have noticed if a later edit inlined the
+    /// parsing here or added a third entry point.
+    ///
+    /// That absence is trap 34's shape: a rule enforced in one place, with no assertion
+    /// that the OTHER caller is subject to it. And the cost is not a cosmetic one — the
+    /// bug this guards against silently marks Sky rewards as turned in that the player
+    /// never obtained (#101, and again #193 when only half the guard existed).
+    ///
+    /// The fixture is wizen's own three-way dump, the same verbatim control set pinned in
+    /// <c>AchievementsImportTests.TokenUnlockedClassNeverImports</c>: Druid confirmed as
+    /// primary, Bard bought with a token, Berserker never unlocked. The Berserker row is
+    /// what keeps it honest — a guard that skipped every class unlock would also pass a
+    /// test that only checked the first two.</summary>
+    [Fact]
+    public void TheAutomaticAchievementsImportObeysTheAutoGrantGuardToo()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqb-ach-guard");
+        try
+        {
+            var path = Path.Combine(dir.FullName, "Dranak_freeport-Achievements.txt");
+            File.WriteAllLines(path,
+            [
+                "Untapped Potential: Classes",
+                "C	Primary Class Unlock - Druid",
+                "C		Obtain Shillelagh.",
+                "C		This achievement will autocomplete if you chose to confirm your Primary Class as a Druid.",
+                "I		This achievement can be bypassed using a Primary Class Unlock Token.",
+                "C	Primary Class Unlock - Bard",
+                "C		Obtain Mask of Song.",
+                "I		This achievement will autocomplete if you chose to confirm your Primary Class as a Bard.",
+                "C		This achievement can be bypassed using a Primary Class Unlock Token.",
+                "I	Primary Class Unlock - Berserker",
+                "I		Obtain Skycleaver",
+                "I		This achievement will autocomplete if you chose to confirm your Primary Class as a Berserker.",
+                "I		This achievement can be bypassed using a Primary Class Unlock Token.",
+            ]);
+
+            var settings = new AppSettings
+            {
+                SkyQuestChecklist =
+                [
+                    new() { Id = "1", ClassName = "Druid", Reward = "Shillelagh", QuestItem = "a" },
+                    new() { Id = "2", ClassName = "Bard", Reward = "Mask of Song", QuestItem = "b" },
+                    new() { Id = "3", ClassName = "Berserker", Reward = "Skycleaver", QuestItem = "d" },
+                ],
+            };
+
+            var outcome = OutputfileAutoImport.ImportAchievements(path, settings, raids: null);
+
+            // Not one reward ticked: two classes were granted, one was never unlocked.
+            Assert.Equal(0, outcome.SkyMarked);
+            Assert.DoesNotContain(settings.SkyQuestChecklist, i => i.Acquired);
+            // And nothing to undo, because nothing was written.
+            Assert.Null(outcome.Undo);
+        }
+        finally { dir.Delete(true); }
+    }
+
     [Fact]
     public void AnAchievementsDumpMarksClearsAndTheUndoLeavesWitnessedKillsAlone()
     {

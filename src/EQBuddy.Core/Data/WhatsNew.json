@@ -1,4 +1,12 @@
 [
+  {
+    "version": "1.99.1",
+    "date": "2026-08-21",
+    "highlights": [
+   "FIXED (discussion #228, thanks joeymavity) - RESPAWN TIMERS NO LONGER COME BACK AFTER YOU CLEAR THEM. Clearing a timer with the X really did remove it - and then EQBuddy read your log again (on the next start, or when you switched character) and built the very same timer back out of the kill line it had just been told to forget. \"Randomly\" was the restart. Clearing now remembers WHICH kill you dismissed, and remembers it across restarts, so that kill stays gone. Killing the mob again still starts a fresh timer, because that is a real new spawn - and if you start one by hand with the play button, that always wins.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+    ]
+  },
  {
   "version": "1.99.0",
   "date": "2026-08-21",

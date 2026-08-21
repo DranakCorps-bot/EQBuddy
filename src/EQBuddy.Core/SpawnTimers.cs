@@ -532,6 +532,10 @@ public sealed class SpawnTimers
             // (possibly placeholder-started) clock was already running. The player's
             // word always wins. Their attested kill counts as the named's own.
             _timers.Remove(Key(Server, zone, name));
+            // …and for the same reason it drops a dismissal: a backdated manual start
+            // ("it died five minutes ago") can land before a kill they cleared earlier,
+            // and Upsert would swallow it without a word. Silent no-ops are broken.
+            _dismissed.Remove(Key(Server, zone, name));
             Upsert(new SpawnTimerState(Server, zone, name, DateTime.Now - elapsed, durationSeconds)
                 { KilledName = name, ZoneStay = _zoneStay });
         }
@@ -547,12 +551,34 @@ public sealed class SpawnTimers
         }
     }
 
+    /// <summary>The ✕ button. Removing the row is only half of it: the player has
+    /// DISMISSED a particular kill, and that decision has to outlive the row.
+    ///
+    /// #228 (joeymavity), "respawn timers randomly re-open after they've been cleared."
+    /// `LogWatcher.Select` is a full-file ingest, so every kill line in the log replays
+    /// through <see cref="Apply"/> — and <see cref="Upsert"/> had nothing to consult, so
+    /// it rebuilt the timer from the very kill that had just been cleared. "Randomly" is
+    /// a restart, a character switch, or anything else that re-selects the log. Trap 20's
+    /// family: the state was removed and the decision was not kept.
+    ///
+    /// So the kill's own timestamp is remembered, and persisted — the replay that does
+    /// the damage is the one at STARTUP, so a dismissal held in memory would be forgotten
+    /// at exactly the wrong moment. A LATER kill is a real new cycle and still starts a
+    /// timer; only the dismissed kill and anything before it stay gone.</summary>
     public void Clear(string zone, string name)
     {
         lock (_lock)
         {
-            _dueSeenAt.Remove(Key(Server, zone, name));
-            if (_timers.Remove(Key(Server, zone, name))) SavePersisted();
+            var key = Key(Server, zone, name);
+            _dueSeenAt.Remove(key);
+            if (_timers.Remove(key, out var dismissed))
+            {
+                // The kill being dismissed, not the wall clock: a replay hands us that
+                // same KilledAt, and comparing against "when they clicked ✕" would let a
+                // kill from earlier in the same log walk back in.
+                _dismissed[key] = new Dismissal(dismissed.KilledAt, DateTime.Now);
+                SavePersisted();
+            }
         }
     }
 
@@ -574,6 +600,26 @@ public sealed class SpawnTimers
     /// due mid-gap before any snapshot ever showed it DUE — the chip vanished
     /// silently and the due alert never fired. In-memory only.</summary>
     private readonly Dictionary<string, DateTime> _dueSeenAt = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>One ✕: WHICH kill was dismissed, and WHEN the player said so.
+    ///
+    /// Both dates are needed and they answer different questions. `KilledAt` is what a
+    /// replayed kill line is compared against — the wall clock at the moment of the click
+    /// would let an earlier kill from the same log walk straight back in. `DismissedAt`
+    /// is what the record is aged out on, because "remember this decision for 30 days"
+    /// is a statement about the decision, not about the mob: pruning on the kill time
+    /// would throw away a dismissal of an old kill the instant it was made.</summary>
+    private sealed record Dismissal(DateTime KilledAt, DateTime DismissedAt);
+
+    /// <summary>Kills the player has dismissed with ✕, by timer key (#228). Persisted
+    /// beside the timers, because the replay this defends against is the full-file
+    /// ingest at startup.</summary>
+    private readonly Dictionary<string, Dismissal> _dismissed = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>How long a dismissal is worth keeping after it is made. Long enough that
+    /// no realistic replay outlives it, short enough that a long-lived profile stays
+    /// tidy.</summary>
+    private static readonly TimeSpan DismissalLifetime = TimeSpan.FromDays(30);
 
     /// <summary>Current timers for this server, expired ones pruned. A due timer shows
     /// DUE for <see cref="DueLinger"/> from the first snapshot that saw it due, then
@@ -636,6 +682,16 @@ public sealed class SpawnTimers
     private void Upsert(SpawnTimerState t)
     {
         var key = Key(t.Server, t.Zone, t.Name);
+        // A kill the player dismissed stays dismissed, however many times the log is
+        // read again (#228). Strictly older kills go too — a full-file ingest replays
+        // the whole camp, not just the last one.
+        if (_dismissed.TryGetValue(key, out var dismissal))
+        {
+            if (t.KilledAt <= dismissal.KilledAt) return;
+            // A newer kill is a real cycle: the dismissal has done its job and must not
+            // outlive it, or it would sit in the file arguing with every future kill.
+            _dismissed.Remove(key);
+        }
         // Replays hand us the same kill again — identical state must not thrash the
         // persistence file. An OLDER kill never overwrites a newer one (a truncated log
         // replayed after a manual start, for example).
@@ -655,8 +711,42 @@ public sealed class SpawnTimers
 
     private static readonly JsonSerializerOptions JsonOpts = new() { PropertyNameCaseInsensitive = true };
 
+    /// <summary>The dismissals file, beside the timers one. A SIBLING rather than a new
+    /// shape for `spawn-timers.json`, so an older build reading this profile still finds
+    /// exactly the list it expects and simply does not know about dismissals.</summary>
+    private string? DismissedPath => _persistPath is null
+        ? null
+        : Path.Combine(Path.GetDirectoryName(_persistPath)!, "spawn-dismissed.json");
+
+    private void LoadDismissed()
+    {
+        if (DismissedPath is not { } path || !File.Exists(path)) return;
+        try
+        {
+            var map = JsonSerializer.Deserialize<Dictionary<string, Dismissal>>(
+                File.ReadAllText(path), JsonOpts);
+            if (map is null) return;
+            var cutoff = DateTime.Now - DismissalLifetime;
+            foreach (var (key, d) in map)
+                if (d.DismissedAt > cutoff) _dismissed[key] = d;
+        }
+        catch { /* corrupt file loses dismissals, not the feature */ }
+    }
+
+    private void SaveDismissed()
+    {
+        if (DismissedPath is not { } path) return;
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, JsonSerializer.Serialize(_dismissed, JsonOpts));
+        }
+        catch { /* read-only disk: dismissals just won't survive a restart */ }
+    }
+
     private void LoadPersisted()
     {
+        LoadDismissed();
         if (_persistPath is null || !File.Exists(_persistPath)) return;
         try
         {
@@ -677,6 +767,9 @@ public sealed class SpawnTimers
 
     private void SavePersisted()
     {
+        // Written together so the two files can never disagree about a kill: every path
+        // that removes or adds a timer is also the path that settles its dismissal.
+        SaveDismissed();
         if (_persistPath is null) return;
         try
         {

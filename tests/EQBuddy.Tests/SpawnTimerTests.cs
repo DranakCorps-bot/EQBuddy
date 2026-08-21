@@ -587,6 +587,70 @@ public class SpawnTimerTests
     /// named measures its cycle on the second kill, while these could never learn one at
     /// all, because LearnFromRekill returned before it started when there was no current
     /// duration to compare a gap against. Being known was worse than being unknown.</summary>
+    /// <summary>Clearing a timer has to SURVIVE the log being read again — #228
+    /// (joeymavity): "respawn timers randomly re-open after they've been cleared."
+    ///
+    /// `Clear` genuinely removes the entry, which is why this looked mysterious. What it
+    /// did not do is record that the player DISMISSED that kill. Every `LogWatcher.Select`
+    /// is a full-file ingest, so every kill line in the log replays through `Apply` — and
+    /// `Upsert` had nothing to consult, so it faithfully rebuilt the timer from the very
+    /// kill the player had just dismissed. "Randomly" is the restart, or a character
+    /// switch, or anything else that re-selects the log.
+    ///
+    /// Trap 20's family once more: the state was removed and the DECISION was not kept.
+    ///
+    /// A later kill is a different matter — that is a real new spawn cycle and it must
+    /// bring the timer back, or "clear" would mean "never track this again".</summary>
+    [Fact]
+    public void AClearedTimerStaysClearedWhenTheLogIsReadAgain()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0, "a froglok ghoul lord", "You"));
+        Assert.Single(t.Snapshot(T0.AddMinutes(1)));
+
+        t.Clear("Lower Guk", "a froglok ghoul lord");
+        Assert.Empty(t.Snapshot(T0.AddMinutes(1)));
+
+        // The replay: the same kill line, read again from the top of the file.
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0, "a froglok ghoul lord", "You"));
+        Assert.Empty(t.Snapshot(T0.AddMinutes(2)));
+
+        // But killing it AGAIN is a real cycle, and that timer is wanted.
+        t.Apply(new KillEvent(T0.AddMinutes(30), "a froglok ghoul lord", "You"));
+        Assert.Single(t.Snapshot(T0.AddMinutes(31)));
+    }
+
+    /// <summary>And the dismissal outlives a restart, which is the case that actually
+    /// bites: the replay that rebuilds a cleared timer is the one that runs at startup,
+    /// so a dismissal held only in memory would be forgotten at exactly the wrong
+    /// moment.</summary>
+    [Fact]
+    public void AClearedTimerStaysClearedAcrossARestart()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqb-spawn-clear");
+        try
+        {
+            var path = Path.Combine(dir.FullName, "spawn-timers.json");
+            var overrides = new SpawnOverrides();
+
+            var first = new SpawnTimers(TestCatalog(), overrides, path) { Server = "freeport" };
+            first.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+            first.Apply(new KillEvent(T0, "a froglok ghoul lord", "You"));
+            first.Clear("Lower Guk", "a froglok ghoul lord");
+
+            // A new process, the same profile, and the log ingested from the top.
+            var second = new SpawnTimers(TestCatalog(), overrides, path) { Server = "freeport" };
+            second.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+            second.Apply(new KillEvent(T0, "a froglok ghoul lord", "You"));
+            Assert.Empty(second.Snapshot(T0.AddMinutes(2)));
+        }
+        finally { dir.Delete(true); }
+    }
+
     [Fact]
     public void ACatalogNamedWithNoRespawnLearnsFromItsSecondKill()
     {
