@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -223,7 +223,9 @@ public class WidgetRenderTests : IDisposable
         var tabs = window.GearLootWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains("Loot", tabs);
-        Assert.Contains("Gear", tabs);
+        // "Wishlist" since 2026-08-20 — the tab held a wishlist and was labelled as though
+        // it held your gear, one tab away from the surface that will.
+        Assert.Contains(LootSurface.LabelFor(LootTab.Gear), tabs);
         Assert.Contains("1/2", tabs);
         window.GearLootWindowForTests?.Close();
         window.Close();

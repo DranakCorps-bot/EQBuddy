@@ -1,4 +1,4 @@
-﻿namespace EQBuddy.Core;
+namespace EQBuddy.Core;
 
 /// <summary>
 /// The GEAR &amp; LOOT theme's tabs, in the order every UI shows them (docs/Themes.md).
@@ -31,8 +31,17 @@ public enum LootTab
     /// <summary>Look an item up: stats, what wants it, where it comes from.</summary>
     Items,
 
-    /// <summary>The imported shopping list, and what is left to farm.</summary>
+    /// <summary>The imported wishlist, and what is left to farm. The ENUM member keeps
+    /// the name <c>Gear</c> because <see cref="LootSurface.KeyFor"/> maps it to the
+    /// settings key <c>gear</c>, which is in every existing player's SectionOrder and
+    /// saved tab choice. Only the LABEL changed.</summary>
     Gear,
+
+    /// <summary>Everything wearable you own, ranked within each slot.</summary>
+    Locker,
+
+    /// <summary>Everything in your bags and bank, as the game's own dump lists it.</summary>
+    Bags,
 }
 
 /// <summary>A tab as a UI should draw it. <see cref="Value"/> is the tab's headline —
@@ -54,7 +63,13 @@ public static class LootSurface
         LootTab.Loot => "Loot",
         LootTab.Drops => "Drops",
         LootTab.Items => "Items",
-        LootTab.Gear => "Gear",
+        // "Gear" read as "my gear" and delivered a wishlist — David, 2026-08-20:
+        // "I guess I figured Gear would show me what gear I had." It sat one tab away
+        // from a surface that DOES show what he has, which made the wrong reading the
+        // reasonable one. The label says which of the two it is; the key stays "gear".
+        LootTab.Gear => "Wishlist",
+        LootTab.Locker => "Locker",
+        LootTab.Bags => "Bags",
         _ => tab.ToString(),
     };
 
@@ -72,6 +87,8 @@ public static class LootSurface
         LootTab.Drops => "drops",
         LootTab.Items => "items",
         LootTab.Gear => "gear",
+        LootTab.Locker => "locker",
+        LootTab.Bags => "bags",
         _ => tab.ToString().ToLowerInvariant(),
     };
 
@@ -80,7 +97,12 @@ public static class LootSurface
         "loot" or "session" => LootTab.Loot,
         "drops" or "targetdrops" => LootTab.Drops,
         "items" or "item" or "lookup" => LootTab.Items,
-        "gear" => LootTab.Gear,
+        // "wishlist" answers too: the label is what a player types into EQBUDDY_GEARLOOT
+        // or reads in a menu, and a key that only accepts the old word would make the
+        // rename a trap for anyone following current documentation.
+        "gear" or "wishlist" => LootTab.Gear,
+        "locker" or "gearlocker" => LootTab.Locker,
+        "bags" or "inventory" => LootTab.Bags,
         _ => null,
     };
 

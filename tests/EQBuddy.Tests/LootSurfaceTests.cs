@@ -18,11 +18,14 @@ public class LootSurfaceTests
     [Fact]
     public void OnlyTabsWithSomethingBehindThemAreHosted()
     {
-        // Drops and Items are named in the enum so the vocabulary is settled once, but
-        // they are still separate windows — a tab with nothing behind it reads as broken
-        // rather than as not-yet-arrived.
+        // Drops, Items, Locker and Bags are named in the enum so the vocabulary is
+        // settled once, but they are still separate windows — a tab with nothing behind
+        // it reads as broken rather than as not-yet-arrived.
         Assert.Equal([LootTab.Loot, LootTab.Gear], LootSurface.Hosted);
-        Assert.Equal(["Loot", "Gear"], LootSurface.Tabs().Select(t => t.Label));
+        // "Wishlist", not "Gear". David, 2026-08-20: "I guess I figured Gear would show
+        // me what gear I had." The KEY is still "gear" (asserted below) so no saved tab
+        // choice or card position breaks — only the word the player reads changed.
+        Assert.Equal(["Loot", "Wishlist"], LootSurface.Tabs().Select(t => t.Label));
     }
 
     [Fact]
