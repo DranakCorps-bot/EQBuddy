@@ -262,6 +262,39 @@ public sealed class RaidKillLedger
         return marked;
     }
 
+    /// <summary>Every record currently marked from an achievements dump, by canonical key.
+    /// Taken either side of an import so the undo knows exactly which records IT created —
+    /// a blanket "unmark everything" would also erase clears from an earlier import the
+    /// player is not undoing.</summary>
+    public IReadOnlyList<string> AchievementCompleteKeys()
+    {
+        lock (_lock)
+            return [.. _records.Where(kv => kv.Value.AchievementComplete).Select(kv => kv.Key)];
+    }
+
+    /// <summary>Undo for <see cref="MarkAchievements"/>: clears the achievement flag on
+    /// exactly the keys named, and NEVER touches <see cref="RaidBossRecord.Kills"/> —
+    /// a witnessed kill is a thing the log saw happen, and no import may take it away.
+    ///
+    /// Exists because an import that runs without being asked has to be reversible
+    /// (David, 2026-08-20). The manual import needed no undo: the player picked the file.</summary>
+    public int UnmarkAchievements(IEnumerable<string> keys)
+    {
+        var cleared = 0;
+        lock (_lock)
+        {
+            foreach (var key in keys)
+                if (_records.TryGetValue(key, out var rec) && rec.AchievementComplete)
+                {
+                    rec.AchievementComplete = false;
+                    cleared++;
+                }
+            if (cleared > 0) Save();
+        }
+        if (cleared > 0) Changed?.Invoke();
+        return cleared;
+    }
+
     /// <summary>A SNAPSHOT of the boss's record, cloned under the lock — the live
     /// record's TierKills dictionary mutates on the watcher thread, and handing it
     /// to the UI invited a cross-thread enumerate-during-add crash (2026-08-13

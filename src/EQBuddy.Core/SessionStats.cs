@@ -454,6 +454,16 @@ public sealed partial class SessionStats
     /// </summary>
     public event Action<RawLineEvent>? TextMatched;
 
+    /// <summary>The game finished writing an /outputfile dump and named it. EQBuddy reads
+    /// the dump itself from here — David, 2026-08-20: <i>"we should automatically read the
+    /// other files we generate"</i> — so no surface ever has to send someone to a menu and
+    /// a folder for a file the log already announced.
+    ///
+    /// Raised on the ingest thread, like <see cref="TextMatched"/>: handlers marshal to
+    /// their own UI thread and must not block, or they stall tailing. Reading a dump is
+    /// file I/O, so the widgets hop to their dispatcher before importing.</summary>
+    public event Action<OutputfileEvent>? OutputfileWritten;
+
     /// <summary>Bumped on every applied event and on reset — the UI's cheap "did
     /// anything change since my last render" signal (perf audit #1: rebuilding a few
     /// hundred WPF rows per second during idle was the app's main steady-state cost).</summary>
@@ -819,6 +829,11 @@ public sealed partial class SessionStats
                     // you never cast one.
                     if (h.Spell != "Unknown")
                         _spells.Learn(h.Spell, h.OverTime ? SpellCategory.HealOverTime : SpellCategory.Heal);
+                    break;
+                case OutputfileEvent dump:
+                    // Nothing to aggregate — the dump is a FILE, not a stat. This only
+                    // forwards the announcement to whoever can read it.
+                    OutputfileWritten?.Invoke(dump);
                     break;
                 case ConsiderEvent con:
                     // Deliberate targeting: a /con names the creature you care about

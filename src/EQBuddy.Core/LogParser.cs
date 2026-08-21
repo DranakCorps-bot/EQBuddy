@@ -173,6 +173,14 @@ public static partial class LogParser
     [GeneratedRegex(@"^(?<name>.+?) (?:scowls at you|regards you|glares at you|glowers at you|judges you|kindly considers you|looks upon you|looks your way).*\(Lvl: (?<level>\d+)\)$")]
     private static partial Regex ConsiderRx();
 
+    // Outputfile Complete: Dranak_freeport-Inventory.txt  (David's own log, 2026-08-20
+    // 18:47:36 — verified verbatim, not assumed). The game names the file it just wrote,
+    // so a dump never has to be hunted for. Deliberately captures ANY name: only the
+    // inventory variant has been observed, and hardcoding a second expected filename
+    // would be guessing at text nobody here has seen (OutputfileNames decides meaning).
+    [GeneratedRegex(@"^Outputfile Complete: (?<file>.+)$")]
+    private static partial Regex OutputfileRx();
+
     // You gain a rune for 8 points of absorption. — a berserker/rune buff building its
     // absorption pool; functions as self-mitigation, so it's tracked as a self-heal.
     [GeneratedRegex(@"^You gain a rune for (?<amount>\d+) points? of absorption\.$")]
@@ -733,6 +741,9 @@ public static partial class LogParser
         if ((r = ConsiderRx().Match(msg)).Success)
             return new ConsiderEvent(ts, Normalize(r.Groups["name"].Value),
                 int.Parse(r.Groups["level"].Value));
+
+        if ((r = OutputfileRx().Match(msg)).Success)
+            return new OutputfileEvent(ts, r.Groups["file"].Value.Trim());
 
         if ((r = FactionCappedRx().Match(msg)).Success)
             return new FactionEvent(ts, r.Groups["faction"].Value, 0, Capped: true,

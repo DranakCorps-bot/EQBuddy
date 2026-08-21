@@ -246,8 +246,23 @@ no copy source. The gear checklist fell straight through that hole, on both widg
 long as the surface had existed. **A negative assertion cannot see an absence**, so the list
 of surfaces is now written down and asserted positively.
 
+**And the command is only half of it.** David, 2026-08-20, after being handed the button:
+*"We automatically read the logs, we should automatically read the other files we generate.
+I shouldn't have to do a bunch of menu navigation and then folder searching hunting around
+for something that can just be lifted directly."* He was right, and the line was already
+there — the game prints `Outputfile Complete: <file>` into the log EQBuddy tails, naming the
+file, and nothing parsed it. Every other piece existed too: the finder, the auto-check, the
+achievements importer. **The defect was a missing seam, not a missing feature.**
+
 | Expectation | Held by |
 |---|---|
+| The game's own announcement of a dump is parsed, from the line as David's log writes it | **Auto** — `OutputfileAutoImportTests` (quoted verbatim, not described) |
+| The filename decides which importer runs; a dump EQBuddy cannot read is named, not guessed at | **Auto** — `OutputfileAutoImportTests` |
+| The dump is located from the log folder alone — it lives in the Logs folder's PARENT, and no player ever supplies that | **Auto** — `OutputfileAutoImportTests` |
+| A name with a path in it never resolves — the log prints bare names, so anything else was not what we were told about | **Auto** — `OutputfileAutoImportTests` |
+| **An import is add-only and reversible**: the Undo puts back exactly what that import changed, leaves the player's own ticks alone, and never removes a witnessed raid kill | **Auto** — `OutputfileAutoImportTests` |
+| Re-reading the same dump applies nothing further and offers no second undo | **Auto** — `OutputfileAutoImportTests` |
+| **The report says the dump was READ even when nothing changed** — "EQBuddy did nothing" and "EQBuddy never saw your file" are indistinguishable to the player, and only one is a fault | **Auto** — `OutputfileAutoImportTests` |
 | Each command has exactly one definition, and it is the text the game expects | **Auto** — `GameCommandsTests` |
 | No copy source anywhere in `src` carries its own slash-command literal | **Auto** — `GameCommandsTests` |
 | **Every surface that NEEDS a command names it, off `GameCommands`** — a curated list with a reason per entry, both UIs, the way `DeadSettingTests.Known` is curated. Adding a surface that asks for an output file means adding its row | **Auto** — `GameCommandsTests` |

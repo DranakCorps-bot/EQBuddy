@@ -45,6 +45,19 @@ public record RegenTickEvent(DateTime Time) : GameEvent(Time);
 /// <summary>A /consider line — deliberate targeting, so it can drive the target-drops
 /// surfaces without a swing being landed first (David, 2026-08-06).</summary>
 public record ConsiderEvent(DateTime Time, string Name, int Level) : GameEvent(Time);
+/// <summary>"Outputfile Complete: Dranak_freeport-Inventory.txt" — the game announcing,
+/// in the log EQBuddy already tails, that it has just written a dump AND naming the file.
+///
+/// David, 2026-08-20: <i>"We automatically read the logs, we should automatically read the
+/// other files we generate. I shouldn't have to do a bunch of menu navigation and then
+/// folder searching around for something that can just be lifted directly."</i> He was
+/// right, and the line had been sitting in the log the whole time — unparsed, while three
+/// surfaces told players to go and find the file by hand.
+///
+/// <see cref="FileName"/> is the bare name the game prints, never a path: the dump is
+/// written beside the game's own folders (the Logs folder's parent), which is exactly
+/// where <see cref="InventoryFile.FindLatest"/> already looks.</summary>
+public record OutputfileEvent(DateTime Time, string FileName) : GameEvent(Time);
 /// <param name="Count">Stack size — auto-storage lines ("stored it in your tradeskill
 /// depot", issue #39) can carry counts like the auto-sell lines do.</param>
 public record LootEvent(DateTime Time, string Item, string Source, string? UpgradeResult, int Count = 1) : GameEvent(Time);

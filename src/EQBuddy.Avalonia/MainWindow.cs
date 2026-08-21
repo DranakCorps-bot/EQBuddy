@@ -408,6 +408,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // watch for, or a Text rule would miss everything already in today's log.
         _stats.RefreshTextPatterns(_settings.TrackedRules);
         _stats.TextMatched += OnTextMatched;
+        // The game announces every dump it writes, and names it — so read it rather than
+        // sending the player to a menu and a folder (David, 2026-08-20). WPF's twin.
+        _stats.OutputfileWritten += OnOutputfileWritten;
+        _gearImportReport = new ImportReportView(
+            () => LastInventoryImport, () => _gearChecklistDirty = true);
         // An idle gap ended the session: anything still cued belongs to a fight that is
         // long over.
         _stats.SessionRolledOver += () => Dispatcher.UIThread.Post(_delayedAlerts.CancelAll);
@@ -1084,6 +1089,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(CopyCommandButton(
             EQBuddy.UI.Shared.GameCommands.OutputfileInventory,
             GearChecklistPresentation.AutoTickTip));
+        panel.Children.Add(_gearImportReport.Body);
         return panel;
     }
 
@@ -4405,8 +4411,53 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         RefreshUi();
     }
 
+    /// <summary>What the last auto-import did, for the Gear and Raids surfaces to report.
+    /// In memory only — a report about something that happened while the player watched
+    /// has no business outliving the session.</summary>
+    internal AutoImportOutcome? LastInventoryImport { get; private set; }
+
+    /// <inheritdoc cref="LastInventoryImport"/>
+    internal AutoImportOutcome? LastAchievementsImport { get; private set; }
+
+    /// <summary>Reads the dump the log just announced. The seam that did not exist until
+    /// 2026-08-20: the finder, the auto-check and the achievements importer were all
+    /// already built, and nothing connected them to the announcement.
+    ///
+    /// Arrives on the ingest thread; hops to the UI thread before touching settings,
+    /// because AppSettings.Save writes the whole file and the UI is the other writer.</summary>
+    private void OnOutputfileWritten(OutputfileEvent ev) => Dispatcher.UIThread.Post(() =>
+    {
+        try
+        {
+            var kind = OutputfileAutoImport.KindOf(ev.FileName);
+            if (kind == OutputfileKind.Unknown) return;
+            if (OutputfileAutoImport.ResolvePath(_settings.LogFolder, ev.FileName) is not { } path) return;
+
+            if (kind == OutputfileKind.Inventory)
+            {
+                var dump = InventoryFile.FindLatest(_settings.LogFolder, Identity.Character);
+                if (dump is null) return;
+                _inventory = dump;
+                LastInventoryImport = OutputfileAutoImport.ImportInventory(dump, _settings);
+                _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
+                _settings.Save();
+                _gearChecklistDirty = true;
+            }
+            else
+            {
+                LastAchievementsImport =
+                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger);
+                _settings.Save();
+            }
+        }
+        catch (Exception ex) { App.LogError(ex); }   // a half-written dump must not kill the tail
+    });
+
+    private readonly ImportReportView _gearImportReport;
+
     private void RenderGearChecklist()
     {
+        _gearImportReport.Render();
         _gearChecklistPanel.Children.Clear();
         var total = _settings.GearChecklist.Count;
         // No list, no view to pivot — the toggle would be a silent no-op.

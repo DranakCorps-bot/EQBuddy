@@ -34,12 +34,12 @@ public static class CommandPrompts
     /// <summary>The gear checklist auto-ticks from the inventory dump.</summary>
     public static readonly CommandPrompt GearInventory = new(
         Lead, GameCommands.OutputfileInventory,
-        "EQBuddy then ticks off whatever your bags and bank already hold.");
+        "EQBuddy on your PC picks the file up by itself and ticks off whatever your "
+        + "bags and bank already hold.");
 
     /// <summary>The Raids surface marks clears from before EQBuddy off the achievements
     /// dump — a two-step: type it in game, then import the file on the PC.</summary>
     public static readonly CommandPrompt RaidsAchievements = new(
         Lead, GameCommands.OutputfileAchievements,
-        "Then import it on the PC (right-click → Data & imports) to mark clears from "
-        + "before EQBuddy.");
+        "EQBuddy on your PC reads it by itself and marks clears from before EQBuddy.");
 }

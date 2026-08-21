@@ -33,6 +33,7 @@ internal sealed class GearCardView : IWidgetCard
     private readonly Func<string, string, int?> _hops;
     private readonly Action _markDirty;
     private readonly Func<string, object> _brush;
+    private readonly Func<AutoImportOutcome?> _lastImport;
 
     // Built here, not handed in. A card that takes its host's controls can only ever
     // live in one host — and this one has to live in two, because the Gear & Loot
@@ -42,6 +43,7 @@ internal sealed class GearCardView : IWidgetCard
     private readonly TextBlock _listName;
     private readonly CheckBox _byZone;
     private readonly Button _copyCmd;
+    private readonly StackPanel _importReport = new() { Visibility = Visibility.Collapsed };
 
     public string Key => LootSurface.KeyFor(LootTab.Gear);
     public UIElement Body { get; }
@@ -49,8 +51,10 @@ internal sealed class GearCardView : IWidgetCard
     public GearCardView(
         AppSettings settings,
         Func<string> currentZone, Func<string, string, int?> hops,
-        Action markDirty, Func<string, object> brush)
+        Action markDirty, Func<string, object> brush,
+        Func<AutoImportOutcome?> lastImport)
     {
+        _lastImport = lastImport;
         _settings = settings;
         _currentZone = currentZone;
         _hops = hops;
@@ -109,6 +113,12 @@ internal sealed class GearCardView : IWidgetCard
         note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         panel.Children.Add(note);
         panel.Children.Add(_copyCmd);
+        // What the auto-import DID. Without this the feature is invisible and reads
+        // exactly like the bug it replaces: David ran the command, the file appeared, and
+        // the window sat there saying nothing (2026-08-20). It also has to say the dump
+        // was READ when nothing changed — "EQBuddy did nothing" and "EQBuddy never saw
+        // your file" look identical from the outside and only one is a fault.
+        panel.Children.Add(_importReport);
         Body = panel;
     }
 
@@ -134,6 +144,7 @@ internal sealed class GearCardView : IWidgetCard
 
     public void Render()
     {
+        RenderImportReport();
         _list.Items.Clear();
         var total = _settings.GearChecklist.Count;
         // No list, no view to pivot — the toggle would be a silent no-op.
@@ -192,6 +203,43 @@ internal sealed class GearCardView : IWidgetCard
             foreach (var item in group.Items) _list.Items.Add(Row(item));
         }
     }
+
+    /// <summary>The report line and its Undo. Undo is offered only when the import
+    /// actually changed something — a button that would put back nothing is the same
+    /// silent no-op this whole change is about.</summary>
+    private void RenderImportReport()
+    {
+        var outcome = _lastImport();
+        if (outcome is null) { _importReport.Visibility = Visibility.Collapsed; return; }
+        if (ReferenceEquals(outcome, _shownImport)) return;   // don't rebuild every tick
+        _shownImport = outcome;
+
+        _importReport.Children.Clear();
+        _importReport.Visibility = Visibility.Visible;
+        var line = Dim(outcome.Summary);
+        line.Ink("GoodBrush");
+        line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        _importReport.Children.Add(line);
+        if (outcome.Undo is not { } undo) return;
+
+        var b = Theming.Button("Undo");
+        b.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
+        b.HorizontalAlignment = HorizontalAlignment.Left;
+        b.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+        b.ToolTip = "Put back exactly what this import ticked — anything you ticked "
+            + "yourself is left alone.";
+        b.Click += (_, _) =>
+        {
+            undo();
+            _shownImport = null;
+            _importReport.Visibility = Visibility.Collapsed;
+            _markDirty();
+            Render();
+        };
+        _importReport.Children.Add(b);
+    }
+
+    private AutoImportOutcome? _shownImport;
 
     private TextBlock Dim(string text) => new()
     {

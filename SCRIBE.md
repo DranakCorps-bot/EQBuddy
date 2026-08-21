@@ -20,6 +20,30 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### standalone Motes card (configurable)
+- **Priority:** waiting (David's call — Progress theme already absorbed Motes)
+- **Place:** Progress theme. Not Gate 5 overlay. Not a group meter.
+- **Source:** #227 typical-usual-chaos Aug 20, 7:00 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
+- **Ask:** "Bring motes back as its own top-level card, behind a setting if needed." At-a-glance motes and motes/hour, not behind a Progress/Wealth tab.
+- **Already shipped:** WhatsNew: MOTES had its own card; Progress theme (2026-08-19) absorbed Progress, Money, Motes, Faction, Raids. ROADMAP: fewer definitions, not fewer cards.
+- **Checked:** not grepped this run for the setting. Hypothesis, unchecked -- there is no toggle to undock Motes from Progress.
+
+### wiki pack Step 2 click on creature name doesn't open wiki
+- **Priority:** must-fix
+- **Place:** Wiki contribution pack window. Desktop. Not Gate 5.
+- **Source:** #226 LeBigNasty Aug 20, 5:12 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
+- **Ask:** "Step 2 says click on creatures name to open wiki. It doesn't seem to be doing that for me."
+- **Already shipped:** wiki pack is its own Data & imports window (#217 ask 1). Copy tip says each row has a direct edit link.
+- **Checked:** WikiPackPresentation.cs:237 "you open the link, paste, review and save." Hypothesis, unchecked -- Step 2 is instructing a click on the creature name in the pack list; that click either has no handler or does not open the wiki page.
+
+### wiki pack copy copies the whole list, not one creature
+- **Priority:** waiting
+- **Place:** Wiki contribution pack Copy for wiki. Desktop.
+- **Source:** #226 LeBigNasty Aug 20, 5:12 PM CT. Replied 2026-08-20 (Scribe). Same thread as the Step 2 click.
+- **Ask:** "The copy feature copies the entire contents, not just that creature."
+- **Already shipped:** WikiPackPresentation.CopyTip: "Copy paste-ready eqlwiki edits for everything listed, each with a direct edit link." That is the whole-pack copy, not a per-creature copy.
+- **Checked:** that CopyTip quote. Hypothesis, unchecked -- there is one Copy button for the pack; no per-row copy. Data source is pack.Contributions, not a selected creature.
+
 ### EQBuddy window position resets on update
 - **Priority:** waiting (started before the last two updates; not a fresh 1.97/1.98 regression)
 - **Place:** main widget window position. Not chips (#208) and not auto-hide (#189).
@@ -111,6 +135,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Priority:** waiting (David's call)
 - **Place:** wiki contribution pack. Desktop contribution surface, not Gate 5.
 - **Source:** #217 Frankthetankk Aug 19, 12:58 PM CT. Old thread — did not reply.
+- **Also:** #226 LeBigNasty Aug 20, 5:12 PM CT (1.98.0). "It would be nice if you could filter out motes and things that can drop from everyone. For things like common drops like gems, it would be nice if the user can filter those out or right click to ignore." Motes corroborate this item. Gems/common-drop ignore is extra; not a second heading yet.
 - **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
 - **Already shipped:** unknown whether the pack currently emits motes.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
@@ -179,6 +204,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** Widget is on the non-EQ monitor. Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.
 - **New evidence (follow-up):** PopOS Cosmic / Wayland. `settings.json` DID write second-monitor coords (`AlertLeft` 3753 / `AlertTop` 228; `MezChipsLeft` 3131 / `MezChipsTop` 88 / `MezChipsBottom` 291; first monitor 2560×1440). Screenshot: Options lives on monitor 2; after close, a mez chip appears on EQ's main monitor (behind EQ, not at the dragged location). Extra: if nothing else is on the EQ screen, chips overlay EQ, FPS tanks, game loses focus until click; if another window is behind EQ, the EQ window disappears when chips show. Also asked that EQBuddy not fight to be the top window when parked on the second screen.
 - **Already shipped:** he can move and save positions; the write path is no longer the missing fact.
+- **Follow-up Aug 20, 6:54 PM CT:** sbaum23 on cosmic-comp: new windows spawn at the cursor; ConfigureRequest is ignored once showing. Chips/alerts are recreated, so they land on the EQ screen (where the mouse is). Keep-open option worked for him but felt clunky. Prefers Mobile on the second screen; wants desktop chips/alerts off while Mobile keeps them, including alert sounds in the browser. EQBuddy Mobile on Linux worked. Did not reply (old thread; Claude is in it).
 - **Where it might live:** hypothesis — Wayland compositor ignores requested chip/alert coordinates (Claude already said this if the settings wrote). Do not assert Avalonia source without a quote.
 
 ### Custom alert volume is still contested

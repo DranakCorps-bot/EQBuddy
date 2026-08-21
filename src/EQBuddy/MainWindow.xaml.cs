@@ -231,6 +231,9 @@ public partial class MainWindow : Window, ICardContext
         // watch for, or a Text rule would miss everything already in today's log.
         _stats.RefreshTextPatterns(_settings.TrackedRules);
         _stats.TextMatched += OnTextMatched;
+        // The game tells the log when it writes a dump, and names it — so EQBuddy reads
+        // it rather than sending the player to a menu and a folder (David, 2026-08-20).
+        _stats.OutputfileWritten += OnOutputfileWritten;
         // An idle gap ended the session: anything still cued belongs to a fight that is
         // long over.
         _stats.SessionRolledOver += () => Dispatcher.BeginInvoke(_delayedAlerts.CancelAll);
@@ -2765,7 +2768,59 @@ public partial class MainWindow : Window, ICardContext
         () => CurrentZoneName,
         (from, to) => ZoneGraph.Distance(from, to)?.Hops,
         () => _gearChecklistDirty = true,
-        FindResource);
+        FindResource,
+        () => LastInventoryImport);
+
+    // ---- /outputfile dumps import themselves (David, 2026-08-20) ----
+
+    /// <summary>What the last auto-import of an inventory dump did, for the Gear surface
+    /// to report. In memory only: the report is about something that happened while the
+    /// player was watching, so it has no business outliving the session.</summary>
+    internal AutoImportOutcome? LastInventoryImport { get; private set; }
+
+    /// <summary>Same for the achievements dump — read by the Raids surface.</summary>
+    internal AutoImportOutcome? LastAchievementsImport { get; private set; }
+
+    /// <summary>The game announced a dump, in the log we already tail, naming the file.
+    /// So read it. This is the seam that did not exist until 2026-08-20: every part of the
+    /// path was already built — the finder, the auto-check, the achievements importer —
+    /// and nothing connected them to the announcement, so three surfaces told the player
+    /// to go and do it by hand.
+    ///
+    /// The event arrives on the ingest thread; file I/O and settings writes hop to the UI
+    /// thread first, because <c>AppSettings.Save</c> serialises the whole file and the UI
+    /// is the only other writer.</summary>
+    private void OnOutputfileWritten(OutputfileEvent ev) => Dispatcher.BeginInvoke(() =>
+    {
+        try
+        {
+            var kind = OutputfileAutoImport.KindOf(ev.FileName);
+            if (kind == OutputfileKind.Unknown) return;
+            if (OutputfileAutoImport.ResolvePath(_settings.LogFolder, ev.FileName) is not { } path) return;
+
+            if (kind == OutputfileKind.Inventory)
+            {
+                // refresh: true re-scans and runs the existing auto-check; the outcome
+                // below is what makes it VISIBLE, which is the half that was missing.
+                var dump = InventoryFile.FindLatest(_settings.LogFolder, Identity.Character);
+                if (dump is null) return;
+                _inventory = dump;
+                LastInventoryImport = OutputfileAutoImport.ImportInventory(dump, _settings);
+                _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
+                _settings.Save();
+                // No explicit repaint call: GearLootWindow.MaybeRefresh renders the gear
+                // tab every second regardless, so the report appears within a tick.
+                _gearChecklistDirty = true;
+            }
+            else
+            {
+                LastAchievementsImport =
+                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger);
+                _settings.Save();
+            }
+        }
+        catch (Exception ex) { App.LogError(ex); }   // a half-written dump must not kill the tail
+    });
 
     private void UpdateGearChecklist(StatsSnapshot s)
     {
