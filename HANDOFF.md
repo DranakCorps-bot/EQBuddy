@@ -8,7 +8,50 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-20 (latest): the command sweep is DONE and 1.98.1 is STAGED, NOT RELEASED
+## 2026-08-20 (latest): NEXT UP — fold Locker and Bags into Gear & Loot
+
+**Decided with David, groundwork committed (`f89f25d`), the fold itself NOT started.**
+Do this before anything else in the list further down.
+
+He opened the theme expecting his gear and got a wishlist: *"I guess I figured Gear would
+show me what gear I had."* The tab is **`Wishlist`** now — label only, the key stays `gear`
+so no saved card position breaks. `Locker` and `Bags` are in the `LootTab` enum with keys
+and labels, deliberately **not** in `Hosted`, because an empty tab reads as broken.
+
+**The fold, as he chose it:**
+
+- Tab strip becomes **Loot · Wishlist · Locker · Bags**. Locker is the Gear Locker
+  (everything wearable you own, ranked per slot); Bags is the Inventory window.
+- **Their two cog-menu entries come OUT** — *"the consolidation of these things should
+  remove the need for them to be under the cog."* Checked: `Gear & Loot…` has its own menu
+  entry (`MainWindow.xaml:38`), so a player who has hidden the card still has a door. Do
+  not remove that one.
+- The roadmap always said this: the theme row lists `Drops, ItemInfo, Inventory, GearLocker`
+  as what it absorbs. This is the second pass, not a new idea.
+
+**Why it is cheap-ish:** the real logic is already framework-free in
+`UI.Shared/GearLocker.cs` (229 lines) and `Core/InventoryFile.cs`. The windows are thin —
+`EQBuddy/GearLockerWindow.cs` 227 lines, `EQBuddy.Avalonia/GearLockerWindow.cs` 244 — so
+this is the `GearCardView` shape again: lift the BODY into a view, host it in the window
+and in the tab.
+
+**Why it needs care:**
+
+1. **`EQBuddy.Avalonia/MainWindow.cs` has 25 ratchet lines left** (5,615 / 5,640) and
+   `LogParser.cs` has 14. The gear-checklist lift out of Avalonia MainWindow is now
+   genuinely blocking, not merely overdue. Lift first, then fold — a fold ADDS ~90 lines
+   because it moves surfaces and leaves the doors.
+2. **Pin before moving.** WPF gets `EQBUDDY_EXPAND` facts asserted from `tests/EQBuddy.E2E`;
+   Avalonia has no E2E, so `WidgetRenderTests` is the only cover — write those first.
+3. **`EQBUDDY_GEARLOOT` already accepts `locker` and `bags`**, so the shots can be staged
+   the moment the tabs exist. `docs/screenshots/gear-locker.png` exists and is hand-taken —
+   check it before naming a shot (trap 21).
+4. Mobile: the phone offers `gear` as a screen. Whether Locker/Bags become phone screens is
+   a separate design question and NOT part of this fold.
+
+---
+
+## 2026-08-20: the command sweep is DONE and 1.98.1 is STAGED, NOT RELEASED
 
 **`main` clean and pushed at `b8077a7`. `Directory.Build.props` says 1.98.1 and
 `WhatsNew.json` has its entry — the release itself is waiting for David's go**, which he
