@@ -2824,9 +2824,15 @@ public partial class MainWindow : Window, ICardContext
                 LastInventoryImport = OutputfileAutoImport.ImportInventory(dump, _settings);
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
-                // No explicit repaint call: GearLootWindow.MaybeRefresh renders the gear
-                // tab every second regardless, so the report appears within a tick.
+                // The Wishlist tab needs no explicit call — GearLootWindow.MaybeRefresh
+                // renders it every second regardless, so the report appears within a tick.
                 _gearChecklistDirty = true;
+                // The INVENTORY tab does, since 2026-08-21: it stopped painting on the tick
+                // (it re-scans the folder and rebuilds every row, which took the player's
+                // scroll position with it), so a fresh dump is now one of the two things
+                // that can make it stale. A surface that shows a file has to repaint when
+                // the file it shows is replaced.
+                _gearLootWindow?.InventoryChanged();
             }
             else
             {

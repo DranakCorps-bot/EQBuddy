@@ -85,8 +85,12 @@ public class GameCommandsTests
             "the checklist auto-ticks from the inventory dump — WPF's GearCardView twin"),
         ("EQBuddy.Avalonia/MainWindow.cs", nameof(GameCommands.OutputfileAchievements),
             "hosts the Raids section inline"),
-        ("EQBuddy.Avalonia/GearLockerWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
-        ("EQBuddy.Avalonia/InventoryWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
+        // ONE row where there were two, a day after Windows made the same trade: the Gear
+        // Locker and the Inventory window read the same dump and folded into one tab with
+        // two pivots. This list has now followed that surface on BOTH builds, which is the
+        // notice a curated list exists to give.
+        ("EQBuddy.Avalonia/InventoryView.cs", nameof(GameCommands.OutputfileInventory),
+            "the tab IS the dump — ranked by slot, or listed by bag"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
         ("EQBuddy.Avalonia/MapWindow.cs", nameof(GameCommands.LocSocial), "WPF twin"),
     ];

@@ -181,7 +181,13 @@ public class WidgetRenderTests : IDisposable
             Dispatcher.UIThread.RunJobs();
         }
 
-        Assert.NotEmpty(window.OfferedLootTabsForTests);
+        // And since 2026-08-21 the answer is ALL of them: the Inventory tab landed here and
+        // the 1.98.1 parity gap is closed. The loop above tolerates a missing tab on
+        // purpose — that tolerance is what let this build ship one release behind without
+        // crashing — so the closing of the gap needs its own assertion, or "not implemented
+        // yet" quietly becomes permanent.
+        Assert.Equal(LootSurface.Hosted,
+            window.OfferedLootTabsForTests.Select(h => h.Tab).ToList());
         host.Close();
         window.Close();
     }

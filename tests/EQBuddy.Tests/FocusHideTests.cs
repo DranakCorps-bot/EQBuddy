@@ -67,11 +67,14 @@ public class FocusHideTests
     [InlineData("MapWindow")]
     [InlineData("SpawnsWindow")]
     [InlineData("DropsWindow")]
-    [InlineData("GearLockerWindow")]
+    // GearLockerWindow and InventoryWindow were two rows here until they folded into the
+    // Gear & Loot window's Inventory tab — Windows 2026-08-20, Linux/macOS 2026-08-21.
+    // The rule is "yes unless named", so a row for a class that no longer exists passes
+    // forever and quietly stops naming anything real.
+    [InlineData("GearLootWindow")]
     [InlineData("HistoryWindow")]
     [InlineData("ItemInfoWindow")]
     [InlineData("TravelWindow")]
-    [InlineData("InventoryWindow")]
     [InlineData("FightTimelineWindow")]
     [InlineData("OptionsWindow")]
     public void EveryWindowOpenedFromTheWidgetFollowsIt(string window) =>

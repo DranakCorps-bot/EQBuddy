@@ -1,5 +1,14 @@
 [
  {
+  "version": "1.99.0",
+  "date": "2026-08-21",
+  "highlights": [
+   "LINUX AND macOS GET THE INVENTORY TAB. Last release said it plainly: the Inventory tab was Windows-only and the other two builds kept the separate Gear Locker and Inventory windows. They are one tab now on all three, with the same \"Group by bag\" switch - off, it ranks everything wearable you own within each slot and marks what is an upgrade over what you are wearing and what is outclassed by something else in your bags; on, it shows where each item actually is. Both old windows are gone from the gear menu there too, because the Gear & Loot card is the way in.",
+   "FIXED - THE INVENTORY TAB NO LONGER REDRAWS ITSELF ONCE A SECOND. It was rebuilding every row on a timer, which threw your scroll position back to the top while you were reading - so a long inventory could not be read past its first screen - and re-read the dump off disk each time for a file that had not changed. It now redraws when you open the tab, when you press Refresh, and when the game writes a new dump, which is every moment it can actually be out of date.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+  ]
+ },
+ {
   "version": "1.98.1",
   "date": "2026-08-20",
   "highlights": [

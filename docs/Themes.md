@@ -153,9 +153,11 @@ sound" become one. `UI.Shared/AlertSoundPlan.cs` already owns the decision; this
 it one front door.
 
 ### 5. Gear & Loot
-**Tabs:** Session loot · Drops by creature · Item lookup · Gear
-**Absorbs:** Loot card, Gear card, `DropsWindow`, `ItemInfoWindow`, `InventoryWindow`,
-`GearLockerWindow`
+**Tabs:** Loot · Wishlist · Inventory (`ItemInfoWindow` is still named-but-unhosted;
+Drops LEFT this theme on 2026-08-20 for Kills & Drops — it is about the MOB, not your bags)
+**Absorbs:** Loot card, Gear card, `ItemInfoWindow`, `InventoryWindow`, `GearLockerWindow`
+**Shipped:** Windows 2026-08-20, Linux/macOS 2026-08-21 — the Inventory tab was the
+one-release gap between them. Both windows are deleted on both builds.
 **Surface:** phone + desktop. This is where #174's approved features land — mob
 lookup, "what is this for?" from a loot row, upgrade preview at +N.
 

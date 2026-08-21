@@ -174,10 +174,17 @@ public partial class GearLootWindow : Window
         // E2E dump reads both surfaces' facts from this one window.
         _loot.Render(s);
         _gear.Render();
-        // The Locker re-reads the inventory dump from disk, so it paints only when it is
-        // the tab on screen — the others are cheap enough to keep their badges true every
-        // tick, and this one is not.
-        if (_tab == LootTab.Inventory) _inventory.Render();
+        // The Inventory tab paints when you ARRIVE at it, not on the tick — force is the
+        // whole difference. It re-scans the game folder and rebuilds every row, so on the
+        // once-a-second tick it was re-reading the dump from disk and clearing a StackPanel
+        // out from under the player's cursor: the scroll position goes with the children,
+        // so a long inventory could not be read past its first screen. The other two are
+        // arithmetic over a snapshot already in memory and stay on the tick, because their
+        // BADGES have to be true for the tab you are not looking at.
+        //
+        // Written when the Avalonia twin landed (2026-08-21) and had to decide the same
+        // question. Fixing it on one side only is how #122 and #152 reached Linux.
+        if (_tab == LootTab.Inventory && force) _inventory.Render();
     }
 
     /// <summary>Build the strip from Core's <see cref="LootSurface"/> and UI.Shared's
@@ -200,6 +207,15 @@ public partial class GearLootWindow : Window
         // every fresh chip unstyled, including the selected one, which is the whole
         // signal (the lesson QuestsWindow.BuildTabs carries).
         _tabs.Select(_tab);
+    }
+
+    /// <summary>A new inventory dump landed. The Inventory tab paints on arrival rather
+    /// than on the tick (see <c>Refresh</c>), so the auto-import has to say so — otherwise a
+    /// player watching the tab while the game writes the file sees the OLD bags, which is
+    /// exactly the "EQBuddy did nothing" reading the whole auto-import exists to prevent.</summary>
+    internal void InventoryChanged()
+    {
+        if (_tab == LootTab.Inventory) _inventory.Render();
     }
 
     /// <summary>Open on a named tab — the screenshot hook's way in, and the same door

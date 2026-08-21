@@ -120,7 +120,7 @@ Inventory tab which closes the 1.98.1 parity gap.
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,390 | 2,612 | 222 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,670 | 1,702 | 32 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 924 | 938 | 14 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,422 | 5,422 | 5,964 | 542 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,422 | 5,438 | 5,964 | 526 |
 
 Re-measured 2026-08-21. The WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down

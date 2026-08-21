@@ -543,7 +543,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_INVENTORY") == "1")
-            Loaded += (_, _) => Dispatcher.UIThread.Post(() => OnInventoryWindow(this, EventArgs.Empty),
+            Loaded += (_, _) => Dispatcher.UIThread.Post(() => OnGearLocker(this, EventArgs.Empty),
                 DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOCKER") == "1")
@@ -1002,6 +1002,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             "Open the Quest Tracker — search every quest by reward, item, quest giver or "
             + "zone, and work your Epic 1.0 and Plane of Sky checklists");
         _lootTabBodies[LootTab.Gear] = Gear.Body;
+        // The tab that closes the 1.98.1 parity gap: LootSurface.Hosted has named
+        // Inventory since 2026-08-20 and this build had no body for it, so the filter in
+        // IGearLootHost.LootTabs hid a chip that shared vocabulary said existed.
+        _lootTabBodies[LootTab.Inventory] = Inventory.Body;
         _sections["tracked"] = AppTheme.Section(Header("tracked", "Watch", _trackedHeader), _trackedPanel);
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
@@ -1409,10 +1413,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         menu.Items.Add(Item("Travel route…", OnTravelRoute,
             "Hop-by-hop directions from where you are to any zone"));
         menu.Items.Add(Item("Spawn timers…", (_, _) => ShowSpawnsWindow()));
-        menu.Items.Add(Item("Inventory…", OnInventoryWindow,
-            "Your worn gear by slot and what's in each bag — from the game's /outputfile inventory dump (type it in game, the file appears, EQBuddy reads it)"));
-        menu.Items.Add(Item("Gear Locker…", OnGearLocker,
-            "Everything wearable you own, grouped by slot and compared — items outclassed by something else in your bags get flagged as dump candidates. Your bags, not 'BiS'."));
         menu.Items.Add(Item("Session history…", OnHistory));
         menu.Items.Add(Item("Drops by creature…", OnDropsWindow));
         menu.Items.Add(new Separator());
@@ -2218,6 +2218,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             Gear.Render();
             _gearChecklistDirty = false;
+        }
+        if (LootTabShowing(LootTab.Inventory) && _inventoryDirty)
+        {
+            Inventory.Render();
+            _inventoryDirty = false;
         }
         if (ProgressTabShowing(ProgressTab.Wealth))
         {
@@ -3533,6 +3538,25 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private GearCardView? _gear;
 
+    /// <summary>The Inventory tab — the Gear Locker and the old Inventory window as one
+    /// surface with two pivots, the way Windows folded them (David, 2026-08-20). Owned by
+    /// the widget rather than by the window, like every other tab body here, so a fetch
+    /// in flight survives the window being closed and reopened.</summary>
+    private InventoryView Inventory => _inventoryTab ??= new InventoryView(
+        _settings, _wikiItems,
+        refresh => LatestInventory(refresh),
+        () => QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
+        () => CurrentSnapshot().InferredClass);
+
+    private InventoryView? _inventoryTab;
+
+    /// <summary>Repaint the Inventory tab next time it is on screen. It re-scans the game
+    /// folder and rebuilds every row, so unlike the other two it does NOT paint on the
+    /// once-a-second tick: a rebuild under the player's cursor takes the scroll position
+    /// with it, and re-reading the dump from disk every second buys nothing a dump written
+    /// minutes ago can give.</summary>
+    private bool _inventoryDirty = true;
+
     /// <summary>The two Gear &amp; Loot tab bodies, built by BuildSections() when these were
     /// two cards and still rendered by the same code. GearLootWindow hosts them.</summary>
     private readonly Dictionary<LootTab, Control> _lootTabBodies = new();
@@ -3572,7 +3596,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// Same shape as the crash the Gear &amp; Loot fold found in <c>ApplySectionLayout</c>:
     /// a key present in a SHARED catalog with no entry in this UI's own map.</summary>
     IReadOnlyList<LootTabHeader> IGearLootHost.LootTabs(StatsSnapshot s) =>
-        [.. LootTheme.Tabs(s, _settings.GearChecklist)
+        [.. LootTheme.Tabs(s, _settings.GearChecklist, _inventoryTab?.Badge)
             .Where(h => _lootTabBodies.ContainsKey(h.Tab))];
 
     IReadOnlyList<(string Key, Control Star, string Label, string Tip)> IGearLootHost.LootMiniStars()
@@ -3615,6 +3639,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var snap = CurrentSnapshot();
         _gearLootWindow.Refresh();   // picks the tab, so the guards below know which one
         _gearChecklistDirty = true;
+        _inventoryDirty = true;
         RefreshExpandedSections(snap);
     }
 
@@ -3622,8 +3647,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private WikiPackWindow? _wikiPackWindow;
     private MapWindow? _mapWindow;
     private TravelWindow? _travelWindow;
-    private InventoryWindow? _inventoryWindow;
-    private GearLockerWindow? _gearLockerWindow;
     private FightTimelineWindow? _timelineWindow;
 
     private void OnQuestsWindow(object? sender, EventArgs e) => ShowQuestsWindow();
@@ -3718,24 +3741,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _travelWindow.Activate();
     }
 
-    private void OnInventoryWindow(object? sender, EventArgs e)
-    {
-        if (_inventoryWindow is { IsVisible: true } w) { w.Activate(); return; }
-        _inventoryWindow = new InventoryWindow(refresh => LatestInventory(refresh));
-        _inventoryWindow.Closed += (_, _) => _inventoryWindow = null;
-        _inventoryWindow.Show(this);
-    }
-
-    private void OnGearLocker(object? sender, EventArgs e)
-    {
-        if (_gearLockerWindow is { IsVisible: true } open) { open.Activate(); return; }
-        _gearLockerWindow = new GearLockerWindow(_wikiItems,
-            refresh => LatestInventory(refresh),
-            () => QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
-            () => CurrentSnapshot().InferredClass);
-        _gearLockerWindow.Closed += (_, _) => _gearLockerWindow = null;
-        _gearLockerWindow.Show(this);
-    }
+    /// <summary>The Gear Locker and the Inventory window are ONE TAB now — they read the
+    /// same dump, so two windows off one file made people wonder which was the real one
+    /// (David, 2026-08-20; Windows folded them a release earlier). Both entry points stay
+    /// and both land on the tab: a hook that silently stops working is worse than a
+    /// redundant one, and EQBUDDY_INVENTORY / EQBUDDY_GEARLOCKER both appear in docs.</summary>
+    private void OnGearLocker(object? sender, EventArgs e) =>
+        ShowGearLootWindow(LootSurface.KeyFor(LootTab.Inventory));
 
     /// <summary>The fight timeline (⧗): one window, re-fronted if already open —
     /// reachable from the Combat card and the Damage breakout alike.</summary>
@@ -4399,6 +4411,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
                 _gearChecklistDirty = true;
+                _inventoryDirty = true;   // the tab IS this file
             }
             else
             {
@@ -5385,6 +5398,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_clickThrough)
             ClickThrough.Set(this, enabled: false);
         _alertWindow?.Close();
+        _inventoryTab?.Dispose();   // a wiki fetch must not outlive the app that started it
         _spawnPoints.Flush();   // debounced archives; anything missed replays from the log
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)
         _stats.AaStore?.Flush();
