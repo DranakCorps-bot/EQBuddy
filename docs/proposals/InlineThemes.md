@@ -1,7 +1,8 @@
 # Proposal: themes expand in place, and pop out only if you want them to
 
-**Status:** proposal, not a decision. Written 2026-08-21 for review by David, Bevel and
-Scribe. Nothing here is built.
+**Status:** nothing is built. The SHAPE is now decided — see "Bevel's ruling" below, which
+settles the tab-strip question and adds the split and host rules. What remains open is
+whether to build it at all, and open questions 4 and 5.
 
 **David's ask, verbatim (2026-08-21):** *"I'm thinking we might want to revisit the themes
 and instead of opening breakout windows, we have expandable sub-categories under them with
@@ -128,6 +129,40 @@ running game — it makes the card openable in place *when the player asks*, whi
 thing every meter card already does.
 
 ---
+
+## Bevel's ruling, 2026-08-21 — question 1 is settled
+
+**Tab strip. And my reason was wrong.**
+
+> *"Consistency is a constraint, not the win. The win is the job."* — Bevel
+
+The rooms inside a theme are PEERS, one question each, not a list of independent jobs. A
+player opening an inline theme is doing the #228 job: *I want my room in the main window,
+without a second window over the game.* They are not asking to watch Faction and Experience
+at once. Nested expanders would put four rooms under Progress — the pre-fold stack with an
+indent, two expands to reach coin, `SizeToContent` growing over the game, and the cards
+below pushed under the scroller. That is the #228 complaint again, arriving as a fix for it.
+Un-folding in costume.
+
+Two rules came with it, and they are the plan of record:
+
+**Split rule.** Tabs when N rooms are peers (one question, one body). Expanders when one
+room is a list of independent jobs you may want two of at once. Skill-ups under Experience
+is already an expander and is correct. The meter cards stay expanders. Do not promote those
+to theme tabs, and do not demote peer rooms to nested rows.
+
+**Host rule.** Same decision (Core tab list + strip), but a WIDGET-SCALE body. Experience,
+Wealth-coin, Sky and Epic can come back as one-card bodies. **The Quests General tracker and
+a long Wealth ledger cannot** — inline, those tabs are the glance of that tab plus a ⧉ into
+the existing window. Do not shrink-wrap a full window onto a `SizeToContent` always-on-top
+panel.
+
+Also settled by the same review: the pop-out COLLAPSES the card (one owner), Progress's
+existing breakout folds into that pop-out, cards stay collapsed by default, both UIs in the
+same change. Name the pills by the old card titles; the default tab is the room that moves
+while you play. Keep the collapsed launcher line as the glance.
+
+That answers open questions 1, 2 and 3 below. **4 and 5 are still open.**
 
 ## Open questions
 
