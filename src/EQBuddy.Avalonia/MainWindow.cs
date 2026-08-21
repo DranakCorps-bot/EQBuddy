@@ -124,9 +124,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _trackedHeader = AppTheme.StatValue("0");
     private readonly TextBlock _motesSummary = AppTheme.DimText("");
     private readonly ItemsControl _motesList = new();
-    private readonly TextBlock _gearListName = AppTheme.DimText("");
-    private readonly CheckBox _gearByZoneCheck = new() { Content = "Group by farm zone" };
-    private readonly StackPanel _gearChecklistPanel = new();
     private readonly StackPanel _raidsPanel = new();
     private readonly TextBlock _buffsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _buffsPanel = new();
@@ -411,8 +408,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // The game announces every dump it writes, and names it — so read it rather than
         // sending the player to a menu and a folder (David, 2026-08-20). WPF's twin.
         _stats.OutputfileWritten += OnOutputfileWritten;
-        _gearImportReport = new ImportReportView(
-            () => LastInventoryImport, () => _gearChecklistDirty = true);
         // An idle gap ended the session: anything still cued belongs to a fight that is
         // long over.
         _stats.SessionRolledOver += () => Dispatcher.UIThread.Post(_delayedAlerts.CancelAll);
@@ -1006,7 +1001,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ToolTip.SetTip(_sections["quests"],
             "Open the Quest Tracker — search every quest by reward, item, quest giver or "
             + "zone, and work your Epic 1.0 and Plane of Sky checklists");
-        _lootTabBodies[LootTab.Gear] = BuildGearSection();
+        _lootTabBodies[LootTab.Gear] = Gear.Body;
         _sections["tracked"] = AppTheme.Section(Header("tracked", "Watch", _trackedHeader), _trackedPanel);
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
@@ -1045,51 +1040,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _motesSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
         panel.Children.Add(_motesSummary);
         panel.Children.Add(_motesList);
-        return panel;
-    }
-
-    private Control BuildGearSection()
-    {
-        var panel = new StackPanel();
-        _gearListName.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
-        _gearListName.TextWrapping = TextWrapping.Wrap;
-        panel.Children.Add(_gearListName);
-        // The checklist says WHAT; this says WHERE (#122abd6). Off by default — the
-        // slot view is the one people import for.
-        _gearByZoneCheck.IsChecked = _settings.GearGroupByZone;
-        _gearByZoneCheck.FontSize = DesignSystem.Size(Role.Caption);
-        _gearByZoneCheck.Margin = new Thickness(0, 0, 0, DesignTokens.SpaceXxs);
-        ToolTip.SetTip(_gearByZoneCheck,
-            "Pivot the same wishes to where you'd farm them — nearest zone first once "
-            + "the log has seen you zone in. An item that drops in several zones is listed "
-            + "under each, and one tick clears it everywhere.");
-        _gearByZoneCheck.IsCheckedChanged += OnGearByZoneToggled;
-        panel.Children.Add(_gearByZoneCheck);
-        panel.Children.Add(new ScrollViewer
-        {
-            MaxHeight = 320,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            Padding = new Thickness(0, 0, DesignTokens.SpaceXs, 0),
-            Content = _gearChecklistPanel,
-        });
-        // The checklist auto-ticks from the game's own inventory dump and never said so,
-        // and offered no way to produce one (David, 2026-08-20). Built HERE rather than in
-        // RenderGearChecklist, and outside the scroller: the note and the button belong to
-        // the surface, not to one of its states, so neither can be scrolled away and no
-        // render branch can forget to draw them. WPF's GearCardView is the twin.
-        panel.Children.Add(new TextBlock
-        {
-            Text = GearChecklistPresentation.AutoTickNote,
-            FontSize = DesignSystem.Size(Role.Caption),
-            TextWrapping = TextWrapping.Wrap,
-            Foreground = AppTheme.DimBrush,
-            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
-        });
-        panel.Children.Add(CopyCommandButton(
-            EQBuddy.UI.Shared.GameCommands.OutputfileInventory,
-            GearChecklistPresentation.AutoTickTip));
-        panel.Children.Add(_gearImportReport.Body);
         return panel;
     }
 
@@ -2266,7 +2216,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _questsHeader.Text = QuestsSummaryLine();
         if (LootTabShowing(LootTab.Gear) && _gearChecklistDirty)
         {
-            RenderGearChecklist();
+            Gear.Render();
             _gearChecklistDirty = false;
         }
         if (ProgressTabShowing(ProgressTab.Wealth))
@@ -3227,38 +3177,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>The Raids card names the achievements dump in both its empty and its
     /// populated state, so both offer the one-click copy (David, 2026-08-14) — every
     /// surface that names a command hands it over without retyping.</summary>
-    private Button CopyAchievementsCmd() => CopyCommandButton(
+    private static Button CopyAchievementsCmd() => DesignSystem.CopyCommandButton(
         EQBuddy.UI.Shared.GameCommands.OutputfileAchievements,
         "Copies the command — paste it into the game's chat and the game " +
         "writes its achievements dump beside its own folders; right-click → " +
         "Data & imports → Import achievements… reads it.");
-
-    /// <summary>ONE builder for every ⧉ command button on this widget. It was
-    /// <c>CopyAchievementsCmd</c> with the command baked in, so the Gear checklist — which
-    /// needs <c>/outputfile inventory</c> and had no button at all (David, 2026-08-20) —
-    /// could not reuse it without a second copy of the same twenty lines. The command is
-    /// an ARGUMENT and never a literal: GameCommands is the only source, pinned by
-    /// GameCommandsTests.</summary>
-    private Button CopyCommandButton(string command, string tip)
-    {
-        var b = AppTheme.IconButton($"copy  {command}", tip);
-        b.FontSize = DesignSystem.Size(Role.Metadata);
-        b.HorizontalAlignment = HorizontalAlignment.Left;
-        b.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
-        b.Click += async (_, _) =>
-        {
-            try
-            {
-                if (TopLevel.GetTopLevel(this)?.Clipboard is { } cb)
-                {
-                    await cb.SetTextAsync(command);
-                    b.Content = "copied — paste in game chat";
-                }
-            }
-            catch (Exception ex) { App.LogError(ex); }   // clipboard momentarily held by another app
-        };
-        return b;
-    }
 
     private void UpdateLoggingStatus()
     {
@@ -3597,6 +3520,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         RenderRaids();
     }
     private GearLootWindow? _gearLootWindow;
+
+    /// <summary>The Wishlist surface, lifted into <see cref="GearCardView"/> when this
+    /// file ran out of ratchet room (CLAUDE.md: lift a surface, never split the file).
+    /// Built lazily and once — a Control has one parent, so the day a second host wants
+    /// this surface it builds its own instance rather than sharing this one.</summary>
+    private GearCardView Gear => _gear ??= new GearCardView(
+        _settings, () => CurrentZoneName,
+        (from, to) => ZoneGraph.Distance(from, to)?.Hops,
+        () => _gearChecklistDirty = true,
+        () => LastInventoryImport);
+
+    private GearCardView? _gear;
 
     /// <summary>The two Gear &amp; Loot tab bodies, built by BuildSections() when these were
     /// two cards and still rendered by the same code. GearLootWindow hosts them.</summary>
@@ -4474,154 +4409,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         catch (Exception ex) { App.LogError(ex); }   // a half-written dump must not kill the tail
     });
-
-    private readonly ImportReportView _gearImportReport;
-
-    private void RenderGearChecklist()
-    {
-        _gearImportReport.Render();
-        _gearChecklistPanel.Children.Clear();
-        var total = _settings.GearChecklist.Count;
-        // No list, no view to pivot — the toggle would be a silent no-op.
-        _gearByZoneCheck.IsVisible = total > 0;
-        if (total == 0)
-        {
-            // The route line IS the empty state; a second "No gear list imported."
-            // underneath said the same thing in less useful words. WPF's twin.
-            _gearListName.Text = GearChecklistPresentation.EmptyRoute;
-            return;
-        }
-
-        UpdateGearListName();
-        if (_settings.GearGroupByZone) RenderGearByZone();
-        else RenderGearBySlot();
-
-    }
-
-    private void RenderGearBySlot()
-    {
-        foreach (var group in EQBuddy.UI.Shared.GearChecklistPresentation.BuildGroups(_settings.GearChecklist))
-        {
-            _gearChecklistPanel.Children.Add(GearGroupHeading(group.Heading));
-            foreach (var item in group.Items)
-                _gearChecklistPanel.Children.Add(GearRow(item));
-        }
-    }
-
-    private void RenderGearByZone()
-    {
-        // The WHERE-TO-GO pivot: grouping and buckets live in UI.Shared
-        // (GearFarmRollup) where they are tested; this side only draws. Nearest-first
-        // needs a current zone — before the first zone line of a session the rollup
-        // degrades to alphabetical rather than guessing.
-        Func<string, int?>? hopsFromHere = CurrentZoneName.Length > 0
-            ? zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops
-            : null;
-        var groups = EQBuddy.UI.Shared.GearFarmRollup.Build(
-            _settings.GearChecklist, ItemCatalog.Default.Find, hopsFromHere);
-        if (groups.Count == 0)
-        {
-            _gearChecklistPanel.Children.Add(
-                EmptyCardLine("Everything on the list is acquired — nothing left to farm."));
-            return;
-        }
-
-        foreach (var group in groups)
-        {
-            _gearChecklistPanel.Children.Add(
-                GearGroupHeading(EQBuddy.UI.Shared.GearFarmRollup.Heading(group)));
-            foreach (var item in group.Items)
-                _gearChecklistPanel.Children.Add(GearRow(item));
-        }
-    }
-
-    private static TextBlock GearGroupHeading(string heading) => new()
-    {
-        Text = heading,
-        FontSize = DesignSystem.Size(Role.Caption),
-        FontWeight = FontWeight.SemiBold,
-        Foreground = AppTheme.AccentBrush,
-        Margin = new Thickness(0, DesignTokens.SpaceM, 0, DesignTokens.SpaceXxs),
-    };
-
-    private CheckBox GearRow(GearChecklistItem item)
-    {
-        var text = new StackPanel();
-        text.Children.Add(new TextBlock
-        {
-            Text = item.Slot,
-            FontSize = DesignSystem.Size(Role.Metadata),
-            Foreground = AppTheme.DimBrush,
-            TextTrimming = TextTrimming.CharacterEllipsis,
-        });
-        var itemName = new TextBlock
-        {
-            FontSize = DesignSystem.Size(Role.Body),
-            Foreground = AppTheme.TextBrush,
-            TextTrimming = TextTrimming.CharacterEllipsis,
-        };
-        // An exaltation's effect rides the name as a dim run, so the row reads as one
-        // item rather than two — same treatment as WPF's.
-        var itemText = EQBuddy.UI.Shared.GearChecklistPresentation.TextFor(item);
-        itemName.Inlines?.Add(new Run(itemText.Name));
-        if (itemText.EffectSuffix.Length > 0)
-            itemName.Inlines?.Add(new Run(itemText.EffectSuffix)
-            {
-                FontSize = DesignSystem.Size(Role.Metadata),
-                Foreground = AppTheme.DimBrush,
-            });
-        text.Children.Add(itemName);
-        if (item.Source.Length > 0)
-            text.Children.Add(new TextBlock
-            {
-                Text = item.Source,
-                FontSize = DesignSystem.Size(Role.Metadata),
-                Foreground = AppTheme.DimBrush,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-            });
-
-        var check = new CheckBox
-        {
-            IsChecked = item.Acquired,
-            Content = text,
-            Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXxs),
-        };
-        ToolTip.SetTip(check, EQBuddy.UI.Shared.GearChecklistPresentation.Tooltip(item));
-        check.IsCheckedChanged += (box, _) => OnGearToggled(item, ((CheckBox)box!).IsChecked == true);
-        return check;
-    }
-
-    private void OnGearToggled(GearChecklistItem item, bool acquired)
-    {
-        item.Acquired = acquired;
-        _settings.Save();
-        UpdateGearListName();
-        // The zone view excludes acquired rows and repeats a multi-zone item under
-        // each zone it drops in — its checkbox twins must repaint, next tick.
-        if (_settings.GearGroupByZone) _gearChecklistDirty = true;
-    }
-
-    private void OnGearByZoneToggled(object? sender, RoutedEventArgs e)
-    {
-        var value = _gearByZoneCheck.IsChecked == true;
-        if (_settings.GearGroupByZone == value) return;
-
-        _settings.GearGroupByZone = value;
-        _settings.Save();
-        if (LootTabShowing(LootTab.Gear))
-        {
-            RenderGearChecklist();
-            _gearChecklistDirty = false;
-        }
-        else
-        {
-            _gearChecklistDirty = true;
-        }
-    }
-
-    private void UpdateGearListName() =>
-        _gearListName.Text = EQBuddy.UI.Shared.GearChecklistPresentation.ListName(
-            _settings.GearChecklistName, _settings.GearChecklist);
 
     private static string SkyRewardKey(string className, string reward) => className + "|" + reward;
 

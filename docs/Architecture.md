@@ -96,26 +96,33 @@ the ceiling, which is the one move this table exists to make someone argue for o
 Worth knowing before the next squeeze: 177 private/internal methods were measured in that
 file and not one was unreferenced. There is no free room in it.
 
-**`LogParser.cs` is the tight one now** — 25 lines. It is the next to need this treatment.
+**`LogParser.cs` is the tight one now** — 14 lines. It is the next to need this treatment.
 
 **And the biggest file in the repo had no ratchet at all until 2026-08-19.**
-`EQBuddy.Avalonia/MainWindow.cs` is 5,127 lines — some 700 more than the WPF widget this
-table was written for — and it was missed because the hotspots were picked while the WPF
-decomposition was the work in front of us, and nothing since had re-read the list. The
+`EQBuddy.Avalonia/MainWindow.cs` was 5,127 lines then — some 700 more than the WPF widget
+this table was written for — and it was missed because the hotspots were picked while the
+WPF decomposition was the work in front of us, and nothing since had re-read the list. The
 Avalonia twin grew unwatched for the entire time the Windows one was being pulled apart.
-It is entered at its current size, because a ratchet's job is to stop growth today; it
-should come down the way `SessionStats` did, by lifting card bodies out (`LootCardView.cs`
-is the worked example on that side).
+It was entered at its current size, because a ratchet's job is to stop growth today.
+
+**It came down for the first time on 2026-08-21, and the entry means something different
+now.** The file had drifted to 5,637 — legal inside the grant and THREE lines from failing —
+and the gear checklist came out into `EQBuddy.Avalonia/GearCardView.cs` (215 lines), the
+lift the 2026-08-19 note had named in advance. `CopyCommandButton` went with it, into
+`DesignSystem`, because a builder only the widget can call is a builder every lifted surface
+has to copy. The baseline came down to the honest 5,422 in the same commit — and the reason
+it had to come first rather than after is that the thing about to claim that room is the
+Inventory tab which closes the 1.98.1 parity gap.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,214 | 4,635 | 421 |
-| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,375 | 2,612 | 237 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,322 | 4,635 | 313 |
+| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,390 | 2,612 | 222 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,670 | 1,702 | 32 |
-| `EQBuddy.Core/LogParser.cs` | 853 | 913 | 938 | 25 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,127 | 5,455 | 5,639 | 184 |
+| `EQBuddy.Core/LogParser.cs` | 853 | 924 | 938 | 14 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,422 | 5,422 | 5,964 | 542 |
 
-Re-measured 2026-08-20. The WPF widget came down 110 lines when the Gear card body was
+Re-measured 2026-08-21. The WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one
 way this table stops meaning anything. `OptionsWindow` is the tight one now: it took the

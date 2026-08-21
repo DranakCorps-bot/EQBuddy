@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Layout;
 using Avalonia.Media;
 using EQBuddy.UI.Shared;
@@ -105,6 +106,38 @@ internal static class DesignSystem
         return button;
     }
 
+
+    /// <summary>ONE builder for every ⧉ command button on this build. It lived on
+    /// <c>MainWindow</c> — first as <c>CopyAchievementsCmd</c> with the command baked in,
+    /// then generalised when the Gear checklist needed <c>/outputfile inventory</c> and had
+    /// no button at all (David, 2026-08-20). It moved here when the checklist was lifted
+    /// into <see cref="GearCardView"/>: a builder that only the widget can call is a
+    /// builder every lifted surface has to copy, and a second copy of this shape is exactly
+    /// what <c>GameCommandsTests</c> exists to prevent.
+    ///
+    /// The command is an ARGUMENT and never a literal — <see cref="GameCommands"/> is the
+    /// only source, and the clipboard comes off the button's OWN TopLevel rather than the
+    /// widget's, so a button in a satellite window copies from the window it is in.</summary>
+    public static Button CopyCommandButton(string command, string tip)
+    {
+        var b = AppTheme.IconButton($"copy  {command}", tip);
+        b.FontSize = Size(DesignTokens.TypeRole.Metadata);
+        b.HorizontalAlignment = HorizontalAlignment.Left;
+        b.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
+        b.Click += async (_, _) =>
+        {
+            try
+            {
+                if (TopLevel.GetTopLevel(b)?.Clipboard is { } cb)
+                {
+                    await cb.SetTextAsync(command);
+                    b.Content = "copied — paste in game chat";
+                }
+            }
+            catch (Exception ex) { App.LogError(ex); }   // clipboard momentarily held by another app
+        };
+        return b;
+    }
     /// <summary>An icon and a word on one baseline — the shape every textual button in
     /// the migrated surfaces takes.</summary>
     public static StackPanel IconLabel(string icon, string label, string colorKey = "DimBrush")

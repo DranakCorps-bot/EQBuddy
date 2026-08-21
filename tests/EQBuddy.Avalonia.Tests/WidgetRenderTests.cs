@@ -220,6 +220,152 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+
+    /// <summary>Two wishes, imported. Written BEFORE the gear checklist was lifted out of
+    /// <c>MainWindow.cs</c>, because CLAUDE.md's rule for a lift is to pin the behaviour
+    /// first and this build has no E2E suite to pin it in — the three pins that already
+    /// existed cover the pivot's existence, the command hand-over and the empty state, and
+    /// none of them had ever seen a POPULATED checklist draw a single row.
+    ///
+    /// So this is the populated state, asserted through the shared presentation rather
+    /// than against spelled-out strings: the group headings come from
+    /// <see cref="GearChecklistPresentation.BuildGroups"/> and the count line from
+    /// <see cref="GearChecklistPresentation.ListName"/>, so the lift is free to move the
+    /// drawing and is not free to change what is drawn.</summary>
+    [AvaloniaFact]
+    public void TheGearChecklistDrawsItsGroupsRowsAndCount()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.Settings.GearChecklistName = "Cleric 50 shopping list";
+        window.Settings.GearChecklist =
+        [
+            new GearChecklistItem { Slot = "Feet", Item = "Golden Efreeti Boots", Acquired = true },
+            new GearChecklistItem { Slot = "Head", Item = "Circlet of Shadow", Source = "a shadow man" },
+        ];
+        window.ShowGearLootWindow("gear");
+        Dispatcher.UIThread.RunJobs();
+
+        var text = GearText(window);
+        Assert.Contains(GearChecklistPresentation.ListName(
+            window.Settings.GearChecklistName, window.Settings.GearChecklist), text);
+        foreach (var group in GearChecklistPresentation.BuildGroups(window.Settings.GearChecklist))
+            Assert.Contains(group.Heading, text);
+        // Both wishes, the acquired one included — by KIND is the list as a list.
+        Assert.Contains("Golden Efreeti Boots", text);
+        Assert.Contains("Circlet of Shadow", text);
+        Assert.Contains("a shadow man", text);   // provenance rides the row
+        // One tickable row per wish, and the ticked one reads as ticked.
+        Assert.Equal(2, GearRows(window).Count);
+        Assert.True(RowFor(window, "Golden Efreeti Boots").IsChecked);
+        Assert.False(RowFor(window, "Circlet of Shadow").IsChecked);
+
+        window.GearLootWindowForTests?.Close();
+        window.Close();
+    }
+
+    /// <summary>Ticking a row is the only thing this surface DOES, and it has to survive
+    /// the lift with the count line following it — the count is what the tab badge reads,
+    /// so a tick that updated the model and not the line would be the "one entry, two
+    /// sources for one fact" trap on a one-second delay.</summary>
+    [AvaloniaFact]
+    public void TickingAGearRowMarksItAcquiredAndUpdatesTheCount()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var wish = new GearChecklistItem { Slot = "Head", Item = "Circlet of Shadow" };
+        window.Settings.GearChecklistName = "Cleric 50 shopping list";
+        window.Settings.GearChecklist = [wish];
+        window.ShowGearLootWindow("gear");
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Contains(GearChecklistPresentation.ListName(
+            window.Settings.GearChecklistName, window.Settings.GearChecklist), GearText(window));
+
+        RowFor(window, "Circlet of Shadow").IsChecked = true;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(wish.Acquired);
+        // "1/1" now, from the same formatter — asserted through it so the two hosts and
+        // the phone cannot end up with three answers.
+        Assert.Contains(GearChecklistPresentation.ListName(
+            window.Settings.GearChecklistName, window.Settings.GearChecklist), GearText(window));
+        Assert.Equal(LootTheme.Gear(window.Settings.GearChecklist),
+            window.OfferedLootTabsForTests.Single(h => h.Tab == LootTab.Gear).Value);
+
+        window.GearLootWindowForTests?.Close();
+        window.Close();
+    }
+
+    /// <summary>The by-zone pivot, DRAWING rather than merely existing. The pin that was
+    /// already here asserts the toggle is in the tree; this one flips it and demands the
+    /// rows change, which is the half a lift can silently drop.
+    ///
+    /// The two views are not symmetrical and that asymmetry is the assertion: by zone
+    /// EXCLUDES what you already own, because its question is "where do I go next".
+    /// Invented item names deliberately — the catalog cannot place them, so they land in
+    /// <see cref="GearFarmRollup.NoDataHeading"/> and the test does not quietly become a
+    /// test of the shipped catalog.</summary>
+    [AvaloniaFact]
+    public void TheByZonePivotRedrawsTheChecklistByFarmZone()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.Settings.GearChecklist =
+        [
+            new GearChecklistItem { Slot = "Feet", Item = "Zzyzx Boots of Testing", Acquired = true },
+            new GearChecklistItem { Slot = "Head", Item = "Zzyzx Circlet of Testing" },
+        ];
+        window.ShowGearLootWindow("gear");
+        Dispatcher.UIThread.RunJobs();
+
+        var pivot = window.GearLootWindowForTests!.GetLogicalDescendants().OfType<CheckBox>()
+            .Single(c => (c.Content as string ?? "").Contains("Group by farm zone"));
+        pivot.IsChecked = true;
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(window.Settings.GearGroupByZone);
+        var text = GearText(window);
+        Assert.Contains(GearFarmRollup.NoDataHeading, text);
+        Assert.Contains("Zzyzx Circlet of Testing", text);
+        // The acquired wish is gone: this view answers "what is left", not "what I own".
+        Assert.DoesNotContain("Zzyzx Boots of Testing", text);
+        Assert.Single(GearRows(window));
+
+        // And back, without a restart — the same toggle owns both directions.
+        pivot.IsChecked = false;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(window.Settings.GearGroupByZone);
+        Assert.Contains("Zzyzx Boots of Testing", GearText(window));
+
+        window.GearLootWindowForTests?.Close();
+        window.Close();
+    }
+
+    /// <summary>Every checkbox on the Gear tab that is a WISH — the pivot toggle is a
+    /// control of the surface, not a row of it, and counting it would put every row
+    /// assertion above out by one. Rows are told apart by carrying a built CONTENT rather
+    /// than a string, which is also the thing the lift must not change.</summary>
+    private static List<CheckBox> GearRows(MainWindow window) =>
+        [.. window.GearLootWindowForTests!.GetLogicalDescendants().OfType<CheckBox>()
+            .Where(c => c.Content is Control)];
+
+    private static CheckBox RowFor(MainWindow window, string item) =>
+        GearRows(window).Single(c => RowText(c).Contains(item));
+
+    private static string RowText(CheckBox row) =>
+        string.Join("\n", ((Control)row.Content!).GetLogicalDescendants()
+            .OfType<TextBlock>().Select(TextOf));
+
+    /// <summary>Everything the Gear tab has on screen, as one string. Inlines included:
+    /// an exaltation's effect rides its name as a second Run, so a plain Text read would
+    /// miss half of the row it is asserting about.</summary>
+    private static string GearText(MainWindow window) =>
+        string.Join("\n", window.GearLootWindowForTests!.GetLogicalDescendants()
+            .OfType<TextBlock>().Select(TextOf));
+
+    private static string TextOf(TextBlock t) =>
+        t.Text is { Length: > 0 } s ? s : t.Inlines?.Text ?? "";
     /// <summary>The launcher that replaced the two cards. It has one line to carry what
     /// both card headers carried, and the tab strip beside it has to name both surfaces —
     /// #219 is the release where a fold trimmed a number out of a summary line and the

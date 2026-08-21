@@ -79,8 +79,10 @@ public class GameCommandsTests
 
         // ---- Avalonia: the same surfaces, per CLAUDE.md's both-UIs-in-one-change rule.
         // A gap here is how #122 and #152 reached Linux after Windows had already paid.
-        ("EQBuddy.Avalonia/MainWindow.cs", nameof(GameCommands.OutputfileInventory),
-            "hosts the gear checklist inline — GearCardView's twin until it is lifted out"),
+        // Lifted out of MainWindow.cs on 2026-08-21, and this row moving is the notice the
+        // list exists to give — the third time in two days it has followed a surface.
+        ("EQBuddy.Avalonia/GearCardView.cs", nameof(GameCommands.OutputfileInventory),
+            "the checklist auto-ticks from the inventory dump — WPF's GearCardView twin"),
         ("EQBuddy.Avalonia/MainWindow.cs", nameof(GameCommands.OutputfileAchievements),
             "hosts the Raids section inline"),
         ("EQBuddy.Avalonia/GearLockerWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
