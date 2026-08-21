@@ -47,6 +47,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** Drops by Creature should list the proper name the wiki uses, e.g. "An elemental warrior" not "Elemental Warrior".
 - **Already shipped:** Drops by Creature exists; wiki pack copy uses wiki names in edit text.
 - **Checked:** not grepped this run for article stripping. Hypothesis, unchecked -- display name drops leading A/An/The or title-cases, so it no longer matches the wiki page title.
+- **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply. "Elemental Warrior" vs in-game/wiki "An Elemental Warrior" "sounds like the same class of bug that hit the wiki pack itself in #65 (Spiroc Lord, the resolver recording the requested title instead of the title actually served)." Hypothesis, unchecked -- the pack fix may have covered pack output, not the Drops window display; two code paths reading the same name. Do not restore #65.
 
 ### Drops by Creature still shows wiki-missing after the page was corrected
 - **Priority:** waiting
@@ -56,6 +57,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker.
 - **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
 - **Follow-up Aug 21, 8:29 AM CT:** LeBigNasty screenshot (filename 092734). Did not reply (already filed; David/Claude share the bot account). Creature headings in yellow. Red diamond = wiki-missing. Named as already on wiki drop tables: Apothic Warband +4 (Fetid fiend -- 4 kills, x1 25%), Cryosilk Amice +4 (Spinechiller spider -- 2 kills, x1 50%), Imbrued Platemail Gauntlets +4 (Worry wraith -- 1 kill, x1 100%). Also red-diamond in the same shot: Fetid Skin, Fire Opal, Mote of Major Potential, Crystallized Sulfur. Eyerazzia +4 and Flayed Turmoilskin Belt +4 have no diamond. Reporter: "not sure if you are checking against cached versions or not accounting for +". Hypothesis, unchecked -- matcher compares the +N item name to a wiki row without the plus, or a cached wiki snapshot.
+- **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply (Claude already answered Step 2). Missing flags not clearing after a wiki correction and the +tier false positives in the 092734 screenshot "might be one root cause rather than two separate bugs." Back in #65, "the comparison was confirmed to run against a 7-day per-page cache on the user's machine — so a wiki edit takes up to a week to reach the flags, immediate only for pages you haven't viewed recently." A per-page re-check button was queued then and he does not see it in the changelog. Hypothesis, unchecked -- data source is that 7-day per-page cache, not a live wiki read. Do not restore #65; this is evidence on this item.
 
 ### wiki pack copy copies the whole list, not one creature
 - **Priority:** waiting
