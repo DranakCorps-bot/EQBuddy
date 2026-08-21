@@ -8,6 +8,67 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-21 (latest): a bug-fix sweep, and the V2 routing used for the first time
+
+**1.99.1 is built and NOT released** — `Directory.Build.props` says 1.99.1 with a What's-new
+entry. Gates: **2,269 unit + 264 Avalonia**. Waiting on David's go.
+
+### What the sweep produced
+
+- **#228 (joeymavity) — a cleared respawn timer stays cleared. FIXED.** The previous handoff
+  could only say "something re-creates it"; it is `LogWatcher.Select`, which is a **full-file
+  ingest**. Every kill line replays through `Apply`, and `Upsert` had nothing to consult, so
+  it rebuilt the timer from the very kill that had just been dismissed. "Randomly" is the
+  restart. `Clear` now records WHICH kill was dismissed and persists it in a sibling file.
+  Trap 20's family again: state removed, decision not kept.
+  **Two mistakes worth remembering from doing it:** the dismissal must key on the kill's own
+  timestamp (a replay hands you that same `KilledAt`; the click time lets an earlier kill walk
+  back in), and it must AGE OUT on when the player decided, not on the kill — pruning on the
+  kill time discards a dismissal of an old kill the instant it is made. Its own test caught
+  that.
+- **#101 (Frankthetankk) — the automatic achievements import obeys the auto-grant guard.**
+  It always did; nothing said so. Now `OutputfileAutoImportTests` runs the AUTOMATIC path
+  against wizen's three-way dump. Verified by disabling the guard and watching it fail.
+- **#173 (KoboldCoterie) — closed.** Force-disabling block compositing on KWin was his own
+  fix; the thread produced trap 12 along the way.
+- **#109 follow-up and #226 — investigated, NOT built. Both are `FABLE.md` stubs.**
+
+### The V2 routing, used for real — read this before taking either stub
+
+Two items are in `FABLE.md`, both `waiting` on a Fable 5 plan and David's `approved`.
+**Do not implement them without that.** Both carry confirmed causes, and both record where
+the *obvious* fix is a trap:
+
+1. **Per-page wiki re-check (#226).** Cause confirmed: `EqlWikiMobs.CacheLifetime` and
+   `EqlWikiItems.CacheLifetime` are both `FromDays(7)`, so correcting a wiki page — the thing
+   the ✦ marker *asks* the player to do — cannot clear the flag for a week. The `+N` tier
+   theory is disproved. V2 because it puts on-demand network I/O behind a cache-only surface
+   and could burst requests at a volunteer wiki.
+2. **Plane of Sky spawn types (#109).** Sky **is** in `RaidTargets.json`; `The Spiroc Lord`
+   and `Bazzt Zzzt` are listed while `The Spiroc Guardian` and `Bzzzt` are not — exactly the
+   two in the screenshot. **Do not just add them:** that list also drives the Raids card and
+   means "raid target you can clear", so it would list trash as raid bosses (trap 4). The
+   domain is missing `chained` and `player-triggered` spawn types.
+   **Waiting on the reporter** for the zone-enter line a personal Sky instance prints —
+   `IsInstancedZoneName` only knows `"<zone> N (Adjective)"` and `"- Solo|Group"`, and if Sky
+   matches neither, the zone-level rule can never fire there.
+
+`FABLE-FEEDBACK.md` asks Fable to say where the V2 line actually sits. That question is open
+and it matters more than either stub.
+
+### Still open
+
+- **#210** (liminalwarmth) — the Sky tracker's lost cross-class workflow.
+- **`docs/proposals/InlineThemes.md`** — decided in shape, nothing built. `FABLE.md`-class.
+- **#222's open question** — bjstrange has been told the pull is a snapshot request rather
+  than the native reload, and invited to say if the difference is felt. Waiting on him or Bevel.
+- Eight feature-request discussions await a reply: #217, #224, #208, #114, #159, #120, #94,
+  #185. None are bugs; none have been answered this round.
+- **`LogWatcher.FinishInitialIngest`** `ObjectDisposedException` at shutdown; `LanAddresses()`
+  on Tailscale; `LogParser.cs` at 14 ratchet lines.
+
+---
+
 ## 2026-08-21 (latest): 1.99.0 IS RELEASED, AND THE OPERATING MODEL CHANGED
 
 `v1.99.0` is **shipped** — signed as `CN=FlossworksCross-Stitch`, verified and timestamped,
