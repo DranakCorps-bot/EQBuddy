@@ -44,22 +44,52 @@ and diffs as correct:
 4. **"Shopping list" was undefined jargon** with no in-app route: *"we have no idea what
    that is."*
 
-### What is next, in order
+### THE AGREED PLAN (David, 2026-08-20): Kills & Drops → Avalonia parity → SHIP
 
-1. **AVALONIA PARITY — the biggest outstanding debt.** That build has the toolbar fix and
-   nothing else: no Inventory tab, no Wishlist rename in its own window, no import report.
-   **`EQBuddy.Avalonia/MainWindow.cs` has ~25 ratchet lines**, so the gear-checklist lift
-   out of that file comes FIRST, with `WidgetRenderTests` assertions written before anything
-   moves — no E2E on that build.
-2. **`GearCardView`'s 320px `MaxHeight`** is a card-sized cap now living in an 880px window.
-   Flagged to David; he has not hit it yet.
-3. **The Raids surface stores its auto-import outcome but never renders it.** `ImportReportView`
-   exists and is wired only to Gear.
-4. Drops and Items as tabs — still named-but-unhosted in `LootSurface`.
+*"Let's do Kills and Drops too, verify, and then ship everything along with the Avalonia
+parity."* One release carrying all of it. Do the steps in this order — each one is a
+prerequisite for the next, not a preference.
 
-**David on Kills → Progress (asked 2026-08-20):** answered no, with reasons — Kills is live
-while Progress is retrospective, and it is already slotted into the Live Meters theme with
-the two cards it belongs with. Not a decision he made; a recommendation he has not answered.
+**1. Kills & Drops — the small fold, do it first while it is cheap.**
+`Core/CreatureSurface.cs` in the shape of `LootSurface`: two tabs, `Kills` and `Drops`,
+keys `kills` and `drops`. Kills is already an `IWidgetCard`; `DropsWindow` needs its body
+lifted the way `GearLockerWindow` was (that lift is the worked example, 2026-08-20 —
+build its own `Body`, leave the window chrome behind, and **do not bring a `ScrollViewer`
+with it**, trap 36). The Kills card becomes the launcher and keeps the slot; `Drops by
+creature…` comes off the cog. **Both are about the CREATURE** — what died and what it
+dropped — which is why this is a theme and not two cards.
+→ Drops must also be **removed from `LootTab`**, where it is still named-but-unhosted. It
+was never really Gear & Loot's: Drops is about the mob, not your bags.
+
+**2. Avalonia parity — the debt, and the reason it is second.** That widget has the
+toolbar fix and nothing else from today: no Inventory tab, no import report, no Wishlist
+rename in its own surfaces. **`EQBuddy.Avalonia/MainWindow.cs` has ~25 ratchet lines**, so
+the gear-checklist lift out of that file comes FIRST — ~275 contiguous lines
+(`BuildGearSection`, `RenderGearChecklist`, `GearRow`, the auto-check marks), exactly what
+WPF lifted into `GearCardView`. **No E2E on that build**, so pin the behaviour in
+`WidgetRenderTests` BEFORE moving anything; `TheGearCardOffersTheByZonePivot` and
+`TheGearCardHandsOverTheInventoryCommand` are two of those pins already.
+Doing Kills & Drops first is deliberate: it adds nothing to that file, so it does not make
+the ratchet worse while you are working toward it.
+
+**3. Ship.** `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.98.1` — but **only on
+David's explicit go at that moment**; the go above is for the WORK, not the release, and
+1.98.0's go did not carry forward either. Wait for the `Release assets` workflow before
+telling anyone it shipped (it attaches the Linux/macOS builds a couple of minutes after
+the tag, and `release.ps1` prints "published" before that finishes). The What's-new entry
+for 1.98.1 already exists and covers the auto-import, the Wishlist rename, the landscape
+window and the phone's selectable command — **add Kills & Drops and the Inventory merge
+to it before releasing.**
+
+### Also outstanding, smaller
+
+1. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now living in an 880px window
+   (trap 36's second half). Flagged to David; he has not hit it.
+2. **The Raids surface stores its auto-import outcome and never renders it.**
+   `ImportReportView` exists and is wired only to Gear.
+3. **Items** as a Gear & Loot tab — still named-but-unhosted.
+4. Mobile: whether Inventory/Locker become phone screens is an open design question, not a
+   bug. The phone's screen picker is not a widget card list.
 
 ---
 
