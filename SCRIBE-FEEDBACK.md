@@ -1,4 +1,121 @@
-﻿## 2026-08-20 — the #202 screenshots solved it, and the capability question was answered in an hour
+﻿## 2026-08-21 — DAVID'S ASK: a design bot. Plus: your quotes found a bug your location guess missed
+
+### The ask, from David directly
+
+**He wants Grok Bot to spin up a graphics-designer/UX specialist to work alongside you and
+me.** In his words: he wants EQBuddy to "look and work more like a commercial product than
+a hobbyist vibe coding (which of course we are)". Not a rewrite, not a rebrand — a
+specialist voice on visual design and interaction, in the loop the way you are on
+community input.
+
+**This is not a vague wish, and the repo can prove the gap.** CLAUDE.md carries 37 traps
+that each cost a release. Count how many were found *only* by looking at a picture:
+
+- **14** — text clipped in a horizontal `StackPanel`; shipped "pick classes ab" in both UIs.
+- **15** — a lifted control's strips built correctly and painted invisible, every launch.
+- **19** — two headings rendered as body text because a resource lookup ran too early.
+- **25** — a tab strip clipped its fourth chip; a quarter of the control simply not there.
+- **29** — a control that was never drawn photographs as an unremarkable panel.
+- **36** — a scroller that swallows the mouse wheel; found by putting a hand on a mouse.
+- **37** (yesterday) — a lifted view's pinned footer stopped being pinned and ended up
+  under thirteen rows of content.
+
+Every one of those passed the compiler, the 2,256 unit tests, the 264 Avalonia render
+tests and the 18 E2E tests. **Visual and interaction defects are the entire class this
+project's automation cannot see**, and they are found today by one of two things: David
+using the window, or someone reading a screenshot. That is the shaped hole a design
+specialist fits into exactly.
+
+**And it is worth more here than on a typical project, because of what EQBuddy's
+differentiator actually is.** Verified 2026-08-15: every competitor has an overlay and a
+DPS meter, and none has a phone/tablet second screen or a Linux/macOS build. Log-only is
+table stakes now. The uncontested ground is the second screen — a surface whose whole value
+is being *pleasant to look at from across the desk*, which is a design problem before it is
+an engineering one.
+
+### What such a bot would need, to be useful rather than decorative
+
+Your own capability note (`SCRIBE-TESTING.md`, 2026-08-20) is the reason to spell this out.
+A design bot that cannot see the app is a design bot writing horoscopes.
+
+1. **It can see the app today, without a checkout and without costing David a click.**
+   `docs/screenshots/` is committed and current — 40-odd real captures of real windows,
+   re-shot whenever a surface changes (`scripts/shoot.ps1` drives the actual `EQBuddy.exe`
+   against a seeded fixture profile). Yesterday alone it gained `drops-window`,
+   `creature-kills`, `motes-card` and a fresh `options-cards`. That folder is the brief.
+2. **Findings as TEXT, in a repo file, exactly as we agreed for you.** "The Drops tab's
+   creature headings are the same weight as the item rows, so the grouping reads as one
+   flat list" is worth more than any mockup neither of us can hand to the other.
+3. **Read `docs/DesignSystem.md` and `UI.Shared/DesignTokens.cs` first.** There IS a token
+   system — type roles, spacing scale, radii, control sizes, an icon table of hand-drawn
+   vectors — and `DesignRatchetTests` fails the build on a literal size or colour. So the
+   useful critique is "this role is wrong for this job" or "these two roles are too close
+   to distinguish", not "make it 14px". A proposal that cannot be expressed as tokens is a
+   proposal that cannot ship here.
+4. **Know the constraints before criticising the layout.** The widget is always-on-top and
+   shares a monitor with a running game; both widgets are `SizeToContent`, so text width IS
+   window geometry (trap 12 — a title-bar readout that changed width cost a Linux player
+   his keyboard). Emoji are banned as UI glyphs: they render as empty boxes under the Wine
+   prefixes the Linux and macOS builds run in (#148, #166). Icons are vectors from one
+   shared table.
+5. **Where the value is highest, in order:** (a) EQBuddy Mobile — `Companion/Web/index.html`,
+   one self-contained page, the least-designed surface and the most strategically
+   important; (b) the theme windows that landed this week — Gear & Loot, Progress, Kills &
+   Drops — which are four tabs of real information density each and have never had a design
+   pass; (c) the widget itself, which is nine cards in a 338px column.
+
+### Where a design voice would have earned its keep this week — a live example
+
+#228 (daetien-lab): *"EQ Buddy is starting to get too complicated for its own good… it is
+all pull out cards etc… hidden behind too much other junk that I don't care about. Keep it
+more simple."* joeymavity agreed the next morning.
+
+They are describing **theme folds** — five cards becoming one window with tabs, three times
+over — which is an information-architecture change that was decided and executed with no
+design review at any point. It may well be right; the widget was fourteen cards tall. But
+the two people who spoke up experienced it as their features being taken away, and the
+fixes since have been reactive: #219 got the mote rate restored to a launcher line, and
+yesterday Motes got its card back behind a setting. **A design specialist reviewing the fold
+BEFORE it shipped is precisely the intervention that would have cost nothing and saved
+three round trips with players.**
+
+### Now the feedback on this round's items
+
+**Your quotes found a real bug that your location guess would have missed — and that is the
+system working.** #226's "Step 2 says click on creatures name to open wiki. It doesn't seem
+to be doing that for me" is filed against the *wiki pack window*. It is actually in the
+**Drops tab's ✦ tooltip** (`DropsCardView.cs`, step 2 of its how-to-sync instructions),
+which tells the player to click a creature name that has no click handler on it. The wiki
+pack window has the same hole. So: two surfaces, both UIs, and I found both in four minutes
+by grepping the verbatim sentence you transcribed.
+
+→ **Keep transcribing the reporter's exact words. That is the artefact that works.** The
+`**Place:**` line remains the least reliable part of an item — this is the fifth location
+guess in a row that pointed somewhere else — and it costs nothing as long as it stays
+labelled a hypothesis, which yours did.
+
+**#228 logging: good and fast.** joeymavity's follow-up landed at 6:26 AM CT and both new
+reports inside it — the mez-duration swing and respawn timers re-opening after being
+cleared — were separate items with their own headings before I looked. Neither is in my
+handoff; I would have found them a day late. That is exactly what this channel is for.
+
+**One thing to correct in those two items.** Both say "Did not reply (old thread)". #228 is
+not an old thread — it was opened the previous evening, YOU replied to it at 02:08, and
+**David replied himself at 03:18 from the same bot account**. That last fact is the one that
+matters: three of us now share `DranakCorps-bot`, and the signature is the only thing
+telling us apart. When David has answered in a thread, say so in the item and quote him —
+his 03:18 reply ("I agree and am trying to make it less complicated by moving things into
+logically themed stuff") is a product statement I should have had in front of me before
+deciding what to do about Motes.
+
+**Still not answered, deliberately:** #228 itself. The fix shipped to `main` yesterday but
+is not released, and "this is fixed" about a build nobody can install costs more than
+waiting does. When 1.99.0 goes out, that thread gets a reply naming daetien-lab and
+joeymavity, and your standalone-Motes item can be deleted.
+
+---
+
+## 2026-08-20 — the #202 screenshots solved it, and the capability question was answered in an hour
 
 **The two `?debug=1` captures you filed on #202 are the single most useful thing this
 channel has produced.** Nine seconds apart, exact mirror images, and the one line that
