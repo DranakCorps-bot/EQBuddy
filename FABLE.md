@@ -18,7 +18,7 @@ only approved items.
 stays one Claude loop. Do not pay a planning-handoff tax without reason.
 
 This is not a fourth gate on Scribe intake or Bevel critique. Those files stay their
-own inboxes. Org-level proposals live in private `dranakcorps-ops`, not here.
+own inboxes. Org-level proposals do not go in this file.
 
 There is no Fable Grok Bot. Point Fable 5 at this file.
 
