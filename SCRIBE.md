@@ -27,6 +27,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** "Bring motes back as its own top-level card, behind a setting if needed." At-a-glance motes and motes/hour, not behind a Progress/Wealth tab.
 - **Already shipped:** WhatsNew: MOTES had its own card; Progress theme (2026-08-19) absorbed Progress, Money, Motes, Faction, Raids. ROADMAP: fewer definitions, not fewer cards.
 - **Checked:** not grepped this run for the setting. Hypothesis, unchecked -- there is no toggle to undock Motes from Progress.
+- **Also:** #228 daetien-lab Aug 20, 8:43 PM CT (1.98.0). Replied 2026-08-20 (Scribe). "I simply want to track my mote drops in the main window, but now it is hidden behind too much other junk that I don't care about. Keep it more simple." Same ask as this item (motes visible on the main window, not behind Progress / pull-out cards). Broader simplicity complaint is the reason, not a second heading.
 
 ### wiki pack Step 2 click on creature name doesn't open wiki
 - **Priority:** must-fix
@@ -137,6 +138,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Place:** wiki contribution pack. Desktop contribution surface, not Gate 5.
 - **Source:** #217 Frankthetankk Aug 19, 12:58 PM CT. Old thread — did not reply.
 - **Also:** #226 LeBigNasty Aug 20, 5:12 PM CT (1.98.0). "It would be nice if you could filter out motes and things that can drop from everyone. For things like common drops like gems, it would be nice if the user can filter those out or right click to ignore." Motes corroborate this item. Gems/common-drop ignore is extra; not a second heading yet.
+- **Follow-up Aug 20, 8:55 PM CT:** Frank on #226 and #217. Motes: exclude from pack suggestions (wiki Mote Guide; not creature-specific). Common drops/gems: wiki admins pushed back on omitting as a category; hide-from-my-view vs omit-from-wiki. Not a second heading. Did not reply (old threads).
 - **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
 - **Already shipped:** unknown whether the pack currently emits motes.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
