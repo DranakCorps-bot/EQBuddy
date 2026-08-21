@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Progress" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
         Width="520" WindowStartupLocation="Manual">
     <!-- The PROGRESS THEME (docs/Themes.md; David ruled themes a direction on
          2026-08-19: "part of the major UX revamp that organizes everything much

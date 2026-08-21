@@ -59,6 +59,7 @@ public partial class ProgressWindow : Window
         _settings = main.Settings;
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "progress", _settings, baseWidth: Width);
+        WindowZoom.AllowResize(this, "progress", _settings);
 
         var surfaces = main.NewProgressSurfaces();
         (_experience, _money, _motes, _faction, _raids) =

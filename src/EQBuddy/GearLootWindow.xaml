@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Gear &amp; Loot" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
         Width="880" WindowStartupLocation="Manual">
     <!-- The GEAR & LOOT theme (docs/Themes.md). Named by David on 2026-08-20 over the
          plan's "Loot & Items": it names the two things actually in it.

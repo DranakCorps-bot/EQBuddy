@@ -69,7 +69,13 @@ public class DeadSettingTests
         // Listed so that stays a decision someone made rather than something nobody
         // noticed. If any of these deserves an Options control, that is a feature.
         ["CursorRingSize"] = "no UI by design — edit settings.json",
-        ["CompanionPort"] = "no UI by design — edit settings.json",
+        // CompanionPort LEFT this list on 2026-08-21, and how it got here is the lesson.
+        // "No UI by design" was true and harmless right up until the pairing dialog told a
+        // player "Change the port and try again" — naming an action the app does not offer,
+        // on the one screen where the feature was already failing. A read-only setting is
+        // fine until something tells someone to write it.
+        // It has a writer now: a refused port falls back to one the OS gives, and the
+        // fallback is remembered.
         ["CompanionHiddenSurfaces"] = "no UI by design — edit settings.json",
         ["UpdateFolder"] = "no UI by design — edit settings.json",
         ["WineFloatOverFullscreen"] = "no UI by design — Wine/Proton escape hatch",

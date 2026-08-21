@@ -141,8 +141,14 @@ public sealed class CompanionWindow : Window
     private void Refresh()
     {
         _pairPanel.Visibility = _host.Running ? Visibility.Visible : Visibility.Collapsed;
-        _errorLine.Text = _host.LastError ?? "";
-        _errorLine.Visibility = _host.LastError is null ? Visibility.Collapsed : Visibility.Visible;
+        // A NOTICE shows in the same line as an error but is not one: today it is only
+        // "the port you asked for was refused, so I took another". Falling back silently
+        // would be a feature quietly behaving differently from what settings.json says.
+        var line = _host.LastError ?? _host.Notice;
+        _errorLine.Text = line ?? "";
+        _errorLine.Visibility = line is null ? Visibility.Collapsed : Visibility.Visible;
+        _errorLine.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty,
+            _host.LastError is null ? "DimBrush" : "BadBrush");
         _enable.IsChecked = _host.Running;
 
         if (_host.PairingUrl is { } url)

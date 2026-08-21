@@ -26,6 +26,9 @@ internal static class WindowZoom
     {
         if (window.Content is not FrameworkElement root) return;
         Apply(root, settings.WindowZooms.TryGetValue(key, out var saved) ? saved : 1.0);
+        // A width the player dragged to becomes the new base; the zoom still multiplies it.
+        baseWidth = WindowSizing.BaseWidth(
+            settings.WindowBaseWidths.TryGetValue(key, out var storedW) ? storedW : null, baseWidth);
         ApplyWidth(window, baseWidth, settings.WindowZooms.TryGetValue(key, out var w) ? w : 1.0);
         window.PreviewMouseWheel += (_, e) =>
         {
@@ -44,6 +47,66 @@ internal static class WindowZoom
     {
         if (double.IsNaN(baseWidth)) return;
         window.Width = Math.Round(baseWidth * zoom);
+    }
+
+    /// <summary>
+    /// Let a theme window be RESIZED, and remember the size.
+    ///
+    /// All four shipped `ResizeMode="NoResize"` because they draw their own chrome, and
+    /// nobody put the resize back — David found it on 2026-08-21 trying to make the Kills
+    /// &amp; Drops tab short enough to scroll. A review surface that decides for you how
+    /// much screen it is worth is the wrong shape for a review surface.
+    ///
+    /// **It lives here because this class already owns width.** Ctrl+wheel sets
+    /// `Width = baseWidth x zoom` on every step, so a second thing writing Width would be
+    /// two owners of one value. A drag therefore stores a new BASE width and the zoom goes
+    /// on multiplying it; UI.Shared/WindowSizing does the arithmetic and the sanity checks,
+    /// where they are unit-tested.
+    ///
+    /// SizeToContent is cleared on the first layout pass, not at attach: these windows open
+    /// at their natural content height by design, and clearing it earlier would open them
+    /// at whatever XAML happened to say. After that the player owns the height.
+    ///
+    /// Persisted on CLOSE, not per drag: a save writes the whole settings file from the
+    /// snapshot taken at load (trap 13), and doing that on every mouse-move would be a
+    /// writer fighting every other writer in the app.
+    /// </summary>
+    public static void AllowResize(Window window, string key, AppSettings settings)
+    {
+        window.ResizeMode = ResizeMode.CanResize;
+        window.MinWidth = Math.Max(window.MinWidth, WindowSizing.MinWidth);
+        window.MinHeight = Math.Max(window.MinHeight, WindowSizing.MinHeight);
+
+        if (settings.WindowHeights.TryGetValue(key, out var savedHeight)
+            && WindowSizing.IsSaneHeight(savedHeight))
+        {
+            window.SizeToContent = SizeToContent.Manual;
+            window.Height = savedHeight;
+        }
+        else
+        {
+            // Open at the natural height once, then hand the axis over.
+            window.ContentRendered += Release;
+        }
+
+        window.Closed += (_, _) =>
+        {
+            var zoom = settings.WindowZooms.TryGetValue(key, out var z) && z > 0 ? z : 1.0;
+            if (WindowSizing.BaseWidthToStore(window.Width, zoom) is { } basis)
+                settings.WindowBaseWidths[key] = basis;
+            if (WindowSizing.HeightToStore(window.ActualHeight) is { } h)
+                settings.WindowHeights[key] = h;
+            settings.Save();
+        };
+
+        void Release(object? sender, EventArgs e)
+        {
+            window.ContentRendered -= Release;
+            // ActualHeight is the measured one; assigning it before clearing SizeToContent
+            // is what stops the window snapping to its XAML height for a frame.
+            if (window.ActualHeight > 0) window.Height = window.ActualHeight;
+            window.SizeToContent = SizeToContent.Manual;
+        }
     }
 
     /// <summary>For windows whose scale already lives in a named setting: wheel just

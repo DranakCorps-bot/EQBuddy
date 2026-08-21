@@ -47,6 +47,7 @@ public partial class CreatureWindow : Window
         // is "drops" rather than a new one, so anyone who had zoomed the Drops window
         // keeps their zoom through the fold — the same courtesy the card keys get.
         WindowZoom.Attach(this, "drops", _settings, baseWidth: Width);
+        WindowZoom.AllowResize(this, "drops", _settings);
 
         _drops = new DropsCardView(main);
 

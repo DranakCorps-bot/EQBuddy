@@ -44,6 +44,7 @@ public partial class QuestsWindow : Window
         _settings = main.Settings;
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "quests", _settings, baseWidth: Width);
+        WindowZoom.AllowResize(this, "quests", _settings);
         _tabs = new EqSegmentedStrip(TabStrip);
         _classes = new EqSegmentedStrip(ClassStrip);
         _modes = new EqSegmentedStrip(ModeStrip);

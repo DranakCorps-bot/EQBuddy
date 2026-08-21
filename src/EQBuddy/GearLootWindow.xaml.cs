@@ -44,6 +44,7 @@ public partial class GearLootWindow : Window
         _settings = main.Settings;
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "gearloot", _settings, baseWidth: Width);
+        WindowZoom.AllowResize(this, "gearloot", _settings);
 
         _loot = new LootCardView(main, _settings);
         _gear = main.NewGearCard();

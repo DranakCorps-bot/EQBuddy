@@ -116,6 +116,11 @@ public sealed class CompanionHost : IDisposable
     /// pairing window to show honestly; null when all is well.</summary>
     public string? LastError { get; private set; }
 
+    /// <summary>Something worth SAYING that is not a failure — today, only "the port you
+    /// asked for was refused so I took another one". Separate from LastError because the
+    /// pairing UI paints that in red and asks the player to act, and this needs neither.</summary>
+    public string? Notice { get; private set; }
+
     /// <summary>Raised (possibly on a worker thread) when a phone connects/drops.</summary>
     public event Action? ClientsChanged;
 
@@ -183,28 +188,72 @@ public sealed class CompanionHost : IDisposable
         // fresh settings file — is now the only thing between a dormant feature and a
         // listening port.
         LastError = null;
+        Notice = null;
         _settings.CompanionToken ??= MintToken();
+
+        var wanted = _settings.CompanionPort;
+        if (TryListen(wanted)) { _lastSections = []; return; }
+
+        // A TAKEN PORT IS NOT A DEAD END, since 2026-08-21.
+        //
+        // David ticked Enable and got "Couldn't listen on port 47998 ... Change the port and
+        // try again." Nothing on his machine owned that port in ANY table — not netstat in
+        // any state, not an HTTP.sys reservation, not the excluded-port ranges — and yet no
+        // process could bind it on any address, 0.0.0.0 included. A kernel-level reservation
+        // from a driver or tunnel: nothing EQBuddy can detect, argue with, or fix.
+        //
+        // Worse, "change the port" named an action the app does not offer: CompanionPort is
+        // in no Options screen and no dialog. That is a surface naming a task and handing
+        // over no way to do it, which is the defect this project has now paid for three
+        // times (the Gear tab, the wiki-pack Step 2 click, and this).
+        //
+        // So: ask the OS for one it WILL give us. The pairing URL carries the port anyway -
+        // a phone scans whatever it is handed — so a fixed number was only ever buying a
+        // stable QR between sessions, which is worth much less than the feature working.
+        if (TryListen(0))
+        {
+            var got = _server!.Port;
+            _settings.CompanionPort = got;
+            _settings.Save();
+            Notice = $"Port {wanted} was refused by Windows, so EQBuddy Mobile is on "
+                   + $"port {got} instead. Nothing to do — the code below already has it.";
+            _lastSections = [];
+            return;
+        }
+
+        LastError = $"Couldn't listen on port {wanted}, or on any port Windows offered "
+                  + $"({_lastListenError}). If you use a VPN or virtual-machine networking, "
+                  + "it may be holding the range.";
+        _lastSections = [];
+    }
+
+    /// <summary>One bind attempt. Returns false and remembers why rather than throwing, so
+    /// Start can try again on a port the OS chooses.</summary>
+    private bool TryListen(int port)
+    {
         try
         {
             var server = new CompanionServer(new CompanionServerOptions
             {
                 Token = _settings.CompanionToken,
-                Port = _settings.CompanionPort,
+                Port = port,
             });
             server.ClientsChanged += () => ClientsChanged?.Invoke();
             server.ActionReceived += action => _actions.Enqueue(action);
             server.MapActionReceived += action => _mapActions.Enqueue(action);
             server.Start();
             _server = server;
+            return true;
         }
         catch (Exception ex)
         {
             CoreLog.Error(ex);
-            LastError = $"Couldn't listen on port {_settings.CompanionPort} — {ex.Message} " +
-                        "(is another program using it? Change the port and try again.)";
+            _lastListenError = ex.Message;
+            return false;
         }
-        _lastSections = [];
     }
+
+    private string _lastListenError = "";
 
     private void Stop()
     {

@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Quest Tracker" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
         Width="880" WindowStartupLocation="Manual">
     <!-- Gate 2 of the UI/UX rework (docs/DesignSystem.md). Same FUNCTIONS as the card
          stack this replaces — nothing was added, removed or rewired — laid out as

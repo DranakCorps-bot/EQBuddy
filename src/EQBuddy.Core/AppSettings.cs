@@ -44,6 +44,20 @@ public sealed class AppSettings
     /// "breakout:Damage", …) — the universal text-scaling answer (discussion #59;
     /// David: "a more permanent scaling solution").</summary>
     public Dictionary<string, double> WindowZooms { get; set; } = new();
+
+    /// <summary>Per-window BASE width, keyed the same way as <see cref="WindowZooms"/> -
+    /// the width a theme window opens at before the zoom multiplies it. Written when a
+    /// player drags the window's edge, read on the next open.
+    ///
+    /// A base rather than the actual width, deliberately: the zoom already owns the final
+    /// number (Width = base x zoom), and storing the multiplied value would compound every
+    /// session until the window walked off the screen. See UI.Shared/WindowSizing.</summary>
+    public Dictionary<string, double> WindowBaseWidths { get; set; } = new();
+
+    /// <summary>Per-window height, same keys. Only the theme windows use it: they size to
+    /// their content until a player resizes one, after which their choice is the height.
+    /// The zoom never touches height, so this is its only writer.</summary>
+    public Dictionary<string, double> WindowHeights { get; set; } = new();
     /// <summary>Opacity of the widget's background panel only — text stays fully opaque.</summary>
     public double BackgroundOpacity { get; set; } = 0.95;
     /// <summary>Re-lift EQBuddy's windows above later-created topmost overlays every few

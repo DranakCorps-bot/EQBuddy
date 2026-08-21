@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Kills &amp; Drops" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
         Width="880" WindowStartupLocation="Manual">
     <!-- The KILLS & DROPS theme (docs/Themes.md). David's grouping, 2026-08-20, and it
          corrected mine: I had put Kills into Live Meters with Combat and Healing, and he

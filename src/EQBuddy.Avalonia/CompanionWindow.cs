@@ -162,8 +162,12 @@ public sealed class CompanionWindow : Window
     private void Refresh()
     {
         _pairPanel.IsVisible = _host.Running;
-        _errorLine.Text = _host.LastError ?? "";
-        _errorLine.IsVisible = _host.LastError is not null;
+        // See the WPF twin: a notice is not an error, and a silent fallback would be a
+        // feature quietly behaving differently from what settings.json says.
+        var line = _host.LastError ?? _host.Notice;
+        _errorLine.Text = line ?? "";
+        _errorLine.IsVisible = line is not null;
+        _errorLine.Foreground = _host.LastError is null ? AppTheme.DimBrush : AppTheme.BadBrush;
         _enable.IsChecked = _host.Running;
 
         if (_host.PairingUrl is { } url)
