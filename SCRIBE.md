@@ -16,13 +16,44 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### I would find it useful to know what drops I need by boss
+- **Priority:** waiting
+- **Place:** Kills & Drops / Drops by Creature. Desktop. Fits the loot to quest to bag link of the chain. Not Gate 5 overlay. Not a group meter.
+- **Source:** #230 eddyystop Aug 21, 4:50 PM CT. Replied 2026-08-21 (Scribe). Footer: EQBuddy 1.87.0 · Windows 19045.
+- **Ask:** for a given boss, show which drops the player still needs (so they can hope while staring at the boss, leave behind what they do not need, and skip bosses).
+- **Already shipped:** WhatsNew: Kills and Drops by Creature are one window (Kills & Drops) with a tab each. Loot surfaces have the quest marker. Reporter is on 1.87.0.
+- **Checked:** not grepped this run for a need-filter on the Drops tab. Hypothesis, unchecked -- Drops by Creature lists drops for the creature; it does not filter that list to items this character still needs (quest, bag, or Sky checklist).
+
+### auto achievement import vs the #101 token/confirm guard
+- **Priority:** waiting
+- **Place:** achievement import. Sky checklist. Not Gate 5.
+- **Source:** #101 Frankthetankk Aug 21, 5:50 PM CT. Did not reply (old thread; Claude is in it).
+- **Ask:** v1.98.1 automatic reading of /outputfile achievements (game dump-announcement line, per-import undo) — does that path use the same token/confirm guard as the manual Import achievements menu, or can it bypass the check this thread just fixed.
+- **Already shipped:** #101 token vs confirm vs never-unlocked guard. Claude 2026-08-20: both granted cases skipped as "Skipped — auto-granted, not earned."
+- **Checked:** not grepped this run for the auto /outputfile path. Hypothesis, unchecked -- two import triggers (menu vs dump-announcement) may not share the same guard.
+
 ### Mobile page doesn't allow refresh when only 1 card is selected
-- **Priority:** must-fix
+- **Priority:** taken / shipped-on-tag. v1.99.0 (5d2922d, Aug 21, 4:47 PM CT). Helm signed it 6:13 PM CT. Same ticket. Not a new heading. No GitHub victory lap unless David says.
 - **Place:** EQBuddy Mobile. Not Gate 5. Hypothesis -- the one-card / solo fill surface, not a new card.
 - **Source:** #222 bjstrange Aug 20, 10:56 AM CT. Replied 2026-08-20 (Scribe). Bounce Aug 21, 1:58 PM CT (Keel / Helm design QA). Did not post on GitHub. Did not restore as a new heading.
 - **Ask:** pull-down refresh should work when only one card is selected, the same as with two or more. Any single card, including map-as-only-card.
-- **Already shipped:** pull-down refresh works with 2+ cards. Claude took this 8:52 AM CT and answered #222 as on main, not released. Current main is not the #222 ship.
+- **Already shipped:** pull-down refresh works with 2+ cards. Bounce misses (subscribe snapshot; map pull from heading, pan on the map) are on the v1.99.0 tag.
 - **Bounce (same ticket, not a new item):** two misses only. Do not pair #227, #223, motes, or Progress. Keep solo fill. (1) Release/pull must ask the PC for a fresh snapshot of the visible surface. `location.reload()` is the wrong verb. Do not replace it by painting `latest` again. Leave staleAfterUpdate reload alone (version-change job, not the pull). (2) Map as the only card still needs a pull. Pan wins on the map. Chrome (header / ZONE MAP title) owns the pull. Do not skip PTR because pan exists. Do not disable pan to make PTR work. Hypothesis, unchecked against the app -- the fills early-return is the miss. Verify; do not treat this wording as the patch.
+- **Shipped:** v1.99.0 (5d2922d, 4:47 PM CT). Subscribe snapshot (not location.reload, not paint latest). Map-as-only-card: pull from heading chrome, pan wins on the map. Bevel tag audit + Helm ship-sign. Do not delete this heading until Claude takes it. Do not pair motes. No GitHub victory lap unless David says.
+
+
+### standalone Motes card (configurable)
+- **Priority:** authorized-next / still-wrong (not this sprint). When David wants motes, not this lab. Helm 6:13 PM CT: keep this item. Do not draft a player "motes are back" reply — default-off is still wrong on v1.99.0.
+- **Place:** Progress theme. Not Gate 5 overlay. Not a group meter.
+- **Source:** #227 typical-usual-chaos Aug 20, 7:00 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
+- **Ask:** "Bring motes back as its own top-level card, behind a setting if needed." At-a-glance motes and motes/hour, not behind a Progress/Wealth tab.
+- **Already shipped:** WhatsNew: MOTES had its own card; Progress theme (2026-08-19) absorbed Progress, Money, Motes, Faction, Raids. ROADMAP: fewer definitions, not fewer cards. Claude shipped a Motes card on v1.99.0 off by default.
+- **Also:** #228 daetien-lab Aug 20, 8:43 PM CT (1.98.0). Replied 2026-08-20 (Scribe). "I simply want to track my mote drops in the main window, but now it is hidden behind too much other junk that I don't care about. Keep it more simple." Same ask as this item (motes visible on the main window, not behind Progress / pull-out cards). Broader simplicity complaint is the reason, not a second heading.
+- **Also:** #229 Ceasar29 Aug 20, 11:11 PM CT (1.98.0). Replied 2026-08-21 (Scribe). "the motes aren't showing up... It isn't on the bars and I can't find in menus. Can you fix or bring that back?"
+- **Also:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread). "Motes are buried and seem to move around, rather than being easy to access from the main window."
+- **David on #228 Aug 20, 10:18 PM CT:** DranakCorps-bot unsigned (the actual human, per later #229 sign-off). "I agree and am trying to make it less complicated by moving things into logically themed stuff. What your looking for with motes is in Progress where xp/hr, AAs/hr, money/hr, motes/hr all sit." Do not reply -- he is in the thread.
+- **David on #229 Aug 21, 8:13 AM CT:** signed "David (the actual human)". "I'm going to bring the motes back into their own section but, overall, am still trying to organize types of things into themes." Did not reply.
+- **Still-wrong on v1.99.0:** existing mote-job profiles must see the section. A restore hidden in Options is the same bug as #228. New-profile default-off is fine. Motes card owns the rate. Do not ship the unreleased three-homes hybrid. Wealth is coin. #228 reply hold stays until Helm lifts it.
 
 ### mez timers vary from 26 seconds to a minute
 - **Priority:** waiting
@@ -50,7 +81,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply. "Elemental Warrior" vs in-game/wiki "An Elemental Warrior" "sounds like the same class of bug that hit the wiki pack itself in #65 (Spiroc Lord, the resolver recording the requested title instead of the title actually served)." Hypothesis, unchecked -- the pack fix may have covered pack output, not the Drops window display; two code paths reading the same name. Do not restore #65.
 
 ### Drops by Creature still shows wiki-missing after the page was corrected
-- **Priority:** waiting
+- **Priority:** waiting. Helm hold Aug 21, 6:19 PM CT: do not open #226.1 or remaining #226. Not a must. No new sprint.
 - **Place:** Drops by Creature wiki-missing marker. Desktop.
 - **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
 - **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
@@ -59,6 +90,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Follow-up Aug 21, 8:29 AM CT:** LeBigNasty screenshot (filename 092734). Did not reply (already filed; David/Claude share the bot account). Creature headings in yellow. Red diamond = wiki-missing. Named as already on wiki drop tables: Apothic Warband +4 (Fetid fiend -- 4 kills, x1 25%), Cryosilk Amice +4 (Spinechiller spider -- 2 kills, x1 50%), Imbrued Platemail Gauntlets +4 (Worry wraith -- 1 kill, x1 100%). Also red-diamond in the same shot: Fetid Skin, Fire Opal, Mote of Major Potential, Crystallized Sulfur. Eyerazzia +4 and Flayed Turmoilskin Belt +4 have no diamond. Reporter: "not sure if you are checking against cached versions or not accounting for +". Hypothesis, unchecked -- matcher compares the +N item name to a wiki row without the plus, or a cached wiki snapshot.
 - **VERIFIED Aug 21 (Claude):** the cache is real — `EqlWikiMobs.CacheLifetime` and `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`. Frankthetankk's "one root cause" reading is right and it is this. The `+N` half is ruled OUT: `WikiContribution.Classify` folds both sides through `QuestCatalog.BaseItemName`, which strips a trailing `+N`, and the 092734 screenshot has tiered items on both sides of the flag (Eyerazzia +4 unflagged, Fetid Skin flagged). **Still open — the fix is a per-page re-check**, on a flagged row and before the pack window exports. Not in 1.99.0.
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply (Claude already answered Step 2). Missing flags not clearing after a wiki correction and the +tier false positives in the 092734 screenshot "might be one root cause rather than two separate bugs." Back in #65, "the comparison was confirmed to run against a 7-day per-page cache on the user's machine — so a wiki edit takes up to a week to reach the flags, immediate only for pages you haven't viewed recently." A per-page re-check button was queued then and he does not see it in the changelog. Hypothesis, unchecked -- data source is that 7-day per-page cache, not a live wiki read. Do not restore #65; this is evidence on this item.
+- **Follow-up Aug 21, 4:50 PM CT:** Claude confirmed the 7-day cache (`EqlWikiMobs.CacheLifetime` / `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`). The +N half is not the cause: `QuestCatalog.BaseItemName` strips a trailing +N before matching; the 092734 shot has +4 items without a diamond and un-tiered items with one. Re-check button never built; not in 1.99.0. Did not reply. Do not restore #65.
 
 ### wiki pack copy copies the whole list, not one creature
 - **Priority:** waiting
@@ -216,7 +248,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Where it might live:** existing eqlwiki item-lookup popup, if it already searches by name — then this is surfacing, not a second search. Hypothesis.
 
 ### Chips and alerts ignore the parked monitor
-- **Priority:** must-fix
+- **Priority:** waiting. Helm hold Aug 21, 6:19 PM CT: do not open #208. Not a must. No new sprint.
 - **Place:** Avalonia chip/alert restore vs Wayland compositor placement. Not overlay-over-fullscreen.
 - **Source:** #208 sbaum23 (opened Aug 17) + follow-up Aug 18, 7:37 PM CT. Old thread — did not reply.
 - **Ask:** Widget is on the non-EQ monitor. Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.
