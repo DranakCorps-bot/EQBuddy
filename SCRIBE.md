@@ -51,9 +51,10 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
 - **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker.
 - **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
+- **Follow-up Aug 21, 8:29 AM CT:** LeBigNasty screenshot (filename 092734). Did not reply (already filed; David/Claude share the bot account). Creature headings in yellow. Red diamond = wiki-missing. Named as already on wiki drop tables: Apothic Warband +4 (Fetid fiend -- 4 kills, x1 25%), Cryosilk Amice +4 (Spinechiller spider -- 2 kills, x1 50%), Imbrued Platemail Gauntlets +4 (Worry wraith -- 1 kill, x1 100%). Also red-diamond in the same shot: Fetid Skin, Fire Opal, Mote of Major Potential, Crystallized Sulfur. Eyerazzia +4 and Flayed Turmoilskin Belt +4 have no diamond. Reporter: "not sure if you are checking against cached versions or not accounting for +". Hypothesis, unchecked -- matcher compares the +N item name to a wiki row without the plus, or a cached wiki snapshot.
 
 ### standalone Motes card (configurable)
-- **Priority:** waiting (David's call — Progress theme already absorbed Motes)
+- **Priority:** approved (David #229 8:13 AM CT: bring motes back as their own section; still fold themes. Claude has the card on main, unreleased. Do not reply on #227/#228/#229 until 1.99.0.)
 - **Place:** Progress theme. Not Gate 5 overlay. Not a group meter.
 - **Source:** #227 typical-usual-chaos Aug 20, 7:00 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
 - **Ask:** "Bring motes back as its own top-level card, behind a setting if needed." At-a-glance motes and motes/hour, not behind a Progress/Wealth tab.
@@ -61,7 +62,9 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Checked:** not grepped this run for the setting. Hypothesis, unchecked -- there is no toggle to undock Motes from Progress.
 - **Also:** #228 daetien-lab Aug 20, 8:43 PM CT (1.98.0). Replied 2026-08-20 (Scribe). "I simply want to track my mote drops in the main window, but now it is hidden behind too much other junk that I don't care about. Keep it more simple." Same ask as this item (motes visible on the main window, not behind Progress / pull-out cards). Broader simplicity complaint is the reason, not a second heading.
 - **Also:** #229 Ceasar29 Aug 20, 11:11 PM CT (1.98.0). Replied 2026-08-21 (Scribe). "the motes aren't showing up... It isn't on the bars and I can't find in menus. Can you fix or bring that back?"
-- **Also:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread). "Motes are buried and seem to move around, rather than being easy to access from the main window."
+- **Also:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (David already in the thread). "Motes are buried and seem to move around, rather than being easy to access from the main window."
+- **David on #228 Aug 20, 10:18 PM CT:** DranakCorps-bot unsigned (the actual human, per later #229 sign-off). "I agree and am trying to make it less complicated by moving things into logically themed stuff. What your looking for with motes is in Progress where xp/hr, AAs/hr, money/hr, motes/hr all sit." Do not reply -- he is in the thread. Fix is on main, not released; Claude will answer #228 when 1.99.0 ships.
+- **David on #229 Aug 21, 8:13 AM CT:** signed "David (the actual human)". "I'm going to bring the motes back into their own section but, overall, am still trying to organize types of things into themes." Did not reply.
 
 ### wiki pack Step 2 click on creature name doesn't open wiki
 - **Priority:** must-fix

@@ -166,7 +166,7 @@ public sealed class WikiPackWindow : Window
     /// <summary>Trap 14: an icon beside wrapping text needs a two-column Grid. A stack
     /// measures its children with infinite width in the stacking direction, so the text
     /// never reaches a boundary to wrap at and is silently CLIPPED instead.</summary>
-    private static Control BuildRow(WikiPackPresentation.PackRow row)
+    private Control BuildRow(WikiPackPresentation.PackRow row)
     {
         var grid = new Grid
         {
@@ -186,6 +186,20 @@ public sealed class WikiPackWindow : Window
         var text = new StackPanel();
         var name = DesignSystem.Text(DesignTokens.TypeRole.Body, row.Creature);
         name.TextWrapping = global::Avalonia.Media.TextWrapping.Wrap;
+        // The pack's whole job is "go and edit these pages", and the creature name was the
+        // one thing on the row that looked like a link and was not (#226, LeBigNasty). It
+        // goes to the page the wiki SERVED when we read it, so the player lands on the
+        // article the paste is written against rather than on a search result (trap 3).
+        name.Cursor = new global::Avalonia.Input.Cursor(
+            global::Avalonia.Input.StandardCursorType.Hand);
+        ToolTip.SetTip(name, "Open this creature's page on eqlwiki — the page this edit is for");
+        var creature = row.Creature;
+        name.PointerReleased += (_, e) =>
+        {
+            if (e.InitialPressMouseButton != global::Avalonia.Input.MouseButton.Left) return;
+            e.Handled = true;
+            MainWindow.OpenWikiUrl(WikiLinks.Creature(_main.WikiMobResult(creature), creature));
+        };
         text.Children.Add(name);
 
         var kills = row.Kills == 1 ? "1 kill" : $"{row.Kills} kills";

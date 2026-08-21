@@ -1839,10 +1839,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>Open an item's eqlwiki page in the default browser — the search URL
     /// lands on the page itself on an exact title match (MediaWiki "Go"), and on
     /// search results otherwise, so a rename never strands the user on a 404.</summary>
-    internal static void OpenWikiPage(string itemName)
+    internal static void OpenWikiPage(string itemName) => OpenWikiUrl(WikiLinks.Search(itemName));
+
+    /// <summary>Open an eqlwiki URL. Split out so a CREATURE can be sent to the page the
+    /// wiki actually served rather than to a search — see WikiLinks.</summary>
+    internal static void OpenWikiUrl(string url)
     {
-        var url = "https://eqlwiki.com/index.php?search="
-            + Uri.EscapeDataString(EqlWikiItemService.NormalizeTitle(itemName));
         try
         {
             Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });

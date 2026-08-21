@@ -131,6 +131,18 @@ public partial class WikiPackWindow : Window
         var text = new StackPanel();
         var name = DesignSystem.Text(DesignTokens.TypeRole.Body, row.Creature);
         name.TextWrapping = TextWrapping.Wrap;
+        // The pack's whole job is "go and edit these pages", and the creature name was the
+        // one thing on the row that looked like a link and was not (#226). It goes to the
+        // page the wiki SERVED when we read it, so the player lands on the article the
+        // paste is written against rather than on a search result (trap 3).
+        name.Cursor = System.Windows.Input.Cursors.Hand;
+        name.ToolTip = "Open this creature's page on eqlwiki — the page this edit is for";
+        var creature = row.Creature;
+        name.MouseLeftButtonUp += (_, e) =>
+        {
+            e.Handled = true;
+            MainWindow.OpenWikiUrl(WikiLinks.Creature(_main.WikiMobResult(creature), creature));
+        };
         text.Children.Add(name);
 
         var kills = row.Kills == 1 ? "1 kill" : $"{row.Kills} kills";

@@ -184,7 +184,7 @@ internal sealed class DropsCardView
         foreach (var mob in mobs)
         {
             var pageStatus = mob.Loot.Count > 0 ? Status(mob, mob.Loot[0]) : WikiDropStatus.Unknown;
-            _mobsPanel.Children.Add(new TextBlock
+            var header = new TextBlock
             {
                 Text = $"{mob.Name} — {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")}"
                     + pageStatus switch
@@ -196,7 +196,15 @@ internal sealed class DropsCardView
                 FontSize = 13, FontWeight = FontWeight.SemiBold,
                 Margin = new Thickness(0, 8, 0, 2),
                 Foreground = AppTheme.AccentBrush,
-            });
+            };
+            // CLICKABLE, because the tooltip two rows down has always said so: step 2 of
+            // the how-to-sync note is "Click the creature's name to open its wiki page",
+            // and until 2026-08-21 this was a plain label (#226, LeBigNasty).
+            ToolTip.SetTip(header, "Open this creature's page on eqlwiki");
+            var creature = mob.Name;
+            OnClick(header, () => MainWindow.OpenWikiUrl(
+                WikiLinks.Creature(_main.WikiMobResult(creature), creature)));
+            _mobsPanel.Children.Add(header);
 
             foreach (var l in mob.Loot)
                 _mobsPanel.Children.Add(ItemRow(l, mob.Kills, Status(mob, l)));

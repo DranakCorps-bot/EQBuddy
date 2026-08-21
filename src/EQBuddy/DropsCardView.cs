@@ -169,8 +169,16 @@ internal sealed class DropsCardView : IWidgetCard
         foreach (var mob in mobs)
         {
             var pageStatus = mob.Loot.Count > 0 ? Status(mob, mob.Loot[0]) : WikiDropStatus.Unknown;
+            // CLICKABLE, because the tooltip two rows down has always said so: step 2 of
+            // the how-to-sync note is "Click the creature's name to open its wiki page",
+            // and until 2026-08-21 this was a plain label (#226, LeBigNasty). An app that
+            // names an action and does not offer it is the silent-no-op rule with the
+            // switch on the other side — the same defect as the Gear tab naming an import
+            // it gave you no way to run.
             var header = new TextBlock
             {
+                Cursor = System.Windows.Input.Cursors.Hand,
+                ToolTip = "Open this creature's page on eqlwiki",
                 Text = $"{mob.Name} — {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")}"
                     + pageStatus switch
                     {
@@ -183,6 +191,12 @@ internal sealed class DropsCardView : IWidgetCard
                 Margin = new Thickness(0, Tok.SpaceS, 0, Tok.SpaceXxs),
             };
             header.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+            var creature = mob.Name;
+            header.MouseLeftButtonUp += (_, e) =>
+            {
+                e.Handled = true;
+                MainWindow.OpenWikiUrl(WikiLinks.Creature(_main.WikiMobResult(creature), creature));
+            };
             _mobs.Children.Add(header);
 
             foreach (var l in mob.Loot)

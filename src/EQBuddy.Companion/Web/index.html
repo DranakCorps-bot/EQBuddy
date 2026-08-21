@@ -404,10 +404,36 @@
   body.solo section.surface.fills > .body { display:flex; flex-direction:column; overflow:hidden; }
   /* The map stops being a fixed-height box and simply takes what is left. */
   body.solo .mapwrap { height:auto; flex:1 1 auto; min-height:200px; }
+  /* PULL TO REFRESH, for solo mode only.
+
+     `body.solo` is a fixed-height flex column with overflow:hidden, so the DOCUMENT never
+     scrolls - and the browser's own pull-to-refresh has nothing to attach to. With two or
+     more panels the page scrolls normally and the native gesture works, which is exactly
+     the asymmetry bjstrange reported (#222): "pull-down refresh should work when only one
+     card is selected, the same as with two or more."
+
+     This is trap 9 again, one class over. `solo` means BOTH "the lone panel fills the
+     viewport" AND "the page itself never scrolls" - and the second meaning quietly took a
+     gesture away. The layout is right; what was missing is that solo has to provide the
+     gesture it displaced.
+
+     Drawn, not silent: a hidden gesture that works is only marginally better than one that
+     does not, because nobody finds it. The tab shows what will happen and follows the
+     finger. */
+  #pull {
+    position:fixed; left:50%; top:0; transform:translate(-50%,-100%);
+    z-index:40; padding:6px 14px; border-radius:0 0 12px 12px;
+    background:var(--panel); color:var(--dim); font-size:13px;
+    border:1px solid var(--hairline); border-top:none; white-space:nowrap;
+    pointer-events:none; opacity:0;
+  }
+  #pull.on { opacity:1; }
+  #pull.ready { color:var(--text); }
 </style>
 </head>
 <body>
 <div id="banner"></div>
+<div id="pull"></div>
 <div id="notice" role="status" aria-live="polite"></div>
 <header>
   <div id="dot"></div>
@@ -730,6 +756,65 @@ function boot() {
     clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => el.classList.remove("show"), 5000);
   }
+
+  // ---------- pull to refresh (solo mode only) ----------
+  //
+  // #222, bjstrange. See the #pull rule in the stylesheet for why solo needs its own
+  // gesture: the page cannot scroll, so the browser's native pull has nothing to grab.
+  //
+  // A reload is precisely what the native gesture does, and it is also the ONLY way this
+  // page ever picks up a new version of itself - the socket reconnects forever and the
+  // browser goes on running whatever HTML it downloaded when the tab was first opened
+  // (trap 32). So this gesture is worth having even on a page whose data is already live.
+  (function pullToRefresh() {
+    const TRIGGER = 70;               // px of travel before a release will reload
+    let startY = null, scroller = null, pulled = 0;
+
+    const tab = () => document.getElementById("pull");
+    const show = (dist) => {
+      const el = tab();
+      if (!el) return;
+      const shown = Math.min(dist, TRIGGER + 20);
+      el.classList.toggle("on", dist > 4);
+      el.classList.toggle("ready", dist >= TRIGGER);
+      el.textContent = dist >= TRIGGER ? "release to refresh" : "pull to refresh";
+      el.style.transform = "translate(-50%," + (shown - 100) + "%)";
+    };
+    const reset = () => {
+      startY = null; scroller = null; pulled = 0;
+      const el = tab();
+      if (el) { el.classList.remove("on", "ready"); el.style.transform = "translate(-50%,-100%)"; }
+    };
+
+    document.addEventListener("touchstart", (e) => {
+      reset();
+      if (!document.body.classList.contains("solo") || e.touches.length !== 1) return;
+      // The lone panel that DRAWS ITSELF (the map) owns vertical drag for panning; a
+      // refresh gesture there would fight it every time someone moves the map.
+      if (document.querySelector("section.surface.fills")) return;
+      scroller = document.querySelector("section.surface > .body");
+      if (!scroller || scroller.scrollTop > 0) { scroller = null; return; }
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener("touchmove", (e) => {
+      if (startY === null || !scroller) return;
+      // Any upward move, or a scroller that has left the top, ends the attempt: the
+      // player is reading, not refreshing.
+      if (scroller.scrollTop > 0) { reset(); return; }
+      pulled = e.touches[0].clientY - startY;
+      if (pulled <= 0) { reset(); return; }
+      show(pulled);
+    }, { passive: true });
+
+    document.addEventListener("touchend", () => {
+      const go = pulled >= TRIGGER;
+      reset();
+      if (go) location.reload();
+    }, { passive: true });
+
+    document.addEventListener("touchcancel", reset, { passive: true });
+  })();
 
   // ---------- staleness banner ----------
   function refreshStale() {
