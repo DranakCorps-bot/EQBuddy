@@ -8,6 +8,122 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-21: 1.98.1 IS LIVE AND SIGNED — start here
+
+`main` clean at `eef2f50`, tag `v1.98.1`. **7 assets, signature Valid,
+`CN=FlossworksCross-Stitch`, timestamped**, OneDrive updated, installed locally. Gates:
+**2,256 unit + 257 Avalonia + 17 E2E**.
+
+**Nothing is half-finished, and one thing is deliberately incomplete** — read "the parity
+gap" below before touching the Avalonia widget.
+
+### What 1.98.1 shipped
+
+- **`/outputfile` dumps import themselves.** The game announces every dump it writes, by
+  name, in the log EQBuddy already tails (`Outputfile Complete: <file>`) and nothing was
+  listening. `Core/OutputfileAutoImport.cs` owns it; the report line and its Undo are on
+  the Gear tab. Both widgets.
+- **Gear & Loot finished on Windows.** Three tabs — **Loot · Wishlist · Inventory**. "Gear"
+  was renamed because it held a wishlist; Gear Locker and Inventory merged into one tab
+  with a by-slot / by-bag pivot, because they read the same file. Window is 880px landscape.
+- **The cog lost three entries** — Inventory, Gear Locker, and Gear & Loot itself. The
+  widget card is the door, matching Quests and Progress.
+- **EQBuddy Mobile** shows in-game commands as selectable text (a phone clipboard cannot
+  reach the game on the PC — David's call).
+
+### THE PARITY GAP — do this first
+
+**Linux and macOS have everything from 1.98.1 EXCEPT the Inventory tab.** They keep the
+separate Gear Locker and Inventory windows and their menu entries, so nothing regressed,
+and the release notes say so in as many words. But:
+
+**`LootSurface.Hosted` is SHARED Core vocabulary and already lists Inventory.** The Avalonia
+widget builds its strip from it and looks bodies up in a dictionary, so before this was
+caught its third chip rendered perfectly and threw `KeyNotFoundException` on click. It is
+guarded now — that build offers only tabs it can draw, and
+`WidgetRenderTests.EveryTabTheWindowOffersCanBeOpened` selects every offered tab and demands
+a body. **The guard is not the fix.** The fix is the view.
+
+1. **Lift the gear checklist out of `EQBuddy.Avalonia/MainWindow.cs` FIRST.** ~25 ratchet
+   lines left; the lift frees ~275 (`BuildGearSection`, `RenderGearChecklist`, `GearRow`,
+   the auto-check marks) — exactly what WPF lifted into `GearCardView`. **No E2E on that
+   build**, so pin behaviour in `WidgetRenderTests` BEFORE moving anything; three pins
+   already exist.
+2. **Then the Inventory tab twin**: fold Avalonia's `GearLockerWindow` + `InventoryWindow`
+   into one view with the two pivots. `EQBuddy/InventoryView.cs` is the worked example.
+   Drop the two menu entries when the tab exists, as WPF did.
+
+### THEN: Kills & Drops
+
+**Step 1 is DONE, tested and deliberately not called yet** — `Core/CreatureSurface.cs`
+(`09507d0`), the same way `LootSurface` landed before its window. David's grouping, and it
+corrected mine: *"Kills isn't a meter though. we don't track kills per second but we track
+damage per second, healing per second. Kills and Drops should be … Kills and Drops ;)"*
+Both tabs are about the CREATURE — what died, and what it dropped at what rate.
+
+Remaining: **lift `DropsWindow`'s body into a view — its body is in XAML, so this is a
+XAML-to-code conversion, not the straight code move `GearLockerView` was** — then a
+`CreaturesWindow` in both UIs, then the fold. **The fold switches on in Core and hits BOTH
+widgets, so the Avalonia twin must exist BEFORE it is switched on**, or the Kills card
+vanishes on Linux with nothing to replace it. That is the lesson the Gear & Loot fold paid
+two days for, and the parity gap above is the same lesson arriving again.
+
+Drops has already left `LootTab`.
+
+### Traps this session paid for — read 34–36 before lifting anything
+
+- **36 — a lifted view must build its own `Body` and NOT bring a `ScrollViewer`.** A child
+  scroller is measured with infinite height, never scrolls, and still swallows the wheel.
+  Cost David a working mouse wheel; no test or screenshot can see it.
+- **A `DockPanel`'s fill child gets what the docked children leave**, and they take what
+  they ask for — three `Dock.Right` buttons starved a status line into a 30px column and
+  stretched the buttons into 380px slabs.
+- **34 — a guard that forbids the wrong thing cannot see a missing thing.** Pair every
+  "no X may do Y" with a curated list of "these must do Y". `GameCommandsTests` caught three
+  real moves in one day.
+- **The pattern under all of them:** every bug David found tonight photographs and diffs as
+  correct. He found them by USING the window. Ship him a build.
+
+### Smaller, outstanding
+
+1. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now in an 880px window.
+2. **The Raids surface stores its auto-import outcome and never renders it** —
+   `ImportReportView` exists and is wired only to Gear.
+3. **Items** as a Gear & Loot tab — still named-but-unhosted.
+4. **EQBuddy Mobile "Couldn't listen on port 47998"** (David, 2026-08-20). **Not
+   reproducible**: one instance running, nothing listening on the port, and it is not in a
+   Windows reserved range (`netsh int ipv4 show excludedportrange protocol=tcp`). Almost
+   certainly `TIME_WAIT` from nine install-and-relaunch cycles that evening. **Worth
+   checking whether the companion listener sets `SO_REUSEADDR`** — the error blames another
+   program when the usual culprit is our own just-exited copy (trap 13's neighbourhood).
+
+### David's direction — recorded in ROADMAP.md
+
+**The gear button should BE Options**, not a menu containing Options: *"I would like the
+gear to eventually be the path to options not click gear then click options from a list of
+things."* Every remaining cog entry is named there with the theme that claims it. Kills is
+not a meter (Live Meters = Combat + Healing). Travel route and zone maps are already the
+World theme, which also takes Spawn timers and the drop-camp marker off the cog.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered; close it if bjstrange confirms.
+
+**Scribe:** `SCRIBE.md` has items untouched this session — #225 (window position resets on
+update), #224 (voice for interrupted/resisted), #222 (mobile pull-refresh with one card,
+must-fix), #223 (waiting on David, do not ping), #208 (Wayland chip placement, must-fix),
+#153 (custom alert volume — needs a fact, not another guess). Take one, delete it, and note
+what helped in `SCRIBE-FEEDBACK.md`.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David explicit go** — the 1.98.1 go does not carry forward. Both UIs
+in the same change. David is Windows-only; never hold a release to verify Avalonia. When a
+decision is his, use the question tool.
+
+---
+
 ## 2026-08-20 (latest): Gear & Loot is DONE ON WINDOWS, and nothing is released
 
 **`main` pushed at `e382cd6`. `Directory.Build.props` says 1.98.1 with its What's-new
