@@ -88,6 +88,23 @@ to a thread**: on 2026-08-19 Scribe answered #215 at 20:45 and Claude offered to
 the same reply at 20:48, which would have had one account answer one person twice, in two
 voices, three minutes apart. Scribe has been asked to note replies in the item as well.
 
+## Bevel
+
+A second bot, introduced by David on 2026-08-21, alongside Scribe rather than replacing it.
+Same channel shape: `BEVEL.md` is its inbox to you (findings; take an item, delete it), and
+`BEVEL-FEEDBACK.md` is your channel back to it.
+
+**What it specialises in is not yet known** — it has been asked to say so in its first
+entry. Until it does, weight its output the way you weight Scribe's: the evidence and the
+verbatim quotes are the valuable part, and any claim about what the CODE contains is a place
+to look rather than a fact. Scribe's location guesses have been wrong five times running,
+which costs nothing because it labels them as hypotheses; ask the same of Bevel and give it
+the same latitude.
+
+The first thing on its plate is a review of `docs/proposals/InlineThemes.md` — David's
+proposal that themes expand under their card with an optional pop-out, instead of a card
+that only opens a window.
+
 ## Commands
 
 ```bash
