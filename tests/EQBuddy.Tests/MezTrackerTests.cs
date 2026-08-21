@@ -423,6 +423,84 @@ public class MezTrackerTests
         Assert.Equal(24, t.LearnedDurations["Mesmerization"]);
     }
 
+    /// <summary>#228 (joeymavity): <i>"mezz timers seem to vary from 26 seconds to a minute
+    /// with no explanation (I have mezz x)."</i>
+    ///
+    /// A HIGH RANK is the case the break guard cannot see. "An observation under the catalog
+    /// base is a break" holds for the BASE spell, where the base duration is the real one -
+    /// but the catalog stores one duration per base name and ranks only lengthen, so the
+    /// floor for a rank-X mez is still the 24s base while its real duration is far longer.
+    /// A break anywhere above 24s sails through the guard and becomes that rank's learned
+    /// duration, overwriting a longer value the caster had already measured honestly.
+    ///
+    /// Which is the reported symptom exactly: chips alternating between a contaminated short
+    /// value and the honest long one as breaks and clean fades interleave, with nothing on
+    /// screen to explain either.</summary>
+    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    public void AnEarlyBreakOnAHighRankDoesNotPoisonItEither()
+    {
+        // A clean fade teaches rank X's real duration: 44s raw, tick-floored to 42.
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerize X."),
+            Ev(2, "an orc pawn has been mesmerized."),
+            Ev(46, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(42, t.LearnedDurations["Mesmerize X"], 0);
+
+        // Now a break at 26s. It is ABOVE the 24s catalog base for "Mesmerize", so the
+        // shorter-than-base guard lets it past — and it used to overwrite the 42 the
+        // caster had just measured.
+        t.Apply(Ev(100, "You begin casting Mesmerize X."));
+        t.Apply(Ev(102, "an orc pawn has been mesmerized."));
+        t.Apply(Ev(128, "Your Mesmerize X spell has worn off of an orc pawn."));
+
+        Assert.Equal(42, t.LearnedDurations["Mesmerize X"], 0);
+    }
+
+    /// <summary>The other half, and why the fix is "corroborate" rather than "never
+    /// shorten": a genuinely shorter duration must stay learnable, or a stale long value
+    /// could never heal. TWO agreeing observations do it, because two identical breaks are
+    /// far less likely than one.</summary>
+    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    public void TwoAgreeingShortFadesDoReviseTheDurationDown()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerize X."),
+            Ev(2, "an orc pawn has been mesmerized."),
+            Ev(46, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(42, t.LearnedDurations["Mesmerize X"], 0);
+
+        // First short fade: not trusted on its own.
+        t.Apply(Ev(100, "You begin casting Mesmerize X."));
+        t.Apply(Ev(102, "an orc pawn has been mesmerized."));
+        t.Apply(Ev(128, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(42, t.LearnedDurations["Mesmerize X"], 0);
+
+        // Second, agreeing with the first: that is a measurement, not a break.
+        t.Apply(Ev(200, "You begin casting Mesmerize X."));
+        t.Apply(Ev(202, "an orc pawn has been mesmerized."));
+        t.Apply(Ev(228, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(24, t.LearnedDurations["Mesmerize X"], 0);
+    }
+
+    /// <summary>Upward revisions stay instant. Contamination inflates (a chain-mez fade
+    /// spans several casts) and breaks deflate, so the two directions are not symmetric and
+    /// must not be guarded as though they were — an upgraded rank should be believed the
+    /// first time it is measured.</summary>
+    [Fact(Skip = "Reproduces #228; the fix conflicts with #68/#69 chain-artifact healing. David's call — see the KNOWN GAP note in MezTracker.OnWornOff.")]
+    public void ALongerFadeIsStillBelievedImmediately()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Mesmerize X."),
+            Ev(2, "an orc pawn has been mesmerized."),
+            Ev(34, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(30, t.LearnedDurations["Mesmerize X"], 0);
+
+        t.Apply(Ev(100, "You begin casting Mesmerize X."));
+        t.Apply(Ev(102, "an orc pawn has been mesmerized."));
+        t.Apply(Ev(146, "Your Mesmerize X spell has worn off of an orc pawn."));
+        Assert.Equal(42, t.LearnedDurations["Mesmerize X"], 0);
+    }
+
     [Fact]
     public void AnEarlyBreakFadeDoesNotPoisonTheLearnedDuration()
     {

@@ -374,6 +374,22 @@ public sealed class MezTracker
         // latest-clean-wins on the next honest cycle.
         var recastAfterLanding = _lastCastOf.TryGetValue(entry.Spell, out var lastCast)
             && lastCast > entry.LandedAt.AddSeconds(1);
+        // KNOWN GAP, unfixed on purpose (#228, joeymavity 2026-08-21): "mezz timers seem
+        // to vary from 26 seconds to a minute with no explanation (I have mezz x)."
+        //
+        // The floor above is the BASE spell's duration, because the catalog stores one
+        // duration per base name — but ranks only lengthen, so for a rank-X mez the floor
+        // is still 24s while the real duration is far longer. An early break anywhere above
+        // 24s walks through every guard here and overwrites an honest longer value.
+        //
+        // Requiring a second agreeing observation before believing a SHORTER reading fixes
+        // it, and breaks #68/#69: a chain-mez artifact would then need two clean fades to
+        // heal instead of one, and Taendar's 1:10 chip on a 24s mez is the report that made
+        // one-fade healing the rule. The two cases are not separable by value — a 26s break
+        // tick-floors to exactly 24, which is also what an honest heal-to-base reads — so
+        // this is a trade between two real reports and David's call, not an oversight.
+        // MezTrackerTests carries three skipped tests that reproduce it.
+        //
         // Latest clean observation wins, longer OR shorter (see class summary): a
         // chain-mez artifact heals on the next single mez, a stale short value heals
         // on the next upgraded cast — either way one honest fade fixes the chip.
