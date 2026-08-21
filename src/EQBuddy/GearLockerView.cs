@@ -13,32 +13,56 @@ namespace EQBuddy;
 /// the one button that fetches missing pages is explicit, counted, and rate-limited
 /// (the same one-fetch-per-request etiquette every wiki surface follows).
 /// </summary>
-public sealed class GearLockerWindow : Window
+/// <remarks>
+/// A TAB of the Gear &amp; Loot theme since 2026-08-20, not a window. David opened the
+/// theme expecting his gear and found only a wishlist: <i>"We should at least put our gear
+/// locker (what we're wearing) into this window so Gear and Loot can complete a theme."</i>
+/// The roadmap always said so — that theme row lists GearLocker among what it absorbs.
+///
+/// Lifted the way <c>GearCardView</c> was: it builds its own body, so the same class can
+/// hang in a tab without a window around it. The comparison logic was already
+/// framework-free in <c>UI.Shared/GearLocker.cs</c>, which is why this was a lift and not
+/// a rewrite.
+/// </remarks>
+internal sealed class GearLockerView : IWidgetCard
 {
+    public string Key => LootSurface.KeyFor(LootTab.Locker);
+    public UIElement Body { get; }
+
+    /// <summary>The tab strip's headline: how many swaps the arithmetic found. Nothing at
+    /// all when there is no dump yet — a "0" would read as "you have no upgrades" when the
+    /// truth is "EQBuddy has not been told what you own".</summary>
+    public string? Badge { get; private set; }
+
+    public void Render(StatsSnapshot snapshot) => Render();
+
     private readonly MainWindow _main;
-    private readonly StackPanel _panel = new() { Margin = new Thickness(10) };
+    private readonly StackPanel _panel = new();
     private readonly TextBlock _status = new() { FontSize = 11, TextWrapping = TextWrapping.Wrap };
     private readonly Button _fetch;
     private bool _fetching;
 
-    public GearLockerWindow(MainWindow main)
+    public GearLockerView(MainWindow main)
     {
         _main = main;
-        Title = "Gear Locker";
-        Width = 470;
-        Height = 640;
-        Owner = main;
-        WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        SetResourceReference(BackgroundProperty, "BgBrush");
         _status.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
         _status.ToolTip = InventoryWindow.OutputFileTip;
 
-        var bar = new DockPanel { Margin = new Thickness(10, 8, 10, 0) };
+        // A DockPanel's FILL child gets whatever the docked children leave, and docked
+        // children take whatever they ask for. Three Dock.Right buttons here are ~440px
+        // of a 470px window, so _status got ~30 and wrapped ONE CHARACTER PER LINE — and
+        // because a docked child stretches to the row's height, the buttons then grew
+        // into 380px-tall slabs (David's screenshot, 2026-08-20). Trap 14's cousin: a
+        // panel whose measurement rule starves a text child, invisible in the code.
+        // It only appeared when the fetch button was visible, which is why it survived.
+        // Buttons in a WrapPanel, status on its OWN row at full width: no starvation
+        // possible at any window size, and it survives the lift into a tab.
+        var bar = new StackPanel { Margin = new Thickness(0, 0, 0, 6) };
+        var buttons = new WrapPanel();
         var refresh = Theming.Button("⟳ Refresh");
         refresh.ToolTip = InventoryWindow.OutputFileTip;
         refresh.Click += (_, _) => Render();
-        DockPanel.SetDock(refresh, Dock.Right);
-        bar.Children.Add(refresh);
+        buttons.Children.Add(refresh);
         _fetch = Theming.Button("");
         _fetch.FontSize = 11;
         _fetch.Margin = new Thickness(0, 0, 6, 0);
@@ -46,8 +70,7 @@ public sealed class GearLockerWindow : Window
             + "yet — one page at a time, politely spaced, cached for a week. Rows fill in "
             + "as pages arrive.";
         _fetch.Click += async (_, _) => await FetchMissing();
-        DockPanel.SetDock(_fetch, Dock.Right);
-        bar.Children.Add(_fetch);
+        buttons.Children.Add(_fetch);
         // Same one-click command as the Inventory window and the quest tracker's
         // held tab (David, 2026-08-14): copy, paste in the game's chat, click ⟳.
         var copyCmd = Theming.WireCopyCommand(Theming.Button(""), GameCommands.OutputfileInventory);
@@ -55,8 +78,9 @@ public sealed class GearLockerWindow : Window
         copyCmd.Margin = new Thickness(0, 0, 6, 0);
         copyCmd.ToolTip = "Copies the command — paste it into the game's chat and the game "
             + "writes your inventory file; the Locker reads it. Re-run any time your bags change.";
-        DockPanel.SetDock(copyCmd, Dock.Right);
-        bar.Children.Add(copyCmd);
+        buttons.Children.Add(copyCmd);
+        bar.Children.Add(buttons);
+        _status.Margin = new Thickness(0, 6, 0, 0);
         bar.Children.Add(_status);
 
         var root = new DockPanel();
@@ -67,8 +91,7 @@ public sealed class GearLockerWindow : Window
             Content = _panel,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
         });
-        Content = root;
-        Render();
+        Body = root;
     }
 
     private List<string> _missing = [];
@@ -87,15 +110,19 @@ public sealed class GearLockerWindow : Window
         return picked.Select(GearLocker.Code).ToList();
     }
 
-    private void Render()
+    public void Render()
     {
         _panel.Children.Clear();
         var snap = _main.LatestInventory(refresh: true);
         if (snap is null)
         {
+            // No "and click ⟳" any more: the dump imports itself the moment the game
+            // announces it (OutputfileAutoImport). Telling someone to press a button that
+            // is no longer required is the same defect as not telling them anything.
             _status.Text = $"No inventory dump found yet — in game, type  {GameCommands.OutputfileInventory}  "
-                + "and click ⟳. (Hover for the full recipe.)";
+                + "and this fills in on its own. (Hover for the full recipe.)";
             _fetch.Visibility = Visibility.Collapsed;
+            Badge = null;
             return;
         }
 
@@ -117,6 +144,9 @@ public sealed class GearLockerWindow : Window
         if (!_fetching)
             _fetch.Content = $"⇣ fetch stats for {_missing.Count} item{(_missing.Count == 1 ? "" : "s")}";
 
+        var upgrades = groups.SelectMany(g => g.Rows).Count(r => r.UpgradeOver.Length > 0);
+        Badge = upgrades > 0 ? $"{upgrades} upgrade{(upgrades == 1 ? "" : "s")}" : null;
+
         var age = DateTime.Now - snap.WrittenAt;
         _status.Text = $"{System.IO.Path.GetFileName(snap.Path)} — "
             + (age.TotalMinutes < 1 ? "just now" : age.TotalHours < 1
@@ -131,9 +161,12 @@ public sealed class GearLockerWindow : Window
                 Text = group.Slot is "STATS NOT FETCHED YET"
                     ? $"{group.Slot} ({group.Rows.Count})"
                     : group.Slot,
-                Style = (Style)FindResource("SectionLabel"),
                 Margin = new Thickness(0, 9, 0, 2),
             };
+            // SetResourceReference, not FindResource: a view has no window to look up
+            // through, and a lookup that silently returns nothing renders a heading as
+            // body text with no error anywhere (trap 19).
+            header.SetResourceReference(FrameworkElement.StyleProperty, "SectionLabel");
             header.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
             _panel.Children.Add(header);
 
@@ -215,13 +248,11 @@ public sealed class GearLockerWindow : Window
         finally
         {
             _fetching = false;
-            if (!_closed.IsCancellationRequested && IsLoaded) Render();
+            if (!_closed.IsCancellationRequested) Render();
         }
     }
 
-    protected override void OnClosed(EventArgs e)
-    {
-        _closed.Cancel();
-        base.OnClosed(e);
-    }
+    /// <summary>The host tears the view down when its window closes: a fetch loop must not
+    /// keep running invisibly (2026-08-13 review), and the view outlives no window now.</summary>
+    public void Dispose() => _closed.Cancel();
 }

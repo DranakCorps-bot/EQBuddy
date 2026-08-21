@@ -119,7 +119,8 @@ public static class LootSurface
     /// than an absent one: it reads as a feature that is broken rather than one that has
     /// not arrived.
     /// </summary>
-    public static readonly IReadOnlyList<LootTab> Hosted = [LootTab.Loot, LootTab.Gear];
+    public static readonly IReadOnlyList<LootTab> Hosted =
+        [LootTab.Loot, LootTab.Gear, LootTab.Locker];
 
     /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
     /// reads this so the list of what disappears lives in ONE place rather than being
@@ -133,12 +134,14 @@ public static class LootSurface
     public const string ThemeCardKey = "loot";
 
     /// <summary>The hosted tabs, with whatever headline each was given.</summary>
-    public static IReadOnlyList<LootTabHeader> Tabs(string? loot = null, string? gear = null)
+    public static IReadOnlyList<LootTabHeader> Tabs(
+        string? loot = null, string? gear = null, string? locker = null)
     {
         var values = new Dictionary<LootTab, string?>
         {
             [LootTab.Loot] = loot,
             [LootTab.Gear] = gear,
+            [LootTab.Locker] = locker,
         };
         return [.. Hosted.Select(tab => new LootTabHeader(
             tab, LabelFor(tab), KeyFor(tab),

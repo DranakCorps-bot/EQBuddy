@@ -59,6 +59,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** "are you able to add voice for character cast spells,  "interupted" or "spell resisted""
 - **Already shipped:** WhatsNew: VOICE CONTROL with voice picker, rate, volume, and per-rule spoken phrases. CombatPresentation already prints interrupted / fizzled / resisted counts. LogParser already has Your (?<spell>.+?) spell is interrupted. and Your target resisted the (?<spell>.+?) spell. GameEvent has SpellInterruptedEvent.
 - **Checked:** those parser/event quotes. Hypothesis, unchecked -- SpokenAlerts is called from Watch rules plus a hardcoded Slowed line; no grep hit connecting SpellInterruptedEvent or ResistRx to SpokenAlerts.Speak.
+- **Follow-up Aug 20, 7:22 PM CT:** bjstrange screenshot of two Watch Log-text rules: Resist `.* resisted your .*` and Interrupted `Your .* spell is interrupted` (sound Off). Workaround: existing log watch until something permanent. Did not reply (already filed; Claude not last, but not a new thread).
 
 ### reliably shows what quest an item is for
 - **Priority:** waiting (desktop loot surfaces already have this; ask is reliability / whether they can find it)

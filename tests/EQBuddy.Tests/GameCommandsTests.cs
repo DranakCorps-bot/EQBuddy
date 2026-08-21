@@ -62,7 +62,10 @@ public class GameCommandsTests
         // ---- WPF ----
         ("EQBuddy/GearCardView.cs", nameof(GameCommands.OutputfileInventory),
             "the checklist auto-ticks from the inventory dump — David 2026-08-20, the one that was missing"),
-        ("EQBuddy/GearLockerWindow.cs", nameof(GameCommands.OutputfileInventory),
+        // A TAB of Gear & Loot since 2026-08-20, not a window. This row is also the list
+        // earning itself: the file rename broke the assertion the same day, which is
+        // exactly the notice a curated list is for.
+        ("EQBuddy/GearLockerView.cs", nameof(GameCommands.OutputfileInventory),
             "the locker IS the dump, rendered by slot"),
         ("EQBuddy/InventoryWindow.cs", nameof(GameCommands.OutputfileInventory),
             "the same dump, raw"),

@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -36,8 +36,9 @@ public static class LootTheme
     /// <summary>The full strip, badges included — what the window's tab row and the
     /// mobile page's tab row both build from.</summary>
     public static IReadOnlyList<LootTabHeader> Tabs(
-        StatsSnapshot s, IReadOnlyCollection<GearChecklistItem> checklist) =>
-        LootSurface.Tabs(loot: Loot(s), gear: Gear(checklist));
+        StatsSnapshot s, IReadOnlyCollection<GearChecklistItem> checklist,
+        string? locker = null) =>
+        LootSurface.Tabs(loot: Loot(s), gear: Gear(checklist), locker: locker);
 
     /// <summary>
     /// The launcher card's one line — the line that has to justify replacing two card

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -879,7 +879,6 @@ public partial class MainWindow : Window, ICardContext
         new(System.IO.Path.Combine(Core.AppPaths.Dir, "wiki-cache", "items"));
     internal EqlWikiItemService WikiItems => _wikiItems;
     private ItemInfoWindow? _itemWindow;
-    private GearLockerWindow? _gearLockerWindow;
 
     private void OnCompanion(object sender, RoutedEventArgs e) => OpenCompanionWindow();
 
@@ -910,12 +909,15 @@ public partial class MainWindow : Window, ICardContext
         }
     }
 
+    /// <summary>The Gear Locker is a TAB of Gear &amp; Loot now, not a window of its own
+    /// (David, 2026-08-20). The menu entry stays and opens the theme on that tab: the
+    /// habit keeps working, and one place owns the surface. Removing the entry outright
+    /// would be the trap-29 shape from the other side — a door deleted while the room it
+    /// led to still exists.</summary>
     private void OnGearLocker(object sender, RoutedEventArgs e)
     {
-        if (_gearLockerWindow is { IsLoaded: true } open) { open.Activate(); return; }
-        _gearLockerWindow = new GearLockerWindow(this);
-        _gearLockerWindow.Closed += (_, _) => _gearLockerWindow = null;
-        _gearLockerWindow.Show();
+        ShowGearLootWindow();
+        _gearLootWindow?.SetTab(LootTab.Locker);
     }
 
     /// <summary>Loot rows and the search box route here: one shared popup, re-driven

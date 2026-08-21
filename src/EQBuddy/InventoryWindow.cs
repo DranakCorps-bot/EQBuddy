@@ -40,12 +40,21 @@ public sealed class InventoryWindow : Window
         _status.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
         _status.ToolTip = OutputFileTip;
 
-        var bar = new DockPanel { Margin = new Thickness(10, 8, 10, 0) };
+        // A DockPanel's FILL child gets whatever the docked children leave, and docked
+        // children take whatever they ask for. Three Dock.Right buttons here are ~440px
+        // of a 470px window, so _status got ~30 and wrapped ONE CHARACTER PER LINE — and
+        // because a docked child stretches to the row's height, the buttons then grew
+        // into 380px-tall slabs (David's screenshot, 2026-08-20). Trap 14's cousin: a
+        // panel whose measurement rule starves a text child, invisible in the code.
+        // It only appeared when the fetch button was visible, which is why it survived.
+        // Buttons in a WrapPanel, status on its OWN row at full width: no starvation
+        // possible at any window size, and it survives the lift into a tab.
+        var bar = new StackPanel { Margin = new Thickness(10, 8, 10, 0) };
+        var buttons = new WrapPanel();
         var refresh = Theming.Button("⟳ Refresh");
         refresh.ToolTip = OutputFileTip;
         refresh.Click += (_, _) => Render();
-        DockPanel.SetDock(refresh, Dock.Right);
-        bar.Children.Add(refresh);
+        buttons.Children.Add(refresh);
         // Same one-click command as the quest tracker's held tab (David's ask,
         // 2026-08-11): copy here, paste in the game's chat, click ⟳.
         var copyCmd = Theming.WireCopyCommand(Theming.Button(""), GameCommands.OutputfileInventory);
@@ -53,8 +62,9 @@ public sealed class InventoryWindow : Window
         copyCmd.Margin = new Thickness(0, 0, 6, 0);
         copyCmd.ToolTip = "Copies the command — paste it into the game's chat and the game " +
             "writes your inventory file; this window reads it. Re-run any time your bags change.";
-        DockPanel.SetDock(copyCmd, Dock.Right);
-        bar.Children.Add(copyCmd);
+        buttons.Children.Add(copyCmd);
+        bar.Children.Add(buttons);
+        _status.Margin = new Thickness(0, 6, 0, 0);
         bar.Children.Add(_status);
 
         var root = new DockPanel();
