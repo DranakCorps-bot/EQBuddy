@@ -8,7 +8,140 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-21 (latest): THE AGREED PLAN IS DONE. NOTHING IS RELEASED.
+## 2026-08-21 (latest): 1.99.0 is READY BUT FOR ONE OPEN BUG
+
+`main` pushed at `4788eae`. `Directory.Build.props` says **1.99.0** with a full What's-new
+entry. Gates: **2,262 unit + 264 Avalonia + 18 E2E**, all green. Installed on David's
+machine and field-tested by him through the day.
+
+**David said "I think we're good to push live what we have now" — and then found the bug
+below, minutes later, before it could be released.** He has not re-confirmed since. Treat
+the go as REAL but conditional on the Quests bug: shipping EQBuddy Mobile with a dead
+surface is the one thing that would undo a release built mostly of trust repairs.
+
+### DO FIRST — EQBuddy Mobile's Quests surface never loads
+
+**David, 2026-08-21, on his phone:** *"Quests does not work though. The window loads, I can
+type, but it's stuck on 'Waiting for the quest catalog from the PC'."* Every other surface
+works; Mobile is otherwise healthy on his machine now.
+
+**The mechanism is understood; the fix is not written.** Do not restart the investigation.
+
+- `index.html` `drawGeneral()` shows that message whenever its local `catalog` is falsy.
+  `setCatalog()` is the only thing that fills it.
+- The catalog is **sent once per device and then withheld**:
+  `CompanionSnapshot.ForClient` (≈line 120) strips `Catalog` to null when the snapshot's
+  `CatalogStamp` equals the per-client `state.QuestCatalogStamp`, and records the stamp the
+  first time it sends it.
+- The page compensates with a sticky re-attach (`index.html` ≈line 650): if a push has no
+  catalog but the stamp matches, it copies the catalog off the PREVIOUS payload.
+
+**The hypothesis, and it implicates something I changed today.** That sticky re-attach needs
+a previous payload to copy from. A page RELOAD has none — the JS `catalog` variable is gone.
+If the per-client state survives the reconnect, the PC believes the device already has the
+catalog, strips it forever, and the page waits forever.
+
+Two things now reload or re-subscribe that page:
+1. **The new pull-to-refresh sends `{"kind":"subscribe"}`** (2026-08-21, Bevel's review), and
+   `subscribe` replies with `ForClient(client, snap)` — which strips the catalog if the
+   stamp was already recorded.
+2. **The version-mismatch self-reload** (trap 32) does a genuine `location.reload()`.
+
+→ **Start by checking whether the per-client `QuestCatalogStamp` survives a reconnect or a
+re-subscribe.** If it does, the "already sent" memo is scoped to the device when it should
+be scoped to the CONNECTION. The likely fix is to clear the stamp when a client subscribes,
+so the next payload carries the catalog. That is the smallest change that cannot leave a
+page waiting forever.
+
+→ **Reproduce with the harness before and after** — `scripts/mobile-harness.ps1` wraps the
+shipped `index.html` with a stubbed socket, so a payload with `catalog: null` and a matching
+stamp can be replayed without a phone.
+
+→ **And write the test at the projection/snapshot layer, not the page.** The decision lives
+in `CompanionSnapshot.ForClient`, which is pure and already unit-tested.
+
+### What landed today (all on `main`, none released)
+
+- **Kills & Drops theme**, both builds — `CreatureWindow`, `DropsCardView`, `DropsWindow`
+  deleted. The Kills card is the door; `Drops by creature…` is off the cog.
+- **The 1.98.1 parity gap closed** — Linux/macOS have the Inventory tab; the gear checklist
+  lifted out of `EQBuddy.Avalonia/MainWindow.cs` first (baseline 5,127 → 5,422).
+- **Motes is a card again** (#227/#228), hidden by default, restored from Options. And the
+  defect under it: Options could not reach three of the ten mini-dashboard switches at all,
+  because the folds moved their stars into windows. Cards & windows lists all ten now.
+- **#226** — creature names are links on the Drops tab and the wiki pack. The app had been
+  telling people to click something that had no handler.
+- **#222** — one-card pull-to-refresh on Mobile, then revised twice on Bevel's review: it
+  asks the PC for a snapshot rather than reloading, and the map gets a reserved chrome pull.
+- **#228 mez swing** — a shorter reading now needs corroborating, a longer one does not.
+  David chose that trade knowingly; it costs chain-mez artifacts one extra cycle to heal.
+- **EQBuddy Mobile had NEVER used the desktop theme** — 563 logged failures nobody had read.
+  `PaletteApplied` broadcasts derived tones and `CompanionTheme.Project` derived them again.
+- **A refused port is no longer a dead end.** 47998 is unbindable on David's machine by ANY
+  process (proved from bare PowerShell) while every table shows it free — a kernel
+  reservation. The app now falls back to a port Windows will give and says so.
+- **The four theme windows resize** and remember their size.
+
+### The new voices
+
+**Bevel** (`BEVEL.md` in, `BEVEL-FEEDBACK.md` out) is product/UX. Its first review was
+excellent: it agreed with my conclusion on inline themes and threw away my reasoning
+(*"consistency is a constraint, not the win. The win is the job."*), and it caught two real
+misses in #222 that I had already pushed. **Read `BEVEL.md` before designing anything.**
+
+**One open question is waiting on it or David**: #222 diverges from what bjstrange literally
+asked for (parity with the native gesture, which is a reload). Written up in
+`BEVEL-FEEDBACK.md`; either leave it or take the gesture over in both layouts.
+
+**Scribe** (`SCRIBE.md` / `SCRIBE-FEEDBACK.md`) is community input and still excellent at it.
+Its `Place:` guesses have now been wrong five times running — always labelled as
+hypotheses, and its verbatim quotes are what actually find the bugs.
+
+**David has asked Grok Bot for a graphics-designer bot** as well; the case for it is written
+in `SCRIBE-FEEDBACK.md` (seven of 37 traps were found ONLY by looking at a picture).
+
+### Also open
+
+1. **The respawn-timer dig** (#228, joeymavity): *"respawn timers randomly re-open after
+   they've been cleared."* `SpawnTimers.Clear` genuinely removes the entry, so something
+   re-creates it. Not started.
+2. **#227 has never been answered** — typical-usual-chaos asked for the Motes card, it is
+   built, and nobody has told him. Post when the release goes out, with #226, #222, #228.
+3. **`docs/proposals/InlineThemes.md`** — shape decided (tab strip, plus Bevel's split and
+   host rules). Open questions 4 and 5 remain; nothing is built.
+4. **`LogWatcher.FinishInitialIngest`** throws `ObjectDisposedException` on a timer in
+   David's log — a shutdown race, low severity, not chased.
+5. **`LanAddresses()` ranking on a Tailscale machine** — David's PC has Wi-Fi (10.0.0.84)
+   and Tailscale (100.118.30.124). The QR advertises `BoundAddresses[0]` only. Worth
+   confirming it picks the Wi-Fi address; a `100.x` QR is unreachable from a phone.
+6. **`LogParser.cs` has 14 ratchet lines** and `OptionsWindow.xaml.cs` has 156 after today's
+   lift. LogParser is the next file that will need one.
+
+### FRESH PASS — David asked for this explicitly
+
+Before taking new work, sweep for what has drifted rather than trusting this file:
+
+- `pwsh -NoProfile -File scripts/status.ps1` — version, uncommitted work, hotspot headroom,
+  open PRs and issues, and every discussion whose last comment is not ours.
+- **Read the last comment's signature before replying to any thread.** Three of us now post
+  as `DranakCorps-bot`: Scribe, Bevel and you. David also replies in his own words from that
+  account — his 03:18 reply on #228 was a product statement I nearly missed.
+- Check `BEVEL.md` and `SCRIBE.md` for items filed since this was written; take one, delete
+  it, and write the feedback note.
+- `docs/screenshots/` is current as of today. If a surface changed, re-shoot it —
+  `scripts/shoot.ps1 -List` names them, and trap 21 (a shot name IS a filename) still bites.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go at that moment.** Both UIs in the same change. David
+is Windows-only; never hold a release to verify Avalonia. When a decision is his, use the
+question tool — he has said twice that a question buried in prose is a question that does
+not get answered.
+
+---
+
+## 2026-08-21 (earlier): the agreed plan (Kills & Drops + parity)
 
 `main` pushed at `395c972`. `Directory.Build.props` says **1.99.0** with its What's-new
 entry. Gates: **2,254 unit + 264 Avalonia + 18 E2E**, all green, E2E run three times to
