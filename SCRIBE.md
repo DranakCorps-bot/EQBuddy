@@ -20,6 +20,38 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### mez timers vary from 26 seconds to a minute
+- **Priority:** waiting
+- **Place:** mez chips / MezTracker duration. Overlay deadline. Not Gate 5 widget cards.
+- **Source:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread).
+- **Ask:** mez timers vary from 26 seconds to a minute with no explanation. He has mezz x.
+- **Already shipped:** MezDurationRows.cs: typed > learned > catalog. MezTracker.ResolveDuration uses typed override, then learned, then catalog.
+- **Checked:** those quotes. Hypothesis, unchecked -- chip remaining time is counting down from a source that is not the typed mez x duration, or mez vs mez x resolve as different spells.
+
+### respawn timers randomly re-open after they have been cleared
+- **Priority:** waiting
+- **Place:** spawn chips / spawn timer dismiss. Overlay. Not Gate 5.
+- **Source:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread).
+- **Ask:** respawn timers randomly re-open after they have been cleared.
+- **Already shipped:** spawn chips can be cleared; manual duration override survives updates.
+- **Checked:** not grepped this run. Hypothesis, unchecked -- a later kill or catalog tick recreates a dismissed chip.
+
+### Drops by Creature should list the wiki article name
+- **Priority:** waiting
+- **Place:** Kills & Drops / Drops by Creature. Desktop. ROADMAP folds Drops by creature into that theme.
+- **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
+- **Ask:** Drops by Creature should list the proper name the wiki uses, e.g. "An elemental warrior" not "Elemental Warrior".
+- **Already shipped:** Drops by Creature exists; wiki pack copy uses wiki names in edit text.
+- **Checked:** not grepped this run for article stripping. Hypothesis, unchecked -- display name drops leading A/An/The or title-cases, so it no longer matches the wiki page title.
+
+### Drops by Creature still shows wiki-missing after the page was corrected
+- **Priority:** waiting
+- **Place:** Drops by Creature wiki-missing marker. Desktop.
+- **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
+- **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
+- **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker.
+- **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
+
 ### standalone Motes card (configurable)
 - **Priority:** waiting (David's call — Progress theme already absorbed Motes)
 - **Place:** Progress theme. Not Gate 5 overlay. Not a group meter.
@@ -28,6 +60,8 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** WhatsNew: MOTES had its own card; Progress theme (2026-08-19) absorbed Progress, Money, Motes, Faction, Raids. ROADMAP: fewer definitions, not fewer cards.
 - **Checked:** not grepped this run for the setting. Hypothesis, unchecked -- there is no toggle to undock Motes from Progress.
 - **Also:** #228 daetien-lab Aug 20, 8:43 PM CT (1.98.0). Replied 2026-08-20 (Scribe). "I simply want to track my mote drops in the main window, but now it is hidden behind too much other junk that I don't care about. Keep it more simple." Same ask as this item (motes visible on the main window, not behind Progress / pull-out cards). Broader simplicity complaint is the reason, not a second heading.
+- **Also:** #229 Ceasar29 Aug 20, 11:11 PM CT (1.98.0). Replied 2026-08-21 (Scribe). "the motes aren't showing up... It isn't on the bars and I can't find in menus. Can you fix or bring that back?"
+- **Also:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread). "Motes are buried and seem to move around, rather than being easy to access from the main window."
 
 ### wiki pack Step 2 click on creature name doesn't open wiki
 - **Priority:** must-fix
@@ -139,6 +173,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Source:** #217 Frankthetankk Aug 19, 12:58 PM CT. Old thread — did not reply.
 - **Also:** #226 LeBigNasty Aug 20, 5:12 PM CT (1.98.0). "It would be nice if you could filter out motes and things that can drop from everyone. For things like common drops like gems, it would be nice if the user can filter those out or right click to ignore." Motes corroborate this item. Gems/common-drop ignore is extra; not a second heading yet.
 - **Follow-up Aug 20, 8:55 PM CT:** Frank on #226 and #217. Motes: exclude from pack suggestions (wiki Mote Guide; not creature-specific). Common drops/gems: wiki admins pushed back on omitting as a category; hide-from-my-view vs omit-from-wiki. Not a second heading. Did not reply (old threads).
+- **Follow-up Aug 21, 5:25 AM CT:** LeBigNasty on #226: "Client side is what I meant when I said user filter." Confirms hide-not-omit. Did not reply.
 - **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
 - **Already shipped:** unknown whether the pack currently emits motes.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
