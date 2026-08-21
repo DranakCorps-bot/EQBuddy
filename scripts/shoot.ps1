@@ -66,6 +66,10 @@ $Shots = [ordered]@{
     # 'loot-card' is gone: the Loot card is a LAUNCHER now (the Gear & Loot theme), so
     # EQBUDDY_EXPAND = 'loot' would photograph a one-line button. The rows it used to
     # show are 'gearloot-loot' below, and the launcher line itself is in 'widget-cards'.
+    # The widget's Kills & Drops LAUNCHER since the 2026-08-21 fold, not a card body -
+    # the name is kept because docs/TestPlan.md cites it and the surface is still "what
+    # the kills slot on the widget looks like". EQBUDDY_EXPAND stays for the debug dump;
+    # there is no longer a card to expand.
     'kills-card'      = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'kills' }; Set = @{} }
     # The two remaining heavy card bodies (Gate 5b). Shot before and after their lift so
     # a refactor that changes what a player SEES shows up as a diff in the picture —
@@ -361,7 +365,18 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
-    'drops-window'    = @{ Title = 'Drops'; Env = @{ EQBUDDY_DROPS = '1' }; Set = @{} }
+    # The KILLS & DROPS theme (2026-08-21). Both were reachable before the fold — one as
+    # a widget card, one as a cog-menu window — and both are tabs now, so both get a shot:
+    # a tab nobody photographs is a tab nobody reviews (trap 22).
+    #
+    # THE FILENAME STAYS 'drops-window' even though the window did not. README.md embeds
+    # docs/screenshots/drops-window.png, and a shot name IS a filename (trap 21) — renaming
+    # it here would leave a broken image in the README and a stale PNG in the repo. The
+    # TITLE had to change, because that is what the capture matches on.
+    'drops-window'    = @{ Title = 'Kills & Drops'
+                           Env = @{ EQBUDDY_CREATURE = 'drops' }; Set = @{} }
+    'creature-kills'  = @{ Title = 'Kills & Drops'
+                           Env = @{ EQBUDDY_CREATURE = 'kills' }; Set = @{} }
     # The quick tour's last page illustrates this window. Trap 22 applies hard: history
     # rows come from FINISHED sessions, and make-test-session.ps1 deliberately compresses
     # every idle gap so the fixture is ONE live session — so an unseeded profile shows an

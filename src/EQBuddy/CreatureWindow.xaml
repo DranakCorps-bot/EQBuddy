@@ -1,0 +1,87 @@
+<Window x:Class="EQBuddy.CreatureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EQBuddy Kills &amp; Drops" SizeToContent="Height"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Width="880" WindowStartupLocation="Manual">
+    <!-- The KILLS & DROPS theme (docs/Themes.md). David's grouping, 2026-08-20, and it
+         corrected mine: I had put Kills into Live Meters with Combat and Healing, and he
+         answered "Kills isn't a meter though. we don't track kills per second but we track
+         damage per second, healing per second. Kills and Drops should be … Kills and
+         Drops ;)" A meter is a per-second board; kills/hour is a rate, which is not the
+         same thing.
+
+         BOTH TABS ARE ABOUT THE CREATURE — what died, and what it dropped at what rate.
+         That is one question, "is this camp worth it", and it was answered in two places,
+         one of them (Drops by creature) buried in the cog menu where nobody found it.
+
+         GearLootWindow is the template, down to the chrome, the 880px landscape width and
+         the drag/close/zoom wiring. 880 because the Drops tab is a wide surface — creature
+         heading, item name, count and rate on one line, plus a filter row with three export
+         buttons — and 520 was the LOOT CARD's width, which is right on the widget (where a
+         card shares the monitor with the game) and wrong in a window.
+
+         Why a window and not the overlay: neither tab is a deadline. "What did I kill" and
+         "what did it drop" are reviewed, not reacted to, so by CLAUDE.md's surface rule
+         neither earns space over the running game. What they earn instead is room to be
+         read.
+
+         Nothing below carries a literal size, radius or spacing value — every number
+         resolves out of the token dictionary, and DesignRatchetTests fails the build if a
+         literal reappears. -->
+    <Border Background="{DynamicResource BgBrush}" CornerRadius="{DynamicResource CornerPanel}"
+            BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="1"
+            MouseLeftButtonDown="OnDrag">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title row. The icon is a vector (DesignSystem.Icon), never a glyph — emoji
+             box outright in the Wine prefixes the Linux and macOS builds run under
+             (#148, #166). -->
+        <Grid Grid.Row="0" Margin="{DynamicResource PadCard}">
+            <StackPanel x:Name="TitleRow" Orientation="Horizontal" VerticalAlignment="Center"/>
+            <Button x:Name="CloseBtn" Style="{StaticResource EqIconButton}" ToolTip="Close"
+                    HorizontalAlignment="Right" Click="OnClose"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Margin="{DynamicResource PadCard}">
+            <!-- Labels, order and keys come from Core's CreatureSurface, and the badges
+                 beside them from UI.Shared's CreatureTheme, so this window, the Avalonia
+                 widget and EQBuddy Mobile cannot end up naming different tabs or reporting
+                 different numbers (#184, #210).
+
+                 WRAPS, and it has to. A horizontal StackPanel measures its children with
+                 INFINITE width, so nothing ever reaches a boundary to wrap at and the last
+                 chip is simply clipped at the panel's edge — silently, with no ellipsis to
+                 say so. That is trap 25, and it cost the Progress theme its Raids tab on
+                 the first build. Two chips fit today; the Drops badge is a phrase
+                 ("13 creatures"), so they are not fixed-width. -->
+            <WrapPanel x:Name="TabStrip" Margin="{DynamicResource StackS}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2" x:Name="BodyScroll" VerticalScrollBarVisibility="Auto"
+                      Margin="{DynamicResource PadCard}">
+            <!-- The active tab's surface. It carries no Visibility and no Margin of its
+                 own: the lifted control owns both (trap 15 — a control that hides itself
+                 inside a host that also hides itself has two switches for one state, and
+                 only one of them is ever wired). And neither lifted view brings a
+                 ScrollViewer, because THIS is the scroller (trap 36). -->
+            <ContentControl x:Name="TabBody"/>
+        </ScrollViewer>
+        <!-- The mini-dashboard star the Kills card header used to carry.
+             It HAD to come somewhere. That star is the only writer MiniStats has for
+             "kills", and a fold that drops the last writer of a setting is exactly the
+             shape of #204/#209, #210 and #212 (CLAUDE.md trap 20 and trap 26) —
+             DeadSettingTests would have failed the build, and before that test existed it
+             cost three player-facing bugs. Here it gets the words it never had. -->
+        <StackPanel Grid.Row="3" x:Name="MiniRow" Orientation="Horizontal"
+                    Margin="{DynamicResource PadCard}" VerticalAlignment="Center"/>
+      </Grid>
+    </Border>
+</Window>

@@ -75,7 +75,7 @@ all three call, never from a feature list kept level by hand.
 > reframes the themes: they are not tidying, they are the route to a widget whose only
 > two controls are the cards and the settings. What is still on it, and where each goes —
 > Zone map, Travel route, Spawn timers and Drop camp marker → **World**; Drops by creature
-> → **Kills & Drops**; Session history → **Progress** or its own; Data & imports → mostly
+> → **Kills & Drops** (done 2026-08-21, and the entry is off the cog); Session history → **Progress** or its own; Data & imports → mostly
 > obsolete already, since `/outputfile` dumps import themselves as of 2026-08-20;
 > Auto-detect log folder and Help → **Options** itself.
 
@@ -109,10 +109,10 @@ became one theme, three tabs, one definition in Core. Five more follow:
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
 | **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
-| **Gear & Loot** | Loot, Wishlist, Inventory (= GearLocker + Inventory) + ItemInfo | **done on Windows 2026-08-20** — three tabs: what I picked up, what I want, what I have. Drops LEFT this theme (see Kills & Drops). **Avalonia parity outstanding** — that widget needs its gear-checklist lift first |
+| **Gear & Loot** | Loot, Wishlist, Inventory (= GearLocker + Inventory) + ItemInfo | **DONE, all three platforms** — Windows 2026-08-20, Linux/macOS 2026-08-21. Three tabs: what I picked up, what I want, what I have. Drops LEFT this theme (see Kills & Drops). The Avalonia lane needed its gear-checklist lifted out of MainWindow first, and that landed with it |
 | **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | then — needs `RenderBuffs` lifted first; lands as its own WINDOW with tabs (David, 2026-08-20) |
 | **Live Meters** | Combat, Healing + their breakouts + FightTimeline | biggest lift. **Kills is NOT here** — David, 2026-08-20: *"Kills isn't a meter though. we don't track kills per second but we track damage per second, healing per second."* A meter is a per-second board; kills/hour is a rate but not that |
-| **Kills & Drops** | Kills + Drops by creature | **David's grouping, 2026-08-20** — *"Kills and Drops should be … Kills and Drops ;)"*. Both are about the CREATURE: what died, and what it dropped at what rate. One question — "is this camp worth it?" — currently answered in two places, one of them buried in the cog. Should be a small fold: two existing surfaces, no new logic |
+| **Kills & Drops** | Kills + Drops by creature | **DONE 2026-08-21, both builds at once.** David's grouping, 2026-08-20 — *"Kills and Drops should be … Kills and Drops ;)"*. Both are about the CREATURE: what died, and what it dropped at what rate. One question — "is this camp worth it?" — that used to be answered in two places, one of them buried in the cog menu. The card key stays `kills`, so nobody's card slot moved |
 | **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity. **Already covers what David asked to note on 2026-08-20** — *"Travels and Death should include travel route and zone maps too"* — and goes further: Spawn timers and the drop-camp marker come off the cog with it |
 
 **Progress went before Alerts, and the reason is worth keeping.** The order above was set

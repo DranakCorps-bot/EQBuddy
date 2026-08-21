@@ -113,7 +113,14 @@ public static class OverlaySections
 {
     public static readonly (string Key, string Title)[] Catalog =
     [
-        ("combat", "Combat"), ("healing", "Healing"), ("kills", "Kills"),
+        ("combat", "Combat"), ("healing", "Healing"),
+        // One card for the KILLS & DROPS theme (docs/Themes.md, David 2026-08-20:
+        // "Kills and Drops should be … Kills and Drops"). The Kills card and the
+        // "Drops by creature…" menu window are two tabs there now. The KEY stays
+        // "kills" — it is in every existing player's SectionOrder, HiddenSections and
+        // MiniStats — so there is nothing for a migration to fold and the card keeps
+        // whatever slot the player put it in. Only the LABEL moved.
+        ("kills", "Kills & Drops"),
         // One card for every quest surface (David, 2026-08-16). It replaced the separate
         // "Sky Quest" and "Epics" cards, which each carried a full tabbed checklist on the
         // widget — a review surface, not a glance one, and now a click away in the Quest
@@ -195,6 +202,12 @@ public static class OverlaySections
         ["progress"] = ["Money", "Motes", "Faction", "Raids"],
         // 2026-08-20: the GEAR & LOOT theme (docs/Themes.md).
         ["loot"] = ["Gear"],
+        // 2026-08-21: the KILLS & DROPS theme. "Drops by creature" was never a CARD —
+        // it was an entry in the cog menu — so it is named here anyway, deliberately.
+        // The note's job is to answer "where did the thing I used to open go", and a
+        // menu entry that disappears is exactly as invisible as a card that does
+        // (trap 29 from the other side). Cards & windows is the screen people look at.
+        ["kills"] = ["Drops by creature"],
     };
 
     /// <summary>The one-line "these live in here now" note for a card, or null for a card

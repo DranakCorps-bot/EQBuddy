@@ -52,6 +52,7 @@ public class DeadSettingTests
         ["QuestsTop"] = "written with QuestsLeft by tuple deconstruction",
         ["ProgressTop"] = "written with ProgressLeft by tuple deconstruction",
         ["GearLootTop"] = "written with GearLootLeft by tuple deconstruction",
+        ["CreatureTop"] = "written with CreatureLeft by tuple deconstruction",
         ["SpawnTop"] = "written with SpawnLeft by tuple deconstruction",
         ["TimelineTop"] = "written with TimelineLeft by tuple deconstruction",
 

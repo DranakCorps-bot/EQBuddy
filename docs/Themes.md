@@ -88,8 +88,12 @@ General · Epic 1.0 · Plane of Sky. Phone + desktop.
 
 ### 2. Live Meters
 **Tabs:** Damage · Healing · Pet · Encounters
-**Absorbs:** Combat card, Healing card, Kills card, the Damage/Healing/Pet breakout
+**Absorbs:** Combat card, Healing card, the Damage/Healing/Pet breakout
 windows, `FightTimelineWindow`
+**The Kills card is NOT here, and that was David's correction** (2026-08-20): *"Kills isn't
+a meter though. we don't track kills per second but we track damage per second, healing per
+second. Kills and Drops should be ... Kills and Drops ;)"* A meter is a per-second board;
+kills/hour is a rate, which is not the same thing. See theme 7.
 **Surface:** phone + desktop. **Not the overlay** — nothing about seeing 412 rather
 than 438 changes the next second, and the comparison that makes competitors put it
 on-screen is the thing we refuse to build.
@@ -167,11 +171,27 @@ lookup, "what is this for?" from a loot row, upgrade preview at +N.
 `ZoneShareWindow`
 **Surface:** phone + desktop, with spawn-due chips staying on the overlay.
 
+### 7. Kills & Drops — **BUILT 2026-08-21**
+**Tabs:** Kills · Drops
+**Absorbs:** Kills card, `DropsWindow`
+**Surface:** phone + desktop. Both tabs are about the CREATURE — what died, and what it
+dropped at what rate — which is one question ("is this camp worth it?") that was being
+answered in two places, one of them buried in the cog menu where nobody found it.
+**Card key stays `kills`**, so there is nothing for a settings migration to fold: the card
+keeps whatever slot the player put it in, and its mini-dashboard star moved into the window
+with the header it belonged to (trap 20/26 — that star is `MiniStats`' only writer for
+"kills").
+**Shipped on both builds in the same change**, because the theme switches on in shared
+vocabulary: a fold that landed on Windows alone would take the Kills card off the Linux and
+macOS widget with nowhere for it to go.
+
 **Stays as-is:** Options, History, Tutorial, WhatsNew, Feedback, SessionPicker,
 Companion, CursorRing, GridOverlay. These are chrome and setup, not themes.
 
 **Outcome:** 14 cards → 6, and each theme owns one window with one Core definition
-behind it.
+behind it. **Three are built** (Quests, Progress, Gear & Loot) plus Kills & Drops, which
+the numbering above puts last only because it was not in the original plan — it came out of
+David reading "Kills" under Live Meters and disagreeing.
 
 ---
 
@@ -188,12 +208,18 @@ would have bought 14 → 13, with `RenderBuffs` (107 lines, tangled into the buf
 evaluator) to lift first. **The right question is not "what does the plan say next" but
 "which theme is most nearly built already".**
 
+0. ~~**Gear & Loot**~~ — **done 2026-08-20** (Windows) and **2026-08-21** (Linux/macOS,
+   the Inventory tab), and ~~**Kills & Drops**~~ — **done 2026-08-21**, both builds at once.
+   Kills & Drops was not on this list at all: it exists because David rejected Kills being
+   filed under Live Meters, which is the best argument in this document for showing the
+   grouping to a player before building the window.
 1. ~~**Progress**~~ — **done 2026-08-19.** Pure aggregation over data already computed;
    the natural home for all-time stats.
 2. **Alerts** — mostly a settings surface, the chips it configures already work, and
    `AlertSoundPlan` is already shared and tested. Also closes the "settings live in
    Options except where they don't" seam. Needs `RenderBuffs` lifted first.
-3. **Gear & Loot** — unblocks #174, which is already approved and waiting.
+3. ~~**Gear & Loot**~~ — done; #174's features can land on its Items tab, which is
+   named-but-unhosted.
 4. **Live Meters** — biggest MainWindow lift, so the most E2E pinning needed first.
 5. **World** — the map is the heaviest surface and the one with the most mobile
    parity work; do it when the recipe is boring.

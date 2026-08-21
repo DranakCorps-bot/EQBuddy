@@ -34,7 +34,6 @@
                           ToolTip="Hop-by-hop directions from where you are to any zone"/>
                 <MenuItem Header="Spawn timers…" Click="OnSpawnsWindow"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
-                <MenuItem Header="Drops by creature…" Click="OnDropsWindow"/>
                 <Separator/>
                 <MenuItem Header="Drop camp marker" Click="OnCampMarker"/>
                 <MenuItem x:Name="ClickThroughItem" Header="Click-through (game clicks pass through)"
@@ -442,25 +441,33 @@
                 </StackPanel>
             </Expander>
 
-            <Expander x:Name="KillsSection" Style="{StaticResource Section}">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Skull" Text="Kills"/>
-                        <TextBlock x:Name="KillsHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0"/>
-                        <ToggleButton x:Name="StarKills" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="kills" Click="OnStarChanged" ToolTip="Show kills in mini dashboard"/>
-                    </Grid>
-                </Expander.Header>
-                <!-- Built in code by KillsCardView (Gate 5b) — the first card written as
-                     an IWidgetCard against ICardContext rather than against MainWindow.
-                     What it SHOWS is UI.Shared/KillsPresentation, tested without a window. -->
-                <ContentControl x:Name="KillsBody"/>
-            </Expander>
+            <!-- The KILLS & DROPS theme's launcher (docs/Themes.md step 3). David's
+                 grouping, 2026-08-20: "Kills isn't a meter though … Kills and Drops
+                 should be … Kills and Drops ;)". The Kills card and the "Drops by
+                 creature…" menu window are two tabs in CreatureWindow now, and this line
+                 carries what the card header carried plus the rate, so the glance survives
+                 the fold rather than being traded for a click.
+
+                 The KEY stays "kills": it is in every existing player's SectionOrder,
+                 HiddenSections and MiniStats, so the card keeps the slot they put it in
+                 and there is nothing for a migration to fold.
+
+                 Auto/* rather than */Auto so the TITLE holds its size and the summary is
+                 the part that ellipsises — the same shape the Gear & Loot launcher uses. -->
+            <Button x:Name="KillsSection" Style="{StaticResource SectionLink}" Click="OnCreatureWindow"
+                    ToolTip="Open Kills &amp; Drops — what died this session, and what it dropped at what rate">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <local:EqCardTitle Icon="Skull" Text="Kills &amp; Drops"/>
+                    <TextBlock x:Name="KillsHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Margin="{DynamicResource IndentM}"
+                               TextTrimming="CharacterEllipsis" Text=""/>
+                </Grid>
+            </Button>
 
             <!-- The GEAR & LOOT theme's launcher (docs/Themes.md step 3). The Loot and
                  Gear cards became two tabs in GearLootWindow; this line carries what both

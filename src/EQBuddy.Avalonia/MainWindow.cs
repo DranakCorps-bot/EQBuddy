@@ -21,7 +21,7 @@ using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 namespace EQBuddy.Avalonia;
 
 public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost,
-    IProgressHost, IGearLootHost
+    IProgressHost, IGearLootHost, ICreatureHost
 {
     private readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
@@ -503,7 +503,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // after the startup replay has fed the ledger. Deferred a beat via Post so
         // the widget's own layout lands first, mirroring WPF's ApplicationIdle.
         if (Environment.GetEnvironmentVariable("EQBUDDY_DROPS") == "1")
-            Loaded += (_, _) => Dispatcher.UIThread.Post(() => OnDropsWindow(this, EventArgs.Empty),
+            Loaded += (_, _) => Dispatcher.UIThread.Post(
+                () => ShowCreatureWindow(CreatureSurface.KeyFor(CreatureTab.Drops)),
                 DispatcherPriority.ApplicationIdle);
 
         // "1" opens the default view; "zone"/"all" open that mode directly.
@@ -975,7 +976,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         AddSection("combat", "dps", "Combat", _combatHeader, BuildCombatSection(), "Show DPS in mini dashboard");
         AddSection("healing", "hps", "Healing", _healingHeader, BuildHealingSection(), "Show HPS in mini dashboard");
-        AddSection("kills", "kills", "Kills", _killsHeader, BuildKillsSection(), "Show kills in mini dashboard");
+        // ONE card for the KILLS & DROPS theme (docs/Themes.md), in the same change as
+        // the WPF twin. David's grouping, 2026-08-20: "Kills isn't a meter though ...
+        // Kills and Drops should be ... Kills and Drops ;)". Both tabs are about the
+        // CREATURE — what died and what it dropped — and one of them was buried in the
+        // cog menu where nobody found it.
+        //
+        // The BODY is still built here and still rendered here — CreatureWindow hosts it
+        // through ICreatureHost.CreatureTabBody, the way GearLootWindow hosts its three.
+        // The KEY stays "kills", so the card keeps the slot the player put it in.
+        _creatureTabBodies[CreatureTab.Kills] = BuildKillsSection();
+        _creatureTabBodies[CreatureTab.Drops] = Drops.Body;
+        _sections["kills"] = AppTheme.SectionLink(
+            Header("kills", "Kills & Drops", _killsHeader), () => ShowCreatureWindow());
+        ToolTip.SetTip(_sections["kills"],
+            "Open Kills & Drops — what died this session, and what it dropped at what rate");
         // ONE card for the GEAR & LOOT theme (docs/Themes.md), in the same change as
         // the WPF twin. It replaced the Loot and Gear cards: what did I get, and what am
         // I still missing. Both are questions you look AWAY for, so by CLAUDE.md's surface
@@ -1414,7 +1429,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             "Hop-by-hop directions from where you are to any zone"));
         menu.Items.Add(Item("Spawn timers…", (_, _) => ShowSpawnsWindow()));
         menu.Items.Add(Item("Session history…", OnHistory));
-        menu.Items.Add(Item("Drops by creature…", OnDropsWindow));
         menu.Items.Add(new Separator());
         menu.Items.Add(Item("Drop camp marker", (_, _) => DropCampMarker()));
         _clickThroughItem.Click += (_, _) => SetClickThrough(!_clickThrough);
@@ -1850,7 +1864,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_questsWindow is { IsVisible: true } qw) qw.MaybeRefresh();
         if (_progressWindow is { IsVisible: true } pw) pw.MaybeRefresh();
         if (_gearLootWindow is { IsVisible: true } gw) gw.MaybeRefresh();
-        if (_dropsWindow is { IsVisible: true } dw) dw.MaybeRefresh();
+        if (_creatureWindow is { IsVisible: true } cw) cw.MaybeRefresh();
         if (_wikiPackWindow is { IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsVisible: true } mapw) mapw.MaybeRefresh();
 
@@ -2030,7 +2044,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _kpiKills.Text = $"{s.YourKillCount}";
         _kpiLoot.Text = $"{s.LootTotal}";
         _kpiXp.Text = $"{s.XpPerHour:0.#}%";
-        _killsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
+        // The KILLS & DROPS launcher's one line. It replaced a card header that said
+        // only "12 (+3)", so it CARRIES that and adds the rate and the creature count —
+        // a fold gets to choose which numbers survive, it does not get to lose one
+        // quietly (#219). CreatureTheme is the shared assembly, so this line, the
+        // window's tab badges and the WPF twin cannot disagree.
+        _killsHeader.Text = CreatureTheme.LauncherSummary(s);
         // The Gear & Loot card is a launcher, not a list: its one line carries what BOTH
         // card headers carried, so the glance survives the fold rather than being traded
         // for a click (#219's lesson, taken in advance). The rows happen in the window.
@@ -2177,7 +2196,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
             FillList(_healerList, s.HealsByHealer.Select(h => (h.Name, $"{h.Total:N0} - {h.Hits} heal{(h.Hits == 1 ? "" : "s")}")));
         }
-        if (_sections["kills"].IsExpanded)
+        if (CreatureTabShowing(CreatureTab.Kills))
         {
             _killsSummary.Text = $"{s.KillsPerHour:0.0} kills/hr - {s.KillsPerActiveHour:0.0} active" +
                 (s.Recent is { } rk ? $" - last {(int)rk.Window.TotalMinutes}m: {rk.Kills}" : "");
@@ -3643,7 +3662,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         RefreshExpandedSections(snap);
     }
 
-    private DropsWindow? _dropsWindow;
+    private CreatureWindow? _creatureWindow;
     private WikiPackWindow? _wikiPackWindow;
     private MapWindow? _mapWindow;
     private TravelWindow? _travelWindow;
@@ -3674,20 +3693,85 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _questsWindow.Activate();
     }
 
-    private void OnDropsWindow(object? sender, EventArgs e)
+    /// <summary>The Drops surface, lifted out of DropsWindow when it became a tab.
+    /// Built lazily and once — a Control has one parent, so the day a second host wants
+    /// this surface it builds its own instance rather than sharing this one.</summary>
+    private DropsCardView Drops => _drops ??= new DropsCardView(this);
+
+    private DropsCardView? _drops;
+
+    /// <summary>The two Kills &amp; Drops tab bodies. CreatureWindow hosts them.</summary>
+    private readonly Dictionary<CreatureTab, Control> _creatureTabBodies = new();
+
+    /// <summary>The Kills &amp; Drops window, for the headless render tests — the two
+    /// surfaces it hosts have no other place to be asserted on since the fold, and this
+    /// build has no E2E suite at all (docs/TestPlan.md).</summary>
+    internal CreatureWindow? CreatureWindowForTests => _creatureWindow;
+
+    /// <summary>What the tab strip is actually offering — so a test can demand that every
+    /// tab the shared catalog names is one this build can draw, rather than only that the
+    /// offered ones open. The Gear &amp; Loot lane learned that distinction the hard way.</summary>
+    internal IReadOnlyList<CreatureTabHeader> OfferedCreatureTabsForTests =>
+        ((ICreatureHost)this).CreatureTabs(CurrentSnapshot());
+
+    /// <summary>Is the window open and showing this tab? The render guards ask this where
+    /// they used to ask "is this card expanded" — same rule either way.</summary>
+    private bool CreatureTabShowing(CreatureTab tab) =>
+        _creatureWindow is { IsVisible: true } w && w.Tab == tab;
+
+    // ---- ICreatureHost ----
+    Control ICreatureHost.CreatureTabBody(CreatureTab tab) => _creatureTabBodies[tab];
+
+    /// <summary>Both tabs are real from the start, unlike Gear &amp; Loot — Kills was
+    /// already a card and Drops was already a window — so the filter that lane needs has
+    /// nothing to hide here. It stays anyway: LootSurface.Hosted grew a member this build
+    /// could not draw once already, and the crash was a dictionary lookup exactly like the
+    /// one below.</summary>
+    IReadOnlyList<CreatureTabHeader> ICreatureHost.CreatureTabs(StatsSnapshot s) =>
+        [.. CreatureTheme.Tabs(s).Where(h => _creatureTabBodies.ContainsKey(h.Tab))];
+
+    IReadOnlyList<(string Key, Control Star, string Label, string Tip)> ICreatureHost.CreatureMiniStars()
     {
-        if (_dropsWindow is null)
+        // Registered in _stars and wired to OnStarChanged, so a click still toggles the
+        // setting, repaints EVERY star and re-decides the breakouts. A star the window
+        // owned instead would be a second mechanism for one piece of state — and this one
+        // is the ONLY writer MiniStats has for "kills" (trap 20, trap 26).
+        const string tip = "Show kills in the mini dashboard";
+        var star = AppTheme.StarButton("kills", tip);
+        star.Click += OnStarChanged;
+        _stars["kills"] = star;
+        UpdateStarVisuals();
+        return [("kills", star, "Kills", tip)];
+    }
+
+    /// <summary>Open (or front) the Kills &amp; Drops window — the theme's two tabs, and the
+    /// only way to reach a surface that used to be a card and one that used to be a menu
+    /// entry.</summary>
+    internal void ShowCreatureWindow(string? tab = null)
+    {
+        // Same reopen contract as every satellite here: a null field means closed for
+        // real (Avalonia's Show() throws on a closed window).
+        if (_creatureWindow is null)
         {
-            var window = new DropsWindow(this);
+            var window = new CreatureWindow(this);
             window.Closed += (_, _) =>
             {
-                if (ReferenceEquals(_dropsWindow, window)) _dropsWindow = null;
+                if (ReferenceEquals(_creatureWindow, window)) _creatureWindow = null;
+                // The star went with it. Leaving a dead control in the table would have
+                // UpdateStarVisuals painting a button in a torn-down window forever.
+                _stars.Remove("kills");
             };
-            _dropsWindow = window;
+            _creatureWindow = window;
         }
-        _dropsWindow.Update(CurrentSnapshot());
-        _dropsWindow.Show();
-        _dropsWindow.Activate();
+        _creatureWindow.Show();
+        if (tab is { Length: > 0 }) _creatureWindow.SetTab(tab);
+        _creatureWindow.Activate();
+        // Paint the tab NOW rather than on the next tick: opening a surface and staring at
+        // an empty one is the field report that made the widget render on expand.
+        var snap = CurrentSnapshot();
+        _creatureWindow.Refresh();   // picks the tab, so the guards below know which one
+        Drops.Render(snap);
+        RefreshExpandedSections(snap);
     }
 
     /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under

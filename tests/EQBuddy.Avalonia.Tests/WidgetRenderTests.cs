@@ -372,6 +372,60 @@ public class WidgetRenderTests : IDisposable
 
     private static string TextOf(TextBlock t) =>
         t.Text is { Length: > 0 } s ? s : t.Inlines?.Text ?? "";
+    /// <summary>The KILLS &amp; DROPS theme reached this build in the SAME change as its
+    /// WPF twin, which is not a preference: the theme switches on in shared vocabulary
+    /// (<see cref="CreatureSurface"/> and the Options catalog), so a fold that landed on
+    /// Windows alone would take the Kills card off this widget with nowhere for it to go.
+    /// That is the 1.98.1 Inventory gap running the other way.
+    ///
+    /// Both tabs are selected and both are demanded to have a body — the assertion
+    /// EveryTabTheWindowOffersCanBeOpened was written for, applied to the new theme from
+    /// its first commit rather than after a KeyNotFoundException taught it.</summary>
+    [AvaloniaFact]
+    public void TheKillsAndDropsWindowOffersBothTabsAndDrawsThem()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.RenderSnapshotForTest(new StatsSnapshot
+        {
+            YourKillCount = 12,
+            Mobs = [new MobSummary("a moss snake", 2, 2, 10, 1.0, 0,
+                [new MobLoot("Snake Fang", 1, 50.0)])],
+        });
+        Dispatcher.UIThread.RunJobs();
+
+        // The widget keeps a DOOR, and the line behind it carries what the card header
+        // carried plus the rate — a fold chooses which numbers survive, it does not get to
+        // lose one quietly (#219).
+        var widget = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Kills & Drops", widget);
+        Assert.Contains("↗", widget);   // this card leaves rather than unfolds
+
+        window.ShowCreatureWindow();
+        var host = window.CreatureWindowForTests!;
+        foreach (var tab in CreatureSurface.Hosted)
+        {
+            window.ShowCreatureWindow(CreatureSurface.KeyFor(tab));
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(CreatureSurface.KeyFor(tab), CreatureSurface.KeyFor(host.Tab));
+            Assert.NotEmpty(host.GetLogicalDescendants().OfType<TextBlock>());
+        }
+        // Every hosted tab is offered — no "not implemented here yet" hole to grow into.
+        // What the tabs SAY is asserted through the shared vocabulary, and what each one
+        // DRAWS is asserted by DropsRenderTests and by the Kills card's own rows: this
+        // window reads CurrentSnapshot() from the live widget rather than a seeded one, so
+        // a row assertion here would be a test of the empty session, not of the fold.
+        var tabs = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        foreach (var tab in CreatureSurface.Hosted)
+            Assert.Contains(CreatureSurface.LabelFor(tab), tabs);
+        Assert.Equal(CreatureSurface.Hosted.Count, window.OfferedCreatureTabsForTests.Count);
+
+        host.Close();
+        window.Close();
+    }
+
     /// <summary>The launcher that replaced the two cards. It has one line to carry what
     /// both card headers carried, and the tab strip beside it has to name both surfaces —
     /// #219 is the release where a fold trimmed a number out of a summary line and the

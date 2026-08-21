@@ -125,15 +125,72 @@ public sealed class EndToEndTests
             "the ⧉ copy of /outputfile inventory to be on the EMPTY tab");
     }
 
+    /// <summary>The DROPS surface draws its creatures, its item rows and the filter that
+    /// narrows both the display and the exports.
+    ///
+    /// Written BEFORE its body is lifted out of <c>DropsWindow.xaml</c> into a tab of the
+    /// Kills &amp; Drops theme. That lift is a XAML-to-code conversion rather than the
+    /// straight move the Gear Locker was, so every control is re-created by hand and any
+    /// one of them can go missing with the build still green — and the WPF layer has no
+    /// unit tests (docs/TestPlan.md §5). This assertion is the only thing between the
+    /// conversion and a silent regression, and it is written to survive the move: the same
+    /// keys, read out of whichever host owns the surface.
+    ///
+    /// The counts come off the fixture replay rather than being spelled out, because the
+    /// fixture log is shared and a hard-coded creature count would be a test of the
+    /// fixture. What is asserted is the RELATIONSHIP the surface exists to draw: a heading
+    /// per creature, a row per drop, and the two adding up to what is on screen.</summary>
+    [Fact]
+    public void TheDropsSurfaceDrawsACreatureHeadingAboveItsDropRows()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_DROPS"] = "1",
+        });
+        app.Launch();
+
+        // The fixture kills things and loots them, so there is something to group.
+        Wait.Until(() => app.DumpValue("dropsMobs") > 0, TimeSpan.FromSeconds(45),
+            "the fixture replay to land at least one creature with a drop");
+
+        var mobs = app.DumpValue("dropsMobs");
+        var items = app.DumpValue("dropsItems");
+        Assert.True(items >= mobs,
+            $"every creature shown has at least one drop (mobs={mobs}, items={items})");
+        // One heading per creature, one row per drop. This is the fact the conversion can
+        // lose without failing anything else: drop the heading loop and the rows still
+        // render, drop the row loop and the headings still do.
+        app.WaitForDump("dropsRows", mobs + items,
+            "a heading per creature above a row per drop");
+        app.WaitForDump("dropsFilterLen", 0, "the filter box to start empty");
+    }
+
     [Fact]
     public void SessionGoesLive_AndFreshKillUpdatesLiveStats()
     {
-        using var app = new AppHarness();
+        // The kill ROWS are a tab now (the Kills & Drops theme), so the window has to be
+        // open for them to exist. The COUNT still lives on the widget — it is the first
+        // part of the launcher's one line — which is the split this assertion pins: the
+        // number a player glances at stayed put, the list moved. Same shape as
+        // KillThenLoot_ShowsUpOnTheLootSurface after the Gear & Loot fold.
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_CREATURE"] = "kills",
+        });
         app.Launch();   // waits for the replayed session to be live
 
         var kills = app.DumpValue("killsTotal");
-        var killRows = app.DumpValue("kills");
         Assert.True(kills > 0, "fixture replay should land kills");
+        // WAIT FOR THE WINDOW before taking a row baseline. It opens at ApplicationIdle
+        // after Launch() returns, so for a tick or two the dump has no "kills" key at all
+        // and DumpValue answers -1 — which then makes the assertion below wait forever for
+        // a row count of zero. Flaky one run in three until this line.
+        Wait.Until(() => app.DumpValue("kills") >= 0, TimeSpan.FromSeconds(45),
+            "the Kills & Drops window to open and report its rows", app.Artifacts);
+        var killRows = app.DumpValue("kills");
+        Assert.Equal(1, app.DumpValue("killsCard"));   // the door is on the widget
+        Assert.True(app.DumpValue("killsSummaryLen") > 0,
+            "the launcher should summarise the theme; dump was: " + app.Artifacts());
 
         app.AppendLogLines(MeleeHit, Kill);
 
@@ -155,8 +212,12 @@ public sealed class EndToEndTests
         app.Launch();
 
         var lootTotal = app.DumpValue("lootTotal");
-        var lootRows = app.DumpValue("lootRows");
         Assert.True(lootTotal > 0, "fixture replay should land loot");
+        // Same window-open race as the kills test above, latent here since the Gear & Loot
+        // fold and fixed in the same change that found it.
+        Wait.Until(() => app.DumpValue("lootRows") >= 0, TimeSpan.FromSeconds(45),
+            "the Gear & Loot window to open and report its rows", app.Artifacts);
+        var lootRows = app.DumpValue("lootRows");
 
         app.AppendLogLines(MeleeHit, Kill,
             "--You have looted a Harness Test Trinket from a training dummy's corpse.--");

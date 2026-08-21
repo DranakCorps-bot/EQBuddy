@@ -78,7 +78,6 @@ public partial class MainWindow : Window, ICardContext
     // fields here at all: they are not on the widget any more, and ProgressWindow builds
     // its own instances through NewProgressSurfaces() below. A UIElement has one parent,
     // so a shared instance would be torn out of whichever host drew it last.
-    private readonly KillsCardView _kills = new();
     /// <summary>What opened up at this level and the next. The Progress card used to hold
     /// this memo, and three callers still need the answer with no card in sight — the
     /// launcher summary, the buff suggestions and the Progress breakout. Shared with the
@@ -125,7 +124,6 @@ public partial class MainWindow : Window, ICardContext
         // 1.84.0, leaving a process with no window (#158, twidget76). Anything the
         // XAML can call must exist before the XAML is touched.
         _quests = new QuestChecklistView(this, _settings, () => _raidLedger);
-        KillsBody.Content = _kills.Body;
         _unlocks = new LevelUnlockMemo(
             s => BuffSetClassSource(s).Classes,
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
@@ -330,7 +328,7 @@ public partial class MainWindow : Window, ICardContext
         // and the review is an acceptance criterion, not a nicety (Gate 3's §11.6).
         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
         if (expand == "1")
-            foreach (var ex in new[] { CombatSection, HealingSection, KillsSection,
+            foreach (var ex in new[] { CombatSection, HealingSection,
                          TrackedSection, MiscSection })
                 ex.IsExpanded = true;
         else if (!string.IsNullOrWhiteSpace(expand))
@@ -375,7 +373,17 @@ public partial class MainWindow : Window, ICardContext
         // after the startup replay has fed the ledger. "1" opens the default view;
         // "zone"/"all" open that mode directly.
         if (Environment.GetEnvironmentVariable("EQBUDDY_DROPS") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnDropsWindow(this, new RoutedEventArgs()),
+            Loaded += (_, _) => Dispatcher.BeginInvoke(
+                () => ShowCreatureWindow(CreatureTab.Drops),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
+        // Same family as EQBUDDY_PROGRESS / EQBUDDY_GEARLOOT: a theme window that can only
+        // be opened from a card cannot be reviewed, and a surface nobody can review reads
+        // as reviewed anyway (trap 22). A tab key opens it there; anything else opens it
+        // on Kills.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_CREATURE") is { Length: > 0 } cvTab)
+            Loaded += (_, _) => Dispatcher.BeginInvoke(
+                () => ShowCreatureWindow(CreatureSurface.TabForKey(cvTab) ?? CreatureTab.Kills),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_WIKIPACK") == "1")
@@ -960,7 +968,7 @@ public partial class MainWindow : Window, ICardContext
     private readonly Dictionary<string, MobLookupResult?> _targetResults =
         new(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>DropsWindow's window into the target-drops memo (WIKI-NEW, #65): the
+    /// <summary>The Drops tab's window into the target-drops memo (WIKI-NEW, #65): the
     /// Drops view flags observations the wiki doesn't know, reusing the same lookups
     /// and cache the Loot card fires — no extra wiki traffic for creatures already
     /// seen, and anything it does request benefits the Loot card too.</summary>
@@ -1855,16 +1863,26 @@ public partial class MainWindow : Window, ICardContext
     private void OnSpawnsWindow(object sender, RoutedEventArgs e) => ShowSpawnsWindow();
 
     private QuestsWindow? _questsWindow;
-    private DropsWindow? _dropsWindow;
+    private CreatureWindow? _creatureWindow;
     private WikiPackWindow? _wikiPackWindow;
 
-    private void OnDropsWindow(object sender, RoutedEventArgs e)
+    /// <summary>The KILLS & DROPS theme's window. One instance, raised if it is already
+    /// up — the same shape every other theme window uses. The widget CARD is the door, and
+    /// the only one: "Drops by creature…" has come off the cog menu, matching Quests,
+    /// Progress and Gear & Loot. A player who hides the card re-shows it in Options →
+    /// Cards & windows, which now says what this card absorbed.</summary>
+    private void OnCreatureWindow(object sender, RoutedEventArgs e) => ShowCreatureWindow();
+
+    internal void ShowCreatureWindow(CreatureTab? tab = null)
     {
-        if (_dropsWindow is not { IsLoaded: true })
-            _dropsWindow = new DropsWindow(this);
-        _dropsWindow.Update(_stats.Snapshot());
-        _dropsWindow.Show();
-        _dropsWindow.Activate();
+        if (_creatureWindow is not { IsLoaded: true })
+        {
+            _creatureWindow = new CreatureWindow(this) { Owner = this };
+            _creatureWindow.Closed += (_, _) => _creatureWindow = null;
+        }
+        if (tab is { } t) _creatureWindow.SetTab(t);
+        _creatureWindow.Show();
+        _creatureWindow.Activate();
     }
 
     /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under
@@ -2255,7 +2273,7 @@ public partial class MainWindow : Window, ICardContext
         if (_questsWindow is { IsLoaded: true, IsVisible: true } qw) qw.MaybeRefresh();
         if (_progressWindow is { IsLoaded: true, IsVisible: true } pw) pw.MaybeRefresh();
         if (_gearLootWindow is { IsLoaded: true, IsVisible: true } glw) glw.MaybeRefresh();
-        if (_dropsWindow is { IsLoaded: true, IsVisible: true } dw) dw.MaybeRefresh();
+        if (_creatureWindow is { IsLoaded: true, IsVisible: true } cw) cw.MaybeRefresh();
         if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
         if (_mapWindow is { IsLoaded: true, IsVisible: true } mapw) mapw.MaybeRefresh();
 
@@ -2423,7 +2441,12 @@ public partial class MainWindow : Window, ICardContext
         KpiKills.Text = $"{s.YourKillCount}";
         KpiLoot.Text = $"{s.LootTotal}";
         KpiXp.Text = $"{s.XpPerHour:0.#}%";
-        KillsHeader.Text = s.PartyKillCount > 0 ? $"{s.YourKillCount} (+{s.PartyKillCount})" : $"{s.YourKillCount}";
+        // The KILLS & DROPS launcher's one line. It replaced a card header that said
+        // only "12 (+3)", so it CARRIES that and adds the rate and the creature count -
+        // a fold gets to choose which numbers survive, it does not get to lose one
+        // quietly (#219). The assembly is CreatureTheme's, shared with the window's tab
+        // badges and the phone.
+        KillsHeader.Text = CreatureTheme.LauncherSummary(s);
         // Merges + crafts counted apart from drops (#131); the breakout's subheader
         // reports the same two numbers from the same place, so they cannot disagree.
         LootHeader.Text = EQBuddy.UI.Shared.LootPresentation.Header(
@@ -2549,7 +2572,6 @@ public partial class MainWindow : Window, ICardContext
             EqCardRows.Fill(HealerList, EQBuddy.UI.Shared.CombatPresentation.HealerRows(s));
         }
 
-        if (KillsSection.IsExpanded) _kills.Render(s);
 
         // The Gear & Loot card is a launcher, not a list: its one line carries what
         // BOTH card headers carried, so the glance survives the fold rather than being
@@ -2588,7 +2610,14 @@ public partial class MainWindow : Window, ICardContext
                 // Row counts say "a new name appeared"; the snapshot totals say "the
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
-                    $"kills={_kills.KillRowCount} party={_kills.PartyRowCount} " +
+                    // The KILLS & DROPS launcher card (docs/Themes.md). It replaced the
+                    // Kills card, whose row counts used to be asserted here; what a reader
+                    // sees now is one line, so that is what this pins. The ROWS moved with
+                    // the surface into CreatureWindow.DebugFacts() below, where the same
+                    // E2E assertions read them — the point being that they are the SAME
+                    // numbers out of a new host.
+                    $"killsCard={(KillsSection.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    $"killsSummaryLen={KillsHeader.Text.Length} " +
 
                     // The PROGRESS THEME's launcher card (docs/Themes.md). It replaced
                     // five cards whose row counts used to be asserted here; what a reader
@@ -2666,6 +2695,12 @@ public partial class MainWindow : Window, ICardContext
                     // numbers are the ones pinned on the widget before the lift; the
                     // point of the assertion is that they are the SAME numbers.
                     (_gearLootWindow is { IsLoaded: true } glwin ? glwin.DebugFacts() + " " : "") +
+                    // The Kills & Drops WINDOW, when EQBUDDY_DROPS or EQBUDDY_CREATURE
+                    // opened one. Its drops numbers are the ones pinned on the OLD host
+                    // before the lift, and its kills numbers the ones pinned on the widget
+                    // before the fold; the point of the assertion is that they are the SAME
+                    // numbers.
+                    (_creatureWindow is { IsLoaded: true } cwin ? cwin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={_companionPumpTicks} " +
@@ -3301,7 +3336,6 @@ public partial class MainWindow : Window, ICardContext
         yield return ("hps", StarHps);
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
-        yield return ("kills", StarKills);
         yield return ("deaths", StarDeaths);
         yield return ("buffs", StarBuffs);
     }
