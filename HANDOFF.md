@@ -1,14 +1,112 @@
 # EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
-the non-negotiable rules, the where-things-live index, the trap list (35) and the
+the non-negotiable rules, the where-things-live index, the trap list (37) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
 
 ---
 
-## 2026-08-21: 1.98.1 IS LIVE AND SIGNED — start here
+## 2026-08-21 (latest): THE AGREED PLAN IS DONE. NOTHING IS RELEASED.
+
+`main` pushed at `395c972`. `Directory.Build.props` says **1.99.0** with its What's-new
+entry. Gates: **2,254 unit + 264 Avalonia + 18 E2E**, all green, E2E run three times to
+prove the race below is gone.
+
+**David's plan of 2026-08-20 was "Kills and Drops too, verify, and then ship everything
+along with the Avalonia parity". Both halves are in.** What is left is the third step, and
+it is his: **`pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.0`, on his explicit go
+at that moment.** The 1.98.1 go does not carry forward.
+
+### What landed
+
+**1. The parity gap is closed.** Linux and macOS have the Inventory tab.
+- The gear checklist came out of `EQBuddy.Avalonia/MainWindow.cs` into `GearCardView.cs`
+  first, because that file had THREE ratchet lines left. Baseline lowered 5,127 → 5,422 in
+  the same commit; `CopyCommandButton` moved to `DesignSystem` so a lifted surface does not
+  have to copy it.
+- `EQBuddy.Avalonia/InventoryView.cs` replaces `GearLockerWindow` + `InventoryWindow`, both
+  deleted, both cog entries gone. It takes DELEGATES where the WPF twin takes `MainWindow`
+  — deliberate: this build has no E2E, so a surface that can only be built from a live
+  widget has no cover at all.
+- `WidgetRenderTests` now demands EVERY tab in `LootSurface.Hosted` is offered, not merely
+  that the offered ones open. The old assertion tolerated a missing tab on purpose, and
+  that tolerance is what let the build ship a release behind.
+
+**2. Kills & Drops, both builds at once.** `CreatureWindow` in each UI, `DropsCardView` in
+each, `DropsWindow` deleted from both. The Kills card is the door; `Drops by creature…` is
+off the cog. Card key stays `kills`, so no settings migration and nobody's card slot moved.
+The mini star went into the window with the header (traps 20/26).
+
+### Bugs that came out of it, all of which shipped fixed
+
+- **Windows: the Inventory tab redrew once a second**, re-scanning the game folder and
+  clearing the panel under the player's cursor — so a long inventory could not be read past
+  its first screen. Both builds now paint it on arrival, on Refresh, and when a new dump
+  lands.
+- **Windows: filtering Drops to something that matched nothing kept the stale rows.** The
+  signature hashed only rows and reset to `""`, so an empty result collided with the reset
+  sentinel. Avalonia had already fixed it.
+- **Both: the drop-row badges were click-handled EMOJI** — boxes under Wine, and #211's
+  hit-testing hole waiting for anyone who converted them naively. `InlineIconButton` now.
+- **E2E had a latent race**: a theme window opens at `ApplicationIdle` AFTER `Launch()`
+  returns, so a row baseline read in that gap is `-1` and the later wait hangs on `-1 + 1`.
+  Flaky one run in three; the loot test had carried it silently since its own fold.
+- **Trap 37, and only the screenshot found it**: a lifted view's PINNED chrome stops being
+  pinned. The Drops footer — the only in-app pointer to where the wiki pack went (#217) —
+  ended up under thirteen creatures of rows.
+
+### Do first next time
+
+1. **`OptionsWindow.xaml.cs` has 32 ratchet lines and `LogParser.cs` has 14.** Those are
+   the two tight ones now; the Avalonia widget has 442 and the WPF one 273. The Options
+   window is the next lift, and `MezDurationsView.cs` is the worked example of lifting out
+   of it.
+2. **`GearCardView`'s 320px `MaxHeight`** — a card-sized cap now living in an 880px window,
+   on BOTH builds. It is the one remaining child scroller in the Gear & Loot window (trap
+   36's neighbourhood); it gets away with it because the hard cap gives it real overflow.
+3. **The Raids surface stores its auto-import outcome and never renders it** —
+   `ImportReportView` exists and is wired only to Gear.
+4. **Items** as a Gear & Loot tab — still named-but-unhosted, and it is where #174's
+   approved features are meant to land.
+5. **EQBuddy Mobile has no Kills & Drops surface.** The theme is desktop-and-phone by the
+   surface rule, and the phone half was not built. `CompanionProjection` is the place; the
+   badges and the launcher line already come from `CreatureTheme`, so the phone can read
+   the same numbers rather than hand-rolling a fourth copy (#210's lesson).
+6. **EQBuddy Mobile "Couldn't listen on port 47998"** (David, 2026-08-20). **Not
+   reproducible.** Worth checking whether the companion listener sets `SO_REUSEADDR` — the
+   error blames another program when the usual culprit is our own just-exited copy.
+
+### David's direction — recorded in ROADMAP.md
+
+**The gear button should BE Options**, not a menu containing Options: *"I would like the
+gear to eventually be the path to options not click gear then click options from a list of
+things."* Every remaining cog entry is named there with the theme that claims it. Two came
+off it today. Travel route and zone maps are the World theme, which also takes Spawn timers
+and the drop-camp marker.
+
+### Waiting on reporters — do not chase, do not close
+
+`#218`, `#221`, `#101`/`#193`. `#202` is answered; close it if bjstrange confirms.
+
+**Scribe:** `SCRIBE.md` has items untouched — #225 (window position resets on update), #224
+(voice for interrupted/resisted), #222 (mobile pull-refresh with one card, must-fix), #223
+(waiting on David, do not ping), #208 (Wayland chip placement, must-fix), #153 (custom alert
+volume — needs a fact, not another guess), and #228 corroborating the motes ask. Take one,
+delete it, and note what helped in `SCRIBE-FEEDBACK.md`.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go.** Both UIs in the same change — the two folds this
+session are both cases where shipping one lane alone would have deleted a card on the other.
+David is Windows-only; never hold a release to verify Avalonia. When a decision is his, use
+the question tool.
+
+---
+
+## 2026-08-21 (earlier): 1.98.1 shipped, and the parity gap it left
 
 `main` clean at `eef2f50`, tag `v1.98.1`. **7 assets, signature Valid,
 `CN=FlossworksCross-Stitch`, timestamped**, OneDrive updated, installed locally. Gates:
@@ -124,7 +222,7 @@ decision is his, use the question tool.
 
 ---
 
-## 2026-08-20 (latest): Gear & Loot is DONE ON WINDOWS, and nothing is released
+## 2026-08-20: Gear & Loot is DONE ON WINDOWS
 
 **`main` pushed at `e382cd6`. `Directory.Build.props` says 1.98.1 with its What's-new
 entry. NOT released — the family is still on 1.98.0 and David has not said ship.** He is

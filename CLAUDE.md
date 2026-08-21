@@ -648,6 +648,19 @@ Read this list before touching the areas it names. Every entry cost a release.
     `GearCardView` gets away with its own scroller only because a hard `MaxHeight` gives it
     genuine overflow — which is a card-sized cap now living in a window, and worth a look.
 
+37. **Trap 36 has a second half: a lifted view's PINNED chrome stops being pinned.**
+    Scrolling belongs to the host, so a view arrives with no scroller of its own — but the
+    thing it left behind was a `Grid` whose rows put a footer OUTSIDE the scroller, always
+    on screen. Concatenate that footer into a `StackPanel` body and it is now the last
+    thing after every row: the Drops tab's footer, which carries the only in-app pointer to
+    where the wiki contribution pack went (#217), landed under thirteen creatures of rows.
+    Nothing sees it — not a diff (the control is there), not a test (it renders), not the
+    unit suite. The first screenshot did, immediately.
+    → **When you lift a view out of a Grid, list what each ROW of that grid was buying.**
+    A row that existed to keep something visible is a decision, not layout. Either give the
+    fact to the host's own chrome or move it ABOVE the scrolling content, which is what the
+    Drops tab did — orientation text is read on arrival, so the top is where it belongs.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
