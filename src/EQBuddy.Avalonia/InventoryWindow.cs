@@ -48,11 +48,16 @@ public sealed class InventoryWindow : Window
         Background = AppTheme.BgBrush;
         ToolTip.SetTip(_status, OutputFileTip);
 
-        var bar = new DockPanel { Margin = new Thickness(10, 8, 10, 0) };
+        // A DockPanel's FILL child gets whatever the docked children leave, and docked
+        // children take what they ask for — three Dock.Right buttons were ~440px of a
+        // 470px window, so the status wrapped ONE CHARACTER PER LINE and the buttons,
+        // which stretch to the row height, grew into 380px slabs (David's screenshot,
+        // 2026-08-20). Trap 14's cousin and invisible in code. WPF twin fixed the same way.
+        var bar = new StackPanel { Margin = new Thickness(10, 8, 10, 0) };
+        var buttons = new WrapPanel();
         var refresh = AppTheme.IconButton("⟳ Refresh", OutputFileTip);
         refresh.Click += (_, _) => Render();
-        DockPanel.SetDock(refresh, Dock.Right);
-        bar.Children.Add(refresh);
+        buttons.Children.Add(refresh);
         // Same one-click command as the quest tracker's held tab (David's ask,
         // 2026-08-11): copy here, paste in the game's chat, click ⟳.
         var copyCmd = AppTheme.IconButton($"⧉ copy  {GameCommands.OutputfileInventory}",
@@ -69,8 +74,9 @@ public sealed class InventoryWindow : Window
             }
             catch (Exception ex) { App.LogError(ex); }   // clipboard momentarily held by another app
         };
-        DockPanel.SetDock(copyCmd, Dock.Right);
-        bar.Children.Add(copyCmd);
+        buttons.Children.Add(copyCmd);
+        bar.Children.Add(buttons);
+        _status.Margin = new Thickness(0, 6, 0, 0);
         bar.Children.Add(_status);
 
         var root = new DockPanel();
@@ -92,7 +98,7 @@ public sealed class InventoryWindow : Window
         if (snap is null)
         {
             _status.Text = $"No inventory dump found yet — in game, type  {GameCommands.OutputfileInventory}  " +
-                "and click ⟳. (Hover for the full recipe.)";
+                "and this fills in on its own. (Hover for the full recipe.)";
             return;
         }
         var age = DateTime.Now - snap.WrittenAt;

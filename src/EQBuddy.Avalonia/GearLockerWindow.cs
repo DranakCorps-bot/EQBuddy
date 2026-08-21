@@ -51,11 +51,16 @@ public sealed class GearLockerWindow : Window
         Background = AppTheme.BgBrush;
         ToolTip.SetTip(_status, InventoryWindow.OutputFileTip);
 
-        var bar = new DockPanel { Margin = new Thickness(10, 8, 10, 0) };
+        // A DockPanel's FILL child gets whatever the docked children leave, and docked
+        // children take what they ask for — three Dock.Right buttons were ~440px of a
+        // 470px window, so the status wrapped ONE CHARACTER PER LINE and the buttons,
+        // which stretch to the row height, grew into 380px slabs (David's screenshot,
+        // 2026-08-20). Trap 14's cousin and invisible in code. WPF twin fixed the same way.
+        var bar = new StackPanel { Margin = new Thickness(10, 8, 10, 0) };
+        var buttons = new WrapPanel();
         var refresh = AppTheme.IconButton("⟳ Refresh", InventoryWindow.OutputFileTip);
         refresh.Click += (_, _) => Render();
-        DockPanel.SetDock(refresh, Dock.Right);
-        bar.Children.Add(refresh);
+        buttons.Children.Add(refresh);
         _fetch = AppTheme.IconButton("",
             "Fetches the wiki page for each owned item that has no cached stats "
             + "yet — one page at a time, politely spaced, cached for a week. Rows fill in "
@@ -63,8 +68,7 @@ public sealed class GearLockerWindow : Window
         _fetch.FontSize = 11;
         _fetch.Margin = new Thickness(0, 0, 6, 0);
         _fetch.Click += async (_, _) => await FetchMissing();
-        DockPanel.SetDock(_fetch, Dock.Right);
-        bar.Children.Add(_fetch);
+        buttons.Children.Add(_fetch);
         // Same one-click command as the Inventory window and the quest tracker's
         // held tab (David, 2026-08-14): copy, paste in the game's chat, click ⟳.
         var copyCmd = AppTheme.IconButton($"⧉ copy  {GameCommands.OutputfileInventory}",
@@ -81,8 +85,9 @@ public sealed class GearLockerWindow : Window
             }
             catch (Exception ex) { App.LogError(ex); }   // clipboard momentarily held by another app
         };
-        DockPanel.SetDock(copyCmd, Dock.Right);
-        bar.Children.Add(copyCmd);
+        buttons.Children.Add(copyCmd);
+        bar.Children.Add(buttons);
+        _status.Margin = new Thickness(0, 6, 0, 0);
         bar.Children.Add(_status);
 
         var root = new DockPanel();
@@ -120,7 +125,7 @@ public sealed class GearLockerWindow : Window
         if (snap is null)
         {
             _status.Text = $"No inventory dump found yet — in game, type  {GameCommands.OutputfileInventory}  "
-                + "and click ⟳. (Hover for the full recipe.)";
+                + "and this fills in on its own. (Hover for the full recipe.)";
             _fetch.IsVisible = false;
             return;
         }
