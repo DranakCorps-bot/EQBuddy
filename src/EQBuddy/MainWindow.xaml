@@ -33,8 +33,6 @@
                 <MenuItem Header="Travel route…" Click="OnTravelRoute"
                           ToolTip="Hop-by-hop directions from where you are to any zone"/>
                 <MenuItem Header="Spawn timers…" Click="OnSpawnsWindow"/>
-                <MenuItem Header="Gear &amp; Loot…" Click="OnGearLootWindow"
-                          ToolTip="This session's loot, your wishlist, and everything you own — the Gear &amp; Loot theme. Absorbed the Inventory and Gear Locker windows on 2026-08-20"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
                 <MenuItem Header="Drops by creature…" Click="OnDropsWindow"/>
                 <Separator/>

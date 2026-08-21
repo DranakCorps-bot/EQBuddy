@@ -1,4 +1,4 @@
-﻿# EQBuddy — handoff
+# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
 the non-negotiable rules, the where-things-live index, the trap list (35) and the
@@ -8,46 +8,58 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-20 (latest): NEXT UP — fold Locker and Bags into Gear & Loot
+## 2026-08-20 (latest): Gear & Loot is DONE ON WINDOWS, and nothing is released
 
-**Decided with David, groundwork committed (`f89f25d`), the fold itself NOT started.**
-Do this before anything else in the list further down.
+**`main` pushed at `e382cd6`. `Directory.Build.props` says 1.98.1 with its What's-new
+entry. NOT released — the family is still on 1.98.0 and David has not said ship.** He is
+testing local installs (`scripts/install-local.ps1`, which now signs properly — see below).
 
-He opened the theme expecting his gear and got a wishlist: *"I guess I figured Gear would
-show me what gear I had."* The tab is **`Wishlist`** now — label only, the key stays `gear`
-so no saved card position breaks. `Locker` and `Bags` are in the `LootTab` enum with keys
-and labels, deliberately **not** in `Hosted`, because an empty tab reads as broken.
+### What the theme looks like now
 
-**The fold, as he chose it:**
+Strip is **Loot · Wishlist · Inventory**, in an 880px landscape window.
 
-- Tab strip becomes **Loot · Wishlist · Locker · Bags**. Locker is the Gear Locker
-  (everything wearable you own, ranked per slot); Bags is the Inventory window.
-- **Their two cog-menu entries come OUT** — *"the consolidation of these things should
-  remove the need for them to be under the cog."* Checked: `Gear & Loot…` has its own menu
-  entry (`MainWindow.xaml:38`), so a player who has hidden the card still has a door. Do
-  not remove that one.
-- The roadmap always said this: the theme row lists `Drops, ItemInfo, Inventory, GearLocker`
-  as what it absorbs. This is the second pass, not a new idea.
+- **`Gear` → `Wishlist`.** It held a wishlist and was labelled as though it held your gear:
+  *"I guess I figured Gear would show me what gear I had."* Label only — the key is still
+  `gear`, so no saved card position broke.
+- **Gear Locker + Inventory → ONE `Inventory` tab with two pivots.** They read the same
+  dump, so two tabs off one file made people wonder which was real. By slot (ranked, with
+  ⬆/⬇ — the default, because it is the actionable question) or by bag. `InventoryByContainer`
+  persists it. Both windows are deleted and **both cog entries are gone** at his request;
+  `Gear & Loot…` keeps its own, so the room still has a door.
+- **`/outputfile` dumps import themselves** — the game announces every dump it writes, by
+  name, in the log we already tail, and nothing was listening. See the section below.
 
-**Why it is cheap-ish:** the real logic is already framework-free in
-`UI.Shared/GearLocker.cs` (229 lines) and `Core/InventoryFile.cs`. The windows are thin —
-`EQBuddy/GearLockerWindow.cs` 227 lines, `EQBuddy.Avalonia/GearLockerWindow.cs` 244 — so
-this is the `GearCardView` shape again: lift the BODY into a view, host it in the window
-and in the tab.
+### Four bugs he found by USING it, none of which any gate could see
 
-**Why it needs care:**
+Worth reading as a set, because they are all the same shape — a behaviour that photographs
+and diffs as correct:
 
-1. **`EQBuddy.Avalonia/MainWindow.cs` has 25 ratchet lines left** (5,615 / 5,640) and
-   `LogParser.cs` has 14. The gear-checklist lift out of Avalonia MainWindow is now
-   genuinely blocking, not merely overdue. Lift first, then fold — a fold ADDS ~90 lines
-   because it moves surfaces and leaves the doors.
-2. **Pin before moving.** WPF gets `EQBUDDY_EXPAND` facts asserted from `tests/EQBuddy.E2E`;
-   Avalonia has no E2E, so `WidgetRenderTests` is the only cover — write those first.
-3. **`EQBUDDY_GEARLOOT` already accepts `locker` and `bags`**, so the shots can be staged
-   the moment the tabs exist. `docs/screenshots/gear-locker.png` exists and is hand-taken —
-   check it before naming a shot (trap 21).
-4. Mobile: the phone offers `gear` as a screen. Whether Locker/Bags become phone screens is
-   a separate design question and NOT part of this fold.
+1. **A `DockPanel`'s fill child gets what the docked children leave**, and they take what
+   they ask for. Three `Dock.Right` buttons were ~440px of a 470px window, so the status
+   wrapped ONE CHARACTER PER LINE and the buttons stretched into 380px slabs.
+2. **A lifted view that brings its own `ScrollViewer` swallows the wheel** inside a host
+   that already scrolls — trap 36, and the scrollbar looks perfectly correct in a picture.
+3. **Two unrelated imports named side by side read as one sequence.** He copied the command,
+   made the file, and followed the *other* sentence into Options.
+4. **"Shopping list" was undefined jargon** with no in-app route: *"we have no idea what
+   that is."*
+
+### What is next, in order
+
+1. **AVALONIA PARITY — the biggest outstanding debt.** That build has the toolbar fix and
+   nothing else: no Inventory tab, no Wishlist rename in its own window, no import report.
+   **`EQBuddy.Avalonia/MainWindow.cs` has ~25 ratchet lines**, so the gear-checklist lift
+   out of that file comes FIRST, with `WidgetRenderTests` assertions written before anything
+   moves — no E2E on that build.
+2. **`GearCardView`'s 320px `MaxHeight`** is a card-sized cap now living in an 880px window.
+   Flagged to David; he has not hit it yet.
+3. **The Raids surface stores its auto-import outcome but never renders it.** `ImportReportView`
+   exists and is wired only to Gear.
+4. Drops and Items as tabs — still named-but-unhosted in `LootSurface`.
+
+**David on Kills → Progress (asked 2026-08-20):** answered no, with reasons — Kills is live
+while Progress is retrospective, and it is already slotted into the Live Meters theme with
+the two cards it belongs with. Not a decision he made; a recommendation he has not answered.
 
 ---
 

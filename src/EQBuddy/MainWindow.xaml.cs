@@ -2764,6 +2764,12 @@ public partial class MainWindow : Window, ICardContext
         _gearLootWindow.Show();
     }
 
+    /// <summary>The widget CARD is the door, and since 2026-08-20 it is the only one
+    /// (David: "we can take gear and loot off the gear menu now"). That matches Quests and
+    /// Progress, which never had cog entries — this theme's was the anomaly, left over from
+    /// when its two surfaces were separate windows. A player who hides the card re-shows it
+    /// in Options → Cards & windows, exactly as for every other card; the handler stays
+    /// because the card's SectionLink and EQBUDDY_GEARLOOT both call it.</summary>
     private void OnGearLootWindow(object sender, RoutedEventArgs e) => ShowGearLootWindow();
 
     private GearCardView Gear => _gear ??= NewGearCard();
