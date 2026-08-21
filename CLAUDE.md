@@ -636,6 +636,18 @@ Read this list before touching the areas it names. Every entry cost a release.
     spelling it, because trap 32 means a page-side literal can sit on an open phone for
     weeks after the PC has moved on.
 
+36. **A lifted view that brings its own `ScrollViewer` SWALLOWS the mouse wheel inside a
+    host that already scrolls.** A child scroller is measured with INFINITE height by the
+    outer one, so it never overflows and never scrolls — but it still *handles* the wheel,
+    so the outer scroller (the one with the real overflow) never sees the event. The
+    Inventory tab could only be moved by dragging the outer slider (David, 2026-08-20).
+    Nothing shows it: not a diff, not a test, not a screenshot — the scrollbar is right
+    there and looks correct. You only find it by putting a mouse on it.
+    → **Scrolling belongs to the HOST**, the same way visibility and spacing do in trap 15.
+    A view lifted out of a window brings its CONTENT and leaves the window chrome behind.
+    `GearCardView` gets away with its own scroller only because a hard `MaxHeight` gives it
+    genuine overflow — which is a card-sized cap now living in a window, and worth a look.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

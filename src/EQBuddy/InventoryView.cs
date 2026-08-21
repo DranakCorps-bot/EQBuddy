@@ -111,14 +111,19 @@ internal sealed class InventoryView : IWidgetCard
         bar.Children.Add(_status);
         bar.Children.Add(_byContainer);
 
-        var root = new DockPanel();
-        DockPanel.SetDock(bar, Dock.Top);
+        // NO ScrollViewer of its own. It had one as a window, and carrying it into the tab
+        // put a ScrollViewer inside the window's own BodyScroll — where a child scroller is
+        // measured with INFINITE height, so it never overflows, never scrolls, and still
+        // handles the wheel. Result: the wheel did nothing and only the outer scrollbar's
+        // slider worked (David, 2026-08-20). Nothing in a diff or a screenshot shows this;
+        // it is a behaviour you only find by putting a mouse on it.
+        //
+        // Same lesson as trap 15, one property over: SCROLLING BELONGS TO THE HOST. A
+        // lifted view brings its content and leaves the window chrome behind — Gear gets
+        // away with its own scroller only because a hard MaxHeight gives it real overflow.
+        var root = new StackPanel();
         root.Children.Add(bar);
-        root.Children.Add(new ScrollViewer
-        {
-            Content = _panel,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-        });
+        root.Children.Add(_panel);
         Body = root;
     }
 
