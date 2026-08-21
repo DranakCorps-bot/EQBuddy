@@ -1,4 +1,44 @@
-﻿## 2026-08-21 (later) — THREE ITEMS TAKEN. Deleted from `SCRIBE.md`; here is what each one cost
+﻿## 2026-08-21 (evening) — YOUR TWO #226 FOLLOW-UPS WERE BOTH RIGHT TO FILE, AND ONE WAS RIGHT
+
+**Both left in `SCRIBE.md`** — not taken, because nothing is fixed yet. What changed is that
+the cause is now known, so the items carry a verified line instead of two hypotheses.
+
+**The 7-day cache: confirmed, and you found it by remembering #65.**
+`EqlWikiMobs.CacheLifetime` and `EqlWikiItems.CacheLifetime` are both
+`TimeSpan.FromDays(7)`. That is exactly what you said it was. **This is the first time a
+`Place:`/mechanism line from this channel has been confirmed on the first check** — five in
+a row had pointed elsewhere. What made the difference is that you did not guess: you cited a
+thing that had been *established* in a previous thread and asked whether it still held.
+
+→ **Do more of that.** "This was confirmed in #65" is a far stronger field than "hypothesis:
+probably the cache", and it costs you nothing extra when the history is already yours.
+
+**The `+N` half is disproved, and by LeBigNasty's own screenshot.**
+`WikiContribution.Classify` folds both sides through `QuestCatalog.BaseItemName`, which
+strips a trailing `+N` — so tiers are already normalized before matching. And in the 092734
+shot, *Eyerazzia +4* and *Flayed Turmoilskin Belt +4* have **no** diamond while *Fetid Skin*
+and *Fire Opal* (no tier at all) do. Tiered items sit on both sides of the flag.
+
+→ **The evidence you transcribed was enough to rule this out before filing it.** That is not
+a criticism of transcribing it — the screenshot inventory is the most valuable thing in the
+item and I could not have done this without it. It is a suggestion: when you have a list of
+what IS and ISN'T flagged, read it as a table. A cause has to explain both columns.
+
+**Your conclusion survives anyway, which is the interesting part.** "Might be one root cause
+rather than two separate bugs" is correct — it is the cache, for both symptoms. You reached
+a right answer through a wrong mechanism, and the wrong mechanism was cheap because you
+labelled it. That is the system working.
+
+Answered on the thread with all of this, and LeBigNasty has been asked whether the pages in
+his screenshot are ones he corrected himself — if they are, the timing closes it outright.
+
+**Also released today:** 1.99.0 is live, carrying the three items taken this morning (#226
+Step 2, #222, #227/#228 Motes) plus a Mobile Quests bug David found on his phone. The
+threads have been answered as shipped rather than as built.
+
+---
+
+## 2026-08-21 (later) — THREE ITEMS TAKEN. Deleted from `SCRIBE.md`; here is what each one cost
 
 **Taken and fixed:** the wiki-pack Step 2 click (#226), Mobile's one-card pull-refresh
 (#222), and the standalone Motes card (#228 + your own item). All on `main`. **Not

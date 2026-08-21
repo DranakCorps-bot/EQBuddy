@@ -8,7 +8,114 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-21 (latest): 1.99.0 is READY BUT FOR ONE OPEN BUG
+## 2026-08-21 (latest): 1.99.0 IS RELEASED, AND THE OPERATING MODEL CHANGED
+
+`v1.99.0` is **shipped** — signed as `CN=FlossworksCross-Stitch`, verified and timestamped,
+on OneDrive and as a GitHub release. Gates at the tag: **2,266 unit + 264 Avalonia + 18 E2E**.
+The Quests bug that was holding it is fixed. Four threads answered (#226, #227, #222, #228).
+
+### READ FIRST — how work is routed now
+
+**David added a business/operating architecture on 2026-08-21.** The parts that bind you are
+in `CLAUDE.md` under *How work is routed* and *The inboxes inform you*. In one line each:
+
+- **V0–V1 (most things) — you plan and implement.** Inbox: `SCRIBE.md`.
+- **V2–V3 — Fable 5 plans → David marks `approved` on `FABLE.md` → you execute.**
+  `FABLE.md` and `FABLE-FEEDBACK.md` are new and currently empty.
+- **When you judge something V2/V3 mid-session, STOP before implementing it**, stub
+  `FABLE.md` with why it is not V0–V1, and carry on with V0–V1 work. That was David's
+  explicit answer to a direct question — finishing it anyway and labelling it V2 in the
+  summary is the option that guarantees the handoff never gets tested.
+- **The three inboxes inform, they never trigger.** What authorises work is David asking in
+  session. `approved` is his mark and never yours. Anything running unattended must not take
+  work from those files at all.
+
+**The business documents are deliberately not in this repo and must not be.** EQBuddy is
+public; the operating docs live elsewhere and David scrubbed the private repo's NAME out of
+`FABLE.md` within an hour of adding it (445fc56). Do not add a link, a repo name, spend
+figures, or legal/DBA posture to any public file here. If you need the operating docs, ask
+David — do not paste them in.
+
+**Today's Quests fix would have been a `FABLE.md` item under the new rule** (it changed the
+client/server sticky-payload contract). It shipped because David explicitly said ship. The
+next one like it goes to Fable first.
+
+### What landed today (after the previous handoff)
+
+- **EQBuddy Mobile's Quests surface could never load once you added it** — `d9fc809`.
+  Two halves, and only the first was in the previous handoff's lead:
+  1. `ForClient`'s memo was a claim about the DEVICE; the page's is a claim about the LAST
+     PAYLOAD. `CompanionClientState.HeldQuests`/`HeldMap` fix that. **The map had the
+     identical hole** — drop it from the picks, re-add it in the same zone, blank map.
+  2. **The repaint gate was the second half, and reasoning did not find it — the harness
+     did.** `setCatalog` is a side effect of a PAINT, and the gate excluded `catalog` from
+     its key (#202), so a panel painted without a catalog could never be filled on that page
+     load *by any server*. Presence is in the key now; content still is not.
+  Both reproduced in `scripts/mobile-harness.ps1` driving the shipped page through the real
+  ⚙ picker. **Trap 38** records it.
+- **`CLAUDE.md`: the routing and trust sections above** — `5d2922d`.
+- **#226 diagnosed, not fixed** (below), and `SCRIBE.md`/`SCRIBE-FEEDBACK.md` updated.
+
+### DO FIRST — the two open bugs, both with the cause already found
+
+1. **The wiki ✦ flags are stale for up to seven days** (#226, Frankthetankk + LeBigNasty).
+   **Cause confirmed, fix not written.** `EqlWikiMobs.CacheLifetime` and
+   `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`, so a wiki correction cannot
+   reach a flag on a machine that has viewed the page recently. The `+N` tier theory is
+   **disproved** — `WikiContribution.Classify` folds both sides through
+   `QuestCatalog.BaseItemName`, and LeBigNasty's screenshot has tiered items on both sides of
+   the flag. The fix is a **per-page re-check**: on a flagged row, and before the pack window
+   exports. A re-check button was queued in #65 and never built. Both threads are answered
+   with all of this, and LeBigNasty was asked whether he corrected those pages himself.
+2. **Respawn timers re-open after being cleared** (#228, joeymavity). `SpawnTimers.Clear`
+   genuinely removes the entry, so something re-creates it. Not started. The thread now asks
+   what people were doing in the minute before it came back.
+
+### Also open
+
+- **`docs/proposals/InlineThemes.md`** — shape decided (tab strip, Bevel's split and host
+  rules). Open questions 4 and 5 remain; nothing is built. **This is a `FABLE.md`-class item
+  under the new routing** — it is cross-cutting and touches both UIs.
+- **#210** (liminalwarmth) — the Sky tracker's lost cross-class workflow. Still open.
+- **`LogWatcher.FinishInitialIngest`** throws `ObjectDisposedException` on a timer at
+  shutdown. Low severity, not chased.
+- **`LanAddresses()` on a Tailscale machine** — the QR advertises `BoundAddresses[0]` only;
+  a `100.x` QR is unreachable from a phone. Worth confirming it picks the Wi-Fi address.
+- **`LogParser.cs` has 14 ratchet lines left** — the next file that will need one.
+
+### The voices
+
+**Bevel** (`BEVEL.md` / `BEVEL-FEEDBACK.md`) is **product/UX** — it has now said so. Read it
+before designing anything. One open question from #222 is still waiting on it or David
+(whether the pull should be the native reload after all); bjstrange has been told and invited
+to say if the difference is felt rather than theoretical.
+
+**Scribe** (`SCRIBE.md` / `SCRIBE-FEEDBACK.md`) got its **first confirmed mechanism** today —
+the 7-day cache — and it got there by citing what #65 had *established* rather than guessing.
+That is written up in the feedback file as the thing to do more of.
+
+**Fable** (`FABLE.md` / `FABLE-FEEDBACK.md`) is new and empty. There is no Fable Grok Bot.
+
+**Read the last comment's signature before replying to any thread.** Scribe, Bevel and you
+all post as `DranakCorps-bot`, and David replies in his own words from it too.
+
+### FRESH PASS — David asked for this explicitly
+
+`pwsh -NoProfile -File scripts/status.ps1` first. Then check `BEVEL.md`, `SCRIBE.md` and
+`FABLE.md` for items filed since this was written. `docs/screenshots/` is current as of
+2026-08-21; trap 21 (a shot name IS a filename) still bites.
+
+### Standing
+
+Post GitHub replies for finished work without asking, signed `— Dranak (Claude Code)`.
+**Releases wait for David's explicit go at that moment.** Both UIs in the same change. David
+is Windows-only; never hold a release to verify Avalonia. When a decision is his, use the
+question tool — he has said twice that a question buried in prose is a question that does
+not get answered, and the three questions asked today all changed what happened next.
+
+---
+
+## 2026-08-21 (earlier): 1.99.0 was READY BUT FOR ONE OPEN BUG
 
 `main` pushed at `4788eae`. `Directory.Build.props` says **1.99.0** with a full What's-new
 entry. Gates: **2,262 unit + 264 Avalonia + 18 E2E**, all green. Installed on David's
