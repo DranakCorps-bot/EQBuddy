@@ -1,12 +1,20 @@
-﻿<Window x:Class="EQBuddy.GearLootWindow"
+<Window x:Class="EQBuddy.GearLootWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Gear &amp; Loot" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
-        Width="520" WindowStartupLocation="Manual">
+        Width="880" WindowStartupLocation="Manual">
     <!-- The GEAR & LOOT theme (docs/Themes.md). Named by David on 2026-08-20 over the
          plan's "Loot & Items": it names the two things actually in it.
+
+         WIDTH IS 880 AND LANDSCAPE ON PURPOSE. It was 520 - the Loot CARD's width,
+         carried over from the widget, where narrow is right because the card shares the
+         monitor with the game. A window does not. David, 2026-08-20: "it should probably
+         open in a landscape window, not portrait as the boxes are all scrunched and the
+         text is unreadable on the side." At 520 a loot row (name, count, source) and a
+         gear row (slot over name over source) both wrap into a tall ribbon, and
+         SizeToContent="Height" then grows the one axis that was already fine.
 
          Two widget cards — Loot and Gear — become two tabs here and one launcher line on
          the widget. Drops and Item lookup join them in a second pass; they are existing

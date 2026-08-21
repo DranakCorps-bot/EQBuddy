@@ -83,7 +83,10 @@ public sealed class GearLootWindow : Window
         _main = main;
         _settings = main.Settings;
         Title = "EQBuddy Gear & Loot";
-        Width = 520;
+        // Landscape — see the note in the WPF twin's XAML. 520 was a CARD's width, and
+        // a card is narrow because it shares the monitor with the game; this window does
+        // not.
+        Width = 880;
         // A starting height as well as SizeToContent: an unmeasured window reports a ZERO
         // client size and the headless render surface rejects that outright — and those
         // tests are this build's only cover for these two surfaces.
