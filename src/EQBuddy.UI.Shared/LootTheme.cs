@@ -37,8 +37,8 @@ public static class LootTheme
     /// mobile page's tab row both build from.</summary>
     public static IReadOnlyList<LootTabHeader> Tabs(
         StatsSnapshot s, IReadOnlyCollection<GearChecklistItem> checklist,
-        string? locker = null) =>
-        LootSurface.Tabs(loot: Loot(s), gear: Gear(checklist), locker: locker);
+        string? inventory = null) =>
+        LootSurface.Tabs(loot: Loot(s), gear: Gear(checklist), inventory: inventory);
 
     /// <summary>
     /// The launcher card's one line — the line that has to justify replacing two card

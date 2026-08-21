@@ -21,14 +21,15 @@ public class LootSurfaceTests
         // Drops, Items, Locker and Bags are named in the enum so the vocabulary is
         // settled once, but they are still separate windows — a tab with nothing behind
         // it reads as broken rather than as not-yet-arrived.
-        // Locker joined on 2026-08-20 — David: "we should at least put our gear locker
-        // (what we're wearing) into this window so Gear and Loot can complete a theme."
-        // Bags, Drops and Items are still named-but-unhosted.
-        Assert.Equal([LootTab.Loot, LootTab.Gear, LootTab.Locker], LootSurface.Hosted);
+        // Inventory joined on 2026-08-20 — David: "we should at least put our gear locker
+        // (what we're wearing) into this window so Gear and Loot can complete a theme",
+        // then "maybe we can merge Locker and Inventory into the tab Inventory". One tab,
+        // two pivots, because both read the same dump. Drops and Items stay unhosted.
+        Assert.Equal([LootTab.Loot, LootTab.Gear, LootTab.Inventory], LootSurface.Hosted);
         // "Wishlist", not "Gear". David, 2026-08-20: "I guess I figured Gear would show
         // me what gear I had." The KEY is still "gear" (asserted below) so no saved tab
         // choice or card position breaks — only the word the player reads changed.
-        Assert.Equal(["Loot", "Wishlist", "Locker"], LootSurface.Tabs().Select(t => t.Label));
+        Assert.Equal(["Loot", "Wishlist", "Inventory"], LootSurface.Tabs().Select(t => t.Label));
     }
 
     [Fact]

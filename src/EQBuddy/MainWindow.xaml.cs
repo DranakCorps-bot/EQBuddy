@@ -419,8 +419,12 @@ public partial class MainWindow : Window, ICardContext
             Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnTravelRoute(this, new RoutedEventArgs()),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        // EQBUDDY_INVENTORY and EQBUDDY_GEARLOCKER both open the same TAB now — the two
+        // windows merged on 2026-08-20. Kept as separate names because both appear in
+        // shot fixtures and docs, and a hook that silently stops working is worse than a
+        // redundant one.
         if (Environment.GetEnvironmentVariable("EQBUDDY_INVENTORY") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnInventoryWindow(this, new RoutedEventArgs()),
+            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnGearLocker(this, new RoutedEventArgs()),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOCKER") == "1")
@@ -914,10 +918,14 @@ public partial class MainWindow : Window, ICardContext
     /// habit keeps working, and one place owns the surface. Removing the entry outright
     /// would be the trap-29 shape from the other side — a door deleted while the room it
     /// led to still exists.</summary>
+    /// <summary>The Gear Locker and the Inventory window are ONE TAB now — they read the
+    /// same dump, so two tabs off one file made people wonder which was the real one
+    /// (David, 2026-08-20). Their cog entries are gone at his request; this stays because
+    /// EQBUDDY_GEARLOCKER and the shot fixtures still open the surface by name.</summary>
     private void OnGearLocker(object sender, RoutedEventArgs e)
     {
         ShowGearLootWindow();
-        _gearLootWindow?.SetTab(LootTab.Locker);
+        _gearLootWindow?.SetTab(LootTab.Inventory);
     }
 
     /// <summary>Loot rows and the search box route here: one shared popup, re-driven
@@ -4125,7 +4133,6 @@ public partial class MainWindow : Window, ICardContext
     // ---- inventory (/outputfile inventory, David 2026-08-11) ----
 
     private InventoryFile.Snapshot? _inventory;
-    private InventoryWindow? _inventoryWindow;
 
     /// <summary>The newest inventory dump for the followed character, adjusted by what
     /// the log has seen since it was written (loot in, sells out — David, 2026-08-11);
@@ -4161,12 +4168,6 @@ public partial class MainWindow : Window, ICardContext
         }
     }
 
-    private void OnInventoryWindow(object sender, RoutedEventArgs e)
-    {
-        if (_inventoryWindow is { IsLoaded: true } w) { w.Activate(); return; }
-        _inventoryWindow = new InventoryWindow(this);
-        _inventoryWindow.Show();
-    }
 
     // ---- travel routing + zone maps (competitive gaps #1/#2, 2026-08-10) ----
 

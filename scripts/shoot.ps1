@@ -336,13 +336,14 @@ $Shots = [ordered]@{
     # an unseeded profile: same tab, deliberately nothing seeded, and the review question is
     # whether both routes out of it are legible (the shopping-list import, and the in-game
     # command that makes the ticks happen by themselves).
-    # The LOCKER tab (David, 2026-08-20: "we should at least put our gear locker into
+    # The INVENTORY tab - the Gear Locker and Inventory windows merged into it (David,
+    # 2026-08-20: "we should at least put our gear locker into
     # this window so Gear and Loot can complete a theme"). It reads the real inventory
     # dump from the game folder, which the throwaway profile does not have - so this
     # shot photographs the no-dump state, which is a REAL state and the one a new player
     # meets. Predicted before running: the recipe line, the copy button, no slot groups.
-    'gearloot-locker' = @{ Title = 'Gear & Loot'
-                           Env = @{ EQBUDDY_GEARLOOT = 'locker' }
+    'gearloot-inventory' = @{ Title = 'Gear & Loot'
+                           Env = @{ EQBUDDY_GEARLOOT = 'inventory' }
                            Set = @{} }
     'gearloot-gear-empty' = @{ Title = 'Gear & Loot'
                            Env = @{ EQBUDDY_GEARLOOT = 'gear' }

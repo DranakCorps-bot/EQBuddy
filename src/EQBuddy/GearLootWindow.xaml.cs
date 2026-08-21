@@ -35,7 +35,7 @@ public partial class GearLootWindow : Window
     private EqSegmentedStrip _tabs = null!;
     private readonly LootCardView _loot;
     private readonly GearCardView _gear;
-    private readonly GearLockerView _locker;
+    private readonly InventoryView _inventory;
 
     public GearLootWindow(MainWindow main)
     {
@@ -47,7 +47,7 @@ public partial class GearLootWindow : Window
 
         _loot = new LootCardView(main, _settings);
         _gear = main.NewGearCard();
-        _locker = new GearLockerView(main);
+        _inventory = new InventoryView(main);
 
         _tabs = new EqSegmentedStrip(TabStrip);
         BuildStaticChrome();
@@ -71,7 +71,7 @@ public partial class GearLootWindow : Window
         Closed += (_, _) =>
         {
             // Never let an unmoved fallback overwrite a real saved spot (#117).
-            _locker.Dispose();
+            _inventory.Dispose();
             (_settings.GearLootLeft, _settings.GearLootTop) = WindowPlacement.PositionToPersist(
                 restored, placedLeft, placedTop, Left, Top,
                 _settings.GearLootLeft, _settings.GearLootTop);
@@ -166,7 +166,7 @@ public partial class GearLootWindow : Window
         TabBody.Content = _tab switch
         {
             LootTab.Gear => _gear.Body,
-            LootTab.Locker => _locker.Body,
+            LootTab.Inventory => _inventory.Body,
             _ => _loot.Body,
         };
         // Both render, not just the visible one. The inactive tab's BADGE has to stay
@@ -177,7 +177,7 @@ public partial class GearLootWindow : Window
         // The Locker re-reads the inventory dump from disk, so it paints only when it is
         // the tab on screen — the others are cheap enough to keep their badges true every
         // tick, and this one is not.
-        if (_tab == LootTab.Locker) _locker.Render();
+        if (_tab == LootTab.Inventory) _inventory.Render();
     }
 
     /// <summary>Build the strip from Core's <see cref="LootSurface"/> and UI.Shared's
@@ -187,7 +187,7 @@ public partial class GearLootWindow : Window
     private void BuildTabs(StatsSnapshot s)
     {
         _tabs.Clear();
-        foreach (var header in LootTheme.Tabs(s, _settings.GearChecklist, _locker.Badge))
+        foreach (var header in LootTheme.Tabs(s, _settings.GearChecklist, _inventory.Badge))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>

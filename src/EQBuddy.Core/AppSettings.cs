@@ -264,6 +264,12 @@ public sealed class AppSettings
     /// by slot. Persisted like the Epics classic-only lens — a view choice survives
     /// a restart.</summary>
     public bool GearGroupByZone { get; set; }
+    /// <summary>The Inventory tab's pivot: false ranks everything wearable within each
+    /// slot (what to swap, what to vendor — the old Gear Locker), true lists where each
+    /// item physically is (the old Inventory window). One tab, two lenses, because both
+    /// read the same dump (David, 2026-08-20). By-slot is the default: "what should I be
+    /// wearing" is the actionable question and the lookup is the occasional one.</summary>
+    public bool InventoryByContainer { get; set; }
     /// <summary>Path|timestamp of the last inventory dump the gear auto-done pass
     /// consumed. Persisted so a box the player deliberately unchecked is not
     /// re-fought on restart by the SAME dump; a new dump re-opens the question.</summary>

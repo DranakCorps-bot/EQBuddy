@@ -24,9 +24,9 @@ namespace EQBuddy;
 /// framework-free in <c>UI.Shared/GearLocker.cs</c>, which is why this was a lift and not
 /// a rewrite.
 /// </remarks>
-internal sealed class GearLockerView : IWidgetCard
+internal sealed class InventoryView : IWidgetCard
 {
-    public string Key => LootSurface.KeyFor(LootTab.Locker);
+    public string Key => LootSurface.KeyFor(LootTab.Inventory);
     public UIElement Body { get; }
 
     /// <summary>The tab strip's headline: how many swaps the arithmetic found. Nothing at
@@ -41,12 +41,28 @@ internal sealed class GearLockerView : IWidgetCard
     private readonly TextBlock _status = new() { FontSize = 11, TextWrapping = TextWrapping.Wrap };
     private readonly Button _fetch;
     private bool _fetching;
+    private readonly CheckBox _byContainer = new();
 
-    public GearLockerView(MainWindow main)
+    /// <summary>The recipe, in one place: it was a const on the old Inventory window and
+    /// three surfaces read it from there.</summary>
+    internal const string OutputFileTip =
+        "In game, type:   " + GameCommands.OutputfileInventory + "\n" +
+        "The game writes it beside its own folders, and EQBuddy reads it on its own.";
+
+    private void SetByContainer(bool value)
+    {
+        if (_main.Settings.InventoryByContainer == value) return;
+        _main.Settings.InventoryByContainer = value;
+        _main.Settings.Save();
+        Render();
+    }
+
+
+    public InventoryView(MainWindow main)
     {
         _main = main;
         _status.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-        _status.ToolTip = InventoryWindow.OutputFileTip;
+        _status.ToolTip = OutputFileTip;
 
         // A DockPanel's FILL child gets whatever the docked children leave, and docked
         // children take whatever they ask for. Three Dock.Right buttons here are ~440px
@@ -60,7 +76,7 @@ internal sealed class GearLockerView : IWidgetCard
         var bar = new StackPanel { Margin = new Thickness(0, 0, 0, 6) };
         var buttons = new WrapPanel();
         var refresh = Theming.Button("⟳ Refresh");
-        refresh.ToolTip = InventoryWindow.OutputFileTip;
+        refresh.ToolTip = OutputFileTip;
         refresh.Click += (_, _) => Render();
         buttons.Children.Add(refresh);
         _fetch = Theming.Button("");
@@ -79,9 +95,21 @@ internal sealed class GearLockerView : IWidgetCard
         copyCmd.ToolTip = "Copies the command — paste it into the game's chat and the game "
             + "writes your inventory file; the Locker reads it. Re-run any time your bags change.";
         buttons.Children.Add(copyCmd);
+        // One tab, two lenses — the same shape the Wishlist tab's "Group by farm zone"
+        // already uses, and the reason this is a pivot rather than two stacked sections:
+        // concatenating them buries the comparison advice, which is the clever part.
+        _byContainer.Content = "Group by bag (where things are)";
+        _byContainer.FontSize = 11;
+        _byContainer.Margin = new Thickness(0, 6, 0, 0);
+        _byContainer.SetResourceReference(Control.ForegroundProperty, "DimBrush");
+        _byContainer.ToolTip = "Off: everything wearable you own, ranked within each slot — "
+            + "what to swap and what to vendor. On: where each item physically is, bag by bag.";
+        _byContainer.Checked += (_, _) => SetByContainer(true);
+        _byContainer.Unchecked += (_, _) => SetByContainer(false);
         bar.Children.Add(buttons);
         _status.Margin = new Thickness(0, 6, 0, 0);
         bar.Children.Add(_status);
+        bar.Children.Add(_byContainer);
 
         var root = new DockPanel();
         DockPanel.SetDock(bar, Dock.Top);
@@ -111,6 +139,16 @@ internal sealed class GearLockerView : IWidgetCard
     }
 
     public void Render()
+    {
+        _byContainer.IsChecked = _main.Settings.InventoryByContainer;
+        if (_main.Settings.InventoryByContainer) RenderByContainer();
+        else RenderBySlot();
+    }
+
+    /// <summary>The BY-SLOT pivot — what to WEAR. Ranked within each slot, with the
+    /// upgrade and outclassed marks; the default, because "what should I swap" is the
+    /// actionable question and "where is my stuff" is the occasional lookup.</summary>
+    private void RenderBySlot()
     {
         _panel.Children.Clear();
         var snap = _main.LatestInventory(refresh: true);
@@ -221,6 +259,109 @@ internal sealed class GearLockerView : IWidgetCard
         };
         foot.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
         _panel.Children.Add(foot);
+    }
+
+    /// <summary>The BY-BAG pivot — where a thing physically is. Lifted from the old
+    /// Inventory window when the two surfaces became one tab (David, 2026-08-20:
+    /// "maybe we can merge Locker and Inventory into the tab Inventory"). Both read
+    /// the SAME dump, which is the argument for one tab: two tabs off one file makes
+    /// people wonder which is the real one.</summary>
+    private void RenderByContainer()
+    {
+        var snap = _main.LatestInventory(refresh: true);
+        if (snap is null)
+        {
+            _status.Text = $"No inventory dump found yet — in game, type  {GameCommands.OutputfileInventory}  " +
+                "and this fills in on its own. (Hover for the full recipe.)";
+            return;
+        }
+        var age = DateTime.Now - snap.WrittenAt;
+        _status.Text = $"{System.IO.Path.GetFileName(snap.Path)} — written " +
+            (age.TotalMinutes < 1 ? "just now" : age.TotalHours < 1
+                ? $"{(int)age.TotalMinutes}m ago" : $"{(int)age.TotalHours}h ago") +
+            $" — re-type {GameCommands.OutputfileInventory} in game any time; "
+            + "EQBuddy picks the new file up by itself.";
+
+        void Header(string text)
+        {
+            var tb = new TextBlock
+            {
+                Text = text,
+                Margin = new Thickness(0, 9, 0, 2),
+            };
+            // SetResourceReference, not FindResource: a view has no window to look
+            // up through, and a silent miss renders a heading as body text (trap 19).
+            tb.SetResourceReference(FrameworkElement.StyleProperty, "SectionLabel");
+            // Small-caps eyebrow, but in accent: these headers carry real names
+            // (which bag), not just structure.
+            tb.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+            _panel.Children.Add(tb);
+        }
+        void Row(string left, string right, bool dim = false)
+        {
+            var g = new Grid { Margin = new Thickness(6, 0, 0, 1) };
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(110) });
+            g.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            var l = new TextBlock { Text = left, FontSize = 11.5 };
+            l.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            var r = new TextBlock
+            {
+                Text = right, FontSize = 11.5,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                ToolTip = right,
+            };
+            r.SetResourceReference(TextBlock.ForegroundProperty, dim ? "DimBrush" : "TextBrush");
+            Grid.SetColumn(r, 1);
+            g.Children.Add(l);
+            g.Children.Add(r);
+            _panel.Children.Add(g);
+        }
+
+        // What the log saw AFTER the dump was written: these counts already feed the
+        // quest tracker's held tab, but the bag structure below is the dump's — the
+        // log knows what you gained, not which bag you put it in.
+        var gained = snap.SinceDump.Where(kv => kv.Value > 0)
+            .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase).ToList();
+        if (gained.Count > 0)
+        {
+            Header($"Looted since this dump ({gained.Count})");
+            foreach (var (item, n) in gained)
+                Row("", n > 1 ? $"{item} ×{n}" : item);
+        }
+
+        var containers = snap.Entries.Where(e => e.InContainer)
+            .GroupBy(e => e.ContainerSlot, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.OrdinalIgnoreCase);
+        var topLevel = snap.Entries.Where(e => !e.InContainer).ToList();
+
+        // Worn gear: top-level slots that aren't bags-with-contents or bank rows.
+        Header("Worn");
+        foreach (var e in topLevel.Where(e =>
+                     !containers.ContainsKey(e.Location)
+                     && !e.Location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase)
+                     && !e.Location.StartsWith("General", StringComparison.OrdinalIgnoreCase)))
+            Row(e.Location, e.Count > 1 ? $"{e.Name} ×{e.Count}" : e.Name);
+
+        // Bags (and any other container), each with its contents.
+        foreach (var e in topLevel.Where(e => containers.ContainsKey(e.Location)))
+        {
+            var contents = containers[e.Location];
+            Header($"{e.Name}  ({e.Location} — {contents.Count} item{(contents.Count == 1 ? "" : "s")})");
+            foreach (var c in contents)
+                Row("", c.Count > 1 ? $"{c.Name} ×{c.Count}" : c.Name);
+        }
+
+        // Anything else top-level (bank slots, loose General rows without children).
+        var rest = topLevel.Where(e =>
+            !containers.ContainsKey(e.Location)
+            && (e.Location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase)
+                || e.Location.StartsWith("General", StringComparison.OrdinalIgnoreCase))).ToList();
+        if (rest.Count > 0)
+        {
+            Header("Elsewhere");
+            foreach (var e in rest)
+                Row(e.Location, e.Count > 1 ? $"{e.Name} ×{e.Count}" : e.Name, dim: true);
+        }
     }
 
     private async Task FetchMissing()

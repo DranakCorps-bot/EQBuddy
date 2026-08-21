@@ -1,4 +1,4 @@
-﻿<Window x:Class="EQBuddy.MainWindow"
+<Window x:Class="EQBuddy.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:EQBuddy"
@@ -33,12 +33,8 @@
                 <MenuItem Header="Travel route…" Click="OnTravelRoute"
                           ToolTip="Hop-by-hop directions from where you are to any zone"/>
                 <MenuItem Header="Spawn timers…" Click="OnSpawnsWindow"/>
-                <MenuItem Header="Inventory…" Click="OnInventoryWindow"
-                          ToolTip="Your worn gear by slot and what's in each bag — from the game's /outputfile inventory dump (type it in game, the file appears, EQBuddy reads it)"/>
                 <MenuItem Header="Gear &amp; Loot…" Click="OnGearLootWindow"
-                          ToolTip="This session's loot and your imported gear list, in one window — the Gear &amp; Loot theme"/>
-                <MenuItem Header="Gear Locker…" Click="OnGearLocker"
-                          ToolTip="Everything wearable you own, grouped by slot and compared — items outclassed by something else in your bags get flagged as dump candidates. Your bags, not 'BiS'."/>
+                          ToolTip="This session's loot, your wishlist, and everything you own — the Gear &amp; Loot theme. Absorbed the Inventory and Gear Locker windows on 2026-08-20"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
                 <MenuItem Header="Drops by creature…" Click="OnDropsWindow"/>
                 <Separator/>

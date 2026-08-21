@@ -37,11 +37,12 @@ public enum LootTab
     /// saved tab choice. Only the LABEL changed.</summary>
     Gear,
 
-    /// <summary>Everything wearable you own, ranked within each slot.</summary>
-    Locker,
-
-    /// <summary>Everything in your bags and bank, as the game's own dump lists it.</summary>
-    Bags,
+    /// <summary>What you actually HAVE, from the game's own inventory dump — one tab
+    /// with two pivots rather than two tabs, because the Gear Locker and the Inventory
+    /// window read the SAME file (David, 2026-08-20). By slot it ranks what to wear and
+    /// what to vendor; by bag it says where a thing is. Named for the word the GAME uses,
+    /// so the tab matches the command the player types.</summary>
+    Inventory,
 }
 
 /// <summary>A tab as a UI should draw it. <see cref="Value"/> is the tab's headline —
@@ -68,8 +69,7 @@ public static class LootSurface
         // from a surface that DOES show what he has, which made the wrong reading the
         // reasonable one. The label says which of the two it is; the key stays "gear".
         LootTab.Gear => "Wishlist",
-        LootTab.Locker => "Locker",
-        LootTab.Bags => "Bags",
+        LootTab.Inventory => "Inventory",
         _ => tab.ToString(),
     };
 
@@ -87,8 +87,7 @@ public static class LootSurface
         LootTab.Drops => "drops",
         LootTab.Items => "items",
         LootTab.Gear => "gear",
-        LootTab.Locker => "locker",
-        LootTab.Bags => "bags",
+        LootTab.Inventory => "inventory",
         _ => tab.ToString().ToLowerInvariant(),
     };
 
@@ -101,8 +100,9 @@ public static class LootSurface
         // or reads in a menu, and a key that only accepts the old word would make the
         // rename a trap for anyone following current documentation.
         "gear" or "wishlist" => LootTab.Gear,
-        "locker" or "gearlocker" => LootTab.Locker,
-        "bags" or "inventory" => LootTab.Bags,
+        // Every word the two folded surfaces were ever called still answers, so an
+        // old habit, an old shot name and an old doc line all still land.
+        "inventory" or "locker" or "gearlocker" or "bags" => LootTab.Inventory,
         _ => null,
     };
 
@@ -120,7 +120,7 @@ public static class LootSurface
     /// not arrived.
     /// </summary>
     public static readonly IReadOnlyList<LootTab> Hosted =
-        [LootTab.Loot, LootTab.Gear, LootTab.Locker];
+        [LootTab.Loot, LootTab.Gear, LootTab.Inventory];
 
     /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
     /// reads this so the list of what disappears lives in ONE place rather than being
@@ -135,13 +135,13 @@ public static class LootSurface
 
     /// <summary>The hosted tabs, with whatever headline each was given.</summary>
     public static IReadOnlyList<LootTabHeader> Tabs(
-        string? loot = null, string? gear = null, string? locker = null)
+        string? loot = null, string? gear = null, string? inventory = null)
     {
         var values = new Dictionary<LootTab, string?>
         {
             [LootTab.Loot] = loot,
             [LootTab.Gear] = gear,
-            [LootTab.Locker] = locker,
+            [LootTab.Inventory] = inventory,
         };
         return [.. Hosted.Select(tab => new LootTabHeader(
             tab, LabelFor(tab), KeyFor(tab),
