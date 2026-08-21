@@ -57,6 +57,31 @@ The mini star went into the window with the header (traps 20/26).
   pinned. The Drops footer — the only in-app pointer to where the wiki pack went (#217) —
   ended up under thirteen creatures of rows.
 
+**3. Motes is a card again, and Options can reach the mini dashboard** (David, 2026-08-21,
+answering #228 and Scribe's item). Two asks with one root cause.
+
+- The card comes back through `HiddenSections` plus the eye in Options — no new setting.
+  `MigrateMotesCard` hides it ONCE for existing profiles; `MotesCardOffered` is what makes
+  showing it stick. `Progress → Wealth` keeps its Motes block, and Motes came OUT of that
+  card's "…are tabs in here now" note, because naming a card two rows above it in the same
+  list sends someone into the window looking for something that is right there.
+- **The defect underneath, which nobody had reported:** Options could not reach three
+  mini-dashboard switches AT ALL. A stat's switch is the star on its card header, and the
+  three folds moved five stars into windows; Options could only reach a star through the
+  BREAKOUT box for its kind, which exists for six of the ten. Motes, coin and kills were
+  switchable only by opening the very windows people were complaining about. Cards &
+  windows lists all ten now, as the same setting. Trap 20 one level out.
+- `OptionsWindow.xaml.cs` went past its ratchet writing that list, so the whole Cards &
+  windows tab lifted into `OptionsCardsView.cs`: 1,670 → 1,546 against a baseline of 1,547
+  that did NOT move.
+
+**#228 HAS NOT BEEN ANSWERED, deliberately.** Scribe replied to it on 2026-08-20 from the
+same bot account, and CLAUDE.md's rule is to read the last comment's signature before
+replying — one account answering one person twice in two voices is the #215 mistake. Post
+when the release actually ships, not before: the fix is real but unreleased, and "this is
+fixed" about a build nobody can install is the kind of thing that costs trust. Same for
+Scribe's standalone-Motes item, which can be deleted from `SCRIBE.md` then.
+
 ### Do first next time
 
 1. **`OptionsWindow.xaml.cs` has 32 ratchet lines and `LogParser.cs` has 14.** Those are
