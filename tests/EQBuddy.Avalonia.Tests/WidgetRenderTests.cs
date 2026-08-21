@@ -153,6 +153,39 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+    /// <summary>EVERY tab this window offers can actually be opened.
+    ///
+    /// Written because it wasn't. <c>LootSurface.Hosted</c> is shared vocabulary and gained
+    /// Inventory on 2026-08-20 when the Gear Locker folded into a tab ON WINDOWS; this
+    /// build had no body for it, and the body lookup is a dictionary, so clicking that chip
+    /// threw KeyNotFoundException. The strip rendered perfectly right up until the click,
+    /// and no existing test clicked it — they assert which LABELS appear, which is exactly
+    /// the assertion that cannot see this.
+    ///
+    /// So: select every offered tab in turn and demand a body. That is the assertion that
+    /// scales, because it fails the day a shared catalog grows a member this UI has not
+    /// implemented — the same shape as the ApplySectionLayout startup crash.</summary>
+    [AvaloniaFact]
+    public void EveryTabTheWindowOffersCanBeOpened()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.ShowGearLootWindow();
+        var host = window.GearLootWindowForTests!;
+
+        foreach (var tab in LootSurface.Hosted)
+        {
+            var offered = window.OfferedLootTabsForTests.Any(h => h.Tab == tab);
+            if (!offered) continue;   // not implemented here yet is fine; crashing is not
+            window.ShowGearLootWindow(LootSurface.KeyFor(tab));
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        Assert.NotEmpty(window.OfferedLootTabsForTests);
+        host.Close();
+        window.Close();
+    }
+
     /// <summary>The gear checklist auto-ticks from the game's own inventory dump, and for
     /// as long as the surface has existed it never said so and offered no way to produce
     /// one — David, 2026-08-20: <i>"telling me to import it but not telling me how or

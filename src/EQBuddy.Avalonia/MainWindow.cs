@@ -3607,6 +3607,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// E2E suite at all (docs/TestPlan.md).</summary>
     internal GearLootWindow? GearLootWindowForTests => _gearLootWindow;
 
+    /// <summary>What the tab strip is actually offering — so a test can demand that every
+    /// offered tab opens, rather than only that the right labels appear.</summary>
+    internal IReadOnlyList<LootTabHeader> OfferedLootTabsForTests =>
+        ((IGearLootHost)this).LootTabs(CurrentSnapshot());
+
     /// <summary>Is the window open and showing this tab? The render guards ask this where
     /// they used to ask "is this card expanded" — same rule either way.</summary>
     private bool LootTabShowing(LootTab tab) =>
@@ -3615,8 +3620,25 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // ---- IGearLootHost ----
     Control IGearLootHost.LootTabBody(LootTab tab) => _lootTabBodies[tab];
 
+    /// <summary>The tabs THIS widget can actually draw, which is not yet all of them.
+    ///
+    /// <c>LootSurface.Hosted</c> is shared vocabulary and gained Inventory on 2026-08-20,
+    /// when the Gear Locker and Inventory windows folded into a tab — on WINDOWS. This
+    /// build has no body for it yet, and <c>LootTabBody</c> is a dictionary lookup, so
+    /// selecting that tab here threw a KeyNotFoundException. Nothing caught it: the tests
+    /// pass because none of them clicks the third chip, and the strip renders correctly
+    /// right up until the click.
+    ///
+    /// Filtering here rather than hardening the lookup, because a tab with nothing behind
+    /// it is the thing LootSurface itself warns about — an absent tab reads as
+    /// not-yet-arrived, an empty one reads as broken. When the Avalonia Inventory view
+    /// lands, this filter starts returning it with no other change.
+    ///
+    /// Same shape as the crash the Gear &amp; Loot fold found in <c>ApplySectionLayout</c>:
+    /// a key present in a SHARED catalog with no entry in this UI's own map.</summary>
     IReadOnlyList<LootTabHeader> IGearLootHost.LootTabs(StatsSnapshot s) =>
-        LootTheme.Tabs(s, _settings.GearChecklist);
+        [.. LootTheme.Tabs(s, _settings.GearChecklist)
+            .Where(h => _lootTabBodies.ContainsKey(h.Tab))];
 
     IReadOnlyList<(string Key, Control Star, string Label, string Tip)> IGearLootHost.LootMiniStars()
     {
