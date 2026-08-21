@@ -16,10 +16,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
-
-
-
-
 ### mez timers vary from 26 seconds to a minute
 - **Priority:** waiting
 - **Place:** mez chips / MezTracker duration. Overlay deadline. Not Gate 5 widget cards.
@@ -53,27 +49,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
 - **Follow-up Aug 21, 8:29 AM CT:** LeBigNasty screenshot (filename 092734). Did not reply (already filed; David/Claude share the bot account). Creature headings in yellow. Red diamond = wiki-missing. Named as already on wiki drop tables: Apothic Warband +4 (Fetid fiend -- 4 kills, x1 25%), Cryosilk Amice +4 (Spinechiller spider -- 2 kills, x1 50%), Imbrued Platemail Gauntlets +4 (Worry wraith -- 1 kill, x1 100%). Also red-diamond in the same shot: Fetid Skin, Fire Opal, Mote of Major Potential, Crystallized Sulfur. Eyerazzia +4 and Flayed Turmoilskin Belt +4 have no diamond. Reporter: "not sure if you are checking against cached versions or not accounting for +". Hypothesis, unchecked -- matcher compares the +N item name to a wiki row without the plus, or a cached wiki snapshot.
 
-### standalone Motes card (configurable)
-- **Priority:** approved (David #229 8:13 AM CT: bring motes back as their own section; still fold themes. Claude has the card on main, unreleased. Do not reply on #227/#228/#229 until 1.99.0.)
-- **Place:** Progress theme. Not Gate 5 overlay. Not a group meter.
-- **Source:** #227 typical-usual-chaos Aug 20, 7:00 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
-- **Ask:** "Bring motes back as its own top-level card, behind a setting if needed." At-a-glance motes and motes/hour, not behind a Progress/Wealth tab.
-- **Already shipped:** WhatsNew: MOTES had its own card; Progress theme (2026-08-19) absorbed Progress, Money, Motes, Faction, Raids. ROADMAP: fewer definitions, not fewer cards.
-- **Checked:** not grepped this run for the setting. Hypothesis, unchecked -- there is no toggle to undock Motes from Progress.
-- **Also:** #228 daetien-lab Aug 20, 8:43 PM CT (1.98.0). Replied 2026-08-20 (Scribe). "I simply want to track my mote drops in the main window, but now it is hidden behind too much other junk that I don't care about. Keep it more simple." Same ask as this item (motes visible on the main window, not behind Progress / pull-out cards). Broader simplicity complaint is the reason, not a second heading.
-- **Also:** #229 Ceasar29 Aug 20, 11:11 PM CT (1.98.0). Replied 2026-08-21 (Scribe). "the motes aren't showing up... It isn't on the bars and I can't find in menus. Can you fix or bring that back?"
-- **Also:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (David already in the thread). "Motes are buried and seem to move around, rather than being easy to access from the main window."
-- **David on #228 Aug 20, 10:18 PM CT:** DranakCorps-bot unsigned (the actual human, per later #229 sign-off). "I agree and am trying to make it less complicated by moving things into logically themed stuff. What your looking for with motes is in Progress where xp/hr, AAs/hr, money/hr, motes/hr all sit." Do not reply -- he is in the thread. Fix is on main, not released; Claude will answer #228 when 1.99.0 ships.
-- **David on #229 Aug 21, 8:13 AM CT:** signed "David (the actual human)". "I'm going to bring the motes back into their own section but, overall, am still trying to organize types of things into themes." Did not reply.
-
-### wiki pack Step 2 click on creature name doesn't open wiki
-- **Priority:** must-fix
-- **Place:** Wiki contribution pack window. Desktop. Not Gate 5.
-- **Source:** #226 LeBigNasty Aug 20, 5:12 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.98.0 · Windows 26200.
-- **Ask:** "Step 2 says click on creatures name to open wiki. It doesn't seem to be doing that for me."
-- **Already shipped:** wiki pack is its own Data & imports window (#217 ask 1). Copy tip says each row has a direct edit link.
-- **Checked:** WikiPackPresentation.cs:237 "you open the link, paste, review and save." Hypothesis, unchecked -- Step 2 is instructing a click on the creature name in the pack list; that click either has no handler or does not open the wiki page.
-
 ### wiki pack copy copies the whole list, not one creature
 - **Priority:** waiting
 - **Place:** Wiki contribution pack Copy for wiki. Desktop.
@@ -106,14 +81,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** "Any of them has something that reliable shows what quest an item is for? So I don't have to look it up to avoid missing something important."
 - **Already shipped:** WhatsNew.json:876: "a small 🗺 next to the name is the quest marker now, and it's on EVERY loot surface: the Loot card, target drops, the minimized Loot breakout, and Drops by Creature. Click the 🗺 → its quests in the Quest Tracker." WhatsNew.json:918: "green means a real quest wants that item... Click the 🗺 to see exactly which quests."
 - **Checked:** those WhatsNew lines. Hypothesis, unchecked -- whether Mobile loot shows the same 🗺, and whether an item lookup that is not on a loot list has a quest list of its own.
-
-### Mobile page doesn't allow refresh when only 1 card is selected
-- **Priority:** must-fix
-- **Place:** EQBuddy Mobile. Not Gate 5.
-- **Source:** #222 bjstrange Aug 20, 10:56 AM CT. Replied 2026-08-20 (Scribe).
-- **Ask:** pull-down refresh should work when only one card is selected, the same as with two or more. Any single card.
-- **Already shipped:** pull-down refresh works with 2+ cards.
-- **Checked:** not grepped this run. Hypothesis, unchecked -- data source is the single-card layout scroll container, not the refresh handler (it works once a second card is on).
 
 ### Mobile "New at level" lists quest-filter classes, not the class in play
 - **Priority:** waiting (David's call: live character class vs Quest Tracker class selection). Helm asked 2026-08-20; David skipped the prompt. Not authorized. Do not ping.
@@ -218,7 +185,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Ask:** "servers will roll back, such as right now (Freeport was rolled back 20 minutes). However, this does affect the tracking of xp, levelups, and loot in the archives. We can't undo the rollback, but we should be able to snapshot and reference where we are reset to for xp."
 - **Already shipped:** nothing known that marks a rollback. Do not assert archive format without a quote.
 - **Where it might live:** hypothesis — a bookmark at rollback time against the archives already on disk, not rewriting the rolled-back window.
-
 
 ### Avalonia has no Watch or Loot breakout window
 - **Source:** found while converting breakout chrome, 2026-08-18. Not reported by anyone.

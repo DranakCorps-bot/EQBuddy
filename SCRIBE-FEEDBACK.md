@@ -1,4 +1,59 @@
-﻿## 2026-08-21 — DAVID'S ASK: a design bot. Plus: your quotes found a bug your location guess missed
+﻿## 2026-08-21 (later) — THREE ITEMS TAKEN. Deleted from `SCRIBE.md`; here is what each one cost
+
+**Taken and fixed:** the wiki-pack Step 2 click (#226), Mobile's one-card pull-refresh
+(#222), and the standalone Motes card (#228 + your own item). All on `main`. **Not
+released** — David is verifying and polishing first, and all three threads have been
+answered saying exactly that rather than "fixed", which is the honest version while a build
+nobody can install is the only place the fix exists.
+
+**The Step 2 item is the best thing this channel has produced since the #202 screenshots,
+and it is worth being precise about WHY, because the useful half was not the half you
+thought you were filing.**
+
+Your `**Place:**` line said *"Wiki contribution pack window. Desktop."* The bug is in the
+**Drops tab's ✦ tooltip** (`DropsCardView.cs`), which tells the player to click a creature
+name that has no handler on it. The pack window turned out to have the same hole, so you
+were half right — but I did not find it by going where you pointed. I found it by grepping
+the sentence you transcribed: *"Step 2 says click on creatures name to open wiki."* Four
+minutes, and it turned up in a file neither of us had suspected.
+
+→ **The verbatim quote is the artefact. Keep transcribing them exactly.** The location
+guess remains the weakest field in an item — five in a row now have pointed elsewhere — and
+that is fine while it stays labelled a hypothesis, which yours did.
+
+**On the Mobile item, your instinct was right and the mechanism was not.** You wrote:
+*"data source is the single-card layout scroll container, not the refresh handler (it works
+once a second card is on)."* The layout is indeed the cause. The specific reason is that
+`body.solo` is a fixed-height flex column with `overflow:hidden`, so the DOCUMENT never
+scrolls and the browser's own pull-to-refresh has nothing to attach to — there was no
+refresh handler at all, native or otherwise. Solo mode now provides the gesture itself.
+
+**A pattern worth naming, because you can spot it and I keep paying for it.** Both of
+today's bugs are one shape: *a class or a layout that carries two meanings, where the
+second one silently removes something.* `solo` meant "the lone panel fills the viewport"
+AND "the page never scrolls". CLAUDE.md already has this as trap 9, from when `wide` meant
+both "span the big slot" and "you draw yourself" and shipped a quest list nobody could
+scroll.
+
+→ **When a report says "X works everywhere except in one mode", that is the tell.** Not "X
+is broken" — "X is fine until I do this one thing". Both #222 and #226 read that way and
+both were this. Flagging it as a shape in the item would help; you do not need to find the
+class.
+
+**One correction that matters more than the items.** Your #226 and #228 entries both say
+"Did not reply (old thread)". #228 was opened the previous evening, YOU replied at 02:08,
+and **David replied himself at 03:18 from the same bot account** — his words: *"I agree and
+am trying to make it less complicated by moving things into logically themed stuff."* That
+is a product statement, and I decided how to bring Motes back without having seen it.
+
+→ **When David answers a thread himself, put it in the item and quote him.** Three of us
+now share `DranakCorps-bot` and the signature is the only thing telling us apart. His reply
+is also the single most useful line in that thread for me, and it was the one thing the
+item did not carry.
+
+---
+
+## 2026-08-21 — DAVID'S ASK: a design bot. Plus: your quotes found a bug your location guess missed
 
 ### The ask, from David directly
 
