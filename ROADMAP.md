@@ -1,4 +1,4 @@
-﻿# EQBuddy — roadmap
+# EQBuddy — roadmap
 
 **Audience: Scribe, and anyone triaging community posts.** This is the frame — what is
 being built, in what order, and what is deliberately not being built. It exists so an
@@ -66,6 +66,19 @@ all three call, never from a feature list kept level by hand.
 
 ## 3. The UI/UX rework — where the work is now
 
+> **The destination, in one sentence (David, 2026-08-20):** *"I would like the gear to
+> eventually be the path to options not click gear then click options from a list of
+> things. So ultimately, that's what I want to work towards."*
+>
+> **The ⚙ button should BE Options.** Every entry now on that menu is a surface that has
+> not been folded yet, and every fold is one line closer. It is worth stating because it
+> reframes the themes: they are not tidying, they are the route to a widget whose only
+> two controls are the cards and the settings. What is still on it, and where each goes —
+> Zone map, Travel route, Spawn timers and Drop camp marker → **World**; Drops by creature
+> → **Kills & Drops**; Session history → **Progress** or its own; Data & imports → mostly
+> obsolete already, since `/outputfile` dumps import themselves as of 2026-08-20;
+> Auto-detect log folder and Help → **Options** itself.
+
 Rebuilding every surface on one design system (`UI.Shared/DesignTokens`, `IconPaths`,
 `ChipStyle`). Staged by **vocabulary**, not screen by screen: finish one shared thing
 everywhere it appears, so later gates spend the primitive instead of minting another.
@@ -96,10 +109,11 @@ became one theme, three tabs, one definition in Core. Five more follow:
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
 | **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
-| **Gear & Loot** | Loot, Gear + Drops, ItemInfo, Inventory, GearLocker | **first pass done 2026-08-20 (1.98.0)** — the window exists, Loot and Gear are tabs 1 and 2 on both desktops. Drops and Items are named in `LootSurface` and not yet `Hosted`; a tab with nothing behind it reads as broken, so they arrive in a second pass — unblocks #174 |
+| **Gear & Loot** | Loot, Wishlist, Inventory (= GearLocker + Inventory) + ItemInfo | **done on Windows 2026-08-20** — three tabs: what I picked up, what I want, what I have. Drops LEFT this theme (see Kills & Drops). **Avalonia parity outstanding** — that widget needs its gear-checklist lift first |
 | **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | then — needs `RenderBuffs` lifted first; lands as its own WINDOW with tabs (David, 2026-08-20) |
-| **Live Meters** | Combat, Healing, Kills + the breakouts + FightTimeline | biggest lift |
-| **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity |
+| **Live Meters** | Combat, Healing + their breakouts + FightTimeline | biggest lift. **Kills is NOT here** — David, 2026-08-20: *"Kills isn't a meter though. we don't track kills per second but we track damage per second, healing per second."* A meter is a per-second board; kills/hour is a rate but not that |
+| **Kills & Drops** | Kills + Drops by creature | **David's grouping, 2026-08-20** — *"Kills and Drops should be … Kills and Drops ;)"*. Both are about the CREATURE: what died, and what it dropped at what rate. One question — "is this camp worth it?" — currently answered in two places, one of them buried in the cog. Should be a small fold: two existing surfaces, no new logic |
+| **World** | Travels & Deaths + Map, Spawns, Travel, ZoneShare | heaviest mobile parity. **Already covers what David asked to note on 2026-08-20** — *"Travels and Death should include travel route and zone maps too"* — and goes further: Spawn timers and the drop-camp marker come off the cog with it |
 
 **Progress went before Alerts, and the reason is worth keeping.** The order above was set
 on 2026-08-17, before Gate 5b lifted four card bodies onto the `IWidgetCard` seam — which
