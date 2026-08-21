@@ -13,6 +13,48 @@ public class CompanionThemeTests
     private static CompanionThemeSection Project(string theme = "ParchmentBrass") =>
         CompanionTheme.Project(theme, ThemePalettes.For(theme));
 
+    /// <summary>THE PHONE HAS HAD NO THEME AT ALL, and the log said so 563 times on
+    /// David's machine before anyone read it (2026-08-21).
+    ///
+    /// <c>ThemeManager.PaletteApplied</c> broadcasts the palette WITH the derived tones
+    /// already concatenated — its own summary says "the derived tones included" — and
+    /// Project derived them a second time and fed both into a ToDictionary. Duplicate key,
+    /// ArgumentException, every single theme apply. CompanionHost.SetTheme catches so the
+    /// app survives, which is exactly why it went unnoticed: nothing breaks, the phone just
+    /// never receives a palette and renders in its own CSS defaults forever.
+    ///
+    /// A contract changed underneath a caller and the caller kept deriving. Project must
+    /// therefore be correct for BOTH shapes — the explicit palette wins, and derivation
+    /// only fills what is missing.</summary>
+    [Fact]
+    public void APaletteThatAlreadyCarriesItsDerivedTonesProjectsAnyway()
+    {
+        var palette = ThemePalettes.For("ParchmentBrass").ToList();
+        // Exactly what PaletteApplied hands the companion host.
+        var withTones = palette.Concat(ThemeTones.Derive(palette)).ToList();
+
+        var fromPlain = CompanionTheme.Project("ParchmentBrass", palette);
+        var fromBroadcast = CompanionTheme.Project("ParchmentBrass", withTones);
+
+        // It used to throw here. And the two must agree: deriving twice cannot be allowed
+        // to produce a different theme from deriving once.
+        Assert.Equal(fromPlain.Colors, fromBroadcast.Colors);
+    }
+
+    /// <summary>An explicit value BEATS a derived one, which is the half that makes the
+    /// fix a decision rather than a shrug: a palette that ships its own HairlineBrush is
+    /// stating a preference, and derivation exists to fill gaps.</summary>
+    [Fact]
+    public void AnExplicitToneWinsOverTheDerivedOne()
+    {
+        var palette = ThemePalettes.For("ParchmentBrass").ToList();
+        var stated = palette.Concat([("HairlineBrush", "#FF00FF00")]).ToList();
+
+        var projected = CompanionTheme.Project("ParchmentBrass", stated);
+
+        Assert.Equal(CompanionTheme.Web("#FF00FF00"), projected.Colors["hairline"]);
+    }
+
     [Fact]
     public void OpaqueValuesBecomeHexAndTranslucentOnesKeepTheirAlpha()
     {

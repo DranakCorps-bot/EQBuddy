@@ -73,8 +73,23 @@ public static class CompanionTheme
     public static CompanionThemeSection Project(string themeKey, IEnumerable<(string Key, string Hex)> palette)
     {
         var rows = palette.ToList();
-        var by = rows.Concat(ThemeTones.Derive(rows))
-            .ToDictionary(e => e.Key, e => e.Hex, StringComparer.Ordinal);
+        // EXPLICIT WINS, DERIVED FILLS GAPS — and this must survive being handed a palette
+        // that already carries its derived tones.
+        //
+        // ThemeManager.PaletteApplied broadcasts exactly that: its own summary says "the
+        // full palette (the derived tones included)". This method then derived them a
+        // SECOND time and fed both into a ToDictionary, which throws on the duplicate key.
+        // CompanionHost.SetTheme catches, so nothing crashed and nothing was fixed: the
+        // phone simply never received a palette and rendered in its own CSS defaults. It
+        // had logged 563 times on David's machine before anyone read the file (2026-08-21).
+        //
+        // A contract changed underneath a caller and the caller kept deriving. Tolerating
+        // both shapes is the fix, not asking the caller to stop — the derivation is a
+        // FALLBACK by definition, so a palette that states its own HairlineBrush is stating
+        // a preference and should keep it.
+        var by = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (key, hex) in rows) by[key] = hex;
+        foreach (var (key, hex) in ThemeTones.Derive(rows)) by.TryAdd(key, hex);
 
         var colors = new Dictionary<string, string>(TokenMap.Length + 1, StringComparer.Ordinal);
         foreach (var (token, key) in TokenMap)

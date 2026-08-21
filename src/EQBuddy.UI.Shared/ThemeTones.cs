@@ -20,7 +20,11 @@ public static class ThemeTones
     /// <see cref="CustomTheme.PaletteFor"/>), as #AARRGGBB like every palette value.</summary>
     public static IEnumerable<(string Key, string Hex)> Derive(IEnumerable<(string Key, string Hex)> palette)
     {
-        var by = palette.ToDictionary(e => e.Key, e => e.Hex, StringComparer.Ordinal);
+        // Tolerates a repeated key (last wins) rather than throwing: callers hand this
+        // whatever palette they have, including one that already carries derived tones,
+        // and a colour lookup is no place to be strict about duplicates.
+        var by = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (key, hex) in palette) by[key] = hex;
         var (aa, ar, ag, ab) = Parse(by["AccentBrush"]);
         var (pa, pr, pg, pb) = Parse(by["PanelBrush"]);
 
