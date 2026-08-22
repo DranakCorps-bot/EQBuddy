@@ -40,6 +40,13 @@ internal sealed class ProgressCardView : IWidgetCard
     private readonly TextBlock _dingLabel = SectionLabel();
     private readonly ItemsControl _dingList = new();
     private readonly ItemsControl _skillList = new();
+    /// <summary>A FIELD, not an inline label, so it can hide when there is nothing under
+    /// it. It was added unconditionally until 2026-08-22 and every session with no
+    /// skill-ups drew a heading with nothing beneath it — visible in
+    /// docs/screenshots/theme-inline-progress.png, and in the Progress WINDOW too, since
+    /// both hosts draw this same view. The ding and AA labels beside it were fields from
+    /// the start; this one was the odd one out.</summary>
+    private readonly TextBlock _skillLabel = SectionLabel("Skill-ups");
     private readonly TextBlock _aaNewLabel = SectionLabel("AA learned this session");
     private readonly ItemsControl _aaNewList = new();
     private readonly EqFoldLabel _aaAllLabel = new() { Section = true, Open = false };
@@ -57,6 +64,11 @@ internal sealed class ProgressCardView : IWidgetCard
     public bool NextShown => _nextLabel.Visibility == Visibility.Visible;
     public int NextRows => _nextList.Items.Count;
     public int SkillRows => _skillList.Items.Count;
+
+    /// <summary>Whether the "Skill-ups" heading is up. Pinned for the reason
+    /// <c>MoneyCardView.SoldShown</c> is: a heading that stops appearing is invisible in a
+    /// diff, a build and every unit test, and the WPF layer has none of its own.</summary>
+    public bool SkillLabelShown => _skillLabel.Visibility == Visibility.Visible;
     public int AaNewRows => _aaNewList.Items.Count;
     public int AaAllRows => _aaAllList.Items.Count;
 
@@ -112,7 +124,7 @@ internal sealed class ProgressCardView : IWidgetCard
         _panel.Children.Add(_summary);
         _panel.Children.Add(_dingLabel);
         _panel.Children.Add(_dingList);
-        _panel.Children.Add(SectionLabel("Skill-ups"));
+        _panel.Children.Add(_skillLabel);
         _panel.Children.Add(_skillList);
         _panel.Children.Add(_aaNewLabel);
         _panel.Children.Add(_aaNewList);
@@ -187,6 +199,8 @@ internal sealed class ProgressCardView : IWidgetCard
 
         EqCardRows.Fill(_skillList,
             s.SkillUps.Select(k => new CardRow(k.Skill, $"{k.Value} (+{k.Ups})")));
+        _skillLabel.Visibility = _skillList.Items.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
 
         // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show newly
         // learned this session?" — yes): session-new AAs lead, the full ledger folds

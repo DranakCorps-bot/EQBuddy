@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using EQBuddy.Core;
@@ -266,6 +266,7 @@ public partial class ProgressWindow : Window
         $"progressMoneySoldShown={(_money.SoldShown ? 1 : 0)} " +
         $"progressFaction={_faction.RowCount} " +
         $"progressSkills={_experience.SkillRows} " +
+        $"progressSkillLabel={(_experience.SkillLabelShown ? 1 : 0)} " +
         // The Experience tab's three lists, under the names E2E has asserted on since the
         // Progress CARD existed — kept identical on purpose, because the whole value of
         // ProgressCard_DrawsItsUnlockListsOnADing is that it goes on asking the same

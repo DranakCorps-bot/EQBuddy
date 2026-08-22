@@ -574,6 +574,25 @@ public sealed class EndToEndTests
         app.WaitForDump("progressTabs", 4, "all four Progress tabs");
     }
 
+    /// <summary>A heading with nothing under it reads as a surface that failed to load.
+    /// The Experience room drew "Skill-ups" unconditionally until 2026-08-22 — on the
+    /// widget card AND in this window, since both hosts draw the same view — and the
+    /// fixture session has no skill-ups, so it is exactly the state a screenshot caught
+    /// and no test could. Same shape as MoneyCardView's sold block.</summary>
+    [Fact]
+    public void TheSkillUpsHeadingStaysDownWhenThereAreNoSkillUps()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForWindow("progressSkillLabel", "the Progress window to open on Experience");
+        app.WaitForDump("progressSkills", 0, "no skill-ups in the fixture session");
+        app.WaitForDump("progressSkillLabel", 0, "the heading to stay down with no rows under it");
+    }
+
     /// <summary>
     /// WHO OWNS THE PROGRESS BODY — pinned here BEFORE Inline themes PR 1 turns the
     /// launcher into an expander, which is the only order in which this assertion is

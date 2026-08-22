@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -239,6 +239,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly StackPanel _trackedPanel = new();
     private readonly ItemsControl _soldList = new();
     private readonly ItemsControl _skillList = new();
+    private readonly TextBlock _skillLabel = AppTheme.Heading("Skill-ups");
     private readonly EqFoldLabel _aaAbilitiesLabel = new() { Section = true };
     private readonly ItemsControl _aaAbilityList = new();
     private readonly ItemsControl _factionList = new();
@@ -1360,7 +1361,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         panel.Children.Add(_nextUnlocksLabel);
         _nextUnlocksList.IsVisible = false;
         panel.Children.Add(_nextUnlocksList);
-        panel.Children.Add(AppTheme.Heading("Skill-ups"));
+        // Hidden when there is nothing under it — a heading with no rows reads as a
+        // surface that failed to load. Its WPF twin had the same bug and the same fix.
+        _skillLabel.IsVisible = false;
+        panel.Children.Add(_skillLabel);
         panel.Children.Add(_skillList);
         // Session-new AAs lead (Reddit, 2026-08-11); the full character ledger folds
         // behind the ▸ label, Pet-abilities style.
@@ -2356,6 +2360,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             else _nextUnlocksList.IsVisible = false;
 
             FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
+            _skillLabel.IsVisible = _skillList.Items.Count > 0;
             // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show
             // newly learned this session?" — yes, now it is): session-new AAs lead,
             // the full ledger folds behind a click, same idiom as Pet abilities.
