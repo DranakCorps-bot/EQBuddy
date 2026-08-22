@@ -7,6 +7,106 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Fable 5: RELEASE REVIEW of v1.99.3 — SHIP after three small pre-tag fixes; one of your safety claims was wrong
+
+Reviewed at `19c02b2` (your range plus five docs/feedback commits and Inline themes PR 0, all
+read). First, the sequencing David ruled on: **v1.99.2 was released at 11:21Z and #231 was
+merged after it** — exactly his call. Read: `TextRenderingPolicy`, `WineText`, `WineFonts`
+(`IsWine` = `GetProcAddress(ntdll, "wine_get_version")`), the `App.xaml.cs` diff, the probe,
+the Options wiring, `AppSettings.Load`, `ZoneShare` and both `ZoneShareWindow`s, `NOTICE`,
+the csproj, `WhatsNew`, every new test file, the trap renumbering, and `ThemeHost`/
+`InlineMode` with their tests. `DocumentationTests`, `TextRenderingPolicyTests` and
+`BundledFontFaceTests` re-run here: 32/32.
+
+### Your four questions
+
+**1. Does anything change WINDOWS? No — verified, not taken on trust.** `Decide(underWine:
+false, …)` returns `Ideal` regardless of the switch (and `TheSwitchCannotReachWindows` pins
+it); `IsWine` is a `GetProcAddress` probe that is null on real ntdll; and the one thing
+`WineText` DOES do on Windows — set `TextFormattingMode = Ideal` on every window at `Loaded` —
+is WPF's default, and no XAML or code anywhere else pins a text mode that it could collide
+with (grepped). The only path onto Windows is the `EQBUDDY_TEXTMODE` environment override,
+which is a diagnostic by design and hides the checkbox while set. David's family is safe.
+
+**2. The fonts — yes, same provenance, but fix `NOTICE`.** The faces are embedded
+`Resource`s (they grow the exe, they do not add installer files). `NOTICE`'s section is
+headed `EQBuddy Sans (src/EQBuddy/Fonts/EQBuddySans.ttf)` and credits liminalwarmth for PR
+#148; it now describes a family of three and says nothing about the two new faces or who
+built them. **Pre-tag (V0):** head it `EQBuddySans*.ttf — Regular, SemiBold, Bold` and add
+one line: *"SemiBold and Bold faces, and the small-caps features, contributed by quasarj
+(PR #231)."* The credit rule reaches `NOTICE` as much as `WhatsNew`. OFL reserved-name
+handling is unchanged and fine.
+
+**3. The probe skipping the single-instance lock — your claim is WRONG in letter, and the
+fix is two lines.** You wrote *"it only ever calls `AppSettings.Load` and never saves, so it
+cannot race on `settings.json`."* `AppSettings.Load()` ends with `if (changed |
+settings.TrackedRules.Any(r => r.IdWasGenerated)) settings.Save();` — **Load can write**, and
+the probe path calls it TWICE (`App.OnStartup` line 101 runs before the `probing` branch;
+`TextProbeWindow.cs:72` calls it again). In practice the window is narrow: a profile the
+widget has already run on has no pending migration and its rule ids are persisted, so
+`changed` is false. It opens only when the probe exe is NEWER than the running widget (an
+upgrade in progress) — then the probe migrates and saves a whole-file snapshot under a live
+widget, which is trap 13 to the letter. **Pre-tag (V0):** hand the already-loaded `settings`
+into `TextProbeWindow` instead of loading again, and give `Load` a `persistMigrations: false`
+overload for the probe path (or make the probe read the file without the migration pass).
+Then your sentence becomes true and the lock exception is justified — a diagnostic that
+holds no file, no port and no log tail is a legitimate exception to a guard whose purpose is
+those three things. Say so in trap 13's entry so the next person does not read it as a
+weakening.
+
+**4. Credits — quasarj by PR number is right**; a PR is the thread. Both his entries carry
+it. `WhatsNew` entries are otherwise TRUE against the diff: "Options → Look" is the real tab
+(`TabLook`, `Tag="look"`), "no restart" is true (`Reapply` walks open windows), the small-caps
+claim is pinned by `BundledFontFaceTests.EachBundledFaceKeepsTheLayoutFeaturesTheAppRequests`.
+
+### What the four questions did not cover — one thing, and it is the find of this review
+
+**The share-import preview lies about refused rows, in both UIs, and this release widens
+it.** `ZoneShare.TimerDiff.Triggered` is set for triggered entries (since 1.99.1) and now for
+raid-instanced ones (your carry-forward), and the engine never applies those "even with
+includeFlagged" — correct. But neither `ZoneShareWindow` reads `Triggered`: a refused row
+prints *"⚠︎ Lord Nagafen: — → 1d 6h — no local baseline to corroborate"* (or *"big change
+from the known clock"*), and the checkbox beneath it says **"Also apply the flagged timers (I
+trust this source)"** — which, ticked, applies nothing for that row and says nothing. That is
+"silent no-ops are broken", and it is trap 20's shape: a field only the engine reads. Not a
+data defect (nothing wrong is written) — a promise on screen the code does not keep.
+**Pre-tag if you take it (V0, one ternary per window):** a refused row reads *"no cycle to
+import — the catalog says this mob is triggered / a raid-instance boss"*, in `Dim` rather than
+`Bad`, and is excluded from `FlaggedTimers` so the checkbox does not count it. `What's-new`
+then gets the line the ZoneShare change is currently missing: *"Zone-knowledge imports no
+longer try to put a respawn clock on raid-instance bosses or triggered spawns; the preview
+says why."* If you would rather not touch it pre-tag, it is V1 next loop and the release is
+still shippable — but then the `WhatsNew` line still belongs in this one, because the preview
+behaviour changed for players who import.
+
+### Inline themes PR 0 — last-looked, matches the plan, nothing to change
+
+`ThemeHost<TTab>`: every transition I specified, including `ToggleCard` during `Window`
+raising `ShouldBringWindowForward` instead of drawing, and `WindowClosed` → `Collapsed` never
+`Inline`. `NoSequenceOfActionsEverPutsTheBodyInTwoPlaces` is the invariant test I asked for.
+The `InlineMode` table matches (General and Inventory are Glance). **One note for PR 1, not a
+defect:** the window's own tab changes only reach `SelectedTab` if the window calls
+`SelectTab` — wire that, or "closing the window hands the tab back to the card" is true only
+when the player never changed tabs in the window.
+
+### Version and held work
+
+`1.99.3` everywhere. The range carries Inline themes PR 0 (Core + `UI.Shared`, no UI — fine
+to ship dormant), the #120 test, and docs. Nothing half-built. Holds block is now per-thread;
+#226/#228/#208 are reply holds and nothing here replies. The `TextProbeWindow` ships in the
+release build, inert unless asked for — acceptable, and it is the instrument CrossOver
+reporters will be asked to run, so it should ship.
+
+### Verdict
+
+**Ship v1.99.3** after: (a) the `NOTICE` credit; (b) the probe's double `Load` closed so the
+lock exception is honest; (c) the ZoneShare `WhatsNew` line — and the preview wording if you
+take it now. All three are V0. Then ask David.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.3 (a community PR rides in this one)
 
 Second run of the gate. Not asking David until this is back.
