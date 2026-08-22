@@ -159,6 +159,147 @@ public class EqlWikiMobsTests
     /// ASKED for, so the resolved title was the stripped one and every link kept the
     /// wrong name. This pins the page's own title as the answer, which is the thing
     /// contribution packs print.</summary>
+    // ---------------- the re-check (#226, LeBigNasty + Frankthetankk; plan: FABLE.md) ----------------
+
+    private const string LockjawWithVest =
+        "{{Namedmobpage\n| name = Lockjaw\n| known_loot = \n{{:Lockjaw Hide Vest}}\n}}";
+    private const string LockjawWithoutVest =
+        "{{Namedmobpage\n| name = Lockjaw\n| known_loot = \n{{:Gator Meat}}\n}}";
+
+    private static string TempCache() => Path.Combine(Path.GetTempPath(), $"mobcache-{Guid.NewGuid():N}");
+
+    /// <summary>The ✦ runs on a 7-day per-page cache, so a player who corrects the wiki —
+    /// the thing the ✦ ASKS them to do — could not clear the flag for a week. A bypass
+    /// asks the wiki now even though the cache still calls the page fresh.</summary>
+    [Fact]
+    public async Task ABypassRefetchesAPageTheCacheStillCallsFresh()
+    {
+        var dir = TempCache();
+        try
+        {
+            var served = LockjawWithoutVest;
+            var fetches = 0;
+            var svc = new EqlWikiMobService(dir, title => { fetches++; return Served(title, served); });
+
+            var first = await svc.LookupAsync("Lockjaw");
+            Assert.Equal(ItemLookupState.Live, first.State);
+            Assert.DoesNotContain(first.Mob!.Drops, d => d.Item == "Lockjaw Hide Vest");
+
+            // The player edits the wiki. Without a bypass the cache answers for a week.
+            served = LockjawWithVest;
+            var cached = await svc.LookupAsync("Lockjaw");
+            Assert.Equal(ItemLookupState.Cached, cached.State);
+            Assert.Equal(1, fetches);
+
+            var rechecked = await svc.LookupAsync("Lockjaw", bypassCache: true);
+            Assert.Equal(ItemLookupState.Live, rechecked.State);
+            Assert.Equal(2, fetches);
+            Assert.Contains(rechecked.Mob!.Drops, d => d.Item == "Lockjaw Hide Vest");
+
+            // …and the re-read is what the cache holds from now on.
+            var after = await svc.LookupAsync("Lockjaw");
+            Assert.Equal(ItemLookupState.Cached, after.State);
+            Assert.Contains(after.Mob!.Drops, d => d.Item == "Lockjaw Hide Vest");
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
+    /// <summary>An offline re-check must not demote a known answer to "not checked":
+    /// the old read comes back as StaleCache with the OLD FetchedAt, never Offline.
+    /// The #217 rule — pending is not nothing-new — and the easiest thing to get wrong
+    /// with a bypass, because the obvious implementation skips the cache entirely.</summary>
+    [Fact]
+    public async Task AFailedBypassReturnsTheStaleReadWithItsOldTimestamp()
+    {
+        var dir = TempCache();
+        try
+        {
+            var first = await new EqlWikiMobService(dir, t => Served(t, LockjawWithVest)).LookupAsync("Lockjaw");
+            var fetchedAt = first.FetchedAt!.Value;
+
+            var offline = new EqlWikiMobService(dir, _ => throw new HttpRequestException("offline"));
+            var again = await offline.LookupAsync("Lockjaw", bypassCache: true);
+
+            Assert.Equal(ItemLookupState.StaleCache, again.State);
+            Assert.Equal(fetchedAt, again.FetchedAt);
+            Assert.Contains(again.Mob!.Drops, d => d.Item == "Lockjaw Hide Vest");
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
+    /// <summary>Forget keys on the REQUESTED name — the same key the windows' session memo
+    /// uses — so one name addresses both stale layers. Here the page was SERVED under a
+    /// different title (a redirect), and the file still goes.</summary>
+    [Fact]
+    public async Task ForgetRemovesTheCacheFileKeyedOnTheRequestedName()
+    {
+        var dir = TempCache();
+        try
+        {
+            var fetches = 0;
+            var svc = new EqlWikiMobService(dir, t => { fetches++; return Served("The Spiroc Lord", LockjawWithVest); });
+            await svc.LookupAsync("Spiroc Lord");
+            Assert.Single(Directory.GetFiles(dir));
+
+            svc.Forget("Spiroc Lord");
+            Assert.Empty(Directory.GetFiles(dir));
+            svc.Forget("Spiroc Lord");   // twice is harmless
+
+            await svc.LookupAsync("Spiroc Lord");
+            Assert.Equal(2, fetches);    // nothing cached: it asked again
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
+    /// <summary>At most two requests in flight, across every caller. A Drops tab with
+    /// thirteen creatures used to send thirteen at once — the burst the re-check button
+    /// was feared to add already existed. Eight lookups are started against a fetcher
+    /// that parks every call; only two may have been ASKED until one is released.</summary>
+    [Fact]
+    public async Task NoMoreThanTwoFetchesAreEverInFlight()
+    {
+        var dir = TempCache();
+        try
+        {
+            var parked = new List<TaskCompletionSource<WikiPageText?>>();
+            var gate = new object();
+            var svc = new EqlWikiMobService(dir, _ =>
+            {
+                var tcs = new TaskCompletionSource<WikiPageText?>();
+                lock (gate) parked.Add(tcs);
+                return tcs.Task;
+            });
+
+            var lookups = Enumerable.Range(0, 8)
+                .Select(i => svc.LookupAsync($"Creature{i}"))
+                .ToList();
+
+            // Give the eight tasks every chance to over-subscribe.
+            await Task.Delay(100);
+            int asked; lock (gate) asked = parked.Count;
+            Assert.Equal(EqlWikiMobService.MaxInFlight, asked);
+
+            // Releasing one admits exactly one more.
+            TaskCompletionSource<WikiPageText?> one; lock (gate) one = parked[0];
+            one.SetResult(new WikiPageText("Creature0", LockjawWithVest));
+            await Task.Delay(100);
+            lock (gate) asked = parked.Count;
+            Assert.Equal(EqlWikiMobService.MaxInFlight + 1, asked);
+
+            // Drain so the temp dir can be deleted; each creature resolves on its first candidate.
+            while (true)
+            {
+                List<TaskCompletionSource<WikiPageText?>> pending;
+                lock (gate) pending = parked.Where(t => !t.Task.IsCompleted).ToList();
+                if (pending.Count == 0 && lookups.All(l => l.IsCompleted)) break;
+                foreach (var t in pending) t.TrySetResult(new WikiPageText("x", LockjawWithVest));
+                await Task.Delay(20);
+            }
+            await Task.WhenAll(lookups);
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
     [Fact]
     public async Task ARedirectedLookupKeepsThePagesOwnTitleNotTheOneWeAskedFor()
     {

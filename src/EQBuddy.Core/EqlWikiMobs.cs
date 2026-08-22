@@ -52,6 +52,15 @@ public sealed partial class EqlWikiMobService
     private readonly Func<string, Task<List<string>>> _search;
     private static readonly HttpClient Http = EqlWikiText.CreateClient();
 
+    /// <summary>How hard EQBuddy may lean on a volunteer wiki: at most this many mob
+    /// requests in flight per service, across every caller (#226 plan, Fable 5; the
+    /// number is David's to change). Before this, a Drops tab with thirteen creatures
+    /// sent thirteen concurrent requests on first render — the burst the re-check button
+    /// was feared to add already existed, and the re-check was the moment to fix it for
+    /// every lookup rather than add a second unthrottled path. The app builds one service.</summary>
+    public const int MaxInFlight = 2;
+    private readonly SemaphoreSlim _inFlight = new(MaxInFlight, MaxInFlight);
+
     public EqlWikiMobService(string cacheDir, Func<string, Task<WikiPageText?>>? fetchOverride = null,
         Func<string, Task<List<string>>>? searchOverride = null)
     {
@@ -60,19 +69,35 @@ public sealed partial class EqlWikiMobService
         _search = searchOverride ?? SearchFromApi;
     }
 
-    public async Task<MobLookupResult> LookupAsync(string creatureName, string currentZone = "")
+    /// <summary>Drop this creature's cached page, best-effort, keyed exactly as
+    /// <see cref="LookupAsync"/> keys it — on the REQUESTED name, which is also what the
+    /// windows' session memo keys on, so one name addresses both layers (#226). The
+    /// served title is re-recorded by the next write, so trap 3 needs nothing here.</summary>
+    public void Forget(string creatureName)
+    {
+        try { File.Delete(CachePath(creatureName.Trim())); }
+        catch { /* a cache file that would not delete re-expires on its own */ }
+    }
+
+    /// <param name="bypassCache">A re-check (#226): skip the freshness test and ask the
+    /// wiki now — but KEEP the stale fallback, so an offline re-check returns
+    /// <see cref="ItemLookupState.StaleCache"/> with the OLD <c>FetchedAt</c> rather than
+    /// <see cref="ItemLookupState.Offline"/>. A known ✦ must not vanish into "not checked"
+    /// because the network blinked: the #217 rule, pending is not nothing-new.</param>
+    public async Task<MobLookupResult> LookupAsync(string creatureName, string currentZone = "",
+        bool bypassCache = false)
     {
         var title = creatureName.Trim();
         if (title.Length == 0) return new MobLookupResult(null, ItemLookupState.NotFound, null);
 
         var cached = ReadCache(title);
-        if (cached is { } fresh && DateTime.UtcNow - fresh.FetchedAt < CacheLifetime)
+        if (!bypassCache && cached is { } fresh && DateTime.UtcNow - fresh.FetchedAt < CacheLifetime)
             return new MobLookupResult(Parse(fresh.Wikitext, fresh.Title), ItemLookupState.Cached, fresh.FetchedAt);
 
         foreach (var candidate in Candidates(title))
         {
             WikiPageText? page;
-            try { page = await _fetch(candidate).ConfigureAwait(false); }
+            try { page = await Gated(() => _fetch(candidate)).ConfigureAwait(false); }
             catch
             {
                 return cached is { } stale
@@ -84,8 +109,8 @@ public sealed partial class EqlWikiMobService
             // article-stripped "Spiroc Lord" succeeds and hands back "The Spiroc Lord".
             // Recording the request is what put stripped names into contribution packs
             // even though the lookup had resolved perfectly (#65, Frankthetankk).
-            WriteCache(title, page.Title, page.Wikitext);
-            return new MobLookupResult(Parse(page.Wikitext, page.Title), ItemLookupState.Live, DateTime.UtcNow);
+            var fetchedAt = WriteCache(title, page.Title, page.Wikitext);
+            return new MobLookupResult(Parse(page.Wikitext, page.Title), ItemLookupState.Live, fetchedAt);
         }
 
         // Every exact form missed: ask the wiki's own search, and accept its top hits
@@ -100,17 +125,17 @@ public sealed partial class EqlWikiMobService
         // player's current zone picks; zoneless pages come before foreign-zone ones.
         try
         {
-            var hits = (await _search(title).ConfigureAwait(false)).Take(5)
+            var hits = (await Gated(() => _search(title)).ConfigureAwait(false)).Take(5)
                 .Where(found => SpawnCatalog.NameMatchesFuzzy(StripZoneSuffix(found), title))
                 .OrderBy(found => ZoneSuffix(found) is { } zone
                     ? zone.Equals(currentZone.Trim(), StringComparison.OrdinalIgnoreCase) ? 0 : 2
                     : 1);
             foreach (var found in hits)
             {
-                var page = await _fetch(found).ConfigureAwait(false);
+                var page = await Gated(() => _fetch(found)).ConfigureAwait(false);
                 if (page is null) continue;
-                WriteCache(title, page.Title, page.Wikitext);
-                return new MobLookupResult(Parse(page.Wikitext, page.Title), ItemLookupState.Live, DateTime.UtcNow);
+                var fetchedAt = WriteCache(title, page.Title, page.Wikitext);
+                return new MobLookupResult(Parse(page.Wikitext, page.Title), ItemLookupState.Live, fetchedAt);
             }
         }
         catch
@@ -120,6 +145,15 @@ public sealed partial class EqlWikiMobService
                 : new MobLookupResult(null, ItemLookupState.Offline, null);
         }
         return new MobLookupResult(null, ItemLookupState.NotFound, null);
+    }
+
+    /// <summary>One network call under the in-flight cap. Held only for the request —
+    /// never across the candidate ladder — so a slow page cannot starve other creatures.</summary>
+    private async Task<T> Gated<T>(Func<Task<T>> call)
+    {
+        await _inFlight.WaitAsync().ConfigureAwait(false);
+        try { return await call().ConfigureAwait(false); }
+        finally { _inFlight.Release(); }
     }
 
     private static string StripZoneSuffix(string title) =>
@@ -232,15 +266,21 @@ public sealed partial class EqlWikiMobService
         catch { return null; }
     }
 
-    private void WriteCache(string title, string resolvedTitle, string wikitext)
+    /// <summary>Returns the timestamp it recorded, so the Live result reports the SAME
+    /// instant the cache holds. Two UtcNow reads for one fact (trap 4) put a later read
+    /// on the result and an earlier one in the file — and a re-check that falls back to
+    /// the file could then disagree with the answer it was refreshing by ten milliseconds.</summary>
+    private DateTime WriteCache(string title, string resolvedTitle, string wikitext)
     {
+        var now = DateTime.UtcNow;
         try
         {
             Directory.CreateDirectory(_cacheDir);
             File.WriteAllText(CachePath(title),
-                JsonSerializer.Serialize(new CacheEntry(resolvedTitle, wikitext, DateTime.UtcNow)));
+                JsonSerializer.Serialize(new CacheEntry(resolvedTitle, wikitext, now)));
         }
         catch { /* cache is a convenience */ }
+        return now;
     }
 
     // ---- parsing ----
