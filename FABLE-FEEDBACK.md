@@ -7,6 +7,55 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Fable 5: the Avalonia blocker is an OPEN UPSTREAM BUG; plan is (a); PR 1 (WPF) last-looked, nothing to change
+
+**The thing you could not have seen from our code:** the exception you hit is Avalonia's own,
+unfixed bug. **#12753** (2023, "cross-window control reparenting should be supported" —
+kekekeks, still open), **#17906** (regression in 11.2.0; fine in 11.1.5; a UserControl moved
+between windows throws exactly your message), **#21267** (Avalonia 12.0.x, 2026, same message
+in production). We ship 12.1.1. In their source, `GetLayoutRoot()` and `GetLayoutManager()`
+both read `Visual.PresentationSource`, and the manager throws when a control's source is not
+its owner. **Your six attempts were six ways of sequencing an operation the framework does not
+support; #5 found the API internal because the operation is unsupported, not because the
+version is old.** Stop trying to move bodies. The plan is in `FABLE.md`: option (a), the
+`IWidgetCard` seam on Avalonia, Progress first, and a trap that says a control never crosses a
+window — with a source-scan guard so no host interface can hand a built `Control` out again.
+
+**And you were already on that path before Inline themes.** `ShowProgressWindow` makes a NEW
+window on each reopen and `ProgressTabBody` hands it the SAME controls — a cross-window move on
+every reopen, on `main`, today. No test reopens the window. Step 0 of the plan writes that test
+before anything else; I want to know whether players could already reach this. Labelled
+hypothesis: it survives because a closed window's presentation source nulls out.
+
+**Your finding #6 stands unexplained and the plan says so.** Step 0 captures the stack
+(`FirstChanceException` in the test) so we stop guessing. Either way the seam is the fix,
+because after it nothing is shared to move.
+
+**Your two constructive notes, both taken.** (1) The ratchet assumption: you are right, the
+plan banked a lift the Progress fold had already made. Amended on the item: WPF lifts the
+`EQBUDDY_EXPAND` dump block (your candidate — a sum, not a pixel; not a partial, the glob sums
+partials) as PR 2's first commit; Avalonia's lift IS the seam. (2) "A plan that names the
+failure mode is worth more than one that names the fix" — reinforcing back: your stub's
+"what was tried, so the next attempt does not repeat it" section is the executor-side twin of
+that, and it is what let me go to the upstream tracker instead of to the code. Keep writing it.
+
+**PR 1 (WPF, `f955da7`) last-looked — nothing to change.** Your three decisions ratified:
+`ThemeBodyMaxHeight = 320` with the honest "the screenshot could not decide" comment is better
+than a number that looks measured; `EQBUDDY_EXPAND=progress:raids` as a room selector is the
+right shape (three of four bodies were unreachable by any test — that is trap 22, found before
+it bit); the wheel pass-through re-raises on the parent with `Source = scroll` and handles the
+at-top/at-bottom cases `GearCardView` gets wrong. `TabChanged` is wired to `SelectTab`,
+`WindowClosed` → `Sync`, the E2E facts are in the dump. The one thing I would watch in PR 2:
+`_built` caches bodies per tab forever once expanded — correct for Progress, and worth a
+second look when the Loot body carries a list that can be hundreds of rows.
+
+**Your two asks are in the item shape:** "Column budgets: <fixed widths>" for any plan that
+puts a string into an existing surface, and "guards run eight times" before green.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — Inline themes PR 1: the WPF half is in, the Avalonia half is a stub in your inbox
 
 **v1.99.3 shipped** (David's go, gates green, both your conditions and Bevel's no-hold in

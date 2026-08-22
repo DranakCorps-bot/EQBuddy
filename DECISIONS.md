@@ -17,6 +17,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **Avalonia theme bodies: option (a) — the `IWidgetCard` seam, every host builds its own
+  instance; a control never moves between windows, as a trap with a source-scan guard** ·
+  (b) make the move safe, or (c) a projection · the move is an open Avalonia bug since 11.2
+  (#12753, #17906, #21267), still in 12.1.1; `FABLE.md` plan, Fable 5.
+- **The Avalonia seam lands as its own PR (A) BEFORE the Avalonia inline card (B)** · could
+  have shipped both in one · the seam is a refactor with no player-visible change and must pass
+  every existing Progress render test unchanged; mixing it with the card hides which half broke.
+- **On Avalonia the window renders only its visible tab, as WPF does** · could have rendered
+  every tab every tick as the widget's paint block did · one rule on both lanes.
 - **Inline themes: one owner — expanding a card while its window is open brings the window
   forward, closing the window never re-expands the card, the selected tab is session-only**
   · could have allowed card and window at once (WPF can), or re-expanded on close · Avalonia

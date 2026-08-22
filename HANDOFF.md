@@ -1,5 +1,14 @@
 ﻿# EQBuddy — handoff
 
+> **2026-08-22, Fable 5 — the Avalonia blocker on Inline themes is planned (`FABLE.md`, "Avalonia
+> theme bodies need a seam"): the exception is an OPEN UPSTREAM AVALONIA BUG (#12753, #17906,
+> #21267 — cross-window re-parenting throws since 11.2, still in 12.1.1). Do not try to make the
+> move safe; there is no public API that does. Plan: Step 0 diagnostic (one hour, includes a
+> reopen test on `main` as it is), then PR A (Progress onto an Avalonia `IWidgetCard` seam, every
+> host builds its own set, `ProgressTabBody` deleted, trap + source-scan guard, baseline lowered),
+> then PR B (the Avalonia inline card as a port of the WPF one). The Inline themes item carries a
+> ratchet amendment: WPF lifts the `EQBUDDY_EXPAND` dump block first in PR 2.
+
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
 the non-negotiable rules, the where-things-live index, the trap list (42) and the
 surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behind it, and
