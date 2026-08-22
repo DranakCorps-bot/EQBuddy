@@ -108,16 +108,20 @@ public sealed class SpawnOverrides
         lock (_sync) _byKey.Remove(Key(zone, name));
     }
 
-    /// <summary>Drop every entry whose NAME the predicate rejects, across all zones, and
-    /// say how many went. For cleaning up entries an older build should never have written
+    /// <summary>Drop every entry the predicate rejects, across all zones, and say how many
+    /// went. The predicate sees the OVERRIDE as well as the name, and it has to: a cleanup
+    /// that matches on the name alone cannot tell EQBuddy's own mistake from the player's
+    /// deliberate entry, and deleting the second one is not a cleanup. For cleaning up entries an older build should never have written
     /// — the fix that stops new ones is invisible to the player whose list already has
     /// them, which is the whole reason this exists.</summary>
-    public int PurgeNames(Func<string, bool> reject)
+    public int PurgeNames(Func<string, SpawnOverride, bool> reject)
     {
         lock (_sync)
         {
-            var doomed = _byKey.Keys
-                .Where(k => k.IndexOf('|') >= 0 && reject(k[(k.IndexOf('|') + 1)..]))
+            var doomed = _byKey
+                .Where(kv => kv.Key.IndexOf('|') >= 0
+                             && reject(kv.Key[(kv.Key.IndexOf('|') + 1)..], kv.Value))
+                .Select(kv => kv.Key)
                 .ToList();
             foreach (var k in doomed) _byKey.Remove(k);
             return doomed.Count;

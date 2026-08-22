@@ -55,33 +55,6 @@ public class NamedMobHeuristicTests
         Assert.False(NamedMobHeuristic.LooksProperName("Chief Goonda's corpse"));
 
     [Fact]
-    public void PetsAreExcludedEvenThoughTheyLookNamed()
-    {
-        // elderbit raised this himself: "Lonn slashes an ogre shaman" — pets carry
-        // proper names and no article. A pet dying is not a spawn cycle.
-        Assert.True(NamedMobHeuristic.LooksProperName("Gobanab"));
-        Assert.True(NamedMobHeuristic.IsExcluded("Gobanab", ["Gobanab"], []));
-        Assert.False(NamedMobHeuristic.IsTimeableNamed("Gobanab", "Gobanab", ["Gobanab"], []));
-    }
-
-    [Fact]
-    public void PlayersAreExcludedToo()
-    {
-        // A group member's death is a proper-named kill line and must never start a
-        // respawn clock.
-        Assert.False(NamedMobHeuristic.IsTimeableNamed("Xyrid", "Xyrid", [], ["Xyrid"]));
-    }
-
-    [Fact]
-    public void ExclusionIgnoresCase() =>
-        Assert.True(NamedMobHeuristic.IsExcluded("gobanab", ["Gobanab"], []));
-
-    [Fact]
-    public void ARealNamedWithNoPetOrPlayerCollisionIsTimeable() =>
-        Assert.True(NamedMobHeuristic.IsTimeableNamed(
-            "Chief Goonda", "Chief Goonda", ["Gobanab"], ["Xyrid"]));
-
-    [Fact]
     public void TheNormalizedNameCanNoLongerAnswerWhichIsWhyRawIsRequired()
     {
         // The whole reason KillEvent carries the raw verdict: after Normalize, trash and

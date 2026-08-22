@@ -222,3 +222,12 @@ one genuinely does. Each line below is a decision I made instead of a question I
   second source of truth competing with the wiki, maintained by us forever.
 - **`/consider`: unparked, wiki half only.** The spawn-chip half stays parked. The wiki half now
   has a reporter-confirmed, admin-backed destination; the chip half has neither.
+- **Deferred `DeadHelperTests` rather than building it in the release loop** (Fable's V1, my
+  call on timing). Could have gone: build it now while the shape is fresh. Landed: it is a
+  whole-assembly scan whose value lives in a curated `Known` list with a reason per entry — the
+  `DeadSettingTests` pattern — and doing that badly under a release is how a guard becomes a
+  green tick nobody trusts. Logged so it is a dated decision rather than a thing that quietly
+  did not happen.
+- **Deleted `IsExcluded`/`IsTimeableNamed` rather than wiring them** (Fable's ruling). The
+  suffix rule covers every possessive pet the log prints and `Killer == "You"` closes the
+  players case. A promise with no caller is worse than no promise.

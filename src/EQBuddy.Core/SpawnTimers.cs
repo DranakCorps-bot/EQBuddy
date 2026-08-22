@@ -130,12 +130,25 @@ public sealed class SpawnTimers
     /// </summary>
     private void PurgePetTimers()
     {
-        var gone = _overrides.PurgeNames(IsPetName);
+        // DISCOVERED ONLY. `Discovered` exists precisely so "a discovery can be discarded
+        // without touching the player's own additions" (its own doc), and the first cut of
+        // this purge matched on the name alone — which would have deleted a player's
+        // hand-added `Custom` entry, and any duration they had TYPED, for anything they
+        // named "… pet". Found by Fable 5 in the v1.99.5 release review; the test could not
+        // see it because it never set Custom. A cleanup that removes the player's own work
+        // is not a cleanup.
+        var gone = _overrides.PurgeNames((name, o) => IsPetName(name) && o.Discovered);
         if (gone > 0) _overrides.Save();
 
         lock (_lock)
         {
-            var doomed = _timers.Where(kv => IsPetName(kv.Value.Name)).Select(kv => kv.Key).ToList();
+            // Same rule for the live timer: a MANUAL duration is the player's word, and it
+            // outranks our inference everywhere else in this file (see IsManual).
+            var doomed = _timers
+                .Where(kv => IsPetName(kv.Value.Name)
+                             && !IsManual(_overrides.Find(kv.Value.Zone, kv.Value.Name)))
+                .Select(kv => kv.Key)
+                .ToList();
             foreach (var k in doomed) _timers.Remove(k);
             if (doomed.Count > 0) SavePersisted();
         }

@@ -1882,7 +1882,9 @@ public class SpawnTimerTests
     {
         var overrides = new SpawnOverrides();
         // A profile an older build wrote: a pet learned as a named, beside a real one.
-        overrides.GetOrAdd("Plane of Hate", "Xanthus`s pet").Learned = true;
+        var discovered = overrides.GetOrAdd("Plane of Hate", "Xanthus`s pet");
+        discovered.Learned = true;
+        discovered.Discovered = true;   // EQBuddy put it there, so EQBuddy may take it away
         overrides.GetOrAdd("Plane of Hate", "Innoruk").Learned = true;
 
         var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
@@ -1895,6 +1897,35 @@ public class SpawnTimerTests
         // And nothing new is discovered from a pet kill, however proper the name reads.
         t.Apply(new ZoneEvent(T0, "Plane of Hate"));
         t.Apply(new KillEvent(T0, "Xanthus`s pet", "You", ProperName: true));
+        Assert.Null(overrides.Find("Plane of Hate", "Xanthus`s pet"));
+    }
+
+    /// <summary>
+    /// THE PURGE MUST NOT TOUCH THE PLAYER'S OWN WORK (Fable 5, v1.99.5 release review).
+    ///
+    /// The first cut matched on the NAME alone, which would have deleted a hand-added entry
+    /// and a TYPED duration for anything a player called "… pet" — against the principle
+    /// written on <c>SpawnOverride.Discovered</c> itself: *"so a discovery can be discarded
+    /// without touching the player's own additions."* The original test could not see it
+    /// because it never set <c>Custom</c>.
+    /// </summary>
+    [Fact]
+    public void ThePetPurgeSparesEntriesThePlayerAddedThemselves()
+    {
+        var overrides = new SpawnOverrides();
+        // A player's own entry, with a duration they typed. Named like a pet on purpose.
+        var mine = overrides.GetOrAdd("Plane of Hate", "Teacher`s pet");
+        mine.Custom = true;
+        mine.RespawnSeconds = 300;      // typed, so Learned stays false — see IsManual
+        // …and beside it, one EQBuddy discovered, which SHOULD go.
+        var ours = overrides.GetOrAdd("Plane of Hate", "Xanthus`s pet");
+        ours.Discovered = true;
+        ours.Learned = true;
+
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+
+        Assert.NotNull(overrides.Find("Plane of Hate", "Teacher`s pet"));
+        Assert.Equal(300, overrides.Find("Plane of Hate", "Teacher`s pet")!.RespawnSeconds);
         Assert.Null(overrides.Find("Plane of Hate", "Xanthus`s pet"));
     }
 

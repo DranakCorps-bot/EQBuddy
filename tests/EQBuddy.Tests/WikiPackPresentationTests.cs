@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -278,4 +278,19 @@ public class WikiPackPresentationTests
         Assert.Contains("Chief Goonda", export);
         Assert.Equal("Chief Goonda", Assert.Single(pack.Rows).Creature);
     }
+    /// <summary>A session whose only loot was motes must not be told "no loot recorded this
+    /// session yet" — the player looted plenty; there is simply nothing a creature page
+    /// should carry. Saying otherwise reads as EQBuddy having missed the kills (Fable 5,
+    /// v1.99.5 review).</summary>
+    [Fact]
+    public void AMoteOnlySessionIsToldWhyRatherThanToldItLootedNothing()
+    {
+        var pack = Build((Mob("a puma", 6, "Mote of Potential"), Page()));
+
+        var text = WikiPackPresentation.EmptyText(pack);
+        Assert.Contains("motes", text, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("No loot recorded", text);
+        Assert.Equal(0, pack.Contributions);
+    }
+
 }

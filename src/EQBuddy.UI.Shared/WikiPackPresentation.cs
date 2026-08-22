@@ -66,7 +66,13 @@ public static class WikiPackPresentation
         /// state would call the session "nothing to contribute" — which is the one thing a
         /// wrong-article session must never be told (Bevel, Helm-signed 2026-08-22). Zero
         /// contributions and no problem are not the same sentence.</summary>
-        int WrongArticleCreatures);
+        int WrongArticleCreatures,
+        /// <summary>Creatures that DID drop something, but nothing the pack may suggest —
+        /// in practice a session whose only loot was motes. Counted separately because the
+        /// alternative is telling the player "no loot recorded this session yet", which is
+        /// false and reads as EQBuddy having missed their kills (Fable 5, v1.99.5 review).
+        /// </summary>
+        int NothingSuggestableCreatures);
 
     /// <summary>The status words, once, so the two desktops cannot spell them differently.</summary>
     public static string KindLabel(RowKind kind) => kind switch
@@ -124,6 +130,7 @@ public static class WikiPackPresentation
     {
         var rows = new List<PackRow>();
         int pagesMissing = 0, pagesNoLoot = 0, newDrops = 0, pending = 0, known = 0;
+        var nothingSuggestable = 0;
 
         foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
         {
@@ -132,8 +139,14 @@ public static class WikiPackPresentation
             // Motes are never suggested to a creature page, so they must not colour the
             // row either — a creature whose only "new" drop was a mote is not a
             // contribution (WikiContribution.SuggestableToWiki).
-            var classified = mob.Loot
+            var suggestable = mob.Loot
                 .Where(l => WikiContribution.SuggestableToWiki(l.Item))
+                .ToList();
+            // It DID drop something; there is just nothing here a creature page should
+            // carry. Counted so the empty state can say that instead of "no loot".
+            if (suggestable.Count == 0) { nothingSuggestable++; continue; }
+
+            var classified = suggestable
                 .Select(l => WikiContribution.Classify(lookup, l.Item))
                 .ToList();
 
@@ -201,7 +214,8 @@ public static class WikiPackPresentation
             NewDrops: newDrops,
             PendingCreatures: pending,
             KnownDrops: known,
-            WrongArticleCreatures: rows.Count(r => r.Kind == RowKind.NotACreaturePage));
+            WrongArticleCreatures: rows.Count(r => r.Kind == RowKind.NotACreaturePage),
+            NothingSuggestableCreatures: nothingSuggestable);
     }
 
     /// <summary>The one line that stops the scope being silent — the whole reason this is a
@@ -273,6 +287,12 @@ public static class WikiPackPresentation
                 "page. Nothing is suggested for those, because pasting a loot table onto the " +
                 "wrong article would be worse than adding nothing. Open the row to see which " +
                 "page it read, then find the creature's own page.";
+
+        if (pack.NothingSuggestableCreatures > 0)
+            return $"You looted from {Creatures(pack.NothingSuggestableCreatures)} this " +
+                "session, but only motes — and motes drop from everything, so they do not " +
+                "belong on any creature's page. That is the pack having nothing to suggest, " +
+                "not EQBuddy having missed your kills.";
 
         return "No loot recorded this session yet. Kill something and come back — the pack " +
             "builds itself from your own loot log.";

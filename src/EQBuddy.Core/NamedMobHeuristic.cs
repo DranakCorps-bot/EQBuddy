@@ -24,8 +24,16 @@ public static class NamedMobHeuristic
     private static readonly string[] Articles = ["a ", "an ", "the "];
 
     /// <summary>True when the raw name carries no leading article AND reads like a proper
-    /// name. Callers must still exclude pets and players — see <see cref="IsExcluded"/>;
-    /// this answers only the question the article convention can answer.</summary>
+    /// name — pets included, since 2026-08-22 (see the trailing-"pet" rule below).
+    ///
+    /// There used to be an `IsExcluded`/`IsTimeableNamed` pair here promising to filter
+    /// "your pet, anyone's pet, and players". **Nothing outside its own tests ever called
+    /// it**, so the promise had never once run, and pets were filtered by the article
+    /// convention alone — which is how "Xanthus`s pet" earned a respawn clock. Deleted on
+    /// Fable 5's ruling (v1.99.5 review) rather than wired: the suffix rule covers every
+    /// possessive pet the log prints, and a player's death is never "You have slain", so
+    /// the `Killer == "You"` gate already closes the players case. **A promise with no
+    /// caller is worse than no promise.**</summary>
     public static bool LooksProperName(string? rawName)
     {
         var name = (rawName ?? "").Trim();
@@ -66,21 +74,4 @@ public static class NamedMobHeuristic
 
         return true;
     }
-
-    /// <summary>Names that look proper but must never start a respawn timer: your pet,
-    /// anyone's pet, and players. elderbit raised the pet case himself — "Lonn slashes an
-    /// ogre shaman" — and a charmed or summoned pet dying is not a spawn cycle. Players
-    /// matter too: a group member's death is a proper-named "kill" in the log.</summary>
-    public static bool IsExcluded(string name, IReadOnlyCollection<string> pets,
-        IReadOnlyCollection<string> players)
-    {
-        name = name.Trim();
-        return pets.Contains(name, StringComparer.OrdinalIgnoreCase)
-            || players.Contains(name, StringComparer.OrdinalIgnoreCase);
-    }
-
-    /// <summary>The whole question in one call: a named mob worth timing.</summary>
-    public static bool IsTimeableNamed(string? rawName, string normalizedName,
-        IReadOnlyCollection<string> pets, IReadOnlyCollection<string> players) =>
-        LooksProperName(rawName) && !IsExcluded(normalizedName, pets, players);
 }
