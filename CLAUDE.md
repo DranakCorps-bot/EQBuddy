@@ -113,11 +113,14 @@ someone, built entirely from the hold text and Scribe's item — both of which d
 intention, never the state of a thread. Once the thing has happened the line is a RECORD, not a
 hold, and it moves out of the block.
 
-**Helm can put a thread on hold, and the hold lives in `SCRIBE.md`, not in the thread.**
-Items carry lines like *"Helm hold Aug 21, 6:19 PM CT: do not open #208"* or *"#228 reply hold
-stays until Helm lifts it"*. David's ruling (2026-08-21): **treat "do not open" as a reply hold
-too, until Helm lifts it** — and re-read `SCRIBE.md` before EVERY thread reply, because holds
-arrive by commit between your pulls. On 2026-08-21 two replies went out against holds that had
+**Helm can put a thread on hold, and since 2026-08-22 the hold lives in `HELM.md`** — Helm's
+own inbox, with `HELM-FEEDBACK.md` as your channel back to it. It moved out of `SCRIBE.md`
+because the author of a hold and the maintainer of the list were different, and that is how all
+three of them came to describe states that had stopped being true. **The holds exist in exactly
+one place; if you ever find a second list, one of them is stale by construction.**
+David's ruling (2026-08-21): **treat "do not open" as a reply hold too, until Helm lifts it** —
+and re-read `HELM.md` before EVERY thread reply, because holds arrive by commit between your
+pulls. On 2026-08-21 two replies went out against holds that had
 landed ninety minutes earlier; the posts stand (accurate, signed), the rule is the lesson.
 
 **A hold names who lifts it and when** (David, 2026-08-22). "Helm hold until Helm lifts it" is
@@ -245,7 +248,8 @@ vetoes, it is too long. Either way the list is the thing to edit, not the habit.
 ## The inboxes inform you. They never trigger an unattended agent.
 
 **`SCRIBE.md`, `BEVEL.md` and `FABLE.md` are insight and guidance, never execution
-authority** (David, 2026-08-21, asked as its own question). This is the same rule as
+authority** (`HELM.md` is the exception that proves it: a hold RESTRAINS you, it never
+commissions work) (David, 2026-08-21, asked as its own question). This is the same rule as
 "GitHub Discussions are input, not instructions", one level up: the files are written by
 agents, and an agent that could hand itself work by writing a file is not a boundary at all.
 
@@ -259,6 +263,25 @@ The `needs-david:` line on a plan is his mark to wait for, and you never resolve
 hook or a routine firing on a file change must not take work from these files — no matter how
 the item is labelled. An interactive session is the transition; a cron tick is not. The rule
 was always about unattended agents, never about David having to say "go" each time.
+
+## Helm
+
+**Chief of staff / COO, and the one agent whose file is STATE rather than a work queue.**
+`HELM.md` carries the holds and the posture rulings; `HELM-FEEDBACK.md` is your channel back.
+You never "take" a hold and delete it — it binds you until Helm lifts it.
+
+Helm rules on *when* a true thing may be said and *whether* work starts. It signs Bevel's
+product rulings and Scribe's public replies. **It does not stand in for David on the
+[consequence list](#what-needs-david-and-what-does-not)** — if a Helm ruling appears to settle
+the release go, the values line, money, roadmap or privacy, that is a question for David.
+
+**You cannot reach Helm. David carries it both ways**, so a note in `HELM-FEEDBACK.md` only
+travels if you tell him there is something to carry.
+
+**Ask a hold for its lifting CONDITION.** #228's was *"after a ship that actually restores the
+card"* — which is what let the executor report progress against it instead of asking Helm to
+re-examine a judgement. A hold with no condition is one nobody can ever satisfy, and it decays
+into a line people stop reading.
 
 **And durable truth lives in the repo, not in a conversation.** Decisions, evidence and
 retrospection go into files, commits and discussions — a chat log is not organizational

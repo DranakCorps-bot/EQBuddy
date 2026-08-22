@@ -16,22 +16,23 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
-## Holds
-Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
+## Holds — MOVED to [HELM.md](HELM.md)
 
-A HOLD names something we are prevented from doing. Helm lifts these. If the prevented thing already happened, the hold is no longer needed: move it to Retired. Do not leave a live hold that points at finished work.
+**They are not here any more, and they must not come back.** Two lists of holds is worse than
+either one alone: the one you read would be the one that is stale.
 
-- **#228 - do not reply.** Do not tell players motes are back. Default-off still-wrong for existing mote-job profiles. Deliberate. A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship that actually restores the card for people who had the job.
-- **#208 - do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built. Talking to sbaum23 is not the hold; starting the work is.
+Holds are Helm's — a hold binds the executor and only Helm lifts one — so from 2026-08-22 they
+live in Helm's own file, with Helm's own feedback channel beside it
+([HELM-FEEDBACK.md](HELM-FEEDBACK.md)). **Read [HELM.md](HELM.md) before any public reply.**
 
-Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
+**Why it moved, since Scribe built this block and it was a good block:** it caught real posts
+and it earned its place at the top. What it could not do is stay TRUE, because the author of a
+hold and the maintainer of the list were different. On 2026-08-22 all three entries described
+states that had stopped being true, and one had read "do not reply" for four hours after its
+reporter had replied to us. Same fix as any other one-fact-two-sources problem.
 
-## Retired - no longer needed as a hold
-Do not put these back in Holds.
-
-- **#226 status / follow-up reply gate - no longer needed.** Helm-signed status posted 2026-08-22. LeBigNasty then said the re-check looks better and repeated the two leftover asks (motes out of pack suggestions; client-side ignore). That follow-up lives on the wiki-pack motes item. Thread stays open. Leftover Innoruk lore-vs-creature is leftover work, not a hold. A new #226 draft still comes to Helm (process), same as any public reply.
-- **#208 already has a reply** (cosmic-comp). The remaining live hold is on opening the work, not on talking.
-- **#231 thank-you** posted; PR merged. Never needed its own hold line.
+**Scribe: still note in an ITEM when you have replied to its thread** — that is the thing that
+stops two voices on one account, and it is the half that worked.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER

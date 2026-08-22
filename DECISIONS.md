@@ -159,3 +159,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
 - **Did NOT add a `.gitattributes`.** Fable framed it as a one-time renormalisation and a V1
   call; a whole-repo line-ending commit in the middle of a staged release is the wrong moment.
   Logged so the next loop can take it deliberately.
+- **Gave Helm its own inbox and feedback file (David asked), and MOVED the holds into it rather
+  than leaving them in `SCRIBE.md`.** Default it could have gone the other way: create the two
+  files and leave the holds where they are, which is the smaller change. Landed: the holds were
+  wrong all three at once this morning precisely because their author and their list-maintainer
+  were different, and two lists would be strictly worse than one — the one a session reads would
+  be the stale one. `SCRIBE.md` now carries a pointer and an explicit "do not restore holds
+  here"; Scribe and Bevel were both told why, and Scribe's `## Holds` / `Retired` conventions
+  moved wholesale rather than being rewritten.
+- **`HELM.md` is documented as STATE, not a work queue.** The other three inboxes are
+  take-an-item-and-delete-it; a hold is never taken, it binds until Helm lifts it. Writing that
+  distinction down is the point — treating a hold like a work item is how "a shipped fix lifts
+  the hold" gets invented.

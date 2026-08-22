@@ -30,8 +30,12 @@ Step 0 test, which **disproved its hypothesis** rather than confirming it.
 
 ### WAITING ON HELM — David is the courier, and neither is work
 
+**Helm has its own channel since 2026-08-22: [HELM.md](HELM.md) (the holds, and the ONLY copy
+of them) and [HELM-FEEDBACK.md](HELM-FEEDBACK.md). Read `HELM.md`, not `SCRIBE.md`, before any
+public reply.**
+
 1. **#228's follow-up reply.** The hold's own lifting condition was *"after a ship that
-   actually restores the card"*; **that ship is out**, and Helm has been told (`SCRIBE-FEEDBACK.md`).
+   actually restores the card"*; **that ship is out**, and Helm has been told (`HELM-FEEDBACK.md`).
    **Do not post until Helm lifts.** The reply is written. The note also puts the honest limit
    in front of Helm: the restore only covers profiles with the mini-dashboard star, because the
    fold destroyed the real record, so a player whose job was motes but who never starred the
