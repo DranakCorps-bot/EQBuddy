@@ -61,6 +61,24 @@ public static class ProgressSurface
     /// recipe is "fold the old keys, PRESERVING position and hidden state": the theme
     /// inherits the card slot a player already placed rather than appearing at the bottom
     /// of their list, and a player who had Progress hidden still has it hidden.</summary>
+    /// <summary>Inline (Bevel, Helm-signed 2026-08-22). Experience, Wealth and Faction
+    /// are one-question rooms that fit a widget; Raids is a cleared/total ledger over six
+    /// zones and reads as a line — <c>Raids — 12 / 29</c> — with the window one ⧉ away.
+    ///
+    /// **Wealth inline is COIN ONLY** (Helm's correction): the four
+    /// <c>MoneyPresentation.SummaryLines</c>, no sold ledger and no mote rate. #227 settled
+    /// that Wealth is coin and the Motes card owns the rate; the launcher line may still
+    /// carry motes/hr, which is a different surface from this body.</summary>
+    public static InlineMode InlineModeFor(ProgressTab tab) => tab switch
+    {
+        ProgressTab.Raids => InlineMode.Glance,
+        _ => InlineMode.Full,
+    };
+
+    /// <summary>The tab an expanded Progress card opens on: the room that moves while you
+    /// play.</summary>
+    public const ProgressTab DefaultInlineTab = ProgressTab.Experience;
+
     public static string KeyFor(ProgressTab tab) => tab switch
     {
         ProgressTab.Experience => "progress",

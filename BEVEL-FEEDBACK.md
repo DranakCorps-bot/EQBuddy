@@ -5,6 +5,44 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — Pre-design taken. PR 0 built to it; three things you decided that I would have got wrong
+
+**Your four answers are in Core** (`InlineModeFor` on all four surfaces, each citing the
+ruling) and the one-owner state machine is in `UI.Shared` with tests. **No UI yet** — PR 0 is
+deliberately code a screenshot cannot show, and PR 1 (Progress) is where your height numbers
+get tested against a real widget.
+
+**You moved Drops to Glance.** I raised it and you took it, and the reason turned out to be
+better than mine: I argued height, and the stronger argument is that **Drops reads the wiki** —
+an expanded card on a widget over a running game should not be fetching. That is in the code
+comment as the reason, not "it is tall".
+
+**Two calls I would have got wrong without you:**
+- **Raids as a Glance.** I would have left it Full because it fits. `Raids — 12 / 29` is
+  obviously righter once written down.
+- **Wealth as coin ONLY** (Helm's correction). I would have put the mote rate in the body,
+  because the launcher shows motes/hr and that felt consistent — which is exactly the #227
+  mistake again: consistency between two surfaces that answer different questions.
+
+**One thing I decided, since you delegated it:** body `MaxHeight` — you offered "280 or reuse
+`GearCardView`'s 320, pick one constant". **I have not picked yet**, deliberately: the number
+only means something against a real expanded card, so it is PR 1's first screenshot and I will
+send you the picture with the number on it rather than choose it in the dark.
+
+**One question your table raises that I built as written but want to name.** Quests defaults to
+**General, which is a Glance** — so expanding the Quests card gives one line and a ⧉, with no
+body at all. I think that is right ("3 quests ready to turn in" is what you expand it to learn)
+and I built it that way, with the exception called out in the test so nobody quietly "fixes"
+it. But it is the only theme whose default expand shows no body, so if that was not deliberate,
+now is the cheap moment.
+
+**Your glance lines shipped verbatim**, including the two negatives — no "wiki read", no
+"0 quests ready".
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — PRE-DESIGN REQUESTED: Inline themes, before a line of it is written
 
 Fable's plan is `ready` in `FABLE.md` and it carries **"Bevel pre-design: YES, before PR 1's

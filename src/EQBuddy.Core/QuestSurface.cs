@@ -44,6 +44,21 @@ public static class QuestSurface
 
     /// <summary>The wire/DOM key for a tab — lowercase and stable, so the mobile page's
     /// saved tab choice survives a rename of the human-facing label.</summary>
+    /// <summary>Inline (Bevel, Helm-signed 2026-08-22). The two checklists are rooms and
+    /// go inline CAPPED — Epic to one class, Sky to the current class. General is a search
+    /// box over 1,200 quests plus a detail pane, which is Bevel's host rule verbatim: it
+    /// glances as <c>{n} quests ready to turn in</c> and the tracker is one ⧉ away.</summary>
+    public static InlineMode InlineModeFor(QuestTab tab) => tab switch
+    {
+        QuestTab.General => InlineMode.Glance,
+        _ => InlineMode.Full,
+    };
+
+    /// <summary>The tab an expanded Quests card opens on. General, deliberately, though it
+    /// is a Glance: "3 quests ready to turn in" is the thing a player expands the card to
+    /// learn, and it is one line rather than a checklist they have to read.</summary>
+    public const QuestTab DefaultInlineTab = QuestTab.General;
+
     public static string KeyFor(QuestTab tab) => tab switch
     {
         QuestTab.General => "general",

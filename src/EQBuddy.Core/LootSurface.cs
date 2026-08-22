@@ -82,6 +82,17 @@ public static class LootSurface
     /// of the recipe is "fold the old keys, PRESERVING position and hidden state": the
     /// theme inherits the card slot a player already placed rather than appearing at the
     /// bottom of their list, and a player who had Loot hidden still has it hidden.</summary>
+    /// <summary>Inline (Bevel, Helm-signed 2026-08-22). Loot goes inline capped to its
+    /// top rows; Wishlist is a room. Inventory is a long list with its own filter bar —
+    /// Bevel's host rule — so it glances as <c>Inventory — {n} items</c>.</summary>
+    public static InlineMode InlineModeFor(LootTab tab) => tab switch
+    {
+        LootTab.Inventory => InlineMode.Glance,
+        _ => InlineMode.Full,
+    };
+
+    public const LootTab DefaultInlineTab = LootTab.Loot;
+
     public static string KeyFor(LootTab tab) => tab switch
     {
         LootTab.Loot => "loot",

@@ -59,6 +59,19 @@ public static class CreatureSurface
     /// <c>EQBUDDY_EXPAND</c>. Step 5 of the recipe is "fold the old keys, PRESERVING
     /// position and hidden state": the theme inherits the slot a player already put that
     /// card in rather than appearing at the bottom of their list.</summary>
+    /// <summary>Inline (Bevel, Helm-signed 2026-08-22). Kills is a rate and capped counts.
+    /// Drops is a Glance — thirteen creature headings with drop rows under each is the
+    /// tallest body in the set, and it also READS THE WIKI, which an expanded card on a
+    /// widget should not be doing. The executor raised that one against the plan's original
+    /// table and Bevel moved it.</summary>
+    public static InlineMode InlineModeFor(CreatureTab tab) => tab switch
+    {
+        CreatureTab.Drops => InlineMode.Glance,
+        _ => InlineMode.Full,
+    };
+
+    public const CreatureTab DefaultInlineTab = CreatureTab.Kills;
+
     public static string KeyFor(CreatureTab tab) => tab switch
     {
         CreatureTab.Kills => "kills",
