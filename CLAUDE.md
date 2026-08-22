@@ -754,6 +754,32 @@ Read this list before touching the areas it names. Every entry cost a release.
     through the real ⚙ picker, before and after. The reasoning had the mechanism right and
     the second half missing; the harness is what found it.
 
+39. **A missing FONT WEIGHT does not fail — it gets SYNTHESISED, and the result looks like
+    a kerning bug in a font whose kerning is perfect.** The bundled Wine font shipped
+    Regular/400 alone while the WPF app names SemiBold or Bold in 71 places. WPF matches a
+    `FontWeight` to a face by `usWeightClass`; with nothing to match it thickens the Regular
+    outlines *where they stand*, so every glyph gets wider and none of its neighbours move —
+    sidebearings and kern pairs untouched. Reported from CrossOver on macOS, 2026-08-21, as
+    "the main font is still having kerning issues", and the natural first move (check the kern table)
+    says the font is fine: 5,652 pairs, values identical to upstream Noto Sans. **The defect
+    was in a face that did not exist**, which is trap 20's "the thing you are looking for is
+    what is not there" wearing a typographic hat. Nothing on Windows can reproduce it, because
+    Segoe UI Variable supplies the real weights.
+    → **A bundled font is a FAMILY, not a file.** Ship every weight the UI asks for, group
+    them with the typographic names (16/17) and not just the legacy family/style pair, and put
+    the icon set in *every* face — a bold run containing a section icon resolves to the bold
+    face, and Wine boxes whatever that face is missing.
+    → **The same blindness hid a second bug in the same font**: `smcp`/`c2sc` had been dropped
+    from the subset as "unused features" while `Theme.xaml`'s `SectionLabel` asks for
+    `Typography.Capitals=AllSmallCaps` on ~40 headings. WPF synthesises no small caps, so those
+    headings quietly lost their case *and* the tracking the design was buying from them.
+    → **Now guarded:** `BundledFontFaceTests` parses the `.ttf` tables directly (name, OS/2,
+    GSUB/GPOS, cmap) and asserts weights, family grouping, features, icon coverage per face and
+    the csproj `Resource` rows. `IconFontCoverageTests` could not have caught any of it — it
+    counts codepoints and never opens the font, so it read as coverage while being blind to
+    everything about the file that is not a cmap entry (trap 34's shape exactly). Verified by
+    running the new test against the pre-fix tree: 9 of 10 rows fail there.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

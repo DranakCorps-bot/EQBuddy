@@ -16,6 +16,18 @@ namespace EQBuddy;
 /// a unit test pins the coverage), swapped in only when actually running under
 /// Wine. Native Windows never takes this path and keeps Segoe UI Variable and its
 /// color emoji untouched.
+///
+/// **The family ships three weights** (Regular 400, SemiBold 600, Bold 700), and
+/// that is not a nicety — the app names SemiBold or Bold in 71 places. WPF resolves
+/// a FontWeight to a face by usWeightClass, and when the family has no face to
+/// resolve to it SYNTHESISES one: the Regular outlines smeared wider, with their
+/// sidebearings and kern pairs untouched. Shipping Regular alone therefore fixed
+/// the boxed icons and left every bold run in the widget mis-fitted, which is what
+/// was reported from CrossOver on macOS on 2026-08-21 as "the kerning is off" (found
+/// by reading the font's tables; nothing on Windows can show it). The family string
+/// below names no weight because it does not have to — WPF picks the face from the
+/// FontWeight on each control, and BundledFontFaceTests asserts all three exist,
+/// group under one typographic family, and each carry the icons.
 /// </summary>
 internal static class WineFonts
 {
