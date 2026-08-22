@@ -62,6 +62,10 @@ public sealed record SpawnRow(
     /// boss (#109) or a triggered spawn, each without a player-typed duration. The row
     /// says which rather than showing a blank, because the player's next action differs.</summary>
     public TimerSuppression Suppression { get; init; }
+
+    /// <summary>What to name beside the suppressed word — for a triggered spawn, what
+    /// brings the mob, shortened to fit a glance (Bevel, 2026-08-22). "" otherwise.</summary>
+    public string SuppressionNote { get; init; } = "";
 }
 
 /// <summary>
@@ -153,8 +157,10 @@ public sealed class SpawnsViewModel
             : TimerSuppression.None;
         var suppressedInstance = suppression == TimerSuppression.RaidInstance;
         var suppressedTriggered = suppression == TimerSuppression.Triggered;
+        var note = suppressedTriggered ? TriggerGlance(entry!.TriggeredBy) : "";
         if (!hasTimer && suppressedInstance) countdown = "instance";
-        if (!hasTimer && suppressedTriggered) countdown = "triggered";
+        if (!hasTimer && suppressedTriggered)
+            countdown = note.Length > 0 ? $"triggered · {note}" : "triggered";
 
         // "Added by you" would be a lie for a row EQBuddy discovered itself (#185) —
         // and the player has to be able to tell, because a discovery is a guess from
@@ -212,7 +218,50 @@ public sealed class SpawnsViewModel
             // manually started with a different value than the row's), else the row's.
             DurationSeconds = timer?.DurationSeconds ?? duration,
             Suppression = suppression,
+            SuppressionNote = note,
         };
+    }
+
+    /// <summary>How many characters of trigger the "Next spawn" column can actually hold
+    /// beside the word "triggered". The column is a FIXED 150px in both windows and
+    /// deliberately so (an Auto lane reflows the inputs under the player's cursor
+    /// mid-edit), so this is a real budget, not a preference.</summary>
+    public const int TriggerGlanceBudget = 12;
+
+    /// <summary>The trigger named ON THE GLANCE where it fits (Bevel, 2026-08-22: "go kill
+    /// X" is the action the row implies, so it does not belong only in a tooltip).
+    ///
+    /// Leading articles go first — "a spiroc banisher" is "spiroc banisher" on a row, and
+    /// EverQuest's own convention makes that unambiguous. What is left either fits the
+    /// column or it does not: a name that fits is shown, and one that does not leaves the
+    /// bare word "triggered" with the tooltip carrying every name. **No ellipsis** — the
+    /// first cut showed "triggered · a spiroc banisher" clipped mid-word into the Respawn
+    /// box (caught by the shot, not by a test), and "spiroc bani…" tells a player less
+    /// than "triggered" does while looking like a bug.
+    ///
+    /// The consequence is honest and worth knowing: the bee chain gets named (Bevel's own
+    /// example, "triggered · Bazzzazzt"); the Spirocs do not, because three trigger names
+    /// cannot fit 150px. Widening that column is a layout decision on a shared window and
+    /// is back with Bevel in `BEVEL-FEEDBACK.md`.</summary>
+    public static string TriggerGlance(string triggeredBy)
+    {
+        var parts = triggeredBy
+            .Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(StripArticle)
+            .Where(p => p.Length > 0)
+            .ToList();
+        if (parts.Count == 0) return "";
+        var glance = parts.Count == 1 ? parts[0] : $"{parts[0]} +{parts.Count - 1}";
+        return glance.Length <= TriggerGlanceBudget ? glance : "";
+
+        static string StripArticle(string name)
+        {
+            foreach (var article in (string[])["a ", "an ", "the "])
+                if (name.Length > article.Length
+                    && name.StartsWith(article, StringComparison.OrdinalIgnoreCase))
+                    return name[article.Length..];
+            return name;
+        }
     }
 
     // ---- user actions ----

@@ -1878,7 +1878,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (!WikiFreshness.CanRecheck(_targetResults.GetValueOrDefault(name)?.FetchedAt,
                 _rechecking.Contains(name), DateTime.UtcNow)) return;
         _rechecking.Add(name);
-        _wikiMobs.Forget(name);
+        // NO Forget here — see the WPF twin: the delete leaves an offline bypass nothing
+        // to fall back on, so a failed re-check reports Offline and the ✦ vanishes (#226,
+        // found by H4 after 1.99.1). WikiRecheckPathTests guards both windows.
         RenderTargetDrops(CurrentSnapshot());
         _ = LookupTargetAsync(name, CurrentZoneName, bypass: true);
     }

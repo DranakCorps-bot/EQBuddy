@@ -113,6 +113,7 @@ public sealed class SpawnTimers
         _overrides = overrides;
         _persistPath = persistPath;
         LoadPersisted();
+        HealSuppressedOverrides();
     }
 
     /// <summary>Fed alongside SessionStats.Apply from the watcher thread.</summary>
@@ -820,6 +821,33 @@ public sealed class SpawnTimers
             }
         }
         catch { /* corrupt file loses timers, not the feature */ }
+    }
+
+    /// <summary>Drop LEARNED durations sitting on entries that can have no cycle at all —
+    /// raid-instanced or triggered. <see cref="OnKill"/> already heals one when the mob
+    /// next dies, and <see cref="LoadPersisted"/> drops the persisted TIMER, but neither
+    /// touched the override itself: until that next kill the row printed the poisoned
+    /// value ("3m") in its duration box beside the word "triggered", contradicting itself
+    /// on screen. Frankthetankk's own file is that case, so waiting for a kill to tidy it
+    /// is waiting on the person who reported it.
+    ///
+    /// Fable 5 raised this as a labelled hypothesis in the H4 last-look; it reproduced.
+    /// A player-TYPED duration is untouched, here as everywhere.</summary>
+    private void HealSuppressedOverrides()
+    {
+        var healed = false;
+        foreach (var zone in _catalog.Zones)
+            foreach (var entry in zone.Named)
+            {
+                if (entry is not ({ RaidInstanced: true } or { IsTriggered: true })) continue;
+                if (_overrides.Find(zone.Zone, entry.Name) is not
+                    { Learned: true, RespawnSeconds: not null } o) continue;
+                o.RespawnSeconds = null;
+                o.Learned = false;
+                o.Imported = false;
+                healed = true;
+            }
+        if (healed) _overrides.Save();
     }
 
     private void SavePersisted()

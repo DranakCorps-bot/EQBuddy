@@ -227,6 +227,48 @@ public class EqlWikiMobsTests
         finally { Directory.Delete(dir, recursive: true); }
     }
 
+    /// <summary>WHY <c>Forget</c> is not in the re-check path, kept as an executable note.
+    ///
+    /// Deleting the cache file first LOOKS like the honest way to force a re-read. It is
+    /// not: <see cref="EqlWikiMobService.LookupAsync"/> reads the cache at the top, so a
+    /// prior <c>Forget</c> leaves nothing for the offline fallback, and a failed bypass
+    /// returns <c>Offline</c> instead of the stale read. That demotes a lit ✦ to "not
+    /// checked" the moment the wiki is unreachable — the #217 rule inverted, on a surface
+    /// built to honour it. Both windows shipped exactly that in 1.99.1; Fable 5 found it
+    /// in the H4 last-look, reachable only with the wiki down, which is why neither the
+    /// suite nor the staged screenshot saw it.
+    ///
+    /// A bypass overwrites the file on success anyway, so the delete bought nothing.
+    /// <c>Forget</c> stays as an API for a caller that genuinely wants the file gone;
+    /// this test is here so the next person to reach for it sees the cost first.</summary>
+    [Fact]
+    public async Task ForgettingBeforeABypassIsWhatCostsTheOfflineFallback()
+    {
+        var dir = TempCache();
+        try
+        {
+            var first = await new EqlWikiMobService(dir, t => Served(t, LockjawWithVest)).LookupAsync("Lockjaw");
+            var fetchedAt = first.FetchedAt!.Value;
+
+            // The path both windows shipped: forget, then bypass, then the wiki is down.
+            var offline = new EqlWikiMobService(dir, _ => throw new HttpRequestException("offline"));
+            offline.Forget("Lockjaw");
+            var afterForget = await offline.LookupAsync("Lockjaw", bypassCache: true);
+            Assert.Equal(ItemLookupState.Offline, afterForget.State);   // the defect, in one line
+            Assert.Null(afterForget.Mob);
+
+            // The path they ship now: bypass alone keeps the stale read and its age.
+            var kept = new EqlWikiMobService(dir, t => Served(t, LockjawWithVest));
+            await kept.LookupAsync("Lockjaw");                          // re-seed the file
+            var offlineAgain = new EqlWikiMobService(dir, _ => throw new HttpRequestException("offline"));
+            var stale = await offlineAgain.LookupAsync("Lockjaw", bypassCache: true);
+            Assert.Equal(ItemLookupState.StaleCache, stale.State);
+            Assert.NotNull(stale.Mob);
+            Assert.True(stale.FetchedAt > fetchedAt - TimeSpan.FromMinutes(1));
+        }
+        finally { Directory.Delete(dir, recursive: true); }
+    }
+
     /// <summary>Forget keys on the REQUESTED name — the same key the windows' session memo
     /// uses — so one name addresses both stale layers. Here the page was SERVED under a
     /// different title (a redirect), and the file still goes.</summary>

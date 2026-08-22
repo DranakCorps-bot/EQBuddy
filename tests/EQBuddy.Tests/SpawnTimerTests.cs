@@ -1778,6 +1778,53 @@ public class SpawnTimerTests
         Assert.Equal(T0.AddHours(12), Assert.Single(t.Snapshot(T0.AddMinutes(1))).DueAt);
     }
 
+    /// <summary>Fable 5's lower-confidence H4 note, verified: a triggered entry carrying a
+    /// `Learned` override from before 1.99.1 heals on the next KILL, but nothing healed it
+    /// at LOAD — <c>SuppressedByCatalog</c> drops the persisted timer, not the override. So
+    /// until the player next killed the mob, the row printed the poisoned duration ("3m")
+    /// in the box beside the word "triggered", which contradicts itself on screen.
+    /// Frankthetankk's own file is exactly this case, which is why it is worth the fix
+    /// rather than waiting for a kill to tidy it.</summary>
+    [Fact]
+    public void APoisonedOverrideOnATriggeredEntryHealsAtLoadNotOnlyOnTheNextKill()
+    {
+        var overrides = new SpawnOverrides();
+        var poisoned = overrides.GetOrAdd("Plane of Sky", "Bzzzt");
+        poisoned.RespawnSeconds = 180;
+        poisoned.Learned = true;
+
+        // Construction alone — no kill, no zone line — is what a player gets on launch.
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+        var vm = new SpawnsViewModel(SkyCatalog(), overrides, t);
+
+        var row = vm.RowsFor("Plane of Sky", T0).Single(r => r.Name == "Bzzzt");
+        Assert.Equal("triggered · Bazzzazzt", row.CountdownText);
+        Assert.Equal("", row.DurationText);          // …and no "3m" contradicting it
+        Assert.Null(overrides.Find("Plane of Sky", "Bzzzt")?.RespawnSeconds);
+    }
+
+    /// <summary>Three triggers do not fit the "Next spawn" column, so the glance shows the
+    /// first and counts the rest; the tooltip keeps every name (Bevel, 2026-08-22).</summary>
+    [Fact]
+    public void AMultiTriggerGlanceShowsTheFirstAndCountsTheRest()
+    {
+        // Fits: named on the glance, article stripped.
+        Assert.Equal("Bazzzazzt", SpawnsViewModel.TriggerGlance("Bazzzazzt"));
+        Assert.Equal("Bzzzt", SpawnsViewModel.TriggerGlance("Bzzzt"));
+
+        // Does not fit: the bare word, and the tooltip keeps every name. NOT an ellipsis —
+        // the first cut clipped "triggered · a spiroc banisher" mid-word into the Respawn
+        // box, and a truncated trigger tells a player less than no trigger while looking
+        // like a bug. Caught by the screenshot; no test could have seen it.
+        Assert.Equal("", SpawnsViewModel.TriggerGlance("a spiroc banisher / a spiroc walker / a spiroc revolter"));
+        Assert.Equal("", SpawnsViewModel.TriggerGlance("The Spiroc Guardian"));
+        Assert.Equal("", SpawnsViewModel.TriggerGlance(""));
+
+        // Every glance that IS shown fits the column's real budget.
+        foreach (var t in new[] { "Bazzzazzt", "Bzzzt", "a spiroc banisher / a spiroc walker" })
+            Assert.True(SpawnsViewModel.TriggerGlance(t).Length <= SpawnsViewModel.TriggerGlanceBudget);
+    }
+
     /// <summary>The Sky follow-up to #109: the row for a triggered spawn says
     /// "triggered", names what brings it, and offers no fake default to edit — and it
     /// is a DIFFERENT word from "instance", because the next action is different.</summary>
@@ -1789,7 +1836,8 @@ public class SpawnTimerTests
         var vm = new SpawnsViewModel(SkyCatalog(), overrides, t);
 
         var row = vm.RowsFor("Plane of Sky", T0).Single(r => r.Name == "Bzzzt");
-        Assert.Equal("triggered", row.CountdownText);
+        Assert.Equal("triggered · Bazzzazzt", row.CountdownText);   // named on the glance
+        Assert.Equal("Bazzzazzt", row.SuppressionNote);
         Assert.Equal("", row.DurationText);
         Assert.Equal(TimerSuppression.Triggered, row.Suppression);
         Assert.Contains("Bazzzazzt", row.Detail);

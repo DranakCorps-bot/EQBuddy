@@ -274,7 +274,7 @@ public partial class SpawnsWindow : Window
         {
             var view = TimerView.For(row.DueAt, row.DurationSeconds, now,
                 row.HasActiveTimer, row.Suppression);
-            _text.Text = TimerView.Text(view, row.DueAt, now);
+            _text.Text = TimerView.Text(view, row.DueAt, now, row.SuppressionNote);
             _text.Ink(view.TextColorKey);
 
             // The percentage is the mockup's, and it earns its place on a long cycle:

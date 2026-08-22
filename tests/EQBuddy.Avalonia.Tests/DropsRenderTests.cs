@@ -113,16 +113,18 @@ public sealed class DropsRenderTests
             .Where(b => IconName(b) == "Refresh")
             .ToList();
         Assert.Equal(2, buttons.Count);                       // one per creature heading
-        Assert.Contains(buttons, b => !b.IsEnabled);          // read just now → refused
-        Assert.Contains(buttons, b => b.IsEnabled);           // never read → allowed
+        // Both LIVE, including the one inside the 30 s window (Bevel, 2026-08-22): the
+        // debounce is the wiki's, not the button's — a greyed control reads as broken.
+        Assert.All(buttons, b => Assert.True(b.IsEnabled));
 
         var text = view.Body.GetLogicalDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
-        Assert.Contains("wiki read just now", text);
+        Assert.Contains("wiki just now", text);
         Assert.Contains("wiki not read yet", text);
 
-        var live = buttons.Single(b => b.IsEnabled);
-        live.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
-        Assert.Equal(["orc pawn"], host.Rechecks);
+        foreach (var b in buttons)
+            b.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        // Both presses reach the host; the WIKI debounce decides what happens next.
+        Assert.Equal(["a moss snake", "orc pawn"], host.Rechecks.OrderBy(x => x).ToList());
     }
 
     /// <summary>Which catalog icon a button draws, by the name DesignSystem.Icon stamps

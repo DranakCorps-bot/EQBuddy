@@ -50,3 +50,16 @@ history of the call stays readable. If vetoes become common, the consequence lis
 - **A re-check in flight keeps the OLD wiki answer on screen rather than showing "not checked
   yet"** · could have nulled the memo entry · the #217 rule (pending ≠ nothing new), wiki
   re-check plan.
+
+## 2026-08-22 — Claude (executor)
+
+- **Took Bevel's 1.99.1 post-hoc item without asking** (Helm-signed, V1, unreleased). Default it
+  could have gone the other way: wait for David. Landed: the release gate is the protection, and
+  "do I like this wording" fails both question tests.
+- **The triggered glance is named-if-it-fits, never an ellipsis.** Could have gone: truncate with
+  "…", or widen the fixed 150px timer column. Landed: bare word when it does not fit; widening a
+  shared column is a layout call and is back with Bevel with the screenshot.
+- **Healed poisoned overrides for raid-instanced entries too**, not only triggered ones as Fable's
+  note said. Same contradiction on screen; the method is `SuppressedByCatalog`'s own definition.
+- **Guarded the re-check defect with a SOURCE SCAN on both windows**, not a Core test. The Core
+  contract was already correct and a Core test could never have failed; the window defeated it.

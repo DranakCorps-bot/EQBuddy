@@ -28,13 +28,22 @@ public class WikiFreshnessTests
         Assert.True(WikiFreshness.CanRecheck(null, inFlight: false, Now));
     }
 
+    /// <summary>Bevel, 2026-08-22: no "read" anywhere in the caption — on a surface whose
+    /// vocabulary is a red ✦, "wiki read just now" hears as "wiki RED just now".</summary>
+    [Fact]
+    public void TheCaptionNeverSaysRead()
+    {
+        foreach (var state in new[] { ItemLookupState.Live, ItemLookupState.Cached, ItemLookupState.StaleCache })
+            Assert.DoesNotContain("read", WikiFreshness.Caption(Read(state, TimeSpan.FromDays(2)), false, Now));
+    }
+
     [Fact]
     public void TheCaptionBucketsTimeAndNeverTicksInSeconds()
     {
-        Assert.Equal("wiki read just now", WikiFreshness.Caption(Read(ItemLookupState.Live, TimeSpan.FromSeconds(20)), false, Now));
-        Assert.Equal("wiki read 3m ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromMinutes(3)), false, Now));
-        Assert.Equal("wiki read 2h ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromHours(2.9)), false, Now));
-        Assert.Equal("wiki read 8d ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromDays(8)), false, Now));
+        Assert.Equal("wiki just now", WikiFreshness.Caption(Read(ItemLookupState.Live, TimeSpan.FromSeconds(20)), false, Now));
+        Assert.Equal("wiki 3m ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromMinutes(3)), false, Now));
+        Assert.Equal("wiki 2h ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromHours(2.9)), false, Now));
+        Assert.Equal("wiki 8d ago", WikiFreshness.Caption(Read(ItemLookupState.Cached, TimeSpan.FromDays(8)), false, Now));
         // Two reads twenty seconds apart produce the SAME caption — trap 8, the signature
         // must not see a value that moves on a clock.
         Assert.Equal(
@@ -47,7 +56,7 @@ public class WikiFreshnessTests
     {
         // The #217 rule on the caption: a failed re-check is not "nothing new" and not
         // "not checked" — it is the OLD read, and the caption says so with its age.
-        Assert.Equal("wiki unreachable \u2014 showing the read from 8d ago",
+        Assert.Equal("wiki unreachable \u2014 showing 8d ago",
             WikiFreshness.Caption(Read(ItemLookupState.StaleCache, TimeSpan.FromDays(8)), false, Now));
         Assert.Equal("wiki unreachable",
             WikiFreshness.Caption(new MobLookupResult(null, ItemLookupState.Offline, null), false, Now));

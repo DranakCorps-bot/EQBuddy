@@ -1009,7 +1009,13 @@ public partial class MainWindow : Window, ICardContext
         if (!WikiFreshness.CanRecheck(_targetResults.GetValueOrDefault(name)?.FetchedAt,
                 _rechecking.Contains(name), DateTime.UtcNow)) return;
         _rechecking.Add(name);
-        _wikiMobs.Forget(name);
+        // NO Forget here. Deleting the file first looks like the honest way to force a
+        // re-read and is the one thing that breaks the fallback: LookupAsync reads the
+        // cache at the top, so the delete leaves nothing for an offline bypass to return
+        // and a failed re-check reports Offline — which Classify turns into Unknown, and
+        // the lit ✦ this button exists to refresh disappears (#226; shipped in 1.99.1 and
+        // found by Fable 5's H4 last-look). The bypass overwrites the file on success, so
+        // the delete bought nothing. WikiRecheckPathTests guards both windows.
         RefreshUi();
         _ = LookupTargetAsync(name, bypass: true);
     }

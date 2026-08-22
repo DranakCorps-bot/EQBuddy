@@ -379,8 +379,9 @@ internal sealed class DropsCardView
         var recheck = DesignSystem.InlineIconButton("Refresh",
             WikiFreshness.RecheckTip(lookup, inFlight, now),
             () => _main.RecheckMobLookup(creature));
-        recheck.IsEnabled = WikiFreshness.CanRecheck(lookup?.FetchedAt, inFlight, now);
-        recheck.Opacity = recheck.IsEnabled ? 1 : 0.4;
+        // LIVE, always — see the WPF twin (Bevel, 2026-08-22). The debounce is the
+        // wiki's, not the button's, and the tooltip carries it.
+        recheck.IsEnabled = true;
         recheck.VerticalAlignment = VerticalAlignment.Center;
         recheck.Margin = new Thickness(6, 8, 0, 2);
         Grid.SetColumn(recheck, 1);

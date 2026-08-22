@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.99.2",
+    "date": "2026-08-22",
+    "highlights": [
+   "FIXED - THE WIKI RE-CHECK NO LONGER LOSES A MARK WHEN THE WIKI IS DOWN. Pressing the refresh button beside a creature deleted its saved copy of the page before asking for a new one, so if the wiki could not be reached there was nothing left to fall back on: the red marks you pressed the button to refresh simply vanished, and the contribution pack dropped those creatures to \"not checked\". The old copy now stays until a new one arrives. Shipped broken in 1.99.1 and caught in review before anyone hit it.",
+   "Plane of Sky rows are tidier: the \"Next spawn\" column now names what brings a triggered mob where the name fits - \"triggered - Bazzzazzt\" - and a respawn time wrongly learned from a chain kill before 1.99.1 is cleared the moment EQBuddy starts, instead of waiting for your next kill of that mob.",
+   "Wording: the wiki age beside a creature reads \"wiki 5d ago\" rather than \"wiki read 5d ago\" (on a surface full of red markers, \"read\" was being seen as \"red\"), and the refresh button stays live instead of greying out for thirty seconds - the wait is the wiki's, not the button's.",
+   "EQBuddy is a BETA - if something reads wrong, tell us: (gear) - Help - Send feedback."
+    ]
+  },
+  {
     "version": "1.99.1",
     "date": "2026-08-21",
     "highlights": [

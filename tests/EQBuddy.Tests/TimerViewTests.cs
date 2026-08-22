@@ -110,6 +110,12 @@ public class TimerViewTests
         var view = TimerView.For(null, null, Now, suppression: TimerSuppression.Triggered);
         Assert.Equal(TimerView.State.Triggered, view.State);
         Assert.Equal("triggered", TimerView.Text(view, null, Now));
+        // …and it NAMES the trigger when there is one (Bevel, 2026-08-22): "go kill X" is
+        // the action the row implies, so it belongs on the glance, not in a tooltip.
+        Assert.Equal("triggered · Bazzzazzt", TimerView.Text(view, null, Now, "Bazzzazzt"));
+        // A raid instance has nothing to name and keeps the bare word.
+        Assert.Equal("instance",
+            TimerView.Text(TimerView.For(null, null, Now, suppression: TimerSuppression.RaidInstance), null, Now, ""));
         Assert.Null(view.Fraction);
         Assert.False(view.HasTrack);
         Assert.NotEqual(TimerView.Text(TimerView.For(null, null, Now, suppression: TimerSuppression.RaidInstance), null, Now),

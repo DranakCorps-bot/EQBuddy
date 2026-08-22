@@ -26,7 +26,12 @@ public static class WikiFreshness
 
     /// <summary>May the player ask for this page again? No while a read is in flight, no
     /// inside <see cref="MinRecheckInterval"/> of the last one. A page never read at all
-    /// (null) may always be asked for — that is the Pending case, and asking is the cure.</summary>
+    /// (null) may always be asked for — that is the Pending case, and asking is the cure.
+    ///
+    /// This debounces the WIKI, not the BUTTON (Bevel, 2026-08-22): the ↻ stays live and
+    /// looks live, because a control that greys out for thirty seconds reads as broken
+    /// rather than as considerate. A press inside the window is answered by the tooltip
+    /// ("Checked just now") instead of by a dead control.</summary>
     public static bool CanRecheck(DateTime? fetchedAtUtc, bool inFlight, DateTime nowUtc)
     {
         if (inFlight) return false;
@@ -44,9 +49,12 @@ public static class WikiFreshness
         {
             ItemLookupState.Offline => "wiki unreachable",
             ItemLookupState.StaleCache when lookup.FetchedAt is { } at =>
-                $"wiki unreachable \u2014 showing the read from {Ago(nowUtc - at)}",
+                $"wiki unreachable \u2014 showing {Ago(nowUtc - at)}",
             ItemLookupState.NotFound => "no wiki page",
-            _ when lookup.FetchedAt is { } at => $"wiki read {Ago(nowUtc - at)}",
+            // No "read" (Bevel, 2026-08-22): "wiki read just now" hears as "wiki RED just
+            // now" on a surface whose whole vocabulary is a red \u2726 marker. The age alone
+            // says the same thing and is shorter on an already dense heading.
+            _ when lookup.FetchedAt is { } at => $"wiki {Ago(nowUtc - at)}",
             _ => "",
         };
     }

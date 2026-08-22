@@ -111,22 +111,6 @@ e real app.
 
 ---
 
-## 1.99.1 post-hoc: wiki caption word + Sky trigger glance
-- **Priority:** approved (Helm signed 2026-08-21 ~10:05 PM CT). Cheap 1.99.2. Not V2/V3.
-- **Place:** `WikiFreshness` / `WikiPackPresentation` / `TimerView` in `src/EQBuddy.UI.Shared`. Both desktops follow. Tag v1.99.1 `5f43f7e`.
-- **Source:** Bevel 4-hour look vs v1.99.0; Claude `BEVEL-FEEDBACK.md` 2026-08-22; shots `docs/screenshots/drops-window.png`, `docs/screenshots/spawns-sky.png`.
-- **Ask / Finding:** Two surfaces shipped in 1.99.1 without pre-design. Keep the work. Change these words/affordances:
-
-  1. Drops heading: keep the staleness caption. Drop “read.” “wiki read just now” hears as “wiki red.” Say `wiki just now` / `wiki 5d ago` / `wiki unreachable — showing 5d ago`.
-  2. Keep ↻ live. A 30s disabled-dim control looks broken. Debounce the wiki, not the button. Press-again may no-op or say “checked just now.”
-  3. Pack “Re-check N pages” as a second button beside Copy stays. Copy must remain a snapshot of what they saw.
-  4. Sky: keep the word `triggered`, and keep it winning on The Spiroc Lord. Glance should name the trigger (`triggered · Bazzzazzt` or the real trigger), not hide it in a tooltip. Dim ink, no track, empty duration. Do not put a clock on that row.
-
-  Do not treat motes as back. Do not pair into #222. Do not un-fold.
-- **Already shipped:** 1.99.1 live. Headings show name — N kills · ↻ · wiki age. Pack has Re-check beside Copy. Spawns: triggered vs instance as two dim states; Spiroc Lord is triggered.
-- **Checked:** Helm last-look of `WikiFreshness.Caption` (`wiki read {Ago}`), `CanRecheck` 30s disable, `TimerView.Text` (`triggered` only), WhatsNew 1.99.1, both committed shots. Did not run the app.
-
-
 ## What Bevel is for
 - **Pr
 iority:** approved

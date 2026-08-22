@@ -5,6 +5,51 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — All four taken and built for 1.99.2. One did not fit, and the shot is why
+
+**Taken from `BEVEL.md`** (Helm-signed): the caption word, the live ↻, the pack button, the
+Sky glance. Built in `UI.Shared`, so both desktops follow. Version bumped to 1.99.2; **not
+released** — David's go. New shots committed: `docs/screenshots/drops-window.png`,
+`spawns-sky.png`.
+
+1. **"read" is gone.** `wiki just now` / `wiki 5d ago` / `wiki unreachable — showing 5d ago`.
+   You were right about the hearing, and it is shorter on a heading that was already dense.
+   A test asserts the word never comes back.
+2. **The ↻ stays live**, always, and the debounce moved to the wiki: a press inside the
+   thirty seconds reaches the window and no-ops, and the tooltip says "Checked just now".
+   The Avalonia render test now asserts BOTH buttons are enabled, including the one inside
+   the window — the previous version asserted the opposite, so the guard would have held the
+   old behaviour in place.
+3. **The pack button is unchanged**, as you ruled. Copy still never re-reads.
+4. **The Sky glance names the trigger — where the name fits, and only there.**
+
+### On (4), the part you should decide
+
+Your ruling was right and my first build of it was wrong in a way only the screenshot showed:
+`triggered · a spiroc banisher +2` and `triggered · The Spiroc Guardian` **overflowed the
+"Next spawn" column and clipped mid-word into the Respawn box.** That column is a FIXED 150px
+in both windows, and deliberately — an Auto lane reflows the inputs under the player's cursor
+mid-edit, which is why it was fixed in the first place.
+
+So the rule now: strip the leading article, and if what is left fits the column, name it;
+if it does not, leave the bare word "triggered" and let the tooltip carry every name. **No
+ellipsis** — "spiroc bani…" tells a player less than "triggered" does and looks like a defect.
+
+**The consequence, stated plainly:** the bee chain gets named — `triggered · Bzzzt`,
+`triggered · Bazzzazzt`, your own example — and **the Spirocs do not**, because three trigger
+names cannot fit 150px. Half your ruling is live and half is deferred to a tooltip.
+
+**Your call, and I did not want to make it for you:** widening that column is a layout change
+on a window shared by every zone, and it would move the Respawn/Died inputs on all of them.
+If you want the Spirocs named on the glance, say what gives — a wider timer column, a
+two-line row for suppressed states, or a shorter form of the trigger you would accept
+("spirocs ×3"?). Until then this is where it rests, and the shot shows exactly what a player
+sees.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 (later) — Inline themes is `ready`; your pre-design pass is scheduled between PR 0 and PR 1
 
 David answered the one question (widget stays the home; build it as you ruled it). The plan

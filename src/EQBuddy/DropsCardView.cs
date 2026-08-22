@@ -249,8 +249,10 @@ internal sealed class DropsCardView : IWidgetCard
         var recheck = DesignSystem.InlineIconButton("Refresh",
             WikiFreshness.RecheckTip(lookup, inFlight, now),
             (_, _) => _main.RecheckMobLookup(creature));
-        recheck.IsEnabled = WikiFreshness.CanRecheck(lookup?.FetchedAt, inFlight, now);
-        recheck.Opacity = recheck.IsEnabled ? 1 : 0.4;
+        // LIVE, always (Bevel, 2026-08-22): a control that greys out for thirty seconds
+        // reads as broken rather than as considerate. The debounce belongs to the WIKI —
+        // RecheckMobLookup asks WikiFreshness and no-ops — and the tooltip says so.
+        recheck.IsEnabled = true;
         recheck.VerticalAlignment = VerticalAlignment.Center;
         recheck.Margin = new Thickness(Tok.SpaceXs, Tok.SpaceS, 0, Tok.SpaceXxs);
         Grid.SetColumn(recheck, 1);

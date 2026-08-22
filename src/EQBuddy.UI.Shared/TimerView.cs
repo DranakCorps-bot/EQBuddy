@@ -122,11 +122,15 @@ public static class TimerView
     /// window worth interrupting for; the rest defer to
     /// <see cref="SpawnDurationText.Countdown"/>. An em dash for unknown — never a blank,
     /// which is the audit's "uncertainty and absence look the same".</summary>
-    public static string Text(View view, DateTime? dueAt, DateTime now) => view.State switch
+    /// <param name="note">What to name beside a suppressed state — for a triggered spawn,
+    /// what brings the mob. Bevel, 2026-08-22: the glance should NAME the trigger rather
+    /// than hide it in a tooltip, because "go kill X" is the whole action the row implies.
+    /// Empty leaves the bare word, which is what a raid instance gets.</param>
+    public static string Text(View view, DateTime? dueAt, DateTime now, string note = "") => view.State switch
     {
         State.Due => "DUE",
         State.Suppressed => "instance",
-        State.Triggered => "triggered",
+        State.Triggered => note.Length > 0 ? $"triggered · {note}" : "triggered",
         State.Unknown => "—",
         State.Idle => "",
         _ => SpawnDurationText.Countdown((dueAt ?? now) - now),
