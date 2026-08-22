@@ -65,7 +65,16 @@ public static class ZoneShare
         public int RefinedPoints { get; init; }
         public int NewObservations { get; init; }
         public List<TimerDiff> Timers { get; init; } = [];
-        public List<TimerDiff> FlaggedTimers => Timers.Where(t => t.Flagged).ToList();
+        /// <summary>Rows the "I trust this source" checkbox actually governs. A REFUSED
+        /// row is excluded: the catalog says that mob has no cycle, so ticking the box
+        /// applies nothing for it — counting it would make the checkbox promise work it
+        /// never does ("silent no-ops are broken"). Found by Fable 5 in the v1.99.3
+        /// release review; the engine was right and only the screen was wrong.</summary>
+        public List<TimerDiff> FlaggedTimers => Timers.Where(t => t.Flagged && !t.Triggered).ToList();
+
+        /// <summary>Rows refused outright, whatever the player ticks — a triggered spawn
+        /// or a raid-instance boss. Shown, and shown as refused rather than as risky.</summary>
+        public List<TimerDiff> RefusedTimers => Timers.Where(t => t.Triggered).ToList();
     }
 
     public static string Export(SpawnPointLedger.ZoneArchive archive, SpawnZone? zone, SpawnOverrides overrides)

@@ -515,7 +515,7 @@ public sealed class AppSettings
     /// <summary>Bump when adding a built-in rule; see <see cref="DefaultRulesVersion"/>.</summary>
     private const int CurrentDefaultRulesVersion = 1;
 
-    public static AppSettings Load()
+    public static AppSettings Load(bool persistMigrations = true)
     {
         AppSettings settings;
         try
@@ -560,7 +560,12 @@ public sealed class AppSettings
         changed |= settings.ApplyDefaultEpicQuestChecklist();
         changed |= settings.MigrateBuffSetsToClassBuckets();
         changed |= settings.MigrateArchiveDefault();
-        if (changed | settings.TrackedRules.Any(r => r.IdWasGenerated))
+        // A READ that writes, and the reason is good: an id assigned at construction is
+        // only stable across restarts if it is persisted now. But it means Load() is a
+        // writer, and a caller that has not taken the single-instance lock must be able to
+        // say no — see persistMigrations. Found by Fable 5 in the v1.99.3 release review,
+        // against an executor claim that Load "never saves". It does.
+        if (persistMigrations && (changed | settings.TrackedRules.Any(r => r.IdWasGenerated)))
             settings.Save();
         return settings;
     }

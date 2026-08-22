@@ -211,12 +211,19 @@ public sealed class ZoneShareWindow : Window
                 FontSize = 10.5, Margin = new Thickness(0, 2, 0, 0), TextWrapping = TextWrapping.Wrap,
                 // Text-presentation warning glyph, not the color emoji — emoji
                 // ignore Foreground and this line must tint BadBrush (house rule).
-                Text = t.Flagged
+                // A REFUSED row is not a risky row: the catalog says this mob has no
+                // cycle, so no tick-box can apply it. Dim, and it says why — the old text
+                // called it "no local baseline to corroborate" under a checkbox offering
+                // to apply it anyway (Fable 5, v1.99.3 release review).
+                Text = t.Triggered
+                    ? $"{t.Name}: no cycle to import — {EQBuddy.UI.Shared.ZoneShareText.RefusedReason(t)}"
+                    : t.Flagged
                     ? $"⚠︎ {t.Name}: {cur} → {EQBuddy.UI.Shared.Countdown.Format(TimeSpan.FromSeconds(t.IncomingSeconds))} — " +
                       (t.CurrentSeconds is null ? "no local baseline to corroborate" : "big change from the known clock")
                     : $"{t.Name}: {cur} → {EQBuddy.UI.Shared.Countdown.Format(TimeSpan.FromSeconds(t.IncomingSeconds))}",
             };
-            line.SetResourceReference(TextBlock.ForegroundProperty, t.Flagged ? "BadBrush" : "TextBrush");
+            line.SetResourceReference(TextBlock.ForegroundProperty,
+                t.Triggered ? "DimBrush" : t.Flagged ? "BadBrush" : "TextBrush");
             _previewPanel.Children.Add(line);
         }
         if (_preview.Timers.Count == 0)

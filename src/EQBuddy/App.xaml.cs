@@ -98,7 +98,12 @@ public partial class App : Application
             Shutdown();
             return;
         }
-        var settings = Core.AppSettings.Load();
+        // The probe runs WITHOUT the single-instance lock, so it must not write: Load
+        // persists migrations and generated rule ids, which is a whole-file Save under a
+        // live widget — trap 13 exactly. Narrow (only when the probe exe is newer than the
+        // running widget) and closed rather than argued about. Fable 5 found this against
+        // my own claim that Load never saves; it does, at the bottom of Load.
+        var settings = Core.AppSettings.Load(persistMigrations: !probing);
         // And under Wine only: whole-pixel glyph positioning. Wine truncates the
         // fractional advances WPF's default Ideal mode relies on, which pulls letters
         // apart mid-word ("an d th is") in text whose font metrics are perfectly correct
@@ -142,7 +147,10 @@ public partial class App : Application
         // probe and nothing else. See TextProbeWindow.cs.
         if (probing)
         {
-            MainWindow = new TextProbeWindow();
+            // The SAME settings instance, not a second Load: the probe used to load
+            // again to answer "what does the policy say", which doubled the write window
+            // above for no gain.
+            MainWindow = new TextProbeWindow(settings);
             MainWindow.Show();
             return;
         }

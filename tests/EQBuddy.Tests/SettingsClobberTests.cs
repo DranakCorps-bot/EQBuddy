@@ -106,4 +106,32 @@ public class SettingsClobberTests : IDisposable
 
         Assert.DoesNotContain(_logged, m => m.Contains("changed underneath"));
     }
+
+    /// <summary>`Load` is a READ that WRITES — it persists migrations and generated rule
+    /// ids at the bottom — and a caller which has not taken the single-instance lock has
+    /// to be able to say no.
+    ///
+    /// That caller is `--textprobe`, a diagnostic you run WITH the widget already up, so
+    /// it deliberately skips the lock. The executor told Fable 5 it was safe "because Load
+    /// never saves"; Fable read the code and it does. Narrow — it needs a profile with a
+    /// pending migration, i.e. an upgrade in progress — and it is trap 13 to the letter:
+    /// a second writer saving a whole-file snapshot under a live widget.</summary>
+    [Fact]
+    public void LoadCanBeAskedNotToPersistMigrations()
+    {
+        // A settings file old enough to need a migration on read.
+        File.WriteAllText(SettingsPath, "{}");
+        var before = File.GetLastWriteTimeUtc(SettingsPath);
+        var bytesBefore = File.ReadAllBytes(SettingsPath).Length;
+
+        var probe = AppSettings.Load(persistMigrations: false);
+        Assert.NotNull(probe);
+        Assert.Equal(bytesBefore, File.ReadAllBytes(SettingsPath).Length);
+        Assert.Equal(before, File.GetLastWriteTimeUtc(SettingsPath));
+
+        // …and the ordinary path still persists, or ids would be re-rolled every launch.
+        AppSettings.Load();
+        Assert.True(File.ReadAllBytes(SettingsPath).Length > bytesBefore,
+            "the normal Load must still write its migrations");
+    }
 }

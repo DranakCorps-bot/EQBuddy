@@ -577,6 +577,42 @@ public class ZoneShareTests
         Assert.Null(mine.Find("Nagafen's Lair", "Lord Nagafen"));
     }
 
+    /// <summary>The "I trust this source" checkbox must not COUNT a row it cannot apply.
+    ///
+    /// The engine refused triggered and raid-instanced rows from the start; the preview
+    /// went on calling them "no local baseline to corroborate" and offering to apply them
+    /// anyway, which is "silent no-ops are broken" with the switch on the other side —
+    /// tick the box, nothing happens for that row, nothing says so. Found by Fable 5 in
+    /// the v1.99.3 release review: the engine was right and only the screen was wrong.</summary>
+    [Fact]
+    public void TheTrustThisSourceBoxDoesNotCountRowsItCannotApply()
+    {
+        var zone = new SpawnZone
+        {
+            Zone = "Plane of Sky",
+            NamedDefaultSeconds = 28800,
+            Named =
+            [
+                new SpawnEntry { Name = "Bzzzt", SpawnType = "triggered", TriggeredBy = "Bazzzazzt" },
+                new SpawnEntry { Name = "a presence" },   // ordinary, and genuinely flagged below
+            ],
+        };
+        var sharer = new SpawnOverrides();
+        sharer.GetOrAdd("Plane of Sky", "Bzzzt").RespawnSeconds = 180;
+        sharer.GetOrAdd("Plane of Sky", "a presence").RespawnSeconds = 90;   // wild vs the 8h default
+
+        var mine = new SpawnOverrides();
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Plane of Sky" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Plane of Sky" },
+            zone, mine)!;
+
+        // Both rows are shown…
+        Assert.Equal(2, preview.Timers.Count);
+        // …but only the one the checkbox can actually apply is counted by it.
+        Assert.Equal("a presence", Assert.Single(preview.FlaggedTimers).Name);
+        Assert.Equal("Bzzzt", Assert.Single(preview.RefusedTimers).Name);
+    }
+
     /// <summary>An import cannot smuggle a stale Sighted flag onto a stranger's number.
     /// Sighted exempts a value from the self-heal that purges re-kill noise — it means
     /// "I watched this mob act before its clock ran out", which is never true of a

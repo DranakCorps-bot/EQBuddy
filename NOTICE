@@ -77,12 +77,17 @@ src/EQBuddy.UI.Shared/AlertThrottle.cs were written independently):
 Good designs deserve naming their source. Thanks, Josh.
 --------------------------------------------------------------------------------
 
-EQBuddy Sans (src/EQBuddy/Fonts/EQBuddySans.ttf)
+EQBuddy Sans (src/EQBuddy/Fonts/EQBuddySans*.ttf — Regular, SemiBold, Bold)
 --------------------------------------------------------------------------------
 Built from Google's Noto fonts — Noto Sans, Noto Sans Symbols, Noto Sans
 Symbols 2, Noto Sans Math, and Noto Emoji — all licensed under the SIL Open
 Font License 1.1, whose full text ships beside the font in
 src/EQBuddy/Fonts/OFL.txt.
+
+The family ships three faces — Regular, SemiBold and Bold — because WPF
+SYNTHESISES a weight a family cannot resolve, which mis-fits every bold run.
+The SemiBold and Bold faces, and the small-caps features, were contributed by
+quasarj (PR #231).
 
 The font is a subset of those sources with EQBuddy's own 80-odd icon code
 points merged into a Latin text base. It is renamed rather than shipped as

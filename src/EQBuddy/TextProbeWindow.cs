@@ -47,8 +47,14 @@ internal sealed class TextProbeWindow : Window
         Environment.GetEnvironmentVariable("EQBUDDY_TEXTPROBE") == "1" ||
         args.Any(a => string.Equals(a, "--textprobe", StringComparison.OrdinalIgnoreCase));
 
-    public TextProbeWindow()
+    private readonly Core.AppSettings _settings;
+
+    /// <summary>Takes the settings the app already loaded rather than loading again: the
+    /// probe runs without the single-instance lock, and <see cref="Core.AppSettings.Load"/>
+    /// writes when it migrates.</summary>
+    public TextProbeWindow(Core.AppSettings settings)
     {
+        _settings = settings;
         Title = "EQBuddy text probe";
         Width = 900;
         SizeToContent = SizeToContent.Height;
@@ -69,7 +75,7 @@ internal sealed class TextProbeWindow : Window
         _inherited = Fact("effective mode on a plain TextBlock: (measured on load)");
         body.Children.Add(_inherited);
         Loaded += (_, _) => _inherited.Text =
-            $"POLICY SAYS {WineText.Resolve(Core.AppSettings.Load())}  ->  a plain TextBlock in this window " +
+            $"POLICY SAYS {WineText.Resolve(_settings)}  ->  a plain TextBlock in this window " +
             $"actually resolves {TextOptions.GetTextFormattingMode(_inherited)}" +
             (TextOptions.GetTextFormattingMode(_inherited) == TextFormattingMode.Display
                 ? "   [applied]"

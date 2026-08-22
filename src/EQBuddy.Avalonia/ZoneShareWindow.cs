@@ -216,7 +216,9 @@ public sealed class ZoneShareWindow : Window
                 FontSize = 10.5, Margin = new Thickness(0, 2, 0, 0), TextWrapping = TextWrapping.Wrap,
                 // Text-presentation warning glyph, not the color emoji — emoji
                 // ignore Foreground and this line must tint BadBrush (house rule).
-                Text = t.Flagged
+                Text = t.Triggered
+                    ? $"{t.Name}: no cycle to import — {EQBuddy.UI.Shared.ZoneShareText.RefusedReason(t)}"
+                    : t.Flagged
                     ? $"⚠︎ {t.Name}: {cur} → {EQBuddy.UI.Shared.Countdown.Format(TimeSpan.FromSeconds(t.IncomingSeconds))} — " +
                       (t.CurrentSeconds is null ? "no local baseline to corroborate" : "big change from the known clock")
                     : $"{t.Name}: {cur} → {EQBuddy.UI.Shared.Countdown.Format(TimeSpan.FromSeconds(t.IncomingSeconds))}",

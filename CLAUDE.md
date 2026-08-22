@@ -573,6 +573,15 @@ Read this list before touching the areas it names. Every entry cost a release.
     → **Now guarded:** `UI.Shared/SingleInstance.cs` (one copy per profile everywhere, and
     a stale lock can never stop a launch), and `AppSettings.Save` logs once when it is
     about to overwrite a file that changed underneath it.
+    → **One legitimate exception, and it is narrow: `--textprobe`.** A diagnostic you run
+    with the widget already up cannot take the lock, and it holds no file, no port and no
+    log tail — the three things the guard exists for. But "it only reads" was WRONG when
+    first claimed (Fable 5, v1.99.3 release review): `AppSettings.Load` persists migrations
+    and generated rule ids at the bottom, so a read IS a write on an un-migrated profile.
+    The probe now passes `persistMigrations: false` and takes the app's already-loaded
+    instance instead of loading twice. **If you add another lock-skipping path, it must
+    write nothing — and check what your "read" does at the bottom.**
+
     → **And the guard itself had the same hole one level up, until 2026-08-19.** Adding
     `SingleInstance` to Avalonia left WPF on its named mutex, so there were TWO guards and
     neither could see the other: on Windows the WPF widget and the Avalonia widget both
