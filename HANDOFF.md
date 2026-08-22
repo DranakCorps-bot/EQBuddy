@@ -1,4 +1,4 @@
-# EQBuddy — handoff
+﻿# EQBuddy — handoff
 
 **Don't re-derive the codebase.** `CLAUDE.md` loads automatically and carries the commands,
 the non-negotiable rules, the where-things-live index, the trap list (42) and the
@@ -8,7 +8,74 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (LATEST — start here): 1.99.3 is ready and waiting on David's GO, nothing else blocks
+## 2026-08-22 (LATEST — start here): 1.99.3 SHIPPED; Inline themes PR 1 is half-done on purpose
+
+**v1.99.3 is released** — David's go, `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.3`.
+Verified by side effects rather than by the script's exit code: tag pushed, GitHub release
+**Latest** with all four assets, `EQBuddySetup.exe` `Valid` and timestamped as
+`CN=FlossworksCross-Stitch`, OneDrive copy at 07:35. Both gates had run first (Fable's three
+conditions verified present in the tree, Bevel's no-hold Helm-signed).
+
+**Gates: 2,350 unit · 267 Avalonia · 23 E2E, green.**
+
+### Inline themes PR 1 — WPF is in, Avalonia is a `FABLE.md` stub, and that is deliberate
+
+**On `main`:** the Progress card expands in place on the Windows widget, built to Bevel's
+Helm-signed table — Experience/Wealth/Faction draw bodies, Raids is a Glance line, Wealth
+inline is coin only. `ThemeCardView` + `ProgressThemeCard`, both outside `MainWindow`.
+Three predicted screenshots committed.
+
+**NOT on `main`, and not half-built:** the Avalonia twin. Its theme bodies are single shared
+instances that the card and window would have to pass between them, and moving a live control
+between two Avalonia visual trees throws *"InvalidateArrange on wrong LayoutManager"* — the
+crash Fable's plan predicted. Six fixes were tried and are written up in the stub so nobody
+repeats them. **It is V2 by the plan's own test (no answer from David finishes it as V1), so
+it was stubbed rather than forced.** `main` therefore has inline themes on Windows and not on
+Linux/macOS — reported, not drift.
+
+→ **The `WhatsNew.json` entry is deliberately NOT written yet.** Writing "the Progress card
+expands" while one of the two widgets cannot would be a false player-facing claim. It is owed
+the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) and David's ask.
+
+### DO NEXT
+
+1. **Read `FABLE.md`'s top item** — the Avalonia seam. It also carries the ratchet problem:
+   **WPF `MainWindow` GREW 4,424 → 4,504**, headroom is **131** against ~80 a theme, so PR 2
+   and PR 3 do not fit until something is lifted. Candidate named: the `EQBUDDY_EXPAND` dump
+   block (~130 lines, a sum not a pixel).
+2. **Two questions are with Bevel** (`BEVEL-FEEDBACK.md`), both visible in the shots: the Raids
+   glance line duplicates its own chip badge, and the Wealth chip still carries the mote rate
+   the body was told to drop. Neither is mine to settle.
+3. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
+   and just needs writing. **#226, #228, #208 are HELD — only Helm lifts them, and you cannot
+   reach Helm; David is the courier.** Re-read `SCRIBE.md`'s Holds block before any post.
+4. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
+   (liminalwarmth), Mobile alert sounds (#208, held), `LogWatcher` shutdown race,
+   `LanAddresses()` on Tailscale.
+
+### A flaky gate was fixed on the way past, and the lesson generalises
+
+`SettingsClobberTests.LoadCanBeAskedNotToPersistMigrations` — the guard Fable asked for in the
+1.99.3 review — failed **one run in three from the hour it shipped**. The assertion was right:
+`CompanionHost` and `OutputfileAutoImport` write the same profile's `settings.json` from a
+parallel xUnit collection. Fixed with a serial collection of the four files plus
+`SettingsFileCollectionTests`, a source scan so a fifth writer fails the build — because the
+file's old comment *claimed* nothing else touched that path, and a claim standing in for a
+guard is trap 34. 2,350 tests still run in 2 s.
+
+→ **A new guard deserves eight runs before it is called green.** This one passed review, passed
+the release, and was lying on a third of them.
+
+### Feedback is filed for all three (it is a rule, not a courtesy)
+
+`FABLE-FEEDBACK.md`, `BEVEL-FEEDBACK.md`, `SCRIBE-FEEDBACK.md` — corrective, constructive and
+reinforcing in each. Bevel's and Scribe's Start/Stop/Continue notes from this morning are
+answered point by point. **Fable did not leave one**; its equivalent is the PR 0 note, which is
+now done rather than carried.
+
+---
+
+## 2026-08-22: 1.99.3 was ready and waiting on David's GO (historical — it shipped)
 
 **Gates at `ee8c97a`: 2,349 unit · 267 Avalonia · 19 E2E.** `Directory.Build.props` says
 **1.99.3** with five What's-new entries. **Both release gates are satisfied** — Fable reviewed

@@ -84,3 +84,14 @@ history of the call stays readable. If vetoes become common, the consequence lis
   Could have gone: a new `EQBUDDY_THEMETAB`. Landed: an inline theme has four bodies behind one
   key, and three of them were unreachable by a test or a screenshot — trap 22, a surface that
   cannot be reviewed reads as reviewed.
+- **Reverted the Avalonia half of Inline themes PR 1 rather than shipping it half-working or
+  forcing it.** Default it could have gone the other way: keep pushing (it was six fixes deep),
+  or leave the failing test and file it. Landed: the blocker is that Avalonia's theme surfaces
+  are shared field-backed instances with no `IWidgetCard`-style seam, which is a V2 refactor of
+  a 5,593-line file — and CLAUDE.md says stop and stub when work turns out V2 mid-session, not
+  finish it and label it. `main` now has inline themes on one widget and not the other, which
+  is a parity gap that is REPORTED rather than quiet, and no What's-new claims it.
+- **Did not write the `WhatsNew.json` entry for PR 1.** Could have gone: write it now so it is
+  not forgotten. Landed: "the Progress card expands in place" is false on Linux and macOS
+  today, and the rule is that entries are TRUE, not that they are early. It is recorded as owed
+  in `HANDOFF.md`.

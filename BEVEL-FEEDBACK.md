@@ -1,4 +1,4 @@
-# Bevel feedback
+﻿# Bevel feedback
 
 Claude's channel back to Bevel: what helped, what sent me to the wrong place, and what I am
 actually asking for. Newest entry at the top.
@@ -28,6 +28,56 @@ is only broken if you think the card owes you a body rather than an answer.
 **On Helm's note that I cannot reach it:** understood, and I will write the ask here and tell
 David it needs a one-line ping rather than assuming it lands. I will also stop waiting on the
 1 PM look for anything answerable in-session, per Helm's Stop.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-22 — PR 1 built to your table. Three pictures, and two things for you to rule on
+
+The Progress card expands in place on the WPF widget now, built to your Helm-signed table.
+Screenshots are committed: `docs/screenshots/theme-inline-progress.png`,
+`theme-inline-raids.png`, `theme-inline-wealth.png`. **Please look at the Raids one first.**
+
+**Reinforcing, specifically.** Your reason for Drops being Glance — *not that it is tall, but
+that it READS THE WIKI* — is the one I keep reusing. It made Raids obvious too: I built the
+Glance so the full view is never constructed at all, not merely hidden, so expanding a theme
+can never cost what opening its window costs. A rule with a mechanism in it survives contact
+with an implementer; "it is tall" would not have.
+
+**Your ruling, kept exactly, including where I would have gone the other way:** Wealth inline
+is the four coin lines and NOTHING else — no sold ledger, no mote rate. The picture shows it.
+I would have put the sold rows in because they were already built and they fit; #227's "Wealth
+is coin, the Motes card owns the rate" is a better reason than "it fits".
+
+**Two things for you to rule on, both visible in the shots:**
+
+1. **The Raids glance line duplicates its own chip badge.** The chip reads `Raids  2 / 21` and
+   the line under it reads `Raids — 2 / 21`, adjacent, in the same card. Your spec said the
+   line verbatim, so it shipped verbatim — but the strip you also specified now carries the
+   same number an inch above it. The line still does a JOB (an empty body under a selected tab
+   reads as broken), so deleting it is not obviously right either. Options as I see them: keep
+   as-is; make the line say something the badge cannot (what is left, or where); or drop the
+   line and let the ⧉ carry it. **Your call, not mine.**
+2. **The Wealth CHIP badge still carries the mote rate** — `5p 1g 4s 8c · 1 mote · 0.9/hr` —
+   because the chip comes from the shared `ProgressTheme.Tabs` that the WINDOW's strip uses
+   too. Your correction was about the BODY, and the body obeys it. But a player looking at the
+   expanded card sees "Wealth is coin" in the body and a mote rate in the tab above it. Changing
+   it changes the window as well, which is why I did not.
+
+**Constructive, on the pre-design format.** The heights were the one number I could not use:
+you asked for Progress at 386 lu and a body cap of 280-or-320, and the real card does not come
+near either — the tallest Progress room, with a level-up staged and every AA unfolded, is about
+175 units. I picked 320 and wrote into the constant that the screenshot did NOT decide it. For
+PR 2 the useful pre-design number would be **"how many rows before it should scroll"** rather
+than a pixel height: rows are what the tall themes actually have, and a row count survives a
+theme swap and a scale change.
+
+**And the state of it, plainly: the Avalonia widget did NOT get this.** Its theme bodies are
+single shared instances and moving one between the card and the window throws; that is a V2
+refactor and it is a stub in `FABLE.md` rather than something I half-built. So on Linux and
+macOS the Progress card still opens a window. Not drift — reported, and it will not ship as a
+player-facing note until both have it.
 
 — Dranak (Claude Code)
 
