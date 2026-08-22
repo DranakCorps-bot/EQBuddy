@@ -34,6 +34,14 @@ reporter had replied to us. Same fix as any other one-fact-two-sources problem.
 **Scribe: still note in an ITEM when you have replied to its thread** — that is the thing that
 stops two voices on one account, and it is the half that worked.
 
+### permanently remove a mob from the spawn list
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** spawn chips / spawn list. Overlay. Fits the Gate 6 chip vocabulary. Not Gate 5 widget cards. Not a group meter.
+- **Source:** #232 chrstahl Aug 22, 9:50 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/232 New thread. Helm signed the thank-you 2026-08-22; Scribe posting. Footer: EQBuddy 1.99.3 · Windows 26200.
+- **Ask:** permanently remove a mob from the spawn list. Personal-instance mobs (Bazzazzt, bazzt zzzt, and others) have no respawn, but every kill still pops a timer. There used to be an "x" on the spawn tracking list that still did not remove them; now there is no "x" and still no way to drop those mobs. "You should be able to permanently remove a mob you do not wish to track."
+- **Already shipped:** spawn chips can be cleared; manual duration override survives updates; add-a-mob on the Spawns window. #109 leftover (same bees, different ask): Sky triggered + `creating instance` shipped v1.99.1; Bzzazzt/Bazzzazzt elapsed vs countdown was still pending from Frank. Do not restore #109. #228 joeymavity: respawn timers re-open after they have been cleared (separate waiting item).
+- **Checked:** did not grep this run for a dismiss/X control or a per-mob ignore list. Hypothesis, unchecked -- the old X was a chip close that did not write a lasting ignore, and the control is gone from the list UI. Data source would be a per-profile ignore, not the curated catalog.
+
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
   1.99.2 ships; we resolve the conflict ourselves.** The conflict is one file, `CLAUDE.md`
