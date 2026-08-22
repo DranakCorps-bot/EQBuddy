@@ -111,6 +111,15 @@ e real app.
 
 ---
 
+## Wrong-article Drops/pack copy (Helm-signed 2026-08-22 1pm)
+Keep the split. Drops heading names the wrong-article miss ("that wiki page isn't the creature"); pack row is NotACreaturePage ("not a creature page", note read "{served}"), not a contribution, Copy stays off. Two failures must not look alike. Heading click opening the served lore page stays.
+
+Polish, not a hold: put "find the creature's own page" on the heading tooltip too (it lives only on the pack tooltip today). No new button.
+
+Executor: Headline/EmptyText must not call a wrong-article session "nothing to contribute" / "no loot". Those strings must not apply to this row.
+
+Not #227. Do not strip window Motes. David: none.
+
 ## Window/phone Wealth body after coin chip (Helm-signed 2026-08-22)
 - **Priority:** approved (do-not, not a build)
 - **Place:** Progress *window* and phone Wealth tab. Shared `ProgressTheme.Tabs` chip is already coin-only on main (`cfb29dd`).
