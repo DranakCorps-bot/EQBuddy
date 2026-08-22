@@ -26,16 +26,43 @@ public static class ProgressTheme
     public static string Experience(StatsSnapshot s, int dingUnlocks) =>
         ProgressText.Header(s, dingUnlocks);
 
-    /// <summary>The Wealth badge. It carries BOTH halves of the merge — coin and motes —
-    /// because Wealth is the one tab that absorbs two cards, and a badge that named only
-    /// coin would quietly answer half the question the Motes card used to answer on its
-    /// own. Motes are dropped from the string when there are none rather than printed as
-    /// a zero: a fresh character is exactly who is looking at a fresh widget.</summary>
-    public static string Wealth(StatsSnapshot s)
+    /// <summary>
+    /// The Raids GLANCE line — what an expanded Raids room says instead of drawing its
+    /// 29-row ledger (Bevel, Helm-signed 2026-08-22).
+    ///
+    /// **It says what the chip cannot.** The first build printed `Raids — 2 / 21` directly
+    /// under a chip already reading `Raids 2 / 21`, which is one fact twice, an inch apart.
+    /// Bevel's ruling: the chip stays the scoreboard, the line carries the REMAINDER — and
+    /// deleting the line instead is equally wrong, because an empty body under a selected
+    /// tab reads as broken. No second "Raids" and no second fraction.
+    ///
+    /// In UI.Shared rather than in either card, so the Avalonia widget says the same words
+    /// when its inline card lands (`FABLE.md`) — parity by shared module, never by feature
+    /// list (#210).
+    /// </summary>
+    public static string RaidsGlance(int defeated, int total)
     {
-        var coin = StatsSnapshot.FormatCoin(s.Copper);
-        return MoteRate(s) is { } motes ? $"{coin} · {motes}" : coin;
+        var left = Math.Max(0, total - defeated);
+        // "all cleared" rather than "0 left": a zero is a number to read, and this is the
+        // one state that is an achievement rather than a measurement.
+        return left == 0 ? "all cleared" : $"{left} left";
     }
+
+    /// <summary>The Wealth badge: **COIN ONLY** (Bevel, Helm-signed 2026-08-22).
+    ///
+    /// It carried the mote rate too, from the days when Wealth was the one tab that
+    /// absorbed two cards. #227 settled that **Wealth is coin and the Motes card owns the
+    /// rate**, and Inline themes PR 1 made the inconsistency impossible to keep: the
+    /// expanded card's Wealth body is the four coin lines and nothing else, so a chip
+    /// naming a mote rate sat an inch above a body that refused to. Bevel's rule is that
+    /// the chip must match the body.
+    ///
+    /// **This deliberately changes the WINDOW's strip as well**, because it is the same
+    /// shared badge — and that is right rather than collateral: the window's Wealth tab is
+    /// coin too. Do not add the rate back for consistency with anything; the launcher line
+    /// may still carry motes/hr, which is a different surface answering a different
+    /// question.</summary>
+    public static string Wealth(StatsSnapshot s) => StatsSnapshot.FormatCoin(s.Copper);
 
     /// <summary>The mote headline: count AND rate, the two halves the Motes card's own
     /// header carried ("3 · 0.9/hr"). Null when nothing has dropped.

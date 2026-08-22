@@ -1,4 +1,4 @@
-# Decisions made without asking
+﻿# Decisions made without asking
 
 **For David to skim, not to approve.** Every line here is a call an agent made under the
 pre-authorization in `CLAUDE.md` ("What needs David, and what does not"): a decision that
@@ -106,3 +106,12 @@ history of the call stays readable. If vetoes become common, the consequence lis
   says "we do not tell players motes are back". A shipped fix does not lift a hold, and reading
   the hold as thread-only would have been me lifting it. Note filed in `SCRIBE-FEEDBACK.md` for
   Helm; David is the courier. Version deliberately NOT bumped, so nothing can ship by accident.
+- **`all cleared` rather than `0 left` for a finished raid ledger**, and an over-counted ledger
+  says the same rather than `-2 left`. Bevel named the two states; the wording of the empty one
+  was left to me. Landed: a zero is a number to read, and that state is an achievement.
+- **Changed the Wealth CHIP only, not the Progress window's Wealth body.** Bevel's ruling was
+  justified with "window Wealth is coin too", which is not true — the window's Wealth tab still
+  draws Coin, Sold and Motes. Default it could have gone the other way: strip the body to match
+  the justification. Landed: the Motes card ships hidden, so for most profiles that block is the
+  only place mote rows appear, and removing a surface uninvited is exactly how #204/#210/#212
+  happened. Handed back to Bevel with the screenshot.

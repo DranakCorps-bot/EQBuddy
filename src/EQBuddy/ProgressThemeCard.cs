@@ -75,11 +75,11 @@ internal static class ProgressThemeCard
                 ProgressTab.Faction => Surfaces().Faction.Body,
                 _ => Surfaces().Experience.Body,
             },
-            // Bevel's line, verbatim, and it is the whole body of the room: Raids is a
-            // cleared/total ledger over six zones, which READS as a line and DRAWS as 29
-            // rows. The number is the answer; the rows are the window's job.
+            // The whole body of the room: Raids is a cleared/total ledger over six zones,
+            // which READS as a line and DRAWS as 29 rows. The words are in UI.Shared so the
+            // Avalonia card says them too when it lands.
             glanceFor: (_, _) =>
-                $"Raids — {raidsDefeated()} / {RaidTargetCatalog.Default.BossCount}",
+                ProgressTheme.RaidsGlance(raidsDefeated(), RaidTargetCatalog.Default.BossCount),
             render: (tab, s) =>
             {
                 switch (tab)

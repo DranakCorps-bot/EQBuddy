@@ -82,21 +82,62 @@ public class ProgressThemeTests
         Assert.Equal("1 faction", ProgressTheme.Faction(s));
     }
 
+    /// <summary>The Wealth badge is COIN ONLY (Bevel, Helm-signed 2026-08-22). It used to
+    /// carry the mote rate as well, from when Wealth was the tab that absorbed two cards;
+    /// #227 settled that Wealth is coin and the Motes card owns the rate, and the inline
+    /// card made the split visible — a chip naming a rate sat an inch above a body that
+    /// refused to.
+    ///
+    /// The negative is the half that matters: without it this passes on a badge that has
+    /// quietly grown the rate back for "consistency" with something.</summary>
     [Fact]
-    public void The_wealth_badge_carries_coin_and_the_mote_rate()
+    public void The_wealth_badge_is_coin_only()
     {
         var badge = ProgressTheme.Wealth(Farming());
 
-        Assert.Contains(StatsSnapshot.FormatCoin(51408), badge);
-        Assert.Contains("/hr", badge);
+        Assert.Equal(StatsSnapshot.FormatCoin(51408), badge);
+        Assert.DoesNotContain("/hr", badge);
+        Assert.DoesNotContain("mote", badge, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>"1 motes" is the same slip the Faction badge carried for months. It is
-    /// cheap to pin and it reads as carelessness on a surface people look at constantly.</summary>
+    /// cheap to pin and it reads as carelessness on a surface people look at constantly.
+    ///
+    /// Asserted against <c>MoteRate</c> itself now that the Wealth badge no longer carries
+    /// it — that string still reaches players, on the Motes card's own header in both
+    /// widgets, which is where #227 said the rate belongs.</summary>
     [Fact]
     public void One_mote_is_singular()
     {
-        Assert.Contains("1 mote ", ProgressTheme.Wealth(Farming(motes: 1)));
-        Assert.Contains("2 motes ", ProgressTheme.Wealth(Farming(motes: 2)));
+        Assert.Contains("1 mote ", ProgressTheme.MoteRate(Farming(motes: 1)));
+        Assert.Contains("2 motes ", ProgressTheme.MoteRate(Farming(motes: 2)));
+    }
+
+    /// <summary>
+    /// The Raids glance line says what the chip CANNOT (Bevel, Helm-signed 2026-08-22).
+    ///
+    /// The first build printed `Raids — 2 / 21` under a chip already reading `Raids 2 / 21`.
+    /// Both failure modes are pinned here: the twin (no second fraction, no second "Raids")
+    /// and the empty body, which is why the line still exists at all.
+    /// </summary>
+    [Fact]
+    public void The_raids_glance_carries_the_remainder_not_the_scoreboard()
+    {
+        var line = ProgressTheme.RaidsGlance(defeated: 2, total: 21);
+
+        Assert.Equal("19 left", line);
+        Assert.DoesNotContain("/", line);
+        Assert.DoesNotContain("Raids", line);
+        Assert.NotEqual("", line);
+    }
+
+    /// <summary>The one state that is an achievement rather than a measurement. "0 left"
+    /// is a number to read; this is not.</summary>
+    [Fact]
+    public void A_cleared_raid_ledger_says_so()
+    {
+        Assert.Equal("all cleared", ProgressTheme.RaidsGlance(defeated: 21, total: 21));
+        // A ledger that has somehow over-counted must not print "-2 left".
+        Assert.Equal("all cleared", ProgressTheme.RaidsGlance(defeated: 23, total: 21));
     }
 }

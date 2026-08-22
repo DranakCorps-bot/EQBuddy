@@ -57,6 +57,51 @@ David it needs a one-line ping rather than assuming it lands. I will also stop w
 
 ---
 
+## 2026-08-22 — Both rulings taken and re-shot. One line in your reasoning is not true yet
+
+**Both are in, both re-shot with the prediction written first**, and the pictures match:
+`theme-inline-raids.png` now reads **`19 left`** under a chip still reading `Raids 2 / 21`, and
+the Wealth pill is **`Wealth 5p 1g 4s 8c`** with the rate gone.
+
+**Reinforcing, and it is the reason the ruling was better than either option I offered.** I
+framed it as keep-the-line or delete-the-line. You refused both and named the actual rule —
+*the chip is the scoreboard, the line says what the chip cannot* — which produced an answer
+neither of my options contained. **A ruling that names the principle beats one that picks from
+the executor's menu**, because the principle travels: `RaidsGlance` lives in `UI.Shared`, so
+the Avalonia card says the same words when it lands, and PR 2's Glance rooms now have a rule to
+be written against instead of a precedent to copy.
+
+`all cleared` rather than `0 left` is mine, logged in `DECISIONS.md` — the one state that is an
+achievement rather than a measurement. A ledger that over-counts also says `all cleared` rather
+than `-2 left`; both are pinned.
+
+**Corrective, and it is the reason I did not do more than you asked.** Your Wealth ruling is
+justified with *"window Wealth is coin too"*. **That is not true today.** The Progress window's
+Wealth TAB still draws three blocks — Coin, "Sold to merchants" (24 rows), and Motes with the
+rate and the mote rows. It is in the shot you can see now: `progress-wealth.png`, re-taken this
+hour, bottom third.
+
+So I changed the CHIP, which is what you asked for, and left the body alone. **Whether the
+window's Wealth body should also become coin-only is a real question and it is yours** — and it
+is not a small one, because the Motes card ships hidden, so for most profiles that block is the
+only place the mote rows appear at all. Stripping it uninvited is how a fold loses a surface
+(the #204/#210/#212 shape).
+
+→ **The ask: when a ruling's REASON contains a claim about what the code currently shows, mark
+it as a claim.** I check them — that is the standing rule for all three channels — and this one
+cost nothing because it was checkable in one screenshot. But a justification that reads as
+established fact is the one an executor is likeliest to act on without looking.
+
+**Heights, taken as you framed them:** 386 lu was a cap and ~175 lu is the right SizeToContent
+outcome — that reframing is what makes the number make sense, and I have said so in the
+constant. 320 stands. **PR 2's pre-design ask is understood: rows-before-scroll per Full room**
+(Loot, Sky, Epic, Kills, Faction), and I will send the Progress shot with the 320 and the row
+count when I ask.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — PR 1 built to your table. Three pictures, and two things for you to rule on
 
 The Progress card expands in place on the WPF widget now, built to your Helm-signed table.

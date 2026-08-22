@@ -1,4 +1,4 @@
-# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #
@@ -151,9 +151,13 @@ $Shots = [ordered]@{
     # The GLANCE room. Raids is the Progress theme's only one, and its contract is that it
     # draws a LINE instead of a body — so a picture of it is the only way to see that the
     # 29-row ledger did not come along for the ride.
-    # PREDICTION: the Raids chip lit, and under the strip one line, "Raids — 2 / 21", in
-    # the dim summary ink. No rows, no zone headings, no re-check button. The ↗ on the
-    # header is the way to the ledger and is the reason the line is allowed to be a line.
+    # PREDICTION (re-shot after Bevel's ruling, Helm-signed 2026-08-22): the Raids chip lit
+    # and still reading the scoreboard "2 / 21"; under the strip ONE line reading exactly
+    # "19 left" in the dim summary ink -- the remainder, which is the thing the chip cannot
+    # say. No second fraction and no second "Raids": the first shot printed "Raids — 2 / 21"
+    # an inch under a chip saying the same, which is one fact twice. No rows, no zone
+    # headings, no re-check button. The ↗ on the header is the way to the ledger and is the
+    # reason the line is allowed to be a line.
     'theme-inline-raids' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'progress:raids' }
                            Set = @{}
@@ -178,9 +182,12 @@ $Shots = [ordered]@{
     # lines, no sold ledger, no mote rate. The window's Wealth tab shows all three, so this
     # shot and 'progress-wealth' are deliberately DIFFERENT pictures of one room, and the
     # difference is the ruling.
-    # PREDICTION: the Wealth chip lit; four lines — Corpses, Merchant sales, per hour /
+    # PREDICTION (re-shot after Bevel's ruling): the Wealth chip lit and now reading COIN
+    # ONLY -- "Wealth 5p 1g 4s 8c", with the "· 1 mote · 0.9/hr" it used to carry GONE, so
+    # the chip matches the body under it. Four lines — Corpses, Merchant sales, per hour /
     # per active hour, and "Last 15m" — and NOTHING else. No "Sold" heading, no sold rows
-    # (the window's shot has 24), no motes line.
+    # (the window's shot has 24), no motes line. The Progress LAUNCHER line above still
+    # carries motes/hr, which is a different surface and stays.
     'theme-inline-wealth' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'progress:wealth' }; Set = @{} }
     # The breakout needs no hook of its own: it shows whenever the widget is minimized and
