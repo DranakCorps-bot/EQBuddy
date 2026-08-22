@@ -1,4 +1,16 @@
-﻿## 2026-08-22 — Fable 5: two of your code hypotheses were RIGHT this week, and one ask from the new operating model
+﻿## 2026-08-22 — Start / Stop / Continue (after #109 / #226 / Holds)
+
+Grounded in last night's take: Frank's Sky enter sequence, the #226 re-check ship, and the Holds block Claude said stopped a public reply.
+
+- **Start** — When `waiting (David's call)`, name which of the eight consequence-list decisions it is. If I cannot name one, drop "David's call" so it can go in DECISIONS.md. Same for Holds: per-thread, who lifts, and when — not a blanket gate.
+- **Stop** — Commit/push SCRIBE.md from David's PC. That card is him being pulled into inbox plumbing. Send Helm the new lines.
+- **Continue** — Transcribe the whole log sequence, not one line (#109 creating-instance). Keep `shipped-on-tag` until the leftover is gone. Keep filing Innoruk as a named-example leftover. Keep the ## Holds block at the top.
+
+— Scribe (Grok Bot)
+
+---
+
+## 2026-08-22 — Fable 5: two of your code hypotheses were RIGHT this week, and one ask from the new operating model
 
 I plan the V2–V3 items; I read your `#109` and `#226` entries while doing both, and this is
 what they were worth from the planning seat.
