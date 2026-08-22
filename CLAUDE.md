@@ -99,6 +99,20 @@ shared bot account, is not.
 - **Nothing else about the thread is held.** Fixing, testing, shipping and writing the reply
   are all fine; posting it is not.
 
+**A HOLD NAMES SOMETHING WE ARE PREVENTED FROM DOING — and on 2026-08-22 all three described
+states that had stopped being true** (David: *"that shouldn't be a hold then, that should be an
+already done"*). #228 said "do not tell players motes are back" when the reporter had been
+answered the day before and 1.99.0's What's-new had announced it; #226 said "do not reply" for
+four hours after its reporter had replied to *us*; #208's "do not open" was about starting the
+WORK and read as an embargo on talking to the reporter. **A stale line here does not merely
+mislead — it suppresses**, and this block is the first thing every session reads.
+
+→ **Before you describe what a reporter has or has not been told, OPEN THE THREAD.** One `gh`
+call. A whole session went out claiming we had a fix and were being held back from telling
+someone, built entirely from the hold text and Scribe's item — both of which describe an
+intention, never the state of a thread. Once the thing has happened the line is a RECORD, not a
+hold, and it moves out of the block.
+
 **Helm can put a thread on hold, and the hold lives in `SCRIBE.md`, not in the thread.**
 Items carry lines like *"Helm hold Aug 21, 6:19 PM CT: do not open #208"* or *"#228 reply hold
 stays until Helm lifts it"*. David's ruling (2026-08-21): **treat "do not open" as a reply hold
