@@ -833,6 +833,119 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+    /// <summary>
+    /// STEP 0 of Fable's Avalonia-seam plan: does `main` ALREADY do a cross-window move?
+    ///
+    /// `ShowProgressWindow` builds a NEW `ProgressWindow` whenever the old one has closed,
+    /// and `IProgressHost.ProgressTabBody` hands the new window the SAME
+    /// `_progressTabBodies[...]` controls the previous one drew. That is a control moving
+    /// between two window roots — the operation that throws *"Attempt to call
+    /// InvalidateArrange on wrong LayoutManager"* and which Avalonia has had open as a bug
+    /// since 2023 (#12753, #17906, #21267; we ship 12.1.1). Inline themes ran into it, but
+    /// this path predates them and **no test has ever closed and reopened the window**.
+    ///
+    /// Fable's hypothesis, which this test exists to settle rather than argue: it survives
+    /// because a closed window's presentation source is cleared, so the check passes by
+    /// null and only two LIVE roots collide. If that is right this test passes and the
+    /// reopen path is safe; if it throws, players can already reach a crash by closing and
+    /// reopening Progress, and that is a release-blocking defect rather than a refactor.
+    ///
+    /// Either answer changes nothing about the plan — which is why it is worth one test.
+    /// </summary>
+    [AvaloniaFact]
+    public void ClosingAndReopeningTheProgressWindowDoesNotThrow()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        window.ShowProgressWindow("progress");
+        window.RenderSnapshotForTest(new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) });
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.ProgressWindowForTests);
+
+        // Close it. The widget drops its reference on Closed, so the next call builds a
+        // fresh window — and hands it the bodies the closed one was holding.
+        window.ProgressWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+
+        window.ShowProgressWindow("progress");
+        window.RenderSnapshotForTest(new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) });
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.ProgressWindowForTests);
+
+        window.ProgressWindowForTests!.Close();
+        window.Close();
+    }
+
+    /// <summary>The same path with a TAB CHANGE in between, which is the half that moves a
+    /// DIFFERENT body: reopening on Wealth hands the new window a control the old window
+    /// never held, while the one it did hold is still parented to the closed root.</summary>
+    [AvaloniaFact]
+    public void ReopeningTheProgressWindowOnAnotherTabDoesNotThrow()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        window.ShowProgressWindow("progress");
+        Dispatcher.UIThread.RunJobs();
+        window.ProgressWindowForTests!.SetTab("faction");
+        window.RenderSnapshotForTest(new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) });
+        Dispatcher.UIThread.RunJobs();
+
+        window.ProgressWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+
+        window.ShowProgressWindow("wealth");
+        window.RenderSnapshotForTest(new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) });
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.ProgressWindowForTests);
+
+        window.ProgressWindowForTests!.Close();
+        window.Close();
+    }
+
+    /// <summary>The same close-and-reopen for the other two theme windows, because the bug
+    /// was never about Progress — all three borrow the widget's single tab bodies through
+    /// the same shape (`LootTabBody`, `CreatureTabBody`). Fixing three windows and guarding
+    /// one is how the third regresses quietly.</summary>
+    [AvaloniaFact]
+    public void ClosingAndReopeningTheGearLootWindowDoesNotThrow()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        window.ShowGearLootWindow("loot");
+        Dispatcher.UIThread.RunJobs();
+        window.GearLootWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+
+        window.ShowGearLootWindow("loot");
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.GearLootWindowForTests);
+
+        window.GearLootWindowForTests!.Close();
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void ClosingAndReopeningTheCreatureWindowDoesNotThrow()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        window.ShowCreatureWindow(CreatureSurface.KeyFor(CreatureTab.Drops));
+        Dispatcher.UIThread.RunJobs();
+        window.CreatureWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+
+        window.ShowCreatureWindow(CreatureSurface.KeyFor(CreatureTab.Drops));
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.CreatureWindowForTests);
+
+        window.CreatureWindowForTests!.Close();
+        window.Close();
+    }
+
     /// <summary>AA display since the 2026-08-11 rethink: session-new AAs lead, the full
     /// character ledger folds behind the ▸ label (Pet-abilities idiom, WPF parity).
     ///

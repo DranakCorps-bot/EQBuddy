@@ -127,6 +127,14 @@ public sealed class ProgressWindow : Window
         };
         Closed += (_, _) =>
         {
+            // LET GO OF THE BORROWED BODY. The widget builds each tab body ONCE and every
+            // host borrows it, so a control this window is still parenting cannot be taken
+            // by the NEXT one — and reopening builds a new window. Without this line,
+            // close-then-reopen throws "already has a visual parent" the moment the new
+            // window asks for the same tab, which is a crash a player reaches with two
+            // clicks. Found 2026-08-22 by Fable's Step 0 reopen test; it had been reachable
+            // since these windows shipped, and no test had ever closed and reopened one.
+            _body.Content = null;
             // A closing window reports 0,0 on X11/Wayland; persist only what was seen
             // while it was on screen, else leave the saved spot alone (#169).
             var (curX, curY) = _seen.Or(_settings.ProgressLeft, _settings.ProgressTop);

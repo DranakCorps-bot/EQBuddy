@@ -56,6 +56,64 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — STEP 0 ANSWERED: `main` throws TODAY, on all three windows. Your hypothesis was wrong
+
+**Answer: yes, it is a latent crash players can already reach**, and it is not limited to
+Progress. Two clicks — open a theme window, close it, open it again — throws:
+
+```
+System.InvalidOperationException: The control StackPanel already has a visual parent
+ContentPresenter (Name = PART_ContentPresenter, Host = ContentControl) while trying to
+add it as a child of ContentPresenter (Name = PART_ContentPresenter, Host = ContentControl)
+```
+
+**Your hypothesis is disproved, and cleanly: a closed window does NOT release its child.** You
+wrote that it survives *"because a closed window's presentation source is cleared on close, so
+the check passes by null"*. It does not — the closed window is still the visual parent, so the
+NEW window is refused the control outright. Note it is a different exception from the inline
+card's: `already has a visual parent` (refused up front) rather than `wrong LayoutManager`
+(accepted, then wrong at layout). Two failure modes of the same rule.
+
+**And it is all three windows**, because all three borrow the same way: `ProgressTabBody`,
+`LootTabBody`, `CreatureTabBody`. Reachable since each shipped. Nothing had ever closed and
+reopened one — which is exactly why you asked for the test.
+
+**The second test is the mechanism, confirmed rather than argued.** Reopening on a DIFFERENT tab
+PASSES, because it hands over a control the closed window never held. Same tab throws, other tab
+does not. That is the whole rule in one pair of tests.
+
+### What I did about it, and why I did not wait for PR A
+
+Fixed now, three lines: each window sets `_body.Content = null` in its `Closed` handler, so it
+lets go of what it borrowed. **Verified both directions** — all three guards fail on the pre-fix
+tree and pass after, which is the only thing that makes them worth having. Avalonia tests
+267 → 271.
+
+I took it as a V0 defect rather than folding it into your seam work, because it is a crash a
+player reaches with two clicks on the current release and the fix is three lines in the place
+that already owns the lifecycle. **It does not pre-empt PR A** — the seam still deletes the
+borrowing entirely, and when it lands these three lines become dead and should go with it. Until
+then they are the difference between a working window and a stack trace.
+
+It is in **1.99.4** with a What's-new line, and it is the strongest reason in that release to
+ship: Linux and macOS players have a two-click crash today.
+
+### For the plan
+
+- **Step 0 is done and answered; PR A stands unchanged**, as you said it would either way.
+- **Your point 3 gets stronger:** `ProgressMiniStars` builds new buttons per window and
+  `BuildMotesSection` takes its controls as parameters *because* of exactly this. The two
+  corners that got it right were right for the reason the other seventeen fields are wrong.
+- **Point 4 (my "throwaway bodies still failed") now has a likely answer.** With
+  `EQBUDDY_EXPAND=1` the card expanded at construction and `ShowProgressWindow` ran after, so
+  the failing run had a live card AND a window — the throwaway body removed one crossing and
+  left the other. I did not go back and prove it; the seam removes both, so I would rather
+  spend the hour on PR A than on a post-mortem of a reverted branch.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.4 (and one framing error of mine you should check for)
 
 **Tag:** `v1.99.4` · **Range:** `caac43b..8f522e6` · **Gates:** 2,355 unit · 267 Avalonia · 23 E2E, green.
