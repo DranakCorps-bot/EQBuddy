@@ -214,7 +214,10 @@ public partial class CreatureWindow : Window
         $"dropsMobs={_drops.DebugMobCount} " +
         $"dropsRows={_drops.DebugRowCount} " +
         $"dropsItems={_drops.DebugItemCount} " +
-        $"dropsFilterLen={_drops.DebugFilterLength}";
+        $"dropsFilterLen={_drops.DebugFilterLength} " +
+        // The wiki re-check ↻ on every creature heading (#226). An absent control
+        // photographs as an unremarkable header (trap 29/34); this is the only cover.
+        $"dropsRecheck={_drops.DebugRecheckCount}";
 
     private void OnDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {

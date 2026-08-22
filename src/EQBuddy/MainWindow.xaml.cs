@@ -993,15 +993,40 @@ public partial class MainWindow : Window, ICardContext
         _ = LookupTargetAsync(name);
     }
 
-    private async Task LookupTargetAsync(string name)
+    /// <summary>Creatures whose page is being read AGAIN right now (#226). Separate from
+    /// the memo's null-means-in-flight, deliberately: a re-check keeps the OLD answer on
+    /// screen until the new one lands, so the memo entry is never nulled — nulling it
+    /// would read as "not checked yet" on a page that was.</summary>
+    private readonly HashSet<string> _rechecking = new(StringComparer.OrdinalIgnoreCase);
+
+    internal bool IsRechecking(string name) => _rechecking.Contains(name);
+
+    /// <summary>The Drops header's ↻ (#226): forget both stale layers — the disk cache
+    /// (Core) and this window's session memo — and read the page again, bypassing the
+    /// 7-day freshness rule. The rate rule lives in <see cref="WikiFreshness"/>.</summary>
+    internal void RecheckMobLookup(string name)
+    {
+        if (!WikiFreshness.CanRecheck(_targetResults.GetValueOrDefault(name)?.FetchedAt,
+                _rechecking.Contains(name), DateTime.UtcNow)) return;
+        _rechecking.Add(name);
+        _wikiMobs.Forget(name);
+        RefreshUi();
+        _ = LookupTargetAsync(name, bypass: true);
+    }
+
+    private async Task LookupTargetAsync(string name, bool bypass = false)
     {
         try
         {
-            var result = await _wikiMobs.LookupAsync(name, CurrentZoneName);
+            var result = await _wikiMobs.LookupAsync(name, CurrentZoneName, bypassCache: bypass);
             _targetResults[name] = result;
-            RefreshUi();
         }
         catch (Exception ex) { App.LogError(ex); }
+        finally
+        {
+            _rechecking.Remove(name);
+            RefreshUi();
+        }
     }
 
     /// <summary>Target-drops content shared by the Loot card's 🎯 block and the Loot

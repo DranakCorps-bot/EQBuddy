@@ -62,6 +62,12 @@ internal sealed class DropsCardView : IWidgetCard
 
     internal int DebugFilterLength => _filter.Text.Trim().Length;
 
+    /// <summary>How many creature headings carry the wiki re-check ↻ (#226). Reported
+    /// because an absent control photographs as an unremarkable header (trap 29/34);
+    /// a launched app asserting it equals the creature count is the only cover.</summary>
+    internal int DebugRecheckCount => _mobs.Children.OfType<Grid>()
+        .Count(g => g.Children.OfType<Button>().Any());
+
     public DropsCardView(MainWindow main)
     {
         _main = main;
@@ -160,8 +166,13 @@ internal sealed class DropsCardView : IWidgetCard
         // sentinel, the early-out fired, and the stale rows stayed on screen instead of
         // "Nothing matches that filter." The Avalonia twin had already fixed this; the
         // conversion is where the two lanes get to agree.
+        // The freshness caption rides the signature in BUCKETS (WikiFreshness), so a
+        // re-check that returns the same status still repaints its caption and a second
+        // passing does not (trap 8).
+        var now = DateTime.UtcNow;
         var sig = _filter.Text.Trim() + "\u0001" + string.Join("|", mobs.Select(m =>
-            $"{m.Name}:{m.Kills}:{string.Join(",", m.Loot.Select(l => $"{l.Item}{l.Count}{(int)Status(m, l)}"))}"));
+            $"{m.Name}:{m.Kills}:{WikiFreshness.SignatureToken(_main.WikiMobResult(m.Name), _main.IsRechecking(m.Name), now)}:"
+            + string.Join(",", m.Loot.Select(l => $"{l.Item}{l.Count}{(int)Status(m, l)}"))));
         if (sig == _signature) return;
         _signature = sig;
 
@@ -197,7 +208,7 @@ internal sealed class DropsCardView : IWidgetCard
                 e.Handled = true;
                 MainWindow.OpenWikiUrl(WikiLinks.Creature(_main.WikiMobResult(creature), creature));
             };
-            _mobs.Children.Add(header);
+            _mobs.Children.Add(HeaderRow(header, creature, now));
 
             foreach (var l in mob.Loot)
                 _mobs.Children.Add(ItemRow(l, mob.Kills, Status(mob, l)));
@@ -216,6 +227,46 @@ internal sealed class DropsCardView : IWidgetCard
             empty.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
             _mobs.Children.Add(empty);
         }
+    }
+
+    /// <summary>The creature heading as one row: the clickable name, then the wiki
+    /// re-check ↻ and its freshness caption (#226). A Grid, not a StackPanel: a
+    /// horizontal stack measures with infinite width and clips the caption silently
+    /// (trap 14). The button is an InlineIconButton — never a bare icon with a handler,
+    /// which hit-tests only where it is painted (trap 16). Disabled inside the 30 s rule
+    /// and visibly dim when it is, because the app's button style has no disabled look
+    /// of its own (trap 17).</summary>
+    private Grid HeaderRow(TextBlock name, string creature, DateTime now)
+    {
+        var lookup = _main.WikiMobResult(creature);
+        var inFlight = _main.IsRechecking(creature);
+        var row = new Grid();
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.Children.Add(name);
+
+        var recheck = DesignSystem.InlineIconButton("Refresh",
+            WikiFreshness.RecheckTip(lookup, inFlight, now),
+            (_, _) => _main.RecheckMobLookup(creature));
+        recheck.IsEnabled = WikiFreshness.CanRecheck(lookup?.FetchedAt, inFlight, now);
+        recheck.Opacity = recheck.IsEnabled ? 1 : 0.4;
+        recheck.VerticalAlignment = VerticalAlignment.Center;
+        recheck.Margin = new Thickness(Tok.SpaceXs, Tok.SpaceS, 0, Tok.SpaceXxs);
+        Grid.SetColumn(recheck, 1);
+        row.Children.Add(recheck);
+
+        var caption = new TextBlock
+        {
+            Text = WikiFreshness.Caption(lookup, inFlight, now),
+            FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(Tok.SpaceXxs, Tok.SpaceS, 0, Tok.SpaceXxs),
+        };
+        caption.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+        Grid.SetColumn(caption, 2);
+        row.Children.Add(caption);
+        return row;
     }
 
     /// <summary>One drop row, wired like the Loot card (David, 2026-08-07: "in the loot

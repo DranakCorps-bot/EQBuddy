@@ -761,6 +761,22 @@ Read this list before touching the areas it names. Every entry cost a release.
     through the real ⚙ picker, before and after. The reasoning had the mechanism right and
     the second half missing; the harness is what found it.
 
+39. **An assertion that compares `ToString()` of two objects can be comparing two TYPE
+    NAMES, and it passes forever.** `DropsRenderTests` proved the #211 fix ("the badge is a
+    clickable vector, not a glyph") by parsing the expected icon path and comparing
+    `StreamGeometry.ToString()` on both sides. Avalonia's `StreamGeometry.ToString()` returns
+    `"Avalonia.Media.StreamGeometry"` — so every icon equalled every other icon, and the
+    assertions that the Map badge and the Sparkle marker were drawn would have passed with a
+    Phone icon in their place. Found 2026-08-22 only because a NEW assertion counted: "two
+    re-check buttons" came back as four, which was every icon button in the view. Trap 34's
+    shape once more — a guard that cannot fail reads as coverage — with the twist that this
+    one was written *because of* a real bug, so it looked like the most trustworthy test in
+    the file.
+    → **Identity is a property you PUT on the object, not a string you hope it renders to.**
+    `DesignSystem.Icon` stamps the catalog name on `Tag` in both UIs; tests read that. And
+    **every equality assertion deserves one negative** — `DoesNotContain("Phone", icons)` is
+    what keeps it from going vacuous again.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

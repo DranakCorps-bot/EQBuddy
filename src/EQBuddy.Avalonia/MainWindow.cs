@@ -1864,6 +1864,25 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _ = LookupTargetAsync(name, CurrentZoneName);
     }
 
+    /// <summary>Creatures whose page is being read AGAIN right now (#226). Separate from
+    /// the memo's null-means-in-flight: a re-check keeps the OLD answer on screen until
+    /// the new one lands, so the memo entry is never nulled.</summary>
+    private readonly HashSet<string> _rechecking = new(StringComparer.OrdinalIgnoreCase);
+
+    public bool IsRechecking(string name) => _rechecking.Contains(name);
+
+    /// <summary>The Drops header's ↻ (#226): forget both stale layers and read the page
+    /// again past the 7-day rule. The rate rule lives in <see cref="WikiFreshness"/>.</summary>
+    public void RecheckMobLookup(string name)
+    {
+        if (!WikiFreshness.CanRecheck(_targetResults.GetValueOrDefault(name)?.FetchedAt,
+                _rechecking.Contains(name), DateTime.UtcNow)) return;
+        _rechecking.Add(name);
+        _wikiMobs.Forget(name);
+        RenderTargetDrops(CurrentSnapshot());
+        _ = LookupTargetAsync(name, CurrentZoneName, bypass: true);
+    }
+
     // ---- inventory (/outputfile inventory) ----
 
     private InventoryFile.Snapshot? _inventory;
@@ -5483,15 +5502,19 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _loot.ShowTargetDrops(names, detail, rows.Take(14));
     }
 
-    private async Task LookupTargetAsync(string target, string zone)
+    private async Task LookupTargetAsync(string target, string zone, bool bypass = false)
     {
         try
         {
-            var result = await _wikiMobs.LookupAsync(target, zone);
+            var result = await _wikiMobs.LookupAsync(target, zone, bypassCache: bypass);
             _targetResults[target] = result;
-            Dispatcher.UIThread.Post(() => RenderTargetDrops(CurrentSnapshot()));
         }
         catch (Exception ex) { App.LogError(ex); }
+        finally
+        {
+            _rechecking.Remove(target);
+            Dispatcher.UIThread.Post(() => RenderTargetDrops(CurrentSnapshot()));
+        }
     }
 
     private void OnDrag(object? sender, PointerPressedEventArgs e)

@@ -380,8 +380,34 @@ $Shots = [ordered]@{
     # docs/screenshots/drops-window.png, and a shot name IS a filename (trap 21) — renaming
     # it here would leave a broken image in the README and a stale PNG in the repo. The
     # TITLE had to change, because that is what the capture matches on.
+    # The wiki re-check ↻ and its freshness caption on every creature heading (#226).
+    # EVERY creature the fixture drops from is seeded, the same set as 'wiki-pack' below,
+    # because the shot is NOT offline: the first run seeded two pages and predicted
+    # "wiki not read yet" for the rest — and the app, correctly, fetched the rest live and
+    # captioned them "just now". A real state, a correct render, and a picture of the
+    # wrong fixture (trap 23). Seeding all of them is what makes the shot deterministic.
+    #
+    # PREDICTION, written before the shot: every heading reads "wiki read just now" with a
+    # DIM ↻ (inside the 30 s rule) EXCEPT Skeleton, seeded five days old, which reads
+    # "wiki read 5d ago" with a live ↻. Still inside the 7-day lifetime on purpose: older
+    # than that is expired, re-fetched live, and "just now" again.
     'drops-window'    = @{ Title = 'Kills & Drops'
-                           Env = @{ EQBUDDY_CREATURE = 'drops' }; Set = @{} }
+                           Env = @{ EQBUDDY_CREATURE = 'drops' }; Set = @{}
+                           Wiki = @{
+                               'Orc pawn' = @()
+                               'Puma' = @('Chunk of Meat')
+                               'Giant spider' = @('Spider Silk', 'Spider Legs')
+                               'Skeleton' = @{ Loot = @('Bone Chips', 'Rusty Scimitar'); AgeDays = 5 }
+                               'Asp' = @('Giant Snake Fang', 'Giant Snake Rattle', 'Snake Meat')
+                               'Large rattlesnake' = @('Snake Egg', 'Snake Fang')
+                               'Rattlesnake' = @('Snake Fang')
+                               'Willowisp' = @('Burned Out Lightstone')
+                               'Young kodiak' = @('Bear Meat', 'Chunk of Meat', 'Thick Grizzly Bear Skin')
+                               'Zombie' = @('Cloth Cape', 'Zombie Skin')
+                               'Ghoul' = @('Mote of Infinitesimal Potential')
+                               'Lesser mummy' = @('Rusty Morning Star', 'Splintering Club')
+                               'Plains cat' = @('Ruined Cat Pelt')
+                           } }
     'creature-kills'  = @{ Title = 'Kills & Drops'
                            Env = @{ EQBUDDY_CREATURE = 'kills' }; Set = @{} }
     # The quick tour's last page illustrates this window. Trap 22 applies hard: history
@@ -553,12 +579,20 @@ function Write-WikiCache([hashtable]$pages) {
         # state (PageHasNoLoot) and therefore renders perfectly plausibly: the first run
         # of this staging showed all thirteen creatures as "page lists no loot" and looked
         # like a correct screenshot of a wrong app.
-        $loot = (($pages[$title] | ForEach-Object { "{{:$_}}" }) -join ' ')
+        # A value is either the loot list, or @{ Loot = @(...); AgeDays = N } to stage a
+        # page read N days ago — how the Drops tab's freshness caption (#226) gets a
+        # state worth photographing. Keep it INSIDE the 7-day lifetime: a page older than
+        # that is expired, the app re-fetches it live, and the caption reads "just now" --
+        # a real state, and a picture of the wrong one (trap 23).
+        $entry = $pages[$title]
+        $items = if ($entry -is [hashtable]) { $entry.Loot } else { $entry }
+        $age = if ($entry -is [hashtable] -and $entry.AgeDays) { [int]$entry.AgeDays } else { 0 }
+        $loot = (($items | ForEach-Object { "{{:$_}}" }) -join ' ')
         $wikitext = "{{Namedmobpage`n|name=$title`n|zone=Test Zone`n|known_loot=$loot`n}}"
         @{
             Title = $title
             Wikitext = $wikitext
-            FetchedAt = (Get-Date).ToUniversalTime().ToString('o')
+            FetchedAt = (Get-Date).ToUniversalTime().AddDays(-$age).ToString('o')
         } | ConvertTo-Json -Depth 4 | Set-Content (Join-Path $dir $file) -Encoding UTF8
     }
 }

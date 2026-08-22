@@ -24,6 +24,10 @@ public interface IDropsHost
     Task<string?> FetchItemTooltip(string itemName);
     MobLookupResult? WikiMobResult(string name);
     void EnsureMobLookup(string name);
+    /// <summary>Read the creature's page again now, past the cache (#226). The host owns
+    /// both stale layers — the disk cache and its session memo — so it is the host's call.</summary>
+    void RecheckMobLookup(string name);
+    bool IsRechecking(string name);
     bool IsActiveQuestItem(string name);
     void OpenQuestInfoForItem(string itemName);
     /// <summary>#217 Ask 1: the contribution pack has its own window under Data &amp;
@@ -175,8 +179,13 @@ internal sealed class DropsCardView
         // with the reset sentinel — the pane kept its stale rows instead of saying "Nothing
         // matches that filter." Windows carried that bug until the same fold, where its
         // conversion took this line rather than the other way round.
+        // The freshness caption rides the signature in BUCKETS (WikiFreshness), so a
+        // re-check that returns the same status still repaints its caption and a second
+        // passing does not (trap 8).
+        var now = DateTime.UtcNow;
         var sig = (_filterBox.Text ?? "").Trim() + "\u0001" + string.Join("|", mobs.Select(m =>
-            $"{m.Name}:{m.Kills}:{string.Join(",", m.Loot.Select(l => $"{l.Item}{l.Count}{(int)Status(m, l)}"))}"));
+            $"{m.Name}:{m.Kills}:{WikiFreshness.SignatureToken(_main.WikiMobResult(m.Name), _main.IsRechecking(m.Name), now)}:"
+            + string.Join(",", m.Loot.Select(l => $"{l.Item}{l.Count}{(int)Status(m, l)}"))));
         if (sig == _signature) return;
         _signature = sig;
 
@@ -204,7 +213,7 @@ internal sealed class DropsCardView
             var creature = mob.Name;
             OnClick(header, () => MainWindow.OpenWikiUrl(
                 WikiLinks.Creature(_main.WikiMobResult(creature), creature)));
-            _mobsPanel.Children.Add(header);
+            _mobsPanel.Children.Add(HeaderRow(header, creature, now));
 
             foreach (var l in mob.Loot)
                 _mobsPanel.Children.Add(ItemRow(l, mob.Kills, Status(mob, l)));
@@ -352,6 +361,41 @@ internal sealed class DropsCardView
             }
             catch (Exception ex) { App.LogError(ex); }
         });
+    }
+
+    /// <summary>The creature heading as one row: the clickable name, then the wiki
+    /// re-check ↻ and its freshness caption (#226). A Grid, not a StackPanel: a
+    /// horizontal stack measures with infinite width and clips the caption silently
+    /// (trap 14). The button is an InlineIconButton — never a bare icon with a handler,
+    /// which hit-tests only where it is painted (trap 16). Disabled inside the 30 s rule
+    /// and visibly dim when it is (trap 17).</summary>
+    private Grid HeaderRow(TextBlock name, string creature, DateTime now)
+    {
+        var lookup = _main.WikiMobResult(creature);
+        var inFlight = _main.IsRechecking(creature);
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,Auto,*") };
+        row.Children.Add(name);
+
+        var recheck = DesignSystem.InlineIconButton("Refresh",
+            WikiFreshness.RecheckTip(lookup, inFlight, now),
+            () => _main.RecheckMobLookup(creature));
+        recheck.IsEnabled = WikiFreshness.CanRecheck(lookup?.FetchedAt, inFlight, now);
+        recheck.Opacity = recheck.IsEnabled ? 1 : 0.4;
+        recheck.VerticalAlignment = VerticalAlignment.Center;
+        recheck.Margin = new Thickness(6, 8, 0, 2);
+        Grid.SetColumn(recheck, 1);
+        row.Children.Add(recheck);
+
+        var caption = new TextBlock
+        {
+            Text = WikiFreshness.Caption(lookup, inFlight, now),
+            FontSize = 11, Foreground = AppTheme.DimBrush,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(4, 8, 0, 2),
+        };
+        Grid.SetColumn(caption, 2);
+        row.Children.Add(caption);
+        return row;
     }
 
     private static void OnClick(TextBlock block, Action action)

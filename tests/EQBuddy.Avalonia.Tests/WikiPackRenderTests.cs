@@ -33,6 +33,8 @@ public sealed class WikiPackRenderTests
         public Task<string?> FetchItemTooltip(string itemName) => Task.FromResult<string?>(null);
         public MobLookupResult? WikiMobResult(string name) => MobResult(name);
         public void EnsureMobLookup(string name) => LookupsFired.Add(name);
+        public void RecheckMobLookup(string name) { }
+        public bool IsRechecking(string name) => false;
         public bool IsActiveQuestItem(string name) => false;
         public void OpenQuestInfoForItem(string itemName) { }
         public void ShowWikiPack() { }

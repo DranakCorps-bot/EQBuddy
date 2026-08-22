@@ -51,9 +51,14 @@ internal static class DesignSystem
     /// <summary>One icon from <see cref="IconPaths"/>, as a vector — never a glyph.
     /// Emoji render at a size and weight the app does not control, and PRs #148 and #166
     /// exist because they failed to render at all in Wine prefixes.</summary>
+    /// <summary><c>Tag</c> carries the icon's catalog name, and it is the ONLY honest
+    /// identity a test has: <c>StreamGeometry.ToString()</c> returns the type name, so two
+    /// parsed geometries compare equal whatever they draw (trap 39 — the #211 vector
+    /// assertions matched any icon for a week without anyone knowing).</summary>
     public static PathIcon Icon(string name, string colorKey = "DimBrush",
         double size = 14, double opacity = 1.0) => new()
     {
+        Tag = name,
         Data = StreamGeometry.Parse(IconPaths.Path(name)),
         Foreground = AppTheme.BrushFor(colorKey),
         Width = size,

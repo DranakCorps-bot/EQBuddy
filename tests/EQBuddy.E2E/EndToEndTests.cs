@@ -164,6 +164,9 @@ public sealed class EndToEndTests
         app.WaitForDump("dropsRows", mobs + items,
             "a heading per creature above a row per drop");
         app.WaitForDump("dropsFilterLen", 0, "the filter box to start empty");
+        // Every heading carries the wiki re-check ↻ (#226). Asserted because an absent
+        // control photographs as an unremarkable header (trap 29/34).
+        app.WaitForDump("dropsRecheck", mobs, "a wiki re-check button on every creature heading");
     }
 
     [Fact]

@@ -36,6 +36,9 @@ public sealed class DropsRenderTests
         public Task<string?> FetchItemTooltip(string itemName) => Task.FromResult<string?>(null);
         public MobLookupResult? WikiMobResult(string name) => MobResult(name);
         public void EnsureMobLookup(string name) => LookupsFired.Add(name);
+        public List<string> Rechecks { get; } = [];
+        public void RecheckMobLookup(string name) => Rechecks.Add(name);
+        public bool IsRechecking(string name) => false;
         public bool IsActiveQuestItem(string name) => QuestItems.Contains(name);
         public void OpenQuestInfoForItem(string itemName) { }
         public int WikiPackOpened { get; private set; }
@@ -80,17 +83,55 @@ public sealed class DropsRenderTests
         // The two badges, as VECTORS. A glyph assertion could not tell an icon that is
         // drawn from one that is drawn AND clickable, which is the distinction #211 was.
         var icons = view.Body.GetLogicalDescendants().OfType<Button>()
-            .Select(b => (b.Content as global::Avalonia.Controls.PathIcon)?.Data?.ToString())
-            .Where(d => d is not null).ToList();
-        Assert.Contains(icons, d => d == Geometry("Map"));       // quest badge on Crude Stein
-        Assert.Contains(icons, d => d == Geometry("Sparkle"));   // new-to-wiki marker
+            .Select(IconName).Where(n => n is not null).ToList();
+        Assert.Contains("Map", icons);       // quest badge on Crude Stein
+        Assert.Contains("Sparkle", icons);   // new-to-wiki marker
+        // And a name that is NOT drawn here must not match — the assertion above was
+        // vacuous for a week (trap 39), and this is what keeps it from going vacuous again.
+        Assert.DoesNotContain("Phone", icons);
     }
 
-    /// <summary>Avalonia re-serializes a parsed geometry, so comparing to IconPaths.Path
-    /// directly does not work — the string coming back off a PathIcon is a normalized form
-    /// of the one that went in. Parse the expected side too.</summary>
-    private static string Geometry(string name) =>
-        global::Avalonia.Media.StreamGeometry.Parse(IconPaths.Path(name)).ToString();
+    /// <summary>The wiki re-check ↻ on every creature heading (#226), with its freshness
+    /// caption. Asserted rather than screenshotted, because an ABSENT control photographs
+    /// as an unremarkable header (trap 29/34). The moss snake's page was read just now,
+    /// so its button is inside the 30 s rule and disabled; the orc pawn's page was never
+    /// read, so its button is live — and pressing it reaches the host.</summary>
+    [AvaloniaFact]
+    public void EveryCreatureHeadingCarriesAWikiRecheckAndItsFreshness()
+    {
+        var host = new FakeHost
+        {
+            MobResult = name => name == "a moss snake"
+                ? new MobLookupResult(new MobInfo { Name = "a moss snake", PageTitle = "A Moss Snake" },
+                    ItemLookupState.Cached, DateTime.UtcNow)
+                : null,
+        };
+        var view = new DropsCardView(host);
+        view.Render(Snapshot());
+
+        var buttons = view.Body.GetLogicalDescendants().OfType<Button>()
+            .Where(b => IconName(b) == "Refresh")
+            .ToList();
+        Assert.Equal(2, buttons.Count);                       // one per creature heading
+        Assert.Contains(buttons, b => !b.IsEnabled);          // read just now → refused
+        Assert.Contains(buttons, b => b.IsEnabled);           // never read → allowed
+
+        var text = view.Body.GetLogicalDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
+        Assert.Contains("wiki read just now", text);
+        Assert.Contains("wiki not read yet", text);
+
+        var live = buttons.Single(b => b.IsEnabled);
+        live.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal(["orc pawn"], host.Rechecks);
+    }
+
+    /// <summary>Which catalog icon a button draws, by the name DesignSystem.Icon stamps
+    /// on its Tag. This REPLACES a helper that parsed the expected path and compared
+    /// ToString() on both sides: StreamGeometry.ToString() is the TYPE NAME, so every
+    /// icon compared equal to every other and the #211 assertions could not fail
+    /// (trap 39). Found when a count of two came back as four.</summary>
+    private static string? IconName(Button b) =>
+        (b.Content as global::Avalonia.Controls.PathIcon)?.Tag as string;
 
     [AvaloniaFact]
     public void FilterNarrowsAndReportsEmptiness()

@@ -167,7 +167,8 @@ internal static class DesignSystem
     {
         var icon = new Path
         {
-            Data = Geometry.Parse(IconPaths.Path(name)),
+            Tag = name,
+        Data = Geometry.Parse(IconPaths.Path(name)),
             Stretch = Stretch.Uniform,
             Width = size,
             Height = size,
