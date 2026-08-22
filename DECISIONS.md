@@ -195,3 +195,15 @@ one genuinely does. Each line below is a decision I made instead of a question I
 - **Two stay with David, and both belong to him:** the spawn-timer mega-thread (public posture
   under the project's name, consequence-list item 3) and the `/consider` park, which is his own
   decision — worth telling him only that #217 has since answered its destination question.
+
+## 2026-08-22 — David's three calls, asked with the question tool
+
+- **#228: star-only IS enough.** He ruled the lifting condition met. Recorded for Helm rather
+  than acted on: Helm's condition named him, but the LIFT is still Helm's, and he answered the
+  question rather than telling me to post. Nothing posted; he is carrying the note.
+- **Spawn-timer mega-thread: he took none of the three options.** *"We should have a way for
+  people to feed verified updates to EQLWiki."* So: no thread we host, and a new V2 in
+  `FABLE.md` instead. The redirect is better than any option I offered — a thread we host is a
+  second source of truth competing with the wiki, maintained by us forever.
+- **`/consider`: unparked, wiki half only.** The spawn-chip half stays parked. The wiki half now
+  has a reporter-confirmed, admin-backed destination; the chip half has neither.

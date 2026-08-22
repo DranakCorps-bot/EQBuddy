@@ -61,6 +61,53 @@ next loop, not a reopening of the plan.
 
 ---
 
+## A way for players to feed VERIFIED spawn-timer updates to eqlwiki
+
+- **Priority:** `ready` — David's own answer, 2026-08-22, asked with the question tool. He was
+  offered "host a community mega-thread" / "decline and point at eqlwiki" / "defer" and took
+  none of them: **"we should have a way for people to feed verified updates to EQLWiki."**
+- **Class:** `V2`. Not V0–V1 because the whole difficulty is the word **verified**, and no
+  answer from David settles it — the honesty bar is the design.
+- **Source:** Scribe's spawn-timer mega-thread item (long-standing, community ask: catalogs lag
+  and kill-to-kill does not determine a duration), redirected by David.
+
+### What he rejected, and why it matters to the shape
+
+A mega-thread we host would be a **second source of truth competing with eqlwiki** — the
+one-fact-two-sources problem, in public, with us maintaining it forever. The standing rule is
+that eqlwiki is the tie-breaker and a correction there helps every player and every other tool.
+So the answer is not a place to collect timers; it is a **path from a player's own observations
+into the wiki**, which is exactly the shape the loot contribution pack already has.
+
+### The hard part, stated plainly
+
+**Scribe's own argument against catalogs is also the argument against us suggesting timers:
+kill-to-kill does not determine a respawn duration.** A gap between two kills is an upper
+bound, and only sometimes that — the mob may have been up for an hour before anyone looked.
+And CLAUDE.md is unambiguous: *"a wrong respawn timer is worse than none"*, and curated timers
+are never auto-written.
+
+So the plan's real question is: **what evidence justifies suggesting a respawn_time to the
+wiki?** The loot pack already has an answer to the analogous question worth copying — the
+10-kill bar, and "no label at all when the sample is thin". Candidate sub-questions:
+
+1. How many corroborating cycles before a duration is suggestible, and must they agree within
+   what tolerance? `SpawnOverride.Learned` already exists and already refuses some cases.
+2. Does an observation from an INSTANCE ever count? (#109 says no for the timer; the wiki page
+   may be about the open-world spawn.)
+3. Triggered and raid-instanced entries have no cycle at all — they must never be suggested,
+   and today's `IsTriggered` / `RaidInstanced` fences are the existing machinery for that.
+4. Is this a new pack, or a section inside the existing contribution pack? `PageSkeleton`
+   already emits `| respawn_time  = ` as an empty field, which is a strong hint.
+
+### Already shipped (must not be fought)
+
+The contribution pack and its honesty rules; `SuggestRarity`'s thin-sample refusal; the
+triggered/raid-instanced suppression; `SpawnOverrides` and learned durations; the fact that the
+pack never publishes anything itself — the player opens the edit link, reviews, and saves.
+
+---
+
 ## The wiki pack reads one live session; it should read the history already on disk
 
 - **Priority:** `ready` — no consequence-list decision in it. It was filed as "David's scope

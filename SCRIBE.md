@@ -266,7 +266,7 @@ stops two voices on one account, and it is the half that worked.
 - **Where it might live:** hypothesis — a roll-up over stored Session History rows, not new collection.
 
 ### /consider rarity word (wiki + spawn timers)
-- **Priority:** waiting (ready when unparked — David parked /consider this morning. Verbatim lines are in; not approved to ship.)
+- **Priority:** UNPARKED 2026-08-22, WIKI HALF ONLY (David, asked with the question tool). Build the pack side: when the game itself called the creature rare in the player's own `/consider`, the pack offers a `description` line saying so — never a paste-over of an editor's existing prose, never inferred from kill counts, and never carried across characters. Destination confirmed by the reporter with the wiki admins (#217): description-field stopgap matching existing hand-edited precedent, moving to a real template parameter when one lands. **The spawn-chip half stays PARKED.** (was: David parked /consider this morning. Verbatim lines are in; not approved to ship.)
 - **Place:** log parse. Serves wiki confirmed-rare and #185 named-vs-townsfolk spawn chips. Not Gate 5 UI.
 - **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n; **verbatim lines #185 bjstrange Aug 19, 11:58 AM CT.** Did not reply — old thread, Claude already asked for the line.
 - **Ask:** use /consider text `a rare creature` as a confirmed rarity flag (wiki `rare=true`; spawn chips only for con-confirmed rares).
@@ -289,7 +289,7 @@ stops two voices on one account, and it is the half that worked.
   parameter when it lands. **This is now a BUILD, not a question.**
 - **STILL PLANNED, as its own thing rather than as Ask 3:** expose the con-confirmed-rare fact and put it on the CREATURE side of the pack ("the game called this a rare creature on N of your considers"), beside the level range and faction hits. **Blocked on a destination question that is Frank's to carry, and he was asked in the reply:** `{{Namedmobpage}}` as the pack fills it has no rare-spawn field (name, race, class, level, location, respawn_time, description, factions, opposing_factions, related_quests, known_loot), so it lands in `description`, the edit summary, or nowhere. He got the admins' ruling on common drops the same way. No date given to him.
 ### Spawn-timer mega-thread
-- **Priority:** waiting (David's call)
+- **Priority:** ANSWERED 2026-08-22 — he took none of the options offered. **NOT a mega-thread we host.** His words: *"we should have a way for people to feed verified updates to EQLWiki."* Filed to `FABLE.md` as a V2: the difficulty is the word *verified*, since kill-to-kill does not determine a duration and a wrong respawn timer is worse than none.
 - **Place:** catalog maintenance. Curated spawn timers are never auto-written. Not a feature gate.
 - **Source:** #185 n3cr0nk1tt3n Aug 18, 10:06 PM CT. Did not reply — Claude already answered.
 - **Ask:** a mega-thread for the community to add and update spawn timers, because catalogs lag and kill-to-kill does not determine duration.
