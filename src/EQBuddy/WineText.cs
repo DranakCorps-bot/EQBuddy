@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
@@ -12,56 +13,87 @@ namespace EQBuddy;
 /// default on <see cref="Window"/> and let the inherited attached property carry it down
 /// — is not reliable, and the first build of this fix shipped exactly that and did not
 /// change what the reporter saw. Property-value inheritance propagates a value that has
-/// been SET; a metadata default is not a set value, so each descendant goes on resolving
+/// been SET; a metadata default is not a set value, so each descendant went on resolving
 /// its own default from its own type's metadata, which is still Ideal. The window changes
 /// and nothing inside it does, which is indistinguishable from the fix not being in the
-/// build (and cost a round trip proving it was).
+/// build (and cost a round trip proving it was). See CLAUDE.md trap 41.
 ///
-/// So:
-///   1. the default is overridden on <see cref="FrameworkElement"/>, which makes Display
-///      the answer for every element on its own account, with no inheritance walk needed;
-///   2. and a class handler SETS it on each window as it loads, which is the one form
-///      inheritance is guaranteed to carry to children.
-/// Either alone would probably do. Both cost one call each, and the failure they prevent
-/// is invisible from this side of the machine.
+/// So the mode is SET on each window — the one form inheritance is guaranteed to carry to
+/// children — both as windows load and, when the player flips the switch in Options, on
+/// every window already open.
 /// </summary>
 internal static class WineText
 {
-    /// <summary>Must run before any Window is constructed — metadata overrides only
-    /// affect instances created afterwards, so a window built earlier would silently
-    /// keep the old default. App.OnStartup is the only place that is guaranteed.</summary>
-    public static void ApplyIfNeeded()
+    private static TextFormattingMode _mode = TextFormattingMode.Ideal;
+    private static bool _hooked;
+
+    /// <summary>Wire up before any window is constructed, so the first frame is already
+    /// correct rather than repainting once it loads.</summary>
+    public static void ApplyIfNeeded(AppSettings settings)
     {
-        if (Resolve() != TextLayoutMode.Display) return;
+        _mode = ToWpf(Resolve(settings));
 
-        // Text cosmetics must never stop startup (the WineFonts rule), and these two are
-        // independent: if the metadata override is refused, the class handler still lands.
-        Attempt(() => TextOptions.TextFormattingModeProperty.OverrideMetadata(
-            typeof(FrameworkElement),
-            new FrameworkPropertyMetadata(
-                TextFormattingMode.Display,
-                FrameworkPropertyMetadataOptions.Inherits)));
+        if (!_hooked)
+        {
+            _hooked = true;
+            // Every window, including the ones built in code long after startup. A
+            // per-window setter would have to be remembered by each future window, which
+            // is the shape of defect this codebase keeps paying for (traps 15, 29, 36).
+            Attempt(() => EventManager.RegisterClassHandler(
+                typeof(Window),
+                FrameworkElement.LoadedEvent,
+                new RoutedEventHandler((sender, _) =>
+                {
+                    if (sender is Window window)
+                        TextOptions.SetTextFormattingMode(window, _mode);
+                })));
+        }
 
-        Attempt(() => EventManager.RegisterClassHandler(
-            typeof(Window),
-            FrameworkElement.LoadedEvent,
-            new RoutedEventHandler((sender, _) =>
-            {
-                if (sender is Window window)
-                    TextOptions.SetTextFormattingMode(window, TextFormattingMode.Display);
-            })));
+        ApplyToOpenWindows();
+    }
+
+    /// <summary>Live, from the Options checkbox. TextFormattingMode is registered
+    /// AffectsMeasure, so setting it invalidates layout down the whole tree and the text
+    /// redraws in place — no restart, and no window has to be reopened.</summary>
+    public static void Reapply(AppSettings settings)
+    {
+        _mode = ToWpf(Resolve(settings));
+        ApplyToOpenWindows();
     }
 
     /// <summary>The mode this process should be using, for the probe to report. Kept
     /// beside the application of it so the diagnostic can never drift from the decision
     /// it is meant to be checking.</summary>
-    public static TextLayoutMode Resolve() => TextRenderingPolicy.Decide(
+    public static TextLayoutMode Resolve(AppSettings settings) => TextRenderingPolicy.Decide(
         WineFonts.IsRunningUnderWine(),
+        settings.WineWholePixelText,
         Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable));
+
+    /// <summary>Whether the player is offered the choice at all. Off Wine the switch has
+    /// nothing to change, and a control that cannot do anything is worse than an absent
+    /// one — it is the silent no-op rule with the switch on the other side.</summary>
+    public static bool IsOfferedHere() =>
+        WineFonts.IsRunningUnderWine() &&
+        Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable) is null or "";
+
+    private static void ApplyToOpenWindows()
+    {
+        Attempt(() =>
+        {
+            foreach (Window window in Application.Current.Windows)
+                TextOptions.SetTextFormattingMode(window, _mode);
+        });
+    }
+
+    private static TextFormattingMode ToWpf(TextLayoutMode mode) =>
+        mode == TextLayoutMode.Display ? TextFormattingMode.Display : TextFormattingMode.Ideal;
 
     private static void Attempt(Action action)
     {
         try { action(); }
-        catch (Exception) { /* see above: never fatal */ }
+        catch (Exception)
+        {
+            // Text cosmetics must never stop startup — the WineFonts rule.
+        }
     }
 }

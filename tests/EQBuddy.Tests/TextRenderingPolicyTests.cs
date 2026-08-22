@@ -12,7 +12,7 @@ public class TextRenderingPolicyTests
     public void WineGetsDisplay_BecauseIdealIsVisiblyBrokenThere()
     {
         Assert.Equal(TextLayoutMode.Display,
-            TextRenderingPolicy.Decide(underWine: true, overrideValue: null));
+            TextRenderingPolicy.Decide(underWine: true, wholePixelText: true, overrideValue: null));
     }
 
     /// <summary>Windows keeps WPF's own default. This fix is scoped to the environment
@@ -23,7 +23,7 @@ public class TextRenderingPolicyTests
     public void WindowsKeepsIdeal()
     {
         Assert.Equal(TextLayoutMode.Ideal,
-            TextRenderingPolicy.Decide(underWine: false, overrideValue: null));
+            TextRenderingPolicy.Decide(underWine: false, wholePixelText: true, overrideValue: null));
     }
 
     [Theory]
@@ -36,8 +36,8 @@ public class TextRenderingPolicyTests
     {
         // Both environments, because the escape hatch exists to overrule the default
         // and a hatch that only opens one way is half a hatch.
-        Assert.Equal(expected, TextRenderingPolicy.Decide(underWine: true, value));
-        Assert.Equal(expected, TextRenderingPolicy.Decide(underWine: false, value));
+        Assert.Equal(expected, TextRenderingPolicy.Decide(underWine: true, wholePixelText: true, value));
+        Assert.Equal(expected, TextRenderingPolicy.Decide(underWine: false, wholePixelText: true, value));
     }
 
     /// <summary>A typo must not leave the app with no policy — it falls back to what the
@@ -50,7 +50,41 @@ public class TextRenderingPolicyTests
     [InlineData(null)]
     public void AnUnrecognisedOverrideFallsBackToTheEnvironment(string? value)
     {
-        Assert.Equal(TextLayoutMode.Display, TextRenderingPolicy.Decide(true, value));
-        Assert.Equal(TextLayoutMode.Ideal, TextRenderingPolicy.Decide(false, value));
+        Assert.Equal(TextLayoutMode.Display, TextRenderingPolicy.Decide(true, true, value));
+        Assert.Equal(TextLayoutMode.Ideal, TextRenderingPolicy.Decide(false, true, value));
+    }
+
+    /// <summary>The switch the Options checkbox writes. It is the reason the whole thing
+    /// is a policy and not a constant: whole-pixel text fixes Wine's letter spacing and
+    /// costs sharpness above 100% widget scale, and which of those a player would rather
+    /// have is theirs to say.</summary>
+    [Fact]
+    public void TurningTheSwitchOffUnderWineGivesIdealBack()
+    {
+        Assert.Equal(TextLayoutMode.Ideal,
+            TextRenderingPolicy.Decide(underWine: true, wholePixelText: false, overrideValue: null));
+    }
+
+    /// <summary>Off Wine the switch is ignored outright rather than merely defaulted, so a
+    /// profile carried from a Wine machine cannot change a Windows widget's text mode
+    /// through a control the Windows UI never shows.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheSwitchCannotReachWindows(bool wholePixelText)
+    {
+        Assert.Equal(TextLayoutMode.Ideal,
+            TextRenderingPolicy.Decide(underWine: false, wholePixelText, overrideValue: null));
+    }
+
+    /// <summary>Precedence: the debug variable outranks the player's switch, both ways.</summary>
+    [Theory]
+    [InlineData("ideal", true, TextLayoutMode.Ideal)]
+    [InlineData("display", false, TextLayoutMode.Display)]
+    public void TheEnvironmentVariableOutranksTheSwitch(
+        string variable, bool wholePixelText, TextLayoutMode expected)
+    {
+        Assert.Equal(expected,
+            TextRenderingPolicy.Decide(underWine: true, wholePixelText, variable));
     }
 }

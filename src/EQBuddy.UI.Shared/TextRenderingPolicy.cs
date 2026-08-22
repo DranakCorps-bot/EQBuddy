@@ -49,13 +49,24 @@ public static class TextRenderingPolicy
     /// typo cannot leave the app with no text policy at all.</summary>
     public const string OverrideVariable = "EQBUDDY_TEXTMODE";
 
-    public static TextLayoutMode Decide(bool underWine, string? overrideValue)
+    /// <summary>Three inputs, in strict precedence: the environment variable is a debug
+    /// escape hatch and outranks everything; then the player's own switch, which only
+    /// has meaning where the choice exists; then the environment, which is the only
+    /// thing that decides it on Windows.
+    ///
+    /// <paramref name="wholePixelText"/> is <c>AppSettings.WineWholePixelText</c>. It is
+    /// deliberately ignored off Wine rather than merely defaulted: Ideal is correct on
+    /// Windows and there is nothing there for the switch to fix, so a profile carried
+    /// from a Wine machine cannot turn a Windows widget's text mode into a setting the
+    /// Windows UI never offered to change.</summary>
+    public static TextLayoutMode Decide(bool underWine, bool wholePixelText, string? overrideValue)
     {
         var requested = overrideValue?.Trim();
         if (string.Equals(requested, "display", StringComparison.OrdinalIgnoreCase))
             return TextLayoutMode.Display;
         if (string.Equals(requested, "ideal", StringComparison.OrdinalIgnoreCase))
             return TextLayoutMode.Ideal;
-        return underWine ? TextLayoutMode.Display : TextLayoutMode.Ideal;
+        if (!underWine) return TextLayoutMode.Ideal;
+        return wholePixelText ? TextLayoutMode.Display : TextLayoutMode.Ideal;
     }
 }

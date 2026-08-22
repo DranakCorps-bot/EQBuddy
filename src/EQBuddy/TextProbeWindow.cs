@@ -69,7 +69,7 @@ internal sealed class TextProbeWindow : Window
         _inherited = Fact("effective mode on a plain TextBlock: (measured on load)");
         body.Children.Add(_inherited);
         Loaded += (_, _) => _inherited.Text =
-            $"POLICY SAYS {WineText.Resolve()}  ->  a plain TextBlock in this window " +
+            $"POLICY SAYS {WineText.Resolve(Core.AppSettings.Load())}  ->  a plain TextBlock in this window " +
             $"actually resolves {TextOptions.GetTextFormattingMode(_inherited)}" +
             (TextOptions.GetTextFormattingMode(_inherited) == TextFormattingMode.Display
                 ? "   [applied]"

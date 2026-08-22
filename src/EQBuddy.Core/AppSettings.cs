@@ -80,6 +80,19 @@ public sealed class AppSettings
     /// the game's monitor or alt-tab a window over it. Companion to WineFloatOverFullscreen;
     /// both need the patched winemac.drv. See docs/CrossOver-macOS-overlay.md.</summary>
     public bool WineKeepGameFullscreen { get; set; }
+
+    /// <summary>Wine/CrossOver only: place every letter on a whole pixel. ON by default,
+    /// and on Windows it is read but never acted on (see UI.Shared/TextRenderingPolicy).
+    ///
+    /// It is a real trade and that is why it is a switch rather than a constant. Wine
+    /// truncates the fractional glyph advances WPF's default text mode relies on, so
+    /// words break apart mid-letter — "bun dles", "an d th is" — in text whose font
+    /// metrics are exactly right. Whole-pixel placement is the only mode Wine renders
+    /// correctly, so ON is the right default. But it snaps BEFORE the widget's UI-scale
+    /// transform, so above 100% the snapped text is resampled and goes soft (reported
+    /// from CrossOver on macOS, 2026-08-21, once the fix landed). A player who runs the
+    /// widget large may well prefer the sharper text and can turn it off here.</summary>
+    public bool WineWholePixelText { get; set; } = true;
     /// <summary>Global hotkeys, opt-in only (#100): action key → gesture text
     /// ("Ctrl+Alt+M"). EMPTY BY DEFAULT and stays that way unless the player binds
     /// keys in Options — the 1.12–1.34 era's default binds ate other apps' shortcuts
