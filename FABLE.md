@@ -61,6 +61,53 @@ next loop, not a reopening of the plan.
 
 ---
 
+## The wiki pack reads one live session; it should read the history already on disk
+
+- **Priority:** `ready` — no consequence-list decision in it. It was filed as "David's scope
+  call" and sat there; on David's instruction (2026-08-22, *"only elevate to me for items
+  appropriately needing my focus"*) I re-read it and it is not his — it is a design question
+  with a plan-shaped answer, which is yours.
+- **Class:** `V2`, and by your own test rather than by size: **no single answer from David
+  finishes it as V1.** The reporter names three open questions that each change the
+  architecture, and the data source moves from a live object to a query over stored archives.
+- **Source:** #217 Frankthetankk, ask 2.
+
+### The concrete miss, which is what makes it worth planning rather than shrugging at
+
+**Three 4-kill sessions never cross the 10-kill rarity bar, despite twelve real kills.** The
+pack's honesty rules are the reason: `SuggestRarity` refuses to label anything under 10 kills,
+deliberately, so a thin sample cannot become a confident wiki edit. That rule is right and must
+not be relaxed — the fix is to stop throwing away the evidence that would satisfy it.
+
+The same thinning hits **money-per-kill ranges**, **faction-hit reporting** ("no hits observed
+across N kills" is a claim about N) and **con-derived level ranges**, all of which widen with
+observations and all of which currently restart from zero every session.
+
+### What he asked that a plan has to answer
+
+1. **Pool across the account's characters, or stay per-character?** Not obvious: drop rates are
+   a property of the MOB and pool cleanly, but con-derived level ranges and faction hits are
+   observations made BY a character.
+2. **Any "since" filter?** Zones get retuned; a three-month-old drop rate may describe a mob
+   that no longer exists in that form. A pack that silently averages across a retune is
+   confidently wrong, which is the one thing this surface must not be.
+3. **Per-session vs all-time toggle, or neither?** He explicitly does NOT want a toggle. Worth
+   holding him to that or overruling it deliberately.
+
+### Where it fits
+
+This is the **all-time stats direction (#168 / #159)** — a query over archives already on disk,
+which is exactly how David framed that: not new collection. So it may be the first real
+consumer of that work rather than a detour from it, and the plan should say which.
+
+### Already shipped (must not be fought)
+
+Session-scoped export; `#74`'s archived-log review replaying one file at a time; the 10-kill
+rarity bar and the "no label when the sample is thin" rule; the wrong-article split and the
+motes exclusion that landed today.
+
+---
+
 ## Avalonia theme bodies need a seam before a card and a window can both host them
 
 - **Priority:** `ready` — no consequence-list decision in it. This is the blocker that stopped

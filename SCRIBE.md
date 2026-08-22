@@ -190,7 +190,7 @@ stops two voices on one account, and it is the half that worked.
 - **Checked:** those WhatsNew lines. Hypothesis, unchecked -- whether Mobile loot shows the same 🗺, and whether an item lookup that is not on a loot list has a quest list of its own.
 
 ### Mobile "New at level" lists quest-filter classes, not the class in play
-- **Priority:** waiting (David's call: live character class vs Quest Tracker class selection). Helm asked 2026-08-20; David skipped the prompt. Not authorized. Do not ping.
+- **Priority:** ROUTED to Bevel (2026-08-22) — it is a which-surface-owns-this-state question (a research filter driving a live panel, the shape that produced #212), not David's. Ask filed in `BEVEL-FEEDBACK.md`. Helm asked 2026-08-20; David skipped the prompt. Not authorized. Do not ping.
 - **Place:** Mobile Progress card. Phone surface.
 - **Source:** #223 bjstrange Aug 20, 10:59 AM CT. Replied 2026-08-20 (Scribe).
 - **Ask:** "New at level xx" on Mobile Progress should list unlocks for the class currently being played, not the classes selected on the Quest Tracker.
@@ -221,7 +221,7 @@ stops two voices on one account, and it is the half that worked.
 - **Checked:** not grepped this run. Hypothesis, unchecked -- UpdateOffer / family-channel path is the data source, not the What's-new popup.
 
 ### What's-new should cover skipped versions
-- **Priority:** waiting (David's call. Claude noted it on #218 so it is not lost.)
+- **Priority:** DONE — and it was already done when this was filed. `WhatsNewCatalog.EntriesBetween(lastSeen, current)` returns EVERY entry between the two versions, both widgets call it, and `WhatsNewTests` covers a multi-version hop (`1.21.0` → `1.23.0`) directly. **The "Already shipped" line below was wrong**, which is the exact rot the 2026-08-22 SSC promises to sweep: this item sat on David for something built long before it was filed.
 - **Place:** What's-new popup after an update. Not Gate 5.
 - **Source:** #218 n3cr0nk1tt3n Aug 19, 6:54 PM CT, second sentence. Did not reply -- Claude already answered.
 - **Ask:** when an update jumps more than one version, show a single stitched What's-new of every entry between the previous build and the latest, not only the build just installed. Reporter's reason for the hop behavior was possibly batched notes; they still want the missed notes if the hop is gone.
@@ -238,7 +238,7 @@ stops two voices on one account, and it is the half that worked.
 - **Follow-up Aug 21, 9:02 PM CT:** Frankthetankk on #109. Did not reply (old thread; he is answering Claude). Personal Plane of Sky instance, character name omitted. Verbatim sequence: `Player [name] creating instance The Plane of Sky 13931.` / `The Plane of Sky is now available to you.` / `LOADING, PLEASE WAIT...` / `You have entered The Plane of Sky.` No difficulty tier, no `- Solo` or `(Refined)` suffix. He says that enter line is indistinguishable from open-world Sky, so the existing instance-suppression rule cannot key off it; the only instance signal is the earlier `creating instance ... 13931` line, which he says does not look like other instanced zones. Offered more surrounding log if useful. Bzzazzt/Bazzzazzt elapsed vs countdown: he will check a screenshot and follow up separately. Hypothesis, now with a quoted enter line -- `InstanceTier` cannot treat this as an instance, so the raid-instance gate never fires for Sky. Do not treat `creating instance` as an instance-charge line (#221 is a different ask).
 
 ### Slow chip counter-type icon sits beside the word
-- **Priority:** waiting (David's call. Claude asked Frank two scoping questions 8/16; this is the answer.)
+- **Priority:** ROUTED to Bevel (2026-08-22) — product/UX, not David. The slow chip is an OVERLAY surface, so "does a glyph earn its space beside the word" is the surface-owner call Bevel makes. Ask filed in `BEVEL-FEEDBACK.md`.
 - **Place:** overlay slow chips. Not Gate 5.
 - **Source:** #94 Frankthetankk Aug 19, 1:46 PM CT. Old thread — did not reply.
 - **Ask:** draw a small custom vector icon to the left of the counter-type word on the slow chip face, without replacing the word. Dual-coding: icon + `disease` / `poison` / `curse` together. Do not use a Unicode glyph. Use the same bundled path-geometry set as the rest of the app (card headings, quest markers). Shapes and colors left to design.
@@ -246,7 +246,7 @@ stops two voices on one account, and it is the half that worked.
 - **Checked:** `SlowSpells.json` already has `counterType` per spell (Frank quoted Shiftless Deeds). `SlowChipText.Label` reads `s.CounterType` and writes the word + count only. `rg` of `IconPaths.cs` has no Disease / Poison / Curse keys. Hypothesis — a second vector keyed off catalog `counterType`, not the ChevronsDown kind mark, and not a Unicode stand-in. Data source is `SlowState.CounterType` from `SlowDebuffCatalog`, not the chip label string.
 
 ### Wiki pack should not suggest motes as creature drops
-- **Priority:** waiting (David's call)
+- **Priority:** DONE (2026-08-22, Claude, decided not asked). Motes are excluded from what the pack SUGGESTS — `WikiContribution.SuggestableToWiki`, following the wiki's own Mote Guide, so this is matching eqlwiki rather than departing from it and is not David's. **The client-side hide/ignore filter for common drops is NOT this and stays open**: the admins ruled common drops stay IN the suggestion, and Frank's own omit-from-wiki vs hide-from-my-view split is the reason both can be true.
 - **Place:** wiki contribution pack. Desktop contribution surface, not Gate 5.
 - **Source:** #217 Frankthetankk Aug 19, 12:58 PM CT. Old thread — did not reply.
 - **Also:** #226 LeBigNasty Aug 20, 5:12 PM CT (1.98.0). "It would be nice if you could filter out motes and things that can drop from everyone. For things like common drops like gems, it would be nice if the user can filter those out or right click to ignore." Motes corroborate this item. Gems/common-drop ignore is extra; not a second heading yet.
@@ -258,7 +258,7 @@ stops two voices on one account, and it is the half that worked.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
 
 ### Wiki pack should pool full session history
-- **Priority:** waiting (David's scope call)
+- **Priority:** MOVED to `FABLE.md` as a `ready` V2 plan (2026-08-22). Not David's: it is a design question with three open sub-questions the reporter named (pool across characters? a "since" filter for zone retunes? a toggle he explicitly does not want), and the data source moves from a live session object to a query over stored archives.
 - **Place:** the all-time stats direction (#168 / #159) — a query over archives already on disk. Fits where that plan is already heading. Not Gate 5.
 - **Source:** #217 Frankthetankk Aug 19, 5:26 AM CT, ask 2. Did not reply — Claude already answered.
 - **Ask:** Wiki export reads full Session History by default, not the live session. No per-session vs all-time toggle. Concrete miss: three 4-kill sessions never cross the 10-kill rarity bar despite 12 real kills. Same thinning on money/faction samples and con-derived level ranges. Open questions he named: pool across characters on the account, or stay per-character; any "since" filter for zone retunes.

@@ -67,6 +67,26 @@ public static class WikiContribution
             : WikiDropStatus.NewToPage,
     };
 
+    /// <summary>
+    /// Is this item worth SUGGESTING to a creature's wiki page?
+    ///
+    /// **Motes are not** (#217 Frankthetankk, #226 LeBigNasty; the wiki's own Mote Guide).
+    /// They drop from everything, so listing one under a creature's `known_loot` is not a
+    /// low-value edit — it is a WRONG one, and it would be wrong on every creature page a
+    /// player ever pastes.
+    ///
+    /// **This is not the same question as the common-drops one, and the difference is why
+    /// it can be decided here.** The wiki admins ruled that common or low-value drops stay
+    /// IN the suggestion, and that ruling stands: a cheap gem really did drop from that
+    /// creature. A mote did not come from that creature in any sense the page cares about.
+    /// Frank drew the same line himself — omit-from-wiki versus hide-from-my-view — and the
+    /// hide-from-my-view half is a separate display feature, not this.
+    ///
+    /// The player still sees their motes everywhere the app shows loot. This governs only
+    /// what gets pasted onto somebody else's wiki.
+    /// </summary>
+    public static bool SuggestableToWiki(string itemName) => !Motes.IsMote(itemName);
+
     /// <summary>A wiki rarity label the observation can honestly support, or null when
     /// the sample is too thin to label (the editor decides; the numbers still travel
     /// in the edit summary).</summary>
@@ -113,6 +133,7 @@ public static class WikiContribution
         {
             if (mob.Loot.Count == 0) continue;
             var news = mob.Loot
+                .Where(l => SuggestableToWiki(l.Item))
                 .Select(l => (Loot: l, Status: Classify(lookup, l.Item)))
                 .Where(x => x.Status is WikiDropStatus.NewToPage
                     or WikiDropStatus.PageHasNoLoot or WikiDropStatus.PageMissing)

@@ -171,3 +171,27 @@ history of the call stays readable. If vetoes become common, the consequence lis
   take-an-item-and-delete-it; a hold is never taken, it binds until Helm lifts it. Writing that
   distinction down is the point — treating a hold like a work item is how "a shipped fix lifts
   the hold" gets invented.
+
+## 2026-08-22 — clearing the `waiting (David's call)` pile
+
+David: *"only elevate to me for items appropriately needing my focus."* Six items sat on him;
+one genuinely does. Each line below is a decision I made instead of a question I asked.
+
+- **Motes are excluded from what the wiki pack SUGGESTS.** Could have gone: leave it for David
+  as filed. Landed: it FOLLOWS eqlwiki (its own Mote Guide says motes are not creature-specific),
+  and "departing from the wiki" is the thing on his list — matching it is not. Kept distinct
+  from the admins' ruling that common drops stay IN: a cheap gem really did drop from that
+  creature, a mote did not. `WikiContribution.SuggestableToWiki`, with the negative asserted.
+- **"What's-new should cover skipped versions" was CLOSED, not decided** — it was already built
+  before it was filed. `EntriesBetween` returns every entry between two versions and
+  `WhatsNewTests` covers a multi-version hop. The item's "Already shipped" line was wrong, which
+  is the rot Scribe's own SSC promises to sweep. Verified rather than assumed.
+- **The pack's session-vs-history scope went to `FABLE.md` as a V2, not to David.** It reads as
+  a scope call and is a design one: three open sub-questions the reporter named, and the data
+  source moves from a live object to a query over archives.
+- **Two UX items went to Bevel, not David** — the slow chip's icon (an overlay-space call) and
+  Mobile "New at level" using the played class rather than the Quest Tracker filter (a
+  which-surface-owns-this-state call, the #212 shape).
+- **Two stay with David, and both belong to him:** the spawn-timer mega-thread (public posture
+  under the project's name, consequence-list item 3) and the `/consider` park, which is his own
+  decision — worth telling him only that #217 has since answered its destination question.

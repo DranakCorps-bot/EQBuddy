@@ -369,4 +369,43 @@ public class WikiContributionTests
         Assert.DoesNotContain("Tainted Heart", export);
     }
 
+    /// <summary>
+    /// MOTES ARE NEVER SUGGESTED TO A CREATURE PAGE (#217 Frankthetankk, #226 LeBigNasty;
+    /// the wiki's own Mote Guide).
+    ///
+    /// They drop from everything, so a mote under a creature's `known_loot` is not a
+    /// low-value edit — it is a wrong one, and wrong on every page a player pastes.
+    /// </summary>
+    [Fact]
+    public void MotesAreNotSuggestedToTheWiki()
+    {
+        var mob = Mob("Orc Thaumaturgist", 12,
+            new MobLoot("Mote of Potential", 6, 50.0),
+            new MobLoot("Words of Cazic-Thule", 7, 58.3));
+
+        var text = WikiContribution.BuildExport(
+            [new(mob, PageWith())], "Dranak", "Legends", "Crushbone",
+            new DateTime(2026, 8, 8, 14, 0, 0));
+
+        Assert.DoesNotContain("Mote of Potential", text);
+        // The negative that matters: the REAL drop beside it still goes up. Without this
+        // the test passes on an export that suggests nothing at all.
+        Assert.Contains("Words of Cazic-Thule", text);
+    }
+
+    /// <summary>And the ruling it must NOT be confused with: the wiki admins said common
+    /// and low-value drops stay IN the suggestion. A cheap gem really did drop from that
+    /// creature; a mote did not, in any sense the page cares about.</summary>
+    [Fact]
+    public void OrdinaryCommonDropsAreStillSuggested()
+    {
+        var mob = Mob("a puma", 20, new MobLoot("Bone Chips", 18, 90.0));
+
+        var text = WikiContribution.BuildExport(
+            [new(mob, PageWith())], "Dranak", "Legends", "Crushbone",
+            new DateTime(2026, 8, 8, 14, 0, 0));
+
+        Assert.Contains("Bone Chips", text);
+    }
+
 }

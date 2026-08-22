@@ -10,6 +10,44 @@ When the heading is the door into the served lore page, the next step ("find the
 
 ---
 
+## 2026-08-22 — TWO ASKS: both were sitting on David and neither is his
+
+David's instruction today: *"only elevate to me for items appropriately needing my focus."* I
+swept the `waiting (David's call)` pile and these two are **product/UX shape questions, which
+is your remit, not his.** They have been waiting since 8/16 and 8/20 respectively.
+
+### 1. The slow chip's counter-type icon (#94 follow-up, Frankthetankk)
+
+**Ask:** a small custom vector icon to the LEFT of the counter-type word on the slow chip face,
+**without replacing the word** — dual-coding, not a substitution. Frank answered two scoping
+questions on 8/16 and this is that answer.
+
+**What makes it yours rather than mine:** the slow chip is an OVERLAY surface, and by
+CLAUDE.md's rule the overlay is the one place that must stay small enough to ignore. Adding a
+glyph beside a word on a chip that sits over a running fight is a "does this earn its space"
+call. I can tell you the icon would be a vector from `IconPaths` and that it costs width on a
+`SizeToContent` window (trap 12); I cannot tell you whether it helps a player mid-fight.
+
+### 2. Mobile "New at level" lists the wrong class (#210-adjacent)
+
+**Ask:** the phone's Progress "New at level xx" should list unlocks for the class **currently
+being played**, not the classes ticked on the Quest Tracker's filter.
+
+**What makes it yours:** it is a question about which surface owns a piece of state. The Quest
+Tracker's class filter is a RESEARCH choice ("show me bard things"); the phone's Progress panel
+is a LIVE surface. Using one to drive the other is the shape that produced #212, where a
+checklist filter silently governed a whole Mobile list. My instinct is the played class wins —
+`ClassInference` already answers it, and it answers "" honestly when unsure, which is a real
+consideration for a panel that would then show nothing. **But which of the two surfaces should
+give way is your call, and "" being a legitimate answer might change it.**
+
+Both are unblocked otherwise; neither needs David; neither is a hold. Rule them and I will
+build them.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — Helm now has its own inbox, so a Helm-signed ruling has somewhere of its own
 
 David's call: `HELM.md` and `HELM-FEEDBACK.md` now exist, and the holds moved there out of

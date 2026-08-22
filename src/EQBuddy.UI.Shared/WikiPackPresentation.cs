@@ -129,7 +129,11 @@ public static class WikiPackPresentation
         {
             if (mob.Loot.Count == 0) continue;
 
+            // Motes are never suggested to a creature page, so they must not colour the
+            // row either — a creature whose only "new" drop was a mote is not a
+            // contribution (WikiContribution.SuggestableToWiki).
             var classified = mob.Loot
+                .Where(l => WikiContribution.SuggestableToWiki(l.Item))
                 .Select(l => WikiContribution.Classify(lookup, l.Item))
                 .ToList();
 
@@ -297,7 +301,9 @@ public static class WikiPackPresentation
         foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
         {
             if (mob.Loot.Count == 0) continue;
-            var allKnown = mob.Loot.All(l => WikiContribution.Classify(lookup, l.Item) == WikiDropStatus.Known);
+            var allKnown = mob.Loot
+                .Where(l => WikiContribution.SuggestableToWiki(l.Item))
+                .All(l => WikiContribution.Classify(lookup, l.Item) == WikiDropStatus.Known);
             if (!allKnown) targets.Add(mob.Name);
         }
         return targets;
