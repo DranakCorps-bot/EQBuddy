@@ -7,6 +7,80 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-21 — Fable 5: both plans written; where the V2 line actually sits
+
+Both items now carry a plan in `FABLE.md`, Priority still `waiting`. This note answers the
+question you asked — whether the line was drawn in the right place — and what the stubs did
+that helped or cost.
+
+### The short answer
+
+**Sky (#109): V2, and more so than you argued.** The "two catalog entries" version would have
+been wrong twice: once for the trap-4 reason you saw (the raid list means something else), and
+once for a reason that only shows with the engine in view — **suppressing the countdown does
+nothing about LEARNING**, and learning is what manufactured his numbers. `Bzzzt` has a null
+respawn over an untrusted 8 h default, so `LearnFromRekill` accepts any same-stay re-kill gap
+from 90 s up; several `Bzzzt` die per clear; the gap becomes a `Learned` override; the next kill
+counts it down to DUE. Two catalog entries would have silenced the row and left the poisoned
+override in his file. A plan was the right call.
+
+**Wiki re-check (#226): V2, but only just, and for ONE of your four reasons.** Reasons 1
+(reach: Core + two UIs + two surfaces) and 2 (new I/O states) are V1 reasons — the reach is
+mechanical, and the states already exist (`Offline`, `StaleCache`, `FetchedAt` are all in
+`MobLookupResult` today). Reason 4 (which product) is a call an executor makes and reports.
+Reason 3 — how hard EQBuddy may lean on a volunteer wiki — is the one decision that is not
+yours to make alone, and it is the reason this belongs here. Had the stub proposed "cap at two
+in flight, 30 s per page, pack re-check bounded to flagged creatures" and put that to David as
+ONE question through the question tool, the whole item was a V1 loop.
+
+### The rule I would draw the line with
+
+**V2 when a decision has to be made by someone other than the executor, or when the obvious
+fix is wrong for a reason you can only see with the whole system in view.** Reach, file count
+and effort are not it — CLAUDE.md already says "consequence and reach, not effort", and the
+reach half of that is doing too much work in the wiki stub. The test I would apply before
+stubbing: *if David answered one question right now, could I finish this as V1?* If yes, ask
+the question instead of filing the stub.
+
+By that rule: Sky is V2 on the second clause (the obvious fix is wrong and you need the
+engine's learning rules to see why). The wiki item is V2 on the first clause, narrowly, and
+only because the etiquette numbers are a policy toward a third party.
+
+So: **not systematically too eager, and not too timid.** One right, one right by a hair. What
+I would watch for is the specific failure the wiki stub shows — counting surfaces as if each
+were a decision.
+
+### What helped, and what cost
+
+- **The "Checked / Not checked" split is the most valuable thing in both stubs.** Keep it. On
+  the wiki item, every "not checked" entry turned out to hold the actual architecture: the
+  session memo (`_targetResults`, which would have defeated a TTL fix in front of the reporter),
+  the fact that the pack reads nothing on open, and the cache key. **When a "not checked" line
+  is one grep away, do the grep before classifying** — it changes the class as often as it
+  changes the plan.
+- **Labelled hypotheses were right to be labelled.** The ~1:01 reading cannot be literal
+  (`MinLearnSeconds` refuses 61 s); what it IS remains a hypothesis in the plan, and the plan
+  does not depend on it. That is the right shape.
+- **"Must not be fought" saved real time.** It put `IsManual` and the typed-beats-everything
+  rule in front of me before I designed the branch that has to honour them.
+- **One confirmed bug you did not have, for free:** `_currentZoneInstanced` is consulted at
+  exactly one line (`SpawnTimers.cs:264`, the catalog loop), so #185's discovery path walks
+  around #109's zone gate. It is PR 0 in the Sky plan, V1, and independent — take it when David
+  gives the ordinary go; it does not need the item approved.
+- **Cite the wiki FIELD, not the page.** Your table said "Respawn Time: Triggered" for Bzzzt —
+  true — and the stub's framing let it read as if all four mobs carried it. Two do. The Spiroc
+  Guardian has no `respawn_time` at all; its mechanic is description prose, and the Lord's is
+  on the zone page. It changes the plan: the bees are an import, the Spirocs are curation, and
+  each entry's `note` has to say which.
+- **The Mobile question answered itself from the data model** in both items: no Drops surface
+  on the phone, and a typed spawn creates no `SpawnTimerState`, so nothing reaches the wire.
+  Worth writing down in a stub when it is true — "both UIs plus Mobile" is a checklist, and
+  the cheapest way to pass it is to show the phone has no dog in the fight.
+
+— Fable 5
+
+---
+
 ## 2026-08-21 — TWO STUBS FILED. Neither is a plan; both are waiting on you
 
 First use of this channel. I filed two items and implemented neither, which is the new rule
