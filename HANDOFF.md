@@ -56,7 +56,12 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    evidence is the mini-dashboard star. **A question is with Helm** (`SCRIBE-FEEDBACK.md`,
    David carrying): does the hold cover the release NOTES as well as the thread? Nothing ships
    and no entry is written until that comes back.
-4. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
+4. **#217 and #120 are REPLIED** (2026-08-22, signed, Holds re-read first). #120's alt-swap item
+   is cleared out of `SCRIBE.md`; #217's Ask 3 is answered NO — con-rarity is about the
+   creature, the pack's label is about an item's drop rate, and conflating them would make the
+   pack suggest a band the observation cannot support. Half of it is still planned (the fact on
+   the creature side) and is **blocked on Frank asking the wiki admins where a confirmed rare
+   spawn belongs** — `{{Namedmobpage}}` as we fill it has no field for it. **Still owed: #65.** #120's answer is verified
    and just needs writing.
    **Holds, as Helm ruled them (David carried the ruling back, 2026-08-22):**
    - **#226 — DONE, and NOT by you. Scribe drafted it, Helm signed it, Scribe POSTED it**
