@@ -780,6 +780,36 @@ Read this list before touching the areas it names. Every entry cost a release.
     everything about the file that is not a cmap entry (trap 34's shape exactly). Verified by
     running the new test against the pre-fix tree: 9 of 10 rows fail there.
 
+40. **Correct font metrics and wrong glyph positions look identical to the person reporting
+    it — and the word they will use is "kerning".** The same 2026-08-21 CrossOver report
+    that produced trap 39 did NOT go away when the missing weights shipped, because the
+    weights were never its cause. Measuring the reporter's screenshot settled it in one
+    pass: the line was 360px wide against the font's predicted 361.9px, all ELEVEN word
+    spaces landed within a pixel of prediction, the letterforms were the bundled font's,
+    and the line pitch (16.4px vs a predicted 16.34px) proved it was rendering 1:1 at 96
+    DPI with no scaling. Everything the font is responsible for was right. What was wrong
+    was five 1-2px gaps *inside* words — "an d th is", "bun dles", "Win e".
+    → **Wine truncates the fractional glyph advances WPF's default `TextFormattingMode.
+    Ideal` depends on**, instead of carrying the remainder, so text creeps left until the
+    accumulated error flushes as a visible gap mid-word. `Display` uses whole-pixel
+    advances and is the only mode Wine renders correctly. **No .ttf can reach this**, which
+    is why a rebuilt font changed nothing.
+    → **Now guarded:** `UI.Shared/TextRenderingPolicy` decides per environment (Wine →
+    Display, Windows → Ideal, `EQBUDDY_TEXTMODE` overrides either way) and is unit-tested;
+    `WineText` applies it with one `OverrideMetadata` call on `Window`, before any window
+    exists, because the property inherits.
+    → **The measurement is the lesson, not the fix.** Two plausible theories died to
+    arithmetic that took a minute each — synthetic bold (real defect, wrong cause) and DPI
+    virtualisation (killed by the line pitch). **A screenshot of text is quantitative
+    evidence**: predicted advances, word-space positions and line pitch are all computable
+    from the shipped `.ttf`, and they say which layer is lying. Measure before theorising.
+    → **And when it is still ambiguous, put the instrument IN the app.** `TextProbeWindow`
+    (`--textprobe`) renders one sentence under all eight TextFormattingMode ×
+    TextRenderingMode combinations and reports which face WPF resolved for each weight.
+    One screenshot from the reporter answered what three rounds of hypothesis had not —
+    including confirming, incidentally, that the trap 39 font DOES group its three weights
+    correctly under Wine.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

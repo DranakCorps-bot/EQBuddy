@@ -88,6 +88,11 @@ public partial class App : Application
         // Under Wine only: swap in the bundled icon font so section icons render
         // instead of boxing — the whole story lives in WineFonts.cs.
         WineFonts.ApplyIfNeeded(Resources);
+        // And under Wine only: whole-pixel glyph positioning. Wine truncates the
+        // fractional advances WPF's default Ideal mode relies on, which pulls letters
+        // apart mid-word ("an d th is") in text whose font metrics are perfectly
+        // correct — see TextRenderingPolicy for the measurements. Before any window.
+        WineText.ApplyIfNeeded();
         Core.CoreLog.Sink = LogError;
         // The probe reads settings and never writes them, so it does not need the
         // profile lock — and taking it would make the diagnostic impossible to run in

@@ -19,14 +19,22 @@ namespace EQBuddy;
 /// rasterisation-side defect, and no .ttf we build can reach it.
 ///
 /// So: stop theorising and photograph the answer (trap 33 — "ship the instrument before
-/// the third theory"). One screenshot of this window says which font WPF actually
-/// resolved, which faces it found for each weight, and whether any combination of
-/// TextFormattingMode/TextRenderingMode renders the sample cleanly. If Display looks
-/// right and Ideal does not, the fix is a formatting mode and not a font; if every cell
-/// is equally bad, it is below WPF and the next suspect is the process-wide
-/// SoftwareOnly render mode.
+/// the third theory").
 ///
-/// Delete this file once the answer is in the trap list.
+/// **It answered, in one screenshot, on the first run.** Under CrossOver:
+///   - the font was never in doubt after all — Normal/SemiBold/Bold each resolved to
+///     their own pack:// face at 400/600/700, so the three-weight family groups
+///     correctly under Wine and the earlier fix landed exactly as intended;
+///   - every TextFormattingMode.Ideal cell split the sample's 12 words into 17 pieces;
+///   - every TextFormattingMode.Display cell rendered exactly 12, words intact;
+///   - TextRenderingMode changed NOTHING, in either mode — all four values identical.
+/// The fix is <see cref="WineText"/>; the reasoning is in TextRenderingPolicy.
+///
+/// **Kept rather than deleted.** It is opt-in and inert, it is the only thing in the app
+/// that can say which face WPF actually resolved, and the next report of this shape will
+/// want exactly this picture. Note it deliberately sets the two modes on its own samples,
+/// so it still shows the BEFORE alongside the after even now that Wine defaults to
+/// Display — a probe that inherited the fix would have nothing to compare against.
 /// </summary>
 internal sealed class TextProbeWindow : Window
 {
