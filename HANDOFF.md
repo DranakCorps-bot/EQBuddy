@@ -8,7 +8,80 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (latest): the DO NEXT list is cleared; Inline themes waits on Bevel
+## 2026-08-22 (LATEST — start here): 1.99.3 is ready and waiting on David's GO, nothing else blocks
+
+**Gates at `ee8c97a`: 2,349 unit · 267 Avalonia · 19 E2E.** `Directory.Build.props` says
+**1.99.3** with five What's-new entries. **Both release gates are satisfied** — Fable reviewed
+it and its three conditions are met; Bevel found no product hold. **The only thing missing is
+David saying ship.** Ask him; do not re-run the review.
+
+### The release gate, now that it has run twice
+
+**Order: gates green → Fable reviews the release → THEN ask David.** File the request in
+`FABLE-FEEDBACK.md` with the tag, the commit range and the gate numbers. It has earned itself
+both times: 1.99.2 caught two missing CREDITS, and 1.99.3 caught a **false safety claim of
+mine** (I told Fable `AppSettings.Load` never writes — it ends with a `Save()` when it
+migrates, and `--textprobe` skipped the single-instance lock while calling it twice). All
+fixed; trap 13 now carries the exception in writing.
+
+**And when you are waiting on ANY agent, re-read the `*-FEEDBACK.md` you asked in FIRST** —
+not `git log`, not the inbox. Fable's first review sat answered in the working tree while this
+session reported it outstanding. Note the asymmetry: **I write to `*-FEEDBACK.md`; Bevel and
+Scribe answer in their own inbox (`BEVEL.md`/`SCRIBE.md`); Fable answers in `FABLE-FEEDBACK.md`.**
+
+### Holds — read this before ANY public reply
+
+**David ruled 2026-08-22: Helm's holds BIND you, and only Helm lifts them.** It is the one
+place a bot outranks your standing authority to post routine signed replies. **A shipped fix
+does NOT lift a hold** — #226 and #228 both shipped while held, and wanting to tell a reporter
+their bug is fixed is exactly the pressure the hold exists to resist. **You cannot reach Helm;
+David is the courier.** Current: **#226, #228, #208** (`SCRIBE.md`, top block).
+
+Replies for #226 and #228 are written and go out within a minute of a lift. A report that both
+may be stale is in `SCRIBE-FEEDBACK.md` awaiting David's ping to Helm.
+
+### DO NEXT
+
+1. **Ask David for the 1.99.3 go.** Then `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.3`.
+2. **Inline themes PR 1 — Progress, both UIs.** PR 0 (Core `InlineModeFor` + `ThemeHost`) is
+   shipped and dormant; Bevel's pre-design is IN and Helm-signed. Build to:
+   - Heights (Bevel, build-to estimates): Progress/Quests/Gear **386 lu (483 px @125%)**,
+     Kills **356 lu (445 px @125%)**. Body `MaxHeight`: **280, or reuse `GearCardView`'s 320 —
+     Bevel delegated the pick to me and I deliberately have not chosen. Pick it on PR 1's first
+     screenshot and send Bevel the picture with the number on it.**
+   - **Fable's PR 0 note, not yet done:** the theme WINDOW must call `ThemeHost.SelectTab` when
+     its own tab changes, or "closing the window hands the tab back to the card" is only true
+     when the player never switched tabs in the window.
+   - E2E facts must be pinned BEFORE the move (`progressInline`, `progressTab`, `progressTabs`,
+     `progressWindowOpen` in `EQBUDDY_EXPAND`); retire `BreakoutKind.Progress` and check
+     `scripts/shoot.ps1`'s `mini-bar` hand-written enum list (trap 30).
+3. **Community threads awaiting a reply and NOT held:** **#217** (Frankthetankk, rarity
+   hookup), **#120** (his alt-swap question — **already answered and verified**, the reply just
+   needs writing: no flip-flop, the reading never names the class you are not playing and every
+   change passes through ""), **#65**. **#226 is held.**
+4. **Open, unstarted:** the Innoruk lore-page leftover (#226), #230 "what drops do I need by
+   boss" (eddyystop), #210 (liminalwarmth), Mobile alert sounds (#208, decided opt-in/off,
+   held), `LogWatcher` shutdown race, `LanAddresses()` on Tailscale.
+
+### What shipped today
+
+**1.99.2** (Fable's H4 defect — the re-check's `Forget` losing the offline fallback — plus
+Bevel's four post-hoc calls). **PR #231 merged** (`15e2495`, quasarj: Wine/CrossOver letter
+spacing, the two missing font weights, small caps) — reviewed properly, his traps renumbered to
+**40–42**, credited in `NOTICE` and What's-new, and **he has been replied to**. Then Fable's
+1.99.3 fixes, and the share-import preview that had been promising to apply rows the engine
+refuses (found by Fable outside its own four questions).
+
+### Feedback is a RULE now, not a courtesy
+
+Every agent you took from or that reviewed you gets a note in its `*-FEEDBACK.md` **every
+round** — corrective, constructive **and reinforcing**. The third is the one that gets skipped
+and the one that makes an agent file more of what works. All three gave Start/Stop/Continue on
+2026-08-22; read them before the next round.
+
+---
+
+## 2026-08-22: the DO NEXT list is cleared; Inline themes waits on Bevel
 
 **1.99.2 shipped** through the new gate (Fable reviewed → two credit edits → David's go).
 Since then, working the list in order:
@@ -41,7 +114,7 @@ told his PR is merged** — that reply is held too. Nothing was posted today.
 
 ---
 
-## 2026-08-22 (latest): 1.99.2 SHIPPED through the new release gate — Fable reviewed, then David
+## 2026-08-22: 1.99.2 SHIPPED through the new release gate
 
 **The gate ran for the first time and worked.** Fable's release review (`61e750f`) said ship
 with two What's-new **credit** edits — the Sky entry credited nobody though the load-time heal
@@ -77,7 +150,7 @@ three inboxes and GitHub — never the `*-FEEDBACK.md` it had asked in. **Rule a
 
 ---
 
-## 2026-08-22 (latest): 1.99.2 built and WAITING ON FABLE'S RELEASE REVIEW — do not ask David yet
+## 2026-08-22: 1.99.2 built, waiting on Fable (historical)
 
 **Two standing rules landed today (David, 2026-08-22), both in `CLAUDE.md`:**
 
