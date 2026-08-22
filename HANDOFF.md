@@ -8,7 +8,28 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (latest): BOTH FABLE.md items executed; 1.99.1 is a big held release
+## 2026-08-22 (latest): 1.99.1 SHIPPED; the day-one retrospective is drafted and in David's hands
+
+**1.99.1 is RELEASED** (tag, GitHub release with four assets, OneDrive, both binaries signed
+and timestamped). After the release: feedback went to all three agents (`BEVEL-FEEDBACK.md`
+owns a skipped pre-design and hands over three shipped surfaces for review; `FABLE-FEEDBACK.md`
+carries the one-question V2 rule, a "Bevel pre-design" line request and an H4 offer;
+`SCRIBE-FEEDBACK.md` asks for a `## Holds` block at the top of `SCRIBE.md`).
+
+**The org-level retrospective is NOT in any repo.** It was drafted as
+`2026-08-22-eqbuddy-lab-day-one.md` and handed to David to commit to the private ops repo's
+`retrospectives/` — his choice, his commit. Do not copy it here; it names pilot hypotheses.
+
+**Three proposals await David's ruling** (all in that retrospective and in the feedback files):
+adopt Fable's one-question V2 rule into `CLAUDE.md` verbatim; run H4 (Fable last-looks the
+executed diff) on the next `FABLE.md` item; the `## Holds` block. None is done until he says.
+
+**Post-release replies are owed** on the threads 1.99.1 answers (#226, #228, #185, #109) —
+read the Holds in `SCRIBE.md` first; #226 and #208 were held as of 2026-08-21 18:20 CT.
+
+---
+
+## 2026-08-22 (earlier): BOTH FABLE.md items executed; 1.99.1 was a big held release
 
 **1.99.1 is built and NOT released.** Gates: **2,294 unit + 267 Avalonia + 19 E2E**. It
 carries: cleared timers (#228), the rare-consider marker (#185), discovery honouring the raid
