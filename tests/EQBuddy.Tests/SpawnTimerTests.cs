@@ -1653,6 +1653,52 @@ public class SpawnTimerTests
     public void OpenWorldZoneNamesAreNot(string zone) =>
         Assert.False(SpawnCatalog.IsInstancedZoneName(zone));
 
+    /// <summary>Frankthetankk's verbatim sequence (#109, 2026-08-21): a personal Plane of
+    /// Sky instance announces itself as "Player X creating instance The Plane of Sky
+    /// 13931." and then enters with a line BYTE-IDENTICAL to the open world's. So the
+    /// zone gate keyed on the enter line alone could never fire there — exactly what
+    /// Fable's plan suspected and could not check without his log. The announcement is
+    /// spent on the next enter line, and a kill of an ordinary catalog named inside the
+    /// instance starts no countdown; the same kill in the open world runs its clock.</summary>
+    [Fact]
+    public void ACreatingInstanceLineMakesTheNextEnterAnInstanceEvenWhenTheLineLooksOpenWorld()
+    {
+        var cat = new SpawnCatalog
+        {
+            Zones =
+            [
+                new SpawnZone
+                {
+                    Zone = "Plane of Sky", LogZoneName = "The Plane of Sky", RaidZone = true,
+                    NamedDefaultSeconds = 28800,
+                    Named = [new SpawnEntry { Name = "a presence" }],   // timed, not raid-listed, not triggered
+                },
+            ],
+        };
+        var t = new SpawnTimers(cat, new SpawnOverrides()) { Server = "freeport" };
+
+        t.Apply(LogParser.Parse("[Fri Aug 21 21:00:00 2026] Player Dranak creating instance The Plane of Sky 13931.")!);
+        t.Apply(LogParser.Parse("[Fri Aug 21 21:00:05 2026] You have entered The Plane of Sky.")!);
+        t.Apply(LogParser.Parse("[Fri Aug 21 21:01:00 2026] You have slain a presence!")!);
+        Assert.Empty(t.Snapshot(new DateTime(2026, 8, 21, 21, 2, 0)));
+
+        // Open world: the same enter line with no announcement before it.
+        t.Apply(LogParser.Parse("[Fri Aug 21 22:00:00 2026] You have entered The Plane of Sky.")!);
+        t.Apply(LogParser.Parse("[Fri Aug 21 22:01:00 2026] You have slain a presence!")!);
+        Assert.Single(t.Snapshot(new DateTime(2026, 8, 21, 22, 2, 0)));
+    }
+
+    [Fact]
+    public void AStaleInstanceAnnouncementDoesNotLeakOntoALaterZone()
+    {
+        var t = Tracker();
+        t.Apply(LogParser.Parse("[Fri Aug 21 21:00:00 2026] Player Dranak creating instance The Plane of Sky 13931.")!);
+        // The player never zoned into Sky; the next enter line is an ordinary dungeon.
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0, "a froglok ghoul lord", "You"));
+        Assert.Single(t.Snapshot(T0.AddMinutes(1)));
+    }
+
     [Fact]
     public void KillsInsideAnInstancedRaidZoneStartNoCountdownEvenForUnlistedNamed()
     {

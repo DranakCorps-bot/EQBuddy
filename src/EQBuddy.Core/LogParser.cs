@@ -274,6 +274,9 @@ public static partial class LogParser
 
     [GeneratedRegex(@"^You have entered (?<zone>.+)\.$")]
     private static partial Regex ZoneRx();
+    // Player Dranak creating instance The Plane of Sky 13931.   (#109: the only instance signal Sky prints)
+    [GeneratedRegex(@"^Player (?<player>.+?) creating instance (?<zone>.+?) (?<id>\d+)\.$")]
+    private static partial Regex InstanceCreatedRx();
 
     // Your Location is -1085.05, -675.53, 3.75   (Y first — EQ's axis order)
     [GeneratedRegex(@"^Your Location is (?<y>-?[\d.]+), (?<x>-?[\d.]+), (?<z>-?[\d.]+)$")]
@@ -842,6 +845,9 @@ public static partial class LogParser
                 double.Parse(r.Groups["y"].Value, System.Globalization.CultureInfo.InvariantCulture),
                 double.Parse(r.Groups["x"].Value, System.Globalization.CultureInfo.InvariantCulture),
                 double.Parse(r.Groups["z"].Value, System.Globalization.CultureInfo.InvariantCulture));
+
+        if ((r = InstanceCreatedRx().Match(msg)).Success)
+            return new InstanceCreatedEvent(ts, r.Groups["zone"].Value, r.Groups["id"].Value);
 
         if ((r = ZoneRx().Match(msg)).Success)
         {

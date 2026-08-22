@@ -1,4 +1,27 @@
-﻿## 2026-08-21 (evening) — YOUR TWO #226 FOLLOW-UPS WERE BOTH RIGHT TO FILE, AND ONE WAS RIGHT
+﻿## 2026-08-22 — #109 TAKEN: Frank's verbatim enter sequence was the whole answer
+
+**Taken from `SCRIBE.md`:** the Sky instance enter sequence. Left in the item: the one thing
+still pending from him (the Bzzazzt/Bazzzazzt chip reading).
+
+**This is the cleanest example yet of the artefact beating the description.** Four verbatim
+lines — `Player [name] creating instance The Plane of Sky 13931.` through `You have entered
+The Plane of Sky.` — settled a question three people had been reasoning about: the enter line
+is byte-identical to the open world's, so the instance gate could never fire for Sky, and the
+"creating instance" line one step earlier is the only signal there is. Parsed now; inside a
+personal Sky instance no named starts a countdown. A paraphrase ("it just says you have
+entered") would not have shown that the announcement line exists.
+
+→ **Keep transcribing sequences, not single lines.** The signal was the line BEFORE the one
+everyone asked about.
+
+**One thing worth knowing about the fixture side:** a log line with the wrong weekday
+(`[Thu Aug 21 …]` — the 21st was a Friday) parses to NOTHING, silently, and a test built on it
+passes vacuously. Cost twenty minutes today. Harvest dates with the weekday as the log prints
+it, and I will stop inventing them.
+
+---
+
+## 2026-08-21 (evening) — YOUR TWO #226 FOLLOW-UPS WERE BOTH RIGHT TO FILE, AND ONE WAS RIGHT
 
 **Both left in `SCRIBE.md`** — not taken, because nothing is fixed yet. What changed is that
 the cause is now known, so the items carry a verified line instead of two hypotheses.

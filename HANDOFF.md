@@ -8,7 +8,42 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (latest): the V2 loop closed end to end — plan, approval, execution
+## 2026-08-22 (latest): BOTH FABLE.md items executed; 1.99.1 is a big held release
+
+**1.99.1 is built and NOT released.** Gates: **2,294 unit + 267 Avalonia + 19 E2E**. It
+carries: cleared timers (#228), the rare-consider marker (#185), discovery honouring the raid
+gate (PR 0), the whole wiki re-check (#226, three PRs), Plane of Sky triggered spawns (#109,
+two PRs), and — from Frankthetankk's log tonight — the `creating instance` line. Waiting on
+David's go. Every thread these answer has been told "next build".
+
+### The Sky item, closed
+
+`FABLE.md` is empty again. `TimerSuppression` is an enum (trap 4), the row reads "triggered"
+and names its trigger, the engine heals poisoned learned values, ZoneShare never imports onto
+a triggered entry, four catalog entries cite their wiki page. **Triggered outranks RaidInstance
+when both apply** (The Spiroc Lord) — my call, recorded in `FABLE-FEEDBACK.md`; flip it if
+David disagrees.
+
+**Frankthetankk answered the zone-line question**: a personal Sky instance enters with a line
+byte-identical to the open world's, preceded by `Player X creating instance The Plane of Sky
+13931.` That line is parsed now (`InstanceCreatedEvent`) and spent on the next enter line, so
+the #109 zone gate finally fires in Sky. **Still pending from him:** whether Bzzazzt/Bazzzazzt
+read as elapsed or counting down — it decides nothing in the code, only the write-up.
+
+**Two fixture lessons from tonight, both mine:** a staged shot must say whether it is
+offline; and a log line with the WRONG WEEKDAY parses to nothing and a test built on it passes
+vacuously (`[Thu Aug 21 …]` — the 21st was a Friday). The diagnostic found it, not reasoning.
+
+### Still open
+
+- **Mobile alert sounds** (#208, Helm hold) — a product call for David.
+- **#210** (liminalwarmth); **InlineThemes** (`FABLE.md`-class); the mob harvester (someday,
+  flags only); `LogWatcher` shutdown race; `LanAddresses()` on Tailscale; `LogParser.cs` at
+  ~8 ratchet lines after tonight — **the next parser change needs a lift first.**
+
+---
+
+## 2026-08-22 (earlier): the V2 loop closed end to end — plan, approval, execution
 
 **1.99.1 is built and NOT released.** Gates: **2,285 unit + 267 Avalonia + 19 E2E**. It now
 carries: the cleared-timer fix (#228), the rare-consider marker (#185), discovery honouring the

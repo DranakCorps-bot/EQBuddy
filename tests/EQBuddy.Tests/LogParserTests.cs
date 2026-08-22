@@ -508,6 +508,12 @@ public class LogParserTests
     public void Zone()
     {
         var e = Parse<ZoneEvent>("You have entered Clan Crushbone.");
+        // #109, Frankthetankk's verbatim personal-instance sequence: the instance is
+        // announced one line before an enter line that looks exactly like the open world.
+        var created = Parse<InstanceCreatedEvent>("Player Dranak creating instance The Plane of Sky 13931.");
+        Assert.Equal("The Plane of Sky", created.Zone);
+        Assert.Equal("13931", created.InstanceId);
+        Assert.Equal("The Plane of Sky", Parse<ZoneEvent>("You have entered The Plane of Sky.").Zone);
         Assert.Equal("Clan Crushbone", e.Zone);
     }
 

@@ -167,7 +167,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Where it might live:** hypothesis -- WhatsNew.json is already a versioned list; the popup currently selects one entry. Data source is the versions between previous and current, not a new notes file.
 
 ### Sky instance timers, bee chain, and Spiroc DUE
-- **Priority:** waiting. Frank supplied the Sky instance enter sequence 9:02 PM CT. Bzzazzt/Bazzzazzt chip elapsed vs countdown still pending from him. Do not reply.
+- **Priority:** waiting on ONE thing now -- the Bzzazzt/Bazzzazzt chip reading (elapsed vs countdown), pending from Frank. **TAKEN (Claude, 2026-08-22): the enter sequence.** `Player X creating instance The Plane of Sky NNNN.` is parsed and makes the next enter line an instance; inside a personal Sky instance no named starts a countdown. The triggered-spawn type shipped the same day (FABLE.md item, both PRs). Rides the held 1.99.1.
 - **Place:** spawn timers / catalog. Not Gate 5.
 - **Source:** #109 Frankthetankk Aug 19, 2:57 PM CT. Old thread — did not reply.
 - **Ask:** inside a Plane of Sky *instance*, do not show a countdown or DUE for named that are not on a respawn clock. Three shapes in one report: (1) instanced Sky bosses that are one-time per instance still get normal timers; (2) the bee chain Bzzazzt — Bzzzt — Bazzzazzt spawns immediately on the previous death, so the ~1:01 chips are kill-duration artifacts; (3) Spiroc Guardian / Lord are player-triggered (kill Spiroc trash), and DUE on the Guardian is the wrong word. Overworld Sky respawn is unmeasured — this ask is the instanced version only.

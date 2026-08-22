@@ -143,6 +143,13 @@ public record SkillSubstitutionEvent(DateTime Time, string Ability, string Repla
 public record FactionEvent(DateTime Time, string Faction, int Delta, bool Capped = false,
     bool CappedDown = false) : GameEvent(Time);
 public record ZoneEvent(DateTime Time, string Zone) : GameEvent(Time);
+
+/// <summary>"Player X creating instance The Plane of Sky 13931." — printed one step
+/// BEFORE the zone-enter line when a personal instance is created (Frankthetankk's
+/// verbatim log, #109, 2026-08-21). It matters because Sky's own enter line is
+/// byte-identical to the open-world one — no tier, no "- Solo", nothing — so this is the
+/// only statement in the log that the zone about to be entered is an instance.</summary>
+public record InstanceCreatedEvent(DateTime Time, string Zone, string InstanceId) : GameEvent(Time);
 /// <summary>"You have successfully merged two items together to create a new item: X" —
 /// the item-merge/augment. Named CraftEvent for history; it is the "(Merged)" provenance.</summary>
 public record CraftEvent(DateTime Time, string Item) : GameEvent(Time);

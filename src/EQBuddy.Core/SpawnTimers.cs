@@ -76,6 +76,13 @@ public sealed class SpawnTimers
     /// <summary>The raw zone-enter name said this zone is an INSTANCE (#109) — kills
     /// here start no automatic countdowns; see SpawnCatalog.IsInstancedZoneName.</summary>
     private bool _currentZoneInstanced;
+
+    /// <summary>The zone a "creating instance" line just named, until the enter line that
+    /// follows it spends the fact (#109, Frankthetankk's Sky sequence). Plane of Sky's
+    /// enter line is byte-identical to the open-world one, so without this the zone gate
+    /// could never fire there. Spent on the FIRST enter line, matching or not — a stale
+    /// announcement must not make some later zone an instance.</summary>
+    private string? _pendingInstanceZone;
     private LocationEvent? _lastLoc;
     /// <summary>Which continuous stay in a zone we are on, bumped by every zone-enter
     /// line. Stamped onto each new timer as <see cref="SpawnTimerState.ZoneStay"/>.</summary>
@@ -113,11 +120,17 @@ public sealed class SpawnTimers
     {
         switch (evt)
         {
+            case InstanceCreatedEvent ic:
+                lock (_lock) _pendingInstanceZone = ic.Zone;
+                break;
             case ZoneEvent z:
                 lock (_lock)
                 {
                     _currentZone = _catalog.FindZone(z.Zone);
-                    _currentZoneInstanced = SpawnCatalog.IsInstancedZoneName(z.Zone);
+                    var announced = _pendingInstanceZone is { } pz
+                        && (_currentZone?.MatchesZoneName(pz) ?? pz.Equals(z.Zone, StringComparison.OrdinalIgnoreCase));
+                    _pendingInstanceZone = null;
+                    _currentZoneInstanced = SpawnCatalog.IsInstancedZoneName(z.Zone) || announced;
                     _lastLoc = null;
                     // Every zone line ends the current stay, including one that names
                     // the zone you are already in: a zone-enter line you did not travel
