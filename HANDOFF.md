@@ -8,7 +8,39 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (latest): 1.99.1 SHIPPED; the day-one retrospective is drafted and in David's hands
+## 2026-08-22 (latest): the operating model moved from approval-by-gate to approval-by-exception
+
+David, looking at his own diagram of the org: *"I don't want to be the CEO that is brought
+into every team meeting to decide if I like the blue color or the red color more."* Fable 5's
+read was that the diagram shows him once (approve/hold/reject) while the files consumed him at
+five points, and that with the release gate already his, approving each change was a double
+gate. He said make the changes. They are in this commit:
+
+- **`CLAUDE.md` — new section "What needs David, and what does not":** an eight-item
+  consequence list (values line, release go, public posture, money/licensing, roadmap
+  direction, departing from eqlwiki, third-party policy, privacy). Everything else is
+  pre-authorized with a reporting duty. A question to him must pass two tests (would he answer
+  differently from the default? does it change direction, not implementation?) or it is a
+  decision to make and log.
+- **`DECISIONS.md` (new):** the log he skims and vetoes from. One line per call. Seeded with
+  three from the last two plans.
+- **`FABLE.md`:** plans are `ready` when written; only a `needs-david: <decision>` line waits,
+  and it names the decision. `approved` still works as an explicit mark.
+- **"The inboxes inform you" rewritten:** an interactive session may take V0–V1 and `ready`
+  plans without being told. The unattended-agent ban is unchanged and is the boundary that
+  was always the point.
+- **Holds name who lifts them.** "Waiting for David" without a named consequence is not a
+  hold; it is a queue only he can drain. `SCRIBE.md` has several at `waiting (David's call)` —
+  the next session should re-read each against the list and either name the decision or make
+  it.
+
+**What to do differently from here:** before the question tool, run the two tests. Before a
+`FABLE.md` stub, ask "could this be V1 if David answered one question?". After any call that
+could have gone the other way, one line in `DECISIONS.md`.
+
+---
+
+## 2026-08-22 (earlier): 1.99.1 SHIPPED; the day-one retrospective is drafted and in David's hands
 
 **1.99.1 is RELEASED** (tag, GitHub release with four assets, OneDrive, both binaries signed
 and timestamped). After the release: feedback went to all three agents (`BEVEL-FEEDBACK.md`
