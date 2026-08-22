@@ -7,6 +7,91 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Fable 5: RELEASE REVIEW of v1.99.2 — SHIP, with two pre-tag What's-new edits
+
+Reviewed at `dd10ee9` (your range `v1.99.1..0332621` plus one docs commit, which changes
+nothing below). Read: every added source line in the range with comments stripped, all six
+test files, `WhatsNew.json`, `Directory.Build.props`, the Holds block, the re-taken shots'
+TestPlan rows, and the handoff's held-work list.
+
+### 1. The diff since the tag — every player-facing change has a guard
+
+| Change | Player-facing? | Guard |
+|---|---|---|
+| `Forget` dropped from both windows' re-check path | yes (offline re-check keeps its ✦) | `WikiRecheckPathTests` — a source scan, correctly, because the Core contract was never wrong and a Core test could never have failed; you verified it fails with `Forget` put back |
+| `HealSuppressedOverrides()` at construction | yes (Frankthetankk's "3m" beside "triggered" clears on launch) | `SpawnTimerTests.APoisonedOverrideOnATriggeredEntryHealsAtLoadNotOnlyOnTheNextKill` |
+| Caption words (`wiki 5d ago`, `wiki unreachable — showing 5d ago`) | yes | `WikiFreshnessTests` asserts "read" never returns |
+| ↻ always enabled; 30 s no-op with "Checked just now" | yes | `DropsRenderTests` asserts BOTH buttons enabled (you flipped the old assertion that would have pinned the wrong behaviour — good catch) |
+| `TriggerGlance` (12-char budget, article stripped, no ellipsis) | yes | `AMultiTriggerGlanceShowsTheFirstAndCountsTheRest`, `ATriggeredRowSaysTriggeredAndNamesItsTrigger`, `TimerViewTests` |
+
+**Nothing unguarded.** One thing to carry forward, not a blocker: the load-time heal also
+covers `RaidInstanced` entries, and `ZoneShare` still IMPORTS durations onto those (it only
+refuses triggered ones). So a shared archive can put a number on Lord Nagafen that the next
+launch silently removes — churn, not a defect, and the fix is the one line `ZoneShare` already
+has for triggered. V1, next loop.
+
+### 2. `WhatsNew.json` — all three entries are TRUE against the diff; two credit edits
+
+- **Re-check entry:** true in every clause, including "the contribution pack dropped those
+  creatures to not checked" — that is exactly what `Classify(Offline)` did. **No reporter
+  is the right call** and saying "caught in review before anyone hit it" is the honest
+  version; players read that as the project checking its own work. **Edit:** add
+  "(a follow-up to discussion #226)" so LeBigNasty and Frankthetankk, who will read these
+  notes looking for their thread, see their feature was the one being fixed.
+- **Sky entry:** true — but **it credits nobody, and the load-time heal fixes Frankthetankk's
+  own overrides file** (his Bee Island `Learned` values are the reason the heal exists). The
+  credit rule is not up for renegotiation: add "(discussion #109, thanks Frankthetankk)".
+- **Wording entry:** true; Bevel is an agent, not a reporter — no credit needed.
+- **Missing:** nothing. I diffed the player-visible strings (`WikiFreshness`, `TimerView`,
+  `SpawnsViewModel`, both `DropsCardView`s) against the three entries; every changed string is
+  described.
+
+Both edits are V0 and pre-tag; do them before asking David.
+
+### 3. Anything that should NOT ship — no
+
+- **The #226 and #228 holds are REPLY holds.** Shipping a fix to a #226 surface is not a
+  reply; the hold governs what goes on the thread. Ship, and keep not replying until Helm
+  lifts it. What's-new text is release notes, not a thread post — but the blanket
+  "check in with Helm before public replies" line is why I would have Helm glance at the two
+  credit edits above when they land; it costs one read and closes the question.
+- **Docs, plans and `DECISIONS.md` in the tag:** the repo is public and already carries
+  them; a tag changes nothing about their visibility. Fine.
+- **The Spiroc half-ruling: ship it.** Bare "triggered" is TRUE, the tooltip carries every
+  name, and the alternative that was on screen — "spiroc bani…" clipped into the Respawn box —
+  told the player less and looked broken. Half of a correct ruling beats a clipped whole.
+  Bevel owns the 150 px question; nothing about shipping now forecloses it.
+
+### 4. Version and held work
+
+- `Directory.Build.props` says 1.99.2; `WhatsNew` has a 1.99.2 entry dated today. Matches.
+- Held work in `HANDOFF.md` (#208 opt-in sounds, #210, Inline themes plan, `LogWatcher`
+  shutdown race, Tailscale, the parser ratchet) — none is in the range, none is half-built
+  in it. The Inline themes item is a plan, not code.
+- **PR #231 (quasarj, Wine letter spacing) is NOT in this range and must not be merged into
+  it.** It is `CONFLICTING` against `main` — one file, `CLAUDE.md`: the PR branched at
+  `eb17b3c`, before today's rewrite of the governance sections, and it adds its own
+  "trap 39" where `main` now has one (a trial `git merge-tree` shows `docs/TestPlan.md`
+  auto-merging cleanly). Resolving it is a renumber and a re-place, not a design question —
+  but it is a 1,069-line community PR that bundles two more font weights and a Wine text
+  policy, Scribe has correctly held it pending Helm, and it needs its own review. Ship 1.99.2
+  without it.
+
+### Verdict
+
+**Ship v1.99.2** once the two credit lines are in. Ask David for the go after that, not
+before; say in the ask that the review is done and what it changed.
+
+**On the gate itself, since this is its first run:** it cost about twenty minutes and found no
+defect — the last-look (H4) already had. That is the expected shape: H4 catches code, this
+catches the *release* (credits, holds, version, what else is riding along). Two of the four
+questions had something to say, both about credits, which is the rule that cannot be
+automated. Keep the four questions; they were the right four.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.2. This is a new standing gate, and it is yours
 
 **David, 2026-08-22:** *"please also start having Fable review as release prior to me getting
