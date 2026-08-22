@@ -16,6 +16,29 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+## Holds
+Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
+- **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong on 1.99.0.
+- **#226** — Helm 6:19 PM CT Aug 21: do not open, do not reply on community.
+- **#208** — Helm 6:19 PM CT Aug 21: do not open. Waiting, not a must.
+- **Public replies** — check in with Helm before posting. Do not edit already-posted comments.
+
+### letter spacing under Wine/CrossOver
+- **Priority:** waiting (community PR; not authorized. Check in with Helm before any reply.)
+- **Place:** desktop text under Wine/CrossOver. Not Gate 5. Not a group meter.
+- **Source:** PR #231 quasarj Aug 21, 9:45 PM CT. https://github.com/DranakCorps-bot/EQBuddy/pull/231 New thread. Did not reply yet (Helm check-in first).
+- **Ask:** "text kerning was looking wrong" under Wine. He opened a PR: Wine-gated whole-pixel letter positions, plus a settings checkbox to opt out when scaling is above 100% (checkbox only shows under Wine). Windows unchanged. No version bump / no WhatsNew in the PR notes.
+- **Already shipped:** unknown whether current Wine builds already snap letter positions. Hypothesis, unchecked -- this is a proposed patch, not a shipped behavior.
+- **Checked:** did not review the diff this run. Do not treat the PR as the implementation instruction.
+
+### alt-swapping two equal classes vs half-life decay
+- **Priority:** waiting
+- **Place:** class inference / Buff sets. Not Gate 5. Not a group meter.
+- **Source:** #120 Frankthetankk Aug 21, 9:10 PM CT. Did not reply (old thread; Claude just posted the decay-over-cutoff close). Thread title is buff sets; this follow-up is the class-inference edge he said was not explicitly addressed.
+- **Ask:** "the alt-swapping edge case, where someone plays two classes roughly equally rather than a one-time dabble like my Berserker situation — does the half-life decay handle that gracefully (recent evidence for whichever class you're actually playing right now wins cleanly), or is there a real risk of visible flip-flopping session to session for someone who genuinely splits their time?" He asks whether the minimum lead margin already covers it or it is worth testing separately. No urgency.
+- **Already shipped:** Claude 7:46 PM CT on #120: class inference derives all sixteen classes from shipped catalogs; evidence decays with a half-life; honesty guards (sighting floor, corroboration, minimum lead margin); "(inferred)" labeling stays.
+- **Checked:** not grepped this run for the lead-margin constant. Hypothesis, unchecked -- two classes with similar recency could take turns winning the inferred class if the lead margin is smaller than an equal split.
+
 ### I would find it useful to know what drops I need by boss
 - **Priority:** waiting
 - **Place:** Kills & Drops / Drops by Creature. Desktop. Fits the loot to quest to bag link of the chain. Not Gate 5 overlay. Not a group meter.
@@ -214,6 +237,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** /consider is parsed for name and level only.
 - **Checked:** `src/EQBuddy.Core/GameEvent.cs:47` `record ConsiderEvent(DateTime Time, string Name, int Level)`. `LogParser.cs:173` ConsiderRx is `^(?<name>.+?) (?:scowls at you|...) .*\(Lvl: (?<level>\d+)\)$`. On the pasted line, the first ` scowls` sits after `creature -`, so the name group would swallow ` - a rare creature -` unless a rarity group is added. Rarity sits BEFORE scowls and BEFORE `(Lvl: N)`, not after the tail.
 - **Where it might live:** hypothesis — a capture group on ` - a rare creature -` between name and the faction phrase. The three lines are the same shape.
+- **Follow-up Aug 21, 9:31 PM CT:** Frankthetankk on #217. Did not reply (old thread; Claude is in it). Now that #185 has shipped the con-rarity mechanism (bjstrange's lines, "a rare creature" overriding the kill-count heuristic) — does that same parsing already satisfy Ask 3 here, or does the wiki pack's rarity labeling need its own separate hookup? He names two consumers: #185 seeds spawn-timer discovery; Ask 3 is the rarity label the pack suggests for a wiki edit. If EQBuddy now holds "this mob was con-confirmed rare" as a fact, he thinks the pack should check that fact rather than parse again — he does not know if they share data. Hypothesis, unchecked -- two consumers of one consider-rarity fact, or two parsers. 9:19 PM CT note on the same thread is status only (still invested in full-history and rarity); not a new ask.
 ### Spawn-timer mega-thread
 - **Priority:** waiting (David's call)
 - **Place:** catalog maintenance. Curated spawn timers are never auto-written. Not a feature gate.
