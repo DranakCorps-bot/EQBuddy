@@ -505,6 +505,38 @@ public class ZoneShareTests
         Assert.False(after.Imported);
     }
 
+    /// <summary>A shared archive cannot land a duration on a TRIGGERED entry, even with
+    /// includeFlagged — the engine heals the poisoned value on the next kill, and one
+    /// import would put it straight back. The preview still shows the row, flagged, so
+    /// the importer sees what was refused rather than a number silently vanishing.</summary>
+    [Fact]
+    public void AnImportNeverPutsADurationOnATriggeredEntry()
+    {
+        var zone = new SpawnZone
+        {
+            Zone = "Plane of Sky",
+            NamedDefaultSeconds = 28800,
+            Named = [new SpawnEntry { Name = "Bzzzt", SpawnType = "triggered", TriggeredBy = "Bazzzazzt" }],
+        };
+        var sharer = new SpawnOverrides();
+        var theirs = sharer.GetOrAdd("Plane of Sky", "Bzzzt");
+        theirs.RespawnSeconds = 180;     // their poisoned "measurement"
+        theirs.Learned = true;
+
+        var mine = new SpawnOverrides();
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Plane of Sky" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Plane of Sky" },
+            zone, mine)!;
+
+        var diff = Assert.Single(preview.Timers);
+        Assert.True(diff.Triggered);
+        Assert.True(diff.Flagged);
+
+        ZoneShare.Apply(preview, new SpawnPointLedger.ZoneArchive { Zone = "Plane of Sky" },
+            zone, mine, includeFlagged: true);
+        Assert.Null(mine.Find("Plane of Sky", "Bzzzt"));
+    }
+
     /// <summary>An import cannot smuggle a stale Sighted flag onto a stranger's number.
     /// Sighted exempts a value from the self-heal that purges re-kill noise — it means
     /// "I watched this mob act before its clock ran out", which is never true of a

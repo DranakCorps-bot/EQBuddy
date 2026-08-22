@@ -45,7 +45,12 @@ public static class ZoneShare
         public Dictionary<string, double> LearnedTimers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
-    public sealed record TimerDiff(string Name, double? CurrentSeconds, double IncomingSeconds, bool Flagged);
+    /// <param name="Triggered">The catalog says this mob has no cycle at all (eqlwiki's
+    /// "Triggered"), so the incoming number is noise by construction. Shown flagged in
+    /// the preview and never applied, even with includeFlagged — or one shared archive
+    /// would re-poison an entry the engine had just healed.</param>
+    public sealed record TimerDiff(string Name, double? CurrentSeconds, double IncomingSeconds, bool Flagged,
+        bool Triggered = false);
 
     public sealed class Preview
     {
@@ -158,9 +163,10 @@ public static class ZoneShare
                 ?? (entry is not null && zone is not null ? SpawnCatalog.EffectiveSeconds(zone, entry) : null);
             // The deviation gate: no baseline = flagged (nothing to corroborate);
             // a big swing from the established clock = flagged.
-            var flagged = current is not { } cur
+            var triggered = entry is { IsTriggered: true };
+            var flagged = triggered || current is not { } cur
                 || Math.Abs(incoming - cur) / Math.Max(1, cur) > DeviationFlagFraction;
-            timers.Add(new TimerDiff(name, current, incoming, flagged));
+            timers.Add(new TimerDiff(name, current, incoming, flagged, triggered));
         }
 
         return new Preview
@@ -208,6 +214,7 @@ public static class ZoneShare
         var changed = false;
         foreach (var diff in preview.Timers)
         {
+            if (diff.Triggered) continue;   // no cycle exists to import a number for
             if (diff.Flagged && !includeFlagged) continue;
             // Never overwrite the importer's own MANUAL edit — their number wins
             // over anyone's, always.

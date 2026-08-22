@@ -47,6 +47,31 @@ public sealed class SpawnEntry
     /// Instanced entries start no countdown and show no respawn default — unless the
     /// player types a duration themselves, which outranks this like everything else.</summary>
     public bool RaidInstanced { get; set; }
+
+    /// <summary>HOW the creature appears, where that is not a clock at all (#109 follow-up,
+    /// Frankthetankk; plan in FABLE.md, Fable 5). Absent or "timed" is the ordinary
+    /// kill-to-respawn cycle. <c>"triggered"</c> is eqlwiki's own word — its creature
+    /// pages carry <c>respawn_time = Triggered</c> — for a mob that appears when something
+    /// ELSE happens: the previous link in a chain dying (Bzzzt → Bazzt Zzzt), or a
+    /// particular trash kill (the Spirocs). There is no cycle to count, and no cycle to
+    /// LEARN: two kills three minutes apart are two links, not a three-minute respawn.
+    ///
+    /// A string and not an enum, on purpose: this is a hand-curated file, and a typo in
+    /// it must fail a TEST (<see cref="KnownSpawnTypes"/>), never the catalog load.
+    /// <see cref="RaidInstanced"/> says WHERE a countdown is wrong; this says HOW the mob
+    /// spawns — the two are independent, and The Spiroc Lord carries both.</summary>
+    public string SpawnType { get; set; } = "";
+
+    /// <summary>For a triggered entry: what brings it, in the player's terms, '/'-separated
+    /// like <see cref="Placeholder"/> — "Bzzzt", "a spiroc banisher / a spiroc walker".
+    /// Read by the Spawns row's detail (trap 20: a field nothing reads is a lost fact).</summary>
+    public string TriggeredBy { get; set; } = "";
+
+    public bool IsTriggered => SpawnType.Equals("triggered", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>Every value the curated file may use. The sanity test holds the shipped
+    /// catalog to this list.</summary>
+    public static readonly string[] KnownSpawnTypes = ["", "timed", "triggered"];
 }
 
 /// <summary>A zone's named mobs plus its zone-wide default named-respawn.</summary>
@@ -209,7 +234,7 @@ public sealed class SpawnCatalog
     /// misleading rather than helpful. A player-typed override still applies — it's
     /// checked before this everywhere.</summary>
     public static double? EffectiveSeconds(SpawnZone zone, SpawnEntry entry) =>
-        entry.RaidInstanced ? null : entry.RespawnSeconds ?? zone.NamedDefaultSeconds;
+        entry.RaidInstanced || entry.IsTriggered ? null : entry.RespawnSeconds ?? zone.NamedDefaultSeconds;
 
     /// <summary>Case-insensitive name equality that shrugs off leading articles, a
     /// trailing plural, and name punctuation: catalog names are wiki titles

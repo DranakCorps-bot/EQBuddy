@@ -264,6 +264,27 @@ public sealed class SpawnTimers
                     if ((entry.RaidInstanced || (_currentZoneInstanced && zone.RaidZone))
                         && !IsManual(o)) return;
 
+                    // A TRIGGERED spawn (eqlwiki's own word) has no cycle to count and —
+                    // the half a suppression alone would miss — no cycle to LEARN. Bee
+                    // Island spawns several Bzzzt per clear; two kills three minutes apart
+                    // used to "measure" a three-minute respawn, write it to the overrides
+                    // file as Learned, and count every later kill down to DUE. That is the
+                    // Sky report (#109 follow-up, Frankthetankk), and it is why this sits
+                    // BEFORE the learning below rather than beside EffectiveSeconds. A
+                    // learned value already in the file heals here, as re-kill noise does.
+                    // The player's typed duration still wins, as it wins over everything.
+                    if (entry.IsTriggered && !IsManual(o))
+                    {
+                        if (o is { Learned: true, RespawnSeconds: not null })
+                        {
+                            o.RespawnSeconds = null;
+                            o.Learned = false;
+                            o.Imported = false;
+                            _overrides.Save();
+                        }
+                        return;
+                    }
+
                     var trusted = IsTrusted(zone, entry);
                     // Self-heal: a LEARNED override sitting under a measured clock came
                     // from multi-spawn re-kill noise (two taskmasters at different camps
@@ -689,15 +710,16 @@ public sealed class SpawnTimers
     private static bool IsManual(SpawnOverride? o) =>
         o?.RespawnSeconds is not null && !o.Learned;
 
-    /// <summary>True when a countdown for this zone/name shouldn't exist at all:
-    /// a raid-instance boss with no player-typed duration. Persisted timers from
-    /// before #109 heal through this at load.</summary>
-    private bool SuppressedRaidInstance(string zoneName, string name)
+    /// <summary>True when a countdown for this zone/name shouldn't exist at all: a
+    /// raid-instance boss or a triggered spawn, with no player-typed duration. Persisted
+    /// timers from before either rule heal through this at load.</summary>
+    private bool SuppressedByCatalog(string zoneName, string name)
     {
         var zone = _catalog.FindZone(zoneName);
         var entry = zone?.Named.FirstOrDefault(e =>
             e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        return entry is { RaidInstanced: true } && !IsManual(_overrides.Find(zoneName, name));
+        return entry is { RaidInstanced: true } or { IsTriggered: true }
+            && !IsManual(_overrides.Find(zoneName, name));
     }
 
     private void Upsert(SpawnTimerState t)
@@ -777,9 +799,10 @@ public sealed class SpawnTimers
             foreach (var t in list)
             {
                 // Countdowns persisted before raid-instance suppression (#109) —
-                // Frank's Maestro at "8:13:38" — drop here instead of running for
-                // days more. Manual-duration timers stay: the player asked for them.
-                if (SuppressedRaidInstance(t.Zone, t.Name)) continue;
+                // Frank's Maestro at "8:13:38" — or before triggered spawns existed
+                // (the Sky follow-up) — drop here instead of running for days more.
+                // Manual-duration timers stay: the player asked for them.
+                if (SuppressedByCatalog(t.Zone, t.Name)) continue;
                 _timers[Key(t.Server, t.Zone, t.Name)] = t;
             }
         }

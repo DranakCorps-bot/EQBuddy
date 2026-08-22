@@ -1465,6 +1465,125 @@ public class SpawnTimerTests
         Assert.True(cat.Zones.Sum(z => z.Named.Count(n => n.RaidInstanced)) >= 3);
     }
 
+    // ---- triggered spawns (#109 follow-up, Frankthetankk; FABLE.md, Fable 5) ----
+    //
+    // eqlwiki's own word: a creature page carrying `respawn_time = Triggered` appears when
+    // something ELSE happens — the previous link in a chain dying, or a particular trash
+    // kill — and has no cycle to count. The bug was not only the missing countdown
+    // suppression: over an UNTRUSTED 8 h zone default, two Bzzzt kills three minutes apart
+    // "measured" a three-minute respawn, wrote it to the overrides file as Learned, and
+    // counted every later kill down to DUE. So the type has to stop LEARNING, and heal
+    // what was already learned.
+
+    private static SpawnCatalog SkyCatalog() => new()
+    {
+        Zones =
+        [
+            new SpawnZone
+            {
+                Zone = "Plane of Sky",
+                NamedDefaultSeconds = 28800,      // untrusted, exactly as shipped
+                Named =
+                [
+                    new SpawnEntry { Name = "Bzzzt", SpawnType = "triggered", TriggeredBy = "Bazzzazzt" },
+                    new SpawnEntry { Name = "Noble Dojorn", RespawnSeconds = 604800 },
+                ],
+            },
+        ],
+    };
+
+    [Fact]
+    public void ATriggeredKillStartsNoCountdownAndARekillGapTeachesNothing()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "Plane of Sky"));
+
+        t.Apply(new KillEvent(T0, "Bzzzt", "You"));
+        Assert.Empty(t.Snapshot(T0.AddMinutes(1)));
+
+        // Three minutes later, the next link dies. Before the type this was a "measured"
+        // three-minute respawn, persisted as Learned.
+        t.Apply(new KillEvent(T0.AddMinutes(3), "Bzzzt", "You"));
+        Assert.Empty(t.Snapshot(T0.AddMinutes(4)));
+        Assert.Null(overrides.Find("Plane of Sky", "Bzzzt"));
+
+        // An ordinary timed named in the same zone is untouched.
+        t.Apply(new KillEvent(T0, "Noble Dojorn", "You"));
+        Assert.Equal("Noble Dojorn", Assert.Single(t.Snapshot(T0.AddMinutes(5))).Name);
+        Assert.Null(SpawnCatalog.EffectiveSeconds(SkyCatalog().Zones[0], SkyCatalog().Zones[0].Named[0]));
+    }
+
+    [Fact]
+    public void APoisonedLearnedOverrideHealsOnTheNextKillAndAtLoad()
+    {
+        // What a player who reported this already has in spawn-overrides.json.
+        var overrides = new SpawnOverrides();
+        var poisoned = overrides.GetOrAdd("Plane of Sky", "Bzzzt");
+        poisoned.RespawnSeconds = 180;
+        poisoned.Learned = true;
+
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+        t.Apply(new ZoneEvent(T0, "Plane of Sky"));
+        t.Apply(new KillEvent(T0, "Bzzzt", "You"));
+
+        Assert.Empty(t.Snapshot(T0.AddMinutes(1)));
+        var healed = overrides.Find("Plane of Sky", "Bzzzt")!;
+        Assert.Null(healed.RespawnSeconds);
+        Assert.False(healed.Learned);
+
+        // And a countdown persisted before the type existed drops at load, as #109's did.
+        var path = Path.Combine(Path.GetTempPath(), $"eqbuddy-test-{Guid.NewGuid():N}.json");
+        try
+        {
+            File.WriteAllText(path, """
+                [{"Server":"freeport","Zone":"Plane of Sky","Name":"Bzzzt",
+                  "KilledAt":"2026-07-18T15:00:00","DurationSeconds":180}]
+                """);
+            var reloaded = new SpawnTimers(SkyCatalog(), new SpawnOverrides(), path) { Server = "freeport" };
+            Assert.Empty(reloaded.Snapshot(T0.AddMinutes(1)));
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public void APlayerTypedDurationStillRunsOnATriggeredEntry()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+        var vm = new SpawnsViewModel(SkyCatalog(), overrides, t);
+        vm.SetDuration("Plane of Sky", "Bzzzt", "10m");   // their reminder, their call
+
+        t.Apply(new ZoneEvent(T0, "Plane of Sky"));
+        t.Apply(new KillEvent(T0, "Bzzzt", "You"));
+        Assert.Equal(T0.AddMinutes(10), Assert.Single(t.Snapshot(T0.AddMinutes(1))).DueAt);
+    }
+
+    /// <summary>The shipped catalog: every spawnType is a value we know (a typo in a
+    /// curated file must fail here, never the load), and the four Sky mobs the report was
+    /// about are typed, with a note that says which wiki page says so.</summary>
+    [Fact]
+    public void EmbeddedCatalogSpawnTypesAreKnownAndTheSkyChainIsTyped()
+    {
+        var cat = SpawnCatalog.LoadEmbedded();
+        foreach (var zone in cat.Zones)
+            foreach (var entry in zone.Named)
+                Assert.Contains(entry.SpawnType, SpawnEntry.KnownSpawnTypes);
+
+        var sky = cat.FindZone("Plane of Sky")!;
+        foreach (var name in new[] { "Bzzzt", "Bazzt Zzzt", "The Spiroc Guardian", "The Spiroc Lord" })
+        {
+            var entry = sky.Named.Single(n => n.Name == name);
+            Assert.True(entry.IsTriggered, $"{name} not typed");
+            Assert.NotEmpty(entry.TriggeredBy);
+            Assert.Contains("eqlwiki", entry.Note);
+        }
+        // The Lord keeps RaidInstanced — the achievements dump's fact to state — and is
+        // now quiet for the right reason as well.
+        Assert.True(sky.Named.Single(n => n.Name == "The Spiroc Lord").RaidInstanced);
+        Assert.False(sky.Named.Single(n => n.Name == "Noble Dojorn").IsTriggered);
+    }
+
     [Fact]
     public void KillingARaidBossStartsNoCountdown()
     {

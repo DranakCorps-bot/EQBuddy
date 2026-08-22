@@ -7323,32 +7323,40 @@
           "respawnSeconds": null,
           "variance": "",
           "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "The Spiroc Guardian",
           "source": "eqlwiki",
-          "note": "Island 5 (Spiroc Island) boss; spawned via The Spiroc Guardian; no documented respawn"
+          "note": "Island 5 (Spiroc Island) boss. Triggered: spawns when The Spiroc Guardian dies (eqlwiki Plane of Sky zone page, Island 5; the creature page itself records no respawn). Also in the raid-target list, so RaidInstanced says where and spawnType says how."
         },
         {
           "name": "The Spiroc Guardian",
           "respawnSeconds": null,
           "variance": "",
           "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "a spiroc banisher / a spiroc walker / a spiroc revolter",
           "source": "eqlwiki",
-          "note": "Island 5 miniboss; triggered: spawns when any Spiroc is killed; killing him spawns The Spiroc Lord"
+          "note": "Island 5 miniboss. Triggered: killing a spiroc banisher, walker or revolter spawns him (eqlwiki Plane of Sky zone page, Island 5), and he instantly respawns while ANY a spiroc vanquisher lives (his creature page's description; it has no respawn_time field). Killing him spawns The Spiroc Lord."
         },
         {
           "name": "Bzzzt",
           "respawnSeconds": null,
           "variance": "",
           "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "Bazzzazzt",
           "source": "eqlwiki",
-          "note": "Mini-Queen Bee, Island 6 (Bee Island); intermediary spawn; killing her triggers Bazzt Zzzt"
+          "note": "Mini-Queen Bee, Island 6 (Bee Island). Triggered: eqlwiki's creature page carries respawn_time = Triggered; one spawns immediately after killing Bazzzazzt, and killing her immediately spawns Bazzt Zzzt."
         },
         {
           "name": "Bazzt Zzzt",
           "respawnSeconds": null,
           "variance": "",
           "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "Bzzzt",
           "source": "eqlwiki",
-          "note": "Queen Bee, Island 6 boss; triggered: spawns immediately after killing Bzzzt; despawns after 80 minutes"
+          "note": "Queen Bee, Island 6 boss. Triggered: eqlwiki's creature page carries respawn_time = Triggered; spawns immediately after killing Bzzzt; despawns after 80 minutes."
         },
         {
           "name": "Sister of the Spire",
