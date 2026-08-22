@@ -19,18 +19,19 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ## Holds
 Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
 
-**A HOLD NAMES SOMETHING WE ARE PREVENTED FROM DOING.** Helm lifts these, not a session rewrite. If it has already happened, it is a record and belongs on the item, not here.
+A HOLD names something we are prevented from doing. Helm lifts these. If the prevented thing already happened, the hold is no longer needed: move it to Retired. Do not leave a live hold that points at finished work.
 
-- **#228 — do not reply.** Do not tell players motes are back. Default-off still-wrong for existing mote-job profiles. Deliberate product hold; not stale. A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship that actually restores the card for people who had the job.
-- **#208 — do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built. Talking to sbaum23 is not the hold; starting the work is.
-- **#226 — leftover only** (Innoruk lore-vs-creature). Status / follow-up reply only after Helm signs that one draft. Not a close.
+- **#228 - do not reply.** Do not tell players motes are back. Default-off still-wrong for existing mote-job profiles. Deliberate. A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship that actually restores the card for people who had the job.
+- **#208 - do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built. Talking to sbaum23 is not the hold; starting the work is.
 
 Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
 
-## Not holds — do not put these back in Holds
-- **#226 status** was posted 2026-08-22 (Helm-signed). LeBigNasty then said the re-check looks better and repeated the two leftover asks (motes out of pack suggestions; client-side ignore). That follow-up is on the wiki-pack motes item. Thread is not closed.
-- **#208** already has a reply (cosmic-comp). The hold is on opening the *work*, not on talking.
-- **#231** thank-you posted; PR merged. No hold line of its own.
+## Retired - no longer needed as a hold
+Do not put these back in Holds.
+
+- **#226 status / follow-up reply gate - no longer needed.** Helm-signed status posted 2026-08-22. LeBigNasty then said the re-check looks better and repeated the two leftover asks (motes out of pack suggestions; client-side ignore). That follow-up lives on the wiki-pack motes item. Thread stays open. Leftover Innoruk lore-vs-creature is leftover work, not a hold. A new #226 draft still comes to Helm (process), same as any public reply.
+- **#208 already has a reply** (cosmic-comp). The remaining live hold is on opening the work, not on talking.
+- **#231 thank-you** posted; PR merged. Never needed its own hold line.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
@@ -113,7 +114,7 @@ Public-reply check-in is process, not a Holds line. New-thread thank-you still c
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply. "Elemental Warrior" vs in-game/wiki "An Elemental Warrior" "sounds like the same class of bug that hit the wiki pack itself in #65 (Spiroc Lord, the resolver recording the requested title instead of the title actually served)." Hypothesis, unchecked -- the pack fix may have covered pack output, not the Drops window display; two code paths reading the same name. Do not restore #65.
 
 ### Drops by Creature still shows wiki-missing after the page was corrected
-- **Priority:** taken / shipped-on-tag. v1.99.1 (5f43f7e, ~9:31 PM CT Aug 21). Wiki re-check / age caption. Same ticket. Community reply hold stays (do not reply). Not a new heading.
+- **Priority:** taken / shipped-on-tag. v1.99.1 (5f43f7e, ~9:31 PM CT Aug 21). Wiki re-check / age caption. Same ticket. Status reply posted 2026-08-22; that reply hold is retired. Not a new heading.
 - **Place:** Drops by Creature wiki-missing marker. Desktop.
 - **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Replied 2026-08-22 (Scribe).
 - **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
@@ -123,7 +124,7 @@ Public-reply check-in is process, not a Holds line. New-thread thank-you still c
 - **VERIFIED Aug 21 (Claude):** the cache is real — `EqlWikiMobs.CacheLifetime` and `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`. Frankthetankk's "one root cause" reading is right and it is this. The `+N` half is ruled OUT: `WikiContribution.Classify` folds both sides through `QuestCatalog.BaseItemName`, which strips a trailing `+N`, and the 092734 screenshot has tiered items on both sides of the flag (Eyerazzia +4 unflagged, Fetid Skin flagged). **Still open — the fix is a per-page re-check**, on a flagged row and before the pack window exports. Not in 1.99.0.
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply (Claude already answered Step 2). Missing flags not clearing after a wiki correction and the +tier false positives in the 092734 screenshot "might be one root cause rather than two separate bugs." Back in #65, "the comparison was confirmed to run against a 7-day per-page cache on the user's machine — so a wiki edit takes up to a week to reach the flags, immediate only for pages you haven't viewed recently." A per-page re-check button was queued then and he does not see it in the changelog. Hypothesis, unchecked -- data source is that 7-day per-page cache, not a live wiki read. Do not restore #65; this is evidence on this item.
 - **Follow-up Aug 21, 4:50 PM CT:** Claude confirmed the 7-day cache (`EqlWikiMobs.CacheLifetime` / `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`). The +N half is not the cause: `QuestCatalog.BaseItemName` strips a trailing +N before matching; the 092734 shot has +4 items without a diamond and un-tiered items with one. Re-check button never built; not in 1.99.0. Did not reply. Do not restore #65.
-- **Follow-up Aug 21, 7:49 PM CT:** LeBigNasty on #226. Did not reply (old thread; Claude/Helm last before this). "I'll try to remember to check, but you should also check which pages. Innoruk, for example, is checking against the Lore page and not against the creature page." Helm hold stays: do not open. Still waiting, not a must. Do not restore #65. Leftover after v1.99.1: Innoruk lore-vs-creature. Helm: keep if still leftover (tooltip now names the served page). Community reply hold stays. Hypothesis, unchecked -- for Innoruk the compare may still read the Lore article. Named example only.
+- **Follow-up Aug 21, 7:49 PM CT:** LeBigNasty on #226. Did not reply (old thread; Claude/Helm last before this). "I'll try to remember to check, but you should also check which pages. Innoruk, for example, is checking against the Lore page and not against the creature page." Leftover after v1.99.1: Innoruk lore-vs-creature (not a hold; do not close the thread). Tooltip now names the served page. Status reply already posted. Hypothesis, unchecked -- for Innoruk the compare may still read the Lore article. Named example only.
 
 ### wiki pack copy copies the whole list, not one creature
 - **Priority:** waiting
