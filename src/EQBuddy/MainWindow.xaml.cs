@@ -2742,6 +2742,9 @@ public partial class MainWindow : Window, ICardContext
                     // numbers are the ones pinned on the widget before the lift; the
                     // point of the assertion is that they are the SAME numbers.
                     (_gearLootWindow is { IsLoaded: true } glwin ? glwin.DebugFacts() + " " : "") +
+                    // The Wiki contribution pack WINDOW, when EQBUDDY_WIKIPACK opened one:
+                    // its rows and its re-check button's target count (#226).
+                    (_wikiPackWindow is { IsLoaded: true } wpwin ? wpwin.DebugFacts() + " " : "") +
                     // The Kills & Drops WINDOW, when EQBUDDY_DROPS or EQBUDDY_CREATURE
                     // opened one. Its drops numbers are the ones pinned on the OLD host
                     // before the lift, and its kills numbers the ones pinned on the widget

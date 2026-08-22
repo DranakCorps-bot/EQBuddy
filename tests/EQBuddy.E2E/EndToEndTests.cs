@@ -140,6 +140,25 @@ public sealed class EndToEndTests
     /// fixture log is shared and a hard-coded creature count would be a test of the
     /// fixture. What is asserted is the RELATIONSHIP the surface exists to draw: a heading
     /// per creature, a row per drop, and the two adding up to what is on screen.</summary>
+    /// <summary>The Wiki contribution pack window draws its rows and carries the re-check
+    /// button (#226). The target COUNT is not predicted — it depends on what eqlwiki says
+    /// about the fixture's creatures that minute — but the fact must be present, which is
+    /// what says the button exists (trap 29/34).</summary>
+    [Fact]
+    public void TheWikiPackWindowDrawsRowsAndCarriesTheRecheck()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_WIKIPACK"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForWindow("packRows", "the Wiki contribution pack window to open");
+        Wait.Until(() => app.DumpValue("packRows") > 0, TimeSpan.FromSeconds(45),
+            "the fixture replay to land at least one creature in the pack");
+        Assert.True(app.DumpValue("packRecheck") >= 0, "the re-check button reports its target count");
+    }
+
     [Fact]
     public void TheDropsSurfaceDrawsACreatureHeadingAboveItsDropRows()
     {

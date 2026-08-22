@@ -237,6 +237,45 @@ public static class WikiPackPresentation
           "link. Nothing publishes automatically: you open the link, paste, review and save."
         : "Nothing to copy yet — the pack is empty.";
 
+    // ---------------- the re-check (#226; plan in FABLE.md, Fable 5) ----------------
+
+    /// <summary>The creatures the pack's "Re-check" button re-reads: every one the pack
+    /// is about to CLAIM something for, or could not read — never a creature whose page
+    /// already has all of it. Bounded on purpose (etiquette toward a volunteer wiki): the
+    /// flagged creatures, not the whole session.</summary>
+    public static IReadOnlyList<string> RecheckTargets(IEnumerable<WikiContribution.MobObservation> observations)
+    {
+        var targets = new List<string>();
+        foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
+        {
+            if (mob.Loot.Count == 0) continue;
+            var allKnown = mob.Loot.All(l => WikiContribution.Classify(lookup, l.Item) == WikiDropStatus.Known);
+            if (!allKnown) targets.Add(mob.Name);
+        }
+        return targets;
+    }
+
+    public static string RecheckLabel(int targets) => targets switch
+    {
+        0 => "Nothing to re-check",
+        1 => "Re-check 1 page",
+        _ => $"Re-check {targets} pages",
+    };
+
+    /// <summary>While it runs, the button itself reports progress through the window's
+    /// existing 3 s tick — "checking 3 of 9…" — so a slow wiki reads as working, not stuck.</summary>
+    public static string RecheckProgress(int inFlight, int total) =>
+        $"checking {Math.Max(0, total - inFlight) + 1} of {total}\u2026";
+
+    public static bool CanRecheck(int targets, bool running) => targets > 0 && !running;
+
+    public static string RecheckTip(int targets, bool running) => running
+        ? "Reading the flagged pages again now."
+        : targets == 0
+            ? "Every creature here is already fully on the wiki — nothing to re-read."
+            : "Read the flagged creatures' wiki pages again now, past the 7-day cache — after " +
+              "you fix a page, this is how the pack catches up. At most two requests at a time.";
+
     /// <summary>The standing footer. Says where the numbers come from and where they don't,
     /// because a rarity band from 10 kills and a rarity band from 200 are not the same claim.</summary>
     public const string Footer =

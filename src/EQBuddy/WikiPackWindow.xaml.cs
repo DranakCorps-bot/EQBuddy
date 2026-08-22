@@ -70,13 +70,27 @@ public partial class WikiPackWindow : Window
         var observations = Observations();
         var pack = WikiPackPresentation.Build(observations);
 
+        // The re-check button's state rides the signature too, so the tick repaints
+        // "checking 3 of 9…" as pages land and the label when the last one does.
+        var targets = WikiPackPresentation.RecheckTargets(observations);
+        var inFlight = targets.Count(_main.IsRechecking);
+
         // Same memo-signature guard as DropsWindow (#65): lookups land async, so the tick
         // re-renders until they settle. Rebuilding an identical panel every three seconds
         // would fight the scroll position.
         var sig = string.Join("|", pack.Rows.Select(r =>
-            $"{r.Creature}:{r.Kind}:{r.Contributions}")) + $"|{pack.PendingCreatures}";
+            $"{r.Creature}:{r.Kind}:{r.Contributions}")) + $"|{pack.PendingCreatures}|{targets.Count}|{inFlight}";
         if (sig == _signature) return;
         _signature = sig;
+
+        // Rows keep their previous kind until the new answer lands — the memo is never
+        // nulled by a re-check — so nothing here flickers to "not checked yet" mid-read.
+        RecheckBtn.Content = inFlight > 0
+            ? WikiPackPresentation.RecheckProgress(inFlight, targets.Count)
+            : WikiPackPresentation.RecheckLabel(targets.Count);
+        RecheckBtn.IsEnabled = WikiPackPresentation.CanRecheck(targets.Count, inFlight > 0);
+        RecheckBtn.Opacity = RecheckBtn.IsEnabled ? 1.0 : 0.5;   // trap 17, as Copy below
+        RecheckBtn.ToolTip = WikiPackPresentation.RecheckTip(targets.Count, inFlight > 0);
 
         var (character, server) = _main.Identity;
         HeadlineText.Text = WikiPackPresentation.Headline(pack);
@@ -157,6 +171,26 @@ public partial class WikiPackWindow : Window
 
         return grid;
     }
+
+    /// <summary>Re-read the flagged creatures' pages (#226). Bounded to
+    /// <see cref="WikiPackPresentation.RecheckTargets"/>, run through the host's own
+    /// re-check — which forgets both stale layers and obeys the two-in-flight cap — and
+    /// never silently: Copy does NOT re-read, because that would change what the player
+    /// saw before they pressed it.</summary>
+    private void OnRecheck(object sender, RoutedEventArgs e)
+    {
+        foreach (var creature in WikiPackPresentation.RecheckTargets(Observations()))
+            _main.RecheckMobLookup(creature);
+        _signature = "";
+        Render();
+    }
+
+    /// <summary>For the E2E dump. <c>packRecheck</c> is the re-check button's target
+    /// count — asserted because an absent control photographs as an unremarkable
+    /// button row (trap 29/34).</summary>
+    public string DebugFacts() =>
+        $"packRows={RowsPanel.Children.Count} " +
+        $"packRecheck={WikiPackPresentation.RecheckTargets(Observations()).Count}";
 
     private void OnCopy(object sender, RoutedEventArgs e)
     {

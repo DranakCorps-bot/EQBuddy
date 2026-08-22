@@ -34,6 +34,10 @@ public sealed class WikiPackWindow : Window
     private readonly TextBlock _breakdown = DesignSystem.Text(DesignTokens.TypeRole.BodySecondary);
     private readonly TextBlock _scope = DesignSystem.Text(DesignTokens.TypeRole.BodySecondary);
     private readonly Button _copyBtn = new();
+    /// <summary>The re-check (#226): read the flagged pages again, past the 7-day cache.
+    /// Explicit, never on open — re-reading on open is the burst, paid by every user on
+    /// every open to serve the few who edit.</summary>
+    private readonly Button _recheckBtn = new();
     private readonly StackPanel _rowsPanel = new();
 
     public WikiPackWindow(IDropsHost main)
@@ -74,6 +78,19 @@ public sealed class WikiPackWindow : Window
         _copyBtn.Cursor = new Cursor(StandardCursorType.Hand);
         _copyBtn.Click += (_, _) => OnCopy();
 
+        _recheckBtn.FontSize = _copyBtn.FontSize;
+        _recheckBtn.Padding = _copyBtn.Padding;
+        _recheckBtn.Margin = new Thickness(DesignTokens.SpaceS, 0, 0, DesignTokens.SpaceS);
+        _recheckBtn.Background = AppTheme.PanelBrush;
+        _recheckBtn.Foreground = AppTheme.TextBrush;
+        _recheckBtn.BorderThickness = new Thickness(0);
+        _recheckBtn.Cursor = new Cursor(StandardCursorType.Hand);
+        _recheckBtn.Click += (_, _) => OnRecheck();
+
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal };
+        buttons.Children.Add(_copyBtn);
+        buttons.Children.Add(_recheckBtn);
+
         var scroll = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -90,11 +107,11 @@ public sealed class WikiPackWindow : Window
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Star));
         layout.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
         Grid.SetRow(header, 0);
-        Grid.SetRow(_copyBtn, 1);
+        Grid.SetRow(buttons, 1);
         Grid.SetRow(scroll, 2);
         Grid.SetRow(footer, 3);
         layout.Children.Add(header);
-        layout.Children.Add(_copyBtn);
+        layout.Children.Add(buttons);
         layout.Children.Add(scroll);
         layout.Children.Add(footer);
         return layout;
@@ -126,14 +143,25 @@ public sealed class WikiPackWindow : Window
 
     private void Render()
     {
-        var pack = WikiPackPresentation.Build(Observations());
+        var observations = Observations();
+        var pack = WikiPackPresentation.Build(observations);
+        var targets = WikiPackPresentation.RecheckTargets(observations);
+        var inFlight = targets.Count(_main.IsRechecking);
 
         // Lookups land async, so the tick re-renders until they settle; rebuilding an
-        // identical panel every three seconds would fight the scroll position.
+        // identical panel every three seconds would fight the scroll position. The
+        // re-check's state rides along so "checking 3 of 9…" advances as pages land.
         var sig = string.Join("|", pack.Rows.Select(r =>
-            $"{r.Creature}:{r.Kind}:{r.Contributions}")) + $"|{pack.PendingCreatures}";
+            $"{r.Creature}:{r.Kind}:{r.Contributions}")) + $"|{pack.PendingCreatures}|{targets.Count}|{inFlight}";
         if (sig == _signature) return;
         _signature = sig;
+
+        _recheckBtn.Content = inFlight > 0
+            ? WikiPackPresentation.RecheckProgress(inFlight, targets.Count)
+            : WikiPackPresentation.RecheckLabel(targets.Count);
+        _recheckBtn.IsEnabled = WikiPackPresentation.CanRecheck(targets.Count, inFlight > 0);
+        _recheckBtn.Opacity = _recheckBtn.IsEnabled ? 1.0 : 0.5;   // trap 17, as Copy below
+        ToolTip.SetTip(_recheckBtn, WikiPackPresentation.RecheckTip(targets.Count, inFlight > 0));
 
         var (character, server) = _main.Identity;
         _headline.Text = WikiPackPresentation.Headline(pack);
@@ -213,6 +241,17 @@ public sealed class WikiPackWindow : Window
         grid.Children.Add(text);
 
         return grid;
+    }
+
+    /// <summary>Re-read the flagged creatures' pages (#226), through the host's own
+    /// re-check (both stale layers, two-in-flight cap). Copy does NOT re-read: that would
+    /// change what the player saw before they pressed it.</summary>
+    private void OnRecheck()
+    {
+        foreach (var creature in WikiPackPresentation.RecheckTargets(Observations()))
+            _main.RecheckMobLookup(creature);
+        _signature = "";
+        Render();
     }
 
     private async void OnCopy()

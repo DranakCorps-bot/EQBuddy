@@ -33,7 +33,8 @@ public sealed class WikiPackRenderTests
         public Task<string?> FetchItemTooltip(string itemName) => Task.FromResult<string?>(null);
         public MobLookupResult? WikiMobResult(string name) => MobResult(name);
         public void EnsureMobLookup(string name) => LookupsFired.Add(name);
-        public void RecheckMobLookup(string name) { }
+        public List<string> Rechecks { get; } = [];
+        public void RecheckMobLookup(string name) => Rechecks.Add(name);
         public bool IsRechecking(string name) => false;
         public bool IsActiveQuestItem(string name) => false;
         public void OpenQuestInfoForItem(string itemName) { }
@@ -106,11 +107,57 @@ public sealed class WikiPackRenderTests
         window.Show();
         window.Update(Snapshot());
 
-        var copy = window.GetVisualDescendants().OfType<Button>().Single();
+        var copy = window.GetVisualDescendants().OfType<Button>().Single(b => (b.Content as string) == "Copy for wiki");
         Assert.False(copy.IsEnabled);
         Assert.True(copy.Opacity < 1.0, "a disabled Copy must LOOK disabled — trap 17");
 
         Assert.Contains(TextsOf(window), t => t is not null && t.Contains("already on eqlwiki"));
+    }
+
+    /// <summary>The re-check button (#226): labelled with how many pages it would read,
+    /// bounded to the flagged creatures, and a press reaches the host for exactly those.
+    /// Here Chief Goonda has no page and the moss snake's page lists no loot, so both are
+    /// targets; nothing is fully known, so nothing is excluded.</summary>
+    [AvaloniaFact]
+    public void The_recheck_button_names_its_targets_and_a_press_reaches_the_host()
+    {
+        var host = new FakeHost
+        {
+            MobResult = name => name == "a moss snake"
+                ? new MobLookupResult(new MobInfo { Name = "a moss snake" }, ItemLookupState.Cached, DateTime.UtcNow)
+                : new MobLookupResult(null, ItemLookupState.NotFound, null),
+        };
+        var window = new WikiPackWindow(host);
+        window.Show();
+        window.Update(Snapshot());
+
+        var recheck = window.GetVisualDescendants().OfType<Button>().Single(b => (b.Content as string) == "Re-check 2 pages");
+        Assert.True(recheck.IsEnabled);
+        recheck.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal(["Chief Goonda", "a moss snake"], host.Rechecks);
+    }
+
+    /// <summary>…and when every page already has everything, it says so and is visibly
+    /// disabled (trap 17) — a button that re-read pages with nothing to gain would be
+    /// the burst with a label on it.</summary>
+    [AvaloniaFact]
+    public void The_recheck_button_is_dim_when_nothing_is_flagged()
+    {
+        var host = new FakeHost
+        {
+            MobResult = _ => new MobLookupResult(new MobInfo
+            {
+                Name = "x",
+                Drops = [("Goonda's Club", ""), ("Snake Fang", "")],
+            }, ItemLookupState.Cached, DateTime.UtcNow),
+        };
+        var window = new WikiPackWindow(host);
+        window.Show();
+        window.Update(Snapshot());
+
+        var recheck = window.GetVisualDescendants().OfType<Button>().Single(b => (b.Content as string) == "Nothing to re-check");
+        Assert.False(recheck.IsEnabled);
+        Assert.True(recheck.Opacity < 1.0);
     }
 
     /// <summary>An unread wiki page must never render as "nothing new" — the one honesty
@@ -127,7 +174,7 @@ public sealed class WikiPackRenderTests
         Assert.Contains(text, t => t is not null && t.Contains("not checked yet"));
         Assert.DoesNotContain(text, t => t is not null && t.Contains("already on eqlwiki"));
 
-        var copy = window.GetVisualDescendants().OfType<Button>().Single();
+        var copy = window.GetVisualDescendants().OfType<Button>().Single(b => (b.Content as string) == "Copy for wiki");
         Assert.False(copy.IsEnabled);
     }
 }

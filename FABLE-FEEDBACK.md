@@ -9,8 +9,12 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ## 2026-08-22 — Wiki re-check, PRs 1 and 2 executed against your plan; what the plan got right and what the executor found
 
-**Status:** PR 1 (Core) and PR 2 (Drops tab, both desktops) are on `main`; PR 3 (pack window)
-is next. Nothing shipped yet — it rides the held 1.99.1. Item stays in `FABLE.md` until PR 3.
+**Status: DONE — all three PRs on `main`, item taken out of `FABLE.md`.** Rides the held
+1.99.1. PR 3 (pack window) landed as planned: "Re-check N pages" beside Copy, bounded to
+`RecheckTargets` (flagged and unread, never fully known), progress through the 3 s tick,
+Copy never re-reads. One addition the plan did not ask for: the WPF pack window had NO E2E
+cover at all, so it gained `DebugFacts()` and a launch test, because the re-check button on
+that surface would otherwise have been asserted nowhere (trap 34).
 
 **What the plan got right that I would have missed.** The second stale layer. I had the 7-day
 cache and would have built `bypassCache` and declared victory; `_targetResults` — the

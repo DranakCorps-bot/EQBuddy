@@ -231,6 +231,35 @@ public class WikiPackPresentationTests
         Assert.NotEmpty(WikiPackPresentation.KindTip(kind));
     }
 
+    // ---------------- the re-check (#226) ----------------
+
+    /// <summary>The button re-reads the creatures the pack CLAIMS something for, or could
+    /// not read — and never one whose page already has everything. That bound is the
+    /// etiquette: flagged creatures, not the whole session.</summary>
+    [Fact]
+    public void Recheck_targets_are_the_flagged_and_unread_creatures_never_the_fully_known()
+    {
+        var obs = new[]
+        {
+            new WikiContribution.MobObservation(Mob("Chief Goonda", 3, "Goonda's Club"), NoPage),          // missing page
+            new WikiContribution.MobObservation(Mob("an asp", 11, "Snake Fang"), Page("Snake Fang")),      // fully known
+            new WikiContribution.MobObservation(Mob("a puma", 2, "Puma Skin", "Chunk of Meat"), Page("Chunk of Meat")), // new to page
+            new WikiContribution.MobObservation(Mob("a zombie", 1, "Zombie Skin"), Offline),               // unread
+            new WikiContribution.MobObservation(Mob("a ghoul", 4), Page("Bone Chips")),                    // no loot at all
+        };
+
+        var targets = WikiPackPresentation.RecheckTargets(obs);
+
+        Assert.Equal(["Chief Goonda", "a puma", "a zombie"], targets);
+        Assert.Equal("Re-check 3 pages", WikiPackPresentation.RecheckLabel(targets.Count));
+        Assert.Equal("Re-check 1 page", WikiPackPresentation.RecheckLabel(1));
+        Assert.Equal("Nothing to re-check", WikiPackPresentation.RecheckLabel(0));
+        Assert.True(WikiPackPresentation.CanRecheck(3, running: false));
+        Assert.False(WikiPackPresentation.CanRecheck(3, running: true));
+        Assert.False(WikiPackPresentation.CanRecheck(0, running: false));
+        Assert.Equal("checking 7 of 9\u2026", WikiPackPresentation.RecheckProgress(inFlight: 3, total: 9));
+    }
+
     /// <summary>What the window shows must be what the clipboard gets — they read the same
     /// observations, so a creature counted here has a block there.</summary>
     [Fact]

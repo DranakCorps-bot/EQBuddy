@@ -30,9 +30,16 @@
                        TextWrapping="Wrap" Margin="{DynamicResource LeadXs}"/>
         </StackPanel>
 
-        <Button x:Name="CopyBtn" Grid.Row="1" HorizontalAlignment="Left"
-                Style="{StaticResource ActionButton}" Margin="{DynamicResource StackS}"
-                Padding="{DynamicResource PadControl}" Click="OnCopy"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="{DynamicResource StackS}">
+            <Button x:Name="CopyBtn" Style="{StaticResource ActionButton}"
+                    Padding="{DynamicResource PadControl}" Click="OnCopy"/>
+            <!-- The re-check (#226): read the flagged pages again, past the 7-day cache.
+                 Explicit, never on open — re-reading on open is the burst, paid by every
+                 user on every open to serve the few who edit. -->
+            <Button x:Name="RecheckBtn" Style="{StaticResource ActionButton}"
+                    Margin="{DynamicResource GapS}"
+                    Padding="{DynamicResource PadControl}" Click="OnRecheck"/>
+        </StackPanel>
 
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="RowsPanel"/>
