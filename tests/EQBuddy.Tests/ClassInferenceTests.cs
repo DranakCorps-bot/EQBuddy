@@ -138,6 +138,59 @@ public class ClassInferenceTests
         Assert.Equal("Wizard", inf.Current());
     }
 
+    /// <summary>#120 (Frankthetankk, 2026-08-21): the ALT-SWAP case — *"someone plays two
+    /// classes roughly equally rather than a one-time dabble… does the half-life decay
+    /// handle that gracefully, or is there a real risk of visible flip-flopping session to
+    /// session?"* He asked whether the lead margin already covers it or it needs testing
+    /// separately. It needed testing separately; this is it.
+    ///
+    /// The answer is that there is no flip-flop, because there are only two outcomes and
+    /// neither one flickers: while you are actually playing a class, recency carries it
+    /// past the 2× lead margin and it is named; in the handover between them the margin is
+    /// not met and the honest "" comes back. A player who splits evenly does not see the
+    /// label alternate under him — he sees it go quiet and then name whatever he is
+    /// actually casting. That is the designed behaviour and it is the right one, but it
+    /// was a reading of the constant until this test drove the sequence.</summary>
+    [Fact]
+    public void AlternatingTwoClassesNamesTheOneBeingPlayedAndNeverFlickers()
+    {
+        var inf = new ClassInference();
+        var answers = new List<string>();
+
+        // Four stretches, alternating. Twenty minutes each — two half-lives, which is what
+        // an alt-swapper actually does in a night, not a one-line dabble.
+        for (var stretch = 0; stretch < 4; stretch++)
+        {
+            var rogue = stretch % 2 == 0;
+            var start = stretch * 20.0;
+            for (var i = 0; i < 120; i++)
+            {
+                var at = start + i / 6.0;
+                if (rogue) inf.RecordAbilityUse("Backstab", At(at));
+                else
+                {
+                    inf.RecordCast("Ice Comet", At(at));
+                    inf.RecordCast("Draught of Fire", At(at + 0.08));
+                }
+                answers.Add(inf.Current());
+            }
+            // By the end of each stretch the class being PLAYED is the one named.
+            Assert.Equal(rogue ? "Rogue" : "Wizard", inf.Current());
+        }
+
+        // The only two things it ever says are the class in hand and "don't know" — it
+        // never names the class you are NOT playing, which is what flip-flopping would be.
+        Assert.All(answers, a => Assert.Contains(a, new[] { "", "Rogue", "Wizard" }));
+
+        // And every change of mind passes through "" rather than swapping directly: a
+        // direct Rogue→Wizard flip would be the visible flicker he was worried about.
+        var changes = answers.Where((a, i) => i == 0 || a != answers[i - 1]).ToList();
+        for (var i = 1; i < changes.Count; i++)
+            Assert.True(changes[i - 1] == "" || changes[i] == "",
+                $"the reading went straight from '{changes[i - 1]}' to '{changes[i]}' without "
+                + "passing through \"don't know\" — that is the flip-flop #120 asked about");
+    }
+
     /// <summary>Decay is uniform, so it can never flip a reading on its own. A player who
     /// earned an inference and then stood in the bazaar for an hour still has it — that
     /// is why the sighting floor counts raw sightings and not weight.</summary>

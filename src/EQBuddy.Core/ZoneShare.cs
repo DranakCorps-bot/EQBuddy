@@ -45,10 +45,16 @@ public static class ZoneShare
         public Dictionary<string, double> LearnedTimers { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
-    /// <param name="Triggered">The catalog says this mob has no cycle at all (eqlwiki's
-    /// "Triggered"), so the incoming number is noise by construction. Shown flagged in
-    /// the preview and never applied, even with includeFlagged — or one shared archive
-    /// would re-poison an entry the engine had just healed.</param>
+    /// <param name="Triggered">The catalog says this mob has no cycle to import a number
+    /// FOR — a triggered spawn (eqlwiki's own "Triggered") or a raid-instance boss, whose
+    /// respawn is the game's instance clock. Shown flagged in the preview and never
+    /// applied, even with includeFlagged.
+    ///
+    /// Triggered entries were refused from the start; RAID-INSTANCED ones were not, and
+    /// that was churn nobody could see (Fable 5, release review of v1.99.2): an import
+    /// would write a duration onto Lord Nagafen that `HealSuppressedOverrides` silently
+    /// removed at the next launch. Same rule, same line — the catalog says there is no
+    /// cycle, so there is nothing for a stranger's number to be about.</param>
     public sealed record TimerDiff(string Name, double? CurrentSeconds, double IncomingSeconds, bool Flagged,
         bool Triggered = false);
 
@@ -163,7 +169,7 @@ public static class ZoneShare
                 ?? (entry is not null && zone is not null ? SpawnCatalog.EffectiveSeconds(zone, entry) : null);
             // The deviation gate: no baseline = flagged (nothing to corroborate);
             // a big swing from the established clock = flagged.
-            var triggered = entry is { IsTriggered: true };
+            var triggered = entry is { IsTriggered: true } or { RaidInstanced: true };
             var flagged = triggered || current is not { } cur
                 || Math.Abs(incoming - cur) / Math.Max(1, cur) > DeviationFlagFraction;
             timers.Add(new TimerDiff(name, current, incoming, flagged, triggered));

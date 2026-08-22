@@ -537,6 +537,46 @@ public class ZoneShareTests
         Assert.Null(mine.Find("Plane of Sky", "Bzzzt"));
     }
 
+    /// <summary>…and the same for a RAID-INSTANCED boss, which was the half this rule
+    /// missed until Fable 5's release review of v1.99.2. An import used to write a
+    /// duration onto Lord Nagafen that `HealSuppressedOverrides` then removed at the next
+    /// launch — churn rather than a defect, invisible to everyone, and closed by the one
+    /// line triggered entries already had. The catalog says there is no cycle; a
+    /// stranger's number has nothing to be about.</summary>
+    [Fact]
+    public void AnImportNeverPutsADurationOnARaidInstancedBoss()
+    {
+        var zone = new SpawnZone
+        {
+            Zone = "Nagafen's Lair",
+            NamedDefaultSeconds = 43200,
+            Named = [new SpawnEntry { Name = "Lord Nagafen", RespawnSeconds = 604800 }],
+        };
+        SpawnCatalog.MarkRaidInstanced(new SpawnCatalog { Zones = [zone] }, new RaidTargetCatalog(
+        [
+            new RaidTargetCatalog.ZoneEntry { Zone = "Nagafen's Lair", Bosses = ["Lord Nagafen"] },
+        ]));
+        Assert.True(zone.Named[0].RaidInstanced, "fixture: the cross-reference must mark him");
+
+        var sharer = new SpawnOverrides();
+        var theirs = sharer.GetOrAdd("Nagafen's Lair", "Lord Nagafen");
+        theirs.RespawnSeconds = 600000;
+        theirs.Learned = true;
+
+        var mine = new SpawnOverrides();
+        var wire = ZoneShare.Export(new SpawnPointLedger.ZoneArchive { Zone = "Nagafen's Lair" }, zone, sharer);
+        var preview = ZoneShare.PreviewImport(wire, new SpawnPointLedger.ZoneArchive { Zone = "Nagafen's Lair" },
+            zone, mine)!;
+
+        var diff = Assert.Single(preview.Timers);
+        Assert.True(diff.Triggered);
+        Assert.True(diff.Flagged);
+
+        ZoneShare.Apply(preview, new SpawnPointLedger.ZoneArchive { Zone = "Nagafen's Lair" },
+            zone, mine, includeFlagged: true);
+        Assert.Null(mine.Find("Nagafen's Lair", "Lord Nagafen"));
+    }
+
     /// <summary>An import cannot smuggle a stale Sighted flag onto a stranger's number.
     /// Sighted exempts a value from the self-heal that purges re-kill noise — it means
     /// "I watched this mob act before its clock ran out", which is never true of a
