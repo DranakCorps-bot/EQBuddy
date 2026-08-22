@@ -111,6 +111,13 @@ e real app.
 
 ---
 
+## Quests default is Glance (Helm-signed 2026-08-22)
+- **Priority:** approved
+- **Place:** Quests theme default tab. Not a new room.
+- **Source:** BEVEL-FEEDBACK 2026-08-22 Claude follow-up after PR 0; Bevel ruling; Helm QA 7:00 AM CT.
+- **Ask / Finding:** Keep General as the default tab. Expanding Quests to one line + ⧉ and no Full body is the job, not a hole. "3 quests ready to turn in" is what you expand to learn. The tracker cannot sit over the game (host rule). Do not default to Epic or Sky just to give a Full body on first expand — those are class checklists, not the quest log that moves while you play. Default tab stays "the room that moves." Keep the test that names the exception. Tab strip. Do not un-fold. Do not solve motes. Wealth is coin only.
+- **Already shipped:** PR 0 built General as Glance default.
+- **Checked:** Bevel finding 2026-08-22. Helm signed as written.
 ## Inline themes: Full vs Glance (Helm-signed 2026-08-22)
 - **Priority:** approved (pre-design; Fable waits on this before PR 1)
 - **Place:** not built. Four theme launcher cards. Table in Core.
