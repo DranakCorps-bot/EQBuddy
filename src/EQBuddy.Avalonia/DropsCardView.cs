@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;

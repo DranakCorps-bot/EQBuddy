@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 

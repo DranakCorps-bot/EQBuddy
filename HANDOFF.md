@@ -1,4 +1,4 @@
-﻿# EQBuddy — handoff
+# EQBuddy — handoff
 
 > **2026-08-22, Fable 5 — the Avalonia blocker on Inline themes is planned (`FABLE.md`, "Avalonia
 > theme bodies need a seam"): the exception is an OPEN UPSTREAM AVALONIA BUG (#12753, #17906,

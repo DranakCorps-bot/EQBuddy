@@ -1,4 +1,4 @@
-﻿# Decisions made without asking
+# Decisions made without asking
 
 **For David to skim, not to approve.** Every line here is a call an agent made under the
 pre-authorization in `CLAUDE.md` ("What needs David, and what does not"): a decision that
@@ -142,3 +142,20 @@ history of the call stays readable. If vetoes become common, the consequence lis
   any tag ships it, and a player-visible change with no note is the defect the What's-new rule
   exists to prevent. The entry names Windows explicitly and says why the other build lags, which
   is the opposite of quiet. **This is the one judgement call in the release for David to veto.**
+- **Corrected the motes What's-new sentence and its code comment rather than building a flag**
+  (Fable, v1.99.4 review). `HiddenSections` has no provenance, so the restore cannot tell a
+  deliberate hide from the blanket one and DOES un-hide a starred player who re-hid the card.
+  Default it could have gone the other way: add a "player touched it" flag. Landed: one day of
+  exposure, one toggle to undo, and a setting that remembers a single day is a setting forever.
+- **PATTERN, not a one-off: I write comments from the INTENT and not from the code.** Fable
+  caught the same shape twice in one day — the `AppSettings.Load` "never saves" claim and the
+  motes "stays off" claim. Both times the tests were right and the prose asserted a safety
+  property the code lacks. Worth checking for deliberately in review.
+- **Stripped the BOMs and rebuilt `WhatsNew.json` from the tag's own bytes.** The cause was my
+  Python `encoding='utf-8-sig'` on WRITE (right for reading, wrong for writing), not a
+  PowerShell `Set-Content` as the review guessed; 19 files, not 15, measured against `v1.99.3`
+  rather than counted by eye. The file uses three-space array elements and `indent=2` emits six,
+  which is what made a 13-line addition a 2,387-line diff. Now 13 added, 0 removed.
+- **Did NOT add a `.gitattributes`.** Fable framed it as a one-time renormalisation and a V1
+  call; a whole-repo line-ending commit in the middle of a staged release is the wrong moment.
+  Logged so the next loop can take it deliberately.

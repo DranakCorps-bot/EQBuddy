@@ -1,4 +1,4 @@
-﻿# Fable inbox
+# Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**
 (or leave only what is still planned).

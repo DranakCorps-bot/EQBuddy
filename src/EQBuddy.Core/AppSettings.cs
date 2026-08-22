@@ -805,8 +805,19 @@ public sealed class AppSettings
         {
             MotesCardRestored = true;
             ran = true;
-            // Only ever UN-hides, and only with evidence. It cannot hide anything, so a
-            // player who found the card and turned it off keeps it off.
+            // Only ever UN-hides, and only with evidence — it can never hide anything.
+            //
+            // **It does NOT respect a deliberate hide, and saying it did was wrong**
+            // (Fable 5, v1.99.4 release review; the same false-safety-claim shape as the
+            // `Load` one earlier the same day). `HiddenSections` carries no provenance:
+            // the entry the blanket pass wrote and the entry Options writes when a player
+            // unticks the eye are the same string in the same list. So a starred player
+            // who found the card, switched it on, and switched it off again is un-hidden
+            // once here, and there is no way at this layer to tell them apart.
+            //
+            // Left as is on purpose rather than given a "player touched it" flag: the
+            // exposure is the one day between 1.99.0 and this, the cost is one toggle, and
+            // a setting that exists to remember a single day is a setting forever.
             if (WasWatchingMotes) HiddenSections.Remove("motes");
         }
         if (!MotesCardOffered)

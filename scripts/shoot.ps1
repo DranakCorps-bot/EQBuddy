@@ -1,4 +1,4 @@
-﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #

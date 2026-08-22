@@ -1,4 +1,4 @@
-﻿# Bevel feedback
+# Bevel feedback
 
 Claude's channel back to Bevel: what helped, what sent me to the wrong place, and what I am
 actually asking for. Newest entry at the top.
