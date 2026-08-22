@@ -23,6 +23,19 @@ namespace EQBuddy.UI.Shared;
 /// the widget's Watch card are the rest. Text formatting is not repeated here — that is
 /// <see cref="SpawnDurationText"/> and <see cref="Countdown"/>, both already load-bearing.
 /// </summary>
+/// <summary>WHY a row deliberately runs no countdown. A bool carried this until the Sky
+/// work (#109 follow-up) needed a second reason, and one flag meaning two things is
+/// trap 4: the word on the row must differ, because the player's next action differs —
+/// wait for the instance clock, versus go and kill the trigger.</summary>
+public enum TimerSuppression
+{
+    None,
+    /// <summary>A raid-instanced boss: the game's own instance clock, not a camp cycle (#109).</summary>
+    RaidInstance,
+    /// <summary>eqlwiki's "Triggered": it appears when something else happens, never on a clock.</summary>
+    Triggered,
+}
+
 public static class TimerView
 {
     /// <summary>Due within this many seconds counts as imminent, and it stays imminent
@@ -49,6 +62,11 @@ public static class TimerView
         /// game's own instance clock, not a kill-to-respawn camp cycle (#109). Says so
         /// instead of showing a blank that reads as broken.</summary>
         Suppressed,
+        /// <summary>Deliberately not counted — a TRIGGERED spawn (eqlwiki's own word): it
+        /// appears when the previous link in a chain dies or a particular trash mob is
+        /// killed, never on a clock. Distinct from <see cref="Suppressed"/> because the
+        /// player's next action is different — go and kill the trigger.</summary>
+        Triggered,
     }
 
     /// <param name="Fraction">Elapsed share of the cycle, 0..1, or null when there is
@@ -77,11 +95,12 @@ public static class TimerView
     /// <param name="durationSeconds">The full cycle, for the progress fraction. Null or
     /// non-positive means no fraction can be computed — the bar draws an empty track.</param>
     /// <param name="hasTimer">Whether a kill has been seen at all.</param>
-    /// <param name="suppressed">Raid-instanced: deliberately not counted (#109).</param>
+    /// <param name="suppression">Why no countdown runs, when one deliberately does not.</param>
     public static View For(DateTime? dueAt, double? durationSeconds, DateTime now,
-        bool hasTimer = true, bool suppressed = false)
+        bool hasTimer = true, TimerSuppression suppression = TimerSuppression.None)
     {
-        if (suppressed) return new(State.Suppressed, null, "DimBrush", null);
+        if (suppression == TimerSuppression.RaidInstance) return new(State.Suppressed, null, "DimBrush", null);
+        if (suppression == TimerSuppression.Triggered) return new(State.Triggered, null, "DimBrush", null);
         if (!hasTimer) return new(State.Idle, null, "DimBrush", null);
         if (dueAt is not { } due) return new(State.Unknown, null, "DimBrush", null);
 
@@ -107,6 +126,7 @@ public static class TimerView
     {
         State.Due => "DUE",
         State.Suppressed => "instance",
+        State.Triggered => "triggered",
         State.Unknown => "—",
         State.Idle => "",
         _ => SpawnDurationText.Countdown((dueAt ?? now) - now),

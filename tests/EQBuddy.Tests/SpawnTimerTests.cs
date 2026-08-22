@@ -1732,6 +1732,31 @@ public class SpawnTimerTests
         Assert.Equal(T0.AddHours(12), Assert.Single(t.Snapshot(T0.AddMinutes(1))).DueAt);
     }
 
+    /// <summary>The Sky follow-up to #109: the row for a triggered spawn says
+    /// "triggered", names what brings it, and offers no fake default to edit — and it
+    /// is a DIFFERENT word from "instance", because the next action is different.</summary>
+    [Fact]
+    public void ATriggeredRowSaysTriggeredAndNamesItsTrigger()
+    {
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+        var vm = new SpawnsViewModel(SkyCatalog(), overrides, t);
+
+        var row = vm.RowsFor("Plane of Sky", T0).Single(r => r.Name == "Bzzzt");
+        Assert.Equal("triggered", row.CountdownText);
+        Assert.Equal("", row.DurationText);
+        Assert.Equal(TimerSuppression.Triggered, row.Suppression);
+        Assert.Contains("Bazzzazzt", row.Detail);
+        Assert.Contains("eqlwiki", row.Detail);
+        Assert.False(row.HasActiveTimer);
+
+        // A typed duration turns it back into an ordinary row — their reminder, their call.
+        vm.SetDuration("Plane of Sky", "Bzzzt", "10m");
+        var typed = vm.RowsFor("Plane of Sky", T0).Single(r => r.Name == "Bzzzt");
+        Assert.Equal(TimerSuppression.None, typed.Suppression);
+        Assert.Equal("10m", typed.DurationText);
+    }
+
     [Fact]
     public void RaidBossRowSaysInstanceInsteadOfABlank()
     {

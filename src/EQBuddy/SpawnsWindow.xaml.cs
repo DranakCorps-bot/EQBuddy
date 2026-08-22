@@ -273,7 +273,7 @@ public partial class SpawnsWindow : Window
         public void Update(SpawnRow row, DateTime now)
         {
             var view = TimerView.For(row.DueAt, row.DurationSeconds, now,
-                row.HasActiveTimer, row.Suppressed);
+                row.HasActiveTimer, row.Suppression);
             _text.Text = TimerView.Text(view, row.DueAt, now);
             _text.Ink(view.TextColorKey);
 

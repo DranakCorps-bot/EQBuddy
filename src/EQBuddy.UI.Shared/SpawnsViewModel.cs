@@ -58,9 +58,10 @@ public sealed record SpawnRow(
     /// <summary>The full respawn cycle, for the progress fraction.</summary>
     public double? DurationSeconds { get; init; }
 
-    /// <summary>Raid-instanced with no player-typed duration: deliberately not counted
-    /// (#109), and it says so rather than showing a blank.</summary>
-    public bool Suppressed { get; init; }
+    /// <summary>Why no countdown runs, when one deliberately does not: a raid-instanced
+    /// boss (#109) or a triggered spawn, each without a player-typed duration. The row
+    /// says which rather than showing a blank, because the player's next action differs.</summary>
+    public TimerSuppression Suppression { get; init; }
 }
 
 /// <summary>
@@ -140,11 +141,20 @@ public sealed class SpawnsViewModel
             else
                 countdown = $"killed {SpawnDurationText.Format((now - timer.KilledAt).TotalSeconds)} ago";
         }
-        // Raid-instance bosses without a player-typed duration run no countdown
-        // (#109) — say why in place of one, instead of a blank that reads as broken.
-        var suppressedInstance = entry is { RaidInstanced: true }
-            && (o?.RespawnSeconds is null || o.Learned);
+        // Raid-instance bosses and triggered spawns without a player-typed duration run
+        // no countdown (#109 and its Sky follow-up) — say WHY in place of one, instead of
+        // a blank that reads as broken. Triggered wins when both apply (The Spiroc Lord
+        // is in the raid-target list AND chained): "go kill the Guardian" is the more
+        // useful sentence than "wait for the instance".
+        var manual = o?.RespawnSeconds is not null && !o.Learned;
+        var suppression = manual ? TimerSuppression.None
+            : entry is { IsTriggered: true } ? TimerSuppression.Triggered
+            : entry is { RaidInstanced: true } ? TimerSuppression.RaidInstance
+            : TimerSuppression.None;
+        var suppressedInstance = suppression == TimerSuppression.RaidInstance;
+        var suppressedTriggered = suppression == TimerSuppression.Triggered;
         if (!hasTimer && suppressedInstance) countdown = "instance";
+        if (!hasTimer && suppressedTriggered) countdown = "triggered";
 
         // "Added by you" would be a lie for a row EQBuddy discovered itself (#185) —
         // and the player has to be able to tell, because a discovery is a guess from
@@ -159,7 +169,12 @@ public sealed class SpawnsViewModel
                 : "Added by you"
             : string.Join(" · ", new[]
         {
-            suppressedInstance
+            suppressedTriggered
+                ? "Triggered spawn — there is no clock to count down: it appears when "
+                  + (entry!.TriggeredBy.Length > 0 ? entry.TriggeredBy : "its trigger")
+                  + " dies (eqlwiki). Type a respawn time here if you want your own "
+                  + "reminder anyway."
+                : suppressedInstance
                 ? "Raid instance: a fresh instance brings its own copy (daily per "
                   + "difficulty, weekly full reset — the game's Instance Maintenance "
                   + "screen has the real clocks), so there is no kill-to-respawn camp "
@@ -196,7 +211,7 @@ public sealed class SpawnsViewModel
             // The timer's own duration when one is running (it may have been learned or
             // manually started with a different value than the row's), else the row's.
             DurationSeconds = timer?.DurationSeconds ?? duration,
-            Suppressed = suppressedInstance,
+            Suppression = suppression,
         };
     }
 

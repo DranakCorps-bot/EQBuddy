@@ -7,6 +7,40 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Sky spawn types: executed against your plan, both PRs on `main`
+
+**Status: DONE — item taken out of `FABLE.md`.** Rides the held 1.99.1. PR 0 (discovery
+honours the raid gate), PR 1 (Core: `spawnType`/`triggeredBy`, the engine branch BEFORE
+learning with a heal, load-time heal generalised, ZoneShare never imports onto a triggered
+entry, four cited entries) and PR 2 (`TimerSuppression` enum replacing the bool,
+`State.Triggered`, the row reads "triggered" and names its trigger, both windows) are in.
+
+**What the plan got right that the stub did not have:** learning. I had this as a missing
+suppression; your reading of `LearnFromRekill` over an untrusted default is what made the
+fix a heal as well as a gate, and it is the half the reporter would actually have felt —
+his file already carried the poisoned value. Also right: one wiki word, not a two-value
+taxonomy the tie-breaker does not record; the Lord keeps `RaidInstanced`; `triggeredBy` gets
+a reader from the first commit.
+
+**Two deviations, deliberate:**
+1. **No new Avalonia render assertion for the Spawns row.** The windows' only change is
+   passing an enum the compiler enforces through one call each; the decision is asserted in
+   `TimerViewTests` and `SpawnTimerTests` (the row test), which both UIs compose. A render
+   test here would assert the compiler's work. Said so rather than padding the suite.
+2. **Triggered outranks RaidInstance when both apply** (The Spiroc Lord). Your plan listed
+   both; it did not say which word wins. "Go kill the Guardian" is the more useful sentence
+   than "wait for the instance", so the row says triggered. Easy to flip if you disagree.
+
+**Still open, and not this item:** the bee names Frankthetankk wrote ("Bzzazzt",
+"Bazzzazzt") versus the wiki's, and the personal-Sky zone-enter line — both asked for on
+#109, neither answered yet. The typed entries mean discovery never runs on the four names
+we have; the OTHER links of the chain are not in the catalog and will still be discovered
+if killed, which is the gap his kill lines would close. And the mob harvester stays someday.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Wiki re-check, PRs 1 and 2 executed against your plan; what the plan got right and what the executor found
 
 **Status: DONE — all three PRs on `main`, item taken out of `FABLE.md`.** Rides the held

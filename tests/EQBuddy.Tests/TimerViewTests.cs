@@ -86,7 +86,7 @@ public class TimerViewTests
     public void RowsWithNoCycleDrawNoTrack()
     {
         Assert.False(TimerView.For(null, null, Now, hasTimer: false).HasTrack);
-        Assert.False(TimerView.For(null, null, Now, suppressed: true).HasTrack);
+        Assert.False(TimerView.For(null, null, Now, suppression: TimerSuppression.RaidInstance).HasTrack);
     }
 
     /// <summary>#109: a raid-instanced boss respawns on the game's instance clock, not a
@@ -94,10 +94,26 @@ public class TimerViewTests
     [Fact]
     public void ARaidInstancedRowExplainsItselfInsteadOfCountingDown()
     {
-        var view = TimerView.For(Now.AddSeconds(300), 600, Now, suppressed: true);
+        var view = TimerView.For(Now.AddSeconds(300), 600, Now, suppression: TimerSuppression.RaidInstance);
         Assert.Equal(TimerView.State.Suppressed, view.State);
         Assert.Equal("instance", TimerView.Text(view, Now.AddSeconds(300), Now));
         Assert.Null(view.Fraction);
+    }
+
+    /// <summary>The Sky follow-up to #109: a TRIGGERED spawn is a different reason from a
+    /// raid instance, and the word on the row must differ because the player's next
+    /// action differs (go kill the trigger, versus wait for the instance clock). One
+    /// flag for two meanings is trap 4.</summary>
+    [Fact]
+    public void ATriggeredRowSaysTriggeredNotInstance()
+    {
+        var view = TimerView.For(null, null, Now, suppression: TimerSuppression.Triggered);
+        Assert.Equal(TimerView.State.Triggered, view.State);
+        Assert.Equal("triggered", TimerView.Text(view, null, Now));
+        Assert.Null(view.Fraction);
+        Assert.False(view.HasTrack);
+        Assert.NotEqual(TimerView.Text(TimerView.For(null, null, Now, suppression: TimerSuppression.RaidInstance), null, Now),
+            TimerView.Text(view, null, Now));
     }
 
     /// <summary>A timer running with no known duration counts down but cannot claim a
@@ -136,7 +152,7 @@ public class TimerViewTests
             At(300), At(5), At(-1),
             TimerView.For(null, null, Now, hasTimer: true),
             TimerView.For(null, null, Now, hasTimer: false),
-            TimerView.For(null, null, Now, suppressed: true),
+            TimerView.For(null, null, Now, suppression: TimerSuppression.RaidInstance),
         })
         {
             Assert.Contains(view.TextColorKey, ThemePalettes.Keys);

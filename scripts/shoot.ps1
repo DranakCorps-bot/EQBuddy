@@ -291,6 +291,17 @@ $Shots = [ordered]@{
                            Append = @('You have gained a level! Welcome to level 12!')
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
+    # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:
+    # 'spawns-window' is embedded by the docs and stays Runnyeye. PREDICTION, written
+    # before the shot: Bzzzt, Bazzt Zzzt, The Spiroc Guardian and The Spiroc Lord read
+    # "triggered" in dim ink with NO track and an empty duration box; their tooltips name
+    # the trigger. Every boss in the raid-target list (Noble Dojorn, Thunder Spirit
+    # Princess, Eye of Veeshan, ...) reads "instance" with an EMPTY box -- the first
+    # prediction here said "7d"/"6h" and was wrong, because RaidInstanced blanks the
+    # default (trap 23: the render was right, the prediction was not). Only the four
+    # catalog names outside that list (a presence, Gwan, Key Master, Sirran) read "8h".
+    # Nothing is seeded: the rows ARE the shipped catalog, which is the point.
+    'spawns-sky'      = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Plane of Sky' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     # Options → Cards & windows, which is the screen a player opens when a card has gone
     # missing — #219 (typical-usual-chaos) went looking for Motes here and found nothing
