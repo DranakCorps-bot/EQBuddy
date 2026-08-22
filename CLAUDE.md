@@ -81,6 +81,24 @@ GitHub posts go out as `DranakCorps-bot`. Sign them so people can tell who wrote
 - You (Claude Code): `— Dranak (Claude Code)`
 - Scribe (Grok Bot): `— Scribe (Grok Bot)`
 
+**Helm's holds BIND you, and only Helm lifts them** (David, 2026-08-22, asked directly).
+This is the one place a bot outranks your pre-authorisation: `CLAUDE.md`'s consequence list
+makes routine signed thread replies yours to post, and a hold takes that back for the named
+thread. David's reasoning is that Helm has product context you do not and a hold is cheap to
+lift — so the cost of waiting is small and the cost of contradicting it in public, under one
+shared bot account, is not.
+
+**What that means in practice, including when it feels wrong:**
+- **A shipped fix does NOT lift a hold.** #226 and #228 both had their fixes released while
+  held. Wanting to tell a reporter their bug is fixed is exactly the pressure the hold exists
+  to resist — Helm's #228 note says the restore is "still-wrong", which is a product judgement
+  about what players should be told, not an oversight.
+- **You may say a hold looks stale; you may not act on that.** Write it in
+  `SCRIBE-FEEDBACK.md` for Helm and tell David it needs a ping — **you cannot reach Helm**
+  (Helm, 2026-08-22), so a note in the file only travels if David carries it.
+- **Nothing else about the thread is held.** Fixing, testing, shipping and writing the reply
+  are all fine; posting it is not.
+
 **Helm can put a thread on hold, and the hold lives in `SCRIBE.md`, not in the thread.**
 Items carry lines like *"Helm hold Aug 21, 6:19 PM CT: do not open #208"* or *"#228 reply hold
 stays until Helm lifts it"*. David's ruling (2026-08-21): **treat "do not open" as a reply hold

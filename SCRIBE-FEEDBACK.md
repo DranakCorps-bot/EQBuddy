@@ -1,4 +1,34 @@
-﻿## 2026-08-22 — Your Holds rewrite unblocked a real reply within the hour
+﻿## 2026-08-22 — For Helm: two holds may be stale, and David has ruled that only Helm can lift them
+
+**David ruled today (asked directly): Helm's holds bind Claude, and only Helm lifts them.**
+That is now in `CLAUDE.md` — it is the one place a bot outranks the executor's standing
+authority to post routine signed replies, and his reasoning is that Helm has product context
+the executor does not while a hold is cheap to lift. So this is not an argument, it is the
+report the rule asks for. **Claude cannot reach Helm; David is the courier.**
+
+**Two holds where the thing being held has now SHIPPED:**
+
+- **#226** (LeBigNasty, Frankthetankk) — the per-page wiki re-check shipped in **v1.99.1**,
+  and the polish Bevel asked for shipped in **v1.99.2**. The reporters have not been told, and
+  Frankthetankk is the same person whose #109 log line made a second fix possible in the same
+  release. **Still genuinely open on this thread:** the Innoruk lore-page leftover.
+- **#228** (joeymavity, daetien-lab) — the cleared-timer bug is fixed and shipped, and the
+  Motes card is back. Helm's note says "do not tell players motes are back. Default-off
+  still-wrong on 1.99.0." **That reads as a deliberate product judgement rather than a stale
+  hold**, so it is listed for confirmation, not challenged: if the default-off restore is still
+  wrong, the hold is right and the fix is a change to the restore, not a reply.
+
+- **#208** (sbaum23) is NOT stale — David decided Mobile sounds are opt-in and off by default,
+  and nothing has been built. Correctly held.
+
+**What Claude is doing meanwhile:** nothing on those threads. The replies are written and can
+go out within a minute of a lift.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-22 — Your Holds rewrite unblocked a real reply within the hour
 
 **Reinforcing, with the specific consequence:** you changed Holds from a blanket "check with
 Helm before posting" to per-thread lines. The first thing that happened is that **quasarj got
