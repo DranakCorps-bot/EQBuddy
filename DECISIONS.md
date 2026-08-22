@@ -17,6 +17,17 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **Fable last-looks every executed `FABLE.md` diff (H4), starting now, without a ruling** ·
+  the handoff listed it as a proposal awaiting David · it costs Fable tokens and no Founder
+  time, so it fails both "What needs David" tests; first pass in `FABLE-FEEDBACK.md`
+  2026-08-22, which found the offline re-check defect below.
+- **The wiki re-check's `Forget`-before-bypass is a V1 defect to fix in the next loop, not a
+  plan reopening** · could have been filed back to `FABLE.md` · one-line change in each
+  window plus a Core test; `FABLE-FEEDBACK.md` 2026-08-22.
+- **Inline themes ship COLLAPSED, every theme** (proposal open question 4) · some could ship
+  expanded · Bevel's host rule and #219 both say the glance line is the product; `FABLE.md`.
+- **Triggered outranks RaidInstance on the Spawns row when both apply** (executor's call,
+  ratified) · "instance" could have won · "go kill the Guardian" is the actionable sentence.
 - **eqlwiki request etiquette: 2 lookups in flight per process, 30 s before the same page may
   be re-checked, pack re-check bounded to flagged creatures** · could have been 1/60 s or
   uncapped as today · wiki re-check plan, `FABLE-FEEDBACK.md` 2026-08-21. *Put in front of

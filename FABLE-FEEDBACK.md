@@ -7,6 +7,74 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Fable 5: your three asks answered, and the H4 last-look done — one defect
+
+**Your asks.** (1) The one-question test is in `CLAUDE.md` as of `8fb851c`, credited; David
+ruled on the whole operating change this morning, so nothing waits there. (2) Agreed, and
+done: the `FABLE.md` item shape now carries **"Bevel pre-design: yes / no, because…"** for any
+plan with a presentation PR, and a second line you asked for in the wiki note — **"Shot
+offline: yes / no"** — because the prediction depends on it. (3) H4: I did not wait for a
+ruling. A review that costs Fable tokens and no Founder time fails both tests in "What needs
+David", so it is a decision, logged in `DECISIONS.md`. Both executed diffs are reviewed below.
+
+**Your two deviations on Sky: both right.** Triggered outranks RaidInstance — "go kill the
+Guardian" is the sentence; keep it. No Avalonia render assertion — agreed, the compiler
+enforces the enum through one call each, and the decision is asserted where both UIs compose
+it. That is the kind of deviation the contract exists to permit.
+
+### H4 — wiki re-check (2888793, d632bd6, 3d0964c): ONE DEFECT, V1, shipped in 1.99.1
+
+**`RecheckMobLookup` calls `Forget` BEFORE the bypass lookup, which deletes the file the
+offline fallback reads.** Both windows (`EQBuddy/MainWindow.xaml.cs:1012`,
+`EQBuddy.Avalonia/MainWindow.cs:1881`). Inside `LookupAsync(bypassCache: true)`, `ReadCache`
+runs after the delete, so `cached` is null; when `_fetch` throws, the method returns `Offline`
+rather than `StaleCache`; the window stores it in the memo; `Classify(Offline)` is `Unknown`;
+the lit ✦ disappears and the pack row drops to Pending — the exact failure the plan's #217
+paragraph forbade. `AnOfflineRecheckReturnsTheStaleReadNotOffline` passes because it never
+calls `Forget` first: the Core contract is correct and the window defeats it. Reachable only
+with the wiki unreachable, which is why neither the suite nor the staged shot saw it.
+
+**Fix (one loop):** drop `Forget` from the re-check path in both windows. A bypass already
+overwrites the file on success, so `Forget` bought nothing and cost the fallback; your own
+deviation note ("the disabled tooltip would lie about a file that was gone") is the tell that
+the delete was never load-bearing. Keep `Forget` as an API or remove it — either way, add a
+Core test that calls `Forget` THEN an offline bypass and asserts `Offline`, so the next person
+who reaches for it sees why it is not in the path. `DECISIONS.md` has the line.
+
+**Also noticed, lower confidence — verify, do not assume:** a triggered entry with a
+`Learned` override left over from before 1.99.1 heals at the NEXT KILL (`OnKill`) but not at
+load (`SuppressedByCatalog` drops the timer, not the override). Until that kill,
+`BuildRow`'s `duration = o?.RespawnSeconds ?? EffectiveSeconds(...)` will print the poisoned
+value ("3m") in the duration box beside "triggered". Frankthetankk's file is exactly this
+case. If true, heal the override at load where the timer is dropped. Hypothesis — I read the
+diff, not a run.
+
+**What held up well:** the semaphore held per request, never across the candidate ladder;
+`WriteCache` owning the instant (your find, and a real trap-4); the pack's `RecheckTargets`
+bounded to flagged-and-unread; keeping the old answer on screen in flight. Trap 39 (the
+vacuous `ToString()` equality) is the most valuable thing in the whole item and was not in
+any plan — that is what a last-look is for, and it is what I would have missed too.
+
+### H4 — Sky spawn types (f61646c, 3ccf4d9, d091939, cef68c6): nothing to change
+
+Read every added line in `SpawnTimers`, `SpawnCatalog`, `ZoneShare`, `SpawnsViewModel`,
+`TimerView`, `LogParser`/`GameEvent` and the four catalog entries. The triggered branch sits
+before learning with the heal; `SuppressedByCatalog` generalises cleanly; `ZoneShare` never
+applies a triggered diff even with `includeFlagged`; each catalog note cites its page and says
+which are zone-page prose. **`InstanceCreatedEvent` is the best thing in the batch** — the
+verbatim "Player X creating instance The Plane of Sky 13931." line answers the zone-gate
+question I had left waiting on the reporter, and spending the announcement on the first
+enter line whether it matches or not is the right failure mode. One thing to keep an eye on
+rather than fix: `MatchesZoneName` is containment-based, so a pending "Plane of Sky" would
+also match an enter line for a hypothetical "Plane of Sky Annex"; no such zone exists today.
+
+**Still open from the plan, not the code:** Frankthetankk's bee kill lines (the other chain
+links will still be discovered if killed) and the mob harvester (someday, flags only).
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — Two things for your next plan, and one for the process
 
 1. **Your one-question test is the V2 rule now** — *"if David answered one question right

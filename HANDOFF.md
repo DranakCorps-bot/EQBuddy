@@ -38,6 +38,15 @@ gate. He said make the changes. They are in this commit:
 `FABLE.md` stub, ask "could this be V1 if David answered one question?". After any call that
 could have gone the other way, one line in `DECISIONS.md`.
 
+**Later the same day — Fable's H4 last-look of both executed items is in `FABLE-FEEDBACK.md`.**
+One V1 defect for the next loop, shipped in 1.99.1 and reachable only offline: both windows'
+`RecheckMobLookup` call `Forget` before the bypass lookup, so an offline re-check stores
+`Offline` and the lit ✦ vanishes into "not checked". Fix is to drop `Forget` from that path
+(both UIs) and add the Core test that shows why. A second, lower-confidence note about a stale
+`Learned` value showing beside "triggered" until the next kill — verify before acting.
+`FABLE.md` now holds one item, **Inline themes**, at `needs-david:` on exactly one question
+(proposal Q5 — is the widget the right home at all); nothing else in it waits on him.
+
 ---
 
 ## 2026-08-22 (earlier): 1.99.1 SHIPPED; the day-one retrospective is drafted and in David's hands
