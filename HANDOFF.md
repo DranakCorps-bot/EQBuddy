@@ -17,7 +17,59 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (LATEST — start here): 1.99.3 SHIPPED; Inline themes PR 1 is half-done on purpose
+## 2026-08-22 (LATEST — start here): 1.99.4 is staged and BLOCKED on two answers, not on work
+
+**Gates: 2,357 unit · 271 Avalonia · 24 E2E, green.** `Directory.Build.props` is **1.99.4**
+with six What's-new entries. **Not released.** v1.99.3 shipped this morning.
+
+### The reason to ship 1.99.4 is a two-click crash
+
+**Closing a theme window and reopening it threw, on Linux and macOS, on all three windows,
+since each shipped.** `InvalidOperationException: The control StackPanel already has a visual
+parent`. Found by writing Fable's Step 0 test; **Fable's hypothesis that a closed window
+releases its child was wrong** — it stays the visual parent, so the next window is refused the
+control. Fixed by each window releasing its borrowed body in `Closed`. All three guards fail on
+the pre-fix tree.
+
+### What else is in it
+
+Motes restore (#228); the Wealth pill dropping a mote rate its own tab does not show (#227);
+the Raids glance line becoming the remainder; a lore article no longer classifying as an empty
+creature page (#226 — the pack would have offered to paste loot onto Innoruk's deity article);
+the "Skill-ups" heading no longer drawn over nothing; and the inline Progress card, **scoped
+explicitly to Windows**.
+
+### BLOCKED — these are the two stop points, and neither is work
+
+1. **Fable's release review of v1.99.4 is filed and unanswered.** Order is gates → Fable →
+   David. **Do not ask David for the go until it answers**, and re-read `FABLE-FEEDBACK.md`
+   FIRST when you come back to this — that is the mailbox, not `git log`.
+2. **#228's follow-up reply is HELD by Helm and the hold is LIVE**, re-asserted 2026-08-22:
+   *"A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship
+   that actually restores the card for people who had the job."* **Helm may not think the
+   star-based restore is enough** — it under-restores by design, since the fold destroyed the
+   real record and the mini-dashboard star is the only proof left. That question is with Helm;
+   David is the courier.
+
+### Also waiting on someone else
+
+- **#226 has an unanswered reporter comment** (LeBigNasty, 13:33Z): *"Still recommend app side
+  filtering of motes and client side ignore drop options."* Scribe's rule is that **a new #226
+  draft goes to Helm before it posts**. The ask itself is the client-side display filter #217
+  already separated from what the pack SUGGESTS to the wiki — the admins ruled the suggestion
+  stays complete, so this is a display question and a legitimately different one.
+- **#65** is the only unheld thread still owed a reply.
+
+### Ready to build, nothing blocking
+
+**Fable's PR A — the Avalonia `IWidgetCard` seam** (`FABLE.md`, top). It is the thing that
+unblocks inline-themes parity, and its Step 0 is now done and answered. It also frees the
+250–350 lines the Avalonia lane needs for PR 2 and PR 3. **The three `Closed` lines shipped
+today should die with it** — the seam deletes the borrowing entirely.
+
+---
+
+## 2026-08-22 1.99.3 SHIPPED; Inline themes PR 1 is half-done on purpose
 
 **v1.99.3 is released** — David's go, `pwsh -NoProfile -File scripts/release.ps1 -Tag v1.99.3`.
 Verified by side effects rather than by the script's exit code: tag pushed, GitHub release
