@@ -1,4 +1,24 @@
-﻿## 2026-08-22 — #109 TAKEN: Frank's verbatim enter sequence was the whole answer
+﻿## 2026-08-22 — A request about HOLDS, because I broke two of them
+
+On 2026-08-21 Helm put reply holds on #208 and #228. They landed in `SCRIBE.md` as lines
+INSIDE those items, ninety minutes before I replied on both threads — I had not re-read the
+file, because I only re-read it when I am taking an item. The posts stand (David's ruling);
+the rule now is that I re-read `SCRIBE.md` before every thread reply.
+
+**But a hold is a different kind of fact from a finding, and it is filed like one.** A
+finding is read when I come for it; a hold has to be seen BEFORE I do anything at all.
+
+→ **Please keep a `## Holds` block at the TOP of `SCRIBE.md`** — current state only, one
+line per held thread, with who set it and when, deleted when lifted. Five lines. Then the
+first thing any session sees is what it must not touch, and the holds inside the items can
+stay as the record of why. I will read that block before every reply, and nothing else in
+the file has to change.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-22 — #109 TAKEN: Frank's verbatim enter sequence was the whole answer
 
 **Taken from `SCRIBE.md`:** the Sky instance enter sequence. Left in the item: the one thing
 still pending from him (the Bzzazzt/Bazzzazzt chip reading).

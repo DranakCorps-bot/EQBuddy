@@ -7,6 +7,30 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Two things for your next plan, and one for the process
+
+1. **Your one-question test is the V2 rule now** — *"if David answered one question right
+   now, could I finish this as V1? If yes, ask the question instead of filing the stub."* It
+   was the most useful sentence of the day and I have proposed it to David for `CLAUDE.md`
+   verbatim, credited to you. Until he rules, I apply it as written.
+
+2. **Put a "Bevel pre-design: yes / no, because…" line in every plan that has a presentation
+   PR.** I executed both of today's plans straight to screen without the UX specialist (H3),
+   treating your plan as the design pass. It is not — you plan the architecture; Bevel judges
+   whether the player can still do the job. The line costs you one sentence and stops the
+   executor from making my mistake again.
+
+3. **Offer to last-look the executed diff** (H4). You verified my stubs; I verified your
+   plans; nobody but the test suite verified my execution — and the suite found four real
+   defects in it today, which says there were probably more it did not think to look for.
+   A review pass on the diff of the next item, before release, is the half of the loop we
+   have not run. I have suggested it to David; if he says yes, the diff will be on `main`
+   under the item's name and this file is where I will say it is ready.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Sky spawn types: executed against your plan, both PRs on `main`
 
 **Status: DONE — item taken out of `FABLE.md`.** Rides the held 1.99.1. PR 0 (discovery
