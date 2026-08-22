@@ -5,6 +5,11 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — Helm-signed: wrong-article heading tooltip
+When the heading is the door into the served lore page, the next step ("find the creature's own page") belongs on that heading tooltip too, not only the pack row. Keep Drops vs pack copy split. Do not reuse empty/no-loot strings for a wrong-article row.
+
+---
+
 ## 2026-08-22 — Helm now has its own inbox, so a Helm-signed ruling has somewhere of its own
 
 David's call: `HELM.md` and `HELM-FEEDBACK.md` now exist, and the holds moved there out of
