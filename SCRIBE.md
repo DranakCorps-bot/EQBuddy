@@ -252,6 +252,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ### Chips and alerts ignore the parked monitor
 - **Priority:** waiting. Helm hold Aug 21, 6:19 PM CT: do not open #208. Not a must. No new sprint.
+- **David's ruling, 2026-08-22 (in session):** EQBuddy Mobile making sound is **opt-in, off by default** -- "I don't need to mandate that for everyone." The design decision is made; the work is not started (hold stands). When it is built: an explicit enable tap on the page (browser autoplay rules), defaulting off, and the desktop's own alerts untouched.
 - **Place:** Avalonia chip/alert restore vs Wayland compositor placement. Not overlay-over-fullscreen.
 - **Source:** #208 sbaum23 (opened Aug 17) + follow-up Aug 18, 7:37 PM CT. Old thread — did not reply.
 - **Ask:** Widget is on the non-EQ monitor. Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.

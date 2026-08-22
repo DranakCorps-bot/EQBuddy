@@ -36,7 +36,7 @@ vacuously (`[Thu Aug 21 …]` — the 21st was a Friday). The diagnostic found i
 
 ### Still open
 
-- **Mobile alert sounds** (#208, Helm hold) — a product call for David.
+- **Mobile alert sounds** (#208, Helm hold) — **decided 2026-08-22: opt-in, off by default** (David: "I don't need to mandate that for everyone"). Not started; the hold stands. When built: an enable tap on the page, default off, desktop alerts untouched. Small and localized — V1.
 - **#210** (liminalwarmth); **InlineThemes** (`FABLE.md`-class); the mob harvester (someday,
   flags only); `LogWatcher` shutdown race; `LanAddresses()` on Tailscale; `LogParser.cs` at
   ~8 ratchet lines after tonight — **the next parser change needs a lift first.**
