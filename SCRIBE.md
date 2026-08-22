@@ -24,7 +24,12 @@ Current state only. Delete a line when Helm lifts it. Re-read this before any pu
 - **Public replies** — check in with Helm before posting. Do not edit already-posted comments.
 
 ### letter spacing under Wine/CrossOver
-- **Priority:** waiting (community PR; not authorized. Check in with Helm before any reply.)
+- **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
+  1.99.2 ships; we resolve the conflict ourselves.** The conflict is one file, `CLAUDE.md`
+  (the PR branched at `eb17b3c` before today's governance rewrite and adds its own "trap 39";
+  `docs/TestPlan.md` auto-merges). Executor: full code review, resolve on our side, merge if it
+  holds up, credit quasarj in the next What's-new. The REPLY to him still waits for Helm to
+  lift the public-reply hold.
 - **Place:** desktop text under Wine/CrossOver. Not Gate 5. Not a group meter.
 - **Source:** PR #231 quasarj Aug 21, 9:45 PM CT. https://github.com/DranakCorps-bot/EQBuddy/pull/231 New thread. Did not reply yet (Helm check-in first).
 - **Ask:** "text kerning was looking wrong" under Wine. He opened a PR: Wine-gated whole-pixel letter positions, plus a settings checkbox to opt out when scaling is above 100% (checkbox only shows under Wine). Windows unchanged. No version bump / no WhatsNew in the PR notes.

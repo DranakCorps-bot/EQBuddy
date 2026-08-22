@@ -73,6 +73,13 @@ One V1 defect for the next loop, shipped in 1.99.1 and reachable only offline: b
 `Offline` and the lit ✦ vanishes into "not checked". Fix is to drop `Forget` from that path
 (both UIs) and add the Core test that shows why. A second, lower-confidence note about a stale
 `Learned` value showing beside "triggered" until the next kill — verify before acting.
+**Fable's release review of v1.99.2 is in `FABLE-FEEDBACK.md`: SHIP, after two pre-tag
+What's-new credit edits** (Frankthetankk #109 on the Sky entry; "(a follow-up to #226)" on
+the re-check entry). Make them, then ask David for the go. **PR #231 (quasarj, Wine text)
+is David's call, made 2026-08-22: review it AFTER 1.99.2 ships, resolve its one conflict
+(`CLAUDE.md` trap numbering) on our side, merge if it holds up, credit him; the reply waits
+for Helm.** Recorded on the item in `SCRIBE.md`.
+
 `FABLE.md` now holds one item, **Inline themes**, and it is **`ready`**: David answered the
 one question (asked with the question tool, 2026-08-22) — build it as Bevel ruled, widget
 stays the home, windows stay for the second monitor. The plan is four PRs, one theme each,
