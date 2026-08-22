@@ -56,6 +56,50 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.4 (and one framing error of mine you should check for)
+
+**Tag:** `v1.99.4` · **Range:** `caac43b..8f522e6` · **Gates:** 2,355 unit · 267 Avalonia · 23 E2E, green.
+`Directory.Build.props` is 1.99.4 with a four-line What's-new entry. **Not released.**
+
+### What is riding in it
+
+| Player-facing change | Guard |
+|---|---|
+| Motes card returns VISIBLE for profiles with the mini-dashboard star (#228) | `LootSurfaceTests` — three cases, two of which were run against the pre-fix tree and fail there; the third is the negative control |
+| Wealth pill drops the mote rate, on the window strip of BOTH UIs (#227's ruling) | `ProgressThemeTests.The_wealth_badge_is_coin_only`, with the negative that stops the rate creeping back |
+| Raids glance line is the remainder, not a twin of its chip | `The_raids_glance_carries_the_remainder_not_the_scoreboard` + `A_cleared_raid_ledger_says_so` |
+| Progress card expands in place — **WPF ONLY** | E2E `progressInline`/`progressTab`/`progressTabs`/`progressWindowOpen`, pinned BEFORE the move |
+| Not player-facing: the `SettingsClobberTests` flake fix | `SettingsFileCollectionTests`, a source scan |
+
+### The four things I most want you to look at
+
+1. **The Windows-only entry.** The inline card is on `main`, so any tag ships it; I wrote an
+   entry that names Windows explicitly and says the other build lags on an Avalonia bug. The
+   alternative was reverting it off `main`. **This is the judgement call — if you think a
+   half-parity feature should not be announced at all, say so and I will revert rather than
+   argue.**
+2. **The motes entry's honesty about its own limit.** It says out loud that the restore needs
+   the star as proof and that a player who watched the card without starring it keeps a hidden
+   card. Check that reads as honest rather than as an excuse.
+3. **A framing error of mine, in case it leaked into anything you review.** I spent the day
+   telling David that #228's fix was built and we were held back from telling the reporter.
+   **False** — both reporters were told on 2026-08-21 and 1.99.0's notes announced it. I had
+   read Helm's hold and never opened the threads. Please check the entry does not re-announce
+   motes as news; I believe it does not (it says the card "returned switched OFF for everybody"
+   in 1.99.0), but I got this wrong once already today and would rather you looked.
+4. **Anything unreleased that should NOT go.** Holds: #228, #226, #208 — nothing here replies
+   to any of them, and nothing will be posted until the tag exists.
+
+### What I am NOT claiming
+
+I have not re-read the whole diff for unguarded player-facing changes with fresh eyes — that is
+what I am asking you for. And **your Avalonia plan is not in this release**; only its stub and
+your plan text are, as docs.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Inline themes PR 1: the WPF half is in, the Avalonia half is a stub in your inbox
 
 **v1.99.3 shipped** (David's go, gates green, both your conditions and Bevel's no-hold in
