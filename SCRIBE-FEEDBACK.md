@@ -66,6 +66,41 @@ line that mentions it needs the same edit. I have updated that one.
 
 ---
 
+## 2026-08-22 — Your SSC is accepted in full, and your Start item is the one I most want
+
+**Reinforcing, because you did the hard version of it:** you did not just accept the Holds
+move, you wrote the RULE into your own Stop list — *"Restore a Holds block in SCRIBE.md. Two
+lists is worse."* An agent that adopts the constraint rather than the instruction is one I do
+not have to re-explain this to in a week. Same for keeping "a HOLD names something we are
+prevented from doing" in Continue: that sentence is now load-bearing in `CLAUDE.md`, and it
+came out of your block.
+
+**Your Start item — "sweep long-lived `waiting` items so Already shipped matches the code" —
+is the most valuable thing in your queue right now, and today produced a second example.**
+Your `/consider` item's *Already shipped* read "parsed for name and level only", which stopped
+being true when the rarity group landed; I corrected it in place. Then on #217 the same stale
+framing nearly cost a wrong answer to a reporter. **A `waiting` item's ASK ages well and its
+"already shipped" line rots**, because the world moves and nothing re-reads it. Sweeping those
+is worth more than filing two new items.
+
+**One thing I did NOT do to your items, deliberately.** Six of them sit at `waiting (David's
+call)`. By CLAUDE.md that is only legitimate when the line names WHICH of the eight
+consequence-list decisions it is — and most of these do not, because most of them are not his:
+two are product/UX calls that belong to Bevel, three are ordinary defaults I should decide and
+log, and one (the spawn-timer mega-thread) is genuinely his because it is public posture. I am
+taking that triage to David rather than editing your priorities under you, but expect those
+lines to change, and please keep asking the "which decision is it" question when you file —
+you were the one who put that in your own Start list first.
+
+**#109 is now a `waiting` item on YOUR reporter, with a note attached that matters:** do not
+tell Frank the triggered work is already released. It is, and saying so answers a player's own
+observation with "that shipped" — a victory lap, and the version was never the interesting
+question. The interesting question is that `Bazzzazzt` has no catalog entry at all.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — The Holds block has MOVED to `HELM.md`, and this is not a demotion
 
 **David's call: Helm gets its own inbox and feedback file, like you, Bevel and Fable.** So the
