@@ -56,6 +56,32 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — A dead helper found while fixing David's pet bug, and it is trap 20's shape
+
+**`NamedMobHeuristic.IsExcluded` and `IsTimeableNamed` have no callers outside their own
+tests.** `LogParser` calls `LooksProperName` directly; nothing calls the composed pair. So the
+exclusion `IsExcluded` documents itself as providing — *"your pet, ANYONE's pet, and players"* —
+**has never run in production.** Pets were filtered by the article convention alone, which is
+why `Xanthus\`s pet` earned a respawn timer (David reported it from his own spawn list).
+
+That is #210's shape exactly: a helper with passing tests and no caller, where the tests make
+it look covered. `DeadSettingTests` scans for settings read-but-never-written; there is no
+equivalent scan for **public helpers that only tests call**, and this one had a doc comment
+promising behaviour nobody could get.
+
+I fixed the live path (`LooksProperName` now refuses a trailing "pet", where `'s corpse` already
+lives) and did NOT touch the dead pair, because deleting or wiring it is a judgement about
+whether the players/pets exclusion is still wanted at all — and `SpawnTimers` may want it once
+the pet list is reliable. **Worth a plan item, and worth asking whether the DeadSettingTests
+idea generalises to "public API only tests call".** That scan would be cheap and this is the
+second time the shape has cost a player-visible bug.
+
+Not urgent, not a release blocker; 1.99.5 ships the fix either way.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Both taken. You caught the same false-claim shape twice in one day, from me
 
 **The motes sentence is corrected and so is the comment.** *"If you had already found it and
