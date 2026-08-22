@@ -8,12 +8,22 @@ namespace EQBuddy;
 /// Applies <see cref="TextRenderingPolicy"/> to WPF. The reasoning lives with the policy;
 /// this file is only the wiring, the same split as <see cref="WineFonts"/>.
 ///
-/// It overrides the metadata rather than setting the property on each window because
-/// TextOptions.TextFormattingMode is an INHERITED attached property: give Window a new
-/// default and every window, card, breakout and popup in the app inherits it, including
-/// the ones built in code after startup. A per-window setter would have to be remembered
-/// by every future window — which is the shape of defect this codebase keeps paying for
-/// (traps 15, 29, 36), and it is avoidable here for one call.
+/// **It does the job twice, on purpose.** The obvious one line — override the metadata
+/// default on <see cref="Window"/> and let the inherited attached property carry it down
+/// — is not reliable, and the first build of this fix shipped exactly that and did not
+/// change what the reporter saw. Property-value inheritance propagates a value that has
+/// been SET; a metadata default is not a set value, so each descendant goes on resolving
+/// its own default from its own type's metadata, which is still Ideal. The window changes
+/// and nothing inside it does, which is indistinguishable from the fix not being in the
+/// build (and cost a round trip proving it was).
+///
+/// So:
+///   1. the default is overridden on <see cref="FrameworkElement"/>, which makes Display
+///      the answer for every element on its own account, with no inheritance walk needed;
+///   2. and a class handler SETS it on each window as it loads, which is the one form
+///      inheritance is guaranteed to carry to children.
+/// Either alone would probably do. Both cost one call each, and the failure they prevent
+/// is invisible from this side of the machine.
 /// </summary>
 internal static class WineText
 {
@@ -22,26 +32,36 @@ internal static class WineText
     /// keep the old default. App.OnStartup is the only place that is guaranteed.</summary>
     public static void ApplyIfNeeded()
     {
-        var mode = TextRenderingPolicy.Decide(
-            WineFonts.IsRunningUnderWine(),
-            Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable));
+        if (Resolve() != TextLayoutMode.Display) return;
 
-        // Ideal is already WPF's default; overriding metadata to the value it already
-        // has would be a no-op with a small risk of throwing, so don't.
-        if (mode != TextLayoutMode.Display) return;
+        // Text cosmetics must never stop startup (the WineFonts rule), and these two are
+        // independent: if the metadata override is refused, the class handler still lands.
+        Attempt(() => TextOptions.TextFormattingModeProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(
+                TextFormattingMode.Display,
+                FrameworkPropertyMetadataOptions.Inherits)));
 
-        try
-        {
-            TextOptions.TextFormattingModeProperty.OverrideMetadata(
-                typeof(Window),
-                new FrameworkPropertyMetadata(
-                    TextFormattingMode.Display,
-                    FrameworkPropertyMetadataOptions.Inherits));
-        }
-        catch (Exception)
-        {
-            // Text cosmetics must never stop startup — same rule as WineFonts. A failure
-            // here leaves the app on Ideal, which is the behaviour it shipped with.
-        }
+        Attempt(() => EventManager.RegisterClassHandler(
+            typeof(Window),
+            FrameworkElement.LoadedEvent,
+            new RoutedEventHandler((sender, _) =>
+            {
+                if (sender is Window window)
+                    TextOptions.SetTextFormattingMode(window, TextFormattingMode.Display);
+            })));
+    }
+
+    /// <summary>The mode this process should be using, for the probe to report. Kept
+    /// beside the application of it so the diagnostic can never drift from the decision
+    /// it is meant to be checking.</summary>
+    public static TextLayoutMode Resolve() => TextRenderingPolicy.Decide(
+        WineFonts.IsRunningUnderWine(),
+        Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable));
+
+    private static void Attempt(Action action)
+    {
+        try { action(); }
+        catch (Exception) { /* see above: never fatal */ }
     }
 }

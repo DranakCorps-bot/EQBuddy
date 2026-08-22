@@ -41,6 +41,8 @@ internal sealed class TextProbeWindow : Window
     // Words whose letters pulled apart in the report, so a clean cell is obvious.
     private const string Sample = "and this was left behind: EQBuddy bundles its own font for Wine";
 
+    private readonly TextBlock _inherited;
+
     public static bool Requested(IEnumerable<string> args) =>
         Environment.GetEnvironmentVariable("EQBUDDY_TEXTPROBE") == "1" ||
         args.Any(a => string.Equals(a, "--textprobe", StringComparison.OrdinalIgnoreCase));
@@ -57,6 +59,21 @@ internal sealed class TextProbeWindow : Window
         var body = new StackPanel { Margin = new Thickness(16) };
         foreach (var line in ResolvedFacts())
             body.Children.Add(Fact(line));
+
+        // The question the first version of this probe could not answer, and the one
+        // that matters most: does the app-wide policy actually REACH an ordinary
+        // element? `_inherited` is a plain TextBlock with nothing set on it, read once
+        // it is in the tree — if it says Ideal while the policy says Display, the fix is
+        // present in the build and failing to apply, which looks exactly like a stale
+        // binary from the outside.
+        _inherited = Fact("effective mode on a plain TextBlock: (measured on load)");
+        body.Children.Add(_inherited);
+        Loaded += (_, _) => _inherited.Text =
+            $"POLICY SAYS {WineText.Resolve()}  ->  a plain TextBlock in this window " +
+            $"actually resolves {TextOptions.GetTextFormattingMode(_inherited)}" +
+            (TextOptions.GetTextFormattingMode(_inherited) == TextFormattingMode.Display
+                ? "   [applied]"
+                : "   [NOT APPLIED - the policy is not reaching ordinary text]");
 
         body.Children.Add(new Separator { Margin = new Thickness(0, 10, 0, 10) });
         body.Children.Add(Fact(
