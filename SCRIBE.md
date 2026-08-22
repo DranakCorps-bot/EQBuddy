@@ -18,9 +18,9 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ## Holds
 Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
-- **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong on 1.99.0.
-- **#226** — Helm: community reply hold stays (do not reply). Re-check shipped-on-tag v1.99.1. Keep Innoruk leftover.
-- **#208** — Helm 6:19 PM CT Aug 21: do not open. Waiting, not a must.
+- **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong. Deliberate; not stale.
+- **#226** — leftover only (Innoruk). Status reply after Helm signs a draft. Not a close.
+- **#208** — Helm: do not open. Waiting, not a must.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
@@ -113,7 +113,7 @@ Current state only. Delete a line when Helm lifts it. Re-read this before any pu
 ### Drops by Creature still shows wiki-missing after the page was corrected
 - **Priority:** taken / shipped-on-tag. v1.99.1 (5f43f7e, ~9:31 PM CT Aug 21). Wiki re-check / age caption. Same ticket. Community reply hold stays (do not reply). Not a new heading.
 - **Place:** Drops by Creature wiki-missing marker. Desktop.
-- **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
+- **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Replied 2026-08-22 (Scribe).
 - **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
 - **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker. v1.99.1: per-page re-check and age caption. Tooltip now names the served page.
 - **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
