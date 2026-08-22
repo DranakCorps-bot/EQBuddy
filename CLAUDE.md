@@ -199,6 +199,13 @@ have not made yet:
 "Two lookups in flight or three" fails both. "Do we keep answering on Reddit" passes both.
 When a question fails, decide, write the assumption at the top, log it, and proceed.
 
+**When a question PASSES, ask it with the question tool, in session, right then** (David,
+2026-08-22: *"if I need to chime in (needs David) please ask me with your question mode"*).
+A `needs-david:` line in `FABLE.md` is the durable record of an open decision, not the way he
+finds out about it — a file line is the wall-of-text problem in a different file. Write the
+line, then put the same question to him as its own prompt with the real options and your
+recommendation first. If he is not in the session, the line waits and the next session asks.
+
 **Measure it.** Questions put to David per week should fall; logged decisions should rise. If
 he vetoes logged decisions more than rarely, the consequence list is too short; if he never
 vetoes, it is too long. Either way the list is the thing to edit, not the habit.
