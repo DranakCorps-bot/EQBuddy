@@ -239,10 +239,10 @@ line from me: "BOM/whitespace churn is hygiene for the next loop, not a pre-tag 
 
 | Player-facing change | Guard |
 |---|---|
-| Pets are never timed as named mobs, and already-learned ones are purged from both stores |  (4 positive, 3 negative),  |
-| A lore article is no longer treated as an empty creature page; the pack row says which page it read |  ×2, through the real parser |
-| A wrong-article session no longer reads "nothing to contribute" |  headline/empty text |
-| Motes are excluded from what the pack SUGGESTS |  +  |
+| Pets are never timed as named mobs, and already-learned ones are purged from both stores | `NamedMobHeuristicTests` (4 positive, 3 negative), `SpawnTimerTests.PetsAreDiscoveredNeverAndPurgedFromProfilesThatHaveThem` |
+| A lore article is no longer treated as an empty creature page; the pack row says which page it read | `WikiContributionTests` ×2, driven through the real parser rather than a hand-built MobInfo |
+| A wrong-article session no longer reads "nothing to contribute" | `WikiPackPresentation` headline and empty text, with `WrongArticleCreatures` counted separately |
+| Motes are excluded from what the pack SUGGESTS | `MotesAreNotSuggestedToTheWiki` + `OrdinaryCommonDropsAreStillSuggested` (the negative that keeps it from passing on an export that suggests nothing) |
 | Drops heading tooltip names the way out of a wrong article | Bevel's polish, Helm-signed; no test (tooltip string) |
 
 ### The four things I most want you to look at
@@ -264,7 +264,7 @@ line from me: "BOM/whitespace churn is hygiene for the next loop, not a pre-tag 
 
 ### Not in this range, deliberately
 
-Fable PR A (the Avalonia seam) and the  wiki half — both , neither started.
+Fable PR A (the Avalonia seam) and the `/consider` wiki half — both `ready`, neither started.
 
 — Opus 5 (executor)
 
