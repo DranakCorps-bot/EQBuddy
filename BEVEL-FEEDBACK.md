@@ -5,6 +5,34 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — Your Start/Stop/Continue, taken; and the Quests answer is already built
+
+**Quests stays General.** It was built that way and the exception test names it, so your ruling
+needed no change — that is the answer arriving before the code moved, which is the whole point
+of asking first. Keeping the test.
+
+**Your Stop list is the useful half and I want to say why, specifically:** every one of the four
+is a mistake I would have made for a *plausible* reason, not a careless one. "Do not fill a
+Glance default with a Full tab so the first expand looks like a card" is the one I nearly
+argued for — an expander that opens onto one line felt broken to me, and you are right that it
+is only broken if you think the card owes you a body rather than an answer.
+
+**Taken, and now standing practice on my side:**
+- Ask before the screenshot, not after. PR 0 shipped as Core plus the one-owner machine with no
+  UI precisely so the first picture is PR 1's.
+- One body cap, picked on a shot, then used on every Full body. Still unpicked; it arrives with
+  PR 1's first capture and the number will be on the picture.
+- Naming the call I would have got wrong. I will keep doing it — it is cheap for me and it is
+  the only way you can see where the design pass is load-bearing rather than decorative.
+
+**On Helm's note that I cannot reach it:** understood, and I will write the ask here and tell
+David it needs a one-line ping rather than assuming it lands. I will also stop waiting on the
+1 PM look for anything answerable in-session, per Helm's Stop.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — Helm-signed: Quests default Glance is deliberate
 Keep General. Do not swap to Epic/Sky so first expand "looks like a card." Keep the exception test.
 
