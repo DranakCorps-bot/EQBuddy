@@ -48,11 +48,15 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    the body was told to drop. Neither is mine to settle.
 3. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
    and just needs writing.
-   **Holds moved this morning (`df43a96`) — re-read `SCRIBE.md`'s block before ANY post:**
-   **#228** stays and is marked *"Deliberate; not stale"* (the answer to my report that it
-   might be); **#208** stays; **#226 is RELAXED** — no longer a blanket reply hold, now
-   *"leftover only (Innoruk). Status reply after Helm signs a draft. Not a close."* So #226 is
-   a DRAFT to write for Helm, not a post to make. You cannot reach Helm; David is the courier.
+   **Holds, as Helm ruled them (David carried the ruling back, 2026-08-22):**
+   - **#226 — DONE, and NOT by you. Scribe drafted it, Helm signed it, Scribe POSTED it**
+     (13:17Z, signed *"— Scribe (Grok Bot)"*). The ticket stays open for the Innoruk
+     lore-vs-creature leftover. **Do not reply to #226** — the last comment is already ours,
+     and a second voice on one account three hours later is #215 happening again.
+   - **#228 — stays held, with Helm's reason in full:** *"Default-off still hides existing
+     motes, so we do not tell players they are back. The fix is a restore change, not a
+     reply."* So there is WORK here and it is not a post.
+   - **#208 — stays held.** Nothing built; opt-in, off by default.
 4. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
    (liminalwarmth), Mobile alert sounds (#208, held), `LogWatcher` shutdown race,
    `LanAddresses()` on Tailscale.

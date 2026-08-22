@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 
@@ -186,6 +186,78 @@ public class LootSurfaceTests
         Assert.False(s.MigrateMotesCard(hadFile: false));
         Assert.Contains("motes", s.HiddenSections);
         Assert.True(s.MotesCardOffered);
+    }
+
+    /// <summary>
+    /// #228, Helm's ruling 2026-08-22: *"Default-off still hides existing motes... The fix
+    /// is a restore change, not a reply."*
+    ///
+    /// A player who was watching motes lost the card to the 2026-08-19 fold and got it back
+    /// switched OFF on 2026-08-21 — so from their side motes simply never came back. The
+    /// evidence has to be the mini-dashboard star, because the fold removed every absorbed
+    /// key from SectionOrder AND HiddenSections: "did they have the card showing" is a
+    /// question their profile can no longer answer.
+    /// </summary>
+    [Fact]
+    public void AProfileThatWasWatchingMotesGetsTheCardBackVisible()
+    {
+        var s = new AppSettings
+        {
+            SectionOrder = ["combat", "progress"],
+            MiniStats = ["kills", "dps", "motes"],
+        };
+
+        Assert.True(s.MigrateMotesCard(hadFile: true));
+        Assert.DoesNotContain("motes", s.HiddenSections);
+    }
+
+    /// <summary>The population that matters most: profiles that already took the blanket
+    /// hide, between the card's return and this fix. <c>MotesCardOffered</c> being true is
+    /// exactly what would have stopped them ever being looked at again, which is why the
+    /// restore is a SECOND one-shot flag rather than a reset of the first.</summary>
+    [Fact]
+    public void AProfileAlreadyHiddenByTheBlanketPassIsCorrectedOnce()
+    {
+        var s = new AppSettings
+        {
+            SectionOrder = ["combat", "progress"],
+            MiniStats = ["kills", "motes"],
+            MotesCardOffered = true,
+            HiddenSections = ["motes"],
+        };
+
+        Assert.True(s.MigrateMotesCard(hadFile: true));
+        Assert.DoesNotContain("motes", s.HiddenSections);
+        Assert.True(s.MotesCardRestored);
+
+        // ONCE. The player hides it again; the next launch leaves it alone. Without this
+        // the restore is the "my tick-boxes won't stay ticked" bug (#169) pointing the
+        // other way — the app as the second writer, every launch.
+        s.HiddenSections.Add("motes");
+        Assert.False(s.MigrateMotesCard(hadFile: true));
+        Assert.Contains("motes", s.HiddenSections);
+    }
+
+    /// <summary>The negatives, without which the two above would pass on a migration that
+    /// simply never hides anything (trap 39: an assertion that cannot fail reads as
+    /// coverage). No star means no evidence, and no evidence means the card still arrives
+    /// hidden — the restore under-reaches on purpose rather than showing it to everybody.
+    /// </summary>
+    [Fact]
+    public void WithoutTheStarTheCardStillArrivesHiddenAndTheFlagStillPersists()
+    {
+        var s = new AppSettings { SectionOrder = ["combat", "progress"] };
+
+        Assert.True(s.MigrateMotesCard(hadFile: true));
+        Assert.Contains("motes", s.HiddenSections);
+        // The flag persists even though nothing moved. A restore that decided "no
+        // evidence" and did not write that down would re-decide every launch, and would
+        // then un-hide the card under a player who stars motes next week.
+        Assert.True(s.MotesCardRestored);
+
+        s.MiniStats.Add("motes");
+        Assert.False(s.MigrateMotesCard(hadFile: true));
+        Assert.Contains("motes", s.HiddenSections);
     }
 
     /// <summary>The two folds share one implementation now, so the Progress theme has to

@@ -95,3 +95,14 @@ history of the call stays readable. If vetoes become common, the consequence lis
   not forgotten. Landed: "the Progress card expands in place" is false on Linux and macOS
   today, and the rule is that entries are TRUE, not that they are early. It is recorded as owed
   in `HANDOFF.md`.
+- **Took Helm's #228 ruling as WORK, and restored the Motes card from the mini-dashboard star
+  rather than from `hadFile`.** Could have gone: show the card to every existing profile (the
+  maximal reading of "restore"). Landed: the fold destroyed the real preference — it removes the
+  key from `SectionOrder` AND `HiddenSections` — so the star is the only surviving evidence, and
+  restoring what can be proven beats growing everyone's widget. It under-restores on purpose,
+  and that limit is written into the code.
+- **Did NOT write the What's-new entry, and asked David instead** (he chose "ask Helm, hold the
+  entry"). The two rules collide: every player-visible change needs an entry, and Helm's hold
+  says "we do not tell players motes are back". A shipped fix does not lift a hold, and reading
+  the hold as thread-only would have been me lifting it. Note filed in `SCRIBE-FEEDBACK.md` for
+  Helm; David is the courier. Version deliberately NOT bumped, so nothing can ship by accident.

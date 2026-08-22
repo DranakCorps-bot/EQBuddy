@@ -750,6 +750,32 @@ public sealed class AppSettings
     /// (trap 13).</summary>
     public bool MotesCardOffered { get; set; }
 
+    /// <summary>Whether the one-shot RESTORE pass below has run on this profile.
+    ///
+    /// A second flag rather than resetting the first, because the two answer different
+    /// questions and a profile can need the second having already had the first: everyone
+    /// who launched between 2026-08-21 and this fix took the blanket hide, and
+    /// <see cref="MotesCardOffered"/> being true is exactly what stops them being looked at
+    /// again.</summary>
+    public bool MotesCardRestored { get; set; }
+
+    /// <summary>The only surviving evidence that this player was watching motes before the
+    /// Progress theme absorbed the card.
+    ///
+    /// It has to be an odd signal because the obvious one was DESTROYED: the 2026-08-19
+    /// fold removes every absorbed key from <c>SectionOrder</c> AND from
+    /// <c>HiddenSections</c> (see <c>FoldThemeSections</c>), so "did they have the Motes
+    /// card showing" is a question no profile can answer any more. The mini-dashboard star
+    /// survived, because nothing but a player's own click has ever written
+    /// <see cref="MiniStats"/> — and it is an affirmative choice rather than a default, the
+    /// shipped list being just kills and dps.
+    ///
+    /// **It under-restores on purpose.** A player who watched the card without ever
+    /// starring the cell leaves no trace at all, and inventing one would mean showing the
+    /// card to everybody — which is the taller-widget-on-update this whole migration exists
+    /// to avoid. Restoring what can be PROVEN beats guessing in either direction.</summary>
+    private bool WasWatchingMotes => MiniStats.Contains("motes");
+
     /// <summary>
     /// Motes is a top-level card again (David, 2026-08-21), and it starts HIDDEN.
     ///
@@ -769,18 +795,41 @@ public sealed class AppSettings
     /// </summary>
     public bool MigrateMotesCard(bool hadFile)
     {
-        if (MotesCardOffered) return false;
-        MotesCardOffered = true;
-        if (!HiddenSections.Contains("motes")) HiddenSections.Add("motes");
-        // The hiding above happens either way. Only the WRITE is conditional: a
-        // profile with no settings.json yet has nothing to preserve, and forcing a
-        // save here made every fresh Load() a file writer. SettingsClobberTests
-        // deletes settings.json and asserts that nothing else touches it, so that
-        // turned a green suite into one that failed intermittently, a different one
-        // of its four cases each run. The migration was right; the write was
-        // gratuitous. The flag persists with the next real save, and until then the
-        // in-memory state is already correct.
-        return hadFile;
+        // THE RESTORE (#228, Helm's ruling 2026-08-22: *"Default-off still hides existing
+        // motes... The fix is a restore change, not a reply."*). Runs even on a profile
+        // that has already been offered the card, because those are precisely the profiles
+        // that took the blanket hide — and it runs FIRST so a single launch both offers and
+        // corrects rather than needing two.
+        var ran = false;
+        if (!MotesCardRestored)
+        {
+            MotesCardRestored = true;
+            ran = true;
+            // Only ever UN-hides, and only with evidence. It cannot hide anything, so a
+            // player who found the card and turned it off keeps it off.
+            if (WasWatchingMotes) HiddenSections.Remove("motes");
+        }
+        if (!MotesCardOffered)
+        {
+            MotesCardOffered = true;
+            ran = true;
+            // The blanket hide skips anyone the restore just spoke for; otherwise this
+            // line would take the card back off them in the same call.
+            if (!WasWatchingMotes && !HiddenSections.Contains("motes"))
+                HiddenSections.Add("motes");
+        }
+        // Both passes are ONE-SHOT, and the flag has to be written for that to be true —
+        // so the answer is "something changed" whenever a pass ran, not only when it moved
+        // a card. A restore that decided "no evidence" and did not persist saying so would
+        // re-decide on every launch, and would then un-hide the card under a player who
+        // stars motes next week. That is the "never quietly re-shown" rule with the switch
+        // on the other side.
+        //
+        // Only the WRITE is conditional on hadFile: a profile with no settings.json yet has
+        // nothing to preserve, and forcing a save here made every fresh Load() a file
+        // writer — which is what made SettingsClobberTests flaky. The in-memory state is
+        // already correct either way, and the flags persist with the next real save.
+        return ran && hadFile;
     }
 
     /// <summary>The fold itself, shared by the themes. Extracted when the second one
