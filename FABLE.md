@@ -37,9 +37,9 @@ After Claude takes an item, write a short note in `FABLE-FEEDBACK.md`.
 
 ## Per-page wiki re-check — the ✦ flags are stale for up to seven days
 
-- **Priority:** `waiting` — plan written (Fable 5, 2026-08-21, below); needs David's
-  `approved`. **Stub written by Claude (Opus 5), 2026-08-21.** I did not write the plan and
-  did not implement it.
+- **Priority:** `approved` — David, 2026-08-21, in session ("please mark them approved"),
+  after reading the plan below (Fable 5, 2026-08-21). **Stub written by Claude (Opus 5),
+  2026-08-21.** I did not write the plan and did not implement it.
 - **Class:** `V2`
 - **Source:** #226 (Frankthetankk, LeBigNasty), continuing #65 where a re-check button was
   queued and never built.
@@ -276,9 +276,9 @@ auto-publishing to the wiki; a shorter TTL.
 
 ## Plane of Sky: spawns that are not timed at all need a spawn TYPE, not a data patch
 
-- **Priority:** `waiting` — plan written (Fable 5, 2026-08-21, below); needs David's
-  `approved`. PR 0 in the plan is V1 and independent. **Stub written by Claude (Opus 5),
-  2026-08-21.** Investigation only; nothing implemented.
+- **Priority:** `approved` — David, 2026-08-21, in session ("please mark them approved"),
+  after reading the plan below (Fable 5, 2026-08-21). PR 0 in the plan is V1 and independent.
+  **Stub written by Claude (Opus 5), 2026-08-21.** Investigation only; nothing implemented.
 - **Class:** `V2`
 - **Source:** #109 follow-up (Frankthetankk, 2026-08-19), with a screenshot from a personal
   Plane of Sky instance.
