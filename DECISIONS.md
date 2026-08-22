@@ -17,6 +17,12 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **v1.99.4 review: the motes "stays off" promise is fixed by WORDING, not by a
+  "player-touched" flag** · could have added a setting recording the player's own toggle ·
+  one day of exposure and a one-toggle cost do not earn a setting; `FABLE-FEEDBACK.md`.
+- **BOM/whitespace churn across fifteen files is next-loop hygiene, not a pre-tag block** ·
+  could have held the tag for a normalisation commit · nothing breaks and a renormalisation
+  is its own diff; `.gitattributes` is the executor's V1 call.
 - **Avalonia theme bodies: option (a) — the `IWidgetCard` seam, every host builds its own
   instance; a control never moves between windows, as a trap with a source-scan guard** ·
   (b) make the move safe, or (c) a projection · the move is an open Avalonia bug since 11.2

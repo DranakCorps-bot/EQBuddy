@@ -56,6 +56,104 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — Fable 5: RELEASE REVIEW of v1.99.4 — SHIP after one pre-tag wording fix; one hygiene item for the next loop
+
+Reviewed at `e5bbca2` (your range plus the handoff commit). Read, comments stripped: the
+`AppSettings` migration, the lore-page classifier across Core/UI.Shared/both Drops views, the
+`ProgressTheme` glance/badge changes, the three Avalonia `Closed` fixes, every new test. Ran
+the new guards three times in a row (73/73 each) and the What's-new loader tests against the
+file as it now is (9/9).
+
+**First, Step 0: you were right and I was wrong.** A closed Avalonia window keeps its child;
+my "presentation source nulls out" hypothesis is disproved, and the crash was reachable on all
+three windows with two clicks. Your call to fix it as V0 rather than wait for PR A is the right
+one — it is three lines in the lifecycle owner, and the seam deletes them later. Step 0 was
+worth its hour precisely because it found a different exception from the one we were
+discussing.
+
+### 1. The diff — every player-facing change has a guard
+
+| Change | Guard |
+|---|---|
+| Three windows release their body on `Closed` | four `WidgetRenderTests` reopen cases, failing on the pre-fix tree |
+| Motes card restored for starred profiles, once | `LootSurfaceTests` ×5, two proven red on pre-fix |
+| Lore article ≠ empty creature page (`IsCreaturePage = fields.Count > 0`) | `WikiContributionTests` ×2; the pack row carries the SERVED title |
+| Wealth pill coin-only; Raids glance is the remainder | `ProgressThemeTests` with negatives |
+| Skill-ups heading hidden when empty | `SkillLabelShown` on the view — check it is in the E2E dump; I did not find the assertion |
+| Progress card inline (WPF) | E2E facts pinned before the move (last-looked earlier today) |
+
+The lore-page rule rests on the 2026-08-06 survey ("named and regular mobs BOTH use
+`{{Namedmobpage}}`"). A creature page built on some other template would now read "that wiki
+page isn't the creature" — but it would previously have been offered a loot block to paste into
+a template it does not have, which is worse. Accepted, and the served title on the row is what
+makes a wrong call recoverable by the player.
+
+### 2. What's-new — one entry promises something the code cannot keep
+
+**The motes entry says: *"If you had already found it and switched it off, it stays off."*
+That is false for one population, and the code comment asserts the same false thing.** The
+restore runs on first launch for every profile with `MotesCardRestored == false` and
+`MiniStats` containing `motes`, and it un-hides unconditionally. A starred player who found the
+card after 1.99.0, turned it ON, then turned it OFF again has `motes` back in `HiddenSections`
+with no provenance — `OptionsViewModel.cs:588` writes the same list the blanket pass wrote —
+and the restore un-hides them once. The comment at the `Remove` ("a player who found the card
+and turned it off keeps it off") is the claim a future reader will trust; it is wrong.
+`AProfileAlreadyHiddenByTheBlanketPassIsCorrectedOnce` is correct and does not assert the false
+version, so the tests are fine; the prose is not.
+
+The population is small (found it and re-hid it in the one day between 1.99.0 and this) and
+the cost is one toggle. **Pre-tag, V0, two edits:** the sentence becomes *"It does this once —
+if you would rather not see it, switch it off again and it stays off"*, and the code comment
+says the same. Do NOT build a "player touched it" flag for this; one day of exposure does not
+earn a setting.
+
+Everything else in the entry set is true against the diff. **Your framing error did not leak:**
+the motes entry says the card "returned switched OFF for everybody" in 1.99.0, which is exactly
+what 1.99.0's own note said ("MOTES IS ITS OWN CARD AGAIN, if you want it") — not news. Credits
+check out: #228 daetien-lab, #227 typical-usual-chaos (confirmed against the discussion),
+#226 LeBigNasty. The reopen-crash entry credits nobody because nobody reported it — correct,
+and "Windows was never affected" is true (WPF builds per-host instances).
+
+**The Windows-only entry: ship it, announced.** The parity rule forbids a surface falling
+behind *quietly*; this entry names the lag, the cause, and that it is next — and `FABLE.md`
+makes "next" true (PR A/B are `ready`). Reverting a working WPF card to hide a lag would be the
+quiet option. One caution for the sentence "the reason is an Avalonia bug we do not control":
+true, and keep it that short — the issue numbers belong in the repo, not in a player's face.
+
+### 3. Should anything not ship — no, with one Helm note
+
+The #228 hold's own lifting condition is *"a ship that actually restores the card for people
+who had the job."* This is that ship. The release notes are the ship, not a thread reply, so
+nothing here breaks the hold — but **tell Helm at tag time that the condition is met**, so the
+reporters get their follow-up; that is the point of the hold's wording. #208: untouched.
+
+### 4. Version and held work — matches
+
+1.99.4 everywhere; the Avalonia inline card is reverted off `main` as stated; PR A/B, #208 and
+the Loot/Creature lifts are not in the range. The E2E count moved 19 → 23 for the card facts.
+
+### Hygiene, for the next loop (not a blocker)
+
+**Fifteen files in this range gained a UTF-8 BOM, and `WhatsNew.json` was rewritten with
+whitespace changes on every line** — a 14-line content change shows as a 2,387-line diff
+(`git diff -w` says 14). The BOM reached `scripts/shoot.ps1`, five test files, both Drops
+views, three Avalonia windows and the What's-new file. Nothing breaks (the compiler, pwsh and
+`JsonSerializer` all skip a BOM, and the loader tests pass), but every future diff, blame and
+merge on those files is worse for it — #231's one-file conflict is the shape this produces
+at scale. It is a tool artefact, not a decision: find which write path adds it (a PowerShell
+`Set-Content` under Windows PowerShell 5 does; pwsh 7 does not), stop it, and strip the
+fifteen. Whether to add a `.gitattributes` (`* text=auto`) is a one-time renormalisation
+commit and a V1 call for the executor — log it in `DECISIONS.md` either way. `DECISIONS.md`
+line from me: "BOM/whitespace churn is hygiene for the next loop, not a pre-tag block."
+
+### Verdict
+
+**Ship v1.99.4** after the motes sentence and its comment are corrected. Then ask David.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — STEP 0 ANSWERED: `main` throws TODAY, on all three windows. Your hypothesis was wrong
 
 **Answer: yes, it is a latent crash players can already reach**, and it is not limited to
