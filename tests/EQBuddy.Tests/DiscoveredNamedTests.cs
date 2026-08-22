@@ -41,6 +41,54 @@ public class DiscoveredNamedTests
         Assert.True(overrides.Find("Western Plains of Karana", "Chief Goonda")!.Discovered);
     }
 
+    /// <summary>The game's own rare marker opens discovery to ARTICLED named mobs
+    /// (#185, bjstrange's log lines). "A ghoul executioner" fails the article
+    /// convention forever — but "A ghoul executioner - a rare creature - scowls at
+    /// you" is EQ Legends itself saying the mob is named-class, and that outranks the
+    /// heuristic. Driven through real log lines end to end: consider, then kill.</summary>
+    [Fact]
+    public void ARareConsideredArticledMobDiscoversOnYourKill()
+    {
+        var (t, overrides) = InZone("The Hole",
+            "[Mon Aug 17 19:00:00 2026] You have entered The Hole.");
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:05 2026] A ghoul executioner - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)")!);
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:30 2026] You have slain a ghoul executioner!")!);
+
+        var row = Assert.Single(t.Snapshot(DateTime.Parse("2026-08-17T19:00:31")));
+        Assert.Equal("Ghoul executioner", row.Name);
+        Assert.Null(row.DurationSeconds);   // one kill still cannot know the cycle
+        Assert.True(overrides.Find("The Hole", "Ghoul executioner")!.Discovered);
+    }
+
+    /// <summary>…and WITHOUT the marker, an articled kill still never discovers — the
+    /// conservative guard is the whole reason "a wrong respawn timer is worse than
+    /// none" holds. The rare path must be an addition, not a loosening.</summary>
+    [Fact]
+    public void AnArticledKillWithoutTheRareMarkerStillNeverDiscovers()
+    {
+        var (t, overrides) = InZone("The Hole",
+            "[Mon Aug 17 19:00:00 2026] You have entered The Hole.");
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:05 2026] A ghoul executioner scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)")!);
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:30 2026] You have slain a ghoul executioner!")!);
+
+        Assert.Empty(t.Snapshot(DateTime.Parse("2026-08-17T19:00:31")));
+        Assert.Null(overrides.Find("The Hole", "Ghoul executioner"));
+    }
+
+    /// <summary>The your-own-kill gate applies to rare-considered mobs exactly as to
+    /// proper-named ones: someone else's kill seeds nothing.</summary>
+    [Fact]
+    public void ARareConsideredMobKilledBySomeoneElseSeedsNothing()
+    {
+        var (t, overrides) = InZone("The Hole",
+            "[Mon Aug 17 19:00:00 2026] You have entered The Hole.");
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:05 2026] A ghoul executioner - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)")!);
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:30 2026] A ghoul executioner has been slain by Lonn!")!);
+
+        Assert.Empty(t.Snapshot(DateTime.Parse("2026-08-17T19:00:31")));
+        Assert.Null(overrides.Find("The Hole", "Ghoul executioner"));
+    }
+
     [Fact]
     public void TheSecondKillMeasuresTheCycle()
     {

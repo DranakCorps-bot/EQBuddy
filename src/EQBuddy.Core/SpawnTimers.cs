@@ -150,6 +150,12 @@ public sealed class SpawnTimers
                 break;
             case ConsiderEvent c:
                 OnSighting(c.Name, c.Time);
+                // The game said it: this mob is rare (#185). Remembered so a later kill
+                // can start a discovered timer even when the name fails the article
+                // heuristic — "A ghoul executioner - a rare creature -" is articled AND
+                // named, and only the game can say so. Session memory, deliberately: a
+                // persisted claim would outlive patches that rename or de-rare a mob.
+                if (c.Rare) _rareConsidered.Add(Key(Server, _currentZone?.Zone ?? "", c.Name));
                 break;
         }
     }
@@ -418,7 +424,13 @@ public sealed class SpawnTimers
     /// </summary>
     private void DiscoverNamed(SpawnZone zone, KillEvent k)
     {
-        if (!k.ProperName || k.Killer != "You") return;
+        // Two ways in: the article convention, or the game's own " - a rare creature - "
+        // consider marker seen this session (#185, bjstrange). The marker outranks the
+        // convention because it is the game speaking rather than a heuristic — an
+        // articled rare ("A ghoul executioner") is exactly the gap the convention
+        // cannot see. The your-own-kill gate still applies to both.
+        var saidRare = _rareConsidered.Contains(Key(Server, zone.Zone, k.Target));
+        if ((!k.ProperName && !saidRare) || k.Killer != "You") return;
         if (_overrides.Find(zone.Zone, k.Target) is not null) return;   // already known here
 
         // A serial-named trash mob reads exactly like a named: "CWG Model XA" has no
@@ -610,6 +622,10 @@ public sealed class SpawnTimers
     /// is a statement about the decision, not about the mob: pruning on the kill time
     /// would throw away a dismissal of an old kill the instant it was made.</summary>
     private sealed record Dismissal(DateTime KilledAt, DateTime DismissedAt);
+
+    /// <summary>Names the game itself called " - a rare creature - " in a consider this
+    /// session, by timer key (#185). Read by <see cref="DiscoverNamed"/>.</summary>
+    private readonly HashSet<string> _rareConsidered = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>Kills the player has dismissed with ✕, by timer key (#228). Persisted
     /// beside the timers, because the replay this defends against is the full-file

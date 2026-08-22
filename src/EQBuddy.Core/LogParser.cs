@@ -167,10 +167,13 @@ public static partial class LogParser
     private static partial Regex RegenTickRx();
 
     // Orc pawn scowls at you, ready to attack -- looks like a reasonably safe opponent. (Lvl: 3)
+    // Magus Rokyl - a rare creature - scowls at you, ready to attack -- ... (Lvl: 51)
+    // The optional insert is the game's own rare marker (#185); without the group it was
+    // swallowed into the NAME, so considering a rare mob silently missed its sighting.
     // (Hugzee's log, 2026-08-06 — the only faction phrase observed in Legends so far;
     // the classic-EQ phrase family fills the alternation, anchored by the Legends-only
     // "(Lvl: N)" tail so a chat line can't satisfy it.)
-    [GeneratedRegex(@"^(?<name>.+?) (?:scowls at you|regards you|glares at you|glowers at you|judges you|kindly considers you|looks upon you|looks your way).*\(Lvl: (?<level>\d+)\)$")]
+    [GeneratedRegex(@"^(?<name>.+?)(?: - (?<rare>a rare creature) -)? (?:scowls at you|regards you|glares at you|glowers at you|judges you|kindly considers you|looks upon you|looks your way).*\(Lvl: (?<level>\d+)\)$")]
     private static partial Regex ConsiderRx();
 
     // Outputfile Complete: Dranak_freeport-Inventory.txt  (David's own log, 2026-08-20
@@ -740,7 +743,7 @@ public static partial class LogParser
 
         if ((r = ConsiderRx().Match(msg)).Success)
             return new ConsiderEvent(ts, Normalize(r.Groups["name"].Value),
-                int.Parse(r.Groups["level"].Value));
+                int.Parse(r.Groups["level"].Value), Rare: r.Groups["rare"].Success);
 
         if ((r = OutputfileRx().Match(msg)).Success)
             return new OutputfileEvent(ts, r.Groups["file"].Value.Trim());

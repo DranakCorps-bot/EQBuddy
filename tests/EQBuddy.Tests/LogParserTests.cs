@@ -444,6 +444,25 @@ public class LogParserTests
         var e = Parse<ConsiderEvent>(line);
         Assert.Equal(name, e.Name);
         Assert.Equal(level, e.Level);
+        Assert.False(e.Rare);
+    }
+
+    /// <summary>VERBATIM from bjstrange's log (#185, 2026-08-19) — the game inserts
+    /// " - a rare creature - " into a rare mob's consider line. Before the regex knew
+    /// the insert, the whole marker was swallowed into the NAME ("Magus Rokyl - a rare
+    /// creature -"), which matches nothing downstream — so considering the very mob you
+    /// were camping silently failed to register a sighting. The marker is also the one
+    /// place EQ Legends SAYS a mob is named-class, which discovery now uses.</summary>
+    [Theory]
+    [InlineData("Magus Rokyl - a rare creature - scowls at you, ready to attack -- looks like it would wipe the floor with you! (Lvl: 51)", "Magus Rokyl", 51)]
+    [InlineData("Lesser blade fiend - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 19)", "Lesser blade fiend", 19)]
+    [InlineData("A ghoul executioner - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)", "Ghoul executioner", 35)]
+    public void RareConsiderLinesKeepTheNameCleanAndCarryTheMarker(string line, string name, int level)
+    {
+        var e = Parse<ConsiderEvent>(line);
+        Assert.Equal(name, e.Name);   // articles normalize off, exactly as kill lines do
+        Assert.Equal(level, e.Level);
+        Assert.True(e.Rare);
     }
 
     /// <summary>Rank upgrades: unquoted name with a trailing rank number. The name can

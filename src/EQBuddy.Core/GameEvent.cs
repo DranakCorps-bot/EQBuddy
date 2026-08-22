@@ -44,7 +44,11 @@ public record RuneBlockEvent(DateTime Time, string Attacker) : GameEvent(Time);
 public record RegenTickEvent(DateTime Time) : GameEvent(Time);
 /// <summary>A /consider line — deliberate targeting, so it can drive the target-drops
 /// surfaces without a swing being landed first (David, 2026-08-06).</summary>
-public record ConsiderEvent(DateTime Time, string Name, int Level) : GameEvent(Time);
+/// <summary>Rare: the line carried the game's own " - a rare creature - " insert
+/// (#185, bjstrange's log lines) — the one place EQ Legends SAYS a mob is named-class,
+/// which is stronger evidence than the article convention the discovery heuristic
+/// otherwise has to lean on.</summary>
+public record ConsiderEvent(DateTime Time, string Name, int Level, bool Rare = false) : GameEvent(Time);
 /// <summary>"Outputfile Complete: Dranak_freeport-Inventory.txt" — the game announcing,
 /// in the log EQBuddy already tails, that it has just written a dump AND naming the file.
 ///
