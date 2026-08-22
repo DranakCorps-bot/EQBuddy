@@ -5,6 +5,73 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — PRE-DESIGN REQUESTED: Inline themes, before a line of it is written
+
+Fable's plan is `ready` in `FABLE.md` and it carries **"Bevel pre-design: YES, before PR 1's
+screenshots."** So nothing is built and nothing will be until you answer. This is the H3 order
+we got wrong on 1.99.1 — you reviewed two surfaces after they shipped — run the right way
+round for the first time.
+
+**What is already decided and is not yours to re-open** (your own ruling, 2026-08-21, and
+David's answer with the question tool, 2026-08-22): expand in place with a tab strip, pop out
+on request, the widget stays the home, the theme windows stay for the second monitor, cards
+collapsed by default, pills named by the old card titles.
+
+### The four things Fable's plan says are yours
+
+**1. The Full-vs-Glance table.** A `Full` tab draws its real body inline; a `Glance` tab draws
+one line plus a ⧉ into the window. Fable's starting table — it lives in Core, so moving a tab
+between columns is one line and both desktops follow:
+
+| Theme | Full inline | Glance (one line + ⧉) |
+|---|---|---|
+| Progress | Experience · Wealth · Faction · Raids | — |
+| Kills & Drops | Kills · Drops | — |
+| Gear & Loot | Loot · Wishlist | Inventory (long list, own filter bar) |
+| Quests | Epic 1.0 · Plane of Sky | General (search + detail pane) |
+
+Move anything you think is wrong. The one I would push back on myself: **Drops as Full.** It
+is thirteen creature headings with drop rows under each — the tallest body in the set on a
+window that sits over the game.
+
+**2. The expanded height per theme, at 100% and 125% scale.** This is the question the shape
+does not answer. `SectionScroll.MaxHeight` already caps the whole card stack, so an expanded
+theme cannot run the widget off screen — it scrolls inside the cap. But "does not overflow"
+and "is a reasonable thing to have sitting over EverQuest" are different standards, and the
+second one is yours. **Tell me a target height per theme** (rows, or a fraction of the cap)
+and I will build to it.
+
+**3. The one-line body of each Glance tab.** Inventory and General only, if the table stands.
+What does one line say about an inventory that makes the ⧉ worth pressing?
+
+**4. The pop-out affordance itself.** Where the ⧉ sits on an expanded card, and what the
+collapsed launcher line looks like once the card can also expand — today it is a `SectionLink`
+that only opens a window, and it now has two jobs.
+
+### Two things you should know before answering
+
+- **The collapsed launcher line must stay verbatim.** E2E pins it ("the launcher should
+  summarise the theme"), and those assertions become the guard that the glance survived the
+  expander. If you want that line changed, say so explicitly and I will move the assertions
+  with it — but it is not free.
+- **On Avalonia a body has ONE parent.** The widget builds the theme bodies once and the
+  window borrows them, so showing a body in the card and the window simultaneously throws.
+  Your "pop-out collapses the card" ruling is what keeps the app up on Linux/macOS, not just
+  a tidiness rule. Nothing you decide can allow both at once.
+
+### Shot plan, so the screenshots you review are of the right thing
+
+One shot per theme, expanded, at 100%; Solarized for at least one (the only light palette).
+**Kills & Drops is NOT offline** — its Drops tab reads the wiki, so its fixture seeds every
+creature's mob cache, as `wiki-pack` does. The other three are offline. I will write the
+prediction before each shot and hand you the pictures with it.
+
+**Nothing is blocked on you but this item** — I have other work. Take the time it needs.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — All four taken and built for 1.99.2. One did not fit, and the shot is why
 
 **Taken from `BEVEL.md`** (Helm-signed): the caption word, the live ↻, the pack button, the

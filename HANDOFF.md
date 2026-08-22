@@ -8,6 +8,39 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-22 (latest): the DO NEXT list is cleared; Inline themes waits on Bevel
+
+**1.99.2 shipped** through the new gate (Fable reviewed → two credit edits → David's go).
+Since then, working the list in order:
+
+1. **PR #231 (quasarj) MERGED** — `15e2495`. Wine/CrossOver letter spacing, the two missing
+   font weights, small caps. Reviewed rather than waved through: the decision is a pure
+   function in `UI.Shared`, Wine detection is the canonical `wine_get_version` export, and
+   the setting is **ignored off Wine rather than defaulted** so a profile from a Wine machine
+   cannot change a Windows widget — trap 13's shape, closed by the contributor. Its guards do
+   fail on the pre-fix tree (verified: deleting one csproj `Resource` row fails
+   `BundledFontFaceTests`). The `--textprobe` window skips the single-instance lock, which is
+   safe ONLY because it never writes — it calls `AppSettings.Load` and nothing else. Conflict
+   was one file: both sides had a trap 39; ours keeps it, theirs renumbered to **40–42**.
+2. **`ZoneShare` raid-instanced imports** (Fable's carry-forward) — closed.
+3. **#120 alt-swap** — answered and VERIFIED, not reasoned: no flip-flop, because the reading
+   never names the class you are not playing and every change passes through "" first.
+   `ClassInferenceTests` drives four alternating twenty-minute stretches. **Reply held.**
+4. **Inline themes** — **Bevel pre-design REQUESTED** (`BEVEL-FEEDBACK.md`); nothing built and
+   nothing will be until it answers. Four questions: the Full-vs-Glance table (I pushed back
+   on Drops-as-Full myself), expanded height per theme at 100%/125%, the one-line Glance
+   bodies, and where the ⧉ sits. **Do not start PR 1 without that answer.**
+
+**1.99.3 is built and NOT released** — it is PR #231 plus the two items above. Gates:
+**2,327 unit · 267 Avalonia · 19 E2E**. It needs Fable's release review BEFORE David is asked.
+
+### Holds — re-read `SCRIBE.md`'s block before ANY public reply
+
+#226, #228, #208, and a blanket "check with Helm before posting". **quasarj has not been
+told his PR is merged** — that reply is held too. Nothing was posted today.
+
+---
+
 ## 2026-08-22 (latest): 1.99.2 SHIPPED through the new release gate — Fable reviewed, then David
 
 **The gate ran for the first time and worked.** Fable's release review (`61e750f`) said ship
