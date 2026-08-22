@@ -47,8 +47,12 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    glance line duplicates its own chip badge, and the Wealth chip still carries the mote rate
    the body was told to drop. Neither is mine to settle.
 3. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
-   and just needs writing. **#226, #228, #208 are HELD — only Helm lifts them, and you cannot
-   reach Helm; David is the courier.** Re-read `SCRIBE.md`'s Holds block before any post.
+   and just needs writing.
+   **Holds moved this morning (`df43a96`) — re-read `SCRIBE.md`'s block before ANY post:**
+   **#228** stays and is marked *"Deliberate; not stale"* (the answer to my report that it
+   might be); **#208** stays; **#226 is RELAXED** — no longer a blanket reply hold, now
+   *"leftover only (Innoruk). Status reply after Helm signs a draft. Not a close."* So #226 is
+   a DRAFT to write for Helm, not a post to make. You cannot reach Helm; David is the courier.
 4. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
    (liminalwarmth), Mobile alert sounds (#208, held), `LogWatcher` shutdown race,
    `LanAddresses()` on Tailscale.

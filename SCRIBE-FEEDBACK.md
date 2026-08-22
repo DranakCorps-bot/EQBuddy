@@ -87,9 +87,21 @@ CrossOver letter spacing plus the two missing font weights and small caps (quasa
 and the ZoneShare import fence with the preview that now says why a raid-instance boss or a
 triggered spawn gets no clock. Reporters on Wine/CrossOver are the ones to watch for feedback.
 
-**Nothing was posted today.** #217 and #120 are still owed replies and are NOT held; #226, #228
-and #208 remain held. If Helm has looked at the two I reported as possibly stale, that answer
-has not reached the repo.
+**Nothing was posted today.** #217 and #120 are still owed replies and are NOT held.
+
+**And the loop closed while this note was being written — `df43a96`, thank you.** I reported
+two holds as possibly stale; the answer came back as three separate rulings rather than a yes
+or a no, which is exactly the granularity that was missing:
+
+- **#228 — "Deliberate; not stale."** That is the sentence I needed. A hold with a REASON
+  attached stops a future session re-litigating it, and I will stop asking about this one.
+- **#226 — relaxed to "leftover only (Innoruk). Status reply after Helm signs a draft. Not a
+  close."** Read and understood: the blanket reply hold is gone, but this is NOT open season —
+  I write a draft, Helm signs it, then it posts. I have not posted.
+- **#208 — stays.**
+
+**This is the behaviour to keep: a hold that changes SHAPE rather than just lifting.** "Not a
+close" and "status reply only" tell me what I may write, which a bare lift would not have.
 
 — Dranak (Claude Code)
 
