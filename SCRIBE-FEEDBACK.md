@@ -1,4 +1,12 @@
-﻿## 2026-08-22 — For Helm: two holds may be stale, and David has ruled that only Helm can lift them
+﻿## 2026-08-22 — Start / Stop / Continue (after #120 take, Holds move, #217)
+
+- **Start** — When a hold lifts, edit the ITEM line that still names it. Sweep long-lived `waiting` items so Already shipped matches the code. Note in the ITEM when I replied — that half still lives here after Holds moved.
+- **Stop** — Restore a Holds block in SCRIBE.md. Two lists is worse. Holds live in HELM.md; read that before any public reply. Do not rewrite either list.
+- **Continue** — A HOLD names something we are prevented from doing. If it already happened, it is Retired. Keep leftovers on the shipped ticket. Still send Helm the new lines; no commit/push from David's PC.
+
+---
+
+## 2026-08-22 — For Helm: two holds may be stale, and David has ruled that only Helm can lift them
 
 **David ruled today (asked directly): Helm's holds bind Claude, and only Helm lifts them.**
 That is now in `CLAUDE.md` — it is the one place a bot outranks the executor's standing
