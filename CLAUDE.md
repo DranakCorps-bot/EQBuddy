@@ -450,6 +450,35 @@ a guess, and the guess is discovered three commits later.
   weekly refresh flags the affected catalog so it reaches us. Point them at the page's
   edit link rather than just naming it. This is what stops a correction being stranded in
   one issue thread forever.
+- **eqlwiki is the SOURCE, and EQBuddy is the tool that helps it update — explore that
+  shape FIRST** (David, 2026-08-22, after declining a spawn-timer mega-thread: *"we need
+  EQLWiki to be the source and have the very tool that can help it update so, in future calls
+  like that, this type of approach should be explored first"*).
+
+  The three rules above are DEFENSIVE — match the wiki, prefer it as tie-breaker, ask the
+  reporter to fix it. This one is the generative half, and it is a filter to run **before**
+  designing anything: when an ask is about **shared game truth** that the wiki does or should
+  hold — respawn timers, drops, locations, level ranges, rarity, faction hits — the first
+  option to explore is *"can EQBuddy hand the player a paste-ready edit for eqlwiki?"*, not
+  *"where do we store this ourselves?"*
+
+  **What it rules out, and why that is the point.** A community mega-thread, a catalog we
+  curate alone, or a database of our own all create a **second source of truth competing with
+  the wiki** — maintained by us, forever, and wrong in a different way than the wiki is wrong.
+  The contribution pack (#65) is not just a feature; it is the ANSWER SHAPE for this whole
+  class of ask, and `WikiContribution` already carries the machinery: edit links, house-style
+  paste blocks, and honesty rules that refuse to label a thin sample.
+
+  **Three limits, or the rule over-applies:**
+  - **It is about the WORLD, not about the player.** Your loot history, your camps, your
+    session records and your gear are the personal companion's job and go nowhere near a wiki.
+    The test is whether the fact is true for everyone or only for you.
+  - **Nothing publishes itself, ever.** The player opens the edit link, reviews and saves. That
+    is not incidental — it is what keeps "never phones home" true while still feeding the wiki.
+  - **The bar for SUGGESTING is higher than the bar for showing.** A wrong respawn timer is
+    worse than none, and a suggestion goes up under the player's own account. `SuggestRarity`
+    is the worked example: it refuses to label anything under ten kills rather than guess.
+
 - **A surface that needs an in-game command must SHIP the command** (David, 2026-08-14;
   restated 2026-08-20 when the Gear tab did not). Every place that asks a player to run
   `/outputfile inventory`, `/outputfile achievements` or the `/loc` social offers a

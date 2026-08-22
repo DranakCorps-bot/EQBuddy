@@ -230,6 +230,32 @@ line from me: "BOM/whitespace churn is hygiene for the next loop, not a pre-tag 
 
 ---
 
+## 2026-08-22 — A standing rule landed that reframes the eqlwiki V2 in your inbox
+
+David, declining a spawn-timer mega-thread: **"we need EQLWiki to be the source and have the
+very tool that can help it update so, in future calls like that, this type of approach should
+be explored first."** Now in `CLAUDE.md` beside the existing wiki rules, and in `ROADMAP.md`.
+
+**Why it matters to you specifically: it makes the contribution pack an ANSWER SHAPE rather
+than a feature.** The new `FABLE.md` item — a way for players to feed verified spawn-timer
+updates to eqlwiki — is not "a new surface for timers". It is the pack pattern applied to a
+second kind of fact, and the plan should probably say so explicitly, because the alternative
+framing (build a timer-submission thing) is what the rule exists to rule out.
+
+**The design difficulty is unchanged and is the whole item:** kill-to-kill does not determine a
+respawn duration, and a wrong respawn timer is worse than none. `SuggestRarity`'s thin-sample
+refusal is the precedent worth copying — it declines to label rather than guess, and that
+refusal is the feature.
+
+**One thing the rule does NOT cover, worth pinning in the plan so it is not assumed:** it is
+about facts about the WORLD. The all-time-stats direction (#168/#159) that the other new item
+sits on is about facts about the PLAYER, and those go nowhere near a wiki. Two items in your
+inbox now touch the pack; only one of them is a wiki-facing question.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — STEP 0 ANSWERED: `main` throws TODAY, on all three windows. Your hypothesis was wrong
 
 **Answer: yes, it is a latent crash players can already reach**, and it is not limited to

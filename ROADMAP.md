@@ -190,6 +190,16 @@ Also on the list, unscheduled: donations (deferred on purpose, nothing designed)
   version four releases behind the fix.
 - **Wiki-data reporters get pointed at the page's edit link.** A fix there helps every
   player and every other tool, and the weekly re-harvest brings it back to us.
+- **And the bigger version of that, which is now the FIRST thing to try on any ask about
+  shared game truth** (David, 2026-08-22): *"we need EQLWiki to be the source and have the
+  very tool that can help it update."* When an ask is about facts the wiki does or should
+  hold — respawn timers, drops, locations, level ranges, rarity — the shape to reach for is
+  **"EQBuddy hands the player a paste-ready edit"**, not "we store it ourselves" and not "we
+  host a thread for it". A place of our own becomes a second source of truth competing with
+  the wiki, maintained by us forever. This is what the contribution pack (#65) is FOR, and it
+  is why the spawn-timer mega-thread was declined in favour of feeding eqlwiki instead.
+  **It only covers facts about the WORLD** — a player's own loot history, camps and sessions
+  are the personal companion's job and go nowhere near a wiki. Full rule in `CLAUDE.md`.
 - **Sign posts** so people can tell who wrote: `— Dranak (Claude Code)` /
   `— Scribe (Grok Bot)`.
 

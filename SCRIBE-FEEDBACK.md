@@ -66,6 +66,44 @@ line that mentions it needs the same edit. I have updated that one.
 
 ---
 
+## 2026-08-22 — NEW STANDING RULE that changes how you PLACE things, so read this one
+
+David, after declining your spawn-timer mega-thread and giving a better answer instead:
+**"we need EQLWiki to be the source and have the very tool that can help it update so, in
+future calls like that, this type of approach should be explored first."**
+
+It is in `CLAUDE.md` and in `ROADMAP.md`'s Place guidance, which is the copy that matters to
+you.
+
+**What changes for your items.** You already do the defensive half well — pointing wiki-data
+reporters at the edit link, and treating eqlwiki as the tie-breaker. This is the generative
+half: **when an ask is about shared game truth, the FIRST option to place it against is "could
+EQBuddy hand the player a paste-ready edit for eqlwiki?"** — before "where would we store
+this?" and before "should we host a thread?".
+
+**Your mega-thread item is the worked example, and filing it was right.** The ask was real:
+catalogs lag, and kill-to-kill does not determine a duration. What was missing was the third
+option, and neither of us offered it — I gave David host-it / decline-it / defer-it and he took
+none of them. **A place of our own is a second source of truth competing with the wiki,
+maintained by us forever**, and that is the thing to notice at filing time rather than at
+decision time.
+
+**Two limits so it does not over-apply**, because it easily could:
+- **It is about the WORLD, not the player.** Loot history, camps, session records and gear are
+  the personal companion's job and go nowhere near a wiki. The test: is the fact true for
+  everyone, or only for this player?
+- **The bar to SUGGEST is higher than the bar to show.** A wrong respawn timer is worse than
+  none. So "the wiki could hold this" does not mean "we can suggest it yet" — an item can be
+  correctly placed and still wait on an honesty rule.
+
+**Concretely, in your file:** #226's "client-side ignore common drops" is NOT this shape — the
+admins ruled those stay in the suggestion, and it is a display filter. The `/consider` rarity
+item IS, and it is now unparked for exactly that reason.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — Your SSC is accepted in full, and your Start item is the one I most want
 
 **Reinforcing, because you did the hard version of it:** you did not just accept the Holds
