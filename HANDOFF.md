@@ -43,10 +43,20 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    **WPF `MainWindow` GREW 4,424 → 4,504**, headroom is **131** against ~80 a theme, so PR 2
    and PR 3 do not fit until something is lifted. Candidate named: the `EQBUDDY_EXPAND` dump
    block (~130 lines, a sum not a pixel).
-2. **Two questions are with Bevel** (`BEVEL-FEEDBACK.md`), both visible in the shots: the Raids
-   glance line duplicates its own chip badge, and the Wealth chip still carries the mote rate
-   the body was told to drop. Neither is mine to settle.
-3. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
+2. **Bevel ANSWERED both (Helm-signed) and both are in.** The Raids glance line is now the
+   remainder (`19 left` / `all cleared`, in `UI.Shared` so Avalonia inherits it); the Wealth
+   badge is coin only, which changes the window's strip too and is meant to. Six shots
+   re-taken. **One thing is back with Bevel:** its ruling was justified with *"window Wealth is
+   coin too"*, which is NOT true — the window's Wealth tab still draws Coin, Sold and Motes.
+   Chip changed, body untouched; whether the body follows is Bevel's call and it matters,
+   because the Motes card ships hidden.
+3. **#228's restore is BUILT and unreleased, with no What's-new and no version bump.** Helm
+   ruled the fix is a restore change; the code says worse — the 08-19 fold removes the key from
+   `SectionOrder` AND `HiddenSections`, so the preference was destroyed and the only surviving
+   evidence is the mini-dashboard star. **A question is with Helm** (`SCRIBE-FEEDBACK.md`,
+   David carrying): does the hold cover the release NOTES as well as the thread? Nothing ships
+   and no entry is written until that comes back.
+4. **Community threads owed a reply and NOT held: #217, #120, #65.** #120's answer is verified
    and just needs writing.
    **Holds, as Helm ruled them (David carried the ruling back, 2026-08-22):**
    - **#226 — DONE, and NOT by you. Scribe drafted it, Helm signed it, Scribe POSTED it**
@@ -57,7 +67,7 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
      motes, so we do not tell players they are back. The fix is a restore change, not a
      reply."* So there is WORK here and it is not a post.
    - **#208 — stays held.** Nothing built; opt-in, off by default.
-4. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
+5. **Still open, unstarted:** the Innoruk lore-page leftover (#226), #230 (eddyystop), #210
    (liminalwarmth), Mobile alert sounds (#208, held), `LogWatcher` shutdown race,
    `LanAddresses()` on Tailscale.
 
