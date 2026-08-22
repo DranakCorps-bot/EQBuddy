@@ -19,36 +19,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ## Holds
 Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
 
-**A HOLD NAMES SOMETHING WE ARE PREVENTED FROM DOING. If it has already happened, it is not a
-hold — it is a record, and it belongs below rather than here** (David, 2026-08-22, after all
-three entries turned out to describe states that had stopped being true). This matters more than
-it sounds: this block is the first thing every session reads, so a stale line does not just
-mislead, it suppresses work. #226 sat here saying "do not reply" for the four hours after its
-reporter had already answered our reply with a new ask.
+**A HOLD NAMES SOMETHING WE ARE PREVENTED FROM DOING.** Helm lifts these, not a session rewrite. If it has already happened, it is a record and belongs on the item, not here.
 
-**Live holds: none.** Nothing here currently forbids a reply.
+- **#228 — do not reply.** Do not tell players motes are back. Default-off still-wrong for existing mote-job profiles. Deliberate product hold; not stale. A 1.99.4 plan does not lift this. Player follow-up only after Helm lifts, after a ship that actually restores the card for people who had the job.
+- **#208 — do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built. Talking to sbaum23 is not the hold; starting the work is.
+- **#226 — leftover only** (Innoruk lore-vs-creature). Status / follow-up reply only after Helm signs that one draft. Not a close.
 
-## Not holds — resolved, kept so nobody re-holds them
-Checked against the threads themselves on 2026-08-22, which is the check that was missing.
+Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
 
-- **#228 — DONE, twice over.** daetien-lab was answered **2026-08-21 21:49**, and **1.99.0's
-  What's-new announced it**: *"MOTES IS ITS OWN CARD AGAIN, if you want it (thanks daetien-lab,
-  #228…)"*. Helm's hold was never blocking a first announcement; read against what had gone out,
-  it was blocking a SECOND one — declaring it done while default-off meant motes were not really
-  back for the people complaining. **Helm's product point was right and is now FIXED**: the card
-  returns visible for anyone with the mini-dashboard star, staged in 1.99.4. *Owed: one follow-up
-  reply once 1.99.4 SHIPS — not before, because until then "it comes back on by itself" is not
-  true yet.*
-- **#226 — status reply POSTED by Scribe 2026-08-22 13:17Z**, Helm-signed, exactly as ruled.
-  **The thread has moved on: LeBigNasty replied 13:33Z** — *"Thanks. Looking much better. Still
-  recommend app side filtering of motes and client side ignore drop options"*. **Last comment is
-  his; the thread is waiting on us.** That ask is the client-side display filter #217 already
-  separated from what the pack SUGGESTS to the wiki (the admins ruled the suggestion stays
-  complete). Innoruk lore-vs-creature leftover still open.
-- **#208 — replied 2026-08-22 00:46** (the cosmic-comp analysis). Helm's *"do not open"* is a
-  **priority call about starting the WORK**, not a communication hold, and it stands as that:
-  nothing built, opt-in and off by default when it is. Filing it under Holds made it read as an
-  embargo on talking to sbaum23, which it never was.
+## Not holds — do not put these back in Holds
+- **#226 status** was posted 2026-08-22 (Helm-signed). LeBigNasty then said the re-check looks better and repeated the two leftover asks (motes out of pack suggestions; client-side ignore). That follow-up is on the wiki-pack motes item. Thread is not closed.
+- **#208** already has a reply (cosmic-comp). The hold is on opening the *work*, not on talking.
+- **#231** thank-you posted; PR merged. No hold line of its own.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
@@ -239,6 +221,7 @@ Checked against the threads themselves on 2026-08-22, which is the check that wa
 - **Also:** #226 LeBigNasty Aug 20, 5:12 PM CT (1.98.0). "It would be nice if you could filter out motes and things that can drop from everyone. For things like common drops like gems, it would be nice if the user can filter those out or right click to ignore." Motes corroborate this item. Gems/common-drop ignore is extra; not a second heading yet.
 - **Follow-up Aug 20, 8:55 PM CT:** Frank on #226 and #217. Motes: exclude from pack suggestions (wiki Mote Guide; not creature-specific). Common drops/gems: wiki admins pushed back on omitting as a category; hide-from-my-view vs omit-from-wiki. Not a second heading. Did not reply (old threads).
 - **Follow-up Aug 21, 5:25 AM CT:** LeBigNasty on #226: "Client side is what I meant when I said user filter." Confirms hide-not-omit. Did not reply.
+- **Follow-up Aug 22, 8:33 AM CT:** LeBigNasty on #226 after the 1.99.1 status note. Helm-signed reply (do not treat as a #228 motes-are-back note). "Thanks. Looking much better." Then: "Still recommend app side filtering of motes and client side ignore drop options." Same two asks as this item (pack should not suggest motes; client-side hide/ignore, not omit-from-wiki). Not a new heading. Not the Innoruk leftover. Do not close #226.
 - **Ask:** exclude motes from what the wiki pack ever suggests as a per-creature drop. Wiki [Mote Guide](https://eqlwiki.com/Mote_Guide): motes can drop from any kill; zone difficulty and con color matter, creature identity does not. Listing "Mote of X" on an NPC page would imply a species source that does not exist.
 - **Already shipped:** unknown whether the pack currently emits motes.
 - **Checked:** `rg -i mote` on `WikiContribution.cs` and `WikiPackPresentation.cs` returned no hits. Hypothesis — not currently surfaced; the flag is so Ask 2 full-history pooling does not start emitting them. Data source is each loot item name in the observation, not a Drops-window filter.
