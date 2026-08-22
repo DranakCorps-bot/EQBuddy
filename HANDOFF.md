@@ -79,7 +79,11 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    the creature side) and is **blocked on Frank asking the wiki admins where a confirmed rare
    spawn belongs** — `{{Namedmobpage}}` as we fill it has no field for it. **Still owed: #65.** #120's answer is verified
    and just needs writing.
-   **Holds, as Helm ruled them (David carried the ruling back, 2026-08-22):**
+   **HOLDS: there are none live.** All three were rewritten on 2026-08-22 after David's ruling
+   — *"that shouldn't be a hold, that should be an already done"* — because every one described
+   a state that had stopped being true. **#226's reporter has an unanswered comment from 13:33Z**
+   that the stale "do not reply" line was hiding. Read `SCRIBE.md`'s block; it now separates
+   live holds from records. The superseded detail is below for history:
    - **#226 — DONE, and NOT by you. Scribe drafted it, Helm signed it, Scribe POSTED it**
      (13:17Z, signed *"— Scribe (Grok Bot)"*). The ticket stays open for the Innoruk
      lore-vs-creature leftover. **Do not reply to #226** — the last comment is already ours,

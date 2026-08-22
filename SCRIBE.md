@@ -18,9 +18,37 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ## Holds
 Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
-- **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong. Deliberate; not stale.
-- **#226** — leftover only (Innoruk). Status reply after Helm signs a draft. Not a close.
-- **#208** — Helm: do not open. Waiting, not a must.
+
+**A HOLD NAMES SOMETHING WE ARE PREVENTED FROM DOING. If it has already happened, it is not a
+hold — it is a record, and it belongs below rather than here** (David, 2026-08-22, after all
+three entries turned out to describe states that had stopped being true). This matters more than
+it sounds: this block is the first thing every session reads, so a stale line does not just
+mislead, it suppresses work. #226 sat here saying "do not reply" for the four hours after its
+reporter had already answered our reply with a new ask.
+
+**Live holds: none.** Nothing here currently forbids a reply.
+
+## Not holds — resolved, kept so nobody re-holds them
+Checked against the threads themselves on 2026-08-22, which is the check that was missing.
+
+- **#228 — DONE, twice over.** daetien-lab was answered **2026-08-21 21:49**, and **1.99.0's
+  What's-new announced it**: *"MOTES IS ITS OWN CARD AGAIN, if you want it (thanks daetien-lab,
+  #228…)"*. Helm's hold was never blocking a first announcement; read against what had gone out,
+  it was blocking a SECOND one — declaring it done while default-off meant motes were not really
+  back for the people complaining. **Helm's product point was right and is now FIXED**: the card
+  returns visible for anyone with the mini-dashboard star, staged in 1.99.4. *Owed: one follow-up
+  reply once 1.99.4 SHIPS — not before, because until then "it comes back on by itself" is not
+  true yet.*
+- **#226 — status reply POSTED by Scribe 2026-08-22 13:17Z**, Helm-signed, exactly as ruled.
+  **The thread has moved on: LeBigNasty replied 13:33Z** — *"Thanks. Looking much better. Still
+  recommend app side filtering of motes and client side ignore drop options"*. **Last comment is
+  his; the thread is waiting on us.** That ask is the client-side display filter #217 already
+  separated from what the pack SUGGESTS to the wiki (the admins ruled the suggestion stays
+  complete). Innoruk lore-vs-creature leftover still open.
+- **#208 — replied 2026-08-22 00:46** (the cosmic-comp analysis). Helm's *"do not open"* is a
+  **priority call about starting the WORK**, not a communication hold, and it stands as that:
+  nothing built, opt-in and off by default when it is. Filing it under Holds made it read as an
+  embargo on talking to sbaum23, which it never was.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
