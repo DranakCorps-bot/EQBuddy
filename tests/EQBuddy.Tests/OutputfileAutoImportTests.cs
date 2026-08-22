@@ -13,6 +13,9 @@ namespace EQBuddy.Tests;
 /// dump is located without help, the import applies, and the undo puts back exactly what
 /// that import changed and nothing else.
 /// </summary>
+// The importer saves the settings back after an import it accepted, so these write the
+// shared profile's settings.json — see SettingsFileCollection.
+[Collection(SettingsFileCollection.Name)]
 public class OutputfileAutoImportTests
 {
     /// <summary>VERBATIM from David's own log, 2026-08-20 18:47:36 — not a guess at what

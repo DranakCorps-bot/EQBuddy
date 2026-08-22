@@ -12,6 +12,9 @@ namespace EQBuddy.Tests;
 ///
 /// Constructing a host does not save settings — these write nothing to any profile.
 /// </summary>
+// CompanionHost persists on pair/enable/theme, so these write the shared profile's
+// settings.json — see SettingsFileCollection.
+[Collection(SettingsFileCollection.Name)]
 public class CompanionEnableTests
 {
     [Fact]

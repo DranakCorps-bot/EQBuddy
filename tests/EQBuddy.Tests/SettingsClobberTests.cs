@@ -15,8 +15,20 @@ namespace EQBuddy.Tests;
 /// is instead of leaving us guessing.
 ///
 /// These tests write settings.json inside the throwaway profile TestProfileIsolation
-/// hands every test; no other test in the suite touches that file.
+/// hands every test — and that profile is ONE directory for the whole assembly, which is
+/// why the collection below exists.
+///
+/// **This file used to claim "no other test in the suite touches that file". It was not
+/// true, and saying it instead of enforcing it cost a 1-in-3 flake** in
+/// <c>LoadCanBeAskedNotToPersistMigrations</c> — the guard Fable 5 asked for in the
+/// v1.99.3 release review, flaky from the day it shipped. `CompanionHost` and
+/// `OutputfileAutoImport` both call `settings.Save()`, their tests run in a different
+/// xUnit collection, and collections run in PARALLEL: so a default settings.json landed
+/// on top of the two-byte file this test had just written, and the assertion that nothing
+/// wrote it failed against a real write by a real writer. Trap 34's shape exactly — a
+/// comment standing in for a guard reads as coverage.
 /// </summary>
+[Collection(SettingsFileCollection.Name)]
 public class SettingsClobberTests : IDisposable
 {
     private readonly Action<object?>? _sink = CoreLog.Sink;
