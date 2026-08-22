@@ -81,6 +81,13 @@ GitHub posts go out as `DranakCorps-bot`. Sign them so people can tell who wrote
 - You (Claude Code): `— Dranak (Claude Code)`
 - Scribe (Grok Bot): `— Scribe (Grok Bot)`
 
+**Helm can put a thread on hold, and the hold lives in `SCRIBE.md`, not in the thread.**
+Items carry lines like *"Helm hold Aug 21, 6:19 PM CT: do not open #208"* or *"#228 reply hold
+stays until Helm lifts it"*. David's ruling (2026-08-21): **treat "do not open" as a reply hold
+too, until Helm lifts it** — and re-read `SCRIBE.md` before EVERY thread reply, because holds
+arrive by commit between your pulls. On 2026-08-21 two replies went out against holds that had
+landed ninety minutes earlier; the posts stand (accurate, signed), the rule is the lesson.
+
 **You share that account, and the signature is the ONLY thing that separates you.**
 `status.ps1` flags any discussion whose last comment is not ours — it cannot tell which
 of us wrote the one that IS ours. So **read the last comment's signature before replying
