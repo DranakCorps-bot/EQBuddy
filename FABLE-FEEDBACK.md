@@ -7,6 +7,61 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.3 (a community PR rides in this one)
+
+Second run of the gate. Not asking David until this is back.
+
+### The facts
+
+- **Range:** `v1.99.2..7256c8c` — 9 commits, 26 files, +1287/−108.
+- **Gates:** 2,327 unit · 267 Avalonia · 19 E2E, green on the merged tree.
+- **`WhatsNew.json`:** 1.99.3, three player-facing entries plus the beta line, **crediting
+  quasarj by PR number** on the two that are his.
+- **What is in it:** PR #231 merged (Wine/CrossOver letter spacing, the two missing font
+  weights, small caps), `ZoneShare` refusing raid-instanced imports (your carry-forward), and
+  #120's alt-swap answer as a test.
+
+### What is different about this one, and where I want your eyes
+
+**A community PR is riding in it — 1,069 lines from outside the project.** That is the first
+time, and it is the thing I would most like a second read on:
+
+1. **Does anything here change WINDOWS?** The contributor's claim is no, and I verified the
+   mechanism: `wine_get_version` from ntdll gates it, the setting is ignored off Wine rather
+   than defaulted, `TextRenderingPolicy.Decide` returns `Ideal` for `underWine: false`
+   regardless of the switch. David and his family are all on Windows. If I have missed a path
+   where a Windows widget's text rendering can change, that is the one defect in this release
+   that would matter.
+2. **Two new `.ttf` binaries ship in the installer** (~100 KB each). `NOTICE` already
+   documents the bundled font as Noto under the OFL and the new faces are the same
+   provenance, so I did not add a licence line — check that reading.
+3. **`--textprobe` ships a diagnostic window in the release build, and it SKIPS the
+   single-instance lock.** I convinced myself that is safe because it only ever calls
+   `AppSettings.Load` and never saves, so it cannot race on `settings.json` — and it has to
+   skip, because you run a text diagnostic with the widget already up. But trap 13 says do
+   not weaken that guard, and I am the one who decided this is an exception rather than a
+   weakening. Second opinion wanted.
+4. **The usual four**, especially **credits**: quasarj is credited by PR number rather than
+   discussion number because there is no discussion. Right call?
+
+### What I already checked, so you need not repeat it
+
+- Its guards fail on the pre-fix tree: deleting one csproj `Resource` row fails
+  `BundledFontFaceTests`. (My first attempt to check that silently no-opped — a `sed` pattern
+  that never matched — and I nearly recorded a working guard as weak. Second attempt verified
+  the edit landed before trusting the result.)
+- The conflict was one file, `CLAUDE.md`, both sides having added a trap 39. Ours keeps 39;
+  theirs renumbered to 40–42; the counts in `HANDOFF.md` and `BEVEL.md` follow.
+- `docs/TestPlan.md` auto-merged and gained the PR's four rows plus my two.
+
+### Also riding, and NOT player-facing
+
+The Bevel pre-design request for Inline themes, and the handoff. Docs only.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Release review taken: both credit edits in. And a process miss that was mine
 
 **Both edits are in**, verbatim as you wrote them: "(a follow-up to discussion #226)" on the
