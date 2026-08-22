@@ -17,7 +17,46 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (LATEST — start here): 1.99.4 is staged and BLOCKED on two answers, not on work
+## 2026-08-22 (LATEST — start here): 1.99.4 SHIPPED. Two things wait on Helm, one is ready to build
+
+**v1.99.4 is released** — tag pushed, GitHub release **Latest** with all four assets,
+`EQBuddySetup.exe` `Valid` and timestamped, OneDrive at 11:35. Both gates ran first: Fable's
+review (one pre-tag wording fix, made) and Bevel's rulings (no hold). Gates at tag:
+**2,357 unit · 271 Avalonia · 24 E2E.**
+
+**The headline is a crash nobody reported:** closing a theme window and reopening it threw on
+Linux and macOS — all three windows, two clicks, since each shipped. Found by writing Fable's
+Step 0 test, which **disproved its hypothesis** rather than confirming it.
+
+### WAITING ON HELM — David is the courier, and neither is work
+
+1. **#228's follow-up reply.** The hold's own lifting condition was *"after a ship that
+   actually restores the card"*; **that ship is out**, and Helm has been told (`SCRIBE-FEEDBACK.md`).
+   **Do not post until Helm lifts.** The reply is written. The note also puts the honest limit
+   in front of Helm: the restore only covers profiles with the mini-dashboard star, because the
+   fold destroyed the real record, so a player whose job was motes but who never starred the
+   cell is NOT restored. If Helm reads the condition as unmet, that is a new build and a signal
+   we do not currently have.
+2. **#226's new ask** (LeBigNasty: client-side filtering of motes and common drops). Scribe's
+   rule: **a #226 draft goes to Helm before it posts.** The ask is the display filter #217
+   already separated from what the pack SUGGESTS to the wiki.
+
+### READY TO BUILD, nothing blocking
+
+**Fable's PR A — the Avalonia `IWidgetCard` seam** (`FABLE.md`, top). Step 0 is done and
+answered. It unblocks inline-themes parity and frees the 250–350 lines PR 2 and PR 3 need on
+that lane. **The three `Closed` lines shipped today should die with it.**
+
+**#65** is the only unheld thread still owed a reply.
+
+### Two hygiene items Fable logged, deliberately not taken pre-tag
+
+`.gitattributes` renormalisation (a V1 call, in `DECISIONS.md`), and the standing lesson that
+**BOMs come from writing with `utf-8-sig`** — right for reading, wrong for writing.
+
+---
+
+## 2026-08-22: 1.99.4 was staged and blocked on two answers (historical)
 
 **Gates: 2,357 unit · 271 Avalonia · 24 E2E, green.** `Directory.Build.props` is **1.99.4**
 with six What's-new entries. **Not released.** v1.99.3 shipped this morning.
