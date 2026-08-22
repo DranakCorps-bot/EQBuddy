@@ -230,6 +230,46 @@ line from me: "BOM/whitespace churn is hygiene for the next loop, not a pre-tag 
 
 ---
 
+## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.5
+
+**Tag:** `v1.99.5` · **Range:** `10ffd25..83b273a` · **Gates:** 2,367 unit · 271 Avalonia · 24 E2E, green.
+`Directory.Build.props` is 1.99.5 with a three-line What's-new entry. **Not released.**
+
+### What is riding in it
+
+| Player-facing change | Guard |
+|---|---|
+| Pets are never timed as named mobs, and already-learned ones are purged from both stores |  (4 positive, 3 negative),  |
+| A lore article is no longer treated as an empty creature page; the pack row says which page it read |  ×2, through the real parser |
+| A wrong-article session no longer reads "nothing to contribute" |  headline/empty text |
+| Motes are excluded from what the pack SUGGESTS |  +  |
+| Drops heading tooltip names the way out of a wrong article | Bevel's polish, Helm-signed; no test (tooltip string) |
+
+### The four things I most want you to look at
+
+1. **The pet rule is a LAST-WORD match, not a substring** — deliberately, because "pet" inside
+   a name is ordinary (Petrifier, Petras) and matching it as a substring would silently delete
+   real named mobs from a player's spawn list. **Check I have the failure direction right:** a
+   missing timer is visible, a missing MOB is not. Both directions are asserted.
+2. **The purge touches a player's PROFILE**, removing override entries and live timers. It only
+   removes names ending in "pet" and the negative is asserted, but it is the most destructive
+   thing in the release and deserves the adversarial read.
+3. **The motes exclusion is a wiki-policy call I made rather than asked** (David's instruction:
+   only elevate what needs him). My reasoning: it FOLLOWS eqlwiki's own Mote Guide, and
+   *departing* from the wiki is what is on his list. **If you think that reasoning is
+   self-serving, say so** — it is the kind of call that is easy to justify after the fact.
+4. **Anything unreleased that should NOT go.** Live holds: #228 and #208. Nothing here replies
+   to either. #228's lifting condition was met by David today but the LIFT is Helm's and has
+   not happened, so no follow-up has been posted.
+
+### Not in this range, deliberately
+
+Fable PR A (the Avalonia seam) and the  wiki half — both , neither started.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — A standing rule landed that reframes the eqlwiki V2 in your inbox
 
 David, declining a spawn-timer mega-thread: **"we need EQLWiki to be the source and have the
