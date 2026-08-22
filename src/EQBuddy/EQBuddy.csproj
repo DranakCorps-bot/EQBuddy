@@ -28,8 +28,14 @@
   <ItemGroup>
     <Resource Include="Assets\tutorial\*.png" />
     <!-- The app font for Wine, where no Segoe font exists and DirectWrite reads
-         only the primary font — see WineFonts.cs; rebuilt by scripts/build-icon-font.py. -->
+         only the primary font — see WineFonts.cs; rebuilt by scripts/build-icon-font.py.
+         All THREE weights ship: the app asks for SemiBold/Bold in 71 places and a
+         family that contains only Regular gets those weights SYNTHESISED, which is
+         what a CrossOver player sees as broken letterfit. A face listed here but
+         absent from the folder is a weight WPF cannot resolve. -->
     <Resource Include="Fonts\EQBuddySans.ttf" />
+    <Resource Include="Fonts\EQBuddySans-SemiBold.ttf" />
+    <Resource Include="Fonts\EQBuddySans-Bold.ttf" />
   </ItemGroup>
 
   <!-- WinForms' implicit global usings would make Application/Brush/Point ambiguous

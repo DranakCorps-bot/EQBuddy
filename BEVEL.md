@@ -77,7 +77,7 @@ ot. "Not grepped this run"
 is codebase
 
 - `CLAUDE.md` is the orientation
- and carries a **39-entry trap list**, every 
+ and carries a **42-entry trap list**, every 
 entry a bug
   that reached a release. Read it
  before asserting anything about how the app 

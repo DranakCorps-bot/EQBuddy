@@ -19,43 +19,66 @@ every Latin letter boxed. The only font Wine will actually consult per
 character is the one WPF resolved as primary for that run, so that font has
 to carry the icons *and* the text.
 
-Fix: bundle one font, family "EQBuddy Sans", built on a Noto Sans Regular
-base (full Latin/Latin-Extended/punctuation/currency/letterlike coverage,
-with its OpenType layout kept — tabular figures matter, since the app sets
-Typography.NumeralAlignment=Tabular globally) with the same icon subsets
-grafted in as extra glyphs. Listed first, it is the *only* font Wine's
-DirectWrite consults, so both text and icons resolve without ever needing
-fallback.
+Fix: bundle one font, family "EQBuddy Sans", built on a Noto Sans text base
+(full Latin/Latin-Extended/punctuation/currency/letterlike coverage, with
+its OpenType layout kept) with the same icon subsets grafted in as extra
+glyphs. Listed first, it is the *only* font Wine's DirectWrite consults, so
+both text and icons resolve without ever needing fallback.
+
+THREE WEIGHTS, not one (2026-08-21). The first version shipped Regular only,
+and the WPF app asks for SemiBold or Bold in 71 places — every stat value,
+every card heading, every emphasised number. On Windows those resolve to a
+real Segoe UI Variable face; with only a 400 face in the family WPF has
+nothing to resolve to and *synthesises* the weight instead, smearing each
+outline wider without touching its sidebearings or its kern pairs. That is
+what a CrossOver player sees as "the kerning is off", and it appears on
+exactly the bold runs and nowhere else. Each face carries the full icon set,
+because a bold run containing a section icon resolves to the bold face and
+Wine will box anything that face is missing.
+
+The icon sources ship Regular only, so every weight gets the same Regular
+icon outlines — an icon is a pictogram, not text, and nothing in the UI
+sets a weight expecting the icon to answer it.
+
+SMALL CAPS ARE USED, so smcp/c2sc are kept (2026-08-21). Theme.xaml's
+SectionLabel style sets Typography.Capitals=AllSmallCaps on ~40 headings
+("dps", "kills", "Damage by attack") and its own comment says the small caps
+"carry the tracking the design wants". An earlier revision of this file
+dropped those two features as "unused"; without them WPF has no small caps
+to request and the labels render as plain mixed-case text at 10.5px.
 
 Pipeline:
   1. Scan src/EQBuddy, src/EQBuddy.UI.Shared, src/EQBuddy.Core (.cs/.xaml,
      skipping obj/bin) for every codepoint >= U+2190 the app can emit —
      these are the icon glyphs.
-  2. Download five pinned, SHA-256-verified Noto source fonts (cached in a
-     temp dir): Noto Sans Regular as the text base, plus the four icon
-     sources, each needed icon codepoint assigned to the first source that
-     covers it, in priority order.
-  3. Subset the text base to five fixed Latin/punctuation/currency/
-     letterlike ranges (intersected with its actual cmap) keeping the
-     OpenType layout features the app depends on (tnum/kern/liga); subset
-     each icon source to its assigned codepoints with layout closure
-     disabled (single standalone glyphs, not shaped prose). Scale every
-     subset to 1000 units/em and merge them into one font, text base first.
+  2. Download seven pinned, SHA-256-verified Noto source fonts (cached in a
+     temp dir): Noto Sans Regular/SemiBold/Bold as the text bases, plus the
+     four icon sources, each needed icon codepoint assigned to the first
+     source that covers it, in priority order.
+  3. For each weight: subset the text base to five fixed Latin/punctuation/
+     currency/letterlike ranges (intersected with its actual cmap) keeping
+     the OpenType layout features the app depends on (see
+     TEXT_LAYOUT_FEATURES); subset each icon source to its assigned
+     codepoints with layout closure disabled (single standalone glyphs, not
+     shaped prose). Scale every subset to 1000 units/em and merge them into
+     one font, text base first.
   4. Graft in empty, zero-width glyphs for the variation selectors U+FE0E
      / U+FE0F (the app's strings carry them; they must never box).
-  5. Normalize vertical metrics to Noto Sans Regular's own values — it's
-     the text base now, so its line-height contract is the one WPF should
-     see, not one of the symbol sources'.
+  5. Normalize vertical metrics to that weight's own Noto Sans values — the
+     text base is the line-height contract WPF should see, not one of the
+     symbol sources'.
   6. Rewrite the name table (family "EQBuddy Sans", OFL license/credit
      records — the OFL forbids reusing the reserved name "Noto" in a
      derivative, which "EQBuddy Sans" satisfies) and verify the result
      covers everything requested before writing it out.
 
-Run with the fonttools venv active:
+Run with the fonttools venv active (or `uv run --with fonttools`):
     python3 scripts/build-icon-font.py
 
 Outputs (checked into the repo):
     src/EQBuddy/Fonts/EQBuddySans.ttf
+    src/EQBuddy/Fonts/EQBuddySans-SemiBold.ttf
+    src/EQBuddy/Fonts/EQBuddySans-Bold.ttf
     src/EQBuddy/Fonts/EQBuddySans.codepoints.txt
 """
 
@@ -87,23 +110,63 @@ EXCLUDED_CODEPOINTS = {0xFE0E, 0xFE0F, 0xFEFF, 0xFFFF}
 VARIATION_SELECTORS = (0xFE0E, 0xFE0F)
 
 FAMILY_NAME = "EQBuddy Sans"
-PS_NAME = "EQBuddySans-Regular"
 
-# Pinned Noto sources. URLs point at each project's upstream repo; the
-# SHA-256 (computed once, by hand, against the exact bytes fetched) is the
-# actual pin — a changed upstream file fails the hash check loudly rather
-# than silently baking in different glyphs.
+# The three faces the family ships, and the exact name-table shape each one
+# needs. WPF resolves a FontWeight to a face by usWeightClass, so the family
+# has to actually CONTAIN the weights the app asks for or WPF synthesises
+# them (see module docstring).
 #
-# "text" is the base font the rest merge into (see module docstring for why
-# a bare icon font isn't enough under Wine). NotoEmoji ships only as a
-# variable font (wght 300-700); we instance it to Regular (wght=400)
-# ourselves rather than depend on a prebuilt static file.
-SOURCES = {
-    "text": dict(
+# The naming follows what Noto's own static files do, because those are
+# known to group correctly in WPF: a RIBBI weight (Regular, Bold) puts the
+# family in nameID 1 and the style in nameID 2, while a weight with no RIBBI
+# slot (SemiBold) puts "<family> <style>" in nameID 1, "Regular" in nameID 2,
+# and the real grouping in the typographic names 16/17. `ribbi=False` is that
+# second shape.
+WEIGHTS = [
+    dict(
+        key="regular",
+        out="EQBuddySans.ttf",
+        style="Regular",
+        ps_name="EQBuddySans-Regular",
+        weight_class=400,
+        ribbi=True,
+        bold=False,
         url="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSans/hinted/ttf/NotoSans-Regular.ttf",
         sha256="478c558ea716033cd60c03438f628dfa75694dcf6b5f6d505a2f05fd2b4f3823",
-        variable=False,
     ),
+    dict(
+        key="semibold",
+        out="EQBuddySans-SemiBold.ttf",
+        style="SemiBold",
+        ps_name="EQBuddySans-SemiBold",
+        weight_class=600,
+        ribbi=False,
+        bold=False,
+        url="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSans/hinted/ttf/NotoSans-SemiBold.ttf",
+        sha256="a4e91fd530ac2b4ef5367240144ff37d7d65d66cf76f2e9a2187b93c676f92d0",
+    ),
+    dict(
+        key="bold",
+        out="EQBuddySans-Bold.ttf",
+        style="Bold",
+        ps_name="EQBuddySans-Bold",
+        weight_class=700,
+        ribbi=True,
+        bold=True,
+        url="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSans/hinted/ttf/NotoSans-Bold.ttf",
+        sha256="1df075a380fc7cb898acf64c1f7b3b4dd780de3caa860178bf929de35817a913",
+    ),
+]
+
+# Pinned Noto ICON sources. URLs point at each project's upstream repo; the
+# SHA-256 (computed once, by hand, against the exact bytes fetched) is the
+# actual pin — a changed upstream file fails the hash check loudly rather
+# than silently baking in different glyphs. The text bases carry their own
+# pins in WEIGHTS above.
+#
+# NotoEmoji ships only as a variable font (wght 300-700); we instance it to
+# Regular (wght=400) ourselves rather than depend on a prebuilt static file.
+SOURCES = {
     "symbols2": dict(
         url="https://raw.githubusercontent.com/notofonts/notofonts.github.io/main/fonts/NotoSansSymbols2/hinted/ttf/NotoSansSymbols2-Regular.ttf",
         sha256="c4a0a80f0041ce4be81e2478faad22776d23edb98ae3f0d19bd37044820ecf9d",
@@ -144,12 +207,24 @@ TEXT_RANGES = [
     (0x2100, 0x214F),
 ]
 
-# The OpenType layout features EQBuddy actually depends on: tabular figures
-# (the app sets Typography.NumeralAlignment=Tabular globally, so digits
-# must have fixed-width variants), kerning, and standard ligatures. Every
-# other default feature (small caps, fractions, stylistic sets, ...) goes
-# unused and is dropped along with its glyphs.
-TEXT_LAYOUT_FEATURES = ["tnum", "kern", "liga"]
+# The OpenType layout features EQBuddy actually depends on, each traceable
+# to a line of Theme.xaml:
+#   kern       — the default. Without it every pair sits at its nominal
+#                advance, which is the visible complaint this font exists
+#                to answer.
+#   smcp/c2sc  — Typography.Capitals=AllSmallCaps on the SectionLabel style
+#                (Theme.xaml), used by ~40 headings. WPF does not synthesise
+#                small caps: no feature, no small caps.
+#   liga       — standard ligatures, on by default in WPF.
+#   tnum       — Typography.NumeralAlignment=Tabular, set globally on every
+#                TextBlock. Noto Sans's default figures are already uniform
+#                (572 units each), so this is belt-and-braces rather than
+#                load-bearing, and fontTools prunes it when the substitution
+#                is glyph-for-glyph — its absence from the output is not a
+#                regression.
+# Every other default feature (fractions, stylistic sets, ordinals, ...)
+# goes unused and is dropped along with its glyphs.
+TEXT_LAYOUT_FEATURES = ["kern", "smcp", "c2sc", "liga", "tnum"]
 
 # Per-source OFL copyright/attribution lines, taken verbatim from each
 # font's own name table (nameID 0) — Symbols and Symbols2 share one line.
@@ -269,11 +344,19 @@ def fetch_source(name, spec):
 
 
 def load_source(name, spec):
+    """A FRESH TTFont from the (cached, hash-verified) file every call.
+    Subsetting mutates a TTFont in place and each weight is built from its
+    own copy, so handing the same object to two builds would merge an
+    already-subset font into the second one."""
     path = fetch_source(name, spec)
     font = TTFont(path)
-    if spec["variable"]:
+    if spec.get("variable"):
         font = instantiateVariableFont(font, {"wght": 400.0})
     return font
+
+
+def load_icon_sources():
+    return {name: load_source(name, SOURCES[name]) for name in BMP_ORDER}
 
 
 # ---------------------------------------------------------------------------
@@ -287,8 +370,7 @@ def text_codepoints(font):
     return {cp for cp in wanted if cp in cmap}
 
 
-def assign_icon_codepoints(needed, fonts):
-    icon_fonts = {name: fonts[name] for name in BMP_ORDER}
+def assign_icon_codepoints(needed, icon_fonts):
     cmaps = {name: font.getBestCmap() for name, font in icon_fonts.items()}
     assigned = {name: set() for name in icon_fonts}
     unresolved = []
@@ -337,22 +419,22 @@ def subset_font(font, codepoints, keep_layout):
     return font
 
 
-def build_merged_font(text_cps, icon_assigned, fonts, tmp_dir):
+def build_merged_font(text_font, text_cps, icon_assigned, icon_fonts, tmp_dir):
     # Text base goes first: it's what supplies the merged font's GSUB/GPOS
     # and is the metrics reference (see normalize_metrics).
     paths = []
-    subset_font(fonts["text"], text_cps, keep_layout=True)
+    subset_font(text_font, text_cps, keep_layout=True)
     text_path = tmp_dir / "subset-text.ttf"
-    fonts["text"].save(text_path)
+    text_font.save(text_path)
     paths.append(text_path)
 
     for name in BMP_ORDER:
         codepoints = icon_assigned[name]
         if not codepoints:
             continue
-        subset_font(fonts[name], codepoints, keep_layout=False)
+        subset_font(icon_fonts[name], codepoints, keep_layout=False)
         path = tmp_dir / f"subset-{name}.ttf"
-        fonts[name].save(path)
+        icon_fonts[name].save(path)
         paths.append(path)
 
     return Merger().merge(paths)
@@ -405,7 +487,7 @@ def normalize_metrics(font, reference):
 # ---------------------------------------------------------------------------
 
 
-def set_names(font):
+def set_names(font, weight):
     name = font["name"]
     name.names = []
     license_text = (
@@ -413,20 +495,44 @@ def set_names(font):
         "Version 1.1. This license is available with a FAQ at: "
         "https://scripts.sil.org/OFL. " + OFL_COPYRIGHT
     )
+    style, ps_name = weight["style"], weight["ps_name"]
+    full_name = FAMILY_NAME if style == "Regular" else f"{FAMILY_NAME} {style}"
     records = {
         0: OFL_COPYRIGHT,
-        1: FAMILY_NAME,
-        2: "Regular",
-        3: f"{PS_NAME}:2026",
-        4: FAMILY_NAME,
-        5: "Version 1.000",
-        6: PS_NAME,
+        # A RIBBI style is addressable through the legacy family/style pair;
+        # SemiBold is not, so it takes its own nameID 1 and defers the real
+        # grouping to the typographic names below.
+        1: FAMILY_NAME if weight["ribbi"] else full_name,
+        2: style if weight["ribbi"] else "Regular",
+        3: f"{ps_name}:2026",
+        4: full_name,
+        5: "Version 1.100",
+        6: ps_name,
         13: license_text,
         14: "https://scripts.sil.org/OFL",
+        # Typographic family/subfamily. Always written, including for the
+        # RIBBI faces: it is what puts all three files in ONE family for a
+        # shaper that reads them, and a family split three ways is the same
+        # bug as having no bold at all.
+        16: FAMILY_NAME,
+        17: style,
     }
     for name_id, value in records.items():
         name.setName(value, name_id, 3, 1, 0x409)  # Windows, Unicode BMP, en-US
         name.setName(value, name_id, 1, 0, 0)  # Mac, Roman, English
+
+
+def set_weight_class(font, weight):
+    """The bits WPF actually matches a FontWeight against. usWeightClass is
+    the one that decides Regular-vs-SemiBold-vs-Bold; the fsSelection and
+    macStyle bold bits keep the legacy GDI-style readers agreeing with it."""
+    os2, head = font["OS/2"], font["head"]
+    os2.usWeightClass = weight["weight_class"]
+    bold, regular = 1 << 5, 1 << 6
+    os2.fsSelection = (os2.fsSelection | (bold if weight["bold"] else regular)) & ~(
+        regular if weight["bold"] else bold
+    )
+    head.macStyle = (head.macStyle | 1) if weight["bold"] else (head.macStyle & ~1)
 
 
 # ---------------------------------------------------------------------------
@@ -446,10 +552,8 @@ def verify(font, needed):
     return cmap
 
 
-def write_manifest(cmap, path):
-    entries = sorted(cp for cp in cmap if cp >= MIN_CODEPOINT)
+def write_manifest_entries(entries, path):
     path.write_text("\n".join(f"{cp:04X}" for cp in entries) + "\n", encoding="utf-8")
-    return entries
 
 
 def write_ofl(path):
@@ -563,40 +667,40 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 # ---------------------------------------------------------------------------
 
 
+def build_weight(weight, icon_cps, icon_assigned):
+    """One face: its own Noto Sans text base, the shared Regular icon set
+    merged in, its own vertical metrics and its own name/weight records."""
+    text_font = load_source(weight["key"], weight)
+    icon_fonts = load_icon_sources()
+    metrics_reference = load_source(weight["key"], weight)
+
+    text_cps = text_codepoints(text_font)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        merged = build_merged_font(
+            text_font, text_cps, icon_assigned, icon_fonts, Path(tmp)
+        )
+
+    add_blank_glyphs(merged, VARIATION_SELECTORS)
+    normalize_metrics(merged, metrics_reference)
+    set_names(merged, weight)
+    set_weight_class(merged, weight)
+
+    cmap = verify(merged, set(icon_cps) | text_cps)
+    return merged, cmap
+
+
 def main():
     print("Scanning for icon codepoints...")
     icon_cps = scan_codepoints()
     print(f"  {len(icon_cps)} icon codepoints found (>= U+2190)")
 
-    print("Fetching pinned source fonts...")
-    fonts = {name: load_source(name, spec) for name, spec in SOURCES.items()}
-
-    text_cps = text_codepoints(fonts["text"])
-    print(f"  {len(text_cps)} text codepoints found across {len(TEXT_RANGES)} ranges")
-
-    icon_assigned = assign_icon_codepoints(icon_cps, fonts)
+    print("Fetching pinned icon sources...")
+    icon_assigned = assign_icon_codepoints(icon_cps, load_icon_sources())
     for name in BMP_ORDER:
         print(f"  {name}: {len(icon_assigned[name])} icon codepoints")
 
-    print("Subsetting, scaling, and merging...")
-    with tempfile.TemporaryDirectory() as tmp:
-        merged = build_merged_font(text_cps, icon_assigned, fonts, Path(tmp))
-
-    print("Adding variation-selector glyphs (FE0E/FE0F)...")
-    add_blank_glyphs(merged, VARIATION_SELECTORS)
-
-    print("Normalizing vertical metrics to Noto Sans Regular...")
-    normalize_metrics(merged, fonts["text"])
-
-    print("Setting name table...")
-    set_names(merged)
-
-    print("Verifying coverage...")
-    needed = set(icon_cps) | text_cps
-    cmap = verify(merged, needed)
-
     FONTS_DIR.mkdir(parents=True, exist_ok=True)
-    ttf_path = FONTS_DIR / "EQBuddySans.ttf"
     manifest_path = FONTS_DIR / "EQBuddySans.codepoints.txt"
     ofl_path = FONTS_DIR / "OFL.txt"
 
@@ -605,19 +709,38 @@ def main():
         if stale_path.exists():
             stale_path.unlink()
 
-    merged.save(ttf_path)
-    entries = write_manifest(cmap, manifest_path)
+    built, entries = [], None
+    for weight in WEIGHTS:
+        print(f"Building {FAMILY_NAME} {weight['style']} ({weight['weight_class']})...")
+        merged, cmap = build_weight(weight, icon_cps, icon_assigned)
+
+        # One manifest for the family, because the coverage test pins ONE
+        # list. That is only honest if the faces agree, so the second and
+        # third are checked against the first rather than assumed.
+        covered = sorted(cp for cp in cmap if cp >= MIN_CODEPOINT)
+        if entries is None:
+            entries = covered
+        elif covered != entries:
+            sys.exit(
+                f"{weight['style']} covers a different icon set than "
+                f"{WEIGHTS[0]['style']} — the shared manifest would be a lie."
+            )
+
+        ttf_path = FONTS_DIR / weight["out"]
+        merged.save(ttf_path)
+        built.append((ttf_path, merged["maxp"].numGlyphs))
+
+    write_manifest_entries(entries, manifest_path)
     write_ofl(ofl_path)
 
-    size = ttf_path.stat().st_size
     print()
     print("Done.")
-    print(f"  glyphs:     {merged['maxp'].numGlyphs}")
-    print(f"  codepoints: {len(entries)}")
-    print(f"  file size:  {size:,} bytes ({size / 1024:.1f} KiB)")
-    print(f"  wrote:      {ttf_path}")
-    print(f"  wrote:      {manifest_path}")
-    print(f"  wrote:      {ofl_path}")
+    print(f"  codepoints: {len(entries)} (identical across all {len(built)} faces)")
+    for path, glyphs in built:
+        size = path.stat().st_size
+        print(f"  wrote:      {path.name} — {glyphs} glyphs, {size / 1024:.1f} KiB")
+    print(f"  wrote:      {manifest_path.name}")
+    print(f"  wrote:      {ofl_path.name}")
 
 
 if __name__ == "__main__":

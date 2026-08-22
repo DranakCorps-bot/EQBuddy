@@ -89,12 +89,23 @@ public partial class App : Application
         // instead of boxing — the whole story lives in WineFonts.cs.
         WineFonts.ApplyIfNeeded(Resources);
         Core.CoreLog.Sink = LogError;
-        if (!ClaimSingleInstance())
+        // The probe reads settings and never writes them, so it does not need the
+        // profile lock — and taking it would make the diagnostic impossible to run in
+        // the situation people actually run it in, with the widget already up.
+        var probing = TextProbeWindow.Requested(e.Args);
+        if (!probing && !ClaimSingleInstance())
         {
             Shutdown();
             return;
         }
         var settings = Core.AppSettings.Load();
+        // And under Wine only: whole-pixel glyph positioning. Wine truncates the
+        // fractional advances WPF's default Ideal mode relies on, which pulls letters
+        // apart mid-word ("an d th is") in text whose font metrics are perfectly correct
+        // — see TextRenderingPolicy. It reads a setting, so it has to come after the
+        // load; it must still come before any window is constructed, and MainWindow is
+        // built at the bottom of this method.
+        WineText.ApplyIfNeeded(settings);
         // Under Wine only, and only when opted in: float the widget over a fullscreen
         // game and stop clicks from foregrounding the Wine process — see WineOverlay.cs.
         // Inert on Windows and off by default.
@@ -125,6 +136,16 @@ public partial class App : Application
             LogError(args.Exception);
             args.SetObserved();
         };
+        // Opt-in diagnostic, inert unless asked for: one window that says which font WPF
+        // resolved for each weight and how the same sentence renders under every text
+        // mode. It replaces the widget rather than joining it, so the picture is of the
+        // probe and nothing else. See TextProbeWindow.cs.
+        if (probing)
+        {
+            MainWindow = new TextProbeWindow();
+            MainWindow.Show();
+            return;
+        }
         MainWindow = new MainWindow();
         MainWindow.Show();
     }

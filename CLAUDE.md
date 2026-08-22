@@ -910,7 +910,87 @@ Read this list before touching the areas it names. Every entry cost a release.
     `DesignSystem.Icon` stamps the catalog name on `Tag` in both UIs; tests read that. And
     **every equality assertion deserves one negative** — `DoesNotContain("Phone", icons)` is
     what keeps it from going vacuous again.
+40. **A missing FONT WEIGHT does not fail — it gets SYNTHESISED, and the result looks like
+    a kerning bug in a font whose kerning is perfect.** The bundled Wine font shipped
+    Regular/400 alone while the WPF app names SemiBold or Bold in 71 places. WPF matches a
+    `FontWeight` to a face by `usWeightClass`; with nothing to match it thickens the Regular
+    outlines *where they stand*, so every glyph gets wider and none of its neighbours move —
+    sidebearings and kern pairs untouched. Reported from CrossOver on macOS, 2026-08-21, as
+    "the main font is still having kerning issues", and the natural first move (check the kern table)
+    says the font is fine: 5,652 pairs, values identical to upstream Noto Sans. **The defect
+    was in a face that did not exist**, which is trap 20's "the thing you are looking for is
+    what is not there" wearing a typographic hat. Nothing on Windows can reproduce it, because
+    Segoe UI Variable supplies the real weights.
+    → **A bundled font is a FAMILY, not a file.** Ship every weight the UI asks for, group
+    them with the typographic names (16/17) and not just the legacy family/style pair, and put
+    the icon set in *every* face — a bold run containing a section icon resolves to the bold
+    face, and Wine boxes whatever that face is missing.
+    → **The same blindness hid a second bug in the same font**: `smcp`/`c2sc` had been dropped
+    from the subset as "unused features" while `Theme.xaml`'s `SectionLabel` asks for
+    `Typography.Capitals=AllSmallCaps` on ~40 headings. WPF synthesises no small caps, so those
+    headings quietly lost their case *and* the tracking the design was buying from them.
+    → **Now guarded:** `BundledFontFaceTests` parses the `.ttf` tables directly (name, OS/2,
+    GSUB/GPOS, cmap) and asserts weights, family grouping, features, icon coverage per face and
+    the csproj `Resource` rows. `IconFontCoverageTests` could not have caught any of it — it
+    counts codepoints and never opens the font, so it read as coverage while being blind to
+    everything about the file that is not a cmap entry (trap 34's shape exactly). Verified by
+    running the new test against the pre-fix tree: 9 of 10 rows fail there.
 
+41. **Correct font metrics and wrong glyph positions look identical to the person reporting
+    it — and the word they will use is "kerning".** The same 2026-08-21 CrossOver report
+    that produced trap 39 did NOT go away when the missing weights shipped, because the
+    weights were never its cause. Measuring the reporter's screenshot settled it in one
+    pass: the line was 360px wide against the font's predicted 361.9px, all ELEVEN word
+    spaces landed within a pixel of prediction, the letterforms were the bundled font's,
+    and the line pitch (16.4px vs a predicted 16.34px) proved it was rendering 1:1 at 96
+    DPI with no scaling. Everything the font is responsible for was right. What was wrong
+    was five 1-2px gaps *inside* words — "an d th is", "bun dles", "Win e".
+    → **Wine truncates the fractional glyph advances WPF's default `TextFormattingMode.
+    Ideal` depends on**, instead of carrying the remainder, so text creeps left until the
+    accumulated error flushes as a visible gap mid-word. `Display` uses whole-pixel
+    advances and is the only mode Wine renders correctly. **No .ttf can reach this**, which
+    is why a rebuilt font changed nothing.
+    → **Now guarded:** `UI.Shared/TextRenderingPolicy` decides per environment (Wine →
+    Display, Windows → Ideal, `EQBUDDY_TEXTMODE` overrides either way) and is unit-tested;
+    `WineText` applies it with one `OverrideMetadata` call on `Window`, before any window
+    exists, because the property inherits.
+    → **The measurement is the lesson, not the fix.** Two plausible theories died to
+    arithmetic that took a minute each — synthetic bold (real defect, wrong cause) and DPI
+    virtualisation (killed by the line pitch). **A screenshot of text is quantitative
+    evidence**: predicted advances, word-space positions and line pitch are all computable
+    from the shipped `.ttf`, and they say which layer is lying. Measure before theorising.
+    → **And when it is still ambiguous, put the instrument IN the app.** `TextProbeWindow`
+    (`--textprobe`) renders one sentence under all eight TextFormattingMode ×
+    TextRenderingMode combinations and reports which face WPF resolved for each weight.
+    One screenshot from the reporter answered what three rounds of hypothesis had not —
+    including confirming, incidentally, that the trap 39 font DOES group its three weights
+    correctly under Wine.
+
+42. **`OverrideMetadata` on a Window changes the WINDOW. It does not change the text in it —
+    a metadata default is not a set value, and only set values inherit.** The trap 40 fix
+    was applied with one line: override the default of the inherited attached property
+    `TextOptions.TextFormattingMode` on `typeof(Window)` and let inheritance carry it down.
+    It shipped, and the reporter saw *no change whatsoever* — from the far side of the
+    machine, indistinguishable from a stale binary, which is where the next round trip
+    went. WPF's property-value inheritance propagates a value that has been SET on an
+    ancestor; a metadata default is not set, so every descendant went on resolving its own
+    default from its OWN type's metadata, which was still `Ideal`. **Nothing is wrong in
+    the diff, the build or the tests, and the feature is genuinely in the binary.**
+    → **Override the default on `FrameworkElement`** (so every element answers Display on
+    its own account, with no inheritance walk involved) **and/or SET it** via
+    `EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, …)`.
+    `WineText` does both; either alone would probably do, and the failure they prevent
+    cannot be seen from a machine that is not running Wine.
+    → **The general shape: "present in the build" and "in effect at runtime" are different
+    claims, and only the second one is the feature.** This is trap 29 (a deleted gate left
+    its controls hidden) and trap 20 (a setting with no writer) in a third costume.
+    → **So make the diagnostic report the EFFECT, not the intent.** `TextProbeWindow` now
+    prints what the policy decided beside what a plain `TextBlock` with nothing set on it
+    actually resolves, tagged `[applied]` / `[NOT APPLIED]`. That one line separates three
+    states that had looked identical for two builds: wrong binary, policy chose Ideal, and
+    policy chose Display and could not deliver it. Confirmed afterwards without trusting
+    the label — a chrome line of *identical text* measured 7px narrower between the two
+    builds, which is the app-wide mode changing and nothing else.
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

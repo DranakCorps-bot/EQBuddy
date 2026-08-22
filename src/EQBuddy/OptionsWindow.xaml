@@ -76,6 +76,22 @@
                     IsSnapToTickEnabled="True" Margin="0,4,0,12"
                     ValueChanged="OnScaleChanged"/>
 
+            <!-- Wine/CrossOver only, and it sits HERE rather than with the other tick
+                 boxes because the person who needs it is the one who has just dragged the
+                 slider above 100% and found the text gone soft. No Visibility attribute:
+                 OptionsWindow decides it in code, both ways, so this cannot become
+                 another control that is permanently hidden because a gate moved on
+                 without it (trap 29). -->
+            <StackPanel x:Name="WholePixelTextPanel" Margin="0,0,0,12">
+                <CheckBox x:Name="WholePixelTextCheck"
+                          Checked="OnWholePixelTextToggled" Unchecked="OnWholePixelTextToggled">
+                    <TextBlock Text="Keep letters on whole pixels (Wine/CrossOver)" FontSize="12"
+                               Foreground="{DynamicResource TextBrush}"/>
+                </CheckBox>
+                <TextBlock Text="Wine can only place letters at whole pixels; without this, words break apart in the middle — &quot;bun dles&quot;, &quot;an d th is&quot;. The catch is that it snaps before the widget is scaled, so above 100% the text is resampled and looks soft. Turn it off if you run the widget large and would rather have sharp text than perfect spacing."
+                           Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+            </StackPanel>
+
             <Grid>
                 <TextBlock Text="Chips &amp; alerts size" FontSize="12"
                            ToolTip="Spawn timer chips, mez chips, and the alert banner"/>
