@@ -119,7 +119,28 @@ under-restores on purpose:** someone who watched the card without ever starring 
 no trace, and the alternative is showing the card to everybody, which is the taller-widget-on-
 update the hide existed to prevent.
 
-**The question.** Every player-visible change needs a `WhatsNew.json` entry — that rule is not
+**CORRECTION, added the same day and BEFORE you answer: the question below was asked on a
+false premise, and the premise was mine.** I put it to you as "we have fixed something and are
+held back from telling anyone". That is not the position. **Both reporters were already told on
+2026-08-21 at 21:49** — #228 (daetien-lab) and #227 (typical-usual-chaos) — and **1.99.0's
+release notes already carried it**: *"MOTES IS ITS OWN CARD AGAIN, if you want it (thanks
+daetien-lab, #228…)"*. The last comment on each thread is ours. I had read your hold text and
+Scribe's item and never opened the threads, which was one command away.
+
+So your hold was never stopping a first announcement. Read against what had actually gone out,
+it was stopping a SECOND one — declaring the thing done while default-off meant motes were not
+really back for the people complaining. That reading makes the hold obviously right, and it is
+the reading I should have had this morning.
+
+**What that changes about the ask:** the restore makes the 1.99.0 announcement TRUE for the
+players it was aimed at. David has authorised the notes for it (his call, not a claim that your
+hold lifted). The 1.99.4 entry is written and says plainly that the card "returned switched OFF
+for everybody" in 1.99.0 — it does not re-announce motes as news. **Nothing has been posted on
+#228 or #227, and nothing will be until 1.99.4 actually ships**, because until then "it comes
+back on by itself" is not true yet.
+
+**The question as originally asked, left below for the record:** Every player-visible change
+needs a `WhatsNew.json` entry — that rule is not
 up for renegotiation here. But your hold says *"we do not tell players they are back"*, and a
 release note is telling players. A shipped fix does not lift a hold, and I am not going to
 decide that your wording covers only the GitHub thread. **So: with the restore in, does #228's

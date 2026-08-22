@@ -59,7 +59,14 @@ the moment the Avalonia half lands, crediting daetien-lab and joeymavity (#228) 
    coin too"*, which is NOT true — the window's Wealth tab still draws Coin, Sold and Motes.
    Chip changed, body untouched; whether the body follows is Bevel's call and it matters,
    because the Motes card ships hidden.
-3. **#228's restore is BUILT and unreleased, with no What's-new and no version bump.** Helm
+3. **#228: read this before repeating a mistake I made all day.** *"We fixed it and are held
+   back from telling someone"* is WRONG and I said it repeatedly. **Both reporters were told on
+   2026-08-21 21:49, and 1.99.0's notes announced it too** — the last comment on #228 and #227
+   is ours. Helm's hold was never blocking a first announcement; it was blocking a SECOND one,
+   because default-off meant motes were not really back for the people complaining. **Open the
+   thread before describing what a reporter has or has not been told** — it is one `gh` call,
+   and I described the state all day without making it.
+   **The restore is BUILT**, and it is what makes the 1.99.0 announcement true for them. Helm
    ruled the fix is a restore change; the code says worse — the 08-19 fold removes the key from
    `SectionOrder` AND `HiddenSections`, so the preference was destroyed and the only surviving
    evidence is the mini-dashboard star. **A question is with Helm** (`SCRIBE-FEEDBACK.md`,

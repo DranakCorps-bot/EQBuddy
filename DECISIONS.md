@@ -124,3 +124,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
   the justification. Landed: the Motes card ships hidden, so for most profiles that block is the
   only place mote rows appear, and removing a surface uninvited is exactly how #204/#210/#212
   happened. Handed back to Bevel with the screenshot.
+- **Corrected my own framing of #228 rather than letting it stand.** I told David repeatedly that
+  a fix was built and we were held back from telling the reporter. False: both reporters were
+  told on 2026-08-21 and 1.99.0's notes announced it. I had read Helm's hold and Scribe's item
+  and never opened the threads. The lesson is narrow and worth keeping: **an agent's hold text
+  describes an intention, not the state of a thread** — check the thread before describing what
+  a player has been told.
+- **Staged 1.99.4 with a Windows-scoped entry for the inline Progress card**, rather than
+  releasing it unannounced or reverting it off `main`. Default it could have gone the other way:
+  no entry until Avalonia has it (what I said this morning). Landed: it is already on `main`, so
+  any tag ships it, and a player-visible change with no note is the defect the What's-new rule
+  exists to prevent. The entry names Windows explicitly and says why the other build lags, which
+  is the opposite of quiet. **This is the one judgement call in the release for David to veto.**
