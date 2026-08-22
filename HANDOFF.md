@@ -68,14 +68,41 @@ reporter for an artefact — a log line, a screenshot — not for a judgement.
 `FABLE-FEEDBACK.md` asks Fable to say where the V2 line actually sits. That question is open
 and it matters more than either stub.
 
+### The backlog round (2026-08-21, evening)
+
+All eight waiting feature threads answered; one produced code. **#185 shipped the rare-consider
+marker** (riding held 1.99.1): the game inserts `- a rare creature -` into a rare mob's
+consider line; the parser used to swallow it into the NAME (so considering a camped named
+silently missed its sighting — a real bug), and it now also opens discovery to articled rares.
+Session memory only, your-own-kill gate unchanged, and a test asserts articled-without-marker
+still never discovers.
+
+Facts established in the other threads, worth not re-deriving:
+
+- **#217 — the wiki admins ruled: do NOT omit common/low-value drops from pack suggestions.**
+  Frankthetankk asked them directly. A client-side display filter is fine; the pack's paste
+  stays complete. That is the destination's own rule — treat it as settled.
+- **#224 — interrupt/resist voice alerts already exist**: Watch text rule + Speak. Both lines
+  are parsed. If players find the rule fiddly, the fix is Watch-page clarity, not a parallel
+  feature.
+- **#120 — closed the loop**: the decay-not-cutoff inference he asked for is what
+  `ClassInference` already does (10-min half-life on LOG time), and buff sets shipped.
+- **#208 — cosmic-comp places new windows at the cursor; no toolkit fix exists.** sbaum23
+  himself concluded EQBuddy Mobile is the answer. **New small item: Mobile plays no sound at
+  all today** — alert sounds on the page need an explicit enable tap (browser autoplay), filed
+  honestly on the thread.
+- **#114 — small item**: tray-vs-taskbar toggle for the hidden state. Low, by the reporter's
+  own weighting.
+- **#94 — spec settled with the reporter**: slow-type icons join the bundled vector set (never
+  Unicode), icon BESIDE text (the number is the actionable half). Not started.
+- **#159 — continuous history remains the direction**; archives accumulate, no query layer yet.
+
 ### Still open
 
 - **#210** (liminalwarmth) — the Sky tracker's lost cross-class workflow.
 - **`docs/proposals/InlineThemes.md`** — decided in shape, nothing built. `FABLE.md`-class.
 - **#222's open question** — bjstrange has been told the pull is a snapshot request rather
   than the native reload, and invited to say if the difference is felt. Waiting on him or Bevel.
-- Eight feature-request discussions await a reply: #217, #224, #208, #114, #159, #120, #94,
-  #185. None are bugs; none have been answered this round.
 - **`LogWatcher.FinishInitialIngest`** `ObjectDisposedException` at shutdown; `LanAddresses()`
   on Tailscale; `LogParser.cs` at 14 ratchet lines.
 
