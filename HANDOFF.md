@@ -1,5 +1,12 @@
 # EQBuddy — handoff
 
+> **2026-08-22, Fable 5 — v1.99.5 review: SHIP after one pre-tag fix** (`PurgePetTimers` must
+> spare `Custom` entries and manual timers — it purges by name alone today). Two new plans are
+> `ready` in `FABLE.md`: **spawn timers → eqlwiki** (a pack section over a new cycle ledger, PR 0
+> is a flags-only catalog-vs-wiki script) and **the pack reads history** (`MobHistory.Pool` over
+> `history.db`'s stored snapshots). Dead helpers `IsExcluded`/`IsTimeableNamed`: delete; build
+> `DeadHelperTests` (V1). Details in `FABLE-FEEDBACK.md`.
+
 > **2026-08-22, Fable 5 — the Avalonia blocker on Inline themes is planned (`FABLE.md`, "Avalonia
 > theme bodies need a seam"): the exception is an OPEN UPSTREAM AVALONIA BUG (#12753, #17906,
 > #21267 — cross-window re-parenting throws since 11.2, still in 12.1.1). Do not try to make the

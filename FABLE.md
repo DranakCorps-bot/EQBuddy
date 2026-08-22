@@ -106,6 +106,135 @@ The contribution pack and its honesty rules; `SuggestRarity`'s thin-sample refus
 triggered/raid-instanced suppression; `SpawnOverrides` and learned durations; the fact that the
 pack never publishes anything itself — the player opens the edit link, reviews, and saves.
 
+### Plan — Fable 5, 2026-08-22
+
+**Shape: a RESPAWN section of the existing contribution pack, fed by a new per-named cycle
+ledger, gated by an agreement bar that plays the role the 10-kill bar plays for rarity.** Not
+a new surface, not a timer-submission tool — the pack pattern applied to a second kind of
+world fact, which is what David's rule says to try first. `needs-david:` none: he asked for
+the path; the honesty bar is design.
+
+#### What I read, and what it changes
+
+1. **The wiki's idiom is a free-text field per creature, and it is sparse.** `{{Namedmobpage}}`
+   carries `| respawn_time = 9.5 min` (A frenzied ghoul), `Triggered` (the bees), and
+   NOTHING on Eldrig the Old and Lockjaw — the field is absent, not empty. There is also a
+   hand-kept `Respawn Timers` list page ("[[Lord Nagafen]] - 3 days with 12 hour variance",
+   "Noble Dojorn - 5 days?") that the catalog's own notes cite. **The paste target is the
+   creature's field**, in the wiki's own words ("22 min", "6 hours", "3 days with 12 hour
+   variance"); the list page is a second place for one fact and is out of scope.
+2. **We do not hold a SAMPLE today, only the tightest value.** `SpawnOverride.RespawnSeconds`
+   is the minimum gap ever accepted, with `Learned`/`Sighted`/`Imported` flags — one number, no
+   count, no spread. `SuggestRarity` can say "10+ kills" because `MobSummary.Kills` exists; the
+   spawn side has no equivalent. The item is therefore mostly about recording evidence, and
+   only then about suggesting.
+3. **The engine already knows which observations are honest.** `LearnFromRekill` accepts a gap
+   only when the named's own death started the clock, the player never left the zone
+   (`NeverLeftSince`), the gap is ≥ 90 s, and the entry is not trusted/multi-spawn;
+   `LearnFromSighting` only inside the final fifth; both refuse triggered and raid-instanced
+   entries before learning; `_currentZoneInstanced && zone.RaidZone` gates instances. Those
+   gates ARE the definition of a countable cycle. The ledger records exactly where they pass.
+4. **The catalog already holds verified timers the wiki lacks.** Entries with `trusted: true`
+   were MEASURED from family logs (Befallen's zone clock, Crushbone's). That is the cheapest
+   first contribution and needs no player at all — a diff report, not a feature.
+5. **`MobInfo` does not read `respawn_time`.** `EqlWikiMobs.Parse` reads name/zone/level/
+   location/loot; the pack cannot currently say what the wiki thinks the timer is. One field.
+
+#### Architecture
+
+**Core — `SpawnCycleLedger`** (`spawn-cycles.json` beside `spawn-overrides.json`): per
+`server|zone|name`, a list of `Cycle(DurationSeconds, Kind: Rekill|Sighting, At)`, capped at
+the last 20. Written by `SpawnTimers` at the three places a gap is ACCEPTED today —
+`LearnFromRekill`, `LearnFromSighting`, `LearnDiscovered` — and nowhere else, so every gate
+above applies by construction (no instance, no triggered/raid, named's own kill, same stay,
+floor and ceiling). Imports never write it (a stranger's number is not an observation).
+
+**Core — `EqlWikiMobs.Parse` reads `respawn_time`** into `MobInfo.RespawnField` (raw text;
+`""` when absent).
+
+**UI.Shared — `RespawnSuggestion`** (pure, unit-tested — the whole honesty bar lives here):
+- **Bar:** at least **3** cycles, all within **±15 % of their median**, median ≥ 90 s.
+  Agreement is the evidence of attention: a player who left the camp produces scattered gaps,
+  not three that agree. Below the bar: no suggestion, numbers travel in the edit summary only
+  — the `SuggestRarity` rule verbatim.
+- **Never** for `IsTriggered`, `RaidInstanced`, or `MultiSpawn` entries (no cycle / sibling
+  noise), whatever the ledger holds.
+- **Wording:** the wiki's own — minutes under an hour ("22 min"), hours ("6 hours"), days
+  with variance only when the spread supports one. `SpawnDurationText` formats for us; this
+  formats for the wiki, and a test pins both idioms apart.
+- **Three-way compare:** wiki field (from `RespawnField`), catalog value, observed. Suggest a
+  paste only when the wiki field is absent or disagrees with the observed median by more than
+  the spread; when it agrees, say "wiki already says 22 min — nothing to add" (the KnownDrops
+  line for timers); when it disagrees, phrase it as the stat block does — *compare, don't
+  overwrite* — with the cycle list in the edit summary.
+
+**UI.Shared — `WikiContribution.BuildExport` and `WikiPackPresentation`** gain a respawn
+section per creature: `RowKind.RespawnObserved` with the paste block
+`| respawn_time = 22 min` and the same edit link the loot section uses (served title, trap
+3). The pack window needs no new control on either desktop: the row kinds are data and both
+windows already draw whatever the presentation returns. **Bevel pre-design: yes** — the row's
+note ("observed 22 min over 3 cycles; wiki says 25 min") is a new sentence on a shipped
+surface. **Column budgets:** the pack rows wrap; none. **Shot offline:** seed the mob cache AND
+a `spawn-cycles.json` in `wiki-pack`; prediction written first.
+
+**Script — `scripts/harvests/eqlwiki/respawn-diff.py`** (flags only, like the rest of the
+refresh): for every catalog entry with `trusted: true`, read the creature page's field and
+report absent/disagreeing ones as paste-ready lines for a human. Curated catalogs stay
+unwritten; this writes a REPORT. It is PR 0 because it needs no player evidence and it is
+the "what we already know that the wiki does not" David was pointing at.
+
+#### Risks
+
+- **The bar is the product.** Too low and EQBuddy becomes the source of wrong timers on the
+  shared reference — uniquely wrong, the thing the match-the-wiki rule exists to prevent. Too
+  high and nothing is ever suggested. 3 / ±15 % is a starting point logged as a decision;
+  the pack's edit summary carries the raw cycles so a wiki editor can judge.
+- **Trap 4 (one fact, two sources):** the observed median is computed ONCE in
+  `RespawnSuggestion` and the paste, the row note and the edit summary all read it.
+- **Trap 20:** the ledger is a new file that only the engine writes and only the pack reads —
+  add its reader in the same PR as its writer, or it is a written-never-read store.
+- **Trap 13 shape:** `spawn-cycles.json` is written from the watcher thread; it is its own
+  file with its own lock, as `SpawnOverrides` is. Never merge it into `spawn-overrides.json`.
+- **Variance:** EQ timers have real variance ("3 days with 12 hour variance"). Three cycles
+  cannot measure it; the plan suggests the median and puts the range in the summary, and
+  never writes a variance clause. Say so in the row note when the spread is wide.
+- **Long timers:** a 3-day boss needs nine days of one player camping to reach the bar. That
+  is correct — under-suggest — and PR 0 is how those reach the wiki instead.
+
+#### Decomposition
+
+- **PR 0 — `respawn-diff.py`** + its report in the weekly refresh; no app change. One-off
+  run now, human pastes what it finds.
+- **PR 1 — Core:** `SpawnCycleLedger`, the three write points, `RespawnField` parse;
+  `SpawnTimerTests` (a cycle is recorded exactly when a gap is learned and never otherwise:
+  instance, triggered, placeholder-started, cross-stay, import — one negative each);
+  `EqlWikiMobsTests` for the field. No UI.
+- **PR 2 — UI.Shared + pack:** `RespawnSuggestion` + tests (bar, agreement, wording both
+  idioms, three-way compare); the pack section and row kind; `WikiPackPresentationTests`;
+  both pack windows unchanged or near it; staged shot; `docs/TestPlan.md` §3 rows; What's-new
+  crediting the mega-thread reporters by name and number (from Scribe's item).
+- **Someday:** a "wiki says / you observed" line on the Spawns window row itself; the
+  Respawn Timers list page.
+
+#### Verification
+
+Unit as above; the bar's tests include a scattered-gap case that must NOT suggest and a
+three-agreeing-cycles case that must. A real-world check David CAN do: camp any low-level
+named three cycles (Crushbone's trainers are minutes) and read the pack. Reporter confirmation
+via the mega-thread reporters after release.
+
+#### Out of scope
+
+Any store we host; the Respawn Timers list page; suggesting variance; a "since" filter on
+cycles; anything on the phone; re-deriving timers from archived logs (the ledger starts from
+this release; history is the other item's problem and a spawn cycle, unlike a drop, cannot be
+pooled across characters without the stay evidence the archive does not hold).
+
+#### Decided without asking (→ `DECISIONS.md`)
+
+Creature field, not the list page; bar = 3 cycles within ±15 % of median; median suggested,
+never variance; ledger capped at 20 cycles; PR 0 is a script not an app feature.
+
 ---
 
 ## The wiki pack reads one live session; it should read the history already on disk
@@ -152,6 +281,122 @@ consumer of that work rather than a detour from it, and the plan should say whic
 Session-scoped export; `#74`'s archived-log review replaying one file at a time; the 10-kill
 rarity bar and the "no label when the sample is thin" rule; the wrong-article split and the
 motes exclusion that landed today.
+
+### Plan — Fable 5, 2026-08-22
+
+**Shape: a pure `MobHistory` pooler in Core over the snapshots `history.db` already stores,
+feeding the SAME `BuildExport` the pack uses today; the pack reads history by default with no
+toggle, and its scope line says exactly what it pooled.** The reporter's framing is right on
+every point I could check. `needs-david:` none.
+
+#### What I read, and what it changes
+
+1. **The data is on disk, in full.** `SessionRepository` stores every session's complete
+   `StatsSnapshot` as `SnapshotJson` (`history.db`, `Sessions` table), and `StatsSnapshot.Mobs`
+   is the list of `MobSummary(Name, Kills, Loot[...], CoinMin/Max, Factions, LevelMin/Max,
+   Zone)` — the exact record the pack consumes. No log replay, no new collection.
+   `ProgressSeries` already probes one field across every row with a `JsonDocument` rather than
+   materialising snapshots; that is the access pattern to copy.
+2. **`BuildExport` takes `MobObservation(MobSummary, lookup)`.** So pooling produces
+   synthetic `MobSummary`s and the export, its honesty rules, and the pack window's rows need
+   no change — the 10-kill bar is then met by twelve kills across three sessions because the
+   number it reads is twelve.
+3. **Review replay writes no sessions** (`SessionStats.cs:197`, #74), so a player re-reading
+   an archived log cannot double-count into the pool. Checkpoints of the LIVE session do land
+   as a row, so the live session must be taken from the live snapshot and its row excluded.
+4. **Session `Zone` on a `MobSummary` is the kill zone** — the #65 fix — so pooling keys on
+   (name, zone), not name alone: "an ice giant" in two zones is two mobs.
+
+#### The three questions, answered as decisions
+
+1. **Pool across the account's characters: YES, and across servers too.** Drop tables, level
+   ranges and faction hits are facts about the mob in the game, not about who observed them.
+   The scope line names every character and server pooled, so nothing is silent. No toggle.
+2. **"Since" filter: no filter, and the scope line shows the earliest date pooled.** A retune
+   is not a date we hold. What protects against it is what already protects the pack: every
+   number is presented for reconciliation, never as a correction, and the edit summary carries
+   the per-session breakdown so an editor can see a rate that moved. If a retune ever produces
+   a visibly bimodal rate, that is the moment to add a filter — not before.
+3. **Per-session vs all-time toggle: none.** The reporter is right that a smaller sample never
+   makes a better wiki edit. Drops by Creature keeps the LIVE view — "is this camp worth it" is
+   a different job and stays session-scoped; only the pack pools.
+
+#### Architecture
+
+**Core — `MobHistory.Pool(IEnumerable<StatsSnapshot> sessions, StatsSnapshot? live)`** →
+`IReadOnlyList<MobSummary>` keyed on (name, zone): kills summed; loot counts summed per
+base item (`QuestCatalog.BaseItemName`, the existing fold) with `DropRatePct` recomputed from
+the pooled counts and `LastAt` the latest; `CoinMin`/`CoinMax` the extremes across sessions
+(−1 stays "never seen"); factions unioned with hit counts summed; `LevelMin`/`LevelMax` the
+extremes of conned values (0 = never conned stays 0). Plus a `PoolScope(characters, servers,
+sessionCount, earliest, latest)` record for the scope line. Pure; tested with a fixture of
+several fake snapshots asserting the pooled counts — the reporter's own test description.
+
+**Core — `SessionRepository.MobRows(server?, character?)`**: the `ProgressSeries` probe
+applied to `Mobs`, so the pack opens without deserialising every snapshot's combat ledgers.
+Default scope = every character, every server (decision 1).
+
+**UI.Shared — `WikiPackPresentation.ScopeLine`** becomes the pooled form: *"12 kills of 4
+creatures across 3 sessions · Dranak and Flossie on freeport · 2026-07-30 → today"*. One
+sentence, and it is the sentence that makes decision 1 and 2 honest. **Bevel pre-design:
+yes** — this line is the surface's whole claim about itself. **Column budgets:** none (the
+line wraps). **Shot offline:** no for the wiki caches (seed them); the `wiki-pack` shot must
+also seed `history.db` with two or three sessions so the pooled numbers are visible — the
+`history-window` shot already stages sessions; reuse its staging and predict the totals first.
+
+**Both pack windows** swap their data source from `_snapshot.Mobs` to `MobHistory.Pool(rows,
+live)`, computed once on open and on the existing 3 s tick only if the live session's mob set
+changed (the signature already exists). `EnsureMobLookup` fires for pooled creatures exactly
+as it does for live ones — with the 2-in-flight cap, so a long history does not burst eqlwiki.
+
+**The Drops tab is untouched**, and says so in its footer hint (the "moved" text already
+points at the pack; add "the pack pools every session you have"). Mobile: no pack surface.
+
+#### Risks
+
+- **Trap 8 / perf:** the pool is recomputed on a signature, never per tick; the DB probe is
+  the cheap one. A profile with hundreds of sessions is the case to measure — stage it.
+- **Double counting:** the live session's checkpointed row AND the live snapshot — exclude
+  the active row by id (`SessionArchiver` knows it). A test with a live session whose row is
+  already checkpointed must pool its kills once.
+- **Trap 4:** one pooled `MobSummary` feeds the row, the paste and the stat block; nothing
+  re-sums.
+- **The 10-kill bar was chosen for one session's evidence.** Pooled kills can reach it with
+  kills spread over months; the rule stands (the reporter's argument is sound), but the edit
+  summary must carry the per-session breakdown so an editor sees the spread.
+- **Credit scope:** the log reference's timestamps now span sessions; use the dated form the
+  export already has for multi-day sessions.
+- **Old snapshots** deserialise `LevelMin`/`CoinMin` as unknown (the record says so); the
+  pooler treats unknown as absent, never as zero.
+
+#### Decomposition
+
+- **PR 1 — Core:** `MobHistory.Pool` + `PoolScope` + fixture tests (sum, fold, extremes,
+  unknown-stays-unknown, (name, zone) keying, live-row exclusion); `SessionRepository.MobRows`
+  with a test over a temp DB. No UI.
+- **PR 2 — pack:** both windows on the pooled source; `ScopeLine`; the Drops footer hint;
+  `WikiPackPresentationTests`; staged shot with predicted totals; `docs/TestPlan.md`; What's-new
+  crediting Frankthetankk (#217, ask 2).
+- **Relationship to the all-time stats direction (#168 / #159):** `MobHistory` IS the first
+  query of that kind over the archive, and the all-time view should consume it rather than
+  write a second pooler. Say so in the class doc; do not build the view here.
+
+#### Verification
+
+Unit as above. The acceptance check a person can run: three short sessions on one camp (the
+fixture log can be split), then open the pack and read "12 kills across 3 sessions" with a
+rarity label that a single session could not have earned. Reporter confirmation on #217.
+
+#### Out of scope
+
+The all-time stats VIEW; pooling the Drops tab; a since/character toggle (decided above, and
+revisited only on evidence); spawn cycles (the other item — a cycle needs stay evidence the
+archive does not hold); changing the 10-kill bar.
+
+#### Decided without asking (→ `DECISIONS.md`)
+
+Pool across characters and servers with no toggle; no "since" filter; live view stays
+session-scoped; (name, zone) keying.
 
 ---
 

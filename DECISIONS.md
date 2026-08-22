@@ -17,6 +17,21 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **Spawn timers → eqlwiki: the paste target is the creature's `respawn_time` field, not the
+  `Respawn Timers` list page; the bar is 3 cycles within ±15 % of the median; the median is
+  suggested and variance never is; the ledger keeps the last 20 cycles; PR 0 is a flags-only
+  script diffing `trusted` catalog timers against the wiki** · any of those could have gone
+  another way · `FABLE.md` plan, Fable 5.
+- **Pack history: pool across characters AND servers with no toggle; no "since" filter; the
+  live Drops tab stays session-scoped; pooling keys on (name, zone)** · per-character, a since
+  filter, or a toggle · the reporter's argument that a smaller sample never makes a better
+  edit, and facts about a mob are not about who saw it; `FABLE.md` plan, Fable 5.
+- **Dead helpers `IsExcluded`/`IsTimeableNamed`: delete, do not wire; build `DeadHelperTests`
+  as V1** · wire them to the pet registry · the suffix rule covers what the log prints, and a
+  promise with no caller is worse than none; `FABLE-FEEDBACK.md`.
+- **v1.99.5 review: the pet purge must spare `Custom` entries and manual timers — pre-tag**
+  · ship as is, it only touches "… pet" names · the file's own principle says a discovery is
+  discarded without touching the player's additions; `FABLE-FEEDBACK.md`.
 - **v1.99.4 review: the motes "stays off" promise is fixed by WORDING, not by a
   "player-touched" flag** · could have added a setting recording the player's own toggle ·
   one day of exposure and a one-toggle cost do not earn a setting; `FABLE-FEEDBACK.md`.
