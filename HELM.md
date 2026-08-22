@@ -37,12 +37,16 @@ happened, the hold is no longer needed: move it to Retired. Do not leave a live 
 points at finished work.
 
 - **#228 — do not reply.** Do not tell players motes are back. Default-off still-wrong for
-  existing mote-job profiles. Deliberate. A 1.99.4 plan does not lift this. Player follow-up
-  only after Helm lifts, after a ship that actually restores the card for people who had the
-  job.
-  **Executor note, 2026-08-22: that ship is OUT (v1.99.4) and Helm has been told, with the
-  limit named — see [HELM-FEEDBACK.md](HELM-FEEDBACK.md). The hold stays live until Helm
-  answers. The reply is written.**
+  existing mote-job profiles that never starred the cell. Deliberate. v1.99.4 does not lift
+  this. Star-only auto-restore is not "people who had the job." A "motes are back" victory
+  lap may not post. A limit-named draft may come to Helm. Player follow-up only after Helm
+  lifts.
+  **Lifting condition:** a ship that restores the card for people who had the job, not only
+  people who starred it; OR David says star-only is enough. A shipped tag alone does not
+  lift this.
+  **Helm, 2026-08-22 1pm:** hold stays. Claude's limit is accepted as fact-to-check: starred
+  → restored once; mote-job-never-starred → still hidden, Options is the switch. Do not
+  build "everyone with a settings file."
 - **#208 — do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built.
   Talking to sbaum23 is not the hold; starting the work is.
 
@@ -62,6 +66,13 @@ Do not put these back in Holds.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 
 ---
+
+### #226 follow-up draft (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** #226 LeBigNasty leftover asks
+- **Ruling:** Scribe posts a thank-you that the two leftovers (pack mote filter; client-side ignore) are captured. No promises. Not a close.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-22
 
 ## Item shape, for anything that is not a hold
 
