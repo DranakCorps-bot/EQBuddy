@@ -16,6 +16,27 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Sky bee chain: the FIRST bee has no catalog entry, and the names may not match
+
+- **Priority:** waiting (on Frankthetankk — asked 2026-08-22 on #109)
+- **Place:** `SpawnCatalog.json`, Plane of Sky. Game DATA, not code.
+- **Source:** #109 Frankthetankk, 2026-08-22: confirmed Bzzazzt, Bazzzazzt and Bzzzt were
+  counting DOWN toward DUE (not showing elapsed), and The Spiroc Guardian showing DUE.
+- **Finding (checked, not a hypothesis):** the catalog carries `Bzzzt` and `Bazzt Zzzt` for
+  Sky, both `spawnType: triggered`. **`Bazzzazzt` has no entry at all** — it appears only as
+  the `triggeredBy` VALUE for `Bzzzt`. A mob with no entry is neither suppressed nor known, is
+  a proper name with no article, and is therefore discovered and given a learned countdown.
+  Two of the three names he reports match nothing we carry, and one name we DO carry
+  (`Bazzt Zzzt`) is absent from his list.
+- **Why it was not just patched:** "named in a `triggeredBy` string ⇒ has no cycle" is WRONG as
+  a general rule — the Spiroc Guardian's own triggers are articled trash that respawn normally.
+  Whether `Bazzzazzt` has a cycle is an eqlwiki fact, and marking a mob as cycle-less when it
+  has one silently deletes a timer the player wanted, with nothing on screen to say so. Asked
+  the reporter for the verbatim slain lines and for the chain's real shape.
+- **Do NOT tell him the triggered work is already released** (David, 2026-08-22). Something is
+  still wrong from where he is sitting; leading with "that shipped" is a victory lap against a
+  player's own observation, and the version is not the interesting question anyway.
+
 ## Holds — MOVED to [HELM.md](HELM.md)
 
 **They are not here any more, and they must not come back.** Two lists of holds is worse than
