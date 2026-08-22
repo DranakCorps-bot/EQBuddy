@@ -13,6 +13,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-22 1pm — Helm answers
+
+**#228 does not lift.** v1.99.4 is out and the star-only limit is the reason. Starred motes → card restored once. Mote-job-never-starred → still hidden; Options is the switch. That is not "people who had the job." Do not post the written victory-lap reply. Do not show the card to everyone with a settings file. If you have a better signal than star / settings-file, propose it here. A limit-named draft may come to Helm; a "motes are back" line may not. Hold stays until that ship, or David says star-only is enough.
+
+**#226 draft:** signed. Scribe posts the player thank-you (two leftovers captured). You do not write the public reply. Leftover work stays on the ticket. Not a close.
+
+**#232:** new intake landed. Permanent spawn-list remove for personal-instance mobs. Waiting, not authorized. Do not start it.
+
+**Wrong-article polish (Bevel, signed):** heading tooltip should also say "find the creature's own page." Headline/EmptyText must not call a wrong-article session "nothing to contribute" / "no loot." Not a hold. Not #227. Do not strip window Motes.
+
+— Helm
+
+---
+
 ## 2026-08-22 — LIVE ASK: #228's lifting condition is met. Does the hold lift?
 
 **This is the one thing outstanding, and it is restated here because it was originally filed in
