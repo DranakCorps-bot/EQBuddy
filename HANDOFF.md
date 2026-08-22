@@ -8,6 +8,64 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-22 (latest): the V2 loop closed end to end — plan, approval, execution
+
+**1.99.1 is built and NOT released.** Gates: **2,285 unit + 267 Avalonia + 19 E2E**. It now
+carries: the cleared-timer fix (#228), the rare-consider marker (#185), discovery honouring the
+raid-instance gate (Fable's PR 0), and the **whole wiki re-check** (#226) — three PRs, both
+desktops, on screen. Waiting on David's go.
+
+### The first FABLE.md item went all the way through
+
+Fable 5 planned both stubs in a fresh session (`3ee1932`), answered the V2-line question in
+`FABLE-FEEDBACK.md` — *one right, one right by a hair; the test is "if David answered one
+question right now, could I finish this as V1?"* — and David marked both `approved`
+(`59e3187`). The wiki item is executed and taken out of `FABLE.md`; **the Sky item is
+`approved` and waiting for an executor** (PR 1 Core, PR 2 presentation; PR 0 already in).
+
+**Every code claim in Fable's plans was verified against the source before acting, and every
+one held.** Its two findings the stub did not have were both real: the SECOND stale layer
+(`_targetResults`, the session memo in both MainWindows — a TTL fix alone would have failed in
+front of the reporter) and that the Sky countdowns are manufactured by re-kill LEARNING over an
+untrusted 8 h default, so "two catalog entries" would have silenced the row and left a poisoned
+override in his file.
+
+**What the executor found that the plan did not, all in `FABLE-FEEDBACK.md`:**
+- **Trap 39.** `DropsRenderTests` compared `StreamGeometry.ToString()` — the TYPE NAME — so
+  every icon equalled every other and the #211 assertions could not fail. `DesignSystem.Icon`
+  stamps the catalog name on `Tag` in both UIs now; every icon equality carries one negative.
+- `FetchedAt` had two `UtcNow` sources ten milliseconds apart; `WriteCache` owns it now.
+- The staged `drops-window` shot was wrong twice (8-day page is outside the lifetime; the shot
+  is not offline). Both corrections are in the spec's prediction comment, and the capture now
+  matches the prediction line for line.
+
+### The Helm-hold miss, and the rule that came out of it
+
+`SCRIBE.md` carries Helm holds ("do not open #208", "#228 reply hold stays until Helm lifts
+it"). Two replies went out against holds that had landed ninety minutes earlier, because the
+file was not re-read after a pull. **David's ruling: the posts stand; "do not open" is a reply
+hold too; re-read `SCRIBE.md` before EVERY thread reply.** It is in `CLAUDE.md`.
+
+### DO NEXT
+
+1. **The Sky item** — `FABLE.md`, `approved`. Read Fable's plan in full; PR 1 is Core only and
+   lands with its own tests. `The Spiroc Lord` is suppressed for the WRONG reason today (it
+   sits in the raid-boss list); the plan keeps `RaidInstanced` and adds the type. Ask
+   Frankthetankk for the bee kill lines first if he has not answered (#109).
+2. **Release 1.99.1** on David's go — it is a large one and every thread it answers is
+   already told "next build".
+3. Reply on #226 (read the last comment's signature first — and the Helm hold on it; it was
+   lifted by David's `approved`, which supersedes it per Fable's plan) telling LeBigNasty and
+   Frankthetankk exactly what to press, after the release.
+
+### Still open
+
+- **Mobile alert sounds** (#208) — a product call for David; no-for-now is fine.
+- **#210** (liminalwarmth); **InlineThemes** (`FABLE.md`-class); `LogWatcher` shutdown race;
+  `LanAddresses()` on Tailscale; `LogParser.cs` at ~12 ratchet lines.
+
+---
+
 ## 2026-08-21 (latest): a bug-fix sweep, and the V2 routing used for the first time
 
 **1.99.1 is built and NOT released** — `Directory.Build.props` says 1.99.1 with a What's-new
