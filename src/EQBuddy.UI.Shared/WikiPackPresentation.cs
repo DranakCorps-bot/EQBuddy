@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -34,6 +34,11 @@ public static class WikiPackPresentation
         PageMissing,
         PageHasNoLoot,
         NewToPage,
+        /// <summary>The title resolved to an article that is not a creature page at all.
+        /// NOT a contribution — it sits with <see cref="Pending"/> at the bottom — but it
+        /// has to be SHOWN, because it is the one row the player can act on and EQBuddy
+        /// cannot: only a person can say which page the creature actually lives on.</summary>
+        NotACreaturePage,
         Pending,
     }
 
@@ -63,6 +68,7 @@ public static class WikiPackPresentation
         RowKind.PageMissing => "no wiki page",
         RowKind.PageHasNoLoot => "page lists no loot",
         RowKind.NewToPage => "new to the page",
+        RowKind.NotACreaturePage => "not a creature page",
         _ => "not checked yet",
     };
 
@@ -74,6 +80,13 @@ public static class WikiPackPresentation
             "The page exists but records no loot, so everything you looted is news to it.",
         RowKind.NewToPage =>
             "The page exists and lists loot, but not these items.",
+        RowKind.NotACreaturePage =>
+            "The wiki answered with an article that is not a creature page — no " +
+            "{{Namedmobpage}} on it — so this is almost certainly the wrong page for the " +
+            "creature, not an empty one. Innoruk is the reported example: the check lands " +
+            "on the Lore article (#226, LeBigNasty). Nothing is suggested for it, because " +
+            "pasting a loot table onto a lore page would be worse than adding nothing. " +
+            "Open it, find the creature's own page, and the next re-check will follow it.",
         _ =>
             "EQBuddy could not read this creature's wiki page — the lookup is still in " +
             "flight, or the wiki was unreachable. This is NOT the same as \"nothing new\": " +
@@ -94,6 +107,8 @@ public static class WikiPackPresentation
         RowKind.PageMissing => "GoodBrush",
         RowKind.PageHasNoLoot => "AccentBrush",
         RowKind.NewToPage => "AccentBrush",
+        // Not dim: this is the one row that needs a person to look at it.
+        RowKind.NotACreaturePage => "BadBrush",
         _ => "DimBrush",
     };
 
@@ -113,6 +128,18 @@ public static class WikiPackPresentation
                 .ToList();
 
             known += classified.Count(s => s == WikiDropStatus.Known);
+
+            // WRONG ARTICLE, before anything else. It contributes nothing, so without its
+            // own row it would fall through the "nothing to contribute" branch below and
+            // vanish entirely — a creature silently absent from the pack, which reads as
+            // "nothing new here" and is the opposite of what happened.
+            if (classified.Contains(WikiDropStatus.PageIsNotACreature))
+            {
+                rows.Add(new PackRow(mob.Name, mob.Kills, RowKind.NotACreaturePage, 0,
+                    lookup?.Mob?.PageTitle is { Length: > 0 } served
+                        ? $"read \"{served}\"" : "wrong page"));
+                continue;
+            }
 
             var news = classified.Count(s => s is WikiDropStatus.NewToPage
                 or WikiDropStatus.PageHasNoLoot or WikiDropStatus.PageMissing);

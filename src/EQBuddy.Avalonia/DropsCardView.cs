@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -200,6 +200,10 @@ internal sealed class DropsCardView
                     {
                         WikiDropStatus.PageMissing => "  ·  no wiki page yet",
                         WikiDropStatus.PageHasNoLoot => "  ·  wiki page lists no loot yet",
+                        // Not "no loot yet": the wiki answered with the wrong ARTICLE, and
+                        // saying the creature's page is empty would be a false statement
+                        // about a page nobody has looked at (#226, Innoruk's Lore page).
+                        WikiDropStatus.PageIsNotACreature => "  ·  that wiki page isn't the creature",
                         _ => "",
                     },
                 FontSize = 13, FontWeight = FontWeight.SemiBold,

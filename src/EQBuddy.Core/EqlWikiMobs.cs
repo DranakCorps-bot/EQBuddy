@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -22,6 +22,17 @@ public sealed class MobInfo
     /// <summary>First coordinate pair from the location field, in /loc's (Y, X)
     /// order — editors paste /loc output. Null when the field is prose-only.</summary>
     public (double Y, double X)? LocYX { get; set; }
+
+    /// <summary>Did the served page actually carry a <c>{{Namedmobpage}}</c>?
+    ///
+    /// **False means we are looking at the wrong ARTICLE, not at an empty creature.**
+    /// A title can resolve to a lore or deity article that has nothing to do with the mob
+    /// — LeBigNasty's example on #226 is Innoruk, where the check reads the Lore page —
+    /// and without this flag that page is indistinguishable from a creature page nobody
+    /// has filled in: both parse to zero drops. The two need opposite responses. An empty
+    /// creature page is the BEST thing the contribution pack can find; a lore article is
+    /// something loot must never be pasted onto.</summary>
+    public bool IsCreaturePage { get; set; }
 }
 
 public sealed record MobLookupResult(MobInfo? Mob, ItemLookupState State, DateTime? FetchedAt);
@@ -302,6 +313,9 @@ public sealed partial class EqlWikiMobService
             WikiUrl = "https://eqlwiki.com/" + Uri.EscapeDataString(title.Replace(' ', '_')),
         };
         var fields = EqlWikiText.TemplateFields(wikitext, "Namedmobpage");
+        // Presence, not content: a creature page with every field blank is still a
+        // creature page, and a lore article with none of them is not.
+        info.IsCreaturePage = fields.Count > 0;
         if (fields.TryGetValue("name", out var name) && name.Trim().Length > 0)
             info.Name = EqlWikiText.StripLinks(name);
         if (fields.TryGetValue("zone", out var zone))

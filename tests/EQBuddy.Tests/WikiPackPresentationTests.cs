@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -23,6 +23,7 @@ public class WikiPackPresentationTests
     private static MobLookupResult Page(params string[] drops) =>
         new(new MobInfo
         {
+            IsCreaturePage = true,
             Name = "x",
             PageTitle = "x",
             Drops = drops.Select(d => (d, "")).ToList(),

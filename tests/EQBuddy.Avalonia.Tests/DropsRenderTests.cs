@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
@@ -65,7 +65,9 @@ public sealed class DropsRenderTests
             QuestItems = ["Crude Stein"],
             // a moss snake's page exists but lists no loot → every drop gets a ✦.
             MobResult = name => name == "a moss snake"
-                ? new MobLookupResult(new MobInfo { Name = "a moss snake" },
+                ? new MobLookupResult(new MobInfo
+        {
+            IsCreaturePage = true, Name = "a moss snake" },
                     ItemLookupState.Cached, DateTime.Now)
                 : null,
         };
@@ -102,7 +104,9 @@ public sealed class DropsRenderTests
         var host = new FakeHost
         {
             MobResult = name => name == "a moss snake"
-                ? new MobLookupResult(new MobInfo { Name = "a moss snake", PageTitle = "A Moss Snake" },
+                ? new MobLookupResult(new MobInfo
+        {
+            IsCreaturePage = true, Name = "a moss snake", PageTitle = "A Moss Snake" },
                     ItemLookupState.Cached, DateTime.UtcNow)
                 : null,
         };

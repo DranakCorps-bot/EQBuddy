@@ -13,6 +13,7 @@ public class WikiContributionTests
     private static MobLookupResult PageWith(params string[] drops) => new(
         new MobInfo
         {
+            IsCreaturePage = true,
             Name = "Ambassador Dvinn", PageTitle = "Ambassador Dvinn",
             Drops = drops.Select(d => (d, "Common")).ToList(),
         },
@@ -181,7 +182,8 @@ public class WikiContributionTests
     {
         var lookup = new MobLookupResult(
             new MobInfo
-            {
+        {
+            IsCreaturePage = true,
                 Name = "Orc Legionnaire", PageTitle = "Orc Legionnaire (Crushbone)",
                 Drops = [("Dragoon Dirk", "Common")],
             },
@@ -310,4 +312,61 @@ public class WikiContributionTests
         // And the zone the player happens to be in never appears anywhere in the entry.
         Assert.DoesNotContain("Nagafen", export);
     }
+    /// <summary>
+    /// #226 (LeBigNasty): *"Innoruk, for example, is checking against the Lore page and not
+    /// against the creature page."*
+    ///
+    /// A lore article and an unfilled creature page BOTH parse to zero drops, and until now
+    /// both classified as <c>PageHasNoLoot</c> — which is the status that means "everything
+    /// you looted is news to this page" and puts the creature in the contribution pack. So
+    /// the pack would have offered to paste a loot table onto an article about a god. The
+    /// wiki is the shared reference and this app's whole claim on it is that it only ever
+    /// suggests what the player actually observed, on the page it belongs on.
+    /// </summary>
+    [Fact]
+    public void ALorePageIsNotAnEmptyCreaturePage()
+    {
+        // No {{Namedmobpage}} anywhere — a deity article, as the wiki really serves one.
+        var lore = WikiContribution.Classify(
+            new MobLookupResult(
+                EqlWikiMobService.Parse("'''Innoruk''' is the god of hate. [[Category:Deities]]", "Innoruk"),
+                ItemLookupState.Cached, DateTime.UtcNow),
+            "Tainted Heart");
+
+        Assert.Equal(WikiDropStatus.PageIsNotACreature, lore);
+
+        // The negative that stops it going vacuous: a REAL creature page with an empty loot
+        // field must still be PageHasNoLoot, because that one is the best find in the pack.
+        var emptyCreature = WikiContribution.Classify(
+            new MobLookupResult(
+                EqlWikiMobService.Parse(
+                    """
+                    {{Namedmobpage
+                    | name = Innoruk
+                    | known_loot =
+                    }}
+                    """, "Innoruk (Plane of Hate)"),
+                ItemLookupState.Cached, DateTime.UtcNow),
+            "Tainted Heart");
+
+        Assert.Equal(WikiDropStatus.PageHasNoLoot, emptyCreature);
+    }
+
+    /// <summary>And it must never reach the export, because the export's whole job is to
+    /// produce something a player pastes onto that page.</summary>
+    [Fact]
+    public void ALorePageContributesNothingToTheExport()
+    {
+        var export = WikiContribution.BuildExport(
+            [new WikiContribution.MobObservation(
+                Mob("Innoruk", 4, new MobLoot("Tainted Heart", 1, null)),
+                new MobLookupResult(
+                    EqlWikiMobService.Parse("'''Innoruk''' is the god of hate.", "Innoruk"),
+                    ItemLookupState.Cached, DateTime.UtcNow))],
+            "Testchar", "test", "The Plane of Hate", new DateTime(2026, 8, 22));
+
+        Assert.DoesNotContain("known_loot", export);
+        Assert.DoesNotContain("Tainted Heart", export);
+    }
+
 }

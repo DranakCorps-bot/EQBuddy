@@ -16,6 +16,16 @@ public enum WikiDropStatus
     PageHasNoLoot,
     /// <summary>No page at all — the biggest contribution of the three.</summary>
     PageMissing,
+    /// <summary>The title resolved to an article that is NOT a creature page — a lore or
+    /// deity entry with no <c>{{Namedmobpage}}</c> (#226, LeBigNasty: *"Innoruk, for
+    /// example, is checking against the Lore page and not against the creature page"*).
+    ///
+    /// Deliberately not <see cref="PageHasNoLoot"/>, which is what it used to be mistaken
+    /// for: that status means "everything you looted is news to this page" and puts the
+    /// creature in the contribution pack. Doing that here would offer to paste a loot
+    /// table onto an article about a god. The two states parse identically — zero drops —
+    /// and mean opposite things.</summary>
+    PageIsNotACreature,
 }
 
 /// <summary>
@@ -47,6 +57,9 @@ public static class WikiContribution
         { State: ItemLookupState.Offline } => WikiDropStatus.Unknown,
         { State: ItemLookupState.NotFound } => WikiDropStatus.PageMissing,
         { Mob: null } => WikiDropStatus.Unknown,
+        // BEFORE the no-loot case, which it would otherwise be swallowed by: both have
+        // zero drops and only this one means "wrong article".
+        { Mob.IsCreaturePage: false } => WikiDropStatus.PageIsNotACreature,
         { Mob.Drops.Count: 0 } => WikiDropStatus.PageHasNoLoot,
         { Mob: { } mob } => mob.Drops.Any(d =>
                 string.Equals(Fold(d.Item), Fold(item), StringComparison.OrdinalIgnoreCase))

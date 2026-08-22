@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using EQBuddy.Core;
@@ -64,7 +64,9 @@ public sealed class WikiPackRenderTests
             Identity = ("Tester", "p1999"),
             // Chief Goonda has no page at all; the moss snake's page exists but is empty.
             MobResult = name => name == "a moss snake"
-                ? new MobLookupResult(new MobInfo { Name = "a moss snake" },
+                ? new MobLookupResult(new MobInfo
+        {
+            IsCreaturePage = true, Name = "a moss snake" },
                     ItemLookupState.Cached, DateTime.Now)
                 : new MobLookupResult(null, ItemLookupState.NotFound, null),
         };
@@ -98,7 +100,8 @@ public sealed class WikiPackRenderTests
         {
             // Every drop is already on the wiki.
             MobResult = _ => new MobLookupResult(new MobInfo
-            {
+        {
+            IsCreaturePage = true,
                 Name = "x",
                 Drops = [("Goonda's Club", ""), ("Snake Fang", "")],
             }, ItemLookupState.Cached, DateTime.Now),
@@ -124,7 +127,9 @@ public sealed class WikiPackRenderTests
         var host = new FakeHost
         {
             MobResult = name => name == "a moss snake"
-                ? new MobLookupResult(new MobInfo { Name = "a moss snake" }, ItemLookupState.Cached, DateTime.UtcNow)
+                ? new MobLookupResult(new MobInfo
+        {
+            IsCreaturePage = true, Name = "a moss snake" }, ItemLookupState.Cached, DateTime.UtcNow)
                 : new MobLookupResult(null, ItemLookupState.NotFound, null),
         };
         var window = new WikiPackWindow(host);
@@ -146,7 +151,8 @@ public sealed class WikiPackRenderTests
         var host = new FakeHost
         {
             MobResult = _ => new MobLookupResult(new MobInfo
-            {
+        {
+            IsCreaturePage = true,
                 Name = "x",
                 Drops = [("Goonda's Club", ""), ("Snake Fang", "")],
             }, ItemLookupState.Cached, DateTime.UtcNow),

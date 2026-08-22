@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -15,7 +15,9 @@ public class WikiFreshnessTests
     private static readonly DateTime Now = new(2026, 8, 22, 12, 0, 0, DateTimeKind.Utc);
 
     private static MobLookupResult Read(ItemLookupState state, TimeSpan ago, string title = "Lockjaw") =>
-        new(new MobInfo { Name = title, PageTitle = title }, state, Now - ago);
+        new(new MobInfo
+        {
+            IsCreaturePage = true, Name = title, PageTitle = title }, state, Now - ago);
 
     [Fact]
     public void ARecentReadRefusesARecheckAndAnOlderOneAllowsIt()

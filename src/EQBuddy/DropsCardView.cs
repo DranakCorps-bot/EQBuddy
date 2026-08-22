@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -195,6 +195,10 @@ internal sealed class DropsCardView : IWidgetCard
                     {
                         WikiDropStatus.PageMissing => "  ·  no wiki page yet",
                         WikiDropStatus.PageHasNoLoot => "  ·  wiki page lists no loot yet",
+                        // Not "no loot yet": the wiki answered with the wrong ARTICLE, and
+                        // saying the creature's page is empty would be a false statement
+                        // about a page nobody has looked at (#226, Innoruk's Lore page).
+                        WikiDropStatus.PageIsNotACreature => "  ·  that wiki page isn't the creature",
                         _ => "",
                     },
                 FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
