@@ -167,13 +167,54 @@ that he has no overworld Sky data and is only describing instances.
 - `#185` (bjstrange) auto-discovery of named mobs from combat text — still open, and the
   interaction above is real.
 
+### The wiki already publishes this distinction, and we flatten it
+
+**Added 2026-08-21 after David said he cannot field-verify any of this — his highest character
+is level 29, so Plane of Sky is out of reach for him and one reporter was the only source.**
+CLAUDE.md's rule covers exactly that case: eqlwiki is the tie-breaker. It corroborates him,
+and it changes what the plan should probably do.
+
+| Page | What eqlwiki says |
+|---|---|
+| `Bzzzt` | **"Respawn Time: Triggered"** — an explicit field value. Plus: *"One spawns immediately after killing Bazzzazzt (#3)"* and *"Killing this mob immediately spawns Bazzt Zzzt, the boss of Island 6"*. |
+| `The Spiroc Guardian` | *"Instantly respawns if killed while ANY a spiroc vanquisher lives."* |
+| Island 5 page (in our own harvest cache) | *"Killing a spiroc banisher, a spiroc walker, or a spiroc revolter will spawn the miniboss The Spiroc Guardian, which in turn spawns The Spiroc Lord"* |
+| `The Spiroc Lord` | **No respawn information at all.** |
+
+So the reporter is right, and on the Guardian he is right about the category while differing on
+the mechanic — the wiki gives a vanquisher-conditional respawn *and* a trash-kill trigger, not
+the "manually summoned" he described. Either way a countdown is wrong.
+
+**The important consequence for the plan: `chained` / `player-triggered` is not a taxonomy we
+would be inventing. eqlwiki already carries "Respawn Time: Triggered" as a value.** Importing an
+upstream distinction is a very different piece of work from designing one, and it is the version
+that stays true as the wiki is corrected.
+
+**But there is no spawn harvester.** `scripts/harvests/eqlwiki/` covers AAs, buffs, charms,
+debuffs, fades, items and quests — not mobs. `SpawnCatalog.json` is hand-curated, so the wiki
+value has nowhere to land today even if it were read. Whether this item includes building that
+harvester, or only the schema plus a curated edit, is a scope decision for the plan — and
+curated catalogs are never auto-written, so a harvester here can only *flag*.
+
+**One more thing the plan should not miss:** `The Spiroc Lord` is currently suppressed only
+because it happens to be in the raid-boss list. It is chained, not a raid-instance boss. It is
+getting the right behaviour for the wrong reason, and a fix that cleans up the raid list would
+silently break it.
+
 ### Checked
 
 Read: `SpawnCatalog.MarkRaidInstanced`, `MatchesZoneName`, `IsInstancedZoneName`,
 `InstanceTier`, `SpawnTimers` lines 250–310 and `SuppressedRaidInstance`, plus the Sky entries
-in `SpawnCatalog.json` and `RaidTargets.json`. **Not checked:** what a personal Sky instance
-prints on zone-in (waiting on the reporter), and whether the overworld Sky bosses have real
-timers at all.
+in `SpawnCatalog.json` and `RaidTargets.json`. Fetched the three eqlwiki pages above and
+grepped the local harvest cache. Confirmed `Plane of Sky` has `namedDefaultSeconds` **28800**
+(8 h), which is what any Sky named with no respawn of its own inherits.
+
+**Not checked / open:** what a personal Sky instance prints on zone-in (asked the reporter — it
+decides whether the zone-level rule can ever fire for Sky); whether overworld Sky bosses have
+real timers; and why his screenshot shows **~1:01** rather than the 8 h default — a plausible
+reading is that `Bzzazzt` and `Bazzzazzt` are **not in the catalog at all** (only `Bzzzt` and
+`Bazzt Zzzt` are), so they arrive through discovery as "killed N ago" chips with no duration,
+and 1:01 is how long the chain took. **That is a hypothesis, not verified.**
 
 ---
 

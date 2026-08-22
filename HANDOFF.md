@@ -49,9 +49,21 @@ the *obvious* fix is a trap:
    two in the screenshot. **Do not just add them:** that list also drives the Raids card and
    means "raid target you can clear", so it would list trash as raid bosses (trap 4). The
    domain is missing `chained` and `player-triggered` spawn types.
+   **The wiki settles the game facts, and David cannot** — his highest character is level 29
+   (2026-08-21), so Sky, Epics and raids are permanently outside what he can field-verify.
+   eqlwiki corroborates the reporter and publishes **"Respawn Time: Triggered"** as a real
+   field value, so the spawn type can be IMPORTED rather than invented. There is no spawn
+   harvester today (`scripts/harvests/eqlwiki/` has no mob pass) and the catalog is curated.
+   Also: `The Spiroc Lord` is suppressed only because it happens to sit in the raid-boss list
+   — right behaviour, wrong reason, and a tidy-up of that list would break it.
    **Waiting on the reporter** for the zone-enter line a personal Sky instance prints —
    `IsInstancedZoneName` only knows `"<zone> N (Adjective)"` and `"- Solo|Group"`, and if Sky
    matches neither, the zone-level rule can never fire there.
+
+**Standing consequence, worth more than either stub:** *"David will catch it"* is not a
+backstop for endgame content. For Sky, Epic 1.0, raid targets and their spawn mechanics the
+evidence chain is **eqlwiki first, reporters second, and say which one you used**. Ask a
+reporter for an artefact — a log line, a screenshot — not for a judgement.
 
 `FABLE-FEEDBACK.md` asks Fable to say where the V2 line actually sits. That question is open
 and it matters more than either stub.
