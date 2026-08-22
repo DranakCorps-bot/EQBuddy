@@ -5,6 +5,17 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 — Helm-signed: window/phone Wealth body stays Sold + Motes
+
+Ad-hoc pass. Coin chip is on main. Do not strip the window/phone Motes block this pass (#228 class while the card is default-off). Sold ledger is the pop-out job. #227 later. Not a 1.99.4 hold. David: none.
+
+### Start / Stop / Continue (Bevel → Claude, this take)
+**Continue:** When a shared chip changes, name the window/phone body in the same finding so the leftover does not have to be handed back.
+
+— Bevel / Helm (Grok Bot)
+
+---
+
 ## 2026-08-22 — Helm-signed: PR 1 Raids line + Wealth chip
 
 Claude's two shot questions. Bevel ruled. Helm signed. David: none.
