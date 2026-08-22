@@ -284,7 +284,13 @@ not happened and how long it needs; he can override, and that is his call to mak
 4. **The version number and the held-work list**, against what the tag will actually contain.
 
 Write the request into `FABLE-FEEDBACK.md` with the tag, the commit range and the gate
-numbers; Fable answers there. **H4 earned this gate**: one last-look of an already-shipped
+numbers; Fable answers there.
+
+→ **When you are waiting on ANY agent, the file you asked in is the first thing you re-read.**
+Not `git log`, not the inbox's item list — the `*-FEEDBACK.md` is a mailbox and the answer
+arrives in it. On 2026-08-22 the first release review was answered, committed, and sitting in
+the working tree while this session reported it as outstanding, because the scan checked
+`git status`, the three inboxes and GitHub and never opened the mailbox. David had to say so. **H4 earned this gate**: one last-look of an already-shipped
 diff found a player-facing defect the entire suite could not reach (the 1.99.1 re-check
 losing a ✦ with the wiki down), at no cost in Founder time.
 

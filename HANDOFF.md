@@ -8,6 +8,42 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-22 (latest): 1.99.2 SHIPPED through the new release gate — Fable reviewed, then David
+
+**The gate ran for the first time and worked.** Fable's release review (`61e750f`) said ship
+with two What's-new **credit** edits — the Sky entry credited nobody though the load-time heal
+exists because of Frankthetankk's own overrides file. Both edits made, then David's go.
+
+**Process miss worth not repeating:** this session reported the review as "outstanding" while
+Fable's answer was already committed in the working tree. The scan checked `git status`, the
+three inboxes and GitHub — never the `*-FEEDBACK.md` it had asked in. **Rule added to
+`CLAUDE.md`: when waiting on an agent, the file you asked in is the first thing you re-read.**
+
+### DO NEXT
+
+1. **PR #231 (quasarj, Wine letter spacing)** — David's call, recorded in `SCRIBE.md`:
+   **review it now that 1.99.2 has shipped.** Full code review, resolve the conflict on our
+   side, merge if it holds up, credit quasarj in the next What's-new. It is 1,069 lines,
+   bundles two more font weights and a Wine text policy, and conflicts on ONE file —
+   `CLAUDE.md` (it branched at `eb17b3c` and adds its own "trap 39" where main now has one;
+   `docs/TestPlan.md` auto-merges). **The REPLY to quasarj still waits for Helm to lift the
+   public-reply hold.**
+2. **`ZoneShare` imports durations onto `RaidInstanced` entries** (Fable's carry-forward from
+   the release review) — the load-time heal then silently removes them. Churn, not a defect.
+   One line, the same one triggered entries already have. V1.
+3. **#120 alt-swap** (Frankthetankk) — verified in part this session: `LeadMargin` is **2.0**,
+   so two classes at comparable weight produce NO answer rather than a flip-flop. A test of
+   the actual alternating sequence was started and not finished; finish it before replying.
+   Reply held.
+4. **Inline themes** — `FABLE.md`, `ready`, the big one. **Bevel pre-design is required before
+   PR 1's screenshots** and has not been requested yet.
+
+### Holds (re-read `SCRIBE.md`'s block before ANY public reply)
+
+#226, #228, #208, and a blanket "check with Helm before posting". Nothing was posted today.
+
+---
+
 ## 2026-08-22 (latest): 1.99.2 built and WAITING ON FABLE'S RELEASE REVIEW — do not ask David yet
 
 **Two standing rules landed today (David, 2026-08-22), both in `CLAUDE.md`:**
