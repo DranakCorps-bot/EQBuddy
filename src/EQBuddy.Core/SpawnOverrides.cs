@@ -108,6 +108,22 @@ public sealed class SpawnOverrides
         lock (_sync) _byKey.Remove(Key(zone, name));
     }
 
+    /// <summary>Drop every entry whose NAME the predicate rejects, across all zones, and
+    /// say how many went. For cleaning up entries an older build should never have written
+    /// — the fix that stops new ones is invisible to the player whose list already has
+    /// them, which is the whole reason this exists.</summary>
+    public int PurgeNames(Func<string, bool> reject)
+    {
+        lock (_sync)
+        {
+            var doomed = _byKey.Keys
+                .Where(k => k.IndexOf('|') >= 0 && reject(k[(k.IndexOf('|') + 1)..]))
+                .ToList();
+            foreach (var k in doomed) _byKey.Remove(k);
+            return doomed.Count;
+        }
+    }
+
     /// <summary>Player-added named for a zone, as (name, override) pairs. Snapshot
     /// semantics — safe to enumerate while another thread edits.</summary>
     public IEnumerable<(string Name, SpawnOverride Override)> CustomFor(string zone)

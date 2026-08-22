@@ -48,6 +48,22 @@ public static class NamedMobHeuristic
         // "Corpse" and possessives are the remains, not the mob.
         if (name.Contains("'s corpse", StringComparison.OrdinalIgnoreCase)) return false;
 
+        // A PET IS NOT A NAMED, however proper the name in front of it looks (David,
+        // 2026-08-22, from his own spawn list: *"we were starting to see named's pet"*).
+        // "Xanthus`s pet" carries no article and is capitalised, so the article convention
+        // waves it straight through and it earns a respawn timer — for a thing that has no
+        // spawn cycle at all, only a summoner. An invented timer teaches you to walk to a
+        // camp that is not up, which is the failure this whole heuristic is built to avoid.
+        //
+        // The test is the LAST WORD, not a substring: "pet" inside a name is ordinary
+        // ("Petrifier", "Petras", "a petrified golem") and matching it would delete real
+        // named mobs from the list, which is the expensive direction to be wrong in. Every
+        // possessive form the game writes — `s, 's, curly ’s — ends in " pet" regardless,
+        // so one check covers them all.
+        if (name.EndsWith(" pet", StringComparison.OrdinalIgnoreCase)
+            || name.Equals("pet", StringComparison.OrdinalIgnoreCase))
+            return false;
+
         return true;
     }
 

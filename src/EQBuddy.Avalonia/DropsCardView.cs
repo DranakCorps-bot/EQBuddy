@@ -213,7 +213,8 @@ internal sealed class DropsCardView
             // CLICKABLE, because the tooltip two rows down has always said so: step 2 of
             // the how-to-sync note is "Click the creature's name to open its wiki page",
             // and until 2026-08-21 this was a plain label (#226, LeBigNasty).
-            ToolTip.SetTip(header, "Open this creature's page on eqlwiki");
+            // Bevel (Helm-signed): the wrong-article case names the way OUT here too.
+            ToolTip.SetTip(header, "Open this creature's page on eqlwiki" + (pageStatus == WikiDropStatus.PageIsNotACreature ? " — this one is not the creature's page. Open it, then find the creature's own page." : ""));
             var creature = mob.Name;
             OnClick(header, () => MainWindow.OpenWikiUrl(
                 WikiLinks.Creature(_main.WikiMobResult(creature), creature)));

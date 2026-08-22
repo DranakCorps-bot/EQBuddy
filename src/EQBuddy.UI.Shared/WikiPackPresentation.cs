@@ -60,7 +60,13 @@ public static class WikiPackPresentation
         int PagesWithoutLoot,
         int NewDrops,
         int PendingCreatures,
-        int KnownDrops);
+        int KnownDrops,
+        /// <summary>Creatures whose title resolved to something that is not a creature page.
+        /// They contribute nothing, so without their own count the headline and the empty
+        /// state would call the session "nothing to contribute" — which is the one thing a
+        /// wrong-article session must never be told (Bevel, Helm-signed 2026-08-22). Zero
+        /// contributions and no problem are not the same sentence.</summary>
+        int WrongArticleCreatures);
 
     /// <summary>The status words, once, so the two desktops cannot spell them differently.</summary>
     public static string KindLabel(RowKind kind) => kind switch
@@ -190,7 +196,8 @@ public static class WikiPackPresentation
             PagesWithoutLoot: pagesNoLoot,
             NewDrops: newDrops,
             PendingCreatures: pending,
-            KnownDrops: known);
+            KnownDrops: known,
+            WrongArticleCreatures: rows.Count(r => r.Kind == RowKind.NotACreaturePage));
     }
 
     /// <summary>The one line that stops the scope being silent — the whole reason this is a
@@ -207,6 +214,13 @@ public static class WikiPackPresentation
     /// <summary>The headline above the rows.</summary>
     public static string Headline(Pack pack)
     {
+        // A wrong-article session has zero contributions and is NOT "nothing to contribute" —
+        // it is EQBuddy having read the wrong page. Checked before the zero, or the false
+        // reassurance wins (Bevel, Helm-signed: "two failures must not look alike").
+        if (pack.Contributions == 0 && pack.WrongArticleCreatures > 0)
+            return pack.WrongArticleCreatures == 1
+                ? "1 creature's wiki page isn't the creature"
+                : $"{pack.WrongArticleCreatures} creatures' wiki pages aren't the creature";
         if (pack.Contributions == 0) return "Nothing to contribute yet";
         var items = pack.Contributions == 1 ? "1 item" : $"{pack.Contributions} items";
         var mobs = pack.Creatures == 1 ? "1 creature" : $"{pack.Creatures} creatures";
@@ -248,6 +262,13 @@ public static class WikiPackPresentation
                 $"({pack.KnownDrops} {(pack.KnownDrops == 1 ? "drop" : "drops")} matched). " +
                 $"That's the wiki being in good shape, not EQBuddy finding nothing.{pendingTail}";
         }
+
+        if (pack.WrongArticleCreatures > 0)
+            return $"EQBuddy looked up {Creatures(pack.WrongArticleCreatures)} and got an " +
+                "article that is not a creature page — a lore or deity entry, not an empty " +
+                "page. Nothing is suggested for those, because pasting a loot table onto the " +
+                "wrong article would be worse than adding nothing. Open the row to see which " +
+                "page it read, then find the creature's own page.";
 
         return "No loot recorded this session yet. Kill something and come back — the pack " +
             "builds itself from your own loot log.";

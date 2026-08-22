@@ -114,7 +114,38 @@ public sealed class SpawnTimers
         _persistPath = persistPath;
         LoadPersisted();
         HealSuppressedOverrides();
+        PurgePetTimers();
     }
+
+    /// <summary>
+    /// Remove spawn entries for PETS that an older build discovered as named mobs (David,
+    /// 2026-08-22: *"we were starting to see named's pet"*).
+    ///
+    /// `NamedMobHeuristic` refuses them now, but that only stops NEW ones — and the player
+    /// who noticed is the one whose list is already full of them. A fix the reporter cannot
+    /// see is a fix they will report again.
+    ///
+    /// Both stores, because a pet reached both: the learned override that remembers it, and
+    /// the live timer counting down to a respawn that will never happen.
+    /// </summary>
+    private void PurgePetTimers()
+    {
+        var gone = _overrides.PurgeNames(IsPetName);
+        if (gone > 0) _overrides.Save();
+
+        lock (_lock)
+        {
+            var doomed = _timers.Where(kv => IsPetName(kv.Value.Name)).Select(kv => kv.Key).ToList();
+            foreach (var k in doomed) _timers.Remove(k);
+            if (doomed.Count > 0) SavePersisted();
+        }
+    }
+
+    /// <summary>The pet test, in one place so the purge and the heuristic cannot disagree
+    /// about what a pet is.</summary>
+    private static bool IsPetName(string name) =>
+        name.Trim().EndsWith(" pet", StringComparison.OrdinalIgnoreCase)
+        || name.Trim().Equals("pet", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>Fed alongside SessionStats.Apply from the watcher thread.</summary>
     public void Apply(GameEvent evt)

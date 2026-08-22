@@ -189,7 +189,9 @@ internal sealed class DropsCardView : IWidgetCard
             var header = new TextBlock
             {
                 Cursor = System.Windows.Input.Cursors.Hand,
-                ToolTip = "Open this creature's page on eqlwiki",
+                // Bevel (Helm-signed): the wrong-article case names the way OUT here too,
+                // not only on the pack row's tooltip.
+                ToolTip = "Open this creature's page on eqlwiki" + (pageStatus == WikiDropStatus.PageIsNotACreature ? " — this one is not the creature's page. Open it, then find the creature's own page." : ""),
                 Text = $"{mob.Name} — {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")}"
                     + pageStatus switch
                     {

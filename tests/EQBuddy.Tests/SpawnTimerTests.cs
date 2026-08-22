@@ -1869,4 +1869,33 @@ public class SpawnTimerTests
         Assert.Equal("", hand.CountdownText);
         Assert.Equal("12h", hand.DurationText);
     }
+    /// <summary>
+    /// A PET IS NOT A NAMED, and the profiles that already learned one get cleaned up
+    /// (David, 2026-08-22: *"we were starting to see named's pet"*).
+    ///
+    /// The heuristic refusing them stops NEW ones, which is invisible to the person who
+    /// reported it — his list is already full of them. A fix the reporter cannot see is a
+    /// fix they report again.
+    /// </summary>
+    [Fact]
+    public void PetsAreDiscoveredNeverAndPurgedFromProfilesThatHaveThem()
+    {
+        var overrides = new SpawnOverrides();
+        // A profile an older build wrote: a pet learned as a named, beside a real one.
+        overrides.GetOrAdd("Plane of Hate", "Xanthus`s pet").Learned = true;
+        overrides.GetOrAdd("Plane of Hate", "Innoruk").Learned = true;
+
+        var t = new SpawnTimers(TestCatalog(), overrides) { Server = "freeport" };
+
+        Assert.Null(overrides.Find("Plane of Hate", "Xanthus`s pet"));
+        // …and the real named beside it is untouched. Without this the purge could be
+        // emptying the whole store and the test above would not notice.
+        Assert.NotNull(overrides.Find("Plane of Hate", "Innoruk"));
+
+        // And nothing new is discovered from a pet kill, however proper the name reads.
+        t.Apply(new ZoneEvent(T0, "Plane of Hate"));
+        t.Apply(new KillEvent(T0, "Xanthus`s pet", "You", ProperName: true));
+        Assert.Null(overrides.Find("Plane of Hate", "Xanthus`s pet"));
+    }
+
 }

@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.99.5",
+    "date": "2026-08-22",
+    "highlights": [
+   "FIXED - PETS ARE NO LONGER TRACKED AS NAMED MOBS ON SPAWN TIMERS. A named mob's pet has no \"a\" or \"an\" in front of it and starts with a capital, exactly like the named itself, so \"Xanthus`s pet\" was being learned as a spawn and given a respawn clock - for something that has no spawn cycle at all, only a summoner. A timer that will never come due teaches you to walk to a camp that isn't up. Any name ending in \"pet\" is now read as a pet, and EQBuddy quietly clears the ones your profile already learned the next time it starts. Names that merely contain the letters (Petrifier, Petras) are untouched.",
+   "The wiki contribution pack stops calling a wrong-article session \"nothing to contribute\". If every creature you looked up landed on a lore page rather than a creature page, the pack said there was nothing to add - which is EQBuddy having read the wrong page, not the wiki being complete. It now says how many pages weren't the creature, and the heading tooltip tells you what to do about it."
+    ]
+  },
+  {
     "version": "1.99.4",
     "date": "2026-08-22",
     "highlights": [
