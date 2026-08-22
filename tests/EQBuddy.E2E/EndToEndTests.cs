@@ -613,6 +613,59 @@ public sealed class EndToEndTests
             "the launcher should summarise the theme; dump was: " + app.Artifacts());
     }
 
+    /// <summary>
+    /// The theme EXPANDED IN PLACE — the change Inline themes PR 1 makes, asserted in the
+    /// same keys that said 0 before it.
+    ///
+    /// The card owning the body is not enough on its own: it has to own the STRIP too, and
+    /// on the room a player who has not chosen gets. <c>progressTab</c>/<c>progressTabs</c>
+    /// come from whichever host holds the body, so this also proves the widget is emitting
+    /// them at all — before the move only the window ever did.
+    /// </summary>
+    [Fact]
+    public void ExpandingTheProgressCardDrawsTheThemeUnderIt()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "progress",
+        });
+        app.Launch();
+
+        app.WaitForDump("progressInline", 1, "the Progress card to own the body");
+        // The window is NOT open. Both at once is the one thing ThemeHost exists to
+        // prevent, and on the Avalonia widget it is a crash rather than a layout bug.
+        Assert.Equal(0, app.DumpValue("progressWindowOpen"));
+        app.WaitForDump("progressTabs", 4, "all four rooms in the card's strip");
+        // Experience — "the room that moves while you play" (Bevel). Its key is
+        // "progress", the one the card has always used.
+        app.WaitForDump("progressTab", "progress", "the default room");
+        // The glance the launcher carried survives being expandable (#219).
+        Assert.True(app.DumpValue("progressSummaryLen") > 0,
+            "the header should still summarise the theme; dump was: " + app.Artifacts());
+    }
+
+    /// <summary>
+    /// A named ROOM — <c>EQBUDDY_EXPAND=progress:raids</c> — and with it the first GLANCE
+    /// tab, whose contract is that it draws a LINE instead of a body.
+    ///
+    /// Without the room selector three of the theme's four bodies could not be reached by
+    /// a test or a screenshot at all, and a surface with no way to reach its state reads
+    /// as reviewed anyway (trap 22).
+    /// </summary>
+    [Fact]
+    public void AnInlineThemeCanBeOpenedOnANamedRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "progress:raids",
+        });
+        app.Launch();
+
+        app.WaitForDump("progressInline", 1, "the Progress card to own the body");
+        app.WaitForDump("progressTab", "raids", "the room named in EQBUDDY_EXPAND");
+        app.WaitForDump("progressTabs", 4, "all four rooms in the card's strip");
+    }
+
     /// <summary>The other half of the pin: with nothing opened, NEITHER host owns the
     /// body. Without this the test above is satisfied by a dump that reports 1 and 0 for
     /// every launch, whatever the app is actually doing — the vacuous-guard shape trap 39

@@ -39,6 +39,33 @@ public static class WidgetMetrics
             : Math.Clamp(contentHeight, MinSectionHeight, Math.Max(MinSectionHeight, cap));
     }
 
+    /// <summary>
+    /// How tall ONE expanded theme's body may get on the widget, in pre-scale units.
+    ///
+    /// <see cref="SectionMaxHeight"/> already caps the whole card stack, so this is not
+    /// about running off the screen — it is about one theme eating the stack. Without it
+    /// an expanded Faction list pushes every other card below the fold, and the widget's
+    /// job is the glance across all of them.
+    ///
+    /// **320 rather than 280** (Bevel offered both and delegated the pick): it is the
+    /// number <c>GearCardView</c> already uses for exactly this job, and a second nearby
+    /// constant would be two answers to one question.
+    ///
+    /// **And the screenshot could not decide between them, which is worth saying out loud
+    /// rather than letting the number look measured.** The Progress theme does not reach
+    /// either cap: its tallest room is Experience with a ding list and every AA shown, and
+    /// that is about 175 of these units — Wealth is four lines, Faction is five rows, and
+    /// Raids is a Glance that draws no body at all. So PR 1 picks the constant and PR 2 is
+    /// where it is actually tested, on Loot's rows and the Drops list. A cap nothing has
+    /// yet hit is a guard, not a measurement.
+    ///
+    /// It is a CAP, not a height: a short room (Wealth's four coin lines) draws short.
+    /// The scroller it implies is the host's problem, and the wheel has to reach the card
+    /// stack when there is nothing here to scroll — trap 36, which shipped an Inventory
+    /// tab that could only be moved by dragging the outer slider.
+    /// </summary>
+    public const double ThemeBodyMaxHeight = 320;
+
     /// <summary>A bottom-edge drag turned into a stored height. The cursor travels in
     /// screen pixels while the list it resizes lives under the transform, so the delta
     /// is divided rather than added raw.</summary>

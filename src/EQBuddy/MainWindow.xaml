@@ -599,27 +599,49 @@
                  The three mini-dashboard stars these cards carried (xp, money, motes)
                  moved INTO the window, where they finally have words beside them. They
                  could not stay here: a ToggleButton nested in a Button bubbles its Click
-                 to the Button's handler, so every star press would also open the window. -->
-            <Button x:Name="ProgressSection" Style="{StaticResource SectionLink}" Click="OnProgressWindow"
-                    ToolTip="Open Progress — experience and AAs, coin and motes, faction standing, and the raid targets you've cleared">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <local:EqCardTitle Icon="Chart" Text="Progress"/>
-                    <!-- Trimmed, and the summary column is the STAR one: both widgets are
-                         SizeToContent, so a label whose string changes width IS window
-                         geometry (trap 12). This line carries up to four parts and moves
-                         with the xp tick, which is exactly the shape that cost #173 a
-                         player's keyboard on X11. Auto/* rather than */Auto so the title
-                         holds its size and the summary is the half that gives. -->
-                    <TextBlock x:Name="ProgressHeader" Grid.Column="1" Style="{StaticResource StatValue}"
-                               HorizontalAlignment="Right" VerticalAlignment="Center"
-                               Margin="{DynamicResource IndentM}"
-                               TextTrimming="CharacterEllipsis" Text=""/>
-                </Grid>
-            </Button>
+                 to the Button's handler, so every star press would also open the window.
+
+                 EXPANDS IN PLACE since Inline themes PR 1 (David, 2026-08-21: "expandable
+                 sub-categories under them with an option to pop out the window"; #228
+                 daetien-lab: "I simply want to track my mote drops in the main window").
+                 It is an Expander rather than a Button now, which is also what drops the
+                 trailing ↗ from the collapsed row: the Section template draws the chevron
+                 that says "this opens here", and the ↗ meaning "this opens a window" moves
+                 onto the expanded header where it is still true (Bevel, Helm-signed).
+
+                 The KEY is unchanged, so nothing migrates: SectionMap still answers
+                 "progress" with this element, and a player who dragged the card keeps its
+                 slot. -->
+            <Expander x:Name="ProgressSection" Style="{StaticResource Section}"
+                      ToolTip="Progress — experience and AAs, coin, faction standing, and the raid targets you've cleared">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:EqCardTitle Icon="Chart" Text="Progress"/>
+                        <!-- Trimmed, and the summary column is the STAR one: both widgets are
+                             SizeToContent, so a label whose string changes width IS window
+                             geometry (trap 12). This line carries up to four parts and moves
+                             with the xp tick, which is exactly the shape that cost #173 a
+                             player's keyboard on X11. Auto/* rather than */Auto so the title
+                             holds its size and the summary is the half that gives. -->
+                        <TextBlock x:Name="ProgressHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="{DynamicResource IndentM}"
+                                   TextTrimming="CharacterEllipsis" Text=""/>
+                        <!-- The pop-out. Filled in code because it is a vector button from
+                             the shared catalog, and it carries no Visibility of its own:
+                             ThemeCardView shows it on the expanded header and nowhere else
+                             (trap 15 — one switch for one state). -->
+                        <ContentControl x:Name="ProgressPopOut" Grid.Column="2"
+                                        VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <ContentControl x:Name="ProgressBody"/>
+            </Expander>
 
             <Expander x:Name="MiscSection" Style="{StaticResource Section}">
                 <Expander.Header>

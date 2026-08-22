@@ -63,3 +63,24 @@ history of the call stays readable. If vetoes become common, the consequence lis
   note said. Same contradiction on screen; the method is `SuppressedByCatalog`'s own definition.
 - **Guarded the re-check defect with a SOURCE SCAN on both windows**, not a Core test. The Core
   contract was already correct and a Core test could never have failed; the window defeated it.
+- **Fixed a 1-in-3 flake in `SettingsClobberTests` mid-PR rather than filing it.** Default it
+  could have gone the other way: leave it, it is pre-existing and unrelated to inline themes.
+  Landed: it is the guard Fable asked for in the v1.99.3 release review, it has been flaky since
+  the hour it shipped, and I was about to run the gates repeatedly against it — a gate that lies
+  one run in three trains you to re-run until green. Cause: `CompanionHost` and
+  `OutputfileAutoImport` write the shared profile's settings.json from a different xUnit
+  collection, and collections run in parallel. Cost 2,350 tests and still 2 s, because the fix
+  is a serial collection of four files rather than disabling parallelism (which was 2 s → 8 s).
+- **Guarded it with a source scan, not just the four attributes.** Could have gone: add
+  `[Collection]` and move on. Landed: the file's old comment *claimed* nothing else touched
+  settings.json, and that claim is what let the flake exist — trap 34, a comment standing in for
+  a guard. `SettingsFileCollectionTests` fails the build when a fifth writer appears.
+- **Inline themes PR 1 ships `ThemeBodyMaxHeight = 320` with the screenshot unable to choose.**
+  Bevel offered 280 or 320 and delegated the pick. Landed: 320, because `GearCardView` already
+  uses it and a second nearby constant is two answers to one question — and the shot is recorded
+  as NOT deciding it, since no Progress room is tall enough to reach either cap. PR 2's Loot and
+  Drops rows are where the number is actually tested.
+- **Extended `EQBUDDY_EXPAND` to name a room (`progress:raids`) instead of adding a variable.**
+  Could have gone: a new `EQBUDDY_THEMETAB`. Landed: an inline theme has four bodies behind one
+  key, and three of them were unreachable by a test or a screenshot — trap 22, a surface that
+  cannot be reviewed reads as reviewed.

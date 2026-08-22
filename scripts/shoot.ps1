@@ -116,6 +116,73 @@ $Shots = [ordered]@{
     # can open. A surface with no way to be photographed reads as reviewed anyway (trap 22).
     'progress-wealth' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'wealth' }; Set = @{} }
     'progress-faction' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'faction' }; Set = @{} }
+    # The PROGRESS theme EXPANDED IN PLACE (Inline themes PR 1). Title is 'EQBuddy' — this
+    # is the widget, not the window, which is the whole point of the change. A NEW name,
+    # per trap 21: 'progress-card' and 'section-progress' are both embedded in the docs and
+    # both still mean the old thing.
+    #
+    # It stages the same level-up 'progress-card' does, and for a second reason on top of
+    # that one: the inline body is CAPPED (WidgetMetrics.ThemeBodyMaxHeight), and a room
+    # shorter than its cap photographs as a card with no cap at all. A shot that cannot
+    # reach the state under review reads as reviewed anyway (trap 22).
+    #
+    # PREDICTION, written before the shot (trap 23): the Progress card is the ONLY expanded
+    # one (the named EQBUDDY_EXPAND form opens just its key). Under its header, a four-chip
+    # wrapped strip — Experience, Wealth, Faction, Raids — each carrying the badge the
+    # window's strip carries. Experience is lit, being the room that moves while you play.
+    # Below it the Experience body, now TALLER than the cap: the same lines 'progress-card'
+    # shows (16 xp gains, Last 15m, 1 AA point, Next level, Level 12 at ...), then "New at
+    # level 12" with Heroic Leap and Unbound Wrath, and it should CUT with a scrollbar
+    # rather than run the widget off the screen. On the header, right of the summary and
+    # left of the chevron, a ↗ that opens the window; the chevron itself reads DOWN.
+    #
+    # THE CUT DID NOT HAPPEN, and the prediction was wrong about the interesting half.
+    # Everything above is what the picture shows EXCEPT the cap: the full body — through
+    # "Double Riposte / Archetype · 3 ranks" — fits in about 175 units against a cap of
+    # 320, with no scrollbar. Staging a level-up does not make this room tall; nothing in
+    # the Progress theme is tall. That is the finding, not a fixture bug: the cap is a
+    # guard for the themes with LISTS in them (PR 2's Loot rows and Drops), and the reason
+    # to keep the append anyway is the "New at level 12" block, which is real content this
+    # card has to draw and the shared fixture never produces.
+    'theme-inline-progress' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'progress' }
+                           Append = @('You have gained a level! Welcome to level 12!')
+                           Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
+    # The GLANCE room. Raids is the Progress theme's only one, and its contract is that it
+    # draws a LINE instead of a body — so a picture of it is the only way to see that the
+    # 29-row ledger did not come along for the ride.
+    # PREDICTION: the Raids chip lit, and under the strip one line, "Raids — 2 / 21", in
+    # the dim summary ink. No rows, no zone headings, no re-check button. The ↗ on the
+    # header is the way to the ledger and is the reason the line is allowed to be a line.
+    'theme-inline-raids' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'progress:raids' }
+                           Set = @{}
+                           # The same two clears 'raids-card' seeds — one witnessed, one
+                           # imported — so the line's numerator is a number both shots
+                           # agree on and the E2E suite already asserts as 2.
+                           Raids = @{
+                               'testchar_test|phinigel autropos' = @{
+                                   Kills = 3
+                                   FirstKill = '2026-07-02T21:15:00'
+                                   LastKill = '2026-08-09T22:40:00'
+                                   AchievementComplete = $false
+                                   TierKills = @{ d2 = 2; open = 1 }
+                               }
+                               'testchar_test|lord nagafen' = @{
+                                   Kills = 0
+                                   AchievementComplete = $true
+                                   TierKills = @{}
+                               }
+                           } }
+    # Wealth inline is COIN ONLY (Bevel's table, Helm's correction): the four summary
+    # lines, no sold ledger, no mote rate. The window's Wealth tab shows all three, so this
+    # shot and 'progress-wealth' are deliberately DIFFERENT pictures of one room, and the
+    # difference is the ruling.
+    # PREDICTION: the Wealth chip lit; four lines — Corpses, Merchant sales, per hour /
+    # per active hour, and "Last 15m" — and NOTHING else. No "Sold" heading, no sold rows
+    # (the window's shot has 24), no motes line.
+    'theme-inline-wealth' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'progress:wealth' }; Set = @{} }
     # The breakout needs no hook of its own: it shows whenever the widget is minimized and
     # its stat is starred, and both are plain settings. Session scope is the one with the
     # filter strips on it (Target is a different axis and hides them).

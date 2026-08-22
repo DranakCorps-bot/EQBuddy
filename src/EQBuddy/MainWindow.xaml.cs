@@ -135,6 +135,16 @@ public partial class MainWindow : Window, ICardContext
         // NewGearCard records.
         _motesCard = new MotesCardView(this); _motesCard.Attach();
         MotesBody.Content = _motesCard.Body;
+        // The PROGRESS theme's card. Its surfaces are built on the first expand, so a
+        // player who only ever uses the window (or neither) pays nothing for it.
+        _progressCard = ProgressThemeCard.Build(
+            ProgressSection, ProgressBody, ProgressPopOut, _progressHost,
+            newSurfaces: NewProgressSurfaces,
+            dingUnlocks: ProgressDingUnlockCount,
+            raidsDefeated: () => _raidLedger.DefeatedCount(),
+            popOut: () => ShowProgressWindow(),
+            bringWindowForward: () => { _progressWindow?.Activate(); },
+            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -332,6 +342,12 @@ public partial class MainWindow : Window, ICardContext
         // scripts/shoot.ps1: a card's expanded state is not persisted, so without it the
         // only way to photograph a card BODY was to open every card at once and crop —
         // and the review is an acceptance criterion, not a nicety (Gate 3's §11.6).
+        //
+        // A theme card may also NAME ITS ROOM — EQBUDDY_EXPAND=progress:raids. An inline
+        // theme has four bodies behind one key, and three of them were unphotographable
+        // and unassertable without this: a surface with no way to reach its state reads as
+        // reviewed anyway (trap 22), and Raids is the first GLANCE room, whose whole
+        // contract is that it draws a line INSTEAD of a body.
         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
         if (expand == "1")
             foreach (var ex in new[] { CombatSection, HealingSection,
@@ -340,10 +356,15 @@ public partial class MainWindow : Window, ICardContext
         else if (!string.IsNullOrWhiteSpace(expand))
         {
             var wanted = expand.Split(',', StringSplitOptions.RemoveEmptyEntries
-                                           | StringSplitOptions.TrimEntries);
+                                           | StringSplitOptions.TrimEntries)
+                .Select(w => w.Split(':', 2))
+                .ToDictionary(p => p[0], p => p.Length > 1 ? p[1] : null,
+                    StringComparer.OrdinalIgnoreCase);
+            if (wanted.TryGetValue("progress", out var room)
+                && ProgressSurface.TabForKey(room) is { } startOn)
+                _progressHost.SelectTab(startOn);
             foreach (var (key, element) in SectionMap())
-                if (element is Expander card
-                    && wanted.Contains(key, StringComparer.OrdinalIgnoreCase))
+                if (element is Expander card && wanted.ContainsKey(key))
                     card.IsExpanded = true;
         }
 
@@ -1959,7 +1980,11 @@ public partial class MainWindow : Window, ICardContext
     /// not what the truth is.</summary>
     private readonly ThemeHost<ProgressTab> _progressHost = new(ProgressSurface.DefaultInlineTab);
 
-    private void OnProgressWindow(object sender, RoutedEventArgs e) => ShowProgressWindow();
+    /// <summary>The Progress theme's card — the launcher line, and the rooms under it when
+    /// the player expands rather than pops out. Its composition lives in
+    /// <see cref="ProgressThemeCard"/>, not here: this window is the ratchet's hotspot, and
+    /// a surface migrated INSIDE it is guarded by nothing.</summary>
+    private ThemeCardView<ProgressTab> _progressCard = null!;
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -1976,10 +2001,21 @@ public partial class MainWindow : Window, ICardContext
             // changes have to reach the host, or "closing the window hands the tab back
             // to the card" is only true for a player who never switched tabs in it.
             _progressWindow.TabChanged += t => _progressHost.SelectTab(t);
-            _progressWindow.Closed += (_, _) => _progressHost.WindowClosed();
+            _progressWindow.Closed += (_, _) =>
+            {
+                // Collapsed, never back to Inline: the player closed a thing, and
+                // re-growing the widget in its place is the opposite of what they asked
+                // for (ThemeHost's rule; Bevel's "close leaves collapsed").
+                _progressHost.WindowClosed();
+                _progressCard?.Sync();
+            };
             _progressWindow.Show();
         }
         if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
+        // The card gives the body up: opening the window while the card is expanded would
+        // otherwise leave the same theme in two hosts — a layout bug here and a crash on
+        // the Avalonia widget, where one instance is shared.
+        _progressCard?.Sync();
         _progressWindow.Activate();
     }
 
@@ -2541,6 +2577,10 @@ public partial class MainWindow : Window, ICardContext
         // do not. Assembled in UI.Shared so the Avalonia widget and EQBuddy Mobile say the
         // same thing (#210 — parity by shared module, never by feature list).
         ProgressHeader.Text = ProgressTheme.LauncherSummary(s);
+        // The theme's own body, when the player has expanded it here rather than popped it
+        // out. It no-ops while the card is collapsed or while the window owns the body —
+        // ThemeHost decides which, and this call does not get a second opinion.
+        _progressCard.Render(s);
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
 
@@ -2714,6 +2754,15 @@ public partial class MainWindow : Window, ICardContext
                     // so two emitters of one key is not a conflict the suite can see.
                     $"progressInline={(_progressHost.IsInline ? 1 : 0)} " +
                     $"progressWindowOpen={(_progressHost.IsWindowOpen ? 1 : 0)} " +
+                    // The CARD's strip, and only while the card owns the body. The window
+                    // reports the same two keys from its own DebugFacts, and DumpValue
+                    // takes the FIRST match in the file — so emitting both at once would
+                    // not be a conflict the suite could see. One owner of the body, one
+                    // owner of the keys that describe it.
+                    (_progressHost.IsInline
+                        ? $"progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
+                          $"progressTabs={_progressCard.TabCount} "
+                        : "") +
                     $"raidsDefeated={_raidLedger.DefeatedCount()} " +
                     $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
