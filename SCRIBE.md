@@ -21,7 +21,6 @@ Current state only. Delete a line when Helm lifts it. Re-read this before any pu
 - **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong on 1.99.0.
 - **#226** — Helm: community reply hold stays (do not reply). Re-check shipped-on-tag v1.99.1. Keep Innoruk leftover.
 - **#208** — Helm 6:19 PM CT Aug 21: do not open. Waiting, not a must.
-- **Public replies** — check in with Helm before posting. Do not edit already-posted comments.
 
 ### letter spacing under Wine/CrossOver
 - **Priority:** approved — David, 2026-08-22 (asked with the question tool): **review it AFTER
