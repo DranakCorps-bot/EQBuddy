@@ -73,6 +73,10 @@ internal static class WineFonts
         return false;
     }
 
+    /// <summary>The same probe, for anything that needs to REPORT where it is running
+    /// rather than change behaviour on it (TextProbeWindow).</summary>
+    public static bool IsRunningUnderWine() => IsWine();
+
     /// <summary>The canonical Wine check: ntdll exports wine_get_version under
     /// Wine and never on real Windows. No environment variables, no guessing.</summary>
     private static bool IsWine()

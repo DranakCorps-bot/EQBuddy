@@ -89,7 +89,11 @@ public partial class App : Application
         // instead of boxing — the whole story lives in WineFonts.cs.
         WineFonts.ApplyIfNeeded(Resources);
         Core.CoreLog.Sink = LogError;
-        if (!ClaimSingleInstance())
+        // The probe reads settings and never writes them, so it does not need the
+        // profile lock — and taking it would make the diagnostic impossible to run in
+        // the situation people actually run it in, with the widget already up.
+        var probing = TextProbeWindow.Requested(e.Args);
+        if (!probing && !ClaimSingleInstance())
         {
             Shutdown();
             return;
@@ -125,6 +129,16 @@ public partial class App : Application
             LogError(args.Exception);
             args.SetObserved();
         };
+        // Opt-in diagnostic, inert unless asked for: one window that says which font WPF
+        // resolved for each weight and how the same sentence renders under every text
+        // mode. It replaces the widget rather than joining it, so the picture is of the
+        // probe and nothing else. See TextProbeWindow.cs.
+        if (probing)
+        {
+            MainWindow = new TextProbeWindow();
+            MainWindow.Show();
+            return;
+        }
         MainWindow = new MainWindow();
         MainWindow.Show();
     }
