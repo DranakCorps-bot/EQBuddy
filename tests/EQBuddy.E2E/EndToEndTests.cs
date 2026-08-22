@@ -575,6 +575,60 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
+    /// WHO OWNS THE PROGRESS BODY — pinned here BEFORE Inline themes PR 1 turns the
+    /// launcher into an expander, which is the only order in which this assertion is
+    /// worth anything.
+    ///
+    /// Today the Progress launcher is a plain <c>Button</c>, so the theme can only ever
+    /// be Collapsed or in its Window and <c>progressInline</c> can only ever be 0. That
+    /// is exactly what makes it worth writing down: after the move the same key can be 1,
+    /// and the thing that must never happen — both at once — is the invariant
+    /// <c>ThemeHost</c> exists to hold. On Avalonia it is not a layout bug but a crash
+    /// (one control, one visual parent), so the rule is load-bearing on the build the WPF
+    /// suite cannot see.
+    ///
+    /// The WPF layer has no unit tests (docs/TestPlan.md §5), so a launched app reporting
+    /// its own state is the only cover the move can have.
+    /// </summary>
+    [Fact]
+    public void TheProgressThemeHasExactlyOneOwnerBeforeTheInlineMove()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "faction",
+        });
+        app.Launch();
+
+        app.WaitForWindow("progressWindowOpen", "the widget to report the theme's owner");
+        app.WaitForDump("progressWindowOpen", 1, "EQBUDDY_PROGRESS to put the body in the window");
+        // The launcher cannot expand yet. When PR 1 makes it able to, this assertion is
+        // what says the window still wins — a card that ALSO drew the body would leave
+        // the same surface in two hosts, which is trap 15 on WPF and an exception on the
+        // other widget.
+        Assert.Equal(0, app.DumpValue("progressInline"));
+        // The glance survives whichever way the body is owned (#219: a changed glance is
+        // a lost feature until proven otherwise).
+        Assert.Equal(1, app.DumpValue("progressCard"));
+        Assert.True(app.DumpValue("progressSummaryLen") > 0,
+            "the launcher should summarise the theme; dump was: " + app.Artifacts());
+    }
+
+    /// <summary>The other half of the pin: with nothing opened, NEITHER host owns the
+    /// body. Without this the test above is satisfied by a dump that reports 1 and 0 for
+    /// every launch, whatever the app is actually doing — the vacuous-guard shape trap 39
+    /// cost us a whole test file to.</summary>
+    [Fact]
+    public void TheProgressThemeStartsOwnedByNobody()
+    {
+        using var app = new AppHarness();
+        app.Launch();
+
+        app.WaitForWindow("progressWindowOpen", "the widget to report the theme's owner");
+        app.WaitForDump("progressWindowOpen", 0, "no Progress window on a plain launch");
+        Assert.Equal(0, app.DumpValue("progressInline"));
+    }
+
+    /// <summary>
     /// The Quest Tracker WINDOW, rebuilt for Gate 2 of the UI/UX rework
     /// (docs/DesignSystem.md): a column of self-contained cards became a LIST plus a
     /// DETAIL PANE.

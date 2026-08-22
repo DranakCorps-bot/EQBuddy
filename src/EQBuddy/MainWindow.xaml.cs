@@ -1949,15 +1949,34 @@ public partial class MainWindow : Window, ICardContext
 
     private ProgressWindow? _progressWindow;
 
+    /// <summary>Who owns the Progress body right now — the card, the window, or neither.
+    ///
+    /// Introduced while the launcher is still a plain Button that can only ever reach
+    /// <see cref="ThemePlacement.Window"/>, deliberately: Inline themes PR 1 turns that
+    /// button into an expander, and the E2E facts below have to be asserted against the
+    /// OLD behaviour first or they pin nothing. The state machine is the same one both
+    /// UIs will share (`UI.Shared/ThemeHost.cs`), so the move changes which inputs fire,
+    /// not what the truth is.</summary>
+    private readonly ThemeHost<ProgressTab> _progressHost = new(ProgressSurface.DefaultInlineTab);
+
     private void OnProgressWindow(object sender, RoutedEventArgs e) => ShowProgressWindow();
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
     internal void ShowProgressWindow(string? tab = null)
     {
+        // The host learns the room BEFORE the window is built, so a named open
+        // (EQBUDDY_PROGRESS=faction, the ⚙ menu) lands with the state machine already
+        // agreeing with the screen.
+        _progressHost.OpenWindow(ProgressSurface.TabForKey(tab));
         if (_progressWindow is not { IsLoaded: true })
         {
             _progressWindow = new ProgressWindow(this);
+            // Fable's PR 0 note, taken here rather than remembered: the WINDOW's own tab
+            // changes have to reach the host, or "closing the window hands the tab back
+            // to the card" is only true for a player who never switched tabs in it.
+            _progressWindow.TabChanged += t => _progressHost.SelectTab(t);
+            _progressWindow.Closed += (_, _) => _progressHost.WindowClosed();
             _progressWindow.Show();
         }
         if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
@@ -2683,6 +2702,18 @@ public partial class MainWindow : Window, ICardContext
                     // below, where the same E2E assertions read them.
                     $"progressCard={(ProgressSection.Visibility == Visibility.Visible ? 1 : 0)} " +
                     $"progressSummaryLen={ProgressHeader.Text.Length} " +
+                    // WHO OWNS THE PROGRESS BODY. Pinned here while the launcher is still
+                    // a plain Button, so Inline themes PR 1 has to keep them true rather
+                    // than define them: today progressInline can only ever be 0, and the
+                    // assertion that it IS 0 is what makes the 1 mean something later.
+                    //
+                    // The two are never both 1 — that is ThemeHost's one invariant, and
+                    // on Avalonia it is what keeps the app from throwing (one control,
+                    // one visual parent). progressTab/progressTabs stay the WINDOW's to
+                    // report while it is up: DumpValue takes the FIRST match in the file,
+                    // so two emitters of one key is not a conflict the suite can see.
+                    $"progressInline={(_progressHost.IsInline ? 1 : 0)} " +
+                    $"progressWindowOpen={(_progressHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={_raidLedger.DefeatedCount()} " +
                     $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +

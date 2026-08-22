@@ -217,6 +217,16 @@ public partial class ProgressWindow : Window
         }
     }
 
+    /// <summary>The room the player moved to IN THIS WINDOW.
+    ///
+    /// The widget's <c>ThemeHost</c> keeps the selected tab so the card and the window
+    /// hand it back and forth; without this event that hand-off is one-way, and "closing
+    /// the window hands the tab back to the card" would be true only for a player who
+    /// never touched the strip (Fable 5, Inline themes PR 0 review). <see cref="SetTab"/>
+    /// does NOT raise it — that call comes FROM the host, and echoing it back is a loop.
+    /// </summary>
+    public event Action<ProgressTab>? TabChanged;
+
     /// <summary>Build the strip from Core's <see cref="ProgressSurface"/> and UI.Shared's
     /// <see cref="ProgressTheme"/>, so this window, the Avalonia widget and EQBuddy Mobile
     /// cannot disagree about which tabs exist, their order, their names or their numbers —
@@ -232,6 +242,7 @@ public partial class ProgressWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                TabChanged?.Invoke(tab);
                 Refresh(force: true);
             });
         }
