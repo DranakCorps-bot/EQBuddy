@@ -19,7 +19,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ## Holds
 Current state only. Delete a line when Helm lifts it. Re-read this before any public reply.
 - **#228** — Helm: do not reply. Do not tell players motes are back. Default-off still-wrong on 1.99.0.
-- **#226** — Helm 6:19 PM CT Aug 21: do not open, do not reply on community.
+- **#226** — Helm: community reply hold stays (do not reply). Re-check shipped-on-tag v1.99.1. Keep Innoruk leftover.
 - **#208** — Helm 6:19 PM CT Aug 21: do not open. Waiting, not a must.
 - **Public replies** — check in with Helm before posting. Do not edit already-posted comments.
 
@@ -105,17 +105,17 @@ Current state only. Delete a line when Helm lifts it. Re-read this before any pu
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply. "Elemental Warrior" vs in-game/wiki "An Elemental Warrior" "sounds like the same class of bug that hit the wiki pack itself in #65 (Spiroc Lord, the resolver recording the requested title instead of the title actually served)." Hypothesis, unchecked -- the pack fix may have covered pack output, not the Drops window display; two code paths reading the same name. Do not restore #65.
 
 ### Drops by Creature still shows wiki-missing after the page was corrected
-- **Priority:** waiting. Helm hold Aug 21, 6:19 PM CT: do not open #226.1 or remaining #226. Not a must. No new sprint.
+- **Priority:** taken / shipped-on-tag. v1.99.1 (5f43f7e, ~9:31 PM CT Aug 21). Wiki re-check / age caption. Same ticket. Community reply hold stays (do not reply). Not a new heading.
 - **Place:** Drops by Creature wiki-missing marker. Desktop.
 - **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
 - **Ask:** reads should be dynamic or at least on open. Items that were missing as drops on the wiki, once corrected, still show as missing in Drops by Creature.
-- **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker.
+- **Already shipped:** wiki pack is a separate window; Drops by Creature has a missing marker. v1.99.1: per-page re-check and age caption. Tooltip now names the served page.
 - **Checked:** not grepped this run for the cache. Hypothesis, unchecked -- data source is a cached wiki snapshot, not a fetch when Drops by Creature opens.
 - **Follow-up Aug 21, 8:29 AM CT:** LeBigNasty screenshot (filename 092734). Did not reply (already filed; David/Claude share the bot account). Creature headings in yellow. Red diamond = wiki-missing. Named as already on wiki drop tables: Apothic Warband +4 (Fetid fiend -- 4 kills, x1 25%), Cryosilk Amice +4 (Spinechiller spider -- 2 kills, x1 50%), Imbrued Platemail Gauntlets +4 (Worry wraith -- 1 kill, x1 100%). Also red-diamond in the same shot: Fetid Skin, Fire Opal, Mote of Major Potential, Crystallized Sulfur. Eyerazzia +4 and Flayed Turmoilskin Belt +4 have no diamond. Reporter: "not sure if you are checking against cached versions or not accounting for +". Hypothesis, unchecked -- matcher compares the +N item name to a wiki row without the plus, or a cached wiki snapshot.
 - **VERIFIED Aug 21 (Claude):** the cache is real — `EqlWikiMobs.CacheLifetime` and `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`. Frankthetankk's "one root cause" reading is right and it is this. The `+N` half is ruled OUT: `WikiContribution.Classify` folds both sides through `QuestCatalog.BaseItemName`, which strips a trailing `+N`, and the 092734 screenshot has tiered items on both sides of the flag (Eyerazzia +4 unflagged, Fetid Skin flagged). **Still open — the fix is a per-page re-check**, on a flagged row and before the pack window exports. Not in 1.99.0.
 - **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply (Claude already answered Step 2). Missing flags not clearing after a wiki correction and the +tier false positives in the 092734 screenshot "might be one root cause rather than two separate bugs." Back in #65, "the comparison was confirmed to run against a 7-day per-page cache on the user's machine — so a wiki edit takes up to a week to reach the flags, immediate only for pages you haven't viewed recently." A per-page re-check button was queued then and he does not see it in the changelog. Hypothesis, unchecked -- data source is that 7-day per-page cache, not a live wiki read. Do not restore #65; this is evidence on this item.
 - **Follow-up Aug 21, 4:50 PM CT:** Claude confirmed the 7-day cache (`EqlWikiMobs.CacheLifetime` / `EqlWikiItems.CacheLifetime` are both `TimeSpan.FromDays(7)`). The +N half is not the cause: `QuestCatalog.BaseItemName` strips a trailing +N before matching; the 092734 shot has +4 items without a diamond and un-tiered items with one. Re-check button never built; not in 1.99.0. Did not reply. Do not restore #65.
-- **Follow-up Aug 21, 7:49 PM CT:** LeBigNasty on #226. Did not reply (old thread; Claude/Helm last before this). "I'll try to remember to check, but you should also check which pages. Innoruk, for example, is checking against the Lore page and not against the creature page." Helm hold stays: do not open. Still waiting, not a must. Do not restore #65. Hypothesis, unchecked -- for Innoruk the wiki-missing compare reads the Lore article, not the creature drop table. Named example only; do not treat as every page.
+- **Follow-up Aug 21, 7:49 PM CT:** LeBigNasty on #226. Did not reply (old thread; Claude/Helm last before this). "I'll try to remember to check, but you should also check which pages. Innoruk, for example, is checking against the Lore page and not against the creature page." Helm hold stays: do not open. Still waiting, not a must. Do not restore #65. Leftover after v1.99.1: Innoruk lore-vs-creature. Helm: keep if still leftover (tooltip now names the served page). Community reply hold stays. Hypothesis, unchecked -- for Innoruk the compare may still read the Lore article. Named example only.
 
 ### wiki pack copy copies the whole list, not one creature
 - **Priority:** waiting
@@ -190,7 +190,7 @@ Current state only. Delete a line when Helm lifts it. Re-read this before any pu
 - **Where it might live:** hypothesis -- WhatsNew.json is already a versioned list; the popup currently selects one entry. Data source is the versions between previous and current, not a new notes file.
 
 ### Sky instance timers, bee chain, and Spiroc DUE
-- **Priority:** waiting on ONE thing now -- the Bzzazzt/Bazzzazzt chip reading (elapsed vs countdown), pending from Frank. **TAKEN (Claude, 2026-08-22): the enter sequence.** `Player X creating instance The Plane of Sky NNNN.` is parsed and makes the next enter line an instance; inside a personal Sky instance no named starts a countdown. The triggered-spawn type shipped the same day (FABLE.md item, both PRs). Rides the held 1.99.1.
+- **Priority:** taken / shipped-on-tag. v1.99.1 (5f43f7e, ~9:31 PM CT Aug 21). Sky triggered + `creating instance` line. Same ticket. Leftover only: Bzzazzt/Bazzzazzt chip elapsed vs countdown, still pending from Frank. Do not reply. Not a new heading.
 - **Place:** spawn timers / catalog. Not Gate 5.
 - **Source:** #109 Frankthetankk Aug 19, 2:57 PM CT. Old thread — did not reply.
 - **Ask:** inside a Plane of Sky *instance*, do not show a countdown or DUE for named that are not on a respawn clock. Three shapes in one report: (1) instanced Sky bosses that are one-time per instance still get normal timers; (2) the bee chain Bzzazzt — Bzzzt — Bazzzazzt spawns immediately on the previous death, so the ~1:01 chips are kill-duration artifacts; (3) Spiroc Guardian / Lord are player-triggered (kill Spiroc trash), and DUE on the Guardian is the wrong word. Overworld Sky respawn is unmeasured — this ask is the instanced version only.
