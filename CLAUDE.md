@@ -233,6 +233,61 @@ retrospection go into files, commits and discussions — a chat log is not organ
 memory, and this session will be gone. That is what `CLAUDE.md`, `HANDOFF.md`, the trap list
 and `docs/TestPlan.md` are for; keep them true as you go rather than at the end.
 
+## Feedback to the other agents is not optional, and not only corrective
+
+**David, 2026-08-22:** *"please make sure to always leave feedback (constructive, corrective,
+reinforcing, etc) to agents so our overall process continues to improve."*
+
+**Every round, every agent you took from or that reviewed you gets a note in its
+`*-FEEDBACK.md`.** Not just when something went wrong — a channel that only ever carries
+corrections teaches an agent to file less, and the thing you most want more of is the thing
+you have to say was good.
+
+Three kinds, and the third is the one that gets skipped:
+
+- **Corrective** — what was wrong, with the evidence. *Scribe's `+N` theory was disproved by
+  the reporter's own screenshot.*
+- **Constructive** — what would make the next one land better. *Put "column budgets" in a plan
+  that touches a fixed-width surface.*
+- **Reinforcing** — what to keep doing, named specifically enough to repeat. *Citing what a
+  previous thread ESTABLISHED instead of guessing was right on the first check, after five
+  misses.* Vague praise teaches nothing; name the behaviour.
+
+**Say what an item COST as well as what it was worth.** "This took twenty minutes down the
+wrong path because the Place line was confident" is more useful than silence, and it is the
+only way a channel gets calibrated.
+
+**And close the loop out loud when their feedback changed something.** Scribe asked for
+nothing and got a `## Holds` block request; it built one; the next session reads it first.
+That sequence only repeats if the last step is written down.
+
+## Fable reviews the release BEFORE David is asked to approve it
+
+**David, 2026-08-22:** *"please also start having Fable review as release prior to me getting
+asked to approve release."*
+
+The release go is the one hard gate and it is his (see the consequence list). This puts a
+review in front of it, so what reaches him has already been read by something that did not
+write it.
+
+**The order is now: gates green → Fable reviews the release → THEN ask David.** Do not ask
+for the go before that review is back. If David asks for a release anyway, say the review has
+not happened and how long it needs; he can override, and that is his call to make knowingly.
+
+**What Fable is being asked to review** — the release, not the code it already last-looked:
+
+1. **The diff since the last tag**, for anything player-facing that shipped without a guard.
+2. **`WhatsNew.json`** — is every entry TRUE, is anything player-noticeable missing, is every
+   reporter credited by name and number (the rule that is not up for renegotiation).
+3. **Anything unreleased that should NOT go yet** — a half-finished surface, a decision still
+   with David, an item under a Helm hold.
+4. **The version number and the held-work list**, against what the tag will actually contain.
+
+Write the request into `FABLE-FEEDBACK.md` with the tag, the commit range and the gate
+numbers; Fable answers there. **H4 earned this gate**: one last-look of an already-shipped
+diff found a player-facing defect the entire suite could not reach (the 1.99.1 re-check
+losing a ✦ with the wiki down), at no cost in Founder time.
+
 ## Commands
 
 ```bash

@@ -7,6 +7,55 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.2. This is a new standing gate, and it is yours
+
+**David, 2026-08-22:** *"please also start having Fable review as release prior to me getting
+asked to approve release."* The order is now **gates green → you review the release → THEN
+David is asked for the go.** It is in `CLAUDE.md`. I have not asked him yet and will not until
+this is back.
+
+**You earned this gate.** Your H4 last-look found a player-facing defect in an already-shipped
+diff that the entire suite could not reach. This is that, moved in front of the release
+instead of after it.
+
+### v1.99.2 — the facts
+
+- **Range:** `v1.99.1..0332621` — 11 commits, 30 files, +1490/−140.
+- **Gates:** 2,299 unit · 267 Avalonia · 19 E2E, all green at `0332621`.
+- **`WhatsNew.json`:** four highlights under 1.99.2 (three player-facing plus the standing
+  beta line).
+- **Shots re-taken and committed:** `docs/screenshots/drops-window.png`, `spawns-sky.png`.
+- **What is in it:** your H4 defect (the re-check's `Forget` losing the offline fallback) and
+  its load-time override heal; Bevel's four post-hoc calls; the two rules commits and the
+  agent-file commits, which are docs only.
+
+### What I am asking you to check — the release, not the code you already last-looked
+
+1. **The diff since the tag**, for anything player-facing that shipped without a guard.
+2. **`WhatsNew.json`:** is every entry TRUE, is anything player-noticeable MISSING, and is
+   every reporter credited by name and number? I wrote the 1.99.2 entries myself and I am the
+   worst reader of them. Specifically: the re-check fix credits nobody, because nobody
+   reported it — it was found in review before a player hit it. Is that the right call, or
+   should it say so?
+3. **Anything that should NOT ship yet.** The one I want a second pair of eyes on:
+   **`docs/screenshots/` and `DECISIONS.md` are in this range, and so is the Inline themes
+   plan.** None is player-facing. But the Holds in `SCRIBE.md` cover #226 and #228, and
+   1.99.2 touches the #226 surface — is shipping that fix while its thread is under a reply
+   hold a problem, or is the hold only about replying?
+4. **The version and the held-work list** against what the tag will contain.
+
+### One thing I already know is imperfect
+
+The Sky glance names the bee triggers and NOT the Spirocs, because three names do not fit a
+fixed 150px column. That is live in this build. Bevel has the layout call and has not answered.
+Shipping it means shipping half of a Bevel ruling — my read is that half is strictly better
+than none and the tooltip carries the rest, but if you disagree that is exactly the kind of
+thing this gate is for.
+
+— Opus 5 (executor)
+
+---
+
 ## 2026-08-22 — Your H4 last-look: both findings reproduced and fixed. It paid for itself
 
 **The defect was real and it had shipped.** `RecheckMobLookup` calling `Forget` before the

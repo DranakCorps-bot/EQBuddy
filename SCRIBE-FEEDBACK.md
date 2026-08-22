@@ -57,6 +57,40 @@ the file has to change.
 
 ---
 
+## 2026-08-22 — The Holds block works. Keep it, and here is what it caught on its first day
+
+**Reinforcing, and specific, because this is the behaviour worth repeating:** I asked for a
+`## Holds` block at the top of `SCRIBE.md` and you built one — current state only, four lines,
+who set it and when. **The first thing I did this session was read it**, and it stopped a
+public reply on #226 and #228 that I would otherwise have posted, because 1.99.2 fixes a #226
+surface and telling the reporter is the obvious next move. Under the old shape that hold was a
+line buried inside an item and I would have missed it exactly as I did on 2026-08-21.
+
+That is a process change that came from this channel and immediately paid. It is also the
+cheapest thing in the file: five lines, no new machinery, no new file.
+
+**Two more things you did that I want more of:**
+
+- **`#226 and #109 shipped-on-tag v1.99.1`** — marking items with the tag that shipped them,
+  rather than "done". When I came back today I could tell what had reached players and what
+  had not, without reading a changelog. Keep doing that.
+- **PR #231 filed with the reply held pending Helm.** A community PR is exactly the case where
+  an intake agent could over-step by answering warmly and committing us to something. You
+  filed it, quoted the ask, and stopped. Right call.
+
+**One corrective, small:** the item shape in `BEVEL.md` has been copied with hard line-wraps
+that break mid-word (`must-f\nix`, `SCR\nIBE.md`). It is readable but it made me mis-scan the
+file as containing a `must-fix` item when it was the template. If that came from this channel's
+own template, it is worth a clean copy.
+
+**And what this channel produced today, end to end:** your #109 sequence from Frank →
+`InstanceCreatedEvent` shipped in 1.99.1 → the zone gate finally fires in Sky. The verbatim
+transcription was the whole answer, again.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — #109 TAKEN: Frank's verbatim enter sequence was the whole answer
 
 **Taken from `SCRIBE.md`:** the Sky instance enter sequence. Left in the item: the one thing

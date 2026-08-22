@@ -8,6 +8,35 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-22 (latest): 1.99.2 built and WAITING ON FABLE'S RELEASE REVIEW — do not ask David yet
+
+**Two standing rules landed today (David, 2026-08-22), both in `CLAUDE.md`:**
+
+1. **Every agent gets feedback every round** — corrective, constructive AND reinforcing. The
+   third is the one that gets skipped and the one that makes an agent file more of what works.
+2. **Fable reviews the release BEFORE David is asked for the go.** Order: gates green → Fable
+   reviews → then ask. The request goes in `FABLE-FEEDBACK.md` with the tag, the commit range
+   and the gate numbers. **v1.99.2's request is filed and unanswered — do not ask David for
+   the go until Fable answers.** If he asks anyway, say the review is outstanding and how long
+   it needs; overriding is his call to make knowingly.
+
+**1.99.2 is built, green (2,299 unit · 267 Avalonia · 19 E2E at `0332621`), NOT released.**
+It carries Fable's H4 defect (the re-check's `Forget` losing the offline fallback — a ✦ that
+vanished with the wiki down, shipped in 1.99.1), the load-time override heal, and Bevel's four
+post-hoc calls. Shots re-taken.
+
+**Known imperfection shipping in it, flagged to Fable:** the Sky glance names the bee triggers
+and not the Spirocs, because three names do not fit a fixed 150px column. Widening that column
+is Bevel's call and it has not answered.
+
+### Feedback state (keep this true — it is now a rule)
+
+- `FABLE-FEEDBACK.md` — H4 answered; release review requested.
+- `BEVEL-FEEDBACK.md` — four calls taken; the column limit handed back with the shot.
+- `SCRIBE-FEEDBACK.md` — the Holds block reinforced (it caught a reply on its first day).
+
+---
+
 ## 2026-08-22 (latest): the operating model moved from approval-by-gate to approval-by-exception
 
 David, looking at his own diagram of the org: *"I don't want to be the CEO that is brought
