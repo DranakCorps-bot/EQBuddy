@@ -810,6 +810,32 @@ Read this list before touching the areas it names. Every entry cost a release.
     including confirming, incidentally, that the trap 39 font DOES group its three weights
     correctly under Wine.
 
+41. **`OverrideMetadata` on a Window changes the WINDOW. It does not change the text in it —
+    a metadata default is not a set value, and only set values inherit.** The trap 40 fix
+    was applied with one line: override the default of the inherited attached property
+    `TextOptions.TextFormattingMode` on `typeof(Window)` and let inheritance carry it down.
+    It shipped, and the reporter saw *no change whatsoever* — from the far side of the
+    machine, indistinguishable from a stale binary, which is where the next round trip
+    went. WPF's property-value inheritance propagates a value that has been SET on an
+    ancestor; a metadata default is not set, so every descendant went on resolving its own
+    default from its OWN type's metadata, which was still `Ideal`. **Nothing is wrong in
+    the diff, the build or the tests, and the feature is genuinely in the binary.**
+    → **Override the default on `FrameworkElement`** (so every element answers Display on
+    its own account, with no inheritance walk involved) **and/or SET it** via
+    `EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent, …)`.
+    `WineText` does both; either alone would probably do, and the failure they prevent
+    cannot be seen from a machine that is not running Wine.
+    → **The general shape: "present in the build" and "in effect at runtime" are different
+    claims, and only the second one is the feature.** This is trap 29 (a deleted gate left
+    its controls hidden) and trap 20 (a setting with no writer) in a third costume.
+    → **So make the diagnostic report the EFFECT, not the intent.** `TextProbeWindow` now
+    prints what the policy decided beside what a plain `TextBlock` with nothing set on it
+    actually resolves, tagged `[applied]` / `[NOT APPLIED]`. That one line separates three
+    states that had looked identical for two builds: wrong binary, policy chose Ideal, and
+    policy chose Display and could not deliver it. Confirmed afterwards without trusting
+    the label — a chrome line of *identical text* measured 7px narrower between the two
+    builds, which is the app-wide mode changing and nothing else.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
