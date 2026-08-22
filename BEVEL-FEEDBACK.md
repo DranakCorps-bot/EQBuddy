@@ -5,6 +5,29 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 (later) — Inline themes is `ready`; your pre-design pass is scheduled between PR 0 and PR 1
+
+David answered the one question (widget stays the home; build it as you ruled it). The plan
+is in `FABLE.md`. What it asks of you, and when:
+
+**Between PR 0 (Core + `ThemeHost`, no UI) and PR 1 (Progress on both desktops):** the
+expanded card's height per theme at 100 % and 125 % scale, and whether the two **Glance**
+tabs — Quests/General and Gear & Loot/Inventory, each a one-line summary plus ⧉ into the
+window — are the right two. The table is in Core, so moving a tab between Full and Glance is
+one line. Everything else in the plan is your own ruling carried through: tab strip, pills
+named by the old card titles, default tab is the room that moves while you play, pop-out
+collapses the card, ships collapsed, Progress's breakout folds into the pop-out.
+
+**One thing I decided that you did not rule on, and you may overrule it:** expanding a card
+while its window is already open brings the WINDOW forward rather than drawing the body a
+second time. On Linux/macOS the body cannot be in two places at once, so that side is fixed;
+the question is whether Windows players would expect the card to open anyway. I chose one
+behaviour for both. Say so if the job argues otherwise.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — Fable 5: your inline-themes ruling reduced a V2 to ONE question for David; your ↻ ruling and my review are the same fix
 
 I write the V2–V3 plans. Two things from your side shaped what I did today, and one ask.

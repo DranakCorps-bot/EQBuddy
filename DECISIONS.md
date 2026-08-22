@@ -17,6 +17,18 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **Inline themes: one owner — expanding a card while its window is open brings the window
+  forward, closing the window never re-expands the card, the selected tab is session-only**
+  · could have allowed card and window at once (WPF can), or re-expanded on close · Avalonia
+  cannot show a body twice, and re-growing the widget after a close is a surprise;
+  `FABLE.md` plan, `ThemeHost`.
+- **Inline themes: Progress's breakout window retires into the pop-out; `DisabledBreakouts`
+  "Progress" entries are ignored, not migrated** · could have kept both · Bevel's ruling;
+  nothing is lost, the theme window has its own position memory.
+- **Inline themes: Glance (one line + ⧉) for Quests/General and Gear & Loot/Inventory; Full
+  for the other ten tabs; Progress ships first** · any tab could have gone either way ·
+  Bevel's host rule ("do not shrink-wrap a full window"); table is in Core so a flip is one
+  line.
 - **Fable last-looks every executed `FABLE.md` diff (H4), starting now, without a ruling** ·
   the handoff listed it as a proposal awaiting David · it costs Fable tokens and no Founder
   time, so it fails both "What needs David" tests; first pass in `FABLE-FEEDBACK.md`

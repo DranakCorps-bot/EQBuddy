@@ -44,8 +44,13 @@ One V1 defect for the next loop, shipped in 1.99.1 and reachable only offline: b
 `Offline` and the lit ✦ vanishes into "not checked". Fix is to drop `Forget` from that path
 (both UIs) and add the Core test that shows why. A second, lower-confidence note about a stale
 `Learned` value showing beside "triggered" until the next kill — verify before acting.
-`FABLE.md` now holds one item, **Inline themes**, at `needs-david:` on exactly one question
-(proposal Q5 — is the widget the right home at all); nothing else in it waits on him.
+`FABLE.md` now holds one item, **Inline themes**, and it is **`ready`**: David answered the
+one question (asked with the question tool, 2026-08-22) — build it as Bevel ruled, widget
+stays the home, windows stay for the second monitor. The plan is four PRs, one theme each,
+both UIs in every one; PR 0 is Core + `UI.Shared/ThemeHost` with no UI, and Bevel's
+pre-design pass sits between PR 0 and PR 1's screenshots. **Read item 2 of the plan before
+touching the Avalonia lane** — the two UIs own theme bodies differently, and the one-owner
+rule is what keeps Avalonia from throwing on a body with two parents.
 
 ---
 
