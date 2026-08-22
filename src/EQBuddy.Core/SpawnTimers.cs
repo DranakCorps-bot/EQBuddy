@@ -431,6 +431,11 @@ public sealed class SpawnTimers
         // cannot see. The your-own-kill gate still applies to both.
         var saidRare = _rareConsidered.Contains(Key(Server, zone.Zone, k.Target));
         if ((!k.ProperName && !saidRare) || k.Killer != "You") return;
+        // The #109 fence applies here too. It was checked at exactly one line — inside
+        // the catalog-entry loop — so a named the catalog does not list, killed inside an
+        // instanced raid zone, walked straight around it and was discovered and timed.
+        // Found by Fable 5 planning the Sky item (FABLE.md, 2026-08-21), not by a report.
+        if (_currentZoneInstanced && zone.RaidZone) return;
         if (_overrides.Find(zone.Zone, k.Target) is not null) return;   // already known here
 
         // A serial-named trash mob reads exactly like a named: "CWG Model XA" has no

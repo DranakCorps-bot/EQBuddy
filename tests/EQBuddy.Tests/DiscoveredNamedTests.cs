@@ -89,6 +89,34 @@ public class DiscoveredNamedTests
         Assert.Null(overrides.Find("The Hole", "Ghoul executioner"));
     }
 
+    /// <summary>Fable 5's finding while planning the Sky item (FABLE.md, 2026-08-21):
+    /// <c>_currentZoneInstanced</c> is consulted at exactly ONE line, inside the
+    /// catalog-entry loop — so the #109 fence ("kills inside an instanced raid zone
+    /// start no countdown") never applied to DISCOVERED named. A proper-named kill the
+    /// catalog does not list, inside an instanced raid zone, was discovered and timed:
+    /// the #185 path walked around the #109 gate. The existing instanced-raid test covers
+    /// a CATALOG entry missing from the dump, not this.</summary>
+    [Fact]
+    public void AProperNamedKillInsideAnInstancedRaidZoneDiscoversNothing()
+    {
+        var catalog = new SpawnCatalog
+        {
+            Zones = [new SpawnZone { Zone = "The Plane of Hate", RaidZone = true, NamedDefaultSeconds = 43200, Named = [] }],
+        };
+        var overrides = new SpawnOverrides();
+        var t = new SpawnTimers(catalog, overrides) { Server = "qeynos" };
+
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:00 2026] You have entered The Plane of Hate - Solo 2 (Adaptive).")!);
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:00:10 2026] You have slain Hand of the Maestro!")!);
+        Assert.Empty(t.Snapshot(DateTime.Parse("2026-08-17T19:00:11")));
+        Assert.Null(overrides.Find("The Plane of Hate", "Hand of the Maestro"));
+
+        // The open-world twin still discovers — the gate is about WHERE, not the mob.
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:05:00 2026] You have entered The Plane of Hate.")!);
+        t.Apply(LogParser.Parse("[Mon Aug 17 19:05:10 2026] You have slain Hand of the Maestro!")!);
+        Assert.Single(t.Snapshot(DateTime.Parse("2026-08-17T19:05:11")));
+    }
+
     [Fact]
     public void TheSecondKillMeasuresTheCycle()
     {

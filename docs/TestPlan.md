@@ -137,6 +137,7 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | With no class filter and no tab, a shared drop ticks ONCE and is flagged — never once per class | **Auto** — `SkyLootAutoCheckTests`, `EpicLootAutoCheckTests` |
 | A proper-named kill outside the catalog starts tracking; its SECOND kill measures the cycle | **Auto** — `DiscoveredNamedTests` |
 | Discovery never fires for articled trash, someone else's kill, or a catalogued family's siblings | **Auto** — `DiscoveredNamedTests`, `NamedMobHeuristicTests` |
+| **Discovery honours the #109 instanced-raid-zone gate** — the gate was checked only inside the catalog loop, so a named the catalog did not list was discovered and timed inside a raid instance (found by Fable 5 planning, 2026-08-21) | **Auto** — `DiscoveredNamedTests` |
 | **The game's "- a rare creature -" consider marker opens discovery to articled named mobs** — parsed off the line (it used to be swallowed into the NAME, silently missing the sighting), remembered per session, and your kill then discovers it; without the marker, articled kills still never discover | **Auto** — `LogParserTests`, `DiscoveredNamedTests` |
 | The named/trash verdict is taken from the RAW name at parse time, before `Normalize` strips the article | **Auto** — `NamedMobHeuristicTests` |
 | Sky groups by REWARD (not by turn-in NPC), with ready/in-progress/done and a per-reward count | **Auto** — `QuestChecklistLayoutTests` |
