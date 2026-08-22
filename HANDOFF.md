@@ -24,7 +24,57 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (LATEST — start here): 1.99.4 SHIPPED. Two things wait on Helm, one is ready to build
+## 2026-08-22 (LATEST — start here): 1.99.5 SHIPPED. Two builds ready, two waits on Helm
+
+**v1.99.5 is released** — Latest, four assets, signed `Valid` + timestamped, OneDrive 18:54,
+installed locally. Gates at tag: **2,365 unit · 271 Avalonia · 24 E2E.** Both gates ran first
+(Fable reviewed with one pre-tag fix, made; Bevel's polish in, no hold).
+
+**It carries the pet spawn-timer fix David reported from his own list**, the Innoruk lore-page
+fix, motes excluded from wiki suggestions, and the empty Skill-ups heading.
+
+### The finding worth carrying forward
+
+**Fable caught my profile purge deleting the player's OWN entries** — it matched on the name
+alone, so a hand-added `Custom` entry and any TYPED duration for a "… pet" name went with the
+discovered ones, under a What's-new line promising to clear what was *learned*. No crash, no
+failing test. `SpawnOverride.Discovered` exists precisely so *"a discovery can be discarded
+without touching the player's own additions"* and I ignored the field. **When you write a
+cleanup, the predicate must see WHO put the data there.**
+
+### READY TO BUILD — nothing blocking either
+
+1. **The `/consider` wiki half** (David unparked it, wiki half only). The pack offers a
+   `description` line when the game itself called a creature rare in the player's own consider.
+   Destination confirmed by the reporter with the wiki admins (#217). Constraints are written
+   into the `SCRIBE.md` item: never a paste-over of an editor's prose, never inferred from kill
+   counts, never carried across characters. **First thing built under the new eqlwiki rule.**
+2. **Fable PR A — the Avalonia `IWidgetCard` seam.** Unblocks inline-themes parity and frees
+   the 250–350 lines PR 2/3 need on that lane. The three `Closed` lines from v1.99.4 die with it.
+
+### WAITING ON HELM — David is the courier
+
+- **#228's follow-up reply.** David ruled star-only IS enough, which is the second lifting route
+  Helm's own hold names — so the CONDITION is met but the LIFT is still Helm's. Recorded in
+  `HELM-FEEDBACK.md`. **Nothing posted.**
+- **#226's draft** — Helm signed Scribe posting the thank-you; not ours to write.
+
+### Also open
+
+**#109** waits on Frank (bee names + whether `Bazzzazzt` respawns; **do not tell him the
+triggered work shipped** — David's call). **#65** is the only unheld thread still owed a reply.
+**`DeadHelperTests`** is agreed with Fable and deliberately deferred — a scan whose value is a
+curated `Known` list with a reason per entry, which is a sitting-down job.
+
+### New standing rule, read it before designing anything data-shaped
+
+**eqlwiki is the SOURCE and EQBuddy is the tool that updates it** (David, 2026-08-22). In
+`CLAUDE.md` beside the wiki rules and in `ROADMAP.md`'s Place guidance. The contribution pack is
+the ANSWER SHAPE for asks about shared game truth, not a feature.
+
+---
+
+## 2026-08-22: 1.99.4 SHIPPED (historical)
 
 **v1.99.4 is released** — tag pushed, GitHub release **Latest** with all four assets,
 `EQBuddySetup.exe` `Valid` and timestamped, OneDrive at 11:35. Both gates ran first: Fable's
