@@ -273,6 +273,14 @@ public sealed partial class SessionStats
         /// <summary>Level bounds from /consider lines (#65: the wiki pack's level
         /// field). 0 min = never conned; each distinct conned level widens the range.</summary>
         public int LevelMin, LevelMax;
+        /// <summary>How many times this creature was /conned, and how many of those the
+        /// GAME ITSELF called "a rare creature" (#217 ask 3, Frankthetankk). Both numbers,
+        /// never just the rare one: same-named spawns are not all rare, so 2-of-7 and
+        /// 7-of-7 are different facts and the editor pasting onto the wiki gets to see
+        /// which one they have. Session-scoped like every other MobAgg field, which is
+        /// what makes "never carried across characters" true by construction rather than
+        /// by a rule someone has to remember.</summary>
+        public int Considers, RareConsiders;
     }
     private static readonly TimeSpan EncounterTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan RewardWindow = TimeSpan.FromSeconds(3);
@@ -842,9 +850,16 @@ public sealed partial class SessionStats
                     _lastConsider = (con.Name, con.Time);
                     // And the con LINE names a level — the one place the log ever does.
                     // Bounds, not last-seen: same-named spawns roam a range (#65).
+                    var conAgg = Mob(con.Name);
+                    conAgg.Considers++;
+                    // The game's own rarity word, counted rather than latched. SpawnTimers
+                    // keeps its own set of these and that is NOT a second source for one
+                    // fact (trap 4): it keys on server|zone|name to decide whether a name
+                    // is worth DISCOVERING as a spawn, and this counts cons per creature
+                    // for what the wiki should be told. Same event, two questions.
+                    if (con.Rare) conAgg.RareConsiders++;
                     if (con.Level > 0)
                     {
-                        var conAgg = Mob(con.Name);
                         conAgg.LevelMin = conAgg.LevelMin == 0
                             ? con.Level : Math.Min(conAgg.LevelMin, con.Level);
                         conAgg.LevelMax = Math.Max(conAgg.LevelMax, con.Level);
@@ -1915,6 +1930,8 @@ public sealed partial class SessionStats
                             .ToList(),
                         LevelMin = kv.Value.LevelMin,
                         LevelMax = kv.Value.LevelMax,
+                        Considers = kv.Value.Considers,
+                        RareConsiders = kv.Value.RareConsiders,
                     })
                     .ToList(),
                 AreaSpells = BuildAreaSpells(),

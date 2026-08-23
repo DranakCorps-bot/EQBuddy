@@ -278,7 +278,17 @@ stops two voices on one account, and it is the half that worked.
 - **Where it might live:** hypothesis — a roll-up over stored Session History rows, not new collection.
 
 ### /consider rarity word (wiki + spawn timers)
-- **Priority:** UNPARKED 2026-08-22, WIKI HALF ONLY (David, asked with the question tool). Build the pack side: when the game itself called the creature rare in the player's own `/consider`, the pack offers a `description` line saying so — never a paste-over of an editor's existing prose, never inferred from kill counts, and never carried across characters. Destination confirmed by the reporter with the wiki admins (#217): description-field stopgap matching existing hand-edited precedent, moving to a real template parameter when one lands. **The spawn-chip half stays PARKED.** (was: David parked /consider this morning. Verbatim lines are in; not approved to ship.)
+- **Priority:** **BUILT 2026-08-22 (Claude), wiki half — staged in 1.99.6, unreleased.** The
+  con-rarity fact is lifted out of `SpawnTimers` into `MobSummary.Considers`/`RareConsiders`,
+  and the pack offers Frank's own wording on the creature's page: in the `description` field
+  of a new-page skeleton, and as an ADD-never-replace block on a page that exists. All three
+  constraints are tests (`RareSpawnContributionTests`): no paste-over, never inferred from
+  kills, never across characters (true by construction — it lives on the session aggregate).
+  Both numbers always printed ("2 of your 7 /considers"). **The spawn-chip half stays PARKED.**
+  **Open, and asked of Bevel:** a creature conned rare whose loot the wiki already has earns
+  no pack section today, so the fact is dropped for exactly the creature most likely to be a
+  known named. That is a new row kind on a pack surface = product, not mine.
+  (was: UNPARKED 2026-08-22, WIKI HALF ONLY (David, asked with the question tool).) Build the pack side: when the game itself called the creature rare in the player's own `/consider`, the pack offers a `description` line saying so — never a paste-over of an editor's existing prose, never inferred from kill counts, and never carried across characters. Destination confirmed by the reporter with the wiki admins (#217): description-field stopgap matching existing hand-edited precedent, moving to a real template parameter when one lands. **The spawn-chip half stays PARKED.** (was: David parked /consider this morning. Verbatim lines are in; not approved to ship.)
 - **Place:** log parse. Serves wiki confirmed-rare and #185 named-vs-townsfolk spawn chips. Not Gate 5 UI.
 - **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n; **verbatim lines #185 bjstrange Aug 19, 11:58 AM CT.** Did not reply — old thread, Claude already asked for the line.
 - **Ask:** use /consider text `a rare creature` as a confirmed rarity flag (wiki `rare=true`; spawn chips only for con-confirmed rares).

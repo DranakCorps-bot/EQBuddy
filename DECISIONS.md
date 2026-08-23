@@ -17,6 +17,21 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **The rare-`/consider` fact needs ONE con, not the pack's ten-kill bar** · reuse
+  `SuggestRarity`'s threshold for consistency · the evidence is categorically different: the
+  game printed the word, so there is no sample to be thin, and a bar would be statistics
+  applied to something that was never a measurement. `WikiContribution.RareSpawnNote`.
+- **Both con numbers are always printed ("2 of your 7 /considers"), never just "rare"** ·
+  print the fact alone · same-named spawns are not all rare, and the person pasting onto
+  someone else's wiki is the one who should weigh a 2-of-7.
+- **The rare fact is said ONCE, in the contribution block, and NOT in the observed stat
+  block** · repeat it there, where the other /consider-derived facts live · the stat block is
+  kill-gated and heads itself "thin sample, for your notes rather than the wiki yet" — which
+  would put a paste-it instruction and a don't-paste-it-yet caveat on one fact three lines
+  apart. Found by reading the real paste block, not from the diff.
+- **A rare-conned creature whose loot the wiki already has still earns NO pack section** ·
+  give it one · that needs a new `RowKind` on the pack surface, which is a product decision
+  about what the surface shows. Asked of Bevel in `BEVEL-FEEDBACK.md` rather than decided.
 - **v1.99.6 review: the report's Sky half living on the Raids surface is a Bevel follow-up,
   not a pre-tag block; the three-sentence line ships as written** · hold the tag for a second
   host on the Quest Tracker's Sky tab, or shorten the line to a tooltip now · the rule "the

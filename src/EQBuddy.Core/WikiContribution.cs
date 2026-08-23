@@ -108,6 +108,43 @@ public static class WikiContribution
             .Replace("%28", "(").Replace("%29", ")").Replace("%27", "'")
         + "&action=edit";
 
+    /// <summary>The wording the reporter cleared with the wiki admins, verbatim
+    /// (Frankthetankk, #217 ask 3, 2026-08-22). Not ours to improve: it goes onto someone
+    /// else's wiki under the player's own account, and the phrasing is the half he took to
+    /// the admins.</summary>
+    public const string RareSpawnDescription =
+        "Confirmed as a rare spawn via in-game /consider";
+
+    /// <summary>
+    /// The rare-spawn line for a creature the GAME ITSELF called "a rare creature" in the
+    /// player's own <c>/consider</c> (#217 ask 3). <c>null</c> when no con said so — an
+    /// absence is never claimed, because "I conned it four times and it never said rare"
+    /// and "I never conned it" are different facts and only one of them is evidence.
+    ///
+    /// **This is not <see cref="SuggestRarity"/> and must never be confused with it.** That
+    /// one is about an ITEM's drop rate and refuses to speak under ten kills, because a
+    /// percentage from a thin sample is a guess. This is about the CREATURE, and its
+    /// evidence is not statistical at all: the game printed the word. One con is proof, and
+    /// a ten-con bar would be arithmetic applied to something that is not a measurement.
+    /// A trash mob can drop an ultra-rare item and a rare spawn can drop its piece every
+    /// time — two axes, and wiring one into the other would suggest a label the observation
+    /// cannot support.
+    ///
+    /// Both numbers are always printed. Same-named spawns are not all rare, so 2-of-7 is a
+    /// materially different claim from 7-of-7 and the person pasting it decides.
+    /// </summary>
+    public static string? RareSpawnNote(MobSummary mob)
+    {
+        if (mob.RareConsiders <= 0) return null;
+        var all = mob.RareConsiders >= mob.Considers;
+        var cons = $"/consider{(mob.Considers == 1 ? "" : "s")}";
+        return all
+            ? $"the game called this \"a rare creature\" on "
+              + (mob.Considers == 1 ? $"your one {cons}" : $"all {mob.Considers} of your {cons}")
+            : $"the game called this \"a rare creature\" on {mob.RareConsiders} of your "
+              + $"{mob.Considers} {cons}";
+    }
+
     /// <summary>One creature's worth of input: the session summary plus whatever the
     /// Target-Drops lookup already knows about its wiki page (null = never looked up).</summary>
     public readonly record struct MobObservation(MobSummary Mob, MobLookupResult? Lookup);
@@ -222,6 +259,9 @@ public static class WikiContribution
                 sb.AppendLine(PageSkeleton(mob, news.Select(n => n.Loot), killZone));
                 break;
         }
+        // Only for a page that already exists — the new-page skeleton carries the line in
+        // its own description field, where there is nothing to overwrite.
+        if (status != WikiDropStatus.PageMissing) WriteRareSpawn(sb, mob);
         sb.AppendLine();
         // Summary-field-sized summary (#65 round four, Frankthetankk: the itemized
         // list was "much longer than what a summary field is meant to hold") — the
@@ -234,7 +274,12 @@ public static class WikiContribution
         // helped them read their log. Anyone who wants to credit EQBuddy can still say so;
         // the point is that it is their choice to make, in their own words.
         sb.AppendLine("Suggested edit summary: observed drops " +
-            $"({news.Count} item{(news.Count == 1 ? "" : "s")}, {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")}).");
+            $"({news.Count} item{(news.Count == 1 ? "" : "s")}, {mob.Kills} kill{(mob.Kills == 1 ? "" : "s")})"
+            // The summary has to describe the whole edit. Offering a description line and
+            // then a summary that mentions only loot leaves the player to notice the gap,
+            // and the half they would forget to mention is the one an editor is likeliest
+            // to question.
+            + (RareSpawnNote(mob) is null ? "." : "; rare spawn confirmed via /consider."));
         sb.AppendLine();
         // Full itemization + last-seen LOG TIMES WITH DATES (a session can span
         // midnight): one date header when they all share a day, per-item otherwise.
@@ -266,6 +311,40 @@ public static class WikiContribution
         WriteStatBlock(sb, mob, killZone);
     }
 
+    /// <summary>
+    /// The rare-spawn contribution, for a page that already exists (#217 ask 3,
+    /// Frankthetankk). Three constraints, all of them his or David's, and each one is the
+    /// reason a line here is worded the way it is:
+    ///
+    /// <list type="bullet">
+    /// <item><b>Never a paste-over of an editor's prose.</b> <c>EqlWikiMobs.Parse</c> does
+    /// not read <c>description</c>, so EQBuddy cannot know whether the page already says
+    /// this — which means the only honest instruction is ADD, never replace. A "replace the
+    /// field with" block would be a tool telling a player to delete a stranger's writing
+    /// sight unseen.</item>
+    /// <item><b>Never inferred from kill counts.</b> The evidence is the game's own word in
+    /// the player's own log, and nothing else feeds it.</item>
+    /// <item><b>A stopgap, and it says so.</b> <c>{{Namedmobpage}}</c> has no rare-spawn
+    /// field; the reporter took the question to the wiki admins, who were positive about a
+    /// real template parameter but have not landed one. The interim home is
+    /// <c>description</c>, matching hand-edited precedent (Packmaster Dledsh's page already
+    /// reads "Rare NPC" there). Saying that in the pack is what stops this becoming folklore
+    /// once the parameter arrives.</item>
+    /// </list>
+    /// </summary>
+    private static void WriteRareSpawn(StringBuilder sb, MobSummary mob)
+    {
+        if (RareSpawnNote(mob) is not { } note) return;
+        sb.AppendLine();
+        sb.AppendLine($"Also observed — {note}.");
+        sb.AppendLine("{{Namedmobpage}} has no rare-spawn field yet. The wiki's own stopgap is the");
+        sb.AppendLine("description (Packmaster Dledsh's page already reads \"Rare NPC\" there by hand),");
+        sb.AppendLine("confirmed with the wiki admins on #217. ADD this to the description field —");
+        sb.AppendLine("never replace what is already written there:");
+        sb.AppendLine();
+        sb.AppendLine("  " + RareSpawnDescription);
+    }
+
     /// <summary>The observed stat block (#65, Frankthetankk's field list): zone at
     /// kill time, per-kill money as the wiki's own low–high-per-coin format, and
     /// faction hits — with a confirmed absence reported too, because "no faction
@@ -280,6 +359,13 @@ public static class WikiContribution
             + (thin ? " — thin sample, for your notes rather than the wiki yet):" : ") — compare, don't overwrite:"));
         if (killZone.Length > 0)
             sb.AppendLine($"  zone (at kill time): {killZone}");
+        // The rare-spawn fact deliberately does NOT appear here, and it is worth saying why
+        // rather than leaving its absence to look like an oversight. This block is gated on
+        // the kill count and headed "thin sample, for your notes rather than the wiki yet"
+        // below ten kills — true of money, faction and level bounds, which are all sampled.
+        // The con-rarity fact is not a sample: the game printed the word. Printing it here
+        // would put a paste-it instruction and a don't-paste-it-yet caveat on one fact, in
+        // one section, three lines apart. It lives in the contribution block above instead.
         if (mob.LevelMin > 0)
             sb.AppendLine("  level (from /consider): " + (mob.LevelMin == mob.LevelMax
                 ? $"{mob.LevelMin} (every /con this session agreed — more cons on other spawns could still widen it)"
@@ -339,7 +425,11 @@ public static class WikiContribution
         sb.AppendLine("| location      = ");
         sb.AppendLine("| respawn_time  = ");
         sb.AppendLine();
-        sb.AppendLine("| description = ");
+        // A NEW page has no editor's prose to overwrite, so the line can simply be in the
+        // field. On an existing page it is offered as an addition instead — see
+        // WriteRareSpawn.
+        sb.AppendLine("| description = "
+            + (RareSpawnNote(mob) is null ? "" : RareSpawnDescription));
         sb.AppendLine();
         sb.AppendLine(KnownLootBlock(loot, mob.Kills));
         sb.AppendLine();

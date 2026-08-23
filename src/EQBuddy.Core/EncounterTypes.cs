@@ -149,6 +149,12 @@ public sealed record MobSummary(
     /// Sessions archived before this existed deserialize as unknown, same as above.</summary>
     public int LevelMin { get; init; }
     public int LevelMax { get; init; }
+    /// <summary>/consider count, and how many of those the GAME called "a rare creature"
+    /// (#217 ask 3). 0 = never conned this session, which is not the same as "not rare" —
+    /// the pack says nothing at all rather than implying an absence it never observed.
+    /// Sessions archived before this existed deserialize as 0, same as the level bounds.</summary>
+    public int Considers { get; init; }
+    public int RareConsiders { get; init; }
 }
 
 /// <summary>Combat time and damage while a stance was active (STANCE-*).</summary>

@@ -5,6 +5,60 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-22 evening — THREE ASKS, all post-hoc, none blocking a tag
+
+Two are Fable's, routed here because it said plainly they are yours rather than its. One is
+mine, and it is the one I most want an answer to.
+
+### 1. MINE — does a rare `/consider` earn a pack row of its own? (#217 ask 3)
+
+**Built and staged in 1.99.6:** when the game itself prints "a rare creature" in the player's
+own `/consider`, the wiki pack offers a line for the creature's page — the reporter's wording,
+cleared by him with the wiki admins, into the `description` field as a stopgap until the
+template gets a real parameter.
+
+**The hole I left, deliberately, because closing it is a design decision and not mine:** the
+pack only emits a section for a creature with **new loot**. So a rare-conned named whose drops
+the wiki already knows produces **nothing at all** — and that is precisely the creature most
+likely to be a documented named with an undocumented rarity. The fact is dropped for the case
+it is most useful in.
+
+Closing it means a **new row kind** on the pack surface: a contribution that is not loot,
+counted in the headline, coloured, tooltipped, and present in the empty state's arithmetic.
+`RowKind` is `{ PageMissing, PageHasNoLoot, NewToPage, NotACreaturePage, Pending }` and every
+one of those is about loot. **What I am NOT asking is "should we do it" in the abstract** —
+it is whether the pack surface is the place a player would look for it, or whether a creature
+with nothing to add to `known_loot` belongs somewhere else entirely.
+
+### 2. FABLE'S — the achievements report's Sky half is read on a raid-clear surface
+
+The auto-import report now lives on the Raids surface, by the rule that a report belongs where
+the command is asked for. Fable agreed that is a rule applied rather than a design invented,
+and then found the follow-up: **the dump feeds TWO consumers and the report sits on one.**
+"1 Sky reward marked · 2 rewards were skipped — the class unlock…" is about the Quest
+Tracker's checklist, being read above a list of raid bosses. Whether the Sky tab should carry
+the same `ImportReportView` — same class, one more host, one more line — is a can-the-player-
+still-do-the-job question. Fable's words, and it explicitly said ship without it.
+
+### 3. FABLE'S — three sentences, or a short line with a tooltip?
+
+`docs/screenshots/raids-import.png` is the shot. At Progress-window width it wraps to three
+lines; on the 338 px widget Fable estimates five. Its read: do not cut a clause, because each
+names something a player would otherwise mistake for a broken import — but sentences two and
+three are candidates for a tooltip behind "2 skipped, 1 unrecognised — hover for why". Same
+shape as the 1.99.1 caption call, which was yours.
+
+### One thing worth saying about how the last two arrived
+
+**Fable routed both to you rather than ruling on them, and named why each was yours.** That is
+the boundary working in the direction that is hardest to hold — the reviewer with the whole
+system in view declining to make a product call it could easily have made. Worth knowing that
+is what happened, since from here you only see the ask.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 evening — your tooltip polish was ALREADY SHIPPED when the item was written
 
 **Reinforcing first, because the finding was right:** "when the heading is the door into the
