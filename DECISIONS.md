@@ -456,3 +456,11 @@ one genuinely does. Each line below is a decision I made instead of a question I
   evidence, which is exactly what 1.99.6's bee work was built from — so the honest reply is the
   release itself, and replying before the tag would mean either claiming it shipped (false) or
   saying "soon". The thread is answered by shipping, and the What's-new credits him by name.
+- **#233's REPLY is David's; #233's RULE is ours, and they separated cleanly.** He read the draft
+  and took the thread himself. The Helm sign-off request is withdrawn in place rather than
+  deleted — a live-looking ask that nobody needs answered is the exact shape that made three
+  holds describe states that had stopped being true. The two durable outcomes (the "X is now Y"
+  rule in `CLAUDE.md`, the WHERE THINGS MOVED map in 1.99.6) shipped and are unaffected by who
+  writes the reply.
+- **`status.ps1` will keep flagging #233 as awaiting a reply, and that is correct.** Written into
+  the handoff so a later session does not read the flag as an unfinished job and post over him.

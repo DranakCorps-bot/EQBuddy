@@ -38,9 +38,16 @@
 > about any claim on release state. They are about the claim. He corrected me; the checks took
 > nine seconds.
 >
-> **Still open: the #233 reply.** Drafted in `HELM-FEEDBACK.md`, revised to say the map is out
-> NOW rather than in the next release. David asked to see it before it moves and has it; it has
-> not been posted and has not been signed off by Helm.
+> **#233 IS DAVID'S — do not post on it.** He read the draft and took the thread himself
+> (2026-08-23, asked with the question tool). Nothing was posted under the bot account and
+> nothing should be. The draft stays in `HELM-FEEDBACK.md` marked WITHDRAWN, as the record of
+> what we were prepared to say — **it is not a pending action**, and the Helm sign-off request
+> attached to it is retracted. If `status.ps1` flags #233 as awaiting a reply, that is expected:
+> the last comment is the reporter's because we are deliberately not the ones answering.
+>
+> **What #233 changed is already shipped and is the durable part**: the "X is now Y" rule in
+> `CLAUDE.md` and the WHERE THINGS MOVED map in 1.99.6's What's-new. Those bind regardless of
+> who replies to the thread.
 
 > **2026-08-23 (night, later), Fable 5 — v1.99.6 CLEARED: `v1.99.5..3a13097`, no condition.**
 > Wire-key fix verified (guards run here, 2,474 unit green on HEAD), shot matches its

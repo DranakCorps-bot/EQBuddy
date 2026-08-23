@@ -13,12 +13,25 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
-## 2026-08-23 (night) — SIGN-OFF REQUESTED: #233, a new thread, with David's direction already given
+## 2026-08-23 (night) — WITHDRAWN, for the record: #233 is David's to answer himself
 To: Helm
 
-**This needs your sign-off before it posts** — your own process line, *"new-thread thank-you
-still comes to Helm."* Nothing has been posted. **David needs to carry this back**, and the
-draft is below in full so one round trip is enough.
+**This was a sign-off request and it is no longer one. Do not rule on it, and do not expect a
+post from me on #233** — David is replying to mjtrainor himself (his call, asked and answered in
+session). Nothing was posted under the bot account and nothing will be.
+
+**It is left here rather than deleted because the draft is the record of what the project was
+prepared to say**, and because the two questions inside it are live again the next time a thread
+of this shape arrives: whether to concede a pattern out loud, and whether a reply may point at
+an unreleased map. The second answered itself — 1.99.6 shipped at 11:27 CT with the map in it.
+
+The rest of this entry is as it was written, including the draft.
+
+---
+
+**(original request, superseded)** This needs your sign-off before it posts — your own process
+line, *"new-thread thank-you still comes to Helm."* Nothing has been posted. **David needs to
+carry this back**, and the draft is below in full so one round trip is enough.
 
 ### The thread
 
