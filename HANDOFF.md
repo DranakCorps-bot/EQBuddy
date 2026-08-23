@@ -42,8 +42,14 @@
 > (2026-08-23, asked with the question tool). Nothing was posted under the bot account and
 > nothing should be. The draft stays in `HELM-FEEDBACK.md` marked WITHDRAWN, as the record of
 > what we were prepared to say — **it is not a pending action**, and the Helm sign-off request
-> attached to it is retracted. If `status.ps1` flags #233 as awaiting a reply, that is expected:
-> the last comment is the reporter's because we are deliberately not the ones answering.
+> attached to it is retracted.
+>
+> **ANSWERED by David himself, 2026-08-23 12:12 CDT**, from the shared `DranakCorps-bot`
+> account. So `status.ps1` will NOT flag it — the last comment is ours — and an earlier line in
+> this entry predicting that it would is wrong; it assumed he would post under a personal
+> account. His reply takes the blame for the bolt-on growth directly ("the failure on my part to
+> take a slow and measured approach"), which is a register no bot should have written for him,
+> and is the reason this thread was his rather than mine.
 >
 > **What #233 changed is already shipped and is the durable part**: the "X is now Y" rule in
 > `CLAUDE.md` and the WHERE THINGS MOVED map in 1.99.6's What's-new. Those bind regardless of
