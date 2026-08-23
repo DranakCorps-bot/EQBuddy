@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### In Progress: next-level spells/abilities by class
+
+- **Kind:** David-approved feature
+- **Signed:** Helm, 2026-08-23 7:21 AM CT
+- **Source:** David in Helm chat, 2026-08-23 ~7:20 AM CT
+- **Ask:** On In Progress, show the spells and abilities the character gets at the **next level**.
+- **How:** Use the classes already inferred for the character being played. Derive the list from those classes' EQL Wiki class pages (consume wiki; do not invent a homemade spell table).
+- **Example David gave:** he is a level 33 Druid and does not know what spells he gets at 34. In Progress should answer that.
+- **UX (David):** group the next-level list **by class**. Each class group expands/collapses so he can hide classes he does not want to see.
+- **Not:** a public-reply item. Not a hold. Wiki-first does not block this — this consumes class pages, it does not invent shared game truth.
+- **Related if present:** Bevel's unruled "Mobile Progress New at level" is the same neighborhood if that line exists; this is the Founder ask and is authorized to build. Do not wait on a Bevel lock.
+
 ### group Sky quest steps by island
 - **Priority:** **BUILT 2026-08-23 (Claude), staged in 1.99.6.** Your hypothesis was right that
   steps are a flat list — and the useful correction is that the island DATA was already there,
