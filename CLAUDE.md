@@ -466,6 +466,17 @@ a guess, and the guess is discovered three commits later.
 - **"Not blocking yet" is not a reason to withhold a question**, only a reason to choose the
   moment. If the answer is his and you already know you will need it, the tool costs him one
   click and costs you nothing; a paragraph asking the same thing costs him a careful read.
+- **THE PATTERN THAT KEEPS DOING IT IS THE CLOSING PARAGRAPH.** Not a question mark buried
+  mid-message — a tidy sign-off listing what he could pick up: *"two things sitting for you
+  whenever you want them"*, *"neither urgent"*, *"whenever you want"*. It reads as a status
+  summary while you write it and it is a menu he has to answer in prose. David said it a THIRD
+  time on 2026-08-23 (*"I'm getting a bit tired of saying that. Please don't bury asks of me in
+  text"*) — after the same instruction on 08-20 and again earlier the same day. **Three
+  statements of one rule means the rule was never the gap; the closing paragraph is.**
+  → **Before sending, re-read your last paragraph.** If it names something he might do, might
+  want, might review, or might decide — that is the question, and it goes in the tool instead.
+  A message that ends with "nothing is pending you" and then lists two things is a message that
+  ends with two things pending him.
 - This does not mean ask more often. It means the ones worth asking are unmissable, and
   everything else is a call you make yourself and report — in `DECISIONS.md`, per
   [what needs David](#what-needs-david-and-what-does-not). **Before using the question tool,
