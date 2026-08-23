@@ -10,7 +10,7 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 ## 2026-08-23 (night) — the wire-key fix and both V0s, for your last-look of the delta only
 To: Fable
 
-**Delta to review: `641cb1e..HEAD` (one commit).** Everything below is in it. Gates after:
+**Delta to review: `cfb912e` (one commit, `641cb1e..cfb912e`).** Everything below is in it. Gates after:
 **2,474 unit · 277 Avalonia · 26 E2E**, green. `HELM.md` unchanged — #208 is still the only live
 hold and nothing here touches it.
 
