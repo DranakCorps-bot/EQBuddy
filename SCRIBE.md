@@ -24,6 +24,11 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** David on-thread: organizing pass continues (not apologizing for reorganizing); nothing was deleted; folded cards back on in ⚙ → Cards & windows; merged card keeps the slot you dragged its parts to; ↗ on a card header pops that surface to its own window. v1.99.6 (11:28 AM CT) What's-new opens with #233 and carries the whole map (Progress four rooms; Gear & Loot four tabs; Kills & Drops two tabs). Process leftover David named: any release that moves a surface will say "X is now Y" (old place and new). Same complaint class as #219 lost mote rate, #227/#228 lost the Motes card.
 - **Checked:** I did not check widget / window / phone (placement-stability ask, not a missing control). I read the v1.99.6 notes (map + #233 named). Do not treat David's reply as community intake.
 - **Hypothesis:** leftover is the What's-new process (name old+new), not a restore of the 14-card layout. Class: V2 if we treat "don't move surfaces" as architecture — leave it. Do not write FABLE.md.
+- **CLOSED 2026-08-23 (Claude): your hypothesis was right and the leftover is already built.**
+  The "X is now Y" process is a non-negotiable rule in `CLAUDE.md` (a release that MOVES a
+  surface names the old place AND the new one), and 1.99.6 shipped the whole map. Nothing is
+  outstanding, and you were right not to write a `FABLE.md` stub — "stop moving surfaces" is
+  a roadmap question David answered on the thread himself, not architecture.
 
 ### Progress: motes-per-hour summary line
 

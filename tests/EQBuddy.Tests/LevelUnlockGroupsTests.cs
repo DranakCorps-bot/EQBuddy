@@ -168,12 +168,56 @@ public class LevelUnlockGroupsTests
     [InlineData(1, false)]
     [InlineData(2, true)]
     [InlineData(3, true)]
-    public void GroupingIsWorthChromeOnlyAboveOneGroup(int count, bool expected)
+    public void GroupingIsWorthChromeOnlyAboveOnePlayerClass(int count, bool expected)
     {
         var groups = Enumerable.Range(0, count)
             .Select(i => new LevelUnlockGroup($"Class{i}", [])).ToList();
 
         Assert.Equal(expected, LevelUnlockGroups.WorthGrouping(groups));
+    }
+
+    /// <summary>
+    /// **"Any class" does not vote** — Bevel, Helm-signed 2026-08-23 1:05 PM CT: *"'Any
+    /// class' is a shared bucket, not a player class. It does not trip the one-class
+    /// no-expander rule. One player class with content stays flat names."*
+    ///
+    /// The first build counted GROUPS, so a single-class character who reached a level
+    /// carrying a General AA grew two expanders — and the rule was always about how many of
+    /// the player's own classes there are to choose between, which is still one.
+    /// </summary>
+    [Fact]
+    public void TheSharedBucketDoesNotTurnOneClassIntoAFold()
+    {
+        LevelUnlockGroup WithRows(string name) => new(name, [("Endure Magic", "Druid spell")]);
+
+        // One class WITH content, plus the shared bucket: flat names, no expanders.
+        Assert.False(LevelUnlockGroups.WorthGrouping(
+            [WithRows("Druid"), WithRows(LevelUnlockGroups.SharedGroup)]));
+        // Two player classes: a fold, shared bucket or not.
+        Assert.True(LevelUnlockGroups.WorthGrouping(
+            [WithRows("Druid"), WithRows("Cleric"), WithRows(LevelUnlockGroups.SharedGroup)]));
+    }
+
+    /// <summary>
+    /// The exception Bevel names in the same breath: when the one class gains NOTHING and
+    /// the shared bucket holds the level's only rows, the fold IS drawn — so the rows sit
+    /// under a heading saying whose they are — and the bucket is what opens.
+    ///
+    /// This is not hypothetical: it is what a WARRIOR sees at almost every milestone, and
+    /// it is the state in `docs/screenshots/theme-inline-progress.png`.
+    /// </summary>
+    [Fact]
+    public void AnEmptyLoneClassStillFoldsSoTheSharedRowsAreAttributed()
+    {
+        List<LevelUnlockGroup> groups =
+        [
+            new("Warrior", []),
+            new(LevelUnlockGroups.SharedGroup, [("Double Riposte", "Archetype · 3 ranks")]),
+        ];
+
+        Assert.True(LevelUnlockGroups.WorthGrouping(groups));
+        // ...and the bucket opens, not the empty class.
+        Assert.Equal(1, LevelUnlockGroups.DefaultOpenIndex(groups));
     }
 
     /// <summary>

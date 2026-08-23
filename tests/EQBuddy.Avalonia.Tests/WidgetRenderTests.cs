@@ -1445,13 +1445,16 @@ public class WidgetRenderTests : IDisposable
     /// applies the theme, and <see cref="AppTheme"/>'s brushes are process-wide (trap
     /// 31).</summary>
     private static (MainWindow Main, Window Host, ProgressCardView View) ExperienceWith(
-        params string[] classes)
+        params string[] classes) => ExperienceAt(12, classes);
+
+    private static (MainWindow Main, Window Host, ProgressCardView View) ExperienceAt(
+        int level, params string[] classes)
     {
         var main = new MainWindow();
         main.Show();
         main.Settings.ShowNextUnlocks = true;   // the rows, not just the fold's label
         ProgressCardView? view = null;
-        view = new ProgressCardView(main.Settings, _ => classes, () => 12,
+        view = new ProgressCardView(main.Settings, _ => classes, () => level,
             () => view!.Render(new StatsSnapshot()));
         var host = new Window { Content = view.Body, Width = 320, Height = 480 };
         host.Show();
@@ -1522,6 +1525,42 @@ public class WidgetRenderTests : IDisposable
         // a test of that instead.
         Assert.DoesNotContain("Druid", host.GetVisualDescendants().OfType<EqFoldLabel>()
             .Select(f => f.Text));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>
+    /// **"Any class" is a shared bucket, not a player class** — Bevel, Helm-signed
+    /// 2026-08-23 1:05 PM CT: *"It does not trip the one-class no-expander rule. One player
+    /// class with content stays flat names."* The first build counted GROUPS, so a
+    /// single-class character who reached a level carrying a General or Archetype AA grew
+    /// two expanders for one class to choose between.
+    ///
+    /// **Prediction, written before the run.** A Druid at 14 reaches level 15, which is the
+    /// only nearby level carrying both: four Druid spells (Calm Animal, Ring of North
+    /// Karana, Ring of Surefall Glade, Terrorize Animal) AND the Archetype AA Double
+    /// Riposte, which belongs to no class. Five rows, flat, no expander — and Double
+    /// Riposte still says "Archetype" in its value column, so the shared row is attributed
+    /// without a heading to do it.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheSharedBucketDoesNotTurnOneClassIntoAFold()
+    {
+        var (main, host, view) = ExperienceAt(14, "Druid");
+
+        Assert.Equal(0, view.NextGroups);
+        Assert.Equal(5, view.NextRows);
+        var text = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Calm Animal", text);
+        Assert.Contains("Double Riposte", text);
+        Assert.Contains("Archetype · 3 ranks", text);
+        // No heading for either — not the class, not the bucket.
+        Assert.DoesNotContain("Druid", host.GetVisualDescendants().OfType<EqFoldLabel>()
+            .Select(f => f.Text));
+        Assert.DoesNotContain(LevelUnlockGroups.SharedGroup,
+            host.GetVisualDescendants().OfType<EqFoldLabel>().Select(f => f.Text));
 
         host.Close();
         main.Close();

@@ -94,7 +94,35 @@ public static class LevelUnlockGroups
     /// 2026-08-23: *"One inferred class = names under the heading, no lone expander."* The
     /// surface asks this rather than counting, so the rule lives in one place and both
     /// desktops and the phone cannot disagree about when a fold appears.</summary>
-    public static bool WorthGrouping(IReadOnlyList<LevelUnlockGroup> groups) => groups.Count > 1;
+    /// <summary>Is this group the class-agnostic bucket rather than one of the player's
+    /// classes? <see cref="SharedGroup"/> is a heading over General/Archetype AA rows and
+    /// belongs to nobody — the distinction decides whether a fold is drawn at all.</summary>
+    public static bool IsShared(LevelUnlockGroup group) =>
+        group.ClassName.Equals(SharedGroup, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Does the split earn its chrome? Counted over the player's CLASSES —
+    /// <see cref="SharedGroup"/> does not vote.
+    ///
+    /// **Bevel's correction, Helm-signed 2026-08-23 1:05 PM CT**: *"'Any class' is a shared
+    /// bucket, not a player class. It does not trip the one-class no-expander rule. One
+    /// player class with content stays flat names."* The first build counted groups, so a
+    /// single-class character who happened to reach a level with a General AA on it grew
+    /// two expanders — and the rule was supposed to be about how many of the player's
+    /// classes there are to choose between, which is still one.
+    ///
+    /// The exception is the case Bevel names next: when that one class gains NOTHING and
+    /// the shared bucket holds the level's only rows, the fold IS drawn, so the rows sit
+    /// under a heading that says whose they are — and <see cref="DefaultOpenIndex"/> opens
+    /// the bucket rather than the empty class.
+    /// </summary>
+    public static bool WorthGrouping(IReadOnlyList<LevelUnlockGroup> groups)
+    {
+        var player = groups.Where(g => !IsShared(g)).ToList();
+        if (player.Count > 1) return true;
+        return player.Count == 1 && player[0].IsEmpty
+            && groups.Any(g => IsShared(g) && !g.IsEmpty);
+    }
 
     /// <summary>
     /// Which group starts open. Bevel, Helm-signed: *"first inferred class open, the rest

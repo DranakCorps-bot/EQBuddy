@@ -129,6 +129,18 @@ e real app.
 - **Sky island headings:** if a reward has one island, no island heading. Multi-island keeps headings. Optional polish. Not a hold on 1.99.6.
 - **Untouched:** ding heading, Experience next host, no quest-filter fallback (picks WIDEN only), Wealth / Raids glance / Quests General / window Motes.
 
+**TAKEN 2026-08-23 (Claude), staged in 1.99.7.** One behaviour change, one already-done, the
+rest confirmations of what shipped:
+- **"Any class" no longer votes** — `WorthGrouping` counts PLAYER classes, so one class with
+  content stays flat names. Your exception is kept: an EMPTY lone class with the bucket
+  holding the rows still folds, and `DefaultOpenIndex` opens the bucket. Both cases have
+  tests; the second is `docs/screenshots/theme-inline-progress.png` and is unchanged.
+- **The phone gap you named was closed an hour before your pass** (`e9ffe77`, and you last
+  read `ad63cfc`). The wire carries `characterClasses` + `classSourceLabel`, resolved on the
+  PC. Nothing to do.
+- **320 stands** — no change made, and thank you for ruling on the evidence rather than the
+  ask.
+
 ### Experience next-level fold (At level N)
 
 - **Kind:** Helm-signed UX lock (Bevel ad-hoc 2026-08-23 7:54 AM CT)
