@@ -429,3 +429,30 @@ one genuinely does. Each line below is a decision I made instead of a question I
   feedback file: 1.99.6's What's-new tells a player to tick classes in the Quest Tracker, which
   that plan makes wrong rather than merely dated. The stub now says the shipping release owes a
   line saying so.
+
+## 2026-08-23 (night) — #233, and the rule it produced
+
+- **#233 went to David with the question tool, and he chose the guarantee.** It passed both
+  tests: the theme fold is his roadmap direction (consequence-list item 5) and a reply would be
+  read as a promise (item 3). His answer: keep the roadmap, add the "what moved" commitment, and
+  say WHY — *"organizing after rapid initial build out of feature requests… the new homes make
+  more logical sense and are intuitive for new users though of course the long term users will
+  feel the changes."*
+- **Treated as a pattern, not a voice.** #219, #227/#228 and now #233 are one complaint arriving
+  three times from three people. That is what moved it from "answer the thread" to "change a
+  rule", and it is why the reply concedes it out loud rather than explaining the fold again.
+- **The rule is about the ORIGIN, not the destination.** Every one of those releases had a
+  truthful What's-new entry describing where a surface had ARRIVED. None named where it had
+  LEFT, which is useless to the only person who needs it — someone looking for something. The
+  rule is the form "X is now Y", both halves.
+- **Built before replying, not promised.** The 1.99.6 What's-new carries the whole current map
+  and the promise; `CLAUDE.md` carries the standing rule. Could have gone: post the reply and
+  add the rule later. A promise made in a thread and not written into the file every session
+  reads first is a promise that lasts one session.
+- **NOT posted — routed to Helm.** `HELM.md`'s process line is "new-thread thank-you still comes
+  to Helm", and this is a new thread. David has settled the direction, so Helm is being asked
+  only about posture and timing; the full draft is in `HELM-FEEDBACK.md` so one carry is enough.
+- **#109 gets no reply yet, deliberately.** Its last comment is Frankthetankk's verbatim
+  evidence, which is exactly what 1.99.6's bee work was built from — so the honest reply is the
+  release itself, and replying before the tag would mean either claiming it shipped (false) or
+  saying "soon". The thread is answered by shipping, and the What's-new credits him by name.

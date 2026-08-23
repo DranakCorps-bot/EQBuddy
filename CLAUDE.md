@@ -493,6 +493,27 @@ a guess, and the guess is discovered three commits later.
 - **Every player-noticeable change needs a `WhatsNew.json` entry** in the release that
   ships it. A user-visible fix landing after a tag earns its own release. Credit
   reporters by name and discussion number.
+- **A release that MOVES a surface says so by name, in the form "X is now Y"** — the old
+  place AND the new one (David, 2026-08-23, answering #233). This is a public promise made
+  in 1.99.6's What's-new, so it is not a style preference: *"you should never have to hunt
+  for something EQBuddy relocated, and if you do, that is a bug in this list."*
+
+  mjtrainor: *"Stop changing every feature and it's location every release… I don't want to
+  need to hunt for 'missing' features every single time I sit down to play EQL."* That was
+  the THIRD arrival of one complaint — #219 lost the mote rate, #227/#228 lost the Motes
+  card — and each time the change itself was defensible and the release notes described the
+  destination without naming the origin. **"Motes is now a tab in Progress" and "Motes has
+  its own rate line" are the same fact told two ways, and only the first one finds a player
+  who is looking for it.**
+
+  David's framing, and it belongs in the words: the fold is an **organizing pass** after a
+  fast build-out that gave every feature request its own card. The new homes are more
+  logical and much better for a new player; a long-term user experiences only the
+  disruption. Say both — the second half is what makes the first half credible.
+
+  The three ways back (folded cards return in Options → Cards & windows, a merged card
+  keeps the slot its parts had, and every card header's ↗ pops the surface out) are what
+  makes this true rather than a promise, so **do not remove one without replacing it.**
 - **Tests must never touch the real profile.** A module initializer redirects
   `EQBUDDY_APPDATA` to temp; it exists because a test once overwrote David's live
   `settings.json`. Do not weaken it.
