@@ -1105,6 +1105,42 @@ Read this list before touching the areas it names. Every entry cost a release.
     policy chose Display and could not deliver it. Confirmed afterwards without trusting
     the label — a chrome line of *identical text* measured 7px narrower between the two
     builds, which is the app-wide mode changing and nothing else.
+
+43. **Trap 20 has a MIRROR, and it is worse: a value with a producer and no consumer.** A
+    setting read but never written loses a capability quietly. A property WRITTEN but never
+    read means the app is doing something to the player's data and telling them nothing.
+    `MainWindow.LastAchievementsImport` shipped 2026-08-20 documented — in both UIs — as
+    *"read by the Raids surface"*, and no Raids surface ever read it. So when the game
+    announced an achievements dump, EQBuddy imported it, marked Sky rewards turned in and
+    raid clears complete, **and produced no report, no Undo, and no mention of the rewards
+    its own #101 guard had just refused.** The inventory half of the same commit reported
+    itself on the Gear tab, so the commit message's "the report is visible on the Gear tab
+    with an Undo" was true and the gap was invisible behind it.
+    → **Nothing routine can see this.** The compiler is happy (the property is assigned),
+    the Core unit tests pass (the outcome was correct all along), the ratchet does not care,
+    and **a screenshot shows an unremarkable card** — trap 29's point again. `DeadSettingTests`
+    scans settings, not properties, so the guard that exists for the other polarity is blind.
+    → **Now guarded:** `ImportReportReachesASurfaceTests` — a curated must-list (trap 34's
+    shape) naming every recorded import outcome and the surface that has to show it, asserted
+    against both widgets' source. Verified by running it on the pre-fix tree: 6 of 11 rows
+    fail there, and every failure names `LastAchievementsImport`.
+    → **The general move: when you write "for X to report" in a doc comment, grep for X.**
+    A comment describing an intended reader is the strongest possible signal that the reader
+    may not exist — nobody writes that sentence about code they have already called.
+
+44. **A report about something that JUST HAPPENED, appended after the rows, is below the
+    fold.** Trap 37 said a lifted view's pinned chrome stops being pinned; this is the same
+    lesson arriving from the other end, and the screenshot is what said it. The Raids import
+    report was added at the bottom of the card — after 21 boss rows, a provenance note and a
+    copy button — and the widget caps its own height, so the report rendered correctly and
+    **behind a scrollbar**, on a surface the player has no reason to scroll. The first take
+    happened to fit; the second did not, and the two pictures differ by nothing but timing.
+    → **Notifications go where the eye lands.** Above the rows, under the header. "Read on
+    arrival" decides position, exactly as it did for the Drops tab's orientation line.
+    → And note what caught it: the shot was taken TWICE, and only the second one showed the
+    problem. **A single passing screenshot is not proof a surface fits** — it is proof it fit
+    once.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

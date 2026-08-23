@@ -189,6 +189,91 @@ public class OutputfileAutoImportTests
             Assert.DoesNotContain(settings.SkyQuestChecklist, i => i.Acquired);
             // And nothing to undo, because nothing was written.
             Assert.Null(outcome.Undo);
+
+            // The guard fired twice, and the player is TOLD so. Without this the report
+            // reads "nothing new to mark" on a dump full of rewards, which is the guard
+            // working and looking exactly like a broken import (#101, Frankthetankk).
+            Assert.Equal(2, outcome.SkySkipped);
+            Assert.Contains("2 rewards were skipped", outcome.Summary);
+            Assert.Contains("flagged them was granted, not earned", outcome.Summary);
+        }
+        finally { dir.Delete(true); }
+    }
+
+    /// <summary>The count that costs real progress: a reward the player DID obtain whose
+    /// name drifted from the checklist's. The manual import lists these by name in its
+    /// preview; the automatic one used to discard the list entirely, so a Sky reward
+    /// simply failed to tick and nothing anywhere said why.
+    ///
+    /// "Windhowl and Spirit Render" vs "Windhowl/Spirit Render" is the real drift this
+    /// guards — here the checklist simply does not carry the reward the dump names, which
+    /// is the same code path and a shorter fixture.</summary>
+    [Fact]
+    public void AnObtainedRewardThatMatchesNothingIsCountedAndReported()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqb-ach-unmatched");
+        try
+        {
+            var path = Path.Combine(dir.FullName, "Dranak_freeport-Achievements.txt");
+            File.WriteAllLines(path,
+            [
+                "Untapped Potential: Classes",
+                "I	Class Unlock - Ranger",
+                "C		Obtain Earthcaller.",
+                "C		Obtain A Thing The Checklist Has Never Heard Of.",
+            ]);
+
+            var settings = new AppSettings
+            {
+                SkyQuestChecklist =
+                [
+                    new() { Id = "1", ClassName = "Ranger", Reward = "Earthcaller", QuestItem = "a" },
+                ],
+            };
+
+            var outcome = OutputfileAutoImport.ImportAchievements(path, settings, raids: null);
+
+            Assert.Equal(1, outcome.SkyMarked);           // Earthcaller matched
+            Assert.Equal(1, outcome.SkyUnrecognized);     // the other did not
+            Assert.Equal(0, outcome.SkySkipped);          // the unlock is incomplete: trusted
+            Assert.Contains("1 obtained reward matched nothing on the checklist", outcome.Summary);
+            Assert.Contains("Import achievements names it.", outcome.Summary);
+        }
+        finally { dir.Delete(true); }
+    }
+
+    /// <summary>A run that only SKIPPED still gets a report and still gets no Undo. The
+    /// two are separate questions — <c>Noted</c> decides whether there is anything to say,
+    /// <c>Undo</c> whether there is anything to reverse — and collapsing them is how a
+    /// surface ends up offering a button that puts back nothing.</summary>
+    [Fact]
+    public void SomethingToSayIsNotTheSameAsSomethingToUndo()
+    {
+        var dir = Directory.CreateTempSubdirectory("eqb-ach-noted");
+        try
+        {
+            var path = Path.Combine(dir.FullName, "Dranak_freeport-Achievements.txt");
+            File.WriteAllLines(path,
+            [
+                "Untapped Potential: Classes",
+                "C	Primary Class Unlock - Druid",
+                "C		Obtain Shillelagh.",
+                "C		This achievement will autocomplete if you chose to confirm your Primary Class as a Druid.",
+            ]);
+            var settings = new AppSettings
+            {
+                SkyQuestChecklist =
+                    [new() { Id = "1", ClassName = "Druid", Reward = "Shillelagh", QuestItem = "a" }],
+            };
+
+            var outcome = OutputfileAutoImport.ImportAchievements(path, settings, raids: null);
+
+            Assert.Equal(0, outcome.Applied);
+            Assert.Equal(1, outcome.Noted);
+            Assert.Null(outcome.Undo);
+            // Both halves in one line: what it did (nothing) and what it found (one skip).
+            Assert.Contains("nothing new to mark", outcome.Summary);
+            Assert.Contains("1 reward was skipped", outcome.Summary);
         }
         finally { dir.Delete(true); }
     }

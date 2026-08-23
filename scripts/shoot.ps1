@@ -293,6 +293,64 @@ $Shots = [ordered]@{
     # count), one marked from an achievements import (no badge — honesty over flattery),
     # and the rest still open, so the tick, the bullet and the "0/n" heading all appear on
     # one screen.
+    # The AUTO-IMPORT REPORT on the Raids surface. It exists only in response to a dump the
+    # game announced, so trap 22 applies at its purest: with no staged dump this surface has
+    # NO state at all, and until 2026-08-22 it had no renderer either — LastAchievementsImport
+    # was written and never read, in both UIs, so an achievements dump marked Sky rewards and
+    # raid clears silently with no report and no Undo.
+    #
+    # Staged through the REAL seam, not a back door: a dump file where the game writes them
+    # (game/, the Logs folder's parent) plus the announcement line the log carries, so the
+    # widget's own tail-parse-import path is what produces the picture.
+    #
+    # PREDICTION, written before the shot (trap 23). The dump names three things and each
+    # exercises a different arm of the report:
+    #   * Cleric — Primary Class Unlock, COMPLETE, with the "will autocomplete" criterion
+    #     also complete. Granted, not earned, so its two Obtains prove nothing: SKIPPED = 2.
+    #   * Warrior — Class Unlock, INCOMPLETE, so its per-criterion flags are trustworthy.
+    #     "Azure Ruby Ring" is a real Warrior reward: MARKED = 1 (Apply counts REWARDS).
+    #   * "Windblade of the Sky" is a reward no class has. It cannot fuzzy-match "Pauldrons
+    #     of the Blue Sky" (neither "windblade" nor "pauldrons" finds a partner):
+    #     UNRECOGNIZED = 1.
+    # No Conqueror section, so RaidsMarked = 0 and the two seeded clears are untouched.
+    # Expect, under the boss rows and the ⧉ copy button, ONE wrapped line in the warning ink:
+    #   "Read your achievements dump (HH:mm) — 1 Sky reward marked. 2 rewards were skipped —
+    #    the class unlock that flagged them was granted, not earned. 1 obtained reward
+    #    matched nothing on the checklist — Import achievements names it."
+    # and an Undo button beneath it, because one reward really was written.
+    #
+    # SHOT 2026-08-22: all three counts as predicted. The FIRST take also proved its own
+    # worth on the copy rather than the code — it read "1 obtained reward … names them",
+    # because the plural was baked into the string. Nothing but a picture was ever going to
+    # catch that; the unit test asserted the same wrong sentence quite happily.
+    'raids-import'    = @{ Title = 'EQBuddy Progress'
+                           Env = @{ EQBUDDY_PROGRESS = 'raids' }
+                           Set = @{}
+                           Dump = @{ 'Testchar_test-Achievements.txt' = @(
+                               'Untapped Potential: Classes'
+                               "C`tPrimary Class Unlock - Cleric"
+                               "C`t`tObtain Aegis of the Wind."
+                               "C`t`tObtain Baton of the Sky."
+                               "C`t`tThis achievement will autocomplete if you chose to confirm your Primary Class as a Cleric."
+                               "I`tClass Unlock - Warrior"
+                               "C`t`tObtain Azure Ruby Ring."
+                               "C`t`tObtain Windblade of the Sky."
+                           ) }
+                           Append = @('Outputfile Complete: Testchar_test-Achievements.txt')
+                           Raids = @{
+                               'testchar_test|phinigel autropos' = @{
+                                   Kills = 3
+                                   FirstKill = '2026-07-02T21:15:00'
+                                   LastKill = '2026-08-09T22:40:00'
+                                   AchievementComplete = $false
+                                   TierKills = @{ d2 = 2; open = 1 }
+                               }
+                               'testchar_test|lord nagafen' = @{
+                                   Kills = 0
+                                   AchievementComplete = $true
+                                   TierKills = @{}
+                               }
+                           } }
     'raids-card'      = @{ Title = 'EQBuddy Progress'
                            Env = @{ EQBUDDY_PROGRESS = 'raids' }
                            Set = @{}
@@ -642,6 +700,18 @@ function Write-Raids([hashtable]$records) {
         Set-Content $path -Encoding UTF8
 }
 
+# An /outputfile dump sitting where the game writes them: the Logs folder's PARENT, which
+# is what OutputfileAutoImport.ResolvePath looks at. Paired with an Append line announcing
+# it, this is the only way to photograph the auto-import REPORT — the surface that exists
+# solely in response to a dump, and the one that shipped unreachable on 2026-08-20 because
+# nothing rendered it (see ImportReportReachesASurfaceTests).
+function Write-Dump([hashtable]$dump) {
+    if ($null -eq $dump) { return }
+    foreach ($file in $dump.Keys) {
+        Set-Content -Path (Join-Path $root "game/$file") -Value $dump[$file] -Encoding UTF8
+    }
+}
+
 # The wiki page cache, which is where the contribution pack's state actually comes from
 # (EqlWikiMobService's 7-day disk cache, under <profile>/wiki-cache/mobs). A seeded entry
 # is served without a fetch, so the shot is offline and deterministic; an unseeded
@@ -779,6 +849,7 @@ try {
         Write-Settings $spec.Set
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
+        Write-Dump $spec.Dump
         Write-WikiCache $spec.Wiki
         Append-Log $spec.Append
         if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }

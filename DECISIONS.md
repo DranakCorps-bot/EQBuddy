@@ -17,6 +17,17 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **The achievements auto-import report goes on the RAIDS surface, and nowhere else** · the
+  Quest Tracker (the other thing the dump feeds), or both · the rule already set by the
+  inventory report: the report lives on the surface that ASKS the player to run the command.
+  Both UIs' own doc comments already said "read by the Raids surface"; this makes it true.
+  Not a design invention, so not a Bevel question. `RaidsCardView.cs`, `MainWindow.cs`.
+- **The report sits ABOVE the boss rows, not after them** · below, matching where the
+  inventory report sits on Gear · the second screenshot showed it behind a scrollbar under
+  21 rows (now trap 44). A notification is read on arrival; a card footer is not.
+- **1.99.6 is its own release rather than riding the next feature** · fold it into whatever
+  ships next · the What's-new rule — a player-noticeable fix earns the release that ships it,
+  and this one has a reporter (#101, Frankthetankk) waiting on the answer.
 - **The agent run cadence (Scribe 6am · Bevel 1pm · Helm 8pm) goes in `CLAUDE.md`, beside the
   "inboxes inform you" boundary, not in `HANDOFF.md` or an agent's own section** · a handoff
   note, or three lines one per agent · it changes what you do at the START of every session

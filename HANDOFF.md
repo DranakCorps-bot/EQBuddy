@@ -24,7 +24,66 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 evening (LATEST — start here): the two Helm waits are GONE, and neither was ours to post
+## 2026-08-22 evening (LATEST — start here): a silent import, found by asking what the inbox could not
+
+**1.99.6 is staged and UNRELEASED.** Gates green — **2,378 unit · 271 Avalonia · 24 E2E** —
+Fable's release review not yet requested at the time of writing. David's go is still the gate.
+
+### The bug: EQBuddy was changing the player's checklist and saying nothing
+
+Since 1.98.1 the app reads an `/outputfile achievements` dump the moment the game announces
+it, marking Sky rewards turned in and raid clears complete. **`LastAchievementsImport` was
+written and never read, in BOTH UIs** — so all of that happened with no report, no Undo, and
+no mention of what the #101 guard had skipped. The inventory half of the same commit reported
+itself on the Gear tab, which is what hid it: the commit message says *"the report is visible
+on the Gear tab with an Undo"* and that sentence is true.
+
+**It is now trap 43** — the mirror of trap 20, a value with a producer and no consumer, and
+the more dangerous polarity of the two. Nothing routine can see it: the compiler is happy, the
+Core tests pass (the outcome was correct throughout), and **an absent control photographs as
+an unremarkable card.**
+
+→ **The general move worth stealing: when a doc comment says "for X to report", grep for X.**
+Nobody writes that sentence about code they have already called.
+
+### How it was found, which is the part to repeat
+
+Scribe's `SCRIBE.md` item asked *"does the automatic path use the same token/confirm guard as
+the manual menu, or can it bypass it?"* (#101, Frankthetankk). **The answer is no bypass** —
+both call one Core method and a test has said so since 2026-08-20. The hypothesis was wrong
+and it still found the defect, because the defect was one line from where it pointed: the
+automatic path routes through the guard and then discards what the guard tells it.
+
+### What shipped with it
+
+- `ImportReportView` lifted in WPF (the Avalonia twin already existed), so the rule *"offer
+  Undo only when something actually changed"* has one home rather than two copies.
+- `AutoImportOutcome.SkySkipped` / `SkyUnrecognized` / `Noted`. The unrecognized count is the
+  one that costs real progress — a reward the player DID obtain whose name drifted — and only
+  the manual preview ever named it.
+- `ImportReportReachesASurfaceTests`: a curated must-list, **verified to fail 6/11 on the
+  pre-fix tree**, every failure naming `LastAchievementsImport`. Eight consecutive green runs.
+- `shoot.ps1 -Shot raids-import`, staged through the REAL seam (a dump in `game/` plus the
+  announcement line), and `docs/screenshots/raids-import.png`.
+
+### The screenshot earned itself twice, and the second time is trap 44
+
+Take one matched the predicted counts and exposed a **grammar bug in the copy** — "1 obtained
+reward … names them" — which the unit test asserted quite happily, because the plural was
+baked into the string. Take two put the report **behind a scrollbar under 21 boss rows**: the
+widget caps its height, so a notification appended after the rows is below the fold on a
+surface nobody scrolls. It now sits above them. **A single passing screenshot is proof a
+surface fit once, not proof it fits.**
+
+### Still pending, unchanged from the survey below
+
+`/consider` wiki half · Fable PR A (Avalonia `IWidgetCard` seam) · three more `ready` Fable
+plans · `DeadHelperTests`. **Frank is owed a reply on #101 once 1.99.6 ships** — he asked a
+direct question and the honest answer has two halves.
+
+---
+
+## 2026-08-22 evening: the two Helm waits are GONE, and neither was ours to post
 
 **A survey pass, no code changed.** The one thing that moved is the thing the last session was
 blocked on.

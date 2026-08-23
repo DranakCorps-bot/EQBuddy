@@ -294,6 +294,10 @@ achievements importer. **The defect was a missing seam, not a missing feature.**
 | **An import is add-only and reversible**: the Undo puts back exactly what that import changed, leaves the player's own ticks alone, and never removes a witnessed raid kill | **Auto** — `OutputfileAutoImportTests` |
 | Re-reading the same dump applies nothing further and offers no second undo | **Auto** — `OutputfileAutoImportTests` |
 | **The report says the dump was READ even when nothing changed** — "EQBuddy did nothing" and "EQBuddy never saw your file" are indistinguishable to the player, and only one is a fault | **Auto** — `OutputfileAutoImportTests` |
+| **Every recorded import outcome REACHES a surface.** The achievements one was written and never read for two days, in both UIs: dumps were imported silently, with no report and no Undo | **Auto** — `ImportReportReachesASurfaceTests` (fails 6/11 on the pre-fix tree) |
+| The report names what it SKIPPED as well as what it applied — rewards refused by the #101 auto-grant guard, and obtained rewards that matched nothing on the checklist. A guard that stays silent looks exactly like a broken import | **Auto** — `OutputfileAutoImportTests` |
+| Something to SAY is not something to UNDO: a run that only skipped still reports, and still offers no Undo button | **Auto** — `OutputfileAutoImportTests` |
+| The achievements report is on the **Raids** surface — the one that asks the player to run the command — above the rows rather than after them, so it is not below the fold | **Shot** — `shoot.ps1 -Shot raids-import` |
 | Each command has exactly one definition, and it is the text the game expects | **Auto** — `GameCommandsTests` |
 | No copy source anywhere in `src` carries its own slash-command literal | **Auto** — `GameCommandsTests` |
 | **Every surface that NEEDS a command names it, off `GameCommands`** — a curated list with a reason per entry, both UIs, the way `DeadSettingTests.Known` is curated. Adding a surface that asks for an output file means adding its row | **Auto** — `GameCommandsTests` |

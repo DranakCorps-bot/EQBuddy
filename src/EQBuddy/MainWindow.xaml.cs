@@ -2043,7 +2043,7 @@ public partial class MainWindow : Window, ICardContext
             Money: money,
             Motes: motes,
             Faction: faction,
-            Raids: new RaidsCardView(() => _raidLedger));
+            Raids: new RaidsCardView(() => _raidLedger, () => LastAchievementsImport));
     }
 
     /// <summary>How many unlocks this session's ding opened — the Experience tab's badge

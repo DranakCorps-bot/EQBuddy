@@ -77,7 +77,14 @@ public static class OutputfileAutoImport
         string path, AppSettings settings, RaidKillLedger? raids)
     {
         var entries = AchievementsImport.Parse(File.ReadLines(path));
-        var (matches, _, _) = AchievementsImport.SkyRewards(entries, settings.SkyQuestChecklist);
+        // The other two lists are NOT spare. The manual import shows both in its preview,
+        // and an unprompted import that drops them is the same dump telling the player
+        // less than the menu would have — so they are counted onto the outcome and the
+        // report says so. `unmatched` is the one that costs progress: a reward the player
+        // really did obtain, whose name drifted from the checklist's, is silently not
+        // ticked, and only the preview ever named it.
+        var (matches, unmatched, autoGranted) =
+            AchievementsImport.SkyRewards(entries, settings.SkyQuestChecklist);
 
         // Captured BEFORE applying, and only what actually flips — an undo that restores
         // a whole snapshot would also revert ticks the player made in between.
@@ -99,6 +106,8 @@ public static class OutputfileAutoImport
         return new AutoImportOutcome(OutputfileKind.Achievements, Path.GetFileName(path),
             File.GetLastWriteTime(path), GearTicked: 0, RaidsMarked: raidsMarked, SkyMarked: skyMarked)
         {
+            SkySkipped = autoGranted.Count,
+            SkyUnrecognized = unmatched.Count,
             Undo = raidsMarked + skyMarked == 0 ? null : () =>
             {
                 foreach (var item in settings.SkyQuestChecklist)
@@ -149,7 +158,25 @@ public sealed record AutoImportOutcome(
     /// surface must not offer an Undo button unconditionally.</summary>
     public Action? Undo { get; init; }
 
+    /// <summary>Sky rewards the dump flagged obtained and the #101 guard refused, because
+    /// the class unlock that flagged them was granted rather than earned. NOT a failure —
+    /// the guard working — but the player has to be told, or a dump full of rewards reads
+    /// as "nothing new to mark" and the import looks broken (Frankthetankk, #101, asking
+    /// whether the unprompted path shares the guard: it does; it just said nothing).</summary>
+    public int SkySkipped { get; init; }
+
+    /// <summary>Completed "Obtain X" criteria that matched no checklist reward — usually a
+    /// name that drifted from the wiki's. This is the count that costs the player real
+    /// progress, so it is the one an unprompted import must never swallow.</summary>
+    public int SkyUnrecognized { get; init; }
+
     public int Applied => GearTicked + RaidsMarked + SkyMarked;
+
+    /// <summary>What the import found but did not apply. Kept apart from
+    /// <see cref="Applied"/> because it decides whether there is anything to SAY, not
+    /// whether there is anything to UNDO — a run that only skipped still needs a report,
+    /// and still must not offer an Undo button.</summary>
+    public int Noted => SkySkipped + SkyUnrecognized;
 
     /// <summary>The report line. It says the dump was READ even when nothing changed,
     /// because "EQBuddy did nothing" and "EQBuddy never saw your file" look identical to
@@ -164,14 +191,29 @@ public sealed record AutoImportOutcome(
             1 => $"Read your inventory dump ({At:HH:mm}) — 1 item ticked.",
             _ => $"Read your inventory dump ({At:HH:mm}) — {GearTicked} items ticked.",
         },
-        OutputfileKind.Achievements => Applied == 0
-            ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark."
-            : $"Read your achievements dump ({At:HH:mm}) — " + string.Join(", ",
-                new[]
-                {
-                    RaidsMarked > 0 ? $"{RaidsMarked} raid clear{(RaidsMarked == 1 ? "" : "s")}" : null,
-                    SkyMarked > 0 ? $"{SkyMarked} Sky reward{(SkyMarked == 1 ? "" : "s")}" : null,
-                }.Where(s => s is not null)) + " marked.",
+        OutputfileKind.Achievements => string.Join(" ", new[]
+        {
+            Applied == 0
+                ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark."
+                : $"Read your achievements dump ({At:HH:mm}) — " + string.Join(", ",
+                    new[]
+                    {
+                        RaidsMarked > 0 ? $"{RaidsMarked} raid clear{(RaidsMarked == 1 ? "" : "s")}" : null,
+                        SkyMarked > 0 ? $"{SkyMarked} Sky reward{(SkyMarked == 1 ? "" : "s")}" : null,
+                    }.Where(s => s is not null)) + " marked.",
+            // Said in the player's terms, not the guard's: what the game marked, why it
+            // proves nothing, and that the tracker is still the way to record it for real.
+            SkySkipped > 0
+                ? $"{SkySkipped} reward{(SkySkipped == 1 ? " was" : "s were")} skipped — the "
+                  + $"class unlock that flagged {(SkySkipped == 1 ? "it" : "them")} was "
+                  + "granted, not earned."
+                : null,
+            SkyUnrecognized > 0
+                ? $"{SkyUnrecognized} obtained reward{(SkyUnrecognized == 1 ? "" : "s")} "
+                  + "matched nothing on the checklist — Import achievements names "
+                  + $"{(SkyUnrecognized == 1 ? "it" : "them")}."
+                : null,
+        }.Where(s => s is not null)),
         _ => $"Saw {FileName} ({At:HH:mm}) — EQBuddy has no reader for that dump.",
     };
 }

@@ -24,33 +24,71 @@ namespace EQBuddy;
 /// is a catalog or a token, so it reaches for <see cref="ICardContext"/> not at all —
 /// its rows name BOSSES, not items, and there is nothing here to click through to.
 /// </summary>
-internal sealed class RaidsCardView(Func<RaidKillLedger> ledger) : IWidgetCard
+internal sealed class RaidsCardView : IWidgetCard
 {
     private readonly StackPanel _panel = new();
+    private readonly StackPanel _body = new();
+    private readonly Func<RaidKillLedger> _ledger;
+    private readonly ImportReportView _importReport;
+
+    /// <param name="lastImport">The widget's last <c>/outputfile achievements</c>
+    /// auto-import. This card is where that report belongs for the same reason the
+    /// inventory one belongs on Gear: it is the surface that ASKS the player to run the
+    /// command, in both its empty and its populated state. It was documented as reading
+    /// this from the day the auto-import shipped and never did — see
+    /// <see cref="ImportReportView"/> for what that cost.</param>
+    public RaidsCardView(Func<RaidKillLedger> ledger, Func<AutoImportOutcome?> lastImport)
+    {
+        _ledger = ledger;
+        // An Undo un-marks bosses, and this card is only rendered on kills and imports —
+        // so it has to repaint itself rather than wait for a tick that may not come.
+        _importReport = new ImportReportView(lastImport, RenderRows);
+        // ABOVE the rows, and outside them. Two separate reasons, both learned the hard way:
+        //
+        // OUTSIDE, because RenderRows clears the rows panel wholesale — a report parented
+        // into it would be swept away by the next kill.
+        //
+        // ABOVE, because the first screenshot of this surface (2026-08-22) put it under 21
+        // boss rows, the provenance note and the copy button, and the widget capped its own
+        // height: the report was real, correct, and BELOW THE FOLD behind a scrollbar. That
+        // is trap 37 exactly — the Drops tab's footer landing under thirteen creature rows —
+        // and the same answer applies. A report about something that JUST HAPPENED is read
+        // on arrival, so it goes where the eye lands, not at the end of a list.
+        _body.Children.Add(_importReport.Body);
+        _body.Children.Add(_panel);
+    }
 
     public string Key => "raids";
 
-    public UIElement Body => _panel;
+    public UIElement Body => _body;
 
     /// <summary>Rendered row count, for the <c>EQBUDDY_EXPAND</c> dump E2E asserts on.
     /// Pinned at 29 on the fixture ledger BEFORE this lift — 6 zone headings, 21 boss
     /// rows, the provenance note and the copy button — so the move has a number to be
-    /// checked against rather than a claim to be believed.</summary>
+    /// checked against rather than a claim to be believed. It counts the ROWS panel only:
+    /// the import report is chrome that comes and goes with a dump, and folding it into
+    /// this number would make the pin drift for a reason that is not a layout change.</summary>
     public int RowCount => _panel.Children.Count;
 
     /// <summary>"2 / 21" — what the card header carried, and what the theme's tab strip
     /// carries now. Computed here so the surface and its badge cannot disagree about how
     /// many targets are cleared.</summary>
     public string Header =>
-        $"{ledger().DefeatedCount()} / {RaidTargetCatalog.Default.BossCount}";
+        $"{_ledger().DefeatedCount()} / {RaidTargetCatalog.Default.BossCount}";
 
     /// <summary>How many targets are cleared — for the launcher card's one-line summary,
     /// which has to carry the glance five card headers used to.</summary>
-    public int DefeatedCount => ledger().DefeatedCount();
+    public int DefeatedCount => _ledger().DefeatedCount();
 
     public void Render(StatsSnapshot snapshot)
     {
-        var raids = ledger();
+        RenderRows();
+        _importReport.Render();
+    }
+
+    private void RenderRows()
+    {
+        var raids = _ledger();
         var defeated = raids.DefeatedCount();
         var catalog = RaidTargetCatalog.Default;
 

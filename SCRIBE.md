@@ -87,7 +87,17 @@ stops two voices on one account, and it is the half that worked.
 - **Checked:** not grepped this run for a need-filter on the Drops tab. Hypothesis, unchecked -- Drops by Creature lists drops for the creature; it does not filter that list to items this character still needs (quest, bag, or Sky checklist).
 
 ### auto achievement import vs the #101 token/confirm guard
-- **Priority:** waiting
+- **Priority:** TAKEN 2026-08-22 (Claude). **Answer: NO BYPASS — and there was a real defect
+  next door.** Both triggers call one Core method, `AchievementsImport.SkyRewards`, so the
+  token/confirm guard applies to the unprompted path by construction; a test has said so
+  since 2026-08-20 (`TheAutomaticAchievementsImportObeysTheAutoGrantGuardToo`). **What was
+  broken is that the automatic path said NOTHING.** `LastAchievementsImport` was written and
+  never read in BOTH UIs, so a dump marked Sky rewards and raid clears silently, with no
+  report, no Undo, and no mention of what the guard had skipped or what it could not match.
+  Fixed for 1.99.6: the report is on the Raids surface (the one that asks for the command),
+  with an Undo, and it names the skipped and unmatched counts. Guarded by
+  `ImportReportReachesASurfaceTests`, verified to fail 6/11 pre-fix. **Frank is owed a reply
+  once it ships.**
 - **Place:** achievement import. Sky checklist. Not Gate 5.
 - **Source:** #101 Frankthetankk Aug 21, 5:50 PM CT. Did not reply (old thread; Claude is in it).
 - **Ask:** v1.98.1 automatic reading of /outputfile achievements (game dump-announcement line, per-import undo) — does that path use the same token/confirm guard as the manual Import achievements menu, or can it bypass the check this thread just fixed.

@@ -134,6 +134,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly TextBlock _cardMotesSummary = AppTheme.DimText("");
     private readonly ItemsControl _cardMotesList = new();
     private readonly StackPanel _raidsPanel = new();
+    private readonly StackPanel _raidsBody = new();
     private readonly TextBlock _buffsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _buffsPanel = new();
     /// <summary>Per-tick clock TextBlocks + their buff labels, so a tick with an
@@ -1053,7 +1054,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _progressTabBodies[ProgressTab.Experience] = BuildProgressSection();
         _progressTabBodies[ProgressTab.Wealth] = BuildWealthSection();
         _progressTabBodies[ProgressTab.Faction] = _factionList;
-        _progressTabBodies[ProgressTab.Raids] = _raidsPanel;
+        // The achievements-import report ABOVE the rows, and outside them: outside because
+        // RenderRaidRows clears the rows panel wholesale, above because a report appended
+        // after 21 boss rows sits below the fold behind a scrollbar (trap 37 — the WPF shot
+        // on 2026-08-22 caught exactly that, and the Drops footer taught it first).
+        _raidsBody.Children.Add(RaidsImport.Body);
+        _raidsBody.Children.Add(_raidsPanel);
+        _progressTabBodies[ProgressTab.Raids] = _raidsBody;
         _sections["progress"] = AppTheme.SectionLink(
             Header("progress", "Progress", _progressHeader), () => ShowProgressWindow());
         ToolTip.SetTip(_sections["progress"],
@@ -3184,9 +3191,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// </summary>
     private void RenderRaids()
     {
+        if (!ProgressTabShowing(ProgressTab.Raids)) return;
+        RenderRaidRows();
+        RaidsImport.Render();
+    }
+
+    /// <summary>The rows alone. Split out on 2026-08-22 so the import report below them
+    /// survives a repaint and so an Undo can put the boss rows back — this surface only
+    /// renders on kills and imports, so it cannot wait for a tick that may not come.</summary>
+    private void RenderRaidRows()
+    {
         var defeated = _raidLedger.DefeatedCount();
         var catalog = RaidTargetCatalog.Default;
-        if (!ProgressTabShowing(ProgressTab.Raids)) return;
         if (defeated == 0)
         {
             _raidsPanel.Children.Clear();
@@ -3621,6 +3637,20 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         () => LastInventoryImport);
 
     private GearCardView? _gear;
+
+    /// <summary>The Raids surface's "EQBuddy just read your achievements dump" line and
+    /// its Undo. It is on THIS card because this is the surface that asks the player to
+    /// run <c>/outputfile achievements</c>, in both its empty and its populated state —
+    /// the same rule that puts the inventory report on Gear.
+    ///
+    /// <c>LastAchievementsImport</c> was documented as "for the Gear and Raids surfaces to
+    /// report" when the auto-import shipped (2026-08-20) and no Raids surface ever read
+    /// it, in either UI: the dump marked Sky rewards and raid clears silently, with no
+    /// report and no Undo. See <c>EQBuddy/ImportReportView.cs</c> for the shape.</summary>
+    private ImportReportView RaidsImport => _raidsImport ??=
+        new ImportReportView(() => LastAchievementsImport, RenderRaidRows);
+
+    private ImportReportView? _raidsImport;
 
     /// <summary>The Inventory tab — the Gear Locker and the old Inventory window as one
     /// surface with two pivots, the way Windows folded them (David, 2026-08-20). Owned by

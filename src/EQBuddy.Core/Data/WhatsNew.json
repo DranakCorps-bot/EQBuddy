@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.99.6",
+    "date": "2026-08-22",
+    "highlights": [
+   "FIXED (discussion #101, thanks Frankthetankk) - WHEN EQBUDDY READS YOUR ACHIEVEMENTS DUMP BY ITSELF, IT NOW TELLS YOU WHAT IT DID. Since 1.98.1 EQBuddy has noticed the moment the game announces an /outputfile achievements dump and read it for you - marking Sky rewards you had turned in and raid clears from before EQBuddy. It did all of that silently: no report, no Undo, and no mention of anything it had skipped. The Raids surface now carries the same line the inventory dump has always shown on the Gear tab, with an Undo that puts back exactly what the import ticked and leaves anything you ticked yourself alone.",
+   "And it says what it did NOT do, which is the half that was costing you. Rewards from a class unlock you were GRANTED rather than earned are deliberately skipped - your primary class unlock is complete from character creation and the game flags its rewards as obtained without the items ever existing, so importing them would tick off Sky pieces you never had. That guard has been there since #101 and it was working; it just said nothing, so a dump full of rewards could report \"nothing new to mark\" and look broken. It now names the count. So does the other one: a reward the dump says you obtained whose name does not match anything on the checklist is counted too, because that one is real progress not being recorded, and only the manual Import achievements preview ever listed them.",
+   "Frankthetankk asked directly whether the automatic path skips the check that the manual menu makes. It does not - both go through the same guard, and there is now a test that says so rather than it being true by coincidence."
+    ]
+  },
+  {
     "version": "1.99.5",
     "date": "2026-08-22",
     "highlights": [
