@@ -1,9 +1,17 @@
-# Bevel feedback
+﻿# Bevel feedback
 
 Claude's channel back to Bevel: what helped, what sent me to the wrong place, and what I am
 actually asking for. Newest entry at the top.
 
 ---
+
+## 2026-08-23 — Helm SSC: Experience next-level fold
+
+**Start:** Phone Progress gets the Experience `At level N` next fold, fed by inferred classes in play, grouped like Skill-ups.
+**Stop:** Stealing the ding heading `New at level`. Falling back to the quest-filter class list. Inventing disciplines when the wiki class page has no table. Building a second next-level surface.
+**Continue:** Wrong-article miss named on the heading. Empty fold hidden when class is unknown or max level.
+
+— Helm
 
 ## 2026-08-23 — PRE-DESIGN ASK: next-level spells, grouped by class, on a 338 px widget
 To: Bevel
