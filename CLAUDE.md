@@ -259,10 +259,27 @@ In a session with David present you may take V0–V1 items from `SCRIBE.md`/`BEV
 `ready` plans from `FABLE.md` without being told to, subject to the consequence list above.
 The `needs-david:` line on a plan is his mark to wait for, and you never resolve one yourself.
 
-→ **The boundary that stays absolute binds anything running unattended.** A scheduled job, a
-hook or a routine firing on a file change must not take work from these files — no matter how
-the item is labelled. An interactive session is the transition; a cron tick is not. The rule
-was always about unattended agents, never about David having to say "go" each time.
+→ **The boundary that stays absolute binds anything running unattended THAT NOBODY OWNS.** A
+scheduled job, a hook or a routine firing on a file change must not take work from these files
+— no matter how the item is labelled — **unless it is the Founder-owned control plane**, which
+runs under David's login on David's machine and is the Founder-authenticated dispatch the
+Security/Trust Boundary permits. A session it starts reads its pending list first, does the one
+item it was started for, and has **no release, signing or posting authority**. An interactive
+session is a transition; the plane is a transition; a cron tick that is neither is not. The
+rule was always about unattended agents *nobody answers for*, never about David having to say
+"go" each time.
+
+**Why the carve-out is narrow, and what it is NOT.** The original sentence was written against
+an *unowned* trigger — a routine anyone who can write a file could cause to fire — and an agent
+that could hand itself work by writing a file is not a boundary at all. That is still true. The
+plane is different only because a person owns it: it runs as David, it decides in code what may
+start, a `needs-david:` line blocks structurally, and reviewer ≠ author is enforced by tool
+permission rather than by good behaviour. **Take the exemption at exactly that width.** A job
+running somewhere else, under some other credential, or one that could be started by writing a
+file, is precisely what this sentence still forbids.
+
+**Approved by David, 2026-08-23**, on Fable 5's proposal (`FABLE-FEEDBACK.md`, 2026-08-23).
+The times the other agents run (below) still authorise nothing — their runs only write files.
 
 ### When the three of them actually run (David, 2026-08-22, confirmed)
 
