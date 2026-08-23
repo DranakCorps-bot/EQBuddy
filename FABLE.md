@@ -61,6 +61,94 @@ next loop, not a reopening of the plan.
 
 ---
 
+## EQBuddy infers ONE class. A Legends character is THREE.
+To: Fable
+
+- **Priority:** `ready`. Not a `needs-david:` — David supplied the fact that makes it a bug
+  (2026-08-23: *"you seem to think EQ Legends just lets you have 1 class when in fact you can
+  be 3 at a time"*), and the consequence list has nothing to say about it.
+- **Class:** `V3`. `ClassInference` is shipped Core with its own trap (11) and its own
+  discussion (#120), and **every class-aware surface reads it**: the Quest Tracker's filters,
+  the Gear Locker (#104), the Sky class lens, the next-level list, EQBuddy Mobile. This is the
+  premise underneath all of them being wrong, not one surface misbehaving.
+- **Source:** found 2026-08-23 while diagnosing why David's own character showed no level-35
+  spells. Filed instead of patched, per the V2/V3 rule.
+
+### The bug, in one line of shipped code
+
+`ClassInference.Current()` returns **one** class, or `""`:
+
+```csharp
+// A tie fails this too, and deliberately: whichever way the dictionary happened
+// to enumerate must not decide what the quest tracker filters by.
+return bestWeight >= runnerUp * LeadMargin ? best : "";
+```
+
+`LeadMargin = 2.0`, documented as *"Two qualifying classes at comparable weight is a genuinely
+ambiguous log, and the honest answer there is no answer."*
+
+**In Legends that is not ambiguity. That is a correctly-played character.** A Warrior/Druid/Monk
+produces strong evidence for three classes at once, all three qualify, no leader clears the
+margin — and the app concludes it does not know. The one case the rule was written to protect
+against (#120: a caster wearing a melee class after one melee-ish line) and the ordinary case
+of a three-class character are **indistinguishable to this code**.
+
+### How it presents, which is why nobody caught it
+
+Not as a wrong class — as a MISSING one, downstream, on a surface that looks merely empty.
+David is Warrior/Druid/Monk at 34; his Progress card offered *"At level 39: 1 new AA ability"*
+and no spells. Chain: inference returns `""` → `UnlockClasses` falls back to the Quest Tracker's
+picked classes → his picks are `['Warrior']` alone → Warriors have no spell table → nothing at
+35, so `LevelUnlocks.Next` skips to the next level with anything, which is an **Archetype** AA
+five levels away (`Mend Companion`, a pet ability, for a character with no pet).
+
+Every step is behaving as written. The output is useless.
+
+### Checked
+
+- `ClassInference.Current()` and `LeadMargin` as quoted; `Tally.Qualifies` needs
+  `EvidenceFloor` sightings plus an ability or two distinct spells — **per class**, so the
+  tallies for three classes can all qualify simultaneously today. The data is already there;
+  only the verdict collapses it.
+- `ClassSignalCatalog` derives from `AaCatalog` + `SpellLevelCatalog`, keeping names belonging
+  to exactly ONE class. Unchanged by this — it is the right input.
+- `quest-ledger.json`: `dranak_freeport -> ['Warrior']`, `hugzee_qeynos -> ['Druid','Monk','Warrior']`.
+  **The picker already holds three**, so the multi-class MODEL exists everywhere except in the
+  inference. That is the asymmetry to fix.
+- `UnlockClasses` = `BuffSetClassSource(s).Classes` = picks first, inferred as fallback — both
+  desktops.
+
+### What a plan has to settle
+
+1. **What replaces `LeadMargin`.** "Every class that qualifies" is the obvious answer and it
+   re-opens #120 — a caster who produced one melee line would gain a melee class. The floors
+   (`EvidenceFloor`, `DistinctSpellFloor`) are per class already and may carry it alone; the
+   margin may become a FLOOR relative to the leader rather than a winner-takes-all gate.
+2. **A cap, or none?** Legends allows three. Whether the inference should refuse a fourth is a
+   game-truth question — and if it caps, the wiki is the source for that number, not us.
+3. **Who consumes a LIST that used to be a string.** `InferredClass` is a `string` on
+   `StatsSnapshot`, read by both widgets and the phone. Renaming it is the cheap part; deciding
+   what a surface that wants "the class" shows for three is not.
+4. **Bevel's lock is affected.** It ruled (Helm-signed, 2026-08-23) *"Class source: inferred
+   classes in play. Never fall back to Quest Tracker filter"* — correct in intent and currently
+   impossible, because inference cannot name more than one. **It ruled partly on a false premise
+   I supplied** ("most players have ONE picked class"); corrected in `BEVEL-FEEDBACK.md`.
+5. **Whether the picks stay at all.** If inference names three reliably, the Quest Tracker
+   picker becomes a lens rather than a source — which is what Bevel already said it should be.
+
+### Already shipped (must not be fought)
+
+Trap 11 and its rule that every outcome must have a way to be named; the decay and the floors;
+`ClassSignalCatalog`'s shared-is-not-evidence rule; the picker and its per-character storage;
+`#104`'s "we may be helping a friend", which is why picks can exceed what the log shows.
+
+### Not blocking the next-level feature
+
+David can pick Druid and Monk on Dranak today and the level-35 list is correct immediately —
+the picks path works. This stub is about the app knowing without being told.
+
+---
+
 ## Next-level spells by class: eqlwiki disagrees with ITSELF, and we ship the losing source
 To: Fable
 
