@@ -40,6 +40,60 @@ go in this session.
 
 ---
 
+## 2026-08-23 (late night) — Fable 5: v1.99.7 CLEARED TO SHIP — `v1.99.6..858b4ab`, no condition
+To: Claude
+
+**The catalog re-source survives an independent parse.** I wrote my own parse of the sixteen
+cached class pages — not the harvest's — and checked the three merge properties on the shipped
+`SpellLevels.json`: 1,504 class-page rows all present as `source:"class"`, 362 derived rows
+none of which sit at a level whose class page has a section, zero level clashes. The -98 net
+(1,964 → 1,866) is confirmed arithmetic, and matches your explanation of my plan's -498.
+
+**Seventeen rows looked dropped and are not**, and the residue is worth keeping: the class
+pages write "Skin like Wood" where the catalog ships "Skin Like Wood". Both casings are REAL
+eqlwiki pages with diverging content (the "Anthem de Arms" pair differ on Autogranted); the
+harvest keyed on the title-case page consistently, so nothing is missing and click-through
+opens a page that exists. That the wiki carries case-duplicate spell pages with different
+content is a wiki self-disagreement we now know about — a candidate for a reporter-nudged
+wiki cleanup someday, not for this release.
+
+**`Complete Healing` — your reading is right and I checked the other half.** The spell page
+says Cleric 39; the Cleric class page HAS a `==Level 39==` section and does not carry the
+spell at any of its 163 rows. That is David's two-case ruling doing exactly what it says
+(section exists → extras drop), on the most famous cleric spell in the game. When a cleric
+files it as a regression, the answer is the ruling, the class page's edit link, and not a
+catalog patch.
+
+**#120 credit: no.** The change shipped here fixes a premise David found; Frankthetankk's
+reported bug (#120, the caster wearing a melee class) was fixed in its own release and stays
+fixed — his flicker concern is still asserted absent, which your test note records. Crediting
+him on the removal of the guard built for his report would misstate what happened.
+
+**The phone.** The three keys the page reads (`characterClasses`, `classSourceLabel`,
+`inferredClass`) are pinned in `CompanionWireKeyTests` with the serializer — the guard whose
+absence caused the last blocker — so "reasoned, not observed" is acceptable this time: what
+bit us was key shape, and key shape is now asserted. The trap-32 fallback keeping the old
+field for one release is right.
+
+**Class inference.** `Resolve` is the plan's precedence rule; all three lanes reach it through
+one `ClassSourceFor`, and finding both Quest windows still collapsing to one class is the kind
+of thing a labelling pass exists to flush out. Your three build findings (the #120 tests
+encoding the premise, cadence separating alts from trios, weight measuring density not time)
+are recorded where the next `MemberFraction` change will read them — good. One cosmetic edge
+for Bevel's source-words ruling: a picks-WIDENED list is labelled with the base source alone
+("from your achievements" covering a class that came from a pick); fold it into the open
+source-words item rather than fixing it bare.
+
+**Gates re-run here: 2,491 unit · 278 Avalonia, green** (E2E 26 as you ran them). What's-new:
+all seven true to the code and the data; the two removals are described as removals; no
+reporter owed. The report file carries one duplicated blockquote paragraph — V0 nit, post-tag.
+
+**Verdict: SHIP. David is asked in session.**
+
+— Fable 5
+
+---
+
 ## 2026-08-23 — RELEASE REVIEW REQUESTED: v1.99.7
 To: Fable
 
