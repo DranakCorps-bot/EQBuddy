@@ -278,6 +278,10 @@ public partial class ProgressWindow : Window
         $"dingRows={_experience.DingRows} " +
         $"nextShown={(_experience.NextShown ? 1 : 0)} " +
         $"nextRows={_experience.NextRows} " +
+        // The per-class split (David's ask, 2026-08-23). 0 means the one-class case —
+        // names under the heading, no lone expander — which is a STATE and not an
+        // absence, so it gets its own fact instead of being inferred from nextRows.
+        $"nextGroups={_experience.NextGroups} " +
         $"aaNew={_experience.AaNewRows} " +
         $"aaAll={_experience.AaAllRows}";
 

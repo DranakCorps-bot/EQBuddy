@@ -71,12 +71,13 @@ public static class ProgressTheme
     /// (typical-usual-chaos): "Where'd motes/hour go? That was the most useful stat and
     /// the main reason I opened EQBuddy." A farmer is measuring a camp against the clock,
     /// so a running total answers a different question than the one being asked.</summary>
-    public static string? MoteRate(StatsSnapshot s)
-    {
-        var motes = Motes.Summarize(s.Loot, s.Elapsed);
-        if (motes.Total <= 0) return null;
-        return $"{motes.Total} mote{(motes.Total == 1 ? "" : "s")} · {motes.PerHour:0.#}/hr";
-    }
+    /// <remarks>The words moved to <see cref="MotesPresentation.RateLine"/> when the
+    /// Progress Experience room grew the same line (David, 2026-08-23); this stays as the
+    /// snapshot-shaped door onto it, because a card header has a snapshot and not a
+    /// summary. Two formatters for one rate is what put a mote rate on the Wealth chip
+    /// above a body that refused to carry one.</remarks>
+    public static string? MoteRate(StatsSnapshot s) =>
+        MotesPresentation.RateLine(Motes.Summarize(s.Loot, s.Elapsed));
 
     /// <summary>The Faction badge — the Faction card's own header, with the plural fixed.
     /// The card said "1 factions" and had done since it was written; it was easy to miss

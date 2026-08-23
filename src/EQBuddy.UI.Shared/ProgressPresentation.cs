@@ -25,6 +25,21 @@ public static class ProgressPresentation
         if (s.AaGained > 0)
             lines.Add($"{s.AaGained} AA point{(s.AaGained == 1 ? "" : "s")} · " +
                       $"{s.AaPerHour:0.0} AA/hr (now {s.AaTotal} unspent)");
+        // Motes per hour, as ONE line item (David, 2026-08-23, asked and answered with
+        // the question tool: the Experience room, not Wealth). It sits beside the AA line
+        // because both are "what this session has accrued that spends", and above the ETA
+        // because everything below is the xp forecast rather than a tally.
+        //
+        // Omitted rather than zeroed when nothing has dropped: this block already omits
+        // the AA line and the ETA on the same principle, and "0 motes/hr" reads as a
+        // measurement of a camp rather than as "none yet".
+        //
+        // **The Motes card keeps its own surface** — David: *"keep the separate Motes
+        // tracking for people specifically farming motes"* — and the Wealth chip stays
+        // coin (Bevel, Helm-signed 2026-08-22). This is a summary of that card, in the
+        // room a player already has open, not a replacement for it.
+        if (MotesPresentation.RateLine(Motes.Summarize(s.Loot, s.Elapsed)) is { } motes)
+            lines.Add(motes);
         if (s.HoursToLevel is { } eta) lines.Add($"Next level in {FormatEta(eta)} at this pace");
         if (Levels(s) is { Length: > 0 } levels) lines.Add(levels);
         return lines;

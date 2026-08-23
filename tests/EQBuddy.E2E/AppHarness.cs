@@ -156,6 +156,32 @@ internal sealed class AppHarness : IDisposable
             }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
+    /// <summary>
+    /// Seeds the Quest Tracker's picked classes for the harness character — the source
+    /// every level-unlock surface filters by (<c>UnlockClasses</c>: picks first, the
+    /// combat-inferred class second).
+    ///
+    /// **Trap 22 again, and this one hides a whole feature.** With no classes the
+    /// next-level preview is not merely thin, it is HIDDEN (Bevel, Helm-signed
+    /// 2026-08-23) — so a test that leaves them empty and asserts the preview is asserting
+    /// about a surface that cannot appear, and would go on passing if the preview never
+    /// worked again. Inference cannot be staged from here: it needs a run of
+    /// class-unique log lines and, per <c>FABLE.md</c>, collapses three classes to one
+    /// anyway. Picks are the honest lever.
+    ///
+    /// Keys are <c>"{character}_{server}"</c>, lowercased, exactly as
+    /// <see cref="SessionStats.LedgerCharacterKey"/> writes them. Call before
+    /// <see cref="Launch"/>.
+    /// </summary>
+    public void SeedQuestClasses(params string[] classes)
+    {
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
+            JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                [$"{Character.ToLowerInvariant()}_{Server}"] = new { Classes = classes },
+            }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
     /// <summary>Appends messages to the character log with live timestamps, the way the
     /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.</summary>
     public void AppendLogLines(params string[] messages)

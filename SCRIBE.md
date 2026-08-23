@@ -18,36 +18,28 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ### Progress: motes-per-hour summary line
 
-- **Kind:** David-approved feature
-- **Signed:** Helm, 2026-08-23 8:00 AM CT
-- **Source:** David in Helm chat, 2026-08-23 ~7:59 AM CT
-- **Ask:** In Progress, show **one line item only** for motes per hour. A summary. Not a card, not a glance, not a pill.
-- **Keep:** the separate Motes tracking / Motes card for people specifically farming motes. Do not delete or hide that surface.
-- **Do not:** put mote rate back on the Wealth chip. Wealth chip stays coin only (`Wealth 5p 1g 4s 8c`). That lock stands.
-- **Do not:** strip window/phone Wealth body Motes as part of this. #227 (move mote rows to the Motes card and show that card) stays its own later item.
-- **Not:** the Experience next-level fold. Not a hold. Not a public reply.
-- **Related if present:** #227 motes card; #228 retired (star-only restore). This is a Founder ask for a Progress summary line, authorized to build.
+- **BUILT 2026-08-23 (Claude), staged in 1.99.6.** It is one line in the Progress
+  **Experience** room — "1 mote · 0.9/hr" — beside the xp and AA rates. **David chose that room
+  himself** (asked with the question tool): the Progress WINDOW and the phone already carried
+  that line inside their Wealth tab's Motes body, so the only Progress surface actually missing
+  it was the widget's inline Wealth room, and that room is coin-only by a Helm-signed ruling.
+  He took the Experience room knowing it means the window now states the rate on two tabs.
+  Every "do not" in your item held: the Wealth chip is still coin, the window/phone Wealth Motes
+  rows are untouched (#227 stays its own item), and the Motes card is unchanged. It reuses the
+  Motes card's own header string rather than becoming a fourth mote formatter.
 
 ### In Progress: next-level spells/abilities by class
 
-- **Kind:** David-approved feature
-- **STATUS: ROUTED to `FABLE.md` as a V2, 2026-08-23 (David's own call, asked with the question
-  tool).** Not because the UX is hard — the grouping is a presentation change and
-  `LevelUnlocks.Next` already answers the question — but because checking the ask against the
-  data found that **eqlwiki disagrees with itself**. The Druid class page's `==Level 34==` lists
-  five spells; our catalog is harvested from individual SPELL pages and has ten: it is missing
-  `Healing Water` entirely and adds five ports that appear nowhere on the class page. A 33 Druid
-  would have been shown a list missing one spell and padded with six. That is two overlapping
-  sources of one fact, on a catalog that already drives the shipped "New at level N" list —
-  a reconciliation, not a feature. David has already settled which source wins; the stub says so.
-- **Signed:** Helm, 2026-08-23 7:21 AM CT
-- **Source:** David in Helm chat, 2026-08-23 ~7:20 AM CT
-- **Ask:** On In Progress, show the spells and abilities the character gets at the **next level**.
-- **How:** Use the classes already inferred for the character being played. Derive the list from those classes' EQL Wiki class pages (consume wiki; do not invent a homemade spell table).
-- **Example David gave:** he is a level 33 Druid and does not know what spells he gets at 34. In Progress should answer that.
-- **UX (David):** group the next-level list **by class**. Each class group expands/collapses so he can hide classes he does not want to see.
-- **Not:** a public-reply item. Not a hold. Wiki-first does not block this — this consumes class pages, it does not invent shared game truth.
-- **Related if present:** Bevel's unruled "Mobile Progress New at level" is the same neighborhood if that line exists; this is the Founder ask and is authorized to build. Do not wait on a Bevel lock.
+- **BUILT 2026-08-23 (Claude), staged in 1.99.6** — the UX half. Per-class expanders under the
+  existing "At level N" fold, on both desktops and the phone, following Bevel's lock
+  (Helm-signed). Your routing note stays true and is the reason this went well: the CATALOG
+  reconciliation is still a Fable V2 and PR 1 is not started, so this ships against the spell
+  pages we already have. Nothing was padded and nothing was invented; a class with no table
+  keeps its row reading "nothing new at N".
+- **One thing your item did not have, and it changed the shape:** the preview is now HIDDEN
+  when EQBuddy knows no class at all. It used to fall back to the class-agnostic AA categories
+  and jump forward to whatever level had one, which is how David's own card offered him a pet
+  ability five levels away for a character with no pet.
 
 ### group Sky quest steps by island
 - **Priority:** **BUILT 2026-08-23 (Claude), staged in 1.99.6.** Your hypothesis was right that

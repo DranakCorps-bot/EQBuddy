@@ -90,6 +90,45 @@ public class MoneyAndMotesPresentationTests
         Assert.Contains("3.5 motes/hr", text);
     }
 
+    /// <summary>
+    /// The one-line form the Progress Experience room shows (David, 2026-08-23) and the
+    /// Motes card's own header both come from here.
+    ///
+    /// **Null rather than "0 motes/hr" when nothing has dropped.** The Progress summary
+    /// block already omits the AA line and the ETA on that principle, and a rate of
+    /// nothing reads as a measurement of the camp rather than as "none yet" — which is the
+    /// same argument <see cref="AnEmptyMotesCardExplainsItselfRatherThanReportingZero"/>
+    /// wins for the card, where the answer is a sentence instead of an omission because a
+    /// card cannot omit itself.
+    /// </summary>
+    [Fact]
+    public void TheRateLineCarriesCountAndRateAndSaysNothingWhenThereAreNone()
+    {
+        Assert.Null(MotesPresentation.RateLine(MotesSummary.Empty));
+        Assert.Equal("1 mote · 0.9/hr", MotesPresentation.RateLine(new MotesSummary(1, 0.9, [])));
+        Assert.Equal("12 motes · 3.5/hr", MotesPresentation.RateLine(new MotesSummary(12, 3.45, [])));
+    }
+
+    /// <summary>One formatter, not four. The Motes card header and the Progress line are
+    /// the same string — two formatters for one rate is how the Wealth chip came to name a
+    /// rate the body underneath refused to show (Bevel, 2026-08-22).</summary>
+    [Fact]
+    public void TheProgressLineAndTheMotesHeaderAreTheSameString()
+    {
+        var snap = new StatsSnapshot
+        {
+            Elapsed = TimeSpan.FromHours(2),
+            Loot = [new LootDetail("Mote of Lesser Potential", 3, "a ghoul")],
+        };
+
+        var line = Assert.Single(ProgressPresentation.SummaryLines(snap), l => l.Contains("mote"));
+        Assert.Equal(ProgressTheme.MoteRate(snap), line);
+        Assert.Equal("3 motes · 1.5/hr", line);
+        // And it is absent, not zeroed, on a session that has looted none.
+        Assert.DoesNotContain(ProgressPresentation.SummaryLines(new StatsSnapshot()),
+            l => l.Contains("mote"));
+    }
+
     /// <summary>Motes are items — they click through to the wiki like any other drop.</summary>
     [Fact]
     public void MoteTiersAreItemRows()

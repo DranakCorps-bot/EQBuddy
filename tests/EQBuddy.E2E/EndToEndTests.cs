@@ -284,7 +284,13 @@ public sealed class EndToEndTests
     /// into ProgressCardView, and the PROGRESS THEME folding that card into the Progress
     /// window's Experience tab. The only line that changed is the one that opens the
     /// window — which is what a good outside-in assertion is supposed to look like when
-    /// the inside is rearranged.</summary>
+    /// the inside is rearranged.
+    ///
+    /// **The classes are new, and the test was previously asserting less than it looked.**
+    /// It ran with an empty ledger, so the preview it checked was built from the
+    /// class-agnostic AA categories alone — which since 2026-08-23 does not appear at all
+    /// (Bevel, Helm-signed: a list that cannot be about you should not claim to be). One
+    /// seeded pick makes the assertion mean what its name says.</summary>
     [Fact]
     public void ProgressCard_DrawsItsUnlockListsOnADing()
     {
@@ -292,6 +298,7 @@ public sealed class EndToEndTests
         {
             ["EQBUDDY_PROGRESS"] = "1",   // Experience, where these three lists now live
         });
+        app.SeedQuestClasses("Druid");
         app.Launch();
 
         // Before any level is known, neither list can honestly say anything.
@@ -307,6 +314,71 @@ public sealed class EndToEndTests
         // Folded by default: the label offers it, the rows wait to be asked for.
         app.WaitForDump("nextRows", 0, "the preview's rows to stay folded by default");
     }
+
+    /// <summary>
+    /// The next-level preview, split per class (David's ask, 2026-08-23; Bevel's rules,
+    /// Helm-signed the same day).
+    ///
+    /// **The prediction, written before the run** (trap 23: a number you did not predict
+    /// has not been reviewed). Warrior/Druid at level 12, from the shipped catalogs: the
+    /// next level with anything is **13**, carrying three Druid spells (Befriend Animal,
+    /// Expulse Summoned, See Invisible) and no AA at all — the AA catalog's levels are
+    /// 1/6/8/10/12/15/…, so 13 has none, and there is therefore no "Any class" group.
+    /// That gives **two** groups and **three** rows: Druid open with its three, Warrior
+    /// kept as a row reading "Nothing new at 13" rather than dropped.
+    ///
+    /// The Warrior half is the assertion worth having. A class with no spell table at any
+    /// level is exactly the group a tidy-minded refactor removes, and on screen its
+    /// absence is indistinguishable from that class not being one of yours.
+    /// </summary>
+    [Fact]
+    public void ProgressCard_SplitsTheNextLevelPreviewByClass()
+    {
+        using var app = new AppHarness(
+            settings => settings.ShowNextUnlocks = true,   // the fold's rows, not just its label
+            environment: new Dictionary<string, string> { ["EQBUDDY_PROGRESS"] = "1" });
+        app.SeedQuestClasses("Druid", "Warrior");
+        app.Launch();
+
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+
+        app.WaitForDump("nextShown", 1, "the preview once a level is known");
+        app.WaitForDump("nextGroups", 2, "one expander per class — Druid and Warrior");
+        app.WaitForDump("nextRows", 3, "the three Druid spells at 13, with Warrior's empty group holding no rows");
+    }
+
+    /// <summary>
+    /// One class is a heading with nothing to choose between — Bevel, Helm-signed:
+    /// *"One inferred class = names under the heading, no lone expander."*
+    ///
+    /// **Prediction:** Druid alone at 12 reaches the same level 13 and the same three
+    /// spells, so the rows are unchanged and only the CHROME differs — <c>nextGroups=0</c>
+    /// where the two-class run says 2. Asserting both against one row count is what makes
+    /// this a test of the split rule rather than of the catalog.
+    /// </summary>
+    [Fact]
+    public void ProgressCard_DrawsNoLoneExpanderForASingleClass()
+    {
+        using var app = new AppHarness(
+            settings => settings.ShowNextUnlocks = true,
+            environment: new Dictionary<string, string> { ["EQBUDDY_PROGRESS"] = "1" });
+        app.SeedQuestClasses("Druid");
+        app.Launch();
+
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+
+        app.WaitForDump("nextRows", 3, "the same three Druid spells at 13");
+        app.WaitForDump("nextGroups", 0, "no expander at all when there is one class");
+    }
+
+    // **There is no E2E twin for "no class hides the preview", and that is a finding
+    // rather than an omission.** The harness always writes the shifted fixture log, and
+    // that log carries enough class-unique evidence for `ClassInference` to name a class
+    // — so with no seeded picks the app still HAS a class and the preview correctly
+    // appears (observed: nextShown=1, nextGroups=2). The rule is asserted where the class
+    // list can actually be empty: `WidgetRenderTests.NoClassHidesTheNextLevelPreview`.
+    // Writing a class-free fixture just for this would give the whole suite a second log
+    // to keep true, which is a worse trade than one assertion on the other lane.
 
     /// <summary>Two rules bring the sort strip up, and it starts on the stored default.
     /// The strip is a shared control now (UI.Shared.SortStrip.ForWatchRules) and a key

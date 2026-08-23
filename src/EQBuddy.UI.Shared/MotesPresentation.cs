@@ -22,6 +22,25 @@ public static class MotesPresentation
         : "No motes yet this session — every Mote of … Potential you loot "
           + "(or store as currency) lands here.";
 
+    /// <summary>
+    /// Count AND rate on one line — "3 motes · 0.9/hr". Null when nothing has dropped,
+    /// because a rate of nothing is a measurement rather than an answer.
+    ///
+    /// **One string, three callers, on purpose.** It is the Motes card's own header, the
+    /// Progress Experience room's summary line (David, 2026-08-23: *"in Progress, show one
+    /// line item only for motes per hour"*), and what the phone's Experience tab is sent.
+    /// Writing the Progress line separately would have made it the FOURTH place this app
+    /// formats a mote rate, and the three that already existed are how the Wealth chip and
+    /// the Wealth body came to disagree (Bevel, 2026-08-22).
+    ///
+    /// The RATE is the half that matters and the half that went missing in 1.96.0 — #219
+    /// (typical-usual-chaos): *"Where'd motes/hour go? That was the most useful stat and
+    /// the main reason I opened EQBuddy."* A farmer is measuring a camp against the clock.
+    /// </summary>
+    public static string? RateLine(MotesSummary motes) => motes.Total > 0
+        ? $"{motes.Total} mote{(motes.Total == 1 ? "" : "s")} · {motes.PerHour:0.#}/hr"
+        : null;
+
     /// <summary>The ladder, richest tier first as Core orders it. Motes are items, so they
     /// click through to the wiki and hover their stats like any other.</summary>
     public static List<CardRow> Rows(MotesSummary motes) =>

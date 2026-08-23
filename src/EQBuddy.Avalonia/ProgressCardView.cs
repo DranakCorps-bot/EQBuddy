@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using EQBuddy.Core;
@@ -36,6 +36,19 @@ internal sealed class ProgressCardView(
     private readonly ItemsControl _levelUnlocksList = new();
     private readonly TextBlock _nextUnlocksLabel = AppTheme.Heading("");
     private readonly ItemsControl _nextUnlocksList = new();
+
+    /// <summary>The per-class expanders under the "At level N" heading (David's ask,
+    /// 2026-08-23; Bevel's rules, Helm-signed the same day). The WPF twin's structure,
+    /// deliberately: <see cref="LevelUnlockGroups"/> decides what goes in a group and
+    /// whether the split earns its chrome, so the two lanes cannot answer differently —
+    /// which is the #210 lesson applied before the divergence rather than after it.</summary>
+    private readonly StackPanel _nextGroups = new();
+
+    /// <summary>Which class groups are open, keyed by class name. **A field, never a
+    /// setting** — Bevel, Helm-signed: *"first inferred class open, the rest collapsed
+    /// (session-only, not a setting)."* Keyed by class rather than by index so the choice
+    /// survives the level moving on.</summary>
+    private readonly Dictionary<string, bool> _openGroups = new(StringComparer.OrdinalIgnoreCase);
     private readonly TextBlock _skillLabel = AppTheme.Heading("Skill-ups");
     private readonly ItemsControl _skillList = new();
     private readonly TextBlock _aaNewLabel = AppTheme.Heading("AA learned this session");
@@ -56,6 +69,14 @@ internal sealed class ProgressCardView(
 
     /// <summary>Skill-up row count, for the <c>EQBUDDY_EXPAND</c> dump the widget writes.</summary>
     public int SkillRowCount => _skillList.Items.Count;
+
+    /// <summary>Every unlock row the next-level preview is drawing, flat or grouped, and
+    /// how many per-class expanders it drew. The WPF twin publishes the same two under the
+    /// names E2E asserts on; here they are what <c>WidgetRenderTests</c> reads, since this
+    /// lane's only coverage is a rendered frame.</summary>
+    public int NextRows { get; private set; }
+
+    public int NextGroups { get; private set; }
 
     private StackPanel Build()
     {
@@ -85,6 +106,8 @@ internal sealed class ProgressCardView(
         panel.Children.Add(_nextUnlocksLabel);
         _nextUnlocksList.IsVisible = false;
         panel.Children.Add(_nextUnlocksList);
+        _nextGroups.IsVisible = false;
+        panel.Children.Add(_nextGroups);
         // Hidden when there is nothing under it — a heading with no rows reads as a
         // surface that failed to load. Its WPF twin had the same bug and the same fix.
         _skillLabel.IsVisible = false;
@@ -135,18 +158,23 @@ internal sealed class ProgressCardView(
         // unlocks anything, anchored to the last level the log ever announced (persisted
         // per character, so it works across restarts). Hidden until a level is known:
         // previewing from an unknown level would be a guess.
+        //
+        // Hidden with no class in play as well, which is Bevel's rule and not a tidy-up:
+        // with no class the preview can only be the class-agnostic AA categories, and
+        // `LevelUnlocks.Next` then walks forward to whatever level has one — David's own
+        // card offered "At level 39: 1 new AA ability", an Archetype pet ability five
+        // levels away, to a character with no pet.
+        var picked = classes(s);
         var knownLevel = s.LastLevel ?? storedLevel();
-        var next = knownLevel is { } kl ? LevelUnlocks.Next(classes(s), kl) : null;
+        var next = picked.Count > 0 && knownLevel is { } kl ? LevelUnlocks.Next(picked, kl) : null;
         _nextUnlocksLabel.IsVisible = next is not null;
         if (next is { } nx)
         {
             _nextUnlocksLabel.Text = LevelUnlockText.NextLabel(
                 nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count, settings.ShowNextUnlocks);
-            _nextUnlocksList.IsVisible = settings.ShowNextUnlocks;
-            if (settings.ShowNextUnlocks)
-                CardParts.FillList(_nextUnlocksList, UnlockRows(nx.Unlocks), tooltip: UnlockTooltip(nx.Unlocks));
+            RenderNextBody(nx.Level, nx.Unlocks, picked);
         }
-        else _nextUnlocksList.IsVisible = false;
+        else ClearNextBody();
 
         CardParts.FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
         _skillLabel.IsVisible = _skillList.Items.Count > 0;
@@ -168,6 +196,106 @@ internal sealed class ProgressCardView(
             CardParts.FillList(_aaAbilityList, s.AaAbilities.Select(a =>
                     (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
                 tooltip: name => AaCatalog.Find(name)?.Effect);
+    }
+
+    private void ClearNextBody()
+    {
+        _nextUnlocksList.IsVisible = false;
+        _nextGroups.IsVisible = false;
+        _nextGroups.Children.Clear();
+        NextRows = 0;
+        NextGroups = 0;
+    }
+
+    /// <summary>
+    /// The preview's body: one list, or one expander per class.
+    ///
+    /// **Why the split earns its chrome.** A Legends character is up to three classes at
+    /// once (David, 2026-08-23), so a level's unlocks are naturally several lists — and
+    /// "which of my classes is this for" was a question the flat list could only answer by
+    /// making you read every row's value column. What belongs in a group, and whether the
+    /// split is worth drawing at all, is <see cref="LevelUnlockGroups"/>'s call; this only
+    /// draws it, which is the difference between parity by shared module and parity by
+    /// feature list (#210).
+    /// </summary>
+    private void RenderNextBody(int level, LevelUnlockSet set, IReadOnlyList<string> picked)
+    {
+        _nextGroups.Children.Clear();
+        NextRows = 0;
+        NextGroups = 0;
+        if (!settings.ShowNextUnlocks)
+        {
+            _nextUnlocksList.IsVisible = false;
+            _nextGroups.IsVisible = false;
+            return;
+        }
+
+        var groups = LevelUnlockGroups.ByClass(set, picked);
+        if (!LevelUnlockGroups.WorthGrouping(groups))
+        {
+            // One group is a heading with nothing to choose between: names go straight
+            // under the "At level N" line, exactly as they did before the split.
+            _nextUnlocksList.IsVisible = true;
+            _nextGroups.IsVisible = false;
+            CardParts.FillList(_nextUnlocksList, UnlockRows(set), tooltip: UnlockTooltip(set));
+            NextRows = set.Count;
+            return;
+        }
+
+        _nextUnlocksList.IsVisible = false;
+        _nextGroups.IsVisible = true;
+        var tooltip = UnlockTooltip(set);
+        var defaultOpen = LevelUnlockGroups.DefaultOpenIndex(groups);
+        for (var i = 0; i < groups.Count; i++)
+        {
+            var group = groups[i];
+            if (group.IsEmpty)
+            {
+                // The class stays on screen and says so. Dropping it is indistinguishable
+                // from that class not being one of yours, and a Warrior has no spell table
+                // at ANY level. No chevron, because there is nothing behind it — an
+                // affordance that opens nothing is trap 16 with the switch the other way.
+                _nextGroups.Children.Add(AppTheme.Heading(group.ClassName));
+                _nextGroups.Children.Add(new TextBlock
+                {
+                    Text = LevelUnlockGroups.NothingNew(level),
+                    FontSize = DesignSystem.Size(DesignTokens.TypeRole.Body),
+                    Foreground = AppTheme.DimBrush,
+                    Margin = new Thickness(DesignTokens.Indent, 1, 0, 1),
+                });
+                NextGroups++;
+                continue;
+            }
+
+            // The first class with something to show is open, the rest collapsed — until
+            // the player says otherwise this session. TryGetValue rather than an up-front
+            // seed, so a class that appears later still gets the default rather than
+            // inheriting a stale entry.
+            if (!_openGroups.TryGetValue(group.ClassName, out var open)) open = i == defaultOpen;
+
+            var heading = new EqFoldLabel { Section = true };
+            heading.Set(open, group.ClassName);
+            heading.Cursor = new Cursor(StandardCursorType.Hand);
+            ToolTip.SetTip(heading,
+                $"What {group.ClassName} gains at level {level} — click to expand or fold");
+            var name = group.ClassName;
+            var wasOpen = open;
+            heading.PointerPressed += (_, e) =>
+            {
+                e.Handled = true;
+                _openGroups[name] = !_openGroups.GetValueOrDefault(name, wasOpen);
+                repaint();
+            };
+            _nextGroups.Children.Add(heading);
+            NextGroups++;
+
+            if (!open) continue;
+            var rows = new ItemsControl();
+            CardParts.FillList(rows, group.Rows.Select(r => (r.Name, r.Value)), tooltip: tooltip);
+            rows.Margin = new Thickness(DesignTokens.Indent, 0, 0, 0);
+            _nextGroups.Children.Add(rows);
+            NextRows += group.Rows.Count;
+        }
     }
 
     private LevelUnlockSet DingUnlocks(StatsSnapshot s)

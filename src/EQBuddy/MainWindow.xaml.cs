@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -214,7 +214,15 @@ public partial class MainWindow : Window, ICardContext
                     .Select(sec => (sec.Class, (IReadOnlyList<BuffSetEntryState>)sec.Entries))],
                 BuffLosses = () => _buffLossLog.Snapshot(),
                 HopsFromHere = zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops,
-                Progress = () => (CurrentSnapshot().LastLevel, ProgressDingUnlocks(CurrentSnapshot())),
+                // One snapshot, four answers — and the CLASSES go with them, so the phone
+                // groups the next level exactly as the two windows do rather than
+                // deciding for itself (#210's lesson, applied before the divergence).
+                Progress = () =>
+                {
+                    var snap = CurrentSnapshot();
+                    return new Companion.CompanionProgressState(snap.LastLevel,
+                        ProgressDingUnlocks(snap), UnlockClasses(snap), NextUnlockPreview(snap));
+                },
                 // The Progress theme's Raids tab, wired in the same change as the desktop
                 // fold — both surfaces or neither (#210).
                 Raids = _raidLedger,

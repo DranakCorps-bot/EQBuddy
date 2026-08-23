@@ -49,6 +49,79 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
+## 2026-08-23 evening (LATEST — start here): both features are BUILT; 1.99.6 needs its third Fable pass
+
+**Still read `FABLE.md`'s top stub before touching anything class-related.** `ClassInference`
+returns ONE class, or `""`; a Legends character is up to THREE. Filed V3, not patched. Everything
+below is built on the PICKS path, which works — and the two features made the gap more visible,
+not less: the next-level fold now hides itself when no class is known, so a player whose classes
+EQBuddy cannot infer and who has not ticked them in the Quest Tracker sees no preview at all.
+That is the honest state and it is called out in `WhatsNew.json`, but it is one more reason the
+V3 matters.
+
+### DONE — next-level spells, grouped by class
+
+Both desktops and the phone, all three drawing from `UI.Shared/LevelUnlockGroups`. Bevel's lock
+(Helm-signed) followed, with one narrowing and one addition that are written up in
+`BEVEL-FEEDBACK.md` and are Bevel's to overrule:
+
+- **Narrowing:** *"first inferred class open"* is *the first class with something to SHOW*
+  (`DefaultOpenIndex`). A Warrior whose next milestone is an Archetype AA has an EMPTY first
+  group above the shared bucket holding the only row — open-by-index put "nothing new at 15"
+  over a collapsed heading with the single row two clicks away. **Found from a prediction
+  written before the screenshot**, which is the trap-23 habit paying for itself.
+- **Addition:** an empty class row gets no chevron. A fold that opens nothing is an affordance
+  that lies.
+- **Not built, deliberately:** *"class page unreachable → heading names the miss"* has no
+  runtime referent — the spell data is a shipped catalog, not a fetch. It becomes implementable
+  with Fable's V2 catalog re-source (PR 1, not started).
+- **Evidence:** `docs/screenshots/theme-inline-progress.png` (inferred one class + "Any class",
+  the DefaultOpenIndex case) and `progress-next-classes.png` (Warrior/Druid/Monk, two groups
+  empty). The phone was driven through the real `⚙ Screens` picker in `mobile-harness.ps1` —
+  grouped, ungrouped, and the fold toggling — because trap 38 says reasoning is not enough.
+
+### DONE — motes/hr, and the room was DAVID'S call
+
+**He chose the Experience room, asked with the question tool.** The thing worth carrying: the
+line was already on TWO of the three surfaces — the Progress window and the phone both had it
+inside their Wealth tab's Motes body — so the only room missing it was the widget's inline
+Wealth room, which is coin-only by a Helm-signed ruling. He took Experience knowing it means the
+window now names the rate on two tabs. One formatter (`MotesPresentation.RateLine`), reused by
+the Motes card header, so a fourth mote string was not created.
+
+### What is OPEN, in the order it matters
+
+1. **The third Fable review of 1.99.6 has been REQUESTED and not answered** —
+   `FABLE-FEEDBACK.md`, with the range. **Do not ask David for the release go until it is
+   back**, and per `CLAUDE.md` the FIRST thing to re-read next session is that file, not
+   `git log`.
+2. **Bevel owes one ruling, and it is the one it asked for.** Its PR 1 note said *"320 stands
+   until a shot overflows it."* `progress-next-classes.png` overflows it: three classes plus a
+   just-announced ding is ~21 rows and the third group is under the cap with the scroller
+   showing. The two-class case fits with room to spare. Evidence and the row count are in
+   `BEVEL-FEEDBACK.md`; nothing was changed.
+3. **A pre-existing defect found while shooting, filed and NOT fixed:** the Progress WINDOW's
+   Experience tab renders ~203px and scrolls after about three lines, while the Wealth tab of
+   the same window renders at 741px. `docs/screenshots/progress-card.png` has been photographing
+   a panel cut off ABOVE the two lists it is named for — including in the committed pre-change
+   copy, so it is not from this work. That is why the new shot uses the inline card. There is a
+   hypothesis in the filed task; it is a hypothesis.
+4. **PR 1 of the catalog re-source is still not started** and David wants to review that diff.
+
+### Findings worth not re-learning
+
+- **The E2E harness's fixture log infers WARRIOR.** Its ding at 12 is Heroic Leap + Unbound
+  Wrath, both Warrior Class AAs. So "no class" is NOT a reachable state in `tests/EQBuddy.E2E`,
+  and an assertion written for it was about a state the harness cannot produce. It moved to
+  `WidgetRenderTests`, where the class list is a parameter. `AppHarness.SeedQuestClasses` is new
+  and is the honest lever for the other cases.
+- **`SectionFingerprints` was keying the phone's Progress surface on `Wealth.MotesSummary`,
+  which is the RATE** — the one value in that record that moves on the clock with nothing
+  happening, and simultaneously the only thing standing in for "a mote dropped". Trap 8, three
+  lines below the comment explaining trap 8. Now keyed on the mote tiers.
+
+---
+
 ## 2026-08-23 midday (LATEST — start here): two features half-built, and one PREMISE ERROR to read first
 
 **Read `FABLE.md`'s top stub before touching anything class-related.** `ClassInference` returns

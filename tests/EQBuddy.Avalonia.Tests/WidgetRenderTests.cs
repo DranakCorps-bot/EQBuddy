@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -1434,6 +1434,171 @@ public class WidgetRenderTests : IDisposable
         Assert.False(main.Settings.ShowPerfStats);
         Assert.False(label.IsVisible);
         Assert.Equal(0, label.Bounds.Width);
+        main.Close();
+    }
+    // ---- the next-level preview, split per class (David, 2026-08-23) ----
+
+    /// <summary>Builds the Experience surface on its own, with a class source the test
+    /// controls. The widget's own source is picks-then-inference off a live ledger, and a
+    /// headless profile has neither — so driving it through <c>MainWindow</c> would test
+    /// the empty case three times over. The window is still created first: it is what
+    /// applies the theme, and <see cref="AppTheme"/>'s brushes are process-wide (trap
+    /// 31).</summary>
+    private static (MainWindow Main, Window Host, ProgressCardView View) ExperienceWith(
+        params string[] classes)
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Settings.ShowNextUnlocks = true;   // the rows, not just the fold's label
+        ProgressCardView? view = null;
+        view = new ProgressCardView(main.Settings, _ => classes, () => 12,
+            () => view!.Render(new StatsSnapshot()));
+        var host = new Window { Content = view.Body, Width = 320, Height = 480 };
+        host.Show();
+        view.Render(new StatsSnapshot());
+        host.UpdateLayout();
+        return (main, host, view);
+    }
+
+    /// <summary>
+    /// The WPF twin of <c>ProgressCard_SplitsTheNextLevelPreviewByClass</c> — Bevel's
+    /// grouping rules, Helm-signed 2026-08-23, on the lane whose only coverage is a
+    /// rendered frame.
+    ///
+    /// **The prediction, written before the run** (trap 23). Druid/Warrior at 12, from the
+    /// shipped catalogs: the next level with anything is **13**, carrying three Druid
+    /// spells (Befriend Animal, Expulse Summoned, See Invisible) and no AA — the AA
+    /// catalog's levels are 1/6/8/10/12/15/…, so 13 has none and there is no "Any class"
+    /// group. Two groups, three rows, and Warrior present as a row that says so.
+    ///
+    /// The negative assertion is the one that keeps this honest: Warrior must NOT be an
+    /// <see cref="EqFoldLabel"/>. A chevron over an empty group is an affordance that
+    /// opens nothing, and every icon assertion in this file needs one negative after
+    /// <c>DropsRenderTests</c> spent months comparing two type names (trap 39).
+    /// </summary>
+    [AvaloniaFact]
+    public void NextLevelPreviewSplitsIntoOneExpanderPerClass()
+    {
+        var (main, host, view) = ExperienceWith("Druid", "Warrior");
+
+        Assert.Equal(2, view.NextGroups);
+        Assert.Equal(3, view.NextRows);
+        var text = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("▾ At level 13: 3 new spells", text);
+        Assert.Contains("Befriend Animal", text);
+        Assert.Contains("Druid spell", text);
+        // Warrior keeps its row and says what it has: nothing. Dropping the group is
+        // indistinguishable on screen from Warrior not being one of your classes.
+        Assert.Contains("Warrior", text);
+        Assert.Contains("Nothing new at 13", text);
+        Assert.Contains("Druid", host.GetVisualDescendants().OfType<EqFoldLabel>()
+            .Select(f => f.Text));
+        Assert.DoesNotContain("Warrior", host.GetVisualDescendants().OfType<EqFoldLabel>()
+            .Select(f => f.Text));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>*"One inferred class = names under the heading, no lone expander."*
+    ///
+    /// **Prediction:** Druid alone reaches the same level 13 and the same three spells, so
+    /// only the chrome differs — no <see cref="EqFoldLabel"/> at all under the heading.
+    /// Asserting the identical row count against a different group count is what makes
+    /// this a test of the split rule rather than of the catalog.</summary>
+    [AvaloniaFact]
+    public void OneClassGetsItsNamesUnderTheHeadingWithNoLoneExpander()
+    {
+        var (main, host, view) = ExperienceWith("Druid");
+
+        Assert.Equal(0, view.NextGroups);
+        Assert.Equal(3, view.NextRows);
+        var text = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Befriend Animal", text);
+        // Scoped to the class name, not to "no folds at all": the Experience surface
+        // always carries the All-AA fold, and asserting on the whole tree would have been
+        // a test of that instead.
+        Assert.DoesNotContain("Druid", host.GetVisualDescendants().OfType<EqFoldLabel>()
+            .Select(f => f.Text));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>
+    /// No class in play hides the preview outright (Bevel, Helm-signed 2026-08-23).
+    ///
+    /// **This is a deliberate loss and it is worth stating.** Before 2026-08-23 a
+    /// character with no picked and no inferred class still got a preview — built from the
+    /// class-agnostic AA categories alone, with <c>LevelUnlocks.Next</c> walking forward
+    /// to whatever level had one. That is how David's own card came to offer *"At level
+    /// 39: 1 new AA ability"*, an Archetype pet ability five levels away, to a character
+    /// with no pet.
+    ///
+    /// **It lives here rather than in E2E, and that took a failing run to learn.** The E2E
+    /// harness always writes the shifted fixture log, which carries enough class-unique
+    /// evidence for <c>ClassInference</c> to name a class — so the no-class state is not
+    /// reachable there at all, and the assertion that looked like the strongest one in the
+    /// suite was about a state the harness cannot produce. Here the class list is a
+    /// parameter.
+    /// </summary>
+    [AvaloniaFact]
+    public void NoClassHidesTheNextLevelPreview()
+    {
+        var (main, host, view) = ExperienceWith();
+
+        Assert.Equal(0, view.NextGroups);
+        Assert.Equal(0, view.NextRows);
+        Assert.DoesNotContain(host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? ""), t => t.Contains("At level "));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>
+    /// First class open, the rest collapsed — and a click moves it, for this session only.
+    ///
+    /// **Prediction:** Druid/Cleric at 12 both reach level 13 with three spells each
+    /// (Druid: Befriend Animal, Expulse Summoned, See Invisible; Cleric: Cancel Magic,
+    /// Endure Cold, Expulse Undead) and no AA between them. So the opening state is three
+    /// rows, not six, and opening Cleric makes it six.
+    ///
+    /// The click is the assertion that matters. The state is a FIELD rather than a
+    /// setting (Bevel: session-only), so nothing on disk can be inspected instead — and a
+    /// fold whose chevron moves while its rows do not is exactly the kind of half-wired
+    /// toggle a screenshot cannot tell from a working one.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheFirstClassOpensAndTheRestFoldUntilClicked()
+    {
+        var (main, host, view) = ExperienceWith("Druid", "Cleric");
+
+        Assert.Equal(2, view.NextGroups);
+        Assert.Equal(3, view.NextRows);
+        Assert.True(Fold(host, "Druid").Open);
+        Assert.False(Fold(host, "Cleric").Open);
+        var text = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Befriend Animal", text);
+        Assert.DoesNotContain("Cancel Magic", text);
+
+        var cleric = Fold(host, "Cleric");
+        var point = global::Avalonia.VisualExtensions.TranslatePoint(
+            cleric, new global::Avalonia.Point(6, cleric.Bounds.Height / 2), host);
+        Assert.True(point.HasValue, "the Cleric heading is not laid out — it cannot be clicked");
+        host.MouseDown(point!.Value, global::Avalonia.Input.MouseButton.Left);
+        host.MouseUp(point!.Value, global::Avalonia.Input.MouseButton.Left);
+        host.UpdateLayout();
+
+        Assert.Equal(6, view.NextRows);
+        Assert.True(Fold(host, "Cleric").Open);
+        Assert.Contains("Cancel Magic", host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? ""));
+
+        host.Close();
         main.Close();
     }
 }

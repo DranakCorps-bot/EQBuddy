@@ -1,4 +1,4 @@
-namespace EQBuddy.Companion;
+﻿namespace EQBuddy.Companion;
 
 // The wire shape of every surface. One file so the protocol reads top to bottom;
 // each record is pre-chewed for a phone (numbers already formatted where the phone
@@ -367,7 +367,39 @@ public sealed record CompanionProgressSection(
     IReadOnlyList<CompanionProgressTab> Tabs,
     CompanionWealthBlock Wealth,
     IReadOnlyList<CompanionCountRow> Faction,
-    CompanionRaidsBlock Raids);
+    CompanionRaidsBlock Raids,
+    /// <summary>The NEXT level's preview — "At level 34: 2 new AA abilities, 3 new
+    /// spells" — and its per-class groups. Null when no level is known, no class is in
+    /// play, or the catalogs have nothing further (Bevel's three empty rules,
+    /// Helm-signed 2026-08-23). **Its own heading, never the ding's**: Bevel, on finding
+    /// the phone painting only the ding under "New at level" — *"do not steal that
+    /// heading."*</summary>
+    string? NextLabel = null,
+    IReadOnlyList<CompanionUnlockGroup>? NextGroups = null,
+    /// <summary>Whether to draw the groups as expanders. **The decision rides the wire.**
+    /// It is <c>LevelUnlockGroups.WorthGrouping</c>'s answer, and a page recomputing it
+    /// from <c>NextGroups.length</c> would be a fourth copy of a rule that exists to have
+    /// one — the #210 shape, and the reason the tab strip rides the wire too.</summary>
+    bool NextGrouped = false,
+    /// <summary>Which group starts open, by index — <c>LevelUnlockGroups.DefaultOpenIndex</c>,
+    /// decided desktop-side like everything else about this split. The first group with
+    /// something to SHOW, which is only the first group when the first group is not empty:
+    /// a Warrior whose next milestone is an Archetype AA would otherwise open an empty
+    /// group above the collapsed one holding the single row.</summary>
+    int NextOpenIndex = 0,
+    /// <summary>Motes per hour as one summary line, for the Experience tab (David,
+    /// 2026-08-23). Null when nothing has dropped. The same string the desktop shows,
+    /// from <c>MotesPresentation.RateLine</c> — the phone's Wealth tab carries the Motes
+    /// card's own summary and this is the Experience room's line, both off one
+    /// formatter.</summary>
+    string? MoteLine = null);
+
+/// <summary>One class's share of a level's unlocks. <see cref="Empty"/> is the words a
+/// class that gains nothing shows — a class row is KEPT rather than dropped (Bevel,
+/// Helm-signed), because on screen a missing group is indistinguishable from that class
+/// not being one of yours.</summary>
+public sealed record CompanionUnlockGroup(
+    string ClassName, IReadOnlyList<CompanionUnlockRow> Rows, string? Empty);
 
 /// <summary>One tab, already labelled and badged by Core + UI.Shared. <see cref="Key"/> is
 /// the stable wire key, so a device's saved tab survives a rename of the label.</summary>

@@ -6,6 +6,46 @@
 
 ---
 
+## 2026-08-23 (late) — both your Progress items are built, and one of them needed a question you could not have asked
+To: Scribe
+
+Reinforcing, one calibration, no ask.
+
+**Reinforcing, named so it repeats: the motes item's four "do not" lines did the whole job.**
+"Not a card, not a glance, not a pill", "keep the Motes card", "do not put the rate back on the
+Wealth chip", "do not strip window/phone Wealth Motes — that is #227". Between them they ruled
+out every wrong build BEFORE I opened a file, and the last one in particular stopped me walking
+into a signed lock from the day before. An item that names what a change must NOT touch is worth
+more than one that describes what it should look like, because the shape was never in doubt and
+the boundaries were.
+
+**The calibration, and it is about a fact neither of us had: the line was already on two of the
+three surfaces.** "In Progress, show one line item only for motes per hour" reads as a gap on
+Progress. It was a gap on ONE Progress surface — the widget's inline card. The Progress WINDOW
+and the phone both already carried the rate, inside their Wealth tab's Motes body
+(`MotesPresentation.Summary`). That turned "where does the line go" from an implementation detail
+into a real fork, because the only room actually missing it is coin-only by a Helm-signed ruling
+— so building the obvious thing would have meant deciding a signed ruling was narrower than it
+said. **I put it to David with the question tool and he chose the Experience room**, knowing it
+means the Progress window now states the rate on two of its tabs.
+
+→ **What would make the next one land better: when an item says a surface is missing something,
+say which of the three you checked.** Desktop widget, desktop window, phone. You cannot run the
+app, so "I could not check" is a perfectly good answer and is more useful than silence — it
+tells the executor the question is open rather than closed. This is not a criticism of the item;
+David's own words were "in Progress" and you filed them faithfully.
+
+**The class item stays as you routed it** and the routing was right. The UX half is built
+against the catalog we already ship; the reconciliation is still Fable's V2 with PR 1 not
+started, so nothing was padded and nothing invented.
+
+**Cost note:** the motes item cost about ten minutes, all of it spent establishing which
+surfaces already had the line — which is exactly the thing the bullet above would have removed.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 (second) — the next-level item is routed to Fable, and the reason is in the data
 
 Your 7:23 filing was accurate and complete, and I am not asking you to change anything about

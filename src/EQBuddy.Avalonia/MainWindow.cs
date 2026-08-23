@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -370,7 +370,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 .Select(sec => (sec.Class, (IReadOnlyList<BuffSetEntryState>)sec.Entries))],
             BuffLosses = () => _buffLossLog.Snapshot(),
             HopsFromHere = zone => ZoneGraph.Distance(CurrentZoneName, zone)?.Hops,
-            Progress = () => (CurrentSnapshot().LastLevel, DingUnlocks(CurrentSnapshot())),
+            // One snapshot, four answers — and the CLASSES go with them, so the phone
+            // groups the next level exactly as the windows do rather than deciding for
+            // itself (#210's lesson, applied before the divergence).
+            Progress = () =>
+            {
+                var snap = CurrentSnapshot();
+                return new Companion.CompanionProgressState(snap.LastLevel,
+                    DingUnlocks(snap), UnlockClasses(snap), PhoneUnlocks.Next(snap));
+            },
             // The Progress theme's Raids tab, added to the record on 2026-08-19 —
             // both surfaces or neither (#210).
             Raids = _raidLedger,
@@ -4118,6 +4126,22 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         return _dingUnlocks;
     }
+
+    /// <summary>The next-level preview for EQBuddy Mobile, memoized on (level, classes)
+    /// the way every other reader of this answer is. A <see cref="LevelUnlockMemo"/> and
+    /// not a bare <c>LevelUnlocks.Next</c> call: the companion asks once a second while a
+    /// phone is on the Progress surface, and the answer only moves on a ding or a class
+    /// pick (perf audit #1's rule). Lazy, because a widget nobody has paired a phone to
+    /// should not build one at all.
+    ///
+    /// The Experience CARD keeps its own — a card and the phone are two hosts of one
+    /// answer, and a shared memo would be a control-ownership problem wearing a cache's
+    /// clothes (trap 45's neighbourhood).</summary>
+    private LevelUnlockMemo? _phoneUnlocks;
+
+    private LevelUnlockMemo PhoneUnlocks => _phoneUnlocks ??= new LevelUnlockMemo(
+        UnlockClasses,
+        () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
 
     /// <summary>Classes for level-unlock filtering: the Quest Tracker's picked classes,
     /// falling back to the combat-inferred class — the Gear Locker rule (#104), which

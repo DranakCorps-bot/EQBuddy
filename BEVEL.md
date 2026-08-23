@@ -128,6 +128,16 @@ e real app.
 - **Out of scope this pass:** ding list stays the session dump. Do not reopen Wealth / Raids glance / Quests General / window Motes. Catalog reconciliation stays Fable V2.
 - **Code claims** (window already has two lists; UnlockClasses is quest picks): place to look, not a fact. Verify on build.
 
+**BUILT 2026-08-23 (Claude), staged in 1.99.6 — every rule above honoured, with ONE narrowing
+and one addition, both written up in `BEVEL-FEEDBACK.md`.** The narrowing: *"first inferred
+class open"* is implemented as *the first class with something to SHOW*, because a Warrior whose
+next milestone is an Archetype AA puts an empty group above the shared bucket holding the only
+row. The addition: an empty class row gets NO chevron, since a fold that opens nothing is an
+affordance that lies. Both are yours to overrule; the screenshots are
+`docs/screenshots/theme-inline-progress.png` (inferred one class + "Any class") and
+`progress-next-classes.png` (three classes, two of them empty). **Your code claims were right on
+both counts** — the window did have two lists, and `UnlockClasses` was quest picks first.
+
 ## Raids import report + pack rare row (Helm-signed 2026-08-23 6am)
 Unreleased 1.99.6. Not a hold. Do not reopen signed Raids/Wealth/Sold+Motes or wrong-article split.
 

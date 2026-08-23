@@ -22,7 +22,11 @@ public sealed record CompanionSources
     public Func<IReadOnlyList<BuffLossEntry>>? BuffLosses { get; init; }
     /// <summary>Zone → hops from here, for the gear checklist's by-zone view.</summary>
     public Func<string, int?>? HopsFromHere { get; init; }
-    public Func<(int? Level, LevelUnlockSet Unlocks)>? Progress { get; init; }
+    /// <summary>The Progress theme's Experience state, as one record rather than a
+    /// widening tuple — it went from two members to four the day the next-level preview
+    /// reached the phone, and a positional tuple is exactly where a caller silently swaps
+    /// two lists of strings.</summary>
+    public Func<CompanionProgressState>? Progress { get; init; }
 
     /// <summary>This character's raid clears — the Progress theme's Raids tab
     /// (docs/Themes.md). Wired in the same change as the desktop fold: a surface that
@@ -314,6 +318,8 @@ public sealed class CompanionHost : IDisposable
                 : null,
             Level = progress?.Level,
             Unlocks = progress?.Unlocks,
+            UnlockClasses = progress?.Classes ?? [],
+            NextUnlocks = progress?.Next,
             Raids = On(CompanionSurfaces.Progress) ? _sources.Raids : null,
             Quests = quests,
             QuestIndex = quests is null ? null : _questIndex,

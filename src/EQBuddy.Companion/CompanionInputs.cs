@@ -9,6 +9,17 @@ namespace EQBuddy.Companion;
 /// surface is offered AND a device is connected (see CompanionHost.Tick), which is why
 /// they are all nullable or empty-by-default rather than required.
 /// </summary>
+/// <summary>The desktop's Experience state for one tick: what the ding opened, what the
+/// NEXT level opens, and the classes both were filtered by. A record rather than a tuple
+/// because it grew from two members to four in one change, and a four-tuple of
+/// <c>(int?, LevelUnlockSet, IReadOnlyList&lt;string&gt;, …)</c> is where a caller swaps
+/// two arguments and nothing complains.</summary>
+public sealed record CompanionProgressState(
+    int? Level,
+    LevelUnlockSet Unlocks,
+    IReadOnlyList<string> Classes,
+    (int Level, LevelUnlockSet Unlocks)? Next);
+
 public sealed record CompanionInputs
 {
     public string Character { get; init; } = "";
@@ -48,6 +59,20 @@ public sealed record CompanionInputs
     /// class list and the memoized lookup).</summary>
     public LevelUnlockSet? Unlocks { get; init; }
     public int? Level { get; init; }
+
+    /// <summary>The next-level preview and the classes it was filtered by — the two
+    /// halves EQBuddy Mobile's own next fold needs (Bevel, Helm-signed 2026-08-23:
+    /// *"give phone Progress the same next fold"*).
+    ///
+    /// **The classes ride the wire rather than the phone asking for them**, and that is
+    /// the whole point: the split is <see cref="EQBuddy.UI.Shared.LevelUnlockGroups"/>'s
+    /// decision, made once desktop-side, so the page cannot group the same unlocks
+    /// differently than the two windows do. It is the #210 fix applied before the bug
+    /// rather than after it — the phone went on building its own cross-class ready list
+    /// for two days once, and this is the same shape of list.</summary>
+    public IReadOnlyList<string> UnlockClasses { get; init; } = [];
+
+    public (int Level, LevelUnlockSet Unlocks)? NextUnlocks { get; init; }
 
     /// <summary>This character's raid clears, for the Progress theme's Raids tab. The
     /// LEDGER rather than a pre-built block: the projection needs to ask it per boss, and

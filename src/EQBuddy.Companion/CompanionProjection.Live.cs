@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
@@ -123,12 +123,22 @@ public static partial class CompanionProjection
     }
 
     private static CompanionProgressSection BuildProgress(
-        StatsSnapshot? s, int? level, LevelUnlockSet? unlocks, RaidKillLedger? raids)
+        StatsSnapshot? s, int? level, LevelUnlockSet? unlocks, RaidKillLedger? raids,
+        IReadOnlyList<string> classes, (int Level, LevelUnlockSet Unlocks)? next)
     {
         unlocks ??= LevelUnlockSet.Empty;
         var stats = s ?? new StatsSnapshot();
         var catalog = RaidTargetCatalog.Default;
         var defeated = raids?.DefeatedCount() ?? 0;
+        // The next-level preview, grouped desktop-side. Withheld with no class in play —
+        // the same rule the two windows apply, and for the same reason: with no class the
+        // list can only be the class-agnostic AA categories, and `LevelUnlocks.Next` then
+        // walks forward to whatever level has one. That is how a card came to offer "At
+        // level 39: 1 new AA ability", an Archetype pet ability five levels away, to a
+        // character with no pet.
+        var nextGroups = next is { } nx && classes.Count > 0
+            ? LevelUnlockGroups.ByClass(nx.Unlocks, classes)
+            : null;
         return new CompanionProgressSection(
             XpPercent: s?.XpPercent ?? 0,
             XpPerHour: s?.XpPerHour ?? 0,
@@ -156,7 +166,23 @@ public static partial class CompanionProjection
             Wealth: BuildWealth(stats),
             Faction: [.. stats.Faction.Take(MaxRows)
                 .Select(f => new CompanionCountRow(f.Faction, f.Net))],
-            Raids: BuildRaids(raids, catalog));
+            Raids: BuildRaids(raids, catalog),
+            // Its OWN heading, never the ding's — Bevel, Helm-signed: "do not steal that
+            // heading". NextWords rather than NextLabel: the page draws its own chevron,
+            // and a glyph baked into a wire string is one the page cannot restyle and the
+            // ratchet cannot see.
+            NextLabel: nextGroups is null || next is not { } n ? null
+                : LevelUnlockText.NextWords(n.Level, n.Unlocks.Aas.Count, n.Unlocks.Spells.Count),
+            NextGroups: nextGroups is null ? null :
+            [
+                .. nextGroups.Select(g => new CompanionUnlockGroup(
+                    g.ClassName,
+                    [.. g.Rows.Take(MaxRows).Select(r => new CompanionUnlockRow(r.Name, r.Value))],
+                    g.IsEmpty && next is { } lv ? LevelUnlockGroups.NothingNew(lv.Level) : null)),
+            ],
+            NextGrouped: nextGroups is not null && LevelUnlockGroups.WorthGrouping(nextGroups),
+            NextOpenIndex: nextGroups is null ? 0 : LevelUnlockGroups.DefaultOpenIndex(nextGroups),
+            MoteLine: MotesPresentation.RateLine(Motes.Summarize(stats.Loot, stats.Elapsed)));
     }
 
     /// <summary>Coin and motes. Coin arrives PRE-FORMATTED because the phone cannot do

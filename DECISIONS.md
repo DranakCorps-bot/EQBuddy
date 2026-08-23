@@ -341,3 +341,59 @@ one genuinely does. Each line below is a decision I made instead of a question I
 - **Deleted `IsExcluded`/`IsTimeableNamed` rather than wiring them** (Fable's ruling). The
   suffix rule covers every possessive pet the log prints and `Killer == "You"` closes the
   players case. A promise with no caller is worse than no promise.
+
+## 2026-08-23 — the two features on 1.99.6: next-level spells by class, and motes/hr
+
+- **Motes/hr went to David with the question tool, and he chose the Experience room.** The
+  question passed both tests: the Progress WINDOW and the phone already carry that line inside
+  their Wealth tab's Motes body, so the only surface missing it was the widget's inline Wealth
+  room — which is coin-only by a Helm-signed ruling. My recommendation was the inline Wealth
+  body (semantic home, and all three surfaces would then agree); I named the cost of the
+  Experience room in the option, which is that the Progress window now states the mote rate in
+  two places, an inch apart, on two different tabs. **He chose Experience knowing that.** So
+  the line lives in `ProgressPresentation.SummaryLines` and reaches the widget, the window and
+  the phone's Experience tab. The Wealth chip is untouched; the window/phone Wealth Motes rows
+  are untouched (#227 is still its own item).
+- **One formatter, not a fourth.** The app already had three mote-rate strings. The Progress
+  line reuses the Motes card's own header via a new `MotesPresentation.RateLine`, and
+  `ProgressTheme.MoteRate` now delegates to it. Could have gone: write the Progress line
+  inline, which is two lines shorter. Two formatters for one rate is how the Wealth chip and
+  the Wealth body came to disagree in the first place.
+- **The line is OMITTED, not zeroed, when nothing has dropped.** The same block already omits
+  the AA line and the ETA. "0 motes/hr" reads as a measurement of a camp rather than "none
+  yet", which is the wording argument `MotesPresentation.Summary` was written to win.
+- **No class in play now HIDES the next-level fold** (Bevel's rule, Helm-signed). This removes
+  a behaviour: a classless character used to get a preview built from the class-agnostic AA
+  categories. It could have gone the other way — those rows are true for everyone — and the
+  reason it did not is that `LevelUnlocks.Next` walks forward to the next level with ANY row,
+  so the surface offered David "At level 39: 1 new AA ability" about a pet ability five levels
+  away, for a character with no pet. Called out in `WhatsNew.json` rather than left to be
+  discovered, and asserted in `WidgetRenderTests` so a later refactor cannot restore it quietly.
+- **Which group opens is "the first with something to show", not "index 0"** — a decision I
+  made, not one Bevel wrote. Its rule says *"first inferred class open"*. A Warrior whose next
+  milestone is an Archetype AA produces an empty Warrior group above the shared bucket holding
+  the only row, so open-by-index would have shown "nothing new at 15" over a collapsed heading
+  with the single row two clicks away. Found from a written prediction BEFORE the screenshot,
+  and it is visible in `docs/screenshots/theme-inline-progress.png`. Sent to Bevel as a
+  narrowing of its rule rather than assumed to be what it meant.
+- **The empty group has no chevron.** Bevel said "keep the class row"; whether it is an
+  expander was mine. A fold that opens nothing is an affordance that lies, which is trap 16
+  with the switch the other way.
+- **The per-class open/shut state is a FIELD on the view, never a setting** (Bevel's rule,
+  followed). Worth logging because the neighbouring folds — `ShowNextUnlocks`, `ShowAllAAs` —
+  are both settings, so the inconsistency is deliberate rather than an oversight.
+- **Fixed a trap-8 violation I was standing next to.** The mobile Progress fingerprint keyed on
+  `Wealth.MotesSummary`, which is the RATE — the one value in that record that moves on the
+  clock while nothing happens, and also the only thing standing in for "a mote dropped". It now
+  keys on the mote tiers. Could have gone: leave it, since it predates this work. It is three
+  lines from the block whose comment says exactly why not to do it.
+- **The E2E "no class hides the preview" assertion was deleted, not made to pass.** The harness
+  always writes the shifted fixture log and that log infers WARRIOR, so the no-class state is
+  unreachable there — the test would have been about a state the harness cannot produce. Moved
+  to `WidgetRenderTests`, where the class list is a parameter, with a comment in the E2E file
+  saying why it is not there. Writing a second class-free fixture for one assertion is a worse
+  trade than one test on the other lane.
+- **The new screenshot shoots the INLINE card, not the Progress window.** The window restores
+  to a height whose body scrolls after ~3 lines, so `progress-card.png` has been photographing
+  a panel cut off ABOVE the two lists it is named for — pre-existing, visible in the committed
+  file, and filed separately rather than fixed here.

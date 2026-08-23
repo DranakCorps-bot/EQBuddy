@@ -51,7 +51,10 @@ public static partial class CompanionProjection
                     SessionDps: stats?.SessionDps ?? 0)
                 : null,
             Loot = On(CompanionSurfaces.Loot) ? BuildLoot(stats) : null,
-            Progress = On(CompanionSurfaces.Progress) ? BuildProgress(stats, input.Level, input.Unlocks, input.Raids) : null,
+            Progress = On(CompanionSurfaces.Progress)
+                ? BuildProgress(stats, input.Level, input.Unlocks, input.Raids,
+                    input.UnlockClasses, input.NextUnlocks)
+                : null,
             Quests = On(CompanionSurfaces.Quests)
                 ? BuildQuests(input.Settings, input.Quests, input.QuestIndex) : null,
             Gear = On(CompanionSurfaces.Gear) ? BuildGear(input.Settings, input.HopsFromHere) : null,
@@ -160,10 +163,24 @@ public static partial class CompanionProjection
         // per-hour rates and the xp fraction drift every tick, and including one would
         // wake every paired device once a second (trap 8). XpPercent is truncated to a
         // whole number for exactly that reason and stays that way.
+        // The next-level preview joins on the same terms: its identity is the LEVEL, the
+        // class split and which rows are in each group — all step changes (a ding, a class
+        // pick). Its `MoteLine` deliberately does NOT, for the reason the block below
+        // states: the rate drifts on the clock with the total standing still, and one
+        // drifting value in a key wakes every paired device for nothing.
         if (snap.Progress is { } pr)
             map[CompanionSurfaces.Progress] = Fold(
                 $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}",
-                pr.Wealth.Total + "/" + pr.Wealth.MotesSummary,
+                pr.NextLabel + "|" + (pr.NextGrouped ? "g" : "-") + "|" +
+                    Join(pr.NextGroups ?? [], g => g.ClassName + "=" +
+                        Join(g.Rows, r => r.Name) + (g.Empty is null ? "" : "!")),
+                // Coin, then the mote LADDER. It was `Wealth.MotesSummary` until
+                // 2026-08-23, which is the rate — the one value in this record that moves
+                // on the clock while nothing is happening, so it both woke paired devices
+                // for nothing AND was the only thing standing in for "a mote dropped".
+                // The tiers are the step change; the rate rides the forced refresh with
+                // xp/hr and the rest (trap 8).
+                pr.Wealth.Total + "/" + Join(pr.Wealth.Motes, m => $"{m.Name}={m.Count}"),
                 Join(pr.Wealth.Sold, i => $"{i.Name}={i.Count}"),
                 Join(pr.Faction, f => $"{f.Name}={f.Count}"),
                 pr.Raids.Defeated.ToString());

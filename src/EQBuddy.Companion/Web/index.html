@@ -1175,13 +1175,22 @@ function boot() {
     if (tab === "wealth") wrap.appendChild(wealthBody(s.wealth));
     else if (tab === "faction") wrap.appendChild(factionBody(s.faction));
     else if (tab === "raids") wrap.appendChild(raidsBody(s.raids));
-    else wrap.appendChild(experienceBody(s));
+    else wrap.appendChild(experienceBody(s, () => renderProgress(p, s)));
 
     p.head.textContent = s.level != null ? "level " + s.level : "";
     p.body.replaceChildren(wrap);
   }
 
-  function experienceBody(s) {
+  // Which class groups of the NEXT-level preview are open, keyed by class name.
+  //
+  // Session-only and per device, exactly as on the two desktops (Bevel, Helm-signed
+  // 2026-08-23: "first inferred class open, the rest collapsed (session-only, not a
+  // setting)"). It is deliberately NOT sent to the PC and not stored: a fold you opened to
+  // read one class is a decision about the next thirty seconds. Keyed by class rather than
+  // by position so the choice survives the level moving on.
+  const nextGroupOpen = new Map();
+
+  function experienceBody(s, redraw) {
     const wrap = el("div");
     const grid = el("div", "stats");
     const stats = [
@@ -1196,11 +1205,53 @@ function boot() {
       grid.appendChild(d);
     }
     wrap.appendChild(grid);
+    // Motes per hour, as ONE summary line (David, 2026-08-23). The Wealth tab still owns
+    // the ladder and the Motes card still owns the surface; this is the same string the
+    // desktop's Experience room shows, built by MotesPresentation.RateLine so there is one
+    // formatter rather than a phone-shaped fourth.
+    if (s.moteLine) wrap.appendChild(el("div", "note", s.moteLine));
     if (s.unlocks && s.unlocks.length) {
       const card = el("div", "card");
       card.style.marginTop = "10px";
       card.appendChild(el("h3", "group", s.unlocksLabel || "New at this level"));
       card.appendChild(rowList(s.unlocks, u => ({ name: u.name, right: u.value })));
+      wrap.appendChild(card);
+    }
+    // ...and what the NEXT level opens, under its OWN heading. Bevel, on finding this page
+    // painting only the ding: "do not steal that heading."
+    if (s.nextLabel && s.nextGroups && s.nextGroups.length) {
+      const card = el("div", "card");
+      card.style.marginTop = "10px";
+      card.appendChild(el("h3", "group", s.nextLabel));
+      if (!s.nextGrouped) {
+        // One group is a heading with nothing to choose between: names go straight under
+        // the line, no lone expander. `nextGrouped` is the PC's answer, not a length check
+        // done here — the rule lives in LevelUnlockGroups and this page is the third
+        // surface that must not re-decide it.
+        const only = s.nextGroups[0];
+        card.appendChild(rowList(only.rows, u => ({ name: u.name, right: u.value })));
+      } else {
+        s.nextGroups.forEach((g, i) => {
+          if (g.empty) {
+            // The class stays and says so. No chevron: there is nothing behind it, and an
+            // affordance that opens nothing is worse than the missing group it replaces.
+            const head = el("h3", "group", g.class);
+            head.appendChild(el("span", "note", g.empty));
+            card.appendChild(head);
+            return;
+          }
+          // The default open group is the PC's answer (LevelUnlockGroups.DefaultOpenIndex),
+          // not "the first one": with an empty first class it would open a group saying
+          // nothing above a collapsed one holding the only row.
+          const open = nextGroupOpen.has(g.class)
+            ? nextGroupOpen.get(g.class) : i === (s.nextOpenIndex || 0);
+          const head = el("h3", "group", (open ? "▾ " : "▸ ") + g.class);
+          head.style.cursor = "pointer";
+          head.onclick = () => { nextGroupOpen.set(g.class, !open); redraw(); };
+          card.appendChild(head);
+          if (open) card.appendChild(rowList(g.rows, u => ({ name: u.name, right: u.value })));
+        });
+      }
       wrap.appendChild(card);
     }
     return wrap;

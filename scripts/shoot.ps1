@@ -1,4 +1,4 @@
-# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #
@@ -426,9 +426,57 @@ $Shots = [ordered]@{
     # none — so without the append below this shoots a card with an empty ding list and
     # proves nothing about the rows the lift actually moved. ShowNextUnlocks unfolds the
     # preview, which is collapsed by default and would otherwise be a label alone.
+    #
+    # RE-SHOT 2026-08-23 for two changes: the summary block grew a motes line, and the
+    # next-level preview grew per-class groups. PREDICTION, written before the run — the
+    # fixture picks NO classes, so the class source is the combat-inferred one, and the
+    # fixture infers WARRIOR (its ding at 12 is Heroic Leap + Unbound Wrath, both Warrior
+    # Class AAs, which is what 'dingRows=2' has always been). From there:
+    #   - the summary block gains ONE line, "1 mote * <rate>/hr" -- the fixture loots
+    #     exactly one Mote of Infinitesimal Potential (line 1388), so the count is 1 and
+    #     the rate is 1 over the shifted session length rather than a number to predict.
+    #   - "New at level 12": Heroic Leap and Unbound Wrath, unchanged.
+    #   - the preview reads "At level 15: 1 new AA ability" and now splits: a chevron-less
+    #     "Warrior" heading over a dim "Nothing new at 15", then an OPEN "Any class" fold
+    #     holding "Double Riposte / Archetype * 3 ranks". Warrior has no spell table at any
+    #     level and the AA catalog's only level-15 row for it is class-agnostic, so this is
+    #     the exact case DefaultOpenIndex exists for: opening group 0 would have put an
+    #     empty heading above the collapsed group holding the single row.
     'progress-card'   = @{ Title = 'EQBuddy Progress'
                            Env = @{ EQBUDDY_PROGRESS = '1' }
                            Append = @('You have gained a level! Welcome to level 12!')
+                           Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
+    # THREE classes at once, which is what a Legends character actually is (David,
+    # 2026-08-23) and what 'progress-card' cannot show: the fixture infers one, and one
+    # class draws no expanders at all. A NEW name per trap 21 -- 'progress-card' and
+    # 'section-progress' are both committed and both still mean the old thing.
+    #
+    # PREDICTION, written before the run. Ledger classes Warrior/Druid/Monk (David's own
+    # combination), level 12 announced:
+    #   - "New at level 12" carries SIX rows: the four Class AAs in alphabetical order
+    #     (Heroic Leap/Warrior, Unbound Alacrity/Monk, Unbound Nature/Druid, Unbound
+    #     Wrath/Warrior) then the two Druid spells (Bind Affinity, Cascade of Hail).
+    #   - the preview reads "At level 15: ..." -- NO. It reads "At level 13: 3 new spells",
+    #     because with Druid in the list the next level with anything is 13 rather than 15.
+    #   - under it, THREE groups in the ledger's own order: a chevron-less "Warrior" over
+    #     "Nothing new at 13", an OPEN "Druid" holding Befriend Animal, Expulse Summoned
+    #     and See Invisible (each "Druid spell"), and a chevron-less "Monk" over "Nothing
+    #     new at 13". Druid opens because it is the first group with anything in it.
+    # The two empty groups are the point of the shot: they are what a tidy-minded refactor
+    # deletes, and on screen their absence is indistinguishable from those classes not
+    # being yours.
+    #
+    # It shoots the INLINE card, not the window, and that is a finding rather than a
+    # preference: the Progress WINDOW restores to a height whose body scrolls, so
+    # 'progress-card' has been photographing a panel cut off mid-summary -- above the ding
+    # list and the preview it is named for -- since it was taken. The inline body fits in
+    # about 175 units (see 'theme-inline-progress'), so it is the only host that can show
+    # this feature at all. Fixing the window shot is its own job; a shot that cannot reach
+    # the state reads as reviewed anyway (trap 22).
+    'progress-next-classes' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'progress' }
+                           Append = @('You have gained a level! Welcome to level 12!')
+                           Ledger = @{ Classes = @('Warrior', 'Druid', 'Monk') }
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:

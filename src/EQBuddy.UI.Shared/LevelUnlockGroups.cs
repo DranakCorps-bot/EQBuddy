@@ -96,6 +96,28 @@ public static class LevelUnlockGroups
     /// desktops and the phone cannot disagree about when a fold appears.</summary>
     public static bool WorthGrouping(IReadOnlyList<LevelUnlockGroup> groups) => groups.Count > 1;
 
+    /// <summary>
+    /// Which group starts open. Bevel, Helm-signed: *"first inferred class open, the rest
+    /// collapsed"* — read as the first class with something to SHOW, which is the same
+    /// group in every ordinary case and a different one in the case that matters.
+    ///
+    /// **Found from a written prediction, before the screenshot** (trap 23). A Warrior
+    /// whose next milestone is an Archetype AA produces exactly two groups: Warrior, empty,
+    /// and <see cref="SharedGroup"/> holding the one row. Open-by-index would open the
+    /// empty one, so the fold a player just expanded would read "Warrior — nothing new at
+    /// 15" above a collapsed heading, and the single row the whole preview exists to show
+    /// would be two clicks away. That is not what "first class open" was protecting.
+    ///
+    /// -1 when every group is empty — a state the surface should not draw a preview for at
+    /// all, and the caller has the level to say so.
+    /// </summary>
+    public static int DefaultOpenIndex(IReadOnlyList<LevelUnlockGroup> groups)
+    {
+        for (var i = 0; i < groups.Count; i++)
+            if (!groups[i].IsEmpty) return i;
+        return -1;
+    }
+
     /// <summary>What a group with nothing in it says. Its own method because it is the line
     /// a Warrior sees at almost every level, and a class that gains nothing must read as
     /// answered rather than broken.</summary>
