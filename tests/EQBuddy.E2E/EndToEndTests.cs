@@ -348,16 +348,25 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
-    /// One class is a heading with nothing to choose between — Bevel, Helm-signed:
-    /// *"One inferred class = names under the heading, no lone expander."*
+    /// The Quest Tracker's picks WIDEN the classes EQBuddy read from the log; they do not
+    /// replace them.
     ///
-    /// **Prediction:** Druid alone at 12 reaches the same level 13 and the same three
-    /// spells, so the rows are unchanged and only the CHROME differs — <c>nextGroups=0</c>
-    /// where the two-class run says 2. Asserting both against one row count is what makes
-    /// this a test of the split rule rather than of the catalog.
+    /// **This test asserted the opposite until 2026-08-23, and the change is the point.**
+    /// It seeded Druid alone and expected ONE class — because picks used to win outright
+    /// and inference was only consulted when there were none. That is the rule #104 argued
+    /// against (a player may tick a class to help a friend) and the one Bevel's lock
+    /// forbids ("never fall back to the Quest Tracker filter"). `CharacterClasses.Resolve`
+    /// now unions them.
+    ///
+    /// **Prediction:** the harness fixture infers WARRIOR (its level-12 ding is Heroic Leap
+    /// and Unbound Wrath, both Warrior Class AAs). Seeding a Druid PICK on top gives
+    /// Warrior + Druid, so level 13 draws two groups and three rows — the three Druid
+    /// spells, with Warrior kept as a row reading "nothing new at 13". The single-class
+    /// no-expander rule is asserted where the class list is a parameter and this fixture
+    /// cannot muddy it: `WidgetRenderTests.OneClassGetsItsNamesUnderTheHeadingWithNoLoneExpander`.
     /// </summary>
     [Fact]
-    public void ProgressCard_DrawsNoLoneExpanderForASingleClass()
+    public void ProgressCard_PicksWidenTheInferredClassRatherThanReplacingIt()
     {
         using var app = new AppHarness(
             settings => settings.ShowNextUnlocks = true,
@@ -367,8 +376,8 @@ public sealed class EndToEndTests
 
         app.AppendLogLines("You have gained a level! Welcome to level 12!");
 
-        app.WaitForDump("nextRows", 3, "the same three Druid spells at 13");
-        app.WaitForDump("nextGroups", 0, "no expander at all when there is one class");
+        app.WaitForDump("nextGroups", 2, "the picked Druid AND the inferred Warrior");
+        app.WaitForDump("nextRows", 3, "the three Druid spells at 13, Warrior contributing none");
     }
 
     // **There is no E2E twin for "no class hides the preview", and that is a finding

@@ -24,6 +24,24 @@
 > heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
 > Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
 
+> **2026-08-23 (afternoon) — 1.99.7 is STAGED and unreleased, and it is large.** Three things
+> David asked for in one go. **PR 1**: the spell catalog is re-sourced from eqlwiki's CLASS
+> pages (1,964 rows → 1,866; `Healing Water` recovered at Druid 34, `Complete Healing` correctly
+> gone, 362 rows marked derived because every class page stops at 50). **Spell hover**: the
+> wiki's own one-line description, from the class page, quoted verbatim. **Class-inference V3**:
+> `CurrentClasses()` returns a LIST, the achievements dump outranks it, picks only widen.
+> Gates 2,488 unit · 277 Avalonia · 26 E2E. **David wants to review the catalog diff himself**,
+> and nothing has gone to Fable yet — he chose "keep building" over sending it.
+>
+> → **The one thing he asked for that is NOT done: the Progress window's Experience tab
+> clipping.** Root cause measured (`AllowResize` pins the height on `ContentRendered`, a frame
+> with nothing in it; 203px vs 389px with the pin skipped) and filed as a V2 in `FABLE.md`
+> because the fix decides chrome behaviour for four windows. Deliberate, and he should know.
+>
+> → **And a producer with no consumer, flagged rather than left to rot:**
+> `CharacterClasses.SourceLabel` is built and tested and NOTHING PRINTS IT. That is trap 43's
+> mirror. It is item 1 of what is still `ready` on the V3 item in `FABLE.md`.
+
 > **2026-08-23 — v1.99.6 IS RELEASED.** Tag `v1.99.6` on origin at `a7e59ab`, GitHub release
 > published 16:28Z, OneDrive artifacts 11:27, `EQBuddySetup.exe` **Valid** and timestamped as
 > `CN=FlossworksCross-Stitch`. Verified in it: the phone wire-key fix (`cfb912e`), the #233
