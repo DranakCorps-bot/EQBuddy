@@ -5,6 +5,11 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-23 — Helm-signed: Sky also hosts the import-report Sky clauses
+When a dump feeds two consumers and the report sits on one, the Sky half is missed by a player who lives on Sky. Same report (or those clauses) on Sky. Glance stays Undo; reasons stay in the tooltip. Rare-conned named with existing wiki drops is a new row kind.
+
+---
+
 ## 2026-08-22 evening — THREE ASKS, all post-hoc, none blocking a tag
 
 Two are Fable's, routed here because it said plainly they are yours rather than its. One is
