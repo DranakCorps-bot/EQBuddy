@@ -876,14 +876,30 @@ public sealed class SpawnTimers
     /// is waiting on the person who reported it.
     ///
     /// Fable 5 raised this as a labelled hypothesis in the H4 last-look; it reproduced.
-    /// A player-TYPED duration is untouched, here as everywhere.</summary>
+    /// A player-TYPED duration is untouched, here as everywhere.
+    ///
+    /// **MULTI-SPAWN entries were added on 2026-08-23 (#109's four-bee follow-up), and the
+    /// argument is the same one a step further.** The learner already refuses these — a
+    /// gap between two kills of a name that several creatures share is two creatures, not a
+    /// respawn — so a `Learned` value sitting on one is, by definition, a number the current
+    /// code could not produce. It came from an older build, and it is the exact failure this
+    /// discussion opened with: two Bzzzt three minutes apart became a three-minute timer that
+    /// went DUE forever. Bzzazzt needed it specifically, because it is the one bee eqlwiki
+    /// gives a real clock (12 hours) — so it is NOT triggered, and the two rules above would
+    /// have left its poisoned value in place.
+    ///
+    /// The cost is bounded and worth naming: a player who learned a genuinely useful number
+    /// for a multi-spawn camp loses it and falls back to the catalog's own figure, or to the
+    /// zone default where there is none. That is the right way round — a wrong respawn timer
+    /// is worse than none, and their own typed duration still outranks all of this.</summary>
     private void HealSuppressedOverrides()
     {
         var healed = false;
         foreach (var zone in _catalog.Zones)
             foreach (var entry in zone.Named)
             {
-                if (entry is not ({ RaidInstanced: true } or { IsTriggered: true })) continue;
+                if (entry is not ({ RaidInstanced: true } or { IsTriggered: true }
+                        or { MultiSpawn: true })) continue;
                 if (_overrides.Find(zone.Zone, entry.Name) is not
                     { Learned: true, RespawnSeconds: not null } o) continue;
                 o.RespawnSeconds = null;

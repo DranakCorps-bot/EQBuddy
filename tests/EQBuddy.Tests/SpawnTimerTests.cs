@@ -1485,6 +1485,12 @@ public class SpawnTimerTests
                 NamedDefaultSeconds = 28800,      // untrusted, exactly as shipped
                 Named =
                 [
+                    // The whole Island 6 chain, as the shipped catalog carries it since
+                    // #109's four-bee follow-up (2026-08-23). The OPENER is the interesting
+                    // one: eqlwiki gives Bzzazzt a real 12-hour clock, so it is deliberately
+                    // NOT triggered — a chain whose first link is triggered never starts.
+                    new SpawnEntry { Name = "Bzzazzt", RespawnSeconds = 43200, MultiSpawn = true },
+                    new SpawnEntry { Name = "Bazzzazzt", SpawnType = "triggered", TriggeredBy = "Bzzazzt", MultiSpawn = true },
                     new SpawnEntry { Name = "Bzzzt", SpawnType = "triggered", TriggeredBy = "Bazzzazzt" },
                     new SpawnEntry { Name = "Noble Dojorn", RespawnSeconds = 604800 },
                 ],
@@ -1511,7 +1517,12 @@ public class SpawnTimerTests
         // An ordinary timed named in the same zone is untouched.
         t.Apply(new KillEvent(T0, "Noble Dojorn", "You"));
         Assert.Equal("Noble Dojorn", Assert.Single(t.Snapshot(T0.AddMinutes(5))).Name);
-        Assert.Null(SpawnCatalog.EffectiveSeconds(SkyCatalog().Zones[0], SkyCatalog().Zones[0].Named[0]));
+        // A triggered entry contributes no default, even though the zone has one. Named by
+        // NAME rather than by index: this read `Named[0]` until 2026-08-23, when two more
+        // bees joined the chain in front of it and the assertion silently began testing a
+        // different creature — which is how a positional fixture reference always fails.
+        var sky = SkyCatalog().Zones[0];
+        Assert.Null(SpawnCatalog.EffectiveSeconds(sky, sky.Named.Single(e => e.Name == "Bzzzt")));
     }
 
     [Fact]
@@ -1801,6 +1812,56 @@ public class SpawnTimerTests
         Assert.Equal("triggered · Bazzzazzt", row.CountdownText);
         Assert.Equal("", row.DurationText);          // …and no "3m" contradicting it
         Assert.Null(overrides.Find("Plane of Sky", "Bzzzt")?.RespawnSeconds);
+    }
+
+    /// <summary>**The same heal, for the one bee that is NOT triggered** (#109's four-bee
+    /// follow-up, 2026-08-23). eqlwiki gives Bzzazzt a real 12-hour clock — it is the opener,
+    /// and a chain whose first link is triggered can never start — so the triggered and
+    /// raid-instanced rules above both skip it, and its poisoned override would have
+    /// survived them.
+    ///
+    /// What catches it is `multiSpawn`: three wasps share the name at island start, the
+    /// learner already refuses to learn from such an entry, and therefore a `Learned` value
+    /// on one is a number the current code cannot produce. That is the whole argument, and
+    /// it is the failure this discussion opened with — two same-named kills three minutes
+    /// apart becoming a three-minute timer that goes DUE forever.
+    ///
+    /// The catalog's own 12 hours takes over, rather than nothing: healing must not cost the
+    /// player the honest answer the wiki already has.</summary>
+    [Fact]
+    public void APoisonedOverrideOnAMultiSpawnEntryHealsAtLoadToo()
+    {
+        var overrides = new SpawnOverrides();
+        var poisoned = overrides.GetOrAdd("Plane of Sky", "Bzzazzt");
+        poisoned.RespawnSeconds = 180;
+        poisoned.Learned = true;
+
+        var t = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+
+        Assert.Null(overrides.Find("Plane of Sky", "Bzzazzt")?.RespawnSeconds);
+        Assert.False(overrides.Find("Plane of Sky", "Bzzazzt")?.Learned);
+        // And the wiki's clock is what the player is left with.
+        var entry = SkyCatalog().Zones
+            .Single(z => z.Zone == "Plane of Sky").Named.Single(e => e.Name == "Bzzazzt");
+        Assert.Equal(TimeSpan.FromHours(12).TotalSeconds, entry.RespawnSeconds);
+        _ = t;
+    }
+
+    /// <summary>**A player's TYPED duration survives all of it**, on a multi-spawn entry as
+    /// everywhere else. The heal exists to remove numbers the app invented, never numbers
+    /// the player chose — and this is the negative that keeps the rule above from quietly
+    /// becoming "delete everything on a multiSpawn row".</summary>
+    [Fact]
+    public void TheMultiSpawnHealNeverTouchesATypedDuration()
+    {
+        var overrides = new SpawnOverrides();
+        var mine = overrides.GetOrAdd("Plane of Sky", "Bzzazzt");
+        mine.RespawnSeconds = 900;          // the player typed 15m
+        mine.Learned = false;
+
+        _ = new SpawnTimers(SkyCatalog(), overrides) { Server = "freeport" };
+
+        Assert.Equal(900, overrides.Find("Plane of Sky", "Bzzazzt")?.RespawnSeconds);
     }
 
     /// <summary>Three triggers do not fit the "Next spawn" column, so the glance shows the

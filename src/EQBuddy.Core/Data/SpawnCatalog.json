@@ -7339,6 +7339,26 @@
           "note": "Island 5 miniboss. Triggered: killing a spiroc banisher, walker or revolter spawns him (eqlwiki Plane of Sky zone page, Island 5), and he instantly respawns while ANY a spiroc vanquisher lives (his creature page's description; it has no respawn_time field). Killing him spawns The Spiroc Lord."
         },
         {
+          "name": "Bzzazzt",
+          "respawnSeconds": 43200,
+          "multiSpawn": true,
+          "variance": "",
+          "placeholder": "",
+          "source": "eqlwiki",
+          "note": "Island 6 (Bee Island) opener, level 50. NOT triggered — eqlwiki's creature page carries respawn_time = 12 hours, and something has to start the chain. Killing it spawns Bazzzazzt. multiSpawn because THREE share the name at island start (the wiki: 'The three initial mobs on Island 6. Clockwise from the NW corner, call #1 #2 and #3'; Frankthetankk on #109: two small flankers and one larger middle, and only the middle one advances the chain), so a kill-to-kill gap here is two different wasps, never a respawn."
+        },
+        {
+          "name": "Bazzzazzt",
+          "respawnSeconds": null,
+          "multiSpawn": true,
+          "variance": "",
+          "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "Bzzazzt",
+          "source": "eqlwiki",
+          "note": "Island 6, level 55. Triggered: eqlwiki's creature page carries respawn_time = Triggered, and its description says these spawn immediately after killing Bzzazzt. Three of them, same as the Bzzazzt they replace. Killing one spawns Bzzzt."
+        },
+        {
           "name": "Bzzzt",
           "respawnSeconds": null,
           "variance": "",
