@@ -521,3 +521,26 @@ one genuinely does. Each line below is a decision I made instead of a question I
   it as a like-for-like replacement of an existing string rather than a new surface — "(inferred)"
   said one of three things and said nothing when the GAME had told us. Bevel's next run should
   see it; flagged rather than presented as settled.
+
+## 2026-08-23 — self-review pass over 1.99.7
+
+- **The phone fixture could never have tested the thing it was for.** `WriteMobileQuestsSnapshot`
+  sets picked classes, and the page suppresses the class-source line whenever picks exist — so
+  the state the line lives in was unreachable from the fixture. A second snapshot now covers
+  no-picks-plus-a-dump. This is the same shape as the wire-key defect: a check that runs and
+  cannot fail. Found by asking what the fixture would show rather than that it passed.
+- **Kept `.claude/launch.json`** (a new tracked file in a directory that had none) because
+  file:// access to the harness was refused mid-session and serving it over HTTP is what made
+  the browser verification possible at all. Small repo-shape call, logged rather than silent.
+- **Collapsed the companion quest request to one snapshot and one resolution per tick.** It was
+  three `CurrentSnapshot()` calls and two `Resolve()` passes per field-set, each taking the
+  ledger lock twice and copying two lists, every second a phone is paired. Nothing was WRONG;
+  it is the steady-state allocation perf audit #1 exists to remove.
+- **One Avalonia gate run reported 1 failed / 279 total and never reproduced** (seven runs
+  since, all 278/278 green). Name unrecoverable — `check.ps1` keeps no log. Ruled out a
+  data-driven count (every theory in that project is static `InlineData`), which points at a
+  transient host crash rather than a logic flake. **Disclosed to Fable with the reasoning
+  labelled as a hypothesis, and the decision of whether to chase it before the tag handed to
+  the reviewer rather than taken by me.**
+  → Worth considering: `check.ps1` discarding test output is what made this unrecoverable. A
+  gate that fails without leaving a name behind costs exactly one incident like this.

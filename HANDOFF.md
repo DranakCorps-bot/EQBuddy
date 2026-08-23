@@ -24,6 +24,20 @@
 > heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
 > Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
 
+> **2026-08-23 — SELF-REVIEW PASS over 1.99.7, and it found three things.** (1) The PHONE gap
+> I had flagged to Fable is closed: `ScreenshotFixtureTests` now writes a second quests
+> snapshot for the state the class-source line lives in — **the old fixture set picks, so the
+> page suppressed that line and could never have exercised it**, the same shape that let the
+> wire key ship — and both branches are driven through the shipped page, including the trap-32
+> fallback. (2) A perf sloppiness: the companion request recomputed `CurrentSnapshot()` three
+> times and `ClassSourceFor` twice PER TICK, each taking the ledger lock twice and copying two
+> lists; collapsed to one of each on both lanes. (3) **One unexplained gate run** —
+> `Failed: 1, Passed: 278, Total: 279` on Avalonia, once, never reproduced in seven runs since,
+> name unrecoverable because `check.ps1` keeps no log. The count cannot vary by data (every
+> theory there is static `InlineData`), so it fits a transient host crash rather than a logic
+> flake — **that is a hypothesis, and it is disclosed in the Fable request rather than waved
+> away.**
+
 > **2026-08-23 (1pm inbox cleared) — all three agents' passes are actioned.** Bevel's one real
 > correction is in: **"Any class" is a shared BUCKET, not a player class, and does not vote in
 > the one-class no-expander rule** — `WorthGrouping` counted groups, so a single-class player

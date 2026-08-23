@@ -113,11 +113,15 @@ To: Fable
 1. **Player-facing without a guard.** Three features. `LevelUnlockGroupsTests` (18),
    `CharacterClassesTests` (8), `ClassSourceWritersTests` (4), `CompanionWireKeyTests` (4),
    six `WidgetRenderTests`, four E2E cases, plus the catalog's own sanity assertions.
-   **The softest spot, named first because it is where you found the last one: the PHONE.**
-   Its quest section gained `characterClasses` + `classSourceLabel`, and I pinned both wire
-   keys in `CompanionWireKeyTests` the day I wrote them — but **I did not drive the page**
-   for this change the way I did for the next-level fold. The page's fallback to the old
-   `inferredClass` when the new field is absent is reasoned, not observed.
+   **The phone was the softest spot and is no longer** — I closed it during a self-review
+   pass after writing this request. `ScreenshotFixtureTests` now writes a SECOND quests
+   snapshot through the real projection for the state the class-source line actually lives
+   in (no picks, classes resolved from a dump); the previous fixture set picks, so the page
+   suppressed that line and the fixture could never have exercised it — the same shape that
+   let the wire key ship. Both branches then driven through the shipped page:
+   `🎭 Filtering for Warrior · Druid · Monk (from your achievements — pick classes to
+   override)`, and, with the two new fields deleted from the same real payload, the trap-32
+   fallback `🎭 Filtering for Druid (inferred from your log — …)`. No `undefined` in either.
 2. **`WhatsNew.json`.** Seven entries. Two describe REMOVALS, deliberately: spells vanishing
    from a druid's list (the class-page re-source) and the next-level preview hiding with no
    class known. No reporter is credited — all three came from David directly. Please check
@@ -138,6 +142,20 @@ To: Fable
   check against, that is the discrepancy and it is intended.
 - **`era` is parsed and NOT shipped.** Fixing PR 0's row regex made it come through cleanly,
   and it is "Classic" on all 1,504 rows. One value discriminates nothing.
+
+### One thing I cannot explain, disclosed rather than buried
+
+**A single Avalonia gate run reported `Failed: 1, Passed: 278, Total: 279`** during the
+self-review pass. Every run since — two `check.ps1` and five direct, seven in total — is
+`278/278` green. I never saw the failing test's name (`check.ps1` keeps no log) and I cannot
+reproduce it.
+
+What I can rule out: the count cannot vary by DATA. Every theory in that project is static
+`InlineData`, and `EveryCatalogThemeAppliesCleanly` is a `[Fact]` with a loop rather than a
+theory. So 278 passed + 1 = an extra REPORTED failure, which fits a transient headless-host
+crash rather than a logic flake. That is a hypothesis, not a finding. **If you want this
+chased before a tag rather than after, say so** — I would rather you make that call than have
+me decide a one-off is noise on the release you are clearing.
 
 ### One thing worth your specific eye
 

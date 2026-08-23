@@ -384,24 +384,34 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             Raids = _raidLedger,
             CampFor = t => EQBuddy.UI.Shared.CampLocations.Resolve(
                 t, EnsureMobLookup, n => WikiMobResult(n)?.Mob?.LocYX),
-            Quests = () => new EQBuddy.Companion.CompanionQuestRequest
+            Quests = () =>
             {
-                Catalog = QuestCatalog,
-                Owned = QuestLedger?.For(QuestCharacterKey)
-                    ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase),
-                Tracked = QuestLedger?.TrackedFor(QuestCharacterKey)
-                    ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
-                Hidden = QuestLedger?.HiddenFor(QuestCharacterKey)
-                    ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
-                Completed = QuestLedger?.CompletedFor(QuestCharacterKey)
-                    ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
-                Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
-                InferredClass = CurrentSnapshot().InferredClass,
-                // The RESOLVED list and its source, decided here so the phone cannot decide it
-                // differently than the two windows (#210). The single class above stays for one
-                // release: an open phone runs the page it downloaded weeks ago (trap 32).
-                CharacterClassNames = ClassSourceFor(CurrentSnapshot()).Classes,
-                ClassSource = ClassSourceFor(CurrentSnapshot()).Source,
+                // ONE snapshot and ONE resolution for the whole request. Both were being
+                // recomputed per field — three CurrentSnapshot() calls and two Resolve()
+                // passes, each taking the ledger lock twice and copying two lists, every
+                // tick a phone is paired on quests. Perf audit #1: a steady-state tick
+                // allocates nothing it does not have to.
+                var snap = CurrentSnapshot();
+                var (classes, classSource) = ClassSourceFor(snap);
+                return new EQBuddy.Companion.CompanionQuestRequest
+                {
+                    Catalog = QuestCatalog,
+                    Owned = QuestLedger?.For(QuestCharacterKey)
+                        ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase),
+                    Tracked = QuestLedger?.TrackedFor(QuestCharacterKey)
+                        ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                    Hidden = QuestLedger?.HiddenFor(QuestCharacterKey)
+                        ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+                    Completed = QuestLedger?.CompletedFor(QuestCharacterKey)
+                        ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                    Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
+                    InferredClass = snap.InferredClass,
+                    // The RESOLVED list and its source, decided here so the phone cannot decide it
+                    // differently than the two windows (#210). The single class above stays for one
+                    // release: an open phone runs the page it downloaded weeks ago (trap 32).
+                    CharacterClassNames = classes,
+                    ClassSource = classSource,
+                };
             },
             QuestLedger = QuestLedger,
             QuestCharacterKey = () => QuestCharacterKey,

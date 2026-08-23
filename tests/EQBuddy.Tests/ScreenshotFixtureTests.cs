@@ -265,6 +265,49 @@ public class ScreenshotFixtureTests
         Assert.NotNull(snap.Quests);
         Assert.NotNull(snap.Quests!.Catalog);
         Assert.NotEmpty(snap.Quests.Mine);
+
+        // A SECOND snapshot for the state the class-source line actually exists in: no
+        // picks, and the character's classes resolved from an achievements dump.
+        //
+        // The fixture above sets picks, so `d.classes` is non-empty and the page suppresses
+        // that line entirely — it could never have exercised it, which is exactly the shape
+        // that let the next-level split ship with an unreadable wire key. Written through
+        // the real projection for the same reason.
+        var resolved = CharacterClasses.Resolve(
+            unlocked: ["Warrior", "Druid", "Monk"], inferred: null, picks: null);
+        var noPicks = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot { CurrentZone = "Crushbone" },
+            Settings = settings,
+            Quests = new CompanionQuestRequest
+            {
+                Catalog = catalog,
+                Owned = ledger.For(key),
+                Tracked = ledger.TrackedFor(key),
+                Hidden = ledger.HiddenFor(key),
+                Completed = ledger.CompletedFor(key),
+                Classes = [],                                   // nothing picked
+                CharacterClassNames = resolved.Classes,
+                ClassSource = resolved.Source,
+            },
+            QuestIndex = CompanionQuestIndex.Build(catalog),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(
+            Path.ChangeExtension(outPath, null) + "-nopicks.json",
+            JsonSerializer.Serialize(noPicks, CompanionSnapshot.JsonOpts));
+
+        // The shape the harness is about to be judged on, so a fixture that stops carrying
+        // the feature fails here rather than photographing an empty line (trap 22).
+        Assert.Equal(["Warrior", "Druid", "Monk"], noPicks.Quests!.CharacterClasses);
+        Assert.Equal("from your achievements", noPicks.Quests.ClassSourceLabel);
+        Assert.Empty(noPicks.Quests.Classes);
+
         Directory.Delete(dir, true);
     }
 

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mobile-harness",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8099", "--directory", "dist/mobile-harness"],
+      "port": 8099,
+      "url": "http://localhost:8099"
+    }
+  ]
+}
