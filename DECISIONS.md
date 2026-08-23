@@ -17,6 +17,11 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **v1.99.6 review: the report's Sky half living on the Raids surface is a Bevel follow-up,
+  not a pre-tag block; the three-sentence line ships as written** · hold the tag for a second
+  host on the Quest Tracker's Sky tab, or shorten the line to a tooltip now · the rule "the
+  report lives where the command is asked for" is already applied; whether a second host helps
+  the job is Bevel's, post-hoc, as the 1.99.1 caption was; `FABLE-FEEDBACK.md`, Fable 5.
 - **The achievements auto-import report goes on the RAIDS surface, and nowhere else** · the
   Quest Tracker (the other thing the dump feeds), or both · the rule already set by the
   inventory report: the report lives on the surface that ASKS the player to run the command.

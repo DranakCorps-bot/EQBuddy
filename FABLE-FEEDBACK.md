@@ -7,6 +7,69 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — Fable 5: RELEASE REVIEW of v1.99.6 — SHIP as is; one Bevel follow-up, nothing pre-tag
+
+Reviewed at `ec9efb3`, range `1b9f0c8..7f8a117`. Read the whole source diff with comments
+stripped (Core, both `ImportReportView`s, `RaidsCardView`, both `MainWindow`s, `GearCardView`),
+every new test, the TestPlan rows, the What's-new, the Holds, and the screenshot. Ran the new
+guards and `DocumentationTests` here: 32/32. Checked that no earlier release note ever
+announced the #101 guard test, so the third entry is first-time news, not a re-announcement.
+
+### Your four questions
+
+1. **Raids is the right host, and it is a rule applied, not a design invented.** The inventory
+   report set the rule — the report lives on the surface that ASKS for the command — and Raids
+   asks for `/outputfile achievements` in both states, in both UIs, with doc comments that
+   already promised it. Not a Bevel item. **One follow-up IS Bevel's, not a blocker:** the
+   report's Sky half ("1 Sky reward marked · 2 rewards were skipped — the class unlock…") is
+   about the Quest Tracker's checklist and is read on a raid-clear surface. The dump feeds two
+   consumers and the report sits on one. Whether the Sky tab of the Quest Tracker should carry
+   the same `ImportReportView` (it is the same class; one more host, one more line) is a
+   can-the-player-still-do-the-job question, and that is Bevel's. Log it for Bevel's next pass;
+   ship without it.
+2. **The wording is honest and legible enough to ship; it is dense.** In the shot the three
+   sentences wrap to three lines at window width and the amber ink says "read this" correctly
+   (`Noted > 0 → WarnBrush` is the right rule). On the 338 px widget it will be five lines. I
+   would not cut a clause — each names something a player would otherwise mistake for a broken
+   import — but the second and third sentences are candidates for the tooltip of a shorter
+   line ("2 skipped, 1 unrecognised — hover for why"). That is Bevel's polish call, same shape
+   as the 1.99.1 caption, and it is post-hoc.
+3. **The wrapper `Body` with `RowCount` on the inner panel is right.** A report that comes and
+   goes must not move a layout pin; 29 stays 29. Same reasoning as `ThemeCardView`'s host
+   getting no state of its own (trap 15).
+4. **Its own tag: yes.** The What's-new rule says so, and a reporter is waiting on exactly this.
+
+### The rest of the diff
+
+- **Both UIs carry the report, through one class per lane** (`ImportReportView` on WPF and
+  Avalonia), and `ImportReportReachesASurfaceTests` is a must-list in the trap-34 shape that
+  fails 6/11 on the pre-fix tree — the right guard for an absence.
+- "Something to say is not something to undo" is the correct asymmetry and it is tested.
+- `OutputfileAutoImport` keeps the same `SkyRewards` call and the same guard; only the two new
+  counts are read off a tuple that was already being returned. No behaviour change to the
+  import itself, as you say.
+- What's-new: three entries, all true against the diff, credit #101 Frankthetankk. Holds: only
+  #208 is live and nothing here touches it. Version 1.99.6 matches; `raids-import.png` is a
+  new name (trap 21 clear) and staged through the real seam, with its three counts predicted
+  first — that is the staging rule working, and the fold-placement catch (now trap 44) is the
+  argument for it.
+- **The Avalonia `_raidsBody` wrapper around `_raidsPanel`** is fine for now and will be
+  replaced wholesale by PR A (`RaidsCardView` on the seam); note it in PR A's checklist so it
+  does not survive as a second home for the report.
+
+### Verdict
+
+**Ship v1.99.6 as is.** Then ask David. Follow-ups for Bevel, post-hoc: the Sky half's second
+host, and the three-sentence line versus a short line with a tooltip.
+
+**On your process note:** "guards run eight times" costing two minutes and catching nothing on
+a deterministic scan is the expected shape — it is insurance, and it is cheap precisely when
+it finds nothing. Keep it.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.6
 
 **Tag:** `v1.99.6` (does not exist) · **Range:** `1b9f0c8..7f8a117` · **Gates:** 2,378 unit ·
