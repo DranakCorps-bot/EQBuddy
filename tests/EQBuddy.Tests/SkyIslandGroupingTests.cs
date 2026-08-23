@@ -46,7 +46,7 @@ public class SkyIslandGroupingTests
     public void IslandsAreOrderedNumericallyWithTheUnlocatedLast()
     {
         Assert.Equal(
-            ["Island 1.5", "Island 6", SkyIslands.SeveralHeading, SkyIslands.AnywhereHeading],
+            ["Island 1.5", "Island 6", "Islands 1.5, 4, and 8", SkyIslands.AnywhereHeading],
             Rows().Select(r => r.IslandHeading));
     }
 
@@ -60,7 +60,12 @@ public class SkyIslandGroupingTests
 
         Assert.Equal(4, rows.Count);
         var efreeti = Assert.Single(rows, r => r.Id == "c");
-        Assert.Equal(SkyIslands.SeveralHeading, efreeti.IslandHeading);
+        // NAMED, not just "Several islands" (David, 2026-08-23, after seeing the first
+        // build): a player on Island 4 can tell at a glance that this is reachable.
+        Assert.Equal("Islands 1.5, 4, and 8", efreeti.IslandHeading);
+        // And the prose stays, because the heading says WHERE while the prose says which
+        // mob on each — a mapping that exists nowhere else.
+        Assert.Contains("Overseer of Air", efreeti.Detail);
     }
 
     /// <summary>On: the same step appears under every island it drops on, so "what can I do
@@ -76,7 +81,7 @@ public class SkyIslandGroupingTests
             ["Island 1.5", "Island 1.5", "Island 4", "Island 6", "Island 8", SkyIslands.AnywhereHeading],
             rows.Select(r => r.IslandHeading));
         // And "Several islands" is not drawn at all — every one of them has a home.
-        Assert.DoesNotContain(SkyIslands.SeveralHeading, rows.Select(r => r.IslandHeading));
+        Assert.DoesNotContain(rows, r => r.IslandHeading.StartsWith("Islands "));
     }
 
     /// <summary>
@@ -127,6 +132,47 @@ public class SkyIslandGroupingTests
         Assert.True(QuestChecklistLayout.Sky(all, null, false).Single().ReadyToTurnIn);
         Assert.True(QuestChecklistLayout.Sky(all, null, true).Single().ReadyToTurnIn);
     }
+
+    /// <summary>**Two different island SETS are two different headings, and they sit apart**
+    /// (David, 2026-08-23: *"for the 'Several Islands' ones, please list which. IE: 1, 3,
+    /// and 7"*).
+    ///
+    /// Before the heading named its islands, every multi-island step shared one "Several
+    /// islands" bucket — which was only ever right because the heading could not tell them
+    /// apart. Naming them makes that bucket wrong, so the ordering had to gain a tiebreak on
+    /// the set. This is the assertion that would catch it being dropped: without it the two
+    /// steps below interleave under whichever heading came first, and the list quietly claims
+    /// one is on islands it is not.</summary>
+    [Fact]
+    public void DifferentIslandSetsGetDifferentHeadingsAndDoNotInterleave()
+    {
+        var mixed = new[]
+        {
+            Step("p", "Alpha", ThreeIsles),                                   // 1.5, 4, 8
+            Step("q", "Bravo", "Isle 2: Protector of Sky; Isle 7: Sister of the Spire"),
+            Step("r", "Charlie", ThreeIsles),                                 // 1.5, 4, 8
+        };
+
+        var rows = QuestChecklistLayout.Sky(mixed, null, repeatMultiIsland: false).Single().Rows;
+
+        Assert.Equal(
+            ["Islands 1.5, 4, and 8", "Islands 1.5, 4, and 8", "Islands 2 and 7"],
+            rows.Select(r => r.IslandHeading));
+        // The two members of the first set are adjacent, which is what "grouped" means.
+        Assert.Equal(["Alpha", "Charlie", "Bravo"], rows.Select(r => r.Title));
+    }
+
+    /// <summary>Two islands read "Islands 4 and 8" — no list comma, because there is no list.
+    /// Three or more take David's own format, with the comma before the "and".</summary>
+    [Theory]
+    [InlineData(new[] { 4.0, 8.0 }, "Islands 4 and 8")]
+    [InlineData(new[] { 1.5, 4.0, 8.0 }, "Islands 1.5, 4, and 8")]
+    [InlineData(new[] { 1.0, 3.0, 7.0 }, "Islands 1, 3, and 7")]
+    // One is not "several" at all — it is that island, spelled the ordinary way, so a caller
+    // that loses track of how many it has cannot produce a heading that reads as a list.
+    [InlineData(new[] { 6.0 }, "Island 6")]
+    public void TheHeadingNamesTheIslands(double[] islands, string expected) =>
+        Assert.Equal(expected, SkyIslands.SeveralHeading(islands));
 
     /// <summary>Epic rows carry no island heading at all, so an Epic surface draws none.
     /// The negative that keeps the field from leaking into the other checklist.</summary>

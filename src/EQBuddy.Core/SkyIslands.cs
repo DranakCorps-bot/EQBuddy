@@ -72,15 +72,41 @@ public static partial class SkyIslands
 
     /// <summary>The heading a group of steps sits under. Kept here so the two desktops and
     /// EQBuddy Mobile cannot spell the same island three ways (#184's rule).</summary>
-    public static string Heading(double island) =>
-        "Island " + island.ToString(island % 1 == 0 ? "0" : "0.0", CultureInfo.InvariantCulture);
+    public static string Heading(double island) => "Island " + Number(island);
 
-    /// <summary>The heading for steps that name SEVERAL islands. They are not unknown — we
-    /// know all three places — so they never fall in with the trash-mob steps; and they are
-    /// not on "a specific island", so by David's own wording they do not join a numbered
-    /// group unless the player asks for that (see
-    /// <see cref="AppSettings.SkyStepsUnderEveryIsland"/>).</summary>
-    public const string SeveralHeading = "Several islands";
+    /// <summary>
+    /// The heading for a step that names SEVERAL islands — **and it names which** (David,
+    /// 2026-08-23, after seeing the first build: *"for the 'Several Islands' ones, please list
+    /// which. IE: 1, 3, and 7"*).
+    ///
+    /// The first cut said only "Several islands", which told a player the one thing they
+    /// already knew from the absence of a number and none of what they needed. A player
+    /// standing on Island 4 can now see at a glance whether a step is reachable from where
+    /// they are, without opening anything.
+    ///
+    /// It also stops being ONE bucket: two steps with different island sets get different
+    /// headings and sit apart, which is the honest grouping — they were only ever together
+    /// because the heading could not tell them apart.
+    ///
+    /// These are still not "on a specific island", so they keep their place after the
+    /// numbered groups unless the player asks otherwise (see
+    /// <see cref="AppSettings.SkyStepsUnderEveryIsland"/>).
+    /// </summary>
+    public static string SeveralHeading(IReadOnlyList<double> islands) => islands.Count switch
+    {
+        0 => AnywhereHeading,
+        1 => Heading(islands[0]),
+        // "Islands 4 and 8" — no list comma needed for two.
+        2 => $"Islands {Number(islands[0])} and {Number(islands[1])}",
+        // "Islands 1.5, 4, and 8" — David's own example format, comma before the "and".
+        _ => "Islands " + string.Join(", ", islands.Take(islands.Count - 1).Select(Number))
+             + ", and " + Number(islands[^1]),
+    };
+
+    /// <summary>An island's number on its own, without the word — "4", "1.5". One formatter,
+    /// so a heading and a list of them cannot disagree about how 1.5 is written.</summary>
+    private static string Number(double island) =>
+        island.ToString(island % 1 == 0 ? "0" : "0.0", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// The source prose with a leading "Isle N:" / "Isle N -" removed, for a row that is

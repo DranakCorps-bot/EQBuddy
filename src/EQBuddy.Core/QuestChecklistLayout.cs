@@ -11,7 +11,8 @@ public sealed record QuestChecklistRow(
     bool Acquired,
     bool Unassigned,
     /// <summary>Which island heading this row sits under — <see cref="SkyIslands.Heading"/>,
-    /// <see cref="SkyIslands.SeveralHeading"/> or <see cref="SkyIslands.AnywhereHeading"/>.
+    /// a multi-island heading that NAMES them ("Islands 1.5, 4, and 8"), or
+    /// <see cref="SkyIslands.AnywhereHeading"/>.
     /// Empty on Epic rows, which have no islands.
     ///
     /// Rows arrive already ORDERED by it, so a surface draws a heading whenever this changes
@@ -135,8 +136,8 @@ public static class QuestChecklistLayout
     /// wherever the alphabet happened to put it.</summary>
     /// <param name="repeatMultiIsland">How a step naming SEVERAL islands is placed (David,
     /// 2026-08-23, asked as its own question — he wanted the player to choose). <c>false</c>:
-    /// it appears once, under <see cref="SkyIslands.SeveralHeading"/> after the numbered
-    /// groups. <c>true</c>: it appears under every island it names, so "what can I do on
+    /// it appears once, after the numbered groups, under a heading that NAMES its islands
+    /// ("Islands 1.5, 4, and 8" — David, 2026-08-23). <c>true</c>: it appears under every island it names, so "what can I do on
     /// Island 4" is answered completely — at the cost of one step rendering three times.
     /// Either way the step is never counted twice; see <see cref="QuestChecklistGroup.Total"/>.</param>
     public static IReadOnlyList<QuestChecklistGroup> Sky(
@@ -156,6 +157,9 @@ public static class QuestChecklistLayout
                         .. g.OrderBy(i => i.QuestItem, StringComparer.OrdinalIgnoreCase)
                             .SelectMany(i => IslandPlacements(i, repeatMultiIsland))
                             .OrderBy(p => p.Sort)
+                            // Steps sharing an island SET stay together — their heading names
+                            // those islands now, so two sets are two headings.
+                            .ThenBy(p => p.Tie, StringComparer.Ordinal)
                             .ThenBy(p => p.Item.QuestItem, StringComparer.OrdinalIgnoreCase)
                             .Select(p => new QuestChecklistRow(
                                 p.Item.Id,
@@ -163,10 +167,11 @@ public static class QuestChecklistLayout
                                 p.Item.QuestItem.Length > 0 ? p.Item.QuestItem : p.Item.Reward,
                                 // The island label comes off the detail when the row is
                                 // already under that island's heading — see
-                                // SkyIslands.WithoutIslePrefix. Multi-island rows keep every
-                                // word, because their three names are the only place a
-                                // player learns where to go.
-                                Detail(p.Item.Npc, p.Heading == SkyIslands.SeveralHeading
+                                // SkyIslands.WithoutIslePrefix. A multi-island row keeps every
+                                // word even though its heading now names the islands: the
+                                // heading says WHERE, the prose says which mob on each, and
+                                // that mapping exists nowhere else.
+                                Detail(p.Item.Npc, p.Tie.Length > 0
                                     ? p.Item.Source
                                     : SkyIslands.WithoutIslePrefix(p.Item.Source)),
                                 p.Item.Acquired,
@@ -406,7 +411,7 @@ public static class QuestChecklistLayout
     /// because Sky has an island 1.5. Sorted as TEXT that lands where it belongs by luck, and
     /// the luck runs out on any two-digit number.
     /// </summary>
-    private static IEnumerable<(SkyQuestChecklistItem Item, double Sort, string Heading)>
+    private static IEnumerable<(SkyQuestChecklistItem Item, double Sort, string Heading, string Tie)>
         IslandPlacements(SkyQuestChecklistItem item, bool repeatMultiIsland)
     {
         var islands = SkyIslands.Parse(item.Source);
@@ -414,24 +419,36 @@ public static class QuestChecklistLayout
         {
             // No island named — and that is the truth for 95 of 223 steps, not a gap.
             // Sorted last, keeping the flat presentation these have always had.
-            yield return (item, AnywhereSort, SkyIslands.AnywhereHeading);
+            yield return (item, AnywhereSort, SkyIslands.AnywhereHeading, "");
             yield break;
         }
         if (islands.Count == 1)
         {
-            yield return (item, islands[0], SkyIslands.Heading(islands[0]));
+            yield return (item, islands[0], SkyIslands.Heading(islands[0]), "");
             yield break;
         }
         if (!repeatMultiIsland)
         {
-            // After the numbered islands, before "anywhere": we know all three places, so
-            // these must not fall in with the steps whose location nobody has written down.
-            yield return (item, SeveralSort, SkyIslands.SeveralHeading);
+            // After the numbered islands, before "anywhere": we know every one of these
+            // places, so they must not fall in with the steps nobody has written down.
+            //
+            // The TIE key groups steps by their island SET. Since the heading names the
+            // islands (David, 2026-08-23), two different sets are two different headings and
+            // must not interleave — before that they shared one "Several islands" bucket
+            // only because the heading could not tell them apart.
+            yield return (item, SeveralSort, SkyIslands.SeveralHeading(islands), SetKey(islands));
             yield break;
         }
         foreach (var island in islands)
-            yield return (item, island, SkyIslands.Heading(island));
+            yield return (item, island, SkyIslands.Heading(island), "");
     }
+
+    /// <summary>A stable, sortable key for a set of islands: zero-padded so "10" could never
+    /// sort between "1" and "2", and ordered so the set starting on the lowest island leads.
+    /// Text, because it only ever has to be consistent — it is never shown.</summary>
+    private static string SetKey(IReadOnlyList<double> islands) =>
+        string.Join("|", islands.Select(i => i.ToString("00.0",
+            System.Globalization.CultureInfo.InvariantCulture)));
 
     /// <summary>Sorts after every real island (Sky's highest is 8) and before "anywhere".</summary>
     private const double SeveralSort = 90;
