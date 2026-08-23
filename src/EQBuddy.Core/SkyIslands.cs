@@ -92,15 +92,22 @@ public static partial class SkyIslands
     /// numbered groups unless the player asks otherwise (see
     /// <see cref="AppSettings.SkyStepsUnderEveryIsland"/>).
     /// </summary>
+    /// <remarks>
+    /// **The separator is a middle dot, and the reason is worth keeping** (David, 2026-08-23).
+    /// It was commas first — "Islands 1.5, 4, and 8" — and he read that back as *four*
+    /// islands, "1, 5, 4, 8", because Sky's half-island puts a decimal point inside a
+    /// comma-separated list. He had specified the comma format himself an hour earlier, which
+    /// is the whole argument: if the person who chose it misreads it, a player who does not
+    /// yet know there IS a half-island has no chance.
+    ///
+    /// "·" is already this app's list separator — the checklist rows beneath these headings
+    /// use it, so do the raid rows — and it cannot be mistaken for part of a number.
+    /// </remarks>
     public static string SeveralHeading(IReadOnlyList<double> islands) => islands.Count switch
     {
         0 => AnywhereHeading,
         1 => Heading(islands[0]),
-        // "Islands 4 and 8" — no list comma needed for two.
-        2 => $"Islands {Number(islands[0])} and {Number(islands[1])}",
-        // "Islands 1.5, 4, and 8" — David's own example format, comma before the "and".
-        _ => "Islands " + string.Join(", ", islands.Take(islands.Count - 1).Select(Number))
-             + ", and " + Number(islands[^1]),
+        _ => "Islands " + string.Join(" · ", islands.Select(Number)),
     };
 
     /// <summary>An island's number on its own, without the word — "4", "1.5". One formatter,

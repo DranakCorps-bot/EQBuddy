@@ -46,7 +46,7 @@ public class SkyIslandGroupingTests
     public void IslandsAreOrderedNumericallyWithTheUnlocatedLast()
     {
         Assert.Equal(
-            ["Island 1.5", "Island 6", "Islands 1.5, 4, and 8", SkyIslands.AnywhereHeading],
+            ["Island 1.5", "Island 6", "Islands 1.5 · 4 · 8", SkyIslands.AnywhereHeading],
             Rows().Select(r => r.IslandHeading));
     }
 
@@ -62,7 +62,7 @@ public class SkyIslandGroupingTests
         var efreeti = Assert.Single(rows, r => r.Id == "c");
         // NAMED, not just "Several islands" (David, 2026-08-23, after seeing the first
         // build): a player on Island 4 can tell at a glance that this is reachable.
-        Assert.Equal("Islands 1.5, 4, and 8", efreeti.IslandHeading);
+        Assert.Equal("Islands 1.5 · 4 · 8", efreeti.IslandHeading);
         // And the prose stays, because the heading says WHERE while the prose says which
         // mob on each — a mapping that exists nowhere else.
         Assert.Contains("Overseer of Air", efreeti.Detail);
@@ -156,18 +156,22 @@ public class SkyIslandGroupingTests
         var rows = QuestChecklistLayout.Sky(mixed, null, repeatMultiIsland: false).Single().Rows;
 
         Assert.Equal(
-            ["Islands 1.5, 4, and 8", "Islands 1.5, 4, and 8", "Islands 2 and 7"],
+            ["Islands 1.5 · 4 · 8", "Islands 1.5 · 4 · 8", "Islands 2 · 7"],
             rows.Select(r => r.IslandHeading));
         // The two members of the first set are adjacent, which is what "grouped" means.
         Assert.Equal(["Alpha", "Charlie", "Bravo"], rows.Select(r => r.Title));
     }
 
-    /// <summary>Two islands read "Islands 4 and 8" — no list comma, because there is no list.
-    /// Three or more take David's own format, with the comma before the "and".</summary>
+    /// <summary>**A middle dot, not commas** (David, 2026-08-23). He read the first cut,
+    /// "Islands 1.5, 4, and 8", back as FOUR islands — "1, 5, 4, 8" — because the
+    /// half-island puts a decimal point inside a comma-separated list. He had chosen the
+    /// comma format himself an hour before, which is the argument: if its author misreads
+    /// it, a player who does not yet know there is a half-island has no chance. "·" is
+    /// already the separator the rows beneath these headings use.</summary>
     [Theory]
-    [InlineData(new[] { 4.0, 8.0 }, "Islands 4 and 8")]
-    [InlineData(new[] { 1.5, 4.0, 8.0 }, "Islands 1.5, 4, and 8")]
-    [InlineData(new[] { 1.0, 3.0, 7.0 }, "Islands 1, 3, and 7")]
+    [InlineData(new[] { 4.0, 8.0 }, "Islands 4 · 8")]
+    [InlineData(new[] { 1.5, 4.0, 8.0 }, "Islands 1.5 · 4 · 8")]
+    [InlineData(new[] { 1.0, 3.0, 7.0 }, "Islands 1 · 3 · 7")]
     // One is not "several" at all — it is that island, spelled the ordinary way, so a caller
     // that loses track of how many it has cannot produce a heading that reads as a list.
     [InlineData(new[] { 6.0 }, "Island 6")]
