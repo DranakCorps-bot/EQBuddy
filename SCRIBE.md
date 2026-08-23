@@ -16,6 +16,23 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### group Sky quest steps by island
+- **Priority:** approved - David, 2026-08-23 6:14 AM CT. Came from a Reddit user; David wants it implemented. Not a hold.
+- **Place:** Sky / Plane of Sky quest tracker. Desktop first. Not Gate 5 overlay. Not a group meter.
+- **Source:** David in Helm chat, Aug 23, 6:14 AM CT. Reddit user idea (URL not pasted; harvest later if Scribe finds the thread). Not a GitHub thread. Do not reply on Reddit.
+- **Ask:** Group steps of Sky quests by which island they are on. Example shape:
+  <X Quest>
+  Island 1:
+  * Kill xyz
+  * Loot abc
+  Island 5:
+  * Hail <npc>
+  Island 6:
+  * Hand in <something> to <someone>
+  A player should see the work for one island together, not a flat list that jumps islands.
+- **Already shipped:** Plane of Sky tracker exists; quests have steps. Unknown whether steps already carry an island field. Hypothesis, unchecked -- steps are a flat list per quest today.
+- **Checked:** did not grep this run for island-on-step. Do not invent the data source. If a step has no island, it still needs a place (unknown / other), not a dropped step.
+
 ### Sky bee chain: the FIRST bee has no catalog entry, and the names may not match
 
 - **Priority:** waiting (on Frankthetankk — asked 2026-08-22 on #109)
