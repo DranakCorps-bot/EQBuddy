@@ -1,5 +1,17 @@
 # EQBuddy — handoff
 
+> **2026-08-23 (night), Claude — #233 needs ONE THING FROM DAVID: carry the draft to Helm.**
+> mjtrainor, *"stop changing every feature and it's location every release"* — the THIRD arrival
+> of one complaint (#219, #227/#228, now this). David settled the direction with the question
+> tool: keep the roadmap, add a public guarantee, and say why. **Built already** — 1.99.6's
+> What's-new carries a WHERE THINGS MOVED map and the promise, and `CLAUDE.md` carries the
+> standing rule ("X is now Y", old place AND new one). **Nothing is posted**: it is a new thread,
+> so Helm's own process wants the sign-off, and the full draft is in `HELM-FEEDBACK.md` with two
+> specific questions (whether to concede "you are the third person", and whether to post before
+> the tag). Neither end can reach the other; if David does not carry it, it does not move.
+> **#109 is deliberately unanswered** — its last word is Frankthetankk's verbatim evidence, which
+> is what 1.99.6's bee work was built from, so the honest reply is the release itself.
+
 > **2026-08-23 (night), Claude — Fable's third pass is ACTIONED and 1.99.6 is ready to ask
 > David for.** The wire key is fixed (`CompanionUnlockGroup.Class`, matching every sibling on
 > that wire) and guarded by `CompanionWireKeyTests`, whose load-bearing line is the NEGATIVE —
