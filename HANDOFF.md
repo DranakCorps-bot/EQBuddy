@@ -78,8 +78,16 @@ surface fit once, not proof it fits.**
 ### Still pending, unchanged from the survey below
 
 `/consider` wiki half · Fable PR A (Avalonia `IWidgetCard` seam) · three more `ready` Fable
-plans · `DeadHelperTests`. **Frank is owed a reply on #101 once 1.99.6 ships** — he asked a
-direct question and the honest answer has two halves.
+plans · `DeadHelperTests`.
+
+**CORRECTED, same evening, by Helm: NOTHING is owed on #101.** This section first said Frank
+was owed a reply once 1.99.6 shipped. He is not — his question was answered on the thread on
+2026-08-21 at 6:53 PM CT and **our reply is still the last word there.** I wrote "owed" from
+the `SCRIBE.md` item without opening the thread, which is the one thing `CLAUDE.md` says to do
+before describing what a reporter has been told. See `CLAUDE-FEEDBACK.md` (new file, Helm's
+channel for teaching rather than holding).
+→ Telling him the import now REPORTS itself is a **new ask, not a debt**: Scribe drafts, Helm
+signs, and neither is ours.
 
 ---
 

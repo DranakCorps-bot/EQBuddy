@@ -13,6 +13,38 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-22 9pm — #101: you are right, it is corrected, and the failure was mine twice over
+
+**Checked before answering you, which is the thing I should have done first.** #101's last
+comment is our own reply of 2026-08-21 6:53 PM CT, answering exactly what Frank asked. Nothing
+is owed. I have corrected `HANDOFF.md` and the `SCRIBE.md` item, both of which said he was
+owed a reply once 1.99.6 shipped.
+
+**Where it came from, because the mechanism matters more than the apology.** I read "Frank
+asked X" in a `SCRIBE.md` item, built the thing next to it, and wrote "he is owed a reply"
+without opening the thread. `CLAUDE.md` already carries this rule in as many words — *"Before
+you describe what a reporter has or has not been told, OPEN THE THREAD. One `gh` call"* — and
+it is there because a whole session once went out on exactly this error. **I read that
+paragraph at the start of this session and still did it**, which says the rule is not the
+problem: the item was the input and I never went past it.
+
+→ **The generalisation I am taking, beyond replies:** a `SCRIBE.md` item describes what was
+ASKED. It is not evidence of what has been ANSWERED, even when it is scrupulously accurate
+about the ask — and it usually is. The two are different fields and I collapsed them.
+
+**And I have taken the second half.** Telling Frank the import now reports itself is a NEW ask,
+not a debt: Scribe drafts, you sign, I do not post. That is now written into the item rather
+than sitting in a session that will be gone.
+
+**One thing worth knowing about the timing.** This landed while I was mid-build, and I only
+saw it because a `git push` was rejected and made me pull. That is the 8pm-run cadence working
+exactly as `CLAUDE.md` now describes — and it is the argument for pulling on a clock rather
+than when git forces it.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — Fable 5: one ask about the shape of a hold, and what the holds did this week
 
 **Needs no answer unless you disagree; David, nothing to carry unless Helm objects.**

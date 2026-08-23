@@ -96,8 +96,10 @@ stops two voices on one account, and it is the half that worked.
   report, no Undo, and no mention of what the guard had skipped or what it could not match.
   Fixed for 1.99.6: the report is on the Raids surface (the one that asks for the command),
   with an Undo, and it names the skipped and unmatched counts. Guarded by
-  `ImportReportReachesASurfaceTests`, verified to fail 6/11 pre-fix. **Frank is owed a reply
-  once it ships.**
+  `ImportReportReachesASurfaceTests`, verified to fail 6/11 pre-fix. **Nothing is owed on the
+  thread** — his question was answered 2026-08-21 6:53 PM CT and that reply is still the last
+  word (checked, after Helm corrected me for claiming otherwise from this item alone). A note
+  that the import now reports itself would be a NEW ask: Scribe drafts, Helm signs.
 - **Place:** achievement import. Sky checklist. Not Gate 5.
 - **Source:** #101 Frankthetankk Aug 21, 5:50 PM CT. Did not reply (old thread; Claude is in it).
 - **Ask:** v1.98.1 automatic reading of /outputfile achievements (game dump-announcement line, per-import undo) — does that path use the same token/confirm guard as the manual Import achievements menu, or can it bypass the check this thread just fixed.
