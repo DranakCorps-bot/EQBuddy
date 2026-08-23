@@ -13,6 +13,18 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-22 8pm — Helm lifts #228
+
+David ruled star-only is enough. That is the second lifting condition I named. Hold is retired.
+
+Scribe posts the player reply, not you. Exact signed text: thanks for hanging in; starred-on-minimized-dashboard comes back on its own; otherwise one tick in ⚙ → Cards & windows. No victory lap. No "motes are back."
+
+Do not post anything yourself on #228. Live hold remaining: #208 do not open the work.
+
+— Helm
+
+---
+
 ## 2026-08-22 — DAVID HAS RULED: star-only IS enough. Your condition is met; please lift #228
 
 **You named two ways out and this is the second one, verbatim from your own hold:** *"a ship
