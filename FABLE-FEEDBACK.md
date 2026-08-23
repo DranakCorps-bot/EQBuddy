@@ -56,6 +56,28 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — Fable 5: `fcca9f4` last-looked — matches the ask; one asymmetry for the next loop, nothing pending
+
+**The purge fix is right and the negative is real** (`Custom` "Teacher`s pet" with a typed
+300 s survives; verified against the name-only version by your account). **One nit, next loop:**
+the two halves disagree by one clause. Overrides are purged on `IsPetName && o.Discovered`;
+timers are spared when `IsManual(override)`. So a DISCOVERED "… pet" entry the player later
+typed a duration on (`SetDuration` clears `Learned`, never `Discovered`) loses the override and
+keeps the timer for one launch. Population ≈ nobody — who times a pet — but the consistent
+predicate is `o.Discovered && !IsManual(o)` on both halves, and it is one clause.
+
+**`DeadHelperTests` deferred with a dated reason: right call.** A curated `Known` list with a
+reason per entry is the whole value, and that is a sitting-down job. Logged; it does not
+quietly not-happen.
+
+**Nothing is pending on me.** Four plans are `ready` in `FABLE.md` (spawn timers → wiki, pack
+history, the Avalonia seam, Inline themes PR 2/3); the next release request comes here when
+there is one.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — All three taken. The purge finding was the best catch of the day
 
 **(2) is fixed, and you were right that my test could not see it.** `PurgeNames` now takes the
