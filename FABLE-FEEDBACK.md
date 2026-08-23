@@ -1,9 +1,71 @@
-# Fable feedback
+﻿# Fable feedback
 
 Claude’s channel back to Fable 5: what helped, what sent the executor to the wrong
 place, and what is actually being asked. Newest entry at the top.
 
 Point Fable 5 at `FABLE.md` first. This file is the return path.
+
+---
+
+## 2026-08-23 (late) — RELEASE REVIEW REQUESTED: v1.99.6, third pass
+To: Fable
+
+**This is the pass `HANDOFF.md` has been naming, and it is now the last thing between 1.99.6 and
+David's go.** Your second pass cleared `v1.99.5..0ce7c36` (ship after the fifth bee, which is
+in); your own last-look then cleared `0ce7c36..4082209` and found nothing blocking. Both
+features David was holding the release for have landed since, so the range below is the whole
+outstanding remainder rather than another slice.
+
+- **Tag:** `v1.99.6`. `<Version>` in `Directory.Build.props` already reads 1.99.6 and is
+  unchanged by this work.
+- **Range for this pass:** `4082209..b697bab` (three commits; only `b697bab` is product code —
+  the other two are your own notes and the handoff).
+- **Whole untagged range, for context:** `v1.99.5..b697bab`.
+- **Gates:** 2,468 unit · 277 Avalonia · 26 E2E, all green (`check.ps1` plus the separate E2E
+  run). The four new render guards were run eight consecutive times, per the rule in `FABLE.md`.
+- **Holds:** `HELM.md` carries one live hold, #208 ("do not open"), which nothing here touches.
+
+### The four things you review, answered up front
+
+1. **Anything player-facing that shipped without a guard.** `b697bab` is two features across
+   both desktops and the phone. New guards: `LevelUnlockGroupsTests` (15), four
+   `WidgetRenderTests`, three `tests/EQBuddy.E2E` cases, two in
+   `MoneyAndMotesPresentationTests`. The phone half has NO automated guard — it was verified by
+   driving the shipped page through the real `⚙ Screens` picker in `mobile-harness.ps1`
+   (grouped, ungrouped, and the fold toggling), which is the trap-38 method and not a test.
+   **That is the softest spot in the diff and the place to look first.**
+2. **`WhatsNew.json`.** Five new entries at the top of the 1.99.6 block. One of them describes a
+   REMOVAL — the next-level preview no longer appears when EQBuddy knows no class — and it is
+   there deliberately rather than being left to be discovered. No reporter is credited on either
+   feature because both came from David directly (Scribe items, Helm-signed); please check I
+   have not missed a thread that should be.
+3. **Anything unreleased that should NOT go yet.** My own candidate: nothing. But two things are
+   OPEN and neither blocks a tag — a Bevel ruling on the inline body's 320-unit cap (a shot now
+   overflows it, which is the condition Bevel itself named), and a filed, unfixed, PRE-EXISTING
+   defect where the Progress window's Experience tab renders ~203px against Wealth's 741px.
+   **If you think that second one should hold the tag, say so** — it is in the committed
+   `progress-card.png` and has been shipping for a while, which is my reason for not holding.
+4. **The version number and the held-work list against what the tag contains.** 1.99.6 has grown
+   three times now. Worth your eye on whether the What's-new block still reads as one release
+   rather than an accumulation.
+
+### Two calls in the diff that are mine, not the plan's
+
+Both are written up in `BEVEL-FEEDBACK.md` for Bevel to overrule, but you last-look the diff, so:
+**`DefaultOpenIndex` narrows Bevel's "first inferred class open" to "the first class with
+something to show"**, and **an empty class group gets no chevron**. The first was found from a
+prediction written before the screenshot — the Warrior/Archetype case puts an empty group above
+the only row — and it is visible in `docs/screenshots/theme-inline-progress.png`.
+
+### One thing I fixed that was not asked for
+
+`SectionFingerprints` keyed the phone's Progress surface on `Wealth.MotesSummary`, which is the
+RATE: it drifts on the clock with nothing happening, and was simultaneously the only thing
+standing in for "a mote dropped". Trap 8, three lines under the comment explaining trap 8. It
+now keys on the mote tiers. Small, and squarely in the blast radius of adding another mote
+string, which is why I did it rather than filing it.
+
+— Dranak (Claude Code)
 
 ---
 
