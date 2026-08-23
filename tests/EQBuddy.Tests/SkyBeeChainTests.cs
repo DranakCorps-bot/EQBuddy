@@ -77,6 +77,37 @@ public class SkyBeeChainTests
         Assert.False(opener.Trusted);
     }
 
+    /// <summary>**The dead-end branch, which the chain test above cannot see** (Fable 5's
+    /// v1.99.6 re-review — it read the live wiki and found a fifth Island 6 mob the first
+    /// four-link pass missed).
+    ///
+    /// `Bizazzzt` is not a link in the chain to the boss: eqlwiki's page reads *"Single spawn
+    /// from each of two Bazzzazzt. Killing these mobs spawns no further mobs."* But it is a
+    /// proper one-word name the player kills, so without a row it would be DISCOVERED on the
+    /// first kill and LEARNED on the second — precisely the defect this release claims to have
+    /// fixed for the first two bees, one branch over.
+    ///
+    /// Both spellings are carried because the wiki disagrees with itself about the name: the
+    /// island page writes "Bizazzt", which redirects to the served title "Bizazzzt" (trap 3 —
+    /// record what was SERVED). Nobody here has seen the kill line, so which one EQBuddy has
+    /// to match is genuinely unknown, and an alias costs nothing while a wrong guess costs a
+    /// timer.</summary>
+    [Fact]
+    public void TheDeadEndBranchIsCataloguedUnderBothSpellings()
+    {
+        var dead = Bee("Bizazzzt");
+
+        Assert.True(dead.IsTriggered);
+        Assert.Null(dead.RespawnSeconds);
+        Assert.Equal("Bazzzazzt", dead.TriggeredBy);
+        Assert.True(dead.MultiSpawn);           // two of them, one per Bazzzazzt
+        Assert.Contains("Bizazzt", dead.Aliases);
+        // It spawns nothing, so nothing may name it as a trigger.
+        Assert.DoesNotContain(
+            Catalog.Zones.Single(z => z.Zone == "Plane of Sky").Named,
+            e => e.TriggeredBy.Contains("Bizazz", StringComparison.OrdinalIgnoreCase));
+    }
+
     /// <summary>Three wasps share each of the first two names, so no gap between two kills
     /// is ever this camp's respawn. `SpawnTimers` refuses to learn from a multiSpawn entry,
     /// which is the mechanism that stops a 12-hour clock being overwritten by a three-minute
@@ -94,7 +125,7 @@ public class SkyBeeChainTests
     [Fact]
     public void EveryBeeNoteCitesItsSource()
     {
-        foreach (var name in new[] { "Bzzazzt", "Bazzzazzt", "Bzzzt", "Bazzt Zzzt" })
+        foreach (var name in new[] { "Bzzazzt", "Bazzzazzt", "Bizazzzt", "Bzzzt", "Bazzt Zzzt" })
         {
             var bee = Bee(name);
             Assert.Equal("eqlwiki", bee.Source);

@@ -98,12 +98,19 @@ are not two routes to one answer:
 
 Both directions are wrong, which is what makes it a reconciliation rather than a fix:
 
-- **`Healing Water` is not in our catalog at ALL** — no row of that name, any class, any level.
-  The class page has it at Druid 34 with description text.
-- **Five of our six extras appear NOWHERE on the Druid class page** (checked by name across all
-  3,682 lines): Circle of Ro, Ring of Iceclad, Circle of Iceclad, Circle of the Combines, Ring
-  of Great Divide. Each one's OWN spell page says Druid 34, so the harvest is not inventing
-  them. `Succor: Butcher` is on the page, under a different level.
+- **`Healing Water` is not in our catalog under that NAME** — and Fable's re-review corrected
+  what that means: it is a wiki REDIRECT to `Greater Healing`, which we do carry. So part of
+  the gap is naming. **The residue is still a real conflict**, and worth stating precisely: we
+  have `Greater Healing` at **Druid 29**, the class page lists it (as Healing Water) at **34**.
+- **Three of our six extras appear NOWHERE on the Druid class page**: Circle of Ro, Circle of
+  Iceclad, Ring of Great Divide. **Two more appear only as PROSE LINKS** in a port-destination
+  bullet list near the foot of the page — `Ring of Iceclad` (line 3679) and `Circle of the
+  Combines` — not as `|name=` entries in any `==Level N==` section. `Succor: Butcher` is a
+  level-section entry, under a different level.
+  **This bullet first read "five appear NOWHERE (checked by name across all 3,682 lines)",
+  which was an overstatement of what I had actually run** — I grepped `name=` occurrences and
+  then described it as a whole-page name search. Fable caught it. The substantive point is
+  unchanged: none of the six is listed as a Druid 34 spell on the class page.
 
 So a 33 Druid asking "what do I get at 34" would be shown a list **missing one spell and padded
 with six he cannot buy** — on a feature whose entire value is being right about a number he
@@ -146,7 +153,14 @@ the wiki.
 
 The three catalog counts above, by parsing `SpellLevels.json` directly; the Druid class page
 fetched raw from eqlwiki and read section by section; each of the six extras searched across
-the whole page. **Not checked:** any class but Druid, any level but 34, and the AA side.
+the whole page **twice — the second time correctly** (see the corrected bullet above).
+**Not checked by me:** any class but Druid, any level but 34, and the AA side.
+
+**Fable's re-review sized it and the framing changed**: across thirteen classes the sources
+disagree on LEVEL only 7 times, but on MEMBERSHIP **498** times, all in one direction — our
+catalog names spells the Legends-curated class pages do not list — and the class pages carry
+an `era` column the spell pages lack. Applying David's ruling globally removes roughly a
+quarter of the catalog, which Fable judges correct. Its plan is on the item; PR 0 is the parse.
 
 ### Plan — Fable 5, 2026-08-23
 

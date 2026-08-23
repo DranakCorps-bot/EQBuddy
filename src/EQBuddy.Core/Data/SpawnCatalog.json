@@ -7356,7 +7356,19 @@
           "spawnType": "triggered",
           "triggeredBy": "Bzzazzt",
           "source": "eqlwiki",
-          "note": "Island 6, level 55. Triggered: eqlwiki's creature page carries respawn_time = Triggered, and its description says these spawn immediately after killing Bzzazzt. Three of them, same as the Bzzazzt they replace. Killing one spawns Bzzzt."
+          "note": "Island 6, level 55. Triggered: eqlwiki's creature page carries respawn_time = Triggered, and its description says these spawn immediately after killing Bzzazzt. Killing one spawns Bzzzt; killing one also spawns a Bizazzzt down a dead-end branch."
+        },
+        {
+          "name": "Bizazzzt",
+          "aliases": ["Bizazzt"],
+          "respawnSeconds": null,
+          "multiSpawn": true,
+          "variance": "",
+          "placeholder": "",
+          "spawnType": "triggered",
+          "triggeredBy": "Bazzzazzt",
+          "source": "eqlwiki",
+          "note": "Island 6, level 57. A DEAD END off the chain, not a link in it: eqlwiki's creature page reads 'Single spawn from each of two Bazzzazzt. Killing these mobs spawns no further mobs', and carries respawn_time = Triggered. Two of them, hence multiSpawn. Both spellings are carried because the page that names it and the page that IS it disagree: the island page says 'Bizazzt', which REDIRECTS to the served title 'Bizazzzt' (trap 3) — and nobody here has seen the kill line, so the name EQBuddy matches on is unknown."
         },
         {
           "name": "Bzzzt",
