@@ -33,7 +33,80 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-23 (LATEST — start here): the whole 6am inbox is cleared
+## 2026-08-23 midday (LATEST — start here): two features half-built, and one PREMISE ERROR to read first
+
+**Read `FABLE.md`'s top stub before touching anything class-related.** `ClassInference` returns
+ONE class, or `""` when two are close. **A Legends character is up to THREE classes at once**
+(David, 2026-08-23: *"you seem to think EQ Legends just lets you have 1 class when in fact you
+can be 3 at a time"*). The `LeadMargin = 2.0` gate treats a correctly-played three-class
+character as an ambiguous log and answers "don't know". Filed V3, not patched.
+
+**The multi-class model already exists everywhere else** — the Quest Tracker picker holds three
+and `hugzee_qeynos` has three stored. Only the inference collapses it.
+
+### Where 1.99.6 stands
+
+**Staged, unreleased, held by David so two more features can ride it.** Gates green
+(2,453 unit · 273 Avalonia · 24 E2E). Fable re-reviewed `v1.99.5..0ce7c36` and said ship after
+the fifth bee, which is in. **Everything after `0ce7c36` is outside that review**, so it needs a
+third pass before the tag. Do not ask David for the go until then.
+
+### IN FLIGHT 1 — next-level spells, grouped by class
+
+David's ask, Helm-filed, **Bevel + Helm have locked the UX** (`BEVEL.md`, "Experience
+next-level fold locks"). Read that lock; it answers most design questions.
+
+- **DONE:** `UI.Shared/LevelUnlockGroups.cs` — `ByClass(set, classes)`, `WorthGrouping`,
+  `NothingNew(level)`. Carries Bevel's rules as code. **Not wired to any surface yet.**
+- **NEXT:** render it in `ProgressCardView` on BOTH desktops (the existing `At level N` fold),
+  then the phone. Bevel: expanders per class, first open and the rest collapsed
+  (session-only, never a setting), one class = names under the heading with **no lone
+  expander**, a class with nothing keeps its row reading "Nothing new at N".
+- **Empty states are ruled** (no inferred class → hide the fold; max level → hide; class page
+  unreachable → heading names the miss; never invent a class).
+- **Tests to write:** `LevelUnlockGroupsTests` (Core-side rules), a `WidgetRenderTests` twin,
+  and a staged shot with the prediction written FIRST.
+- **Class source:** Bevel says inferred classes, never the Quest Tracker filter — **currently
+  impossible** (see the premise error above). Until the V3 lands, `UnlockClasses` picks-first
+  is what works, and David's own fix today was to tick all three classes on Dranak.
+
+### IN FLIGHT 2 — Progress motes-per-hour summary line (not started)
+
+`SCRIBE.md`, Helm-signed 2026-08-23 8:00 AM. **One line item only** in Progress. Not a card,
+not a glance, not a pill. Keep the Motes card as it is. **Do NOT** put the rate back on the
+Wealth chip (that lock stands) and **do NOT** strip the window/phone Wealth Motes rows —
+that is #227, its own later item. `MotesPresentation`/`Motes.Summarize` already computes
+`PerHour`; this is a placement job, not a calculation one.
+
+### The wiki work behind feature 1, if you touch the catalog
+
+`FABLE.md` has the V2 plan; **PR 0 is DONE** (`scripts/harvests/eqlwiki/class-spells-harvest.py`
++ `class-spells-report.md`). It independently reproduced Fable's sizing to the row (1,504 /
+1,964 / 38 / 498 / 7) and found two things Fable's plan did not have:
+
+1. **`spellname` on a spell page is a copy-paste artefact.** `Circle of Butcherblock` declares
+   `spellname = Ring of South Ro`. Our existing promote keys on it and de-duplicates, so **13
+   real spells are missing from the shipped catalog**, including `Healing Water` [Druid 34].
+   This affects the ding list players see TODAY.
+2. **Class pages stop at level 50**; Legends caps at 60, and several classes have interior
+   gaps (Paladin 7, Rogue 35). So the spell-page gap-filler is load-bearing, not vestigial —
+   51-60 is entirely derived, and Bevel's "do not silently pad" is what makes that honest.
+
+PR 1 (the ~500-row catalog re-source) is **not started** and David wants to review that diff.
+
+### Corrections I made to my own work today, so they are not re-learned
+
+- I told David his level-35 list was correct after checking **Druid** — Dranak is
+  Warrior/Druid/Monk and his picks were `['Warrior']` alone. Check the character before
+  checking the data.
+- My `FABLE.md` stub said five spells "appear nowhere on the Druid class page (checked across
+  all 3,682 lines)". I had grepped `name=` only. **Describe the search you RAN.**
+- I told Bevel "most players have ONE picked class" and it ruled the grouping partly on that.
+  Multi-class is the NORMAL case. Corrected in `BEVEL-FEEDBACK.md`.
+
+---
+
+## 2026-08-23: the whole 6am inbox is cleared
 
 **1.99.6 is still staged and UNRELEASED, and it has grown again.** Gates: **2,441 unit · 273
 Avalonia · 24 E2E**, green. **A Fable re-review is owed before the tag** — it cleared
