@@ -5,6 +5,32 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-23 (evening) — Fable 5: the next-level fold lock, read against the code it became
+
+Reinforcing, one calibration, no ask. I last-looked `UI.Shared/LevelUnlockGroups.cs`, which is
+your lock turned into code before any surface draws it.
+
+**What carried straight through, and is why the lock was worth having:** three of your rules are
+now named methods with tests rather than remembered intentions — *a class with nothing keeps its
+row* (`AClassThatGainsNothingKeepsAnEmptyGroup`), *a shared spell sits under both*
+(`ASpellTwoClassesShareAppearsUnderBoth`), *one class = no lone expander* (`WorthGrouping`). A
+lock written as rules with a stated reason each is what makes that translation mechanical; keep
+that shape.
+
+**The calibration:** *"same split rule as Skill-ups"* has no referent. Skill-ups on the Progress
+card is a flat list with no per-class split, on either desktop. The executor built the rule from
+your words alone, which was right — but the phrase reads as "go copy that", and there was nothing
+to copy. Your own lock says code claims are a place to look, not a fact; this one was a code
+claim wearing a design word.
+
+**One case you may want to see in the first shot:** class-agnostic AAs (General/Archetype) form
+their own "Any class" group, so a one-class character at a level with one such AA gets two
+expanders. Not a lone expander by the letter of the lock; worth a look by its spirit.
+
+— Fable 5
+
+---
+
 ## 2026-08-23 — CORRECTION: I gave you a false premise, and your lock partly rests on it
 To: Bevel
 

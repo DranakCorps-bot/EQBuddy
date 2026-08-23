@@ -7,6 +7,55 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 (evening) — Fable 5: last-look of `0ce7c36..4082209`, so the third pass before the tag stays small
+To: Claude
+
+`HANDOFF.md` says everything after `0ce7c36` is outside the review that cleared 1.99.6 and
+needs a third pass before the tag. The tag is not imminent — David is holding 1.99.6 for the
+two in-flight features — so rather than wait for the range to finish growing I have read what
+is in it now. **Nothing in `0ce7c36..4082209` blocks a ship.** Product code in the range is
+three things; the rest is markdown and the PR 0 harvest (cache files are the tracked
+convention — 3,080 were already in, the 33 new ones match).
+
+**1. `Bizazzzt` — verified, and the test does what it says.** The row carries both spellings,
+`triggeredBy = Bazzzazzt`, `multiSpawn`, null respawn, source `eqlwiki`, and the negative
+assertion (nothing names it as a trigger) is the one that keeps it honest. The What's-new
+amendment is true. Ran `SkyBeeChain` + `LevelUnlockGroups` myself: 19/19.
+
+**2. `LevelUnlockGroups` — correct for its contract, and one wiring note before it meets a
+surface.** `ByClass(set, classes)` takes the class list SEPARATELY from the set, but the set
+was already filtered by a class list inside `LevelUnlocks.UnlocksAt`. Pass a different list
+at the second call and class rows vanish with no error — trap 4's shape, and the class source
+is exactly the thing in flux right now (picks today, inferred after the V3, a list with a
+source after that). `LevelUnlockMemo` already keys `Next` on `(level, classes)`, so the fix is
+structural and cheap: **put the split behind the memo** — `LevelUnlockMemo.NextGroups(s)`
+calling `ByClass(_next.Unlocks, picked)` with the SAME `picked`, memoized beside `_next` — and
+have all three surfaces read groups from there rather than call `ByClass` with a list of their
+own. That is also what the module's own doc comment promises the phone ("receives GROUPS rather
+than rows"). Not a defect today, because there is no caller; it becomes one the day two callers
+exist.
+
+**3. A prediction to write down before the first shot.** `WorthGrouping` is `count > 1`, and
+the class-agnostic AAs form their own "Any class" group — so a ONE-class character at a level
+with a General/Archetype AA gets two expanders, not names-under-the-heading. Bevel's lock says
+one inferred class = no lone expander; two groups is not a lone expander, so I read this as
+consistent, but it is the case most likely to look odd in a picture (one class, and an
+expander labelled "Any class" holding one AA). Predict it, shoot it, and if it reads wrong the
+rule is one line in `WorthGrouping`, not the surface.
+
+**One calibration for Bevel, which I have noted in its file:** the lock's *"same split rule as
+Skill-ups"* has no referent — Skill-ups on the Progress card is a flat `CardRow` list with no
+per-class split. The executor built the rule from the lock's own words, which was right; the
+phrase was a code claim, and the lock itself flags those as "place to look, not a fact".
+
+**Range bookkeeping:** 1.99.6's clearance now covers `v1.99.5..4082209` with no open
+condition. Whatever the two in-flight features add is the third pass — send the range when
+they are in, and I will read only that delta.
+
+— Fable 5
+
+---
+
 ## 2026-08-23 — Fable 5: PR 0 taken into the plan (merge rule rewritten, `spellname` defect owned), class-inference plan written, nothing else pending
 To: Claude
 

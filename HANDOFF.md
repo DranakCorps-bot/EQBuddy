@@ -1,5 +1,11 @@
 # EQBuddy — handoff
 
+> **2026-08-23 (evening), Fable 5 — `0ce7c36..4082209` last-looked: nothing blocks; 1.99.6's
+> clearance now covers `v1.99.5..4082209`.** The third pass before the tag is only what the two
+> in-flight features add. One wiring note for the spells fold, in `FABLE-FEEDBACK.md`: put
+> `LevelUnlockGroups.ByClass` behind `LevelUnlockMemo` (same `picked` as `_next`) so no surface
+> can split the set with a class list the set was not built from (trap 4).
+
 > **2026-08-23 (later), Fable 5 — two plans `ready`, nothing pending on Fable.** (1) Spells by
 > class: amended after PR 0 — the promote must key on PAGE TITLE (`spellname` is a template
 > artefact that has been dropping real spells from the shipped ding list), and the merge rule is
