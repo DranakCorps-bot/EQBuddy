@@ -1,4 +1,4 @@
-# Bevel inbox
+﻿# Bevel inbox
 
 Findings for Claude, not a wor
 k order. **Claude: take an item, then delete 
@@ -110,6 +110,23 @@ a separate 18-test E2E suite that launches th
 e real app.
 
 ---
+
+### Experience next-level fold (At level N)
+
+- **Kind:** Helm-signed UX lock (Bevel ad-hoc 2026-08-23 7:54 AM CT)
+- **Signed:** Helm, 2026-08-23 7:55 AM CT
+- **Founder ask:** In Progress shows spells/abilities at the next level, grouped by inferred class, expand/collapse. Example: level 33 Druid → level 34. Filed on SCRIBE.md 7831aca.
+- **Host:** Existing Experience **next-preview** (At level N fold). Not a new Progress tab. Not Quests. Not the ding list.
+- **Phone:** Give phone Progress the same next fold. Today phone only paints ding, labeled New at level. **Do not steal that heading** for this list.
+- **Class source:** inferred classes in play. Never fall back to Quest Tracker filter. Related leftover (Mobile "New at level" / UnlockClasses as quest picks) is the same class-source bug; do not build a second list. Quest filter stays research.
+- **Grouping:** expanders per class under the next heading, same split rule as Skill-ups. One inferred class = names under the heading, no lone expander. More than one: first inferred class open, the rest collapsed (session-only, not a setting). A spell two classes share sits under both. Widget stays Full. Window and phone get the same groups.
+- **Empty:**
+  - No inferred class: hide the next fold. "Class not known yet" only if we must say it. Never invent Druid.
+  - Class page unreachable: heading names the miss (wrong-article shape). Do not silently pad from spell pages.
+  - Max level: hide the fold. Not an empty "At 60".
+  - Class with nothing at next (Warrior/Monk/Berserker have no spell tables): keep the class row, "nothing new at N". Do not drop the group. Do not invent disciplines.
+- **Out of scope this pass:** ding list stays the session dump. Do not reopen Wealth / Raids glance / Quests General / window Motes. Catalog reconciliation stays Fable V2.
+- **Code claims** (window already has two lists; UnlockClasses is quest picks): place to look, not a fact. Verify on build.
 
 ## Raids import report + pack rare row (Helm-signed 2026-08-23 6am)
 Unreleased 1.99.6. Not a hold. Do not reopen signed Raids/Wealth/Sold+Motes or wrong-article split.
