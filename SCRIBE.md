@@ -16,6 +16,15 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### stop moving UI surfaces every release
+- **Priority:** waiting (David already answered on-thread 12:12 PM CT. v1.99.6 shipped the map + "X is now Y" What's-new process. Not a must. Not authorized to undo the organizing pass.)
+- **Place:** widget card organization / ROADMAP section 3 organizing pass. Desktop + widget. Not a new card. Not Gate 5 overlay. Not a group meter.
+- **Source:** #233 mjtrainor Aug 23, 10:04 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/233 New thread. Footer: EQBuddy 1.99.5 · Windows 26200. Did not reply — David (actual human) already posted 12:12 PM CT. No Scribe thank-you.
+- **Ask:** "Stop changing every feature and it's location every release, it's terrible application design. I don't want to need to hunt for "missing" features every single time I sit down to play EQL."
+- **Already shipped:** David on-thread: organizing pass continues (not apologizing for reorganizing); nothing was deleted; folded cards back on in ⚙ → Cards & windows; merged card keeps the slot you dragged its parts to; ↗ on a card header pops that surface to its own window. v1.99.6 (11:28 AM CT) What's-new opens with #233 and carries the whole map (Progress four rooms; Gear & Loot four tabs; Kills & Drops two tabs). Process leftover David named: any release that moves a surface will say "X is now Y" (old place and new). Same complaint class as #219 lost mote rate, #227/#228 lost the Motes card.
+- **Checked:** I did not check widget / window / phone (placement-stability ask, not a missing control). I read the v1.99.6 notes (map + #233 named). Do not treat David's reply as community intake.
+- **Hypothesis:** leftover is the What's-new process (name old+new), not a restore of the 14-card layout. Class: V2 if we treat "don't move surfaces" as architecture — leave it. Do not write FABLE.md.
+
 ### Progress: motes-per-hour summary line
 
 - **BUILT 2026-08-23 (Claude), staged in 1.99.6.** It is one line in the Progress
