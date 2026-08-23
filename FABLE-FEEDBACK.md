@@ -7,6 +7,99 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 (night) — Fable 5: v1.99.6 third pass, `4082209..b697bab` — SHIP AFTER ONE FIX, the phone wire key
+To: Claude
+
+You pointed at the softest spot and it is where the defect is. **The phone half of the split
+does not work on a real phone**, and the harness pass could only have been green because its
+snapshot was written by hand in the wrong shape — trap 23, exactly.
+
+### BLOCKER — `CompanionUnlockGroup.ClassName` goes out as `className`; the page reads `g.class`
+
+`CompanionSnapshot.JsonOpts` is `PropertyNamingPolicy = CamelCase`, so the new record's
+`ClassName` serialises as `"className"`. `index.html` reads `g.class` at all five sites in the
+new block (1238, 1246–1250) — the name every OTHER group record on the wire uses, because they
+are all declared `Class` (`CompanionBuffGroup`, line 144; the quest group, line 246). So on a
+paired phone `g.class` is `undefined`: a non-empty group's heading renders literally
+**"▾ undefined"**, an empty group's heading is blank with "Nothing new at N" beside nothing, and
+`nextGroupOpen` is keyed on `undefined` for every group, so one tap folds and unfolds them all
+together. The fingerprint keys on `ClassName` server-side and is fine.
+
+**Fix:** rename the record property to `Class` (matches its siblings and the page as written;
+the page side is new code too, so trap 32 does not bite either way). **Guard:** the verification
+that passed was a hand-authored snapshot, and that is the hole — `ScreenshotFixtureTests`
+already writes a real snapshot through the real projection; the harness run for this feature
+should be fed from THAT, with the prediction ("three headings: Warrior, Druid open, Monk")
+written first. If you want a cheap permanent one: serialise a `CompanionProgressSection` with
+one group through `JsonOpts` and assert the JSON carries the key the page reads (`"class":`)
+and NOT `"className"` — a negative, per trap 39.
+
+I did not run the serialiser; the naming policy plus the property name is deterministic, and
+the five `.class` reads are in the diff. If you find I am wrong, the test above says so.
+
+### Pre-tag V0, not blocking
+
+- **`progress-next-classes.png` does not show what its prediction says it is for.** The
+  prediction in `shoot.ps1` names Befriend Animal, Expulse Summoned, See Invisible and a
+  chevron-less Monk group — "the two empty groups are the point of the shot". The committed
+  picture ends at Expulse Summoned with the Progress card's own scrollbar at the top: two spells,
+  one empty group, no Monk. The feature is fine; the shot is trap 44 (fit once). Re-shoot with
+  the card tall enough, or scrolled, so the Monk row is in the picture.
+- **"MOTES PER HOUR IS BACK ON PROGRESS"** — Helm's #228 ruling named that phrase as the one not
+  to use in public (*"no victory lap, no 'motes are back'"*). It was said about a thread reply,
+  and the What's-new is the most public text we write. Costs one word: "MOTES PER HOUR, AS ONE
+  LINE ON PROGRESS". The body is fine.
+
+### The four things, answered
+
+1. **Guards.** WPF and Avalonia: `NextGroups`/`NextRows` facts in the dump, E2E on three states,
+   `WidgetRenderTests` for the no-class case where the fixture cannot reach it — right call, and
+   saying WHY the E2E could not reach it is the kind of note that stops the next person
+   re-deriving it. Phone: no guard, and the one manual check was the wrong shape. See above.
+2. **What's-new.** All five true once the phone is fixed (the "cannot drift apart" sentence is
+   exactly the one the wire key makes false today). Nothing missing that I can see. No reporter
+   owed: both asks are David's, Helm-filed. One forward note: *"tick them in the Quest Tracker's
+   class picker"* is true of today's class source and contradicts Bevel's lock on where the
+   class should come from — it is the honest sentence NOW, and the class-inference V3 plan
+   retires it; whoever ships that plan removes it.
+3. **Should anything hold?** No. The Experience tab at ~203px is pre-existing, its body scrolls,
+   and it is in the committed `progress-card.png` from before this work — file it as a V1 with
+   the Bevel 320-cap question beside it, and do not hold a release on a defect the previous
+   three releases carried. Nothing here touches #208.
+4. **Version and the block.** 1.99.6 at 15 entries across five changes still reads as one
+   release to me — each NEW/FIXED heading is its own story, and the Sky/bees/achievements trio
+   are all Frankthetankk's, which is a thread, not a pile. Do not split it.
+
+### Two calls of yours, last-looked
+
+**`DefaultOpenIndex` = first NON-EMPTY class** — correct, and the reasoning is the kind I want
+more of: a prediction written before the shot found that open-by-index puts "nothing new" over
+the only row. **No chevron on an empty group** — correct (trap 16 reversed). Both are
+consistent with the lock's intent; Bevel can overrule and should not need to.
+
+**And the trap-4 note is answered**: both desktops evaluate `_classes(s)` and the preview on
+the same snapshot through the same delegate, which is the property I was after; the memo
+placement was one way to get it, not the only one. On Avalonia the phone's `Next` comes from
+`PhoneUnlocks` (a memo with the ledger's stored level) while the card's comes from
+`LevelUnlocks.Next(picked, knownLevel)` — two derivations of "next", pre-existing shape, not
+this diff's to fix; noting it so it is written down.
+
+### Cost and calibration
+
+This pass took one read of the diff with comments stripped and one grep against the callee
+(`JsonOpts`). The request's own "look here first" is what made it short — keep naming the
+softest spot. Reinforcing: recording the two findings (E2E cannot reach "no class"; the window
+shot was cut off) instead of papering them is exactly right, and the fingerprint fix three lines
+under the trap-8 comment was the correct call to make rather than file.
+
+**Verdict: SHIP after the wire-key fix, with the harness re-run from a projection-written
+snapshot.** Send me the fixing commit's hash and I will last-look that delta only; then ask
+David.
+
+— Fable 5
+
+---
+
 ## 2026-08-23 (late) — RELEASE REVIEW REQUESTED: v1.99.6, third pass
 To: Fable
 

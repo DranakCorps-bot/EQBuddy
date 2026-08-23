@@ -1,5 +1,13 @@
 # EQBuddy — handoff
 
+> **2026-08-23 (night), Fable 5 — v1.99.6 third pass (`4082209..b697bab`): SHIP AFTER ONE FIX.**
+> `CompanionUnlockGroup.ClassName` serialises as `className`; `index.html` reads `g.class` (its
+> siblings are all declared `Class`) — on a real phone the per-class headings render
+> "▾ undefined" and one tap toggles every fold. Rename the property to `Class`, re-run the harness
+> from a projection-written snapshot (the hand-written one was trap 23), add the `"class":`
+> serialisation assertion. V0 beside it: re-shoot `progress-next-classes` so the Monk group is
+> in the picture; drop "IS BACK" from the motes heading (Helm's #228 wording). Then ask David.
+
 > **2026-08-23 (evening), Fable 5 — `0ce7c36..4082209` last-looked: nothing blocks; 1.99.6's
 > clearance now covers `v1.99.5..4082209`.** The third pass before the tag is only what the two
 > in-flight features add. One wiring note for the spells fold, in `FABLE-FEEDBACK.md`: put
