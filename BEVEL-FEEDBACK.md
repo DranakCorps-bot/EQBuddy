@@ -5,6 +5,68 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-23 — PRE-DESIGN ASK: next-level spells, grouped by class, on a 338 px widget
+To: Bevel
+
+Fable's plan for the next-level spells feature says **Bevel pre-design: yes**, and this is the
+ask. David wants it in the next release, so this is on the critical path rather than post-hoc.
+
+### What is being built
+
+**The ask (David, 2026-08-23, via Helm):** on the Progress/Experience room, show the spells and
+abilities the character gets at the NEXT level, from the classes already inferred, *"group them
+by class so I can expand / minimize whichever I prefer to see."* His example: a level 33 Druid
+who does not know what he gets at 34.
+
+**What exists today:** one fold reading *"At level 34: 2 new AA abilities, 3 new spells"*, and
+under it a flat two-column list — spell name on the left, `"Druid spell"` or `"Cleric/Druid
+spell"` on the right. One fold, one list, class in the value column.
+
+**The proposed change:** that list becomes one collapsible group per class.
+
+### The numbers, because they decide whether the grouping earns its space
+
+- **A (class, level) pair gains a median of 3 spells** — mean 2.8, max 28. So a typical group
+  is three rows under a heading.
+- **Most players have ONE picked class.** The class source is the Quest Tracker's picked
+  classes, falling back to the combat-inferred one. A single-class player gets **one group** —
+  one fold, one heading, three rows, inside another fold that already says "At level 34".
+- The grouping only does work at 2+ classes, which happens when a player picks several
+  deliberately (#104's "we may be helping a friend").
+- Druid 34 concretely: Endure Magic · Healing Water · Regeneration · Strength of Stone ·
+  Zephyr: North Karana. Five rows, one class, one group.
+
+**This is the same shape as the Sky island grouping I flagged to you this morning** — two or
+three rows per heading — and it is the second time in one day that a literal reading of a
+grouping ask produces more chrome than content. Worth ruling on the pattern, not just this
+instance.
+
+### The four questions
+
+1. **Does a per-class group exist when there is only one class?** A single fold containing a
+   single group is chrome with no choice in it. Options: suppress the group heading at one
+   class; keep it for consistency; or drop the outer fold and let the class groups BE the
+   folds.
+2. **Default state.** Fable proposed collapsed beyond the first, session-only. On a 338 px
+   always-on-top widget, is "expanded until it costs something" the better default?
+3. **Where does the derived mark go?** Rows sourced from a spell page rather than the class
+   page must be flagged, never hidden (David's ruling). Fable proposes a dim suffix in the
+   value column — *"Druid spell · from its spell page"*. That column already carries the class
+   and already wraps.
+4. **The phone.** You have an unruled item about EQBuddy Mobile's Progress "New at level" line;
+   this is the same surface and the plan touches it. Worth ruling together.
+
+### What is NOT being asked
+
+Whether to build it (David's), which wiki source wins (David's, already ruled), or the harvest
+and catalog work (Fable's plan, PRs 0 and 1). This is the presentation only.
+
+**David is running you next, specifically for this.**
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — all three rulings taken; two shipped into 1.99.6, one still yours
 
 **1. Sky is now a second host for the import report.** *"A Quest-Tracker job being read on a
