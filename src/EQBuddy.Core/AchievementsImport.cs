@@ -59,6 +59,48 @@ public static class AchievementsImport
     /// earned, so its Obtain flags prove nothing; those rewards are SKIPPED and
     /// reported, never imported. Incomplete unlocks stay fully trustworthy — their
     /// per-criterion flags are individually tracked by the game.</summary>
+    /// <summary>
+    /// Every class the dump says this character HOLDS — primary first, then the rest in
+    /// dump order.
+    ///
+    /// **The game's own statement about what the character is**, which is better evidence
+    /// than any log heuristic and has been sitting in this file unused for two releases:
+    /// <see cref="SkyRewards"/> has read these same rows since #101, purely to refuse
+    /// importing rewards for a granted primary. Reading them for what they plainly SAY is
+    /// the point of <see cref="CharacterClasses"/>.
+    ///
+    /// A complete "Class Unlock - X" is the character holding X **however they got it** —
+    /// quested, confirmed as primary, or token-bought. That is deliberately wider than
+    /// <see cref="SkyRewards"/>'s guard, and the difference matters: an auto-granted unlock
+    /// means "do not tick their Sky rewards" and still means "they ARE a Bard". #193
+    /// (wizen) is the worked example — token-unlocked Bard, no Sky rewards earned, and a
+    /// Bard all the same.
+    ///
+    /// Incomplete unlocks are excluded: the dump tracks those per criterion and an
+    /// unfinished unlock is a class the character is working towards, not one they have.
+    /// </summary>
+    public static List<string> UnlockedClasses(IEnumerable<AchievementEntry> achievements)
+    {
+        var primary = new List<string>();
+        var rest = new List<string>();
+        foreach (var a in achievements)
+        {
+            if (!a.Complete) continue;
+            var dash = a.Name.LastIndexOf(" - ", StringComparison.Ordinal);
+            if (dash < 0 || !a.Name.Contains("Class Unlock", StringComparison.OrdinalIgnoreCase))
+                continue;
+            var className = a.Name[(dash + 3)..].Trim();
+            if (className.Length == 0) continue;
+            var into = a.Name.Contains("Primary Class Unlock", StringComparison.OrdinalIgnoreCase)
+                ? primary : rest;
+            if (!into.Contains(className, StringComparer.OrdinalIgnoreCase))
+                into.Add(className);
+        }
+        // Primary first: it is the class the character was created as, and the surface
+        // that shows ONE class should show that one.
+        return [.. primary, .. rest.Where(c => !primary.Contains(c, StringComparer.OrdinalIgnoreCase))];
+    }
+
     public static (List<SkyRewardMatch> Matches, List<string> Unmatched, List<string> AutoGranted)
         SkyRewards(IEnumerable<AchievementEntry> achievements, IReadOnlyList<SkyQuestChecklistItem> checklist)
     {

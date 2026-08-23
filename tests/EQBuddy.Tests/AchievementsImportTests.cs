@@ -82,6 +82,7 @@ public class AchievementsImportTests
         var (matches, _, autoGranted) =
             AchievementsImport.SkyRewards(AchievementsImport.Parse(lines), checklist);
 
+
         Assert.DoesNotContain(matches, m => m.Reward == "Girdle of Faith");
         Assert.Contains(autoGranted, g => g.Contains("Girdle of Faith"));
         Assert.Contains(matches, m => m is { ClassName: "Bard", Reward: "Amulet of the Fae" });
@@ -141,6 +142,18 @@ public class AchievementsImportTests
 
         var (matches, _, autoGranted) =
             AchievementsImport.SkyRewards(AchievementsImport.Parse(lines), checklist);
+
+        // THE SAME DUMP names which classes wizen HOLDS, and that is a wider question
+        // than which rewards may be imported — deliberately so. Druid was confirmed as
+        // primary and Bard was token-bought: neither EARNED its Sky rewards, and he is
+        // both all the same. Berserker is incomplete, so it is a class he is working
+        // towards rather than one he has.
+        //
+        // These rows have been in this file since #101 and were read only to REFUSE
+        // things. Reading them for what they plainly say is what lets the app know a
+        // character is more than one class without being told (`CharacterClasses`).
+        Assert.Equal(["Druid", "Bard"],
+            AchievementsImport.UnlockedClasses(AchievementsImport.Parse(lines)));
 
         // Nothing from either granted class is imported…
         Assert.DoesNotContain(matches, m => m.ClassName is "Druid" or "Bard");

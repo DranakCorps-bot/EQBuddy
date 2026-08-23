@@ -166,6 +166,11 @@ internal sealed class QuestChecklistView
         try
         {
             var achievements = AchievementsImport.Parse(System.IO.File.ReadLines(dlg.FileName));
+            // The game's own class list, recorded here as well as on the automatic path
+            // — a fact that only one of two import routes captures is a fact that half
+            // the players never get (trap 20's shape, and #204/#210/#212's cause).
+            _w.QuestLedger?.SetUnlockedClasses(_w.QuestCharacterKey,
+                AchievementsImport.UnlockedClasses(achievements));
             var (matches, unmatched, autoGranted) =
                 AchievementsImport.SkyRewards(achievements, _settings.SkyQuestChecklist);
             // The same dump carries the Conqueror sections — the Raids card's memory

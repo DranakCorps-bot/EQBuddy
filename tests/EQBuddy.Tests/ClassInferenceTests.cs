@@ -100,10 +100,23 @@ public class ClassInferenceTests
         Assert.Equal("Shadow Knight", inf.Current());
     }
 
-    /// <summary>Two classes with comparable recent evidence is an ambiguous log. The
-    /// reading drives the quest lens, so "don't know" beats a coin toss.</summary>
+    /// <summary>
+    /// Two classes with comparable recent evidence is a **two-class character**, and both
+    /// are named.
+    ///
+    /// **This test asserted the opposite until 2026-08-23**, and it was the bug rather
+    /// than the guard: it expected `""`, documented as *"the reading drives the quest lens,
+    /// so 'don't know' beats a coin toss"*. That is right for a game where you have one
+    /// class. EverQuest Legends gives you up to three (David: *"you seem to think EQ
+    /// Legends just lets you have 1 class when in fact you can be 3 at a time"*), so a
+    /// player backstabbing and laying on hands is not an ambiguous log — he is a
+    /// Rogue/Paladin, and the honest answer is to say so.
+    ///
+    /// What "don't know" still means is <see cref="OneSightingNeverNamesAClassAndThreeDo"/>'s
+    /// case: not enough evidence, rather than too much.
+    /// </summary>
     [Fact]
-    public void AnAmbiguousLogNamesNoClassAtAll()
+    public void TwoClassesPlayedTogetherAreBothNamed()
     {
         var inf = new ClassInference();
         for (var i = 0; i < 4; i++)
@@ -111,7 +124,12 @@ public class ClassInferenceTests
             inf.RecordAbilityUse("Backstab", At(i));
             inf.RecordAbilityUse("Lay on Hands", At(i + 0.5));
         }
-        Assert.Equal("", inf.Current());
+
+        Assert.Equal(["Paladin", "Rogue"], inf.CurrentClasses().OrderBy(c => c));
+        // Current() still answers, and now means "the one you are playing MOST" rather
+        // than "the one I am sure enough to name" — Lay on Hands is the later of the two
+        // each round, so Paladin carries marginally less decay.
+        Assert.Equal("Paladin", inf.Current());
     }
 
     /// <summary>Recency, the second half of the #120 fix. A rogue plays for half an hour,
@@ -132,33 +150,47 @@ public class ClassInferenceTests
         }
 
         for (var i = 0; i < 30; i++) Cast(i / 6.0);            // 5 min in
-        Assert.Equal("", inf.Current());                       // no longer Rogue, not yet Wizard
+        // Mid-handover BOTH are named — half an hour of rogue does not stop being true
+        // because a wizard sat down five minutes ago, and on a real character it might
+        // never have been someone else. What used to happen here was `""`: the app
+        // withdrew the reading entirely, which is the behaviour that left a genuine
+        // multi-class player with no classes at all.
+        Assert.Contains("Rogue", inf.CurrentClasses());
+        Assert.Contains("Wizard", inf.CurrentClasses());
 
         for (var i = 30; i < 120; i++) Cast(i / 6.0);          // 20 min in
+        // Recency still decides the ORDER, which is the half of #120 that mattered: what
+        // you are playing now leads.
         Assert.Equal("Wizard", inf.Current());
+        // And the stale class eventually falls under MemberFraction and drops out — two
+        // more half-lives of silence.
+        for (var i = 120; i < 240; i++) Cast(i / 6.0);         // 40 min in
+        Assert.Equal(["Wizard"], inf.CurrentClasses());
     }
 
-    /// <summary>#120 (Frankthetankk, 2026-08-21): the ALT-SWAP case — *"someone plays two
-    /// classes roughly equally rather than a one-time dabble… does the half-life decay
-    /// handle that gracefully, or is there a real risk of visible flip-flopping session to
-    /// session?"* He asked whether the lead margin already covers it or it needs testing
-    /// separately. It needed testing separately; this is it.
+    /// <summary>
+    /// #120 (Frankthetankk, 2026-08-21): the ALT-SWAP case — *"someone plays two classes
+    /// roughly equally rather than a one-time dabble… does the half-life decay handle that
+    /// gracefully, or is there a real risk of visible flip-flopping session to session?"*
     ///
-    /// The answer is that there is no flip-flop, because there are only two outcomes and
-    /// neither one flickers: while you are actually playing a class, recency carries it
-    /// past the 2× lead margin and it is named; in the handover between them the margin is
-    /// not met and the honest "" comes back. A player who splits evenly does not see the
-    /// label alternate under him — he sees it go quiet and then name whatever he is
-    /// actually casting. That is the designed behaviour and it is the right one, but it
-    /// was a reading of the constant until this test drove the sequence.</summary>
+    /// **Re-expressed 2026-08-23, and the honest reading is that his question had a false
+    /// premise we supplied.** The old answer was "there is no flip-flop because there are
+    /// only two outcomes: the class in hand, or the honest `""` during a handover" — the
+    /// reading went QUIET between stretches. That is defensible for two alts sharing a log
+    /// and wrong for the case it cannot tell apart: one character who is both classes.
+    /// Legends allows three at once, so going quiet is not caution, it is losing the
+    /// answer.
+    ///
+    /// What replaces it: **both are named while both are recent, and the one being played
+    /// leads.** The flicker he was actually worried about — the LEAD swapping back and
+    /// forth mid-stretch — is still asserted, and is still absent.
+    /// </summary>
     [Fact]
-    public void AlternatingTwoClassesNamesTheOneBeingPlayedAndNeverFlickers()
+    public void AlternatingTwoClassesNamesBothAndLeadsWithTheOneInHand()
     {
         var inf = new ClassInference();
-        var answers = new List<string>();
+        var leads = new List<string>();
 
-        // Four stretches, alternating. Twenty minutes each — two half-lives, which is what
-        // an alt-swapper actually does in a night, not a one-line dabble.
         for (var stretch = 0; stretch < 4; stretch++)
         {
             var rogue = stretch % 2 == 0;
@@ -172,23 +204,40 @@ public class ClassInferenceTests
                     inf.RecordCast("Ice Comet", At(at));
                     inf.RecordCast("Draught of Fire", At(at + 0.08));
                 }
-                answers.Add(inf.Current());
+                leads.Add(inf.Current());
             }
-            // By the end of each stretch the class being PLAYED is the one named.
+            // The class being PLAYED leads at the end of its stretch...
             Assert.Equal(rogue ? "Rogue" : "Wizard", inf.Current());
+            // ...and the class NOT being played never leads, whether or not it is still
+            // named. Both outcomes are legitimate and which one you get depends on signal
+            // DENSITY rather than on elapsed time — a fact worth stating because it looks
+            // like an inconsistency until you see why:
+            //
+            //   after a Rogue stretch  -> ["Rogue", "Wizard"]   Wizard is still named
+            //   after a Wizard stretch -> ["Wizard"]            Rogue has dropped
+            //
+            // The wizard casts TWO class-unique spells per tick and the rogue backstabs
+            // once, so wizard weight accrues twice as fast and survives two half-lives of
+            // silence where rogue weight does not. Weight measures how loudly a class
+            // announces itself, not how long it was played. For an ALT SWAP either answer
+            // is fine — the lead is right in both. For a real MULTI-CLASS character the
+            // question never arises: a Warrior/Druid/Monk rotates inside a single fight,
+            // so all three stay recent (see PlayNowOutweighsPlayAnHourAgo's handover).
+            Assert.Equal(rogue ? "Rogue" : "Wizard", inf.CurrentClasses()[0]);
+            Assert.InRange(inf.CurrentClasses().Count, 1, 2);
         }
 
-        // The only two things it ever says are the class in hand and "don't know" — it
-        // never names the class you are NOT playing, which is what flip-flopping would be.
-        Assert.All(answers, a => Assert.Contains(a, new[] { "", "Rogue", "Wizard" }));
+        // It only ever leads with a class it has evidence for — never a third one, and
+        // never nothing once the first stretch has earned an answer.
+        Assert.All(leads, a => Assert.Contains(a, new[] { "", "Rogue", "Wizard" }));
 
-        // And every change of mind passes through "" rather than swapping directly: a
-        // direct Rogue→Wizard flip would be the visible flicker he was worried about.
-        var changes = answers.Where((a, i) => i == 0 || a != answers[i - 1]).ToList();
-        for (var i = 1; i < changes.Count; i++)
-            Assert.True(changes[i - 1] == "" || changes[i] == "",
-                $"the reading went straight from '{changes[i - 1]}' to '{changes[i]}' without "
-                + "passing through \"don't know\" — that is the flip-flop #120 asked about");
+        // The flicker #120 asked about: the lead changing hands more than once per
+        // stretch. Four stretches means at most four handovers, and anything more is the
+        // reading oscillating under a player who is doing one thing.
+        var changes = leads.Where((a, i) => i > 0 && a != leads[i - 1]).Count();
+        Assert.True(changes <= 4,
+            $"the leading class changed {changes} times across four stretches — that is the "
+            + "flip-flop #120 asked about");
     }
 
     /// <summary>Decay is uniform, so it can never flip a reading on its own. A player who
@@ -215,7 +264,17 @@ public class ClassInferenceTests
         inf.RecordAbilityUse("Lay on Hands", At(0));
         inf.RecordAbilityUse("Lay on Hands", At(0));
         inf.RecordAbilityUse("Lay on Hands", At(0));
-        Assert.Equal("", inf.Current());   // three each, same instant: ambiguous, not Paladin
+        // Three each, and neither is INFLATED — which is the property under test. Replaying
+        // the older Paladin lines cannot decay the banked Rogue weight (the clock never runs
+        // backwards), so the two sit at exactly equal weight and both are named.
+        //
+        // The tie then breaks on the class NAME, not on dictionary order: that is the half
+        // of the old assertion worth keeping. It used to expect `""` under the "two close
+        // classes name nobody" rule, with the comment that "whichever way the dictionary
+        // happened to enumerate must not decide what the quest tracker filters by" — still
+        // true, and now guaranteed by an explicit ThenBy rather than by refusing to answer.
+        Assert.Equal(["Paladin", "Rogue"], inf.CurrentClasses());
+        Assert.Equal("Paladin", inf.Current());
     }
 
     [Fact]

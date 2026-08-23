@@ -464,3 +464,39 @@ one genuinely does. Each line below is a decision I made instead of a question I
   writes the reply.
 - **`status.ps1` will keep flagging #233 as awaiting a reply, and that is correct.** Written into
   the handoff so a later session does not read the flag as an unfinished job and post over him.
+
+## 2026-08-23 (afternoon) — the three queued items
+
+- **Progress-window clipping: measured, then FILED rather than fixed.** `AllowResize` releases
+  the height on `ContentRendered`, which for a replay-filled body is a frame with nothing in it
+  — proven by running the same shot with the pin skipped (203px → 389px), with
+  `progress-wealth` as the control at 741px. The FIX is not a V1 call: `AllowResize` wants
+  "size to content" and "let the user drag the edge", WPF will not do both, and resolving it
+  decides chrome for four windows. Four candidate fixes are in the stub with the cost of each.
+  David asked for all three items; this is the one I did not finish, and it is deliberate.
+- **PR 1's real number is -98 rows, not -498.** The plan predicted removing ~500; it assumed
+  every class page carries every level and PR 0 found none do (all stop at 50 against a cap of
+  60). So 362 rows return as DERIVED. Worth logging because the plan's headline number is the
+  one a reviewer would check against.
+- **`era` is parsed but NOT shipped.** Fixing PR 0's row regex made it come through cleanly —
+  and it is "Classic" on all 1,504 rows. One value discriminates nothing, and a harvest field
+  no surface reads is trap 43's mirror.
+- **`PageTitle` deferred with a reason, not forgotten.** The plan lists it; links work without
+  it because the wiki resolves redirects itself, so it buys nothing until something needs the
+  served title.
+- **The spell hover is ONE LINE because of a rule I nearly tripped over.** Both widgets switch
+  a tooltip to monospace when it contains a newline — right for the stat blocks that rule
+  exists for, wrong for wiki prose, and invisible to every test and screenshot.
+- **1.99.7 exists because 1.99.6 had already shipped.** The first draft of these notes went
+  into 1.99.6's block, which would have claimed things the released build does not have.
+- **#120's four tests were re-expressed, not relaxed.** They asserted `""` for two comparable
+  classes and documented it as a virtue. The protection that actually mattered (a one-off line
+  never names a class) lives in the FLOORS and is untouched; what was deleted is a margin that
+  could not tell a three-class character from an ambiguous log.
+- **`MemberFraction` stays at 0.25 even though it drops a class after two idle half-lives.**
+  That is what separates an alt-swap (blocks) from a multi-class character (rotation inside a
+  fight), and the dump — which outranks inference — is the answer for anyone it gets wrong.
+- **`ClassSourceWritersTests` joins the settings.json collection despite writing nothing.** It
+  names `OutputfileAutoImport.cs` as a path string and the flake guard reads that as a call.
+  Serialising four file reads is cheaper than teaching that guard to tell a path from a call,
+  and a guard with a convenience exception carved into it stops being a guard.

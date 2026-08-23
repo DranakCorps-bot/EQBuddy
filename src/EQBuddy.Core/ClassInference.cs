@@ -148,10 +148,37 @@ public sealed class ClassInference
     /// in his first two casts.</summary>
     public const int DistinctSpellFloor = 2;
 
-    /// <summary>How far the leader must be ahead of the runner-up to be named. Two
-    /// qualifying classes at comparable weight is a genuinely ambiguous log, and the
-    /// honest answer there is no answer.</summary>
-    public const double LeadMargin = 2.0;
+    /// <summary>
+    /// How much of the leader's weight a class needs to stay in the list — not to BEAT
+    /// it. A class earns its place against the floors above; this only drops a class the
+    /// log has stopped playing.
+    ///
+    /// **It replaces a winner-takes-all margin that was wrong about the game.** Until
+    /// 2026-08-23 this was <c>LeadMargin = 2.0</c>: the leader had to be twice the
+    /// runner-up or the answer was <c>""</c>, documented as *"two qualifying classes at
+    /// comparable weight is a genuinely ambiguous log, and the honest answer there is no
+    /// answer."* In EverQuest Legends that is not ambiguity — **a character is up to three
+    /// classes at once** (David, 2026-08-23: *"you seem to think EQ Legends just lets you
+    /// have 1 class when in fact you can be 3 at a time"*), so a correctly-played
+    /// Warrior/Druid/Monk produced strong evidence for three classes, none cleared the
+    /// margin, and the app concluded it did not know. The one case the rule protected
+    /// against (#120: a caster wearing a melee class after one melee-ish line) and the
+    /// ordinary case of a three-class character were indistinguishable to it.
+    ///
+    /// **#120's protection does not depend on this and never did** — a single melee-ish
+    /// line is ONE sighting against <see cref="EvidenceFloor"/> of three. What the margin
+    /// actually guarded was the alt-swap (two characters in one log), and decay already
+    /// handles that: an old class's weight halves every ten minutes and falls under this
+    /// fraction within the hour.
+    /// </summary>
+    public const double MemberFraction = 0.25;
+
+    /// <summary>The most classes a character can hold. **The wiki's number, not ours** —
+    /// eqlwiki's `Character Classes`: *"EverQuest Legends also allows players to mix
+    /// classes, creating custom class combinations and trio builds."* Departing from the
+    /// wiki on game truth needs decisive evidence (CLAUDE.md), and inventing a cap would
+    /// be exactly that departure.</summary>
+    public const int MaxClasses = 3;
 
     private sealed class Tally
     {
@@ -219,26 +246,44 @@ public sealed class ClassInference
         _asOf = at;
     }
 
-    /// <summary>The class the log currently looks like, or "" for "don't know" — which
-    /// is a real answer here, not a failure.</summary>
-    public string Current()
+    /// <summary>
+    /// Every class the log currently looks like, heaviest first, at most
+    /// <see cref="MaxClasses"/> — empty for "don't know", which is a real answer here
+    /// rather than a failure.
+    ///
+    /// **A LIST, because a Legends character is one** (David, 2026-08-23). Each class
+    /// argues for itself against <see cref="EvidenceFloor"/> and
+    /// <see cref="DistinctSpellFloor"/>; <see cref="MemberFraction"/> then removes only
+    /// what the log has stopped playing. That is the trap-11 rule kept intact for a list:
+    /// every outcome this can name still has a way to be named — the catalog derives
+    /// signals for all sixteen classes — and a way to STOP being named, which is decay
+    /// plus the fraction rather than a rival's success.
+    ///
+    /// Ordered by decayed weight so the first entry is what you are playing most right
+    /// now, which is what a surface showing one class should show. Ties break on the class
+    /// NAME rather than on dictionary order: two classes at identical weight is common on
+    /// a fresh log, and which one a quest filter picks must not depend on insertion order.
+    /// </summary>
+    public IReadOnlyList<string> CurrentClasses()
     {
-        string? best = null;
-        double bestWeight = 0, runnerUp = 0;
-        foreach (var (cls, tally) in _tallies)
-        {
-            if (!tally.Qualifies) continue;
-            if (tally.Weight > bestWeight)
-            {
-                runnerUp = bestWeight;
-                bestWeight = tally.Weight;
-                best = cls;
-            }
-            else if (tally.Weight > runnerUp) runnerUp = tally.Weight;
-        }
-        if (best is null) return "";
-        // A tie fails this too, and deliberately: whichever way the dictionary happened
-        // to enumerate must not decide what the quest tracker filters by.
-        return bestWeight >= runnerUp * LeadMargin ? best : "";
+        var qualifying = _tallies
+            .Where(kv => kv.Value.Qualifies)
+            .OrderByDescending(kv => kv.Value.Weight)
+            .ThenBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (qualifying.Count == 0) return [];
+
+        var leader = qualifying[0].Value.Weight;
+        return [.. qualifying
+            .Where(kv => kv.Value.Weight >= leader * MemberFraction)
+            .Take(MaxClasses)
+            .Select(kv => kv.Key)];
     }
+
+    /// <summary>The heaviest class the log looks like, or "". Kept for the surfaces that
+    /// genuinely want ONE class — and note it no longer means the same thing: it is now
+    /// "the class you are playing most", where it used to be "the class I am confident
+    /// enough about to name at all". Anything asking "what is this character" wants
+    /// <see cref="CurrentClasses"/>.</summary>
+    public string Current() => CurrentClasses().FirstOrDefault() ?? "";
 }

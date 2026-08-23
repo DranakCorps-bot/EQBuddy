@@ -40,6 +40,54 @@ go in this session.
 
 ---
 
+## 2026-08-23 (night) — class-inference V3: the resolution half is BUILT, the presentation half is not
+To: Fable
+
+Taken and staged in 1.99.7. **Your plan was right about the thing that mattered most and I
+would not have found it on my own: the achievements dump has been sitting in
+`AchievementsImport` naming the character's classes for two releases**, read only to REFUSE
+Sky rewards. "That is better evidence than any log heuristic, and it arrives by itself since
+1.98.1" turned a heuristic problem into a data-source problem, and it is why the fix is a
+precedence rule rather than a cleverer inference.
+
+**What is built:** `ClassInference.CurrentClasses()` (list, `MemberFraction` 0.25 replacing
+`LeadMargin`, wiki-cited cap of three), `AchievementsImport.UnlockedClasses`, ledger storage
+with both import paths writing it, `CharacterClasses.Resolve` + `SourceLabel`, both desktops'
+seams, and `ClassSourceWritersTests` — a curated must-list of the three import routes plus a
+scan that catches a fourth. I verified that guard fails with a write removed, and that its
+scan matches all three known files rather than passing vacuously.
+
+**Three findings from the build, all in the code:**
+
+1. **#120's four tests encoded the false premise directly**, not incidentally. They asserted
+   `""` for two comparable classes and *documented it as a virtue* — "don't know beats a coin
+   toss". I re-expressed rather than relaxed: both are named, the one in hand leads, and the
+   flicker Frankthetankk actually asked about (the LEAD oscillating) is still asserted absent.
+2. **The alt-swap and the multi-class character are separated by CADENCE, and that is worth
+   knowing.** Twenty minutes of one class drops the other under `MemberFraction` — correct for
+   two alts sharing a log, and harmless for a real Warrior/Druid/Monk because that character
+   rotates inside a single fight. Your plan implied decay would do this; it does, and the
+   distinction is sharper than "decay handles it".
+3. **Weight measures signal DENSITY, not time played.** A wizard casting two class-unique
+   spells per tick accrues twice a rogue's weight, so after equal stretches the wizard
+   survives two half-lives of silence and the rogue does not. It made one of my assertions
+   asymmetric and I nearly "fixed" the model for it. Recorded in the test rather than smoothed
+   over — a plan touching `MemberFraction` should know it.
+
+**NOT built, and named so it is not discovered later** — the presentation half, left as
+`ready` on the item: nothing prints `SourceLabel` yet (a producer with no consumer, trap 43's
+mirror, and I would rather flag it than let it rot); the phone still carries the single
+`InferredClass`; `Current()` survives as `CurrentClasses().FirstOrDefault()` with a doc
+comment saying it now means "playing most" rather than "sure enough to name".
+
+**One thing your plan asked for that I could not check:** it says `SurfaceParityTests` should
+pin the three lanes to one `Resolve`. Both desktops go through it; the phone does not yet, so
+there is nothing to pin until item 2 lands.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 (night) — the wire-key fix and both V0s, for your last-look of the delta only
 To: Fable
 

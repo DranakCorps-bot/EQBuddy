@@ -1,4 +1,4 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>
 /// Thread-safe aggregator for one play session. A "play session" is a contiguous
@@ -1943,6 +1943,7 @@ public sealed partial class SessionStats
                     .Select(kv => (kv.Key, kv.Value.Casts, kv.Value.Resists, kv.Value.Blocked))
                     .OrderByDescending(x => x.Resists + x.Blocked).ToList(),
                 InferredClass = _classInference.Current(),
+                InferredClasses = _classInference.CurrentClasses(),
                 CurrentStance = _currentStance ?? "",
                 Stances = _stanceAgg
                     .Select(kv => new StanceInfo(kv.Key, kv.Value.Seconds, kv.Value.Damage,
@@ -2181,7 +2182,16 @@ public sealed class StatsSnapshot
     public List<(string Spell, int Casts, int Resists, int Blocked)> SpellResists { get; init; } = [];
     /// <summary>Most-evidenced class from class-unique signals — "" until enough
     /// sightings. ALWAYS present as "(inferred)": players swap classes.</summary>
+    /// <summary>The heaviest class the log looks like, or "". **Kept, and it no longer
+    /// means what it did**: it used to be "the class I am confident enough to name at
+    /// all", refusing to answer when two were close; it is now simply the first of
+    /// <see cref="InferredClasses"/>. Anything asking what the CHARACTER is wants the
+    /// list — a Legends character is up to three classes at once.</summary>
     public string InferredClass { get; init; } = "";
+
+    /// <summary>Every class the log qualifies, heaviest first, at most three
+    /// (<see cref="ClassInference.CurrentClasses"/>). Empty for "don't know".</summary>
+    public IReadOnlyList<string> InferredClasses { get; init; } = [];
 
     /// <summary>Format copper as "3p 2g 4s 7c".</summary>
     public static string FormatCoin(long copper)

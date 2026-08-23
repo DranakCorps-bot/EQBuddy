@@ -3921,6 +3921,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         try
         {
             var achievements = AchievementsImport.Parse(File.ReadLines(path));
+            // The game's own class list, recorded here as well as on the automatic path
+            // — a fact that only one of two import routes captures is a fact that half
+            // the players never get (trap 20's shape).
+            QuestLedger?.SetUnlockedClasses(QuestCharacterKey,
+                AchievementsImport.UnlockedClasses(achievements));
             var (matches, unmatched, autoGranted) =
                 AchievementsImport.SkyRewards(achievements, _settings.SkyQuestChecklist);
             // The same dump carries the Conqueror sections — the Raids card's memory
@@ -4147,13 +4152,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// falling back to the combat-inferred class — the Gear Locker rule (#104), which
     /// this UI already applies when it opens the Locker. (WPF routes the same source
     /// through BuffSetClassSource; that helper arrives with buff sets.)</summary>
-    private IReadOnlyList<string> UnlockClasses(StatsSnapshot s)
-    {
-        var picked = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [];
-        if (picked.Count == 0 && s.InferredClass is { Length: > 0 } inferred)
-            return [inferred];
-        return picked;
-    }
+    private IReadOnlyList<string> UnlockClasses(StatsSnapshot s) => ClassSourceFor(s).Classes;
+
+    /// <summary>The character's classes and where they came from — the WPF twin's
+    /// `ClassSourceFor`, through the same `CharacterClasses.Resolve`, so the two lanes and
+    /// the phone cannot answer differently (#210's rule applied to a decision rather than
+    /// to a list of rows).</summary>
+    internal (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) =>
+        CharacterClasses.Resolve(
+            QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
+            s.InferredClasses,
+            QuestLedger?.ClassesFor(QuestCharacterKey));
 
     private void UpdateGearChecklist(StatsSnapshot s)
     {
@@ -4293,7 +4302,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             else
             {
                 LastAchievementsImport =
-                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger);
+                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger,
+                        QuestLedger, QuestCharacterKey);
                 _settings.Save();
             }
         }

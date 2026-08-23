@@ -1,4 +1,4 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>Which dump the game just announced. Decided from the FILENAME the log prints,
 /// because that is the only thing the announcement gives us.</summary>
@@ -73,10 +73,22 @@ public static class OutputfileAutoImport
     /// the manual path and is what makes doing it unprompted safe (David chose "read and
     /// apply, say what it did" on 2026-08-20). The undo is offered anyway, because a
     /// change the player did not watch happen has to be reversible to be honest.</summary>
+    /// <param name="ledger">Where the dump's class list is recorded, with
+    /// <paramref name="characterKey"/>. Optional only so a test can call this without a
+    /// store — every SHIPPING caller passes one, and `ClassSourceWritersTests` names them,
+    /// because "the data survived the move and the write path did not" is the sentence
+    /// behind #204, #210 and #212.</param>
     public static AutoImportOutcome ImportAchievements(
-        string path, AppSettings settings, RaidKillLedger? raids)
+        string path, AppSettings settings, RaidKillLedger? raids,
+        QuestLedgerStore? ledger = null, string characterKey = "")
     {
         var entries = AchievementsImport.Parse(File.ReadLines(path));
+        // The game's own statement about which classes this character holds. Recorded
+        // before anything else, because it is the one thing here that cannot be wrong:
+        // every other outcome below is a MATCH against our checklists, and this is a
+        // read of what the dump plainly says.
+        if (ledger is not null && characterKey.Length > 0)
+            ledger.SetUnlockedClasses(characterKey, AchievementsImport.UnlockedClasses(entries));
         // The other two lists are NOT spare. The manual import shows both in its preview,
         // and an unprompted import that drops them is the same dump telling the player
         // less than the menu would have — so they are counted onto the outcome and the

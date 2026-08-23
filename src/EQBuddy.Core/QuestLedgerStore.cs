@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace EQBuddy.Core;
 
@@ -48,6 +48,15 @@ public sealed class QuestLedgerStore
         /// three active classes (David, 2026-08-07), and a character's classes don't
         /// change per session, so the selection belongs to the character.</summary>
         public List<string> Classes { get; set; } = [];
+
+        /// <summary>Classes the character's achievements dump says they HOLD — the game's
+        /// own statement, as opposed to <see cref="Classes"/>, which is the player's
+        /// filter. Written by both import paths (the ⚙ menu's Import achievements and the
+        /// automatic one that fires when the game announces a dump); read through
+        /// <see cref="CharacterClasses.Resolve"/>. Two writers named on purpose — trap 20
+        /// is what happens when a setting has readers and no writer, and #204/#210/#212
+        /// were all one import path being missed.</summary>
+        public List<string> UnlockedClasses { get; set; } = [];
         /// <summary>Last level the log announced ("Welcome to level N!"), 0 = never
         /// seen. The log states the number only at the ding itself, so the level-unlock
         /// preview needs this to survive restarts (and log truncation).</summary>
@@ -118,7 +127,8 @@ public sealed class QuestLedgerStore
                 if (stored.Count > 0
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
-                                              && c.Classes.Count == 0 && c.Level == 0))
+                                              && c.Classes.Count == 0 && c.Level == 0
+                                              && c.UnlockedClasses.Count == 0))
                 {
                     try
                     {
@@ -145,6 +155,7 @@ public sealed class QuestLedgerStore
                         Hidden = kv.Value.Hidden,
                         Completed = new Dictionary<string, int>(kv.Value.Completed, StringComparer.OrdinalIgnoreCase),
                         Classes = kv.Value.Classes,
+                        UnlockedClasses = kv.Value.UnlockedClasses,
                         Level = kv.Value.Level,
                     }),
                 StringComparer.OrdinalIgnoreCase);
@@ -313,6 +324,29 @@ public sealed class QuestLedgerStore
     {
         lock (_lock)
             return _byCharacter.TryGetValue(characterKey, out var c) ? [.. c.Classes] : [];
+    }
+
+    /// <summary>What the achievements dump said this character holds (copy).</summary>
+    public List<string> UnlockedClassesFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c) ? [.. c.UnlockedClasses] : [];
+    }
+
+    /// <summary>Record the dump's class list. Empty is IGNORED rather than stored: a dump
+    /// that parsed badly, or one taken before any unlock completed, must not erase a list
+    /// the game gave us earlier — the same reasoning that keeps manual counts and picks
+    /// surviving a counting-rules reset.</summary>
+    public void SetUnlockedClasses(string characterKey, IEnumerable<string> classes)
+    {
+        if (characterKey.Length == 0) return;
+        var list = classes.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        if (list.Count == 0) return;
+        lock (_lock)
+        {
+            CharacterFor(characterKey).UnlockedClasses = list;
+            Save();
+        }
     }
 
     public void SetClasses(string characterKey, IEnumerable<string> classes)

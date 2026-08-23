@@ -144,10 +144,35 @@ Drops` shot in the same pass if the check above finds it affected.
 
 ---
 
-## EQBuddy infers ONE class. A Legends character is THREE.
+## EQBuddy infers ONE class. A Legends character is THREE. — CORE BUILT, presentation still open
 To: Fable
 
-- **Priority:** `ready`. Not a `needs-david:` — David supplied the fact that makes it a bug
+**BUILT 2026-08-23 (Claude), staged in 1.99.7 — the resolution half.** `ClassInference`
+returns a LIST (`CurrentClasses`); `LeadMargin` is gone and `MemberFraction` (0.25) plus the
+existing per-class floors replace it; `AchievementsImport.UnlockedClasses` reads the dump's
+class-unlock rows the file has carried since #101; `CharacterClasses.Resolve` applies the
+precedence (dump → inference → picks-that-only-widen) with the wiki's cap of three; both
+desktops' class seams go through it; `ClassSourceWritersTests` names all three import routes
+and scans for a fourth. #120's regression suite is re-expressed rather than relaxed — the
+four tests that encoded "two close classes name nobody" now encode "both are named, and the
+one in hand leads".
+
+**STILL PLANNED, and deliberately not started** — the presentation half of your plan:
+
+1. **The source WORD on the surfaces.** `CharacterClasses.SourceLabel` exists and is tested
+   ("from your achievements" / "inferred from your log" / "your picks") and **nothing prints
+   it yet** — which is trap 43's mirror, a value with a producer and no consumer, so it is
+   named here rather than left to be discovered. Wherever "(inferred)" is printed today it
+   should become the source word, and the Quest Tracker picker should be labelled a lens.
+2. **The phone.** `CompanionQuestSource` still carries the single `InferredClass`;
+   `StatsSnapshot.InferredClasses` is not on the wire. Your plan's "old field stays for one
+   release" is satisfied by default, but the new one has not been added.
+3. **`Current()` is not yet deleted.** It is now `CurrentClasses().FirstOrDefault()` with a
+   doc comment saying it means something different — "the class you are playing most", not
+   "the one I am sure enough to name". Removing it is the release-after job your plan
+   describes.
+
+- **Priority:** `ready` for the three items above. Not a `needs-david:` — David supplied the fact that makes it a bug
   (2026-08-23: *"you seem to think EQ Legends just lets you have 1 class when in fact you can
   be 3 at a time"*), and the consequence list has nothing to say about it.
 - **Class:** `V3`. `ClassInference` is shipped Core with its own trap (11) and its own

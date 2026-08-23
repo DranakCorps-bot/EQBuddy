@@ -1617,10 +1617,25 @@ public partial class MainWindow : Window, ICardContext
     /// the combination says which source it came from.</summary>
     internal (IReadOnlyList<string> Classes, bool Picked) BuffSetClassSource(StatsSnapshot s)
     {
-        var picked = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [];
-        if (picked.Count > 0) return (picked, true);
-        return s.InferredClass is { Length: > 0 } inf ? ([inf], false) : ([], false);
+        var (classes, source) = ClassSourceFor(s);
+        return (classes, source == ClassSource.Picked);
     }
+
+    /// <summary>The character's classes and where they came from — one resolution for the
+    /// buff sets, the unlock filter, the Gear Locker and the quest window, so no two of
+    /// them can answer differently.
+    ///
+    /// **Precedence inverted on 2026-08-23** (`CharacterClasses`): the achievements dump
+    /// leads, inference fills in, and the Quest Tracker's picks are LAST and only widen.
+    /// It used to be picks-first, falling back to a single inferred class — which is how a
+    /// Warrior/Druid/Monk with only Warrior ticked was told he gained nothing at level 35.
+    /// Bevel's lock ("never fall back to the Quest Tracker filter") is satisfiable for the
+    /// first time and is honoured here.</summary>
+    internal (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) =>
+        CharacterClasses.Resolve(
+            QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
+            s.InferredClasses,
+            QuestLedger?.ClassesFor(QuestCharacterKey));
 
     /// <summary>The assembled set (#120 stage 2, Frankthetankk): the "(any class)"
     /// bucket plus every active class's picks — swap one class and the others' picks
@@ -3021,7 +3036,8 @@ public partial class MainWindow : Window, ICardContext
             else
             {
                 LastAchievementsImport =
-                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger);
+                    OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger,
+                        QuestLedger, QuestCharacterKey);
                 _settings.Save();
             }
         }
