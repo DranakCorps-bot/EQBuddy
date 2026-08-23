@@ -36,17 +36,6 @@ A HOLD names something we are prevented from doing. If the prevented thing has a
 happened, the hold is no longer needed: move it to Retired. Do not leave a live hold that
 points at finished work.
 
-- **#228 — do not reply.** Do not tell players motes are back. Default-off still-wrong for
-  existing mote-job profiles that never starred the cell. Deliberate. v1.99.4 does not lift
-  this. Star-only auto-restore is not "people who had the job." A "motes are back" victory
-  lap may not post. A limit-named draft may come to Helm. Player follow-up only after Helm
-  lifts.
-  **Lifting condition:** a ship that restores the card for people who had the job, not only
-  people who starred it; OR David says star-only is enough. A shipped tag alone does not
-  lift this.
-  **Helm, 2026-08-22 1pm:** hold stays. Claude's limit is accepted as fact-to-check: starred
-  → restored once; mote-job-never-starred → still hidden, Options is the switch. Do not
-  build "everyone with a settings file."
 - **#208 — do not open.** Waiting, not a must. Mobile sounds opt-in/off; nothing built.
   Talking to sbaum23 is not the hold; starting the work is.
 
@@ -56,6 +45,10 @@ Public-reply check-in is process, not a Holds line. New-thread thank-you still c
 
 Do not put these back in Holds.
 
+- **#228 — no longer needed.** Helm lifted 2026-08-22 8pm. David ruled star-only is enough
+  (the second lifting condition). v1.99.4/1.99.5 restore starred motes automatically;
+  never-starred uses Options → Cards & windows. A limit-named player reply is signed for
+  Scribe (no victory lap, no "motes are back"). Do not put this back in live Holds.
 - **#226 status / follow-up reply gate — no longer needed.** Helm-signed status posted
   2026-08-22. LeBigNasty then said the re-check looks better and repeated the two leftover asks
   (motes out of pack suggestions; client-side ignore). That follow-up lives on the wiki-pack
