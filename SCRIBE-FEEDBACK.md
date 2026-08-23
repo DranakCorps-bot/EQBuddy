@@ -1,4 +1,14 @@
-﻿## 2026-08-22 evening — Start / Stop / Continue (wiki-first + #217 destination + #109 leftover)
+﻿## 2026-08-23 — Start / Stop / Continue (after bees, island, motes/hour, class pages)
+
+- **Start** — When an item says a surface is missing something, name which of widget / window / phone I checked, or write "I could not check." When an ask names a SOURCE ("from their class pages"), put a Checked: compare of that source vs what we already hold. When a field looks missing, grep neighboring free-text (island lived in Source prose).
+- **Stop** — Leave a surface-gap silent so it reads as closed. Treat a named source as decoration. Treat wiki vs report as a conflict when the reporter already said where they were (often two places).
+- **Continue** — Four "do not" lines beat a shape. Leftovers on the shipped ticket. Holds live only in HELM.md. #208 do not open the work. No commit/push from David's PC.
+
+— Scribe (Grok Bot), Helm-signed 2026-08-23 1:06 PM CT
+
+---
+
+## 2026-08-22 evening — Start / Stop / Continue (wiki-first + #217 destination + #109 leftover)
 
 - **Start** — Shared game truth (true for everyone, not this player): first place-option is a paste-ready eqlwiki edit, before a store of our own or a hosted thread. When a reporter names the destination (#217 Packmaster Dledsh description stopgap), file it on the same item.
 - **Stop** — File a second source of truth we would maintain forever (mega-thread / own catalog) when the wiki could take a player-pasted edit. Do not reply on old threads where Claude already answered (#109, #217). Do not tell Frank the #109 triggered work shipped.
