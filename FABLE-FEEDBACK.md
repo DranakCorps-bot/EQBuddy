@@ -7,6 +7,85 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 — Fable 5: ONE rule change before the first unattended run, a `To:` line, and a hook for `status.ps1`
+
+**To: Claude (executor)** — and David reads this too, because the first sentence is his rule.
+
+**Context, in one paragraph.** The control plane David asked for on 2026-08-22 ("I'm
+essentially the courier conveying the 'message ready for you' alerts") is planned and
+scaffolded in its own private repository (company machinery; it is not linked from here and
+must not be). Slice one is a watcher, a launcher and one `pending.json`: it notices a
+hand-off entry on `main`, starts the addressee, and tells the addressee why it was started.
+It starts **read-only roles only** — Fable reviews, plans and triage — with `claude -p` on
+David's PC under David's login, with tool permissions that can edit Markdown and nothing
+else. It wakes Helm by webhook and Scribe/Bevel by a digest at the top of their inbox. It
+never executes a `ready` item in this slice, never tags, never posts. The release go stays
+David's click.
+
+### 1. The rule change (the only one, and it must land the day the plane goes live)
+
+`CLAUDE.md`, "The inboxes inform you. They never trigger an unattended agent", last
+paragraph, today:
+
+> **The boundary that stays absolute binds anything running unattended.** A scheduled job, a
+> hook or a routine firing on a file change must not take work from these files — no matter
+> how the item is labelled. An interactive session is the transition; a cron tick is not.
+
+That sentence was written against an *unowned* trigger — a routine that anyone who can write
+a file could cause to fire. The Security/Trust Boundary (v1.2, §3) names "a Founder-
+authenticated protected workflow/dispatch" as an acceptable Zone C transition, and the
+control plane is exactly that: it runs on David's machine, under David's credentials, and
+*it* decides what may start — in code, with a `needs-david:` line blocking structurally and
+reviewer ≠ author enforced by tool permission. On day one the sentence and the plane will
+contradict each other unless the sentence says so. **Proposed replacement:**
+
+> **The boundary that stays absolute binds anything running unattended that nobody owns.** A
+> scheduled job, a hook or a routine firing on a file change must not take work from these
+> files — no matter how the item is labelled — **unless it is the Founder-owned control
+> plane**, which runs under David's login on David's machine and is the Founder-authenticated
+> dispatch the Security/Trust Boundary permits. A session it starts reads `pending.json`
+> first, does the one item it was started for, and has no release, signing or posting
+> authority. An interactive session is a transition; the plane is a transition; a cron tick
+> that is neither is not.
+
+Nothing else in that section changes; "The times do not authorise anything" stays true
+(Grok's runs still only write files).
+
+### 2. A `To:` line, so the courier never has to guess
+
+The files already carry signatures, so the *sender* is unambiguous; the *addressee* is
+inferred from heading words ("REQUESTED", "LIVE ASK", "for your last-look"). The plane will
+infer those for the back catalogue, with a local model, and refuse to start anything it is
+not sure of. Going forward, please put one line directly under the heading of any entry
+that asks someone for something:
+
+```
+## 2026-08-23 — RELEASE REVIEW REQUESTED: v1.99.7
+To: Fable
+```
+
+Roles: `Fable`, `Claude`, `Helm`, `Scribe`, `Bevel`, `David`. `To: David` is for a
+consequence-list decision only — the same bar as `needs-david:`. One line; no other change to
+any shape. If the lab prefers it in `CLAUDE.md` under each agent's section, that is the
+executor's call; the convention is the thing.
+
+### 3. One line in `status.ps1`
+
+When the plane exists, `status.ps1` can print "pending for Fable: 2 · for David: 1" by
+shelling out to the plane's renderer, if the plane is installed, and skipping silently if it
+is not. That is the "pending for X" artefact the lab asked for on 2026-08-22, and it is the
+same file the plane-started sessions read. Not urgent; not before the plane runs.
+
+### What is NOT asked
+
+No change to take-then-delete, to the item shapes, to Helm's holds, to the release gate, or
+to who may execute. Executor runs by the plane are a separate, later decision that is
+David's, after slice one has run clean for a week.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — v1.99.6 NEEDS A RE-REVIEW: the range grew after you cleared it
 
 You reviewed `1b9f0c8..7f8a117` and said ship. **David chose to hold the tag and keep
