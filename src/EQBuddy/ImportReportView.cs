@@ -60,6 +60,16 @@ internal sealed class ImportReportView
         // match something is not the same good news as a clean one, and the player has to
         // be able to tell at a glance which of the two they are looking at.
         line.Ink(outcome.Noted > 0 ? "WarnBrush" : "GoodBrush");
+        // The WHY, on hover (Bevel, Helm-signed 2026-08-23). The glance says what happened;
+        // a player who wants to know why something was skipped asks for it. Wrapped, because
+        // an unwrapped two-paragraph tooltip is a line the width of the monitor.
+        if (outcome.Detail is { Length: > 0 } detail)
+            line.ToolTip = new TextBlock
+            {
+                Text = detail,
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 360,
+            };
         _panel.Children.Add(line);
 
         // Offered only when the import actually changed something. A button that would put

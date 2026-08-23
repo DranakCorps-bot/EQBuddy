@@ -438,6 +438,17 @@ a guess, and the guess is discovered three commits later.
   supply.
 - **A finished piece of work with an open question in it is not finished.** Either ask, or
   state the assumption plainly at the TOP of the reply where it cannot be missed.
+- **THE TELL: if you are writing a sentence that offers him a choice, you are asking a
+  question — use the tool.** "unless you'd rather settle it now", "say the word and I'll…",
+  "or reorder it if you prefer" are all questions wearing prose. David re-stated this rule
+  unprompted on 2026-08-23 (*"if a call is needed by me on anything, please always frame it
+  to me in the question / answer way"*) — a repeat, which means the rule was never the gap.
+  The gap is that an offer buried in a summary does not FEEL like a question while you write
+  it. It is one. He answered three of them in prose that day, which works only because he
+  happened to be reading closely.
+- **"Not blocking yet" is not a reason to withhold a question**, only a reason to choose the
+  moment. If the answer is his and you already know you will need it, the tool costs him one
+  click and costs you nothing; a paragraph asking the same thing costs him a careful read.
 - This does not mean ask more often. It means the ones worth asking are unmissable, and
   everything else is a call you make yourself and report — in `DECISIONS.md`, per
   [what needs David](#what-needs-david-and-what-does-not). **Before using the question tool,

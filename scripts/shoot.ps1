@@ -323,6 +323,14 @@ $Shots = [ordered]@{
     # worth on the copy rather than the code — it read "1 obtained reward … names them",
     # because the plural was baked into the string. Nothing but a picture was ever going to
     # catch that; the unit test asserted the same wrong sentence quite happily.
+    #
+    # RE-SHOT 2026-08-23 after Bevel's ruling (Helm-signed): the three sentences became ONE
+    # counted line — "1 Sky reward marked · 2 skipped · 1 unmatched" — with the reasons on
+    # hover. Predicted and confirmed. Expect a SCROLLBAR now and the footer (provenance note
+    # + ⧉ copy) below the fold: 21 boss rows plus a report exceed the card's height cap, so
+    # the scroller is correct rather than a regression. What matters is what holds the TOP,
+    # and that is the report and its Undo (trap 44). A tooltip cannot be photographed, so
+    # the hover half is asserted in OutputfileAutoImportTests, not here.
     'raids-import'    = @{ Title = 'EQBuddy Progress'
                            Env = @{ EQBUDDY_PROGRESS = 'raids' }
                            Set = @{}

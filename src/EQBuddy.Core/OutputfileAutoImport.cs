@@ -178,11 +178,20 @@ public sealed record AutoImportOutcome(
     /// and still must not offer an Undo button.</summary>
     public int Noted => SkySkipped + SkyUnrecognized;
 
-    /// <summary>The report line. It says the dump was READ even when nothing changed,
-    /// because "EQBuddy did nothing" and "EQBuddy never saw your file" look identical to
-    /// the player and only one of them is a bug — which is exactly the confusion the
-    /// manual flow produced (David, 2026-08-20: he ran the command, the file appeared,
-    /// and the window sat there).</summary>
+    /// <summary>
+    /// **The glance line: what happened, and nothing else.** It says the dump was READ even
+    /// when nothing changed, because "EQBuddy did nothing" and "EQBuddy never saw your file"
+    /// look identical to the player and only one of them is a bug — exactly the confusion
+    /// the manual flow produced (David, 2026-08-20: he ran the command, the file appeared,
+    /// and the window sat there).
+    ///
+    /// **The counts stay here; the REASONS moved to <see cref="Detail"/>** (Bevel, Helm-signed
+    /// 2026-08-23). The first cut said all of it on the card and ran to three sentences —
+    /// five lines on the 338 px widget. Bevel's ruling was not to cut a clause, because each
+    /// one names a different way the import can look broken when it is not; it was that the
+    /// glance is *"something happened, here's Undo"* and the why is a second job behind
+    /// hover. Same shape as the 1.99.1 caption call.
+    /// </summary>
     public string Summary => Kind switch
     {
         OutputfileKind.Inventory => GearTicked switch
@@ -191,29 +200,54 @@ public sealed record AutoImportOutcome(
             1 => $"Read your inventory dump ({At:HH:mm}) — 1 item ticked.",
             _ => $"Read your inventory dump ({At:HH:mm}) — {GearTicked} items ticked.",
         },
-        OutputfileKind.Achievements => string.Join(" ", new[]
-        {
-            Applied == 0
-                ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark."
+        OutputfileKind.Achievements =>
+            (Applied == 0
+                ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark"
                 : $"Read your achievements dump ({At:HH:mm}) — " + string.Join(", ",
                     new[]
                     {
                         RaidsMarked > 0 ? $"{RaidsMarked} raid clear{(RaidsMarked == 1 ? "" : "s")}" : null,
                         SkyMarked > 0 ? $"{SkyMarked} Sky reward{(SkyMarked == 1 ? "" : "s")}" : null,
-                    }.Where(s => s is not null)) + " marked.",
-            // Said in the player's terms, not the guard's: what the game marked, why it
-            // proves nothing, and that the tracker is still the way to record it for real.
-            SkySkipped > 0
-                ? $"{SkySkipped} reward{(SkySkipped == 1 ? " was" : "s were")} skipped — the "
-                  + $"class unlock that flagged {(SkySkipped == 1 ? "it" : "them")} was "
-                  + "granted, not earned."
-                : null,
-            SkyUnrecognized > 0
-                ? $"{SkyUnrecognized} obtained reward{(SkyUnrecognized == 1 ? "" : "s")} "
-                  + "matched nothing on the checklist — Import achievements names "
-                  + $"{(SkyUnrecognized == 1 ? "it" : "them")}."
-                : null,
-        }.Where(s => s is not null)),
+                    }.Where(s => s is not null)) + " marked")
+            // Counted, not explained. A player who sees "2 skipped" and wants to know why
+            // hovers; a player who does not is left with one short line.
+            + string.Concat(new[]
+            {
+                SkySkipped > 0 ? $" · {SkySkipped} skipped" : null,
+                SkyUnrecognized > 0 ? $" · {SkyUnrecognized} unmatched" : null,
+            }.Where(s => s is not null))
+            + ".",
         _ => $"Saw {FileName} ({At:HH:mm}) — EQBuddy has no reader for that dump.",
     };
+
+    /// <summary>
+    /// **The hover half: WHY something was skipped or unmatched.** <c>null</c> when there is
+    /// nothing to explain, so a surface can hang it straight on a tooltip without inventing
+    /// filler for the ordinary case.
+    ///
+    /// Both clauses survive intact from the first cut, because both were load-bearing: each
+    /// names a different way a correct import reads as a broken one. The skipped clause is
+    /// the #101 guard working and staying silent; the unmatched clause is real progress not
+    /// being recorded, which is the one that costs the player something.
+    /// </summary>
+    public string? Detail
+    {
+        get
+        {
+            if (Kind != OutputfileKind.Achievements || Noted == 0) return null;
+            var parts = new List<string>();
+            if (SkySkipped > 0)
+                parts.Add($"{SkySkipped} reward{(SkySkipped == 1 ? " was" : "s were")} skipped: "
+                    + $"the class unlock that flagged {(SkySkipped == 1 ? "it" : "them")} was "
+                    + "granted at character creation rather than earned, so the game marks its "
+                    + "rewards obtained without the items ever existing. Turn them in for real "
+                    + "and the Sky tracker records them the normal way.");
+            if (SkyUnrecognized > 0)
+                parts.Add($"{SkyUnrecognized} obtained reward{(SkyUnrecognized == 1 ? "" : "s")} "
+                    + $"matched nothing on the checklist — usually a name that has drifted from "
+                    + $"the wiki's. Import achievements… names {(SkyUnrecognized == 1 ? "it" : "them")}, "
+                    + "so nothing is lost.");
+            return string.Join("\n\n", parts);
+        }
+    }
 }

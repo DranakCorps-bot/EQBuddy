@@ -194,8 +194,11 @@ public class OutputfileAutoImportTests
             // reads "nothing new to mark" on a dump full of rewards, which is the guard
             // working and looking exactly like a broken import (#101, Frankthetankk).
             Assert.Equal(2, outcome.SkySkipped);
-            Assert.Contains("2 rewards were skipped", outcome.Summary);
-            Assert.Contains("flagged them was granted, not earned", outcome.Summary);
+            // The GLANCE counts it; the WHY is on hover (Bevel, Helm-signed 2026-08-23).
+            Assert.Contains("2 skipped", outcome.Summary);
+            Assert.DoesNotContain("granted", outcome.Summary);
+            Assert.Contains("2 rewards were skipped", outcome.Detail);
+            Assert.Contains("granted at character creation rather than earned", outcome.Detail);
         }
         finally { dir.Delete(true); }
     }
@@ -236,10 +239,45 @@ public class OutputfileAutoImportTests
             Assert.Equal(1, outcome.SkyMarked);           // Earthcaller matched
             Assert.Equal(1, outcome.SkyUnrecognized);     // the other did not
             Assert.Equal(0, outcome.SkySkipped);          // the unlock is incomplete: trusted
-            Assert.Contains("1 obtained reward matched nothing on the checklist", outcome.Summary);
-            Assert.Contains("Import achievements names it.", outcome.Summary);
+            Assert.Contains("1 unmatched", outcome.Summary);
+            Assert.Contains("1 obtained reward matched nothing on the checklist", outcome.Detail);
+            Assert.Contains("Import achievements… names it", outcome.Detail);
         }
         finally { dir.Delete(true); }
+    }
+
+    /// <summary>**Nothing was CUT when the reasons moved to hover** (Bevel, Helm-signed
+    /// 2026-08-23: *"each clause names a different false-broken-import. Do not cut one."*).
+    /// The glance carries the counts; the detail carries the explanations; a clean run has
+    /// no tooltip at all rather than a filler one.
+    ///
+    /// This is the assertion that would catch the tempting version of this change — quietly
+    /// dropping a clause instead of rehoming it, which no other test here would see, because
+    /// they all check the summary and the summary is supposed to get shorter.</summary>
+    [Fact]
+    public void TheReasonsMovedToHoverRatherThanBeingCut()
+    {
+        var noted = new AutoImportOutcome(OutputfileKind.Achievements, "d.txt",
+            new DateTime(2026, 8, 22, 20, 45, 0), 0, RaidsMarked: 0, SkyMarked: 1)
+        { SkySkipped = 2, SkyUnrecognized = 1 };
+
+        // Glance: what happened, counted, one line.
+        Assert.Equal("Read your achievements dump (20:45) — 1 Sky reward marked · 2 skipped · 1 unmatched.",
+            noted.Summary);
+        // Hover: both reasons, intact, and separated so they read as two facts.
+        Assert.Contains("granted at character creation rather than earned", noted.Detail);
+        Assert.Contains("a name that has drifted from the wiki's", noted.Detail);
+        Assert.Contains("\n\n", noted.Detail);
+
+        // A clean run has nothing to explain, so it offers no tooltip at all.
+        var clean = new AutoImportOutcome(OutputfileKind.Achievements, "d.txt",
+            new DateTime(2026, 8, 22, 20, 45, 0), 0, RaidsMarked: 2, SkyMarked: 0);
+        Assert.Equal("Read your achievements dump (20:45) — 2 raid clears marked.", clean.Summary);
+        Assert.Null(clean.Detail);
+
+        // And the inventory half never had reasons to move.
+        Assert.Null(new AutoImportOutcome(OutputfileKind.Inventory, "i.txt",
+            new DateTime(2026, 8, 22, 20, 45, 0), GearTicked: 3, RaidsMarked: 0, SkyMarked: 0).Detail);
     }
 
     /// <summary>A run that only SKIPPED still gets a report and still gets no Undo. The
@@ -273,7 +311,8 @@ public class OutputfileAutoImportTests
             Assert.Null(outcome.Undo);
             // Both halves in one line: what it did (nothing) and what it found (one skip).
             Assert.Contains("nothing new to mark", outcome.Summary);
-            Assert.Contains("1 reward was skipped", outcome.Summary);
+            Assert.Contains("1 skipped", outcome.Summary);
+            Assert.Contains("1 reward was skipped", outcome.Detail);
         }
         finally { dir.Delete(true); }
     }

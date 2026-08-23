@@ -35,6 +35,9 @@ public sealed class QuestsRenderTests : IDisposable
         public string QuestCharacterKey { get; init; } = "";
         public string CurrentZoneName { get; init; } = "";
         public StatsSnapshot CurrentSnapshot() => new();
+        /// <summary>Settable, so a test can put the Sky tab's import report on screen —
+        /// null is the ordinary case (no dump has been read this session).</summary>
+        public AutoImportOutcome? LastAchievementsImport { get; set; }
         public InventoryFile.Snapshot? LatestInventory(bool refresh = false) => null;
         public string? CachedItemStats(string itemName) => null;
         public Task<string?> FetchItemTooltip(string itemName) => Task.FromResult<string?>(null);

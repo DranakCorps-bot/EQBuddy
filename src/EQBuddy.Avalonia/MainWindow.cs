@@ -4239,7 +4239,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal AutoImportOutcome? LastInventoryImport { get; private set; }
 
     /// <inheritdoc cref="LastInventoryImport"/>
-    internal AutoImportOutcome? LastAchievementsImport { get; private set; }
+    public AutoImportOutcome? LastAchievementsImport { get; private set; }
 
     /// <summary>Reads the dump the log just announced. The seam that did not exist until
     /// 2026-08-20: the finder, the auto-check and the achievements importer were all

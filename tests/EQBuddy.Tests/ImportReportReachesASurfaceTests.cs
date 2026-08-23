@@ -47,6 +47,42 @@ public class ImportReportReachesASurfaceTests
             + "achievements, in BOTH its empty and its populated state — same rule."),
     ];
 
+    /// <summary>**The dump feeds TWO consumers, so the report has two homes** (Bevel,
+    /// Helm-signed 2026-08-23). Raid clears land on Raids; Sky rewards land on the Quest
+    /// Tracker's Sky tab. With the report on Raids alone, "1 Sky reward marked · 2 skipped"
+    /// was being read above a list of raid bosses — by a player who may never open that
+    /// surface at all. Bevel: *"a Quest-Tracker job being read on a raid-clear list."*
+    ///
+    /// Listed separately from <see cref="MustReachASurface"/> because it is a SECOND host
+    /// for an outcome that already has one — the scan above asks "does anything read this",
+    /// and the answer was yes while a whole audience still could not see it.</summary>
+    public static readonly (string Project, string File, string Why)[] SecondHosts =
+    [
+        ("EQBuddy", "QuestsWindow.xaml.cs",
+            "The Sky tab. Same ImportReportView, not a Sky-flavoured variant — one more "
+            + "host, one more line, and the Undo rule stays in one place."),
+        ("EQBuddy.Avalonia", "QuestsWindow.cs", "The Avalonia twin of the same tab."),
+    ];
+
+    /// <summary>Both lanes' Sky tab builds one. A ruling that shipped on one UI only is how
+    /// #122 and #152 reached Linux after Windows had already paid for them.</summary>
+    [Theory]
+    [MemberData(nameof(SecondHostRows))]
+    public void TheSkyTabReportsTheImportToo(string project, string file, string why)
+    {
+        var text = File.ReadAllText(Path.Combine(Src, project, file));
+
+        Assert.Contains("new ImportReportView(() => _main.LastAchievementsImport", text);
+        Assert.NotEmpty(why);
+    }
+
+    public static TheoryData<string, string, string> SecondHostRows()
+    {
+        var data = new TheoryData<string, string, string>();
+        foreach (var (project, file, why) in SecondHosts) data.Add(project, file, why);
+        return data;
+    }
+
     private static readonly (string Ui, string File)[] Widgets =
     [
         ("WPF", Path.Combine("EQBuddy", "MainWindow.xaml.cs")),

@@ -27,6 +27,13 @@ public interface IQuestsHost
     string QuestCharacterKey { get; }
     string CurrentZoneName { get; }
     StatsSnapshot CurrentSnapshot();
+
+    /// <summary>What the last unprompted <c>/outputfile achievements</c> import did, for the
+    /// Sky tab to report (Bevel, Helm-signed 2026-08-23). The dump feeds two consumers and
+    /// the report used to sit only on Raids — so "1 Sky reward marked · 2 skipped" was read
+    /// above a list of raid bosses by a player who may never open that surface.</summary>
+    AutoImportOutcome? LastAchievementsImport { get; }
+
     InventoryFile.Snapshot? LatestInventory(bool refresh = false);
     string? CachedItemStats(string itemName);
     Task<string?> FetchItemTooltip(string itemName);
@@ -724,8 +731,27 @@ public sealed class QuestsWindow : Window
     /// The rows are TICKABLE, and have to be: hand-ticking used to live on the widget's
     /// Epic and Sky cards, and when those became one launcher this became the only place
     /// on the desktop to say "I already have that".</summary>
+    /// <summary>The Sky tab's copy of the achievements auto-import report — the Avalonia
+    /// twin of the WPF one, same class, same rule about when an Undo is offered. See
+    /// <see cref="IQuestsHost.LastAchievementsImport"/> for why Sky is a host at all.</summary>
+    private ImportReportView SkyImport => _skyImport ??=
+        // force: true — an Undo moves checklist TICKS, and Refresh's signature is built
+        // from the same lists it just restored, so a plain repaint would decide nothing
+        // changed. A repaint that no-ops is how an Undo looks broken.
+        new ImportReportView(() => _main.LastAchievementsImport, () => Refresh(force: true));
+
+    private ImportReportView? _skyImport;
+
     private void RenderChecklist(QuestTab tab, string filter, List<string> classes)
     {
+        // ABOVE the rows and re-added on every render, because the panel is cleared
+        // wholesale — trap 44: a report about something that just happened belongs where
+        // the eye lands, not under a checklist the player has to scroll.
+        if (tab == QuestTab.Sky)
+        {
+            SkyImport.Render();
+            _questsPanel.Children.Add(SkyImport.Body);
+        }
         // Grouping, ordering and the detail line come from Core so this window, the WPF
         // one and EQBuddy Mobile cannot disagree about what a checklist row says (#184).
         var groups = tab == QuestTab.Epic
