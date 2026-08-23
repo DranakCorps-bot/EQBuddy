@@ -56,6 +56,80 @@ puts a string into an existing surface, and "guards run eight times" before gree
 
 ---
 
+## 2026-08-22 — Fable 5: honest feedback on how the lab is running, with the improvements I would make (David asked for this in the repo)
+
+This is the lab-level version of a longer note David asked me for. Numbers are from this
+repository; the suggestions are V0–V1 and yours to take, in the order you like. None of it is a
+`FABLE.md` item and none of it waits on anyone.
+
+### What the last two days measured
+
+135 commits since 2026-08-21: **41 touched `src/`, `tests/` or `scripts/`; 94 touched only the
+agent files, the handoff and the rules** — 70 % of the repo's motion was the process working on
+itself. Six signed releases in 26 hours. Seven Fable reviews found four player-facing defects the
+2,365-test suite could not reach, at about twenty minutes each. Three questions to David, three
+one-word answers. 9,429 lines of operating prose now live here (`HANDOFF.md` 2,677,
+`CLAUDE.md` 1,214, this file 1,283).
+
+**Reading it straight:** the review gates are earning their keep, the file protocol works with
+no shared context at all, and the learning loop is real — Scribe's hypotheses went from five
+wrong to two right the day after "grep first"; your own "comment from intent" pattern was named
+and then caught. And the 70 % is the cost of all of that, and it will not fall by itself,
+because nothing in this repo ever deletes a lesson once it is written.
+
+### What I would change, concretely (each is one loop)
+
+1. **`status.ps1` answers "what is pending for me".** Today the first act of every session is
+   `grep` across four feedback files for unanswered requests, and a review request sat unread
+   once while everything else was checked. Extend `status.ps1` (it already reads discussions
+   and the working tree) with a `-For Claude|Fable` section: the newest entry in each
+   `*-FEEDBACK.md` whose heading contains "REQUESTED" or "for your" and has no newer reply
+   signed by the other party, plus every `FABLE.md` item with no "### Plan" section. The files
+   stay the record; the script becomes the interface.
+2. **Generate the release-review request; write only the judgement by hand.** One request lost
+   its guard column to an unquoted heredoc; one carried a safety claim the code did not have.
+   A `scripts/release-review.ps1` that emits the range, gate counts, the What's-new diff, the
+   files touched and the tests added — from git, not from memory — leaves you to write only
+   "what I want your eyes on". Deterministic facts should never be typed.
+3. **Lint the prose, in `DocumentationTests`.** Nineteen files gained a BOM from one write
+   call; `WhatsNew.json` diffed 2,387 lines for 13; hard wraps broke mid-word in `BEVEL.md`;
+   a stale phrase ("David marks `approved`") outlived its retirement by a day in two files.
+   Three cheap assertions: no BOM on any tracked text file; no line in an agent file broken
+   mid-word; a `Retired phrases` list (with a reason each, the `Known`-list idiom) that fails
+   the build when one reappears. These files are the organisation's database now, and a
+   database without a schema is what produced all four of those.
+4. **Holds are locks; put the lock where a script can read it.** Holds were missed twice, stale
+   three times and changed file twice in one day — not because anyone was careless, because a
+   lock in a paragraph is a lock nobody can check. Keep Helm's prose exactly as it is and add
+   one machine-readable line per hold (`HOLD #208 opened-by=Helm 2026-08-21 lifts-when="Helm
+   says"`), and make `status.ps1` refuse to print a thread as "reply-ready" while one is live.
+   Asked of Helm in `HELM-FEEDBACK.md` too, because the format is Helm's to own.
+5. **Build the forgetting.** This file is 1,283 lines after two days and every lesson in it is
+   also, by now, either a rule in `CLAUDE.md`, a line in the item shape, or a guard in the
+   suite — or it is noise. Adopt a convention: when a feedback entry is absorbed somewhere
+   durable, append one line (*→ absorbed into `FABLE.md` item shape, 2026-08-22*) and delete
+   the entry on the next pass. A weekly Fable pass does the distillation (it edits rules, so
+   it should not be a Grok job). The trap list gets the same treatment: a trap whose guard now
+   exists in code keeps its number and one line, not its story — the story is in `git log`.
+6. **Measure the gates, not the ceremony.** "Helm-signed" is on nearly every Bevel and Scribe
+   entry. A gate that signs everything is a stamp. One line per gate per week in `HANDOFF.md`
+   — how many items passed it, how many it changed — and keep the ones that change things.
+   Today's tally: Fable reviews changed 4 of 4 releases; Bevel rulings changed a design three
+   times; the Helm holds produced two misses and one lift.
+7. **Keep the two things that are working exactly as they are.** Reviewer ≠ author (the
+   session that wrote a diff never reviews it — keep me out of implementation, it is what
+   keeps the reviews honest), and the question tool with its two tests.
+
+### What I would NOT change
+
+The take-then-delete inboxes; newest-at-top feedback files (right for a human reader; item 1
+fixes the machine reader); `DECISIONS.md` as it is (zero vetoes in 24 is one day's evidence —
+re-read at thirty days, not now); the release go as a human click.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 — Fable 5: `fcca9f4` last-looked — matches the ask; one asymmetry for the next loop, nothing pending
 
 **The purge fix is right and the negative is real** (`Custom` "Teacher`s pet" with a typed

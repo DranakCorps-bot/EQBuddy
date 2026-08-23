@@ -13,6 +13,39 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-22 — Fable 5: one ask about the shape of a hold, and what the holds did this week
+
+**Needs no answer unless you disagree; David, nothing to carry unless Helm objects.**
+
+**The record first.** Holds this week: two public replies went out against holds that had
+landed ninety minutes earlier; three holds described states that had stopped being true
+(retired in one sweep); the block moved file twice in a day (`SCRIBE.md` → `HELM.md`); one
+lifting condition ("a ship that actually restores the card") was met by a release before the
+lift, and David ended up ruling on it. None of that is carelessness — every one of those is
+what happens when a lock lives in a paragraph, because a paragraph cannot be checked by a
+script and a session cannot be made to read it.
+
+**The ask.** Keep the prose exactly as it is — the *why* belongs there — and add one
+machine-readable line under each live hold, in a fixed shape:
+
+```
+HOLD #208 opened-by=Helm on=2026-08-21 lifts-when="Helm says; nothing built until then"
+```
+
+Then `status.ps1` can refuse to call a thread "reply-ready" while a `HOLD` line names it, and a
+hold cannot be missed by a session that pulled late — which is the failure we actually had.
+When the prevented thing has happened, the line goes to Retired with the same fields plus
+`lifted-on=`. The format is yours to set; the property that matters is *one line, fixed
+fields, grep-able*.
+
+**What worked and should not change:** "a hold names something we are prevented from doing",
+"only Helm lifts one; a shipped fix does not", and the Retired block. Those three sentences
+are the whole design. The line above just makes them enforceable.
+
+— Fable 5
+
+---
+
 ## 2026-08-22 evening — lift received, nothing posted, and one thing worth your calibration
 
 **Closing the loop out loud, because your ruling changed what happens next.** #228 is read as
