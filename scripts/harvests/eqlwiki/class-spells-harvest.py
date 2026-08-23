@@ -69,6 +69,11 @@ API = "https://eqlwiki.com/api.php"
 UA = "EQBuddy-harvester/1.0 (contact: david.edwards08@gmail.com; polite ~1 req/sec)"
 CATALOG = HERE.parents[2] / "src" / "EQBuddy.Core" / "Data" / "SpellLevels.json"
 REPORT = HERE / "class-spells-report.md"
+# The parsed class pages, for spell-levels-promote.py to merge (PR 1). This file is
+# the harvest's DATA output where the report is its prose one — written here rather
+# than re-parsed there so there is exactly one parser for the class pages, which is
+# the same rule spells-harvest/spell-levels-promote already follow.
+ROWS = HERE / "class-spells.json"
 
 # The app's spelling wins where the wiki differs — the same fold the spell
 # promote already applies (QuestClassFilter.Classes).
@@ -84,7 +89,12 @@ CLASSES = [
 ]
 
 LEVEL_RX = re.compile(r"^==+\s*Level\s+(\d+)\s*==+\s*$", re.IGNORECASE | re.MULTILINE)
-ROW_RX = re.compile(r"\{\{RadSpellRow2(.*?)\}\}", re.DOTALL)
+# The row body may itself contain templates ({{Classic Short}} in `era=`), so a
+# non-greedy .*? terminates at the INNER close and truncates the row. PR 0 got away
+# with it because only `name` travelled and it precedes `era`; PR 1 carries era and
+# it came out as the literal "{{Classic Short". One level of nesting is all these
+# rows have.
+ROW_RX = re.compile(r"\{\{RadSpellRow2((?:[^{}]|\{\{[^{}]*\}\})*)\}\}", re.DOTALL)
 FIELD_RX = re.compile(r"^\s*\|\s*([a-z_]+)\s*=\s*(.*?)\s*$", re.MULTILINE)
 ERA_RX = re.compile(r"\{\{\s*([^}|]+?)\s*(?:Short)?\s*\}\}")
 
@@ -126,6 +136,20 @@ def fetch_class_page(title: str, refetch: bool = False):
     text_file.write_text(text, encoding="utf-8")
     meta_file.write_text(json.dumps({"served": served}), encoding="utf-8")
     return text, served
+
+
+def level_sections(text: str):
+    """Which `==Level N==` headings the page HAS, empty ones included.
+
+    This is a different question from "which levels have rows", and the
+    difference is load-bearing: David's ruling admits a spell-page row only where
+    the class page has **no section** for that level, so a section that exists and
+    is empty is the class page SAYING you get nothing — and must not be filled in
+    from somewhere wider. Every page also stops at 50 against Legends' cap of 60,
+    so 51-60 is derived for every class and has to be marked, not hidden
+    (Bevel: "do not silently pad from spell pages").
+    """
+    return {int(m.group(1)) for m in LEVEL_RX.finditer(text)}
 
 
 def parse_class_page(text: str):
@@ -225,7 +249,8 @@ def main():
         page = {}                          # name -> level (first wins; a page listing
         for level, name, era in rows:      # a spell twice means the earlier level)
             page.setdefault(name, (level, era))
-        per_class[cls] = {"served": served, "page": page, "rows": len(rows)}
+        per_class[cls] = {"served": served, "page": page, "rows": len(rows),
+                          "sections": sorted(level_sections(text))}
         print(f"{cls:<14} served={served or '(missing)':<16} rows={len(rows):>4} "
               f"catalog={len(catalog.get(cls, {})):>4}")
 
@@ -379,6 +404,19 @@ def main():
             lines.append(f"**In catalog, not on page** ({len(only_cat)}):")
             lines.append("- " + " · ".join(only_cat))
             lines.append("")
+
+    # The DATA output. Written after the case fold above has run, so a class page's
+    # "Skin like Wood" is already reconciled with the catalog's "Skin Like Wood" and
+    # the merge downstream is not re-deciding a spelling.
+    ROWS.write_text(json.dumps({
+        cls: {
+            "served": per_class[cls]["served"],
+            "sections": per_class[cls]["sections"],
+            "spells": {name: {"level": lv, "era": era}
+                       for name, (lv, era) in sorted(per_class[cls]["page"].items())},
+        } for cls in CLASSES
+    }, indent=1, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    print(f"wrote {ROWS}")
 
     REPORT.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"\nwrote {REPORT}")

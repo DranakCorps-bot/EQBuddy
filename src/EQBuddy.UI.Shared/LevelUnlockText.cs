@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -52,7 +52,20 @@ public static class LevelUnlockText
     /// this level, plus the word that keeps spells apart from the AA rows —
     /// "Cleric spell", "Druid/Ranger spell".</summary>
     public static string SpellRowValue(SpellUnlock s) =>
-        string.Join("/", s.Classes) + " spell";
+        string.Join("/", s.Classes) + " spell" + (s.Derived ? DerivedMark : "");
+
+    /// <summary>What a row derived from a spell page says, appended to its value column.
+    ///
+    /// **It is a mark, not a filter.** David's ruling (2026-08-23) is that the class page
+    /// wins and anything taken from a spell page is FLAGGED — shown, and shown as less
+    /// certain — and Bevel's lock is "do not silently pad from spell pages". This is not a
+    /// rare footnote either: every class page on eqlwiki stops at level 50 while Legends
+    /// caps at 60, so a level-50 character's entire next-level list is derived, plus the
+    /// interior gaps (Paladin is missing seven sections; Rogue thirty-five).
+    ///
+    /// In the VALUE column, which already wraps, rather than beside the name — the name is
+    /// what a click looks up on the wiki and what the eye scans down.</summary>
+    public const string DerivedMark = " · from its spell page";
 
     /// <summary>Tooltip for a spell row: every class that gets the spell and when —
     /// "Cleric 20 · Druid 29". Catalog facts only; effect text stays on the wiki,

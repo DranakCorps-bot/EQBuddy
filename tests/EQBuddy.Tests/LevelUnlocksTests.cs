@@ -152,9 +152,31 @@ public class LevelUnlocksTests
                 Assert.InRange(c.Level, 1, 60);
             });
         });
-        // A stable anchor fact: the signature Cleric heal.
-        var ch = Assert.Single(catalog.Find("Complete Healing")!.Classes);
+        // A stable anchor fact, and it MOVED on 2026-08-23 for a reason worth recording:
+        // it was "Complete Healing", the signature classic Cleric heal, and the class-page
+        // re-source (PR 1) removed it. That is not a loss — eqlwiki's Legends-curated
+        // Cleric page does not list it at any level; its Level 39 is Promised Renewal,
+        // Sacred Word and the rest. The old catalog carried it because SPELL pages name
+        // every class that has ever had a spell, which is wider than this game. If this
+        // assertion fails again, check the class page before assuming the promotion broke.
+        var ch = Assert.Single(catalog.Find("Promised Renewal")!.Classes);
         Assert.Equal(("Cleric", 39), (ch.Class, ch.Level));
+
+        // Provenance is real and bounded: every row says where it came from, and a
+        // derived row only exists where the class page has no section for that level.
+        Assert.All(catalog.All, s => Assert.All(s.Classes, c =>
+            Assert.True(c.Source is SpellClassLevel.ClassPage or SpellClassLevel.SpellPage,
+                $"{s.Name}/{c.Class} has source '{c.Source}'")));
+        var derived = catalog.All.SelectMany(s => s.Classes).Count(c => c.IsDerived);
+        // Every class page stops at 50 against Legends' cap of 60, so derived rows are
+        // NORMAL rather than exceptional — but they are a minority, and a promotion that
+        // started deriving everything (an empty class-spells.json, say) would fail here.
+        Assert.InRange(derived, 100, catalog.All.SelectMany(s => s.Classes).Count() / 2);
+        // The three classes eqlwiki gives no spell table are absent entirely, rather than
+        // being handed one from the wider spell pages.
+        foreach (var none in (string[])["Warrior", "Monk", "Berserker"])
+            Assert.DoesNotContain(catalog.All.SelectMany(s => s.Classes),
+                c => c.Class.Equals(none, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -174,13 +196,17 @@ public class LevelUnlocksTests
         Assert.Equal("Cleric spell", LevelUnlockText.SpellRowValue(new SpellUnlock("x", ["Cleric"])));
         Assert.Equal("Druid/Ranger spell",
             LevelUnlockText.SpellRowValue(new SpellUnlock("x", ["Druid", "Ranger"])));
+        // A row the class page never listed says so rather than passing as curated
+        // (David's ruling: flagged, not filtered; Bevel: do not silently pad).
+        Assert.Equal("Cleric spell · from its spell page",
+            LevelUnlockText.SpellRowValue(new SpellUnlock("x", ["Cleric"], Derived: true)));
     }
 
     [Fact]
     public void SpellTooltipListsCatalogClassesAndNothingInvented()
     {
         Assert.Equal("Cleric 39",
-            LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find("Complete Healing")));
+            LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find("Promised Renewal")));
         // Multi-class spells list every class with its own level.
         var tip = LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find("Greater Healing"))!;
         Assert.Contains("Cleric 20", tip);

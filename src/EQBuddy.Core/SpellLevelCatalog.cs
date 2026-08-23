@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,6 +13,25 @@ public sealed class SpellClassLevel
 {
     [JsonPropertyName("class")] public string Class { get; set; } = "";
     public int Level { get; set; }
+
+    /// <summary>Where this class/level came from: <c>"class"</c> (the class page,
+    /// authoritative) or <c>"spell"</c> (derived from the spell's own page because the
+    /// class page has NO section for that level).
+    ///
+    /// **It exists so a derived row can be marked rather than hidden** — David's ruling
+    /// (2026-08-23) is that the class page wins and anything from a spell page is FLAGGED,
+    /// and Bevel's lock is "do not silently pad from spell pages". Every class page stops
+    /// at 50 against Legends' cap of 60, so a level-50 character's whole next-level list
+    /// is derived; that has to be visible.
+    ///
+    /// Defaults to <see cref="ClassPage"/> so a hand-built test catalog, and any older
+    /// SpellLevels.json, reads as authoritative rather than as a silent unknown.</summary>
+    public string Source { get; set; } = ClassPage;
+
+    public const string ClassPage = "class";
+    public const string SpellPage = "spell";
+
+    public bool IsDerived => Source.Equals(SpellPage, StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>One spell's per-class levels as eqlwiki's spell pages record them.
@@ -27,7 +46,11 @@ public sealed class SpellLevelEntry
 /// <summary>The picked classes that gain a spell at exactly one level — the spell
 /// half of a <see cref="LevelUnlockSet"/>. Classes carry the catalog's spelling
 /// for display regardless of how the caller cased its picks.</summary>
-public sealed record SpellUnlock(string Name, IReadOnlyList<string> Classes);
+/// <param name="Derived">Every class row behind this unlock came from the spell's own
+/// page rather than a class page — so the surface says so instead of presenting it with
+/// the same confidence as a curated row. False when ANY contributing class row is from a
+/// class page: a mixed unlock is answered by the authoritative half.</param>
+public sealed record SpellUnlock(string Name, IReadOnlyList<string> Classes, bool Derived = false);
 
 /// <summary>
 /// The embedded spell-level catalog (eqlwiki spells harvest, promoted by
@@ -73,11 +96,13 @@ public sealed class SpellLevelCatalog
         var unlocks = new List<SpellUnlock>();
         foreach (var s in _spells)
         {
-            var gained = s.Classes
+            var rows = s.Classes
                 .Where(c => c.Level == level
                     && classes.Contains(c.Class, StringComparer.OrdinalIgnoreCase))
-                .Select(c => c.Class).ToList();
-            if (gained.Count > 0) unlocks.Add(new SpellUnlock(s.Name, gained));
+                .ToList();
+            if (rows.Count > 0)
+                unlocks.Add(new SpellUnlock(s.Name, [.. rows.Select(c => c.Class)],
+                    Derived: rows.All(c => c.IsDerived)));
         }
         return unlocks.OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase).ToList();
     }

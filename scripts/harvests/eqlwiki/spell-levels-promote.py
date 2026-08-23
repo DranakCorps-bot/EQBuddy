@@ -1,29 +1,59 @@
 #!/usr/bin/env python3
-"""Promote per-class spell levels from the spells harvest into SpellLevels.json.
+"""Promote per-class spell levels into SpellLevels.json — CLASS pages first.
 
-The level-unlocks feature answered the ding from the AA catalog alone; this
-promotion gives it the other half — which SPELLS open up at a level. Only the
-name and the class/level rows travel: descriptions, effects, cast times stay in
-the harvest (the unlock card names the spell, the wiki explains it).
+PR 1 of Fable 5's "next-level spells by class" plan (FABLE.md). Until 2026-08-23
+this file read only `spells.json`, the harvest of individual SPELL pages. David
+ruled that eqlwiki's per-class pages win:
 
-Row discipline:
+    "Class page wins; spell pages fill gaps only where the class page has no
+     section for that level; anything sourced from a spell page is FLAGGED as
+     such."
+
+WHY THE SOURCES DISAGREE, AND WHY THE CLASS PAGE IS RIGHT
+---------------------------------------------------------
+A spell page names every class that has ever had the spell; the Legends-curated
+CLASS page names what this game gives you at that level, and carries an `era`
+field the spell pages lack. So the two disagree on MEMBERSHIP far more than on
+level: 498 rows to 7 (class-spells-report.md). Applying the ruling removes about
+a quarter of the old catalog — Velious-era ports a Legends druid never learns —
+and that is the point of it rather than a side effect.
+
+It also FIXES rows that were missing outright. The old promotion keyed each
+harvest page on its `spellname` field, which is a copy-paste artefact rather than
+a canonical name: `Healing Water` declares `spellname = Greater Healing` while
+describing a 425-point heal, so it de-duplicated away and never reached the
+catalog at all. Reading the class page settles it — the class page prints the
+name the class actually sees.
+
+THE GAP-FILLER IS LOAD-BEARING, NOT VESTIGIAL
+---------------------------------------------
+Fable's plan assumed every class page carries every level, which would mean no
+spell-page row is ever admitted. Neither half holds. **Every class page stops at
+level 50** and Legends' cap is 60, so 51-60 is derived for every class; several
+pages also have interior gaps (Paladin is missing seven sections, Rogue
+thirty-five). Those levels are answered from spell pages and MARKED, which is
+what makes them honest instead of invisible (Bevel, Helm-signed 2026-08-23: "do
+not silently pad from spell pages").
+
+The distinction that decides each row is **section, not row**: a `==Level N==`
+heading that exists and is empty is the class page SAYING you gain nothing at N,
+and must not be filled in from a wider source. Only a level with no heading at
+all is a gap.
+
+Row discipline (unchanged from the spell-page era where it still applies):
   - levels: integers 1..60 only. 0/absent is the wiki's "unknown" and never a
-    level; the two rows above 60 (Improved Invisibility to Undead 61/63) are
-    Live-era imports on the wiki page, past Legends' cap.
+    level.
   - class names: "Shadowknight" folds into "Shadow Knight" — the app's spelling
-    (QuestClassFilter.Classes); every other harvest name already matches.
-    "Beastlord" rows are kept as data even though the class picker doesn't
-    offer it yet.
-  - duplicate names (case-insensitive): the wiki holds a few spells on extra
-    pages (epic guides, "Spell: X" shells, misspelled twins) with stale levels.
-    Entries whose page_title exactly equals their name win the group — the
-    spell's own page is authoritative; remaining conflicts merge to the
-    earliest level per class (available-at means the first level you can use
-    it). Display name is the group's first case-sensitive sort.
+    (QuestClassFilter.Classes).
+  - display name: the class page's spelling wins, which also settles seventeen
+    case-only twins ("Skin like Wood" vs "Skin Like Wood").
 
 Serialization is single-line compact JSON with a fixed entry key order: the
 catalog is reviewed as a diff in knowledge-refresh PRs, and a stable shape is
 what keeps those diffs about DATA, not formatting.
+
+Inputs:  spells.json (spells-harvest.py), class-spells.json (class-spells-harvest.py)
+Output:  src/EQBuddy.Core/Data/SpellLevels.json
 """
 
 import json
@@ -36,45 +66,107 @@ OUT = HERE.parents[2] / "src" / "EQBuddy.Core" / "Data" / "SpellLevels.json"
 LEVEL_CAP = 60
 CLASS_FOLD = {"Shadowknight": "Shadow Knight"}
 
+SOURCE_CLASS = "class"
+SOURCE_SPELL = "spell"
 
-def main():
+
+def spell_page_rows():
+    """{(class, name_casefold): (level, display_name)} from the SPELL pages.
+
+    The old de-duplication is kept verbatim for the rows that still reach the
+    catalog — a spell held on extra pages (epic guides, "Spell: X" shells) whose
+    own page wins the group, remaining conflicts merging to the earliest level.
+    """
     spells = json.loads((HERE / "spells.json").read_text(encoding="utf-8"))
-
     groups = defaultdict(list)
     for s in spells:
         name = (s.get("name") or "").strip()
         if name:
             groups[name.casefold()].append(s)
 
-    entries, rows_total, dropped = [], 0, 0
+    rows = {}
     for group in groups.values():
         exact = [e for e in group if e.get("page_title") == e["name"]]
         picked = exact or group
-        levels = {}
+        display = sorted(e["name"] for e in picked)[0]
         for e in picked:
             for c in e.get("classes") or []:
                 cls = CLASS_FOLD.get(c.get("class") or "", c.get("class") or "")
                 lv = c.get("level")
                 if not cls or not isinstance(lv, int) or not 1 <= lv <= LEVEL_CAP:
-                    dropped += 1
                     continue
-                levels[cls] = min(levels.get(cls, lv), lv)
-        if not levels:
-            continue
-        entries.append({
-            "name": sorted(e["name"] for e in picked)[0],
-            "classes": [{"class": cls, "level": lv}
-                        for cls, lv in sorted(levels.items())],
-        })
-        rows_total += len(levels)
+                key = (cls, display.casefold())
+                prev = rows.get(key)
+                rows[key] = (min(prev[0], lv) if prev else lv, display)
+    return rows
 
-    entries.sort(key=lambda e: (e["name"].casefold(), e["name"]))
-    catalog = {"spells": entries}
-    OUT.write_text(json.dumps(catalog, separators=(",", ":"), ensure_ascii=False),
+
+def main():
+    classes = json.loads((HERE / "class-spells.json").read_text(encoding="utf-8"))
+    page_rows = spell_page_rows()
+
+    # class -> the levels its page HAS a section for. A class with no page at all
+    # (Warrior, Monk, Berserker) has no sections, so every spell-page row for it
+    # would be a "gap" — which is why those three are excluded outright below:
+    # the wiki says they have no spell table, and deriving them one from spell
+    # pages is exactly the invention this ruling exists to stop.
+    sections = {cls: set(v["sections"]) for cls, v in classes.items()}
+    spell_less = {cls for cls, v in classes.items() if not v["sections"]}
+
+    # name_casefold -> {"name": display, "classes": {cls: {...}}}
+    entries = {}
+
+    def put(display, cls, level, source):
+        key = display.casefold()
+        entry = entries.setdefault(key, {"name": display, "classes": {}})
+        # The class page's spelling wins the display name for the whole entry.
+        if source == SOURCE_CLASS:
+            entry["name"] = display
+        # `era` is deliberately NOT carried into the catalog. It parses cleanly now
+        # and is "Classic" on all 1,504 class-page rows — one value discriminates
+        # nothing, and a field written by a harvest and read by nothing is trap 43's
+        # mirror. Add it the day a surface shows it.
+        entry["classes"][cls] = {"class": cls, "level": level, "source": source}
+
+    # 1. Class pages, authoritative.
+    for cls, data in sorted(classes.items()):
+        for name, row in data["spells"].items():
+            lv = row["level"]
+            if 1 <= lv <= LEVEL_CAP:
+                put(name, cls, lv, SOURCE_CLASS)
+
+    # 2. Spell pages, ONLY for a (class, level) the class page has no section for.
+    derived = 0
+    for (cls, _), (lv, display) in sorted(page_rows.items()):
+        if cls in spell_less or cls not in sections:
+            continue
+        if lv in sections[cls]:
+            continue          # the class page covered this level; its answer stands
+        key = display.casefold()
+        if key in entries and cls in entries[key]["classes"]:
+            continue          # already answered for this class by its own page
+        put(display, cls, lv, SOURCE_SPELL)
+        derived += 1
+
+    out = []
+    for key in sorted(entries, key=lambda k: (entries[k]["name"].casefold(), entries[k]["name"])):
+        e = entries[key]
+        rows = [e["classes"][c] for c in sorted(e["classes"])]
+        out.append({"name": e["name"], "classes": rows})
+
+    OUT.write_text(json.dumps({"spells": out}, separators=(",", ":"), ensure_ascii=False),
                    encoding="utf-8")
-    print(f"wrote {OUT}: {len(entries)} spells, {rows_total} class-level rows "
-          f"({dropped} rows dropped: level absent/0 or past {LEVEL_CAP}, "
-          f"{len(spells) - len(entries)} harvest pages without usable rows)")
+
+    total_rows = sum(len(e["classes"]) for e in out)
+    by_source = defaultdict(int)
+    for e in out:
+        for r in e["classes"]:
+            by_source[r["source"]] += 1
+    print(f"wrote {OUT}: {len(out)} spells, {total_rows} class-level rows "
+          f"({by_source[SOURCE_CLASS]} from class pages, "
+          f"{by_source[SOURCE_SPELL]} derived from spell pages where the class "
+          f"page has no section for that level)")
+    print(f"spell-less classes excluded outright: {', '.join(sorted(spell_less))}")
 
 
 if __name__ == "__main__":
