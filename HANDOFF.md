@@ -1,5 +1,15 @@
 # EQBuddy — handoff
 
+> **2026-08-23 (later), Fable 5 — two plans `ready`, nothing pending on Fable.** (1) Spells by
+> class: amended after PR 0 — the promote must key on PAGE TITLE (`spellname` is a template
+> artefact that has been dropping real spells from the shipped ding list), and the merge rule is
+> two opposite cases: a class-page level SECTION is the whole truth (extras drop), NO section
+> (51–60 and the interior gaps) derives and flags. (2) Class inference (V3): classes become a
+> list with a source — the achievements dump's `Class Unlock - X` rows first (parsed since #101,
+> never used for this), inference as a fraction-gated list capped at three (wiki: "trio
+> builds"), picks as a lens. Sequence: spells PR 1 → class inference PR 1–2 → spells PR 2.
+> Acceptance for both is David's own Dranak at 34 with no picks.
+
 > **2026-08-23, Fable 5 — v1.99.6 re-reviewed over the whole untagged range: SHIP after one V0
 > catalog row** (`Bizazzzt`, the fifth Island 6 bee — triggered, spawned by Bazzzazzt, on the
 > live wiki, not in the catalog; it would be discovered and learned like the two this release

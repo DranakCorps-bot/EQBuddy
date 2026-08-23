@@ -17,6 +17,16 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-23
 
+- **Class inference (Fable 5): classes are a LIST with a SOURCE — the achievements dump
+  first, inference second (every qualifying class within 0.25 of the leader, at most three,
+  cited to the wiki's "trio builds"), picks as a lens that widens and never narrows;
+  `LeadMargin` deleted** · keep a single inferred class and raise the margin; let picks
+  override the dump · the dump is the game's own statement and has been parsed for two
+  releases without being used; `FABLE.md` plan.
+- **Spells by class, amended after PR 0 (Fable 5): the promote keys on PAGE TITLE, never the
+  `spellname` field; "section exists → extras drop" and "no section → derive and flag" are
+  two rules, not one** · keep `spellname` as the key · it is a copy-paste artefact that has
+  been dropping real spells from the shipped ding list; `FABLE.md` amendment.
 - **Spells by class (Fable 5): one catalog with `source` per row, not two; the class page's
   spelling wins and the page title is kept for the link; derived rows are marked dim, never
   hidden; the first promote run (~500-row diff) is human-reviewed before the harvest joins

@@ -147,6 +147,119 @@ Trap 11 and its rule that every outcome must have a way to be named; the decay a
 David can pick Druid and Monk on Dranak today and the level-35 list is correct immediately —
 the picks path works. This stub is about the app knowing without being told.
 
+### Plan — Fable 5, 2026-08-23
+
+**Shape: the character's classes become a LIST with a SOURCE, and the game's own statement
+outranks inference.** Three sources, in precedence: (1) **the achievements dump** — it names
+every class the character holds, as a fact the game wrote; (2) **inference**, now a list of
+every qualifying class rather than one winner; (3) **the Quest Tracker picks**, which stay a
+LENS the player may widen (#104, helping a friend) — never the thing that tells the app what
+the character is. `needs-david:` none; the cap is the wiki's.
+
+#### What I read, and what it changes
+
+1. **The dump already says which classes a character has.** `AchievementsImport.Parse` reads
+   `"Primary Class Unlock - Bard"` and `"Class Unlock - Berserker"` rows with a complete flag;
+   the #101 guard distinguishes the granted primary from earned unlocks — it has been reading
+   the character's class list for two releases and using it only to refuse Sky rewards. A
+   complete `Class Unlock - X` IS "this character is an X". That is better evidence than any
+   log heuristic, and it arrives by itself since 1.98.1 (`OutputfileAutoImport`). **Inference
+   becomes the fallback for players who have never dumped**, not the primary.
+2. **The cap is three, and the wiki says so:** `Character Classes` — *"EverQuest Legends also
+   allows players to mix classes, creating custom class combinations and trio builds."* Cite
+   that page in the constant's comment; we do not invent the number.
+3. **`ClassInference` already holds per-class tallies with per-class floors** (`Qualifies`:
+   ≥ 3 sightings and an ability or two distinct spells). Only `Current()` collapses them — a
+   winner-takes-all with a 2× lead margin that fails a tie on purpose. The data model is
+   right; one method is wrong.
+4. **Consumers are few and all go through two seams.** `BuffSetClassSource(s)` (picks, else
+   `[InferredClass]`) feeds `UnlockClasses`, the buff sets, the breakouts and Options on both
+   desktops; `QuestsWindow`/`InventoryView` fall back to `InferredClass` when picks are empty;
+   the phone gets `InferredClass` in the quests section only when picks are empty. Changing
+   the string to a list touches those seams and nothing else.
+5. **#120's protection survives without the margin.** A caster's single melee-ish line is one
+   sighting; the floor is three. What the margin actually protected was the alt-swap (two
+   characters in one log); decay already handles that — an old class's weight halves every
+   ten minutes and drops below the membership fraction within the hour.
+
+#### Architecture
+
+**Core — `CharacterClasses`** (new, pure): `Resolve(dumpClasses, inferred, picks)` →
+`(IReadOnlyList<string> Classes, ClassSource Source)` with `Source ∈ {Achievements, Inferred,
+Picked, Unknown}`. Precedence as above; picks never shrink the list below what the game or
+the log says, only widen it (the #104 rule), and the result is capped at three with the
+wiki citation.
+
+**Core — `ClassInference.CurrentClasses()`**: every qualifying class whose decayed weight is
+≥ `MemberFraction` (0.25) of the leader's, ordered by weight, at most three. `Current()`
+becomes `CurrentClasses().FirstOrDefault() ?? ""` for one release and is then removed;
+`LeadMargin` is deleted, its comment rewritten into `MemberFraction`'s ("a class argues for
+itself against the floors; the fraction only removes a class the log has stopped playing").
+
+**Core — `AchievementsImport.UnlockedClasses(entries)`**: the complete `Class Unlock - X` and
+`Primary Class Unlock - X` rows, primary first. Recorded per character beside the picks in the
+quest ledger (`UnlockedClasses`), written by BOTH import paths (manual and automatic — trap
+20: name the writers). `StatsSnapshot.InferredClasses` (list) replaces `InferredClass`.
+
+**Seams.** `BuffSetClassSource` returns `CharacterClasses.Resolve(...)` on both desktops;
+`QuestsWindow`/`InventoryView` fallbacks read the resolved list; `CompanionQuestSource`
+carries `Classes` + `Source` and the page prints the source word. `SurfaceParityTests` pins
+the three lanes to one `Resolve`.
+
+**Presentation (Bevel pre-design: yes).** Wherever "(inferred)" is printed today, the
+source word is printed from one `UI.Shared` table: "Warrior · Druid · Monk (from your
+achievements)" / "(inferred from your log)" / "(your picks)". The Quest Tracker picker is
+labelled as a lens, which is what Bevel already ruled it should be. **Column budgets:** the
+Progress launcher line is trap-12 territory — the class list does NOT go on it; it goes in
+the Experience room's header.
+
+#### Risks
+
+- **Trap 11, restated for a list:** every class must have a way to be named — the dump names
+  any; inference names any with signals (`ClassSignalCatalog` covers all sixteen); picks name
+  any. And a way NOT to be named: the fraction and decay.
+- **The dump is a snapshot.** A class unlocked after the last dump is missing until the next
+  one; inference still runs, so `Resolve` UNIONS dump and qualifying inferred classes rather
+  than letting the dump silence the log — capped at three, dump first.
+- **Trap 32:** the phone reads a new field; the version-reload path covers it; the old
+  `InferredClass` stays on the wire for one release.
+- **Bevel's lock** ("inferred classes in play; never fall back to the Quest Tracker filter")
+  becomes satisfiable and is honoured: picks widen, never source.
+- **#120 regression suite** stays green as written; `AlternatingTwoClassesNamesTheOneBeingPlayedAndNeverFlickers`
+  is re-expressed as "names both while both are recent, drops the stale one after decay".
+
+#### Decomposition
+
+- **PR 1 — Core:** `UnlockedClasses`, `CurrentClasses`, `CharacterClasses.Resolve`, the
+  ledger field written by both import paths; tests: the dump precedence, the union, the trio
+  cap with the wiki cited, the fraction (one stray line never qualifies; two played classes
+  both do; an hour-old alt drops), #120's cases unchanged.
+- **PR 2 — seams, both desktops + phone:** `BuffSetClassSource` → `Resolve`; fallbacks; the
+  wire field; `SurfaceParityTests`; David's own profile as the acceptance (Dranak is
+  Warrior/Druid/Monk at 34 — the Experience room must read "At level 35:" with Druid and
+  Monk spells, from his achievements dump, with no pick made).
+- **PR 3 — presentation after Bevel:** the source words, the picker as lens.
+- Sequencing: **after** the spells PR 1 lands (the list is only as good as the catalog behind
+  it), before the grouping PR 2 of that plan (which wants three classes to group by).
+
+#### Verification
+
+Unit as above. The acceptance is David's character with no picks: dump present → three
+classes from achievements; dump absent (`EQBUDDY_APPDATA` fixture) → inference lists the
+classes the fixture log plays. Both pinned in E2E through `EQBUDDY_EXPAND` facts
+(`classes=`, `classSource=`).
+
+#### Out of scope
+
+Which class is "primary" beyond what the dump says (the log cannot tell); a fourth class;
+changing `ClassSignalCatalog`; the buff-set semantics for three classes (they already take a
+list); any UI beyond the source word and the lens label.
+
+#### Decided without asking (→ `DECISIONS.md`)
+
+Dump outranks inference outranks picks; picks widen and never narrow; `MemberFraction` 0.25;
+cap three cited to the wiki; `InferredClass` kept one release for the wire.
+
 ---
 
 ## Next-level spells by class: eqlwiki disagrees with ITSELF, and we ship the losing source
@@ -384,12 +497,45 @@ Spell effect text (stays on the wiki); the AA catalog (single source, untouched)
 disciplines for the three spell-less classes; reconciling Rogue; any change to
 `AppSettings`; the Progress window layout beyond the fold.
 
+#### Amendment after PR 0 — Fable 5, 2026-08-23
+
+PR 0 reproduced the table to the row from an independent parse and corrected three things
+in this plan; the merge rule below REPLACES the one in "Architecture".
+
+1. **`Healing Water` is not a redirect.** Its page exists under that title; its
+   `spellname` field says `Greater Healing` because the template field is a copy-paste
+   artefact — PR 0 found `Circle of Butcherblock` carrying `spellname = Ring of South Ro`
+   while describing a port to Butcherblock. **The existing `spell-levels-promote.py` keys on
+   that field and then de-duplicates, so a page with a wrong `spellname` is filed under another
+   spell and DROPPED. The shipped ding list is missing real spells today** (13 of the 36
+   unmatched names, including Healing Water [Druid 34], Circle of Butcherblock [Druid 25],
+   Torbas' Poison Blast [Necromancer 49], five Bard songs). PR 1 keys on the PAGE TITLE and
+   treats `spellname` as display text only. The residue is still a conflict — we hold Greater
+   Healing at Druid 29, the class page says Healing Water at 34 — and the class page wins.
+2. **The class pages stop at level 50 and several have interior gaps** (Paladin is missing
+   seven levels; Rogue 35; Bard 4 and 14; Enchanter 49; Magician 40; Ranger 8, 23; Shadow
+   Knight 3, 25). Legends' cap is 60. So the gap-filler is **load-bearing, not vestigial**:
+   every class's 51–60 is derived, and a level-50 character's "what next" is answered entirely
+   from flagged rows. Bevel's *"do not silently pad from spell pages"* is what keeps that honest.
+3. **The merge rule, stated so the two cases cannot read alike** (they are opposite in code):
+   - **The class page HAS a `==Level N==` section for this class** → that section is the whole
+     truth for (class, N). A spell-page row naming (class, N) that the section omits is
+     **dropped** (the 498). A class-page row the catalog lacks is **added**, `source: "class"`.
+   - **The class page has NO section for N** (51–60 everywhere; the interior gaps listed) →
+     spell-page rows for (class, N) are **admitted**, `source: "spell"`, flagged derived.
+   - A level disagreement on a spell both name → the class page's level (the 7).
+   - Warrior, Monk, Berserker: no table → no spell rows either way; AAs only.
+   `class-spells-report.md` carries the coverage table so the second case is reviewable.
+
+PR 1's What's-new gains a sentence: the fix also restores spells the ding list has been
+silently missing since the spell harvest first ran.
+
 #### Decided without asking (→ `DECISIONS.md`)
 
 One catalog with provenance, not two; the class page's spelling wins and the page title is
 kept for the link; derived rows are marked dim, never hidden; the first promote run is
 human-reviewed before it joins the cadence; groups collapse by default beyond the first
-class, session-only.
+class, session-only; **the promote keys on page title, never `spellname`.**
 
 ---
 
