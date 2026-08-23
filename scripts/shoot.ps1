@@ -451,21 +451,6 @@ $Shots = [ordered]@{
     # class draws no expanders at all. A NEW name per trap 21 -- 'progress-card' and
     # 'section-progress' are both committed and both still mean the old thing.
     #
-    # PREDICTION, written before the run. Ledger classes Warrior/Druid/Monk (David's own
-    # combination), level 12 announced:
-    #   - "New at level 12" carries SIX rows: the four Class AAs in alphabetical order
-    #     (Heroic Leap/Warrior, Unbound Alacrity/Monk, Unbound Nature/Druid, Unbound
-    #     Wrath/Warrior) then the two Druid spells (Bind Affinity, Cascade of Hail).
-    #   - the preview reads "At level 15: ..." -- NO. It reads "At level 13: 3 new spells",
-    #     because with Druid in the list the next level with anything is 13 rather than 15.
-    #   - under it, THREE groups in the ledger's own order: a chevron-less "Warrior" over
-    #     "Nothing new at 13", an OPEN "Druid" holding Befriend Animal, Expulse Summoned
-    #     and See Invisible (each "Druid spell"), and a chevron-less "Monk" over "Nothing
-    #     new at 13". Druid opens because it is the first group with anything in it.
-    # The two empty groups are the point of the shot: they are what a tidy-minded refactor
-    # deletes, and on screen their absence is indistinguishable from those classes not
-    # being yours.
-    #
     # It shoots the INLINE card, not the window, and that is a finding rather than a
     # preference: the Progress WINDOW restores to a height whose body scrolls, so
     # 'progress-card' has been photographing a panel cut off mid-summary -- above the ding
@@ -473,10 +458,35 @@ $Shots = [ordered]@{
     # about 175 units (see 'theme-inline-progress'), so it is the only host that can show
     # this feature at all. Fixing the window shot is its own job; a shot that cannot reach
     # the state reads as reviewed anyway (trap 22).
+    #
+    # NO LEVEL-UP APPEND, and that is the second version of this shot. The first announced
+    # level 12 the way 'progress-card' does, which added a six-row ding list above the
+    # preview and pushed the THIRD group under the inline body's 320-unit cap -- so the
+    # committed picture ended at Expulse Summoned with no Monk in it, while the prediction
+    # below said the two empty groups were the point (found by Fable 5, v1.99.6 review;
+    # trap 44 -- the shot fitted once). The level is seeded on the LEDGER instead: the
+    # preview only needs a level to be KNOWN, not announced, so this isolates the feature
+    # and the whole split fits.
+    #
+    # PREDICTION, written before the run. Ledger classes Warrior/Druid/Monk (David's own
+    # combination) and ledger level 12, with nothing appended to the log:
+    #   - NO "New at level 12" block at all -- nothing dinged this session, and the ding
+    #     list is what just happened rather than what is remembered.
+    #   - the summary block is five lines and includes "1 mote * <rate>/hr" (the fixture
+    #     loots exactly one Mote of Infinitesimal Potential, line 1388).
+    #   - the preview reads "At level 13: 3 new spells" -- 13 rather than 15, because with
+    #     Druid in the list the next level with anything is the Druid spell tier.
+    #   - under it, THREE groups in the ledger's own order: a chevron-less "Warrior" over
+    #     "Nothing new at 13", an OPEN "Druid" holding Befriend Animal, Expulse Summoned
+    #     and See Invisible (each "Druid spell"), and a chevron-less "Monk" over "Nothing
+    #     new at 13". Druid opens because it is the first group with anything in it.
+    #   - and no scrollbar on the Progress body.
+    # The two empty groups are the point of the shot: they are what a tidy-minded refactor
+    # deletes, and on screen their absence is indistinguishable from those classes not
+    # being yours.
     'progress-next-classes' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'progress' }
-                           Append = @('You have gained a level! Welcome to level 12!')
-                           Ledger = @{ Classes = @('Warrior', 'Druid', 'Monk') }
+                           Ledger = @{ Classes = @('Warrior', 'Druid', 'Monk'); Level = 12 }
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:

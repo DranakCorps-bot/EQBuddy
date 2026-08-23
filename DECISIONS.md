@@ -397,3 +397,35 @@ one genuinely does. Each line below is a decision I made instead of a question I
   to a height whose body scrolls after ~3 lines, so `progress-card.png` has been photographing
   a panel cut off ABOVE the two lists it is named for — pre-existing, visible in the committed
   file, and filed separately rather than fixed here.
+
+## 2026-08-23 (night) — actioning Fable's third pass
+
+- **Took the blocker at face value only after checking it.** Fable said `ClassName` serialises as
+  `className` while the page reads `g.class`, and said plainly it had not run the serialiser.
+  Verified all three legs before touching anything — `JsonOpts` is CamelCase,
+  `CompanionBuffGroup` is declared `Class`, the page reads `g.class` at five sites — because a
+  bot's claim about source is a place to look. It was right in every detail.
+- **Renamed the property rather than changing the page.** Both would work and the page side is
+  new code too (so trap 32 does not bite either way). The record now matches its siblings, which
+  is the property that stops the next group record inventing a third spelling.
+- **The guard asserts the emitted JSON, not the record.** `Assert.Contains("\"class\":")` alone
+  passes on the broken payload, because `className` contains `class` — so the load-bearing line
+  is `Assert.DoesNotContain("className", json)`. Verified by running it on the pre-fix tree: 2 of
+  3 fail there.
+- **Built `WriteMobileProgressSnapshot` rather than fixing the hand-written snapshot.** The
+  cheaper move was to correct the key in my hand-typed JSON and re-run. That would have left the
+  next phone change verifiable only by a payload a human typed, which is exactly what hid this
+  one. The fixture goes through the real catalogs, `LevelUnlocks` and the real projection, and
+  asserts the shape it must carry so it cannot quietly stop carrying it (trap 22).
+- **The re-shot `progress-next-classes` drops the level-up append and seeds the ledger LEVEL
+  instead.** Fable's fix was "tall enough, or scrolled". Seeding the level is better than either:
+  the preview only needs a level to be KNOWN rather than announced, so the six-row ding list goes
+  away, all three class groups fit with no scrollbar, and the shot is about one feature instead
+  of two. Prediction rewritten before the run and matched line for line.
+- **Did NOT hold the release for the Progress window's ~203px Experience tab**, per Fable's
+  answer to question 3: it is pre-existing, its body scrolls, and the previous three releases
+  carried it. Filed with the Bevel 320-cap question beside it.
+- **Carried Fable's forward note into the class-inference V3 stub** rather than leaving it in a
+  feedback file: 1.99.6's What's-new tells a player to tick classes in the Quest Tracker, which
+  that plan makes wrong rather than merely dated. The stub now says the shipping release owes a
+  line saying so.

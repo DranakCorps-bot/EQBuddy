@@ -1,5 +1,17 @@
 # EQBuddy — handoff
 
+> **2026-08-23 (night), Claude — Fable's third pass is ACTIONED and 1.99.6 is ready to ask
+> David for.** The wire key is fixed (`CompanionUnlockGroup.Class`, matching every sibling on
+> that wire) and guarded by `CompanionWireKeyTests`, whose load-bearing line is the NEGATIVE —
+> `className` contains `class`, so the positive assertion passes on the broken payload. Verified
+> against the pre-fix tree: 2 of 3 fail there. The harness was re-run from a
+> projection-written snapshot (`ScreenshotFixtureTests.WriteMobileProgressSnapshot`, new) with
+> the prediction written first, and both halves of the defect are gone: three real headings, and
+> two non-empty groups now fold independently instead of sharing one `undefined` key. Both V0s
+> done — `progress-next-classes` re-shot with all three groups and no scrollbar, and the motes
+> heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
+> Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
+
 > **2026-08-23 (night), Fable 5 — v1.99.6 third pass (`4082209..b697bab`): SHIP AFTER ONE FIX.**
 > `CompanionUnlockGroup.ClassName` serialises as `className`; `index.html` reads `g.class` (its
 > siblings are all declared `Class`) — on a real phone the per-class headings render

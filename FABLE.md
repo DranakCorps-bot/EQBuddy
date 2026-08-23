@@ -1,4 +1,4 @@
-# Fable inbox
+﻿# Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**
 (or leave only what is still planned).
@@ -135,6 +135,12 @@ Every step is behaving as written. The output is useless.
    I supplied** ("most players have ONE picked class"); corrected in `BEVEL-FEEDBACK.md`.
 5. **Whether the picks stay at all.** If inference names three reliably, the Quest Tracker
    picker becomes a lens rather than a source — which is what Bevel already said it should be.
+6. **One shipped sentence this plan retires** (Fable 5, v1.99.6 review). 1.99.6's What's-new
+   tells a player whose classes are not showing to *"tick them in the Quest Tracker's class
+   picker"*. That is honest about today's class source and it contradicts Bevel's lock on where
+   the class should come from. When this plan lands, the advice becomes wrong rather than merely
+   dated — so the release that ships it owes a What's-new line saying EQBuddy now works the
+   classes out for itself, and the next-level fold's empty state stops naming the picker.
 
 ### Already shipped (must not be fought)
 

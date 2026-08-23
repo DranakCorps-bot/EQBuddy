@@ -172,7 +172,7 @@ public static partial class CompanionProjection
             map[CompanionSurfaces.Progress] = Fold(
                 $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}",
                 pr.NextLabel + "|" + (pr.NextGrouped ? "g" : "-") + "|" +
-                    Join(pr.NextGroups ?? [], g => g.ClassName + "=" +
+                    Join(pr.NextGroups ?? [], g => g.Class + "=" +
                         Join(g.Rows, r => r.Name) + (g.Empty is null ? "" : "!")),
                 // Coin, then the mote LADDER. It was `Wealth.MotesSummary` until
                 // 2026-08-23, which is the rate — the one value in this record that moves

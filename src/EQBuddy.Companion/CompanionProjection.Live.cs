@@ -176,7 +176,7 @@ public static partial class CompanionProjection
             NextGroups: nextGroups is null ? null :
             [
                 .. nextGroups.Select(g => new CompanionUnlockGroup(
-                    g.ClassName,
+                    g.ClassName,   // -> the wire key "class"; see CompanionUnlockGroup
                     [.. g.Rows.Take(MaxRows).Select(r => new CompanionUnlockRow(r.Name, r.Value))],
                     g.IsEmpty && next is { } lv ? LevelUnlockGroups.NothingNew(lv.Level) : null)),
             ],

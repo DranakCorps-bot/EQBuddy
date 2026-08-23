@@ -398,8 +398,15 @@ public sealed record CompanionProgressSection(
 /// class that gains nothing shows — a class row is KEPT rather than dropped (Bevel,
 /// Helm-signed), because on screen a missing group is indistinguishable from that class
 /// not being one of yours.</summary>
+/// <param name="Class">Named <c>Class</c>, not <c>ClassName</c>, and that is load-bearing:
+/// <see cref="CompanionSnapshot.JsonOpts"/> is camelCase, so the property name IS the wire
+/// key. It shipped once as <c>ClassName</c> — reaching the page as <c>className</c> while
+/// every other group record on this wire (<see cref="CompanionBuffGroup"/>, the quest group)
+/// says <c>class</c> — so the page's <c>g.class</c> was <c>undefined</c> on a real phone: a
+/// heading reading "▾ undefined", and one open/shut state shared by every group because they
+/// were all keyed on the same <c>undefined</c>. `CompanionWireKeyTests` is the guard.</param>
 public sealed record CompanionUnlockGroup(
-    string ClassName, IReadOnlyList<CompanionUnlockRow> Rows, string? Empty);
+    string Class, IReadOnlyList<CompanionUnlockRow> Rows, string? Empty);
 
 /// <summary>One tab, already labelled and badged by Core + UI.Shared. <see cref="Key"/> is
 /// the stable wire key, so a device's saved tab survives a rename of the label.</summary>

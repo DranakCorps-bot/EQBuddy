@@ -108,6 +108,78 @@ public class ScreenshotFixtureTests
         Directory.Delete(dir, true);
     }
 
+    /// <summary>
+    /// The Progress theme's snapshot for the mobile harness — specifically the next-level
+    /// split, which is the one half of that feature with no automated guard.
+    ///
+    /// **It exists because the manual check that passed was the wrong shape.** The split
+    /// was verified by driving the shipped page against a snapshot typed BY HAND, so it
+    /// exercised the page against a payload the server never sends — and the wire key was
+    /// wrong (`className` where the page reads `class`), which the hand-written snapshot
+    /// could not possibly reveal. Found by Fable 5 in the v1.99.6 review. Everything here
+    /// goes through the real catalogs, the real <see cref="LevelUnlocks"/> and the real
+    /// projection, so the JSON the harness loads is byte-identical in shape to a phone's.
+    ///
+    /// Warrior/Druid/Monk at level 12 — David's own combination, and the one that shows
+    /// all three rules at once: two classes with nothing, one with three spells.
+    ///   dotnet test --filter FullyQualifiedName~ScreenshotFixture -e EQBUDDY_SHOOT=1
+    /// </summary>
+    [Fact]
+    public void WriteMobileProgressSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+
+        var now = new DateTime(2026, 8, 23, 21, 12, 0);
+        string[] classes = ["Warrior", "Druid", "Monk"];
+        const int level = 12;
+
+        var stats = new StatsSnapshot
+        {
+            CurrentZone = "West Commonlands",
+            Elapsed = TimeSpan.FromHours(2),
+            XpPercent = 16.0,
+            XpPerHour = 14.2,
+            XpPerActiveHour = 14.2,
+            AaGained = 1,
+            AaTotal = 8,
+            AaPerHour = 0.5,
+            HoursToLevel = 7.0,
+            // So the Experience room's mote line has something to say — the other half
+            // of what shipped that day, and it is drawn by the same body.
+            Loot = [new LootDetail("Mote of Lesser Potential", 3, "a ghoul")],
+        };
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Progress],
+            Stats = stats,
+            Level = level,
+            Unlocks = LevelUnlocks.UnlocksAt(classes, level),
+            UnlockClasses = classes,
+            NextUnlocks = LevelUnlocks.Next(classes, level),
+            Theme = CompanionTheme.Project("midnight",
+                EQBuddy.UI.Shared.CustomTheme.PaletteFor(new AppSettings { Theme = "midnight" })),
+        }, now);
+
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_OUT")
+            ?? Path.Combine(Path.GetTempPath(), "eqbuddy-mobile-progress.json");
+        File.WriteAllText(outPath, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // The shape the harness is about to be judged on, asserted here so a fixture that
+        // silently stops carrying the feature fails rather than photographing an empty
+        // room (trap 22). Three groups, two of them empty, Druid opening.
+        var progress = Assert.IsType<CompanionProgressSection>(snap.Progress);
+        Assert.Equal("At level 13: 3 new spells", progress.NextLabel);
+        Assert.Equal(classes, progress.NextGroups!.Select(g => g.Class));
+        Assert.True(progress.NextGrouped);
+        Assert.Equal(1, progress.NextOpenIndex);
+        Assert.Equal(3, progress.NextGroups![1].Rows.Count);
+        Assert.Equal("Nothing new at 13", progress.NextGroups![0].Empty);
+        Assert.Equal("3 motes · 1.5/hr", progress.MoteLine);
+    }
+
     /// <summary>The quest surface's snapshot for the mobile harness and the README
     /// shots: the REAL embedded catalog (all ~1,200 quests, so the shot carries the
     /// real search index and its real weight), a real ledger taught by real calls,
