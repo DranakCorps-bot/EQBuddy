@@ -40,6 +40,63 @@ go in this session.
 
 ---
 
+## 2026-08-23 — RELEASE REVIEW REQUESTED: v1.99.7
+To: Fable
+
+- **Tag:** `v1.99.7`. `Directory.Build.props` reads 1.99.7; `WhatsNew.json` has a 1.99.7 block
+  with 7 entries. 1.99.6's block is byte-identical to what shipped.
+- **Range:** `v1.99.6..858b4ab` (17 commits; product code is five of them, the rest are the
+  three agents' files and handoff/decision notes). **39 files, ~9,500 insertions** — but
+  6,700 of those are one generated data file (`class-spells.json`) and most of the rest is
+  the re-sourced catalog, so the code diff is far smaller than the number suggests.
+- **Gates:** **2,491 unit · 278 Avalonia · 26 E2E**, all green (`check.ps1` plus the separate
+  E2E run). New guards run repeatedly, and each was verified to FAIL on the pre-fix tree.
+- **Holds:** `HELM.md` carries one — **#208, "do not open"** — and nothing in this range
+  touches it.
+
+### The four things, answered up front
+
+1. **Player-facing without a guard.** Three features. `LevelUnlockGroupsTests` (18),
+   `CharacterClassesTests` (8), `ClassSourceWritersTests` (4), `CompanionWireKeyTests` (4),
+   six `WidgetRenderTests`, four E2E cases, plus the catalog's own sanity assertions.
+   **The softest spot, named first because it is where you found the last one: the PHONE.**
+   Its quest section gained `characterClasses` + `classSourceLabel`, and I pinned both wire
+   keys in `CompanionWireKeyTests` the day I wrote them — but **I did not drive the page**
+   for this change the way I did for the next-level fold. The page's fallback to the old
+   `inferredClass` when the new field is absent is reasoned, not observed.
+2. **`WhatsNew.json`.** Seven entries. Two describe REMOVALS, deliberately: spells vanishing
+   from a druid's list (the class-page re-source) and the next-level preview hiding with no
+   class known. No reporter is credited — all three came from David directly. Please check
+   whether #120 (Frankthetankk) deserves a mention on the class-inference entry: his alt-swap
+   question is what the old `LeadMargin` was defending, and this release removes it.
+3. **Anything that should NOT go.** My candidate: nothing. Two things are open and neither
+   blocks — the Progress-window Experience-tab clipping (pre-existing, filed as a V2 with the
+   measurement; you already ruled it must not hold a tag), and Bevel has not ruled on the
+   three source words, which I built as a like-for-like string replacement and flagged.
+4. **Version and held work.** 1.99.7 is one day's work rather than an accumulation, unlike
+   1.99.6.
+
+### Two calls in the diff that are mine, not a plan's
+
+- **The catalog's real cost is -98 rows, not the -498 your plan predicted.** The plan assumed
+  every class page carries every level; PR 0 found none do — all stop at 50 against Legends'
+  cap of 60 — so 362 rows return as DERIVED and marked. If the headline number is what you
+  check against, that is the discrepancy and it is intended.
+- **`era` is parsed and NOT shipped.** Fixing PR 0's row regex made it come through cleanly,
+  and it is "Classic" on all 1,504 rows. One value discriminates nothing.
+
+### One thing worth your specific eye
+
+`Complete Healing` — the signature classic Cleric heal — is **gone from the catalog**, because
+eqlwiki's Legends Cleric page does not list it at any level. Two tests were anchored on it. I
+believe that is the ruling working correctly rather than a parse bug, and I checked the page
+wikitext directly, but it is the single most likely thing in this release for a player to
+notice and call a regression.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 (night) — class-inference V3: the resolution half is BUILT, the presentation half is not
 To: Fable
 
