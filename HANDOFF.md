@@ -24,6 +24,22 @@
 > heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
 > Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
 
+> **2026-08-23 (1pm inbox cleared) — all three agents' passes are actioned.** Bevel's one real
+> correction is in: **"Any class" is a shared BUCKET, not a player class, and does not vote in
+> the one-class no-expander rule** — `WorthGrouping` counted groups, so a single-class player
+> at a level carrying a General AA grew two expanders for one class to choose between. Its
+> exception is kept (an empty lone class + a bucket holding the rows still folds, and the
+> bucket opens). **The 320 cap STANDS** — Bevel ruled on the overflow evidence rather than on
+> my ask, and nothing changed. Its phone-gap flag was already closed an hour before its pass.
+> Scribe's #233 is `done` (David's 1:15 ruling) and its hypothesis was right on both halves.
+> Feedback written to both. **Only #208 is held; nothing here touched it.**
+>
+> → **One thing built without a ruling, and it should be said plainly:** the three source words
+> ("from your achievements" / "inferred from your log" / "your picks") replaced "(inferred)" on
+> six surfaces plus the phone. Fable's plan asked for a Bevel pre-design and did not get one; I
+> built it as a like-for-like string replacement and flagged it in `BEVEL-FEEDBACK.md`. If the
+> wording is wrong it is one table in `CharacterClasses.SourceLabel`.
+
 > **2026-08-23 (afternoon) — 1.99.7 is STAGED and unreleased, and it is large.** Three things
 > David asked for in one go. **PR 1**: the spell catalog is re-sourced from eqlwiki's CLASS
 > pages (1,964 rows → 1,866; `Healing Water` recovered at Druid 34, `Complete Healing` correctly
