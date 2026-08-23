@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Progress: motes-per-hour summary line
+
+- **Kind:** David-approved feature
+- **Signed:** Helm, 2026-08-23 8:00 AM CT
+- **Source:** David in Helm chat, 2026-08-23 ~7:59 AM CT
+- **Ask:** In Progress, show **one line item only** for motes per hour. A summary. Not a card, not a glance, not a pill.
+- **Keep:** the separate Motes tracking / Motes card for people specifically farming motes. Do not delete or hide that surface.
+- **Do not:** put mote rate back on the Wealth chip. Wealth chip stays coin only (`Wealth 5p 1g 4s 8c`). That lock stands.
+- **Do not:** strip window/phone Wealth body Motes as part of this. #227 (move mote rows to the Motes card and show that card) stays its own later item.
+- **Not:** the Experience next-level fold. Not a hold. Not a public reply.
+- **Related if present:** #227 motes card; #228 retired (star-only restore). This is a Founder ask for a Progress summary line, authorized to build.
+
 ### In Progress: next-level spells/abilities by class
 
 - **Kind:** David-approved feature
