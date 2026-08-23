@@ -17,6 +17,12 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-23
 
+- **VETOED nothing — but recorded because David decided it in session:** when eqlwiki's class
+  page and its spell pages disagree about a spell's level, **the class page wins and spell
+  pages fill gaps only where the class page has no section**, with anything derived flagged as
+  such · class-page-only, or keeping the spell-page harvest and patching the gaps · found from
+  Druid 34: class page 5, our catalog 10, missing `Healing Water` and padded with five ports.
+  `FABLE.md` stub, 2026-08-23.
 - **Bzzazzt is catalogued with eqlwiki's 12-hour clock, NOT as triggered — against what the
   reporter asked for** · mark both new bees triggered as #109 requested · the wiki is the
   tie-breaker and its reason holds independently (a chain's opener cannot itself be

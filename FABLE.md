@@ -61,6 +61,95 @@ next loop, not a reopening of the plan.
 
 ---
 
+## Next-level spells by class: eqlwiki disagrees with ITSELF, and we ship the losing source
+To: Fable
+
+- **Priority:** `ready` — David routed it here himself (2026-08-23, asked with the question
+  tool) after the evidence below came out of a five-minute check. He also settled the one
+  question a plan would otherwise exist to answer; see **Decided by David** below.
+- **Class:** `V2`. Not V0–V1 because it is **two overlapping sources of one fact**, and the
+  catalog that loses is already shipping on a surface players use. Fixing it in place changes
+  the "New at level N" ding list; adding a second catalog is trap 4 by construction. Neither
+  is the executor's call.
+- **Source:** David in Helm chat, 2026-08-23 ~7:20 AM CT; filed by Scribe 7:23 AM (Helm-signed).
+  The Scribe item stays where it is and points here.
+
+### The ask, which is mostly built already
+
+*"On In Progress, show the spells and abilities the character gets at the next level… derived
+from their class pages on EQL Wiki… group them by class so I can expand / minimize whichever
+I prefer to see."* His example: a level 33 Druid who does not know what he gets at 34.
+
+**What exists:** `LevelUnlocks.Next(classes, afterLevel)` already answers this, the Progress
+Experience room already renders it ("At level 34: 2 new AA abilities, 3 new spells") behind
+one fold, and `UnlockClasses` already uses the inferred/picked classes. `SpellUnlock` carries
+its classes, so grouping is a presentation change. **On the face of it this is a V1.**
+
+### Why it is not — the evidence, gathered 2026-08-23
+
+`SpellLevelCatalog` is harvested from **individual spell pages**
+(`scripts/harvests/eqlwiki/spell-levels-promote.py`). David asked for **class pages**. Those
+are not two routes to one answer:
+
+| Druid, level 34 | Count | Contents |
+|---|---:|---|
+| eqlwiki **Druid class page**, `==Level 34==` | 5 | Endure Magic · Healing Water · Regeneration · Strength of Stone · Zephyr: North Karana |
+| **Our catalog** (spell pages) | 10 | the four in bold above **minus Healing Water**, plus Circle of Iceclad · Circle of Ro · Circle of the Combines · Ring of Great Divide · Ring of Iceclad · Succor: Butcher |
+
+Both directions are wrong, which is what makes it a reconciliation rather than a fix:
+
+- **`Healing Water` is not in our catalog at ALL** — no row of that name, any class, any level.
+  The class page has it at Druid 34 with description text.
+- **Five of our six extras appear NOWHERE on the Druid class page** (checked by name across all
+  3,682 lines): Circle of Ro, Ring of Iceclad, Circle of Iceclad, Circle of the Combines, Ring
+  of Great Divide. Each one's OWN spell page says Druid 34, so the harvest is not inventing
+  them. `Succor: Butcher` is on the page, under a different level.
+
+So a 33 Druid asking "what do I get at 34" would be shown a list **missing one spell and padded
+with six he cannot buy** — on a feature whose entire value is being right about a number he
+cannot check without leaving the app.
+
+**Helm read the class page correctly and named all five.** The disagreement is eqlwiki's, not
+Helm's, and it was invisible until someone compared the two sources on one level of one class.
+
+### Decided by David, 2026-08-23 — do not re-open
+
+**Class page wins; spell pages fill gaps only where the class page has no section for that
+level; anything sourced from a spell page is FLAGGED as such** so a player can tell curated
+from derived. He was offered class-page-only and keep-spell-pages and took neither.
+
+### What a plan has to settle
+
+1. **One catalog or two.** Re-sourcing `SpellLevelCatalog` changes the ding list ("New at level
+   N") on surfaces that already ship; a second catalog puts one fact in two files, which is
+   trap 4 and which this repo has paid for before. There is a third shape — one catalog, two
+   provenance values per row — and it is probably the answer, but it is a schema change.
+2. **How wide the disagreement is.** One class, one level was enough to justify the work; it is
+   not enough to size it. A read-only diff script over all sixteen class pages versus the
+   current catalog would say whether this is a handful of ports or thousands of rows, and it is
+   the cheapest first PR (the spawn-timer plan's "PR 0 is a flags-only script" shape).
+3. **Whether AAs have the same split.** `AaCatalog` is harvested separately and the ask covers
+   "spells and abilities". Unchecked.
+4. **The grouping UX**, which is the part David actually asked for and the only player-visible
+   half: group by class, each group independently expandable. Both desktops and — decide —
+   EQBuddy Mobile, whose Progress surface has a "New at level" line Bevel has an unruled item
+   about.
+
+### Already shipped (must not be fought)
+
+`SpellLevelCatalog`, `AaCatalog`, `LevelUnlocks.UnlocksAt`/`Next`, `LevelUnlockText`, the
+Experience room's existing ding list and next-level fold, `AppSettings.ShowNextUnlocks`, and
+the rule that a spell row never invents effect text — names and levels only, prose stays on
+the wiki.
+
+### Checked
+
+The three catalog counts above, by parsing `SpellLevels.json` directly; the Druid class page
+fetched raw from eqlwiki and read section by section; each of the six extras searched across
+the whole page. **Not checked:** any class but Druid, any level but 34, and the AA side.
+
+---
+
 ## A way for players to feed VERIFIED spawn-timer updates to eqlwiki
 
 - **Priority:** `ready` — David's own answer, 2026-08-22, asked with the question tool. He was

@@ -19,6 +19,15 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ### In Progress: next-level spells/abilities by class
 
 - **Kind:** David-approved feature
+- **STATUS: ROUTED to `FABLE.md` as a V2, 2026-08-23 (David's own call, asked with the question
+  tool).** Not because the UX is hard — the grouping is a presentation change and
+  `LevelUnlocks.Next` already answers the question — but because checking the ask against the
+  data found that **eqlwiki disagrees with itself**. The Druid class page's `==Level 34==` lists
+  five spells; our catalog is harvested from individual SPELL pages and has ten: it is missing
+  `Healing Water` entirely and adds five ports that appear nowhere on the class page. A 33 Druid
+  would have been shown a list missing one spell and padded with six. That is two overlapping
+  sources of one fact, on a catalog that already drives the shipped "New at level N" list —
+  a reconciliation, not a feature. David has already settled which source wins; the stub says so.
 - **Signed:** Helm, 2026-08-23 7:21 AM CT
 - **Source:** David in Helm chat, 2026-08-23 ~7:20 AM CT
 - **Ask:** On In Progress, show the spells and abilities the character gets at the **next level**.

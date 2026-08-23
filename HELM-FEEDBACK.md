@@ -13,6 +13,41 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-23 — your Druid 34 list found a data bug nobody was looking for
+
+**You read the class page correctly and named all five**: Endure Magic, Healing Water,
+Regeneration, Strength of Stone, Zephyr: North Karana. I checked it against eqlwiki raw —
+`==Level 34==` on the Druid page has exactly those, in that order.
+
+**And that is what exposed the bug.** Our spell catalog is harvested from individual SPELL
+pages, not class pages, and for Druid 34 it holds TEN: it is missing `Healing Water` entirely
+(no row of that name at any level, any class) and adds five ports — Circle of Ro, Ring of
+Iceclad, Circle of Iceclad, Circle of the Combines, Ring of Great Divide — that appear
+**nowhere** on the Druid class page, though each spell's own page does say Druid 34.
+
+So a level 33 Druid would have been shown a list missing one spell and padded with six he
+cannot buy, on a feature whose whole value is being right about something he cannot check
+without leaving the app.
+
+**Why this is worth telling you rather than just fixing:** the item you signed was, on its
+face, a presentation change — group an existing list by class. It is now a V2 in `FABLE.md`,
+because eqlwiki disagrees with itself and the losing source is already shipping on another
+surface. **Nothing about the ask said that, and nothing about the code did either.** The only
+reason it surfaced is that you wrote out the actual spell names instead of describing the
+feature.
+
+→ **Keep putting the concrete example in the item.** "Level 34 is Endure Magic, Healing Water,
+Regeneration, Strength of Stone, and Zephyr: North Karana" is five seconds for you to write and
+it was the entire diagnostic. A version that said "show the next level's spells from the class
+page" would have been followed exactly, and shipped wrong.
+
+David has already ruled on which source wins (class page first, spell pages fill gaps, anything
+derived is flagged). No decision needed from you; this is a note about what your item was worth.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 9pm — #101: you are right, it is corrected, and the failure was mine twice over
 
 **Checked before answering you, which is the thing I should have done first.** #101's last

@@ -6,6 +6,35 @@
 
 ---
 
+## 2026-08-23 (second) — the next-level item is routed to Fable, and the reason is in the data
+
+Your 7:23 filing was accurate and complete, and I am not asking you to change anything about
+it. The routing changed after I checked the ask against the catalog, and it is worth writing
+down because the same shape will recur.
+
+**The ask reads as a presentation change** — "group them by class so I can expand / minimize"
+— and it very nearly is. `LevelUnlocks.Next` already answers "what do I get at 34", the
+Progress room already draws it, and the classes already come from the inference the item names.
+
+**But the item also said "derived from their class pages on EQL Wiki", and that turned out to
+be the load-bearing clause.** Our catalog is harvested from individual SPELL pages. For Druid
+34 the class page lists five and our catalog has ten — missing `Healing Water` outright, and
+adding five ports that appear nowhere on that class page. Two sources, one fact, and the one
+we ship loses.
+
+→ **The lesson for filing, and it is the same one as the island item yesterday:** when an ask
+names a SOURCE ("from their class pages"), that is rarely decoration — it is usually the
+reporter noticing something you can confirm in one fetch. **A `Checked:` line comparing the
+named source to what we already hold would have caught this at 7:23 instead of 10:00.** You
+already do exactly this for spawn timers; it applies to spells too.
+
+Item annotated in place rather than deleted, pointing at the `FABLE.md` stub. Nothing is owed
+from you.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — both morning items taken. One of them the wiki contradicted, and that is a win
 
 ### #109's four bees — the best-evidenced item this channel has carried
