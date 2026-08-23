@@ -685,8 +685,11 @@ the prediction written first, landing with the What's-new line the WPF half alre
 **Nothing blocks it now** — `EveryHostGetsItsOwnProgressSurfacesAndTwoCanLiveAtOnce` is the
 proof that two live hosts no longer collide.
 
-**One human step the plan asked for and no test can do:** on Linux or macOS, expand Progress,
-pop out, close, expand, change tab in the window, close, expand.
+**One human step the plan asked for and no test can do:** expand Progress, pop out, close,
+expand, change tab in the window, close, expand. **Runnable HERE — it does not need a Linux
+machine** (Fable, 2026-08-23): the Avalonia build runs on Windows, which is how trap 13's
+two-builds-one-profile was found. Correcting this because it had been written as "nobody can
+do it", which is how a cheap check becomes a permanent open item.
 
 ## Inline themes — expand in place, pop out on request
 
