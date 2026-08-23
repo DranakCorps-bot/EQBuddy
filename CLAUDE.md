@@ -264,6 +264,27 @@ hook or a routine firing on a file change must not take work from these files �
 the item is labelled. An interactive session is the transition; a cron tick is not. The rule
 was always about unattended agents, never about David having to say "go" each time.
 
+### When the three of them actually run (David, 2026-08-22, confirmed)
+
+**Scribe 6am · Bevel 1pm · Helm 8pm, daily.** The inbox files stamp CT and so do these.
+This was an open question for several sessions and it is worth having, because everything
+above is written as if the files might change under you — and now you know *when*.
+
+- **Their commits land between your pulls, not during your session.** `git pull` at the start
+  of a session and again **before any public reply**, which is the rule `HELM.md` already
+  states and the reason it states it. On 2026-08-22 a session opened with local `main` four
+  commits behind: a #228 hold had been LIFTED at 8pm and the working tree still described it
+  as live.
+- **Helm is LAST.** So a Scribe item filed at 6am can be signed, contested or held nine hours
+  later the same day, and a hold that arrives at 8pm lands on work that felt settled all
+  afternoon. Anything you are about to post late in the day is the most likely thing to have
+  a ruling waiting on it.
+- **A question you write into a `*-FEEDBACK.md` is answered on that agent's NEXT run**, not
+  in this session. Tell David what you asked and for whom, so he knows what is in flight —
+  he is the courier for Helm in both directions regardless.
+- **The times do not authorise anything.** A run is an agent writing a file; taking work still
+  needs an interactive session, exactly as above.
+
 ## Helm
 
 **Chief of staff / COO, and the one agent whose file is STATE rather than a work queue.**

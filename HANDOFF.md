@@ -24,7 +24,48 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 (LATEST — start here): 1.99.5 SHIPPED. Two builds ready, two waits on Helm
+## 2026-08-22 evening (LATEST — start here): the two Helm waits are GONE, and neither was ours to post
+
+**A survey pass, no code changed.** The one thing that moved is the thing the last session was
+blocked on.
+
+### Helm lifted #228 at 8pm — and the reply is SCRIBE'S, not yours
+
+`HELM.md` now carries #228 under **Retired**. David ruled star-only is enough, which is the
+second lifting condition the hold itself named. Helm's words in `HELM-FEEDBACK.md`: *"Scribe
+posts the player reply, not you… Do not post anything yourself on #228."* The drafted reply
+from the last two sessions therefore never goes out under our signature. **#226's global-ignore
+thank-you is Scribe's too**, signed the same evening.
+
+→ **The only live hold left is #208 — do not open the work.** Talking to sbaum23 is not held.
+
+### The lift arrived by COMMIT, and local `main` was four behind when this session opened
+
+`git status` said "working tree clean" and it was; `git log` said 1.99.5 and it was. Both were
+useless, because the four commits that mattered were on `origin`. **`git pull` is the first
+move of a session and the move before any public reply**, which is what `HELM.md` has said all
+along. The new cadence block in `CLAUDE.md` says when they land: **Scribe 6am, Bevel 1pm, Helm
+8pm** (David confirmed the times, 2026-08-22). Helm runs LAST, so the ruling on a thing that
+felt settled all afternoon arrives after dinner.
+
+### Pending on us, verified against the source this pass
+
+1. **The `/consider` wiki half** (V1, unparked by David, wiki half only). Still unbuilt — the
+   con-rarity fact is parsed but private to `SpawnTimers._rareConsidered`, so nothing outside
+   can ask the question. Lifting it is the first step.
+2. **Fable PR A — the Avalonia `IWidgetCard` seam** (`ready`). Unblocks inline-themes parity.
+3. Three more `ready` Fable plans: **spawn timers → eqlwiki**, **the pack reads history**,
+   **Inline themes**.
+4. **`DeadHelperTests`** — the dead helpers themselves are already gone (`NamedMobHeuristic.cs`
+   keeps only the comment); what is deferred is the curated-`Known`-list scan.
+
+**Already done, found by checking rather than by trusting the list:** Bevel's "polish, not a
+hold" tooltip on the Drops heading ships in BOTH UIs (`DropsCardView.cs`, WPF and Avalonia).
+**#65 needs no reply** — Frankthetankk closed it out himself on Aug 20 and moved item 4 to #217.
+
+---
+
+## 2026-08-22: 1.99.5 SHIPPED. Two builds ready, two waits on Helm (historical)
 
 **v1.99.5 is released** — Latest, four assets, signed `Valid` + timestamped, OneDrive 18:54,
 installed locally. Gates at tag: **2,365 unit · 271 Avalonia · 24 E2E.** Both gates ran first

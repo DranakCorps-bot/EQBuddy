@@ -17,6 +17,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **The agent run cadence (Scribe 6am · Bevel 1pm · Helm 8pm) goes in `CLAUDE.md`, beside the
+  "inboxes inform you" boundary, not in `HANDOFF.md` or an agent's own section** · a handoff
+  note, or three lines one per agent · it changes what you do at the START of every session
+  (pull first; Helm rules last), which is what `CLAUDE.md` is for; commit this one.
+- **A Bevel item that turns out to be already shipped is marked DONE in place, not deleted**
+  · the take-then-delete contract says delete · the wrong-article item's body is mostly
+  *do-not* rulings ("two failures must not look alike", Copy stays off), and deleting the
+  item would take the standing constraints with it; `BEVEL.md`, verified against
+  `DropsCardView.cs` in both UIs.
 - **Spawn timers → eqlwiki: the paste target is the creature's `respawn_time` field, not the
   `Respawn Timers` list page; the bar is 3 cycles within ±15 % of the median; the median is
   suggested and variance never is; the ledger keeps the last 20 cycles; PR 0 is a flags-only
