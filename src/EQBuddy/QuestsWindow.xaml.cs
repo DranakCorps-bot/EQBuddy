@@ -50,6 +50,7 @@ public partial class QuestsWindow : Window
         _modes = new EqSegmentedStrip(ModeStrip);
         BuildStaticChrome();
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
+        SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
         BuildClassChecks();
         EraCombo.Items.Add("Any era");
         foreach (var era in QuestEraLadder.Eras) EraCombo.Items.Add($"≤ {era}");
@@ -322,6 +323,7 @@ public partial class QuestsWindow : Window
         // The Epic tab's own lens, which followed the Epic card here when the widget
         // consolidated its quest cards (2026-08-16).
         EpicClassicOnlyCheck.Visibility = _tab == QuestTab.Epic ? Visibility.Visible : Visibility.Collapsed;
+        SkyIslandRepeatCheck.Visibility = _tab == QuestTab.Sky ? Visibility.Visible : Visibility.Collapsed;
         ClassBtn.Visibility = Visibility.Visible;
         FilterRow.Visibility = Visibility.Visible;
         // A checklist has nothing to select, so the pane would only ever be empty. Give
@@ -400,6 +402,17 @@ public partial class QuestsWindow : Window
     private void OnEpicClassicOnlyToggled(object sender, RoutedEventArgs e)
     {
         _settings.EpicQuestClassicOnly = EpicClassicOnlyCheck.IsChecked == true;
+        _settings.Save();
+        Refresh(force: true);
+    }
+
+    /// <summary>The Sky tab's island lens. Persisted for the same reason the Epic one is:
+    /// EQBuddy Mobile's Sky tab reads the same setting, so the phone and the desktop group
+    /// one checklist one way (#210's rule — a surface that shows the same list differently
+    /// is the drift SurfaceParityTests exists to stop).</summary>
+    private void OnSkyIslandRepeatToggled(object sender, RoutedEventArgs e)
+    {
+        _settings.SkyStepsUnderEveryIsland = SkyIslandRepeatCheck.IsChecked == true;
         _settings.Save();
         Refresh(force: true);
     }
@@ -1523,7 +1536,8 @@ public partial class QuestsWindow : Window
         var groups = tab == QuestTab.Epic
             ? QuestChecklistLayout.Epic(_settings.EpicQuestChecklist
                 .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic))
-            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted);
+            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
+                _settings.SkyStepsUnderEveryIsland);
 
         var setters = tab == QuestTab.Epic
             ? _settings.EpicQuestChecklist.ToDictionary(i => i.Id, i => (Action<bool>)(done =>
@@ -1661,8 +1675,24 @@ public partial class QuestsWindow : Window
             }
             else QuestsPanel.Children.Add(headingText);
 
+            // Island sub-headings (David, 2026-08-23, from a Reddit ask): "a player should
+            // see the work for one island together, not a flat list that jumps islands."
+            // Core hands the rows over already ordered and already labelled, so this draws a
+            // heading whenever the label changes and owns no grouping logic of its own —
+            // which is the only reason three surfaces can agree about it (#184).
+            var lastIsland = "";
             foreach (var row in group.Rows)
             {
+                if (row.IslandHeading.Length > 0 && row.IslandHeading != lastIsland)
+                {
+                    lastIsland = row.IslandHeading;
+                    var island = DesignSystem.Text(Role.Caption, row.IslandHeading);
+                    island.FontWeight = FontWeights.SemiBold;
+                    island.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceS,
+                        0, DesignTokens.SpaceXxs);
+                    island.Ink("DimBrush");
+                    QuestsPanel.Children.Add(island);
+                }
                 var text = DesignSystem.Text(Role.Body, "");
                 text.TextWrapping = TextWrapping.Wrap;
                 text.Inlines.Add(new System.Windows.Documents.Run(row.Title));

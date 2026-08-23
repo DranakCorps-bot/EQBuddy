@@ -109,6 +109,16 @@
                           Content="Classic-doable only"
                           Foreground="{DynamicResource DimBrush}"
                           ToolTip="Show only the Epic steps that can be finished in the classic era"/>
+                <!-- The Sky tab's own lens, same rule and same column as the Epic one above:
+                     a tab-scoped view choice belongs on the tab, not in Options. -->
+                <CheckBox x:Name="SkyIslandRepeatCheck" Grid.Column="3"
+                          VerticalAlignment="Center" Margin="{DynamicResource GapS}"
+                          FontSize="{DynamicResource FontCaption}"
+                          Visibility="Collapsed"
+                          Checked="OnSkyIslandRepeatToggled" Unchecked="OnSkyIslandRepeatToggled"
+                          Content="Repeat multi-island steps"
+                          Foreground="{DynamicResource DimBrush}"
+                          ToolTip="Some Sky pieces drop on several islands. Off: each is listed once, under &quot;Several islands&quot;. On: each appears under every island it drops on, so one island's list is complete — the same step then shows more than once."/>
                 <Popup x:Name="ClassPopup" PlacementTarget="{Binding ElementName=ClassBtn}"
                        Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
                     <Border Background="{DynamicResource PopupBrush}"

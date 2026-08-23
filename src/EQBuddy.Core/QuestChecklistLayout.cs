@@ -9,7 +9,15 @@ public sealed record QuestChecklistRow(
     string Title,
     string Detail,
     bool Acquired,
-    bool Unassigned);
+    bool Unassigned,
+    /// <summary>Which island heading this row sits under — <see cref="SkyIslands.Heading"/>,
+    /// <see cref="SkyIslands.SeveralHeading"/> or <see cref="SkyIslands.AnywhereHeading"/>.
+    /// Empty on Epic rows, which have no islands.
+    ///
+    /// Rows arrive already ORDERED by it, so a surface draws a heading whenever this changes
+    /// from the previous row and needs no grouping logic of its own — the same reason the
+    /// rows themselves come pre-ordered (#184).</summary>
+    string IslandHeading = "");
 
 /// <summary>A group of rows under one heading, with the state of the reward as a whole.</summary>
 /// <param name="Title">The reward (Sky) or section (Epic) on its own, WITHOUT the class.
@@ -42,8 +50,17 @@ public sealed record QuestChecklistGroup(
     /// control is worth offering.</summary>
     public bool ReadyToTurnIn => !Completed && Rows.Count > 0 && Rows.All(r => r.Acquired);
 
-    public int Done => Rows.Count(r => r.Acquired);
-    public int Total => Rows.Count;
+    /// <summary>Progress counts DISTINCT steps, not rendered rows.
+    ///
+    /// **This became load-bearing on 2026-08-23**, when the player gained the option to see a
+    /// step under every island it can be found on: a step naming three islands renders three
+    /// times, and counting rows would have turned a 6-piece reward into a 12-piece one — a
+    /// checklist that reports "3/12" for a quest with six steps, silently, on the surface
+    /// whose whole job is to say how far along you are. Nothing about it would look wrong in
+    /// the code that renders the rows.</summary>
+    public int Done => Rows.DistinctBy(r => r.Id, StringComparer.Ordinal).Count(r => r.Acquired);
+
+    public int Total => Rows.DistinctBy(r => r.Id, StringComparer.Ordinal).Count();
 
     /// <summary>Which slice of the state lens this group falls in — one of
     /// <see cref="QuestChecklistLayout.States"/>, never "any state", which is the absence
@@ -116,9 +133,16 @@ public static class QuestChecklistLayout
     /// rewards sink to the bottom and read fine there as trophies. Alphabetical order
     /// interleaved all four states and buried the reward that needed one more piece
     /// wherever the alphabet happened to put it.</summary>
+    /// <param name="repeatMultiIsland">How a step naming SEVERAL islands is placed (David,
+    /// 2026-08-23, asked as its own question — he wanted the player to choose). <c>false</c>:
+    /// it appears once, under <see cref="SkyIslands.SeveralHeading"/> after the numbered
+    /// groups. <c>true</c>: it appears under every island it names, so "what can I do on
+    /// Island 4" is answered completely — at the cost of one step rendering three times.
+    /// Either way the step is never counted twice; see <see cref="QuestChecklistGroup.Total"/>.</param>
     public static IReadOnlyList<QuestChecklistGroup> Sky(
         IEnumerable<SkyQuestChecklistItem> items,
-        IReadOnlyCollection<string>? completedRewardKeys = null)
+        IReadOnlyCollection<string>? completedRewardKeys = null,
+        bool repeatMultiIsland = false)
     {
         var completed = new HashSet<string>(completedRewardKeys ?? [], StringComparer.OrdinalIgnoreCase);
         return
@@ -130,13 +154,24 @@ public static class QuestChecklistLayout
                     g.Key.Reward,
                     [
                         .. g.OrderBy(i => i.QuestItem, StringComparer.OrdinalIgnoreCase)
-                            .Select(i => new QuestChecklistRow(
-                                i.Id,
-                                i.ClassName,
-                                i.QuestItem.Length > 0 ? i.QuestItem : i.Reward,
-                                Detail(i.Npc, i.Source),
-                                i.Acquired,
-                                i.AcquiredUnassigned)),
+                            .SelectMany(i => IslandPlacements(i, repeatMultiIsland))
+                            .OrderBy(p => p.Sort)
+                            .ThenBy(p => p.Item.QuestItem, StringComparer.OrdinalIgnoreCase)
+                            .Select(p => new QuestChecklistRow(
+                                p.Item.Id,
+                                p.Item.ClassName,
+                                p.Item.QuestItem.Length > 0 ? p.Item.QuestItem : p.Item.Reward,
+                                // The island label comes off the detail when the row is
+                                // already under that island's heading — see
+                                // SkyIslands.WithoutIslePrefix. Multi-island rows keep every
+                                // word, because their three names are the only place a
+                                // player learns where to go.
+                                Detail(p.Item.Npc, p.Heading == SkyIslands.SeveralHeading
+                                    ? p.Item.Source
+                                    : SkyIslands.WithoutIslePrefix(p.Item.Source)),
+                                p.Item.Acquired,
+                                p.Item.AcquiredUnassigned,
+                                p.Heading)),
                     ],
                     RewardKey(g.Key.ClassName, g.Key.Reward),
                     completed.Contains(RewardKey(g.Key.ClassName, g.Key.Reward)),
@@ -360,6 +395,50 @@ public static class QuestChecklistLayout
 
     /// <summary>"Cilin Spellsinger · Isle 6: Bazzt Zzzt" — whichever halves exist. The
     /// drop location is the half #184 asked for back, and the half that was never drawn.</summary>
+    /// <summary>
+    /// Where one step sits in the island order, and under which heading.
+    ///
+    /// Returns SEVERAL placements only when the player has asked for multi-island steps to be
+    /// repeated. Otherwise every step yields exactly one, which is what keeps a checklist row
+    /// a checklist row: one tick, one place.
+    ///
+    /// The sort key is the island number itself, so "numerically" is literal — and it matters,
+    /// because Sky has an island 1.5. Sorted as TEXT that lands where it belongs by luck, and
+    /// the luck runs out on any two-digit number.
+    /// </summary>
+    private static IEnumerable<(SkyQuestChecklistItem Item, double Sort, string Heading)>
+        IslandPlacements(SkyQuestChecklistItem item, bool repeatMultiIsland)
+    {
+        var islands = SkyIslands.Parse(item.Source);
+        if (islands.Count == 0)
+        {
+            // No island named — and that is the truth for 95 of 223 steps, not a gap.
+            // Sorted last, keeping the flat presentation these have always had.
+            yield return (item, AnywhereSort, SkyIslands.AnywhereHeading);
+            yield break;
+        }
+        if (islands.Count == 1)
+        {
+            yield return (item, islands[0], SkyIslands.Heading(islands[0]));
+            yield break;
+        }
+        if (!repeatMultiIsland)
+        {
+            // After the numbered islands, before "anywhere": we know all three places, so
+            // these must not fall in with the steps whose location nobody has written down.
+            yield return (item, SeveralSort, SkyIslands.SeveralHeading);
+            yield break;
+        }
+        foreach (var island in islands)
+            yield return (item, island, SkyIslands.Heading(island));
+    }
+
+    /// <summary>Sorts after every real island (Sky's highest is 8) and before "anywhere".</summary>
+    private const double SeveralSort = 90;
+
+    /// <summary>Last. The steps with no location named close the list.</summary>
+    private const double AnywhereSort = 99;
+
     private static string Detail(string npc, string source)
     {
         npc = npc.Trim();

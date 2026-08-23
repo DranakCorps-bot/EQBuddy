@@ -77,7 +77,10 @@ public static partial class CompanionProjection
     private static CompanionChecklistSection BuildSky(AppSettings? settings)
     {
         var items = settings?.SkyQuestChecklist ?? [];
-        var all = QuestChecklistLayout.Sky(items, settings?.SkyQuestCompleted);
+        // The phone reads the player's own grouping choice too — a surface that shows the
+        // same checklist a different way is the drift SurfaceParityTests exists to stop.
+        var all = QuestChecklistLayout.Sky(items, settings?.SkyQuestCompleted,
+            settings?.SkyStepsUnderEveryIsland ?? false);
 
         var groups = new List<CompanionChecklistGroup>();
 

@@ -17,7 +17,16 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### group Sky quest steps by island
-- **Priority:** approved - David, 2026-08-23 6:14 AM CT. Came from a Reddit user; David wants it implemented. Not a hold.
+- **Priority:** **BUILT 2026-08-23 (Claude), staged in 1.99.6.** Your hypothesis was right that
+  steps are a flat list — and the useful correction is that the island DATA was already there,
+  written by hand into each step's `Source` prose in five different spellings ("Isle 4:",
+  "Isle four -", "Isle 1.5", and 22 steps naming three at once). `SkyIslands` parses it;
+  `QuestChecklistLayout.Sky` orders and labels; all three surfaces draw a heading when the
+  label changes. 95 of 223 steps name no island at all ("Trash mobs") and keep the flat
+  listing, under "Anywhere on the plane" — which is your own "it still needs a place
+  (unknown / other), not a dropped step" note, honoured. David chose a player toggle for the
+  multi-island case (asked with the question tool).
+  (was: approved - David, 2026-08-23 6:14 AM CT. Came from a Reddit user.)
 - **Place:** Sky / Plane of Sky quest tracker. Desktop first. Not Gate 5 overlay. Not a group meter.
 - **Source:** David in Helm chat, Aug 23, 6:14 AM CT. Reddit user idea (URL not pasted; harvest later if Scribe finds the thread). Not a GitHub thread. Do not reply on Reddit.
 - **Ask:** Group steps of Sky quests by which island they are on. Example shape:

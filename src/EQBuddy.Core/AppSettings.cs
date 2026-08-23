@@ -320,6 +320,23 @@ public sealed class AppSettings
     /// key here and unchecking falls back to clearing just the completed flag.</summary>
     public Dictionary<string, List<string>> EpicQuestPreCompleteAcquired { get; set; } = [];
     public bool EpicQuestClassicOnly { get; set; }
+
+    /// <summary>How a Plane of Sky step that can be found on SEVERAL islands is placed
+    /// (David, 2026-08-23, asked as its own question — his answer was to let the player
+    /// choose rather than pick one).
+    ///
+    /// <c>false</c> (default): it appears once, under "Several islands", after the numbered
+    /// groups. One step, one row, one tick — and a numbered island list that is literally
+    /// true about what is on that island.
+    ///
+    /// <c>true</c>: it appears under every island it names, so "what can I do on Island 4
+    /// today" is answered completely. The same step then renders more than once; progress
+    /// counts distinct steps regardless (<see cref="QuestChecklistGroup.Total"/>).
+    ///
+    /// Defaulted to the conservative one because it is the shape the ask described — *"where
+    /// we know a step is on a specific island"* — and a step on three islands is not on a
+    /// specific one.</summary>
+    public bool SkyStepsUnderEveryIsland { get; set; }
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

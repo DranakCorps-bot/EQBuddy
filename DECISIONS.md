@@ -15,6 +15,31 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-23
+
+- **Bzzazzt is catalogued with eqlwiki's 12-hour clock, NOT as triggered — against what the
+  reporter asked for** · mark both new bees triggered as #109 requested · the wiki is the
+  tie-breaker and its reason holds independently (a chain's opener cannot itself be
+  triggered). His evidence is all from personal instances, which never respawn, so the two
+  accounts describe different places rather than disagreeing. `SpawnCatalog.json`,
+  `SkyBeeChainTests`.
+- **The load-time self-heal now clears learned overrides on multiSpawn entries too** · leave
+  it to triggered/raid-instanced only · the learner already refuses multi-spawn names, so a
+  `Learned` value on one is a number the current code cannot produce. Bounded cost, named in
+  the comment; typed durations untouched, with a negative test.
+- **Multi-island Sky steps: default to one row under "Several islands"** · default to
+  repeating them under every island · David asked for a toggle rather than a fixed answer,
+  and the conservative side matches his wording ("a specific island"). `AppSettings.SkyStepsUnderEveryIsland`.
+- **The island toggle lives on the Sky TAB, not in Options** · Options, per the standing rule
+  · it is a tab-scoped view lens, and the Epic tab's "Classic-doable only" set that precedent
+  in the same control row.
+- **`QuestChecklistGroup.Done`/`Total` count DISTINCT steps** · count rows · repeating a step
+  under three islands would otherwise turn a 4-step reward into a 6-step one, silently, only
+  for players who opted in.
+- **The "Isle N:" label is stripped from a row already sitting under that island's heading** ·
+  leave the prose alone · the grouping created the redundancy ("Island 6" / "· Isle 6: Bazzt
+  Zzzt"), so removing it is part of the same change. Multi-island rows keep every word.
+
 ## 2026-08-22
 
 - **PR A: `IProgressHost` and `ProgressWindow` become `internal`** · make `ProgressSurfaceSet`

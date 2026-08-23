@@ -171,6 +171,15 @@ public sealed class QuestsWindow : Window
         VerticalAlignment = VerticalAlignment.Center,
     };
 
+    /// <summary>The Sky tab's island lens — the twin of the Epic one above, sharing its
+    /// column because the two are never visible at once.</summary>
+    private readonly CheckBox _islandRepeatCheck = new()
+    {
+        Content = "Repeat multi-island steps",
+        FontSize = DesignTokens.Spec(Role.Caption).Size,
+        VerticalAlignment = VerticalAlignment.Center,
+    };
+
     public QuestsWindow(IQuestsHost main)
     {
         _main = main;
@@ -346,6 +355,23 @@ public sealed class QuestsWindow : Window
         };
         Grid.SetColumn(_classicOnlyCheck, 3);
         filterRow.Children.Add(_classicOnlyCheck);
+        _islandRepeatCheck.Foreground = AppTheme.DimBrush;
+        _islandRepeatCheck.Margin = Gap;
+        _islandRepeatCheck.IsVisible = false;
+        _islandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
+        ToolTip.SetTip(_islandRepeatCheck,
+            "Some Sky pieces drop on several islands. Off: each is listed once, under "
+            + "\"Several islands\". On: each appears under every island it drops on, so one "
+            + "island's list is complete — the same step then shows more than once.");
+        _islandRepeatCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_settings.SkyStepsUnderEveryIsland == (_islandRepeatCheck.IsChecked == true)) return;
+            _settings.SkyStepsUnderEveryIsland = _islandRepeatCheck.IsChecked == true;
+            _settings.Save();
+            Refresh(force: true);
+        };
+        Grid.SetColumn(_islandRepeatCheck, 3);
+        filterRow.Children.Add(_islandRepeatCheck);
         Grid.SetColumn(_modeStrip, 4);
         filterRow.Children.Add(_modeStrip);
 
@@ -541,6 +567,7 @@ public sealed class QuestsWindow : Window
         // reported: a checklist is the surface where "ready" and "done" mean the most.
         _stateCombo.IsVisible = true;
         _classicOnlyCheck.IsVisible = _tab == QuestTab.Epic;
+        _islandRepeatCheck.IsVisible = _tab == QuestTab.Sky;
         _classBtn.IsVisible = true;
         // A checklist has nothing to select, so the pane would only ever be empty. Give
         // its width back to the rows instead.
@@ -757,7 +784,8 @@ public sealed class QuestsWindow : Window
         var groups = tab == QuestTab.Epic
             ? QuestChecklistLayout.Epic(_settings.EpicQuestChecklist
                 .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic))
-            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted);
+            : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
+                _settings.SkyStepsUnderEveryIsland);
 
         var setters = tab == QuestTab.Epic
             ? _settings.EpicQuestChecklist.ToDictionary(i => i.Id, i => (Action<bool>)(done =>
@@ -880,9 +908,23 @@ public sealed class QuestsWindow : Window
             }
             else _questsPanel.Children.Add(headingText);
 
+            // Island sub-headings (David, 2026-08-23). Core hands the rows over already
+            // ordered and already labelled; this draws a heading when the label changes and
+            // owns no grouping logic of its own. WPF twin does exactly the same.
+            var lastIsland = "";
             foreach (var row in group.Rows)
             {
                 if (!setters.TryGetValue(row.Id, out var set)) continue;
+                if (row.IslandHeading.Length > 0 && row.IslandHeading != lastIsland)
+                {
+                    lastIsland = row.IslandHeading;
+                    var island = DesignSystem.Text(Role.Caption, row.IslandHeading);
+                    island.FontWeight = FontWeight.SemiBold;
+                    island.Foreground = AppTheme.DimBrush;
+                    island.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceS,
+                        0, DesignTokens.SpaceXxs);
+                    _questsPanel.Children.Add(island);
+                }
                 var text = DesignSystem.Text(Role.Body,
                     // The drop location on every row, and the * on a tick EQBuddy placed
                     // itself — both were in the model and neither was drawn.

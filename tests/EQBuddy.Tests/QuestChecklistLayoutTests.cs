@@ -52,7 +52,13 @@ public class QuestChecklistLayoutTests
             .Single(g => g.Heading.EndsWith("Mask of Song"))
             .Rows.Single(r => r.Title == "Light Woolen Mask");
 
-        Assert.Equal("Cilin Spellsinger · Isle 3: Gorgalosk", row.Detail);
+        // Both halves are still here. The "Isle 3:" label moved OUT of the detail on
+        // 2026-08-23 and INTO the island heading this row now sits under — it was being
+        // said twice in eight words, and the mob is the half the column was always for.
+        // The island itself is asserted a line below, so nothing is merely assumed to
+        // have survived the move.
+        Assert.Equal("Cilin Spellsinger · Gorgalosk", row.Detail);
+        Assert.Equal("Island 3", row.IslandHeading);
     }
 
     [Fact]
