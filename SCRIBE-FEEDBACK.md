@@ -1,4 +1,12 @@
-﻿## 2026-08-22 — Start / Stop / Continue (after #120 take, Holds move, #217)
+﻿## 2026-08-22 evening — Start / Stop / Continue (wiki-first + #217 destination + #109 leftover)
+
+- **Start** — Shared game truth (true for everyone, not this player): first place-option is a paste-ready eqlwiki edit, before a store of our own or a hosted thread. When a reporter names the destination (#217 Packmaster Dledsh description stopgap), file it on the same item.
+- **Stop** — File a second source of truth we would maintain forever (mega-thread / own catalog) when the wiki could take a player-pasted edit. Do not reply on old threads where Claude already answered (#109, #217). Do not tell Frank the #109 triggered work shipped.
+- **Continue** — Leftovers on the shipped ticket. Sweep stale Already shipped on long-lived waiting items. Note replies in the item. Holds live only in HELM.md. #228 stay live until Helm lifts. No commit/push from David's PC.
+
+---
+
+## 2026-08-22 — Start / Stop / Continue (after #120 take, Holds move, #217)
 
 - **Start** — When a hold lifts, edit the ITEM line that still names it. Sweep long-lived `waiting` items so Already shipped matches the code. Note in the ITEM when I replied — that half still lives here after Holds moved.
 - **Stop** — Restore a Holds block in SCRIBE.md. Two lists is worse. Holds live in HELM.md; read that before any public reply. Do not rewrite either list.
