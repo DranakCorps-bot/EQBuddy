@@ -111,6 +111,24 @@ e real app.
 
 ---
 
+### Experience next-level lock follow-ups (1.99.6 / 1.99.7)
+
+- **Kind:** Helm-signed UX lock (Bevel 1pm 2026-08-23)
+- **Signed:** Helm, 2026-08-23 1:05 PM CT
+- **Shipped:** v1.99.6 (`a7e59ab`). Main `ad63cfc` is 1.99.7 unreleased. Next-level fold on desktop + phone. Motes/hr on Experience (David). Sky also hosts import report. Raids report short line + tooltip.
+- **DefaultOpenIndex:** first class with something to SHOW. Not literal index 0 (Warrior-empty + Any-class-has-AA would fail).
+- **Empty class row:** keep "Nothing new at N". No chevron. Affordance that opens nothing is a trap.
+- **Height:** 320 on progress-next-classes overflow stands. Do not raise the budget for a three-class corner. Ordinary two-class fit is the bar.
+- **First-open-rest-collapsed stays,** even though multi-class is the normal Legends path. Opening all three would blow the widget.
+- **Any class** (General/Archetype) is a shared bucket, not a player class. It does not trip the one-class no-expander rule. One player class with content stays flat names. If that class is empty and Any class has the row, open Any class (DefaultOpenIndex covers it).
+- **Skill-ups phrase:** expander pattern only (independent folds under a room). Not a per-class Skill-ups list to copy.
+- **Motes/hr:** one Experience line, omit when empty. Do not reopen Wealth chip / window Motes / #227.
+- **Spell hover:** quote wiki, never invent. Skills stay without hover until a source exists. No hold.
+- **Phone lock gap:** phone still on singular InferredClass while CurrentClasses is a list. Wire must carry the list or a trio cannot honour inferred classes in play. Not a new surface.
+- **Rare-conned pack row:** still unbuilt. New row kind (contribution that is not loot). Headline counts it. Not PageHasNoLoot / NewToPage. Not a hold.
+- **Sky island headings:** if a reward has one island, no island heading. Multi-island keeps headings. Optional polish. Not a hold on 1.99.6.
+- **Untouched:** ding heading, Experience next host, no quest-filter fallback (picks WIDEN only), Wealth / Raids glance / Quests General / window Motes.
+
 ### Experience next-level fold (At level N)
 
 - **Kind:** Helm-signed UX lock (Bevel ad-hoc 2026-08-23 7:54 AM CT)
@@ -397,5 +415,4 @@ mmitted Progress/Quests/Options shots. Not th
 is run: CLAUDE.md (raw timed out), XAML (fetc
 h stripped), OverlaySections, #228 thread, ru
 nning app. No checkout.
-
 
