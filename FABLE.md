@@ -61,6 +61,89 @@ next loop, not a reopening of the plan.
 
 ---
 
+## Every resizable window pins its height on a frame that has no content in it
+To: Fable
+
+- **Priority:** `ready`. No `needs-david:` — nothing here touches the consequence list.
+- **Class:** `V2`. The ROOT CAUSE is measured and certain (below); what is not a V1 call is the
+  FIX, because the two things `AllowResize` is trying to do are in direct tension and resolving
+  them decides behaviour for **four windows' chrome at once** (Progress, Kills & Drops, Gear &
+  Loot, Quests). I stopped before implementing, per the routing rule.
+- **Source:** found 2026-08-23 while shooting `progress-next-classes`; `progress-card.png` has
+  been photographing a clipped panel since it was taken. Fable 5 saw it in the v1.99.6 review
+  and correctly ruled it must not hold the tag (it shipped in the previous three releases).
+
+### The measurement, not a hypothesis
+
+`WindowZoom.AllowResize` (`src/EQBuddy/WindowZoom.cs:74`) has no saved height on a fresh
+profile, so it takes the else branch: **open at the natural height once, then hand the axis
+over** — `window.ContentRendered += Release`, and `Release` sets `window.Height =
+window.ActualHeight` and `SizeToContent = Manual`.
+
+**`ContentRendered` fires on the first frame.** For a window whose body is filled by the LOG
+REPLAY, that is a frame with nothing in it — on the Progress window's Experience tab every
+child is `Collapsed` (no ding, no preview, no AA lists) and the summary string is empty. The
+height sampled there becomes permanent, and the body scrolls forever after.
+
+Proven by experiment rather than argued: the same shot, same fixture, same seeded profile, with
+one escape hatch that skips the pin —
+
+| | window size |
+|---|---|
+| `progress-card` as shipped | **520 × 203** (body cut mid-summary, above both lists) |
+| identical, pin skipped | **520 × 389** (the whole body) |
+
+`progress-wealth.png` is 520 × 741 and is NOT affected, which is the control: `_wealthBody` is
+assembled in the CONSTRUCTOR with `_money.Body` and `_motes.Body` already in it, and
+`MoneyPresentation.SummaryLines` returns four lines for an empty session — so that tab has real
+height at first render and the pin samples something true.
+
+### Why it is not a V1 — the tension
+
+`AllowResize` wants **both** "size to your content" and "let the user drag the bottom edge, and
+remember it". WPF will not do both: with `SizeToContent="Height"` a vertical drag does nothing,
+so the axis must be released for resizing to exist at all. Sampling later is not free either —
+every candidate I considered has a real cost, and picking between them is the plan:
+
+1. **Never pin; keep `SizeToContent="Height"` and let `BodyScroll.MaxHeight` bound it.** Always
+   correct height, and vertical resize stops existing on all four windows. `WindowHeights` then
+   has a writer and no meaningful reader — trap 20's shape.
+2. **Pin after the content arrives** (first refresh carrying data, not first render). Correct,
+   but "content has arrived" is knowledge `WindowZoom` does not have; handing it in means four
+   call sites and the fourth one gets missed (trap 34).
+3. **Pin when the height stops growing** (settle timer / consecutive equal layout passes).
+   Generic and needs no call-site knowledge, and it is a timing heuristic in window chrome,
+   which is how `SettingsClobberTests` became flaky one run in three.
+4. **Release on the user's first resize attempt** rather than on a render — the honest trigger,
+   and it needs an `HwndSource` hook for `WM_ENTERSIZEMOVE`, which is Windows-only and has no
+   Avalonia twin.
+
+### Checked
+
+- `AllowResize` call sites: `ProgressWindow.xaml.cs:62`, `CreatureWindow.xaml.cs:50`,
+  `GearLootWindow.xaml.cs:47`, `QuestsWindow.xaml.cs:47`. **Quests and Gear & Loot are probably
+  fine and I did not confirm it** — their content comes from the embedded catalog and from
+  settings, both available at first render. **Kills & Drops is the one to check**: its rows come
+  from the replay exactly as Progress's do, so it is the likeliest second victim. A shot would
+  settle it in a minute and I did not take one.
+- `UpdateHeightCap` is NOT the constraint: `MaxHeight` ≈ 872 and `BodyScroll.MaxHeight` ≈ 712 on
+  a 1080p primary, against an observed 203.
+- The Avalonia lane has its own window code and was not examined at all.
+
+### Already shipped (must not be fought)
+
+`#186`'s Ctrl+wheel zoom drives WIDTH through the same helper and works; `WindowSizing`'s
+sanity clamps; `ScreenGuard`/`WindowPlacement`'s position restore (#117), which is a separate
+axis and unaffected.
+
+### Verification a plan should ask for
+
+A shot is the only thing that can see this — no test, diff or build can — so whichever option
+wins, `progress-card` gets re-shot and the picture is the acceptance criterion. Add a `Kills &
+Drops` shot in the same pass if the check above finds it affected.
+
+---
+
 ## EQBuddy infers ONE class. A Legends character is THREE.
 To: Fable
 
