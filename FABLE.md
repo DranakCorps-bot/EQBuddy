@@ -148,6 +148,147 @@ The three catalog counts above, by parsing `SpellLevels.json` directly; the Drui
 fetched raw from eqlwiki and read section by section; each of the six extras searched across
 the whole page. **Not checked:** any class but Druid, any level but 34, and the AA side.
 
+### Plan — Fable 5, 2026-08-23
+
+**Shape: ONE catalog, provenance per row, re-sourced from the sixteen class pages with the
+spell pages as a flagged gap-filler; then the grouped-by-class presentation David asked for,
+on both desktops and the phone.** No second catalog (trap 4). `needs-david:` none — his
+ruling stands, and the sizing below supports it rather than reopening it.
+
+#### The sizing (question 2), run 2026-08-23 against the live wiki and `SpellLevels.json`
+
+| Class | Class-page rows | Catalog rows | On page, not in catalog | In catalog, not on page | Level disagrees |
+|---|---:|---:|---:|---:|---:|
+| Cleric | 163 | 206 | 1 | 44 | 0 |
+| Druid | 192 | 256 | 8 | 72 | 2 |
+| Wizard | 140 | 233 | 5 | 98 | 0 |
+| Necromancer | 143 | 190 | 3 | 50 | 0 |
+| Enchanter | 191 | 236 | 2 | 47 | 1 |
+| Shaman | 163 | 208 | 1 | 46 | 0 |
+| Magician | 158 | 200 | 1 | 43 | 1 |
+| Bard | 61 | 84 | 5 | 28 | 0 |
+| Paladin / Ranger / Shadow Knight | 71 / 66 / 68 | 90 / 87 / 88 | 0 / 0 / 0 | 19 / 21 / 20 | 0 / 3 / 0 |
+| Rogue | 12 | 9 | 12 | 9 | 0 |
+| Beastlord | 76 | 77 | 0 | 1 | 0 |
+| Warrior / Monk / Berserker | 0 | 0 | — | — | — |
+| **Total** | **1,504** | **~2,000** | **38** | **498** | **7** |
+
+Three things this settles, and one it corrects:
+
+1. **The two sources almost never disagree on a LEVEL** (7 rows). They disagree on
+   **membership**: a quarter of our catalog names spells the class pages do not list. The
+   Druid 34 extras are classic Velious ports (Circle of Ro, the Rings), the class page's
+   Level 34 has `Zephyr: North Karana` — the Legends port — and every class-page row carries
+   an `era=` field the spell pages lack. The class pages are Legends-curated; the spell pages
+   are wider than the game. **David's ruling is the right one at scale, and it is larger than
+   he saw: it removes ~500 rows.**
+2. **The 38 "missing" are mostly NAMING, not data.** `Healing Water` is a wiki redirect to
+   `Greater Healing` (the spell page's title); the class page uses the name the class sees.
+   The harvest keyed on page titles and lost the alias. The catalog must carry the name the
+   class page prints and the page title it resolves to.
+3. **The stub's "five extras appear nowhere on the page" is wrong for one of them** — `Ring
+   of Iceclad` IS on the Druid page (at another level). The number in the stub was from a
+   hand check; the table above is from a parse. Item 2 of the stub's "what a plan has to
+   settle" is answered: it is a handful per class, not thousands, and it is a script.
+4. **Warrior, Monk, Berserker have no spell tables** on their pages and no rows in the catalog;
+   their "abilities" are AAs, which come from the single `Alternate Advancement` page with
+   per-class sections — **one source, already class-structured; no split on the AA side.**
+   Question 3 is closed.
+
+The sizing script is reproducible (sixteen titles in one API call; `RadSpellRow2 |name=` under
+each `==Level N==`); it becomes PR 0.
+
+#### Architecture
+
+**Harvest.** `scripts/harvests/eqlwiki/class-spells-harvest.py` reads the sixteen class pages
+(one API call, `redirects=1`, cached like the others) and emits rows `(class, level, name,
+era, pageTitle)` — `pageTitle` resolved through the wiki's redirects so the link and the
+class-page name both survive. `spell-levels-promote.py` merges: **a class-page row is
+authoritative for its (class, level, name)**; a spell-page row is admitted only for a class
+whose page has **no `==Level N==` section at all** for that level (today: none of the
+thirteen — every page has all fifty), and is written with `source: "spell"`. Class rows carry
+`source: "class"`. The output stays single-line compact JSON with a fixed key order so the
+refresh PR diffs as data. **The first run of this is the ~500-row diff; it is reviewed in the
+knowledge-refresh PR like any other, not auto-merged.**
+
+**Catalog.** `SpellLevelEntry` gains `PageTitle` (for links; `""` when equal to `Name`) and
+`SpellClassLevel` gains `Source` (`"class"`/`"spell"`) and `Era`. `SpellUnlock` carries
+`Derived` (true when every class row behind it is `"spell"`). `KnownSources` list + a sanity
+test, the `SpawnType` idiom.
+
+**Presentation (the ask).** `LevelUnlockSet` already knows each spell's classes. A pure
+`LevelUnlockGroups.ByClass(set, pickedClasses)` in Core returns ordered groups — the player's
+classes in picker order, a spell that two picked classes share listed under each, AAs under
+their class then Archetype/General — and both desktops' `ProgressCardView` render the
+"At level N" fold as one collapsible group per class (`EqFoldLabel` per group; remembered per
+session, collapsed by default beyond the first — Bevel may flip that). Derived rows get a dim
+suffix from `LevelUnlockText.DerivedMark` ("· from its spell page"), never hidden: David asked
+for flagged, not filtered. **Phone:** `CompanionUnlockRow` gains `Class` and `Derived`; the
+page groups by the same Core call's output (it receives groups, not rows, so it cannot group
+differently — trap 9's cousin); trap 32 applies and the version-reload path covers it.
+
+**Bevel pre-design: yes** — the grouped fold on a 338 px widget, and Bevel's still-unruled
+item about the phone's "New at level" line is the same surface. **Column budgets:** the
+unlock rows are a two-column list (name, value); the derived mark goes in the value column,
+which already wraps. **Shot offline: yes** (catalog data only); stage a Druid at 33 so the
+Level 34 group is the picture, and write down the five names first.
+
+#### Risks
+
+- **The ding list changes for everyone on the next refresh** — that is the point, and it is
+  also why the promote step must not be run by the weekly job unattended the first time: the
+  500-row diff is a human review, then the harvest joins the cadence. The `CURATED` list in
+  `refresh.py` does not gain `SpellLevels.json` (it stays generated); the refresh report gains
+  a "class-page membership changes" section.
+- **Match-the-wiki, both halves:** the class page IS the wiki; a spell-page row kept only
+  where the class page is silent is "another source where eqlwiki is silent", and it is
+  marked as such. No row departs from the class page; a disagreement is resolved by the
+  class page, and the old value goes in the refresh report, not the catalog.
+- **Trap 20:** `ShowNextUnlocks` keeps its writer; the per-group fold state is session-only,
+  not a setting.
+- **Trap 4:** one builder (`LevelUnlockGroups`) feeds both desktops and the phone; the page
+  receives groups.
+- **`Healing Water`-style aliases** must link to the page that exists (`PageTitle`), or the
+  name the player clicks 404s — trap 3's cousin.
+- **Rogue** (12 on the page, 9 in the catalog, no overlap by name) is the one class where
+  neither source looks complete; the promote step logs it and the plan does not invent a rule
+  for it.
+
+#### Decomposition
+
+- **PR 0 — the diff script**, reviewed output committed to `scripts/harvests/eqlwiki/
+  class-spells-report.md` (the table above, per class, with names). No catalog change.
+- **PR 1 — harvest + promote + schema**, one refresh-style PR carrying the ~500-row diff,
+  reviewed by a human before merge; `SpellLevelCatalogTests` for `KnownSources`, the Druid 34
+  acceptance pinned against the harvest CACHE snapshot (never the live wiki); the alias case.
+  `LevelUnlocks` unchanged in behaviour except that `Derived` rides through. What's-new:
+  "the next-level spell list now follows your class page on eqlwiki" with the Druid example,
+  crediting David's report and Helm's list.
+- **PR 2 — grouping**, both desktops and the phone, after Bevel's pass; `LevelUnlockGroups`
+  tests; `WidgetRenderTests` twin; the staged shot; `SurfaceParityTests` case for the phone.
+- **Then:** the class harvest joins the weekly refresh.
+
+#### Verification
+
+The Druid 33 acceptance: the "At level 34" group shows Endure Magic · Healing Water ·
+Regeneration · Strength of Stone · Zephyr: North Karana and nothing else, with Healing Water
+linking to the page that serves it. David can check that one himself against the class page
+in a browser, which is the whole point of the ruling. Then Helm's five, by name, in the
+refresh report.
+
+#### Out of scope
+
+Spell effect text (stays on the wiki); the AA catalog (single source, untouched);
+disciplines for the three spell-less classes; reconciling Rogue; any change to
+`AppSettings`; the Progress window layout beyond the fold.
+
+#### Decided without asking (→ `DECISIONS.md`)
+
+One catalog with provenance, not two; the class page's spelling wins and the page title is
+kept for the link; derived rows are marked dim, never hidden; the first promote run is
+human-reviewed before it joins the cadence; groups collapse by default beyond the first
+class, session-only.
+
 ---
 
 ## A way for players to feed VERIFIED spawn-timer updates to eqlwiki

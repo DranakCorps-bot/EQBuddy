@@ -1,5 +1,14 @@
 # EQBuddy — handoff
 
+> **2026-08-23, Fable 5 — v1.99.6 re-reviewed over the whole untagged range: SHIP after one V0
+> catalog row** (`Bizazzzt`, the fifth Island 6 bee — triggered, spawned by Bazzzazzt, on the
+> live wiki, not in the catalog; it would be discovered and learned like the two this release
+> fixes). PR A last-looked: nothing to change; the Avalonia human step can be run on Windows.
+> **Spells-by-class plan is `ready`** in `FABLE.md`: sizing across 16 class pages says the
+> sources disagree on membership (498 rows, one direction) not level (7), so David's ruling
+> holds at scale; one catalog with provenance, PR 0 is the parse. `FABLE-FEEDBACK.md` has all
+> three.
+
 > **2026-08-22, Fable 5 — v1.99.5 review: SHIP after one pre-tag fix** (`PurgePetTimers` must
 > spare `Custom` entries and manual timers — it purges by name alone today). Two new plans are
 > `ready` in `FABLE.md`: **spawn timers → eqlwiki** (a pack section over a new cycle ledger, PR 0

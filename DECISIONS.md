@@ -17,6 +17,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-23
 
+- **Spells by class (Fable 5): one catalog with `source` per row, not two; the class page's
+  spelling wins and the page title is kept for the link; derived rows are marked dim, never
+  hidden; the first promote run (~500-row diff) is human-reviewed before the harvest joins
+  the weekly cadence; unlock groups collapse beyond the first class, session-only** · a
+  second catalog; hide derived rows; auto-run the promote · trap 4, David's "flagged not
+  filtered", and a quarter of a catalog is a review not a cron tick; `FABLE.md` plan.
+- **v1.99.6 re-review (Fable 5): the fifth Island 6 bee (`Bizazzzt`) is a pre-tag catalog
+  row, not a follow-up** · ship the four and file the fifth · it is discovered-and-learned on
+  two kills, the exact defect the release claims to fix; `FABLE-FEEDBACK.md`.
 - **VETOED nothing — but recorded because David decided it in session:** when eqlwiki's class
   page and its spell pages disagree about a spell's level, **the class page wins and spell
   pages fill gaps only where the class page has no section**, with anything derived flagged as
