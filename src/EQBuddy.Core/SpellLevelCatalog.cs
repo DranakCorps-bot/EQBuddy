@@ -40,6 +40,21 @@ public sealed class SpellClassLevel
 public sealed class SpellLevelEntry
 {
     public string Name { get; set; } = "";
+
+    /// <summary>eqlwiki's own one-line description ("Party: Increase STR, DEX, AC"),
+    /// taken from the CLASS page's row where there is one and from the spell's own page
+    /// otherwise — the same precedence the levels follow.
+    ///
+    /// **It is quoted, never composed.** The long-standing rule here is that an unlock row
+    /// names the spell and the wiki explains it, and this does not break that: the prose
+    /// is the wiki's, carried verbatim, so a hover cannot claim an effect the source does
+    /// not. What changed on 2026-08-23 is only that the player no longer has to open a
+    /// browser to read it (David: "have mouse over give the skill/spell description").
+    ///
+    /// Empty when the wiki gives none, and the hover then falls back to the class/level
+    /// facts alone rather than showing a blank box.</summary>
+    public string Description { get; set; } = "";
+
     public List<SpellClassLevel> Classes { get; set; } = [];
 }
 

@@ -1,10 +1,10 @@
-<Project>
+﻿<Project>
   <!-- THE version, single-sourced for every project. The Avalonia csproj used to carry
        its own hardcoded copy, which release.ps1 never bumped — so the v1.27/1.28 Linux
        tarballs identified as 1.26.0 and nagged their own users to update forever
        (issue #30, reported with the exact diagnosis by sahaq). release.ps1 and
        install-local.ps1 read the version from this file. -->
   <PropertyGroup>
-    <Version>1.99.6</Version>
+    <Version>1.99.7</Version>
   </PropertyGroup>
 </Project>

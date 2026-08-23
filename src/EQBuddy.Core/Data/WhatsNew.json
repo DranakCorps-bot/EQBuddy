@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.99.7",
+    "date": "2026-08-23",
+    "highlights": [
+   "NEW - HOVER A SPELL IN PROGRESS AND IT TELLS YOU WHAT IT DOES. The next-level list and the ding list have always named the spells you are about to get and left you to look them up; the AA rows beside them have shown the wiki's own effect text for months, which is what made the silence on the spell rows look like an oversight rather than a decision. Hovering now gives eqlwiki's own one-line description - \"Imbues your target with life after 0:00:18, healing for 5000.\" - followed by which of your classes gets it and when. The words are the wiki's, carried across exactly as written; EQBuddy does not compose them and never guesses at an effect.",
+   "AND THE SPELL LIST ITSELF IS RE-SOURCED FROM EQL WIKI'S CLASS PAGES. It was built from individual SPELL pages, which name every class that has ever had a spell across every version of EverQuest - wider than this game. The class pages are curated for Legends, so those are what EQBuddy reads now. Two things change on screen. Spells you were shown but never actually get at that level are gone - a druid's Level 34 list drops six Velious-era ports it was never going to grant you. And a spell that was missing entirely is back: Healing Water at Druid 34, which fell out because its wiki page carries another spell's name in one of its fields and our old import de-duplicated it away.",
+   "Levels 51 to 60 are marked, because the class pages stop at 50. Every class page on the wiki ends at level 50 while Legends goes to 60, and a few have gaps in the middle. Those levels are still answered - from the spell pages, as before - but the row now says \"from its spell page\" so you can tell a curated answer from a derived one at a glance. Nothing is hidden from you and nothing is quietly padded; if a level's information is thinner, it says so."
+    ]
+  },
+  {
     "version": "1.99.6",
     "date": "2026-08-22",
     "highlights": [

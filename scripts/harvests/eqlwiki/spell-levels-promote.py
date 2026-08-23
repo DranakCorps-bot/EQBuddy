@@ -85,10 +85,14 @@ def spell_page_rows():
             groups[name.casefold()].append(s)
 
     rows = {}
+    descriptions = {}
     for group in groups.values():
         exact = [e for e in group if e.get("page_title") == e["name"]]
         picked = exact or group
         display = sorted(e["name"] for e in picked)[0]
+        for e in picked:
+            if (d := (e.get("description") or "").strip()):
+                descriptions.setdefault(display.casefold(), d)
         for e in picked:
             for c in e.get("classes") or []:
                 cls = CLASS_FOLD.get(c.get("class") or "", c.get("class") or "")
@@ -98,12 +102,12 @@ def spell_page_rows():
                 key = (cls, display.casefold())
                 prev = rows.get(key)
                 rows[key] = (min(prev[0], lv) if prev else lv, display)
-    return rows
+    return rows, descriptions
 
 
 def main():
     classes = json.loads((HERE / "class-spells.json").read_text(encoding="utf-8"))
-    page_rows = spell_page_rows()
+    page_rows, page_descriptions = spell_page_rows()
 
     # class -> the levels its page HAS a section for. A class with no page at all
     # (Warrior, Monk, Berserker) has no sections, so every spell-page row for it
@@ -116,9 +120,14 @@ def main():
     # name_casefold -> {"name": display, "classes": {cls: {...}}}
     entries = {}
 
-    def put(display, cls, level, source):
+    def put(display, cls, level, source, description=""):
         key = display.casefold()
-        entry = entries.setdefault(key, {"name": display, "classes": {}})
+        entry = entries.setdefault(key, {"name": display, "classes": {}, "description": ""})
+        # The CLASS page's one-liner wins, for the same reason its levels do. A spell
+        # page's description only fills an entry no class page describes — which is
+        # every derived (51-60, interior-gap) row.
+        if description and (source == SOURCE_CLASS or not entry["description"]):
+            entry["description"] = description
         # The class page's spelling wins the display name for the whole entry.
         if source == SOURCE_CLASS:
             entry["name"] = display
@@ -133,7 +142,7 @@ def main():
         for name, row in data["spells"].items():
             lv = row["level"]
             if 1 <= lv <= LEVEL_CAP:
-                put(name, cls, lv, SOURCE_CLASS)
+                put(name, cls, lv, SOURCE_CLASS, row.get("description") or "")
 
     # 2. Spell pages, ONLY for a (class, level) the class page has no section for.
     derived = 0
@@ -145,14 +154,18 @@ def main():
         key = display.casefold()
         if key in entries and cls in entries[key]["classes"]:
             continue          # already answered for this class by its own page
-        put(display, cls, lv, SOURCE_SPELL)
+        put(display, cls, lv, SOURCE_SPELL, page_descriptions.get(key, ""))
         derived += 1
 
     out = []
     for key in sorted(entries, key=lambda k: (entries[k]["name"].casefold(), entries[k]["name"])):
         e = entries[key]
         rows = [e["classes"][c] for c in sorted(e["classes"])]
-        out.append({"name": e["name"], "classes": rows})
+        row = {"name": e["name"]}
+        if e["description"]:
+            row["description"] = e["description"]
+        row["classes"] = rows
+        out.append(row)
 
     OUT.write_text(json.dumps({"spells": out}, separators=(",", ":"), ensure_ascii=False),
                    encoding="utf-8")

@@ -67,10 +67,31 @@ public static class LevelUnlockText
     /// what a click looks up on the wiki and what the eye scans down.</summary>
     public const string DerivedMark = " · from its spell page";
 
-    /// <summary>Tooltip for a spell row: every class that gets the spell and when —
-    /// "Cleric 20 · Druid 29". Catalog facts only; effect text stays on the wiki,
-    /// never invented here.</summary>
-    public static string? SpellTooltip(SpellLevelEntry? e) =>
-        e is null ? null
-        : string.Join(" · ", e.Classes.Select(c => $"{c.Class} {c.Level}"));
+    /// <summary>Tooltip for a spell row: what the spell DOES, then every class that gets
+    /// it and when.
+    ///
+    /// The description leads because it is the question being asked — David, 2026-08-23:
+    /// *"have mouse over give the skill/spell description"* — and the class/level line
+    /// follows as the provenance for it. It is eqlwiki's own prose carried verbatim, never
+    /// composed here, which is the same rule as before: the row names the spell, the wiki
+    /// explains it. All this changed is that you no longer open a browser to read it.
+    ///
+    /// A spell the wiki describes with nothing still hovers its class levels rather than
+    /// an empty box, and AA rows are unaffected — they have shown
+    /// <c>AaCatalog.Find(name)?.Effect</c> since the ledger existed, which is what made
+    /// the spell rows' silence look like an oversight rather than a design.</summary>
+    public static string? SpellTooltip(SpellLevelEntry? e)
+    {
+        if (e is null) return null;
+        var levels = string.Join(" · ", e.Classes.Select(c => $"{c.Class} {c.Level}"));
+        // ONE LINE, and the newline it obviously wanted is the reason. Both widgets
+        // switch a tooltip to MONOSPACE the moment it contains "\n" (EqCardRows.cs:110,
+        // CardParts.cs:77) — a good rule, because every other multi-line tip in this app
+        // is a stat block whose columns need it. Wiki PROSE in monospace is not that, and
+        // nothing could have caught it: a tooltip does not appear in a screenshot and no
+        // test reads a font. The " · " separator is the house idiom anyway.
+        return e.Description is { Length: > 0 } d
+            ? (levels.Length > 0 ? d + " · " + levels : d)
+            : levels;
+    }
 }

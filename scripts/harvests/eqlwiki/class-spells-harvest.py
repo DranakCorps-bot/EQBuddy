@@ -178,7 +178,12 @@ def parse_class_page(text: str):
             continue
         era_raw = (fields.get("era") or "").strip()
         era = ERA_RX.sub(r"\1", era_raw).strip()
-        rows.append((level, name, era))
+        # The class page's own one-liner ("Party: Increase STR, DEX, AC"). Legends-
+        # curated, present on all 1,504 rows, ~50 chars, and the source of the unlock
+        # row's hover (David, 2026-08-23). It comes from HERE rather than from the
+        # spell pages for the same reason the levels do: this page is this game.
+        desc = (fields.get("description") or "").strip()
+        rows.append((level, name, era, desc))
     return rows
 
 
@@ -247,8 +252,8 @@ def main():
         text, served = fetch_class_page(cls, refetch)
         rows = parse_class_page(text)
         page = {}                          # name -> level (first wins; a page listing
-        for level, name, era in rows:      # a spell twice means the earlier level)
-            page.setdefault(name, (level, era))
+        for level, name, era, desc in rows:   # a spell twice means the earlier level)
+            page.setdefault(name, (level, era, desc))
         per_class[cls] = {"served": served, "page": page, "rows": len(rows),
                           "sections": sorted(level_sections(text))}
         print(f"{cls:<14} served={served or '(missing)':<16} rows={len(rows):>4} "
@@ -412,8 +417,8 @@ def main():
         cls: {
             "served": per_class[cls]["served"],
             "sections": per_class[cls]["sections"],
-            "spells": {name: {"level": lv, "era": era}
-                       for name, (lv, era) in sorted(per_class[cls]["page"].items())},
+            "spells": {name: {"level": lv, "era": era, "description": desc}
+                       for name, (lv, era, desc) in sorted(per_class[cls]["page"].items())},
         } for cls in CLASSES
     }, indent=1, ensure_ascii=False, sort_keys=True), encoding="utf-8")
     print(f"wrote {ROWS}")

@@ -205,13 +205,42 @@ public class LevelUnlocksTests
     [Fact]
     public void SpellTooltipListsCatalogClassesAndNothingInvented()
     {
-        Assert.Equal("Cleric 39",
-            LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find("Promised Renewal")));
+        // What it DOES leads, the class levels follow (David, 2026-08-23: "have mouse over
+        // give the skill/spell description"). Before this the hover was the levels alone,
+        // while AA rows had shown the wiki's effect text since the ledger existed.
+        var promised = SpellLevelCatalog.Default.Find("Promised Renewal")!;
+        Assert.Equal("Imbues your target with life after 0:00:18, healing for 5000. · Cleric 39",
+            LevelUnlockText.SpellTooltip(promised));
+        // One LINE, deliberately: both widgets render a tooltip containing a newline in
+        // monospace (it is how stat blocks keep their columns), and wiki prose is not a
+        // stat block. Nothing else can catch that — a tooltip is not in a screenshot and
+        // no test reads a font — so the rule is pinned here.
+        Assert.DoesNotContain("\n", LevelUnlockText.SpellTooltip(promised));
+        // NOTHING INVENTED, and this is the assertion that keeps that true: the first line
+        // is the catalog's own string, character for character, not prose composed here.
+        Assert.StartsWith(promised.Description, LevelUnlockText.SpellTooltip(promised));
         // Multi-class spells list every class with its own level.
         var tip = LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find("Greater Healing"))!;
         Assert.Contains("Cleric 20", tip);
         Assert.Contains("Druid 29", tip);
         Assert.Null(LevelUnlockText.SpellTooltip(null));
+
+        // A spell the wiki describes with nothing hovers its levels rather than an empty
+        // box — and a spell with no levels at all still hovers its description. Neither
+        // is reachable from the shipped catalog today (every entry has both), which is
+        // exactly why they are asserted against hand-built entries instead of hoping.
+        Assert.Equal("Cleric 39", LevelUnlockText.SpellTooltip(new SpellLevelEntry
+        {
+            Name = "x", Classes = [new SpellClassLevel { Class = "Cleric", Level = 39 }],
+        }));
+        Assert.Equal("Heals a bit", LevelUnlockText.SpellTooltip(new SpellLevelEntry
+        {
+            Name = "x", Description = "Heals a bit",
+        }));
+
+        // Every shipped entry carries the wiki's prose, so the hover is never bare.
+        Assert.All(SpellLevelCatalog.Default.All, e =>
+            Assert.False(string.IsNullOrWhiteSpace(e.Description), $"{e.Name} has no description"));
     }
 
     [Fact]
