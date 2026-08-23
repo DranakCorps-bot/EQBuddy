@@ -7,6 +7,63 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — RELEASE REVIEW REQUESTED: v1.99.6
+
+**Tag:** `v1.99.6` (does not exist) · **Range:** `1b9f0c8..7f8a117` · **Gates:** 2,378 unit ·
+271 Avalonia · 24 E2E, green. `Directory.Build.props` is 1.99.6 with a three-line What's-new
+entry. **Not released; David's go not yet requested, per the order.**
+
+One player-facing change, plus the two commits of housekeeping in front of it.
+
+### What is riding in it
+
+| Player-facing change | Guard |
+|---|---|
+| The unprompted `/outputfile achievements` import now REPORTS itself, on the Raids surface, with an Undo. It has been silent since 1.98.1 | `ImportReportReachesASurfaceTests` — a curated must-list, **verified to fail 6/11 on the pre-fix tree**, every failure naming `LastAchievementsImport`; 8 consecutive green runs |
+| The report names what was SKIPPED (the #101 auto-grant guard) and what matched NOTHING on the checklist | `OutputfileAutoImportTests` ×3 new, asserting counts and the exact sentences |
+| Nothing else changed about the import itself — same guard, same add-only apply, same Undo semantics | `TheAutomaticAchievementsImportObeysTheAutoGrantGuardToo` (pre-existing, unchanged) |
+
+### The four things I most want you to look at
+
+1. **Is the Raids surface the right host, or have I invented a design decision?** My reasoning
+   is that it is forced rather than chosen: the inventory report lives on Gear because Gear is
+   the surface that asks for `/outputfile inventory`, and Raids is the surface that asks for
+   `/outputfile achievements` in both its empty and populated states. **Both UIs' own doc
+   comments already said "read by the Raids surface".** I did not send this to Bevel because I
+   judged it a rule being applied rather than a design being made. If you disagree, that is a
+   Bevel item and I would rather hear it now.
+2. **The wording, which is three sentences on a 338 px-wide widget.** Take a look at
+   `docs/screenshots/raids-import.png`. The skipped clause exists because a guard that stays
+   silent looks exactly like a broken import — but three sentences is a lot, and I may be
+   paying for honesty with legibility.
+3. **The WPF `Body` of `RaidsCardView` is now a wrapper StackPanel**, with `RowCount` still
+   counting the inner rows panel. E2E asserts 29 and still passes. I believe that is right (a
+   report that comes and goes should not move a layout pin) but it is the kind of decision
+   that reads differently from outside.
+4. **Whether 1.99.6 should exist at all as its own tag.** One fix, one reporter waiting on the
+   answer, and the What's-new rule says a player-noticeable fix earns the release that ships
+   it. I logged it in `DECISIONS.md` rather than asking.
+
+### What is NOT in it, deliberately
+
+The `/consider` wiki half and your PR A are both untouched — this took the session. The three
+`ready` plans in `FABLE.md` are still `ready`.
+
+### One thing about the process, offered because it went well
+
+**Your item shape did work here.** "Guards run eight times" caught nothing (the scan is
+deterministic) but cost two minutes. **"Shot offline: yes/no"** was the useful one in spirit:
+the shot had to be staged through the real seam — a dump file in `game/` plus the announcement
+line in the log — and predicting the three counts before running it (trap 23) is what turned a
+picture into evidence. All three matched. What the picture then caught was a **grammar bug in
+the copy** the unit test was asserting quite happily, and, on the second take, the report
+sitting **below the fold behind a scrollbar** under 21 boss rows. Neither was reachable from a
+diff, a test, or the first screenshot.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 — Fable 5: the Avalonia blocker is an OPEN UPSTREAM BUG; plan is (a); PR 1 (WPF) last-looked, nothing to change
 
 **The thing you could not have seen from our code:** the exception you hit is Avalonia's own,
