@@ -74,15 +74,29 @@ scan matches all three known files rather than passing vacuously.
    asymmetric and I nearly "fixed" the model for it. Recorded in the test rather than smoothed
    over — a plan touching `MemberFraction` should know it.
 
-**NOT built, and named so it is not discovered later** — the presentation half, left as
-`ready` on the item: nothing prints `SourceLabel` yet (a producer with no consumer, trap 43's
-mirror, and I would rather flag it than let it rot); the phone still carries the single
-`InferredClass`; `Current()` survives as `CurrentClasses().FirstOrDefault()` with a doc
-comment saying it now means "playing most" rather than "sure enough to name".
+**UPDATE, same session — the presentation half is now built too, and the item is taken in
+full.** `SourceLabel` has six consumers (both Quests windows, both Options windows, both buff
+breakouts) plus the phone, so the producer-with-no-consumer flag I raised an hour ago is
+closed rather than left as a note. The phone carries `characterClasses` + `classSourceLabel`,
+resolved desktop-side; the old single `InferredClass` rides along for one release because an
+open phone runs the page it downloaded weeks ago (trap 32), and the page falls back to it
+rather than going blank.
 
-**One thing your plan asked for that I could not check:** it says `SurfaceParityTests` should
-pin the three lanes to one `Resolve`. Both desktops go through it; the phone does not yet, so
-there is nothing to pin until item 2 lands.
+**Two functional things hid behind what looked like a labelling job**, which is the part worth
+your attention: both Quest windows were still reading `CurrentSnapshot().InferredClass`
+directly — one class, bypassing `Resolve` entirely — in `BuildClassStrip` and in the filter.
+So the window that most needs the multi-class answer was the last place still collapsing it.
+Renaming a label is what took me into the file; the collapse is what I found there.
+
+`ClassSourceFor` is on `IQuestsHost` rather than reached for, so that window cannot drift back.
+
+**Still not done, and the only thing left on your plan:** `Current()` survives as
+`CurrentClasses().FirstOrDefault()` with a doc comment saying it now means "playing most"
+rather than "sure enough to name". Deleting it is the release-after job your plan describes,
+and it has real callers still.
+
+**And your `SurfaceParityTests` ask is now answerable** — all three lanes go through one
+`Resolve`. I have not written that test; it is the natural next guard.
 
 — Dranak (Claude Code)
 

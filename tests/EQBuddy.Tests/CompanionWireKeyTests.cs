@@ -79,6 +79,35 @@ public class CompanionWireKeyTests
         Assert.Contains("\"value\":\"Druid spell\"", json);
     }
 
+    /// <summary>
+    /// The quest section's class fields, added 2026-08-23 with the multi-class fix. Pinned
+    /// here the same day they were written rather than after a reporter finds them: the
+    /// LAST field added to this wire (`CompanionUnlockGroup.ClassName`) reached the page as
+    /// `className` while the page read `class`, and the manual check that was supposed to
+    /// catch it used a hand-typed payload in the shape the page wanted.
+    /// </summary>
+    [Fact]
+    public void TheQuestSectionsClassFieldsUseTheKeysThePageReads()
+    {
+        var json = JsonSerializer.Serialize(
+            new CompanionQuestsSection(
+                Tabs: [], CatalogStamp: "s", Catalog: null, Mine: [], MineMore: 0,
+                Owned: new Dictionary<string, int>(), Tracked: [], Hidden: [],
+                Completed: new Dictionary<string, int>(), Classes: [],
+                InferredClass: "Druid",
+                CharacterClasses: ["Warrior", "Druid", "Monk"],
+                ClassSourceLabel: "from your achievements",
+                Epics: new CompanionChecklistSection(0, 0, []),
+                Sky: new CompanionChecklistSection(0, 0, [])),
+            CompanionSnapshot.JsonOpts);
+
+        Assert.Contains("\"characterClasses\":[\"Warrior\",\"Druid\",\"Monk\"]", json);
+        Assert.Contains("\"classSourceLabel\":\"from your achievements\"", json);
+        // The old single-class field rides along for one release, because an open phone
+        // runs the page it downloaded weeks ago (trap 32) and that page reads it.
+        Assert.Contains("\"inferredClass\":\"Druid\"", json);
+    }
+
     /// <summary>Every group-bearing record on this wire spells the class the same way, which
     /// is the rule the defect broke. Asserted across the three rather than one at a time,
     /// because "matches its siblings" is the property — a fourth group record that invents its

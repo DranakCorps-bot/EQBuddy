@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -271,10 +271,11 @@ public partial class QuestsWindow : Window
     {
         _classes.Clear();
         var key = _main.QuestCharacterKey;
-        var mine = _main.QuestLedger?.ClassesFor(key) ?? [];
-        if (mine.Count == 0
-            && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inferred)
-            mine = [inferred];
+        // The RESOLVED list, not the picks with one inferred class behind them: the dump
+        // leads, the log fills in, picks widen (`CharacterClasses`). Reading
+        // `InferredClass` here was the last place this window could see one class where
+        // the character has three.
+        var mine = _main.ClassSourceFor(_main.CurrentSnapshot()).Classes;
         // One class and no lens to offer: a strip reading "Any · BRD" chooses nothing.
         if (mine.Count < 2) { ClassStrip.Visibility = Visibility.Collapsed; return; }
         ClassStrip.Visibility = Visibility.Visible;
@@ -463,17 +464,15 @@ public partial class QuestsWindow : Window
         var completed = _main.QuestLedger?.CompletedFor(key)
             ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var filter = FilterBox.Text.Trim();
-        var classes = _main.QuestLedger?.ClassesFor(key) ?? [];
-        SyncClassChecks(classes);
-        // No classes picked? The log's own evidence pre-filters — ALWAYS labeled
-        // inferred, never persisted, and one popup pick overrides it (David,
-        // 2026-08-11: players swap classes, so this is a reading, not a fact).
-        var inferred = "";
-        if (classes.Count == 0 && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inf)
-        {
-            inferred = inf;
-            classes = [inf];
-        }
+        var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
+        SyncClassChecks(picks);
+        // Nothing PICKED? The character's classes still pre-filter — from the dump if it
+        // has one, from the log otherwise — always labeled with where they came from,
+        // never persisted, and one popup pick overrides (David, 2026-08-11: players swap
+        // classes, so this is a reading, not a fact).
+        var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
+        var classes = picks.Count > 0 ? picks : resolved.ToList();
+        var inferred = picks.Count > 0 ? "" : string.Join(" · ", resolved);
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing it here covers the catalog, the zone view and the
         // item-driven tabs at once. A stale lens (you dropped that class) is ignored
@@ -506,8 +505,8 @@ public partial class QuestsWindow : Window
         }
         if (inferred.Length > 0)
         {
-            var note = Note($"Filtering for {inferred} (inferred from your most-used skills — " +
-                "pick classes above to override; inference follows you if you swap)", "Info");
+            var note = Note($"Filtering for {inferred} ({CharacterClasses.SourceLabel(classSource)}" +
+                " — pick classes above to override)", "Info");
             QuestsPanel.Children.Add(note);
         }
 

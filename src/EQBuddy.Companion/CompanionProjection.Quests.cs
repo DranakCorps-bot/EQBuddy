@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Companion;
 
@@ -58,6 +58,9 @@ public static partial class CompanionProjection
             Classes: [.. req.Classes.Select(c => new CompanionQuestClass(c, QuestClassFilter.Abbrev(c)))],
             InferredClass: req.Classes.Count == 0 && req.InferredClass.Length > 0
                 ? req.InferredClass : null,
+            CharacterClasses: req.CharacterClassNames.Count > 0 ? req.CharacterClassNames : null,
+            ClassSourceLabel: req.CharacterClassNames.Count > 0
+                ? EQBuddy.Core.CharacterClasses.SourceLabel(req.ClassSource) : null,
             Epics: BuildEpics(settings),
             Sky: BuildSky(settings));
     }

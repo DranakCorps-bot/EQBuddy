@@ -241,6 +241,11 @@ public partial class MainWindow : Window, ICardContext
                         ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
                     Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                     InferredClass = CurrentSnapshot().InferredClass,
+                    // The RESOLVED list and its source, decided here so the phone cannot decide it
+                    // differently than the two windows (#210). The single class above stays for one
+                    // release: an open phone runs the page it downloaded weeks ago (trap 32).
+                    CharacterClassNames = ClassSourceFor(CurrentSnapshot()).Classes,
+                    ClassSource = ClassSourceFor(CurrentSnapshot()).Source,
                 },
                 QuestLedger = QuestLedger,
                 QuestCharacterKey = () => QuestCharacterKey,

@@ -1686,7 +1686,7 @@ function boot() {
           // Optimistic: the view narrows now; the PC saves the pick with this
           // character (the desktop ⚙ popup's own SetClasses) and confirms next push.
           d.classes = catalog.allClasses.filter(c2 => names.includes(c2.name));
-          if (names.length) d.inferredClass = null;
+          if (names.length) { d.inferredClass = null; d.characterClasses = null; }
           sendTick("quests", "classes|" + names.join(","), true);
           redraw();
         };
@@ -1722,11 +1722,19 @@ function boot() {
           out.push(el("div", "empty", "Nothing matches. Searches cover quest names, turn-in "
             + "items, rewards, quest givers, and zones — try fewer words."));
       } else {
+        // The whole class list and where it came from, both decided on the PC
+        // (CharacterClasses.Resolve) — a Legends character is up to three classes and this
+        // line used to name one. `characterClasses` is newer than `inferredClass`; the old
+        // field is still sent for a release because an open phone runs the page it
+        // downloaded weeks ago (trap 32), so fall back to it rather than going blank.
         scopeLine.textContent = !d.classes || !d.classes.length
-          ? (d.inferredClass
-            ? "🎭 Filtering for " + d.inferredClass + " (inferred from your most-used skills "
-              + "— pick classes to override; inference follows you if you swap)"
-            : "")
+          ? (d.characterClasses && d.characterClasses.length
+            ? "🎭 Filtering for " + d.characterClasses.join(" · ")
+              + (d.classSourceLabel ? " (" + d.classSourceLabel + " — pick classes to override)" : "")
+            : d.inferredClass
+              ? "🎭 Filtering for " + d.inferredClass + " (inferred from your log "
+                + "— pick classes to override)"
+              : "")
           : "";
         const names = lens ? [lens.name] : viewClasses().map(c => c.name);
         const mine = d.mine.map(n => byName.get(n.toLowerCase())).filter(Boolean);

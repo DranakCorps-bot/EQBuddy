@@ -397,6 +397,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
                 Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                 InferredClass = CurrentSnapshot().InferredClass,
+                // The RESOLVED list and its source, decided here so the phone cannot decide it
+                // differently than the two windows (#210). The single class above stays for one
+                // release: an open phone runs the page it downloaded weeks ago (trap 32).
+                CharacterClassNames = ClassSourceFor(CurrentSnapshot()).Classes,
+                ClassSource = ClassSourceFor(CurrentSnapshot()).Source,
             },
             QuestLedger = QuestLedger,
             QuestCharacterKey = () => QuestCharacterKey,
@@ -4158,7 +4163,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// `ClassSourceFor`, through the same `CharacterClasses.Resolve`, so the two lanes and
     /// the phone cannot answer differently (#210's rule applied to a decision rather than
     /// to a list of rows).</summary>
-    internal (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) =>
+    public (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) =>
         CharacterClasses.Resolve(
             QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
             s.InferredClasses,

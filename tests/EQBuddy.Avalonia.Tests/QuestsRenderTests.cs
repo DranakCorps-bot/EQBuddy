@@ -35,6 +35,13 @@ public sealed class QuestsRenderTests : IDisposable
         public string QuestCharacterKey { get; init; } = "";
         public string CurrentZoneName { get; init; } = "";
         public StatsSnapshot CurrentSnapshot() => new();
+
+        /// <summary>Settable, so a test can put a real class list (and its SOURCE) in front
+        /// of the window — the point of `CharacterClasses` is that "Warrior · Druid · Monk"
+        /// reads differently depending on whether the game said it or a heuristic guessed.</summary>
+        public (IReadOnlyList<string> Classes, ClassSource Source) Classes { get; set; } = ([], ClassSource.Unknown);
+
+        public (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s) => Classes;
         /// <summary>Settable, so a test can put the Sky tab's import report on screen —
         /// null is the ordinary case (no dump has been read this session).</summary>
         public AutoImportOutcome? LastAchievementsImport { get; set; }

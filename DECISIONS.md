@@ -500,3 +500,24 @@ one genuinely does. Each line below is a decision I made instead of a question I
   names `OutputfileAutoImport.cs` as a path string and the flake guard reads that as a call.
   Serialising four file reads is cheaper than teaching that guard to tell a path from a call,
   and a guard with a convenience exception carved into it stops being a guard.
+
+## 2026-08-23 (afternoon) — the V3 presentation half
+
+- **What looked like a labelling job was hiding two functional collapses.** Both Quest windows
+  were still reading `CurrentSnapshot().InferredClass` directly — one class, bypassing
+  `CharacterClasses.Resolve` — in `BuildClassStrip` and in the filter. The window that most
+  needs the multi-class answer was the last place still collapsing it. Renaming a label is what
+  took me into the file; the collapse is what I found there.
+- **`ClassSourceFor` went ON `IQuestsHost` rather than being reached for.** A seam that window
+  must go through cannot drift back to the snapshot's single class.
+- **The old `InferredClass` stays on the wire for a release** and the page falls back to it.
+  Trap 32: an open phone runs the page it downloaded weeks ago, so removing the field it reads
+  would blank the line on every device that has not reloaded.
+- **The new wire keys were pinned the same day they were written.** `characterClasses` and
+  `classSourceLabel` are in `CompanionWireKeyTests` — the last field added to this wire reached
+  the page under the wrong name and the manual check could not see it because the payload was
+  hand-typed.
+- **Bevel has NOT ruled on this wording** and Fable's plan asked for a pre-design pass. I built
+  it as a like-for-like replacement of an existing string rather than a new surface — "(inferred)"
+  said one of three things and said nothing when the GAME had told us. Bevel's next run should
+  see it; flagged rather than presented as settled.

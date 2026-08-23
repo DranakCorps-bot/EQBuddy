@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -27,6 +27,16 @@ public interface IQuestsHost
     string QuestCharacterKey { get; }
     string CurrentZoneName { get; }
     StatsSnapshot CurrentSnapshot();
+
+    /// <summary>The character's classes and where they came from
+    /// (<see cref="CharacterClasses.Resolve"/>): the achievements dump leads, the log fills
+    /// in, and the Quest Tracker's own picks come last and only WIDEN.
+    ///
+    /// On the interface rather than reached for, so this window cannot go back to reading
+    /// <c>CurrentSnapshot().InferredClass</c> — which was one class where a Legends
+    /// character has three, and is what made this window filter to a Warrior's quests for
+    /// a Warrior/Druid/Monk.</summary>
+    (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s);
 
     /// <summary>What the last unprompted <c>/outputfile achievements</c> import did, for the
     /// Sky tab to report (Bevel, Helm-signed 2026-08-23). The dump feeds two consumers and
@@ -520,10 +530,9 @@ public sealed class QuestsWindow : Window
     private void BuildClassStrip()
     {
         _classes.Clear();
-        var mine = _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [];
-        if (mine.Count == 0
-            && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inferred)
-            mine = [inferred];
+        // The RESOLVED list, not the picks with one inferred class behind them — the dump
+        // leads, the log fills in, picks widen (`CharacterClasses`). WPF twin does the same.
+        var mine = _main.ClassSourceFor(_main.CurrentSnapshot()).Classes;
         // One class and no lens to offer: a strip reading "Any · BRD" chooses nothing.
         if (mine.Count < 2) { _classStrip.IsVisible = false; return; }
         _classStrip.IsVisible = true;
@@ -1236,17 +1245,14 @@ public sealed class QuestsWindow : Window
         var completed = _main.QuestLedger?.CompletedFor(key)
             ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var filter = (_filterBox.Text ?? "").Trim();
-        var classes = _main.QuestLedger?.ClassesFor(key) ?? [];
-        SyncClassChecks(classes);
-        // No classes picked? The log's own evidence pre-filters — ALWAYS labeled
-        // inferred, never persisted, and one popup pick overrides it (David,
-        // 2026-08-11: players swap classes, so this is a reading, not a fact).
-        var inferred = "";
-        if (classes.Count == 0 && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inf)
-        {
-            inferred = inf;
-            classes = [inf];
-        }
+        var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
+        SyncClassChecks(picks);
+        // Nothing PICKED? The character's classes still pre-filter — from the dump if it
+        // has one, from the log otherwise — always labeled with where they came from,
+        // never persisted, and one popup pick overrides (David, 2026-08-11).
+        var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
+        var classes = picks.Count > 0 ? picks : resolved.ToList();
+        var inferred = picks.Count > 0 ? "" : string.Join(" · ", resolved);
 
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing here covers the catalog, the zone view and the two
@@ -1280,8 +1286,8 @@ public sealed class QuestsWindow : Window
         }
         if (inferred.Length > 0)
             _questsPanel.Children.Add(Note(
-                $"Filtering for {inferred} (inferred from your most-used skills — " +
-                "pick classes above to override; inference follows you if you swap)", "Info"));
+                $"Filtering for {inferred} ({CharacterClasses.SourceLabel(classSource)}" +
+                " — pick classes above to override)", "Info"));
 
         var era = _settings.QuestEraFilter;
         // Era and class gate separately since 2026-08-11 (David's Crushbone session):

@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Companion;
 
@@ -20,7 +20,18 @@ public sealed record CompanionQuestRequest
     public IReadOnlyDictionary<string, int> Completed { get; init; } =
         new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
     public IReadOnlyList<string> Classes { get; init; } = [];
+    /// <summary>The heaviest class, kept for one release so an OPEN PHONE running the
+    /// page it downloaded weeks ago keeps working (trap 32 — the page never re-fetches
+    /// itself). New code reads <see cref="CharacterClassNames"/>.</summary>
     public string InferredClass { get; init; } = "";
+
+    /// <summary>The character's classes and where they came from, resolved desktop-side by
+    /// <see cref="CharacterClasses.Resolve"/> — so the phone cannot resolve them
+    /// differently than the two windows do (#210's rule applied to a decision rather than
+    /// to a list of rows).</summary>
+    public IReadOnlyList<string> CharacterClassNames { get; init; } = [];
+
+    public ClassSource ClassSource { get; init; } = ClassSource.Unknown;
 }
 
 /// <summary>

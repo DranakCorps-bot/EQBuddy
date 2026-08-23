@@ -818,8 +818,12 @@ public sealed class OptionsWindow : Window
               + (classes.Count > 0
                   ? $"{string.Join(", ", classes.Select(QuestClassFilter.Abbrev))} "
                     + (picked
-                        ? "(picked in the Quest Tracker)."
-                        : "(inferred from your combat log — pick classes in the Quest Tracker to override).")
+                        ? "(picked in the Quest Tracker — picks WIDEN what EQBuddy already "
+                          + "knows about your character rather than replacing it)."
+                        // "(inferred)" was one of three things this can be, and said nothing
+                        // at all when the GAME had told us through an achievements dump.
+                        : $"({CharacterClasses.SourceLabel(ClassSource.Inferred)} — pick classes "
+                          + "in the Quest Tracker to widen).")
                   : "your classes — none known yet: pick them in the Quest Tracker, or use (any class).")
             : "No character detected yet — once today's log names one, reopen Options and the editor unlocks.";
         _buffSetAddBox.IsEnabled = key.Length > 0;

@@ -201,6 +201,9 @@ public static partial class CompanionProjection
                     kv => $"{kv.Key}={kv.Value}"),
                 Join(qs.Classes, c => c.Abbrev),
                 qs.InferredClass,
+                // The resolved list and its source: step changes (a dump read, a pick, a
+                // class clearing its evidence floor), never a per-tick drift.
+                Join(qs.CharacterClasses ?? [], c => c) + "|" + qs.ClassSourceLabel,
                 ChecklistPrint(qs.Epics),
                 ChecklistPrint(qs.Sky));
 

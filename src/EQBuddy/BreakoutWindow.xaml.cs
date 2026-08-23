@@ -858,7 +858,11 @@ public partial class BreakoutWindow : Window
         // The class filter, visible: the combination this set is assembled for, its
         // source named honestly — the log has no /who or loadout-change line to read.
         SubText.Text = main.BuffSetCharacterName + " · " + (classes.Count > 0
-            ? string.Join("/", classes.Select(QuestClassFilter.Abbrev)) + (picked ? "" : " (inferred)")
+            // Where the classes came from, in the shared words — "(inferred)" said only
+            // one of the three things this can now be, and said nothing at all when the
+            // GAME had told us via an achievements dump.
+            ? string.Join("/", classes.Select(QuestClassFilter.Abbrev))
+                + (picked ? "" : $" ({CharacterClasses.SourceLabel(ClassSource.Inferred)})")
             : "no classes known yet");
         SubText.ToolTip = "Classes come from your Quest Tracker picks, falling back to the class "
             + "inferred from your combat log — EQ Legends logs announce no loadout changes, so "

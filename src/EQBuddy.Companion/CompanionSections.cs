@@ -296,6 +296,11 @@ public sealed record CompanionQuestsSection(
     /// <summary>Set only when nothing is picked and the log's evidence suggests a
     /// class — always labeled inferred on screen, exactly as the desktop labels it.</summary>
     string? InferredClass,
+    /// <summary>Every class this character has, and the WORDS for where that came from
+    /// ("from your achievements" / "inferred from your log" / "your picks") — decided once
+    /// desktop-side. Empty when nothing knows yet.</summary>
+    IReadOnlyList<string>? CharacterClasses,
+    string? ClassSourceLabel,
     CompanionChecklistSection Epics,
     CompanionChecklistSection Sky);
 
