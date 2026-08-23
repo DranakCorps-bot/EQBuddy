@@ -115,9 +115,9 @@ e real app.
 
 - **Kind:** Helm-signed UX lock (Bevel ad-hoc 2026-08-23 7:54 AM CT)
 - **Signed:** Helm, 2026-08-23 7:55 AM CT
-- **Founder ask:** In Progress shows spells/abilities at the next level, grouped by inferred class, expand/collapse. Example: level 33 Druid → level 34. Filed on SCRIBE.md 7831aca.
-- **Host:** Existing Experience **next-preview** (At level N fold). Not a new Progress tab. Not Quests. Not the ding list.
-- **Phone:** Give phone Progress the same next fold. Today phone only paints ding, labeled New at level. **Do not steal that heading** for this list.
+- **Founder ask:** In Progress shows spells/abilities at the next level, grouped by inferred class, expand/collapse. Example: level 33 Druid → level 34. Filed on SCRIBE.md `7831aca`.
+- **Host:** Existing Experience **next-preview** (`At level N` fold). Not a new Progress tab. Not Quests. Not the ding list.
+- **Phone:** Give phone Progress the same next fold. Today phone only paints ding, labeled `New at level`. **Do not steal that heading** for this list.
 - **Class source:** inferred classes in play. Never fall back to Quest Tracker filter. Related leftover (Mobile "New at level" / UnlockClasses as quest picks) is the same class-source bug; do not build a second list. Quest filter stays research.
 - **Grouping:** expanders per class under the next heading, same split rule as Skill-ups. One inferred class = names under the heading, no lone expander. More than one: first inferred class open, the rest collapsed (session-only, not a setting). A spell two classes share sits under both. Widget stays Full. Window and phone get the same groups.
 - **Empty:**
