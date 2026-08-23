@@ -142,6 +142,65 @@ A shot is the only thing that can see this — no test, diff or build can — so
 wins, `progress-card` gets re-shot and the picture is the acceptance criterion. Add a `Kills &
 Drops` shot in the same pass if the check above finds it affected.
 
+### Plan — Fable 5, 2026-08-23
+
+**Status: `ready`.** No `needs-david:` — restoring intended behaviour, nothing on the
+consequence list. Bevel: notify, not pre-design — one entry in `BEVEL-FEEDBACK.md` describing
+the behaviour below before PR 1 lands, so the 1pm run can object to the interaction (it owns
+"which surface does which job", and window chrome is a job).
+
+**The ruling: none of the four options. The tension dissolves if the pin is not a MOMENT.**
+All four candidates try to pick a better instant to sample the height, and every instant is
+wrong for some window because "the content has arrived" is not an event WPF gives you. So stop
+sampling: **the window follows its content until the user takes the height for themselves,
+and the first user-caused size change ends following and starts persisting.** That is exactly
+the UX both features were separately trying to buy — size-to-content for people who never
+touch the edge, a remembered height for people who do — with no timer (option 3's flake), no
+per-window knowledge (option 2's fourth call site), no Win32 hook (option 4), and no lost
+capability (option 1).
+
+**The decision is a sum, so it goes in UI.Shared** (the standing move — the WPF layer has no
+tests): `UI.Shared/WindowHeightFollower.cs`, a small state machine with no framework types:
+
+- `Desired(measuredContentHeight, cap)` — what the window's height should be now, `null` for
+  "leave it alone". Returns a value only while UNOWNED and only when the measured height
+  CHANGED (trap 12's lesson: never emit geometry on a clock; emit on delta).
+- `OnSizeChanged(newHeight, wasSelfSet)` — the attribution rule. A change we just assigned is
+  ours; any other is the user's, flips the state to OWNED, and its value is what
+  `WindowHeights` persists. Wiring sets a flag around its own assignment so `wasSelfSet` is a
+  fact, not a guess.
+- `Owned` / saved-height entry: a profile that already carries a height starts OWNED at that
+  height — nobody who has dragged a window ever sees it move by itself.
+- Unit tests enumerate the state machine: fresh-follow, grow, shrink (folding a section
+  shrinks the window again, which the shipped pin also broke), user-drag mid-follow, restore
+  from saved, cap collision, and the negative: after OWNED, `Desired` is null forever.
+
+**PR 0 — evidence, half a day, before any behaviour changes.** The stub's own two unchecked
+claims: shoot Kills & Drops on a fresh profile (the likeliest second victim — replay-fed like
+Progress) and Quests/Gear & Loot (expected unaffected — catalog/settings-fed; confirm the
+control). Write the four expected heights down BEFORE shooting (trap 23). And measure the
+Avalonia lane the same way with `WidgetSheetTests`-style capture or a manual run — it "was not
+examined at all" and its window code is its own.
+
+**PR 1 — the follower + WPF wiring.** `WindowZoom.AllowResize` drops the
+`ContentRendered` pin (delete `Release`), gains the follower; the per-refresh site is
+`MaybeRefresh`/the existing tick the four windows already share through `WindowZoom` — if that
+turns out not to be one place, STOP and re-scope, because a four-site wiring is option 2
+wearing a helper's name. `WindowHeights` keeps both its writer (now: first user resize) and
+its reader (restore = start OWNED), so trap 20 stays satisfied in both directions.
+Acceptance: `progress-card` re-shot, prediction written first — **520 × ~389, summary + both
+lists, no scrollbar on a fresh profile** — plus whichever PR 0 shots showed clipping. Guards
+run eight times; the follower tests plus a `WindowZoom` source-scan asserting no
+`ContentRendered` handler returns (the pin must not come back by reflex).
+
+**PR 2 — the Avalonia twin**, same follower, its own wiring, sized by what PR 0 found there.
+If PR 0 finds the Avalonia lane unaffected (different sizing path), PR 2 is a one-line
+feedback note saying so and why, not a port for symmetry's sake.
+
+**Out of scope, stated so it is not dragged in:** #186's Ctrl+wheel width zoom (separate axis,
+works, untouched); `ScreenGuard` position restore (#117); the Progress window's tab-strip
+chrome; any change to `BodyScroll.MaxHeight` caps.
+
 ---
 
 ## Next-level spells by class: eqlwiki disagrees with ITSELF, and we ship the losing source
