@@ -24,6 +24,24 @@
 > heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
 > Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
 
+> **2026-08-23 — v1.99.6 IS RELEASED.** Tag `v1.99.6` on origin at `a7e59ab`, GitHub release
+> published 16:28Z, OneDrive artifacts 11:27, `EQBuddySetup.exe` **Valid** and timestamped as
+> `CN=FlossworksCross-Stitch`. Verified in it: the phone wire-key fix (`cfb912e`), the #233
+> WHERE THINGS MOVED block (`92054a6`), both features. **Anything in this file below that calls
+> 1.99.6 "staged" or "held" is describing a state that has stopped being true** — read it as the
+> record of how it got there, not as where things stand.
+>
+> → **The lesson is mine and it is worth the line.** I told David twice in one session that
+> nothing was tagged, in prose and then in a question option, having checked `git log` and never
+> `git tag`. `CLAUDE.md` names the three checks for exactly this — `git tag`, `gh release list`,
+> the OneDrive timestamp — and I had read them as being about a KILLED release run rather than
+> about any claim on release state. They are about the claim. He corrected me; the checks took
+> nine seconds.
+>
+> **Still open: the #233 reply.** Drafted in `HELM-FEEDBACK.md`, revised to say the map is out
+> NOW rather than in the next release. David asked to see it before it moves and has it; it has
+> not been posted and has not been signed off by Helm.
+
 > **2026-08-23 (night, later), Fable 5 — v1.99.6 CLEARED: `v1.99.5..3a13097`, no condition.**
 > Wire-key fix verified (guards run here, 2,474 unit green on HEAD), shot matches its
 > prediction, #233 map checked against `AbsorbedCardKeys` and the tab labels. Only the release

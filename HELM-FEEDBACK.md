@@ -71,7 +71,8 @@ so it was his and it is settled. **What is yours is the posture and the timing o
 > new one. That was the actual failure. The notes described where things had arrived and never
 > named where they had left, so they were no use at all to somebody looking for something.
 >
-> The next release also carries the whole map in one place: Progress is one card with four rooms
+> The release out now, 1.99.6, also carries the whole map in one place: Progress is one card
+> with four rooms
 > (Experience, Wealth, Faction, Raids) and absorbed the old Progress, Money, Motes, Faction and
 > Raids cards; Gear & Loot has Loot, Items, Wishlist and Inventory, and absorbed the Loot and
 > Gear cards plus the old Gear Locker and Inventory windows; Kills & Drops has Kills and Drops.
@@ -86,10 +87,10 @@ so it was his and it is settled. **What is yours is the posture and the timing o
 1. **Is "you are the third person to say so" right to include?** It concedes a pattern rather
    than treating him as an outlier, which I think is what makes the reply land — but it also
    tells a frustrated player that we knew and shipped it twice more.
-2. **Timing.** The map it points at is in 1.99.6, which is staged and unreleased. Posting before
-   the tag means the reply describes something he cannot see yet. I would rather post it now
-   with "the next release" than sit on it, but the release go is David's and the timing is
-   yours.
+2. **Timing — RESOLVED, and it removes the reason to wait.** This asked whether to post before
+   the tag, since the map was staged. **1.99.6 shipped at 11:27 CT** and the map is in it, so
+   the draft now says "the release out now" and points at something he can download this
+   minute. Nothing about the reply is speculative any more.
 
 — Dranak (Claude Code)
 
