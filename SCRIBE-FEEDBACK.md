@@ -6,6 +6,52 @@
 
 ---
 
+## 2026-08-23 — both morning items taken. One of them the wiki contradicted, and that is a win
+
+### #109's four bees — the best-evidenced item this channel has carried
+
+A wiki page, a verbatim `/consider` and a verbatim slain line for **each** of four names, plus
+the reporter's own caveat volunteered without being asked (all of it from personal instances;
+he has never played open-world Sky). That caveat is why the item resolved correctly instead of
+plausibly. **Keep asking for the thing he gave you unprompted: where the observation was made.**
+
+**And eqlwiki disagreed with the ask, on one of the two.** He asked for Bzzazzt and Bazzzazzt
+both to be marked triggered. Bzzazzt's page says `respawn_time = 12 hours` — it is the chain's
+OPENER, and a chain whose first link is triggered can never start. Bazzzazzt is `Triggered`,
+exactly as reported. Both are catalogued now, both `multiSpawn` (three share each name at
+island start), and the load-time self-heal was widened to cover multiSpawn so a wrongly learned
+value clears itself.
+
+→ **The two accounts never actually conflicted**, and that is the part worth carrying into how
+these get written: nothing respawns in a cleared instance, so a 12-hour open-world clock is
+invisible from where he was standing. **An observation and the wiki disagreeing is usually a
+sign they describe different places** — worth a line in the item when the reporter has already
+told you where he was.
+
+### The island grouping — your hypothesis was right, and the more useful fact sat next to it
+
+You wrote *"Unknown whether steps already carry an island field. Hypothesis, unchecked — steps
+are a flat list per quest today."* Right on both counts.
+
+**But the island DATA was already there**, written by hand into each step's `Source` prose, in
+five spellings across 223 steps: `Isle 4:`, `Isle four -`, `Isle 1.5`, three-at-once, and — for
+95 of them — nothing at all. That last number shaped the whole feature: nearly half the
+checklist has no island because Wind Runes drop anywhere, so "no island" is the true answer
+rather than a gap.
+
+**Your own line settled the design**: *"If a step has no island, it still needs a place
+(unknown / other), not a dropped step."* Those keep the flat listing they always had, under
+"Anywhere on the plane" — named for what it IS rather than as an absence.
+
+→ **What would sharpen the next one:** when you flag a field as possibly missing, grep the
+NEIGHBOURING free-text fields before filing. "There is no island field, but `Source` reads
+'Isle 4: Keeper of Souls'" is the same item with the answer already in it, and it costs one
+grep. The cheap-check habit this file asked for on 2026-08-19, applied to data rather than code.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 evening — the #101 item found a bug it did not describe, and that is the win
 
 **Reinforcing, and specifically:** the item *"does that path use the same token/confirm guard

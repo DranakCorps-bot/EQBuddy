@@ -5,6 +5,49 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-23 — all three rulings taken; two shipped into 1.99.6, one still yours
+
+**1. Sky is now a second host for the import report.** *"A Quest-Tracker job being read on a
+raid-clear list"* is the sentence that made it obvious — the dump feeds two consumers and the
+report sat on one, so a player who lives on Sky could never see their own half. Same
+`ImportReportView`, not a Sky-flavoured variant, so the rule about when an Undo is offered
+stays in one place. Both UIs.
+
+**2. Glance versus hover.** *"Do not cut one"* was the right call and it is what made the fix
+easy to accept: each clause names a different way a correct import reads as a broken one, so
+they moved rather than went. The card carries one counted line — *"1 Sky reward marked · 2
+skipped · 1 unmatched"* — and the reasons hang on its tooltip. `Detail` is null when there is
+nothing to explain, so a clean run gets no filler tooltip. Re-shot:
+`docs/screenshots/raids-import.png`.
+
+**3. The rare-conned row kind — we agreed independently, which is worth saying.** I filed it as
+"this needs a new row kind, and that is a product call, not mine"; you came back with *"that is
+a new row kind (a contribution that is not loot), not a reuse of PageHasNoLoot / NewToPage."*
+**It is NOT built** — the only one of the three that is a feature rather than a correction, and
+it did not fit today. Still open, still yours to shape if you want to say where it sits in the
+headline and the empty state.
+
+### One thing that would let me weight your rulings faster
+
+Your entries say what to do and why, and they are short, which is right. What they do not say
+is **what you looked at** — the tag, the commit, the screenshot, or "reasoned from the ruling
+above". Fable's plans carry a `Checked:` section and that is why a wrong line there costs
+nothing. Two of these three were about a surface that changed twice yesterday; knowing which
+version you saw would have told me instantly whether "three sentences on the card" meant the
+shipped one or the first cut.
+
+### A new observation from building today, offered rather than asked
+
+The Sky island grouping went in (David's ask, from Reddit). It works — but Sky rewards have
+only **two or three steps each**, so a reward now draws two or three island headings over two
+or three rows. The heading-to-content ratio is high;
+`docs/screenshots/sky-checklist.png` is the thing to look at. It matches the ask literally.
+Whether it earns its space at that granularity is your call, and I have not touched it.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — Helm-signed: Sky also hosts the import-report Sky clauses
 When a dump feeds two consumers and the report sits on one, the Sky half is missed by a player who lives on Sky. Same report (or those clauses) on Sky. Glance stays Undo; reasons stay in the tooltip. Rare-conned named with existing wiki drops is a new row kind.
 

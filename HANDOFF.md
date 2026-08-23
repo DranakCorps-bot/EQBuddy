@@ -24,7 +24,58 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 late (LATEST — start here): /consider reaches the wiki, and Avalonia gets its seam
+## 2026-08-23 (LATEST — start here): the whole 6am inbox is cleared
+
+**1.99.6 is still staged and UNRELEASED, and it has grown again.** Gates: **2,441 unit · 273
+Avalonia · 24 E2E**, green. **A Fable re-review is owed before the tag** — it cleared
+`1b9f0c8..7f8a117` and the range is now much larger. The request in `FABLE-FEEDBACK.md` needs
+its range updated again before it goes back.
+
+### Three items in, from the morning run
+
+1. **#109's four bees.** The chain is Bzzazzt → Bazzzazzt → Bzzzt → Bazzt Zzzt and we carried
+   the last two. **The reporter asked for both new ones to be marked triggered and eqlwiki says
+   only one is** — Bzzazzt has a real 12-hour clock, because a chain's opener cannot itself be
+   triggered. His evidence is all from personal instances, which never respawn, so the two
+   accounts describe different places rather than disagreeing. The load-time self-heal now
+   covers `multiSpawn` entries, which is what Bzzazzt needed.
+2. **Bevel's three rulings.** The import report is one counted line with the reasons on hover,
+   and **Sky is now a second host** for it. The third — a new pack row kind for a rare-conned
+   named with no new loot — is NOT built and is still Bevel's to shape.
+3. **Sky steps grouped by island.** No island field existed; the data was in each step's
+   `Source` prose in five spellings. 95 of 223 steps name no island at all and keep the flat
+   listing. **David chose a player toggle** for the 22 multi-island steps.
+
+### The two findings worth carrying
+
+- **Repeating a step nearly broke the score.** Progress counted ROWS, so a step shown under
+  three islands would have made a 4-step reward read as 6 — silently, only for players who
+  opted in, on the surface whose whole job is to say how far along you are. Counts are over
+  distinct steps now and the guard fails on the pre-fix tree.
+- **A positional fixture reference broke quietly.** A spawn test read `Named[0]`; two bees
+  joined the chain in front of it and it began asserting about a different creature. Fixed to
+  name what it means.
+
+### Governance
+
+**David approved Fable's boundary change** — a Founder-owned control plane may start a session;
+everything unowned is still forbidden, and the carve-out now states its own width. **Fable's
+`To:` convention is adopted** (in `CLAUDE.md`, with `To: David` explicitly not a substitute for
+the question tool).
+
+**He restated for the THIRD time that any call of his comes through the question tool.** Three
+statements of one rule means the rule was never the gap — the tell is now written as syntax
+rather than judgement: *any sentence handing him a choice is a question, however calm it
+sounds.* Memory and `CLAUDE.md` both updated.
+
+### Open
+
+**Bevel's rare-conned row kind** · the **1.99.6 re-review** · the **human click-through** of the
+Avalonia Progress pop-out sequence on Linux or macOS, which no test can reach.
+
+---
+
+## 2026-08-22 late: /consider reaches the wiki, and Avalonia gets its seam
 
 **1.99.6 is staged and UNRELEASED — David held the tag deliberately so more could ride it.**
 Fable reviewed it and said ship; he chose "hold it, carry on building". Gates: **2,402 unit ·

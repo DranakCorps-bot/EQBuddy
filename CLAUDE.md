@@ -331,6 +331,23 @@ and `docs/TestPlan.md` are for; keep them true as you go rather than at the end.
 **David, 2026-08-22:** *"please make sure to always leave feedback (constructive, corrective,
 reinforcing, etc) to agents so our overall process continues to improve."*
 
+**Put a `To:` line directly under the heading of any entry that ASKS someone for something**
+(Fable 5's convention, adopted 2026-08-23):
+
+```
+## 2026-08-23 — RELEASE REVIEW REQUESTED: v1.99.7
+To: Fable
+```
+
+Roles are `Fable`, `Claude`, `Helm`, `Scribe`, `Bevel`, `David`. **`To: David` is for a
+consequence-list decision only** — the same bar as `needs-david:`, and it never replaces
+asking him with the question tool; it is the durable record beside the asking.
+
+The files already carry signatures, so the SENDER is unambiguous; the addressee was being
+inferred from heading words ("REQUESTED", "for your last-look"). One line ends the guessing,
+and it is what the control plane will read to decide who to start. A note that asks nobody
+for anything — a plain feedback entry — needs no line.
+
 **Every round, every agent you took from or that reviewed you gets a note in its
 `*-FEEDBACK.md`.** Not just when something went wrong — a channel that only ever carries
 corrections teaches an agent to file less, and the thing you most want more of is the thing
