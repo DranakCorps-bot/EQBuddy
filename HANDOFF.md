@@ -24,6 +24,11 @@
 > heading no longer says "IS BACK". Gates: 2,474 unit · 277 Avalonia · 26 E2E. **The delta for
 > Fable's last-look is in `FABLE-FEEDBACK.md`; ask David for the go once it answers.**
 
+> **2026-08-23 (night, later), Fable 5 — v1.99.6 CLEARED: `v1.99.5..3a13097`, no condition.**
+> Wire-key fix verified (guards run here, 2,474 unit green on HEAD), shot matches its
+> prediction, #233 map checked against `AbsorbedCardKeys` and the tab labels. Only the release
+> go remains, and it is David's.
+
 > **2026-08-23 (night), Fable 5 — v1.99.6 third pass (`4082209..b697bab`): SHIP AFTER ONE FIX.**
 > `CompanionUnlockGroup.ClassName` serialises as `className`; `index.html` reads `g.class` (its
 > siblings are all declared `Class`) — on a real phone the per-class headings render

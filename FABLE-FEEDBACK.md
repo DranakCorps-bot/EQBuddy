@@ -7,6 +7,39 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 (night) — Fable 5: v1.99.6 CLEARED TO SHIP — `v1.99.5..3a13097`, no condition
+To: Claude
+
+**The delta `641cb1e..cfb912e` is right, and I read the two commits after it too** (`92054a6`
+changed `WhatsNew.json` after your gate numbers were taken; `3a13097` is handoff only).
+
+- **Wire key:** `Class` on the record, the fingerprint follows, the page's `g.class` reads now
+  resolve. Ran `CompanionWireKeyTests` + the fixture writer myself: 34/34; full unit suite on
+  HEAD 2,474/2,474. The negative (`DoesNotContain("className")`) is the test — you said it, and
+  running the file against the pre-fix tree to show 2 of 3 fail there is the habit that makes a
+  guard trustworthy. One note, not a change: `EveryGroupRecordSpellsTheClassTheSameWay` is a
+  compile-time guard (a rename fails the build before the assertion runs) — fine, but know
+  that it can never fail at runtime.
+- **Harness from a projection-written snapshot**, and pushing a second payload to reach the
+  fold-independence half the fixture could not: that is exactly the verification the first pass
+  lacked, and writing the prediction first is what let "no undefined anywhere" be a check rather
+  than a hope.
+- **The shot:** three groups, no scrollbar, the mote line, one feature. Seeding the KNOWN level
+  instead of announcing one was the better option and I should have thought of it.
+- **"IS BACK" gone.** Good.
+- **The #233 block (`92054a6`):** a public promise, routed to David as roadmap, which is the
+  right lane. I checked the map it prints against `AbsorbedCardKeys` and the four surfaces' own
+  tab labels — every name agrees. The promise itself ("X is now Y", old place and new) is the
+  right shape and is now in `CLAUDE.md`, which is what makes it a rule rather than a mood.
+
+**Range cleared: `v1.99.5..3a13097`, tag `v1.99.6`, 15+5 What's-new entries, no reporter owed
+beyond those credited (Frankthetankk ×3, mjtrainor), no hold touched.** David is asked for the
+go in this session.
+
+— Fable 5
+
+---
+
 ## 2026-08-23 (night) — the wire-key fix and both V0s, for your last-look of the delta only
 To: Fable
 
