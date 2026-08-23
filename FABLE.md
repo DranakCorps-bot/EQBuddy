@@ -400,249 +400,49 @@ session-scoped; (name, zone) keying.
 
 ---
 
-## Avalonia theme bodies need a seam before a card and a window can both host them
+## Avalonia theme bodies need a seam — PR A DONE, PR B still planned
 
-- **Priority:** `ready` — no consequence-list decision in it. This is the blocker that stopped
-  Inline themes PR 1 finishing, and it is written the day it was hit rather than carried.
-  **Plan written by Fable 5, 2026-08-22 — see "Plan" below the stub. Short form: option (a),
-  because (b) is an open upstream Avalonia bug and not ours to make safe.**
-- **Class:** `V2`. Not V0–V1 by your own test: **no answer from David finishes it as V1.** The
-  obvious fix (build a second instance for the card, as WPF does) is wrong for a reason only
-  visible with the whole widget in view — the Avalonia surfaces are not objects, they are
-  render code writing into ~40 MainWindow fields, so a "second instance" would be a second
-  panel containing THE SAME field controls and would fail identically one level down.
-- **Source:** Inline themes PR 1, executor, 2026-08-22. WPF half is on `main` (`a1157f2`).
+- **Priority:** `ready` for **PR B only**. PR A was executed 2026-08-22 (Claude); the plan's
+  Step 0 was already done and is what found the 1.99.4 reopen crash.
+- **Class:** `V2`, unchanged.
 
-### What happened, precisely
+### PR A — DONE, and what it actually cost
 
-`WidgetRenderTests.ProgressCardFoldsTheAaLedgerBehindAToggle` fails with
-**`System.ArgumentException: Attempt to call InvalidateArrange on wrong LayoutManager`**,
-thrown from the test's own `Dispatcher.UIThread.RunJobs()`. 38 pass before the change, 37 pass
-and 1 fails after. It is the crash your plan predicted in as many words — *"a control has one
-visual parent; showing a body in the card and the window at once throws"* — arriving through a
-route the `HandThemeBodyTo` funnel does not close.
+Option (a), as planned. `EQBuddy.Avalonia/IWidgetCard.cs` (seam, `ICardContext`,
+`ProgressSurfaceSet`), `CardParts` for the shared row builder, and five views —
+`ProgressCardView`, `MoneyCardView`, `MotesCardView`, `FactionCardView`, `RaidsCardView`.
+`ProgressTabBody` is deleted and replaced by `NewProgressSurfaces()`; `ProgressWindow` builds
+its own set in its constructor, eagerly, because two of those views are the only writers of
+settings the rest of the app reads. **369 lines out of `MainWindow.cs` (5,598 → 5,229);
+baseline lowered to 5,229 in the same commit.** All 271 existing Avalonia tests pass
+unchanged — the "tabs draw what the cards drew" claim carried across the seam.
 
-The sequence is ordinary, not exotic: `WidgetRenderTests` sets `EQBUDDY_EXPAND=1`, the widget
-expands every section (`MainWindow.cs:472`), the theme card therefore goes `Inline` and takes
-`_progressTabBodies[Experience]`, and the test then opens the Progress window. **A player does
-the same thing by expanding Progress and clicking ⧉.**
+**Two things the plan did not predict, both worth having:**
 
-### What was tried, so the next attempt does not repeat it
+1. **The two-second throttle nearly ate the live numbers.** `MaybeRefresh()` had only ever
+   throttled the window's CHROME; the surfaces were painted by the widget's own per-tick
+   `RefreshExpandedSections`, and that distinction existed nowhere but in the arrangement of
+   the old code. Rendering in `MaybeRefresh` would have put a 2 s stutter on live values.
+   Now trap 46.
+2. **`SurfaceOwnershipTests` found the same hand-off on TWO more lanes** on its first run:
+   `IGearLootHost.LootTabBody` and `ICreatureHost.CreatureTabBody`, with the same doc comment.
+   They are exempt by a curated list naming the PR that removes each. **What holds them today
+   is 1.99.4's release-on-close mitigation, not safety** — the day one of them expands in
+   place it is the Progress crash again.
 
-Each of these was built and run, not reasoned about:
+Traps 45 and 46 are in `CLAUDE.md`. The `_raidsBody` wrapper from the same morning's
+auto-import fix died with the lift, as you asked.
 
-1. **The funnel itself** — card releases in `ThemeCardPanel.Render`, window releases through
-   `IProgressHost.ProgressTabBody`. Correct and insufficient.
-2. **`Presenter?.UpdateChild()` on release** — `ContentControl` detaches its old child on the
-   next LAYOUT pass, not on assignment. Still failed.
-3. **Posting the repaint at `Background` priority** (what the WPF twin does on `Expanded`).
-   Still failed.
-4. **Deferring `Sync()` off the pop-out path.** Still failed.
-5. **Forcing a layout flush on release** — `ILayoutRoot` and `ILayoutRoot.LayoutManager` are
-   `internal` in the Avalonia version we ship, so this route does not exist from our code.
-6. **Isolation, to stop guessing:** reverting ONLY the `SectionLink` → `Section` swap makes the
-   test pass with every other change in place. So the trigger is the card being expandable at
-   all, not the strip, not the ⧉, and not the body composition — a run with the card given
-   private throwaway bodies still failed.
+### PR B — Inline themes PR 1, Avalonia half — STILL PLANNED
 
-### The shape of the fix, as far as the executor got
+Unchanged from the plan: `ThemeCardPanel` mirroring `ThemeCardView`, `EQBUDDY_EXPAND=progress:raids`
+honoured, the expand → pop-out → close → expand sequence test, a `WidgetSheetTests` shot with
+the prediction written first, landing with the What's-new line the WPF half already has.
+**Nothing blocks it now** — `EveryHostGetsItsOwnProgressSurfacesAndTwoCanLiveAtOnce` is the
+proof that two live hosts no longer collide.
 
-The WPF lane does not have this problem because its surfaces sit on `IWidgetCard` — "paint
-yourself from this snapshot" — so each host builds its own instance and nothing is ever moved.
-`ProgressWindow.xaml.cs` says so itself. The Avalonia lane never got that seam; `BuildProgressSection()`
-and friends compose shared fields, and `RefreshExpandedSections` paints those fields directly.
-
-So the question for the plan is which of these, and it is genuinely not the executor's call:
-
-- **(a) Put the Avalonia Progress surfaces on the `IWidgetCard` seam** (a real refactor of a
-  5,593-line file, and the one that makes the two lanes the same shape — and would pay for
-  PR 2 and PR 3 as well as this one).
-- **(b) Keep one instance and make the MOVE safe** with a public Avalonia API that actually
-  exists in our version.
-- **(c) Something else — e.g. the card hosts a projection rather than the surface.**
-
-### Also in scope of whatever you decide
-
-**MainWindow (WPF) GREW 4,424 → 4,504 in PR 1**, where the plan says each theme PR lowers the
-baseline. Nothing moved out, because the Progress surfaces were already out. Headroom is now
-**131 lines against ~80 a theme**, so PR 2 and PR 3 do not fit. The lift the plan assumed has
-to be named: the most obvious candidate is the `EQBUDDY_EXPAND` dump block (~130 lines of pure
-string-building that is a SUM, not a pixel, and therefore belongs in a file of its own).
-
-### Already shipped (must not be fought)
-
-The WPF inline card (`ThemeCardView`, `ProgressThemeCard`), `ThemeHost` and `InlineMode` from
-PR 0, `WidgetMetrics.ThemeBodyMaxHeight`, `EQBUDDY_EXPAND=progress:raids`, and three committed
-screenshots. **The Avalonia half was reverted rather than left half-built**, so `main` has one
-UI with inline themes and one without — deliberate and reported, not drift.
-
-### Checked
-
-Read this session: `MainWindow.cs:472` (the expand loop), `:479` (the generic ExpandedChanged
-subscription that is registered AFTER it, which is why the widget's own handler never saw the
-initial expand and mine did), `BuildWealthSection`/`BuildProgressSection`, `RefreshExpandedSections`,
-`ProgressWindow.Refresh`, `IProgressHost`, `SectionPanel`, and the Avalonia `DesignSystem`
-strip/icon helpers.
-
-### Plan — Fable 5, 2026-08-22
-
-**Decision: (a). Put the Avalonia theme surfaces on the `IWidgetCard` seam, one theme at a
-time, starting with Progress — and adopt the rule that on Avalonia a control NEVER moves
-between two windows.** (b) is off the table for a reason you could not have seen from our
-code, and (c) is (a) wearing a smaller hat.
-
-#### What I read, and what it changes
-
-1. **The exception is an open upstream bug, not a gap in the funnel.** Avalonia issues
-   **#12753** (2023, "cross-window control reparenting should be supported" — kekekeks, still
-   open), **#17906** (2025: a regression in 11.2.0, moving a UserControl between windows throws
-   this exact message; fine in 11.1.5) and **#21267** (2026, Avalonia 12.0.x, same message in
-   production). We ship 12.1.1. The mechanism in their source: `GetLayoutRoot()` and
-   `GetLayoutManager()` both read `Visual.PresentationSource`, the field 11.2 introduced, and
-   `LayoutManager.InvalidateArrange` throws when the control's presentation source is not the
-   manager's owner. Your six attempts were all variations on making a cross-window move safe;
-   **there is no sequence of public calls that does, and the people who own the layout engine
-   have not found one in three years.** That is why #5 found the API internal: it is internal
-   because re-parenting across roots is not a supported operation.
-2. **The existing design is already on that path and working by accident.** `ShowProgressWindow`
-   creates a NEW `ProgressWindow` each time the old one closes (`MainWindow.cs:3584`), and
-   `IProgressHost.ProgressTabBody` hands the SAME `_progressTabBodies[...]` controls to the new
-   window — a cross-window move on every reopen, today, on `main`, before Inline themes touched
-   anything. No test closes and reopens the window, so nothing has ever checked it.
-   **Hypothesis, labelled:** it survives because a closed window's presentation source is
-   cleared on close, so the check passes by null; the inline card is the first time both roots
-   are alive at once. Step 0 below tests the reopen path directly.
-3. **Your own file already contains the right pattern twice.** `IProgressHost.ProgressMiniStars()`
-   builds NEW star buttons per window and registers them; `BuildMotesSection(summary, list)`
-   takes its controls as parameters "because two hosts draw motes now and a Control has one
-   parent". The seam is that pattern applied to the whole theme instead of two corners of it.
-4. **Your finding #6 ("throwaway bodies still failed") is the one thing this plan does not
-   explain, and it is why Step 0 exists.** If a run with no shared body still threw, something
-   else crossed a root — the reopen move above is the leading candidate (the test opens the
-   window once, but `EQBUDDY_EXPAND=1` with an expandable card may have forced a second
-   `Refresh`), and the stack trace will say in one line what we are both guessing at.
-5. **Ratchet.** Avalonia `MainWindow.cs` is 5,593 against a 5,422 baseline (cap 5,964; 371 of
-   headroom). The Progress rooms are ~17 fields, `BuildProgressSection` (~60 lines),
-   `BuildWealthSection`/`BuildMoneySection`/`BuildMotesSection`, the paint block at ~2,300–2,380,
-   `RenderRaids` (3,180–3,259, ~80 lines) and `ProgressMiniStars`. Lifting them is 250–350 lines
-   out, which is the headroom PR 2 and PR 3 need on THIS lane and the lift the original plan
-   assumed. On WPF the lift is the `EQBUDDY_EXPAND` dump block, as you proposed — see the
-   amendment on the Inline themes item.
-
-#### Architecture
-
-**The seam (`EQBuddy.Avalonia/IWidgetCard.cs`, mirroring `EQBuddy/IWidgetCard.cs` name for
-name):** `IWidgetCard { string Key; Control Body; void Render(StatsSnapshot) }`, `ICardContext`
-with the same six members, and `ProgressSurfaceSet(Experience, Money, Motes, Faction, Raids)`.
-`MainWindow.NewProgressSurfaces()` builds a fresh set on every call. **Nothing hands out a
-`Control` it built earlier** — `IProgressHost.ProgressTabBody(tab)` is deleted, and its
-replacement is `IProgressHost.NewProgressSurfaces()`.
-
-**Four view classes** (`ProgressCardView`, `MoneyCardView` + `MotesCardView` composed as the
-Wealth tab exactly as `ProgressWindow.xaml.cs:64–71` composes them on WPF, `FactionCardView`,
-`RaidsCardView`), each owning the fields it paints today. `RaidsCardView` takes the ledger
-accessor and `CopyAchievementsCmd` factory; `ProgressCardView` takes what WPF's does
-(`settings`, the class source, the level accessor). The widget's `RefreshExpandedSections` loses
-its Progress/Wealth/Faction branches and `RenderRaids` goes with its view.
-
-**`ProgressWindow` builds its own set in its constructor and renders it on its tick** — reopen
-is a new window with a new set; nothing moves. The mini stars stay as they are (already
-per-window).
-
-**`ThemeCardPanel`** (the twin of WPF's `ThemeCardView`, in its own file) builds ITS own set on
-first expand through the same factory, and never releases anything because it never shares
-anything. `HandThemeBodyTo` is deleted — a funnel for a move that must not happen is a place for
-the next person to make it happen.
-
-**The rule, as a trap (copy-ready for `CLAUDE.md`, number it when it lands):**
-
-> **A control NEVER moves between two windows on Avalonia.** Re-parenting across `TopLevel`s
-> throws `Attempt to call InvalidateArrange on wrong LayoutManager` — an open upstream bug since
-> 11.2 (#12753, #17906, #21267), still present in 12.1.1, with no public API that makes it safe.
-> The widget's theme bodies were handed to the Progress window by reference, which worked only
-> because no test ever reopened the window; the inline card, the first host alive at the same
-> time as the window, threw on the first run. Six attempts to sequence the hand-off failed
-> because the operation is unsupported, not mis-sequenced.
-> → **Every host builds its own instance through a factory** (`NewProgressSurfaces()` on both
-> lanes), and no host interface returns a `Control` it did not just create. Guarded by
-> `SurfaceOwnershipTests` (no `*TabBody(` accessor on any Avalonia host interface) and by the
-> reopen/pop-out sequence test in `WidgetRenderTests`.
-
-#### Risks and the traps they touch
-
-- **Trap 20/26 (a fold loses a writer):** moving 17 fields out of `MainWindow` is exactly the
-  event that drops a setting's last writer. List every control each view takes and every
-  `_settings.X =` in the code that moves; `DeadSettingTests` will not see a writer that moved
-  into a view that is never constructed — the card builds lazily, so the WINDOW must construct
-  its set eagerly for those writers to exist.
-- **Trap 15:** `ThemeCardPanel`'s body host gets no `IsVisible` of its own; `SectionPanel`
-  owns expansion, `ThemeHost` owns placement.
-- **Trap 36:** `ThemeCardPanel` carries the body cap WITH a scroller and the wheel pass-through
-  (`PointerWheelChanged`, the Avalonia shape of `PassWheelUpWhenItCannotScroll`).
-- **The mini stars** stay window-only; the card shows none (as WPF). `_stars` removal on close
-  is already right.
-- **`ProgressTabShowing` and the paint gates** (`RenderRaids` returns unless the tab shows) move
-  into `RaidsCardView.Render` as "render only when hosted" — or the host calls `Render` only for
-  the visible tab, which is what WPF's `ThemeCardView` does. Pick the latter; it is one rule.
-- **Two instances of `MotesCardView`** when the widget's own Motes card is shown AND Progress is
-  open — the precedent is already in the file (`_cardMotesSummary` vs `_motesSummary`), so this
-  is the existing behaviour made explicit.
-- **Ratchet:** lower the Avalonia baseline in the same commit as the lift.
-
-#### Decomposition
-
-- **Step 0 — diagnostic, time-boxed to one hour, BEFORE any refactor.** (i) Re-apply the
-  reverted attempt from your local reflog or stash if you still have it; if not, skip to (ii).
-  Attach `AppDomain.CurrentDomain.FirstChanceException` in the failing test and print the
-  `ArgumentException`'s stack — which control, which caller (`ContentPresenter.UpdateChild`,
-  `SetVisualParent`, a `Refresh`). (ii) **Write the reopen test on `main` as it is:** open the
-  Progress window, close it, reopen it, `RunJobs()`; then the same with a tab change in between.
-  Record in `FABLE-FEEDBACK.md` whether `main` throws TODAY. Either answer changes nothing about
-  the plan — it tells us whether this was a latent crash players could already reach.
-- **PR A — the seam, Progress only, no inline card.** `IWidgetCard`/`ICardContext`/
-  `ProgressSurfaceSet` on Avalonia; the four views; `NewProgressSurfaces()`; `ProgressWindow`
-  builds its own; `ProgressTabBody` deleted; the widget's Progress paint branches deleted;
-  `SurfaceOwnershipTests`; the reopen test from Step 0 now green by construction; Avalonia
-  baseline lowered. **Every existing `WidgetRenderTests` case for Progress must pass
-  unchanged** — that is the "tabs draw what the cards drew" claim carried across the seam.
-  Trap entry into `CLAUDE.md`. No player-visible change; no What's-new.
-- **PR B — Inline themes PR 1, Avalonia half**, now a port of the WPF card: `ThemeCardPanel`
-  mirroring `ThemeCardView` line for line where Avalonia allows; `EQBUDDY_EXPAND=progress:raids`
-  honoured; the expand → pop-out → close → expand sequence test; `WidgetSheetTests` shot with
-  the prediction written first. Lands with the What's-new line the WPF half already has, as one
-  entry for both lanes.
-- **PR 2 and PR 3 of Inline themes each begin with their lane's lift** — Loot/Gear/Inventory
-  bodies (`_lootTabBodies`) and Kills/Drops (`_creatureTabBodies`) onto the seam first, card
-  second. The plan's "each PR lowers the baseline" is true again because the lift is real on
-  the lane that needs it.
-
-#### Verification
-
-- `SurfaceOwnershipTests` (source scan: no Avalonia host interface method returns `Control`
-  from a field); `ThemeHostTests` unchanged; the reopen sequence and the card/window sequence
-  in `WidgetRenderTests`, each with `RunJobs()` between steps — **and run the new guards eight
-  times before calling them green** (your flaky-guard lesson from 1.99.3, now a rule in the
-  item shape).
-- Both lanes' `EQBUDDY_EXPAND` facts agree on names (`progressInline`, `progressTab`,
-  `progressWindowOpen`) so one E2E-style assertion reads both.
-- A person clicks it on Linux or macOS once before the tag: expand Progress, pop out, close,
-  expand, change tab in the window, close, expand. That is the sequence no test could reach
-  before today.
-
-#### Out of scope
-
-Fixing the upstream bug or filing on it (we are not blocked on them once nothing moves);
-changing WPF's seam (it is the model); the Loot and Creature lifts (they are PR 2/3's first
-commits, not this item's); anything about the inline card's LOOK (Bevel has ruled; PR B ports
-the WPF result).
-
-#### Decided without asking (→ `DECISIONS.md`)
-
-Option (a) over (b)/(c); the never-move rule as a trap with a source-scan guard; PR A before
-the Avalonia card rather than with it; the window renders only the visible tab (WPF's rule)
-rather than every tab every tick.
-
----
+**One human step the plan asked for and no test can do:** on Linux or macOS, expand Progress,
+pop out, close, expand, change tab in the window, close, expand.
 
 ## Inline themes — expand in place, pop out on request
 

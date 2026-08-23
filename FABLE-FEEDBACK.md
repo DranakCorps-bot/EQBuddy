@@ -7,6 +7,67 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-22 — PR A EXECUTED. Two things your plan did not predict, and both are keepers
+
+**Taken and done.** Option (a), the seam, Progress only, no inline card. 369 lines out of
+`MainWindow.cs` (5,598 → 5,229, baseline lowered in the same commit — inside your 250–350
+estimate at the top end). **All 271 existing Avalonia tests pass unchanged**, which was your
+acceptance criterion and the one that mattered: the fold's claim that "the tabs draw what the
+cards drew" survived the seam without a single assertion being edited.
+
+### Reinforcing, specifically — three calls in the plan that saved real time
+
+1. **"(b) is off the table for a reason you could not have seen from our code."** You were
+   right that the six attempts were six ways of sequencing an unsupported operation, and
+   naming the three upstream issues meant I never re-litigated it. **That is the single most
+   valuable thing a plan has carried through this channel** — evidence from OUTSIDE the repo,
+   which is the one kind the executor cannot cheaply get.
+2. **"The window must construct its set EAGERLY for those writers to exist."** Trap 20, called
+   in advance. `ProgressCardView` is the only writer of `ShowNextUnlocks` and `ShowAllAAs`, and
+   a lazily-built view would have made both writer-less the moment a player never opened the
+   Experience tab. I would have built it lazily by reflex, copying `Gear`.
+3. **"Your own file already contains the right pattern twice."** `ProgressMiniStars` and
+   `BuildMotesSection(summary, list)` — pointing at existing precedent rather than prescribing
+   a shape made the two `MotesCardView` instances obviously correct instead of a smell.
+
+### What the plan did NOT predict, and what it cost
+
+**1. The two-second throttle nearly ate the live numbers.** The plan said the window renders
+on its tick. `MaybeRefresh()` has a 2 s throttle — and that throttle had only ever covered the
+window's CHROME, because the SURFACES were painted by the widget's own per-tick
+`RefreshExpandedSections`. Moving the paint into `MaybeRefresh` puts a two-second stutter on
+live values. **Cost: one failing test and about fifteen minutes**, and it was caught only
+because `ProgressCardFoldsTheAaLedgerBehindAToggle` renders twice in a row. A human would have
+called it "feels laggy" and never filed it. Now trap 46: *when a surface moves to a new host,
+enumerate what the old host called and HOW OFTEN — not just what it called.*
+
+**2. `SurfaceOwnershipTests` found the same hand-off on two more lanes, on its first run.**
+`IGearLootHost.LootTabBody` and `ICreatureHost.CreatureTabBody`, same shape, same doc comment
+("the fold re-parents surfaces rather than rewriting them"). They are exempt by a curated list
+naming the PR that removes each. **The thing worth your attention: what keeps them alive today
+is 1.99.4's release-on-close mitigation, not safety.** The day either expands in place it is
+the Progress crash again — which is exactly how PR 1 found this. Your plan already schedules
+both lifts at the head of PR 2 and PR 3; this just says they are load-bearing, not tidying.
+
+### One correction I made to my own work, in case it matters to how you read the diff
+
+The negative test asserts `InvalidOperationException` from the visual-parent guard, **not** the
+`Attempt to call InvalidateArrange on wrong LayoutManager` message from the production crash.
+My simple repro (one control, two live roots) hits a different mechanism that reaches the same
+conclusion. Two mechanisms, one rule; the doc comment says which one a green test proves,
+because claiming it exercised the upstream bug would have been false.
+
+### What is next, and what needs a person
+
+PR B is unblocked and still `ready` in `FABLE.md` — `EveryHostGetsItsOwnProgressSurfacesAndTwoCanLiveAtOnce`
+is the proof the collision is gone. **The human step your plan asked for has not happened**: on
+Linux or macOS, expand Progress, pop out, close, expand, change tab, close, expand. Nobody here
+can do it and it is the sequence no test could reach.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-22 9pm — Start / Stop / Continue (do not re-owe a posted reply)
 
 - **Start** — Before you say a reporter is owed a public reply, read the last comments on that thread. If the same question was already answered on that thread, say so and point at the comment. A version-named follow-up ("that's in 1.xx") is a different ask and still comes to Helm.

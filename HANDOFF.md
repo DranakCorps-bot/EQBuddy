@@ -24,7 +24,56 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 
 ---
 
-## 2026-08-22 evening (LATEST — start here): a silent import, found by asking what the inbox could not
+## 2026-08-22 late (LATEST — start here): /consider reaches the wiki, and Avalonia gets its seam
+
+**1.99.6 is staged and UNRELEASED — David held the tag deliberately so more could ride it.**
+Fable reviewed it and said ship; he chose "hold it, carry on building". Gates: **2,402 unit ·
+273 Avalonia · 24 E2E**, all green. **A re-review is owed before the tag** — Fable read
+`1b9f0c8..7f8a117` and the range has grown by two features since.
+
+### What landed after the review
+
+1. **`/consider` rarity reaches the wiki pack** (#217 ask 3). Player-facing, in What's-new.
+2. **Fable's PR A — the Avalonia `IWidgetCard` seam.** No player-facing change, no What's-new
+   entry, by the plan.
+
+### PR A, and the two things worth carrying
+
+369 lines out of Avalonia `MainWindow.cs` (5,598 → 5,229, baseline lowered in the same
+commit). Five views on a seam that mirrors WPF's name for name. **All 271 existing Avalonia
+tests passed unchanged** — the fold's claim that "the tabs draw what the cards drew" survived
+without one assertion being edited.
+
+- **A two-second throttle nearly ate the live numbers.** The window's `MaybeRefresh()` throttle
+  had only ever covered its CHROME; the surfaces were painted by the widget every tick, and
+  that distinction lived nowhere but in the arrangement of the old code. Now **trap 46**.
+- **`SurfaceOwnershipTests` found the same cross-window hand-off on TWO more lanes** on its
+  first run — Gear & Loot and Kills & Drops, same shape, same doc comment. They are exempt by
+  a curated list naming the PR that removes each. **What keeps them alive is 1.99.4's
+  release-on-close mitigation, not safety.** Traps 45 and 46 are in `CLAUDE.md`.
+
+### Needs a person, and nobody here can do it
+
+**On Linux or macOS: expand Progress, pop out, close, expand, change tab in the window, close,
+expand.** Fable's plan asks for it before the tag; it is the sequence no test could reach.
+
+### Corrected this session, and the mechanism matters more than the fix
+
+**Helm caught me claiming #101 owed Frank a reply.** It did not — his question was answered on
+2026-08-21 and our reply is still the last word. I wrote "owed" from a `SCRIBE.md` item without
+opening the thread, which `CLAUDE.md` names in as many words. **A `SCRIBE.md` item describes
+what was ASKED; it is not evidence of what has been ANSWERED**, and I collapsed two fields.
+`CLAUDE-FEEDBACK.md` is new — Helm/Scribe/Bevel's channel for teaching rather than holding.
+
+### Open asks with Bevel (three, all post-hoc)
+
+A rare `/consider` on a creature whose loot the wiki already has earns no pack section — mine.
+The achievements report's Sky half being read on a raid surface, and its three-sentence line
+versus a tooltip — both Fable's, routed to Bevel rather than ruled on.
+
+---
+
+## 2026-08-22 evening: a silent import, found by asking what the inbox could not
 
 **1.99.6 is staged and UNRELEASED.** Gates green — **2,378 unit · 271 Avalonia · 24 E2E** —
 Fable's release review not yet requested at the time of writing. David's go is still the gate.

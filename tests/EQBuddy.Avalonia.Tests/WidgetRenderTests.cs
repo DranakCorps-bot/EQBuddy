@@ -834,7 +834,105 @@ public class WidgetRenderTests : IDisposable
     }
 
     /// <summary>
+    /// **The guarantee PR A added, and the one no test could reach before it.**
+    ///
+    /// The two reopen tests below pass on `main` as it was — but they passed by MITIGATION:
+    /// a closed window's presentation source is cleared, so the re-parent checked against
+    /// null. Nothing stopped two LIVE hosts colliding, and the first thing that tried it
+    /// (the inline theme card) threw immediately.
+    ///
+    /// Now every host builds its own set, so the question changes from "does the move
+    /// survive?" to "is there anything to move?" — and the answer is no. Two sets share no
+    /// control, and both can be mounted at once, which is what PR B needs.
+    /// </summary>
+    [AvaloniaFact]
+    public void EveryHostGetsItsOwnProgressSurfacesAndTwoCanLiveAtOnce()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        var first = window.NewProgressSurfaces();
+        var second = window.NewProgressSurfaces();
+
+        // Not the same objects, and — the half that matters — not the same CONTROLS.
+        Assert.NotSame(first.Experience, second.Experience);
+        Assert.NotSame(first.Experience.Body, second.Experience.Body);
+        Assert.NotSame(first.Money.Body, second.Money.Body);
+        Assert.NotSame(first.Motes.Body, second.Motes.Body);
+        Assert.NotSame(first.Faction.Body, second.Faction.Body);
+        Assert.NotSame(first.Raids.Body, second.Raids.Body);
+
+        // Both mounted, both live, both painted — the collision that used to throw.
+        var snapshot = new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) };
+        var a = new Window { Content = first.Experience.Body, Width = 400, Height = 300 };
+        var b = new Window { Content = second.Experience.Body, Width = 400, Height = 300 };
+        a.Show();
+        b.Show();
+        first.Experience.Render(snapshot);
+        second.Experience.Render(snapshot);
+        Dispatcher.UIThread.RunJobs();
+
+        a.Close();
+        b.Close();
+        window.Close();
+    }
+
+    /// <summary>
+    /// **The negative that makes the rule a fact rather than a belief** (trap 39: every
+    /// equality assertion deserves one negative).
+    ///
+    /// PR A rests entirely on the claim that a control cannot be shown by two live windows
+    /// on this toolkit. Everything else — the factory, the per-host sets, the deleted
+    /// accessor — is downstream of it. So the claim is EXERCISED here rather than cited.
+    ///
+    /// **Be precise about which mechanism this catches, because it is not the one from the
+    /// production crash.** Asking a control to live in a second root while the first still
+    /// holds it throws `InvalidOperationException` from Avalonia's visual-parent guard —
+    /// immediate, unambiguous, and what this test asserts. The crash that reached players
+    /// was the subtler sibling: a RE-PARENT that passes the parent guard and then throws
+    /// `ArgumentException: Attempt to call InvalidateArrange on wrong LayoutManager` on the
+    /// next layout pass (avalonia#12753/#17906/#21267). Two mechanisms, one conclusion —
+    /// **there is no supported way to share a control between live hosts** — and the honest
+    /// thing is to say which one a green test actually proves.
+    ///
+    /// **If this ever fails, that is a decision to make, not a test to fix:** it means the
+    /// toolkit changed under us and someone should read the release notes before relaxing
+    /// anything. A rule that outlives its reason becomes folklore.
+    /// </summary>
+    [AvaloniaFact]
+    public void AControlCannotBeShownByTwoLiveWindows()
+    {
+        var shared = new TextBlock { Text = "one control, two roots" };
+        var a = new Window { Content = shared, Width = 300, Height = 200 };
+        a.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        // The move: same control, second live root.
+        a.Content = null;
+        var b = new Window { Content = shared, Width = 300, Height = 200 };
+        b.Show();
+
+        var moved = Record.Exception(() =>
+        {
+            a.Content = shared;   // back to the first, while the second still holds it
+            Dispatcher.UIThread.RunJobs();
+        });
+
+        a.Close();
+        b.Close();
+
+        Assert.NotNull(moved);
+        Assert.IsType<InvalidOperationException>(moved);
+        Assert.Contains("TextBlock", moved.Message);
+    }
+
+    /// <summary>
     /// STEP 0 of Fable's Avalonia-seam plan: does `main` ALREADY do a cross-window move?
+    ///
+    /// **Kept after PR A, and it means something different now.** It used to ask whether the
+    /// mitigation held; it now asserts that a path which no longer moves anything still
+    /// works end to end. Deleting it would remove the only case that closes and reopens the
+    /// window at all.
     ///
     /// `ShowProgressWindow` builds a NEW `ProgressWindow` whenever the old one has closed,
     /// and `IProgressHost.ProgressTabBody` hands the new window the SAME

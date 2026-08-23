@@ -17,6 +17,26 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-22
 
+- **PR A: `IProgressHost` and `ProgressWindow` become `internal`** · make `ProgressSurfaceSet`
+  public instead · the seam types are implementation, and widening the assembly's public API
+  to satisfy an accessibility rule is the tail wagging the dog. Tests already have
+  `InternalsVisibleTo`.
+- **The Progress window's surface set is built EAGERLY in its constructor, not per tab** ·
+  lazily, as the widget does for Gear · two of the five views are the only writers of
+  `ShowNextUnlocks` and `ShowAllAAs`, and a writer that only exists once a tab is visited is
+  trap 20 waiting to happen (Fable's plan flagged this; it was right).
+- **`ProgressWindow.RenderVisible(snapshot)` takes the tick as a parameter** · fetch
+  `CurrentSnapshot()` internally · the widget's headless render path hands one in, and
+  keeping that possible is what lets `WidgetRenderTests` go on asserting that the tabs draw
+  what the cards drew.
+- **`SurfaceOwnershipTests` exempts the two lanes that still hand out bodies, by name** ·
+  scope the guard to Progress and say nothing about the others · an exemption nobody can see
+  is a blind spot; each row names the PR that removes it.
+- **The negative test asserts `InvalidOperationException` (visual-parent guard), not the
+  `LayoutManager` message from the production crash** · reproduce the exact upstream
+  sequence · the simple repro hits a different mechanism reaching the same conclusion, and
+  claiming it proved the other one would have been false. The doc comment says which is
+  which.
 - **The rare-`/consider` fact needs ONE con, not the pack's ten-kill bar** · reuse
   `SuggestRarity`'s threshold for consistency · the evidence is categorically different: the
   game printed the word, so there is no sample to be thin, and a bar would be statistics

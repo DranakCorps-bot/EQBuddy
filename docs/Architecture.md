@@ -114,15 +114,27 @@ has to copy. The baseline came down to the honest 5,422 in the same commit — a
 it had to come first rather than after is that the thing about to claim that room is the
 Inventory tab which closes the 1.98.1 parity gap.
 
+**And it came down again on 2026-08-22, for the reason the 2026-08-19 note had named.**
+That note said the Progress fold cost this file 164 lines because *"the WPF fold moved five
+card VIEWS to a window while this one only re-parented five card BODIES"*. PR A made the two
+lanes the same shape: the five bodies are five views on an Avalonia `IWidgetCard` seam
+(`ProgressCardView`, `MoneyCardView`, `MotesCardView`, `FactionCardView`, `RaidsCardView`),
+with `CardParts` carrying the row builder they share. 369 lines left the file.
+
+It was not decomposition for its own sake. Handing a `Control` built here to a window is a
+cross-`TopLevel` re-parent, which Avalonia has thrown on since 11.2 — the crash that reached
+Linux and macOS in every theme window, and the blocker that stopped Inline themes PR 1.
+Nothing is shared now, so nothing can be moved.
+
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,322 | 4,635 | 313 |
-| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,390 | 2,612 | 222 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,670 | 1,702 | 32 |
-| `EQBuddy.Core/LogParser.cs` | 853 | 924 | 938 | 14 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,422 | 5,438 | 5,964 | 526 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,504 | 4,635 | 131 |
+| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,407 | 2,612 | 205 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,565 | 1,702 | 137 |
+| `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,233 | 5,752 | 519 |
 
-Re-measured 2026-08-21. The WPF widget came down 110 lines when the Gear card body was
+Re-measured 2026-08-22. The WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one
 way this table stops meaning anything. `OptionsWindow` is the tight one now: it took the

@@ -21,10 +21,18 @@ using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 namespace EQBuddy.Avalonia;
 
 public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBuffSetHost,
-    IProgressHost, IGearLootHost, ICreatureHost
+    IProgressHost, IGearLootHost, ICreatureHost, ICardContext
 {
     private readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
+
+    /// <summary>The widget's own Motes card (#228). A SECOND MotesCardView is built by the
+    /// Progress window for its Wealth tab, and that is correct rather than duplication: a
+    /// Control has one parent, so two hosts means two instances. Before PR A this was the
+    /// same fact expressed as two hand-held pairs of controls.</summary>
+    private MotesCardView? _cardMotesView;
+
+    private MotesCardView CardMotes => _cardMotesView ??= new MotesCardView(this);
     // Attached at construction (not in SessionStats itself) so tests never touch disk.
     private void AttachSpellStore() =>
         _stats.Spells.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "spell-categories.json"));
@@ -129,12 +137,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // and the Wealth tab, built first, would simply lose its motes. Nothing shows that:
     // it compiles, it renders, and the tab is just missing a block. Same rule the WPF
     // twin obeys by building a second MotesCardView instance.
-    private readonly TextBlock _motesSummary = AppTheme.DimText("");
-    private readonly ItemsControl _motesList = new();
-    private readonly TextBlock _cardMotesSummary = AppTheme.DimText("");
-    private readonly ItemsControl _cardMotesList = new();
-    private readonly StackPanel _raidsPanel = new();
-    private readonly StackPanel _raidsBody = new();
     private readonly TextBlock _buffsHeader = AppTheme.StatValue("0");
     private readonly StackPanel _buffsPanel = new();
     /// <summary>Per-tick clock TextBlocks + their buff labels, so a tick with an
@@ -176,14 +178,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     };
     private readonly StackPanel _procLabel = DesignSystem.IconLabel("Bolt", "Procs", "AccentBrush");
     private readonly ItemsControl _procList = new();
-    private readonly TextBlock _aaNewLabel = AppTheme.Heading("AA learned this session");
     // #813c82d: "what did I just unlock?" — the ding list, and the always-on preview
     // of the next level that unlocks anything.
-    private readonly TextBlock _levelUnlocksLabel = AppTheme.Heading("");
-    private readonly ItemsControl _levelUnlocksList = new();
-    private readonly TextBlock _nextUnlocksLabel = AppTheme.Heading("");
-    private readonly ItemsControl _nextUnlocksList = new();
-    private readonly ItemsControl _aaNewList = new();
     private readonly Button _combatFightCopy = DesignSystem.IconButton("Copy",
         "Copy this fight as Discord-ready text (a monospace block — the official Discord blocks images, "
         + "so the parse travels as text). Your numbers only, from your log.");
@@ -223,8 +219,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly StackPanel _healSessionBody = new();
     private readonly TextBlock _healingSummary = AppTheme.DimText("");
     private readonly TextBlock _killsSummary = AppTheme.DimText("");
-    private readonly TextBlock _moneySummary = AppTheme.DimText("");
-    private readonly TextBlock _progressSummary = AppTheme.DimText("");
     private readonly StackPanel _damageSourceList = new();
     // A fold heading, not a heading with a chevron typed into its text (Gate 5).
     private readonly EqFoldLabel _petAbilityLabel = new() { Section = true };
@@ -238,12 +232,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // a surface migrated INSIDE this window is guarded by no ratchet.
     private LootCardView _loot = null!;
     private readonly StackPanel _trackedPanel = new();
-    private readonly ItemsControl _soldList = new();
-    private readonly ItemsControl _skillList = new();
-    private readonly TextBlock _skillLabel = AppTheme.Heading("Skill-ups");
-    private readonly EqFoldLabel _aaAbilitiesLabel = new() { Section = true };
-    private readonly ItemsControl _aaAbilityList = new();
-    private readonly ItemsControl _factionList = new();
     private readonly ItemsControl _deathList = new();
     private readonly ItemsControl _zoneList = new();
     private readonly TextBlock _healSpellsLabel = AppTheme.Heading("Heals cast", AppTheme.GoodBrush);
@@ -253,7 +241,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private EqSegmentedStrip _dmgOutStrip = null!, _dmgInStrip = null!, _healStrip = null!;
     private readonly TextBlock _healersLabel = AppTheme.Heading("Healed by", AppTheme.GoodBrush);
     private readonly TextBlock _partyKillsLabel = AppTheme.Heading("Group kills");
-    private readonly TextBlock _soldLabel = AppTheme.Heading("Sold to merchants");
     private readonly TextBlock _recentFightsLabel = AppTheme.Heading("Recent fights");
     private readonly ItemsControl _recentFightsList = new();
     private readonly TextBlock _areaSpellLabel = AppTheme.Heading("Area spells (per cast)");
@@ -1048,19 +1035,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // a window rather than five slots on the thing that sits over the running game.
         //
         // The BODIES are still built here and still rendered here — the window hosts them
-        // through IProgressHost.ProgressTabBody. The fold re-parents surfaces instead of
-        // rewriting them, which is what makes "the tabs draw what the cards drew" checkable
-        // rather than merely claimed.
-        _progressTabBodies[ProgressTab.Experience] = BuildProgressSection();
-        _progressTabBodies[ProgressTab.Wealth] = BuildWealthSection();
-        _progressTabBodies[ProgressTab.Faction] = _factionList;
-        // The achievements-import report ABOVE the rows, and outside them: outside because
-        // RenderRaidRows clears the rows panel wholesale, above because a report appended
-        // after 21 boss rows sits below the fold behind a scrollbar (trap 37 — the WPF shot
-        // on 2026-08-22 caught exactly that, and the Drops footer taught it first).
-        _raidsBody.Children.Add(RaidsImport.Body);
-        _raidsBody.Children.Add(_raidsPanel);
-        _progressTabBodies[ProgressTab.Raids] = _raidsBody;
+        // through IProgressHost.NewProgressSurfaces() — each host builds its OWN, because a
+        // control cannot live in two windows on this toolkit (see IWidgetCard).
         _sections["progress"] = AppTheme.SectionLink(
             Header("progress", "Progress", _progressHeader), () => ShowProgressWindow());
         ToolTip.SetTip(_sections["progress"],
@@ -1073,35 +1049,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // into Progress the mini-dashboard cell for motes had no switch Options could
         // reach at all (#228, and MiniBarPresentation.Names carries the rest of that note).
         AddSection("motes", "motes", "Motes", _motesHeader,
-            BuildMotesSection(_cardMotesSummary, _cardMotesList), "Show motes in mini dashboard");
+            CardMotes.Body, "Show motes in mini dashboard");
         AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
         return _sectionsPanel;
-    }
-
-    /// <summary>The motes block, for a NAMED pair of controls. It takes them rather than
-    /// closing over one pair because two hosts draw motes now and a Control has one parent
-    /// — see the field comment.</summary>
-    /// <summary>Motes into one pair of controls. ONE renderer for both hosts, so the
-    /// widget's card and the Progress window's Wealth tab cannot end up saying different
-    /// things about the same numbers (#210's rule, one level down).</summary>
-    private void RenderMotes(StatsSnapshot s, TextBlock summary, ItemsControl list)
-    {
-        var motes = Motes.Summarize(s.Loot, s.Elapsed);
-        summary.Text = motes.Total > 0
-            ? $"{motes.PerHour:0.#} motes/hr this session"
-            : "No motes yet this session — every Mote of … Potential you loot " +
-              "(or store as currency) lands here.";
-        FillList(list, motes.Tiers.Select(t => (t.Item, $"x{t.Count}")),
-            onNameClick: ShowItemInfo, tooltip: ItemHoverStats);
-    }
-
-    private static Control BuildMotesSection(TextBlock summary, ItemsControl list)
-    {
-        var panel = new StackPanel();
-        summary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
-        panel.Children.Add(summary);
-        panel.Children.Add(list);
-        return panel;
     }
 
     private void AddSection(string sectionKey, string starKey, string title, TextBlock value, Control content, string tip)
@@ -1314,87 +1264,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         _loot = new LootCardView(this, _settings);
         return _loot.Body;
-    }
-
-    private Control BuildMoneySection()
-    {
-        var panel = new StackPanel();
-        panel.Children.Add(_moneySummary);
-        _soldLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
-        panel.Children.Add(_soldLabel);
-        panel.Children.Add(_soldList);
-        return panel;
-    }
-
-    /// <summary>The Wealth tab: the two cards it merges, each under its own label. The
-    /// merge is the whole reason this tab exists rather than two — motes are currency in
-    /// Legends, and "what was the trip worth" should not require knowing which of two
-    /// cards held which half.</summary>
-    private Control BuildWealthSection()
-    {
-        var panel = new StackPanel();
-        panel.Children.Add(AppTheme.SectionLabel("Coin"));
-        panel.Children.Add(BuildMoneySection());
-        panel.Children.Add(AppTheme.SectionLabel("Motes"));
-        panel.Children.Add(BuildMotesSection(_motesSummary, _motesList));
-        return panel;
-    }
-
-    private Control BuildProgressSection()
-    {
-        var panel = new StackPanel();
-        _progressSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
-        panel.Children.Add(_progressSummary);
-        // Ding, and the card answers "what did I just get?" — AAs first (labeled, not
-        // guessed: the wiki doesn't say which classes they cover), then spells.
-        _levelUnlocksLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
-        _levelUnlocksLabel.IsVisible = false;
-        panel.Children.Add(_levelUnlocksLabel);
-        _levelUnlocksList.IsVisible = false;
-        panel.Children.Add(_levelUnlocksList);
-        // "What do I get at N?" without waiting for a ding — click to fold.
-        _nextUnlocksLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
-        _nextUnlocksLabel.IsVisible = false;
-        _nextUnlocksLabel.Cursor = new Cursor(StandardCursorType.Hand);
-        ToolTip.SetTip(_nextUnlocksLabel,
-            "The next level that unlocks anything for your classes — click to expand or fold");
-        _nextUnlocksLabel.PointerPressed += (_, e) =>
-        {
-            e.Handled = true;
-            _settings.ShowNextUnlocks = !_settings.ShowNextUnlocks;
-            _settings.Save();
-            RefreshUi();
-        };
-        panel.Children.Add(_nextUnlocksLabel);
-        _nextUnlocksList.IsVisible = false;
-        panel.Children.Add(_nextUnlocksList);
-        // Hidden when there is nothing under it — a heading with no rows reads as a
-        // surface that failed to load. Its WPF twin had the same bug and the same fix.
-        _skillLabel.IsVisible = false;
-        panel.Children.Add(_skillLabel);
-        panel.Children.Add(_skillList);
-        // Session-new AAs lead (Reddit, 2026-08-11); the full character ledger folds
-        // behind the ▸ label, Pet-abilities style.
-        _aaNewLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
-        _aaNewLabel.IsVisible = false;
-        panel.Children.Add(_aaNewLabel);
-        _aaNewList.IsVisible = false;
-        panel.Children.Add(_aaNewList);
-        _aaAbilitiesLabel.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
-        _aaAbilitiesLabel.Cursor = new Cursor(StandardCursorType.Hand);
-        ToolTip.SetTip(_aaAbilitiesLabel,
-            "Everything the log's history (plus the durable ledger) says this character owns — "
-            + "click to expand or fold");
-        _aaAbilitiesLabel.PointerPressed += (_, e) =>
-        {
-            e.Handled = true;
-            _settings.ShowAllAAs = !_settings.ShowAllAAs;
-            _settings.Save();
-            RefreshUi();
-        };
-        panel.Children.Add(_aaAbilitiesLabel);
-        panel.Children.Add(_aaAbilityList);
-        return panel;
     }
 
     private Control BuildMiscSection()
@@ -1821,7 +1690,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     }
 
     /// <summary>Prefix an item tooltip with the quest marker so the badge explains itself.</summary>
-    internal string? QuestAwareTooltip(string name, string? baseTip)
+    public string? QuestAwareTooltip(string name, string? baseTip)
     {
         if (!IsActiveQuestItem(name)) return baseTip;
         const string marker = "Part of a quest — click the green map pin to see its quests in the Quest Tracker.";
@@ -1830,7 +1699,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     /// <summary>Hover stats for an item row: the cached wiki stat block when we have one
     /// (any age — a hover is a peek, not a lookup), else a hint that clicking fetches.</summary>
-    internal string ItemHoverStats(string itemName) =>
+    public string ItemHoverStats(string itemName) =>
         _wikiItems.CachedStatsText(itemName) ?? "Click for item info (eqlwiki)";
 
     /// <summary>Raw cached stats (null when the cache is empty) — the tooltip surfaces
@@ -2097,7 +1966,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         }
         RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
         RenderBuffs(s);     // per-tick: the countdowns ARE the content
-        if (fullRender) RenderRaids();   // changes on kills and imports only
         UpdatePerfStats();  // #112: self-measurement, every few seconds, off by default
     }
 
@@ -2155,9 +2023,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         UpdateHeadlines(s);
         ApplySessionSubsections();
         RefreshExpandedSections(s);
+        // An open theme window paints from the SAME tick the widget was handed. On a real
+        // tick MaybeRefresh fetches CurrentSnapshot() instead; here the caller supplies
+        // one, which is how a headless test can drive a window it does not own.
+        if (_progressWindow is { IsVisible: true } pw) pw.RenderVisible(s);
         RenderTracked(s, dueByRule);
         RenderBuffs(s);
-        RenderRaids();
     }
 
     private void RefreshExpandedSections(StatsSnapshot s)
@@ -2288,10 +2159,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _loot.Render(s);
             RenderTargetDrops(s);
         }
-        if (ProgressTabShowing(ProgressTab.Wealth))
-        {
-            RenderMotes(s, _motesSummary, _motesList);
-        }
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         _questsHeader.Text = QuestsSummaryLine();
@@ -2303,7 +2170,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // never expanded — so this costs nothing for the people the fold was for, and gives
         // the rate back to the people who asked for it.
         if (_sections["motes"].IsExpanded)
-            RenderMotes(s, _cardMotesSummary, _cardMotesList);
+            CardMotes.Render(s);
         if (LootTabShowing(LootTab.Gear) && _gearChecklistDirty)
         {
             Gear.Render();
@@ -2314,82 +2181,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             Inventory.Render();
             _inventoryDirty = false;
         }
-        if (ProgressTabShowing(ProgressTab.Wealth))
-        {
-            _moneySummary.Text = $"Corpses {StatsSnapshot.FormatCoin(s.CorpseCopper)} ({s.CoinDrops} drops, biggest {StatsSnapshot.FormatCoin(s.BiggestDrop)})\n" +
-                $"Merchant sales {StatsSnapshot.FormatCoin(s.VendorCopper)} ({s.SalesCount} sales)\n" +
-                $"{StatsSnapshot.FormatCoin(s.CopperPerHour)} per hour - {StatsSnapshot.FormatCoin(s.CopperPerActiveHour)} per active hour" +
-                (s.Recent is { } rm ? $"\nLast {(int)rm.Window.TotalMinutes}m: {StatsSnapshot.FormatCoin(rm.Copper)}" : "");
-            _soldLabel.IsVisible = s.SoldItems.Count > 0;
-            // Sold items are drops too (#74, Snagglefern: "if an item is unknown on
-            // the wiki I definitely sold it") — same click, tooltip, and quest badges
-            // as the Loot card, with the count moved to the value column so the name
-            // stays a clean lookup key.
-            FillList(_soldList, s.SoldItems.Select(i =>
-                    (i.Item, (i.Count > 1 ? $"x{i.Count} - " : "") + StatsSnapshot.FormatCoin(i.Copper))),
-                onNameClick: ShowItemInfo,
-                tooltip: n => QuestAwareTooltip(n, ItemHoverStats(n)), questBadges: true);
-        }
-        if (ProgressTabShowing(ProgressTab.Experience))
-        {
-            // The shared builder with this build's plain-ASCII separator ("-", the
-            // file's own convention under fonts Wine/Linux may lack).
-            _progressSummary.Text = ProgressText.Summary(s, " - ");
-            // Ding: the AA group in its category order (labeled, not guessed — the wiki
-            // doesn't say which classes they cover); the Spells grouping follows, its
-            // rows marked "… spell".
-            var ding = DingUnlocks(s);
-            _levelUnlocksLabel.IsVisible = ding.Count > 0;
-            _levelUnlocksList.IsVisible = _levelUnlocksLabel.IsVisible;
-            if (ding.Count > 0 && s.LastLevel is { } dingLevel)
-            {
-                _levelUnlocksLabel.Text = LevelUnlockText.NewAtLevelLabel(dingLevel);
-                FillList(_levelUnlocksList, UnlockRows(ding), tooltip: UnlockTooltip(ding));
-            }
-
-            // "What do I get at N?" without waiting for a ding — the next milestone
-            // that unlocks anything, anchored to the last level the log ever announced
-            // (persisted per character, so it works across restarts). Hidden until a
-            // level is known: previewing from an unknown level would be a guess.
-            int? knownLevel = s.LastLevel;
-            if (knownLevel is null && QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var stored)
-                knownLevel = stored;
-            var next = knownLevel is { } kl ? LevelUnlocks.Next(UnlockClasses(s), kl) : null;
-            _nextUnlocksLabel.IsVisible = next is not null;
-            if (next is { } nx)
-            {
-                _nextUnlocksLabel.Text = LevelUnlockText.NextLabel(
-                    nx.Level, nx.Unlocks.Aas.Count, nx.Unlocks.Spells.Count, _settings.ShowNextUnlocks);
-                _nextUnlocksList.IsVisible = _settings.ShowNextUnlocks;
-                if (_settings.ShowNextUnlocks)
-                    FillList(_nextUnlocksList, UnlockRows(nx.Unlocks), tooltip: UnlockTooltip(nx.Unlocks));
-            }
-            else _nextUnlocksList.IsVisible = false;
-
-            FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
-            _skillLabel.IsVisible = _skillList.Items.Count > 0;
-            // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show
-            // newly learned this session?" — yes, now it is): session-new AAs lead,
-            // the full ledger folds behind a click, same idiom as Pet abilities.
-            var newAas = ProgressText.SessionNewAas(s);
-            _aaNewLabel.IsVisible = newAas.Count > 0;
-            _aaNewList.IsVisible = _aaNewLabel.IsVisible;
-            FillList(_aaNewList, newAas.Select(a =>
-                    (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
-                tooltip: name => AaCatalog.Find(name)?.Effect);
-            _aaAbilitiesLabel.IsVisible = s.AaAbilities.Count > 0;
-            _aaAbilitiesLabel.Set(_settings.ShowAllAAs, _settings.ShowAllAAs
-                ? "All AA abilities"
-                : $"All AA abilities ({s.AaAbilities.Count})");
-            _aaAbilityList.IsVisible = _settings.ShowAllAAs;
-            if (_settings.ShowAllAAs)
-                FillList(_aaAbilityList, s.AaAbilities.Select(a =>
-                        (a.Name, a.Rank > 1 ? $"rank {a.Rank}" : "")),
-                    tooltip: name => AaCatalog.Find(name)?.Effect);
-        }
-        if (ProgressTabShowing(ProgressTab.Faction))
-            FillList(_factionList, s.Faction.Select(f => (f.Faction, EQBuddy.UI.Shared.FactionFormat.Net(f))),
-                valueBrush: f => f.StartsWith('-') ? AppTheme.BadBrush : AppTheme.GoodBrush);
+        // Experience, Wealth, Faction and Raids used to be painted HERE, into fields the
+        // Progress window borrowed. PR A moved all four into their own views, which that
+        // window builds for itself and renders on its own tick — so the widget no longer
+        // paints surfaces it does not host, and there is nothing left for a second host to
+        // take. See IWidgetCard for why that is structural rather than tidy.
         if (_sections["misc"].IsExpanded)
         {
             FillList(_deathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
@@ -2407,7 +2203,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     // The Gear & Loot launcher's one line, by length — the thing that
                     // moves if the fold silently drops one of the two cards' numbers.
                     $"lootSummaryLen={_lootHeader.Text?.Length ?? 0} " +
-                    $"skills={_skillList.Items.Count} faction={_factionList.Items.Count} " +
+                    // skills= and faction= moved out with their surfaces in PR A: they
+                    // belong to the Progress window's own views now, and it reports them
+                    // from DebugFacts() rather than the widget guessing at controls it no
+                    // longer owns.
+                    $"{_progressWindow?.DebugFacts() ?? ""} " +
                     $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} " +
                     $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
                 File.WriteAllText(AppPaths.File("debug.txt"), dump);
@@ -2424,7 +2224,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _invocationLabel.IsVisible = s.Invocations.Count > 0;
         _farmingLabel.IsVisible = s.Mobs.Any(m => m.Kills > 0);
         _partyKillsLabel.IsVisible = s.PartyKillsByKiller.Count > 0;
-        _soldLabel.IsVisible = s.SoldItems.Count > 0;
         _healSpellsLabel.IsVisible = s.HealsBySpell.Count > 0;
         _healSortBar.IsVisible = s.HealsBySpell.Count > 0;
         _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
@@ -3182,112 +2981,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ? $"{(int)r / 60}:{(int)r % 60:00}{(estimated ? " est" : "")}"
         : "?";
 
-    /// <summary>
-    /// The Raids card: every raid target the game's own achievements list names, per
-    /// zone, with the personal record — witnessed kills with dates, or the imported
-    /// Conqueror achievement for clears from before EQBuddy. The badge is the highest
-    /// difficulty PROVEN by a witnessed kill; kills from before tiers existed carry no
-    /// tier and earn no badge — honesty over flattery.
-    /// </summary>
-    private void RenderRaids()
-    {
-        if (!ProgressTabShowing(ProgressTab.Raids)) return;
-        RenderRaidRows();
-        RaidsImport.Render();
-    }
-
-    /// <summary>The rows alone. Split out on 2026-08-22 so the import report below them
-    /// survives a repaint and so an Undo can put the boss rows back — this surface only
-    /// renders on kills and imports, so it cannot wait for a tick that may not come.</summary>
-    private void RenderRaidRows()
-    {
-        var defeated = _raidLedger.DefeatedCount();
-        var catalog = RaidTargetCatalog.Default;
-        if (defeated == 0)
-        {
-            _raidsPanel.Children.Clear();
-            _raidsPanel.Children.Add(EmptyCardLine(
-                "Nothing defeated yet — kills your log witnesses land here, and importing " +
-                $"{EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} marks clears from before EQBuddy."));
-            _raidsPanel.Children.Add(CopyAchievementsCmd());
-            return;
-        }
-
-        _raidsPanel.Children.Clear();
-        foreach (var zone in catalog.Zones)
-        {
-            var records = zone.Bosses.Select(b => (Boss: b, Rec: _raidLedger.For(b))).ToList();
-            var done = records.Count(x => x.Rec is { } r && (r.Kills > 0 || r.AchievementComplete));
-            _raidsPanel.Children.Add(new TextBlock
-            {
-                Text = $"{zone.Zone} — {done}/{zone.Bosses.Length}",
-                FontSize = DesignSystem.Size(Role.Caption), FontWeight = FontWeight.SemiBold, Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 1),
-                Foreground = done == zone.Bosses.Length ? AppTheme.GoodBrush : AppTheme.AccentBrush,
-            });
-            foreach (var (boss, rec) in records)
-            {
-                var cleared = rec is { } rr && (rr.Kills > 0 || rr.AchievementComplete);
-                var badge = rec?.HighestDifficulty() is { } hd ? $"D{hd} · " : "";
-                var detail = rec switch
-                {
-                    { Kills: > 0 } k =>
-                        $"{badge}{(k.Kills > 1 ? $"×{k.Kills} · " : "")}last {k.LastKill:MMM d}",
-                    { AchievementComplete: true } => "cleared (from achievements)",
-                    _ => "",
-                };
-                // A fixed lane for the mark, so the boss names line up whether or not
-                // one is cleared — mirrors the WPF twin. The "·" stays as TEXT (the
-                // ratchet allows it): it holds the column open and is not an icon.
-                var row = new Grid { Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0) };
-                row.ColumnDefinitions.Add(new ColumnDefinition(
-                    new GridLength(DesignTokens.IconInlineHit)));
-                row.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
-                if (cleared)
-                {
-                    var tick = DesignSystem.Icon("Check", "GoodBrush", DesignTokens.IconInline);
-                    tick.HorizontalAlignment = HorizontalAlignment.Left;
-                    row.Children.Add(tick);
-                }
-                else row.Children.Add(DesignSystem.Text(DesignTokens.TypeRole.BodySecondary, "·"));
-                var bossText = new TextBlock
-                {
-                    Text = $"{boss}{(detail.Length > 0 ? $" — {detail}" : "")}",
-                    FontSize = DesignTokens.Spec(DesignTokens.TypeRole.BodySecondary).Size,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    Foreground = cleared ? AppTheme.TextBrush : AppTheme.DimBrush,
-                };
-                Grid.SetColumn(bossText, 1);
-                row.Children.Add(bossText);
-                if (rec is { TierKills.Count: > 0 } tk)
-                    ToolTip.SetTip(row, "Kills by difficulty: " + string.Join(" · ",
-                        new[] { "d4", "d3", "d2", "d1", "d0", "open", "instance", "unknown" }
-                            .Where(k => tk.TierKills.ContainsKey(k))
-                            .Select(k => $"{(k.StartsWith('d') ? k.ToUpperInvariant() : k)} ×{tk.TierKills[k]}"))
-                        + (tk.Kills > tk.TierKills.Values.Sum()
-                            ? $" · {tk.Kills - tk.TierKills.Values.Sum()} earlier kill(s) predate tier tracking"
-                            : ""));
-                _raidsPanel.Children.Add(row);
-            }
-        }
-        _raidsPanel.Children.Add(new TextBlock
-        {
-            Text = "Kills count when your log sees the boss die; import " +
-                $"{EQBuddy.UI.Shared.GameCommands.OutputfileAchievements} to mark older clears.",
-            FontSize = DesignSystem.Size(Role.Metadata), TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
-            Foreground = AppTheme.DimBrush,
-        });
-        _raidsPanel.Children.Add(CopyAchievementsCmd());
-    }
-
-    /// <summary>The Raids card names the achievements dump in both its empty and its
-    /// populated state, so both offer the one-click copy (David, 2026-08-14) — every
-    /// surface that names a command hands it over without retyping.</summary>
-    private static Button CopyAchievementsCmd() => DesignSystem.CopyCommandButton(
-        EQBuddy.UI.Shared.GameCommands.OutputfileAchievements,
-        "Copies the command — paste it into the game's chat and the game " +
-        "writes its achievements dump beside its own folders; right-click → " +
-        "Data & imports → Import achievements… reads it.");
-
     private void UpdateLoggingStatus()
     {
         DateTime? lastActivity = _watcher.LastGrowth;
@@ -3554,7 +3247,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
-    private readonly Dictionary<ProgressTab, Control> _progressTabBodies = new();
 
     /// <summary>The Progress window, for the headless render tests — the four surfaces it
     /// hosts have no other place to be asserted on since the fold, and this build has no
@@ -3564,11 +3256,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>Is the Progress window open and showing this tab? The render guards ask
     /// this where they used to ask "is this card expanded" — same rule either way: a
     /// surface nobody is looking at costs nothing.</summary>
-    private bool ProgressTabShowing(ProgressTab tab) =>
-        _progressWindow is { IsVisible: true } w && w.Tab == tab;
 
     // ---- IProgressHost ----
-    Control IProgressHost.ProgressTabBody(ProgressTab tab) => _progressTabBodies[tab];
+    /// <summary>A fresh set for whoever asked — see <see cref="IProgressHost.NewProgressSurfaces"/>
+    /// for why nothing here is cached. The widget keeps none of these: on this lane the
+    /// Progress card is a launcher, so the window is the only host until PR B.</summary>
+    ProgressSurfaceSet IProgressHost.NewProgressSurfaces() => NewProgressSurfaces();
+
+    internal ProgressSurfaceSet NewProgressSurfaces() => new(
+        Experience: new ProgressCardView(_settings, UnlockClasses,
+            () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null,
+            RefreshUi),
+        Money: new MoneyCardView(this),
+        Motes: new MotesCardView(this),
+        Faction: new FactionCardView(),
+        Raids: new RaidsCardView(() => _raidLedger, () => LastAchievementsImport));
 
     IReadOnlyList<ProgressTabHeader> IProgressHost.ProgressTabs(StatsSnapshot s) =>
         ProgressTheme.Tabs(s, DingUnlocks(s).Count,
@@ -3620,9 +3322,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // Paint the tab NOW rather than on the next tick: opening a surface and staring
         // at an empty one is the field report that made the WPF widget render on expand.
         var snap = CurrentSnapshot();
-        _progressWindow.Refresh();   // picks the tab, so the guards below know which one
+        // Refresh() picks the tab AND paints that tab's own surface — the window owns
+        // its five views now, so the widget has nothing left to render on its behalf.
+        _progressWindow.Refresh();
         RefreshExpandedSections(snap);
-        RenderRaids();
     }
     private GearLootWindow? _gearLootWindow;
 
@@ -3637,20 +3340,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         () => LastInventoryImport);
 
     private GearCardView? _gear;
-
-    /// <summary>The Raids surface's "EQBuddy just read your achievements dump" line and
-    /// its Undo. It is on THIS card because this is the surface that asks the player to
-    /// run <c>/outputfile achievements</c>, in both its empty and its populated state —
-    /// the same rule that puts the inventory report on Gear.
-    ///
-    /// <c>LastAchievementsImport</c> was documented as "for the Gear and Raids surfaces to
-    /// report" when the auto-import shipped (2026-08-20) and no Raids surface ever read
-    /// it, in either UI: the dump marked Sky rewards and raid clears silently, with no
-    /// report and no Undo. See <c>EQBuddy/ImportReportView.cs</c> for the shape.</summary>
-    private ImportReportView RaidsImport => _raidsImport ??=
-        new ImportReportView(() => LastAchievementsImport, RenderRaidRows);
-
-    private ImportReportView? _raidsImport;
 
     /// <summary>The Inventory tab — the Gear Locker and the old Inventory window as one
     /// surface with two pivots, the way Windows folded them (David, 2026-08-20). Owned by
@@ -4441,21 +4130,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             return [inferred];
         return picked;
     }
-
-    /// <summary>Unlock rows for FillList: the AA group in its category order, then
-    /// the Spells grouping — same list, rows told apart by their value column.</summary>
-    private static IEnumerable<(string Name, string Value)> UnlockRows(LevelUnlockSet set) =>
-        set.Aas.Select(a => (a.Name, LevelUnlockText.RowValue(a)))
-            .Concat(set.Spells.Select(sp => (sp.Name, LevelUnlockText.SpellRowValue(sp))));
-
-    /// <summary>Tooltip lookup for a merged unlock list: spell rows show which classes
-    /// get the spell and when (catalog facts, never invented effect text); AA rows keep
-    /// the wiki effect prose. Resolved per set, since only it knows which group a name
-    /// came from.</summary>
-    private static Func<string, string?> UnlockTooltip(LevelUnlockSet set) =>
-        name => set.Spells.Any(sp => sp.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            ? LevelUnlockText.SpellTooltip(SpellLevelCatalog.Default.Find(name))
-            : AaCatalog.Find(name)?.Effect;
 
     private void UpdateGearChecklist(StatsSnapshot s)
     {
@@ -5370,85 +5044,16 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     };
 
     // Internal: the lifted Loot card formats the same stat-block tooltips.
-    internal static readonly FontFamily MonoFamily = new("monospace");
+    internal static FontFamily MonoFamily => CardParts.MonoFamily;
 
+    /// <summary>The window's own calls into <see cref="CardParts.FillList"/>, which moved
+    /// out for PR A. Kept as a wrapper rather than rewriting 22 call sites: the row shape
+    /// is what had to survive the lift unchanged, and a mechanical edit at every caller is
+    /// where a survivable refactor stops being survivable.</summary>
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         Func<string, IBrush>? valueBrush = null, Action<string>? onNameClick = null,
-        Func<string, string?>? tooltip = null, bool questBadges = false)
-    {
-        list.ItemsSource = rows.Select(row =>
-        {
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            var left = new TextBlock
-            {
-                Text = row.Name,
-                FontSize = DesignSystem.Size(Role.Body),
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                Foreground = AppTheme.TextBrush,
-                Margin = new Thickness(0, 1, DesignTokens.SpaceM, 1),
-            };
-            if (tooltip?.Invoke(row.Name) is { Length: > 0 } tip)
-            {
-                var tipText = new TextBlock
-                {
-                    Text = tip,
-                    TextWrapping = TextWrapping.Wrap,
-                    MaxWidth = 340,
-                    Foreground = AppTheme.TextBrush,
-                };
-                // Multi-line tips are stat blocks — monospace keeps their columns readable.
-                if (tip.Contains('\n')) tipText.FontFamily = MonoFamily;
-                ToolTip.SetTip(left, tipText);
-            }
-            if (onNameClick is not null)
-            {
-                var itemName = row.Name;
-                left.Cursor = new Cursor(StandardCursorType.Hand);
-                if (tooltip is null) ToolTip.SetTip(left, "Click for item info (eqlwiki)");
-                left.PointerPressed += (_, e) =>
-                {
-                    if (!e.GetCurrentPoint(left).Properties.IsLeftButtonPressed) return;
-                    onNameClick(itemName);
-                    e.Handled = true;
-                };
-            }
-            grid.Children.Add(left);
-            if (questBadges && IsActiveQuestItem(row.Name))
-            {
-                // 🗺 next to quest loot → the Quest Tracker, filtered to this item's
-                // quests; each card's name opens the wiki walkthrough from there
-                // (David's final shape, 2026-08-07: item click = item page, 🗺 = tracker).
-                var badgeName = row.Name;
-                // A BUTTON rather than a handled vector, so the whole square is clickable
-                // (#211, n3cr0nk1tt3n): the map pin has a gap between its folds you could
-                // click straight through. Same conversion LootCardView already made.
-                var badge = DesignSystem.InlineIconButton("Map",
-                    "Part of a quest — click for its quest info",
-                    () => OpenQuestInfoForItem(badgeName), "GoodBrush");
-                badge.Margin = new Thickness(0, 1, DesignTokens.SpaceS, 1);
-                badge.PointerPressed += (_, e) =>
-                {
-                    if (!e.GetCurrentPoint(badge).Properties.IsLeftButtonPressed) return;
-                    OpenQuestInfoForItem(badgeName);
-                    e.Handled = true;
-                };
-                Grid.SetColumn(badge, 1);
-                grid.Children.Add(badge);
-            }
-            var right = new TextBlock
-            {
-                Text = row.Value,
-                FontSize = DesignSystem.Size(Role.Body),
-                Foreground = valueBrush?.Invoke(row.Value) ?? AppTheme.DimBrush,
-            };
-            Grid.SetColumn(right, 2);
-            grid.Children.Add(right);
-            return grid;
-        }).ToList();
-    }
+        Func<string, string?>? tooltip = null, bool questBadges = false) =>
+        CardParts.FillList(list, rows, this, valueBrush, onNameClick, tooltip, questBadges);
 
     /// <summary>Repaint the Loot card alone, from the snapshot we already have. Its two
     /// filter chips call this: a full refresh recomputes nothing new and repaints every
@@ -5458,7 +5063,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_sections["loot"].IsExpanded) _loot.Render(CurrentSnapshot());
     }
 
-    internal void ShowItemInfo(string itemName)
+    public void ShowItemInfo(string itemName)
     {
         if (_itemInfoWindow is null)
         {

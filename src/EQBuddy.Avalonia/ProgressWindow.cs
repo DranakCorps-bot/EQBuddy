@@ -12,17 +12,24 @@ namespace EQBuddy.Avalonia;
 /// <summary>What the Progress window needs from the widget. Small on purpose, and the
 /// same discipline <see cref="IQuestsHost"/> follows: the window draws chrome and picks a
 /// tab; the widget owns the surfaces and keeps painting them.</summary>
-public interface IProgressHost
+internal interface IProgressHost
 {
     AppSettings Settings { get; }
     string QuestCharacterKey { get; }
     StatsSnapshot CurrentSnapshot();
 
-    /// <summary>The already-built body for one tab. The widget BUILT these when it still
-    /// drew them as cards and goes on rendering them into the same controls, so the fold
-    /// re-parents surfaces rather than rewriting them — which is what keeps "the tabs draw
-    /// what the cards drew" a fact rather than a hope.</summary>
-    Control ProgressTabBody(ProgressTab tab);
+    /// <summary>A FRESH set of the five Progress surfaces, built for the caller alone.
+    ///
+    /// **This replaced <c>ProgressTabBody(tab)</c> in PR A, and the difference is the whole
+    /// point.** That method handed back controls the widget had built and was still
+    /// rendering into — a control shared by two <c>TopLevel</c>s, which Avalonia throws on
+    /// (<c>Attempt to call InvalidateArrange on wrong LayoutManager</c>, an open upstream
+    /// bug with no public API that makes it safe). It survived only because a closed
+    /// window's presentation source is cleared, so the reopen move passed by null.
+    ///
+    /// **No host interface on this lane returns a <c>Control</c> it did not just create.**
+    /// Guarded by <c>SurfaceOwnershipTests</c>.</summary>
+    ProgressSurfaceSet NewProgressSurfaces();
 
     /// <summary>The tab strip with its badges, from UI.Shared's ProgressTheme.</summary>
     IReadOnlyList<ProgressTabHeader> ProgressTabs(StatsSnapshot s);
@@ -53,7 +60,7 @@ public interface IProgressHost
 /// release — it ships on headless evidence (WidgetRenderTests) and gets named in the notes
 /// for the Linux and macOS reporters to look at.
 /// </summary>
-public sealed class ProgressWindow : Window
+internal sealed class ProgressWindow : Window
 {
     private readonly IProgressHost _main;
     private readonly AppSettings _settings;
@@ -78,9 +85,20 @@ public sealed class ProgressWindow : Window
     private readonly TextBlock _titleText =
         DesignSystem.Text(DesignTokens.TypeRole.TitleWindow, "Progress");
 
+    /// <summary>THIS window's own five surfaces. Built here, in the constructor, and never
+    /// shared with the widget or with a previous window — reopening the Progress window
+    /// creates a new one with a new set, which is what makes the never-move rule structural
+    /// (see <see cref="IProgressHost.NewProgressSurfaces"/>).
+    ///
+    /// Eagerly, not lazily: two of these surfaces are the only WRITERS of settings the rest
+    /// of the app reads (<c>ShowNextUnlocks</c>, <c>ShowAllAAs</c>), and a writer that only
+    /// exists once a tab has been visited is trap 20 waiting to happen.</summary>
+    private readonly ProgressSurfaceSet _surfaces;
+
     public ProgressWindow(IProgressHost main)
     {
         _main = main;
+        _surfaces = main.NewProgressSurfaces();
         _settings = main.Settings;
         Title = "EQBuddy Progress";
         Width = 520;
@@ -245,8 +263,21 @@ public sealed class ProgressWindow : Window
         Refresh();
     }
 
+    /// <summary>Called on every widget tick.
+    ///
+    /// **The visible surface paints every time; only the CHROME is throttled.** That split
+    /// is not a refinement, it is behaviour preservation: before PR A the widget itself
+    /// painted this window's controls inside `RefreshExpandedSections`, which runs each
+    /// tick, and the two-second throttle only ever covered the title and the tab strip.
+    /// Moving the surfaces here without moving that distinction would have quietly put a
+    /// two-second stutter on live numbers — the kind of regression that reads as "feels
+    /// laggy" and never gets reported as a bug.
+    ///
+    /// Caught by `ProgressCardFoldsTheAaLedgerBehindAToggle`, which renders twice in a row
+    /// and reads the result; it is the only headless place that could have seen it.</summary>
     public void MaybeRefresh()
     {
+        RenderVisible(_main.CurrentSnapshot());
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh();
     }
 
@@ -273,7 +304,70 @@ public sealed class ProgressWindow : Window
         // Chips first, THEN the paint — colouring before rebuilding the chip list leaves
         // every fresh chip unstyled, the selected one included.
         _tabs.Select(_tab);
-        _body.Content = _main.ProgressTabBody(_tab);
+        RenderVisible(s);
+    }
+
+    /// <summary>Paint the tab that is showing, and only that one, FROM THE SNAPSHOT GIVEN.
+    ///
+    /// The snapshot is a parameter rather than a fetch because the widget's headless render
+    /// path hands one in — before PR A the widget painted these controls itself, so a test
+    /// could render an arbitrary tick into an open window. Keeping that possible is what
+    /// lets `WidgetRenderTests` go on asserting that the tabs draw what the cards drew,
+    /// which is the whole claim the PROGRESS THEME fold rests on.
+    ///
+    /// This window's OWN
+    /// surfaces, built in its constructor and never shared — the host deciding who renders
+    /// is the one rule that replaced the `ProgressTabShowing` gates scattered through the
+    /// widget's paint code, and it is what WPF's `ThemeCardView` already did.</summary>
+    internal void RenderVisible(StatsSnapshot s)
+    {
+        var card = CardFor(_tab);
+        card.Render(s);
+        // Assigned every time rather than once: the Wealth tab's content is composed
+        // lazily, and a ContentControl told to show what it already shows costs nothing.
+        if (!ReferenceEquals(_body.Content, card.Body)) _body.Content = card.Body;
+    }
+
+    /// <summary>The surface behind one tab. Wealth is TWO of them under their own labels,
+    /// composed here exactly as the WPF twin composes it — motes are currency in Legends,
+    /// and "what was the trip worth" should not require knowing which of two cards held
+    /// which half.</summary>
+    private IWidgetCard CardFor(ProgressTab tab) => tab switch
+    {
+        ProgressTab.Experience => _surfaces.Experience,
+        ProgressTab.Wealth => _wealth ??= new WealthTab(_surfaces.Money, _surfaces.Motes),
+        ProgressTab.Faction => _surfaces.Faction,
+        _ => _surfaces.Raids,
+    };
+
+    private WealthTab? _wealth;
+
+    /// <summary>The Wealth tab: the two surfaces it merges, each under its own label.
+    /// A card in its own right so the host has one thing to render per tab.</summary>
+    private sealed class WealthTab : IWidgetCard
+    {
+        private readonly MoneyCardView _money;
+        private readonly MotesCardView _motes;
+        private readonly StackPanel _body = new();
+
+        public WealthTab(MoneyCardView money, MotesCardView motes)
+        {
+            _money = money;
+            _motes = motes;
+            _body.Children.Add(AppTheme.SectionLabel("Coin"));
+            _body.Children.Add(money.Body);
+            _body.Children.Add(AppTheme.SectionLabel("Motes"));
+            _body.Children.Add(motes.Body);
+        }
+
+        public string Key => "wealth";
+        public Control Body => _body;
+
+        public void Render(StatsSnapshot s)
+        {
+            _money.Render(s);
+            _motes.Render(s);
+        }
     }
 
     /// <summary>The window's facts for the <c>EQBUDDY_EXPAND</c> dump, matching the WPF

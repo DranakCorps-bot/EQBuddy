@@ -1141,6 +1141,43 @@ Read this list before touching the areas it names. Every entry cost a release.
     problem. **A single passing screenshot is not proof a surface fits** — it is proof it fit
     once.
 
+45. **A control NEVER moves between two windows on Avalonia — and the operation that does
+    it looks like a getter.** `IProgressHost.ProgressTabBody(tab)` handed a theme window a
+    control the widget had built and was still rendering into. That is a cross-`TopLevel`
+    re-parent, which throws `Attempt to call InvalidateArrange on wrong LayoutManager` —
+    **an open upstream bug, not a mis-sequencing on our side**: avalonia#12753 (2023, still
+    open), #17906 (regression in 11.2.0, fine in 11.1.5), #21267 (2026, same message in
+    production). We ship 12.1.1. Six attempts to sequence the hand-off safely all failed,
+    and the one API that would have forced a layout flush turned out to be `internal` —
+    because re-parenting across roots is unsupported, not because the version is old.
+    → **It hid for months because a CLOSED window's presentation source is cleared**, so
+    the reopen move passed by null. It surfaced twice: every theme window crashed on close
+    and reopen for Linux and macOS players (two clicks, since each shipped, fixed in
+    1.99.4), and the inline theme card — the first host alive at the same time as the
+    window — threw on its first run and blocked Inline themes PR 1 outright.
+    → **Now guarded:** every host builds its own instance through a factory
+    (`NewProgressSurfaces()` on both lanes) and no host interface returns a `Control` it did
+    not just create. `SurfaceOwnershipTests` scans for the accessor shape and carries a
+    curated list of the two lanes that still have it (Gear & Loot, Kills & Drops) with the
+    reason and the PR that removes each — an exemption nobody can see is a blind spot, not
+    an exemption.
+    → **The general shape, and it outlives this toolkit bug: a method that returns a
+    long-lived UI object is a transfer of ownership wearing a getter's clothes.** The WPF
+    lane never had the crash because its cards were objects from the start, and "each host
+    builds its own" cost nothing there either.
+
+46. **When a surface moves to a new host, check what the OLD host was doing for it every
+    tick.** PR A moved the Progress rooms into views the window owns. The window already had
+    a `MaybeRefresh()` with a two-second throttle, so the obvious wiring was to render there
+    — and that would have put a two-second stutter on live numbers, because the throttle had
+    only ever covered the window's CHROME. The surfaces themselves were painted by the
+    widget's own per-tick `RefreshExpandedSections`, and that distinction lived nowhere
+    except in the arrangement of the old code.
+    → The visible surface paints every tick; only the title and tab strip are throttled.
+    **A regression like this reads as "feels laggy" and never gets reported as a bug**, so
+    the thing to do at move time is enumerate what the old host called and how often —
+    not just what it called.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

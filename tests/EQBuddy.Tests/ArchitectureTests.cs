@@ -164,7 +164,20 @@ public class ArchitectureTests
         // Lowered in the SAME commit as the lift, because room that is freed and not
         // claimed quietly refills — and the thing about to claim it is the Inventory tab
         // that closes the 1.98.1 parity gap, which is precisely why the lift came first.
-        (@"EQBuddy.Avalonia/MainWindow.cs", 5422),
+        //
+        // 5,422 → 5,229 on 2026-08-22 (PR A, Fable 5's plan), and this one is the lowering
+        // the 2026-08-19 note above asked for in as many words: *"the WPF fold moved five
+        // card VIEWS to a window while this one only re-parented five card BODIES"*. The
+        // five bodies are now five views — ProgressCardView, MoneyCardView, MotesCardView,
+        // FactionCardView, RaidsCardView on an Avalonia IWidgetCard seam, plus CardParts
+        // for the row builder they share. 369 lines left this file.
+        //
+        // **It was not a tidiness exercise.** Handing a Control built here to a window is a
+        // cross-TopLevel re-parent, which Avalonia throws on and has since 11.2 — the crash
+        // that shipped to Linux and macOS in every theme window (fixed in 1.99.4) and the
+        // blocker that stopped Inline themes PR 1. Nothing is shared now, so nothing can be
+        // moved, and the headroom PR 2 and PR 3 need on this lane exists.
+        (@"EQBuddy.Avalonia/MainWindow.cs", 5229),
     ];
 
     private const double AllowedGrowth = 1.10;
