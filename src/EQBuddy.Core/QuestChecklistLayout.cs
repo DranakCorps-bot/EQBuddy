@@ -172,7 +172,9 @@ public static class QuestChecklistLayout
                                 // heading says WHERE, the prose says which mob on each, and
                                 // that mapping exists nowhere else.
                                 Detail(p.Item.Npc, p.Tie.Length > 0
-                                    ? p.Item.Source
+                                    // Clauses ascend, so the prose and the heading above it
+                                    // name the islands in the same order (David, 2026-08-23).
+                                    ? SkyIslands.OrderClausesByIsland(p.Item.Source)
                                     : SkyIslands.WithoutIslePrefix(p.Item.Source)),
                                 p.Item.Acquired,
                                 p.Item.AcquiredUnassigned,

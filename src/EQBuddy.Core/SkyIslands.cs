@@ -109,6 +109,40 @@ public static partial class SkyIslands
         island.ToString(island % 1 == 0 ? "0" : "0.0", CultureInfo.InvariantCulture);
 
     /// <summary>
+    /// The clauses of a multi-island source, reordered so the islands ascend (David,
+    /// 2026-08-23: *"in the 'Several Islands', order the islands numerically"*).
+    ///
+    /// The heading was already sorted — <see cref="Parse"/> sorts — but the PROSE underneath
+    /// it was not, because it is hand-written and the catalog happens to say *"Isle eight: the
+    /// Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn"*. So the row read
+    /// 8, 4, 1.5 directly beneath a heading reading 1.5, 4, 8. Two orderings of one fact, one
+    /// line apart.
+    ///
+    /// **Only the ORDER of whole clauses changes; not a word inside one.** Each clause is
+    /// self-contained ("Isle N: which mob"), which is what makes this safe to do to curated
+    /// prose — nothing is rewritten, reworded or dropped. A clause naming no island keeps its
+    /// place at the end rather than being sorted to an island it never claimed.
+    /// </summary>
+    public static string OrderClausesByIsland(string? source)
+    {
+        var text = (source ?? "").Trim();
+        if (text.Length == 0 || !text.Contains(';')) return text;
+
+        var clauses = text.Split(';')
+            .Select(c => c.Trim())
+            .Where(c => c.Length > 0)
+            .ToList();
+        if (clauses.Count < 2) return text;
+
+        // OrderBy is a STABLE sort in .NET, so clauses that name no island — all sorted to
+        // the same sentinel — keep the order the editor wrote them in.
+        var ordered = clauses
+            .OrderBy(c => Parse(c) is [var first, ..] ? first : double.MaxValue)
+            .ToList();
+        return ordered.SequenceEqual(clauses) ? text : string.Join("; ", ordered);
+    }
+
+    /// <summary>
     /// The source prose with a leading "Isle N:" / "Isle N -" removed, for a row that is
     /// already sitting under that island's heading.
     ///

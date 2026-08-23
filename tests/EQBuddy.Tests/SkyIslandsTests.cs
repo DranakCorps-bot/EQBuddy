@@ -60,6 +60,34 @@ public class SkyIslandsTests
     [InlineData("6 of them patrol here")]
     public void ANumberInProseIsNotAnIsland(string source) => Assert.Empty(SkyIslands.Parse(source));
 
+    /// <summary>**The prose ascends too, so it agrees with the heading above it** (David,
+    /// 2026-08-23). The catalog writes the real three-island source as "eight … four … 1.5",
+    /// which rendered directly beneath a heading reading "1.5, 4, and 8" — two orderings of
+    /// one fact, one line apart.</summary>
+    [Fact]
+    public void MultiIslandProseIsReorderedToAscend() =>
+        Assert.Equal(
+            "Isle 1.5: Noble Dojorn; Isle four: Overseer of Air; Isle eight: the Hand of Veeshan",
+            SkyIslands.OrderClausesByIsland(
+                "Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn"));
+
+    /// <summary>**Only whole clauses move — no word inside one is touched**, which is what
+    /// makes reordering curated prose safe. Prose with nothing to reorder comes back byte for
+    /// byte, and a clause naming no island keeps its place at the end rather than being sorted
+    /// to an island it never claimed (OrderBy is a stable sort).</summary>
+    [Theory]
+    [InlineData("Isle 6: Bazzt Zzzt", "Isle 6: Bazzt Zzzt")]
+    [InlineData("Trash mobs", "Trash mobs")]
+    [InlineData("", "")]
+    // Already ascending: returned unchanged rather than rebuilt, so spacing cannot drift.
+    [InlineData("Isle 2: Protector of Sky; Isle 7: Sister of the Spire",
+                "Isle 2: Protector of Sky; Isle 7: Sister of the Spire")]
+    // A clause with no island of its own sinks to the end, keeping its own wording.
+    [InlineData("Isle 7: Sister of the Spire; rare trash drop; Isle 2: Protector of Sky",
+                "Isle 2: Protector of Sky; Isle 7: Sister of the Spire; rare trash drop")]
+    public void ReorderingNeverRewritesAClause(string source, string expected) =>
+        Assert.Equal(expected, SkyIslands.OrderClausesByIsland(source));
+
     /// <summary>**The grouping created a redundancy and this removes it.** A row under
     /// "Island 6" was reading "Josin Faithbringer · Isle 6: Bazzt Zzzt" — the island twice in
     /// eight words. Only the leading label goes; the mob that drops it is what the detail
