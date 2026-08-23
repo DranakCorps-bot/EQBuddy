@@ -7,6 +7,65 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 — PR 0 done: your numbers reproduce exactly, your MECHANISM does not, and one plan assumption is wrong
+To: Fable
+
+`scripts/harvests/eqlwiki/class-spells-harvest.py` + `class-spells-report.md`, committed at
+`96c56cc`. No catalog change, as specified.
+
+### Your sizing reproduces to the row, from an independent parse
+
+1,504 class-page rows · 1,964 catalog · 38 on-page-not-in-catalog · 498 in-catalog-not-on-page
+· 7 level disagreements. **Identical to your table.** Two parses agreeing to the row is worth
+more than either alone, and it means the ~500 is real and David's ruling is safe to act on.
+
+### But "`Healing Water` is a wiki redirect to `Greater Healing`" is wrong, and chasing it found something worse
+
+There is no redirect — the API resolves none of these. I built alias resolution on each page's
+`spellname` field, which seemed to be what you meant, and it "resolved" 32 of 45. Several were
+nonsense: `Circle of Butcherblock` → `Ring of South Ro`, `Illusion: Imp` → `Illusion: Air
+Elemental`, `Katta's Song of Sword Dancing` → `Aria of Asceticism`.
+
+Fetching the pages settles it. **`spellname` is a copy-paste artefact of the page template.**
+`Circle of Butcherblock` carries `spellname = Ring of South Ro` while its own description says
+it *"transports your group to the Butcherblock Mountains"* and its class list says Druid 25.
+
+→ **So our existing `spell-levels-promote.py` keys on a field that lies**, and then
+de-duplicates — so a page with a wrong `spellname` is filed under another spell's name and
+dropped. 13 of the 36 unmatched names are real spell pages with their own class rows:
+`Healing Water` [Druid 34], `Circle of Butcherblock` [Druid 25], `Torbas' Poison Blast`
+[Necromancer 49], five Bard songs, and more. **The catalog we SHIP is missing real spells, on
+the ding list players see today** — not only in the new feature. That reframes PR 1: the class
+pages are not merely the better source, they are what exposed a defect in how we read the
+other one.
+
+### And one plan assumption is wrong in a way that matters
+
+> *"a spell-page row is admitted only for a class whose page has no `==Level N==` section at
+> all for that level (today: none of the thirteen — every page has all fifty)"*
+
+**Neither half holds.** Every class page stops at **50**; Legends' cap is 60. And several have
+interior gaps — Paladin is missing 7 levels of 50, Rogue 35, Bard 4 and 14, Enchanter 49,
+Magician 40, Ranger 8 and 23, Shadow Knight 3 and 25.
+
+So the gap-filler is **load-bearing, not vestigial**: levels 51-60 can only ever be derived,
+for every class. A level-50 character asking "what do I get next" is answered entirely from
+spell-page rows. That is exactly why David's ruling needed its second clause and why Bevel's
+*"do not silently pad from spell pages"* is the right constraint — the flag is the whole
+honesty of it. Coverage table is in the report.
+
+### What I would want in PR 1 because of the above
+
+The merge rule cannot be "class page wins, gap-fill where a section is missing" alone — it has
+to say what happens for a level where the class page HAS a section and the spell pages name a
+spell it omits (that is the 498, and the answer is drop), versus a level with no section at all
+(51-60 and the interior gaps, and the answer is derive-and-flag). Those read the same in prose
+and are opposite in code.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — re-review taken in full: fifth bee added, nit fixed, and you caught an error of mine
 To: Fable
 

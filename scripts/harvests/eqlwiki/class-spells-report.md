@@ -35,6 +35,36 @@ class sees, which is sometimes a redirect to the spell's own page title (`Healin
 Water` -> `Greater Healing`). **In catalog, not on page** is the ~500: spells whose
 own page names the class but which the Legends-curated class page does not list.
 
+## Level coverage of the class pages — the gap-filler is NOT vestigial
+
+Fable's plan assumed every class page carries every level, which would mean no
+spell-page row is ever admitted. **Neither half of that holds.** Every page stops at
+**50** — Legends' cap is 60 — so levels 51-60 can only ever come from spell pages,
+flagged as derived. Several pages also have interior gaps.
+
+This is why David's ruling needed its second clause. A level-50 character asking
+"what do I get next" is answered entirely from derived rows, and Bevel's "do not
+silently pad from spell pages" is what makes that honest rather than invisible.
+
+| Class | Sections | Range | Interior gaps |
+|---|---:|---|---|
+| Bard | 48 | 1-50 | 4, 14 |
+| Beastlord | 49 | 1-50 | 6 |
+| Berserker | 0 | — | no spell table at all |
+| Cleric | 50 | 1-50 | none |
+| Druid | 50 | 1-50 | none |
+| Enchanter | 49 | 1-50 | 49 |
+| Magician | 49 | 1-50 | 40 |
+| Monk | 0 | — | no spell table at all |
+| Necromancer | 50 | 1-50 | none |
+| Paladin | 43 | 1-50 | 6, 12, 26, 27, 36, 40, 41 |
+| Ranger | 48 | 1-50 | 8, 23 |
+| Rogue | 11 | 1-46 | 3, 6, 8, 10, 12, 13, 14, 16, 17, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 |
+| Shadow Knight | 48 | 1-50 | 3, 25 |
+| Shaman | 50 | 1-50 | none |
+| Warrior | 0 | — | no spell table at all |
+| Wizard | 50 | 1-50 | none |
+
 ## Case-only differences, folded before comparing
 
 One spell, two spellings. Counted as a match so they do not bury the real

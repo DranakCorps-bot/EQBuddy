@@ -286,6 +286,34 @@ def main():
               "Water` -> `Greater Healing`). **In catalog, not on page** is the ~500: spells whose",
               "own page names the class but which the Legends-curated class page does not list.",
               ""]
+    # LEVEL COVERAGE. Fable's plan assumed "every page has all fifty", which would
+    # make the spell-page gap-filler vestigial. It is not true, and the difference
+    # decides how much of the catalog the class pages can actually source.
+    lines += [
+        "## Level coverage of the class pages — the gap-filler is NOT vestigial", "",
+        "Fable's plan assumed every class page carries every level, which would mean no",
+        "spell-page row is ever admitted. **Neither half of that holds.** Every page stops at",
+        "**50** — Legends' cap is 60 — so levels 51-60 can only ever come from spell pages,",
+        "flagged as derived. Several pages also have interior gaps.",
+        "",
+        "This is why David's ruling needed its second clause. A level-50 character asking",
+        "\"what do I get next\" is answered entirely from derived rows, and Bevel's \"do not",
+        "silently pad from spell pages\" is what makes that honest rather than invisible.",
+        "",
+        "| Class | Sections | Range | Interior gaps |",
+        "|---|---:|---|---|",
+    ]
+    for cls in CLASSES:
+        text, _ = fetch_class_page(cls)
+        levels = sorted({int(m.group(1)) for m in LEVEL_RX.finditer(text)})
+        if not levels:
+            lines.append(f"| {cls} | 0 | — | no spell table at all |")
+            continue
+        interior = [l for l in range(levels[0], levels[-1] + 1) if l not in levels]
+        lines.append(f"| {cls} | {len(levels)} | {levels[0]}-{levels[-1]} | "
+                     + (", ".join(str(l) for l in interior) if interior else "none") + " |")
+    lines.append("")
+
     caseonly = [(cls, c) for cls in CLASSES for c in per_class[cls].get("caseonly", [])]
     if caseonly:
         lines += [
