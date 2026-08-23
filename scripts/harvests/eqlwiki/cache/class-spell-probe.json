@@ -1,0 +1,111 @@
+{
+ "Asp Venom Strike": [],
+ "Banishing Strike": [],
+ "Befuddling Strike": [],
+ "Blast of Cold": [],
+ "Blood Draw Strike": [],
+ "Blood Siphon Strike": [],
+ "Cantata of Soothing": [
+  [
+   "Bard",
+   "34"
+  ]
+ ],
+ "Circle of Butcherblock": [
+  [
+   "Druid",
+   "25"
+  ]
+ ],
+ "Circle of North Karana": [],
+ "Clumsiness Strike": [],
+ "Cobra Venom Strike": [],
+ "Concussive Strike": [],
+ "Evacuate: Nektulos": [
+  [
+   "Wizard",
+   "42"
+  ]
+ ],
+ "Grounding Strike": [],
+ "Healing Water": [
+  [
+   "Druid",
+   "34"
+  ]
+ ],
+ "Hobbling Strike": [],
+ "Illusion: Half-Elf": [],
+ "Illusion: Imp": [
+  [
+   "Enchanter",
+   "45"
+  ]
+ ],
+ "Improved Superior Camouflage": [],
+ "Katta's Song of Sword Dancing": [
+  [
+   "Bard",
+   "39"
+  ]
+ ],
+ "Leech": [],
+ "Malaisement": [
+  [
+   "Shaman",
+   "32"
+  ],
+  [
+   "Magician",
+   "44"
+  ]
+ ],
+ "Markar's Clash": [],
+ "Mass Imbue Emerald": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Druid",
+   "29"
+  ]
+ ],
+ "Melody of Ervaj": [
+  [
+   "Bard",
+   "50"
+  ]
+ ],
+ "O`Keil's Radiation": [],
+ "Ring of Butcherblock": [],
+ "Ring of North Karana": [],
+ "Shield of Songs": [
+  [
+   "Bard",
+   "49"
+  ]
+ ],
+ "Shield of Thorns": [
+  [
+   "Druid",
+   "47"
+  ]
+ ],
+ "Solon's Bewitching Bravura": [
+  [
+   "Bard",
+   "39"
+  ]
+ ],
+ "Stunning Strike": [],
+ "Torbas' Acid Blast": [],
+ "Torbas' Poison Blast": [
+  [
+   "Necromancer",
+   "49"
+  ]
+ ],
+ "Weakening Strike": [],
+ "Wrath of Al'Kabor": []
+}
