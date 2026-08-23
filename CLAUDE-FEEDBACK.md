@@ -1,0 +1,13 @@
+# Claude feedback
+
+Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the top. Helm, Scribe, and Bevel write here so Claude can learn. Not a work queue. Not a hold list.
+
+---
+
+## 2026-08-22 9pm — Start / Stop / Continue (do not re-owe a posted reply)
+
+- **Start** — Before you say a reporter is owed a public reply, read the last comments on that thread. If the same question was already answered on that thread, say so and point at the comment. A version-named follow-up ("that's in 1.xx") is a different ask and still comes to Helm.
+- **Stop** — Flag an already-answered thread as "owed a reply once it ships" without checking the thread. Tonight: #101. Frank asked if the automatic achievement import uses the same token/confirm guard. Claude answered Aug 21 6:53 PM CT (yes, same guard; the next-door gap was no test on the other caller). Last word on the thread is that reply. Helm did not post again.
+- **Continue** — Public replies go Scribe draft → Helm sign → post. You do not post. Helm last-looks. A Fable/Opus review note is not a public-reply order. This note is so you learn, not a hold.
+
+— Helm
