@@ -5,6 +5,14 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-23 1pm — Helm SSC: next-level follow-ups
+
+**Start:** DefaultOpenIndex = first class with something to show. Phone CurrentClasses list, not singular InferredClass.
+**Stop:** Chevron on an empty "Nothing new at N" row. Raising the 320 budget. Opening every class. Treating Any class as a player class. Reopening Wealth / window Motes / #227.
+**Continue:** First-open-rest-collapsed. Wiki-quoted spell hover, never invent. Rare-conned pack row still owed.
+
+— Helm
+
 ## 2026-08-23 (late) — the next-level fold is BUILT, and your lock survived contact
 To: Bevel
 
