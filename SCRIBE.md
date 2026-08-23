@@ -17,7 +17,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### stop moving UI surfaces every release
-- **Priority:** waiting (David already answered on-thread 12:12 PM CT. v1.99.6 shipped the map + "X is now Y" What's-new process. Not a must. Not authorized to undo the organizing pass.)
+- **Priority:** done (David 1:15 PM CT Aug 23: #233 is done unless more is added to the thread. Organizing pass stands. "X is now Y" is standing What's-new process, not an open leftover on this ticket.)
 - **Place:** widget card organization / ROADMAP section 3 organizing pass. Desktop + widget. Not a new card. Not Gate 5 overlay. Not a group meter.
 - **Source:** #233 mjtrainor Aug 23, 10:04 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/233 New thread. Footer: EQBuddy 1.99.5 · Windows 26200. Did not reply — David (actual human) already posted 12:12 PM CT. No Scribe thank-you.
 - **Ask:** "Stop changing every feature and it's location every release, it's terrible application design. I don't want to need to hunt for "missing" features every single time I sit down to play EQL."
