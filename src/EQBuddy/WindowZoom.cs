@@ -1,5 +1,4 @@
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using EQBuddy.Core;
@@ -64,24 +63,13 @@ internal static class WindowZoom
     /// on multiplying it; UI.Shared/WindowSizing does the arithmetic and the sanity checks,
     /// where they are unit-tested.
     ///
-    /// **The height FOLLOWS the content until the player takes it** (Fable 5's ruling,
-    /// 2026-08-23). It used to be pinned on `ContentRendered`, which fires on the first
-    /// frame — and for a window whose body is filled by the log replay that is a frame with
-    /// nothing in it. The Progress window's Experience tab pinned ~203px and scrolled
-    /// forever after, for three releases (measured: 203 pinned, 389 unpinned).
-    ///
-    /// Every fix that picked a BETTER instant to sample was wrong for some window, because
-    /// "the content has arrived" is not an event WPF gives you. So there is no instant:
-    /// `WindowHeightFollower` (UI.Shared, unit-tested — the WPF layer has no test project)
-    /// tracks the content, and the first size change we did not cause hands the axis over
-    /// permanently. Both halves of what this method wanted are kept: size-to-content for
-    /// players who never touch the edge, a remembered height for players who drag.
+    /// SizeToContent is cleared on the first layout pass, not at attach: these windows open
+    /// at their natural content height by design, and clearing it earlier would open them
+    /// at whatever XAML happened to say. After that the player owns the height.
     ///
     /// Persisted on CLOSE, not per drag: a save writes the whole settings file from the
     /// snapshot taken at load (trap 13), and doing that on every mouse-move would be a
-    /// writer fighting every other writer in the app. **And only when OWNED** — persisting
-    /// a followed height would make the next launch start owned at whatever the content
-    /// happened to measure at close, which is the pin coming back through the settings file.
+    /// writer fighting every other writer in the app.
     /// </summary>
     public static void AllowResize(Window window, string key, AppSettings settings)
     {
@@ -89,70 +77,36 @@ internal static class WindowZoom
         window.MinWidth = Math.Max(window.MinWidth, WindowSizing.MinWidth);
         window.MinHeight = Math.Max(window.MinHeight, WindowSizing.MinHeight);
 
-        var follower = new WindowHeightFollower();
-        var selfSet = false;
-
         if (settings.WindowHeights.TryGetValue(key, out var savedHeight)
             && WindowSizing.IsSaneHeight(savedHeight))
         {
             window.SizeToContent = SizeToContent.Manual;
             window.Height = savedHeight;
-            follower.StartOwned(savedHeight);
         }
-
-        // One wiring point, which is what keeps this out of the four call sites. While
-        // following, SizeToContent stays Height so the first pass costs nothing and there
-        // is no flash; the first emit switches to Manual and takes the axis, which is the
-        // only mode a vertical drag works in.
-        window.LayoutUpdated += (_, _) =>
+        else
         {
-            if (follower.Owned) return;
-            var scroller = FirstScroller(window);
-            var natural = scroller is null
-                ? window.ActualHeight
-                : WindowHeightFollower.Natural(
-                    window.ActualHeight, scroller.ExtentHeight, scroller.ViewportHeight);
-            if (follower.Desired(natural, window.MaxHeight) is not { } target) return;
-
-            selfSet = true;
-            window.SizeToContent = SizeToContent.Manual;
-            window.Height = target;
-            selfSet = false;
-        };
-
-        // HeightChanged only: Ctrl+wheel drives WIDTH through this same class, and letting a
-        // zoom step count as "the player took the height" would end following by accident.
-        window.SizeChanged += (_, e) =>
-        {
-            if (e.HeightChanged) follower.OnSizeChanged(e.NewSize.Height, selfSet);
-        };
+            // Open at the natural height once, then hand the axis over.
+            window.ContentRendered += Release;
+        }
 
         window.Closed += (_, _) =>
         {
             var zoom = settings.WindowZooms.TryGetValue(key, out var z) && z > 0 ? z : 1.0;
             if (WindowSizing.BaseWidthToStore(window.Width, zoom) is { } basis)
                 settings.WindowBaseWidths[key] = basis;
-            if (follower.OwnedHeight is { } owned
-                && WindowSizing.HeightToStore(owned) is { } h)
+            if (WindowSizing.HeightToStore(window.ActualHeight) is { } h)
                 settings.WindowHeights[key] = h;
             settings.Save();
         };
-    }
 
-    /// <summary>The window's scrolling body, or null. Found by walking rather than by name
-    /// so the four call sites stay call sites — asking each window to hand its own scroller
-    /// in is the four-site wiring this design exists to avoid, and the fourth one gets
-    /// missed (trap 34).</summary>
-    private static ScrollViewer? FirstScroller(DependencyObject root)
-    {
-        var count = VisualTreeHelper.GetChildrenCount(root);
-        for (var i = 0; i < count; i++)
+        void Release(object? sender, EventArgs e)
         {
-            var child = VisualTreeHelper.GetChild(root, i);
-            if (child is ScrollViewer sv) return sv;
-            if (FirstScroller(child) is { } found) return found;
+            window.ContentRendered -= Release;
+            // ActualHeight is the measured one; assigning it before clearing SizeToContent
+            // is what stops the window snapping to its XAML height for a frame.
+            if (window.ActualHeight > 0) window.Height = window.ActualHeight;
+            window.SizeToContent = SizeToContent.Manual;
         }
-        return null;
     }
 
     /// <summary>For windows whose scale already lives in a named setting: wheel just
