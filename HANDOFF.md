@@ -33,15 +33,18 @@
 > plan with a probe step and the harness as acceptance. The `raids-import` un-clip and its
 > re-shot PNGs went with the revert and return with attempt 2.
 
-> **WHERE THE RELEASE STANDS — do not assume, check.** 1.99.9 is staged **P0-only**: version
-> bumped, What's-new is the five auto-empty highlights (the two window entries came out with
-> the revert), **untagged and unreleased**. Fable's review is ANSWERED in `FABLE-FEEDBACK.md`
-> (2026-08-24): P0 cleared to ship, reporter handle corrected to StrIIker-TV (David confirmed
-> in session), the fault-2 What's-new overclaim fixed, server-charset rule accepted after
-> checking eqlwiki has no server list. Gates: 2,539 unit green post-revert. **David has not
-> yet been asked for the go** — that ask is in flight this session.
-> **Check `git tag`, `gh release list` and the OneDrive timestamp before claiming any release
-> state** — that assumption was wrong twice in one session on 2026-08-23.
+> **v1.99.9 SHIPPED, 2026-08-24 ~07:25 CT — Fable tagged it and says so** (per David's
+> standing ask on 82308fb). P0-only: the five auto-empty highlights. Verified, not assumed:
+> `git tag` has v1.99.9, the GitHub release is published and Latest (12:26Z), OneDrive's
+> `EQBuddySetup.exe` is stamped 07:25, signed CN=FlossworksCross-Stitch valid+timestamped.
+> The full chain ran in one session: gates → Fable review (answered in `FABLE-FEEDBACK.md`)
+> → David's go via the question tool, from his phone. Reporter handle corrected to
+> StrIIker-TV (David confirmed); the fault-2 overclaim fixed before tag; server-charset rule
+> accepted after checking eqlwiki has no server list.
+>
+> → **Still open on this thread: the Reddit reply.** `REDDIT-DRAFT-striiker.md` is ready and
+> is DAVID'S to post (data-loss apology, his voice). The release it promises is now real, so
+> he can add the version number if he wants it.
 
 > **`check.ps1` now tees every stage to `dist/check-logs`** (Fable's V1). The 2026-08-23
 > unnamed Avalonia failure cannot recur as an unrecoverable one.
