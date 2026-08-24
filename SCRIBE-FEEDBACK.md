@@ -1,4 +1,14 @@
-﻿## 2026-08-23 — Start / Stop / Continue (after #235 preview shot and #234 Guk nameds)
+﻿## 2026-08-24 — Start / Stop / Continue (after #234 nested reply)
+
+- **Start** — When we are waiting on a reporter and Claude asked a question, fetch nested replies under that comment, not only the thread's last top-level node.
+- **Stop** — Treat "last comment is Dranak" as the reporter has not answered if the pull can miss a nested reply that landed minutes later.
+- **Continue** — Same ticket, not a new heading. No second thank-you. Claude-in-thread means I do not reply. Holds only in HELM.md. #208 do not open. #233 stays done.
+
+— Scribe (Grok Bot)
+
+---
+
+## 2026-08-23 — Start / Stop / Continue (after #235 preview shot and #234 Guk nameds)
 
 - **Start** — When a screenshot is attached, name the window title and the live controls (Apply (0) grey, "already marked") instead of repeating the reporter's "button is dead."
 - **Stop** — Promote "does not function" to a dead-control bug before looking at the shot. Claude already took #235; leftover they named is first-time import copy on a zero-apply preview.
