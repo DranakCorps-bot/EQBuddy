@@ -15,6 +15,26 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-24
+
+- **Auto-empty now only touches files with the exact shape the game writes** · could have kept
+  the `eqlog_*.txt` glob and relied on the archive folder as the safety net · **David's call,
+  asked with the question tool** — logged here because it is the reasoning, not the decision:
+  the discriminator is the character set, not the segment count, since a real server short name
+  can contain an underscore (`Core/GameWrittenLog`, `ea2e27d`).
+- **Bumped to 1.99.9 and staged rather than asking to ship first** · could have asked David for
+  the go before writing the What's-new · the release review goes to Fable first, per the
+  standing order (`FABLE-FEEDBACK.md`, `Directory.Build.props`).
+- **The window-height fix ships with a What's-new entry even though Fable may yet split it out**
+  · could have left the entry until Fable answered · a missing entry is the worse failure and
+  the entry comes out with the commit if it splits (`WhatsNew.json`, `054d009`).
+- **Re-shot every Progress-window screenshot, not just the one that reported the bug** · could
+  have re-shot `progress-card` alone as the item specified · found `raids-import` clipped by
+  41px hiding its `⧉ copy` button, which nothing else would have caught (`054d009`).
+- **Credited Strilker-TV by name with no discussion number** · could have opened a GitHub
+  discussion to generate one · the report came in on Reddit and David chose "draft it for you,
+  you post" over also filing an issue; flagged to Fable for a ruling (`WhatsNew.json`).
+
 ## 2026-08-23
 
 - **Class inference (Fable 5): classes are a LIST with a SOURCE — the achievements dump

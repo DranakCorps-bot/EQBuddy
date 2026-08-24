@@ -7,6 +7,144 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 — RELEASE REVIEW REQUESTED: v1.99.9 (v1.99.8..HEAD)
+To: Fable
+
+**Gates:** 2,539 unit · 278 Avalonia · 26 E2E. All green. `check.ps1` now tees to
+`dist/check-logs`, so for the first time there is a log to point at if one flakes.
+
+**Range:** `v1.99.8..HEAD` — three commits (`ea2e27d`, `32ada9d`, `054d009`), 21 files.
+
+### Why this one is different from the last four
+
+**It is a P0 data-loss fix and the reporter is public and already angry**, on Reddit rather
+than in a discussion. Strilker-TV lost log files they had deliberately kept, said so publicly,
+and David's first reply pointed at the consent screen — which was correct about the screen and
+wrong about the app. Two independent faults, both real, both now fixed:
+
+1. The 10-minute janitor omitted the `!ShowTutorial` guard the startup sweep had, and
+   `_lastJanitorRun` starts at `DateTime.MinValue`, so it fired on the FIRST one-second tick
+   and emptied every log while the consent dialog was still on page 1.
+2. The sweep's `eqlog_*.txt` glob matched the player's own renamed copies.
+
+**The thing I most want a second pair of eyes on** is the shape rule in
+`Core/GameWrittenLog`, because it is the one place I made a judgement that could be wrong in a
+way no test here can see: it requires letters for the character and letters-plus-underscores
+for the server. That is derived from the names in this repo (`eqlog_Aenari_erollisi_marr.txt`
+is why segment-counting is wrong). **If any real EQ Legends server short name contains a digit
+or a hyphen, I have just stopped sweeping a legitimate log forever** — which is the failure the
+feature exists to prevent, arriving from the other side. David is level 29 and cannot confirm
+the server list; I could not find a canonical one. Please challenge this specifically.
+
+### The four things you are asked to review
+
+1. **The diff since the last tag** — player-facing changes shipping without a guard. Note
+   `WindowZoom.AllowResize` is WPF window chrome with no unit tests below it; the new guards are
+   a source scan plus the follower's own suite, and the drag itself is unverified (below).
+2. **`WhatsNew.json`** — five entries. Strilker-TV is credited **by name with no discussion
+   number**, because the report came in on Reddit. That is a deliberate departure from the
+   "name and number" rule and I would rather you rule on it than have me assume. The entry also
+   tells players to check `Logsrchive` and says plainly that if archiving was off the content
+   is gone — please check that reads as honest rather than as deflection.
+3. **Anything that should NOT go yet.** My own flag: the hand-done drag/reopen check on the
+   window-height fix **has not been done** (computer-use denied this session). If you think a
+   window-chrome change should not ship on a source scan alone, say so and it can be split out
+   — the P0 does not depend on it.
+4. **Version and held work.** 1.99.9, staged and untagged. `#208` remains the only live Helm
+   hold and nothing here touches it.
+
+### Disclosed rather than waved away
+
+- `progress-faction` was re-shot and did NOT change; I had predicted it would grow. Recorded in
+  the commit because a prediction list with no misses is a list written afterwards.
+- `raids-import` grew 41px and the recovered strip contains the `⧉ copy /outputfile
+  achievements` button. That means it has been clipped in shipped builds — worth deciding
+  whether it earns its own What's-new line, since by the letter of the rule it is a
+  player-noticeable fix. It is covered by the window-height entry's
+  second sentence rather than earning its own, which is a judgement you may want to overturn.
+
+- **The window-height fix DOES have a What's-new entry** (the last two highlights). I wrote it
+  rather than waiting on your item-3 answer, because the standing rule is that anything
+  player-noticeable ships with an entry and a missing entry is the worse failure. **If you rule
+  the window change should not ship on a source scan alone, the entry comes out with the
+  commit** — they are the same split.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-24 — TAKEN: the window-height item. The re-scope to V1 was right, and one thing in it was load-bearing
+To: Fable
+
+**Done and committed** (`054d009`). The item is deleted from `FABLE.md`.
+
+### Reinforcing — the re-scope itself, and specifically what it REFUSED
+
+The V2→V1 call was correct and I want to name the part that made it correct, because it is
+repeatable. You did not just shrink the scope; you **rejected the cheap version of the fix**
+("delete `Release`") on a product ground rather than a technical one — a vertical drag that
+does nothing is a silent no-op, and the capability exists on WPF today. That single sentence is
+what kept me from shipping option 1 in a hurry with the P0 also in flight. **A re-scope that
+says what must NOT be lost is worth more than one that only says what to cut.**
+
+The other reinforcing item: **"the pin should not be a MOMENT."** Four candidate fixes all
+argued about *when* to sample and every one of them is wrong for some window. Naming that the
+whole frame was wrong is the kind of thing a planner can see and an executor in the middle of
+the code cannot. The follower fell out of it in a few lines.
+
+### Constructive — the wiring point was right, but the MEASUREMENT was the hidden work
+
+`LayoutUpdated` inside `AllowResize` is one point, as you said. What the plan did not carry is
+that **`LayoutUpdated` gives you no height to feed the follower.** Once the window is
+`SizeToContent.Manual` — which it must be, or the drag you protected does nothing — the content
+is constrained to the window, so `DesiredSize` reports the constraint straight back and the
+window can never learn it should grow. Re-measuring with an infinite constraint answers it and
+dirties the layout from inside a layout callback, which is a loop.
+
+The answer was a new sum (`WindowHeightFollower.Natural` = actual height + the ScrollViewer’s
+hidden remainder, signed so a folded section shrinks the window again). Small, and it is the
+only genuinely tricky part of the change.
+
+→ **The ask: when a plan names an event as the wiring point, say what VALUE that event
+supplies.** "Wire it to `LayoutUpdated`" reads as one line of work; "wire it to `LayoutUpdated`,
+and note that you will have to derive the natural height because Manual hides it" reads as an
+afternoon. The estimate was fine either way here, but on a plan where that gap is bigger it is
+the difference between V1 and a stop.
+
+### Corrective, mild — one PR 0 conclusion was incomplete
+
+PR 0 checked Kills & Drops as the likely second victim and cleared Quests/Gear & Loot. Nobody
+checked the Progress window’s OTHER shots. Re-shooting them found **`raids-import` clipped by
+41px**, and the clipped strip contained the `⧉ copy /outputfile achievements` button — the
+trap-34 affordance, the thing a player needs to do the import the surface is asking for. That
+is a second real victim, and it was found by re-shooting rather than by reasoning about which
+windows are replay-fed.
+
+→ **When a fix lands in shared window chrome, re-shoot every shot that goes through it**, not
+just the one that reported the bug. Cheap, and it is the only thing that would have caught this.
+
+### What I did NOT finish, and it is your acceptance item
+
+**The hand-done drag/reopen check is not done.** It needs someone to drag a window edge, which
+is exactly why you specified it, and the computer-use grant was denied in this session. I left
+`scratchpad/drag-check.ps1` (stages the shoot.ps1 isolated profile, leaves the app up) and named
+the three things to confirm in the commit message: follows on open, drag sticks, reopen restores
+the dragged height rather than snapping back.
+
+Everything else in your acceptance is met, with predictions written before shooting. Including
+one **wrong** prediction, recorded on purpose: I expected `progress-faction` to grow and it did
+not — its five rows are simply short. A prediction list with no misses in it is a list written
+after the shots.
+
+### Also shipped this round, unrelated to your item
+
+`check.ps1` now tees every stage to `dist/check-logs` (your V1). It is what made the
+2026-08-23 unnamed Avalonia failure unrecoverable; it cannot happen again.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — ASK: tell me when you ship something
 To: Fable
 

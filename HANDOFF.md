@@ -1,5 +1,57 @@
 # EQBuddy — handoff
 
+> **2026-08-24, Claude — A P0 DATA-LOSS BUG IS FIXED AND 1.99.9 IS STAGED, UNRELEASED.**
+> Strilker-TV on Reddit: EQBuddy emptied log files they had deliberately renamed and kept.
+> **Two independent faults, both real, and the reporter's tick was never the problem.**
+> (1) The 10-minute janitor omitted the `!ShowTutorial` guard the startup sweep had, and
+> `_lastJanitorRun` starts at `DateTime.MinValue` — so it fired on the FIRST one-second tick
+> and emptied every log while the consent dialog was still on page 1. (2) The `eqlog_*.txt`
+> glob matched the player's own renamed copies. Fixed in `ea2e27d`:
+> `UI.Shared/LogJanitorPolicy` (one answer, four call sites) and `Core/GameWrittenLog` (the
+> shape the game actually writes). Traps 47 and 48 in `CLAUDE.md`. Both guards were run
+> against the broken tree and each names its own defect.
+>
+> → **The mitigation is the most useful thing to say to anyone who reports this:**
+> `ArchiveLogs` has defaulted ON since 1.84.0, so in almost every case the content is sitting
+> in `Logsrchive`. Said plainly in What's-new, including the honest half — if archiving was
+> switched off, it is gone.
+>
+> → **`REDDIT-DRAFT-strilker.md` is written and NOT posted.** David chose "draft it for you,
+> you post" with the question tool. It is a data-loss apology on a thread he is already in
+> personally, so it is his voice and his post; it concedes that his first reply pointed at the
+> consent screen and was wrong about the app.
+
+> **2026-08-24 — the window-height item is DONE and deleted from `FABLE.md`** (`054d009`).
+> `WindowHeightFollower` is wired into `WindowZoom.AllowResize` via `LayoutUpdated`; the
+> `ContentRendered` pin is gone. Acceptance met with predictions written first: `progress-card`
+> 203 → **389**, whole body, no scrollbar. Re-shooting the OTHER Progress shots (not asked for)
+> found `raids-import` clipped by 41px, hiding its `⧉ copy /outputfile achievements` button —
+> a second real victim.
+>
+> → **ONE ACCEPTANCE ITEM IS NOT DONE: the hand-done drag/reopen check.** It needs a human to
+> drag a window edge, which is why Fable specified it, and the computer-use grant was denied
+> this session. `scratchpad/drag-check.ps1` stages an isolated profile and leaves the app up.
+> Three things to confirm: follows on open, a bottom-edge drag sticks, reopening restores the
+> dragged height rather than snapping back to content.
+
+> **WHERE THE RELEASE STANDS — do not assume, check.** 1.99.9 is staged: version bumped,
+> What's-new written (7 highlights), **untagged and unreleased**. The review request is in
+> `FABLE-FEEDBACK.md` and Fable has NOT answered. The order is gates → Fable → David, and
+> David has not been asked for the go. Gates: 2,539 unit · 278 Avalonia · 26 E2E, all green.
+> **Check `git tag`, `gh release list` and the OneDrive timestamp before claiming any release
+> state** — that assumption was wrong twice in one session on 2026-08-23.
+>
+> → **The one thing in this release I most doubt**, and it is flagged to Fable: the server-name
+> character rule in `GameWrittenLog` requires letters and underscores. If a real EQ Legends
+> server short name contains a DIGIT or a HYPHEN, that log stops being swept forever — the
+> feature's own failure arriving from the other side. Derived from names in this repo; no
+> canonical server list found; David is level 29 and cannot confirm it.
+
+> **`check.ps1` now tees every stage to `dist/check-logs`** (Fable's V1). The 2026-08-23
+> unnamed Avalonia failure cannot recur as an unrecoverable one.
+
+> **#208 is still the only live Helm hold** and nothing this session touched it.
+
 > **2026-08-23 (night), Claude — #233 needs ONE THING FROM DAVID: carry the draft to Helm.**
 > mjtrainor, *"stop changing every feature and it's location every release"* — the THIRD arrival
 > of one complaint (#219, #227/#228, now this). David settled the direction with the question
