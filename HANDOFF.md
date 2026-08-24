@@ -1,7 +1,7 @@
 # EQBuddy — handoff
 
 > **2026-08-24, Claude — A P0 DATA-LOSS BUG IS FIXED AND 1.99.9 IS STAGED, UNRELEASED.**
-> Strilker-TV on Reddit: EQBuddy emptied log files they had deliberately renamed and kept.
+> StrIIker-TV on Reddit: EQBuddy emptied log files they had deliberately renamed and kept.
 > **Two independent faults, both real, and the reporter's tick was never the problem.**
 > (1) The 10-minute janitor omitted the `!ShowTutorial` guard the startup sweep had, and
 > `_lastJanitorRun` starts at `DateTime.MinValue` — so it fired on the FIRST one-second tick
@@ -16,7 +16,7 @@
 > in `Logsrchive`. Said plainly in What's-new, including the honest half — if archiving was
 > switched off, it is gone.
 >
-> → **`REDDIT-DRAFT-strilker.md` is written and NOT posted.** David chose "draft it for you,
+> → **`REDDIT-DRAFT-striiker.md` is written and NOT posted.** David chose "draft it for you,
 > you post" with the question tool. It is a data-loss apology on a thread he is already in
 > personally, so it is his voice and his post; it concedes that his first reply pointed at the
 > consent screen and was wrong about the app.

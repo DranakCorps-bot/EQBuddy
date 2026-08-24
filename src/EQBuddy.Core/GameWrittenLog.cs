@@ -8,9 +8,9 @@ namespace EQBuddy.Core;
 /// PLAYER made in the same folder?
 ///
 /// The janitor's glob was <c>eqlog_*.txt</c>, which is the shape of the game's logs and
-/// also the shape of every copy a player keeps beside them. Strilker-TV (Reddit,
+/// also the shape of every copy a player keeps beside them. StrIIker-TV (Reddit,
 /// 2026-08-23) kept their history by renaming each log as it grew — the obvious way to do
-/// it, and the result is <c>eqlog_Strilker_erollisi_2026-08-01.txt</c>, which the glob
+/// it, and the result is <c>eqlog_StrIIker_erollisi_2026-08-01.txt</c>, which the glob
 /// matched and <c>SetLength(0)</c> emptied. EQBuddy is allowed to empty the file the game
 /// is writing for it. It is not allowed to empty the player's own archive, and a glob
 /// cannot tell those apart.
@@ -27,7 +27,7 @@ namespace EQBuddy.Core;
 /// underscores for the server, and no other character anywhere.
 ///
 /// **The residual gap is stated rather than papered over.** A rename that adds only
-/// letters — <c>eqlog_Strilker_erollisi_old.txt</c> — is indistinguishable from a
+/// letters — <c>eqlog_StrIIker_erollisi_old.txt</c> — is indistinguishable from a
 /// character on a server called "erollisi_old" and is still swept. Nothing in the
 /// filename can settle that one. It is a much narrower target than "anything starting
 /// eqlog_", and archiving (on by default since 1.84.0) is the net underneath it.

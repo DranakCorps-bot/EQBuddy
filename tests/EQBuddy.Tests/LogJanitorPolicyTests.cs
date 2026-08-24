@@ -7,7 +7,7 @@ namespace EQBuddy.Tests;
 /// <summary>
 /// The auto-empty consent question, and the two ways it was defeated.
 ///
-/// Reddit, 2026-08-23, Strilker-TV: *"I ran your program to try it out a week or so ago.
+/// Reddit, 2026-08-23, StrIIker-TV: *"I ran your program to try it out a week or so ago.
 /// It deleted all of my logs. Even the ones not being played. I was keeping all of my log
 /// files and had renamed them as they got larger. Those are all gone."* And then, shown
 /// the consent page: *"I saw that and I know that I selected the check box. I made sure
@@ -82,10 +82,10 @@ public class LogJanitorPolicyTests
         => Assert.True(GameWrittenLog.IsGameWritten(name));
 
     [Theory]
-    [InlineData("eqlog_Strilker_erollisi_2026-08-01.txt")] // the reporter's own shape
-    [InlineData("eqlog_Strilker_erollisi 2026-08-01.txt")]
-    [InlineData("eqlog_Strilker_erollisi - Copy.txt")]
-    [InlineData("eqlog_Strilker_erollisi (1).txt")]
+    [InlineData("eqlog_StrIIker_erollisi_2026-08-01.txt")] // the reporter's own shape
+    [InlineData("eqlog_StrIIker_erollisi 2026-08-01.txt")]
+    [InlineData("eqlog_StrIIker_erollisi - Copy.txt")]
+    [InlineData("eqlog_StrIIker_erollisi (1).txt")]
     [InlineData("eqlog_Dranak_legends_20260607143219.txt")] // an archive copy
     [InlineData("eqlog_Dranak_legends.txt.bak")]
     public void APlayersOwnKeptCopyIsNeverSwept(string name)
@@ -99,8 +99,8 @@ public class LogJanitorPolicyTests
         var dir = Directory.CreateTempSubdirectory("eqbuddy-janitor-").FullName;
         try
         {
-            var live = Path.Combine(dir, "eqlog_Strilker_erollisi.txt");
-            var kept = Path.Combine(dir, "eqlog_Strilker_erollisi_2026-08-01.txt");
+            var live = Path.Combine(dir, "eqlog_StrIIker_erollisi.txt");
+            var kept = Path.Combine(dir, "eqlog_StrIIker_erollisi_2026-08-01.txt");
             File.WriteAllText(live, new string('x', 4000));
             File.WriteAllText(kept, "a month of play the player deliberately kept");
             var old = DateTime.Now.AddHours(-5);

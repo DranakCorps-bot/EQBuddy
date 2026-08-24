@@ -15,7 +15,7 @@ namespace EQBuddy.UI.Shared;
 /// "every 10 minutes" test passes on the FIRST one-second UI tick. The unguarded copy
 /// therefore emptied every log about a second after launch — while the consent dialog
 /// was still on page 1, before the player could physically read the sentence asking
-/// them. Strilker-TV (Reddit, 2026-08-23) ticked the box, was emptied anyway, and could
+/// them. StrIIker-TV (Reddit, 2026-08-23) ticked the box, was emptied anyway, and could
 /// only report that it "didn't take hold properly". It took hold; it was simply asked
 /// after the fact.
 ///

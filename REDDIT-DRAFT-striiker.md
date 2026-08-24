@@ -1,4 +1,4 @@
-# Draft reply to Strilker-TV (Reddit) — for David to post as Dranak75
+# Draft reply to StrIIker-TV (Reddit) — for David to post as Dranak75
 
 **Status:** draft only, nothing posted. This is a data-loss apology on a thread David is
 already in personally, so it is his voice and his call — not a routine signed thread reply.
@@ -66,6 +66,6 @@ either way.
 
 A GitHub discussion for this. You picked "draft it for you, you post" over also opening one,
 so nothing has been filed in the repo. Say the word if you want it tracked publicly with a
-number to credit in What's-new — right now the release notes credit Strilker-TV by name with
+number to credit in What's-new — right now the release notes credit StrIIker-TV by name with
 no number, which is a small departure from the usual "name and discussion number" rule and is
 deliberate, since the report came in on Reddit.

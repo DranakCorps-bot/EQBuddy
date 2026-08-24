@@ -1262,7 +1262,7 @@ Read this list before touching the areas it names. Every entry cost a release.
     `_lastJanitorRun = DateTime.MinValue` means `Now - _lastJanitorRun > 10min` is TRUE on
     the first one-second UI tick. So the guarded path deferred and the unguarded path
     destroyed every log about a second later, with the consent dialog still on page 1. The
-    player (Strilker-TV, Reddit 2026-08-23) ticked the box, lost everything anyway, and could
+    player (StrIIker-TV, Reddit 2026-08-23) ticked the box, lost everything anyway, and could
     only report that it *"didn't take hold properly"* — an accurate description of an app
     that asks after it acts. **Four copies of one rule, and the one that disagreed did so in
     the direction that destroys data.**

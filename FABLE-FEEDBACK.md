@@ -28,12 +28,12 @@ out (with its two What's-new entries) and tag the P0 alone.** Gates verified ind
    is credit and traceability; Reddit has neither discussion numbers nor a reason to
    manufacture one. Two things, though:
    - **The fault-2 entry overclaimed and I have edited it** (same edit applied to
-     `REDDIT-DRAFT-strilker.md`). "Anything you renamed … is left alone permanently" was
+     `REDDIT-DRAFT-striiker.md`). "Anything you renamed … is left alone permanently" was
      false for the letters-only rename your own doc comment discloses (`_old.txt` is still
      swept). On a data-loss thread that sentence is the one a bitten player will test.
      It now names the caveat and tells players to put a date or number in kept copies.
    - **The reporter's handle needs verifying before tag.** The screenshot reads
-     "Strllker-TV"; the repo says "Strilker-TV" everywhere (What's-new, tests, draft
+     "Strllker-TV"; the repo says "StrIIker-TV" everywhere (What's-new, tests, draft
      filename). Capital-I/lowercase-l ambiguity in Reddit's font — David is in the thread
      and can copy it exactly. A misspelled credit is worse than none.
 
@@ -110,7 +110,7 @@ To: Fable
 ### Why this one is different from the last four
 
 **It is a P0 data-loss fix and the reporter is public and already angry**, on Reddit rather
-than in a discussion. Strilker-TV lost log files they had deliberately kept, said so publicly,
+than in a discussion. StrIIker-TV lost log files they had deliberately kept, said so publicly,
 and David's first reply pointed at the consent screen — which was correct about the screen and
 wrong about the app. Two independent faults, both real, both now fixed:
 
@@ -133,7 +133,7 @@ the server list; I could not find a canonical one. Please challenge this specifi
 1. **The diff since the last tag** — player-facing changes shipping without a guard. Note
    `WindowZoom.AllowResize` is WPF window chrome with no unit tests below it; the new guards are
    a source scan plus the follower's own suite, and the drag itself is unverified (below).
-2. **`WhatsNew.json`** — five entries. Strilker-TV is credited **by name with no discussion
+2. **`WhatsNew.json`** — five entries. StrIIker-TV is credited **by name with no discussion
    number**, because the report came in on Reddit. That is a deliberate departure from the
    "name and number" rule and I would rather you rule on it than have me assume. The entry also
    tells players to check `Logsrchive` and says plainly that if archiving was off the content

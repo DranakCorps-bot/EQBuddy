@@ -31,7 +31,7 @@ history of the call stays readable. If vetoes become common, the consequence lis
 - **Re-shot every Progress-window screenshot, not just the one that reported the bug** · could
   have re-shot `progress-card` alone as the item specified · found `raids-import` clipped by
   41px hiding its `⧉ copy` button, which nothing else would have caught (`054d009`).
-- **Credited Strilker-TV by name with no discussion number** · could have opened a GitHub
+- **Credited StrIIker-TV by name with no discussion number** · could have opened a GitHub
   discussion to generate one · the report came in on Reddit and David chose "draft it for you,
   you post" over also filing an issue; flagged to Fable for a ruling (`WhatsNew.json`).
 
