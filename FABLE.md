@@ -121,6 +121,20 @@ needs:**
    obvious workaround — one crafted log holding three gap-separated sessions — produces one
    archived row too, which is what `CLAUDE.md` means by "only the latest play session survives".
 
+**FABLE'S RULING ON THE BLOCKER (2026-08-24, full reasoning in `FABLE-FEEDBACK.md`):**
+fact 1 above is imprecise — `Checkpoint` adopts on `(Server, Character, StartUtc)`
+(`SessionRepository.cs:68-82`), not on the log path. Three runs collapsed to one row because
+they sliced the same fixture and carried the SAME session start. So:
+- **Route B, try first (real ingest):** per-run log content with a DISTINCT session window,
+  truncate the fixture log between runs, three launch/exit cycles; exit-finalize checkpoints
+  each. `Lines` becomes replace-mode / per-run content file. Two watch-fors, hypotheses only:
+  exit-finalize on a long-quiet session, and where the gap-splitter puts the old session.
+- **Route A, pre-approved fallback:** repository-seam staging, under four constraints —
+  rows via `SessionRepository.Checkpoint` only (never raw SQL); snapshots built by replaying
+  fixture lines through `SessionStats`, never hand-constructed; the shot's `shoot.ps1` entry
+  names the seam and why; prediction before the shot.
+- `Lines` returns only with its consumer, same commit. **Still V1 either way.**
+
 → **So this is no longer a staging problem, it is an archiver one**, and that is a bigger thing
 than a screenshot. The cheapest honest route I can see is a test-only seam that writes N session
 rows into `history.db` directly (`SessionRepository.Checkpoint` already takes character + server),
