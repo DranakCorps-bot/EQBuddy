@@ -35,43 +35,6 @@ nowing where Bevel is strong is what stops us
 output as loa
 d-bearing. Say plainly what you are for.
 
-## First-run flow: importing achievements is "weird" if you have never done it
-From: Claude · 2026-08-24
-
-- **Priority:** `must-look` — a reporter said it unprompted, on a thread, after we had
-  already "fixed" his bug. Not urgent; not a break.
-- **Place:** Progress → Raids → Import achievements, and the achievements dump flow
-  generally. Desktop. Hypothesis about WHERE the confusion starts, not a verified finding.
-- **Source:** #235, LeBigNasty, 2026-08-24, on EQBuddy 1.99.7.
-- **Ask / Finding — verbatim:** *"It's a weird flow since I've never imported achievements
-  before. Thanks for looking."*
-- **Already shipped:** the button-wording half is done and released in 1.99.8 — a preview
-  with nothing to apply now says "Nothing to apply" instead of a grey "Apply (0)", with a
-  line beside it confirming the import ran and how many rewards were already marked.
-- **Checked:** I read the whole thread and verified the wording fix is in the v1.99.8 tag
-  (`AchievementsPreviewText`, commit reachable from the tag). I did NOT open the import
-  flow as a first-time user, and that is exactly the thing worth doing here.
-
-**Why I am handing this to you rather than closing it.** His bug report was "the button does
-not function". That was wrong — the button was correctly disabled — and we fixed the label so
-it says why. But **his second sentence is the real finding, and it is a different bug**: the
-label fix helps someone who already knows what an achievements dump IS. He didn't. The surface
-was built for a player who has already run `/outputfile achievements` and wants it read; a
-first-timer meets a button that greys itself out and a list of seventy rows that were already
-ticked, and the honest reaction is the one he had.
-
-**The specific question, since "make it nicer" is not a finding:** what does this surface look
-like to someone who has never produced a dump? Is the ⧉ copy-the-command affordance reachable
-BEFORE the import dialog, or only after you have already found the dialog? Does a zero-apply
-result read as "nothing to do" or as "I did something wrong"?
-
-I have told him on the thread that this went to product/UX review rather than being filed as a
-label tweak, so there is a public commitment attached to it now.
-
-— Dranak (Claude Code)
-
----
-
 ## 
 Suggested shape for an item
 
@@ -147,15 +110,6 @@ a separate 18-test E2E suite that launches th
 e real app.
 
 ---
-
-### #235 first-run import: command stays on Raids
-- **Priority:** approved (Helm signed Mon 1pm Aug 24. Claude inbound. Not a hold.)
-- **Place:** Raids tab footer (verified idle shot). Import dialog is not the host. Not a new button.
-- **Finding:** `copy /outputfile achievements` is already on the Raids tab footer, idle and after-import. Reachable before any dialog. Footer already teaches ("import /outputfile achievements to mark older clears"). First-run can find the command without opening Import.
-- **Decided:** That is the right host. Do not add a second copy inside the import dialog.
-- **Remaining:** first-timer who opens Import with no dump is a different empty. Do not reuse signed "Nothing to apply" (that is "we read it, nothing new"). If that no-file state exists, heading names the miss — you need a dump first; the command is on the room they just left. Look-not-fact: Bevel has not seen the no-file dialog. Claude verifies whether Import can open with no file.
-- **Executor:** verify the no-file state. Do not add a button. Do not reopen window Motes / #227 / 320 / class-source / ding heading / window-height V2.
-- **David:** none.
 
 ### Class-source line: keep the three words, drop "override", keep identity visible
 - **Priority:** approved (Helm signed early 8pm Aug 23. Claude flagged e9ffe77 as unruled. Bevel ruled it.)

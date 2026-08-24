@@ -3,10 +3,12 @@
 **Status:** draft only, nothing posted. This is a data-loss apology on a thread David is
 already in personally, so it is his voice and his call — not a routine signed thread reply.
 
-**The one thing to check before posting:** ask them to look in `Logs\archive` first. If
-their content is there, this thread ends well; if archiving had been switched off, it does
-not, and the reply should not promise otherwise. The draft below is written to be true
-either way.
+**Superseded in part — read the CORRECTION at the bottom before using any of this.** The
+reporter has since said his build never created the archive folder at all, so the recovery
+path this draft leads with did not exist for him. The two bug explanations still stand; the
+"check your archive folder" paragraph does not apply to pre-1.84.0 builds, and the reason an
+archive is missing is **ours** (it was off by default, or absent) rather than a setting he
+turned off.
 
 ---
 
@@ -37,8 +39,8 @@ either way.
 > on by default. It never deletes anything in that folder. Files there are named
 > `eqlog_yourname_yourserver_` plus the date and time the session ended. If your logs were
 > emptied by the bug above, there's a good chance the text is all still sitting on your
-> disk. If that folder's empty, archiving had been turned off in Options and it's genuinely
-> gone — in which case I'm sorry, and I'd rather say that than pretend otherwise.
+> disk. If there's no archive folder at all, it's genuinely gone — in which case I'm sorry, and
+> I'd rather say that than pretend otherwise.
 >
 > Both fixes are in the next build with the whole thing written up in the release notes.
 > Thanks for pushing back after my first reply — I pointed at the consent screen instead of
@@ -69,3 +71,30 @@ so nothing has been filed in the repo. Say the word if you want it tracked publi
 number to credit in What's-new — right now the release notes credit StrIIker-TV by name with
 no number, which is a small departure from the usual "name and discussion number" rule and is
 deliberate, since the report came in on Reddit.
+
+---
+
+## ⚠ CORRECTION, 2026-08-24 — the draft's recovery line was wrong for HIS build, and David posted it
+
+**StrIIker-TV replied on Reddit (8:42 AM CT): their build never created the Archive directory
+at all, and the in-folder backups went too — "all of my logs (including the backups which were
+in the logs directory) are gone for good."**
+
+The draft above told him to check the archive folder and said that an empty folder meant *"archiving
+had been turned off in Options"*. **That sentence quietly puts the choice on him, and it is not
+true of his build.** The timeline:
+
+- **before 2026-08-07** — archiving did not exist. No setting, no folder, no copy.
+- **2026-08-07 → 1.84.0 (08-14)** — archiving existed but **defaulted OFF**. A player who never
+  opened Options got no copies, having chosen nothing.
+- **1.84.0 onward** — on by default, with a one-time migration for existing profiles.
+
+So for anyone on a pre-1.84.0 build the honest sentence is **"we never made you a copy"**, not
+"you turned it off" — which is wizen's #146 complaint exactly ("EQBuddy's out-of-the-box
+behaviour was destroying a file the player never asked it to destroy"). The line above is fixed;
+**this note stays because David already relayed the wrong version on the thread at 8:13 AM.**
+
+**Nothing is owed on the thread from this end** — Helm signed the item harvest-only on
+2026-08-24 1:26 PM: waiting, not authorized, do not reply, David is in the thread. 1.99.9 does
+not restore already-wiped pre-archive users, and no new empty-logs bug is implied. Recovery or
+copy tooling for pre-archive users is a leftover only if David opens it.

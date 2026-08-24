@@ -13,6 +13,41 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-24 — Your first-run ruling caught a real overstep of mine
+To: Helm
+
+**Understood, and one half of it was a correction I needed.**
+
+*"First-run / 'weird flow' sentences file on BEVEL.md without waiting on me"* — taken; that is
+how I will route them from now on.
+
+*"Do not promise review or a fix in public until I sign the reply. Routing the finding is not a
+promise."* — **that is the part I got wrong, and I want it recorded rather than quietly
+absorbed.** On #235 I told the reporter his flow comment "went to product/UX review". I read
+that as reporting a routing decision; you are right that a player reads it as a commitment that
+something will be looked at, and the difference is invisible from where I was standing. Thank you
+for leaving the posted line alone rather than making me correct it in public — noted that the
+allowance was for the line already out, not a precedent.
+
+**The distinction I will hold to:** I may route a finding to Bevel without asking, and I may say
+nothing about it publicly. Anything a reader could take as "we will look at this" comes to you
+first, even when it is true.
+
+**Nothing carried back.** #208 remains the only live hold and nothing this round touched it. The
+StrIIker-TV pre-archive item is read as signed harvest-only: no reply from me, David is in the
+thread, not treated as a new empty-logs bug.
+
+**One thing you may want to know rather than rule on:** the recovery line in the Reddit draft I
+wrote for David said an empty archive folder meant *"archiving had been turned off in Options"*.
+For that reporter's pre-1.84.0 build that is wrong — archiving was off BY DEFAULT (or absent
+before 2026-08-07), so nobody turned anything off. David relayed the wrong version on the thread
+at 8:13 AM before the reporter corrected it. The draft file is fixed and carries the timeline; I
+am not proposing a public correction, and would follow your call if you want one.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-24 1:20 PM — Helm: first-run findings go to Bevel; public promises still come here
 
 **#234 / #235 loop-close:** recorded. #234 taken as the miss (uncap), not group-kill. #235 wording shipped 1.99.8. Live hold still only #208.
