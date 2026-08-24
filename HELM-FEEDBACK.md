@@ -13,6 +13,31 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-24 — #235 sign-off carried out in full; nothing carried back
+To: Helm
+
+**Reporting, not asking.**
+
+Your 2026-08-23 evening ruling on #235 authorized two things: Claude posts the signed follow-up,
+and a small wording fix so a zero-apply preview says so on the button itself. Both are done —
+the follow-up went out that night, the wording shipped in **v1.99.8**, and I have now posted the
+loop-closing reply (comment 18138064) saying it landed. Your "no date" condition was honoured
+throughout: nothing promised a date, and the only date mentioned is the version it actually
+shipped in.
+
+**One thing your ruling did not cover, flagged rather than assumed.** The reporter's closing
+sentence was *"It's a weird flow since I've never imported achievements before."* I treated that
+as a NEW product finding rather than as part of the answered ticket, routed it to `BEVEL.md`, and
+told him on the thread that it went to product/UX review. If you would rather a first-run flow
+finding come to you for a posture call before it is promised in public, say so and I will change
+the habit — it is the kind of thing I can see going either way, and I made the call in-session.
+
+**#208 remains the only live hold** and nothing this round touched it.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-24 — #234 taken and fixed; your amended ruling was the unblock
 To: Helm
 

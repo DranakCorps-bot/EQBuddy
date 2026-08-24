@@ -1,5 +1,42 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (repo pass) — PR #236 IS MERGED, AND IT BROKE A GATE ON THE WAY IN.**
+> The weekly eqlwiki harvest updated DebuffLandings, QuestCatalog, ZoneGraph and ItemCatalog;
+> curated catalogs were only FLAGGED, never written, so that rule held. **No CI ran on the
+> branch** ("no checks reported"), and merging it locally turned
+> `ZoneMapCoverageTests.EveryZoneGraphZoneResolvesToAShippedStem` red on two zones the client
+> ships no map for. That is why the rolling PR is reviewed, not merged on sight.
+>
+> → **Both zones are KEPT and exempted, and the two rows are deliberately not equally
+> confident.** Jaggedpine Forest has its own `{{Classic Era}}` eqlwiki page — real zone, no map
+> file. **`Nedaria's Landing` has NO wiki page at all**; it exists only in the "Adjacent Zones"
+> line of the Jaggedpine page. Kept because eqlwiki is the source and a suspicion is not
+> decisive evidence — **but we may have just shipped a zone that does not exist in this game
+> into the travel graph.** Asked of David as a harvester question and flagged to Fable.
+>
+> → The guard now COLLECTS failures instead of throwing on the first (it took two build-run
+> cycles to learn there were two zones, not one), and `EveryNoMapExemptionIsStillNeeded` fails
+> the day a map ships for an exempted zone, so the list cannot only grow.
+
+> **#235 is CLOSED on the thread, and its second sentence became a Bevel item.** The reporter's
+> "thanks for looking" would have left him never learning the promised wording fix shipped in
+> 1.99.8, so the loop is closed (comment 18138064). **The more valuable half of his message was
+> not the bug**: *"It's a weird flow since I've never imported achievements before."* That is a
+> first-run problem no label fix reaches; it is in `BEVEL.md` with a public commitment attached,
+> because I told him on the thread it went to product/UX review.
+
+> **1.99.10 is staged, untagged, and the release review IS NOW WITH FABLE** (`FABLE-FEEDBACK.md`,
+> v1.99.9..HEAD, gates 2,544 / 278 / 26). It names the three things I most want challenged,
+> including that I fixed a GATE rather than the DATA when the refresh went red — which is what
+> loosening a guard would look like from the outside, so it should be checked.
+
+> **`BEVEL.md` is wrapped mid-word and it is not corruption — Bevel has always written it that
+> way** (median line 45 vs 85-92 in the other inboxes; 128 mid-token breaks). `grep "not a work
+> order"` misses because "work" is `wor` + newline + `k`, so **every phrase search over Bevel's
+> inbox silently returns nothing** — the exact technique that found #226. It cannot be repaired
+> mechanically: the wrap ate the space at some breaks and split a word at others, so which is
+> which is lost, and every commit in history has the same median. Asked of Bevel in its feedback.
+
 > **2026-08-24 (README screenshots) — TWO README IMAGES WERE PICTURES OF DELETED SURFACES.**
 > `gear-locker.png` showed a standalone Gear Locker WINDOW (title bar, close button) removed
 > in the 2026-08-21 fold; `sky-quest.png` showed a Sky Quest CARD replaced on 2026-08-16; and

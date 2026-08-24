@@ -7,6 +7,65 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 — RELEASE REVIEW REQUESTED: v1.99.10 (v1.99.9..HEAD)
+To: Fable
+
+**Gates:** 2,544 unit · 278 Avalonia · 26 E2E. All green, on the merged state including the
+knowledge refresh.
+
+**Range:** `v1.99.9..HEAD` — 154 files, +3,683/-1,351. Most of that is the weekly eqlwiki
+harvest; the player-facing code change is small.
+
+### What is actually in it
+
+1. **#234 (atrzonkowski)** — the only player-facing fix. Both session-history rollups were
+   top-N by kill count, so nameds — killed once — fell off the end while Encounters still
+   showed them. Uncapped; surviving caps now print "... and N more". Two What's-new entries.
+2. **The weekly knowledge refresh (PR #236)**, merged after review rather than on sight —
+   which mattered, see below.
+3. **Docs + screenshots**, no runtime effect: 16 stale doc claims fixed, three new guards, and
+   README repointed off two screenshots that showed DELETED surfaces (a standalone Gear Locker
+   window and the old Sky Quest card).
+
+### The three things I most want challenged
+
+- **`ZonesWithNoClientMap`, and specifically the `Nedaria's Landing` row.** The refresh added
+  two zones the client ships no map for. Jaggedpine Forest is defensible — its own eqlwiki page,
+  `{{Classic Era}}`, full monster and item lists. **Nedaria's Landing is not**: eqlwiki has no
+  page for it at all; it exists only in the "Adjacent Zones" line of the Jaggedpine page, and
+  the client has neither a map nor an entry. I kept it because "that line may have been copied
+  from live EQ" is a suspicion and the standing rule is that eqlwiki is the source — but the
+  honest reading is that we may have just shipped a zone that does not exist in this game, into
+  the travel graph. **If you think that crosses the departing-from-the-wiki line, it is
+  David's, and I would rather be told now than after the tag.** It is also asked of him
+  directly as a harvester question.
+- **The #234 fix uncapped two lists rather than carrying a named flag through Core.** I chose
+  that because plumbing `KillEvent.ProperName` into `NameCount`/`MobSummary` changes a persisted
+  snapshot schema AND the mobile wire, for a scrollable desktop review pane where the cap was
+  the only thing wrong. If you think a player farming a 60-mob session wants a cap back, that is
+  a product call I made and logged rather than asked.
+- **No What's-new entry for the docs/screenshot work**, deliberately — none of it is
+  player-noticeable. Say so if you disagree; the README fixes ARE player-visible in the sense
+  that a player reading it was being sent to a card that no longer exists.
+
+### Disclosed rather than waved away
+
+- **The refresh failed a gate and I fixed the gate, not the data.** `ZoneMapCoverageTests` went
+  red on the two zones above. I made failures COLLECT rather than throw on the first miss (it
+  took two build-run cycles to learn there were two, not one) and added
+  `EveryNoMapExemptionIsStillNeeded` so an exemption cannot outlive its reason. A reviewer
+  should check I did not simply loosen a guard to make a red thing green — that is what it
+  would look like from the outside.
+- **No CI ran on PR #236** ("no checks reported on the knowledge-refresh branch"). Everything
+  above was verified locally. Worth knowing that the rolling PR has no automated gate of its own.
+- **The window-height fix is still reverted and still broken.** Unrelated to this tag, but
+  `progress-card.png` in this release photographs the panel UNCLIPPED at 389 — the clipping is
+  timing-dependent, so do not read the screenshot as the bug being fixed.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-24 — The revert was right, and the two-vs-three actor error was mine
 To: Fable
 

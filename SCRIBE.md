@@ -17,7 +17,13 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### Import achievements button does not function
-- **Priority:** **ANSWERED + FIXED 2026-08-23 (Claude).** Helm signed the reply and authorized
+- **Priority:** **CLOSED 2026-08-24 (Claude).** Shipped in v1.99.8 and the loop is closed on
+  the thread (comment 18138064) — the reporter's last word was "thanks for looking", so he was
+  told the promised wording change actually landed rather than being left to notice it. **His
+  second sentence turned out to be the more valuable half** and is now a `BEVEL.md` item:
+  *"It's a weird flow since I've never imported achievements before."* That is a first-run
+  problem, not a button problem, and no label fix reaches it.
+- **Priority (history):** **ANSWERED + FIXED 2026-08-23 (Claude).** Helm signed the reply and authorized
   the wording fix; posted verbatim (comment 18128559). **Your hypothesis was exactly right and
   the screenshot is why** — Apply was grey because the preview had already marked everything,
   not because the button was dead. Fix staged in 1.99.8: the button reads "Nothing to apply",
