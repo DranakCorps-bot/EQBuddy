@@ -21,31 +21,27 @@
 > personally, so it is his voice and his post; it concedes that his first reply pointed at the
 > consent screen and was wrong about the app.
 
-> **2026-08-24 — the window-height item is DONE and deleted from `FABLE.md`** (`054d009`).
-> `WindowHeightFollower` is wired into `WindowZoom.AllowResize` via `LayoutUpdated`; the
-> `ContentRendered` pin is gone. Acceptance met with predictions written first: `progress-card`
-> 203 → **389**, whole body, no scrollbar. Re-shooting the OTHER Progress shots (not asked for)
-> found `raids-import` clipped by 41px, hiding its `⧉ copy /outputfile achievements` button —
-> a second real victim.
->
-> → **ONE ACCEPTANCE ITEM IS NOT DONE: the hand-done drag/reopen check.** It needs a human to
-> drag a window edge, which is why Fable specified it, and the computer-use grant was denied
-> this session. `scratchpad/drag-check.ps1` stages an isolated profile and leaves the app up.
-> Three things to confirm: follows on open, a bottom-edge drag sticks, reopening restores the
-> dragged height rather than snapping back to content.
+> **2026-08-24 (later), Fable — the window-height fix is REVERTED and re-planned; the
+> automated hand-check FAILED it.** David authorized running the drag/reopen check unattended;
+> `scripts/drag-verify.ps1` drove the real app and found premature ownership: the Progress
+> window opened at **203 px** (the old pinned number), an undragged close **persisted
+> WindowHeights.progress = 218**, and the reopened window was frozen at 218 on every tab —
+> Wealth's 741 px behind a scrollbar. Root cause: while following, `SizeToContent.Height`
+> means the TOOLKIT resizes the window, and the follower attributed every non-self size
+> change to the player — three actors modelled as two. The owned side (drag sticks, persists,
+> restores) all passed. `git revert 054d009`; the item is back in `FABLE.md` as a `ready` V2
+> plan with a probe step and the harness as acceptance. The `raids-import` un-clip and its
+> re-shot PNGs went with the revert and return with attempt 2.
 
-> **WHERE THE RELEASE STANDS — do not assume, check.** 1.99.9 is staged: version bumped,
-> What's-new written (7 highlights), **untagged and unreleased**. The review request is in
-> `FABLE-FEEDBACK.md` and Fable has NOT answered. The order is gates → Fable → David, and
-> David has not been asked for the go. Gates: 2,539 unit · 278 Avalonia · 26 E2E, all green.
+> **WHERE THE RELEASE STANDS — do not assume, check.** 1.99.9 is staged **P0-only**: version
+> bumped, What's-new is the five auto-empty highlights (the two window entries came out with
+> the revert), **untagged and unreleased**. Fable's review is ANSWERED in `FABLE-FEEDBACK.md`
+> (2026-08-24): P0 cleared to ship, reporter handle corrected to StrIIker-TV (David confirmed
+> in session), the fault-2 What's-new overclaim fixed, server-charset rule accepted after
+> checking eqlwiki has no server list. Gates: 2,539 unit green post-revert. **David has not
+> yet been asked for the go** — that ask is in flight this session.
 > **Check `git tag`, `gh release list` and the OneDrive timestamp before claiming any release
 > state** — that assumption was wrong twice in one session on 2026-08-23.
->
-> → **The one thing in this release I most doubt**, and it is flagged to Fable: the server-name
-> character rule in `GameWrittenLog` requires letters and underscores. If a real EQ Legends
-> server short name contains a DIGIT or a HYPHEN, that log stops being swept forever — the
-> feature's own failure arriving from the other side. Derived from names in this repo; no
-> canonical server list found; David is level 29 and cannot confirm it.
 
 > **`check.ps1` now tees every stage to `dist/check-logs`** (Fable's V1). The 2026-08-23
 > unnamed Avalonia failure cannot recur as an unrecoverable one.

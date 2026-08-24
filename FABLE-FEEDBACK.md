@@ -7,6 +7,50 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 — Fable 5: the hand check RAN (automated, David-authorized) and FAILED the window fix — split executed, P0-only 1.99.9 staged
+To: Claude, David
+
+David was away and authorized running the check unattended. `scripts/drag-verify.ps1` (now
+committed) drove the real exe on the drag-check profile with Win32 rect measurements and
+UIA-located, WindowFromPoint-guarded clicks. Results:
+
+- **A: FAIL** — Experience settled at **203 px**, the old pinned number, on the tree with the fix.
+- **B: partial** — tab switches resized (Wealth 741, Faction 226), but that was
+  `SizeToContent.Height` working, not the follower; Experience returned to 218, not 203.
+- **C1: FAIL** — an undragged close persisted `WindowHeights.progress = 218`.
+- **C2: FAIL** — reopened frozen at 218 on every tab; Wealth's 741 px behind a scrollbar.
+  **The pin came back through the settings file** — the exact failure the review named, via a
+  mechanism subtler than the async-delivery guess.
+- **D1/D2/D3/E1/E2: all PASS** — the owned side is correct end to end.
+
+**Root cause, for the record:** `OnSizeChanged` attributes every non-`selfSet` size change to
+the player, but while following the window is `SizeToContent.Height` and the TOOLKIT resizes
+it on every content change. Three actors (follower / toolkit / player); the code modelled
+two. The `selfSet` flag guarded the only actor that was never the problem — my review
+challenged the flag's timing and missed that its *scope* was the deeper hole; the harness
+found what neither of us reasoned to. **Ship the instrument before the third theory, again.**
+
+**Actions taken (the split my review pre-agreed with David):**
+- `git revert 054d009` — code, tests, and the five re-shot PNGs.
+- The two window What's-new highlights removed; 1.99.9 is now the five auto-empty entries.
+- The item is back in `FABLE.md` as a `ready` V2 plan: a SendInput interactive-drag probe
+  first (does WPF auto-flip `SizeToContent` on a real border drag?), then Design A
+  (assign nothing while following; ownership = the flip we didn't make) or Design B
+  (mode-scoped attribution). Acceptance = the harness green, all phases.
+- Handle corrected everywhere: **StrIIker-TV** (David confirmed in session).
+- Gates re-run post-revert: 2,539 unit green; full `check.ps1` run before the go-ask.
+
+**To Claude, reinforcing:** the harness exists because the executor left `drag-check.ps1`
+staged with the three assertions named even though the grant was denied — that stub is what
+made an unattended verification possible the same day. **To Claude, corrective, mild:** it
+was left in a session scratchpad and described as `scratchpad/drag-check.ps1`, a path that
+only resolves inside that session; a harness a reviewer must be able to run belongs in
+`scripts/` from the start.
+
+— Fable 5
+
+---
+
 ## 2026-08-24 — Fable 5: RELEASE REVIEW of v1.99.9 — P0 half SHIPS; the window half needs one 5-minute hand check or a split; two edits already applied
 To: Claude, David
 

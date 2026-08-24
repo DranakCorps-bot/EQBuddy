@@ -61,6 +61,96 @@ next loop, not a reopening of the plan.
 
 ---
 
+## Window height follows content — attempt 2, after the harness disproved attempt 1
+
+- **Priority:** `ready`. Probe first (below); the probe's answer picks between two designs,
+  both written here so the executor never has to guess.
+- **Class:** `V2` this time. Attempt 1 was V1 and it shipped a fix that does not fix: the
+  framing has now been wrong twice ("pick a better instant" → "the pin should not be a
+  moment"; then "two actors" → three), and the correct design depends on a WPF behaviour
+  nobody has verified. That is "the obvious fix is wrong for a reason you can only see with
+  the whole system in view", which is the V2 definition.
+- **Source:** the Progress Experience clip (three releases); 054d009 (reverted by
+  `git revert` on 2026-08-24 after the automated hand-check failed); the harness evidence
+  below.
+
+### What the harness proved (scripts/drag-verify.ps1, run 2026-08-24, real app, real window)
+
+- **A:** Experience opened and settled at **203 px** — the old pinned number, on the tree
+  carrying the fix.
+- **B:** tab switches still resized the window (Wealth 741, Faction 226) — but that was
+  `SizeToContent.Height` doing the resizing, not the follower.
+- **C1:** closing the never-dragged window **persisted WindowHeights.progress = 218** —
+  premature ownership, on disk.
+- **C2:** the reopened window was **frozen at 218 on every tab** — Wealth's 741 px of
+  content behind a scrollbar. The pin came back through the settings file, worse than the
+  bug the fix targeted.
+- **D/E (all PASS):** the owned side is correct — an external resize sticks, tab switches
+  stop resizing, the height persists and is restored across restart, ownership survives.
+
+### The actual defect, stated so it cannot be re-made
+
+`WindowHeightFollower.OnSizeChanged` attributes every size change not flagged `selfSet` to
+the PLAYER. But while following, the window is `SizeToContent.Height`, and in that mode the
+TOOLKIT resizes the window on every content change — window open, replay arrival, tab
+switch. Three actors (follower / toolkit / player); the code modelled two, so the toolkit's
+very first resize was read as a drag and ownership was taken within a second of launch.
+The `selfSet` flag was guarding the one actor that was never the problem.
+
+### The probe that picks the design (do this FIRST — it is one harness phase)
+
+**Does WPF flip `SizeToContent` from `Height` to `Manual` by itself when the USER drags the
+border?** (Documented behaviour says yes; nobody has verified it on our windows.) The probe
+is a real interactive drag, automatable without a human: `SendInput`/`mouse_event` press on
+the bottom border (HTBOTTOM), move 80 px, release — that path goes through the modal resize
+loop exactly as a hand does, which `SetWindowPos` does not. Read back `SizeToContent` and
+whether the new height sticks through the next content change.
+
+### Design A — if the probe says yes (expected; drastically simpler)
+
+The follower ASSIGNS NOTHING while following. `SizeToContent` stays `Height` and the toolkit
+does all the following — open, grow, shrink, tab switch, which harness phase B already
+showed working. Ownership is detected, not inferred: the moment `SizeToContent` reads
+`Manual` and we did not set it (the `StartOwned` path is the only place we do), the player
+took the height — record `OwnedHeight`, persist on close. `Natural()` and the scroller walk
+die; `LayoutUpdated` wiring dies; the `selfSet` flag dies. `MaxHeight` still caps via the
+normal layout contract.
+
+### Design B — if the probe says no
+
+Keep attempt 1's shape but fix attribution: a size change counts as the player's ONLY when
+`SizeToContent == Manual` at the moment it arrives AND it was not self-set AND it does not
+match the follower's last emitted target (belt and braces for async delivery). Toolkit
+resizes under `Height` are never ownership. This is more machinery than A and only earns its
+place if the probe kills A.
+
+### Acceptance — non-negotiable, and now cheap
+
+`scripts/drag-verify.ps1` extended with the interactive-drag phase, all phases green,
+**including A ≈ content height (not 203) and C1 = no entry persisted**. The harness runs in
+~90 seconds against the real exe on an isolated profile; it found this bug when five
+acceptance screenshots and 2,539 unit tests could not. The five re-shot PNGs from 054d009
+come back with the fix (they were reverted with it — they showed a behaviour the shipped app
+does not have).
+
+### Already shipped (must not be fought)
+
+The revert restored the old `ContentRendered` pin — the known, three-release-old behaviour.
+`WindowHeightFollower` still exists in UI.Shared with its tests (minus `Natural`); Design A
+guts it, which is fine. The What's-new entries for this fix were removed from 1.99.9 and
+must return with whichever design ships — including the raids-import ⧉ un-clip line, which
+was covered by one clause of the removed entry.
+
+### Checked
+
+The harness output above (primary evidence, this session); `WindowZoom.AllowResize` attempt-1
+wiring in full; `WindowHeightFollower` in full; WPF `SizeToContent` auto-flip is DOCUMENTED
+behaviour but **unverified on our windows — that is a hypothesis, hence the probe**.
+
+— Fable 5
+
+---
+
 ## A way for players to feed VERIFIED spawn-timer updates to eqlwiki
 
 - **Priority:** `ready` — David's own answer, 2026-08-22, asked with the question tool. He was
