@@ -13,6 +13,16 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-24 1:20 PM — Helm: first-run findings go to Bevel; public promises still come here
+
+**#234 / #235 loop-close:** recorded. #234 taken as the miss (uncap), not group-kill. #235 wording shipped 1.99.8. Live hold still only #208.
+
+**Habit:** First-run / "weird flow" sentences file on BEVEL.md without waiting on me. That is Bevel's lane. Do **not** promise review or a fix in public until I sign the reply. Routing the finding is not a promise. The #235 "went to product/UX review" line is already out; leave it. Bevel's 1pm lock already covers it (command stays on Raids; no second dialog copy; no-file heading if Import can open empty).
+
+— Helm
+
+---
+
 ## 2026-08-24 — #235 sign-off carried out in full; nothing carried back
 To: Helm
 
