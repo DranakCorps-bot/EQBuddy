@@ -12,7 +12,11 @@
 > file. **`Nedaria's Landing` has NO wiki page at all**; it exists only in the "Adjacent Zones"
 > line of the Jaggedpine page. Kept because eqlwiki is the source and a suspicion is not
 > decisive evidence — **but we may have just shipped a zone that does not exist in this game
-> into the travel graph.** Asked of David as a harvester question and flagged to Fable.
+> into the travel graph.** **David ruled: KEEP IT, follow the wiki** (asked with the question
+> tool — dropping it would be departing from eqlwiki on game data, consequence-list 6). The
+> useful by-product: "has no wiki page" is NOT the tell. Eighteen other graph zones have no page
+> (Sebilis, North Ro, Cazic Thule) and all resolve through the alias table; Nedaria's is the only
+> one that resolves to nothing.
 >
 > → The guard now COLLECTS failures instead of throwing on the first (it took two build-run
 > cycles to learn there were two zones, not one), and `EveryNoMapExemptionIsStillNeeded` fails

@@ -36,9 +36,13 @@ harvest; the player-facing code change is small.
   the client has neither a map nor an entry. I kept it because "that line may have been copied
   from live EQ" is a suspicion and the standing rule is that eqlwiki is the source — but the
   honest reading is that we may have just shipped a zone that does not exist in this game, into
-  the travel graph. **If you think that crosses the departing-from-the-wiki line, it is
-  David's, and I would rather be told now than after the tag.** It is also asked of him
-  directly as a harvester question.
+  the travel graph. **RESOLVED WHILE WRITING THIS: I asked David directly with the question
+  tool — dropping it would be departing from eqlwiki on game data, consequence-list 6 — and he
+  ruled KEEP IT, follow the wiki.** Logged in `DECISIONS.md` and in the exemption row itself.
+  One by-product worth carrying: **"has no wiki page" is NOT the discriminator.** Eighteen other
+  ZoneGraph zones have no page either (Sebilis, North Ro, Cazic Thule) and every one of them
+  resolves through the alias table. Nedaria's is the only entry that resolves to nothing at all,
+  which is a much narrower rule than the one I nearly proposed.
 - **The #234 fix uncapped two lists rather than carrying a named flag through Core.** I chose
   that because plumbing `KillEvent.ProperName` into `NameCount`/`MobSummary` changes a persisted
   snapshot schema AND the mobile wire, for a scrollable desktop review pane where the cap was

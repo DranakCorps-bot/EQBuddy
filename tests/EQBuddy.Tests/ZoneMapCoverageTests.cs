@@ -202,8 +202,12 @@ public class ZoneMapCoverageTests : IDisposable
                 + "client's zone table has neither a map nor an entry. Kept because the standing "
                 + "rule is that eqlwiki is the source and we do not depart from it without "
                 + "decisive evidence — 'the page it is named on may have been copied from live "
-                + "EQ' is a suspicion, not evidence. Flagged to David as a harvester question: "
-                + "should a zone with no page of its own be allowed into ZoneGraph at all?",
+                + "EQ' is a suspicion, not evidence. **David ruled on it directly, 2026-08-24 "
+                + "(asked with the question tool, because dropping it would be departing from "
+                + "eqlwiki on game data): keep it, follow the wiki.** Worth knowing that "
+                + "'no page of its own' is NOT the discriminator — 18 other ZoneGraph zones have "
+                + "no page either (Sebilis, North Ro, Cazic Thule) and every one of them resolves "
+                + "through the alias table. This is the only entry that resolves to nothing at all.",
         };
 
     [Fact]

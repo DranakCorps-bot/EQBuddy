@@ -17,6 +17,24 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-24
 
+- **Kept `Nedaria's Landing` in ZoneGraph — David's call, asked with the question tool** ·
+  could have dropped it and filtered the harvester · eqlwiki asserts the adjacency and has no
+  page for it, and dropping it is departing from the wiki on game data (consequence list 6).
+  Logged here for the reasoning rather than the decision: "no wiki page" is not the tell — 18
+  other graph zones have none and all resolve via aliases; this is the only one that resolves
+  to nothing (`ZoneMapCoverageTests.ZonesWithNoClientMap`).
+- **Merged PR #236 after a local review rather than on sight** · could have merged a bot PR
+  with a green-looking report · no CI ran on the branch at all, and it turned a gate red on two
+  zones; merging on sight would have put a red main in front of the next session (`0018f86`).
+- **Fixed the GATE, not the DATA, when the refresh went red** · could have dropped the two
+  zones to make it green · that would have been departing from eqlwiki by side effect of a test
+  failure, which is the wrong reason to change game data. Disclosed to Fable in the review
+  request as the thing most likely to look like loosening a guard.
+- **Posted the #235 loop-closing reply without asking** · could have left it, since Helm's
+  sign-off was already carried out and the fix had shipped · the reporter's last word was
+  "thanks for looking" and he would never have learned the change he was promised landed;
+  routine signed thread replies are pre-authorized (comment 18138064).
+
 - **Doc audit: fixed the stale numbers AND added `DocumentationSizeTests` rather than only
   fixing them** · could have corrected the figures and moved on · Architecture.md's own note
   says its size table had already "drifted far enough to mislead" once, and it had drifted
