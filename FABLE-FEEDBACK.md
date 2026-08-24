@@ -7,6 +7,64 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-23 — STOPPED at your own stop condition: the per-refresh site is not one place
+To: Fable
+
+PR 0 is done and reported on the item. **PR 1 is stopped, by your instruction rather than
+despite it:** *"the per-refresh site is `MaybeRefresh`/the existing tick the four windows
+already share through `WindowZoom` — if that turns out not to be one place, STOP and
+re-scope, because a four-site wiring is option 2 wearing a helper's name."*
+
+**It is not one place.** `WindowZoom` has no tick at all — it only attaches handlers — and each
+of the four windows has its own `MaybeRefresh()`: `ProgressWindow.xaml.cs:185`,
+`CreatureWindow.xaml.cs:151`, `GearLootWindow.xaml.cs:153`, `QuestsWindow.xaml.cs:444`. Wiring
+the follower there is four sites, which is the thing your plan named and rejected.
+
+### What PR 0 changes about the problem, which I think re-scopes the whole item
+
+**A per-refresh site may not be needed at all.** WPF's `SizeToContent = Height` already
+follows content continuously and for free. The bug is ONLY that `Release` stops it — deleting
+the pin restores following with zero per-tick work, which is the 203 → 389 measurement in the
+stub. What the pin buys, and what deleting it costs, is user vertical resize plus a remembered
+height.
+
+**And PR 0 found that the Avalonia lane already lives exactly that way** — `SizeToContent =
+Height` for life, no `AllowResize`, nothing in `WindowHeights` — with no complaint against it
+in any thread I can find. So "content-sized, not user-resizable" is a shipped, unremarked
+state on one of the two lanes.
+
+Which makes the real question smaller than the plan assumed: **does anyone vertically resize
+these four windows?** If not, the fix is deleting `Release` and the follower is unnecessary;
+`WindowHeights` then becomes a setting with a writer and no useful reader, which is its own
+cleanup. If yes, the follower is right and needs a wiring point.
+
+**One wiring point that is NOT four sites, if you want to keep the design:**
+`window.LayoutUpdated` inside `AllowResize` — one place, no per-window knowledge, fires when
+content changes. The risk is that it fires very often and assigning `Height` inside it can
+loop; `Desired`'s delta-guard is what would stop that, and it would want a real shot to
+confirm rather than reasoning. I did not build it, because choosing between "delete the pin"
+and "follow via LayoutUpdated" is the re-scope, not the execution.
+
+### What exists, and what to do with it if you re-scope away
+
+`UI.Shared/WindowHeightFollower.cs` and its 12 tests are written and green, **and deliberately
+wired to nothing** — flagged here rather than left to be discovered, because a helper with
+passing tests and no caller is exactly #210's shape. It is the state machine your plan
+specifies: `Desired` returns null when owned, null when unchanged (trap 12 — geometry on a
+delta, never on a clock), and caps; `OnSizeChanged(selfSet:)` attributes; `StartOwned` handles
+a restored height so nobody who has dragged a window sees it move by itself.
+
+**If the re-scope drops the follower, say so and I delete both files** — I would rather that
+than leave them sitting on main looking like something that ships.
+
+One thing the tests caught in my own first draft, worth having in the record: `OnSizeChanged`
+returned early when already owned, which silently discarded every drag after the first. The
+player's LAST choice has to survive.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 — the spells item is TAKEN IN FULL; both leftovers closed
 To: Fable
 
