@@ -22,6 +22,9 @@ What one run does:
        spells.json  -> DebuffLandings.json (debuffs-harvest.py)
        spells.json  -> CharmSpells.json    (charms-harvest.py)
        spells.json  -> SpellLevels.json    (spell-levels-promote.py)
+       class pages  -> SpellLevels.json    (class-spells-harvest.py, then the promote:
+                                            the CLASS page wins and the spell pages fill
+                                            only levels it has no section for)
        quests.json  -> QuestCatalog.json   (quests-promote.py)
        zones.json   -> ZoneGraph.json      (../eqltools/zones-merge.py; the
                        eqltools half is a committed extract — browser-fetched,
@@ -74,8 +77,12 @@ TITLE_LISTS = ["quest-titles.json", "quest-items.json", "titles.json", "zone-tit
 # Harvest, then promote — order matters (promotions read harvester output).
 # items-harvest.py needs no cache eviction: it keys on revision ids itself and
 # only refetches pages whose revision moved.
+# class-spells-harvest.py runs with the harvesters (it fetches the sixteen class pages)
+# and BEFORE the promote that consumes its class-spells.json. Its report therefore compares
+# the class pages against the catalog as it stands BEFORE this refresh rewrites it, which
+# is the diff a reviewer wants: what this run is about to change.
 HARVESTERS = ["spells-harvest.py", "quests-harvest.py", "zones-harvest.py", "aas-harvest.py",
-              "items-harvest.py"]
+              "items-harvest.py", "class-spells-harvest.py"]
 # fades -> slows -> buffs -> debuffs is load-bearing: each excludes messages
 # the ones before it claimed (see module docstring; issue #167).
 PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
@@ -166,6 +173,23 @@ def lsth_cache(title):
     return "lsth-" + re.sub(r"[^A-Za-z0-9._-]", "_", title) + ".wikitext"
 
 
+def class_cache(title):
+    """class-spells-harvest.py's scheme: `class-{Title_With_Underscores}.wikitext` plus a
+    `.json` holding the SERVED title (trap 3 — `redirects=1` means the page you get may not
+    be the page you asked for).
+
+    **This is the load-bearing half of putting that harvest on the weekly cadence.** Running
+    the script every week achieves nothing if an edited class page still comes back from the
+    cache — the catalog would freeze at the day it was first parsed while reporting success,
+    which is exactly the silent decay the refresh exists to prevent."""
+    stem = title.replace(" ", "_")
+    return f"class-{stem}.wikitext"
+
+
+def class_meta_cache(title):
+    return f"class-{title.replace(' ', '_')}.json"
+
+
 def spell_cache(title):
     h = hashlib.md5(title.encode("utf-8")).hexdigest()[:8]
     safe = re.sub(r"[^A-Za-z0-9 '`().,_-]", "_", title).strip(" .")
@@ -177,7 +201,7 @@ def evict(titles):
     evicted = []
     for title in titles:
         candidates = [quest_cache(title), zone_cache(title), spell_cache(title),
-                      lsth_cache(title)]
+                      lsth_cache(title), class_cache(title), class_meta_cache(title)]
         if title == "Alternate Advancement":
             candidates.append("Alternate_Advancement.wikitext")
             candidates.append("revision_meta.json")

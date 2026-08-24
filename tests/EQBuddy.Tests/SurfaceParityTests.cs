@@ -238,4 +238,78 @@ public class SurfaceParityTests
         Assert.Equal(RaidTargetCatalog.Default.BossCount, raids.Total);
         Assert.Equal(0, raids.Defeated);
     }
+
+    // ---- the character's classes: one Resolve, three lanes ----
+
+    /// <summary>
+    /// **The phone resolves a character's classes through the same `CharacterClasses.Resolve`
+    /// the two desktops use** — Fable's plan asked for this case and it could not be written
+    /// until 2026-08-23, because until then the phone was sent a single `InferredClass`
+    /// string while the desktops had a list.
+    ///
+    /// This is #210's rule applied to a DECISION rather than to a list of rows: the phone
+    /// receives the ANSWER, not the ingredients, so it cannot resolve precedence differently.
+    /// The precedence itself is not re-asserted here (`CharacterClassesTests` owns it); what
+    /// this pins is that the wire carries the resolved list and its source rather than
+    /// anything the page could re-derive.
+    /// </summary>
+    [Fact]
+    public void ThePhoneIsSentTheResolvedClassesRatherThanTheIngredients()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: ["Warrior", "Druid"], inferred: ["Monk"], picks: ["Bard"]);
+
+        var section = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot(),
+            Settings = new AppSettings(),
+            Quests = new CompanionQuestRequest
+            {
+                Catalog = new QuestCatalog(),
+                CharacterClassNames = classes,
+                ClassSource = source,
+            },
+        }, new DateTime(2026, 8, 23)).Quests;
+
+        Assert.NotNull(section);
+        // The same list the desktops hold, in the same order, capped the same way.
+        Assert.Equal(classes, section!.CharacterClasses);
+        // And the WORDS, from Core's one table — the page must not compose its own
+        // (Bevel, Helm-signed 2026-08-23: "do not grow a phone-only string").
+        Assert.Equal(CharacterClasses.SourceLabel(source), section.ClassSourceLabel);
+        // The INGREDIENTS are not on the wire — asserted against the DTO's own properties
+        // rather than its ToString(), which is trap 39's mistake (comparing a rendered
+        // string that may not mention what you are looking for either way).
+        //
+        // If the dump list and the pick list both travelled, a page could merge them into a
+        // different answer than the desktops did, which is exactly how the quest checklists
+        // drifted for two days before #210. `Classes` (the picker's own state) is a
+        // deliberate exception: the page draws that picker.
+        var wireFields = typeof(CompanionQuestsSection).GetProperties().Select(p => p.Name).ToList();
+        Assert.DoesNotContain(wireFields, n => n.Contains("Unlocked", StringComparison.Ordinal));
+        Assert.Contains("CharacterClasses", wireFields);
+        Assert.Contains("ClassSourceLabel", wireFields);
+    }
+
+    /// <summary>Nothing known is the same nothing on all three: an empty list and no source
+    /// word, rather than a phone-side "unknown" string somebody has to keep in step.</summary>
+    [Fact]
+    public void AnUnknownClassListIsEmptyOnThePhoneToo()
+    {
+        var section = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot(),
+            Settings = new AppSettings(),
+            Quests = new CompanionQuestRequest { Catalog = new QuestCatalog() },
+        }, new DateTime(2026, 8, 23)).Quests;
+
+        Assert.NotNull(section);
+        Assert.Null(section!.CharacterClasses);
+        Assert.Null(section.ClassSourceLabel);
+        Assert.Equal("", CharacterClasses.SourceLabel(ClassSource.Unknown));
+    }
 }
