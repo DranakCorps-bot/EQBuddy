@@ -703,6 +703,24 @@ $updateDir = New-Item -ItemType Directory -Force (Join-Path $root 'updates')
 Write-Host "Profile: $profileDir"
 & (Join-Path $PSScriptRoot 'make-test-session.ps1') -Out $logsDir.FullName | Write-Host
 
+# The fixture log exactly as make-test-session wrote it. Every shot is restored to this
+# BEFORE its own appends, because the log is shared by all 50 shots and Append-Log is
+# cumulative — which made shots ORDER-DEPENDENT and the committed PNGs a function of
+# which shots had run before them.
+#
+# Found 2026-08-24: `progress-card` came back 520x497 in a full run and 520x389 shot on
+# its own, twice each, on identical code. Two different shots append "Welcome to level
+# 12!", so in a batch the Progress ding list had TWO levels in it and the card grew. Both
+# pictures are of a real state; only one is of the state the shot is about. That is trap
+# 23's failure mode reached through the harness rather than through the staging, and it
+# quietly made `shoot.ps1` unusable as the acceptance criterion CLAUDE.md relies on: a
+# reviewer re-shooting one image to check a change would get a different picture than the
+# batch that committed it, and read the difference as their own regression.
+$pristineLog = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
+if (-not $pristineLog) { throw "make-test-session wrote no fixture log to $($logsDir.FullName)" }
+$pristineCopy = Join-Path $root 'fixture-pristine.txt'
+Copy-Item $pristineLog.FullName $pristineCopy -Force
+
 # Extra log lines for one shot, stamped NOW so the replay treats them as the newest
 # events. Some surfaces exist only in response to a line the shared fixture does not
 # carry — the Progress card's ding list needs "Welcome to level N" — and the fixture
@@ -710,9 +728,12 @@ Write-Host "Profile: $profileDir"
 # asserts that the ding list is absent BEFORE it appends its own level-up. Per-shot
 # appends give a shot the state it needs without making the fixture lie to a test.
 function Append-Log([string[]]$lines) {
-    if (-not $lines -or $lines.Count -eq 0) { return }
     $log = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
     if (-not $log) { throw "No fixture log to append to in $($logsDir.FullName)" }
+    # Unconditional, and BEFORE the early return: a shot with no appends of its own must
+    # still be given a clean log, or it inherits the previous shot's level-ups.
+    Copy-Item $pristineCopy $log.FullName -Force
+    if (-not $lines -or $lines.Count -eq 0) { return }
     # The game's own stamp shape, e.g. [Mon Jul 20 19:03:34 2026].
     $stamp = (Get-Date).ToString("[ddd MMM d HH:mm:ss yyyy]", [Globalization.CultureInfo]::InvariantCulture)
     foreach ($line in $lines) { Add-Content -Path $log.FullName -Value "$stamp $line" -Encoding utf8 }

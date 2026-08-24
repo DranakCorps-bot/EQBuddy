@@ -27,17 +27,19 @@ Measured 2026-08-14 at v1.82.0.
       (the widget)        (Linux/macOS)          (EQBuddy Mobile, LAN)
 ```
 
-Sizes re-measured 2026-08-20 (`.cs` under each project, excluding `obj/` and `bin/`);
+Sizes re-measured 2026-08-24 (`.cs` under each project, excluding `obj/` and `bin/`);
 the previous set had drifted far enough to mislead — UI.Shared had doubled and the
-Avalonia build tripled since they were written.
+Avalonia build tripled since they were written. It then drifted 10-15% again in FOUR DAYS,
+which is why `DocumentationSizeTests` now checks this table against the repo: a measurement
+nobody re-measures rots without anyone touching it.
 
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 75 | 16,980 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
-| `EQBuddy.UI.Shared` | 69 | 7,047 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
-| `EQBuddy.Companion` | 16 | 3,462 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
-| `EQBuddy` | 55 | 18,176 | The WPF widget and its windows. |
-| `EQBuddy.Avalonia` | 49 | 19,703 | Cross-platform build, trails by a few releases. Now the largest project in the repo — see the ratchet note on `MainWindow.cs`. |
+| `EQBuddy.Core` | 84 | 19,484 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
+| `EQBuddy.UI.Shared` | 85 | 8,709 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Companion` | 16 | 3,726 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
+| `EQBuddy` | 64 | 20,838 | The WPF widget and its windows. |
+| `EQBuddy.Avalonia` | 57 | 21,819 | Cross-platform build, trails by a few releases. Now the largest project in the repo — see the ratchet note on `MainWindow.cs`. |
 
 ## 2. Load-bearing invariants
 

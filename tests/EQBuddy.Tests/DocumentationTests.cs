@@ -65,12 +65,22 @@ public class DocumentationTests
             + string.Join("\n  ", missing));
     }
 
-    [Fact]
-    public void EveryTestNamedAsEvidenceInTheTestPlanExists()
+    [Theory]
+    [InlineData("docs/TestPlan.md")]
+    [InlineData("CLAUDE.md")]
+    [InlineData("docs/Architecture.md")]
+    public void EveryTestNamedAsEvidenceInTheTestPlanExists(string doc)
     {
         // The Held-by column cites test classes. A renamed or deleted suite silently
         // turns a documented guarantee into a fiction, which is the exact failure this
         // file exists to prevent.
+        //
+        // **Extended to CLAUDE.md and Architecture.md on 2026-08-24.** This checked only
+        // the TestPlan, and the TestPlan is not where most of these claims live: the trap
+        // list in CLAUDE.md cites ~30 suites, almost all of them in the form "→ **Now
+        // guarded:** `SomethingTests`". A trap that names a guard which no longer exists
+        // is worse than a trap with no guard at all — it tells the next reader the hole
+        // is closed, and that reader is the one deciding whether to be careful.
         //
         // Scanned from SOURCE across every test project rather than by reflection over
         // this assembly: the plan legitimately cites suites in EQBuddy.Avalonia.Tests and
@@ -84,18 +94,18 @@ public class DocumentationTests
                 .Select(m => m.Groups[1].Value))
             .ToHashSet(StringComparer.Ordinal);
 
-        var cited = Regex.Matches(Read("docs/TestPlan.md"), @"`([A-Za-z0-9_]+Tests)`")
+        var cited = Regex.Matches(Read(doc), @"`([A-Za-z0-9_]+Tests)`")
             .Select(m => m.Groups[1].Value)
             .Distinct(StringComparer.Ordinal)
             .ToList();
 
-        Assert.NotEmpty(cited);   // a plan citing nothing is a plan that stopped being maintained
+        Assert.NotEmpty(cited);   // a doc citing nothing is a doc that stopped being maintained
         var gone = cited.Where(name => !known.Contains(name))
             .OrderBy(n => n, StringComparer.Ordinal).ToList();
 
         Assert.True(gone.Count == 0,
-            "docs/TestPlan.md cites test classes that exist in no test project. "
-            + "Either the plan is stale or a guarantee lost its test:\n  " + string.Join("\n  ", gone));
+            $"{doc} cites test classes that exist in no test project. "
+            + "Either the doc is stale or a guarantee lost its test:\n  " + string.Join("\n  ", gone));
     }
 
     [Fact]

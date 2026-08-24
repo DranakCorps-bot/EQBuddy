@@ -38,7 +38,7 @@ The deciding question is **not** "is this important?" It is:
 |---|---|---|
 | In-game overlay | A deadline with an action. Small enough to ignore. | Mez/charm chips, spawn-due chips, Watch alerts, buff-expiring |
 | Phone / tablet | Anything worth *looking away* for. | Map, quests, item lookup, gear, loot, DPS, session totals |
-| Desktop | Before and after play: research, compare, configure, review. | Gear Locker, history, Options, wiki packs |
+| Desktop | Before and after play: research, compare, configure, review. | Gear & Loot (the old Gear Locker), history, Options, wiki packs |
 
 **Mobile and desktop are both first-class, in both directions** (David, 2026-08-18). Once
 a feature is on two surfaces, neither may quietly fall behind — and the drift runs both
@@ -109,7 +109,7 @@ became one theme, three tabs, one definition in Core. Five more follow:
 |---|---|---|
 | **Quests** | Sky + Epics + catalog | **done — the template** |
 | **Progress** | Progress, Money, Motes, Faction, Raids | **done 2026-08-19 — 14 cards → 10** |
-| **Gear & Loot** | Loot, Wishlist, Inventory (= GearLocker + Inventory) + ItemInfo | **DONE, all three platforms** — Windows 2026-08-20, Linux/macOS 2026-08-21. Three tabs: what I picked up, what I want, what I have. Drops LEFT this theme (see Kills & Drops). The Avalonia lane needed its gear-checklist lifted out of MainWindow first, and that landed with it |
+| **Gear & Loot** | Loot, Wishlist, Inventory (= GearLocker + Inventory) + ItemInfo | **DONE, all three platforms** — Windows 2026-08-20, Linux/macOS 2026-08-21. Four tabs — Loot, Items, Wishlist, Inventory: what I picked up, what I can look up, what I want, what I have. Drops LEFT this theme (see Kills & Drops). The Avalonia lane needed its gear-checklist lifted out of MainWindow first, and that landed with it |
 | **Alerts** | Watch, Buffs + spawn/mez/alert *configuration* | then — needs `RenderBuffs` lifted first; lands as its own WINDOW with tabs (David, 2026-08-20) |
 | **Live Meters** | Combat, Healing + their breakouts + FightTimeline | biggest lift. **Kills is NOT here** — David, 2026-08-20: *"Kills isn't a meter though. we don't track kills per second but we track damage per second, healing per second."* A meter is a per-second board; kills/hour is a rate but not that |
 | **Kills & Drops** | Kills + Drops by creature | **DONE 2026-08-21, both builds at once.** David's grouping, 2026-08-20 — *"Kills and Drops should be … Kills and Drops ;)"*. Both are about the CREATURE: what died, and what it dropped at what rate. One question — "is this camp worth it?" — that used to be answered in two places, one of them buried in the cog menu. The card key stays `kills`, so nobody's card slot moved |

@@ -17,6 +17,29 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-24
 
+- **Doc audit: fixed the stale numbers AND added `DocumentationSizeTests` rather than only
+  fixing them** · could have corrected the figures and moved on · Architecture.md's own note
+  says its size table had already "drifted far enough to mislead" once, and it had drifted
+  10-15% again in four days — a measurement nobody re-measures rots untouched, so it belongs
+  in the build like the ratchet (`DocumentationSizeTests`).
+- **Size checks assert within 10%, not exactly** · could have pinned the numbers to the line ·
+  exact pinning makes every commit a documentation edit and a check people route around is
+  worse than no check; 10% matches the hotspot ratchet's own growth allowance and still
+  catches the 31% and 11% drifts that were live.
+- **Marked `AdditionalRequirements.md` and `docs/ImplementationPlan.md` HISTORICAL instead of
+  deleting or rewriting them** · could have archived or removed them · both are orphaned
+  (nothing in the live doc set links to either) and 1,732 lines of superseded requirements at
+  the repo root reads as current to a new agent; a banner fixes the misleading-ness without
+  destroying the record, and what to do with them long-term is a roadmap call.
+- **Left `docs/DesignSystem.md`'s "Loot card" references alone** · could have renamed them to
+  "Loot tab" for consistency with the fold · that file is a historical design log ("#198 added
+  a view filter to the Loot card"), and rewriting it would falsify what was true when #198
+  shipped. Only docs that describe the CURRENT app were updated.
+- **Fixed `shoot.ps1`'s shared-fixture contamination rather than re-shooting around it** ·
+  could have committed the batch output and moved on · the batch and the solo shot disagreed
+  on identical code (`progress-card` 497 vs 389), which makes every committed screenshot a
+  function of shot order and breaks the acceptance criterion CLAUDE.md depends on (trap 51).
+
 - **#234 fixed by UNCAPPING the two session-history rollups rather than by carrying a named
   flag through Core** · could have plumbed `KillEvent.ProperName` into `NameCount`/`MobSummary`
   so nameds are always kept regardless of rank · that changes a persisted snapshot schema AND

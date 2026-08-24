@@ -131,7 +131,11 @@ carry real amounts, unlike hymn/regen ticks. One week of a real cleric-adjacent 
 had 223 received-HoT lines that were previously invisible, so pre-1.19 sessions
 understate healing received wherever a druid or cleric ran HoTs.
 
-### Kills card
+### Kills tab — Kills & Drops card (was the Kills card)
+*Folded into the Kills & Drops theme 2026-08-21 (docs/Themes.md). Drops by Creature is the
+tab beside it — it moved OUT of Gear & Loot in the same pass, because Gear & Loot is about
+your bags and Drops is about the mob.*
+
 Header: your kills (+ group kills). Details: per-creature counts, kills/hour +
 recent-window kills, **Farming (per creature)**: avg fight length · coin · xp% per
 creature, then each creature's observed drops indented with `×count · drop%`
@@ -143,7 +147,10 @@ by corpse name, which the log always includes (even with the advanced loot windo
 **Verify:** fixture with kills + loot + coin. Farming coin/xp must be non-zero for
 coin/xp-giving kills; animals and gray cons legitimately show 0.
 
-### Loot card
+### Loot tab — Gear & Loot card (was the Loot card)
+*Folded into the Gear & Loot theme 2026-08-21 (docs/Themes.md), alongside Items, Wishlist
+and Inventory.*
+
 Every looted item with counts (both the `--You have looted…--` form and the auto-sell
 form), plus "Created by merging". Auto-sold loot counts as loot AND merchant income.
 Selling from the advanced loot window ("You successfully destroyed N X." followed by
@@ -349,9 +356,13 @@ third to `Off` and confirm it stays silent rather than falling back to the defau
 Append `Your Chords of Dissonance spell has worn off of a giant spider.` → no alert
 (not crowd control). Toggle 🔊 off, delete the rule, restart → it stays deleted.
 
-### Gear card
+### Wishlist tab — Gear & Loot card (was the Gear card)
+*Folded into the Gear & Loot theme 2026-08-21 (docs/Themes.md) and RENAMED: the tab reads
+**Wishlist**, not Gear. `LootSurface.LabelFor(LootTab.Gear)` is the source of that word. The
+old Gear Locker and Inventory windows both live on the Inventory tab beside it.*
+
 Import an EQ Legends Tools shopping-list HTML file from **Options → Cards & windows
-→ Import gear list…**. The 🛡 Gear card is a persistent manual checklist: each row
+→ Import gear list…**. The Wishlist tab is a persistent manual checklist: each row
 includes its slot, target item, drop/quest source, wiki/item URL on hover, and a
 checkbox. Re-importing replaces the complete list; *Clear* removes it.
 
@@ -364,7 +375,7 @@ shopping-list exports without socketed entries remain ordinary Gear-only lists.
 **Verify:** Import a shopping-list export
 containing both equipped gear and socketed exaltations. Confirm that Gear comes first,
 Exaltations follows, item sources remain with their own rows, effect text is smaller
-and parenthetical, and toggling a checkbox updates the Gear-card count and persists
+and parenthetical, and toggling a checkbox updates the Wishlist count and persists
 after restart. Import a gear-only export as a compatibility check.
 
 ### Wealth tab — Progress window (was the Money card)

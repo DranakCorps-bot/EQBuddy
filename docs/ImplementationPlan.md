@@ -1,5 +1,10 @@
 # EQBuddy Roadmap Assessment & Implementation Plan
 
+> **HISTORICAL — an assessment of `AdditionalRequirements.md` v3.0 written 2026-07-20,
+> kept for the record. It is NOT the current plan.** Its build order was superseded; step 1
+> (`Core/SessionJournal.cs`) was never built, which is why that link has always been dead.
+> Current plan: [../ROADMAP.md](../ROADMAP.md). Current architecture: [Architecture.md](Architecture.md).
+
 **Assessed:** `AdditionalRequirements.md` v3.0 (July 20, 2026) and PR #1 (Avalonia port)
 **Decisions (D. Edwards):** MIT license · merge PR #1 with fixes · first push = Foundation + Release A
 

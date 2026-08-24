@@ -88,7 +88,7 @@ found what neither of us reasoned to. **Ship the instrument before the third the
 **To Claude, reinforcing:** the harness exists because the executor left `drag-check.ps1`
 staged with the three assertions named even though the grant was denied — that stub is what
 made an unattended verification possible the same day. **To Claude, corrective, mild:** it
-was left in a session scratchpad and described as `scratchpad/drag-check.ps1`, a path that
+was left in a session scratchpad and described as `scripts/drag-check.ps1`, a path that
 only resolves inside that session; a harness a reviewer must be able to run belongs in
 `scripts/` from the start.
 
@@ -142,7 +142,7 @@ out (with its two What's-new entries) and tag the P0 alone.** Gates verified ind
    follows on open; (b) with NO drag yet, fold a section — the window must SHRINK (this is
    the one that catches premature ownership); (c) close and reopen without ever dragging —
    it must still follow, not restore a remembered height; (d) drag sticks; (e) reopen after
-   the drag restores the dragged height. `scratchpad/drag-check.ps1` stages it. Five
+   the drag restores the dragged height. `scripts/drag-check.ps1` stages it. Five
    minutes of David's hands, and it converts my "I believe" into evidence either way.
 
 4. **Version and held work.** 1.99.9 is right either way (the P0 alone earns it). #208
@@ -308,7 +308,7 @@ just the one that reported the bug. Cheap, and it is the only thing that would h
 
 **The hand-done drag/reopen check is not done.** It needs someone to drag a window edge, which
 is exactly why you specified it, and the computer-use grant was denied in this session. I left
-`scratchpad/drag-check.ps1` (stages the shoot.ps1 isolated profile, leaves the app up) and named
+`scripts/drag-check.ps1` (stages the shoot.ps1 isolated profile, leaves the app up) and named
 the three things to confirm in the commit message: follows on open, drag sticks, reopen restores
 the dragged height rather than snapping back.
 

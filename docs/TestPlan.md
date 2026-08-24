@@ -353,8 +353,9 @@ so it can be pinned without an audio device. Both UIs obey the same plan.
 
 ## 5. The gap — read this before trusting the suite
 
-**`src/EQBuddy` (the WPF app, 14,432 lines across 37 files) has no automated coverage.
-No test project references it.**
+**`src/EQBuddy` (the WPF app, 20,838 lines across 64 files) has no automated coverage.
+No test project references it.** (Size pinned by `DocumentationSizeTests` — it was still
+claiming 14,432 across 37 on 2026-08-24, understating the untested surface by a third.)
 
 **Partly closed 2026-08-14.** The *arithmetic* behind both reported bugs now lives in
 `UI.Shared` and is unit-tested — `WidgetMetricsTests` (screen-to-pre-scale conversions,
@@ -385,8 +386,8 @@ bugs of the kind a small pure helper *could* pin.
 2. **A WPF render-test project** mirroring `EQBuddy.Avalonia.Tests`, which already
    proves the approach works on this codebase. Would cover placement, scaling and chip
    layout properly.
-3. **Extend E2E** past its four scenarios into what the widget *shows*, not just what it
-   ingests. **Started 2026-08-14**: the `EQBUDDY_EXPAND` dump now carries `uiScale100`,
+3. **Extend E2E** past its current 26 scenarios into what the widget *shows*, not just what
+   it ingests. **Started 2026-08-14**: the `EQBUDDY_EXPAND` dump now carries `uiScale100`,
    `sectionCapScreen` and `sectionMaxH`, and two scenarios assert the conversion in the
    launched app at 1.6x and at 1.0x. The pattern generalises — **to cover a piece of
    window behaviour, dump the fact and assert it from E2E.** It is cheaper than it looks

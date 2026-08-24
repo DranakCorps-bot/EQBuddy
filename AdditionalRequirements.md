@@ -1,5 +1,11 @@
 # EQ Buddy Product Requirements
 
+> **HISTORICAL — this is the original requirements document (v3.0, 2026-07-20), kept for
+> the record. It is NOT the current plan and nothing in the live doc set points at it.**
+> Six weeks of shipping have overtaken it. For what EQBuddy is and what is being built now,
+> read [ROADMAP.md](ROADMAP.md); for how the code is arranged, [docs/Architecture.md](docs/Architecture.md);
+> for working rules, [CLAUDE.md](CLAUDE.md).
+
 **Document version:** 3.0  
 **Date:** July 20, 2026  
 **Product owner:** David Edwards  

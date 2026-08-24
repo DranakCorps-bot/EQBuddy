@@ -408,7 +408,7 @@ losing a ✦ with the wiki down), at no cost in Founder time.
 
 ```bash
 dotnet build EQBuddy.slnx -c Release
-dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release              # ~1300 tests, seconds
+dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release              # ~2,500 tests, seconds
 dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release
 pwsh -NoProfile -File scripts/check.ps1                                      # all gates, one command
 ```
@@ -605,7 +605,7 @@ The deciding question is **not** "is this important?" — everything here is imp
 |---|---|---|
 | **In-game overlay** | A deadline with an action. Must be small enough to ignore. | Mez/charm chips, spawn-due chips, Watch alerts, buff-expiring |
 | **Phone / tablet** | Anything worth *looking away* for. | Map, quests, item lookup, gear, loot, DPS, session totals |
-| **Desktop** | Before and after play: research, compare, configure, review history. | Gear Locker, history, Options, wiki packs |
+| **Desktop** | Before and after play: research, compare, configure, review history. | Gear & Loot (the old Gear Locker), history, Options, wiki packs |
 
 **DPS goes off-screen**, which surprises people. Nothing about seeing 412 rather than 438
 changes what you do in the next second — it is retrospective by nature. Competitors keep
@@ -638,7 +638,7 @@ it.** If you find yourself porting a feature *to* the phone, stop: that is the s
 logic never went through the shared layer in the first place.
 
 **Breakout windows straddle the line and were built before the rule existed.**
-`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }`; by the test above Watch
+`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs, Progress }` on WPF (the Avalonia twin is a deliberately smaller `{ Damage, Healing, Pet, Buffs }`; `DocumentationSizeTests` pins the WPF list, which went stale on `Progress` for five days despite trap 30 in this file being about exactly that); by the test above Watch
 and Buffs earn the overlay (both are deadlines) and Damage/Healing/Pet/Loot are review
 surfaces. Change defaults rather than delete — `AppSettings.DisabledBreakouts` already
 gates them per kind, and David uses the damage one.
@@ -662,7 +662,7 @@ busier.
 | Zone map geometry, aliases | `Core/ZoneMap.cs` (holds `ZoneMap`, `ZoneMapFiles`) |
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
-| The widget itself | `EQBuddy/MainWindow.xaml.cs` (4.3k lines — the hotspot) |
+| The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
 | Quest window (all three tabs) | `EQBuddy/QuestsWindow.xaml.cs` — the widget's Quests card just opens it |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop zone map | `EQBuddy/MapWindow.cs` |
@@ -670,8 +670,8 @@ busier.
 | The mobile page | `Companion/Web/index.html` (one self-contained file) |
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` — data, like `ThemePalettes`; each UI composes it |
 | Icon geometry (and reward slot silhouettes) | `UI.Shared/IconPaths.cs` — vectors, never glyphs (#148, #166) |
-| The selectable pill (tabs, lenses, filter and sort strips) | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip` in each UI's `DesignSystem.cs`. **Never hand-build another one** — there are ~14 left in `MainWindow.xaml`/`BreakoutWindow.xaml` waiting to be converted |
-| What a Loot surface shows (slice, order, strips, empty wording) | `UI.Shared/LootPresentation.cs` — rows from `LootRows`, everything around them from here. Four surfaces read it: `EQBuddy/LootCardView.cs`, `EQBuddy/LootBreakoutView.cs`, `EQBuddy.Avalonia/LootCardView.cs` |
+| The selectable pill (tabs, lenses, filter and sort strips) | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip` in each UI's `DesignSystem.cs`. **Never hand-build another one** — there are 8 `ToggleButton`s left in `MainWindow.xaml`/`BreakoutWindow.xaml` waiting to be converted |
+| What a Loot surface shows (slice, order, strips, empty wording) | `UI.Shared/LootPresentation.cs` — rows from `LootRows`, everything around them from here. Read by `EQBuddy/LootCardView.cs`, `EQBuddy/LootBreakoutView.cs`, `EQBuddy.Avalonia/LootCardView.cs` and both `MainWindow`s |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
 
@@ -1331,6 +1331,27 @@ Read this list before touching the areas it names. Every entry cost a release.
     no way for a player to tell a short session from a truncated one, which is why this took
     a bug report to find rather than being obvious to anyone who ever farmed a zone.
 
+51. **ONE SHARED FIXTURE + CUMULATIVE STAGING = ORDER-DEPENDENT SCREENSHOTS, and the
+    difference reads as a regression in whatever you happen to be reviewing.** All 50 shots
+    in `shoot.ps1` run against ONE profile and ONE fixture log. `Write-Settings` rewrote
+    `settings.json` wholesale per shot, so that half was clean — but `Append-Log` only ever
+    *appended*, and four shots append. So a shot's picture depended on which shots had run
+    before it: `progress-card` came back **520×497** in a full run and **520×389** shot on
+    its own, twice each, on identical code, because two different shots append *"Welcome to
+    level 12!"* and in a batch the Progress ding list had two levels in it.
+    → **Both pictures are of a real state. Only one is of the state the shot is about** —
+    trap 23's failure mode arriving through the HARNESS rather than through the staging, and
+    the reason it is worse: it cannot be caught by predicting the numbers, because the number
+    is correct for the log that was actually there.
+    → **What it silently cost: `shoot.ps1` was not usable as the acceptance criterion this
+    file relies on.** A reviewer re-shooting one image to check their change gets a different
+    picture than the batch that committed it, and the honest reading of that difference is
+    "I broke something". I nearly filed 17 screenshots as "drifted" on exactly that mistake.
+    → **Now guarded:** the pristine fixture is copied aside once and restored before EVERY
+    shot's appends — unconditionally, and before the early return, so a shot with no appends
+    of its own still gets a clean log rather than inheriting the last one's. **When staging is
+    cumulative and the fixture is shared, reset is not an optimisation, it is the contract.**
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
@@ -1432,8 +1453,11 @@ chip stacks shipped a hand-copied older version of the WPF anchor and carried #1
 **When MainWindow runs out of ratchet room, lift a surface out — don't split the file.**
 The hotspot entry is a glob and `ArchitectureTests` **sums** its matches, so another
 partial buys nothing; that is deliberate, because a partial leaves exactly as much
-untestable window logic as before. `QuestChecklistView.cs` is the worked example: 992
-lines, and it only ever touched settings, its own state and eleven named controls.
+untestable window logic as before. `QuestChecklistView.cs` is the worked example: it came
+out at **992 lines**, and it only ever touched settings, its own state and eleven named
+controls. (It is 317 lines today — roughly 780 of those lines were rendering for cards that
+no longer exist and were deleted outright in the 2026-08-16 fold, which is the better half
+of the lesson: **deleting a surface beats extracting one.** See `docs/Architecture.md` §3.)
 Pin the behaviour in E2E *before* the move (facts into `EQBUDDY_EXPAND`, asserted from
 `tests/EQBuddy.E2E`) — with no unit tests down there, that assertion is the only thing
 between a move and a silent regression. Then lower the baseline in the same commit, or
