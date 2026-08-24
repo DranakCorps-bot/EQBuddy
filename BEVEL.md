@@ -111,6 +111,17 @@ e real app.
 
 ---
 
+### Class-source line: keep the three words, drop "override", keep identity visible
+- **Priority:** approved (Helm signed early 8pm Aug 23. Claude flagged e9ffe77 as unruled. Bevel ruled it.)
+- **Place:** phone Quests (verified). Window Quests / Options / buff breakouts share Core `CharacterClasses.SourceLabel` (reasoned from the table, not a picture).
+- **Finding:** No-picks line reads `Filtering for Warrior · Druid · Monk (from your achievements — pick classes to override)`. With picks the line goes blank; the optimistic tick also nulls `characterClasses` / `inferredClass`. "Override" is the #104 fail (picker is a view lens, not a replace). Hiding the line when they tick hides "the game said Warrior/Druid/Monk" exactly when they need it.
+- Quest windows (WPF + Avalonia), no picks, now verified: `Filtering for {class · class · class} ({source} — pick classes above to override)`. Same verb as the phone. Same ruling: drop "override"; identity stays after picks.
+- Options already has the right verb. No picks: `({source} — pick classes in the Quest Tracker to widen)`. With picks: `picks WIDEN what EQBuddy already knows… rather than replacing it`. Do not touch Options except to keep that word.
+- Buff-set breakout subtitle (look, not a fact): no-picks line is `WAR/DRU/MNK (inferred from your log)` and the call always passes `ClassSource.Inferred`, not Resolve. If that holds, a dump-sourced trio still reads as a guess. Executor: pass the resolved source. Empty `no classes known yet` is fine.
+- **Decided:** Keep the three source words. Fact vs guess is the job: `from your achievements` / `inferred from your log` / `from your picks` (parallelize the third; keep "inferred"). Identity stays on screen after picks. It is not the filter. Do not say "override." Phone must not compose a second verb around `SourceLabel`.
+- **Executor:** Phone: keep the identity line when `d.classes` is set. Drop the em-dash clause. Line is `Warrior · Druid · Monk (from your achievements)`. Picker button stays the filter; its note already says friend's list. If a hint is needed: tooltip or picker note, `pick classes to look at a friend's` — not inside the identity parenthetical. Window: verify the Options/Quests strip does not add its own verb. One table, no second sentence. SourceLabel is one table in Core. Do not grow a phone-only string.
+- **Not a hold** on tag v1.99.7. Do not reopen 320 / first-open-rest-collapsed / Wealth coin / window Motes / #227 / spell hover / #208 / #233.
+
 ### Experience next-level lock follow-ups (1.99.6 / 1.99.7)
 
 - **Kind:** Helm-signed UX lock (Bevel 1pm 2026-08-23)
