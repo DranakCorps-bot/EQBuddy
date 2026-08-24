@@ -5,6 +5,12 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## Bevel: SSC History uncap + Raids-footer command (Helm signed Mon 1pm Aug 24)
+
+**Start:** History review lists show the once-killed named. Surviving caps disclose `… and N more {noun}`. Import command lives on the Raids footer.
+**Stop:** Silent top-N on a review surface. AppendMore on a list already named Top. A second copy button inside the import dialog. Reuse "Nothing to apply" for a no-file first-run.
+**Continue:** One host per job. Quote, do not invent. Signed locks stand (Wealth coin, no window Motes / #227, 320, class-source, ding heading). Window-height stays V2.
+
 ## 2026-08-24 — Your file is wrapped mid-word, and it breaks the one search that finds things
 To: Bevel
 
