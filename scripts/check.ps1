@@ -21,14 +21,28 @@ $ErrorActionPreference = 'Continue'
 $repo = Split-Path $PSScriptRoot -Parent
 $failed = @()
 
+# Every stage's full output is TEED to a file, pass or fail. It used to live only in a
+# variable that was filtered to 15 lines on failure and dropped entirely on success —
+# so on 2026-08-23 a one-off Avalonia failure (Failed: 1, Passed: 278) could not be
+# named, could not be reproduced in seven further runs, and had to be written up as a
+# hypothesis. A gate that cannot say WHICH test failed is not much of a gate, and the
+# run that matters is the one you cannot repeat.
+$logDir = Join-Path $repo 'dist\check-logs'
+New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+
 function Step([string] $name, [scriptblock] $body) {
     Write-Host "-- $name " -NoNewline
+    $slug = ($name.Trim() -replace '\s+', '-')
+    $log = Join-Path $logDir "$stamp-$slug.log"
     $output = & $body 2>&1
+    $output | Out-File -FilePath $log -Encoding utf8
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
         $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
+        Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
     }
     else {
@@ -46,6 +60,7 @@ if (-not $Quick) {
 }
 
 Write-Host ''
+Write-Host "logs: $logDir" -ForegroundColor DarkGray
 if ($failed.Count -gt 0) {
     Write-Host "FAILED: $($failed -join ', ')" -ForegroundColor Red
     exit 1

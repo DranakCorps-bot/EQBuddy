@@ -502,7 +502,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             // Page one of the launch tour is the log-truncation consent question.
             // Leave existing logs untouched until the user has answered it.
-            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
+            var prune = LogJanitorPolicy.ShouldPrune(_settings.TruncateLogs, _settings.ShowTutorial);
             var archive = _settings.ArchiveLogs;
             Task.Run(() =>
             {
@@ -1909,7 +1909,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
             _lastJanitorRun = DateTime.Now;
-            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
+            var prune = LogJanitorPolicy.ShouldPrune(_settings.TruncateLogs, _settings.ShowTutorial);
             var archive = _settings.ArchiveLogs;
             Task.Run(() =>
             {

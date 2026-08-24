@@ -116,6 +116,10 @@ public static class EqConfig
         int truncated = 0;
         foreach (var f in Directory.EnumerateFiles(logFolder, "eqlog_*.txt"))
         {
+            // The glob is the game's shape AND the shape of every copy a player keeps
+            // beside it, so it is not on its own permission to destroy the file
+            // (GameWrittenLog, Reddit 2026-08-23). Enumerate with it, then decide.
+            if (!GameWrittenLog.IsGameWritten(f)) continue;
             try
             {
                 var fi = new FileInfo(f);

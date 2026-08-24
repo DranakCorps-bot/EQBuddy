@@ -350,7 +350,7 @@ public partial class MainWindow : Window, ICardContext
         // periodic janitor handles it afterwards.
         if (_settings.LogFolder is { } lf)
         {
-            var prune = _settings.TruncateLogs && !_settings.ShowTutorial;
+            var prune = LogJanitorPolicy.ShouldPrune(_settings.TruncateLogs, _settings.ShowTutorial);
             var archive = _settings.ArchiveLogs;
             Task.Run(() =>
             {
@@ -2497,7 +2497,7 @@ public partial class MainWindow : Window, ICardContext
         if (_settings.LogFolder is { } folder && DateTime.Now - _lastJanitorRun > TimeSpan.FromMinutes(10))
         {
             _lastJanitorRun = DateTime.Now;
-            var prune = _settings.TruncateLogs;
+            var prune = LogJanitorPolicy.ShouldPrune(_settings.TruncateLogs, _settings.ShowTutorial);
             var archive = _settings.ArchiveLogs;
             Task.Run(() =>
             {
