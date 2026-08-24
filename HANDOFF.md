@@ -164,17 +164,25 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 `pwsh -NoProfile -File scripts/status.ps1`.
 
 
-## 2026-08-23 evening (LATEST — start here): 1.99.7 SHIPPED, 1.99.8 is cleared and waiting on David
+## 2026-08-23 evening (LATEST — start here): THREE releases shipped today; nothing is staged
 
-**Two releases went out today** (1.99.6 at 11:27, 1.99.7 at 13:46, both signed and verified).
-**1.99.8 is staged, Fable-cleared with no condition, and needs only David's go.**
+**1.99.6 (11:27), 1.99.7 (13:46) and 1.99.8 (20:16) all shipped**, all signed
+`CN=FlossworksCross-Stitch`, Valid and timestamped. `v1.99.8` is tagged at `eecd6f3` and
+contains everything below; the only unreleased commit is this handoff.
+
+**1.99.8 was released by Fable after clearing it**, not by a session asking David — which is
+why an earlier draft of this entry said it was "waiting on David's go" and was wrong within
+minutes. **Fable has been asked (`FABLE-FEEDBACK.md`) to tell the executor when it ships
+something**, because a release that happens outside the session leaves every downstream claim
+— what is staged, what a reporter is running, which What's-new block a fix belongs in — quietly
+false.
 
 → **Before you claim anything about release state, run the three checks**: `git tag`,
 `gh release list`, the OneDrive timestamp. This session told David twice that nothing was
 tagged, having checked `git log` and never `git tag`. He corrected it; the checks take nine
 seconds and `CLAUDE.md` names them.
 
-### What is in 1.99.8 (staged, unreleased)
+### What is in 1.99.8 (SHIPPED)
 
 Bevel's class-source ruling (identity survives a pick, no "override", the buff breakouts pass
 the RESOLVED source instead of a hardcoded `Inferred`), Helm's #235 wording fix
