@@ -163,6 +163,62 @@ surface-allocation rule. `docs/Architecture.md` and `docs/TestPlan.md` sit behin
 `DocumentationTests` fails the build if any go stale. Start with
 `pwsh -NoProfile -File scripts/status.ps1`.
 
+
+## 2026-08-23 evening (LATEST — start here): 1.99.7 SHIPPED, 1.99.8 is cleared and waiting on David
+
+**Two releases went out today** (1.99.6 at 11:27, 1.99.7 at 13:46, both signed and verified).
+**1.99.8 is staged, Fable-cleared with no condition, and needs only David's go.**
+
+→ **Before you claim anything about release state, run the three checks**: `git tag`,
+`gh release list`, the OneDrive timestamp. This session told David twice that nothing was
+tagged, having checked `git log` and never `git tag`. He corrected it; the checks take nine
+seconds and `CLAUDE.md` names them.
+
+### What is in 1.99.8 (staged, unreleased)
+
+Bevel's class-source ruling (identity survives a pick, no "override", the buff breakouts pass
+the RESOLVED source instead of a hardcoded `Inferred`), Helm's #235 wording fix
+(`AchievementsPreviewText` — "Nothing to apply" instead of "Apply (0)", LeBigNasty credited),
+and the class harvest joining the weekly refresh. Gates 2,518 unit · 278 Avalonia · 26 E2E.
+
+### The work queue, in the order it is ready
+
+1. **Window height — now V1, not V2** (`FABLE.md`, re-scoped after PR 0). Wiring is
+   **`LayoutUpdated` inside `AllowResize`** — one point, which is why the four-`MaybeRefresh`
+   stop no longer applies. `UI.Shared/WindowHeightFollower` + 12 tests already exist and are
+   **wired to nothing**; Fable ruled it rides. Add an **emit-once-per-delta** test (the loop
+   risk as a unit test rather than a shot). **Deleting `Release` alone is REJECTED** — a
+   vertical drag that does nothing is a silent no-op. **PR 2 is closed**: Avalonia has no pin
+   and no bug; adding resize there is a new capability and its own item. Acceptance:
+   `progress-card` re-shot (predict 520 × ~389, whole body, no scrollbar) **plus one hand-done
+   drag/reopen check, named in the commit** — a drag cannot be shot or unit-tested.
+2. **`check.ps1` discards test output** (Fable's V1). One unnamed Avalonia failure this session
+   was unrecoverable because of it — ten consecutive greens since, transient-host-crash reading
+   stands, tag did not wait. Tee each suite to a file so the next one-off has a name.
+3. **Four older `ready` plans** in `FABLE.md`: spawn timers → eqlwiki, the wiki pack reading
+   history, Avalonia PR B, Inline themes.
+
+### Open with other people
+
+- **#234 (atrzonkowski) waits on the reporter.** Helm signed the QUESTION only. The mechanism
+  is found: a kill reaches Mob Farming / Kills by Creature ONLY when you or your pet land the
+  killing blow, while `FinalizeFight` runs either way — which is why Encounters lists the named
+  and the rollups do not. **If he says he landed the blow himself, that is a real miss and it
+  needs a session file. If a group member did, the fix counts other players' kills and brushes
+  the values line — David's call, then Bevel, before any code.**
+- **#235 answered and fixed.** #233 answered by David himself. **#208 is the only live hold.**
+- A picks-WIDENED class list is still labelled with the base source alone. Fable flagged it,
+  Bevel's "one table, no second sentence" rules out the obvious fix, nothing changed.
+
+### Two habits that earned their keep today, both worth keeping
+
+- **Run a new guard against the broken tree.** Two guards written this session were VACUOUS
+  until that step: `Contains("class_cache(title)")` matched the function definition, and an
+  earlier one compared `ToString()`. Both looked green and guarded nothing.
+- **Ask what a fixture would SHOW, not whether it passes.** The phone quests fixture set picks,
+  and the page hides the class line whenever picks exist — so it could never have exercised the
+  thing it was written for. Same shape as the wire-key defect Fable caught.
+
 ---
 
 ## 2026-08-23 evening (LATEST — start here): both features are BUILT; 1.99.6 needs its third Fable pass
