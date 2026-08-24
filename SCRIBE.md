@@ -16,6 +16,24 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Import achievements button does not function
+- **Priority:** waiting (new thread; not authorized. Check in with Helm before any reply.)
+- **Place:** achievement import. Desktop WINDOW titled "Import achievements — preview" (screenshot). Not the widget. Not the phone. Not Gate 5 overlay. Not a group meter. Nearby #101 is a different ask (token/confirm / silent auto) and is TAKEN — do not restore it.
+- **Source:** #235 LeBigNasty Aug 23, 5:13 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/235 New thread. 0 replies. Footer: EQBuddy 1.99.7 · Windows 26200. Screenshot: https://github.com/user-attachments/assets/39d8c84d-7fd3-438f-8dbc-8a1821f77fa0
+- **Ask:** "Import achievements button does not function."
+- **Already shipped:** 1.99.6 put the import report on the Raids surface (Undo; skipped/unmatched counts). 1.99.7 published 1:46 PM CT (multiclass), before this report. The preview window exists and ran on this shot.
+- **Checked:** WINDOW — the attached shot is "Import achievements — preview": "502 achievements read · 76 Sky rewards recognized"; status "Everything recognized is already marked — nothing to apply."; list rows are ✓ Class — item (already marked) (Bard / Beastlord / Berserker / Cleric Sky rewards visible); Apply (0) grayed out; Cancel live. I could not check widget or phone.
+- **Hypothesis:** Apply is disabled because the preview says nothing to apply, not because the button is dead. Reporter may have read a disabled Apply as "does not function." Named SOURCE is this preview shot. I do not have a token-unlocked dump AND a quested one from the same player as a control.
+
+### Guk nameds missing from session Mob Farming / Kills by Creature
+- **Priority:** waiting (new thread; not authorized. Check in with Helm before any reply.)
+- **Place:** Session history. Desktop. ROADMAP: Session history → Progress or its own; Kills & Drops is the creature (what died / what it dropped). Not Gate 5 overlay. Not a group meter. Not the Drops-by-Creature wiki-name items.
+- **Source:** #234 atrzonkowski Aug 23, 1:21 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/234 New thread. 0 replies. Footer: EQBuddy 1.99.5 · Windows 26200.
+- **Ask:** Under session history, Mob Farming and Kills by Creature do not pull named mobs from Guk. They are listed in the encounters. Examples: Ghoul Savant, Ghoul Sentinel.
+- **Already shipped:** Kills and Drops by Creature are one window (Kills & Drops) as of 2026-08-21. Encounters list exists (reporter sees the nameds there). Reporter is on 1.99.5; 1.99.7 shipped 1:46 PM CT after this post. I could not check whether 1.99.6/1.99.7 changed the session aggregators.
+- **Checked:** I could not check widget / window / phone. I did not open a Guk session. Named SOURCE is the same session's Encounters list vs Mob Farming and Kills by Creature.
+- **Hypothesis:** session kill aggregators skip nameds or miss Guk instance names that Encounters still records. Control would be one Guk session where Encounters lists Ghoul Savant / Ghoul Sentinel and the two rollups do not.
+
 ### stop moving UI surfaces every release
 - **Priority:** done (David 1:15 PM CT Aug 23: #233 is done unless more is added to the thread. Organizing pass stands. "X is now Y" is standing What's-new process, not an open leftover on this ticket.)
 - **Place:** widget card organization / ROADMAP section 3 organizing pass. Desktop + widget. Not a new card. Not Gate 5 overlay. Not a group meter.
