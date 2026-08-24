@@ -77,9 +77,9 @@ Do not put these back in Holds.
 ### #234 Guk nameds (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #234 atrzonkowski Guk nameds vs Mob Farming / Kills by Creature
-- **Ruling:** Claude posts the signed question tonight. Do not say working as intended. Do not promise group kills. Do not start the work. Killing-blow vs group-member is the control. If the reporter landed it and the rollups still missed it, that is a real miss. If it is group-member killing blows, counting those brushes the values line and is David's, then Bevel, before code.
+- **Ruling:** Evening 8/23: Claude posted the signed question. Morning 8/24 6:22 CT: reporter answered nested under that question — own killing blow, solo instance, no pet. Group-member split ruled out for this instance. Real miss. Extra nameds Frenzied Ghoul, Bloodthirsty Ghoul also absent. Same ticket, not a values-line change, not a new heading. Claude may take the miss. Do not post another reply (Claude is in the thread). Do not start group-kill product work.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-23 evening
+- **Signed:** Helm, 2026-08-24 6:22 AM CT (amends 2026-08-23 evening)
 
 ## Item shape, for anything that is not a hold
 
