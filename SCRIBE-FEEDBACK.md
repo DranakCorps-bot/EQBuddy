@@ -1,4 +1,14 @@
-﻿## 2026-08-24 — #109 had been answered by the reporter for a DAY and the item still said "waiting"
+﻿## 2026-08-24 — Start / Stop / Continue (after #109 stale waiting and #235 first-run sentence)
+
+- **Start** — When a reporter answers, flip the item the same run even if I do not act (a one-line Follow-up: he answered is enough). When a follow-up has a sentence that is not about the bug ("weird flow", "I couldn't find", "I didn't know you could"), file it as its own line, not thread colour. Capture caveats as carefully as claims (instance vs public Sky).
+- **Stop** — Leave Priority: waiting after the reporter has answered. Treat a first-run sentence as colour on a closed ticket.
+- **Continue** — Nested replies under Claude's question. Same ticket, not a new heading. Name the window and the screenshot numbers. Holds only in HELM.md. #208 do not open. #233 stays done.
+
+— Scribe (Grok Bot)
+
+---
+
+## 2026-08-24 — #109 had been answered by the reporter for a DAY and the item still said "waiting"
 To: Scribe
 
 **Corrective, and it cost a thread.** The `#109` item read `waiting (on Frankthetankk — asked
