@@ -17,7 +17,12 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### Import achievements button does not function
-- **Priority:** waiting (new thread; not authorized. Check in with Helm before any reply.)
+- **Priority:** **ANSWERED + FIXED 2026-08-23 (Claude).** Helm signed the reply and authorized
+  the wording fix; posted verbatim (comment 18128559). **Your hypothesis was exactly right and
+  the screenshot is why** — Apply was grey because the preview had already marked everything,
+  not because the button was dead. Fix staged in 1.99.8: the button reads "Nothing to apply",
+  a line beside it says the import worked and how many were already marked, and the disabled
+  state carries a dim and a tooltip (trap 17). LeBigNasty credited in What's-new.
 - **Place:** achievement import. Desktop WINDOW titled "Import achievements — preview" (screenshot). Not the widget. Not the phone. Not Gate 5 overlay. Not a group meter. Nearby #101 is a different ask (token/confirm / silent auto) and is TAKEN — do not restore it.
 - **Source:** #235 LeBigNasty Aug 23, 5:13 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/235 New thread. 0 replies. Footer: EQBuddy 1.99.7 · Windows 26200. Screenshot: https://github.com/user-attachments/assets/39d8c84d-7fd3-438f-8dbc-8a1821f77fa0
 - **Ask:** "Import achievements button does not function."
@@ -26,7 +31,13 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis:** Apply is disabled because the preview says nothing to apply, not because the button is dead. Reporter may have read a disabled Apply as "does not function." Named SOURCE is this preview shot. I do not have a token-unlocked dump AND a quested one from the same player as a control.
 
 ### Guk nameds missing from session Mob Farming / Kills by Creature
-- **Priority:** waiting (new thread; not authorized. Check in with Helm before any reply.)
+- **Priority:** **ASKED 2026-08-23 (Claude), waiting on the reporter.** Helm signed the
+  QUESTION and explicitly no code; posted verbatim (comment 18128563). **The mechanism is
+  found and it is not "the aggregators skip nameds"** — in `SessionStats`, a kill reaches Mob
+  Farming / Kills by Creature only when you or your pet land the killing blow, while
+  `FinalizeFight` runs on both branches, which is exactly why Encounters still lists them. So
+  a named a group member finished is invisible to both rollups. The reply asks him which it
+  was; that answer decides whether this is working as designed or a real miss.
 - **Place:** Session history. Desktop. ROADMAP: Session history → Progress or its own; Kills & Drops is the creature (what died / what it dropped). Not Gate 5 overlay. Not a group meter. Not the Drops-by-Creature wiki-name items.
 - **Source:** #234 atrzonkowski Aug 23, 1:21 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/234 New thread. 0 replies. Footer: EQBuddy 1.99.5 · Windows 26200.
 - **Ask:** Under session history, Mob Farming and Kills by Creature do not pull named mobs from Guk. They are listed in the encounters. Examples: Ghoul Savant, Ghoul Sentinel.

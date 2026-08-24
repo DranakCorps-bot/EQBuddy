@@ -254,8 +254,27 @@ internal sealed class QuestChecklistView
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new Thickness(10),
         };
-        var apply = Theming.Button($"Apply ({fresh.Count})");
+        // The button carries its own reason, and a line sits beside it — the sentence that
+        // explains a disabled Apply is at the TOP of the panel, four screens above the
+        // control a player scrolls to (#235; traps 44 and 17 together).
+        if (AchievementsPreviewText.WhyDisabled(fresh.Count, matches.Count) is { } why)
+        {
+            var note = new TextBlock
+            {
+                Text = why, FontSize = 12, TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center,
+                MaxWidth = 300,
+                Margin = new Thickness(0, 0, DesignTokens.SpaceM, 0),
+            };
+            note.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            buttons.Children.Add(note);
+        }
+        var apply = Theming.Button(AchievementsPreviewText.ApplyLabel(fresh.Count));
         apply.IsEnabled = fresh.Count > 0;
+        apply.ToolTip = AchievementsPreviewText.ApplyTooltip(fresh.Count, matches.Count);
+        // IsEnabled alone is invisible in this app's button style (trap 17), so the dim is
+        // explicit rather than inherited.
+        if (fresh.Count == 0) apply.Opacity = 0.55;
         apply.Click += (_, _) =>
         {
             AchievementsImport.Apply(matches, _settings);

@@ -4011,8 +4011,23 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             HorizontalAlignment = HorizontalAlignment.Right,
             Margin = new Thickness(DesignTokens.SpaceL),
         };
-        var apply = ZoneTheming.Button($"Apply ({fresh.Count})", isDefault: true);
+        // The button carries its own reason, and a line sits beside it — see the WPF twin
+        // and AchievementsPreviewText (#235; traps 44 and 17 together).
+        if (AchievementsPreviewText.WhyDisabled(fresh.Count, matches.Count) is { } why)
+            buttons.Children.Add(new TextBlock
+            {
+                Text = why,
+                FontSize = DesignSystem.Size(Role.Body),
+                TextWrapping = TextWrapping.Wrap,
+                MaxWidth = 300,
+                VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+                Foreground = AppTheme.DimBrush,
+                Margin = new Thickness(0, 0, DesignTokens.SpaceM, 0),
+            });
+        var apply = ZoneTheming.Button(AchievementsPreviewText.ApplyLabel(fresh.Count), isDefault: true);
         apply.IsEnabled = fresh.Count > 0;
+        ToolTip.SetTip(apply, AchievementsPreviewText.ApplyTooltip(fresh.Count, matches.Count));
+        if (fresh.Count == 0) apply.Opacity = 0.55;
         apply.Click += (_, _) =>
         {
             AchievementsImport.Apply(matches, _settings);
