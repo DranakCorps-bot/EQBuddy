@@ -162,4 +162,101 @@ public class WindowHeightFollowerTests
 
         Assert.Equal(700, f.OwnedHeight);
     }
+
+    // ---- The loop risk, as a unit test rather than as a screenshot ----------
+
+    /// <summary>
+    /// **The specific thing that makes `LayoutUpdated` wiring safe** (Fable 5's ask on the
+    /// re-scope). `LayoutUpdated` fires continuously, and the handler ASSIGNS a height —
+    /// which causes another layout, which fires it again. That is only not a loop because
+    /// one delta produces exactly one emit and the settled state produces none.
+    ///
+    /// Simulated the way the real cycle runs: emit, then feed back the height we just
+    /// assigned (a settled window measures what it was told), repeatedly.
+    /// </summary>
+    [Fact]
+    public void OneDeltaEmitsOnceAndThenTheLayoutSettles()
+    {
+        var f = new WindowHeightFollower();
+        var emits = 0;
+
+        var measured = 389.0;
+        for (var pass = 0; pass < 25; pass++)
+        {
+            if (f.Desired(measured, Cap) is { } target)
+            {
+                emits++;
+                measured = target;   // the window is now this tall; the body fits exactly
+            }
+        }
+
+        Assert.Equal(1, emits);
+    }
+
+    /// <summary>Trap 12 is the reason this matters more here than it looks. Assigning a
+    /// height asks the windowing system to resize an always-on-top window, and doing that
+    /// on a repeating signal is what cost EverQuest its keyboard under X11 (#173). Twenty
+    /// layout passes with nothing changing must ask for nothing at all.</summary>
+    [Fact]
+    public void AQuietLayoutAsksForNothingHoweverOftenItFires()
+    {
+        var f = new WindowHeightFollower();
+        Assert.NotNull(f.Desired(400, Cap));
+
+        for (var pass = 0; pass < 20; pass++)
+            Assert.Null(f.Desired(400, Cap));
+    }
+
+    // ---- Natural(): the measurement the wiring feeds in --------------------
+
+    [Fact]
+    public void AClippedBodyReportsTheHeightItWouldNeed()
+    {
+        // The shipped defect, in numbers: a 203px window whose body holds 389px of content.
+        Assert.Equal(389, WindowHeightFollower.Natural(
+            actualHeight: 203, extentHeight: 350, viewportHeight: 164));
+    }
+
+    [Fact]
+    public void ABodyThatFitsReportsTheHeightItAlreadyHas()
+        => Assert.Equal(389, WindowHeightFollower.Natural(389, 350, 350));
+
+    [Fact]
+    public void AFoldedSectionReportsASMALLERHeight()
+    {
+        // The half the old pin ALSO broke: the window could never shrink again. The
+        // remainder is signed, so a viewport larger than its content pulls the window in.
+        Assert.Equal(300, WindowHeightFollower.Natural(
+            actualHeight: 389, extentHeight: 250, viewportHeight: 339));
+    }
+
+    /// <summary>
+    /// The pin must not come back by reflex. It is one line
+    /// (`window.ContentRendered += Release`) and it read as obviously correct for three
+    /// releases, so the guard is a source scan — the WPF layer has no other kind.
+    /// </summary>
+    [Fact]
+    public void WindowZoomNeverPinsTheHeightOnARenderEventAgain()
+    {
+        var source = File.ReadAllText(
+            Path.Combine(RepoRoot(), "src", "EQBuddy", "WindowZoom.cs"));
+
+        // The SUBSCRIPTION, not the word: the doc comment above the method explains what
+        // the pin was and why it went, and a scan that forbade naming it would forbid the
+        // explanation. Matching `+=` is also the precise claim — nothing may hook a render
+        // event to set geometry.
+        Assert.DoesNotMatch(@"ContentRendered\s*\+=", source);
+        // The negative that stops this going vacuous (trap 39): the replacement really is
+        // wired, so a file that merely deleted the pin cannot pass.
+        Assert.Contains("LayoutUpdated", source);
+        Assert.Contains("WindowHeightFollower", source);
+    }
+
+    private static string RepoRoot()
+    {
+        var d = new DirectoryInfo(AppContext.BaseDirectory);
+        while (d is not null && !File.Exists(Path.Combine(d.FullName, "EQBuddy.slnx")))
+            d = d.Parent;
+        return d?.FullName ?? throw new InvalidOperationException("repo root not found");
+    }
 }

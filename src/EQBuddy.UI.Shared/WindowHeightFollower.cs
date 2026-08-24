@@ -39,6 +39,27 @@ public sealed class WindowHeightFollower
     /// rather than whatever the content happened to measure when the app closed.</summary>
     public double? OwnedHeight { get; private set; }
 
+    /// <summary>
+    /// What the window WOULD measure if nothing were clipping it: its current height plus
+    /// however much of the body is currently hidden.
+    ///
+    /// This exists because the natural height is unreadable once the window is
+    /// `SizeToContent.Manual` — and it has to be Manual, because that is the only mode in
+    /// which a vertical drag does anything at all (keeping `SizeToContent.Height` forever
+    /// was rejected for exactly that: a drag that silently does nothing). Under Manual the
+    /// content is constrained to the window, so `DesiredSize` reports the constraint back
+    /// and the window can never learn it should grow. Re-measuring the tree with an
+    /// infinite constraint would answer it and would also dirty the layout from inside a
+    /// layout callback, which is a loop.
+    ///
+    /// A `ScrollViewer` has already computed the answer: `ExtentHeight` is the full content,
+    /// `ViewportHeight` is what fits. The difference is the hidden remainder, and it is
+    /// SIGNED — negative when the viewport is larger than the content, which is what makes
+    /// the window shrink again when a section is folded. The shipped pin broke that half too.
+    /// </summary>
+    public static double Natural(double actualHeight, double extentHeight, double viewportHeight)
+        => actualHeight + (extentHeight - viewportHeight);
+
     /// <summary>A profile that already carries a height starts OWNED at that height.
     /// **Nobody who has ever dragged a window sees it move by itself afterwards** — and it
     /// keeps <c>WindowHeights</c> honest in both directions (trap 20): the reader is this,
