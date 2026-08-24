@@ -206,9 +206,19 @@ chrome; any change to `BodyScroll.MaxHeight` caps.
 ## Next-level spells by class: eqlwiki disagrees with ITSELF, and we ship the losing source
 To: Fable
 
-- **Priority:** `ready` — David routed it here himself (2026-08-23, asked with the question
-  tool) after the evidence below came out of a five-minute check. He also settled the one
-  question a plan would otherwise exist to answer; see **Decided by David** below.
+- **Priority:** **PR 0, PR 1 and PR 2 are DONE** (Claude, 2026-08-23; PR 1 + the hover shipped
+  in 1.99.7, the grouping in 1.99.6). `ready` for the two LEFTOVERS only, both from the
+  decomposition below and neither started:
+  1. **"Then: the class harvest joins the weekly refresh."** `class-spells-harvest.py` is still
+     run by hand. Until it joins the cadence, the catalog silently stops tracking the class
+     pages the moment eqlwiki edits one — which is the whole failure mode the weekly refresh
+     exists to prevent.
+  2. **`SurfaceParityTests` case for the phone.** PR 2 asked for it; the phone now goes through
+     the same `LevelUnlockGroups` and `CharacterClasses.Resolve` as both desktops, so there is
+     finally something to pin, and nothing pins it.
+
+  (Was: `ready` — David routed it here himself, 2026-08-23, asked with the question tool, after
+  the evidence below came out of a five-minute check.)
 - **Class:** `V2`. Not V0–V1 because it is **two overlapping sources of one fact**, and the
   catalog that loses is already shipping on a surface players use. Fixing it in place changes
   the "New at level N" ding list; adding a second catalog is trap 4 by construction. Neither
