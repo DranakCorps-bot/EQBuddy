@@ -87,6 +87,42 @@ public sealed class HistoryPresentationTests
         Assert.NotNull(JsonDocument.Parse(json));
     }
 
+    /// <summary>
+    /// #234's second half, applied to the OTHER capped lists in the overview text: a
+    /// trimmed list that looks complete is a silent no-op with the switch on the other
+    /// side. Every surviving cap in BuildOverview must announce what it cut — damage
+    /// sources (8), heals (6) and pet abilities (8) — and stay silent when nothing was.
+    /// </summary>
+    [Fact]
+    public void OverviewAnnouncesEverySurvivingCap()
+    {
+        static List<SourceDamage> Sources(int n, string prefix) =>
+            [.. Enumerable.Range(1, n).Select(i => new SourceDamage($"{prefix}{i}", i, 100 - i))];
+
+        var over = new StatsSnapshot
+        {
+            DamageBySource = Sources(10, "slash"),
+            HealsBySpell = Sources(8, "mend"),
+            PetAbilities = Sources(10, "bite"),
+        };
+        var overview = HistoryPresentation.BuildOverview(Row(), over);
+        Assert.Contains("... and 2 more sources", overview);
+        Assert.Contains("... and 2 more heals", overview);
+        Assert.Contains("(8 hits) - ... and 2 more", overview);   // the pets line is inline
+
+        var under = new StatsSnapshot
+        {
+            DamageBySource = Sources(8, "slash"),
+            HealsBySpell = Sources(6, "mend"),
+            PetAbilities = Sources(8, "bite"),
+        };
+        // The negative that keeps this from going vacuous (trap 39).
+        Assert.DoesNotContain("more source", HistoryPresentation.BuildOverview(Row(), under));
+        Assert.DoesNotContain("more heal", HistoryPresentation.BuildOverview(Row(), under));
+        Assert.DoesNotContain("... and", HistoryPresentation.BuildOverview(Row(), under)
+            .Split("Loot:")[0]);   // nothing above Loot announces a cut that did not happen
+    }
+
     internal static StatsSnapshot Snapshot()
     {
         var stats = new SessionStats { CharacterName = "Kaybek", ServerName = "freeport" };

@@ -82,6 +82,7 @@ public static class HistoryPresentation
                     $" - {100.0 * source.Total / grandTotal,3:0}% - {source.Hits} hits - avg {(double)source.Total / Math.Max(1, source.Hits):0.#}" +
                     $" - {source.Total / Math.Max(1, snapshot.CombatSeconds):0.#} dps" +
                     (source.Crits > 0 ? $" - {100.0 * source.Crits / Math.Max(1, source.Hits):0}% crit" : ""));
+            AppendMore(text, snapshot.DamageBySource.Count, SourceCap, "source");
             text.AppendLine();
         }
 
@@ -95,6 +96,7 @@ public static class HistoryPresentation
                     $" - {100.0 * heal.Total / grandTotal,3:0}% - {heal.Hits} cast{(heal.Hits == 1 ? "" : "s")}" +
                     $" - avg {(double)heal.Total / Math.Max(1, heal.Hits):0.#}" +
                     $" - {heal.Total / Math.Max(1, snapshot.CombatSeconds):0.#} hps");
+            AppendMore(text, snapshot.HealsBySpell.Count, HealCap, "heal");
             text.AppendLine();
         }
 
@@ -193,7 +195,10 @@ public static class HistoryPresentation
         if (snapshot.PetAbilities.Count > 0)
             text.AppendLine("Pet abilities: " + string.Join(" - ",
                 snapshot.PetAbilities.Take(PetCap).Select(ability =>
-                    $"{ability.Name} {ability.Total:N0} ({ability.Hits} hits)")));
+                    $"{ability.Name} {ability.Total:N0} ({ability.Hits} hits)"))
+                + (snapshot.PetAbilities.Count > PetCap
+                    ? $" - ... and {snapshot.PetAbilities.Count - PetCap} more"
+                    : ""));
         if (snapshot.Stances.Count > 0)
             text.AppendLine("Stances: " + string.Join(" - ",
                 snapshot.Stances.Select(stance => $"{stance.Name} {stance.Damage:N0} dmg over {(int)stance.CombatSeconds}s ({stance.Dps:0.#} dps)")));

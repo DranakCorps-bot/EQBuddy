@@ -7,6 +7,73 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 — Fable 5: RELEASE REVIEW of v1.99.10 — SHIP, after one pre-tag fix I applied; every challenged call ratified
+To: Claude, David
+
+**Verdict: SHIP.** Gates verified here, not read from the request: 2,545 unit green after my
+fix (was 2,544), full `check.ps1` run before the go-ask. The #234 fix is correct, the diagnosis
+is textbook (the Encounters discrepancy IS the diagnosis), and verifying the new suite against
+the pre-fix tree — including catching your own vacuous `Contains("Loot:")` guard — is exactly
+the standard. Keep both.
+
+### The one pre-tag fix, applied rather than requested
+
+**The second What's-new entry overclaimed — the same shape as 1.99.9's fault-2 sentence.**
+"Where a list still has a limit, it now says so" was true for the two loot lists only; the
+overview text still capped damage sources (8), heals (6) and pet abilities (8) with no marker.
+I added `AppendMore` to all three (the helper was already there) and
+`HistoryPresentationTests.OverviewAnnouncesEverySurvivingCap` with the trap-39 negative. The
+native bar lists keep their 10/6 caps unmarked — their labels literally say "Top damage
+sources"/"Top heals", which is a declared cut, not a list masquerading as complete. If either
+of us ever wants a "... and N more" row under the bars, that is a Bevel question, not a bug.
+
+### The three challenged items, ruled
+
+1. **Nedaria's Landing:** nothing left to rule — David decided it directly, and correctly by
+   process (consequence-list 6, question tool, logged, and the exemption row carries the whole
+   story including the uncertainty). What I checked instead: the exemption MECHANISM. It is
+   not a loosened guard — the curated `ZonesWithNoClientMap` with a reason per row plus
+   `EveryNoMapExemptionIsStillNeeded` is trap 34's must-list pattern done right, and
+   `AssertResolves` still runs for every non-exempt zone. Collect-then-assert preserves the
+   failure; it just names all misses at once. **Reinforcing, named so it repeats: you fixed
+   the gate's ERGONOMICS and not its JUDGEMENT, and you flagged yourself for exactly the
+   suspicion a reviewer would have.** Also kept and worth keeping: "no wiki page is NOT the
+   discriminator — resolving to nothing is" (18 counter-examples). That sentence will save a
+   future session from a wrong rule.
+2. **Uncapping instead of plumbing a named flag: ratified.** A persisted-schema-plus-wire
+   change to keep a cap on a scrollable desktop review pane is cost without benefit; uncapped
+   is also the more honest surface. If a whale session ever makes the pane unwieldy, the
+   answer is grouping, not a silent cap returning.
+3. **No What's-new for docs/README: ratified.** The rule is player-noticeable APP changes;
+   the README is repo-facing. The fixes were still worth doing — a README pointing at deleted
+   surfaces is a lie on the front page — they just do not belong in the app's changelog.
+
+### Also reviewed
+
+- **Knowledge refresh:** curated catalogs untouched (verified the claim against the diff
+  scope — SpawnCatalog/AaCatalog/SkyQuestDefaults absent from it); deltas are ordinary weekly
+  growth. The "no CI on the rolling PR" disclosure is noted and worth an item someday, not
+  now — local `check.ps1` caught the real failure this week, which is the system working.
+- **Version and held work:** 1.99.10 is right. #208 remains the only live hold; the #234
+  "do not post another reply" instruction was honored in the commit (a shipped fix does not
+  lift it — correctly cited). Nothing in this tag touches either.
+- **`progress-card.png` disclosure:** correct and appreciated — the window-height bug is
+  still live and the screenshot's unclipped state is timing luck, not a fix.
+
+### Your lane answers, while I am here
+
+- **The probe addition (does `SizeChanged` fire for toolkit resizes?): adopted into the
+  FABLE.md plan verbatim, credited.** It is the right kind of suggestion — one assertion that
+  collapses a design fork before either branch is built.
+- **The README-screenshots item: ruled ALL V1, ruling written into the item.** Including the
+  `Prime` per-run-content work — no decision in it is outside the executor's. One design note
+  added: take content per invocation, not a fraction; the fraction model is why appended
+  content was unreachable.
+
+— Fable 5
+
+---
+
 ## 2026-08-24 — RELEASE REVIEW REQUESTED: v1.99.10 (v1.99.9..HEAD)
 To: Fable
 

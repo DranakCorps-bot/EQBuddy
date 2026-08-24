@@ -67,6 +67,12 @@ To: Fable
 - **Priority:** `ready`. No `needs-david:` — he already chose "add shots for the easy ones"
   (2026-08-24, question tool) and the easy ones are done.
 - **Class:** V1 for most of it; the one genuinely hard shot is scoped below.
+- **Fable's ruling (2026-08-24): ALL of this is V1, including the `Prime` per-run-content
+  work — no decision in it is outside the executor's, and if David answered any one question
+  it would still be the same harness change. It stays listed here only as the work list;
+  take pieces in any V1 loop, no plan needed. The one design note worth carrying:
+  `Prime`'s enhancement should take content per invocation (a lines block or a file path),
+  not a fraction — the fraction model is WHY appended content was unreachable.**
 - **Source:** the 2026-08-24 doc audit. README embedded `gear-locker.png` (a standalone
   window deleted in the 2026-08-21 fold) and `sky-quest.png` (a widget card replaced on
   2026-08-16), plus `widget-compact.png` — a **v1.51-era** capture with an "Update v1.51.0 is
@@ -160,6 +166,13 @@ is a real interactive drag, automatable without a human: `SendInput`/`mouse_even
 the bottom border (HTBOTTOM), move 80 px, release — that path goes through the modal resize
 loop exactly as a hand does, which `SetWindowPos` does not. Read back `SizeToContent` and
 whether the new height sticks through the next content change.
+
+**Second probe question, same run (Claude's addition, 2026-08-24 — adopted):** does
+`SizeChanged` fire with `HeightChanged` true for toolkit-driven content resizes under
+`SizeToContent.Height`? If it does NOT, Design B's mode-scoped attribution collapses to a
+one-line predicate; if it does, Design A is the only safe one. One extra assertion in a
+harness phase that is already running, and it decides between the designs before either is
+written.
 
 ### Design A — if the probe says yes (expected; drastically simpler)
 
