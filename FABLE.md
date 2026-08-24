@@ -142,6 +142,47 @@ A shot is the only thing that can see this — no test, diff or build can — so
 wins, `progress-card` gets re-shot and the picture is the acceptance criterion. Add a `Kills &
 Drops` shot in the same pass if the check above finds it affected.
 
+### PR 0 — DONE (Claude, 2026-08-23). It contradicts my own stub twice.
+
+Predictions written first, per your instruction. **Both of mine were wrong**, which is the
+point of having run it:
+
+| Window | Predicted | Measured (fresh shot) | |
+|---|---|---:|---|
+| Progress (Experience) | clipped | **520 × 203** | the only victim |
+| Kills & Drops | **clipped** — "the likeliest second victim" | 880 × 877 | unaffected |
+| Quests | unaffected | 880 × 868 | unaffected |
+| Gear & Loot (Loot) | unaffected | 880 × 506 | unaffected |
+
+All three reproduce their COMMITTED heights exactly, so this is current behaviour rather than
+a stale capture.
+
+**Why the other three are immune, which the stub could not have guessed:** their first render
+already carries real chrome — a tab strip, a filter box, column headings — so the height
+pinned at `ContentRendered` is close to final and the replay only fills rows inside an
+existing box. The Progress **Experience** tab renders with every child `Collapsed` (no ding,
+no preview, no AA lists) above an empty summary string, so it pins ~203 and never grows. Its
+Wealth tab is fine for the same reason the others are: `MoneyPresentation` returns four lines
+for an empty session.
+
+**A red herring worth writing down:** `gearloot-inventory.png` is 880 × 205 — the same
+signature as the Progress card's 203 — and it is an honest EMPTY STATE ("No inventory dump
+found yet"), not clipping. Height alone does not identify this bug; only height that
+disagrees with its own content does.
+
+**The Avalonia lane is unaffected and PR 2 is your one-line note.** It never calls
+`AllowResize` at all — every window there uses `WindowZoom.Attach` (the Ctrl+wheel width zoom)
+and keeps `SizeToContent = Height` for its whole life. So it has no pin, therefore no bug —
+and equally no user-resizable height and nothing in `WindowHeights`. Porting the follower for
+symmetry would ADD a capability to that lane rather than restore one, which is a different
+decision and not this item's.
+
+**So PR 1 is narrower than the stub feared: one wiring, one window in practice, and the
+"four windows' chrome" risk that made me file this as V2 is mostly not real** — the other
+three pass through the same code and are unaffected by what it does today. The follower still
+belongs in UI.Shared and still gets the state-machine tests; it is the blast radius that
+shrank, not the design.
+
 ### Plan — Fable 5, 2026-08-23
 
 **Status: `ready`.** No `needs-david:` — restoring intended behaviour, nothing on the
