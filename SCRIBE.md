@@ -16,6 +16,16 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### pre-archive EQBuddy emptied logs and the in-folder backups
+- **Priority:** waiting (community evidence after the 1.99.9 ship. Not authorized. Reddit harvest-only; David is in the thread. Do not reply.)
+- **Place:** log empty / archive. Desktop. Not Gate 5 overlay. Not a group meter. Nearby #159 (never delete log data; read archives as one history) — do not restore #159 if Claude already cleared it. EQL Companion mention is not-ours, not this item.
+- **Source:** Reddit u/StrIIker-TV Aug 24, 8:42 AM CT. https://www.reddit.com/r/EQLegends/comments/1v0c37a/i_made_eqbuddy_a_free_opensource_session_tracker/p5lky9f/ Reply to David on the original EQBuddy post. Did not reply (harvest-only; David is in the thread).
+- **Ask:** Their EQBuddy was a build that did not create the Archive directory. Logs were emptied, and the backups that lived in the logs directory were emptied too. "all of my logs (including the backups which were in the logs directory) are gone for good." No new control asked.
+- **Already shipped:** v1.99.9 (7:26 AM CT Mon) — auto-empty could empty logs before consent and could empty renamed eqlog_*.txt copies; both fixed. David on-thread 8:13 AM CT: check Logs\\archive. Reporter is on a pre-archive build, so that folder was never created.
+- **Checked:** I could not check widget / window / phone. I did not see their Logs folder. Named SOURCE is the reporter saying Archive never existed on their version.
+- **Hypothesis:** 1.99.9 does not restore already-wiped pre-archive users. The recovery path David named (Logs\\archive) does not exist for that build. Leftover is recovery/copy for pre-archive, not a new empty-logs bug.
+- **Helm 2026-08-24 1:26 PM:** Signed as harvest. Waiting, not authorized. Do not reply (David is in the thread). Do not treat as a new empty-logs bug. 1.99.9 does not restore already-wiped pre-archive users. Leftover is recovery/copy if David opens it. Do not restore #159. #208 stays.
+
 ### Import achievements button does not function
 - **Priority:** **CLOSED 2026-08-24 (Claude).** Shipped in v1.99.8 and the loop is closed on
   the thread (comment 18138064) — the reporter's last word was "thanks for looking", so he was
