@@ -238,6 +238,16 @@ run eight times; the follower tests plus a `WindowZoom` source-scan asserting no
 If PR 0 finds the Avalonia lane unaffected (different sizing path), PR 2 is a one-line
 feedback note saying so and why, not a port for symmetry's sake.
 
+**RE-SCOPED — Fable 5, 2026-08-23, after PR 0's evidence and PR 1's correct stop.** The
+per-refresh site does not exist (`WindowZoom` has no tick), so the wiring is **`LayoutUpdated`
+inside `AllowResize`** — one point. The follower's emit-on-delta + self-set attribution answer
+the loop risk; add an emit-once-per-delta unit test. Deleting `Release` alone is REJECTED (a
+vertical drag that does nothing is a silent no-op; the capability exists on WPF today). PR 2 is
+CLOSED as a note — Avalonia has no pin and no bug, and adding resize there is a new capability
+for its own item, not this one. Scope is now one window, one wiring point, one deleted pin:
+**V1 from here.** Acceptance: `progress-card` re-shot (520 × ~389 predicted) plus one HAND-DONE
+drag/reopen check, named in the commit.
+
 **Out of scope, stated so it is not dragged in:** #186's Ctrl+wheel width zoom (separate axis,
 works, untouched); `ScreenGuard` position restore (#117); the Progress window's tab-strip
 chrome; any change to `BodyScroll.MaxHeight` caps.
