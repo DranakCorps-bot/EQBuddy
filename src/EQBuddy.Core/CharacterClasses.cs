@@ -1,4 +1,4 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>Where a character's class list came from, worst evidence last. The surfaces
 /// print this, because "Warrior · Druid · Monk" means something different depending on
@@ -89,14 +89,26 @@ public static class CharacterClasses
         return (classes, source);
     }
 
-    /// <summary>How a surface says where the list came from. One table, so the two
-    /// desktops and the phone cannot word it three ways — and so the difference between a
-    /// fact and a guess is visible to the player rather than only to us.</summary>
+    /// <summary>
+    /// How a surface says where the list came from. **ONE table** — Bevel, Helm-signed
+    /// 2026-08-23: *"SourceLabel is one table in Core. Do not grow a phone-only string"*,
+    /// and *"the phone must not compose a second verb around SourceLabel."*
+    ///
+    /// The three read in parallel on purpose ("from your …" / "inferred from your …" /
+    /// "from your …") because the job is telling a FACT from a GUESS at a glance, and
+    /// "inferred" is the word carrying that difference. The third was "your picks" until
+    /// Bevel parallelized it.
+    ///
+    /// **It names a source and nothing else.** No verb, no instruction, no "— pick classes
+    /// to override": this labels who the character IS, and the picker is a lens over that
+    /// (#104), not a replacement for it. A parenthetical that tells the player to override
+    /// their own identity is the #104 error in miniature.
+    /// </summary>
     public static string SourceLabel(ClassSource source) => source switch
     {
         ClassSource.Achievements => "from your achievements",
         ClassSource.Inferred => "inferred from your log",
-        ClassSource.Picked => "your picks",
+        ClassSource.Picked => "from your picks",
         _ => "",
     };
 }

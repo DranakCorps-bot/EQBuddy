@@ -1252,7 +1252,9 @@ public sealed class QuestsWindow : Window
         // never persisted, and one popup pick overrides (David, 2026-08-11).
         var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
         var classes = picks.Count > 0 ? picks : resolved.ToList();
-        var inferred = picks.Count > 0 ? "" : string.Join(" · ", resolved);
+        // WHO the character is, shown whether or not classes are picked (Bevel,
+        // Helm-signed 2026-08-23). Identity is not the filter.
+        var identity = string.Join(" · ", resolved);
 
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing here covers the catalog, the zone view and the two
@@ -1263,7 +1265,7 @@ public sealed class QuestsWindow : Window
         else if (_classLens is not null && !classes.Contains(_classLens, StringComparer.OrdinalIgnoreCase))
             _classLens = null;
 
-        var sig = $"{key}|{filter}|{_tab}|{_mode}|st:{_state}|{string.Join("+", classes)}|inf:{inferred}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
+        var sig = $"{key}|{filter}|{_tab}|{_mode}|st:{_state}|{string.Join("+", classes)}|id:{identity}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
@@ -1284,10 +1286,10 @@ public sealed class QuestsWindow : Window
             RenderChecklist(_tab, filter, classes);
             return;
         }
-        if (inferred.Length > 0)
+        if (identity.Length > 0)
+            // No verb — the picker is a lens over identity (#104), not a replacement.
             _questsPanel.Children.Add(Note(
-                $"Filtering for {inferred} ({CharacterClasses.SourceLabel(classSource)}" +
-                " — pick classes above to override)", "Info"));
+                $"{identity} ({CharacterClasses.SourceLabel(classSource)})", "Info"));
 
         var era = _settings.QuestEraFilter;
         // Era and class gate separately since 2026-08-11 (David's Crushbone session):

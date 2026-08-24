@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.99.8",
+    "date": "2026-08-23",
+    "highlights": [
+   "YOUR CLASSES STAY ON SCREEN WHEN YOU USE THE CLASS PICKER. 1.99.7 started naming which classes you are and where that came from - and then hid the line the moment you ticked anything in the Quest Tracker's picker, which is exactly when you want to see it. Your classes are who your character IS; the picker is a lens you look through. The line stays now: \"Warrior · Druid · Monk (from your achievements)\" on the phone, the Quest Tracker and the buff-set editor, picked or not.",
+   "And it no longer tells you to \"override\" them. That word was wrong twice over: the picker widens what EQBuddy knows about you rather than replacing it, and being told to override your own character is a strange thing for an app to say. The line names where your classes came from and stops there. \"Your picks\" also reads \"from your picks\" now, so the three answers line up and you can tell a fact from a guess at a glance.",
+   "FIXED - the buff-set breakout called your classes a guess even when the game had told us. Its subtitle always said \"inferred from your log\", so a character whose classes came from an achievements dump was labelled as though EQBuddy had worked them out from what you cast. It says which of the three it actually was."
+    ]
+  },
+  {
     "version": "1.99.7",
     "date": "2026-08-23",
     "highlights": [

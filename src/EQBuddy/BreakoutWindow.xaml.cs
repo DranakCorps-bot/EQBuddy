@@ -854,7 +854,11 @@ public partial class BreakoutWindow : Window
         BuffClassBox.IsEnabled = true;
 
         var now = DateTime.Now;
-        var (classes, picked) = main.BuffSetClassSource(s);
+        // The RESOLVED source, not a hardcoded "inferred" — Bevel, Helm-signed
+        // 2026-08-23: passing ClassSource.Inferred always meant "a dump-sourced trio still
+        // reads as a guess", which is the exact fact-vs-guess distinction these words exist
+        // to carry.
+        var (classes, classSource) = main.ClassSourceFor(s);
         // The class filter, visible: the combination this set is assembled for, its
         // source named honestly — the log has no /who or loadout-change line to read.
         SubText.Text = main.BuffSetCharacterName + " · " + (classes.Count > 0
@@ -862,7 +866,7 @@ public partial class BreakoutWindow : Window
             // one of the three things this can now be, and said nothing at all when the
             // GAME had told us via an achievements dump.
             ? string.Join("/", classes.Select(QuestClassFilter.Abbrev))
-                + (picked ? "" : $" ({CharacterClasses.SourceLabel(ClassSource.Inferred)})")
+                + $" ({CharacterClasses.SourceLabel(classSource)})"
             : "no classes known yet");
         SubText.ToolTip = "Classes come from your Quest Tracker picks, falling back to the class "
             + "inferred from your combat log — EQ Legends logs announce no loadout changes, so "

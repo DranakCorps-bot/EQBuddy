@@ -1686,7 +1686,10 @@ function boot() {
           // Optimistic: the view narrows now; the PC saves the pick with this
           // character (the desktop ⚙ popup's own SetClasses) and confirms next push.
           d.classes = catalog.allClasses.filter(c2 => names.includes(c2.name));
-          if (names.length) { d.inferredClass = null; d.characterClasses = null; }
+          // Identity survives a pick — it is not the filter (Bevel, Helm-signed). Only
+          // the old single-class field is cleared, and only because the pre-identity page
+          // used it AS the filter line.
+          if (names.length) d.inferredClass = null;
           sendTick("quests", "classes|" + names.join(","), true);
           redraw();
         };
@@ -1722,19 +1725,25 @@ function boot() {
           out.push(el("div", "empty", "Nothing matches. Searches cover quest names, turn-in "
             + "items, rewards, quest givers, and zones — try fewer words."));
       } else {
-        // The whole class list and where it came from, both decided on the PC
-        // (CharacterClasses.Resolve) — a Legends character is up to three classes and this
-        // line used to name one. `characterClasses` is newer than `inferredClass`; the old
-        // field is still sent for a release because an open phone runs the page it
-        // downloaded weeks ago (trap 32), so fall back to it rather than going blank.
-        scopeLine.textContent = !d.classes || !d.classes.length
-          ? (d.characterClasses && d.characterClasses.length
-            ? "🎭 Filtering for " + d.characterClasses.join(" · ")
-              + (d.classSourceLabel ? " (" + d.classSourceLabel + " — pick classes to override)" : "")
-            : d.inferredClass
-              ? "🎭 Filtering for " + d.inferredClass + " (inferred from your log "
-                + "— pick classes to override)"
-              : "")
+        // WHO THIS CHARACTER IS, and how we know — not what the list is filtered to.
+        // Bevel, Helm-signed 2026-08-23: "identity stays on screen after picks. It is not
+        // the filter. Do not say 'override'." Two things follow, and both were wrong here:
+        //   - it is shown whether or not classes are picked. Hiding it the moment they tick
+        //     the picker hid "the game said Warrior/Druid/Monk" exactly when they need it.
+        //   - it carries NO verb. "pick classes to override" told the player to override
+        //     their own character, which is the #104 error in one parenthetical; the picker
+        //     is a lens over identity, not a replacement for it.
+        // The words come from Core's one SourceLabel table — the page must not compose a
+        // second sentence around them. `inferredClass` is the trap-32 fallback for a phone
+        // still running the page it downloaded before this field existed.
+        const idClasses = (d.characterClasses && d.characterClasses.length)
+          ? d.characterClasses.join(" · ")
+          : (d.inferredClass || "");
+        const idSource = (d.characterClasses && d.characterClasses.length)
+          ? (d.classSourceLabel || "")
+          : (d.inferredClass ? "inferred from your log" : "");
+        scopeLine.textContent = idClasses
+          ? "🎭 " + idClasses + (idSource ? " (" + idSource + ")" : "")
           : "";
         const names = lens ? [lens.name] : viewClasses().map(c => c.name);
         const mine = d.mine.map(n => byName.get(n.toLowerCase())).filter(Boolean);

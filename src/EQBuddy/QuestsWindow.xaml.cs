@@ -472,7 +472,11 @@ public partial class QuestsWindow : Window
         // classes, so this is a reading, not a fact).
         var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
         var classes = picks.Count > 0 ? picks : resolved.ToList();
-        var inferred = picks.Count > 0 ? "" : string.Join(" · ", resolved);
+        // WHO the character is, shown whether or not classes are picked — Bevel,
+        // Helm-signed 2026-08-23: "identity stays on screen after picks. It is not the
+        // filter." Hiding it the moment they tick the picker hides the game's own answer
+        // exactly when they are deciding what to look at.
+        var identity = string.Join(" · ", resolved);
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing it here covers the catalog, the zone view and the
         // item-driven tabs at once. A stale lens (you dropped that class) is ignored
@@ -482,7 +486,7 @@ public partial class QuestsWindow : Window
         else if (_classLens is not null && !classes.Contains(_classLens, StringComparer.OrdinalIgnoreCase))
             _classLens = null;
 
-        var sig = $"{key}|{filter}|{_mode}|st:{_state}|{string.Join("+", classes)}|inf:{inferred}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
+        var sig = $"{key}|{filter}|{_mode}|st:{_state}|{string.Join("+", classes)}|id:{identity}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
@@ -503,10 +507,11 @@ public partial class QuestsWindow : Window
             RenderChecklist(_tab, filter, classes);
             return;
         }
-        if (inferred.Length > 0)
+        if (identity.Length > 0)
         {
-            var note = Note($"Filtering for {inferred} ({CharacterClasses.SourceLabel(classSource)}" +
-                " — pick classes above to override)", "Info");
+            // No verb. "pick classes above to override" told the player to override their
+            // own character; the picker is a LENS over identity (#104), not a replacement.
+            var note = Note($"{identity} ({CharacterClasses.SourceLabel(classSource)})", "Info");
             QuestsPanel.Children.Add(note);
         }
 

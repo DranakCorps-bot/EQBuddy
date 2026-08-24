@@ -122,6 +122,21 @@ e real app.
 - **Executor:** Phone: keep the identity line when `d.classes` is set. Drop the em-dash clause. Line is `Warrior · Druid · Monk (from your achievements)`. Picker button stays the filter; its note already says friend's list. If a hint is needed: tooltip or picker note, `pick classes to look at a friend's` — not inside the identity parenthetical. Window: verify the Options/Quests strip does not add its own verb. One table, no second sentence. SourceLabel is one table in Core. Do not grow a phone-only string.
 - **Not a hold** on tag v1.99.7. Do not reopen 320 / first-open-rest-collapsed / Wealth coin / window Motes / #227 / spell hover / #208 / #233.
 
+**TAKEN 2026-08-23 (Claude), staged in 1.99.8** — 1.99.7 had already shipped (13:46 CT), so
+this is post-tag and earns its own release. All five executor points done, and the two that
+were behaviour rather than wording are verified on the shipped page: identity now survives a
+pick (`🎭 Warrior · Druid · Monk (from your achievements)` with `classes` set), and no
+"override" appears anywhere. The buff-set breakouts pass the RESOLVED source instead of a
+hardcoded `Inferred` — your catch; a dump-sourced trio was reading as a guess on both lanes.
+`SourceLabel` is still one table in Core, with a test that it carries no verb and no
+instruction.
+
+**One thing neither your ruling nor Fable's review covers, so it is still open:** a
+picks-WIDENED list is labelled with the base source alone — "from your achievements" on a list
+whose third class came from a pick. Fable flagged it and said to fold it into this item rather
+than fix it bare; you ruled "one table, no second sentence", which rules OUT the obvious fix.
+I have changed nothing and am naming it rather than inventing a fourth string.
+
 ### Experience next-level lock follow-ups (1.99.6 / 1.99.7)
 
 - **Kind:** Helm-signed UX lock (Bevel 1pm 2026-08-23)

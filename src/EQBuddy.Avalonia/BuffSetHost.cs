@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Avalonia;
 
@@ -25,6 +25,13 @@ public interface IBuffSetHost
     /// <summary>The active class combination, and whether it was picked or inferred —
     /// every surface that shows the combination says which source it came from.</summary>
     (IReadOnlyList<string> Classes, bool Picked) BuffSetClassSource(StatsSnapshot s);
+
+    /// <summary>The same combination with its REAL source rather than a picked/not
+    /// boolean — the dump, the log or the picks (<see cref="CharacterClasses.Resolve"/>).
+    /// A surface that prints where the classes came from needs the three-way answer: with
+    /// only a boolean it has to guess "inferred" for everything that is not a pick, and a
+    /// dump-sourced trio then reads as a guess (Bevel, Helm-signed 2026-08-23).</summary>
+    (IReadOnlyList<string> Classes, ClassSource Source) ClassSourceFor(StatsSnapshot s);
 
     List<string> AssembledBuffSet(IReadOnlyList<string> classes);
     List<(string Class, List<BuffSetEntryState> Entries)> BuffSetSectionStates(StatsSnapshot s, DateTime now);

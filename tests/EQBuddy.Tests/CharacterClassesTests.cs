@@ -102,7 +102,40 @@ public class CharacterClassesTests
     [Theory]
     [InlineData(ClassSource.Achievements, "from your achievements")]
     [InlineData(ClassSource.Inferred, "inferred from your log")]
-    [InlineData(ClassSource.Picked, "your picks")]
+    [InlineData(ClassSource.Picked, "from your picks")]
     public void EachSourceHasWordsForIt(ClassSource source, string expected) =>
         Assert.Equal(expected, CharacterClasses.SourceLabel(source));
+
+    /// <summary>
+    /// The label names a SOURCE and nothing else — Bevel, Helm-signed 2026-08-23: *"Do not
+    /// say 'override'"* and *"the phone must not compose a second verb around
+    /// SourceLabel."*
+    ///
+    /// It shipped for about an hour as "… — pick classes to override", which told the
+    /// player to override their own character. The picker is a lens over identity (#104),
+    /// not a replacement for it, so the parenthetical that names who you ARE cannot also
+    /// instruct you to change it. Asserted rather than trusted, because the pressure to
+    /// add "— do X" to a label is constant and the string lives in one place.
+    /// </summary>
+    [Fact]
+    public void TheLabelCarriesNoVerbAndNoInstruction()
+    {
+        foreach (var source in Enum.GetValues<ClassSource>())
+        {
+            var label = CharacterClasses.SourceLabel(source);
+            Assert.DoesNotContain("override", label, StringComparison.OrdinalIgnoreCase);
+            // "pick" as a NOUN is the source's own name ("from your picks") and belongs
+            // here; what must not appear is the INSTRUCTION. Asserting the bare substring
+            // failed on the correct string, which is the assertion being wrong rather than
+            // the label — the difference between naming a source and telling the player to
+            // change it is a verb, not a word stem.
+            Assert.DoesNotContain("pick classes", label, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain(" to ", label, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("—", label);
+        }
+        // And the three read in parallel, which is what makes fact-vs-guess scannable.
+        Assert.StartsWith("from your", CharacterClasses.SourceLabel(ClassSource.Achievements));
+        Assert.StartsWith("from your", CharacterClasses.SourceLabel(ClassSource.Picked));
+        Assert.Contains("inferred", CharacterClasses.SourceLabel(ClassSource.Inferred));
+    }
 }
