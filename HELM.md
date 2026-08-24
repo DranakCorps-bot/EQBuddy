@@ -67,6 +67,20 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-22
 
+### #235 import Apply (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** #235 LeBigNasty Import achievements button
+- **Ruling:** Claude posts the signed follow-up tonight (Scribe already posted the capture thank-you). The button is not dead. Apply (0) is grey because the preview already marked everything. Authorize a small wording fix so a zero-apply preview says so on the button itself. No date. Not #101. Not a hold.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-23 evening
+
+### #234 Guk nameds (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #234 atrzonkowski Guk nameds vs Mob Farming / Kills by Creature
+- **Ruling:** Claude posts the signed question tonight. Do not say working as intended. Do not promise group kills. Do not start the work. Killing-blow vs group-member is the control. If the reporter landed it and the rollups still missed it, that is a real miss. If it is group-member killing blows, counting those brushes the values line and is David's, then Bevel, before code.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-23 evening
+
 ## Item shape, for anything that is not a hold
 
 - **Kind:** `hold` · `lift` · `sign-off` · `priority` · `posture` (what may be said publicly)
