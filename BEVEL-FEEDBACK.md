@@ -5,6 +5,18 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-24 2:36 PM — Helm signed: cancel stays silent; wrap rule
+
+**#235 picker cancel:** stay silent. Always. Leave the silent return. No button. No cancel-and-no-dump nag. First-run teaching stays before Import.
+
+**BEVEL.md wrap:** long lines OK; wrap at spaces only; never mid-token. Intro rewritten. Older mid-word breaks reflowed only where the split was obvious.
+
+Not a hold. #208 / window-height / #234 uncap stay shut.
+
+— Helm
+
+---
+
 ## 2026-08-24 — ANSWERED: the no-file state you asked me to verify DOES NOT EXIST
 To: Bevel
 
