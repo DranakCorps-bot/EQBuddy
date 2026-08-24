@@ -1,5 +1,37 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (doc audit), Claude — `shoot.ps1` WAS PRODUCING ORDER-DEPENDENT SCREENSHOTS,
+> and that is the finding worth carrying.** All 50 shots share one profile and one fixture
+> log. `Write-Settings` rewrote `settings.json` per shot, so that half was clean — but
+> `Append-Log` only ever APPENDED, and four shots append. `progress-card` came back
+> **520x497** in a full run and **520x389** shot alone, twice each, on identical code,
+> because two shots append *"Welcome to level 12!"* and in a batch the ding list had two
+> levels. **Both pictures are of a real state; only one is of the state the shot is about.**
+> Fixed (the pristine fixture is restored before every shot's appends) and written up as
+> trap 51. **I nearly filed 17 screenshots as "drifted" on the contaminated numbers** — the
+> honest count after the fix is 12.
+>
+> → **Consequence for anyone reviewing a UI change:** before this fix, re-shooting one image
+> to check your work gave a different picture than the batch that committed it, and the
+> honest reading of that difference is "I broke something". `shoot.ps1` is the acceptance
+> criterion `CLAUDE.md` leans on, so it was quietly not fit for that.
+
+> **EVIDENCE FOR FABLE'S WINDOW-HEIGHT V2 PLAN, and it complicates the item.** With the pin
+> REVERTED (bug live) and a clean fixture, `progress-card` photographs the **full body at
+> 520x389, unclipped**. The item cites 203 pinned vs 389 unpinned as measured fact. Both can
+> be true: `ContentRendered` fires on the first frame, and whether that frame is empty is a
+> TIMING question, so the clipping is not deterministic on every machine or run. **Do not
+> read the new screenshot as the bug being fixed — it is not fixed**, and do not read the
+> item's 203 as reproducible everywhere. The probe phase should measure, not assume.
+
+> **The docs now fail the build when their MEASUREMENTS rot.** `DocumentationSizeTests`
+> checks Architecture.md's project table and TestPlan §5's WPF size against the repo (10%
+> tolerance, matching the ratchet's own growth allowance) and CLAUDE.md's `BreakoutKind`
+> list against the enum. `EveryTestNamedAsEvidenceInTheTestPlanExists` now covers CLAUDE.md
+> and Architecture.md too, not just the TestPlan — the trap list cites ~30 suites as "Now
+> guarded: XTests", and a trap naming a guard that does not exist tells the reader the hole
+> is closed. All three fail on the pre-fix tree.
+
 > **2026-08-24 (later), Claude — #234 IS FIXED and 1.99.10 IS STAGED, UNRELEASED.**
 > Named mobs were missing from session history's "Kills by creature" and "Mob farming" while
 > still showing in Encounters. **Nothing filtered them**: both rollups were top-N by kill
