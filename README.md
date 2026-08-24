@@ -51,21 +51,21 @@ page instead.
 
 | | |
 |---|---|
-| ![Compact view](docs/screenshots/widget-compact.png) | ![Expanded details](docs/screenshots/widget-expanded.png) |
+| ![Compact view](docs/screenshots/widget-cards.png) | ![Expanded details](docs/screenshots/widget-expanded.png) |
 | **The widget at a glance** — one line per card: Combat, Healing, Kills & Drops, Quests, Gear & Loot, Watch, Buffs, Progress, Motes and Travels & Deaths. Click any card to expand it. (The 1.98/1.99 organizing pass folded the old Money, Faction, Raids and Motes cards into **Progress**, Loot and Gear into **Gear & Loot**, Kills and Drops-by-Creature into **Kills & Drops**, and Sky Quest and Epics into **Quests** — every one of them can be switched back on individually in ⚙ Options → Cards & windows.) | **Full drill-down** — damage per skill with crit *and miss* rates inline, hit ranges on hover, last-fight breakdowns, and both session DPS models labeled: in-combat and wall-clock |
-| ![Fight timeline](docs/screenshots/fight-timeline.png) | ![Buffs, raids and watch cards](docs/screenshots/widget-cards.png) |
+| ![Fight timeline](docs/screenshots/fight-timeline.png) | ![Raid targets in the Progress window](docs/screenshots/raids-card.png) |
 | **Fight timeline** — the whole pull on one canvas: a lane per skill, solid bars for hits (taller = harder, bright = critical), hollow outlines for misses and resists with the log's own words on hover, dotted markers where you swapped stance or invocation, and a smoothed DPS-over-time graph whose curves mathematically can't exaggerate — colors are colorblind-validated, and damage you took wears blue so red always means trouble | **Buff timers & raid targets** — buffs count down with honest `est` labels until a natural fade teaches your character's *real* duration; the Progress window's Raids tab remembers every raid target your log saw die, now with **D0–D4 difficulty badges** for the highest tier a witnessed kill proves |
 | ![Inventory tab of Gear & Loot](docs/screenshots/gearloot-inventory.png) | ![Behavior options](docs/screenshots/options-behavior.png) |
 | **Gear Locker is now the Inventory tab of the Gear & Loot card** — every wearable you own, grouped by slot and compared against the rest of your bags: an item beaten on every stat by something else you hold gets flagged **⬇ outclassed**, a dump candidate by arithmetic, not taste. Stats come from the built-in 11,000+-item catalog, instantly — never "BiS", it ranks *your* bags | **It gets out of your way** — hide the widget when the game loses focus, or whenever the game isn't running at all; a tray icon stays put so EQBuddy is always one click from coming back |
 | ![Drops by Creature](docs/screenshots/drops-window.png) | ![Quest Tracker](docs/screenshots/quest-tracker.png) |
 | **Drops by Creature** — your personal drop rates per mob, with ✦ marking drops the [community wiki](https://eqlwiki.com) doesn't know yet and **✦ Copy for wiki** building a paste-ready contribution | **Quest Tracker** — 1,172 wiki quests as a scannable list beside a detail pane; loot something a quest wants and its row flips to **ready** with a green rule down its edge, sorted by how close the quest is to where you're standing |
-| ![Sky Quest checklist](docs/screenshots/sky-quest.png) | ![Spawn timers](docs/screenshots/spawns-window.png) |
-| **Plane of Sky checklist** — all 222 turn-in items, a tab per class; loot auto-checks *your* class's boxes, and a reward's own checkbox marks the quest turned in | **Spawn timers** — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
+| ![Sky checklist in the Quest Tracker](docs/screenshots/sky-checklist.png) | ![Spawn timers](docs/screenshots/spawns-window.png) |
+| **The Sky Quest card is now the Plane of Sky tab of the Quest Tracker** (right-click → *Quest tracker…*, or the Quests card) — all 222 turn-in items, filtered by a class chip strip rather than a card per class; loot auto-checks *your* class's boxes, a **Ready to turn in** block leads with what you can hand in right now, and a reward's own checkbox marks the quest turned in | **Spawn timers** — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
 | ![Session history with progress charts](docs/screenshots/history-progress.png) | ![Review an archived session](docs/screenshots/session-picker.png) |
 | **Session history & progress charts** — every session in a local, searchable database (notes, tags, compare, export), and per-character **level and AA charts**: every ding at its exact time, a staircase not a slope | **Archive review** — replay any saved log read-only; a multi-session file asks which evening you meant. Drops and wiki export work on the past |
-| ![Mini dashboard](docs/screenshots/widget-mini-chips.png) | ![Breakout windows](docs/screenshots/breakout-windows.png) |
+| ![Mini dashboard](docs/screenshots/mini-bar.png) | ![Breakout windows](docs/screenshots/damage-breakout.png) |
 | **Mini mode** — a one-line pill of your starred stats plus live watch-rule chips; alerts still pop | **Breakout windows** — floating bar charts for your damage, healing, and pet, per fight or per session |
-| ![Options, tabbed](docs/screenshots/options-tabs.png) | ![See-through mode](docs/screenshots/widget-seethrough.png) |
+| ![Options, tabbed](docs/screenshots/options-mez.png) | ![See-through mode](docs/screenshots/widget-seethrough.png) |
 | **Options, now in tabs** — Look · Alerts & chips · Watch rules · Cards & windows · Behavior. The alerts tab shown: the 🐌 slow alert (with its spoken voice and raid-only mode) and the buff-timer display controls | **See-through mode** — the panel fades, the text stays sharp; with click-through on, the game gets every click |
 | ![Zone map](docs/screenshots/map-window.png) | ![Travel route](docs/screenshots/travel-window.png) |
 | **Zone map** — classic map packs with your `/loc` marker, a comet-tail breadcrumb trail, and **spawn-point circles** learned from your own kills; every running spawn timer shows in the side panel **and** as a camp pin with its countdown | **Travel route** — hop-by-hop directions from where you stand to any zone, from the same graph that sorts quests by distance |
@@ -368,10 +368,12 @@ Quests (tracker, Sky checklist, ledger):
   what the log sees leave — sales, merges, destroys), so a quest flips to **✓ ready**
   the moment you hold everything it needs; hand-ins aren't in the log, so click ✓ when
   you turn in. Click a quest name for the full wiki walkthrough.
-- **Plane of Sky checklist**: an overlay card tracking all 222 Sky turn-in items with
-  a tab per class (contributed by dandrews2930). Loot auto-checks boxes for the class
-  tab you use, and each reward line is its own "I turned this in" checkbox — completed
-  quests dim their items and stay done across restarts.
+- **Plane of Sky checklist**: all 222 Sky turn-in items (contributed by dandrews2930).
+  It used to be its own overlay card with a tab per class; **it is now the Plane of Sky
+  tab of the Quest Tracker**, filtered by a class chip strip. Loot auto-checks boxes for
+  the classes you play, a **Ready to turn in** block leads with what you can hand in right
+  now, and each reward line is its own "I turned this in" checkbox — completed quests dim
+  their items and stay done across restarts.
 - **The accuracy contract.** Quest data mirrors [eqlwiki.com](https://eqlwiki.com) —
   EQBuddy is exactly as accurate as the wiki is, no more and no less. We hold up our
   half: every quest's turn-in items are **verified item-for-item against the live

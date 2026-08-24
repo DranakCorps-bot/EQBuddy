@@ -61,6 +61,61 @@ next loop, not a reopening of the plan.
 
 ---
 
+## README screenshots: 13 of 24 still cannot be regenerated, and `history-progress` needs real staging
+To: Fable
+
+- **Priority:** `ready`. No `needs-david:` — he already chose "add shots for the easy ones"
+  (2026-08-24, question tool) and the easy ones are done.
+- **Class:** V1 for most of it; the one genuinely hard shot is scoped below.
+- **Source:** the 2026-08-24 doc audit. README embedded `gear-locker.png` (a standalone
+  window deleted in the 2026-08-21 fold) and `sky-quest.png` (a widget card replaced on
+  2026-08-16), plus `widget-compact.png` — a **v1.51-era** capture with an "Update v1.51.0 is
+  ready" banner in it, showing Kills, Loot, Sky Quest, Money and Faction as separate cards.
+
+### What is already done
+
+Six README images were repointed at shots `shoot.ps1` already produces, which is cheaper than
+adding duplicates: compact widget → `widget-cards`, Sky → `sky-checklist`, mini → `mini-bar`,
+breakouts → `damage-breakout`, options → `options-mez`, and the freed row → `raids-card`.
+Regenerable coverage went **5/24 → 11/24**. The three stale originals are still on disk,
+unreferenced, deliberately not deleted — a live Reddit post may hotlink them.
+
+### `history-progress` — attempted, reverted, and here is why
+
+I built `EQBUDDY_HISTORY=charts` (open History with nothing selected) plus a
+`SelectFirstCharacterFilter` helper, shot it twice, and **reverted the lot** rather than ship a
+hook with no working shot (trap 43's shape). Both captures were empty-state pictures, which is
+exactly the thing trap 22 says reads as reviewed anyway.
+
+**The preconditions, which are in `HistoryWindow.RenderProgress` and were written down
+nowhere** — this is the useful part of the attempt:
+
+1. `_vm.FilterIsSingleCharacter` must be true. "All characters" collapses the charts entirely
+   ("would braid unrelated ladders"), so the capture must select a character in `CharFilter`.
+2. **No session may be selected** — picking one replaces the charts with the detail pane.
+3. There must be `dings` or cumulative AA to plot, **across more than one session**.
+
+(3) is what defeated it. `Prime` builds its extra log from a **prefix** of the fixture
+(`$lines[0..take]`), and `Append-Log` appends to the END, so an appended "Welcome to level N!"
+is unreachable at any fraction below 1.0 — and repeated same-character primes gave one session,
+not three. Staging this needs per-prime-run log content, which `Prime` does not currently
+support. **That is the actual work item, and it is bigger than a shot.**
+
+### The other 12, for whoever picks this up
+
+`cursor-ring`, `feedback-and-alert`, `fight-timeline`, `map-window`, `mobile-map-phone`,
+`mobile-map-tablet`, `options-behavior`, `session-picker`, `spawn-circles`, `travel-window`,
+`widget-seethrough`, `zone-share`. `options-behavior` and `session-picker` look closest to
+free — both are ordinary windows the existing hooks nearly reach. The map/mobile/travel ones
+need a live zone or a phone viewport and are their own item.
+
+**None of these is urgent**: unlike `gear-locker` and `sky-quest`, every one of them depicts a
+surface that still exists. The risk is slow rot, not a lie on the page today.
+
+— Dranak (Claude Code)
+
+---
+
 ## Window height follows content — attempt 2, after the harness disproved attempt 1
 
 - **Priority:** `ready`. Probe first (below); the probe's answer picks between two designs,

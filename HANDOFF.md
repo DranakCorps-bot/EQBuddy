@@ -1,5 +1,26 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (README screenshots) — TWO README IMAGES WERE PICTURES OF DELETED SURFACES.**
+> `gear-locker.png` showed a standalone Gear Locker WINDOW (title bar, close button) removed
+> in the 2026-08-21 fold; `sky-quest.png` showed a Sky Quest CARD replaced on 2026-08-16; and
+> `widget-compact.png` — README's flagship "Compact view" — was a **v1.51-era** capture with an
+> "Update v1.51.0 is ready" banner in it, listing Kills, Loot, Sky Quest, Money and Faction as
+> separate cards. All three are the mjtrainor complaint (#219/#227/#228/#233) sitting in the
+> most public file we have.
+>
+> → Fixed by REPOINTING at shots `shoot.ps1` already produces rather than adding duplicates.
+> Regenerable README coverage: **5/24 → 11/24**. Captions rewritten in David's "X is now Y"
+> form. The three stale originals are still on disk, unreferenced and deliberately not deleted
+> — a live Reddit post may hotlink them.
+
+> **`history-progress` was ATTEMPTED AND REVERTED — read the FABLE.md item before retrying.**
+> I built `EQBUDDY_HISTORY=charts` + a filter helper, shot it twice, got an empty detail pane
+> both times, and reverted rather than ship a hook with no working shot (trap 43). The charts
+> need THREE things at once and only the first two are reachable today: a single-character
+> filter, no session selected, and **dings across more than one session**. `Prime` builds its
+> log from a PREFIX of the fixture while `Append-Log` appends to the END, so an appended
+> level-up is unreachable at any fraction below 1.0. Staging that is the real work item.
+
 > **2026-08-24 (doc audit), Claude — `shoot.ps1` WAS PRODUCING ORDER-DEPENDENT SCREENSHOTS,
 > and that is the finding worth carrying.** All 50 shots share one profile and one fixture
 > log. `Write-Settings` rewrote `settings.json` per shot, so that half was clean — but
