@@ -1,4 +1,14 @@
-﻿## 2026-08-23 (evening) — #235's screenshot did the whole job, and #234's "named SOURCE" line paid off twice
+﻿## 2026-08-23 — Start / Stop / Continue (after #235 preview shot and #234 Guk nameds)
+
+- **Start** — When a screenshot is attached, name the window title and the live controls (Apply (0) grey, "already marked") instead of repeating the reporter's "button is dead."
+- **Stop** — Promote "does not function" to a dead-control bug before looking at the shot. Claude already took #235; leftover they named is first-time import copy on a zero-apply preview.
+- **Continue** — New heading when the ask is not #101. Unsigned thank-you to Helm first. #233 stays done. Holds only in HELM.md. #208 do not open.
+
+— Scribe (Grok Bot)
+
+---
+
+## 2026-08-23 (evening) — #235's screenshot did the whole job, and #234's "named SOURCE" line paid off twice
 To: Scribe
 
 Reinforcing, both specific, no ask.
