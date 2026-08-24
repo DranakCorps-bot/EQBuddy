@@ -157,14 +157,6 @@ e real app.
 - **Executor:** verify the no-file state. Do not add a button. Do not reopen window Motes / #227 / 320 / class-source / ding heading / window-height V2.
 - **David:** none.
 
-### #234 History lists: uncap; Top bars stay ranked
-- **Priority:** approved (Helm signed Mon 1pm Aug 24. 1.99.10 as built. Not a hold.)
-- **Place:** Session History window. Kills by creature / Mob farming. Native Top damage sources / Top heals bars.
-- **Finding:** Uncap on Kills by creature / Mob farming is right. History is a review surface after play; a named killed once is the row you remember; silent top-N by kill count hid it. That is the #234 miss class.
-- **Decided:** Do not put the cap back. Whale length later is grouping, not a silent trim. Where a cap survives, it must say so: `… and N more {noun}`. Pet inline `… and N more` (no noun) stays; do not grow a second pattern. Native Top damage / Top heals bars: do NOT add AppendMore. The word Top already names a ranking. Bars are glance. Copy summary / the text dump is the complete-ish record, and that dump now says so. Different jobs.
-- **Executor:** nothing this tag. 1.99.10 can ship as built.
-- **David:** none.
-
 ### Class-source line: keep the three words, drop "override", keep identity visible
 - **Priority:** approved (Helm signed early 8pm Aug 23. Claude flagged e9ffe77 as unruled. Bevel ruled it.)
 - **Place:** phone Quests (verified). Window Quests / Options / buff breakouts share Core `CharacterClasses.SourceLabel` (reasoned from the table, not a picture).

@@ -16,9 +16,21 @@
 > Sky."* Taking instance behaviour as universal would have shipped a wrong timer to everyone
 > in the public zone. He has been asked to put the three-mobs detail on the eqlwiki page.
 
-> **Nothing is pending in the inboxes.** PR #236 merged; #235 and #109 both answered and
-> closed; feedback written to Scribe (x2), Bevel and Helm this round. **#208 is still the only
-> live Helm hold.** 1.99.10 remains staged and untagged with the review sitting with Fable.
+> **v1.99.10 SHIPPED, 2026-08-24 ~13:24 CT — Fable reviewed it, fixed the one defect, and
+> tagged it on David's go.** Verified: tag pushed, GitHub release Latest (18:25Z), OneDrive
+> stamped 13:24, signed CN=FlossworksCross-Stitch. The pre-tag fix: the What's-new claimed
+> every surviving list limit announces itself, but the overview text still silently capped
+> damage sources (8), heals (6) and pet abilities (8) — all three now print "... and N more",
+> guarded by `OverviewAnnouncesEverySurvivingCap`. Bevel's Helm-signed 1pm ruling converged
+> on every one of those calls independently ("1.99.10 can ship as built"); its #234 item is
+> taken and deleted, feedback written. **Bevel's #235 item (no-file first-run import state)
+> is the executor's next-loop verify.** All other challenged review items ratified; the
+> coverage-gate change verified as a must-list, not a loosening.
+
+> **Inboxes after this round:** #208 is still the only live Helm hold. `FABLE.md` carries the
+> window-height V2 plan (probe now has TWO questions — Claude's `HeightChanged` addition was
+> adopted), the README-screenshots item (ruled ALL V1, executor's, no plan needed), and the
+> two older `ready` plans. `BEVEL.md` holds #235 first-run and the older first-run-flow item.
 
 > **`LogParser.cs` has FIVE lines of ratchet headroom** (933 / 938). Not urgent and nothing is
 > blocked, but the next parser change hits the wall — and the standing move is to lift logic

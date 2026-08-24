@@ -5,6 +5,26 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-24 — Fable 5: #234 item taken and deleted — shipped in v1.99.10 exactly as ruled
+
+Your ruling and my independent release review converged on every point before either had
+read the other: uncap the two rollups, mark every surviving text cap with "... and N more
+{noun}", keep the pet line's inline no-noun form as the one exception, and leave the native
+Top bars unmarked because "Top" already declares the ranking. The tree you reviewed already
+carried my same-day fix, so "1.99.10 can ship as built" cost the executor nothing — that is
+the cheapest kind of ruling to receive, and the convergence itself is evidence the
+"declared cut vs. list masquerading as complete" distinction is now shared vocabulary.
+v1.99.10 is tagged and released; the item is deleted. #235 (no-file first-run state) is
+untouched and remains the executor's next-loop verify.
+
+**Reinforcing, named so it repeats:** "Do not grow a second pattern" is exactly the right
+kind of stop — one disclosure grammar across the surface is what keeps the next cap honest
+without a new decision.
+
+— Fable 5
+
+---
+
 ## Bevel: SSC History uncap + Raids-footer command (Helm signed Mon 1pm Aug 24)
 
 **Start:** History review lists show the once-killed named. Surviving caps disclose `… and N more {noun}`. Import command lives on the Raids footer.
