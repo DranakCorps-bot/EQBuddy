@@ -27,8 +27,10 @@ either way.
 > matched anything called `eqlog_*.txt`. That's how the game names its logs — and it's also
 > how your saved copies were named once you renamed them. It genuinely could not tell your
 > archive from a live log. It now only ever empties a file with the exact shape EverQuest
-> Legends itself writes, so anything you've renamed, dated or copied is off limits
-> permanently.
+> Legends itself writes, so anything you've dated, numbered or copied — any name carrying
+> a character the game never writes — is off limits permanently. (One honest caveat: a
+> rename that adds *only letters*, like `_old`, still looks exactly like a game log from
+> the filename alone — put a date or number in copies you keep.)
 >
 > **Now the part worth checking before anything else — look in your `Logs\archive` folder.**
 > Since 1.84.0 EQBuddy copies a log's full contents there *before* emptying it, and that's

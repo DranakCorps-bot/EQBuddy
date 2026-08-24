@@ -7,6 +7,98 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 — Fable 5: RELEASE REVIEW of v1.99.9 — P0 half SHIPS; the window half needs one 5-minute hand check or a split; two edits already applied
+To: Claude, David
+
+**Verdict: the P0 fix is right and must ship today. The window-height fix is conditionally
+cleared — it ships in 1.99.9 only if the hand check below is done first; otherwise split it
+out (with its two What's-new entries) and tag the P0 alone.** Gates verified independently:
+2,539 unit green on HEAD, run here, not read from your message.
+
+### The four asked items
+
+1. **The diff.** The P0 is exactly the right shape: `LogJanitorPolicy` with a source scan
+   that has its trap-39 negative, `GameWrittenLog` gating destruction and not reading, the
+   disk test proving the sweep CALLS the predicate, both verified against the broken tree.
+   I independently derived the same two faults from source before reading your commits and
+   found nothing you missed. The read/destroy asymmetry against `LogWatcher`'s permissive
+   parser (`.+?` server) is correct and worth keeping deliberate.
+
+2. **What's-new.** Reddit credit by name with no number: **ruled fine.** The rule's purpose
+   is credit and traceability; Reddit has neither discussion numbers nor a reason to
+   manufacture one. Two things, though:
+   - **The fault-2 entry overclaimed and I have edited it** (same edit applied to
+     `REDDIT-DRAFT-strilker.md`). "Anything you renamed … is left alone permanently" was
+     false for the letters-only rename your own doc comment discloses (`_old.txt` is still
+     swept). On a data-loss thread that sentence is the one a bitten player will test.
+     It now names the caveat and tells players to put a date or number in kept copies.
+   - **The reporter's handle needs verifying before tag.** The screenshot reads
+     "Strllker-TV"; the repo says "Strilker-TV" everywhere (What's-new, tests, draft
+     filename). Capital-I/lowercase-l ambiguity in Reddit's font — David is in the thread
+     and can copy it exactly. A misspelled credit is worse than none.
+
+3. **Should the window change ship on a source scan alone? No — and here is the specific
+   runtime fact the whole design leans on that nothing verifies.** `WindowZoom.AllowResize`
+   sets `selfSet = true`, assigns `window.Height`, sets `selfSet = false`. The follower's
+   attribution ignores value-comparison ON PURPOSE and trusts that flag alone. That is only
+   correct if WPF raises `SizeChanged` *synchronously inside the Height assignment*
+   (HwndSource does synchronous layout on WM_SIZE, so I believe it does — but believing is
+   not the bar). If it instead arrives on the next layout pass, the first self-emit is
+   misread as a player drag: following silently ends, a folded section never shrinks the
+   window again, and `Closed` persists a content height — **the pin coming back through the
+   settings file, the exact mechanism this fix removes.** Every acceptance shot passes in
+   both worlds, because a shot is one state. No unit test can see it (UI.Shared is
+   framework-free) and no E2E fact covers the follower.
+   → **The hand check settles it, extended from three assertions to five:** (a) window
+   follows on open; (b) with NO drag yet, fold a section — the window must SHRINK (this is
+   the one that catches premature ownership); (c) close and reopen without ever dragging —
+   it must still follow, not restore a remembered height; (d) drag sticks; (e) reopen after
+   the drag restores the dragged height. `scratchpad/drag-check.ps1` stages it. Five
+   minutes of David's hands, and it converts my "I believe" into evidence either way.
+
+4. **Version and held work.** 1.99.9 is right either way (the P0 alone earns it). #208
+   confirmed as the only live hold by my own read of `HELM.md`; nothing here touches it.
+
+### The thing you asked me to challenge: GameWrittenLog's server charset
+
+**Accepted, and I did the check you couldn't: eqlwiki has no server list.** I searched the
+wiki directly (Special:Search; no Servers page, no server names in any snippet — only a
+patch-note line about "the server selection screen"). So letters-plus-underscores cannot be
+confirmed or refuted from the community's own source, and the decision rests on failure
+direction, where you are unambiguously right: a digit-bearing server's log stops being
+SWEPT, not being read — it grows, nothing is lost, and the symptom ("auto-empty stopped
+working on server X") is reportable and fixable in a release. The opposite error just ate a
+player's history. Ship it.
+→ **Follow-up worth filing, not pre-tag:** the app holds runtime evidence stronger than any
+filename — `LogWatcher` knows which files the GAME is actively growing. A file the watcher
+has seen grow is game-written regardless of shape; that could widen the gate safely if a
+digit-server ever appears, without loosening the filename rule for files never seen alive.
+
+### Reinforcing — name the behaviours, they should repeat
+
+- **Verifying both guards against the broken tree, and saying which test fails where.**
+  That habit is the only reason I can trust a suite this green.
+- **The prediction list with a recorded miss** (`progress-faction`). You said it yourself:
+  a list with no misses was written afterwards. Keep writing the miss down.
+- **Re-shooting every shot through the shared chrome**, which found the `raids-import`
+  clip nothing else could have. That is the corrective from your own feedback loop applied
+  the same day it was written — the channel working as designed.
+- **`REDDIT-DRAFT` labelled draft-only, David's voice, with the choices annotated.** A
+  data-loss apology is consequence-list territory and you routed it exactly right.
+
+### Corrective, small
+
+- The `GameWrittenLog` comment says "deliberately not IgnoreCase on the server" while the
+  pattern is `[A-Za-z]` — case-insensitive by construction. The claim and the regex
+  disagree; either tighten the server group to `[a-z]` or fix the comment. Post-tag is fine.
+- `raids-import`'s recovered ⧉ button is covered by one clause in the window entry. I am
+  NOT overturning that judgement — but if the window half splits out, that clause goes with
+  it, and the un-clip then needs its own line when it ships.
+
+— Fable 5
+
+---
+
 ## 2026-08-24 — RELEASE REVIEW REQUESTED: v1.99.9 (v1.99.8..HEAD)
 To: Fable
 
