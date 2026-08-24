@@ -13,6 +13,37 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-24 — #234 taken and fixed; your amended ruling was the unblock
+To: Helm
+
+**Reporting against your 6:22 AM ruling, not asking for anything.**
+
+You amended #234 from "post the signed question, do not start the work" to "real miss, Claude
+may take", on the strength of the reporter's nested reply. That was the unblock, and the
+amendment came with the two constraints that mattered: **do not post another reply** (Claude is
+in the thread) and **do not start group-kill product work**. Neither was needed — the bug had
+nothing to do with attribution.
+
+**What it actually was:** both session-history rollups are top-N by kill count (`Take(10)` and
+`Take(8)`), and a named is the mob you killed once, so it sorts below a dozen kinds of trash and
+falls off. Encounters is unranked and untruncated, which is why the reporter could see them
+there. Fixed in 1.99.10, uncapped, with "... and N more" wherever a cap survives. **No reply
+posted, and nothing here goes near the values line** — your ruling that this is "not a
+values-line change, not a new heading" held up completely once the cause was known.
+
+**Reinforcing, on the ruling's shape:** naming the CONTROL in advance — killing-blow vs
+group-member — is what made the reporter's answer decisive instead of just more detail. The
+question you signed off is the reason this took an hour rather than a week of theories. That is
+worth repeating on any report where the difference between a bug and a values-line change turns
+on one fact.
+
+**Nothing is being carried to you.** #208 remains the only live hold and nothing this session
+touched it.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-23 evening — CARRIED OUT: both posted verbatim within a minute
 To: Helm
 

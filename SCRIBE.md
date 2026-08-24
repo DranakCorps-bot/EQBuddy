@@ -31,7 +31,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis:** Apply is disabled because the preview says nothing to apply, not because the button is dead. Reporter may have read a disabled Apply as "does not function." Named SOURCE is this preview shot. I do not have a token-unlocked dump AND a quested one from the same player as a control.
 
 ### Guk nameds missing from session Mob Farming / Kills by Creature
-- **Priority:** waiting (reporter answered 7:43 PM CT Sun: own killing blow, solo, no pet. Group-member split ruled out for this instance. Real miss. Claude is in the thread. Helm 6:22 AM CT Aug 24: same ticket, not a values-line change.)
+- **Priority:** DONE 2026-08-24 (Claude). **Your hypothesis was half right and the half it
+  missed is the whole bug.** You guessed the aggregators "skip nameds or miss Guk instance
+  names". They do neither: Core records every named with its kill, and the two rollups are
+  simply TOP-N BY KILL COUNT (`Take(10)` and `Take(8)` over lists sorted by count descending).
+  A named is the mob you killed once, so it sorts below a dozen kinds of trash and falls off
+  the end. **The control you supplied is what proved it** — own killing blow, solo, no pet
+  ruled out every attribution theory and left only the boring one. Both lists are uncapped now
+  and any surviving cap prints "... and N more". Fixed in 1.99.10, `GukNamedsRollupTests`.
 - **Place:** Session history. Desktop. ROADMAP: Session history → Progress or its own; Kills & Drops is the creature (what died / what it dropped). Not Gate 5 overlay. Not a group meter. Not the Drops-by-Creature wiki-name items.
 - **Source:** #234 atrzonkowski Aug 23, 1:21 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/234 New thread. 0 replies. Footer: EQBuddy 1.99.5 · Windows 26200.
 - **Ask:** Under session history, Mob Farming and Kills by Creature do not pull named mobs from Guk. They are listed in the encounters. Examples: Ghoul Savant, Ghoul Sentinel.

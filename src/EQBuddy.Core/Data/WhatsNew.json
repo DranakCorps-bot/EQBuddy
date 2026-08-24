@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.99.10",
+    "date": "2026-08-24",
+    "highlights": [
+   "FIXED (discussion #234, thanks atrzonkowski) - YOUR NAMED KILLS ARE BACK IN THE SESSION SUMMARY. Under a session in History, \"Kills by creature\" and \"Mob farming\" were quietly showing only your top 10 and top 8 creatures by kill count - and a named is, by definition, the one you killed once. So an evening in Guk with a dozen kinds of trash at ten-plus kills each pushed Ghoul Savant, Ghoul Sentinel, Frenzied Ghoul and Bloodthirsty Ghoul off the bottom of both lists, while the Encounters list below them still showed every one. Nothing was ever missing from your data; the summary was cutting it off. Both lists now show everything you killed.",
+   "And where a list still has a limit, it now says so - \"... and 5 more items\" rather than simply stopping. A trimmed list that looks complete is what made this take a bug report to find: there was no way to tell a short session from a truncated one. The nameds are the part of a session you actually remember, which makes them the worst possible rows to drop silently."
+    ]
+  },
+  {
     "version": "1.99.9",
     "date": "2026-08-24",
     "highlights": [

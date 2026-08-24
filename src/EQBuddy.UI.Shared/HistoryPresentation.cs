@@ -77,7 +77,7 @@ public static class HistoryPresentation
             text.AppendLine("Top damage sources:");
             var grandTotal = Math.Max(1, snapshot.DamageBySource.Sum(source => source.Total));
             var topTotal = Math.Max(1, snapshot.DamageBySource.Max(source => source.Total));
-            foreach (var source in snapshot.DamageBySource.Take(8))
+            foreach (var source in snapshot.DamageBySource.Take(SourceCap))
                 text.AppendLine($"  {source.Name,-24} {ShareBar((double)source.Total / topTotal),-10} {source.Total,8:N0}" +
                     $" - {100.0 * source.Total / grandTotal,3:0}% - {source.Hits} hits - avg {(double)source.Total / Math.Max(1, source.Hits):0.#}" +
                     $" - {source.Total / Math.Max(1, snapshot.CombatSeconds):0.#} dps" +
@@ -90,7 +90,7 @@ public static class HistoryPresentation
             text.AppendLine("Top heals:");
             var grandTotal = Math.Max(1, snapshot.HealsBySpell.Sum(heal => heal.Total));
             var topTotal = Math.Max(1, snapshot.HealsBySpell.Max(heal => heal.Total));
-            foreach (var heal in snapshot.HealsBySpell.Take(6))
+            foreach (var heal in snapshot.HealsBySpell.Take(HealCap))
                 text.AppendLine($"  {heal.Name,-24} {ShareBar((double)heal.Total / topTotal),-10} {heal.Total,8:N0}" +
                     $" - {100.0 * heal.Total / grandTotal,3:0}% - {heal.Hits} cast{(heal.Hits == 1 ? "" : "s")}" +
                     $" - avg {(double)heal.Total / Math.Max(1, heal.Hits):0.#}" +
@@ -121,12 +121,46 @@ public static class HistoryPresentation
         text.AppendLine();
     }
 
+    /// <summary>
+    /// Caps that REMAIN in the session-history detail, and the rule that goes with them.
+    ///
+    /// #234 (atrzonkowski) was a silent cap: "Kills by creature" took the top 10 and "Mob
+    /// farming" the top 8, both from lists Core sorts by kill count descending. A named is
+    /// the mob you killed ONCE, so in a Guk session with a dozen kinds of trash at ten-plus
+    /// kills each it sorts below all of them and falls off the end — while Encounters, which
+    /// is neither ranked nor truncated, still showed it. That discrepancy is what the
+    /// reporter saw, and it is the whole diagnosis.
+    ///
+    /// Those two lists are now UNCAPPED. This is a desktop review surface — it exists to be
+    /// read after play, it scrolls, and one row per creature you killed is not a lot. The
+    /// nameds are also the part of a session a player actually remembers, so they are the
+    /// worst possible rows to drop.
+    ///
+    /// **Where a cap survives, it says so.** A truncated list that looks complete is the
+    /// "silent no-ops are broken" rule wearing a different hat: the player cannot tell a
+    /// short session from a trimmed one.
+    /// </summary>
+    private const int LootCap = 15;
+    private const int SourceCap = 8;
+    private const int HealCap = 6;
+    private const int PetCap = 8;
+    private const int MobLootCap = 4;
+
+    /// <summary>"... and 6 more items" — printed only when something was actually cut.</summary>
+    private static void AppendMore(StringBuilder text, int total, int shown, string noun,
+        string indent = "  ")
+    {
+        if (total <= shown) return;
+        var extra = total - shown;
+        text.AppendLine($"{indent}... and {extra} more {noun}{(extra == 1 ? "" : "s")}");
+    }
+
     private static void AppendRest(StringBuilder text, StatsSnapshot snapshot)
     {
         if (snapshot.YourKills.Count > 0)
         {
             text.AppendLine("Kills by creature:");
-            foreach (var kill in snapshot.YourKills.Take(10))
+            foreach (var kill in snapshot.YourKills)
                 text.AppendLine($"  {kill.Name,-28} x{kill.Count}");
             text.AppendLine();
         }
@@ -134,12 +168,13 @@ public static class HistoryPresentation
         if (snapshot.Loot.Count > 0)
         {
             text.AppendLine("Loot:");
-            foreach (var loot in snapshot.Loot.Take(15))
+            foreach (var loot in snapshot.Loot.Take(LootCap))
                 text.AppendLine($"  {loot.Item,-34} x{loot.Count}");
+            AppendMore(text, snapshot.Loot.Count, LootCap, "item");
             text.AppendLine();
         }
 
-        var farmed = snapshot.Mobs.Where(mob => mob.Kills > 0).Take(8).ToList();
+        var farmed = snapshot.Mobs.Where(mob => mob.Kills > 0).ToList();
         if (farmed.Count > 0)
         {
             text.AppendLine("Mob farming (observed personal rates):");
@@ -147,16 +182,17 @@ public static class HistoryPresentation
             {
                 text.AppendLine($"  {mob.Name} - {mob.Kills} kills - avg fight {mob.AvgFightSeconds:0}s - " +
                                 $"{mob.XpPercent:0.0}% xp - {StatsSnapshot.FormatCoin(mob.Copper)}");
-                foreach (var loot in mob.Loot.Take(4))
+                foreach (var loot in mob.Loot.Take(MobLootCap))
                     text.AppendLine($"      {loot.Item,-30} x{loot.Count}" +
                         (loot.DropRatePct is { } percent ? $"  {percent:0.#}% ({loot.Count}/{mob.Kills})" : ""));
+                AppendMore(text, mob.Loot.Count, MobLootCap, "drop", indent: "      ");
             }
             text.AppendLine();
         }
 
         if (snapshot.PetAbilities.Count > 0)
             text.AppendLine("Pet abilities: " + string.Join(" - ",
-                snapshot.PetAbilities.Take(8).Select(ability =>
+                snapshot.PetAbilities.Take(PetCap).Select(ability =>
                     $"{ability.Name} {ability.Total:N0} ({ability.Hits} hits)")));
         if (snapshot.Stances.Count > 0)
             text.AppendLine("Stances: " + string.Join(" - ",

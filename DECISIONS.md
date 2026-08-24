@@ -17,6 +17,19 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-24
 
+- **#234 fixed by UNCAPPING the two session-history rollups rather than by carrying a named
+  flag through Core** · could have plumbed `KillEvent.ProperName` into `NameCount`/`MobSummary`
+  so nameds are always kept regardless of rank · that changes a persisted snapshot schema AND
+  the mobile wire for a surface that is a scrollable desktop review pane, where one row per
+  creature killed is simply not a lot; uncapping fixes the report with no schema change and no
+  heuristic false-positives (`HistoryPresentation`, `GukNamedsRollupTests`).
+- **Remaining caps in the session detail now print "... and N more" instead of being raised**
+  · could have uncapped loot/pet/damage lists too · a cap that admits itself is honest and
+  bounded; uncapping everything makes the text arbitrarily long for no reported complaint.
+- **Bumped to 1.99.10 and staged; no reply posted to #234** · could have replied to the
+  reporter now the fix is in · Helm's 6:22 AM ruling says explicitly "do not post another
+  reply (Claude is in the thread)", and a shipped fix does not lift a Helm instruction.
+
 - **Ran the hand drag/reopen check unattended as an automated harness** · could have waited
   for David at the machine · David authorized it in session while away; `scripts/drag-verify.ps1`
   uses Win32 rects and WindowFromPoint-guarded clicks so nothing could land on his live widget

@@ -1293,6 +1293,44 @@ Read this list before touching the areas it names. Every entry cost a release.
     an irreversible operation pays for itself the day the operation turns out to be wrong
     about what it was operating on.
 
+49. **WHEN ATTRIBUTION IS THE MECHANISM, COUNT THE ACTORS FIRST — a rule that names two
+    when there are three guards the one that was never the problem.** The window-height
+    follower asked "did *I* cause this size change, or the *player*?" and set a `selfSet`
+    flag around its own assignment so the answer was a fact rather than a guess. That flag
+    was correct and irrelevant: while following, the window is `SizeToContent.Height`, so
+    the **TOOLKIT** resizes it on every content change, and every one of those read as the
+    player's drag. The window took ownership on its first frame, persisted ~218px on an
+    undragged close, and reopened frozen — **the pin came back through the settings file**,
+    which is worse than the bug it replaced. Reverted (Fable 5, `4548e10`) on evidence from
+    `scripts/drag-verify.ps1`.
+    → **The unit tests agreed with the bug**, which is the part worth carrying: thirteen
+    green tests, all written over the same two-actor world, so the model's missing
+    participant was invisible to every one of them. This is trap 34's shape one level up —
+    not a guard that forbids the wrong thing, but a guard that **cannot conceive of** the
+    right thing. A test suite is only as complete as the model it encodes.
+    → **So enumerate the participants and put them in the test names.** "selfSet vs not" is
+    a binary someone invented; "follower / toolkit / player" is a fact about the system, and
+    writing the second one down is what makes the third actor visible before the code ships.
+    → And once again the instrument beat the reasoning: a harness driving the real exe
+    answered in one run what a review and an executor had both reasoned past. **Ship the
+    instrument before the third theory** (trap 33's closing line, earning itself again).
+
+50. **A LIST THAT IS "TOP N BY COUNT" HIDES EXACTLY THE ROWS A PLAYER CARES MOST ABOUT,
+    because the memorable thing is the RARE thing.** #234 (atrzonkowski): named mobs from
+    Guk were missing from session history's "Kills by creature" and "Mob farming" while
+    still appearing in Encounters. Nothing filtered them. Both rollups were `Take(10)` and
+    `Take(8)` over lists Core sorts by kill count descending — and a named is the mob you
+    killed **once**, so a dozen kinds of trash at ten-plus kills each pushed all four off
+    the end. Core was innocent throughout; the data was complete.
+    → **The reporter's own discrepancy was the diagnosis.** "Present in one list, absent
+    from two others" is a ranking-and-truncation signature before it is a filtering one, and
+    the tell is that the missing rows are the rarest. Ask "are the absent entries the ones
+    with the lowest count?" before looking for a filter.
+    → **And a surviving cap must SAY so** — "... and 5 more items". A trimmed list that
+    looks complete is "silent no-ops are broken" with the switch on the other side: there is
+    no way for a player to tell a short session from a truncated one, which is why this took
+    a bug report to find rather than being obvious to anyone who ever farmed a zone.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
