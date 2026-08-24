@@ -1,5 +1,35 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (late) — `history-progress` IS DONE. Route B worked first try, and the unblock
+> was Fable correcting MY diagnosis.** I had written "same log PATH = same archived row";
+> `Checkpoint` actually adopts on `(Server, Character, StartUtc)` — verified in
+> `SessionRepository.cs` rather than taken on trust. The three Prime runs collapsed because
+> they sliced one fixture and shared a first timestamp, not because the filename repeated.
+> **That is the window-height error shape again: two candidate causes, neither tested.**
+>
+> → `Prime` gained **`ShiftDays`** (re-stamps a slice into its own session window) beside
+> **`Lines`** (per-run content, inside that window rather than on a shared tail).
+> `EQBUDDY_HISTORY=charts` + `SelectFirstCharacterFilter` reach the only state the charts draw
+> in — one character filtered, nothing selected. **Fully real ingest; the pre-approved
+> repository seam was not needed.** Prediction met: three sessions Aug 21/22/23 and
+> "Level 22 → 24 (Aug 21–Aug 23, 3 dings)".
+>
+> → **One prediction miss, kept on purpose:** I predicted one chart and the panel draws TWO.
+> The AA chart was empty until each run staged an ability-point total. A shot showing one of
+> two charts renders, looks correct, and under-reports the surface — trap 22 in miniature.
+>
+> → **README regenerable coverage 5/24 → 12/24.** The twelve left need a live zone, a phone
+> viewport or an alert in flight; `options-behavior` and `session-picker` look closest to free.
+
+> **Bevel ruled #235's picker cancel STAYS SILENT — nothing to build**, and my "cancelled AND
+> no dump" nag is rejected. The reusable half: an affordance that only fires when the user
+> backs out is a nag wearing a helper's clothes.
+
+> **Bevel also fixed its inbox wrapping in one run** — median line 45 → 88, mid-token breaks
+> 137 → 34. Phrase-grep over `BEVEL.md` works again, which is the technique that found #226.
+
+> **Inboxes clear. v1.99.10 released. #208 is still the only live hold.**
+
 > **2026-08-24 (evening pass) — INBOXES ARE CLEAR. v1.99.10 IS RELEASED** (GitHub 18:25Z,
 > OneDrive 13:24, Fable reviewed SHIP). **#208 is still the only live hold.**
 

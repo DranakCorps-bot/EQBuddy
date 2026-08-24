@@ -630,6 +630,31 @@ $Shots = [ordered]@{
                                @{ Character = 'Aludra'; Fraction = 0.45 }
                                @{}
                            ) }
+    # The cross-session level/AA charts. They render ONLY with a single-character filter
+    # and NO session selected, so EQBUDDY_HISTORY=charts exists to reach that state.
+    #
+    # THREE primed sessions for ONE character, each shifted to its own day and carrying its
+    # own ding. The shift is what makes them three: SessionRepository adopts on
+    # (Server, Character, StartUtc), so same-fixture slices share a start and collapse to
+    # one row no matter how their content differs. Fully real ingest — parse, SessionStats,
+    # exit-checkpoint — the same path every other shot drives. Each run also carries an AA
+    # total, because the surface draws TWO charts and a shot of one of them would quietly
+    # under-report what the panel does (README's caption promises "level and AA charts").
+    'history-charts'  = @{ Title = 'Session History'
+                           Env = @{ EQBUDDY_HISTORY = 'charts' }
+                           Set = @{}
+                           Prime = @(
+                               @{ Character = 'Aludra'; Fraction = 0.35; ShiftDays = 3
+                                  Lines = @('You have gained a level! Welcome to level 22!',
+                                            'You have gained an ability point!  You now have 3 ability points.') }
+                               @{ Character = 'Aludra'; Fraction = 0.65; ShiftDays = 2
+                                  Lines = @('You have gained a level! Welcome to level 23!',
+                                            'You have gained 3 ability point(s)!  You now have 6 ability point(s).') }
+                               @{ Character = 'Aludra'; Fraction = 0.9;  ShiftDays = 1
+                                  Lines = @('You have gained a level! Welcome to level 24!',
+                                            'You have gained 3 ability point(s)!  You now have 9 ability point(s).') }
+                               @{}
+                           ) }
     # The wiki contribution pack (#217 Ask 1). Trap 22: with an empty profile every row
     # is "not checked yet", because the pack's state comes from the WIKI LOOKUP and not
     # from the log — a shot of that proves nothing about the rows underneath and reads as
@@ -895,14 +920,50 @@ function Invoke-PrimeRun([object[]]$runs) {
         # that wants a DISTINCT session writes a distinct log: another character, and a
         # prefix of the fixture rather than all of it, which gives that session its own
         # duration and its own numbers instead of a suspiciously identical twin.
+        # A run gets its own SESSION WINDOW, not just its own length. SessionRepository
+        # adopts an existing row on (Server, Character, StartUtc) — Fable checked the query
+        # after my first diagnosis blamed the log path — so two runs that slice the same
+        # fixture carry the SAME first timestamp and collapse into one row however much
+        # their content differs. ShiftDays re-stamps the slice so each run is a distinct
+        # session to the adopter, through the fully real ingest path.
         $extraLog = $null
         if ($run.Character) {
             $source = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
             $lines = Get-Content $source.FullName
             $fraction = if ($run.Fraction) { $run.Fraction } else { 1.0 }
             $take = [Math]::Max(1, [int]($lines.Count * $fraction))
+            $body = @($lines[0..($take - 1)])
+
+            if ($run.ShiftDays) {
+                $fmt = 'ddd MMM dd HH:mm:ss yyyy'
+                $ci = [Globalization.CultureInfo]::InvariantCulture
+                $span = [TimeSpan]::FromDays([double]$run.ShiftDays)
+                $body = @($body | ForEach-Object {
+                    if ($_ -match '^\[(?<t>[^\]]+)\] (?<m>.*)$') {
+                        $t = [datetime]::ParseExact($Matches.t, $fmt, $ci)
+                        "[$(($t - $span).ToString($fmt, $ci))] $($Matches.m)"
+                    } else { $_ }
+                })
+            }
+
+            # Per-run content, appended INSIDE this run's own window so it belongs to this
+            # session rather than to a shared tail (Fable's design note, corrected: the flaw
+            # was appending to a shared prefix, not the per-invocation idea).
+            if ($run.Lines) {
+                $fmt = 'ddd MMM dd HH:mm:ss yyyy'
+                $ci = [Globalization.CultureInfo]::InvariantCulture
+                $last = [datetime]::Now
+                if ($body[-1] -match '^\[(?<t>[^\]]+)\]') {
+                    $last = [datetime]::ParseExact($Matches.t, $fmt, $ci)
+                }
+                $body += @($run.Lines | ForEach-Object {
+                    $last = $last.AddSeconds(1)
+                    "[$($last.ToString($fmt, $ci))] $_"
+                })
+            }
+
             $extraLog = Join-Path $logsDir.FullName "eqlog_$($run.Character)_test.txt"
-            $lines[0..($take - 1)] | Set-Content $extraLog -Encoding utf8
+            $body | Set-Content $extraLog -Encoding utf8
         }
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false

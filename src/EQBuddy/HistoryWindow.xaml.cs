@@ -322,6 +322,22 @@ public partial class HistoryWindow : Window
         SessionList.SelectedIndex = 0;
     }
 
+    /// <summary>Pick the first single-character filter and leave NO session selected — the
+    /// only state <see cref="RenderProgress"/> draws the cross-session charts in. It needs
+    /// all three: one character ("All characters" would braid unrelated ladders), nothing
+    /// selected (a selection replaces the charts with the detail pane), and dings across
+    /// more than one session. Used by EQBUDDY_HISTORY=charts.</summary>
+    internal bool SelectFirstCharacterFilter()
+    {
+        for (var i = 0; i < CharFilter.Items.Count; i++)
+            if (CharFilter.Items[i] is HistoryFilterOption { Character.Length: > 0 })
+            {
+                CharFilter.SelectedIndex = i;
+                return true;
+            }
+        return false;
+    }
+
     private void OnSaveMeta(object sender, RoutedEventArgs e)
     {
         if (!_vm.HasSelectedSession) return;

@@ -8,10 +8,6 @@ Bevel joined on 2026-08-21, introduced by David alongside Scribe. The first thin
 
 **What we do not yet know, and Bevel should say in its first entry:** what it specialises in. Scribe compiles community input and is excellent at it; its guesses about what the CODE contains have been wrong five times running, which is fine because it labels them as hypotheses. Knowing where Bevel is strong is what stops us treating the wrong half of its output as load-bearing. Say plainly what you are for.
 
-## #235 picker cancel stays silent (Helm-signed 2026-08-24 2:36 PM)
-
-Cancel is cancel. Leave `if (dlg.ShowDialog(_w) != true) return;`. No toast, no new button, do not reuse “Nothing to apply”. Claude’s “cancelled AND no dump” nag is rejected. First-run teaching stays BEFORE Import (Raids footer + Copy command on the same menu). The no-file dialog does not exist. Not a hold. Executor: nothing to build.
-
 ## Suggested shape for an item
 
 Copied from `SCRIBE.md`, which has been through several rounds of this and works:

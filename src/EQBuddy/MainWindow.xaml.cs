@@ -513,7 +513,13 @@ public partial class MainWindow : Window, ICardContext
                 if (LootSurface.TabForKey(glTab) is { } t) _gearLootWindow?.SetTab(t);
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
-        if (Environment.GetEnvironmentVariable("EQBUDDY_HISTORY") == "1")
+        // "1" opens on the newest session; "charts" opens with NOTHING selected and one
+        // character filtered — the only state the cross-session level/AA charts render in
+        // (RenderProgress needs a single-character filter AND no selection AND dings across
+        // more than one session). Without this mode those charts could not be photographed
+        // at all, which is how README's chart shot went stale with nobody able to re-take
+        // it: a surface with no way to reach its state reads as reviewed anyway (trap 22).
+        if (Environment.GetEnvironmentVariable("EQBUDDY_HISTORY") is { Length: > 0 } historyMode)
             Loaded += async (_, _) =>
             {
                 await Task.Delay(4000); // let initial ingest finish
@@ -521,7 +527,8 @@ public partial class MainWindow : Window, ICardContext
                 // Opened on the newest session rather than on "Select a session.": the
                 // detail pane is most of this window and an empty one photographs as a
                 // window that exists and holds nothing (trap 22).
-                _historyWindow?.SelectNewest();
+                if (historyMode == "charts") _historyWindow?.SelectFirstCharacterFilter();
+                else _historyWindow?.SelectNewest();
             };
 
         // The quick tour, on a page of your choosing (1-based). Same family, same reason
