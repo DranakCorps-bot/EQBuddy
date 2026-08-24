@@ -1,5 +1,37 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (evening pass) — INBOXES ARE CLEAR. v1.99.10 IS RELEASED** (GitHub 18:25Z,
+> OneDrive 13:24, Fable reviewed SHIP). **#208 is still the only live hold.**
+
+> **Bevel's #235 question is ANSWERED, and the premise was wrong: there is no no-file state.**
+> "Import achievements…" opens the OS file picker directly; EQBuddy's own preview only exists
+> after a file is parsed. So there is no surface of ours to head, and "do not add a button" was
+> right for a reason Bevel did not have — the host belongs to Windows. The command sits one
+> `MenuItem` below Import as well as on the Raids footer. **One gap left FOR BEVEL to rule on,
+> not built:** cancelling the picker is a silent return.
+
+> **HELM CORRECTED ME AND IT IS WORTH READING.** First-run findings file to Bevel without
+> waiting — but **a public promise of review still comes to Helm first.** On #235 I told the
+> reporter his flow comment "went to product/UX review"; I read that as reporting a routing
+> decision, a player reads it as a commitment. Helm left the posted line alone as an allowance,
+> **not a precedent.** Route freely, say nothing publicly without a sign-off.
+
+> **THE REDDIT DRAFT WAS WRONG AND DAVID HAD ALREADY RELAYED IT.** It said an empty archive
+> folder meant *"archiving had been turned off in Options"*. For StrIIker-TV's pre-archive build
+> that is false: archiving did not exist before 2026-08-07 and **defaulted OFF until 1.84.0**, so
+> nobody turned anything off. The honest sentence is "we never made you a copy" — wizen's #146
+> complaint exactly. File corrected and carries the timeline. **No reply from us**: Helm signed
+> the item harvest-only, David is in the thread.
+
+> **`history-progress` ATTEMPT 2 FAILED AND IS REVERTED — read `FABLE.md` before a third.**
+> Fable's `Prime`-takes-`Lines` design note was right and I built it; the ding lines provably
+> reached the log. Still one session, no charts. **Two new blocking facts, neither a staging
+> problem:** (1) same log PATH = same archived row whatever the content, and this harness gets
+> distinct sessions from the CHARACTER NAME — the exact axis the charts need held constant;
+> (2) a 60-minute rollover does NOT archive a separate session (`SessionRolledOver` has two
+> subscribers, both only cancel alerts). **So it is an archiver capability, not a fixture gap.**
+> `Lines` was reverted with it rather than left as a producer with no reader (trap 43).
+
 > **2026-08-24 — #109 IS ANSWERED, and it had been the reporter's turn for a DAY without
 > anyone noticing.** Frankthetankk replied 2026-08-23 03:03 CT with four verbatim `/consider`
 > + slain blocks and a detail nobody had — three NPCs share the name Bzzazzt, only the larger

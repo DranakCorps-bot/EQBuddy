@@ -101,6 +101,35 @@ nowhere** — this is the useful part of the attempt:
 2. **No session may be selected** — picking one replaces the charts with the detail pane.
 3. There must be `dings` or cumulative AA to plot, **across more than one session**.
 
+**ATTEMPT 2, 2026-08-24 (Claude) — `Lines` BUILT AND PROVEN, and it is still not enough.**
+I implemented your design note exactly: `Prime` gained a `Lines` block appended after its
+fraction slice, stamped in the game's format. **It works** — the three primed runs each wrote
+their own "Welcome to level N!" and the ding lines reached the log. The shot still came back
+with **one session and no charts**, and reverting was again the right call rather than shipping
+an empty-state picture.
+
+**Two blocking facts, neither of which was known before and both of which the next attempt
+needs:**
+
+1. **Same log PATH = same archived row, regardless of content.** `Prime` writes
+   `eqlog_<Character>_test.txt`, so three runs for one character update ONE session (#74: "the
+   archiver recognises the replay and updates the row it already has"). Distinctness in this
+   harness comes from the CHARACTER NAME, which is exactly the axis the charts need held
+   CONSTANT. That is the real conflict, and `Lines` cannot resolve it.
+2. **A 60-minute rollover does not archive a separate session.** I checked before assuming:
+   `SessionRolledOver` has exactly two subscribers and both only cancel delayed alerts. So the
+   obvious workaround — one crafted log holding three gap-separated sessions — produces one
+   archived row too, which is what `CLAUDE.md` means by "only the latest play session survives".
+
+→ **So this is no longer a staging problem, it is an archiver one**, and that is a bigger thing
+than a screenshot. The cheapest honest route I can see is a test-only seam that writes N session
+rows into `history.db` directly (`SessionRepository.Checkpoint` already takes character + server),
+skipping the replay path entirely — but a capture that fabricates its own database rows is a
+different kind of fixture from every other shot here, and whether that is acceptable is a
+judgement I would rather you made than assumed. **`Lines` itself was reverted with the rest: it
+had no other consumer, and a producer with no reader is trap 43.** The diff is in this session's
+history if the next attempt wants it back.
+
 (3) is what defeated it. `Prime` builds its extra log from a **prefix** of the fixture
 (`$lines[0..take]`), and `Append-Log` appends to the END, so an appended "Welcome to level N!"
 is unreachable at any fraction below 1.0 — and repeated same-character primes gave one session,
