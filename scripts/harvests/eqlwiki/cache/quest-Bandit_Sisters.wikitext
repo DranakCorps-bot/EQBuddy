@@ -1,6 +1,6 @@
 {{Classic Era}}
 __NOTOC__
-[[File:npc_tynkale.png|frame|Tynkale]]
+[[File:npc_tynkale.png|thumb|Tynkale]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Felwithe|Northern Felwithe]]
@@ -83,7 +83,6 @@ You say, 'I will hunt the Nybright Sisters'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 
 {{YouGainExperience}}

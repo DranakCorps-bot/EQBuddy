@@ -35,7 +35,7 @@ __NOTOC__
 # In [[Rivervale]], complete the [[Honey Jum Quest]] and receive '''[[Honey Jum]]'''.
 # In [[Qeynos|North Qeynos]], give the honey jum to [[Astaed Wemor]] and receive '''Prime Healer Potion''' [identifies as ''Potion of Disease Warding''].
 ## Note: you need good faction with [[Astaed Wemor]] or he will keep the honey jum and give nothing. '''(Warning: Amiable faction is required (wolf form seems to work). You will recieve dialogue for the quest down to apprehensive, but not dubious, but if you are indifferent or apprehensive, your Honey Jum will be eaten.)'''
-# In [[West Karana]], give the potion to [[Lempeck Hargrin]] and receive a LORE/NODROP '''Rusty Scythe'''.
+# In [[West Karana]], give the potion to [[Lempeck Hargrin]] and receive a LORE/NODROP '''Rusty Scythe'''. <b>CAUTION:</b> Sometimes he goes crazy and attacks you at this point. This is most likely related to the potion you give him. The potion that identifies as "Potion of Disease Warding" is the one you want. If it identifies as "Ochre Potion Disease Ward" or anything else, you'll get attacked.
 # In [[Qeynos|North Qeynos]], give the scythe to [[Astaed Wemor]] and receive [[Shining Star of Light]].
 
 === Complete Walkthrough: ===

@@ -28,7 +28,7 @@ Blackburrow is the home of the Blackburrow clan of gnolls. It is something of a 
 |blackburrow
 |-
 !Zone Spawn Timer:
-|22:00
+| 3:55
 |-
 ! '''Succor/Evacuate:'''
 | -159, 39 (Zone line to Qeynos Hills)

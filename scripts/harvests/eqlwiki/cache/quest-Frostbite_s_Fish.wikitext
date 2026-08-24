@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_enic_ruklin.png|frame|Enic Ruklin]]
+[[File:npc_enic_ruklin.png|thumb|Enic Ruklin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos|North Qeynos]]
@@ -78,33 +78,19 @@ Frostbite spits something into your hand.
 You receive a [[Koalindl Fish]].
 
 ===Turn-in===
-<s>The faction for this turn in massive. I went from a couple points into amiable to Kindly in 3 turn ins. 5 to get ally on an Iksar Monk. (11/2018)</s><br>
-As of March, 2025, from 1 point into Amiable, 6 turn-ins still leaves you at Kindly. The 7th turn-in takes you from Kindly into Warmly. It looks like the Priests of Life increase is 100. 
+Hand the [[Koalindl Fish]] to [[Enic Ruklin]]:
 
 : Enic Ruklin says, 'Thank you my friend!!  Every Koalindl must be accounted for, even the dead.  Rodcet Nife shall be pleased and I shall reward you. Nothing much, just a small token of gratitude.' 
 
 <div class='facblock'>
-* Your faction standing with [[Priests of Life]] got better (100).
-* Your faction standing with [[Knights of Thunder]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Bloodsabers]] got '''worse.'''
-* Your faction standing with [[Antonius Bayle]] got better.
+* Your faction standing with [[Priests of Life]] has been adjusted by 100.
+* Your faction standing with [[Knights of Thunder]] has been adjusted by 30.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 50.
+* Your faction standing with [[Bloodsabers]] has been adjusted by -25.
+* Your faction standing with [[Antonius Bayle]] has been adjusted by 15.
 </div>
 {{exp}}
 
-== Exp Gain ==
-
-=== Human Monk ===
-
-{| class="eoTable2"
-! Level 
-! Exp per turn in (Rough Average)
-! Sample size (Number of runs)
-|-
-| 11
-| 9%
-| 2
-|}
 
 [[Category:Quests]]
 [[Category:North Qeynos]]

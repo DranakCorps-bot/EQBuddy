@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Disambig3|[[Bone Chips Quests]]}}
-[[File:npc_yeolarn_bronzeleaf.png|frame|Yeolarn Bronzeleaf]]
+[[File:npc_yeolarn_bronzeleaf.png|thumb|Yeolarn Bronzeleaf]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Felwithe|Northern Felwithe]]
@@ -50,7 +50,6 @@ You say, 'I will help protect the Mother'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 
 {{YouGainExperience}}

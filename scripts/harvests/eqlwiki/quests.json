@@ -82,6 +82,50 @@
   "repeatable": false
  },
  {
+  "name": "A sealed letter",
+  "url": "https://eqlwiki.com/A_sealed_letter",
+  "startZone": "",
+  "questGiver": "",
+  "minLevel": 0,
+  "classes": "",
+  "items": [
+   {
+    "name": "Peacekeeper Staff",
+    "qty": 1
+   }
+  ],
+  "rewards": [],
+  "categories": [
+   "Cleric Quests",
+   "Erudin",
+   "Inventory Items",
+   "Paladin Quests"
+  ],
+  "relatedZones": [],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
+  "name": "Acquire a Mark of Karana",
+  "url": "https://eqlwiki.com/Acquire_a_Mark_of_Karana",
+  "startZone": "Surefall Glade",
+  "questGiver": "Qaelin Hailstorm",
+  "minLevel": 1,
+  "classes": "Any; requires Karana as your active deity.",
+  "items": [],
+  "rewards": [
+   "Mark of Karana"
+  ],
+  "categories": [
+   "Fletching Quests",
+   "Karana Quests",
+   "Surefall Glade"
+  ],
+  "relatedZones": [],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
   "name": "Acumen Mask Quest",
   "url": "https://eqlwiki.com/Acumen_Mask_Quest",
   "startZone": "Temple of Solusek Ro",
@@ -13506,7 +13550,12 @@
   "questGiver": "Enic Ruklin",
   "minLevel": 3,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Koalindl Fish",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Band of Rodcet Nife",
    "Prayer Beads"
@@ -18723,7 +18772,7 @@
   "relatedZones": [
    "Toxxulia Forest"
   ],
-  "era": "Velious",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -24608,15 +24657,10 @@
    {
     "name": "Deathfist Slashed Belt",
     "qty": 1
-   },
-   {
-    "name": "Tagglefoot Tingle Drink",
-    "qty": 1
    }
   ],
   "rewards": [
-   "Faction",
-   "Tagglefoot Tingle Drink"
+   "Faction"
   ],
   "categories": [
    "All Classes Quests",
@@ -24830,6 +24874,10 @@
    },
    {
     "name": "Deathfist Slashed Belt",
+    "qty": 1
+   },
+   {
+    "name": "Silk Swatch",
     "qty": 1
    }
   ],
@@ -29342,7 +29390,7 @@
    "Plane of Fear",
    "Plane of Hate"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -29564,7 +29612,7 @@
    "Permafrost",
    "Solusek's Eye"
   ],
-  "era": "Temple",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -33977,7 +34025,7 @@
    "Erudin Palace"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -35699,11 +35747,63 @@
   "classes": "Paladin",
   "items": [
    {
+    "name": "Amber",
+    "qty": 1
+   },
+   {
+    "name": "Diamond",
+    "qty": 1
+   },
+   {
     "name": "Dusty Old Finger Bones",
     "qty": 1
    },
    {
+    "name": "Dusty Old Skull",
+    "qty": 1
+   },
+   {
     "name": "Dwarven Ale",
+    "qty": 1
+   },
+   {
+    "name": "Empty Gem Bag",
+    "qty": 1
+   },
+   {
+    "name": "Enchanted Platinum Bar",
+    "qty": 1
+   },
+   {
+    "name": "Fire Emerald",
+    "qty": 1
+   },
+   {
+    "name": "Fire Opal",
+    "qty": 1
+   },
+   {
+    "name": "Jade",
+    "qty": 1
+   },
+   {
+    "name": "Pearl",
+    "qty": 1
+   },
+   {
+    "name": "Pick",
+    "qty": 1
+   },
+   {
+    "name": "Revenant Ash",
+    "qty": 1
+   },
+   {
+    "name": "Sapphire",
+    "qty": 1
+   },
+   {
+    "name": "Star Ruby",
     "qty": 1
    }
   ],
@@ -37600,7 +37700,15 @@
   "classes": "All",
   "items": [
    {
+    "name": "Bayle List II",
+    "qty": 1
+   },
+   {
     "name": "Flask of Nitrates",
+    "qty": 1
+   },
+   {
+    "name": "Regurgitonic",
     "qty": 1
    }
   ],

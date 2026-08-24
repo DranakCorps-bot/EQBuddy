@@ -2,6 +2,11 @@
 __NOTOC__
 The Estate of Unrest was once the home of a dwarven noble, in ages past. Following the unholy destruction that created Dagnor's Cauldron and the following takeover of that region by evil creatures, his estate was overrun by the undead, and is now one of the great havens of the unliving in all of Norrath.
 
+{| style="margin: 0 0 0.4em 1em; border:1px solid silver; float:right; font-size:90%; text-align:left;" cellpadding="5"
+! colspan="2" style="font-size:110%; text-align:center;" | {{{name|{{PAGENAME}}}}}
+|-
+| colspan="2" align="center" | {{{image|[[File:the_estate_of_unrest.png|200px]]}}}
+|- valign="top"
 {|
 |rowspan="6" valign="top" width="15%"| <div style='float:left;'>__TOC__</div>
 |valign="top"|
@@ -25,7 +30,7 @@ The Estate of Unrest was once the home of a dwarven noble, in ages past. Followi
 |unrest
 |-
 ! ''' Spawn Timer: '''
-|11:00
+|7:30
 |-
 ! '''Succor/Evacuate:'''
 | -38, 52 (Zone line to Dagnor's Cauldron)

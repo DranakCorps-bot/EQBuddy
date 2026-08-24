@@ -1,4 +1,4 @@
-[[File:npc_innkeep_wuleran.png|frame|Innkeep Wuleran]]
+[[File:npc_innkeep_wuleran.png|thumb|Innkeep Wuleran]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark]]
@@ -61,7 +61,6 @@ Return and give to Innkeep Wuleran.
 * Your faction standing with [[Kelethin Merchants]] got better.
 * Your faction standing with [[Faydarks Champions]] got better.
 * Your faction standing with [[Emerald Warriors]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 
 {{Exp}}

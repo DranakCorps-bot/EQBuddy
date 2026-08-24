@@ -71,6 +71,6 @@ Vexia D`Ynth says, in Dark Elvish, 'Yes. You will hunt for the Dread Slayers. Yo
 == Notes ==
 
 All of the turn ins here can be done independently; as described by Vexia you just have to hand in four of a kind. Turn in whatever you have - likely [[Bone Chips]]. 
-
+Turning in Giant Bat Fur grants +10 to Dread Slayers
 [[Category: Quests]]
 [[Category: Neriak Commons]]

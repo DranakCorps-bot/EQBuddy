@@ -45,8 +45,9 @@ You say, 'What job?'
 
 : Basher Nanrum says 'Heh heh.  All da eyeballses!  I didn't think ya could do it but ya did.  Here is da shiny.  If you gets more I always have more shinies.'
 <div class="facblock">
-* Your faction standing with [[DaBashers]] got better.
-* Your faction standing with [[Broken Skull Clan]] got worse.
+* Your faction standing with [[DaBashers]] has been adjusted by 5.
+* Your faction standing with [[Broken Skull Clan]] has been adjusted by -1.
+* Your faction standing with [[Grobb Merchants]] has been adjusted by 5.
 </div>
 : {{YouGainExperience}}
 

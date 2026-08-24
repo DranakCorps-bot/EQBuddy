@@ -50,7 +50,6 @@ You say, 'I am a veteran of the good fight.'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{exp}}
 
@@ -199,7 +198,6 @@ a royal fish gladly gulps up your odd mixture and transforms into..!!
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{exp}}
 
@@ -234,7 +232,6 @@ You say, 'What Silent Watch?'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{exp}}
 
@@ -253,7 +250,6 @@ Give him the [[Highkeep Royal Suite]] (key) and the [[Royal Amulet of Thex]]:
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{exp}}
 

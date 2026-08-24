@@ -1,10 +1,11 @@
 # ZoneGraph merge report
 
 - Atlas zones: 121 · atlas edges (client-mined): 124
-- Wiki-supplied edges (boats, ports, wiki-only zones): 25
-- Final: 124 nodes, 149 edges
+- Wiki-supplied edges (boats, ports, wiki-only zones): 28
+- Final: 126 nodes, 152 edges
 
 ## Edges added from the wiki
+- Blackburrow ↔ Jaggedpine Forest
 - Butcherblock Mountains ↔ The Ocean of Tears
 - Butcherblock Mountains ↔ Timorous Deep
 - Cabilis West ↔ The Field of Bone
@@ -21,6 +22,8 @@
 - Erud's Crossing ↔ South Qeynos
 - Erudin ↔ The Ruins of Old Paineel
 - Firiona Vie ↔ Timorous Deep
+- Jaggedpine Forest ↔ Nedaria's Landing
+- Jaggedpine Forest ↔ Surefall Glade
 - Lake Rathetear ↔ The Arena
 - New Sebilis Expedition ↔ The Northern Desert of Ro
 - South Qeynos ↔ Qeynos Hills

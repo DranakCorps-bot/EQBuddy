@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_kimble_nogflop.png|frame|Kimble Nogflop]]
+[[File:npc_kimble_nogflop.png|thumb|Kimble Nogflop]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
@@ -17,7 +17,7 @@
 | [[Surefall Glade]]
 |-
 ! ''' Related NPCs: '''
-| [[TeAnara]]
+| [[Te`Anara]]
 |}
 
 == Reward ==
@@ -60,33 +60,50 @@ Head to Ak'Anon, and once there find Kimble Nogflop at location 1329, -808, -61 
 You receive [[Regurgitonic]].
  
 <div class="facblock">
-* Your faction standing with [[Gem Choppers]] got better.
-* Your faction standing with [[Merchants of AkAnon]] got better.
-* Your faction standing with [[King AkAnon]] got better.
-* Your faction standing with [[Dark Reflection]] got worse.
-* Your faction standing with [[Clan Grikbar]] got worse.
+* Your faction standing with [[Gem Choppers]] has been adjusted by 10.
+* Your faction standing with [[Merchants of AkAnon]] has been adjusted by 5.
+* Your faction standing with [[King AkAnon]] has been adjusted by 5.
+* Your faction standing with [[Dark Reflection]] has been adjusted by -2.
+* Your faction standing with [[Clan Grikbar]] has been adjusted by -1.
 </div>
+{{Exp}}
 
 You say, 'regurgitonic'.
  
 :Kimble Nogflop says 'I formulate the Regurgitonic myself. My animals kept eating the occasional spectator here and there. Femurs and ribs kept getting stuck inside, not to mention a few platinum pieces. Sometimes my batch would come out wrong and the animals would go berserk!! '''I hope I got the formula right this time'''.'
 
-If you choose to give the regurgitonic to Mammoth and give the Bayle List II to Te'Anara
+If you choose to give the [[Regurgitonic]] to [[Mammoth]]:
+
+: Mammoth coughs up something. 
+<div class="facblock">
+* Your faction standing with [[Surefall Protected Animals]] has been adjusted by 10.
+* Your faction standing with [[Protectors of Pine]] has been adjusted by 5.
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 5. (? needs confirmation)
+* Your faction standing with [[Karana Bandits]] has been adjusted by -1.
+</div>
+{{Exp}}
+
+You receive the [[Bayle List II]].
+
+If you give the [[Bayle List II]] to Te'Anara:
 
 : Te`Anara says 'Oh my! This must belong to Antonius Bayle. I shall see that he receives it. You have done a great service to Qeynos and Surefall Glade. I rewards you with this. May it be of good use in your future deeds.' 
 
 <div class="facblock">
-* Your faction standing with [[Jaggedpine Treefolk]] got better.
-* Your faction standing with [[Protectors of Pine]] got better.
-* Your faction standing with [[QRG Protected Animals]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Unkempt Druids]] got worse.
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 10. (? needs confirmation)
+* Your faction standing with [[Protectors of Pine]] has been adjusted by 5.
+* Your faction standing with [[Surefall Protected Animals]] has been adjusted by 5.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5. (? needs confirmation)
+* Your faction standing with [[Unkempt Druids]] has been adjusted by -2.
+* Your faction standing with [[Unkempt Druids]] has been adjusted by -2.
 </div>
+{{Exp}}
 
-
-You receive [[Invigor|Spell: Invigor]].
+You receive a low level spell scroll.
 
 == Known uses ==
+
+The [[Regurgitonic]] can be used directly or indirectly in several quests:
 
 * [[Frostbite's Fish]]
 * [[Exotic Drinks]]

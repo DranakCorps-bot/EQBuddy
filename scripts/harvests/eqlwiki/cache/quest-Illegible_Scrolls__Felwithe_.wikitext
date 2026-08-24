@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Disambig3|[[Illegible Scrolls]]}}
-[[File:npc_general_jyleel.png|frame|General Jyleel]]
+[[File:npc_general_jyleel.png|General Jyleel|thumb]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Felwithe|Northern Felwithe]]
@@ -64,7 +64,6 @@ You say, 'I will assist the defenders'
 : General Jyleel says, 'Very fine work. A pity you are not Koada'Vie. Here is a small reward for you. Anytime you come upon an oracle, remember to return its scroll to me. Go and find your fate on the field of battle.'
 
 <div class="facblock">
-* Your faction standing with [[Anti-Mage]] got better. <<did not give this faction in EQL 0 in EQL>>
 * Your faction standing with [[Clerics of Tunare]] got better. <<+5 in EQL>>
 * Your faction standing with [[King Tearis Thex]] got better. <<+5 in EQL>> <<exp with half-elf shm/wiz/enc - 0.513% at lvl 10>> <<exp with half-elf BRD/RNG/DRU 0.513% at lvl 10>>
 </div>

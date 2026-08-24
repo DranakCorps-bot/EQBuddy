@@ -1,4 +1,4 @@
-{{Era}}
+{{Classic Era}}
 
 {| class="questTopTable"
 ! ''' Starts In: '''
@@ -20,12 +20,10 @@
 | [[Cazic Thule (God)]], [[Innoruuk (God)]]
 |}
 
-= Reward =
-
+== Reward ==
 * [[Agnostic]] [[:Category:Achievements#deity_unlock|Deity Unlock]]
 
-= Dialogue =
-
+== Dialogue ==
 '''You say, "Hail, [[Emissary of Zebuxoruk]]"'''
 
 : [[Emissary of Zebuxoruk]] says, "Hello again, _____. How goes your journey so far? Have you spoken to your Gods lately, or have their [voices diminished] in your ears?"
@@ -36,23 +34,24 @@
 
 '''You say, "faint of heart"'''
 
-:: Before the quest is accepted:
-: ***NEEDS DIALOG BEFORE QUEST ACCEPTED HERE***
-:: Or, if the quest is already accepted:
+: [[Emissary of Zebuxoruk]] says, "If you wish to [follow this path], you will have to face the gods themselves, and overcome them. After you do so, you will be able to walk free of the shadow of the Gods. Such is the will of Zebuxoruk, that all mortals forge their own path.
+
+'''You say, "follow this path"'''
+
+: [[Emissary of Zebuxoruk]] says, "Go, may your strength and ambition be enough to see you through."
+
+''' After accepting the quest '''
 : [[Emissary of Zebuxoruk]] says, "You've already begun your journey out of the shadow of the Gods. Continue it, and walk your own path."
 
-= Walkthrough =
-
+== Walkthrough ==
 # Speak with [[Emissary of Zebuxoruk]] in [[Oasis of Marr]].
 # Kill [[Cazic Thule (God)]] in the [[Plane of Fear]].
 # Kill [[Innoruuk (God)]] in the [[Plane of Hate]].
 
-= Notes =
-
+== Notes ==
 * None
 
-= Related Quests =
-
+== Related Quests ==
 * None
 
 [[Category:Quests]]

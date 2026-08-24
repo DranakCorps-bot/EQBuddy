@@ -7920,6 +7920,40 @@
   "cc_families": []
  },
  {
+  "name": "Brass Resonance 14",
+  "page_title": "Brass Resonance 15",
+  "template": "Spellpagesmart",
+  "classes": [],
+  "classes_raw": "BRD",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": null,
+  "beneficial": null,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "2:27:00",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": "100",
+  "description": "Increases the power of brass instrument based bard songs by up to 140%.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Increases the power of brass instrument based bard songs by up to 150%"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
   "name": "Bravery",
   "page_title": "Bravery",
   "template": "Spellpage",
@@ -29675,6 +29709,43 @@
   "cc_families": []
  },
  {
+  "name": "Firestrike (Effect)",
+  "page_title": "Firestrike (Effect)",
+  "template": "Spellpagesmart",
+  "classes": [],
+  "classes_raw": "* None; this spell is found on weapons.",
+  "school": "Evocation",
+  "school_raw": "[[Skill Evocation | Evocation]]",
+  "target_type": "Single",
+  "spell_type_raw": "Detrimental",
+  "beneficial": false,
+  "mana": 0.0,
+  "mana_raw": "0",
+  "cast_time_seconds": 0.0,
+  "casting_time_raw": "0.0",
+  "recast_seconds": 1.5,
+  "recast_time_raw": "1.50",
+  "duration_raw": "Instant",
+  "duration_seconds": 0.0,
+  "resist_raw": "Fire (0)",
+  "resist": {
+   "type": "Fire",
+   "modifier": 0
+  },
+  "range_raw": "200",
+  "description": "Ignites your target's skin, doing 302 damage.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Decrease Hitpoints by 302"
+   }
+  ],
+  "msg_cast_on_you": "You feel your skin ignite.",
+  "msg_cast_on_other": "Someone 's skin ignites.",
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
   "name": "Fist of Air",
   "page_title": "Fist of Air",
   "template": "Spellpage",
@@ -38020,6 +38091,52 @@
   "cc_families": []
  },
  {
+  "name": "Heritage of Mistmoore",
+  "page_title": "Heritage of Mistmoore",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": "Abjuration",
+  "school_raw": "[[Skill Abjuration|Abjuration]]",
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "10:00",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": null,
+  "description": "Increases your health and mana regeneration while also decreasing your resistances to magic and fire.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Increase HP regen by 1"
+   },
+   {
+    "slot": 2,
+    "effect": "Increase MP regen by 1"
+   },
+   {
+    "slot": 3,
+    "effect": "Decrease Magic resist by 10"
+   },
+   {
+    "slot": 4,
+    "effect": "Decrease Fire resist by 15"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
   "name": "Heroic Bond",
   "page_title": "Heroic Bond",
   "template": "Spellpage",
@@ -42111,6 +42228,64 @@
   "msg_cast_on_you": "You vanish.",
   "msg_cast_on_other": "Someone  fades away.",
   "msg_wears_off": "You appear.",
+  "cc_families": []
+ },
+ {
+  "name": "Improved Vampirism II",
+  "page_title": "Improved Vampirism II",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "1:33:00",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": "100",
+  "description": "Increases the damage of lifetaps by up to 25%.  This bonus will decay on spells over level 44.",
+  "slot_effects": [],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Improved Vampirism III",
+  "page_title": "Improved Vampirism III",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "1:33:00",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": "100",
+  "description": "Increases the damage of lifetaps by up to 25%.  This bonus will decay on spells over level 55.",
+  "slot_effects": [],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
   "cc_families": []
  },
  {
@@ -47075,6 +47250,55 @@
   ],
   "msg_cast_on_you": "You feel your life force drain away.",
   "msg_cast_on_other": "Someone  looks pale.",
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Lifebite",
+  "page_title": "Lifebite",
+  "template": "Spellpage",
+  "classes": [
+   {
+    "class": "Necromancer",
+    "level": 8,
+    "note": "Autogranted"
+   },
+   {
+    "class": "Shadow Knight",
+    "level": 10,
+    "note": "Autogranted"
+   }
+  ],
+  "classes_raw": "* [[Necromancer]] - Level 8 (Autogranted)\n* [[Shadow Knight]] - Level 10 (Autogranted)",
+  "school": "Alteration",
+  "school_raw": "[[Skill Alteration|Alteration]]",
+  "target_type": "Lifetap",
+  "spell_type_raw": "Detrimental",
+  "beneficial": false,
+  "mana": 35.0,
+  "mana_raw": "35",
+  "cast_time_seconds": null,
+  "casting_time_raw": "1.75 sec",
+  "recast_seconds": null,
+  "recast_time_raw": "1 sec",
+  "duration_raw": "Instant",
+  "duration_seconds": 0.0,
+  "resist_raw": "Magic: (-200)",
+  "resist": null,
+  "range_raw": "200",
+  "description": "Drains your target of life energy, siphoning between 42 and 42 hit points.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Decrease Hitpoints by 42 to 42"
+   },
+   {
+    "slot": 2,
+    "effect": "Increase Hitpoints by 42 to 42 (Self)"
+   }
+  ],
+  "msg_cast_on_you": "You feel your life force drain away.",
+  "msg_cast_on_other": "Someone staggers.",
   "msg_wears_off": null,
   "cc_families": []
  },
@@ -67072,8 +67296,8 @@
   "school": "Alteration",
   "school_raw": "[[Skill Alteration | Alteration]]",
   "target_type": "Single",
-  "spell_type_raw": "Slow",
-  "beneficial": null,
+  "spell_type_raw": "Detrimental",
+  "beneficial": false,
   "mana": 45.0,
   "mana_raw": "45",
   "cast_time_seconds": 3.5,
@@ -72576,7 +72800,7 @@
  {
   "name": "Specter Lifetap",
   "page_title": "Specter Lifetap",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [],
   "classes_raw": "* Item Effect",
   "school": null,
@@ -72592,21 +72816,21 @@
   "recast_time_raw": "12",
   "duration_raw": "Instant",
   "duration_seconds": 0.0,
-  "resist_raw": "Magic",
+  "resist_raw": "Magic (-200)",
   "resist": {
    "type": "Magic",
-   "modifier": null
+   "modifier": -200
   },
   "range_raw": "200",
   "description": "Tears the life from your target, siphoning between 2 and 40 damage.",
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Decrease Hitpoints by 2 (L1) to 40 (L60)"
+    "effect": "Decrease Hit Points by 2 (L1) to 51 (L50)"
    }
   ],
   "msg_cast_on_you": "You feel your life force drain away.",
-  "msg_cast_on_other": "Someone  staggers.",
+  "msg_cast_on_other": "Someone staggers.",
   "msg_wears_off": null,
   "cc_families": []
  },
@@ -90262,6 +90486,40 @@
    {
     "slot": 1,
     "effect": "Increases the power of wind instrument based bard songs by up to 100%"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Wind Resonance 10",
+  "page_title": "Wind Resonance 11",
+  "template": "Spellpagesmart",
+  "classes": [],
+  "classes_raw": "BRD",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": null,
+  "beneficial": null,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "1:54:00",
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": "100",
+  "description": "Increases the power of wind instrument based bard songs by up to 110%.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Increases the power of wind instrument based bard songs by up to 110%"
    }
   ],
   "msg_cast_on_you": null,

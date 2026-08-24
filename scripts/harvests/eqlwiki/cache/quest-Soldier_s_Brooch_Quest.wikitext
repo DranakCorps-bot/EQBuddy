@@ -24,11 +24,9 @@ The Soldier's Brooch is a set of Range slot items with a level 30 minimum requir
 
 == Rewards ==
 
-IMPORTANT NOTE! Rewards are based upon your Primary class.  If your primary class is not one of the listed below, you will NOT get an item reward when you trade in the quest items!
+You can pick whichever brooch suits your build.
 
-'''Upcoming change (patch of August 18, 2026):''' per the pre-patch notes shared by Secrets on the official Discord (August 14, 2026), ''"The Soldier's Brooch quest in Rathe Mountains will now allow the player to choose their reward."'' Once the patch is live, you will no longer be locked to your primary class reward and can pick whichever brooch suits your build.
-
-All eight brooches are LORE, NO TRADE, Range slot, Req Level 30, Race: ALL. Their stats are compared below so you can pick the best one for your class — click an item name for its full page.
+All eight brooches are LORE EQUIPPED, NO TRADE, Range slot, Req Level 30, Race: ALL. Their stats are compared below so you can pick the best one for your class — click an item name for its full page.
 
 {| class="wikitable sortable"
 ! Class !! Reward !! AC !! HP !! Mana !! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA !! SV Magic !! SV Fire !! SV Cold !! SV Disease !! SV Poison !! WT
@@ -79,8 +77,12 @@ Each of the targets for this quest can be found at the same place. (+1187, +2479
 ; You offered 1 Teir`Dal Arcane Insignia to Gaz Commander Faltip.
 ; You offered 1 Troll Basher Insignia to Gaz Commander Faltip.
 ; You offered 1 Teir`Dal Priest Insignia to Gaz Commander Faltip.
+
 : Gaz Commander Faltip says, 'You've done quite well for yourself, and for the Guktan Army, though we are far from being safe just yet. I'm still receiving reports of these groups appearing in different areas of the Mountains, though I can't be sure if these were from before or after your actions. Regardless, I appreciate your efforts, and please make sure to keep an eye out for more of these groups.'
+
 * Your faction standing with [[Protectors of Gukta]] has been adjusted by 5.
-* You gain experience!
+{{Exp}}
+
+After turning in the insignia, the quest rewards window appears so you can choose your reward.
 
 [[Category:Quests]]
