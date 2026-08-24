@@ -1255,6 +1255,44 @@ Read this list before touching the areas it names. Every entry cost a release.
     the thing to do at move time is enumerate what the old host called and how often —
     not just what it called.
 
+47. **A CONSENT GATE IS ONLY AS GOOD AS ITS SLOWEST PATH — and a periodic job whose "last
+    run" starts at `DateTime.MinValue` is not periodic, it fires immediately.** Auto-empty
+    asks permission on the tour's first page, and the startup sweep waited for the answer
+    (`TruncateLogs && !ShowTutorial`). The 10-minute janitor asked `TruncateLogs` alone, and
+    `_lastJanitorRun = DateTime.MinValue` means `Now - _lastJanitorRun > 10min` is TRUE on
+    the first one-second UI tick. So the guarded path deferred and the unguarded path
+    destroyed every log about a second later, with the consent dialog still on page 1. The
+    player (Strilker-TV, Reddit 2026-08-23) ticked the box, lost everything anyway, and could
+    only report that it *"didn't take hold properly"* — an accurate description of an app
+    that asks after it acts. **Four copies of one rule, and the one that disagreed did so in
+    the direction that destroys data.**
+    → **Never let two code paths decide a destructive question.** `UI.Shared/LogJanitorPolicy`
+    is the one answer and `LogJanitorPolicyTests` scans both widgets so a fifth site cannot
+    drift. And **when you find an "every N minutes" job, check its epoch** — `MinValue` is a
+    first-tick job wearing a scheduler's clothes, which is fine for a refresh and not fine
+    for anything irreversible.
+
+48. **A GLOB THAT SELECTS THE APP'S OWN FILES ALSO SELECTS THE USER'S COPIES OF THEM, AND
+    IT CANNOT TELL THEM APART.** The same sweep emptied everything matching `eqlog_*.txt` —
+    the game's naming, and equally the naming of every backup a player keeps beside it.
+    Renaming a log as it grows (`eqlog_Name_server_2026-08-01.txt`) is the obvious way to
+    keep history and put it directly in the firing line. **Enumeration is not permission**:
+    the pattern that FINDS a file is not the test for whether you may destroy it.
+    → `Core/GameWrittenLog` gates destruction on the shape the game itself writes, and the
+    subtlety is worth carrying: **the discriminator is the CHARACTER SET, not the segment
+    count.** "Exactly two parts after `eqlog_`" looks obviously right and is wrong —
+    `eqlog_Aenari_erollisi_marr.txt` is a real log whose server short name contains an
+    underscore, so segment counting would refuse to sweep a legitimate log forever, which is
+    the failure the feature exists to prevent. A rename adds digits, a dash, a space, a dot,
+    "(1)", " - Copy"; the game writes letters. The residual gap (a letters-only rename like
+    `..._old.txt` is unresolvable from the filename) is written into the doc comment rather
+    than papered over.
+    → **And the reason this was recoverable at all is a default set two weeks earlier for
+    the same reason** — `ArchiveLogs` on by default since 1.84.0 (#146, wizen: EQBuddy's
+    out-of-the-box behaviour was destroying a file nobody asked it to destroy). A net under
+    an irreversible operation pays for itself the day the operation turns out to be wrong
+    about what it was operating on.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
