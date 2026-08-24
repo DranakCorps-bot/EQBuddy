@@ -2,6 +2,7 @@
 
 ==Description==
 *There are two different types of Muffin quests outlined below. The first two quests involve buying Vendor sold Muffins in infinite supply and handing them directly to NPC. The second kind involves Baking them and combining into a Muffin Crate.  <br>
+
 ==Vendor purchased Muffin Hand-in==
 ===[[Muffin for Pandos]] (Freeport, [[Pandos Flintside]])===
 ===[[Wenbie's Muffins]] (Qeynos, [[Guard Wenbie]])===
@@ -177,6 +178,7 @@ Sal Drana says, 'Very good work. I can see you are a talented baker and these mu
 </div>
 <span style="font-weight:bold;color:#D6A100;">You gain experience!!</span><br>
 You receive 7 gold.
+
 ===Fresh Baked Muffins (Kelethin, [[Innkeep Wuleran]])===
 Turning a [[Full Muffin Crate]] into Innkeep Wuleran ([[Kelethin]]):<br>
 Innkeep Wuleran says, 'Oh, these look delicious! No doubt they were made with fresh fruit grown locally; I can tell by the aroma. You have quite a talent! Thank you so much. Here is your payment. This should be enough to last me for a little while.'
@@ -184,11 +186,10 @@ Innkeep Wuleran says, 'Oh, these look delicious! No doubt they were made with fr
 * Your faction standing with [[Kelethin Merchants]] got better.
 * Your faction standing with [[Faydarks Champions]] got better.
 * Your faction standing with [[Emerald Warriors]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
-
 {{Exp}}<br>
 You receive 7 gold
+
 ===Fresh Baked Muffins (Erudin, [[Beth Breadmaker]])===
 Turning a [[Full Muffin Crate]] into Beth Breadmaker ([[Erudin]]):<br>
 Beth Breadmaker says, 'Ah yes! This is exactly what I am looking for, dear. Let me put these on the shelf right away. Here is some coin for your trouble. Perhaps we can do business again sometime.'

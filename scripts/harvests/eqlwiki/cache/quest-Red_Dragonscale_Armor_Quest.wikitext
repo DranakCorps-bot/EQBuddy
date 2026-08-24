@@ -33,6 +33,8 @@ Requires Indifferent or better faction, is multiquestable.
 * [[Red Dragon Scales]] from [[Lord Nagafen]] or [[Talendor]]
 * [[Vial of Swirling Smoke]] (vendor - see item page notes for tips to acquire)
 * 1000 platinum pieces
+
+Note: As of 8-17-26, I handed in all items, got the armor and Karam gave back the 1,000 platinum.  The Vial of Swirling Smoke was 1,200 platinum, though. Left it in place, however, in case this is patched out. Wouldn't want you to be surprised.
 {{End}}
 
 == Dialogue ==

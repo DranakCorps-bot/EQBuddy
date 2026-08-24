@@ -1,4 +1,7 @@
-[[File:npc_shondo_billin.png|frame|Shondo Billin]]
+{{Classic Era}}
+
+[[File:npc_shondo_billin.png|thumb|Shondo Billin]]
+
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Erudin|Erudin Palace]]
@@ -43,11 +46,11 @@ You say, 'What tonic?'
 : Shondo Billin says 'Gulp.. Gulp.. Aaahhh!!! That hits the spot. All I can tell you is that the heretic's name was E'lial B'rook. He mumbled something about a rendezvous and he would be floating down a river, smooth sailing back to something called Paineel. That's all I know.'
 
 <div class="facblock">
-* Your faction standing with [[Gem Choppers]] got better. (+10)
-* Your faction standing with [[Merchants of AkAnon]] got better. (+5)
-* Your faction standing with [[King AkAnon]] got better. (+5)
-* Your faction standing with [[Dark Reflection]] got worse. (-2)
-* Your faction standing with [[Clan Grikbar]] got worse. (-1)
+* Your faction standing with [[Gem Choppers]] has been adjusted by 10.
+* Your faction standing with [[Merchants of AkAnon]] has been adjusted by 5.
+* Your faction standing with [[King AkAnon]] has been adjusted by 5.
+* Your faction standing with [[Dark Reflection]] has been adjusted by -2.
+* Your faction standing with [[Clan Grikbar]] has been adjusted by -1.
 </div>
 {{exp}}
 

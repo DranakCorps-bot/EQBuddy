@@ -34,7 +34,7 @@
 == Checklist == 
 {{CheckboxList}}
 * [[Ajrah Leaf]]
-** Locate and Kill [[a kobold shaman]] around -990.37, -425.06, -83.46
+** Locate and Kill [[a kobold shaman]] around -990.37, -425.06, -83.46 (Kobold Shaman can be near Erudin, or Paineel, appears to just be a rare or uncommon. I found one by  tents near Paineel and another roaming near Erudin)
 ** Return to Allix
 
 {{End}}

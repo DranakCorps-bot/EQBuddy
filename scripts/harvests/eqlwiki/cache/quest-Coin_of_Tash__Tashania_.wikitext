@@ -32,7 +32,7 @@ __NOTOC__
 * Get [[Coin Pouch]] from [[Romar Sunto]] in The Temple of Solusek Ro
 * Collect the coins from cities across the world:
 ** Azia - '''[[Ak'anon]]''' - Near great wheel (not in water) (+1990, -260, -125).  It's on the West side of the water wheel, then North a bit right at the Star light thing.
-** Beza - '''[[Erudin|Erudin Palace]]''' - In the Caster's Guild zone, go one level up from the zone-in teleporter. It's in the fountain with rocks in it. (+703, +740, +44).
+** Beza - '''[[Erudin|Erudin Palace]]''' - In the Caster's Guild zone (Erudin Palace), go one level up from the zone-in teleporter. It's in the fountain with rocks in it. (+703, +740, +44).
 ** Caza - '''[[Felwithe|Northern Felwithe]]''' - in the fishing pond (-110, -790, -50).
 ** Dena - '''[[West Freeport]]''' - In the pool under the Academy of Arcane Science (Caster Guild) (129, -750, -80).
 ** Ena - '''[[Grobb]]''' - in pool near bar #6 on map. When you enter the zone and go across the first bridge the small pool on the right. (+197, -261).
@@ -43,9 +43,9 @@ __NOTOC__
 ** Jaka - '''[[North Qeynos]]''' - under Temple of Life "UFO" in the Koalindl Fish Pool (-90, -445, -10).
 * Combine the 10 coins and combine them in the coin pouch to get a [[Coin of Tash]].
 * Give [[Coin of Tash]] to [[Tarn Visilin]] in the High Keep library at +75, -220 and receive the [[Glowing Coin of Tash]].
-* Give [[Glowing Coin of Tash]] to [[Mizr N`Mar]] in the Neriak 3rd Gate library to receive the [[Gleaming Coin of Tash]]. 
-* Give [[Gleaming Coin of Tash]] to [[Raine Beteria]] in Erudin library to receive the [[Radiant Coin of Tash]]. 
-* Give [[Radiant Coin of Tash]] to [[Romar Sunto]] in The Temple of Solusek Ro to receive [[Spell: Tashania]].
+* Give [[Glowing Coin of Tash]] to [[Mizr N`Mar]] in the Neriak 3rd Gate library at +913, -1314 to receive the [[Gleaming Coin of Tash]]. 
+* Give [[Gleaming Coin of Tash]] to [[Raine Beteria]] in Erudin library at -1050, -212 to receive the [[Radiant Coin of Tash]]. 
+* Give [[Radiant Coin of Tash]] to [[Romar Sunto]] in The Temple of Solusek Ro at +393, +90 to receive [[Spell: Tashania]].
 {{End}}
 
 '''Warning DO NOT do turn-ins while invisible, though you can use Sneak'''

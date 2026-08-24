@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_yeolarn_bronzeleaf.png|frame|Yeolarn Bronzeleaf]]
+[[File:npc_yeolarn_bronzeleaf.png|thumb|Yeolarn Bronzeleaf]]
 __NOTOC__
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -70,7 +70,6 @@ You say, 'I will protect the Mother'
 <div class='facblock'>
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{YouGainExperience}}
 
@@ -87,7 +86,6 @@ You say, 'What Initiate of Tunare?'
 <div class='facblock'>
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{YouGainExperience}} 
 
@@ -124,7 +122,6 @@ You say, 'I will slay the Necromancer'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{YouGainExperience}} 
 
@@ -185,7 +182,6 @@ You receive [[Powder of Unanimation]].
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{YouGainExperience}} 
 

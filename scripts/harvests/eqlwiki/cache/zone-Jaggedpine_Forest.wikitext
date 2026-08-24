@@ -1,0 +1,98 @@
+{{Classic Era}}
+
+Jaggedpine Forest was once the tranquil sanctuary of people devoted to the god Karana, and nobody travelled from there to the outside or back. Lately, however, gnolls have started moving between here and the area north of Qeynos.
+
+{|
+|rowspan="6" valign="top" width="160"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+| 35-60
+
+|-
+! ''' Types of Monsters: '''
+|[[Cave Basilisk]], [[Grey Pinewolf]], [[Black Pinewolf]], [[Docile Bear]], [[Anchorite of Brell Serilis]], [[Greenwood Bear]], [[Greenwood Grizzly]], [[Willowisp]], [[Darkpaw Curate]], [[Darkpaw Mystic]], [[Darkpaw Corruptor]], [[Defiler]], [[Gnoll]], [[Warrior; Giant Anaconda]], [[Dryad]], [[Timber Griffon]], [[Treant]], [[River Turtle]], [[Potameid Guardian]], [[Potameid Wildling]], [[Potameid Maiden]]
+
+|-
+! ''' Notable NPCs: '''
+| [[Myraephe the Pure]], [[Oracle Jaarl]], [[Shard the Fang]]
+
+|-
+! ''' Unique Items: '''
+| [[Qeynos Badge of Nobility]], [[Cloak of Shimmering Water]], [[Stone Studded Shield]], [[Enchanted Dew Woven Circlet]], [[Silver Blade of Thunder]], [[Copper Plated Bracer]], [[Sigil Ring of Jaggedpine]], [[Griffon Fang Earring]], [[Eye of the Griffon]], [[Boots of Stalking]], [[Cloak of Crystalline Waters]], [[Bracer of Acuity]], [[Bear Fanged Glove]], [[Barkleather Gloves]], [[Sap Stained Boots]], [[Whilom Treant Fossil]], [[The Silver Nemesis]], [[Sap Stained Gorget]], [[Resin Covered Leaves]], [[Sabertooth]], [[Ancient Treant Branch]], [[Gnoll Forged Axe]], [[Poorly Balanced Dagger]], [[Poorly Balanced Battle Axe]], [[Absorbtion Stone]], [[Poorly Balanced Spear]], [[Decanter of the Apothecary]], [[Long Fanged Glaive]], [[Partisan of Stampede]], [[Poorly Balanced Mace]], [[Anaconda Fang Knife]], [[Sack Full of Rocks]], [[Greater Shockstone]], [[Poorly Balanced Longsword]], [[Blackguard's Dudgeon]], [[Gnollish Ring of Sorcery]], [[Mythril Knuckles]], [[Claw of the Beast]], [[Poorly Balanced Hammer]], [[Greater Lightstones]]
+
+|-
+! ''' Adjacent Zones: '''
+| [[Blackburrow]], [[Nedaria's Landing]], [[Surefall Glade]]
+
+|-
+! ''' Name in /who: '''
+| jaggedpine
+
+|-
+! ''' [[Zone Spawn Timer]]: '''
+| ?
+
+|-
+! ''' Succor/Evacuate: '''
+| X (1800) Y (1319) Z (-13) - East of the teleporter to/from [[Surefall Glade]]
+
+|-
+! [[Recommended Levels and ZEM List|ZEM]] ''' Value:'''
+| 75 (100%)
+
+|}
+|}
+
+== Map ==
+
+{| cellspacing="0" cellpadding="0" style="border:1px solid gray; max-width:1280px;" width="100%"
+|-
+| style="padding:10px;" |
+
+[[File:map_jaggedpineforest.jpg|right|frame|Jaggedpine Forest]]
+
+'''Jaggedpine Forest'''
+
+<ol style="margin-left:1.5rem; padding:0;">
+<li>Darkpaw Gnoll Caves</li>
+<li>Pit trap when coming from west</li>
+<li>Teleporter to/from Surefall Glade</li>
+<li>Buildings with Druid Trainer, Bank, Merchants selling Food and Goods, Cooking Supplies, Pottery Sketches, Molds</li>
+<li>Stone Ring</li>
+<li>Teleporter to/from Blackburrow</li>
+<li>Cave with Cave Basilisks</li>
+<li>Oracle Jaarl</li>
+<li>Bank, also Merchants selling Food and Other Goods, Molds, Pottery Sketches</li>
+<li>Bandit Camp</li>
+<li>Potameid Tunnels</li>
+</ol>
+
+|}
+
+== Dangers ==
+
+The potmeids are highly aggressive and powerful, and roam the area near the river. They are also immune to root/snare type spells. They also have an extensive underwater tunnel area underneath the river to the east. Although most of it is completely underwater, there are air pockets throughout in case your spell runs out.
+
+Darkpaw gnoll oracles in the evil gnoll caverns can see through all invisibility spells. There is also a large pit trap in there that leads you to a much deeper place if you fall into it. You'll hit it if you enter the caves and then keep to the right.
+
+== Benefits ==
+
+The zone is outdoors, and has a large number of animals to hunt. Although hunting them will hurt your faction, if you have special animal abilities and aren't worried about faction it can be a great place to hunt them down. This is especially true for [[Druid|Druids]] and [[Ranger|Rangers]], although I would make sure you don't worship [[Karana]] first, because it could cause problems in the future.
+
+There are banks and merchants in the human town and also the good gnoll caverns.
+
+== Traveling To and From ==
+
+You can enter the [[Jaggedpine Forest]] through a teleporter located deep in the bear caves in [[Surefall Glade]]. There is also a teleporter located in the bottom of [[Blackburrow]]
+
+== What's in this zone? ==
+
+{{Special:DynamicZoneList/Jaggedpine Forest}}
+
+[[Category:Zones]]
+
+<!-- Add only after Loc Mapping is configured:
+[[Category:Loc Mapped]]
+-->

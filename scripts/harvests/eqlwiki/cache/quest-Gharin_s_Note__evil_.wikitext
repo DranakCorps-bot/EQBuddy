@@ -65,10 +65,10 @@ You say, 'What is Lion's Mane'
 
 <div class="facblock">
 * Your faction standing with [[Guards of Qeynos]] has been adjusted by 50.
-* Your faction standing with [[Antonius Bayle]] has been adjusted by 5?.
+* Your faction standing with [[Antonius Bayle]] has been adjusted by 7.
 * Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by -7.
 * Your faction standing with [[Circle Of Unseen Hands]] has been adjusted by -12.
-* Your faction standing with [[Merchants of Qeynos]] has been adjusted by 5?.
+* Your faction standing with [[Merchants of Qeynos]] has been adjusted by 5.
 </div>
 
 {{YouGainExperience}}

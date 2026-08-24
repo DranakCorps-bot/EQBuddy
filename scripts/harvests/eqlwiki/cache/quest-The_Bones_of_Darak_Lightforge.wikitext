@@ -26,6 +26,39 @@
 <ul><li> [[Divine Might|Spell: Divine Might]]
 </li></ul>
 
+== Checklist ==
+{{CheckboxList}}
+* Collect six bones, a shield, and a sword. All are ground spawns; collectable in open world or a personal instance. Suggested order to collect:
+** [[A Dusty Old Backbone]] and [[Dusty Ribcage]] - Both spawn in the Ghost Room Pit in [[Unrest]]. Go into the basement, then through the invisible wall, go through the lava, and the bag is in the pit. Dusty Ribcage also spawns in Mistmoore Castle. You can skip going to Mistmoore if you collect it in Unrest.
+** [[Dusty Old Finger Bones]] - Inside Phinigel Autropos's room in [[Kedge Keep]].
+** [[Dusty Ribcage]] - <b>Skip if you got in Unrest already.</b> The Garden in [[Mistmoore Castle]]. This is in Fountain Room #7 on the map.
+** [[Dusty Old Skull]] - Minotaur caves in [[Steamfont Mountains]] in Meldrath's room.
+** [[A Dusty Old Jawbone]] - Underwater Ice Cave (Miragul's area) in [[Everfrost Peaks]]. There are emblems on the wall in the cave. The item is under the third emblem at about 4535, -5235.
+** [[A Dusty Broken Sword]] - In the mines of [[North Kaladim]] in the water. Ground spawn in the water at roughly +761, +332.
+*** While in Kaladim, buy a [[Pick]] from [[Kadek Norkhitter]] in [[North Kaladim]] and two [[Dwarven Ale]]s from [[Dura Darkfoam]] in [[South Kaladim]] (or any other number of vendors that sell it).
+** [[A Dusty Broken Shield]] - On a ledge on right cliffs in [[Erudin]] from the docks. Ground spawn at -605, -725.  You must swim from the docks to reach the shield.
+** [[A Dusty Old Leg Bone]]
+*** If not done already, purchase a [[Pick]] from [[Kadek Norkhitter]] in [[North Kaladim]] and two [[Dwarven Ale]]s from [[Dura Darkfoam]] in [[South Kaladim]] (or any other number of vendors that sell it).
+*** Hand the [[Pick]] and both [[Dwarven Ale]]s to [[Diggs Duggun]] in [[Beholder's Maze]].
+* Get [[Empty Gem Bag]] from [[Ping Fuzzlecutter]] in [[West Freeport]].
+** Say 'What components?' to [[Ping Fuzzlecutter]].
+* Gather the following gems for the Empty Gem Bag:
+** [[Diamond]] - Drop only, various zones from level 50+ mobs.
+** [[Star Ruby]] - Drops in various zones. Purchaseable from various Jewelcrafting vendors.
+** [[Pearl]] - Drops in various zones. Purchaseable from various Jewelcrafting vendors.
+** [[Fire Emerald]] - Drops in various zones. Purchaseable from various Jewelcrafting vendors.
+** [[Sapphire]] - Drops in various zones. Purchaseable from various Jewelcrafting vendors.
+** [[Fire Opal]] - Drops in various zones. Purchaseable in [[North Freeport]] from [[Amber]] or [[Jade]].
+** 2 [[Enchanted Platinum Bar]]s (Unstacked) - [[Platinum Bar]]s can be purchased from various Jewelcrafting vendors and then must be enchanted by a 32+ Enchanter using the [[Enchant Platinum]] spell.
+* Combine the gems in the bag to craft a [[Full Gem Bag]].
+* Give [[Full Gem Bag]] to [[Ping Fuzzlecutter]] to receive [[Gem Encrusted Casket]] (8-slot container version).
+* Combine the 6 bones, sword, and shield collected in the first step in the [[Gem Encrusted Casket]] container to receive a non-container version, also called [[Gem Encrusted Casket]].
+* Give non-container [[Gem Encrusted Casket]] to [[Simon Aldicott]] in the [[West Commonlands]]. <b>Note: this spawns [[A Tortured Revenant]], be ready for combat.</b>
+** Kill [[A Tortured Revenant]] and loot [[Revenant Ash]] ("Ash of Darak Lightforge")
+* Give the [[Revenant Ash]] to [[Simon Aldicott]] to receive [[Divine Might|Spell: Divine Might]].
+
+{{End}}
+
 == Walkthrough ==
 
 ''[[Diggs Duggun]] is at 1260, -550 in the Gorge of King Xorbb.''
@@ -44,7 +77,7 @@ You say, 'What boon?'
 
 '''Receive A Dusty Old Leg Bone.'''
 
-Now go find a Paladin guildmaster by the name of [[Valeron Dushire]].
+Now go find the Paladin guildmaster in North Freeport by the name of [[Valeron Dushire]].
 
 You say, 'Hail, Valeron Dushire'
 
@@ -77,8 +110,8 @@ You say, 'I accept.'
 # [[A Dusty Old Backbone]] and [[Dusty Ribcage]] - Ghost Room Pit in [[Unrest]].  Go in the basement, then through the invisible wall, go through the lava, and the bag is in the pit.
 # [[A Dusty Old Jawbone]] - Underwater Ice Cave (Miragul's area) in [[Everfrost Peaks]]. There are emblems on the wall in the cave. The item is under the third emblem at about 4535, -5235.
 # [[A Dusty Broken Sword]] - In the mines of North [[Kaladim]] in the water. Ground spawn in the water at roughly +761, +291.
-# [[A Dusty Broken Shield]] - On a ledge on right cliffs in [[Erudin]] from the docks.  Ground spawn at -605, -725.  You must swim from the docks to reach the shield.
-# [[Dusty Old Finger Bones]] - Inside Phinigel Autropos's room in [[Kedge Keep]]. Beware Swirlspine Seahorse (4 of them, 51 Cleric’s) can see invis! So bring a group! Swim down through the Star which is in the center of the room. There's an alcove on the SOUTH WALL with a large rock, and the bag spawns to the LEFT of the rock. Exact Location is neg 150, pos 127, neg 270.
+# [[A Dusty Broken Shield]] - [[Erudin]], take the small gem teleporter to the Docks area (not the Palace). Once you get outdoors, hug the right wall, swimming all the way to the edge of the zone. The shield spawns on an outcropping of rock at -605, -716.
+# [[Dusty Old Finger Bones]] - Inside Phinigel Autropos's room in [[Kedge Keep]]. Beware of the [[Swirlspine Seahorse]]s (there are 4 of them, 51 Clerics), they can see invis, but can be lulled! So bring a group! Swim down through the star in the center of the room down to where Phinny spawns. There's an alcove on the SOUTH WALL with a large rock; the bag spawns to the LEFT of the rock. Exact Location is -150, +127, -270.
 [[File:Dust_Old_Finger_Bones.png]]
 ''*NOTE:'' The respawn timer on bones seems to be 20 minutes. Tested 6/30/2022 with two Paladins in Unrest and Mistmoore.
 
@@ -132,9 +165,9 @@ A Tortured Revenant's corpse says 'At last I can rest..'
 : Simon Aldicott says, 'Thank you Knight. With this task accomplished, I shall reward you with this scroll. It is an ancient spell that only the holiest of knights may cast. Remember your duty!'
 
 <div class="facblock">
-* Your faction standing with [[Priests of Marr]] got better.
-* Your faction standing with [[The Freeport Militia]] got worse.
-* Your faction standing with [[Knights of Truth]] got better.
+* Your faction standing with Priests of Marr has been adjusted by 300.
+* Your faction standing with The Freeport Militia has been adjusted by -30.
+* Your faction standing with Knights of Truth has been adjusted by 45.
 </div>
 {{YouGainExperience}}
 

@@ -29,7 +29,7 @@ The sash quests require "high amiably" faction in order to do. Sneaking only giv
 
 You can check if you have the require faction by saying "what white training sash" to [[Velan Torresk]]. If your faction is insufficient, he will say "I have been watching you, and appreciate the help you've given to the brothers and sisters of the Ashen Order, but I feel that such a vital matter should be left to one of our more trusted members.". If it is sufficient, he will give you details on how to obtain the quest items.
 
-A Human Monk starting out can instantly gain the required faction by simply turning in their newbie note. An Iksar Monk must embark on a long faction grind, which is most simply done by killing Deathfist orcs in the newbie area of Freeport, and in East/West Commonlands. Between 1800 and 2000 orc kills are required to get the necessary faction. If you wish, you can repeat the White Sash quest to gain even more faction, along with Knights of Truth and Silent Fist Clan (Qeynos Monks) faction. You can also complete a few select quests to gain faction, see [[Ashen Order]].
+A Human Monk starting out can instantly gain the required faction by simply turning in their newbie note. An Iksar Monk must embark on a faction grind, which is most simply done by killing Deathfist orcs in the newbie area of Freeport, and in East/West Commonlands. If you wish, you can repeat the White Sash quest to gain even more faction, along with Knights of Truth and Silent Fist Clan (Qeynos Monks) faction. You can also complete a few select quests to gain faction, see [[Ashen Order]].  By far the easiest of these is the [[Note for Konem]] quest, which you can fill your backpack and do quickly 100+ times.
 
 == Rewards ==
 

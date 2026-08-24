@@ -1,13 +1,13 @@
 # Debuff-landing catalog report
 
-- 615 debuffs across 397 landing lines (88 shared)
+- 617 debuffs across 397 landing lines (88 shared)
 
 ## Shared landing lines (the loss entry names the line, not one spell)
 
-- 'You feel your life force drain away.': Bond of Death, Curse of the Garou, Deflux, Drain Soul, Drain Spirit, Life Leech, Lifespike, Lifetap, Siphon, Siphon Life, Soul Bond, Soul Consumption, Specter Lifetap, Spirit Tap, Strike of the Chosen, feast of blood, soul well
+- 'You feel your life force drain away.': Bond of Death, Curse of the Garou, Deflux, Drain Soul, Drain Spirit, Life Leech, Lifebite, Lifespike, Lifetap, Siphon, Siphon Life, Soul Bond, Soul Consumption, Specter Lifetap, Spirit Tap, Strike of the Chosen, feast of blood, soul well
 - 'You have been poisoned.': Dark Poison, Deadly Poison, Envenomed Bolt, Feeble Poison, Froglok Poison, Goop Poison, Ikatiar's Revenge, Injected Poison I, Injected Poison II, Injected Poison III, Injected Poison IV, Injected Poison V, Manticore Poison, Poison, Poison Bolt, Venom of the Snake, Weak Poison
 - 'You are struck by a sudden force.': Cease, Desist, Force, Holy Might, Markar's Clash, Markar's Discord, Monkey Stun, Sacred Word, Stun Command, Tishan's Clash, Tishan's Discord, Verlekarnorm's Disaster
-- 'You feel your skin ignite.': Blaze, Burning Arrow, Call of Flame, Firestrike, Flaming Arrow, Ignite, Inferno Shock, Lightning Shock, Scorching Arrow, Searing Arrow, Shock of Flame
+- 'You feel your skin ignite.': Blaze, Burning Arrow, Call of Flame, Firestrike, Firestrike (Effect), Flaming Arrow, Ignite, Inferno Shock, Lightning Shock, Scorching Arrow, Searing Arrow, Shock of Flame
 - 'You have been charmed.': Alluring Whispers, Beguile, Boltran's Agacerie, Cajoling Whispers, Charm, Dictate, Vampire Charm
 - 'Lightning surges through your body.': Bolt of Karana, Careless Lightning, Fury of Air, Invoke Lightning, Lightning Blast, Lightning Strike
 - 'You are immolated by flame.': Column of Fire, Fiery Death, Fire, Flame Song of Ro, Pillar of Fire, Supernova
@@ -45,6 +45,7 @@
 - Selo's Assonant Strain: landing line 'Silver strands of music bind you.' already claimed by another catalog
 - Selo's Chords of Cessation: landing line 'Chords of music bind your hands.' already claimed by another catalog
 - Selo's Consonant Chain: landing line 'Your voice binds chords into chains.' already claimed by another catalog
+- Sha's Lethargy: landing line 'You feel lethargic.' already claimed by another catalog
 - Shiftless Deeds: landing line 'You slow down.' already claimed by another catalog
 - Shroud of Hate: landing line 'Hatred fuels your arms.' already claimed by another catalog
 - Slime Mist: landing line 'Your body is covered in a fine mist of slime.' already claimed by another catalog

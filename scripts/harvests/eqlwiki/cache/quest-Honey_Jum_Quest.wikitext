@@ -83,11 +83,11 @@ You say, 'What buggers?'
 Joogl Honeybugger says 'Oh thank you, _____. If you are ever going to gather bixie honeycombs pray you do not run into the queen. The only way I know of collecting the honey is by intercepting the drones and taking the honeycombs they sometimes carry. Good luck !!'
 
 <div class="facblock">
-* Your faction standing with [[Merchants of Rivervale]] got better.
-* Your faction standing with [[DeepPockets]] got better.
-* Your faction standing with [[Guardians of the Vale]] got better.
-* Your faction standing with [[Mayor Gubbin]] got better.
-* Your faction standing with [[Coalition of Tradefolk Underground]] got worse. 
+* Your faction standing with [[Merchants of Rivervale]] has been adjusted by 5.
+* Your faction standing with [[DeepPockets]] has been adjusted by 5.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by 5.
+* Your faction standing with [[Mayor Gubbin]] has been adjusted by 5.
+* Your faction standing with [[Coalition of Tradefolk Underground]] has been adjusted by -1.
 </div>
 
 '''Get 3 [[honeycomb]]s, 30 gold and return to Kizzie for the turn in:'''
@@ -95,10 +95,10 @@ Joogl Honeybugger says 'Oh thank you, _____. If you are ever going to gather bix
 Kizzie Mintopp says 'You are one lucky bixie buster. I just made a batch of honey jum. Here. No waiting for you. One jar for your good work. Bye, now!'
 
 <div class="facblock">
-* Your faction standing with [[Merchants of Rivervale]] got better.
-* Your faction standing with [[DeepPockets]] got better.
-* Your faction standing with [[Guardians of the Vale]] got better.
-* Your faction standing with [[Mayor Gubbin]] got better.
+* Your faction standing with [[Merchants of Rivervale]] has been adjusted by 5.
+* Your faction standing with [[DeepPockets]] has been adjusted by 5.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by 5.
+* Your faction standing with [[Mayor Gubbin]] has been adjusted by 5.
 * Your faction standing with [[Coalition of Tradefolk Underground]] has been adjusted by -1. 
 </div>
 {{YouGainExperience}}

@@ -176,18 +176,84 @@ public class ZoneMapCoverageTests : IDisposable
         }
     }
 
+    /// <summary>
+    /// ZoneGraph nodes the CLIENT ships no map for — curated, one reason per row.
+    ///
+    /// The test below exists so a new zone cannot SILENTLY lose its map, so an exemption
+    /// has to be added deliberately and defended here rather than by loosening the rule.
+    /// Same shape as `DeadSettingTests.Known` and `GameCommandsTests.SurfacesNeedingACommand`
+    /// (trap 34): the list is the thing that keeps the guard honest.
+    /// </summary>
+    private static readonly Dictionary<string, string> ZonesWithNoClientMap =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Jaggedpine Forest"] =
+                "A real EQ Legends zone — eqlwiki's page is tagged {{Classic Era}} and carries "
+                + "its monster list, notable NPCs and unique items — but the client's own zone "
+                + "table ships no map stem for it. It entered ZoneGraph in the 2026-08-24 "
+                + "knowledge refresh, as a connection from Blackburrow that the wiki's Blackburrow "
+                + "page had gained. Keeping it is the eqlwiki-is-the-source rule: travel routing "
+                + "through it is correct, and the map window already has a no-map state to show.",
+
+            ["Nedaria's Landing"] =
+                "Arrived in the same 2026-08-24 refresh, but on WEAKER evidence than Jaggedpine "
+                + "and it is worth saying so: eqlwiki has NO page of its own for it. It exists "
+                + "only in the 'Adjacent Zones' line of the Jaggedpine Forest page, and the "
+                + "client's zone table has neither a map nor an entry. Kept because the standing "
+                + "rule is that eqlwiki is the source and we do not depart from it without "
+                + "decisive evidence — 'the page it is named on may have been copied from live "
+                + "EQ' is a suspicion, not evidence. Flagged to David as a harvester question: "
+                + "should a zone with no page of its own be allowed into ZoneGraph at all?",
+        };
+
     [Fact]
     public void EveryZoneGraphZoneResolvesToAShippedStem()
     {
         var stems = ClientZones.Select(z => z.Stem).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var graph = ZoneGraph.LoadEmbedded();
         Assert.True(graph.ZoneCount > 100, "ZoneGraph failed to load");
+        // Collected, not thrown on the first miss: a knowledge refresh adds zones in
+        // BATCHES, and failing one at a time turns one review into N build-run cycles.
+        var unmapped = graph.Zones
+            .Where(z => !ZonesWithNoClientMap.ContainsKey(z))
+            .Select(z => (Zone: z, Stem: ZoneMapFiles.ExpectedShortname(z)))
+            .Where(z => !stems.Contains(z.Stem))
+            .ToList();
+
+        Assert.True(unmapped.Count == 0,
+            "ZoneGraph names zones the game ships no map for. Add an alias in "
+            + "ZoneMapFiles.Shortnames, or — if the client genuinely ships no map — a defended "
+            + "row in ZonesWithNoClientMap:" + Environment.NewLine + "  "
+            + string.Join(Environment.NewLine + "  ",
+                unmapped.Select(u => $"{u.Zone} (expected {u.Stem}.txt)")));
+
         foreach (var zone in graph.Zones)
         {
-            var expected = ZoneMapFiles.ExpectedShortname(zone);
-            Assert.True(stems.Contains(expected),
-                $"ZoneGraph '{zone}': expected stem '{expected}' is no map file the game ships — add an alias in ZoneMapFiles.Shortnames");
-            AssertResolves(zone, expected, "ZoneGraph");
+            if (ZonesWithNoClientMap.ContainsKey(zone)) continue;
+            AssertResolves(zone, ZoneMapFiles.ExpectedShortname(zone), "ZoneGraph");
+        }
+    }
+
+    /// <summary>
+    /// An exemption nobody can see is a blind spot, not an exemption. Every row above must
+    /// still be BOTH in the graph and genuinely map-less — so the day a map ships for one of
+    /// them, or the zone leaves the graph, this fails and the row comes out. Without this the
+    /// list only ever grows, which is how a hold decays into a line people stop reading.
+    /// </summary>
+    [Fact]
+    public void EveryNoMapExemptionIsStillNeeded()
+    {
+        var stems = ClientZones.Select(z => z.Stem).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var zones = ZoneGraph.LoadEmbedded().Zones.ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var (zone, reason) in ZonesWithNoClientMap)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(reason), $"{zone}: an exemption needs a reason");
+            Assert.True(zones.Contains(zone),
+                $"'{zone}' is exempted from the map check but is no longer in ZoneGraph — drop the row");
+            Assert.False(stems.Contains(ZoneMapFiles.ExpectedShortname(zone)),
+                $"'{zone}' now resolves to a shipped map — drop its ZonesWithNoClientMap row, "
+                + "the exemption is hiding real coverage");
         }
     }
 

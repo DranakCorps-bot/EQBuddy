@@ -31,11 +31,13 @@
 
 == Getting In and Out ==
 
-To begin, '''do not enter this zone unless you are prepared to deal with high level mobs with extreme aggro ranges that see through invisibility.''' The entrance to the Plane of Fear is a '''''one-way''''' portal located in the spectre caves in [[The Feerrott]], and if you die inside it will be almost impossible to recover your corpse alone. You must be at least level 46 to enter. Once you zone in, the only way out is either through gating/porting or through an exit portal deep inside the Temple. The latter is not recommended as there are see-invis mobs nearby which will aggro through the temple's ceiling and walls.
-The entrance portal is guarded by several see invis mobs which will gank you immediately upon stepping through, so going in alone is not recommended. No matter your class or the size of your party, a charged [[Leatherfoot Raider Skullcap]] is invaluable to have here.
-It is possible to bind within the zone but this is generally not recommended.
+To begin, '''be aware that this zone is populated with high level mobs with extreme aggro ranges that see through invisibility.''' The entrance to the Plane of Fear is a '''''one-way''''' portal located in the spectre caves in [[The Feerrott]]. Entrance requires level 46. 
 
-For an in-depth guide on this zone, camp spots & places to bind, see [[A Cazicite's Guide to the Plane of Fear]]
+Once inside, the entrance portal is patrolled by see-invis mobs which can attack you immediately upon stepping through, so be prepared. 
+
+Once you zone in, the only way out is either through gating, porting, or through an exit portal deep inside the Temple. The portal is on the Temple's second floor, and can be found by following the left wall after entering from the outside ledge. 
+
+It is possible to bind within the zone.
 
 == Enemies and Loot ==
 
@@ -117,24 +119,6 @@ A listing of the foes you are likely to encounter here, with a brief description
 
 Non-raid mobs in fear are level 48(49?)-51. The level 51 ones will summon. [[Irak Altil]] is always 51 and [[Wraith of a Shissar]] is always 55. Unlike many other zones, there are no rare/named mobs with placeholders, but certain spawn points (notably on the western side of the zone) can have multiple potential spawns, such as [[a spinechiller spider]] in place of [[a scareling]].
 
-=== Raid Targets ===
-
-{| class="eoTable2" style="text-align: center; width: 80%"
-|-
-! style="text-align: center"|Mob Name !! style="text-align: center"| Creature Type !! style="text-align: center"| Class !! style="text-align: center"| Abilities !! style="text-align: center"| Notes !! style="text-align: center"| Unique Drops 
-|-
-| [[Fright]] || Golem || Warrior || [[Enrage]] ||  || [[Fright|Various]]
-|-
-| [[Dread]] || Golem || Warrior || [[Scarab Storm]], [[Enrage]] ||  || [[Dread|Various]]
-|-
-| [[Terror]] || Golem || Warrior || [[Frost Breath]], 56 point lifetap proc, [[Enrage]] || [[Frost Breath]] is a dispel and will likely break charm on pets || [[Terror|Various]]
-|-
-| [[a dracoliche]] || Dragon Skeleton (NOT undead) || Shadow Knight || [[Deadly Lifetap]], [[Rotting Flesh]], small hitbox || Utilize Evasive Discipline and damage absorption (e.g. [[Rune IV]]) to mitigate [[Deadly Lifetap]]. Can be difficult for melee to hit due to the small hitbox || [[Dracoliche|Various]]
-|-
-| [[Cazic Thule (God)]] || Diety || Shadow Knight || [[Avatar Power]], [[Panic]] (random target), [[Enrage]] || All mobs will zone-wide social aggro with Cazic when he is engaged. [[Avatar Power]] is a top slot dispel. [[Cazic Thule (God)|See page for full encounter details.]] || [[Cazic Thule (God)|Various]]
-|-
-|}
-
 == Additional Maps ==
 
 [[File:Fear_golems.png|600px|]]
@@ -147,6 +131,72 @@ Non-raid mobs in fear are level 48(49?)-51. The level 51 ones will summon. [[Ira
 == What's in this zone? ==
 
 {{Special:DynamicZoneList/Plane of Fear}}
+
+= Raid Instance =
+'''Plane of Fear (Raid)''' is a Raid Encounter in EverQuest Legends that includes the Raid Bosse [[Cazic-Thule]], as well as the mini bosses [[a dracoliche]], [[Dread]], [[Fright]] and [[Terror]].  Entrance to the raid is by hailing a [[voidling]] in [[The Feerrott]] zone.
+
+{|
+|rowspan="6" valign="top" width="15%"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+|49 - 55
+|-
+! ''' Types of Monsters: '''
+|[[a Frightfinger]], [[a glare lord]], [[a gorgon]], [[a phantasm]], [[a shiverback]], [[a spinechiller spider]], [[a turmoil toad]], [[a worry wraith]], [[Amygdalan warrior]]
+|-
+!''' Mini Boss NPCs
+|[[a dracoliche]], [[Dread]], [[Fright]], [[Terror]]
+|-
+! ''' Raid Boss NPCs: '''
+|[[Cazic-Thule]]
+|-
+| ''' Mini Boss Drops '''
+|{{:Amulet of Necropotence}}, {{:Ball of Everliving Golem}}, {{:Barbarian Spiritist`s Hammer}}, {{:Blood Fire}}, {{:Bone Razor}}, {{:Bone-Clasped Girdle}}, {{:Crimson Robe of Alendine}}, {{:Darkwood Trunk}}, {{:DawnFire, Morning Star of Light}}, {{:Lyssa`s Darkwood Piccolo}}, {{:Monsoon, Sword of the Swiftwind}}, {{:Puppet Strings}}, {{:Shield of Rainbow Hues}}, {{:Slime Blood of Cazic Thule}}, {{:Soul Leech, Dark Sword of Blood}}, {{:Spined Dragon Claws}}, {{:Staff of Undead Legions}}, {{:Staff of the Earthcrafter}}
+|-
+| ''' Cazic-Thule Drops '''
+|{{:Bile Etched Obsidian Choker}}, {{:Brain of Cazic Thule}}, {{:Cloak of the Fearsome}}, {{:Eye of Cazic Thule}}, {{:Halo of the Enlightened}}, {{:Pauldrons of Ferocity}}, {{:Robe of Inspiration}}, {{:Amulet of Necropotence}}, {{:Barbarian Spiritist`s Hammer}}, {{:Blood Fire}}, {{:Crimson Robe of Alendine}}, {{:Darkwood Trunk}}, {{:DawnFire, Morning Star of Light}}, {{:Lyssa`s Darkwood Piccolo}}, {{:Puppet Strings}}, {{:Shield of Rainbow Hues}}, {{:Soul Leech, Dark Sword of Blood}}, {{:Staff of the Earthcrafter}}
+|}
+|}
+
+== Raid Map ==
+
+{|cellspacing="0" cellpadding="0" style="border: 1px solid gray; max-width: 1000px;" width="100%"
+|-
+|style="padding:10px;"|
+[[Image:Plane of Fear Raid.png|right|border]]
+'''Plane of Fear Raid '''
+<ul><li> 1. Zone in location
+</li><li> 2. [[Terror]]
+</li><li> 3. [[Dread]]
+</li><li> 4. [[a dracoliche]]
+</li><li> 5. [[Fright]]
+</li><li> 6. [[Cazic-Thule]]
+|}
+
+== Solo vs. Multiplayer ==
+
+When creating the raid instance, players can choose between solo and multiplayer instances.  These instances share lockouts, so players cannot do both in the same week and receive full loot.
+
+There is no difference between solo and multiplayer as far as trash mobs or mobs locations in Plane of Fear.
+
+== Raid Targets ==
+
+{| class="eoTable2" style="text-align: center; width: 80%"
+|-
+! style="text-align: center"|Mob Name !! style="text-align: center"| Creature Type !! style="text-align: center"| Class !! style="text-align: center"| Abilities !! style="text-align: center"| Notes !! style="text-align: center"|
+|-
+| [[Fright]] || Golem || Warrior || [[Enrage]] || 
+|-
+| [[Dread]] || Golem || Warrior || [[Scarab Storm]], [[Enrage]] ||
+|-
+| [[Terror]] || Golem || Warrior || [[Frost Breath]], 56 point lifetap proc, [[Enrage]] || [[Frost Breath]] is a dispel and will likely break charm on pets
+|-
+| [[a dracoliche]] || Dragon Skeleton (NOT undead) || Shadow Knight || [[Deadly Lifetap]], [[Rotting Flesh]], small hitbox || Utilize Evasive Discipline and damage absorption (e.g. [[Rune IV]]) to mitigate [[Deadly Lifetap]]. Can be difficult for melee to hit due to the small hitbox
+|-
+| [[Cazic Thule (God)]] || Diety || Shadow Knight || [[Avatar Power]], [[Panic]] (random target), [[Enrage]] || All mobs will zone-wide social aggro with Cazic when he is engaged. [[Avatar Power]] is a top slot dispel. [[Cazic Thule (God)|See page for full encounter details.]]
+|-
+|}
 
 [[Category: Zones]]
 [[Category:Loc Mapped]]

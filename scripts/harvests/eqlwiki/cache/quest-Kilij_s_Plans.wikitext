@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_bilrio_surecut.png|frame|Bilrio Surecut]]
+[[File:npc_bilrio_surecut.png|thumb|Bilrio Surecut]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark]]
@@ -67,7 +67,6 @@ Hand Bilrio Surecut the {{:Kilij Plans}} and 3 x {{:Enchanted Gold Bar}}.
 * Your faction standing with [[Kelethin Merchants]] got better.
 * Your faction standing with [[Faydarks Champions]] got better.
 * Your faction standing with [[Emerald Warriors]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 {{exp}}
 

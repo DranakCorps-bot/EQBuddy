@@ -40,7 +40,7 @@ __NOTOC__
 * The [[Testimony]]
 ** Obtain [[A Spider Venom Sac]]
 ** Obtain [[Cloth Shirt]]
-** Turn in Cloth Shirt to [[Altunic Jartin]] in East Commons (to receive [[Token of Generosity]])
+** Turn in Cloth Shirt to [[Altunic Jartin]] (requires Amiable) in East Commons (to receive [[Token of Generosity]])
 ** Turn in Venom Sac to [[Merko Quetalis]] in the North Freeport Hall of Truth (to receive [[Token of Bravery]])
 ** Turn in both Tokens to Merko to spawn [[Guard Willia]]
 ** Kill [[Guard Willia]] (to loot [[Token of Truth]])
@@ -54,7 +54,7 @@ __NOTOC__
 ** Obtain '''warmly''' faction with [[Knights of Truth]] (soon as you hit Warmly you can safely turn in the Testimony of Truth in the next step - Verified on EQL 8/8/2026) (see [[Fabian's Strings]])
 ** Turn in [[Testimony of Truth]] to [[Valeron Dushire]] in the North Freeport Hall of Truth (to receive [[Brilliant Sword of Faith]])
 * Note
-** Obtain '''warmly''' faction with [[Priests of Life]] (see [[Bone Chips Qeynos]])
+** Obtain '''warmly''' faction with [[Priests of Life]] (see [[Bone Chips Qeynos]] or [[Werewolf Hunters]])
 ** Turn in A Sealed Note to [[Brother Hayle]] in Splitpaw (to receive [[Note]])
 
 * Final Turn-ins
@@ -115,7 +115,7 @@ Your final turn-in will be a note, your own Paladin Testimony, the [[Glowing Swo
 </div>
 
 ;The Hilt of SoulFire
-*Kill [[Xicotl]] in the pool room in [[Mistmoore Castle]]. He is a rare spawn, but 100% drop rate. His PH is the naked female DE standing in front of the pool steps. He is a level 43 (ish?) SK, and kinda tough for a level 50 paladin. Be safe and bring a friend. Loot ''[[Glowing Sword Hilt]]''.
+*Kill [[Xicotl]] in the pool room in [[Mistmoore Castle]]. Loot ''[[Glowing Sword Hilt]]''.
 
 ;The Brilliant Sword of Faith
 *Kill [[Sir Lucan D'Lere]] in West Freeport. This spawns the TRUE [[Sir Lucan Dlere|Sir Lucan D'Lere]], an undead knight (of weaker power than his first form). Loot a [[Testimony of Truth]] from the undead Sir Lucan. Sir Lucan's respawn time is uncertain, but will be up in a personal instance.

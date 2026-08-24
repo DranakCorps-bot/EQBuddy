@@ -1,4 +1,4 @@
-{{Velious Era}}
+{{Classic Era}}
 
 [[File:npc_leraena_shelyrak.png|frame|Leraena Shelyrak]]
 {| class="questTopTable"

@@ -43,7 +43,7 @@ You say, 'Why are they Dead?'
 
 : Lokar To`Biath says 'Perhaps, perhaps not. I cannot remember, but perhaps Innoruuk would help me remember should you tithe him a bottle of red wine from the Blind Fish.' 
 
-'''Give him a [[Red Wine]] (up to 4 unstacked). It can be from anywhere, not just the Blind Fish. The nearest bar might be the Cuisine Excelsior, which is also conveniently devoid of hostile patrons.'''
+'''Give him a [[Red Wine]] (large stacks are fine). It can be from anywhere, not just the Blind Fish. The nearest bar might be the Cuisine Excelsior, which is also conveniently devoid of hostile patrons.'''
 
 : Lokar To`Biath says 'Ah, yes, let me pray to our god.. Yes, Innoruuk has given me wisdom. A Scribe of Dal still exists, disguised as a barkeep in the Blind Fish. This information will not help you though, for she has sworn a [vow] of silence and will not speak of the Dal.' 
 

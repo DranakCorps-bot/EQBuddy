@@ -1,6 +1,6 @@
 {{Disambig3|[[Guild Summons]]}}
 {{Classic Era}}
-[[File:npc_tynkale.png|frame|Tynkale]]
+[[File:npc_tynkale.png|thumb|Tynkale]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Northern Felwithe]]
@@ -45,7 +45,6 @@ You say, 'Hail, Tynkale'
 <div class="facblock">
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Anti-Mage]] got better.
 </div>
 
 {{YouGainExperience}}

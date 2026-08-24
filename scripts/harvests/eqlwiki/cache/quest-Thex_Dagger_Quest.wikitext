@@ -44,7 +44,7 @@ This quest is 'removed' with the Temple Era (October 1999)
 
 == Walkthrough ==
 
-'''You must be Kindly or better with [[Clerics of Tunare]].  [[Anti-Mage]] is not needed'''
+'''You must be Kindly or better with [[Clerics of Tunare]].'''
 
 ''Vaila's Notes''
 
@@ -81,7 +81,6 @@ Tearon Bleanix: 'King Tearis Thex thanks you my friend. Could you please hand th
 <div class="facblock">
 * Your faction standing with [[King Tearis Thex]] got better. 
 * Your faction standing with [[Clerics of Tunare]] got better. 
-* Your faction standing with [[Anti-Mage]] got better. 
 </div>
 {{exp}}
 

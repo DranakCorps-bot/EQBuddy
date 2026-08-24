@@ -1,7 +1,7 @@
 # Zone harvest report
 
-- Zone pages: 117
-- With adjacency: 116 (286 directed edges after mirroring)
+- Zone pages: 118
+- With adjacency: 117 (291 directed edges after mirroring)
 - No adjacency parsed: 1
 
 ## Zones with no adjacency parsed

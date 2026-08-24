@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_trantor_everhot.png|frame|Trantor Everhot]]
+[[File:npc_trantor_everhot.png|thumb|Trantor Everhot]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]
@@ -43,7 +43,7 @@ You say, 'What Tumpy Tonics'
 
 : Trantor Everhot says' Aaah!! I love Tumpy Tonics. They were created by Tumpy Irontoe. He was once a member of the famed Irontoe Brigade. Since they disbanded and left for parts unknown he decided to stay in Kaladim and open Irontoe's, the finest well in Faydwer.'
 
-[[File:Npc_tumpy_irontoe.png|frame|Tumpy Irontoe (Kaladim)]]
+[[File:Npc_tumpy_irontoe.png|thumb|Tumpy Irontoe (Kaladim)]]
 
 ''[[Tumpy Irontoe]] is located at 177, 313, 3 inside Irontoe's Eats in [[South Kaladim]].''
 
@@ -72,12 +72,9 @@ You say, 'Make me a Tumpy Tonic'
 * Your faction standing with [[Merchants of Kaladim]] has been adjusted by 5.
 * Your faction standing with [[Craknek Warriors]] has been adjusted by -1.
 </div>
-
 {{YouGainExperience}}
 
-
-'''Quest Turn in Experience gains
-: Level 7 Druid with 60 Nuts got me to level 8, another 60 nuts got me half way to level 9.
+You receive a [[Dwarven Wire]].
 
 == Related Quests ==
 

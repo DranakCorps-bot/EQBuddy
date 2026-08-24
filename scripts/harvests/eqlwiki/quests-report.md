@@ -1,11 +1,11 @@
 # Quest harvest report
 
-- Quest Items category members: 4012
-- Pages enumerated: 924
-- Parsed: 1174 (empty pages: 0)
-- With turn-in items: 851
-- Unique turn-in item names: 2413
-- Missing quest giver: 26
+- Quest Items category members: 4013
+- Pages enumerated: 926
+- Parsed: 1176 (empty pages: 0)
+- With turn-in items: 853
+- Unique turn-in item names: 2418
+- Missing quest giver: 27
 - Collection pages split: 57 (250 step quests)
 - Backoff events: 0
 
@@ -352,6 +352,7 @@
   - Sage's Sleeves (2 items)
 
 ## Quests with no turn-in items parsed (review these)
+- Acquire a Mark of Karana
 - Aenia and Behroe
 - Air Tight Box Quest
 - Ancient Dragon Tome
@@ -418,7 +419,6 @@
 - Faren's Tacklebox
 - Fire Goblin Runner
 - Fresh Baked Muffins (Qeynos)
-- Frostbite's Fish
 - Garath's Weapons to Trade
 - Gearheart (Quest)
 - Geozite Tool Quest
@@ -678,6 +678,7 @@
 
 ## Missing quest giver
 - 10th Coldain Ring Quest
+- A sealed letter
 - All Positive Faction Quests
 - Bone Chips Quests
 - Bread Shipment Quests

@@ -1,4 +1,4 @@
-[[File:npc_groflah_steadirt.png|frame|Groflah Steadirt]]
+[[File:npc_groflah_steadirt.png|thumb|Groflah Steadirt]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|East Freeport]]

@@ -233,7 +233,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Light Woolen Mask]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Light Woolen Mask]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Mask of Song}}
@@ -247,7 +247,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Light Woolen Mantle]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Light Woolen Mantle]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Mantle of the Songweaver}}
@@ -261,7 +261,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Crude Wooden Flute]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Crude Wooden Flute]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Ervaj's Flute of Flight}}
@@ -275,7 +275,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Amulet of Woven Hair]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Amulet of Woven Hair]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Fae Amulet}}
@@ -289,7 +289,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Glowing Diamond]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Glowing Diamond]]}}''' (7-SotS)</li>
 <li>[[Efreeti War Horn]]</li>
 </ul>
 </div>
@@ -304,7 +304,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Nebulous Diamond]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Nebulous Diamond]]}}''' (8-EoV)</li>
 <li>[[Efreeti War Spear]]</li>
 </ul>
 </div>
@@ -328,7 +328,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}} ''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}} ''' (5-SL)</li>
 </ul>
 </div>
 | {{:Spiroc Beak Earcuff}}
@@ -342,7 +342,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Azarack Skin]]}}  (2 - [[Protector of Sky]])'''</li>
+<li>'''{{SkyNoDrop|[[Azarack Skin]]}}  (2-PoS)'''</li>
 </ul>
 </div>
 | {{:Azarack Skin Wristwraps}}   
@@ -356,8 +356,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7 - [[Sister of the Spire]])</li>
-<li>'''{{SkyNoDrop|[[Mithril Bands]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7-SotS)</li>
+<li>'''{{SkyNoDrop|[[Mithril Bands]]}}''' (8-EoV)</li>
 <li>[[Brass Knuckles]]</li>
 </ul>
 </div>
@@ -372,7 +372,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Griffon-Hide Armguards}}  
@@ -386,7 +386,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Diaphonous Waistband}}
@@ -409,7 +409,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Djinni War Blade]]}} (7 - [[Sister of the Spire]])'''</li>
+<li>'''{{SkyNoDrop|[[Djinni War Blade]]}} (7-SotS)'''</li>
 <li>[[Efreeti Standard]]</li>
 </ul>
 </div>
@@ -424,7 +424,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Pulsating Ruby]]}} (6 - [[Bazzt_Zzzt]])'''</li>
+<li>'''{{SkyNoDrop|[[Pulsating Ruby]]}} (6-BZ)'''</li>
 </ul>
 </div>
 | {{:Molten Coil}}
@@ -438,7 +438,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[High Quality Raiment]]}} (5 - [[The Spiroc Lord]])'''</li>
+<li>'''{{SkyNoDrop|[[High Quality Raiment]]}} (5-SL)'''</li>
 </ul>
 </div>
 | {{:Sash of Ferocity}}
@@ -452,7 +452,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Feathered Cape]]}}  (3 - [[Gorgalosk]])'''</li>
+<li>'''{{SkyNoDrop|[[Feathered Cape]]}}  (3-Gorga)'''</li>
 </ul>
 </div>
 | {{:Shroud of the Sky}} 
@@ -466,7 +466,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Azarack Blood]]}} (2 - [[Protector of Sky]])'''</li>
+<li>'''{{SkyNoDrop|[[Azarack Blood]]}} (2-PoS)'''</li>
 </ul>
 </div>
 | {{:Blood-Drawn Runes}}
@@ -480,7 +480,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Jester's Mask]]}}  (4 - [[Keeper of Souls]])'''</li>
+<li>'''{{SkyNoDrop|[[Jester's Mask]]}}  (4-KoS)'''</li>
 <li>[[Efreeti Great Staff]]</li>
 </ul>
 </div>
@@ -504,7 +504,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silver Hoop]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Silver Hoop]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Truewind Earring}}
@@ -518,7 +518,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Small Shield]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Small Shield]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Aegis of the Wind}}
@@ -532,7 +532,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Shiny Pauldrons]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Shiny Pauldrons]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Pauldrons of Piety}}
@@ -546,7 +546,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silvered Spiroc Necklace]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Silvered Spiroc Necklace]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Necklace of Resolution}}
@@ -560,7 +560,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Djinni Aura]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Djinni Aura]]}}''' (7-SotS)</li>
 <li>[[Efreeti Mace]]</li>
 </ul>
 </div>
@@ -575,7 +575,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Mithril Bands]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Mithril Bands]]}}''' (8-EoV)</li>
 <li>[[Efreeti Standard]]</li>
 </ul>
 </div>
@@ -599,7 +599,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Worn Leather Mask]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Worn Leather Mask]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Drake-Hide Mask}}
@@ -613,7 +613,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Mantle of Woven Grass]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Mantle of Woven Grass]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Nature Walker's Mantle}}
@@ -627,7 +627,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Spiroc Battle Staff]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Spiroc Battle Staff]]}}''' (5-SL)</li>
 <li>[[Efreeti Statuette]]</li>
 </ul>
 </div>
@@ -642,7 +642,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Divine Honeycomb]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Divine Honeycomb]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Honeycomb Belt}}
@@ -656,8 +656,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ethereal Ruby]]}}''' (7 - [[Sister of the Spire]])</li>
-<li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Ethereal Ruby]]}}''' (7-SotS)</li>
+<li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Spiroc Banisher Focus}}
@@ -671,7 +671,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Storm Sky Opal]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Storm Sky Opal]]}}''' (8-EoV)</li>
 <li>[[Efreeti Scimitar]]</li>
 </ul>
 </div>
@@ -695,7 +695,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Finely Woven Cloth Cord]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Finely Woven Cloth Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Sphinx Hair Cord}}
@@ -709,7 +709,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Light Cloth Mantle]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Light Cloth Mantle]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Wind Walker's Mantle}}
@@ -723,13 +723,13 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silken Mask]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Silken Mask]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Ivory Mask}}
 |-
-| Enchanter Test of Disillusion
-| disillusion
+| Enchanter Test of Dislocation
+| dislocation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
 <li>[[Wind Rune Caza]]</li>
@@ -737,7 +737,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Adamantium Earring]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Adamantium Earring]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Earring of Displacement}}
@@ -751,7 +751,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Glowing Necklace]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Glowing Necklace]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Necklace of Whispering Winds}}
@@ -765,7 +765,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Large Sky Sapphire]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Large Sky Sapphire]]}}''' (8-EoV)</li>
 <li>[[Efreeti Wind Staff]]</li>
 </ul>
 </div>
@@ -789,7 +789,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Feathered Cape]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Feathered Cape]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Bracelet of Clarification}}
@@ -803,7 +803,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ceramic Mask]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Ceramic Mask]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Mask of Empowerment}}
@@ -817,7 +817,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Golden Coffer]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Golden Coffer]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Gold White Pendant}}
@@ -831,7 +831,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Large Diamond]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Large Diamond]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Drake-Hide Amice}}
@@ -845,7 +845,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Golden Efreeti Ring]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Golden Efreeti Ring]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Duennan Shielding Ring}}
@@ -859,7 +859,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Hazy Opal]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Hazy Opal]]}}''' (8-EoV)</li>
 <li>[[Efreeti Magi Staff]]</li>
 </ul>
 </div>
@@ -875,8 +875,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
 <li>'''{{SkyNoDrop|[[Crown of Elemental Mastery]]}}''' (7-Trash)</li>
-<li>'''{{SkyNoDrop|[[Large Opal]]}}''' (8 - [[Eye of Veeshan]])</li>
-<li>'''{{SkyNoDrop|[[Djinni Stave]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Large Opal]]}}''' (8-EoV)</li>
+<li>'''{{SkyNoDrop|[[Djinni Stave]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Staff of Elemental Mastery: Air}}
@@ -898,7 +898,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silken Strands]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Silken Strands]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Back Straps of Mastery}}
@@ -912,7 +912,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Cracked Leather Eyepatch]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Cracked Leather Eyepatch]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Ton Po's Eye Patch}}
@@ -926,7 +926,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Dove Slippers]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Dove Slippers]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Sandals of Alacrity}}
@@ -940,7 +940,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Ton Po's Shoulder Wraps}}
@@ -954,7 +954,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Nebulous Sapphire]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Nebulous Sapphire]]}}''' (7-SotS)</li>
 <li>[[Brass Knuckles]]</li>
 </ul>
 </div>
@@ -969,7 +969,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Tear of Quellious]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Tear of Quellious]]}}''' (8-EoV)</li>
 </ul>
 </div>
 | {{:Golden Sash of Tranquility}}
@@ -991,7 +991,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Griffon's Beak]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Griffon's Beak]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Bloody Griffon-Hide Wrist Guard}}
@@ -1005,7 +1005,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Black Silk Cape]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Black Silk Cape]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Cloak of Spiroc Feathers}}
@@ -1019,7 +1019,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Fine Cloth Raiment]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Fine Cloth Raiment]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Bloodsoaked Raiment}}
@@ -1033,7 +1033,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Pulsating Ruby]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Pulsating Ruby]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Sphinx Heart Amulet}}
@@ -1047,7 +1047,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ring of Veeshan]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Ring of Veeshan]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Band of Wailing Winds}}
@@ -1061,7 +1061,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Gorgon Head]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Gorgon Head]]}}''' (3-Gorga)</li>
 <li>[[Efreeti Great Staff]]</li>
 </ul>
 </div>
@@ -1085,7 +1085,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ivory Sky Diamond]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Ivory Sky Diamond]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Girdle of Faith}}
@@ -1099,7 +1099,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Bixie Sword Blade]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Bixie Sword Blade]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Aldryn, Blade of the Ocean}}
@@ -1114,7 +1114,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
 <li>'''{{SkyNoDrop|[[Golden Hilt]]}}''' (7)</li>
-<li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Thelvorn, Blade of Light}}
@@ -1128,7 +1128,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Large Sky Diamond]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Large Sky Diamond]]}}''' (8-EoV)</li>
 <li>[[Efreeti Zweihander]]</li>
 </ul>
 </div>
@@ -1152,7 +1152,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Griffon Talon]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Griffon Talon]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Griffon Talon Necklace}}
@@ -1166,7 +1166,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Fine Velvet Cloak]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Fine Velvet Cloak]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Dark Cloak of the Sky}}
@@ -1180,7 +1180,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Spiroc Earth Totem]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Spiroc Earth Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Earthshaker's Mantle}}
@@ -1194,7 +1194,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[White Gold Earring]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[White Gold Earring]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Thunderforged Earring}}
@@ -1208,7 +1208,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Circlet of Brambles]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Circlet of Brambles]]}}''' (7-SotS)</li>
 <li>[[Efreeti Long Sword]]</li>
 </ul>
 </div>
@@ -1223,7 +1223,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Shimmering Pearl]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Shimmering Pearl]]}}''' (8-EoV)</li>
 <li>[[Efreeti War Bow]]</li>
 </ul>
 </div>
@@ -1247,7 +1247,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Inlaid Choker]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Inlaid Choker]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Wispy Choker of Vigor}}
@@ -1261,7 +1261,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Sphinxian Circlet]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Sphinxian Circlet]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Renard's Belt of Quickness}}
@@ -1275,7 +1275,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Spiroc Sky Totem]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Spiroc Sky Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Griffon Wing Spauldors}}
@@ -1289,7 +1289,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Jester's Mask]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Jester's Mask]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Crystal Mask}}
@@ -1303,10 +1303,10 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Fine Wool Cloak]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Fine Wool Cloak]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Shimmering Bracer of Protection}}(item is actually SHIMMERING Bracer)
+| {{:Shimmering Bracer of Protection}}
 |-
 | Rogue Test of Deception
 | deception
@@ -1317,8 +1317,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Bixie Stinger]]}}''' (6 - [[Bazzt_Zzzt]])</li>
-<li>'''{{SkyNoDrop|[[Bloodsky Sapphire]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Bixie Stinger]]}}''' (6-BZ)</li>
+<li>'''{{SkyNoDrop|[[Bloodsky Sapphire]]}}''' (8-EoV)</li>
 </ul>
 </div>
 | {{:Thornstinger}}
@@ -1341,7 +1341,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Finely Crafted Amulet]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Finely Crafted Amulet]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Amulet of the Sphinx Eye}}
@@ -1355,7 +1355,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Silvery Ring]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Silvery Ring]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Crimson Ring of the Djinni}}
@@ -1369,7 +1369,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Finely Woven Cloth Belt]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Finely Woven Cloth Belt]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Pegasus-Hide Belt}}
@@ -1383,7 +1383,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Rusted Pauldrons]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Rusted Pauldrons]]}}''' (6-BZ)</li>
 </ul>
 </div>
 | {{:Blood Sky Face Plate}}
@@ -1411,8 +1411,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Sphinxian Ring]]}}''' (7 - [[Sister of the Spire]])</li>
-<li>'''{{SkyNoDrop|[[Fae Pauldrons]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Sphinxian Ring]]}}''' (7-SotS)</li>
+<li>'''{{SkyNoDrop|[[Fae Pauldrons]]}}''' (8-EoV)</li>
 </ul>
 </div>
 | {{:Pearlescent Pauldrons}}
@@ -1426,7 +1426,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Blood Sky Ruby]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Blood Sky Ruby]]}}''' (8-EoV)</li>
 <li>[[Efreeti War Axe]]</li>
 </ul>
 </div>
@@ -1450,7 +1450,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Amulet of the Fang}}
@@ -1464,7 +1464,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ceremonial Belt]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Ceremonial Belt]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Bracelet of the Spirits}}
@@ -1478,7 +1478,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Light Damask Mantle]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Light Damask Mantle]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Fairy-Hide Mantle}}
@@ -1492,7 +1492,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Corrosive Venom]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Corrosive Venom]]}}''' (6-BZ)</li>
 <li>[[Efreeti War Club]]</li>
 </ul>
 </div>
@@ -1508,7 +1508,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
 <li>'''{{SkyNoDrop|[[Bixie Essence]]}}''' (6)</li>
-<li>'''{{SkyNoDrop|[[Spiritualist`s Ring]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Spiritualist`s Ring]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Vermilion Sky Ring}}
@@ -1522,7 +1522,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Symbol of Veeshan]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Symbol of Veeshan]]}}''' (8-EoV)</li>
 <li>[[Efreeti War Maul]]</li>
 </ul>
 </div>
@@ -1546,7 +1546,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Azure Ring]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Azure Ring]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Azure Ruby Ring}}
@@ -1560,7 +1560,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Stone Amulet]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Stone Amulet]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Runed Wind Amulet}}
@@ -1574,7 +1574,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Spiroc Air Totem]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[Spiroc Air Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Pauldrons of the Blue Sky}}
@@ -1588,7 +1588,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Wind Tablet]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Wind Tablet]]}}''' (6-BZ)</li>
 <li>[[Efreeti Belt]]</li>
 </ul>
 </div>
@@ -1603,7 +1603,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Djinni War Blade]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Djinni War Blade]]}}''' (7-SotS)</li>
 <li>'''{{SkyNoDrop|[[Gem of Invigoration]]}}''' (7-Trash)</li>
 </ul>
 </div>
@@ -1618,7 +1618,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Ethereal Emerald]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Ethereal Emerald]]}}''' (8-EoV)</li>
 <li>[[Efreeti Battle Axe]]</li>
 </ul>
 </div>
@@ -1642,7 +1642,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Grey Damask Cloak]]}}''' (3 - [[Gorgalosk]])</li>
+<li>'''{{SkyNoDrop|[[Grey Damask Cloak]]}}''' (3-Gorga)</li>
 </ul>
 </div>
 | {{:Augmentor's Mask}}
@@ -1656,7 +1656,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Woven Skull Cap]]}}''' (4 - [[Keeper of Souls]])</li>
+<li>'''{{SkyNoDrop|[[Woven Skull Cap]]}}''' (4-KoS)</li>
 </ul>
 </div>
 | {{:Al`Kabor's Cap of Binding}}
@@ -1670,7 +1670,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[High Quality Raiment]]}}''' (5 - [[The Spiroc Lord]])</li>
+<li>'''{{SkyNoDrop|[[High Quality Raiment]]}}''' (5-SL)</li>
 </ul>
 </div>
 | {{:Raiment of Thunder}}
@@ -1684,7 +1684,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Box of Winds]]}}''' (6 - [[Bazzt_Zzzt]])</li>
+<li>'''{{SkyNoDrop|[[Box of Winds]]}}''' (6-BZ)</li>
 <li>[[Efreeti Statuette]]</li>
 </ul>
 </div>
@@ -1699,7 +1699,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Amethyst Amulet]]}}''' (7 - [[Sister of the Spire]])</li>
+<li>'''{{SkyNoDrop|[[Amethyst Amulet]]}}''' (7-SotS)</li>
 </ul>
 </div>
 | {{:Amulet of the Void}}
@@ -1713,7 +1713,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Large Sky Lapis]]}}''' (8 - [[Eye of Veeshan]])</li>
+<li>'''{{SkyNoDrop|[[Large Sky Lapis]]}}''' (8-EoV)</li>
 <li>[[Efreeti War Staff]]</li>
 </ul>
 </div>

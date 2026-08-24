@@ -15,7 +15,7 @@ __TOC__
 |[[an advisor]], [[an avenging caitiff]], [[Black Dire]], [[Butler Syncall]], [[a cloaked dhampyre]], [[a deathly usher]], [[Enynti]], [[Garton Viswin]], [[a glyphed ghoul]], [[an imp familiar]], [[Lasna Cheroon]], [[Maid Issis]], [[Mayong Mistmoore]], [[Mynthi Davissi]], [[Princess Cherista]], [[Ssynthi]], [[Xicotl]]
 |-
 ! ''' Unique Items: '''
-|{{:Advisor Robe}}, {{:Black Silk Gloves}}, {{:Blood of the Dhampyre}}, {{:Blood Spirit}}, {{:Bloodstone Eyepatch}}, {{:Butler Syncalls Fang}}, {{:Cape of Midnight Mist}}, {{:Chestplate of the Dark Flame}}, {{:Crested Helm}}, {{:Crested Mistmoore Shield}}, {{:Crested Spaulders}}, {{:Diamondine Earring}}, {{:Gypsy Lute}}, {{:Gem-Encrusted Scepter}}, {{:Glowing Iron Pike}}, {{:Glowing Sword Hilt}}, {{:Hooded Black Cloak}}, {{:Lute of the Gypsy Princess}}, {{:Maid Issis Fang}}, {{:Mistmoore Battle Drums}}, {{:Mistmoore Granite}}, {{:Nightshade Wreath}}, {{:Platinum Skull Ring}}, {{:Robe of the Keeper}}, {{:Rune of Fortune}}, {{:Sacrificial Dagger}}, {{:Vial of Vampire Blood}}
+|{{:Advisor Robe}}, {{:Black Silk Gloves}}, {{:Blood of the Dhampyre}}, {{:Blood Spirit}}, {{:Bloodstone Eyepatch}}, {{:Butler Syncalls Fang}}, {{:Cape of Midnight Mist}}, {{:Cherista's Fangs}}, {{:Chestplate of the Dark Flame}}, {{:Crested Helm}}, {{:Crested Mistmoore Shield}}, {{:Crested Spaulders}}, {{:Diamondine Earring}}, {{:Fleeting Memory}}, {{:Gargoyle Grips}}, {{:Gem-Encrusted Scepter}}, {{:Gilded Mistmoore Visor}}, {{:Glowing Iron Pike}}, {{:Glowing Sword Hilt}}, {{:Gypsy Lute}}, {{:Hooded Black Cloak}}, {{:Lute of the Gypsy Princess}}, {{:Maid Issis Fang}}, {{:Maid's Stockings}}, {{:Mistmoore Battle Drums}}, {{:Mistmoore Granite}}, {{:Mistmoore Heirloom Ring}}, {{:Nightshade Wreath}}, {{:Noble's Robes}}, {{:Platinum Skull Ring}}, {{:Robe of the Keeper}}, {{:Rod of Understanding}}, {{:Rune of Fortune}}, {{:Sacrificial Dagger}}, {{:Tarnished Ancient Tiara}}, {{:Veil of Silence}}, {{:Vial of Vampire Blood}}, {{:Visage of the Gargoyle}}, {{:Wine Thief}}
 |-
 ! ''' Related Quests: '''
 |[[Crafted Armor Quests|Crafted Breastplate]], [[Lambent Armor Quests|Lambent Breastplate]], [[Lambent Armor Quests|Lambent Gauntlets]], [[Crusader's Tests|Lord of Pain's Khukri]], [[Shaman Epic Quest]], [[Solusek's Flower]], [[Vampire Teeth]], [[Incandescent Armor Quests]], [[Zimel's Blades (SoulFire)]]
@@ -24,7 +24,7 @@ __TOC__
 |[[Lesser Faydark]]
 |-
 ! ''' Respawn time: '''
-|22 minutes for the zone (Mistmoore castle has both 6 AM/8 PM respawns for vampires which reset the timer).
+|6.5 minutes for the zone (Mistmoore castle has both 6 AM/8 PM respawns for vampires which reset the timer).
 |-
 ! ''' Name in /who: '''
 |mistmoore
@@ -45,13 +45,13 @@ __TOC__
 [[File:Mistmoore.jpg|right|border]]
 '''Castle Mistmoore
 
-<ul><li> 1. "Graveyard" (GY) where [[an imp familiar]] spawns, who drops {{:Sacrificial Dagger}} (Common) and {{:Bloodstone Eyepatch}} (Rare), and [[a glyphed ghoul]], who drops {{:Vial of Vampire Blood}} (Common) and {{:Crested Mistmoore Shield}} (Rare)
+<ul><li> 1. "Graveyard" (GY) where [[an imp familiar]] spawns, who drops {{:Sacrificial Dagger}} (Common) and {{:Bloodstone Eyepatch}} (Rare), and [[a glyphed ghoul]], who drops {{:Vial of Vampire Blood}} (Common) and {{:Crested Mistmoore Shield}} and {{:Gilded Mistmoore Visor}}
 </li><li> 2. Tomb with Coffin; behind it is [[Ssynthi]] who drops {{:Robe of the Keeper}}, and a Secret Entrance leading one way to the Jail
 </li><li> 3. "The Pit"
-</li><li> 4. "The Canyon" where [[Black Dire]] spawns, as well as [[Enynti]], who drops {{:Rune of Fortune}} (Rare)
+</li><li> 4. "The Canyon" where [[Black Dire]] spawns, as well as [[Enynti]], who drops {{:Gargoyle Grips}}, {{:Rune of Fortune}} and {{:Visage of the Gargoyle}}
 </li><li> 5. "Jail" where [[a deathly usher]] spawns, who drops {{:Black Silk Gloves}}, secret door has trap that strips off invisibility spells, Stairs is where [[an avenging caitiff]] spawns who drops {{:Crested Spaulders}} (Common) and {{:Crested Helm}} (Rare). A ground spawn for Cleric quest [[Caduceus of Sacrament Quest|Caduceus of Sacrament]] is here
-</li><li> 6. "Courtyard" (CY) where [[A Hemo Enologist]] spawns, drops {{:Blood Spirit}}.
-</li><li> 7. Fountain where [[a cloaked dhampyre]] spawns, drops {{:Blood of the Dhampyre}} (Common) and {{:Hooded Black Cloak}} (Rare).  Spawn location of [[A Fallen Noble]] who drops {{:Noble's Robes}} (Uncommon) and {{:Vial of Noble's Blood}} (Uncommon)
+</li><li> 6. "Courtyard" (CY) where [[A Hemo Enologist]] spawns, drops {{:Blood Spirit}} and {{:Wine Thief}}
+</li><li> 7. Fountain where [[a cloaked dhampyre]] spawns, who drops {{:Blood of the Dhampyre}}, {{:Fleeting Memory}} and {{:Hooded Black Cloak}}.  Also location of [[A Fallen Noble]] who drops {{:Mistmoore Heirloom Ring}}, {{:Noble's Robes}} and {{:Vial of Noble's Blood}}
 </li><li> 8. Entry Hall
 </li><li> 9. "Piano"
 </li><li> 10. "Ballroom" where gypsies and [[Mynthi Davissi]] spawn, drops {{:Lute of the Gypsy Princess}} (Common) and {{:Mistmoore Battle Drums}} (Rare)
@@ -61,12 +61,12 @@ __TOC__
 </li><li> 14. Torture Chamber
 </li><li> 15. Mayong Mistmoore's Coffin Room
 </li><li> 16. Kitchen
-</li><li> 17. Servant Room where [[Maid Issis]] spawns, drops {{:Nightshade Wreath}} (Common) and {{:Maid Issis Fang}} (Rare)
+</li><li> 17. Servant Room where [[Maid Issis]] spawns, who drops {{:Maid's Stockings}}, {{:Nightshade Wreath}} and {{:Maid Issis Fang}}
 </li><li> 18. Servant Room where [[Butler Syncall]] spawns, drops {{:Cape of Midnight Mist}} (Common) and {{:Butler Syncalls Fang}} (Rare)
-</li><li> 19. Library
+</li><li> 19. Library Room where [[a dark librarian]] spawns, who drops {{:Rod of Understanding}}
 <ul> 19a. Advisor room where [[an advisor]] spawns who drops {{:Advisor Robe}}
-</ul><li> 20. Throne Room where [[Princess Cherista]] spawns, drops {{:Gem-Encrusted Scepter}} (Uncommon) and {{:Diamondine Earring}} (Rare)
-</li><li> 21. "The Bath" where [[Lasna Cheroon]] spawns, who drops {{:Diamondine Earring}} (Common) and {{:Platinum Skull Ring}} (Rare), and [[Xicotl]], who drops {{:Hilt of Soulfire}}
+</ul><li> 20. Throne Room where [[Princess Cherista]] spawns, drops {{:Cherista's Fangs}}, {{:Diamondine Earring}}, {{:Gem-Encrusted Scepter}} & {{:Tarnished Ancient Tiara}}
+</li><li> 21. "The Bath" where [[Lasna Cheroon]] spawns, who drops {{:Diamondine Earring}} (Common) and {{:Platinum Skull Ring}} (Rare), and [[Xicotl]], who drops {{:Glowing Sword Hilt}}
 </li><li> 22. Bedroom
 </li><li> 23. [[a dark ass`t librarian]] spawns who drops {{:Illegible Scroll}} ("Vok Na Zov XI")
 

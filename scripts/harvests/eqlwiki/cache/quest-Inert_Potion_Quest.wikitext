@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_toresian_fhabel.png|frame|Toresian Fhabel]]
+[[File:npc_toresian_fhabel.png|thumb|Toresian Fhabel]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Erudin|Erudin Palace]]
@@ -37,7 +37,7 @@ You say, 'i will study enchantment'
 
 : Toresian Fhabel says 'Then I welcome you into our circle. It is good to see new blood. I have a favor to ask of you. Do you wish to [assist Toresian] or do you not have the time?'
 
-This spawns either [[Slansin]] or [[Slansin Denvin]] downstairs in the shop Vials of Vitality. '''Slansin''' is a merchant selling one item, a cloth cap. '''Slansin Denvin''' is not a merchant, is wearing armor, and is an enchanter who will summon an enchanter pet after spawning. Only one Slansin can be up a time.
+This spawns either [[Slansin]] or [[Slansin Denvin]] downstairs in the shop Vials of Vitality. '''Slansin''' is a merchant selling one item, a cloth cap. '''Slansin Denvin''' is not a merchant, is wearing armor, <s>and is an enchanter who will summon an enchanter pet after spawning</s> (EQL: he did not summon a pet, the Real Slansin is level 50 and the fake is level 10). Only one Slansin can be up a time.
 
 You say, 'I wish to assist Toresian'
 
@@ -52,10 +52,10 @@ Give Slansin the Inert Potion.
 : Slansin says 'Thank you. I have been expecting this. We require it for mixing.' 
 
 <div class="facblock">
-* Your faction standing with [[Heretics]] got better.
-* Your faction standing with [[Craftkeepers]] got '''worse'''.
-* Your faction standing with [[High_Council_of_Erudin|High Council of Erudin]] got '''worse'''.
-* Your faction standing with [[High_Guard_of_Erudin|High Guard of Erudin]] got '''worse'''. 
+* Your faction standing with [[Heretics]] got better. (5)
+* Your faction standing with [[Craftkeepers]] got '''worse'''. (-1)
+* Your faction standing with [[High_Council_of_Erudin|High Council of Erudin]] got '''worse'''. (-1)
+* Your faction standing with [[High_Guard_of_Erudin|High Guard of Erudin]] got '''worse'''. (-1)
 </div>
 {{exp}}
 
@@ -85,6 +85,8 @@ You can actually trigger Toresian from the bottom floor to get the potion with h
  /pause 3
  /say I wish to assist Toresian
 Then just go straight across to Vials of Vitality, where Slansin is.
+
+This didn't seem to work on EQL, NPCs seem to need LoS with you to interact (8-22-2029).
 
 [[Category:Quests]]
 [[Category:Erudin Palace]]

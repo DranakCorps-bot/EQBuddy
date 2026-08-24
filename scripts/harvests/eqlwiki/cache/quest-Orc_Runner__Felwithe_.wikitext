@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Disambig3|[[Orc Runner (Kelethin)]]}}
-[[File:npc_general_jyleel.png|frame|General Jyleel]]
+[[File:npc_general_jyleel.png|thumb|General Jyleel]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Felwithe|Northern Felwithe]]
@@ -69,7 +69,6 @@ You say, 'What Crushbone runners'
 : General Jyleel says, 'So, you succeeded in stopping a Crushbone runner! That is good. Now take this as reward. Keep up your fine work. The people of Felwithe are grateful.'
 
 <div class="facblock">
-* Your faction standing with [[Anti-Mage]] got better.
 * Your faction standing with [[Clerics of Tunare]] got better.
 * Your faction standing with [[King Tearis Thex]] got better.
 </div>

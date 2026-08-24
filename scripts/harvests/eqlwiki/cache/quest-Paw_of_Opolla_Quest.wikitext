@@ -20,7 +20,7 @@
 |}
 
 == Reward ==
-[[Paw of Opolla]]
+{{:Paw of Opolla}}
 
 == Checklist ==
 {{CheckboxList}}

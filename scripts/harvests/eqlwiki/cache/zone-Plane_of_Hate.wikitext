@@ -1,7 +1,7 @@
 {{Classic Era}}
 
-[[File:plane_of_hate_kronas.jpg|600px|right|Map of the Plane of Hate, first floor ]]
-[[File:HateSecondFloorTrimmed.jpg|600px|right|Map of the Plane of Hate, second floor ]]
+[[File:Plane_of_Hate_First_Floor.png|600px|right|Map of the Plane of Hate, First Floor ]]
+[[File:Plane_of_Hate_Second_Floor.png|600px|right|Map of the Plane of Hate, Second Floor ]]
 
 The Plane of Hate is home to Innoruuk and his numerous minions. The plane opened back in 1999 after the famous in game event - The Battle of [[Kithicor Forest]] between the armies of Lanys T'Vyl and Firiona Vie. The terrible battle both cursed Kithicor forever and opened the Plane of Hate to mortals permanently.
 
@@ -35,13 +35,16 @@ Innoruuk does not care for trespassers into his realm. All those entering, even 
 
 == Map Locations ==
 
-* 1. Port In Location
-* 2-19. Various buildings.
-* 20. The Church
-* 21-28. Various buildings.
-* 29. The Organ Hall with [[Maestro of Rancor]]. This building has a second floor.
-* 30. Spiral staircase to the second level. The Fountain is immediately to the east.
-
+* 1. [[Lord of Ire]] location
+* 2. [[Lord of Loathing]] location
+* 3. [[Coercer T`vala]] location (2nd floor of building)
+* 4. [[High Priest M`kari]] location (2nd floor of building)
+* 5. [[Ashenbone Broodmaster]] location
+* 6. [[Magi P`Tasa]] location
+* 7. [[Avatar of Abhorrence]] location
+* 8. [[Master of Spite]] location
+* 9. [[Grandmaster R`Tal]] location
+* 10. [[Mistress of Scorn]] location
 
 == Getting In and Out ==
 
@@ -66,8 +69,8 @@ Additionally, some specific mob types also drop various class-specific items.
 
 {| class="wikitable"
 ! 
-! '''Group 1:''' <br> [[Ethereal Mist Armor|CLR]] [[Vermiculated Armor|DRU]] [[Rune Etched Armor|SHM]] <br> [[Anthemion Armor|BST]] [[Thorny Vine Armor|RNG]] [[Valorium Armor|PAL]] <br> [[Shadow Rage Armor|BER]] [[Shiverback-hide Armor|MNK]] <br> [[Lustrous Russet Armor|Lustrous Russet]] 
-! '''Group 2:''' <br> [[Insidious Armor|ENC]] [[Apothic Armor|MAG]] [[Blighted Armor|NEC]] [[Carmine Armor|WIZ]] <br> [[Imbrued Armor|BRD]] [[Umbral Platemail|SHD]] <br> [[Woven Shadow Armor|ROG]] [[Indicolite Armor|WAR]] <br> [[Midnight Clad Armor|Midnight Clad]]
+! '''Group 1:''' <br>  [[Ethereal Mist Armor|CLR]] [[Vermiculated Armor|DRU]] [[Rune Etched Armor|SHM]] <br> [[Anthemion Armor|BST]] [[Thorny Vine Armor|RNG]] [[Valorium Armor|PAL]] <br> [[Shadow Rage Armor|BER]] [[Shiverback-hide Armor|MNK]] <br> [[Lustrous Russet Armor|Lustrous Russet]]
+! '''Group 2:''' <br> [[Apothic Armor|MAG]] [[Blighted Armor|NEC]] [[Carmine Armor|WIZ]] <br> [[Insidious Armor|ENC]] [[Imbrued Armor|BRD]]  [[Umbral Platemail|SHD]] <br> [[Woven Shadow Armor|ROG]]  [[Indicolite Armor|WAR]] <br> [[Midnight Clad Armor|Midnight Clad]] 
 |-
 | Head || [[Cleric of Innoruuk]] || [[a spite golem]]
 |-
@@ -129,7 +132,7 @@ A listing of the foes you are likely to encounter here, with a brief description
 | [[a spite golem]] || NO || Golem || Shaman || Very high MR || Head <br> Group 2 || {{:Runewood Shield}} <br> {{:Spitestone Shield}}
 |}
 
-=== Minibosses and Bosses ===
+=== Minibosses ===
 
 {| class="eoTable2" style="text-align: center; width: 80%"
 |-
@@ -154,10 +157,6 @@ A listing of the foes you are likely to encounter here, with a brief description
 | [[Master of Spite]] || Golem || Shaman || Very high MR || Miniboss [[a spite golem|spite golem]] || [[Master of Spite|Various]], [[Rune Etched Armor]]
 |-
 | [[Mistress of Scorn]] || Zombie || Warrior || [[Strong Disease]], See Invis || Miniboss [[a scorn banshee|scorn banshee]] || [[Mistress of Scorn|Various]], [[Imbrued Platemail Armor]]
-|-
-| [[Maestro of Rancor]] || Vampire || Bard || [[Maestro Lifetap]], See Invis || Raid Boss || [[Maestro of Rancor|Various]]
-|-
-| [[Innoruuk (God)|Innoruuk]] || Diety || Wizard || [[Pillage Enchantment]], Lifetap, Knockback || Raid Boss || [[Innoruuk (God)|Various]]
 |}
 
 
@@ -169,6 +168,61 @@ A listing of the foes you are likely to encounter here, with a brief description
 == What's in this zone? ==
 
 {{Special:DynamicZoneList/Plane of Hate}}
+
+= Raid Instance =
+'''Plane of Hate (Raid)''' is a Raid Encounter in EverQuest Legends that includes the Raid Bosses [[Maestro of Rancor]] and [[Innoruuk]].  Entrance to the raid is by hailing a [[voidling]] in the [[Oasis of Marr]] zone.
+
+{|
+|rowspan="6" valign="top" width="15%"| <div style='float:left;'>__TOC__</div>
+|valign="top"|
+{| class="zoneTopTable"
+! ''' Level of Monsters: '''
+|49 - 55
+|-
+! ''' Types of Monsters: '''
+|[[a haunted chest]], , [[a Knight of Innoruuk]], [[a loathing lich]], [[a scorn banshee]], [[a spite golem]], [[Cleric of Innoruuk]], [[An Evangelist of Hate]], [[a forsaken revenant]], [[Innoruuk's Chosen]]
+|-
+!''' Mini Boss NPCs
+|[[Ashenbone Broodmaster]], [[Avatar of Abhorrence]], [[Coercer T`vala]], [[Grandmaster R`Tal]], [[High Priest M`kari]], [[Lord of Ire]], [[Lord of Loathing]], [[Magi P`Tasa]], [[Master of Spite]], [[Mistress of Scorn]]
+|-
+! ''' Raid Boss NPCs: '''
+|[[Maestro of Rancor]], [[Innoruuk]]
+|-
+| ''' Maestro of Rancor Drops '''
+|{{:Evensong}}, {{:Hand of the Maestro}}, {{:Kelin`s Seven Stringed Lute}}, {{:Mempo of Likato}}, {{:Shield of the Stalwart Seas}}, {{:Six Note Blade}}
+|-
+| ''' Innoruuk Drops '''
+|{{:Bloodstar Pendant}}, {{:Brewer's Mesh Cloak}}, {{:Cloak of Scales}}, {{:Darkbrood Mask}}, {{:Earring of Bashing}}, {{:Engineer's Ring}}, {{:Eye of Innoruuk}}, {{:Hotof's Bracer}}, {{:Icebelt}}, {{:Leatherfoot Sandals}}, {{:Pauldrons of Power}}, {{:Ring of Pureblood}}, {{:Shattered Emerald of Corruption}}, {{:Skinner's Belt}}, {{:Triumphant Mask}}
+|}
+|}
+
+== Raid Map ==
+
+{|cellspacing="0" cellpadding="0" style="border: 1px solid gray; max-width: 1000px;" width="100%"
+|-
+|style="padding:10px;"|
+[[Image:Plane of Hate Raid Floor 1.png|right|border]]
+'''Plane of Hate Raid Floor 1'''
+<ul><li> 1. [[Ashenbone Broodmaster]], [[Avatar of Abhorrence]] or [[Master of Spite]] 
+</li><li> 2. [[Coercer T`vala]] or [[Magi P`Tasa]] 
+|}
+
+{|cellspacing="0" cellpadding="0" style="border: 1px solid gray; max-width: 1000px;" width="100%"
+|-
+|style="padding:10px;"|
+[[Image:Plane of Hate Raid Floor 2.png|right|border]]
+'''Plane of Hate Raid Floor 2'''
+<ul><li> 3. [[Grandmaster R`Tal]], [[High Priest M`kari]] or [[Mistress of Scorn]]
+</li><li> 4. [[Maestro of Rancor]]
+</li><li> 5. [[Lord of Ire]] or [[Lord of Loathing]]
+</li><li> 6. [[Innoruuk]]
+|}
+
+== Solo vs. Multiplayer ==
+
+When creating the raid instance, players can choose between solo and multiplayer instances.  These instances share lockouts, so players cannot do both in the same week and receive full loot.
+
+There is no difference between solo and multiplayer as far as trash mobs or mobs locations in Plane of Hate.
 
 [[Category:Zones]]
 [[Category:Plane of Hate]]

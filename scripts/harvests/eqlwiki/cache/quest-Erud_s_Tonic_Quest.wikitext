@@ -1,4 +1,4 @@
-[[File:npc_geoard_bluehawk.png|frame|Geoard Bluehawk]]
+[[File:npc_geoard_bluehawk.png|thumb|Geoard Bluehawk]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Erudin]]
@@ -61,7 +61,7 @@ You say, 'What about Erud's Tonic?'
 : Sinnkin Highbrow says 'It's about time you figured it out, genius! Maybe you should spend more time in the library. Here, take this tonic and get out of here before they see me giving it to you and turn us both inside out.'
 
 <div class="facblock">
-* Your faction standing with [[Erudite Citizen]] got better. (+5)
+* Your faction standing with [[Erudite Citizen]] has been adjusted by 5.
 </div>
 {{exp}}
 

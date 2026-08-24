@@ -2034,7 +2034,14 @@
   "Poison Awareness I (Spell)",
   "Poison Awareness II (Spell)",
   "Poison Awareness III (Spell)",
-  "Poison Awareness IV (Spell)"
+  "Poison Awareness IV (Spell)",
+  "Heritage of Mistmoore",
+  "Improved Vampirism II",
+  "Lifebite",
+  "Improved Vampirism III",
+  "Firestrike (Effect)",
+  "Wind Resonance 11",
+  "Brass Resonance 15"
  ],
  "Template:Spellpagesmart": [
   "Anthem de Arms",
@@ -2679,6 +2686,7 @@
   "Grasping Roots",
   "Invoke Lightning",
   "Thistlecoat",
+  "Specter Lifetap",
   "Shield of Song",
   "Engulfing Roots",
   "Fire",
@@ -3065,6 +3073,9 @@
   "Whirl Bolt",
   "String Resonance 14",
   "Wind Resonance 14",
-  "Full Heal"
+  "Full Heal",
+  "Firestrike (Effect)",
+  "Wind Resonance 11",
+  "Brass Resonance 15"
  ]
 }

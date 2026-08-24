@@ -7,7 +7,8 @@
  ],
  "Blackburrow": [
   "Qeynos Hills",
-  "Everfrost Peaks"
+  "Everfrost Peaks",
+  "Jaggedpine Forest"
  ],
  "Burning Wood": [
   "Frontier Mountains",
@@ -191,6 +192,11 @@
   "Upper Guk",
   "Southern Desert of Ro",
   "The Feerrott"
+ ],
+ "Jaggedpine Forest": [
+  "Blackburrow",
+  "Nedaria's Landing",
+  "Surefall Glade"
  ],
  "Kael Drakkel": [
   "Eastern Wastes",
@@ -401,7 +407,8 @@
   "The Warrens"
  ],
  "Surefall Glade": [
-  "Qeynos Hills"
+  "Qeynos Hills",
+  "Jaggedpine Forest"
  ],
  "Swamp of No Hope": [
   "Cabilis",
