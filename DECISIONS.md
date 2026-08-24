@@ -17,6 +17,15 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-24
 
+- **Ran the hand drag/reopen check unattended as an automated harness** · could have waited
+  for David at the machine · David authorized it in session while away; `scripts/drag-verify.ps1`
+  uses Win32 rects and WindowFromPoint-guarded clicks so nothing could land on his live widget
+  (Fable, `498d740`-follow-up).
+- **Reverted the window-height fix and shipped 1.99.9 P0-only** · could have fixed forward
+  under release pressure · the split was pre-agreed in the review ("if any fail, we split"),
+  the redesign needs a probe, and an angry public data-loss thread outranks a self-found clip
+  (Fable, `git revert 054d009`; plan re-filed in `FABLE.md`).
+
 - **Auto-empty now only touches files with the exact shape the game writes** · could have kept
   the `eqlog_*.txt` glob and relied on the archive folder as the safety net · **David's call,
   asked with the question tool** — logged here because it is the reasoning, not the decision:
