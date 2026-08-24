@@ -31,20 +31,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis:** Apply is disabled because the preview says nothing to apply, not because the button is dead. Reporter may have read a disabled Apply as "does not function." Named SOURCE is this preview shot. I do not have a token-unlocked dump AND a quested one from the same player as a control.
 
 ### Guk nameds missing from session Mob Farming / Kills by Creature
-- **Priority:** **ASKED 2026-08-23 (Claude), waiting on the reporter.** Helm signed the
-  QUESTION and explicitly no code; posted verbatim (comment 18128563). **The mechanism is
-  found and it is not "the aggregators skip nameds"** — in `SessionStats`, a kill reaches Mob
-  Farming / Kills by Creature only when you or your pet land the killing blow, while
-  `FinalizeFight` runs on both branches, which is exactly why Encounters still lists them. So
-  a named a group member finished is invisible to both rollups. The reply asks him which it
-  was; that answer decides whether this is working as designed or a real miss.
+- **Priority:** waiting (reporter answered 7:43 PM CT Sun: own killing blow, solo, no pet. Group-member split ruled out for this instance. Real miss. Claude is in the thread. Helm 6:22 AM CT Aug 24: same ticket, not a values-line change.)
 - **Place:** Session history. Desktop. ROADMAP: Session history → Progress or its own; Kills & Drops is the creature (what died / what it dropped). Not Gate 5 overlay. Not a group meter. Not the Drops-by-Creature wiki-name items.
 - **Source:** #234 atrzonkowski Aug 23, 1:21 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/234 New thread. 0 replies. Footer: EQBuddy 1.99.5 · Windows 26200.
 - **Ask:** Under session history, Mob Farming and Kills by Creature do not pull named mobs from Guk. They are listed in the encounters. Examples: Ghoul Savant, Ghoul Sentinel.
 - **Already shipped:** Kills and Drops by Creature are one window (Kills & Drops) as of 2026-08-21. Encounters list exists (reporter sees the nameds there). Reporter is on 1.99.5; 1.99.7 shipped 1:46 PM CT after this post. I could not check whether 1.99.6/1.99.7 changed the session aggregators.
 - **Checked:** I could not check widget / window / phone. I did not open a Guk session. Named SOURCE is the same session's Encounters list vs Mob Farming and Kills by Creature.
 - **Hypothesis:** session kill aggregators skip nameds or miss Guk instance names that Encounters still records. Control would be one Guk session where Encounters lists Ghoul Savant / Ghoul Sentinel and the two rollups do not.
-
+- **Follow-up Aug 23, 7:43 PM CT:** atrzonkowski on #234, nested under Claude's killing-blow question. Did not reply (Claude is in the thread). "In this instance all named I had the killing blow. This was a solo instance with no pet. Frenzied Ghoul, Bloodthirsty Ghoul are also absent." Control is now in: own killing blow, solo instance, no pet. Group-member split ruled out for this instance. Extra nameds on the same lists: Frenzied Ghoul, Bloodthirsty Ghoul. I could not check widget / window / phone.
 ### stop moving UI surfaces every release
 - **Priority:** done (David 1:15 PM CT Aug 23: #233 is done unless more is added to the thread. Organizing pass stands. "X is now Y" is standing What's-new process, not an open leftover on this ticket.)
 - **Place:** widget card organization / ROADMAP section 3 organizing pass. Desktop + widget. Not a new card. Not Gate 5 overlay. Not a group meter.
