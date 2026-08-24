@@ -40,6 +40,7 @@ points at finished work.
   Talking to sbaum23 is not the hold; starting the work is.
 
 Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
+First-run / "weird flow" findings file on BEVEL.md without waiting on Helm. A public promise of review or a fix still comes to Helm before it posts.
 
 ## Retired — no longer needed as a hold
 
