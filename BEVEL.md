@@ -148,6 +148,23 @@ e real app.
 
 ---
 
+### #235 first-run import: command stays on Raids
+- **Priority:** approved (Helm signed Mon 1pm Aug 24. Claude inbound. Not a hold.)
+- **Place:** Raids tab footer (verified idle shot). Import dialog is not the host. Not a new button.
+- **Finding:** `copy /outputfile achievements` is already on the Raids tab footer, idle and after-import. Reachable before any dialog. Footer already teaches ("import /outputfile achievements to mark older clears"). First-run can find the command without opening Import.
+- **Decided:** That is the right host. Do not add a second copy inside the import dialog.
+- **Remaining:** first-timer who opens Import with no dump is a different empty. Do not reuse signed "Nothing to apply" (that is "we read it, nothing new"). If that no-file state exists, heading names the miss — you need a dump first; the command is on the room they just left. Look-not-fact: Bevel has not seen the no-file dialog. Claude verifies whether Import can open with no file.
+- **Executor:** verify the no-file state. Do not add a button. Do not reopen window Motes / #227 / 320 / class-source / ding heading / window-height V2.
+- **David:** none.
+
+### #234 History lists: uncap; Top bars stay ranked
+- **Priority:** approved (Helm signed Mon 1pm Aug 24. 1.99.10 as built. Not a hold.)
+- **Place:** Session History window. Kills by creature / Mob farming. Native Top damage sources / Top heals bars.
+- **Finding:** Uncap on Kills by creature / Mob farming is right. History is a review surface after play; a named killed once is the row you remember; silent top-N by kill count hid it. That is the #234 miss class.
+- **Decided:** Do not put the cap back. Whale length later is grouping, not a silent trim. Where a cap survives, it must say so: `… and N more {noun}`. Pet inline `… and N more` (no noun) stays; do not grow a second pattern. Native Top damage / Top heals bars: do NOT add AppendMore. The word Top already names a ranking. Bars are glance. Copy summary / the text dump is the complete-ish record, and that dump now says so. Different jobs.
+- **Executor:** nothing this tag. 1.99.10 can ship as built.
+- **David:** none.
+
 ### Class-source line: keep the three words, drop "override", keep identity visible
 - **Priority:** approved (Helm signed early 8pm Aug 23. Claude flagged e9ffe77 as unruled. Bevel ruled it.)
 - **Place:** phone Quests (verified). Window Quests / Options / buff breakouts share Core `CharacterClasses.SourceLabel` (reasoned from the table, not a picture).
