@@ -1,5 +1,39 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (later), Claude — #234 IS FIXED and 1.99.10 IS STAGED, UNRELEASED.**
+> Named mobs were missing from session history's "Kills by creature" and "Mob farming" while
+> still showing in Encounters. **Nothing filtered them**: both rollups were top-N by kill
+> count (`Take(10)`, `Take(8)`) over lists Core sorts by count descending, and a named is the
+> mob you killed ONCE — so a dozen kinds of Guk trash pushed all four off the end. Core was
+> innocent throughout. Both lists uncapped; surviving caps now print "... and N more".
+> `GukNamedsRollupTests` fails 3 of 5 on the pre-fix tree. Traps 49 and 50 added.
+>
+> → **No reply was posted and none should be.** Helm's 6:22 AM ruling: *"Claude may take the
+> miss. Do not post another reply (Claude is in the thread)."* A shipped fix does not lift it.
+
+> **THE WINDOW-HEIGHT FIX WAS REVERTED BY FABLE AND THE REASON MATTERS MORE THAN THE CODE.**
+> `scripts/drag-verify.ps1` proved it shipped WORSE than the bug: frozen at 218px on first
+> open, persisted on an undragged close, restored frozen — the pin returning through the
+> settings file. **My design modelled two actors (follower, player) where there are three:
+> while following, `SizeToContent.Height` means the TOOLKIT resizes the window, and every one
+> of those reads as the player's drag.** The `selfSet` flag guarded the only actor that was
+> never the problem, and thirteen green unit tests encoded the same missing participant.
+> That is trap 49. The item is back in `FABLE.md` as a `ready` V2 plan with a probe phase.
+>
+> → **One suggestion is already in `FABLE-FEEDBACK.md` for whoever takes it:** add a second
+> assertion to the probe run — *does `SizeChanged` fire with `HeightChanged` true for
+> toolkit-driven content resizes?* It decides between Fable's Design A and Design B before
+> either is written, and the harness is already running.
+
+> **1.99.9 IS RELEASED** — tag on origin, GitHub 12:26Z, OneDrive 07:25, signed. It carries
+> the P0 auto-empty fix ONLY; the window half was split out before the tag. **1.99.10 is
+> staged and untagged** and carries #234 alone. Check `git tag`, `gh release list` and the
+> OneDrive timestamp before claiming any release state.
+
+> **`REDDIT-DRAFT-strilker.md` is still unposted and still David's.** It is a data-loss
+> apology on a thread he is in personally. Note the reporter's handle is **StrIIker-TV**
+> (capital i's) — corrected repo-wide in `b048595` after I had it wrong.
+
 > **2026-08-24, Claude — A P0 DATA-LOSS BUG IS FIXED AND 1.99.9 IS STAGED, UNRELEASED.**
 > StrIIker-TV on Reddit: EQBuddy emptied log files they had deliberately renamed and kept.
 > **Two independent faults, both real, and the reporter's tick was never the problem.**
