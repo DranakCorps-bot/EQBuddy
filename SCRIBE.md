@@ -119,7 +119,15 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ### Sky bee chain: the FIRST bee has no catalog entry, and the names may not match
 
-- **Priority:** waiting (on Frankthetankk — asked 2026-08-22 on #109)
+- **Priority:** **ANSWERED 2026-08-24 (Claude)** — comment 18138377. He HAD replied (2026-08-23
+  03:03 CT) with four verbatim `/consider` + slain blocks and the three-identical-Bzzazzt
+  detail; the item still said "waiting on him" a day later, which is how the thread sat unanswered
+  while the work it produced had already shipped in 1.99.6. Bazzzazzt is triggered now exactly as
+  he asked; **Bzzazzt deliberately was NOT**, and the reply says so and why — eqlwiki gives it a
+  12-hour respawn, something has to start the chain, and his own caveat (personal instances never
+  respawn, he has not played the public zone) is the reason we did not generalise instance
+  behaviour. His three-mobs observation is in the catalog as `multiSpawn`. Asked him to put it on
+  the eqlwiki page, which is where it belongs.
 - **Place:** `SpawnCatalog.json`, Plane of Sky. Game DATA, not code.
 - **Source:** #109 Frankthetankk, 2026-08-22: confirmed Bzzazzt, Bazzzazzt and Bzzzt were
   counting DOWN toward DUE (not showing elapsed), and The Spiroc Guardian showing DUE.

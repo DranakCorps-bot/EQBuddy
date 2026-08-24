@@ -1,5 +1,29 @@
 # EQBuddy — handoff
 
+> **2026-08-24 — #109 IS ANSWERED, and it had been the reporter's turn for a DAY without
+> anyone noticing.** Frankthetankk replied 2026-08-23 03:03 CT with four verbatim `/consider`
+> + slain blocks and a detail nobody had — three NPCs share the name Bzzazzt, only the larger
+> middle one advances the chain. **That answer is what 1.99.6's bee catalog was built from**,
+> so the work shipped and he was never told, while `SCRIBE.md` still said "waiting on him".
+> `status.ps1` said the thread awaited a reply; the item said the opposite. Caught only by
+> opening the thread, which is the rule — second instance of the failure that rule exists for.
+>
+> → **The reply (comment 18138377) says where we DISAGREED with him, which is the point.**
+> Bazzzazzt is triggered now exactly as he asked (eqlwiki agrees, `respawn_time = Triggered`).
+> **Bzzazzt deliberately keeps its 12-hour clock** — the wiki gives it one, something has to
+> start the chain, and his own caveat is the reason we did not generalise: *"all of the above
+> is from personal Plane of Sky instances… I've never played the public/overworld Plane of
+> Sky."* Taking instance behaviour as universal would have shipped a wrong timer to everyone
+> in the public zone. He has been asked to put the three-mobs detail on the eqlwiki page.
+
+> **Nothing is pending in the inboxes.** PR #236 merged; #235 and #109 both answered and
+> closed; feedback written to Scribe (x2), Bevel and Helm this round. **#208 is still the only
+> live Helm hold.** 1.99.10 remains staged and untagged with the review sitting with Fable.
+
+> **`LogParser.cs` has FIVE lines of ratchet headroom** (933 / 938). Not urgent and nothing is
+> blocked, but the next parser change hits the wall — and the standing move is to lift logic
+> into Core/UI.Shared rather than split the file, because `ArchitectureTests` sums globs.
+
 > **2026-08-24 (repo pass) — PR #236 IS MERGED, AND IT BROKE A GATE ON THE WAY IN.**
 > The weekly eqlwiki harvest updated DebuffLandings, QuestCatalog, ZoneGraph and ItemCatalog;
 > curated catalogs were only FLAGGED, never written, so that rule held. **No CI ran on the

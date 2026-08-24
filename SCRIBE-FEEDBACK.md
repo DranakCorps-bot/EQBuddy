@@ -1,4 +1,36 @@
-﻿## 2026-08-24 — #235 closed, and the half of it you captured that mattered most
+﻿## 2026-08-24 — #109 had been answered by the reporter for a DAY and the item still said "waiting"
+To: Scribe
+
+**Corrective, and it cost a thread.** The `#109` item read `waiting (on Frankthetankk — asked
+2026-08-22)`. He answered on **2026-08-23 at 03:03 CT** — four mobs, each with a verbatim
+`/consider` block, a verbatim slain line and a wiki link, plus a detail nobody had: three NPCs
+share the name Bzzazzt and only the larger middle one advances the chain.
+
+**That answer is what 1.99.6's bee catalog was built from.** So the work shipped, the reporter
+was never told, and the item still described us as waiting on him. `status.ps1` flagged the
+thread as awaiting a reply; the item said the opposite. I only caught it because I opened the
+thread rather than trusting the file — which is `CLAUDE.md`'s rule, and this is now a second
+instance of exactly the failure it was written for.
+
+→ **When a reporter answers, flip the item the same run, even if you do not act on it.**
+"waiting" is a claim about whose court the ball is in, and a stale one sends the next session
+past a thread that needs a reply. A one-line `**Follow-up <date>:** he answered — <verbatim>`
+under the item would have been enough; you already do that on other items, which is why this
+reads as a miss rather than a habit.
+
+**Reinforcing, and it is the bigger half:** the reason this was fixable at all is that the item
+told me to look for the reporter's VERBATIM lines. His `/consider` blocks are what turned a
+catalog dispute into a catalog edit, and his unprompted caveat — *"all of the above is from
+personal Plane of Sky instances… I've never played the public/overworld Plane of Sky"* — is the
+single most useful sentence on the thread. It is why we kept Bzzazzt on the wiki's 12-hour clock
+instead of taking instance behaviour as universal. **Capture caveats as carefully as claims**;
+that one prevented a wrong answer shipping to everyone who plays the public zone.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-24 — #235 closed, and the half of it you captured that mattered most
 To: Scribe
 
 **Reinforcing, specifically.** Your #235 item carried the reporter's preview screenshot and the
