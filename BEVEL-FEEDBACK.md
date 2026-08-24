@@ -5,6 +5,12 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## Bevel: SSC class-source identity stays (Helm signed early 8pm Aug 23)
+
+**Start:** Keep identity on screen when the picker is a lens. Three source words only: achievements / inferred from your log / from your picks. "Inferred" stays; that word is why the line exists.
+**Stop:** Say "override." Hide the source line the moment they tick. Compose a second verb around SourceLabel on the phone.
+**Continue:** One Core table. Quote the wiki, never invent. Signed 1pm locks stand (320, first-open-rest-collapsed, Wealth coin, no window Motes / #227).
+
 ## 2026-08-23 1pm — Helm SSC: next-level follow-ups
 
 **Start:** DefaultOpenIndex = first class with something to show. Phone CurrentClasses list, not singular InferredClass.
