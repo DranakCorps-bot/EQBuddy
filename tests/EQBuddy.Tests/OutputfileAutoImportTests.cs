@@ -39,8 +39,15 @@ public class OutputfileAutoImportTests
     // Case varies across servers in the filenames we HAVE seen, so the match is
     // case-insensitive rather than trusting one capitalisation.
     [InlineData("dranak_freeport-inventory.txt", OutputfileKind.Inventory)]
+    // The faction dump, and the reason it is a SUFFIX rule: the game splices the
+    // character's class code into the middle of the name. Counting segments would refuse
+    // a real dump forever, which is trap 48's distinction on a different filename.
+    // Verified from David's own log, 2026-08-25:
+    //   Outputfile Complete: Hateborne_neriak-ENC-Factions.txt
+    [InlineData("Hateborne_neriak-ENC-Factions.txt", OutputfileKind.Factions)]
+    [InlineData("Dranak_freeport-Factions.txt", OutputfileKind.Factions)]
     // A dump EQBuddy has no reader for is named as such, not silently treated as one of
-    // the two it does read — guessing here would apply the wrong importer to a real file.
+    // the ones it does read — guessing here would apply the wrong importer to a real file.
     [InlineData("Dranak_freeport-Spellbook.txt", OutputfileKind.Unknown)]
     [InlineData("", OutputfileKind.Unknown)]
     public void TheFilenameDecidesWhichImporterRuns(string file, OutputfileKind expected) =>

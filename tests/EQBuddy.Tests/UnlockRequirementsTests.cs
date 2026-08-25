@@ -76,10 +76,9 @@ public class UnlockRequirementsTests
         Assert.True(FactionsFile.IsFactionDump("Dranak_freeport-Factions.txt"));
         Assert.False(FactionsFile.IsFactionDump("Hateborne_neriak-Inventory.txt"));
         Assert.False(FactionsFile.IsFactionDump("eqlog_Hateborne_neriak.txt"));
-
-        // And the auto-import agrees, so the game's own announcement lands on a reader.
-        Assert.Equal(OutputfileKind.Factions,
-            OutputfileAutoImport.KindOf("Hateborne_neriak-ENC-Factions.txt"));
+        // That the AUTO-IMPORT agrees is asserted in OutputfileAutoImportTests, beside its
+        // siblings — naming that type here would put this file in the serial settings.json
+        // collection for a call that writes nothing.
     }
 
     // ---- classifying the criteria -----------------------------------------------
