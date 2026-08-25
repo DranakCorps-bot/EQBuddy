@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### false "slowed by 60%" on Shaman / Shadowknight / Ranger
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** the player's own slow status. Overlay slow chip + spoken slow alert. Not shared game truth / eqlwiki. Not a group meter. Nearby #94 (chip icon) and the Reddit mute-the-slow-sound item — different asks; do not restore them.
+- **Source:** #237 selflesshero Aug 24, 10:47 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/237 New thread. 0 replies. Footer: EQBuddy 1.99.10 · Windows 26200.
+- **Ask:** "Every time I run my Shaman/Shd/Rng I get \"slowed by 60%\" but i'm never slowed."
+- **Already shipped:** the slow alert (#94) is a chip plus optional voice when a catalog landing line matches. Chip face: `Slowed {s.PctText}` / `Slowed {s.PctText} · {counterType} {count}` (`SlowChipText.cs:13–16`; WhatsNew example `Slowed 40% · disease 12`). Voice: `SpokenAlerts.Speak($"Slowed {pct}")` with `pct` = `"{N} percent"` or `"up to {N} percent"` (`MainWindow.xaml.cs:1930–1933`; Options copy `Speak it when it lands ("Slowed 40 percent")`). Parser is an exact-match on `SlowDebuffCatalog` messages (`LogParser.cs:683–686`). Tracker comment: landing is "self-targeted by construction (\"You feel lethargic.\"), so there is no attribution problem" (`SlowTracker.cs:25–32`). 1.99.10 What's-new is the Guk nameds fix only — no slow change.
+- **Checked:** grepped source. The exact literal `"slowed by 60%"` is not a shipped string. Closest: chip `Slowed 60%`, voice `Slowed 60 percent`, and catalog line `"You are slowed by the  mist of the seas."` (Breath of the Sea, 20%). The only catalog row that is exactly 60%/60% is `ancient breath` / `"Your life force drains away."` The shaman insect group (`You feel drowsy.` — Drowsy / Tagar's / Tigir's / Togor's / Turgur's / Walking Sleep) is a 23–75% range; that voice would be `Slowed up to 75 percent`. I could not check widget / window / phone. I could not check the binary. No screenshot. No log.
+- **Hypothesis, unchecked against a log:** they heard or saw EQBuddy's chip/voice (`Slowed 60%` / `Slowed 60 percent`) and quoted it as "slowed by 60%". A first-person catalog line those three classes print is matching when they are not attack-speed slowed. Named SOURCE is the quoted string plus those three classes. Self-vs-target is not supported by the quoted tracker/parser comments unless a you-line also prints when they land their own slow — I did not replay a Shaman / SHD / RNG log.
+- **Class:** V0–V1 (localized status/parser). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-08-25 5:16 AM:** Signed. Waiting, not authorized. Thank-you may post. Not #94 and not the mute-slow-sound item. Do not implement until we know which surface they saw (chip / voice / Combat / phone).
+
 ### pre-archive EQBuddy emptied logs and the in-folder backups
 - **Priority:** waiting (community evidence after the 1.99.9 ship. Not authorized. Reddit harvest-only; David is in the thread. Do not reply.)
 - **Place:** log empty / archive. Desktop. Not Gate 5 overlay. Not a group meter. Nearby #159 (never delete log data; read archives as one history) — do not restore #159 if Claude already cleared it. EQL Companion mention is not-ours, not this item.
