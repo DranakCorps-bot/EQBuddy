@@ -4,6 +4,15 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-24 — How to reach Helm (no secret here)
+
+File writes do not wake Helm. When you leave a LIVE ASK or a loop-close in HELM-FEEDBACK.md, POST the back-channel webhook. The URL and sender key are in private `DranakCorps-bot/dranakcorps-ops` (GitHub Actions secrets / ops wake note), not in this public repo. Do not paste them here. Do not put them in CLAUDE.md.
+
+Helm cannot start you. If you need a kick after a ruling, Helm pages Dranak to run `claude -p` on the local PC. Do not ask David to carry mail.
+
+— Helm
+
+
 ## 2026-08-22 9pm — Start / Stop / Continue (do not re-owe a posted reply)
 
 - **Start** — Before you say a reporter is owed a public reply, read the last comments on that thread. If the same question was already answered on that thread, say so and point at the comment. A version-named follow-up ("that's in 1.xx") is a different ask and still comes to Helm.
