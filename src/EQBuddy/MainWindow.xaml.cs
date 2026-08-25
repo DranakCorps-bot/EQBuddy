@@ -33,7 +33,7 @@ public partial class MainWindow : Window, ICardContext
     // Window-level double-click state for the mini-bar breakout chips (see MiniChip): the
     // chips are rebuilt every tick, so per-element ClickCount can't be trusted. Threshold
     // reads the user's own Windows double-click speed; add a floor for a stray zero.
-    private BreakoutKind? _lastChipClickKind;
+    private string? _lastChipClickKey;
     private DateTime _lastChipClickAt = DateTime.MinValue;
     private static readonly TimeSpan DoubleClickWindow =
         TimeSpan.FromMilliseconds(Math.Max(200, GetDoubleClickTime()));
@@ -3656,15 +3656,25 @@ public partial class MainWindow : Window, ICardContext
     /// a thin hairline divider rather than any chip chrome. A counting-down watch
     /// rule still announces itself by color alone. A chip whose stat has a breakout
     /// window takes a double-click to toggle it.</summary>
+    /// <summary>
+    /// <paramref name="onDoubleClick"/> is what the gesture DOES, and it is pluggable because
+    /// not every chip toggles a breakout any more: the xp chip opens the Progress WINDOW, which
+    /// has the tabs (Bevel's fold, Helm-signed — "reuse existing theme window on current tab …
+    /// retire tab-less 272×135 float"). The gesture is keyed on <paramref name="clickKey"/>
+    /// rather than on a BreakoutKind so a chip with no breakout can still own a double-click.
+    /// </summary>
     private StackPanel MiniChip(string iconName, string value, string valueBrush, string? edgeBrush = null,
-        BreakoutKind? breakout = null)
+        BreakoutKind? breakout = null, string? clickKey = null, Action? onDoubleClick = null,
+        string? doubleClickHint = null)
     {
         var panel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Margin = new Thickness(0, 0, Tok.SpaceL, 0),
         };
-        if (breakout is { } kind && _settings.DoubleClickChipsToggleBreakouts)
+        var key = clickKey ?? breakout?.ToString();
+        var act = onDoubleClick ?? (breakout is { } bk ? () => ToggleBreakout(bk) : null);
+        if (key is not null && act is not null && _settings.DoubleClickChipsToggleBreakouts)
         {
             // Transparent (not null) so the gaps between glyph and value are hit-testable
             // too. Two things conspired against WPF's own double-click here, so we detect it
@@ -3681,19 +3691,19 @@ public partial class MainWindow : Window, ICardContext
             // chip stays inert and a double-click expands the widget as before.
             panel.Background = System.Windows.Media.Brushes.Transparent;
             panel.Cursor = System.Windows.Input.Cursors.Hand;
-            panel.ToolTip = $"Double-click to show or hide the {kind} breakout";
+            panel.ToolTip = doubleClickHint ?? $"Double-click to show or hide the {key} breakout";
             panel.MouseLeftButtonDown += (_, e) =>
             {
                 e.Handled = true;
                 var now = DateTime.Now;
-                if (_lastChipClickKind == kind && now - _lastChipClickAt <= DoubleClickWindow)
+                if (_lastChipClickKey == key && now - _lastChipClickAt <= DoubleClickWindow)
                 {
-                    _lastChipClickKind = null;   // consume, so a third click starts fresh
-                    ToggleBreakout(kind);
+                    _lastChipClickKey = null;   // consume, so a third click starts fresh
+                    act();
                 }
                 else
                 {
-                    _lastChipClickKind = kind;
+                    _lastChipClickKey = key;
                     _lastChipClickAt = now;
                 }
             };
@@ -3745,11 +3755,17 @@ public partial class MainWindow : Window, ICardContext
                 "hps" => BreakoutKind.Healing,
                 "pet" => BreakoutKind.Pet,
                 "loot" => BreakoutKind.Loot,
-                "xp" => BreakoutKind.Progress,
                 _ => null,   // kills/procs/motes/money/deaths have no breakout
             };
-            MiniChips.Children.Add(
-                MiniChip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout));
+            // xp is the exception: it opens the PROGRESS WINDOW, which has the Experience /
+            // Wealth / Faction / Raids tabs, rather than the tab-less 272x135 float it used to
+            // (Bevel, Helm-signed 2026-08-24: "Fold Progress breakout into that pop-out. Retire
+            // tab-less 272x135 float."). Same gesture, same one gate, a surface with tabs.
+            MiniChips.Children.Add(cell.Key == "xp"
+                ? MiniChip(cell.Icon, cell.Text, "AccentBrush", clickKey: "xp",
+                    onDoubleClick: () => ShowProgressWindow(),
+                    doubleClickHint: "Double-click to open the Progress window")
+                : MiniChip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout));
         }
 
         // Per-rule pins: only the rules you picked (📌 in Options), not every enabled one.

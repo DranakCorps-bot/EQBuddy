@@ -26,11 +26,14 @@ public sealed class TravelWindow : Window
         _main = main;
         Title = "Travel route";
         WindowStyle = WindowStyle.ToolWindow;
-        ResizeMode = ResizeMode.NoResize;
+        ResizeMode = ResizeMode.CanResize;
         SizeToContent = SizeToContent.WidthAndHeight;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         SetResourceReference(BackgroundProperty, "BgBrush");
         WindowZoom.Attach(this, "travel", main.Settings);
+        // Resizable and REMEMBERED (David, 2026-08-25). The route is computed before the
+        // window opens, so the height sampled at first render is a true one.
+        WindowZoom.AllowResize(this, "travel", main.Settings);
 
         _fromLabel.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         foreach (var zone in _main.ZoneGraph.Zones) _dest.Items.Add(zone);

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.99.11",
+    "date": "2026-08-25",
+    "highlights": [
+   "THE POP-OUT PROGRESS FLOAT IS NOW THE PROGRESS WINDOW - and that means it finally has tabs. Double-clicking the xp chip on the minimized bar used to open a small fixed panel that showed Experience and nothing else: no Wealth, no Faction, no Raids, and no way to reach them without going back to the widget. It now opens the same Progress window the card's arrow opens, with Experience, Wealth, Faction and Raids across the top and Experience selected first. The old float is gone rather than kept alongside - one Progress surface, not two, which is why the small one never grew the tabs the big one got.",
+   "MORE WINDOWS CAN BE RESIZED, AND THEY REMEMBER IT. Spawns, Travel routes, Session history, the Fight timeline, Zone knowledge and the session picker can all be dragged to the size you want. Spawns, Travel, Session history and the Fight timeline also remember that size the next time they open; Zone knowledge and the session picker do not, because you see them once and dismiss them.",
+   "Three windows deliberately did NOT change, and it is worth saying which. Options already resizes by dragging its edge and fits its own height to your screen. Item info and the wiki pack both look their contents up while they are open, so pinning a size would freeze them at the size of an empty box before the answer arrives - they are waiting on a separate fix to the way windows decide their height."
+    ]
+  },
+  {
     "version": "1.99.10",
     "date": "2026-08-24",
     "highlights": [

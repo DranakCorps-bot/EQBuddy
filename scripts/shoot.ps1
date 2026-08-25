@@ -198,13 +198,12 @@ $Shots = [ordered]@{
     'damage-breakout' = @{ Title = 'Damage breakout'
                            Env = @{}
                            Set = @{ Minimized = $true; MiniStats = @('dps'); BreakoutDamageScope = 'session' } }
-    # The Progress breakout (#214, Liminal Warmth). Same staging as the others: starred
-    # while minimized is what opens it. Its folds default open so one shot shows the
-    # ding list, the skill-ups and the session AAs rather than three closed headings.
-    'progress-breakout' = @{ Title = 'Progress breakout'
-                           Env = @{}
-                           Set = @{ Minimized = $true; MiniStats = @('xp')
-                                    ShowAllAAs = $true; ShowNextUnlocks = $true } }
+    # 'progress-breakout' RETIRED 2026-08-25. The tab-less 272x125 Progress float is gone
+    # (Bevel's fold, Helm-signed): the mini bar's xp chip opens the Progress WINDOW, which
+    # has the tabs. Shoot 'progress-card' / 'progress-wealth' / 'progress-faction' /
+    # 'raids-card' for that surface instead. Not re-pointed at the window under the old
+    # name, because a shot name IS a filename (trap 21) and the old PNG is a picture of a
+    # surface that no longer exists.
     'loot-breakout'   = @{ Title = 'Loot breakout'
                            Env = @{}
                            Set = @{ Minimized = $true; MiniStats = @('loot'); BreakoutLootScope = 'session' } }
@@ -283,7 +282,7 @@ $Shots = [ordered]@{
                            # window, wrong feature (trap 24). Re-running it would have
                            # overwritten a correct committed screenshot with that.
                            Set = @{ Minimized = $true
-                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Progress')
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
     # The Watch card with rules that the fixture session actually matches — without them
     # the card is a one-line empty state and its sort strip does not exist at all (it
@@ -384,7 +383,7 @@ $Shots = [ordered]@{
     'mini-tour'       = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true
-                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs','Progress')
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','loot')
                                     TrackedRules = @(
                                         @{ Id = 'shot-mote'; Name = 'Motes'

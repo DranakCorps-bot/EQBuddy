@@ -26,7 +26,9 @@ internal sealed class SessionPickerWindow : Window
     {
         Title = "Review which session?";
         WindowStyle = WindowStyle.ToolWindow;
-        ResizeMode = ResizeMode.NoResize;
+        // Resizable (David, 2026-08-25). Size is NOT remembered: this is a modal picker
+        // shown once per import (ShowDialog), with no AppSettings in scope.
+        ResizeMode = ResizeMode.CanResize;
         SizeToContent = SizeToContent.WidthAndHeight;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
         SetResourceReference(BackgroundProperty, "BgBrush");

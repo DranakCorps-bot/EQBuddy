@@ -21,6 +21,10 @@ public partial class HistoryWindow : Window
     {
         InitializeComponent();
         WindowZoom.Attach(this, "history", settings);
+        // Remembered size (David, 2026-08-25). It was already CanResize by default and
+        // simply forgot — the list and detail pane are read from the history DB before the
+        // window shows, so there is nothing for a late payload to grow past the pin.
+        WindowZoom.AllowResize(this, "history", settings);
         _vm = new HistoryViewModel(repo);
 
         CharFilter.ItemsSource = _vm.Filters;

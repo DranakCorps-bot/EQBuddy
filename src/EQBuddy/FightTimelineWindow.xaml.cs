@@ -35,6 +35,10 @@ public partial class FightTimelineWindow : Window
     {
         InitializeComponent();
         _settings = settings;
+        // Resizable and REMEMBERED (David, 2026-08-25: "allow all the pop out windows to be
+        // resized"). Content is complete at first render — the timeline is built from the
+        // fight handed in — so AllowResize's height sample is a true one.
+        WindowZoom.AllowResize(this, "timeline", settings);
         _source = source;
 
         Chrome.SetResourceReference(System.Windows.Controls.Border.BackgroundProperty, "BgBrush");

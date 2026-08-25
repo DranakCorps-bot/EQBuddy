@@ -632,7 +632,16 @@ it.** If you find yourself porting a feature *to* the phone, stop: that is the s
 logic never went through the shared layer in the first place.
 
 **Breakout windows straddle the line and were built before the rule existed.**
-`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs, Progress }` on WPF (the Avalonia twin is a deliberately smaller `{ Damage, Healing, Pet, Buffs }`; `DocumentationSizeTests` pins the WPF list, which went stale on `Progress` for five days despite trap 30 in this file being about exactly that); by the test above Watch
+`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }` on WPF (the Avalonia twin is a deliberately smaller `{ Damage, Healing, Pet, Buffs }`; `DocumentationSizeTests` pins the WPF list — it caught the list going stale when `Progress` was ADDED, then failed again the moment `Progress` was REMOVED, which is a guard doing its job in both directions).
+
+**`Progress` stopped being a breakout on 2026-08-25, deliberately** (Bevel's fold, Helm-signed
+2026-08-24; built on David's call). The tab-less 272×135 float is retired and the mini bar's xp
+chip opens the **Progress WINDOW** instead — the one with Experience / Wealth / Faction / Raids
+tabs. **"Reuse the existing theme window on its current tab" is the rule for every fold of this
+shape**: a second surface showing one tab's worth of the same data is precisely the thing that
+drifts, and it is why the float had no tabs three releases after the window grew them.
+
+By the test above Watch
 and Buffs earn the overlay (both are deadlines) and Damage/Healing/Pet/Loot are review
 surfaces. Change defaults rather than delete — `AppSettings.DisabledBreakouts` already
 gates them per kind, and David uses the damage one.

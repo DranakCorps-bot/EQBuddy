@@ -40,6 +40,10 @@ public partial class SpawnsWindow : Window
     {
         InitializeComponent();
         WindowZoom.Attach(this, "spawns", main.Settings);
+        // Resizable and REMEMBERED (David, 2026-08-25: "allow all the pop out windows to
+        // be resized"). Safe for AllowResize's height sample because the spawn rows come
+        // from the ledger the app already holds — nothing arrives after first render.
+        WindowZoom.AllowResize(this, "spawns", main.Settings);
         _main = main;
         _vm = vm;
         _settings = main.Settings;

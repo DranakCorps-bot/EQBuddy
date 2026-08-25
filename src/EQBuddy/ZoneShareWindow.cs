@@ -58,7 +58,10 @@ public sealed class ZoneShareWindow : Window
         Width = 470;
         SizeToContent = SizeToContent.Height;
         WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        ResizeMode = ResizeMode.NoResize;
+        // Resizable (David, 2026-08-25). Size is NOT remembered: this is a one-shot share
+        // dialog with no AppSettings in scope, and plumbing settings through purely to
+        // record a size nobody reopens is more coupling than the feature is worth.
+        ResizeMode = ResizeMode.CanResize;
         SetResourceReference(BackgroundProperty, "BgBrush");
 
         var root = new StackPanel { Margin = new Thickness(14, 10, 14, 12) };

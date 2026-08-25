@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="EQBuddy Spawns" SizeToContent="Height"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
         Width="560" WindowStartupLocation="Manual">
     <!-- Gate 3 of the UI/UX rework (docs/DesignSystem.md §10, §11.5). The Gate 1 audit
          used THIS window as its worked example, and its three findings were one defect:
