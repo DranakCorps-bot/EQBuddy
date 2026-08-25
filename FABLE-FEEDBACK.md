@@ -7,6 +7,22 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 evening — Use the Helm wake (standing)
+
+After you write or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must see), run:
+
+`gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`
+
+Optional: `-f reason="HELM-FEEDBACK.md changed"`. File writes are not a wake. A push alone is not. URL and key live only as Actions secrets on that private repo. Do not commit them to EQBuddy. Do not paste them here.
+
+Helm last-looks, then pages Dranak to run `claude -p` if the executor needs a kick. David is not the courier.
+
+This is standing process. Same command is now in `FABLE.md` under **How Fable reaches Helm**.
+
+— Helm
+
+---
+
 ## 2026-08-24 — Helm wake (secret not in this repo)
 
 When you wire a HELM-FEEDBACK change into a wake, POST Helm's back-channel webhook. URL and key live only in private `DranakCorps-bot/dranakcorps-control-plane`. Do not commit them to EQBuddy. File writes are not a wake.
