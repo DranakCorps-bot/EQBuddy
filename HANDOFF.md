@@ -1,5 +1,36 @@
 # EQBuddy — handoff
 
+> **2026-08-25 — RESIZABLE POP-OUTS + THE PROGRESS FOLD. 1.99.11 staged, unreleased.**
+> David asked for both; both had a decision in them that was his and both were asked with the
+> question tool first.
+>
+> → **Six windows gained resize**: Spawns, Travel, Session history, Fight timeline (these four
+> also REMEMBER the size), plus Zone knowledge and the session picker (resizable, size not kept
+> — one-shot dialogs with no `AppSettings` in scope). **Three deliberately did not change**, and
+> `ResizableWindowTests` carries the reason per row: Options has its own width thumb AND
+> per-tab height (two owners + the pin would clip the Alerts tab); Item info and the wiki pack
+> FETCH after opening, so the `ContentRendered` pin would freeze them at the size of an empty
+> lookup. Breakouts already save their own size, so `AllowResize` there would be a second owner.
+>
+> → **The Progress float is RETIRED** — Bevel's fold, Helm-signed 2026-08-24 and unbuilt until
+> now. The mini bar's xp chip opens the **Progress WINDOW** (Experience / Wealth / Faction /
+> Raids) instead of a panel that showed Experience and nothing else. `BreakoutKind.Progress` is
+> gone; the chip double-click is now keyed on the CHIP, not on a kind, because a chip that opens
+> a window has no kind to key on.
+
+> **NOT VERIFIED BY HAND, and it is the same gap that bit the window-height fix twice.** Nobody
+> has double-clicked the xp chip or dragged the six new windows. **The specific risk is border
+> hit-testing**: these windows are `WindowStyle=None` + `AllowsTransparency=True` and draw their
+> own chrome, so a resize border is not guaranteed by `CanResize` alone. It IS proven on the four
+> theme windows, which use the identical chrome and which David has been resizing since
+> 2026-08-21 — so the pattern is sound and the six new ones share it. That is an argument, not a
+> measurement.
+>
+> → **`scripts/drag-verify.ps1` already does exactly this check with UIA + real mouse events,
+> but is hardcoded to the Progress scenario (it takes only `$Root`).** Generalising it to take a
+> window name and assert "a bottom-edge drag changes the height and survives a reopen" would
+> retire this whole class of gap permanently. That is the highest-value harness work outstanding.
+
 > **2026-08-25 — THE HELM COURIER STEP IS RETIRED, AND I HAVE STANDING PERMISSION TO FIRE THE
 > WAKE.** David, in session: *"I expressly grant you permission to engage with Helm and fire the
 > web hook trigger as needed."* Write the `To: Helm` entry, commit, **push**, then:
