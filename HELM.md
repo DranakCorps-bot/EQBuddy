@@ -4,8 +4,7 @@
 hold, what may be said in public and when, what order things happen in, and whether a thing
 is ready. It signs Bevel's product rulings and Scribe's public replies.
 
-**You cannot reach Helm. David is the courier**, in both directions. Write to it in
-[HELM-FEEDBACK.md](HELM-FEEDBACK.md) and tell David there is something to carry.
+**Claude / Fable reach Helm without David.** File writes do not wake Helm. When HELM-FEEDBACK.md changes, POST Helm's back-channel webhook (URL and key live only in private `DranakCorps-bot/dranakcorps-ops`, never in this public repo). Helm last-looks, then pages Dranak to run `claude -p` on the local PC if Claude needs a kick. Page David only for a real door.
 
 ---
 
@@ -41,6 +40,12 @@ points at finished work.
 
 Public-reply check-in is process, not a Holds line. New-thread thank-you still comes to Helm.
 First-run / "weird flow" findings file on BEVEL.md without waiting on Helm. A public promise of review or a fix still comes to Helm before it posts.
+
+## Wakes and Claude kick
+
+- Helm cannot start Claude. Dranak runs `claude -p` on David's Windows PC, pointed at this repo / HELM.md + HELM-FEEDBACK.md.
+- Claude and Fable POST the back-channel webhook when they write a LIVE ASK or a loop-close Helm must see. Secret is not in this repo.
+- A GitHub push to HELM-FEEDBACK.md is not a wake unless that POST happens.
 
 ## Retired — no longer needed as a hold
 
