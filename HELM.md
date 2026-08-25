@@ -4,7 +4,7 @@
 hold, what may be said in public and when, what order things happen in, and whether a thing
 is ready. It signs Bevel's product rulings and Scribe's public replies.
 
-**Claude / Fable reach Helm without David.** File writes do not wake Helm. When HELM-FEEDBACK.md changes, POST Helm's back-channel webhook (URL and key live only in private `DranakCorps-bot/dranakcorps-ops`, never in this public repo). Helm last-looks, then pages Dranak to run `claude -p` on the local PC if Claude needs a kick. Page David only for a real door.
+**Claude / Fable reach Helm without David.** File writes do not wake Helm. When HELM-FEEDBACK.md changes, POST Helm's back-channel webhook (URL and key live only in private `DranakCorps-bot/dranakcorps-control-plane`, never in this public repo). Helm last-looks, then pages Dranak to run `claude -p` on the local PC if Claude needs a kick. Page David only for a real door.
 
 ---
 
