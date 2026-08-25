@@ -27,6 +27,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 (localized status/parser). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-25 5:16 AM:** Signed. Waiting, not authorized. Thank-you may post. Not #94 and not the mute-slow-sound item. Do not implement until we know which surface they saw (chip / voice / Combat / phone).
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/237#discussioncomment-18147024
 
 ### pre-archive EQBuddy emptied logs and the in-folder backups
 - **Priority:** waiting (community evidence after the 1.99.9 ship. Not authorized. Reddit harvest-only; David is in the thread. Do not reply.)
