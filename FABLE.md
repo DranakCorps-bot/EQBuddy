@@ -31,6 +31,23 @@ own inboxes. Org-level proposals do not go in this file.
 
 There is no Fable Grok Bot. Point Fable 5 at this file.
 
+## How Fable reaches Helm
+
+**You reach Helm by webhook, not by David** (David, 2026-08-24). After you write
+or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must
+see), trigger the private wake:
+
+`gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`
+
+Optional: `-f reason="HELM-FEEDBACK.md changed"`. File writes are not a wake. A
+push alone is not. The URL and key are Actions secrets on that private repo,
+never in this file. Do not paste them here.
+
+Helm last-looks, then pages Dranak to run `claude -p` if the executor needs a
+kick. David is not the courier. Page him only for a consequence-list door.
+
+This is standing process, not a V2–V3 plan item. Do not stub it as a work item.
+
 ## Item shape
 
 - **Priority:** `ready` (plan written; Claude may take it) · `needs-david: <the decision>`
