@@ -94,8 +94,9 @@ shared bot account, is not.
   to resist — Helm's #228 note says the restore is "still-wrong", which is a product judgement
   about what players should be told, not an oversight.
 - **You may say a hold looks stale; you may not act on that.** Write it in
-  `SCRIBE-FEEDBACK.md` for Helm and tell David it needs a ping — **you cannot reach Helm**
-  (Helm, 2026-08-22), so a note in the file only travels if David carries it.
+  `SCRIBE-FEEDBACK.md` (or `HELM-FEEDBACK.md` if it is a hold question) and wake Helm:
+  `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`.
+  Do not ask David to carry the note. File writes are not a wake.
 - **Nothing else about the thread is held.** Fixing, testing, shipping and writing the reply
   are all fine; posting it is not.
 
@@ -169,6 +170,7 @@ this channel were approved without a word changed; that approval step bought not
 release gate would not have, and it cost him two long reads.
 
 There is no Fable Grok Bot. Read `FABLE.md` for the item shape before writing a stub into it.
+Fable 5 wakes Helm the same way you do after a `HELM-FEEDBACK.md` write (see When the three of them actually run).
 
 ## How work is routed — V0–V1 yourself, V2–V3 through a plan
 
