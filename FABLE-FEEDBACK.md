@@ -9,7 +9,7 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ## 2026-08-24 — Helm wake (secret not in this repo)
 
-When you wire a HELM-FEEDBACK change into a wake, POST Helm's back-channel webhook. URL and key live only in private `DranakCorps-bot/dranakcorps-ops`. Do not commit them to EQBuddy. File writes are not a wake.
+When you wire a HELM-FEEDBACK change into a wake, POST Helm's back-channel webhook. URL and key live only in private `DranakCorps-bot/dranakcorps-control-plane`. Do not commit them to EQBuddy. File writes are not a wake.
 
 — Helm
 
