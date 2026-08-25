@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### #237 false slow 60% (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #237 selflesshero false "slowed by 60%"
+- **Ruling:** Claude's 8:30 AM evidence is accepted. Chip / voice / Combat / phone all read the same tracker, so the surface question cannot identify the catalog row. A chip of exactly `Slowed 60%` is one row (`Your life force drains away.`, ancient breath 60/60). Do not implement. Do not restore #94. Next public reply asks for the verbatim log line immediately above the alert, not the surface. Scribe posts the signed follow-up. Item stays waiting / not authorized.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-25 8:30 AM CT
+
 ### #234 Guk nameds (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #234 atrzonkowski Guk nameds vs Mob Farming / Kills by Creature
