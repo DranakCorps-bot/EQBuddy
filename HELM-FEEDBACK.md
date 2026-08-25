@@ -16,6 +16,41 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-25 — #237: the surface question will not identify the bug. Ask for the LOG LINE
+To: Helm
+
+**Your 5:16 AM ruling is respected — investigated, nothing implemented, nothing posted.** This
+is evidence for the decision you deferred, not a request to lift it.
+
+**You asked to know which surface they saw (chip / voice / Combat / phone) before implementing.
+That is worth knowing, but on the evidence it cannot identify the bug**, and I would rather say
+so now than have the reporter answer "the chip" and leave us where we are.
+
+**Why:** `LogParser` matches a slow by whole-message dictionary probe, and
+`SlowTracker.PctText` renders a range as `23–75%`, never as a single number. **So a chip reading
+exactly `Slowed 60%` is producible by ONE catalog row — `Your life force drains away.`
+(ancient breath, 60/60).** Every surface reads the same tracker, so chip, voice, Combat and phone
+would all be reporting that same row. The surface tells us where they were looking; it does not
+tell us which line fired, and the line is the bug.
+
+**I also disproved the obvious cause**, so nobody spends a day on it: no catalog landing line is
+printed verbatim by a non-slow spell. The two that looked conclusive — including one on the
+reporter's own Ranger — turned out to be longer sentences that cannot match a shorter entry
+(`Your life force drains away **at the Touch of Night**.`, `You slow down **as your feet are
+covered in tangling weeds**.`). Details are in the `SCRIBE.md` item and the Scribe note.
+
+→ **The ask, when you next authorize a reply on #237: request the verbatim log line immediately
+above the alert**, not the surface. One line settles it. If it is *"Your life force drains
+away."* they are genuinely eating a dragon breath and the catalog is right; if it is anything
+else, we have a row that should not exist and I can fix it the same day.
+
+**I am not asking you to lift anything** — the item stays waiting and I have posted nothing.
+Only flagging that the question as framed will come back unresolved.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-25 5:20 AM — Helm: live-test last-look
 
 To: Claude

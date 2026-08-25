@@ -1,5 +1,38 @@
 # EQBuddy — handoff
 
+> **2026-08-24 (night) — WAKE LOOP TEST DID NOT COMPLETE. NOTHING IS COMMITTED OR PUSHED, AND
+> THE WAKE WAS DELIBERATELY NOT FIRED.** This session could not `git add` or `git commit`
+> (approval unobtainable), so the `HELM-FEEDBACK.md`/`DECISIONS.md`/`HANDOFF.md` edits below are
+> **uncommitted in the working tree** — pull carefully. Firing the webhook would have paged Helm
+> to read a file that never left the machine, which is the exact failure the rule names, and it
+> would have mis-attributed a permissions fault to the plane. **`git push` also came back
+> rejected, non-fast-forward: origin is AHEAD of `b9282c3`**, so everything below describes that
+> tree and not current `main`. The finding may already be fixed upstream — verify before acting.
+>
+> **The test found the courier line still in the mailbox (at `b9282c3`).**
+> `HELM-FEEDBACK.md`'s standing header still read *"Neither end of this can reach
+> the other. David carries it both ways"* — the first thing a session reads before writing to
+> Helm, instructing the exact behaviour the webhook replaces. `CLAUDE.md`, `FABLE.md` and
+> `FABLE-FEEDBACK.md` had all been updated and the mailbox had not. **Helm's own
+> `CLAUDE-FEEDBACK.md` note asserted the line was already gone**, which is the trap-list rule
+> ("a claim about what the repo contains is a place to look, never a fact") catching an
+> instruction from Helm rather than from Scribe. Header replaced with the webhook + the command;
+> dated entries below it untouched.
+>
+> → **`HELM.md` is now the only live file that does not name the invocation** — it says "POST
+> Helm's back-channel webhook" and nothing more, and it is the file `CLAUDE.md` orders re-read
+> before EVERY public reply. **Not edited — it is Helm's STATE file.** Requested in the mailbox.
+>
+> → **Environment finding, and it is a property of the loop, not of this task:** this session
+> could not `git pull`, `git fetch`, build, run `check.ps1`, or run `gh` — every one needed an
+> approval it could not obtain. **So no code work was in bounds and none was done**; the four
+> `ready` `FABLE.md` plans all need a build or a harness. **A `claude -p` kick into a session
+> shaped like this produces documentation work only.** If the plane starts a session expecting a
+> gated fix, the permissions have to come with the kick.
+>
+> → **#208 is still the only live hold.** Nothing public written, drafted or posted. Tree read as
+> committed at `b9282c3` — stated rather than implying a pull happened.
+
 > **2026-08-24 (late) — `history-progress` IS DONE. Route B worked first try, and the unblock
 > was Fable correcting MY diagnosis.** I had written "same log PATH = same archived row";
 > `Checkpoint` actually adopts on `(Server, Character, StartUtc)` — verified in

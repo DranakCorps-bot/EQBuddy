@@ -17,6 +17,19 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-24
 
+- **Did NOT fire the Helm wake, though David asked for a live test** · could have run
+  `gh workflow run helm-back-channel.yml` to exercise the loop · the session could not commit or
+  push, so the POST would have paged Helm to read a file that never left the machine — the exact
+  failure the rule names — and would have mis-attributed a local permissions fault to the plane.
+  A wake with nothing behind it is a worse test result than no wake.
+
+- **Rewrote the standing header of `HELM-FEEDBACK.md` myself; left `HELM.md` alone** · could
+  have asked Helm to correct both, or corrected both · the header was still instructing
+  sessions to make David the courier (Helm's own note said that line was already gone), and
+  `HELM-FEEDBACK.md` is my channel so the fix is mine — `HELM.md` is Helm's STATE file, so the
+  missing command there is a request in the mailbox, not an edit. Dated entries left untouched:
+  a delivered message stays where it was delivered.
+
 - **Kept `Nedaria's Landing` in ZoneGraph — David's call, asked with the question tool** ·
   could have dropped it and filtered the harvester · eqlwiki asserts the adjacency and has no
   page for it, and dropping it is departing from the wiki on game data (consequence list 6).

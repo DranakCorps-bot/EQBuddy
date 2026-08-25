@@ -26,6 +26,32 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis, unchecked against a log:** they heard or saw EQBuddy's chip/voice (`Slowed 60%` / `Slowed 60 percent`) and quoted it as "slowed by 60%". A first-person catalog line those three classes print is matching when they are not attack-speed slowed. Named SOURCE is the quoted string plus those three classes. Self-vs-target is not supported by the quoted tracker/parser comments unless a you-line also prints when they land their own slow — I did not replay a Shaman / SHD / RNG log.
 - **Class:** V0–V1 (localized status/parser). Do not write FABLE.md.
 - **Off-topic here:** none reported.
+- **CLAUDE 2026-08-25 — INVESTIGATED, NOT IMPLEMENTED (Helm's line respected). Your
+  hypothesis is DISPROVEN, and the negative result narrows the question a lot.**
+  Your theory was "a first-person catalog line those three classes print is matching when they
+  are not attack-speed slowed." I checked every one of the catalog's 20 landing lines against
+  the whole harvested wiki cache. **No catalog landing line is printed verbatim by a non-slow
+  spell.** The near-misses all collapse on inspection:
+  - `Your life force drains away.` also appears on **Touch of Night** and **Gangrenous Touch of
+    Zum\`uul** (Necro 59/60 DoTs) — but their lines are *"Your life force drains away **at the
+    Touch of Night**."* Longer sentence, no match.
+  - `You slow down.` appears on **Tangling Weeds** (Druid/**Ranger** — the reporter's class, so
+    this looked like the answer) — but its line is *"You slow down **as your feet are covered in
+    tangling weeds**."* Longer sentence, no match.
+  - The other four apparent collisions are wiki SPELLING variants of the same spells
+    (Strane/Strain, Absonant/Assonant, backtick vs apostrophe), not different spells.
+  **And the match is a whole-message dictionary probe** (`LogParser.cs:685`,
+  `SlowDebuffCatalog.Default.Find(msg)`), not a regex or a substring — so a longer line cannot
+  match a shorter entry.
+- **The number pins it further.** `SlowTracker.PctText` is `PctMin == PctMax ? "{n}%" :
+  "{min}–{max}%"` — a range renders as `23–75%`, never as a single number. **So the chip can
+  read exactly `Slowed 60%` for one entry only: `Your life force drains away.` (ancient breath,
+  60/60).** Nothing else in the catalog can produce that string.
+- **What that leaves, for whoever asks the reporter next:** either they are genuinely taking
+  Ancient Breath (a dragon breath — implausible "every time"), or the "60%" is a paraphrase of a
+  different surface. **The one question that unblocks this is the LOG LINE**, not the surface:
+  ask for the line immediately above the alert in their log, verbatim. Surface alone
+  (chip/voice/Combat/phone) will not identify which catalog row fired.
 - **Helm 2026-08-25 5:16 AM:** Signed. Waiting, not authorized. Thank-you may post. Not #94 and not the mute-slow-sound item. Do not implement until we know which surface they saw (chip / voice / Combat / phone).
 - **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/237#discussioncomment-18147024
 

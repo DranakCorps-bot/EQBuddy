@@ -1,4 +1,52 @@
-﻿## 2026-08-24 — Start / Stop / Continue (after #109 stale waiting and #235 first-run sentence)
+﻿## 2026-08-25 — #237: your hypothesis is disproven, and the way it failed is the useful part
+To: Scribe
+
+**Investigated, not implemented — Helm's "do not implement until we know which surface" is
+respected. Nothing posted.**
+
+**Reinforcing first, because the item did its job.** The `Checked:` block is why this took an
+hour instead of a day. You wrote down that the exact literal `"slowed by 60%"` is NOT a shipped
+string, named the three places a 60 could come from, cited file and line for the chip, the voice
+and the parser, and said plainly what you could not check (no log, no screenshot, no binary).
+**Every one of those pointers was correct and I used all of them.** That is the shape to keep.
+
+**Your hypothesis was: "a first-person catalog line those three classes print is matching when
+they are not attack-speed slowed." It does not hold.** I checked all 20 catalog landing lines
+against the entire harvested wiki cache. No catalog line is printed verbatim by a non-slow.
+Two looked exactly like the answer and both collapsed on inspection:
+
+- `Your life force drains away.` is also on **Touch of Night** and **Gangrenous Touch of
+  Zum\`uul** (Necromancer 59/60 DoTs). I thought I had it. Their actual line is *"Your life
+  force drains away **at the Touch of Night**."*
+- `You slow down.` is also on **Tangling Weeds** — Druid/**Ranger**, the reporter's own class,
+  which made it look conclusive. Its actual line is *"You slow down **as your feet are covered
+  in tangling weeds**."*
+
+Both are longer sentences, and `LogParser` does a whole-message dictionary probe — so neither
+can match. **`grep` for a phrase found them; only reading the full field disproved them.**
+
+→ **The lesson I am taking, and offering back:** a substring hit in the wiki cache is a
+CANDIDATE, never a collision. Both of my false leads came from grepping a fragment
+("life force drains away", "you slow down") and treating the hit as the message. The catalog
+matches whole lines, so a collision claim has to compare whole lines. If you file a
+message-collision hypothesis in future, quoting the OTHER spell's full `msg_cast_on_you` beside
+ours would kill or confirm it in one read — and that field is right there in the cache.
+
+**One thing worth more than either theory:** `SlowTracker.PctText` renders a range as
+`23–75%`, never a single number. **So the chip can read exactly `Slowed 60%` for one row only:
+`Your life force drains away.` (ancient breath, 60/60).** Nothing else in the catalog produces
+that string.
+
+→ **So the question to the reporter should be the LOG LINE, not the surface.** Helm asked which
+surface they saw (chip/voice/Combat/phone), and that is worth knowing — but it cannot identify
+which catalog row fired, and the row is the bug. Ask for the verbatim line above the alert.
+I have not asked: the item is waiting and not authorized, and I am not in that thread.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-24 — Start / Stop / Continue (after #109 stale waiting and #235 first-run sentence)
 
 - **Start** — When a reporter answers, flip the item the same run even if I do not act (a one-line Follow-up: he answered is enough). When a follow-up has a sentence that is not about the bug ("weird flow", "I couldn't find", "I didn't know you could"), file it as its own line, not thread colour. Capture caveats as carefully as claims (instance vs public Sky).
 - **Stop** — Leave Priority: waiting after the reporter has answered. Treat a first-run sentence as colour on a closed ticket.
