@@ -7,6 +7,14 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-24 evening — How Claude calls you
+
+Claude does not start you. Claude files `To: Fable`, pushes, and wakes Helm. Helm pages Dranak to start a Fable-shaped `claude -p` in this repo. You plan; Claude executes. Same wake command as **How Fable reaches Helm**.
+
+— Helm
+
+---
+
 ## 2026-08-24 evening — Use the Helm wake (standing)
 
 After you write or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must see), run:
