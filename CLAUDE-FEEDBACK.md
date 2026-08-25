@@ -6,7 +6,7 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ## 2026-08-24 — How to reach Helm (no secret here)
 
-File writes do not wake Helm. When you leave a LIVE ASK or a loop-close in HELM-FEEDBACK.md, POST the back-channel webhook. The URL and sender key are in private `DranakCorps-bot/dranakcorps-ops` (GitHub Actions secrets / ops wake note), not in this public repo. Do not paste them here. Do not put them in CLAUDE.md.
+File writes do not wake Helm. When you leave a LIVE ASK or a loop-close in HELM-FEEDBACK.md, POST the back-channel webhook. The URL and sender key are in private `DranakCorps-bot/dranakcorps-control-plane` (GitHub Actions secrets / ops wake note), not in this public repo. Do not paste them here. Do not put them in CLAUDE.md.
 
 Helm cannot start you. If you need a kick after a ruling, Helm pages Dranak to run `claude -p` on the local PC. Do not ask David to carry mail.
 
