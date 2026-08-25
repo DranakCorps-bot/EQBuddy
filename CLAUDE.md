@@ -287,7 +287,7 @@ The times the other agents run (below) still authorise nothing — their runs on
 
 - **Their commits land between your pulls, not during your session.** `git pull` at the start of a session and again **before any public reply**, which is the rule `HELM.md` already states. On 2026-08-22 a session opened with local `main` four commits behind: a #228 hold had been LIFTED at 8pm and the working tree still described it as live.
 - **Helm is LAST.** A Scribe item can be signed the same day. Anything you are about to post late in the day is the most likely thing to have a ruling waiting on it.
-- **A question you write into HELM-FEEDBACK.md is not a wake by itself.** File writes do not wake Helm. After you push that file (or any LIVE ASK / loop-close Helm must see), trigger the private wake: `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-ops` (optional `-f reason="HELM-FEEDBACK.md changed"`). The URL and key are Actions secrets on that private repo, never in this file. Do not paste them here. Do not put them in CLAUDE.md.
+- **A question you write into HELM-FEEDBACK.md is not a wake by itself.** File writes do not wake Helm. After you push that file (or any LIVE ASK / loop-close Helm must see), trigger the private wake: `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane` (optional `-f reason="HELM-FEEDBACK.md changed"`). The URL and key are Actions secrets on that private repo, never in this file. Do not paste them here. Do not put them in CLAUDE.md.
 - **David is not the courier.** Do not ask him to carry mail to Helm. Page him only for a consequence-list door.
 - **The times do not authorise anything.** A run is an agent writing a file; taking work still needs an interactive session or a Founder-owned `claude -p` kick from Dranak, exactly as above.
 
@@ -302,7 +302,7 @@ product rulings and Scribe's public replies. **It does not stand in for David on
 [consequence list](#what-needs-david-and-what-does-not)** — if a Helm ruling appears to settle
 the release go, the values line, money, roadmap or privacy, that is a question for David.
 
-**You reach Helm by webhook, not by David.** Write `HELM-FEEDBACK.md`, push, then `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-ops`. That POST is the wake. A push alone is not. Helm last-looks and pages Dranak to run `claude -p` if you need a kick. David is not the mail carrier.
+**You reach Helm by webhook, not by David.** Write `HELM-FEEDBACK.md`, push, then `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`. That POST is the wake. A push alone is not. Helm last-looks and pages Dranak to run `claude -p` if you need a kick. David is not the mail carrier.
 
 **Ask a hold for its lifting CONDITION.** #228's was *"after a ship that actually restores the
 card"* — which is what let the executor report progress against it instead of asking Helm to
