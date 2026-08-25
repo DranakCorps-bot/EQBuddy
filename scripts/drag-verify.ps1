@@ -148,6 +148,38 @@ function HeightsEntry {
     } else { $null }
 }
 
+# A REAL border drag: press the bottom edge and move. SetWindowPos is not this — the app
+# now records a height as the player's only on WM_EXITSIZEMOVE after a resize hit code,
+# which is the native size loop and nothing else. A harness that resized programmatically
+# and then asserted the height was kept would be testing a path no player can take, and
+# would report FAIL for correct behaviour.
+#
+# Returns the new height, or $null when the bottom edge cannot be aimed at.
+function Drag-BottomEdge([IntPtr]$hwnd, [int]$delta) {
+    $rect = New-Object W.U+RECT
+    [W.U]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
+    $midX = [int]($rect.L + ($rect.R - $rect.L) / 2)
+    $edgeY = -1
+    foreach ($off in 1..14) {
+        $probe = $rect.B - $off
+        $owner = [W.U]::GetAncestor([W.U]::WindowFromPoint((New-Object W.U+POINT($midX, $probe))), 2)
+        if ($owner -eq $hwnd) { $edgeY = $probe; break }
+    }
+    if ($edgeY -lt 0) { return $null }
+    [W.U]::SetCursorPos($midX, $edgeY) | Out-Null; Start-Sleep -Milliseconds 200
+    [W.U]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero)
+    Start-Sleep -Milliseconds 150
+    $steps = 8
+    foreach ($i in 1..$steps) {
+        [W.U]::SetCursorPos($midX, $edgeY + [int]($delta * $i / $steps)) | Out-Null
+        [W.U]::mouse_event(1, 0, 0, 0, [IntPtr]::Zero)
+        Start-Sleep -Milliseconds 60
+    }
+    [W.U]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)
+    Start-Sleep -Milliseconds 500
+    Settle $hwnd
+}
+
 $results = [Collections.ArrayList]::new()
 function Note([string]$s) { Write-Host $s; $null = $results.Add($s) }
 
@@ -215,15 +247,26 @@ try {
     # monitor work-area cap — the Quest Tracker opens at 1822px on a tall screen — and
     # asking it to grow then fails for a reason that has nothing to do with ownership,
     # which reads as a defect in exactly the thing being measured. Shrinking is always
-    # available, and it is also the operation David actually asked for on 2026-08-21:
+    # available, and it is also the operation Hateborne actually asked for on 2026-08-21:
     # making a tab short enough to scroll.
-    $w = Get-W $hwnd; $before = Get-H $hwnd
-    $taken = [Math]::Max(320, $before - 200)
-    [W.U]::SetWindowPos($hwnd, [IntPtr]::Zero, 0, 0, $w, $taken, 0x0002 -bor 0x0004 -bor 0x0010) | Out-Null  # resize only
-    Start-Sleep -Milliseconds 800
-    $hTaken = Get-H $hwnd
-    if ([Math]::Abs($hTaken - $taken) -le 4) { Note "D1: PASS - resize to $taken stuck ($hTaken)" }
-    else { Note "D1: FAIL - asked $taken, window says $hTaken (follower fought the player?)" }
+    # Park it fully on screen: a window restored at a saved position can have its bottom
+    # edge off the monitor, which probes as "no border" and reads like a defect.
+    [W.U]::SetWindowPos($hwnd, [IntPtr]::Zero, 80, 40, 0, 0, 0x0001 -bor 0x0004 -bor 0x0010) | Out-Null
+    Start-Sleep -Milliseconds 400
+    $before = Get-H $hwnd
+    # Shrink if there is room above the floor, otherwise grow. A window already at its
+    # MinHeight cannot shrink, and asserting that it did would fail for a reason that has
+    # nothing to do with what is being measured.
+    $delta = if ($before -gt 520) { -200 } else { 200 }
+    $hTaken = Drag-BottomEdge $hwnd $delta
+    if ($null -eq $hTaken) {
+        Note "D1: INCONCLUSIVE - could not aim at the bottom edge of $Window"
+        $hTaken = $before
+    } elseif ([Math]::Abs($hTaken - $before) -ge 40) {
+        Note "D1: PASS - a real bottom-edge drag moved the height $before -> $hTaken"
+    } else {
+        Note "D1: FAIL - a real bottom-edge drag moved the height only $before -> $hTaken. CanResize is set and the chrome offers no border to grab; FramelessResize's WM_NCHITTEST hook is what provides one."
+    }
     if ($tabs.Count -ge 2 -and (Click-Label $win $tabs[1] $hwnd)) {
         $hAfterTab = Settle $hwnd
         if ([Math]::Abs($hAfterTab - $hTaken) -le 4) { Note "D2: PASS - owned: tab switch no longer resizes ($hAfterTab)" }
@@ -255,56 +298,7 @@ try {
         Note "E2: INCONCLUSIVE - no third tab on $Window to change the content with"
     }
 
-    # ---- Phase F: a REAL bottom-edge drag ---------------------------------------
-    # Phases D and E resize with SetWindowPos, which proves the window ACCEPTS a size
-    # and says nothing about whether a player can grab it. That distinction is the gap
-    # HANDOFF.md named on 2026-08-25: these windows are WindowStyle=None +
-    # AllowsTransparency=True and draw their own chrome, so a resize border is not
-    # guaranteed by CanResize alone, and only BreakoutWindow has a WM_NCHITTEST hook.
-    # "It works on the theme windows and these use the same chrome" is an argument. This
-    # is a measurement.
-    $rect = New-Object W.U+RECT
-    [W.U]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
-    $midX = [int]($rect.L + ($rect.R - $rect.L) / 2)
-
-    # AIM FIRST. These windows are AllowsTransparency=True and may carry a transparent
-    # margin, so the window RECT's bottom is not necessarily where the chrome ends — and
-    # a drag on empty space is indistinguishable in the result from a window that refuses
-    # to resize. Walk up from the rect bottom until the point actually belongs to us, and
-    # SAY which offset worked, so a reader can tell a real "no border" from a bad aim.
-    $edgeY = -1
-    foreach ($off in 1..14) {
-        $probe = $rect.B - $off
-        $owner = [W.U]::GetAncestor([W.U]::WindowFromPoint((New-Object W.U+POINT($midX, $probe))), 2)
-        if ($owner -eq $hwnd) { $edgeY = $probe; break }
-    }
-    if ($edgeY -lt 0) {
-        Note "F: INCONCLUSIVE - no point within 14px of the bottom edge belongs to $Window (transparent margin?), so a drag there proves nothing"
-        return
-    }
-    Note "F: bottom edge of $Window responds to the pointer at rect.bottom-$($rect.B - $edgeY)px"
-    $hBefore = Get-H $hwnd
-    $wBefore = Get-W $hwnd
-    [W.U]::SetCursorPos($midX, $edgeY) | Out-Null; Start-Sleep -Milliseconds 200
-    [W.U]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero)   # left down on the bottom edge
-    Start-Sleep -Milliseconds 150
-    foreach ($step in 1..6) {
-        [W.U]::SetCursorPos($midX, $edgeY - ($step * 15)) | Out-Null
-        [W.U]::mouse_event(1, 0, 0, 0, [IntPtr]::Zero)   # MOVE, so a resize loop sees it
-        Start-Sleep -Milliseconds 60
-    }
-    [W.U]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)   # up
-    Start-Sleep -Milliseconds 500
-    $hAfterDrag = Settle $hwnd
-    $wAfterDrag = Get-W $hwnd
-    Note "F: bottom-edge drag: height $hBefore -> $hAfterDrag (width $wBefore -> $wAfterDrag)"
-    if ([Math]::Abs($hAfterDrag - $hBefore) -ge 40) {
-        Note 'F: PASS - the bottom edge is really grabbable (hit-testing works on this chrome)'
-    } elseif ($hAfterDrag -eq $hBefore -and $wAfterDrag -ne $wBefore) {
-        Note 'F: FAIL - the drag moved the WIDTH, so the pointer landed on a corner, not the edge'
-    } else {
-        Note "F: FAIL - the bottom edge did not resize $Window. CanResize is set and the chrome offers no border to grab; BreakoutWindow's WM_NCHITTEST hook is the fix."
-    }
+    # (Phase F retired: it asked the same question as D, which now drags for real.)
 }
 finally {
     Stop-App $app

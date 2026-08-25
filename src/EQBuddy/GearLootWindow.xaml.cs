@@ -45,6 +45,9 @@ public partial class GearLootWindow : Window
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "gearloot", _settings, baseWidth: Width);
         WindowZoom.AllowResize(this, "gearloot", _settings);
+        // A drag changes how much room the body has; without this the window grows
+        // and its content does not follow.
+        SizeChanged += (_, _) => UpdateHeightCap();
 
         _loot = new LootCardView(main, _settings);
         _gear = main.NewGearCard();
@@ -142,9 +145,12 @@ public partial class GearLootWindow : Window
             ? work.Height
             : SystemParameters.WorkArea.Height;   // before the handle exists
         MaxHeight = Math.Max(220, height * 0.85);
+        // The BODY opens at a design constant, not at a fraction of the monitor. Deriving
+        // it from the screen is what made this window fill a tall display; UI.Shared owns
+        // the number so all seven pop-outs cannot disagree about it.
         // Cap the SCROLLER, not just the window: otherwise the window grows past its own
         // cap on a long gear list and the tab strip walks off the bottom.
-        BodyScroll.MaxHeight = Math.Max(120, MaxHeight - 120);
+        BodyScroll.MaxHeight = WindowSizing.BodyCap(MaxHeight, 120, FramelessResize.ManualHeight(this));
     }
 
     /// <summary>Repaint from the widget's shared snapshot. Throttled the way the other

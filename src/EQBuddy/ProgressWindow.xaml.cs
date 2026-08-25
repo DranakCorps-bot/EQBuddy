@@ -60,6 +60,9 @@ public partial class ProgressWindow : Window
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "progress", _settings, baseWidth: Width);
         WindowZoom.AllowResize(this, "progress", _settings);
+        // A drag changes how much room the body has; without this the window grows
+        // and its content does not follow.
+        SizeChanged += (_, _) => UpdateHeightCap();
 
         var surfaces = main.NewProgressSurfaces();
         (_experience, _money, _motes, _faction, _raids) =
@@ -166,9 +169,12 @@ public partial class ProgressWindow : Window
             ? work.Height
             : SystemParameters.WorkArea.Height;   // before the handle exists
         MaxHeight = Math.Max(220, height * 0.85);
+        // The BODY opens at a design constant, not at a fraction of the monitor. Deriving
+        // it from the screen is what made this window fill a tall display; UI.Shared owns
+        // the number so all seven pop-outs cannot disagree about it.
         // Cap the SCROLLER, not just the window: otherwise the window grows past its own
         // cap on a long list and the star row walks off the bottom.
-        BodyScroll.MaxHeight = Math.Max(120, MaxHeight - 160);
+        BodyScroll.MaxHeight = WindowSizing.BodyCap(MaxHeight, 160, FramelessResize.ManualHeight(this));
     }
 
     /// <summary>Open this window on a tab by its wire key — the EQBUDDY_PROGRESS hook and

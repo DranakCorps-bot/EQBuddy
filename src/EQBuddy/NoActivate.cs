@@ -67,6 +67,34 @@ internal static class NoActivate
         if (visible) window.Show();
     }
 
+    /// <summary>
+    /// Arm every OTHER window as it loads, so the setting means what it says.
+    ///
+    /// The satellites all ship `ShowInTaskbar="False"`, which gives them a hidden owner and
+    /// usually keeps them out of the switcher on its own — but "usually" is a claim about a
+    /// shell behaviour nobody here has measured, and the cost of being wrong is the feature
+    /// covering the widget and nothing else. Setting the bit is a fact rather than an
+    /// inference.
+    ///
+    /// `SourceInitialized` is a plain CLR event and cannot be class-handled; `Loaded` is
+    /// routed and can. Post-show is fine for these because they are not the taskbar case,
+    /// and <see cref="SetToolWindow"/> re-shows if it has to.
+    /// </summary>
+    public static void ArmSatellites(Window main, Func<bool> wanted) =>
+        EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
+            new RoutedEventHandler((sender, _) =>
+            {
+                if (sender is Window w && !ReferenceEquals(w, main)) SetToolWindow(w, wanted());
+            }));
+
+    /// <summary>Apply to every open window at once, for the moment the box is flipped — a
+    /// setting that waits for a relaunch is indistinguishable from a broken one.</summary>
+    public static void ApplyToAll(Window main, bool on)
+    {
+        foreach (Window w in Application.Current.Windows) SetToolWindow(w, on);
+        SetToolWindow(main, on);
+    }
+
     /// <summary>Is the style actually ON the window right now? For the E2E dump, which
     /// has to report the EFFECT rather than the intent — the whole lesson of trap 42 is
     /// that a feature can be in the binary and not in force, and the two look identical

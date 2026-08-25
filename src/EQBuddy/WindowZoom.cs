@@ -76,12 +76,21 @@ internal static class WindowZoom
         window.ResizeMode = ResizeMode.CanResize;
         window.MinWidth = Math.Max(window.MinWidth, WindowSizing.MinWidth);
         window.MinHeight = Math.Max(window.MinHeight, WindowSizing.MinHeight);
+        // AND A BORDER TO GRAB: CanResize creates no non-client area on a frameless
+        // window, so every window through here was resizable in settings and immovable
+        // under a mouse. Here rather than at the call sites, so a window cannot join the
+        // feature and miss the affordance. FramelessResize has the evidence.
+        if (window.WindowStyle == WindowStyle.None) FramelessResize.Attach(window);
 
         if (settings.WindowHeights.TryGetValue(key, out var savedHeight)
             && WindowSizing.IsSaneHeight(savedHeight))
         {
             window.SizeToContent = SizeToContent.Manual;
             window.Height = savedHeight;
+            // A stored height only exists because the player dragged for it, so the window
+            // opens already owning its height — otherwise the next undragged close would
+            // delete the very choice this line just restored.
+            FramelessResize.MarkPlayerSized(window);
         }
         else
         {
@@ -94,8 +103,16 @@ internal static class WindowZoom
             var zoom = settings.WindowZooms.TryGetValue(key, out var z) && z > 0 ? z : 1.0;
             if (WindowSizing.BaseWidthToStore(window.Width, zoom) is { } basis)
                 settings.WindowBaseWidths[key] = basis;
-            if (WindowSizing.HeightToStore(window.ActualHeight) is { } h)
+            // ONLY a height the player dragged to. Persisting ActualHeight unconditionally
+            // recorded whatever a window happened to measure, including an empty first
+            // frame — four such entries in one real profile, none of them chosen. A value
+            // nobody chose is REMOVED, so a profile carrying one heals itself.
+            // MigrateWindowHeights explains why they all had to go.
+            if (FramelessResize.PlayerTookHeight(window)
+                && WindowSizing.HeightToStore(window.ActualHeight) is { } h)
                 settings.WindowHeights[key] = h;
+            else
+                settings.WindowHeights.Remove(key);
             settings.Save();
         };
 
