@@ -10,6 +10,11 @@ public enum OutputfileKind
     Unknown,
     Inventory,
     Achievements,
+    /// <summary>`/outputfile faction` — singular command, plural file, with the
+    /// character's class code spliced in: `Hateborne_neriak-ENC-Factions.txt`. It is what
+    /// the Unlocks tab's race progress reads; the log can only see faction CHANGES, never
+    /// a standing.</summary>
+    Factions,
 }
 
 /// <summary>
@@ -51,6 +56,11 @@ public static class OutputfileAutoImport
         var name = Path.GetFileNameWithoutExtension(fileName ?? "");
         if (name.EndsWith("-Inventory", StringComparison.OrdinalIgnoreCase)) return OutputfileKind.Inventory;
         if (name.EndsWith("-Achievements", StringComparison.OrdinalIgnoreCase)) return OutputfileKind.Achievements;
+        // Suffix, never segment count: the real name is Hateborne_neriak-ENC-Factions.txt,
+        // with the character's class code spliced into the middle. Counting parts would
+        // refuse a legitimate dump forever, which is trap 48's lesson wearing a different
+        // filename.
+        if (FactionsFile.IsFactionDump(name)) return OutputfileKind.Factions;
         return OutputfileKind.Unknown;
     }
 
