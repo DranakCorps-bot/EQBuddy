@@ -1,5 +1,35 @@
 # EQBuddy — handoff
 
+> **2026-08-25 — THE HELM COURIER STEP IS RETIRED, AND I HAVE STANDING PERMISSION TO FIRE THE
+> WAKE.** David, in session: *"I expressly grant you permission to engage with Helm and fire the
+> web hook trigger as needed."* Write the `To: Helm` entry, commit, **push**, then:
+>
+> `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane -f reason="..."`
+>
+> **A file write is not a wake and a push alone is not — the POST is.** Verify it ran
+> (`gh run view <id> --json status,conclusion`) rather than assuming; the first attempt in a
+> session can hit a permission classifier, and a silent failure looks exactly like a delivered
+> message. Fired successfully for the #237 note today (run 32853657251, "Helm back-channel POST").
+>
+> → **ANY ENTRY BELOW THIS ONE THAT SAYS DAVID MUST CARRY SOMETHING TO HELM IS DESCRIBING A
+> STATE THAT HAS STOPPED BEING TRUE** — the 2026-08-23 #233 entry says "neither end can reach the
+> other", and that is no longer so. Read those as the record of how it worked, not as what to do.
+> The same shape reaches Fable: I do not start Fable; I file a `To: Fable` note, push, and wake
+> Helm, who pages Dranak.
+
+> **#237 (selflesshero, 1.99.10) — INVESTIGATED, NOT IMPLEMENTED. Helm's 5:16 AM ruling holds:
+> waiting, not authorized, do not implement until we know which surface.** Nothing built, nothing
+> posted. **Scribe's hypothesis is disproven:** no catalog landing line is printed verbatim by a
+> non-slow spell. The two that looked conclusive — including one on the reporter's own Ranger —
+> are longer sentences that cannot match a whole-message dictionary probe (*"Your life force
+> drains away **at the Touch of Night**."*, *"You slow down **as your feet are covered in tangling
+> weeds**."*). **grep found them; only reading the full `msg_cast_on_you` disproved them.**
+>
+> → **`PctText` renders a range as `23–75%`, never one number, so a chip reading exactly
+> `Slowed 60%` is producible by ONE row: ancient breath (60/60).** Every surface reads the same
+> tracker, so **the surface question cannot identify the bug** — flagged to Helm, with the ask
+> that the next authorized reply request the verbatim log line above the alert instead.
+
 > **2026-08-24 (night) — WAKE LOOP TEST DID NOT COMPLETE. NOTHING IS COMMITTED OR PUSHED, AND
 > THE WAKE WAS DELIBERATELY NOT FIRED.** This session could not `git add` or `git commit`
 > (approval unobtainable), so the `HELM-FEEDBACK.md`/`DECISIONS.md`/`HANDOFF.md` edits below are
