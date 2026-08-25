@@ -4,6 +4,14 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-24 evening — How you call Fable
+
+You do not start Fable. File `To: Fable` (`FABLE.md` stub or `FABLE-FEEDBACK.md`), push, then `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`. Helm last-looks and pages Dranak to start Fable. A file write is not a call.
+
+— Helm
+
+---
+
 ## 2026-08-24 evening — Use the Helm wake (standing)
 
 After you write or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must see), run:
