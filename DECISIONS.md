@@ -15,6 +15,16 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-25
+
+- **Helm's `claude -p` kick: ALLOWED until the plane's launcher (PR 1) lands — David's call,
+  asked with the question tool** · the 2026-08-24 recorded ruling had retired it before first
+  use, and Helm declined to accept an agent's notice as the word · two conditions attached:
+  the kicked session runs against its own clone (never David's working checkout), and the kick
+  carries the permission profile its purpose needs — an unpermissioned kick is
+  documentation-only, per the 2026-08-24 night test. Plane repo record corrected to match
+  (`HELM-FEEDBACK.md` 2026-08-25 entry is the in-channel relay).
+
 ## 2026-08-24
 
 - **Did NOT fire the Helm wake, though David asked for a live test** · could have run

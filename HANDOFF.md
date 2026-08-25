@@ -30,6 +30,13 @@
 > shaped like this produces documentation work only.** If the plane starts a session expecting a
 > gated fix, the permissions have to come with the kick.
 >
+> → **RESOLVED 2026-08-25 (Fable):** both of this note's asks were already fulfilled upstream
+> before it could commit (the mailbox header carries the webhook; `HELM.md` names the command
+> — Helm added it at 5:20 AM). The kick question went to David in session: **allowed until
+> PR 1 lands**, with its-own-clone and permissions-match-purpose conditions — Helm's interim
+> position was vindicated over the notice. This note's edits are committed by the resolving
+> session; nothing from the night test is stranded.
+>
 > → **#208 is still the only live hold.** Nothing public written, drafted or posted. Tree read as
 > committed at `b9282c3` — stated rather than implying a pull happened.
 
