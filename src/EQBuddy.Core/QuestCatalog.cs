@@ -129,6 +129,40 @@ public static class QuestClassFilter
     public static bool MatchesAny(string classText, IReadOnlyCollection<string> classes) =>
         classes.Count == 0 || classes.Any(c => Matches(classText, c));
 
+    /// <summary>
+    /// This catalog's spelling of a class name, or "" when the name is not one of the
+    /// sixteen. Abbreviations resolve too — a caller holding "SHD" or "SK" is asking the
+    /// same question as one holding "Shadowknight".
+    ///
+    /// **It exists because the game and the catalogs disagree about a space.**
+    /// `/outputfile achievements` writes "Primary Class Unlock - Shadowknight";
+    /// `SkyQuestDefaults` writes "Shadow Knight". An `Equals(..., OrdinalIgnoreCase)`
+    /// between the two is false, and in `AchievementsImport` that dropped every Shadow
+    /// Knight Sky reward before the auto-grant guard and before the unmatched list that
+    /// exists so nothing is swallowed. Fifteen classes spell identically, so only a
+    /// Shadow Knight could ever see it (David's own dump, 2026-08-25).
+    ///
+    /// Matching ignores everything that is not a letter or digit rather than carrying an
+    /// alias list: the sixteen names stay distinct once stripped, so this is a RULE and
+    /// not a list, and a variant nobody has met yet ("Shadow-Knight") is already covered.
+    /// A list would need the next spelling added to it after the next bug report.
+    /// </summary>
+    public static string Canonical(string className)
+    {
+        var key = Squash(className);
+        if (key.Length == 0) return "";
+        foreach (var c in Classes)
+            if (Squash(c) == key) return c;
+        // The canonical name is the KEY of this map, so an abbreviation hit answers with
+        // the spelling every catalog uses rather than with the code it came in as.
+        foreach (var (name, abbrevs) in Abbrevs)
+            if (abbrevs.Any(a => Squash(a) == key)) return name;
+        return "";
+    }
+
+    private static string Squash(string s) =>
+        new([.. s.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)]);
+
     /// <summary>Short label for a class ("CLR"), for the multi-select button face.</summary>
     public static string Abbrev(string className) =>
         Abbrevs.TryGetValue(className, out var a) ? a[0]

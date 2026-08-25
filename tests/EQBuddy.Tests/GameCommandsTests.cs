@@ -70,6 +70,14 @@ public class GameCommandsTests
             "the tab IS the dump — ranked by slot, or listed by bag"),
         ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileInventory),
             "the held and ready views answer what-can-I-turn-in from bags and bank"),
+        // The Sky tab is FED by the achievements dump — a hand-in never appears in the
+        // log, so that dump is the only thing that can say a reward was turned in before
+        // EQBuddy existed — and it named no way to produce one. The command lived on the
+        // widget menu and the Raids card, neither of which is where someone looking at
+        // Sky rewards is looking. Same absence as the Gear tab in 2026-08-20, found the
+        // same way: by asking what a surface needs rather than what it must not carry.
+        ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileAchievements),
+            "the Sky tab's turn-in state comes from the achievements dump"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),
@@ -92,6 +100,7 @@ public class GameCommandsTests
         ("EQBuddy.Avalonia/InventoryView.cs", nameof(GameCommands.OutputfileInventory),
             "the tab IS the dump — ranked by slot, or listed by bag"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
+        ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileAchievements), "WPF twin"),
         ("EQBuddy.Avalonia/MapWindow.cs", nameof(GameCommands.LocSocial), "WPF twin"),
     ];
 

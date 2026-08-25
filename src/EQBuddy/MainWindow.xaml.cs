@@ -246,8 +246,13 @@ public partial class MainWindow : Window, ICardContext
                             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
                         Hidden = QuestLedger?.HiddenFor(QuestCharacterKey)
                             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
-                        Completed = QuestLedger?.CompletedFor(QuestCharacterKey)
-                            ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                        // Sky turn-ins folded in, so the phone's quest list answers what
+                        // its own Sky tab already knows — parity by shared module, not by
+                        // a feature list kept level by hand.
+                        Completed = SkyTestSplit.WithTurnIns(
+                            QuestLedger?.CompletedFor(QuestCharacterKey)
+                                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                            _settings.SkyQuestCompleted),
                         Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                         InferredClass = snap.InferredClass,
                         // The RESOLVED list and its source, decided here so the phone cannot decide it

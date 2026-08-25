@@ -201,18 +201,15 @@ public static class GearLocker
     /// a wrong guess would gate comparisons on a lie.</summary>
     public static string Code(string className)
     {
-        var key = className.Trim();
-        return ClassCodeMap.TryGetValue(key, out var code) ? code : key.ToUpperInvariant();
+        // This used to be a private 17-row map that carried BOTH "Shadow Knight" and
+        // "Shadowknight" — so the knowledge that the two spellings exist lived here,
+        // and the code doing the comparing in AchievementsImport did not have it.
+        // One fact, two sources (trap 4). QuestClassFilter owns the names and the
+        // codes, so it owns this too.
+        if (QuestClassFilter.Canonical(className) is { Length: > 0 } canonical)
+            return QuestClassFilter.Abbrev(canonical);
+        return className.Trim().ToUpperInvariant();
     }
-
-    private static readonly Dictionary<string, string> ClassCodeMap = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Bard"] = "BRD", ["Beastlord"] = "BST", ["Berserker"] = "BER", ["Cleric"] = "CLR",
-        ["Druid"] = "DRU", ["Enchanter"] = "ENC", ["Magician"] = "MAG", ["Monk"] = "MNK",
-        ["Necromancer"] = "NEC", ["Paladin"] = "PAL", ["Ranger"] = "RNG", ["Rogue"] = "ROG",
-        ["Shadow Knight"] = "SHD", ["Shadowknight"] = "SHD", ["Shaman"] = "SHM",
-        ["Warrior"] = "WAR", ["Wizard"] = "WIZ",
-    };
 
     private static int LocationRank(string location) =>
         location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase) ? 2

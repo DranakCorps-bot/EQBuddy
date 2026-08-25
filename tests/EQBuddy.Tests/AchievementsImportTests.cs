@@ -13,6 +13,13 @@ public class AchievementsImportTests
         File.ReadAllLines(Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "..", "fixtures", "achievements", "averaj.txt"));
 
+    /// <summary>David's own dump, 2026-08-25 — the one that found the Shadow Knight
+    /// hole. Kept beside averaj's because the two spell the class differently and only
+    /// a real pair proves which spelling the game writes.</summary>
+    private static string[] Hateborne() =>
+        File.ReadAllLines(Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "..", "fixtures", "achievements", "hateborne.txt"));
+
     [Fact]
     public void ParsesSectionsAchievementsAndFlaggedCriteria()
     {
@@ -165,6 +172,67 @@ public class AchievementsImportTests
         // The unearned class is untouched by all of it.
         Assert.DoesNotContain(autoGranted, g => g.Contains("Skycleaver"));
         Assert.DoesNotContain(matches, m => m.ClassName == "Berserker");
+    }
+
+    /// <summary>
+    /// The dump writes "Shadowknight"; the catalog writes "Shadow Knight".
+    ///
+    /// `SkyRewards` compared the two with an exact match and, finding no checklist rows,
+    /// `continue`d — so every Shadow Knight reward was dropped BEFORE the auto-grant
+    /// guard, before the matcher, and before `unmatched`, which exists precisely so that
+    /// nothing is swallowed. Fifteen classes spell identically on both sides, so the hole
+    /// was invisible to anyone who was not a Shadow Knight, and David is one. In his own
+    /// dump it cost two real turn-ins.
+    ///
+    /// The repo already knew both spellings existed (`SpellLevelCatalog`'s doc comment
+    /// names the hazard; `GearLocker` carried a private map with both strings in it) —
+    /// one fact with two sources, and neither of them was the one doing the comparing.
+    /// </summary>
+    [Fact]
+    public void ShadowknightIsTheSameClassAsShadowKnight()
+    {
+        var checklist = new List<SkyQuestChecklistItem>
+        {
+            new() { Id = "1", ClassName = "Shadow Knight", Reward = "Obtenebrate Mithril Guard", QuestItem = "x" },
+            new() { Id = "2", ClassName = "Shadow Knight", Reward = "Crimson Ring of the Djinni", QuestItem = "y" },
+            new() { Id = "3", ClassName = "Shadow Knight", Reward = "Pegasus-Hide Belt", QuestItem = "z" },
+        };
+
+        var (matches, _, _) = AchievementsImport.SkyRewards(
+            AchievementsImport.Parse(Hateborne()), checklist);
+
+        // Both are flagged C under an INCOMPLETE unlock, so the per-criterion flags are
+        // trustworthy — and both items are in his inventory dump, which is what makes
+        // this a fact about the game rather than about the parser.
+        Assert.Contains(matches, m => m.Reward == "Obtenebrate Mithril Guard");
+        Assert.Contains(matches, m => m.Reward == "Crimson Ring of the Djinni");
+        // Still I in the dump: the fix must not tick everything it can now see.
+        Assert.DoesNotContain(matches, m => m.Reward == "Pegasus-Hide Belt");
+        // The match carries the CATALOG's spelling, because that is what keys
+        // SkyQuestCompleted ("Class|Reward") and what every surface reads back.
+        Assert.All(matches, m => Assert.Equal("Shadow Knight", m.ClassName));
+    }
+
+    /// <summary>The other half of the same hole: a class unlock the checklist has no
+    /// rows for used to vanish without a word. An unresolvable name is REPORTED — the
+    /// rule `unmatched` already enforces one level down, and the reason a player can
+    /// see why nothing ticked instead of guessing.</summary>
+    [Fact]
+    public void AClassTheChecklistDoesNotCarryIsReportedNotDropped()
+    {
+        var lines = new[]
+        {
+            "Untapped Potential: Classes",
+            "I\tPrimary Class Unlock - Bard",
+            "C\t\tObtain Mask of Song.",
+        };
+
+        var (matches, unmatched, autoGranted) = AchievementsImport.SkyRewards(
+            AchievementsImport.Parse(lines), []);
+
+        Assert.Empty(matches);
+        Assert.Empty(autoGranted);
+        Assert.Contains(unmatched, u => u.Contains("Mask of Song"));
     }
 
     [Fact]

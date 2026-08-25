@@ -338,6 +338,51 @@ public class QuestTrackerTests : IDisposable
         Assert.Empty(reloaded.ClassesFor("vex_legends"));
     }
 
+    /// <summary>
+    /// One class name, several spellings, one answer. The game's achievements dump writes
+    /// "Shadowknight" and every catalog in this repo writes "Shadow Knight" — an exact
+    /// compare between the two is false, and that dropped all sixteen Shadow Knight Sky
+    /// rewards silently until 2026-08-25.
+    ///
+    /// The negatives are the half that keeps this honest (trap 39): a resolver that says
+    /// yes to everything would satisfy every positive above and be worse than no resolver
+    /// at all, because callers would start trusting it.
+    /// </summary>
+    [Fact]
+    public void ClassNamesResolveToOneCatalogSpelling()
+    {
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("Shadowknight"));
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("Shadow Knight"));
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("shadow knight"));
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("Shadow-Knight"));
+        // Codes ask the same question, and both of Shadow Knight's answer it.
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("SHD"));
+        Assert.Equal("Shadow Knight", QuestClassFilter.Canonical("SK"));
+        Assert.Equal("Beastlord", QuestClassFilter.Canonical("BST"));
+        // Every one of the sixteen resolves to itself, so no caller has to special-case.
+        Assert.All(QuestClassFilter.Classes,
+            c => Assert.Equal(c, QuestClassFilter.Canonical(c)));
+
+        // Not a class: "" rather than a guess, so a caller can tell and say so.
+        Assert.Equal("", QuestClassFilter.Canonical("Shadow"));
+        Assert.Equal("", QuestClassFilter.Canonical("Knight"));
+        Assert.Equal("", QuestClassFilter.Canonical("Dark Elf"));
+        Assert.Equal("", QuestClassFilter.Canonical(""));
+        Assert.Equal("", QuestClassFilter.Canonical("   "));
+    }
+
+    /// <summary>The code map that used to live privately in GearLocker — with BOTH
+    /// spellings in it while the code doing the comparing had neither — now comes off
+    /// QuestClassFilter. Same answers, one source.</summary>
+    [Fact]
+    public void GearLockerCodesComeFromTheSameTable()
+    {
+        Assert.Equal("SHD", EQBuddy.UI.Shared.GearLocker.Code("Shadowknight"));
+        Assert.Equal("SHD", EQBuddy.UI.Shared.GearLocker.Code("Shadow Knight"));
+        Assert.Equal("PAL", EQBuddy.UI.Shared.GearLocker.Code("PAL"));
+        Assert.Equal("NEWCLASS", EQBuddy.UI.Shared.GearLocker.Code("NewClass"));
+    }
+
     [Fact]
     public void BerserkerIsAKnownClass()
     {

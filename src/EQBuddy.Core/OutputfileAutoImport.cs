@@ -38,12 +38,14 @@ public enum OutputfileKind
 /// </summary>
 public static class OutputfileAutoImport
 {
-    /// <summary>Suffix → meaning. The inventory name is verified against David's own log
-    /// (2026-08-20 18:47:36); the achievements name is NOT — nobody here has seen that
-    /// line, because running <c>/outputfile achievements</c> is a thing you do once. So it
-    /// matches on the same shape the inventory dump uses rather than on a literal quoted
-    /// from nowhere, and an unrecognised dump is <see cref="OutputfileKind.Unknown"/>
-    /// rather than a guess.</summary>
+    /// <summary>Suffix → meaning. Both names are now verified against David's own log —
+    /// inventory 2026-08-20 18:47:36, and achievements 2026-08-25 12:02:04
+    /// (<c>Outputfile Complete: Hateborne_neriak-Achievements.txt</c>), which is what the
+    /// note here used to say nobody had seen. An unrecognised dump is
+    /// <see cref="OutputfileKind.Unknown"/> rather than a guess; the game writes more of
+    /// these than EQBuddy reads, and its own usage line names them all:
+    /// <c>achievements | faction | guild | guildbank | guildhall | inventory |
+    /// missingspells | raid | realestate | recipes | spellbook</c>.</summary>
     public static OutputfileKind KindOf(string fileName)
     {
         var name = Path.GetFileNameWithoutExtension(fileName ?? "");

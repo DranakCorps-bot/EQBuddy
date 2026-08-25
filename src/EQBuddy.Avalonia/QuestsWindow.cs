@@ -778,6 +778,40 @@ public sealed class QuestsWindow : Window
 
     private ImportReportView? _skyImport;
 
+    /// <summary>@see QuestsWindow.SkyAchievementsPrompt (WPF) — the reason it exists and
+    /// why it sits above the rows are stated there.</summary>
+    private Control SkyAchievementsPrompt()
+    {
+        var wrap = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS) };
+        wrap.Children.Add(Note(
+            "Turned rewards in before EQBuddy? The game's achievements dump knows. Run this "
+            + "in game and EQBuddy reads the file it writes — it never scans the game itself.",
+            "Info"));
+        var b = ActionButton("");
+        b.Content = DesignSystem.IconLabel("Copy", GameCommands.OutputfileAchievements);
+        b.HorizontalAlignment = HorizontalAlignment.Left;
+        b.Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0);
+        ToolTip.SetTip(b,
+            "Copies the command — paste it into the game's chat. The game writes "
+            + "<name>_<server>-Achievements.txt beside its own folders and EQBuddy imports "
+            + "it on its own; the report appears here.");
+        b.Click += async (_, _) =>
+        {
+            try
+            {
+                if (Clipboard is { } cb)
+                {
+                    await cb.SetTextAsync(GameCommands.OutputfileAchievements);
+                    b.Content = DesignSystem.IconLabel(
+                        "Check", "copied — paste in game chat", "GoodBrush");
+                }
+            }
+            catch (Exception ex) { App.LogError(ex); }   // clipboard held elsewhere
+        };
+        wrap.Children.Add(b);
+        return wrap;
+    }
+
     private void RenderChecklist(QuestTab tab, string filter, List<string> classes)
     {
         // ABOVE the rows and re-added on every render, because the panel is cleared
@@ -787,6 +821,7 @@ public sealed class QuestsWindow : Window
         {
             SkyImport.Render();
             _questsPanel.Children.Add(SkyImport.Body);
+            _questsPanel.Children.Add(SkyAchievementsPrompt());
         }
         // Grouping, ordering and the detail line come from Core so this window, the WPF
         // one and EQBuddy Mobile cannot disagree about what a checklist row says (#184).
@@ -1242,8 +1277,14 @@ public sealed class QuestsWindow : Window
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var hidden = _main.QuestLedger?.HiddenFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var completed = _main.QuestLedger?.CompletedFor(key)
-            ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        // Folded with the Sky checklist, because a "<Class> Sky Test: <Reward>" row on
+        // THIS tab and the reward row on the Sky tab are the same fact. The ledger never
+        // knew about SkyQuestCompleted, so a reward the game's own achievements dump said
+        // was handed in still sat here as live work.
+        var completed = SkyTestSplit.WithTurnIns(
+            _main.QuestLedger?.CompletedFor(key)
+                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+            _settings.SkyQuestCompleted);
         var filter = (_filterBox.Text ?? "").Trim();
         var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
         SyncClassChecks(picks);
@@ -1720,8 +1761,7 @@ public sealed class QuestsWindow : Window
             entry.CompletedCount > 0
                 ? $"Completed ×{entry.CompletedCount} — click to unmark"
                 : "Did this before EQBuddy? Mark it completed (consumes nothing; click again to undo)",
-            () => WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, m.Quest.Name,
-                entry.CompletedCount == 0)),
+            () => ToggleCompleted(m.Quest.Name, entry.CompletedCount == 0),
             entry.CompletedCount > 0 ? "GoodBrush" : "DimBrush",
             entry.CompletedCount > 0 ? 1.0 : 0.55));
         // Close = "not interested": drops the quest from the overlap view AND un-greens
@@ -1998,6 +2038,27 @@ public sealed class QuestsWindow : Window
         var key = _main.QuestCharacterKey;
         if (_main.QuestLedger is not { } ledger || key.Length == 0) return;
         act(ledger);
+        Refresh(force: true);
+    }
+
+    /// <summary>@see QuestsWindow.ToggleCompleted (WPF) — the rules are stated there and
+    /// the decision itself is <see cref="SkyTestSplit.RewardKeyFor"/> plus
+    /// <see cref="SkyCompleteToggle"/>, so both builds get one answer.</summary>
+    private void ToggleCompleted(string questName, bool done)
+    {
+        var rewardKey = SkyTestSplit.RewardKeyFor(questName);
+        if (rewardKey.Length == 0)
+        {
+            WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, questName, done));
+            return;
+        }
+
+        if (done)
+            SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
+                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey));
+        else
+            SkyCompleteToggle.Reopen(_settings, rewardKey);
+        _settings.Save();
         Refresh(force: true);
     }
 

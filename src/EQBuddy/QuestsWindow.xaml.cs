@@ -461,8 +461,14 @@ public partial class QuestsWindow : Window
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var hidden = _main.QuestLedger?.HiddenFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var completed = _main.QuestLedger?.CompletedFor(key)
-            ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        // Folded with the Sky checklist, because a "<Class> Sky Test: <Reward>" row on
+        // THIS tab and the reward row on the Sky tab are the same fact. The ledger never
+        // knew about SkyQuestCompleted, so a reward the game's own achievements dump said
+        // was handed in still sat here as live work.
+        var completed = SkyTestSplit.WithTurnIns(
+            _main.QuestLedger?.CompletedFor(key)
+                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+            _settings.SkyQuestCompleted);
         var filter = FilterBox.Text.Trim();
         var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
         SyncClassChecks(picks);
@@ -962,8 +968,7 @@ public partial class QuestsWindow : Window
             entry.CompletedCount > 0
                 ? $"Completed ×{entry.CompletedCount} — click to unmark"
                 : "Did this before EQBuddy? Mark it completed (consumes nothing; click again to undo)",
-            (_, _) => WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, m.Quest.Name,
-                entry.CompletedCount == 0)),
+            (_, _) => ToggleCompleted(m.Quest.Name, entry.CompletedCount == 0),
             entry.CompletedCount > 0 ? "GoodBrush" : "DimBrush",
             entry.CompletedCount > 0 ? 1.0 : 0.55));
         // Close = "not interested": drops the quest from the overlap view AND un-greens
@@ -1257,6 +1262,39 @@ public partial class QuestsWindow : Window
         Refresh(force: true);
     }
 
+    /// <summary>
+    /// Mark or unmark a catalog quest, sending a Plane of Sky test to the Sky checklist
+    /// instead of the quest ledger.
+    ///
+    /// The read side folds `SkyQuestCompleted` into the completed map, so writing to the
+    /// ledger here would leave the merge undoing the player's un-mark on the next render
+    /// — a control that visibly does nothing, which is the "silent no-ops are broken"
+    /// rule with the switch on the other side. One fact, one store, both directions.
+    ///
+    /// It also means turning a Sky Test in HERE acquires its pieces and resolves any
+    /// parked auto-tick, exactly as the Sky tab's own button does — those rules live in
+    /// <see cref="SkyCompleteToggle"/> and are not re-decided here. The Sky checklist is
+    /// per profile rather than per character, which is how it has always been; this makes
+    /// the two tabs agree rather than introducing it.
+    /// </summary>
+    private void ToggleCompleted(string questName, bool done)
+    {
+        var rewardKey = SkyTestSplit.RewardKeyFor(questName);
+        if (rewardKey.Length == 0)
+        {
+            WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, questName, done));
+            return;
+        }
+
+        if (done)
+            SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
+                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey));
+        else
+            SkyCompleteToggle.Reopen(_settings, rewardKey);
+        _settings.Save();
+        Refresh(force: true);
+    }
+
     // ---- shared small pieces ----
 
     /// <summary>A leading note above the list — the search scope, the current zone, the
@@ -1524,6 +1562,41 @@ public partial class QuestsWindow : Window
 
     private ImportReportView? _skyImport;
 
+    /// <summary>
+    /// The Sky tab's route to its own data source.
+    ///
+    /// This surface is FED by the achievements dump — the import is what tells it which
+    /// rewards were handed in before EQBuddy existed, and a hand-in never appears in the
+    /// log — and it named no way to produce one. The command lived on the widget's menu
+    /// and on the Raids card, neither of which is where a player wondering about Sky
+    /// rewards is looking. `GameCommandsTests.SurfacesNeedingACommand` is the curated
+    /// list this row is now on: a negative assertion cannot see an absence (trap 34), and
+    /// the Gear tab fell through the same hole for as long as it existed.
+    ///
+    /// Above the rows, beside the import report, for the reason in trap 44 — it is read
+    /// on arrival, and the widget caps its own height.
+    /// </summary>
+    private UIElement SkyAchievementsPrompt()
+    {
+        var wrap = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS) };
+        wrap.Children.Add(Note(
+            "Turned rewards in before EQBuddy? The game's achievements dump knows. Run this "
+            + "in game and EQBuddy reads the file it writes — it never scans the game itself.",
+            "Info"));
+        var b = new Button
+        {
+            Style = (Style)FindResource("ActionButton"),
+            FontSize = DesignTokens.Spec(Role.Caption).Size,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
+            ToolTip = "Copies the command — paste it into the game's chat. The game writes "
+                + "<name>_<server>-Achievements.txt beside its own folders and EQBuddy "
+                + "imports it on its own; the report appears here.",
+        };
+        wrap.Children.Add(Theming.WireCopyCommand(b, GameCommands.OutputfileAchievements));
+        return wrap;
+    }
+
     private void RenderChecklist(QuestTab tab, string filter, List<string> classes)
     {
         // ABOVE the rows and re-added on every render, because QuestsPanel is cleared
@@ -1533,6 +1606,7 @@ public partial class QuestsWindow : Window
         {
             SkyImport.Render();
             QuestsPanel.Children.Add(SkyImport.Body);
+            QuestsPanel.Children.Add(SkyAchievementsPrompt());
         }
         // Grouping, ordering and the detail line come from Core so this window, the
         // Avalonia one and EQBuddy Mobile cannot disagree about what a checklist row
