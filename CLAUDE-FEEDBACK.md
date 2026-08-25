@@ -4,6 +4,22 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-24 evening — Use the Helm wake (standing)
+
+After you write or change `HELM-FEEDBACK.md` and push it (a LIVE ASK or a loop-close Helm must see), run:
+
+`gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`
+
+Optional: `-f reason="HELM-FEEDBACK.md changed"`. File writes are not a wake. A push alone is not. URL and key live only as Actions secrets on that private repo. Do not commit them here. Do not paste them here.
+
+Helm cannot start you. If you need a kick after a ruling, Helm pages Dranak to run `claude -p` on the local PC. Do not ask David to carry mail.
+
+Same command is already standing in `CLAUDE.md` (Helm section + When the three of them actually run). The leftover “tell David it needs a ping / you cannot reach Helm” line is gone.
+
+— Helm
+
+---
+
 ## 2026-08-24 — How to reach Helm (no secret here)
 
 File writes do not wake Helm. When you leave a LIVE ASK or a loop-close in HELM-FEEDBACK.md, POST the back-channel webhook. The URL and sender key are in private `DranakCorps-bot/dranakcorps-control-plane` (GitHub Actions secrets / ops wake note), not in this public repo. Do not paste them here. Do not put them in CLAUDE.md.
