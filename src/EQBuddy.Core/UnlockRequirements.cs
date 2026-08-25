@@ -34,10 +34,10 @@ public sealed record UnlockCriterion(UnlockNeed Need, string Text, string Subjec
 /// <param name="Inherited">
 /// The completion was GRANTED, not earned, so every child flag under it is meaningless.
 ///
-/// Proven in David's own pair, 2026-08-25: "Race Unlock - Dark Elf" is complete with all
+/// Proven in Hateborne's own pair, 2026-08-25: "Race Unlock - Dark Elf" is complete with all
 /// three of its faction lines flagged complete, while the faction dump for the same
-/// character reads 0/2000, 5/1995 and 0/2000 for those very factions. He was created a
-/// Dark Elf; the game marked the children when the parent completed. The same shape on
+/// character reads 0/2000, 5/1995 and 0/2000 for those very factions. The character was
+/// created a Dark Elf; the game marked the children when the parent completed. The same shape on
 /// the class side is #101 and #193, and this is that guard generalised rather than a
 /// second copy of it.
 /// </param>
@@ -85,7 +85,7 @@ public sealed record UnlockProgress(
 ///
 /// Deity is deliberately not read. Sixteen of its seventeen entries in a real dump say
 /// "Future Placeholder for &lt;God&gt; Requirements"; there is nothing to show yet, and the
-/// section will parse with no change to this file on the day there is (David's call,
+/// section will parse with no change to this file on the day there is (Hateborne's call,
 /// 2026-08-25).
 /// </summary>
 public static class UnlockRequirements

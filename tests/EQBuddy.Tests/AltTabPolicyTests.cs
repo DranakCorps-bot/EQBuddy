@@ -4,7 +4,7 @@ using Xunit;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// "Keep EQBuddy out of Alt+Tab" (David, 2026-08-25), and the two honesty rules around it.
+/// "Keep EQBuddy out of Alt+Tab" (Hateborne, 2026-08-25), and the two honesty rules around it.
 ///
 /// The setting is one Windows flag with two effects, and both of them matter to a player:
 /// it leaves the switcher AND it leaves the taskbar. There is no way to have one without

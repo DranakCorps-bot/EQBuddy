@@ -13,7 +13,7 @@ public class AchievementsImportTests
         File.ReadAllLines(Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "..", "fixtures", "achievements", "averaj.txt"));
 
-    /// <summary>David's own dump, 2026-08-25 — the one that found the Shadow Knight
+    /// <summary>Hateborne's own dump, 2026-08-25 — the one that found the Shadow Knight
     /// hole. Kept beside averaj's because the two spell the class differently and only
     /// a real pair proves which spelling the game writes.</summary>
     private static string[] Hateborne() =>
@@ -181,7 +181,7 @@ public class AchievementsImportTests
     /// `continue`d — so every Shadow Knight reward was dropped BEFORE the auto-grant
     /// guard, before the matcher, and before `unmatched`, which exists precisely so that
     /// nothing is swallowed. Fifteen classes spell identically on both sides, so the hole
-    /// was invisible to anyone who was not a Shadow Knight, and David is one. In his own
+    /// was invisible to anyone who was not a Shadow Knight, and Hateborne is one. In that
     /// dump it cost two real turn-ins.
     ///
     /// The repo already knew both spellings existed (`SpellLevelCatalog`'s doc comment
@@ -202,7 +202,7 @@ public class AchievementsImportTests
             AchievementsImport.Parse(Hateborne()), checklist);
 
         // Both are flagged C under an INCOMPLETE unlock, so the per-criterion flags are
-        // trustworthy — and both items are in his inventory dump, which is what makes
+        // trustworthy — and both items are in the inventory dump, which is what makes
         // this a fact about the game rather than about the parser.
         Assert.Contains(matches, m => m.Reward == "Obtenebrate Mithril Guard");
         Assert.Contains(matches, m => m.Reward == "Crimson Ring of the Djinni");

@@ -119,14 +119,10 @@ public static class AchievementsImport
             var dash = a.Name.LastIndexOf(" - ", StringComparison.Ordinal);
             if (dash < 0 || !a.Name.Contains("Class Unlock", StringComparison.OrdinalIgnoreCase))
                 continue;
-            // The dump spells one class differently from every catalog here
-            // ("Shadowknight" vs "Shadow Knight"), so the comparison goes through the
-            // canonical name. It used to be an exact match followed by
-            // `if (rewards.Count == 0) continue;`, and that pair dropped all sixteen
-            // Shadow Knight rewards before the auto-grant guard AND before `unmatched`
-            // — the list whose entire job is that nothing is swallowed. There is no
-            // early return now: a class with no checklist rows reports its obtains as
-            // unmatched, which is what makes the failure visible instead of silent.
+            // "Shadowknight" in the dump, "Shadow Knight" in every catalog here, so the
+            // compare goes through the canonical name. There is no early return now
+            // either: that pair dropped all sixteen Shadow Knight rewards before the
+            // guard and before `unmatched`. See ShadowknightIsTheSameClassAsShadowKnight.
             var className = a.Name[(dash + 3)..].Trim();
             if (QuestClassFilter.Canonical(className) is { Length: > 0 } canonical)
                 className = canonical;

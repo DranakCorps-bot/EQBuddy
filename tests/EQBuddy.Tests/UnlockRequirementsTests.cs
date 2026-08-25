@@ -7,7 +7,7 @@ namespace EQBuddy.Tests;
 /// Race and class unlocks read out of `/outputfile achievements`, cross-referenced with
 /// `/outputfile faction`.
 ///
-/// The fixtures are David's own pair, written by the same game for the same character
+/// The fixtures are Hateborne's own pair, written by the same game for the same character
 /// three minutes apart on 2026-08-25. That matters more than usual here: the two files
 /// disagree about how to spell four factions, and only a real pair could have shown that.
 /// </summary>
@@ -166,11 +166,12 @@ public class UnlockRequirementsTests
 
     /// <summary>
     /// **The measurement this whole feature turns on.** "Race Unlock - Dark Elf" is
-    /// COMPLETE in David's dump with all three faction criteria flagged complete — and
+    /// COMPLETE in Hateborne's dump with all three faction criteria flagged complete — and
     /// the faction dump, written three minutes later for the same character, says those
     /// three factions stand at 0/2000, 5/1995 and 0/2000.
     ///
-    /// He was created a Dark Elf. The game marked the children when the parent completed.
+    /// The character was created a Dark Elf. The game marked the children when the parent
+    /// completed.
     /// So a completed unlock's per-criterion flags prove nothing, and a surface that
     /// believed them would tell a player they had maxed three factions they have barely
     /// touched. This is #101 and #193 generalised from classes to races rather than a
@@ -266,14 +267,14 @@ public class UnlockRequirementsTests
         Assert.False(shd.Complete);
         Assert.Equal(7, shd.Actionable.Count);
         Assert.All(shd.Actionable, c => Assert.Equal(UnlockNeed.Obtain, c.Need));
-        Assert.Equal((2, 7), shd.Score);   // both confirmed present in his inventory dump
+        Assert.Equal((2, 7), shd.Score);   // both confirmed present in the inventory dump
 
         // Shaman was bought with a token: complete, every child flagged, nothing earned.
         var shaman = Assert.Single(classes, c => c.Subject == "Shaman");
         Assert.True(shaman.Complete);
         Assert.True(shaman.Inherited);
 
-        // Enchanter is his primary and autocompleted — the other inheritance shape.
+        // Enchanter is the primary class and autocompleted — the other inheritance shape.
         var enc = Assert.Single(classes, c => c.Subject == "Enchanter");
         Assert.True(enc.Inherited);
 
@@ -281,5 +282,35 @@ public class UnlockRequirementsTests
         var warrior = Assert.Single(classes, c => c.Subject == "Warrior");
         Assert.False(warrior.Inherited);
         Assert.Equal((0, 6), warrior.Score);
+    }
+
+    // ---- the section lens ---------------------------------------------------------
+
+    /// <summary>
+    /// The tab is divided by SECTION, so that is what its filter narrows by — the class
+    /// picker it replaced would have hidden every race while claiming to filter the tab
+    /// (Hateborne, 2026-08-25).
+    ///
+    /// The list is asserted to hold exactly what the tab renders. A lens offering a section
+    /// nobody draws is a dead option, and Deity is the live example: its requirements are
+    /// undefined in the game, so it is neither rendered nor offered.
+    /// </summary>
+    [Fact]
+    public void TheSectionLensOffersOnlyTheSectionsTheTabDraws()
+    {
+        Assert.Equal(
+            [UnlockLayout.SectionAll, UnlockLayout.RacesHeading, UnlockLayout.ClassesHeading],
+            UnlockLayout.Sections);
+        Assert.DoesNotContain("Deity", UnlockLayout.Sections);
+
+        // "All" and an unset lens both mean no filtering — a null lens must not blank the tab.
+        Assert.True(UnlockLayout.InSection(UnlockLayout.RacesHeading, UnlockLayout.SectionAll));
+        Assert.True(UnlockLayout.InSection(UnlockLayout.ClassesHeading, UnlockLayout.SectionAll));
+        Assert.True(UnlockLayout.InSection(UnlockLayout.RacesHeading, ""));
+
+        // And narrowing really narrows, in both directions.
+        Assert.True(UnlockLayout.InSection(UnlockLayout.RacesHeading, UnlockLayout.RacesHeading));
+        Assert.False(UnlockLayout.InSection(UnlockLayout.ClassesHeading, UnlockLayout.RacesHeading));
+        Assert.False(UnlockLayout.InSection(UnlockLayout.RacesHeading, UnlockLayout.ClassesHeading));
     }
 }

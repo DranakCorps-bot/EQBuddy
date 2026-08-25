@@ -4,7 +4,7 @@ namespace EQBuddy.Core;
 /// The achievements dump and the faction dump do not spell every faction the same way, so
 /// one has to be translated into the other before a standing can be looked up.
 ///
-/// **Four of the forty-two race-unlock requirement lines miss**, measured against David's
+/// **Four of the forty-two race-unlock requirement lines miss**, measured against Hateborne's
 /// own pair on 2026-08-25 — both files written by the same game, for the same character,
 /// three minutes apart:
 ///

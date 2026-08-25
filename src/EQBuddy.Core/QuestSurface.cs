@@ -12,6 +12,10 @@ public enum QuestTab
     General,
     Epic,
     Sky,
+    /// <summary>Race and class unlocks, read out of the achievements and faction dumps
+    /// (Hateborne, 2026-08-25). Deity is deliberately absent: sixteen of its seventeen entries
+    /// in a real dump read "Future Placeholder for &lt;God&gt; Requirements".</summary>
+    Unlocks,
 }
 
 /// <summary>A tab as a UI should draw it: what to call it, and the progress badge.
@@ -39,6 +43,7 @@ public static class QuestSurface
         QuestTab.General => "Quests",
         QuestTab.Epic => "Epic 1.0",
         QuestTab.Sky => "Plane of Sky",
+        QuestTab.Unlocks => "Unlocks",
         _ => tab.ToString(),
     };
 
@@ -64,6 +69,7 @@ public static class QuestSurface
         QuestTab.General => "general",
         QuestTab.Epic => "epic",
         QuestTab.Sky => "sky",
+        QuestTab.Unlocks => "unlocks",
         _ => tab.ToString().ToLowerInvariant(),
     };
 
@@ -72,23 +78,53 @@ public static class QuestSurface
         "general" => QuestTab.General,
         "epic" => QuestTab.Epic,
         "sky" => QuestTab.Sky,
+        "unlocks" => QuestTab.Unlocks,
         _ => null,
     };
 
-    /// <summary>The full strip, always all three tabs in a fixed order. Empty checklists
-    /// still get their tab: a Sky tab that vanishes when nothing is ticked is a silent
-    /// no-op, and a player who has never opened Sky is exactly who needs to find it.</summary>
+    /// <summary>The full strip, always every tab in a fixed order. Empty checklists still
+    /// get their tab: a Sky tab that vanishes when nothing is ticked is a silent no-op,
+    /// and a player who has never opened Sky is exactly who needs to find it.</summary>
     public static IReadOnlyList<QuestTabHeader> Tabs(
-        (int Done, int Total)? epic = null, (int Done, int Total)? sky = null)
+        (int Done, int Total)? epic = null, (int Done, int Total)? sky = null,
+        (int Done, int Total)? unlocks = null)
     {
         return
         [
             Header(QuestTab.General, null),
             Header(QuestTab.Epic, epic),
             Header(QuestTab.Sky, sky),
+            Header(QuestTab.Unlocks, unlocks),
         ];
 
         static QuestTabHeader Header(QuestTab tab, (int Done, int Total)? counts) =>
             new(tab, LabelFor(tab), KeyFor(tab), counts?.Done, counts?.Total);
+    }
+
+    /// <summary>
+    /// A checklist tab's badge numbers, said once.
+    ///
+    /// Both desktop windows and the phone each hand-rolled this identical
+    /// `items.Count(i => i.Acquired) / items.Count`, three copies of one rule — and a
+    /// fourth copy is exactly how #184 happened. Null for an empty checklist, because
+    /// "0 / 0" is not a badge, it is a tab that looks broken.
+    /// </summary>
+    public static (int Done, int Total)? CountOf<T>(
+        IReadOnlyCollection<T> items, Func<T, bool> done) =>
+        items.Count == 0 ? null : (items.Count(done), items.Count);
+
+    /// <summary>
+    /// The Unlocks badge: races and classes together, one number.
+    ///
+    /// An unlock with nothing to do — Half Elf, whose only rows say it completes when
+    /// Human or Wood Elf does — is not in the denominator. Counting it would put a target
+    /// on the strip that no amount of play can move, and the tab would read as permanently
+    /// short of finished.
+    /// </summary>
+    public static (int Done, int Total)? UnlockCounts(
+        IReadOnlyCollection<UnlockProgress> races, IReadOnlyCollection<UnlockProgress> classes)
+    {
+        var all = races.Concat(classes).Where(u => u.Score is not null).ToList();
+        return all.Count == 0 ? null : (all.Count(u => u.Complete), all.Count);
     }
 }

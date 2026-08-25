@@ -9,7 +9,7 @@ namespace EQBuddy.Core;
 ///
 /// **The command is singular and the file is plural**, with the character's class code
 /// spliced into the middle — `Hateborne_neriak-ENC-Factions.txt`. Both facts come from
-/// David's own log rather than from documentation, which does not cover this dump at all:
+/// Hateborne's own log rather than from documentation, which does not cover this dump at all:
 ///
 ///   usage: /outputfile [achievements | faction | guild | guildbank | guildhall |
 ///          inventory | missingspells | raid | realestate | recipes | spellbook ]

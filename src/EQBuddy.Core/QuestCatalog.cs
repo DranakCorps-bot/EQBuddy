@@ -140,7 +140,7 @@ public static class QuestClassFilter
     /// between the two is false, and in `AchievementsImport` that dropped every Shadow
     /// Knight Sky reward before the auto-grant guard and before the unmatched list that
     /// exists so nothing is swallowed. Fifteen classes spell identically, so only a
-    /// Shadow Knight could ever see it (David's own dump, 2026-08-25).
+    /// Shadow Knight could ever see it (Hateborne's own dump, 2026-08-25).
     ///
     /// Matching ignores everything that is not a letter or digit rather than carrying an
     /// alias list: the sixteen names stay distinct once stripped, so this is a RULE and

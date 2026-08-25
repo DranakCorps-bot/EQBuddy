@@ -78,6 +78,12 @@ public class GameCommandsTests
         // same way: by asking what a surface needs rather than what it must not carry.
         ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileAchievements),
             "the Sky tab's turn-in state comes from the achievements dump"),
+        // The Unlocks tab is built from TWO dumps and neither is a one-off — a race unlock
+        // moves every time you grind faction — so both buttons are on the populated
+        // surface, not only in an empty state (#217's rule, and the reason the Gear tab's
+        // copy is not empty-state-only either).
+        ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileFaction),
+            "the Unlocks tab's race progress is faction standings, which the log never sees"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),
@@ -101,6 +107,7 @@ public class GameCommandsTests
             "the tab IS the dump — ranked by slot, or listed by bag"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileAchievements), "WPF twin"),
+        ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileFaction), "WPF twin"),
         ("EQBuddy.Avalonia/MapWindow.cs", nameof(GameCommands.LocSocial), "WPF twin"),
     ];
 

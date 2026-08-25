@@ -44,7 +44,14 @@
                  so the main widget stops carrying Epic and Sky as separate lines.
                  Labels and order come from Core's QuestSurface so mobile shows the
                  same three in the same order. -->
-            <StackPanel x:Name="TabStrip" Orientation="Horizontal" Margin="{DynamicResource StackS}"/>
+            <!-- A WrapPanel, not a StackPanel (trap 25). A stack measures with INFINITE
+                 width in its stacking direction, so a chip past the panel's edge is
+                 clipped — no ellipsis, no overflow, simply not on screen. The Progress
+                 window shipped exactly that with four tabs, and these chips carry their
+                 counts in the label ("Plane of Sky  76 / 222"), so their width is not
+                 something anyone can eyeball as safe. Nothing in a diff, a build or a
+                 unit test can see it; the first screenshot can. -->
+            <WrapPanel x:Name="TabStrip" Margin="{DynamicResource StackS}"/>
 
             <!-- The search box now spans the header, which is the whole point: it was
                  "so compressed I missed it" (David, 2026-08-15) sharing a row with a
@@ -83,6 +90,17 @@
                           Height="{DynamicResource ControlHeight}"
                           SelectionChanged="OnEraChanged"
                           ToolTip="Hide quests from later eras than the world has (unmarked quests always show)"/>
+                <!-- The Unlocks tab's own lens: which SECTION to show. It shares the era
+                     combo's column because the two are never visible together — era is a
+                     catalog concept and Unlocks is not a catalog. Options come from Core
+                     (UnlockLayout.Sections), so this cannot offer a section the tab does
+                     not render. -->
+                <ComboBox x:Name="UnlockSectionCombo" Grid.Column="0" Width="104"
+                          FontSize="{DynamicResource FontCaption}"
+                          Height="{DynamicResource ControlHeight}"
+                          Visibility="Collapsed"
+                          SelectionChanged="OnUnlockSectionChanged"
+                          ToolTip="Show every unlock, or narrow to races or to classes"/>
                 <!-- State filter (Reddit ask, 2026-08-11): every tab and search can
                      narrow to open / ready / completed. -->
                 <ComboBox x:Name="StateCombo" Grid.Column="1" Width="86"

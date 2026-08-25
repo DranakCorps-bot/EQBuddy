@@ -1,5 +1,53 @@
 # EQBuddy — handoff
 
+> **2026-08-25 (later) — THE RESIZE FEATURE WAS INERT, AND WE TOLD A CONTRIBUTOR TO COPY IT.
+> MEASURED, FIXED, UNCOMMITTED. TWO OUTWARD-FACING CORRECTIONS DELIBERATELY NOT MADE.**
+>
+> `WindowStyle="None"` + `AllowsTransparency="True"` means Windows draws no non-client area,
+> so **`ResizeMode="CanResize"` creates no border to grab.** Every window that gained resize
+> on 2026-08-21 and 2026-08-25 had `CanResize`, called `WindowZoom.AllowResize`, persisted a
+> height on close — and could not be dragged by hand. Hateborne, asked directly: *"I cannot
+> resize pop-up windows."* Then, after the fix: *"I was able to resize this time."*
+>
+> → **Nothing in the suite could see it.** `ResizableWindowTests` asserts a window does not
+> say `NoResize` and that it calls `AllowResize`. Both were true throughout. That is trap 34
+> exactly — a guard that checks the wrong thing is present cannot see the right thing being
+> absent — and a screenshot cannot see it either, because the window looks correct.
+>
+> → **The mechanism was already in the repo and had been since 2026-08-06**, when the same
+> complaint arrived about the loot window. `BreakoutWindow`'s `WM_NCHITTEST` hook is the only
+> reason breakouts resize. It was never lifted out. `FramelessResize.cs` is that hook lifted,
+> called from `AllowResize` itself so a window cannot gain the feature and miss the
+> affordance. Zone math stays in the unit-tested `UI.Shared/ResizeZones`.
+>
+> → **`scripts/drag-verify.ps1` now takes `-Window`**, and grew a phase F that drives a REAL
+> mouse at the bottom edge — D and E use `SetWindowPos`, which proves a window ACCEPTS a size
+> and says nothing about whether anyone can grab it. It probes for a point that belongs to the
+> window before dragging, so "no border" and "aimed at a transparent margin" cannot be
+> confused. **It also reproduces C1 — the premature-ownership pin — on progress, quests and
+> spawns alike** (progress persists 203, the exact number `WindowHeightFollower`'s doc comment
+> cites). That defect is untouched and still wants the V2.
+>
+> **TWO THINGS ARE KNOWN-WRONG AND OUTWARD-FACING. Hateborne chose to leave both, 2026-08-25.
+> They are not oversights; do not "fix" them without asking.**
+>
+> 1. **Issue #50 (DonThompson) carries a table saying eight windows resize** — posted 17:22
+>    today, to the one contributor who cannot run Windows to check. It also says *"that helper
+>    is the thing to mirror"*, pointing him at `AllowResize`, which is the half that did not
+>    work. He would have reproduced an inert feature on Avalonia with no way to tell. The post
+>    correctly warns him off the `ContentRendered` pin and could not warn him off the missing
+>    hit-test, because nobody had measured it. **Decision: leave it until there is a shipped,
+>    working version to point at.**
+> 2. **The v1.99.11 Fable review request (`5c4866c`) discloses this risk as unverified.** It is
+>    now measured, and it materialised. Fable is being asked to approve a release whose
+>    headline feature does nothing. **Decision: say nothing to Fable yet.**
+>
+> **Session conventions, both stated by Hateborne and both overriding CLAUDE.md as written:**
+> no commits or pushes without being asked (CLAUDE.md says "commit and push source freely");
+> and **the person in the session is Hateborne, not David** — earlier work today attributed
+> this session's asks and quotes to David from CLAUDE.md's prose and the git log, and that was
+> corrected across five commits and nineteen files. Check who you are talking to.
+
 > **2026-08-25 — RESIZABLE POP-OUTS + THE PROGRESS FOLD. 1.99.11 staged, unreleased.**
 > David asked for both; both had a decision in them that was his and both were asked with the
 > question tool first.

@@ -43,7 +43,7 @@ public enum OutputfileKind
 /// </summary>
 public static class OutputfileAutoImport
 {
-    /// <summary>Suffix → meaning. Both names are now verified against David's own log —
+    /// <summary>Suffix → meaning. Both names are now verified against Hateborne's own log —
     /// inventory 2026-08-20 18:47:36, and achievements 2026-08-25 12:02:04
     /// (<c>Outputfile Complete: Hateborne_neriak-Achievements.txt</c>), which is what the
     /// note here used to say nobody had seen. An unrecognised dump is

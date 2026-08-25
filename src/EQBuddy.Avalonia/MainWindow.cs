@@ -1804,6 +1804,36 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// the log has seen since it was written (loot in, sells out); the dump itself is
     /// memoized, the log overlay is always current. Pass refresh to re-scan the game
     /// folder (the ⟳ button, the held tab).</summary>
+    // ---- the Unlocks tab's two dumps (Hateborne, 2026-08-25) ----
+    // Re-read from disk when their timestamps move rather than stored at import time:
+    // "the data survived the move and the write path did not" is the sentence behind
+    // #204, #210 and #212, and a file on disk cannot get out of step with itself.
+
+    private readonly UnlockSource _unlockSource = new();
+
+    public IReadOnlyList<UnlockProgress> RaceUnlocks
+    {
+        get { RefreshUnlocks(); return _unlockSource.Races; }
+    }
+
+    public IReadOnlyList<UnlockProgress> ClassUnlocks
+    {
+        get { RefreshUnlocks(); return _unlockSource.Classes; }
+    }
+
+    public FactionsFile.Snapshot? LatestFactions
+    {
+        get { RefreshUnlocks(); return _unlockSource.Factions; }
+    }
+
+    public bool HasUnlockDump
+    {
+        get { RefreshUnlocks(); return _unlockSource.HasAchievements; }
+    }
+
+    private void RefreshUnlocks() =>
+        _unlockSource.Refresh(_settings.LogFolder, Identity.Character);
+
     public InventoryFile.Snapshot? LatestInventory(bool refresh = false)
     {
         if (refresh || _inventory is null)
@@ -4326,8 +4356,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             if (kind == OutputfileKind.Unknown) return;
             if (OutputfileAutoImport.ResolvePath(_settings.LogFolder, ev.FileName) is not { } path) return;
 
-            if (kind == OutputfileKind.Inventory)
+            // A SWITCH, not `if (Inventory) … else …` — see the WPF twin. The else branch
+            // meant "everything that is not inventory", so a faction dump was parsed as
+            // achievements and wiped the character's unlocked-class list.
+            switch (kind)
             {
+            case OutputfileKind.Inventory:
                 var dump = InventoryFile.FindLatest(_settings.LogFolder, Identity.Character);
                 if (dump is null) return;
                 _inventory = dump;
@@ -4336,13 +4370,24 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 _settings.Save();
                 _gearChecklistDirty = true;
                 _inventoryDirty = true;   // the tab IS this file
-            }
-            else
-            {
+                break;
+
+            case OutputfileKind.Achievements:
                 LastAchievementsImport =
                     OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger,
                         QuestLedger, QuestCharacterKey);
                 _settings.Save();
+                break;
+
+            case OutputfileKind.Factions:
+                // Nothing to import: UnlockSource reads it off disk when its timestamp
+                // moves. Just nudge the window so an open tab fills in now.
+                _questsWindow?.FactionsChanged();
+                break;
+
+            case OutputfileKind.Unknown:
+            default:
+                break;
             }
         }
         catch (Exception ex) { App.LogError(ex); }   // a half-written dump must not kill the tail
