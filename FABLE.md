@@ -48,6 +48,14 @@ kick. David is not the courier. Page him only for a consequence-list door.
 
 This is standing process, not a V2–V3 plan item. Do not stub it as a work item.
 
+## How Claude calls Fable
+
+Claude does not start you (David, 2026-08-24). Claude files a `To: Fable` note
+(this file or `FABLE-FEEDBACK.md`), pushes, and wakes Helm with the same
+`gh workflow run` command above. Helm last-looks and pages Dranak to start a
+Fable-shaped `claude -p` in this repo. You plan; Claude executes. Do not wait
+for David to carry the ask.
+
 ## Item shape
 
 - **Priority:** `ready` (plan written; Claude may take it) · `needs-david: <the decision>`
