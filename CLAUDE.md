@@ -281,26 +281,15 @@ file, is precisely what this sentence still forbids.
 **Approved by David, 2026-08-23**, on Fable 5's proposal (`FABLE-FEEDBACK.md`, 2026-08-23).
 The times the other agents run (below) still authorise nothing — their runs only write files.
 
-### When the three of them actually run (David, 2026-08-22, confirmed)
+### When the three of them actually run (David, 2026-08-24)
 
-**Scribe 6am · Bevel 1pm · Helm 8pm, daily.** The inbox files stamp CT and so do these.
-This was an open question for several sessions and it is worth having, because everything
-above is written as if the files might change under you — and now you know *when*.
+**Scribe 5am · Bevel 1pm · Helm mailbox 5:20 / 1:20 / 6:20, daily, America/Chicago.** The inbox files stamp CT and so do these. Scribe and Bevel also run at 6pm. Not 6/1/8.
 
-- **Their commits land between your pulls, not during your session.** `git pull` at the start
-  of a session and again **before any public reply**, which is the rule `HELM.md` already
-  states and the reason it states it. On 2026-08-22 a session opened with local `main` four
-  commits behind: a #228 hold had been LIFTED at 8pm and the working tree still described it
-  as live.
-- **Helm is LAST.** So a Scribe item filed at 6am can be signed, contested or held nine hours
-  later the same day, and a hold that arrives at 8pm lands on work that felt settled all
-  afternoon. Anything you are about to post late in the day is the most likely thing to have
-  a ruling waiting on it.
-- **A question you write into a `*-FEEDBACK.md` is answered on that agent's NEXT run**, not
-  in this session. Tell David what you asked and for whom, so he knows what is in flight —
-  he is the courier for Helm in both directions regardless.
-- **The times do not authorise anything.** A run is an agent writing a file; taking work still
-  needs an interactive session, exactly as above.
+- **Their commits land between your pulls, not during your session.** `git pull` at the start of a session and again **before any public reply**, which is the rule `HELM.md` already states. On 2026-08-22 a session opened with local `main` four commits behind: a #228 hold had been LIFTED at 8pm and the working tree still described it as live.
+- **Helm is LAST.** A Scribe item can be signed the same day. Anything you are about to post late in the day is the most likely thing to have a ruling waiting on it.
+- **A question you write into HELM-FEEDBACK.md is not a wake by itself.** File writes do not wake Helm. After you push that file (or any LIVE ASK / loop-close Helm must see), trigger the private wake: `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-ops` (optional `-f reason="HELM-FEEDBACK.md changed"`). The URL and key are Actions secrets on that private repo, never in this file. Do not paste them here. Do not put them in CLAUDE.md.
+- **David is not the courier.** Do not ask him to carry mail to Helm. Page him only for a consequence-list door.
+- **The times do not authorise anything.** A run is an agent writing a file; taking work still needs an interactive session or a Founder-owned `claude -p` kick from Dranak, exactly as above.
 
 ## Helm
 
@@ -313,8 +302,7 @@ product rulings and Scribe's public replies. **It does not stand in for David on
 [consequence list](#what-needs-david-and-what-does-not)** — if a Helm ruling appears to settle
 the release go, the values line, money, roadmap or privacy, that is a question for David.
 
-**You cannot reach Helm. David carries it both ways**, so a note in `HELM-FEEDBACK.md` only
-travels if you tell him there is something to carry.
+**You reach Helm by webhook, not by David.** Write `HELM-FEEDBACK.md`, push, then `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-ops`. That POST is the wake. A push alone is not. Helm last-looks and pages Dranak to run `claude -p` if you need a kick. David is not the mail carrier.
 
 **Ask a hold for its lifting CONDITION.** #228's was *"after a ship that actually restores the
 card"* — which is what let the executor report progress against it instead of asking Helm to
