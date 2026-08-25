@@ -435,6 +435,16 @@ public sealed class AppSettings
     /// which deliberately keeps the widget visible in that case. Both off by default;
     /// they compose. EQBuddy's own windows having focus always overrides the hide.</summary>
     public bool HideWhenGameNotRunning { get; set; }
+    /// <summary>Keep EQBuddy out of the Alt+Tab switcher (David, 2026-08-25). Off by
+    /// default, and Windows-only — Alt+Tab is a Windows concept, so the box says so
+    /// rather than persisting a choice that does nothing (the rule
+    /// <see cref="UI.Shared.FocusHide.UnavailableNote"/> already sets one row above).
+    ///
+    /// **It takes the taskbar button with it, and that is not separable**: WS_EX_TOOLWINDOW
+    /// is one flag with both effects. The tray icon is then the only way back to a hidden
+    /// widget, so the Options row names it — a setting that can strand a player without
+    /// saying so is worse than no setting.</summary>
+    public bool HideFromAltTab { get; set; }
 
     // Breakout stat windows (BREAKOUT-*): one position + Fight/Session scope per kind.
     // They open while the widget is minimized with the matching star set.

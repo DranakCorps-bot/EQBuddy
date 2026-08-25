@@ -37,6 +37,47 @@ internal static class NoActivate
         };
     }
 
+    /// <summary>
+    /// The Alt+Tab half on its own, for windows that must still take focus.
+    ///
+    /// <see cref="Attach"/> sets WS_EX_TOOLWINDOW together with WS_EX_NOACTIVATE, which is
+    /// right for a chip nobody types into and wrong for every window a player clicks in:
+    /// NOACTIVATE would leave the widget's search boxes and the Options tabs unable to
+    /// take the keyboard. So this sets the one bit.
+    ///
+    /// **The hide/show is not optional when the window is already up.** Windows samples a
+    /// window's taskbar and switcher membership when it is SHOWN, so flipping the style on
+    /// a visible window changes the bit and nothing the player can see — which reads as a
+    /// dead tick-box (trap 42's shape: present in the build, not in effect at runtime). It
+    /// costs one frame, and only on the click that flips the setting.
+    /// </summary>
+    public static void SetToolWindow(Window window, bool on)
+    {
+        var hwnd = new WindowInteropHelper(window).Handle;
+        if (hwnd == IntPtr.Zero) return;
+        var style = GetWindowLong(hwnd, GwlExStyle);
+        var wanted = on ? style | WsExToolWindow : style & ~WsExToolWindow;
+        if (wanted == style) return;
+
+        var visible = window.IsVisible;
+        // Never re-show something that is deliberately hidden: the focus-hide feature owns
+        // the widget's visibility on its own tick and would be fighting us for it.
+        if (visible) window.Hide();
+        SetWindowLong(hwnd, GwlExStyle, wanted);
+        if (visible) window.Show();
+    }
+
+    /// <summary>Is the style actually ON the window right now? For the E2E dump, which
+    /// has to report the EFFECT rather than the intent — the whole lesson of trap 42 is
+    /// that a feature can be in the binary and not in force, and the two look identical
+    /// from anywhere except the HWND.</summary>
+    public static bool IsToolWindow(Window window)
+    {
+        var hwnd = new WindowInteropHelper(window).Handle;
+        return hwnd != IntPtr.Zero
+            && (GetWindowLong(hwnd, GwlExStyle) & WsExToolWindow) != 0;
+    }
+
     [DllImport("user32.dll")] private static extern int GetWindowLong(IntPtr hwnd, int index);
     [DllImport("user32.dll")] private static extern int SetWindowLong(IntPtr hwnd, int index, int value);
 }

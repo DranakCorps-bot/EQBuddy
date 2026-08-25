@@ -127,6 +127,37 @@ public class OptionsRenderTests : IDisposable
         main.Close();
     }
 
+    /// <summary>
+    /// The Alt+Tab tick-box is really on screen on this lane, and it says what it costs.
+    ///
+    /// An absent control photographs as an unremarkable panel (trap 29) and a setting with
+    /// no writer is trap 20, so neither a screenshot nor `DeadSettingTests` would catch
+    /// this lane simply not having the row. The warning text is asserted too, because
+    /// WS_EX_TOOLWINDOW takes the taskbar button with it and the tray icon then becomes
+    /// the only way back — a control that removes someone's way back without saying so is
+    /// the failure, not the flag.
+    /// </summary>
+    [AvaloniaFact]
+    public void TheAltTabBoxIsOnScreenAndNamesWhatItCosts()
+    {
+        var (main, options) = Open();
+        var toggle = options.GetVisualDescendants().OfType<CheckBox>()
+            .Single(c => (c.Content as TextBlock)?.Text?.Contains("Alt+Tab") == true);
+
+        Assert.False(toggle.IsChecked);
+        toggle.IsChecked = true;
+        Assert.True(main.Settings.HideFromAltTab);
+
+        // The cost is beside the box, off the shared table rather than spelled here.
+        var texts = options.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains(texts, t => t.Contains("taskbar button"));
+        Assert.Contains(texts, t => t == EQBuddy.UI.Shared.AltTabPolicy.TaskbarWarning);
+
+        options.Close();
+        main.Close();
+    }
+
     [AvaloniaFact]
     public void TargetDropsToggleAndAlertColorControlsAreAvailable()
     {

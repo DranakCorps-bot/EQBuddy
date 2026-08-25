@@ -354,6 +354,11 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
         get => _settings.HideWhenGameNotRunning;
         set { _settings.HideWhenGameNotRunning = value; PersistAnd(); }
     }
+    public bool HideFromAltTab
+    {
+        get => _settings.HideFromAltTab;
+        set { _settings.HideFromAltTab = value; PersistAnd(); }
+    }
     public bool KeepAboveOverlays
     {
         get => _settings.KeepAboveOverlays;

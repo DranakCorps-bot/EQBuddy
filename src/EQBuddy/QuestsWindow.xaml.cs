@@ -805,7 +805,17 @@ public partial class QuestsWindow : Window
         $"questsDetailShown={(DetailCard.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
-        $"questsModes={_modes.Count}";
+        $"questsModes={_modes.Count} " +
+        // The Sky tab's ⧉ copy of /outputfile achievements. Counted off the real visual
+        // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
+        // control photographs as an unremarkable panel (trap 29), and a bool that nobody
+        // resets goes stale without anything noticing.
+        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen()}";
+
+    private int SkyCopyCommandsOnScreen() => QuestsPanel.Children.OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<Button>())
+        .Count(b => b.Content is string s
+            && s.Contains(GameCommands.OutputfileAchievements, StringComparison.Ordinal));
 
     // ---- the list ----
 

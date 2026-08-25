@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -114,6 +115,7 @@ public sealed class OptionsWindow : Window
     private readonly TextBox _regenPerTickBox;
     private CheckBox _hideUnfocusedCheck = null!;
     private CheckBox _hideNotRunningCheck = null!;
+    private CheckBox _hideAltTabCheck = null!;
     private CheckBox _keepAboveCheck = null!;
     private CheckBox _truncateCheck = null!;
     private CheckBox _archiveCheck = null!;
@@ -1951,6 +1953,30 @@ public sealed class OptionsWindow : Window
         if (FocusHide.UnavailableNote is { Length: > 0 } note)
         {
             var warn = AppTheme.DimText(note, new Thickness(20, 6, 0, 0));
+            warn.Foreground = AppTheme.WarnBrush;
+            panel.Children.Add(warn);
+        }
+
+        // Applied to every open window on the click, not on the next launch — a tick-box
+        // whose effect waits for a relaunch is indistinguishable from a broken one.
+        _hideAltTabCheck = Check("Keep EQBuddy out of the Alt+Tab switcher",
+            _vm.HideFromAltTab,
+            on =>
+            {
+                _vm.HideFromAltTab = on;
+                AltTabHide.ApplyAll(on, (Application.Current?.ApplicationLifetime
+                    as IClassicDesktopStyleApplicationLifetime)?.Windows ?? []);
+            },
+            new Thickness(0, 8, 0, 0));
+        panel.Children.Add(_hideAltTabCheck);
+        panel.Children.Add(AppTheme.DimText(
+            AltTabPolicy.TaskbarWarning, new Thickness(20, 2, 0, 0)));
+        // Windows is the only platform with a per-window opt-out; elsewhere the switcher
+        // belongs to the desktop. Same rule as the note above — say so rather than save a
+        // choice that does nothing.
+        if (AltTabPolicy.UnavailableNote is { Length: > 0 } altTabNote)
+        {
+            var warn = AppTheme.DimText(altTabNote, new Thickness(20, 6, 0, 0));
             warn.Foreground = AppTheme.WarnBrush;
             panel.Children.Add(warn);
         }

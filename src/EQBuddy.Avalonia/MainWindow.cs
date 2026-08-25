@@ -621,6 +621,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             // takes the widget AND its taskbar entry, this is how you know it's running
             // and how you get it back.
             _trayIcon = new TrayIcon(this, () => OnOptions(this, EventArgs.Empty));
+            // Opt-in only, and it takes the taskbar button with it — which is exactly why
+            // the tray icon above is created first.
+            AltTabHide.Apply(this, _settings.HideFromAltTab);
             ApplyHotkeys();
             if (_settings.ShowTutorial)
                 new TutorialWindow(this).Show(this);

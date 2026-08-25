@@ -2890,7 +2890,14 @@ public partial class MainWindow : Window, ICardContext
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={_companionPumpTicks} " +
-                    $"companionPushes={_companionPushes}";
+                    $"companionPushes={_companionPushes} " +
+                    // Alt+Tab (David, 2026-08-25). Reported as the EFFECT — the ex-style
+                    // actually on the HWND — not as the setting, because "present in the
+                    // build" and "in effect at runtime" are different claims and trap 42
+                    // cost two builds to learn it. The setting is beside it so a
+                    // disagreement between the two is visible rather than inferable.
+                    $"altTabWanted={(_settings.HideFromAltTab ? 1 : 0)} " +
+                    $"altTabStyle={(NoActivate.IsToolWindow(this) ? 1 : 0)}";
                 System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
             }
             catch { }
@@ -4296,6 +4303,43 @@ public partial class MainWindow : Window, ICardContext
         ApplyHotkeys();
         // Under Wine + opt-in only: don't steal focus from a fullscreen game when clicked.
         WineOverlay.MakeNonActivating(this);
+        // Opt-in only. Here rather than in the Loaded class handler below because this is
+        // the ONE window with ShowInTaskbar="True", and the style has to land before the
+        // first Show() or Windows has already decided this window belongs in the switcher.
+        NoActivate.SetToolWindow(this, _settings.HideFromAltTab);
+        ArmAltTabStyleForSatellites();
+    }
+
+    /// <summary>
+    /// Every other window as it loads, so the setting means what it says.
+    ///
+    /// The satellites all ship `ShowInTaskbar="False"`, which gives them a hidden owner and
+    /// USUALLY keeps them out of the switcher on its own — but "usually" is a claim about
+    /// a shell behaviour nobody here has measured, and the cost of being wrong is the
+    /// feature quietly covering the widget and nothing else. Setting the bit is cheap and
+    /// is a fact rather than an inference.
+    ///
+    /// `SourceInitialized` is a plain CLR event, so it cannot be class-handled; `Loaded` is
+    /// routed and can. Post-show is fine here precisely because these windows are not the
+    /// taskbar case — and `SetToolWindow` re-shows if it has to.
+    /// </summary>
+    private void ArmAltTabStyleForSatellites() =>
+        EventManager.RegisterClassHandler(typeof(Window), LoadedEvent,
+            new RoutedEventHandler((sender, _) =>
+            {
+                if (sender is Window w && !ReferenceEquals(w, this))
+                    NoActivate.SetToolWindow(w, _settings.HideFromAltTab);
+            }));
+
+    /// <summary>Apply the current setting to every open window. Called when the box is
+    /// flipped in Options, because a setting that waits for a relaunch to do anything is
+    /// indistinguishable from one that is broken.</summary>
+    internal void ApplyAltTabStyle()
+    {
+        NoActivate.SetToolWindow(this, _settings.HideFromAltTab);
+        foreach (Window w in Application.Current.Windows)
+            if (!ReferenceEquals(w, this))
+                NoActivate.SetToolWindow(w, _settings.HideFromAltTab);
     }
 
     // ---- global hotkeys, opt-in only (#100 — see HotkeyManager) ----

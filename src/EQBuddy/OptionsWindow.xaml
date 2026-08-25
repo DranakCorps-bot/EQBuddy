@@ -471,6 +471,13 @@
             <TextBlock Text="The overlay exists only while you play: quit the game and everything disappears, launch it and everything returns (within a few seconds). Need it back without the game — say, to browse session history? Launch EQBuddy again from the Start menu: the running copy surfaces, and stays visible while any of its windows has focus."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
 
+            <CheckBox x:Name="HideAltTabCheck" Margin="0,8,0,0"
+                      Checked="OnHideAltTabToggled" Unchecked="OnHideAltTabToggled">
+                <TextBlock Text="Keep EQBuddy out of the Alt+Tab switcher" FontSize="12"
+                           Foreground="{DynamicResource TextBrush}"/>
+            </CheckBox>
+            <TextBlock x:Name="HideAltTabNote" Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+
             <CheckBox x:Name="KeepAboveCheck" Margin="0,10,0,0"
                       Checked="OnKeepAboveToggled" Unchecked="OnKeepAboveToggled">
                 <TextBlock Text="Keep EQBuddy above fullscreen overlays (Lossless Scaling and kin)" FontSize="12"
