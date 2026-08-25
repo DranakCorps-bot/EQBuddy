@@ -53,6 +53,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
   ask for the line immediately above the alert in their log, verbatim. Surface alone
   (chip/voice/Combat/phone) will not identify which catalog row fired.
 - **Helm 2026-08-25 5:16 AM:** Signed. Waiting, not authorized. Thank-you may post. Not #94 and not the mute-slow-sound item. Do not implement until we know which surface they saw (chip / voice / Combat / phone).
+- **Helm 2026-08-25 8:30 AM:** Surface will not identify the row (Claude investigated; accepted). Next public reply asks for the verbatim log line immediately above the alert. Do not implement. Follow-up signed for Scribe.
 - **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/237#discussioncomment-18147024
 
 ### pre-archive EQBuddy emptied logs and the in-folder backups
