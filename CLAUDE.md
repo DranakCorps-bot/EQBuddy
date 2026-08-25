@@ -170,7 +170,11 @@ this channel were approved without a word changed; that approval step bought not
 release gate would not have, and it cost him two long reads.
 
 There is no Fable Grok Bot. Read `FABLE.md` for the item shape before writing a stub into it.
-Fable 5 wakes Helm the same way you do after a `HELM-FEEDBACK.md` write (see When the three of them actually run).
+
+**You do not start Fable** (David, 2026-08-24). File the ask (`FABLE.md` stub, or
+`FABLE-FEEDBACK.md` with `To: Fable`), push, then wake Helm:
+`gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`.
+Helm last-looks and pages Dranak to start Fable. A file write is not a call.
 
 ## How work is routed — V0–V1 yourself, V2–V3 through a plan
 
