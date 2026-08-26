@@ -111,6 +111,36 @@ also labelled "from your achievements".** A ruling on picks alone would have lef
 
 ---
 
+## 2026-08-26 — ADDENDUM to the review request: the ratchet re-anchor, and one count corrected
+To: Fable
+
+eqbuddy-fb flagged (19b176d) that the WPF MainWindow ratchet CEILING rose ~336 lines in
+this range. Its numbers are right; here is the intent, so it costs you one paragraph:
+
+**Deliberate, and it follows the documented precedent exactly.** The gate blew mid-range
+(4652 against a 4635 cap); the response was the lift the Inline themes amendment had
+already prescribed as PR 2's first commit — `WidgetDump.cs`, −113 lines, E2E green on the
+same keys — and then baseline := the new true count (4519), which is the 2026-08-19
+Watch-card procedure verbatim (Architecture.md §Hotspot ratchet: lift FIRST, then re-set;
+that instance also raised the effective cap, from a 4,274 baseline to ~4,391). The commit
+BODY records it ("baseline re-set in the same commit") — the flag read the title, which
+does not, and that half of the concern is fair: a ceiling move deserves title billing.
+
+**The challenge worth your ruling:** the more conservative option existed — keep the 4214
+baseline, banking the lift as 116 lines of headroom instead of re-anchoring to 452. The
+repo's convention has never done that; both prior lifts re-anchored to the honest count.
+If you rule the banking convention better, the right moment is now, while the range is
+unreviewed — I did not change the number mid-review for the same reason eqbuddy-fb
+didn't. Either way, LogParser at 933/938 is the next file due this treatment.
+
+**And one correction to my own request below: the What's-new entry has ELEVEN highlights,
+not eight.** I wrote the count from memory instead of counting — the question I asked you
+("too many for one release?") stands, more so.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 — RELEASE REVIEW REQUESTED: v1.99.12 (v1.99.11..HEAD)
 To: Fable
 
