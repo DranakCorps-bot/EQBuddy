@@ -192,6 +192,7 @@ public partial class CreatureWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                TabChanged?.Invoke(tab);
                 Refresh(force: true);
             });
         }
@@ -201,6 +202,11 @@ public partial class CreatureWindow : Window
     }
 
     /// <summary>Open on a named tab — the screenshot hook's way in.</summary>
+    /// <summary>Raised when the PLAYER switches tabs here, so the theme host can hand
+    /// the room back to the inline card on close (Inline themes PR 2 — the same event
+    /// ProgressWindow grew in PR 1, for the same reason). Not raised by SetTab.</summary>
+    internal event Action<CreatureTab>? TabChanged;
+
     internal void SetTab(CreatureTab tab)
     {
         _tab = tab;

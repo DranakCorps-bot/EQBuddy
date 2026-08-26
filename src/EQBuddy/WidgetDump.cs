@@ -69,6 +69,21 @@ internal static class WidgetDump
                         ? $"progressTab={ProgressSurface.KeyFor(w._progressCard.SelectedTab)} " +
                           $"progressTabs={w._progressCard.TabCount} "
                         : "") +
+                    // The other two themes' placement, PR 2 - same contract as the
+                    // progress keys above: inline and windowOpen are never both 1, and
+                    // the tab keys are emitted only while the CARD owns the body.
+                    $"killsInline={(w._creatureHost.IsInline ? 1 : 0)} " +
+                    $"killsWindowOpen={(w._creatureHost.IsWindowOpen ? 1 : 0)} " +
+                    (w._creatureHost.IsInline
+                        ? $"killsTab={CreatureSurface.KeyFor(w._killsCard.SelectedTab)} " +
+                          $"killsTabs={w._killsCard.TabCount} "
+                        : "") +
+                    $"lootInline={(w._lootHost.IsInline ? 1 : 0)} " +
+                    $"lootWindowOpen={(w._lootHost.IsWindowOpen ? 1 : 0)} " +
+                    (w._lootHost.IsInline
+                        ? $"lootTab={LootSurface.KeyFor(w._lootCard.SelectedTab)} " +
+                          $"lootTabs={w._lootCard.TabCount} "
+                        : "") +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
                     $"zones={w.ZoneList.Items.Count} deaths={w.DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +

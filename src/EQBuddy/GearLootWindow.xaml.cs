@@ -207,6 +207,7 @@ public partial class GearLootWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                TabChanged?.Invoke(tab);
                 Refresh(force: true);
             });
         }
@@ -227,6 +228,9 @@ public partial class GearLootWindow : Window
 
     /// <summary>Open on a named tab — the screenshot hook's way in, and the same door
     /// QuestsWindow.SetTab offers.</summary>
+    /// <summary>Raised when the PLAYER switches tabs here — see CreatureWindow's twin.</summary>
+    internal event Action<LootTab>? TabChanged;
+
     internal void SetTab(LootTab tab)
     {
         _tab = tab;

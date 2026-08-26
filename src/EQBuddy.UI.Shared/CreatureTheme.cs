@@ -42,6 +42,18 @@ public static class CreatureTheme
     public static IReadOnlyList<CreatureTabHeader> Tabs(StatsSnapshot s) =>
         CreatureSurface.Tabs(kills: Kills(s), drops: Drops(s));
 
+    /// <summary>The Drops tab's GLANCE line on the inline card (Bevel's wording,
+    /// Helm-signed 2026-08-22): the tab is a Glance because thirteen creature headings is
+    /// the tallest body in the set AND it reads the wiki, which an expanded card over a
+    /// running game must not do. One line, and the ⧉ is the door.</summary>
+    public static string DropsGlance(StatsSnapshot s)
+    {
+        var mobs = s.Mobs.Count(m => m.Loot.Count > 0);
+        return mobs == 0
+            ? "Drops by Creature"
+            : $"Drops by Creature — {mobs} type{(mobs == 1 ? "" : "s")}";
+    }
+
     /// <summary>
     /// The launcher card's one line — the line that has to justify replacing the Kills
     /// card's own header with a door.

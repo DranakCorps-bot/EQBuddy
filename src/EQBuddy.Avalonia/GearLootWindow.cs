@@ -11,7 +11,7 @@ namespace EQBuddy.Avalonia;
 /// <summary>What the Gear &amp; Loot window needs from the widget — the same small shape
 /// <see cref="IProgressHost"/> uses, and for the same reason: the window draws chrome and
 /// picks a tab; the widget owns the surfaces and goes on painting them.</summary>
-public interface IGearLootHost
+internal interface IGearLootHost
 {
     AppSettings Settings { get; }
     StatsSnapshot CurrentSnapshot();
@@ -20,7 +20,9 @@ public interface IGearLootHost
     /// two cards and still renders into the same controls, so the fold re-parents surfaces
     /// rather than rewriting them — which is what makes "the tabs draw what the cards
     /// drew" checkable rather than merely claimed.</summary>
-    Control LootTabBody(LootTab tab);
+    /// <summary>A fresh set of the tab surfaces, built for the caller — see
+    /// <see cref="ICreatureHost.NewCreatureSurfaces"/> for the one-owner reason.</summary>
+    LootSurfaceSet NewLootSurfaces();
 
     /// <summary>The tab strip with its badges, from UI.Shared's LootTheme.</summary>
     IReadOnlyList<LootTabHeader> LootTabs(StatsSnapshot s);
@@ -51,7 +53,7 @@ public interface IGearLootHost
 /// release — it ships on headless evidence and gets named in the notes for the Linux and
 /// macOS reporters to look at.
 /// </summary>
-public sealed class GearLootWindow : Window
+internal sealed class GearLootWindow : Window
 {
     private readonly IGearLootHost _main;
     private readonly AppSettings _settings;
@@ -75,6 +77,13 @@ public sealed class GearLootWindow : Window
     private readonly WrapPanel _tabStrip = new();
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();
+    private readonly LootCardView _loot;
+    private readonly GearCardView _gear;
+    private readonly InventoryView _inventory;
+    /// <summary>The Inventory tab paints on ARRIVAL, not on the tick — it re-scans the
+    /// game folder and rebuilds every row, and a rebuild under the cursor takes the
+    /// scroll position with it (the WPF twin's rule, and the fold's own note).</summary>
+    private bool _inventoryPainted;
     private readonly ScrollViewer _bodyScroll = new();
     private readonly StackPanel _miniRow = new() { Orientation = Orientation.Horizontal };
 
@@ -100,6 +109,10 @@ public sealed class GearLootWindow : Window
         ShowInTaskbar = false;
         CanResize = false;
 
+        // Its OWN surfaces, from the host's factory — never the widget's instances
+        // (one control, one visual parent; see NewLootSurfaces).
+        var set = main.NewLootSurfaces();
+        (_loot, _gear, _inventory) = (set.Loot, set.Gear, set.Inventory);
         _tabs = new EqSegmentedStrip(_tabStrip);
         Content = BuildContent();
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
@@ -251,7 +264,10 @@ public sealed class GearLootWindow : Window
         if (!LootSurface.Hosted.Contains(tab)) return;
         _tab = tab;
         Refresh();
+        if (tab == LootTab.Inventory && !_inventoryPainted) PaintInventory();
     }
+
+    public void SetTab(LootTab tab) => SetTab(LootSurface.KeyFor(tab));
 
     public void MaybeRefresh()
     {
@@ -269,13 +285,43 @@ public sealed class GearLootWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                TabChanged?.Invoke(tab);
                 Refresh();
+                // Arrival paint for the tab that must not paint on the tick.
+                if (tab == LootTab.Inventory) PaintInventory();
             });
         }
         // Chips first, THEN the paint — colouring before rebuilding the chip list leaves
         // every fresh chip unstyled, the selected one included.
         _tabs.Select(_tab);
-        _body.Content = _main.LootTabBody(_tab);
+        _body.Content = _tab switch
+        {
+            LootTab.Gear => _gear.Body,
+            LootTab.Inventory => _inventory.Body,
+            _ => _loot.Body,
+        };
+        // Loot and Gear render every refresh (arithmetic over a snapshot in memory;
+        // their BADGES have to stay true for the tab you are not looking at). Inventory
+        // paints on arrival only — see the field's note.
+        _loot.Render(s);
+        _gear.Render();
+    }
+
+    /// <summary>Raised when the PLAYER switches tabs here. Not raised by SetTab.</summary>
+    public event Action<LootTab>? TabChanged;
+
+    private void PaintInventory()
+    {
+        _inventory.Render();
+        _inventoryPainted = true;
+    }
+
+    /// <summary>A new inventory dump landed — repaint if the tab is in view, else let the
+    /// next arrival paint pick it up (the WPF twin's InventoryChanged).</summary>
+    public void InventoryChanged()
+    {
+        _inventoryPainted = false;
+        if (IsVisible && _tab == LootTab.Inventory) PaintInventory();
     }
 
     /// <summary>The window's facts for the debug dump, matching the WPF twin's shape so

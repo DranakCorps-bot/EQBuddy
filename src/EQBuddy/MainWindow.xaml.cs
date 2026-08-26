@@ -145,6 +145,26 @@ public partial class MainWindow : Window, ICardContext
             popOut: () => ShowProgressWindow(),
             bringWindowForward: () => { _progressWindow?.Activate(); },
             bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+        // The KILLS & DROPS theme's card (PR 2). Kills is the Full room; Drops is the
+        // Glance — it reads the wiki, which an expanded card over a running game must
+        // not do (Bevel's move, recorded on CreatureSurface.InlineModeFor).
+        _killsCard = KillsThemeCard.Build(
+            KillsSection, KillsBody, KillsPopOut, _creatureHost,
+            newKills: () => new KillsCardView(),
+            popOut: () => ShowCreatureWindow(),
+            bringWindowForward: () => _creatureWindow?.Activate(),
+            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+        // The GEAR & LOOT theme's card (PR 2). Loot/Items/Wishlist are Full; Inventory
+        // is the Glance (Bevel's host rule - a long list with its own filter bar).
+        _lootCard = GearThemeCard.Build(
+            LootSection, LootBody, LootPopOut, _lootHost,
+            newLoot: () => new LootCardView(this, _settings),
+            newGear: NewGearCard,
+            tabs: s2 => LootTheme.Tabs(s2, _settings.GearChecklist),
+            inventoryCount: () => LatestInventory()?.Counts.Count,
+            popOut: () => ShowGearLootWindow(),
+            bringWindowForward: () => _gearLootWindow?.Activate(),
+            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -392,6 +412,12 @@ public partial class MainWindow : Window, ICardContext
             if (wanted.TryGetValue("progress", out var room)
                 && ProgressSurface.TabForKey(room) is { } startOn)
                 _progressHost.SelectTab(startOn);
+            if (wanted.TryGetValue("kills", out var killsRoom)
+                && CreatureSurface.TabForKey(killsRoom) is { } killsOn)
+                _creatureHost.SelectTab(killsOn);
+            if (wanted.TryGetValue("loot", out var lootRoom)
+                && LootSurface.TabForKey(lootRoom) is { } lootOn)
+                _lootHost.SelectTab(lootOn);
             foreach (var (key, element) in SectionMap())
                 if (element is Expander card && wanted.ContainsKey(key))
                     card.IsExpanded = true;
@@ -1992,13 +2018,23 @@ public partial class MainWindow : Window, ICardContext
 
     internal void ShowCreatureWindow(CreatureTab? tab = null)
     {
+        // The host learns the room first and the CARD gives the body up - the same
+        // handshake ShowProgressWindow makes, for the same one-owner reason.
+        _creatureHost.OpenWindow(tab);
         if (_creatureWindow is not { IsLoaded: true })
         {
             _creatureWindow = new CreatureWindow(this) { Owner = this };
-            _creatureWindow.Closed += (_, _) => _creatureWindow = null;
+            _creatureWindow.TabChanged += t2 => _creatureHost.SelectTab(t2);
+            _creatureWindow.Closed += (_, _) =>
+            {
+                _creatureWindow = null;
+                _creatureHost.WindowClosed();
+                _killsCard?.Sync();
+            };
         }
-        if (tab is { } t) _creatureWindow.SetTab(t);
+        _creatureWindow.SetTab(tab ?? _creatureHost.SelectedTab);
         _creatureWindow.Show();
+        _killsCard?.Sync();
         _creatureWindow.Activate();
     }
 
@@ -2063,6 +2099,13 @@ public partial class MainWindow : Window, ICardContext
     /// <see cref="ProgressThemeCard"/>, not here: this window is the ratchet's hotspot, and
     /// a surface migrated INSIDE it is guarded by nothing.</summary>
     internal ThemeCardView<ProgressTab> _progressCard = null!;
+
+    /// <summary>The other two inline themes' state machines and cards (Inline themes
+    /// PR 2) — same contract as Progress: one owner of the body, the host decides.</summary>
+    internal readonly ThemeHost<CreatureTab> _creatureHost = new(CreatureSurface.DefaultInlineTab);
+    internal ThemeCardView<CreatureTab> _killsCard = null!;
+    internal readonly ThemeHost<LootTab> _lootHost = new(LootSurface.DefaultInlineTab);
+    internal ThemeCardView<LootTab> _lootCard = null!;
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -2659,6 +2702,8 @@ public partial class MainWindow : Window, ICardContext
         // out. It no-ops while the card is collapsed or while the window owns the body —
         // ThemeHost decides which, and this call does not get a second opinion.
         _progressCard.Render(s);
+        _killsCard.Render(s);
+        _lootCard.Render(s);
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
 
@@ -2879,12 +2924,27 @@ public partial class MainWindow : Window, ICardContext
 
     /// <summary>The Gear &amp; Loot theme's window. One instance, raised if it is already
     /// up — the same shape every other theme window uses.</summary>
-    internal void ShowGearLootWindow()
+    internal void ShowGearLootWindow(LootTab? tab = null)
     {
-        if (_gearLootWindow is { IsLoaded: true } open) { open.Activate(); return; }
+        _lootHost.OpenWindow(tab);
+        if (_gearLootWindow is { IsLoaded: true } open)
+        {
+            if (tab is { } t0) open.SetTab(t0);
+            _lootCard?.Sync();
+            open.Activate();
+            return;
+        }
         _gearLootWindow = new GearLootWindow(this) { Owner = this };
-        _gearLootWindow.Closed += (_, _) => _gearLootWindow = null;
+        _gearLootWindow.TabChanged += t2 => _lootHost.SelectTab(t2);
+        _gearLootWindow.Closed += (_, _) =>
+        {
+            _gearLootWindow = null;
+            _lootHost.WindowClosed();
+            _lootCard?.Sync();
+        };
+        _gearLootWindow.SetTab(tab ?? _lootHost.SelectedTab);
         _gearLootWindow.Show();
+        _lootCard?.Sync();
     }
 
     /// <summary>The widget CARD is the door, and since 2026-08-20 it is the only one

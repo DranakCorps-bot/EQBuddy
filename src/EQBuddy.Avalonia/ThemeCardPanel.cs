@@ -158,6 +158,10 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
 
     public TTab SelectedTab => _host.SelectedTab;
 
+    /// <summary>Land the card on a room, for the render tests — the same transition a
+    /// chip click takes.</summary>
+    internal void SelectGlanceRoomForTest(TTab tab) => _host.SelectTab(tab);
+
     public void Sync()
     {
         var inline = _host.IsInline;

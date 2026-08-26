@@ -779,6 +779,71 @@ public sealed class EndToEndTests
         app.WaitForWindow("progressWindowOpen", "the widget to report the theme's owner");
         app.WaitForDump("progressWindowOpen", 0, "no Progress window on a plain launch");
         Assert.Equal(0, app.DumpValue("progressInline"));
+        // PR 2's two themes start the same way — collapsed, owned by nobody.
+        Assert.Equal(0, app.DumpValue("killsInline"));
+        Assert.Equal(0, app.DumpValue("killsWindowOpen"));
+        Assert.Equal(0, app.DumpValue("lootInline"));
+        Assert.Equal(0, app.DumpValue("lootWindowOpen"));
+    }
+
+    /// <summary>
+    /// Inline themes PR 2: the KILLS &amp; DROPS card expands in place on its Full room,
+    /// and its Drops room is the theme set's second GLANCE — it reads the wiki, which an
+    /// expanded card over a running game must not do (Bevel's move).
+    /// </summary>
+    [Fact]
+    public void TheKillsThemeExpandsInPlaceAndDropsIsAGlance()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "kills:drops",
+        });
+        app.Launch();
+
+        app.WaitForDump("killsInline", 1, "the Kills & Drops card to own the body");
+        Assert.Equal(0, app.DumpValue("killsWindowOpen"));
+        app.WaitForDump("killsTab", "drops", "the room named in EQBUDDY_EXPAND");
+        app.WaitForDump("killsTabs", 2, "both rooms in the card's strip");
+        // The glance the launcher carried survives being expandable (#219).
+        Assert.True(app.DumpValue("killsSummaryLen") > 0,
+            "the header should still summarise the theme; dump was: " + app.Artifacts());
+    }
+
+    /// <summary>Inline themes PR 2: the GEAR &amp; LOOT card, opened on its Glance room —
+    /// Inventory, Bevel's host-rule case (a long list with its own filter bar).</summary>
+    [Fact]
+    public void TheGearThemeExpandsInPlaceAndInventoryIsAGlance()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "loot:inventory",
+        });
+        app.Launch();
+
+        app.WaitForDump("lootInline", 1, "the Gear & Loot card to own the body");
+        Assert.Equal(0, app.DumpValue("lootWindowOpen"));
+        app.WaitForDump("lootTab", "inventory", "the room named in EQBUDDY_EXPAND");
+        app.WaitForDump("lootTabs", 3, "all three rooms in the card's strip");
+        Assert.True(app.DumpValue("lootSummaryLen") > 0,
+            "the header should still summarise the theme; dump was: " + app.Artifacts());
+    }
+
+    /// <summary>Opening a theme's WINDOW keeps the card collapsed — one owner, PR 2's
+    /// lanes behaving exactly as Progress does.</summary>
+    [Fact]
+    public void TheKillsAndGearWindowsOwnTheirBodiesAlone()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_CREATURE"] = "kills",
+            ["EQBUDDY_GEARLOOT"] = "loot",
+        });
+        app.Launch();
+
+        app.WaitForDump("killsWindowOpen", 1, "EQBUDDY_CREATURE to put the body in the window");
+        Assert.Equal(0, app.DumpValue("killsInline"));
+        app.WaitForDump("lootWindowOpen", 1, "EQBUDDY_GEARLOOT to put the body in the window");
+        Assert.Equal(0, app.DumpValue("lootInline"));
     }
 
     /// <summary>

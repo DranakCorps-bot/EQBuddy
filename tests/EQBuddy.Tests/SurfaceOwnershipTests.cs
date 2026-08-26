@@ -48,16 +48,12 @@ public class SurfaceOwnershipTests
     ///
     /// A row leaves this list when its lane gets the seam. Adding one is a deliberate act.
     /// </summary>
-    public static readonly (string File, string Accessor, string Why)[] StillHandingOutBodies =
-    [
-        ("GearLootWindow.cs", "Control LootTabBody(LootTab tab);",
-            "Loot, Gear and Inventory bodies. Gear and Inventory are already lifted views "
-            + "(GearCardView) built once by the widget; the lift here is the Loot body. "
-            + "Inline themes PR 2 begins with it."),
-        ("CreatureWindow.cs", "Control CreatureTabBody(CreatureTab tab);",
-            "Kills and Drops. Drops is already a lifted view; Kills is the body to move. "
-            + "Inline themes PR 3 begins with it."),
-    ];
+    /// <summary>EMPTY since Inline themes PR 2 (2026-08-26): both remaining lanes got
+    /// their factories (`NewCreatureSurfaces` / `NewLootSurfaces`), the Kills body became
+    /// a view on BOTH lanes (`KillsCardView`), and the widgets' body tables are gone. The
+    /// list stays so the day someone needs a new exemption they add a ROW with a reason,
+    /// not a blanket skip.</summary>
+    public static readonly (string File, string Accessor, string Why)[] StillHandingOutBodies = [];
 
     /// <summary>The accessor shape that was the bug: <c>Control SomethingTabBody(Tab)</c>.
     /// It reads like a getter and it is a transfer of ownership between two windows.</summary>
@@ -102,7 +98,7 @@ public class SurfaceOwnershipTests
 
     /// <summary>The positive half, per trap 34: forbidding the old name is not the same as
     /// requiring the new shape. A future <c>ProgressBody(tab)</c> would sail past the scan
-    /// above, so the Progress lane is asserted to actually have the factory.</summary>
+    /// above, so every lane is asserted to actually have its factory.</summary>
     [Fact]
     public void TheProgressHostHandsOutAFreshSetInstead()
     {
@@ -112,6 +108,21 @@ public class SurfaceOwnershipTests
         // And the window uses it in its CONSTRUCTOR — a set fetched later, per render,
         // would rebuild the surfaces under the player and lose their fold states.
         Assert.Contains("_surfaces = main.NewProgressSurfaces();", text);
+    }
+
+    /// <summary>PR 2's two lanes got the same shape, and the windows build their sets in
+    /// their constructors, exactly as Progress does.</summary>
+    [Theory]
+    [InlineData("CreatureWindow.cs", "CreatureSurfaceSet NewCreatureSurfaces();",
+        "var set = main.NewCreatureSurfaces();")]
+    [InlineData("GearLootWindow.cs", "LootSurfaceSet NewLootSurfaces();",
+        "var set = main.NewLootSurfaces();")]
+    public void TheOtherTwoHostsHandOutFreshSetsToo(string file, string factory, string ctorUse)
+    {
+        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.Avalonia", file));
+
+        Assert.Contains(factory, text);
+        Assert.Contains(ctorUse, text);
     }
 
     /// <summary>No dictionary of pre-built bodies survives on either widget. That field was

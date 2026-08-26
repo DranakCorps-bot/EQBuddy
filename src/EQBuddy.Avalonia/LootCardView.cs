@@ -143,6 +143,13 @@ internal sealed class LootCardView
     /// even by accident.</summary>
     public void Render(StatsSnapshot s)
     {
+        // Target drops are PULLED here rather than pushed by the widget (Inline themes
+        // PR 2, mirroring the WPF twin): with per-host instances there is no longer one
+        // loot view for the widget to push into, and each host renders its own.
+        var (tdNames, tdDetail, tdRows) = _w.TargetDropsContent(s);
+        if (tdNames.Length == 0) HideTargetDrops();
+        else ShowTargetDrops(tdNames, tdDetail, tdRows);
+
         var plan = LootPresentation.Build(s.Loot, s.Crafted, s.Fashioned, s.RecentLoot,
             _settings.LootView, _settings.LootSort);
 

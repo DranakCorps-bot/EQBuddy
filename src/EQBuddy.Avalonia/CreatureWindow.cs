@@ -11,16 +11,17 @@ namespace EQBuddy.Avalonia;
 /// <summary>What the Kills &amp; Drops window needs from the widget — the same small shape
 /// <see cref="IGearLootHost"/> uses, and for the same reason: the window draws chrome and
 /// picks a tab; the widget owns the surfaces and goes on painting them.</summary>
-public interface ICreatureHost
+internal interface ICreatureHost
 {
     AppSettings Settings { get; }
     StatsSnapshot CurrentSnapshot();
 
-    /// <summary>The already-built body for one tab. The widget BUILT the Kills body when
-    /// it was a card and still renders into the same controls, so the fold re-parents that
-    /// surface rather than rewriting it — which is what makes "the tab draws what the card
-    /// drew" checkable rather than merely claimed.</summary>
-    Control CreatureTabBody(CreatureTab tab);
+    /// <summary>A fresh set of the two tab surfaces, built for the caller. Each host
+    /// builds its OWN — a control has one visual parent on this toolkit, and the borrowed
+    /// single instance was the cross-window re-parent crash class PR A retired for
+    /// Progress (IWidgetCard has the history). Inline themes PR 2 retires this lane's
+    /// exemption in SurfaceOwnershipTests the same way.</summary>
+    CreatureSurfaceSet NewCreatureSurfaces();
 
     /// <summary>The tab strip with its badges, from UI.Shared's CreatureTheme.</summary>
     IReadOnlyList<CreatureTabHeader> CreatureTabs(StatsSnapshot s);
@@ -52,7 +53,7 @@ public interface ICreatureHost
 /// release — it ships on headless evidence and gets named in the notes for the Linux and
 /// macOS reporters to look at.
 /// </summary>
-public sealed class CreatureWindow : Window
+internal sealed class CreatureWindow : Window
 {
     private readonly ICreatureHost _main;
     private readonly AppSettings _settings;
@@ -76,6 +77,8 @@ public sealed class CreatureWindow : Window
     private readonly WrapPanel _tabStrip = new();
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();
+    private readonly KillsCardView _kills;
+    private readonly DropsCardView _drops;
     private readonly ScrollViewer _bodyScroll = new();
     private readonly StackPanel _miniRow = new() { Orientation = Orientation.Horizontal };
 
@@ -102,6 +105,10 @@ public sealed class CreatureWindow : Window
         ShowInTaskbar = false;
         CanResize = false;
 
+        // Its OWN surfaces, from the host's factory — never the widget's instances
+        // (one control, one visual parent; see NewCreatureSurfaces).
+        var set = main.NewCreatureSurfaces();
+        (_kills, _drops) = (set.Kills, set.Drops);
         _tabs = new EqSegmentedStrip(_tabStrip);
         Content = BuildContent();
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186). The key
@@ -256,6 +263,8 @@ public sealed class CreatureWindow : Window
         Refresh();
     }
 
+    public void SetTab(CreatureTab tab) => SetTab(CreatureSurface.KeyFor(tab));
+
     public void MaybeRefresh()
     {
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 1) Refresh();
@@ -272,14 +281,23 @@ public sealed class CreatureWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                // The theme host follows the player (Inline themes PR 2) — same event
+                // ProgressWindow grew in PR B, for the same hand-back.
+                TabChanged?.Invoke(tab);
                 Refresh();
             });
         }
         // Chips first, THEN the paint — colouring before rebuilding the chip list leaves
         // every fresh chip unstyled, the selected one included.
         _tabs.Select(_tab);
-        _body.Content = _main.CreatureTabBody(_tab);
+        _body.Content = _tab == CreatureTab.Drops ? _drops.Body : _kills.Body;
+        // BOTH render (the WPF twin's rule): the inactive tab's badge has to stay true.
+        _kills.Render(s);
+        _drops.Render(s);
     }
+
+    /// <summary>Raised when the PLAYER switches tabs here. Not raised by SetTab.</summary>
+    public event Action<CreatureTab>? TabChanged;
 
     /// <summary>The window's facts for the debug dump, matching the WPF twin's shape so
     /// one assertion reads the same names on both.</summary>

@@ -1752,4 +1752,78 @@ public class WidgetRenderTests : IDisposable
         window.ProgressWindowForTests!.Close();
         window.Close();
     }
+
+    // ---- PR 2: the KILLS & DROPS and GEAR & LOOT inline cards ----
+
+    /// <summary>The crash-class sequence for PR 2's two lanes, whose per-host factories
+    /// this PR created (the SurfaceOwnershipTests exemptions are retired with it):
+    /// expand, pop out, close, expand — for each theme.</summary>
+    [AvaloniaFact]
+    public void KillsAndGearThemesSurviveExpandPopOutCloseExpand()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var snap = new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) };
+
+        var kills = window.KillsCardForTests;
+        var loot = window.LootCardForTests;
+        Assert.True(kills.IsExpanded && loot.IsExpanded,
+            "EQBUDDY_EXPAND=1 should expand both theme cards like every sibling");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(2, kills.TabCount);
+        Assert.Equal(3, loot.TabCount);   // Loot, Wishlist, Inventory — Items is not a strip tab
+
+        window.ShowCreatureWindow();
+        window.ShowGearLootWindow();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(kills.IsExpanded, "pop-out must collapse the Kills card");
+        Assert.False(loot.IsExpanded, "pop-out must collapse the Gear card");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+
+        window.CreatureWindowForTests!.Close();
+        window.GearLootWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(kills.IsExpanded, "closing the window must not re-grow the widget");
+        Assert.False(loot.IsExpanded);
+
+        kills.IsExpanded = true;
+        loot.IsExpanded = true;
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(kills.IsExpanded && loot.IsExpanded);
+
+        window.Close();
+    }
+
+    /// <summary>The two GLANCE rooms draw their LINE and never their body: Drops (it
+    /// reads the wiki, which an expanded card must not) and Inventory (Bevel's host
+    /// rule). The line's wording is Core's, shared with the WPF twin.</summary>
+    [AvaloniaFact]
+    public void TheGlanceRoomsDrawALineInsteadOfABody()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var snap = new StatsSnapshot
+        {
+            SessionStart = new DateTime(2026, 8, 8),
+            Mobs =
+            [
+                new MobSummary("a puma", 2, 2, 10, 1.0, 0, [new MobLoot("Pelt", 1, 50.0)]),
+            ],
+        };
+
+        window.KillsCardForTests.SelectGlanceRoomForTest(CreatureTab.Drops);
+        window.LootCardForTests.SelectGlanceRoomForTest(LootTab.Inventory);
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+
+        var text = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Drops by Creature — 1 type", text);
+        Assert.Contains("Inventory — no dump yet", text);
+
+        window.Close();
+    }
 }

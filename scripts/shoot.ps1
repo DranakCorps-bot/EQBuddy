@@ -148,6 +148,28 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_EXPAND = 'progress' }
                            Append = @('You have gained a level! Welcome to level 12!')
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
+    # PR 2's first theme. PREDICTION: the Kills & Drops card expanded with a two-chip
+    # strip (Kills carrying the fixture's kill count, Drops carrying "N creatures"), and
+    # under it the Kills room - the kills/hr summary line, the per-creature kill rows,
+    # and the Farming block with loot sub-rows. NOT the drops list: that room is a
+    # Glance, and this shot proves the FULL room.
+    'theme-inline-kills' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'kills' }
+                           Set = @{} }
+    # The Drops GLANCE (Bevel's move: it reads the wiki, which an expanded card over a
+    # running game must not). PREDICTION: the Drops chip lit, and under the strip ONE
+    # dim line reading "Drops by Creature - N types" - no creature headings, no rows,
+    # no filter, no export buttons. The window is one ⧉ away and that is the point.
+    'theme-inline-kills-glance' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'kills:drops' }
+                           Set = @{} }
+    # PR 2's second theme. PREDICTION: the Gear & Loot card expanded with a three-chip
+    # strip (Loot with the item count badge, Wishlist, Inventory), and under it the Loot
+    # room's slice strip and rows, capped by the shared body height with its own
+    # scrollbar if the fixture overflows it.
+    'theme-inline-loot' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'loot' }
+                           Set = @{} }
     # The GLANCE room. Raids is the Progress theme's only one, and its contract is that it
     # draws a LINE instead of a body — so a picture of it is the only way to see that the
     # 29-row ledger did not come along for the ride.

@@ -611,6 +611,33 @@ machine** (Fable, 2026-08-23): the Avalonia build runs on Windows, which is how 
 two-builds-one-profile was found. Correcting this because it had been written as "nobody can
 do it", which is how a cheap check becomes a permanent open item.
 
+## Inline themes — expand in place, pop out on request — PR 2 DONE 2026-08-26
+
+**PR 2 executed (Claude), staged in 1.99.12, BOTH lanes in one change:** the Kills & Drops
+and Gear & Loot cards expand in place on WPF and Avalonia. What it took and found:
+
+- **The Avalonia half was the seam plan's PR 2/PR 3 lifts done together**: `KillsCardView`
+  now exists on the Avalonia lane (and closed a quiet drift — the widget's kills panel
+  hand-rolled its rows while WPF read `KillsPresentation`; both lanes read the shared
+  module now), `NewCreatureSurfaces()`/`NewLootSurfaces()` are the factories, both windows
+  build their sets in their constructors, and **the `SurfaceOwnershipTests` exemption list
+  is EMPTY** — with a positive-half test asserting the factories exist.
+- **Target drops moved from push to pull** on Avalonia, mirroring the WPF twin's
+  `TargetDropsContent`: with per-host loot views there is no longer one view to push into.
+- The `_gearChecklistDirty`/`_inventoryDirty` flags died with their consumers — per-host
+  views render on their own ticks; the Inventory arrival-paint rule lives in the window
+  (`InventoryChanged`), as on WPF.
+- Glance wordings are Bevel's, in UI.Shared (`CreatureTheme.DropsGlance`,
+  `LootTheme.InventoryGlance`). The Items tab is NOT a strip tab (`LootSurface.Hosted` is
+  three) — a prediction miss the first test run caught.
+- E2E: `killsInline`/`lootInline` + window-owner facts, three new tests; Avalonia: the
+  crash-class sequence for both themes and the two Glance rooms. Shots
+  `theme-inline-kills`, `theme-inline-kills-glance`, `theme-inline-loot` all matched their
+  written predictions; `widget-expanded` deliberately re-shot.
+
+**PR 3 (Quests) is the remainder** — the Glance General tab and the `QuestChecklistView`
+hosting question (plan item 7, still a hypothesis to verify first).
+
 ## Inline themes — expand in place, pop out on request
 
 - **Priority:** `ready` — David answered the one question that was his (2026-08-22, asked

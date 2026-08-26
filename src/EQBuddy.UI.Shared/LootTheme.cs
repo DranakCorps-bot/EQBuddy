@@ -40,6 +40,13 @@ public static class LootTheme
         string? inventory = null) =>
         LootSurface.Tabs(loot: Loot(s), gear: Gear(checklist), inventory: inventory);
 
+    /// <summary>The Inventory tab's GLANCE line on the inline card (Bevel's wording,
+    /// Helm-signed 2026-08-22): a long list with its own filter bar is the host rule's
+    /// case for a Glance — one line, and the ⧉ is the door.</summary>
+    public static string InventoryGlance(int? items) => items is { } n
+        ? $"Inventory — {n} item{(n == 1 ? "" : "s")}"
+        : "Inventory — no dump yet";
+
     /// <summary>
     /// The launcher card's one line — the line that has to justify replacing two card
     /// headers with one. Delegates the assembly, and the "omit a part with nothing to

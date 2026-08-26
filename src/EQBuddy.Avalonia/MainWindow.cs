@@ -102,9 +102,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly Dictionary<string, int> _gearCraftSeen = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, int> _gearUpgradeSeen = new(StringComparer.OrdinalIgnoreCase);
     private DateTime? _autoCheckSessionStart;
-    // Rebuilding 200+ checkboxes every UI tick is the one thing this overlay never
-    // does elsewhere — the checklist re-renders only when a box actually changed.
-    private bool _gearChecklistDirty = true;
     private readonly DispatcherTimer _uiTimer;
     private readonly DispatcherTimer _companionPump;
     /// <summary>Whether a pump tick has anything to do. The decision lives in UI.Shared
@@ -218,7 +215,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly Button _healSessionLabel = AppTheme.IconButton("v Session so far", "Show or hide the session totals");
     private readonly StackPanel _healSessionBody = new();
     private readonly TextBlock _healingSummary = AppTheme.DimText("");
-    private readonly TextBlock _killsSummary = AppTheme.DimText("");
     private readonly StackPanel _damageSourceList = new();
     // A fold heading, not a heading with a chevron typed into its text (Gate 5).
     private readonly EqFoldLabel _petAbilityLabel = new() { Section = true };
@@ -226,11 +222,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly ItemsControl _damageTakenList = new();
     private readonly StackPanel _healSpellList = new();
     private readonly ItemsControl _healerList = new();
-    private readonly ItemsControl _killList = new();
-    private readonly ItemsControl _partyKillList = new();
-    // The Loot card, lifted into its own class for Gate 4 (docs/DesignSystem.md §11.5) —
-    // a surface migrated INSIDE this window is guarded by no ratchet.
-    private LootCardView _loot = null!;
     private readonly StackPanel _trackedPanel = new();
     private readonly ItemsControl _deathList = new();
     private readonly ItemsControl _zoneList = new();
@@ -240,7 +231,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     // with Tags, a shared ParseSort and a hand-written SetSortVisual.
     private EqSegmentedStrip _dmgOutStrip = null!, _dmgInStrip = null!, _healStrip = null!;
     private readonly TextBlock _healersLabel = AppTheme.Heading("Healed by", AppTheme.GoodBrush);
-    private readonly TextBlock _partyKillsLabel = AppTheme.Heading("Group kills");
     private readonly TextBlock _recentFightsLabel = AppTheme.Heading("Recent fights");
     private readonly ItemsControl _recentFightsList = new();
     private readonly TextBlock _areaSpellLabel = AppTheme.Heading("Area spells (per cast)");
@@ -249,8 +239,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly ItemsControl _stanceList = new();
     private readonly TextBlock _invocationLabel = AppTheme.Heading("By invocation");
     private readonly ItemsControl _invocationList = new();
-    private readonly TextBlock _farmingLabel = AppTheme.Heading("Farming (per creature)");
-    private readonly ItemsControl _farmingList = new();
     private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
     private readonly ItemsControl _markerList = new();
     private readonly Button _gearBtn = AppTheme.IconButton(AppIcon.Settings, "Settings");
@@ -512,6 +500,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             if (wanted.TryGetValue("progress", out var room)
                 && ProgressSurface.TabForKey(room) is { } startOn)
                 _progressHost.SelectTab(startOn);
+            if (wanted.TryGetValue("kills", out var killsRoom)
+                && CreatureSurface.TabForKey(killsRoom) is { } killsOn)
+                _creatureHost.SelectTab(killsOn);
+            if (wanted.TryGetValue("loot", out var lootRoom)
+                && LootSurface.TabForKey(lootRoom) is { } lootOn)
+                _lootHost.SelectTab(lootOn);
             foreach (var (key, section) in _sections)
                 if (wanted.ContainsKey(key))
                     section.IsExpanded = true;
@@ -1038,29 +1032,39 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // CREATURE — what died and what it dropped — and one of them was buried in the
         // cog menu where nobody found it.
         //
-        // The BODY is still built here and still rendered here — CreatureWindow hosts it
-        // through ICreatureHost.CreatureTabBody, the way GearLootWindow hosts its three.
-        // The KEY stays "kills", so the card keeps the slot the player put it in.
-        _creatureTabBodies[CreatureTab.Kills] = BuildKillsSection();
-        _creatureTabBodies[CreatureTab.Drops] = Drops.Body;
-        _sections["kills"] = AppTheme.SectionLink(
-            Header("kills", "Kills & Drops", _killsHeader), () => ShowCreatureWindow());
+        // Since Inline themes PR 2 it EXPANDS IN PLACE like the WPF twin — Kills is the
+        // Full room, Drops is the Glance (it reads the wiki, which an expanded card over
+        // a running game must not do). Every host builds its OWN surfaces through
+        // NewCreatureSurfaces(); the borrowed-instance lane is retired.
+        _killsCard = KillsThemeCard.Build(
+            Header("kills", "Kills & Drops", _killsHeader), _creatureHost,
+            newSurfaces: NewCreatureSurfaces,
+            popOut: () => ShowCreatureWindow(),
+            bringWindowForward: () => _creatureWindow?.Activate());
+        _sections["kills"] = _killsCard;
         ToolTip.SetTip(_sections["kills"],
-            "Open Kills & Drops — what died this session, and what it dropped at what rate");
+            "Kills & Drops — what died this session, and what it dropped at what rate. "
+            + "Expands in place; the arrow opens its window.");
         // ONE card for the GEAR & LOOT theme (docs/Themes.md), in the same change as
         // the WPF twin. It replaced the Loot and Gear cards: what did I get, and what am
         // I still missing. Both are questions you look AWAY for, so by CLAUDE.md's surface
         // rule they earn a window rather than two slots on the thing that sits over the
         // running game.
         //
-        // The BODIES are still built here and still rendered here — GearLootWindow hosts
-        // them through IGearLootHost.LootTabBody, the way ProgressWindow hosts its four.
-        _lootTabBodies[LootTab.Loot] = BuildLootSection();
-        _sections["loot"] = AppTheme.SectionLink(
-            Header("loot", "Gear & Loot", _lootHeader), () => ShowGearLootWindow());
+        // Since Inline themes PR 2 it EXPANDS IN PLACE — Loot/Items/Wishlist are Full,
+        // Inventory is the Glance (Bevel's host rule: a long list with its own filter
+        // bar). Every host builds its OWN surfaces through NewLootSurfaces().
+        _lootCard = GearThemeCard.Build(
+            Header("loot", "Gear & Loot", _lootHeader), _lootHost,
+            newSurfaces: NewLootSurfaces,
+            tabs: s2 => LootTheme.Tabs(s2, _settings.GearChecklist),
+            inventoryCount: () => LatestInventory()?.Counts.Count,
+            popOut: () => ShowGearLootWindow(),
+            bringWindowForward: () => _gearLootWindow?.Activate());
+        _sections["loot"] = _lootCard;
         ToolTip.SetTip(_sections["loot"],
-            "Open Gear & Loot - everything this session picked up, and what is left on "
-            + "your imported gear list");
+            "Gear & Loot - everything this session picked up, and what is left on "
+            + "your imported gear list. Expands in place; the arrow opens its window.");
         // ONE card for every quest surface (David, 2026-08-16). It replaced the "Sky
         // Quest" and "Epics" cards, each of which carried a full tabbed checklist on the
         // widget — a review surface by the rule in CLAUDE.md, not a glance one. The Quest
@@ -1072,11 +1076,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         ToolTip.SetTip(_sections["quests"],
             "Open the Quest Tracker — search every quest by reward, item, quest giver or "
             + "zone, and work your Epic 1.0 and Plane of Sky checklists");
-        _lootTabBodies[LootTab.Gear] = Gear.Body;
-        // The tab that closes the 1.98.1 parity gap: LootSurface.Hosted has named
-        // Inventory since 2026-08-20 and this build had no body for it, so the filter in
-        // IGearLootHost.LootTabs hid a chip that shared vocabulary said existed.
-        _lootTabBodies[LootTab.Inventory] = Inventory.Body;
         _sections["tracked"] = AppTheme.Section(Header("tracked", "Watch", _trackedHeader), _trackedPanel);
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
@@ -1302,30 +1301,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         body.Children.Add(_healerList);
         panel.Children.Add(body);
         return panel;
-    }
-
-    private Control BuildKillsSection()
-    {
-        var panel = new StackPanel();
-        _killsSummary.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, DesignTokens.SpaceXs);
-        panel.Children.Add(_killsSummary);
-        panel.Children.Add(_killList);
-        _farmingLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
-        panel.Children.Add(_farmingLabel);
-        panel.Children.Add(_farmingList);
-        _partyKillsLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
-        panel.Children.Add(_partyKillsLabel);
-        panel.Children.Add(_partyKillList);
-        return panel;
-    }
-
-    /// <summary>The Loot card's body. "Created by merging" is no longer a block of its
-    /// own: merges and crafts ride the one list under the "other" slice, tagged inline,
-    /// the way the Windows card has shown them since #198.</summary>
-    private Control BuildLootSection()
-    {
-        _loot = new LootCardView(this, _settings);
-        return _loot.Body;
     }
 
     private Control BuildMiscSection()
@@ -1823,7 +1798,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // NO Forget here — see the WPF twin: the delete leaves an offline bypass nothing
         // to fall back on, so a failed re-check reports Offline and the ✦ vanishes (#226,
         // found by H4 after 1.99.1). WikiRecheckPathTests guards both windows.
-        RenderTargetDrops(CurrentSnapshot());
+        RepaintLootHosts();
         _ = LookupTargetAsync(name, CurrentZoneName, bypass: true);
     }
 
@@ -2031,10 +2006,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_hiddenForFocus) return;
 
         _zoneText.Text = s.CurrentZone.Length > 0 ? s.CurrentZone : "-";
-        // The by-zone gear view bakes "you're here"/hop counts into its headings —
-        // zoning must repaint it or the card keeps claiming the old zone.
-        if (_settings.GearGroupByZone && CurrentZoneName != s.CurrentZone)
-            _gearChecklistDirty = true;
         CurrentZoneName = s.CurrentZone;
         var active = TimeSpan.FromSeconds(s.ActiveSeconds);
         _sessionText.Text = s.SessionStart is { } start
@@ -2232,30 +2203,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
             FillList(_healerList, s.HealsByHealer.Select(h => (h.Name, $"{h.Total:N0} - {h.Hits} heal{(h.Hits == 1 ? "" : "s")}")));
         }
-        if (CreatureTabShowing(CreatureTab.Kills))
-        {
-            _killsSummary.Text = $"{s.KillsPerHour:0.0} kills/hr - {s.KillsPerActiveHour:0.0} active" +
-                (s.Recent is { } rk ? $" - last {(int)rk.Window.TotalMinutes}m: {rk.Kills}" : "");
-            FillList(_killList, s.YourKills.Select(k => (k.Name, $"x{k.Count}")));
-            var farmed = s.Mobs.Where(m => m.Kills > 0).ToList();
-            _farmingLabel.IsVisible = farmed.Count > 0;
-            var farmRows = new List<(string, string)>();
-            foreach (var m in farmed)
-            {
-                farmRows.Add((m.Name,
-                    $"avg {m.AvgFightSeconds:0}s - {StatsSnapshot.FormatCoin(m.Copper)} - {m.XpPercent:0.0}% xp"));
-                foreach (var l in m.Loot)
-                    farmRows.Add(($"      {l.Item}", l.DropRatePct is { } pct ? $"x{l.Count} - {pct:0}%" : $"x{l.Count}"));
-            }
-            FillList(_farmingList, farmRows);
-            _partyKillsLabel.IsVisible = s.PartyKillsByKiller.Count > 0;
-            FillList(_partyKillList, s.PartyKillsByKiller.Select(k => (k.Name, $"x{k.Count}")));
-        }
-        if (LootTabShowing(LootTab.Loot))
-        {
-            _loot.Render(s);
-            RenderTargetDrops(s);
-        }
+        // Kills and Loot paint through their OWN views now (Inline themes PR 2): the
+        // window renders its set on its tick, and the inline cards render theirs below.
+        // The widget-side hand-rolled kills rows died with the lift — both lanes read
+        // KillsPresentation, closing a parity drift #210's rule exists to prevent.
+        _killsCard?.Render(s);
+        _lootCard?.Render(s);
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         _questsHeader.Text = QuestsSummaryLine();
@@ -2268,16 +2221,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // the rate back to the people who asked for it.
         if (_sections["motes"].IsExpanded)
             CardMotes.Render(s);
-        if (LootTabShowing(LootTab.Gear) && _gearChecklistDirty)
-        {
-            Gear.Render();
-            _gearChecklistDirty = false;
-        }
-        if (LootTabShowing(LootTab.Inventory) && _inventoryDirty)
-        {
-            Inventory.Render();
-            _inventoryDirty = false;
-        }
         // Experience, Wealth, Faction and Raids used to be painted HERE, into fields the
         // Progress window borrowed. PR A moved all four into their own views, which that
         // window builds for itself and renders on its own tick — so the widget no longer
@@ -2296,7 +2239,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             try
             {
                 var dump = $"dmgSrc={_damageSourceList.Children.Count} dmgTaken={_damageTakenList.Items.Count} " +
-                    $"kills={_killList.Items.Count} party={_partyKillList.Items.Count} " +
+                    // The kills rows moved into KillsCardView with the PR 2 lift; the
+                    // inline card reports its placement below and the window reports its
+                    // own facts, same contract as progress.
+                    (_killsCard is { IsExpanded: true }
+                        ? $"killsInline=1 killsTab={CreatureSurface.KeyFor(_killsCard.SelectedTab)} " +
+                          $"killsTabs={_killsCard.TabCount} "
+                        : "killsInline=0 ") +
+                    (_lootCard is { IsExpanded: true }
+                        ? $"lootInline=1 lootTab={LootSurface.KeyFor(_lootCard.SelectedTab)} " +
+                          $"lootTabs={_lootCard.TabCount} "
+                        : "lootInline=0 ") +
                     // The Gear & Loot launcher's one line, by length — the thing that
                     // moves if the fold silently drops one of the two cards' numbers.
                     $"lootSummaryLen={_lootHeader.Text?.Length ?? 0} " +
@@ -2325,8 +2278,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _petAbilityLabel.IsVisible = s.PetAbilities.Count > 0;
         _stanceLabel.IsVisible = s.Stances.Count > 0;
         _invocationLabel.IsVisible = s.Invocations.Count > 0;
-        _farmingLabel.IsVisible = s.Mobs.Any(m => m.Kills > 0);
-        _partyKillsLabel.IsVisible = s.PartyKillsByKiller.Count > 0;
         _healSpellsLabel.IsVisible = s.HealsBySpell.Count > 0;
         _healSortBar.IsVisible = s.HealsBySpell.Count > 0;
         _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
@@ -3368,6 +3319,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly ThemeHost<ProgressTab> _progressHost = new(ProgressTab.Experience);
     private ThemeCardPanel<ProgressTab> _progressCard = null!;
 
+    /// <summary>The other two inline themes (PR 2) — same one-owner contract.</summary>
+    private readonly ThemeHost<CreatureTab> _creatureHost = new(CreatureSurface.DefaultInlineTab);
+    private ThemeCardPanel<CreatureTab> _killsCard = null!;
+    private readonly ThemeHost<LootTab> _lootHost = new(LootSurface.DefaultInlineTab);
+    private ThemeCardPanel<LootTab> _lootCard = null!;
+
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
 
@@ -3376,6 +3333,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// E2E suite at all (docs/TestPlan.md).</summary>
     internal ProgressWindow? ProgressWindowForTests => _progressWindow;
     internal ThemeCardPanel<ProgressTab> ProgressCardForTests => _progressCard;
+    internal ThemeCardPanel<CreatureTab> KillsCardForTests => _killsCard;
+    internal ThemeCardPanel<LootTab> LootCardForTests => _lootCard;
 
     /// <summary>Is the Progress window open and showing this tab? The render guards ask
     /// this where they used to ask "is this card expanded" — same rule either way: a
@@ -3466,41 +3425,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     }
     private GearLootWindow? _gearLootWindow;
 
-    /// <summary>The Wishlist surface, lifted into <see cref="GearCardView"/> when this
-    /// file ran out of ratchet room (CLAUDE.md: lift a surface, never split the file).
-    /// Built lazily and once — a Control has one parent, so the day a second host wants
-    /// this surface it builds its own instance rather than sharing this one.</summary>
-    private GearCardView Gear => _gear ??= new GearCardView(
-        _settings, () => CurrentZoneName,
-        (from, to) => ZoneGraph.Distance(from, to)?.Hops,
-        () => _gearChecklistDirty = true,
-        () => LastInventoryImport);
-
-    private GearCardView? _gear;
-
-    /// <summary>The Inventory tab — the Gear Locker and the old Inventory window as one
-    /// surface with two pivots, the way Windows folded them (David, 2026-08-20). Owned by
-    /// the widget rather than by the window, like every other tab body here, so a fetch
-    /// in flight survives the window being closed and reopened.</summary>
-    private InventoryView Inventory => _inventoryTab ??= new InventoryView(
-        _settings, _wikiItems,
-        refresh => LatestInventory(refresh),
-        () => QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
-        () => CurrentSnapshot().InferredClass);
-
-    private InventoryView? _inventoryTab;
-
-    /// <summary>Repaint the Inventory tab next time it is on screen. It re-scans the game
-    /// folder and rebuilds every row, so unlike the other two it does NOT paint on the
-    /// once-a-second tick: a rebuild under the player's cursor takes the scroll position
-    /// with it, and re-reading the dump from disk every second buys nothing a dump written
-    /// minutes ago can give.</summary>
-    private bool _inventoryDirty = true;
-
-    /// <summary>The two Gear &amp; Loot tab bodies, built by BuildSections() when these were
-    /// two cards and still rendered by the same code. GearLootWindow hosts them.</summary>
-    private readonly Dictionary<LootTab, Control> _lootTabBodies = new();
-
     /// <summary>The Gear &amp; Loot window, for the headless render tests — the two surfaces
     /// it hosts have no other place to be asserted on since the fold, and this build has no
     /// E2E suite at all (docs/TestPlan.md).</summary>
@@ -3511,33 +3435,36 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal IReadOnlyList<LootTabHeader> OfferedLootTabsForTests =>
         ((IGearLootHost)this).LootTabs(CurrentSnapshot());
 
-    /// <summary>Is the window open and showing this tab? The render guards ask this where
-    /// they used to ask "is this card expanded" — same rule either way.</summary>
-    private bool LootTabShowing(LootTab tab) =>
-        _gearLootWindow is { IsVisible: true } w && w.Tab == tab;
-
     // ---- IGearLootHost ----
-    Control IGearLootHost.LootTabBody(LootTab tab) => _lootTabBodies[tab];
+    /// <summary>A fresh set for whoever asked — the same one-owner contract as
+    /// NewProgressSurfaces, retiring this lane's borrowed-instance exemption. The
+    /// InventoryView is tracked so its in-flight wiki fetch is disposed at shutdown.</summary>
+    LootSurfaceSet IGearLootHost.NewLootSurfaces() => NewLootSurfaces();
 
-    /// <summary>The tabs THIS widget can actually draw, which is not yet all of them.
-    ///
-    /// <c>LootSurface.Hosted</c> is shared vocabulary and gained Inventory on 2026-08-20,
-    /// when the Gear Locker and Inventory windows folded into a tab — on WINDOWS. This
-    /// build has no body for it yet, and <c>LootTabBody</c> is a dictionary lookup, so
-    /// selecting that tab here threw a KeyNotFoundException. Nothing caught it: the tests
-    /// pass because none of them clicks the third chip, and the strip renders correctly
-    /// right up until the click.
-    ///
-    /// Filtering here rather than hardening the lookup, because a tab with nothing behind
-    /// it is the thing LootSurface itself warns about — an absent tab reads as
-    /// not-yet-arrived, an empty one reads as broken. When the Avalonia Inventory view
-    /// lands, this filter starts returning it with no other change.
-    ///
-    /// Same shape as the crash the Gear &amp; Loot fold found in <c>ApplySectionLayout</c>:
-    /// a key present in a SHARED catalog with no entry in this UI's own map.</summary>
+    internal LootSurfaceSet NewLootSurfaces()
+    {
+        var inventory = new InventoryView(
+            _settings, _wikiItems,
+            refresh => LatestInventory(refresh),
+            () => QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
+            () => CurrentSnapshot().InferredClass);
+        _inventoryViews.Add(inventory);
+        return new LootSurfaceSet(
+            new LootCardView(this, _settings),
+            new GearCardView(
+                _settings, () => CurrentZoneName,
+                (from, to) => ZoneGraph.Distance(from, to)?.Hops,
+                () => { },   // per-tick renders repaint every live host already
+                () => LastInventoryImport),
+            inventory);
+    }
+
+    private readonly List<InventoryView> _inventoryViews = [];
+
+    /// <summary>Every tab has a body now — Inventory landed with the 1.98.1 parity fix —
+    /// so the strip is Core's list, unfiltered.</summary>
     IReadOnlyList<LootTabHeader> IGearLootHost.LootTabs(StatsSnapshot s) =>
-        [.. LootTheme.Tabs(s, _settings.GearChecklist, _inventoryTab?.Badge)
-            .Where(h => _lootTabBodies.ContainsKey(h.Tab))];
+        LootTheme.Tabs(s, _settings.GearChecklist);
 
     IReadOnlyList<(string Key, Control Star, string Label, string Tip)> IGearLootHost.LootMiniStars()
     {
@@ -3557,30 +3484,43 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// only way to reach two surfaces that used to be two cards.</summary>
     internal void ShowGearLootWindow(string? tab = null)
     {
+        _lootHost.OpenWindow(tab is null ? null : LootSurface.TabForKey(tab));
         // Same reopen contract as every satellite here: a null field means closed for
         // real (Avalonia's Show() throws on a closed window).
         if (_gearLootWindow is null)
         {
             var window = new GearLootWindow(this);
+            window.TabChanged += t2 => _lootHost.SelectTab(t2);
             window.Closed += (_, _) =>
             {
                 if (ReferenceEquals(_gearLootWindow, window)) _gearLootWindow = null;
                 // The star went with it. Leaving a dead control in the table would have
                 // UpdateStarVisuals painting a button in a torn-down window forever.
                 _stars.Remove("loot");
+                _lootHost.WindowClosed();
+                _lootCard?.Sync();
             };
             _gearLootWindow = window;
         }
         _gearLootWindow.Show();
         if (tab is { Length: > 0 }) _gearLootWindow.SetTab(tab);
+        else _gearLootWindow.SetTab(_lootHost.SelectedTab);
         _gearLootWindow.Activate();
+        _lootCard?.Sync();
         // Paint the tab NOW rather than on the next tick: opening a surface and staring at
-        // an empty one is the field report that made the widget render on expand.
-        var snap = CurrentSnapshot();
-        _gearLootWindow.Refresh();   // picks the tab, so the guards below know which one
-        _gearChecklistDirty = true;
-        _inventoryDirty = true;
-        RefreshExpandedSections(snap);
+        // an empty one is the field report that made the widget render on expand. The
+        // window renders its OWN surfaces since PR 2.
+        _gearLootWindow.Refresh();
+        RefreshExpandedSections(CurrentSnapshot());
+    }
+
+    /// <summary>A target changed or a wiki lookup landed: repaint whichever loot hosts
+    /// are live, now rather than on the next tick.</summary>
+    private void RepaintLootHosts()
+    {
+        var s = CurrentSnapshot();
+        _lootCard?.Render(s);
+        if (_gearLootWindow is { IsVisible: true } gw) gw.Refresh();
     }
 
     private CreatureWindow? _creatureWindow;
@@ -3636,16 +3576,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _questsWindow.Activate();
     }
 
-    /// <summary>The Drops surface, lifted out of DropsWindow when it became a tab.
-    /// Built lazily and once — a Control has one parent, so the day a second host wants
-    /// this surface it builds its own instance rather than sharing this one.</summary>
-    private DropsCardView Drops => _drops ??= new DropsCardView(this);
-
-    private DropsCardView? _drops;
-
-    /// <summary>The two Kills &amp; Drops tab bodies. CreatureWindow hosts them.</summary>
-    private readonly Dictionary<CreatureTab, Control> _creatureTabBodies = new();
-
     /// <summary>The Kills &amp; Drops window, for the headless render tests — the two
     /// surfaces it hosts have no other place to be asserted on since the fold, and this
     /// build has no E2E suite at all (docs/TestPlan.md).</summary>
@@ -3657,21 +3587,16 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal IReadOnlyList<CreatureTabHeader> OfferedCreatureTabsForTests =>
         ((ICreatureHost)this).CreatureTabs(CurrentSnapshot());
 
-    /// <summary>Is the window open and showing this tab? The render guards ask this where
-    /// they used to ask "is this card expanded" — same rule either way.</summary>
-    private bool CreatureTabShowing(CreatureTab tab) =>
-        _creatureWindow is { IsVisible: true } w && w.Tab == tab;
-
     // ---- ICreatureHost ----
-    Control ICreatureHost.CreatureTabBody(CreatureTab tab) => _creatureTabBodies[tab];
+    /// <summary>A fresh set for whoever asked — the same one-owner contract as
+    /// NewProgressSurfaces, retiring this lane's borrowed-instance exemption.</summary>
+    CreatureSurfaceSet ICreatureHost.NewCreatureSurfaces() => NewCreatureSurfaces();
 
-    /// <summary>Both tabs are real from the start, unlike Gear &amp; Loot — Kills was
-    /// already a card and Drops was already a window — so the filter that lane needs has
-    /// nothing to hide here. It stays anyway: LootSurface.Hosted grew a member this build
-    /// could not draw once already, and the crash was a dictionary lookup exactly like the
-    /// one below.</summary>
+    internal CreatureSurfaceSet NewCreatureSurfaces() =>
+        new(new KillsCardView(), new DropsCardView(this));
+
     IReadOnlyList<CreatureTabHeader> ICreatureHost.CreatureTabs(StatsSnapshot s) =>
-        [.. CreatureTheme.Tabs(s).Where(h => _creatureTabBodies.ContainsKey(h.Tab))];
+        CreatureTheme.Tabs(s);
 
     IReadOnlyList<(string Key, Control Star, string Label, string Tip)> ICreatureHost.CreatureMiniStars()
     {
@@ -3692,29 +3617,35 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// entry.</summary>
     internal void ShowCreatureWindow(string? tab = null)
     {
+        // The host learns the room first and the CARD gives the body up — the WPF
+        // twin's handshake, for the one-owner reason.
+        _creatureHost.OpenWindow(tab is null ? null : CreatureSurface.TabForKey(tab));
         // Same reopen contract as every satellite here: a null field means closed for
         // real (Avalonia's Show() throws on a closed window).
         if (_creatureWindow is null)
         {
             var window = new CreatureWindow(this);
+            window.TabChanged += t2 => _creatureHost.SelectTab(t2);
             window.Closed += (_, _) =>
             {
                 if (ReferenceEquals(_creatureWindow, window)) _creatureWindow = null;
                 // The star went with it. Leaving a dead control in the table would have
                 // UpdateStarVisuals painting a button in a torn-down window forever.
                 _stars.Remove("kills");
+                _creatureHost.WindowClosed();
+                _killsCard?.Sync();
             };
             _creatureWindow = window;
         }
         _creatureWindow.Show();
         if (tab is { Length: > 0 }) _creatureWindow.SetTab(tab);
+        else _creatureWindow.SetTab(_creatureHost.SelectedTab);
         _creatureWindow.Activate();
-        // Paint the tab NOW rather than on the next tick: opening a surface and staring at
-        // an empty one is the field report that made the widget render on expand.
-        var snap = CurrentSnapshot();
-        _creatureWindow.Refresh();   // picks the tab, so the guards below know which one
-        Drops.Render(snap);
-        RefreshExpandedSections(snap);
+        _killsCard?.Sync();
+        // Paint the tab NOW rather than on the next tick — the window renders its OWN
+        // surfaces since PR 2, so one Refresh() paints both tabs.
+        _creatureWindow.Refresh();
+        RefreshExpandedSections(CurrentSnapshot());
     }
 
     /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under
@@ -4333,11 +4264,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void UpdateGearChecklist(StatsSnapshot s)
     {
         var changed = AutoCheckGearLoot(s);
-        if (changed)
-        {
-            _gearChecklistDirty = true;   // rebuild next tick: checked box, list-name count
-            _settings.Save();
-        }
+        // Every live gear host re-renders on its own tick, so a changed box is on
+        // screen within a second with no dirty flag to thread.
+        if (changed) _settings.Save();
     }
 
     private bool AutoCheckGearLoot(StatsSnapshot s)
@@ -4400,10 +4329,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (stamp == _settings.GearInventoryAppliedStamp) return;
         _settings.GearInventoryAppliedStamp = stamp;
         if (GearLootAutoCheck.ApplyInventory(_settings.GearChecklist, dump.Entries))
-        {
-            _gearChecklistDirty = true;
             _settings.Save();
-            }
     }
 
     // ---- the imported gear checklist card (#113) ----
@@ -4426,11 +4352,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     /// <summary>The Options window's hook after an import/clear: re-render now, not
     /// on the next event.</summary>
-    internal void RefreshGearCard()
-    {
-        _gearChecklistDirty = true;
-        RefreshUi();
-    }
+    internal void RefreshGearCard() => RefreshUi();
 
     /// <summary>What the last auto-import did, for the Gear and Raids surfaces to report.
     /// In memory only — a report about something that happened while the player watched
@@ -4466,8 +4388,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 LastInventoryImport = OutputfileAutoImport.ImportInventory(dump, _settings);
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
-                _gearChecklistDirty = true;
-                _inventoryDirty = true;   // the tab IS this file
+                // The Inventory tab IS this file — tell an open window to repaint on
+                // arrival (its own rule keeps the tick from eating the scroll position).
+                _gearLootWindow?.InventoryChanged();
                 break;
 
             case OutputfileKind.Achievements:
@@ -4814,7 +4737,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             case EQBuddy.Companion.CompanionSurfaces.Sky:
                 _questsWindow?.MaybeRefresh();
                 break;
-            case EQBuddy.Companion.CompanionSurfaces.Gear: _gearChecklistDirty = true; break;
+            // Gear hosts re-render on their own tick; nothing to flag.
+            case EQBuddy.Companion.CompanionSurfaces.Gear: break;
         }
     }
 
@@ -5275,7 +5199,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// card and the whole mobile projection.</summary>
     internal void RepaintLootCard()
     {
-        if (_sections["loot"].IsExpanded) _loot.Render(CurrentSnapshot());
+        if (_sections["loot"].IsExpanded) _lootCard?.Render(CurrentSnapshot());
     }
 
     public void ShowItemInfo(string itemName)
@@ -5290,14 +5214,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _itemInfoWindow.Lookup(itemName);
     }
 
-    private void RenderTargetDrops(StatsSnapshot snapshot)
+    /// <summary>The target-drops block's CONTENT, computed once — every live
+    /// LootCardView instance pulls it during its own Render, exactly the WPF twin's
+    /// shape (MainWindow.TargetDropsContent), which is what made per-host loot views
+    /// possible there and now here.</summary>
+    internal (string Names, string Detail, List<(string Name, string Value)> Rows)
+        TargetDropsContent(StatsSnapshot snapshot)
     {
         var targets = _settings.ShowTargetDrops ? snapshot.CurrentTargets : [];
-        if (targets.Count == 0)
-        {
-            _loot.HideTargetDrops();
-            return;
-        }
+        if (targets.Count == 0) return ("", "", []);
         foreach (var target in targets)
         {
             if (_targetResults.ContainsKey(target)) continue;
@@ -5356,7 +5281,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // heading is one string in one place for every surface that shows it.
         var detail = (kills > 0 ? $" — {kills} kill{(kills == 1 ? "" : "s")} this session" : "") +
             $" · drops (eqlwiki · {state}{(extra > 0 ? $" · +{extra} more" : "")})";
-        _loot.ShowTargetDrops(names, detail, rows.Take(14));
+        return (names, detail, rows.Take(14).ToList());
     }
 
     private async Task LookupTargetAsync(string target, string zone, bool bypass = false)
@@ -5370,7 +5295,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         finally
         {
             _rechecking.Remove(target);
-            Dispatcher.UIThread.Post(() => RenderTargetDrops(CurrentSnapshot()));
+            Dispatcher.UIThread.Post(RepaintLootHosts);
         }
     }
 
@@ -5408,7 +5333,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_clickThrough)
             ClickThrough.Set(this, enabled: false);
         _alertWindow?.Close();
-        _inventoryTab?.Dispose();   // a wiki fetch must not outlive the app that started it
+        foreach (var iv in _inventoryViews) iv.Dispose();   // a wiki fetch must not outlive the app
         _spawnPoints.Flush();   // debounced archives; anything missed replays from the log
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)
         _stats.AaStore?.Flush();

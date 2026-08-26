@@ -454,20 +454,26 @@
 
                  Auto/* rather than */Auto so the TITLE holds its size and the summary is
                  the part that ellipsises — the same shape the Gear & Loot launcher uses. -->
-            <Button x:Name="KillsSection" Style="{StaticResource SectionLink}" Click="OnCreatureWindow"
-                    ToolTip="Open Kills &amp; Drops — what died this session, and what it dropped at what rate">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <local:EqCardTitle Icon="Skull" Text="Kills &amp; Drops"/>
-                    <TextBlock x:Name="KillsHeader" Grid.Column="1" Style="{StaticResource StatValue}"
-                               HorizontalAlignment="Right" VerticalAlignment="Center"
-                               Margin="{DynamicResource IndentM}"
-                               TextTrimming="CharacterEllipsis" Text=""/>
-                </Grid>
-            </Button>
+            <Expander x:Name="KillsSection" Style="{StaticResource Section}"
+                      ToolTip="Kills &amp; Drops — what died this session, and what it dropped at what rate. Expands in place; the arrow opens its window.">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:EqCardTitle Icon="Skull" Text="Kills &amp; Drops"/>
+                        <TextBlock x:Name="KillsHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="{DynamicResource IndentM}"
+                                   TextTrimming="CharacterEllipsis" Text=""/>
+                        <ContentControl x:Name="KillsPopOut" Grid.Column="2"
+                                        VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <ContentControl x:Name="KillsBody"/>
+            </Expander>
 
             <!-- MOTES IS A CARD AGAIN (David, 2026-08-21), and it ships HIDDEN -
                  AppSettings.MigrateMotesCard puts it in HiddenSections once, so nobody's
@@ -509,20 +515,26 @@
                  the half that gives: both widgets are SizeToContent, so a label whose
                  string changes width IS window geometry (trap 12), and this line moves
                  with every drop. -->
-            <Button x:Name="LootSection" Style="{StaticResource SectionLink}" Click="OnGearLootWindow"
-                    ToolTip="Open Gear &amp; Loot — everything this session picked up, and what is left on your imported gear list">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <local:EqCardTitle Icon="Bag" Text="Gear &amp; Loot"/>
-                    <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}"
-                               HorizontalAlignment="Right" VerticalAlignment="Center"
-                               Margin="{DynamicResource IndentM}"
-                               TextTrimming="CharacterEllipsis" Text=""/>
-                </Grid>
-            </Button>
+            <Expander x:Name="LootSection" Style="{StaticResource Section}"
+                      ToolTip="Gear &amp; Loot — everything this session picked up, and what is left on your imported gear list. Expands in place; the arrow opens its window.">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:EqCardTitle Icon="Bag" Text="Gear &amp; Loot"/>
+                        <TextBlock x:Name="LootHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="{DynamicResource IndentM}"
+                                   TextTrimming="CharacterEllipsis" Text=""/>
+                        <ContentControl x:Name="LootPopOut" Grid.Column="2"
+                                        VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <ContentControl x:Name="LootBody"/>
+            </Expander>
 
             <!-- ONE card for every quest surface (David, 2026-08-16). It replaced the
                  "Sky Quest" and "Epics" cards, each of which carried a full tabbed

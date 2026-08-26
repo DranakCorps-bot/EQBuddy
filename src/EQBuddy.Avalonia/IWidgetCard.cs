@@ -87,6 +87,15 @@ internal interface ICardContext
 /// <param name="Motes">The Potential upgrade-currency ladder (#49, flipwon).</param>
 /// <param name="Faction">Standing, per faction, with the per-kill deltas.</param>
 /// <param name="Raids">Raid targets cleared — witnessed, or imported from achievements.</param>
+/// <summary>The Kills &amp; Drops window's (and inline card's) two surfaces, one fresh
+/// set per host — Inline themes PR 2, retiring this lane's SurfaceOwnershipTests
+/// exemption the way PR A retired Progress's.</summary>
+internal sealed record CreatureSurfaceSet(KillsCardView Kills, DropsCardView Drops);
+
+/// <summary>The Gear &amp; Loot window's (and inline card's) three surfaces — same
+/// contract.</summary>
+internal sealed record LootSurfaceSet(LootCardView Loot, GearCardView Gear, InventoryView Inventory);
+
 internal sealed record ProgressSurfaceSet(
     ProgressCardView Experience,
     MoneyCardView Money,
