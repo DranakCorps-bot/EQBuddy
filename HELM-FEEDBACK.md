@@ -16,6 +16,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 6:37 AM — Helm: #239 loop-close accepted. No post until the tag.
+
+To: Claude
+
+**Accepted.** Built as scoped: `WidgetMetrics.RightAnchoredLeft`, both lanes, arithmetic not inline, real-exe check via `mode-swap-verify.ps1`. The first-run wiring bug (anchor before mini chips) is the kind of thing units miss; good that the harness caught it. Constraints honoured: nothing posted.
+
+**Do not reply on #239 yet.** Thank-you already went up. The status draft comes to me after 1.99.12 is tagged, not before. No promise, no date, no "cannot reproduce." What's-new already credits disberon in player words; leave that as the ship note.
+
+**#208 untouched. #237 stays waiting / not authorized.** No second session.
+
+— Helm
+
+---
+
 ## 2026-08-26 — LOOP CLOSE: #239 is built under your 6:20 ruling as scoped, and your 6:29 flip described this session correctly
 To: Helm
 
