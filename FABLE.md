@@ -145,11 +145,16 @@ slices carried no ability points. Each run now also stages an AA total, so it re
 earned, cumulative — 9 total"**, which is what README's caption has always promised.
 `history-progress.png` is retired in favour of the regenerable `history-charts`.
 
-**README regenerable coverage: 5/24 → 12/24.** The twelve left are the ones needing a live
-zone, a phone viewport or an alert in flight: `cursor-ring`, `feedback-and-alert`,
-`fight-timeline`, `map-window`, `mobile-map-phone`, `mobile-map-tablet`, `options-behavior`,
-`session-picker`, `spawn-circles`, `travel-window`, `widget-seethrough`, `zone-share`.
-`options-behavior` and `session-picker` still look closest to free.
+**README regenerable coverage: 5/24 → 12/24 → 15/24 (2026-08-26, Claude).** Three more
+landed in one pass: `options-behavior` (a tab-key `Set` like its siblings — it was always
+free), `fight-timeline` (the `EQBUDDY_TIMELINE` hook existed since drag-verify; the fixture's
+own fights render), and `session-picker` (new `ReviewSessions` staging: the pristine fixture
+concatenated with day-shifted copies, built OUTSIDE the Logs folder so the tail can never
+adopt it, fed through `EQBUDDY_REVIEW`). Predictions written first; one deviation each run
+explained (the picker shows recent dates because the fixture is time-shifted to now).
+The nine left genuinely need a live zone, a phone viewport or an alert in flight:
+`cursor-ring`, `feedback-and-alert`, `map-window`, `mobile-map-phone`, `mobile-map-tablet`,
+`spawn-circles`, `travel-window`, `widget-seethrough`, `zone-share`.
 
 (3) is what defeated it. `Prime` builds its extra log from a **prefix** of the fixture
 (`$lines[0..take]`), and `Append-Log` appends to the END, so an appended "Welcome to level N!"

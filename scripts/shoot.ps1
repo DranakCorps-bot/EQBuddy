@@ -654,6 +654,29 @@ $Shots = [ordered]@{
                                             'You have gained 3 ability point(s)!  You now have 9 ability point(s).') }
                                @{}
                            ) }
+    # The fight timeline, from the fixture log's own fights — the EQBUDDY_TIMELINE hook
+    # existed (drag-verify uses it) and no shot ever did, so README's fight-timeline.png
+    # was a hand-taken one-off nobody could regenerate.
+    'fight-timeline'  = @{ Title = 'EQBuddy fight timeline'
+                           Env = @{ EQBUDDY_TIMELINE = '1' }
+                           Set = @{} }
+    # Options → Behavior: the tab that answers "why is EQBuddy doing/not doing X", and as
+    # of #238 the home of the Alt+Tab opt-out with its taskbar-cost warning. Zoomed out
+    # like its siblings — the tab is one of the two longest and at 100% the shot is a
+    # picture of its top third.
+    'options-behavior' = @{ Title = 'Options'
+                            Env = @{ EQBUDDY_OPTIONS = '1' }
+                            Set = @{ OptionsTab = 'behavior'
+                                     WindowZooms = @{ options = 0.55 } } }
+    # The "Review which session?" picker (#74): shows only for an archive holding MORE
+    # than one session, which the fixture log never does — so the shot stages a
+    # three-session archive (the fixture concatenated with day-shifted copies of itself;
+    # sessions split on a 60-minute gap, so day shifts are unambiguous). The file lives
+    # OUTSIDE the Logs folder on purpose: an extra eqlog in there with patched stamps
+    # could become the newest log and hijack what the app tails (trap 24's shape).
+    'session-picker'  = @{ Title = 'Review which session?'
+                           Set = @{}
+                           ReviewSessions = 3 }
     # The wiki contribution pack (#217 Ask 1). Trap 22: with an empty profile every row
     # is "not checked yet", because the pack's state comes from the WIKI LOOKUP and not
     # from the log — a shot of that proves nothing about the rows underneath and reads as
@@ -1009,12 +1032,35 @@ try {
         Write-WikiCache $spec.Wiki
         Append-Log $spec.Append
         if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }
+        # A multi-session archive for the review picker: the pristine fixture plus
+        # day-shifted copies, oldest first so the file reads chronologically. Built
+        # outside the Logs folder so the tail can never adopt it.
+        $reviewLog = $null
+        if ($spec.ReviewSessions) {
+            $fmt = 'ddd MMM dd HH:mm:ss yyyy'
+            $ci = [Globalization.CultureInfo]::InvariantCulture
+            $src = Get-Content $pristineCopy
+            $all = @()
+            for ($d = $spec.ReviewSessions - 1; $d -ge 0; $d--) {
+                $span = [TimeSpan]::FromDays($d)
+                $all += @($src | ForEach-Object {
+                    if ($_ -match '^\[(?<t>[^\]]+)\] (?<m>.*)$') {
+                        $t = [datetime]::ParseExact($Matches.t, $fmt, $ci)
+                        "[$(($t - $span).ToString($fmt, $ci))] $($Matches.m)"
+                    } else { $_ }
+                })
+            }
+            $reviewDir = New-Item -ItemType Directory -Force (Join-Path $root 'review')
+            $reviewLog = Join-Path $reviewDir.FullName 'eqlog_Testchar_archive.txt'
+            $all | Set-Content $reviewLog -Encoding utf8
+        }
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false
         $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
         $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
         foreach ($k in $spec.Env.Keys) { $psi.EnvironmentVariables[$k] = $spec.Env[$k] }
+        if ($reviewLog) { $psi.EnvironmentVariables['EQBUDDY_REVIEW'] = $reviewLog }
         $proc = [Diagnostics.Process]::Start($psi)
         try {
             # Wait for the window this shot is about, then let the replay settle.
