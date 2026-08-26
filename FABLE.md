@@ -651,10 +651,14 @@ predictions. E2E 32/32, Avalonia 287/287, unit 2,646.
 
 ## Inline themes — expand in place, pop out on request
 
-- **Priority:** `ready` — David answered the one question that was his (2026-08-22, asked
-  with the question tool): **build it as Bevel ruled it — expand in place, pop out on
-  request; the widget stays the home; the theme windows stay for the second monitor.**
-  Plan by Fable 5, 2026-08-22. One theme per PR, both UIs in each.
+- **Priority:** **DONE 2026-08-26 (Claude) — all four themes, both lanes, staged in
+  1.99.12; the DONE headers above carry the execution record.** Flipped in place so a
+  grep for `ready` cannot find a plan whose work has shipped (eqbuddy-fb's catch — the
+  other three items closed on this line and this one had only gained a header).
+  (was: `ready` — David answered the one question that was his, 2026-08-22, asked with
+  the question tool: build it as Bevel ruled it — expand in place, pop out on request;
+  the widget stays the home; the theme windows stay for the second monitor. Plan by
+  Fable 5, 2026-08-22. One theme per PR, both UIs in each.)
 - **Class:** `V2` — four themes × two UIs, a host-ownership rule a compiler cannot see (a
   body has one visible parent), a retired breakout, and it reverses the *direction* of four
   folds that were themselves signed decisions. Not V1 because the host rule has to be right
