@@ -169,6 +169,12 @@ internal sealed class ProgressWindow : Window
     /// widget's collapsed cards have always followed.</summary>
     public ProgressTab Tab => _tab;
 
+    /// <summary>Raised when the PLAYER switches tabs here, so the theme host can hand the
+    /// room back to the inline card on close (Inline themes PR B — the WPF twin has the
+    /// same event for the same reason). Not raised by <see cref="SetTab"/>: a programmatic
+    /// open is the host talking to this window, not the player talking to the host.</summary>
+    public event Action<ProgressTab>? TabChanged;
+
     private Control BuildContent()
     {
         var title = new Grid { Margin = new Thickness(DesignTokens.SpaceM) };
@@ -302,6 +308,10 @@ internal sealed class ProgressWindow : Window
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
             {
                 _tab = tab;
+                // The theme host follows the player (Inline themes PR B): closing this
+                // window hands the tab back to the card, which is only true if the card's
+                // side of the handshake hears about switches made HERE.
+                TabChanged?.Invoke(tab);
                 Refresh();
             });
         }

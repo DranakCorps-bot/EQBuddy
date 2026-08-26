@@ -1640,4 +1640,116 @@ public class WidgetRenderTests : IDisposable
         host.Close();
         main.Close();
     }
+
+    // ---- the Progress theme's INLINE card (Inline themes PR B) ----
+
+    /// <summary>The sequence that throws if any body assignment bypasses the one-owner
+    /// rule: expand the card, pop the theme out, close the window, expand again. Each
+    /// host builds its own surfaces since PR A, so the crash-class here is a shared
+    /// instance sneaking back in — this is the guard the plan named before PR 1.</summary>
+    [AvaloniaFact]
+    public void ExpandPopOutCloseExpandDoesNotThrowAndEndsCollapsed()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var snap = new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) };
+
+        var card = window.ProgressCardForTests;
+        // The class fixture sets EQBUDDY_EXPAND=1, so the card starts expanded (inline).
+        Assert.True(card.IsExpanded, "EQBUDDY_EXPAND=1 should expand the theme card like every sibling");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(card.TabCount >= 4, $"the inline strip should carry the theme's tabs, got {card.TabCount}");
+
+        // Pop out: the window takes the body and the card collapses (one owner).
+        window.ShowProgressWindow();
+        Dispatcher.UIThread.RunJobs();
+        Assert.NotNull(window.ProgressWindowForTests);
+        Assert.False(card.IsExpanded, "pop-out must collapse the card - one owner of the body");
+
+        // Change tab IN the window with a real (headless) click - the PLAYER's switch is
+        // what reaches the host; a programmatic SetTab deliberately does not.
+        var pw = window.ProgressWindowForTests!;
+        pw.RenderVisible(snap);
+        pw.UpdateLayout();
+        var chip = pw.GetVisualDescendants().OfType<TextBlock>()
+            .First(t => t.Text == "Faction");
+        var point = global::Avalonia.VisualExtensions.TranslatePoint(
+            chip, new global::Avalonia.Point(2, chip.Bounds.Height / 2), pw);
+        Assert.True(point.HasValue, "the Faction chip is not laid out - it cannot be clicked");
+        pw.MouseDown(point!.Value, global::Avalonia.Input.MouseButton.Left);
+        pw.MouseUp(point.Value, global::Avalonia.Input.MouseButton.Left);
+        Dispatcher.UIThread.RunJobs();
+
+        // Close the window: collapsed, never back to inline (Bevel's rule).
+        pw.Close();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "closing the window must not re-grow the widget");
+
+        // Expand again and paint - the sequence that threw on this toolkit when a body
+        // had two hosts. This is the plan's "human step", now reachable headless because
+        // PR A gave every host its own surfaces. The room the player picked in the
+        // window is the room the card reopens on - the hand-back half of the handshake.
+        card.IsExpanded = true;
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(card.IsExpanded);
+        Assert.Equal(ProgressTab.Faction, card.SelectedTab);
+
+        window.Close();
+    }
+
+    /// <summary>EQBUDDY_EXPAND=progress:raids — WPF parity (the named form, with the
+    /// theme's room). Raids is the GLANCE room: its line renders and its full view is
+    /// never built, which is the contract InlineMode exists to make.</summary>
+    [AvaloniaFact]
+    public void TheNamedExpandFormOpensTheThemeOnItsGlanceRoom()
+    {
+        Environment.SetEnvironmentVariable("EQBUDDY_EXPAND", "progress:raids");
+        try
+        {
+            var window = new MainWindow();
+            window.Show();
+            window.RenderSnapshotForTest(new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) });
+            Dispatcher.UIThread.RunJobs();
+
+            var card = window.ProgressCardForTests;
+            Assert.True(card.IsExpanded, "EQBUDDY_EXPAND=progress:raids should expand the card");
+            Assert.Equal(ProgressTab.Raids, card.SelectedTab);
+            // The glance line is on screen - RaidsGlance's words, not the 29-row ledger.
+            var text = window.GetVisualDescendants().OfType<TextBlock>()
+                .Select(t => t.Text ?? "").ToList();
+            Assert.Contains(text, t => t.Contains("left") || t.Contains("all cleared"));
+
+            window.Close();
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("EQBUDDY_EXPAND", "1");
+        }
+    }
+
+    /// <summary>Clicking the card while its window is open brings the window forward and
+    /// never draws a second copy of the surface — ThemeHost's ShouldBringWindowForward
+    /// answer, asserted through the real card.</summary>
+    [AvaloniaFact]
+    public void TogglingTheCardWhileTheWindowIsOpenNeverExpandsIt()
+    {
+        var window = new MainWindow();
+        window.Show();
+
+        window.ShowProgressWindow();
+        Dispatcher.UIThread.RunJobs();
+        var card = window.ProgressCardForTests;
+        Assert.False(card.IsExpanded);
+
+        // The stack machinery's own path (Options, EQBUDDY_EXPAND) — routed through the
+        // host, which answers bring-forward, not inline.
+        card.IsExpanded = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "the card must not expand while its window owns the body");
+
+        window.ProgressWindowForTests!.Close();
+        window.Close();
+    }
 }

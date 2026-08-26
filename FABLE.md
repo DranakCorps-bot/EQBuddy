@@ -532,10 +532,20 @@ session-scoped; (name, zone) keying.
 
 ---
 
-## Avalonia theme bodies need a seam — PR A DONE, PR B still planned
+## Avalonia theme bodies need a seam — PR A DONE, PR B DONE 2026-08-26
 
-- **Priority:** `ready` for **PR B only**. PR A was executed 2026-08-22 (Claude); the plan's
-  Step 0 was already done and is what found the 1.99.4 reopen crash.
+- **Priority:** **DONE.** PR A executed 2026-08-22; **PR B executed 2026-08-26 (Claude),
+  staged in 1.99.12**: `ThemeCardPanel<TTab>` + the Avalonia `ProgressThemeCard`, mirroring
+  the WPF pair name for name; `EQBUDDY_EXPAND` reached full WPF parity (named keys and
+  `progress:raids`); the expand → pop-out → close → expand sequence is a headless test now
+  — INCLUDING the window tab-change via a real click and the hand-back assertion — because
+  PR A's per-host surfaces made the plan's "human step" testable
+  (`ExpandPopOutCloseExpandDoesNotThrowAndEndsCollapsed`). The sheet capture matched its
+  written prediction (strip wraps, Experience body inline, ⧉ on the header). One defect
+  found by an existing test and worth carrying: the card's first cut raised
+  `ExpandedChanged` on BOTH edges, and the collapse edge queued a live repaint that wiped a
+  theme window's freshly painted rows with an empty snapshot — the consumer only ever
+  wanted the open edge. The CLAUDE.md `EQBUDDY_EXPAND` parity note is updated.
 - **Class:** `V2`, unchanged.
 
 ### PR A — DONE, and what it actually cost

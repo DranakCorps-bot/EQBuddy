@@ -291,7 +291,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private StatSort _dmgOutSort = StatSort.Total;
     private StatSort _dmgInSort = StatSort.Total;
     private StatSort _healSort = StatSort.Total;
-    private readonly bool _expandForTesting = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") == "1";
+    // EQBUDDY_EXPAND=1 expands every card (and turns on the debug dump); the NAMED form
+    // (EQBUDDY_EXPAND=progress:raids) reached parity with WPF in Inline themes PR B —
+    // a theme card has four bodies behind one key, and three of them were
+    // unphotographable and unassertable here without it (trap 22).
+    // Instance, not static: the render tests construct many MainWindows in one process
+    // with different EQBUDDY_EXPAND values, and a static would freeze the first one.
+    private readonly string _expandVar =
+        Environment.GetEnvironmentVariable("EQBUDDY_EXPAND") ?? "";
+    private bool _expandForTesting => _expandVar.Length > 0;
 
     private static readonly string[] MiniStatOrder = ["kills", "dps", "hps", "pet", "procs", "loot", "motes", "money", "xp", "deaths"];
 
@@ -486,9 +494,27 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         UpdateStarVisuals();
         ApplySectionLayout();
         SetMode(_settings.Minimized);
-        if (_expandForTesting)
+        if (_expandVar == "1")
+        {
             foreach (var section in _sections.Values)
                 section.IsExpanded = true;
+        }
+        else if (_expandForTesting)
+        {
+            // The WPF form: EQBUDDY_EXPAND=loot,kills opens those cards, and a theme card
+            // may name its room — EQBUDDY_EXPAND=progress:raids. Parsed the same way.
+            var wanted = _expandVar.Split(',', StringSplitOptions.RemoveEmptyEntries
+                                              | StringSplitOptions.TrimEntries)
+                .Select(w => w.Split(':', 2))
+                .ToDictionary(p => p[0], p => p.Length > 1 ? p[1] : null,
+                    StringComparer.OrdinalIgnoreCase);
+            if (wanted.TryGetValue("progress", out var room)
+                && ProgressSurface.TabForKey(room) is { } startOn)
+                _progressHost.SelectTab(startOn);
+            foreach (var (key, section) in _sections)
+                if (wanted.ContainsKey(key))
+                    section.IsExpanded = true;
+        }
         // Expanding a card renders it NOW (David's field report: sections only fill
         // inside the fullRender gate, so a click during a quiet moment stared at an
         // empty body until the next event or the 10 s heartbeat). Background priority
@@ -1060,19 +1086,23 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _stars["buffs"] = buffsStar;
         _sections["buffs"] = AppTheme.Section(Header("buffs", "Buffs", _buffsHeader, buffsStar), _buffsPanel);
         // ONE card for every progress surface — the PROGRESS THEME (docs/Themes.md,
-        // David ruled themes a direction 2026-08-19), in the same change as the WPF twin.
-        // It replaced the Progress, Money, Motes, Faction and Raids cards. All five are
-        // retrospective, so by CLAUDE.md's surface rule they are review surfaces and earn
-        // a window rather than five slots on the thing that sits over the running game.
-        //
-        // The BODIES are still built here and still rendered here — the window hosts them
-        // through IProgressHost.NewProgressSurfaces() — each host builds its OWN, because a
-        // control cannot live in two windows on this toolkit (see IWidgetCard).
-        _sections["progress"] = AppTheme.SectionLink(
-            Header("progress", "Progress", _progressHeader), () => ShowProgressWindow());
+        // David ruled themes a direction 2026-08-19). Since Inline themes PR B it EXPANDS
+        // IN PLACE like the WPF twin: the tab strip and one room's body under the card,
+        // with the ⧉ opening the window for the second monitor. Surfaces are built on the
+        // first expand through the same NewProgressSurfaces() the window uses — each host
+        // its OWN instances, because a control cannot live in two windows on this toolkit
+        // (see IWidgetCard).
+        _progressCard = ProgressThemeCard.Build(
+            Header("progress", "Progress", _progressHeader), _progressHost,
+            newSurfaces: NewProgressSurfaces,
+            dingUnlocks: s => DingUnlocks(s).Count,
+            raidsDefeated: () => _raidLedger.DefeatedCount(),
+            popOut: () => ShowProgressWindow(),
+            bringWindowForward: () => _progressWindow?.Activate());
+        _sections["progress"] = _progressCard;
         ToolTip.SetTip(_sections["progress"],
-            "Open Progress - experience and AAs, coin and motes, faction standing, and "
-            + "the raid targets you've cleared");
+            "Progress - experience and AAs, coin, faction standing, and the raid targets "
+            + "you've cleared. Expands in place; the arrow opens its window.");
         // MOTES IS A CARD AGAIN (David, 2026-08-21), hidden by default -
         // AppSettings.MigrateMotesCard puts it in HiddenSections once, so nobody's widget
         // grows a row on update and the eye in Options is the switch. Its star comes back
@@ -2096,6 +2126,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     {
         RefreshOptionalSectionVisibility(s);
 
+        // The Progress theme's inline card (PR B). Render() checks placement itself: a
+        // collapsed card costs nothing, and a theme whose body is in its window is that
+        // window's to paint.
+        _progressCard?.Render(s);
+
         if (_sections["combat"].IsExpanded)
         {
             var acc = s.HitCount + s.MissCount > 0 ? (double)s.HitCount / (s.HitCount + s.MissCount) * 100 : 0;
@@ -2269,6 +2304,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     // from DebugFacts() rather than the widget guessing at controls it no
                     // longer owns.
                     $"{_progressWindow?.DebugFacts() ?? ""} " +
+                    // The inline theme card's half of the story (PR B) — only one of the
+                    // two hosts is ever reporting, same contract as the WPF dump.
+                    (_progressCard is { IsExpanded: true }
+                        ? $"progressInline=1 progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
+                          $"progressTabs={_progressCard.TabCount} "
+                        : "progressInline=0 ") +
                     $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} " +
                     $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
                 File.WriteAllText(AppPaths.File("debug.txt"), dump);
@@ -3320,6 +3361,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private QuestsWindow? _questsWindow;
     private ProgressWindow? _progressWindow;
 
+    /// <summary>The Progress theme's placement state machine — one owner of the body
+    /// (UI.Shared/ThemeHost; Inline themes PR B). The card and the window are both its
+    /// outputs, never its inputs.</summary>
+    private readonly ThemeHost<ProgressTab> _progressHost = new(ProgressTab.Experience);
+    private ThemeCardPanel<ProgressTab> _progressCard = null!;
+
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
 
@@ -3327,6 +3374,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// hosts have no other place to be asserted on since the fold, and this build has no
     /// E2E suite at all (docs/TestPlan.md).</summary>
     internal ProgressWindow? ProgressWindowForTests => _progressWindow;
+    internal ThemeCardPanel<ProgressTab> ProgressCardForTests => _progressCard;
 
     /// <summary>Is the Progress window open and showing this tab? The render guards ask
     /// this where they used to ask "is this card expanded" — same rule either way: a
@@ -3377,23 +3425,36 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// the only way to reach five surfaces that used to be five cards.</summary>
     internal void ShowProgressWindow(string? tab = null)
     {
+        // The host learns the room BEFORE the window is built, and the CARD gives the
+        // body up — same handshake as the WPF twin, and the reason nothing can put one
+        // theme in two hosts at once.
+        _progressHost.OpenWindow(ProgressSurface.TabForKey(tab));
         // Same reopen contract as every satellite here: a null field means closed for
         // real (Avalonia's Show() throws on a closed window).
         if (_progressWindow is null)
         {
             var window = new ProgressWindow(this);
+            // The window's own tab changes reach the host, or "closing the window hands
+            // the tab back to the card" is only true for a player who never switched.
+            window.TabChanged += t => _progressHost.SelectTab(t);
             window.Closed += (_, _) =>
             {
                 if (ReferenceEquals(_progressWindow, window)) _progressWindow = null;
                 // The stars went with it. Leaving dead controls in the table would have
                 // UpdateStarVisuals painting buttons in a torn-down window forever.
                 foreach (var key in new[] { "xp", "money", "motes" }) _stars.Remove(key);
+                // Collapsed, never back to Inline (ThemeHost's rule; Bevel's "close
+                // leaves collapsed").
+                _progressHost.WindowClosed();
+                _progressCard?.Sync();
             };
             _progressWindow = window;
         }
         _progressWindow.Show();
         if (tab is { Length: > 0 }) _progressWindow.SetTab(tab);
+        else _progressWindow.SetTab(ProgressSurface.KeyFor(_progressHost.SelectedTab));
         _progressWindow.Activate();
+        _progressCard?.Sync();
         // Paint the tab NOW rather than on the next tick: opening a surface and staring
         // at an empty one is the field report that made the WPF widget render on expand.
         var snap = CurrentSnapshot();

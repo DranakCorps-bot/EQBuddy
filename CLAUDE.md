@@ -1424,8 +1424,8 @@ defaults to column 0.
 
 → **A capture surface needs `EQBUDDY_APPDATA` isolation MORE than an assertion does**, since
 its entire output is a picture of whatever profile it finds. Mirror `WidgetRenderTests`'
-constructor. And note `EQBUDDY_EXPAND` is **not** at parity: WPF takes card keys
-(`loot,motes`), Avalonia takes only `1`.
+constructor. `EQBUDDY_EXPAND` reached parity on 2026-08-26 (Inline themes PR B): both
+lanes take `1`, card keys (`loot,motes`), and a theme's room (`progress:raids`).
 
 ## Working on EQBuddy Mobile
 
