@@ -16,6 +16,76 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### expand / minimize cursor miss starts a new session
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** WIDGET. Mini dashboard expand vs the full title bar (Settings / Start a new session / Minimize). Not a pop-out window. Not the phone. Not Gate 5 overlay. Not a group meter. Not PR #238 / unreleased 1.99.11 pop-out resize.
+- **Source:** #239 disberon Aug 25, 6:33 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/239 New thread. 0 replies. Footer: EQBuddy 1.99.10 · Windows 26200.
+- **Ask:** "Can you make it so when you hit the expand button, it stays aligned with the minimize button? Right now when I hit expand the cursor is over settings/start new session and habitually I may just click again to minimize and instead i click start new session."
+- Thank you.
+- **Already shipped:** both controls exist on 1.99.10. Mini bar: Expand (`OnRestore`, tooltip "Expand (or double-click)") then Close (`MainWindow.xaml:78–81`). Full title bar, left to right after the character name: feedback, Mobile, Settings (`GearBtn`), Start a new session (`ResetButton`), Minimize to dashboard (`OnMinimize`), Close (`MainWindow.xaml:159–172`). Latest tag is still v1.99.10.
+- **Checked:** WIDGET chrome in `MainWindow.xaml`. I could not check window / phone. I did not run the binary, so I did not watch the cursor after expand. No screenshot.
+- **Hypothesis, unchecked against a running widget:** after expand, MiniRoot hides and NormalRoot’s title bar is wider, so the same cursor spot is no longer over Minimize — it lands on Settings or Start a new session.
+- **Class:** V0–V1 likely (localized layout / hit-target). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/239#discussioncomment-18154931
+- **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting, not authorized. Thank-you may post. V0–V1 hit-target. Do not implement tonight.
+
+### Reddit: resize this window (hateborne, harvest-only)
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+- **Place:** unknown EQBuddy window. Screenshot attached on Reddit; Scribe did not open it, so could not name widget / window / phone. Not a group meter. Nearby #50 is Linux/Avalonia resize parity — same theme, not the same report. Do not fold without the shot. PR #238 / unreleased 1.99.11 pop-out resize is collaborator work, not this ask.
+- **Source:** u/hateborne r/EQLegends Aug 25, 6:14 AM CT on `1vkwbol`. https://www.reddit.com/r/EQLegends/comments/1vkwbol/eqbuddy_update/p5s3r9u/ Harvest-only. Stay off 1v0c37a.
+- **Ask:** "Is there some way to resize this window that I am overlooking?"
+- **Already shipped:** latest tag v1.99.10. 1.99.11 pop-out resize is unreleased / not a tag.
+- **Checked:** screenshot not opened. Could not check widget / window / phone.
+- **Class:** V0–V1 if it is one window’s resize grip. Leave it if the shot shows something else.
+- **Helm 2026-08-25 7:01 PM CT:** Signed harvest-only. No Reddit reply.
+
+### Avalonia window resizing parity
+- **Priority:** waiting (reporter answered the Linux test; leftover is the table below. Not authorized.)
+- **Place:** Avalonia windows. Desktop Linux. Not Gate 5 overlay. Not a group meter. Nearby “Avalonia has no Watch or Loot breakout window” is a different ask (missing Watch/Loot kinds, not resize) — do not file this there.
+- **Source:** #50 DonThompson opened Aug 7. https://github.com/DranakCorps-bot/EQBuddy/issues/50 Still open. He could not run Windows to compare.
+- **Ask (original):** Avalonia window resizing parity. Two questions: is it just Main and Options that resize; does text scale as you resize.
+- **Already shipped (WPF, Claude 12:22 PM CT Aug 25, issuecomment-5414122014 — Claude, not a new ask):** Progress / Quests / Gear & Loot / Kills & Drops resize yes, remember yes; Spawns / Travel / Session history / Fight timeline yes/yes; Breakouts yes/yes (own save path); Map / wiki pack yes / no; Options no (width grip); Main widget / chips / alerts no. That is the WPF table. 1.99.11 pop-out resize is unreleased / not a tag. Latest tag still v1.99.10.
+- **Follow-up Aug 25, 5:41 PM CT:** DonThompson on #50, issuecomment-5417846142. Linux/Avalonia test. Verbatim:
+
+  Quests - Not resizable.
+  Gear & Loot - Not resizable.
+  Kills & Drops - Not resizable.
+  Travel Route - Not resizable.
+  Zone Map -- Resizes yes, remember no.
+  Session History -- resizes yes, remember no.
+  Options -- Resizes horizonally yes, vertically no (it's naturally ~90% of height).  Remember yes.
+
+- He did not list Progress, Spawns, Fight timeline, breakouts, wiki pack, Item info, or the main widget.
+- **Checked:** did not run Avalonia. Named SOURCE is his Linux table against Claude’s WPF table on the same issue.
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/50#issuecomment-5418689964
+- **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting leftover is Avalonia vs WPF table. Thank-you may post. Not authorized.
+
+### Avalonia parity through 1.37.0 (or maybe 1.42)
+- **Priority:** done / closed (Don closed it himself Aug 25, 5:44 PM CT. Was waiting on him.)
+- **Place:** Avalonia parity lane. Not Gate 5. Not a group meter.
+- **Source:** #66 DonThompson opened Aug 8. https://github.com/DranakCorps-bot/EQBuddy/issues/66 Closed by DonThompson 5:44 PM CT. https://github.com/DranakCorps-bot/EQBuddy/issues/66#issuecomment-5417877017
+- **Ask (original):** Avalonia parity through 1.37.0 (or maybe 1.42). Claude on Aug 15 asked him to say whether v1.84.0 still left a residual list; would not close it from the WPF side.
+- **Follow-up Aug 25, 5:44 PM CT:** DonThompson. "I'm good with closing. The latest version builds and runs. Those new areas appear to be working at a quick glance (I didn't spend a ton of time testing them)."
+- He closed the issue himself.
+- The glance caveat is his: he did not spend a ton of time testing the new areas.
+- **Already shipped:** v1.84.0 claimed parity through v1.80/1.81 (Claude on this thread, Aug 15). Latest tag is v1.99.10.
+- **Checked:** issue state is closed; closed_by DonThompson at 2026-08-25T22:44:27Z (verified).
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/66#issuecomment-5418690054
+- **Helm 2026-08-25 7:01 PM CT:** Signed done/closed. Thank-you may post. Keep the glance caveat.
+
+### Avalonia Options window and High DPI
+- **Priority:** waiting (he answered; leftover is no high-DPI test. Not authorized.)
+- **Place:** Avalonia Options window. Desktop Linux. Not Gate 5 overlay. Not a group meter. Not #50’s resize table (same reporter, different ask).
+- **Source:** #53 DonThompson opened Aug 7. https://github.com/DranakCorps-bot/EQBuddy/issues/53 Still open. Claude Aug 15 asked him to open Options on a high-DPI display with v1.84.0 and say whether the bottom of the panel is reachable.
+- **Ask (original):** Avalonia Options at high DPI — WPF had a 300% / 4K-TV case where the panel filled the screen and the lower half was unreachable; Claude thought v1.84.0 bounded-and-scrolled it, and asked him to confirm on his display.
+- **Follow-up Aug 25, 5:45 PM CT:** DonThompson, issuecomment-5417886138. "I don't have a high DPI display to test this. It works fine on my normal laptop screen."
+- He answered. He does not have a high-DPI display. The high-DPI case is still untested. The normal-laptop claim is only that screen.
+- **Already shipped:** Claude Aug 15: Avalonia Options clamps `MaxHeight` to the working area / scale and the body scrolls (v1.84.0). That is his claim, not a high-DPI confirmation. Latest tag still v1.99.10.
+- **Checked:** could not check widget / window / phone on a high-DPI display. No screenshot. No scale factor.
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/53#issuecomment-5418690131
+- **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting leftover is no high-DPI test. Thank-you posted. Not authorized.
+
 ### false "slowed by 60%" on Shaman / Shadowknight / Ranger
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** the player's own slow status. Overlay slow chip + spoken slow alert. Not shared game truth / eqlwiki. Not a group meter. Nearby #94 (chip icon) and the Reddit mute-the-slow-sound item — different asks; do not restore them.
