@@ -473,11 +473,13 @@ public sealed class AppSettings
     // the class combination, shown in its own header.
     public double BreakoutBuffsLeft { get; set; } = double.NaN;
     public double BreakoutBuffsTop { get; set; } = double.NaN;
-    /// <summary>The Progress breakout (LW, 2026-08-17): the expanded Progress card as
-    /// a floating window while minimized, opened by the 📈 star. No Fight/Session
-    /// scope — xp, skill-ups and AAs are session-shaped by nature.</summary>
-    public double BreakoutProgressLeft { get; set; } = double.NaN;
-    public double BreakoutProgressTop { get; set; } = double.NaN;
+    // BreakoutProgressLeft/Top/Width/Height were deleted 2026-08-25 with the Progress
+    // breakout itself (Bevel's fold): the xp chip opens the Progress WINDOW now. They were
+    // ORPHANS for a few minutes — neither read nor written — and nothing would have caught
+    // them: DeadSettingTests scans for settings READ but never written, so a setting with
+    // no reader AND no writer is its blind spot. Removing the properties is safe for
+    // existing profiles because AppSettings' JsonSerializerOptions leaves
+    // UnmappedMemberHandling at its default, so the leftover keys are simply skipped.
     /// <summary>"target" (drops for the creature you're fighting or last /considered) or
     /// "session" (what you've looted).</summary>
     public string BreakoutLootScope { get; set; } = "target";
@@ -496,8 +498,6 @@ public sealed class AppSettings
     public double BreakoutLootHeight { get; set; } = double.NaN;
     public double BreakoutBuffsWidth { get; set; } = double.NaN;
     public double BreakoutBuffsHeight { get; set; } = double.NaN;
-    public double BreakoutProgressWidth { get; set; } = double.NaN;
-    public double BreakoutProgressHeight { get; set; } = double.NaN;
     // Per-breakout row sort for the stat kinds: "total" | "hits" | "avg" | "rate".
     public string BreakoutDamageSort { get; set; } = "total";
     public string BreakoutHealingSort { get; set; } = "total";
