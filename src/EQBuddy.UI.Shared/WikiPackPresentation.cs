@@ -34,6 +34,14 @@ public static class WikiPackPresentation
         PageMissing,
         PageHasNoLoot,
         NewToPage,
+        /// <summary>A contribution that is NOT loot (Bevel, Helm-signed 2026-08-23): the
+        /// game's own /consider called this creature rare, its page already has every
+        /// drop it produced (or it dropped only motes), and the description-field paste
+        /// is the whole edit. Its own kind rather than a reuse of
+        /// <see cref="PageHasNoLoot"/>/<see cref="NewToPage"/>, because those claim the
+        /// page is missing loot and this claims nothing about the page at all — EQBuddy
+        /// cannot read the description, so the row's tip says ADD, never replace.</summary>
+        RareConfirmed,
         /// <summary>The title resolved to an article that is not a creature page at all.
         /// NOT a contribution — it sits with <see cref="Pending"/> at the bottom — but it
         /// has to be SHOWN, because it is the one row the player can act on and EQBuddy
@@ -72,7 +80,15 @@ public static class WikiPackPresentation
         /// alternative is telling the player "no loot recorded this session yet", which is
         /// false and reads as EQBuddy having missed their kills (Fable 5, v1.99.5 review).
         /// </summary>
-        int NothingSuggestableCreatures);
+        int NothingSuggestableCreatures,
+        /// <summary>Creatures whose only contribution is the con-rarity fact — no loot the
+        /// wiki lacks, but the game itself said "a rare creature" and the page can carry
+        /// that. Its own count because it is not an ITEM: folding it into
+        /// <see cref="Contributions"/> would make the headline claim drops that do not
+        /// exist, and ignoring it would let the headline say "nothing to contribute" over
+        /// a row that plainly contributes (Bevel's #226 rule: two different states must
+        /// not read alike).</summary>
+        int RareOnlyCreatures = 0);
 
     /// <summary>The status words, once, so the two desktops cannot spell them differently.</summary>
     public static string KindLabel(RowKind kind) => kind switch
@@ -80,6 +96,7 @@ public static class WikiPackPresentation
         RowKind.PageMissing => "no wiki page",
         RowKind.PageHasNoLoot => "page lists no loot",
         RowKind.NewToPage => "new to the page",
+        RowKind.RareConfirmed => "rare spawn confirmed",
         RowKind.NotACreaturePage => "not a creature page",
         _ => "not checked yet",
     };
@@ -92,6 +109,13 @@ public static class WikiPackPresentation
             "The page exists but records no loot, so everything you looted is news to it.",
         RowKind.NewToPage =>
             "The page exists and lists loot, but not these items.",
+        RowKind.RareConfirmed =>
+            "The game's own /consider called this creature \"a rare creature\", and its " +
+            "page already has every drop it produced — so the rarity IS the contribution. " +
+            "The paste goes in the page's description field (the wiki's stopgap until " +
+            "{{Namedmobpage}} grows a rare-spawn field, confirmed with the admins on " +
+            "#217), and it is an ADD: EQBuddy cannot read what the description already " +
+            "says, so never replace what is written there.",
         RowKind.NotACreaturePage =>
             "The wiki answered with an article that is not a creature page — no " +
             "{{Namedmobpage}} on it — so this is almost certainly the wrong page for the " +
@@ -119,6 +143,7 @@ public static class WikiPackPresentation
         RowKind.PageMissing => "GoodBrush",
         RowKind.PageHasNoLoot => "AccentBrush",
         RowKind.NewToPage => "AccentBrush",
+        RowKind.RareConfirmed => "AccentBrush",
         // Not dim: this is the one row that needs a person to look at it.
         RowKind.NotACreaturePage => "BadBrush",
         _ => "DimBrush",
@@ -131,6 +156,19 @@ public static class WikiPackPresentation
         var rows = new List<PackRow>();
         int pagesMissing = 0, pagesNoLoot = 0, newDrops = 0, pending = 0, known = 0;
         var nothingSuggestable = 0;
+        var rareOnly = 0;
+
+        // The rare-only row, in ONE place for the two branches that used to drop the fact
+        // (all-loot-known, and motes-only). Mirrors WikiContribution.BuildExport's own
+        // check so what you see is what you copy.
+        bool TryRareRow(MobSummary mob, MobLookupResult? lookup)
+        {
+            if (!WikiContribution.EarnsRareOnlyRow(mob, lookup)) return false;
+            rareOnly++;
+            rows.Add(new PackRow(mob.Name, mob.Kills, RowKind.RareConfirmed, 0,
+                WikiContribution.RareSpawnRowNote(mob) ?? "rare"));
+            return true;
+        }
 
         foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
         {
@@ -143,8 +181,12 @@ public static class WikiPackPresentation
                 .Where(l => WikiContribution.SuggestableToWiki(l.Item))
                 .ToList();
             // It DID drop something; there is just nothing here a creature page should
-            // carry. Counted so the empty state can say that instead of "no loot".
-            if (suggestable.Count == 0) { nothingSuggestable++; continue; }
+            // carry — unless the game conned it rare, which is a contribution of its own.
+            if (suggestable.Count == 0)
+            {
+                if (!TryRareRow(mob, lookup)) nothingSuggestable++;
+                continue;
+            }
 
             var classified = suggestable
                 .Select(l => WikiContribution.Classify(lookup, l.Item))
@@ -169,13 +211,19 @@ public static class WikiPackPresentation
 
             if (news == 0)
             {
-                // Nothing to contribute. Only worth a row if the reason is "we could not
-                // look", never if the reason is "the wiki already has it".
+                // Nothing LOOT can contribute. A row only if the reason is "we could not
+                // look" (never claimed as "nothing new"), or if the game conned it rare —
+                // the fact this kind exists to stop being dropped. Unknown first: an
+                // unread page gets no claim of any kind, rare included.
                 if (classified.Any(s => s == WikiDropStatus.Unknown))
                 {
                     pending++;
                     rows.Add(new PackRow(mob.Name, mob.Kills, RowKind.Pending, 0,
                         "wiki page not read"));
+                }
+                else
+                {
+                    TryRareRow(mob, lookup);
                 }
                 continue;
             }
@@ -207,7 +255,10 @@ public static class WikiPackPresentation
         });
 
         return new Pack(rows,
-            Creatures: rows.Count(r => r.Kind != RowKind.Pending),
+            // Not the rare-only rows: this count feeds "N items across M creatures", and a
+            // creature contributing zero items would make that sentence claim drops that
+            // do not exist. The rare rows have their own count and their own clause.
+            Creatures: rows.Count(r => r.Kind is not RowKind.Pending and not RowKind.RareConfirmed),
             Contributions: rows.Sum(r => r.Contributions),
             PagesMissing: pagesMissing,
             PagesWithoutLoot: pagesNoLoot,
@@ -215,7 +266,8 @@ public static class WikiPackPresentation
             PendingCreatures: pending,
             KnownDrops: known,
             WrongArticleCreatures: rows.Count(r => r.Kind == RowKind.NotACreaturePage),
-            NothingSuggestableCreatures: nothingSuggestable);
+            NothingSuggestableCreatures: nothingSuggestable,
+            RareOnlyCreatures: rareOnly);
     }
 
     /// <summary>The one line that stops the scope being silent — the whole reason this is a
@@ -239,10 +291,20 @@ public static class WikiPackPresentation
             return pack.WrongArticleCreatures == 1
                 ? "1 creature's wiki page isn't the creature"
                 : $"{pack.WrongArticleCreatures} creatures' wiki pages aren't the creature";
-        if (pack.Contributions == 0) return "Nothing to contribute yet";
+        // A rare-only pack is a real contribution with zero ITEMS — the headline counts it
+        // (Bevel, Helm-signed 2026-08-23) rather than calling the session empty.
+        var rare = pack.RareOnlyCreatures switch
+        {
+            0 => "",
+            1 => "1 rare-spawn confirmation",
+            var n => $"{n} rare-spawn confirmations",
+        };
+        if (pack.Contributions == 0)
+            return rare.Length > 0 ? $"{rare} for the wiki" : "Nothing to contribute yet";
         var items = pack.Contributions == 1 ? "1 item" : $"{pack.Contributions} items";
         var mobs = pack.Creatures == 1 ? "1 creature" : $"{pack.Creatures} creatures";
-        return $"{items} across {mobs} the wiki doesn't have";
+        return $"{items} across {mobs} the wiki doesn't have"
+            + (rare.Length > 0 ? $" · {rare}" : "");
     }
 
     /// <summary>The sub-line: where the value is concentrated, so a player can tell a pack
@@ -256,6 +318,8 @@ public static class WikiPackPresentation
             parts.Add($"{pack.PagesWithoutLoot} whose page lists no loot");
         if (pack.NewDrops > 0)
             parts.Add($"{pack.NewDrops} with new drops for an existing page");
+        if (pack.RareOnlyCreatures > 0)
+            parts.Add($"{pack.RareOnlyCreatures} confirmed rare via /consider");
         return string.Join(" · ", parts);
     }
 
@@ -301,8 +365,9 @@ public static class WikiPackPresentation
     private static string Creatures(int n) => n == 1 ? "1 creature" : $"{n} creatures";
 
     /// <summary>Copy is offered only when there is something to paste. A button that copies
-    /// a header and nothing else is a silent no-op.</summary>
-    public static bool CanCopy(Pack pack) => pack.Contributions > 0;
+    /// a header and nothing else is a silent no-op. A rare-only pack has a paste — the
+    /// description-field ADD — so it copies too.</summary>
+    public static bool CanCopy(Pack pack) => pack.Contributions > 0 || pack.RareOnlyCreatures > 0;
 
     public static string CopyTip(Pack pack) => CanCopy(pack)
         ? "Copy paste-ready eqlwiki edits for everything listed, each with a direct edit " +

@@ -145,6 +145,39 @@ public static class WikiContribution
               + $"{mob.Considers} {cons}";
     }
 
+    /// <summary>The row-sized form of <see cref="RareSpawnNote"/> — same two numbers, same
+    /// all-vs-some distinction, few enough characters for a pack row's note column. One
+    /// fact, two lengths, both built from the same fields so they cannot disagree.</summary>
+    public static string? RareSpawnRowNote(MobSummary mob)
+    {
+        if (mob.RareConsiders <= 0) return null;
+        return mob.RareConsiders >= mob.Considers
+            ? $"rare on {(mob.Considers == 1 ? "your one /consider" : $"all {mob.Considers} /considers")}"
+            : $"rare on {mob.RareConsiders} of {mob.Considers} /considers";
+    }
+
+    /// <summary>
+    /// Does this creature earn a RARE-ONLY contribution — a section (and a pack row) whose
+    /// contribution is the con-rarity fact rather than loot?
+    ///
+    /// The gap this closes (Bevel, Helm-signed 2026-08-23): a rare-conned named whose wiki
+    /// page already carries all its drops produced NOTHING — <see cref="WriteRareSpawn"/>
+    /// only ever rode along on mobs that qualified through loot, so the fact was dropped
+    /// for exactly the creature most likely to be a known named. Same for a named whose
+    /// only drops were motes.
+    ///
+    /// The conditions are the honest ones, each with a reason:
+    /// <list type="bullet">
+    /// <item>The game called it rare (<see cref="RareSpawnNote"/> non-null) — never inferred.</item>
+    /// <item>The page was READ and is a creature page. An unread page stays Pending
+    /// (nothing is claimed about a page we could not see), and a lore article must not be
+    /// offered a description edit any more than a loot table (#226's split).</item>
+    /// </list>
+    /// </summary>
+    public static bool EarnsRareOnlyRow(MobSummary mob, MobLookupResult? lookup) =>
+        RareSpawnNote(mob) is not null
+        && lookup is { Mob: { IsCreaturePage: true } };
+
     /// <summary>One creature's worth of input: the session summary plus whatever the
     /// Target-Drops lookup already knows about its wiki page (null = never looked up).</summary>
     public readonly record struct MobObservation(MobSummary Mob, MobLookupResult? Lookup);
@@ -178,7 +211,21 @@ public static class WikiContribution
             if (news.Count == 0)
             {
                 if (mob.Loot.Any(l => Classify(lookup, l.Item) == WikiDropStatus.Unknown))
+                {
                     unknown.Add(mob.Name);
+                }
+                // The rare-only contribution (Bevel, Helm-signed 2026-08-23): everything
+                // it looted is already on its page (or was only motes), and the game
+                // itself called it rare. The con fact is still news the pack can carry —
+                // dropping it here dropped it for exactly the creature most likely to be
+                // a known named. Behind the Unknown check on purpose: an unread page gets
+                // no claim of any kind.
+                else if (EarnsRareOnlyRow(mob, lookup))
+                {
+                    wroteAny = true;
+                    WriteRareOnlySection(sb, mob,
+                        lookup?.Mob?.PageTitle is { Length: > 0 } t ? t : mob.Name);
+                }
                 continue;
             }
             wroteAny = true;
@@ -343,6 +390,30 @@ public static class WikiContribution
         sb.AppendLine("never replace what is already written there:");
         sb.AppendLine();
         sb.AppendLine("  " + RareSpawnDescription);
+    }
+
+    /// <summary>
+    /// A section whose whole contribution is the con-rarity fact (Bevel, Helm-signed
+    /// 2026-08-23): the creature's loot is already on its page, so the loot machinery has
+    /// nothing to say — and used to say nothing at all, dropping the rarity for exactly
+    /// the creature most likely to be a known named.
+    ///
+    /// The heading claims what EQBuddy KNOWS, not what the page lacks:
+    /// <see cref="EqlWikiMobs"/> does not read <c>description</c>, so whether the page
+    /// already says "rare" is the player's to check — which is why the paste block
+    /// (<see cref="WriteRareSpawn"/>, reused verbatim — ADD, both counts, said once) leads
+    /// with the instruction to add rather than replace.
+    /// </summary>
+    private static void WriteRareOnlySection(StringBuilder sb, MobSummary mob, string pageTitle)
+    {
+        sb.AppendLine();
+        sb.AppendLine($"=== {pageTitle} — rare spawn confirmed via /consider ===");
+        sb.AppendLine("Nothing it dropped is missing from its page — the contribution here is the");
+        sb.AppendLine("rarity itself. If the description already says it, there is nothing to do.");
+        sb.AppendLine("Edit page:  " + EditUrl(pageTitle));
+        WriteRareSpawn(sb, mob);
+        sb.AppendLine();
+        sb.AppendLine("Suggested edit summary: rare spawn confirmed via /consider.");
     }
 
     /// <summary>The observed stat block (#65, Frankthetankk's field list): zone at

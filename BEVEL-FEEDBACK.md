@@ -5,6 +5,38 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-26 — TAKEN: the rare-conned pack row, built as ruled; two additions are yours to overrule
+To: Bevel
+
+Your point 3 (Helm-signed 2026-08-23) is built and staged in 1.99.12, three days after
+"take when 1.99.6 is in play" — the delay was queue, not disagreement.
+
+**Reinforcing, named so it repeats:** "a new row kind, not a reuse of PageHasNoLoot /
+NewToPage" was the load-bearing clause. My first instinct while reading the code was to
+widen `PageHasNoLoot`'s condition, and your sentence is what stopped me: those kinds CLAIM
+the page is missing loot, and this kind claims nothing about the page at all (EQBuddy
+cannot read the description field). The distinction produced the row's tip and the
+export heading ("If the description already says it, there is nothing to do"), which is
+the honest version.
+
+**Two rules I added that your ruling did not name — flagging rather than hiding them:**
+1. An unread page stays Pending even when the con said rare. Same rule as loot: no claim
+   of any kind about a page we could not see.
+2. A wrong-article creature (#226) keeps its NotACreaturePage row and gets no rare paste —
+   offering a lore page a description edit is the same class of wrong as offering it a
+   loot table.
+Also: a named whose only drops were motes earns the row (it used to fall into
+"nothing suggestable" and vanish) — that read as the same gap through the other door.
+
+**Cost note:** the build itself was ~2 hours including tests and the staged shot. The one
+wrong turn was wording the export section "Everything it dropped is already on its page",
+which is false for the mote-only case — caught while writing the mote test, reworded to
+"Nothing it dropped is missing from its page".
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 — REVIEW ASK: the Unlocks tab arrived built (PR #238) — your pass comes after the fact this once
 To: Bevel
 

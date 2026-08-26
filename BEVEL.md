@@ -125,13 +125,19 @@ affordance that lies. Both are yours to overrule; the screenshots are
 both counts** — the window did have two lists, and `UnlockClasses` was quest picks first.
 
 ## Raids import report + pack rare row (Helm-signed 2026-08-23 6am)
-Unreleased 1.99.6. Not a hold. Do not reopen signed Raids/Wealth/Sold+Motes or wrong-article split.
 
-1. Raids stays the host for "I just typed the command." Sky clauses on that report are a Quest-Tracker job being read on a raid-clear list. Same ImportReportView (or the Sky clauses) also belongs on Sky. Not Raids-only.
-2. Each clause names a different false-broken-import. Do not cut one. Glance is "something happened, here's Undo." Why it skipped or failed to match is a second job behind hover (short line + tooltip), same shape as the 1.99.1 caption call. Prefer that over three sentences on the card.
-3. Pack is still a loot-contribution surface. A rare-conned named whose wiki already has drops produces nothing. That is a new row kind (a contribution that is not loot), not a reuse of PageHasNoLoot / NewToPage. The paste block that shipped stays (ADD, both counts, said once).
-
-David: none for a product fork. Executor: take when 1.99.6 is in play.
+**TAKEN in full — point 3, the last one open, BUILT 2026-08-26 (Claude), staged in 1.99.12.**
+Points 1–2 shipped with 1.99.6 (Sky hosts the report too; short line + tooltip). Point 3 is
+`RowKind.RareConfirmed` exactly as ruled: its own kind, not a reuse of
+PageHasNoLoot/NewToPage; the shipped ADD paste block reused verbatim (both counts, said
+once); the headline counts it. Two honesty rules you did not spell out and I added, yours
+to overrule: an UNREAD page stays Pending even when the con said rare (no claim of any kind
+about a page we could not see), and a lore article is never offered the description paste
+(#226's split applied to the new kind). The mote-only rare-conned named earns the row too —
+same gap, other door. Evidence: `docs/screenshots/wiki-pack.png` re-shot with the state
+staged (Asp: complete page, "rare on 1 of 4 /considers"); prediction written first, one
+explained deviation (the fixture log already carried two plain asp cons). Full note in
+`BEVEL-FEEDBACK.md`.
 
 ## Wrong-article Drops/pack copy (Helm-signed 2026-08-22 1pm)
 **DONE — verified in source 2026-08-22 (Claude), including the polish line.** Heading tooltip carries "Open it, then find the creature's own page" in BOTH UIs (`src/EQBuddy/DropsCardView.cs:194`, `src/EQBuddy.Avalonia/DropsCardView.cs:217`); `WikiPackPresentation` keeps `NotACreaturePage` its own RowKind with its own note and no Copy, and `Headline`/`EmptyText` already refuse to call a wrong-article session "nothing to contribute". **The do-not rulings below stand** — they are why the code looks like this; nothing here is open work.

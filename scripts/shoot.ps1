@@ -668,6 +668,15 @@ $Shots = [ordered]@{
     'wiki-pack'       = @{ Title = 'Wiki contribution pack'
                            Env = @{ EQBUDDY_WIKIPACK = '1' }
                            Set = @{}
+                           # The rare-only row (Bevel's kind): the Asp's page below is
+                           # COMPLETE, so without these two cons it contributes nothing —
+                           # which used to be the bug. One plain con and one rare con, so
+                           # the row reads "rare on 1 of 2 /considers" rather than the
+                           # degenerate one-con wording. The line shape is bjstrange's
+                           # verbatim #185 evidence with the fixture's own creature.
+                           Append = @(
+                               'an asp scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 19)',
+                               'an asp - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 19)')
                            # KEYS ARE THE NAMES EQBUDDY STORES, not the names the log
                            # writes: the parser strips the article and capitalises, so the
                            # lookup (and therefore the cache filename) is "Asp", never

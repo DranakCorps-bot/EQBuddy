@@ -77,6 +77,7 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | **A contribution pack names the zone the creature died in, everywhere in the entry** | **Auto** — `WikiContributionTests` (#65) |
 | Rarity labels only appear from 10+ kills | **Auto** — `WikiContributionTests` |
 | **A creature whose wiki page could not be read is reported as "not checked yet", never counted as a contribution and never worded as "nothing new"** | **Auto** — `WikiPackPresentationTests`, `WikiPackRenderTests` (#217) |
+| **A rare-conned named whose page already has every drop still contributes — the rarity itself** (Bevel, Helm-signed 2026-08-23): its own row kind and export section, the description-field ADD with both counts, headline counted, Copy live; an unread page stays Pending and a lore article is never offered the paste | **Auto** — `WikiPackPresentationTests` (rare-only cases) |
 | An empty contribution pack distinguishes its three causes: nothing looted, the wiki already has it, or the lookups have not landed | **Auto** — `WikiPackPresentationTests` (#217) |
 | The contribution pack surface says what it pooled — this session, named character — rather than copying a silent scope | **Auto** — `WikiPackPresentationTests` (rule), `WikiPackRenderTests` (on screen); **Visual** — `shoot.ps1 -Shot wiki-pack` |
 | Copy is offered only when there is something to paste, and a disabled Copy LOOKS disabled | **Auto** — `WikiPackPresentationTests`, `WikiPackRenderTests` (trap 17) |

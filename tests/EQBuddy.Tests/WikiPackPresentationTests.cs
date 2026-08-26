@@ -293,4 +293,116 @@ public class WikiPackPresentationTests
         Assert.Equal(0, pack.Contributions);
     }
 
+    // ---- the rare-only row (Bevel, Helm-signed 2026-08-23): a contribution that is
+    // not loot. The gap: a rare-conned named whose page already had every drop produced
+    // NOTHING — dropped for exactly the creature most likely to be a known named. ----
+
+    private static MobSummary RareMob(string name, int kills, int considers, int rare,
+        params string[] loot) =>
+        Mob(name, kills, loot) with { Considers = considers, RareConsiders = rare };
+
+    [Fact]
+    public void ARareConnedNamedWithAllKnownLootEarnsItsOwnRow()
+    {
+        var pack = Build((RareMob("Magus Rokyl", 1, 2, 2, "Rokyl's Robe"),
+            Page("Rokyl's Robe")));
+
+        var row = Assert.Single(pack.Rows);
+        Assert.Equal(WikiPackPresentation.RowKind.RareConfirmed, row.Kind);
+        Assert.Equal(0, row.Contributions);
+        Assert.Equal("rare on all 2 /considers", row.Note);
+        Assert.Equal(1, pack.RareOnlyCreatures);
+        // The headline counts it (the ruling's own words) — not "Nothing to contribute".
+        Assert.Equal("1 rare-spawn confirmation for the wiki",
+            WikiPackPresentation.Headline(pack));
+        Assert.Contains("1 confirmed rare via /consider", WikiPackPresentation.Breakdown(pack));
+        // And the paste exists, so Copy is live.
+        Assert.True(WikiPackPresentation.CanCopy(pack));
+    }
+
+    [Fact]
+    public void AMoteOnlyRareConIsARareRowNotANothingSuggestable()
+    {
+        var pack = Build((RareMob("Lesser blade fiend", 1, 1, 1, "Mote of Potential"),
+            Page()));
+
+        Assert.Equal(WikiPackPresentation.RowKind.RareConfirmed,
+            Assert.Single(pack.Rows).Kind);
+        Assert.Equal(0, pack.NothingSuggestableCreatures);
+    }
+
+    /// <summary>An unread page gets no claim of any kind — rare included. Pending wins,
+    /// exactly as it does for loot.</summary>
+    [Fact]
+    public void AnUnreadPageStaysPendingEvenWhenTheConSaidRare()
+    {
+        var pack = Build((RareMob("Magus Rokyl", 1, 2, 2, "Rokyl's Robe"), Offline));
+
+        Assert.Equal(WikiPackPresentation.RowKind.Pending, Assert.Single(pack.Rows).Kind);
+        Assert.Equal(0, pack.RareOnlyCreatures);
+    }
+
+    /// <summary>A lore article must not be offered a description edit any more than a
+    /// loot table — the wrong-article row wins and no rare paste is suggested.</summary>
+    [Fact]
+    public void AWrongArticleStaysWrongArticleEvenWhenTheConSaidRare()
+    {
+        var lore = new MobLookupResult(new MobInfo
+        {
+            IsCreaturePage = false,
+            Name = "Innoruk",
+            PageTitle = "Innoruk (Lore)",
+        }, ItemLookupState.Cached, DateTime.UtcNow);
+        var pack = Build((RareMob("Innoruk", 1, 1, 1, "Shard"), lore));
+
+        Assert.Equal(WikiPackPresentation.RowKind.NotACreaturePage,
+            Assert.Single(pack.Rows).Kind);
+        Assert.Equal(0, pack.RareOnlyCreatures);
+    }
+
+    /// <summary>A mixed pack keeps the item sentence honest: the rare-only creature is
+    /// its own clause, never inflating "N items across M creatures".</summary>
+    [Fact]
+    public void AMixedPackNamesItemsAndRareConfirmationsSeparately()
+    {
+        var pack = Build(
+            (Mob("Chief Goonda", 3, "Goonda's Club"), NoPage),
+            (RareMob("Magus Rokyl", 1, 2, 2, "Rokyl's Robe"), Page("Rokyl's Robe")));
+
+        Assert.Equal(1, pack.Creatures);
+        Assert.Equal("1 item across 1 creature the wiki doesn't have · 1 rare-spawn confirmation",
+            WikiPackPresentation.Headline(pack));
+        // Sorted below the loot contributions, above wrong-article and pending.
+        Assert.Equal(WikiPackPresentation.RowKind.PageMissing, pack.Rows[0].Kind);
+        Assert.Equal(WikiPackPresentation.RowKind.RareConfirmed, pack.Rows[1].Kind);
+    }
+
+    /// <summary>The rare row and the export agree — a row here has a section there, with
+    /// the ADD instruction and both counts. And the negative: a rare-conned creature is
+    /// NOT in the export when its page was never read.</summary>
+    [Fact]
+    public void TheRareRowHasARareSectionInTheExport()
+    {
+        var obs = new[]
+        {
+            new WikiContribution.MobObservation(
+                RareMob("Magus Rokyl", 1, 2, 1, "Rokyl's Robe"), Page("Rokyl's Robe")),
+        };
+        var export = WikiContribution.BuildExport(obs, "Dranak", "freeport", "gfaydark", DateTime.Now);
+
+        Assert.Contains("rare spawn confirmed via /consider ===", export);
+        Assert.Contains("ADD this to the description field", export);
+        Assert.Contains(WikiContribution.RareSpawnDescription, export);
+        Assert.Contains("1 of your 2 /considers", export);   // both counts, said once
+        Assert.DoesNotContain("Nothing confirmed new yet", export);
+        Assert.DoesNotContain("already on the wiki. Nothing to contribute", export);
+
+        var unread = new[]
+        {
+            new WikiContribution.MobObservation(
+                RareMob("Magus Rokyl", 1, 2, 1, "Rokyl's Robe"), Offline),
+        };
+        Assert.DoesNotContain("rare spawn confirmed",
+            WikiContribution.BuildExport(unread, "Dranak", "freeport", "gfaydark", DateTime.Now));
+    }
 }
