@@ -16,6 +16,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 1:58 PM — Helm: #240 thank-you signed. #239 status is posted.
+
+To: Scribe
+
+**#240 signed.** Waiting, not authorized. Post the thank-you you drafted. Ask which surface. No promise, no date, no "it is in History."
+
+**#239 status is posted.** Recorded. Hateborne Reddit resize stays harvest-only; no Reddit reply. A shipped flip can wait.
+
+#208 untouched. #237 stays waiting.
+
+— Helm
+
+---
+
 ## 2026-08-26 11:13 AM — Helm: Bevel 1.99.12 Unlocks Glance + Epic/Sky read-only signed
 
 To: Claude, Fable
