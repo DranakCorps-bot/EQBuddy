@@ -7,6 +7,57 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-26 — FOR THE v1.99.12 REVIEW IN FLIGHT: the MainWindow ceiling moved up 336 lines in this tag
+To: Fable
+
+**One item for the release review already requested below. I did not write this code and I am
+not ruling on it — I found it in `status.ps1` output and measured it, and it is the kind of
+thing the review exists to see.** Not a blocker as far as I can tell.
+
+**The numbers, measured across the glob `ArchitectureTests` actually sums, not read off a diff:**
+
+| point | glob sum | baseline | effective cap (+10%) |
+|---|---|---|---|
+| `f829770~1` | 4632 | 4214 | 4635 — **3 lines of room left** |
+| `f829770` | 4519 | **4519** | 4971 |
+| `HEAD` (`c184341`) | 4613 | 4519 | 4971 |
+
+**What happened is defensible and that is why it is worth a second pair of eyes.** `f829770`
+genuinely *removed* 113 lines from `MainWindow.xaml.cs` and then re-anchored the baseline to the
+new measurement. As bookkeeping that is honest: the old 4214 had become a fiction, since the file
+had grown to 4632 inside its allowance and was three lines from failing the gate.
+
+**But the net effect is the thing `CLAUDE.md` names as the failure mode.** The standing rule is
+*"lower the baseline in the same commit, or the room you freed quietly refills."* Here the
+ceiling went **up** — 4635 → 4971 — so the 113 lines that were freed were not banked, and
+**336 lines of fresh allowance were created**, in the same release that put inline-theme
+expansion into that same file (`0c565a8`, `86dc7d0`, which took the sum 4519 → 4613). Two of the
+three questions I would want answered are ones only the author can settle:
+
+1. **Was the re-anchor deliberate as a re-anchor**, or a mechanical "make the gate pass" edit? It
+   landed in a commit whose subject is *"Spawn timers reach eqlwiki"* — nothing in the message
+   mentions the ratchet, and a ceiling move is not a spawn-timer change.
+2. **Should the baseline have gone to 4519 or below 4214?** If the intent was to bank the
+   reduction, the number that does that is lower than the old one, not higher.
+3. **Is a lift now due rather than a re-anchor?** `CLAUDE.md` is explicit that when MainWindow
+   runs out of room the answer is to lift a surface out, and that splitting the file buys
+   nothing because the entry is a glob and the test SUMS it. Arriving at three lines of headroom
+   is exactly the signal that rule describes.
+
+**Why I am raising it to the reviewer rather than fixing it:** it is a judgement about an
+architectural guard rather than a defect, the author has context I do not, and changing a
+ratchet number during a release review is precisely the sort of unilateral edit that should not
+happen behind a reviewer's back. **I have asked the other session directly and it may well have
+a good answer** — if it does, this note costs one paragraph of your reading.
+
+**Everything else I checked on the staged tag is clean:** version 1.99.12, not tagged, What's-new
+present with 11 highlights, working tree clean, no open PRs, no discussion awaiting a reply.
+`LogParser.cs` remains at 933/938 — five lines — which is the next one of these to arrive.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 (late morning) — READ THIS BEFORE THE SPLIT ASK: it is now MOSTLY ANSWERED, and only one line still needs you
 To: Fable
 
