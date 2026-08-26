@@ -165,6 +165,23 @@ public partial class MainWindow : Window, ICardContext
             popOut: () => ShowGearLootWindow(),
             bringWindowForward: () => _gearLootWindow?.Activate(),
             bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+        // The QUESTS theme's card (PR 3). Epic and Sky inline as ONE class's rows,
+        // capped (QuestInline owns the arrangement); General is the Glance AND the
+        // default (Bevel); Unlocks is a Glance pending its ruling.
+        _questsCard = QuestsThemeCard.Build(
+            QuestsSection, QuestsCardBody, QuestsPopOut, _questsHost,
+            tabs: () => QuestSurface
+                .Tabs(QuestSurface.CountOf(_settings.EpicQuestChecklist, i => i.Acquired),
+                      QuestSurface.CountOf(_settings.SkyQuestChecklist, i => i.Acquired),
+                      QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes))
+                .Select(t => new ThemeCardTab<QuestTab>(t.Tab, t.Label, t.Badge))
+                .ToList(),
+            classes: () => BuffSetClassSource(_stats.Snapshot()).Classes,
+            settings: _settings,
+            unlockCounts: () => QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes),
+            popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
+            bringWindowForward: () => _questsWindow?.Activate(),
+            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -418,6 +435,9 @@ public partial class MainWindow : Window, ICardContext
             if (wanted.TryGetValue("loot", out var lootRoom)
                 && LootSurface.TabForKey(lootRoom) is { } lootOn)
                 _lootHost.SelectTab(lootOn);
+            if (wanted.TryGetValue("quests", out var questsRoom)
+                && QuestSurface.TabForKey(questsRoom) is { } questsOn)
+                _questsHost.SelectTab(questsOn);
             foreach (var (key, element) in SectionMap())
                 if (element is Expander card && wanted.ContainsKey(key))
                     card.IsExpanded = true;
@@ -2106,6 +2126,8 @@ public partial class MainWindow : Window, ICardContext
     internal ThemeCardView<CreatureTab> _killsCard = null!;
     internal readonly ThemeHost<LootTab> _lootHost = new(LootSurface.DefaultInlineTab);
     internal ThemeCardView<LootTab> _lootCard = null!;
+    internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
+    internal ThemeCardView<QuestTab> _questsCard = null!;
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -2194,14 +2216,25 @@ public partial class MainWindow : Window, ICardContext
 
     /// <summary>Open (or front) the Quest Tracker; with an item, jump straight to that
     /// item's quests — the 🗺 badge path from the Loot views.</summary>
-    internal void ShowQuestsWindow(string? filterItem = null)
+    internal void ShowQuestsWindow(string? filterItem = null, QuestTab? tab = null)
     {
+        // The host learns the room first and the CARD gives the body up — the same
+        // handshake the other three themes make.
+        _questsHost.OpenWindow(tab);
         if (_questsWindow is not { IsLoaded: true })
         {
             _questsWindow = new QuestsWindow(this);
+            _questsWindow.TabChanged += t2 => _questsHost.SelectTab(t2);
+            _questsWindow.Closed += (_, _) =>
+            {
+                _questsHost.WindowClosed();
+                _questsCard?.Sync();
+            };
             _questsWindow.Show();
         }
+        if (tab is { } t0) _questsWindow.SetTab(QuestSurface.KeyFor(t0));
         if (filterItem is { Length: > 0 }) _questsWindow.FilterToItem(filterItem);
+        _questsCard?.Sync();
         _questsWindow.Activate();
     }
 
@@ -2704,6 +2737,7 @@ public partial class MainWindow : Window, ICardContext
         _progressCard.Render(s);
         _killsCard.Render(s);
         _lootCard.Render(s);
+        _questsCard.Render(s);
         MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
         ApplySessionSubsections();
 

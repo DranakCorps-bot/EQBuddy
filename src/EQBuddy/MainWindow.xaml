@@ -543,17 +543,26 @@
                  tabs (General · Epic 1.0 · Plane of Sky), and this card is the way in,
                  which is also why the ⚙ menu no longer carries a Quest tracker line.
                  The header still reports both checklists, so the glance survives. -->
-            <Button x:Name="QuestsSection" Style="{StaticResource SectionLink}" Click="OnQuestsWindow"
-                    ToolTip="Open the Quest Tracker — search every quest by reward, item, quest giver or zone, and work your Epic 1.0 and Plane of Sky checklists">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <local:EqCardTitle Icon="Map" Text="Quests"/>
-                    <TextBlock x:Name="QuestsHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text=""/>
-                </Grid>
-            </Button>
+            <Expander x:Name="QuestsSection" Style="{StaticResource Section}"
+                      ToolTip="Quests — your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in. Expands in place; the arrow opens the Quest Tracker.">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <local:EqCardTitle Icon="Map" Text="Quests"/>
+                        <TextBlock x:Name="QuestsHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="{DynamicResource IndentM}"
+                                   TextTrimming="CharacterEllipsis" Text=""/>
+                        <ContentControl x:Name="QuestsPopOut" Grid.Column="2"
+                                        VerticalAlignment="Center"/>
+                    </Grid>
+                </Expander.Header>
+                <ContentControl x:Name="QuestsCardBody"/>
+            </Expander>
 
 
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">

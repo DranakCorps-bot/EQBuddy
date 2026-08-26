@@ -506,6 +506,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             if (wanted.TryGetValue("loot", out var lootRoom)
                 && LootSurface.TabForKey(lootRoom) is { } lootOn)
                 _lootHost.SelectTab(lootOn);
+            if (wanted.TryGetValue("quests", out var questsRoom)
+                && QuestSurface.TabForKey(questsRoom) is { } questsOn)
+                _questsHost.SelectTab(questsOn);
             foreach (var (key, section) in _sections)
                 if (wanted.ContainsKey(key))
                     section.IsExpanded = true;
@@ -1071,11 +1074,26 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // Tracker window owns that job, and this card is the way in, which is also why
         // the ⚙ menu no longer carries a Quest tracker line. The header still reports
         // both checklists, so the glance survives.
-        _sections["quests"] = AppTheme.SectionLink(Header("quests", "Quests", _questsHeader),
-            () => ShowQuestsWindow());
+        // Since Inline themes PR 3 it EXPANDS IN PLACE: Epic and Sky inline as ONE
+        // class's rows, capped (QuestInline owns the arrangement); General is the Glance
+        // AND the default (Bevel); Unlocks is a Glance pending its ruling.
+        _questsCard = QuestsThemeCard.Build(
+            Header("quests", "Quests", _questsHeader), _questsHost,
+            tabs: () => QuestSurface
+                .Tabs(QuestSurface.CountOf(_settings.EpicQuestChecklist, i => i.Acquired),
+                      QuestSurface.CountOf(_settings.SkyQuestChecklist, i => i.Acquired),
+                      QuestSurface.UnlockCounts(RaceUnlocks, ClassUnlocks))
+                .Select(t => new ThemeCardTab<QuestTab>(t.Tab, t.Label, t.Badge))
+                .ToList(),
+            classes: () => UnlockClasses(CurrentSnapshot()),
+            settings: _settings,
+            unlockCounts: () => QuestSurface.UnlockCounts(RaceUnlocks, ClassUnlocks),
+            popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
+            bringWindowForward: () => _questsWindow?.Activate());
+        _sections["quests"] = _questsCard;
         ToolTip.SetTip(_sections["quests"],
-            "Open the Quest Tracker — search every quest by reward, item, quest giver or "
-            + "zone, and work your Epic 1.0 and Plane of Sky checklists");
+            "Quests — your Epic 1.0 and Plane of Sky checklists, and what is ready to "
+            + "turn in. Expands in place; the arrow opens the Quest Tracker.");
         _sections["tracked"] = AppTheme.Section(Header("tracked", "Watch", _trackedHeader), _trackedPanel);
         // The ⭐ opens the Buff set breakout while minimized (#120 stage 2). Unlike the
         // other stars this one gates a window only — "buffs" is not a mini-chip stat.
@@ -2209,6 +2227,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // KillsPresentation, closing a parity drift #210's rule exists to prevent.
         _killsCard?.Render(s);
         _lootCard?.Render(s);
+        _questsCard?.Render(s);
         // The Quests card is a launcher, not a checklist: its one line reports both
         // checklists so the glance survives, and the work happens in the window.
         _questsHeader.Text = QuestsSummaryLine();
@@ -3324,6 +3343,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private ThemeCardPanel<CreatureTab> _killsCard = null!;
     private readonly ThemeHost<LootTab> _lootHost = new(LootSurface.DefaultInlineTab);
     private ThemeCardPanel<LootTab> _lootCard = null!;
+    private readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
+    private ThemeCardPanel<QuestTab> _questsCard = null!;
 
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
@@ -3335,6 +3356,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal ThemeCardPanel<ProgressTab> ProgressCardForTests => _progressCard;
     internal ThemeCardPanel<CreatureTab> KillsCardForTests => _killsCard;
     internal ThemeCardPanel<LootTab> LootCardForTests => _lootCard;
+    internal ThemeCardPanel<QuestTab> QuestsCardForTests => _questsCard;
+    internal QuestsWindow? QuestsWindowForTests => _questsWindow;
 
     /// <summary>Is the Progress window open and showing this tab? The render guards ask
     /// this where they used to ask "is this card expanded" — same rule either way: a
@@ -3555,8 +3578,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     /// <summary>Open (or front) the Quest Tracker; with an item, jump straight to that
     /// item's quests — the 🗺 badge path from the Loot views.</summary>
-    internal void ShowQuestsWindow(string? filterItem = null)
+    internal void ShowQuestsWindow(string? filterItem = null, QuestTab? tab = null)
     {
+        _questsHost.OpenWindow(tab);
         // Reopen contract for every satellite here: a null field means the window is
         // closed for real (each Closed handler nulls it — Avalonia's Show() throws on a
         // closed window, so WPF's `is not { IsLoaded: true }` becomes a null check), and
@@ -3565,12 +3589,17 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_questsWindow is null)
         {
             var window = new QuestsWindow(this);
+            window.TabChanged += t2 => _questsHost.SelectTab(t2);
             window.Closed += (_, _) =>
             {
                 if (ReferenceEquals(_questsWindow, window)) _questsWindow = null;
+                _questsHost.WindowClosed();
+                _questsCard?.Sync();
             };
             _questsWindow = window;
         }
+        if (tab is { } t0) _questsWindow.SetTab(t0);
+        _questsCard?.Sync();
         _questsWindow.Show();
         if (filterItem is { Length: > 0 }) _questsWindow.FilterToItem(filterItem);
         _questsWindow.Activate();

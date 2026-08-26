@@ -55,9 +55,29 @@ public static class QuestSurface
     /// glances as <c>{n} quests ready to turn in</c> and the tracker is one ⧉ away.</summary>
     public static InlineMode InlineModeFor(QuestTab tab) => tab switch
     {
-        QuestTab.General => InlineMode.Glance,
-        _ => InlineMode.Full,
+        // Unlocks joined the strip with #238, AFTER Bevel's table — it is a Glance
+        // pending a ruling (flagged in the Unlocks review ask), because it is a review
+        // checklist over two dump files with its own section lens, which is the same
+        // host-rule shape as Inventory. Making the NEW tab conservative and one ⧉ from
+        // its window beats shipping an unruled full body on the widget.
+        QuestTab.Epic or QuestTab.Sky => InlineMode.Full,
+        _ => InlineMode.Glance,
     };
+
+    /// <summary>The General room's glance line (Bevel's wording): what a player expands
+    /// the card to learn, in one line.</summary>
+    public static string GeneralGlance(int readyCount) => readyCount switch
+    {
+        0 => "Quest Tracker",
+        1 => "1 quest ready to turn in",
+        _ => $"{readyCount} quests ready to turn in",
+    };
+
+    /// <summary>The Unlocks room's glance line — the badge's fraction as a sentence, or
+    /// the route in when no dump has ever been read.</summary>
+    public static string UnlocksGlance((int Done, int Total)? counts) => counts is { } c
+        ? $"Unlocks — {c.Done} / {c.Total}"
+        : "Unlocks — run /outputfile achievements in game";
 
     /// <summary>The tab an expanded Quests card opens on. General, deliberately, though it
     /// is a Glance: "3 quests ready to turn in" is the thing a player expands the card to

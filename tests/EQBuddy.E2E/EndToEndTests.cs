@@ -828,6 +828,27 @@ public sealed class EndToEndTests
             "the header should still summarise the theme; dump was: " + app.Artifacts());
     }
 
+    /// <summary>Inline themes PR 3: the QUESTS card expands in place. Epic is a Full
+    /// room (one class's rows, capped — QuestInline's arrangement); General and Unlocks
+    /// are Glances. General is also the DEFAULT (Bevel: "3 quests ready to turn in" is
+    /// the thing a player expands the card to learn).</summary>
+    [Fact]
+    public void TheQuestsThemeExpandsInPlaceOnItsEpicRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "quests:epic",
+        });
+        app.Launch();
+
+        app.WaitForDump("questsInline", 1, "the Quests card to own the body");
+        Assert.Equal(0, app.DumpValue("questsHostWindowOpen"));
+        app.WaitForDump("questsCardTab", "epic", "the room named in EQBUDDY_EXPAND");
+        app.WaitForDump("questsCardTabs", 4, "all four rooms in the card's strip");
+        Assert.True(app.DumpValue("questsSummaryLen") > 0,
+            "the header should still summarise both checklists; dump was: " + app.Artifacts());
+    }
+
     /// <summary>Opening a theme's WINDOW keeps the card collapsed — one owner, PR 2's
     /// lanes behaving exactly as Progress does.</summary>
     [Fact]

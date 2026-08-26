@@ -229,6 +229,9 @@ public partial class QuestsWindow : Window
     /// <summary>Build the strip from Core's <see cref="QuestSurface"/> so the desktop and
     /// EQBuddy Mobile cannot disagree about which tabs exist, their order or their
     /// names — the whole reason that lives in Core.</summary>
+    /// <summary>Raised when the PLAYER switches tabs here. Not raised by SetTab.</summary>
+    internal event Action<QuestTab>? TabChanged;
+
     private void BuildTabs()
     {
         _tabs.Clear();
@@ -238,6 +241,9 @@ public partial class QuestsWindow : Window
             _tabs.Add(header.Label, tab, header.Badge, onClick: () =>
             {
                 _tab = tab;
+                // The theme host follows the player (Inline themes PR 3) — the same
+                // event the other three windows raise, for the same hand-back.
+                TabChanged?.Invoke(tab);
                 ApplyTabVisual();
                 Refresh(force: true);
             });

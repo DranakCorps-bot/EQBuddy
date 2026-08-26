@@ -84,6 +84,11 @@ internal static class WidgetDump
                         ? $"lootTab={LootSurface.KeyFor(w._lootCard.SelectedTab)} " +
                           $"lootTabs={w._lootCard.TabCount} "
                         : "") +
+                    (w._questsHost.IsInline
+                        ? $"questsInline=1 questsCardTab={QuestSurface.KeyFor(w._questsCard.SelectedTab)} " +
+                          $"questsCardTabs={w._questsCard.TabCount} "
+                        : "questsInline=0 ") +
+                    $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
                     $"zones={w.ZoneList.Items.Count} deaths={w.DeathList.Items.Count} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +

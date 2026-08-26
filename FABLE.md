@@ -635,8 +635,19 @@ and Gear & Loot cards expand in place on WPF and Avalonia. What it took and foun
   `theme-inline-kills`, `theme-inline-kills-glance`, `theme-inline-loot` all matched their
   written predictions; `widget-expanded` deliberately re-shot.
 
-**PR 3 (Quests) is the remainder** — the Glance General tab and the `QuestChecklistView`
-hosting question (plan item 7, still a hypothesis to verify first).
+**PR 3 (Quests) DONE the same day — the whole Inline themes item is COMPLETE.** Item 7's
+hypothesis verified: the checklist RENDERING lives inside each QuestsWindow (no view class
+to instantiate twice), so the inline Full rooms are a new REDUCED body — `Core/QuestInline`
+owns the arrangement (one class's rows, capped at 12 with "... and N more", read-only on
+purpose: a checkbox inside a capped scroller invites ticks the cap hides context for, and
+ticking stays in the window). General is the Glance AND the default, exactly as Bevel
+ruled. **One decision Bevel has not ruled: the #238 Unlocks tab (post-table) is a Glance,
+conservatively** — flagged in the pending Unlocks review ask. All four theme windows now
+raise `TabChanged`; all four hosts hand the room back and forth; the ↗-arrow assertions
+became chevron-era assertions per the plan's own "do not keep ↗ on the collapsed row".
+Shots `theme-inline-quests` (the default General glance: "Quest Tracker") and
+`theme-inline-quests-epic` (Warrior's checklist, four-chip strip wrapping) matched their
+predictions. E2E 32/32, Avalonia 287/287, unit 2,646.
 
 ## Inline themes — expand in place, pop out on request
 

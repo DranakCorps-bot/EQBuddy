@@ -163,6 +163,22 @@ $Shots = [ordered]@{
     'theme-inline-kills-glance' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'kills:drops' }
                            Set = @{} }
+    # PR 3. PREDICTION: the Quests card expanded with a FOUR-chip strip (Quests lit,
+    # Epic 1.0 with its 0/486 badge, Plane of Sky 0/222, Unlocks with no badge on this
+    # profile), and under the strip ONE dim line - the General GLANCE, reading "Quest
+    # Tracker" on this fixture (nothing is ready to turn in). No search box, no detail
+    # pane, no checklist: General is the default AND a glance, which is Bevel's ruling
+    # verbatim.
+    'theme-inline-quests' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'quests' }
+                           Set = @{} }
+    # The Epic FULL room. PREDICTION: the Epic 1.0 chip lit and under it ONE class's
+    # checklist - a heading naming the class, up to 12 read-only rows (name plus a check
+    # for acquired), and "... and N more" if the class's list is longer. No class picker,
+    # no state combo, no search - window chrome stays with the window.
+    'theme-inline-quests-epic' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'quests:epic' }
+                           Set = @{} }
     # PR 2's second theme. PREDICTION: the Gear & Loot card expanded with a three-chip
     # strip (Loot with the item count badge, Wishlist, Inventory), and under it the Loot
     # room's slice strip and rows, capped by the shared body height with its own

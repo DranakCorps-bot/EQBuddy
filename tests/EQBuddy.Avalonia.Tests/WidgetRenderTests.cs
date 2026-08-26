@@ -116,7 +116,9 @@ public class WidgetRenderTests : IDisposable
         Assert.Contains("Quests", text);
         Assert.Contains(window.GetVisualDescendants().OfType<global::Avalonia.Controls.PathIcon>(),
             i => i.Data is not null);
-        Assert.Contains("↗", text);   // this card leaves rather than unfolds
+        // Since Inline themes PR 3 the card EXPANDS rather than leaves — the ↗ became
+        // the expand chevron, exactly as the plan ruled ("do not keep ↗ on the
+        // collapsed row"); the window is behind the header's ⧉ instead.
 
         // Both checklists are seeded from the embedded catalogs, so the glance the two
         // deleted cards used to give is still on the widget, in one line.
@@ -400,7 +402,8 @@ public class WidgetRenderTests : IDisposable
         var widget = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains("Kills & Drops", widget);
-        Assert.Contains("↗", widget);   // this card leaves rather than unfolds
+        // The ↗ became the expand chevron in Inline themes PR 2; the window is behind
+        // the header's ⧉ now.
 
         window.ShowCreatureWindow();
         var host = window.CreatureWindowForTests!;
@@ -452,7 +455,8 @@ public class WidgetRenderTests : IDisposable
         var text = window.GetVisualDescendants().OfType<TextBlock>()
             .Select(t => t.Text ?? "").ToList();
         Assert.Contains("Gear & Loot", text);
-        Assert.Contains("↗", text);   // this card leaves rather than unfolds
+        // The ↗ became the expand chevron in Inline themes PR 2; the window is behind
+        // the header's ⧉ now.
         // The exact line the shared formatter produces — asserted through it rather than
         // spelled again here, so the two windows and the phone cannot drift apart.
         Assert.Contains(LootTheme.LauncherSummary(snapshot, window.Settings.GearChecklist), text);
@@ -1793,6 +1797,47 @@ public class WidgetRenderTests : IDisposable
         window.RenderSnapshotForTest(snap);
         Dispatcher.UIThread.RunJobs();
         Assert.True(kills.IsExpanded && loot.IsExpanded);
+
+        window.Close();
+    }
+
+    /// <summary>PR 3: the Quests card's crash-class sequence, and its two Glance rooms —
+    /// General (the DEFAULT: "N quests ready to turn in" / "Quest Tracker") and Unlocks
+    /// (unruled by Bevel, conservative until it is).</summary>
+    [AvaloniaFact]
+    public void TheQuestsThemeExpandsGlancesAndSurvivesThePopOutSequence()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var snap = new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) };
+
+        var card = window.QuestsCardForTests;
+        Assert.True(card.IsExpanded, "EQBUDDY_EXPAND=1 should expand the Quests card too");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(4, card.TabCount);
+        // The DEFAULT room is General, a Glance: one line, no checklist body.
+        Assert.Equal(QuestTab.General, card.SelectedTab);
+        var text = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains(text, t => t.Contains("ready to turn in") || t == "Quest Tracker");
+
+        // The Epic FULL room: one class's rows, capped, read-only.
+        card.SelectGlanceRoomForTest(QuestTab.Epic);
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+
+        // Pop out, close, expand — the sequence that throws when a body has two hosts.
+        window.ShowQuestsWindow();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "pop-out must collapse the Quests card");
+        window.QuestsWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "closing the window must not re-grow the widget");
+        card.IsExpanded = true;
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(card.IsExpanded);
 
         window.Close();
     }

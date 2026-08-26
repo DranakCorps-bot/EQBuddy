@@ -525,6 +525,8 @@ public sealed class QuestsWindow : Window
             _tabs.Add(header.Label, tab, header.Badge, onClick: () =>
             {
                 _tab = tab;
+                // The theme host follows the player (Inline themes PR 3).
+                TabChanged?.Invoke(tab);
                 ApplyTabVisual();
                 Refresh(force: true);
             });
@@ -1296,6 +1298,9 @@ public sealed class QuestsWindow : Window
     /// <summary>Programmatic tab switch, for the same reasons <see cref="SetMode"/>
     /// exists — a screenshot hook, and the handle the render tests drive the checklist
     /// tabs by (clicking a Border in a headless test proves layout, not behaviour).</summary>
+    /// <summary>Raised when the PLAYER switches tabs here. Not raised by SetTab.</summary>
+    internal event Action<QuestTab>? TabChanged;
+
     internal void SetTab(QuestTab tab)
     {
         _tab = tab;
