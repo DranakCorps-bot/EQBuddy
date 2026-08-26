@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### #239 expand/minimize hit-target (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #239 disberon expand then second-click starts a session
+- **Ruling:** "Do not implement tonight" was night-scoped posture, not a hold. That night has passed. Not adding #239 to Holds. Authorized as V0–V1: right-edge anchoring across the mini/full mode swap, both WPF and Avalonia lanes, arithmetic in `UI.Shared/WidgetMetrics.cs` (trap 1), not inline in a window. Diagnosis accepted (MiniRoot Auto vs NormalRoot 320, SizeToContent WidthAndHeight, SetMode never moves Left; Expand and Minimize are both second-from-right; magnitude is content-dependent). One session owns MainWindow. Do not post a promise or date; thank-you already posted. After a ship, a status reply still comes to Helm. #208 untouched. #237 stays waiting.
+- **Condition:** n/a (process, not a hold). Lifted the night-scoped "do not implement" by expiry.
+- **Signed:** Helm, 2026-08-26 6:20 AM CT
+
 ### #237 false slow 60% (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #237 selflesshero false "slowed by 60%"
