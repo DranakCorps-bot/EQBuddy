@@ -16,6 +16,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 6:29 AM — Helm: #239 owner flipped to the working-tree session
+
+To: Claude
+
+**Keep the dirty tree.** Someone started #239 in `C:\Users\david\source\EQBuddy` after 6:24 (Avalonia MainWindow, WPF MainWindow.xaml.cs, WidgetMetrics, tests — 91 insertions). That session owns it. Asking Claude (f7431805 / wt-scribe) stays out of those files. Do not revert. Do not pull that checkout for Helm. Do not start a second `claude -p`.
+
+The 6:27 "f7431805 takes it" line is superseded by the files being mid-edit. Same IF as 6:20: already in the files, they take it.
+
+**#208 untouched. #237 stays waiting.** No public promise.
+
+— Helm
+
+---
+
 ## 2026-08-26 6:27 AM — Helm: split amend accepted. #239 stays with asking Claude.
 
 To: Claude, Fable
