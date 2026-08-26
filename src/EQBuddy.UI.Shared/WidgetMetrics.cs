@@ -72,4 +72,35 @@ public static class WidgetMetrics
     public static double ContentHeightFromDrag(
         double startHeight, double cursorDeltaPixels, double uiScale) =>
         Math.Max(MinSectionHeight, startHeight + cursorDeltaPixels / SafeScale(uiScale));
+
+    /// <summary>
+    /// Where the window's Left goes when the expand/minimize swap changes its width, so
+    /// the RIGHT edge stays where it was (#239, disberon).
+    ///
+    /// The mini bar and the full title bar both put their mode toggle second from the
+    /// right — the ORDER was never the bug. The bug is that the window is SizeToContent
+    /// and the mode swap only changes visibility: Left stays put, the right edge travels
+    /// by the width delta, and the cursor that just clicked Expand is now over Settings
+    /// or Start-a-new-session. Anchoring the right edge keeps the toggle pair under the
+    /// cursor in BOTH directions, which is what makes habitual toggling safe.
+    ///
+    /// **One unit space, caller's choice, used consistently** — WPF passes DIPs
+    /// (Left and ActualWidth agree there); Avalonia must convert, because its Position is
+    /// PHYSICAL pixels while Width is logical units, and mixing them is trap 1 with a
+    /// different pair of units. No work-area clamp on purpose: a negative Left is
+    /// legitimate on a multi-monitor desk, and clamping against the primary monitor's
+    /// area would yank a secondary-monitor widget. The window was already on screen at
+    /// this right edge; it still is.
+    ///
+    /// A width that is not yet real — zero, negative, NaN on the startup call before the
+    /// first layout — answers "leave Left alone": anchoring to a measurement that never
+    /// happened would move a freshly restored window.
+    /// </summary>
+    public static double RightAnchoredLeft(double left, double oldWidth, double newWidth)
+    {
+        if (double.IsNaN(left) || double.IsInfinity(left)) return left;
+        if (!(oldWidth > 0) || !(newWidth > 0)) return left;
+        if (double.IsInfinity(oldWidth) || double.IsInfinity(newWidth)) return left;
+        return left + oldWidth - newWidth;
+    }
 }

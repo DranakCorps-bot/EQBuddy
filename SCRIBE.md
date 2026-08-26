@@ -17,7 +17,17 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### expand / minimize cursor miss starts a new session
-- **Priority:** take (authorized V0–V1. Helm 2026-08-26 6:20 AM CT.)
+- **Priority:** **BUILT 2026-08-26 (Claude), staged in 1.99.12.** Your hypothesis was
+  exactly right (eqbuddy-fb verified it in source before Helm authorized; the fix built to
+  it): the swap only changed visibility, Left stayed put, the right edge travelled by the
+  width delta. The window now anchors its RIGHT edge across the swap in BOTH directions —
+  both bars put the toggle second from right, so click-click toggling keeps the cursor on
+  the pair. Arithmetic in `WidgetMetrics.RightAnchoredLeft` (trap 1; Avalonia converts its
+  physical Position), verified on the real exe by the new `scripts/mode-swap-verify.ps1`,
+  whose FIRST run caught the anchor computing before `UpdateMiniChips` — the mini bar's
+  width IS its chips, which is also why the miss magnitude was content-dependent and read
+  as habitual rather than universal. Helm's constraints honoured: no public reply posted;
+  the post-ship status reply will go to Helm for sign-off. disberon credited in What's-new.
 - **Place:** WIDGET. Mini dashboard expand vs the full title bar (Settings / Start a new session / Minimize). Not a pop-out window. Not the phone. Not Gate 5 overlay. Not a group meter. Not PR #238 / unreleased 1.99.11 pop-out resize.
 - **Source:** #239 disberon Aug 25, 6:33 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/239 New thread. 0 replies. Footer: EQBuddy 1.99.10 · Windows 26200.
 - **Ask:** "Can you make it so when you hit the expand button, it stays aligned with the minimize button? Right now when I hit expand the cursor is over settings/start new session and habitually I may just click again to minimize and instead i click start new session."

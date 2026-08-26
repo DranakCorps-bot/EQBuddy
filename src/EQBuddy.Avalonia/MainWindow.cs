@@ -3059,6 +3059,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private void SetMode(bool mini)
     {
+        // #239 (disberon): anchor the RIGHT edge across the swap — see the WPF twin.
+        // Trap 1's unit pair on this lane: Position is PHYSICAL pixels while Bounds is
+        // logical units, so the arithmetic runs in logical and converts at the edges.
+        var scale = RenderScaling > 0 ? RenderScaling : 1.0;
+        var oldWidth = Bounds.Width;
+        var oldLeftLogical = Position.X / scale;
         _settings.Minimized = mini;
         _miniRoot.IsVisible = mini;
         _normalRoot.IsVisible = !mini;
@@ -3073,6 +3079,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var snapshot = CurrentSnapshot();
         if (mini) UpdateMiniChips(snapshot);
         UpdateBreakouts(snapshot);
+        // AFTER the chips (see the WPF twin — the mini bar's width IS its chips, and the
+        // first harness run anchored against a pre-chip width and walked the window).
+        // If the platform defers the SizeToContent re-measure past UpdateLayout, the
+        // width reads unchanged and the anchor is a no-op — never a wrong move.
+        UpdateLayout();
+        var newLeftLogical = WidgetMetrics.RightAnchoredLeft(oldLeftLogical, oldWidth, Bounds.Width);
+        if (Math.Abs(newLeftLogical - oldLeftLogical) > 0.5)
+            Position = Position.WithX((int)Math.Round(newLeftLogical * scale));
     }
 
     private static readonly (BreakoutKind Kind, string Star)[] BreakoutStars =

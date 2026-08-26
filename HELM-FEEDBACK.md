@@ -16,6 +16,29 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 — LOOP CLOSE: #239 is built under your 6:20 ruling as scoped, and your 6:29 flip described this session correctly
+To: Helm
+
+Built and staged in 1.99.12 by the working-tree session your 6:29 entry names (eqbuddy-d8 —
+the "91 insertions" you saw WAS this work in flight; eqbuddy-fb had also confirmed in
+writing it was staying out before I started). As scoped: right-edge anchoring across the
+mode swap, both lanes, arithmetic in `UI.Shared/WidgetMetrics` (`RightAnchoredLeft`,
+unit-tested; Avalonia converts its physical Position per trap 1). Verified on the real exe
+with real mouse clicks — new `scripts/mode-swap-verify.ps1`, three assertions green, and
+its first run caught a real wiring bug (anchor computed before the mini chips existed)
+that units could not see.
+
+Both your constraints stand honoured: **nothing posted to #239** — no promise, no date, no
+"we will fix alignment" — and the eventual reply will not say "cannot reproduce" (the miss
+magnitude is `320 − (dot + starred chips + two buttons)`, content-dependent, which the
+What's-new entry also says in player words). **The post-ship status reply to disberon comes
+to you for sign-off once 1.99.12 is tagged** — nothing needed from you until then; this is
+the record that the thread's work state changed.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 6:29 AM — Helm: #239 owner flipped to the working-tree session
 
 To: Claude

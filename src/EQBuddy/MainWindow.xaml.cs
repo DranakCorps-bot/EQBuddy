@@ -3596,6 +3596,14 @@ public partial class MainWindow : Window, ICardContext
 
     private void SetMode(bool mini)
     {
+        // #239 (disberon): the swap changes the window's width (SizeToContent), and with
+        // Left fixed the right edge travels — so the cursor that just clicked Expand
+        // lands on Settings or Start-a-new-session. Anchor the RIGHT edge instead: both
+        // bars put the mode toggle second from the right, so this keeps the toggle pair
+        // under the cursor in both directions. The startup call is naturally a no-op —
+        // ActualWidth is 0 before the first layout and RightAnchoredLeft leaves Left
+        // alone for a width that never happened.
+        var oldWidth = ActualWidth;
         _settings.Minimized = mini;
         MiniRoot.Visibility = mini ? Visibility.Visible : Visibility.Collapsed;
         NormalRoot.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
@@ -3605,6 +3613,14 @@ public partial class MainWindow : Window, ICardContext
         var snap = _stats.Snapshot();
         if (mini) UpdateMiniChips(snap);
         UpdateBreakouts(snap);
+        // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
+        // ~87, a starred one 300+), so anchoring before UpdateMiniChips computes
+        // against a width the player never sees — the first harness run did exactly
+        // that and walked the window 230px right. UpdateLayout is what makes the
+        // SizeToContent re-measure land before Left is read; a deferred layout would
+        // anchor against the OLD width and move nothing.
+        UpdateLayout();
+        Left = WidgetMetrics.RightAnchoredLeft(Left, oldWidth, ActualWidth);
     }
 
     // ---- breakout stat windows (BREAKOUT-*) ----

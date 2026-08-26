@@ -75,4 +75,39 @@ public class WidgetMetricsTests
         Assert.Equal(WidgetMetrics.MinSectionHeight,
             WidgetMetrics.ContentHeightFromDrag(300, cursorDeltaPixels: -9999, uiScale: 1.0));
     }
+
+    // ---- #239 (disberon): the mode swap anchors the RIGHT edge, both directions ----
+
+    [Fact]
+    public void ExpandingAnchorsTheRightEdgeSoTheTogglePairStaysUnderTheCursor()
+    {
+        // Mini bar 180 wide at Left=1000 (right edge 1180) expands to the 320 window:
+        // Left moves to 860 and the right edge does not move.
+        Assert.Equal(860, WidgetMetrics.RightAnchoredLeft(1000, oldWidth: 180, newWidth: 320));
+        // And back: minimizing returns Left to where the mini bar's right edge was.
+        Assert.Equal(1000, WidgetMetrics.RightAnchoredLeft(860, oldWidth: 320, newWidth: 180));
+    }
+
+    /// <summary>The startup call reaches SetMode before the first layout, when ActualWidth
+    /// is 0 — anchoring to a measurement that never happened would move a freshly restored
+    /// window. Same answer for a width that is broken rather than merely absent.</summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-5)]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void AWidthThatIsNotRealLeavesTheWindowWhereItIs(double unreal)
+    {
+        Assert.Equal(500, WidgetMetrics.RightAnchoredLeft(500, unreal, 320));
+        Assert.Equal(500, WidgetMetrics.RightAnchoredLeft(500, 320, unreal));
+    }
+
+    /// <summary>No work-area clamp, on purpose: a negative Left is a real place on a
+    /// multi-monitor desk, and clamping against the primary would yank a secondary-monitor
+    /// widget. The window was already on screen at this right edge.</summary>
+    [Fact]
+    public void AMultiMonitorNegativeLeftIsARealPlaceNotAnErrorToClamp()
+    {
+        Assert.Equal(-1500, WidgetMetrics.RightAnchoredLeft(-1360, oldWidth: 180, newWidth: 320));
+    }
 }
