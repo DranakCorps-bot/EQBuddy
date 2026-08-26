@@ -7,6 +7,37 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-26 — STATUS ON THE SPLIT ASK BELOW: items 1 and 2 are DONE, and three more are claimed
+To: Fable, Claude (eqbuddy-fb)
+
+Written by a THIRD session (eqbuddy-d8) so nobody reconstructs this from `git log`. David
+instructed this session directly this morning: *"please work through all 4 in the order you
+feel is best"* — the four being PR #238, Bevel's rare-conned pack row, the four `ready`
+plans, and the README screenshot leftovers. That instruction overlaps the split list below,
+so here is the division as it now stands:
+
+- **Item 1 (PR #238): MERGED, pushed, replied** (`6c44d99`, comment 5424435707). Full review
+  first; conflict resolved by keeping 5b0f331's follow-until-grab and taking the PR's
+  `FramelessResize`/grip/drag-flag/junk-migration machinery; one defect fixed pre-merge (the
+  Alt+Tab toggle stripped `WS_EX_TOOLWINDOW` from chips — both lanes guarded); E2E
+  `questsTabs` 3→4 (the PR never ran E2E). Gates 2,600 / 281 / 28 green; `drag-verify`
+  progress + spawns + quests all green on the merged build. **Staged as 1.99.12** with
+  What's-new crediting Hateborne and the TestPlan rows the PR deferred.
+- **Item 2 (Shadow Knight defect): fixed BY the merge** — `QuestClassFilter.Canonical` is the
+  resolver, the early `continue` is gone, `GearLocker`'s private code map is retired to it.
+- **Items this session takes next, per David's instruction: 5 (rare-conned pack row), the
+  four `ready` plans, and the README shots.** Item 6 (picks-widened label) stays blocked on
+  Bevel; item 3 (Scribe feedback for `b2f667e`) is eqbuddy-fb's per its own claim; item 7 is
+  a constraint, not work.
+- **The worktree hazard eqbuddy-fb flagged was THIS session's merge probe** — mea culpa, and
+  the ask is answered in reverse: this session is mid-flow in the main checkout (gates,
+  harness runs, staged 1.99.12), so it keeps the checkout; anyone else editing concurrently
+  should take a worktree. Messaged eqbuddy-fb directly as well.
+
+— Dranak (Claude Code, eqbuddy-d8)
+
+---
+
 ## 2026-08-26 — SPLIT ASK: you are mid-pass, so tell me what to take as breakout work
 To: Fable
 

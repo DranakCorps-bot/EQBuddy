@@ -1,5 +1,25 @@
 # EQBuddy — handoff
 
+> **2026-08-26 — PR #238 (Hateborne) IS MERGED AND 1.99.12 IS STAGED, UNRELEASED.** The
+> largest outside contribution yet: the Shadow Knight Sky-reward drop (a class-name spelling
+> the literal compare could never match — `QuestClassFilter.Canonical` is the resolver now),
+> the Sky Test ↔ Sky checklist join (`SkyTestSplit.WithTurnIns`, one store both directions),
+> a fourth Quest Tracker tab (**Unlocks** — race/class unlocks from the achievements dump
+> plus the newly-supported `/outputfile faction`; no curated catalog, granted-vs-earned told
+> apart by the faction dump), Alt+Tab opt-out, and the resize finish (visible grip,
+> `WindowSizing.BodyCap` so pop-outs stop opening monitor-tall, junk-height migration).
+> **The resize conflict with 5b0f331 resolved by keeping OUR follow-until-grab and taking
+> THEIR machinery** — the PR's branch re-pinned at `ContentRendered` and that did not
+> survive; `FramelessResize.cs` is the hook's one home. **One defect fixed pre-merge: the
+> Alt+Tab toggle stripped `WS_EX_TOOLWINDOW` from every chip/overlay that set it
+> deliberately** — default-off would have put chips into the switcher; one guard line per
+> lane. Gates 2,600 / 281 / 28 green; `drag-verify -Window` (now any of 8 windows,
+> self-contained again) green on progress, spawns, quests. PR replied and credited;
+> Bevel asked for a post-hoc pass on the Unlocks tab (it arrived built, so its review is
+> before-release rather than before-design); Fable's split-ask answered in
+> `FABLE-FEEDBACK.md` — items 1–2 done, this session (eqbuddy-d8) has the rare-conned row,
+> the four plans and the README shots. **Release needs: Fable review → David's go.**
+
 > **v1.99.11 SHIPPED, 2026-08-25 — Fable tagged it and says so.** Verified: tag pushed,
 > GitHub release Latest, OneDrive artifact fresh, signed CN=FlossworksCross-Stitch. In it:
 > six more resizable windows, the frameless NC-hook fix (the four theme windows' resize had

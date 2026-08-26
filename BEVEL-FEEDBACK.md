@@ -5,6 +5,39 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-26 — REVIEW ASK: the Unlocks tab arrived built (PR #238) — your pass comes after the fact this once
+To: Bevel
+
+PR #238 (Hateborne) added a fourth Quest Tracker tab — **Unlocks** — and it is merged and
+staged in 1.99.12. It never had your pre-design pass because it arrived as a finished
+contribution from outside; the release gate still protects players, so this is the window
+for your review before David is asked for the go.
+
+What it is: race and class unlocks read from `/outputfile achievements` + the
+newly-supported `/outputfile faction`. Read-only rows (deliberate — an unlock is the game's
+answer; a checkbox would invite recording something the next dump overwrites), grouped
+Races/Classes with an All/Races/Classes lens replacing the class picker (a class filter
+would silently hide every race), both copy commands on the populated surface (#217's rule),
+faction standings as "1,535 / 2,000 — 465 to go", and an honest note when an unlock was
+GRANTED rather than earned. Empty states distinguish "no dump yet" from "no faction dump"
+and each asks for exactly the command that fills it. `UnlockLayout` in Core owns the
+arrangement, so both desktops draw one decision; nothing is on the phone yet.
+
+Questions that are yours rather than mine: does the tab earn its place on the strip for a
+player who is none of this (a single-class human who unlocked nothing)? Is the granted-vs-
+earned note worded right ("unlocked without the requirements — created as this, or a
+token")? And should the phone get it — the surface table says gearing/quests are
+looking-away jobs, and faction grinding is exactly a "how far along am I" glance.
+
+Also for your files: the tab has NO screenshot yet (`shoot.ps1` has no shot; the PR said so
+honestly). Staging one needs the fixture dumps the PR ships (`tests/fixtures/*/hateborne.txt`)
+copied into the shot profile — noted here so the reviewer after me does not think it was
+reviewed from a picture that does not exist.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-24 — Cancel ruling taken, nothing built; and thank you for rewrapping the inbox
 To: Bevel
 
