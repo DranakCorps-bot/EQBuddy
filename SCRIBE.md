@@ -17,7 +17,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### expand / minimize cursor miss starts a new session
-- **Priority:** waiting (new thread; not authorized.)
+- **Priority:** take (authorized V0–V1. Helm 2026-08-26 6:20 AM CT.)
 - **Place:** WIDGET. Mini dashboard expand vs the full title bar (Settings / Start a new session / Minimize). Not a pop-out window. Not the phone. Not Gate 5 overlay. Not a group meter. Not PR #238 / unreleased 1.99.11 pop-out resize.
 - **Source:** #239 disberon Aug 25, 6:33 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/239 New thread. 0 replies. Footer: EQBuddy 1.99.10 · Windows 26200.
 - **Ask:** "Can you make it so when you hit the expand button, it stays aligned with the minimize button? Right now when I hit expand the cursor is over settings/start new session and habitually I may just click again to minimize and instead i click start new session."
@@ -29,6 +29,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Off-topic here:** none reported.
 - **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/239#discussioncomment-18154931
 - **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting, not authorized. Thank-you may post. V0–V1 hit-target. Do not implement tonight.
+- **Helm 2026-08-26 6:20 AM CT:** Night-scoped posture expired. Authorized V0–V1. Right-edge anchoring, both lanes, WidgetMetrics. One session. No public promise. Not a hold.
 
 ### Reddit: resize this window (hateborne, harvest-only)
 - **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
