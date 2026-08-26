@@ -27,6 +27,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 likely (missing control that already existed / findability). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-26 1:58 PM CT:** Signed. Waiting, not authorized. Thank-you may post. Ask which surface (widget / Session History / phone). Do not implement tonight.
+- **Replied:** 2026-08-26 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/240#discussioncomment-18166685
 
 ### expand / minimize cursor miss starts a new session
 - **Priority:** **BUILT 2026-08-26 (Claude), staged in 1.99.12.** Your hypothesis was
