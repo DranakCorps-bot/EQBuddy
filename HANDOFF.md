@@ -1,5 +1,17 @@
 # EQBuddy — handoff
 
+> **v1.99.11 SHIPPED, 2026-08-25 — Fable tagged it and says so.** Verified: tag pushed,
+> GitHub release Latest, OneDrive artifact fresh, signed CN=FlossworksCross-Stitch. In it:
+> six more resizable windows, the frameless NC-hook fix (the four theme windows' resize had
+> never worked), the Progress float folded into the tabbed window, and the ContentRendered
+> pin retired. **The window-height V2 item is CLOSED** — the NC-grab design met the full
+> acceptance on the rewritten `scripts/drag-verify.ps1` (real border drags; Progress 9
+> phases + History 3 all green) AND David dragged one by hand before the go. Pre-tag fix:
+> the fourth What's-new highlight was stale against the third and miscounted the wiki pack.
+> Residuals: Item info stays non-resizable by mechanism (`ResizableWindowTests` carries the
+> staleness tell); Avalonia resize parity gap widened knowingly (#50 has the corrected table).
+
+
 > **2026-08-25 — RESIZABLE POP-OUTS + THE PROGRESS FOLD. 1.99.11 staged, unreleased.**
 > David asked for both; both had a decision in them that was his and both were asked with the
 > question tool first.
