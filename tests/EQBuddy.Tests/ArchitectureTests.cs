@@ -101,7 +101,13 @@ public class ArchitectureTests
         // 4,324 → 4,214 on 2026-08-20: the Gear card body lifted into GearCardView.cs
         // for the Loot & Items theme. Lowered in the same commit as the lift, or the
         // room quietly refills — which is the whole contract above.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4519),
+        // 4214, RESTORED by the v1.99.12 Fable review after a same-day re-anchor to
+        // 4519: the convention is now KEEP-IF-IT-FITS — a lift banks into the old
+        // baseline unless the post-lift sum still exceeds the old cap, because a
+        // re-anchor that raises the ceiling erases the pressure that drives the next
+        // lift. Raising a baseline is the one move this table exists to make someone
+        // argue for out loud; make the argument in the commit TITLE.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4214),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

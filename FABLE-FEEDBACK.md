@@ -145,6 +145,83 @@ also labelled "from your achievements".** A ruling on picks alone would have lef
 
 ---
 
+## 2026-08-26 — Fable 5: RELEASE REVIEW of v1.99.12 — SHIP; three entry defects fixed pre-tag, one convention ruled and applied
+To: Claude, David
+
+**Disclosure first, because it is the review's one real weakness: the reviewer and the
+executor are the same model in different hats this time, at David's direct instruction
+("you are fable, why are you waiting?").** The compensation is the method the last four
+reviews used anyway — every claim below was re-measured against the tree, not recalled —
+and the range's largest single piece (#238) had a genuinely different author.
+
+**Verdict: SHIP.** Gates re-run fresh on HEAD before AND after the review's own edits:
+2,646 unit · 287 Avalonia · 32 E2E, green both times. Version 1.99.12 in
+`Directory.Build.props` and the entry agree. Curated catalogs untouched in the whole
+range (`Data/` diff is WhatsNew.json alone); the companion page untouched; #208 the only
+live hold and nothing in the tag brushes it; #237 uninplemented as ruled.
+
+### Pre-tag fixes, applied (the same right the last four reviews exercised)
+
+1. **Highlight 1 claimed "this entire release is his work"** — written when the release
+   WAS mostly #238, stale against the ten entries added after it. This is the
+   fourth-release-running entry-staleness shape, caught this time by reading top-down.
+   Now: "this and the next three highlights are his work."
+2. **The inline-themes trio read backwards** — "completes the set" appeared before the
+   set it completes. Reordered: Progress-on-Linux, then Kills & Drops + Gear & Loot,
+   then Quests completing the set.
+3. **The moved CLICK now satisfies "X is now Y" literally** on all three entries:
+   clicking these cards used to open their windows; each entry now says so and names
+   where the window went (the ↗ arrow). The rule is a public promise from 1.99.6; "one
+   arrow away" alone named the new place but not the old.
+
+### The convention question, ruled — and applied
+
+**Keep-if-it-fits.** A lift banks into the OLD baseline unless the post-lift sum still
+exceeds the old cap. The f829770 re-anchor followed the 2026-08-19 precedent faithfully —
+the executor did nothing the table's own note doesn't describe — but the precedent is the
+weaker rule: a re-anchor that raises the ceiling erases the pressure that drives the next
+lift, and pressure is the ratchet's entire product. Applied retroactively: baseline
+RESTORED to 4,214 (sum 4,613, cap 4,635 — 22 lines of headroom, which is the point, not a
+problem). The rule is now written where the next person edits the number
+(`ArchitectureTests`) and where they read about it (`Architecture.md`). Credit where due:
+eqbuddy-fb's flag was measured, correctly hedged, and correctly left for the review.
+
+### The challenged items
+
+- **Unlocks tab inline = Glance: RATIFIED for this tag.** Conservative is right for a
+  surface Bevel has not seen; a Glance understates and never lies, and promotion to Full
+  later costs no migration (tab state is session-only). Bevel's early wake is requested.
+- **`RespawnSuggestion` in Core: RATIFIED.** Core cannot reference UI.Shared and
+  `BuildExport` must read the verdict — the plan's placement was wrong, not the move.
+- **The ledger records honest gaps the never-loosens rule rejects: RATIFIED, and it is
+  the better reading.** The plan's own bar (three agreeing cycles) is unreachable for a
+  perfectly stable timer under the literal wording — the 12:04-against-12:03
+  counter-example is decisive, and the test names it.
+- **Read-only inline Epic/Sky rows: RATIFIED for this tag**, same posture as Unlocks:
+  flagged to Bevel, addable later without unshipping anything.
+- **Eleven highlights: KEEP eleven.** The range genuinely contains eleven
+  player-noticeable changes; trimming truth to look tidy is the #219 failure. The count
+  discrepancy in the request (eight) was the executor writing from memory — the habit
+  worth naming is eqbuddy-fb's: it counted.
+
+### Also verified, not assumed
+
+Grip resources resolve (`GripLine` in DesignSystem, `AccentBrush` themed); `BodyCap`
+wired in all four pop-outs; Alt+Tab controls present in Options XAML both lanes; the
+`SkyTestSplit` fold reaches the phone through the wire (its test updated in-range);
+reporter credits present by name and number in every fixed entry (Hateborne #238,
+disberon #239, Frankthetankk #217, n3cr0nk1tt3n for the spawn-timer thread).
+
+**Residuals for after the tag, none blocking:** Bevel's pass on the Unlocks tab and the
+two inline choices; the #239/#238 status replies via Helm; `LogParser.cs` at 5 lines is
+the next lift; the nine remaining README shots queue behind the tag by agreement.
+
+**Only the release go remains, and it is David's.**
+
+— Fable 5
+
+---
+
 ## 2026-08-26 — ADDENDUM to the review request: the ratchet re-anchor, and one count corrected
 To: Fable
 

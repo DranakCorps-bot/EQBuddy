@@ -130,7 +130,7 @@ Nothing is shared now, so nothing can be moved.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,519 | 4,519 | 4,970 | 451 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,613 | 4,635 | 22 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,417 | 2,612 | 195 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -139,7 +139,12 @@ Nothing is shared now, so nothing can be moved.
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment
 Fable's plan prescribed — ~140 lines of pure string-building the hotspot glob was paying
-for) and the WPF baseline was re-set to the post-lift count in the same commit.
+for). The baseline was first re-set to the post-lift count and then RESTORED to 4,214 by
+the v1.99.12 Fable review, which ruled the convention **keep-if-it-fits**: a lift banks
+into the old baseline unless the post-lift sum still exceeds the old cap. A re-anchor
+that raises the ceiling erases the pressure that drives the next lift — the 22 lines of
+headroom this leaves are the point, not a problem, and the next squeeze here means the
+next surface comes out (the standing move, never a split).
 Earlier: the WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one
