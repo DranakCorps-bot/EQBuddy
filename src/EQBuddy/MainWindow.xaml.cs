@@ -2010,6 +2010,13 @@ public partial class MainWindow : Window, ICardContext
     /// <summary>Also reached from the ✦ marker on a Drops by Creature row, which used to
     /// copy the pack straight to the clipboard. Opening the surface instead is the point
     /// of the move: the marker says "there is something here", and the window says what.</summary>
+    /// <summary>The pack's history pool reads these (#217 ask 2): every stored session's
+    /// mob aggregates, and the live session's own checkpointed row id so it is excluded
+    /// from the fold rather than counted twice.</summary>
+    internal List<MobHistory.SessionMobs> StoredMobRows() => _repo.MobRows();
+
+    internal long ActiveSessionRowId => _archiver.ActiveRowId;
+
     internal void ShowWikiPackWindow()
     {
         if (_wikiPackWindow is not { IsLoaded: true })

@@ -196,28 +196,40 @@ public class WikiPackPresentationTests
     }
 
     /// <summary>The reason this is a window and not a menu command: the scope has to be on
-    /// screen. Ask 2 (#217) widens it to the full archive, and this line is what has to
-    /// change when it does.</summary>
+    /// screen. Ask 2 (#217) widened it to the full archive, and this line is what makes
+    /// the pooling decisions honest — it names everyone pooled and the date span, never a
+    /// policy sentence.</summary>
     [Fact]
-    public void Scope_line_names_the_character_and_says_this_session_only()
+    public void Scope_line_names_everyone_pooled_and_the_span()
     {
-        var text = WikiPackPresentation.ScopeLine(
-            "Dranak", "freeport", new DateTime(2026, 8, 19, 18, 22, 0));
+        var scope = new PoolScope(["Dranak", "Flossie"], ["freeport"], 3,
+            new DateTime(2026, 7, 30), new DateTime(2026, 8, 19));
+        var text = WikiPackPresentation.ScopeLine(scope, kills: 12, creatures: 4);
 
-        Assert.Contains("This session only", text);
-        Assert.Contains("Dranak (freeport)", text);
-        Assert.Contains("18:22", text);
-        Assert.Contains("earlier sessions are not counted", text);
+        Assert.Contains("12 kills of 4 creatures across 3 sessions", text);
+        Assert.Contains("Dranak and Flossie on freeport", text);
+        Assert.Contains("2026-07-30", text);
+        // The old single-session wording is gone with the single-session scope.
+        Assert.DoesNotContain("This session only", text);
     }
 
     [Fact]
-    public void Scope_line_survives_an_unknown_character_and_no_session_start()
+    public void Scope_line_survives_an_empty_pool_and_says_why_it_is_empty()
     {
-        var text = WikiPackPresentation.ScopeLine("", "", null);
+        var text = WikiPackPresentation.ScopeLine(
+            new PoolScope([], [], 0, null, null), kills: 0, creatures: 0);
 
-        Assert.Contains("This session only", text);
-        Assert.Contains("this character", text);
-        Assert.DoesNotContain("since", text);
+        Assert.Contains("No sessions with kills yet", text);
+    }
+
+    [Fact]
+    public void Scope_line_calls_a_today_only_pool_today_rather_than_a_degenerate_span()
+    {
+        var scope = new PoolScope(["Dranak"], ["freeport"], 1, DateTime.Today.AddHours(5), DateTime.Now);
+        var text = WikiPackPresentation.ScopeLine(scope, kills: 3, creatures: 2);
+
+        Assert.Contains("· today", text);
+        Assert.DoesNotContain("→", text);
     }
 
     /// <summary>Both desktops read these; a divergence would be two different products.</summary>

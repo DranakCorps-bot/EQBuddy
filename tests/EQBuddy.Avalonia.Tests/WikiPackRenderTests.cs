@@ -39,6 +39,9 @@ public sealed class WikiPackRenderTests
         public bool IsActiveQuestItem(string name) => false;
         public void OpenQuestInfoForItem(string itemName) { }
         public void ShowWikiPack() { }
+        public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => StoredRows;
+        public List<MobHistory.SessionMobs> StoredRows { get; init; } = [];
+        public long ActiveSessionRowId => 0;
     }
 
     private static StatsSnapshot Snapshot() => new()
@@ -85,11 +88,11 @@ public sealed class WikiPackRenderTests
         Assert.Contains(text, t => t is not null && t.Contains("page lists no loot"));
 
         // The scope, on screen. Behind a menu command this was invisible, which is the
-        // whole reason the move came with a window.
+        // whole reason the move came with a window — and since #217 ask 2 it names the
+        // POOL (kills, creatures, sessions, who, where) rather than "this session only".
         Assert.Contains(text, t => t is not null
-            && t.Contains("This session only")
-            && t.Contains("Tester (p1999)")
-            && t.Contains("18:22"));
+            && t.Contains("5 kills of 2 creatures across 1 session")
+            && t.Contains("Tester on p1999"));
     }
 
     /// <summary>Trap 17: a disabled control with no disabled visual is a silent no-op.</summary>

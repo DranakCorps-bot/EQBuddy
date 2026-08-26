@@ -33,6 +33,14 @@ public interface IDropsHost
     /// <summary>#217 Ask 1: the contribution pack has its own window under Data &amp;
     /// imports now, and the row marker opens it instead of copying silently.</summary>
     void ShowWikiPack();
+
+    /// <summary>#217 Ask 2 — the pack pools history. These two feed
+    /// <see cref="EQBuddy.UI.Shared.WikiPackPool"/>: every stored session's mob
+    /// aggregates, and the live session's checkpointed row id so the fold excludes it
+    /// rather than counting the live kills twice. Drops by Creature deliberately does
+    /// NOT read them — its live view is "is this camp worth it", a different question.</summary>
+    IReadOnlyList<MobHistory.SessionMobs> StoredMobRows();
+    long ActiveSessionRowId { get; }
 }
 
 /// <summary>

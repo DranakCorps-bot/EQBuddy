@@ -371,13 +371,23 @@ never variance; ledger capped at 20 cycles; PR 0 is a script not an app feature.
 
 ## The wiki pack reads one live session; it should read the history already on disk
 
-- **Priority:** `ready` — no consequence-list decision in it. It was filed as "David's scope
-  call" and sat there; on David's instruction (2026-08-22, *"only elevate to me for items
-  appropriately needing my focus"*) I re-read it and it is not his — it is a design question
-  with a plan-shaped answer, which is yours.
-- **Class:** `V2`, and by your own test rather than by size: **no single answer from David
-  finishes it as V1.** The reporter names three open questions that each change the
-  architecture, and the data source moves from a live object to a query over stored archives.
+- **Priority:** **DONE 2026-08-26 (Claude), staged in 1.99.12 — both PRs, executed as
+  planned with one addition the plan could not have predicted.** `MobHistory.Pool` +
+  `PoolScope` + `SessionRepository.MobRows` (the ProgressSeries probe applied to `Mobs`);
+  `UI.Shared/WikiPackPool` (the memo both windows share instead of hand-rolling the cache);
+  both pack windows on the pooled source; the new `ScopeLine(PoolScope, kills, creatures)`
+  in exactly the plan's wording shape; the Drops footer hint extended; Frankthetankk
+  credited in What's-new. All three of the plan's decisions implemented as decided (pool
+  across characters and servers, no toggle, no "since" filter, (name, zone) keying).
+  **The addition: your double-counting risk was real and one exclusion was not enough.**
+  The staged shot's first run caught it — `ActiveRowId` is set by the FIRST checkpoint, so
+  a pool computed before it (the re-ingested-log adoption case) counted the archived twin
+  AND the live snapshot, doubling every number on screen. The live session is now excluded
+  by row id AND by identity `(server, character, session start)` — Checkpoint's own
+  adoption rule — with the failing case as a test. `MobHistoryTests` (9 cases incl. a
+  temp-DB probe), gates 2,621 / 284 green, shot re-staged with the pooled scope line
+  matching its prediction.
+- **Class:** was `V2`; the plan carried it.
 - **Source:** #217 Frankthetankk, ask 2.
 
 ### The concrete miss, which is what makes it worth planning rather than shrugging at

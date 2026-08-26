@@ -43,6 +43,8 @@ public sealed class DropsRenderTests
         public void OpenQuestInfoForItem(string itemName) { }
         public int WikiPackOpened { get; private set; }
         public void ShowWikiPack() => WikiPackOpened++;
+        public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => [];
+        public long ActiveSessionRowId => 0;
     }
 
     private static StatsSnapshot Snapshot() => new()

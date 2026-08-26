@@ -28,7 +28,7 @@ namespace EQBuddy;
 public partial class WikiPackWindow : Window
 {
     private readonly MainWindow _main;
-    private StatsSnapshot _snapshot = new();
+    private readonly WikiPackPool _pool;
     private string _signature = "";
     private DateTime _lastRefresh = DateTime.MinValue;
 
@@ -36,6 +36,9 @@ public partial class WikiPackWindow : Window
     {
         InitializeComponent();
         _main = main;
+        // Stored sessions read once per open (this window is built fresh each time);
+        // the live session re-folds on top only when its mob set moves.
+        _pool = new WikiPackPool(main.StoredMobRows);
         WindowZoom.Attach(this, "wikipack", main.Settings);
         FooterText.Text = WikiPackPresentation.Footer;
     }
@@ -44,7 +47,8 @@ public partial class WikiPackWindow : Window
     public void Update(StatsSnapshot s)
     {
         _lastRefresh = DateTime.Now;
-        _snapshot = s;
+        var (character, server) = _main.Identity;
+        _pool.Refresh(s, character, server, _main.ActiveSessionRowId);
         Render();
     }
 
@@ -54,11 +58,14 @@ public partial class WikiPackWindow : Window
     }
 
     /// <summary>The same observations the clipboard export consumes, so what is on screen
-    /// is what gets pasted. Lookups are kicked off for everything shown — a creature whose
-    /// page has not been read yet is reported as exactly that, never as "nothing new".</summary>
+    /// is what gets pasted. POOLED across every stored session plus the live one (#217
+    /// ask 2) — that is what lets twelve kills over three evenings cross the 10-kill
+    /// rarity bar the honesty rules refuse to relax. Lookups are kicked off for
+    /// everything shown; the 2-in-flight cap in the host is what keeps a long history
+    /// from bursting eqlwiki.</summary>
     private List<WikiContribution.MobObservation> Observations()
     {
-        var mobs = _snapshot.Mobs.Where(m => m.Loot.Count > 0).ToList();
+        var mobs = _pool.Mobs.Where(m => m.Loot.Count > 0).ToList();
         foreach (var m in mobs) _main.EnsureMobLookup(m.Name);
         return mobs
             .Select(m => new WikiContribution.MobObservation(m, _main.WikiMobResult(m.Name)))
@@ -79,7 +86,8 @@ public partial class WikiPackWindow : Window
         // re-renders until they settle. Rebuilding an identical panel every three seconds
         // would fight the scroll position.
         var sig = string.Join("|", pack.Rows.Select(r =>
-            $"{r.Creature}:{r.Kind}:{r.Contributions}")) + $"|{pack.PendingCreatures}|{targets.Count}|{inFlight}";
+            $"{r.Creature}:{r.Kind}:{r.Contributions}"))
+            + $"|{pack.PendingCreatures}|{targets.Count}|{inFlight}|{_pool.Scope.SessionCount}";
         if (sig == _signature) return;
         _signature = sig;
 
@@ -92,9 +100,9 @@ public partial class WikiPackWindow : Window
         RecheckBtn.Opacity = RecheckBtn.IsEnabled ? 1.0 : 0.5;   // trap 17, as Copy below
         RecheckBtn.ToolTip = WikiPackPresentation.RecheckTip(targets.Count, inFlight > 0);
 
-        var (character, server) = _main.Identity;
         HeadlineText.Text = WikiPackPresentation.Headline(pack);
-        ScopeText.Text = WikiPackPresentation.ScopeLine(character, server, _snapshot.SessionStart);
+        ScopeText.Text = WikiPackPresentation.ScopeLine(_pool.Scope,
+            kills: observations.Sum(o => o.Mob.Kills), creatures: observations.Count);
 
         var breakdown = WikiPackPresentation.Breakdown(pack);
         BreakdownText.Text = breakdown;

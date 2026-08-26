@@ -271,14 +271,27 @@ public static class WikiPackPresentation
     }
 
     /// <summary>The one line that stops the scope being silent — the whole reason this is a
-    /// window and not a menu command. It names what was pooled, not what could be.</summary>
-    public static string ScopeLine(string character, string server, DateTime? sessionStart)
+    /// window and not a menu command. It names what was pooled, not what could be.
+    ///
+    /// Since #217 ask 2 the pack pools EVERY stored session plus the live one, across the
+    /// account's characters and servers — this sentence is what makes that decision honest
+    /// rather than silent, so it names everyone and the date span rather than a policy.</summary>
+    public static string ScopeLine(PoolScope scope, int kills, int creatures)
     {
-        var who = character.Length > 0
-            ? server.Length > 0 ? $"{character} ({server})" : character
-            : "this character";
-        var since = sessionStart is { } s ? $", since {s:HH:mm}" : "";
-        return $"This session only — {who}{since}. Kills from earlier sessions are not counted yet.";
+        if (scope.SessionCount == 0)
+            return "No sessions with kills yet — the pack builds itself from your own loot log.";
+        var who = scope.Characters.Count == 0 ? "this character"
+            : string.Join(" and ", scope.Characters);
+        var where = scope.Servers.Count > 0 ? $" on {string.Join(" and ", scope.Servers)}" : "";
+        var span = scope.Earliest is { } e0
+            ? e0.Date == DateTime.Today
+                ? " · today"
+                : $" · {e0:yyyy-MM-dd} → {(scope.Latest is { } l0 && l0.Date != DateTime.Today ? l0.ToString("yyyy-MM-dd") : "today")}"
+            : "";
+        var k = kills == 1 ? "1 kill" : $"{kills:N0} kills";
+        var c = creatures == 1 ? "1 creature" : $"{creatures} creatures";
+        var s = scope.SessionCount == 1 ? "1 session" : $"{scope.SessionCount} sessions";
+        return $"{k} of {c} across {s} · {who}{where}{span}";
     }
 
     /// <summary>The headline above the rows.</summary>
@@ -428,8 +441,11 @@ public static class WikiPackPresentation
     public const string Title = "Wiki contribution pack";
 
     /// <summary>The pointer left behind in Drops by Creature, so the button moving out is
-    /// not a disappearance.</summary>
+    /// not a disappearance — and, since the pack pools history, the sentence that says the
+    /// two surfaces deliberately answer DIFFERENT questions: this live view is "is this
+    /// camp worth it", the pack is "what can I give the wiki" over everything on disk.</summary>
     public const string MovedHint =
         "Drops eqlwiki doesn't know yet are marked here. The paste-ready edits for them " +
-        "are now under Data & imports → Wiki contribution pack.";
+        "are now under Data & imports → Wiki contribution pack — and the pack pools every " +
+        "session you have, so kills from other evenings count toward its rarity labels.";
 }

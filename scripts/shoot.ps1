@@ -691,6 +691,17 @@ $Shots = [ordered]@{
     'wiki-pack'       = @{ Title = 'Wiki contribution pack'
                            Env = @{ EQBUDDY_WIKIPACK = '1' }
                            Set = @{}
+                           # The pack POOLS history (#217 ask 2), so the shot stages two
+                           # stored sessions (fixture slices, day-shifted) under a second
+                           # character - the scope line must read "across 3 sessions -
+                           # Aludra and Testchar on test" and the per-creature kill counts
+                           # must exceed the live session's own, or the picture is of the
+                           # old single-session pack wearing the new chrome.
+                           Prime = @(
+                               @{ Character = 'Aludra'; Fraction = 0.4; ShiftDays = 2 }
+                               @{ Character = 'Aludra'; Fraction = 0.7; ShiftDays = 1 }
+                               @{}
+                           )
                            # The rare-only row (Bevel's kind): the Asp's page below is
                            # COMPLETE, so without these two cons it contributes nothing —
                            # which used to be the bug. One plain con and one rare con, so

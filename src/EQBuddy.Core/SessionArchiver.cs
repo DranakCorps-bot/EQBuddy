@@ -26,6 +26,11 @@ public sealed class SessionArchiver : IDisposable
         _repo.MarkInterruptedAsRecovered();
     }
 
+    /// <summary>The live session's checkpointed row, or 0. The wiki pack's history pool
+    /// excludes this row and takes the live session from the live snapshot instead —
+    /// counting both would pool the same kills twice (#217 ask 2).</summary>
+    public long ActiveRowId { get { lock (_lock) return _activeId; } }
+
     public void SetIdentity(string? server, string? character)
     {
         lock (_lock)

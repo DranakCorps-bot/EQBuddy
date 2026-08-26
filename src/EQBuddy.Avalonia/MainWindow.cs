@@ -3584,6 +3584,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private CreatureWindow? _creatureWindow;
     private WikiPackWindow? _wikiPackWindow;
+
+    /// <summary>The pack's history pool (#217 ask 2) — see the interface doc on
+    /// <see cref="IDropsHost"/>.</summary>
+    public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => _repo.MobRows();
+
+    public long ActiveSessionRowId => _archiver.ActiveRowId;
     private MapWindow? _mapWindow;
     private TravelWindow? _travelWindow;
     private FightTimelineWindow? _timelineWindow;

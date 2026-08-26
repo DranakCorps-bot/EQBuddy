@@ -247,6 +247,52 @@ public sealed class SessionRepository : IDisposable
         }
     }
 
+    /// <summary>
+    /// Every stored session's per-creature aggregates, oldest first — the
+    /// <see cref="ProgressSeries"/> probe applied to <c>Mobs</c>, so the wiki pack can
+    /// pool history without materialising every snapshot's combat ledgers (#217 ask 2).
+    /// Default scope is EVERY character and server (the plan's decision 1: drop tables
+    /// are facts about the mob, not about who observed them); the parameters exist for
+    /// callers that genuinely mean one.
+    /// </summary>
+    public List<MobHistory.SessionMobs> MobRows(string? server = null, string? character = null)
+    {
+        lock (_lock)
+        {
+            using var cmd = _db.CreateCommand();
+            cmd.CommandText = """
+                SELECT Id, Server, Character, StartUtc, EndUtc, SnapshotJson FROM Sessions
+                WHERE ($server IS NULL OR Server = $server)
+                  AND ($char IS NULL OR Character = $char)
+                ORDER BY StartUtc ASC LIMIT 1000
+                """;
+            cmd.Parameters.AddWithValue("$server", (object?)server ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$char", (object?)character ?? DBNull.Value);
+            using var r = cmd.ExecuteReader();
+            var rows = new List<MobHistory.SessionMobs>();
+            while (r.Read())
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(r.GetString(5));
+                    if (!doc.RootElement.TryGetProperty("Mobs", out var mobsEl)
+                        || mobsEl.ValueKind != JsonValueKind.Array
+                        || mobsEl.GetArrayLength() == 0)
+                        continue;
+                    var mobs = mobsEl.Deserialize<List<MobSummary>>(JsonOpts);
+                    if (mobs is not { Count: > 0 }) continue;
+                    var start = DateTime.Parse(r.GetString(3)).ToLocalTime();
+                    var end = DateTime.Parse(r.IsDBNull(4) ? r.GetString(3) : r.GetString(4))
+                        .ToLocalTime();
+                    rows.Add(new MobHistory.SessionMobs(
+                        r.GetInt64(0), r.GetString(1), r.GetString(2), start, end, mobs));
+                }
+                catch { /* one unreadable snapshot must not empty the pool */ }
+            }
+            return rows;
+        }
+    }
+
     public StatsSnapshot? LoadSnapshot(long id)
     {
         lock (_lock)
