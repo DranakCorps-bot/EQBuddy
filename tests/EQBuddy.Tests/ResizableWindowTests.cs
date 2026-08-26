@@ -20,9 +20,11 @@ namespace EQBuddy.Tests;
 ///   which gives minimum sizes and a remembered size.
 /// - Something else already owns it → leave it alone. Two writers for one value is trap 4,
 ///   and `WindowZoom` says so about Width in its own doc comment.
-/// - The content arrives AFTER first render → excluded until the window-height V2 fix,
-///   because `AllowResize` pins the height at `ContentRendered` and would freeze the
-///   window at its "loading" size. That is a REGRESSION, not a missing feature.
+/// - Something ELSE about it is unresolved → excluded with the reason named.
+///
+/// **Updated 2026-08-25:** `AllowResize` no longer pins the height at `ContentRendered`. It
+/// follows the content until the player grabs a resize border (WM_NCLBUTTONDOWN), which is
+/// why Item info's exclusion is now only about its own async body rather than about the pin.
 /// </summary>
 public class ResizableWindowTests
 {
@@ -49,10 +51,9 @@ public class ResizableWindowTests
         { "SessionPickerWindow.cs",      "CanResize" },
         // Keeps its own saved size (restores savedW/savedH, Closed += SavePosition).
         { "BreakoutWindow.xaml.cs",      "CanResize" },
-        // Resizable by WPF's DEFAULT — they name no ResizeMode at all. Size is not kept:
-        // both fetch from eqlwiki after the window is up, so AllowResize's ContentRendered
-        // pin would freeze them at the size of an empty lookup. They ride the window-height
-        // V2 fix, at which point they can hold a remembered size honestly.
+        // Resizable by WPF's DEFAULT — they name no ResizeMode at all, so they get WPF's own
+        // chrome and a real border. Size is not kept: neither calls AllowResize, and neither
+        // needs to until someone asks.
         { "WikiPackWindow.xaml.cs",      "Default" },
         { "MapWindow.cs",                "Default" },
     };
@@ -89,9 +90,9 @@ public class ResizableWindowTests
             + "and CHANGES PER TAB — the Alerts tab is ~300px taller than Look. AllowResize "
             + "would pin it to whichever tab opened first and clip the rest." },
         { "ItemInfoWindow.xaml",
-            "Content arrives after first render — it fetches the item from eqlwiki (async) "
-            + "and grows when the reply lands. Pinning at ContentRendered would freeze it at "
-            + "the size of an empty lookup. Rides the window-height V2 fix." },
+            "Frameless like the rest, and its body arrives from an async eqlwiki fetch that "
+            + "resizes it under the player. Nobody has asked to drag it, and giving a window "
+            + "that grows on its own a manual size is a decision, not a default." },
     };
 
     [Theory]
@@ -157,5 +158,34 @@ public class ResizableWindowTests
             "These windows set a ResizeMode but appear in neither list. Add each to "
             + "Resizable() or to NotResizable() with the mechanism that excludes it:"
             + Environment.NewLine + "  " + string.Join(Environment.NewLine + "  ", unlisted));
+    }
+
+    /// <summary>
+    /// **`CanResize` on a frameless window is a claim, not a capability.** These windows are
+    /// `WindowStyle=None` + `AllowsTransparency=True`, so WPF gives them no non-client area
+    /// and there is no border for the mouse to find — the mode said resizable and every one
+    /// of them was immovable. David reported it twice, four days apart in 2026-08 and again
+    /// on 2026-08-06 for the loot breakout, which is where the WM_NCHITTEST hook came from.
+    ///
+    /// So the guard is not "does it say CanResize" (the list above already checks that) but
+    /// "is the hook that makes it TRUE still wired". And the pin must not come back: taking
+    /// the height at `ContentRendered` samples a frame where a replay-fed body is empty.
+    /// </summary>
+    [Fact]
+    public void AllowResizeWiresTheHitTestHookAndDoesNotPinOnARenderEvent()
+    {
+        var source = Wpf("WindowZoom.cs");
+
+        Assert.Contains("WmNcHitTest", source);
+        Assert.Contains("ResizeZones.Hit", source);
+        Assert.Contains("WmNcLButtonDown", source);
+        // The pin, by SUBSCRIPTION rather than by name: the doc comment above the method
+        // explains what it was and why it went, and a scan that forbade naming it would
+        // forbid the explanation (the mistake I made writing this guard the first time).
+        Assert.DoesNotMatch(@"ContentRendered\s*\+=", source);
+        // The height is only persisted once the player has taken it — otherwise a window
+        // nobody dragged reopens OWNED at whatever the content measured, which is the pin
+        // arriving through the settings file instead.
+        Assert.Contains("SizeToContent == SizeToContent.Manual", source);
     }
 }
