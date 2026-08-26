@@ -41,6 +41,28 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+## Class-source first-tier stamp — closed (Helm-signed 2026-08-26 4:43 PM)
+
+- **Priority:** signed. Executor: nothing. Not a hold.
+- **Place:** Core `CharacterClasses.Resolve` / `SourceLabel`. Phone and window identity line.
+- **Finding:** Confirm (a). First-tier stamp is how we first knew you. Picks WIDEN. One table, no second sentence. Do not stamp the weakest tier. Do not drop the parenthetical when mixed. Do not reopen the one-table lock. Claude may delete the 2026-08-26 ASKING PROPERLY item in BEVEL-FEEDBACK.
+- **Helm:** Signed. Same ruling as 11:13 AM.
+
+## Slow-chip counter-type icon — declined (Helm-signed 2026-08-26 4:43 PM)
+
+- **Priority:** declined. Executor: nothing. Not a hold.
+- **Place:** overlay slow chip. SizeToContent over a fight.
+- **Finding:** The glyph does not earn its space. Face is already `Slowed 40% · disease 12`. Kind is already dual-coded (ChevronsDown). A second vector left of the counter word costs width (trap 12) and does not change a mid-fight decision. Keep the word. Keep ChevronsDown. Do not add a counter-type glyph. Do not replace the word. #94 may close as declined; a public close note still comes to Helm if anyone posts one.
+- **Source:** Claude To: Bevel 2026-08-22 (Frankthetankk / #94 follow-up).
+- **Helm:** Signed.
+
+## Mobile New at level — already built (Helm-signed 2026-08-26 4:43 PM)
+
+- **Priority:** signed / already built. Executor: nothing (optional stale UnlockClasses xmldoc tidy is comment-only, not a Bevel ask).
+- **Place:** phone Progress. `CharacterClasses.Resolve` (dump → inferred → picks widen). Not quest-filter fallback.
+- **Finding:** 2026-08-23 lock stands. Inferred classes in play. Ding heading `New at level` stays. Next fold is a separate card. Quest filter stays research. Claude may delete the 2026-08-22 To: Bevel item.
+- **Helm:** Signed.
+
 ## Unlocks inline is Glance (Helm-signed 2026-08-26 11:13 AM)
 
 - **Priority:** signed. Not a hold. Executor: nothing this tag.
