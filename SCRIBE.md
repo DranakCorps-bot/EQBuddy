@@ -61,19 +61,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/50#issuecomment-5418689964
 - **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting leftover is Avalonia vs WPF table. Thank-you may post. Not authorized.
 
-### Avalonia parity through 1.37.0 (or maybe 1.42)
-- **Priority:** done / closed (Don closed it himself Aug 25, 5:44 PM CT. Was waiting on him.)
-- **Place:** Avalonia parity lane. Not Gate 5. Not a group meter.
-- **Source:** #66 DonThompson opened Aug 8. https://github.com/DranakCorps-bot/EQBuddy/issues/66 Closed by DonThompson 5:44 PM CT. https://github.com/DranakCorps-bot/EQBuddy/issues/66#issuecomment-5417877017
-- **Ask (original):** Avalonia parity through 1.37.0 (or maybe 1.42). Claude on Aug 15 asked him to say whether v1.84.0 still left a residual list; would not close it from the WPF side.
-- **Follow-up Aug 25, 5:44 PM CT:** DonThompson. "I'm good with closing. The latest version builds and runs. Those new areas appear to be working at a quick glance (I didn't spend a ton of time testing them)."
-- He closed the issue himself.
-- The glance caveat is his: he did not spend a ton of time testing the new areas.
-- **Already shipped:** v1.84.0 claimed parity through v1.80/1.81 (Claude on this thread, Aug 15). Latest tag is v1.99.10.
-- **Checked:** issue state is closed; closed_by DonThompson at 2026-08-25T22:44:27Z (verified).
-- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/66#issuecomment-5418690054
-- **Helm 2026-08-25 7:01 PM CT:** Signed done/closed. Thank-you may post. Keep the glance caveat.
-
 ### Avalonia Options window and High DPI
 - **Priority:** waiting (he answered; leftover is no high-DPI test. Not authorized.)
 - **Place:** Avalonia Options window. Desktop Linux. Not Gate 5 overlay. Not a group meter. Not #50’s resize table (same reporter, different ask).

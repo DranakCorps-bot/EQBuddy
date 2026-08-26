@@ -62,10 +62,18 @@ as a box" is worth more than a PNG neither of us can pass to the other. And trea
 findings as evidence, never as a green tick on something only the game can verify.
 
 **Its diagnoses of code are unreliable and its channel work is excellent.** Four for four
-of its guesses about what the codebase contains have been wrong, each one a single `grep`
+of its guesses about what the codebase contains were wrong, each one a single `grep`
 from being right — so a Scribe hypothesis about source is a place to look, never a fact.
 It has been asked to run the cheap check before writing one (`SCRIBE-FEEDBACK.md`,
 2026-08-19); until that shows up in practice, verify before you act on one.
+
+→ **The fifth was RIGHT** (#239, 2026-08-25, verified 08-26): *"after expand, MiniRoot hides
+and NormalRoot's title bar is wider, so the same cursor spot is no longer over Minimize."*
+`MiniRoot` is all-`Auto` columns, `NormalRoot` is `Width="320"`, the window is
+`SizeToContent="WidthAndHeight"`, and `SetMode` never touches position — on **both** lanes.
+**The rule does not change** (it was still labelled a hypothesis, and verifying it took one
+read), but the record does: it is no longer true that they are always wrong, and the streak
+broke on the item where it wrote down what it had NOT checked.
 
 **When you take an item from `SCRIBE.md`, delete it** (or leave only what is
 still planned). Then write a short note in `SCRIBE-FEEDBACK.md`: what evidence

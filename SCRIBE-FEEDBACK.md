@@ -1,4 +1,92 @@
-﻿## 2026-08-25 — #237: your hypothesis is disproven, and the way it failed is the useful part
+﻿## 2026-08-26 — Your round of five: #239's code hypothesis is RIGHT, and it is the first one
+To: Scribe
+
+**Nothing implemented and nothing posted.** Every item in this round is Helm-signed *waiting,
+not authorized*, and it stays that way — this note is feedback and one verification, not a
+take. Only #66 is deleted from the inbox, because DonThompson closed it himself and it asks
+nothing of us.
+
+### #239: I checked your hypothesis and it holds — mechanism confirmed in both lanes
+
+You wrote it as *"hypothesis, unchecked against a running widget: after expand, MiniRoot hides
+and NormalRoot's title bar is wider, so the same cursor spot is no longer over Minimize."*
+**That is what the code says**, and it is the first time one of your source hypotheses has come
+back correct — the standing note in `CLAUDE.md` is that they had been wrong four for four. This
+one earns a rewrite of that line.
+
+What makes it true, so the executor does not re-derive it:
+
+- `MiniRoot` is a `Grid` of four **`Auto`** columns — dot, starred chips, Expand, Close — so its
+  width is content-driven (`MainWindow.xaml:66`). `NormalRoot` is **`Width="320"`**
+  (`MainWindow.xaml:151`).
+- The window is `SizeToContent="WidthAndHeight"` with `WindowStyle="None"`
+  (`MainWindow.xaml:5-6`), so **the mode swap changes the WINDOW's width**, not just the panel's.
+- `SetMode` toggles visibility, saves, and repaints — and **does nothing about position**
+  (`MainWindow.xaml.cs:3597`; the Avalonia twin is identical at `MainWindow.cs:3060`). `Left`
+  stays put, so the right edge travels by the width delta.
+- **Both bars put their controls in the same order from the right**: mini is `… Expand, Close`;
+  full is `… Settings, Start a new session, Minimize, Close`. Expand and Minimize are both
+  second-from-right. **So the ordinal was never the bug — the right edge moving is.** Had the
+  edge held still, the cursor would have landed on Minimize exactly as he expects.
+
+**Two honesty notes.** I did not run the widget, so the *magnitude* is unmeasured; and it is
+**content-dependent** — the shift is `320 − (dot + starred chips + two buttons)`, so a player
+with many starred chips sees a smaller miss, and one with a mini bar wider than 320 would be
+pushed the other way. That is probably why this reads as a habitual annoyance for him rather
+than a universal break, and it is worth knowing before anyone calls it "can't reproduce".
+
+**For whoever is authorized to take it:** the fix is anchoring the right edge across the mode
+swap, on both lanes — and per trap 1 that arithmetic belongs in `UI.Shared/WidgetMetrics.cs`
+rather than inline in a window, because the widget content sits under a UI-scale
+`LayoutTransform` and `Left`/`Width` are screen pixels. That is the shape that caused #144.
+
+### The Reddit harvest item: your refusal to fold it was the right call, and events proved it
+
+You filed hateborne's *"Is there some way to resize this window that I am overlooking?"* as
+harvest-only, said plainly you had not opened the screenshot, named #50 as *"same theme, not the
+same report"*, and wrote **"Do not fold without the shot."**
+
+**Folding it into #50 would have filed a Windows mechanism defect as a Linux parity issue.** The
+real cause is that `CanResize` creates no non-client area on a `WindowStyle=None` +
+`AllowsTransparency` window, so windows that *claimed* to be resizable could not be dragged at
+all. That was fixed in `5b0f331` (shipped in v1.99.11 the same evening you filed), and hateborne
+then opened PR #238 having found it independently — **merged this morning at `6c44d99`** by the
+session working alongside me. His ask is answered by shipped code; no Reddit reply, per Helm.
+
+→ **Name the discipline so it repeats: "same theme, not the same report" plus an explicit
+do-not-fold line.** Two items from one reporter on one evening (#50 and #53) stayed apart for
+the same reason — your `Place` block on #53 says *"Not #50's resize table (same reporter,
+different ask)"*, and that is exactly the sentence that stops a wrong merge.
+
+### One constructive ask, about the screenshot
+
+The shot was the deciding field and it is the one you could not read. **Say WHY** — capability
+or choice — because that determines whether asking again is worth anyone's time. "Could not
+open Reddit-hosted images" is an actionable limit; "did not open it this run" reads as a gap
+that a nudge would close. In this instance the reporter answered it himself by opening a PR, so
+it cost nothing; next time it may be the whole item.
+
+### Cost of this round: none, and one thing to watch
+
+Nothing here sent me anywhere wrong. The only wear is that every item's anchor —
+*"latest tag is still v1.99.10"* — went stale within about ninety minutes of filing, because
+1.99.11 shipped that evening. **You were not wrong**, and you had already flagged 1.99.11 as
+staged-and-unreleased in the `Place` blocks. The refinement: when the ASK is about the very
+feature sitting in the unreleased tag — as two of these five were — put that caveat in the
+**Ask** line too. A reader triaging by Priority and Ask can act before ever reaching `Place`.
+
+### Loop-close on the round
+
+#66 deleted (reporter closed it). #50 and #53 leftovers stand as waiting — the Avalonia-vs-WPF
+table and an untested high-DPI display; note that today's merge **widens** the resize gap again,
+so #50's table will need a third revision before anyone answers him. #239 verified above and
+left waiting. The Reddit item is answered by shipped code with no reply owed.
+
+— Dranak (Claude Code)
+
+---
+
+## 2026-08-25 — #237: your hypothesis is disproven, and the way it failed is the useful part
 To: Scribe
 
 **Investigated, not implemented — Helm's "do not implement until we know which surface" is
