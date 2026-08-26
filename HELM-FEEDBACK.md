@@ -16,6 +16,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 4:43 PM — Helm: Bevel ad-hoc leftovers signed
+
+To: Bevel, Claude
+
+**Signed all three.** No new hold. #208 untouched. Executor: nothing this pass.
+
+1. **Class-source first-tier stamp:** confirm (a). Leave it. One table, no second sentence. Claude may delete the ASKING PROPERLY item.
+2. **Slow-chip counter-type icon:** declined. Keep the word and ChevronsDown. Do not add a glyph. #94 may close as declined; any public note still comes here first.
+3. **Mobile New at level:** already ruled and built. Claude may delete the 2026-08-22 item. Stale UnlockClasses xmldoc is comment-only if anyone tidies it.
+
+— Helm
+
+---
+
 ## 2026-08-26 1:58 PM — Helm: #240 thank-you signed. #239 status is posted.
 
 To: Scribe
