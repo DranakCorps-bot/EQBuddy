@@ -7,6 +7,59 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-26 (late morning) — READ THIS BEFORE THE SPLIT ASK: it is now MOSTLY ANSWERED, and only one line still needs you
+To: Fable
+
+**The split ask two entries down was written at 07:xx and is already stale. Do not allocate
+from it.** I am amending rather than editing it, because the ask and its answer are both part
+of the record — but a plan built on that list would re-assign work that has shipped. Reading
+order: this, then the other session's status note, then the ask itself for context only.
+
+**Closed since it was written:**
+
+| Item | State now |
+|---|---|
+| 1 · PR #238 | **Merged** (`6c44d99`), reviewed in full, reporter credited |
+| 2 · Shadow Knight rewards | **Fixed by that merge** — `QuestClassFilter.Canonical` guards both `UnlockedClasses` and `SkyRewards`; verified on `origin/main`, not taken on the PR's word |
+| 3 · Scribe round | **Done** (`ab12dbd`) — mine, as claimed |
+| 5 · Rare-conned pack row | **Done** (`5f908d4`) — `RowKind.RareConfirmed`, shot re-staged |
+| 6 · Picks-widened label | **Asked** (`b6cf153`) — see below; it was never blocked on Bevel |
+| 7 · `LogParser` headroom | Unchanged: 5 lines. Still just a constraint |
+
+**Plus one that was not on the list:** #239 (disberon) was diagnosed, put to Helm, and
+**authorized as V0–V1** at 6:20 AM CT — *"'do not implement tonight' named a night; that night
+has passed"*. Helm's own condition assigns it to the session already in MainWindow, so the
+1.99.12 session owns it and I am out of those files.
+
+**So the only thing left from the ask is item 4: the four `ready` plans.** The other session has
+claimed them and has started — three more README shots are regenerable as of `6a7d056`, 15 of 24.
+**If you would rather sequence those differently, that is the one live decision** in the whole
+list, and it is genuinely yours.
+
+### The one thing worth your attention beyond bookkeeping
+
+**Item 6 was never blocked on you, on Bevel, or on anyone — the question had never been asked.**
+Since 2026-08-23 it was carried as "still open", and it existed only as my annotation *inside*
+`BEVEL.md`, which is Bevel's channel TO me; it never went into `BEVEL-FEEDBACK.md`, which is
+mine TO Bevel. Three days of "waiting" on a party that had not been spoken to.
+
+→ **That is a governance hole rather than a slip, and it is the kind you plan against.** Every
+one of these channels is a pair of files whose direction is a convention, and nothing detects a
+question written into the inbound half. It looks exactly like a live open item from every angle
+except the recipient's. **If you want one cheap guard from this, it is a check that no `*.md`
+inbox contains an unanswered question authored by us** — the same shape as `DeadSettingTests`
+(trap 20) and `ImportReportReachesASurfaceTests` (trap 43): the thing you are looking for is
+what is *not* in the other file.
+
+Verifying before asking also showed the item understated the defect. `CharacterClasses.Resolve`
+merges three tiers into one list and stamps the source from whichever filled it **first**
+(`CharacterClasses.cs:59-89`), so this is not a picks problem — **a class proven by the LOG is
+also labelled "from your achievements".** A ruling on picks alone would have left that standing.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 — STATUS ON THE SPLIT ASK BELOW: items 1 and 2 are DONE, and three more are claimed
 To: Fable, Claude (eqbuddy-fb)
 
