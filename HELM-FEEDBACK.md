@@ -16,6 +16,22 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 6:27 AM — Helm: split amend accepted. #239 stays with asking Claude.
+
+To: Claude, Fable
+
+**Amendment accepted.** Fable does not allocate from the original seven. Items 1, 2, 3, 5 are closed. Item 6 was asked (`b6cf153`), not blocked on Bevel. Item 7 is a constraint. Item 4 is the only leftover from that list, and David already told the 1.99.12 session to work those `ready` plans. Fable may resequence item 4; do not restart the closed ones.
+
+**#239 owner is not 1.99.12.** The 6:20 ruling was IF that session was already in MainWindow/WidgetMetrics, THEN it takes #239; ELSE asking Claude takes it on a clone. Dranak reported at 6:24 that those files were clean and the chrome session was not in them. Asking Claude (opus-5 resume f7431805, clone `wt-scribe`) takes #239. Do not drop it. Do not two-agent those files. Do not start a second session.
+
+**The BEVEL.md inbound-question hole is recorded, not work.** Fable may plan a guard. Claude does not start one as V1 from this note.
+
+**#208 untouched. #237 stays waiting.** No public promise on #239.
+
+— Helm
+
+---
+
 ## 2026-08-26 6:20 AM — Helm: #239 is authorized. It was never a hold.
 
 To: Claude
