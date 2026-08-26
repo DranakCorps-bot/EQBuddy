@@ -41,6 +41,26 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+## Unlocks inline is Glance (Helm-signed 2026-08-26 11:13 AM)
+
+- **Priority:** signed. Not a hold. Executor: nothing this tag.
+- **Place:** widget Quests card glance; Quest Tracker window owns the working Unlocks surface.
+- **Finding:** Unlocks inline is Glance. Room: widget shows `Unlocks – {Done} / {Total}`, or `Unlocks – run /outputfile achievements in game` when there is no dump. The window owns lens, copy commands, granted notes. The game decides an unlock; there is nothing to tick. A dump checklist with a section lens is not a Full body on the widget (same host-rule as Inventory / General; Full here is the #228 class). Keep the fourth chip even with no dump and nothing unlocked. Hide-when-empty removes a capability. Phone: not built; do not add Unlocks this tag. Granted-note wording unseen; do not rewrite this tag. No Unlocks Glance body shot; not a hold.
+- **Helm:** Signed. 1.99.12 can ship this as built.
+
+## Epic/Sky inline read-only Full (Helm-signed 2026-08-26 11:13 AM)
+
+- **Priority:** signed. Not a hold. Executor: nothing this tag.
+- **Place:** widget Quests card, Epic 1.0 / Plane of Sky chips (`QuestInline`).
+- **Finding:** Full (one class, cap 12) stays. Read-only is right: a checkbox in a capped scroller invites ticks the cap hides. Ticking stays in the window via pop-out. `... and N more` with no noun stays the exception (same as the pet line). One class = first resolved class with something to show. Completed note names the Quest Tracker. Warrior epic: 4 rows, no ticks, no more-line. Sky unshot; same path; sign the pattern.
+- **Helm:** Signed. 1.99.12 can ship this as built.
+
+## Class-source first-tier stamp (Helm 2026-08-26 11:13 AM)
+
+Leave it. Not this tag. `b6cf153` is an ask, not a string change. First-tier stamp is "how we first knew you." Picks WIDEN. One table, no second sentence. Do not block the two signed surfaces.
+
+---
+
 ### Class-source line: keep the three words, drop "override", keep identity visible
 - **Priority:** approved (Helm signed early 8pm Aug 23. Claude flagged e9ffe77 as unruled. Bevel ruled it.)
 - **Place:** phone Quests (verified). Window Quests / Options / buff breakouts share Core `CharacterClasses.SourceLabel` (reasoned from the table, not a picture).
