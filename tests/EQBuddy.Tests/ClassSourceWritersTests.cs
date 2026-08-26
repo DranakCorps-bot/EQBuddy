@@ -56,6 +56,24 @@ public class ClassSourceWritersTests
         },
     };
 
+    /// <summary>
+    /// Routes that READ a dump and deliberately record nothing, each with the reason.
+    ///
+    /// An exemption nobody can see is a blind spot rather than an exemption
+    /// (`SurfaceOwnershipTests` says the same thing about its two lanes), so this is a
+    /// list and not a hole in the scan below.
+    /// </summary>
+    public static readonly (string File, string Why)[] ReadsButDoesNotRecord =
+    [
+        ("src/EQBuddy.Core/UnlockSource.cs",
+            "It re-reads both dumps on a RENDER path, when their timestamps move, so that "
+            + "the Unlocks tab cannot show what was true last week. Recording from there "
+            + "would make a getter write to the per-character ledger on a UI tick — a "
+            + "second writer racing the import path for one fact (trap 4), and a ledger "
+            + "save per repaint. The import routes above are the writers, and they run on "
+            + "the same dump the moment the game announces it."),
+    ];
+
     [Theory]
     [MemberData(nameof(Writers))]
     public void EveryAchievementsImportRouteRecordsTheClassesItRead(string file, string why)
@@ -76,6 +94,7 @@ public class ClassSourceWritersTests
     public void NoOtherFileParsesAnAchievementsDumpUnnoticed()
     {
         var known = Writers.Select(row => (string)row[0]!)
+            .Concat(ReadsButDoesNotRecord.Select(r => r.File))
             .Select(f => f.Replace('/', Path.DirectorySeparatorChar))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -96,7 +115,20 @@ public class ClassSourceWritersTests
 
         Assert.True(offenders.Count == 0,
             "these files read an achievements dump and are not on the writers list — either "
-            + "record UnlockedClasses there or add a row saying why not: "
-            + string.Join(", ", offenders));
+            + "record UnlockedClasses there or add a row to ReadsButDoesNotRecord saying "
+            + "why not: " + string.Join(", ", offenders));
+    }
+
+    /// <summary>An exemption needs a REASON, and the file it names has to still exist —
+    /// otherwise the list decays into a set of names nobody can evaluate.</summary>
+    [Fact]
+    public void EveryExemptionNamesARealFileAndSaysWhy()
+    {
+        Assert.All(ReadsButDoesNotRecord, row =>
+        {
+            Assert.True(File.Exists(Path.Combine(Root, row.File)),
+                $"{row.File} has moved — update this exemption");
+            Assert.True(row.Why.Length > 40, $"{row.File}: an exemption needs a real reason");
+        });
     }
 }

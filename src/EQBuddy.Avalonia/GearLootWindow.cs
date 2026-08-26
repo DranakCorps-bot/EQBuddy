@@ -235,7 +235,11 @@ public sealed class GearLootWindow : Window
         var work = Screens.ScreenFromWindow(this) ?? Screens.Primary;
         var height = work is null ? 900 : work.WorkingArea.Height / work.Scaling;
         MaxHeight = Math.Max(220, height * 0.85);
-        _bodyScroll.MaxHeight = Math.Max(120, MaxHeight - 160);
+        // The BODY opens at a design constant, not at a fraction of the monitor — see
+        // WindowSizing.BodyCap. `taken` is null on this lane because these windows are not
+        // resizable here yet (issue #50); the moment they are, pass the dragged height and
+        // the body follows it, exactly as the WPF twin does.
+        _bodyScroll.MaxHeight = WindowSizing.BodyCap(MaxHeight, 160, taken: null);
     }
 
     /// <summary>Open on a tab by its wire key. An unknown key — or one of the two the theme

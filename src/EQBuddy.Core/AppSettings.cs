@@ -247,6 +247,9 @@ public sealed class AppSettings
     /// A flag rather than inferring it from "nothing is pinned", so deliberately unpinning
     /// every rule isn't undone at the next launch.</summary>
     public bool WatchPinsMigrated { get; set; }
+    /// <summary>Has the one-time <see cref="MigrateWindowHeights"/> clear run? See there
+    /// for why every stored window height written before 2026-08-25 is discarded.</summary>
+    public bool WindowHeightsReset { get; set; }
     /// <summary>Whether the watch-rule examples panel in Options is expanded. Remembered so
     /// someone still learning the feature doesn't have to reopen it every time, and someone
     /// who doesn't need it never sees it again.</summary>
@@ -435,6 +438,16 @@ public sealed class AppSettings
     /// which deliberately keeps the widget visible in that case. Both off by default;
     /// they compose. EQBuddy's own windows having focus always overrides the hide.</summary>
     public bool HideWhenGameNotRunning { get; set; }
+    /// <summary>Keep EQBuddy out of the Alt+Tab switcher (Hateborne, 2026-08-25). Off by
+    /// default, and Windows-only — Alt+Tab is a Windows concept, so the box says so
+    /// rather than persisting a choice that does nothing (the rule
+    /// <see cref="UI.Shared.FocusHide.UnavailableNote"/> already sets one row above).
+    ///
+    /// **It takes the taskbar button with it, and that is not separable**: WS_EX_TOOLWINDOW
+    /// is one flag with both effects. The tray icon is then the only way back to a hidden
+    /// widget, so the Options row names it — a setting that can strand a player without
+    /// saying so is worse than no setting.</summary>
+    public bool HideFromAltTab { get; set; }
 
     // Breakout stat windows (BREAKOUT-*): one position + Fight/Session scope per kind.
     // They open while the widget is minimized with the matching star set.
@@ -577,6 +590,7 @@ public sealed class AppSettings
         changed |= settings.ApplyDefaultEpicQuestChecklist();
         changed |= settings.MigrateBuffSetsToClassBuckets();
         changed |= settings.MigrateArchiveDefault();
+        changed |= settings.MigrateWindowHeights();
         // A READ that writes, and the reason is good: an id assigned at construction is
         // only stable across restarts if it is persisted now. But it means Load() is a
         // writer, and a caller that has not taken the single-instance lock must be able to
@@ -639,19 +653,33 @@ public sealed class AppSettings
     }
 
     /// <summary>
-    /// The "Sky Quest" and "Epics" cards became ONE "Quests" card (David, 2026-08-16).
-    /// Both used to carry a full tabbed checklist on the widget — a review surface, not
-    /// a glance one — and the Quest Tracker window now owns that on its own three tabs,
-    /// which the new card opens.
+    /// Discard every stored window height, once.
     ///
-    /// The surviving key takes the EARLIER of the two old slots, so the card appears
-    /// where the player already looked for quests instead of arriving at the bottom of
-    /// the list, where a new card reads as missing (the 1.66 lesson recorded in
-    /// NormalizeSectionOrder). It is hidden only when BOTH old cards were hidden:
-    /// keeping either one visible was a statement that quests belong on the widget.
+    /// **Not one of them was a choice.** `WindowZoom.AllowResize` persisted `ActualHeight`
+    /// on close unconditionally, and until 2026-08-25 no frameless pop-out had a border a
+    /// player could grab — so every entry in `WindowHeights` records whatever the window
+    /// happened to measure when it was closed. Hateborne's profile carried four: `drops`
+    /// 1224 (a window filling the screen), `gearloot` 200 (the minimum floor, sampled from
+    /// a frame with nothing in it yet), `quests` 425, `progress` 493.
     ///
-    /// Idempotent — once neither old key is present there is nothing left to fold.
+    /// They cannot be repaired, only distinguished from real ones by WHEN they were
+    /// written — so they go, once. From here a height is only stored when the player has
+    /// actually dragged the border, which the app can now tell exactly.
+    ///
+    /// A player who had dragged a window before today loses that one size and sets it
+    /// again in a second. A player who had not — everyone, since it was impossible — gets
+    /// their pop-outs back at a sensible height instead of whatever an empty first frame
+    /// measured.
     /// </summary>
+    public bool MigrateWindowHeights()
+    {
+        if (WindowHeightsReset) return false;
+        WindowHeightsReset = true;
+        if (WindowHeights.Count == 0) return true;
+        WindowHeights.Clear();
+        return true;
+    }
+
     /// <summary>Reward names corrected in the catalog, so a turn-in already recorded
     /// against the old name is not orphaned.
     ///
@@ -700,6 +728,20 @@ public sealed class AppSettings
         return changed;
     }
 
+    /// <summary>
+    /// The "Sky Quest" and "Epics" cards became ONE "Quests" card (David, 2026-08-16).
+    /// Both used to carry a full tabbed checklist on the widget — a review surface, not
+    /// a glance one — and the Quest Tracker window now owns that on its own three tabs,
+    /// which the new card opens.
+    ///
+    /// The surviving key takes the EARLIER of the two old slots, so the card appears
+    /// where the player already looked for quests instead of arriving at the bottom of
+    /// the list, where a new card reads as missing (the 1.66 lesson recorded in
+    /// NormalizeSectionOrder). It is hidden only when BOTH old cards were hidden:
+    /// keeping either one visible was a statement that quests belong on the widget.
+    ///
+    /// Idempotent — once neither old key is present there is nothing left to fold.
+    /// </summary>
     public bool MigrateQuestSections()
     {
         var firstSlot = -1;

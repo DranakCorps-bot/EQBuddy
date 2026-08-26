@@ -48,6 +48,9 @@ public partial class CreatureWindow : Window
         // keeps their zoom through the fold — the same courtesy the card keys get.
         WindowZoom.Attach(this, "drops", _settings, baseWidth: Width);
         WindowZoom.AllowResize(this, "drops", _settings);
+        // A drag changes how much room the body has; without this the window grows
+        // and its content does not follow.
+        SizeChanged += (_, _) => UpdateHeightCap();
 
         _drops = new DropsCardView(main);
 
@@ -140,9 +143,12 @@ public partial class CreatureWindow : Window
             ? work.Height
             : SystemParameters.WorkArea.Height;   // before the handle exists
         MaxHeight = Math.Max(220, height * 0.85);
+        // The BODY opens at a design constant, not at a fraction of the monitor. Deriving
+        // it from the screen is what made this window fill a tall display; UI.Shared owns
+        // the number so all seven pop-outs cannot disagree about it.
         // Cap the SCROLLER, not just the window: otherwise the window grows past its own
         // cap on a long drops list and the tab strip walks off the bottom.
-        BodyScroll.MaxHeight = Math.Max(120, MaxHeight - 120);
+        BodyScroll.MaxHeight = WindowSizing.BodyCap(MaxHeight, 120, FramelessResize.ManualHeight(this));
     }
 
     /// <summary>Repaint from the widget's shared snapshot. Throttled the way the other

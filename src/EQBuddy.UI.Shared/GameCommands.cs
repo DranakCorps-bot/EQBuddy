@@ -16,6 +16,10 @@ public static class GameCommands
     /// <summary>Makes the game write its achievements dump — the import that
     /// pre-marks Sky rewards and raid clears from before EQBuddy.</summary>
     public const string OutputfileAchievements = "/outputfile achievements";
+    /// <summary>Singular, and the file it writes is plural with the class code in the
+    /// middle. Both verified from the game's own usage line and announcement in Hateborne's
+    /// log, 2026-08-25 — no public documentation covers this dump.</summary>
+    public const string OutputfileFaction = "/outputfile faction";
 
     /// <summary>The map's breadcrumb social, one command per social-editor line:
     /// /loc drops a position into the log, /doability 1 keeps the key doing what

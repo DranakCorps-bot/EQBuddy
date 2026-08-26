@@ -91,6 +91,12 @@ public static class AchievementsImport
                 continue;
             var className = a.Name[(dash + 3)..].Trim();
             if (className.Length == 0) continue;
+            // Canonical, because this list is compared against catalog class names
+            // everywhere it lands — the ledger, the class strip, the quest filter. An
+            // unresolvable name keeps its own spelling rather than being dropped: a
+            // class we do not recognise is still a class the dump says they hold.
+            if (QuestClassFilter.Canonical(className) is { Length: > 0 } canonical)
+                className = canonical;
             var into = a.Name.Contains("Primary Class Unlock", StringComparison.OrdinalIgnoreCase)
                 ? primary : rest;
             if (!into.Contains(className, StringComparer.OrdinalIgnoreCase))
@@ -113,10 +119,15 @@ public static class AchievementsImport
             var dash = a.Name.LastIndexOf(" - ", StringComparison.Ordinal);
             if (dash < 0 || !a.Name.Contains("Class Unlock", StringComparison.OrdinalIgnoreCase))
                 continue;
+            // "Shadowknight" in the dump, "Shadow Knight" in every catalog here, so the
+            // compare goes through the canonical name. There is no early return now
+            // either: that pair dropped all sixteen Shadow Knight rewards before the
+            // guard and before `unmatched`. See ShadowknightIsTheSameClassAsShadowKnight.
             var className = a.Name[(dash + 3)..].Trim();
+            if (QuestClassFilter.Canonical(className) is { Length: > 0 } canonical)
+                className = canonical;
             var rewards = checklist.Where(c =>
                 c.ClassName.Equals(className, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (rewards.Count == 0) continue;
 
             // TWO ways to get a class unlock without doing the quests, and the dump marks
             // the Obtain criteria complete for BOTH. Each announces itself with its own

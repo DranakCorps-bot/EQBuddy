@@ -50,4 +50,62 @@ public class SkyTestSplitTests
         Assert.NotEmpty(wizardOnly);
         Assert.DoesNotContain(wizardOnly, q => q.Name.StartsWith("Monk "));
     }
+
+    /// <summary>The split quest name and the Sky checklist key are two spellings of one
+    /// fact, and the round trip is what stops them drifting. The negatives matter as much:
+    /// an ordinary catalog quest must resolve to "" or every quest in the catalog would
+    /// start reading its completion off the Sky checklist.</summary>
+    [Fact]
+    public void ASplitQuestNameRoundTripsToItsRewardKey()
+    {
+        Assert.Equal("Wizard Sky Test: Nargon's Staff",
+            SkyTestSplit.QuestName("Wizard", "Nargon's Staff"));
+        Assert.Equal("Wizard|Nargon's Staff",
+            SkyTestSplit.RewardKeyFor("Wizard Sky Test: Nargon's Staff"));
+        // The class with a space in it is the one that broke everything else.
+        Assert.Equal("Shadow Knight|Obtenebrate Mithril Guard",
+            SkyTestSplit.RewardKeyFor("Shadow Knight Sky Test: Obtenebrate Mithril Guard"));
+
+        Assert.Equal("", SkyTestSplit.RewardKeyFor("Journey to the Plane of Sky"));
+        Assert.Equal("", SkyTestSplit.RewardKeyFor("Sky Test: no class"));
+        Assert.Equal("", SkyTestSplit.RewardKeyFor("Wizard Sky Test: "));
+        Assert.Equal("", SkyTestSplit.RewardKeyFor(""));
+
+        // Every SHIPPED split quest resolves — the property that makes the fold total,
+        // asserted against the real catalog rather than a hand-built one.
+        var split = QuestCatalog.LoadEmbedded().Quests
+            .Where(q => q.Name.Contains(" Sky Test: ", StringComparison.Ordinal)).ToList();
+        Assert.True(split.Count >= 60, $"only {split.Count} split quests");
+        Assert.All(split, q => Assert.NotEqual("", SkyTestSplit.RewardKeyFor(q.Name)));
+    }
+
+    /// <summary>
+    /// #101/#204's other half: the Quests tab read the per-character quest ledger and the
+    /// Sky tab read `SkyQuestCompleted`, and nothing joined them — so a reward the game's
+    /// own achievements dump reported as handed in still sat on the Quests tab as work to
+    /// do. The fold is read-only and additive; a ledger count already there wins.
+    /// </summary>
+    [Fact]
+    public void ASkyRewardTurnedInReadsCompletedOnTheCatalogTabToo()
+    {
+        var ledger = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Journey to the Plane of Sky"] = 1,
+            ["Wizard Sky Test: Nargon's Staff"] = 3,   // repeatable count the player set
+        };
+
+        var merged = SkyTestSplit.WithTurnIns(ledger,
+            ["Shadow Knight|Obtenebrate Mithril Guard", "Wizard|Nargon's Staff"]);
+
+        Assert.Equal(1, merged["Shadow Knight Sky Test: Obtenebrate Mithril Guard"]);
+        // The ledger's own answer is not overwritten by the fold.
+        Assert.Equal(3, merged["Wizard Sky Test: Nargon's Staff"]);
+        Assert.Equal(1, merged["Journey to the Plane of Sky"]);
+        // Nothing invented: a reward nobody turned in stays absent, so a quest with no
+        // entry is still "not completed" rather than "completed zero times".
+        Assert.DoesNotContain("Bard Sky Test: Mask of Song", merged.Keys);
+
+        // A null/empty checklist is the common case and must not throw.
+        Assert.Equal(ledger.Count, SkyTestSplit.WithTurnIns(ledger, null).Count);
+    }
 }

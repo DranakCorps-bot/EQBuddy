@@ -174,18 +174,30 @@ public class ResizableWindowTests
     [Fact]
     public void AllowResizeWiresTheHitTestHookAndDoesNotPinOnARenderEvent()
     {
-        var source = Wpf("WindowZoom.cs");
-
-        Assert.Contains("WmNcHitTest", source);
-        Assert.Contains("ResizeZones.Hit", source);
-        Assert.Contains("WmNcLButtonDown", source);
+        // Since the #238 merge the hook lives in FramelessResize (one home for the
+        // hit-test, the grip hint, the ownership switch and the drag flag); AllowResize
+        // must still be the thing that wires it, so a window cannot join the feature and
+        // miss the affordance.
+        var wiring = Wpf("WindowZoom.cs");
+        Assert.Contains("FramelessResize.Attach", wiring);
         // The pin, by SUBSCRIPTION rather than by name: the doc comment above the method
         // explains what it was and why it went, and a scan that forbade naming it would
         // forbid the explanation (the mistake I made writing this guard the first time).
-        Assert.DoesNotMatch(@"ContentRendered\s*\+=", source);
+        // #238's branch re-pinned at ContentRendered ("open at natural height once, then
+        // hand the axis over") and the merge deliberately kept follow-until-grab instead.
+        Assert.DoesNotMatch(@"ContentRendered\s*\+=", wiring);
         // The height is only persisted once the player has taken it — otherwise a window
         // nobody dragged reopens OWNED at whatever the content measured, which is the pin
         // arriving through the settings file instead.
-        Assert.Contains("SizeToContent == SizeToContent.Manual", source);
+        Assert.Contains("FramelessResize.PlayerTookHeight", wiring);
+
+        var hook = Wpf("FramelessResize.cs");
+        Assert.Contains("WmNcHitTest", hook);
+        Assert.Contains("ResizeZones.Hit", hook);
+        // Ownership at the player's actual grab (5b0f331's design, kept through the
+        // merge), and the drag flag at the end of the native size loop (#238's).
+        Assert.Contains("WmNcLButtonDown", hook);
+        Assert.Contains("WmExitSizeMove", hook);
+        Assert.DoesNotMatch(@"ContentRendered\s*\+=", hook);
     }
 }

@@ -107,8 +107,8 @@ public class CompanionQuestsTests
             SkyQuestChecklist = [new SkyQuestChecklistItem { Id = "s1", ClassName = "Bard", Reward = "y", QuestItem = "z" }],
         };
         var quests = Build(new CompanionQuestRequest { Catalog = Catalog() }, settings).Quests!;
-        Assert.Equal(["general", "epic", "sky"], quests.Tabs.Select(t => t.Key));
-        Assert.Equal(["Quests", "Epic 1.0", "Plane of Sky"], quests.Tabs.Select(t => t.Label));
+        Assert.Equal(["general", "epic", "sky", "unlocks"], quests.Tabs.Select(t => t.Key));
+        Assert.Equal(["Quests", "Epic 1.0", "Plane of Sky", "Unlocks"], quests.Tabs.Select(t => t.Label));
         Assert.Null(quests.Tabs[0].Badge);       // a catalog you search, not a checklist you finish
         Assert.Equal("1 / 1", quests.Tabs[1].Badge);
         Assert.Equal("0 / 1", quests.Tabs[2].Badge);

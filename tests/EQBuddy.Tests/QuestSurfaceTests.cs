@@ -11,12 +11,12 @@ namespace EQBuddy.Tests;
 public class QuestSurfaceTests
 {
     [Fact]
-    public void AllThreeTabsAlwaysExistInAFixedOrder()
+    public void EveryTabAlwaysExistsInAFixedOrder()
     {
         // Nothing ticked anywhere: the tabs still show. A Sky tab that appears only
         // once you've started Sky hides itself from the player who most needs it.
         var tabs = QuestSurface.Tabs();
-        Assert.Equal([QuestTab.General, QuestTab.Epic, QuestTab.Sky], tabs.Select(t => t.Tab));
+        Assert.Equal([QuestTab.General, QuestTab.Epic, QuestTab.Sky, QuestTab.Unlocks], tabs.Select(t => t.Tab));
     }
 
     [Fact]

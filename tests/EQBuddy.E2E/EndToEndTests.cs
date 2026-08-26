@@ -827,8 +827,52 @@ public sealed class EndToEndTests
             + app.Artifacts());
 
         // Core's QuestSurface owns the tab list, and the mode strip is the five views.
-        Assert.Equal(3, app.DumpValue("questsTabs"));
+        // Four since #238: General, Epic 1.0, Plane of Sky, Unlocks.
+        Assert.Equal(4, app.DumpValue("questsTabs"));
         Assert.Equal(5, app.DumpValue("questsModes"));
+    }
+
+    /// <summary>
+    /// The Sky tab hands over the command that FEEDS it.
+    ///
+    /// A hand-in never appears in the log, so `/outputfile achievements` is the only thing
+    /// that can say a Sky reward was turned in before EQBuddy existed — and until
+    /// 2026-08-25 this surface named no way to produce one, with the copy living on the
+    /// widget menu and the Raids card. Same absence the Gear tab had, and the same reason
+    /// nothing caught it: a negative assertion cannot see a missing control (trap 34), and
+    /// an absent control photographs as an unremarkable panel (trap 29).
+    ///
+    /// The count is read off the real visual tree, so this is the WPF lane's only proof
+    /// that the button EXISTS rather than that the constant is referenced somewhere.
+    /// </summary>
+    [Fact]
+    public void TheSkyTabOffersTheAchievementsCommandItRunsOn()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "sky" });
+        app.Launch();
+
+        Wait.Until(() => app.DumpValue("questsTabs") > 0, TimeSpan.FromSeconds(45),
+            "the Quest Tracker to open on the Sky tab", app.Artifacts);
+        Assert.Equal(1, app.DumpValue("questsSkyCopyCmd"));
+    }
+
+    /// <summary>
+    /// Alt+Tab exclusion is off by default, and the window agrees with the setting.
+    ///
+    /// Both halves are reported because they are different claims: `altTabWanted` is what
+    /// `settings.json` says and `altTabStyle` is the ex-style actually on the HWND. Trap
+    /// 42 is exactly the gap between them — a feature genuinely in the binary, genuinely
+    /// not in force, and indistinguishable from a stale build from anywhere but here.
+    /// </summary>
+    [Fact]
+    public void TheWidgetStaysInAltTabUntilAskedNotTo()
+    {
+        using var app = new AppHarness();
+        app.Launch();
+
+        Assert.Equal(0, app.DumpValue("altTabWanted"));
+        Assert.Equal(0, app.DumpValue("altTabStyle"));
     }
 
     /// <summary>

@@ -39,8 +39,15 @@ public class OutputfileAutoImportTests
     // Case varies across servers in the filenames we HAVE seen, so the match is
     // case-insensitive rather than trusting one capitalisation.
     [InlineData("dranak_freeport-inventory.txt", OutputfileKind.Inventory)]
+    // The faction dump, and the reason it is a SUFFIX rule: the game splices the
+    // character's class code into the middle of the name. Counting segments would refuse
+    // a real dump forever, which is trap 48's distinction on a different filename.
+    // Verified from Hateborne's own log, 2026-08-25:
+    //   Outputfile Complete: Hateborne_neriak-ENC-Factions.txt
+    [InlineData("Hateborne_neriak-ENC-Factions.txt", OutputfileKind.Factions)]
+    [InlineData("Dranak_freeport-Factions.txt", OutputfileKind.Factions)]
     // A dump EQBuddy has no reader for is named as such, not silently treated as one of
-    // the two it does read — guessing here would apply the wrong importer to a real file.
+    // the ones it does read — guessing here would apply the wrong importer to a real file.
     [InlineData("Dranak_freeport-Spellbook.txt", OutputfileKind.Unknown)]
     [InlineData("", OutputfileKind.Unknown)]
     public void TheFilenameDecidesWhichImporterRuns(string file, OutputfileKind expected) =>
@@ -372,5 +379,47 @@ public class OutputfileAutoImportTests
         var again = OutputfileAutoImport.ImportInventory(dump, settings);
         Assert.Equal(0, again.GearTicked);
         Assert.Null(again.Undo);
+    }
+
+    /// <summary>
+    /// A faction dump must never reach the achievements importer.
+    ///
+    /// Both widgets routed the announcement with `if (kind == Inventory) … else …`, so the
+    /// else branch meant "everything that is not inventory". Adding OutputfileKind.Factions
+    /// to the enum on 2026-08-25 therefore fed TSV faction rows to a parser that looks for
+    /// C/I achievement lines: it finds none, and ImportAchievements then records the empty
+    /// result — SetUnlockedClasses(key, []) — WIPING the class list the real achievements
+    /// dump established, while reporting "read your achievements dump" about a file that
+    /// was nothing of the kind.
+    ///
+    /// This pins the parser half, which is where the damage came from: an achievements
+    /// parse of a faction dump yields nothing, so anything that writes what it yields is
+    /// destroying data. Both widgets now switch on the kind exhaustively.
+    /// </summary>
+    [Fact]
+    public void AFactionDumpIsNotAnAchievementsDump()
+    {
+        // The real shape: a header row and tab-separated integers, no C/I column at all.
+        var factionLines = new[]
+        {
+            "ID	Name	StandingValue	PointsToMax",
+            "236	Dark Bargainers	0	2000",
+            "330	The Freeport Militia	-15	2015",
+        };
+
+        var asAchievements = AchievementsImport.Parse(factionLines);
+        Assert.Empty(asAchievements.Where(a => a.Criteria.Count > 0));
+        Assert.Empty(AchievementsImport.UnlockedClasses(asAchievements));
+
+        // Which is exactly why the kind must be told apart BEFORE anything is applied.
+        Assert.Equal(OutputfileKind.Factions,
+            OutputfileAutoImport.KindOf("Hateborne_neriak-ENC-Factions.txt"));
+        Assert.NotEqual(OutputfileKind.Achievements,
+            OutputfileAutoImport.KindOf("Hateborne_neriak-ENC-Factions.txt"));
+
+        // And it really does parse as factions.
+        var standings = FactionsFile.Parse(factionLines);
+        Assert.Equal(2, standings.Count);
+        Assert.Equal("Dark Bargainers", standings[0].Name);
     }
 }

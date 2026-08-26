@@ -49,6 +49,12 @@ public partial class OptionsWindow : Window
         TargetDropsCheck.IsChecked = _vm.ShowTargetDrops;
         HideUnfocusedCheck.IsChecked = _vm.HideWhenGameUnfocused;
         HideNotRunningCheck.IsChecked = _vm.HideWhenGameNotRunning;
+        HideAltTabCheck.IsChecked = _vm.HideFromAltTab;
+        // The cost is stated where the choice is made: one flag, both effects.
+        HideAltTabNote.Text = string.Join(" ",
+            new[] { EQBuddy.UI.Shared.AltTabPolicy.TaskbarWarning,
+                    EQBuddy.UI.Shared.AltTabPolicy.UnavailableNote }
+                .Where(s => s.Length > 0));
         KeepAboveCheck.IsChecked = _vm.KeepAboveOverlays;
         SpawnGrowUpCheck.IsChecked = _vm.SpawnChipsGrowUp;
         MezGrowUpCheck.IsChecked = _vm.MezChipsGrowUp;
@@ -567,6 +573,16 @@ public partial class OptionsWindow : Window
     private void OnHideNotRunningToggled(object sender, RoutedEventArgs e)
     {
         if (_ready) _vm.HideWhenGameNotRunning = HideNotRunningCheck.IsChecked == true;
+    }
+
+    /// <summary>Applied to every open window immediately, not on the next launch — a
+    /// tick-box whose effect waits for a relaunch is indistinguishable from a broken
+    /// one, and this one has a visible answer the moment it lands.</summary>
+    private void OnHideAltTabToggled(object sender, RoutedEventArgs e)
+    {
+        if (!_ready) return;
+        _vm.HideFromAltTab = HideAltTabCheck.IsChecked == true;
+        _main.ApplyAltTabStyle();
     }
 
     /// <summary>

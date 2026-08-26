@@ -60,6 +60,16 @@ public static class IconPaths
         ["Pin"] = "M14 4v5c0 1.12.37 2.16 1 3H9c.63-.84 1-1.88 1-3V4h4m3-2H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3V4h1c.55 0 1-.45 1-1s-.45-1-1-1Z",
         ["PinFilled"] = "M16 9V4h1c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3Z",
         ["Check"] = "M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17Z",
+        // The partner to Check on a READ-ONLY list: a requirement that is simply not met
+        // yet. A bullet, deliberately — ChevronRight was used here first and it promises a
+        // drill-down that does not exist, which is an affordance lying about itself
+        // (Hateborne, 2026-08-25). Not a checkbox either: nothing on the Unlocks tab is
+        // the player's to tick, and a control that looks tickable and is not is the same
+        // fault from the other side (trap 17).
+        // Check's partner on a READ-ONLY list. A dash, not a chevron (promises a
+        // drill-down) and not a ring (reads as a tickable checkbox). 14 wide because
+        // IconGeometryTests wants half the grid filled; a dot renders as a speck.
+        ["Pending"] = "M5 11h14v2H5Z",
         ["Flag"] = "M6 3h2v18H6V3Zm3 1h10.5l-2.4 3.75L19.5 11.5H9V4Z",
         ["Undo"] = "M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62A8 8 0 0 1 20.4 15.1l2.37-.78A10.5 10.5 0 0 0 12.5 8Z",
         ["Copy"] = "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1Zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H8V7h11v14Z",

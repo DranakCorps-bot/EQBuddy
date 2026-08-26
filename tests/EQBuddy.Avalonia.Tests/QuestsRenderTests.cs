@@ -46,6 +46,14 @@ public sealed class QuestsRenderTests : IDisposable
         /// null is the ordinary case (no dump has been read this session).</summary>
         public AutoImportOutcome? LastAchievementsImport { get; set; }
         public InventoryFile.Snapshot? LatestInventory(bool refresh = false) => null;
+
+        // The Unlocks tab's two dumps. Settable so a test can stage them; the default is
+        // the honest "this player has never run either command" state, which is the one
+        // the tab has to handle without showing sixteen races at zero.
+        public IReadOnlyList<UnlockProgress> RaceUnlocks { get; set; } = [];
+        public IReadOnlyList<UnlockProgress> ClassUnlocks { get; set; } = [];
+        public FactionsFile.Snapshot? LatestFactions { get; set; }
+        public bool HasUnlockDump { get; set; }
         public string? CachedItemStats(string itemName) => null;
         public Task<string?> FetchItemTooltip(string itemName) => Task.FromResult<string?>(null);
     }

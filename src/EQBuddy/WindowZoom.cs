@@ -60,8 +60,11 @@ internal static class WindowZoom
     ///
     /// **Setting `CanResize` was not enough and nobody noticed for four days.** A
     /// WindowStyle=None + AllowsTransparency window has no non-client area, so there is no
-    /// border to grab: the mode said resizable and the mouse could not do it. The
-    /// WM_NCHITTEST hook below is what actually makes it true.
+    /// border to grab: the mode said resizable and the mouse could not do it.
+    /// <see cref="FramelessResize"/> owns the WM_NCHITTEST hook that actually makes it
+    /// true — found independently by Hateborne (#238) and by 5b0f331 on the same day; the
+    /// merged shape keeps this repo's follow-until-grab ownership and #238's visible grip,
+    /// drag-flag persistence and junk-height healing.
     ///
     /// **It lives here because this class already owns width.** Ctrl+wheel sets
     /// `Width = baseWidth x zoom` on every step, so a second thing writing Width would be
@@ -75,8 +78,8 @@ internal static class WindowZoom
     /// pinned ~203px and scrolled forever after, for three releases. The honest trigger is
     /// WM_NCLBUTTONDOWN on a resize border, because a window nobody has grabbed yet has no
     /// player-chosen size to remember. That also makes the saved height meaningful: it is
-    /// written on close ONLY once SizeToContent is Manual, so a window you never dragged
-    /// cannot come back owned.
+    /// written on close ONLY once <see cref="FramelessResize.PlayerTookHeight"/> says the
+    /// player took it, so a window you never dragged cannot come back owned.
     ///
     /// Persisted on CLOSE, not per drag: a save writes the whole settings file from the
     /// snapshot taken at load (trap 13), and doing that on every mouse-move would be a
@@ -87,83 +90,41 @@ internal static class WindowZoom
         window.ResizeMode = ResizeMode.CanResize;
         window.MinWidth = Math.Max(window.MinWidth, WindowSizing.MinWidth);
         window.MinHeight = Math.Max(window.MinHeight, WindowSizing.MinHeight);
+        // AND A BORDER TO GRAB: CanResize creates no non-client area on a frameless
+        // window, so every window through here was resizable in settings and immovable
+        // under a mouse. Here rather than at the call sites, so a window cannot join the
+        // feature and miss the affordance. FramelessResize has the evidence.
+        if (window.WindowStyle == WindowStyle.None) FramelessResize.Attach(window);
 
         if (settings.WindowHeights.TryGetValue(key, out var savedHeight)
             && WindowSizing.IsSaneHeight(savedHeight))
         {
             window.SizeToContent = SizeToContent.Manual;
             window.Height = savedHeight;
+            // A stored height only exists because the player dragged for it, so the window
+            // opens already owning its height — otherwise the next undragged close would
+            // delete the very choice this line just restored.
+            FramelessResize.MarkPlayerSized(window);
         }
-        // **A frameless window has NO resize borders, so CanResize alone does nothing.**
-        // These windows are WindowStyle=None + AllowsTransparency=True: WPF gives them no
-        // non-client area at all, so there is nothing for the mouse to grab and every one
-        // of them has been "resizable" on paper and immovable in practice. David, 2026-08-25,
-        // testing 1.99.11: *"Please let me resize the Progress popout window."*
-        //
-        // The fix is not new — `BreakoutWindow` has carried it since 2026-08-06 (his identical
-        // report then: *"I still can't resize the loot window"*). It is lifted here so every
-        // window that opts into AllowResize gets it, instead of one window knowing the trick.
-        window.SourceInitialized += (_, _) =>
-        {
-            if (PresentationSource.FromVisual(window) is HwndSource src) src.AddHook(Hook);
-        };
-
         window.Closed += (_, _) =>
         {
             var zoom = settings.WindowZooms.TryGetValue(key, out var z) && z > 0 ? z : 1.0;
             if (WindowSizing.BaseWidthToStore(window.Width, zoom) is { } basis)
                 settings.WindowBaseWidths[key] = basis;
-            // Only once the player has actually taken the size. Persisting a
-            // content-driven height would make the next launch open OWNED at whatever the
-            // content happened to measure at close — the old pin coming back through the
-            // settings file.
-            if (window.SizeToContent == SizeToContent.Manual
+            // ONLY a height the player dragged to (or restored — MarkPlayerSized above).
+            // Persisting a content-driven height would make the next launch open OWNED at
+            // whatever the content happened to measure at close — the old pin coming back
+            // through the settings file. And a value nobody chose is REMOVED, so a profile
+            // carrying one from the 08-21..08-25 builds heals itself even after
+            // MigrateWindowHeights has run once.
+            if (FramelessResize.PlayerTookHeight(window)
                 && WindowSizing.HeightToStore(window.ActualHeight) is { } h)
                 settings.WindowHeights[key] = h;
+            else
+                settings.WindowHeights.Remove(key);
             settings.Save();
         };
-
-        IntPtr Hook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            switch (msg)
-            {
-                case WmNcHitTest:
-                {
-                    // lParam: screen coords, low word X, high word Y (signed for multi-monitor).
-                    var x = (short)((long)lParam & 0xFFFF);
-                    var y = (short)(((long)lParam >> 16) & 0xFFFF);
-                    var p = window.PointFromScreen(new Point(x, y));
-                    var hit = ResizeZones.Hit(p.X, p.Y, window.ActualWidth, window.ActualHeight,
-                        BreakdownRowLayout.ResizeEdge, BreakdownRowLayout.ResizeCorner);
-                    if (hit != 0) { handled = true; return hit; }
-                    break;
-                }
-                case WmNcLButtonDown when (long)wParam is >= HtLeft and <= HtBottomRight:
-                    // **This is where the height stops following the content and becomes the
-                    // player's** — the honest trigger, and the reason the ContentRendered pin
-                    // is gone. The old code sampled a height on the FIRST FRAME, which for a
-                    // replay-fed body is a frame with every child collapsed; the Progress
-                    // Experience tab pinned ~203px and scrolled forever after. Taking the size
-                    // at the moment the player grabs an edge cannot sample an empty window,
-                    // and it must happen BEFORE the native size loop starts or layout snaps
-                    // the height back the instant it runs.
-                    if (window.SizeToContent != SizeToContent.Manual)
-                    {
-                        var w = window.ActualWidth;
-                        var h = window.ActualHeight;
-                        window.SizeToContent = SizeToContent.Manual;
-                        window.Width = w;
-                        window.Height = h;
-                    }
-                    break;
-            }
-            return IntPtr.Zero;
-        }
     }
-
-    private const int WmNcHitTest = 0x84;
-    private const int WmNcLButtonDown = 0xA1;
-    private const int HtLeft = 10, HtBottomRight = 17;
 
     /// <summary>For windows whose scale already lives in a named setting: wheel just
     /// drives that setter (which applies, clamps, and persists on its own).</summary>

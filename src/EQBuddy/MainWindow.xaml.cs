@@ -246,8 +246,13 @@ public partial class MainWindow : Window, ICardContext
                             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
                         Hidden = QuestLedger?.HiddenFor(QuestCharacterKey)
                             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
-                        Completed = QuestLedger?.CompletedFor(QuestCharacterKey)
-                            ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                        // Sky turn-ins folded in, so the phone's quest list answers what
+                        // its own Sky tab already knows — parity by shared module, not by
+                        // a feature list kept level by hand.
+                        Completed = SkyTestSplit.WithTurnIns(
+                            QuestLedger?.CompletedFor(QuestCharacterKey)
+                                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                            _settings.SkyQuestCompleted),
                         Classes = QuestLedger?.ClassesFor(QuestCharacterKey) ?? [],
                         InferredClass = snap.InferredClass,
                         // The RESOLVED list and its source, decided here so the phone cannot decide it
@@ -444,7 +449,8 @@ public partial class MainWindow : Window, ICardContext
             Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
             {
                 ShowQuestsWindow();
-                if (questsMode.Split(':')[0] is "sky" or "epic") _questsWindow?.SetTab(questsMode);
+                if (QuestSurface.TabForKey(questsMode.Split(':')[0]) is not null)
+                    _questsWindow?.SetTab(questsMode);
                 else if (questsMode is "zone" or "all") _questsWindow?.SetMode(questsMode);
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
@@ -2885,7 +2891,14 @@ public partial class MainWindow : Window, ICardContext
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={_companionPumpTicks} " +
-                    $"companionPushes={_companionPushes}";
+                    $"companionPushes={_companionPushes} " +
+                    // Alt+Tab (Hateborne, 2026-08-25). Reported as the EFFECT — the ex-style
+                    // actually on the HWND — not as the setting, because "present in the
+                    // build" and "in effect at runtime" are different claims and trap 42
+                    // cost two builds to learn it. The setting is beside it so a
+                    // disagreement between the two is visible rather than inferable.
+                    $"altTabWanted={(_settings.HideFromAltTab ? 1 : 0)} " +
+                    $"altTabStyle={(NoActivate.IsToolWindow(this) ? 1 : 0)}";
                 System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
             }
             catch { }
@@ -3035,7 +3048,12 @@ public partial class MainWindow : Window, ICardContext
             if (kind == OutputfileKind.Unknown) return;
             if (OutputfileAutoImport.ResolvePath(_settings.LogFolder, ev.FileName) is not { } path) return;
 
-            if (kind == OutputfileKind.Inventory)
+            // A SWITCH, never `if (Inventory) … else …`: that else meant "not inventory",
+            // so a new enum member routed faction dumps into ImportAchievements and wiped
+            // the class list. Pinned by AFactionDumpIsNotAnAchievementsDump.
+            switch (kind)
+            {
+            case OutputfileKind.Inventory:
             {
                 // refresh: true re-scans and runs the existing auto-check; the outcome
                 // below is what makes it VISIBLE, which is the half that was missing.
@@ -3054,13 +3072,22 @@ public partial class MainWindow : Window, ICardContext
                 // that can make it stale. A surface that shows a file has to repaint when
                 // the file it shows is replaced.
                 _gearLootWindow?.InventoryChanged();
+                break;
             }
-            else
-            {
+
+            case OutputfileKind.Achievements:
                 LastAchievementsImport =
                     OutputfileAutoImport.ImportAchievements(path, _settings, _raidLedger,
                         QuestLedger, QuestCharacterKey);
                 _settings.Save();
+                break;
+
+            case OutputfileKind.Factions:
+                // Nothing to import — UnlockSource reads it off disk. Just nudge the tab.
+                _questsWindow?.FactionsChanged();
+                break;
+
+            default: break;   // Unknown returned above; a new kind lands here, not silently
             }
         }
         catch (Exception ex) { App.LogError(ex); }   // a half-written dump must not kill the tail
@@ -4291,7 +4318,16 @@ public partial class MainWindow : Window, ICardContext
         ApplyHotkeys();
         // Under Wine + opt-in only: don't steal focus from a fullscreen game when clicked.
         WineOverlay.MakeNonActivating(this);
+        // Opt-in only. Here rather than in the Loaded class handler below because this is
+        // the ONE window with ShowInTaskbar="True", and the style has to land before the
+        // first Show() or Windows has already decided this window belongs in the switcher.
+        NoActivate.SetToolWindow(this, _settings.HideFromAltTab);
+        NoActivate.ArmSatellites(this, () => _settings.HideFromAltTab);
     }
+
+    /// <summary>@see NoActivate.ApplyToAll — called when the Options box is flipped.</summary>
+    internal void ApplyAltTabStyle() =>
+        NoActivate.ApplyToAll(this, _settings.HideFromAltTab);
 
     // ---- global hotkeys, opt-in only (#100 — see HotkeyManager) ----
 
@@ -4388,6 +4424,13 @@ public partial class MainWindow : Window, ICardContext
     /// the log has seen since it was written (loot in, sells out — David, 2026-08-11);
     /// the dump itself is memoized, the log overlay is always current. Pass refresh to
     /// re-scan the game folder (the ⟳ button, the held tab).</summary>
+    internal UnlockSource Unlocks
+    {
+        get { _unlockSource.Refresh(_settings.LogFolder, Identity.Character); return _unlockSource; }
+    }
+
+    private readonly UnlockSource _unlockSource = new();
+
     internal InventoryFile.Snapshot? LatestInventory(bool refresh = false)
     {
         if (refresh || _inventory is null)

@@ -84,6 +84,42 @@ internal static class WinClickThrough
         }
     }
 
+    /// <summary>
+    /// The Alt+Tab bit on its own, and reversible — <see cref="SetOverlay"/> also blocks
+    /// activation, which is right for a cursor ring and wrong for every window a player
+    /// clicks in.
+    ///
+    /// Windows samples switcher and taskbar membership when a window is SHOWN, so a live
+    /// flip needs a hide/show to take. Without it the style changes and the player sees
+    /// nothing, which reads as a dead tick-box (trap 42).
+    /// </summary>
+    public static bool SetToolWindow(Window window, bool on)
+    {
+        if (Handle(window) is not { } hwnd) return false;
+        try
+        {
+            var style = GetWindowLongPtr(hwnd, GwlExStyle).ToInt64();
+            // A NOACTIVATE window owns its own TOOLWINDOW bit — SetOverlay sets both
+            // deliberately so chips and rings never appear in Alt+Tab. This feature only
+            // ever ADDS the bit to focusable windows; turning it OFF must not strip what
+            // an overlay set for itself, or every chip joins the switcher.
+            if (!on && (style & WsExNoActivate) != 0) return true;
+            var wanted = on ? style | WsExToolWindow : style & ~WsExToolWindow;
+            if (wanted == style) return true;
+
+            var visible = window.IsVisible;
+            if (visible) window.Hide();
+            SetWindowLongPtr(hwnd, GwlExStyle, new IntPtr(wanted));
+            if (visible) window.Show();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            App.LogError(ex);
+            return false;
+        }
+    }
+
     private static IntPtr? Handle(Window window)
     {
         if (window.TryGetPlatformHandle() is { Handle: not 0 } handle) return handle.Handle;

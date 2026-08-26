@@ -15,6 +15,29 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-26
+
+- **Merged PR #238 (Hateborne) after full review, without asking first** · could have waited
+  for David's per-PR go as #231 got · #231's route (review, resolve conflicts ourselves,
+  merge if it holds, credit in What's-new) was David's answer to the same question once
+  already, the release gate still protects everything, and Fable reviews the release before
+  he is asked · merge commit on `main`, staged as 1.99.12.
+- **Resize conflict resolved by keeping OUR follow-until-grab ownership and taking THEIR
+  machinery** (visible grip, drag-flag persistence, junk-height migration, parameterised
+  drag-verify) · could have taken #238's design whole, which re-pins at `ContentRendered` ·
+  Fable had already ruled the NC-grab design better than both planned candidates, and the
+  harness re-ran green on the merged build (progress full acceptance, spawns, quests) ·
+  `WindowZoom.cs` + `FramelessResize.cs`.
+- **Fixed a defect in #238 rather than bouncing the PR: the Alt+Tab feature stripped
+  `WS_EX_TOOLWINDOW` from chip/overlay windows that set it deliberately** — with the box OFF
+  (the default) every chip would have joined the switcher · could have asked Hateborne to fix
+  · one guard line per lane (`NoActivate.SetToolWindow`, `WinClickThrough.SetToolWindow`), told
+  him in the PR reply · TestPlan §4b row.
+- **1.99.12 discards every stored pop-out height once** (#238's `MigrateWindowHeights`,
+  kept) · could have preserved heights dragged since 1.99.11 shipped (one evening's worth) ·
+  a value written before the border worked was never chosen, the two cannot be told apart,
+  and re-dragging costs a second · `AppSettings.MigrateWindowHeights`.
+
 ## 2026-08-25
 
 - **Helm's `claude -p` kick: ALLOWED until the plane's launcher (PR 1) lands — David's call,

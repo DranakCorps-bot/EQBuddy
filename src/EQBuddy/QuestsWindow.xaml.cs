@@ -45,6 +45,9 @@ public partial class QuestsWindow : Window
         // Base width so Ctrl+wheel shrinks the WINDOW, not just its text (#186).
         WindowZoom.Attach(this, "quests", _settings, baseWidth: Width);
         WindowZoom.AllowResize(this, "quests", _settings);
+        // A drag changes how much room the body has; without this the window grows
+        // and its content does not follow.
+        SizeChanged += (_, _) => UpdateHeightCaps();
         _tabs = new EqSegmentedStrip(TabStrip);
         _classes = new EqSegmentedStrip(ClassStrip);
         _modes = new EqSegmentedStrip(ModeStrip);
@@ -60,6 +63,8 @@ public partial class QuestsWindow : Window
         // offering three different vocabularies for one lens.
         foreach (var s in QuestChecklistLayout.States) StateCombo.Items.Add(s);
         StateCombo.SelectedIndex = 0;
+        foreach (var s in UnlockLayout.Sections) UnlockSectionCombo.Items.Add(s);
+        UnlockSectionCombo.SelectedIndex = 0;
         BuildModeStrip();
         // No ChipScale here — quests read at widget size, not chip size. That used to be
         // said as ChipScale.Apply(this, 1.0), which is not a no-op: it CLEARS the content
@@ -147,10 +152,13 @@ public partial class QuestsWindow : Window
             ? work.Height
             : SystemParameters.WorkArea.Height;   // before the handle exists
         MaxHeight = Math.Max(220, height * 0.85);
+        // The BODY opens at a design constant, not at a fraction of the monitor. Deriving
+        // it from the screen is what made this window fill a tall display; UI.Shared owns
+        // the number so all seven pop-outs cannot disagree about it.
         // The list and the pane share the window's height, so cap the SCROLLERS rather
         // than the window: without this the window grows past its cap on a long catalog
         // and the footnotes walk off the bottom of the screen.
-        BodyScroll.MaxHeight = Math.Max(120, MaxHeight - 280);
+        BodyScroll.MaxHeight = WindowSizing.BodyCap(MaxHeight, 280, FramelessResize.ManualHeight(this));
         DetailScroll.MaxHeight = BodyScroll.MaxHeight;
     }
 
@@ -184,9 +192,11 @@ public partial class QuestsWindow : Window
     {
         var state = "";
         if (tab.Split(':') is [var name, var wanted]) { tab = name; state = wanted; }
-        _tab = tab.Equals("sky", StringComparison.OrdinalIgnoreCase) ? QuestTab.Sky
-            : tab.Equals("epic", StringComparison.OrdinalIgnoreCase) ? QuestTab.Epic
-            : QuestTab.General;
+        // Core's own key table, not a ladder repeated here: it already maps every tab,
+        // so a new one is openable by its wire key the day it exists. The ladder knew
+        // only sky and epic, which is why the Unlocks tab could not be opened for review
+        // at all — a surface nobody can put on screen reads as reviewed anyway (trap 22).
+        _tab = QuestSurface.TabForKey(tab) ?? QuestTab.General;
         if (QuestChecklistLayout.States.Contains(state))
         {
             _state = state;
@@ -222,7 +232,7 @@ public partial class QuestsWindow : Window
     private void BuildTabs()
     {
         _tabs.Clear();
-        foreach (var header in QuestSurface.Tabs(EpicCounts(), SkyCounts()))
+        foreach (var header in QuestSurface.Tabs(EpicCounts(), SkyCounts(), UnlockCounts()))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Badge, onClick: () =>
@@ -291,17 +301,17 @@ public partial class QuestsWindow : Window
                 onClick: () => { _classLens = cls; Refresh(force: true); });
     }
 
-    private (int Done, int Total)? EpicCounts()
-    {
-        var items = _settings.EpicQuestChecklist;
-        return items.Count == 0 ? null : (items.Count(i => i.Acquired), items.Count);
-    }
+    // The counting RULE is Core's (QuestSurface.CountOf) — this window, the Avalonia one
+    // and the phone each had their own hand-rolled copy of the same expression, and a
+    // fourth copy is how #184 happened.
+    private (int Done, int Total)? EpicCounts() =>
+        QuestSurface.CountOf(_settings.EpicQuestChecklist, i => i.Acquired);
 
-    private (int Done, int Total)? SkyCounts()
-    {
-        var items = _settings.SkyQuestChecklist;
-        return items.Count == 0 ? null : (items.Count(i => i.Acquired), items.Count);
-    }
+    private (int Done, int Total)? SkyCounts() =>
+        QuestSurface.CountOf(_settings.SkyQuestChecklist, i => i.Acquired);
+
+    private (int Done, int Total)? UnlockCounts() =>
+        QuestSurface.UnlockCounts(_main.Unlocks.Races, _main.Unlocks.Classes);
 
     private void ApplyTabVisual()
     {
@@ -320,12 +330,23 @@ public partial class QuestsWindow : Window
         // "done" mean the most, because the reward you can hand in RIGHT NOW is the only
         // thing on the page with anything to do about it. The widget's Sky card had this
         // lens and it did not come across when the card became a launcher.
-        StateCombo.Visibility = Visibility.Visible;
         // The Epic tab's own lens, which followed the Epic card here when the widget
         // consolidated its quest cards (2026-08-16).
         EpicClassicOnlyCheck.Visibility = _tab == QuestTab.Epic ? Visibility.Visible : Visibility.Collapsed;
         SkyIslandRepeatCheck.Visibility = _tab == QuestTab.Sky ? Visibility.Visible : Visibility.Collapsed;
-        ClassBtn.Visibility = Visibility.Visible;
+        // Unlocks is divided by SECTION, not by class, so the class picker is replaced by
+        // a section lens; the state lens is not wired here and an inert filter is worse
+        // than an absent one. EVERY CONTROL BELOW IS ASSIGNED EXACTLY ONCE — an earlier
+        // cut hid ClassBtn in an `if` that a later unconditional assignment overwrote,
+        // which only a screenshot could catch.
+        var unlocks = _tab == QuestTab.Unlocks;
+        UnlockSectionCombo.Visibility = unlocks ? Visibility.Visible : Visibility.Collapsed;
+        StateCombo.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
+        ClassBtn.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
+        // "scan bags" copies /outputfile inventory, which is not what this tab reads.
+        CopyInvBtn.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
+        ClassStrip.Visibility = !unlocks && _classes.Count > 1
+            ? Visibility.Visible : Visibility.Collapsed;
         FilterRow.Visibility = Visibility.Visible;
         // A checklist has nothing to select, so the pane would only ever be empty. Give
         // its width back to the rows instead.
@@ -336,6 +357,25 @@ public partial class QuestsWindow : Window
     }
 
     private void ApplyModeVisual() => _modes.Select(_mode);
+
+    /// <summary>A faction dump just landed. Nothing to import — UnlockSource re-reads it
+    /// off disk — but an OPEN Unlocks tab should fill in now rather than on the next
+    /// reopen, which is the difference between the command appearing to work and appearing
+    /// to do nothing.</summary>
+    internal void FactionsChanged()
+    {
+        if (_tab == QuestTab.Unlocks) Refresh(force: true);
+    }
+
+    /// <summary>Which section of the Unlocks tab is in view. Session-scoped, like the
+    /// class lens and the search box: a sticky filter reads as a broken tracker tomorrow.</summary>
+    private string _unlockSection = UnlockLayout.SectionAll;
+
+    private void OnUnlockSectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (UnlockSectionCombo.SelectedItem is string s) _unlockSection = s;
+        Refresh(force: true);
+    }
 
     // ---- multiclass filter (Legends: up to three active classes; David 2026-08-07) ----
 
@@ -461,8 +501,14 @@ public partial class QuestsWindow : Window
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var hidden = _main.QuestLedger?.HiddenFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var completed = _main.QuestLedger?.CompletedFor(key)
-            ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        // Folded with the Sky checklist, because a "<Class> Sky Test: <Reward>" row on
+        // THIS tab and the reward row on the Sky tab are the same fact. The ledger never
+        // knew about SkyQuestCompleted, so a reward the game's own achievements dump said
+        // was handed in still sat here as live work.
+        var completed = SkyTestSplit.WithTurnIns(
+            _main.QuestLedger?.CompletedFor(key)
+                ?? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+            _settings.SkyQuestCompleted);
         var filter = FilterBox.Text.Trim();
         var picks = _main.QuestLedger?.ClassesFor(key) ?? [];
         SyncClassChecks(picks);
@@ -501,6 +547,12 @@ public partial class QuestsWindow : Window
         _suppressed = 0;
         SummaryRow.Visibility = Visibility.Collapsed;
         BuildTabs();
+        if (_tab == QuestTab.Unlocks)
+        {
+            DetailPane.Children.Clear();
+            RenderUnlocks();
+            return;
+        }
         if (_tab != QuestTab.General)
         {
             DetailPane.Children.Clear();
@@ -799,7 +851,17 @@ public partial class QuestsWindow : Window
         $"questsDetailShown={(DetailCard.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
-        $"questsModes={_modes.Count}";
+        $"questsModes={_modes.Count} " +
+        // The Sky tab's ⧉ copy of /outputfile achievements. Counted off the real visual
+        // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
+        // control photographs as an unremarkable panel (trap 29), and a bool that nobody
+        // resets goes stale without anything noticing.
+        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen()}";
+
+    private int SkyCopyCommandsOnScreen() => QuestsPanel.Children.OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<Button>())
+        .Count(b => b.Content is string s
+            && s.Contains(GameCommands.OutputfileAchievements, StringComparison.Ordinal));
 
     // ---- the list ----
 
@@ -962,8 +1024,7 @@ public partial class QuestsWindow : Window
             entry.CompletedCount > 0
                 ? $"Completed ×{entry.CompletedCount} — click to unmark"
                 : "Did this before EQBuddy? Mark it completed (consumes nothing; click again to undo)",
-            (_, _) => WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, m.Quest.Name,
-                entry.CompletedCount == 0)),
+            (_, _) => ToggleCompleted(m.Quest.Name, entry.CompletedCount == 0),
             entry.CompletedCount > 0 ? "GoodBrush" : "DimBrush",
             entry.CompletedCount > 0 ? 1.0 : 0.55));
         // Close = "not interested": drops the quest from the overlap view AND un-greens
@@ -1257,6 +1318,39 @@ public partial class QuestsWindow : Window
         Refresh(force: true);
     }
 
+    /// <summary>
+    /// Mark or unmark a catalog quest, sending a Plane of Sky test to the Sky checklist
+    /// instead of the quest ledger.
+    ///
+    /// The read side folds `SkyQuestCompleted` into the completed map, so writing to the
+    /// ledger here would leave the merge undoing the player's un-mark on the next render
+    /// — a control that visibly does nothing, which is the "silent no-ops are broken"
+    /// rule with the switch on the other side. One fact, one store, both directions.
+    ///
+    /// It also means turning a Sky Test in HERE acquires its pieces and resolves any
+    /// parked auto-tick, exactly as the Sky tab's own button does — those rules live in
+    /// <see cref="SkyCompleteToggle"/> and are not re-decided here. The Sky checklist is
+    /// per profile rather than per character, which is how it has always been; this makes
+    /// the two tabs agree rather than introducing it.
+    /// </summary>
+    private void ToggleCompleted(string questName, bool done)
+    {
+        var rewardKey = SkyTestSplit.RewardKeyFor(questName);
+        if (rewardKey.Length == 0)
+        {
+            WithLedger(l => l.SetCompleted(_main.QuestCharacterKey, questName, done));
+            return;
+        }
+
+        if (done)
+            SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
+                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey));
+        else
+            SkyCompleteToggle.Reopen(_settings, rewardKey);
+        _settings.Save();
+        Refresh(force: true);
+    }
+
     // ---- shared small pieces ----
 
     /// <summary>A leading note above the list — the search scope, the current zone, the
@@ -1524,6 +1618,193 @@ public partial class QuestsWindow : Window
 
     private ImportReportView? _skyImport;
 
+    /// <summary>
+    /// The Sky tab's route to its own data source.
+    ///
+    /// This surface is FED by the achievements dump — the import is what tells it which
+    /// rewards were handed in before EQBuddy existed, and a hand-in never appears in the
+    /// log — and it named no way to produce one. The command lived on the widget's menu
+    /// and on the Raids card, neither of which is where a player wondering about Sky
+    /// rewards is looking. `GameCommandsTests.SurfacesNeedingACommand` is the curated
+    /// list this row is now on: a negative assertion cannot see an absence (trap 34), and
+    /// the Gear tab fell through the same hole for as long as it existed.
+    ///
+    /// Above the rows, beside the import report, for the reason in trap 44 — it is read
+    /// on arrival, and the widget caps its own height.
+    /// </summary>
+    private UIElement SkyAchievementsPrompt()
+    {
+        var wrap = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS) };
+        wrap.Children.Add(Note(
+            "Turned rewards in before EQBuddy? The game's achievements dump knows. Run this "
+            + "in game and EQBuddy reads the file it writes — it never scans the game itself.",
+            "Info"));
+        var b = new Button
+        {
+            Style = (Style)FindResource("ActionButton"),
+            FontSize = DesignTokens.Spec(Role.Caption).Size,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
+            ToolTip = "Copies the command — paste it into the game's chat. The game writes "
+                + "<name>_<server>-Achievements.txt beside its own folders and EQBuddy "
+                + "imports it on its own; the report appears here.",
+        };
+        wrap.Children.Add(Theming.WireCopyCommand(b, GameCommands.OutputfileAchievements));
+        return wrap;
+    }
+
+    /// <summary>
+    /// Race and class unlocks (Hateborne, 2026-08-25).
+    ///
+    /// **Rows are read-only, and that is the design rather than a shortcut.** An unlock is
+    /// the GAME's answer — it comes from the achievements dump and, for a race, from the
+    /// faction dump. There is nothing for the player to tick, so there is no checkbox: a
+    /// disabled one would render exactly like a live one and swallow clicks (trap 17), and
+    /// a live one would invite a player to record something EQBuddy would overwrite on the
+    /// next dump.
+    /// </summary>
+    private void RenderUnlocks()
+    {
+        var races = _main.Unlocks.Races;
+        var classes = _main.Unlocks.Classes;
+        var factions = _main.Unlocks.Factions;
+
+        // BOTH commands, always — not only in the empty states they used to hide behind
+        // (Hateborne, 2026-08-25). This tab is built from two dumps and neither is a
+        // one-off: a race unlock moves every time you grind faction, so the button a
+        // player needs most is the one on the POPULATED surface. That is the same rule
+        // the Gear tab learned in #217, and the reason its ⧉ is not empty-state-only.
+        QuestsPanel.Children.Add(UnlockCommandRow());
+
+        if (!_main.Unlocks.HasAchievements)
+        {
+            QuestsPanel.Children.Add(EmptyState(
+                "No achievements dump yet. Race and class unlocks are the game's own record "
+                + "— EQBuddy reads the file the game writes and never scans the game itself. "
+                + "Run the achievements command above and this fills in."));
+            return;
+        }
+
+        // What the second dump is for, said only when something in view wants it.
+        if (UnlockLayout.NeedsFactionDump(races, factions))
+        {
+            QuestsPanel.Children.Add(Note(
+                "Race unlocks are faction work, and the log only ever sees faction CHANGES "
+                + "— never where you stand. Run the faction command above and the rows "
+                + "below fill in.", "Info"));
+        }
+        else if (factions is { } f)
+        {
+            QuestsPanel.Children.Add(Note(
+                $"Standings as of {f.WrittenAt:d MMM HH:mm}. Re-run the faction command "
+                + "after a grind to refresh them.", "Info"));
+        }
+
+        Section(UnlockLayout.RacesHeading, races);
+        Section(UnlockLayout.ClassesHeading, classes);
+
+        void Section(string heading, IReadOnlyList<UnlockProgress> unlocks)
+        {
+            if (unlocks.Count == 0) return;
+            if (!UnlockLayout.InSection(heading, _unlockSection)) return;
+            var title = DesignSystem.Text(Role.TitleSection, heading);
+            title.Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceL, 0,
+                DesignTokens.SpaceXs);
+            title.Ink("AccentBrush");
+            QuestsPanel.Children.Add(title);
+
+            var groups = UnlockLayout.Groups(unlocks, factions, heading);
+            for (var i = 0; i < groups.Count; i++)
+            {
+                var g = groups[i];
+                var u = unlocks[i];
+                var score = u.Score is { } s ? $"   {s.Done}/{s.Total}" : "";
+                var head = DesignSystem.Text(Role.Body, g.Title + score);
+                head.FontWeight = FontWeights.SemiBold;
+                head.TextWrapping = TextWrapping.Wrap;
+                head.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceM, 0, 0);
+                head.Ink(u.Complete ? "GoodBrush" : "TextBrush");
+                QuestsPanel.Children.Add(head);
+
+                // Why it is complete matters as much as that it is: a granted unlock sits
+                // beside factions near zero, and a player who is not told reads the
+                // tracker as broken rather than the unlock as free.
+                if (UnlockLayout.Note(u) is { Length: > 0 } note)
+                    QuestsPanel.Children.Add(Note(note, "Info"));
+
+                foreach (var row in g.Rows)
+                {
+                    var line = new Grid { Margin = new Thickness(DesignTokens.SpaceL, 1, 0, 1) };
+                    line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    // Two columns, never a horizontal StackPanel: a stack measures with
+                    // infinite width, so wrapping text beside an icon is clipped with no
+                    // ellipsis to say so (trap 14).
+                    var icon = DesignSystem.Icon(row.Acquired ? "Check" : "Pending",
+                        row.Acquired ? "GoodBrush" : "DimBrush", size: DesignTokens.IconInline);
+                    icon.VerticalAlignment = VerticalAlignment.Center;
+                    icon.Margin = new Thickness(0, 0, DesignTokens.SpaceXs, 0);
+                    Grid.SetColumn(icon, 0);
+                    line.Children.Add(icon);
+
+                    var text = DesignSystem.Text(Role.Body, "");
+                    text.TextWrapping = TextWrapping.Wrap;
+                    text.Inlines.Add(new System.Windows.Documents.Run(row.Title));
+                    if (row.Detail.Length > 0)
+                    {
+                        var detail = new System.Windows.Documents.Run("   " + row.Detail);
+                        detail.SetResourceReference(
+                            System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
+                        text.Inlines.Add(detail);
+                    }
+                    text.Ink(row.Acquired ? "DimBrush" : "TextBrush");
+                    Grid.SetColumn(text, 1);
+                    line.Children.Add(text);
+                    QuestsPanel.Children.Add(line);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// The two commands this tab is built from, side by side and always on screen.
+    ///
+    /// The header's "scan bags" button is hidden on this tab (see ApplyTabVisual): it
+    /// copies <c>/outputfile inventory</c>, which has nothing to do with race or class
+    /// unlocks, and its tooltip said so in as many words. A button that works and answers
+    /// a question the surface is not asking is its own kind of wrong.
+    /// </summary>
+    private UIElement UnlockCommandRow()
+    {
+        var row = new WrapPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS) };
+        row.Children.Add(CommandPrompt(GameCommands.OutputfileAchievements,
+            "Copies the command. The game writes <name>_<server>-Achievements.txt beside "
+            + "its own folders; EQBuddy reads it on its own and this tab fills in. "
+            + "This is what says which races and classes you have unlocked."));
+        row.Children.Add(CommandPrompt(GameCommands.OutputfileFaction,
+            "Copies the command. The game writes <name>_<server>-<CLASS>-Factions.txt; "
+            + "EQBuddy reads it the moment the game says it is written. This is what says "
+            + "how far along each race's factions are — the log can only see faction "
+            + "CHANGES, never where you stand."));
+        return row;
+    }
+
+    /// <summary>A ⧉ copy of an in-game command, off <see cref="GameCommands"/>. Never its
+    /// own literal — GameCommandsTests forbids that, and the reason is that a button and
+    /// the prose beside it drifted.</summary>
+    private Button CommandPrompt(string command, string tip)
+    {
+        var b = new Button
+        {
+            Style = (Style)FindResource("ActionButton"),
+            FontSize = DesignTokens.Spec(Role.Caption).Size,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceXs, 0, DesignTokens.SpaceS),
+            ToolTip = tip,
+        };
+        return Theming.WireCopyCommand(b, command);
+    }
+
     private void RenderChecklist(QuestTab tab, string filter, List<string> classes)
     {
         // ABOVE the rows and re-added on every render, because QuestsPanel is cleared
@@ -1533,6 +1814,7 @@ public partial class QuestsWindow : Window
         {
             SkyImport.Render();
             QuestsPanel.Children.Add(SkyImport.Body);
+            QuestsPanel.Children.Add(SkyAchievementsPrompt());
         }
         // Grouping, ordering and the detail line come from Core so this window, the
         // Avalonia one and EQBuddy Mobile cannot disagree about what a checklist row
