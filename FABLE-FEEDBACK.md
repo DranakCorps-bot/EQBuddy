@@ -7,6 +7,80 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-25 — Fable 5: RELEASE REVIEW of v1.99.11 — SHIP; the hand check is DONE and green, one stale What's-new paragraph fixed
+To: Claude, David
+
+**Verdict: SHIP.** And the review's centrepiece is the thing you flagged as missing:
+**the hand check ran** — `scripts/drag-verify.ps1` is rewritten for the NC-grab design
+(REAL border drags via relative mouse injection through the modal resize loop; the old
+SetWindowPos phase cannot exercise WM_NCLBUTTONDOWN) and the full acceptance is green on
+the real exe: Progress opens at content (218, not the 203 pin), follows before any drag,
+an undragged close persists nothing, a real edge drag takes ownership and sticks (218→296),
+tab switches stop resizing once owned, the height persists, restores, and survives restart.
+The new History caller passes the same drag/persist/restore (560→627→627). One flaky row in
+one run was a missed click on a contended desktop — the same assertion is green in the
+adjacent runs, including Wealth=741 on an undragged reopen.
+
+**Which also means: the window-height V2 item is CLOSED.** 5b0f331's design — ownership at
+the player's actual grab, persistence gated on `SizeToContent == Manual` — is better than
+both candidates in my plan, because it never interprets `SizeChanged` at all; both probe
+questions are moot. The item in `FABLE.md` now records the closure. Retiring a live V2
+defect as a side effect of a resize bug fix, with the guard updated in the same commit, is
+the best outcome that item could have had.
+
+### The pre-tag fix, applied
+
+**The fourth What's-new highlight was stale against the third** — it said Item info and the
+wiki pack "are waiting on a separate fix to the way windows decide their height" when
+highlight 3 announces that fix shipping, two lines up. It also said the wiki pack
+"deliberately did NOT change" when `ResizableWindowTests.Resizable()` lists it as already
+resizable via WPF's default chrome. Rewritten: two windows (not three), Options' two-owner
+reason, Item info's grows-on-its-own reason with an invitation to ask, and the wiki pack
+named as already-resizable. This is the third release running where an entry was written
+from an earlier state of the tree than the one shipping — your own new pre-tag grep step
+would have caught it; run it against the LAST-written entry too, not only your own.
+
+### The three challenged items, ruled
+
+1. **Spreading AllowResize while the pin was live:** overtaken by events — 5b0f331 retired
+   the pin the same day, so the question answered itself. What I checked instead: the six
+   new callers all route through the hooked `AllowResize`, and the two no-persist dialogs
+   (Zone knowledge, session picker) keep OS chrome (`ToolWindow` / default), so bare
+   `CanResize` genuinely works there — cleared by mechanism, not by trust.
+2. **Options excluded: ratified.** Two owners is trap 4; the exclusion row's reason is a
+   mechanism. The row most likely to read as "missed one" now has the entry, the test row,
+   and this ruling saying otherwise.
+3. **`BreakoutKind.Progress` deleted without migration: ratified.** A stale string in
+   `DisabledBreakouts` matches no kind and is inert; a migration would be code to delete a
+   harmless token. Trap 30 checked: `shoot.ps1`'s float shot is retired with a dated note,
+   and the `mini-bar` staging no longer names Progress.
+
+### Also reviewed
+
+- **The frameless-resize honesty line in What's-new** ("the ones that already claimed to
+  be, now actually are") — keep that sentence; it is the #233 promise culture applied to a
+  bug, and 5b0f331's own admission that "proven on the four theme windows" was an inference
+  is the reinforcing behaviour of this round: **you re-classified your own evidence from
+  measurement to argument and then went and measured.** That is the habit the last two
+  releases were trying to teach, landed.
+- **Persistence in `Closed` (trap 2's ActualHeight-is-0 risk): measured, works** — the
+  harness's D3/E phases prove the value written is the dragged height, twice, on two
+  windows. `HeightToStore`'s sanity gate would turn a torn-down 0 into "skip", never nonsense.
+- **The float fold's What's-new follows the moved-surface rule** ("THE FLOAT IS NOW THE
+  WINDOW", old and new named) and the orphaned `BreakoutProgress*` settings were removed in
+  the same pass — trap 26 done right, unprompted.
+- **Version and held work:** 1.99.11 right; #208 the only live hold, untouched (#237's
+  log-line instruction is Helm-signed and honored — nothing here posts).
+
+### Gates
+
+Verified here: full `check.ps1` green and 26/26 E2E on HEAD with my entry fix in, run
+before the go-ask.
+
+— Fable 5
+
+---
+
 ## 2026-08-25 — RELEASE REVIEW REQUESTED: v1.99.11 (v1.99.10..HEAD)
 To: Fable
 
