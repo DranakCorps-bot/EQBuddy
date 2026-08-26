@@ -42,6 +42,11 @@ public static class WikiPackPresentation
         /// page is missing loot and this claims nothing about the page at all — EQBuddy
         /// cannot read the description, so the row's tip says ADD, never replace.</summary>
         RareConfirmed,
+        /// <summary>An observed respawn timer the agreement bar accepted (3+ cycles
+        /// within ±15 % of their median), for a page whose respawn_time is empty or
+        /// disagrees. A second row for a creature that may also have loot rows — the
+        /// timer is a different fact with a different paste target.</summary>
+        RespawnObserved,
         /// <summary>The title resolved to an article that is not a creature page at all.
         /// NOT a contribution — it sits with <see cref="Pending"/> at the bottom — but it
         /// has to be SHOWN, because it is the one row the player can act on and EQBuddy
@@ -88,7 +93,11 @@ public static class WikiPackPresentation
         /// exist, and ignoring it would let the headline say "nothing to contribute" over
         /// a row that plainly contributes (Bevel's #226 rule: two different states must
         /// not read alike).</summary>
-        int RareOnlyCreatures = 0);
+        int RareOnlyCreatures = 0,
+        /// <summary>Creatures with an observed-respawn row - a timer to suggest or to
+        /// reconcile. Its own count for the same reason as the rare one: not an ITEM,
+        /// and not nothing.</summary>
+        int RespawnCreatures = 0);
 
     /// <summary>The status words, once, so the two desktops cannot spell them differently.</summary>
     public static string KindLabel(RowKind kind) => kind switch
@@ -97,6 +106,7 @@ public static class WikiPackPresentation
         RowKind.PageHasNoLoot => "page lists no loot",
         RowKind.NewToPage => "new to the page",
         RowKind.RareConfirmed => "rare spawn confirmed",
+        RowKind.RespawnObserved => "respawn timer observed",
         RowKind.NotACreaturePage => "not a creature page",
         _ => "not checked yet",
     };
@@ -116,6 +126,13 @@ public static class WikiPackPresentation
             "{{Namedmobpage}} grows a rare-spawn field, confirmed with the admins on " +
             "#217), and it is an ADD: EQBuddy cannot read what the description already " +
             "says, so never replace what is written there.",
+        RowKind.RespawnObserved =>
+            "Three or more of your own camping cycles agree within 15% on this " +
+            "creature's respawn, and its wiki page either has no respawn_time or says " +
+            "something different. The paste sets the field; when the wiki disagrees the " +
+            "pack presents both numbers to reconcile and never a paste-over - kill-to-kill " +
+            "alone does not determine a duration, which is why one clean gap is never " +
+            "enough and a scattered sample suggests nothing.",
         RowKind.NotACreaturePage =>
             "The wiki answered with an article that is not a creature page — no " +
             "{{Namedmobpage}} on it — so this is almost certainly the wrong page for the " +
@@ -144,6 +161,7 @@ public static class WikiPackPresentation
         RowKind.PageHasNoLoot => "AccentBrush",
         RowKind.NewToPage => "AccentBrush",
         RowKind.RareConfirmed => "AccentBrush",
+        RowKind.RespawnObserved => "AccentBrush",
         // Not dim: this is the one row that needs a person to look at it.
         RowKind.NotACreaturePage => "BadBrush",
         _ => "DimBrush",
@@ -157,6 +175,7 @@ public static class WikiPackPresentation
         int pagesMissing = 0, pagesNoLoot = 0, newDrops = 0, pending = 0, known = 0;
         var nothingSuggestable = 0;
         var rareOnly = 0;
+        var respawnRows = 0;
 
         // The rare-only row, in ONE place for the two branches that used to drop the fact
         // (all-loot-known, and motes-only). Mirrors WikiContribution.BuildExport's own
@@ -170,9 +189,22 @@ public static class WikiPackPresentation
             return true;
         }
 
-        foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
+        foreach (var o in observations)
         {
+            var (mob, lookup) = (o.Mob, o.Lookup);
             if (mob.Loot.Count == 0) continue;
+
+            // The respawn row rides beside whatever loot rows the creature earns - a
+            // different fact with a different paste target, so it is never folded into
+            // a loot row's note. RespawnFor already refuses an unread page and a
+            // suppressed (triggered/raid/multi-spawn) entry.
+            var respawn = WikiContribution.RespawnFor(o);
+            if (respawn.Kind is RespawnVerdictKind.Suggest or RespawnVerdictKind.WikiDisagrees)
+            {
+                respawnRows++;
+                rows.Add(new PackRow(mob.Name, mob.Kills, RowKind.RespawnObserved, 0,
+                    respawn.Note));
+            }
 
             // Motes are never suggested to a creature page, so they must not colour the
             // row either — a creature whose only "new" drop was a mote is not a
@@ -258,7 +290,8 @@ public static class WikiPackPresentation
             // Not the rare-only rows: this count feeds "N items across M creatures", and a
             // creature contributing zero items would make that sentence claim drops that
             // do not exist. The rare rows have their own count and their own clause.
-            Creatures: rows.Count(r => r.Kind is not RowKind.Pending and not RowKind.RareConfirmed),
+            Creatures: rows.Count(r => r.Kind is not RowKind.Pending
+                and not RowKind.RareConfirmed and not RowKind.RespawnObserved),
             Contributions: rows.Sum(r => r.Contributions),
             PagesMissing: pagesMissing,
             PagesWithoutLoot: pagesNoLoot,
@@ -267,7 +300,8 @@ public static class WikiPackPresentation
             KnownDrops: known,
             WrongArticleCreatures: rows.Count(r => r.Kind == RowKind.NotACreaturePage),
             NothingSuggestableCreatures: nothingSuggestable,
-            RareOnlyCreatures: rareOnly);
+            RareOnlyCreatures: rareOnly,
+            RespawnCreatures: respawnRows);
     }
 
     /// <summary>The one line that stops the scope being silent — the whole reason this is a
@@ -304,20 +338,23 @@ public static class WikiPackPresentation
             return pack.WrongArticleCreatures == 1
                 ? "1 creature's wiki page isn't the creature"
                 : $"{pack.WrongArticleCreatures} creatures' wiki pages aren't the creature";
-        // A rare-only pack is a real contribution with zero ITEMS — the headline counts it
-        // (Bevel, Helm-signed 2026-08-23) rather than calling the session empty.
-        var rare = pack.RareOnlyCreatures switch
-        {
-            0 => "",
-            1 => "1 rare-spawn confirmation",
-            var n => $"{n} rare-spawn confirmations",
-        };
+        // A pack whose only contributions are FACTS (rarity, a timer) is still a real
+        // contribution with zero ITEMS — the headline counts them (Bevel, Helm-signed
+        // 2026-08-23) rather than calling the session empty.
+        var facts = new List<string>();
+        if (pack.RareOnlyCreatures > 0)
+            facts.Add(pack.RareOnlyCreatures == 1
+                ? "1 rare-spawn confirmation" : $"{pack.RareOnlyCreatures} rare-spawn confirmations");
+        if (pack.RespawnCreatures > 0)
+            facts.Add(pack.RespawnCreatures == 1
+                ? "1 respawn timer" : $"{pack.RespawnCreatures} respawn timers");
+        var factClause = string.Join(" · ", facts);
         if (pack.Contributions == 0)
-            return rare.Length > 0 ? $"{rare} for the wiki" : "Nothing to contribute yet";
+            return factClause.Length > 0 ? $"{factClause} for the wiki" : "Nothing to contribute yet";
         var items = pack.Contributions == 1 ? "1 item" : $"{pack.Contributions} items";
         var mobs = pack.Creatures == 1 ? "1 creature" : $"{pack.Creatures} creatures";
         return $"{items} across {mobs} the wiki doesn't have"
-            + (rare.Length > 0 ? $" · {rare}" : "");
+            + (factClause.Length > 0 ? $" · {factClause}" : "");
     }
 
     /// <summary>The sub-line: where the value is concentrated, so a player can tell a pack
@@ -333,6 +370,8 @@ public static class WikiPackPresentation
             parts.Add($"{pack.NewDrops} with new drops for an existing page");
         if (pack.RareOnlyCreatures > 0)
             parts.Add($"{pack.RareOnlyCreatures} confirmed rare via /consider");
+        if (pack.RespawnCreatures > 0)
+            parts.Add($"{pack.RespawnCreatures} with an observed respawn timer");
         return string.Join(" · ", parts);
     }
 
@@ -380,7 +419,8 @@ public static class WikiPackPresentation
     /// <summary>Copy is offered only when there is something to paste. A button that copies
     /// a header and nothing else is a silent no-op. A rare-only pack has a paste — the
     /// description-field ADD — so it copies too.</summary>
-    public static bool CanCopy(Pack pack) => pack.Contributions > 0 || pack.RareOnlyCreatures > 0;
+    public static bool CanCopy(Pack pack) =>
+        pack.Contributions > 0 || pack.RareOnlyCreatures > 0 || pack.RespawnCreatures > 0;
 
     public static string CopyTip(Pack pack) => CanCopy(pack)
         ? "Copy paste-ready eqlwiki edits for everything listed, each with a direct edit " +

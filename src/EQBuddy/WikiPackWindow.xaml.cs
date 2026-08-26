@@ -68,7 +68,8 @@ public partial class WikiPackWindow : Window
         var mobs = _pool.Mobs.Where(m => m.Loot.Count > 0).ToList();
         foreach (var m in mobs) _main.EnsureMobLookup(m.Name);
         return mobs
-            .Select(m => new WikiContribution.MobObservation(m, _main.WikiMobResult(m.Name)))
+            .Select(m => new WikiContribution.MobObservation(m, _main.WikiMobResult(m.Name),
+                _main.RespawnEvidenceFor(m.Zone, m.Name)))
             .ToList();
     }
 

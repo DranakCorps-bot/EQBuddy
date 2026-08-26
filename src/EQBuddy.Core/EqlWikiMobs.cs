@@ -19,6 +19,11 @@ public sealed class MobInfo
     public string WikiUrl { get; set; } = "";
     /// <summary>The page's location field, as written ("-500, -200 by the tower").</summary>
     public string Location { get; set; } = "";
+    /// <summary>The page's <c>respawn_time</c> field, raw ("9.5 min", "Triggered",
+    /// "3 days with 12 hour variance"); "" when absent. The pack's respawn section reads
+    /// it for the three-way compare (wiki · catalog · observed) and never parses it into
+    /// seconds — the wiki's idiom is free prose and a human reconciles.</summary>
+    public string RespawnField { get; set; } = "";
     /// <summary>First coordinate pair from the location field, in /loc's (Y, X)
     /// order — editors paste /loc output. Null when the field is prose-only.</summary>
     public (double Y, double X)? LocYX { get; set; }
@@ -322,6 +327,12 @@ public sealed partial class EqlWikiMobService
             info.Zone = EqlWikiText.StripLinks(zone);
         if (fields.TryGetValue("level", out var level))
             info.Level = level.Trim();
+        // Raw text, never parsed to seconds: the wiki's idiom is free prose ("9.5 min",
+        // "Triggered", "3 days with 12 hour variance") and the pack's respawn section
+        // COMPARES against it rather than interpreting it. "" = field present but
+        // empty; absence leaves the property "".
+        if (fields.TryGetValue("respawn_time", out var respawn))
+            info.RespawnField = EqlWikiText.StripLinks(respawn).Trim();
         if (fields.TryGetValue("location", out var location))
         {
             info.Location = EqlWikiText.StripLinks(location).Trim();

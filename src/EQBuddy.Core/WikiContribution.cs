@@ -178,9 +178,28 @@ public static class WikiContribution
         RareSpawnNote(mob) is not null
         && lookup is { Mob: { IsCreaturePage: true } };
 
+    /// <summary>The respawn-cycle evidence one creature carries into the pack (the
+    /// spawn-timer feed, Fable 5's plan 2026-08-22). Null on an observation means the
+    /// ledger holds nothing for it — most creatures, and every creature on a build
+    /// without the ledger.</summary>
+    /// <param name="Suppressed">Triggered / raid-instanced / multi-spawn per the catalog
+    /// entry: no suggestion ever, whatever the cycles say (#109's bees).</param>
+    public sealed record RespawnEvidence(IReadOnlyList<SpawnCycle> Cycles, bool Suppressed);
+
     /// <summary>One creature's worth of input: the session summary plus whatever the
-    /// Target-Drops lookup already knows about its wiki page (null = never looked up).</summary>
-    public readonly record struct MobObservation(MobSummary Mob, MobLookupResult? Lookup);
+    /// Target-Drops lookup already knows about its wiki page (null = never looked up),
+    /// plus any respawn-cycle evidence the ledger holds.</summary>
+    public readonly record struct MobObservation(
+        MobSummary Mob, MobLookupResult? Lookup, RespawnEvidence? Respawn = null);
+
+    /// <summary>The respawn verdict for one observation — computed ONCE here and read by
+    /// the export, the row and the edit summary (trap 4). None when there is no
+    /// evidence, or no read creature page to compare against: a paste needs a page, and
+    /// an unread page gets no claim of any kind.</summary>
+    public static RespawnVerdict RespawnFor(MobObservation o) =>
+        o.Respawn is not { } evidence || o.Lookup?.Mob is not { IsCreaturePage: true } mob
+            ? new RespawnVerdict(RespawnVerdictKind.None, "", "", o.Respawn?.Cycles ?? [])
+            : RespawnSuggestion.Evaluate(evidence.Cycles, evidence.Suppressed, mob.RespawnField);
 
     /// <summary>The paste-ready contribution pack. Only creatures with something the
     /// wiki doesn't know make the cut; creatures still Unknown are listed at the end
@@ -199,9 +218,11 @@ public static class WikiContribution
 
         var unknown = new List<string>();
         var wroteAny = false;
-        foreach (var (mob, lookup) in observations.Select(o => (o.Mob, o.Lookup)))
+        foreach (var o in observations)
         {
+            var (mob, lookup) = (o.Mob, o.Lookup);
             if (mob.Loot.Count == 0) continue;
+            var respawn = RespawnFor(o);
             var news = mob.Loot
                 .Where(l => SuggestableToWiki(l.Item))
                 .Select(l => (Loot: l, Status: Classify(lookup, l.Item)))
@@ -214,22 +235,24 @@ public static class WikiContribution
                 {
                     unknown.Add(mob.Name);
                 }
-                // The rare-only contribution (Bevel, Helm-signed 2026-08-23): everything
-                // it looted is already on its page (or was only motes), and the game
-                // itself called it rare. The con fact is still news the pack can carry —
-                // dropping it here dropped it for exactly the creature most likely to be
-                // a known named. Behind the Unknown check on purpose: an unread page gets
-                // no claim of any kind.
-                else if (EarnsRareOnlyRow(mob, lookup))
+                // The facts-only contributions: everything it looted is already on its
+                // page (or was only motes), and yet the session holds something the page
+                // can carry — the con-rarity fact (Bevel, Helm-signed 2026-08-23), or an
+                // observed respawn timer that clears the agreement bar. Dropping either
+                // here dropped it for exactly the creature most likely to be a known
+                // named. Behind the Unknown check on purpose: an unread page gets no
+                // claim of any kind.
+                else if (EarnsRareOnlyRow(mob, lookup)
+                    || respawn.Kind is RespawnVerdictKind.Suggest or RespawnVerdictKind.WikiDisagrees)
                 {
                     wroteAny = true;
-                    WriteRareOnlySection(sb, mob,
-                        lookup?.Mob?.PageTitle is { Length: > 0 } t ? t : mob.Name);
+                    WriteFactsOnlySection(sb, mob,
+                        lookup?.Mob?.PageTitle is { Length: > 0 } t ? t : mob.Name, respawn);
                 }
                 continue;
             }
             wroteAny = true;
-            WriteMobSection(sb, mob, lookup, news, currentZone);
+            WriteMobSection(sb, mob, lookup, news, currentZone, respawn);
         }
 
         if (!wroteAny)
@@ -249,7 +272,7 @@ public static class WikiContribution
 
     private static void WriteMobSection(StringBuilder sb, MobSummary mob,
         MobLookupResult? lookup, List<(MobLoot Loot, WikiDropStatus Status)> news,
-        string currentZone)
+        string currentZone, RespawnVerdict? respawn = null)
     {
         var status = news[0].Status;
         // Upgrade tiers fold to one wiki entry (#65, Frankthetankk's catch): the
@@ -309,6 +332,7 @@ public static class WikiContribution
         // Only for a page that already exists — the new-page skeleton carries the line in
         // its own description field, where there is nothing to overwrite.
         if (status != WikiDropStatus.PageMissing) WriteRareSpawn(sb, mob);
+        if (status != WikiDropStatus.PageMissing && respawn is { } rv) WriteRespawnBlock(sb, rv);
         sb.AppendLine();
         // Summary-field-sized summary (#65 round four, Frankthetankk: the itemized
         // list was "much longer than what a summary field is meant to hold") — the
@@ -326,7 +350,10 @@ public static class WikiContribution
             // then a summary that mentions only loot leaves the player to notice the gap,
             // and the half they would forget to mention is the one an editor is likeliest
             // to question.
-            + (RareSpawnNote(mob) is null ? "." : "; rare spawn confirmed via /consider."));
+            + (RareSpawnNote(mob) is null ? "" : "; rare spawn confirmed via /consider")
+            + (respawn is { Kind: RespawnVerdictKind.Suggest } rvv
+                ? $"; respawn observed {rvv.Wording} over {rvv.Cycles.Count} cycles."
+                : "."));
         sb.AppendLine();
         // Full itemization + last-seen LOG TIMES WITH DATES (a session can span
         // midnight): one date header when they all share a day, per-item otherwise.
@@ -404,16 +431,72 @@ public static class WikiContribution
     /// (<see cref="WriteRareSpawn"/>, reused verbatim — ADD, both counts, said once) leads
     /// with the instruction to add rather than replace.
     /// </summary>
-    private static void WriteRareOnlySection(StringBuilder sb, MobSummary mob, string pageTitle)
+    private static void WriteFactsOnlySection(StringBuilder sb, MobSummary mob,
+        string pageTitle, RespawnVerdict respawn)
     {
+        var rare = RareSpawnNote(mob) is not null;
+        var timer = respawn.Kind is RespawnVerdictKind.Suggest or RespawnVerdictKind.WikiDisagrees;
         sb.AppendLine();
-        sb.AppendLine($"=== {pageTitle} — rare spawn confirmed via /consider ===");
+        sb.AppendLine($"=== {pageTitle} — " + (rare, timer) switch
+        {
+            (true, true) => "rare spawn + respawn timer observed ===",
+            (true, false) => "rare spawn confirmed via /consider ===",
+            _ => "respawn timer observed ===",
+        });
         sb.AppendLine("Nothing it dropped is missing from its page — the contribution here is the");
-        sb.AppendLine("rarity itself. If the description already says it, there is nothing to do.");
+        sb.AppendLine((rare, timer) switch
+        {
+            (true, true) => "rarity and the timer themselves.",
+            (true, false) => "rarity itself. If the description already says it, there is nothing to do.",
+            _ => "timer itself.",
+        });
         sb.AppendLine("Edit page:  " + EditUrl(pageTitle));
         WriteRareSpawn(sb, mob);
+        WriteRespawnBlock(sb, respawn);
         sb.AppendLine();
-        sb.AppendLine("Suggested edit summary: rare spawn confirmed via /consider.");
+        var clauses = new List<string>();
+        if (rare) clauses.Add("rare spawn confirmed via /consider");
+        if (respawn.Kind == RespawnVerdictKind.Suggest)
+            clauses.Add($"respawn observed {respawn.Wording} over {respawn.Cycles.Count} cycles");
+        if (clauses.Count > 0)
+            sb.AppendLine("Suggested edit summary: " + string.Join("; ", clauses) + ".");
+    }
+
+    /// <summary>
+    /// The respawn contribution for a page that already exists (the spawn-timer feed,
+    /// Fable 5's plan 2026-08-22). Three rules, mirroring the rare-spawn block above:
+    /// a SUGGESTION only when the agreement bar passed and the wiki's field is empty or
+    /// absent; a wiki that DISAGREES gets both numbers and no paste instruction —
+    /// compare, don't overwrite (a mismatch may be a range or a tier our sample hasn't
+    /// seen); and the raw cycles always ride along so a wiki editor can judge the
+    /// evidence rather than trust a median.
+    /// </summary>
+    private static void WriteRespawnBlock(StringBuilder sb, RespawnVerdict v)
+    {
+        if (v.Kind == RespawnVerdictKind.None) return;
+        var cycles = string.Join(" · ", v.Cycles.Select(c => RespawnSuggestion.WikiWording(c.DurationSeconds)));
+        switch (v.Kind)
+        {
+            case RespawnVerdictKind.Suggest:
+                sb.AppendLine();
+                sb.AppendLine($"Also observed — {v.Note}.");
+                sb.AppendLine("The page's respawn_time field is empty (or missing). Set it to:");
+                sb.AppendLine();
+                sb.AppendLine($"  | respawn_time  = {v.Wording}");
+                sb.AppendLine();
+                sb.AppendLine($"Cycles behind it (for the edit summary): {cycles}");
+                break;
+            case RespawnVerdictKind.WikiDisagrees:
+                sb.AppendLine();
+                sb.AppendLine($"Also observed — {v.Note}.");
+                sb.AppendLine($"Your cycles: {cycles}. Presented to reconcile, never to paste over —");
+                sb.AppendLine("the wiki may carry a range or a tier your sample has not seen.");
+                break;
+            case RespawnVerdictKind.WikiAgrees:
+                sb.AppendLine();
+                sb.AppendLine($"Respawn: {v.Note}.");
+                break;
+        }
     }
 
     /// <summary>The observed stat block (#65, Frankthetankk's field list): zone at

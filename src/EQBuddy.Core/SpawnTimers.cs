@@ -107,15 +107,22 @@ public sealed class SpawnTimers
     public string Server { get; set; } = "";
     public SpawnZone? CurrentZone { get { lock (_lock) return _currentZone; } }
 
-    public SpawnTimers(SpawnCatalog catalog, SpawnOverrides overrides, string? persistPath = null)
+    public SpawnTimers(SpawnCatalog catalog, SpawnOverrides overrides, string? persistPath = null,
+        SpawnCycleLedger? cycles = null)
     {
         _catalog = catalog;
         _overrides = overrides;
         _persistPath = persistPath;
+        _cycles = cycles;
         LoadPersisted();
         HealSuppressedOverrides();
         PurgePetTimers();
     }
+
+    /// <summary>The respawn-cycle evidence store behind the pack's wiki suggestions —
+    /// written only here, at the points a gap passes the honesty gates, so the gates
+    /// apply to the ledger by construction. Null in tests that don't care.</summary>
+    private readonly SpawnCycleLedger? _cycles;
 
     /// <summary>
     /// Remove spawn entries for PETS that an older build discovered as named mobs (David,
@@ -275,6 +282,12 @@ public sealed class SpawnTimers
     /// noise, knows to leave it alone.</summary>
     private void LearnFromSighting(SpawnZone zone, string name, double elapsed)
     {
+        // The call site's gates (the named's own kill started the clock, same stay,
+        // final stretch) are what make this a cycle observation; the manual-edit and
+        // never-loosens returns below are about the COUNTDOWN, not about whether the
+        // mob was really seen up at this elapsed.
+        if (elapsed >= MinLearnSeconds && elapsed <= MaxDiscoverSeconds)
+            _cycles?.Record(Server, zone.Zone, name, Math.Floor(elapsed), "Sighting", DateTime.Now);
         var entry = zone.Named.FirstOrDefault(e =>
             e.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         var o = _overrides.Find(zone.Zone, name);
@@ -546,6 +559,9 @@ public sealed class SpawnTimers
         if (o is { Learned: false, RespawnSeconds: not null }) return o.RespawnSeconds;
 
         if (FirstDurationFromGap(zone, name, killedAt) is not { } elapsed) return o.RespawnSeconds;
+        // A cycle for the ledger whether or not it tightens the countdown (see
+        // LearnFromRekill) — the honesty gates all passed inside FirstDurationFromGap.
+        _cycles?.Record(Server, zone, name, elapsed, "Discovered", killedAt);
         if (o.RespawnSeconds is { } current && elapsed >= current) return o.RespawnSeconds;
 
         o.RespawnSeconds = elapsed;
@@ -589,14 +605,25 @@ public sealed class SpawnTimers
             // of the mob (David, 2026-08-20).
             if (!NeverLeftSince(prev)) return currentDuration;
             var gap = (killedAt - prev.KilledAt).TotalSeconds;
-            if (gap < MinLearnSeconds || gap >= d) return currentDuration;
+            if (gap < MinLearnSeconds) return currentDuration;
+            // An honest cycle for the LEDGER even when it does not tighten the
+            // countdown below: a 12:04 gap against a learned 12:03 is a real observed
+            // cycle, and refusing it would keep a stable timer from ever reaching
+            // three agreeing cycles. The discovery ceiling keeps out "went to bed".
+            if (gap <= MaxDiscoverSeconds)
+                _cycles?.Record(Server, zone.Zone, entry.Name, Math.Floor(gap), "Rekill", killedAt);
+            if (gap >= d) return currentDuration;
             learned = Math.Floor(gap);
         }
         // Nothing has ever said how long this cycle is — the catalog lists the named
         // with a blank respawn and its zone has no default. Measure it the way a
         // discovered named is measured, under the stricter bounds that stand in for the
         // sanity check a known duration would have provided.
-        else if (FirstDurationFromGap(zone.Zone, entry.Name, killedAt) is { } first) learned = first;
+        else if (FirstDurationFromGap(zone.Zone, entry.Name, killedAt) is { } first)
+        {
+            _cycles?.Record(Server, zone.Zone, entry.Name, first, "Rekill", killedAt);
+            learned = first;
+        }
         else return currentDuration;
 
         var o = _overrides.GetOrAdd(zone.Zone, entry.Name);

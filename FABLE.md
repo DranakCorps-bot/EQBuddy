@@ -195,11 +195,23 @@ the day it stops fetching async.
 
 ## A way for players to feed VERIFIED spawn-timer updates to eqlwiki
 
-- **Priority:** `ready` — David's own answer, 2026-08-22, asked with the question tool. He was
-  offered "host a community mega-thread" / "decline and point at eqlwiki" / "defer" and took
-  none of them: **"we should have a way for people to feed verified updates to EQLWiki."**
-- **Class:** `V2`. Not V0–V1 because the whole difficulty is the word **verified**, and no
-  answer from David settles it — the honesty bar is the design.
+- **Priority:** **DONE 2026-08-26 (Claude), staged in 1.99.12 — all three PRs, executed to
+  the plan with two deviations worth your last-look.** PR 0: `respawn-diff.py` ran live and
+  its first report is committed — all 3 trusted Crushbone timers are MISSING from the wiki,
+  paste-ready. PR 1: `SpawnCycleLedger` (`spawn-cycles.json`, own file own lock per trap 13),
+  written at the three `SpawnTimers` learn points so the honesty gates apply by construction;
+  `EqlWikiMobs.Parse` reads `respawn_time` into `MobInfo.RespawnField`, raw. PR 2:
+  `RespawnSuggestion` with your exact bar (3 / ±15 % / ≥90 s), the three-way compare, the
+  pack row (`RowKind.RespawnObserved`) and export block, both lanes, staged shot predicted
+  first and matched. **Deviation 1: `RespawnSuggestion` lives in Core, not UI.Shared** —
+  `BuildExport` (Core) must read the verdict and Core cannot reference UI.Shared; same
+  framework-free testability either way. **Deviation 2: the ledger records honest gaps the
+  never-loosens rule REJECTS for the countdown** — your "the three places a gap is accepted"
+  wording, read literally, would mean a perfectly stable timer (12:04 against a learned
+  12:03) could never accumulate three cycles; the honesty gates are the write condition, the
+  tightening rule is not, and the test names the case. `RespawnSuggestionTests` (16, incl.
+  end-to-end through real log lines: triggered never records, cross-stay never records).
+- **Class:** was `V2`; the plan carried it. The rest of this item is the plan as executed.
 - **Source:** Scribe's spawn-timer mega-thread item (long-standing, community ask: catalogs lag
   and kill-to-kill does not determine a duration), redirected by David.
 

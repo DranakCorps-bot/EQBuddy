@@ -1,0 +1,46 @@
+#title:Chokehold
+{{Namedmobpage
+
+| imagefilename     = npc_chokehold.png
+
+| name              = Chokehold
+| race              = [[Orc]]
+| class             = [[Rogue]]
+| level             = ~20
+| agro_radius       = 
+| run_speed         = 1
+
+| zone              = [[Crushbone]]
+| location          = 185, -4, 4
+
+| AC                = 
+| HP                = 
+| HP_regen          = 
+| mana_regen        = 
+
+| attacks_per_round = 1
+| attack_speed      = 100%
+| damage_per_hit    = 1  - 34
+| special           = Appears immune to physical damage
+
+| description = Stands just under the keep tower
+
+| known_loot = 
+
+<ul><li>  {{:Armband of Serrated Teeth}}                  <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li><li> {{:Carved Walking Stick}}             <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li></ul>
+
+| factions = 
+
+* [[Crushbone Orcs]] <span class='profac'>(-10)</span>
+
+| opposing_factions = 
+
+* [[Emerald Warriors]] <span class='oppfac'>(5)</span>
+* [[Faydarks Champions|Faydark's Champions]] <span class='oppfac'>(5)</span>
+* [[Storm Guard]] <span class='oppfac'>(5)</span>
+
+}}
+
+[[Category:Crushbone]]

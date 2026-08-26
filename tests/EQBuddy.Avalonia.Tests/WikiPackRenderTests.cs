@@ -42,6 +42,7 @@ public sealed class WikiPackRenderTests
         public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => StoredRows;
         public List<MobHistory.SessionMobs> StoredRows { get; init; } = [];
         public long ActiveSessionRowId => 0;
+        public WikiContribution.RespawnEvidence? RespawnEvidenceFor(string mobZone, string name) => null;
     }
 
     private static StatsSnapshot Snapshot() => new()

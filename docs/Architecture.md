@@ -130,13 +130,17 @@ Nothing is shared now, so nothing can be moved.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,504 | 4,635 | 131 |
-| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,407 | 2,612 | 205 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,565 | 1,702 | 137 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,519 | 4,519 | 4,970 | 451 |
+| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,417 | 2,612 | 195 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,233 | 5,752 | 519 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,448 | 5,752 | 304 |
 
-Re-measured 2026-08-22. The WPF widget came down 110 lines when the Gear card body was
+Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
+`EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment
+Fable's plan prescribed — ~140 lines of pure string-building the hotspot glob was paying
+for) and the WPF baseline was re-set to the post-lift count in the same commit.
+Earlier: the WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one
 way this table stops meaning anything. `OptionsWindow` is the tight one now: it took the

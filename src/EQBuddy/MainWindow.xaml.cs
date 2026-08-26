@@ -19,7 +19,7 @@ namespace EQBuddy;
 
 public partial class MainWindow : Window, ICardContext
 {
-    private readonly AppSettings _settings = AppSettings.Load();
+    internal readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
     // Attached at construction (not in SessionStats itself) so tests never touch disk.
     private void AttachSpellStore() =>
@@ -86,7 +86,7 @@ public partial class MainWindow : Window, ICardContext
     // Watch takes the seam plus one thing no snapshot can answer: when each rule's cue
     // is due. That is scheduled by the alert path, not by the session, so it is handed
     // in rather than reached for — and ICardContext stays six methods wide.
-    private WatchCardView _watch = null!;
+    internal WatchCardView _watch = null!;
 
     // ---- ICardContext ----
     //
@@ -190,7 +190,8 @@ public partial class MainWindow : Window, ICardContext
         // the startup replay re-derives countdowns from kills already in the log.
         var spawnCatalog = SpawnCatalog.LoadEmbedded();
         var spawnOverrides = SpawnOverrides.Load(AppPaths.File("spawn-overrides.json"));
-        _spawnTimers = new SpawnTimers(spawnCatalog, spawnOverrides, AppPaths.File("spawn-timers.json"));
+        _spawnCycles = new SpawnCycleLedger(AppPaths.File("spawn-cycles.json"));
+        _spawnTimers = new SpawnTimers(spawnCatalog, spawnOverrides, AppPaths.File("spawn-timers.json"), _spawnCycles);
         _watcher.Spawns = _spawnTimers;
         _spawnsVm = new EQBuddy.UI.Shared.SpawnsViewModel(spawnCatalog, spawnOverrides, _spawnTimers);
         // EQBuddy Mobile — the title-bar 📱 and the menu's first window entry are always
@@ -670,8 +671,8 @@ public partial class MainWindow : Window, ICardContext
     // did any work. E2E asserts the second is zero while no device is paired — the
     // "free when idle" claim is the one that costs a core if it's wrong, and a unit
     // test of the gate can't show that the real timer is wired to the real gate.
-    private long _companionPumpTicks;
-    private long _companionPushes;
+    internal long _companionPumpTicks;
+    internal long _companionPushes;
 
     public AppSettings Settings => _settings;
     /// <summary>
@@ -953,7 +954,7 @@ public partial class MainWindow : Window, ICardContext
     private readonly SlowTracker _slowTracker = new();
     private readonly BuffTracker _buffTracker = new();
     private readonly BuffLossLog _buffLossLog = new();
-    private readonly RaidKillLedger _raidLedger;
+    internal readonly RaidKillLedger _raidLedger;
 
     private readonly EqlWikiItemService _wikiItems =
         new(System.IO.Path.Combine(Core.AppPaths.Dir, "wiki-cache", "items"));
@@ -1232,7 +1233,7 @@ public partial class MainWindow : Window, ICardContext
     /// bottom-edge grip chose one (Reddit ask, 2026-08-09 — taller or shorter without
     /// rescaling text). The choice lives in pre-scale units so it survives scale
     /// changes; the monitor's cap always wins.</summary>
-    private double _sectionAutoCap = double.MaxValue;
+    internal double _sectionAutoCap = double.MaxValue;
 
     /// <summary>SectionScroll sits under the UI-scale LayoutTransform, so its MaxHeight
     /// is in pre-scale units while the monitor cap arrives in screen pixels. The
@@ -1978,9 +1979,9 @@ public partial class MainWindow : Window, ICardContext
 
     private void OnSpawnsWindow(object sender, RoutedEventArgs e) => ShowSpawnsWindow();
 
-    private QuestsWindow? _questsWindow;
-    private CreatureWindow? _creatureWindow;
-    private WikiPackWindow? _wikiPackWindow;
+    internal QuestsWindow? _questsWindow;
+    internal CreatureWindow? _creatureWindow;
+    internal WikiPackWindow? _wikiPackWindow;
 
     /// <summary>The KILLS & DROPS theme's window. One instance, raised if it is already
     /// up — the same shape every other theme window uses. The widget CARD is the door, and
@@ -2017,6 +2018,25 @@ public partial class MainWindow : Window, ICardContext
 
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 
+    /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by
+    /// SpawnTimers at the honesty-gated learn points, read only by the pack.</summary>
+    private readonly SpawnCycleLedger _spawnCycles;
+
+    /// <summary>One creature's respawn evidence for the pack, or null when the ledger
+    /// holds nothing. The catalog entry's triggered/raid/multi-spawn flags travel as
+    /// Suppressed so the suggestion layer can refuse them whatever the cycles say.</summary>
+    internal WikiContribution.RespawnEvidence? RespawnEvidenceFor(string mobZone, string name)
+    {
+        var zone = _spawnCatalog.FindZone(mobZone.Length > 0 ? mobZone : CurrentZoneName);
+        if (zone is null) return null;
+        var cycles = _spawnCycles.For(_spawnTimers.Server, zone.Zone, name);
+        if (cycles.Count == 0) return null;
+        var entry = zone.Named.FirstOrDefault(e => SpawnCatalog.NameMatches(e.Name, name)
+            || e.Aliases.Any(a => SpawnCatalog.NameMatches(a, name)));
+        var suppressed = entry is { } en && (en.IsTriggered || en.RaidInstanced || en.MultiSpawn);
+        return new WikiContribution.RespawnEvidence(cycles, suppressed);
+    }
+
     internal void ShowWikiPackWindow()
     {
         if (_wikiPackWindow is not { IsLoaded: true })
@@ -2026,7 +2046,7 @@ public partial class MainWindow : Window, ICardContext
         _wikiPackWindow.Activate();
     }
 
-    private ProgressWindow? _progressWindow;
+    internal ProgressWindow? _progressWindow;
 
     /// <summary>Who owns the Progress body right now — the card, the window, or neither.
     ///
@@ -2036,13 +2056,13 @@ public partial class MainWindow : Window, ICardContext
     /// OLD behaviour first or they pin nothing. The state machine is the same one both
     /// UIs will share (`UI.Shared/ThemeHost.cs`), so the move changes which inputs fire,
     /// not what the truth is.</summary>
-    private readonly ThemeHost<ProgressTab> _progressHost = new(ProgressSurface.DefaultInlineTab);
+    internal readonly ThemeHost<ProgressTab> _progressHost = new(ProgressSurface.DefaultInlineTab);
 
     /// <summary>The Progress theme's card — the launcher line, and the rooms under it when
     /// the player expands rather than pops out. Its composition lives in
     /// <see cref="ProgressThemeCard"/>, not here: this window is the ratchet's hotspot, and
     /// a surface migrated INSIDE it is guarded by nothing.</summary>
-    private ThemeCardView<ProgressTab> _progressCard = null!;
+    internal ThemeCardView<ProgressTab> _progressCard = null!;
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -2773,143 +2793,10 @@ public partial class MainWindow : Window, ICardContext
         // That is exactly backwards: Raids is the surface about to be lifted, and the
         // WPF layer has no unit tests (docs/TestPlan.md §5). A shot's throwaway profile
         // getting a debug.txt it does not read costs nothing.
-        if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("EQBUDDY_EXPAND")))
-        {
-            try
-            {
-                // Row counts say "a new name appeared"; the snapshot totals say "the
-                // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
-                var dump = $"dmgSrc={DamageSourceList.Items.Count} dmgTaken={DamageTakenList.Items.Count} " +
-                    // The KILLS & DROPS launcher card (docs/Themes.md). It replaced the
-                    // Kills card, whose row counts used to be asserted here; what a reader
-                    // sees now is one line, so that is what this pins. The ROWS moved with
-                    // the surface into CreatureWindow.DebugFacts() below, where the same
-                    // E2E assertions read them — the point being that they are the SAME
-                    // numbers out of a new host.
-                    $"killsCard={(KillsSection.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"killsSummaryLen={KillsHeader.Text.Length} " +
-
-                    // The PROGRESS THEME's launcher card (docs/Themes.md). It replaced
-                    // five cards whose row counts used to be asserted here; what a reader
-                    // sees now is one line, so that is what this pins — the card is
-                    // present, and folding five cards into it kept their numbers on
-                    // screen rather than quietly losing the glance. Exactly the shape
-                    // questsCard/questsSummaryLen took when the quest cards folded.
-                    //
-                    // The ROWS moved with the surfaces, into ProgressWindow.DebugFacts()
-                    // below, where the same E2E assertions read them.
-                    $"progressCard={(ProgressSection.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"progressSummaryLen={ProgressHeader.Text.Length} " +
-                    // WHO OWNS THE PROGRESS BODY. Pinned here while the launcher is still
-                    // a plain Button, so Inline themes PR 1 has to keep them true rather
-                    // than define them: today progressInline can only ever be 0, and the
-                    // assertion that it IS 0 is what makes the 1 mean something later.
-                    //
-                    // The two are never both 1 — that is ThemeHost's one invariant, and
-                    // on Avalonia it is what keeps the app from throwing (one control,
-                    // one visual parent). progressTab/progressTabs stay the WINDOW's to
-                    // report while it is up: DumpValue takes the FIRST match in the file,
-                    // so two emitters of one key is not a conflict the suite can see.
-                    $"progressInline={(_progressHost.IsInline ? 1 : 0)} " +
-                    $"progressWindowOpen={(_progressHost.IsWindowOpen ? 1 : 0)} " +
-                    // The CARD's strip, and only while the card owns the body. The window
-                    // reports the same two keys from its own DebugFacts, and DumpValue
-                    // takes the FIRST match in the file — so emitting both at once would
-                    // not be a conflict the suite could see. One owner of the body, one
-                    // owner of the keys that describe it.
-                    (_progressHost.IsInline
-                        ? $"progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
-                          $"progressTabs={_progressCard.TabCount} "
-                        : "") +
-                    $"raidsDefeated={_raidLedger.DefeatedCount()} " +
-                    $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} " +
-                    $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
-                    $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
-                    // The Watch card's RENDERED shape, not just its total. The total
-                    // above proves the data arrived; these prove the card drew it, and
-                    // they exist because this surface is about to be lifted into a file
-                    // of its own — the WPF layer has no unit tests (docs/TestPlan.md §5),
-                    // so an assertion from a launched app is the only thing standing
-                    // between that move and a silent regression. Row count, whether the
-                    // sort strip is up (it appears only above two or more rules), and
-                    // which sort is lit.
-                    // The PROGRESS card's rendered shape, for the same reason and in the
-                    // same week: it is the next surface being lifted out. "skills" above
-                    // proves the data arrived; these prove the card drew the three lists
-                    // that are easy to lose in a move — the ding unlocks (shown only when
-                    // a level was announced this session), the next-milestone preview
-                    // (hidden until a level is known at all, and folded behind a setting)
-                    // and the AA split into session-new vs the full ledger.
-                    $"watchRows={_watch.RowCount} " +
-                    $"watchStrip={(_watch.SortStripShown ? 1 : 0)} " +
-                    $"watchSort={_settings.WatchSortMode} " +
-                    // The GEAR card's rendered shape, pinned for the same reason and in
-                    // the same way as the two above: it is the next surface to be lifted
-                    // out (the Gear & Loot theme), and the WPF layer has no unit tests,
-                    // so an assertion from a launched app is the only thing standing
-                    // between that move and a silent regression.
-                    //
-                    // The gear numbers themselves moved with the surface, into
-                    // GearLootWindow.DebugFacts() below — same keys, new host, which is
-                    // exactly what the E2E assertions are for.
-                    $"lootCard={(LootSection.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"lootSummaryLen={LootHeader.Text.Length} " +
-                    $"actualH={ActualHeight:0} actualW={ActualWidth:0} " +
-                    // Geometry, for the E2E wiring check. WidgetMetrics is unit-tested,
-                    // but only a launched app can show that its answer actually reaches
-                    // the control — which is the half of #144 a unit test cannot see.
-                    // uiScale is ×100 because the dump carries integers.
-                    $"uiScale100={_settings.UiScale * 100:0} " +
-                    $"sectionCapScreen={_sectionAutoCap:0} " +
-                    $"sectionMaxH={SectionScroll.MaxHeight:0} " +
-                    // The Quests card (2026-08-16). It replaced the Epic and Sky cards,
-                    // whose tab and row counts used to be asserted here. What a reader
-                    // sees now is one launcher line, so that is what E2E pins: the card
-                    // is present, and folding two cards into it kept BOTH checklists'
-                    // counts on screen rather than quietly losing the glance.
-                    $"questsCard={(QuestsSection.Visibility == Visibility.Visible ? 1 : 0)} " +
-                    $"questsEpicTotal={_settings.EpicQuestChecklist.Count} " +
-                    $"questsSkyTotal={_settings.SkyQuestChecklist.Count} " +
-                    $"questsSummaryLen={QuestsHeader.Text.Length} " +
-                    // The Quest Tracker WINDOW, when EQBUDDY_QUESTS opened one. The WPF
-                    // layer has no unit tests (docs/TestPlan.md §5), so the Gate 2
-                    // rebuild's structure — list rows, a selection, a populated detail
-                    // pane — is only assertable from a launched app. The window formats
-                    // its own facts; this just carries them.
-                    (_questsWindow is { IsLoaded: true } qwin ? qwin.DebugFacts() + " " : "") +
-                    // The Progress WINDOW, when EQBUDDY_PROGRESS opened one. The five
-                    // surfaces it hosts were pinned on the widget before the fold; this
-                    // is where those same numbers come out now, and the point of the
-                    // assertion is that they are the SAME numbers.
-                    (_progressWindow is { IsLoaded: true } pwin ? pwin.DebugFacts() + " " : "") +
-                    // The Gear & Loot WINDOW, when EQBUDDY_GEARLOOT opened one. Its gear
-                    // numbers are the ones pinned on the widget before the lift; the
-                    // point of the assertion is that they are the SAME numbers.
-                    (_gearLootWindow is { IsLoaded: true } glwin ? glwin.DebugFacts() + " " : "") +
-                    // The Wiki contribution pack WINDOW, when EQBUDDY_WIKIPACK opened one:
-                    // its rows and its re-check button's target count (#226).
-                    (_wikiPackWindow is { IsLoaded: true } wpwin ? wpwin.DebugFacts() + " " : "") +
-                    // The Kills & Drops WINDOW, when EQBUDDY_DROPS or EQBUDDY_CREATURE
-                    // opened one. Its drops numbers are the ones pinned on the OLD host
-                    // before the lift, and its kills numbers the ones pinned on the widget
-                    // before the fold; the point of the assertion is that they are the SAME
-                    // numbers.
-                    (_creatureWindow is { IsLoaded: true } cwin ? cwin.DebugFacts() + " " : "") +
-                    // EQBuddy Mobile's pump: it should be running, and it should be
-                    // doing nothing, because this profile has no paired device.
-                    $"companionPumpTicks={_companionPumpTicks} " +
-                    $"companionPushes={_companionPushes} " +
-                    // Alt+Tab (Hateborne, 2026-08-25). Reported as the EFFECT — the ex-style
-                    // actually on the HWND — not as the setting, because "present in the
-                    // build" and "in effect at runtime" are different claims and trap 42
-                    // cost two builds to learn it. The setting is beside it so a
-                    // disagreement between the two is visible rather than inferable.
-                    $"altTabWanted={(_settings.HideFromAltTab ? 1 : 0)} " +
-                    $"altTabStyle={(NoActivate.IsToolWindow(this) ? 1 : 0)}";
-                System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
-            }
-            catch { }
-        }
+        // Lifted into WidgetDump (Inline themes PR 2's first commit — the ratchet lift
+        // the plan's amendment prescribed): ~140 lines of pure string-building that the
+        // hotspot glob was paying for. Same guard, same file, same keys.
+        WidgetDump.MaybeWrite(this, s);
     }
 
     /// <summary>
@@ -2988,7 +2875,7 @@ public partial class MainWindow : Window, ICardContext
     /// <summary>The Gear card, lifted into <see cref="GearCardView"/> for the Loot &amp;
     /// Items theme. Built here because it needs the widget's zone and hop lookup, and
     /// nothing else in this file needs it back.</summary>
-    private GearLootWindow? _gearLootWindow;
+    internal GearLootWindow? _gearLootWindow;
 
     /// <summary>The Gear &amp; Loot theme's window. One instance, raised if it is already
     /// up — the same shape every other theme window uses.</summary>

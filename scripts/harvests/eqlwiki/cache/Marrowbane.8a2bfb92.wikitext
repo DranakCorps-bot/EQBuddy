@@ -1,0 +1,52 @@
+#title:Marrowbane
+{{Namedmobpage
+
+| imagefilename     = npc_marrowbane.png
+
+| name              = Marrowbane
+| race              = [[Orc]]
+| class             = [[Magician]]
+| level             = 19-21
+| agro_radius       = 
+| run_speed         = 1
+
+| zone              = [[Crushbone]]
+| location          = 87, -100, 4
+
+| AC                = 
+| HP                = 
+| HP_regen          = 
+| mana_regen        = 
+
+| attacks_per_round = 1
+| attack_speed      = 100%
+| damage_per_hit    = 1  - 34
+| special           = None
+
+| description = Stands just north of the main entrance to the keep
+
+| known_loot = 
+
+<ul><li>  {{:Wood Elf Scout Bauble}}                  <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li><li> {{:Grimy Black Silk Robe}}             <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li></ul>
+
+| common_loot = 
+
+<ul><li> {{:Bronze Two Handed Sword}} 
+</li><li> {{:Raw-Hide Skullcap}}
+</li></ul>
+
+| factions = 
+
+* [[Crushbone Orcs]] <span class='profac'>(-10)</span>
+
+| opposing_factions = 
+
+* [[Emerald Warriors]] <span class='oppfac'>(5)</span>
+* [[Faydarks Champions|Faydark's Champions]] <span class='oppfac'>(5)</span>
+* [[Storm Guard]] <span class='oppfac'>(5)</span>
+
+}}
+
+[[Category:Crushbone]]

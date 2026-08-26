@@ -343,7 +343,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _watcher.Raids = _raidLedger;
         var spawnCatalog = SpawnCatalog.LoadEmbedded();
         var spawnOverrides = SpawnOverrides.Load(AppPaths.File("spawn-overrides.json"));
-        _spawnTimers = new SpawnTimers(spawnCatalog, spawnOverrides, AppPaths.File("spawn-timers.json"));
+        _spawnCycles = new SpawnCycleLedger(AppPaths.File("spawn-cycles.json"));
+        _spawnTimers = new SpawnTimers(spawnCatalog, spawnOverrides, AppPaths.File("spawn-timers.json"), _spawnCycles);
         _watcher.Spawns = _spawnTimers;
         _spawnsVm = new EQBuddy.UI.Shared.SpawnsViewModel(spawnCatalog, spawnOverrides, _spawnTimers);
         // Voice settings are set app-wide, from the Options → Alerts picker and sliders
@@ -3590,6 +3591,22 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => _repo.MobRows();
 
     public long ActiveSessionRowId => _archiver.ActiveRowId;
+
+    /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by
+    /// SpawnTimers at the honesty-gated learn points, read only by the pack.</summary>
+    private readonly SpawnCycleLedger _spawnCycles;
+
+    public WikiContribution.RespawnEvidence? RespawnEvidenceFor(string mobZone, string name)
+    {
+        var zone = _spawnCatalog.FindZone(mobZone.Length > 0 ? mobZone : CurrentZoneName);
+        if (zone is null) return null;
+        var cycles = _spawnCycles.For(_spawnTimers.Server, zone.Zone, name);
+        if (cycles.Count == 0) return null;
+        var entry = zone.Named.FirstOrDefault(e => SpawnCatalog.NameMatches(e.Name, name)
+            || e.Aliases.Any(a => SpawnCatalog.NameMatches(a, name)));
+        var suppressed = entry is { } en && (en.IsTriggered || en.RaidInstanced || en.MultiSpawn);
+        return new WikiContribution.RespawnEvidence(cycles, suppressed);
+    }
     private MapWindow? _mapWindow;
     private TravelWindow? _travelWindow;
     private FightTimelineWindow? _timelineWindow;

@@ -702,6 +702,17 @@ $Shots = [ordered]@{
                                @{ Character = 'Aludra'; Fraction = 0.7; ShiftDays = 1 }
                                @{}
                            )
+                           # Three agreeing camped cycles for the Asp (its page below is
+                           # complete, so the timer IS the contribution): the respawn row
+                           # must read "observed 12.3 min over 3 agreeing cycles" beside
+                           # the rare row, and the headline must count both facts.
+                           Cycles = @{
+                               'test|West Commonlands|Asp' = @(
+                                   @{ DurationSeconds = 738; Kind = 'Rekill'; At = '2026-08-24T19:00:00' }
+                                   @{ DurationSeconds = 744; Kind = 'Rekill'; At = '2026-08-24T19:15:00' }
+                                   @{ DurationSeconds = 731; Kind = 'Sighting'; At = '2026-08-25T19:00:00' }
+                               )
+                           }
                            # The rare-only row (Bevel's kind): the Asp's page below is
                            # COMPLETE, so without these two cons it contributes nothing —
                            # which used to be the bug. One plain con and one rare con, so
@@ -873,6 +884,13 @@ function Write-Dump([hashtable]$dump) {
 #
 # Format is the service's own CacheEntry: Title, Wikitext, FetchedAt. Drops are the
 # wiki's {{:Item}} transclusions, which is what its parser reads.
+function Write-Cycles([hashtable]$cycles) {
+    $path = Join-Path $profileDir 'spawn-cycles.json'
+    if ($null -eq $cycles) { Remove-Item $path -Force -ErrorAction SilentlyContinue; return }
+    # The ledger's own shape: "server|zone|name" -> [{DurationSeconds, Kind, At}].
+    $cycles | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding utf8
+}
+
 function Write-WikiCache([hashtable]$pages) {
     $dir = Join-Path $profileDir 'wiki-cache/mobs'
     if ($null -eq $pages) { Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue; return }
@@ -1041,6 +1059,7 @@ try {
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
         Write-WikiCache $spec.Wiki
+        Write-Cycles $spec.Cycles
         Append-Log $spec.Append
         if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }
         # A multi-session archive for the review picker: the pristine fixture plus

@@ -41,6 +41,10 @@ public interface IDropsHost
     /// NOT read them — its live view is "is this camp worth it", a different question.</summary>
     IReadOnlyList<MobHistory.SessionMobs> StoredMobRows();
     long ActiveSessionRowId { get; }
+
+    /// <summary>One creature's respawn-cycle evidence for the pack's timer suggestions
+    /// (the spawn-timer feed), or null when the ledger holds nothing for it.</summary>
+    WikiContribution.RespawnEvidence? RespawnEvidenceFor(string mobZone, string name);
 }
 
 /// <summary>

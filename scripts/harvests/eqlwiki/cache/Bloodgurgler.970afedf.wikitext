@@ -1,0 +1,46 @@
+#title:Bloodgurgler
+{{Namedmobpage
+
+| imagefilename     = npc_bloodgurgler.png
+
+| name              = Bloodgurgler
+| race              = [[Orc]]
+| class             = [[Enchanter]]
+| level             = ~19
+| agro_radius       = 
+| run_speed         = 1
+
+| zone              = [[Crushbone]]
+| location          = 288, -70, 4
+
+| AC                = 
+| HP                = 
+| HP_regen          = 
+| mana_regen        = 
+
+| attacks_per_round = 1
+| attack_speed      = 100%
+| damage_per_hit    = 1  - 34
+| special           = 
+
+| description = Stands next to back tree at Slaver Pits
+
+| known_loot = 
+
+<ul><li>  {{:Rib-bone Stiletto}}                  <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li><li> {{:Spiky Splintmail}}             <span class='drare'>(Uncommon)</span> <span class='ddb'>[1] 1x 50% (50%)</span>
+</li></ul>
+
+| factions = 
+
+* [[Crushbone Orcs]] <span class='profac'>(-10)</span>
+
+| opposing_factions = 
+
+* [[Emerald Warriors]] <span class='oppfac'>(5)</span>
+* [[Faydarks Champions|Faydark's Champions]] <span class='oppfac'>(5)</span>
+* [[Storm Guard]] <span class='oppfac'>(5)</span>
+
+}}
+
+[[Category:Crushbone]]

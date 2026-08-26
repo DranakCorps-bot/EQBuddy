@@ -45,6 +45,7 @@ public sealed class DropsRenderTests
         public void ShowWikiPack() => WikiPackOpened++;
         public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => [];
         public long ActiveSessionRowId => 0;
+        public WikiContribution.RespawnEvidence? RespawnEvidenceFor(string mobZone, string name) => null;
     }
 
     private static StatsSnapshot Snapshot() => new()
