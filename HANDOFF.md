@@ -1,5 +1,27 @@
 # EQBuddy — handoff
 
+> **2026-08-26 (later) — ALL FOUR FABLE PLANS EXECUTED; 1.99.12 IS THE LARGEST STAGED
+> RELEASE YET AND ITS FABLE REVIEW IS REQUESTED** (`FABLE-FEEDBACK.md`, v1.99.11..HEAD,
+> gates 2,646 / 287 / 32). In it beyond the #238 merge below: **#239** (right-edge
+> anchoring across the mode swap, Helm-authorized, harness-verified by the new
+> `mode-swap-verify.ps1` whose FIRST run caught the anchor computing before the mini
+> chips); **the pooled wiki pack** (#217 ask 2 — `MobHistory.Pool` over `history.db`,
+> live session excluded by row id AND identity after the staged shot caught every number
+> doubling); **the verified spawn-timer feed** (all three PRs — `SpawnCycleLedger` at the
+> honesty-gated learn points, `RespawnSuggestion`'s 3-cycle ±15 % bar, the pack's
+> RespawnObserved row, and `respawn-report.md` with the 3 trusted Crushbone timers
+> paste-ready for the wiki); **the rare-conned pack row** (Bevel's rule, RowKind.
+> RareConfirmed); **Inline themes COMPLETE** — PR B (Avalonia Progress), PR 2 (Kills &
+> Drops + Gear & Loot, both lanes, `SurfaceOwnershipTests` exemptions EMPTY, the Avalonia
+> `KillsCardView` closing a hand-rolled parity drift, target drops moved push→pull) and
+> PR 3 (Quests: `QuestInline`'s one-class capped read-only rooms, General the Glance
+> default; the #238 Unlocks tab a Glance by MY call, unruled — flagged to Bevel). Every
+> shot predicted first; three README shots regenerated (15/24). The WPF dump block lifted
+> into `WidgetDump.cs` when the ratchet blew (4519 baseline re-set). **Next: Fable's
+> review → David's go. The #239/#238 status replies go to Helm AFTER the tag (Helm 6:37).**
+> Peer coordination: eqbuddy-fb has SCRIBE-FEEDBACK + the Bevel label ask; this session
+> owned the main checkout throughout.
+
 > **2026-08-26 — PR #238 (Hateborne) IS MERGED AND 1.99.12 IS STAGED, UNRELEASED.** The
 > largest outside contribution yet: the Shadow Knight Sky-reward drop (a class-name spelling
 > the literal compare could never match — `QuestClassFilter.Canonical` is the resolver now),

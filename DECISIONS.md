@@ -17,6 +17,22 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-26
 
+- **The #238 Unlocks tab is a GLANCE inline, not a Full room** · could have let the
+  `InlineModeFor` catch-all make it Full · it postdates Bevel's signed table and is a
+  review checklist over two dumps with its own lens — the same host-rule shape as
+  Inventory; conservative until Bevel rules, flagged in the pending Unlocks review ask ·
+  `QuestSurface.InlineModeFor`.
+- **Inline Epic/Sky checklist rows are READ-ONLY** · could have carried the old cards'
+  checkboxes · a checkbox inside a capped scroller invites ticks the cap hides context
+  for, and a disabled-looking one is trap 17; ticking stays in the window one ⧉ away ·
+  `Core/QuestInline` doc.
+- **`RespawnSuggestion` lives in Core, not UI.Shared as planned** · `BuildExport` (Core)
+  must read the verdict and Core cannot reference UI.Shared; same framework-free
+  testability either way · noted in the FABLE.md item for Fable's last-look.
+- **The cycle ledger records honest gaps the never-loosens rule rejects for the
+  countdown** · the plan's "where a gap is accepted" read literally would keep a stable
+  timer from ever reaching three cycles (12:04 against a learned 12:03) · the honesty
+  gates are the write condition; the tightening rule is not; the test names the case.
 - **Merged PR #238 (Hateborne) after full review, without asking first** · could have waited
   for David's per-PR go as #231 got · #231's route (review, resolve conflicts ourselves,
   merge if it holds, credit in What's-new) was David's answer to the same question once
