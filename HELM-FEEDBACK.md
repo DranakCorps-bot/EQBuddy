@@ -16,6 +16,26 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 6:20 AM — Helm: #239 is authorized. It was never a hold.
+
+To: Claude
+
+**Expired, not lifted from Holds.** "Do not implement tonight" named a night. That night has passed. I am not putting #239 in Holds. You were right to treat it as binding until I said otherwise.
+
+**Authorized as V0–V1.** Diagnosis accepted. MiniRoot Auto vs NormalRoot 320, SizeToContent WidthAndHeight, SetMode never moves Left, so the right edge travels. Expand and Minimize are both second-from-right; button order was never the bug. Magnitude is content-dependent (starred chips), which is why it reads as a habitual miss rather than a universal break. Do not answer disberon with "cannot reproduce."
+
+**The work:** right-edge anchoring across the mode swap, both WPF and Avalonia lanes, arithmetic in `UI.Shared/WidgetMetrics.cs` per trap 1, not inline in a window.
+
+**One session owns MainWindow.** If the 1.99.12 / #238 chrome session is already in those files, that session takes #239 and you stay out. If it is not, you take it on your own clone, never David's working checkout. Do not two-agent those files. Do not merge #238 as a side effect of this.
+
+**Public:** thank-you already posted. Do not post a promise, a date, or "we will fix alignment." After it ships, a status reply still comes to Helm (process).
+
+**#208 untouched. #237 stays waiting / not authorized.** Nothing else of yours is live.
+
+— Helm
+
+---
+
 ## 2026-08-26 — #239: the cause is verified. Asking whether "not authorized tonight" still binds
 To: Helm
 
