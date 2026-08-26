@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### leveling timestamps in an xp dropdown
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** player history (level times). Not shared game truth / eqlwiki. Not a group meter. Nearby #215 is rollback/archives (xp, levelups) — different ask; do not fold. #228 joeymavity is motes / mez / respawn — do not fold.
+- **Source:** #240 joeymavity Aug 26, 11:44 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/240 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.11 · Windows 26200.
+- **Ask:** "At one point I thought you had leveling timestamps in an xp dropdown, I can't find it now."
+- **Already shipped:** no control whose label is "xp dropdown" was grepped. Latest tag is v1.99.12 (shipped today; reporter's footer is 1.99.11). FeatureGuide Experience tab: "level-ups with **time-in-level**". Desktop Experience summary (`ProgressCardView` → `ProgressPresentation.SummaryLines`) adds that line only when this session has dings: `Level {N} at {h:mm tt} ({minutes}m)` (`SessionStats.cs:1882` Text is `$"Level {l.Level}"`; `ProgressPresentation.cs:58`). WhatsNew 1.65.0: "character progress charts in Session History — pick a character and see Level over time (every ding, exact times, a staircase not a slope)". History WINDOW: ComboBox `CharFilter` (character picker, not labeled XP); `HistoryWindow.xaml.cs:233` "Levels come from ding lines (exact times)"; caption "Character progress — every stored session" / `Level {min} → {max} ({MMM d}–{MMM d}, {n} dings)` only when a single character is filtered. Mini-bar key `xp` is named "Experience" (`MiniBarPresentation.cs:64`). WhatsNew 1.99.11: "Double-clicking the xp chip on the minimized bar used to open a small fixed panel that showed Experience and nothing else" — it now opens the Progress window, Experience first. Phone Experience (`experienceBody`) draws xp / xp/hr / aa / to level / mote line / unlocks / next; Companion does not call `ProgressPresentation.Levels`.
+- **Checked:** WIDGET (Progress Experience + mini-bar xp name, source). WINDOW (Session History + Progress window, source). PHONE (Companion / `experienceBody`, source). I could not check the binary.
+- **Hypothesis, unchecked against a running widget:** they remember one of those two shipped timestamp surfaces as an "xp dropdown" — the Experience session line, or History's character ComboBox beside the Level-over-time chart — and cannot find it on 1.99.11. Named SOURCE is the quoted sentence plus the 1.99.11 footer. Do not assert the 1.99.11 xp-chip change removed timestamps.
+- **Class:** V0–V1 likely (missing control that already existed / findability). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-08-26 1:58 PM CT:** Signed. Waiting, not authorized. Thank-you may post. Ask which surface (widget / Session History / phone). Do not implement tonight.
+
 ### expand / minimize cursor miss starts a new session
 - **Priority:** **BUILT 2026-08-26 (Claude), staged in 1.99.12.** Your hypothesis was
   exactly right (eqbuddy-fb verified it in source before Helm authorized; the fix built to
@@ -39,6 +51,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 likely (localized layout / hit-target). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/239#discussioncomment-18154931
+- **Replied:** 2026-08-26 (Scribe) v1.99.12 right-edge fix https://github.com/DranakCorps-bot/EQBuddy/discussions/239#discussioncomment-18166662
 - **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting, not authorized. Thank-you may post. V0–V1 hit-target. Do not implement tonight.
 - **Helm 2026-08-26 6:20 AM CT:** Night-scoped posture expired. Authorized V0–V1. Right-edge anchoring, both lanes, WidgetMetrics. One session. No public promise. Not a hold.
 
