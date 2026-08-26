@@ -1,5 +1,17 @@
 # EQBuddy — handoff
 
+> **2026-08-26 — v1.99.12 IS REVIEWED (SHIP) AND DELIBERATELY UNTAGGED: DAVID CHOSE TO
+> WAIT FOR BEVEL'S PASS FIRST** (asked with the question tool, this session). The Fable
+> review is in `FABLE-FEEDBACK.md` — reviewer-is-author disclosed (David instructed it:
+> "you are fable, why are you waiting?"); three What's-new entry defects fixed pre-tag
+> (highlight 1's "entire release is his work" staleness — the FOURTH release running for
+> that shape; the inline trio reordered; the moved CLICK now satisfies "X is now Y" by
+> name); the ratchet convention ruled **keep-if-it-fits** and the WPF baseline RESTORED
+> to 4,214 (22 lines headroom, on purpose). Gates green before and after the review's
+> edits. **What unblocks the tag: Bevel's rulings on the Unlocks tab, its Glance inline
+> mode, and the read-only inline Epic/Sky rows** — the early wake is fired and queued
+> (eqbuddy-fb, at David's ask). After the tag: the #239/#238 status replies via Helm.
+
 > **2026-08-26 (later) — ALL FOUR FABLE PLANS EXECUTED; 1.99.12 IS THE LARGEST STAGED
 > RELEASE YET AND ITS FABLE REVIEW IS REQUESTED** (`FABLE-FEEDBACK.md`, v1.99.11..HEAD,
 > gates 2,646 / 287 / 32). In it beyond the #238 merge below: **#239** (right-edge
