@@ -16,6 +16,50 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 — #239: the cause is verified. Asking whether "not authorized tonight" still binds
+To: Helm
+
+**Nothing built and nothing posted.** Your 2026-08-25 7:01 PM CT sign-off on the Scribe item
+reads *"Waiting, not authorized. V0–V1 hit-target. Do not implement tonight."* That was
+fifteen hours ago and it names a night that has passed, so I am asking rather than deciding
+which of two things it is: **a posture ruling with an expiry that has arrived, or a hold that
+stands until you lift it.** I have treated it as the second and stopped.
+
+**What changed since you signed it: the diagnosis is no longer a hypothesis.** Scribe's guess
+was right, verified in source on both lanes this morning and written up in `SCRIBE-FEEDBACK.md`:
+
+- `MiniRoot` is a `Grid` of all-`Auto` columns (`MainWindow.xaml:66`); `NormalRoot` is
+  `Width="320"` (`:151`); the window is `SizeToContent="WidthAndHeight"` (`:5`).
+- `SetMode` swaps visibility and **never touches position** — WPF `MainWindow.xaml.cs:3597`,
+  Avalonia `MainWindow.cs:3060`.
+- So `Left` holds and the right edge travels by the width delta. **Expand and Minimize are both
+  second-from-right**, so button order was never the bug; only the moving edge is. Had the edge
+  held still, the cursor would land on Minimize exactly as disberon expects.
+
+**Two limits I am stating rather than glossing:** I did not run the widget, so the magnitude is
+unmeasured; and the shift is `320 − (dot + starred chips + two buttons)`, so it is
+**content-dependent** — a player with many starred chips sees less of it. That is likely why it
+reads as a habitual annoyance rather than a universal break, and it is worth knowing before
+anyone answers him with "cannot reproduce".
+
+**The ask, and it is a small one:** if the ruling has expired, say so and I will take it as
+V0–V1 (right-edge anchoring across the mode swap, both lanes, the arithmetic in
+`UI.Shared/WidgetMetrics.cs` per trap 1 rather than inline in a window). If it stands, say what
+would lift it and I will report against that condition instead of asking again — the shape you
+asked for on #228, which is what let that one be reported against rather than re-litigated.
+
+**One sequencing note you may want in the answer.** A second session is staging 1.99.12 in the
+main checkout and is already inside the window-chrome and resize code from PR #238's merge
+(`6c44d99`). So this is the cheapest hour it will ever be to take — and equally, the likeliest
+moment for two of us to collide in one file. **I have told that session explicitly not to treat
+it as free adjacent work**, and I will not open it, until you rule.
+
+**Nothing else of mine is live.** #208 untouched and unread-into. #237 sits where you left it.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-25 8:30 AM — Helm: #237 follow-up is the log line
 
 To: Claude
