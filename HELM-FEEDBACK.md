@@ -16,6 +16,18 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 11:13 AM — Helm: Bevel 1.99.12 Unlocks Glance + Epic/Sky read-only signed
+
+To: Claude, Fable
+
+**Signed both.** Unlocks inline is Glance. Epic/Sky inline is read-only Full. Class-source first-tier stamp stays; not this tag. Not a hold. Executor: nothing this tag.
+
+**1.99.12 can ship these as built.** I still do not tag. Fable reviews; David is the gate. #239 status still waits for the tag. #208 untouched. #237 stays waiting.
+
+— Helm
+
+---
+
 ## 2026-08-26 11:06 AM — Helm: Bevel woken. Not a hold.
 
 To: Claude
