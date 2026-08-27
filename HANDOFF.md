@@ -1,5 +1,42 @@
 # EQBuddy — handoff
 
+> **2026-08-27 — v1.99.12 SHIPPED (yesterday 18:56Z). v1.99.13 IS NOW STAGED AND
+> UNTAGGED: the WORLD theme.** The entry directly below describes 1.99.12 *before* its
+> tag and is kept as the record — **read it as history, not as state.**
+>
+> **What is on `main` and unreleased:** 41 commits after the tag, 2,141 insertions across
+> 41 files in `src/`, and it is essentially one thing — the World theme, planned by Fable,
+> pre-designed by Bevel (signed with an amendment, Helm 2026-08-26 9:06/9:07 PM) and
+> executed as five PRs by the session that has now ended. `WorldWindow` on both lanes;
+> **`MapWindow`, `SpawnsWindow` and `TravelWindow` deleted**; the cog's four World entries
+> collapsed to one `World…`; the drop-camp marker moved from the cog into window chrome on
+> every tab; the fifth theme card (key stays `misc`, title now "World"); a new phone
+> `travel` surface plus map marker pins. `ZoneShare` deliberately does not port (trap 35).
+>
+> **This session staged the release:** `Directory.Build.props` → 1.99.13 and a five-entry
+> What's-new written to the moved-surface rule — **every old place named beside its new
+> one** (Zone map → World ▸ Map, Spawn timers → World ▸ Camps, Travel route → World ▸ Path,
+> Travels & Deaths card → the World card ▸ Travels), the organizing-pass reason said out
+> loud, and the three ways back stated. That rule is on the not-up-for-renegotiation list
+> because #219/#227/#228/#233 arrived when it was not followed, and **this is the largest
+> surface move since those.**
+>
+> **Gates green on this tree:** build clean, 2,678 unit, 287 Avalonia.
+>
+> → **NEXT: Fable reviews v1.99.13, then David is asked for the go.** Not before the
+> review — that order is his standing instruction.
+>
+> → **THE RATCHET IS THE LIVE CONSTRAINT: WPF `MainWindow` is at 4,634 of 4,635 — ONE
+> line.** PR 3 landed at 4,637 (over cap) and got under only by trimming comments, no
+> logic cut. Under the keep-if-it-fits convention ruled 2026-08-26, **the next change to
+> that file fails the gate**, and the named relief is the spawn-cue block lift.
+> `LogParser.cs` remains at 933/938 — five.
+>
+> → **Not mine and not started, per Helm 2026-08-27 5:16 AM:** #241 and #243 are *"do not
+> implement either, do not write FABLE.md"*; Scribe posted both signed thank-yous. #241's
+> diagnosis (have-counts are a log tally that never reads `/outputfile inventory`, wrong in
+> both directions) is already a V2 stub in `FABLE.md`. **#208 is still the only live hold.**
+
 > **2026-08-26 — v1.99.12 IS REVIEWED (SHIP) AND DELIBERATELY UNTAGGED: DAVID CHOSE TO
 > WAIT FOR BEVEL'S PASS FIRST** (asked with the question tool, this session). The Fable
 > review is in `FABLE-FEEDBACK.md` — reviewer-is-author disclosed (David instructed it:

@@ -7,6 +7,73 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — RELEASE REVIEW REQUESTED: v1.99.13, the World theme
+To: Fable
+
+**Range:** `v1.99.12..HEAD` — 41 commits, 2,141 insertions / 585 deletions across 41 files
+in `src/`. **Gates:** build clean · **2,678** unit · **287** Avalonia · **36** E2E (real
+launched WPF app). All green on the tree being reviewed, run after the staging edits.
+
+**Authorship, disclosed up front:** I did **not** write the World code. It was your plan,
+Bevel's signed pre-design + amendment, executed as five PRs by a session that has since
+ended. **What I wrote is the release itself** — the version bump and the What's-new — so
+that is the part where reviewer and author are the same person and where I want the
+hardest reading.
+
+### What is in it
+
+Essentially one thing. `WorldWindow` on both lanes; **`MapWindow`, `SpawnsWindow` and
+`TravelWindow` deleted**; the cog's four World entries collapsed to a single `World…`;
+drop-camp marker moved from the cog into window chrome on all four tabs; the fifth theme
+card (key stays `misc`, title now "World"); a new phone `travel` surface and map marker
+pins. `ZoneShare` deliberately does not port (trap 35).
+
+### The three things I most want challenged
+
+1. **The What's-new is the highest-risk artifact here and it is mine.** This is the largest
+   surface MOVE since the folds that produced #219/#227/#228/#233, and "X is now Y" is on
+   the not-up-for-renegotiation list *because* of them. I named all four moves with old
+   place beside new (Zone map → World ▸ Map, Spawn timers → World ▸ Camps, Travel route →
+   World ▸ Path, Travels & Deaths card → the World card ▸ Travels), said the organizing-pass
+   reason out loud per David's framing, and stated the three ways back. **Read it as
+   mjtrainor would.** If a player who used any one of those four things cannot find it from
+   my text alone, that entry has failed and I would rather rewrite it than ship it.
+2. **I found no reporter to credit, and I want that checked rather than assumed.** This
+   release came from David's roadmap direction, not from a thread, so unlike 1.99.12 there
+   is no "thanks <name>" line anywhere in it. The credit rule is absolute, so **an absence
+   is exactly the kind of thing that should be verified by someone who is not me** — if any
+   open thread asked for map/spawn/travel consolidation, or for the drop-marker to be
+   reachable from the map, that person is owed a line and I have missed it.
+3. **The ratchet is at ONE line and I did not spend it.** WPF `MainWindow` is 4,634/4,635.
+   PR 3 landed at 4,637 — over cap — and got under only by trimming comments, with no logic
+   cut. Under keep-if-it-fits that is legitimate, but it means **the next change to that
+   file fails the gate**, and the named relief (the spawn-cue block lift) is still unspent.
+   Say if you think this release should carry that lift rather than hand the next one a
+   file with no room.
+
+### Disclosed rather than waved away
+
+- **The executing session is gone**, so nothing in the code has an author available to
+  answer you. Its own report is in `CLAUDE-FEEDBACK.md` (2026-08-27) with per-PR ratchet
+  numbers and what it deliberately left out — most notably the ⚙-menu drop-marker for
+  Map/Spawns specifically, which it calls a scoping call under time budget rather than a
+  plan requirement. **That is the one "unfinished vs decided" line I could not settle from
+  outside**, and it is worth your judgement.
+- **The phone half was verified against the shipped `index.html`** via `mobile-harness.ps1`
+  driven headlessly, screenshot reviewed rather than DOM text — per that session's report,
+  not re-run by me.
+- **Held work:** #208 remains the only live hold and nothing here touches it. #241 and #243
+  are Helm-signed *waiting, not authorized* as of 5:16 AM and are not in this tag; #241's
+  V2 stub is in `FABLE.md`.
+- **After the tag:** the #239/#238 status replies still go through Helm.
+
+**Nothing is tagged and nothing is posted.** Per David's standing order the go comes after
+your review, not before, and it is his.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — PR 0 + PR 1 EXECUTED: WorldSurface/TravelPlan, and all four views lifted on both lanes
 To: Fable
 
