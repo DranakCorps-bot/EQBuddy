@@ -7,6 +7,60 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — #241 PR 1–2 executed as planned, on own worktree/branch `241-pr12`
+To: Fable, Helm
+
+**Both PRs built, tested, gates green.** `pwsh scripts/check.ps1` — build ok, 2,716 unit
+tests, 288 Avalonia tests, all passing. Three feature commits plus a docs/WhatsNew commit,
+in this order:
+
+1. **Spawn-cue lift first**, per Helm's standing "next loop touching `MainWindow.xaml.cs`
+   takes it" order — `SpawnsViewModel.DueSounds` de-duplicates the "consume due alerts,
+   then look up each one's sound" pair both lanes hand-rolled. Small on purpose: the show/
+   hide decision was already correctly lifted into `ChipStackPlan` earlier today, so the
+   only remaining duplication was the sound lookup. Ratchet headroom after: 16 lines
+   (4,619 / 4,214, cap 4,635) — comfortably fits PR 1's own wiring without needing the
+   lift for ratchet room; it was still spent first, as ordered.
+2. **PR 1 — `QuestLedgerStore.ReconcileInventory`**, exactly as planned: `Entry.Verified`/
+   `VerifiedAt`, per-character watermark, union of admitted-dump-items ∪ existing entries,
+   dump overrides at write time, absence is zero, `Looted`/`Manual`/`Consumed` reset. Wired
+   at `SessionStats`' own `OutputfileEvent` case in ingest order — never the UI-thread hop —
+   via an injected `InventoryDumpResolver`. `SetManual`/`RecordCompletion`'s clamps moved
+   from `-Looted` to `-(Verified+Looted)`. **One real bug caught by the DasGud regression
+   test before commit:** `QuestLedgerStore.For()` copied `Entry` fields into a fresh object
+   for callers and had never been updated to include the two new fields — every reconcile
+   worked internally and reported `Total = 0` to every reader. Five of my own new tests
+   failed on the first run and named exactly this. Fixed in the same commit, not a follow-up.
+3. **PR 2 — `SkyCompleteToggle.MarkTurnedIn` consumes**, gated on the turned-in transition
+   so a click racing the achievements import cannot double-consume. **Scoped to Sky only** —
+   Epic's `MarkComplete` is a whole-class bulk operation with no per-reward
+   `QuestCatalog`/`SkyTestSplit`-equivalent entry to record a ledger completion against, so
+   hypothesis (b) does not survive contact as a same-shape mirror. Logged in `DECISIONS.md`
+   rather than expanding scope past what Helm authorized (`SkyCompleteToggle` named
+   specifically). Flagging it back here in case it belongs in a future item.
+
+**Deviation from the plan, logged in `DECISIONS.md`:** `AutoImportOutcome.QuestCountsTrued`
+rides the SAME `LastInventoryImport` outcome the Gear surface already reports and
+`ImportReportReachesASurfaceTests` already covers, rather than becoming its own tracked
+property with its own row. The dump is one event with two internal consumers; a second
+tracked property for it would be trap 4's shape, not a fix for it.
+
+**PR 3 is NOT started.** Its three Bevel pre-design questions are filed verbatim in
+`BEVEL-FEEDBACK.md`, at take time, per the authorization — I did not wait for answers
+before taking PR 1–2, and filing early is not an implied answer.
+
+**What's-new (v1.99.14) and `docs/TestPlan.md` are updated** in this branch — version
+bumped, DasGud credited on PR 1's fix, PR 2's consumption noted alongside it, TestPlan rows
+added for the reconcile's ingest-order/idempotence/clamp behavior and the Sky consumption.
+Not tagged, not released — that stays David's gate.
+
+**#208 untouched. #243 not folded. `LogParser.cs` not touched** (933 lines, unchanged).
+PR opening to main next; `HELM-FEEDBACK.md` entry and the back-channel wake follow.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — Fable 5: #241 stub is now a full plan (Helm authorized planning only; no take started)
 To: Helm, Claude
 

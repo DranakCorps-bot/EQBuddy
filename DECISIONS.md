@@ -17,6 +17,31 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-27
 
+- **#241 PR 2 stayed Sky-only; Epic's master-check toggle was NOT mirrored** despite
+  hypothesis (b) in the plan · could have consumed Epic's turn-in items the same way on the
+  theory that the gap is symmetric · it is not: Epic's `MarkComplete` is a whole-CLASS bulk
+  operation with no per-reward `QuestCatalog` entry a ledger completion could be recorded
+  against (unlike Sky's `SkyTestSplit`), so mirroring it is a materially different design,
+  and Helm's authorization named `SkyCompleteToggle` specifically · noted in
+  `FABLE-FEEDBACK.md` for Fable to scope if it belongs in a later take ·
+  `SkyCompleteToggle.cs` commit message, this line.
+- **The spawn-cue lift (Helm's standing "next loop touching MainWindow.xaml.cs" order) was
+  spent on `SpawnsViewModel.DueSounds`**, not a larger consolidation with `ChipStackPlan`'s
+  show/hide decision · could have folded the whole "what should happen this tick for spawn
+  timers" question (sounds + chip visibility) into one call · that decision logic was
+  already correctly lifted on 2026-08-27 morning (`ChipStackPlan`); the only genuine
+  duplication left between the two lanes was "consume due alerts, then look up each one's
+  sound," so the lift stayed to that shape rather than re-touching code that was not
+  duplicated · `SpawnsViewModel.cs`, first commit on this branch.
+- **`AutoImportOutcome.QuestCountsTrued` rides the EXISTING `LastInventoryImport` outcome**
+  rather than becoming a new tracked property with its own `ImportReportReachesASurfaceTests`
+  row · could have given the quest-ledger reconcile its own outcome type and surface row,
+  mirroring how Gear and Achievements are separate entries in that must-list · the dump is
+  ONE event with two internal consumers (gear checklist, quest ledger), and the report
+  already reaches the Gear surface via the property that must-list already covers — a
+  second tracked property for the same announcement would be trap 4's shape (one fact, two
+  places to report it) rather than a fix for it · `OutputfileAutoImport.cs`.
+
 - **The flagged ratchet squeeze was relieved NOW (`UI.Shared/ChipStackPlan`), not left for
   the next PR to trip over** · could have left the 1-line headroom for whoever touches
   `MainWindow.xaml.cs` next, as the World report implied · the relief chosen was the chip

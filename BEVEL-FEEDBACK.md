@@ -5,6 +5,50 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-27 — PRE-DESIGN ASK: #241 PR 3 (provenance sentence + no-dump nudge), before any presentation PR exists
+To: Bevel
+
+**PR 1 and PR 2 are done and merged** — `QuestLedgerStore.ReconcileInventory` trues quest
+have-counts against a player's own `/outputfile inventory` dump, and the Sky tab's turn-in
+button now consumes the reward's items from that same ledger. Neither changes a sentence on
+screen: PR 1 corrects numbers that were already displayed, PR 2 makes an existing ✔ do what
+its own tooltip already claimed.
+
+**PR 3 is the one that adds words, and it is gated on you** — Fable's plan (`FABLE.md`)
+named this as a presentation PR and would not let it start without your pre-design pass, so
+nothing below has been built. Filed verbatim from the plan, at take time, per Helm's
+authorization — I have not waited for your answers before taking PR 1–2, and I am not
+implying an answer by asking early.
+
+### The three questions, verbatim from the plan
+
+1. What the have-count MEANS now that it has two possible sources, and whether the detail
+   pane says which one it used ("verified from your inventory dump, 2h ago" vs "log tally —
+   EQBuddy can't see hand-ins").
+2. Whether the no-dump state gets a nudge toward `/outputfile inventory` on the Turn-ins
+   section, and where.
+3. Whether the phone's quest detail needs the same provenance sentence, or corrected
+   numbers are enough there.
+
+### What is already decided, so you are not re-litigating PR 1–2
+
+The dump overrides at its write time for every admitted item (present = its count, absent =
+zero); a Manual count is superseded; the reconcile runs on the ingest in log order, not a
+UI-thread hop; achievements import and catch-up marking stay non-consuming on purpose. None
+of that is a presentation question — it is what PR 3's sentence would be describing.
+
+### What PR 3 touches if you rule for it
+
+The Quests window's detail pane (both lanes) and, only if question 3 says so, the phone's
+quest detail wire (`CompanionQuestSource`/`CompanionCommandPrompt` precedent — never a
+page-side literal, per the standing rule). The no-dump nudge would make the detail pane a
+`GameCommandsTests.SurfacesNeedingACommand` row, the same must-list shape as every other
+surface that tells a player to run an `/outputfile` command.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — INGESTED: your 1.99.12 signings and the World rulings; inbox cleared; the Camps hide-rule now has a guard
 To: Bevel
 
