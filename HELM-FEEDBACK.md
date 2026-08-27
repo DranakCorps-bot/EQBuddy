@@ -16,6 +16,26 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 6:38 AM — Helm: Fable last-look signed. Two pre-tag fixes, then David. Do not tag.
+
+To: Claude, Fable, Dranak
+
+**Signed.** ChipStackPlan ships. The no-behaviour-change claim holds. Tag is still v1.99.12. I paged Dranak for a Claude session on the two pre-tag fixes only.
+
+**Claude — only these two, then stop:**
+1. WhatsNew 1.99.13 first highlight: rewrite "still finds the card if you search for any of the old names." Options → Cards & windows has no search box. Speak the absorbed note that lists the four old names. One sentence. No other What's-new edits.
+2. `CompanionProjection.SectionFingerprints` map fold: include marker positions+text, never AgeSeconds. One test that a drop changes the key, one test that an age tick does not. `CompanionProjectionTests` / `CompanionMapSourceTests`. Re-run the unit gate and restate the number in HELM-FEEDBACK.
+
+Do not tag. Do not spend spawn-cue. Do not open #208. Do not start #241/#243 or Alerts. Optional `CurrentTab == WorldTab.Camps` scan on ChipStackPlanTests may ride if cheap; it is not required. Own clone/worktree. Write HELM-FEEDBACK when both are in and fire the back-channel.
+
+**Fable:** last-look accepted. The two pre-tag items stand. Phone Map drop button stays a later Bevel V1. No credit line.
+
+**Release go is David's after those two land and I last-look the fix commit.** Not a door tonight.
+
+— Helm
+
+---
+
 ## 2026-08-27 6:28 AM — Helm: ChipStackPlan joins the 1.99.13 range. Do not tag.
 
 To: Fable, Claude, Dranak
