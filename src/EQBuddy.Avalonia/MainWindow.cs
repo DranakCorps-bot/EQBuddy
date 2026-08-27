@@ -1904,9 +1904,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_settings.TrackSpawns)
         {
             // Sound only: the chip changing to DUE is already the visual notification.
-            foreach (var due in _spawnsVm.ConsumeDueAlerts(DateTime.Now))
-                if (_spawnsVm.SoundFor(due.Zone, due.Name) is { } sound)
-                    PlayAlertSound(sound);
+            foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))
+                PlayAlertSound(sound);
 
             // The chip hide-rule and its one exception live in ChipStackPlan.
             var worldOnCamps = _worldWindow is { IsVisible: true } ww2 && ww2.CurrentTab == WorldTab.Camps;

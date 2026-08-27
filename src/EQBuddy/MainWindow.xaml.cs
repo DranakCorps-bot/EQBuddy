@@ -2536,9 +2536,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // banner on top of it was double notification (David's call). Each named
             // can carry its own sound; "Default" maps to Alarm — a camp popping
             // deserves a louder default than a loot ding (also David's call).
-            foreach (var due in _spawnsVm.ConsumeDueAlerts(DateTime.Now))
-                if (_spawnsVm.SoundFor(due.Zone, due.Name) is { } sound)
-                    PlayAlertSound(sound);
+            foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))
+                PlayAlertSound(sound);
 
             // The chip hide-rule and its one exception live in ChipStackPlan.
             var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
