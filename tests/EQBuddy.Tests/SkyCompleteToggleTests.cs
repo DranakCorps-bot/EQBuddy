@@ -15,8 +15,19 @@ namespace EQBuddy.Tests;
 /// that could WRITE it. These tests exist so the capability cannot go missing quietly
 /// again — a reorganisation should not cost a feature.
 /// </summary>
-public class SkyCompleteToggleTests
+public class SkyCompleteToggleTests : IDisposable
 {
+    private readonly string _ledgerPath =
+        Path.Combine(Path.GetTempPath(), $"quest-ledger-{Guid.NewGuid():N}.json");
+
+    public void Dispose()
+    {
+        try { File.Delete(_ledgerPath); } catch { }
+        try { File.Delete(_ledgerPath + ".rules"); } catch { }
+    }
+
+    private QuestLedgerStore Ledger() => new(_ledgerPath) { TrackFilter = _ => true };
+
     private static AppSettings WithReward(bool firstAcquired = false)
     {
         var s = new AppSettings();
@@ -106,6 +117,87 @@ public class SkyCompleteToggleTests
         SkyCompleteToggle.MarkTurnedIn(s, Key, items);
         SkyCompleteToggle.MarkTurnedIn(s, Key, items);
         Assert.Single(s.SkyQuestCompleted, k => k.Equals(Key, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ---- consumption (#241 PR 2: the ✔ that was promised) ----
+
+    /// <summary>Turning in consumes the reward's turn-in items from the quest ledger — the
+    /// gap DasGud's report exposed: a Sky Test hand-in from the Sky tab's own button never
+    /// touched the ledger, so the have-count stayed inflated forever. And it bumps the
+    /// ledger's own completion count for the split quest, the same fact the Quests tab's
+    /// non-Sky turn-in button already records via RecordCompletion.</summary>
+    [Fact]
+    public void TurningInConsumesTheRewardsItemsFromTheLedger()
+    {
+        var s = WithReward();
+        var ledger = Ledger();
+        var key = "ranger_legends";
+        ledger.RecordLoot(key, "Sky Emerald", 1, new DateTime(2026, 8, 27, 12, 0, 0));
+        ledger.RecordLoot(key, "Sky Diamond", 1, new DateTime(2026, 8, 27, 12, 0, 1));
+
+        SkyCompleteToggle.MarkTurnedIn(s, Key,
+            SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, Key), ledger, key);
+
+        var owned = ledger.For(key);
+        Assert.Equal(0, owned["Sky Emerald"].Total);
+        Assert.Equal(0, owned["Sky Diamond"].Total);
+        Assert.Equal(1, ledger.CompletedFor(key)["Ranger Sky Test: Bow of Sky"]);
+    }
+
+    /// <summary>The mirror of <see cref="ReopeningDoesNotUntickTheItems"/>: reopening does
+    /// not hand the consumed items back either. A mis-click on the turn-in costs one click
+    /// to undo on the checklist, and the ledger squares itself on the next dump regardless
+    /// (#241) — restoring it here would be a second, competing way to fix the same number.</summary>
+    [Fact]
+    public void ReopeningDoesNotRestoreTheConsumedLedgerItems()
+    {
+        var s = WithReward();
+        var ledger = Ledger();
+        var key = "ranger_legends";
+        ledger.RecordLoot(key, "Sky Emerald", 1, new DateTime(2026, 8, 27, 12, 0, 0));
+        ledger.RecordLoot(key, "Sky Diamond", 1, new DateTime(2026, 8, 27, 12, 0, 1));
+        SkyCompleteToggle.MarkTurnedIn(s, Key,
+            SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, Key), ledger, key);
+
+        SkyCompleteToggle.Reopen(s, Key);
+
+        var owned = ledger.For(key);
+        Assert.Equal(0, owned["Sky Emerald"].Total);
+        Assert.Equal(0, owned["Sky Diamond"].Total);
+    }
+
+    /// <summary>A click and the achievements import can both arrive at
+    /// <see cref="SkyCompleteToggle.MarkTurnedIn"/> for the same reward — the ledger must
+    /// only ever be consumed once, or a second call would subtract items the player was
+    /// never asked to hand in twice.</summary>
+    [Fact]
+    public void MarkingTwiceConsumesTheLedgerOnlyOnce()
+    {
+        var s = WithReward();
+        var ledger = Ledger();
+        var key = "ranger_legends";
+        ledger.RecordLoot(key, "Sky Emerald", 2, new DateTime(2026, 8, 27, 12, 0, 0));
+        ledger.RecordLoot(key, "Sky Diamond", 2, new DateTime(2026, 8, 27, 12, 0, 1));
+        var items = SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, Key);
+
+        SkyCompleteToggle.MarkTurnedIn(s, Key, items, ledger, key);
+        SkyCompleteToggle.MarkTurnedIn(s, Key, items, ledger, key);
+
+        var owned = ledger.For(key);
+        Assert.Equal(1, owned["Sky Emerald"].Total);   // 2 looted − 1 consumed, not 0
+        Assert.Equal(1, owned["Sky Diamond"].Total);
+        Assert.Equal(1, ledger.CompletedFor(key)["Ranger Sky Test: Bow of Sky"]);
+    }
+
+    /// <summary>Omitting the ledger (the default) still runs the checklist side effect —
+    /// a caller (or a test) that has no ledger in hand must not be forced to construct
+    /// one.</summary>
+    [Fact]
+    public void OmittingTheLedgerStillMarksTheChecklist()
+    {
+        var s = WithReward();
+        SkyCompleteToggle.MarkTurnedIn(s, Key, SkyCompleteToggle.ItemsFor(s.SkyQuestChecklist, Key));
+        Assert.True(SkyCompleteToggle.IsTurnedIn(s, Key));
     }
 
     // ---- what the layout tells a view to draw ----

@@ -1300,6 +1300,22 @@ public class SpawnTimerTests
         Assert.Empty(vm.ConsumeDueAlerts(T0.AddMinutes(70 + 29)));
     }
 
+    /// <summary>DueSounds is ConsumeDueAlerts plus the per-named sound lookup, one call —
+    /// a named with the bell on and no sound override plays the "Default" sound (Alarm);
+    /// a named with the bell OFF never reaches the sound lookup at all.</summary>
+    [Fact]
+    public void DueSoundsResolvesTheSoundForEachFreshAlertOnly()
+    {
+        var (vm, timers, _) = Vm();
+        vm.ToggleAlert("Lower Guk", "a froglok ghoul lord");
+        timers.Apply(new ZoneEvent(T0, "Lower Guk"));
+        timers.Apply(new KillEvent(T0.AddMinutes(70), "froglok ghoul lord", "You"));
+
+        Assert.Empty(vm.DueSounds(T0.AddMinutes(71)));   // priming call, still counting down
+        Assert.Equal("Alarm", Assert.Single(vm.DueSounds(T0.AddMinutes(70 + 28))));
+        Assert.Empty(vm.DueSounds(T0.AddMinutes(70 + 29)));   // already consumed
+    }
+
     /// <summary>ConsumeNewTimers drives the pop-on-kill window: recovered timers pop at
     /// startup (unlike due ALERTS, which prime silently), each kill pops once, and a
     /// re-kill pops again because it carries a new kill time.</summary>

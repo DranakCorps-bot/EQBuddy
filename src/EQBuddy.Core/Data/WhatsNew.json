@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.99.14",
+    "date": "2026-08-27",
+    "highlights": [
+      "FIXED (discussion #241, thanks DasGud) - QUEST TRACKER HAVE-COUNTS NOW MATCH YOUR BAGS. A turn-in item's have-count was a running log tally that could never see a hand-in, a sale, or anything you picked up off-log - so a Sky Test could keep showing items you had already handed in, or miss ones you got another way (DasGud's report: 4 Sphinx Claws and 1 Mithril Bands showing when he had none, 15 Wind Rune Izah instead of his 17). Running /outputfile inventory now trues every tracked count up to exactly what your bags and bank hold at that moment - present in the dump is its exact count, absent is zero, and any manual count you had typed in is superseded by the game's own answer. Nothing changes if you never run the command; your log-derived counts work exactly as before.",
+      "AND TURNING A SKY REWARD IN NOW ACTUALLY CONSUMES ITS ITEMS. The Sky tab's turn-in button ticked the checklist but never told the quest ledger the items were handed in, so a reward's have-count stayed inflated until your next inventory dump corrected it. The button now consumes the same way the Quests tab's own turn-in button always has - reopening a reward still leaves your item ticks alone, exactly as before."
+    ]
+  },
+  {
     "version": "1.99.13",
     "date": "2026-08-27",
     "highlights": [

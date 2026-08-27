@@ -34,17 +34,34 @@ namespace EQBuddy.UI.Shared;
 public static class SkyCompleteToggle
 {
     /// <summary>Mark a reward turned in. Idempotent: a second call changes nothing, which
-    /// matters because the achievements import and a click can both arrive at it.</summary>
+    /// matters because the achievements import and a click can both arrive at it.
+    ///
+    /// <paramref name="ledger"/>/<paramref name="characterKey"/> are the ✔ that was
+    /// promised (#241, PR 2): the log never records a hand-in, so this button IS the log,
+    /// the same contract <see cref="QuestLedgerStore.RecordCompletion"/>'s own doc comment
+    /// already states for the non-Sky quest detail's turn-in button. Optional so a caller
+    /// (or a test) that only wants the checklist side effect can omit them; every SHIPPING
+    /// call site passes both.</summary>
     public static void MarkTurnedIn(AppSettings settings, string rewardKey,
-        IEnumerable<SkyQuestChecklistItem> rewardItems)
+        IEnumerable<SkyQuestChecklistItem> rewardItems,
+        QuestLedgerStore? ledger = null, string characterKey = "")
     {
-        if (!settings.SkyQuestCompleted.Contains(rewardKey, StringComparer.OrdinalIgnoreCase))
+        var items = rewardItems.ToList();
+        // Captured before the write: the consume below must fire only on the transition
+        // INTO turned-in, or a second call (achievements import racing a click, a
+        // re-render) would consume the reward's items twice.
+        var alreadyTurnedIn = IsTurnedIn(settings, rewardKey);
+        if (!alreadyTurnedIn)
             settings.SkyQuestCompleted.Add(rewardKey);
-        foreach (var item in rewardItems)
+        foreach (var item in items)
         {
             item.Acquired = true;
             item.AcquiredUnassigned = false;
         }
+        if (!alreadyTurnedIn && ledger is not null && characterKey.Length > 0 && items.Count > 0)
+            ledger.RecordCompletion(characterKey,
+                SkyTestSplit.QuestName(items[0].ClassName, items[0].Reward),
+                items.Select(i => new QuestItemNeed { Name = i.QuestItem }));
     }
 
     /// <summary>Reopen a reward. Deliberately does NOT untick its items — see the class

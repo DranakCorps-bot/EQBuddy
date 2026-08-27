@@ -145,24 +145,38 @@ public static class OutputfileAutoImport
 
     /// <summary>The inventory dump's half: tick the gear checklist off what the character
     /// verifiably owns. The dump itself is found and parsed by the caller (the widgets
-    /// already memoize it), so this is only the apply-and-remember step.</summary>
-    public static AutoImportOutcome ImportInventory(InventoryFile.Snapshot dump, AppSettings settings)
+    /// already memoize it), so this is only the apply-and-remember step.
+    ///
+    /// <paramref name="questReconcile"/> is the SEPARATE quest-ledger reconcile that
+    /// already ran on the ingest thread, at the moment the dump was announced (#241,
+    /// SessionStats' <c>OutputfileEvent</c> case) — folded in here purely for the report:
+    /// one <see cref="AutoImportOutcome"/>, one Undo, for a caller that treats "read the
+    /// inventory dump" as a single event even though gear and quest counts are two
+    /// different stores underneath.</summary>
+    public static AutoImportOutcome ImportInventory(InventoryFile.Snapshot dump, AppSettings settings,
+        (int Trued, Action? Undo)? questReconcile = null)
     {
         var before = settings.GearChecklist
             .Where(i => !i.Acquired).Select(GearKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
         GearLootAutoCheck.ApplyInventory(settings.GearChecklist, dump.Entries);
         var flipped = settings.GearChecklist
             .Where(i => i.Acquired && before.Contains(GearKey(i))).Select(GearKey).ToList();
+        var (questTrued, questUndo) = questReconcile ?? (0, null);
 
         return new AutoImportOutcome(OutputfileKind.Inventory, Path.GetFileName(dump.Path),
             dump.WrittenAt, GearTicked: flipped.Count, RaidsMarked: 0, SkyMarked: 0)
         {
-            Undo = flipped.Count == 0 ? null : () =>
+            QuestCountsTrued = questTrued,
+            Undo = flipped.Count == 0 && questUndo is null ? null : () =>
             {
-                var undo = flipped.ToHashSet(StringComparer.OrdinalIgnoreCase);
-                foreach (var item in settings.GearChecklist)
-                    if (undo.Contains(GearKey(item))) item.Acquired = false;
-                settings.Save();
+                if (flipped.Count > 0)
+                {
+                    var undo = flipped.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    foreach (var item in settings.GearChecklist)
+                        if (undo.Contains(GearKey(item))) item.Acquired = false;
+                    settings.Save();
+                }
+                questUndo?.Invoke();
             },
         };
     }
@@ -181,6 +195,12 @@ public sealed record AutoImportOutcome(
     /// there is nothing to put back — which is the common case, and the reason the
     /// surface must not offer an Undo button unconditionally.</summary>
     public Action? Undo { get; init; }
+
+    /// <summary>How many quest-item counts an inventory dump trued up against the ledger
+    /// (#241) — a Sky/Epic reward's "have" number correcting itself because the dump saw
+    /// a hand-in, a sale, or off-log loot the log tally could not. Zero on every kind but
+    /// <see cref="OutputfileKind.Inventory"/>.</summary>
+    public int QuestCountsTrued { get; init; }
 
     /// <summary>Sky rewards the dump flagged obtained and the #101 guard refused, because
     /// the class unlock that flagged them was granted rather than earned. NOT a failure —
@@ -218,12 +238,16 @@ public sealed record AutoImportOutcome(
     /// </summary>
     public string Summary => Kind switch
     {
-        OutputfileKind.Inventory => GearTicked switch
-        {
-            0 => $"Read your inventory dump ({At:HH:mm}) — nothing new to tick.",
-            1 => $"Read your inventory dump ({At:HH:mm}) — 1 item ticked.",
-            _ => $"Read your inventory dump ({At:HH:mm}) — {GearTicked} items ticked.",
-        },
+        OutputfileKind.Inventory => GearTicked == 0 && QuestCountsTrued == 0
+            ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick."
+            : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
+                new[]
+                {
+                    GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
+                    QuestCountsTrued > 0
+                        ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
+                        : null,
+                }.Where(s => s is not null)) + ".",
         OutputfileKind.Achievements =>
             (Applied == 0
                 ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark"

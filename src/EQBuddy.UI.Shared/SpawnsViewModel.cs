@@ -410,4 +410,11 @@ public sealed class SpawnsViewModel
         _primed = true;
         return fresh;
     }
+
+    /// <summary>Sound-only spawn cue for this tick: consumes the newly-due alerts and
+    /// resolves each one's sound in one call, replacing the "consume, then look up each
+    /// one's sound" pair both widgets used to hand-roll inline. No banner — the chip
+    /// flipping to DUE is already the visual (David's call).</summary>
+    public List<string> DueSounds(DateTime now) =>
+        [.. ConsumeDueAlerts(now).Select(t => SoundFor(t.Zone, t.Name)).OfType<string>()];
 }
