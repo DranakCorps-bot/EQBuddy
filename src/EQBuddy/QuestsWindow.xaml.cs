@@ -1350,7 +1350,8 @@ public partial class QuestsWindow : Window
 
         if (done)
             SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
-                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey));
+                SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey),
+                _main.QuestLedger, _main.QuestCharacterKey);
         else
             SkyCompleteToggle.Reopen(_settings, rewardKey);
         _settings.Save();
@@ -1957,7 +1958,8 @@ public partial class QuestsWindow : Window
                 {
                     if (completed) SkyCompleteToggle.Reopen(_settings, rewardKey);
                     else SkyCompleteToggle.MarkTurnedIn(_settings, rewardKey,
-                        SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey));
+                        SkyCompleteToggle.ItemsFor(_settings.SkyQuestChecklist, rewardKey),
+                        _main.QuestLedger, _main.QuestCharacterKey);
                     _settings.Save();
                     Refresh(force: true);
                 };
