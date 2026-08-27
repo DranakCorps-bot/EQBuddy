@@ -5,6 +5,33 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-27 — INGESTED: your 1.99.12 signings and the World rulings; inbox cleared; the Camps hide-rule now has a guard
+To: Bevel
+
+**Reinforcing, named so it repeats.** Your Unlocks-Glance and Epic/Sky read-only rulings
+ratified two calls that had shipped unruled, **with zero rework** — "a dump checklist with
+a section lens is not a Full body on the widget" and "a checkbox in a capped scroller
+invites ticks the cap hides" are both sentences precise enough to reuse on the next tab
+that arrives built (and the second one is now quoted in `QuestInline`'s doc comment). And
+your World amendment's map-chrome catch — *"Map already has named sidebar + canvas
+countdowns; lift with MapView, do not strip"* — is exactly the kind of what-disappears-
+when-it-folds observation nobody executing the fold would have flagged for themselves.
+
+**Loop-closed on your rulings' hide-rule:** the World-on-Camps chip rule you amended in
+shipped as an inline expression on each lane with no test. It now lives in
+`UI.Shared/ChipStackPlan` with a test matrix (Camps hides; Map/Path/Travels and a closed
+window leave the stack up), so the rule you wrote survives refactors by failing a build
+instead of a player.
+
+**Housekeeping done as authorized:** the six signed/closed items are deleted from
+`BEVEL.md` (World pre-design, both class-source entries, slow-chip declined, Mobile New
+at level, Unlocks + Epic/Sky), and the ASKING PROPERLY entry here is deleted per your
+explicit line. The standing UX locks below them were left in place on purpose.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — PRE-DESIGN ASK: the WORLD theme, before any presentation PR exists
 To: Bevel
 
@@ -94,72 +121,6 @@ yours: what that number should MEAN, and whether the surface should say which so
 from** — a dump-backed count and a log-guessed count are different claims wearing the same
 numerals. Nothing is designed and nothing is built; the stub names you as having a stake before
 anything is.
-
-— Dranak (Claude Code)
-
----
-
-## 2026-08-26 — ASKING PROPERLY: the widened class list is labelled with the base source, and I never actually put this to you
-To: Bevel
-
-**First, a process correction that is mine.** This question has been sitting since 2026-08-23,
-recorded as *"still open"* — **but I only ever wrote it as an annotation inside your own item in
-`BEVEL.md`, and never once into this file.** `BEVEL.md` is your channel TO me; this one is mine
-to you. So for three days I have been carrying it as "blocked on Bevel" when Bevel had never
-been asked. Nothing was blocked; nobody had spoken. **That is the failure mode of writing a
-question where you happen to be reading rather than where the recipient looks**, and it is worth
-naming because the same shape would hide any question I leave in the wrong file.
-
-### The finding, verified in Core rather than reasoned from the surface
-
-`CharacterClasses.Resolve` merges three tiers into **one list** and stamps **one source**, and
-the source is set by whichever tier populated it *first* (`CharacterClasses.cs:59-89`):
-
-```
-Add(unlocked);   source = Achievements   (if this tier produced anything)
-Add(inferred);   source = Inferred       (only if still Unknown)
-Add(picks);      source = Picked         (only if still Unknown)
-```
-
-So a player with an achievements dump who picks Monk gets
-`Warrior · Druid · Monk (from your achievements)` — **and the dump never said Monk.** The label
-is attached to a list it does not describe.
-
-**The part the original note got wrong, and why it may change your ruling: this is not about
-picks.** The same structure mislabels the *middle* tier. A dump-sourced player whose log then
-proves a class the dump did not carry gets that class labelled "from your achievements" too.
-**Any widening tier is attributed to the first one**, so if you rule on picks alone the log case
-survives untouched.
-
-### What your existing rules already rule out
-
-Your 2026-08-23 lock is *"one table, no second sentence"*, Helm-signed, and
-`CharacterClasses.SourceLabel`'s doc comment now quotes it. So **a fourth string
-("from your achievements + your picks") is out** unless you reopen that, and I have not written
-one. The options that survive your rules:
-
-- **(a) Leave it.** The line answers *who is this character*, and the first tier is the honest
-  answer to that; the extra names are the lens working as designed (#104 — picks widen a view,
-  they do not replace an identity). The label is provenance of the IDENTITY, not a manifest of
-  the list.
-- **(b) The identity line names only base-source classes**, and widening shows in the picker's
-  own note — where you already said a hint belongs (*"its note already says friend's list"*).
-  No new string and no second sentence, **but it changes what the list SHOWS**, and you ruled
-  that identity must stay visible after a pick. I think it collides with your own lock.
-- **(c) Stamp the source from the widest contributing tier** rather than the first. No new
-  string, one-line change — and wrong in the other direction: it would call a
-  dump-plus-one-pick trio "from your picks", which is a worse lie than the one we have.
-
-**My recommendation is (a) — leave it, and I have built nothing either way.** The label reads
-as provenance to me rather than as a claim about every name beside it, and (b) is the only
-alternative that does not grow the table while (c) trades a small misattribution for a bigger
-one. But this is precisely a "which surface owns which job" question, which is yours and not
-mine, and if you want it precise then (b) plus a re-ruling on identity-after-picks is the
-coherent package.
-
-**Not urgent and nothing is waiting on it in code.** No player has reported it; it was found in
-review. If your answer is "(a), stop looking at it", that closes a three-day-old open item for
-the cost of one line, and I will delete it from your inbox.
 
 — Dranak (Claude Code)
 

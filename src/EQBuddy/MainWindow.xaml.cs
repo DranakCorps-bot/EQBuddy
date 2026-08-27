@@ -1940,17 +1940,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         var chips = _settings.MezChipsEnabled ? MezChips(now) : [];
         if (SlowChipsVisible(now)) chips.AddRange(SlowChips(now));
-        // Placement preview (#94 follow-up): the stack only exists while a mez or
-        // slow is live, so there was no way to park it BEFORE the first mid-fight
-        // debuff. While Options is open, an empty stack shows one draggable
-        // placeholder — same idea as the alert tile's placement mode.
         if (chips.Count == 0 && _optionsWindow is { IsLoaded: true })
-            chips.Add(new SpawnChip(Zone: "", Name: "drag me — chips appear here",
-                CountdownText: "", IsDue: false,
-                Detail: "Placement preview: mez and slow chips will stack at this "
-                    + "spot. Drag it where you'll notice them; it disappears when "
-                    + "Options closes.",
-                Icon: "ChevronsDown"));
+            chips.Add(ChipStackPlan.PlacementPreview());
         return chips;
     }
 
@@ -2549,17 +2540,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 if (_spawnsVm.SoundFor(due.Zone, due.Name) is { } sound)
                     PlayAlertSound(sound);
 
-            // Chicklets are the ambient face of spawn tracking: the stack exists exactly
-            // while timers do — including alongside the World window on any OTHER tab,
-            // which is a browser, not a replacement. No pop-open of the full window, ever
-            // (David's design). The one exception (Bevel-signed World pre-design
-            // amendment, chip hide-rule): while the World window is open AND showing the
-            // Camps tab, the same timers are already on screen there, so the overlay
-            // stack hides — Map, Path, Travels and a closed window all leave it up.
+            // The chip hide-rule and its one exception live in ChipStackPlan.
             var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
                 && ww3.CurrentTab == WorldTab.Camps;
-            var hasTimers = !_hiddenForFocus && !worldOnCamps && _spawnsVm.HasActiveTimers(DateTime.Now);
-            if (hasTimers)
+            if (ChipStackPlan.SpawnStack(true, _hiddenForFocus, worldOnCamps,
+                    _spawnsVm.HasActiveTimers(DateTime.Now)))
             {
                 if (_chipsWindow is not { IsLoaded: true })
                 {
@@ -2578,24 +2563,14 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             CloseChips();
         }
 
-        // The mez stack lives its own life, independent of spawn tracking: it exists
-        // exactly while a mez is believed active, in its own window (David's call —
-        // mez chips park next to the fight, spawn chips are ambient). Optional since
-        // the 2026-08-11 Reddit ask — a non-CC class never wants the stack.
-        // Slow chips (#94) ride the same stack: both are "active effect, counting
-        // down, parked next to the fight", and one window means one saved position.
-        // Emptiness is probed cheaply first (2026-08-12 tuning pass): building the
-        // full chip list twice a second to learn it was empty was pure churn.
+        // Why the fight stack is its own window, and why Options-open forces it: see
+        // ChipStackPlan, which owns the rule for both lanes.
         var chipsNow = DateTime.Now;
-        // Options open = placement preview: the stack exists (with a placeholder if
-        // empty) so it can be parked before the first real debuff (#94 follow-up).
-        var chipPlacement = _optionsWindow is { IsLoaded: true }
-            && (_settings.MezChipsEnabled || _settings.SlowAlertEnabled);
-        var haveFightChips = !_hiddenForFocus
-            && (chipPlacement
-                || (_settings.MezChipsEnabled && _mezTracker.Any(chipsNow))
-                || (SlowChipsVisible(chipsNow) && _slowTracker.Any(chipsNow)));
-        if (haveFightChips)
+        if (ChipStackPlan.FightStack(_hiddenForFocus,
+                optionsOpen: _optionsWindow is { IsLoaded: true },
+                _settings.MezChipsEnabled, _settings.SlowAlertEnabled,
+                mezHasChips: _settings.MezChipsEnabled && _mezTracker.Any(chipsNow),
+                slowHasChips: SlowChipsVisible(chipsNow) && _slowTracker.Any(chipsNow)))
         {
             if (_mezWindow is not { IsLoaded: true })
             {

@@ -88,11 +88,16 @@ next loop, not a reopening of the plan.
 
 ## The WORLD theme — Travels & Deaths + Map, Spawns, Travel, ZoneShare become one theme
 
-- **Priority:** `ready` for PR 0 and PR 1 (Core + view lifts — no presentation change in
-  either). **PR 2–PR 4 wait for Bevel's pre-design answers**, asked in `BEVEL-FEEDBACK.md`
-  in this same commit — that is a Bevel gate, not a `needs-david:`. No `needs-david:` at
-  all: the theme choice was David's and is made (2026-08-27, question tool, over Alerts);
-  every remaining decision is design (Bevel's) or implementation (the executor's).
+- **Priority:** **DONE 2026-08-27 — all five PRs executed, merged, staged in 1.99.13.**
+  PR 0/1 on PR #242 (execution report: `FABLE-FEEDBACK.md` 2026-08-27, with the
+  four-factories deviation flagged for your last-look); Bevel's six pre-design answers plus
+  the amendment signed (Helm 2026-08-26 9:06/9:07 PM); PR 2–4 on PR #244 (execution report:
+  `CLAUDE-FEEDBACK.md` 2026-08-27 — WorldWindow both lanes, the three standalone windows
+  deleted, theme card, phone travel + marker pins). Flipped DONE in place so a grep for
+  `ready` cannot find shipped work. Your last-look rides the 1.99.13 release review
+  requested in `FABLE-FEEDBACK.md`.
+  (was: `ready` for PR 0 and PR 1; PR 2–PR 4 gated on Bevel's pre-design answers. No
+  `needs-david:` — the theme choice was David's, 2026-08-27, question tool, over Alerts.)
 - **Class:** `V3` — four surfaces × two lanes fold into one window; the heaviest pair in
   the app (`MapWindow`, 1,079 + 1,061 lines) moves onto a host seam; a card-key decision;
   wire additions on the phone; and the trap-45 ownership rule has to be right before the
@@ -471,6 +476,14 @@ explained (the picker shows recent dates because the fixture is time-shifted to 
 The nine left genuinely need a live zone, a phone viewport or an alert in flight:
 `cursor-ring`, `feedback-and-alert`, `map-window`, `mobile-map-phone`, `mobile-map-tablet`,
 `spawn-circles`, `travel-window`, `widget-seethrough`, `zone-share`.
+
+**Update 2026-08-27 (Claude): three of those nine got worse, not better.** World PR 2
+deleted `MapWindow`, `SpawnsWindow` and `TravelWindow`, so `map-window.png`,
+`spawn-circles.png` and `travel-window.png` now depict retired windows — the
+`gear-locker.png` class of stale, not slow rot — the moment 1.99.13 ships. The surfaces
+live on as WorldWindow tabs, so replacements are WorldWindow shots (still needing a live
+zone for the Map tab; Camps/Path may stage from the fixture). `zone-share.png` is still
+real — `ZoneShareWindow` survived the fold untouched, its door now on the Map tab.
 
 (3) is what defeated it. `Prime` builds its extra log from a **prefix** of the fixture
 (`$lines[0..take]`), and `Append-Log` appends to the END, so an appended "Welcome to level N!"

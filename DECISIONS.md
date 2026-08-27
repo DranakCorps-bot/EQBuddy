@@ -15,6 +15,20 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-27
+
+- **The flagged ratchet squeeze was relieved NOW (`UI.Shared/ChipStackPlan`), not left for
+  the next PR to trip over** · could have left the 1-line headroom for whoever touches
+  `MainWindow.xaml.cs` next, as the World report implied · the relief chosen was the chip
+  stacks' existence rules rather than the plan's named spawn-cue lift, because the same
+  edit de-duplicates a Bevel-signed rule (World-on-Camps chip hide) that had NO unit test
+  and a player-facing string both lanes carried verbatim · keep-if-it-fits, baseline stays
+  4,214 · `ChipStackPlan.cs`, `ChipStackPlanTests.cs`, this commit.
+- **1.99.13 release prep authored unprompted for the staged World work** (What's-new entry
+  with "X is now Y" for all four moved surfaces; version bump; Fable review requested) ·
+  could have waited for David to ask for a release · the review-before-David order is the
+  standing sequence and the go stays his · `WhatsNew.json`, `FABLE-FEEDBACK.md`.
+
 ## 2026-08-26
 
 - **World PR 1's four views use separate factories (`NewMapView`/`NewSpawnsView`/

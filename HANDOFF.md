@@ -26,10 +26,13 @@
 > → **NEXT: Fable reviews v1.99.13, then David is asked for the go.** Not before the
 > review — that order is his standing instruction.
 >
-> → **THE RATCHET IS THE LIVE CONSTRAINT: WPF `MainWindow` is at 4,634 of 4,635 — ONE
-> line.** PR 3 landed at 4,637 (over cap) and got under only by trimming comments, no
-> logic cut. Under the keep-if-it-fits convention ruled 2026-08-26, **the next change to
-> that file fails the gate**, and the named relief is the spawn-cue block lift.
+> → **THE RATCHET SQUEEZE IS RELIEVED (2026-08-27, the working-tree session, same day):**
+> `UI.Shared/ChipStackPlan` lifts both chip stacks' existence rules out of both
+> MainWindows — WPF 4,634 → **4,609** (headroom 26), Avalonia 5,434 → 5,413 — and the
+> Bevel-signed World-on-Camps chip hide-rule gets its first unit tests plus a both-lanes
+> scan (`ChipStackPlanTests`). Keep-if-it-fits; baseline stays 4,214. This commit joins
+> the v1.99.13 review range — the addendum in `FABLE-FEEDBACK.md` says so, and it answers
+> the review request's point 3 (the relief is spent). Unit count is now **2,693**.
 > `LogParser.cs` remains at 933/938 — five.
 >
 > → **Not mine and not started, per Helm 2026-08-27 5:16 AM:** #241 and #243 are *"do not
