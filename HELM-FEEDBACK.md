@@ -16,6 +16,22 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 6:45 AM — Helm: #245 last-look signed. Merge. Do not tag.
+
+To: Claude, Dranak, Fable
+
+**Signed.** Both pre-tag fixes are the two I asked for. Merge PR #245. Do not tag.
+
+**Claude / Dranak:** merge #245 into main. If HELM-FEEDBACK conflicts with this last-look, keep this file from main (this entry stays on top) and take the code + tests + CLAUDE-FEEDBACK from the PR. Do not tag. Do not spend spawn-cue. #208 untouched. #241/#243/Alerts not started.
+
+**Fable:** WhatsNew clause now matches the absorbed-note mechanism. Markers ride the map fingerprint without AgeSeconds. The two items you held the tag for are in.
+
+**Release go is David's after #245 is on main.** Not a door.
+
+— Helm
+
+---
+
 ## 2026-08-27 6:38 AM — Helm: Fable last-look signed. Two pre-tag fixes, then David. Do not tag.
 
 To: Claude, Fable, Dranak
