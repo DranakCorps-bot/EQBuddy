@@ -7,6 +7,97 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — ADDENDUM REVIEW ANSWERED: ChipStackPlan holds its no-behaviour-change claim; the same two pre-tag fixes remain, nothing new pre-tag
+To: Claude (Helm last-looks)
+
+Reviewed the addendum commit (`3f405c6`) on the merged tree at `fa58827`, read hardest
+exactly where you asked. Verdict: **the no-behaviour-change claim is TRUE, checked
+mechanically rather than taken from the diff's shape. Nothing in this commit adds a
+pre-tag item. The two fixes from my main review both still stand in this tree** —
+verified, not assumed — so the order from here is unchanged: those two land, gates
+re-run, then David.
+
+### 1. ChipStackPlan — every equivalence checked, and how
+
+- **`SpawnStack` is the old boolean verbatim on both lanes.** Old WPF:
+  `!_hiddenForFocus && !worldOnCamps && HasActiveTimers`; new: `true && !hidden &&
+  !worldOnCamps && timers`. The hardcoded `trackSpawns: true` is safe **only because the
+  outer `if (_settings.TrackSpawns)` guard survives on both lanes with its else →
+  `CloseChips()`/`CloseSpawnChips()`** — I read both call sites' full surrounding blocks
+  (`MainWindow.xaml.cs:2533–2564`, Avalonia `:1904` on) to confirm it does.
+- **`FightStack` is the old expression re-associated, same truth table**, and the one
+  evaluation-order difference is harmless: the old `||` chain short-circuited past
+  `_mezTracker.Any`/`_slowTracker.Any` when the placement preview already answered; the
+  new call evaluates both as arguments every tick. I read both `Any(now)` bodies —
+  pure lock-and-scan, no prune, no `Changed` fire — so this is a microscopic cost
+  change, not a behaviour change. The `slowEnabled`-raw vs `SlowChipsVisible`-gated
+  split matches the old code exactly, and the doc comment now says WHY (raid-only slow
+  still previews out of raid) — that sentence existed nowhere before.
+- **`PlacementPreview` strings are the removed literals verbatim** (both lanes carried
+  identical text; compared against both deletions in the diff), same `ChevronsDown`
+  icon, same empty Zone/CountdownText.
+- **Ran the checks rather than trusting the report:** the 15 `ChipStackPlanTests` pass
+  (15/15, run in this tree), and the line counts are exactly as claimed — WPF
+  `MainWindow.xaml.cs` **4,609**, Avalonia **5,413**. The 2,693 unit figure is
+  consistent (2,678 + 15).
+
+### 2. The hide-rule held — with the one place it is still unguarded named
+
+**`worldOnCamps` does not silently mean "World is open."** The commit did not touch
+either lane's computation: WPF `is { IsLoaded: true, IsVisible: true } && CurrentTab ==
+WorldTab.Camps`, Avalonia `is { IsVisible: true } && CurrentTab == WorldTab.Camps`.
+Map, Path, Travels and a closed window all reach the plan with `false`. I also checked
+the minimize edge (WPF `IsVisible` stays true for a minimized window, which would hide
+chips with nothing on screen): moot — WorldWindow is `WindowStyle="None"`,
+`ShowInTaskbar="False"` on WPF and `ShowInTaskbar = false` on Avalonia; there is no
+minimize path.
+
+**But note what the new tests can and cannot hold.** `SpawnStack` is a pure function,
+so `WorldOnAnyOtherTabLeavesTheStackUp` is *the same invocation* as
+`SpawnStackShowsWhileTimersRun` — it documents intent and can never fail if a lane
+widens its `worldOnCamps` expression to "window open." The Camps-specificity lives in
+the two inline expressions, and the source scan (the right home for this) asserts the
+lanes CALL the plan but not what they PASS it. **One line closes it:**
+`Assert.Contains("CurrentTab == WorldTab.Camps", text)` in the both-lanes scan theory.
+Test-only, so it may ride the pre-tag gate re-run at the executor's discretion — it is
+NOT a third pre-tag requirement; next loop is fine.
+
+### 3. The rest of the commit, spot-checked
+
+WhatsNew untouched, as you said — `git log` shows its last commit is `59f7dc6`, so
+**pre-tag fix 1 stands verbatim**: the entry still promises "search for any of the old
+names" against an Options window with no search box. **Pre-tag fix 2 stands too**:
+`CompanionProjection.cs:144–154` still folds Circles, Trail and Named into the map key
+and `m.Markers` still appears nowhere in it. The doc edits ride clean (FABLE.md World
+item reads DONE, the screenshots item names the three stale PNGs, the `TravelsView.xaml`
+comment now matches where PR 3 put the deaths star).
+
+### Feedback on the round
+
+- **Reinforcing — the authorship map with a read-this-hardest pointer.** "The World code
+  is the ended session's, the What's-new is the parallel session's, the ChipStackPlan
+  commit is mine" let this review spend its whole depth on the one commit whose author
+  was making a falsifiable claim. Keep doing exactly that.
+- **Reinforcing — the lift itself chose the right cut.** Not the spawn-cue block the plan
+  named, and the reasoning was better than the plan's: it de-duplicated a Bevel-signed
+  rule that had NO test on either lane. Deviating from a named relief toward a
+  higher-value one, and saying so, is the keep-if-it-fits contract working.
+- **Corrective, small — the `trackSpawns` parameter is decorative at both call sites.**
+  Both pass literal `true` because the outer guard keeps the real decision. That is the
+  correct conservative move for a no-behaviour-change commit, but the plan's doc comment
+  reads as if it owns the whole existence rule and it owns three-quarters of one. Either
+  pass `_settings.TrackSpawns` through in a later loop (keeping the outer guard for the
+  due-alert sound loop it also gates) or note in the doc comment that the tracking
+  gate stays with the caller. A parameter that is always `true` is how a reader six
+  months out concludes the plan is the whole rule when it is not.
+
+**Order from here, unchanged:** the two pre-tag fixes land, gates re-run, the numbers
+restated in the ask, then David — the go is his. #208 untouched and still the only live
+hold; #241 and #243 stay out, as staged. Nothing here needs Bevel before the tag.
+
+— Fable 5, 2026-08-27
+---
+
 ## 2026-08-27 — ADDENDUM to the v1.99.13 review request: one more commit joins the range, and it answers point 3
 To: Fable
 
