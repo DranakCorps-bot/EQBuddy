@@ -1,4 +1,4 @@
-# Helm inbox
+﻿# Helm inbox
 
 **Helm is chief of staff / COO for this repo.** It rules on operating posture: what is on
 hold, what may be said in public and when, what order things happen in, and whether a thing
@@ -120,9 +120,9 @@ Do not put these back in Holds.
 ### #246 Blackburrow Brewers qty 1 vs 3 (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #246 jlcrisp Blackburrow Brewers — catalog shows 1 Blackburrow Cask; quest needs 3
-- **Ruling:** Authorized 2026-08-27 evening. V0-V1 catalog qty only (Blackburrow Cask 1 to 3). Not wiki-data -- eqlwiki already says three casks / third cask. Do not fold other quests. Do not tag. Do not touch Play Console. #208 untouched. Separate take from #241. PR #247 is that take; do not merge it from the #241 kick.
+- **Ruling:** Last-looked PR #247 (`246-qty`). Signed. Merge after rebase onto main (branch is dirty against tonight's HELM lands). Scope holds: Blackburrow Brewers cask qty 1→3 in harvest + catalog only; Rogue Redemption qty 1 left alone; CatalogSanityTests pin; harvest parser untouched. Not wiki-data. Do not tag. Do not touch Play Console. #208 untouched. Separate from #241 / PR #248.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 evening (supersedes 1:20 PM waiting; still authorized)
+- **Signed:** Helm, 2026-08-27 6:35 PM CT (supersedes evening authorize)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
@@ -134,9 +134,9 @@ Do not put these back in Holds.
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
-- **Ruling:** Last-looked Fable plan 49898fd. Signed. Not a hold. Not needs-david. PR 1 and PR 2 authorized (Core ReconcileInventory at ingest OutputfileEvent in log order; SkyCompleteToggle consumes). PR 3 (provenance sentence + no-dump) waits on Bevel's three pre-design questions. Reconcile the store, not the readers. Dump overrides at write time; absence is zero; Manual superseded. Do not fold #243. Do not touch LogParser. Do not touch the wiki. If this take edits MainWindow.xaml.cs, spawn-cue lift is the first commit. Own worktree, not David's checkout, not the #246 session. Credit DasGud #241 when PR 1 ships. #208 untouched.
+- **Ruling:** Last-looked PR #248 (`241-pr12`). Signed. Merge. Matches the 5:00 PM plan last-look: spawn-cue first; PR1 ReconcileInventory at ingest OutputfileEvent in log order (dump overrides, absence zero, Manual superseded); PR2 SkyCompleteToggle consumes (Sky only); both lanes + wiring scan; What's-new v1.99.14 credits DasGud; Bevel's three PR3 questions filed at take time. Do not fold #243. Do not touch LogParser. Do not tag. Do not touch Play Console. PR3 waits on Bevel. #208 untouched. Do not merge #247 from this kick — that PR rebases separately.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 5:00 PM CT (supersedes evening planning-only)
+- **Signed:** Helm, 2026-08-27 6:35 PM CT (supersedes 5:00 PM plan-only; PR 1-2 last-look)
 
 ### #239 expand/minimize hit-target (sign-off)
 - **Kind:** sign-off / posture
