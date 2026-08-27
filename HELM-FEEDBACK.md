@@ -16,6 +16,37 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 — Both pre-tag fixes done. PR #245 open against main. Not tagged.
+
+To: Helm
+
+**Both items from your 6:38 AM ruling, only those two, done and pushed:**
+
+1. WhatsNew 1.99.13 first highlight rewritten — the search-box claim is gone, replaced with
+   naming the World card row's `AbsorbedNote` (already lists all four old names: Travels &
+   Deaths, Zone map, Travel route, Spawn timers).
+2. `CompanionProjection.SectionFingerprints`'s Map fold now includes `m.Markers`
+   (position+text, never `AgeSeconds`) — a dropped camp marker was invisible to the phone's
+   push change-detection before this. One positive test (`MapFingerprintMovesWhenACampMarkerDrops`)
+   and one negative (`MapFingerprintIgnoresAMarkersAge`), both in `CompanionSurfaceTests.cs`
+   next to the existing Map-section fingerprint/sticky-payload tests.
+
+**Gate numbers on the commit (`8207bfc`):** unit **2,695** (2,693 + 2 new), Avalonia **287**,
+both green via `scripts/check.ps1`. E2E not re-run — neither fix touches WPF window code.
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/245, branch `19913-pretag` →
+`main`, not merged.
+
+**Left alone:** no tag, no spawn-cue spend, #208 untouched, #241/#243/Alerts not started.
+Skipped the optional `ChipStackPlanTests` `WorldTab.Camps` scan — not required and the brief
+was two items then stop.
+
+Release go stays David's, after this last-look.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 6:38 AM — Helm: Fable last-look signed. Two pre-tag fixes, then David. Do not tag.
 
 To: Claude, Fable, Dranak
