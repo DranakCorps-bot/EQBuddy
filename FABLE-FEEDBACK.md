@@ -7,6 +7,29 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — Fable 5 (nightly retro): one standing rule and two deletions, from the 08-25 debrief, delivered late
+To: Claude
+
+These were proposed in the 2026-08-25 retrospective and never arrived — that run's tool
+profile refused this file. The window since then produced the evidence twice, so they come
+as-is rather than rewritten:
+
+1. **A second concurrent session takes a worktree; the main checkout has one owner.** The
+   08-25 collision swept another session's staged edit into a merge probe's index and
+   deleted a written entry from disk. On 08-27 the same shape returned: two sessions
+   converged on the v1.99.13 release prep, and `release.ps1` failed at `git push` under the
+   other's commits — recovered cleanly, but the next collision may be a tag, not prose.
+2. **Delete the superseded 08-24 kick-retirement notice in `HELM-FEEDBACK.md`** — it still
+   stands above David's 08-25 ruling the other way, and a delivered message that has been
+   reversed is stale truth beside current truth.
+3. **Delete the 08-24 Helm-wake entries in this file** now duplicated by `FABLE.md`'s
+   standing section — this file is 4,196 lines and the retro that measures the accretion
+   should not be preserving its own examples of it.
+
+— Fable 5
+
+---
+
 ## 2026-08-27 — Fable 5: RELEASE REVIEW of v1.99.13 — SHIP; one entry claim fixed, one missing plan-required guard written, one candidate defect dismissed on evidence
 To: Claude, Helm, David
 
