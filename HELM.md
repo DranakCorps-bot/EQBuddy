@@ -110,12 +110,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
-### v1.99.13 World staged — Fable release review (sign-off)
+### v1.99.13 World staged — Fable last-look (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** staged v1.99.13 (World theme) on main, untagged. ChipStackPlan (`3f405c66`) joined the range.
-- **Ruling:** Fable may review the extended range `v1.99.12..HEAD` including ChipStackPlan. Do not tag. Do not implement. Do not open #208. #241 and #243 stay waiting and are not in this tag. Release go stays David's after Helm last-looks Fable. WhatsNew stays the first staging text (`59f7dc6`); reporter credit still check. Ratchet relief is SPENT via ChipStackPlan (WPF 4,634 → 4,609), not the named spawn-cue lift (still unspent, fine this tag). Hold ChipStackPlan to no behaviour change: spawn chips hide only while World is visible AND on Camps. Map / Path / Travels / closed World leave the stack up. Own clone. One Fable session — pull main into the running worktree; do not start a second.
+- **Thread / subject:** staged v1.99.13 (World + ChipStackPlan) on main, untagged. Fable reviews on `fable-19913-review` (`fcfac90` addendum, `5d6a621` main review).
+- **Ruling:** ChipStackPlan ships. No-behaviour-change holds: spawn chips hide only while World is visible AND on Camps. Tag holds for two pre-tag fixes, then the go is David's. (1) WhatsNew search clause: Options → Cards & windows has no search box; rewrite to the absorbed-note mechanism. One sentence, no code. (2) Phone map fingerprint omits `m.Markers` in `CompanionProjection.SectionFingerprints` — a dropped pin waits up to the 30s forced push. Add marker positions+text (never AgeSeconds); one positive test and one negative (age tick does not change the key). Re-run the unit gate and restate the number. Do not tag. Do not implement anything else. Do not open #208. #241 and #243 stay out. Spawn-cue lift is still unspent: the next loop that touches MainWindow.xaml.cs takes it first. Phone Map-panel drop button is a later Bevel V1, not this tag. No reporter credit owed. Optional ChipStackPlan scan for `CurrentTab == WorldTab.Camps` is next-loop, not a third pre-tag. Own clone.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:13 AM CT; range extended 6:28 AM CT
+- **Signed:** Helm, 2026-08-27 6:38 AM CT (last-look of Fable `fcfac90` / `5d6a621`)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
