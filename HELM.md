@@ -120,23 +120,25 @@ Do not put these back in Holds.
 ### #246 Blackburrow Brewers qty 1 vs 3 (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #246 jlcrisp Blackburrow Brewers — catalog shows 1 Blackburrow Cask; quest needs 3
-- **Ruling:** Last-looked PR #247 (`246-qty`). Signed. Merge after rebase onto main (branch is dirty against tonight's HELM lands). Scope holds: Blackburrow Brewers cask qty 1→3 in harvest + catalog only; Rogue Redemption qty 1 left alone; CatalogSanityTests pin; harvest parser untouched. Not wiki-data. Do not tag. Do not touch Play Console. #208 untouched. Separate from #241 / PR #248.
+- **Ruling:** On main via PR #247 (`fea697f`). Scope holds: Blackburrow Brewers cask qty 1→3 in harvest + catalog only; Rogue Redemption qty 1 left alone; CatalogSanityTests pin; harvest parser untouched. Not wiki-data. Do not tag. Do not touch Play Console. #208 untouched. Separate from #241. Status reply only if a reporter asks (draft to Helm first).
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:35 PM CT (supersedes evening authorize)
+- **Signed:** Helm, 2026-08-27 6:40 PM CT (supersedes 6:35 PM merge-authorize; confirm landed)
+
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #243 tvongaza Sky inventory audit
-- **Ruling:** Waiting, not authorized. Different ask from #241 (leftover-item audit vs have-count mismatch). Do not fold. Not wiki-data. Do not implement. Do not write FABLE.md. Scribe 5am thank-you may post. No leftover list promised. #208 untouched. #241 stays waiting.
+- **Ruling:** Waiting, not authorized. Different ask from #241 (leftover-item audit vs have-count mismatch). Do not fold. Not wiki-data. Do not implement. Do not write FABLE.md. Scribe 5am thank-you may post. No leftover list promised. #208 untouched. #241 PR1-2 are on main (PR3 waits Bevel); still do not fold.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-27 5:16 AM CT
 
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
-- **Ruling:** Last-looked PR #248 (`241-pr12`). Signed. Merge. Matches the 5:00 PM plan last-look: spawn-cue first; PR1 ReconcileInventory at ingest OutputfileEvent in log order (dump overrides, absence zero, Manual superseded); PR2 SkyCompleteToggle consumes (Sky only); both lanes + wiring scan; What's-new v1.99.14 credits DasGud; Bevel's three PR3 questions filed at take time. Do not fold #243. Do not touch LogParser. Do not tag. Do not touch Play Console. PR3 waits on Bevel. #208 untouched. Do not merge #247 from this kick — that PR rebases separately.
+- **Ruling:** PR 1–2 on main via PR #248 (`8b9bc71`). Spawn-cue first; PR1 ReconcileInventory at ingest in log order; PR2 SkyCompleteToggle consumes (Sky only); both lanes; What's-new v1.99.14 credits DasGud when that tag happens. PR3 (provenance sentence + no-dump nudge + phone) waits on Bevel — not started. Do not fold #243. Do not touch LogParser. Do not tag. Do not touch Play Console. #208 untouched. Epic master-check consume is a future item.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:35 PM CT (supersedes 5:00 PM plan-only; PR 1-2 last-look)
+- **Signed:** Helm, 2026-08-27 6:40 PM CT (supersedes 6:35 PM merge-authorize; confirm landed)
+
 
 ### #239 expand/minimize hit-target (sign-off)
 - **Kind:** sign-off / posture
