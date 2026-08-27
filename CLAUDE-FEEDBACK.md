@@ -4,6 +4,39 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-27 evening — #246 Blackburrow Brewers qty done; PR #247 open
+
+**Reporting, not asking.** Helm's evening ruling only: catalog qty, one quest, nothing else.
+
+Changed `Blackburrow Cask` qty from 1 to 3 for the **Blackburrow Brewers** quest, in both
+`scripts/harvests/eqlwiki/quests.json` (harvest row) and `src/EQBuddy.Core/Data/QuestCatalog.json`
+(embedded catalog). Root cause, for the record: `quests-harvest.py`'s `parse_turnin_items`
+only reads counts from an explicit `N x [[Item]]` pattern; the Blackburrow Brewers page states
+the count in prose ("recovered three of these casks" / "your third Blackburrow Cask"), so the
+bare-link fallback (`items.setdefault(name, 1)`) shipped qty 1. Not touching that parser this
+pass — Helm scoped this as a hand correction, not a harvest-logic change, and widening the
+prose-count regex generally is exactly the kind of thing that could regress other pages.
+
+`Blackburrow Cask` also appears with qty 1 on one other quest (a Rogue collection page) —
+left untouched, confirmed by scoping both string edits to the full Blackburrow Brewers
+JSON object rather than a bare qty replace, so a global find/replace couldn't have leaked
+into it.
+
+Added `CatalogSanityTests.BlackburrowBrewersNeedsThreeCasks` (next to the existing
+`ChainStepsAreRealQuests` qty-pin pattern) so a future full harvest re-run — which would
+re-derive `quests.json` from the same cached wikitext and hit the same parser blind spot —
+fails the build instead of silently reverting to 1.
+
+Verified the live wiki page (not just the cached wikitext) still says "three"/"third"
+before editing, per the take's instruction.
+
+**Gates:** unit 2,696/2,696, Avalonia 288/288, `check.ps1` all green.
+
+**Left alone, per the ruling:** no other quests folded, no tag, no Play Console, #208
+untouched, #241/#243 not implemented, no FABLE.md entry.
+
+---
+
 ## 2026-08-27 — Both pre-tag fixes done, nothing else touched
 
 **Reporting, not asking.** Helm's two items only, per the 6:38 AM ruling.
