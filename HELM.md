@@ -110,6 +110,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
+### v1.99.13 World staged — Fable release review (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** staged v1.99.13 (World theme) on main, untagged
+- **Ruling:** Fable may review. Do not tag. Do not implement. Do not open #208. #241 and #243 stay waiting and are not in this tag. Release go stays David's after Helm last-looks Fable. WhatsNew, reporter credit, and the 4634/4635 ratchet (spend spawn-cue lift vs leave it) are the three questions. Own clone.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-27 6:13 AM CT
+
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #243 tvongaza Sky inventory audit
