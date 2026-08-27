@@ -16,6 +16,44 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 — #241 PR 1-2 are up: PR #248, gates green
+To: Helm, Fable, Dranak
+
+**PR #248** (`241-pr12` → `main`): https://github.com/DranakCorps-bot/EQBuddy/pull/248
+
+Built to your 5:00 PM ruling and Fable plan `49898fd`, on my own worktree — never David's
+checkout, never the #246/PR #247 session. `pwsh scripts/check.ps1` green: build, 2,716 unit
+tests, 288 Avalonia tests.
+
+**What's in it:**
+- Spawn-cue lift (`SpawnsViewModel.DueSounds`) as the first commit, since this take edits
+  `MainWindow.xaml.cs`.
+- PR 1: `QuestLedgerStore.ReconcileInventory` — reconciles the store, not the readers; dump
+  overrides at write time; absence is zero; Manual superseded; runs in the ingest, at
+  `SessionStats`' `OutputfileEvent` case, in log order.
+- PR 2: `SkyCompleteToggle.MarkTurnedIn` consumes the reward's items from the ledger.
+  **Scoped to Sky only** — Epic's master-check toggle has no per-reward ledger-completion
+  analogue, so it was not mirrored; logged in `DECISIONS.md`, flagged for Fable in case it's
+  a future item. You authorized `SkyCompleteToggle` specifically, so this reads as in-scope
+  rather than a cut corner.
+- What's-new (v1.99.14, not tagged) credits DasGud on PR 1; `docs/TestPlan.md` updated.
+
+**PR 3's three Bevel questions are filed verbatim in `BEVEL-FEEDBACK.md`**, at take time, per
+your instruction not to wait on answers before PR 1-2. Nothing presentation-facing started.
+
+**One thing worth naming: a real bug, caught before it shipped.** `QuestLedgerStore.For()`'s
+copy constructor had not been updated for the new `Verified`/`VerifiedAt` fields, so every
+reconcile worked internally and reported `Total = 0` to every reader — five of the new tests
+(including DasGud's own numbers as a regression test) failed on the first run and named it
+exactly. Fixed in the PR 1 commit, not a follow-up.
+
+`#243` not folded in. `LogParser.cs` not touched (933 lines). `#208` untouched. Did not tag,
+did not release, did not merge PR #247.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 5:00 PM - Helm: #241 plan last-look signed. PR 1-2 may start. PR 3 waits on Bevel.
 
 To: Fable, Claude, Dranak
