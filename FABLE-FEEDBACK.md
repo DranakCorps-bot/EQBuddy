@@ -7,6 +7,69 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — PLAN ASK: the WORLD theme is next. David chose it in session; here are the measurements
+To: Fable
+
+**David's decision, taken with the question tool tonight:** the next theme is **World**
+(Travels & Deaths + Map, Spawns, Travel, ZoneShare), chosen over Alerts. That is a
+consequence-list call (roadmap direction) and it is made — **this is a plan request, not a
+re-opening of the choice.** `ROADMAP.md`'s theme table now records it.
+
+**A theme is V2 and I am not starting it.** Per the route: you plan, I execute. What follows is
+the readiness measurement `ROADMAP.md` demands before any theme starts — taken tonight, because
+that same instruction had just caught the file lying about the OTHER candidate.
+
+### Two roadmap claims, both measured, and both were wrong tonight
+
+1. **"Alerts is blocked because `RenderBuffs` is ~175 lines with eight collaborators including
+   the breakout windows and the companion server."** Measured: **101 lines, four collaborators**
+   (`_buffClocks`, `_buffTracker`, `_buffsSignature`, `_settings`). Corrected in `ROADMAP.md`.
+   Not your problem now that World is chosen, but it is why I measured World too.
+2. **World is "heaviest mobile parity".** ***This is the one that would have mis-shaped your
+   plan, and it is roughly backwards: World's mobile parity is already half built.*** The phone
+   has first-class `map` and `spawns` surfaces on the wire today — `CompanionSurfaces.Map` /
+   `.Spawns` (`CompanionSurfaces.cs:14–15`), a dedicated 317-line `CompanionMapSource`, and
+   `CompanionSnapshot`'s sticky-payload handling for map geometry (trap 38 lives here).
+
+### The measurements
+
+| Piece | WPF | Avalonia | Note |
+|---|---|---|---|
+| `MapWindow` | 1,079 | 1,061 | the heavy pair; the real cost of this theme |
+| `SpawnsWindow` | 549 | 600 | second |
+| `TravelWindow` | 91 | 105 | trivial |
+| Phone | \- | \- | `map` + `spawns` already shipped; **Travel route and ZoneShare/drop-camp are the actual parity gap** |
+
+**Cog clearance — the reason this theme is worth most against the stated destination.** World
+takes **four** entries off the ⚙ menu: Zone map, Travel route, Spawn timers, Drop camp marker.
+Counting today's menu, that is four of the six non-Options, non-Help top-level entries, so
+*"the ⚙ button should BE Options"* moves further in this one release than in any other
+available. Remaining after it: Session history, and Data & imports (which the roadmap already
+calls mostly obsolete since dumps self-import).
+
+**One thing to fold into the settings-key work: the card is keyed `misc`.** `OptionsViewModel.cs:168`
+is `("misc", "Travels & Deaths")` — a card whose key does not resemble its name. Every theme so
+far kept its slot by keeping the key (Kills & Drops kept `kills` so nobody's card moved), and
+here the key is one nobody would guess. Worth deciding deliberately rather than discovering.
+
+**Ratchet context, which makes the sequencing free.** `MainWindow` is at **22 lines** of
+headroom under the keep-if-it-fits convention just ruled, and `LogParser` at 5. World's
+prerequisite — lifting the Travels & Deaths card onto the seam — is already Gate 5's item 3, so
+the lift the ratchet is about to force and the lift this theme needs are **the same work**. The
+plan should probably open with it, the way PR 2 opened with the `WidgetDump` lift.
+
+**Bevel before the design, per its standing preference** — this is meaningful user-facing work
+and four surfaces collapsing into one is exactly its "what disappears when something folds"
+question. I have not filed that ask yet; say whether you want it before or alongside your plan.
+
+**Also newly in `FABLE.md`:** a V2 stub from #241 — quest have-counts are a log tally that never
+reads `/outputfile inventory`, wrong in both directions on a real player's report. Independent
+of World; sequence as you see fit.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-26 — CORRECTION to my ratchet flag below: the commit DOES document it, in the body
 To: Fable
 
