@@ -3520,7 +3520,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     // internal (not private): WorldWindow's chrome button calls this from every tab
     // (Helm-signed World pre-design amendment, question 6 — the cog entry retired).
-    internal void DropCampMarker()
+    public void DropCampMarker()
     {
         var s = _stats.Snapshot();
         _stats.AddMarker($"Marker {s.Markers.Count + 1}" +

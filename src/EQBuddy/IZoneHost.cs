@@ -29,4 +29,5 @@ public interface IZoneHost
     MobLookupResult? WikiMobResult(string name);
     void EnsureMobLookup(string name);
     void PlayAlertSound(string choiceOrPath, bool coalesce = false);
+    void DropCampMarker();
 }

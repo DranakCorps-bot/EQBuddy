@@ -4506,7 +4506,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     // internal (not private): WorldWindow's chrome button calls this from every tab
     // (Helm-signed World pre-design amendment, question 6 — the cog entry retired).
-    internal void DropCampMarker()
+    public void DropCampMarker()
     {
         var s = CurrentSnapshot();
         _stats.AddMarker($"Marker {s.Markers.Count + 1}" +

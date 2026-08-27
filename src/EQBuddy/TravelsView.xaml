@@ -5,7 +5,7 @@
          PR 1 (docs/Themes.md theme 6). Markup unchanged — only the container moved,
          from an Expander's inline content to this UserControl's. The header (title,
          MiscHeader, StarDeaths) stays on the widget, same as every other theme card. -->
-    <StackPanel>
+    <StackPanel x:Name="Root">
         <TextBlock Text="Deaths" FontSize="{DynamicResource FontCaption}" FontWeight="SemiBold" Foreground="{DynamicResource BadBrush}"/>
         <ItemsControl x:Name="DeathList" Margin="{DynamicResource ListBlock}"/>
         <TextBlock Text="Zones visited" Style="{StaticResource SectionLabel}"/>
