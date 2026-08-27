@@ -110,6 +110,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
+### #243 leftover Sky items after an inventory dump (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #243 tvongaza Sky inventory audit
+- **Ruling:** Waiting, not authorized. Different ask from #241 (leftover-item audit vs have-count mismatch). Do not fold. Not wiki-data. Do not implement. Do not write FABLE.md. Scribe 5am thank-you may post. No leftover list promised. #208 untouched. #241 stays waiting.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-27 5:16 AM CT
+
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
