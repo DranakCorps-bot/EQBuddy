@@ -26,7 +26,9 @@ namespace EQBuddy.Avalonia;
 /// on the Map tab, exactly as before this window existed (Bevel-signed; it is not ported
 /// to the phone either).
 ///
-/// No <c>ThemeHost&lt;WorldTab&gt;</c> yet — that arrives with the inline card in PR 3.
+/// This window still tracks its own selected tab directly rather than through a
+/// <c>ThemeHost&lt;WorldTab&gt;</c>; <c>MainWindow</c>'s own <c>_worldHost</c> (World PR 3)
+/// is wired to this window's <see cref="TabChanged"/> event and <see cref="SetTab(WorldTab)"/>.
 /// </summary>
 internal sealed class WorldWindow : Window
 {
@@ -52,6 +54,11 @@ internal sealed class WorldWindow : Window
     private readonly SpawnsView _spawns;
     private readonly TravelView _travel;
     private readonly TravelsView _travels;
+
+    /// <summary>The Travels tab's own star (trap 20/26 — see <c>MainWindow.BuildDeathsStar</c>).
+    /// Visibility toggles with the tab rather than living in a separate row.</summary>
+    private Button _deathsStar = null!;
+    private TextBlock _deathsStarLabel = null!;
 
     /// <paramref name="initialZone"/>: the zone whose kill popped a spawn window before
     /// this fold — carried through so <c>EQBUDDY_SPAWNS=&lt;zone&gt;</c> still opens on it.
@@ -161,6 +168,16 @@ internal sealed class WorldWindow : Window
         markerLabel.Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0);
         _actionRow.Children.Add(markerLabel);
 
+        // The Travels tab's own star — visibility toggled in Refresh() based on _tab.
+        _deathsStar = _main.BuildDeathsStar();
+        _deathsStar.Margin = new Thickness(DesignTokens.SpaceL, 0, 0, 0);
+        _actionRow.Children.Add(_deathsStar);
+        _deathsStarLabel = DesignSystem.Text(DesignTokens.TypeRole.Caption, "Show in mini dashboard");
+        _deathsStarLabel.Foreground = AppTheme.DimBrush;
+        _deathsStarLabel.VerticalAlignment = VerticalAlignment.Center;
+        _deathsStarLabel.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        _actionRow.Children.Add(_deathsStarLabel);
+
         var stack = new StackPanel();
         stack.Children.Add(title);
         stack.Children.Add(_tabStrip);
@@ -219,6 +236,9 @@ internal sealed class WorldWindow : Window
             });
         }
         _tabs.Select(_tab);
+        var onTravels = _tab == WorldTab.Travels;
+        _deathsStar.IsVisible = onTravels;
+        _deathsStarLabel.IsVisible = onTravels;
         _body.Content = _tab switch
         {
             WorldTab.Map => _map.Body,

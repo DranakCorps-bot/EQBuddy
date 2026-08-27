@@ -20,9 +20,11 @@ namespace EQBuddy;
 /// on the Map tab, exactly as before this window existed (Bevel-signed; it is not ported
 /// to the phone either).
 ///
-/// No <c>ThemeHost&lt;WorldTab&gt;</c> yet — that arrives with the inline card in PR 3.
-/// Until then this window tracks its own selected tab, the same way every theme window
-/// did before its card existed.
+/// This window still tracks its own selected tab directly (World PR 2) rather than
+/// through a <c>ThemeHost&lt;WorldTab&gt;</c> — the same shape every theme window took
+/// before its card existed. World PR 3 wired <c>MainWindow</c>'s own <c>_worldHost</c> to
+/// this window's <see cref="TabChanged"/> event and <see cref="SetTab(WorldTab)"/>,
+/// exactly as it does for the other three theme windows.
 /// </summary>
 public partial class WorldWindow : Window
 {
@@ -37,6 +39,14 @@ public partial class WorldWindow : Window
     private readonly SpawnsView _spawns;
     private readonly TravelView _travel;
     private readonly TravelsView _travels;
+
+    /// <summary>The mini-dashboard star the old Travels &amp; Deaths card header carried
+    /// (trap 20/26 — the ONLY writer <c>MiniStats</c> has for "deaths"). Lives beside the
+    /// Travels tab specifically, per the plan, rather than on every tab like the drop
+    /// marker: it stars the ROOM it sits next to, the same way Kills' star sits beside
+    /// only the Kills room in <see cref="CreatureWindow"/>.</summary>
+    private System.Windows.Controls.Primitives.ToggleButton _deathsStar = null!;
+    private System.Windows.Controls.TextBlock _deathsStarLabel = null!;
 
     /// <paramref name="initialZone"/>: the zone whose kill popped a spawn window before
     /// this fold — carried through so <c>EQBUDDY_SPAWNS=&lt;zone&gt;</c> still opens on it.
@@ -117,6 +127,32 @@ public partial class WorldWindow : Window
         label.Margin = new Thickness(Tok.SpaceS, 0, 0, 0);
         label.VerticalAlignment = VerticalAlignment.Center;
         ActionRow.Children.Add(label);
+
+        // The Travels tab's own star — visibility toggled in Refresh() rather than being
+        // a separate row, so switching tabs costs no new chrome.
+        _deathsStar = new System.Windows.Controls.Primitives.ToggleButton
+        {
+            Style = (Style)FindResource("StarToggle"),
+            Tag = "deaths",
+            IsChecked = _settings.MiniStats.Contains("deaths"),
+            ToolTip = "Show deaths in mini dashboard",
+            Margin = new Thickness(Tok.SpaceL, 0, 0, 0),
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        _deathsStar.Click += (_, _) =>
+        {
+            if (_deathsStar.IsChecked == true)
+            {
+                if (!_settings.MiniStats.Contains("deaths")) _settings.MiniStats.Add("deaths");
+            }
+            else _settings.MiniStats.Remove("deaths");
+            _settings.Save();
+        };
+        ActionRow.Children.Add(_deathsStar);
+        _deathsStarLabel = DesignSystem.Text(Role.Caption, "Show in mini dashboard");
+        _deathsStarLabel.Margin = new Thickness(Tok.SpaceXs, 0, 0, 0);
+        _deathsStarLabel.VerticalAlignment = VerticalAlignment.Center;
+        ActionRow.Children.Add(_deathsStarLabel);
     }
 
     private void UpdateHeightCap()
@@ -141,6 +177,9 @@ public partial class WorldWindow : Window
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
         BuildTabs(s);
+        var onTravels = _tab == WorldTab.Travels ? Visibility.Visible : Visibility.Collapsed;
+        _deathsStar.Visibility = onTravels;
+        _deathsStarLabel.Visibility = onTravels;
         TabBody.Content = _tab switch
         {
             WorldTab.Map => _map.Body,

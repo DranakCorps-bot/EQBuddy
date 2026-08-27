@@ -131,11 +131,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
-        // The Travels & Deaths card's body (World PR 1, docs/Themes.md theme 6 — this
-        // card is the theme's ThemeCardKey="misc" slot; the theme card shell itself is
-        // PR 3's work). One instance, built here the way the Motes card below is.
+        // The Travels tab's body; WorldThemeCard.Build below reads this same instance.
         _travelsView = new TravelsView(this);
-        MiscBody.Content = _travelsView.Body;
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -188,6 +185,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             unlockCounts: () => QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes),
             popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
             bringWindowForward: () => _questsWindow?.Activate(),
+            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+        _worldCard = WorldThemeCard.Build(   // World PR 3: Travels Full, Map/Camps/Path Glance
+            MiscSection, MiscBody, MiscPopOut, _worldHost,
+            newTravels: () => _travelsView, currentZone: () => CurrentZoneName,
+            runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
+            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate(),
             bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
 
         BuildSortStrips();
@@ -2137,6 +2140,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal ThemeCardView<LootTab> _lootCard = null!;
     internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
     internal ThemeCardView<QuestTab> _questsCard = null!;
+    internal readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultInlineTab);   // World PR 3
+    internal ThemeCardView<WorldTab> _worldCard = null!;
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -2746,7 +2751,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _killsCard.Render(s);
         _lootCard.Render(s);
         _questsCard.Render(s);
-        MiscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
+        _worldCard.Render(s);
+        MiscHeader.Text = WorldSurface.LauncherSummary(zone: CurrentZoneName,   // counts, never countdowns
+            zonesVisited: s.Zones.Count, deaths: s.Deaths.Count,
+            runningTimers: _spawnTimers.Snapshot(DateTime.Now).Count);
         ApplySessionSubsections();
 
         // Perf audit #1: identical content was re-rendered every tick — hundreds of
@@ -2859,8 +2867,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // formatter, so the card, the theme and the phone cannot report three answers
         // (#210's rule). Blank until something drops.
         MotesHeader.Text = ProgressTheme.MoteRate(s) ?? "";
-
-        if (MiscSection.IsExpanded) _travelsView.Render(s);
         }   // end fullRender gate
 
         RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
@@ -3544,7 +3550,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         yield return ("hps", StarHps);
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
-        yield return ("deaths", StarDeaths);
         yield return ("buffs", StarBuffs);
     }
 
@@ -4474,36 +4479,30 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
     }
 
-
-    // ---- the WORLD theme: Map, Camps, Path, Travels (World PR 2, docs/Themes.md theme 6) ----
-    // Replaces the three separate windows this section used to hold (MapWindow,
-    // SpawnsWindow, TravelWindow — all deleted this PR) plus the "Drop camp marker" cog
-    // entry, which is now a chrome button inside WorldWindow itself.
-
-    // internal (not private), same reason as _questsWindow/_progressWindow: WidgetDump
-    // reads DebugFacts() off this for the EQBUDDY_EXPAND dump.
+    // ---- the WORLD theme: Map, Camps, Path, Travels (docs/Themes.md theme 6) ----
+    // internal (not private): WidgetDump reads DebugFacts() off this.
     internal WorldWindow? _worldWindow;
 
     private void OnWorldWindow(object sender, RoutedEventArgs e) => ShowWorldWindow();
 
-    /// <summary>Open (or front) the World window, optionally on a named tab and/or a
-    /// specific spawn zone (the zone whose kill used to pop <c>SpawnsWindow</c> on its
-    /// own — <c>EQBUDDY_SPAWNS=&lt;zone&gt;</c> still reaches it). Re-opening on the Map
-    /// tab re-probes: a zone whose map wasn't found (pack unzipped since?) must not stay a
-    /// cached failure just because the window object lived on.</summary>
+    // Host learns the room first, card gives the body up — other themes' handshake (PR 3).
     internal void ShowWorldWindow(WorldTab? tab = null, string? spawnZone = null)
     {
+        _worldHost.OpenWindow(tab);
         if (_worldWindow is { IsLoaded: true })
         {
             if (tab is { } t) _worldWindow.SetTab(t);
-            else _worldWindow.MaybeRefresh(force: true);
+            _worldCard?.Sync();
             _worldWindow.Activate();
             return;
         }
         var w = new WorldWindow(this, spawnZone) { Owner = this };
-        w.Closed += (_, _) => { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; };
+        w.TabChanged += t2 => _worldHost.SelectTab(t2);
+        w.Closed += (_, _) =>
+            { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; _worldHost.WindowClosed(); _worldCard?.Sync(); };
         _worldWindow = w;
-        if (tab is { } t2) w.SetTab(t2);
+        _worldCard?.Sync();
+        if (tab is { } t3) w.SetTab(t3);
         w.Show();
     }
 

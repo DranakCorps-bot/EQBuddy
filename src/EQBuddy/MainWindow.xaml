@@ -666,18 +666,29 @@
                 <ContentControl x:Name="ProgressBody"/>
             </Expander>
 
-            <Expander x:Name="MiscSection" Style="{StaticResource Section}">
+            <!-- The WORLD theme (docs/Themes.md theme 6; World PR 3) — the fifth theme
+                 card, absorbing this card's own former self plus MapWindow/SpawnsWindow/
+                 TravelWindow (World PR 2). Card key stays "misc" (no settings migration);
+                 the TITLE becomes "World". Same Auto/*/Auto shape every theme card uses,
+                 so the title holds its size and the summary ellipsises. No star here —
+                 like Kills' and Progress', it moved into the theme's own window
+                 (WorldWindow's Travels tab, trap 20/26). -->
+            <Expander x:Name="MiscSection" Style="{StaticResource Section}"
+                      ToolTip="World — your zone map, camp timers, travel routes, deaths and zone markers. Expands in place; the arrow opens its window.">
                 <Expander.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Location" Text="Travels &amp; Deaths"/>
-                        <TextBlock x:Name="MiscHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 deaths"/>
-                        <ToggleButton x:Name="StarDeaths" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="deaths" Click="OnStarChanged" ToolTip="Show deaths in mini dashboard"/>
+                        <local:EqCardTitle Icon="Location" Text="World"/>
+                        <TextBlock x:Name="MiscHeader" Grid.Column="1" Style="{StaticResource StatValue}"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="{DynamicResource IndentM}"
+                                   TextTrimming="CharacterEllipsis" Text=""/>
+                        <ContentControl x:Name="MiscPopOut" Grid.Column="2"
+                                        VerticalAlignment="Center"/>
                     </Grid>
                 </Expander.Header>
                 <ContentControl x:Name="MiscBody"/>

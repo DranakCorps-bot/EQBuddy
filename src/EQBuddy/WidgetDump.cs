@@ -90,6 +90,15 @@ internal static class WidgetDump
                         : "questsInline=0 ") +
                     $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
+                    // The WORLD theme's placement (World PR 3) — same contract as the
+                    // three above: inline and windowOpen are never both 1, and the tab
+                    // keys are emitted only while the CARD owns the body.
+                    $"worldInline={(w._worldHost.IsInline ? 1 : 0)} " +
+                    $"worldWindowOpen={(w._worldHost.IsWindowOpen ? 1 : 0)} " +
+                    (w._worldHost.IsInline
+                        ? $"worldTab={WorldSurface.KeyFor(w._worldCard.SelectedTab)} " +
+                          $"worldTabs={w._worldCard.TabCount} "
+                        : "") +
                     // The Travels tab's body, lifted into TravelsView (World PR 1). Same
                     // keys (zones/deaths) the misc card always dumped, plus travelsMarkers
                     // (never pinned before this PR) — DebugFacts() carries all three.

@@ -1133,11 +1133,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // reach at all (#228, and MiniBarPresentation.Names carries the rest of that note).
         AddSection("motes", "motes", "Motes", _motesHeader,
             CardMotes.Body, "Show motes in mini dashboard");
-        // The Travels & Deaths card's body (World PR 1, docs/Themes.md theme 6 — this
-        // card is the theme's ThemeCardKey="misc" slot; the theme card shell itself is
-        // PR 3's work). One instance, built here like every other card's.
+        // The WORLD theme's card (World PR 3, docs/Themes.md theme 6). Card key stays
+        // "misc" (no settings migration); the title becomes "World". Travels is the Full
+        // room (this same TravelsView instance, built here like every other card's); Map,
+        // Camps and Path are Glance — no star in the header, like Kills/Progress: it
+        // moved into WorldWindow's own chrome (trap 20/26).
         _travelsView = new TravelsView(this);
-        AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, _travelsView.Body, "Show deaths in mini dashboard");
+        _worldCard = WorldThemeCard.Build(
+            Header("misc", "World", _miscHeader), _worldHost,
+            travels: () => _travelsView, currentZone: () => CurrentZoneName,
+            runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
+            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate());
+        _sections["misc"] = _worldCard;
+        ToolTip.SetTip(_sections["misc"],
+            "World - your zone map, camp timers, travel routes, deaths and zone markers. "
+            + "Expands in place; the arrow opens its window.");
         return _sectionsPanel;
     }
 
@@ -2091,7 +2101,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // UI.Shared so this build, the WPF widget and EQBuddy Mobile say the same thing
         // (#210: parity by shared module, never by feature list).
         _progressHeader.Text = ProgressTheme.LauncherSummary(s);
-        _miscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
+        _miscHeader.Text = WorldSurface.LauncherSummary(zone: CurrentZoneName,   // counts, never countdowns
+            zonesVisited: s.Zones.Count, deaths: s.Deaths.Count,
+            runningTimers: _spawnTimers.Snapshot(DateTime.Now).Count);
     }
 
     /// <summary>Paint a snapshot into the cards, without the timer-driven housekeeping
@@ -2246,7 +2258,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // window builds for itself and renders on its own tick — so the widget no longer
         // paints surfaces it does not host, and there is nothing left for a second host to
         // take. See IWidgetCard for why that is structural rather than tidy.
-        if (_sections["misc"].IsExpanded) _travelsView.Render(s);
+        _worldCard?.Render(s);
 
         if (_expandForTesting)
         {
@@ -2278,6 +2290,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         ? $"progressInline=1 progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
                           $"progressTabs={_progressCard.TabCount} "
                         : "progressInline=0 ") +
+                    // The WORLD theme's placement (World PR 3) — same contract as above.
+                    (_worldCard is { IsExpanded: true }
+                        ? $"worldInline=1 worldTab={WorldSurface.KeyFor(_worldCard.SelectedTab)} " +
+                          $"worldTabs={_worldCard.TabCount} "
+                        : "worldInline=0 ") +
                     // The Travels tab's body, lifted into TravelsView (World PR 1). Same
                     // keys (zones/deaths) this dump always carried, plus travelsMarkers,
                     // and the WORLD window's own facts (World PR 2 — replaces the three
@@ -3328,6 +3345,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private ThemeCardPanel<LootTab> _lootCard = null!;
     private readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
     private ThemeCardPanel<QuestTab> _questsCard = null!;
+    private readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultInlineTab);   // World PR 3
+    private ThemeCardPanel<WorldTab> _worldCard = null!;
 
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
@@ -3569,21 +3588,24 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private void OnWorldWindow(object? sender, EventArgs e) => ShowWorldWindow();
 
-    /// <summary>Open (or front) the World window, optionally on a named tab and/or a
-    /// specific spawn zone (the zone whose kill used to pop <c>SpawnsWindow</c> on its
-    /// own).</summary>
+    // Host learns the room first, card gives the body up — other themes' handshake (PR 3).
     internal void ShowWorldWindow(WorldTab? tab = null, string? spawnZone = null)
     {
+        _worldHost.OpenWindow(tab);
         if (_worldWindow is null)
         {
             var window = new WorldWindow(this, spawnZone);
+            window.TabChanged += t2 => _worldHost.SelectTab(t2);
             window.Closed += (_, _) =>
             {
                 if (ReferenceEquals(_worldWindow, window)) _worldWindow = null;
+                _worldHost.WindowClosed();
+                _worldCard?.Sync();
             };
             _worldWindow = window;
         }
         if (tab is { } t) _worldWindow.SetTab(t);
+        _worldCard?.Sync();
         _worldWindow.Show(this);
         _worldWindow.Activate();
     }
@@ -3653,6 +3675,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _stars["kills"] = star;
         UpdateStarVisuals();
         return [("kills", star, "Kills", tip)];
+    }
+
+    /// <summary>The mini-dashboard star the old Travels &amp; Deaths card header carried
+    /// (World PR 3) — same registration as the Kills star above: the ONLY writer
+    /// <c>MiniStats</c> has for "deaths" (trap 20/26), so it goes through the shared
+    /// <c>_stars</c>/<c>OnStarChanged</c> mechanism rather than a second one WorldWindow
+    /// would own on its own.</summary>
+    internal Button BuildDeathsStar()
+    {
+        const string tip = "Show deaths in mini dashboard";
+        var star = AppTheme.StarButton("deaths", tip);
+        star.Click += OnStarChanged;
+        _stars["deaths"] = star;
+        UpdateStarVisuals();
+        return star;
     }
 
     /// <summary>Open (or front) the Kills &amp; Drops window — the theme's two tabs, and the
