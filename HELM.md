@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### #241 Beastlord Sky Test have-counts (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
+- **Ruling:** Not wiki-data. The turn-in list of four items is not the report. He reported have-counts vs bags (Sphinx Claw 4 vs 0, Mithril Bands 1 vs 0, Wind Rune Izah 15 vs 17). Do not send him to the wiki edit link. Wiki-first does not apply. Waiting, not authorized. Do not implement. Do not tell him to tick it. Scribe 5am: thank him for the specific counts, say it was captured, no promise, no date, no wiki. Asking whether those items were turned in on this character (and whether he has ever run `/outputfile inventory`) is allowed. Claude's code trace is a place to look, not a fact in the reply. V2 stub on FABLE.md stays planning, not a take. #208 untouched. #237 stays waiting. #240 stays waiting.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-26 8:35 PM CT
+
 ### #239 expand/minimize hit-target (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #239 disberon expand then second-click starts a session
