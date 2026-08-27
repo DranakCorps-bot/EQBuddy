@@ -422,4 +422,51 @@ public class OutputfileAutoImportTests
         Assert.Equal(2, standings.Count);
         Assert.Equal("Dark Bargainers", standings[0].Name);
     }
+
+    /// <summary>The quest-ledger half of the SAME dump reconciles on the ingest thread,
+    /// separately from the gear half this class otherwise tests — <c>ImportInventory</c>
+    /// only folds that already-computed result into one report (#241). Both clauses can
+    /// be present at once: a dump can tick gear AND true up quest counts in the same
+    /// event.</summary>
+    [Fact]
+    public void QuestCountsTruedRidesTheSameReportAndUndoAsGear()
+    {
+        var settings = new AppSettings { GearChecklist = [] };
+        var dump = new InventoryFile.Snapshot(
+            "Dranak_freeport-Inventory.txt", new DateTime(2026, 8, 20, 18, 47, 0), []);
+        var questUndoCalled = false;
+        var questReconcile = (Trued: 3, Undo: (Action)(() => questUndoCalled = true));
+
+        var outcome = OutputfileAutoImport.ImportInventory(dump, settings, questReconcile);
+
+        Assert.Equal(3, outcome.QuestCountsTrued);
+        Assert.Contains("3 quest counts trued", outcome.Summary);
+        Assert.NotNull(outcome.Undo);
+
+        outcome.Undo!();
+        Assert.True(questUndoCalled);
+    }
+
+    /// <summary>No quest reconcile happened this time (a stale-watermark or empty-dump
+    /// no-op returns a null Undo) — the report must not offer an Undo button for a change
+    /// that never occurred, even though the gear half did tick something.</summary>
+    [Fact]
+    public void NoQuestUndoMeansOnlyTheGearUndoRuns()
+    {
+        var settings = new AppSettings
+        {
+            GearChecklist = [new GearChecklistItem { Slot = "HEAD", Item = "Crown of Narandi" }],
+        };
+        var dump = new InventoryFile.Snapshot(
+            "Dranak_freeport-Inventory.txt", new DateTime(2026, 8, 20, 18, 47, 0), [])
+        { Entries = [new InventoryFile.Entry("General1", "Crown of Narandi", 1)] };
+
+        var outcome = OutputfileAutoImport.ImportInventory(dump, settings, (0, null));
+
+        Assert.Equal(0, outcome.QuestCountsTrued);
+        Assert.DoesNotContain("quest count", outcome.Summary);
+        Assert.NotNull(outcome.Undo);   // the gear tick still needs one
+        outcome.Undo!();
+        Assert.False(settings.GearChecklist[0].Acquired);
+    }
 }

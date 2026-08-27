@@ -310,6 +310,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         QuestLedger = new QuestLedgerStore(AppPaths.File("quest-ledger.json"))
         { TrackFilter = QuestCatalog.IsTurnInItem, Normalize = QuestCatalog.BaseItemName };
         _stats.QuestStore = QuestLedger;
+        // Reconcile seam (#241): the ingest asks for the dump's snapshot only when the
+        // announced file is actually an inventory dump — same finder InventoryFile has
+        // always used, so this creates no second reader.
+        _stats.InventoryDumpResolver = fileName =>
+            OutputfileAutoImport.KindOf(fileName) == OutputfileKind.Inventory
+                ? InventoryFile.FindLatest(_settings.LogFolder, Identity.Character)
+                : null;
         _watcher = new LogWatcher(_stats);
         _watcher.Mez = _mezTracker;
         _watcher.Slow = _slowTracker;
@@ -4421,7 +4428,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 var dump = InventoryFile.FindLatest(_settings.LogFolder, Identity.Character);
                 if (dump is null) return;
                 _inventory = dump;
-                LastInventoryImport = OutputfileAutoImport.ImportInventory(dump, _settings);
+                // The quest-ledger half of this same dump already ran on the ingest
+                // thread (SessionStats' OutputfileEvent case, #241) — folded into one
+                // report rather than a second surface for the same announcement.
+                LastInventoryImport = OutputfileAutoImport.ImportInventory(
+                    dump, _settings, _stats.LastQuestReconcile);
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
                 // The Inventory tab IS this file — tell an open window to repaint on

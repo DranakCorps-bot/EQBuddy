@@ -190,6 +190,19 @@ public sealed partial class SessionStats
     /// rides AA purchases (QUEST-*; the UI wires catalog + path).</summary>
     public QuestLedgerStore? QuestStore { get; set; }
 
+    /// <summary>Resolves an announced dump's file name to its parsed inventory snapshot,
+    /// or null when the file isn't an inventory dump (or can't be read) — the host wires
+    /// this beside <see cref="QuestStore"/> so the ingest can reconcile the quest ledger
+    /// (#241) without SessionStats knowing about the log folder or the file system.</summary>
+    public Func<string, InventoryFile.Snapshot?>? InventoryDumpResolver { get; set; }
+
+    /// <summary>What the most recent <see cref="InventoryDumpResolver"/>-driven reconcile
+    /// did, for the host's UI-thread <c>OutputfileEvent</c> handler to fold into the report
+    /// it already builds for the Gear surface — set synchronously before
+    /// <see cref="OutputfileWritten"/> fires, so a `BeginInvoke`/`Post` subscriber always
+    /// sees this call's result, not a later one's.</summary>
+    public (int Trued, Action? Undo)? LastQuestReconcile { get; private set; }
+
     /// <summary>Optional spell-stacking ledger, fed from blocked-cast lines the same
     /// way — its own time high-water mark keeps the startup replay idempotent.</summary>
     public StackingLedgerStore? StackingStore { get; set; }
@@ -839,8 +852,16 @@ public sealed partial class SessionStats
                         _spells.Learn(h.Spell, h.OverTime ? SpellCategory.HealOverTime : SpellCategory.Heal);
                     break;
                 case OutputfileEvent dump:
-                    // Nothing to aggregate — the dump is a FILE, not a stat. This only
-                    // forwards the announcement to whoever can read it.
+                    // Reconciled HERE, in ingest order — not on the UI-thread handler this
+                    // event also reaches. A loot line seconds after the dump must land
+                    // AFTER the reconcile and survive; doing this on a BeginInvoke/Post hop
+                    // would let it race ahead and get zeroed (#241).
+                    if (!StoresSuppressed && QuestStore is not null
+                        && InventoryDumpResolver?.Invoke(dump.FileName) is { } snap)
+                        LastQuestReconcile = QuestStore.ReconcileInventory(
+                            AaCharacterKey, snap.Counts, snap.WrittenAt);
+                    // Nothing else to aggregate — the dump is a FILE, not a stat. This
+                    // forwards the announcement to whoever can read it (gear, achievements).
                     OutputfileWritten?.Invoke(dump);
                     break;
                 case ConsiderEvent con:

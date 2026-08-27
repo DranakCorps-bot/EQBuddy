@@ -292,6 +292,143 @@ public class QuestTrackerTests : IDisposable
         Assert.Equal(1, reloaded.For("dranak_freeport")["Crushbone Belt"].Looted);
     }
 
+    // ---- inventory reconcile (#241) ----
+
+    /// <summary>The reporter's own numbers, verbatim: showing 4 Sphinx Claws held when
+    /// he had none, one Mithril Bands when he had zero, and 15 Wind Rune Izah instead of
+    /// his 17 — a log tally can't see a hand-in or off-log acquisition; the dump can. If
+    /// this test's name stops mentioning #241, write it again.</summary>
+    [Fact]
+    public void DasGud241TripleReconcilesLootedToTheDump()
+    {
+        var store = Store();
+        store.RecordLoot("dasgud_legends", "Sphinx Claw", 4, T0);
+        store.RecordLoot("dasgud_legends", "Mithril Bands", 1, T0);
+        store.RecordLoot("dasgud_legends", "Wind Rune Izah", 15, T0);
+
+        var (trued, _) = store.ReconcileInventory("dasgud_legends",
+            new Dictionary<string, int> { ["Wind Rune Izah"] = 17 }, T0.AddMinutes(10));
+
+        var owned = store.For("dasgud_legends");
+        Assert.Equal(0, owned["Sphinx Claw"].Total);
+        Assert.Equal(0, owned["Mithril Bands"].Total);
+        Assert.Equal(17, owned["Wind Rune Izah"].Total);
+        Assert.Equal(17, owned["Wind Rune Izah"].Verified);
+        Assert.Equal(0, owned["Wind Rune Izah"].Looted);
+        Assert.Equal(3, trued);   // all three counts actually changed
+    }
+
+    [Fact]
+    public void PreDumpLootIsSquaredPostDumpLootSurvivesAndReplayIsIdempotent()
+    {
+        var store = Store();
+        var counts = new Dictionary<string, int> { ["Wind Rune Izah"] = 2 };
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 5, T0);              // pre-dump
+        store.ReconcileInventory("dranak_legends", counts, T0.AddMinutes(1));
+        Assert.Equal(2, store.For("dranak_legends")["Wind Rune Izah"].Total);
+
+        // Ingest order: a loot line whose log time is AFTER the dump lands after the
+        // reconcile call and survives untouched.
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 1, T0.AddMinutes(2));
+        Assert.Equal(3, store.For("dranak_legends")["Wind Rune Izah"].Total);
+
+        // The launch replay re-offers the identical event sequence — nothing moves.
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 5, T0);
+        var (trued, _) = store.ReconcileInventory("dranak_legends", counts, T0.AddMinutes(1));
+        Assert.Equal(0, trued);
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 1, T0.AddMinutes(2));
+        Assert.Equal(3, store.For("dranak_legends")["Wind Rune Izah"].Total);
+    }
+
+    [Fact]
+    public void AnOlderDumpThanTheWatermarkIsANoOp()
+    {
+        var store = Store();
+        store.ReconcileInventory("dranak_legends",
+            new Dictionary<string, int> { ["Wind Rune Izah"] = 5 }, T0.AddMinutes(10));
+
+        var (trued, undo) = store.ReconcileInventory("dranak_legends",
+            new Dictionary<string, int> { ["Wind Rune Izah"] = 99 }, T0.AddMinutes(5));
+
+        Assert.Equal(0, trued);
+        Assert.Null(undo);
+        Assert.Equal(5, store.For("dranak_legends")["Wind Rune Izah"].Total);
+    }
+
+    /// <summary>The SetUnlockedClasses precedent: a dump that failed to parse must not
+    /// erase what the ledger already knew.</summary>
+    [Fact]
+    public void AnEmptyDumpIsANoOpAndDoesNotEraseKnownCounts()
+    {
+        var store = Store();
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 3, T0);
+
+        var (trued, undo) = store.ReconcileInventory(
+            "dranak_legends", new Dictionary<string, int>(), T0.AddMinutes(1));
+
+        Assert.Equal(0, trued);
+        Assert.Null(undo);
+        Assert.Equal(3, store.For("dranak_legends")["Wind Rune Izah"].Total);
+    }
+
+    /// <summary>Post-reconcile Looted is zero, so a hand-in has to be able to lower the
+    /// VERIFIED count or the ✔ becomes a no-op the moment a dump has run — the clamp
+    /// this test guards used to be <c>-Looted</c> alone.</summary>
+    [Fact]
+    public void ATurnInAfterAReconcileCanLowerAVerifiedCount()
+    {
+        var store = Store();
+        store.ReconcileInventory("dranak_legends",
+            new Dictionary<string, int> { ["Wind Rune Izah"] = 4 }, T0);
+
+        var needs = new[] { new QuestItemNeed { Name = "Wind Rune Izah", Qty = 1 } };
+        store.RecordCompletion("dranak_legends",
+            "Beastlord Sky Test: Windhowl/Spirit Render", needs);
+
+        Assert.Equal(3, store.For("dranak_legends")["Wind Rune Izah"].Total);
+    }
+
+    [Fact]
+    public void UndoRestoresThePriorEntriesAndTheWatermark()
+    {
+        var store = Store();
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 5, T0);
+        var counts = new Dictionary<string, int> { ["Wind Rune Izah"] = 2 };
+
+        var (trued, undo) = store.ReconcileInventory("dranak_legends", counts, T0.AddMinutes(1));
+        Assert.Equal(1, trued);
+        Assert.NotNull(undo);
+
+        undo!();
+        var entry = store.For("dranak_legends")["Wind Rune Izah"];
+        Assert.Equal(5, entry.Looted);
+        Assert.Equal(0, entry.Verified);
+        Assert.Equal(5, entry.Total);
+
+        // The watermark is restored too — the same dump can be reconciled again.
+        var (trued2, _) = store.ReconcileInventory("dranak_legends", counts, T0.AddMinutes(1));
+        Assert.Equal(1, trued2);
+    }
+
+    /// <summary>The union is "admitted dump items" ∪ "existing entries" — a dump item the
+    /// filter has never admitted does not get a new tracked entry, but an existing tracked
+    /// item still gets squared even though the dump didn't mention this second item at
+    /// all.</summary>
+    [Fact]
+    public void ReconcileOnlyAdmitsNewItemsTheFilterAllowsButStillZeroesExistingOnes()
+    {
+        var store = new QuestLedgerStore(_path) { TrackFilter = i => i == "Wind Rune Izah" };
+        store.RecordLoot("dranak_legends", "Wind Rune Izah", 2, T0);
+
+        store.ReconcileInventory("dranak_legends",
+            new Dictionary<string, int> { ["Wind Rune Izah"] = 2, ["Rat Whiskers"] = 40 },
+            T0.AddMinutes(1));
+
+        var owned = store.For("dranak_legends");
+        Assert.False(owned.ContainsKey("Rat Whiskers"));
+        Assert.Equal(2, owned["Wind Rune Izah"].Verified);
+    }
+
     [Fact]
     public void UpgradeTiersFoldToTheBaseItem()
     {

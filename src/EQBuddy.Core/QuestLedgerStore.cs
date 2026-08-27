@@ -30,7 +30,17 @@ public sealed class QuestLedgerStore
         /// become one). Hand-ins still aren't logged — that stays the ✔ click.</summary>
         public int Consumed { get; set; }
         public DateTime LastTime { get; set; }
-        public int Total => Math.Max(0, Looted + Manual - Consumed);
+        /// <summary>What the player's own <c>/outputfile inventory</c> dump said this
+        /// character held, as of <see cref="VerifiedAt"/> (#241, DasGud) — the game's own
+        /// statement of possession, strictly better information than a log tally that
+        /// cannot see hand-ins. Set only by <see cref="ReconcileInventory"/>, which zeroes
+        /// <see cref="Looted"/>, <see cref="Manual"/> and <see cref="Consumed"/> in the same
+        /// stroke: the dump supersedes everything derived before it, not just this field.</summary>
+        public int Verified { get; set; }
+        /// <summary>When the dump behind <see cref="Verified"/> was written — 0001-01-01
+        /// (default) means never reconciled.</summary>
+        public DateTime VerifiedAt { get; set; }
+        public int Total => Math.Max(0, Verified + Looted + Manual - Consumed);
     }
 
     /// <summary>One character's slice: owned items plus the quests they chose to 📌-track
@@ -61,6 +71,12 @@ public sealed class QuestLedgerStore
         /// seen. The log states the number only at the ding itself, so the level-unlock
         /// preview needs this to survive restarts (and log truncation).</summary>
         public int Level { get; set; }
+
+        /// <summary>The <c>writtenAt</c> of the last inventory dump reconciled onto this
+        /// character — the watermark <see cref="ReconcileInventory"/> checks so a replayed
+        /// or repeated announcement (launch replay, a second `/outputfile inventory` with
+        /// nothing new) is a no-op rather than a second reset. 0001-01-01 = never.</summary>
+        public DateTime LastInventoryReconcile { get; set; }
     }
 
     private readonly string _path;
@@ -157,6 +173,7 @@ public sealed class QuestLedgerStore
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         Level = kv.Value.Level,
+                        LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
                 StringComparer.OrdinalIgnoreCase);
     }
@@ -194,11 +211,98 @@ public sealed class QuestLedgerStore
         }
     }
 
+    /// <summary>Square this character's ledger against their own <c>/outputfile
+    /// inventory</c> dump (#241, DasGud: a Sky reward showed 4 Sphinx Claws held when he
+    /// had none, and 15 Izah runes instead of 17, because the log never sees a hand-in
+    /// or off-log acquisition — the dump is the game's own statement of what remains).
+    ///
+    /// Reconciles the STORE, not the readers: every dump item the <see cref="TrackFilter"/>
+    /// admits, plus every item this character already tracks, is squared to what the dump
+    /// says — present = its count, absent = zero — and <see cref="Entry.Looted"/>,
+    /// <see cref="Entry.Manual"/> and <see cref="Entry.Consumed"/> all reset to zero,
+    /// because the dump supersedes everything derived before it. A Manual count meaning "my
+    /// mule holds two" is truthfully wrong about what THIS character carries, and the dump
+    /// wins — the cost is one +1 click if that was ever a real statement.
+    ///
+    /// Idempotent by a per-character watermark: a <paramref name="writtenAt"/> at or before
+    /// the last reconcile is a no-op, so the launch replay (which re-offers the same
+    /// <c>OutputfileEvent</c> every restart) and a re-announced dump cannot re-apply. An
+    /// empty <paramref name="counts"/> is also a no-op — a dump that failed to parse must
+    /// not erase what the ledger already knew (the <see cref="SetUnlockedClasses"/>
+    /// precedent).
+    ///
+    /// Call this from the ingest, at the <c>OutputfileEvent</c> case, in log order — never
+    /// from a UI-thread hop. In ingest order a loot line seconds after the announcement
+    /// lands AFTER this call and survives untouched; everything logged before the dump is
+    /// squared by it, and the launch replay reproduces the identical sequence.</summary>
+    public (int Trued, Action? Undo) ReconcileInventory(
+        string characterKey, IReadOnlyDictionary<string, int> counts, DateTime writtenAt)
+    {
+        if (characterKey.Length == 0 || counts.Count == 0) return (0, null);
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            if (writtenAt <= c.LastInventoryReconcile) return (0, null);
+
+            var union = new HashSet<string>(
+                counts.Keys.Where(TrackFilter), StringComparer.OrdinalIgnoreCase);
+            foreach (var key in c.Items.Keys) union.Add(key);
+
+            var priorWatermark = c.LastInventoryReconcile;
+            var before = new Dictionary<string, Entry>(StringComparer.OrdinalIgnoreCase);
+            var trued = 0;
+            foreach (var item in union)
+            {
+                var entry = EntryFor(characterKey, item);
+                var verified = counts.TryGetValue(item, out var n) ? n : 0;
+                var totalBefore = entry.Total;
+                var changed = entry.Verified != verified || entry.Looted != 0
+                    || entry.Manual != 0 || entry.Consumed != 0 || entry.VerifiedAt != writtenAt;
+                if (!changed) continue;
+
+                before[item] = new Entry
+                {
+                    Verified = entry.Verified, Looted = entry.Looted, Manual = entry.Manual,
+                    Consumed = entry.Consumed, LastTime = entry.LastTime, VerifiedAt = entry.VerifiedAt,
+                };
+                entry.Verified = verified;
+                entry.Looted = 0;
+                entry.Manual = 0;
+                entry.Consumed = 0;
+                entry.VerifiedAt = writtenAt;
+                if (writtenAt > entry.LastTime) entry.LastTime = writtenAt;
+                if (entry.Total != totalBefore) trued++;
+            }
+            c.LastInventoryReconcile = writtenAt;
+            Save();
+
+            Action? undo = before.Count == 0 ? null : () =>
+            {
+                lock (_lock)
+                {
+                    foreach (var (item, prior) in before)
+                    {
+                        var entry = EntryFor(characterKey, item);
+                        entry.Verified = prior.Verified;
+                        entry.Looted = prior.Looted;
+                        entry.Manual = prior.Manual;
+                        entry.Consumed = prior.Consumed;
+                        entry.LastTime = prior.LastTime;
+                        entry.VerifiedAt = prior.VerifiedAt;
+                    }
+                    c.LastInventoryReconcile = priorWatermark;
+                    Save();
+                }
+            };
+            return (trued, undo);
+        }
+    }
+
     /// <summary>Set the manual adjustment: positive = "already had these before EQBuddy",
-    /// negative = a hand-in offset against the looted history (clamped so Total never
-    /// goes below zero — you can't owe the ledger items). Zero removes an entry with no
-    /// looted history. Manual entries bypass the filter — the user typing a name is its
-    /// own statement of relevance.</summary>
+    /// negative = a hand-in offset against the looted (and, since #241, verified) history
+    /// — clamped so Total never goes below zero, you can't owe the ledger items. Zero
+    /// removes an entry with no looted or verified history. Manual entries bypass the
+    /// filter — the user typing a name is its own statement of relevance.</summary>
     public void SetManual(string characterKey, string item, int count)
     {
         item = Normalize(item);
@@ -206,8 +310,8 @@ public sealed class QuestLedgerStore
         lock (_lock)
         {
             var entry = EntryFor(characterKey, item.Trim());
-            entry.Manual = Math.Max(count, -entry.Looted);
-            if (entry is { Manual: 0, Looted: 0 })
+            entry.Manual = Math.Max(count, -(entry.Verified + entry.Looted));
+            if (entry is { Manual: 0, Looted: 0, Verified: 0 })
                 _byCharacter[characterKey].Items.Remove(item.Trim());
             Save();
         }
@@ -223,6 +327,7 @@ public sealed class QuestLedgerStore
                     {
                         Looted = kv.Value.Looted, Manual = kv.Value.Manual,
                         Consumed = kv.Value.Consumed, LastTime = kv.Value.LastTime,
+                        Verified = kv.Value.Verified, VerifiedAt = kv.Value.VerifiedAt,
                     },
                     StringComparer.OrdinalIgnoreCase)
                 : new(StringComparer.OrdinalIgnoreCase);
@@ -297,7 +402,7 @@ public sealed class QuestLedgerStore
             foreach (var item in consume)
             {
                 var entry = EntryFor(characterKey, item.Name);
-                entry.Manual = Math.Max(entry.Manual - item.Qty, -entry.Looted);
+                entry.Manual = Math.Max(entry.Manual - item.Qty, -(entry.Verified + entry.Looted));
             }
             c.Completed[questName] = c.Completed.TryGetValue(questName, out var n) ? n + 1 : 1;
             Save();
