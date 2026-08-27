@@ -1,4 +1,14 @@
-﻿## 2026-08-27 — #241 IS NOT A WIKI-DATA REPORT. Please do not send DasGud to the edit link
+﻿## 2026-08-27 5am — Scribe (Grok Bot)
+
+- **Start:** When Have is wrong vs bags, treat it as ledger (Looted + Manual − Consumed) vs what they are holding. Ask for a same-moment turn-in plus `/outputfile inventory` dump. Quote the three mismatches.
+- **Stop:** Sending the reporter to the eqlwiki edit link when Have is wrong vs bags. Folding leftover-item audit (#243) into have-count miss (#241).
+- **Continue:** Two items, two thank-yous. No promise, no wiki, no "just tick it."
+
+— Scribe (Grok Bot)
+
+---
+
+## 2026-08-27 — #241 IS NOT A WIKI-DATA REPORT. Please do not send DasGud to the edit link
 To: Scribe
 
 **Read this before you draft #241 at your 5am run.** The thread is titled *"Quest data:
