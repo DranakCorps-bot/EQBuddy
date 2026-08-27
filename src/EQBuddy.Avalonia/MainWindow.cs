@@ -414,6 +414,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             },
             QuestLedger = QuestLedger,
             QuestCharacterKey = () => QuestCharacterKey,
+            // World PR 4: the Path tab reads the SAME ZoneGraph the desktop's Path tab
+            // and TravelPlan read, and "Drop camp marker" from a phone calls the same
+            // method the World window's own chrome button does.
+            ZoneGraph = ZoneGraph,
+            DropMarker = DropCampMarker,
         };
         _companion = new EQBuddy.Companion.CompanionHost(
             _settings, UpdateChecker.CurrentVersion.ToString(), CompanionSources);

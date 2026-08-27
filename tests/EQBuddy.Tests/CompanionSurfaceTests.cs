@@ -377,7 +377,7 @@ public class CompanionSurfaceTests
         var snap = Build(new CompanionInputs
         {
             Theme = CompanionTheme.Project("ParchmentBrass", EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
-            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", geometry, null, null, [], [], []),
+            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", geometry, null, null, [], [], [], []),
         });
         var state = new CompanionClientState();
 
@@ -413,7 +413,7 @@ public class CompanionSurfaceTests
             [new CompanionMapStroke("#AAAAAA", [0, 0, 10, 10])], [], false);
         var snap = Build(new CompanionInputs
         {
-            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", geometry, null, null, [], [], []),
+            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", geometry, null, null, [], [], [], []),
         });
         var state = new CompanionClientState();
 

@@ -17,6 +17,11 @@ public enum CompanionMapEdit
     ResetZone,
 }
 
+/// <summary>A destination pick from the phone's Path tab (World PR 4). Null/empty
+/// clears the picked destination rather than being rejected — the picker's own "clear"
+/// affordance, not an error.</summary>
+public sealed record CompanionTravelAction(string? Destination);
+
 /// <summary>A curation tap from a device. The point is named by its LOCATION, not an
 /// index: the archive re-clusters as kills land, so an index the phone read a second
 /// ago may already mean a different dot. The ledger resolves the nearest cluster, which
@@ -115,6 +120,17 @@ public static class CompanionActions
             default:
                 return false;
         }
+    }
+
+    /// <summary>Apply a destination pick to the same setting the desktop's Path tab
+    /// would need if it persisted one (World PR 4). False when nothing changed — no
+    /// save, no repaint, exactly like the settings overload above.</summary>
+    public static bool Apply(AppSettings settings, CompanionTravelAction action)
+    {
+        var wanted = string.IsNullOrWhiteSpace(action.Destination) ? null : action.Destination.Trim();
+        if (string.Equals(settings.CompanionTravelDestination, wanted, StringComparison.Ordinal)) return false;
+        settings.CompanionTravelDestination = wanted;
+        return true;
     }
 
     /// <summary>Apply a curation tap to the spawn-point archive. Returns the sentence

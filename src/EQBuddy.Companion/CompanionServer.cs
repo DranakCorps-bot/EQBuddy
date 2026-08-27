@@ -94,6 +94,16 @@ public sealed class CompanionServer : IDisposable
     /// the desktop's own tick, never on this thread.</summary>
     public event Action<CompanionMapAction>? MapActionReceived;
 
+    /// <summary>Raised when a device picks (or clears) a Path-tab destination (World
+    /// PR 4). Same queue-and-apply-on-tick contract as the two above.</summary>
+    public event Action<CompanionTravelAction>? TravelActionReceived;
+
+    /// <summary>Raised when a device taps "Drop camp marker" (World PR 4) — the same
+    /// action the desktop's World window chrome offers on every tab. No payload: the
+    /// marker is dropped at wherever the log currently says the player is, exactly as
+    /// the desktop button does.</summary>
+    public event Action? MarkerDropReceived;
+
     /// <summary>The machine's LAN IPv4s: up interfaces, skipping loopback and
     /// link-local (169.254 — an address that means "no network"). Ordered by
     /// <see cref="LanAddressRank"/>, so BoundAddresses[0] is the one to print on the QR.
@@ -541,6 +551,12 @@ public sealed class CompanionServer : IDisposable
     /// "locY":…,"locX":…} — the desktop map's right-click, arriving from a tablet.
     /// Same deal: an event for the host, applied on the tick, never on this thread.
     ///
+    /// {"kind":"travel","destination":"…"} — the Path tab's destination picker
+    /// (World PR 4); an absent/empty destination clears the pick.
+    ///
+    /// {"kind":"dropMarker"} — the Path/Travels tab's "Drop camp marker" button
+    /// (World PR 4); no payload, same action the desktop's World window chrome offers.
+    ///
     /// Anything else, or anything unparseable, is ignored: a companion page bug must
     /// not kill the link.</summary>
     private async Task HandleClientMessageAsync(WsClient client, byte[] payload)
@@ -599,6 +615,20 @@ public sealed class CompanionServer : IDisposable
                     MapActionReceived?.Invoke(new CompanionMapAction(edit, zone, locY, locX));
                     return;
                 }
+                case "travel":
+                {
+                    // destination omitted or "" clears the pick — the picker's own
+                    // "clear" affordance, not a malformed message.
+                    var destination = doc.RootElement.TryGetProperty("destination", out var destEl)
+                        && destEl.ValueKind == System.Text.Json.JsonValueKind.String
+                        && destEl.GetString() is { Length: < 200 } d
+                        ? d : null;
+                    TravelActionReceived?.Invoke(new CompanionTravelAction(destination));
+                    return;
+                }
+                case "dropMarker":
+                    MarkerDropReceived?.Invoke();
+                    return;
             }
         }
         catch (System.Text.Json.JsonException) { /* garbage in, nothing out */ }

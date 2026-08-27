@@ -40,6 +40,8 @@ public static partial class CompanionProjection
             Theme = input.Theme,
             Map = On(CompanionSurfaces.Map) ? input.Map : null,
             Spawns = On(CompanionSurfaces.Spawns) ? new CompanionSpawnSection(BuildTimers(input.Timers, now)) : null,
+            Travel = On(CompanionSurfaces.Travel)
+                ? BuildTravel(input.ZoneGraph, stats?.CurrentZone ?? "", input.TravelDestination) : null,
             Mez = On(CompanionSurfaces.Mez) ? BuildMez(input.Mezzes, now) : null,
             Buffs = On(CompanionSurfaces.Buffs) ? BuildBuffs(input.BuffSets, input.BuffLosses, now) : null,
             Combat = On(CompanionSurfaces.Combat) ? BuildCombat(stats) : null,
@@ -78,6 +80,26 @@ public static partial class CompanionProjection
             AppVersion = appVersion,
             Offered = offered ?? [CompanionSurfaces.Spawns, CompanionSurfaces.Session],
         }, now);
+
+    /// <summary>The Path tab (World PR 4) — the SAME <see cref="TravelPlan"/> module the
+    /// desktop Path tab reads, so the phone cannot compute a different route (#210's
+    /// rule). No zone graph (a test host, or the surface built before one is wired)
+    /// still answers, with an empty zone list and "noroute".</summary>
+    private static CompanionTravelSection BuildTravel(ZoneGraph? graph, string from, string? destination)
+    {
+        if (graph is null)
+            return new CompanionTravelSection(from, destination, [], "noroute", 0, [],
+                "This copy of EQBuddy has no zone graph loaded.");
+        if (string.IsNullOrWhiteSpace(destination))
+            return new CompanionTravelSection(from, null, graph.Zones.ToList(), "noroute", 0, [],
+                "Pick a destination.");
+
+        var result = TravelPlan.Plan(graph, from, destination);
+        return new CompanionTravelSection(
+            from, destination, graph.Zones.ToList(),
+            result.Outcome.ToString().ToLowerInvariant(),
+            result.Hops, result.Path, result.Note);
+    }
 
     private static List<CompanionSpawnTimer> BuildTimers(IReadOnlyList<SpawnTimerState> timers, DateTime now)
     {
@@ -134,6 +156,15 @@ public static partial class CompanionProjection
         if (snap.Spawns is { } sp)
             map[CompanionSurfaces.Spawns] = Join(sp.Timers,
                 t => $"{t.Zone}/{t.Name}:{(t.Due ? 'D' : t.Imminent ? 'I' : '-')}:{t.DurationSeconds ?? -1}");
+
+        // Trap 8: no clock rides this key. The route recomputes from the CURRENT zone
+        // every tick (trap 38 says this surface must not go sticky), but its identity —
+        // whether it is worth re-sending to a subscribed device — is the from/destination/
+        // outcome/path, not "did a second pass". A zone change with the same destination
+        // legitimately changes this key, which is exactly the point.
+        if (snap.Travel is { } tr)
+            map[CompanionSurfaces.Travel] =
+                Fold(tr.From, tr.Destination ?? "", tr.Outcome, Join(tr.Path, p => p));
 
         if (snap.Mez is { } mz)
             map[CompanionSurfaces.Mez] = Join(mz.Chips, c => $"{c.Name}:{c.Warning}");

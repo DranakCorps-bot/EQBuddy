@@ -312,6 +312,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 },
                 QuestLedger = QuestLedger,
                 QuestCharacterKey = () => QuestCharacterKey,
+                ZoneGraph = ZoneGraph,   // World PR 4: Path tab reads the same graph TravelPlan does
+                DropMarker = DropCampMarker,
             });
         ThemeManager.PaletteApplied += _companion.SetTheme;
         _companion.SurfaceEdited += OnCompanionSurfaceEdited;

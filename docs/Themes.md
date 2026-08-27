@@ -165,7 +165,7 @@ one-release gap between them. Both windows are deleted on both builds.
 **Surface:** phone + desktop. This is where #174's approved features land — mob
 lookup, "what is this for?" from a loot row, upgrade preview at +N.
 
-### 6. World — **BUILT 2026-08-27 (PR 2)**
+### 6. World — **BUILT 2026-08-27 (PR 0-4, all lanes and the phone)**
 **Tabs:** Map · Camps · Path · Travels (Bevel-signed pre-design; "Path" rather than
 "Routes" so it stops reading as a near-synonym of "Travels")
 **Absorbs:** Travels & Deaths card, `MapWindow`, `SpawnsWindow`, `TravelWindow`,

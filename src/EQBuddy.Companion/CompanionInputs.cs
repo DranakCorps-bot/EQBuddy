@@ -40,6 +40,14 @@ public sealed record CompanionInputs
     /// cached by <see cref="CompanionMapSource"/> — never re-parsed per tick.</summary>
     public CompanionMapSection? Map { get; init; }
 
+    /// <summary>The embedded zone graph, for the Path tab's route (World PR 4) — the
+    /// SAME <see cref="EQBuddy.Core.TravelPlan"/> module the desktop Path tab reads.</summary>
+    public ZoneGraph? ZoneGraph { get; init; }
+
+    /// <summary>The Path tab's picked destination, held in settings (World PR 4) —
+    /// null/empty means nothing picked yet.</summary>
+    public string? TravelDestination { get; init; }
+
     /// <summary>The checklists live in settings, not in the snapshot.</summary>
     public AppSettings? Settings { get; init; }
 

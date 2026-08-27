@@ -537,6 +537,12 @@ public sealed class AppSettings
     /// the pairing window). Hidden-list idiom like <see cref="HiddenSections"/>:
     /// empty = everything offered, which is the default.</summary>
     public List<string> CompanionHiddenSurfaces { get; set; } = [];
+    /// <summary>The Travel surface's picked destination (World PR 4) — persisted so a
+    /// reconnecting device sees the same route rather than an empty picker. Session-only
+    /// in spirit (nobody needs yesterday's destination), but there is no cheaper place to
+    /// hold "what did the phone last ask for" than the settings file every other piece of
+    /// companion state already lives in.</summary>
+    public string? CompanionTravelDestination { get; set; }
 
     private static string FilePath => AppPaths.File("settings.json");
 

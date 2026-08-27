@@ -33,10 +33,15 @@ public static class CompanionSurfaces
     public const string Epics = "epics";
     public const string Sky = "sky";
     public const string Gear = "gear";
+    /// <summary>The WORLD theme's Path tab, on the phone (World PR 4). Deliberately a
+    /// SEPARATE surface from <see cref="Map"/> — the desktop folds Map/Camps/Path/Travels
+    /// into one window, but a tablet showing the map AND timers at once is the product's
+    /// uncontested ground, so the phone does NOT fold to match the desktop.</summary>
+    public const string Travel = "travel";
 
     /// <summary>All surfaces this build knows, in default display order.</summary>
     public static readonly IReadOnlyList<string> All =
-        [Map, Spawns, Mez, Buffs, Combat, Session, Loot, Progress, Quests, Gear];
+        [Map, Spawns, Travel, Mez, Buffs, Combat, Session, Loot, Progress, Quests, Gear];
 
     /// <summary>Human label for the desktop gate checkboxes (both UIs share it;
     /// the phone page carries its own copy in its SURFACE_META table).</summary>
@@ -44,6 +49,7 @@ public static class CompanionSurfaces
     {
         Map => "Zone map",
         Spawns => "Spawn timers",
+        Travel => "Travel route",
         Mez => "Mez chips",
         Buffs => "Buffs",
         Combat => "Damage, healing & pet",
@@ -61,6 +67,7 @@ public static class CompanionSurfaces
     {
         Map => "The zone's map picture, your last /loc marker, and your archived spawn points.",
         Spawns => "Named spawn countdowns for the zone you're in.",
+        Travel => "The destination you pick, and the hop-by-hop route there.",
         Mez => "Who's mezzed and how long is left.",
         Buffs => "Your buff set's state, and what you've lost this session.",
         Combat => "Ability breakdowns for damage, healing and your pet, last fight and session.",

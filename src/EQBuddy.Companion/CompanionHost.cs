@@ -48,6 +48,16 @@ public sealed record CompanionSources
     /// same store the desktop quest window writes.</summary>
     public QuestLedgerStore? QuestLedger { get; init; }
     public Func<string>? QuestCharacterKey { get; init; }
+
+    /// <summary>The embedded zone graph, for the Path tab's route (World PR 4) — the
+    /// SAME <see cref="EQBuddy.Core.TravelPlan"/> module the desktop Path tab reads.</summary>
+    public ZoneGraph? ZoneGraph { get; init; }
+
+    /// <summary>"Drop camp marker" from a device (World PR 4) — the same action the
+    /// desktop's World window chrome offers on every tab. Null means this host has no
+    /// session to drop a marker into (there always is one on the real app; tests may
+    /// leave it unwired).</summary>
+    public Action? DropMarker { get; init; }
 }
 
 /// <summary>
@@ -70,6 +80,8 @@ public sealed class CompanionHost : IDisposable
     private readonly CompanionMapSource _maps;
     private readonly ConcurrentQueue<CompanionAction> _actions = new();
     private readonly ConcurrentQueue<CompanionMapAction> _mapActions = new();
+    private readonly ConcurrentQueue<CompanionTravelAction> _travelActions = new();
+    private int _pendingMarkerDrops;
     private CompanionServer? _server;
     private CompanionThemeSection? _theme;
     /// <summary>The searchable quest index, built once from the immutable catalog on
@@ -245,6 +257,8 @@ public sealed class CompanionHost : IDisposable
             server.ClientsChanged += () => ClientsChanged?.Invoke();
             server.ActionReceived += action => _actions.Enqueue(action);
             server.MapActionReceived += action => _mapActions.Enqueue(action);
+            server.TravelActionReceived += action => _travelActions.Enqueue(action);
+            server.MarkerDropReceived += () => Interlocked.Increment(ref _pendingMarkerDrops);
             server.Start();
             _server = server;
             return true;
@@ -276,6 +290,8 @@ public sealed class CompanionHost : IDisposable
         // read when the queue is empty, which is every tick but a handful.
         if (!_actions.IsEmpty) DrainActions();
         if (!_mapActions.IsEmpty) DrainMapActions();
+        if (!_travelActions.IsEmpty) DrainTravelActions();
+        if (Interlocked.Exchange(ref _pendingMarkerDrops, 0) > 0) _sources.DropMarker?.Invoke();
         if (_server is not { ClientCount: > 0 } server) return; // zero cost while idle
 
         var offered = OfferedSurfaces;
@@ -314,8 +330,11 @@ public sealed class CompanionHost : IDisposable
                     Location = stats?.LastLocation,
                     Trail = stats?.LocationTrail,
                     CampFor = _sources.CampFor,
+                    Markers = stats?.Markers,
                 }, now)
                 : null,
+            ZoneGraph = On(CompanionSurfaces.Travel) ? _sources.ZoneGraph : null,
+            TravelDestination = _settings.CompanionTravelDestination,
             Level = progress?.Level,
             Unlocks = progress?.Unlocks,
             UnlockClasses = progress?.Classes ?? [],
@@ -417,6 +436,24 @@ public sealed class CompanionHost : IDisposable
         // The ledger owns its own persistence; what the desktop needs is the cue to
         // repaint the map card, exactly as a checklist tap gets one.
         if (touched) SurfaceEdited?.Invoke(CompanionSurfaces.Map);
+    }
+
+    /// <summary>Apply the destination picks devices made (World PR 4). On the tick
+    /// thread, same as every other write path here.</summary>
+    private void DrainTravelActions()
+    {
+        var touched = false;
+        while (_travelActions.TryDequeue(out var action))
+        {
+            try
+            {
+                if (CompanionActions.Apply(_settings, action)) touched = true;
+            }
+            catch (Exception ex) { CoreLog.Error(ex); }
+        }
+        if (!touched) return;
+        _settings.Save();
+        SurfaceEdited?.Invoke(CompanionSurfaces.Travel);
     }
 
     /// <summary>128 crypto-random bits as lowercase hex — long enough that guessing

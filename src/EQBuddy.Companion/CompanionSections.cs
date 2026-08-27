@@ -49,7 +49,20 @@ public sealed record CompanionMapSection(
     CompanionMapMarker? You,
     IReadOnlyList<CompanionMapCircle> Circles,
     IReadOnlyList<CompanionMapCrumb> Trail,
-    IReadOnlyList<CompanionMapNamed> Named);
+    IReadOnlyList<CompanionMapNamed> Named,
+    /// <summary>Session camp markers (World PR 4) — "Drop camp marker"'s output, at
+    /// last. Desktop-dropped and phone-dropped markers land on the same list, since both
+    /// write the same <c>SessionStats.AddMarker</c>. Empty (not null) when nothing has
+    /// been dropped, or when a marker exists but carries no location (dropped before the
+    /// first /loc) — that marker still shows on the Travels list, it just plants no pin
+    /// here, exactly as a named with no camp yet gets a row but no dot.</summary>
+    IReadOnlyList<CompanionMapPin> Markers);
+
+/// <summary>One dropped camp marker, plotted. <see cref="AgeSeconds"/> rides the wire
+/// rather than a label already worded ("3m ago") for the same reason
+/// <see cref="CompanionMapMarker.AgeSeconds"/> does — the page ticks it locally, so a
+/// marker sitting on screen for an hour does not need an hourly re-push to stay honest.</summary>
+public sealed record CompanionMapPin(double X, double Y, string Text, double AgeSeconds);
 
 /// <summary>Map-space geometry. Coordinates are rounded to whole map units (roughly
 /// game feet) — the pack's sub-unit precision is invisible on a phone and doubles the
@@ -120,6 +133,29 @@ public sealed record CompanionMapCircle(
     int Kills,
     string Mobs,
     double LocY, double LocX);
+
+// ---------------- travel ----------------
+
+/// <summary>
+/// The Path tab on a phone (World PR 4) — the SAME <see cref="EQBuddy.Core.TravelPlan"/>
+/// module the desktop's Path tab reads, so the two cannot compute different routes for
+/// one destination (#210's rule). Resent in full every tick rather than riding the map's
+/// sticky-payload machinery (trap 38): a route is a few dozen zone names at most, and it
+/// must never go stale the way a withheld map geometry silently can.
+/// </summary>
+public sealed record CompanionTravelSection(
+    string From,
+    string? Destination,
+    /// <summary>Every zone the embedded ZoneGraph knows, for the destination picker.</summary>
+    IReadOnlyList<string> Zones,
+    /// <summary><see cref="EQBuddy.Core.TravelOutcome"/> lowercased — "route" /
+    /// "alreadythere" / "noroute" — the same semantic-flag convention
+    /// <see cref="CompanionBuffRow.Status"/> uses, so the page colors it rather than the
+    /// server inventing a color here.</summary>
+    string Outcome,
+    int Hops,
+    IReadOnlyList<string> Path,
+    string Note);
 
 // ---------------- mez ----------------
 

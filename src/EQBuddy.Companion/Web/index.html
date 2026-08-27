@@ -488,6 +488,7 @@ const PROTOCOL = 3;
 const SURFACE_META = {
   map:      { label: "Zone map", wide: true, fills: true },
   spawns:   { label: "Spawn timers" },
+  travel:   { label: "Travel route" },
   mez:      { label: "Mez chips" },
   buffs:    { label: "Buffs" },
   combat:   { label: "Damage, healing & pet" },
@@ -701,6 +702,16 @@ function boot() {
   function sendCurate(edit, zone, locY, locX) {
     if (!ws || ws.readyState !== 1) { notice("Not connected to the PC — that edit didn't go through."); return; }
     ws.send(JSON.stringify({ kind: "curate", edit: edit, zone: zone, locY: locY, locX: locX }));
+  }
+  // World PR 4 — the Path tab's destination pick (empty clears it) and the "Drop camp
+  // marker" button, the same two actions the desktop's World window chrome offers.
+  function sendTravel(destination) {
+    if (!ws || ws.readyState !== 1) { notice("Not connected to the PC — that pick didn't go through."); return; }
+    ws.send(JSON.stringify({ kind: "travel", destination: destination || "" }));
+  }
+  function sendDropMarker() {
+    if (!ws || ws.readyState !== 1) { notice("Not connected to the PC — the marker wasn't dropped."); return; }
+    ws.send(JSON.stringify({ kind: "dropMarker" }));
   }
   connect();
 
@@ -980,6 +991,54 @@ function boot() {
     }
     p.head.textContent = data.timers.length + " running";
     p.body.replaceChildren(ul);
+  }
+
+  // ---------- travel (World PR 4) ----------
+  // Deliberately its own surface, never folded into the map — a tablet showing the
+  // map AND a route at once is the product's uncontested ground (docs/Themes.md
+  // theme 6). Reads the same EQBuddy.Core.TravelPlan module the desktop's Path tab
+  // does; this only draws the words the PC already worked out.
+  function renderTravel(p, data) {
+    const wrap = el("div", "travel");
+
+    const pickRow = el("div", "row");
+    const pick = el("select");
+    const blank = el("option", null, "Pick a destination…");
+    blank.value = "";
+    pick.appendChild(blank);
+    for (const z of data.zones) {
+      const opt = el("option", null, z);
+      opt.value = z;
+      if (data.destination === z) opt.selected = true;
+      pick.appendChild(opt);
+    }
+    const go = el("button", null, "Go");
+    go.onclick = () => sendTravel(pick.value);
+    const clear = el("button", null, "Clear");
+    clear.onclick = () => sendTravel("");
+    pickRow.append(pick, go, clear);
+    wrap.appendChild(pickRow);
+
+    const note = el("div", data.outcome === "noroute" && data.destination ? "note warn" : "note", data.note);
+    wrap.appendChild(note);
+
+    if (data.path && data.path.length > 1) {
+      const ol = el("ol", "route");
+      data.path.forEach((z, i) => ol.appendChild(el("li", i === data.path.length - 1 ? "dest" : null, z)));
+      wrap.appendChild(ol);
+    }
+
+    // Same action the World window's chrome offers on every tab (Helm-signed
+    // pre-design amendment) — dropped at wherever the log currently says you are.
+    const marker = el("button", "dropmarker", "Drop camp marker");
+    marker.onclick = () => sendDropMarker();
+    wrap.appendChild(marker);
+
+    p.head.textContent = !data.destination ? ""
+      : data.outcome === "route" ? data.hops + (data.hops === 1 ? " hop" : " hops")
+      : data.outcome === "alreadythere" ? "here"
+      : "no route";
+    p.body.replaceChildren(wrap);
   }
 
   // ---------- session ----------
@@ -2262,6 +2321,25 @@ function boot() {
         g.append(tri, t);
         dyn.appendChild(g);
       }
+      // Session camp markers (World PR 4) — "Drop camp marker"'s output, plotted where
+      // a /loc was known at drop time. A diamond rather than the spawn pin's triangle
+      // or the you-marker's dot: three different marks for three different facts.
+      for (const m of (data.markers || [])) {
+        const g = document.createElementNS(SVG, "g");
+        g.dataset.pin = `${m.x} ${m.y}`;
+        const dia = document.createElementNS(SVG, "polygon");
+        dia.setAttribute("points", "0,-6 6,0 0,6 -6,0");
+        dia.setAttribute("fill", accent);
+        dia.setAttribute("stroke", css.getPropertyValue("--bg").trim() || "#16130e");
+        dia.setAttribute("stroke-width", "1");
+        const t = document.createElementNS(SVG, "text");
+        t.setAttribute("x", 8); t.setAttribute("y", -6);
+        t.setAttribute("font-size", 10);
+        t.setAttribute("fill", accent); t.setAttribute("class", "poi");
+        t.textContent = m.text;
+        g.append(dia, t);
+        dyn.appendChild(g);
+      }
       if (data.you) {
         const me = document.createElementNS(SVG, "circle");
         me.setAttribute("cx", data.you.x); me.setAttribute("cy", data.you.y);
@@ -2307,7 +2385,7 @@ function boot() {
         // The map panel repaints every second for its /loc age line, but the circles
         // only when they actually moved — rebuilding them would restart every pulse
         // animation mid-beat.
-        const key = JSON.stringify([data.circles, data.you, data.named]);
+        const key = JSON.stringify([data.circles, data.you, data.named, data.markers]);
         if (key !== dynKey) { dynKey = key; drawDynamic(data); }
         drawTrail(data);
         tickPins(data);
@@ -2329,6 +2407,7 @@ function boot() {
   const RENDER = {
     map: (p, d) => map.render(p, d),
     spawns: renderSpawns,
+    travel: renderTravel,
     session: renderSession,
     mez: renderMez,
     buffs: renderBuffs,
