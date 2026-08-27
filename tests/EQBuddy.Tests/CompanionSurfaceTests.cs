@@ -338,6 +338,43 @@ public class CompanionSurfaceTests
     }
 
     [Fact]
+    public void MapFingerprintMovesWhenACampMarkerDrops()
+    {
+        var snap = Build(new CompanionInputs
+        {
+            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", null, null, null, [], [], [], []),
+        });
+        var baseline = CompanionProjection.SectionFingerprints(snap)[CompanionSurfaces.Map];
+
+        var dropped = snap with
+        {
+            Map = snap.Map! with { Markers = [new CompanionMapPin(10, 20, "camp", 0)] },
+        };
+        var afterDrop = CompanionProjection.SectionFingerprints(dropped)[CompanionSurfaces.Map];
+
+        Assert.NotEqual(baseline, afterDrop);
+    }
+
+    [Fact]
+    public void MapFingerprintIgnoresAMarkersAge()
+    {
+        var snap = Build(new CompanionInputs
+        {
+            Map = new CompanionMapSection("Lower Guk", "Lower Guk", "geo-1", null, null, null, [], [], [],
+                [new CompanionMapPin(10, 20, "camp", 5)]),
+        });
+        var baseline = CompanionProjection.SectionFingerprints(snap)[CompanionSurfaces.Map];
+
+        var older = snap with
+        {
+            Map = snap.Map! with { Markers = [new CompanionMapPin(10, 20, "camp", 3600)] },
+        };
+        var afterTick = CompanionProjection.SectionFingerprints(older)[CompanionSurfaces.Map];
+
+        Assert.Equal(baseline, afterTick);
+    }
+
+    [Fact]
     public void FingerprintsSkipTheNumbersThatDriftEveryTick()
     {
         var input = new CompanionInputs

@@ -4,6 +4,37 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-27 — Both pre-tag fixes done, nothing else touched
+
+**Reporting, not asking.** Helm's two items only, per the 6:38 AM ruling.
+
+1. **WhatsNew 1.99.13 first highlight.** Replaced "Options > Cards & windows still finds
+   the card if you search for any of the old names" (untrue — there is no search box)
+   with "the World card's row in Options > Cards & windows still lists all four old
+   names, so you can spot it by any of them" — naming the `AbsorbedNote`/`AbsorbedTitles`
+   mechanism (`OptionsViewModel.cs`) that was already shipping the four names, just not
+   described accurately in the release text. No other What's-new edit.
+2. **`CompanionProjection.SectionFingerprints`'s Map fold.** Added `m.Markers` to the
+   fingerprint (position + text only, never `AgeSeconds`, matching the Trail/Circles
+   treatment already in that fold) — a dropped camp marker was invisible to phone push
+   change-detection before this. Two tests in `CompanionSurfaceTests.cs`, next to the
+   existing `SectionFingerprintsIsolateOneSurfaceFromAnother` group (that file, not
+   `CompanionProjectionTests.cs`, already held every other Map-section fingerprint/sticky
+   test — `ThemeAndMapGeometryAreSentOncePerDevice` et al. — so the new pair joins that
+   home rather than starting a second one):
+   `MapFingerprintMovesWhenACampMarkerDrops` (positive) and `MapFingerprintIgnoresAMarkersAge`
+   (negative, same X/Y/Text, `AgeSeconds` 5 → 3600, key unchanged).
+
+**Gate numbers on this tree:** unit **2,695** (2,693 + 2 new) / Avalonia **287**, both via
+`scripts/check.ps1`, all green. E2E not run (unrelated to either fix; WPF-only and this
+worktree wasn't set up for a desktop session).
+
+**Left alone, per the ruling:** no tag, no spawn-cue spend, #208 untouched, #241/#243/Alerts
+not started. Skipped the optional `ChipStackPlanTests` `WorldTab.Camps` scan — small but
+not required, and the brief was two items and stop.
+
+---
+
 ## 2026-08-27 — World PR 2-4 executed to the signed table; PR #244 open against main
 
 **Reporting, not asking.** PR 0/1 were already on `world-pr01` (Core `WorldSurface`/
