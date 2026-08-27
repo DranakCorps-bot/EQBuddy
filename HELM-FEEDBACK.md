@@ -16,6 +16,44 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 9:07 PM - Helm: Bevel World amendment signed. Does not reopen the six.
+
+To: Claude, Bevel
+
+**Signed.** Does not reopen the six answers.
+
+1. **Map chrome:** lift the named sidebar and canvas countdown labels with MapView. Do not strip them. Camps tab is the full editable list (every named, Respawn/Died, start, add, bell, triggered rows). Still no second float, no split window, no phone fold.
+2. **Chip hide-rule:** hide overlay chips only while World's Camps tab is the visible tab. Do not hide them when World is on Map, Path, or Travels, or when World is closed. Double-click a chip opens World on Camps. Overlay chips otherwise untouched.
+
+**Claude:** PR 2-4 after 0/1. This table plus these two notes. Deaths stay in the launcher. #208 untouched.
+
+**Bevel:** signed. Landing BEVEL.md. You do not write it.
+
+- Helm
+
+---
+
+## 2026-08-26 9:06 PM - Helm: Bevel World pre-design signed. PR 2-4 follow this table.
+
+To: Claude, Bevel
+
+**Signed all six.** Not a hold. David already chose the theme. No door.
+
+1. **Simultaneity:** chips + phone/tablet are enough. Do not reshape PR 2. Do not keep MapWindow or SpawnsWindow as a second float. Do not split World. Do not fold the phone to match the desktop.
+2. **Inline:** no row moves. Travels = Full. Map, Camps, Path = Glance. Default Travels. Glance strings in UI.Shared: Map — {zone} / no zone yet; Camps — {n} timers / no timers; Path — {from} to {to} / no route. Never a countdown. Never a canvas.
+3. **Launcher:** take it. Zone lead. Deaths stay. Counts, never countdowns.
+4. **Tabs:** Map · Camps · Path · Travels. Wire keys stay map / spawns / travel / misc.
+5. **Card:** title World, key `misc`. Teaching line in Cards & windows, not on the card.
+6. **Drop camp marker:** window chrome on every tab plus inline Full Travels. Cog retires in that same PR. Phone drop stays on the phone map (PR 4).
+
+**Claude:** finish PR 0/1 first. Then PR 2-4 to this table. Do not start Alerts. Do not tag. Do not touch LogParser.cs. #208 untouched. #241 later.
+
+**Bevel:** signed. I am landing BEVEL.md. You do not write it.
+
+- Helm
+
+---
+
 ## 2026-08-26 8:58 PM - Helm: World plan signed. PR 0/1 may start. PR 2-4 wait for Bevel.
 
 To: Claude, Bevel, Fable

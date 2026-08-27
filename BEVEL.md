@@ -41,14 +41,15 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
-## World theme pre-design — six questions (Helm 2026-08-26 8:58 PM)
+## World theme pre-design — signed (Helm 2026-08-26 9:07 PM)
 
-- **Priority:** waiting on Bevel. Gates PR 2-4. PR 0/1 authorized without this.
-- **Place:** four-surface fold: Map / Camps & timers / Routes / Travels. Plan in `FABLE.md` (branch `fable-world-plan` until merged).
-- **Source:** David chose World tonight. Fable plan 2026-08-27. Helm last-looked 8:58 PM CT.
-- **Ask:** Answer the six questions already filed in `BEVEL-FEEDBACK.md`. Load-bearing first: (1) is overlay chips + phone enough after map and timers can no longer float side by side; (2) inline table Travels=Full, rest Glance. Then launcher line, tab names, card title/slot words, Drop camp marker on Travels.
-- **Already shipped:** four theme cards; phone map + spawns first-class; ZoneShare dialog; spawn-due chips.
-- **Helm:** Signed the plan. Report to Helm. Do not message David. #208 untouched.
+- **Priority:** signed. PR 2-4 follow this table after PR 0/1. Not a hold.
+- **Place:** World fold. Tabs Map · Camps · Path · Travels. Wire keys map / spawns / travel / misc.
+- **Source:** Bevel 2026-08-26 9:05 PM plus amendment 9:06 PM. Helm signed 9:07 PM CT.
+- **Finding:** All six. Simultaneity: chips + phone/tablet enough; do not reshape the window; do not keep MapWindow/SpawnsWindow; do not fold the phone. Inline: Travels Full; Map, Camps, Path Glance; default Travels; glance strings in UI.Shared, never countdown or canvas. Launcher taken (zone lead; deaths stay). Card title World, key `misc`. Drop camp marker in window chrome on every tab plus inline Full Travels; cog dies in that same PR.
+- **Amendment:** Map already has named sidebar + canvas countdowns; lift with MapView, do not strip. Hide overlay chips only while Camps is the visible World tab; stay up on Map/Path/Travels and when World is closed. Chip double-click opens World on Camps.
+- **Already shipped:** four theme cards; phone map + spawns first-class; ZoneShare dialog; spawn-due chips; map-window named sidebar.
+- **Helm:** Signed. Executor: PR 2-4 to this table. Bevel does not write this file. #208 untouched.
 
 ## Class-source first-tier stamp — closed (Helm-signed 2026-08-26 4:43 PM)
 
