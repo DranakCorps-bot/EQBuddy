@@ -86,6 +86,59 @@ next loop, not a reopening of the plan.
 
 ---
 
+## STUB (Claude, 2026-08-27): quest have-counts are a log tally the player reads as their bags
+To: Fable
+
+- **Priority:** `ready` for planning — no `needs-david:` that I can see, but see the open
+  questions: one of them may turn out to be his.
+- **Class:** **V2, and here is why it is not V0–V1** — no single answer from David finishes it.
+  It changes the SOURCE of a number on a core surface (Quest Tracker, Sky, Epic, and the phone),
+  and the sub-questions below each change the architecture independently.
+- **Source:** #241 DasGud, 2026-08-26 7:40 PM CT. Evidence and the full trace are in
+  `SCRIBE-FEEDBACK.md`. Nothing built, nothing posted, no promise made to him.
+
+**The defect, verified in source.** The have-count beside a turn-in item is
+`QuestLedgerStore.Entry.Total` = `Looted + Manual − Consumed` (`QuestLedgerStore.cs:33`) — a
+tally of what the LOG saw, which the player reasonably reads as "what I have". `Consumed` is
+recorded only for merchant sales, destroys and merges (`SessionStats.cs:909–935`), and the
+field's own comment concedes the gap: *"Hand-ins still aren't logged — that stays the ✔ click."*
+
+DasGud's three numbers are wrong in **both directions at once**, which is what rules out an
+arithmetic bug: Sphinx Claw 4-shown/0-held and Mithril Bands 1/0 (turned in, invisible to the
+log), and Wind Rune Izah **15 shown against 17 actually held** (acquired off-log).
+
+**The thing that makes this worth planning rather than shrugging at: the answer already exists
+on disk and nothing reads it.** `/outputfile inventory` knows his true counts, the Gear tab
+already imports it, and `QuestLedgerStore` and `QuestMatcher` contain **no reference to
+inventory at all**. This is the `loot → quest → item` chain the roadmap names as the
+differentiator, broken at the first link, on the surface that is supposed to answer *"what am
+I working on"*.
+
+**Open questions a plan has to answer — this is the V2 argument:**
+
+1. **Precedence.** Does an inventory dump *override* the tally for items it lists, or reconcile
+   with it? A dump is a point-in-time truth that goes stale the moment he loots again.
+2. **Staleness.** A three-week-old dump is worse than no dump for an item he has farmed since.
+   What is the rule, and does the surface say which source it used? (#101/#193's honesty bar.)
+3. **Bags vs bank vs shared bank.** A turn-in item in the bank counts for "do I have it" but not
+   for "can I hand it in right now".
+4. **No dump at all** — the common case. Whatever ships must not make the no-dump state worse
+   than today's.
+5. **The two completion paths, which is a defect in its own right.** `RecordCompletion` consumes
+   turn-in items (`:298–301`); `SetCompleted` — catch-up marking — deliberately does not, and
+   says so. **A player cannot tell which one a given tick is.** I have NOT traced which path the
+   Sky checklist uses; that is a place to look, not a fact.
+
+**Bevel has a stake** before anything is designed: what the number MEANS, and whether the
+surface should say which source it came from. That is a which-room-owns-this call, not mine.
+
+**What I did not do:** build anything, post anything, or ask David. Filed as a stub per the
+V2 route rather than finished and labelled V2 afterwards.
+
+— Dranak (Claude Code)
+
+---
+
 ## README screenshots: 13 of 24 still cannot be regenerated, and `history-progress` needs real staging
 To: Fable
 

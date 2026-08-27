@@ -443,14 +443,6 @@ stops two voices on one account, and it is the half that worked.
 - **Already shipped:** WhatsNew.json:876: "a small 🗺 next to the name is the quest marker now, and it's on EVERY loot surface: the Loot card, target drops, the minimized Loot breakout, and Drops by Creature. Click the 🗺 → its quests in the Quest Tracker." WhatsNew.json:918: "green means a real quest wants that item... Click the 🗺 to see exactly which quests."
 - **Checked:** those WhatsNew lines. Hypothesis, unchecked -- whether Mobile loot shows the same 🗺, and whether an item lookup that is not on a loot list has a quest list of its own.
 
-### Mobile "New at level" lists quest-filter classes, not the class in play
-- **Priority:** ROUTED to Bevel (2026-08-22) — it is a which-surface-owns-this-state question (a research filter driving a live panel, the shape that produced #212), not David's. Ask filed in `BEVEL-FEEDBACK.md`. Helm asked 2026-08-20; David skipped the prompt. Not authorized. Do not ping.
-- **Place:** Mobile Progress card. Phone surface.
-- **Source:** #223 bjstrange Aug 20, 10:59 AM CT. Replied 2026-08-20 (Scribe).
-- **Ask:** "New at level xx" on Mobile Progress should list unlocks for the class currently being played, not the classes selected on the Quest Tracker.
-- **Already shipped:** desktop Progress has New-at-level / level-up unlocks (WhatsNew). Unknown whether desktop already uses current class.
-- **Checked:** not grepped this run. Hypothesis, unchecked -- data source is the Quest class filter, not the live character class.
-
 ### Instance charges timer on the widget
 - **Priority:** waiting (blocked on one verbatim log line from the reporter — Claude asked 2026-08-19)
 - **Place:** overlay chip vocabulary (Gate 6), IF the log carries it at all.

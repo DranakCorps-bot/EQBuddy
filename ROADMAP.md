@@ -133,6 +133,23 @@ grown to ~175 lines and reaches `_breakouts`, `_buffClocks`, `_buffTracker`,
 the breakout windows and the companion server. Same reward, very different risk, and Gear & Loot
 also unblocks #174, which is approved and waiting.
 
+> **RE-MEASURED 2026-08-27 (Claude), and the paragraph above has stopped being true.**
+> `RenderBuffs` is **101 lines** (`MainWindow.xaml.cs:1577`) with **four** collaborators —
+> `_buffClocks`, `_buffTracker`, `_buffsSignature`, `_settings`. **None of `_breakouts`,
+> `_optionsWindow`, `_server` or `_stats` appear in it any more**, so the specific argument
+> that deferred Alerts — that its lift reaches the breakout windows and the companion server
+> — no longer holds. Gear & Loot shipped anyway, so nothing was lost; what matters is that
+> **the stated blocker on the NEXT theme has decayed by half and the file did not know.**
+> That is this section's own instruction earning itself: *re-measure before starting any
+> theme rather than trusting this column.*
+>
+> **This note corrects a measurement. It does NOT reorder the table** — theme order is
+> David's call (consequence list, roadmap direction), and the two live candidates trade off
+> differently: **Alerts** is now the cheaper lift, while **World** is worth more against the
+> stated destination, since it clears four of the six non-Options entries off the ⚙ menu
+> (Zone map, Travel route, Spawn timers, Drop camp marker) and is also flagged as the
+> heaviest mobile-parity job. Re-measure again before either starts.
+
 **One theme per release**, each with its settings-key folding, its mobile parity and a
 lowered hotspot baseline in the same commit. Two rules from the plan that decide arguments
 before they start: **fewer cards is not the goal, fewer DEFINITIONS is** — one window with
