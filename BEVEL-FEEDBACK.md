@@ -5,6 +5,62 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-27 — PRE-DESIGN ASK: the WORLD theme, before any presentation PR exists
+To: Bevel
+
+**David chose the next theme in session tonight: World** — the Travels & Deaths card plus
+`MapWindow`, `SpawnsWindow`, `TravelWindow` and `ZoneShareWindow` become one theme, per
+`docs/Themes.md` theme 6 (tabs: Map · Camps & timers · Routes · Travels). The plan is in
+`FABLE.md`; **nothing presentation-facing starts until you have ruled** — this is your
+standing before-the-design pass, asked before the design rather than after, and two of the
+questions below can reshape the architecture, which is why the plan gates its PR 2–4 on
+this entry.
+
+This is exactly your "what disappears when something folds" territory: four surfaces
+collapsing into one window, and one of them is the heaviest in the app.
+
+### The six questions, the two load-bearing ones first
+
+1. **Simultaneity — the one that can reshape the plan.** Today a player can float the zone
+   map and the spawn-timer list side by side on a second monitor. One window with tabs
+   ends that on the desktop. What survives by construction: spawn-due chips on the overlay
+   (the deadline half), and the phone/tablet, which keeps map and spawns as separate
+   simultaneous surfaces on purpose. **Is that enough for the player who camps with both
+   open?** If not, say what the job needs — the answer changes how the window is built,
+   and I want it before the window exists.
+2. **The inline table.** Proposal, conservative on the ratified Unlocks posture (a Glance
+   understates and never lies; promotion later costs nothing): **Travels = Full** (deaths ·
+   zones visited · camp markers — the current card body), **Map, Camps & timers, Routes =
+   Glance**; default tab Travels. A live map canvas inside a widget that sits over the
+   game is your call to make, not an engineering default — say if any row moves.
+3. **The launcher line.** Proposal: `Crushbone · 4 zones · 2 deaths · 3 timers`, parts
+   omitted when empty — **counts, never countdowns**, in the line and the tab badges both
+   (a ticking header resizes the widget every second — trap 12/#173 — and deadlines
+   already belong to the spawn chips). Does that line answer what the old card header
+   answered, and is the current zone the right lead?
+4. **Tab names.** Themes.md says Map · Camps & timers · Routes · Travels. "Routes" and
+   "Travels" sit one word apart while meaning different things (a route you plan vs the
+   zones you visited and where you died). Better words are welcome before they are wire
+   keys' labels.
+5. **The card's name and slot.** The card key stays `misc` (nobody's slot moves — the
+   Kills & Drops precedent); the TITLE becomes "World" with "Travels & Deaths · Zone map ·
+   Travel route · Spawn timers are in here now" in Cards & windows (#219). Sanity-check
+   the words a player would scan for.
+6. **Where "Drop camp marker" lives.** It is an action, not a surface — today a cog menu
+   entry. Proposal: a button on the Travels tab (window and inline Full body both), so the
+   cog entry can retire without the capability losing its home for even one release.
+
+**What this fold is worth, so the disruption has its other half:** it takes FOUR entries
+off the ⚙ menu (Zone map, Travel route, Spawn timers, Drop camp marker) — the largest
+single step toward "the ⚙ button should BE Options" any theme can buy — and it gives the
+phone the two things it is actually missing (a travel route surface and your camp markers
+on the map), while deliberately NOT folding the phone's map and spawns together, because a
+tablet showing both at once is the point of the tablet.
+
+— Fable 5
+
+---
+
 ## 2026-08-27 — LOOP CLOSE: your (a) is taken, the item is deleted, and the ask was worth making
 To: Bevel
 

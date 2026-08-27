@@ -86,6 +86,269 @@ next loop, not a reopening of the plan.
 
 ---
 
+## The WORLD theme — Travels & Deaths + Map, Spawns, Travel, ZoneShare become one theme
+
+- **Priority:** `ready` for PR 0 and PR 1 (Core + view lifts — no presentation change in
+  either). **PR 2–PR 4 wait for Bevel's pre-design answers**, asked in `BEVEL-FEEDBACK.md`
+  in this same commit — that is a Bevel gate, not a `needs-david:`. No `needs-david:` at
+  all: the theme choice was David's and is made (2026-08-27, question tool, over Alerts);
+  every remaining decision is design (Bevel's) or implementation (the executor's).
+- **Class:** `V3` — four surfaces × two lanes fold into one window; the heaviest pair in
+  the app (`MapWindow`, 1,079 + 1,061 lines) moves onto a host seam; a card-key decision;
+  wire additions on the phone; and the trap-45 ownership rule has to be right before the
+  first presentation PR ships. Not V1 because no single answer finishes it, and the wrong
+  obvious fold (one phone card with tabs) is wrong for a reason you can only see with the
+  whole system in view — see the phone decision below.
+- **Source:** David in session 2026-08-27 (roadmap direction, consequence list 5, asked and
+  answered with the question tool); `docs/Themes.md` theme 6, which already names the tabs;
+  the 2026-08-27 measurement entry in `FABLE-FEEDBACK.md`. David's 2026-08-20 note is
+  covered by construction: *"Travels and Death should include travel route and zone maps
+  too."*
+- **Bevel pre-design: YES, and it gates the presentation PRs.** Filed alongside this plan
+  (its standing preference — before the design, not after). The six questions are in
+  `BEVEL-FEEDBACK.md`; the two that can reshape the architecture are simultaneity (map +
+  timers at once dies on the desktop when both are tabs) and the inline table.
+- **Shot offline: mostly yes.** Spawns/Routes/Travels tabs stage from the fixture log and
+  seeded stores. **The Map tab is the known-hard one** — it needs zone geometry; the mobile
+  harness's fixture already feeds real map files through the real projection, so try that
+  seam first, and if the desktop shot still needs a live install it stays in the manual
+  bucket **and says so** (trap 22/23 — no silent coverage claim). `map-window`,
+  `spawn-circles`, `travel-window`, `zone-share` are committed HAND shots embedded in
+  README (trap 21): new shots take new names, never those.
+- **Column budgets:** the launcher line replaces the `MiscHeader` "N deaths" StatValue in a
+  320-wide card header — headline parts only, tabs carry detail (the Progress clipping
+  lesson). The tab strip WRAPS (trap 25). Shoot at 100 % and 125 % and once in Solarized.
+- **Guards run eight times:** `drag-verify` on the new WorldWindow, and the Avalonia
+  expand → pop out → close → expand sequence test.
+
+### What I re-measured (all of Claude's numbers confirmed, none taken on trust)
+
+| Piece | WPF | Avalonia | Note |
+|---|---|---|---|
+| `MapWindow` | 1,079 | 1,061 | the heavy pair; the real cost of the theme |
+| `SpawnsWindow` | 549 (+125 xaml) | 600 | `SpawnsViewModel` already shared in UI.Shared |
+| `TravelWindow` | 91 | 105 | trivial, but reaches `MainWindow` directly on WPF |
+| `ZoneShareWindow` | 278 | 274 | Core collaborators only — needs NO lift |
+| misc card body | ~6 lines + XAML | ~76 (`BuildMiscSection`) | the smallest fold yet |
+| Ratchet | 4,613 / 4,214 / cap 4,635 — **22 lines** | 5,402 / 5,229 / cap 5,751 — ~349 | keep-if-it-fits |
+| `LogParser` | 933 / 853 / cap 938 — **5 lines** | — | constraint: this plan must not touch it |
+
+**Findings that shape the plan, verified in source:**
+
+1. **The seam WPF needs already exists on the other lane, and it was written to be copied.**
+   Avalonia's `IZoneHost` (`ZoneHost.cs`, 9 members) says in its own doc comment that its
+   member names *"mirror the WPF MainWindow surface one-for-one"*. I counted WPF
+   `MapWindow`'s reach into `main` and it is exactly that member set (`SpawnPoints` ×9,
+   `Settings` ×4, `SpawnTimers` ×3, `CurrentZoneName` ×3, `CurrentSnapshot` ×2, and one
+   each of `WikiMobResult`, `SpawnOverridesStore`, `SpawnCatalogData`, `EnsureMobLookup`).
+   The heavy lift is therefore mostly mechanical: WPF grows the same interface and
+   MainWindow satisfies it implicitly.
+2. **`SpawnsWindow` needs only `Settings` + `PlayAlertSound`** beyond its shared VM.
+   `TravelWindow` needs `ZoneGraph` + `CurrentZoneName` + `Settings` — inside `IZoneHost`.
+3. **`ZoneShareWindow` was built for this day** — *"no MainWindow reach-back, so an
+   Avalonia port passes the same three objects"* (its own comment). It stays a dialog
+   opened from the Map tab, exactly as it opens from the Map window today. It is absorbed
+   by the theme in the sense that its DOOR moves; the window itself is untouched.
+4. **`AlertSurface` already exists in Core and its `Spawns` tab is CONFIGURATION** — its
+   doc: *"what consolidates here is the CONFIGURATION, not the alerting."* So the boundary
+   is: **World owns the timer LIST** (the zone list, editable durations, camps); **Alerts
+   will own "alert me, at this volume, with this sound"**. The per-named bell picker inside
+   `SpawnsWindow` (`SetSound`/`PlayAlertSound`, ~line 450) rides into the Camps tab
+   UNCHANGED and is not redesigned here.
+5. **Phone:** `map` and `spawns` are first-class on the wire (`CompanionSurfaces.cs:14-15`,
+   `CompanionMapSource` 317 lines, trap 38's sticky `HeldMap`). There is **no travel and no
+   zone-share**, and `CompanionMapMarker` plots only the 'you' marker and camp pins —
+   **session markers (Drop camp marker's output) never reach the phone map.** The phone
+   already has a map WRITE path (`CompanionMapAction`: Confirm/Unconfirm/Remove/ResetZone),
+   so a marker-drop action has precedent, not a new trust question.
+6. **Everything that must re-route, enumerated** (trap 29's lesson taken in advance): four
+   cog entries (`MainWindow.xaml:31-38`); `toggleMap`/`toggleSpawns` hotkeys; the
+   `EQBUDDY_*` env openers (`MainWindow.xaml.cs:519-530`); the show/hide-all branches
+   (`:4368-4380`); the per-tick `_mapWindow.MaybeRefresh()` (`:2531`); `StarDeaths` — the
+   only `MiniStats` writer for `"deaths"` (trap 20/26).
+
+### Architecture
+
+**Core — `WorldSurface`** (recipe step 1), the fifth sibling of `ProgressSurface`:
+`WorldTab { Map, Camps, Routes, Travels }` with Themes.md's labels — Map · Camps & timers ·
+Routes · Travels. Wire keys reuse names that already exist where they exist: `map`,
+`spawns`, `travel`, and `misc` for Travels. `TabForKey` aliases: camps/timers → Camps,
+routes → Routes, travels/deaths → Travels.
+
+- **`ThemeCardKey = "misc"` — decided deliberately, the thing the ask flagged.** Every
+  theme so far kept an absorbed card's key precisely so nobody's card slot moved, and this
+  theme absorbs exactly ONE card, so keeping `misc` means there is **no settings migration
+  at all** — the step Themes.md calls "where silent data loss lives" simply does not run.
+  Renaming to `world` buys an aesthetic and costs a migration. The doc comment on the
+  constant names the oddity out loud so nobody "fixes" it later. The card's TITLE becomes
+  "World"; `("misc", "Travels & Deaths")` in `OptionsViewModel` becomes `("misc", "World")`
+  with the old titles in `AbsorbedTitles` (#219). Icon stays `Location`.
+- **`InlineModeFor`, initial table (Bevel may move any row):** Travels = **Full** (the
+  current card body — deaths, zones, markers — small player-driven lists); Map, Camps,
+  Routes = **Glance**. `DefaultInlineTab = Travels`. Conservative-glance is the ratified
+  posture (the Unlocks precedent: a Glance understates and never lies, and promotion later
+  costs no migration). A map canvas inline over the game is a Bevel question, not an
+  engineering default.
+- **`LauncherSummary(zone, zonesVisited, deaths, runningTimers)`** → e.g.
+  `Crushbone · 4 zones · 2 deaths · 3 timers`, parts omitted when empty.
+  **Counts, never countdowns — in the launcher AND the tab badges.** A countdown in either
+  changes measured size every second (trap 12, the #173 keyboard-killer) and would wake
+  every phone every second (trap 8). Deadlines belong to the spawn-due chips, which this
+  theme does not touch.
+
+**Core — `TravelPlan`** (recipe step 2 for Routes): a pure module over
+`ZoneGraph.Distance` — from, destination, hops, the step list, and the two wordings both
+`TravelWindow`s currently hand-roll ("You're already there.", the no-route-with-wiki-hint
+text). Desktop Routes tab and the phone travel surface read the SAME module; that is the
+parity mechanism, per the standing rule.
+
+**PR 1 — the view lifts, both lanes, zero product change.** `MapView`, `SpawnsView`,
+`TravelView`, `TravelsView` (the misc card body) extracted per lane; WPF gains `IZoneHost`
+verbatim from Avalonia's; views take `IZoneHost` (+ `SpawnsViewModel`), never `MainWindow`.
+The three standalone windows become thin hosts of the views, behaviour identical.
+`NewWorldSurfaces()` factories on both lanes (trap 45: no host interface may return a
+control it did not just create; `SurfaceOwnershipTests`' positive half grows the rows).
+E2E pins the CURRENT behaviour before any of it moves.
+
+**PR 2 — `WorldWindow`, both lanes; the standalone windows retire.** `EqSegmentedStrip`
+tabs (wraps), per-host surfaces via the factories. `MapWindow`, `SpawnsWindow`,
+`TravelWindow` are **deleted** (the Gear & Loot precedent — a window kept "just in case" is
+a second definition). `ZoneShareWindow` survives untouched, opened from the Map tab.
+Re-route everything in finding 6: hotkey IDs and `EQBUDDY_*` names stay stable and open the
+window on the right tab; the four cog entries go **only after** each capability has its new
+home in the same PR — including a **Drop marker button on the Travels tab** (the action
+must not lose its home for even one release; "X is now Y" lines for all four moves).
+WindowZoom: `WorldWindow` gets its own size key; the orphaned `map`/`spawns`/`travel` size
+entries are left inert (the `BreakoutKind.Progress` ruling — a migration would be code to
+delete a harmless token). **Trap 46, enumerated at move time:** the Map window repaints
+per tick (`MaybeRefresh()` every second, forced on zone change) and follows you zone to
+zone; the Spawns list ticks; Travel re-routes on zone. The visible tab keeps per-tick
+paint; only chrome may throttle.
+
+**PR 3 — the theme card.** `WorldThemeCard` on both lanes (fifth instance of
+`ThemeCardView`/`ThemeCardPanel` — the machinery needs nothing new). The misc XAML section
+converts to the theme shell (the `ProgressSection` shape); `StarDeaths` moves into the
+WorldWindow's Travels tab header with the surface it stars (trap 26 — list every control
+of the old card and say where each went); tutorial page, Options row, `AbsorbedTitles`
+("Travels & Deaths · Zone map · Travel route · Spawn timers are in here now" — those are
+the words someone scans for); glance wordings in UI.Shared so the Avalonia card says the
+same sentences.
+
+**PR 4 — the phone.** The REAL parity gap, confirmed: **Travel and markers, not map or
+spawns.**
+- **`map` and `spawns` stay separate first-class surfaces — decided, and it is the
+  opposite of the desktop fold on purpose.** They are the glance-while-camping surfaces
+  (first in display order); the map is the one `fills` surface (trap 9 — its container
+  contract is unique); and a tablet propped on a desk showing map AND timers at once is
+  the product's uncontested ground. Parity is by shared module (steps 1–2), not by
+  matching chrome — folding the phone to match the desktop would DELETE simultaneity from
+  the surface that has it.
+- **New `travel` surface** reading `TravelPlan`; destination picked on the phone via the
+  existing input machinery; fingerprint carries zone + destination + route, nothing that
+  ticks (trap 8) — and it must NOT ride the map's sticky-payload machinery (trap 38:
+  `HeldMap` stays exactly as it is; a route is small enough to travel every time).
+- **Session marker pins on the phone map**, and a **drop-marker action**
+  (`CompanionMapAction` precedent; a write the desktop already offers; nothing leaves the
+  machine). Mirror whatever the map fingerprint does about ages before adding pins —
+  hypothesis (b) below.
+- **ZoneShare does NOT go to the phone** (trap 35: a share string on the phone's clipboard
+  cannot reach the game or a friend usefully, and the import preview is desk work by the
+  surface table). Said here so its absence reads as a decision, not a miss.
+
+### Risks
+
+- **Trap 45 is the crash-class risk**, and it is why PR 1 exists as its own PR: every host
+  builds its own instances, the sequence test runs per lane, and no accessor returns a
+  live control.
+- **Ratchet, keep-if-it-fits:** WPF has **22 lines**. PR 1 and PR 2 must be net-negative
+  in MainWindow (they remove the openers, two window fields, the show/hide branches and
+  the misc body); PR 3's theme-card wiring costs ~80 (the Progress measurement). If the
+  sum will not fit under 4,635, the named relief lift goes first in that PR: the
+  spawn-cue block (~`:2524`, banner + sound on timers crossing zero) is a sum, not a
+  pixel, and belongs in UI.Shared anyway. **Measure at each PR; do not trust this
+  paragraph** — the file's own history says these numbers rot.
+- **LogParser at 5 lines is a tripwire, not a task.** Deaths, zones, locs and markers are
+  all parsed today; nothing here needs a new line type. A PR that finds itself editing
+  `LogParser.cs` has taken a wrong turn — stop and re-read the plan.
+- **The Alerts boundary** (finding 4): carry the bell config, do not improve it. Scope
+  creep here builds half of the next theme inside this one.
+- **Trap 20/26 in both directions:** the fold list (finding 6) is the checklist; PR 2 and
+  PR 3 each end with "every control of the absorbed surfaces, and where it went" in the
+  PR notes. `DeadSettingTests` cannot see a lost WRITER whose setting has other writers —
+  `MiniStats["deaths"]` is exactly that shape.
+- **Simultaneity is the real product risk**, and it is Bevel's question 1: today a player
+  can float the map and the timer list side by side; one window with tabs ends that on the
+  desktop. What survives by construction: spawn-due chips (deadlines, overlay) and the
+  phone (both at once). If Bevel rules that is not enough, the answer shapes PR 2 and I
+  want the ruling before the window is built, not after.
+- **Trap 24/21 on shots**, per the Shot line above.
+
+### Verification
+
+- **E2E first, before PR 1 moves anything:** the current openers as facts in
+  `EQBUDDY_EXPAND`; then `worldInline`/`worldTab`/`worldTabs`/`worldWindowOpen` mirroring
+  the progress keys, asserted from `tests/EQBuddy.E2E`.
+- Unit: `WorldSurface` table tests (keys, aliases, absorbed list, inline table);
+  `TravelPlan` (route, already-there, no-route wording — with one negative each, trap 39);
+  `ThemeHost` is already generic and tested.
+- Avalonia: `WidgetRenderTests` twins; the expand → pop out → close → expand sequence for
+  World; the sheet capture with its prediction written first.
+- `drag-verify` on WorldWindow, eight consecutive green runs; `mobile-harness` drives the
+  shipped page through the travel surface and marker pins, before and after, prediction
+  first.
+- **The check David can do himself:** expand World on the widget and read deaths and zones
+  without opening anything; pop it out; hit the map hotkey and land on the Map tab; drop a
+  marker from the Travels tab and see it on the phone map.
+
+### Out of scope
+
+The #241 have-counts stub (independent; sequence after World's plan is in motion); the
+Alerts theme and any bell/sound redesign; Session history and Data & imports (the two cog
+survivors — their homes are a different decision); the all-time stats view; ZoneShare on
+the phone (decided above); any change to spawn-due chips, `SpawnChipsWindow` or the
+overlay; map feature work (new layers, new geometry); the README manual-shot backlog
+beyond what this theme's staging makes free.
+
+### Already shipped (must not be fought)
+
+`ThemeCardView`/`ThemeCardPanel`/`ThemeHost` and the four theme cards; `IWidgetCard`/
+`ICardContext` and the per-host factory rule with `SurfaceOwnershipTests`' empty exemption
+list; Avalonia's `IZoneHost`; `SpawnsViewModel`; `ZoneShare` and its deviation gate; the
+spawn-cycle ledger and respawn suggestions (1.99.12); `CompanionMapSource` and the sticky
+`HeldQuests`/`HeldMap` machinery; the keep-if-it-fits ratchet ruling; the moved-surface
+"X is now Y" promise.
+
+### Checked
+
+Read this session: `FABLE-FEEDBACK.md`'s plan ask; `ROADMAP.md` in full; `docs/Themes.md`
+in full (theme 6 names the tabs); `ProgressSurface.cs`, `AlertSurface.cs`,
+`CreatureSurface.cs`/`LootSurface.cs` key precedents, `InlineMode` sites;
+`ProgressThemeCard.cs` in full; `ThemeHost.cs`/`ThemeCardView.cs`/`ThemeCardPanel.cs`
+sizes and shapes; `ZoneShareWindow.cs` and `TravelWindow.cs` in full; `MapWindow`/
+`SpawnsWindow` constructor reach (grep-counted per member); `ZoneHost.cs` in full;
+`CompanionSurfaces.cs` in full; `CompanionActions`/`CompanionMapSource`/
+`CompanionSections` marker shapes; the misc card in both MainWindows and
+`MainWindow.xaml:667-689`; the cog menu, hotkeys, env openers, show/hide branches;
+`OptionsViewModel.cs:150-198`; `ArchitectureTests` baselines and live sums (measured, not
+recalled). **Hypotheses, labelled:** (a) Avalonia MainWindow has a `PlayAlertSound`
+equivalent for the bell preview — verify before widening `IZoneHost`; (b) the map
+section's fingerprint already excludes the 'you' marker's age — mirror its mechanism for
+marker pins, verify in `CompanionSnapshot`; (c) `MapWindow`'s layer toggles hold no
+settings writers that die with the window — the trap-26 list settles it; (d) the mobile
+harness's map fixture can seed a desktop Map-tab shot.
+
+### Decided without asking (→ `DECISIONS.md` when taken)
+
+Card key stays `misc`, card title becomes "World"; phone keeps map + spawns separate and
+gains travel + marker pins; ZoneShare stays a desktop dialog and is not ported;
+the three standalone windows are deleted, their size keys left inert; badges and launcher
+carry counts, never countdowns; initial inline table Travels-Full/rest-Glance with Travels
+as default tab; the per-named bell config rides into Camps unchanged.
+
+— Fable 5, 2026-08-27
+
+---
+
 ## STUB (Claude, 2026-08-27): quest have-counts are a log tally the player reads as their bags
 To: Fable
 
