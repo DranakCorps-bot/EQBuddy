@@ -72,6 +72,13 @@ public partial class SpawnsView : UserControl
     /// exactly where <c>_tick.Stop()</c> ran before the lift.</summary>
     public void StopTicking() => _tick.Stop();
 
+    /// <summary>Hide this view's own title row and close button (World PR 2) — leftover
+    /// chrome from when this was a borderless standalone window. <c>WorldWindow</c>
+    /// supplies both now, so drawing this view's copies too would put two title rows and
+    /// two close buttons on screen at once. Collapsing the row rather than deleting the
+    /// controls: the Auto row height follows, so nothing leaves a gap.</summary>
+    internal void HideOwnTitleBar() => TitleBar.Visibility = Visibility.Collapsed;
+
     private static string FirstNonEmpty(string a, string b) => a.Length > 0 ? a : b;
 
     private string SelectedZone => ZoneCombo.SelectedItem as string ?? "";

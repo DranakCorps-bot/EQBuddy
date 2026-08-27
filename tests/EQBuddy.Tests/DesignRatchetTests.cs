@@ -36,11 +36,12 @@ public class DesignRatchetTests
         "EQBuddy/QuestsWindow.xaml.cs",
         "EQBuddy.Avalonia/QuestsWindow.cs",
         // Renamed EQBuddy/SpawnsWindow.xaml(.cs) -> SpawnsView.xaml(.cs) in World PR 1:
-        // the Gate 3 content moved into the view the theme's future window will host;
-        // the thin SpawnsWindow.cs left behind carries no sizes to check.
+        // the Gate 3 content moved into the view. World PR 2 retired the thin
+        // SpawnsWindow.cs/MapWindow.cs/TravelWindow.cs hosts (both lanes) into
+        // WorldWindow, which — like CreatureWindow/GearLootWindow/ProgressWindow — is
+        // chrome rather than migrated Gate content, so it is not added here.
         "EQBuddy/SpawnsView.xaml",
         "EQBuddy/SpawnsView.xaml.cs",
-        "EQBuddy.Avalonia/SpawnsWindow.cs",
         "EQBuddy.UI.Shared/LootPresentation.cs",
         "EQBuddy/LootCardView.cs",
         "EQBuddy/LootBreakoutView.cs",

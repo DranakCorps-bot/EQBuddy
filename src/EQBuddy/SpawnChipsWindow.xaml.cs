@@ -193,9 +193,10 @@ public partial class SpawnChipsWindow : Window
         if (sender is not Border { Tag: SpawnChip chip }) return;
         if (e.ClickCount == 2)
         {
-            // The full zone list, opened on the chip's zone. MainWindow's tick hides
-            // the stack while the full window is up.
-            _main.ShowSpawnsWindow(chip.Zone);
+            // The World window's Camps tab, opened on the chip's zone (World PR 2 —
+            // Bevel-signed chip hide-rule). MainWindow's tick hides this stack only
+            // while that tab is the visible one; Map, Path and Travels leave it up.
+            _main.ShowWorldWindow(WorldTab.Camps, chip.Zone);
             e.Handled = true;
             return;
         }

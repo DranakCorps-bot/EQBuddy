@@ -230,7 +230,10 @@ public sealed class SpawnChipsWindow : Window
         }
         if (e.ClickCount == 2)
         {
-            _main.ShowSpawnsWindow(chip.Zone);
+            // The World window's Camps tab, opened on the chip's zone (World PR 2 —
+            // Bevel-signed chip hide-rule). MainWindow's tick hides this stack only while
+            // that tab is the visible one; Map, Path and Travels leave it up.
+            _main.ShowWorldWindow(WorldTab.Camps, chip.Zone);
             e.Handled = true;
             return;
         }

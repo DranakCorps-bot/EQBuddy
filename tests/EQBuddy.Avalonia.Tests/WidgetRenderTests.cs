@@ -505,7 +505,11 @@ public class WidgetRenderTests : IDisposable
         var catalog = SpawnCatalog.LoadEmbedded();
         var overrides = SpawnOverrides.Load(Path.Combine(_profile, "spawn-test-overrides.json"));
         var timers = new SpawnTimers(catalog, overrides, Path.Combine(_profile, "spawn-test-timers.json"));
-        var tracker = new SpawnsWindow(main, new SpawnsViewModel(catalog, overrides, timers));
+        // SpawnsWindow retired into WorldWindow (World PR 2); this test renders the
+        // content view (SpawnsView) directly in a plain host, the same content the
+        // retired window used to draw.
+        var view = new SpawnsView(main, new SpawnsViewModel(catalog, overrides, timers));
+        var tracker = new Window { Content = view.Body };
         tracker.Show(main);
 
         Assert.NotNull(tracker.CaptureRenderedFrame());
@@ -531,8 +535,9 @@ public class WidgetRenderTests : IDisposable
         var catalog = SpawnCatalog.LoadEmbedded();
         var overrides = SpawnOverrides.Load(Path.Combine(_profile, "spawn-lifecycle-overrides.json"));
         var timers = new SpawnTimers(catalog, overrides, Path.Combine(_profile, "spawn-lifecycle-timers.json"));
-        var tracker = new SpawnsWindow(main,
+        var view = new SpawnsView(main,
             new SpawnsViewModel(catalog, overrides, timers), "Befallen");
+        var tracker = new Window { Content = view.Body };
         tracker.Show(main);
 
         // Gate 3 (docs/DesignSystem.md §11.5): the clock emoji in the title is a vector

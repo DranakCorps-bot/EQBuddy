@@ -42,8 +42,11 @@ public static class WorldSurface
     public static string LabelFor(WorldTab tab) => tab switch
     {
         WorldTab.Map => "Map",
-        WorldTab.Camps => "Camps & timers",
-        WorldTab.Routes => "Routes",
+        WorldTab.Camps => "Camps",
+        // "Path" (Bevel-signed pre-design, question 4) — "Routes" sat one word from
+        // "Travels" while meaning something different (a route you plan vs the zones you
+        // visited). The enum member and wire key stay Routes/"travel"; only the label moved.
+        WorldTab.Routes => "Path",
         WorldTab.Travels => "Travels",
         _ => tab.ToString(),
     };

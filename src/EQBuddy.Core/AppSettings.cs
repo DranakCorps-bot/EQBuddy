@@ -37,6 +37,13 @@ public sealed class AppSettings
     /// real saved position (#117).</summary>
     public double CreatureLeft { get; set; } = double.NaN;
     public double CreatureTop { get; set; } = double.NaN;
+
+    /// <summary>The WORLD theme window's spot (World PR 2 — Map · Camps · Path · Travels,
+    /// replacing the three standalone windows below). NaN until placed once -
+    /// WindowPlacement.PositionToPersist keeps an unmoved fallback from overwriting a
+    /// real saved position (#117).</summary>
+    public double WorldLeft { get; set; } = double.NaN;
+    public double WorldTop { get; set; } = double.NaN;
     /// <summary>Quest Tracker era ceiling ("" = any): quests after this era are hidden
     /// (discussion #62). Persisted app-wide — the world's era isn't per character.</summary>
     public string QuestEraFilter { get; set; } = "";

@@ -676,7 +676,7 @@ busier.
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
 | Quest window (all three tabs) | `EQBuddy/QuestsWindow.xaml.cs` — the widget's Quests card just opens it |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
-| Desktop zone map | `EQBuddy/MapWindow.cs` |
+| Desktop World theme (Map/Camps/Path/Travels) | `EQBuddy/WorldWindow.xaml.cs` — Map/Spawns/Travel windows retired into it (World PR 2) |
 | Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs` |
 | The mobile page | `Companion/Web/index.html` (one self-contained file) |
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` — data, like `ThemePalettes`; each UI composes it |

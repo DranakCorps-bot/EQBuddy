@@ -53,7 +53,13 @@ public class DeadSettingTests
         ["ProgressTop"] = "written with ProgressLeft by tuple deconstruction",
         ["GearLootTop"] = "written with GearLootLeft by tuple deconstruction",
         ["CreatureTop"] = "written with CreatureLeft by tuple deconstruction",
-        ["SpawnTop"] = "written with SpawnLeft by tuple deconstruction",
+        ["WorldTop"] = "written with WorldLeft by tuple deconstruction",
+        // SpawnTop LEFT this list on 2026-08-27 (World PR 2): both lanes' SpawnsWindow.cs
+        // — the only readers/writers of SpawnLeft/SpawnTop — retired into WorldWindow,
+        // which persists WorldLeft/WorldTop instead. Nothing reads SpawnLeft/SpawnTop any
+        // more, so the scan no longer sees them at all (unread is a different problem;
+        // "left inert" is the plan's own word for this, the same treatment the orphaned
+        // WindowZoom "spawns"/"map"/"travel" size-factor keys get).
         ["TimelineTop"] = "written with TimelineLeft by tuple deconstruction",
 
         // GENUINELY writer-less, and each one is a deliberate decision rather than a

@@ -54,8 +54,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal Companion.CompanionHost Companion => _companion;
     private CompanionWindow? _companionWindow;
     private readonly EQBuddy.UI.Shared.SpawnsViewModel _spawnsVm;
-    // internal (not private): WidgetDump reads DebugFacts() off this (World PR 1).
-    internal SpawnsWindow? _spawnsWindow;
     // Gear auto-done high-water marks, one per snapshot stream: loot drops, manual
     // merges (Crafted — how exaltations arrive), and loot-merge results (Upgraded —
     // how a wished "+N" tier is usually reached). Same delta contract as Sky's.
@@ -520,23 +518,27 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 () => ShowProgressWindow(progressTab == "1" ? null : progressTab),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
-        // Same family, and the one that was missing: the Spawns window deliberately stays
-        // hidden until a countdown exists, so scripts/shoot.ps1 could never capture it and
-        // Gate 3 shipped without a screenshot review. "1" opens it on the current zone.
+        // The WORLD theme's window (World PR 2). Same family, and the one that was
+        // missing: the Spawns tab deliberately stays hidden until a countdown exists, so
+        // scripts/shoot.ps1 could never capture it and Gate 3 shipped without a
+        // screenshot review. "1" opens the World window on Camps at the current zone;
+        // EQBUDDY_MAP/EQBUDDY_TRAVEL open it on Map/Path — three separate env names for
+        // one shared window now, kept apart because they already appear in shot fixtures
+        // and docs.
         if (Environment.GetEnvironmentVariable("EQBUDDY_SPAWNS") is { Length: > 0 } spawnZone)
             Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => ShowSpawnsWindow(spawnZone == "1" ? null : spawnZone),
+                () => ShowWorldWindow(WorldTab.Camps, spawnZone == "1" ? null : spawnZone),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
             Loaded += (_, _) => OnOptions(this, new RoutedEventArgs());
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_MAP") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnZoneMap(this, new RoutedEventArgs()),
+            Loaded += (_, _) => Dispatcher.BeginInvoke(() => ShowWorldWindow(WorldTab.Map),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_TRAVEL") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnTravelRoute(this, new RoutedEventArgs()),
+            Loaded += (_, _) => Dispatcher.BeginInvoke(() => ShowWorldWindow(WorldTab.Routes),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         // EQBUDDY_INVENTORY and EQBUDDY_GEARLOCKER both open the same TAB now — the two
@@ -2032,8 +2034,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         e.Handled = true;
     }
 
-    private void OnSpawnsWindow(object sender, RoutedEventArgs e) => ShowSpawnsWindow();
-
     internal QuestsWindow? _questsWindow;
     internal CreatureWindow? _creatureWindow;
     internal WikiPackWindow? _wikiPackWindow;
@@ -2258,34 +2258,19 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>Single switch for the spawn-timer feature: the setting, the menu check,
     /// and the Options checkbox stay in lockstep whichever of them the user touched.
     /// Arming opens nothing — the chicklet stack appears from the next tick if timers
-    /// are running; the full window only ever opens on demand.</summary>
+    /// are running.
+    ///
+    /// World PR 2: turning tracking OFF no longer closes a window. Spawns used to be its
+    /// own standalone window with nothing else in it, so closing it on disarm was free;
+    /// now it is one tab of <see cref="WorldWindow"/>, which may also be open on Map,
+    /// Path or Travels — closing the whole window would take those away too, for a
+    /// setting that has nothing to do with them.</summary>
     internal void SetTrackSpawns(bool on)
     {
         _settings.TrackSpawns = on;
         _settings.Save();
         if (_optionsWindow is { IsLoaded: true } ow) ow.SyncTrackSpawns(on);
-        if (!on)
-        {
-            CloseChips();
-            if (_spawnsWindow is { } w)
-            {
-                _spawnsWindow = null;   // cleared first so Closed handling can't loop
-                if (w.IsLoaded) w.Close();
-            }
-        }
-    }
-
-    internal void ShowSpawnsWindow(string? zone = null)
-    {
-        if (_spawnsWindow is { IsLoaded: true })
-        {
-            _spawnsWindow.Activate();
-            return;
-        }
-        var w = new SpawnsWindow(this, _spawnsVm, zone);
-        w.Closed += (_, _) => { if (ReferenceEquals(_spawnsWindow, w)) _spawnsWindow = null; };
-        _spawnsWindow = w;
-        w.Show();
+        if (!on) CloseChips();
     }
 
     private void OnOptions(object sender, RoutedEventArgs e)
@@ -2545,7 +2530,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (_gearLootWindow is { IsLoaded: true, IsVisible: true } glw) glw.MaybeRefresh();
         if (_creatureWindow is { IsLoaded: true, IsVisible: true } cw) cw.MaybeRefresh();
         if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
-        if (_mapWindow is { IsLoaded: true, IsVisible: true } mapw) mapw.MaybeRefresh();
+        if (_worldWindow is { IsLoaded: true, IsVisible: true } ww) ww.MaybeRefresh();
 
         if (_settings.TrackSpawns)
         {
@@ -2558,9 +2543,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                     PlayAlertSound(sound);
 
             // Chicklets are the ambient face of spawn tracking: the stack exists exactly
-            // while timers do — including alongside the full window, which is a browser,
-            // not a replacement. No pop-open of the full window, ever (David's design).
-            var hasTimers = !_hiddenForFocus && _spawnsVm.HasActiveTimers(DateTime.Now);
+            // while timers do — including alongside the World window on any OTHER tab,
+            // which is a browser, not a replacement. No pop-open of the full window, ever
+            // (David's design). The one exception (Bevel-signed World pre-design
+            // amendment, chip hide-rule): while the World window is open AND showing the
+            // Camps tab, the same timers are already on screen there, so the overlay
+            // stack hides — Map, Path, Travels and a closed window all leave it up.
+            var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
+                && ww3.CurrentTab == WorldTab.Camps;
+            var hasTimers = !_hiddenForFocus && !worldOnCamps && _spawnsVm.HasActiveTimers(DateTime.Now);
             if (hasTimers)
             {
                 if (_chipsWindow is not { IsLoaded: true })
@@ -3504,8 +3495,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private void OnFeedback(object sender, RoutedEventArgs e) =>
         new FeedbackWindow { Owner = this }.Show();
 
-    private void OnCampMarker(object sender, RoutedEventArgs e) => DropCampMarker();
-
     private HistoryWindow? _historyWindow;
 
     private void OnHistory(object sender, RoutedEventArgs e)
@@ -3521,7 +3510,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _historyWindow.Show();
     }
 
-    private void DropCampMarker()
+    // internal (not private): WorldWindow's chrome button calls this from every tab
+    // (Helm-signed World pre-design amendment, question 6 — the cog entry retired).
+    internal void DropCampMarker()
     {
         var s = _stats.Snapshot();
         _stats.AddMarker($"Marker {s.Markers.Count + 1}" +
@@ -4378,10 +4369,14 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         _hotkeyHidden = _hotkeyHiddenWindows.Count > 0;
                     }
                     break;
+                // World PR 2: both hotkeys now share one window. Each still opens (or
+                // re-shows) on its own tab — the hotkey ID and its landing tab stay
+                // stable across the fold — but hiding either one hides the shared
+                // window, since it is the same instance whichever tab it is on.
                 case "toggleMap":
-                    if (_mapWindow is { IsLoaded: true, IsVisible: true }) _mapWindow.Hide();
-                    else if (_mapWindow is { IsLoaded: true }) _mapWindow.Show();
-                    else OnZoneMap(this, new RoutedEventArgs());
+                    if (_worldWindow is { IsLoaded: true, IsVisible: true }) _worldWindow.Hide();
+                    else if (_worldWindow is { IsLoaded: true } wmap) { wmap.SetTab(WorldTab.Map); wmap.Show(); }
+                    else ShowWorldWindow(WorldTab.Map);
                     break;
                 case "toggleQuests":
                     if (_questsWindow is { IsLoaded: true, IsVisible: true }) _questsWindow.Hide();
@@ -4389,9 +4384,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                     else OnQuestsWindow(this, new RoutedEventArgs());
                     break;
                 case "toggleSpawns":
-                    if (_spawnsWindow is { IsLoaded: true, IsVisible: true }) _spawnsWindow.Hide();
-                    else if (_spawnsWindow is { IsLoaded: true }) _spawnsWindow.Show();
-                    else ShowSpawnsWindow(null);
+                    if (_worldWindow is { IsLoaded: true, IsVisible: true }) _worldWindow.Hide();
+                    else if (_worldWindow is { IsLoaded: true } wspawn) { wspawn.SetTab(WorldTab.Camps); wspawn.Show(); }
+                    else ShowWorldWindow(WorldTab.Camps);
                     break;
                 case "toggleClickThrough":
                     OnClickThrough(this, new RoutedEventArgs());
@@ -4480,27 +4475,36 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     }
 
 
-    // ---- travel routing + zone maps (competitive gaps #1/#2, 2026-08-10) ----
+    // ---- the WORLD theme: Map, Camps, Path, Travels (World PR 2, docs/Themes.md theme 6) ----
+    // Replaces the three separate windows this section used to hold (MapWindow,
+    // SpawnsWindow, TravelWindow — all deleted this PR) plus the "Drop camp marker" cog
+    // entry, which is now a chrome button inside WorldWindow itself.
 
     // internal (not private), same reason as _questsWindow/_progressWindow: WidgetDump
-    // reads DebugFacts() off these for the EQBUDDY_EXPAND dump (World PR 1).
-    internal TravelWindow? _travelWindow;
-    internal MapWindow? _mapWindow;
+    // reads DebugFacts() off this for the EQBUDDY_EXPAND dump.
+    internal WorldWindow? _worldWindow;
 
-    private void OnTravelRoute(object sender, RoutedEventArgs e)
-    {
-        if (_travelWindow is { IsLoaded: true } t) { t.RenderRoute(); t.Activate(); return; }
-        _travelWindow = new TravelWindow(this) { Owner = this };
-        _travelWindow.Show();
-    }
+    private void OnWorldWindow(object sender, RoutedEventArgs e) => ShowWorldWindow();
 
-    private void OnZoneMap(object sender, RoutedEventArgs e)
+    /// <summary>Open (or front) the World window, optionally on a named tab and/or a
+    /// specific spawn zone (the zone whose kill used to pop <c>SpawnsWindow</c> on its
+    /// own — <c>EQBUDDY_SPAWNS=&lt;zone&gt;</c> still reaches it). Re-opening on the Map
+    /// tab re-probes: a zone whose map wasn't found (pack unzipped since?) must not stay a
+    /// cached failure just because the window object lived on.</summary>
+    internal void ShowWorldWindow(WorldTab? tab = null, string? spawnZone = null)
     {
-        // Re-opening re-probes: a zone whose map wasn't found (pack unzipped since?)
-        // must not stay a cached failure just because the window object lived on.
-        if (_mapWindow is { IsLoaded: true } m) { m.MaybeRefresh(force: true); m.Activate(); return; }
-        _mapWindow = new MapWindow(this);
-        _mapWindow.Show();
+        if (_worldWindow is { IsLoaded: true })
+        {
+            if (tab is { } t) _worldWindow.SetTab(t);
+            else _worldWindow.MaybeRefresh(force: true);
+            _worldWindow.Activate();
+            return;
+        }
+        var w = new WorldWindow(this, spawnZone) { Owner = this };
+        w.Closed += (_, _) => { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; };
+        _worldWindow = w;
+        if (tab is { } t2) w.SetTab(t2);
+        w.Show();
     }
 
     // ---- the cursor-finder ring (issue #81) ----
