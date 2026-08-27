@@ -16,6 +16,31 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### leftover Sky items after an inventory dump
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** player's inventory + personal quest completion. Not shared game truth / eqlwiki. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (Sphinx Claw / Mithril Bands / Izah) — different reporter, different ask (count mismatch vs leftover-item audit); do not fold. Claude lesson: #241 is NOT wiki-data. Someday heading "Check off Sky items already in the bag / already turned in" is the inverse (bag → ticks, no leftover list); do not fold.
+- **Source:** #243 tvongaza Aug 26, 10:24 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/243 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.12 · Windows 26200.
+- **Ask:** "It would be great when you do an inventory dump, it could cross check which sky quests you've completed an which sky quest items you no longer need as you've completed all the quests which use them. Would help with limited inventory space."
+- **Already shipped:** latest tag v1.99.12 (reporter is on it). Inventory dump: WhatsNew 1.98.1 "Type /outputfile inventory in game and EQBuddy reads the file" / "Read your inventory dump (18:47) - 3 items ticked"; `InventoryFile.cs` parses the dump "so the quest tracker can answer 'what could I turn in with what I'm already carrying'"; Gear & Loot WINDOW tab Inventory (`LootSurface` / `InventoryView`) is "What you actually HAVE, from the game's own inventory dump". Widget Gear & Loot Inventory is a glance — WhatsNew 1.99.12 "a long filterable list belongs in a window". Sky completion: README "a reward's own checkbox marks the quest turned in" / "completed quests dim their items"; WhatsNew 1.92.0 "Mark turned in"; 1.93.0 Ready band + state filter done; 1.95.0 search "Wind Rune Azia · 7 classes want this · 2 of 7 in hand"; 1.98.1 `/outputfile achievements` "marks your raid clears and Sky rewards"; 1.99.12 "Turning a Sky reward in also marks its Sky Test quest complete on the Quests tab" and the Sky tab copies the achievements command. Widget Quests card: Plane of Sky tab is one class's checklist, read-only, capped (`QuestSurface.Sky`). Phone: Quests / Plane of Sky from `CompanionProjection.BuildSky` (same layout; Ready; tap ticks). No leftover / "no longer need" / dump-vs-completed-quests audit string was grepped.
+- **Checked:** WIDGET (Quests Plane of Sky + Gear & Loot Inventory glance, source). WINDOW (Quest Tracker Plane of Sky + Gear & Loot Inventory tab, source). PHONE (Companion Quests / Plane of Sky, source). I could not check the binary. No leftover-item label found in source.
+- **Hypothesis, unchecked against a running widget:** leftover-item audit is not a shipped surface. The dump already feeds have-counts / Ready; Sky completion is Mark turned in / achievements / dim. The hole is the join: dump items that no Sky quest still uses once every quest that wants them is complete.
+- **Class:** V0–V1 likely (dump counts + already-known `SkyQuestCompleted` flags). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-08-27 5:16 AM CT:** Signed. Waiting, not authorized. Different ask from #241; do not fold. Thank-you may post. No leftover list promised. No wiki.
+
+### have-count miss on Sphinx Claw / Mithril Bands / Izah
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** the player's own loot/have counts (personal). Not shared game truth / eqlwiki. Not a group meter. Named SOURCE is his three item mismatches (Sphinx Claw 4 vs none, Mithril Bands 1 vs zero, Izah 15 vs 17). Nearby "Check off Sky items already in the bag / already turned in" is a different Reddit someday ask — do not fold; do not restore it. Sky island grouping and the Sky bee chain are different asks.
+- **Source:** #241 DasGud Aug 26, 7:40 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/241 New thread. Category: Q&A. 0 replies. No version footer in the posted body (only the catalog-mirrors-eqlwiki template note).
+- **Ask:** "Showing I have 4 Sphinx Claws but unfortunately I have none. Also shows one Mithril Bands when I have zero and 15 Izah runes instead of my 17." Form also names Quest: Beastlord Sky Test: Windhowl/Spirit Render; turn-ins Brass Knuckles, Mithril Bands, Sphinx Claw, Wind Rune Izah; Giver Animist Kratho · Zone: Plane of Sky. Brass Knuckles has no count complaint.
+- **Already shipped:** have-count is `Total => Math.Max(0, Looted + Manual - Consumed)` (`QuestLedgerStore.Entry`). Looted is log-accumulated; Manual is "I already had this before EQBuddy"; Consumed is sales / destroys / merges — comment: "Hand-ins still aren't logged — that stays the ✓ click." Quest Tracker item Have is that Total (`QuestMatcher`: `owned.TryGetValue(i.Name, out var e) ? e.Total : 0`). `InventoryFile` parses `/outputfile inventory` for Gear Locker / Inventory tab; QuestMatcher does not read the dump. Latest tag is v1.99.12 (reporter footer unknown).
+- **Checked:** WINDOW (Quest Tracker Have = ledger Total, source). WIDGET (Quests card: Sky ticks via `SkyLootAutoCheck` on session loot; General ready uses the ledger, source). PHONE (Companion Quests tab exists; have-count path not grepped this run). I could not check the binary. No screenshot. No inventory dump. No log.
+- **Hypothesis, unchecked against his bags or a dump:** the three numbers are ledger Totals that do not match what he is holding. Named SOURCE is those three mismatches. Do not treat this as a wiki-data miss.
+- **Class:** V0–V1 (localized have-count). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-08-26 8:35 PM CT:** Signed. Not wiki-data. Waiting, not authorized. Thank-you may post. No eqlwiki edit link.
+- **Helm 2026-08-27 5:16 AM CT:** Thank-you signed. Post as drafted. No wiki. No "just tick it."
+
 ### leveling timestamps in an xp dropdown
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** player history (level times). Not shared game truth / eqlwiki. Not a group meter. Nearby #215 is rollback/archives (xp, levelups) — different ask; do not fold. #228 joeymavity is motes / mez / respawn — do not fold.
