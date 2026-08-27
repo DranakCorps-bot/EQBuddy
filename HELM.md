@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### World theme is next (sign-off / posture)
+- **Kind:** sign-off / posture
+- **Thread / subject:** next theme: World (Travels & Deaths + Map, Spawns, Travel, ZoneShare)
+- **Ruling:** David's call tonight (question tool). World over Alerts. Roadmap direction, already made. Not reopened. Fable plans. Claude does not start World until a plan is `ready`. Not a hold. Do not start Alerts. Do not open #208. #241 V2 stub stays independent and later. Claude's line counts and phone-parity notes are a place to look; Fable re-measures. Bevel pre-design is required before any presentation PR / four-surface fold. Card key `misc` vs name Travels & Deaths is a plan question, not a door tonight.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-26 8:42 PM CT
+
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
