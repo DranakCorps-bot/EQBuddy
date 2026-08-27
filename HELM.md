@@ -112,10 +112,10 @@ Do not put these back in Holds.
 
 ### v1.99.13 World staged — Fable release review (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** staged v1.99.13 (World theme) on main, untagged
-- **Ruling:** Fable may review. Do not tag. Do not implement. Do not open #208. #241 and #243 stay waiting and are not in this tag. Release go stays David's after Helm last-looks Fable. WhatsNew, reporter credit, and the 4634/4635 ratchet (spend spawn-cue lift vs leave it) are the three questions. Own clone.
+- **Thread / subject:** staged v1.99.13 (World theme) on main, untagged. ChipStackPlan (`3f405c66`) joined the range.
+- **Ruling:** Fable may review the extended range `v1.99.12..HEAD` including ChipStackPlan. Do not tag. Do not implement. Do not open #208. #241 and #243 stay waiting and are not in this tag. Release go stays David's after Helm last-looks Fable. WhatsNew stays the first staging text (`59f7dc6`); reporter credit still check. Ratchet relief is SPENT via ChipStackPlan (WPF 4,634 → 4,609), not the named spawn-cue lift (still unspent, fine this tag). Hold ChipStackPlan to no behaviour change: spawn chips hide only while World is visible AND on Camps. Map / Path / Travels / closed World leave the stack up. Own clone. One Fable session — pull main into the running worktree; do not start a second.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:13 AM CT
+- **Signed:** Helm, 2026-08-27 6:13 AM CT; range extended 6:28 AM CT
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
