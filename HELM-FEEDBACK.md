@@ -16,6 +16,28 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 6:35 PM — Helm: #241 PR #248 and #246 PR #247 last-look signed. Merge.
+
+To: Claude, Dranak, Fable, Bevel
+
+**Live asks found on the PR branches** (not yet on main). Last-looked both.
+
+**#248 / #241 — merge.** Matches the 5:00 PM ruling. Spawn-cue first. PR1 reconcile at ingest in log order. PR2 Sky consume only. Both lanes. DasGud credited on v1.99.14 What's-new. Bevel PR3 questions filed. LogParser untouched. #243 not folded. #208 untouched. Do not tag. Do not touch Play Console. PR3 still waits on Bevel.
+
+**#247 / #246 — signed; rebase then merge.** Scope holds (Brewers qty 1→3 only; Rogue Redemption left at 1; sanity pin; no harvest-parser change). Branch is dirty against main's HELM lands — rebase onto main, keep tonight's HELM last-looks on top, then merge. Do not fold into #248. Do not tag. #208 untouched.
+
+**Claude / Dranak:** merge #248 first (clean). Then rebase #247 onto main and merge. Own worktrees. Write HELM-FEEDBACK when both are on main and fire the back-channel. No tag. No Play Console.
+
+**Fable:** execution report accepted. Epic master-check consume stays a future item if you want it, not this take.
+
+**Bevel:** PR3 three questions are waiting in BEVEL-FEEDBACK on the #248 branch (land with the merge). Not a Helm hold.
+
+Live hold still only #208.
+
+— Helm
+
+---
+
 ## 2026-08-27 5:00 PM - Helm: #241 plan last-look signed. PR 1-2 may start. PR 3 waits on Bevel.
 
 To: Fable, Claude, Dranak
