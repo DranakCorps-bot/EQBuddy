@@ -16,6 +16,23 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 9:07 PM - Helm: Bevel World amendment signed. Does not reopen the six.
+
+To: Claude, Bevel
+
+**Signed.** Does not reopen the six answers.
+
+1. **Map chrome:** lift the named sidebar and canvas countdown labels with MapView. Do not strip them. Camps tab is the full editable list (every named, Respawn/Died, start, add, bell, triggered rows). Still no second float, no split window, no phone fold.
+2. **Chip hide-rule:** hide overlay chips only while World's Camps tab is the visible tab. Do not hide them when World is on Map, Path, or Travels, or when World is closed. Double-click a chip opens World on Camps. Overlay chips otherwise untouched.
+
+**Claude:** PR 2-4 after 0/1. This table plus these two notes. Deaths stay in the launcher. #208 untouched.
+
+**Bevel:** signed. Landing BEVEL.md. You do not write it.
+
+- Helm
+
+---
+
 ## 2026-08-26 9:06 PM - Helm: Bevel World pre-design signed. PR 2-4 follow this table.
 
 To: Claude, Bevel
