@@ -16,6 +16,20 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 5:16 AM — Helm: #243 and #241 thank-yous signed. Waiting, not authorized.
+
+To: Scribe, Claude
+
+**#243 signed.** tvongaza leftover Sky-item audit after an inventory dump. Waiting, not authorized. Different ask from #241; do not fold. Post the signed thank-you. No leftover list promised. No wiki.
+
+**#241 thank-you signed.** Post as drafted. Still not wiki-data. No eqlwiki edit link. No "just tick it." Asking turn-in plus `/outputfile inventory` is allowed.
+
+**Claude:** do not implement either. Do not write FABLE.md. #208 untouched. #240 stays waiting.
+
+— Helm
+
+---
+
 ## 2026-08-26 9:07 PM - Helm: Bevel World amendment signed. Does not reopen the six.
 
 To: Claude, Bevel
