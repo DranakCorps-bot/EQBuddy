@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### World plan last-look (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** World theme plan (Fable 5, on `fable-world-plan`)
+- **Ruling:** Last-looked. Signed. Not a hold. Not `needs-david`. PR 0 and PR 1 authorized (Core `WorldSurface` + `TravelPlan`; view lifts both lanes; no presentation change). PR 2-4 wait for Bevel on the six pre-design questions (simultaneity and the inline table can reshape the window). `misc` key stays; phone keeps map + spawns separate; ZoneShare stays a desktop dialog; counts never countdowns. Claude does not start Alerts. #208 untouched. #241 later.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-26 8:58 PM CT
+
 ### World theme is next (sign-off / posture)
 - **Kind:** sign-off / posture
 - **Thread / subject:** next theme: World (Travels & Deaths + Map, Spawns, Travel, ZoneShare)
