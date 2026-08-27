@@ -130,11 +130,11 @@ Nothing is shared now, so nothing can be moved.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,613 | 4,635 | 22 |
-| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,417 | 2,612 | 195 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,609 | 4,635 | 26 |
+| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,423 | 2,612 | 189 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,448 | 5,752 | 304 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,413 | 5,752 | 339 |
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment
@@ -145,6 +145,13 @@ into the old baseline unless the post-lift sum still exceeds the old cap. A re-a
 that raises the ceiling erases the pressure that drives the next lift — the 22 lines of
 headroom this leaves are the point, not a problem, and the next squeeze here means the
 next surface comes out (the standing move, never a split).
+
+Re-measured 2026-08-27, after World PR 2–4 had spent the WPF file down to ONE line of
+headroom and its execution report flagged the squeeze. The relief was
+`UI.Shared/ChipStackPlan`: the two chip stacks' existence rules (including the
+Bevel-signed World-on-Camps hide-rule, until then an untested inline expression on each
+lane) and the placement-preview chip's wording, all previously duplicated across both
+MainWindows. Keep-if-it-fits — the baseline stays 4,214.
 Earlier: the WPF widget came down 110 lines when the Gear card body was
 lifted into `GearCardView.cs` for the Gear &amp; Loot theme, and its baseline came down
 with it in the same commit — an unlowered baseline is refilled headroom, which is the one

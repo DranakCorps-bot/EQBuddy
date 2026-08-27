@@ -3,8 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- The Travels &amp; Deaths card's body, lifted out of MainWindow.xaml for World
          PR 1 (docs/Themes.md theme 6). Markup unchanged — only the container moved,
-         from an Expander's inline content to this UserControl's. The header (title,
-         MiscHeader, StarDeaths) stays on the widget, same as every other theme card. -->
+         from an Expander's inline content to this UserControl's. The old header's
+         deaths star did NOT stay behind: World PR 3 moved it into WorldWindow's
+         Travels-tab chrome (the only MiniStats writer for "deaths" — trap 20/26). -->
     <StackPanel x:Name="Root">
         <TextBlock Text="Deaths" FontSize="{DynamicResource FontCaption}" FontWeight="SemiBold" Foreground="{DynamicResource BadBrush}"/>
         <ItemsControl x:Name="DeathList" Margin="{DynamicResource ListBlock}"/>
