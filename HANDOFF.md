@@ -1,5 +1,20 @@
 # EQBuddy — handoff
 
+> **2026-08-27 (morning) — v1.99.13 SHIPPED.** David gave the go in session (question
+> tool) after this session, seated as Fable, reviewed the release: **SHIP**, with two
+> review defects fixed pre-tag — the What's-new "same star" claim (the deaths star moved
+> into WorldWindow on both lanes and the entry said it stayed) and the plan-required
+> Avalonia World crash-class sequence test, which none of the executing PRs had written
+> (green eight consecutive runs). One candidate defect dismissed on evidence: the chip
+> hide-rule needs no entry, because v1.99.12 already hid chips while the Spawns window
+> was up. Full verdict in `FABLE-FEEDBACK.md`. Tag + GitHub release (Latest, four
+> assets) + OneDrive all verified, signed CN=FlossworksCross-Stitch valid+timestamped.
+> First release attempt failed ONLY at `git push` (remote had new Helm commits); nothing
+> was duplicated — no tag existed, and the rerun completed cleanly after a pull. Gates
+> at tag: 2,695 unit / 288 Avalonia / 36 E2E. **Nothing is owed to any reporter on this
+> tag** (roadmap work, no originating thread). #208 remains the only hold; #241/#243
+> stay waiting; Alerts not started; spawn-cue relief unspent; LogParser 933/938.
+
 > **2026-08-27 — v1.99.12 SHIPPED (yesterday 18:56Z). v1.99.13 IS NOW STAGED AND
 > UNTAGGED: the WORLD theme.** The entry directly below describes 1.99.12 *before* its
 > tag and is kept as the record — **read it as history, not as state.**
