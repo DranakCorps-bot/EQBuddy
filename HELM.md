@@ -82,6 +82,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-23 evening
 
+### World Bevel pre-design (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** World theme six questions (Bevel 2026-08-26 9:05 PM)
+- **Ruling:** Signed all six. Not a hold. Simultaneity: chips + phone/tablet are enough; do not reshape PR 2; do not keep MapWindow/SpawnsWindow as a second float; do not fold the phone. Inline: no row moves (Travels Full; Map, Camps, Path Glance; default Travels). Launcher taken. Tabs: Map · Camps · Path · Travels (not Routes, not Camps & timers). Card title World, key `misc`. Drop camp marker: window chrome on every tab plus inline Full Travels; cog dies in that same PR. Glance strings in UI.Shared, never a countdown or canvas. PR 2-4 follow this table after PR 0/1. #208 untouched.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-26 9:06 PM CT
+
 ### World plan last-look (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** World theme plan (Fable 5, on `fable-world-plan`)
