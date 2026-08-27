@@ -45,6 +45,7 @@ internal sealed class SpawnsView
     private readonly DispatcherTimer _tick;
     private readonly List<TimerCell> _timerCells = [];
     private readonly Grid _headerRow = new();
+    private Grid _titleBar = null!;
     private readonly Border _root;
     private List<SpawnRow> _rows = [];
     private string _signature = "";
@@ -88,6 +89,12 @@ internal sealed class SpawnsView
     /// handler, exactly where <c>_tick.Stop()</c> ran before the lift.</summary>
     public void StopTicking() => _tick.Stop();
 
+    /// <summary>Hide this view's own title row and close button (World PR 2) — leftover
+    /// chrome from when this was a borderless standalone window. <c>WorldWindow</c>
+    /// supplies both now, so drawing this view's copies too would put two title rows and
+    /// two close buttons on screen at once.</summary>
+    internal void HideOwnTitleBar() => _titleBar.IsVisible = false;
+
     /// <summary>Window-edge padding, from the spacing scale — the same value the WPF
     /// window's PadCard resource composes.</summary>
     private static Thickness CardPad => new(
@@ -116,7 +123,7 @@ internal sealed class SpawnsView
             "Hide — the tracker returns on the next named kill; disable tracking in Options or the main menu",
             CloseWindow);
         close.HorizontalAlignment = HorizontalAlignment.Right;
-        var header = new Grid { Margin = CardPad };
+        var header = _titleBar = new Grid { Margin = CardPad };
         header.Children.Add(_title);
         header.Children.Add(close);
 

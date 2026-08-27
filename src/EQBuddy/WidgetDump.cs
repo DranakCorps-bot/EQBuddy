@@ -90,6 +90,15 @@ internal static class WidgetDump
                         : "questsInline=0 ") +
                     $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
+                    // The WORLD theme's placement (World PR 3) — same contract as the
+                    // three above: inline and windowOpen are never both 1, and the tab
+                    // keys are emitted only while the CARD owns the body.
+                    $"worldInline={(w._worldHost.IsInline ? 1 : 0)} " +
+                    $"worldWindowOpen={(w._worldHost.IsWindowOpen ? 1 : 0)} " +
+                    (w._worldHost.IsInline
+                        ? $"worldTab={WorldSurface.KeyFor(w._worldCard.SelectedTab)} " +
+                          $"worldTabs={w._worldCard.TabCount} "
+                        : "") +
                     // The Travels tab's body, lifted into TravelsView (World PR 1). Same
                     // keys (zones/deaths) the misc card always dumped, plus travelsMarkers
                     // (never pinned before this PR) — DebugFacts() carries all three.
@@ -166,14 +175,12 @@ internal static class WidgetDump
                     // before the fold; the point of the assertion is that they are the SAME
                     // numbers.
                     (w._creatureWindow is { IsLoaded: true } cwin ? cwin.DebugFacts() + " " : "") +
-                    // The World theme's three standalone windows (World PR 1 — no
-                    // WorldWindow yet, so each still opens on its own EQBUDDY_* hook).
-                    // Same reason as every DebugFacts() above: the WPF layer has no unit
-                    // tests, so these numbers are pinned from a launched app before the
-                    // view-lift and must read the same after it.
-                    (w._mapWindow is { IsLoaded: true } mwin ? mwin.DebugFacts() + " " : "") +
-                    (w._spawnsWindow is { IsLoaded: true } swin ? swin.DebugFacts() + " " : "") +
-                    (w._travelWindow is { IsLoaded: true } twin ? twin.DebugFacts() + " " : "") +
+                    // The WORLD theme's window (World PR 2 — replaces the three
+                    // standalone windows the three keys above used to come from). Same
+                    // reason as every DebugFacts() above: the WPF layer has no unit
+                    // tests, so these numbers are pinned from a launched app and must
+                    // read the same after the fold as they did on the old hosts.
+                    (w._worldWindow is { IsLoaded: true } wwin ? wwin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={w._companionPumpTicks} " +

@@ -97,6 +97,36 @@ public class CompanionMapSourceTests : IDisposable
         Assert.Equal(45, map.You.AgeSeconds, 1);
     }
 
+    /// <summary>Session camp markers plot at the /loc they were dropped at (World PR 4)
+    /// — same plotting rule as the "you are here" marker above, same file.</summary>
+    [Fact]
+    public void ACampMarkerWithALocationPlotsAPin()
+    {
+        var markers = new List<MarkerDetail>
+        {
+            new(Now.AddMinutes(-2), "Marker 1 — Befallen", LocY: 30, LocX: 20),
+        };
+        var map = Source().Build(In() with { Markers = markers }, Now);
+
+        var pin = Assert.Single(map.Markers);
+        Assert.Equal(-20, pin.X);
+        Assert.Equal(-30, pin.Y);
+        Assert.Equal("Marker 1 — Befallen", pin.Text);
+        Assert.Equal(120, pin.AgeSeconds, 1);
+    }
+
+    /// <summary>A marker dropped before the first /loc has nowhere to plot — it still
+    /// belongs on the Travels list (unaffected by this surface), it just gets no pin,
+    /// the same "row but no dot" shape a named with no camp yet gets.</summary>
+    [Fact]
+    public void ACampMarkerWithNoLocationPlotsNoPin()
+    {
+        var markers = new List<MarkerDetail> { new(Now, "Marker 1 — Befallen") };
+        var map = Source().Build(In() with { Markers = markers }, Now);
+
+        Assert.Empty(map.Markers);
+    }
+
     [Fact]
     public void CirclesCarryTheirCountdownAndTheirImminence()
     {

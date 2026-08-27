@@ -4,6 +4,69 @@ Start / Stop / Continue for Claude Code (and Opus sessions). Newest entry at the
 
 ---
 
+## 2026-08-27 — World PR 2-4 executed to the signed table; PR #244 open against main
+
+**Reporting, not asking.** PR 0/1 were already on `world-pr01` (Core `WorldSurface`/
+`TravelPlan`, view lifts). This session built and committed PR 2, 3 and 4 to the
+Bevel-signed six + amendment (Helm-signed 2026-08-26 9:06/9:07 PM), pushed the branch,
+and opened https://github.com/DranakCorps-bot/EQBuddy/pull/244 against main.
+
+**What shipped, one line each** (full detail in the three commit messages —
+`ac9cc82`/`87e2a74`/`01f62aa`):
+- **PR 2:** `WorldWindow` both lanes; `MapWindow`/`SpawnsWindow`/`TravelWindow` deleted
+  on both lanes; cog's four World entries → one "World…" entry; Drop-marker moved from
+  the cog to window chrome on every tab; the Bevel-signed chip hide-rule (chips hide
+  only while World is visible AND on Camps).
+- **PR 3:** the fifth `ThemeCardView`/`ThemeCardPanel` (Travels Full, Map/Camps/Path
+  Glance); new `UI.Shared/WorldTheme.cs`; card key stays `misc`, title becomes "World";
+  `StarDeaths` (trap 20/26) moved into `WorldWindow`'s Travels-tab chrome, self-contained
+  on WPF (matching that lane's Kills-star shape) and via the shared `_stars`/
+  `OnStarChanged` mechanism on Avalonia (matching that lane's Kills-star shape) — each
+  lane kept its own existing pattern rather than inventing a third.
+- **PR 4:** new phone `travel` surface reading the same `TravelPlan` Core module the
+  desktop Path tab reads; kept separate from `map`/`spawns` per the signed simultaneity
+  ruling. `SessionMarkerEvent`/`StatsSnapshot.Markers` gained an optional location so
+  "Drop camp marker" can plant a pin on the phone map (new `MarkerDetail` record,
+  `CompanionMapPin`). Two new WS message kinds (`travel`, `dropMarker`). `ZoneShare`
+  stays desktop-only, as decided.
+
+**Hard limits honored:** no Alerts work started, no tag, `LogParser.cs` untouched
+(933/938 lines throughout), deaths still show in the launcher line
+(`WorldSurface.LauncherSummary`), this worktree only — never David's working checkout.
+
+**Ratchet, re-measured at the end of each PR** (the plan's own instruction, since its
+own numbers "rot"):
+
+| File | After PR2 | After PR3 | After PR4 | Cap |
+|---|---|---|---|---|
+| WPF `MainWindow.xaml.cs` | 4633 | 4632 | 4634 | 4635 |
+| Avalonia `MainWindow.cs` | 5403→5392 | 5429 | 5434 | 5751 |
+| `LogParser.cs` | 933 | 933 | 933 | 938 |
+
+**The WPF number is the one worth flagging.** PR 2 landed at 4633/4635 — 2 lines of
+headroom — and PR 3's card wiring first landed at 4637 (over cap) purely from comment
+density; it fit at 4632 only after trimming comments, with no logic cut. The plan's own
+risk section anticipated exactly this and named a relief lift (the spawn-cue block) as
+the fallback; comment-trimming was enough this time, but the next PR to touch this file
+should expect to need that lift for real — there are effectively 1 line of headroom left
+after PR 4's small `ZoneGraph`/`DropMarker` wiring addition.
+
+**Gates green throughout:** 2678 Core unit tests (2668 + 10 new), 287 Avalonia tests, 36
+E2E tests (real launched WPF app), both lanes build with 0 new warnings. The phone side
+was verified against the real shipped `index.html` via `scripts/mobile-harness.ps1`
+driven headlessly with Playwright (chromium) — zero console/page errors, and the
+travel panel + map marker pin rendered exactly as predicted from a pushed snapshot,
+screenshot reviewed rather than just the DOM text.
+
+**Not done, out of scope per the plan:** any Alerts/bell redesign; ZoneShare on the
+phone; ⚙-menu drop-marker for Map/Spawns specifically (the button lives on the phone's
+Travel panel, not duplicated onto the Map panel — a scoping call made under time
+budget, not a plan requirement); #241 (untouched, later).
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-24 evening — How you call Fable
 
 You do not start Fable. File `To: Fable` (`FABLE.md` stub or `FABLE-FEEDBACK.md`), push, then `gh workflow run helm-back-channel.yml --repo DranakCorps-bot/dranakcorps-control-plane`. Helm last-looks and pages Dranak to start Fable. A file write is not a call.

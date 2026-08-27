@@ -12,8 +12,8 @@ public class WorldSurfaceTests
     public void LabelsMatchThemesDoc()
     {
         Assert.Equal("Map", WorldSurface.LabelFor(WorldTab.Map));
-        Assert.Equal("Camps & timers", WorldSurface.LabelFor(WorldTab.Camps));
-        Assert.Equal("Routes", WorldSurface.LabelFor(WorldTab.Routes));
+        Assert.Equal("Camps", WorldSurface.LabelFor(WorldTab.Camps));
+        Assert.Equal("Path", WorldSurface.LabelFor(WorldTab.Routes));
         Assert.Equal("Travels", WorldSurface.LabelFor(WorldTab.Travels));
     }
 

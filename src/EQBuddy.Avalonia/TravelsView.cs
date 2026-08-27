@@ -1,21 +1,19 @@
 using Avalonia.Controls;
+using Avalonia.Layout;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Avalonia;
 
 /// <summary>
-/// The Travels &amp; Deaths card's body: deaths, zones visited, camp markers. Lifted out
-/// of <c>MainWindow</c> for World PR 1 (docs/Themes.md theme 6) — the small,
-/// player-driven lists that make this the theme's one Full-inline tab (Travels).
-///
-/// Takes <see cref="IZoneHost"/> in the constructor for the same reason every other
-/// World view does, though this one currently reads nothing from it beyond what its
-/// caller already has — future tabs on the same theme (Camps, Routes) share the host,
-/// and this keeps the four views' constructors uniform.
+/// The Travels and Deaths card body: deaths, zones visited, camp markers.
+/// Drop camp marker (Helm-signed World pre-design question 6) lives here so the
+/// inline Full Travels card calls the same handler WorldWindow chrome already uses.
+/// Glance tabs never reach this body.
 /// </summary>
 internal sealed class TravelsView
 {
+    private readonly IZoneHost _host;
     private readonly ItemsControl _deathList = new();
     private readonly ItemsControl _zoneList = new();
     private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
@@ -24,8 +22,19 @@ internal sealed class TravelsView
 
     public TravelsView(IZoneHost host)
     {
-        _ = host;   // unused today; kept for constructor uniformity across the theme's four views
+        _host = host;
         _body = new StackPanel();
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        var marker = DesignSystem.IconButton("Location",
+            "Drop a marker at your current zone - see it on the Travels tab and on your phone map",
+            () => { _host.DropCampMarker(); Render(_host.CurrentSnapshot()); }, "AccentBrush");
+        row.Children.Add(marker);
+        var markerLabel = DesignSystem.Text(DesignTokens.TypeRole.Caption, "Drop camp marker");
+        markerLabel.Foreground = AppTheme.DimBrush;
+        markerLabel.VerticalAlignment = VerticalAlignment.Center;
+        markerLabel.Margin = new global::Avalonia.Thickness(DesignTokens.SpaceS, 0, 0, 0);
+        row.Children.Add(markerLabel);
+        _body.Children.Add(row);
         _body.Children.Add(AppTheme.Heading("Deaths", AppTheme.BadBrush));
         _body.Children.Add(_deathList);
         _body.Children.Add(AppTheme.Heading("Zones visited"));
@@ -37,25 +46,16 @@ internal sealed class TravelsView
 
     public Control Body => _body;
 
-    /// <summary>Paints the three lists — called only while the card is expanded, the
-    /// same gate <c>MainWindow.RefreshUi</c> always used.</summary>
     public void Render(StatsSnapshot s)
     {
-        // ctx is null: deaths/zones/markers use neither questBadges nor item clicks,
-        // so this depends on nothing beyond the rows (CardParts.FillList's own contract).
         CardParts.FillList(_deathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
         CardParts.FillList(_zoneList, s.Zones.Select(z => (z.Text, z.Time.ToString("h:mm tt"))));
         _markersLabel.IsVisible = s.Markers.Count > 0;
         CardParts.FillList(_markerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
     }
 
-    /// <summary>The markers label's visibility is also refreshed independent of the
-    /// card's own expand gate (<c>RefreshOptionalSectionVisibility</c> ran this every
-    /// tick before the lift, alongside every other optional-section label) — kept as
-    /// its own entry point so that second call site still reaches it.</summary>
     public void SetMarkersVisible(bool visible) => _markersLabel.IsVisible = visible;
 
-    /// <summary>Facts for a debug/E2E-style dump, mirroring the WPF view's shape.</summary>
     public string DebugFacts() =>
         $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} travelsMarkers={_markerList.Items.Count}";
 }

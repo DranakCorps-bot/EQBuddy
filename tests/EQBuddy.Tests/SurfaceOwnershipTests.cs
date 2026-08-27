@@ -127,11 +127,12 @@ public class SurfaceOwnershipTests
 
     /// <summary>
     /// World PR 1's four separate factories (docs/Themes.md theme 6) — not one combined
-    /// set, unlike Progress/Creature/Loot. There is no WorldWindow yet (PR 2), only three
-    /// SEPARATE standalone windows, and MapView/SpawnsView do real construction-time work
-    /// (file I/O, ledger reads) a shared factory would fire needlessly for every sibling.
-    /// Both lanes name the same four methods, which is what a reader of one lane checks
-    /// against the other.
+    /// set, unlike Progress/Creature/Loot, because MapView/SpawnsView do real
+    /// construction-time work (file I/O, ledger reads) a shared factory would fire
+    /// needlessly for every sibling. WPF's <c>WorldWindow</c> (PR 2) calls all four from
+    /// its own constructor; Avalonia still opens three separate standalone windows until
+    /// its own PR 2 fold. Both lanes name the same four methods, which is what a reader
+    /// of one lane checks against the other.
     /// </summary>
     [Theory]
     [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
@@ -148,22 +149,25 @@ public class SurfaceOwnershipTests
 
     /// <summary>
     /// Every World host builds ITS OWN instance, never a shared one — trap 45's actual
-    /// requirement (fresh, not shared), satisfied here two ways: WPF's three windows all
-    /// go through MainWindow's factory (mirroring Progress/Creature/Loot); Avalonia's
-    /// SpawnsWindow does too, but its Map/Travel windows already took <c>IZoneHost</c>
-    /// directly before this PR (<c>ZoneWindowsRenderTests</c> constructs them against a
-    /// fake host with no widget at all) — preserved rather than "fixed", since a
-    /// constructor signature that render tests depend on is not the thing to change in a
-    /// zero-product-change PR. Building <c>new MapView(host)</c>/<c>new TravelView(host)</c>
-    /// inline is exactly as fresh as calling a factory that would do the same thing.
+    /// requirement (fresh, not shared). World PR 2 folded both lanes' three standalone
+    /// windows into one <c>WorldWindow</c> each, which builds all four surfaces in its
+    /// OWN constructor (mirroring Progress/Creature/Loot). Avalonia's <c>MapView</c>/
+    /// <c>TravelView</c> are built directly against <c>IZoneHost</c> rather than through
+    /// a factory — the shape <c>MapWindow</c>/<c>TravelWindow</c> already used before this
+    /// PR, kept rather than "fixed" because <c>ZoneWindowsRenderTests</c> constructs them
+    /// against a fake host with no widget at all. Building <c>new MapView(host)</c>/
+    /// <c>new TravelView(host)</c> inline is exactly as fresh as calling a factory that
+    /// would do the same thing.
     /// </summary>
     [Theory]
-    [InlineData("EQBuddy", "MapWindow.cs", "main.NewMapView()")]
-    [InlineData("EQBuddy", "SpawnsWindow.cs", "main.NewSpawnsView(initialZone)")]
-    [InlineData("EQBuddy", "TravelWindow.cs", "main.NewTravelView()")]
-    [InlineData("EQBuddy.Avalonia", "MapWindow.cs", "new MapView(host)")]
-    [InlineData("EQBuddy.Avalonia", "SpawnsWindow.cs", "main.NewSpawnsView(initialZone)")]
-    [InlineData("EQBuddy.Avalonia", "TravelWindow.cs", "new TravelView(host)")]
+    [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewMapView()")]
+    [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewSpawnsView(initialZone)")]
+    [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewTravelView()")]
+    [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewTravelsView()")]
+    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "new MapView(main)")]
+    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "main.NewSpawnsView(initialZone)")]
+    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "new TravelView(main)")]
+    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "main.NewTravelsView()")]
     public void EveryWorldHostBuildsItsOwnFreshView(string project, string file, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));

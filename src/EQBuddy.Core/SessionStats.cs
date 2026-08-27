@@ -229,7 +229,7 @@ public sealed partial class SessionStats
     private static readonly TimeSpan ActiveBucket = TimeSpan.FromMinutes(2);
     private readonly SortedSet<long> _activeBuckets = new();
 
-    private readonly List<(DateTime Time, string Label)> _markers = new();
+    private readonly List<(DateTime Time, string Label, double? LocY, double? LocX)> _markers = new();
 
     // ---- encounters + mob farming (Release C) ----
     private sealed class ActiveFight
@@ -1051,7 +1051,7 @@ public sealed partial class SessionStats
                     break;
                 case ItemProcEvent iproc: _lastItemProc = (iproc.Item, iproc.Time); break;
                 case SessionMarkerEvent mk:
-                    _markers.Add((mk.Time, mk.Label));
+                    _markers.Add((mk.Time, mk.Label, mk.LocY, mk.LocX));
                     break;
             }
         }
@@ -1511,7 +1511,8 @@ public sealed partial class SessionStats
     }
 
     /// <summary>Drop a camp/segment marker (wall-clock timestamped).</summary>
-    public void AddMarker(string label) => Apply(new SessionMarkerEvent(DateTime.Now, label));
+    public void AddMarker(string label) =>
+        Apply(new SessionMarkerEvent(DateTime.Now, label, _lastLoc?.LocY, _lastLoc?.LocX));
 
     public void Reset()
     {
@@ -1902,7 +1903,7 @@ public sealed partial class SessionStats
                 KillsPerActiveHour = _yourKills.Values.Sum() / activeHours,
                 Recent = recent,
                 Tracked = tracked,
-                Markers = _markers.Select(m => new TimedDetail(m.Time, m.Label)).ToList(),
+                Markers = _markers.Select(m => new MarkerDetail(m.Time, m.Label, m.LocY, m.LocX)).ToList(),
                 LastFight = BuildLastFight(),
                 CurrentTargets = BuildCurrentTargetsLocked(),
                 RecentEncounters = _encounters.TakeLast(8).Reverse().ToList(),
@@ -1973,6 +1974,11 @@ public record NameCount(string Name, int Count);
 public record RecentRates(TimeSpan Window, bool HasFullWindow, double XpPercent, double XpPerHour,
     int Kills, long Copper, double Dps, double Hps);
 public record TimedDetail(DateTime Time, string Text);
+/// <summary>A camp marker, with the location it was dropped at when one was known
+/// (World PR 4 — the phone's session-marker pins read <see cref="LocY"/>/<see cref="LocX"/>;
+/// the desktop's Travels tab reads <see cref="Time"/>/<see cref="Text"/> exactly as it did
+/// when markers were plain <see cref="TimedDetail"/> rows).</summary>
+public record MarkerDetail(DateTime Time, string Text, double? LocY = null, double? LocX = null);
 
 /// <summary>One minute of the session's damage timeline (see
 /// <see cref="StatsSnapshot.DamageTimeline"/>).</summary>
@@ -2152,7 +2158,7 @@ public sealed class StatsSnapshot
     public double KillsPerActiveHour { get; init; }
     public RecentRates? Recent { get; init; }
     public List<TrackedRuleResult> Tracked { get; init; } = [];
-    public List<TimedDetail> Markers { get; init; } = [];
+    public List<MarkerDetail> Markers { get; init; } = [];
     /// <summary>The fight in progress, or the last one that finished; null before the first
     /// fight of the session. Shown above the session totals on Combat and Healing.</summary>
     public LastFightInfo? LastFight { get; init; }

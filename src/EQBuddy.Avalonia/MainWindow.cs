@@ -58,7 +58,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>Followed character identity for window titles and exports.</summary>
     public (string Character, string Server) Identity =>
         (_stats.CharacterName ?? "", _stats.ServerName ?? "");
-    private SpawnsWindow? _spawnsWindow;
     private SpawnChipsWindow? _spawnChipsWindow;
     private MezChipsWindow? _mezChipsWindow;
     private readonly MezTracker _mezTracker = new();
@@ -415,6 +414,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             },
             QuestLedger = QuestLedger,
             QuestCharacterKey = () => QuestCharacterKey,
+            // World PR 4: the Path tab reads the SAME ZoneGraph the desktop's Path tab
+            // and TravelPlan read, and "Drop camp marker" from a phone calls the same
+            // method the World window's own chrome button does.
+            ZoneGraph = ZoneGraph,
+            DropMarker = DropCampMarker,
         };
         _companion = new EQBuddy.Companion.CompanionHost(
             _settings, UpdateChecker.CurrentVersion.ToString(), CompanionSources);
@@ -583,12 +587,19 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
             Loaded += (_, _) => OnOptions(this, EventArgs.Empty);
 
+        // The WORLD theme's window (World PR 2). EQBUDDY_MAP/EQBUDDY_TRAVEL open the
+        // shared window on Map/Path; EQBUDDY_SPAWNS (below) opens it on Camps.
         if (Environment.GetEnvironmentVariable("EQBUDDY_MAP") == "1")
-            Loaded += (_, _) => Dispatcher.UIThread.Post(() => OnZoneMap(this, EventArgs.Empty),
+            Loaded += (_, _) => Dispatcher.UIThread.Post(() => ShowWorldWindow(WorldTab.Map),
                 DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_TRAVEL") == "1")
-            Loaded += (_, _) => Dispatcher.UIThread.Post(() => OnTravelRoute(this, EventArgs.Empty),
+            Loaded += (_, _) => Dispatcher.UIThread.Post(() => ShowWorldWindow(WorldTab.Routes),
+                DispatcherPriority.ApplicationIdle);
+
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SPAWNS") is { Length: > 0 } spawnZone)
+            Loaded += (_, _) => Dispatcher.UIThread.Post(
+                () => ShowWorldWindow(WorldTab.Camps, spawnZone == "1" ? null : spawnZone),
                 DispatcherPriority.ApplicationIdle);
 
         if (Environment.GetEnvironmentVariable("EQBUDDY_INVENTORY") == "1")
@@ -1127,11 +1138,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // reach at all (#228, and MiniBarPresentation.Names carries the rest of that note).
         AddSection("motes", "motes", "Motes", _motesHeader,
             CardMotes.Body, "Show motes in mini dashboard");
-        // The Travels & Deaths card's body (World PR 1, docs/Themes.md theme 6 — this
-        // card is the theme's ThemeCardKey="misc" slot; the theme card shell itself is
-        // PR 3's work). One instance, built here like every other card's.
+        // The WORLD theme's card (World PR 3, docs/Themes.md theme 6). Card key stays
+        // "misc" (no settings migration); the title becomes "World". Travels is the Full
+        // room (this same TravelsView instance, built here like every other card's); Map,
+        // Camps and Path are Glance — no star in the header, like Kills/Progress: it
+        // moved into WorldWindow's own chrome (trap 20/26).
         _travelsView = new TravelsView(this);
-        AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, _travelsView.Body, "Show deaths in mini dashboard");
+        _worldCard = WorldThemeCard.Build(
+            Header("misc", "World", _miscHeader), _worldHost,
+            travels: () => _travelsView, currentZone: () => CurrentZoneName,
+            runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
+            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate());
+        _sections["misc"] = _worldCard;
+        ToolTip.SetTip(_sections["misc"],
+            "World - your zone map, camp timers, travel routes, deaths and zone markers. "
+            + "Expands in place; the arrow opens its window.");
         return _sectionsPanel;
     }
 
@@ -1381,14 +1402,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // a session, not a setting you visit once — same place as the WPF menu's.
         menu.Items.Add(Item("EQBuddy Mobile (Beta)…", (_, _) => OpenCompanionWindow(),
             "Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."));
-        menu.Items.Add(Item("Zone map…", OnZoneMap,
-            "Your zone's map with your last /log position — type /loc in game to update the marker"));
-        menu.Items.Add(Item("Travel route…", OnTravelRoute,
-            "Hop-by-hop directions from where you are to any zone"));
-        menu.Items.Add(Item("Spawn timers…", (_, _) => ShowSpawnsWindow()));
+        // The WORLD theme (docs/Themes.md theme 6, World PR 2): Zone map, Travel route,
+        // Spawn timers and Drop camp marker all retire as separate entries here — one
+        // door onto the four World tabs, the same shape Gear & Loot's cog entries took
+        // when that theme's card became the only door. Drop camp marker's replacement is
+        // the button in the World window's own chrome (every tab), not a cog entry.
+        menu.Items.Add(Item("World…", (_, _) => ShowWorldWindow(),
+            "Zone map, camp timers, travel routes, deaths and zone markers — one window, four tabs"));
         menu.Items.Add(Item("Session history…", OnHistory));
         menu.Items.Add(new Separator());
-        menu.Items.Add(Item("Drop camp marker", (_, _) => DropCampMarker()));
         _clickThroughItem.Click += (_, _) => SetClickThrough(!_clickThrough);
         menu.Items.Add(_clickThroughItem);
         menu.Items.Add(new Separator());
@@ -1877,7 +1899,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         if (_gearLootWindow is { IsVisible: true } gw) gw.MaybeRefresh();
         if (_creatureWindow is { IsVisible: true } cw) cw.MaybeRefresh();
         if (_wikiPackWindow is { IsVisible: true } wp) wp.MaybeRefresh();
-        if (_mapWindow is { IsVisible: true } mapw) mapw.MaybeRefresh();
+        if (_worldWindow is { IsVisible: true } ww) ww.MaybeRefresh();
 
         if (_settings.TrackSpawns)
         {
@@ -1886,8 +1908,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 if (_spawnsVm.SoundFor(due.Zone, due.Name) is { } sound)
                     PlayAlertSound(sound);
 
-            // Chips are the ambient face and stay visible alongside the full browser.
-            if (!_hiddenForFocus && _spawnsVm.HasActiveTimers(DateTime.Now))
+            // Chips are the ambient face and stay visible alongside the World window on
+            // any OTHER tab. The one exception (Bevel-signed World pre-design amendment,
+            // chip hide-rule): while the World window is visible AND showing Camps, the
+            // same timers are already on screen there, so the overlay stack hides — Map,
+            // Path, Travels and a closed window all leave it up.
+            var worldOnCamps = _worldWindow is { IsVisible: true } ww2 && ww2.CurrentTab == WorldTab.Camps;
+            if (!_hiddenForFocus && !worldOnCamps && _spawnsVm.HasActiveTimers(DateTime.Now))
             {
                 // A null field is the "window truly gone" signal (its Closed handler
                 // nulls it) — the Avalonia stand-in for WPF's `is not { IsLoaded: true }`,
@@ -2079,7 +2106,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // UI.Shared so this build, the WPF widget and EQBuddy Mobile say the same thing
         // (#210: parity by shared module, never by feature list).
         _progressHeader.Text = ProgressTheme.LauncherSummary(s);
-        _miscHeader.Text = $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}";
+        _miscHeader.Text = WorldSurface.LauncherSummary(zone: CurrentZoneName,   // counts, never countdowns
+            zonesVisited: s.Zones.Count, deaths: s.Deaths.Count,
+            runningTimers: _spawnTimers.Snapshot(DateTime.Now).Count);
     }
 
     /// <summary>Paint a snapshot into the cards, without the timer-driven housekeeping
@@ -2234,7 +2263,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // window builds for itself and renders on its own tick — so the widget no longer
         // paints surfaces it does not host, and there is nothing left for a second host to
         // take. See IWidgetCard for why that is structural rather than tidy.
-        if (_sections["misc"].IsExpanded) _travelsView.Render(s);
+        _worldCard?.Render(s);
 
         if (_expandForTesting)
         {
@@ -2266,14 +2295,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         ? $"progressInline=1 progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
                           $"progressTabs={_progressCard.TabCount} "
                         : "progressInline=0 ") +
+                    // The WORLD theme's placement (World PR 3) — same contract as above.
+                    (_worldCard is { IsExpanded: true }
+                        ? $"worldInline=1 worldTab={WorldSurface.KeyFor(_worldCard.SelectedTab)} " +
+                          $"worldTabs={_worldCard.TabCount} "
+                        : "worldInline=0 ") +
                     // The Travels tab's body, lifted into TravelsView (World PR 1). Same
-                    // keys (zones/deaths) this dump always carried, plus travelsMarkers
-                    // (never pinned before this PR) and the three World windows' own
-                    // facts, when EQBUDDY_MAP/EQBUDDY_SPAWNS/EQBUDDY_TRAVEL opened one.
+                    // keys (zones/deaths) this dump always carried, plus travelsMarkers,
+                    // and the WORLD window's own facts (World PR 2 — replaces the three
+                    // separate windows above), when EQBUDDY_MAP/EQBUDDY_SPAWNS/
+                    // EQBUDDY_TRAVEL opened one.
                     $"{_travelsView.DebugFacts()} " +
-                    (_mapWindow is { IsVisible: true } mwin ? mwin.DebugFacts() + " " : "") +
-                    (_spawnsWindow is { IsVisible: true } swin ? swin.DebugFacts() + " " : "") +
-                    (_travelWindow is { IsVisible: true } twin ? twin.DebugFacts() + " " : "") +
+                    (_worldWindow is { IsVisible: true } wwin ? wwin.DebugFacts() + " " : "") +
                     $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
                 File.WriteAllText(AppPaths.File("debug.txt"), dump);
             }
@@ -3267,39 +3300,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
     private void OnTutorial(object? sender, EventArgs e) => new TutorialWindow(this).Show(this);
 
-    /// <summary>One switch keeps settings, Options, and tracker window in sync (the
-    /// menu item moved to Options with the 1.67.1 menu reshuffle).</summary>
+    /// <summary>One switch keeps settings and Options in sync (the menu item moved to
+    /// Options with the 1.67.1 menu reshuffle).
+    ///
+    /// World PR 2: turning tracking OFF no longer closes a window. Spawns used to be its
+    /// own standalone window with nothing else in it, so closing it on disarm was free;
+    /// now it is one tab of <see cref="WorldWindow"/>, which may also be open on Map,
+    /// Path or Travels — closing the whole window would take those away too, for a
+    /// setting that has nothing to do with them.</summary>
     internal void SetTrackSpawns(bool on)
     {
         _settings.TrackSpawns = on;
         _settings.Save();
         if (_optionsWindow is { IsVisible: true } options)
             options.SyncTrackSpawns(on);
-        if (!on)
-        {
-            CloseSpawnChips();
-            if (_spawnsWindow is { } window)
-            {
-                _spawnsWindow = null;
-                window.Close();
-            }
-        }
-    }
-
-    internal void ShowSpawnsWindow(string? zone = null)
-    {
-        if (_spawnsWindow is { IsVisible: true })
-        {
-            _spawnsWindow.Activate();
-            return;
-        }
-        var window = new SpawnsWindow(this, _spawnsVm, zone);
-        window.Closed += (_, _) =>
-        {
-            if (ReferenceEquals(_spawnsWindow, window)) _spawnsWindow = null;
-        };
-        _spawnsWindow = window;
-        window.Show(this);
+        if (!on) CloseSpawnChips();
     }
 
     private void CloseSpawnChips()
@@ -3335,6 +3350,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private ThemeCardPanel<LootTab> _lootCard = null!;
     private readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
     private ThemeCardPanel<QuestTab> _questsCard = null!;
+    private readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultInlineTab);   // World PR 3
+    private ThemeCardPanel<WorldTab> _worldCard = null!;
 
     /// <summary>The four Progress-theme tab bodies, built by BuildSections() when these
     /// were five cards and still rendered by the same code. ProgressWindow hosts them.</summary>
@@ -3568,9 +3585,35 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         var suppressed = entry is { } en && (en.IsTriggered || en.RaidInstanced || en.MultiSpawn);
         return new WikiContribution.RespawnEvidence(cycles, suppressed);
     }
-    private MapWindow? _mapWindow;
-    private TravelWindow? _travelWindow;
+    // The WORLD theme's window (World PR 2, docs/Themes.md theme 6) — replaces
+    // MapWindow/SpawnsWindow/TravelWindow (all deleted this PR) plus the "Drop camp
+    // marker" cog entry, which is now a chrome button inside WorldWindow itself.
+    private WorldWindow? _worldWindow;
     private FightTimelineWindow? _timelineWindow;
+
+    private void OnWorldWindow(object? sender, EventArgs e) => ShowWorldWindow();
+
+    // Host learns the room first, card gives the body up — other themes' handshake (PR 3).
+    internal void ShowWorldWindow(WorldTab? tab = null, string? spawnZone = null)
+    {
+        _worldHost.OpenWindow(tab);
+        if (_worldWindow is null)
+        {
+            var window = new WorldWindow(this, spawnZone);
+            window.TabChanged += t2 => _worldHost.SelectTab(t2);
+            window.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_worldWindow, window)) _worldWindow = null;
+                _worldHost.WindowClosed();
+                _worldCard?.Sync();
+            };
+            _worldWindow = window;
+        }
+        if (tab is { } t) _worldWindow.SetTab(t);
+        _worldCard?.Sync();
+        _worldWindow.Show(this);
+        _worldWindow.Activate();
+    }
 
     private void OnQuestsWindow(object? sender, EventArgs e) => ShowQuestsWindow();
 
@@ -3639,6 +3682,21 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         return [("kills", star, "Kills", tip)];
     }
 
+    /// <summary>The mini-dashboard star the old Travels &amp; Deaths card header carried
+    /// (World PR 3) — same registration as the Kills star above: the ONLY writer
+    /// <c>MiniStats</c> has for "deaths" (trap 20/26), so it goes through the shared
+    /// <c>_stars</c>/<c>OnStarChanged</c> mechanism rather than a second one WorldWindow
+    /// would own on its own.</summary>
+    internal Button BuildDeathsStar()
+    {
+        const string tip = "Show deaths in mini dashboard";
+        var star = AppTheme.StarButton("deaths", tip);
+        star.Click += OnStarChanged;
+        _stars["deaths"] = star;
+        UpdateStarVisuals();
+        return star;
+    }
+
     /// <summary>Open (or front) the Kills &amp; Drops window — the theme's two tabs, and the
     /// only way to reach a surface that used to be a card and one that used to be a menu
     /// entry.</summary>
@@ -3693,37 +3751,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _wikiPackWindow.Update(CurrentSnapshot());
         _wikiPackWindow.Show();
         _wikiPackWindow.Activate();
-    }
-
-    private void OnZoneMap(object? sender, EventArgs e)
-    {
-        if (_mapWindow is null)
-        {
-            var window = new MapWindow(this);
-            window.Closed += (_, _) =>
-            {
-                if (ReferenceEquals(_mapWindow, window)) _mapWindow = null;
-            };
-            _mapWindow = window;
-        }
-        _mapWindow.Show(this);
-        _mapWindow.Activate();
-    }
-
-    private void OnTravelRoute(object? sender, EventArgs e)
-    {
-        if (_travelWindow is null)
-        {
-            var window = new TravelWindow(this);
-            window.Closed += (_, _) =>
-            {
-                if (ReferenceEquals(_travelWindow, window)) _travelWindow = null;
-            };
-            _travelWindow = window;
-        }
-        _travelWindow.Show(this);
-        _travelWindow.RenderRoute();
-        _travelWindow.Activate();
     }
 
     /// <summary>The Gear Locker and the Inventory window are ONE TAB now — they read the
@@ -3927,10 +3954,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     _hotkeyHidden = _hotkeyHiddenWindows.Count > 0;
                 }
                 break;
+            // World PR 2: both hotkeys now share one window. Each still opens (or
+            // re-shows) on its own tab, but hiding either one hides the shared window.
             case "toggleMap":
-                if (_mapWindow is { IsVisible: true }) _mapWindow.Hide();
-                else if (_mapWindow is not null) _mapWindow.Show();
-                else OnZoneMap(this, EventArgs.Empty);
+                if (_worldWindow is { IsVisible: true }) _worldWindow.Hide();
+                else if (_worldWindow is not null) { _worldWindow.SetTab(WorldTab.Map); _worldWindow.Show(); }
+                else ShowWorldWindow(WorldTab.Map);
                 break;
             case "toggleQuests":
                 if (_questsWindow is { IsVisible: true }) _questsWindow.Hide();
@@ -3938,9 +3967,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 else OnQuestsWindow(this, EventArgs.Empty);
                 break;
             case "toggleSpawns":
-                if (_spawnsWindow is { IsVisible: true }) _spawnsWindow.Hide();
-                else if (_spawnsWindow is not null) _spawnsWindow.Show();
-                else ShowSpawnsWindow();
+                if (_worldWindow is { IsVisible: true }) _worldWindow.Hide();
+                else if (_worldWindow is not null) { _worldWindow.SetTab(WorldTab.Camps); _worldWindow.Show(); }
+                else ShowWorldWindow(WorldTab.Camps);
                 break;
             case "toggleClickThrough":
                 SetClickThrough(!_clickThrough);
@@ -4475,7 +4504,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _historyWindow.Activate();
     }
 
-    private void DropCampMarker()
+    // internal (not private): WorldWindow's chrome button calls this from every tab
+    // (Helm-signed World pre-design amendment, question 6 — the cog entry retired).
+    public void DropCampMarker()
     {
         var s = CurrentSnapshot();
         _stats.AddMarker($"Marker {s.Markers.Count + 1}" +

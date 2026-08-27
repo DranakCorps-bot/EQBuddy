@@ -165,7 +165,12 @@ public static class OverlaySections
         // ApplySectionLayout throws on startup for everybody — the crash the Gear & Loot
         // fold found. Both have it.
         ("motes", "Motes"),
-        ("misc", "Travels & Deaths"),
+        // The WORLD THEME (docs/Themes.md theme 6, World PR 3). Absorbs this card's own
+        // former self plus MapWindow/SpawnsWindow/TravelWindow (World PR 2) — the KEY
+        // stays "misc" (WorldSurface.ThemeCardKey's own doc comment explains why: this
+        // theme absorbs exactly one card, so there is no settings migration at all).
+        // Only the TITLE moved, from "Travels & Deaths" to "World".
+        ("misc", "World"),
     ];
 
     /// <summary>The card's icon, by section key — one table both widgets read (Gate 5).
@@ -233,6 +238,10 @@ public static class OverlaySections
         // menu entry that disappears is exactly as invisible as a card that does
         // (trap 29 from the other side). Cards & windows is the screen people look at.
         ["kills"] = ["Drops by creature"],
+        // 2026-08-27: the WORLD THEME (World PR 3). Names the card's own former title
+        // alongside the three menu-only windows it absorbed (World PR 2) — the same
+        // "Drops by creature" shape, since none of the three ever had a card either.
+        ["misc"] = ["Travels & Deaths", "Zone map", "Travel route", "Spawn timers"],
     };
 
     /// <summary>The one-line "these live in here now" note for a card, or null for a card

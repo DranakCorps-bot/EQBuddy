@@ -2,32 +2,40 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
+using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 using Tok = EQBuddy.UI.Shared.DesignTokens;
 
 namespace EQBuddy;
 
 /// <summary>
-/// The Travels &amp; Deaths card's body: deaths, zones visited, camp markers. Lifted out
-/// of <c>MainWindow</c> for World PR 1 (docs/Themes.md theme 6) — the small,
-/// player-driven lists that make this the theme's one Full-inline tab (Travels).
-///
-/// Takes <see cref="IZoneHost"/> in the constructor for the same reason every other
-/// World view does, though this one currently reads nothing from it beyond what its
-/// caller already has — future tabs on the same theme (Camps, Routes) share the host,
-/// and this keeps the four views' constructors uniform.
+/// The Travels and Deaths card body: deaths, zones visited, camp markers.
+/// Drop camp marker (Helm-signed World pre-design question 6) lives here so the
+/// inline Full Travels card calls the same handler WorldWindow chrome already uses.
+/// Glance tabs never reach this body.
 /// </summary>
 public partial class TravelsView : UserControl
 {
+    private readonly IZoneHost _host;
+
     public TravelsView(IZoneHost host)
     {
         InitializeComponent();
-        _ = host;   // unused today; kept for constructor uniformity across the theme's four views
+        _host = host;
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        var button = DesignSystem.IconButton("Location",
+            "Drop a marker at your current zone - see it on the Travels tab and on your phone map",
+            (_, _) => { _host.DropCampMarker(); Render(_host.CurrentSnapshot()); }, "AccentBrush");
+        row.Children.Add(button);
+        var label = DesignSystem.Text(Role.Caption, "Drop camp marker");
+        label.Margin = new Thickness(Tok.SpaceS, 0, 0, 0);
+        label.VerticalAlignment = VerticalAlignment.Center;
+        row.Children.Add(label);
+        Root.Children.Insert(0, row);
     }
 
     public UIElement Body => this;
 
-    /// <summary>Paints the three lists — called only while the card is expanded, the
-    /// same gate <c>MainWindow.RefreshUi</c> always used.</summary>
     public void Render(StatsSnapshot s)
     {
         FillList(DeathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
@@ -36,9 +44,6 @@ public partial class TravelsView : UserControl
         FillList(MarkerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
     }
 
-    /// <summary>The reduced shape of <c>MainWindow.FillList</c> this card ever needed —
-    /// plain name/value rows, no tooltip, no click, no note. Deaths/zones/markers never
-    /// passed those optional parameters, so this carries only what they used.</summary>
     private static void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows)
     {
         list.Items.Clear();
@@ -68,9 +73,6 @@ public partial class TravelsView : UserControl
         }
     }
 
-    /// <summary>Facts for the <c>EQBUDDY_EXPAND</c> dump — the WPF layer's only test seam.
-    /// Same key names the card carried before the lift (<c>zones</c>/<c>deaths</c>), plus
-    /// <c>travelsMarkers</c>, which was never pinned before this PR.</summary>
     public string DebugFacts() =>
         $"zones={ZoneList.Items.Count} deaths={DeathList.Items.Count} travelsMarkers={MarkerList.Items.Count}";
 }

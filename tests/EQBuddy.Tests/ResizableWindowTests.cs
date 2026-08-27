@@ -42,10 +42,10 @@ public class ResizableWindowTests
         { "CreatureWindow.xaml.cs",      "AllowResize" },
         { "GearLootWindow.xaml.cs",      "AllowResize" },
         { "QuestsWindow.xaml.cs",        "AllowResize" },
-        // Renamed from SpawnsWindow.xaml.cs in World PR 1: the content moved to
-        // SpawnsView.xaml(.cs), and the thin host left behind has no XAML sibling.
-        { "SpawnsWindow.cs",             "AllowResize" },
-        { "TravelWindow.cs",             "AllowResize" },
+        // World PR 2: MapWindow/SpawnsWindow/TravelWindow retired into one WorldWindow
+        // (Map/Camps/Path/Travels tabs), which gets its own size key ("world") and its
+        // own AllowResize call, the same shape as every other theme window.
+        { "WorldWindow.xaml.cs",        "AllowResize" },
         { "HistoryWindow.xaml.cs",       "AllowResize" },
         { "FightTimelineWindow.xaml.cs", "AllowResize" },
         // Resizable, size deliberately not kept — see the reasons in each file.
@@ -57,7 +57,6 @@ public class ResizableWindowTests
         // chrome and a real border. Size is not kept: neither calls AllowResize, and neither
         // needs to until someone asks.
         { "WikiPackWindow.xaml.cs",      "Default" },
-        { "MapWindow.cs",                "Default" },
     };
 
     [Theory]

@@ -165,11 +165,18 @@ one-release gap between them. Both windows are deleted on both builds.
 **Surface:** phone + desktop. This is where #174's approved features land — mob
 lookup, "what is this for?" from a loot row, upgrade preview at +N.
 
-### 6. World
-**Tabs:** Map · Camps & timers · Routes · Travels
+### 6. World — **BUILT 2026-08-27 (PR 0-4, all lanes and the phone)**
+**Tabs:** Map · Camps · Path · Travels (Bevel-signed pre-design; "Path" rather than
+"Routes" so it stops reading as a near-synonym of "Travels")
 **Absorbs:** Travels & Deaths card, `MapWindow`, `SpawnsWindow`, `TravelWindow`,
-`ZoneShareWindow`
-**Surface:** phone + desktop, with spawn-due chips staying on the overlay.
+`ZoneShareWindow` (the last stays a desktop dialog, opened from the Map tab — its door
+moves, the window does not)
+**Card key stays `misc`** — this theme absorbs exactly one card, so there is no settings
+migration at all; the card's title becomes "World" (PR 3).
+**Surface:** phone + desktop, with spawn-due chips staying on the overlay. The phone
+gains a `travel` surface and camp-marker pins (PR 4); `map`/`spawns` stay separate
+first-class phone surfaces on purpose — a tablet showing both at once is the product's
+uncontested ground, and folding them to match the desktop window would delete that.
 
 ### 7. Kills & Drops — **BUILT 2026-08-21**
 **Tabs:** Kills · Drops

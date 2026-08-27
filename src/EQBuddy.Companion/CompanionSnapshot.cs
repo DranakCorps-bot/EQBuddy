@@ -59,6 +59,7 @@ public sealed record CompanionSnapshot
     // ---- sections, one nullable property per surface ----
     public CompanionMapSection? Map { get; init; }
     public CompanionSpawnSection? Spawns { get; init; }
+    public CompanionTravelSection? Travel { get; init; }
     public CompanionMezSection? Mez { get; init; }
     public CompanionBuffsSection? Buffs { get; init; }
     public CompanionCombatSection? Combat { get; init; }
@@ -82,6 +83,7 @@ public sealed record CompanionSnapshot
         {
             Map = wanted.Contains(CompanionSurfaces.Map) ? Map : null,
             Spawns = wanted.Contains(CompanionSurfaces.Spawns) ? Spawns : null,
+            Travel = wanted.Contains(CompanionSurfaces.Travel) ? Travel : null,
             Mez = wanted.Contains(CompanionSurfaces.Mez) ? Mez : null,
             Buffs = wanted.Contains(CompanionSurfaces.Buffs) ? Buffs : null,
             Combat = wanted.Contains(CompanionSurfaces.Combat) ? Combat : null,

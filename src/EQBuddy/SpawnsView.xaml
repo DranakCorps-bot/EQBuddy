@@ -41,7 +41,7 @@
           <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="{DynamicResource PadCard}">
+        <Grid Grid.Row="0" x:Name="TitleBar" Margin="{DynamicResource PadCard}">
             <StackPanel x:Name="TitleRow" Orientation="Horizontal" VerticalAlignment="Center"/>
             <Button x:Name="CloseBtn" Style="{StaticResource EqIconButton}"
                     ToolTip="Hide — the window returns when the next named dies (turn tracking off in Options or the right-click menu)"

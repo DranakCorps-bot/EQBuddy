@@ -214,8 +214,12 @@ public record ThirdMissEvent(DateTime Time, string Attacker) : GameEvent(Time);
 /// proof an AWAKE creature of that name exists, which the mez tracker uses to keep
 /// a never-mezzed twin's attacks from eating a mezzed sibling's chip (#122).</summary>
 public record ResistEvent(DateTime Time, string Spell = "", string Target = "") : GameEvent(Time);
-/// <summary>A user-dropped camp/segment marker (hotkey or menu), timestamped with wall clock.</summary>
-public record SessionMarkerEvent(DateTime Time, string Label) : GameEvent(Time);
+/// <summary>A user-dropped camp/segment marker (hotkey or menu), timestamped with wall
+/// clock. <see cref="LocY"/>/<see cref="LocX"/> are the last /loc seen when it was
+/// dropped (World PR 4) — null when no /loc has been seen yet this session, which is
+/// why they ride the marker rather than being re-derived later: a marker with no
+/// location stays that way, it does not silently borrow a LATER one.</summary>
+public record SessionMarkerEvent(DateTime Time, string Label, double? LocY = null, double? LocX = null) : GameEvent(Time);
 /// <summary>A raw log line (message only, no timestamp prefix) kept because it matched a
 /// <see cref="WatchKind.Text"/> rule's text. Only matching lines become events — journaling
 /// every line would mean holding the whole log in memory, most of it chat.</summary>

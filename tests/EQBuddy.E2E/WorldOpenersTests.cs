@@ -2,12 +2,14 @@ namespace EQBuddy.E2E;
 
 /// <summary>
 /// World PR 1's "pin behaviour in E2E before the move" step (docs/Themes.md's recipe,
-/// step applied one theme early): the CURRENT shape of the three standalone windows
-/// (Map, Spawns, Travel) and the Travels &amp; Deaths card body, asserted against a
-/// launched app before <c>MapView</c>/<c>SpawnsView</c>/<c>TravelView</c>/
-/// <c>TravelsView</c> existed, and kept green after the lift — the WPF layer has no
-/// unit tests (docs/TestPlan.md §5), so this is the only thing standing between the
-/// move and a silent regression.
+/// step applied one theme early), extended by World PR 2: the three standalone windows
+/// (Map, Spawns, Travel) retired into one <c>WorldWindow</c> with four tabs, and every
+/// key these tests already asserted still has to read the same — <c>DumpValue</c> takes
+/// the FIRST match in the dump, and <c>WorldWindow.DebugFacts()</c> reports all four
+/// sub-surfaces' facts regardless of which tab is selected (the same shape
+/// <c>CreatureWindow.DebugFacts()</c> already uses for Kills+Drops). The WPF layer has
+/// no unit tests (docs/TestPlan.md §5), so this is the only thing standing between the
+/// fold and a silent regression.
 /// </summary>
 [Collection("e2e")]
 public sealed class WorldOpenersTests
@@ -36,6 +38,9 @@ public sealed class WorldOpenersTests
         Assert.True(app.DumpValue("mapCircles") >= 0);
         Assert.True(app.DumpValue("mapCampPins") >= 0);
         Assert.True(app.DumpValue("mapMarkerVisible") is 0 or 1);
+        // World PR 2: EQBUDDY_MAP opens the shared WorldWindow landed on the Map tab.
+        Assert.Equal("map", app.DumpText("worldTab"));
+        Assert.Equal(4, app.DumpValue("worldTabs"));
     }
 
     /// <summary>The Travel window opens via <c>EQBUDDY_TRAVEL=1</c> and lists every zone
@@ -55,6 +60,9 @@ public sealed class WorldOpenersTests
             "the embedded ZoneGraph should populate the destination dropdown");
         // No destination has been picked yet, so no route panel has rendered.
         Assert.Equal(0, app.DumpValue("travelRouteShown"));
+        // World PR 2: EQBUDDY_TRAVEL opens the shared WorldWindow landed on the Path tab
+        // (Bevel-signed label; the enum member and wire key stay Routes/"travel").
+        Assert.Equal("travel", app.DumpText("worldTab"));
     }
 
     /// <summary>The Spawns window opens via <c>EQBUDDY_SPAWNS=1</c> on whatever zone the
@@ -72,6 +80,8 @@ public sealed class WorldOpenersTests
         Assert.True(app.DumpValue("spawnsZones") > 0,
             "the zone combo should list every zone the spawn catalog knows");
         Assert.True(app.DumpValue("spawnsRows") >= 0);
+        // World PR 2: EQBUDDY_SPAWNS opens the shared WorldWindow landed on the Camps tab.
+        Assert.Equal("spawns", app.DumpText("worldTab"));
     }
 
     /// <summary>The Travels &amp; Deaths card body (the misc card, <c>TravelsView</c> as

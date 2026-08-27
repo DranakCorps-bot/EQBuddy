@@ -26,6 +26,10 @@ public sealed record CompanionMapRequest
     public LocationEvent? Location { get; init; }
     public IReadOnlyList<LocationEvent>? Trail { get; init; }
 
+    /// <summary>Session camp markers (World PR 4) — "Drop camp marker"'s output, the
+    /// same list the desktop's Travels tab reads.</summary>
+    public IReadOnlyList<MarkerDetail>? Markers { get; init; }
+
     /// <summary>Camp resolution, owned by the desktop — see CompanionSources.CampFor.
     /// Null simply means no pins, which is what a host that can't answer should get.</summary>
     public Func<SpawnTimerState, (double Y, double X, bool FromWiki)?>? CampFor { get; init; }
@@ -106,7 +110,24 @@ public sealed class CompanionMapSource
             You: you,
             Circles: circles,
             Trail: BuildTrail(request.Trail, now),
-            Named: BuildNamed(request.Timers, request.CampFor, now));
+            Named: BuildNamed(request.Timers, request.CampFor, now),
+            Markers: BuildMarkers(request.Markers, now));
+    }
+
+    /// <summary>Session camp markers, plotted where a /loc was known at drop time — a
+    /// marker with no location gets no pin, the same "row but no dot" treatment a named
+    /// with no camp yet gets in <see cref="BuildNamed"/>.</summary>
+    private static List<CompanionMapPin> BuildMarkers(IReadOnlyList<MarkerDetail>? markers, DateTime now)
+    {
+        if (markers is null || markers.Count == 0) return [];
+        var pins = new List<CompanionMapPin>(markers.Count);
+        foreach (var m in markers)
+        {
+            if (m.LocY is not { } locY || m.LocX is not { } locX) continue;
+            var (x, y) = ZoneMap.FromLoc(locY, locX);
+            pins.Add(new CompanionMapPin(x, y, m.Text, Math.Max(0, (now - m.Time).TotalSeconds)));
+        }
+        return pins;
     }
 
     /// <summary>The zone's running named: the desktop map's side panel in list form,

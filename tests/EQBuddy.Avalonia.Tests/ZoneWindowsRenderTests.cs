@@ -13,8 +13,13 @@ using Path = System.IO.Path;
 namespace EQBuddy.Avalonia.Tests;
 
 /// <summary>
-/// The zone/map cluster (MapWindow, TravelWindow, ZoneShareWindow, SessionPickerWindow)
-/// rendered against a fake IZoneHost — real Core collaborators, no MainWindow.
+/// The zone/map cluster rendered against a fake IZoneHost — real Core collaborators, no
+/// MainWindow. World PR 2 retired the standalone <c>MapWindow</c>/<c>TravelWindow</c>
+/// wrappers into <c>WorldWindow</c> (which needs a full <c>MainWindow</c>, not a fake
+/// host), so these tests render <see cref="MapView"/>/<see cref="TravelView"/> directly
+/// in a plain test <see cref="Window"/> — exactly what the retired wrappers did, minus
+/// the chrome this file never asserted on. <c>ZoneShareWindow</c>/<c>SessionPickerWindow</c>
+/// are untouched by that fold and still construct directly.
 /// </summary>
 [Collection("avalonia")]
 public sealed class ZoneWindowsRenderTests : IDisposable
@@ -48,6 +53,7 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         public MobLookupResult? WikiMobResult(string name) => null;
         public void EnsureMobLookup(string name) { }
         public void PlayAlertSound(string choiceOrPath, bool coalesce = false) { }
+        public void DropCampMarker() { }
     }
 
     /// <summary>One archived kill in Befallen — enough for a spawn point.</summary>
@@ -72,9 +78,10 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         host.CurrentZoneName = "Befallen";
         ObserveOneKill(host);
 
-        var window = new MapWindow(host);
+        var view = new MapView(host);
+        var window = new Window { Content = view.Body };
         window.Show();
-        window.MaybeRefresh(force: true);
+        view.MaybeRefresh(force: true);
 
         var text = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
         Assert.Contains(text, t => t?.StartsWith("befallen — type /loc in game") == true);
@@ -107,9 +114,10 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         host.CurrentZoneName = "Befallen";
         ObserveOneKill(host);
 
-        var window = new MapWindow(host);
+        var view = new MapView(host);
+        var window = new Window { Content = view.Body };
         window.Show();
-        window.MaybeRefresh(force: true);
+        view.MaybeRefresh(force: true);
 
         // Circles win over the map's own menu when the right-click lands on a dot:
         // the ring owns the ContextRequested bubble and stops it there.
@@ -129,7 +137,7 @@ public sealed class ZoneWindowsRenderTests : IDisposable
 
         // The edit bumped Revision, so the next tick rebuilds the circles — and the
         // rebuilt menu offers the other direction.
-        window.MaybeRefresh(force: true);
+        view.MaybeRefresh(force: true);
         said = ClickAndReadTexts(window, CircleMenuItem(window, "Remove this spawn point"));
         Assert.Empty(host.SpawnPoints.Snapshot("Befallen").Points);
         Assert.Contains(said, t => t?.StartsWith("Spawn point removed (Decaying skeleton)") == true);
@@ -149,7 +157,7 @@ public sealed class ZoneWindowsRenderTests : IDisposable
     }
 
     /// <summary>The circle rings are the only overlay ellipses carrying a menu.</summary>
-    private static MenuItem CircleMenuItem(MapWindow window, string header) =>
+    private static MenuItem CircleMenuItem(Window window, string header) =>
         window.GetVisualDescendants().OfType<Ellipse>()
             .First(e => e.ContextMenu is not null)
             .ContextMenu!.Items.OfType<MenuItem>()
@@ -163,7 +171,7 @@ public sealed class ZoneWindowsRenderTests : IDisposable
     /// anything depends on how the text measures, so pumping the dispatcher here made this
     /// test pass on one platform's fonts and fail on another's. Handlers run synchronously on
     /// RaiseEvent, so the snapshot below is exactly what the click put on screen.</summary>
-    private static List<string?> ClickAndReadTexts(MapWindow window, MenuItem item)
+    private static List<string?> ClickAndReadTexts(Window window, MenuItem item)
     {
         item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
         return window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
@@ -176,11 +184,12 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         var zone = host.ZoneGraph.Zones.First();
         host.CurrentZoneName = zone;
 
-        var window = new TravelWindow(host);
+        var view = new TravelView(host);
+        var window = new Window { Content = view.Body };
         window.Show();
         var dest = window.GetVisualDescendants().OfType<AutoCompleteBox>().Single();
         dest.Text = zone;
-        window.RenderRoute();
+        view.Render();
 
         var text = window.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text).ToList();
         Assert.Contains($"From: {zone}", text);

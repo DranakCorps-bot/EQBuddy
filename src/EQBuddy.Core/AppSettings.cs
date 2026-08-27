@@ -37,6 +37,13 @@ public sealed class AppSettings
     /// real saved position (#117).</summary>
     public double CreatureLeft { get; set; } = double.NaN;
     public double CreatureTop { get; set; } = double.NaN;
+
+    /// <summary>The WORLD theme window's spot (World PR 2 — Map · Camps · Path · Travels,
+    /// replacing the three standalone windows below). NaN until placed once -
+    /// WindowPlacement.PositionToPersist keeps an unmoved fallback from overwriting a
+    /// real saved position (#117).</summary>
+    public double WorldLeft { get; set; } = double.NaN;
+    public double WorldTop { get; set; } = double.NaN;
     /// <summary>Quest Tracker era ceiling ("" = any): quests after this era are hidden
     /// (discussion #62). Persisted app-wide — the world's era isn't per character.</summary>
     public string QuestEraFilter { get; set; } = "";
@@ -530,6 +537,12 @@ public sealed class AppSettings
     /// the pairing window). Hidden-list idiom like <see cref="HiddenSections"/>:
     /// empty = everything offered, which is the default.</summary>
     public List<string> CompanionHiddenSurfaces { get; set; } = [];
+    /// <summary>The Travel surface's picked destination (World PR 4) — persisted so a
+    /// reconnecting device sees the same route rather than an empty picker. Session-only
+    /// in spirit (nobody needs yesterday's destination), but there is no cheaper place to
+    /// hold "what did the phone last ask for" than the settings file every other piece of
+    /// companion state already lives in.</summary>
+    public string? CompanionTravelDestination { get; set; }
 
     private static string FilePath => AppPaths.File("settings.json");
 
