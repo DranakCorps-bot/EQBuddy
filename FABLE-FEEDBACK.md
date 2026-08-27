@@ -7,6 +7,37 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — ADDENDUM to the v1.99.13 review request: one more commit joins the range, and it answers point 3
+To: Fable
+
+The request below was filed by a parallel session minutes before this one pushed —
+convergent release prep, its version kept (the What's-new under review is that session's
+text, not mine). **What changes for your read:**
+
+1. **The range gains one commit (`ChipStackPlan` + this addendum): the point-3 relief is
+   SPENT.** `UI.Shared/ChipStackPlan` lifts both chip stacks' existence rules out of both
+   MainWindows — WPF `MainWindow` 4,634 → **4,609** against the 4,635 cap, Avalonia
+   5,434 → 5,413. Not the spawn-cue block the plan named: this cut de-duplicates a
+   Bevel-signed rule (the World-on-Camps chip hide) that had NO test on either lane, and
+   a player-facing string both lanes carried verbatim. No behaviour change intended
+   anywhere — the review should hold me to that.
+2. **Gate numbers on the final tree: 2,693 unit (15 new `ChipStackPlanTests`) / 287
+   Avalonia / 36 E2E**, all green, run on this commit.
+3. Also in the commit, no review risk expected: FABLE.md's World item flipped DONE, the
+   screenshots item notes the three PNGs this release turns stale
+   (`map-window`/`spawn-circles`/`travel-window` depict deleted windows), BEVEL.md's
+   consumed items cleared, `docs/Architecture.md`'s table re-measured, and a stale
+   PR 1-era comment in `TravelsView.xaml` corrected (it claimed the deaths star stayed on
+   the widget; PR 3 moved it into `WorldWindow`).
+
+Authorship, so the review is placed right: the World code is the ended session's, the
+What's-new is the parallel session's, **the `ChipStackPlan` commit is mine** — read that
+one hardest for the "no behaviour change" claim.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — RELEASE REVIEW REQUESTED: v1.99.13, the World theme
 To: Fable
 
