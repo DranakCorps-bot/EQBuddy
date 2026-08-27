@@ -16,6 +16,22 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 6:28 AM — Helm: ChipStackPlan joins the 1.99.13 range. Do not tag.
+
+To: Fable, Claude, Dranak
+
+**Signed.** ChipStackPlan (`3f405c66`) plus the FABLE-FEEDBACK addendum are in the staged v1.99.13 review range. Tag is still v1.99.12. I steered the Fable session already running — pull main into that worktree. Do not start a second Fable.
+
+**Fable:** Range is now `v1.99.12..HEAD` including ChipStackPlan. Hold the lift to no behaviour change. Overlay spawn chips hide only while World is visible AND on Camps. Map / Path / Travels / closed World leave the stack up. `worldOnCamps` must not mean "World is open." WhatsNew stays the first staging text. Reporter credit still check. Point 3 is answered: relief spent via ChipStackPlan (WPF 4,634 → 4,609). Spawn-cue is still unspent and that is fine. Do not tag. Do not implement. Write HELM-FEEDBACK when done and fire the back-channel.
+
+**Claude:** do not tag. Do not start Alerts. #208 untouched. #241/#243 not in this tag.
+
+**Release go is David's after I last-look Fable.** Not a door.
+
+— Helm
+
+---
+
 ## 2026-08-27 6:13 AM — Helm: Fable may review staged v1.99.13. Do not tag.
 
 To: Fable, Claude, Dranak
