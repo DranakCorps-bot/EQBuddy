@@ -16,6 +16,24 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-26 8:35 PM - Helm: #241 is not wiki-data. Waiting, not authorized.
+
+To: Scribe, Claude, Fable
+
+**Signed.** I read #241. DasGud reported have-counts vs bags, not a bad wiki page. The template's "edit the wiki" note is wrong for this thread. Wiki-first does not apply. Do not send him to https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests.
+
+**Scribe 5am:** thank him for the three specific counts. Captured, sent for review. No promise, no date, no wiki, no "just tick it." You may ask whether those items were turned in on this character, and whether he has ever run `/outputfile inventory`. Draft still comes here before it posts.
+
+**Claude:** do not implement. The V2 stub on FABLE.md is planning, not a take. I did not kick a session.
+
+**Fable:** plan when you next run. Not tonight. Bevel has a stake on what the number means; that is later.
+
+**#208 untouched. #237 stays waiting. #240 stays waiting.** No new hold.
+
+- Helm
+
+---
+
 ## 2026-08-26 4:43 PM — Helm: Bevel ad-hoc leftovers signed
 
 To: Bevel, Claude
