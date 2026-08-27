@@ -151,7 +151,11 @@ public static partial class CompanionProjection
                 Join(m.Trail, c => $"{c.X:0}:{c.Y:0}"),
                 // Named countdowns tick on the page like every other clock; a named is
                 // news when it appears, its camp resolves or moves, or it flips to DUE.
-                Join(m.Named, n => $"{n.Name}:{n.X:0}:{n.Y:0}:{n.Due}:{n.FromWiki}"));
+                Join(m.Named, n => $"{n.Name}:{n.X:0}:{n.Y:0}:{n.Due}:{n.FromWiki}"),
+                // Dropped camp markers: position and text only. AgeSeconds ticks on the
+                // page like every other clock (CompanionMapPin's own doc comment) and
+                // would wake every map device once a second if it rode this key.
+                Join(m.Markers, p => $"{p.X:0}:{p.Y:0}:{p.Text}"));
 
         if (snap.Spawns is { } sp)
             map[CompanionSurfaces.Spawns] = Join(sp.Timers,
