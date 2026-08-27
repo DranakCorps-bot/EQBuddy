@@ -42,7 +42,9 @@ public class ResizableWindowTests
         { "CreatureWindow.xaml.cs",      "AllowResize" },
         { "GearLootWindow.xaml.cs",      "AllowResize" },
         { "QuestsWindow.xaml.cs",        "AllowResize" },
-        { "SpawnsWindow.xaml.cs",        "AllowResize" },
+        // Renamed from SpawnsWindow.xaml.cs in World PR 1: the content moved to
+        // SpawnsView.xaml(.cs), and the thin host left behind has no XAML sibling.
+        { "SpawnsWindow.cs",             "AllowResize" },
         { "TravelWindow.cs",             "AllowResize" },
         { "HistoryWindow.xaml.cs",       "AllowResize" },
         { "FightTimelineWindow.xaml.cs", "AllowResize" },

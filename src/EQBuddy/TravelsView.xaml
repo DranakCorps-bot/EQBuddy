@@ -1,0 +1,16 @@
+<UserControl x:Class="EQBuddy.TravelsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- The Travels &amp; Deaths card's body, lifted out of MainWindow.xaml for World
+         PR 1 (docs/Themes.md theme 6). Markup unchanged — only the container moved,
+         from an Expander's inline content to this UserControl's. The header (title,
+         MiscHeader, StarDeaths) stays on the widget, same as every other theme card. -->
+    <StackPanel>
+        <TextBlock Text="Deaths" FontSize="{DynamicResource FontCaption}" FontWeight="SemiBold" Foreground="{DynamicResource BadBrush}"/>
+        <ItemsControl x:Name="DeathList" Margin="{DynamicResource ListBlock}"/>
+        <TextBlock Text="Zones visited" Style="{StaticResource SectionLabel}"/>
+        <ItemsControl x:Name="ZoneList" Margin="{DynamicResource ListBlock}"/>
+        <TextBlock x:Name="MarkersLabel" Text="Camp markers" Style="{StaticResource SectionLabel}" Visibility="Collapsed"/>
+        <ItemsControl x:Name="MarkerList" Margin="{DynamicResource LeadXxs}"/>
+    </StackPanel>
+</UserControl>

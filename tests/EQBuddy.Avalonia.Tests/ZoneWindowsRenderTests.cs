@@ -47,6 +47,7 @@ public sealed class ZoneWindowsRenderTests : IDisposable
         public StatsSnapshot CurrentSnapshot() => Snapshot;
         public MobLookupResult? WikiMobResult(string name) => null;
         public void EnsureMobLookup(string name) { }
+        public void PlayAlertSound(string choiceOrPath, bool coalesce = false) { }
     }
 
     /// <summary>One archived kill in Befallen — enough for a spawn point.</summary>

@@ -223,8 +223,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly StackPanel _healSpellList = new();
     private readonly ItemsControl _healerList = new();
     private readonly StackPanel _trackedPanel = new();
-    private readonly ItemsControl _deathList = new();
-    private readonly ItemsControl _zoneList = new();
     private readonly TextBlock _healSpellsLabel = AppTheme.Heading("Heals cast", AppTheme.GoodBrush);
     private readonly StackPanel _healSortBar = new() { Orientation = Orientation.Horizontal };
     // The three sort strips, on the chip primitive (Gate 5) — they were nine TextBlocks
@@ -239,8 +237,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private readonly ItemsControl _stanceList = new();
     private readonly TextBlock _invocationLabel = AppTheme.Heading("By invocation");
     private readonly ItemsControl _invocationList = new();
-    private readonly TextBlock _markersLabel = AppTheme.Heading("Camp markers");
-    private readonly ItemsControl _markerList = new();
+    // The World theme's Travels tab body, on the widget's own misc card (World PR 1).
+    private TravelsView _travelsView = null!;
     private readonly Button _gearBtn = AppTheme.IconButton(AppIcon.Settings, "Settings");
     private readonly Button _mobileBtn = AppTheme.IconButton(AppIcon.Phone,
         "EQBuddy Mobile (Beta) - show EQBuddy on a phone or tablet on your Wi-Fi");
@@ -1129,7 +1127,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // reach at all (#228, and MiniBarPresentation.Names carries the rest of that note).
         AddSection("motes", "motes", "Motes", _motesHeader,
             CardMotes.Body, "Show motes in mini dashboard");
-        AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, BuildMiscSection(), "Show deaths in mini dashboard");
+        // The Travels & Deaths card's body (World PR 1, docs/Themes.md theme 6 — this
+        // card is the theme's ThemeCardKey="misc" slot; the theme card shell itself is
+        // PR 3's work). One instance, built here like every other card's.
+        _travelsView = new TravelsView(this);
+        AddSection("misc", "deaths", "Travels & Deaths", _miscHeader, _travelsView.Body, "Show deaths in mini dashboard");
         return _sectionsPanel;
     }
 
@@ -1318,19 +1320,6 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         body.Children.Add(_healersLabel);
         body.Children.Add(_healerList);
         panel.Children.Add(body);
-        return panel;
-    }
-
-    private Control BuildMiscSection()
-    {
-        var panel = new StackPanel();
-        panel.Children.Add(AppTheme.Heading("Deaths", AppTheme.BadBrush));
-        panel.Children.Add(_deathList);
-        panel.Children.Add(AppTheme.Heading("Zones visited"));
-        panel.Children.Add(_zoneList);
-        _markersLabel.Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0);
-        panel.Children.Add(_markersLabel);
-        panel.Children.Add(_markerList);
         return panel;
     }
 
@@ -2245,13 +2234,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // window builds for itself and renders on its own tick — so the widget no longer
         // paints surfaces it does not host, and there is nothing left for a second host to
         // take. See IWidgetCard for why that is structural rather than tidy.
-        if (_sections["misc"].IsExpanded)
-        {
-            FillList(_deathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
-            FillList(_zoneList, s.Zones.Select(z => (z.Text, z.Time.ToString("h:mm tt"))));
-            _markersLabel.IsVisible = s.Markers.Count > 0;
-            FillList(_markerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
-        }
+        if (_sections["misc"].IsExpanded) _travelsView.Render(s);
 
         if (_expandForTesting)
         {
@@ -2283,7 +2266,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                         ? $"progressInline=1 progressTab={ProgressSurface.KeyFor(_progressCard.SelectedTab)} " +
                           $"progressTabs={_progressCard.TabCount} "
                         : "progressInline=0 ") +
-                    $"zones={_zoneList.Items.Count} deaths={_deathList.Items.Count} " +
+                    // The Travels tab's body, lifted into TravelsView (World PR 1). Same
+                    // keys (zones/deaths) this dump always carried, plus travelsMarkers
+                    // (never pinned before this PR) and the three World windows' own
+                    // facts, when EQBUDDY_MAP/EQBUDDY_SPAWNS/EQBUDDY_TRAVEL opened one.
+                    $"{_travelsView.DebugFacts()} " +
+                    (_mapWindow is { IsVisible: true } mwin ? mwin.DebugFacts() + " " : "") +
+                    (_spawnsWindow is { IsVisible: true } swin ? swin.DebugFacts() + " " : "") +
+                    (_travelWindow is { IsVisible: true } twin ? twin.DebugFacts() + " " : "") +
                     $"actualH={Bounds.Height:0} actualW={Bounds.Width:0}";
                 File.WriteAllText(AppPaths.File("debug.txt"), dump);
             }
@@ -2300,7 +2290,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         _healSpellsLabel.IsVisible = s.HealsBySpell.Count > 0;
         _healSortBar.IsVisible = s.HealsBySpell.Count > 0;
         _healersLabel.IsVisible = s.HealsByHealer.Count > 0;
-        _markersLabel.IsVisible = s.Markers.Count > 0;
+        _travelsView.SetMarkersVisible(s.Markers.Count > 0);
     }
 
     // Keyed by TrackedRule.Id — a display name can be shared by two rules, and keying
@@ -3377,6 +3367,14 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         Motes: new MotesCardView(this),
         Faction: new FactionCardView(),
         Raids: new RaidsCardView(() => _raidLedger, () => LastAchievementsImport));
+
+    // World theme (World PR 1): four separate factories rather than one combined set —
+    // three SEPARATE standalone windows share no host yet, and Map/SpawnsView do real
+    // construction-time work a shared factory would fire needlessly (DECISIONS.md).
+    internal MapView NewMapView() => new(this);
+    internal SpawnsView NewSpawnsView(string? initialZone = null) => new(this, _spawnsVm, initialZone);
+    internal TravelView NewTravelView() => new(this);
+    internal TravelsView NewTravelsView() => new(this);
 
     IReadOnlyList<ProgressTabHeader> IProgressHost.ProgressTabs(StatsSnapshot s) =>
         ProgressTheme.Tabs(s, DingUnlocks(s).Count,
@@ -4855,8 +4853,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// With <paramref name="coalesce"/> on, sounds within <see cref="EQBuddy.UI.Shared.SoundGate.Window"/>
     /// of the last are dropped — several rules firing together are one audio alert (here they
     /// would literally overlap, one player process per sound). Previews keep coalesce off.
+    ///
+    /// Public (rather than internal) since World PR 1: it is part of <see cref="IZoneHost"/>
+    /// now, for the Camps tab's per-named bell preview (<c>SpawnsView</c>).
     /// </summary>
-    internal void PlayAlertSound(string choiceOrPath, bool coalesce = false)
+    public void PlayAlertSound(string choiceOrPath, bool coalesce = false)
     {
         if (coalesce && !_soundGate.TryClaim(DateTime.Now)) return;
         try

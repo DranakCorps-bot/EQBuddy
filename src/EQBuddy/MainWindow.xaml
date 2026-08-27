@@ -678,14 +678,7 @@
                                       Tag="deaths" Click="OnStarChanged" ToolTip="Show deaths in mini dashboard"/>
                     </Grid>
                 </Expander.Header>
-                <StackPanel>
-                    <TextBlock Text="Deaths" FontSize="{DynamicResource FontCaption}" FontWeight="SemiBold" Foreground="{DynamicResource BadBrush}"/>
-                    <ItemsControl x:Name="DeathList" Margin="{DynamicResource ListBlock}"/>
-                    <TextBlock Text="Zones visited" Style="{StaticResource SectionLabel}"/>
-                    <ItemsControl x:Name="ZoneList" Margin="{DynamicResource ListBlock}"/>
-                    <TextBlock x:Name="MarkersLabel" Text="Camp markers" Style="{StaticResource SectionLabel}" Visibility="Collapsed"/>
-                    <ItemsControl x:Name="MarkerList" Margin="{DynamicResource LeadXxs}"/>
-                </StackPanel>
+                <ContentControl x:Name="MiscBody"/>
             </Expander>
             </StackPanel>
             </ScrollViewer>

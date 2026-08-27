@@ -1,10 +1,6 @@
-<Window x:Class="EQBuddy.SpawnsWindow"
+<UserControl x:Class="EQBuddy.SpawnsView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="EQBuddy Spawns" SizeToContent="Height"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="False" ResizeMode="CanResize"
-        Width="560" WindowStartupLocation="Manual">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!-- Gate 3 of the UI/UX rework (docs/DesignSystem.md §10, §11.5). The Gate 1 audit
          used THIS window as its worked example, and its three findings were one defect:
          a countdown that is only a string has no state.
@@ -26,7 +22,13 @@
          regress week-long raid targets. What it gains is the placeholder guidance the
          mockup added, which is a real improvement.
 
-         No literal sizes here: every number resolves out of the token dictionary. -->
+         No literal sizes here: every number resolves out of the token dictionary.
+
+         Lifted out of SpawnsWindow.xaml for World PR 1 (docs/Themes.md theme 6) — the
+         whole bordered panel, chrome and content together (the window is borderless and
+         hand-drawn, so unlike Map/Travel there is no clean chrome/content seam at the
+         XAML level). SpawnsWindow becomes a thin Window that hosts this and owns only
+         what a literal OS window owns: sizing, position, DragMove, Close. -->
     <Border Background="{DynamicResource BgBrush}" CornerRadius="{DynamicResource CornerPanel}"
             BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="1"
             MouseLeftButtonDown="OnDrag">
@@ -122,4 +124,4 @@
         </StackPanel>
       </Grid>
     </Border>
-</Window>
+</UserControl>

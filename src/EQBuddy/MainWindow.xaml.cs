@@ -17,7 +17,7 @@ using Tok = EQBuddy.UI.Shared.DesignTokens;
 
 namespace EQBuddy;
 
-public partial class MainWindow : Window, ICardContext
+public partial class MainWindow : Window, ICardContext, IZoneHost
 {
     internal readonly AppSettings _settings = AppSettings.Load();
     private readonly SessionStats _stats = new();
@@ -48,12 +48,14 @@ public partial class MainWindow : Window, ICardContext
     private bool _installingUpdate;
 
     private readonly SpawnTimers _spawnTimers;
-    internal SpawnTimers SpawnTimers => _spawnTimers;
+    // Public since World PR 1 (IZoneHost, like Settings already was) — MapView etc. take the interface, never MainWindow.
+    public SpawnTimers SpawnTimers => _spawnTimers;
     private readonly Companion.CompanionHost _companion;
     internal Companion.CompanionHost Companion => _companion;
     private CompanionWindow? _companionWindow;
     private readonly EQBuddy.UI.Shared.SpawnsViewModel _spawnsVm;
-    private SpawnsWindow? _spawnsWindow;
+    // internal (not private): WidgetDump reads DebugFacts() off this (World PR 1).
+    internal SpawnsWindow? _spawnsWindow;
     // Gear auto-done high-water marks, one per snapshot stream: loot drops, manual
     // merges (Crafted — how exaltations arrive), and loot-merge results (Upgraded —
     // how a wished "+N" tier is usually reached). Same delta contract as Sky's.
@@ -87,6 +89,8 @@ public partial class MainWindow : Window, ICardContext
     // is due. That is scheduled by the alert path, not by the session, so it is handed
     // in rather than reached for — and ICardContext stays six methods wide.
     internal WatchCardView _watch = null!;
+    // The World theme's Travels tab body, on the widget's own misc card (World PR 1).
+    internal TravelsView _travelsView = null!;
 
     // ---- ICardContext ----
     //
@@ -129,6 +133,11 @@ public partial class MainWindow : Window, ICardContext
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
+        // The Travels & Deaths card's body (World PR 1, docs/Themes.md theme 6 — this
+        // card is the theme's ThemeCardKey="misc" slot; the theme card shell itself is
+        // PR 3's work). One instance, built here the way the Motes card below is.
+        _travelsView = new TravelsView(this);
+        MiscBody.Content = _travelsView.Body;
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -793,13 +802,13 @@ public partial class MainWindow : Window, ICardContext
     }
 
     internal QuestCatalog QuestCatalog { get; private set; } = new();
-    internal ZoneGraph ZoneGraph { get; private set; } = new();
+    public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
 
     /// <summary>The zone the log last put us in — the Quest Tracker measures distances
     /// from here.</summary>
-    internal string CurrentZoneName { get; private set; } = "";
+    public string CurrentZoneName { get; private set; } = "";
 
     /// <summary>Followed character identity for window titles and exports.</summary>
     internal (string Character, string Server) Identity =>
@@ -815,8 +824,8 @@ public partial class MainWindow : Window, ICardContext
 
     /// <summary>The current stats snapshot for windows that refresh on their own
     /// cadence: this tick's shared instance, or a fresh build when a window opens
-    /// before RefreshUi has ever ticked.</summary>
-    internal StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? BuildSnapshot();
+    /// before RefreshUi has ever ticked. Public since World PR 1 (IZoneHost).</summary>
+    public StatsSnapshot CurrentSnapshot() => _latestSnapshot ?? BuildSnapshot();
 
     /// <summary>The 🗺 badge signal: a known quest's turn-in OR a member of the wiki's
     /// Quest Items category (back to the broad set once the loud green retired — a
@@ -1087,10 +1096,10 @@ public partial class MainWindow : Window, ICardContext
     /// Drops view flags observations the wiki doesn't know, reusing the same lookups
     /// and cache the Loot card fires — no extra wiki traffic for creatures already
     /// seen, and anything it does request benefits the Loot card too.</summary>
-    internal MobLookupResult? WikiMobResult(string name) =>
+    public MobLookupResult? WikiMobResult(string name) =>   // IZoneHost, World PR 1
         _targetResults.GetValueOrDefault(name);
 
-    internal void EnsureMobLookup(string name)
+    public void EnsureMobLookup(string name)
     {
         if (_targetResults.ContainsKey(name)) return;
         _targetResults[name] = null;
@@ -2189,6 +2198,14 @@ public partial class MainWindow : Window, ICardContext
             Raids: new RaidsCardView(() => _raidLedger, () => LastAchievementsImport));
     }
 
+    // World theme (World PR 1): four separate factories rather than one combined set —
+    // three SEPARATE standalone windows share no host yet, and Map/SpawnsView do real
+    // construction-time work a shared factory would fire needlessly (DECISIONS.md).
+    internal MapView NewMapView() => new(this);
+    internal SpawnsView NewSpawnsView(string? initialZone = null) => new(this, _spawnsVm, initialZone);
+    internal TravelView NewTravelView() => new(this);
+    internal TravelsView NewTravelsView() => new(this);
+
     /// <summary>How many unlocks this session's ding opened — the Experience tab's badge
     /// needs the count, and the memo that answers it lives here.</summary>
     internal int ProgressDingUnlockCount(StatsSnapshot s) => ProgressDingUnlocks(s).Count;
@@ -2852,13 +2869,7 @@ public partial class MainWindow : Window, ICardContext
         // (#210's rule). Blank until something drops.
         MotesHeader.Text = ProgressTheme.MoteRate(s) ?? "";
 
-        if (MiscSection.IsExpanded)
-        {
-            FillList(DeathList, s.Deaths.Select(d => (d.Text, d.Time.ToString("h:mm tt"))));
-            FillList(ZoneList, s.Zones.Select(z => (z.Text, z.Time.ToString("h:mm tt"))));
-            MarkersLabel.Visibility = s.Markers.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            FillList(MarkerList, s.Markers.Select(m => (m.Text, m.Time.ToString("h:mm tt"))));
-        }
+        if (MiscSection.IsExpanded) _travelsView.Render(s);
         }   // end fullRender gate
 
         RenderTracked(s);   // per-tick: live cue countdowns and "last: … ago" ages
@@ -3412,8 +3423,11 @@ public partial class MainWindow : Window, ICardContext
     /// With <paramref name="coalesce"/> on, sounds inside <see cref="EQBuddy.UI.Shared.SoundGate.Window"/>
     /// of the last one are dropped — several rules firing together are one audio alert, and
     /// the first clip plays to the end instead of being cut off by the next Open(). Manual
-    /// previews and spawn-due chimes keep coalesce off: the user asked for that exact sound.</summary>
-    internal void PlayAlertSound(string choiceOrPath, bool coalesce = false)
+    /// previews and spawn-due chimes keep coalesce off: the user asked for that exact sound.
+    ///
+    /// Public (rather than internal) since World PR 1: it is part of <see cref="IZoneHost"/>
+    /// now, for the Camps tab's per-named bell preview (<c>SpawnsView</c>).</summary>
+    public void PlayAlertSound(string choiceOrPath, bool coalesce = false)
     {
         if (coalesce && !_soundGate.TryClaim(DateTime.Now)) return;
         try
@@ -4151,9 +4165,9 @@ public partial class MainWindow : Window, ICardContext
     private readonly SpawnPointLedger _spawnPoints;
     private readonly SpawnOverrides _spawnOverrides;
     private readonly SpawnCatalog _spawnCatalog;
-    internal SpawnPointLedger SpawnPoints => _spawnPoints;
-    internal SpawnOverrides SpawnOverridesStore => _spawnOverrides;
-    internal SpawnCatalog SpawnCatalogData => _spawnCatalog;
+    public SpawnPointLedger SpawnPoints => _spawnPoints;   // IZoneHost, World PR 1
+    public SpawnOverrides SpawnOverridesStore => _spawnOverrides;
+    public SpawnCatalog SpawnCatalogData => _spawnCatalog;
 
     // What the focus hide took down, so the same windows — and only those — come back.
     // Not "everything that is closed now": a window the player shut while alt-tabbed
@@ -4468,8 +4482,10 @@ public partial class MainWindow : Window, ICardContext
 
     // ---- travel routing + zone maps (competitive gaps #1/#2, 2026-08-10) ----
 
-    private TravelWindow? _travelWindow;
-    private MapWindow? _mapWindow;
+    // internal (not private), same reason as _questsWindow/_progressWindow: WidgetDump
+    // reads DebugFacts() off these for the EQBUDDY_EXPAND dump (World PR 1).
+    internal TravelWindow? _travelWindow;
+    internal MapWindow? _mapWindow;
 
     private void OnTravelRoute(object sender, RoutedEventArgs e)
     {

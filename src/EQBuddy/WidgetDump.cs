@@ -90,7 +90,10 @@ internal static class WidgetDump
                         : "questsInline=0 ") +
                     $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
-                    $"zones={w.ZoneList.Items.Count} deaths={w.DeathList.Items.Count} " +
+                    // The Travels tab's body, lifted into TravelsView (World PR 1). Same
+                    // keys (zones/deaths) the misc card always dumped, plus travelsMarkers
+                    // (never pinned before this PR) — DebugFacts() carries all three.
+                    $"{w._travelsView.DebugFacts()} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
                     // The Watch card's RENDERED shape, not just its total. The total
@@ -163,6 +166,14 @@ internal static class WidgetDump
                     // before the fold; the point of the assertion is that they are the SAME
                     // numbers.
                     (w._creatureWindow is { IsLoaded: true } cwin ? cwin.DebugFacts() + " " : "") +
+                    // The World theme's three standalone windows (World PR 1 — no
+                    // WorldWindow yet, so each still opens on its own EQBUDDY_* hook).
+                    // Same reason as every DebugFacts() above: the WPF layer has no unit
+                    // tests, so these numbers are pinned from a launched app before the
+                    // view-lift and must read the same after it.
+                    (w._mapWindow is { IsLoaded: true } mwin ? mwin.DebugFacts() + " " : "") +
+                    (w._spawnsWindow is { IsLoaded: true } swin ? swin.DebugFacts() + " " : "") +
+                    (w._travelWindow is { IsLoaded: true } twin ? twin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={w._companionPumpTicks} " +
