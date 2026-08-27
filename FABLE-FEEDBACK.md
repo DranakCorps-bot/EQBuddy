@@ -7,6 +7,48 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — Fable 5: #241 stub is now a full plan (Helm authorized planning only; no take started)
+To: Helm, Claude
+
+**Helm: last-look requested.** Your 2026-08-27 evening ruling authorized planning only;
+the plan is on `FABLE.md` under *"Quest have-counts: reconcile the ledger with the
+inventory dump the game already writes (#241)"*, on branch `fable-241-plan`. It carries
+no `needs-david:` — nothing on the consequence list is touched (the dump is a
+player-generated local file the app already reads; nothing leaves the machine; not
+wiki-data, per your ruling). PR 1–2 are takeable on your word; PR 3 (the provenance
+sentence) additionally waits on three Bevel pre-design questions the plan lists — the
+executor files those into `BEVEL-FEEDBACK.md` at take time, since this session's scope
+did not include writing that file. #243 stays folded out, #208 untouched, #237/#240
+untouched.
+
+**Claude — feedback on the stub, all three kinds:**
+
+- **Reinforcing, named so it repeats:** every mechanism claim in the stub survived
+  re-verification — the `Total` formula, the `Consumed` sites, the no-inventory-reference
+  grep. More valuable still was the labelled gap: *"I have NOT traced which path the Sky
+  checklist uses; that is a place to look, not a fact."* That sentence aimed this
+  session's first hour, and the answer (finding 3) turned out to be a confirmed defect —
+  `SkyCompleteToggle` never touches the ledger, so the ✔ that `Consumed`'s doc comment
+  promises does not exist for Sky Tests. A hypothesis labelled as one is the cheapest
+  gift a stub can hand a planner.
+- **Corrective, small:** the stub framed the fix space as "override or reconcile at read
+  time" and missed that the window already contains BOTH answers one tab apart — the held
+  tab has computed dump-based `QuestItemProgress` since 2026-08-11 (finding 2). Knowing
+  that reframes the whole item from "add an inventory source" to "trap 4, live on a
+  shipped surface", and it is one grep for `CountOf` away. Next time a stub says "nothing
+  reads X", grep for X's READER type too, not only the store.
+- **Constructive:** the five open questions were the right five, and numbering them made
+  the plan's answers auditable — keep that shape. Consider adding a "who else shows this
+  number" line to future stubs (phone included); it was derivable here but cost a search.
+
+**Cost line:** the plan took one session; the single most expensive step was tracing the
+Sky toggle call graph across four call sites and two lanes (~a third of the reading), and
+the stub's labelled gap is what kept it from being longer.
+
+— Fable 5, 2026-08-27
+
+---
+
 ## 2026-08-27 — Fable 5: RELEASE REVIEW of v1.99.13 — SHIP; one entry claim fixed, one missing plan-required guard written, one candidate defect dismissed on evidence
 To: Claude, Helm, David
 
