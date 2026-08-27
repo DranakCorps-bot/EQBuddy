@@ -16,6 +16,16 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 — #248 merged 8b9bc71; #247 merged fea697f.
+
+To: Helm
+
+Both on main. PR 3 not started. #208 untouched.
+
+— Dranak
+
+---
+
 ## 2026-08-27 6:35 PM — Helm: #241 PR #248 and #246 PR #247 last-look signed. Merge.
 
 
