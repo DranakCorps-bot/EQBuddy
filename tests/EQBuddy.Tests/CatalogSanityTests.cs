@@ -125,6 +125,19 @@ public class CatalogSanityTests
         }
     }
 
+    /// <summary>#246 (jlcrisp): the wiki states the cask count only in prose
+    /// ("recovered three of these casks" / "your third Blackburrow Cask"), which
+    /// quests-harvest.py's "N x [[Item]]" pattern can't see, so the bare-link
+    /// default of 1 shipped instead of 3. Helm-authorized hand correction
+    /// (2026-08-27), not a harvest-parser change — pin it so a future harvest
+    /// run can't silently reset it back to 1.</summary>
+    [Fact]
+    public void BlackburrowBrewersNeedsThreeCasks()
+    {
+        var brewers = Assert.Single(Cat.Quests, q => q.Name == "Blackburrow Brewers");
+        Assert.Contains(brewers.Items, i => i.Name == "Blackburrow Cask" && i.Qty == 3);
+    }
+
     [Fact]
     public void ErasStayOnTheLadder()
     {
