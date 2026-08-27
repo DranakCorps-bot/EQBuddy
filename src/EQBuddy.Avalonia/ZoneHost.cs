@@ -9,6 +9,11 @@ namespace EQBuddy.Avalonia;
 /// What the zone/map windows need from the app shell. Member names mirror the WPF
 /// MainWindow surface one-for-one, so wiring is "MainWindow implements IZoneHost" —
 /// the members it already grows for the spawn layer satisfy this implicitly.
+///
+/// <see cref="PlayAlertSound"/> joined World PR 1 (Fable 5's plan, hypothesis (a)
+/// verified): <c>SpawnsWindow</c> reached <c>_main.PlayAlertSound</c> directly for the
+/// per-named bell preview, and both lanes' <c>MainWindow</c>s already carry the identical
+/// signature — so <c>SpawnsView</c> can take this interface instead of the concrete class.
 /// </summary>
 public interface IZoneHost
 {
@@ -22,6 +27,7 @@ public interface IZoneHost
     ZoneGraph ZoneGraph { get; }
     MobLookupResult? WikiMobResult(string name);
     void EnsureMobLookup(string name);
+    void PlayAlertSound(string choiceOrPath, bool coalesce = false);
 }
 
 /// <summary>

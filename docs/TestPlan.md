@@ -371,7 +371,7 @@ so it can be pinned without an audio device. Both UIs obey the same plan.
 
 ## 5. The gap — read this before trusting the suite
 
-**`src/EQBuddy` (the WPF app, 20,838 lines across 64 files) has no automated coverage.
+**`src/EQBuddy` (the WPF app, 22,029 lines across 74 files) has no automated coverage.
 No test project references it.** (Size pinned by `DocumentationSizeTests` — it was still
 claiming 14,432 across 37 on 2026-08-24, understating the untested surface by a third.)
 

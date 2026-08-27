@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -10,18 +9,22 @@ using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 namespace EQBuddy;
 
 /// <summary>
-/// The Spawns window (SPAWN-004): named-mob respawn countdowns for one zone at a time,
-/// fed by <see cref="SpawnsViewModel"/>. While "Track spawns" is armed the window stays
-/// HIDDEN until a countdown exists — it pops when a named (or placeholder) death starts
-/// one, including timers recovered from the log at startup — and MainWindow closes it
-/// again when the last timer runs out. Closing only hides it; the next kill brings it back.
-/// David's call (2026-08-02): a tracker parked on screen all session is noise, a tracker
-/// that appears because something died is information. Alerts fire from MainWindow's
-/// shared tick, not here, so they don't depend on this window's lifetime.
+/// Named-mob respawn countdowns for one zone at a time, fed by <see cref="SpawnsViewModel"/>.
+///
+/// Lifted out of <c>SpawnsWindow</c> for World PR 1 (docs/Themes.md theme 6): this carries
+/// the whole bordered panel — chrome and content together, since the window is borderless
+/// and hand-drawn and there is no clean chrome/content seam at the XAML level the way
+/// Map/Travel had. <c>SpawnsWindow</c> becomes a thin host owning only what a literal OS
+/// window owns: sizing, position, <c>DragMove</c>, <c>Close</c> — reached here via
+/// <see cref="Window.GetWindow(DependencyObject)"/> rather than a captured reference.
+///
+/// Owns its own 1-second tick (unlike Map, which rides <c>MainWindow</c>'s shared
+/// <c>RefreshUi</c> tick via <c>MaybeRefresh</c>) — that was already true of the window
+/// this replaces, so the timer moved with the rest of the content unchanged.
 /// </summary>
-public partial class SpawnsWindow : Window
+public partial class SpawnsView : UserControl
 {
-    private readonly MainWindow _main;
+    private readonly IZoneHost _host;
     private readonly SpawnsViewModel _vm;
     private readonly AppSettings _settings;
     private readonly DispatcherTimer _tick;
@@ -34,31 +37,15 @@ public partial class SpawnsWindow : Window
     private List<SpawnRow> _rows = [];
     private bool _syncingZone;
 
-    /// <summary><paramref name="initialZone"/>: the zone whose kill popped the window,
-    /// so it opens showing the timer that summoned it.</summary>
-    public SpawnsWindow(MainWindow main, SpawnsViewModel vm, string? initialZone = null)
+    /// <paramref name="initialZone"/>: the zone whose kill popped the window,
+    /// so it opens showing the timer that summoned it.
+    public SpawnsView(IZoneHost host, SpawnsViewModel vm, string? initialZone = null)
     {
         InitializeComponent();
-        WindowZoom.Attach(this, "spawns", main.Settings);
-        // Resizable and REMEMBERED (David, 2026-08-25: "allow all the pop out windows to
-        // be resized"). Safe for AllowResize's height sample because the spawn rows come
-        // from the ledger the app already holds — nothing arrives after first render.
-        WindowZoom.AllowResize(this, "spawns", main.Settings);
-        _main = main;
+        _host = host;
         _vm = vm;
-        _settings = main.Settings;
+        _settings = host.Settings;
         BuildStaticChrome();
-
-        MaxHeight = SystemParameters.WorkArea.Height - 40;
-        BodyScroll.MaxHeight = SystemParameters.WorkArea.Height - 220;
-        // Follow the monitor this window is on (portrait secondaries — discussion #31).
-        SourceInitialized += (_, _) => UpdateHeightCaps();
-        LocationChanged += (_, _) => UpdateHeightCaps();
-
-        var restored = ScreenGuard.OnScreen(_settings.SpawnLeft, _settings.SpawnTop, Width, Height);
-        if (restored) { Left = _settings.SpawnLeft; Top = _settings.SpawnTop; }
-        else { Left = SystemParameters.WorkArea.Left + 40; Top = 80; }
-        var (placedLeft, placedTop) = (Left, Top);
 
         _vm.RefreshZoneList();
         foreach (var z in _vm.ZoneNames) ZoneCombo.Items.Add(z);
@@ -73,17 +60,17 @@ public partial class SpawnsWindow : Window
         _tick.Tick += (_, _) => RefreshRows();
         _tick.Start();
         RefreshRows();
-
-        Closed += (_, _) =>
-        {
-            _tick.Stop();
-            // Never let an unmoved fallback overwrite a real saved spot (#117).
-            (_settings.SpawnLeft, _settings.SpawnTop) = WindowPlacement.PositionToPersist(
-                restored, placedLeft, placedTop, Left, Top,
-                _settings.SpawnLeft, _settings.SpawnTop);
-            _settings.Save();
-        };
     }
+
+    public UIElement Body => this;
+
+    /// <summary>Exposed so the thin host's <c>UpdateHeightCaps</c> can cap the scroller —
+    /// the one place the window's geometry and this view's content agree.</summary>
+    internal ScrollViewer BodyScrollView => BodyScroll;
+
+    /// <summary>Stop the independent tick — called from the host's <c>Closed</c> handler,
+    /// exactly where <c>_tick.Stop()</c> ran before the lift.</summary>
+    public void StopTicking() => _tick.Stop();
 
     private static string FirstNonEmpty(string a, string b) => a.Length > 0 ? a : b;
 
@@ -117,7 +104,7 @@ public partial class SpawnsWindow : Window
 
         var now = DateTime.Now;
         _rows = _vm.RowsFor(zone, now);
-        var signature = zone + "" + string.Join("",
+        var signature = zone + "" + string.Join("",
             _rows.Select(r => $"{r.DisplayName}|{r.HasActiveTimer}|{r.IsDue}|{r.DurationText}|{r.Alert}|{r.SoundName}|{r.IsCustom}"));
         if (signature != _signature)
         {
@@ -450,12 +437,12 @@ public partial class SpawnsWindow : Window
                     if (dlg.ShowDialog() == true)
                     {
                         _vm.SetSound(row.Zone, row.Name, dlg.FileName);
-                        _main.PlayAlertSound(dlg.FileName);
+                        _host.PlayAlertSound(dlg.FileName);
                     }
                     break;
                 default:
                     _vm.SetSound(row.Zone, row.Name, choice);
-                    _main.PlayAlertSound(choice);   // hear it as you pick it
+                    _host.PlayAlertSound(choice);   // hear it as you pick it
                     break;
             }
             Kick();
@@ -495,26 +482,20 @@ public partial class SpawnsWindow : Window
         return box;
     }
 
-
     // ---- chrome ----
+    //
+    // DragMove/Close are Window-only, so they resolve the actual hosting window at the
+    // point of use rather than capturing one in the constructor — this view is no longer
+    // a Window itself. Works identically: both fire from an event that already arrived
+    // on the same window's message pump.
 
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && e.OriginalSource is not TextBox) DragMove();
+        if (e.ChangedButton == MouseButton.Left && e.OriginalSource is not TextBox)
+            Window.GetWindow(this)?.DragMove();
     }
 
-    // Closing hides the window; tracking stays armed and the next kill re-opens it. Turning
-    // the feature off lives in the menu and Options, deliberately elsewhere.
-    /// <summary>Height caps follow the monitor this window occupies (portrait
-    /// secondary screens are taller than the primary — discussion #31).</summary>
-    private void UpdateHeightCaps()
-    {
-        if (MonitorMetrics.WorkAreaFor(this) is not { } work) return;
-        MaxHeight = Math.Max(200, work.Height - 40);
-        BodyScroll.MaxHeight = Math.Max(120, work.Height - 220);
-    }
-
-    private void OnClose(object sender, RoutedEventArgs e) => Close();
+    private void OnClose(object sender, RoutedEventArgs e) => Window.GetWindow(this)?.Close();
 
     private void OnZonePicked(object sender, SelectionChangedEventArgs e)
     {
@@ -546,4 +527,10 @@ public partial class SpawnsWindow : Window
         }
     }
 
+    /// <summary>Facts for the <c>EQBUDDY_EXPAND</c> dump — the WPF layer's only test seam
+    /// (docs/TestPlan.md §5). Pinned before the extraction so the move has numbers to be
+    /// checked against, not a claim to be believed.</summary>
+    public string DebugFacts() =>
+        $"spawnsRows={_rows.Count} spawnsZones={ZoneCombo.Items.Count} " +
+        $"spawnsFollow={(FollowCheck.IsChecked == true ? 1 : 0)}";
 }

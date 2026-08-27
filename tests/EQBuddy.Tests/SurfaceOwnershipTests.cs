@@ -125,6 +125,52 @@ public class SurfaceOwnershipTests
         Assert.Contains(ctorUse, text);
     }
 
+    /// <summary>
+    /// World PR 1's four separate factories (docs/Themes.md theme 6) — not one combined
+    /// set, unlike Progress/Creature/Loot. There is no WorldWindow yet (PR 2), only three
+    /// SEPARATE standalone windows, and MapView/SpawnsView do real construction-time work
+    /// (file I/O, ledger reads) a shared factory would fire needlessly for every sibling.
+    /// Both lanes name the same four methods, which is what a reader of one lane checks
+    /// against the other.
+    /// </summary>
+    [Theory]
+    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
+    [InlineData("EQBuddy", "MainWindow.xaml.cs")]
+    public void BothLanesNameTheSameFourWorldFactories(string project, string file)
+    {
+        var text = File.ReadAllText(Path.Combine(Src, project, file));
+
+        Assert.Contains("NewMapView()", text);
+        Assert.Contains("NewSpawnsView(", text);
+        Assert.Contains("NewTravelView()", text);
+        Assert.Contains("NewTravelsView()", text);
+    }
+
+    /// <summary>
+    /// Every World host builds ITS OWN instance, never a shared one — trap 45's actual
+    /// requirement (fresh, not shared), satisfied here two ways: WPF's three windows all
+    /// go through MainWindow's factory (mirroring Progress/Creature/Loot); Avalonia's
+    /// SpawnsWindow does too, but its Map/Travel windows already took <c>IZoneHost</c>
+    /// directly before this PR (<c>ZoneWindowsRenderTests</c> constructs them against a
+    /// fake host with no widget at all) — preserved rather than "fixed", since a
+    /// constructor signature that render tests depend on is not the thing to change in a
+    /// zero-product-change PR. Building <c>new MapView(host)</c>/<c>new TravelView(host)</c>
+    /// inline is exactly as fresh as calling a factory that would do the same thing.
+    /// </summary>
+    [Theory]
+    [InlineData("EQBuddy", "MapWindow.cs", "main.NewMapView()")]
+    [InlineData("EQBuddy", "SpawnsWindow.cs", "main.NewSpawnsView(initialZone)")]
+    [InlineData("EQBuddy", "TravelWindow.cs", "main.NewTravelView()")]
+    [InlineData("EQBuddy.Avalonia", "MapWindow.cs", "new MapView(host)")]
+    [InlineData("EQBuddy.Avalonia", "SpawnsWindow.cs", "main.NewSpawnsView(initialZone)")]
+    [InlineData("EQBuddy.Avalonia", "TravelWindow.cs", "new TravelView(host)")]
+    public void EveryWorldHostBuildsItsOwnFreshView(string project, string file, string ctorUse)
+    {
+        var text = File.ReadAllText(Path.Combine(Src, project, file));
+
+        Assert.Contains(ctorUse, text);
+    }
+
     /// <summary>No dictionary of pre-built bodies survives on either widget. That field was
     /// the store the accessor read from, and leaving it behind would leave the next person
     /// a loaded gun with the trigger guard removed.</summary>

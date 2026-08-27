@@ -88,7 +88,9 @@ public class GameCommandsTests
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),
             "owns the achievements import, and the menu copy beside it"),
-        ("EQBuddy/MapWindow.cs", nameof(GameCommands.LocSocial),
+        // Moved from EQBuddy/MapWindow.cs to MapView.cs in World PR 1 (the content lift) —
+        // this row following the surface is exactly the notice this list exists to give.
+        ("EQBuddy/MapView.cs", nameof(GameCommands.LocSocial),
             "the /loc social is the map's whole trick"),
 
         // ---- Avalonia: the same surfaces, per CLAUDE.md's both-UIs-in-one-change rule.
@@ -108,7 +110,8 @@ public class GameCommandsTests
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileAchievements), "WPF twin"),
         ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileFaction), "WPF twin"),
-        ("EQBuddy.Avalonia/MapWindow.cs", nameof(GameCommands.LocSocial), "WPF twin"),
+        // Moved from EQBuddy.Avalonia/MapWindow.cs to MapView.cs in World PR 1.
+        ("EQBuddy.Avalonia/MapView.cs", nameof(GameCommands.LocSocial), "WPF twin"),
     ];
 
     public static TheoryData<string, string, string> SurfaceRows()

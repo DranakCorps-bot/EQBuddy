@@ -35,8 +35,11 @@ public class DesignRatchetTests
         "EQBuddy/QuestsWindow.xaml",
         "EQBuddy/QuestsWindow.xaml.cs",
         "EQBuddy.Avalonia/QuestsWindow.cs",
-        "EQBuddy/SpawnsWindow.xaml",
-        "EQBuddy/SpawnsWindow.xaml.cs",
+        // Renamed EQBuddy/SpawnsWindow.xaml(.cs) -> SpawnsView.xaml(.cs) in World PR 1:
+        // the Gate 3 content moved into the view the theme's future window will host;
+        // the thin SpawnsWindow.cs left behind carries no sizes to check.
+        "EQBuddy/SpawnsView.xaml",
+        "EQBuddy/SpawnsView.xaml.cs",
         "EQBuddy.Avalonia/SpawnsWindow.cs",
         "EQBuddy.UI.Shared/LootPresentation.cs",
         "EQBuddy/LootCardView.cs",

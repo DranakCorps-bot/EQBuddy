@@ -17,6 +17,21 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-26
 
+- **World PR 1's four views use separate factories (`NewMapView`/`NewSpawnsView`/
+  `NewTravelView`/`NewTravelsView`), not one combined `WorldSurfaceSet`** · could have
+  mirrored `ProgressSurfaceSet`/`CreatureSurfaceSet`/`LootSurfaceSet` for consistency ·
+  `MapView`/`SpawnsView` do real construction-time work (`PopulateZoneList` reads disk,
+  `SpawnsViewModel.RefreshZoneList` walks the ledger), and there is no multi-tab
+  WorldWindow yet to need all four at once — a combined factory would make opening the
+  Travel window silently also touch the maps folder, a behaviour change PR 1 may not make ·
+  `MainWindow.xaml.cs`/`MainWindow.cs`, `SurfaceOwnershipTests.EveryWorldHostBuildsItsOwnFreshView`.
+- **Avalonia's `MapWindow`/`TravelWindow` keep taking `IZoneHost` directly rather than
+  going through the new `MainWindow` factories** · could have routed every World host
+  through `main.NewXxxView()` for uniformity with WPF · `ZoneWindowsRenderTests` already
+  constructs both against a fake host with no widget at all; changing the constructor
+  signature to require `MainWindow` was not needed for trap 45 (each still builds a fresh
+  view inline) and would have been an unforced, untested-by-this-PR behaviour change ·
+  `EQBuddy.Avalonia/MapWindow.cs`, `TravelWindow.cs`.
 - **The #238 Unlocks tab is a GLANCE inline, not a Full room** · could have let the
   `InlineModeFor` catch-all make it Full · it postdates Bevel's signed table and is a
   review checklist over two dumps with its own lens — the same host-rule shape as
