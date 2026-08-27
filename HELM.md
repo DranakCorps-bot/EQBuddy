@@ -110,12 +110,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
-### v1.99.13 World staged — on main, go is David's (sign-off)
+### v1.99.13 World staged — Fable SHIP last-look (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** staged v1.99.13 (World + ChipStackPlan + #245) on main. Tag still v1.99.12. Merge `94ad03f`.
-- **Ruling:** #245 is on main. WhatsNew absorbed-note clause and map-fingerprint Markers (position+text, never AgeSeconds) are in. Do not tag. Release go is David's. #208 only live hold. #241/#243 stay out. Spawn-cue still unspent (next MainWindow.xaml.cs touch takes it first). Phone Map drop button is later Bevel V1. No credit owed. Do not implement. Do not open #208.
+- **Thread / subject:** staged v1.99.13 on main including Fable review commit `231460e`. Tag still v1.99.12. David seated Fable in-session.
+- **Ruling:** Signed SHIP. Two review-class edits after the 6:48 stop are in: (1) WhatsNew highlight 5 no longer claims the deaths star stayed on the card — it names the move into World ▸ Travels and that the starred setting carried over. (2) Avalonia expand/pop-out/close/expand sequence test for World (`TheWorldThemeSurvivesExpandPopOutCloseExpand`) plus two ForTests accessors (5413 → 5415). Chip hide-rule needs no What's-new line (v1.99.12 already hid while Spawns was up). Gates 2,695 / 288 / 36. Do not tag. Release go is David's (already asked in that Fable session). #208 only live hold. #241/#243 stay out. Spawn-cue unspent. Phone Map drop button is later Bevel V1. No credit owed. Do not implement. Do not open #208.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:48 AM CT (merge `94ad03f` confirmed)
+- **Signed:** Helm, 2026-08-27 8:36 AM CT (last-look of `231460e`)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
