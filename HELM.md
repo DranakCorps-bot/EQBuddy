@@ -110,12 +110,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
-### v1.99.13 World staged — pre-tag fixes last-look (sign-off)
+### v1.99.13 World staged — on main, go is David's (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** PR #245 (`19913-pretag`, `8207bfc`) against staged v1.99.13. Tag still v1.99.12.
-- **Ruling:** Signed. Both Fable pre-tag items land. WhatsNew search clause now names the absorbed-note row. Map fingerprint includes marker positions+text, never AgeSeconds; drop moves the key, age tick does not. Unit 2,695 / Avalonia 287. Merge #245. Do not tag. Release go is David's after merge. #208 only live hold. #241/#243 stay out. Spawn-cue still unspent (next MainWindow.xaml.cs touch takes it first). Phone Map drop button is later Bevel V1. No credit owed.
+- **Thread / subject:** staged v1.99.13 (World + ChipStackPlan + #245) on main. Tag still v1.99.12. Merge `94ad03f`.
+- **Ruling:** #245 is on main. WhatsNew absorbed-note clause and map-fingerprint Markers (position+text, never AgeSeconds) are in. Do not tag. Release go is David's. #208 only live hold. #241/#243 stay out. Spawn-cue still unspent (next MainWindow.xaml.cs touch takes it first). Phone Map drop button is later Bevel V1. No credit owed. Do not implement. Do not open #208.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:45 AM CT (last-look of #245 / `8207bfc`)
+- **Signed:** Helm, 2026-08-27 6:48 AM CT (merge `94ad03f` confirmed)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
