@@ -354,56 +354,254 @@ as default tab; the per-named bell config rides into Camps unchanged.
 
 ---
 
-## STUB (Claude, 2026-08-27): quest have-counts are a log tally the player reads as their bags
-To: Fable
+## Quest have-counts: reconcile the ledger with the inventory dump the game already writes (#241)
 
-- **Priority:** `ready` for planning — no `needs-david:` that I can see, but see the open
-  questions: one of them may turn out to be his.
-- **Class:** **V2, and here is why it is not V0–V1** — no single answer from David finishes it.
-  It changes the SOURCE of a number on a core surface (Quest Tracker, Sky, Epic, and the phone),
-  and the sub-questions below each change the architecture independently.
-- **Source:** #241 DasGud, 2026-08-26 7:40 PM CT. Evidence and the full trace are in
-  `SCRIBE-FEEDBACK.md`. Nothing built, nothing posted, no promise made to him.
+- **Priority:** `ready`, with one gate named honestly: **Helm's 2026-08-27 evening ruling
+  authorized planning only**, so no take starts until Helm last-looks this plan (the wake
+  requesting that rides this commit). No `needs-david:` — nothing here touches the
+  consequence list: the dump is a file the player generates on their own machine, the app
+  already reads it (Gear tab, held tab), and nothing leaves the machine. PR 3 additionally
+  waits on Bevel's pre-design answers; PR 1–2 do not.
+- **Class:** `V2`, confirmed — the fix is to change which STORE is authoritative for a number
+  on four surfaces (Quest Tracker, Sky, Epic, phone), and the wrong obvious fix (overlay the
+  dump at each read site) is wrong for a trap-33 reason you only see with all the readers in
+  view. Not V1 because no single answer from David finishes it; the five sub-questions below
+  are answered as design decisions instead.
+- **Source:** #241 DasGud, 2026-08-26 7:40 PM CT ("Showing I have 4 Sphinx Claws but
+  unfortunately I have none… one Mithril Bands when I have zero and 15 Izah runes instead of
+  my 17"). Claude's stub (2026-08-27) and the `SCRIBE-FEEDBACK.md` trace, both verified here.
+  Nothing posted, no promise made to him.
+- **Bevel pre-design: YES, and it gates PR 3 only.** PR 1–2 change numbers, not sentences.
+  The questions for Bevel (executor files them verbatim in `BEVEL-FEEDBACK.md` when taking
+  the item — this session could not, per the planning-only scope): (1) what the have-count
+  MEANS now that it has two possible sources, and whether the detail pane says which one it
+  used ("verified from your inventory dump, 2h ago" vs "log tally — EQBuddy can't see
+  hand-ins"); (2) whether the no-dump state gets a nudge toward `/outputfile inventory` on
+  the Turn-ins section, and where; (3) whether the phone's quest detail needs the same
+  provenance sentence, or corrected numbers are enough there.
+- **Shot offline: yes, with staging.** Seed a `<Character>_<server>-Inventory.txt` beside the
+  fixture's Logs PARENT (where `InventoryFile.FindLatest` looks) and an announcement line in
+  the fixture log. Predict the counts BEFORE shooting (trap 23) — the whole point of the shot
+  is three numbers whose values the plan dictates. Hypothesis (c) below if the harness can't
+  reach the folder.
+- **Column budgets:** the detail-pane provenance line is an `IconLine` (a Grid, wraps — trap
+  14 already paid for); the import Summary clause rides the existing Gear-card report line on
+  a 320-wide card — keep it to the shape "· quest counts trued (3)", no item names.
+- **Guards run eight times:** the new store tests are deterministic (tests call `Flush()`,
+  never the debounced `Save()`), but the rule is the rule — eight consecutive green runs on
+  `QuestLedgerStoreTests` before PR 1 is done.
 
-**The defect, verified in source.** The have-count beside a turn-in item is
-`QuestLedgerStore.Entry.Total` = `Looted + Manual − Consumed` (`QuestLedgerStore.cs:33`) — a
-tally of what the LOG saw, which the player reasonably reads as "what I have". `Consumed` is
-recorded only for merchant sales, destroys and merges (`SessionStats.cs:909–935`), and the
-field's own comment concedes the gap: *"Hand-ins still aren't logged — that stays the ✔ click."*
+### What I verified in source (every stub claim re-checked; two new findings)
 
-DasGud's three numbers are wrong in **both directions at once**, which is what rules out an
-arithmetic bug: Sphinx Claw 4-shown/0-held and Mithril Bands 1/0 (turned in, invisible to the
-log), and Wind Rune Izah **15 shown against 17 actually held** (acquired off-log).
+1. **The stub's mechanism is right.** Have = `Entry.Total = max(0, Looted + Manual −
+   Consumed)` (`QuestLedgerStore.cs:33`); `Consumed` is written only for crafts/merges,
+   destroys, and named vendor sales (`SessionStats.cs:905–935`); hand-ins are invisible.
+   `QuestMatcher` and the ledger contain no reference to inventory.
+2. **The window already contains BOTH answers, one tab apart** — the stub missed this, and it
+   sharpens the ask. The Quests window's **held** tab computes `QuestItemProgress` from
+   `LatestInventory()` = dump + net log since (`InventoryFile.Snapshot.WithChanges`,
+   `QuestsWindow.xaml.cs:688–726`, Avalonia twin `:1685`). The **mine/zone/all** views, the
+   detail pane's Turn-ins rows, and the phone (`CompanionQuestRequest.Owned` is the ledger
+   slice) all read the ledger. DasGud's numbers are the ledger's; the correct ones were on
+   the next tab. Trap 4's one-fact-two-sources, live on a shipped surface.
+3. **Stub question 5 is ANSWERED, and it is a confirmed defect, not a hypothesis.** A Sky
+   Test turn-in — from the Sky tab's button AND from the quest detail's toggle, both lanes —
+   routes to `SkyCompleteToggle.MarkTurnedIn` (`QuestsWindow.xaml.cs:1342–1358`, Avalonia
+   `:2241–2253`), which writes `SkyQuestCompleted` + item `Acquired` flags and **never
+   touches the quest ledger**. `RecordCompletion` — the path that consumes — is reachable
+   only for non-Sky quests. So the ✔ click that `Consumed`'s own doc comment promises
+   ("that stays the ✔ click") **does not exist for Sky Tests.** DasGud's 4→0 and 1→0 are
+   this, mechanically; the 15→17 is off-log acquisition, which only a dump can see.
+4. **The reconcile seam already runs end-to-end.** `LogParser.cs:184` parses
+   `Outputfile Complete:` → `OutputfileEvent` → `SessionStats.cs:841` forwards →
+   both MainWindows already auto-import the dump for gear (`OnOutputfileWritten`, WPF
+   `:3016`, Avalonia `:4408`), with a `GearInventoryAppliedStamp` idempotence precedent.
+   The launch replay re-offers announcements chronologically every start — the exact
+   machinery a replay-safe reconcile needs is already exercised daily.
+5. **Absence in a dump means zero.** The dump enumerates every slot — worn, bags, bank —
+   with "Empty" rows for gaps (`InventoryFile` doc + `Entry.Location`), sums stacks through
+   `BaseItemName`. So "the dump does not list Sphinx Claw" is the game saying he holds none.
+6. **The quest is real catalog data.** "Beastlord Sky Test: Windhowl/Spirit Render" is a
+   `SkyTestSplit` quest; its four turn-ins including Sphinx Claw, Mithril Bands and Wind
+   Rune Izah are rows sky-023…026 in `SkyQuestDefaults.cs:42–45`. The turn-in list is not
+   disputed and is not wiki-data — per Helm, this item never touches the wiki.
 
-**The thing that makes this worth planning rather than shrugging at: the answer already exists
-on disk and nothing reads it.** `/outputfile inventory` knows his true counts, the Gear tab
-already imports it, and `QuestLedgerStore` and `QuestMatcher` contain **no reference to
-inventory at all**. This is the `loot → quest → item` chain the roadmap names as the
-differentiator, broken at the first link, on the surface that is supposed to answer *"what am
-I working on"*.
+### Architecture
 
-**Open questions a plan has to answer — this is the V2 argument:**
+**Reconcile the STORE, not the readers (trap 33: one value, one builder).** Overlaying the
+dump at each read site means changing the mine view, the zone view, the detail pane, the
+widget card and the phone projection — five chances to miss one, and the phone would need a
+wire change. Writing the truth into `QuestLedgerStore` corrects every reader at once,
+including EQBuddy Mobile with zero wire change.
 
-1. **Precedence.** Does an inventory dump *override* the tally for items it lists, or reconcile
-   with it? A dump is a point-in-time truth that goes stale the moment he loots again.
-2. **Staleness.** A three-week-old dump is worse than no dump for an item he has farmed since.
-   What is the rule, and does the surface say which source it used? (#101/#193's honesty bar.)
-3. **Bags vs bank vs shared bank.** A turn-in item in the bank counts for "do I have it" but not
-   for "can I hand it in right now".
-4. **No dump at all** — the common case. Whatever ships must not make the no-dump state worse
-   than today's.
-5. **The two completion paths, which is a defect in its own right.** `RecordCompletion` consumes
-   turn-in items (`:298–301`); `SetCompleted` — catch-up marking — deliberately does not, and
-   says so. **A player cannot tell which one a given tick is.** I have NOT traced which path the
-   Sky checklist uses; that is a place to look, not a fact.
+**PR 1 — Core: `ReconcileInventory`.** `Entry` gains `Verified int` + `VerifiedAt DateTime`
+(old files parse; no `CountingRulesVersion` bump — the reset machinery is for wrong log
+counters, and these start at zero). `Total = max(0, Verified + Looted + Manual − Consumed)`.
+New `QuestLedgerStore.ReconcileInventory(characterKey, counts, writtenAt)`:
 
-**Bevel has a stake** before anything is designed: what the number MEANS, and whether the
-surface should say which source it came from. That is a which-room-owns-this call, not mine.
+- **No-op** when `writtenAt` ≤ the per-character `LastInventoryReconcile` watermark (any
+  trigger is idempotent — replay, relaunch, manual refresh), and when `counts` is empty
+  (the `SetUnlockedClasses` bad-parse precedent: an empty dump must not erase knowledge).
+- For the union of (dump items the `TrackFilter` admits) ∪ (the character's existing
+  entries): `Verified` = dump count (0 when absent), `Looted = Consumed = Manual = 0`,
+  `VerifiedAt = writtenAt`, `LastTime = max(LastTime, writtenAt)` so replayed pre-dump
+  events bounce.
+- **`Manual` is deliberately superseded** — the dump is the game's own statement of
+  possession, strictly better information than "I already had this"; the +1/right-click
+  affordances still work afterward, on top of the verified base.
+- **Clamps move or the fix breaks the ✔:** `SetManual`'s floor and `RecordCompletion`'s
+  decrement floor are `-Looted` today; post-reconcile `Looted` is 0, so a hand-in could
+  never lower a verified count. Both become `-(Verified + Looted)`, with the failing case
+  as a test.
 
-**What I did not do:** build anything, post anything, or ask David. Filed as a stub per the
-V2 route rather than finished and labelled V2 afterwards.
+**Where it runs: inside the ingest, at `case OutputfileEvent`, in log order** — not in the
+UI-thread handler. The `BeginInvoke` hop would let a loot line seconds after the dump land
+first and be zeroed; in ingest order, pre-dump loot lands and is squared, post-dump loot
+lands after and survives, and the launch replay reproduces the identical sequence. Gated on
+`!StoresSuppressed` (#74 review replay). SessionStats gets an injected
+`Func<string, InventoryFile.Snapshot?>` resolver wired by both lanes beside `QuestStore`,
+with a source-scan test in the `CompanionSnapshotArgumentTests` shape so a lane cannot miss
+the wiring (trap 20's family). File I/O on the ingest thread is bounded: announcements are
+rare, the watermark short-circuits stale ones, and a half-written file must not kill the
+tail (the existing handler's catch pattern).
 
-— Dranak (Claude Code)
+**Report and undo (trap 43): a count that changes off-screen is still a change to the
+player's data.** `AutoImportOutcome` gains `QuestCountsTrued`; the existing inventory
+`Summary` line gains the short clause; the existing `Undo` also restores the pre-reconcile
+entries. `ImportReportReachesASurfaceTests` gets its row — that must-list exists precisely
+for this.
+
+**PR 2 — the ✔ that was promised.** `SkyCompleteToggle.MarkTurnedIn` gains the ledger, the
+character key and the turn-in needs, and consumes the split quest's items — the same list
+`RecordCompletion` would have used. `Reopen` restores nothing (the mirror of "reopen does
+not untick items": a mis-click costs one click, and the next dump re-trues regardless).
+**The achievements import deliberately does NOT consume** — it is a statement about
+history, possibly predating the ledger, and consuming there would over-subtract a player
+re-farming the same items. The Epic toggle gets the same treatment if hypothesis (b)
+survives contact.
+
+**PR 3 — provenance, Bevel-gated.** The detail pane's status area says which source fed the
+counts and how old the anchor is; the no-dump state names the command with a ⧉ copy — which
+makes the detail pane a **`GameCommandsTests.SurfacesNeedingACommand` row** (trap 34: the
+must-list, not just the no-literal rule). Phone numbers correct themselves for free; if
+Bevel wants the sentence there too, it rides the wire (trap 32 — no page-side literal;
+`CompanionCommandPrompt` is the precedent, and trap 35 says selectable text + "on your PC",
+never a dead copy button).
+
+### The stub's five questions, answered as decisions
+
+1. **Precedence:** the dump overrides, at its write time, for every admitted item —
+   present = its count, absent = zero. The log continues from that anchor.
+2. **Staleness:** solved structurally, no cutoff rule. The reconcile applies at the dump's
+   position in the log TIMELINE, so a three-week-old dump cannot override this week's loot —
+   post-dump events land after it by construction. The surface states the anchor's age
+   (PR 3); honesty bar met by saying, not by refusing.
+3. **Bags vs bank:** total possession counts, as the held tab already counts it. The
+   "could I hand it in right now" split is real but separable — `Entry.Location` supports
+   it later; a someday line, not this plan.
+4. **No dump:** nothing changes. `Verified` is never set, `Total` reduces to today's
+   formula exactly; PR 3's nudge is additive. The common case cannot get worse.
+5. **Two completion paths:** the explicit turn-in click consumes (PR 2 — the missing
+   half); catch-up `SetCompleted` stays non-consuming on purpose (items long gone); the
+   achievements import stays non-consuming on purpose (history, not now). Every path is
+   squared by the next dump, which is what makes the asymmetry safe to keep.
+
+### Risks
+
+- **The one place a user statement is machine-overwritten:** a Manual count meaning "my
+  mule holds two" is zeroed by a dump that truthfully says THIS character holds none. Dump
+  wins — the ledger is per-character and a turn-in needs the items on this character — and
+  the cost is one +1 click. The alternative (preserve Manual when absent) would have left
+  DasGud's numbers wrong forever had he typed them in. Named in `DECISIONS.md`.
+- **A partially-written or truncated dump is undetectable** (`ParseEntries` skips bad rows
+  silently). Empty is ignored; partial is accepted and the next dump fixes it; the game
+  announces only after "Outputfile Complete", which bounds the window.
+- **Ratchet, keep-if-it-fits:** the MainWindow cost is a few wiring lines per lane, but
+  Helm's 1.99.13 ruling stands — **the next loop that touches `MainWindow.xaml.cs` takes
+  the spawn-cue lift FIRST.** That loop is this one, unless the World PRs already spent it.
+  Measure at the PR; do not trust this paragraph.
+- **Trap 8/12:** `VerifiedAt` ages never enter fingerprints or fixed-width chrome. The
+  quests fingerprint already carries `Total`s (`QuestsWindow.xaml.cs:546`), so a reconcile
+  wakes devices exactly once, correctly.
+- **Double-subtraction is impossible by construction** — a ✔ consume followed by a dump
+  reconcile overwrites rather than accumulates — but the TEST for it still gets written.
+- **LogParser is not touched.** The announcement regex has existed since 2026-08-20. A PR
+  that finds itself editing `LogParser.cs` has taken a wrong turn — stop and re-read.
+
+### Decomposition
+
+- **PR 1 — Core:** `Verified`/`VerifiedAt`, `ReconcileInventory` + watermark, ingest
+  wiring + resolver seam + scan test, clamp updates, outcome/undo/summary plumbing,
+  `QuestLedgerStoreTests` (below). No sentence changes. Every surface's numbers true up.
+- **PR 2 — consumption:** `SkyCompleteToggle` (+ Epic twin per hypothesis (b)), all four
+  call sites via the one helper, tests. `docs/TestPlan.md` rows for both PRs.
+- **PR 3 — provenance (Bevel-gated):** detail-pane source line + no-dump ⧉ nudge, both
+  lanes; the `SurfacesNeedingACommand` row; staged shot with predicted counts; phone
+  sentence only if Bevel pulls it in. What's-new entry crediting **DasGud, #241** ships
+  with whichever release carries PR 1 — the counts moving IS the player-noticeable change.
+
+### Verification
+
+- **DasGud's triple as a unit test, verbatim:** ledger looted {Sphinx Claw 4, Mithril
+  Bands 1, Wind Rune Izah 15}; dump {Izah: 17}; after reconcile → 0 / 0 / 17. If this
+  test's name does not mention #241, write it again.
+- **Order and replay:** pre-dump loot squared, post-dump loot survives; the identical
+  event sequence re-offered (relaunch replay) changes nothing; an older dump than the
+  watermark is a no-op; empty dump is a no-op; `StoresSuppressed` suppresses.
+- **Clamps:** a ✔ after a reconcile lowers Total (fails on today's clamp — run it against
+  the pre-fix tree, trap 34's lesson); `Reopen` restores nothing (the negative, trap 39).
+- **Seams:** both-lanes resolver scan test; `ImportReportReachesASurfaceTests` row;
+  `GameCommandsTests.SurfacesNeedingACommand` row (PR 3).
+- **The check David can do himself, at level 29, no endgame needed:** loot any quest item,
+  sell one copy, run `/outputfile inventory`, and watch the tracker's count match his bags
+  — then type a manual +1 and watch it survive. This item is UNUSUAL in being fully
+  David-verifiable; say so in the release review request.
+- Reporter confirmation: after release, ask DasGud to re-dump and read the three numbers.
+
+### Out of scope
+
+#243's leftover-item audit (parked, Helm, different ask — no fold); anything wiki-facing
+(this is the "about the player, not the world" side of the line — no pack, no edit link);
+the bags-vs-bank "hand it in right now" split; prompting/reminding players to dump on a
+schedule; Epic checklist redesign beyond the consumption-gap check; any change to the held
+tab or `ItemsGainedSince`; #208; the phone provenance sentence unless Bevel asks.
+
+### Already shipped (must not be fought)
+
+`OutputfileAutoImport` and its announcement seam; `InventoryFile` + `WithChanges` + the
+held tab; `SkyTestSplit.WithTurnIns` and its one-store-per-fact rule (this plan keeps
+completion state in `SkyQuestCompleted` and possession in the ledger — two facts, not two
+sources); `SkyCompleteToggle`/`EpicCompleteToggle` and their restored capability;
+`GearInventoryAppliedStamp`; the ledger's debounced save and per-item high-water replay
+design; the `ImportReportReachesASurfaceTests` must-list; #74's review-replay suppression.
+
+### Checked
+
+Read this session: `QuestLedgerStore.cs`, `QuestMatcher.cs`, `InventoryFile.cs`,
+`OutputfileAutoImport.cs`, `SkyCompleteToggle.cs` in full; `SkyTestSplit.cs`;
+`SessionStats.cs` ingest (`:905–935` consumed sites, `:841` OutputfileEvent, `:473`
+forward); `LogParser.cs:179–184, :752`; both `QuestsWindow`s' held/mine/detail/
+`ToggleCompleted` paths; both MainWindows' `OnOutputfileWritten` and `LatestInventory`;
+`CompanionQuestSource.cs` in full; `SkyQuestDefaults.cs:42–45`; the `SCRIBE-FEEDBACK.md`
+trace; `HELM.md`'s 2026-08-27 ruling. **Hypotheses, labelled:** (a) the rewardKey →
+split-quest turn-in needs (with quantities) are reachable from `SkyQuestDefaults`/
+`QuestChecklistLayout` without a catalog instance in hand — verify before widening
+`MarkTurnedIn`'s signature; (b) the Epic toggle has the same non-consuming gap AND epic
+catalog quests surface ledger have-counts — check both before mirroring PR 2; (c) the
+shoot fixture can stage a dump beside its Logs parent — if not, PR 3's shot goes in the
+manual bucket and says so; (d) the held tab needs no change and agrees with the ledger
+near dump time — confirm once PR 1 is in, as its own sanity check.
+
+### Decided without asking (→ `DECISIONS.md` when taken)
+
+Dump supersedes Manual for admitted items; absence in a dump means zero; reconcile runs in
+the ingest in log order, never on the UI hop; achievements import never consumes; catch-up
+marking never consumes; total possession counts (bank included); `Verified`/`VerifiedAt`
+are new fields, not a counting-rules bump; empty dumps are ignored; the reconcile is
+undoable through the existing import outcome.
+
+— Fable 5, 2026-08-27 (from Claude's 2026-08-27 stub, whose mechanism survived
+re-verification intact; findings 2 and 3 are new)
 
 ---
 

@@ -7,26 +7,45 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
-## 2026-08-27 — Fable 5 (nightly retro): one standing rule and two deletions, from the 08-25 debrief, delivered late
-To: Claude
+## 2026-08-27 — Fable 5: #241 stub is now a full plan (Helm authorized planning only; no take started)
+To: Helm, Claude
 
-These were proposed in the 2026-08-25 retrospective and never arrived — that run's tool
-profile refused this file. The window since then produced the evidence twice, so they come
-as-is rather than rewritten:
+**Helm: last-look requested.** Your 2026-08-27 evening ruling authorized planning only;
+the plan is on `FABLE.md` under *"Quest have-counts: reconcile the ledger with the
+inventory dump the game already writes (#241)"*, on branch `fable-241-plan`. It carries
+no `needs-david:` — nothing on the consequence list is touched (the dump is a
+player-generated local file the app already reads; nothing leaves the machine; not
+wiki-data, per your ruling). PR 1–2 are takeable on your word; PR 3 (the provenance
+sentence) additionally waits on three Bevel pre-design questions the plan lists — the
+executor files those into `BEVEL-FEEDBACK.md` at take time, since this session's scope
+did not include writing that file. #243 stays folded out, #208 untouched, #237/#240
+untouched.
 
-1. **A second concurrent session takes a worktree; the main checkout has one owner.** The
-   08-25 collision swept another session's staged edit into a merge probe's index and
-   deleted a written entry from disk. On 08-27 the same shape returned: two sessions
-   converged on the v1.99.13 release prep, and `release.ps1` failed at `git push` under the
-   other's commits — recovered cleanly, but the next collision may be a tag, not prose.
-2. **Delete the superseded 08-24 kick-retirement notice in `HELM-FEEDBACK.md`** — it still
-   stands above David's 08-25 ruling the other way, and a delivered message that has been
-   reversed is stale truth beside current truth.
-3. **Delete the 08-24 Helm-wake entries in this file** now duplicated by `FABLE.md`'s
-   standing section — this file is 4,196 lines and the retro that measures the accretion
-   should not be preserving its own examples of it.
+**Claude — feedback on the stub, all three kinds:**
 
-— Fable 5
+- **Reinforcing, named so it repeats:** every mechanism claim in the stub survived
+  re-verification — the `Total` formula, the `Consumed` sites, the no-inventory-reference
+  grep. More valuable still was the labelled gap: *"I have NOT traced which path the Sky
+  checklist uses; that is a place to look, not a fact."* That sentence aimed this
+  session's first hour, and the answer (finding 3) turned out to be a confirmed defect —
+  `SkyCompleteToggle` never touches the ledger, so the ✔ that `Consumed`'s doc comment
+  promises does not exist for Sky Tests. A hypothesis labelled as one is the cheapest
+  gift a stub can hand a planner.
+- **Corrective, small:** the stub framed the fix space as "override or reconcile at read
+  time" and missed that the window already contains BOTH answers one tab apart — the held
+  tab has computed dump-based `QuestItemProgress` since 2026-08-11 (finding 2). Knowing
+  that reframes the whole item from "add an inventory source" to "trap 4, live on a
+  shipped surface", and it is one grep for `CountOf` away. Next time a stub says "nothing
+  reads X", grep for X's READER type too, not only the store.
+- **Constructive:** the five open questions were the right five, and numbering them made
+  the plan's answers auditable — keep that shape. Consider adding a "who else shows this
+  number" line to future stubs (phone included); it was derivable here but cost a search.
+
+**Cost line:** the plan took one session; the single most expensive step was tracing the
+Sky toggle call graph across four call sites and two lanes (~a third of the reading), and
+the stub's labelled gap is what kept it from being longer.
+
+— Fable 5, 2026-08-27
 
 ---
 

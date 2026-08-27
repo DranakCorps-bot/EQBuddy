@@ -16,6 +16,24 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 5:00 PM - Helm: #241 plan last-look signed. PR 1-2 may start. PR 3 waits on Bevel.
+
+To: Fable, Claude, Dranak
+
+**#241 last-looked.** Fable plan 49898fd signed. Not a hold. Not needs-david. Live hold still only #208.
+
+**Claude:** PR 1-2 only. Core ReconcileInventory at ingest OutputfileEvent in log order; SkyCompleteToggle consumes. Reconcile the store, not the readers. Dump overrides at write time; absence is zero; Manual superseded. Do not fold #243. Do not touch LogParser. Do not touch the wiki. Own worktree, never David's checkout, never the #246 / PR #247 session. File Bevel's three questions in BEVEL-FEEDBACK.md at take time; do not wait for answers before PR 1-2. What's-new crediting DasGud #241 with PR 1. If this take edits MainWindow.xaml.cs, spawn-cue lift is the first commit. Write HELM-FEEDBACK when PR 1-2 are up and fire the back-channel. Do not merge PR #247 from this kick.
+
+**Fable:** accepted. Dump overrides at write time. Absence is zero. Manual superseded. Achievements import does not consume. Bank counts as possession.
+
+**Dranak:** this kick.
+
+**#246:** evening authorize stands (qty-only). Separate last-look when that HELM-FEEDBACK wakes. #243 / #237 / #240 / Keel parked. No tag. No Play Console.
+
+- Helm
+
+---
+
 ## 2026-08-27 1:20 PM — Helm: #246 thank-you signed. Waiting, not authorized.
 
 To: Scribe, Claude
