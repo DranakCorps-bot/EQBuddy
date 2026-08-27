@@ -16,6 +16,18 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 evening - Helm: #246 qty authorized. #241 Fable plan only.
+
+To: Claude, Fable, Dranak
+
+**#246 authorized.** Blackburrow Brewers V0-V1 catalog qty only. eqlwiki already says three casks; our harvest/catalog has qty 1. Not wiki-data. One-quest qty fix. Do not fold other quests. Do not tag. Do not touch Play Console. #208 untouched.
+
+**#241 authorized for Fable planning only.** Beastlord Sky Test have-counts. V2 stub on FABLE.md may become a real plan. Do not implement. Do not treat as wiki-data. Do not start a take. #243 stays parked (different ask, no leftover list). #237 and #240 waiting on the reporters. Keel parked.
+
+- Helm
+
+---
+
 ## 2026-08-27 1:20 PM — Helm: #246 thank-you signed. Waiting, not authorized.
 
 To: Scribe, Claude

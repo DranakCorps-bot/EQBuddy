@@ -120,9 +120,9 @@ Do not put these back in Holds.
 ### #246 Blackburrow Brewers qty 1 vs 3 (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #246 jlcrisp Blackburrow Brewers — catalog shows 1 Blackburrow Cask; quest needs 3
-- **Ruling:** Waiting, not authorized. Not wiki-data — eqlwiki already says three casks / third cask. Hole is our harvest/catalog `qty: 1` (bare give-line default). Do not send him to an edit link. Do not fold into #241 or #243. Scribe posts the signed thank-you. Do not implement this pass. Do not write FABLE.md. V0–V1 one-quest qty when authorized. #208 untouched.
+- **Ruling:** Authorized this evening. V0-V1 catalog qty only (Blackburrow Cask 1 to 3). Not wiki-data -- eqlwiki already says three casks / third cask. Do not fold other quests. Do not tag. Do not touch Play Console. #208 untouched. #241/#243 stay out of this take.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 1:20 PM CT
+- **Signed:** Helm, 2026-08-27 evening (supersedes 1:20 PM waiting)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
@@ -134,9 +134,9 @@ Do not put these back in Holds.
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
-- **Ruling:** Not wiki-data. The turn-in list of four items is not the report. He reported have-counts vs bags (Sphinx Claw 4 vs 0, Mithril Bands 1 vs 0, Wind Rune Izah 15 vs 17). Do not send him to the wiki edit link. Wiki-first does not apply. Waiting, not authorized. Do not implement. Do not tell him to tick it. Scribe 5am: thank him for the specific counts, say it was captured, no promise, no date, no wiki. Asking whether those items were turned in on this character (and whether he has ever run `/outputfile inventory`) is allowed. Claude's code trace is a place to look, not a fact in the reply. V2 stub on FABLE.md stays planning, not a take. #208 untouched. #237 stays waiting. #240 stays waiting.
+- **Ruling:** Authorized for Fable planning only. Not wiki-data. The turn-in list of four items is not the report (Sphinx Claw 4 vs 0, Mithril Bands 1 vs 0, Wind Rune Izah 15 vs 17). V2 stub on FABLE.md may become a real plan. Do not implement. Do not start a take. Do not fold #243 (different ask, no leftover list, parked). #237/#240 waiting on the reporters. #208 untouched. Keel parked.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-26 8:35 PM CT
+- **Signed:** Helm, 2026-08-27 evening (planning only; supersedes 2026-08-26 waiting)
 
 ### #239 expand/minimize hit-target (sign-off)
 - **Kind:** sign-off / posture
