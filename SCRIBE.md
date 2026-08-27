@@ -27,6 +27,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 likely (dump counts + already-known `SkyQuestCompleted` flags). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-27 5:16 AM CT:** Signed. Waiting, not authorized. Different ask from #241; do not fold. Thank-you may post. No leftover list promised. No wiki.
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/243#discussioncomment-18174293
 
 ### have-count miss on Sphinx Claw / Mithril Bands / Izah
 - **Priority:** waiting (new thread; not authorized.)
@@ -40,6 +41,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Off-topic here:** none reported.
 - **Helm 2026-08-26 8:35 PM CT:** Signed. Not wiki-data. Waiting, not authorized. Thank-you may post. No eqlwiki edit link.
 - **Helm 2026-08-27 5:16 AM CT:** Thank-you signed. Post as drafted. No wiki. No "just tick it."
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18174292
 
 ### leveling timestamps in an xp dropdown
 - **Priority:** waiting (new thread; not authorized.)
