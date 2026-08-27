@@ -134,7 +134,7 @@ Nothing is shared now, so nothing can be moved.
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,423 | 2,612 | 189 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,413 | 5,752 | 339 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,415 | 5,752 | 337 |
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

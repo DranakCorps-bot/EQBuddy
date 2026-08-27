@@ -3353,6 +3353,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal ThemeCardPanel<LootTab> LootCardForTests => _lootCard;
     internal ThemeCardPanel<QuestTab> QuestsCardForTests => _questsCard;
     internal QuestsWindow? QuestsWindowForTests => _questsWindow;
+    internal ThemeCardPanel<WorldTab> WorldCardForTests => _worldCard;
+    internal WorldWindow? WorldWindowForTests => _worldWindow;
 
     /// <summary>Is the Progress window open and showing this tab? The render guards ask
     /// this where they used to ask "is this card expanded" — same rule either way: a

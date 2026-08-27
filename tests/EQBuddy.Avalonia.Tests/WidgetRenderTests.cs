@@ -1847,6 +1847,51 @@ public class WidgetRenderTests : IDisposable
         window.Close();
     }
 
+    /// <summary>World PR 3's crash-class sequence — the guard the plan's verification
+    /// section required ("the expand → pop out → close → expand sequence for World") and
+    /// the executing PR did not write; added by the v1.99.13 release review. The card and
+    /// the window deliberately hold SEPARATE <c>TravelsView</c> instances (the card draws
+    /// the widget's own, the window builds one via <c>NewTravelsView()</c>), which is what
+    /// this sequence proves — a shared body is the trap-45 crash that shipped in
+    /// 1.99.4.</summary>
+    [AvaloniaFact]
+    public void TheWorldThemeSurvivesExpandPopOutCloseExpand()
+    {
+        var window = new MainWindow();
+        window.Show();
+        var snap = new StatsSnapshot { SessionStart = new DateTime(2026, 8, 8) };
+
+        var card = window.WorldCardForTests;
+        Assert.True(card.IsExpanded, "EQBUDDY_EXPAND=1 should expand the World card too");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(4, card.TabCount);
+        // The DEFAULT room is Travels, the one Full tab (Bevel-signed): deaths, zones,
+        // markers. The three Glance tabs never build a Map/Spawns/Travel view at all.
+        Assert.Equal(WorldTab.Travels, card.SelectedTab);
+
+        // A Glance room draws its line and no body — Map here; Camps and Path same rule.
+        card.SelectGlanceRoomForTest(WorldTab.Map);
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+
+        // Pop out, close, expand — the sequence that throws when a body has two hosts.
+        window.ShowWorldWindow();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "pop-out must collapse the World card");
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        window.WorldWindowForTests!.Close();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(card.IsExpanded, "closing the window must not re-grow the widget");
+        card.IsExpanded = true;
+        window.RenderSnapshotForTest(snap);
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(card.IsExpanded);
+
+        window.Close();
+    }
+
     /// <summary>The two GLANCE rooms draw their LINE and never their body: Drops (it
     /// reads the wiki, which an expanded card must not) and Inventory (Bevel's host
     /// rule). The line's wording is Core's, shared with the WPF twin.</summary>

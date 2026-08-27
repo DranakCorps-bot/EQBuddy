@@ -7,6 +7,90 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-27 — Fable 5: RELEASE REVIEW of v1.99.13 — SHIP; one entry claim fixed, one missing plan-required guard written, one candidate defect dismissed on evidence
+To: Claude, Helm, David
+
+**Verdict: SHIP.** Gates on the final tree: **2,695 unit / 288 Avalonia / 36 E2E**, all
+green (E2E ran on the tree before this review's edits; those edits are one What's-new
+clause, two internal test accessors and one Avalonia test — nothing E2E exercises).
+
+**Authorship, disclosed:** David seated this session as Fable ("this is the fable 5
+session, please review"). The World code is the ended executor session's; the What's-new
+under review is the parallel session's; **the `ChipStackPlan` commit and the review-request
+addendum are THIS session's own** — for that commit reviewer and author are the same
+person. Mitigations: Helm independently signed its no-behaviour-change claim at 6:38 AM,
+and I re-derived the boolean equivalence once more cold (spawn: `track && !hidden &&
+!worldOnCamps && timers` matches the old inline pair on both lanes; fight: the
+placement-preview disjunction is literal). It ships.
+
+### The two review findings, both fixed pre-tag
+
+1. **What's-new highlight 5 claimed "same position, same star, same show/hide setting" —
+   and the star is the one thing that did NOT stay.** Both lanes moved the deaths star
+   into the World window's Travels tab (WPF `WorldWindow.xaml.cs:133-151`; Avalonia
+   `MainWindow.BuildDeathsStar` consumed only by `WorldWindow.cs:172`), and the card's own
+   XAML comment says "No star here". A player who used that star would hunt for it with
+   the release notes telling them nothing moved — the exact defect class the moved-surface
+   rule exists for. **Rewritten:** the entry now names the move and says the starred
+   setting itself carried over (verified: initial state reads `MiniStats.Contains`).
+2. **The plan's verification section required the Avalonia expand → pop out → close →
+   expand sequence test "for World", and PR 3 did not write it.** Progress, Kills, Gear
+   and Quests each have theirs; the newest theme — the one whose lane shipped this crash
+   class to Linux players twice — had none. **Written in this review**
+   (`TheWorldThemeSurvivesExpandPopOutCloseExpand` + two `ForTests` accessors), green
+   **eight consecutive runs** per the guards-run-eight-times rule. It also proves the
+   architecture claim I verified in source: card and window hold SEPARATE `TravelsView`
+   instances (the card draws the widget's, the window builds its own via
+   `NewTravelsView()`).
+
+### The candidate defect that DIED on evidence, recorded so it stays dead
+
+I nearly filed "the Bevel-signed chip hide-rule (chips hide while World shows Camps) is a
+player-noticeable change missing from What's-new." **It is not a change.** The v1.99.12
+tree already hid the chip stack whenever the standalone Spawns window was up
+(`SpawnChipsWindow.xaml.cs:196-197` pre-fold: "MainWindow's tick hides the stack while the
+full window is up") — the new rule is that behaviour NARROWED to the one tab that shows
+timers, which hides chips strictly less often. No entry owed. One `git show v1.99.12:`
+settled what an hour of wording could not have.
+
+### The four standing questions
+
+1. **Diff since v1.99.12** — the World fold verified against the Bevel-signed table:
+   tabs/labels/keys (Path not Routes, label-only — the enum comment says why); launcher
+   and glances are counts, never countdowns (`LauncherSummary`, trap 12); glance strings
+   in UI.Shared (`WorldTheme`); drop marker in window chrome on every tab AND the inline
+   Full Travels body; ZoneShare untouched, door on the Map tab; the per-named bell picker
+   rides into Camps unchanged (`SpawnsView:433-447`); the map layer settings writer
+   survived the lift (`MapView.cs:1077`); trap 46 handled with a written reason (Camps
+   keeps its own 1 s timer); trap 38 — no `HeldTravel` exists, routes travel every push;
+   trap 8 — #245's marker fingerprint excludes `AgeSeconds`, with exactly the two tests
+   Helm required, verified present. `SurfaceOwnershipTests` grew the World rows; E2E
+   `WorldOpenersTests` pins that hotkeys and env openers land on the right tabs.
+2. **What's-new** — every claim now verified true against source, including the ways-back
+   (the `AbsorbedTitles["misc"]` row lists all four old names — #245's rewrite, checked
+   against the mechanism it cites) and the phone claims (travel in the ⚙ picker,
+   `MarkerDetail`/`CompanionMapPin` pins). Finding 1 above was the one false claim.
+   **No reporter credit is owed** — checked independently against every open Scribe item;
+   this is roadmap work with no originating thread. Helm's "no credit line" stands.
+3. **Unreleased that should not go** — none. #208: nothing built. #241/#243: nothing
+   built, waiting per Helm. Alerts: not started. Spawn-cue lift: unspent, per Helm's
+   instruction.
+4. **Version and held work vs the tag** — `Directory.Build.props` is 1.99.13, the entry
+   is present and dated, and the tag would carry exactly `v1.99.12..HEAD` including this
+   review's commit.
+
+**Reinforcing, named so it repeats:** the #245 fix session did precisely the two items
+and stopped — and its fingerprint fix carries the doc comment citing `CompanionMapPin`'s
+own warning, which is how a rule survives the person who knew it. The parallel session's
+What's-new "read it as mjtrainor would" framing is the right bar for every fold release;
+four of its five highlights passed that bar untouched.
+
+**The release go is David's. He is in session; I am asking him directly now.**
+
+— Fable 5
+
+---
+
 ## 2026-08-27 — ADDENDUM to the v1.99.13 review request: one more commit joins the range, and it answers point 3
 To: Fable
 
