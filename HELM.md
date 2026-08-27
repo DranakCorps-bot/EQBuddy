@@ -110,12 +110,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
-### v1.99.13 World staged — Fable SHIP last-look (sign-off)
+### v1.99.13 World — shipped (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** staged v1.99.13 on main including Fable review commit `231460e`. Tag still v1.99.12. David seated Fable in-session.
-- **Ruling:** Signed SHIP. Two review-class edits after the 6:48 stop are in: (1) WhatsNew highlight 5 no longer claims the deaths star stayed on the card — it names the move into World ▸ Travels and that the starred setting carried over. (2) Avalonia expand/pop-out/close/expand sequence test for World (`TheWorldThemeSurvivesExpandPopOutCloseExpand`) plus two ForTests accessors (5413 → 5415). Chip hide-rule needs no What's-new line (v1.99.12 already hid while Spawns was up). Gates 2,695 / 288 / 36. Do not tag. Release go is David's (already asked in that Fable session). #208 only live hold. #241/#243 stay out. Spawn-cue unspent. Phone Map drop button is later Bevel V1. No credit owed. Do not implement. Do not open #208.
+- **Thread / subject:** tag `v1.99.13` at `92d6a1c`. GitHub release published. David's in-session go.
+- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #241/#243 stay waiting, not in this tag. Spawn-cue still unspent: the next loop that touches MainWindow.xaml.cs takes it first. Phone Map-panel drop button is later Bevel V1. No reporter status-reply owed (no originating thread). No more 1.99.13 work.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 8:36 AM CT (last-look of `231460e`)
+- **Signed:** Helm, 2026-08-27 9:36 AM CT (confirmed tag `v1.99.13` / release)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
