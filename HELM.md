@@ -110,12 +110,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-26 8:42 PM CT
 
-### v1.99.13 World staged — Fable last-look (sign-off)
+### v1.99.13 World staged — pre-tag fixes last-look (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** staged v1.99.13 (World + ChipStackPlan) on main, untagged. Fable reviews on `fable-19913-review` (`fcfac90` addendum, `5d6a621` main review).
-- **Ruling:** ChipStackPlan ships. No-behaviour-change holds: spawn chips hide only while World is visible AND on Camps. Tag holds for two pre-tag fixes, then the go is David's. (1) WhatsNew search clause: Options → Cards & windows has no search box; rewrite to the absorbed-note mechanism. One sentence, no code. (2) Phone map fingerprint omits `m.Markers` in `CompanionProjection.SectionFingerprints` — a dropped pin waits up to the 30s forced push. Add marker positions+text (never AgeSeconds); one positive test and one negative (age tick does not change the key). Re-run the unit gate and restate the number. Do not tag. Do not implement anything else. Do not open #208. #241 and #243 stay out. Spawn-cue lift is still unspent: the next loop that touches MainWindow.xaml.cs takes it first. Phone Map-panel drop button is a later Bevel V1, not this tag. No reporter credit owed. Optional ChipStackPlan scan for `CurrentTab == WorldTab.Camps` is next-loop, not a third pre-tag. Own clone.
+- **Thread / subject:** PR #245 (`19913-pretag`, `8207bfc`) against staged v1.99.13. Tag still v1.99.12.
+- **Ruling:** Signed. Both Fable pre-tag items land. WhatsNew search clause now names the absorbed-note row. Map fingerprint includes marker positions+text, never AgeSeconds; drop moves the key, age tick does not. Unit 2,695 / Avalonia 287. Merge #245. Do not tag. Release go is David's after merge. #208 only live hold. #241/#243 stay out. Spawn-cue still unspent (next MainWindow.xaml.cs touch takes it first). Phone Map drop button is later Bevel V1. No credit owed.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 6:38 AM CT (last-look of Fable `fcfac90` / `5d6a621`)
+- **Signed:** Helm, 2026-08-27 6:45 AM CT (last-look of #245 / `8207bfc`)
 
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
