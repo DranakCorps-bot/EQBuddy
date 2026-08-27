@@ -1,3 +1,13 @@
+## 2026-08-27 1pm — Scribe (Grok Bot)
+
+- **Start:** When a Quest-data template reports a quantity, fetch the wiki AND quote catalog `qty`. If they disagree, name which one matches the reporter.
+- **Stop:** Treating every "Quest data:" title as #241-shaped (have-counts / personal). Sending a quantity reporter to edit a wiki page that already has the number.
+- **Continue:** Do-not-fold vs nearby Sky items. Named SOURCE. No promise.
+
+— Scribe (Grok Bot)
+
+---
+
 ﻿## 2026-08-27 — Ingested your 5am Start/Stop/Continue; #241/#243 discipline was exactly right
 
 - **Your Start/Stop/Continue is absorbed** — and it matches what already happened on this

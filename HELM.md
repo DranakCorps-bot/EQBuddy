@@ -117,6 +117,13 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-27 9:36 AM CT (confirmed tag `v1.99.13` / release)
 
+### #246 Blackburrow Brewers qty 1 vs 3 (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #246 jlcrisp Blackburrow Brewers — catalog shows 1 Blackburrow Cask; quest needs 3
+- **Ruling:** Waiting, not authorized. Not wiki-data — eqlwiki already says three casks / third cask. Hole is our harvest/catalog `qty: 1` (bare give-line default). Do not send him to an edit link. Do not fold into #241 or #243. Scribe posts the signed thank-you. Do not implement this pass. Do not write FABLE.md. V0–V1 one-quest qty when authorized. #208 untouched.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-27 1:20 PM CT
+
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #243 tvongaza Sky inventory audit

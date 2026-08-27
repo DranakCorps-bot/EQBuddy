@@ -16,6 +16,19 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Blackburrow Brewers wants 3 casks, catalog has qty 1
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** shared game truth (turn-in quantity, true for everyone). Wiki already says 3. Paste-ready eqlwiki edit is not the first option — there is nothing to edit. Hole is our harvest/catalog qty. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (personal ledger vs bags) — different reporter, different ask; do not fold. Nearby #243 is leftover Sky-item audit after a dump; do not fold. Claude lesson: #241 is NOT wiki-data. This one IS catalog qty vs a wiki page that is already right.
+- **Source:** #246 jlcrisp Aug 27. https://github.com/DranakCorps-bot/EQBuddy/discussions/246 New thread. Category: Q&A. 0 replies. Template form (Quest / wiki page / EQBuddy shows / What's wrong). No version footer.
+- **Ask:** "EQBuddy shows: 1 turn-in item(s) — Blackburrow Cask" / "It takes 3 Blackburrow Casks to complete quest turn-in." Form also names Quest: Blackburrow Brewers; wiki https://eqlwiki.com/Blackburrow_Brewers; Giver Larsk Juton · Zone: Surefall Glade.
+- **Already shipped:** latest tag v1.99.13 (World fold; reporter footer unknown). Catalog mirrors eqlwiki weekly. `QuestCatalog.json` and harvest `quests.json` both carry the same row: `{"name":"Blackburrow Brewers",...,"items":[{"name":"Blackburrow Cask","qty":1}]}`. Harvest `parse_turnin_items` (`quests-harvest.py`): `(\d+)\s*x\s*[[Item]]` sets qty; comment: "Bare links on a give-line with no \"N x\" prefix count as quantity 1".
+- **Checked:** WIKI (live eqlwiki.com/Blackburrow_Brewers): "When you have recovered three of these casks, I shall award you the [Cloak of Jaggedpine]." / "Upon turning in your third Blackburrow Cask..." Named SOURCE is those two sentences plus the catalog `qty: 1`. I could not check widget / window / phone (David PC host unanswered this run). No screenshot. No log.
+- **Hypothesis, checked against catalog + harvest + wiki, unchecked against a running widget:** the harvest never saw a `3 x [[Blackburrow Cask]]` line, defaulted the vouched item to 1, and promote copied it. Wiki prose has the 3; EQBuddy shows the 1 the reporter quoted.
+- **Class:** V0–V1 (one quest qty). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-08-27 1:20 PM CT:** Signed. Waiting, not authorized. Not wiki-data (page already has 3). Catalog/harvest qty miss. Thank-you may post. Do not implement this pass. Do not write FABLE.md. #208 untouched. #241/#243 stay separate.
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18179483
+
 ### leftover Sky items after an inventory dump
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** player's inventory + personal quest completion. Not shared game truth / eqlwiki. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (Sphinx Claw / Mithril Bands / Izah) — different reporter, different ask (count mismatch vs leftover-item audit); do not fold. Claude lesson: #241 is NOT wiki-data. Someday heading "Check off Sky items already in the bag / already turned in" is the inverse (bag → ticks, no leftover list); do not fold.

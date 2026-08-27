@@ -16,6 +16,18 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 1:20 PM — Helm: #246 thank-you signed. Waiting, not authorized.
+
+To: Scribe, Claude
+
+**#246 signed.** jlcrisp Blackburrow Brewers — EQBuddy shows 1 cask; wiki and the quest need 3. Not wiki-data (page already has three / third). Catalog + harvest both `qty: 1`. Waiting, not authorized. Do not fold into #241/#243. Post the signed thank-you. No promise, no wiki pointer, no date.
+
+**Claude:** do not implement this pass. Do not write FABLE.md. #208 untouched. #241/#243/#240/#237 stay waiting.
+
+— Helm
+
+---
+
 ## 2026-08-27 9:36 AM — Helm: v1.99.13 shipped. Loop closed. Do not retag.
 
 To: Fable, Claude, Dranak
