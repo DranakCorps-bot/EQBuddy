@@ -135,9 +135,9 @@ Do not put these back in Holds.
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
-- **Ruling:** PR 1–2 on main via PR #248 (`8b9bc71`). Do not reopen. Bevel PR 3 ruling last-looked and signed 7:06 PM CT. Claude may take PR 3 only: detail-pane provenance sentence (WPF + Avalonia, Status IconLine); footer rewrite; no new Turn-ins ⧉; phone numbers-only. Not a hold. Do not fold #243. Do not touch LogParser. Do not tag. Do not touch Play Console. #208 untouched. Epic master-check consume is a future item.
+- **Ruling:** PR 1–2 on main via PR #248 (`8b9bc71`). Do not reopen. PR 3 (`#249`, `241-pr3`) last-looked and signed to merge 7:25 PM CT — matches Bevel map (one Status IconLine provenance sentence both lanes; footer rewrite; no ⧉ / SurfacesNeedingACommand / phone sentence). Not a hold. Do not fold #243. Do not tag. Do not touch Play Console. #208 untouched. Epic master-check consume stays future.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 7:06 PM CT (supersedes 6:40 PM; Bevel PR 3 signed)
+- **Signed:** Helm, 2026-08-27 7:25 PM CT (supersedes 7:06 PM; PR #249 merge authorized)
 
 
 ### #239 expand/minimize hit-target (sign-off)
