@@ -229,7 +229,7 @@
             <TextBlock x:Name="CountsNote" TextWrapping="Wrap"
                        FontSize="{DynamicResource FontMetadata}"
                        Foreground="{DynamicResource DimBrush}"
-                       Text="Counts what you loot, minus what the log sees leave (sales, merges, destroys), plus whatever scan bags reads from your bags and bank. Hand-ins aren't in the log — use the detail pane's turn-in button, or right-click an item row to clear it."/>
+                       Text="After you scan bags, the count is your dump, then the log since. Hand-ins aren't in the log — use Mark as turned in, or right-click a row to clear it."/>
             <TextBlock x:Name="WikiNote" TextWrapping="Wrap"
                        Margin="{DynamicResource StackXs}"
                        FontSize="{DynamicResource FontMetadata}"

@@ -36,6 +36,11 @@ public partial class QuestsWindow : Window
     private string _signature = "";
     private DateTime _lastRefresh = DateTime.MinValue;
     private string _mode = "mine";   // mine = items+pins · zone = current zone · all
+    // Snapshot of the ledger's owned dict as of the last Refresh, kept for the detail
+    // pane: Select()/BuildDetail() run off a click, not a refresh, and need the raw
+    // Verified/VerifiedAt fields Progressed() already collapsed to Total.
+    private IReadOnlyDictionary<string, QuestLedgerStore.Entry> _owned =
+        new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
 
     public QuestsWindow(MainWindow main)
     {
@@ -503,6 +508,7 @@ public partial class QuestsWindow : Window
 
         var owned = _main.QuestLedger?.For(key)
             ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
+        _owned = owned;
         var tracked = _main.QuestLedger?.TrackedFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var hidden = _main.QuestLedger?.HiddenFor(key)
@@ -1170,6 +1176,11 @@ public partial class QuestsWindow : Window
         {
             Text = "Turn-ins", Style = (Style)FindResource("SectionLabel"),
         });
+        // One sentence, not one per item (#241 PR 3, Bevel-signed 2026-08-27): where
+        // today's have-counts came from — an inventory dump, or a log tally that cannot
+        // see hand-ins.
+        panel.Children.Add(Note(
+            QuestPresentation.TurnInProvenanceText(m.Items, _owned, DateTime.Now), "Bag"));
         foreach (var item in m.Items) panel.Children.Add(ItemRow(item));
         return panel;
     }

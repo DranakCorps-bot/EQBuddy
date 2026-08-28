@@ -343,6 +343,7 @@ achievements importer. **The defect was a missing seam, not a missing feature.**
 | Both widgets wire the resolver beside `QuestStore`, before the watcher starts, reusing `InventoryFile.FindLatest` rather than a second reader | **Auto** — `QuestReconcileWiringTests` |
 | **Turning a Sky reward in consumes its turn-in items from the quest ledger** (#241 PR 2) — the ✔ was the log for a hand-in the game never writes, and the Sky tab's own button had never kept that promise. Reopening still does not restore the items, matching "reopen does not untick" | **Auto** — `SkyCompleteToggleTests.TurningInConsumesTheRewardsItemsFromTheLedger`, `ReopeningDoesNotRestoreTheConsumedLedgerItems` |
 | A click and the achievements import racing the same reward cannot double-consume the ledger | **Auto** — `SkyCompleteToggleTests.MarkingTwiceConsumesTheLedgerOnlyOnce` |
+| **The Turn-ins section names its own source** (#241 PR 3, Bevel-signed 2026-08-27): one Status IconLine, not per item — reconciled with nothing logged since names the dump's age, reconciled with movement adds "plus loot since", and an item never dumped reads as a log tally that cannot see hand-ins. Both lanes; phone stays numbers-only, no sentence | **Auto** — `QuestPresentationTests` (`TurnInProvenanceText`) |
 
 ## 4d. Settings, and who is allowed to write them
 
