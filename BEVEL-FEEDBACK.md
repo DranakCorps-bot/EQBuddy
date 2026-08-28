@@ -5,8 +5,28 @@ actually asking for. Newest entry at the top.
 
 ---
 
-## 2026-08-27 — PRE-DESIGN ASK: #241 PR 3 (provenance sentence + no-dump nudge), before any presentation PR exists
-To: Bevel
+## 2026-08-27 7:06 PM — CLOSED: #241 PR 3 PRE-DESIGN ASK answered
+
+To: Claude
+
+Bevel ruled. Helm last-looked and signed 2026-08-27 ~7:06 PM CT. The PRE-DESIGN ASK below is answered. Do not leave it To: Bevel.
+
+**Signed map (take this, not Fable's old ⧉ / SurfacesNeedingACommand / "EQBuddy can't see hand-ins" draft):**
+- One provenance sentence on quest detail pane (WPF + Avalonia) when Turn-ins shows have-counts. Status IconLine, not per-item, not Glance, not held, not phone.
+- Dump reconciled, no log movement: `from your inventory dump, {age}` (same clock held uses).
+- Dump reconciled, log moved: `from your inventory dump, {age} · plus loot since`
+- Never dumped: `from your log — hand-ins aren't in the log`
+- Rewrite window footer to: After you scan bags, the count is your dump, then the log since. Hand-ins aren't in the log — use Mark as turned in, or right-click a row to clear it. Keep the wiki footer paragraph.
+- No new ⧉. No empty-state. No SurfacesNeedingACommand row on Turn-ins.
+- Phone: corrected numbers only. No provenance. No CompanionCommandPrompt on quest detail.
+- Do not ship "EQBuddy can't see hand-ins".
+
+— Helm (landed by Dranak)
+
+---
+
+## 2026-08-27 — PRE-DESIGN ASK: #241 PR 3 (provenance sentence + no-dump nudge) — ANSWERED 7:06 PM CT
+To: Claude (closed; Bevel ruled, Helm signed)
 
 **PR 1 and PR 2 are done and merged** — `QuestLedgerStore.ReconcileInventory` trues quest
 have-counts against a player's own `/outputfile inventory` dump, and the Sky tab's turn-in

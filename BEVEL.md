@@ -43,6 +43,18 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### #241 PR 3: Detail-pane provenance sentence (Helm-signed 2026-08-27 7:06 PM)
+
+#241 PR 3: Detail-pane provenance sentence (dump age · plus loot since / from your log — hand-ins aren't in the log). Footer rewrite to match. No new Turn-ins ⧉. Phone numbers-only. Not a hold.
+
+- **Kind:** Helm-signed UX lock (Bevel 2026-08-27)
+- **Signed:** Helm, 2026-08-27 7:06 PM CT
+- **Place:** Quests window detail pane (WPF + Avalonia) when Turn-ins shows have-counts. Status IconLine. Not per-item, not Glance, not held, not phone.
+- **Sentence:** dump, no log movement — `from your inventory dump, {age}` (same clock held uses). Dump + log moved — `from your inventory dump, {age} · plus loot since`. Never dumped — `from your log — hand-ins aren't in the log`.
+- **Footer:** After you scan bags, the count is your dump, then the log since. Hand-ins aren't in the log — use Mark as turned in, or right-click a row to clear it. Keep the wiki footer paragraph.
+- **Do not:** new Turn-ins ⧉; empty-state; SurfacesNeedingACommand row on Turn-ins; phone provenance; CompanionCommandPrompt on quest detail; ship "EQBuddy can't see hand-ins". Phone: corrected numbers only.
+- **Not a hold.** Claude may take PR 3 only. Do not reopen PR 1-2. Do not fold #243.
+
 ### Experience next-level lock follow-ups (1.99.6 / 1.99.7)
 
 - **Kind:** Helm-signed UX lock (Bevel 1pm 2026-08-23)
