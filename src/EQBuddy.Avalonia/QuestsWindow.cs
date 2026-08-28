@@ -82,6 +82,11 @@ public sealed class QuestsWindow : Window
     private string _signature = "";
     private DateTime _lastRefresh = DateTime.MinValue;
     private string _mode = "mine";   // mine = items+pins · zone = current zone · all
+    // Snapshot of the ledger's owned dict as of the last Refresh, kept for the detail
+    // pane: Select()/BuildDetail() run off a click, not a refresh, and need the raw
+    // Verified/VerifiedAt fields Progressed() already collapsed to Total.
+    private IReadOnlyDictionary<string, QuestLedgerStore.Entry> _owned =
+        new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
     private bool _restored;
     private PixelPoint _placed;
     /// <summary>The last on-screen position, so Closed never persists a torn-down
@@ -460,9 +465,8 @@ public sealed class QuestsWindow : Window
         // we're exactly as right as it is, and the door to fixing BOTH swings from here.
         var footer = new StackPanel { Margin = CardPad };
         footer.Children.Add(Footnote(
-            "Counts what you loot, minus what the log sees leave (sales, merges, destroys), " +
-            "plus whatever scan bags reads from your bags and bank. Hand-ins aren't in the " +
-            "log — use the detail pane's turn-in button, or right-click an item row to clear it."));
+            "After you scan bags, the count is your dump, then the log since. Hand-ins " +
+            "aren't in the log — use Mark as turned in, or right-click a row to clear it."));
         var wiki = Footnote(
             "Every quest here mirrors eqlwiki.com — verified item-for-item against it, so " +
             "EQBuddy is exactly as accurate as the wiki is today. Spot something wrong? The " +
@@ -1463,6 +1467,7 @@ public sealed class QuestsWindow : Window
 
         var owned = _main.QuestLedger?.For(key)
             ?? new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
+        _owned = owned;
         var tracked = _main.QuestLedger?.TrackedFor(key)
             ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var hidden = _main.QuestLedger?.HiddenFor(key)
@@ -2100,6 +2105,11 @@ public sealed class QuestsWindow : Window
     {
         var panel = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceM) };
         panel.Children.Add(SectionLabel("Turn-ins"));
+        // One sentence, not one per item (#241 PR 3, Bevel-signed 2026-08-27): where
+        // today's have-counts came from — an inventory dump, or a log tally that cannot
+        // see hand-ins.
+        panel.Children.Add(Note(
+            QuestPresentation.TurnInProvenanceText(m.Items, _owned, DateTime.Now), "Bag"));
         foreach (var item in m.Items) panel.Children.Add(ItemRow(item));
         return panel;
     }

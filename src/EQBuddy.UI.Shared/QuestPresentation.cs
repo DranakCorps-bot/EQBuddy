@@ -127,4 +127,35 @@ public static class QuestPresentation
         1 => "1 zone away",
         _ => $"{hops} zones away",
     };
+
+    /// <summary>The ONE sentence PR 3 adds under Turn-ins (#241, Bevel-signed
+    /// 2026-08-27): which source today's have-counts came from, and how stale it is. One
+    /// line for the whole pane, never per item — <see cref="QuestLedgerStore.ReconcileInventory"/>
+    /// always re-stamps every existing entry together, so "the dump" is one moment even
+    /// though <see cref="QuestLedgerStore.Entry.VerifiedAt"/> is stored per item; an item
+    /// with no entry, or one never reconciled, is simply not counted toward it.
+    ///
+    /// Three states, Bevel's words: reconciled with nothing logged since; reconciled with
+    /// loot or a hand-in landing after; never reconciled at all, so the number is a log
+    /// tally that cannot see hand-ins.</summary>
+    public static string TurnInProvenanceText(
+        IReadOnlyList<QuestItemProgress> items,
+        IReadOnlyDictionary<string, QuestLedgerStore.Entry> owned, DateTime now)
+    {
+        var dumpAt = DateTime.MinValue;
+        var everDumped = false;
+        var movedSince = false;
+        foreach (var item in items)
+        {
+            if (!owned.TryGetValue(item.Name, out var e) || e.VerifiedAt == default) continue;
+            everDumped = true;
+            if (e.VerifiedAt > dumpAt) dumpAt = e.VerifiedAt;
+            if (e.Looted != 0 || e.Manual != 0 || e.Consumed != 0) movedSince = true;
+        }
+        if (!everDumped) return "from your log — hand-ins aren't in the log";
+        var age = WikiFreshness.Ago(now - dumpAt);
+        return movedSince
+            ? $"from your inventory dump, {age} · plus loot since"
+            : $"from your inventory dump, {age}";
+    }
 }

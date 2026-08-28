@@ -154,4 +154,66 @@ public class QuestPresentationTests
         var again = new QuestEntry { Name = "Q", StartZone = "Kaladim", Repeatable = true };
         Assert.Contains("done ×2", QuestPresentation.MetaLine(again, 2, ""));
     }
+
+    // ---- #241 PR 3: the Turn-ins provenance sentence (Bevel-signed 2026-08-27) ----
+
+    private static readonly DateTime Now = new(2026, 8, 27, 12, 0, 0);
+
+    private static Dictionary<string, QuestLedgerStore.Entry> Owned(
+        params (string Name, QuestLedgerStore.Entry Entry)[] entries) =>
+        new(entries.Select(e => new KeyValuePair<string, QuestLedgerStore.Entry>(e.Name, e.Entry)),
+            StringComparer.OrdinalIgnoreCase);
+
+    [Fact]
+    public void AnItemNeverDumpedReadsAsALogTally()
+    {
+        var items = new List<QuestItemProgress> { new("Sphinx Claw", 1, 0) };
+        var text = QuestPresentation.TurnInProvenanceText(items, Owned(), Now);
+        Assert.Equal("from your log — hand-ins aren't in the log", text);
+    }
+
+    [Fact]
+    public void ADumpWithNothingLoggedSinceNamesOnlyTheAge()
+    {
+        var items = new List<QuestItemProgress> { new("Sphinx Claw", 1, 0) };
+        var owned = Owned(("Sphinx Claw", new QuestLedgerStore.Entry { VerifiedAt = Now.AddHours(-2) }));
+        Assert.Equal("from your inventory dump, 2h ago",
+            QuestPresentation.TurnInProvenanceText(items, owned, Now));
+    }
+
+    [Fact]
+    public void LootAfterTheDumpAddsThePlusLootSinceClause()
+    {
+        var items = new List<QuestItemProgress> { new("Sphinx Claw", 1, 1) };
+        var owned = Owned(("Sphinx Claw",
+            new QuestLedgerStore.Entry { VerifiedAt = Now.AddMinutes(-30), Looted = 1 }));
+        Assert.Equal("from your inventory dump, 30m ago · plus loot since",
+            QuestPresentation.TurnInProvenanceText(items, owned, Now));
+    }
+
+    /// <summary>A hand-in offset (Manual goes negative after a ✔) is log movement exactly
+    /// as much as fresh loot is — both mean the dump is no longer the whole story.</summary>
+    [Fact]
+    public void AManualAdjustmentAfterTheDumpAlsoCountsAsMovement()
+    {
+        var items = new List<QuestItemProgress> { new("Sphinx Claw", 1, 0) };
+        var owned = Owned(("Sphinx Claw",
+            new QuestLedgerStore.Entry { VerifiedAt = Now.AddHours(-1), Manual = -1 }));
+        Assert.Equal("from your inventory dump, 1h ago · plus loot since",
+            QuestPresentation.TurnInProvenanceText(items, owned, Now));
+    }
+
+    /// <summary>One sentence for the whole pane, not one per item (Bevel's explicit
+    /// "not per-item"): a quest with several turn-ins reads by whichever items HAVE been
+    /// dumped, not split three ways.</summary>
+    [Fact]
+    public void OneSentenceCoversAllOfAQuestsTurnInsNotOnePerItem()
+    {
+        var items = new List<QuestItemProgress> { new("A", 1, 0), new("B", 1, 0) };
+        // A was dumped an hour ago; B has never been seen at all (no entry). The pane
+        // still reads as dump-sourced, using the item(s) it has an answer for.
+        var owned = Owned(("A", new QuestLedgerStore.Entry { VerifiedAt = Now.AddHours(-1) }));
+        Assert.Equal("from your inventory dump, 1h ago",
+            QuestPresentation.TurnInProvenanceText(items, owned, Now));
+    }
 }
