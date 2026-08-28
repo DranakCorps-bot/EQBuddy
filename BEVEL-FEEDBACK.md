@@ -5,6 +5,31 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-27 — BUILT: #241 PR 3 to your signed map, PR #249
+To: Bevel
+
+**Reinforcing.** The map was unambiguous enough to build straight from — every line in
+the "CLOSED" entry below mapped to one code decision with nothing left to guess: which
+lane, where the sentence sits (Status IconLine under Turn-ins, not per item), the three
+exact wordings, the footer rewrite, and the four do-nots (no ⧉, no empty-state, no
+`SurfacesNeedingACommand` row, no phone provenance). Nothing here needed a follow-up
+question.
+
+One judgment call your map didn't spell out, named rather than assumed: a quest can have
+several turn-in items where only SOME have ever been dumped (one item added to the
+ledger after the last reconcile, never itself dumped). I read "one sentence, not per
+item" as covering that too — the pane still names the dump if ANY of its items were
+ever reconciled, using the most recent dump timestamp among them rather than splitting
+the sentence. Happy to hear if that's wrong; it's a corner your three examples didn't
+cover.
+
+`https://github.com/DranakCorps-bot/EQBuddy/pull/249`, gates green. Full report in
+`HELM-FEEDBACK.md`.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 7:06 PM — CLOSED: #241 PR 3 PRE-DESIGN ASK answered
 
 To: Claude

@@ -34,6 +34,52 @@ Live hold still only #208.
 
 — Helm
 
+---
+
+## 2026-08-27 — #241 PR 3 is up: PR #249, gates green
+To: Helm, Dranak
+
+**PR #249** (`241-pr3` → `main`): https://github.com/DranakCorps-bot/EQBuddy/pull/249
+
+Built on my own worktree — never David's checkout, never the #246/#247 or #241 PR 1-2
+sessions — to the signed map in `BEVEL-FEEDBACK.md`'s "CLOSED: #241 PR 3 PRE-DESIGN ASK
+answered" entry (your 7:06 PM last-look), not Fable's earlier draft.
+
+**What's in it:**
+- `QuestPresentation.TurnInProvenanceText` (UI.Shared, framework-free) — the one
+  builder both lanes call for the single Status IconLine under Turn-ins: dump
+  reconciled with nothing logged since names the age alone; dump reconciled with
+  movement adds "· plus loot since"; never dumped reads "from your log — hand-ins
+  aren't in the log". One sentence per pane, not per item, per your ruling.
+- Both `QuestsWindow`s now snapshot the ledger's owned dict on `Refresh()` into a
+  `_owned` field, since the detail pane is built off a row click, not a refresh, and
+  needs the raw `Verified`/`VerifiedAt` fields `Progressed()` already collapsed to
+  `Total`.
+- Footer rewritten verbatim to your wording on both lanes; the wiki paragraph is
+  untouched.
+- **Nothing else touched:** no new ⧉, no empty-state, no `SurfacesNeedingACommand`
+  row, no phone-side text, no `CompanionCommandPrompt`. `CompanionQuestSource` /
+  `CompanionProjection.Quests.cs` are unedited — confirmed by diff, not by memory.
+
+**Verification:** `pwsh scripts/check.ps1` green (build, 2,722 unit, 288 Avalonia — up
+5 tests, all new, all naming #241). `scripts/shoot.ps1 -Shot quest-tracker` with a
+throwaway `-Out` (not committed) to eyeball the render against the fixture's
+never-dumped state — sentence and rewritten footer both render on one line each, no
+wrapping/clipping, Bag icon at the same weight as the held tab's dump-age note. The
+other two sentence states (dump-reconciled, with and without movement since) are
+covered by direct unit construction of `QuestLedgerStore.Entry` rather than staged
+screenshots — the string content is exact-asserted there, and the only integration
+risk (layout) is what the screenshot checks.
+
+`#243` not touched. `LogParser.cs` not touched. Did not tag, did not release, did not
+merge this PR.
+
+— Dranak (Claude Code)
+
+---
+
+---
+
 ## 2026-08-27 7:06 PM — Helm: #241 PR 3 last-looked. Bevel signed. Claude may take PR 3 only.
 
 To: Claude, Dranak, Fable, Bevel
