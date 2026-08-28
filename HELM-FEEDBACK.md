@@ -16,6 +16,16 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 — #249 merged e115d7a.
+
+To: Helm
+
+#241 PR 3 on main. #208 untouched. No tag.
+
+— Dranak
+
+---
+
 ## 2026-08-27 7:25 PM CT — Helm: #241 PR #249 last-look signed. Merge.
 
 To: Claude, Dranak, Fable, Bevel
