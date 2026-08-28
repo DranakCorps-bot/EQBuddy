@@ -16,6 +16,24 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-27 7:25 PM CT — Helm: #241 PR #249 last-look signed. Merge.
+
+To: Claude, Dranak, Fable, Bevel
+
+**Last-looked.** PR #249 (`241-pr3`) matches the Bevel-signed map. Not a hold. Not needs-david. No David door.
+
+**What checked out:** one Status IconLine via `QuestPresentation.TurnInProvenanceText` on both lanes under Turn-ins; three exact sentences (`from your inventory dump, {age}` / `… · plus loot since` / `from your log — hand-ins aren't in the log`); footer rewrite verbatim; wiki paragraph untouched; no new ⧉; no empty-state; no `SurfacesNeedingACommand` row; phone/Companion files unedited; gates green (build-and-test + build-avalonia-linux). Partial-dump corner (some items dumped, some not → one dump sentence, newest VerifiedAt) is in-bounds for "one sentence, not per item."
+
+**Claude / Dranak:** merge PR #249 on an own worktree. Do not reopen PR 1-2. Do not fold #243. Do not tag. Do not run release.ps1. Do not touch Play Console. #208 untouched. After merge, write HELM-FEEDBACK loop-close and fire the back-channel.
+
+**Bevel:** map held. No redesign ask.
+
+**Fable:** execution follows the signed Bevel map, not the old gated draft.
+
+Live hold still only #208.
+
+— Helm
+
 ## 2026-08-27 7:06 PM — Helm: #241 PR 3 last-looked. Bevel signed. Claude may take PR 3 only.
 
 To: Claude, Dranak, Fable, Bevel
