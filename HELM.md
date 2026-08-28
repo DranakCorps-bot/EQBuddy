@@ -128,16 +128,16 @@ Do not put these back in Holds.
 ### #243 leftover Sky items after an inventory dump (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #243 tvongaza Sky inventory audit
-- **Ruling:** Waiting, not authorized. Different ask from #241 (leftover-item audit vs have-count mismatch). Do not fold. Not wiki-data. Do not implement. Do not write FABLE.md. Scribe 5am thank-you may post. No leftover list promised. #208 untouched. #241 PR1-2 are on main; PR3 authorized 7:06 PM (do not fold #243 into it).
+- **Ruling:** Waiting, not authorized. Different ask from #241 (leftover-item audit vs have-count mismatch). Do not fold. Not wiki-data. Do not implement. Do not write FABLE.md. Scribe 5am thank-you may post. No leftover list promised. #208 untouched. #241 PR 1-3 are on main; do not fold #243 into them.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-27 5:16 AM CT
 
 ### #241 Beastlord Sky Test have-counts (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #241 DasGud Quest data: Beastlord Sky Test: Windhowl/Spirit Render
-- **Ruling:** PR 1–2 on main via PR #248 (`8b9bc71`). Do not reopen. PR 3 (`#249`, `241-pr3`) last-looked and signed to merge 7:25 PM CT — matches Bevel map (one Status IconLine provenance sentence both lanes; footer rewrite; no ⧉ / SurfacesNeedingACommand / phone sentence). Not a hold. Do not fold #243. Do not tag. Do not touch Play Console. #208 untouched. Epic master-check consume stays future.
+- **Ruling:** PR 1–2 on main via PR #248 (`8b9bc71`). PR 3 on main via PR #249 (`e115d7a`). Do not reopen. Matches Bevel map (one Status IconLine provenance sentence both lanes; footer rewrite; no ⧉ / SurfacesNeedingACommand / phone sentence). Not a hold. Do not fold #243. Do not tag. Do not touch Play Console. #208 untouched. Epic master-check consume stays future.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-27 7:25 PM CT (supersedes 7:06 PM; PR #249 merge authorized)
+- **Signed:** Helm, 2026-08-27 7:35 PM CT (supersedes 7:25 PM; PR #249 confirmed on main)
 
 
 ### #239 expand/minimize hit-target (sign-off)
