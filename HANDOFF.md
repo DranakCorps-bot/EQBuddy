@@ -1,5 +1,13 @@
 # EQBuddy — handoff
 
+> **2026-08-28 (night) — v1.99.14 SHIPPED.** David's go came with a re-check condition
+> ("helm and the others have been pushed for updates — if still good, ship"); the
+> re-check found only Bevel's #250/#251 fold locks (both marked "Not in 1.99.14", zero
+> src changes), so the reviewed tree shipped as reviewed. Tag + GitHub release (Latest,
+> four assets) + OneDrive verified, signed and timestamped. **Owed next Scribe run:**
+> shipped-status replies to DasGud (#241) and jlcrisp (#246) — Scribe drafts, Helm
+> signs; noted in `HELM-FEEDBACK.md`. The entry below is the review record.
+
 > **2026-08-28 (late) — v1.99.14 IS REVIEWED: SHIP, after the review found and fixed one
 > real defect.** The staged release (#241 PRs 1–3, #246 cask fix, the `DueSounds` lift)
 > was Fable-reviewed by the working-tree session on David's ask. **The finding:
