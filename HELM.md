@@ -68,6 +68,13 @@ Do not put these back in Holds.
 
 ---
 
+### v1.99.15 — staged / Fable review authorized (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** `v1.99.14..HEAD` at `83a7551`. David chose review over override in session.
+- **Ruling:** Last-looked. Fable may review. Do not tag. Do not touch Play Console / signing / prod secrets. Tag / release go stays David's after Fable signs. A tag does not lift a hold: #208 stays live. #250/#251/#243 not in this tag. Scribe still owes #241/#246 shipped-status drafts from 1.99.14 (Helm signs before post). No ship from this stage alone.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-28 9:30 PM CT
+
 ### v1.99.14 — shipped (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** tag `v1.99.14` at `b4efb35`. GitHub release published. David's re-check-then-go.
