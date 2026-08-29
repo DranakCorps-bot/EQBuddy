@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -1053,6 +1053,45 @@ public class SpawnTimerTests
         t.Apply(LogParser.Parse("[Tue Aug 4 19:05:00 2026] You have slain the ghoul lord!")!);
         Assert.Single(t.Snapshot(DateTime.Parse("2026-08-04T19:05:01")),
             s => s.Name == "the ghoul lord" && s.Zone == "Lower Guk");
+    }
+
+    /// <summary>Sol B's Kobold King never started a timer, because the wiki titles it
+    /// "Solusek kobold king" and the game kills "a kobold king" (David, 2026-08-28, from
+    /// his own Dranak log: 15 clean kills, every one of them "You have slain a kobold
+    /// king!"). Eight characters apart, so <see cref="SpawnCatalog.NameMatchesFuzzy"/>
+    /// rightly refused it — a dropped leading word is not a typo, and widening that budget
+    /// to reach this would buy unknown wrong matches (the faction-name lesson, #238).
+    ///
+    /// The catalog KEEPS the wiki's title, because eqlwiki is the tie-breaker and renaming
+    /// the entry would depart from it. The game's name goes in `Aliases`, which exists for
+    /// exactly this (issue #38: Legends renames named mobs, the wiki keeps classic
+    /// titles). `Fold` already strips the leading article, so the bare name suffices.
+    ///
+    /// Both zone forms are asserted because his log carries both — plain and the
+    /// "1 (Awakened)" instance.</summary>
+    [Theory]
+    [InlineData("You have entered Nagafen's Lair.")]
+    [InlineData("You have entered Nagafen's Lair 1 (Awakened).")]
+    public void SolBKoboldKingTracksUnderTheNameTheGameActuallyKills(string zoneLine)
+    {
+        var t = new SpawnTimers(SpawnCatalog.LoadEmbedded(), new SpawnOverrides()) { Server = "freeport" };
+        t.Apply(LogParser.Parse($"[Fri Aug 28 14:58:00 2026] {zoneLine}")!);
+        t.Apply(LogParser.Parse("[Fri Aug 28 14:58:06 2026] You have slain a kobold king!")!);
+        Assert.Single(t.Snapshot(DateTime.Parse("2026-08-28T14:58:07")),
+            s => s.Zone == "Nagafen's Lair");
+    }
+
+    /// <summary>The king's PET must not run the king's clock. His log kills "a kobold king
+    /// pet" five times among the fifteen kings, and the alias is a prefix of it — so a
+    /// matcher that forgave a trailing word would start the named's timer on trash.</summary>
+    [Fact]
+    public void SolBKoboldKingPetIsNotTheKing()
+    {
+        var t = new SpawnTimers(SpawnCatalog.LoadEmbedded(), new SpawnOverrides()) { Server = "freeport" };
+        t.Apply(LogParser.Parse("[Fri Aug 28 15:38:00 2026] You have entered Nagafen's Lair.")!);
+        t.Apply(LogParser.Parse("[Fri Aug 28 15:38:25 2026] You have slain a kobold king pet!")!);
+        Assert.DoesNotContain(t.Snapshot(DateTime.Parse("2026-08-28T15:38:26")),
+            s => s.Zone == "Nagafen's Lair");
     }
 
     [Theory]

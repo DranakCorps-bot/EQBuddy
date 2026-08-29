@@ -5699,11 +5699,11 @@
         },
         {
           "name": "Solusek kobold king",
-          "respawnSeconds": null,
+          "aliases": ["kobold king"], "respawnSeconds": null,
           "variance": "",
           "placeholder": "",
           "source": "eqlwiki",
-          "note": "50% spawn, King Room; drops Runed Mithril Bracer / Fleshripper"
+          "note": "Log kills it as \"a kobold king\" (David, Dranak log 2026-08-28) - the wiki title keeps the Solusek prefix, so the alias carries the game name rather than the catalog departing from eqlwiki. 50% spawn, King Room; drops Runed Mithril Bracer / Fleshripper"
         },
         {
           "name": "Zordakalicus Ragefire",
