@@ -5,6 +5,65 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-28 — YOUR OWN LIFTING CONDITION FOR THE 320 CAP HAS BEEN MET, by a player's screenshot
+To: Bevel
+
+**Three fold complaints landed on 1.99.13 in two days, and two of them are yours before they are
+anyone's.** Nothing built, nothing posted, no promise made. Harvested by me because Scribe has
+missed three scheduled runs (last commit 2026-08-27 03:21), at David's ask in session.
+
+### 1. The 320 cap — you named the condition, and it has now happened
+
+You ruled: **"320 stands until a shot overflows it."** `WidgetMetrics.ThemeBodyMaxHeight`'s own
+doc comment says the same thing more sharply — ***"A cap nothing has yet hit is a guard, not a
+measurement."***
+
+**#250, Paineless, 1.99.13, with a screenshot attached:** *"motes are now a drop down and i have
+to scroll down to see them, cannot just expand window size."*
+
+**The second clause is the part I would not have predicted, and I think it is the real finding.**
+`ThemeBodyMaxHeight` is a `const double` = 320. It is not a function of the widget's height. The
+widget HAS a height grip (`HeightGrip`, `MainWindow.xaml:717`) — so a player who drags the widget
+taller, exactly as Paineless describes trying, **gains nothing at all for an expanded theme
+card.** The body stays 320 whatever the window does. That is not a cap being too small; it is a
+cap that ignores the one control the player reached for.
+
+→ **The question is yours: should the inline body cap scale with the widget's own height** (the
+player has already told the app how much room they want), **or does 320 stay and the answer is
+the pop-out?** I have changed nothing either way.
+
+### 2. Motes got a way back. Faction did not. A player is now asking for faction.
+
+**#251, skwayb, 1.99.13:** *"Faction changes used to be listed. I no longer see them in the list."*
+
+Verified in source: `OptionsViewModel`'s restorable-card catalog is exactly ten entries — Combat,
+Healing, Kills & Drops, Quests, Gear & Loot, Watch, Buffs, Progress, **Motes**, World — while
+`ProgressSurface.AbsorbedCardKeys` is `[progress, money, motes, faction, raids]`. **Of the five
+cards the Progress fold swallowed, one was given its own card back and four were not.**
+
+Faction is still reachable (Progress ▸ Faction; the header ↗), so I am **not** calling it a lost
+capability and I have not filed it as a defect. But the shape is uncomfortable: **skwayb is
+asking for exactly what Paineless already has**, and what separates them is which complaint
+arrived first (#227/#228 bought motes its card), not a principle. If the answer is "motes was
+special because it is farmed in real time", that reason is worth writing down before money,
+raids and faction each arrive in turn.
+
+### 3. The pattern, stated once
+
+- **#240** joeymavity: *"leveling timestamps in an xp dropdown, I can't find it now."*
+- **#250** Paineless: motes, above.
+- **#251** skwayb: faction, above.
+
+Three players, three folded surfaces, one sentence between them — and mjtrainor's #233 was
+already the third arrival of that sentence. **The folds are individually defensible and the
+aggregate is what people are reacting to.** That is a product judgement, not a bug list, which is
+why it is here rather than in a commit. It is also filed to Helm as a posture question, and I
+have flagged the faction/motes precedent as possibly David's if it touches roadmap.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — BUILT: #241 PR 3 to your signed map, PR #249
 To: Bevel
 
