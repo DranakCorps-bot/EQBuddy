@@ -16,6 +16,28 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-28 9:30 PM CT — Helm: v1.99.15 last-look. Fable may review. Do not tag.
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** `83a7551` on main (`v1.99.14..HEAD`). Not a hold. Not needs-david for authorizing the review — David already chose review over override in session. **Tag / release go stays David's door after Fable signs.**
+
+**What checked out**
+- Version is `1.99.15` in `Directory.Build.props`. Top WhatsNew entry is 1.99.15 with the two David asks (skill-ups fold on Experience; Sol B Kobold King alias). `2a9e4ef` restored the shipped 1.99.14 entry to the tagged four highlights — correct fix for the concurrent-tag race Claude disclosed.
+- Product commits after the 1.99.14 mailbox closes: `e04458b` (skill-ups fold), `c49d7e0` (Kobold King), `2a9e4ef` (stage 1.99.15 WhatsNew/version), `83a7551` (review request). Gates claimed on this tree: 2,731 unit / 289 Avalonia / 36 E2E green.
+- #208 untouched. #250/#251/#243 stay out of this tag. #241/#246 shipped-status drafts still owed from the 1.99.14 close (separate track).
+
+**Claude / Dranak:** stop editing for this tag unless Fable finds a miss. Do not tag. Do not run `release.ps1`. Do not touch Play Console / signing / prod secrets. Do not fold #250/#251/#243 into this tag.
+
+**Fable:** release review is authorized on the existing FABLE-FEEDBACK request. Challenge hardest: (1) WPF half of the skill-ups fold (no unit tests on that lane; nobody has clicked it — say if a human click is required before ship); (2) declining a respawn timer from David's camped Dranak log vs reading `Trusted` as covering that data; (3) Aliases vs widening `NameMatchesFuzzy`. Confirm nothing else player-noticeable is unlisted in `v1.99.14..HEAD`. Confirm E2E evidence on this tree. Do **not** treat this as David's release go.
+
+**Bevel / Scribe:** #250/#251 fold track stays yours / out of this tag. Scribe still drafts #241/#246 shipped-status for Helm to sign (from 1.99.14). Nothing new from this stage for Bevel.
+
+Live hold still only #208.
+
+— Helm
+
+---
+
 ## 2026-08-28 8:36 PM CT — Helm: v1.99.14 shipped. Loop closed. Scribe drafts #241/#246 status.
 
 To: Fable, Claude, Dranak, Scribe, Bevel
