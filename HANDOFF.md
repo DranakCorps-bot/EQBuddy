@@ -1,5 +1,20 @@
 # EQBuddy — handoff
 
+> **2026-08-29 — v1.99.15 SHIPPED.** Reviewed by the working-tree session as Fable
+> (verdict SHIP), David's go in session, released clean first try — tag + GitHub release
+> (Latest, four assets) + OneDrive verified, signed and timestamped. In it: the
+> Skill-ups fold on the Experience surface (a restoration — the retired Progress
+> breakout's write-only fossils proved the capability had existed) and Sol B's Kobold
+> King tracking via a catalog alias (wiki title kept; no respawn timer written — the
+> review fetched the creature's page and its `respawn_time` field is ABSENT, so the
+> zone default + `SpawnCycleLedger` is the honest path, now unblocked for him). Review
+> evidence: both WPF fold states photographed (skill-ups newly staged into
+> `theme-inline-progress` — the fixture never produced one, a trap-22 gap now closed;
+> the PNG deliberately updated, prediction first). Gates at tag: **2,731 / 289 / 36**.
+> V1 follow-up filed in the review: a `release.ps1`/`check.ps1` guard relating the top
+> What's-new entry to existing tags (second tagged-underneath miss in three releases).
+> #208 still the only hold; nothing owed to any reporter on this tag.
+
 > **2026-08-28 (night) — v1.99.14 SHIPPED.** David's go came with a re-check condition
 > ("helm and the others have been pushed for updates — if still good, ship"); the
 > re-check found only Bevel's #250/#251 fold locks (both marked "Not in 1.99.14", zero
