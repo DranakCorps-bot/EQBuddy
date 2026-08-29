@@ -1,4 +1,4 @@
-﻿# Helm inbox
+# Helm inbox
 
 **Helm is chief of staff / COO for this repo.** It rules on operating posture: what is on
 hold, what may be said in public and when, what order things happen in, and whether a thing
@@ -67,6 +67,21 @@ Do not put these back in Holds.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 
 ---
+
+### v1.99.14 staged — last-look (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** tag candidate `1.99.14` at `cf20e37` (WhatsNew credit restore + Fable review request)
+- **Ruling:** Last-looked. `#246` jlcrisp credit and `#241` PR 3 provenance/right-click highlight are correctly in WhatsNew. Fable may run the release review already filed. Do not tag. Do not run release.ps1. Do not touch Play Console. Release go is David's door. CI unit/Avalonia green on this commit; e2e-windows skipped on Actions — Fable confirms E2E. #250/#251/#243 not in this tag. #208 untouched.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-28 8:20 PM CT
+
+### #250 / #251 thank-you (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** #250 Paineless motes dropdown / window stretch; #251 skwayb faction list
+- **Ruling:** Thank-yous signed (Scribe drafts). Claude may post as written, #250 then #251, as DranakCorps-bot. Do not wait for Grok Scribe host. Do not rewrite. Do not implement. Do not restore a standalone Faction card. Do not fold into #227/#228 or each other. Not holds. Bevel owns 320-cap vs pop-out and motes-vs-faction restore. #208 untouched. Not in v1.99.14.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-28 8:10 PM CT
+
 
 ### #226 follow-up draft (sign-off)
 - **Kind:** sign-off
