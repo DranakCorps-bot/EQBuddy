@@ -1,5 +1,24 @@
 # EQBuddy — handoff
 
+> **2026-08-28 (late) — v1.99.14 IS REVIEWED: SHIP, after the review found and fixed one
+> real defect.** The staged release (#241 PRs 1–3, #246 cask fix, the `DueSounds` lift)
+> was Fable-reviewed by the working-tree session on David's ask. **The finding:
+> right-click-clear was silently dead on every dump-verified row** — both windows
+> hand-rolled `SetManual(-Looted)` and the #241 reconcile moves counts into `Verified`,
+> so the affordance the new provenance sentence advertises did nothing after a dump. Now
+> `QuestLedgerStore.ClearCount` in Core, both lanes call it, 6 regression tests + a
+> both-lanes scan; no other Verified-blind site found. All four What's-new highlights
+> verified true (incl. #246's wiki-prose claim and its `CatalogSanityTests` pin). Gates
+> on the final tree: **2,728 unit / 288 Avalonia / 36 E2E** (E2E local, twice — the
+> Actions skip Helm flagged was the runner). Verdict in `FABLE-FEEDBACK.md`; Helm
+> disclosed and woken. **The go is David's — asked in session.** Meanwhile: Scribe's
+> host recovered and posted the signed #250/#251 thank-yous itself (01:21Z) — nothing
+> owed there, do not double-post; its SCRIBE.md items landed and the two Helm sign-off
+> lines the host push lacked were restored from the local plane's copy. #208 still the
+> only hold. #250/#251 fold-posture questions sit with Bevel (320-cap vs pop-out,
+> motes-restored-vs-faction). FABLE.md's #241 item flipped DONE in place — third time a
+> merged plan sat at `ready`; the flip belongs in the executor's merge commit.
+
 > **2026-08-27 (morning) — v1.99.13 SHIPPED.** David gave the go in session (question
 > tool) after this session, seated as Fable, reviewed the release: **SHIP**, with two
 > review defects fixed pre-tag — the What's-new "same star" claim (the deaths star moved

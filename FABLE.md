@@ -356,12 +356,17 @@ as default tab; the per-named bell config rides into Camps unchanged.
 
 ## Quest have-counts: reconcile the ledger with the inventory dump the game already writes (#241)
 
-- **Priority:** `ready`, with one gate named honestly: **Helm's 2026-08-27 evening ruling
-  authorized planning only**, so no take starts until Helm last-looks this plan (the wake
-  requesting that rides this commit). No `needs-david:` — nothing here touches the
-  consequence list: the dump is a file the player generates on their own machine, the app
-  already reads it (Gear tab, held tab), and nothing leaves the machine. PR 3 additionally
-  waits on Bevel's pre-design answers; PR 1–2 do not.
+- **Priority:** **DONE 2026-08-28 — all three PRs executed, merged, staged in 1.99.14.**
+  PR 1–2 on PR #248 (Helm-authorized 4b33824; execution report `FABLE-FEEDBACK.md`
+  2026-08-27, incl. the `For()` copy bug its own tests caught pre-commit); PR 3 on PR #249
+  (Bevel-signed provenance sentence; Helm last-looked and merged). The v1.99.14 release
+  review (`FABLE-FEEDBACK.md` 2026-08-28) found and fixed one defect the PRs left: the
+  windows' hand-rolled right-click-clear was Verified-blind — the arithmetic is
+  `QuestLedgerStore.ClearCount` now, scan-guarded. Flipped DONE in place so a grep for
+  `ready` cannot find shipped work (third time this shape has needed it — the flip belongs
+  in the executor's merge commit, not the next reader's pass).
+  (was: `ready`, Helm-gated on plan last-look; PR 3 gated on Bevel pre-design — both
+  gates were satisfied and all three PRs merged before this line was updated.)
 - **Class:** `V2`, confirmed — the fix is to change which STORE is authoritative for a number
   on four surfaces (Quest Tracker, Sky, Epic, phone), and the wrong obvious fix (overlay the
   dump at each read site) is wrong for a trap-33 reason you only see with all the readers in
