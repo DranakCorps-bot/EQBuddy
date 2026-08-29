@@ -26,6 +26,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis, checked against source, unchecked against a running widget:** they are on the Progress Faction tab (or once had a standalone Faction card) and the row list is empty while they expect session faction hits/nets. Named SOURCE is the quoted sentence plus the 1.99.13 footer. Could be parse miss (`FactionEvent`), empty `_faction`, or they are looking at the launcher/live line which no longer lists factions. Do not treat as a wiki ask.
 - **Class:** V0–V1 (one tab's row list / session faction fill). Do not write FABLE.md.
 - **Off-topic here:** none reported.
+- **Helm 2026-08-28 6:20 PM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #250. #208 untouched.
 
 ### motes in a dropdown / have to scroll / cannot stretch the window
 - **Priority:** waiting (new thread; not authorized.)
@@ -37,6 +38,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis, checked against source, unchecked against a running widget:** they are in the Progress window Wealth tab (or they called the Progress card’s tab strip / expander a drop down). Motes sit under Coin in a capped ScrollViewer, so stretching the window does not show the ladder without scrolling. Named SOURCE is the quoted sentence plus the 1.99.13 footer. Do not treat this as a “Motes card is gone” report.
 - **Class:** V0–V1 (one window’s scroller vs resize). Do not write FABLE.md.
 - **Off-topic here:** none reported.
+- **Helm 2026-08-28 5:21 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228. #208 untouched.
 
 ### Blackburrow Brewers wants 3 casks, catalog has qty 1
 - **Priority:** waiting (new thread; not authorized.)
