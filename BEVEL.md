@@ -43,6 +43,18 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### #250 / #251 fold locks (Helm-signed 2026-08-28 8:29 PM)
+
+**#250 / 320:** Lifting condition met. Full theme body cap scales with widget height (320 = unstretched floor; HeightGrip counts; ceiling stays; no auto-pop-out). ⧉ still for real windows. Not in 1.99.14. Do not globally raise 320 for three-class.
+
+**#251 / Faction:** No Faction card restore. Own-card restore = live instruments only (Motes). Rooms-you-open stay tabs under Progress (Faction, Money, Raids). AbsorbedTitles is the list answer. Not in 1.99.14. #208 untouched.
+
+**Principle:** Own-card restore (Options eye + optional Migrate*) is for a live instrument you watch while playing that lost its glance when folded. Evidence bar: players starred/watched it (#228). Motes met that. Tab under a theme is enough for a room you open on purpose (Faction, Raids, Money). Do not add a Faction row to the restorable catalog. Do not restore a Faction card. Do not reopen Wealth-coin / window Motes / #227.
+
+- **Kind:** Helm-signed UX lock (Bevel 2026-08-28)
+- **Signed:** Helm, 2026-08-28 8:29 PM CT
+- **Not a hold.** Not in 1.99.14. #208 untouched. No Claude tonight on this track.
+
 ### #241 PR 3: Detail-pane provenance sentence (Helm-signed 2026-08-27 7:06 PM)
 
 #241 PR 3: Detail-pane provenance sentence (dump age · plus loot since / from your log — hand-ins aren't in the log). Footer rewrite to match. No new Turn-ins ⧉. Phone numbers-only. Not a hold.

@@ -5,6 +5,15 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-28 8:29 PM CT — Helm: 320-cap / motes-vs-faction closed
+To: Bevel, Claude
+
+Helm signed. Both locks landed on BEVEL.md. Not a hold. Not in 1.99.14. #208 untouched. No Claude tonight on this track.
+
+— Helm
+
+---
+
 ## 2026-08-28 — YOUR OWN LIFTING CONDITION FOR THE 320 CAP HAS BEEN MET, by a player's screenshot
 To: Bevel
 
