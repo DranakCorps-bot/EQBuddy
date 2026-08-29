@@ -16,6 +16,28 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### faction changes no longer listed
+- **Priority:** waiting (new thread; not authorized. Reporter frames it as a regression — "used to be listed.")
+- **Place:** Progress WINDOW Faction tab (and the shared Faction card body). Player session standings / per-kill deltas. Not shared game truth / eqlwiki. Not a group meter. Nearby #250 is motes scroll/resize. Nearby #240 is leveling timestamps in an xp dropdown. #208 is mobile sounds — not this.
+- **Source:** #251 skwayb Aug 28, 1:43 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/251 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.13 · Windows 26200.
+- **Ask:** "Faction changes used to be listed. I no longer see them in the list"
+- **Already shipped:** latest tag v1.99.13 (reporter is on it). Faction is still a Progress tab (`ProgressTab.Faction`) with `FactionCardView` (`SimpleCardViews.cs`: `Render` → `FactionFormat.Rows(s.Faction)`). Rows are name + net (`FactionFormat.Net`: "+120", "maxed"/"bottomed"). Session fill is `FactionEvent` into `_faction` then `StatsSnapshot.Faction` as `FactionDetail` (Hits, Net, Capped) ordered by abs(Net) (`SessionStats.cs`). Widget Progress theme can show the same Faction body (`ProgressThemeCard` switches `ProgressTab.Faction` to `Surfaces().Faction`). Launcher line no longer carries a faction tally mid-play (ProgressTheme comments: live line is xp/coin/mote rate; faction is review-time).
+- **Checked:** WINDOW (Progress Faction source). WIDGET (Progress theme Faction body source). PHONE (ProgressTheme.Tabs shared; I did not grep Companion Faction body this run). I could not check a running binary. No screenshot.
+- **Hypothesis, checked against source, unchecked against a running widget:** they are on the Progress Faction tab (or once had a standalone Faction card) and the row list is empty while they expect session faction hits/nets. Named SOURCE is the quoted sentence plus the 1.99.13 footer. Could be parse miss (`FactionEvent`), empty `_faction`, or they are looking at the launcher/live line which no longer lists factions. Do not treat as a wiki ask.
+- **Class:** V0–V1 (one tab's row list / session faction fill). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+
+### motes in a dropdown / have to scroll / cannot stretch the window
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** Progress WINDOW Wealth tab (Coin, then Motes). Player session ladder. Not shared game truth / eqlwiki. Not a group meter. Nearby #227/#228 is bring-the-Motes-card-back / too-complicated — same theme, not the same report (scroll + cannot stretch vs restore the card). Do not fold. Nearby #219 is motes/hr on the launcher. Nearby #240 is “xp dropdown” timestamps. #208 is mobile sounds — not this.
+- **Source:** #250 Paineless Aug 27, 10:29 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/250 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.13 · Windows 26200.
+- **Ask:** "motes are now a drop down and i have to scroll down to see them , cannot just expand window size"
+- **Already shipped:** latest tag v1.99.13 (reporter is on it). Standalone Motes card still exists (`MotesCardView`, key `motes`; ladder via `MotesPresentation.Rows`). Progress WINDOW Wealth tab hosts Coin then Motes (`ProgressWindow.xaml.cs`: BlockLabel Coin + `_money.Body` + BlockLabel Motes + `_motes.Body`). Widget Progress card Wealth inline is COIN ONLY (Bevel/Helm); motes rows are in the window via ⧉. Window: `SizeToContent="Height"` `ResizeMode="CanResize"` `Width="520"`; `WindowZoom.AllowResize`; `UpdateHeightCap` sets `MaxHeight` to 85% of the window’s monitor and `BodyScroll.MaxHeight = WindowSizing.BodyCap(...)`. Tab strip is `EqSegmentedStrip` chips, not a ComboBox. David on #228: star-only is enough; never-starred uses Options → Cards & windows.
+- **Checked:** WINDOW (Progress Wealth source). WIDGET (Wealth inline coin-only; Motes card source). PHONE (ProgressTheme.Tabs shared; I did not grep Companion Wealth/motes body this run). I could not check the binary. No screenshot. No ComboBox named mote was grepped in ProgressWindow / ProgressThemeCard / MotesCardView.
+- **Hypothesis, checked against source, unchecked against a running widget:** they are in the Progress window Wealth tab (or they called the Progress card’s tab strip / expander a drop down). Motes sit under Coin in a capped ScrollViewer, so stretching the window does not show the ladder without scrolling. Named SOURCE is the quoted sentence plus the 1.99.13 footer. Do not treat this as a “Motes card is gone” report.
+- **Class:** V0–V1 (one window’s scroller vs resize). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+
 ### Blackburrow Brewers wants 3 casks, catalog has qty 1
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** shared game truth (turn-in quantity, true for everyone). Wiki already says 3. Paste-ready eqlwiki edit is not the first option — there is nothing to edit. Hole is our harvest/catalog qty. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (personal ledger vs bags) — different reporter, different ask; do not fold. Nearby #243 is leftover Sky-item audit after a dump; do not fold. Claude lesson: #241 is NOT wiki-data. This one IS catalog qty vs a wiki page that is already right.
