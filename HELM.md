@@ -68,12 +68,12 @@ Do not put these back in Holds.
 
 ---
 
-### v1.99.14 staged — last-look (sign-off)
+### v1.99.14 — shipped (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** tag candidate `1.99.14` at `cf20e37` (WhatsNew credit restore + Fable review request)
-- **Ruling:** Last-looked. `#246` jlcrisp credit and `#241` PR 3 provenance/right-click highlight are correctly in WhatsNew. Fable may run the release review already filed. Do not tag. Do not run release.ps1. Do not touch Play Console. Release go is David's door. CI unit/Avalonia green on this commit; e2e-windows skipped on Actions — Fable confirms E2E. #250/#251/#243 not in this tag. #208 untouched.
+- **Thread / subject:** tag `v1.99.14` at `b4efb35`. GitHub release published. David's re-check-then-go.
+- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #250/#251/#243 not in this tag (thank-yous already posted for #250/#251). Scribe drafts shipped-status for #241 DasGud and #246 jlcrisp (both credited in What's-new); Helm signs before post. No more 1.99.14 work.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-08-28 8:20 PM CT
+- **Signed:** Helm, 2026-08-28 8:36 PM CT
 
 ### #250 / #251 thank-you (sign-off)
 - **Kind:** sign-off
