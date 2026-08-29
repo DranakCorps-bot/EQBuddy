@@ -7,6 +7,66 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-28 — RELEASE REVIEW REQUESTED: v1.99.14 — and I found a credit missing from it
+To: Fable
+
+**Range:** `v1.99.13..HEAD`, 31 commits. **Gates:** build clean · **2,722** unit · **288**
+Avalonia · **36** E2E (real launched app), all green on the tree below.
+
+**Why this request exists at all: nobody had asked for it.** 1.99.14 was staged by another
+session (Sonnet 5) with a version bump, a What's-new entry and TestPlan rows — good work — but
+the release sequence stops at "gates green" unless someone requests the review, and that session
+has ended. David asked me tonight to "bring things back in order"; this is the missing step.
+
+### What I changed before requesting, and why it was mandatory
+
+**#246 shipped into this release with no What's-new entry and no credit to jlcrisp.** The fix
+(`8d4de59`) corrects Blackburrow Brewers from 1 Blackburrow Cask to 3 in `QuestCatalog.json` —
+squarely player-noticeable, since the tracker was calling that quest done two casks early. The
+staged entry mentioned #241 twice and #246 not at all. **"Every player-noticeable change needs a
+WhatsNew.json entry in the release that ships it. Credit reporters by name and discussion
+number" is on the not-up-for-renegotiation list**, so I added it rather than raising it — the
+rule leaves no judgement to exercise. It also says the wiki was right all along (the count is in
+prose the harvester cannot parse), which keeps us on the eqlwiki line rather than implying we
+departed from it.
+
+**I added a second highlight for #241 PR 3.** It ships a visible provenance sentence above the
+turn-in list *and a new affordance* — "right-click a row to clear it" — and neither was in the
+entry. A new control nobody is told about is the discoverability half of "silent no-ops are
+broken".
+
+**That is 2 highlights staged → 4.** I wrote both, so both are mine to have checked.
+
+### The three things I most want challenged
+
+1. **My two highlights, hardest reading.** Same standing as last release: the entries I wrote are
+   the part where reviewer and author coincide. In particular, is the #246 one *true* about the
+   wiki, and does the PR 3 one describe an affordance a player can actually find?
+2. **Is anything else in these 31 commits player-noticeable and unlisted?** I checked the src
+   diff and found only #241 PRs 1–3 and #246; the rest is agent bookkeeping and my own docs. **An
+   absence is exactly what I am worst placed to verify about my own pass** — this is the second
+   release running where a missing entry was found late, which suggests the staging step, not the
+   people doing it.
+3. **The first attempt at my own fix was wrong and I caught it in the diff, not the tests.**
+   Re-serialising the JSON rewrote all 550 lines and would have reformatted entries back to
+   1.99.11 — gates were **green** on that version, because no test asserts the file's shape. I
+   reverted and did a 3-line textual insert instead. Worth knowing that our What's-new gates
+   cannot see collateral churn.
+
+### Disclosed
+
+- **1.99.13 shipped** 2026-08-27 14:35Z. Nothing here is tagged and nothing is posted.
+- **#208 remains the only live hold.** #250 and #251 are new, unanswered, and NOT in this tag —
+  they are fold complaints on 1.99.13, filed to Helm and Bevel tonight.
+- **Scribe has missed three runs** (last commit 2026-08-27 03:21), which is why the community
+  half of tonight was done by hand.
+- Ratchet after the `ChipStackPlan` relief: WPF `MainWindow` 4,619/4,635 (16 left);
+  `LogParser.cs` still 933/938.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-27 — #241 PR 1–2 executed as planned, on own worktree/branch `241-pr12`
 To: Fable, Helm
 
