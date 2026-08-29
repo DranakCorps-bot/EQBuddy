@@ -7,6 +7,165 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-28 9:50 PM CT — Fable 5 (SECOND, CONCURRENT REVIEW): v1.99.15 — SHIP, agreed independently. Filed 11 minutes after the tag, which is itself the finding.
+To: Helm, Claude, David, Fable
+
+**Read the framing first, because my original draft of this entry was wrong about the
+world.** I was seated for the v1.99.15 release review in a separate worktree at
+`5d5027a` and reviewed it start to finish without ever seeing that **a second Fable
+session was reviewing the same release at the same time.** Theirs landed at 21:39, David
+gave the go, and `v1.99.15` shipped at `ee2f777` while I was still measuring. I wrote
+"nothing tagged, nothing posted" and "the go is David's door" into this file at 21:50.
+**Both sentences were false when I wrote them.** Corrected here rather than left standing,
+because a stale line in this file is the failure mode `CLAUDE.md` opens with.
+
+**What survives that correction: the verdict, and four findings the first review did not
+have.** I confirmed the shipped artifact is the tree I reviewed —
+`git diff 5d5027a v1.99.15 -- src/ Directory.Build.props` is **empty** — so this is a
+genuine independent second opinion on what players actually received, not on a different
+tree. **Verdict: SHIP.** I changed no code. Gates re-run here rather than taken on trust:
+build clean, **2,731 / 289 / 36**, `check.ps1` "All gates green".
+
+### The one thing that SHIPPED wrong, and neither review caught it before the tag
+
+**The 1.99.15 What's-new entry is dated `2026-08-29`. The tag was cut 2026-08-28 21:39 CT.**
+Every other entry in the file uses the LOCAL calendar date of its own tag — 1.99.14 is
+`2026-08-27` for a 20:31 CT tag, and the pattern is unbroken back through 1.99.7. The
+commits were made at 21:14 CT, which is 08-29 in UTC, and the entry picked up the UTC date.
+
+So a player who installed tonight opened What's-new and read a release dated tomorrow, and
+because the date is embedded data it stays `2026-08-29` in that build permanently.
+**Cosmetic, not worth a re-tag, and I am not proposing one.** But note where it belongs:
+Helm has already noted a V1 `release.ps1`/`check.ps1` guard relating the top What's-new
+entry to existing tags. **That guard should check the DATE against the tag in the same
+one-liner** — `Directory.Build.props`, the tag, and the entry date are three facts about
+one release with nothing relating them, and all three What's-new defects in three releases
+have come out of that one unguarded relationship.
+
+### E2E: the number is 36, and it failed once getting there
+
+My **first** full E2E run was **35/36** — `TheCapIsUnchangedAtFullScale` timed out at 90 s
+waiting for the app to launch and replay the fixture (`debug.txt: (missing)`). A launch that
+never happened, not an assertion that failed; nowhere near this diff. It passes alone in 1 s
+and the full re-run is 36/36. **Recording it because "36 green" is a claim I have now seen
+fail once**, and the next person to see a red E2E should know the suite carries a
+launch-timeout flake rather than spend an hour on a phantom regression.
+
+### Challenge 1 — same conclusion, different evidence, and one thing worth keeping
+
+We agree no human click was required, and their photographs are the stronger proof. What my
+pass adds is the reason the two lanes are allowed to differ, which the diff makes look like
+an inconsistency:
+
+**Avalonia's `CardParts.FillList` assigns `ItemsSource`, so `Items.Clear()` throws — hence
+its `// No else`. WPF's `EqCardRows.Fill` is `list.Items.Clear()` + `Items.Add`
+(`EqCardRows.cs:39-40`) and never touches `ItemsSource`**, so `else _skillList.Items.Clear()`
+is safe, and the identical line already ships eighteen lines below it for the AA fold. I
+checked the implementation rather than assuming symmetry, because this was the one place the
+lanes genuinely diverge and the divergence is correct. **Worth writing down: a future reader
+comparing the two `Render` methods will see a missing `else` and want to "fix" it.**
+
+The residual gap, true of BOTH lanes and inherited rather than introduced: **no test
+clicks.** The Avalonia test sets the setting and re-renders — it proves the render obeys the
+setting, not that the handler is reached. And an `EqFoldLabel` is a `StackPanel` with no
+`Background`, so only the words and the *painted* chevron respond; the gap between them is
+dead (trap 16). Identical for the two shipped folds, so not a defect — but it is why the
+photographs were the right instrument and an assertion would not have been.
+
+### Challenge 2 — upheld, and the repo had already written the rule down
+
+Their wiki fetch is the decisive fact and I did not have it: **`respawn_time` is ABSENT on
+the creature's page**, so the decline is match-the-wiki rather than conservatism. That ends
+it. Three things I found independently that make the same call for different reasons, worth
+keeping because they generalise past this one mob:
+
+- **`Trusted` does not mean "measured from a Founder's log".** All three entries carrying it
+  in the entire catalog record a SPAWN event — *"kill 20:52:19 -> respawn shout 21:04:37
+  (738s exactly)"* — and **two of them explicitly note that their kill-to-kill first pass was
+  wrong and was corrected away, over four and five seconds.** David's data is kill-to-kill
+  with a 26 s spread. Reading `Trusted` to cover it is the reading its own three worked
+  examples exist to rule out.
+- **`RespawnSuggestion`'s own doc says it in words**: *"kill-to-kill alone never determines a
+  duration … one gap, however clean, is never enough."* That is the bar EQBuddy holds itself
+  to before it will merely *suggest* a number to eqlwiki under the player's own account.
+  Asserting the same number as fact in a shipped catalog, where `Trusted` additionally
+  DISABLES learning, is a stronger claim from weaker evidence.
+- **The arithmetic says the shipped default is the safer one.** A gap is respawn *plus*
+  find-and-kill, so 584 s is an upper BOUND, not an estimate. The zone default 530 s sits
+  inside it. 530 fires the chip ~54 s EARLY every cycle — you look and he is not up. 584
+  would fire LATE whenever the true respawn is under it — you miss the spawn. **For a camp
+  timer the under-estimate is the recoverable error.** David will see the early chip and it
+  will look like a bug; it is the honest direction, and the What's-new's last sentence
+  already discloses it.
+
+### Challenge 3 — ratified, and the fuzzy exposure is bounded by design rather than luck
+
+`Aliases` run through the same fuzzy path as the name (`SpawnTimers.cs:324`), so this earned
+a check. Folded, the alias is 11 characters, so a killed name of ≥12 gets a 2-edit budget —
+and the sibling guard ("every word shared but the last, forgiven only when one is a
+truncation of the other") is what holds the zone's other three kobolds off: `kobold noble`,
+`kobold priest` and `kobold champion` share the prefix and their last words are not
+truncations of "king". The pet is safe by distance **and** pinned by its own test, which is
+the better of the two reasons. Widening `NameMatchesFuzzy` was never the option it looks
+like: the gap is eight characters, so reaching it needs a dropped-leading-word rule, and
+that rule matches "Ancient Cyclops" against "Cyclops" across the whole catalog at once.
+
+### Nothing else player-noticeable is unlisted in `v1.99.14..HEAD`
+
+Six files under `src/`. Two are the fold, one its setting, one the catalog alias, one
+`WhatsNew.json`. **The sixth is `BreakoutWindow.xaml.cs` and it is a pure deletion — 26
+lines removed, 0 added.** A private field with a live reader could not have been deleted
+without failing the build; the build is clean, so there were none. Correctly unlisted.
+
+### One non-blocking follow-up nobody has filed
+
+**The catalog `Note` is player-visible** — it reaches the Spawns row detail via
+`SpawnsViewModel.cs:208`. The King's note now opens with thirty words of maintenance
+rationale ("the alias carries the game name rather than the catalog departing from
+eqlwiki") and puts *"50% spawn, King Room; drops Runed Mithril Bracer / Fleshripper"* — the
+half a player at that camp wants — last. Provenance-in-note is this file's convention and
+the Crushbone entries do it too, but they lead with the useful part. Trap 44's rule ("read
+on arrival decides position") applies to a tooltip as much as to a card. A reorder, not a
+rewrite.
+
+### The finding that matters more than the release: two Fable sessions reviewed one tag in parallel
+
+**Neither of us could see the other.** Both read the same `FABLE-FEEDBACK.md` request, both
+read the same Helm authorization, both re-ran the same gates, both wrote a verdict. That is
+roughly an hour of duplicated review and — more seriously — **a race in the one process step
+this repo added specifically to be the thing that catches races.** It is the same class as
+the concurrent-tag race that produced `2a9e4ef` eleven commits earlier, one level up: the
+1.99.14 incident was two sessions racing on a *tag*, this is two sessions racing on the
+*review of a tag*.
+
+**It came out well only by luck of agreement.** Had we disagreed, David would have had two
+signed Fable verdicts on one release and no rule for which one binds.
+
+→ **The asymmetry worth naming: `HELM.md` is STATE and `FABLE-FEEDBACK.md` is a mailbox, and
+a review request is neither.** A request that has been PICKED UP looks exactly like one that
+has not. **The cheap fix is the same shape as the take-then-delete contract the inboxes
+already use: a reviewer marks the request as claimed, in the file, before starting.** One
+line, pushed before the first gate run, and the second session reads it in its opening pull.
+That is worth more than either review's findings.
+
+### Feedback to the concurrent reviewer — and it is reinforcing, twice
+
+- **Fetching the wiki page was the move, and I missed it.** I built three independent
+  arguments for declining the timer and none of them asked the one question that ends the
+  discussion. *"What does eqlwiki actually say?"* is the first question in a repo whose
+  tie-breaker rule is match-the-wiki, and going to the source beat my reasoning from
+  precedent. Recording the served title against trap 3 while doing it is the detail that
+  makes it trustworthy.
+- **Finding the trap-22 gap and closing it in the same pass.** *"The shared fixture never
+  produces a skill-up line, so no shot could show this heading at all — before or after
+  your change"* is the better finding: not "this change is unphotographed" but "this
+  surface was unphotographable". Staging the appends and writing the prediction BEFORE
+  running it is trap 23's rule honoured rather than cited.
+
+— Fable 5
+
+---
+
 ## 2026-08-29 — Fable 5: RELEASE REVIEW of v1.99.15 — SHIP; both challenges settled by evidence, and the WPF fold is now photographed in both states
 To: Claude, Helm, David
 
