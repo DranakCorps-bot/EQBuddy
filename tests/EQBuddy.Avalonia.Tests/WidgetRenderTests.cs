@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -1097,6 +1097,62 @@ public class WidgetRenderTests : IDisposable
         Assert.Contains("All AA abilities", text);
         Assert.Contains("Natural Durability", text);
         Assert.True(Fold(window.ProgressWindowForTests!, "All AA abilities").Open);
+        window.ProgressWindowForTests?.Close();
+    }
+
+    /// <summary>Skill-ups fold open and closed on the Experience surface (David,
+    /// 2026-08-28: "in the experience break-out window, we need to be able to
+    /// expand/collapse the skillups").
+    ///
+    /// **It defaults OPEN, and that is the assertion that matters most here.** Its two
+    /// neighbours were born folded; this list has always drawn its rows, so shipping it
+    /// closed would take something away from every existing profile — the #227/#228 class,
+    /// and #240/#250/#251 are three players in one week who could not find something a
+    /// fold had moved.
+    ///
+    /// The capability is a RESTORATION: the retired Progress breakout carried
+    /// `_skillUpsOpen`, and folding that float into this window (1.99.11) dropped it. The
+    /// field survived as a write-only fossil, which is what proved the loss.</summary>
+    [AvaloniaFact]
+    public void ProgressCardFoldsSkillUpsAndDefaultsOpen()
+    {
+        var window = new MainWindow();
+        window.Show();
+        window.ShowProgressWindow("progress");   // Experience
+        var snapshot = new StatsSnapshot
+        {
+            SessionStart = new DateTime(2026, 8, 8),
+            SkillUps = [new SkillDetail("1H Slashing", 4, 112), new SkillDetail("Dodge", 1, 55)],
+        };
+
+        // Default: no profile has ever set this, and the rows must still be there.
+        Assert.True(new AppSettings().ShowSkillUps);
+
+        window.RenderSnapshotForTest(snapshot);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var text = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Skill-ups", text);
+        Assert.Contains("1H Slashing", text);
+        Assert.True(Fold(window.ProgressWindowForTests!, "Skill-ups").Open);
+
+        // Folded: the rows go, the COUNT stays — folding must not cost you the fact that
+        // skills went up at all.
+        //
+        // Assert on what is VISIBLE, not on what is in the tree. This lane hides the list
+        // rather than emptying it (CardParts.FillList assigns ItemsSource, so Clear()
+        // throws), exactly as the AA fold beside it does — so the folded rows are still
+        // descendants and a plain text scan finds them. The player's contract is that they
+        // cannot see them, and that is what this checks.
+        window.Settings.ShowSkillUps = false;
+        window.RenderSnapshotForTest(snapshot);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var shown = window.ProgressWindowForTests!.GetVisualDescendants().OfType<TextBlock>()
+            .Where(t => t.IsEffectivelyVisible).Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Skill-ups (2)", shown);
+        Assert.DoesNotContain("1H Slashing", shown);
+        Assert.DoesNotContain("Dodge", shown);
+        Assert.False(Fold(window.ProgressWindowForTests!, "Skill-ups (2)").Open);
         window.ProgressWindowForTests?.Close();
         window.Close();
     }

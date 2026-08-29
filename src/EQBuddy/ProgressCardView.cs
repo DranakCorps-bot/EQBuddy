@@ -46,7 +46,7 @@ internal sealed class ProgressCardView : IWidgetCard
     /// docs/screenshots/theme-inline-progress.png, and in the Progress WINDOW too, since
     /// both hosts draw this same view. The ding and AA labels beside it were fields from
     /// the start; this one was the odd one out.</summary>
-    private readonly TextBlock _skillLabel = SectionLabel("Skill-ups");
+    private readonly EqFoldLabel _skillLabel = new() { Section = true, Open = true };
     private readonly TextBlock _aaNewLabel = SectionLabel("AA learned this session");
     private readonly ItemsControl _aaNewList = new();
     private readonly EqFoldLabel _aaAllLabel = new() { Section = true, Open = false };
@@ -154,6 +154,18 @@ internal sealed class ProgressCardView : IWidgetCard
         _nextList.Visibility = Visibility.Collapsed;
         _nextGroups.Visibility = Visibility.Collapsed;
 
+        _skillLabel.Visibility = Visibility.Collapsed;
+        _skillLabel.Cursor = System.Windows.Input.Cursors.Hand;
+        _skillLabel.ToolTip = "Every skill that went up this session — "
+            + "click to expand or fold";
+        _skillLabel.MouseLeftButtonDown += (_, e) =>
+        {
+            e.Handled = true;
+            _settings.ShowSkillUps = !_settings.ShowSkillUps;
+            _settings.Save();
+            Render(_context.CurrentSnapshot());
+        };
+
         _panel.Children.Add(_summary);
         _panel.Children.Add(_dingLabel);
         _panel.Children.Add(_dingList);
@@ -231,10 +243,20 @@ internal sealed class ProgressCardView : IWidgetCard
         }
         else ClearNextBody();
 
-        EqCardRows.Fill(_skillList,
-            s.SkillUps.Select(k => new CardRow(k.Skill, $"{k.Value} (+{k.Ups})")));
-        _skillLabel.Visibility = _skillList.Items.Count > 0
+        // The heading hides when there is nothing under it (2026-08-22); the FOLD is a
+        // separate question and only applies once there is. Collapsed keeps the count on
+        // the label, so folding never costs you the fact that skills went up.
+        _skillLabel.Visibility = s.SkillUps.Count > 0
             ? Visibility.Visible : Visibility.Collapsed;
+        _skillLabel.Set(_settings.ShowSkillUps, _settings.ShowSkillUps
+            ? "Skill-ups"
+            : $"Skill-ups ({s.SkillUps.Count})");
+        _skillList.Visibility = _settings.ShowSkillUps && s.SkillUps.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
+        if (_settings.ShowSkillUps)
+            EqCardRows.Fill(_skillList,
+                s.SkillUps.Select(k => new CardRow(k.Skill, $"{k.Value} (+{k.Ups})")));
+        else _skillList.Items.Clear();
 
         // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show newly
         // learned this session?" — yes): session-new AAs lead, the full ledger folds

@@ -180,6 +180,21 @@ public sealed class AppSettings
     /// label always names the level and count; the rows are a click away.</summary>
     public bool ShowNextUnlocks { get; set; }
 
+    /// <summary>The Progress card's skill-up list (David, 2026-08-28). **Defaults to TRUE,
+    /// unlike its two neighbours above**, and the difference is deliberate: those two were
+    /// born folded, while skill-ups has always drawn its rows outright. Shipping this
+    /// `false` would hide a list every existing profile can see today — the #227/#228 class
+    /// of change, and #240/#250/#251 are three players in one week saying they cannot find
+    /// something a fold moved. A new fold may take something AWAY from nobody.
+    ///
+    /// It is also a RESTORATION rather than a new idea: the retired Progress breakout gave
+    /// ding, session AAs and skill-ups their own open/closed state, and folding that float
+    /// into the Progress window (1.99.11) dropped all three. `BreakoutWindow`'s
+    /// `_skillUpsOpen`/`_dingOpen`/`_sessionAasOpen` survived as write-only fossils and are
+    /// deleted with this change — trap 43's polarity, and the fossil is what proved the
+    /// capability had existed.</summary>
+    public bool ShowSkillUps { get; set; } = true;
+
     /// <summary>Chip-stack growth direction (#95): anchored at the bottom edge, new
     /// chips push the stack upward — so boss timers can sit above mez timers with
     /// each growing away from the other.</summary>

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using EQBuddy.Core;
@@ -49,7 +49,7 @@ internal sealed class ProgressCardView(
     /// (session-only, not a setting)."* Keyed by class rather than by index so the choice
     /// survives the level moving on.</summary>
     private readonly Dictionary<string, bool> _openGroups = new(StringComparer.OrdinalIgnoreCase);
-    private readonly TextBlock _skillLabel = AppTheme.Heading("Skill-ups");
+    private readonly EqFoldLabel _skillLabel = new() { Section = true, Open = true };
     private readonly ItemsControl _skillList = new();
     private readonly TextBlock _aaNewLabel = AppTheme.Heading("AA learned this session");
     private readonly ItemsControl _aaNewList = new();
@@ -111,6 +111,16 @@ internal sealed class ProgressCardView(
         // Hidden when there is nothing under it — a heading with no rows reads as a
         // surface that failed to load. Its WPF twin had the same bug and the same fix.
         _skillLabel.IsVisible = false;
+        _skillLabel.Cursor = new Cursor(StandardCursorType.Hand);
+        ToolTip.SetTip(_skillLabel,
+            "Every skill that went up this session — click to expand or fold");
+        _skillLabel.PointerPressed += (_, e) =>
+        {
+            e.Handled = true;
+            settings.ShowSkillUps = !settings.ShowSkillUps;
+            settings.Save();
+            repaint();
+        };
         panel.Children.Add(_skillLabel);
         panel.Children.Add(_skillList);
         // Session-new AAs lead (Reddit, 2026-08-11); the full character ledger folds
@@ -176,8 +186,19 @@ internal sealed class ProgressCardView(
         }
         else ClearNextBody();
 
-        CardParts.FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
-        _skillLabel.IsVisible = _skillList.Items.Count > 0;
+        // Heading hides with nothing under it; the FOLD is a separate question and only
+        // applies once there is. Collapsed keeps the count, so folding never costs you the
+        // fact that skills went up.
+        _skillLabel.IsVisible = s.SkillUps.Count > 0;
+        _skillLabel.Set(settings.ShowSkillUps, settings.ShowSkillUps
+            ? "Skill-ups"
+            : $"Skill-ups ({s.SkillUps.Count})");
+        _skillList.IsVisible = settings.ShowSkillUps && s.SkillUps.Count > 0;
+        // No else, matching the AA fold below: CardParts.FillList assigns ItemsSource, and
+        // ItemCollection.Clear() throws once that is set. A hidden list keeps its last rows
+        // and nobody can see them.
+        if (settings.ShowSkillUps)
+            CardParts.FillList(_skillList, s.SkillUps.Select(k => (k.Skill, $"{k.Value} (+{k.Ups})")));
         // AA display, rethought (Reddit, 2026-08-11: "is it supposed to just show newly
         // learned this session?" — yes, now it is): session-new AAs lead, the full ledger
         // folds behind a click, same idiom as Pet abilities.

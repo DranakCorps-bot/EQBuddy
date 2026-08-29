@@ -558,32 +558,6 @@ public partial class BreakoutWindow : Window
         _lootView?.Render(s);
     }
 
-    // ---- the Progress breakout (LW, 2026-08-17) ----
-
-    private DateTime _lastProgressRender = DateTime.MinValue;
-    /// <summary>The live summary block, kept so the 10 s heartbeat can refresh its
-    /// drifting rates in place instead of rebuilding every row (the clocks idiom).</summary>
-    private TextBlock? _progressSummaryBlock;
-
-    /// <summary>The Progress breakout: the expanded Progress card as a floating window —
-    /// the pace summary, the ding's "New at level N" list, skill-ups, session AAs, and
-    /// the card's two ▸ folds (All AA abilities, the next-milestone preview), sharing
-    /// ShowAllAAs/ShowNextUnlocks so the two surfaces agree the way Loot's view/sort
-    /// toggles do. No Fight/Session axis — xp and skill-ups are session-shaped.</summary>
-    private bool _dingOpen = true;
-    private bool _sessionAasOpen = true;
-    private bool _skillUpsOpen = true;
-
-    private void AddSectionLabel(string text)
-    {
-        var label = new TextBlock { Text = text, Style = (Style)FindResource("SectionLabel") };
-        // Accent (gold in the default theme) over the style's dim: this window stacks
-        // several sections in one scroll, and dim headers between dim values made the
-        // seams invisible (LW's design pass, 2026-08-17 — the Loot window's color lesson).
-        label.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-        Rows.Items.Add(label);
-    }
-
 
 
     // ---- the Buff Set breakout (#120 stage 2, Frankthetankk) ----
