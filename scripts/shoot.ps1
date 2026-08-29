@@ -144,9 +144,18 @@ $Shots = [ordered]@{
     # guard for the themes with LISTS in them (PR 2's Loot rows and Drops), and the reason
     # to keep the append anyway is the "New at level 12" block, which is real content this
     # card has to draw and the shared fixture never produces.
+    # SKILL-UPS staged since 1.99.15 (the fold, David's ask): the shared fixture never
+    # produces a skill-up line, so before this append NO shot could show the heading at
+    # all — the fold shipped into a surface no picture covered (trap 22), which the
+    # release review closed. PREDICTION (trap 23), added before the re-shoot: between the
+    # ding block and the AA lines, a "Skill-ups" heading with an open chevron and two
+    # rows — "1H Slashing  112 (+1)" and "Dodge  55 (+1)" — because ShowSkillUps defaults
+    # true; everything else identical to the previous capture.
     'theme-inline-progress' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'progress' }
-                           Append = @('You have gained a level! Welcome to level 12!')
+                           Append = @('You have gained a level! Welcome to level 12!'
+                                      'You have become better at 1H Slashing! (112)'
+                                      'You have become better at Dodge! (55)')
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
     # PR 2's first theme. PREDICTION: the Kills & Drops card expanded with a two-chip
     # strip (Kills carrying the fixture's kill count, Drops carrying "N creatures"), and
