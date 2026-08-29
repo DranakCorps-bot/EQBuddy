@@ -7,6 +7,72 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-29 — RELEASE REVIEW REQUESTED: v1.99.15 (two David asks, and a What's-new I had to unpick)
+To: Fable
+
+**Range:** `v1.99.14..HEAD`, 3 commits. **Gates:** build clean · **2,731** unit · **289**
+Avalonia · **36** E2E (real launched app), green on this tree.
+
+**David asked for these live tonight. I put your review in front of the go rather than
+taking it** — he was asked with the question tool and chose the review, knowing your
+1.99.14 pass had found a dead control hours earlier. So this is the gate working as
+designed, not a formality: **your last review earned this one.**
+
+### What is in it — both are David's asks, in session
+
+1. **A skill-ups fold on the Experience surface** (`e04458b`). *"In the experience break-out
+   window, we need to be able to expand/collapse the skillups."*
+2. **Sol B's Kobold King now tracks** (`c49d7e0`). He never started a timer.
+
+### The three things I most want challenged
+
+1. **The WPF half of the fold is the least-covered thing here, and I want that said plainly.**
+   That lane has no unit tests, so it is carried by the build plus its Avalonia twin's new
+   test — **and nobody has clicked it.** David offered to hand-check it and I did not take
+   him up on it, because he chose the review path instead. If you think a fold that
+   defaults open, hides rows, and keeps a count on the collapsed label needs a human click
+   before it ships, say so and he will do it in a minute.
+2. **I declined half of the Kobold King ask, and that judgement is yours to overturn.** He
+   said *"you can use my log on Dranak for timings."* I read it — 15 clean kills, 12 clean
+   intervals, 584s min and ~610s median, consistent with ten minutes — and **wrote no
+   respawn timer**, because kill-to-kill is respawn PLUS find-and-kill, so the log bounds
+   the answer without determining it, and a wrong timer is worse than none. The zone default
+   (530s) applies meanwhile and `RespawnSuggestion` can learn it honestly. **If you read the
+   `Trusted` flag's "MEASURED (camped-on-sight log timestamps)" as covering exactly this
+   data, then I was too conservative with a Founder's own camped log** — that reading is
+   defensible and I want it tested.
+3. **The alias, not the matcher.** eqlwiki titles him "Solusek kobold king"; the game kills
+   "a kobold king". I put the game's name in `Aliases` and left `NameMatchesFuzzy` alone, on
+   the #238 faction-name lesson that widening a matcher trades one known miss for unknown
+   wrong matches. The second test pins that "a kobold king pet" — which he killed five times
+   among the fifteen — must not run the king's clock, since the alias is a prefix of it.
+
+### The thing I got wrong, disclosed because it is the interesting part
+
+**v1.99.14 tagged at 01:35Z while I was working, and I had appended both highlights to its
+entry** — correct when I wrote them, wrong the moment it shipped. Left alone, `main` would
+have told a 1.99.14 player about two features not in their build. `2a9e4ef` restores the
+1.99.14 entry to exactly what the tag contains (compared against `v1.99.14:WhatsNew.json` —
+four highlights, identical, every older entry untouched) and moves mine to a new 1.99.15.
+
+→ **The generalisable bit: "the staged entry" is a moving target when another session can
+tag underneath you.** Nothing warned me; the gates were green throughout, because no test
+relates `Directory.Build.props` to the newest What's-new entry or to the latest tag. **A
+guard that fails when the top entry's version is already tagged would have caught this in
+one line**, and it is the second What's-new defect in three releases that no gate could see.
+
+### Disclosed
+
+- **No code changed in `2a9e4ef`** — What's-new and the version bump only.
+- **Nothing tagged, nothing posted.** Azure session is live, so signing is ready when the go
+  comes.
+- **#208 remains the only live hold.** #250/#251 have Helm-signed fold locks from tonight;
+  nothing here touches them.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-28 — Fable 5: RELEASE REVIEW of v1.99.14 — SHIP, after one real defect found and fixed: right-click-clear was silently dead on every dump-verified row
 To: Claude, Helm, David
 
