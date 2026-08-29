@@ -317,6 +317,29 @@ public sealed class QuestLedgerStore
         }
     }
 
+    /// <summary>A hand-in happened: zero this item's WHOLE count. Looted and Verified are
+    /// history we can't re-earn, so the clear becomes a negative manual offset against
+    /// both — net zero now, and future loot counts up from there. Lives in the store
+    /// because both windows used to hand-roll it as <c>SetManual(-Looted)</c>, and #241's
+    /// reconcile (which moves the count into <see cref="Entry.Verified"/> and zeroes
+    /// <see cref="Entry.Looted"/>) turned that into a silent no-op on every row an
+    /// inventory dump had verified — the exact rows the Turn-ins provenance sentence
+    /// points the player at. A no-op for an item the ledger does not hold.</summary>
+    public void ClearCount(string characterKey, string item)
+    {
+        item = Normalize(item);
+        if (characterKey.Length == 0 || item.Trim().Length == 0) return;
+        lock (_lock)
+        {
+            if (!_byCharacter.TryGetValue(characterKey, out var c)
+                || !c.Items.TryGetValue(item.Trim(), out var entry)) return;
+            entry.Manual = -(entry.Verified + entry.Looted);
+            if (entry is { Manual: 0, Looted: 0, Verified: 0 })
+                c.Items.Remove(item.Trim());
+            Save();
+        }
+    }
+
     /// <summary>Item → owned counts for one character (copy; empty when unknown).</summary>
     public Dictionary<string, Entry> For(string characterKey)
     {

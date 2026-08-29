@@ -2195,16 +2195,15 @@ public partial class QuestsWindow : Window
         Refresh(force: true);
     }
 
-    /// <summary>A hand-in happened: zero the whole count for this item. The looted count
-    /// is history we can't re-earn, so it becomes a negative manual offset instead —
-    /// net zero now, and future loot counts up from there.</summary>
+    /// <summary>A hand-in happened: zero the whole count for this item. The arithmetic
+    /// lives in the store (it must offset Verified as well as Looted since #241);
+    /// hand-rolling it here is how the right-click went silently dead on dump-verified
+    /// rows once.</summary>
     private void ClearCount(string item)
     {
         var key = _main.QuestCharacterKey;
         if (_main.QuestLedger is not { } ledger || key.Length == 0) return;
-        ledger.For(key).TryGetValue(item, out var entry);
-        if (entry is null) return;
-        ledger.SetManual(key, item, -entry.Looted);
+        ledger.ClearCount(key, item);
         Refresh(force: true);
     }
 
