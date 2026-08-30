@@ -16,6 +16,31 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### cards reset to Gear & loot + Motes
+- **Priority:** waiting (not authorized)
+- **Place:** widget card visibility / Options Cards & windows. Player session. Not shared wiki. Nearby #250 motes scroll; #227/#228 motes card restore — same theme area, not the same report (reset-after-hide vs stretch/scroll). Do not fold. #208 mobile sounds — not this (reporter wants existing mez alerts + DPS, not new mobile sound work).
+- **Source:** #252 TiconaX Aug 29/30 night CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/252 New thread. Category: as filed. 0 replies. Footer: EQBuddy 1.99.15 · Windows 26200.
+- **Ask:** "The cards always reset to having 2 cards open even though I have hidden all of them. Gear & loot and + Motes. I just need the DPS and sound alerts for mez dropping."
+- **Already shipped:** Options card show/hide; starred motes restore path; mez/DPS alerts exist.
+- **Checked:** GitHub discussion body via harvest. Not grepped settings keys this pass.
+- **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228/#250. #208 untouched.
+
+### Show watch chips re-enables on every launch
+- **Priority:** must-fix (authorized V0–V1)
+- **Place:** Options “Show watch chips in the mini dashboard” / PinWatchChips. WPF + Avalonia MainWindow startup migration. Not #208 mobile sounds. Not overlay chips park-monitor (#208 adjacent history) — this is the group pin checkbox.
+- **Source:** #253 HiramDucky Aug 30 ~11:15 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/253 0 comments.
+- **Ask:** Unchecking the option does not survive restart when any TrackedRule is Pinned; settings.json saves false then migration flips true.
+- **Already shipped:** PinWatchChips setting + WatchPinsMigrated one-time gate for per-rule pass; group-pin block currently ungated.
+- **Checked:** Scribe verified both lane sites on 5e519c2 (WPF MainWindow.xaml.cs:356-358, Avalonia MainWindow.cs:465-467).
+- **Helm 2026-08-30 5:20 AM CT:** Signed must-fix. V0–V1 authorized: move group-pin migration inside WatchPinsMigrated, both lanes. Thank-you may post. Do not tag. #208 untouched.
+
+### macOS AltTab / activation policy (contributor)
+- **Priority:** waiting (not authorized)
+- **Place:** AltTabPolicy / Avalonia macOS activation policy. Nearby Windows HideFromAltTab / taskbar warning. Not #208.
+- **Source:** #254 tvongaza Aug 30 ~11:20 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/254 Fork: tvongaza/EQBuddy macos-alttab-activation-policy. 0 comments.
+- **Ask:** Report Available on macOS via NSApplicationActivationPolicyAccessory; measured; wants Don/Avalonia call before PR.
+- **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post. Do not open PR. Do not fold into #208.
+
 ### Reddit: EQLegends Advisor (harvest-only competitor)
 - **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
 - **Place:** competitive context, not a new EQBuddy surface and not a group meter. Occupies the same personal-companion chain EQBuddy already ships: next-level spells, travel, gear-from-inventory, drops/zone. Nearby “In Progress: next-level spells/abilities by class” is BUILT 1.99.6. Nearby World theme is travel. Nearby inventory dump / Drops by Creature. Do not fold those. Do not treat this as an EQBuddy bug or feature ask.

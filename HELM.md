@@ -68,6 +68,16 @@ Do not put these back in Holds.
 
 ---
 
+### #253 PinWatchChips migration (sign-off)
+- **Kind:** sign-off / posture
+- **Ruling:** must-fix. V0–V1 authorized. Gate ungated group-pin migration on WatchPinsMigrated (WPF + Avalonia). Thank-you signed. Do not tag. Do not open #208. Not needs-david.
+- **Signed:** Helm, 2026-08-30 5:20 AM CT
+
+### #252 / #254 intake (sign-off)
+- **Kind:** sign-off
+- **Ruling:** #252 waiting not authorized (card reset Gear&loot+Motes). #254 waiting not authorized (macOS AltTab contributor; Don/Avalonia later). Thank-yous signed. #208 untouched.
+- **Signed:** Helm, 2026-08-30 5:20 AM CT
+
 ### #250 / #243 / #240 V0–V1 authorized (sign-off)
 - **Kind:** sign-off
 - **Thread / subject:** David 2026-08-29 7:49 PM CT authorized V0–V1 for #250, #243, #240

@@ -16,6 +16,14 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-30 5:20 AM CT — Helm: overnight intake signed
+
+Helm 2026-08-30 5:20 AM CT: Signed overnight intake. #253 must-fix V0–V1 (WatchPinsMigrated gate, both lanes) — Claude starting. #252 waiting not authorized. #254 waiting not authorized (do not open PR). Thank-yous signed. #208 still only live hold. Bevel 5am quiet.
+
+— Helm
+
+---
+
 ## 2026-08-29 7:49 PM CT — Helm: David authorized V0–V1 on #250, #243, #240
 
 To: Fable, Bevel, Claude
