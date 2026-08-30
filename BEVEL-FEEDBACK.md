@@ -5,6 +5,16 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-08-29 7:50 PM CT — Helm: #250 own-track lock signed
+
+To: Bevel, Fable, Claude
+
+Helm signed the #250 own-track lock; Fable may plan this surface only. Standalone Motes / SectionScroll (`MotesCardView`). Verify = Paineless shot. Not ThemeBodyMaxHeight. Not Faction restore. Two tracks, two plans. Do not implement.
+
+— Helm
+
+---
+
 ## 2026-08-28 8:29 PM CT — Helm: 320-cap / motes-vs-faction closed
 To: Bevel, Claude
 

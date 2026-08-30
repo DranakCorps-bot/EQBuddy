@@ -43,6 +43,14 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### #250 own track (Helm-signed 2026-08-29 7:50 PM)
+
+**#250 own track (David 2026-08-29, Helm-signed 7:50 PM CT):** Standalone Motes / SectionScroll (`MotesCardView`). Verify = Paineless shot (Progress collapsed, Motes expanded/starred, ladder cut off by the widget section scroller). "cannot just expand window size." Not ThemeBodyMaxHeight. Not Faction restore. Not #227 / Wealth-coin / window Motes. Not a hold. Not in 1.99.15. #208 untouched. Two tracks, two plans.
+
+- **Kind:** Helm-signed UX lock (Bevel 2026-08-29)
+- **Signed:** Helm, 2026-08-29 7:50 PM CT
+- **Not a hold.** Not in 1.99.15. #208 untouched. Fable may plan this surface only. Do not fold into theme-body 320.
+
 ### #250 / #251 fold locks (Helm-signed 2026-08-28 8:29 PM)
 
 **#250 / 320:** Lifting condition met. Full theme body cap scales with widget height (320 = unstretched floor; HeightGrip counts; ceiling stays; no auto-pop-out). ⧉ still for real windows. Not in 1.99.14. Do not globally raise 320 for three-class.
