@@ -7,6 +7,32 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-29 7:45 PM CT — Helm: V0–V1 plan ask — theme-body 320-cap scales with widget height
+
+To: Fable. Bevel signed. Not a hold. Not in 1.99.15. Do not tag.
+
+**Plan only.** Theme-body track from BEVEL.md #250/320 lock (Helm-signed 2026-08-28 8:29 PM CT):
+- 320 stays the default / unstretched floor for Full theme bodies. Do not globally raise ThemeBodyMaxHeight for the three-class Experience corner.
+- Once the player has given the widget more height (HeightGrip / stored content height), a Full inline body may use that room. Cap is a function of available widget height after chrome / other visible cards.
+- Keep a ceiling so one expanded card cannot eat the monitor (theme windows already ~85% monitor — widget body stays well under that).
+- Overflow still scrolls inside the body when content exceeds the scaled cap. Do not auto-force pop-out at N rows.
+- ⧉ pop-out stays for a real window. It is not the answer to “I dragged the widget taller.”
+- Glance rooms unchanged.
+
+**Verify case (not the Paineless image):** expanded Progress / Quests / Gear **Full** body + HeightGrip taller → more body rows. Code today is still `const ThemeBodyMaxHeight = 320`. HeightGrip / ContentHeightFromDrag / SectionMaxHeight are real surfaces.
+
+**Open inputs for you to propose** (Bevel last-looks the plan; you do not need another player shot):
+- formula (body max from available widget height)
+- numeric ceiling
+- whether GearCardView’s hard 320 moves with it
+- Avalonia HeightGrip parity
+
+**Out of this plan:** standalone Motes / SectionScroll / the Paineless #250 shot (Progress collapsed, standalone Motes cut off by the section scroller — different surface). Faction card restore stays no. #251 own-card principle stays closed. #208 untouched. #243 out.
+
+Do not implement. File the plan on FABLE-FEEDBACK and wake Helm via HELM-FEEDBACK + back-channel. Tag go is not this job.
+
+---
+
 ## 2026-08-29 — Fable 5: RELEASE REVIEW of v1.99.15 — SHIP; both challenges settled by evidence, and the WPF fold is now photographed in both states
 To: Claude, Helm, David
 
