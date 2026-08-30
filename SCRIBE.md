@@ -68,7 +68,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ### Blackburrow Brewers wants 3 casks, catalog has qty 1
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** shared game truth (turn-in quantity, true for everyone). Wiki already says 3. Paste-ready eqlwiki edit is not the first option — there is nothing to edit. Hole is our harvest/catalog qty. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (personal ledger vs bags) — different reporter, different ask; do not fold. Nearby #243 is leftover Sky-item audit after a dump; do not fold. Claude lesson: #241 is NOT wiki-data. This one IS catalog qty vs a wiki page that is already right.
-- **Source:** #246 jlcrisp Aug 27. https://github.com/DranakCorps-bot/EQBuddy/discussions/246 New thread. Category: Q&A. 0 replies. Template form (Quest / wiki page / EQBuddy shows / What's wrong). No version footer.
+- **Source:** #246 jlcrisp Aug 27. https://github.com/DranakCorps-bot/EQBuddy/discussions/246 New thread. Category: Q&A. 1 reply. Template form (Quest / wiki page / EQBuddy shows / What's wrong). No version footer.
 - **Ask:** "EQBuddy shows: 1 turn-in item(s) — Blackburrow Cask" / "It takes 3 Blackburrow Casks to complete quest turn-in." Form also names Quest: Blackburrow Brewers; wiki https://eqlwiki.com/Blackburrow_Brewers; Giver Larsk Juton · Zone: Surefall Glade.
 - **Already shipped:** latest tag v1.99.13 (World fold; reporter footer unknown). Catalog mirrors eqlwiki weekly. `QuestCatalog.json` and harvest `quests.json` both carry the same row: `{"name":"Blackburrow Brewers",...,"items":[{"name":"Blackburrow Cask","qty":1}]}`. Harvest `parse_turnin_items` (`quests-harvest.py`): `(\d+)\s*x\s*[[Item]]` sets qty; comment: "Bare links on a give-line with no \"N x\" prefix count as quantity 1".
 - **Checked:** WIKI (live eqlwiki.com/Blackburrow_Brewers): "When you have recovered three of these casks, I shall award you the [Cloak of Jaggedpine]." / "Upon turning in your third Blackburrow Cask..." Named SOURCE is those two sentences plus the catalog `qty: 1`. I could not check widget / window / phone (David PC host unanswered this run). No screenshot. No log.
@@ -77,6 +77,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Off-topic here:** none reported.
 - **Helm 2026-08-27 1:20 PM CT:** Signed. Waiting, not authorized. Not wiki-data (page already has 3). Catalog/harvest qty miss. Thank-you may post. Do not implement this pass. Do not write FABLE.md. #208 untouched. #241/#243 stay separate.
 - **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18179483
+- **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18197613
 
 ### leftover Sky items after an inventory dump
 - **Priority:** waiting (new thread; not authorized.)
@@ -94,7 +95,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ### have-count miss on Sphinx Claw / Mithril Bands / Izah
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** the player's own loot/have counts (personal). Not shared game truth / eqlwiki. Not a group meter. Named SOURCE is his three item mismatches (Sphinx Claw 4 vs none, Mithril Bands 1 vs zero, Izah 15 vs 17). Nearby "Check off Sky items already in the bag / already turned in" is a different Reddit someday ask — do not fold; do not restore it. Sky island grouping and the Sky bee chain are different asks.
-- **Source:** #241 DasGud Aug 26, 7:40 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/241 New thread. Category: Q&A. 0 replies. No version footer in the posted body (only the catalog-mirrors-eqlwiki template note).
+- **Source:** #241 DasGud Aug 26, 7:40 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/241 New thread. Category: Q&A. 1 reply. No version footer in the posted body (only the catalog-mirrors-eqlwiki template note).
 - **Ask:** "Showing I have 4 Sphinx Claws but unfortunately I have none. Also shows one Mithril Bands when I have zero and 15 Izah runes instead of my 17." Form also names Quest: Beastlord Sky Test: Windhowl/Spirit Render; turn-ins Brass Knuckles, Mithril Bands, Sphinx Claw, Wind Rune Izah; Giver Animist Kratho · Zone: Plane of Sky. Brass Knuckles has no count complaint.
 - **Already shipped:** have-count is `Total => Math.Max(0, Looted + Manual - Consumed)` (`QuestLedgerStore.Entry`). Looted is log-accumulated; Manual is "I already had this before EQBuddy"; Consumed is sales / destroys / merges — comment: "Hand-ins still aren't logged — that stays the ✓ click." Quest Tracker item Have is that Total (`QuestMatcher`: `owned.TryGetValue(i.Name, out var e) ? e.Total : 0`). `InventoryFile` parses `/outputfile inventory` for Gear Locker / Inventory tab; QuestMatcher does not read the dump. Latest tag is v1.99.12 (reporter footer unknown).
 - **Checked:** WINDOW (Quest Tracker Have = ledger Total, source). WIDGET (Quests card: Sky ticks via `SkyLootAutoCheck` on session loot; General ready uses the ledger, source). PHONE (Companion Quests tab exists; have-count path not grepped this run). I could not check the binary. No screenshot. No inventory dump. No log.
@@ -104,6 +105,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Helm 2026-08-26 8:35 PM CT:** Signed. Not wiki-data. Waiting, not authorized. Thank-you may post. No eqlwiki edit link.
 - **Helm 2026-08-27 5:16 AM CT:** Thank-you signed. Post as drafted. No wiki. No "just tick it."
 - **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18174292
+- **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18197611
 
 ### leveling timestamps in an xp dropdown
 - **Priority:** waiting (new thread; not authorized.)

@@ -1,4 +1,4 @@
-# Helm inbox
+﻿# Helm inbox
 
 **Helm is chief of staff / COO for this repo.** It rules on operating posture: what is on
 hold, what may be said in public and when, what order things happen in, and whether a thing
@@ -71,14 +71,14 @@ Do not put these back in Holds.
 ### v1.99.15 — shipped (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** tag `v1.99.15` at `ee2f777`. GitHub release published. David's in-session go.
-- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #250/#251/#243 not in this tag. No reporter on either 1.99.15 feature (both David's in-session asks) so Scribe owes nothing new for this tag. #241/#246 shipped-status drafts from 1.99.14 still owed (Helm signs before post). V1 follow-up noted for a future loop: `release.ps1`/`check.ps1` guard relating top What's-new to existing tags. No more 1.99.15 work.
+- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #250/#251/#243 not in this tag. No reporter on either 1.99.15 feature (both David's in-session asks) so Scribe owes nothing new for this tag. #241/#246 shipped-status drafts from 1.99.14 posted/signed (Helm signs before post). V1 follow-up noted for a future loop: `release.ps1`/`check.ps1` guard relating top What's-new to existing tags. No more 1.99.15 work.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-28 9:50 PM CT
 
 ### v1.99.14 — shipped (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** tag `v1.99.14` at `b4efb35`. GitHub release published. David's re-check-then-go.
-- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #250/#251/#243 not in this tag (thank-yous already posted for #250/#251). Scribe drafts shipped-status for #241 DasGud and #246 jlcrisp (both credited in What's-new); Helm signs before post. No more 1.99.14 work.
+- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). #250/#251/#243 not in this tag (thank-yous already posted for #250/#251). Scribe drafts shipped-status for #241 DasGud and #246 jlcrisp (both credited in What's-new); posted/signed. No more 1.99.14 work.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-08-28 8:36 PM CT
 
