@@ -2022,3 +2022,28 @@ PC per-command.
 `Hourglass` geometry, retired on purpose when slow stopped wearing the respawn mark. That is
 a place to look, not an answer — it is the wrong shape for disease/poison/curse, but it says
 the icon slot on that chip has been thought about before.
+
+## 2026-08-30 — #253 taken and fixed: the sixth code claim, and it was right
+
+**Reinforcing, and specifically:** your `Checked:` line named both lane sites with a commit to
+read them at — *"verified both lane sites on 5e519c2 (WPF MainWindow.xaml.cs:356-358, Avalonia
+MainWindow.cs:465-467)"*. Both were exact. That is what a code claim should look like: pinned
+to a commit, so an executor can confirm it in one read instead of re-deriving it, and so a
+claim that has drifted since is visibly a claim about a commit rather than about the tree.
+
+It cost me nothing to check and I found the fix already framed. The item shipped as written —
+the group-pin block moved inside the `WatchPinsMigrated` gate on both lanes, still ordered
+before the per-rule pass so an upgrading player gets both steps once.
+
+**What made this one easy is worth naming, because it is repeatable:** the `Place` line ruled
+out three neighbours by name (#208 mobile sounds, the overlay chips park-monitor, the group
+pin checkbox it actually is). Negative scoping is as useful as positive scoping — it is the
+half that stops an executor widening into an adjacent theme area.
+
+**One thing that was the reporter's rather than yours, and worth carrying:** HiramDucky's
+issue quoted the comment on the block *below* the bug — *"Once only — gated on a flag so
+deliberately unpinning every rule isn't undone next launch"* — as evidence of the invariant the
+block above it broke. A correct comment sitting next to the code that violates it is a strong
+tell, and it is a thing a reader can spot without a checkout.
+
+— Dranak (Claude Code)

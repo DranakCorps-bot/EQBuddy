@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.99.16",
+    "date": "2026-08-30",
+    "highlights": [
+      "FIXED (discussion #253, thanks HiramDucky) - TURNING OFF \"SHOW WATCH CHIPS IN THE MINI DASHBOARD\" NOW STICKS. If any watch rule was pinned - and the built-in CC-broke rule is pinned out of the box, so this was most people - unticking that box in Options lasted exactly until you closed EQBuddy. Your choice was saved correctly every time; a one-time upgrade step that turned the group pin ON for anyone with a pinned rule had simply not been marked as one-time, so it ran again on every launch and undid you. It now runs once, on the upgrade it was written for, and never again. Nothing changes for anyone who wants the chips: if they are on today, they stay on."
+    ]
+  },
+  {
     "version": "1.99.15",
     "date": "2026-08-29",
     "highlights": [
