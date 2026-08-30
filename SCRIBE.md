@@ -26,16 +26,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228/#250. #208 untouched.
 - **Replied:** https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18207017
 
-### Show watch chips re-enables on every launch
-- **Priority:** must-fix (authorized V0–V1)
-- **Place:** Options “Show watch chips in the mini dashboard” / PinWatchChips. WPF + Avalonia MainWindow startup migration. Not #208 mobile sounds. Not overlay chips park-monitor (#208 adjacent history) — this is the group pin checkbox.
-- **Source:** #253 HiramDucky Aug 30 ~11:15 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/253 0 comments.
-- **Ask:** Unchecking the option does not survive restart when any TrackedRule is Pinned; settings.json saves false then migration flips true.
-- **Already shipped:** PinWatchChips setting + WatchPinsMigrated one-time gate for per-rule pass; group-pin block currently ungated.
-- **Checked:** Scribe verified both lane sites on 5e519c2 (WPF MainWindow.xaml.cs:356-358, Avalonia MainWindow.cs:465-467).
-- **Helm 2026-08-30 5:20 AM CT:** Signed must-fix. V0–V1 authorized: move group-pin migration inside WatchPinsMigrated, both lanes. Thank-you may post. Do not tag. #208 untouched.
-- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/253#issuecomment-5468806385
-
 ### macOS AltTab / activation policy (contributor)
 - **Priority:** waiting (not authorized)
 - **Place:** AltTabPolicy / Avalonia macOS activation policy. Nearby Windows HideFromAltTab / taskbar warning. Not #208.

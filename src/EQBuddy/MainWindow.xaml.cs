@@ -353,14 +353,17 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         SourceInitialized += (_, _) => UpdateHeightCaps();
         LocationChanged += (_, _) => UpdateHeightCaps();
 
-        // Migration: any per-rule pin from older versions turns on the group pin.
-        if (!_settings.PinWatchChips && _settings.TrackedRules.Any(r => r.Pinned))
-            _settings.PinWatchChips = true;
         // Chips became per-rule again. Someone who had them on was seeing every enabled rule,
         // so pin what they already had rather than silently emptying their mini bar. Once
         // only — gated on a flag so deliberately unpinning every rule isn't undone next launch.
         if (!_settings.WatchPinsMigrated)
         {
+            // Any per-rule pin from older versions turns on the group pin. Inside the gate,
+            // not above it: ungated, this re-ran every launch and flipped PinWatchChips back
+            // on for anyone who had turned the group pin off while a rule stayed pinned, so
+            // the Options tick-box could never survive a relaunch (#253).
+            if (!_settings.PinWatchChips && _settings.TrackedRules.Any(r => r.Pinned))
+                _settings.PinWatchChips = true;
             // Not conditioned on "nothing is pinned": AppSettings.Load may already have
             // added the built-in CC-broke rule, which is pinned by default, and that made
             // this pass skip itself and leave the user's own rules invisible.
