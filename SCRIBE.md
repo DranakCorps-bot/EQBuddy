@@ -16,6 +16,29 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Reddit: EQLegends Advisor (harvest-only competitor)
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+- **Place:** competitive context, not a new EQBuddy surface and not a group meter. Occupies the same personal-companion chain EQBuddy already ships: next-level spells, travel, gear-from-inventory, drops/zone. Nearby “In Progress: next-level spells/abilities by class” is BUILT 1.99.6. Nearby World theme is travel. Nearby inventory dump / Drops by Creature. Do not fold those. Do not treat this as an EQBuddy bug or feature ask.
+- **Source:** u/therealmkeeper r/EQLegends Aug 29 ~11:15 AM CT. https://www.reddit.com/r/EQLegends/comments/1w1pxfu/eqlegends_advisor/ Harvest-only. Stay off Rajahten and StrIIker-TV. u/Dranak75 not in the thread.
+- **Ask:** none directed at EQBuddy. The post is a free in-browser companion (eqladvisor.game-host.org): best spells per character/level, travel planning from teleport rituals you have, gear recommendations from an uploaded inventory text file, item drop/zone info. OP says it runs entirely in-browser, no server transmission, never touches the game client; item data from EQLWiki plus his ranking script. Asks for feedback.
+- **Already shipped:** EQBuddy’s chain on those jobs is live (next-level spells 1.99.6; World/travel; `/outputfile inventory` dump; Drops by Creature + quest marker; Gear). EQBuddy is log-local, not a web app you upload a dump into. Latest tag v1.99.15 (Helm: Scribe owes nothing new for that tag’s features).
+- **Checked:** signed-in old.reddit harvest 1:20 PM CT. Did not comment, vote, or message. Could not copy the OP body this run (old.reddit 403 to fetch; quote-resume of the browser session failed). Paraphrase above is from that harvest, not a pasted body. No EQBuddy mention in the thread. r/EQ_Legends quiet. I did not open the advisor site.
+- **Thread colour (not the ask):** u/PiratePilot — spell lists slightly sloppy / missing some still-best spells (mostly resists); asked if AI built it. OP — site structure was AI, he wrote the spell-data parser, needs work because spell-effect wording is inconsistent. u/Merstin — check such tools for security risks before using. u/a-r-c called it “AI slop.”
+- **Class:** not a V0–V3 EQBuddy ticket unless David opens a product call. Do not write FABLE.md.
+- **Hypothesis, unchecked:** this is the same “what upgrade / where does it drop / how do I get there” chain, delivered as a no-install web advisor rather than a private local companion. Not a group meter.
+
+### Reddit: Sky quest retro-backfill after install (themurhk, harvest-only)
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+- **Place:** player's Sky / Plane of Sky checklist + personal inventory. Not shared game truth / eqlwiki. Not a group meter. Nearby #243 is leftover Sky items after a dump (what you no longer need). Nearby #241 is have-count miss vs bags. Do not fold. Achievements import + Mark turned in + inventory dump are the already-shipped retro paths — this ask is discoverability / whether install-after-runs can catch up.
+- **Source:** Reddit u/themurhk r/EQLegends Aug 29, 6:05 PM CT. https://www.reddit.com/r/EQLegends/comments/1w20vav/eql_companion_sky_retrotracking/ Harvest-only. Title names EQL Companion; **EQBuddy is not named.** Do not open third-party sites named in-thread.
+- **Ask:** "I just installed EQL Companion to track Sky quests. I've completed a couple runs prior and have several ruins and quest items. Is there any way to add these to the tracker retroactively?"
+- **Also (same thread, not a second heading):** u/No-Meaning1851 "I was wondering the same thing." u/Fountsy + u/blaat_splat point players at a third-party inventory-dump web page (ELposky.com / "skyyravking") that counts bags/bank/horde from `/outputfile inventory` and lists Sky items owned vs still needed + which mobs drop them. Competitor/third-party pointer — not ours; do not open; not a fileable ask of its own.
+- **Already shipped (EQBuddy, for Claude's map — not said on Reddit):** `/outputfile achievements` marks Sky rewards / raid clears (manual Import + auto path; report on Raids). Sky tab Mark turned in / reward turn-in consumes checklist items (1.99.14). `/outputfile inventory` trues Quest Tracker have-counts to bags+bank (1.99.14). No claim that EQBuddy already answers "retro after install" as one button; do not assert without a quote.
+- **Checked:** Reddit thread only this run. Could not check widget / window / phone. No EQBuddy mention on-thread.
+- **Hypothesis, unchecked against a running widget:** the community want is install-after-runs catch-up for Sky (ruins + quest items already held). EQBuddy's path is achievements + inventory dump + Mark turned in, not a Companion feature. Class: V0–V1 if it is discoverability / one import flow; leave it if Claude reads it as already-answered. Do not write FABLE.md.
+- **Off-topic here:** none directed at EQBuddy.
+- **Scribe 2026-08-29 6:28 PM CT:** Harvest-only. Waiting, not authorized. No Reddit reply. No GitHub thank-you. Do not fold into #243/#241. Advisor land still separate / still queued.
+
 ### faction changes no longer listed
 - **Priority:** waiting (new thread; not authorized. Reporter frames it as a regression — "used to be listed.")
 - **Place:** Progress WINDOW Faction tab (and the shared Faction card body). Player session standings / per-kill deltas. Not shared game truth / eqlwiki. Not a group meter. Nearby #250 is motes scroll/resize. Nearby #240 is leveling timestamps in an xp dropdown. #208 is mobile sounds — not this.
