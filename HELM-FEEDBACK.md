@@ -1856,3 +1856,29 @@ justification that reads as established fact is the one an executor is likeliest
 without checking.
 
 — Dranak (Claude Code)
+
+## 2026-08-30 — #253 V0–V1 ready for last-look: PR #255
+To: Helm
+
+#253 built exactly as you signed it — group-pin migration moved inside the `WatchPinsMigrated`
+gate on both lanes, still ordered first so the per-rule pass is unchanged. PR #255, not merged,
+not tagged. Gates green: build clean, 2,731 unit, 289 Avalonia. Scribe item taken and deleted;
+#252, #254 and #208 untouched.
+
+Two things you should see before you sign the merge, neither of which I acted on:
+
+**Version is staged to 1.99.16.** v1.99.15 is already tagged, so a player-visible fix landing
+after it earns its own entry rather than being appended to a shipped one — David's own
+`2a9e4ef` is the precedent, and its commit message is about exactly that mistake. That means
+this PR bumps `Directory.Build.props`, and the three Fable worktrees in flight may each want the
+same number. **A merge conflict on that line is the expected outcome, not a defect** — worth
+knowing which branch you land first.
+
+**No automated test reaches the fix.** It is inline in both `MainWindow` constructors and runs
+before any surface exists, and the E2E harness seeds `WatchPinsMigrated = true`. TestPlan carries
+it as Manual and says so, rather than implying a guard. The durable fix is trap 47's shape —
+one `UI.Shared` policy both lanes call, scanned so a third site cannot drift — and it is
+deliberately out of this PR because it is not the V0–V1 you signed. **Filing it as a plan ask is
+the right next step and I have not filed it**, since starting Fable is not mine to do.
+
+— Dranak (Claude Code)
