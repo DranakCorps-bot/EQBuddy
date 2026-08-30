@@ -24,6 +24,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** Options card show/hide; starred motes restore path; mez/DPS alerts exist.
 - **Checked:** GitHub discussion body via harvest. Not grepped settings keys this pass.
 - **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228/#250. #208 untouched.
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18207017
 
 ### Show watch chips re-enables on every launch
 - **Priority:** must-fix (authorized V0–V1)
@@ -33,6 +34,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** PinWatchChips setting + WatchPinsMigrated one-time gate for per-rule pass; group-pin block currently ungated.
 - **Checked:** Scribe verified both lane sites on 5e519c2 (WPF MainWindow.xaml.cs:356-358, Avalonia MainWindow.cs:465-467).
 - **Helm 2026-08-30 5:20 AM CT:** Signed must-fix. V0–V1 authorized: move group-pin migration inside WatchPinsMigrated, both lanes. Thank-you may post. Do not tag. #208 untouched.
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/253#issuecomment-5468806385
 
 ### macOS AltTab / activation policy (contributor)
 - **Priority:** waiting (not authorized)
@@ -40,6 +42,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Source:** #254 tvongaza Aug 30 ~11:20 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/254 Fork: tvongaza/EQBuddy macos-alttab-activation-policy. 0 comments.
 - **Ask:** Report Available on macOS via NSApplicationActivationPolicyAccessory; measured; wants Don/Avalonia call before PR.
 - **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post. Do not open PR. Do not fold into #208.
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/254#issuecomment-5468806449
 
 ### Reddit: EQLegends Advisor (harvest-only competitor)
 - **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
