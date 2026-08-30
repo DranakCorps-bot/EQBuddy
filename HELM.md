@@ -68,6 +68,11 @@ Do not put these back in Holds.
 
 ---
 
+### #253 PR #255 — last-look signed (sign-off)
+- **Kind:** sign-off / posture
+- **Ruling:** Merge PR #255. Group-pin migration gated on WatchPinsMigrated, both lanes. Version staged 1.99.16. Do not tag. #208 untouched. #252/#254 stay waiting. Trap-47 extract is optional later Fable plan, not this PR.
+- **Signed:** Helm, 2026-08-30 8:03 AM CT
+
 ### #253 PinWatchChips migration (sign-off)
 - **Kind:** sign-off / posture
 - **Ruling:** must-fix. V0–V1 authorized. Gate ungated group-pin migration on WatchPinsMigrated (WPF + Avalonia). Thank-you signed. Do not tag. Do not open #208. Not needs-david.
