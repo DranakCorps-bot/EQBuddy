@@ -68,6 +68,13 @@ Do not put these back in Holds.
 
 ---
 
+### #250 / #243 / #240 V0–V1 authorized (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** David 2026-08-29 7:49 PM CT authorized V0–V1 for #250, #243, #240
+- **Ruling:** David 2026-08-29 7:49 PM CT authorized V0–V1 for #250 (Motes/section-scroller, not theme-body 320), #243 leftover Sky after dump, #240 xp timestamps. #251 stays no-card. #208 stays held. Not a hold. Not in 1.99.15. Do not tag. Do not restore Holds.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-29 7:49 PM CT
+
 ### v1.99.15 — shipped (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** tag `v1.99.15` at `ee2f777`. GitHub release published. David's in-session go.

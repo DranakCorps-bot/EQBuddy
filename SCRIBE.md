@@ -53,7 +53,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Replied:** 2026-08-28 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/251#discussioncomment-18194835
 
 ### motes in a dropdown / have to scroll / cannot stretch the window
-- **Priority:** waiting (new thread; not authorized.)
+- **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
 - **Place:** Progress WINDOW Wealth tab (Coin, then Motes). Player session ladder. Not shared game truth / eqlwiki. Not a group meter. Nearby #227/#228 is bring-the-Motes-card-back / too-complicated — same theme, not the same report (scroll + cannot stretch vs restore the card). Do not fold. Nearby #219 is motes/hr on the launcher. Nearby #240 is “xp dropdown” timestamps. #208 is mobile sounds — not this.
 - **Source:** #250 Paineless Aug 27, 10:29 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/250 New thread. Category: Ideas. 1 reply. Footer: EQBuddy 1.99.13 · Windows 26200.
 - **Ask:** "motes are now a drop down and i have to scroll down to see them , cannot just expand window size"
@@ -63,6 +63,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 (one window’s scroller vs resize). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-28 5:21 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228. #208 untouched.
+- **Helm 2026-08-29 7:49 PM CT:** David authorized V0–V1. Motes/section-scroller track, not theme-body 320. Wait for Bevel lock, then Fable. #208 untouched.
 - **Replied:** 2026-08-28 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/250#discussioncomment-18194834
 
 ### Blackburrow Brewers wants 3 casks, catalog has qty 1
@@ -80,7 +81,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18197613
 
 ### leftover Sky items after an inventory dump
-- **Priority:** waiting (new thread; not authorized.)
+- **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
 - **Place:** player's inventory + personal quest completion. Not shared game truth / eqlwiki. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (Sphinx Claw / Mithril Bands / Izah) — different reporter, different ask (count mismatch vs leftover-item audit); do not fold. Claude lesson: #241 is NOT wiki-data. Someday heading "Check off Sky items already in the bag / already turned in" is the inverse (bag → ticks, no leftover list); do not fold.
 - **Source:** #243 tvongaza Aug 26, 10:24 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/243 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.12 · Windows 26200.
 - **Ask:** "It would be great when you do an inventory dump, it could cross check which sky quests you've completed an which sky quest items you no longer need as you've completed all the quests which use them. Would help with limited inventory space."
@@ -90,6 +91,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 likely (dump counts + already-known `SkyQuestCompleted` flags). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-27 5:16 AM CT:** Signed. Waiting, not authorized. Different ask from #241; do not fold. Thank-you may post. No leftover list promised. No wiki.
+- **Helm 2026-08-29 7:49 PM CT:** David authorized V0–V1. Fable plans leftover Sky after dump. Do not fold into #241. #208 untouched.
 - **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/243#discussioncomment-18174293
 
 ### have-count miss on Sphinx Claw / Mithril Bands / Izah
@@ -108,7 +110,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18197611
 
 ### leveling timestamps in an xp dropdown
-- **Priority:** waiting (new thread; not authorized.)
+- **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
 - **Place:** player history (level times). Not shared game truth / eqlwiki. Not a group meter. Nearby #215 is rollback/archives (xp, levelups) — different ask; do not fold. #228 joeymavity is motes / mez / respawn — do not fold.
 - **Source:** #240 joeymavity Aug 26, 11:44 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/240 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.11 · Windows 26200.
 - **Ask:** "At one point I thought you had leveling timestamps in an xp dropdown, I can't find it now."
@@ -118,6 +120,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 likely (missing control that already existed / findability). Do not write FABLE.md.
 - **Off-topic here:** none reported.
 - **Helm 2026-08-26 1:58 PM CT:** Signed. Waiting, not authorized. Thank-you may post. Ask which surface (widget / Session History / phone). Do not implement tonight.
+- **Helm 2026-08-29 7:49 PM CT:** David authorized V0–V1. Fable plans xp timestamps. #208 untouched.
 - **Replied:** 2026-08-26 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/240#discussioncomment-18166685
 
 ### expand / minimize cursor miss starts a new session
