@@ -97,6 +97,49 @@ public sealed class EndToEndTests
             "the launcher line to carry both cards' numbers");
     }
 
+    /// <summary>
+    /// The Gear tab's list stops carrying a CARD-SIZED cap around inside a WINDOW.
+    ///
+    /// `GearCardView` built its own `ScrollViewer { MaxHeight = 320 }` — a number chosen
+    /// for the widget, which came along when the surface was lifted into the Gear &amp;
+    /// Loot window. The window already caps its body with `WindowSizing.BodyCap` off the
+    /// monitor and off any height the player dragged, and the inner 320 overrode all of it:
+    /// the window grew, the gear list did not. A resize that visibly does nothing is the
+    /// complaint this whole area started with, and trap 36's own note had this file flagged
+    /// as the loose end.
+    ///
+    /// The list is capped BELOW the window body, not equal to it, because the auto-tick
+    /// note, the ⧉ copy of the command and the import report stay pinned outside the
+    /// scroller (trap 37) — the reason the scroller is re-pointed rather than deleted.
+    /// </summary>
+    [Fact]
+    public void TheGearListsCapFollowsTheWindowRatherThanACardSizedConstant()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_GEARLOOT"] = "gear",
+        });
+        app.Launch();
+        app.WaitForWindow("gearListCap", "the Gear tab to report its list cap");
+
+        var windowBody = app.DumpValue("gearLootBodyCap");
+        var listCap = app.DumpValue("gearListCap");
+
+        Assert.True(windowBody > 0,
+            "the window should cap its own body; dump was: " + app.Artifacts());
+        // Derived from the window, not from 320. On every screen the run can land on, the
+        // window body opens at WindowSizing.DefaultBodyHeight (400) or less, so a list cap
+        // of exactly 320 would mean the constant survived.
+        Assert.True(listCap <= windowBody,
+            $"the list must fit inside the window's body: {listCap} vs {windowBody}");
+        Assert.True(listCap > 120,
+            $"the list must still be a list: {listCap}");
+        // The pinned footer is real, so the list gets LESS than the whole body — an equal
+        // number would mean the note and the ⧉ copy were being counted as list.
+        Assert.True(listCap < windowBody,
+            $"the pinned note and ⧉ copy must be left room: {listCap} vs {windowBody}");
+    }
+
     /// <summary>With nothing imported the card says so in one line and hides the pivot —
     /// the empty state is a real state and the lift must keep it.
     ///

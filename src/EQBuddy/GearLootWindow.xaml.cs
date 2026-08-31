@@ -50,7 +50,11 @@ public partial class GearLootWindow : Window
         SizeChanged += (_, _) => UpdateHeightCap();
 
         _loot = new LootCardView(main, _settings);
-        _gear = main.NewGearCard();
+        // The window's OWN scroller decides, not a card-sized constant: BodyScroll is
+        // already WindowSizing.BodyCap of the monitor and of any height the player
+        // dragged, so the gear list now follows a resize instead of ignoring it.
+        _gear = main.NewGearCard(
+            pinned => WindowSizing.NestedBodyCap(BodyScroll.MaxHeight, pinned));
         _inventory = new InventoryView(main);
 
         _tabs = new EqSegmentedStrip(TabStrip);
@@ -253,6 +257,11 @@ public partial class GearLootWindow : Window
         $"gearAcquired={_settings.GearChecklist.Count(i => i.Acquired)} " +
         $"gearByZone={(_settings.GearGroupByZone ? 1 : 0)} " +
         $"gearPivotShown={(_gear.DebugPivotShown ? 1 : 0)} " +
+        // The gear list's cap, and the window body's, so E2E can say the first FOLLOWS the
+        // second instead of being the old hard 320. Nothing else can: the WPF layer has no
+        // unit tests, and a list that stops one row early photographs as a list.
+        $"gearListCap={_gear.DebugListCap:0} " +
+        $"gearLootBodyCap={BodyScroll.MaxHeight:0} " +
         // The ⧉ copy of /outputfile inventory (David, 2026-08-20). Reported because an
         // ABSENT control photographs as an unremarkable panel (trap 29) — a screenshot
         // review could never have caught this one, and a launched app asserting it is the

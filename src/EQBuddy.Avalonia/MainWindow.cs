@@ -1070,7 +1070,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // bar). Every host builds its OWN surfaces through NewLootSurfaces().
         _lootCard = GearThemeCard.Build(
             Header("loot", "Gear & Loot", _lootHeader), _lootHost,
-            newSurfaces: NewLootSurfaces,
+            newSurfaces: () => NewLootSurfaces(WidgetGearListCap),
             tabs: s2 => LootTheme.Tabs(s2, _settings.GearChecklist),
             inventoryCount: () => LatestInventory()?.Counts.Count,
             popOut: () => ShowGearLootWindow(),
@@ -1547,6 +1547,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     .Select(card => ReferenceEquals(card, askingCard)
                         ? askingCardChromeExcludingBody
                         : card.HeaderExtent)));
+
+    /// <summary>The gear list's cap while the card is INLINE on the widget: whatever the
+    /// Gear &amp; Loot theme card's body is capped at this tick, less what that surface
+    /// keeps pinned. Before the card exists the floor is the honest answer.</summary>
+    internal double WidgetGearListCap(double pinned) =>
+        WindowSizing.NestedBodyCap(
+            _lootCard?.BodyCap ?? WidgetMetrics.ThemeBodyMaxHeight, pinned);
 
     /// <summary>True while any expanded theme card's body is holding back rows a taller
     /// widget would show. The height grip's tooltip asks (#250).</summary>
@@ -3511,9 +3518,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>A fresh set for whoever asked — the same one-owner contract as
     /// NewProgressSurfaces, retiring this lane's borrowed-instance exemption. The
     /// InventoryView is tracked so its in-flight wiki fetch is disposed at shutdown.</summary>
-    LootSurfaceSet IGearLootHost.NewLootSurfaces() => NewLootSurfaces();
+    LootSurfaceSet IGearLootHost.NewLootSurfaces(Func<double, double> gearListCap) =>
+        NewLootSurfaces(gearListCap);
 
-    internal LootSurfaceSet NewLootSurfaces()
+    /// <param name="gearListCap">Where the gear list's own cap comes from. THE HOST
+    /// DECIDES: inline it is the theme card's body (which follows the height grip since
+    /// #250), in the window it is that window's own scroller.</param>
+    internal LootSurfaceSet NewLootSurfaces(Func<double, double> gearListCap)
     {
         var inventory = new InventoryView(
             _settings, _wikiItems,
@@ -3527,7 +3538,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 _settings, () => CurrentZoneName,
                 (from, to) => ZoneGraph.Distance(from, to)?.Hops,
                 () => { },   // per-tick renders repaint every live host already
-                () => LastInventoryImport),
+                () => LastInventoryImport,
+                gearListCap),
             inventory);
     }
 

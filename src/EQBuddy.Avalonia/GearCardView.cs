@@ -54,13 +54,20 @@ internal sealed class GearCardView
     private readonly TextBlock _listName = AppTheme.DimText("");
     private readonly CheckBox _byZone = new() { Content = "Group by farm zone" };
     private readonly StackPanel _rows = new();
+    private readonly ScrollViewer _listScroll;
+
+    /// <summary>Asked for the list's cap, given what this surface keeps PINNED beside it.
+    /// The HOST answers — the WPF twin's contract verbatim.</summary>
+    private readonly Func<double, double> _listCap;
 
     /// <summary>What the Gear &amp; Loot window hangs in its Wishlist tab.</summary>
     public Control Body { get; }
 
     public GearCardView(AppSettings settings, Func<string> currentZone,
-        Func<string, string, int?> hops, Action markDirty, Func<AutoImportOutcome?> lastImport)
+        Func<string, string, int?> hops, Action markDirty, Func<AutoImportOutcome?> lastImport,
+        Func<double, double> listCap)
     {
+        _listCap = listCap;
         _settings = settings;
         _currentZone = currentZone;
         _hops = hops;
@@ -85,9 +92,11 @@ internal sealed class GearCardView
             + "under each, and one tick clears it everywhere.");
         _byZone.IsCheckedChanged += OnByZoneToggled;
         panel.Children.Add(_byZone);
-        panel.Children.Add(new ScrollViewer
+        panel.Children.Add(_listScroll = new ScrollViewer
         {
-            MaxHeight = 320,
+            // Starts at the design opening height and follows the HOST from the first
+            // render (ApplyListCap) — the WPF twin's note carries the reasoning.
+            MaxHeight = WindowSizing.DefaultBodyHeight,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             Padding = new Thickness(0, 0, DesignTokens.SpaceXs, 0),
@@ -110,10 +119,29 @@ internal sealed class GearCardView
             GameCommands.OutputfileInventory, GearChecklistPresentation.AutoTickTip));
         panel.Children.Add(_importReport.Body);
         Body = panel;
+        // Re-measured on LAYOUT, not only on Render — the WPF twin's note carries the
+        // reasoning. Layout-driven, never on a clock (trap 12), and idempotent.
+        panel.LayoutUpdated += (_, _) => ApplyListCap();
     }
+
+    /// <summary>Point the list's cap at whatever is capping the HOST right now — the WPF
+    /// twin's <c>ApplyListCap</c> line for line. What is handed over is everything this
+    /// surface keeps OUTSIDE the scroller (the auto-tick note, the ⧉ copy of the in-game
+    /// command, the import report), which is out there so a long list cannot push it below
+    /// the fold (trap 37) — and is why the scroller is capped rather than deleted.</summary>
+    private void ApplyListCap()
+    {
+        if (Body is not Control panel) return;
+        var cap = Math.Floor(_listCap(panel.Bounds.Height - _listScroll.Bounds.Height));
+        if (Math.Abs(_listScroll.MaxHeight - cap) > 0.5) _listScroll.MaxHeight = cap;
+    }
+
+    /// <summary>The list's cap right now, for the render tests.</summary>
+    internal double ListCap => _listScroll.MaxHeight;
 
     public void Render()
     {
+        ApplyListCap();
         _importReport.Render();
         _rows.Children.Clear();
         var total = _settings.GearChecklist.Count;

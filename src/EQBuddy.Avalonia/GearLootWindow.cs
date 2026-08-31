@@ -22,7 +22,7 @@ internal interface IGearLootHost
     /// drew" checkable rather than merely claimed.</summary>
     /// <summary>A fresh set of the tab surfaces, built for the caller — see
     /// <see cref="ICreatureHost.NewCreatureSurfaces"/> for the one-owner reason.</summary>
-    LootSurfaceSet NewLootSurfaces();
+    LootSurfaceSet NewLootSurfaces(Func<double, double> gearListCap);
 
     /// <summary>The tab strip with its badges, from UI.Shared's LootTheme.</summary>
     IReadOnlyList<LootTabHeader> LootTabs(StatsSnapshot s);
@@ -111,7 +111,10 @@ internal sealed class GearLootWindow : Window
 
         // Its OWN surfaces, from the host's factory — never the widget's instances
         // (one control, one visual parent; see NewLootSurfaces).
-        var set = main.NewLootSurfaces();
+        // The window's OWN scroller decides, not a card-sized constant: _bodyScroll is
+        // already WindowSizing.BodyCap of the monitor this window is on.
+        var set = main.NewLootSurfaces(
+            pinned => WindowSizing.NestedBodyCap(_bodyScroll.MaxHeight, pinned));
         (_loot, _gear, _inventory) = (set.Loot, set.Gear, set.Inventory);
         _tabs = new EqSegmentedStrip(_tabStrip);
         Content = BuildContent();

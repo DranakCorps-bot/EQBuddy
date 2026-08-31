@@ -71,6 +71,39 @@ public static class WindowSizing
             : Math.Min(DefaultBodyHeight, room);
     }
 
+    /// <summary>
+    /// The cap for a scroller NESTED inside a host body — one surface's own list, with
+    /// something pinned beside it that must not scroll away.
+    ///
+    /// <c>GearCardView</c> is the case, and it is the trap 36 note's own loose end:
+    /// *"GearCardView gets away with its own scroller only because a hard MaxHeight gives
+    /// it genuine overflow — which is a card-sized cap now living in a window."* That cap
+    /// was <c>320</c> in both lanes, so dragging the Gear &amp; Loot window taller grew the
+    /// window and left the gear list exactly where it was. A resize that visibly does
+    /// nothing is the complaint this whole area started with.
+    ///
+    /// **The inner scroller is not removed, and that is deliberate.** Trap 36 says
+    /// scrolling belongs to the host — but trap 37 is its second half, and it is what this
+    /// scroller is buying: the ⧉ copy of <c>/outputfile inventory</c>, the auto-tick note
+    /// and the import report sit OUTSIDE it precisely so a forty-row list cannot push them
+    /// below the fold. Deleting the scroller would hand the host one long body and bury the
+    /// only in-app route to the command that makes the ticks happen (trap 34's row for this
+    /// very surface). So the scroller stays and its CAP comes from the host instead of from
+    /// a constant, which is the same move the theme bodies made for #250.
+    /// </summary>
+    /// <param name="hostBodyCap">Whatever is capping the host's body right now — a theme
+    /// window's <see cref="BodyCap"/>, or the widget's <c>WidgetMetrics.ThemeBodyCap</c>
+    /// when the card is inline. Non-finite (the host has not sized itself yet) answers
+    /// <see cref="DefaultBodyHeight"/> rather than "no cap": an uncapped list inside an
+    /// uncapped body is how a pop-out filled a display in the first place.</param>
+    /// <param name="pinnedChrome">What the surface keeps outside the scroller and must
+    /// always be able to draw.</param>
+    public static double NestedBodyCap(double hostBodyCap, double pinnedChrome)
+    {
+        var ceiling = double.IsFinite(hostBodyCap) ? hostBodyCap : DefaultBodyHeight;
+        return Math.Max(120, ceiling - Math.Max(0, pinnedChrome));
+    }
+
     /// <summary>Is a stored number worth restoring at all?</summary>
     public static bool IsSaneWidth(double w) => w is >= MinWidth and <= MaxAny;
 

@@ -115,8 +115,13 @@ public class SurfaceOwnershipTests
     [Theory]
     [InlineData("CreatureWindow.cs", "CreatureSurfaceSet NewCreatureSurfaces();",
         "var set = main.NewCreatureSurfaces();")]
-    [InlineData("GearLootWindow.cs", "LootSurfaceSet NewLootSurfaces();",
-        "var set = main.NewLootSurfaces();")]
+    // The Loot factory takes the host's gear-list cap since #250 PR 2 (the window's own
+    // BodyScroll decides, not a card-sized 320), so the call no longer ends in "();". The
+    // open paren is deliberate and still pins what this guard is FOR: the window builds its
+    // own set, in its constructor, through the factory.
+    [InlineData("GearLootWindow.cs",
+        "LootSurfaceSet NewLootSurfaces(Func<double, double> gearListCap);",
+        "var set = main.NewLootSurfaces(")]
     public void TheOtherTwoHostsHandOutFreshSetsToo(string file, string factory, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.Avalonia", file));
