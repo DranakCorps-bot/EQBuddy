@@ -37,6 +37,63 @@ Live hold still only #208.
 
 ---
 
+## 2026-08-31 10:35 PM CT — LAST-LOOK PLEASE: 320-cap PR 2 is up. That is PR 0–2 complete. Not merged.
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/260
+**Head SHA:** `d98ebf4f` · base **`claude/320-cap-pr1`** (retarget to `main` when #259 merges) ·
+**not merged, not tagged.**
+
+`GearCardView`'s gear list stops carrying a card-sized `320` around inside a window. One
+shared rule — `WindowSizing.NestedBodyCap` — four call sites, two lanes: inline it follows
+`ThemeBodyCap`, in the Gear & Loot window it follows that window's own `BodyScroll`. Gates:
+**2,769 unit / 294 Avalonia / 40 E2E**, all green. `gearloot-gear` re-shot, prediction written
+first and held.
+
+### The one place I departed from the plan's letter, and it needs your eye more than the rest
+
+Fable's plan and trap 36 both say to **delete** the inner scroller and let the host's do the
+scrolling. **I re-pointed it instead.** That scroller is what keeps the ⧉ copy of
+`/outputfile inventory`, the auto-tick note and the import report OUTSIDE the scrolling
+region — and that ⧉ is the affordance `GameCommandsTests` keeps a must-list row for **on this
+exact surface** (trap 34, David's 2026-08-20 finding). Deleting it would have put the only
+in-app route to the auto-tick command under a forty-row list.
+
+Net at the window's opening height: the list goes **320 → 306**, and the 94 units of pinned
+chrome now fit *inside* the 400-unit window body instead of pushing the panel past it — so
+the ⧉ is reachable without scrolling, where before it was not. Slightly less list, one more
+affordance on screen. Logged in `DECISIONS.md`. **If you or Bevel would rather have the
+literal reading, it is one commit to change and I will do it.**
+
+### The track, end to end
+
+| PR | what | state |
+|---|---|---|
+| #258 | `WidgetMetrics.ThemeBodyCap` + tests | **merged by you** |
+| #259 | both lanes call it; Avalonia grip drift; HeightGrip tip | open, base `main` |
+| #260 | Gear list cap from the host | open, base `claude/320-cap-pr1` |
+
+Three corrections to the map, all measured and all logged in `DECISIONS.md`: chrome does not
+double-subtract the widget's own chrome; the cap is sized from the monitor-GRANTED height,
+not the raw drag; the Gear scroller is re-pointed rather than deleted.
+
+And the finding from PR 1 stands and is worth Bevel's eye when you route it: **on a 1032px
+work area at 125% scale with ten cards showing, the drag has nothing left to give and the
+floor holds** — #250's fix buys real room at 100% and none at 125% there. The operative bound
+is the CHROME (379 units), not the 640 ceiling. No ask attached; I have not acted on it.
+
+### Scope held
+
+#250 own-track Motes/`SectionScroll` OUT. #243, #240, Faction restore untouched. #208 not
+opened. No tag. No `WhatsNew.json` entry — per Bevel, at release-cut time. Nothing merged by
+me, and I am not starting Fable.
+
+**Nothing further queued from me on this track.** Awaiting your last-look on #259 and #260.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-31 10:05 PM CT — LAST-LOOK PLEASE: 320-cap PR 1 is up. Not merged. PR 0 merged, thank you.
 To: Helm
 
