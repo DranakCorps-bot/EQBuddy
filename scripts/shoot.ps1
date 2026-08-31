@@ -648,6 +648,15 @@ $Shots = [ordered]@{
     'gearloot-loot'   = @{ Title = 'Gear & Loot'
                            Env = @{ EQBUDDY_GEARLOOT = 'loot' }
                            Set = @{} }
+    # #250 PR 2 re-shot this. PREDICTION, written before the run: the gear list stops
+    # carrying its own hard 320 and takes the WINDOW's cap instead, so at the design opening
+    # height (400) the list gets 306 and the 94 units of pinned chrome below it — the
+    # auto-tick note, the ⧉ copy of /outputfile inventory, and the import report — fit
+    # INSIDE the window body rather than pushing the panel past it. So: no outer scrollbar
+    # on the window, and the ⧉ copy visible without scrolling, which is the affordance
+    # trap 34 has a must-list row for on this very surface. Five seeded rows nowhere near
+    # either cap, so the ROWS themselves must be identical to the committed shot — a
+    # changed row set would mean this is a picture of something else (trap 23).
     'gearloot-gear'   = @{ Title = 'Gear & Loot'
                            Env = @{ EQBUDDY_GEARLOOT = 'gear' }
                            Set = @{

@@ -102,4 +102,54 @@ public class WindowSizingTests
         Assert.Equal(400, WindowSizing.DefaultBodyHeight);
         Assert.Equal(320 * 1.25, WindowSizing.DefaultBodyHeight);
     }
+
+    // ---- A nested scroller inside a host body (GearCardView's gear list) ----
+
+    /// <summary>The whole point: the nested list is derived from the HOST, so a window
+    /// dragged taller grows the list inside it. `GearCardView` carried a hard 320 — a
+    /// card-sized number that came along when the surface was lifted into a window — so
+    /// the window grew and the list did not, which is a resize that visibly does
+    /// nothing.</summary>
+    [Fact]
+    public void TheNestedListFollowsTheHostBodyRatherThanAConstant()
+    {
+        Assert.Equal(306, WindowSizing.NestedBodyCap(hostBodyCap: 400, pinnedChrome: 94));
+        Assert.Equal(686, WindowSizing.NestedBodyCap(hostBodyCap: 780, pinnedChrome: 94));
+        // A host that shrank takes the list down with it — the direction that keeps the
+        // pinned footer reachable rather than pushed under the fold.
+        Assert.Equal(206, WindowSizing.NestedBodyCap(300, 94));
+    }
+
+    /// <summary>The pinned chrome always gets its room. It is the auto-tick note, the ⧉
+    /// copy of `/outputfile inventory` and the import report — the affordances that sit
+    /// outside the scroller precisely so a forty-row list cannot bury them (traps 34 and
+    /// 37), which is why this scroller is re-pointed rather than deleted.</summary>
+    [Fact]
+    public void ThePinnedChromeIsAlwaysSubtractedAndNeverAddsRoom()
+    {
+        Assert.Equal(400, WindowSizing.NestedBodyCap(400, pinnedChrome: 0));
+        // A negative measurement is a toolkit having a bad day, not extra room.
+        Assert.Equal(400, WindowSizing.NestedBodyCap(400, pinnedChrome: -50));
+    }
+
+    /// <summary>A list too short is not a list. Chrome bigger than the body cannot squeeze
+    /// it out of existence — the same floor `BodyCap` keeps one level up.</summary>
+    [Fact]
+    public void TheNestedListIsNeverSqueezedToASliver()
+    {
+        Assert.Equal(120, WindowSizing.NestedBodyCap(200, pinnedChrome: 500));
+    }
+
+    /// <summary>A host that has not sized itself yet answers the DESIGN OPENING HEIGHT,
+    /// not "no cap". An uncapped list inside an uncapped body is exactly how a pop-out
+    /// filled a tall display (Hateborne, 2026-08-25), and the first render of this surface
+    /// genuinely can land before layout.</summary>
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void AHostThatHasNotSizedItselfYetAnswersTheDesignHeight(double unsized)
+    {
+        Assert.Equal(WindowSizing.DefaultBodyHeight - 40,
+            WindowSizing.NestedBodyCap(unsized, pinnedChrome: 40));
+    }
 }

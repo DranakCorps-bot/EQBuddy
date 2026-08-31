@@ -17,6 +17,17 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-31
 
+- **`GearCardView`'s inner scroller was RE-POINTED at the host, not deleted**, though the
+  plan's literal reading ("defer to the window's own `BodyScroll`") and trap 36's rule
+  ("scrolling belongs to the host") both point at deleting it. · The other way: drop the
+  scroller and let the window's `BodyScroll` carry one long body. · That scroller is what
+  keeps the ⧉ copy of `/outputfile inventory`, the auto-tick note and the import report
+  outside the scrolling region — the exact affordance `GameCommandsTests` has a must-list
+  row for on this surface (trap 34), and dropping it would have put the only in-app route to
+  the command under a forty-row list (trap 37, and trap 44 for the report). So the cap comes
+  from the host and the pinning stays. Net effect at the window's opening height: the list
+  goes 320 → 306 and the pinned footer now fits INSIDE the window body instead of pushing
+  the panel past it, so the ⧉ is reachable without scrolling. (PR 2, #250 track)
 - **The 320-cap chrome does NOT subtract the widget's title bar, KPI strip or status line,
   though the signed plan says it should.** · The other way: implement the sign literally and
   subtract them. · Measured instead: the height grip seeds from `SectionScroll.ActualHeight`

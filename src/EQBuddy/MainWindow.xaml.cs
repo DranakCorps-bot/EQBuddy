@@ -163,7 +163,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _lootCard = GearThemeCard.Build(
             LootSection, LootBody, LootPopOut, _lootHost,
             newLoot: () => new LootCardView(this, _settings),
-            newGear: NewGearCard,
+            newGear: () => NewGearCard(WidgetGearListCap),
             tabs: s2 => LootTheme.Tabs(s2, _settings.GearChecklist),
             inventoryCount: () => LatestInventory()?.Counts.Count,
             popOut: () => ShowGearLootWindow(),
@@ -2968,7 +2968,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// because the card's SectionLink and EQBUDDY_GEARLOOT both call it.</summary>
     private void OnGearLootWindow(object sender, RoutedEventArgs e) => ShowGearLootWindow();
 
-    private GearCardView Gear => _gear ??= NewGearCard();
+    private GearCardView Gear => _gear ??= NewGearCard(WidgetGearListCap);
 
     private GearCardView? _gear;
 
@@ -2980,13 +2980,25 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>A fresh Gear card. The Gear &amp; Loot theme's window wants one too, and
     /// a UIElement has one parent — so each host builds its own rather than sharing an
     /// instance that would be torn out of whichever drew it last.</summary>
-    internal GearCardView NewGearCard() => new(
+    /// <param name="listCap">Where the gear list's own cap comes from. THE HOST DECIDES:
+    /// inline it is the theme card's body (which follows the height grip since #250), in
+    /// the window it is that window's own scroller. Handing both the same constant is what
+    /// made the window's resize do nothing on this tab.</param>
+    internal GearCardView NewGearCard(Func<double, double> listCap) => new(
         _settings,
         () => CurrentZoneName,
         (from, to) => ZoneGraph.Distance(from, to)?.Hops,
         () => _gearChecklistDirty = true,
         FindResource,
-        () => LastInventoryImport);
+        () => LastInventoryImport,
+        listCap);
+
+    /// <summary>The gear list's cap while the card is INLINE on the widget: whatever the
+    /// Gear &amp; Loot theme card's body is capped at this tick, less what this surface
+    /// keeps pinned. Before the card exists the floor is the honest answer.</summary>
+    internal double WidgetGearListCap(double pinned) =>
+        EQBuddy.UI.Shared.WindowSizing.NestedBodyCap(
+            _lootCard?.BodyCap ?? EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight, pinned);
 
     // ---- /outputfile dumps import themselves (David, 2026-08-20) ----
 

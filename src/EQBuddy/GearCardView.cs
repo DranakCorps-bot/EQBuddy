@@ -43,6 +43,13 @@ internal sealed class GearCardView : IWidgetCard
     private readonly CheckBox _byZone;
     private readonly Button _copyCmd;
     private readonly ImportReportView _importReport;
+    private readonly ScrollViewer _listScroll;
+
+    /// <summary>Asked for the list's cap, given what this surface keeps PINNED beside
+    /// it. The HOST answers, because the host is the only one that knows how much body
+    /// there is — the widget's theme card and the Gear &amp; Loot window give different
+    /// answers, and this card used to hand the same 320 to both.</summary>
+    private readonly Func<double, double> _listCap;
 
     public string Key => LootSurface.KeyFor(LootTab.Gear);
     public UIElement Body { get; }
@@ -51,8 +58,10 @@ internal sealed class GearCardView : IWidgetCard
         AppSettings settings,
         Func<string> currentZone, Func<string, string, int?> hops,
         Action markDirty, Func<string, object> brush,
-        Func<AutoImportOutcome?> lastImport)
+        Func<AutoImportOutcome?> lastImport,
+        Func<double, double> listCap)
     {
+        _listCap = listCap;
         // The Undo has to make the LIST repaint, not just hide the line: the rows it put
         // back are the checklist's, and this card only rebuilds when it is marked dirty.
         _importReport = new ImportReportView(lastImport, () => { _markDirty(); Render(); });
@@ -98,9 +107,12 @@ internal sealed class GearCardView : IWidgetCard
         var panel = new StackPanel();
         panel.Children.Add(_byZone);
         panel.Children.Add(_listName);
-        panel.Children.Add(new ScrollViewer
+        panel.Children.Add(_listScroll = new ScrollViewer
         {
-            MaxHeight = 320,
+            // Starts at the design opening height and follows the HOST from the first
+            // render (ApplyListCap). It used to be a hard 320 living in a window, so
+            // dragging Gear & Loot taller grew the window and left this list alone.
+            MaxHeight = WindowSizing.DefaultBodyHeight,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             PanningMode = PanningMode.VerticalOnly,
@@ -121,6 +133,13 @@ internal sealed class GearCardView : IWidgetCard
         // your file" look identical from the outside and only one is a fault.
         panel.Children.Add(_importReport.Body);
         Body = panel;
+        // Re-measured on LAYOUT, not only on Render: the first render can land before this
+        // panel has a height at all, and a cap computed from a measurement that has not
+        // happened is the whole body — which is how the pinned note and ⧉ copy would get
+        // squeezed off the bottom on the very first paint. Layout-driven, never on a clock
+        // (trap 12), and ApplyListCap assigns only when the number actually moved, so this
+        // settles in one extra pass rather than oscillating.
+        panel.LayoutUpdated += (_, _) => ApplyListCap();
     }
 
     // The E2E dump's window into this card. The WPF layer has no unit tests, so a
@@ -143,8 +162,38 @@ internal sealed class GearCardView : IWidgetCard
 
     public void Render(StatsSnapshot snapshot) => Render();
 
+    /// <summary>
+    /// Point the list's cap at whatever is capping the HOST right now.
+    ///
+    /// The 320 this replaces was a card-sized constant that the Gear &amp; Loot window
+    /// inherited when the surface was lifted into it — the loose end trap 36's note already
+    /// flagged. Its cost was a resize that visibly does nothing: the window grew, the list
+    /// did not, and the player who dragged it had no way to tell whether they had done it
+    /// wrong.
+    ///
+    /// What is handed over is everything this surface keeps OUTSIDE the scroller — the
+    /// auto-tick note, the ⧉ copy of the in-game command, and the import report. They are
+    /// out there so a forty-row list cannot push them below the fold (trap 37), which is
+    /// also why this scroller is not simply deleted in favour of the host's.
+    ///
+    /// Measured, assigned only when it changed, and never on a clock (trap 12).
+    /// </summary>
+    private void ApplyListCap()
+    {
+        if (Body is not FrameworkElement panel) return;
+        var pinned = panel.ActualHeight - _listScroll.ActualHeight;
+        var cap = Math.Floor(_listCap(pinned));
+        if (Math.Abs(_listScroll.MaxHeight - cap) > 0.5) _listScroll.MaxHeight = cap;
+    }
+
+    /// <summary>The list's cap right now, for the <c>EQBUDDY_EXPAND</c> dump — the only
+    /// thing that can say this number is in effect at runtime rather than merely in the
+    /// binary (trap 42), since the WPF layer has no unit tests.</summary>
+    internal double DebugListCap => _listScroll.MaxHeight;
+
     public void Render()
     {
+        ApplyListCap();
         _importReport.Render();
         _list.Items.Clear();
         var total = _settings.GearChecklist.Count;
