@@ -30,7 +30,7 @@ Najena is the ancient home of a twisted dark elf magician named Najena, who carv
 |najena
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|5:00
+|4:24
 |-
 ! '''Succor/Evacuate:'''
 | -13, 856 (Zone line to Lavastorm)

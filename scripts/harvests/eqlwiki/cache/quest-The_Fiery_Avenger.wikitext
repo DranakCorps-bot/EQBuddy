@@ -44,7 +44,7 @@
 ** Obtain [[Miragul's Robe]] and [[Miragul's Head]] by killing [[Miragul]]- '''Only to whoever turned in the Phylactery!'''
 * Final hand-in to [[Inte Akera]]
 ** Obtain access to Island 4 (Pegasus Island) of [[Plane of Sky]], this requires several keys.
-** In the [[Plane of Sky]] Efreeti room, give [Dason Goldblade]] 500pp to spawn Inte Akera -- '''Doing so will spawn Inte Akera in the Windmill on Island 4. Inte is a Deepwater Knight of Prexus and will unleash the Oceanlord's fury upon those deemed 'evil' in their eyes -- including your raid. Inte Akera only stays up for a few minutes which is why you need to have access to Island 4 ahead of time.  You can use invisibility to run up to Island 4 after spawning him.'''
+** In the [[Plane of Sky]] Efreeti room, give [[Dason Goldblade]] 500pp to spawn [[Inte Akera]] -- '''Doing so will spawn Inte Akera in the Windmill on Island 4. Inte is a Deepwater Knight of Prexus and will unleash the Oceanlord's fury upon those deemed 'evil' in their eyes -- including your raid. Inte Akera only stays up for a few minutes, which is why you need to have access to Island 4 ahead of time.  You can use invisibility to run up to Island 4 after spawning him.'''
 **  Give [[Inte Akera]] the [[Soulfire]] ALONE for the [[Blessing of Nobility]]. Warmly Faction Needed
 **  Give [[Inte Akera]] the [[Ghoulbane]] ALONE for the [[Blessing of Sacrifice]]. Warmly Faction Needed
 **  Give Inte Akera the head, robe, and both blessings (TOGETHER) for the [[:Fiery Avenger]]. Warmly Faction Needed
@@ -52,7 +52,7 @@
 
 == Walkthrough ==
 
-Your final turn-in will consist of [[SoulFire]], [[Ghoulbane]], and [[Miragul's Robe]] and [[Miragul's Head]]. Note that even though the quest technically begins in Plane of Sky, there is no need to speak with Inte Akera before you have all the items ready to hand in. Also note that Inte Akera is a Deepwater Knight, and you need high faction with Erudite Paladins. It would be wise to have sufficient faction as well before going to Sky.
+Your final turn-in will consist of [[SoulFire]], [[Ghoulbane]], and [[Miragul's Robe]] and [[Miragul's Head]]. Note that even though the quest technically begins in the Plane of Sky, there is no need to speak with Inte Akera before you have all the items ready to hand in. Also note that Inte Akera is a Deepwater Knight, and you need high faction with Erudite Paladins. It would be wise to have sufficient faction as well before going to Sky.
 
 How to acquire the Head and Robe of Miragul is as follows:
 

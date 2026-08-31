@@ -136,7 +136,7 @@ You say, 'Can you return the sash?'
 * [[Needle of the Void]]
 * [[Rare Robe Pattern]]
 * [[Jonthan's Whistling Warsong|Song: Jonthan's Whistling Warsong]] - Can be purchased from the Bard's Guild.
-* [[Shadow Silk]] (Tailoring trivial at 36)
+* [[Shadow Silk]] ([[Tailoring]] trivial at 36)
 **1 x [[Shadow Wolf Pelt]] - Dropped from shadow wolves.
 **1 x [[Silk Swatch]] - Crafted using two spider silk.
 **1 x [[Gather Shadows|Spell: Gather Shadows]] - Bought.

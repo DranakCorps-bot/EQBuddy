@@ -42,11 +42,11 @@ You say, 'Hail, Lashun Novashine'
 : Lashun Novashine says 'Very well, young one. May the light of the Prime Healer wash away your scars.' 
 
 <div class="facblock">
-* Your faction standing with [[Priests of Life]] got better.
-* Your faction standing with [[Knights of Thunder]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Antonius Bayle]] got better. 
-* Your faction standing with [[Bloodsabers]] got '''worse'''.
+* Your faction standing with [[Priests of Life]] has been adjusted by 5.
+* Your faction standing with [[Knights of Thunder]] has been adjusted by 5.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5.
+* Your faction standing with [[Antonius Bayle]] has been adjusted by 5. 
+* Your faction standing with [[Bloodsabers]] has been adjusted by -1.
 </div>
 {{YouGainExperience}} About 0.5% at level 4.
 
@@ -57,11 +57,11 @@ Lashun Novashine begins to cast a spell. You feel a little better. You have been
 : Lashun Novashine says 'Thank you for the donation to the Temple of Life. May Rodcet Nife cleanse your body of all ills.' 
 
 <div class="facblock">
-* Your faction standing with [[Priests of Life]] got better.
-* Your faction standing with [[Knights of Thunder]] got better.
-* Your faction standing with [[Guards of Qeynos]] got better.
-* Your faction standing with [[Antonius Bayle]] got better. 
-* Your faction standing with [[Bloodsabers]] got '''worse'''.
+* Your faction standing with [[Priests of Life]] has been adjusted by 5.
+* Your faction standing with [[Knights of Thunder]] has been adjusted by 5.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5.
+* Your faction standing with [[Antonius Bayle]] has been adjusted by 5. 
+* Your faction standing with [[Bloodsabers]] has been adjusted by -1.
 </div>
 
 {{YouGainExperience}}

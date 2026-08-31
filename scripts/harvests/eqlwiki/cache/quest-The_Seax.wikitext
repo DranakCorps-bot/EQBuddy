@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_lysbith_mcnaff.png|frame|Lysbith McNaff]]
+[[File:npc_lysbith_mcnaff.png|thumb|Lysbith McNaff]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Halas]]
@@ -46,7 +46,7 @@ You say, 'What Seax?'
 
 : Lysbith McNaff says 'The Seax is a Northman warrior's piercing weapon. Dinnae confuse this with another [weapon] related to the Seax called the Langseax. The local rogues have also learned to master the Seax. I'll only offer it to those who battle the [orc troopers].' 
 
-'''After handing in four [[Wrath Orc Wristbands]]:'''
+After handing in four [[Wrath Orc Wristbands]]:
 
 : Lysbith McNaff says 'Ye're becoming a fine champion o' Halas. Take th' Seax. May ye always defend Halas!' 
 
@@ -59,8 +59,9 @@ You say, 'What Seax?'
 </div> 
 {{exp}}
 
-You receive [[Seax]], a piercing weapon usable by Rogues.
+'''You receive the [[Seax]], a piercing weapon usable by Rogues.'''
 
 [[Category:Quests]]
 [[Category:Halas]]
 [[Category:Warrior Quests]]
+[[Category:Rogue Quests]]

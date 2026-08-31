@@ -1,4 +1,4 @@
-[[File:npc_beek_guinders.png|frame|Beek Guinders]]
+[[File:npc_beek_guinders.png|thumb|Beek Guinders]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Rivervale|Rivervale]]

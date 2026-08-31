@@ -180,48 +180,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Healing
-|description=Healing spell
-|era={{Classic Short}}
+|kind=Heals
+|targ=Friendly
+|mana=10
+|effects=1: Increase Hitpoints by 12 (L1) to 20 (L5)
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=10
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=12-20 HP
-}}
-{{RadSpellRow2
-|name=Strike
-|description=Calls upon the power of the gods to strike your target, causing between 8 and 10 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Strike
+|kind=Magic DD
+|targ=Single
+|mana=7
+|effects=1: Decrease Hitpoints by 8 (L1) to 10 (L4)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=7
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=8-10 Dmg
-}}
-{{RadSpellRow2
-|name=Ward Undead
-|description=Undead DD line of spells.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward Undead
+|kind=Undead DD
+|targ=Undead
+|mana=5
+|effects=1: Decrease Hitpoints by 7 (L1) to 12 (L10)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=5
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=7-12 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -234,24 +230,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Flash of Light
-|description=Blinds target
-|era={{Classic Short}}
+|kind=Blind
+|targ=Single
+|mana=12
+|effects=1: Blind<br>2: Decrease ATK by 5
+|duration=12 Sec
 |school=Divination
 |location=Autogranted Vendor
-|mana=12
-|kind=Detrimental
-|targ=Single
-|duration=12 Sec
-|max=-5 ATK
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -264,24 +258,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=True North
-|description=Face to the north.
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Heading
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -294,24 +286,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sense the Dead
-|description=Detects undead creatures
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Undead
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -324,24 +314,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Poison
-|description=Cures target of poison effects
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=20
+|effects=1: Cure Poison: 1 counter
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 1 Poison
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -354,24 +342,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cease
-|description=Invokes the will of the gods, stunning your opponent. This spell works on creatures up to level 55.
-|era={{Classic Short}}
+|kind=Stun DD
+|targ=Single
+|mana=15
+|effects=1: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=Stun 1s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -384,36 +370,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Courage
-|description=HP and AC buff (4AC 20HP) - Hint: More mana efficient healing than [[Minor Healing]]
-|era={{Classic Short}}
+|kind=HP Buff (Line 1)
+|targ=Friendly
+|mana=12
+|effects=1: Increase AC by 2 (L1) to 3 (L10)<br>2: Increase Max Hitpoints by 11 (L1) to 20 (L10)<br>3: Increase Hitpoints by 11 (L1) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=12
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+3 AC<br>+20 Max HP<br>11-20 HP
-}}
-{{RadSpellRow2
-|name=Furor
-|description=Calls upon the furor of the gods to strike your target, causing between 20 and 33 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Furor
+|kind=Magic DD
+|targ=Single
+|mana=19
+|effects=1: Decrease Hitpoints by 25 (L5) to 33 (L13)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=19
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=25-33 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -426,36 +409,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spook the Dead
-|description=Undead only fear
-|era={{Classic Short}}
+|kind=Fear
+|targ=Undead
+|mana=10
+|effects=1: Fear (up to L52)
+|duration=18 Sec
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Detrimental
-|targ=Undead
-|duration=18 Sec
-|max=Fear (max L52)
-}}
-{{RadSpellRow2
-|name=Yaulp
-|description=Self only combat buff spell (6AC 10STR)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Yaulp
+|kind=Attack
+|targ=Self
+|mana=1
+|effects=1: Increase Strength by 10<br>2: Increase AC by 5
+|duration=Permanent
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=1
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 STR<br>+5 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -468,36 +448,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Light Healing
-|description=Healing spell.
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
+|kind=Heals
+|targ=Friendly
 |mana=28
-|kind=Heal
-|targ=Single Friendly (or Self)
+|effects=1: Increase Hitpoints by 47 (L4) to 65 (L10)
 |duration=Instant
-|max=47-65 HP
-}}
-{{RadSpellRow2
-|name=Lull
-|description=Reduce the target's aggression
-|era={{Classic Short}}
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=10
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lull
+|kind=Calm
 |targ=Single
+|mana=10
+|effects=1: Reduce Aggro Radius (up to L30)<br>2: Assist Radius (up to L30)
 |duration=2 Min
-|max=Calm (max L30)
+|school=Alteration
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -510,24 +487,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Disease
-|description=Cures the target of disease effects
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=20
+|effects=1: Cure Disease: 1 counter
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=20
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 1 Disease
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -540,24 +515,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Desist
-|description=Invokes the will of the gods, briefly stunning your opponent. This spell works on creatures up to level 55.
-|era={{Classic Short}}
+|kind=Stun DD
+|targ=Single
+|mana=25
+|effects=1: Stun: 2.5s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=25
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=Stun 2.5s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -570,24 +543,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Hammer of Wrath
-|description=Summons a magical hammer: {{:Summoned: Hammer of Wrath}}
-|era={{Classic Short}}
+|kind=Summon Weapon
+|targ=Self
+|mana=50
+|effects=1: {{:Summoned: Hammer of Wrath}}
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=50
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #6307
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -600,36 +571,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Holy Armor
-|description=AC buff
-|era={{Classic Short}}
+|kind=Armor Class
+|targ=Friendly
+|mana=20
+|effects=1: Increase AC by 4 (L1) to 5 (L5)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+5 AC
-}}
-{{RadSpellRow2
-|name=Instrument of Nife
-|description=Imbues your weapon with the power of Rodcet Nife, granting it a chance to cause great pain to undead creatures.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Instrument of Nife
+|kind=Combat Innates
+|targ=Self
+|mana=50
+|effects=1: Procs Condemnation of Nife
+|duration=Permanent
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=Procs: Condemnation of Nife
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -642,24 +610,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Halo of Light
-|description=Summons a Halo of Light: {{:Summoned: Halo of Light}} - Lightsource like a  [[Greater Lightstone]]
-|era={{Classic Short}}
+|kind=Summon Utility
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Halo of Light}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10290
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -672,24 +638,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invisibility versus Undead
-|description=Makes target invisible vs undead creatures
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Friendly
+|mana=40
+|effects=1: Invisibility vs Undead
+|duration=27 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -702,24 +666,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Reckless Strength
-|description=Temporary strength buff
-|era={{Classic Short}}
+|kind=Strength
+|targ=Friendly
+|mana=30
+|effects=1: Increase Strength by 20
+|duration=3 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=3 Min
-|max=+20 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -732,48 +694,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Remove Minor Curse
-|description=Cleanses your target's soul, removing minor curses.
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=25
+|effects=1: Cure Curse: 2 counters
+|duration=Instant
 |school=Alteration
 |location=
-|mana=25
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 2 Curse
-}}
-{{RadSpellRow2
-|name=Root
-|description=Stops target's movement. Max 48 seconds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Root
+|kind=Root
+|targ=Single
+|mana=30
+|effects=1: Root
+|duration=48 Sec
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=48 Sec
-|max=Root
-}}
-{{RadSpellRow2
-|name=Smite
-|description=Calls upon the power of the gods to smite your target, causing between 60 and 88 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Smite
+|kind=Magic DD
+|targ=Single
+|mana=43
+|effects=1: Decrease Hitpoints by 74 (L14) to 88 (L28)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=43
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=74-88 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -786,36 +744,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Center
-|description=HP and AC buff (6 AC - 44HP @ L9 up to 90HP at L60)
-|era={{Classic Short}}
+|kind=HP Buff (Line 1)
+|targ=Friendly
+|mana=40
+|effects=1: Increase AC by 4 (L7) to 5 (L14)<br>2: Increase Max Hitpoints by 42 (L7) to 85 (L50)<br>3: Increase Hitpoints by 42 (L7) to 85 (L50)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+5 AC<br>+85 Max HP<br>42-85 HP
-}}
-{{RadSpellRow2
-|name=Healing
-|description=Single Target Healing Spell (Max: 100)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Healing
+|kind=Heals
+|targ=Friendly
+|mana=65
+|effects=1: Increase Hitpoints by 135 (L10) to 175 (L20)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=65
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=135-175 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -828,24 +783,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Poison
-|description=Adds to poison resist (20 Sv Poison)
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Poison Resist by 16 (L6) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Poison Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -858,24 +811,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Reanimation
-|description=Revives a slain ally. It takes some time for the recently revived to fully recover.
-|era={{Classic Short}}
+|kind=Resurrection
+|targ=Corpse
+|mana=150
+|effects=1: Resurrect 0%
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Heal
-|targ=Corpse
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -888,24 +839,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Hammer of Striking
-|description=Summons a magical hammer: {{:Summoned: Hammer of Striking}}
-|era={{Classic Short}}
+|kind=Summon Weapon
+|targ=Self
+|mana=100
+|effects=1: {{:Summoned: Hammer of Striking}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=100
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #6309
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -918,24 +867,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Symbol of Transal
-|description=HP Buff (73 HP) Requires [[Cat's Eye Agate]].
-|era={{Classic Short}}
+|kind=Symbol
+|targ=Friendly
+|mana=55
+|effects=1: Increase Max Hitpoints by 34 (L11) to 73 (L21)<br>2: Increase Hitpoints by 34 (L11) to 73 (L21)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=55
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=73 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -948,24 +895,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Soothe
-|description=Reduces the target's aggression
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=30
+|effects=1: Reduce Aggro Radius (up to L40)<br>2: Assist Radius (up to L40)<br>3: Add Hate (Aggro)
+|duration=2 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=2 Min 30 Sec
-|max=Calm (max L40)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -978,24 +923,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Stun
-|description=Stuns the target (4s)
-|era={{Classic Short}}
+|kind=Stun DD
+|targ=Single
+|mana=35
+|effects=1: Stun: 4s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=35
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=Stun 4s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1008,24 +951,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Magic
-|description=Increases magic resistance (20 Sv Magic)
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=40
+|effects=1: Increase Magic Resist by 20
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1038,60 +979,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expulse Undead
-|description=Undead DD spell.
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=36
+|effects=1: Decrease Hitpoints by 99 (L13) to 106 (L20)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=36
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=99-106 Dmg
-}}
-{{RadSpellRow2
-|name=Greater Healing
-|description=Single Target Healing Spell.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Healing
+|kind=Heals
+|targ=Friendly
+|mana=115
+|effects=1: Increase Hitpoints by 280 (L20) to 350 (L30)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=115
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=280-350 HP
-}}
-{{RadSpellRow2
-|name=Reconstitution
-|description=Revives a slain ally. It takes some time for the recently revived to fully recover.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Reconstitution
+|kind=Resurrection
+|targ=Corpse
+|mana=250
+|effects=1: Resurrect 10%
+|duration=Instant
 |school=Alteration
 |location=
-|mana=250
-|kind=Heal
-|targ=Corpse
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Spirit Armor
-|description=AC Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Armor
+|kind=Armor Class
+|targ=Friendly
+|mana=75
+|effects=1: Increase AC by 9 (L15) to 11 (L24)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=75
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+11 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1104,24 +1040,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Reparation
-|description=Revives a slain ally. It takes some time for the recently revived to fully recover.
-|era={{Classic Short}}
+|kind=Resurrection
+|targ=Corpse
+|mana=350
+|effects=1: Resurrect 20%
+|duration=Instant
 |school=Alteration
 |location=
-|mana=350
-|kind=Heal
-|targ=Corpse
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1134,24 +1068,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancel Magic
-|description=Removes a magical effect
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1164,24 +1096,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Symbol of Ryltan
-|description=HP Buff (158 HP) Requires [[Bloodstone]]
-|era={{Classic Short}}
+|kind=Symbol
+|targ=Friendly
+|mana=111
+|effects=1: Increase Max Hitpoints by 94 (L21) to 158 (L31)<br>2: Increase Hitpoints by 94 (L21) to 158 (L31)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=111
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=158 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1194,48 +1124,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Counteract Poison
-|description=Cures target of poison effects
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=50
+|effects=1: Cure Poison: 8 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 8 Poison
-}}
-{{RadSpellRow2
-|name=Remove Lesser Curse
-|description=Cleanses your target's soul, removing lesser curses.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Remove Lesser Curse
+|kind=Cure
+|targ=Friendly
+|mana=75
+|effects=1: Cure Curse: 4 counters
+|duration=Instant
 |school=Alteration
 |location=
-|mana=75
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 4 Curse
-}}
-{{RadSpellRow2
-|name=Wrath
-|description=Calls upon the wrath of the gods to strike your target, inflicting between 90 and 176 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Wrath
+|kind=Magic DD
+|targ=Single
+|mana=77
+|effects=1: Decrease Hitpoints by 148 (L29) to 176 (L43)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=77
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=148-176 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1248,24 +1174,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Divine Vigor
-|description=Fills your target with divine vigor, increasing their hit points for 50 min.
-|era={{Classic Short}}
+|kind=HP Buff (Line 2)
+|targ=Friendly
+|mana=35
+|effects=1: Increase Max Hitpoints by 100
+|duration=50 Min
 |school=Alteration
 |location=
-|mana=35
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=50 Min
-|max=+100 Max HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1278,36 +1202,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Daring
-|description=HP and AC buff
-|era={{Classic Short}}
+|kind=HP Buff (Line 1)
+|targ=Friendly
+|mana=60
+|effects=1: Increase AC by 6 (L17) to 7 (L26)<br>2: Increase Max Hitpoints by 82 (L17) to 115 (L50)<br>3: Increase Hitpoints by 82 (L17) to 115 (L50)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+7 AC<br>+115 Max HP<br>82-115 HP
-}}
-{{RadSpellRow2
-|name=Divine Purpose
-|description=Self Only Health Regeneration Spell (2.66 HPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Divine Purpose
+|kind=Conversions
+|targ=Self
+|mana=1
+|effects=1: Decrease Mana by 3 per tick<br>2: Increase Hitpoints by 8 per tick
+|duration=Permanent
 |school=Alteration
 |location=Vendor
-|mana=1
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=-3 Mana<br>+8 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1320,36 +1241,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Disease
-|description=Adds to disease resistance
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Resist Buff
+|targ=Friendly
 |mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Disease Resist by 18 (L8) to 20 (L10)
 |duration=27 Min
-|max=+20 Disease Resist
-}}
-{{RadSpellRow2
-|name=Yaulp II
-|description=Self only combat buff spell
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=1
-|kind=Buff
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Yaulp II
+|kind=Attack
 |targ=Self
+|mana=1
+|effects=1: Increase Strength by 20<br>2: Increase AC by 7
 |duration=Permanent
-|max=+20 STR<br>+7 AC
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1362,48 +1280,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Guard
-|description=AC Buff (19 AC)
-|era={{Classic Short}}
+|kind=Armor Class
+|targ=Friendly
+|mana=80
+|effects=1: Increase AC by 14 (L25) to 16 (L34)
+|duration=45 Min
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=45 Min
-|max=+16 AC
-}}
-{{RadSpellRow2
-|name=Revive
-|description=Summons a player to their corpse with 0% experience
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Revive
+|kind=Resurrection
+|targ=Corpse
+|mana=450
+|effects=1: Resurrect 35%
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=450
-|kind=Heal
-|targ=Corpse
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Wave of Life
-|description=Emanates a wave of life from the caster, healing 219 hit points for everyone in your group.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Wave of Life
+|kind=Heals
+|targ=Group
+|mana=274
+|effects=1: Increase Hitpoints by 201 (L39) to 219 (L45)
+|duration=Instant
 |school=Alteration
 |location=
-|mana=274
-|kind=Heal
-|targ=Group
-|duration=Instant
-|max=201-219 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1416,24 +1330,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Holy Might
-|description=Stuns target with a small amount of damage (6s; 29-60 MR0)
-|era={{Classic Short}}
+|kind=Stun DD
+|targ=Single
+|mana=60
+|effects=1: Stun: 6s (up to L55)<br>2: Decrease Hitpoints by 26 (L16) to 60 (L50)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=60
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=Stun 6s (max L55)<br>26-60 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1446,24 +1358,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Calm
-|description=Calms the mind of your target, lowering its aggressiveness
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=50
+|effects=1: Reduce Aggro Radius (up to L50)<br>2: Assist Radius (up to L50)<br>3: Add Hate (Aggro)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Calm (max L50)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1476,36 +1386,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Ethereal Cleansing
-|description=Fills your target's body with cleansing light, healing 10 hit points every six seconds for 24s. If your target is an enemy, you will heal that enemy's current target instead.
-|era={{Classic Short}}
-|school=Alteration
-|location=
+|kind=Duration Heals
+|targ=Friendly
 |mana=150
-|kind=Heal
-|targ=Single Friendly (or Self)
+|effects=1: Increase Hitpoints by 98 (L44) to 100 (L45) per tick
 |duration=24 Sec
-|max=+10 HoT
-}}
-{{RadSpellRow2
-|name=Valor of Marr
-|description=Fills your muscles with the valor of Marr, increasing your attack speed.
-|era={{Classic Short}}
 |school=Alteration
 |location=
-|mana=300
-|kind=Utility
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Valor of Marr
+|kind=Haste
 |targ=Self
+|mana=300
+|effects=1: Increase Attack Speed by 25%
 |duration=Permanent
-|max=+25% Atkspd
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1518,36 +1425,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Divine Might
-|description=Self Only 65pt DD Weapon Proc Enchantment
-|era={{Classic Short}}
+|kind=Combat Innates
+|targ=Self
+|mana=100
+|effects=1: Procs Divine Might Strike
+|duration=Permanent
 |school=Alteration
 |location=Quest
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=Procs: Divine Might Strike
-}}
-{{RadSpellRow2
-|name=Remove Curse
-|description=Cleanses your target's soul, removing minor curses.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Remove Curse
+|kind=Cure
+|targ=Friendly
+|mana=75
+|effects=1: Cure Curse: 4 counters
+|duration=Instant
 |school=Alteration
 |location=
-|mana=75
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 4 Curse
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1560,48 +1464,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dismiss Undead
-|description=Undead Only Direct Damage.
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=63
+|effects=1: Decrease Hitpoints by 196 (L23) to 211 (L31)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=63
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=196-211 Dmg
-}}
-{{RadSpellRow2
-|name=Superior Healing
-|description=Healing spell (2.1 HPM; 116.5 HPS)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Superior Healing
+|kind=Heals
+|targ=Friendly
+|mana=185
+|effects=1: Increase Hitpoints by 500 (L30) to 600 (L40)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=185
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=500-600 HP
-}}
-{{RadSpellRow2
-|name=Symbol of Pinzarn
-|description=HP buff (307 HP) Requires [[Jasper]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Symbol of Pinzarn
+|kind=Symbol
+|targ=Friendly
+|mana=200
+|effects=1: Increase Max Hitpoints by 224 (L31) to 307 (L41)<br>2: Increase Hitpoints by 224 (L31) to 307 (L41)
+|duration=45 Min
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=45 Min
-|max=307 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1614,36 +1514,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Thunder of Karana
-|description=Summons the booming thunder of Karana, causing severe trauma to your target's mind and draining 100 mana.
-|era={{Classic Short}}
+|kind=Mana Drain
+|targ=Single
+|mana=75
+|effects=1: Decrease Mana by 100
+|duration=Instant
 |school=Evocation
 |location=
-|mana=75
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=-100 Mana
-}}
-{{RadSpellRow2
-|name=Valor
-|description=HP and AC buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Valor
+|kind=HP Buff (Line 1)
+|targ=Friendly
+|mana=90
+|effects=1: Increase AC by 10 (L32) to 11 (L40)<br>2: Increase Max Hitpoints by 164 (L32) to 200 (L50)<br>3: Increase Hitpoints by 164 (L32) to 200 (L50)
+|duration=54 Min
 |school=Abjuration
 |location=Vendor
-|mana=90
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+11 AC<br>+200 Max HP<br>164-200 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1656,36 +1553,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Armor of Faith
-|description=AC Buff
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Armor Class
+|targ=Friendly
 |mana=150
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AC by 19 (L35) to 21 (L44)
 |duration=63 Min
-|max=+21 AC
-}}
-{{RadSpellRow2
-|name=Divine Aura
-|description=Self-only 18-second invulnerability
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Utility
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Divine Aura
+|kind=Invulnerability
 |targ=Self
+|mana=10
+|effects=1: Invulnerability
 |duration=18 Sec
-|max=
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1698,60 +1592,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Brell's Steadfast Aegis
-|description=Surrounds your group with the aegis of the Underfoot, increasing their hit points for 150 min.
-|era={{Classic Short}}
+|kind=HP Buff (Line 2)
+|targ=Group
+|mana=175
+|effects=1: Increase Max Hitpoints by 145
+|duration=150 Min
 |school=Alteration
 |location=
-|mana=175
-|kind=Buff
-|targ=Group
-|duration=150 Min
-|max=+145 Max HP
-}}
-{{RadSpellRow2
-|name=Pacify
-|description=Reduces the target's aggression
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pacify
+|kind=Calm
+|targ=Single
+|mana=100
+|effects=1: Reduce Aggro Radius (up to L55)<br>2: Assist Radius (up to L55)<br>3: Add Hate (Aggro)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Calm (max L55)
-}}
-{{RadSpellRow2
-|name=Renewal
-|description=Revives a slain ally, restoring 50% of their lost experience. It takes some time for the recently revived to fully recover.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Renewal
+|kind=Resurrection
+|targ=Corpse
+|mana=550
+|effects=1: Resurrect 50%
+|duration=Instant
 |school=Alteration
 |location=
-|mana=550
-|kind=Heal
-|targ=Corpse
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Retribution
-|description=Calls upon the retribution of the gods to strike your target, causing between 240 and 390 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Retribution
+|kind=Magic DD
+|targ=Single
+|mana=144
+|effects=1: Decrease Hitpoints by 372 (L44) to 390 (L50)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=144
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=372-390 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1764,36 +1653,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Flame of Light
-|description=Single Target Fire Based Direct Damage (Max: 125hp; 1.5 DPM)
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Single
+|mana=85
+|effects=1: Decrease Hitpoints by 125
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=85
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=125 Dmg
-}}
-{{RadSpellRow2
-|name=Resist Disease
-|description=Increases disease resistance
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Disease
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Disease Resist by 40
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Disease Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>

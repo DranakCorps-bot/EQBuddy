@@ -1,8 +1,10 @@
-{{Classic Era}}{{DNE}}Freeport is considered by most to be the hub of Antonica for a variety of reasons. It is the mercantile center of the continent, since it holds the only port with a regular boat to the island continent of Faydwer. It holds facilities for most of the artisan trades, and most budding craftsman travel to Freeport to take advantage of the readily available facilities. Freeport is also the hub for traffic of all sorts. The good races travel its streets to go to their guilds and the shops, as well as to the boat to Faydwer, and the dark races travel through the sewers to reach most of the same destinations. Guild Halls for all classes except the Rangers, Druids, and Shamans are present within the city.
+{{Classic Era}}{{DNE}}
+[[File:freeport header.webp|right]]Freeport is considered by most to be the hub of Antonica for a variety of reasons. It is the mercantile center of the continent, since it holds the only port with a regular boat to the island continent of Faydwer. It holds facilities for most of the artisan trades, and most budding craftsman travel to Freeport to take advantage of the readily available facilities. Freeport is also the hub for traffic of all sorts. The good races travel its streets to go to their guilds and the shops, as well as to the boat to Faydwer, and the dark races travel through the sewers to reach most of the same destinations. Guild Halls for all classes except the Rangers, Druids, and Shamans are present within the city.
 
 {|
 |rowspan="6" valign="top" width="200"| <div style='float:left;'>__TOC__</div>
 |valign="top"|
+|-
 {| class="zoneTopTable"
 ! width="150"|''' City Races: '''
 |[[Human]], [[Half Elf]]

@@ -2981,7 +2981,7 @@
   "relatedZones": [
    "Steamfont Mountains"
   ],
-  "era": "Kunark",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -3044,7 +3044,7 @@
   "items": [
    {
     "name": "Blackburrow Cask",
-    "qty": 3
+    "qty": 1
    }
   ],
   "rewards": [
@@ -4927,7 +4927,12 @@
   "questGiver": "",
   "minLevel": 0,
   "classes": "",
-  "items": [],
+  "items": [
+   {
+    "name": "Innoruuk Symbol Quests",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Class_Race_Quest_List/Bard",
    "Class_Race_Quest_List/Cleric",
@@ -9579,7 +9584,12 @@
   "questGiver": "Tani N`Mar",
   "minLevel": 4,
   "classes": "Bard, Rogue, Shadow Knight",
-  "items": [],
+  "items": [
+   {
+    "name": "Human Head",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Cinctured Whip"
   ],
@@ -9592,7 +9602,7 @@
   "relatedZones": [
    "Freeport"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -14349,6 +14359,26 @@
   "repeatable": false
  },
  {
+  "name": "Grub Locker",
+  "url": "https://eqlwiki.com/Grub_Locker",
+  "startZone": "",
+  "questGiver": "Nerbilik",
+  "minLevel": 0,
+  "classes": "ALL / CLASS",
+  "items": [],
+  "rewards": [
+   "ITEM NAME"
+  ],
+  "categories": [
+   "ZONE NAME"
+  ],
+  "relatedZones": [
+   "ZONE NAME"
+  ],
+  "era": "",
+  "repeatable": false
+ },
+ {
   "name": "Guard of Ik Quest",
   "url": "https://eqlwiki.com/Guard_of_Ik_Quest",
   "startZone": "Firiona Vie",
@@ -17122,14 +17152,10 @@
   "startZone": "Halas",
   "questGiver": "Lysbith McNaff",
   "minLevel": 2,
-  "classes": "?",
+  "classes": "Any",
   "items": [
    {
     "name": "Bag of Ice Necklaces",
-    "qty": 1
-   },
-   {
-    "name": "Empty Bag",
     "qty": 1
    },
    {
@@ -17146,7 +17172,8 @@
    "Water Flask"
   ],
   "categories": [
-   "Halas"
+   "Halas",
+   "Warrior Quests"
   ],
   "relatedZones": [
    "Everfrost Peaks"
@@ -17728,7 +17755,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "Kunark",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -17762,7 +17789,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "Kunark",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -17788,7 +17815,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "Kunark",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -17826,7 +17853,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "Kunark",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -17851,10 +17878,6 @@
    },
    {
     "name": "Barbarian Skull",
-    "qty": 1
-   },
-   {
-    "name": "Box of Remains",
     "qty": 1
    }
   ],
@@ -18275,15 +18298,7 @@
   "classes": "?",
   "items": [
    {
-    "name": "A tattered note",
-    "qty": 1
-   },
-   {
     "name": "Karana Clover Shipment",
-    "qty": 1
-   },
-   {
-    "name": "Polar Bear Cloak",
     "qty": 1
    }
   ],
@@ -18294,7 +18309,7 @@
    "Halas"
   ],
   "relatedZones": [
-   "Western Plains of Karana"
+   "Western Karana"
   ],
   "era": "Classic",
   "repeatable": true
@@ -19217,19 +19232,11 @@
   "classes": "Warrior",
   "items": [
    {
-    "name": "Langseax",
-    "qty": 1
-   },
-   {
-    "name": "Langseax of the Wolves",
+    "name": "Barbarian Head",
     "qty": 1
    },
    {
     "name": "Lion Delight",
-    "qty": 1
-   },
-   {
-    "name": "Sweaty Shirt",
     "qty": 1
    }
   ],
@@ -19242,7 +19249,7 @@
    "Warrior Quests"
   ],
   "relatedZones": [
-   "Western Plains of Karana"
+   "Western Karana"
   ],
   "era": "",
   "repeatable": false
@@ -19498,12 +19505,7 @@
   "questGiver": "Teria O`Danos",
   "minLevel": 1,
   "classes": "?",
-  "items": [
-   {
-    "name": "Lion Meat Shipment",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Lion Delight"
   ],
@@ -19879,8 +19881,21 @@
   "startZone": "Halas",
   "questGiver": "Dargon McPherson",
   "minLevel": 1,
-  "classes": "?",
-  "items": [],
+  "classes": "All",
+  "items": [
+   {
+    "name": "Full Bottle of Elixir",
+    "qty": 1
+   },
+   {
+    "name": "One Half of Elixir",
+    "qty": 1
+   },
+   {
+    "name": "One Quarter of Elixir",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Copper Band",
    "Lapis Lazuli",
@@ -19891,7 +19906,8 @@
    "Turquoise"
   ],
   "categories": [
-   "Halas"
+   "Halas",
+   "Warrior Quests"
   ],
   "relatedZones": [
    "Everfrost Peaks"
@@ -21333,6 +21349,36 @@
   "rewards": [],
   "categories": [],
   "relatedZones": [],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
+  "name": "Militia Seals",
+  "url": "https://eqlwiki.com/Militia_Seals",
+  "startZone": "",
+  "questGiver": "Guard Jup",
+  "minLevel": 35,
+  "classes": "All",
+  "items": [
+   {
+    "name": "Militia Crate",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Twisted Silver Torque"
+  ],
+  "categories": [
+   "All Classes Quests",
+   "Broken Skull Rock",
+   "Dulak's Harbor",
+   "Gulf of Gunthak",
+   "West Freeport"
+  ],
+  "relatedZones": [
+   "Dulak's Harbor",
+   "Gulf of Gunthak"
+  ],
   "era": "Classic",
   "repeatable": false
  },
@@ -22817,7 +22863,7 @@
   "name": "More Help for Innoruuk",
   "url": "https://eqlwiki.com/More_Help_for_Innoruuk",
   "startZone": "Grobb",
-  "questGiver": "Kaglari",
+  "questGiver": "Bregna",
   "minLevel": 1,
   "classes": "All",
   "items": [
@@ -30023,6 +30069,10 @@
   "classes": "",
   "items": [
    {
+    "name": "Bixie Stinger (Bixie God's Stinger)",
+    "qty": 1
+   },
+   {
     "name": "Bloodsky Sapphire",
     "qty": 1
    },
@@ -31996,10 +32046,6 @@
   "minLevel": 24,
   "classes": "Necromancer",
   "items": [
-   {
-    "name": "A Werebat Wing",
-    "qty": 1
-   },
    {
     "name": "Eye of Shadow",
     "qty": 1
@@ -37787,12 +37833,7 @@
   "questGiver": "Eolorn J`Axx",
   "minLevel": 1,
   "classes": "?",
-  "items": [
-   {
-    "name": "A Locked Chest",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Rat Pelt Cape"
   ],
@@ -37818,6 +37859,7 @@
   ],
   "categories": [
    "Halas",
+   "Rogue Quests",
    "Warrior Quests"
   ],
   "relatedZones": [
@@ -38078,6 +38120,10 @@
    },
    {
     "name": "Fire Beetle Eye",
+    "qty": 1
+   },
+   {
+    "name": "Greater Lightstone",
     "qty": 1
    },
    {
@@ -38450,11 +38496,27 @@
   "classes": "Paladin, Shadowknight",
   "items": [
    {
+    "name": "Bone Chips",
+    "qty": 4
+   },
+   {
+    "name": "Fire Beetle Eye",
+    "qty": 4
+   },
+   {
     "name": "Pestilence Scythe",
     "qty": 1
    },
    {
     "name": "SoulFire",
+    "qty": 1
+   },
+   {
+    "name": "Spiderling Silk",
+    "qty": 4
+   },
+   {
+    "name": "Torrid Corruptor",
     "qty": 1
    }
   ],
@@ -38826,6 +38888,8 @@
   "classes": "All",
   "items": [],
   "rewards": [
+   "Desecrated Kejaar Totem",
+   "Heretic Insurrection Orders",
    "Talisman of Kejaar Kerrath"
   ],
   "categories": [

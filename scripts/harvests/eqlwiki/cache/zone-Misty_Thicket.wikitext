@@ -1,12 +1,13 @@
-<p> Misty Thicket is the major newbie zone for Rivervale (with a smaller one existing in Kithicor). It is also an area that the halflings have staked out to protect their city from the dangers of the Runnyeye goblins to their west. The ancient walls of the halflings stretch across this zone, cutting it into two distinct halves.
+[[File:misty thicket header.webp|right]]Misty Thicket is the major newbie zone for Rivervale (with a smaller one existing in Kithicor). It is also an area that the halflings have staked out to protect their city from the dangers of the Runnyeye goblins to their west. The ancient walls of the halflings stretch across this zone, cutting it into two distinct halves.
 
-</p> Filbus Furyfoot, the Lord of the Misty Thicket, Warlord, and Guardian of Rivervale, is a fairly common sight, as he devotes a great portion of his efforts to ensuring the safety of his lands and outfitting young hobbit adventurers.
+Filbus Furyfoot, the Lord of the Misty Thicket, Warlord, and Guardian of Rivervale, is a fairly common sight, as he devotes a great portion of his efforts to ensuring the safety of his lands and outfitting young hobbit adventurers.
 
 {|
-|rowspan="6" valign="top" width="160"| <div style='float:left;'>__TOC__</div>
+|rowspan="6" valign="top" width="200"| <div style='float:left;'>__TOC__</div>
 |valign="top"|
+|-
 {| class="zoneTopTable"
-! ''' Level of Monsters: '''
+! width="150"| ''' Level of Monsters: '''
 |1-12
 |-
 ! ''' Types of Monsters: '''

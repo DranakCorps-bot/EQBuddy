@@ -26,6 +26,8 @@
 
 == Walkthrough ==
 
+''Can be done with apprehensive faction.''
+
 Talk to [[Hekzin G`Zule]] in the rogue guild. He will say he is working on some new type of armor.
 
 You say, 'Hail, Hekzin G`Zule' 
@@ -46,22 +48,10 @@ You receive an Empty Bag in which you need to combine three [[Snake Scales]] and
 * Your faction standing with [[Wolves of the North]] has been adjusted by -2.
 * Your faction standing with [[Guardians of the Vale]] has been adjusted by -1.
 * Your faction standing with [[Carson McCabe]] has been adjusted by -2.
-{{exp}}
 </div> 
+{{YouGainExperience}}
 
-You receive between 3-12 silver from Hekzin G`Zule. 
-
-You also receive the Dark Shield of Ebon.
-
-== Experience Gain ==
-
-As a level 9 Dark Elf Shadow Knight, this quest gives about 1/3 gold bubble in experience.
-
-(green 99, 9/22/2020) As a newly level 8 Dark Elf Shadow Knight, it took me 17 turn ins to reach level 9.
-
-(green 99, 9/15/2021) For a level 11 Dark Elf Shadow Knight, every 4 turn in was about 1 yellow bubble.
-
-(green 99, 12/28/2022) For a level 6-7 Dark Elf Cleric, it gives 11% (rarely 12%) of xp bar per turn, then 6-7% at level 10 and 5% at level 11.
+'''You receive the [[Dark Shield of Ebon]] and 3-12 silver.]]
 
 [[Category:Quests]]
 [[Category:Neriak Third Gate]]

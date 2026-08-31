@@ -1,4 +1,4 @@
-[[File:npc_cappi_mctarnigal.png|frame|Cappi McTarnigal]]
+[[File:npc_cappi_mctarnigal.png|thumb|Cappi McTarnigal]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Halas]]
@@ -47,7 +47,7 @@ You say, 'I am a member of the white rose.' ''(If your faction is too low, he re
 
 Ysanna MacGibbon says 'The mammoth calf hides are used to shield our beasts of burden from the icy wind. You are probably now asking what shields us Northmen from that same icy wind eh? Well, along with many other furs and leathers, we have come to find that [gnoll fur] of all things is a good insulator against the cold.  Look at their tiny bodies and it's obvious their fur does something good.
 
-'''Give Cappi McTarnigal 4 [[Mammoth Calf Hide]]s.'''
+Give Cappi McTarnigal 4 [[Mammoth Calf Hide|Mammoth Calf Hides]].
 
 : Cappi McTarnigal says 'You returned? We believed the gnoll pups got you.  The caravan has already left, and these do me little good now. But, as I said before, one must remain respectable. Here is what I promised.
 
@@ -56,7 +56,9 @@ Ysanna MacGibbon says 'The mammoth calf hides are used to shield our beasts of b
 {{YouGainExperience}}
 </div>
 
-Although he prompts the phrase "[gnoll fur]", he does not respond to it.
+'''You receive a piece of Black Wolf Armor as seen above.'''
+
+Cappi does not respond to the phrase "gnoll fur". Say "gnoll fur" to [[Ysanna MacGibbon]] nearby for the [[Gnoll Fur]] quest.
 
 [[Category:Quests]]
 [[Category:Halas]]

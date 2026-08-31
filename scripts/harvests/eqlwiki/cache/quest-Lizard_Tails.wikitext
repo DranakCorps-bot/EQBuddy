@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_Horgus.png|frame|Horgus]]
+[[File:npc_Horgus.png|thumb|Horgus]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

@@ -131,7 +131,6 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |(515, -132)
 |}
 <div id="spells_level_1">
-
 ==Level 1==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -139,24 +138,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chant of Battle
-|description=Party: Increase STR, DEX, AC
-|era={{Classic Short}}
+|kind=Armor Class
+|targ=Group
+|mana=0
+|effects=1: Increase AC by 1 (L1) to 4 (L50)<br>2: Increase Strength by 5 (L1) to 17 (L50)<br>3: Increase DEX by 5 (L1) to 17 (L50)
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+4 AC<br>+17 STR<br>+17 DEX
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -169,24 +166,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chords of Dissonance
-|description=PBAoE: DoT
-|era={{Classic Short}}
+|kind=Magic DoT
+|targ=PB AE
+|mana=0
+|effects=1: Decrease Hitpoints by 2 (L2) to 14 (L50) per tick
+|duration=12 Sec
 |school=Stringed Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=PB AE
-|duration=12 Sec
-|max=-14 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -199,30 +194,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Jaxan's Jig o' Vigor
-|description=Fills your group with an invigorating rhythm that increases endurance regeneration.
-|era={{Classic Short}}
+|kind=Endurance
+|targ=Group
+|mana=0
+|effects=1: Increase Endurance by 1 (L3) to 7 (L48)
+|duration=18 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Regen
-|targ=Group
-|duration=18 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_5">
-
 ==Level 5==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -230,30 +222,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Selo's Accelerando
-|description=Party: Increase Movement Speed
-|era={{Classic Short}}
+|kind=Movement
+|targ=Group
+|mana=0
+|effects=1: Increase Movement Speed by 20% (L5) to 65% (L50)
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Autogranted<br>Vendor<br>[[Winds of Karana]]
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=Run Speed
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_6">
-
 ==Level 6==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -261,24 +250,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Hymn of Restoration
-|description=Party: Increase HP Regeneration
-|era={{Classic Short}}
+|kind=Health
+|targ=Group
+|mana=0
+|effects=1: Increase Hitpoints by 2 (L6) to 9 (L50) per tick
+|duration=12 Sec
 |school=Stringed Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Regen
-|targ=Group
-|duration=12 Sec
-|max=1 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -291,24 +278,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Jonthan's Whistling Warsong
-|description=Self: Increase STR, AC, Attack Speed
-|era={{Classic Short}}
+|kind=Haste
+|targ=Self
+|mana=0
+|effects=1: Increase Attack Speed by 16% (L7) to 25% (L40)<br>2: Increase AC by 2 (L7) to 7 (L50)<br>3: Increase Strength by 8 (L7) to 30 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Utility
-|targ=Self
-|duration=12 Sec
-|max=+25% Atkspd<br>+7 AC<br>+30 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -321,24 +306,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Kelin's Lugubrious Lament
-|description=Target: Lull
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=0
+|effects=1: Reduce Aggro Radius (up to L60)<br>2: Assist Radius (up to L60)<br>3: Add Hate (Aggro)
+|duration=30 Sec
 |school=Stringed Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=30 Sec
-|max=Calm (max L60)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -351,36 +334,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental Rhythms
-|description=Party: Increase AC, MR, FR, CR
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Group
+|mana=0
+|effects=1: Increase Magic Resist by 9 (L9) to 30 (L50)<br>2: Increase Cold Resist by 9 (L9) to 30 (L50)<br>3: Increase Fire Resist by 9 (L9) to 30 (L50)<br>4: Increase AC by 1 (L9) to 4 (L50)
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+30 Magic Resist<br>+30 Cold Resist<br>+30 Fire Resist<br>+4 AC
-}}
-{{RadSpellRow2
-|name=Magical Monologue
-|description=A simple tune that adds a magical quality to your group's weapons, allowing them to harm creatures that would otherwise be invulnerable.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Magical Monologue
+|kind=Utility Beneficial
+|targ=Self
+|mana=0
+|effects=1: Attacks Count as Magic
+|duration=18 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Self
-|duration=18 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -393,24 +373,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Anthem de Arms
-|description=Party: Increase STR, Attack Speed
-|era={{Classic Short}}
+|kind=Haste
+|targ=Group
+|mana=0
+|effects=1: Increase Attack Speed by 10%<br>2: Increase Strength by 10 (L10) to 30 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+10% Atkspd<br>+30 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -423,24 +401,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cinda's Charismatic Carillon
-|description=Target: Improve Faction
-|era={{Classic Short}}
+|kind=Alliance
+|targ=Single
+|mana=0
+|effects=1: Increase Faction by 120 (L11) to 510 (L50)
+|duration=12 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Single
-|duration=12 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -453,24 +429,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Brusco's Boastful Bellow
-|description=Target: DD and Interrupt Casting
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 7 (L12) to 26 (L50)
+|duration=Instant
 |school=Singing
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=7-26 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -483,24 +457,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Purifying Rhythms
-|description=Party: Increase AC, MR, PR, DR
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Group
+|mana=0
+|effects=1: Increase Magic Resist by 11 (L13) to 30 (L50)<br>2: Increase Poison Resist by 11 (L13) to 30 (L50)<br>3: Increase Disease Resist by 11 (L13) to 30 (L50)<br>4: Increase AC by 2 (L13) to 4 (L50)
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+30 Magic Resist<br>+30 Poison Resist<br>+30 Disease Resist<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -513,36 +485,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Kelin's Lucid Lullaby
-|description=Target: Mesmerize (up to level 30)
-|era={{Classic Short}}
+|kind=Enthrall
+|targ=Single
+|mana=0
+|effects=1: Mesmerize (up to L30)
+|duration=18 Sec
 |school=Stringed Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Mez (max L30)
-}}
-{{RadSpellRow2
-|name=Song of Sustenance
-|description=Food/Water
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Song of Sustenance
+|kind=Utility Beneficial
+|targ=Group
+|mana=0
+|effects=1: Create Food/Water
+|duration=1 Min 30 Sec
 |school=Stringed Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=1 Min 30 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -555,24 +524,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Tarew's Aquatic Ayre
-|description=Party: Enduring Breath
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Group
+|mana=0
+|effects=1: Enduring Breath (Water Breathing)
+|duration=24 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=24 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -585,24 +552,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Guardian Rhythms
-|description=Party: Increase AC, MR
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Group
+|mana=0
+|effects=1: Increase AC by 3 (L17) to 7 (L50)<br>2: Increase Magic Resist by 13 (L17) to 30 (L50)
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+7 AC<br>+30 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -615,24 +580,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Denon's Disruptive Discord
-|description=PBAoE: DoT, Decrease AC
-|era={{Classic Short}}
+|kind=Magic DoT
+|targ=PB AE
+|mana=0
+|effects=1: Decrease Hitpoints by 8 (L18) to 16 (L50) per tick<br>2: Decrease AC by 4 (L18) to 12 (L50)
+|duration=12 Sec
 |school=Brass Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=PB AE
-|duration=12 Sec
-|max=-16 HP/tick<br>-12 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -645,24 +608,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shauri's Sonorous Clouding
-|description=Party: Invisibility, See Invisible
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Group
+|mana=0
+|effects=1: Invisibility<br>2: See Invisible
+|duration=18 Sec
 |school=Wind Instruments
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=18 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -675,36 +636,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cassindra's Chant of Clarity
-|description=Party: Increase Mana Regeneration
-|era={{Classic Short}}
+|kind=Mana
+|targ=Group
+|mana=0
+|effects=1: Increase Mana by 2 per tick
+|duration=Instant
 |school=Singing
 |location=Autogranted<br>East Commons
-|mana=0
-|kind=Regen
-|targ=Group
-|duration=12 Sec
-|max=+2 Mana
-}}
-{{RadSpellRow2
-|name=Largo's Melodic Binding
-|description=PBAoE: Decrease AC, Attack Speed
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Largo's Melodic Binding
+|kind=Slow
+|targ=PB AE
+|mana=0
+|effects=1: Decrease Attack Speed by 15% (L20) to 30% (L50)<br>2: Decrease AC by 3 (L20) to 7 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Autogranted<br>Vendor
-|mana=0
-|kind=Detrimental
-|targ=PB AE
-|duration=12 Sec
-|max=-35% Atkspd<br>-7 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -717,24 +675,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Melanie's Mellifluous Motion
-|description=Party: Short Range Teleport
-|era={{Classic Short}}
+|kind=Shadowstep
+|targ=Group
+|mana=0
+|effects=1: Shadow Step
+|duration=Instant
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -747,24 +703,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alenia's Disenchanting Melody
-|description=Party: Remove Buffs (Dispel)
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Group
+|mana=0
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Stringed Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -777,24 +731,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Selo's Consonant Chain
-|description=Target: Decrease Movement Speed, Attack Speed
-|era={{Classic Short}}
+|kind=Slow
+|targ=Single
+|mana=0
+|effects=1: Decrease Movement Speed by 53% (L23) to 80% (L50)<br>2: Decrease Attack Speed by 16% (L23) to 30% (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=12 Sec
-|max=Snare<br>-40% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -807,24 +759,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lyssa's Veracious Concord
-|description=Party: See Invisibility, Ultravision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Group
+|mana=0
+|effects=1: See Invisible<br>2: Ultravision
+|duration=12 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -837,24 +787,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Psalm of Warmth
-|description=Party: Increase CR, Damage Shield
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Group
+|mana=0
+|effects=1: Increase Damage Shield by 5 (L25) to 9 (L50)<br>2: Increase Cold Resist by 35 (L25) to 60 (L50)<br>3: Infravision<br>4: Increase AC by 2 (L25) to 4 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor, Erudin
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+60 Cold Resist<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -867,24 +815,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Angstlich's Appalling Screech
-|description=PBAoE: Fear
-|era={{Classic Short}}
+|kind=Fear
+|targ=PB AE
+|mana=0
+|effects=1: Fear (up to L52)
+|duration=12 Sec
 |school=Brass Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=PB AE
-|duration=12 Sec
-|max=Fear (max L52)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -897,24 +843,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Solon's Song of the Sirens
-|description=Target: Charm NPC, Decrease MR
-|era={{Classic Short}}
+|kind=Charm
+|targ=Single
+|mana=0
+|effects=1: Charm (up to L37)<br>2: Decrease Magic Resist by 4 (L27) to 7 (L50)
+|duration=18 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Charm (max L37)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -927,24 +871,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Crission's Pixie Strike
-|description=Target: Mesmerize, Decrease MR (up to level 45)
-|era={{Classic Short}}
+|kind=Enthrall
+|targ=Single
+|mana=0
+|effects=1: Mesmerize (up to L45)<br>2: Decrease Magic Resist by 5 (L28) to 9 (L50)
+|duration=18 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Mez (max L45)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -957,24 +899,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Psalm of Vitality
-|description=Party: Increase AC, DR
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Group
+|mana=0
+|effects=1: Increase Damage Shield by 5 (L29) to 9 (L50)<br>2: Increase Disease Resist by 39 (L29) to 60 (L50)<br>3: Increase AC by 3 (L29) to 4 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+60 Disease Resist<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -987,36 +927,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Amplification
-|description=Increase Singing Skill
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=0
+|effects=1: Increase Amplify Song Effects by 7 (L30) to 10 (L50)<br>2: Suppress · mode 4 · Amplification (#118)
+|duration=30 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Self
-|duration=30 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Fufil's Curtailing Chant
-|description=Target: DoT, Decrease MR
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Fufil's Curtailing Chant
+|kind=Magic DoT
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 11 (L30) to 17 (L50) per tick<br>2: 100% chance · Chant of Magic
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=Single
-|duration=12 Sec
-|max=1-40 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1029,24 +966,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Agilmente's Aria of Eagles
-|description=Party: Levitate
-|era={{Classic Short}}
+|kind=Levitate
+|targ=Group
+|mana=0
+|effects=1: Levitate
+|duration=18 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=18 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1059,24 +994,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cassindra's Chorus of Clarity
-|description=Party: Increase Mana Restoration
-|era={{Classic Short}}
+|kind=Mana
+|targ=Group
+|mana=0
+|effects=1: Increase Mana by 5 (L32) to 7 (L48) per tick
+|duration=Instant
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Regen
-|targ=Group
-|duration=12 Sec
-|max=+1 Mana
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1089,24 +1022,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Psalm of Cooling
-|description=Party: Increase FR, Damage Shield, Ultravision
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Group
+|mana=0
+|effects=1: Increase Damage Shield by 6 (L33) to 9 (L50)<br>2: Increase Fire Resist by 43 (L33) to 60 (L50)<br>3: Ultravision<br>4: Increase AC by 3 (L33) to 4 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+60 Fire Resist<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1119,36 +1050,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cantata of Soothing
-|description=A light cantata that regenerates the health, mana, and endurance of your entire group.
-|era={{Classic Short}}
+|kind=Health/Mana
+|targ=Group
+|mana=0
+|effects=1: Increase Hitpoints by 4 per tick<br>2: Increase Mana by 5 per tick<br>3: Increase Endurance by 2
+|duration=12 Sec
 |school=Stringed Instruments
 |location=
-|mana=0
-|kind=Regen
-|targ=Group
-|duration=12 Sec
-|max=+4 HP/tick<br>+5 Mana
-}}
-{{RadSpellRow2
-|name=Lyssa's Solidarity of Vision
-|description=Target: Bind Sight
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lyssa's Solidarity of Vision
+|kind=Vision
+|targ=Single
+|mana=0
+|effects=1: Bind Sight
+|duration=24 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Single
-|duration=24 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1161,24 +1089,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Denon's Dissension
-|description=PBAoE: Decrease Mana
-|era={{Classic Short}}
+|kind=Mana Drain
+|targ=PB AE
+|mana=0
+|effects=1: Decrease Mana by 22 (L35) to 30 (L50)
+|duration=Instant
 |school=Brass Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=PB AE
-|duration=Instant
-|max=-30 Mana
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1191,24 +1117,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Vilia's Verses of Celerity
-|description=Party: Increase AC, AGI, Attack Speed
-|era={{Classic Short}}
+|kind=Haste
+|targ=Group
+|mana=0
+|effects=1: Increase Attack Speed by 20%<br>2: Increase AGI by 23 (L36) to 30 (L50)<br>3: Increase AC by 4 (L36) to 6 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+20% Atkspd<br>+30 AGI<br>+6 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1221,24 +1145,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Psalm of Purity
-|description=Party: Increase AC, PR
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Group
+|mana=0
+|effects=1: Increase Damage Shield by 7 (L37) to 9 (L50)<br>2: Increase Poison Resist by 47 (L37) to 60 (L50)<br>3: Increase AC by 3 (L37) to 4 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+60 Poison Resist<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1251,24 +1173,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Tuyen's Chant of Flame
-|description=Target: DoT, Decrease FR
-|era={{Classic Short}}
+|kind=Fire DoT
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 20 (L38) to 26 (L50) per tick<br>2: 100% chance · Chant of Flame
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=Single
-|duration=12 Sec
-|max=-26 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1281,36 +1201,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Katta's Song of Sword Dancing
-|description=Add Proc: Blade Dance, Increase DEX
-|era={{Classic Short}}
+|kind=Combat Innates
+|targ=Group
+|mana=0
+|effects=1: Procs Blade Dance<br>2: Increase DEX by 40
+|duration=18 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=18 Sec
-|max=Procs: Blade Dance
-}}
-{{RadSpellRow2
-|name=Solon's Bewitching Bravura
-|description=A bewitching melody that charms the target, allowing you to command it.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Solon's Bewitching Bravura
+|kind=Charm
+|targ=Single
+|mana=60
+|effects=1: Charm (up to L51)<br>2: Decrease Magic Resist by 5 (L39) to 7 (L50)
+|duration=1 Min
 |school=Wind Instruments
 |location=
-|mana=60
-|kind=Detrimental
-|targ=Single
-|duration=1 Min
-|max=Charm (max L51)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1323,36 +1240,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sionachie's Dreams
-|description=Target: Mesmerize
-|era={{Classic Short}}
+|kind=Enthrall
+|targ=Single
+|mana=0
+|effects=1: Mesmerize (up to L53)<br>2: Decrease Magic Resist by 7 (L40) to 9 (L50)
+|duration=18 Sec
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Mez (max L53)
-}}
-{{RadSpellRow2
-|name=Syvelian's Anti-Magic Aria
-|description=Target: Remove Buffs (Dispel)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Syvelian's Anti-Magic Aria
+|kind=Dispel
+|targ=Single
+|mana=0
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1365,24 +1279,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Psalm of Mystic Shielding
-|description=Party: Increase HP Regeneration, Absorb Magic Damage, AC, MR
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Group
+|mana=0
+|effects=1: Increase Magic Resist by 51 (L41) to 60 (L50)<br>2: Increase SS by 15<br>3: Increase Hitpoints by 5 per tick<br>4: Increase AC by 3 (L41) to 4 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+60 Magic Resist<br>+5 HP/tick<br>+4 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1395,36 +1307,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=McVaxius' Berserker Crescendo
-|description=Party: Increase STR, AC, Attack Speed
-|era={{Classic Short}}
+|kind=Haste
+|targ=Group
+|mana=0
+|effects=1: Increase Attack Speed by 18% (L42) to 20% (L50)<br>2: Increase Strength by 15 (L42) to 17 (L50)<br>3: Increase AC by 5 (L42) to 6 (L50)
+|duration=12 Sec
 |school=Brass Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+20% Atkspd<br>+6 AC
-}}
-{{RadSpellRow2
-|name=Tuyen's Chant of Disease
-|description=Target: Disease Based Dot
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tuyen's Chant of Disease
+|kind=Disease DoT
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 22 (L42) to 26 (L50) per tick<br>2: 100% chance · Chant of Plague
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=Single
-|duration=12 Sec
-|max=-26 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1437,24 +1346,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Denon's Desperate Dirge
-|description=Target: AoE DD
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Targeted AE
+|mana=800
+|effects=1: Decrease Hitpoints by 315
+|duration=Instant
 |school=Singing
 |location=Vendor
-|mana=800
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=315-635 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1467,24 +1374,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cassindra's Elegy
-|description=Party: Increase WIS, INT
-|era={{Classic Short}}
+|kind=Wisdom/Intelligence
+|targ=Group
+|mana=0
+|effects=1: Increase INT by 12 (L44) to 13 (L50)<br>2: Increase WIS by 12 (L44) to 13 (L50)
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Buff
-|targ=Group
-|duration=12 Sec
-|max=+1 INT
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1497,48 +1402,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Aria of Asceticism
-|description=Decrease Poison and Disease counters
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=0
+|effects=1: Cure Poison: 7 counters<br>2: Cure Disease: 7 counters
+|duration=Instant
 |school=Wind Instruments
 |location=Vendor
-|mana=0
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 2 Poison
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Jonthan's Provocation
-|description=Self: Increase STR, ATK, Attack Speed
-|era={{Classic Short}}
-|school=Singing
-|location=Vendor
-|mana=0
-|kind=Utility
+|kind=Haste
 |targ=Self
+|mana=0
+|effects=1: Increase Attack Speed by 48% (L45) to 50% (L47)<br>2: Increase Strength by 13 (L45) to 14 (L50)<br>3: Increase ATK by 13 (L45) to 14 (L50)
 |duration=12 Sec
-|max=+50% Atkspd<br>+14 STR<br>+14 ATK
-}}
-{{RadSpellRow2
-|name=Rizlona's Embers
-|description=Group: Increase party spell damage
-|era={{Classic Short}}
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rizlona's Embers
+|kind=Spell Focus
 |targ=Group
+|mana=0
+|effects=1: Focus — Spell Dmg: +1% to +15%<br>2: Only damage & healing spells<br>3: Instant spells only<br>4: Detrimental spells only<br>5: Not Targeted AE spells<br>6: Not PB AE spells<br>7: Not Uber Giants spells<br>8: Not Uber Dragons spells<br>9: Only spells up to L52 (fades 5%/level above)<br>10: Excludes weapon procs
 |duration=12 Sec
-|max=
+|school=Singing
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1551,24 +1452,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Tuyen's Chant of Frost
-|description=Target: DoT, Decrease CR
-|era={{Classic Short}}
+|kind=Cold DoT
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 24 (L46) to 26 (L50) per tick<br>2: 100% chance · Chant of Frost
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=Single
-|duration=12 Sec
-|max=-26 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1581,24 +1480,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Niv's Melody of Preservation
-|description=Party: Increase STR, HP Regeneration, Absorb Magic Damage
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Group
+|mana=0
+|effects=1: Increase Strength by 10<br>2: Increase SS by 10<br>3: Increase Hitpoints by 6 (L47) to 7 (L50) per tick
+|duration=12 Sec
 |school=Stringed Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+10 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1611,24 +1508,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Selo's Chords of Cessation
-|description=PBAoE: DoT, Decrease Attack Speed
-|era={{Classic Short}}
+|kind=Slow
+|targ=PB AE
+|mana=0
+|effects=1: Decrease Hitpoints by 26 (L48) to 27 (L50) per tick<br>2: Decrease Attack Speed by 17%
+|duration=12 Sec
 |school=Stringed Instruments
 |location=Vendor
-|mana=0
-|kind=Detrimental
-|targ=PB AE
-|duration=12 Sec
-|max=-27 HP/tick<br>-25% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1641,36 +1536,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Selo's Accelerating Chorus
-|description=The rapid pace of this song fills your feet with speed, increasing the movement rate of your group for 2 min 30s.
-|era={{Classic Short}}
+|kind=Movement
+|targ=Group
+|mana=0
+|effects=1: Increase Movement Speed by 64% (L49) to 65% (L50)
+|duration=2 Min 30 Sec
 |school=Percussion Instruments
 |location=
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=2 Min 30 Sec
-|max=Run Speed
-}}
-{{RadSpellRow2
-|name=Shield of Songs
-|description=This song wraps an aura of protection around your group that absorbs damage .
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shield of Songs
+|kind=Rune
+|targ=Group
+|mana=0
+|effects=1: Increase Stoneskin by 20<br>2: Increase SS by 20
+|duration=12 Sec
 |school=Stringed Instruments
 |location=
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1683,48 +1575,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Melody of Ervaj
-|description=Party: Increase AC, Attack Speed
-|era={{Classic Short}}
+|kind=Haste
+|targ=Group
+|mana=0
+|effects=1: Increase Attack Speed by 5%
+|duration=12 Sec
 |school=Brass Instruments
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Tuyen's Chant of Poison
-|description=Target: Poison Dot
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tuyen's Chant of Poison
+|kind=Poison DoT
+|targ=Single
+|mana=0
+|effects=1: Decrease Hitpoints by 26 per tick<br>2: 100% chance · Chant of Venom
+|duration=12 Sec
 |school=Percussion Instruments
 |location=Vendor
-|mana=0
-|kind=Damage Over Time
-|targ=Single
-|duration=12 Sec
-|max=-26 HP/tick
-}}
-{{RadSpellRow2
-|name=Verses of Victory
-|description=Party: Increase STR, AGI, Attack Speed
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Verses of Victory
+|kind=Haste
+|targ=Group
+|mana=0
+|effects=1: Increase Attack Speed by 30%<br>2: Increase AGI by 30<br>3: Increase AC by 12<br>4: Increase Strength by 30
+|duration=12 Sec
 |school=Singing
 |location=Vendor
-|mana=0
-|kind=Utility
-|targ=Group
-|duration=12 Sec
-|max=+30% Atkspd<br>+30 AGI<br>+12 AC<br>+30 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>

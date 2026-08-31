@@ -54,9 +54,10 @@ You say, 'I will hunt the diseased shark.'
 : Weligon Steelherder says 'Very good, my dear young follower of Prexus. You will learn that swimming is a strong skill among the Deepwater Knights. Keep this up and you may wield a Deepwater harpoon soon enough. For now, you shall wear this barnacle breastplate. It is strong enough to aid a young knight in his quest for perfection.'
 
 <div class="facblock">
-* Your faction standing with [[Deepwater Knights]] got better.
-* Your faction standing with [[High Council of Erudin]] got better.
-* Your faction standing with [[Heretics]] got worse.
+* Your faction standing with [[Deepwater Knights]] got better (+20).
+* Your faction standing with [[High Council of Erudin]] got better (+5).
+* Your faction standing with [[Heretics]] got worse (-3).
+* Your faction standing with Kerra Isle got worse (-2).
 </div>
 
 {{YouGainExperience}}

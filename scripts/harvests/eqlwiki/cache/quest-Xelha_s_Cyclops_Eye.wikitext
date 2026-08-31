@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_xelha_nevagon.png|frame|Xelha Nevagon]]
+[[File:npc_xelha_nevagon.png|thumb|Xelha Nevagon]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|East Freeport]]
@@ -37,6 +37,7 @@
 
 Your Location is -1409.67, 547.72, -49.54
 
+You must have kindly faction to do this quest.
 
 '''After bringing [[Xelha Nevagon]] four [[spiderling silk]]s,'''
 

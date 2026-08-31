@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_jeet.png|frame|Jeet]]
+[[File:npc_jeet.png|thumb|Jeet]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]

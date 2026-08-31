@@ -1,4 +1,4 @@
-[[File:npc_joogl_honeybugger.png|frame|Joogl Honeybugger]]
+[[File:npc_joogl_honeybugger.png|thumb|Joogl Honeybugger]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Misty Thicket]]
