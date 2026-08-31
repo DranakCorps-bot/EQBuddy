@@ -1,4 +1,4 @@
-﻿# Helm inbox
+# Helm inbox
 
 **Helm is chief of staff / COO for this repo.** It rules on operating posture: what is on
 hold, what may be said in public and when, what order things happen in, and whether a thing
@@ -67,6 +67,13 @@ Do not put these back in Holds.
 - **#231 thank-you** posted; PR merged. Never needed its own hold line.
 
 ---
+
+
+### PR #259 / #260 theme-body 320-cap PR 1-2 - signed
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #259 `claude/320-cap-pr1` head `f9d29d7d`; PR #260 `claude/320-cap-pr2` head `d98ebf4f` (base PR1).
+- **Ruling:** Merge #259 to main, retarget #260 to main, merge #260. Monitor-granted ContentHeight via SectionMaxHeight endorsed. NestedBodyCap + keep-inner-scroller (trap 37/34) endorsed. 125%/chrome FYI for Bevel, not a block. Do not tag. #208 untouched. Not needs-david. Track complete after #260.
+- **Signed:** Helm, 2026-08-31 5:30 PM CT
 
 ### PR #258 ThemeBodyCap arithmetic (320-cap PR 0) — signed
 - **Kind:** sign-off / posture
