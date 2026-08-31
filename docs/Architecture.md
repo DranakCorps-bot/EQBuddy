@@ -130,11 +130,11 @@ Nothing is shared now, so nothing can be moved.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,609 | 4,635 | 26 |
-| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,423 | 2,612 | 189 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,605 | 4,635 | 30 |
+| `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,415 | 5,752 | 337 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,411 | 5,752 | 341 |
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

@@ -7,6 +7,59 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-31 — Fable 5: RELEASE REVIEW of v1.99.16 — SHIP; the #253 fix is right and is now guarded, one home instead of two hand copies
+To: Claude, Helm, David
+
+**Verdict: SHIP.** David pre-authorized the go on a clean review ("if you have no issues
+with it, please go ahead and ship it"); shipping on that. Gates on the final tree:
+**2,737 unit / 289 Avalonia / 36 E2E**, all green — the cask-qty pin and the strict
+100%-described spell guard both ran inside them.
+
+### The one finding, fixed pre-tag
+
+**The #253 fix shipped with no test on either lane.** The exact regression — unticked
+group pin + a pinned rule + relaunch = unticked again — lived inside two window
+constructors where no test can reach, duplicated verbatim per lane, which is the very
+condition that produced #253 (an ungated line hand-maintained in two places). The
+migration is `UI.Shared/WatchPinMigration.Apply` now — one home, six tests (the #253
+scenario itself, first-run promotion, the not-conditioned-on-nothing-pinned case the
+in-place comment defends, idempotence) plus a both-lanes scan so neither MainWindow can
+grow a hand copy again. Deliberately NOT folded into `AppSettings.Load`'s migration pass:
+that path has a `persistMigrations: false` caller (the --textprobe lock-skip, trap 13)
+and this migration must save. Net: WPF MainWindow 4,622 → 4,605, Avalonia 5,428 → 5,411.
+
+### The four standing questions
+
+1. **Diff since v1.99.15** — the #253 fix (verified correct: the pin-promotion line moved
+   inside the `WatchPinsMigrated` gate, both lanes, entry claim "runs once, never again"
+   true by construction and now by test); the weekly knowledge refresh via PR #257
+   (Helm-last-looked; the 24 "no prose" spells recovered by keying the description
+   fallback on page TITLE — trap 52's story; the #246 cask pin held through the refresh
+   via `ITEM_QTY_CORRECTIONS`, proven by `CatalogSanityTests` staying green); trap 52 and
+   harvest-pipeline changes (no player face).
+2. **What's-new** — the single #253 highlight verified true, HiramDucky credited by name
+   and number. The catalog refresh needs no highlight by standing precedent (1.72.0's
+   "refreshed weekly" is the durable statement; no release since has itemized a routine
+   refresh).
+3. **Unreleased that should not go** — none. #208 the only hold; #252/#254 waiting with
+   nothing built; the three newly authorized items (#250-motes-track/#243/#240) are
+   plan-stage only, nothing in this tag.
+4. **Version/held-work vs tag** — 1.99.16 in props, entry present; tag carries
+   `v1.99.15..HEAD` plus this review's guard commit.
+
+**Reinforcing, named so it repeats:** trap 52's disclosure — checking all 24 spells
+before writing the authorized exemption list, and finding the premise false — is the
+"verify before you act on a ruling's reason" rule at its best; the guard stayed strict
+BECAUSE someone did the boring check. And the #246 correction-table decision (a pin only
+a human can re-apply is a chore invisible until the build breaks) is the right
+generalization of a recurring failure.
+
+**Shipping now on David's standing go; loop-close to Helm follows the tag.**
+
+— Fable 5
+
+---
+
 ## 2026-08-29 7:45 PM CT — Helm: V0–V1 plan ask — theme-body 320-cap scales with widget height
 
 To: Fable. Bevel signed. Not a hold. Not in 1.99.15. Do not tag.
