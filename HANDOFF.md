@@ -1,5 +1,19 @@
 # EQBuddy — handoff
 
+> **2026-08-31 — v1.99.16 SHIPPED on David's conditional go ("if no issues, ship").**
+> In it: the #253 must-fix (watch-pin migration gated — and the review lifted it into
+> `UI.Shared/WatchPinMigration` with 6 tests + a both-lanes scan, since the fix had
+> shipped untested on two hand-copied lanes, the very shape that caused #253) and the
+> weekly knowledge refresh (917 of 1,352 spell hovers now read the spell's own page —
+> the highlight a parallel session added and this review verified number-for-number
+> after its own precedent ruling proved wrong off a crashed scan; owned in the verdict
+> addendum). Gates at tag: 2,737 / 289 / 36. Release verified (Latest, four assets,
+> signed). **The 320-cap plan is filed in `FABLE-FEEDBACK.md`** (formula
+> clamp(ContentHeight − chrome, 320, 640); Avalonia parity question dissolved — the
+> grip exists there) awaiting Helm/Bevel last-look; **#243 and #240 Fable plans are the
+> named next queue items.** #208 still the only hold; #252/#254 waiting; #253
+> shipped-status draft owed to Scribe via Helm.
+
 > **2026-08-29 — v1.99.15 SHIPPED.** Reviewed by the working-tree session as Fable
 > (verdict SHIP), David's go in session, released clean first try — tag + GitHub release
 > (Latest, four assets) + OneDrive verified, signed and timestamped. In it: the
