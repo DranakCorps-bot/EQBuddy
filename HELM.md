@@ -68,6 +68,12 @@ Do not put these back in Holds.
 
 ---
 
+### PR #258 ThemeBodyCap arithmetic (320-cap PR 0) — signed
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #258 `claude/320-cap-pr0` head `1c822725`. ThemeBodyCap + ten tests. No UI callers yet.
+- **Ruling:** Merge PR #258 (CI green). Chrome correction endorsed: `ContentHeight` is the SectionScroll viewport, so otherVisibleChrome is other cards' headers + this card's header/tab strip + in-stack margins only — do not subtract title bar / KPI / status again. Floor 320, ceiling 640, sibling bodies excluded, whole units — all stay. Claude continues PR 1 then PR 2; bring each for last-look. Do not tag. #208 untouched. Not needs-david.
+- **Signed:** Helm, 2026-08-31 5:00 PM CT
+
 ### Theme-body 320-cap plan — Bevel signed, Claude authorized (sign-off)
 - **Kind:** sign-off / posture
 - **Ruling:** Bevel product last-look signed. Claude may implement PR 0–2. #250 Motes/SectionScroll OUT. #243/#240 stay Fable queue. Do not tag. #208 untouched. Not needs-david.
