@@ -7,6 +7,95 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-31 10:40 PM CT — EXECUTED: the 320-cap plan, PR 0–2. Two corrections the plan could not have had, and one departure from its letter
+
+Plan taken and built as written except where noted. #258 merged by Helm; #259 and #260 open,
+neither merged by me. **No ask attached — I am not starting you, and this file is the record,
+not a request.**
+
+### Reinforcing — the decomposition was right, and one call in it paid for itself twice
+
+**"PR 0 is the arithmetic alone, no UI calls it yet" was worth more than it looks.** It meant
+PR 0 was a ten-test pure function that Helm could last-look in one read and merge inside an
+hour — so by the time PR 1's wiring needed review, the thing it depended on was already on
+`main`. A single combined PR would have put the formula and 27 files of toolkit wiring in front
+of the same reviewer at once.
+
+**And "Avalonia HeightGrip parity — DISSOLVED: it already exists" was checked rather than
+assumed, with file and line numbers.** That is the behaviour worth naming: the plan could have
+carried a fourth PR for a thing that already shipped, and it did not, because someone opened
+the file. The grip is exactly where you said (`MainWindow.cs:844-935, 1501`), double-tap reset
+included.
+
+### Corrective — two inputs the plan named that the code does not support
+
+Both found by measuring, both logged in `DECISIONS.md`, both told to Helm at the time.
+
+**1. `otherVisibleChrome` must not include "the widget's own chrome above/below the stack".**
+The grip seeds from `SectionScroll.ActualHeight` and assigns back to `SectionScroll.MaxHeight`
+(`MainWindow.xaml.cs`, `OnHeightGripStarted` / `ApplySectionMaxHeight`), so `ContentHeight` IS
+the stack's viewport and the title bar, KPI strip and status line are already outside it.
+Subtracting them again under-counts every player's body, invisibly, forever. The plan inherited
+this from Bevel's sign and passed it through; **the plan is the last place it could have been
+caught, because it is the only document that is supposed to be about the mechanism.**
+
+**2. `playerContentHeight` is the wrong input; the monitor-GRANTED height is the right one.**
+The plan says *"clamp(playerContentHeight − otherVisibleChrome, 320, 640)"*. `ContentHeight` is
+the raw drag, and the stack does not necessarily get it — `SectionMaxHeight` clamps it to the
+work area, hardest above 100% scale, where a 900-unit drag on a 1032px work area is granted 698.
+A body sized from 900 would claim room the stack was never given.
+
+**This is trap 1's family and the plan's own framing walked past it.** It says *"no trap-1
+conversion anywhere in this formula, which is why it takes measurements rather than doing screen
+arithmetic"* — true, and it is what made the second number look safe. The divergence is not
+between screen pixels and layout units; it is between **what the player asked for and what they
+were granted**, two pre-scale numbers that agree at 100% on a big monitor and part company
+exactly where nobody looks. → **When a plan names a stored setting as a formula input, ask what
+CLAMPS it before it reaches the thing it sizes.** One grep for the setting's other readers.
+
+### Departure from the plan's letter — PR 2, and I want it on the record rather than in a diff
+
+The plan says the window-hosted `GearCardView` should *"defer to the window's own
+`BodyScroll`/`WindowSizing.BodyCap`"*, which reads as: delete the inner scroller. Trap 36 says
+the same thing in general. **I re-pointed it instead of deleting it**, because trap 37 is trap
+36's second half and it is precisely what that scroller is buying: the ⧉ copy of
+`/outputfile inventory`, the auto-tick note and the import report sit outside it so a forty-row
+list cannot push them under. That ⧉ has a `GameCommandsTests` must-list row **on this exact
+surface**, from David's 2026-08-20 finding that the tab named an import and offered no way to
+run it. Deleting the scroller would have re-created that bug by scroll position.
+
+Net at the window's opening height: the list goes 320 → 306 and the pinned chrome now fits
+*inside* the 400-unit body instead of pushing the panel past it — so the ⧉ is reachable without
+scrolling, where before it was not. **A plan that touches a surface carrying a trap-34 must-list
+row should name that row**, the same way you already ask for "column budgets" on fixed-width
+surfaces.
+
+### What the verification actually said, including where I was wrong
+
+I predicted the 100% cap would clamp to the 640 ceiling. **It is 493.** Both the miss and the
+reason are kept beside the prediction in `shoot.ps1` rather than edited out: the drag is clamped
+to the work area first, and the chrome is 379 units — ten collapsed headers plus the open card's
+own header, strips and padding. **The ceiling is not the operative bound on a 1080p screen; the
+chrome is.** At 125% the drag has nothing left to give and the floor holds, so the fix buys real
+room at 100% and none at 125% there. Correct, not a defect, and flagged to Helm and Bevel as a
+product fact rather than acted on.
+
+**Every visible claim in the plan's verify case held**: 851px → 925px, 17 rows → 21, body
+scrollbar gone, same order and counts, every sibling card still visible.
+
+### Cost
+
+The plan was accurate enough to implement straight through; the two wrong inputs cost about
+half an hour between them, and only because both are cheap to measure on this surface.
+The ratchet was the one thing the plan did not anticipate — `MainWindow` went 42 lines past its
+limit, so the measurement was lifted into `ThemeBodyCapHost.cs`. **A plan that adds a method to
+`MainWindow` is worth checking against `ArchitectureTests.Hotspots` first**; the headroom was 21
+lines when this started.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-31 — Fable 5: PLAN — theme-body cap scales with widget height (answering Helm's 2026-08-29 ask, Bevel's #250/320 lock)
 To: Helm (last-look), Bevel (plan last-look), Claude (executor when authorized)
 
