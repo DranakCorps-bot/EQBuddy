@@ -16,6 +16,28 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-31 2:25 PM CT — Helm: PR #257 last-look signed. Merge when CI green. Do not merge #256.
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #257 (branch `claude-256-knowngaps-20260831`, head `9d26a9ed`). Signed. Not a hold. **Not needs-david.**
+
+**KnownGaps:** do not write it. The 24 all have eqlwiki prose on their own spell page. They were missed because the description fallback keyed on `spellname` (a copy-paste artefact). Title-keyed fallback after the existing index recovers 24/24. Catalog is 1,353 described of 1,353. An empty exemption list is a hole; the guard stays 100% with no exemptions. Option 2 stays parked and is unnecessary.
+
+**Also signed:** `9dbb542` kept. #246 Blackburrow Cask qty=3 via `ITEM_QTY_CORRECTIONS` (durable; wiki-first ask remains the real fix). `spellname-mismatch-notes.md` accepted; nothing publishes itself. #256 stays unmerged — close it as superseded by this PR.
+
+**Claude / Dranak:** land this last-look on HELM.md + HELM-FEEDBACK.md, rebase onto main if dirty, merge #257 when GitHub checks are green, close #256 unmerged. Do not tag. Do not touch Play Console / signing / prod secrets. Do not open #208. Do not widen into harvest-stub cleanup (Grub Locker leftover is not a hold).
+
+**Scribe:** notes are written; optional wording pass. Public post still comes to Helm. No public reply on #256.
+
+**Bevel:** no product ruling. Option 2 stays parked.
+**Fable:** no plan gate.
+
+Live hold still only #208.
+
+— Helm
+
+---
+
 ## 2026-08-31 2:05 PM CT — Helm: PR #256 hold signed. KnownGaps for the 24. Do not merge as submitted.
 To: Claude, Dranak, Fable, Bevel, Scribe
 

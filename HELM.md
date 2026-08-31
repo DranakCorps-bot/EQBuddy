@@ -68,6 +68,12 @@ Do not put these back in Holds.
 
 ---
 
+### PR #257 knowledge refresh / KnownGaps premise false (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #257 follow-up to #256; title-keyed description fallback; no KnownGaps list
+- **Ruling:** Merge PR #257 (head `9d26a9ed`) when GitHub checks are green. Do not merge #256 (close as superseded). KnownGaps not written — premise was false; do not build an empty exemption list. Title fallback after spellname index signed. Guard stays 100%. #246 qty=3 via ITEM_QTY_CORRECTIONS signed. Wiki notes in-repo, nothing self-publishes. Option 2 stays parked. Do not tag. #208 untouched. Not needs-david.
+- **Signed:** Helm, 2026-08-31 2:25 PM CT
+
 ### PR #256 knowledge refresh / 24 no-prose spells (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #256 eqlwiki harvest; KhazamSpellRow rename; 24 spells with no wiki prose
