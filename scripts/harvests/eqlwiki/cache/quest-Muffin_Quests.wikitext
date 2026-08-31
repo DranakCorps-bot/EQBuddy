@@ -154,18 +154,18 @@ You receive 7 gold.
 Turning a [[Full Muffin Crate]] into Inkeep Morpa ([[Feerrott]]):<br>
 Innkeep Gub says, 'Nice muffins, very stinky. Weeze tank you. Here some money. Weeze need more muffins later. You check back again sum time.'
 <div class="facblock">
-* Your faction standing with Merchants of Oggok got better. +2
-* Your faction standing with Clurg got better. +1
-* Your faction standing with Oggok Guards got better. +1
+* Your faction standing with Merchants of Oggok got better. +5
+* Your faction standing with Clurg got better. +5
+* Your faction standing with Oggok Guards got better. +5
 </div>
 You receive 8 gold.
 ===Fresh Baked Muffins (Feerrott, [[Innkeep Gub]])===
 Turning a [[Full Muffin Crate]] into Inkeep Gub ([[Feerrott]]):<br>
 Innkeep Gub says, 'MMmmm... Deez look like gud muffins. Here's sum money. Tanks. Now meez all stocked again.'
 <div class="facblock">
-* Your faction standing with Merchants of Oggok got better. +2
-* Your faction standing with Clurg got better. +1
-* Your faction standing with Oggok Guards got better. +1
+* Your faction standing with Merchants of Oggok got better. +5
+* Your faction standing with Clurg got better. +5
+* Your faction standing with Oggok Guards got better. +5
 </div>
 You receive 8 gold.
 ===Fresh Baked Muffins (Neriak, [[Sal Drana]])===

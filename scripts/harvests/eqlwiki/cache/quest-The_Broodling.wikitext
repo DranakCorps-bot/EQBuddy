@@ -1,8 +1,8 @@
 {{Classic Era}}
 {{Unsolved}}
 {{expand}}
-[[File:npc_dorn_b`dynn.png|frame|Dorn B`Dynn]]
-[[File:A_dark_elf_spy.jpg|frame|a dark elf spy]]
+[[File:npc_dorn_b`dynn.png|thumb|Dorn B`Dynn]]
+[[File:A_dark_elf_spy.jpg|thumb|a dark elf spy]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Northern Desert of Ro]]

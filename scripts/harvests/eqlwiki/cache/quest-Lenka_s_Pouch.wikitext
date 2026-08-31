@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_toala_nehron.png|frame|Toala Nehron]]
+[[File:npc_toala_nehron.png|thumb|Toala Nehron]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|West Freeport]]

@@ -1,5 +1,6 @@
-[[File:npc_tani_n`mar.png|frame|Tani N`Mar]]
-{| class="questTopTable"
+{{Classic Era}}
+[[File:npc_tani_n`mar.png|thumb|Tani N`Mar]]
+{| class="raidMobTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Third Gate]]
 |-
@@ -19,7 +20,7 @@
 | [[Giz Dinree]], [[Lyda Nasin]]
 |-
 ! ''' Required Faction: '''
-| Amiable or better.
+| Amiable or better on all steps.
 |}
 
 == Reward ==
@@ -41,50 +42,35 @@ You say 'I am ready to venture to Freeport.'
 
 : Tani N`Mar says 'Find a way to the port of Freeport. Seek out Giz Dinree. She is usually near the shores at night. She is your contact. Tell her you were [sent by Tani]. She will fill you in on your mission. Good luck. Do not waste your time practicing your skills. Go as you are.'
 
-
-: [[Giz Dinree]] used to be found around the corner to the right of the docks, by the shark '-374.91,-1083.97'
+[[Giz Dinree]] is found around the corner from the Seafarer's Roost on the south side of the [[Freeport|East Freeport]] harbor, between 9 PM and 5 AM.
 
 You say 'Hail, Giz Dinree'
 
 : Giz Dinree says 'Excuse me! I came here in hopes of being alone!'
 
-WARNING! As a Dark Elf Shadowknight Giz Dinree conned amiably towards me but when I said "Tani sent me." She turned and attacked me. She called me a "Liar!" and said, "Silent and deadly are the daggers of the Ebon Mask!"
-Hit me for 34 damage until I died.
-
 You say 'Tani sent me'
+You say 'I was sent by Tani'
 
-: Giz Dinree says 'You're a new rogue, then! Your mission is to kill the young daughter of the owner of the Seafarer's Roost. Wait for the right time. Why? You don't need to know. Do it and return Lyda's head to Tani in Neriak. I hope you can make it back to Neriak alive. Good hunting!'
+: Giz Dinree says, 'You're a new rogue, then! Your mission is to kill the young daughter of the owner of the Seafarer's Roost. Wait for the right time. Why? You don't need to know. Do it and return Lyda's head to Tani in Neriak. I hope you can make it back to Neriak alive. Good hunting!'
 
-Do not enter the Seafarer's Roost until 9pm, there is a high level Ogre right inside during the day that is kos to Dark Elves.
+Do not enter the Seafarer's Roost until 9pm, there is a high level Ogre right inside during the day that is KOS to Dark Elves.
 
-[[Lyda Nasin]] Spawns at 9pm behind the bar on the second floor of the Seafarer's Roost. 
+[[Lyda Nasin]] spawns at 9pm in front of the bar on the second floor of the Seafarer's Roost. Murder her.
 
-You have slain Lyda Nasin!
+She drops a [[Human Head]] (identifies as "Lyda's Head" with that incorrect spelling). Take it to [[Neriak|Neriak Third Gate]] and hand it to [[Tani N`Mar]]:
 
-<div class="facblock">
-* Your faction standing with [[Coalition of Tradefolk]] got worse.
-* Your faction standing with [[Knights of Truth]] got worse.
-* Your faction standing with [[Merchants of Qeynos]] got worse.
-* Your faction standing with [[Coalition of Tradefolk Underground]] got worse.
-</div>
-Lyda Nasin's corpse says 'The good people of this city will know of this. They will strike back at you!'
-
---You have looted [[Human Head]]--
-
-'''Hand the head in to Tani N`Mar back in the rogues guild in Neriak.'''
-
-: Tani N`Mar says 'Good work! I knew you could prove your worth. Most waste time training. I do not reward those who waste my time. Please take this. It is from our horde, from countless robberies. I hope you can use it to advance yourself. Remember to always stay faithful to Neriak.'
+: Tani N`Mar says, 'Good work! I knew you could prove your worth. Most waste time training. I do not reward those who waste my time. Please take this. It is from our horde, from countless robberies. I hope you can use it to advance yourself. Remember to always stay faithful to Neriak.'
 
 <div class="facblock">
-* Your faction standing with [[Ebon Mask]] got better.
-* Your faction standing with [[Guards of Qeynos]] got worse.
-* Your faction standing with [[Wolves of the North]] got worse.
-* Your faction standing with [[Guardians of the Vale]] got worse.
-* Your faction standing with [[Carson McCabe]] got worse.
+* Your faction standing with [[Ebon Mask]] has been adjusted by 20.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -1.
+* Your faction standing with [[Wolves of the North]] has been adjusted by -5.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by -2.
+* Your faction standing with [[Carson McCabe]] has been adjusted by -5.
 </div>
-{{exp}}
+{{YouGainExperience}}
 
-You receive 8 silver from Tani N`Mar.
+'''You receive the [[Cinctured Whip]] and 7-10 silver.'''
 
 [[Category:Quests]]
 [[Category:Neriak Third Gate]]

@@ -1,12 +1,12 @@
 {{Classic Era}}
 :''For the overview of the many orc belt quests, see [[Orc Belt Quests]].''
-[[File:npc_kaglari.png|thumb|Kaglari]]
+[[File:Npc bregna.png|thumb|Bregna]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Grobb]]
 |-
 ! ''' Quest Giver: '''
-| [[Kaglari]]
+| [[Bregna]]
 |-
 ! ''' Minimum Level: '''
 | 1
@@ -30,15 +30,15 @@ Multiquestable with correct faction requirements
 
 == Walkthrough ==
 
-'''At the end of the previous quest, [[Kaglari]] asked you whether you wanted to "more help Innoruuk.". Apprehensive or better is required for this quest. This means Ogres normally cannot complete it. Agnostic and Innoruuk Dark Elves can.'''
+'''At the end of the previous quest, [[Bregna]] asked you whether you wanted to "more help Innoruuk.". Apprehensive or better is required for this quest. This means Ogres normally cannot complete it. Agnostic and Innoruuk Dark Elves can.'''
 
 You say, 'Meez more help Innoruuk.'
 
-: Kaglari says 'Me hears orcs nearby are trubble. Da werd frum Neriak is dey wants us ta kills dem before dey organize. Dark elf say ta looks for Deathfist Clan. Say dey called cen-tu-ri-ons. Dey try ta gets big orc army. Shows me ya can strike fear and hate inta dem orcs.. dey needs be more scared a us den dem humies. Brings me a Deathfist slashed belt.'
+: Bregna says 'Me hears orcs nearby are trubble. Da werd frum Neriak is dey wants us ta kills dem before dey organize. Dark elf say ta looks for Deathfist Clan. Say dey called cen-tu-ri-ons. Dey try ta gets big orc army. Shows me ya can strike fear and hate inta dem orcs.. dey needs be more scared a us den dem humies. Brings me a Deathfist slashed belt.'
 
-Give Kaglari a [[Deathfist Slashed Belt]].
+Give Bregna [[Deathfist Slashed Belt]].
 
-: Kaglari says 'Good job. Dat help lerns um. Takes dis ta help ya lerns how ta do more hateful tings. Ya gots a good starts fer Him ta be prouds a ya.'
+: Bregna says 'Good job. Dat help lerns um. Takes dis ta help ya lerns how ta do more hateful tings. Ya gots a good starts fer Him ta be prouds a ya.'
 
 <div class="facblock">
 * Your faction standing with [[Dark Ones]] got better.

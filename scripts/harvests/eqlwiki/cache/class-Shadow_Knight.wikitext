@@ -195,42 +195,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lifetap
-|description=Transfer life from target to caster (3.33 DPS)
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted Vendor
-|mana=8
 |kind=Lifetap
 |targ=Single
+|mana=8
+|effects=1: Decrease Hitpoints by 4 (L1) to 8 (L8)
 |duration=Instant
-|max=4-6 Dmg
-}}
-{{RadSpellRow2
-|name=Spike of Disease
-|description=Single Target Disease DD (max: 15)
+|school=Alteration
+|location=Autogranted Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spike of Disease
+|kind=Disease DD
+|targ=Single
+|mana=9
+|effects=1: Decrease Hitpoints by 15
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=9
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=15 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_2">
-
 ==Level 2==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -238,30 +234,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sense the Dead
-|description=Locate Nearest Undead Creature
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Undead
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Sense
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_4">
-
 ==Level 4==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -269,30 +262,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invisibility versus Undead
-|description=Invisibility to the Undead
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Friendly
+|mana=40
+|effects=1: Invisibility vs Undead
+|duration=27 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly
-|duration=27 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_5">
-
 ==Level 5==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -300,24 +290,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Disease Cloud
-|description=Single Target Disease DoT (max: 64)
-|era={{Classic Short}}
+|kind=Disease DoT
+|targ=Single
+|mana=10
+|effects=1: Increase Disease Counter by 1<br>2: Decrease Hitpoints by 5<br>3: Decrease Hitpoints by 1 per tick
+|duration=6 Min
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=10
-|kind=DoT
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifespike
+|kind=Lifetap
 |targ=Single
-|duration=6 Min
-|max=-5 Dmg<br>-1 HP/tick
+|mana=13
+|effects=1: Decrease Hitpoints by 8 (L3) to 16 (L18)
+|duration=Instant
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -330,30 +329,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Siphon Strength
-|description=Transfer strength from target to caster
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=5
 |kind=Power Tap
 |targ=Single
+|mana=5
+|effects=1: Decrease Strength by 5 (L1) to 10 (L10)
 |duration=6 Min
-|max=-10 STR
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_7">
-
 ==Level 7==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -361,60 +357,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Leering Corpse
-|description=Summons a Skeleton Pet
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=40
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Pet lvl 3-5
-}}
-</table>
-</div>
-
-<div id="spells_level_8">
-==Level 8==
-<table class="eoTable2 " style="width:100%;">
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Target</th>
-      <th>Mana</th>
-      <th>Max Effect</th>
-      <th>Duration</th>
-      <th>Description</th>
-      <th>Skill</th>
-      <th>Location</th>
-      <th>Era</th>
-    </tr>
-{{RadSpellRow2
-|name=Lifespike
-|description=Lifetap (6.3 DPS)
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=13
-|kind=Lifetap
-|targ=Single
-|duration=Instant
-|max=8-12 Dmg
 }}
 </table>
 </div>
 
 <div id="spells_level_9">
-
 ==Level 9==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -422,42 +385,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Despair
-|description=Steals hope from your target, decreasing their attack rating for 7 min 30s.
-|era={{Classic Short}}
+|kind=Power Tap
+|targ=Single
+|mana=12
+|effects=1: Decrease ATK by 5
+|duration=7 Min 30 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=12
-|kind=Taps
-|targ=Single
-|duration=6 Min
-|max=-5 ATK
-}}
-{{RadSpellRow2
-|name=Numb the Dead
-|description=Frenzy Range Reducer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Numb the Dead
+|kind=Calm
+|targ=Undead
+|mana=20
+|effects=1: Reduce Aggro Radius (up to L30)<br>2: Assist Radius (up to L30)<br>3: Add Hate (Aggro)
+|duration=2 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Detrimental
-|targ=Undead
-|duration=2 Min
-|max=Calm (max L30)
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_10">
-
 ==Level 10==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -465,30 +424,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Cold
-|description=Cold Resistance Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Cold Resist by 11 (L1) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly
-|duration=27 Min
-|max=+20 Cold Resist
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifebite
+|kind=Lifetap
+|targ=Single
+|mana=35
+|effects=1: Decrease Hitpoints by 42
+|duration=Instant
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_11">
-
 ==Level 11==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -496,30 +463,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Clinging Darkness
-|description=Snare DoT
-|era={{Classic Short}}
-|school=Conjuration
-|location=Autogranted Vendor
-|mana=20
 |kind=Snare DoT
 |targ=Single
+|mana=20
+|effects=1: Decrease Hitpoints by 8 per tick<br>2: Decrease Movement Speed by 24% (L4) to 30% (L10)
 |duration=48 Sec
-|max=-8 HP/tick<br>Snare
+|school=Conjuration
+|location=Autogranted Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_12">
-
 ==Level 12==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -527,24 +491,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fear
-|description=Fear Spell
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=40
 |kind=Fear
 |targ=Single
+|mana=40
+|effects=1: Fear (up to L52)
 |duration=18 Sec
-|max=Fear (max L52)
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -557,24 +519,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shadow Step
-|description=Self Only Random Teleport
-|era={{Classic Short}}
+|kind=Shadowstep
+|targ=Self
+|mana=10
+|effects=1: Shadow Step
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Teleport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -587,30 +547,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bone Walk
-|description=Summons a skeleton pet.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=80
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Pet level 6-7
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_15">
-
 ==Level 15==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -618,54 +575,49 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lifedraw
-|description=Lifetap Spell (18.4 DPS)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=86
 |kind=Lifetap
 |targ=Single
+|mana=86
+|effects=1: Decrease Hitpoints by 102 (L12) to 105 (L15)
 |duration=Instant
-|max=102-105 Dmg
-}}
-{{RadSpellRow2
-|name=Scream of Hate
-|description=Lower target's attack rating, increase yours
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=85
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scream of Hate
 |kind=Power Tap
 |targ=Single
+|mana=85
+|effects=1: Decrease ATK by 8
 |duration=10 Min
-|max=-8 ATK
-}}
-{{RadSpellRow2
-|name=Vampiric Embrace
-|description=Add single-target lifetap proc
+|school=Alteration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vampiric Embrace
+|kind=Combat Innates
+|targ=Self
+|mana=30
+|effects=1: Procs Vampiric Embrace
+|duration=Permanent
 |school=Alteration
 |location=Autogranted Vendor
-|mana=30
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=Procs: Vampiric Embrace
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_16">
-
 ==Level 16==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -673,30 +625,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Grim Aura
-|description=Increase attack rating
-|era={{Classic Short}}
+|kind=Attack Buff
+|targ=Self
+|mana=25
+|effects=1: Increase ATK by 6 (L3) to 10 (L10)
+|duration=Permanent
 |school=Alteration
 |location=Autogrant Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 ATK
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_17">
-
 ==Level 17==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -704,24 +653,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Deadeye
-|description=See Invisible, Infravision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=35
+|effects=1: See Invisible<br>2: Infravision
+|duration=Permanent
 |school=Divination
 |location=Vendor
-|mana=35
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -734,42 +681,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancelling of Life
-|description=Debuff target's healing received by 20%, 11 damage/tick
-|era={{Classic Short}}
+|kind=Anti-Healing DoT
+|targ=Single
+|mana=60
+|effects=1: Decrease Hitpoints by 11 per tick<br>2: Decrease Healing Modifier by 20
+|duration=1 Min
 |school=Conjuration
 |location=Vendor
-|mana=60
-|kind=Heal debuff, DoT
-|targ=Single
-|duration=1 Min
-|max=-11 HP/tick
-}}
-{{RadSpellRow2
-|name=Ward Undead
-|description=Undead Only DD
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward Undead
+|kind=Undead DD
+|targ=Undead
+|mana=5
+|effects=1: Decrease Hitpoints by 7 (L1) to 12 (L10)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=5
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=7-12 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_19">
-
 ==Level 19==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -777,36 +720,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Disease
-|description=Cure minor diseases
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=20
 |kind=Cure
-|targ=Single Friendly (or Self)
+|targ=Friendly
+|mana=20
+|effects=1: Cure Disease: 1 counter
 |duration=Instant
-|max=Cure 1 Disease
-}}
-{{RadSpellRow2
-|name=Tiny Companion
-|description=Shrink your pet
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=50
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tiny Companion
 |kind=Pet
 |targ=Pet
+|mana=50
+|effects=1: Increase Shrink Pet by 50
 |duration=Instant
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -819,42 +759,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Engulfing Darkness
-|description=Snare DoT (Max: 110dmg; 1.83 DPS; 2.02 DPM)
-|era={{Classic Short}}
-|school=Conjuration
-|location=Autogranted Vendor
-|mana=60
 |kind=Snare DoT
 |targ=Single
+|mana=60
+|effects=1: Decrease Hitpoints by 11 per tick<br>2: Decrease Movement Speed by 40%
 |duration=1 Min
-|max=-11 HP/tick<br>Snare
-}}
-{{RadSpellRow2
-|name=Spook the Dead
-|description=Undead only fear
+|school=Conjuration
+|location=Autogranted Vendor
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=10
+}}
+{{KhazamSpellRow
+|name=Spook the Dead
 |kind=Fear
 |targ=Undead
+|mana=10
+|effects=1: Fear (up to L52)
 |duration=18 Sec
-|max=Fear (max L52)
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_21">
-
 ==Level 21==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -862,30 +798,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dark Empathy
-|description=Transfer life from caster to target
-|era={{Classic Short}}
+|kind=Life Flow
+|targ=Single
+|mana=20
+|effects=1: Increase Hitpoints by 30
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Heal
-|targ=Single
-|duration=Instant
-|max=30 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_22">
-
 ==Level 22==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -893,24 +826,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Convoke Shadow
-|description=Summons a skeleton pet.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=120
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Lvl 9-11 Pet
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -923,30 +854,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Scream of Pain
-|description=Lower target's armor class, increase yours
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
 |kind=Power Tap
 |targ=Single
+|mana=100
+|effects=1: Decrease AC by 5
 |duration=10 Min
-|max=-5 AC
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_24">
-
 ==Level 24==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -954,24 +882,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Feign Death
-|description=Fake Death
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=60
+|effects=1: Feign Death (87% success)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=60
-|kind=Beneficial
-|targ=Self
-|duration=Instant
-|max=+87 Invul
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -984,30 +910,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Disease
-|description=Disease Resistance Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Disease Resist by 18 (L8) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly
-|duration=27 Min
-|max=+20 Disease Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_27">
-
 ==Level 27==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1015,24 +938,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Wave of Enfeeblement
-|description=Point Blank AE Strength Debuff
-|era={{Classic Short}}
+|kind=Disempowering
+|targ=PB AE
+|mana=40
+|effects=1: Decrease Strength by 9 (L9) to 15 (L20)
+|duration=4 Min
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Debuff
-|targ=PB AE
-|duration=4 Min
-|max=-15 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1045,24 +966,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Heat Blood
-|description=Fire Based DoT (Max: 170; 2.36 DPM)
-|era={{Classic Short}}
+|kind=Fire DoT
+|targ=Single
+|mana=88
+|effects=1: Decrease Hitpoints by 28 (L10) to 43 (L25) per tick
+|duration=36 Sec
 |school=Alteration
 |location=Vendor
-|mana=88
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-43 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1075,24 +994,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Strengthen Death
-|description=Pet Only Melee Buff
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=50
+|effects=1: Increase Strength by 5<br>2: Increase Attack Speed by 20%<br>3: Increase AC by 1
+|duration=60 Min
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Pet
-|duration=60 Min
-|max=+5 STR<br>+20% Atkspd<br>+1 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1105,54 +1022,49 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gather Shadows
-|description=Self Only Invisibility
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Self
+|mana=35
+|effects=1: Invisibility
+|duration=20 Min
 |school=Divination
 |location=Vendor
-|mana=35
-|kind=Buff
-|targ=Self
-|duration=20 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Restless Bones
-|description=Summon Skeleton Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Restless Bones
+|kind=Sum: Undead
+|targ=Self
+|mana=160
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=160
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=lvl 12-16 Pet
-}}
-{{RadSpellRow2
-|name=Siphon Life
-|description=Steal life from target
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=115
+}}
+{{KhazamSpellRow
+|name=Siphon Life
 |kind=Lifetap
 |targ=Single
+|mana=115
+|effects=1: Decrease Hitpoints by 140 (L20) to 150 (L25)
 |duration=Instant
-|max=140-150 Dmg
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_31">
-
 ==Level 31==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1160,42 +1072,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Negation of Life
-|description=Debuff target's healing received by 30%, 20 damage/tick
-|era={{Classic Short}}
+|kind=Anti-Healing DoT
+|targ=Single
+|mana=120
+|effects=1: Decrease Hitpoints by 20 per tick<br>2: Decrease Healing Modifier by 30
+|duration=1 Min 30 Sec
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=DoT
-|targ=Single
-|duration=1 Min 30 Sec
-|max=-20 HP/tick
-}}
-{{RadSpellRow2
-|name=Shieldskin
-|description=Absorb damage
 |era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=41
+}}
+{{KhazamSpellRow
+|name=Shieldskin
 |kind=Rune
 |targ=Self
+|mana=41
+|effects=1: Increase Stoneskin by 27 (L13) to 55 (L21)
 |duration=36 Min
-|max=
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_32">
-
 ==Level 32==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1203,24 +1111,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dark Temptation
-|description=Increase attack rating, lower health regen
-|era={{Classic Short}}
+|kind=Conversions
+|targ=Self
+|mana=100
+|effects=1: Increase ATK by 25<br>2: Decrease Hitpoints by 3 per tick
+|duration=Permanent
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+25 ATK<br>-3 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1233,30 +1139,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Terror of Darkness
-|description=Taunt
-|era={{Classic Short}}
+|kind=Jolt
+|targ=Single
+|mana=20
+|effects=1: Increase Hate over Time by 1
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Taunt
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_34">
-
 ==Level 34==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1264,24 +1167,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spear of Disease
-|description=Single target disease damage
-|era={{Classic Short}}
+|kind=Disease DD
+|targ=Single
+|mana=118
+|effects=1: Decrease Hitpoints by 251
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=118
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=251 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1294,42 +1195,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Resist Cold
-|description=Cold Resistance Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Cold Resist by 39 (L24) to 40 (L25)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly
-|duration=36 Min
-|max=+40 Cold Resist
-}}
-{{RadSpellRow2
-|name=Shroud of Hate
-|description=Transfer ATK from target to caster
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shroud of Hate
+|kind=Power Tap
+|targ=Single
+|mana=60
+|effects=1: Decrease ATK by 20
+|duration=10 Min
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Detrimental
-|targ=Single
-|duration=10 Min
-|max=-20 ATK
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_36">
-
 ==Level 36==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1337,54 +1234,49 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancel Magic
-|description=Removes magical effects
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=2 Effects
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Heart Flutter
-|description=STR & AC Debuff and Disease DoT
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=41
-|kind=Debuff/DoT
+|kind=Disease DoT
 |targ=Single
+|mana=41
+|effects=1: Decrease Strength by 20<br>2: Decrease AC by 7<br>3: Decrease Hitpoints by 24 per tick
 |duration=36 Sec
-|max=-20 STR<br>-7 AC<br>-24 HP/tick
-}}
-{{RadSpellRow2
-|name=Spirit Tap
-|description=Transfer life from target to caster
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=152
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Tap
 |kind=Lifetap
 |targ=Single
+|mana=152
+|effects=1: Decrease Hitpoints by 202 (L26) to 210 (L30)
 |duration=Instant
-|max=202-210 Dmg
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_37">
-
 ==Level 37==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1392,42 +1284,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Scream of Death
-|description=Add point blank area of effect lifetap proc
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=50
-|kind=Buff
+|kind=Combat Innates
 |targ=Self
+|mana=50
+|effects=1: Procs Scream of Death Strike
 |duration=Permanent
-|max=Procs: Scream of Death Strike
-}}
-{{RadSpellRow2
-|name=Shadow Vortex
-|description=Transfer AC from target to caster
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=40
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow Vortex
 |kind=Power Tap
 |targ=Single
-|duration=6 Min
-|max=-10 AC
+|mana=40
+|effects=1: Decrease AC by 7 (L19) to 10 (L30)
+|duration=7 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_38">
-
 ==Level 38==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1435,24 +1323,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Animate Dead
-|description=Summons a Skeleton Pet. Lvl 19 pet can dual wield with weapons
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=200
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Pet lvl 15-19
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1465,42 +1351,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expulse Undead
-|description=Undead Only Direct Damage
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=36
+|effects=1: Decrease Hitpoints by 99 (L13) to 106 (L20)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=36
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=99-106 Dmg
-}}
-{{RadSpellRow2
-|name=Voice of Darkness
-|description=Imbues your target's voice with the power of darkness, causing creatures to take more notice of their attacks for 10 min.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Voice of Darkness
+|kind=Visages
+|targ=Friendly
+|mana=50
+|effects=1: Increase Hate by 2
+|duration=10 Min
 |school=Conjuration
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Single Friendly
-|duration=10 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_40">
-
 ==Level 40==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1508,24 +1390,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shadow Sight
-|description=Self Only Ultravision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=50
+|effects=1: Ultravision<br>2: See Invisible
+|duration=Permanent
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1538,30 +1418,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Blood of Pain
-|description=Single target poison damage over time
-|era={{Classic Short}}
+|kind=Poison DoT
+|targ=Single
+|mana=172
+|effects=1: Decrease Hitpoints by 56 (L41) to 65 (L50) per tick
+|duration=36 Sec
 |school=Alteration
 |location=Vendor
-|mana=172
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-65 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_42">
-
 ==Level 42==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1569,30 +1446,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Terror of Shadows
-|description=Fills your target's mind with shadowed terror, inciting hatred.
-|era={{Classic Short}}
+|kind=Jolt
+|targ=Single
+|mana=40
+|effects=1: Increase Hate over Time by 1
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Taunt
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_43">
-
 ==Level 43==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1600,24 +1474,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invoke Fear
-|description=Causes target to flee
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
 |kind=Fear
 |targ=Single
+|mana=100
+|effects=1: Fear (up to L52)
 |duration=42 Sec
-|max=Fear (max L52)
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1630,30 +1502,27 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dooming Darkness
-|description=Slows target and deals damage
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=120
 |kind=Snare DoT
 |targ=Single
+|mana=120
+|effects=1: Decrease Hitpoints by 20 per tick<br>2: Decrease Movement Speed by 48% (L27) to 59% (L48)
 |duration=1 Min 30 Sec
-|max=-20 HP/tick<br>Snare
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_45">
-
 ==Level 45==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1661,42 +1530,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Breath of the Dead
-|description=Water Breathing
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=45
+|effects=1: Enduring Breath (Water Breathing)
+|duration=Permanent
 |school=Alteration
 |location=Vendor
-|mana=45
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=
-}}
-{{RadSpellRow2
-|name=Word of Spirit
-|description=Point Blank Area Magical Direct Damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Word of Spirit
+|kind=Magic DD
+|targ=PB AE
+|mana=133
+|effects=1: Decrease Hitpoints by 91 (L26) to 104 (L33)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=133
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=91-104 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_46">
-
 ==Level 46==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1704,42 +1569,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Dead
-|description=Summons a Skeleton Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=290
-|kind=Summon
+|kind=Sum: Undead
 |targ=Self
+|mana=290
+|effects=1: Summons a Skeleton Pet
 |duration=Instant
-|max=Pet lvl 22-25
-}}
-{{RadSpellRow2
-|name=Voice of Shadows
-|description=Imbues your target's voice with the power of shadows, causing creatures to take more notice of their attacks for 10 min.
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Voice of Shadows
+|kind=Visages
+|targ=Friendly
 |mana=100
-|kind=Utility
-|targ=Single Friendly
+|effects=1: Increase Hate by 4
 |duration=10 Min
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_47">
-
 ==Level 47==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1747,42 +1608,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Life Leech
-|description=Transfer life from target to caster
-|era={{Classic Short}}
-|school=Alteration
-|location=[[The Etched Stone|Quest]]
-|mana=181
 |kind=Lifetap
 |targ=Single
+|mana=181
+|effects=1: Decrease Hitpoints by 250
 |duration=Instant
-|max=250 Dmg
-}}
-{{RadSpellRow2
-|name=Scythe of Darkness
-|description=Single target undead-only damage
+|school=Alteration
+|location=[[The Etched Stone|Quest]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scythe of Darkness
+|kind=Undead DD
+|targ=Undead
+|mana=112
+|effects=1: Decrease Hitpoints by 346
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=112
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=346 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_48">
-
 ==Level 48==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1790,24 +1647,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spear of Pain
-|description=Single target disease damage
-|era={{Classic Short}}
+|kind=Disease DD
+|targ=Single
+|mana=138
+|effects=1: Decrease Hitpoints by 325
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=138
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=325 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1820,42 +1675,38 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dismiss Undead
-|description=Undead Only Direct Damage
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=63
+|effects=1: Decrease Hitpoints by 196 (L23) to 211 (L31)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=63
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=196-211 Dmg
-}}
-{{RadSpellRow2
-|name=Drain Spirit
-|description=Transfer life from target to caster
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=213
+}}
+{{KhazamSpellRow
+|name=Drain Spirit
 |kind=Lifetap
 |targ=Single
+|mana=213
+|effects=1: Decrease Hitpoints by 314
 |duration=Instant
-|max=314 Dmg
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_50">
-
 ==Level 50==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1863,36 +1714,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Harmshield
-|description=18 second invulnerability
-|era={{Classic Short}}
+|kind=Invulnerability
+|targ=Self
+|mana=85
+|effects=1: Decrease Hitpoints by 20<br>2: Invulnerability
+|duration=18 Sec
 |school=Abjuration
 |location=Vendor
-|mana=85
-|kind=Utility
-|targ=Self
-|duration=18 Sec
-|max=-20 Dmg
-}}
-{{RadSpellRow2
-|name=Shroud of Pain
-|description=Transfer AC from target to caster
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=75
+}}
+{{KhazamSpellRow
+|name=Shroud of Pain
 |kind=Power Tap
 |targ=Single
+|mana=75
+|effects=1: Decrease AC by 12
 |duration=10 Min
-|max=-12 AC
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>

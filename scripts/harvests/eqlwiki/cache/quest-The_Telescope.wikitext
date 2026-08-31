@@ -25,14 +25,14 @@
 
 == Reward ==
 
-<ul><li>  {{:Staff of the Observers}}
+<ul><li>[[Staff of the Observers]]
 </li></ul>
 
 == Walkthrough ==
 
 At the observatory past the windmills in the Steamfonts a female gnome name Brona Frugrin is a telescope lens crafter and she believes that if you can get the retina of the beholder named Borxx, who may be found in either Runnyeye or Beholder at certain times, and return it to her, she can create a telescope unlike any other.
 
-Borxx is a L30 Evil Eye-type monster.  Bringing back his loot, the evil eye lens, will yield a 2h blunt weapon called the Staff of the Observers.
+Borxx is a L30 Evil Eye-type monster.  Bringing back her loot, the evil eye lens, will yield a 2h blunt weapon called the Staff of the Observers.
 
 == Dialogue ==
 
@@ -52,11 +52,14 @@ You say, 'What are evil eyes?'
 
 [[Borxx]] can be found on the fourth floor of Clan Runnyeye. (loc?) She will drop the [[Evil Eye Lens]]
 
-: Brona Frugrin says, 'This lens is perfect, ________! Please, take this staff in return for your services.'
+: You offered 1 Evil Eye Lens to Brona Frugrin. Brona Frugrin says, 'Not only did you find Borxx but you were able to slay her as well?!  You are truly a champion of great skill.  This lens of Borxx's will greatly aid our research of other planes of existence.  I have been authorized by the Eldritch Collective to offer you this Staff of the Observers.  Carry it with pride.'
 
 <div class="facblock">
-* Your faction with [[King Ak'Anon]] got better.
-* Your faction with [[Eldritch Collective]] got better.
+* Your faction standing with <nowiki>[[Eldritch Collective]]</nowiki> has been adjusted by 15.
+* Your faction standing with <nowiki>[[Dark Reflection]]</nowiki> has been adjusted by -2.
+* Your faction standing with <nowiki>[[The Dead]]</nowiki> has been adjusted by -1.
+* Your faction standing with <nowiki>[[Gem Choppers]]</nowiki> has been adjusted by 5.
+* Your faction standing with <nowiki>[[King Ak`Anon]]</nowiki> has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 

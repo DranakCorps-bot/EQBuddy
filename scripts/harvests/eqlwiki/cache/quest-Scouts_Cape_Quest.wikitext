@@ -27,6 +27,9 @@
 
 == Walkthrough ==
 
+'''''WARNING: Like many NPCs involved in newbie armor quests, this quest appears to be impossible to complete in Legends as Kelynn appears to have been removed'''''.
+
+
 ''[[Geeda]] is located at -566, -145, 161 behind the Scouts of Tunare ([[Rogue]]) Guild Hall.''
 
 You say, 'Hail, Geeda'

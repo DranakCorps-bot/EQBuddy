@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_cindl.png|frame|Cindl]]
+[[File:npc_cindl.png|thumb|Cindl]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Halas]]
@@ -20,7 +20,6 @@
 | [[a glacier bear]], [[a polar bear]], [[a polar bear cub]]
 |}
 
-
 == Reward ==
 
 <ul><li>  Large Tattered, Patchwork, and Raw-Hide Armor
@@ -40,17 +39,19 @@ You say, 'What extra hides?'
 
 : Cindl says 'I'll offer any hunter some used tattered armor fer every polar bear skin I'm brought. I'm sure even ye can wrestle the skins from the backs o' the polar bear cubs, no?'
 
-'''Turn in a [[Polar Bear Skin]]:'''
+Turn in a [[Polar Bear Skin]]:
 
 : Cindl says 'This is much appreciated! Please accept this used armor in return and a gold piece as well, fer yer troubles. Ye've done well! I may have a [second job] fer ye, if ye like?'
 
 <div class="facblock">
-* Your faction standing with [[Merchants of Halas]] got better.
-* Your faction standing with [[Wolves of the North]] got better.
-* Your faction standing with [[Shamen of Justice]] got better.
+* Your faction standing with [[Merchants of Halas]] has been adjusted by 5.
+* Your faction standing with [[Wolves of the North]] has been adjusted by 5.
+* Your faction standing with [[Shamen of Justice]] has been adjusted by 5.
+* Your faction standing with [[Rogues of the White Rose]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
+'''You also receive minor coin and an item:'''
 <ul><li>{{:Large Patchwork Boots}}
 </li><li>{{:Large Patchwork Cloak}}
 </li><li>{{:Large Patchwork Pants}}
@@ -66,6 +67,7 @@ You say, 'What extra hides?'
 </li><li>{{:Large Tattered Wristbands}}
 </li></ul>
 
+This leads to [[Cindl's Wristband Collection]].
 
 [[Category:Quests]]
 [[Category:Halas]]

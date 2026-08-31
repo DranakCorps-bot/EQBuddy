@@ -1,0 +1,48 @@
+{{Era}}
+
+{| class="raidMobTopTable"
+! ''' Starts In: '''
+| [[Ocean of Tears]]
+|-
+! ''' Quest Giver: '''
+| [[Nerbilik]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL / CLASS
+|-
+! ''' Related Zones: '''
+| [[ZONE NAME]]
+|-
+! ''' Related NPCs: '''
+| [[NPC NAME]]
+|}
+
+= Reward =
+
+* {{:ITEM NAME}}
+
+= Dialogue =
+
+'''You say, "Hail, NPC NAME"'''
+
+: NPC NAME says, "Dialogue."
+
+= Walkthrough =
+
+# Speak with [[Nerbilik]] in [[Ocean of Tears]].
+# Obtain [[Grub Locker]] from [[The Gobbler]] in [[Neriak]] Foreign Quarter.
+# Return to [[Nerbilik]].
+
+= Notes =
+
+* Add factual tips, warnings, faction requirements, spawn information, or alternate steps here.
+
+= Related Quests =
+
+* [[Related Quest]]
+
+[[Category:Quests]]
+[[Category:ZONE NAME]]

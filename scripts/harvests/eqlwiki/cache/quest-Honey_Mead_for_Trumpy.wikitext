@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_trumpy_irontoe.png|frame|Trumpy Irontoe]]
+[[File:npc_trumpy_irontoe.png|thumb|Trumpy Irontoe]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos|South Qeynos]]
@@ -41,24 +41,18 @@ You say, 'What is honey mead?'
 
 : Trumpy Irontoe says ' Yeah. Gimme a.  er. honey mead.'
 
-'''Give him 4 x [[Honey Mead]].'''<br>
-'''''Note: This is not Multi-Questable. You must hand in 4 Honey Mead at a time. If you hand in only 1 at a time, on the 4th you will not get the reward unlike other quests.''
-'''
-: Trumpy Irontoe says 'Beh! Thanks, Skippy. Why don't ya buy yourself one? And. . . get me another!'
-: Trumpy Irontoe says 'Beh! Thanks, Skippy. Why don't ya buy yourself one? And. . . get me another!'
-: Trumpy Irontoe says 'Beh! Thanks, Skippy. Why don't ya buy yourself one? And. . . get me another!'
-: Trumpy Irontoe says 'BWAH hah hah! I knew you wasn't the loser you. . . appear to be! I will have to tell [Kane]. . all about you. Maybe get you in the gang!'
+Give him 4 x [[Honey Mead]].
+
+: Trumpy Irontoe says, 'BWAH hah hah!  I knew you wasn't the loser you...  <nowiki><gulp>...  <gulp></nowiki>... appear to be!  I will have to tell [Kane]... <nowiki><burp></nowiki>... all about you.  Maybe get you in the gang!'
 
 <div class="facblock">
-* Your faction standing with [[Circle Of Unseen Hands]] got better.
-* Your faction standing with [[Merchants of Qeynos]] got worse.
-* Your faction standing with [[Corrupt Qeynos Guards]] got better.
-* Your faction standing with [[Guards of Qeynos]] got worse.
-* Your faction standing with [[Kane Bayle]] got better.
+* Your faction standing with [[Circle of Unseen Hands]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Qeynos]] has been adjusted by -1.
+* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by 5.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -1.
+* Your faction standing with [[Kane Bayle]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
-
-'''Additional Dialogue'''
 
 You say, 'Who is Kane?'
 

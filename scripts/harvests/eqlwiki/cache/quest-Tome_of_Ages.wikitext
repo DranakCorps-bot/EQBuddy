@@ -57,9 +57,9 @@ You say, 'What about the Book of Enlightenment?'
 
 : Oracle of K`Arnon says 'I do not seek the Book of Enlightenment at this time, but I might have need of it in the future.'
 
-You say, 'What about the Book of Scale?' 
+You say, 'What about the [[Book of Scale]]?' 
 
-: Oracle of K`Arnon says 'Ah, the Book of Scale.. It would be wondrous indeed if you could recover the Book of Scale for me. If you do manage to procure the Book of Scale, I will gladly part with an artifact of my own that may be of interest to you.'
+: Oracle of K`Arnon says 'Ah, the Book of Scale... It would be wondrous indeed if you could recover the Book of Scale for me. If you do manage to procure the Book of Scale, I will gladly part with an artifact of my own that may be of interest to you.'
 
 '''Giving him the Book of Scale nets you Miragul's Phylactery, used in the Fiery Avenger quest, a subquest for the Paladin epic.'''
 
@@ -71,7 +71,7 @@ You say, 'What about the Book of Scale?'
 </div> 
 {{exp}}
 
-You say, 'What about the Book of Turmoil?' 
+You say, 'What about the [[Book of Turmoil]]?' 
 
 : Oracle of K`Arnon says 'Ah, yes! The Book of Turmoil. I seek this book, and should you find it and return it to me, I will reward you with secret knowledge.'
 

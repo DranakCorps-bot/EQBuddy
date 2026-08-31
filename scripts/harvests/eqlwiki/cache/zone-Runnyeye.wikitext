@@ -1,7 +1,9 @@
 {{Classic Era}}{{revamped}}{{Disambig3|[[Clan Runnyeye (Faction)]]}}
  Runnyeye has been changed. Something is up in Goblin land...
  - May 30, 2001 patch notes
-'''RunnyEye Citadel''' (formerly '''Clan RunnyEye''') is the underground home of the Pickclaw clan of goblins. Their tunnels wind their way through the hills, carving deeper and deeper down into the depths. There are rumors that the Runnyeye clan of goblins are allied in some strange way with the evil eyes ruled by King Xorbb, working together to expand both of their domains. They also seemed to have tapped into other elemental beings that make their home in this area of Norrath. The respawn timer for named mobs in this zone is 22 minutes. The regular mobs are between 6 and 10 minutes. The evil eye prisoner is 55 minutes.
+'''RunnyEye Citadel''' (formerly '''Clan RunnyEye''') is the underground home of the Pickclaw clan of goblins. While the remaining Runnyeye Goblins that inhabit the top floor of the dungeon are KoS, the Pickclaw goblins on floors 2 and 4 are... not exactly what they seem, and start indifferent to everyone
+
+The respawn timer for named mobs in this zone is 22 minutes. The regular mobs are between 6 and 10 minutes. The evil eye prisoner is 55 minutes (unconfirmed on eql)
 [[File:Runnyeye.jpg|500px|thumb|right|RunnyEye Citadel just inside the entrance from the Gorge of King Xorbb.]] 
 {|
 |rowspan="6" valign="top"| <div style='float:left;'>__TOC__</div>
@@ -129,6 +131,38 @@ Keeping directly to the right will take you quickly to the entrance to the [[Gor
 
 === Post-Revamp ===
 
+* [[a goblin peon]]
+* [[a goblin neophyte]]
+* [[a goblin scavenger]]
+* [[a goblin trainee]]
+* [[a goblin runt]]
+* [[A Pickclaw Bladestopper]]
+* [[A Pickclaw Arroweater]]
+* [[A Pickclaw Mindripper]]
+* [[A Pickclaw Thoughtshaper]]
+* [[A Pickclaw bonemender]]
+* [[Goblin Janitor]]
+* [[A Pickclaw Foeseeker]]
+* [[A Pickclaw Crusader]]
+* [[A Pickclaw Foechopper]]
+* [[A Pickclaw Zekspeaker]]
+* [[A Pickclaw Foeslicer]]
+* [[A Pickclaw Destroyer]]
+* [[Battlelord Paluk]]
+* [[Lord Pickclaw]]
+* [[Battlewizard Unak]]
+
+* [[A Sporali Miner]]  
+* [[A Sporali Scavenger]]  
+* [[A Sporali Defender]]  
+* [[A Sporali worker]]  
+* [[A Sporali Gatherer]]  
+* [[A sporeling]]  
+* [[The Sporali Moldmaster]]  
+* A sludge guppy
+* [[An ooze crawler]]
+* [[Sludge Dankmire]]
+* [[Borxx]]
 {{Special:DynamicZoneList/RunnyEye Citadel}}
 
 === Pre-Revamp ===

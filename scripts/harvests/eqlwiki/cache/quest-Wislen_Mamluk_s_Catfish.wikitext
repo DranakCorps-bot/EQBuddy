@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:Wislen.png|frame|Wislen Mamluk]]
+[[File:Wislen.png|thumb|Wislen Mamluk]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kerra Island]]

@@ -29,87 +29,142 @@
 * Suggested tasks to complete first:
 ** Obtain a [[SoulFire]] via the [[Zimel's Blades (SoulFire)]] quest
 ** Obtain a [[Dark Reaver]] from [[A ghoul cavalier]] in [[Lower Guk]]
-** Get [[Bloodsabers]] faction <b>Kindly</b> or higher - there are few ways to do this.
-** Get [[Heretics]] faction <b>Warmly</b> or higher - Kill Kobolds in [[The Warrens]]
-** Get [[Dismal Rage]] faction <b>Kindly</b> or higher - Do [[Assist the Great Xelha]] quest in [[East Freeport]] (requires about 1000 bone chips to turn-ins)
-* Slay [[Brother Hayle]] in [[Splitpaw Lair]] prison area - <b>cell doors open via switches</b>!
-** Loot and right-click on [[Burning Soul of the Pious]]
-* Find [[Lord Grimrot]] in [[Southern Karana]] - <b>MUST BE LIVING VERSION!</b>
-** Give Lord Grimrot [[Dark Reaver]] and right-clicked [[Burning Soul of the Pious]] - <b>requires [[Bloodsabers]] Kindly faction</b>!
+** Get [[Bloodsabers]] faction <b>Kindly</b> or higher; see below for tips
+** Get [[Heretics]] faction <b>Warmly</b> or higher; see below for tips
+** Get [[Dismal Rage]] faction <b>Kindly</b> or higher; see below for tips
+* Get the [[Burning Soul of the Pious]]
+** Quest for the [[Soulfire]] first, ending with...
+** Find [[Brother Hayle]] in the [[Splitpaw Lair]] prison area (#6 on the map)
+** Kill Hayle for the Soul
+** Right-click the [[Burning Soul of the Pious]] to get the text.
+* Get the [[Pestilence Scythe]] (with soul) and the [[Burning Soul of the Pestilent]]
+** Make sure you have Kindly faction with [[Bloodsabers]] 
+** Find [[Lord Grimrot]] in [[Southern Karana]] - <b>MUST BE THE LIVING VERSION!</b>
+** Give Lord Grimrot [[Dark Reaver]] and the clicked [[Burning Soul of the Pious]]
 ** Right-click the [[Burning Soul of the Pious]] he hands you back - <b>make sure it does not have any text in the chat window; if it does, your turn-in did not work (probably due to faction)</b>!
 ** Kill Lord Grimrot
-** Loot [[Pestilence Scythe]] - <b>the one with charges; the other one doesn't matter for this quest</b>.
-* Find [[Jotayi Ibupran]] in [[Paineel]] (Necromancer Guild balcony)
-** Give Jotayi Ibupran [[Pestilence Scythe]] (the one with charges) and [[Burning Soul of the Pestilent]] - <b>requires [[Heretics]] Warmly Faction</b>!
-* Find [[Dason Goldblade]] in [[Plane of Sky]] Efreeti Chamber (quest room) - <b>MAKE SURE YOU ARE KEYED UP TO ISLAND 4 BEFORE SEEKING HIM OUT</b>!
+** Loot [[Pestilence Scythe]] - <b>the one with charges</b>
+** Loot [[Burning Soul of the Pestilent]] and right-click it to see the text
+* Get the [[Burning Soul of the Virtuous]]
+** Make sure you have Warmly faction with [[Heretics]]
+** Find [[Jotayi Ibupran]] in [[Paineel]], on the Necromancer Guild balcony
+** Give Jotayi Ibupran [[Pestilence Scythe]] (the one with charges and no item lore) and [[Burning Soul of the Pestilent]]
+** Make sure you are keyed up to Island 4 in [[Plane of Sky]]
+** Find [[Dason Goldblade]] in [[Plane of Sky]] Efreeti Chamber (quest room)
 ** Give [[Dason Goldblade]] 500pp to spawn [[Inte Akera]] inside the Windmill on Island 4 - <b>be quick, he will eventually despawn</b>.
-** Kill [[Inte Akera]] and loot the [[Burning Soul of the Virtuous]]. ''Note: If you are in a group, the soul is linked to whoever turns in the 500 platinum to spawn Inte.''
-*  Find [[Luxio Nulsis]] in [[East Freeport]] (Shadowknight spell vendor basement area)
-** Give [[Luxio Nulsis]] the three Souls and [[Soulfire]] - <b>Requires [[Dismal Rage]] Kindly faction</b>!
+** Invis and run up to the Windmill on Island 4
+** Kill [[Inte Akera]] and loot the [[Burning Soul of the Virtuous]]. 
+*** ''Note: If you are in a group, the soul is linked to whoever turns in the 500 platinum to spawn Inte.''
+** Right-click the [[Burning Soul of the Virtuous]] to get the text. 
+* Get the [[Torrid Corruptor]]
+** Make sure you have Kindly faction with [[Dismal Rage]]
+** Find [[Luxio Nulsis]] in the [[East Freeport]] Shadow Knight spell vendor basement area
+** Give [[Luxio Nulsis]] the three Souls and [[Soulfire]]
 {{End}}
 
 == Walkthrough ==
 
-;Burning Soul of the Pious
+=== Burning Soul of the Pious ===
+In the depths of [[Splitpaw Lair]] (#6 on the map) you can find [[Brother Hayle]], a cleric of [[Rodcet Nife]]. He has been captured by the [[Split Paw Clan]] gnolls, and is a key figure in the [[Zimel's Blades (SoulFire)|quest]] for the Paladin blade [[Soulfire]]. Open his cell door wth the switch on the wall outside.
 
-;Burning Soul of the Pestilent
-*Next part requires [[Bloodsabers]] Kindly Faction.
-**You can gain [[Bloodsabers]] faction by doing the [[Guard Shilster's Stout]] or [[Gharin's Note (evil)]] quest.
-**By doing Guard Shilster's Stout, give 5 gold at a time to [[Guard Shilster]] (1380, -2764) in [[Northern Plains of Karana|North Karana]]. Takes about ~3000 gold to max out all of his factions.
-*Find [[Lord Grimrot]] (1377, 1172) by the skeletons in [[South Karana]]. There's a living and undead version with the same name. '''The turn-in requires the living version.''' It's rumored to be a 3.2-hour spawn. One of the fastest ways to spawn Lord Grimrot is to make an instance right at 6am. Use <code><nowiki>/time</nowiki></code> to see the in-game time.
-*Turn in the clicked version of [[Burning Soul of the Pious]] and [[Dark Reaver]] to the living version of Lord Grimrot.
-**:Lord Grimrot says, 'You have served me well. You may yet prove useful to my master.'
+After you complete the [[Zimel's Blades (SoulFire)|Zimel's Blades]] quest and obtain the [[Soulfire]] you'll have options. If your active loadout has [[Paladin]] and [[Shadowknight]], then you'll receive a message. To proceed with the Torrid Corruptor quest, murder [[Brother Hayle]]. He drops the [[Burning Soul of the Pious]], which contains a message for murderers like you. Right click the Soul in your inventory (you must right-click the soul in order to progress the quest) to receive a message from a greater power:
+
+: As you stare into the fading embers within your palm, you are haunted by the visage of Brother Hayle and your decision to slay him. What temptation drove you to this madness? Within moments, a voice fills your head. "You've done well. This loathsome soul sought to spread their own piety into the minds of gnolls, disgracing the blessing of decay I've bestowed upon them." As the voice speaks, you feel a churn in your stomach as if you are about to be sick. "If you wish to understand your actions, seek out my servant, Lord Grimrot. Bestow upon them my gift through your hands, a dark reaver, and a token of your loyalty, the soul you have claimed. Only though them will you learn the truth."
+
+=== Burning Soul of the Pestilent ===
+Make sure you have at least Kindly faction with the [[Bloodsabers]]. [[Guard Shilster's Stout]] is a quick but more expensive method, and the [[Gharin's Note (evil)]] quest is slower but more economical. 
+
+* For [[Guard Shilster's Stout]], give 5 gold per turnin to [[Guard Shilster]] (1380, -2764) in [[Northern Plains of Karana|North Karana]]. It takes about ~3000 gold to max out all of his factions.
+* Find the [[a ghoul cavalier|ghoul cavalier]] in the Dead Side area of [[Lower Guk]] and take the [[A Dark Reaver|Dark Reaver]] from it. 
+
+Find [[Lord Grimrot]] (1377, 1172) by the skeletons in [[South Karana]]. There's a living and undead version with the same name. '''The turn-in requires the living version.''' It's rumored to be a 3.2-hour spawn. One of the fastest ways to spawn Lord Grimrot is to make a non-respawning instance during daytime between 6am and 6pm. Use <code><nowiki>/time</nowiki></code> to see the in-game time.
+
+Turn in the clicked version of [[Burning Soul of the Pious]] and [[Dark Reaver]] to the living version of Lord Grimrot.
+: Lord Grimrot says, 'You have served me well. You may yet prove useful to my master.'
 <div class='facblock'>
-:* Your faction standing with [[Bloodsabers]] has been adjusted by (+?).
-:* Your faction standing with [[Guards of Qeynos]] has been adjusted by (-15).
-:* Your faction standing with [[Opal Darkbriar]] has been adjusted by (+10).
-:* Your faction standing with [[Priests of Life]] has been adjusted by (-25).
-:* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by (+?).
+* Your faction standing with [[Bloodsabers]] has been adjusted by 100.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by -15.
+* Your faction standing with [[Opal Darkbriar]] has been adjusted by 10.
+* Your faction standing with [[Priests of Life]] has been adjusted by -25.
+* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by 5.
 </div>
 :{{exp}}
-*Kill the living version of Lord Grimrot.
+
+'''You receive a non-clickable [[Burning Soul of the Pious]]'''. 
+
+Murder the living version of [[Lord Grimrot]]. You will get the usual faction hits from killing him.
+
+Loot the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] with 1 charge of [[Vampiric Curse]] and no item lore. (There is another [[Pestilence Scythe]] of the same name with no charges that isn't required for this quest. Its item lore says "Pestilence Scythe(No Soul)".)
+
+Right-click the [[Burning Soul of the Pestilent]]: 
+
+: As you stare into the fading embers within your palm, the feeling of redemption is lost upon you as you bear witness to the visage of Lord Grimrot cursing you from beyond for your sudden betrayal. Within moments you hear laughter in your mind as you are pierced by an overencumbrance of terror that speaks to your very being. "This loathsome soul sought to serve my enemy and deserved such a fate. As for your pitiful plight, if you still live in fear of your regrets, then seek out Jotayi Ibupran. Show them you have served me well, and you may yet prove your worth."
+
+The next part requires [[Heretics]] Warmly Faction.
+* You can gain [[Heretics]] faction by killing Kobolds in [[The Warrens]]. At +5 [[Heretics]] per Kobold kill, it takes about ~2 rounds of killing the entire zone. 
+* If you are a Paladin, it helps to set your diety to Agnostic. 
+
+Go to [[Paineel]] and find [[Jotayi Ibupran]] (726, 856, -54) in the Necromancer guild, The Abattoir, on the third-floor balcony overlooking the courtyard.
+
+Turn in the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] (with charges, not uncharged) to Jotayi Ibupran.
+
+: Jotayi Ibupran says, 'My master has sent you? Such is the will of Cazic-Thule. I beseech you to be my vengeance. Before the war, I was friend to a paladin named Inte Akera, a man who could not let go of his sense of zeal. In our last battle, I fell to his blade, leaving me now the grim image you see before you. I believe he must have left Norrath some time ago, as I can no longer sense his life force anymore. It would bring my soul to rest to see his face beyond the veil.'
+
 <div class='facblock'>
-:* Your faction standing with [[Bloodsabers]] has been adjusted by (-915).
-:* Your faction standing with [[Guards of Qeynos]] has been adjusted by (+137).
-:* Your faction standing with [[Opal Darkbriar]] has been adjusted by (-91).
-:* Your faction standing with [[Priests of Life]] has been adjusted by (+70).
-:* Your faction standing with [[Corrupt Qeynos Guards]] has been adjusted by (-45).
+* Your faction standing with [[Heretics]] has been adjusted by 100.
+* Your faction standing with [[Deepwater Knights]] has been adjusted by -100.
+* Your faction standing with [[Gate Callers]] has been adjusted by -100.
+* Your faction standing with [[Craftkeepers]] has been adjusted by -100.
+* Your faction standing with [[Crimson Hands]] has been adjusted by -100.
+* Your faction standing with [[Kerra Isle]] has been adjusted by -10.
 </div>
 :{{exp}}
-*Loot the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] with 1 charge of [[Vampiric Curse]]. There is another [[Pestilence Scythe]] of the same name with no charges that isn't required for this quest.
-*Next part requires [[Heretics]] Warmly Faction.
-**You can gain [[Heretics]] faction by killing Kobolds in [[The Warrens]]. Take about ~2 rounds of killing the entire zone. Agnostic deity also helps if you are a Paladin.
-*Go to [[Paineel]] and find [[Jotayi Ibupran]] (726, 856, -54) in the Necromancer guild, The Abattoir, on the third-floor balcony overlooking the courtyard.
-*Turn in the [[Burning Soul of the Pestilent]] and the [[Pestilence Scythe]] (with charges, not uncharged) to Jotayi Ibupran.
-**:Jotayi Ibupran says, 'My master has sent you? Such is the will of Cazic-Thule. I beseech you to be my vengeance. Before the war, I was friend to a paladin named Inte Akera, a man who could not let go of his sense of zeal. In our last battle, I fell to his blade, leaving me now the grim image you see before you. I believe he must have left Norrath some time ago, as I can no longer sense his life force anymore. It would bring my soul to rest to see his face beyond the veil. '
+
+'''You receive an unclickable version of [[Burning Soul of the Pestilent]].'''
+
+=== Burning Soul of the Virtuous ===
+Get yourself keyed access to the [[Plane of Sky|Plane of Sky's]] island 4, the one with the flying horses and griffins. Careful of the [[An Essence Carrier|an essence carrier]] mobs, as they are scowls, ready to attack. Make sure you have a safe path from island 1 up to inside island 4's windmill. You can use invisibility to go unnoticed.
+
+Next, go to the quest room from Island 1, with all the Efreeti. You can either leave the instance and renter, jump off an island, or cycle up past island 8: Veeshan's Island to get back to island 1 to be able to enter the quest island. 
+
+Find [[Dason Goldblade]] and prepare for a fight.
+
+Give Dason Goldblade 500 platinum, and this will spawn [[Inte Akera]], a level 55 Paladin, inside island 4's windmill. He will only stay up for a limited time. Hurry up to Island 4's windmill, and you will see him sitting down inside the windmill. If you still have the faction, he will consider you an ally, and when you hail him, he will say:
+
+: Inte Akera says, 'Greetings, _____.  I am Inte Akera. I have retired to the Plane of Sky after a long life toiling on Norrath's soil.  Have you retreated here as well, or are you merely visiting?'
+
+Murder [[Inte Akera]]. You will get the usual faction hits from killing him.
+
+Loot the [[Burning Soul of the Virtuous]] and right-click it:
+
+: As you stare into the fading embers within your palm, the fear of your mistakes overwhelms you as the visage of Jotayi's vengeance upon Inte echoes from the beyond. You are left with a long silence and have no conclusions left to draw from. You clasp the flames away in disgust, and close your eyes to seek inward. A voice calls out to you from the void. "Still the gods' plaything, are you? A miserable fate we all have come to learn. You'll not find any truth despite their promises. It has led me only to selfish spite. My name is Luxio, I was once a knight such as you. If you still need guidance, seek me out in Freeport amidst the rest of the forsaken rabble."
+
+=== Torrid Corruptor ===
+
+Get <b>Kindly</b> or higher [[Dismal Rage]] faction. [[Assist the Great Xelha]] quest in [[East Freeport]] is probably the easiest method:
+* 4x [[Bone Chips]] increases faction by 5. 
+* 4x [[Fire Beetle Eye|Fire Beetle Eyes]] increases faction by 10.
+* 4x [[Spiderling Silk]] increases faction by 10.
+** The [[Paineel]] newbie yard is a great place to get [[Bone Chips]] and [[Fire Beetle Eye|Fire Beetle Eyes]]. In the northernmost corner of the yard, there are 2 spots that respawn ''very'' quickly- one spot spawns 3 [[A Fire Beetle|fire beetles]] and the other spawns 4 [[A Decaying Skeleton|decaying skeletons]]. If you can kill them fast enough, you can loot about 400 [[Bone Chips]] ''and'' 400 [[Fire Beetle Eye|Fire Beetle Eyes]] in about an hour. 
+
+Find [[Luxio Nulsis]] in the East Freeport tunnels near the [[Shadow Knight]] and [[Necromancer]] guild masters. He won't respond to hails: 
+
+: Luxio Nulsis says, 'Leave me, I have no interest in speaking with you.'
+
+However, tell Luxio "'''I still seek guidance'''":
+
+: Luxio Nulsis says, 'So, you've finally sought me out. It is unfortunate to see you still carry the guilt of your past with you. I know that feeling all too well. I can only advise to be rid of it once and for all. If you wish, as a fellow knight, I will take the sword and the three souls you've collected. This burden I will carry for you.'
+
+Give him the three Souls and the [[Soulfire]]:
+
 <div class='facblock'>
-:* Your faction standing with [[Heretics]] has been adjusted by (+?).
-:* Your faction standing with [[Deepwater Knights]] has been adjusted by (-100).
-:* Your faction standing with [[Gate Callers]] has been adjusted by (-100).
-:* Your faction standing with [[Craftkeepers]] has been adjusted by (-100).
-:* Your faction standing with [[Crimson Hands]] has been adjusted by (-100).
-:* Your faction standing with [[Kerra Isle]] has been adjusted by (-10).
+* Your faction standing with [[Dismal Rage]] has been adjusted by 100.
+* Your faction standing with [[Knights of Truth]] has been adjusted by -15.
+* Your faction standing with [[Opal Darkbriar]] has been adjusted by 20.
 </div>
 :{{exp}}
-*You will receive an unclickable version of [[Burning Soul of the Pestilent]].
 
-;Burning Soul of the Virtuous
-*Get yourself keyed access to the [[Plane of Sky|Plane of Sky's]] island 4, the one with the flying horses and griffins. Careful of the [[An Essence Carrier|an essence carrier]] mobs, as they are scowls, ready to attack. Make sure you have a safe path from island 1 up to inside island 4's windmill. You can use invisibility to go unnoticed.
-*Next, go to the quest room from Island 1, with all the Efreeti. You can either leave the instance and renter, jump off an island, or cycle up past island 8: Veeshan's Island to get back to island 1 to be able to enter the quest island. 
-*Find [[Dason Goldblade]] and prepare for a fight.
-*Give Dason Goldblade 500 platinum, and this will spawn [[Inte Akera]], a level 55 Paladin, inside island 4's windmill. He will only stay up for a limited time. Hurry up to Island 4's windmill, and you will see him sitting down inside the windmill. If you still have the faction, he will consider you an ally, and when you hail him, he will say:
-**:Inte Akera says, 'Greetings, _____.  I am Inte Akera.   I have retired to the Plane of Sky after a long life toiling on Norrath's soil.  Have you retreated here as well, or are you merely visiting?'
-*Kill him.
-<div class='facblock'>
-:* Your faction standing with [[Deepwater Knights]] has been adjusted by (-750).
-:* Your faction standing with [[High Council of Erudin]] has been adjusted by (-112).
-:* Your faction standing with [[Heretics]] has been adjusted by (+?).
-:* Your faction standing with [[Kerra Isle]] has been adjusted by (+10).
-</div>
-*Loot the [[Burning Soul of the Virtuous]]
-
-;Torrid Corruptor
-* Find [[Luxio Nulsis]] in East Freeport and hand him the three souls and [[Soulfire]].
+'''You receive the [[Torrid Corruptor]].'''
 
 [[Category:Quests]]
 [[Category:Plane of Sky]]

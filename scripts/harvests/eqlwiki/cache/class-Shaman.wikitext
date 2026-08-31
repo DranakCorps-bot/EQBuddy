@@ -149,7 +149,6 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 NOTE: Spells with ? may be removed need to be confirmed!!!
 The spell list below was last updated for EQL on 5/19/26.
 <div id="spells_level_1">
-
 ==Level 1==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -157,120 +156,110 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burst of Flame
-|description=Fire direct damage in 1.5 sec
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Single
+|mana=4
+|effects=1: Decrease Hitpoints by 3 (L1) to 5 (L4)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=4
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=3-5 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Disease
-|description=Cures weak diseases in 2 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=20
 |kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 1 Disease
-}}
-{{RadSpellRow2
-|name=Dexterous Aura
-|description=+DEX for 27 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
-|mana=10
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+10 DEX
-}}
-{{RadSpellRow2
-|name=Endure Cold
-|description=+Cold Resist for 27 min
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|targ=Friendly
 |mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Cold Resist
-}}
-{{RadSpellRow2
-|name=Flash of Light
-|description=Blind and -ATK for 12 sec (high aggro)
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=12
-|kind=Debuff
-|targ=Single
-|duration=12 Sec
-|max=-5 ATK
-}}
-{{RadSpellRow2
-|name=Inner Fire
-|description=+AC/Max HP for 27 min or efficient heal
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=10
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+2 AC<br>+20 Max HP<br>11-20 HP
-}}
-{{RadSpellRow2
-|name=Minor Healing
-|description=Heal target in 1 sec
-|era={{Classic Short}}
+|effects=1: Cure Disease: 1 counter
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=12-20 HP
-}}
-{{RadSpellRow2
-|name=Strengthen
-|description=+STR for 27 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dexterous Aura
+|kind=Dexterity
+|targ=Friendly
+|mana=10
+|effects=1: Increase DEX by 5 (L1) to 10 (L6)
+|duration=27 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=10
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+10 STR
-}}
-{{RadSpellRow2
-|name=True North
-|description=Face north (or level Divination cheaply)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Endure Cold
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Cold Resist by 11 (L1) to 20 (L10)
+|duration=27 Min
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Flash of Light
+|kind=Blind
+|targ=Single
+|mana=12
+|effects=1: Blind<br>2: Decrease ATK by 5
+|duration=12 Sec
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Inner Fire
+|kind=HP Buff (Line 1)
+|targ=Friendly
+|mana=10
+|effects=1: Increase AC by 1 (L1) to 2 (L10)<br>2: Increase Max Hitpoints by 11 (L1) to 20 (L10)<br>3: Increase Hitpoints by 11 (L1) to 20 (L10)
+|duration=27 Min
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Healing
+|kind=Heals
+|targ=Friendly
+|mana=10
+|effects=1: Increase Hitpoints by 12 (L1) to 20 (L5)
 |duration=Instant
-|max=-
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Strengthen
+|kind=Strength
+|targ=Friendly
+|mana=10
+|effects=1: Increase Strength by 5 (L1) to 10 (L6)
+|duration=27 Min
+|school=Alteration
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=True North
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Heading
+|duration=Instant
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -283,48 +272,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Poison
-|description=Cures weak poisons in 2 sec
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=20
+|effects=1: Cure Poison: 1 counter
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 1 Poison
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit Pouch
-|description=Summon 1 temporary 4-slot 100% weight reduction bag which disappears ~15 minutes after leaving game; all contents are lost as well
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Summon Utility
+|targ=Self
 |mana=40
-|kind=Utility
-|targ=Self
+|effects=1: {{:Summoned: Spirit Pouch}}
 |duration=Instant
-|max=Summon Item #17303
-}}
-{{RadSpellRow2
-|name=Summon Drink
-|description=Summon 1 temporary drink
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=10
-|kind=Utility
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Drink
+|kind=Summon Food/Water
 |targ=Self
+|mana=10
+|effects=1: {{:Summoned: Globe of Water}}
 |duration=Instant
-|max=Summon Item #13079
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -337,36 +322,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Feet like Cat
-|description=+AGI for 36 min
-|era={{Classic Short}}
+|kind=Agility
+|targ=Friendly
+|mana=40
+|effects=1: Increase AGI by 12 (L3) to 18 (L9)
+|duration=36 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+18 AGI
-}}
-{{RadSpellRow2
-|name=Scale Skin
-|description=+AC for 27 min (requires [[Snake Scales]])
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scale Skin
+|kind=Armor Class
+|targ=Friendly
+|mana=25
+|effects=1: Increase AC by 3 (L3) to 5 (L9)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+5 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -379,48 +361,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fleeting Fury
-|description=+STR/DEX/AC for 12-18 sec
-|era={{Classic Short}}
+|kind=Strength
+|targ=Friendly
+|mana=10
+|effects=1: Increase Strength by 15<br>2: Increase AC by 5<br>3: Increase DEX by 20
+|duration=18 Sec
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=18 Sec
-|max=+15 STR<br>+5 AC<br>+20 DEX
-}}
-{{RadSpellRow2
-|name=Frost Rift
-|description=Cold direct damage in 1.75 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Rift
+|kind=Cold DD
+|targ=Single
+|mana=19
+|effects=1: Decrease Hitpoints by 26 (L4) to 29 (L10)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=19
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=26-29 Dmg
-}}
-{{RadSpellRow2
-|name=Sicken
-|description=Disease damage over time for 90-126 seconds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sicken
+|kind=Disease DoT
+|targ=Single
+|mana=11
+|effects=1: Increase Disease Counter by 1<br>2: Decrease Hitpoints by 3 (L4) to 11 (L20) per tick<br>3: Decrease Hitpoints by 8
+|duration=1 Min 24 Sec
 |school=Conjuration
 |location=Vendor
-|mana=11
-|kind=DoT
-|targ=Single
-|duration=1 Min 24 Sec
-|max=-11 HP/tick<br>-8 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -433,48 +411,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Drowsy
-|description=-Attack Speed for 12-174 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
-|mana=20
 |kind=Slow
 |targ=Single
-|duration=2 Min 30 Sec
-|max=-25% Atkspd
-}}
-{{RadSpellRow2
-|name=Endure Fire
-|description=+Fire Resist for 27 min
+|mana=20
+|effects=1: Decrease Attack Speed by 11% (L5) to 22% (L50)<br>2: Increase Disease Counter by 3
+|duration=3 Min 30 Sec
+|school=Alteration
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Endure Fire
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Fire Resist by 11 (L1) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Fire Resist
-}}
-{{RadSpellRow2
-|name=Gate
-|description=Return to your Bind Point in 5 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gate
+|kind=Transport
+|targ=Self
+|mana=70
+|effects=1: Gate · 98% chance · bind point 1
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=70
-|kind=Teleport
-|targ=Self
-|duration=Instant
-|max=-
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -487,48 +461,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Serpent Sight
-|description=+Infravision for 27 min
-|era={{Classic Short}}
+|kind=Vision
+|targ=Friendly
+|mana=30
+|effects=1: Infravision
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Spirit of Bear
-|description=+STA for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Bear
+|kind=Stamina
+|targ=Friendly
+|mana=40
+|effects=1: Increase STA by 11 (L6) to 15 (L14)
+|duration=36 Min
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+15 STA
-}}
-{{RadSpellRow2
-|name=Summon Food
-|description=Summon 1 temporary food
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Food
+|kind=Summon Food/Water
+|targ=Self
+|mana=10
+|effects=1: {{:Summoned: Black Bread}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=Summon Item #13078
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -541,48 +511,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Blindness
-|description=Cures blindness in 2 sec
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=20
+|effects=1: Cure Blindness
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=-
-}}
-{{RadSpellRow2
-|name=Sense Animals
-|description=Face the closest Animal
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sense Animals
+|kind=Animal
+|targ=Self
+|mana=5
+|effects=1: Sense Animals
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=-
-}}
-{{RadSpellRow2
-|name=Spirit Sight
-|description=+See Invisible for 27 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Sight
+|kind=Vision
+|targ=Friendly
+|mana=20
+|effects=1: See Invisible
+|duration=27 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=-
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -595,48 +561,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Disease
-|description=Surrounds your target with an aura of protection, warding away disease for 27 min.
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Disease Resist by 18 (L8) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Disease Resist
-}}
-{{RadSpellRow2
-|name=Tainted Breath
-|description=Poison damage over time for 42 seconds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tainted Breath
+|kind=Poison DoT
+|targ=Single
+|mana=58
+|effects=1: Increase Poison Counter by 5<br>2: Decrease Hitpoints by 10<br>3: Decrease Hitpoints by 14 (L8) to 22 (L24) per tick
+|duration=42 Sec
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=58
-|kind=DoT
-|targ=Single
-|duration=42 Sec
-|max=-10 Dmg<br>-22 HP/tick
-}}
-{{RadSpellRow2
-|name=Talisman of the Beast
-|description=Increase Strength by 10
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Talisman of the Beast
+|kind=Strength
+|targ=Group
+|mana=25
+|effects=1: Increase Strength by 10
+|duration=27 Min
 |school=Alteration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Group
-|duration=27 Min
-|max=+10 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -649,54 +611,49 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Light Healing
-|description=Heal target in 2 sec
-|era={{Classic Short}}
+|kind=Heals
+|targ=Friendly
+|mana=28
+|effects=1: Increase Hitpoints by 47 (L4) to 65 (L10)
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=28
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=47-65 HP
-}}
-{{RadSpellRow2
-|name=Remove Minor Curse
-|description=Decrease Curse Counter by 2
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Remove Minor Curse
+|kind=Cure
+|targ=Friendly
+|mana=25
+|effects=1: Cure Curse: 2 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=25
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 2 Curse
-}}
-{{RadSpellRow2
-|name=Spirit of Wolf
-|description=+Run Speed for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Wolf
+|kind=Movement
+|targ=Friendly
+|mana=40
+|effects=1: Increase Movement Speed by 34% (L9) to 55% (L50)
+|duration=36 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=Run Speed
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_10">
-
 ==Level 10==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -704,48 +661,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invisibility versus Animals
-|description=Become invisible to Animals for 27-36 min (may fade earlier)
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Friendly
+|mana=30
+|effects=1: Invisibility vs Animals
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Levitate
-|description=Levitate and suffer no fall damage for 5.2-19 min (requires [[Bat Wing]])
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Levitate
+|kind=Levitate
+|targ=Friendly
+|mana=30
+|effects=1: Levitate
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Spirit of Snake
-|description=+CHA for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Snake
+|kind=Charisma
+|targ=Friendly
+|mana=40
+|effects=1: Increase CHA by 11 (L10) to 15 (L18)
+|duration=36 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+15 CHA
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -758,48 +711,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burst of Strength
-|description=+STR/DEX/AC for 18 sec
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Strength
+|targ=Friendly
 |mana=15
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Strength by 20<br>2: Increase AC by 6<br>3: Increase DEX by 20
 |duration=18 Sec
-|max=+20 STR<br>+6 AC<br>+20 DEX
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Poison
-|description=+Poison Resist for 27 min
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Resist Buff
+|targ=Friendly
 |mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Poison Resist by 16 (L6) to 20 (L10)
 |duration=27 Min
-|max=+20 Poison Resist
-}}
-{{RadSpellRow2
-|name=Turtle Skin
-|description=+AC for 36 min
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Turtle Skin
+|kind=Armor Class
+|targ=Friendly
 |mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AC by 7 (L11) to 8 (L18)
 |duration=36 Min
-|max=+8 AC
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -812,54 +761,49 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Disempower
-|description=-STR/STA/AC for 84-120 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=45
-|kind=Debuff
+|kind=Disempowering
 |targ=Single
+|mana=45
+|effects=1: Decrease STA by 9 (L12) to 20 (L34)<br>2: Decrease Strength by 13 (L12) to 15 (L16)<br>3: Decrease AC by 5 (L12) to 7 (L28)
 |duration=2 Min
-|max=-20 STA<br>-15 STR<br>-7 AC
-}}
-{{RadSpellRow2
-|name=Enduring Breath
-|description=Breathe underwater for 27 min (requires [[Fish Scales]])
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=35
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Root
-|description=Causes the earth to adhere to your target's feet, preventing them from moving.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Enduring Breath
+|kind=Utility Beneficial
+|targ=Friendly
+|mana=35
+|effects=1: Enduring Breath (Water Breathing)
+|duration=27 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Root
+|kind=Root
+|targ=Single
+|mana=30
+|effects=1: Root
+|duration=48 Sec
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=48 Sec
-|max=Root
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_13">
-
 ==Level 13==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -867,30 +811,27 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Walking Sleep
-|description=-Attack Speed for 42-180 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
-|mana=60
 |kind=Slow
 |targ=Single
-|duration=2 Min 30 Sec
-|max=-35% Atkspd
+|mana=60
+|effects=1: Decrease Attack Speed by 23% (L13) to 32% (L50)<br>2: Increase Disease Counter by 6
+|duration=3 Min 30 Sec
+|school=Alteration
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_14">
-
 ==Level 14==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -898,48 +839,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Affinity
-|description=Change Bind Point to current location; must be in party, cannot bind others outside of towns.
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Single
+|mana=100
+|effects=1: Bind Affinity
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=100
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=-
-}}
-{{RadSpellRow2
-|name=Snails Healing
-|description=Imbues your target with the health of a snail spirit, healing 60 hit points every 6 seconds for 24s, but vastly decreasing their movement rate.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Snails Healing
+|kind=Duration Heals
+|targ=Group Member
+|mana=120
+|effects=1: Increase Hitpoints by 60 per tick<br>2: Stops movement
+|duration=24 Sec
 |school=Alteration
 |location=Vendor
-|mana=120
-|kind=Heal Over Time
-|targ=Target Group Member or Self
-|duration=24 Sec
-|max=Snare
-}}
-{{RadSpellRow2
-|name=Spirit Strike
-|description=Cold direct damage in 2.45 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Strike
+|kind=Cold DD
+|targ=Single
+|mana=44
+|effects=1: Decrease Hitpoints by 72 (L14) to 78 (L20)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=44
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=72-78 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -952,42 +889,38 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Infectious Cloud
-|description=AOE 20DD + 5/tic damage over time for 126 seconds
-|era={{Classic Short}}
+|kind=Disease DoT
+|targ=Targeted AE
+|mana=78
+|effects=1: Increase Disease Counter by 1<br>2: Decrease Hitpoints by 5 per tick<br>3: Decrease Hitpoints by 20
+|duration=2 Min 6 Sec
 |school=Conjuration
 |location=Vendor
-|mana=78
-|kind=DoT
-|targ=Targeted AE
-|duration=2 Min 6 Sec
-|max=-5 HP/tick<br>-20 Dmg
-}}
-{{RadSpellRow2
-|name=Shrink
-|description=Shrink target's character model and hitbox (castable indoors only)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shrink
+|kind=Utility Beneficial
+|targ=Single
+|mana=50
+|effects=1: Increase Size by 66
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=50
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=Casts to minimum size:<br>0 for gnome<br>1 for small/medium<br>2 for large<br>3 for pets
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_16">
-
 ==Level 16==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -995,66 +928,60 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Frenzy
-|description=+AC/AGI/STR/DEX
-|era={{Classic Short}}
+|kind=Strength
+|targ=Self
+|mana=35
+|effects=1: Increase AC by 5 (L16) to 8 (L40)<br>2: Increase AGI by 18 (L16) to 25 (L30)<br>3: Increase Strength by 19 (L16) to 27 (L50)<br>4: Increase DEX by 25
+|duration=Permanent
 |school=Abjuration
 |location=Autogranted
-|mana=35
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+8 AC<br>+25 AGI<br>+27 STR<br>+25 DEX
-}}
-{{RadSpellRow2
-|name=Grow
-|description=Increases the size of your target, causing them to appear more imposing.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Grow
+|kind=Utility Beneficial
+|targ=Single
+|mana=50
+|effects=1: Increase Size by 133
+|duration=Instant
 |school=Alteration
 |location=Autogranted
-|mana=50
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Impassivity
-|description=Places your target into a stoic state, healing 60 hit points every 6 seconds for 24s, but vastly decreasing their attack rate.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Duration Heals
+|targ=Group Member
 |mana=120
-|kind=Heal Over Time
-|targ=Target Group Member or Self
+|effects=1: Increase Hitpoints by 60 per tick<br>2: Decrease Attack Speed by 30%
 |duration=24 Sec
-|max=-30% Atkspd
-}}
-{{RadSpellRow2
-|name=Tiny Companion
-|description=Decrease Pet Size by 50%
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Beneficial
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tiny Companion
+|kind=Pet
 |targ=Pet
+|mana=50
+|effects=1: Increase Shrink Pet by 50
 |duration=Instant
-|max=-
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_17">
-
 ==Level 17==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1062,36 +989,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Insidious Fever
-|description=-Disease Resist for 4.8-12 min
-|era={{Classic Short}}
+|kind=Resist Debuffs
+|targ=Single
+|mana=30
+|effects=1: Increase Disease Counter by 4<br>2: Decrease Disease Resist by 18 (L17) to 35 (L50)
+|duration=14 Min
 |school=Conjuration
 |location=Vendor
-|mana=30
-|kind=Debuff
-|targ=Single
-|duration=11 Min
-|max=-35 Disease Resist
-}}
-{{RadSpellRow2
-|name=Vision
-|description=See through target's eyes with Ultravision and +30% magnification for 5-12 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vision
+|kind=Vision
+|targ=Single
+|mana=10
+|effects=1: Bind Sight<br>2: Increase Magnify by 130<br>3: Ultravision
+|duration=14 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Single
-|duration=11 Min
-|max=-
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1104,54 +1028,49 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Malaise
-|description=-Fire, Cold, Magic, and Poison Resists for 4.8-12 min
-|era={{Classic Short}}
+|kind=Resist Debuffs
+|targ=Single
+|mana=60
+|effects=1: Decrease Cold Resist by 15 (L18) to 20 (L28)<br>2: Decrease Magic Resist by 15 (L18) to 20 (L28)<br>3: Decrease Poison Resist by 15 (L18) to 20 (L28)<br>4: Decrease Fire Resist by 15 (L18) to 20 (L28)
+|duration=14 Min
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Debuff
-|targ=Single
-|duration=11 Min
-|max=-20 Cold Resist<br>-20 Magic Resist<br>-20 Poison Resist<br>-20 Fire Resist
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit Strength
-|description=+STR for 36 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
+|kind=Strength
+|targ=Friendly
 |mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Strength by 16 (L18) to 18 (L22)
 |duration=36 Min
-|max=+18 STR
-}}
-{{RadSpellRow2
-|name=Spirit of Cat
-|description=+AGI for 45 min
-|era={{Classic Short}}
 |school=Alteration
 |location=Autogranted<br>Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Cat
+|kind=Agility
+|targ=Friendly
 |mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AGI by 22 (L18) to 27 (L23)
 |duration=45 Min
-|max=+27 AGI
+|school=Alteration
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_19">
-
 ==Level 19==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1159,66 +1078,60 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Affliction
-|description=30DD + 6/tick damage over time for 126 seconds
-|era={{Classic Short}}
+|kind=Disease DoT
+|targ=Single
+|mana=71
+|effects=1: Increase Disease Counter by 4<br>2: Decrease Hitpoints by 26 (L19) to 38 (L31) per tick<br>3: Decrease Hitpoints by 42
+|duration=1 Min 24 Sec
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=71
-|kind=DoT
-|targ=Single
-|duration=1 Min 24 Sec
-|max=-38 HP/tick<br>-42 Dmg
-}}
-{{RadSpellRow2
-|name=Cancel Magic
-|description=Attempts to remove one weak spell in 3.5 sec
 |era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=30
+}}
+{{KhazamSpellRow
+|name=Cancel Magic
 |kind=Dispel
 |targ=Single
+|mana=30
+|effects=1: Dispel (1)
 |duration=Instant
-|max=-1 spell counter
-}}
-{{RadSpellRow2
-|name=Endure Magic
-|description=+Magic Resist for 27 min
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Healing
-|description=Mends moderate wounds, healing between 95 and 175 hit points.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Endure Magic
+|kind=Resist Buff
+|targ=Friendly
+|mana=40
+|effects=1: Increase Magic Resist by 20
+|duration=27 Min
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Healing
+|kind=Heals
+|targ=Friendly
+|mana=65
+|effects=1: Increase Hitpoints by 135 (L10) to 175 (L20)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=65
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=135-175 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_20">
-
 ==Level 20==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1226,36 +1139,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Creeping Vision
-|description=Magnify vision for 1 min (decreases over time)
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=20
+|effects=1: Increase Magnify by 80
+|duration=1 Min
 |school=Divination
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Self
-|duration=1 Min
-|max=+88-100% Magnify
-}}
-{{RadSpellRow2
-|name=Protect
-|description=+AC for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Protect
+|kind=Armor Class
+|targ=Friendly
+|mana=75
+|effects=1: Increase AC by 9 (L20) to 11 (L28)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=75
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+11 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1268,48 +1178,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit of Cheetah
-|description=+Run Speed for 48 sec (10 min cooldown)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=20
-|kind=Buff
+|kind=Movement
 |targ=Self
+|mana=20
+|effects=1: Increase Movement Speed by 96% (L21) to 115% (L40)
 |duration=48 Sec
-|max=Run Speed
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit of Monkey
-|description=+DEX for 36 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Dexterity
+|targ=Friendly
 |mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase DEX by 19 (L21) to 20 (L22)
 |duration=36 Min
-|max=+20 DEX
-}}
-{{RadSpellRow2
-|name=Spirit of Ox
-|description=+STA for 45 min
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Ox
+|kind=Stamina
+|targ=Friendly
 |mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase STA by 19 (L21) to 23 (L28)
 |duration=45 Min
-|max=+23 STA
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1322,48 +1228,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Counteract Disease
-|description=Cures modereate diseases in 4 sec
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=50
+|effects=1: Cure Disease: 8 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 8 Disease
-}}
-{{RadSpellRow2
-|name=Poison Storm
-|description=Poison rain damage in 3.5 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Poison Storm
+|kind=Poison DD
+|targ=Targeted AE
+|mana=125
+|effects=1: Decrease Hitpoints by 60
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=125
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=60 Dmg
-}}
-{{RadSpellRow2
-|name=Scale of Wolf
-|description=+Run Speed for 45 min (fades when you attack or cast)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scale of Wolf
+|kind=Movement
+|targ=Group Member
+|mana=60
+|effects=1: Fragile (Fades on Hit)<br>2: Increase Movement Speed by 56% (L22) to 70% (L50)
+|duration=45 Min
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Buff
-|targ=Target Group Member or Self
-|duration=45 Min
-|max=Run Speed
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1376,48 +1278,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cannibalize
-|description=Convert your HP to Mana in 1.25 sec
-|era={{Classic Short}}
+|kind=Conversions
+|targ=Self
+|mana=0
+|effects=1: Decrease Hitpoints by 50<br>2: Increase Mana by 19 (L23) to 24 (L50)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=0
-|kind=Mana
-|targ=Self
-|duration=Instant
-|max=50 Dmg
-}}
-{{RadSpellRow2
-|name=Frost Strike
-|description=Cold direct damage in 3.1 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Strike
+|kind=Cold DD
+|targ=Single
+|mana=78
+|effects=1: Decrease Hitpoints by 142 (L23) to 156 (L30)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=78
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=142-156 Dmg
-}}
-{{RadSpellRow2
-|name=Regeneration
-|description=+HP Regen for 8.2-19 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Regeneration
+|kind=Health
+|targ=Friendly
+|mana=100
+|effects=1: Increase Hitpoints by 5 (L23) to 9 (L36) per tick
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=+5 HP Regen
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1430,48 +1328,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Envenomed Breath
-|description=30DD + 27/tic damage over time for 42 seconds
-|era={{Classic Short}}
+|kind=Poison DoT
+|targ=Single
+|mana=173
+|effects=1: Increase Poison Counter by 3<br>2: Decrease Hitpoints by 21<br>3: Decrease Hitpoints by 77 (L24) to 90 (L37) per tick
+|duration=42 Sec
 |school=Conjuration
 |location=Vendor
-|mana=173
-|kind=DoT
-|targ=Single
-|duration=42 Sec
-|max=-21 Dmg<br>-90 HP/tick
-}}
-{{RadSpellRow2
-|name=Remove Lesser Curse
-|description=Decrease Curse Counter by 4
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Remove Lesser Curse
+|kind=Cure
+|targ=Friendly
+|mana=75
+|effects=1: Cure Curse: 4 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=75
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 4 Curse
-}}
-{{RadSpellRow2
-|name=Resist Cold
-|description=+Cold Resist for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Cold
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Cold Resist by 39 (L24) to 40 (L25)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Cold Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1484,48 +1378,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Befriend Animal
-|description=Charm Animals up to Level 24 (random duration)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=70
 |kind=Charm
 |targ=Animal
-|duration=16 Min
-|max=Charm (max L24)
+|mana=70
+|effects=1: Charm (up to L24)
+|duration=20 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Form of the Bear
-|description=+HP Regen/WIS/Illusion: Bear for 2.4 hours
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
-|kind=Buff
+|kind=Illusion: Other
 |targ=Self
+|mana=100
+|effects=1: Bear<br>2: Increase Hitpoints by 1 per tick<br>3: Increase WIS by 5
 |duration=144 Min
-|max=Illusion<br>+1 HP/tick
-}}
-{{RadSpellRow2
-|name=Rising Dexterity
-|description=Increase Dexterity by 30 for 45m
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rising Dexterity
+|kind=Dexterity
+|targ=Friendly
 |mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase DEX by 26 (L25) to 30 (L29)
 |duration=45 Min
-|max=+30 DEX
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1538,48 +1428,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Counteract Poison
-|description=Cures moderate poisons in 4 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=50
 |kind=Cure
-|targ=Single Friendly (or Self)
+|targ=Friendly
+|mana=50
+|effects=1: Cure Poison: 8 counters
 |duration=Instant
-|max=Cure 8 Poison
-}}
-{{RadSpellRow2
-|name=Quickness
-|description=Grants your target quickened movement, increasing their attack speed for 11 min.
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=11 Min
-|max=+30% Atkspd
-}}
-{{RadSpellRow2
-|name=Ultravision
-|description=Gain Ultravision for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Quickness
+|kind=Haste
+|targ=Friendly
+|mana=80
+|effects=1: Increase Attack Speed by 27% (L15) to 30% (L20)
+|duration=11 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ultravision
+|kind=Vision
+|targ=Friendly
+|mana=55
+|effects=1: Ultravision
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=55
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=-
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1592,48 +1478,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invisibility
-|description=Cloaks your target in a mystic veil, making them invisible to many creatures.
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Friendly
+|mana=30
+|effects=1: Invisibility
+|duration=20 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=20 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Resist Fire
-|description=+Fire Resist for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Fire
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Fire Resist by 30 (L20) to 40 (L30)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Fire Resist
-}}
-{{RadSpellRow2
-|name=Tagar's Insects
-|description=-Attack Speed for 84-180 sec
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=125
+}}
+{{KhazamSpellRow
+|name=Tagar's Insects
 |kind=Slow
 |targ=Single
-|duration=2 Min 30 Sec
-|max=-50% Atkspd
+|mana=125
+|effects=1: Decrease Attack Speed by 33% (L27) to 45% (L50)<br>2: Increase Disease Counter by 9
+|duration=3 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1646,48 +1528,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alluring Aura
-|description=+CHA for 45 min
-|era={{Classic Short}}
+|kind=Charisma
+|targ=Friendly
+|mana=60
+|effects=1: Increase CHA by 20 (L28) to 23 (L34)
+|duration=45 Min
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=45 Min
-|max=+23 CHA
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Raging Strength
-|description=+STR for 45 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Strength
+|targ=Friendly
 |mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Strength by 23 (L28) to 26 (L34)
 |duration=45 Min
-|max=+26 STR
-}}
-{{RadSpellRow2
-|name=Tortoises Healing
-|description=Imbues your target with the health of a tortoise spirit, healing 120 hit points every 6 seconds for 24s, but vastly decreasing their movement rate.
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tortoises Healing
+|kind=Duration Heals
+|targ=Group Member
 |mana=155
-|kind=Heal Over Time
-|targ=Target Group Member or Self
+|effects=1: Increase Hitpoints by 120 per tick<br>2: Stops movement
 |duration=24 Sec
-|max=Snare
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1700,168 +1578,154 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Healing
-|description=Heal target in 3.75 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Heals
+|targ=Friendly
 |mana=115
-|kind=Heal
-|targ=Single Friendly (or Self)
+|effects=1: Increase Hitpoints by 280 (L20) to 350 (L30)
 |duration=Instant
-|max=280-350 HP
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Imbue Amber
-|description=Turn [[Amber]] into [[Imbued Amber]] (requires worshipper of Cazic Thule)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=200
+|effects=1: {{:Summoned: Imbued Amber}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22502
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Imbue Diamond
-|description=Turn [[Diamond]] into [[Imbued Diamond]] (requires worshipper of Mithanial)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=200
+|effects=1: {{:Summoned: Imbued Diamond}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22549
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Imbue Ivory
-|description=Turn [[Ivory]] into [[Imbued Ivory]] (requires worshipper of The Tribunal)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Imbue Gem
+|targ=Self
 |mana=225
-|kind=Tradeskill
-|targ=Self
+|effects=1: {{:Summoned: Imbued Ivory}}
 |duration=Instant
-|max=Summon Item #22501
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Imbue Jade
-|description=Turn [[Jade]] into [[Imbued Jade]] (requires worshipper of Rallos Zek)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=200
+|effects=1: {{:Summoned: Imbued Jade}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22500
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Imbue Sapphire
-|description=Turn [[Sapphire]] into [[Imbued Sapphire]]  (requires worshipper of Innoruuk)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Imbue Gem
+|targ=Self
 |mana=200
-|kind=Tradeskill
-|targ=Self
+|effects=1: {{:Summoned: Imbued Sapphire}}
 |duration=Instant
-|max=Summon Item #22508
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Listless Power
-|description=-STR/AGI/AC for 2.9-6.5 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=90
-|kind=Debuff
+|kind=Disempowering
 |targ=Single
-|duration=5 Min
-|max=-35 AGI<br>-35 STR<br>-15 AC
+|mana=90
+|effects=1: Decrease AGI by 22 (L25) to 35 (L50)<br>2: Decrease Strength by 22 (L25) to 35 (L50)<br>3: Decrease AC by 8 (L25) to 15 (L50)
+|duration=6 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Amber
-|description=Turn [[Amber]] into [[Imbued Amber]] x5 (requires worshipper of Cazic Thule)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=600
+|effects=1: {{:Summoned: Imbued Amber}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=600
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22502
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Diamond
-|description=Turn [[Diamond]] into [[Imbued Diamond]] x5 (requires worshipper of  	Mithanial)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=600
+|effects=1: {{:Summoned: Imbued Diamond}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=600
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22549
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Ivory
-|description=Turn [[Ivory]] into [[Imbued Ivory]] x5 (requires worshipper of The Tribunal)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Imbue Gem
+|targ=Self
 |mana=675
-|kind=Tradeskill
-|targ=Self
+|effects=1: {{:Summoned: Imbued Ivory}} (×5)
 |duration=Instant
-|max=Summon Item #22501
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Jade
-|description=Turn [[Jade]] into [[Imbued Jade]] X5 (requires worshipper of Rallos Zek)
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=600
+|effects=1: {{:Summoned: Imbued Jade}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=600
-|kind=Tradeskill
-|targ=Self
-|duration=Instant
-|max=Summon Item #22500
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Sapphire
-|description=Turn [[Sapphire]] into [[Imbued Sapphire]] x5 (requires worshipper of Innoruuk)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=600
-|kind=Tradeskill
+|kind=Imbue Gem
 |targ=Self
+|mana=600
+|effects=1: {{:Summoned: Imbued Sapphire}} (×5)
 |duration=Instant
-|max=Summon Item #22508
-}}
-{{RadSpellRow2
-|name=Spirit of the Shrew
-|description=Ultravision Increase Movement Speed by 30% 36m
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of the Shrew
+|kind=Movement
+|targ=Friendly
 |mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Ultravision<br>2: Increase Movement Speed by 30%
 |duration=36 Min
-|max=Run Speed
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1874,60 +1738,55 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fury
-|description=+AC/AGI/STR/DEX
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=50
-|kind=Buff
+|kind=Strength
 |targ=Self
+|mana=50
+|effects=1: Increase AC by 10 (L30) to 12 (L50)<br>2: Increase AGI by 32 (L30) to 35 (L33)<br>3: Increase Strength by 25 (L30) to 35 (L50)<br>4: Increase DEX by 35
 |duration=Permanent
-|max=+12 AC<br>+35 AGI<br>+35 STR<br>+35 DEX
-}}
-{{RadSpellRow2
-|name=Health
-|description=+STA for 54 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+31 STA
-}}
-{{RadSpellRow2
-|name=Nonchalance
-|description=Places your target into a nonchalant state, healing 120 hit points every 6 seconds for 24s, but vastly decreasing their attack rate. (30% melee slow)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=155
-|kind=Heal Over Time
-|targ=Target Group Member or Self
-|duration=24 Sec
-|max=-30% Atkspd
-}}
-{{RadSpellRow2
-|name=Resist Disease
-|description=+Disease Resist for 36 min
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Health
+|kind=Stamina
+|targ=Friendly
+|mana=80
+|effects=1: Increase STA by 27 (L30) to 31 (L38)
+|duration=54 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nonchalance
+|kind=Duration Heals
+|targ=Group Member
+|mana=155
+|effects=1: Increase Hitpoints by 120 per tick<br>2: Decrease Attack Speed by 30%
+|duration=24 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Disease
+|kind=Resist Buff
+|targ=Friendly
 |mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Disease Resist by 40
 |duration=36 Min
-|max=+40 Disease Resist
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1940,48 +1799,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Nimble
-|description=+AGI for 54 min
-|era={{Classic Short}}
+|kind=Agility
+|targ=Friendly
+|mana=80
+|effects=1: Increase AGI by 31 (L31) to 36 (L40)
+|duration=54 Min
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+36 AGI
-}}
-{{RadSpellRow2
-|name=Scourge
-|description=40DD + 24/tic damage over time for 126 seconds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scourge
+|kind=Disease DoT
+|targ=Single
+|mana=199
+|effects=1: Increase Disease Counter by 4<br>2: Decrease Hitpoints by 88 (L31) to 98 (L50) per tick<br>3: Decrease Hitpoints by 58
+|duration=1 Min 12 Sec
 |school=Conjuration
 |location=Vendor
-|mana=199
-|kind=DoT
-|targ=Single
-|duration=1 Min 12 Sec
-|max=-98 HP/tick<br>-58 Dmg
-}}
-{{RadSpellRow2
-|name=Shifting Shield
-|description=+AC for 45 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shifting Shield
+|kind=Armor Class
+|targ=Friendly
+|mana=80
+|effects=1: Increase AC by 14 (L31) to 15 (L35)
+|duration=45 Min
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=45 Min
-|max=+15 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1994,60 +1849,55 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Charm Animals
-|description=Charm Animals up to Level 33 for 8.2-18 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=120
 |kind=Charm
 |targ=Animal
-|duration=16 Min
-|max=Charm (max L33)
-}}
-{{RadSpellRow2
-|name=Companion Spirit
-|description=Summon a L22-L26 wolf pet
+|mana=120
+|effects=1: Charm (up to L33)
+|duration=20 Min 30 Sec
+|school=Alteration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Companion Spirit
+|kind=Sum: Warder
+|targ=Self
+|mana=350
+|effects=1: Summons a Spirit Wolf Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=350
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=850 HP<br>30 melee<br>18 kick
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Malaisement
-|description=-Fire, Cold, Magic, and Poison Resists for 7.8-12 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
-|kind=Debuff
+|kind=Resist Debuffs
 |targ=Single
-|duration=11 Min
-|max=-40 Cold Resist<br>-40 Magic Resist<br>-40 Poison Resist<br>-40 Fire Resist
-}}
-{{RadSpellRow2
-|name=Talisman of Tnarg
-|description=+Max HP for 72 min
-|era={{Classic Short}}
+|mana=100
+|effects=1: Decrease Cold Resist by 36 (L32) to 40 (L40)<br>2: Decrease Magic Resist by 36 (L32) to 40 (L40)<br>3: Decrease Poison Resist by 36 (L32) to 40 (L40)<br>4: Decrease Fire Resist by 36 (L32) to 40 (L40)
+|duration=14 Min
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Talisman of Tnarg
+|kind=Shielding
+|targ=Friendly
 |mana=125
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Max Hitpoints by 132 (L32) to 150 (L50)<br>2: Increase Hitpoints by 132 (L32) to 150 (L50)
 |duration=72 Min
-|max=+150 Max HP<br>132-150 HP
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2060,36 +1910,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Instill
-|description=Root target in place
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=60
 |kind=Root
 |targ=Single
+|mana=60
+|effects=1: Root
 |duration=1 Min 36 Sec
-|max=Root
-}}
-{{RadSpellRow2
-|name=Winter's Roar
-|description=Cold direct damage in 4 sec
+|school=Alteration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Winter's Roar
+|kind=Cold DD
+|targ=Single
+|mana=116
+|effects=1: Decrease Hitpoints by 236 (L33) to 246 (L38)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=116
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=236-246 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2102,48 +1949,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Curse
-|description=Increase Curse Counter by 4, 148 damage over time for 24 seconds
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=212
-|kind=Damage
+|kind=Magic DoT
 |targ=Single
+|mana=212
+|effects=1: Increase Curse Counter by 4<br>2: Decrease Hitpoints by 133 (L34) to 148 (L49) per tick
 |duration=30 Sec
-|max=-148 HP/tick
-}}
-{{RadSpellRow2
-|name=Pack Shrew
-|description=Ultravision Increase Movement Speed by 30% 36m
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=320
-|kind=Buff
-|targ=Group
-|duration=36 Min
-|max=Run Speed
-}}
-{{RadSpellRow2
-|name=Shock of the Tainted
-|description=Poison direct damage in 3.9 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pack Shrew
+|kind=Movement
+|targ=Group
+|mana=320
+|effects=1: Ultravision<br>2: Increase Movement Speed by 30%
+|duration=36 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of the Tainted
+|kind=Poison DD
+|targ=Single
+|mana=131
+|effects=1: Decrease Hitpoints by 248 (L34) to 254 (L37)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=131
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=248-254 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2156,36 +1999,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Resist Poison
-|description=+Poison Resist for 36 min
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Poison Resist by 40
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Poison Resist
-}}
-{{RadSpellRow2
-|name=Tumultuous Strength
-|description=+STR for 46 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tumultuous Strength
+|kind=Strength
+|targ=Group
+|mana=150
+|effects=1: Increase Strength by 34
+|duration=46 Min
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Buff
-|targ=Group
-|duration=46 Min
-|max=+34 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2198,48 +2038,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Assiduous Vision
-|description=See through target's eyes with Ultravision and +30% magnification for 2+ hours
-|era={{Classic Short}}
+|kind=Vision
+|targ=Friendly
+|mana=50
+|effects=1: Bind Sight<br>2: Increase Magnify by 130<br>3: Ultravision
+|duration=150 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=150 Min
-|max=-
-}}
-{{RadSpellRow2
-|name=Gale of Poison
-|description=Poison rain damage in 5 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gale of Poison
+|kind=Poison DD
+|targ=Targeted AE
+|mana=200
+|effects=1: Decrease Hitpoints by 122
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=200
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=122 Dmg
-}}
-{{RadSpellRow2
-|name=Spirit of Bih`Li
-|description=Increase Movement Speed by 55% Increase Attack by 15
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of Bih`Li
+|kind=Movement
+|targ=Group
+|mana=120
+|effects=1: Increase Movement Speed by 48% (L36) to 55% (L50)<br>2: Increase ATK by 15
+|duration=36 Min
 |school=Alteration
 |location=Vendor
-|mana=120
-|kind=Buff
-|targ=Group
-|duration=36 Min
-|max=Run Speed<br>+15 ATK
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2252,48 +2088,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Glamour
-|description=+CHA for 54 min
-|era={{Classic Short}}
+|kind=Charisma
+|targ=Friendly
+|mana=80
+|effects=1: Increase CHA by 28 (L37) to 32 (L44)
+|duration=54 Min
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+32 CHA
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Venom of the Snake
-|description=40 DD + 59/tic damage over time for 42 seconds
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=203
-|kind=DoT
+|kind=Poison DoT
 |targ=Single
+|mana=203
+|effects=1: Increase Poison Counter by 7<br>2: Decrease Hitpoints by 33<br>3: Decrease Hitpoints by 205 (L34) to 220 (L49) per tick
 |duration=36 Sec
-|max=-33 Dmg<br>-220 HP/tick
-}}
-{{RadSpellRow2
-|name=Vigilant Spirit
-|description=Summon a L24-L28 wolf pet
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=400
-|kind=Pet
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vigilant Spirit
+|kind=Sum: Warder
 |targ=Self
+|mana=400
+|effects=1: Summons a Spirit Wolf Pet
 |duration=Instant
-|max=900 HP<br>35 melee<br>19 kick
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2306,48 +2138,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Insidious Malady
-|description=-Disease Resist for 8.8-12 min
-|era={{Classic Short}}
+|kind=Resist Debuffs
+|targ=Single
+|mana=60
+|effects=1: Increase Disease Counter by 9<br>2: Decrease Disease Resist by 48 (L38) to 60 (L50)
+|duration=14 Min
 |school=Conjuration
 |location=Vendor
-|mana=60
-|kind=Debuff
-|targ=Single
-|duration=11 Min
-|max=-60 Disease Resist
-}}
-{{RadSpellRow2
-|name=Remove Curse
-|description=Cleanses your target's soul, removing minor curses.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Remove Curse
+|kind=Cure
+|targ=Friendly
+|mana=75
+|effects=1: Cure Curse: 4 counters
+|duration=Instant
 |school=Alteration
 |location=
-|mana=75
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 4 Curse
-}}
-{{RadSpellRow2
-|name=Togor's Insects
-|description=-Attack Speed for 114-180 sec
 |era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=175
+}}
+{{KhazamSpellRow
+|name=Togor's Insects
 |kind=Slow
 |targ=Single
-|duration=2 Min 30 Sec
-|max=-70% Atkspd
+|mana=175
+|effects=1: Decrease Attack Speed by 48% (L38) to 60% (L50)<br>2: Increase Disease Counter by 12
+|duration=3 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2360,60 +2188,55 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Blinding Luminance
-|description=Blind and -ATK for 24 sec (high aggro)
-|era={{Classic Short}}
+|kind=Blind
+|targ=Single
+|mana=50
+|effects=1: Blind<br>2: Decrease ATK by 5
+|duration=24 Sec
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Debuff
-|targ=Single
-|duration=24 Sec
-|max=-5 ATK
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chloroplast
-|description=+HP and End Regen for 12.7-19 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Health
+|targ=Friendly
 |mana=200
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=+10 HP/End Regen
+|effects=1: Increase Hitpoints by 10 (L39) to 16 (L50) per tick<br>2: Increase Endurance by 7 (L39) to 10 (L44)
+|duration=20 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Deftness
-|description=+DEX for 54 min
-|era={{Classic Short}}
+|kind=Dexterity
+|targ=Friendly
+|mana=80
+|effects=1: Increase DEX by 40
+|duration=54 Min
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+40 DEX
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Furious Strength
-|description=+STR for 54 min
-|era={{Classic Short}}
+|kind=Strength
+|targ=Friendly
+|mana=80
+|effects=1: Increase Strength by 31 (L39) to 34 (L44)
+|duration=54 Min
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=+34 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2426,48 +2249,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit Salve
-|description=Heal for 456
-|era={{Classic Short}}
+|kind=Heals
+|targ=Friendly
+|mana=181
+|effects=1: Increase Hitpoints by 446 (L40) to 456 (L44)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=181
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=446-456 HP
-}}
-{{RadSpellRow2
-|name=Summon Companion
-|description=Summon your Pet to your location in 5 sec
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=50
+}}
+{{KhazamSpellRow
+|name=Summon Companion
 |kind=Pet
 |targ=Self
+|mana=50
+|effects=1: Call Pet
 |duration=Instant
-|max=-
-}}
-{{RadSpellRow2
-|name=Talisman of Altuna
-|description=+Max HP for 72 min
+|school=Conjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Talisman of Altuna
+|kind=Shielding
+|targ=Friendly
+|mana=250
+|effects=1: Increase Max Hitpoints by 230 (L40) to 250 (L50)<br>2: Increase Hitpoints by 230 (L40) to 250 (L50)
+|duration=72 Min
 |school=Alteration
 |location=Vendor
-|mana=250
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=72 Min
-|max=+250 Max HP<br>230-250 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2480,48 +2299,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Agility
-|description=+AGI for 63 min
-|era={{Classic Short}}
+|kind=Agility
+|targ=Friendly
+|mana=100
+|effects=1: Increase AGI by 41 (L41) to 45 (L48)
+|duration=63 Min
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=63 Min
-|max=+45 AGI
-}}
-{{RadSpellRow2
-|name=Guardian Spirit
-|description=Summon a L28-L32 wolf pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Guardian Spirit
+|kind=Sum: Warder
+|targ=Self
+|mana=450
+|effects=1: Summons a Spirit Wolf Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=450
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=1,200 HP<br>43 melee<br>21 kick
-}}
-{{RadSpellRow2
-|name=Incapacitate
-|description=-STR/AGI/AC for 4.4-6 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Incapacitate
+|kind=Disempowering
+|targ=Single
+|mana=150
+|effects=1: Decrease AGI by 45 (L40) to 55 (L50)<br>2: Decrease Strength by 45 (L40) to 55 (L50)<br>3: Decrease AC by 17 (L40) to 20 (L50)
+|duration=6 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Debuff
-|targ=Single
-|duration=5 Min
-|max=-55 AGI<br>-55 STR<br>-20 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2534,60 +2349,55 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alacrity
-|description=Grants your target quickened movement, increasing their attack speed for 11 min.
-|era={{Classic Short}}
+|kind=Haste
+|targ=Friendly
+|mana=115
+|effects=1: Increase Attack Speed by 32% (L21) to 40% (L36)
+|duration=11 Min
 |school=Alteration
 |location=Vendor
-|mana=115
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=11 Min
-|max=+40% Atkspd
-}}
-{{RadSpellRow2
-|name=Blast of Poison
-|description=Poison direct damage in 4.5 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Blast of Poison
+|kind=Poison DD
+|targ=Single
+|mana=167
+|effects=1: Decrease Hitpoints by 346 (L42) to 360 (L47)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=167
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=346-360 Dmg
-}}
-{{RadSpellRow2
-|name=Guardian
-|description=+AC for 63 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Guardian
+|kind=Armor Class
+|targ=Friendly
+|mana=150
+|effects=1: Increase AC by 19 (L42) to 20 (L45)
+|duration=63 Min
 |school=Abjuration
 |location=Vendor
-|mana=150
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=63 Min
-|max=+20 AC
-}}
-{{RadSpellRow2
-|name=Slugs Healing
-|description=Imbues your target with the health of a slug spirit, healing 200 hit points every 6 seconds for 24s, but vastly decreasing their movement rate.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Slugs Healing
+|kind=Duration Heals
+|targ=Group Member
+|mana=180
+|effects=1: Increase Hitpoints by 200 per tick<br>2: Stops movement
+|duration=24 Sec
 |school=Alteration
 |location=Vendor
-|mana=180
-|kind=Heal Over Time
-|targ=Target Group Member or Self
-|duration=24 Sec
-|max=Snare
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2600,48 +2410,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Odium
-|description=Decrease Current Hit Points by 325 per Tick for 5 ticks, Increase Curse Counter by 8
-|era={{Classic Short}}
+|kind=Magic DoT
+|targ=Single
+|mana=409
+|effects=1: Increase Curse Counter by 8<br>2: Decrease Hitpoints by 303 (L43) to 317 (L50) per tick
+|duration=30 Sec
 |school=Conjuration
 |location=Vendor
-|mana=409
-|kind=DOT
-|targ=Single
-|duration=30 Sec
-|max=-317 HP/tick
-}}
-{{RadSpellRow2
-|name=Resist Magic
-|description=Increase Magic Resist by 40
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Magic
+|kind=Resist Buff
+|targ=Friendly
+|mana=85
+|effects=1: Increase Magic Resist by 40
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=85
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Magic Resist
-}}
-{{RadSpellRow2
-|name=Stamina
-|description=Fills your target with pure endurance, increasing their stamina for 63 min.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Stamina
+|kind=Stamina
+|targ=Friendly
+|mana=100
+|effects=1: Increase STA by 36 (L43) to 40 (L50)
+|duration=63 Min
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=63 Min
-|max=+40 STA
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2654,48 +2460,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Blizzard Blast
-|description=Cold direct damage in 5.3 sec
-|era={{Classic Short}}
+|kind=Cold DD
+|targ=Single
+|mana=147
+|effects=1: Decrease Hitpoints by 332 (L44) to 346 (L49)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=147
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=332-346 Dmg
-}}
-{{RadSpellRow2
-|name=Nullify Magic
-|description=Attempts to remove two spells in 4.5 sec
 |era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=50
+}}
+{{KhazamSpellRow
+|name=Nullify Magic
 |kind=Dispel
 |targ=Single
+|mana=50
+|effects=1: Dispel (4)
 |duration=Instant
-|max=-4 spell counters x2
-}}
-{{RadSpellRow2
-|name=Stoicism
-|description=Increase Current Hit Points by 200 per Tick for 4, Decrease Movement Speed by 100%,  Decrease Melee Haste by 30%
+|school=Abjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Stoicism
+|kind=Duration Heals
+|targ=Group Member
+|mana=180
+|effects=1: Increase Hitpoints by 200 per tick<br>2: Decrease Attack Speed by 30%
+|duration=24 Sec
 |school=Alteration
 |location=Vendor
-|mana=180
-|kind=Heal
-|targ=Target Group Member or Self
-|duration=24 Sec
-|max=-30% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2708,48 +2510,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Frenzied Spirit
-|description=Summon a L32-L36 wolf pet
-|era={{Classic Short}}
+|kind=Sum: Warder
+|targ=Self
+|mana=500
+|effects=1: Summons a Spirit Wolf Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=500
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Rage
-|description=+AC/AGI/STR/DEX
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rage
+|kind=Strength
+|targ=Self
+|mana=100
+|effects=1: Increase AC by 14 (L45) to 15 (L50)<br>2: Increase AGI by 47 (L45) to 52 (L50)<br>3: Increase Strength by 47 (L45) to 51 (L49)<br>4: Increase DEX by 47 (L45) to 52 (L50)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+15 AC<br>+52 AGI<br>+51 STR<br>+52 DEX
-}}
-{{RadSpellRow2
-|name=Superior Healing
-|description=Heal target in 4.5 sec
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Superior Healing
+|kind=Heals
+|targ=Friendly
+|mana=185
+|effects=1: Increase Hitpoints by 500 (L30) to 600 (L40)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=185
-|kind=Heal
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=500-600 HP
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2762,36 +2560,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Harnessing of Spirit
-|description=Increase Max HP by 251, Increase Current HP by 251, Increase Str by 67, Increase Dex by 50, 72min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Shielding
+|targ=Friendly
 |mana=425
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Max Hitpoints by 243 (L46) to 251 (L50)<br>2: Increase Hitpoints by 243 (L46) to 251 (L50)<br>3: Increase Strength by 65 (L46) to 67 (L50)<br>4: Increase DEX by 47 (L46) to 50 (L49)
 |duration=72 Min
-|max=+251 Max HP<br>243-251 HP<br>+67 STR<br>+50 DEX
-}}
-{{RadSpellRow2
-|name=Strength
-|description=+STR for 63 min
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Strength
+|kind=Strength
+|targ=Friendly
 |mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Strength by 65 (L46) to 67 (L50)
 |duration=63 Min
-|max=+67 STR
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2804,36 +2599,33 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Charisma
-|description=+CHA for 63 min
-|era={{Classic Short}}
+|kind=Charisma
+|targ=Friendly
+|mana=100
+|effects=1: Increase CHA by 40
+|duration=63 Min
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=63 Min
-|max=+40 CHA
-}}
-{{RadSpellRow2
-|name=Shock of Venom
-|description=Decrease Current Hit Points by 535
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Venom
+|kind=Poison DD
+|targ=Single
+|mana=227
+|effects=1: Decrease Hitpoints by 494 (L47) to 500 (L50)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=227
-|kind=Direct Damage
-|targ=Single
-|duration=Instant
-|max=494-500 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2846,48 +2638,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Abolish Disease
-|description=Cures strong diseases in 6 sec
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
 |kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 36 Disease
-}}
-{{RadSpellRow2
-|name=Dexterity
-|description=+DEX for 63 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|targ=Friendly
 |mana=100
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=63 Min
-|max=+50 DEX
-}}
-{{RadSpellRow2
-|name=Malosi
-|description=-Fire, Cold, Magic, and Poison Resists for 10.8-12 min
-|era={{Classic Short}}
+|effects=1: Cure Disease: 36 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=175
-|kind=Debuff
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dexterity
+|kind=Dexterity
+|targ=Friendly
+|mana=100
+|effects=1: Increase DEX by 49 (L48) to 50 (L49)
+|duration=63 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Malosi
+|kind=Resist Debuffs
 |targ=Single
-|duration=11 Min
-|max=-60 Cold Resist<br>-60 Magic Resist<br>-60 Poison Resist<br>-60 Fire Resist
+|mana=175
+|effects=1: Decrease Cold Resist by 58 (L48) to 60 (L50)<br>2: Decrease Magic Resist by 58 (L48) to 60 (L50)<br>3: Decrease Poison Resist by 58 (L48) to 60 (L50)<br>4: Decrease Fire Resist by 58 (L48) to 60 (L50)
+|duration=14 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2900,48 +2688,44 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Envenomed Bolt
-|description=Poison damage over time 48 seconds
-|era={{Classic Short}}
+|kind=Poison DoT
+|targ=Single
+|mana=409
+|effects=1: Increase Poison Counter by 10<br>2: Decrease Hitpoints by 41<br>3: Decrease Hitpoints by 344 (L49) to 345 (L50) per tick
+|duration=36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=409
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-41 Dmg<br>-345 HP/tick
-}}
-{{RadSpellRow2
-|name=Infusion of Spirit
-|description=Increase Str by 50, Increase Dex by 55, Increase Sta by 45
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Infusion of Spirit
+|kind=Strength
+|targ=Friendly
+|mana=200
+|effects=1: Increase Strength by 50<br>2: Increase DEX by 55<br>3: Increase STA by 45
+|duration=72 Min
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=72 Min
-|max=+50 STR<br>+55 DEX<br>+45 STA
-}}
-{{RadSpellRow2
-|name=Plague
-|description=Disease damage over time over 132 seconds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Plague
+|kind=Disease DoT
+|targ=Single
+|mana=308
+|effects=1: Increase Disease Counter by 9<br>2: Decrease Hitpoints by 146 (L49) to 147 (L50) per tick<br>3: Decrease Hitpoints by 144
+|duration=1 Min 18 Sec
 |school=Conjuration
 |location=Vendor
-|mana=308
-|kind=DoT
-|targ=Single
-|duration=1 Min 18 Sec
-|max=-147 HP/tick<br>-144 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2954,60 +2738,55 @@ The spell list below was last updated for EQL on 5/19/26.
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Kragg's Salve
-|description=Increase Current Hit Points by 688
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Heals
+|targ=Friendly
 |mana=244
-|kind=Heal
-|targ=Single Friendly (or Self)
+|effects=1: Increase Hitpoints by 688
 |duration=Instant
-|max=688 HP
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spirit Quickening
-|description=+STR/AC/Attack Speed for 6-7 min
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=50
-|kind=Buff
+|kind=Pet Haste
 |targ=Pet
+|mana=50
+|effects=1: Increase Strength by 30<br>2: Increase Attack Speed by 20%<br>3: Increase AC by 16
 |duration=60 Min
-|max=+30 STR<br>+20% Atkspd<br>+16 AC
-}}
-{{RadSpellRow2
-|name=Spirit of the Puma
-|description=Add Melee Proc: Puma Maw (154 dd) with 400% Rate Mod, 60s
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=212
-|kind=Buff/Proc
-|targ=Target Group Member or Self
-|duration=1 Min
-|max=Procs: Puma Maw
-}}
-{{RadSpellRow2
-|name=Talisman of Jasinth
-|description=+Disease Resist for 36 min
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit of the Puma
+|kind=Combat Innates
+|targ=Group Member
+|mana=212
+|effects=1: Procs Puma Maw (5× rate)
+|duration=1 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Talisman of Jasinth
+|kind=Resist Buff
+|targ=Group
+|mana=150
+|effects=1: Increase Disease Resist by 45
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=150
-|kind=Buff
-|targ=Group
-|duration=36 Min
-|max=+45 Disease Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3546,8 +3325,10 @@ How: Talisman of Shadoo (poison) and Talisman of Jacinth (disease). Druids shoul
 
 Due to the level limitations on receiving high level buffs, the standard package looks like:
 
-[[Strength]], [[Stamina]], [[Agility]], [[Talisman of the Raptor]] (use /tgb on, target yourself, cast the spell, then use a hotkey to "target nearest player" to get around the level limits), [[Talisman of Altuna]], [[Guardian]], [[Ultravision]] (for the non-dark elves), [[Spirit of Wolf]], [[Chloroplast]], and [[Alacrity]].
+[[Strength]], [[Stamina]], [[Agility]], [[Talisman of the Raptor]] (<s>use /tgb on, target yourself, cast the spell, then use a hotkey to "target nearest player" to get around the level limits)</s>, [[Talisman of Altuna]], [[Guardian]], [[Ultravision]] (for the non-dark elves), [[Spirit of Wolf]], [[Chloroplast]], and [[Alacrity]].
 
 For pets, it's entirely different because they aren't affected by those level limits. If you feel like going crazy, give them [[Maniacal Strength]], [[Mortal Deftness]], [[Focus of Spirit]], [[Scale of Wolf]] (doesn't fade from pets when they attack like it does from players), [[Deliriously Nimble]] (why not), [[Riotous Health]], [[Shroud of the Spirits]], [[Regrowth]], and [[Celerity]].
+
+* Note: /tgb on yields - This command no longer exists. target group buff is now on by default.
 
 {{Template: Navbox Classes}}

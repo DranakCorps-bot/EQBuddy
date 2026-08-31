@@ -43,9 +43,9 @@ It is possible to bind within the zone.
 
 General foes in the Plane of Fear drop planar-level armor for Chest, Wrist, Hands, and Feet. They can be divided into 2 groups:
 
-Group 1 drops armor for Wisdom casters, Berserkers, Monks, and also all pieces of [[Lustrous Russet Armor]]. ([[Ethereal Mist Armor|Cleric]], [[Vermiculated Armor|Druid]], [[Rune Etched Armor|Shaman]], [[Anthemion Armor|Beastlord]], [[Thorny Vine Armor|Ranger]], [[Valorium Armor|Paladin]], [[Shadow Rage Armor|Berserker]], [[Shiverback-hide Armor|Monk]])
+Group 1 drops armor for Wisdom casters, Berserkers, Monks, and also all pieces of [[Lustrous Russet Armor]]. ([[Indicolite Armor|Warrior]], [[Ethereal Mist Armor|Cleric]], [[Valorium Armor|Paladin]], [[Thorny Vine Armor|Ranger]], [[Umbral Platemail|Shadow Knight]], [[Imbrued Armor|Bard]], [[Woven Shadow Armor|Rogue]], [[Rune Etched Armor|Shaman]], [[Shadow Rage Armor|Berserker]])
 
-Group 2 drops armor for Intelligence casters, Rogues, Warriors, and also all pieces of [[Midnight Clad Armor]]. ([[Insidious Armor|Enchanter]], [[Apothic Armor|Magician]], [[Blighted Armor|Necromancer]], [[Carmine Armor|Wizard]], [[Imbrued Armor|Bard]], [[Umbral Platemail|Shadow Knight]], [[Woven Shadow Armor|Rogue]], [[Indicolite Armor|Warrior]])
+Group 2 drops armor for Intelligence casters, Rogues, Warriors, and also all pieces of [[Midnight Clad Armor]]. ([[Vermiculated Armor|Druid]], [[Shiverback-hide Armor|Monk]], [[Woven Shadow Armor|Rogue]], [[Blighted Armor|Necromancer]], [[Carmine Armor|Wizard]], [[Apothic Armor|Magician]], [[Insidious Armor|Enchanter]], [[Anthemion Armor|Beastlord]])
 
 [[Phoboplasm]] can drop any planar armor, including pieces that normally drop only in [[Plane of Hate]]!
 

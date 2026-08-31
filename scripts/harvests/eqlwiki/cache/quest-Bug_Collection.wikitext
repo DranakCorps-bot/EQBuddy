@@ -16,7 +16,7 @@
 | [[Western Karana]], [[Kithicor Forest]], [[North Qeynos]]
 |-
 ! ''' Related NPCs: '''
-| [[Queen Klaknak]], [[a fire beetle]], [[a giant scarab]], [[a giant wasp]], [[a spiderling]]
+| [[Queen Klaknak]], [[a fire beetle]], [[a giant fire beetle]], [[a giant scarab]], [[a giant wasp]], [[a spiderling]], [[a giant yellowjacket]]
 |}
 
 == Reward ==
@@ -32,17 +32,19 @@
 
 == Walkthrough ==
 
+'''Note: The responses you need to use for this quest do not quite match the highlighted words in EQL, which is likely a bug. See below for responses which work.'''
+
 Blixkin Entopop roams the inside of the wall and has an unusual hobby.  He collects bug parts, and you are just the halfling to help him out. Hail him to make him stop walking, then say the following: 
 
 You Say 'Hail, Blixkin Entopop'
 
 : Blixkin Entopop says, 'Hail! My name is Blixkin Entopop. Have you seen the wonderful assortment of [spiders] and [beetles] that inhabit the thicket? I have quite an extensive [bug collection]. Be careful, though. I have seen many brave halflings fall beneath a [swarm] of clicking hissing bugs.'
 
-You say 'What bug collection?'
+You say 'What collection?' ''(not 'bug collection')''
 
 :Blixkin Entopop says ' I collect all kinds of bugs but most of the ones I have are dead. [Ember] is the only exception. I just like them for their pretty colors and I kind of admire how loyal they are to each other. If you want to, you can help me fill out my collection and I will reward you for your time. Here is a list of the bug parts I need for my collection. If you [don't have a bug collection box] to collect the bug parts, just ask me for one. I think I have some extras.'
 
-You say, 'I don't have a bug collection box'
+You say, 'I don't have a box' ''(not 'don't have a bug collection box')''
 
 :Blixkin Entopop says 'Here you go. Just follow the instructions on the [list] so you know what to collect and how to prepare the collection for me.'
 
@@ -61,7 +63,7 @@ You say 'What list?'
 5. [[Giant Fire Beetle Leg]] <br />
 6. [[Giant Wasp Wing]] <br />
 
-'''After collecting the items, hit combine and give the '''box''' back to him, ''along with the '''list''' he gave you'', for your reward. Make sure to hand them both in at the same time or he won't give you a reward or experience. I forgot to ask for a list, handed him the box and he ate it. I then asked for a list and handed it to him and still got nothing.'''
+'''After collecting the items, hit combine and give the '''box''' back to him, ''along with the '''list''' he gave you'', for your reward. Make sure to hand them both in at the same time or he won't give you a reward or experience.'''
 
 :Blixkin Entopop says 'Oh you have a complete collection for me?! Good! Good! Well done. But remember that I need the complete bug collection and you must return my want list before I can pay you.'
 
@@ -70,11 +72,11 @@ You say 'What list?'
 You will also get the following faction changes:
 
 <div class="facblock">
-* Your faction standing with [[Merchants of Rivervale]] has gotten better.
-* Your faction standing with [[Deeppockets]] has gotten better.
-* Your faction standing with [[Guardians of the Vale]] has gotten better.
-* Your faction standing with [[Mayor Gubbin]] has gotten better.
-* Your faction standing with [[Coalition of Tradefolk Ill]] has gotten worse. 
+* Your faction standing with [[Merchants of Rivervale]] has been adjusted by 5.
+* Your faction standing with [[Deeppockets]] has been adjusted by 5.
+* Your faction standing with [[Guardians of the Vale]] has been adjusted by 5.
+* Your faction standing with [[Mayor Gubbin]] has been adjusted by 5.
+* Your faction standing with [[Coalition of Tradefolk Underground]] has been adjusted by -1. 
 </div>
 
 [[Category:Quests]]

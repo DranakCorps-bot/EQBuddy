@@ -88,6 +88,8 @@ Then just go straight across to Vials of Vitality, where Slansin is.
 
 This didn't seem to work on EQL, NPCs seem to need LoS with you to interact (8-22-2029).
 
+Slansin does not spawn with a surname in EQL. The level difference and appearance can be used to determine the 'Denvin' version for the faction turn in. The level 50 version of Slansin wears a shopkeeper type outfit. The level 10 'Denvin' version wears a robe. Turn in your inert potions to the level 10, robe wearing Slansin. If you spawn the level 50 version, you can pick a different difficulty or create an instance to try again. You can turn in 4 bottles at a time without issue. (8-27-2026)
+
 [[Category:Quests]]
 [[Category:Erudin Palace]]
 [[Category:All Classes Quests]]

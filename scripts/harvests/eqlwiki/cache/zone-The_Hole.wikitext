@@ -12,7 +12,7 @@
 | Elementals, Erudite Ghosts, Golems, Humans, Iksar, Imps, Mimics, Ratmen, Skeletons
 |-
 ! ''' Notable NPCs: '''
-| [[Bejeweled Elemental]], [[Commander Yarik]], [[Caradon]], [[Dartain the Lost]], [[Ghost of Kindle]], [[Ghost of Glohnor]], [[Gibartik]], [[High Scale Kirn]], [[Initiate Sirlis]], [[Irslak the Wretched]], [[Jaeil the Wretched]], [[Keeper of the Tombs]], [[Kejar the Mighty]], [[Niltoth the Unholy]], [[Nortlav the Scalekeeper]], [[Polzin Mrid]], [[a ratman guard]], [[Rocksoul]], [[Schnozz the Flighty]], [[Stonegrinder Minion]], [[Stonesoul the Unmoving]], [[Ulrik the Devout]]    
+| [[Bejeweled Elemental]], [[Commander Yarik]], [[Caradon]], [[Dartain the Lost]], [[Ghost of Kindle]], [[Ghost of Glohnor]], [[Gibartik]], [[High Scale Kirn]], [[Initiate Sirlis]], [[Irslak the Wretched]], [[Jaeil the Wretched]], [[Keeper of the Tombs]], [[Kejar the Mighty]], [[Niltoth the Unholy]], [[Nortlav the Scalekeeper]], [[Polzin Mrid]], [[a ratman guard]], [[Rocksoul]], [[Slizik the Mighty]], [[Schnozz the Flighty]], [[Stonegrinder Minion]], [[Stonesoul the Unmoving]], [[Ulrik the Devout]], [[Retseth Tretse]]    
 |-
 ! ''' Unique Items: '''
 | {{:Bow of the Underfoot}}, {{:Cracked Paineel Shield}}, {{:Dirt of Underfoot}}, {{:Dusty Tome}}, {{:Earthen Blade}}, {{:Elemental Binder}}, {{:Engraved Ring}}, {{:Fiery Jewel of the Underfoot}}, {{:Living Heart of a Brell Minion}}, {{:Idol of the Underking}}, {{:Imbued Granite Spauldors}}, {{:Imbued Shield of Paineel}}, [[Loam Encrusted Armor]], {{:Mudman Enforcer}}, {{:Paineel Splinted Cloak}}, [[Paineel Steel Armor]], {{:Ruined Heretic Longsword}}, {{:Smoldering Brand}}, {{:Tome of Miragul}}, [[Withered Leather Armor]],  {{:Stonemelder's Band}}
@@ -105,7 +105,7 @@ This zone is a haven for the high-level weapon quests for all the classes. No le
 [[File:EQ000087.jpg|thumb|200px|right|Small races can duck and swim through this opening, thus by-passing the locked door]]
 There are two ways to enter the Hole, both from within the Erudite city of [[Paineel]]. The first is through the large hole with the waterfall in Paineel. This, however, is not a safe way to enter the city. Levitate gets stripped when you enter the zone, and you will fall for lethal damage at the feet of Master Yael at the bottom of the zone.
 
-The other way is through a small, locked boulder located in the area just past the newbie area in Paineel. You will need to be able to pick locks in order to open this, but evil races can purchase the key in Paineel from [[Rallia_Hapera]] (941,770) for quite a large sum (around 100-120 pp). Also, smaller races or creatures (like wolf form or some illusions) can fit through the rocks with a little work, although they must be careful not to drown while doing so.
+The other way is through a small, locked boulder located in the area just past the newbie area in Paineel. You will need to be able to pick locks in order to open this, but evil races can purchase the key in Paineel from [[Rallia Hapera]] (941,770) for quite a large sum (around 100-120 pp). Also, smaller races or creatures (like wolf form or some illusions) can fit through the rocks with a little work, although they must be careful not to drown while doing so.
 
 
 {{Loc|The Hole|(830, 220), (70, 360), (50, 340), (30, 360)|Zone Out Locations Map}}

@@ -58,10 +58,10 @@ Groflah Steadirt says, 'Tumpy Tonics are great!! I used to drink them often in a
 Groflah Steadirt says, '..glug,glug,glug.. Ahh!! I missed those. I was just telling myself the other.. Uh oh!! I have to use the little dwarves facilities. Excuse me.'
 
 <div class="facblock">
-* Your faction standing with [[Coalition of Tradefolk]] got better!
-* Your faction standing with [[Knights of Truth]] got better!
-* Your faction standing with [[Merchants of Qeynos]] got better!
-* Your faction standing with [[Coalition of Tradefolk Underground]] got better!
+* Your faction standing with [[Coalition of Tradefolk]] got better! (+5)
+* Your faction standing with [[Knights of Truth]] got better! (+5)
+* Your faction standing with [[Merchants of Qeynos]] got better! (+5)
+* Your faction standing with [[Coalition of Tradefolk Underground]] got better! (+5)
 </div>
 {{YouGainExperience}}
 

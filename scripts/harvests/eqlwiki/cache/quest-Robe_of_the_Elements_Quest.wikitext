@@ -29,7 +29,7 @@
 
 Joyce will make a [[Robe of the Elements]] if you bring her the following:
 {{CheckboxList}}
-* [[Fire Goblin Skin]] (Fire Goblins in [[Solusek's Eye]])
+* [[Fire Goblin Skin]] ([[fire goblin]] (others?) in [[Solusek's Eye]])
 * [[Frost Goblin Skin]] ([[An Elite Goblin Guard]] in [[Permafrost]])
 * a "[[Twice-Woven Cloak]]" ([[A Faerie Guard]] in [[Lesser Faydark]])
 * a scroll of [[Elemental Armor]].

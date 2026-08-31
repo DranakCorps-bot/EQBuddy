@@ -1,4 +1,4 @@
-[[File:npc_waltor_felligan.png|frame|Waltor Felligan]]
+[[File:npc_waltor_felligan.png|thumb|Waltor Felligan]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Halas]]

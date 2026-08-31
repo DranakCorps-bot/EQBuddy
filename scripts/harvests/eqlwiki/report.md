@@ -44,8 +44,8 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
 *Requirements: Level 1.*
 
 - Keywords `regen`:
-  > This passive ability increases your health regeneration by 1/1/1/2/3/5/5 point(s).
-  - Per-rank numbers: 1/1/1/2/3/5/5
+  > This passive ability increases your health regeneration by 1/1/1/1/1/1/1 point(s).
+  - Per-rank numbers: 1/1/1/1/1/1/1
 
 ### Permanent Illusion (General; 1 rank(s), cost 5)
 *Requirements: Level 1.*

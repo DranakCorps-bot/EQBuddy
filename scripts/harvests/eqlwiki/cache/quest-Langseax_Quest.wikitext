@@ -1,4 +1,4 @@
-[[File:npc_renth_mclanis.png|frame|Renth McLanis]]
+[[File:npc_renth_mclanis.png|thumb|Renth McLanis]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Halas]]
@@ -13,10 +13,10 @@
 | [[Warrior]]
 |-
 ! ''' Related Zones: '''
-| [[Western Plains of Karana]]
+| [[Western Karana]]
 |-
 ! ''' Related NPCs: '''
-| [[Frostbite]], [[Iceberg]], [[Basil]], [[Paglan]]
+| [[Frostbite]], [[Iceberg]], [[Basil]], [[Paglan]], [[Dok]], [[Tundra Jack]], [[Ulrich McMannus]]
 |}
 
 == Reward ==
@@ -26,10 +26,9 @@
 </li></ul>
 
 == Walkthrough ==
-
 ''This is the quest to obtain the Langseax or the Langseax of the Wolves.  You need at least Kindly with the [[Wolves of the North]] to start this quest.''
 
-Faction Note: This quest requires a secondary quest - [[Lion Meat Shipment Quest]] which can probably be done with much lower faction. You can also do this quest a bunch of times in one go by asking Misla for the lion meat multiple times. Take empty bags and do you can do the quest 50+ times in one trip, gaining +350 [[Wolves of the North]] faction. You can use this to boost your faction for the Langsaex quest and get plenty [[Lion Delight]] for [[Iceberg]].
+Faction Note: This quest requires a secondary quest - [[Lion Meat Shipment Quest]] which can be done with much lower faction. You can also do this quest many times in one go by asking Misla or Einhorst for the lion meat multiple times. Take empty bags and do you can do the quest 50+ times in one trip, gaining +350 [[Wolves of the North]] faction. You can use this to boost your faction for the Langsaex quest and get plenty [[Lion Delight]] for [[Iceberg]].
 
 === Quest Summary ===
 *Complete the Lion Meat Shipment quest to get Lion Delight.
@@ -41,33 +40,123 @@ Faction Note: This quest requires a secondary quest - [[Lion Meat Shipment Quest
 === Part 1: The Story ===
 Go through the following steps to learn the story behind this quest.  However, it's unnecessary - you can skip it and go to Part 2.
 
-*Go to [[Renth McLanis]] in the tavern across from Mac's Kilts.  Ask him "What dangerous matter?".  He tells you of a crime.  Agree to hunt the murderer.  Renth then sends you to see Dok in Dok's Cigars.  Find out all you can about the crime. 
+After the [[Ivan McMannus' Remains]] quest, [[Renth McLanis]] in [[Halas]]' McDaniels Smokes & Spirits mentions a more "dangerous matter". Once you have Kindly faction with the [[Wolves of the North]], visit him again.
 
-*He tells you to go see the leader of Clan McMannus.  This is the fishing village located in West Karanas.  Speak to the leader.  Then speak to Ulrich McMannus and he tells you Frostbite can track prey if he has a piece of sweaty clothing.
+You say, 'What dangerous matter'
 
-*Return to Dok and ask him "Where is the sweaty shirt?".  He then tells you he sold it to Tundra Jack.  Find Tundra Jack on the tundra of Everfrost.  He will tell you that Iceberg is using it for a collar and that you can distract [[Iceberg]] with his favorite meal, [[Lion Delight]].
+: Renth McLanis says, 'A murder was done in Halas recently.  A couple were killed by a pair o' rogues fer a mere pouch o' copper.  The shaman gave chase and the main rogue, Paglan, fell beneath an ice floe.  One got away.  We must [hunt the murderer].  Will ye help?'
 
-Short version: You need a [[Sweaty Shirt]] for Frostbite to track the murderer. The polar bear Iceberg, Tundra Jack's companion and very good boy, has the shirt. You need some [[Lion Delight]] to get the shirt.
+You say, 'I will hunt the murderer'
+
+: Renth McLanis says, 'Twas good old Dok whose brother and wife were slain.  Speak with him at his shop.  Ask him if he has [any information about the crime].  Return the head of the murderer and I'll give ye a [Langseax].'
+
+You say, 'What Langseax'
+
+: Renth McLanis says, 'The Langseax was crafted to be wielded by a warrior only.  Tis a one-handed slashing weapon with great balance to assist the warrior who masters it.'
+
+Find [[Dok]] west of [[Halas]]' bank in Dok's Cigars.
+
+You say, 'Do you have any information about the crime?'
+
+: Dok says, 'Aye. I happened upon the crime scene, but too late, more's the pity.  I grabbed fer one of the rogues and got only a handful of his shirt.  Before I knew it, I was left holding his sweaty shirt and he was far from the scene.  I called fer the guards and they summoned the shaman.  Methinks one died and one got away in the chase.  I've heard rumors that the leader of [Clan McMannus] has spotted the culprit.  Ye should go to the leader of Clan McMannus and tell him ye're [searching for the fugitive].'
+
+You say, 'Clan McMannus'
+
+: Dok says, 'Clan McMannus were instructed by the Council to live far away from Halas.  They now live in the Western Plains of Karana and supply Halas with food and materials from the warmer regions.'
+
+To get to the village, head south out of [[Halas]], all the way to the southwest corner of [[Everfrost Peaks]], through [[Blackburrow]], to [[Qeynos Hills]]. Then follow the eastern mountains south, until you hit a path which leads to the [[Western Karana]] zone line. In [[Western Karana]], follow the path until it opens up from the zone valley, then turn right to head south. You'll find the fishing village straight ahead, just before the shore. Talk to [[Einhorst McMannus]] in one of the small fishing huts (/loc -3807, -2096).
+
+You say, 'I'm searching for the fugitive'
+
+: Einhorst McMannus says, 'I see they have sent someone to hunt the scoundrel down. I am afraid I haven't seen the barbarian thief in quite some time. You can search and search for him here in the western plains, but I doubt you shall find him. Good luck.'
+
+You can ask the same of the rest of the villagers, and eventually you'll catch up with [[Ulrich McMannus]]:
+
+You say, 'I'm searching for the fugitive'
+
+: Ulrich McMannus says, 'Searching for someone, eh?  You will most likely never find them on the plains.  This is a vast area.  I could have Frostbite help you search.  He is quite good at [tracking prey].'
+
+You say, 'Frostbite'
+
+: Ulrich McMannus says, 'Frostbite is my trusty pet and dearest friend.  I trained him since he was nothing more than a pup.  He can sniff out any danger with his keen sense of smell.  He is quite good at [tracking prey].'
+
+You say, 'tracking prey'
+
+: Ulrich McMannus says, 'Frostbite can track down anyone, be they man or beast.  All one needs to do is obtain a SWEATY piece of clothing recently worn by the one you seek.'
+
+Return to [[Dok]] in [[Halas]].
+
+You say, 'Where is the sweaty shirt?'
+
+: Dok says, 'Now, why would ye be wantin' that smelly thing?!  I no longer have it.  [Tundra Jack] came into me shop and bought it from me.  He says he can wash it good and make a new collar for Iceberg out of it.'
+
+You say, 'Tundra Jack'
+
+: Dok says, 'Well, now, let's see...  His name is Tundra Jack... Me first guess would be that ye might find him on the frozen tundra of Everfrost, eh?'
+
+Head out to [[Everfrost Peaks]] and find [[Tundra Jack]] on the tundra of Everfrost. He usually patrols from north to south, just west of the river. 
+
+You say, 'Hail, Tundra Jack'
+
+: Tundra Jack says, 'Good mining to you, kid! What are you doing way out here? You're gonna catch frostbite. The name's Tundra Jack, prospector supreme. Trained by the finest miners in Kaladim! Me 'n [Iceberg] have been out here for three years now, searchin' fer fortune.'
+
+You say, 'Where is the sweaty shirt?'
+
+: Tundra Jack says, 'Looking fer that blasted shirt, huh?  Well, as you can smell, I didn't get to washing it, but I wrapped it onto Iceberg's collar. I'd say you can have it, but Iceberg kind of likes it now.  The only way you're gonna be able to grab it from him is to feed him his [favorite meal].'
+
+You say, 'favorite meal'
+
+: Tundra Jack says, 'Iceberg has some picky eating habits.  If he can't catch any goblins, he prefers [Lion Delight].  Lion Delight is his favorite.'
+
+You say, 'Lion Delight'
+
+: Tundra Jack says, 'I usually get Lion Delight from Teria O'Danos in Halas.'
 
 === Part 2: The Sweaty Shirt ===
 
-*Go back to Halas and speak to [[Teria O`Danos]].  Do the [[Lion Meat Shipment Quest]].
-**If you want to do this quest multiple times - either to merge multiple [[Langseax]] or to get [[Langseax of the Wolves]] you can do a bunch of the Lion meat quests in one go to save time. Simply ask Misla for the lion meat shipment a bunch of times.
-**WARNING: Once you have Lion Delight, be sure to bury it lower in your container than your normal food to prevent it being eaten by you.
+Go back to [[Halas]] and speak to [[Teria O`Danos]].  Do the [[Lion Meat Shipment Quest]].
 
-*Take the Lion Delight to [[Iceberg]] and receive the [[Sweaty Shirt]] and a faction adjustment.
-**Iceberg can be found roaming the tundra of Everfrost, usually west of the river. He spawns at Tundra Jack's tower (2050,-3800) and immediately runs off to find Tundra Jack. However, if you wait at the tower, the two of them return to the tower frequently.
-***You can often find him stuck in pathing in front of the tower if you hop into a difficulty instance no one else is using, like D2 or D3.
-***After giving him the meat, he immediately respawns at the tower, making it easy to hand in the meat over and over and over for faction and more shirts if you plan to complete the quest multiple times.
+'''WARNING: Once you have Lion Delight, be sure to bury it lower in your containers than your normal food to prevent eating it.'''
+
+Once you have the [[Lion Delight]], return to [[Iceberg]] who can be found roaming the tundra of Everfrost, usually west of the river to give him the food.
+
+* He spawns at Tundra Jack's tower (2050,-3800) and immediately runs off to find Tundra Jack. However, if you wait at the tower, the two of them return to the tower frequently.
+* You can often find him stuck in pathing in front of the tower if you hop into a difficulty instance no one else is using, like D2 or D3.
+* After giving him the meat, he immediately respawns at the tower, making it easy to hand in the meat over and over and over for faction and more shirts if you plan to complete the quest multiple times.
+
+You offered 1 Lion Delight to Iceberg.
+
+: Iceberg growls with happiness and licks your face.  Just enough time to swipe the sweaty shirt from his collar!  Iceberg then runs off to enjoy his lion delight!
+
+<div class="facblock">
+* Your faction standing with [[Wolves of the North]] has been adjusted by 5.
+* Your faction standing with [[Shamen of Justice]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Halas]] has been adjusted by 5.
+* Your faction standing with [[Rogues of the White Rose]] has been adjusted by 5.
+* Your faction standing with [[Steel Warriors]] has been adjusted by 5.
+</div>
+{{YouGainExperience}}
+
+: Tundra Jack says, 'Ha!  Looks like old Iceberg likes you.  Either that or he's tasting you.'
+
+'''You receive the [[Sweaty Shirt]].'''
 
 === Part 3: The Murderers ===
-'''This step appears to be slightly broken on EQ Legends - giving Frostbite the shirt causes the murderer to spawn, but Frostbite will not track for you.'''
 
-*Return to the McMannus fishing village in West Karana and give the shirt to Frostbite. 
+''This step appears to be slightly broken on EQ Legends - giving Frostbite the shirt causes the murderer to spawn, but Frostbite will not track for you.''
 
-If Frostbite responds to the shirt with "RUFF RUFF" something bugged and the murderer did not spawn. He should react to the shirt with "Frostbite takes a whiff of the sweaty shirt and barks".
+Return to the McMannus fishing village in [[Western Karana]] and give the shirt to [[Frostbite]]. 
 
-The murderer will be either [[Paglan]] or [[Basil]].  [[Paglan]] is tougher to kill and probably in his low to mid 20's, [[Basil]] is around level 20. Since Frostbite won't track for you it is recommended you just a loadout that includes a class with tracking.  You can try finding them on your own, they seem to spawn on the western side of the map, but then run up into the mountainous north/northeast area of the map.  Typically they pass through the area north of the Ogre shaman camp (area 18 on the [[West Karana]] map). Run speed buffs are also recommended.
+: Frostbite takes a whiff of the sweaty shirt and barks.
+{{YouGainExperience}}
+
+''(If he responds with "RUFF RUFF" something bugged and the murderer did not spawn.)''
+
+The murderer, either [[Paglan]] or [[Basil]], spawns to the north and then start jogging to the east. 
+
+Since Frostbite won't track for you, you may want a loadout that includes [[Tracking]]. Typically the murderer passes through the area north of the Ogre shaman camp (area 18 on the [[Western Karana]] map). Run speed buffs are also recommended. Each of them will show up on tracking with an * in front of their name.
+
+[[Paglan]] is tougher to kill and probably in his low to mid 20's, [[Basil]] is around level 20. Each drops a different [[Barbarian Head]] which have their own identifying lore.
 
 Give the head to Renth for faction, coin, and of course, the Langseax (if you have Basil's head) or the Langseax of the Wolves (if it is Paglan's head).  I am not sure what triggers which criminal you get or even if you can just kill both and get both heads, but it seems that you wil normally get Basil.
 

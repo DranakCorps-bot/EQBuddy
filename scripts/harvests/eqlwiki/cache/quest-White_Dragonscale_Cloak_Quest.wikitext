@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_karam_dragonforge.png|frame|Karam Dragonforge]]
+[[File:npc_karam_dragonforge.png|thumb|Karam Dragonforge]]
 
 {| class="questTopTable"
 ! ''' Start Zone: '''

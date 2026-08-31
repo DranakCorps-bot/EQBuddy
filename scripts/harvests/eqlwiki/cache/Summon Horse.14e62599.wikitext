@@ -1,0 +1,52 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Summon Horse
+| spellicon = 4
+
+| description = Summons a horse mount
+
+| classes = 
+
+| items_with_effect =
+
+* [[Black Chain Bridle]]
+* [[Black Leather Bridle]]
+* [[Black Rope Bridle]]
+* [[Black Silken Bridle]]
+* [[Brown Chain Bridle]]
+* [[Brown Leather Bridle]]
+* [[Brown Rope Bridle]]
+* [[Brown Silken Bridle]]
+* [[Tan Chain Bridle]]
+* [[Tan Leather Bridle]]
+* [[Tan Rope Bridle]]
+* [[Tan Silken Bridle]]
+* [[White Chain Bridle]]
+* [[White Leather Bridle]]
+* [[White Rope Bridle]]
+* [[White Silken Bridle]]
+
+| slots =
+
+{{SpellSlotRow | 1 | Summons a horse mount}}
+
+| skill = 
+
+| mana = 
+| range = 
+| casting_time = Instant
+| fizzle_time = 
+| recast_time = 
+| duration = 
+| target_type = Self
+| spell_type = Beneficial
+| resist = 
+
+| other =
+
+| msg_cast_on_you =
+| msg_cast_on_other =
+| msg_wears_off =
+}}

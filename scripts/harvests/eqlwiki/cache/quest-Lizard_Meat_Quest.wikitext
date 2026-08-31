@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_kogna.png|frame|Kogna]]
+[[File:npc_kogna.png|thumb|Kogna]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

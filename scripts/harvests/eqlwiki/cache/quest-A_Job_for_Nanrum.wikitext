@@ -1,4 +1,4 @@
-[[File:npc_basher_nanrum.png|frame|Basher Nanrum]]
+[[File:npc_basher_nanrum.png|thumb|Basher Nanrum]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Grobb]]

@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_maesyn_trueshot.png|frame|Maesyn Trueshot]]
+[[File:npc_maesyn_trueshot.png|right|200px]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark]]
@@ -50,6 +50,7 @@
 
 == Walkthrough ==
 
+=== Enchanters of Felwithe ===
 ''At the end of the Trueshot Longbow quest, [[Maesyn Trueshot]] mentioned a next incarnation of the bow.'' ''(Optional)''
 
 You say, 'What is the next incarnation?'
@@ -78,6 +79,8 @@ You say, 'What remaining components?'
 
 : Kinool Goldsinger says 'The remaining components are the Trueshot longbow and a treant heart. There will also be the guild donation in the amount of 3000 gold coins. These and the [fairie gold dust] will merit a ranger the Rain Caller enchanted bow.'
 
+=== Princess Joleena ===
+
 '''[[Princess Joleena]] may be found in the Lesser Faydark.''' ''(Optional)''
 
 You say, 'Hail, Princess Joleena'
@@ -93,6 +96,8 @@ You say, 'Who snatched your wing?'
 : Princess Joleena says 'I did not see the swift giant, I was blinded by the sun glaring off his balding head. I do remember the smell of rust and refuse. How he got past my Clockwork Guardian, Gearheart, is a mystery to us all.'
 
 '''The bald "giant" she's talking about is [[Sanfyrd Featherhead]] in Ak'Anon.'''
+
+=== Sanfyrd's Toupee ===
 
 You say, 'Hail, Sanfyrd Featherhead'
 
@@ -110,38 +115,26 @@ You say, 'I will fetch the hair tonic.'
 
 : Sanfyrd Featherhead says 'Great!! Here you go, my friend. Take this crate and within you shall fill each slot with hair tonic. When all are combined within the crate, return it to me for your wing. I am not sure what the tonic was or where I got it. There is some writing on the crate, but I could not identify it.'
 
-'''You receive a [[Crate for Tonics]], a 10-slot SMALL container. <br>
+'''You receive a [[Crate for Tonics]], a 10-slot SMALL container.
+
+==== Hair Tonic ====
+
 '''You must now go to Freeport.  [[Ping Fuzzlecutter]] is a gnome merchant located outside the west gate.  Buy 10 of [[Fuzzlecutter Formula 5000]] from him, enough to fill the crate, then hit combine to craft a [[Crate of Tonic]]. '''
 
-'''While you're in West Freeport, find [[Jyle Windshot]] and keep giving [[Small Lantern]]s to him until he gives you [[A Wooden Heart]], which identifies as "A Treant Heart." '''
-
-'''You can also obtain them as rare drops from treants, but rangers shouldn't kill treants, so that isn't really an option.<br> 
-Upon turning in 1 small lantern: 
-
-: Jyle Windshot says, 'Thanks, friend. I have run a long way to get here in time. Mostly at night. I lost my lantern in a card game in Highkeep.'
-<div class="facblock">
-* Your faction standing with [[Faydarks Champions]] has been adjusted by 1.
-* Your faction standing with [[King Tearis Thex]] has been adjusted by 1.
-* Your faction standing with [[Clerics of Tunare]] has been adjusted by 1.
-* Your faction standing with [[Soldiers of Tunare]] has been adjusted by 1.
-* Your faction standing with [[Crushbone Orcs]] has been adjusted by -1.
-</div>
-{{YouGainExperience}} <br>
-<br>
 '''Once you have everything, head back to [[Sanfyrd Featherhead]] in [[Akanon]] and give him the [[Crate of Tonic]].'''
 
 : Sanfyrd Featherhead says 'Huzzah!! You are my friend. Now you can take my old toupee and get it repaired. Just go to Freeport and ask Ping to [repair the toupee]. Hey!! You know what? He is the guy who sells the hair tonic!! I remember now. Well,.. Get my toupee repaired and I will give you the fairie wing.'
 <div class="facblock">
-* Your faction standing with [[Gem Choppers]] has been adjusted by 1.
-* Your faction standing with [[Merchants of Ak'Anon]] has been adjusted by 1.
-* Your faction standing with [[King Ak'Anon]] has been adjusted by 1.
+* Your faction standing with [[Gem Choppers]] has been adjusted by 5.
+* Your faction standing with [[Merchants of Ak'Anon]] has been adjusted by 5.
+* Your faction standing with [[King Ak'Anon]] has been adjusted by 5.
 * Your faction standing with [[Dark Reflection]] has been adjusted by -1.
 * Your faction standing with [[Clan Grikbar]] has been adjusted by -1.
 </div>
 
-
 '''You receive a [[Tattered Toupee]], which identifies as "Sanfyrd's Used Toupee." <br>
-<br>
+
+==== Repair the Toupee ====
 '''Head back to [[West Freeport]] and [[Ping Fuzzlecutter]].'''
 
 You say, 'Can you repair the toupee?'
@@ -170,27 +163,50 @@ You say, 'What certain mermaid?'
 <div class="facblock">
 * Your faction standing with [[Coalition of Tradefolk]] has been adjusted by 5.
 * Your faction standing with [[Knights of Truth]] has been adjusted by 5.
-* Your faction standing with [[Merchants of Qeynos]] has been adjusted by 5. (PLEASE CONFIRM THIS NUMBER)
+* Your faction standing with [[Merchants of Qeynos]] has been adjusted by 5.
 * Your faction standing with [[Coalition of Underground Tradefolk]] has been adjusted by 5.
 </div>
 {{YouGainExperience}}
 
 '''You receive the [[Mane Attraction]]. <br>
-<br>
+
+=== Treant Heart ===
+'''While you're in West Freeport, find [[Jyle Windshot]] and keep giving [[Small Lantern]]s to him until he gives you [[A Wooden Heart]], which identifies as "A Treant Heart." '''
+
+'''You can also obtain them as rare drops from treants, but rangers shouldn't kill treants, so that isn't really an option.<br> 
+Upon turning in 1 small lantern: 
+
+: Jyle Windshot says, 'Thanks, friend. I have run a long way to get here in time. Mostly at night. I lost my lantern in a card game in Highkeep.'
+<div class="facblock">
+* Your faction standing with [[Faydarks Champions]] has been adjusted by 1.
+* Your faction standing with [[King Tearis Thex]] has been adjusted by 1.
+* Your faction standing with [[Clerics of Tunare]] has been adjusted by 1.
+* Your faction standing with [[Soldiers of Tunare]] has been adjusted by 1.
+* Your faction standing with [[Crushbone Orcs]] has been adjusted by -1.
+</div>
+{{YouGainExperience}} <br>
+
+=== Gold Fairie Dust ===
+
+==== Return Sanfyrd's Toupee ====
+
 '''Head back to [[Sanfyrd Featherhead]] in [[Akanon]] and give the [[Mane Attraction]] to him.'''
 
 :Sanfyrd Featherhead says 'Double Huzzah!! You are a good friend ______. Now mayhaps I shall find myself a wife. Here pal, the fairy wing. I hope it can give you a great head of hair. You need it.'
 
 <div class="facblock">
-* Your faction standing with [[Gem Choppers]] got better.
-* Your faction standing with [[Merchants of Ak'Anon]] got better.
-* Your faction standing with [[King Ak'Anon]] got better.
-* Your faction standing with [[Dark Reflection]] got worse.
+* Your faction standing with [[Gem Choppers]] has been adjusted by 10.
+* Your faction standing with [[Merchants of Ak'Anon]] has been adjusted by 5.
+* Your faction standing with [[King Ak'Anon]] has been adjusted by 5.
+* Your faction standing with [[Dark Reflection]] has been adjusted by -2.
+* Your faction standing with [[Clan Grikbar]] has been adjusted by -1.
 </div>
 {{YouGainExperience}}
 
 '''You receive [[A Glimmering Fairie Wing]], which identifies as "Princess Joleena's Wing."  <br>
-<br>
+
+==== Return Joleena's Wing ====
+
 '''Head back to [[Lesser Faydark]] and hand [[Princess Joleena]] her [[A Glimmering Fairie Wing]]'''<br>
 ''Note* as a Ranger who was KOS to Fairies, I was able to do the turn in by casting Harmony on the whole Fairie village. Cast Superior Camouflage to invis yourself, stand behind Princess Joleena. Sneak. Open Trade window with Glimmering Fairie Wing, recast Invis. Complete the turn in.''<br>
 :Princess Joleena says 'My wing!! I am so happy!! Thank you ____. You have proved that I can trust giants once again. Please take a Pouch of Fairie Gold Dust. Its magical properties are desired by all.'
@@ -201,15 +217,17 @@ You say, 'What certain mermaid?'
 {{YouGainExperience}}
 
 '''You receive a [[Pouch of Gold Dust]], which identifies as "Fairie Gold Dust." <br>
-<br>
-''' Head back to [[South Felwithe]] to see [[Kinool Goldsinger]] and give him the [[Pouch of Gold Dust]],  [[A Wooden Heart]], the [[Trueshot Longbow]], and 3000 GOLD Pieces.'''
+
+=== The Rain Caller ===
+
+''' Head back to [[South Felwithe]] to see [[Kinool Goldsinger]] and give him the [[Pouch of Gold Dust]],  [[A Wooden Heart]], the [[Trueshot Longbow]], and 3000 Gold Pieces (or 300 Platinum Pieces).'''
 
 Kinool Goldsinger says 'Fine work!! I now reward you with The {{:Rain Caller}}.'<br>
 <div class="facblock">
-* Your faction standing with [[Keepers of the Art]] got better.
-* Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Faydarks Champions]] got better.
-* Your faction standing with [[The Dead]] got worse.
+* Your faction standing with [[Keepers of the Art]] has been adjusted by 25.
+* Your faction standing with [[King Tearis Thex]] has been adjusted by 6.
+* Your faction standing with [[Faydarks Champions]] has been adjusted by 6?
+* Your faction standing with [[The Dead]] has been adjusted by -6.
 </div>
 {{YouGainExperience}}
 -

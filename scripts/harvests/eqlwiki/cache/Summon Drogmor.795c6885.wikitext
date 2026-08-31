@@ -1,0 +1,53 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Summon Drogmor
+| spellicon = 4
+
+| description = Summons a drogmor mount
+
+| classes = 
+
+| items_with_effect =
+
+* [[Black Drum]]
+* [[Giant Black Drum]]
+* [[Giant Green Drum]]
+* [[Giant Red Drum]]
+* [[Giant White Drum]]
+* [[Green Drum]]
+* [[Large Black Drum]]
+* [[Large Green Drum]]
+* [[Large Red Drum]]
+* [[Large White Drum]]
+* [[Red Drum]]
+* [[Small Black Drum]]
+* [[Small Green Drum]]
+* [[Small Red Drum]]
+* [[Small White Drum]]
+* [[White Drum]]
+
+
+| slots =
+
+{{SpellSlotRow | 1 | Summons a drogmor mount}}
+
+| skill = 
+
+| mana = 
+| range = 
+| casting_time = Instant
+| fizzle_time = 
+| recast_time = 
+| duration = 
+| target_type = Self
+| spell_type = Beneficial
+| resist = 
+
+| other =
+
+| msg_cast_on_you =
+| msg_cast_on_other =
+| msg_wears_off =
+}}

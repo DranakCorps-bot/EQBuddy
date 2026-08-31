@@ -227,120 +227,110 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cavorting Bones
-|description=Skeleton Warrior, Level 1.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=15
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Coldlight
-|description=Summon an item that gives off light
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=15
-|kind=Summon
+|kind=Summon Utility
 |targ=Self
+|mana=15
+|effects=1: {{:Summoned: Coldlight}}
 |duration=Instant
-|max=Summon Item #10291
-}}
-{{RadSpellRow2
-|name=Disease Cloud
-|description=Deals 5 direct damage + 1 damage per tick for 6 minutes damage over time.
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=10
-|kind=DoT
-|targ=Single
-|duration=6 Min
-|max=-5 Dmg<br>-1 HP/tick
-}}
-{{RadSpellRow2
-|name=Invisibility versus Undead
-|description=Single Target Invisibility versus Undead
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Disease Cloud
+|kind=Disease DoT
+|targ=Single
+|mana=10
+|effects=1: Increase Disease Counter by 1<br>2: Decrease Hitpoints by 5<br>3: Decrease Hitpoints by 1 per tick
+|duration=6 Min
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility versus Undead
+|kind=Invisibility
+|targ=Friendly
+|mana=40
+|effects=1: Invisibility vs Undead
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=40
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Lifetap
-|description=Drains 4 to 6 health from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifetap
+|kind=Lifetap
+|targ=Lifetap
+|mana=8
+|effects=1: Decrease Hitpoints by 4 (L1) to 8 (L8)
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=8
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=4-6 Dmg
-}}
-{{RadSpellRow2
-|name=Minor Shielding
-|description=Grants the caster +5 to +10 HP & +10 to +15 AC
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Shielding
+|kind=Shielding
+|targ=Self
+|mana=10
+|effects=1: Increase Max Hitpoints by 6 (L1) to 10 (L5)<br>2: Increase AC by 2 (L1) to 3 (L5)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 Max HP<br>+3 AC
-}}
-{{RadSpellRow2
-|name=Reclaim Energy
-|description=Sacrifice your summoned pet for mana based on the pet's health
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=5
+}}
+{{KhazamSpellRow
+|name=Reclaim Energy
 |kind=Pet
 |targ=Pet
+|mana=5
+|effects=1: Reclaim Pet Energy · 75% reclaimed
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Sense the Dead
-|description=Detects nearby undead
+|school=Conjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sense the Dead
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Undead
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Siphon Strength
-|description=Drain 5 to 10 STR from target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Siphon Strength
+|kind=Power Tap
+|targ=Single
+|mana=5
+|effects=1: Decrease Strength by 5 (L1) to 10 (L10)
+|duration=6 Min
 |school=Alteration
 |location=Vendor
-|mana=5
-|kind=Taps
-|targ=Single
-|duration=6 Min
-|max=-10 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -353,48 +343,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fear
-|description=Single Target Fear for 3 ticks
-|era={{Classic Short}}
+|kind=Fear
+|targ=Single
+|mana=40
+|effects=1: Fear (up to L52)
+|duration=18 Sec
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Fear (max L52)
-}}
-{{RadSpellRow2
-|name=Numb the Dead
-|description=Lulls undead to reduce aggression.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Numb the Dead
+|kind=Calm
+|targ=Undead
+|mana=20
+|effects=1: Reduce Aggro Radius (up to L30)<br>2: Assist Radius (up to L30)<br>3: Add Hate (Aggro)
+|duration=2 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Detrimental
-|targ=Undead
-|duration=2 Min
-|max=Calm (max L30)
-}}
-{{RadSpellRow2
-|name=True North
-|description=Turns caster to face North.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=True North
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Heading
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -407,48 +393,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Cold
-|description=Increase cold resistance by 10 to 20.
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Cold Resist by 11 (L1) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Cold Resist
-}}
-{{RadSpellRow2
-|name=Grim Aura
-|description=Increase caster's attack by 5 to 10.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Grim Aura
+|kind=Attack
+|targ=Self
+|mana=25
+|effects=1: Increase ATK by 6 (L3) to 10 (L10)
+|duration=Permanent
 |school=Alteration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 ATK
-}}
-{{RadSpellRow2
-|name=Lifespike
-|description=Drains 9 to 11 health from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifespike
+|kind=Lifetap
+|targ=Lifetap
+|mana=13
+|effects=1: Decrease Hitpoints by 8 (L3) to 16 (L18)
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=13
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=8-12 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -461,60 +443,55 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Clinging Darkness
-|description=Deals 5 damage per tick for 2 to 8 ticks damage over time. Reduces movement speed by 24% to 30%.
-|era={{Classic Short}}
+|kind=Snare DoT
+|targ=Single
+|mana=20
+|effects=1: Decrease Hitpoints by 8 per tick<br>2: Decrease Movement Speed by 24% (L4) to 30% (L10)
+|duration=48 Sec
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=20
-|kind=DoT
-|targ=Single
-|duration=48 Sec
-|max=-8 HP/tick<br>Snare
-}}
-{{RadSpellRow2
-|name=Gate
-|description=Teleport to your bind point
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gate
+|kind=Transport
+|targ=Self
+|mana=70
+|effects=1: Gate · 98% chance · bind point 1
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=70
-|kind=Travel
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Leering Corpse
-|description=Skeleton Warrior, Level 3-5.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Leering Corpse
+|kind=Sum: Undead
+|targ=Self
+|mana=40
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=40
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Poison Bolt
-|description=Deals 6 direct damage + 5 per tick for 2 to 7 ticks damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Poison Bolt
+|kind=Poison DoT
+|targ=Single
+|mana=18
+|effects=1: Increase Poison Counter by 1<br>2: Decrease Hitpoints by 6<br>3: Decrease Hitpoints by 10 per tick
+|duration=24 Sec
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=18
-|kind=DoT
-|targ=Single
-|duration=24 Sec
-|max=-6 Dmg<br>-10 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -527,36 +504,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Deadeye
-|description=See Invisibility and Infravision.
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=35
+|effects=1: See Invisible<br>2: Infravision
+|duration=Permanent
 |school=Divination
 |location=Vendor
-|mana=35
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=
-}}
-{{RadSpellRow2
-|name=Shadow Step
-|description=Short range, random direction teleportation.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow Step
+|kind=Shadowstep
+|targ=Self
+|mana=10
+|effects=1: Shadow Step
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -569,48 +543,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dark Empathy
-|description=Caster loses 30 health, and target gains 30 health.
-|era={{Classic Short}}
+|kind=Life Flow
+|targ=Single
+|mana=20
+|effects=1: Increase Hitpoints by 30
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Heal
-|targ=Single
-|duration=Instant
-|max=30 HP
-}}
-{{RadSpellRow2
-|name=Dark Pact
-|description=Lich. The caster loses 2 health per tick, and restores 2 mana per tick.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dark Pact
+|kind=Conversions
+|targ=Self
+|mana=5
+|effects=1: Increase Mana by 2 per tick<br>2: Decrease Hitpoints by 3 per tick
+|duration=Permanent
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+2 Mana<br>-3 HP/tick
-}}
-{{RadSpellRow2
-|name=Ward Undead
-|description=Deals 35 to 41 damage to an undead target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward Undead
+|kind=Undead DD
+|targ=Undead
+|mana=5
+|effects=1: Decrease Hitpoints by 7 (L1) to 12 (L10)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=5
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=7-12 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -623,48 +593,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gather Shadows
-|description=Invisibility.
-|era={{Classic Short}}
+|kind=Invisibility
+|targ=Self
+|mana=35
+|effects=1: Invisibility
+|duration=20 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=35
-|kind=Utility
-|targ=Self
-|duration=20 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Mend Bones
-|description=Heals the caster's pet for 33 to 50 HP.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mend Bones
+|kind=Heals
+|targ=Pet
+|mana=15
+|effects=1: Increase Hitpoints by 22 (L7) to 32 (L17)<br>2: Cure Disease: 10 counters<br>3: Cure Poison: 10 counters<br>4: Cure Curse: 10 counters
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Pet Heal
-|targ=Pet
-|duration=Instant
-|max=22-32 HP<br>Cure 10 Disease<br>Cure 10 Poison<br>Cure 10 Curse
-}}
-{{RadSpellRow2
-|name=Vampiric Embrace
-|description=Caster's melee attacks gain a chance to proc a lifetap.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vampiric Embrace
+|kind=Combat Innates
+|targ=Self
+|mana=30
+|effects=1: Procs Vampiric Embrace
+|duration=Permanent
 |school=Alteration
 |location=Autogranted Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=Procs: Vampiric Embrace
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -677,60 +643,66 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bone Walk
-|description=Skeleton Warrior, Level 6-9.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=80
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=80
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Cancelling of Life
-|description=Covers your target in a shroud of anti-life, decreasing their ability to be healed by 20%, and does 11 damage every 6 seconds for 1 min damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cancelling of Life
+|kind=Anti-Healing DoT
+|targ=Single
+|mana=60
+|effects=1: Decrease Hitpoints by 11 per tick<br>2: Decrease Healing Modifier by 20
+|duration=1 Min
 |school=Conjuration
 |location=
-|mana=60
-|kind=DoT
-|targ=Single
-|duration=1 Min
-|max=-11 HP/tick
-}}
-{{RadSpellRow2
-|name=Impart Strength
-|description=Caster loses 10 STR, and target gains 10 STR for 6 minutes.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Impart Strength
+|kind=Strength
+|targ=Friendly
+|mana=15
+|effects=1: Increase Strength by 10
+|duration=6 Min
 |school=Alteration
 |location=Vendor
-|mana=15
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=6 Min
-|max=+10 STR
-}}
-{{RadSpellRow2
-|name=Lesser Shielding
-|description=Grants the caster +20 to +30 HP, and +6 to +9 AC.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Shielding
+|kind=Shielding
+|targ=Self
+|mana=25
+|effects=1: Increase Max Hitpoints by 17 (L5) to 30 (L18)<br>2: Increase AC by 4 (L5) to 7 (L18)<br>3: Increase Magic Resist by 6 (L5) to 10 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+30 Max HP<br>+7 AC<br>+10 Magic Resist
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifebite
+|kind=Lifetap
+|targ=Lifetap
+|mana=35
+|effects=1: Decrease Hitpoints by 42
+|duration=Instant
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -743,48 +715,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Leech
-|description=Drains the life from your target, doing 8 damage every six seconds for 54s. 1000% of the life-force taken is used to heal your wounds.
-|era={{Classic Short}}
+|kind=Duration Tap
+|targ=Single
+|mana=72
+|effects=1: Decrease Hitpoints by 8 per tick<br>2: Reference model: returns 100% of spell damage as HP, capped at 28 per damage event
+|duration=54 Sec
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=72
-|kind=Taps
-|targ=Single
-|duration=54 Sec
-|max=-8 HP/tick
-}}
-{{RadSpellRow2
-|name=Sight Graft
-|description=Makes the caster view through the eyes of their summoned minion.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sight Graft
+|kind=Vision
+|targ=Pet
+|mana=10
+|effects=1: Bind Sight
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Pet
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Wave of Enfeeblement
-|description=Decreases STR of targets in range by 11 to 15 for 12 to 20 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Wave of Enfeeblement
+|kind=Disempowering
+|targ=PB AE
+|mana=40
+|effects=1: Decrease Strength by 9 (L9) to 15 (L20)
+|duration=4 Min
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Detrimental
-|targ=PB AE
-|duration=4 Min
-|max=-15 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -797,48 +765,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Heat Blood
-|description=Deals 17 per tick for 6 to 10 ticks damage over time.
-|era={{Classic Short}}
+|kind=Fire DoT
+|targ=Single
+|mana=88
+|effects=1: Decrease Hitpoints by 28 (L10) to 43 (L25) per tick
+|duration=36 Sec
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=88
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-43 HP/tick
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Scent of Dusk
-|description=Decreases fire, poison and disease resist by 7 to 9.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=50
-|kind=Detrimental
+|kind=Resist Debuffs
 |targ=Single
-|duration=11 Min
-|max=-9 Fire Resist<br>-9 Poison Resist<br>-9 Disease Resist
-}}
-{{RadSpellRow2
-|name=Spook the Dead
-|description=Single target Fear for 1 to 3 ticks.
-|era={{Classic Short}}
+|mana=50
+|effects=1: Increase Poison Counter by 1<br>2: Decrease Fire Resist by 6 (L10) to 9 (L16)<br>3: Decrease Poison Resist by 6 (L10) to 9 (L16)<br>4: Decrease Disease Resist by 6 (L10) to 9 (L16)
+|duration=14 Min
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spook the Dead
+|kind=Fear
 |targ=Undead
+|mana=10
+|effects=1: Fear (up to L52)
 |duration=18 Sec
-|max=Fear (max L52)
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -851,48 +815,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Endure Disease
-|description=Increases the target's disease resistance by 19 to 20.
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Friendly
+|mana=20
+|effects=1: Increase Disease Resist by 18 (L8) to 20 (L10)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Disease Resist
-}}
-{{RadSpellRow2
-|name=Engulfing Darkness
-|description=Deals 11 damage per tick for 10 ticks damage over time. Snares movement speed by 40%.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Engulfing Darkness
+|kind=Snare DoT
+|targ=Single
+|mana=60
+|effects=1: Decrease Hitpoints by 11 per tick<br>2: Decrease Movement Speed by 40%
+|duration=1 Min
 |school=Conjuration
 |location=Vendor
-|mana=60
-|kind=DoT
-|targ=Single
-|duration=1 Min
-|max=-11 HP/tick<br>Snare
-}}
-{{RadSpellRow2
-|name=Focus Death
-|description=Intensifies the power of your undead servant, increasing their strength, armor class, and attack speed.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Focus Death
+|kind=Pet Haste
+|targ=Pet
+|mana=35
+|effects=1: Increase Strength by 14 (L11) to 20 (L32)<br>2: Increase Attack Speed by 11% (L11) to 15% (L30)<br>3: Increase AC by 3 (L11) to 5 (L32)
+|duration=60 Min
 |school=Alteration
 |location=
-|mana=35
-|kind=Pet Buff
-|targ=Pet
-|duration=60 Min
-|max=+20 STR<br>+5 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -905,48 +865,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Affinity
-|description=Sets the caster's bind point to most locations, or the target's bind point in cities.
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Single
+|mana=100
+|effects=1: Bind Affinity
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Convoke Shadow
-|description=Skeleton Warrior, Level 8-11.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Convoke Shadow
+|kind=Sum: Undead
+|targ=Self
+|mana=120
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Lifedraw
-|description=Drains 39 to 45 health from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lifedraw
+|kind=Lifetap
+|targ=Lifetap
+|mana=86
+|effects=1: Decrease Hitpoints by 102 (L12) to 105 (L15)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=86
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=102-105 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -959,36 +915,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cure Disease
-|description=Cures a disease, removing 1 disease counter from the target.
-|era={{Classic Short}}
+|kind=Cure
+|targ=Friendly
+|mana=20
+|effects=1: Cure Disease: 1 counter
+|duration=Instant
 |school=Alteration
 |location=Vendor.
-|mana=20
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 1 Disease
-}}
-{{RadSpellRow2
-|name=Heart Flutter
-|description=Deals 12 damage per tick for 8 to 12 ticks damage over time, also debuffs AC and Str
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Heart Flutter
+|kind=Disease DoT
+|targ=Single
+|mana=41
+|effects=1: Decrease Strength by 20<br>2: Decrease AC by 7<br>3: Decrease Hitpoints by 24 per tick
+|duration=36 Sec
 |school=Alteration
 |location=Vendor
-|mana=41
-|kind=DoT / Debuff
-|targ=Single
-|duration=36 Sec
-|max=-20 STR<br>-7 AC<br>-24 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1001,24 +954,22 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shieldskin
-|description=Absorbs 27 to 55 damage. Consumes a [[Cat's Eye Agate]].
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=41
+|effects=1: Increase Stoneskin by 27 (L13) to 55 (L21)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=41
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1031,60 +982,55 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Banshee Aura
-|description=Shield on the caster that deals 9 to 12 damage to attackers.  Requires a [[Pearl]]
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=60
-|kind=Utility
+|kind=Damage Shield
 |targ=Self
+|mana=60
+|effects=1: Increase Damage Shield by 8 (L15) to 12 (L36)
 |duration=Permanent
-|max=
-}}
-{{RadSpellRow2
-|name=Cancel Magic
-|description=Dispels magic effects from the target.
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Infectious Cloud
-|description=Deals 20 direct damage + 5 damage per tick for 21 ticks damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cancel Magic
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Infectious Cloud
+|kind=Disease DoT
+|targ=Targeted AE
+|mana=78
+|effects=1: Increase Disease Counter by 1<br>2: Decrease Hitpoints by 5 per tick<br>3: Decrease Hitpoints by 20
+|duration=2 Min 6 Sec
 |school=Conjuration
 |location=Vendor
-|mana=78
-|kind=DoT
-|targ=Targeted AE
-|duration=2 Min 6 Sec
-|max=-5 HP/tick<br>-20 Dmg
-}}
-{{RadSpellRow2
-|name=Voice Graft
-|description=Allows the caster to speak through their summoned minion.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Voice Graft
+|kind=Utility Beneficial
+|targ=Pet
+|mana=10
+|effects=1: Ventriloquism
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Pet
-|duration=27 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1097,84 +1043,77 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Feign Death
-|description=The caster appears dead to enemies, removing the necromancer from the enemy's hate list.
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Self
+|mana=60
+|effects=1: Feign Death (87% success)
+|duration=Instant
 |school=Abjuration
 |location=Autogranted Vendor
-|mana=60
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=+87 Invul
-}}
-{{RadSpellRow2
-|name=Form of Chilled Bone
-|description=Bestows upon your pet the form of a chilled skeleton. This effect lasts for 120 min.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Form of Chilled Bone
+|kind=Illusion: Other
+|targ=Pet
+|mana=70
+|effects=1: Ancient Skeleton
+|duration=120 Min
 |school=Divination
 |location=
-|mana=70
-|kind=Pet
-|targ=Pet
-|duration=120 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Hungry Earth
-|description=Roots target undead to the ground, dealing between 26 and 75 damage, and lasts 8 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Hungry Earth
+|kind=Root
+|targ=Undead
+|mana=30
+|effects=1: Decrease Hitpoints by 26 (L16) to 60 (L50)<br>2: Root
+|duration=48 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Undead
-|duration=48 Sec
-|max=-26--60 Dmg<br>Root
-}}
-{{RadSpellRow2
-|name=Restless Bones
-|description=Skeleton Warrior, Level 14-16.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Restless Bones
+|kind=Sum: Undead
+|targ=Self
+|mana=160
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=160
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shielding
-|description=Grants the caster +46 to +50 HP, +12 to +13 AC, and +13 Magic Resist.
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=50
-|kind=Buff
+|kind=Shielding
 |targ=Self
+|mana=50
+|effects=1: Increase Max Hitpoints by 45 (L15) to 50 (L20)<br>2: Increase AC by 9 (L15) to 11 (L21)<br>3: Increase Magic Resist by 11 (L15) to 12 (L16)
 |duration=Permanent
-|max=+50 Max HP<br>+11 AC<br>+12 Magic Resist
-}}
-{{RadSpellRow2
-|name=Spirit Armor
-|description=Increases the target's armor by 11 to 13.
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Armor
+|kind=Armor Class
+|targ=Friendly
 |mana=75
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AC by 9 (L15) to 11 (L24)
 |duration=36 Min
-|max=+11 AC
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1187,36 +1126,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shackle of Bone
-|description=Surrounds an undead target in a shackle of bone, slowing their attack speed.
-|era={{Classic Short}}
+|kind=Undead
+|targ=Undead
+|mana=80
+|effects=1: Decrease Attack Speed by 24% (L17) to 32% (L50)
+|duration=3 Min 30 Sec
 |school=Alteration
 |location=
-|mana=80
-|kind=Detrimental
-|targ=Undead
-|duration=2 Min 30 Sec
-|max=-35% Atkspd
-}}
-{{RadSpellRow2
-|name=Shadow Compact
-|description=The caster loses 20 health per tick, and the target is healed for 20 damage per tick for 4 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow Compact
+|kind=Life Flow
+|targ=Single
+|mana=10
+|effects=1: Increase Hitpoints by 20 per tick
+|duration=24 Sec
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Heal
-|targ=Single
-|duration=24 Sec
-|max=+20 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1229,48 +1165,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Allure of Death
-|description=Lich. The caster loses 5 health per tick, and restores 4 mana per tick.
-|era={{Classic Short}}
+|kind=Conversions
+|targ=Self
+|mana=5
+|effects=1: Increase Mana by 4 per tick<br>2: Decrease Hitpoints by 6 per tick
+|duration=Permanent
 |school=Alteration
 |location=Autogranted Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+4 Mana<br>-6 HP/tick
-}}
-{{RadSpellRow2
-|name=Dominate Undead
-|description=Charms target undead creature to act as the caster's minion for 7 to 20 minutes. Breaks randomly.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dominate Undead
+|kind=Charm
+|targ=Undead
+|mana=100
+|effects=1: Charm (up to L32)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Undead
-|duration=16 Min
-|max=Charm (max L32)
-}}
-{{RadSpellRow2
-|name=Negation of Life
-|description=Covers your target in a shroud of anti-life, decreasing their ability to be healed by 30%, and does 20 damage every 6 seconds for 1 min 30s damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Negation of Life
+|kind=Anti-Healing DoT
+|targ=Single
+|mana=120
+|effects=1: Decrease Hitpoints by 20 per tick<br>2: Decrease Healing Modifier by 30
+|duration=1 Min 30 Sec
 |school=Conjuration
 |location=
-|mana=120
-|kind=DoT
-|targ=Single
-|duration=1 Min 30 Sec
-|max=-20 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1283,48 +1215,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expulse Undead
-|description=Deals 88 to 94 damage to an undead target.
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=36
+|effects=1: Decrease Hitpoints by 99 (L13) to 106 (L20)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=36
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=99-106 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shadow Vortex
-|description=Drains 9 to 12 AC from the target and gives it to the caster.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=40
-|kind=Detrimental
+|kind=Power Tap
 |targ=Single
-|duration=6 Min
-|max=-10 AC
-}}
-{{RadSpellRow2
-|name=Tiny Companion
-|description=Shrinks your pet, allowing it better mobility in tight quarters.
-|era={{Classic Short}}
+|mana=40
+|effects=1: Decrease AC by 7 (L19) to 10 (L30)
+|duration=7 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=50
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tiny Companion
 |kind=Pet
 |targ=Pet
+|mana=50
+|effects=1: Increase Shrink Pet by 50
 |duration=Instant
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1337,60 +1265,55 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Animate Dead
-|description=Skeleton Warrior, Level 15-19. Dual Wield (19+)
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=200
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Harmshield
-|description=Grants the caster immunity to damage for 18 seconds. Cannot attack or cast spells while immune.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Harmshield
+|kind=Invulnerability
+|targ=Self
+|mana=85
+|effects=1: Decrease Hitpoints by 20<br>2: Invulnerability
+|duration=18 Sec
 |school=Abjuration
 |location=Vendor
-|mana=85
-|kind=Utility
-|targ=Self
-|duration=18 Sec
-|max=-20 Dmg
-}}
-{{RadSpellRow2
-|name=Siphon Life
-|description=Drains 65 to 75 health from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Siphon Life
+|kind=Lifetap
+|targ=Lifetap
+|mana=115
+|effects=1: Decrease Hitpoints by 140 (L20) to 150 (L25)
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=115
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=140-150 Dmg
-}}
-{{RadSpellRow2
-|name=Word of Shadow
-|description=Deals 52 to 58 damage to all targets around the caster.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Word of Shadow
+|kind=Magic DD
+|targ=PB AE
+|mana=85
+|effects=1: Decrease Hitpoints by 52 (L19) to 58 (L25)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=85
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=52-58 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1403,60 +1326,55 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Breath of the Dead
-|description=Allows the caster to breathe underwater.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=45
-|kind=Utility
+|kind=Utility Beneficial
 |targ=Self
+|mana=45
+|effects=1: Enduring Breath (Water Breathing)
 |duration=Permanent
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Rapacious Subvention
-|description=Twitch. Restores targets mana by 60 at the cost of 200 mana.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Mana Flow
+|targ=Single
 |mana=200
-|kind=Heal
-|targ=Single
+|effects=1: Increase Mana by 60
 |duration=Instant
-|max=+60 Mana
-}}
-{{RadSpellRow2
-|name=Scent of Shadow
-|description=Decreases fire, poison and disease resist by 14 to 18.
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-18 Fire Resist<br>-18 Poison Resist<br>-18 Disease Resist
-}}
-{{RadSpellRow2
-|name=Shock of Poison
-|description=Deals 146 to 160 damage to the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scent of Shadow
+|kind=Resist Debuffs
+|targ=Single
+|mana=100
+|effects=1: Increase Poison Counter by 4<br>2: Decrease Fire Resist by 12 (L21) to 18 (L32)<br>3: Decrease Poison Resist by 12 (L21) to 18 (L32)<br>4: Decrease Disease Resist by 12 (L21) to 18 (L32)
+|duration=14 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Poison
+|kind=Poison DD
+|targ=Single
+|mana=99
+|effects=1: Decrease Hitpoints by 171 (L21) to 200 (L50)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=99
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=171-200 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1469,48 +1387,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Leatherskin
-|description=Absorbs 71 to 118 damage. Consumes a [[bloodstone]].
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=83
+|effects=1: Increase Stoneskin by 71 (L21) to 118 (L30)
+|duration=54 Min
 |school=Abjuration
 |location=Vendor
-|mana=83
-|kind=Utility
-|targ=Self
-|duration=54 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Screaming Terror
-|description=Mesmerizes the target with a chance to memory blur, for 3 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Screaming Terror
+|kind=Enthrall
+|targ=Single
+|mana=60
+|effects=1: Mesmerize (up to L55)<br>2: Memory Blur · 1% chance
+|duration=18 Sec
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Shadow Sight
-|description=The caster gains ultravision.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow Sight
+|kind=Vision
+|targ=Self
+|mana=50
+|effects=1: Ultravision<br>2: See Invisible
+|duration=Permanent
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1523,36 +1437,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Intensify Death
-|description=Increases the caster's minion's attack speed by 22% to 30%, STR by 26 to 33, and AC by 6 to 8.
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=50
+|effects=1: Increase Strength by 25 (L23) to 32 (L50)<br>2: Increase Attack Speed by 21% (L23) to 30% (L40)<br>3: Increase AC by 5 (L23) to 6 (L48)
+|duration=60 Min
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Pet Buff
-|targ=Pet
-|duration=60 Min
-|max=+32 STR<br>+30% Atkspd<br>+6 AC
-}}
-{{RadSpellRow2
-|name=Rest the Dead
-|description=Lulls undead to reduce aggression.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rest the Dead
+|kind=Calm
+|targ=Undead
+|mana=75
+|effects=1: Reduce Aggro Radius (up to L50)<br>2: Assist Radius (up to L50)<br>3: Add Hate (Aggro)<br>4: Memory Blur · 1% chance
+|duration=3 Min
 |school=Abjuration
 |location=Vendor
-|mana=75
-|kind=Detrimental
-|targ=Undead
-|duration=3 Min
-|max=Calm (max L50)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1565,48 +1476,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Haunting Corpse
-|description=Skeleton Warrior, Level 18-22.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=240
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=240
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Major Shielding
-|description=+69 to +75 HP, +16 to +18 AC, and +14 Magic Resist.
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=80
-|kind=Buff
+|kind=Shielding
 |targ=Self
+|mana=80
+|effects=1: Increase Max Hitpoints by 68 (L23) to 75 (L30)<br>2: Increase AC by 13 (L23) to 15 (L28)<br>3: Increase Magic Resist by 14
 |duration=Permanent
-|max=+75 Max HP<br>+15 AC<br>+14 Magic Resist
-}}
-{{RadSpellRow2
-|name=Resist Cold
-|description=Increase cold resistance by 39 to 40.
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Cold
+|kind=Resist Buff
+|targ=Friendly
 |mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Cold Resist by 39 (L24) to 40 (L25)
 |duration=36 Min
-|max=+40 Cold Resist
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1619,24 +1526,22 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Panic the Dead
-|description=Single target Fear for 9 ticks.
-|era={{Classic Short}}
+|kind=Fear
+|targ=Undead
+|mana=50
+|effects=1: Fear (up to L52)
+|duration=54 Sec
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Undead
-|duration=54 Sec
-|max=Fear (max L52)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1649,36 +1554,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Renew Bones
-|description=Heals the target minion for 154 to 175 health.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=64
-|kind=Pet Heal
+|kind=Heals
 |targ=Pet
+|mana=64
+|effects=1: Increase Hitpoints by 121 (L26) to 175 (L44)<br>2: Cure Disease: 10 counters<br>3: Cure Poison: 10 counters<br>4: Cure Curse: 10 counters
 |duration=Instant
-|max=121-175 HP<br>Cure 10 Disease<br>Cure 10 Poison<br>Cure 10 Curse
-}}
-{{RadSpellRow2
-|name=Spirit Tap
-|description=Drains 132 to 150 health from the target.
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=152
-|kind=Taps
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Spirit Tap
+|kind=Lifetap
 |targ=Lifetap
+|mana=152
+|effects=1: Decrease Hitpoints by 202 (L26) to 210 (L30)
 |duration=Instant
-|max=202-210 Dmg
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1691,48 +1593,44 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dooming Darkness
-|description=Deals 20 damage per tick for 15 to 16 ticks damage over time. Snares movement speed by 49% to 60%.
-|era={{Classic Short}}
+|kind=Snare DoT
+|targ=Single
+|mana=120
+|effects=1: Decrease Hitpoints by 20 per tick<br>2: Decrease Movement Speed by 48% (L27) to 59% (L48)
+|duration=1 Min 30 Sec
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=DoT
-|targ=Single
-|duration=1 Min 30 Sec
-|max=-20 HP/tick<br>Snare
-}}
-{{RadSpellRow2
-|name=Eternities Torment
-|description=Places an undead target in the torment of eternity, causing 30 damage every six seconds for 2 min 6s damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Eternities Torment
+|kind=Undead DoT
+|targ=Undead
+|mana=140
+|effects=1: Decrease Hitpoints by 30 per tick
+|duration=2 Min 6 Sec
 |school=Alteration
 |location=
-|mana=140
-|kind=DoT
-|targ=Undead
-|duration=2 Min 6 Sec
-|max=-30 HP/tick
-}}
-{{RadSpellRow2
-|name=Word of Spirit
-|description=Deals 97 to 104 damage to all targets around the caster.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Word of Spirit
+|kind=Magic DD
+|targ=PB AE
+|mana=133
+|effects=1: Decrease Hitpoints by 91 (L26) to 104 (L33)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=133
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=91-104 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1745,36 +1643,33 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Boil Blood
-|description=Deals 24 per tick for 16 to 21 ticks damage over time.
-|era={{Classic Short}}
+|kind=Fire DoT
+|targ=Single
+|mana=136
+|effects=1: Decrease Hitpoints by 67 per tick
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=136
-|kind=DoT
-|targ=Single
-|duration=42 Sec
-|max=-67 HP/tick
-}}
-{{RadSpellRow2
-|name=Dismiss Undead
-|description=Deals 140 to 162 damage to an undead target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dismiss Undead
+|kind=Undead DD
+|targ=Undead
+|mana=63
+|effects=1: Decrease Hitpoints by 196 (L23) to 211 (L31)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=63
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=196-211 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1787,37 +1682,34 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Dead
-|description=Skeleton Warrior, Level 22-25.
-|era={{Classic Short}}
+|kind=Sum: Undead
+|targ=Self
+|mana=290
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=290
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Vampiric Curse
-|description=Deals 21 per tick for 9 ticks. Heals the caster for 21 per tick for 9 ticks. (3.5 DPS; 1.3 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vampiric Curse
+|kind=Duration Tap
+|targ=Single
+|mana=144
+|effects=1: Decrease Hitpoints by 21 per tick<br>2: Reference model: returns 100% of spell damage as HP, capped at 74 per damage event
+|duration=54 Sec
 |school=Alteration
 |location=Vendor
 Vendor (Kunark)
-|mana=144
-|kind=Taps
-|targ=Single
-|duration=54 Sec
-|max=-21 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1830,24 +1722,22 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invoke Fear
-|description=Single Target Fear for 7 ticks.
-|era={{Classic Short}}
+|kind=Fear
+|targ=Single
+|mana=100
+|effects=1: Fear (up to L52)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Fear (max L52)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1860,48 +1750,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Beguile Undead
-|description=Charms target undead creature to act as the caster's minion for 11 to 20 minutes. Breaks randomly.
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=170
-|kind=Detrimental
+|kind=Charm
 |targ=Undead
-|duration=16 Min
-|max=Charm (max L46)
-}}
-{{RadSpellRow2
-|name=Call of Bones
-|description=Lich. The caster loses 10 health per tick, and restores 8 mana per tick. Bleached Skeleton Illusion.
-|era={{Classic Short}}
+|mana=170
+|effects=1: Charm (up to L46)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+8 Mana<br>-11 HP/tick
-}}
-{{RadSpellRow2
-|name=Resist Disease
-|description=Increases the target's disease resistance by 40.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Call of Bones
+|kind=Conversions
+|targ=Self
+|mana=5
+|effects=1: 100% chance · Icebone Skeletal Form<br>2: Increase Mana by 8 per tick<br>3: Ultravision<br>4: Decrease Hitpoints by 11 per tick
+|duration=Permanent
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resist Disease
+|kind=Resist Buff
+|targ=Friendly
+|mana=50
+|effects=1: Increase Disease Resist by 40
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+40 Disease Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1914,48 +1800,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Steelskin
-|description=Absorbs 168 to 230 damage. Consumes a [[jasper]].
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=149
+|effects=1: Increase Stoneskin by 168 (L30) to 230 (L41)
+|duration=72 Min
 |school=Abjuration
 |location=Vendor
-|mana=149
-|kind=Utility
-|targ=Self
-|duration=72 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Surge of Enfeeblement
-|description=Decreases STR of targets in range by 22 to 30 for 100 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Surge of Enfeeblement
+|kind=Disempowering
+|targ=PB AE
+|mana=100
+|effects=1: Decrease Strength by 21 (L32) to 30 (L50)
+|duration=6 Min
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=PB AE
-|duration=6 Min
-|max=-30 STR
-}}
-{{RadSpellRow2
-|name=Torbas' Acid Blast
-|description=Deals 207 to 220 poison damage to the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Torbas' Acid Blast
+|kind=Poison DD
+|targ=Single
+|mana=147
+|effects=1: Decrease Hitpoints by 314 (L32) to 332 (L41)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=147
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=314-332 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1968,36 +1850,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Shielding
-|description=Grants the caster +94 to +100 HP, +21 to +30 AC, and +16 Magic Resist.
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=120
+|effects=1: Increase Max Hitpoints by 91 (L31) to 100 (L40)<br>2: Increase AC by 16 (L31) to 18 (L39)<br>3: Increase Magic Resist by 16
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=120
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+100 Max HP<br>+18 AC<br>+16 Magic Resist
-}}
-{{RadSpellRow2
-|name=Invoke Shadow
-|description=Skeleton Warrior, Level 25-29.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invoke Shadow
+|kind=Sum: Undead
+|targ=Self
+|mana=340
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=340
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2010,36 +1889,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Root
-|description=Root. Adheres the target's feet to the ground, preventing movement. Lasts 8 ticks. Breaks randomly, and on direct damage.
-|era={{Classic Short}}
+|kind=Root
+|targ=Single
+|mana=30
+|effects=1: Root
+|duration=48 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=48 Sec
-|max=Root
-}}
-{{RadSpellRow2
-|name=Venom of the Snake
-|description=Deals 40 direct + 59 damage per tick for 7 to 8 ticks damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Venom of the Snake
+|kind=Poison DoT
+|targ=Single
+|mana=203
+|effects=1: Increase Poison Counter by 7<br>2: Decrease Hitpoints by 33<br>3: Decrease Hitpoints by 205 (L34) to 220 (L49) per tick
+|duration=36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=203
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-33 Dmg<br>-220 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2052,36 +1928,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Augment Death
-|description=Increases the caster's minion's attack speed by 49% to 55%, STR by 39 to 45, and AC by 10 to 12.
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=200
+|effects=1: Increase Strength by 37 (L35) to 45 (L50)<br>2: Increase Attack Speed by 45% (L35) to 55% (L45)<br>3: Increase AC by 8 (L35) to 10 (L50)
+|duration=60 Min
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Pet
-|duration=60 Min
-|max=+45 STR<br>+55% Atkspd<br>+10 AC
-}}
-{{RadSpellRow2
-|name=Scourge
-|description=40 Direct + 24 per tick for 21 ticks damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scourge
+|kind=Disease DoT
+|targ=Single
+|mana=199
+|effects=1: Increase Disease Counter by 4<br>2: Decrease Hitpoints by 88 (L31) to 98 (L50) per tick<br>3: Decrease Hitpoints by 58
+|duration=1 Min 12 Sec
 |school=Conjuration
 |location=Vendor
-|mana=199
-|kind=DoT
-|targ=Single
-|duration=1 Min 12 Sec
-|max=-98 HP/tick<br>-58 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2094,48 +1967,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chilling Embrace
-|description=40 damage per tick for 16 ticks damage over time.
-|era={{Classic Short}}
+|kind=Poison DoT
+|targ=Single
+|mana=172
+|effects=1: Increase Poison Counter by 3<br>2: Decrease Hitpoints by 100 (L36) to 114 (L50) per tick
+|duration=36 Sec
 |school=Alteration
 |location=NPC Drop.
-|mana=172
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-114 HP/tick
-}}
-{{RadSpellRow2
-|name=Counteract Disease
-|description=Cures a target's disease, removing 8 disease counters from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Counteract Disease
+|kind=Cure
+|targ=Friendly
+|mana=50
+|effects=1: Cure Disease: 8 counters
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Cure
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Cure 8 Disease
-}}
-{{RadSpellRow2
-|name=Word of Souls
-|description=147 to 155 damage to all targets around the caster.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Word of Souls
+|kind=Magic DD
+|targ=PB AE
+|mana=171
+|effects=1: Decrease Hitpoints by 138 (L36) to 155 (L42)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=171
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=138-155 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2148,48 +2017,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cessation of Life
-|description=Covers your target in a shroud of anti-life, decreasing their ability to be healed by 35%, and does 72 damage every 6 seconds for 1 min 36s damage over time.
-|era={{Classic Short}}
+|kind=Anti-Healing DoT
+|targ=Single
+|mana=300
+|effects=1: Decrease Hitpoints by 72 per tick<br>2: Decrease Healing Modifier by 35
+|duration=1 Min 36 Sec
 |school=Conjuration
 |location=
-|mana=300
-|kind=DoT
-|targ=Single
-|duration=1 Min 36 Sec
-|max=-72 HP/tick
-}}
-{{RadSpellRow2
-|name=Nullify Magic
-|description=Dispels magic effects from the target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nullify Magic
+|kind=Dispel
+|targ=Single
+|mana=50
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Scent of Darkness
-|description=Decreases fire, poison and disease resist by 24 to 27.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Scent of Darkness
+|kind=Resist Debuffs
+|targ=Single
+|mana=150
+|effects=1: Increase Poison Counter by 9<br>2: Decrease Fire Resist by 23 (L37) to 27 (L44)<br>3: Decrease Poison Resist by 23 (L37) to 27 (L44)<br>4: Decrease Disease Resist by 23 (L37) to 27 (L44)
+|duration=14 Min
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-27 Fire Resist<br>-27 Poison Resist<br>-27 Disease Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2202,36 +2067,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expel Undead
-|description=261 to 273 damage to an undead target. (2.1 DPM)
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=93
+|effects=1: Decrease Hitpoints by 299 (L33) to 333 (L45)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=93
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=299-333 Dmg
-}}
-{{RadSpellRow2
-|name=Shackle of Spirit
-|description=Surrounds an undead target in a shackle of spirits, slowing their attack speed.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shackle of Spirit
+|kind=Undead
+|targ=Undead
+|mana=175
+|effects=1: Decrease Attack Speed by 48% (L38) to 60% (L50)
+|duration=3 Min 30 Sec
 |school=Alteration
 |location=
-|mana=175
-|kind=Detrimental
-|targ=Undead
-|duration=2 Min 30 Sec
-|max=-70% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2244,48 +2106,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dark Soul
-|description=Inflicts a dark curse upon your target, adding 8 curse counters and causing between 95 and 140 damage every six seconds for 30s damage over time.
-|era={{Classic Short}}
+|kind=Magic DoT
+|targ=Single
+|mana=200
+|effects=1: Increase Curse Counter by 8<br>2: Decrease Hitpoints by 134 (L39) to 140 (L45) per tick
+|duration=30 Sec
 |school=Conjuration
 |location=
-|mana=200
-|kind=DoT
-|targ=Single
-|duration=30 Sec
-|max=-140 HP/tick
-}}
-{{RadSpellRow2
-|name=Drain Spirit
-|description=Drains 207 to 226 health from the target. (1.1-1.2 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Drain Spirit
+|kind=Lifetap
+|targ=Lifetap
+|mana=213
+|effects=1: Decrease Hitpoints by 314
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=213
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=314 Dmg
-}}
-{{RadSpellRow2
-|name=Malignant Dead
-|description=Skeleton Warrior, Level 29-33.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Malignant Dead
+|kind=Sum: Undead
+|targ=Self
+|mana=390
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=390
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2298,36 +2156,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Asystole
-|description=Ticks for 69 damage for 10 ticks. Reduces the target's STR by 37 to 40, and the target's AC by 16 to 18 damage over time.
-|era={{Classic Short}}
+|kind=Disease DoT
+|targ=Single
+|mana=98
+|effects=1: Increase Disease Counter by 4<br>2: Decrease Strength by 40<br>3: Decrease AC by 15<br>4: Decrease Hitpoints by 62 per tick
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=98
-|kind=DoT
-|targ=Single
-|duration=42 Sec
-|max=-40 STR<br>-15 AC<br>-62 HP/tick
-}}
-{{RadSpellRow2
-|name=Summon Companion
-|description=Summons your pet to your location.
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=50
+}}
+{{KhazamSpellRow
+|name=Summon Companion
 |kind=Pet
 |targ=Self
+|mana=50
+|effects=1: Call Pet
 |duration=Instant
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2340,36 +2195,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Arch Shielding
-|description=+144 to +150 HP, +25 to +36 AC, and +20 Magic Resist.
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
-|mana=200
-|kind=Buff
+|kind=Shielding
 |targ=Self
+|mana=200
+|effects=1: Increase Max Hitpoints by 140 (L40) to 150 (L50)<br>2: Increase AC by 20 (L40) to 22 (L48)<br>3: Increase Magic Resist by 20
 |duration=Permanent
-|max=+150 Max HP<br>+22 AC<br>+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Dead Man Floating
-|description=Grants the following undead traits to the target. Levitation. See Invisible. Water Breathing. Increases poison resist by 64 to 70.
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dead Man Floating
+|kind=Levitate
+|targ=Friendly
 |mana=150
-|kind=Utility
-|targ=Single Friendly (or Self)
+|effects=1: Enduring Breath (Water Breathing)<br>2: See Invisible<br>3: Levitate<br>4: Increase Poison Resist by 61 (L41) to 70 (L50)
 |duration=72 Min
-|max=+70 Poison Resist
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2382,36 +2234,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Ignite Bones
-|description=Deals 494 to 500 damage to the target. Applies a skeleton illusion to the target. (2.38dpm)
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
-|mana=210
-|kind=Damage
+|kind=Fire DD
 |targ=Single
+|mana=210
+|effects=1: Decrease Hitpoints by 492 (L42) to 500 (L50)<br>2: Ancient Skeleton<br>3: Stun: 0.5s (up to L55)
 |duration=12 Sec
-|max=-492--500 Dmg<br>Illusion<br>Stun 0.5s (max L55)
-}}
-{{RadSpellRow2
-|name=Incinerate Bones
-|description=Deals 494 to 500 damage to the target. (Chardok revamp drop) (2.38dpm)
-|era={{Classic Short}}
 |school=Evocation
 |location=Vendor
-|mana=210
-|kind=Damage
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Incinerate Bones
+|kind=Fire DD
 |targ=Single
+|mana=210
+|effects=1: Decrease Hitpoints by 492 (L42) to 500 (L50)<br>2: Stun: 1s (up to L55)
 |duration=Instant
-|max=492-500 Dmg<br>Stun 1s (max L55)
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2424,48 +2273,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Corporeal Empathy
-|description=The caster loses 215 health to heal the target for 215 instantly.
-|era={{Classic Short}}
+|kind=Life Flow
+|targ=Single
+|mana=200
+|effects=1: Increase Hitpoints by 215
+|duration=Instant
 |school=Alteration
 |location=NPC Drop
-|mana=200
-|kind=Heal
-|targ=Single
-|duration=Instant
-|max=215 HP
-}}
-{{RadSpellRow2
-|name=Covetous Subversion
-|description=Twitch. Restores targets mana by 100 at the cost of 300 mana.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Covetous Subversion
+|kind=Mana Flow
+|targ=Single
+|mana=300
+|effects=1: Increase Mana by 100
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=300
-|kind=Heal
-|targ=Single
-|duration=Instant
-|max=+100 Mana
-}}
-{{RadSpellRow2
-|name=Diamondskin
-|description=Absorbs 245 to 394 damage. Consumes a [[peridot]].
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Diamondskin
+|kind=Rune
+|targ=Self
+|mana=236
+|effects=1: Increase Stoneskin by 305 (L40) to 394 (L50)
+|duration=90 Min
 |school=Abjuration
 |location=Vendor
-|mana=236
-|kind=Utility
-|targ=Self
-|duration=90 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2478,66 +2323,60 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bounce
-|description=Surrounds your body in a reflective aura, providing a chance for all incoming spells to rebound back against the caster.
-|era={{Classic Short}}
+|kind=Reflection
+|targ=Self
+|mana=100
+|effects=1: Increase Spell Reflect by 40
+|duration=12 Sec
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=12 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Cackling Bones
-|description=Skeleton Warrior, Level 33-37.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cackling Bones
+|kind=Sum: Undead
+|targ=Self
+|mana=450
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=450
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Form of Bleached Bone
-|description=Bestows upon your pet the form of a bleached skeleton. This effect lasts for 120 min.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Form of Bleached Bone
+|kind=Illusion: Other
+|targ=Pet
+|mana=70
+|effects=1: Ancient Skeleton
+|duration=120 Min
 |school=Divination
 |location=
-|mana=70
-|kind=Pet
-|targ=Pet
-|duration=120 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Pact of Shadow
-|description=The caster loses 45 health per tick, and the target is healed for 81 health per tick for 4 ticks.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pact of Shadow
+|kind=Life Flow
+|targ=Single
+|mana=10
+|effects=1: Increase Hitpoints by 80 per tick
+|duration=24 Sec
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Heal
-|targ=Single
-|duration=24 Sec
-|max=+80 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_45">
-
 ==Level 45==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -2545,36 +2384,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Auspice
-|description=Drains the life from your target, doing 30 damage every six seconds for 54s. 1000% of the life-force taken is used to heal your wounds.
-|era={{Classic Short}}
+|kind=Duration Tap
+|targ=Single
+|mana=300
+|effects=1: Decrease Hitpoints by 30 per tick<br>2: Reference model: returns 100% of spell damage as HP, capped at 105 per damage event
+|duration=54 Sec
 |school=Alteration
 |location=
-|mana=300
-|kind=Taps
-|targ=Single
-|duration=54 Sec
-|max=-30 HP/tick
-}}
-{{RadSpellRow2
-|name=Dead Men Floating
-|description=Applies [[Dead Man Floating]] to the caster's entire group.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dead Men Floating
+|kind=Levitate
+|targ=Group
+|mana=375
+|effects=1: Enduring Breath (Water Breathing)<br>2: See Invisible<br>3: Levitate<br>4: Increase Poison Resist by 65 (L45) to 70 (L50)
+|duration=72 Min
 |school=Abjuration
 |location=NPC Drop.
-|mana=375
-|kind=Utility
-|targ=Group
-|duration=72 Min
-|max=+70 Poison Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2587,48 +2423,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Banish Undead
-|description=Deals 585 damage to an undead target.
-|era={{Classic Short}}
+|kind=Undead DD
+|targ=Undead
+|mana=118
+|effects=1: Decrease Hitpoints by 442 (L43) to 468 (L50)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=118
-|kind=Damage
-|targ=Undead
-|duration=Instant
-|max=442-468 Dmg
-}}
-{{RadSpellRow2
-|name=Insidious Retrogression
-|description=Pelts your target's body with spores, causing 500 damage and decreasing their movement rate, strength, and attack rating for 1 min 36s.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Insidious Retrogression
+|kind=Snare
+|targ=Single
+|mana=210
+|effects=1: Decrease Hitpoints by 546 (L46) to 550 (L50)<br>2: Decrease Movement Speed by 56% (L46) to 60% (L50)<br>3: Decrease Strength by 25<br>4: Decrease ATK by 25
+|duration=1 Min 36 Sec
 |school=Conjuration
 |location=
-|mana=210
-|kind=Detrimental
-|targ=Single
-|duration=1 Min 36 Sec
-|max=-546--550 Dmg<br>Snare<br>-25 STR<br>-25 ATK
-}}
-{{RadSpellRow2
-|name=Paralyzing Earth
-|description=Root. Adheres the target's feet to the ground, preventing movement. Lasts 30 ticks. Breaks on direct damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Paralyzing Earth
+|kind=Root
+|targ=Single
+|mana=100
+|effects=1: Root
+|duration=3 Min
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=3 Min
-|max=Root
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2641,48 +2473,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cajole Undead
-|description=Charms target undead creature (up to lvl 51) to act as the caster's minion for 15 to 19 minutes. Breaks randomly.
-|era={{Classic Short}}
+|kind=Charm
+|targ=Undead
+|mana=245
+|effects=1: Charm (up to L51)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=245
-|kind=Detrimental
-|targ=Undead
-|duration=16 Min
-|max=Charm (max L51)
-}}
-{{RadSpellRow2
-|name=Cascading Darkness
-|description=Deals 72 damage per tick for 16 ticks damage over time. Reduces movement speed by 60%.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cascading Darkness
+|kind=Snare DoT
+|targ=Single
+|mana=300
+|effects=1: Decrease Hitpoints by 72 per tick<br>2: Decrease Movement Speed by 60%
+|duration=1 Min 36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=300
-|kind=DoT
-|targ=Single
-|duration=1 Min 36 Sec
-|max=-72 HP/tick<br>Snare
-}}
-{{RadSpellRow2
-|name=Ignite Blood
-|description=Deals 56 per tick for 21 ticks damage over time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ignite Blood
+|kind=Fire DoT
+|targ=Single
+|mana=218
+|effects=1: Decrease Hitpoints by 124 (L47) to 125 (L48) per tick
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=218
-|kind=DoT
-|targ=Single
-|duration=42 Sec
-|max=-125 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2695,48 +2523,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Drain Soul
-|description=Drains 332 to 338 health from the target.
-|era={{Classic Short}}
+|kind=Lifetap
+|targ=Lifetap
+|mana=248
+|effects=1: Decrease Hitpoints by 394 (L48) to 400 (L50)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=248
-|kind=Taps
-|targ=Lifetap
-|duration=Instant
-|max=394-400 Dmg
-}}
-{{RadSpellRow2
-|name=Invoke Death
-|description=Skeleton Warrior, Level 37-41.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invoke Death
+|kind=Sum: Undead
+|targ=Self
+|mana=490
+|effects=1: Summons a Skeleton Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=490
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Lich
-|description=Lich. The caster loses 22 health per tick, and restores 20 mana per tick. Bloody Skeleton Illusion.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lich
+|kind=Conversions
+|targ=Self
+|mana=5
+|effects=1: 100% chance · Skeletal Form<br>2: Increase Mana by 20 per tick<br>3: Ultravision<br>4: Decrease Hitpoints by 22 per tick
+|duration=Permanent
 |school=Alteration
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+20 Mana<br>-22 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2749,48 +2573,44 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bond of Death
-|description=Deals 80 per tick for 9 ticks. Heals the caster for 80 per tick for 9 ticks. (2.0dpm..720hp total)
-|era={{Classic Short}}
+|kind=Duration Tap
+|targ=Single
+|mana=360
+|effects=1: Decrease Hitpoints by 80 per tick<br>2: Reference model: returns 100% of spell damage as HP, capped at 280 per damage event
+|duration=54 Sec
 |school=Alteration
 |location=Vendor
-|mana=360
-|kind=Taps
-|targ=Single
-|duration=54 Sec
-|max=-80 HP/tick
-}}
-{{RadSpellRow2
-|name=Torbas' Poison Blast
-|description=Strikes your target with a jet of poison, causing between 466 and 466 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Torbas' Poison Blast
+|kind=Poison DD
+|targ=Single
+|mana=186
+|effects=1: Decrease Hitpoints by 466
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=186
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=466 Dmg
-}}
-{{RadSpellRow2
-|name=Ward of Calliav
-|description=Places the Ward of Calliav on your pet, absorbing up to 11747 damage from the next 1 melee strikes or direct damage spells that hit it.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward of Calliav
+|kind=Block
+|targ=Pet
+|mana=200
+|effects=1: Increase Absorb Damage by 1
+|duration=36 Min
 |school=Abjuration
 |location=
-|mana=200
-|kind=Pet
-|targ=Pet
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2803,36 +2623,33 @@ Vendor (Kunark)
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Envenomed Bolt
-|description=Deals 110 direct damage, and then 146 damage per tick for 8 ticks damage over time.
-|era={{Classic Short}}
+|kind=Poison DoT
+|targ=Single
+|mana=409
+|effects=1: Increase Poison Counter by 10<br>2: Decrease Hitpoints by 41<br>3: Decrease Hitpoints by 344 (L49) to 345 (L50) per tick
+|duration=36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=409
-|kind=DoT
-|targ=Single
-|duration=36 Sec
-|max=-41 Dmg<br>-345 HP/tick
-}}
-{{RadSpellRow2
-|name=Improved Invisibility to Undead
-|description=Cloaks your body in a light aura, rendering you invisible to most undead creatures for 10 min.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Improved Invisibility to Undead
+|kind=Invisibility
+|targ=Self
+|mana=75
+|effects=1: Improved Invis vs Undead
+|duration=10 Min
 |school=Divination
 |location=
-|mana=75
-|kind=Utility
-|targ=Self
-|duration=10 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>

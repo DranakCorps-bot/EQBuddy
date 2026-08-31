@@ -73,7 +73,11 @@ You say, 'I want to learn'
 : Devin Ashwood says 'He is a very busy individual. I believe he is currently in the eastern part of the Karanas trying to track down a poacher. Even if you can track him down, don't get your hopes up.' 
 Lily Ashwood says 'Oh! If you're going to see him, would you please take this letter to him? I trust you, since you're a ranger and all.' 
 
-You say, 'I will take him the letter' '''(If you are not a level 50+ Ranger, she says "I'm sorry, I don't trust you with such a task" and you cannot proceed with the quest)'''
+You say, 'I will take him the letter'
+
+'''<s>(If you are not a level 50+ Ranger, she says "I'm sorry, I don't trust you with such a task" and you cannot proceed with the quest)</s>'''
+
+(Received the note as a ROG/ENC/DRU with Lily conning as an ally)
 
 : Lily Ashwood smiles sweetly. 'Thank you sooo much.' 
 

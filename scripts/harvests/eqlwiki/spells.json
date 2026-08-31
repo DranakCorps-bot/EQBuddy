@@ -78104,6 +78104,40 @@
   "cc_families": []
  },
  {
+  "name": "Summon Drogmor",
+  "page_title": "Summon Drogmor",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": null,
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": null,
+  "description": "Summons a drogmor mount",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Summons a drogmor mount"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
   "name": "Summon Elemental Blanket",
   "page_title": "Summon Elemental Blanket",
   "template": "Spellpage",
@@ -78448,6 +78482,40 @@
    {
     "slot": 1,
     "effect": "Summon Item: [[Brell's Blessed Stout]]"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Summon Horse",
+  "page_title": "Summon Horse",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": null,
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": null,
+  "duration_seconds": null,
+  "resist_raw": null,
+  "resist": null,
+  "range_raw": null,
+  "description": "Summons a horse mount",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Summons a horse mount"
    }
   ],
   "msg_cast_on_you": null,

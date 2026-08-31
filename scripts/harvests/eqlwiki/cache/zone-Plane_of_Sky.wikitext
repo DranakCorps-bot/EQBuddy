@@ -48,9 +48,11 @@ Boss NPCs no longer have a deathtouch (a.k.a. DT, [[Cazic Touch]]).
 Most of the loot from Plane of Sky quests are quite excellent for the Kunark era. All melee classes can quickly attain a 21% haste belt and eventually earn a 41% belt. There are also numerous useful clicky items for caster classes, such as the [[Vermilion Sky Ring]] for Shamans, the [[Duennan Shielding Ring]] for Magicians, and the [[Necklace of Resolution]] for Clerics. Magicians, Monks, Rangers, and Paladins will also find they must visit Plane of Sky for their epic quests. For these reasons, most casual raiding guilds will raid Plane of Sky once a week, and defeating every boss in Plane of Sky is considered a major milestone in a guild's rise to fame.
 
 = Travelling To/From Plane of Sky =
-The Plane of Sky is accessible via an orb in East Freeport, located on a rock in the bay (location approximately -425, -1200). Clicking the orb will send you to the zone.
-
-The Plane of Sky, like the Plane of Hate, is also accessible through the Wizard's spell [[Alter Plane: Sky]], which requires [[Cloudy Stone of Veeshan]] for each cast. Upon entering, all buffs and debuffs are stripped from the characters. No form of teleport spell or ability will work within Plane of Sky, except for [[Alter Plane: Sky]] (which allows a group to return to island 1 with their keys). There are only three ways to leave, jumping or falling off an island, death, or Druid [[Wind of the South]] or [[Wind of the North]] ports. After falling, a character will have all of his keys from Plane of Sky destroyed, and land in the ocean of [[East Freeport]], east of the docks (swim directly west to get back to land, the docks should come into view quickly).
+This is a quest zone, very similar to the Temple of Solusek Ro, only the challenges are here in the Zone with us.
+<br><br>
+The Plane of Sky is accessible via an orb in East Freeport, located on a rock in the bay (location approximately -425, -1200). Clicking the orb will send you to the zone. There are reports of a Wizard spell  [[Alter Plane: Sky]], which requires [[Cloudy Stone of Veeshan]] for each cast, which may also work, but this is not confirmed for EQL. If you are grouped, you may also accept a 'Gather Party' summons from a group member already on the island.
+<br><br>
+Leaving the Plane of Sky is available via any normal port spell or ritual, Gate, or the Origin ability. You may also opt to leap off the edge. After falling, you zone into the eastern edge of the ocean of [[East Freeport]], east of the docks (swim directly west to get back to land, the docks should come into view quickly).
 
 = Walkthrough/Guide =
 
@@ -96,7 +98,7 @@ The thunder spirits are bards and use some weak DoTs. Ideal to cut your teeth an
 
 Reached through the western teleporter on Island 1.
 
-This small island features a windmill and a portal to island 2. [[Noble Dojorn]], the boss of this island, is the first kill in the Efreeti Cycle, and drops coveted Efreeti pieces required for several Sky Quests. Killing him will also Spawn the [[Overseer of Air]] on Island 4.  No key pieces drop here. Hopefully you already got the key for island 2, otherwise you'll be stuck here unless you die, fall, or wizard port back to island 1. Evacuate, Succor, and Exodus also work.
+This small island features a windmill and a portal to island 2. [[Noble Dojorn]], the boss of this island, is the first kill in the Efreeti Cycle, and drops coveted Efreeti pieces required for several Sky Quests. Killing him will also Spawn the [[Overseer of Air]] on Island 4.  No key pieces drop here. Hopefully you already got the key for island 2, otherwise you'll be stuck here unless you die, fall (East Freeport), Gate (bind point), Succor, or wizard port back to island 1. Evacuate & Exodus also work.
 
 Note that the blade storms WILL assist the Noble Dojorn. There's one less on solo mode than on group mode.
 
@@ -478,10 +480,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Wind Rune Dena]]</li>
 </ul>
 </div>
-| <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
-<ul style="margin:0; padding-left:0;">
+| <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;"><ul style="margin:0; padding-left:0;">
 <li>'''{{SkyNoDrop|[[Jester's Mask]]}}  (4-KoS)'''</li>
-<li>[[Efreeti Great Staff]]</li>
+<li>[[Efreeti Great Staff]] (8-EoV)</li>
 </ul>
 </div>
 | {{:Cudgel of the Fool}}
@@ -1062,7 +1063,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
 <li>'''{{SkyNoDrop|[[Gorgon Head]]}}''' (3-Gorga)</li>
-<li>[[Efreeti Great Staff]]</li>
+<li>[[Efreeti Great Staff]] (8-EoV)</li>
 </ul>
 </div>
 | {{:Gorgon Head Staff}}
@@ -1113,7 +1114,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Golden Hilt]]}}''' (7)</li>
+<li>'''{{SkyNoDrop|[[Golden Hilt]]}}''' (7-Trash)</li>
 <li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7-SotS)</li>
 </ul>
 </div>
@@ -1317,7 +1318,7 @@ From there find Efreeti for your class based on the details below. You can hail 
 </div>
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
 <ul style="margin:0; padding-left:0;">
-<li>'''{{SkyNoDrop|[[Bixie Stinger]]}}''' (6-BZ)</li>
+<li>'''{{SkyNoDrop|[[Bixie Stinger (Bixie God's Stinger)|Bixie Stinger]]}}''' (6-BZ)</li>
 <li>'''{{SkyNoDrop|[[Bloodsky Sapphire]]}}''' (8-EoV)</li>
 </ul>
 </div>

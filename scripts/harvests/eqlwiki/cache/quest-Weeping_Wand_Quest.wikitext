@@ -1,5 +1,5 @@
 {{Temple Era}}
-[[File:npc_gardern.png|frame|Gardern]]
+[[File:npc_gardern.png|thumb|Gardern]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Temple of Solusek Ro]]

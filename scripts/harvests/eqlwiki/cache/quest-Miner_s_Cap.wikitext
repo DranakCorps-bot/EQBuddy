@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:Jeet.png|frame|Jeet]]
+[[File:npc_jeet.png|thumb|Jeet, Rogue GM]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]
