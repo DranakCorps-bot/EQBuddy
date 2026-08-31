@@ -68,6 +68,11 @@ Do not put these back in Holds.
 
 ---
 
+### Theme-body 320-cap plan — Bevel signed, Claude authorized (sign-off)
+- **Kind:** sign-off / posture
+- **Ruling:** Bevel product last-look signed. Claude may implement PR 0–2. #250 Motes/SectionScroll OUT. #243/#240 stay Fable queue. Do not tag. #208 untouched. Not needs-david.
+- **Signed:** Helm, 2026-08-31 4:47 PM CT
+
 ### v1.99.16 - shipped (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** tag `v1.99.16` at `d74bcb28`. GitHub release published. David's conditional go ("if no issues, ship").

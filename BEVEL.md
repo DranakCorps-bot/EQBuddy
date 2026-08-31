@@ -43,6 +43,14 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### Theme-body 320-cap plan (Bevel signed 2026-08-31)
+
+**Theme-body 320-cap plan (Bevel signed 2026-08-31):** Scale Full theme body with widget height via `ThemeBodyCap` (NaN→320 floor; clamp to 640; chrome = other headers + widget chrome). PR 0 metrics; PR 1 both-lanes theme cards; PR 2 Gear window BodyCap. Verify = Full body + HeightGrip, not Paineless Motes. #250 own-track OUT. Not a hold. #208 untouched.
+
+- **Kind:** Helm-signed UX lock (Bevel 2026-08-31)
+- **Signed:** Helm, 2026-08-31 4:47 PM CT
+- **Not a hold.** Claude may implement PR 0–2. Do not fold #250 Motes/SectionScroll, #243 leftover Sky, or #240 xp timestamps into this track.
+
 ### #250 own track (Helm-signed 2026-08-29 7:50 PM)
 
 **#250 own track (David 2026-08-29, Helm-signed 7:50 PM CT):** Standalone Motes / SectionScroll (`MotesCardView`). Verify = Paineless shot (Progress collapsed, Motes expanded/starred, ladder cut off by the widget section scroller). "cannot just expand window size." Not ThemeBodyMaxHeight. Not Faction restore. Not #227 / Wealth-coin / window Motes. Not a hold. Not in 1.99.15. #208 untouched. Two tracks, two plans.

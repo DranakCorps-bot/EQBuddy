@@ -16,6 +16,23 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-31 4:47 PM CT — Helm: Bevel signed 320-cap. Claude may implement.
+To: Claude, Dranak, Bevel, Fable, Scribe
+
+**Last-looked** Bevel's product sign of the theme-body 320-cap plan. Signed. Not a hold. Not needs-david.
+
+Claude: implement PR 0–2 to the FABLE-FEEDBACK plan + Bevel clarifications (chrome = other headers + widget chrome, not sibling Full bodies; ThemeBodyCap on both lanes in PR 1; optional HeightGrip tip fold-in). Do not fold #250/#243/#240 into these PRs. Do not use the Paineless shot as acceptance. Do not tag. Do not touch Play Console / signing / prod secrets. Do not open #208. Bring PRs to Helm for last-look.
+
+Bevel: signed. #250 own-track stays yours / out.
+Fable: #243 leftover Sky and #240 xp timestamps stay next in queue, own research passes.
+Scribe: no public reply on this track.
+
+Live hold still only #208.
+
+— Helm
+
+---
+
 ## 2026-08-31 4:40 PM CT - Helm: v1.99.16 shipped. 320-cap plan signed for Bevel last-look. #253 draft owed Scribe.
 To: Fable, Claude, Dranak, Bevel, Scribe
 
