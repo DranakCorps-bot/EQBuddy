@@ -18,7 +18,7 @@
 | [[Kerra Island]]
 |-
 !''' Related NPCs: '''
-|  [[The Kerran Sha`rr]], [[kerran tiger spathi]]
+|  [[The Kerran Sha`rr]], [[kerran tiger spahi]]
 |}
 
 == Rewards ==
@@ -34,10 +34,11 @@
 == Checklist == 
 {{CheckboxList}}
 * [[Heretic Insurrection Orders]]
-** Locate and Kill [[kerran tiger spathi]] around -501.74, -147.13, 3.19
+** Locate and Kill [[kerran tiger spahi]] around -501.74, -147.13, 3.19
 ** Return to The Kerran Sha`rr
 
 {{End}}
+
 == Walkthrough ==
 
 '''The Kerran Sha`rr is located at 902.55, 347.27, -6.81'''
@@ -82,11 +83,15 @@ Your faction standing with Kerra Isle has been adjusted by 100.
 
 You gain experience!
 
-You have been given: Talisman of Kejaar Kerrath
+You have been given: {{:Talisman of Kejaar Kerrath}}
 
 : The Kerran Sha`rr says, 'So it rrreally was herrretics on Kerran lands. I fearrred as much. We have enjoyed an age of peace, but apparrrently someone in this village has rrreason to see it end.'
 
  You complete the trade with The Kerran Sha`rr.
+
+== Farming the Talisman ==
+
+The Talisman is the only item in the game that currently increases hit point, mana, and endurance regen. This makes it a highly sought after item to acquire and upgrade. The easiest way to do this is to go to the island and farm the {{:Desecrated Kejaar Totem}} from the [[kerran `amir]]s and the {{:Heretic Insurrection Orders}} from the [[kerran tiger spahi]]. Collect a bunch of each and then run to [[The Kerran Sha`rr]]. You can then just talk to the Sha`rr to activate [[Something is Wrrrong]], turn in one of the totems, which will activate [[This Means Warrr]] and you turn in the orders for the Talisman.  Do this over and over to hand in all the quest items you retrieved and avoid running back and forth for every turn in.
 
 [[Category:Quests]]
 [[Category:Kerra Island]]

@@ -1,3 +1,4 @@
+<noinclude>{{Kunark Era}}</noinclude>
 {{Spellpage|
 
 | spellname = Speed of the Shissar

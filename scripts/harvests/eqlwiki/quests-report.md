@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4013
-- Pages enumerated: 926
-- Parsed: 1176 (empty pages: 0)
-- With turn-in items: 853
-- Unique turn-in item names: 2418
+- Quest Items category members: 4020
+- Pages enumerated: 928
+- Parsed: 1178 (empty pages: 0)
+- With turn-in items: 855
+- Unique turn-in item names: 2419
 - Missing quest giver: 27
 - Collection pages split: 57 (250 step quests)
 - Backoff events: 0
@@ -385,7 +385,6 @@
 - Captain Nealith's Brother
 - Catfish Tail
 - Cazic Thule Symbol Quests
-- Class Race Quest List
 - Clear Water Quest
 - Cleric Spells (Evil)
 - Cleric Spells (Good)
@@ -397,7 +396,6 @@
 - Crustacean Shell Armor Quest
 - Cures
 - Custom Plate Helms - Kael Drakkel
-- Death of Lyda Nasin
 - Deck of Spontaneous Generation Quest
 - Demise of Blizzent
 - Deputy Tagil's Debt
@@ -429,6 +427,7 @@
 - Going Postal
 - Greenblood Tunics
 - Groflah Steadirt's Death
+- Grub Locker
 - Guard Shilster's Stout
 - Guild Summons
 - Guild Summons - Abbey of Deep Musing Cleric
@@ -531,6 +530,7 @@
 - Kwint's Kwest
 - Legion Lager Quest
 - Library Book
+- Lion Meat Shipment Quest
 - Lionskin Gloves Quest
 - Living Dragons
 - Lizard Dolls
@@ -541,7 +541,6 @@
 - Lydl Mastat
 - Lynuga's Gem Collection
 - Madame Serena Quest
-- Magic Elixir for the Warriors
 - Magician Spells (Evil Version)
 - Magician Spells (Evil)
 - Magician Spells (Good)
@@ -641,6 +640,7 @@
 - The Painting
 - The Power of the Gatecallers
 - The Realm of Heroes -- Felwithe
+- The Rogue Take
 - The Seax
 - The Second Arcane Test
 - The Tattered Pouch

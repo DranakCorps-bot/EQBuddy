@@ -36,6 +36,43 @@ Live hold still only #208.
 
 — Helm
 
+## 2026-08-31 — LAST-LOOK PLEASE: clean PR #257 up. KnownGaps NOT written — the premise was false.
+To: Helm
+
+**PR: https://github.com/DranakCorps-bot/EQBuddy/pull/257 · SHA `09ea9f5f` · NOT merged. #256
+still not merged. Nothing tagged. #208 untouched.**
+
+**The one thing you need to rule on:** you authorized a curated KnownGaps list for the 24
+spells with `no eqlwiki prose`. **I did not write it, because all 24 HAVE eqlwiki prose** — on
+their own spell page. They were missed because the description fallback looked them up by the
+page's `spellname` field, which both harvest docstrings in this repo already call a copy-paste
+artefact rather than a canonical name (`Healing Water` declares `spellname = Greater Healing`
+and is the worked example in `spell-levels-promote.py`'s own header; `Circle of Butcherblock`
+declares `Ring of South Ro` while its text says it transports you to Butcherblock). Keying the
+fallback on the page TITLE, after the existing index so nothing that resolves today changes,
+recovered **24 of 24**. Catalog is **1,353 described of 1,353** (345 in #256 as submitted,
+1,329 after `9dbb542`).
+
+So the description guard stays **strict at 100% with no exemption list** — your "do not weaken
+the guard" got the stronger reading, and nothing was waved through. Option 2 (`effects` /
+`<br>`) stays parked and is now unnecessary. I am flagging this rather than deciding it
+quietly: you signed option 1, and it is your call whether you want the KnownGaps mechanism
+built anyway. My recommendation is no — an exemption list with no entries to justify is a hole
+waiting for the next harvest regression.
+
+**The rest of the ruling, done as written:** `9dbb542` kept (ancestor of the branch,
+untouched). `origin/claude/pr256-repaired` preserved. Re-harvest run against the live wiki.
+#246 Blackburrow qty=3 preserved — and made **durable**: your instruction said "through any
+re-harvest", and the re-harvest proved the revert recurs weekly (`CatalogSanityTests` pinned it
+"so a future harvest run can't silently reset it back to 1"; the very next run reset it). It is
+now a named row in `ITEM_QTY_CORRECTIONS` with a rotted-row report, not a hand re-edit.
+Wiki-first track delivered in the same PR, not blocking: `spellname-mismatch-notes.md`,
+paste-ready for all 24, one field each, nothing self-publishing. No public reply on #256.
+
+Gates green: build clean, 2,731 unit, 289 Avalonia. Both calls logged in `DECISIONS.md`.
+
+— Dranak (Claude Code)
+
 ---
 
 ## 2026-08-31 2:05 PM CT — Helm: PR #256 hold signed. KnownGaps for the 24. Do not merge as submitted.

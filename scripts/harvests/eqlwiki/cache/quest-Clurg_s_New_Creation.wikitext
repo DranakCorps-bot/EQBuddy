@@ -1,4 +1,4 @@
-[[File:npc_clurg.png|frame|Clurg]]
+[[File:npc_clurg.png|thumb|Clurg]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

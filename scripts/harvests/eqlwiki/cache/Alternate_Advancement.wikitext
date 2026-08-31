@@ -13,13 +13,13 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Adamant Will || 4 || 2/4/6/9 || This passive ability grants you an additional 20/40/60/80% chance to resist charm, and 15/30/45/60% chance to resist mesmerization spells. Requirements: Level 1.
 |-
-| Alchemy Mastery || 3 || 3/6/? || This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1.
+| Alchemy Mastery || 3 || 3/6/9 || This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1.
 |-
-| Baking Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Baking recipes by 10/?/?%. Requirements: Level 1.
+| Baking Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Baking recipes by 10/25/?%. Requirements: Level 1.
 |-
-| Blacksmithing Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Blacksmithing recipes by 10/?/?%. Requirements: Level 1.
+| Blacksmithing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/?%. Requirements: Level 1.
 |-
-| Brewing Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1.
+| Brewing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1.
 |-
 | Circular Breathing || 4 || 2/3/4/5 || This passive ability increases your endurance regeneration by 1/2/3/4 point(s). Requirements: Level 1.
 |-
@@ -29,13 +29,13 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Combat Stability || 3 || 2/4/6 || This passive ability increases the armor class soft cap of your class by 2/5/10%. The armor class soft cap is the amount of armor class that functions at 100% effectiveness. Armor class gains in excess of this cap are reduced in effectiveness by a percentage based on your class and level. Requirements: Level 1.
 |-
-| Crafting Mastery || 6 || 3/?/?/?/?/? || Training with the sages and merchants of Norrath gives adventurers the chance to hone their crafting skills. This passive ability allows you to raise 1/2/3/4/5/6 additional standard tradeskill (Baking, Blacksmithing, Brewing, Fletching, Jewelcraft, Pottery, or Tailoring) from its initial Specialization cap of 200 up to 300. Requirements: Level 1.
+| Crafting Mastery || 6 || 3/3/3/3/3/3 || Training with the sages and merchants of Norrath gives adventurers the chance to hone their crafting skills. This passive ability allows you to raise 1/2/3/4/5/6 additional standard tradeskill (Baking, Blacksmithing, Brewing, Fletching, Jewelcraft, Pottery, or Tailoring) from its initial Specialization cap of 200 up to 300. Requirements: Level 1.
 |-
 | Fear Resistance || 4 || 2/4/6/9 || This passive ability grants you an additional 25/50/75/100% chance to resist most fear spells and increases the chance of breaking fear earlier. Requirements: Level 1.
 |-
 | First Aid || 6 || 1/1/1/3/?/? || This passive ability increases the maximum health you can bind wound to 80/90/100/100/100/100% and increases the amount of healing provided by a single bandage by 0/0/0/10/25/50%. Requirements: Level 1.
 |-
-| Fletching Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Fletching recipes by 10/?/?%. Requirements: Level 1.
+| Fletching Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Fletching recipes by 10/25/?%. Requirements: Level 1.
 |-
 | Foraging || 1 || 3 || This passive ability increases your Forage skill cap by 50 points. Requirements: Level 1.
 |-
@@ -48,11 +48,11 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Innate Eminence || 5 || 3/3/3/3/3 || This passive ability increases your strength, stamina, agility, dexterity, wisdom, intelligence, and charisma by 2/4/6/8/10 points. Requirements: Level 1.
 |-
-| Innate Lung Capacity || 3 || 1/1/? || This passive ability increases the amount of air you can hold in your lungs by 10/25/?%. Requirements: Level 1.
+| Innate Lung Capacity || 3 || 1/1/1 || This passive ability increases the amount of air you can hold in your lungs by 10/25/50%. Requirements: Level 1.
 |-
-| Innate Metabolism || 3 || 1/?/? || This passive ability reduces your food and drink consumption by 110/125/?%. Requirements: Level 1.
+| Innate Metabolism || 3 || 1/1/2 || This passive ability reduces your food and drink consumption by 110/125/150%. Requirements: Level 1.
 |-
-| Innate Regeneration || 7 || 1/1/1/2/3/5/5 || This passive ability increases your health regeneration by 1/1/1/2/3/5/5 point(s). Requirements: Level 1.
+| Innate Regeneration || 7 || 1/1/1/2/3/5/5 || This passive ability increases your health regeneration by 1/1/1/1/1/1/1 point(s). Requirements: Level 1.
 |-
 | Innate Spell Resistance || 5 || 2/2/2/2/2 || This passive ability improves your cold, disease, fire, magic, and poison resistances by 2/4/6/8/10 points. Requirements: Level 1.
 |-
@@ -66,7 +66,7 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Permanent Illusion || 1 || 5 || This passive ability extends the duration of your beneficial illusion spells to 16.6 hours and allows them to persist when zoning. Requirements: Level 1.
 |-
-| Pottery Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Pottery recipes by 10/?/?%. Requirements: Level 1.
+| Pottery Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Pottery recipes by 10/25/?%. Requirements: Level 1.
 |-
 | Quick Buff || 1 || 5 || Ability Activation ID: 4 - Refresh Time: 0:10:00 - Ability Timer(s): 98. This ability, when activated, will cast all currently memorized beneficial spells on all valid group and raid targets in range, for full mana and reagent cost. NOTE: This ability will continue casting spells even if you have no mana left. Requirements: Level 1.
 |-
@@ -74,7 +74,7 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Stoicism || 5 || 2/2/2/2/2 || This passive ability reduces how far incoming melee attacks push you backward by 10%. Requirements: Level 1.
 |-
-| Tailoring Mastery || 3 || 2/?/? || This passive ability reduces the chance of failing Tailoring recipes by 10/?/?%. Requirements: Level 1.
+| Tailoring Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Tailoring recipes by 10/25/?%. Requirements: Level 1.
 |}
 
 == Archetype AAs ==

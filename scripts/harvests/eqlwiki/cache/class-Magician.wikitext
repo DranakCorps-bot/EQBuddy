@@ -400,120 +400,110 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burst of Flame
-|description=Single Target Fire-based Direct Damage (DD) (Max: 5)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Single
+|mana=4
+|effects=1: Decrease Hitpoints by 3 (L1) to 5 (L4)
+|duration=Instant
 |school=Evocation
 |location=Autogranted Vendor
-|mana=4
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=3-5 Dmg
-}}
-{{RadSpellRow2
-|name=Fire Flux
-|description=Area of Effect (AE) Fire-based Point Blank (PB) Direct Damage (DD) (Max: 12)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Fire Flux
+|kind=Fire DD
+|targ=PB AE
+|mana=23
+|effects=1: Decrease Hitpoints by 8 (L1) to 12 (L8)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=23
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=8-12 Dmg
-}}
-{{RadSpellRow2
-|name=Flare
-|description=Casts a flame that will travel directly ahead of you
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Flare
+|kind=Utility Beneficial
+|targ=Bolt
+|mana=3
+|effects=1: Decrease Fatigue by 1
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=3
-|kind=Utility
-|targ=Bolt
-|duration=Instant
-|max=-1 STA Regen
-}}
-{{RadSpellRow2
-|name=Minor Shielding
-|description=Self Only Hit Points (HP) and Armor Class (AC) Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Shielding
+|kind=Shielding
+|targ=Self
+|mana=10
+|effects=1: Increase Max Hitpoints by 6 (L1) to 10 (L5)<br>2: Increase AC by 2 (L1) to 3 (L5)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 Max HP<br>+3 AC
-}}
-{{RadSpellRow2
-|name=Reclaim Energy
-|description=Kills pet and gives you mana
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=5
+}}
+{{KhazamSpellRow
+|name=Reclaim Energy
 |kind=Pet
 |targ=Pet
+|mana=5
+|effects=1: Reclaim Pet Energy · 75% reclaimed
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Dagger
-|description=Summons 1 {{:Summoned: Dagger}}
+|school=Conjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Dagger
+|kind=Summon Weapon
+|targ=Self
+|mana=10
+|effects=1: {{:Summoned: Dagger}}
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=10
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #7305
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Drink
-|description=Summons 1 {{:Summoned: Globe of Water}}
-|era={{Classic Short}}
+|kind=Summon Food/Water
+|targ=Self
+|mana=10
+|effects=1: {{:Summoned: Globe of Water}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=10
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #13079
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Food
-|description=Summons 1 {{:Summoned: Black Bread}}
-|era={{Classic Short}}
+|kind=Summon Food/Water
+|targ=Self
+|mana=10
+|effects=1: {{:Summoned: Black Bread}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=10
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #13078
-}}
-{{RadSpellRow2
-|name=True North
-|description=Turns player to the North
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=True North
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Heading
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -526,48 +516,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementalkin: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=40
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Bandages
-|description=Summons 20 {{:Summoned: Bandages}} for binding wounds
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Bandages
+|kind=Summon Utility
+|targ=Self
+|mana=15
+|effects=1: {{:Summoned: Bandages}} (×20)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=15
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #13081
-}}
-{{RadSpellRow2
-|name=Summon Brass Choker
-|description=Focuses mana into the form of a brass choker that sometimes allows you to cast a spell without consuming any reagents. This item works on spells up to level 12.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Brass Choker
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Jedah's Brass Choker}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23500
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -580,48 +566,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementalkin: Fire
-|description=Summons a Fire Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Fire
+|targ=Self
+|mana=40
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Sense Summoned
-|description=Points you in the direction of  the nearest summoned creature in the zone
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sense Summoned
+|kind=Summoned
+|targ=Self
+|mana=5
+|effects=1: Sense Summoned
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Wisp
-|description=Summons 1 {{:Summoned: Wisp Stone}} as a light source
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Wisp
+|kind=Summon Utility
+|targ=Self
+|mana=30
+|effects=1: {{:Summoned: Wisp Stone}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=30
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10294
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -634,48 +616,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burn
-|description=Single Target Fire-based Direct Damage (DD) (Max: 14)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Single
+|mana=7
+|effects=1: Decrease Hitpoints by 13 (L4) to 14 (L5)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=7
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=13-14 Dmg
-}}
-{{RadSpellRow2
-|name=Elementalkin: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elementalkin: Air
+|kind=Sum: Air
+|targ=Self
+|mana=40
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Gate
-|description=Returns you to your Bind Point
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gate
+|kind=Transport
+|targ=Self
+|mana=70
+|effects=1: Gate · 98% chance · bind point 1
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=70
-|kind=Travel
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -688,48 +666,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementalkin: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=40
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Flame Bolt
-|description=Single Target Fire-based Projectile Direct Damage (Fire DD) (Max: 47/1.18 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Flame Bolt
+|kind=Fire DD
+|targ=Bolt
+|mana=25
+|effects=1: Decrease Hitpoints by 45 (L5) to 55 (L15)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=25
-|kind=Damage
-|targ=Bolt
-|duration=Instant
-|max=45-55 Dmg
-}}
-{{RadSpellRow2
-|name=Lesser Shielding
-|description=Self Only Hit Point (HP), Magic Resist (MR), and Armor Class (AC) Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Shielding
+|kind=Shielding
+|targ=Self
+|mana=25
+|effects=1: Increase Max Hitpoints by 17 (L5) to 30 (L18)<br>2: Increase AC by 4 (L5) to 7 (L18)<br>3: Increase Magic Resist by 6 (L5) to 10 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+30 Max HP<br>+7 AC<br>+10 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -742,48 +716,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dimensional Pocket
-|description=Summons a {{:Summoned: Dimensional Pocket}}
-|era={{Classic Short}}
+|kind=Summon Utility
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Dimensional Pocket}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #17304
-}}
-{{RadSpellRow2
-|name=Elementaling: Water
-|description=Summons a Water Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elementaling: Water
+|kind=Sum: Water
+|targ=Self
+|mana=80
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=80
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Eye of Zomm
-|description=Summons a small eye you can control and see with
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Eye of Zomm
+|kind=Vision
+|targ=Self
+|mana=30
+|effects=1: Eye of Zomm
+|duration=30 Sec
 |school=Conjuration
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=30 Sec
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -796,60 +766,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementaling: Fire
-|description=Summons a Fire Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Fire
+|targ=Self
+|mana=80
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=80
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Renew Elements
-|description=Pet Only Heal (Max: 50)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Renew Elements
+|kind=Heals
+|targ=Pet
+|mana=15
+|effects=1: Increase Hitpoints by 22 (L7) to 32 (L17)<br>2: Cure Disease: 10 counters<br>3: Cure Poison: 10 counters<br>4: Cure Curse: 10 counters
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Pet
-|targ=Pet
-|duration=Instant
-|max=22-32 HP<br>Cure 10 Disease<br>Cure 10 Poison<br>Cure 10 Curse
-}}
-{{RadSpellRow2
-|name=Shield of Fire
-|description=Single Target Damage Shield (DS) and Fire Resist (FR) Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shield of Fire
+|kind=Damage Shield
+|targ=Friendly
+|mana=40
+|effects=1: Increase Damage Shield by 4 (L7) to 6 (L12)<br>2: Increase Fire Resist by 10
+|duration=15 Min
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=40
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=+10 Fire Resist
-}}
-{{RadSpellRow2
-|name=Shock of Blades
-|description=Single Target Magical Direct Damage (DD) (Max: 35/1.17 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Blades
+|kind=Magic DD
+|targ=Single
+|mana=18
+|effects=1: Decrease Hitpoints by 37 (L7) to 42 (L12)
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=18
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=37-42 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -862,60 +827,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementaling: Air
-|description=Summons an Air Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Air
+|targ=Self
+|mana=80
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=80
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Invisibility
-|description=Single Target Invisibility
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility
+|kind=Invisibility
+|targ=Friendly
+|mana=30
+|effects=1: Invisibility
+|duration=20 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=20 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Staff of Tracing
-|description=Summons 1 {{:Summoned: Staff of Tracing}}
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Staff of Tracing
+|kind=Summon Weapon
+|targ=Self
+|mana=20
+|effects=1: {{:Summoned: Staff of Tracing}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=20
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #6330
-}}
-{{RadSpellRow2
-|name=Summon Linen Mantle
-|description=Focuses mana into the form of a linen mantle that allows many of your beneficial spells to last a longer period of time. This item works on spells up to level sixteen.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Linen Mantle
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Tavee's Linen Mantle}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23503
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -928,48 +888,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elementaling: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Sum: Earth
+|targ=Self
 |mana=80
-|kind=Pet
-|targ=Self
+|effects=1: Summons an Earth Elemental Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Fang
-|description=Summons 1 {{:Summoned: Snake Fang}}
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #7313
-}}
-{{RadSpellRow2
-|name=Ward Summoned
-|description=Single Target Direct Damage (DD) vs Summoned (Max: 14)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Fang
+|kind=Summon Weapon
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Snake Fang}}
+|duration=Instant
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward Summoned
+|kind=Summoned DD
+|targ=Construct
+|mana=6
+|effects=1: Decrease Hitpoints by 6 (L2) to 14 (L18)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=6
-|kind=Damage
-|targ=Construct/Elemental
-|duration=Instant
-|max=6-14 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -982,60 +938,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancel Magic
-|description=Removes a magical effect from your target
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Elemental: Water
-|description=Summons a Water Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elemental: Water
+|kind=Sum: Water
+|targ=Self
+|mana=120
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=120
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Rain of Blades
-|description=Area of Effect (AE) spell that hits your target(s) with 3 waves (Max: 26)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rain of Blades
+|kind=Magic DD
+|targ=Targeted AE
+|mana=62
+|effects=1: Decrease Hitpoints by 26
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=62
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=26 Dmg
-}}
-{{RadSpellRow2
-|name=Summon Tarnished Bauble
-|description=Focuses mana into the form of a tarnished bauble that sometimes allows you to cast a spell for a reduced mana cost. This item works on spells up to level twenty-four.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Tarnished Bauble
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Jolum's Tarnished Bauble}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23512
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1048,48 +999,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burnout
-|description=Pet Only 15-min Strength (STR) and Haste buff
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=35
+|effects=1: Increase Strength by 15<br>2: Increase Attack Speed by 12% (L11) to 15% (L18)<br>3: Increase AC by 6
+|duration=60 Min
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=35
-|kind=Pet
-|targ=Pet
-|duration=60 Min
-|max=+15 STR<br>+6 AC
-}}
-{{RadSpellRow2
-|name=Elemental: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elemental: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=120
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Elemental Defender
-|description=Focuses mana into the form of an elemental defender.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Elemental Defender
+|kind=Summon Armor
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Elemental Defender}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #3427
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1102,48 +1049,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Affinity
-|description=Single Target new Bind Point
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Single
+|mana=100
+|effects=1: Bind Affinity
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=100
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Column of Fire
-|description=Area of Effect (AE) Fire-based Direct Damage (DD) around target
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Column of Fire
+|kind=Fire DD
+|targ=Targeted AE
+|mana=65
+|effects=1: Decrease Hitpoints by 49 (L12) to 51 (L14)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=65
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=49-51 Dmg
-}}
-{{RadSpellRow2
-|name=Elemental: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elemental: Air
+|kind=Sum: Air
+|targ=Self
+|mana=120
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1156,36 +1099,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=120
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=120
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Phantom Leather
-|description=Self Only Armor Class (AC) and Hit Point (HP) Regeneration Buff (+1/tick) (Consumes [[Cat's Eye Agate]] when cast)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Phantom Leather
+|kind=Health
+|targ=Self
+|mana=60
+|effects=1: Increase Hitpoints by 1 per tick<br>2: Increase AC by 6 (L13) to 7 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=60
-|kind=Regen
-|targ=Self
-|duration=Permanent
-|max=+1 HP/tick<br>+7 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1198,36 +1138,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Summoning: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=160
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=160
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Staff of Warding
-|description=Summons 1 {{:Summoned: Staff of Warding}}
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Staff of Warding
+|kind=Summon Weapon
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Staff of Warding}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #6331
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1240,60 +1177,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Summoning: Fire
-|description=Summons a Fire Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Fire
+|targ=Self
+|mana=160
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=160
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Shock of Flame
-|description=Single Target Fire-based Direct Damage (DD) (Max: 97/1.37 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Flame
+|kind=Fire DD
+|targ=Single
+|mana=48
+|effects=1: Decrease Hitpoints by 115 (L15) to 122 (L22)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=48
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=115-122 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Heatstone
-|description=Summons 1 {{:Summoned: Heatstone}} for light and Infravision
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Summon Utility
+|targ=Self
 |mana=40
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Heatstone}}
 |duration=Instant
-|max=Summon Item #10310
-}}
-{{RadSpellRow2
-|name=Summon Throwing Dagger
-|description=Summons 20 {{:Summoned: Throwing Dagger}}s
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=20
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Throwing Dagger
+|kind=Summon Weapon
 |targ=Self
+|mana=20
+|effects=1: {{:Summoned: Throwing Dagger}} (×100)
 |duration=Instant
-|max=Summon Item #8317
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1306,60 +1238,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Summoning: Air
-|description=Summons an Air Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Air
+|targ=Self
+|mana=160
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=160
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=See Invisible
-|description=Single Target Vision Enhancer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=See Invisible
+|kind=Vision
+|targ=Friendly
+|mana=25
+|effects=1: See Invisible
+|duration=27 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=25
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Shielding
-|description=Self Only Hit Point (HP), Magic Resist (MR), and Armor Class (AC) Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shielding
+|kind=Shielding
+|targ=Self
+|mana=50
+|effects=1: Increase Max Hitpoints by 45 (L15) to 50 (L20)<br>2: Increase AC by 9 (L15) to 11 (L21)<br>3: Increase Magic Resist by 11 (L15) to 12 (L16)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+50 Max HP<br>+11 AC<br>+12 Magic Resist
-}}
-{{RadSpellRow2
-|name=Summon Tiny Ring
-|description=Focuses mana into the form of a tiny ring that allows you to cast many spells faster. This item works on spells up to level twenty-four.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Tiny Ring
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Naki's Tiny Ring}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23509
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1372,60 +1299,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Summoning: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=160
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=160
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Rain of Fire
-|description=Area of Effect (AE) Fire-based spell that hits your target with 3 waves (Max: 56)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rain of Fire
+|kind=Fire DD
+|targ=Targeted AE
+|mana=125
+|effects=1: Decrease Hitpoints by 75
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendorr
-|mana=125
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=75 Dmg
-}}
-{{RadSpellRow2
-|name=Summon Phantom Leather
-|description=Focuses mana into the form of a pack of phantom leather armor.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Phantom Leather
+|kind=Summon Armor
+|targ=Self
+|mana=100
+|effects=1: {{:Summoned: Phantom Satchel}}<br>2: {{:Summoned: Phantom Leather Skullcap}}<br>3: {{:Summoned: Phantom Leather Tunic}}<br>4: {{:Summoned: Phantom Leather Sleeves}}<br>5: {{:Summoned: Phantom Leather Bracer}}<br>6: {{:Summoned: Phantom Leather Gloves}}<br>7: {{:Summoned: Phantom Leather Leggings}}<br>8: {{:Summoned: Phantom Leather Boots}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=100
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #17310
-}}
-{{RadSpellRow2
-|name=Summon Waterstone
-|description=Summons 1 {{:Summoned: Waterstone}}
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Waterstone
+|kind=Summon Utility
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Waterstone}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10342
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1438,60 +1360,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bolt of Flame
-|description=Single Target Fire-based Projectile Direct Damage (DD) (Max: 156/1.49 DPM)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Bolt
+|mana=102
+|effects=1: Decrease Hitpoints by 261 (L18) to 297 (L36)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=102
-|kind=Damage
-|targ=Bolt
-|duration=Instant
-|max=261-297 Dmg
-}}
-{{RadSpellRow2
-|name=Expulse Summoned
-|description=Single Target Direct Damage (DD) vs Summoned (Max: 94)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Expulse Summoned
+|kind=Summoned DD
+|targ=Construct
+|mana=41
+|effects=1: Decrease Hitpoints by 113 (L13) to 122 (L22)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=41
-|kind=Damage
-|targ=Construct/Elemental
-|duration=Instant
-|max=113-122 Dmg
-}}
-{{RadSpellRow2
-|name=Lesser Summoning: Water
-|description=Summons a Water Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Summoning: Water
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Renew Summoning
-|description=Pet Only Heal (Max: 220)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Renew Summoning
+|kind=Heals
+|targ=Pet
+|mana=36
+|effects=1: Increase Hitpoints by 75 (L18) to 87 (L24)<br>2: Cure Disease: 10 counters<br>3: Cure Poison: 10 counters<br>4: Cure Curse: 10 counters
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=36
-|kind=Pet
-|targ=Pet
-|duration=Instant
-|max=75-87 HP<br>Cure 10 Disease<br>Cure 10 Poison<br>Cure 10 Curse
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1504,60 +1421,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental Shield
-|description=Self Only Fire Resist (FR) and Cold Resist (CR) Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Self
+|mana=50
+|effects=1: Increase Cold Resist by 14 (L19) to 15 (L20)<br>2: Increase Fire Resist by 14 (L19) to 15 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+15 Cold Resist<br>+15 Fire Resist
-}}
-{{RadSpellRow2
-|name=Lesser Summoning: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Summoning: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=200
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Shield of Flame
-|description=Single Target Fire-based Damage Shield (DS) (Max: 9)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shield of Flame
+|kind=Damage Shield
+|targ=Friendly
+|mana=60
+|effects=1: Increase Damage Shield by 7 (L19) to 9 (L24)<br>2: Increase Fire Resist by 15
+|duration=15 Min
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=60
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=+15 Fire Resist
-}}
-{{RadSpellRow2
-|name=Tiny Companion
-|description=Shrinks your pet, allowing it better mobility in tight quarters.
 |era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
-|mana=50
+}}
+{{KhazamSpellRow
+|name=Tiny Companion
 |kind=Pet
 |targ=Pet
+|mana=50
+|effects=1: Increase Shrink Pet by 50
 |duration=Instant
-|max=
+|school=Alteration
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1570,72 +1482,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lesser Summoning: Air
-|description=Summons an Air Elemental Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Sum: Air
+|targ=Self
 |mana=200
-|kind=Pet
-|targ=Self
+|effects=1: Summons an Air Elemental Pet
 |duration=Instant
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Spear of Warding
-|description=Summons 1 {{:Summoned: Spear of Warding}}
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Summon Weapon
+|targ=Self
 |mana=60
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Spear of Warding}}
 |duration=Instant
-|max=Summon Item #7309
-}}
-{{RadSpellRow2
-|name=Summon Arrows
-|description=Summons 20 {{:Summoned: Arrow}}s
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Arrows
+|kind=Summon Weapon
+|targ=Self
 |mana=30
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Arrow}} (×100)
 |duration=Instant
-|max=Summon Item #8316
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Jade Bracelet
-|description=Focuses mana into the form of a jade bracelet that increases the damage of many spells. This item works on spells up to level thirty-four.
-|era={{Classic Short}}
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Gallenite's Jade Bracelet}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23506
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Wooden Bracelet
-|description=Focuses mana into the form of a wooden bracelet that increases the damage of many affliction spells. This item works on spells up to level twenty.
-|era={{Classic Short}}
+|kind=Summon Focus
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Rallican's Wooden Bracelet}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #59561
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1648,48 +1554,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cornucopia
-|description=Summons 20 {{:Summoned: Black Bread}}
-|era={{Classic Short}}
+|kind=Summon Food/Water
+|targ=Self
+|mana=25
+|effects=1: {{:Summoned: Black Bread}} (×20)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=25
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #13078
-}}
-{{RadSpellRow2
-|name=Lesser Summoning: Earth
-|description=Summons an Earth Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Summoning: Earth
+|kind=Sum: Earth
+|targ=Self
+|mana=200
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor (OoT)
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Silver Choker
-|description=Focuses mana into the form of a silver choker that sometimes allows you to cast a spell without consuming any reagents. This item works on spells up to level twenty-four.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Silver Choker
+|kind=Summon Focus
+|targ=Self
+|mana=80
+|effects=1: {{:Summoned: Jedah's Silver Choker}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23501
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1702,60 +1604,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Everfount
-|description=Summons 20 {{:Summoned: Globe of Water}}
-|era={{Classic Short}}
+|kind=Summon Food/Water
+|targ=Self
+|mana=25
+|effects=1: {{:Summoned: Globe of Water}} (×20)
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=25
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #13079
-}}
-{{RadSpellRow2
-|name=Flame Flux
-|description=Area of Effect (AE) Fire-based Point Blank (PB) Direct Damage (DD) (Max: 96)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Flame Flux
+|kind=Fire DD
+|targ=PB AE
+|mana=123
+|effects=1: Decrease Hitpoints by 89 (L22) to 96 (L29)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=123
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=89-96 Dmg
-}}
-{{RadSpellRow2
-|name=Malaise
-|description=Single Target Fire Resist (FR), Magic Resist (MR), Cold Resist (CR), and Poison Resist (PR) Debuff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Malaise
+|kind=Resist Debuffs
+|targ=Single
+|mana=60
+|effects=1: Decrease Cold Resist by 15 (L18) to 20 (L28)<br>2: Decrease Magic Resist by 15 (L18) to 20 (L28)<br>3: Decrease Poison Resist by 15 (L18) to 20 (L28)<br>4: Decrease Fire Resist by 15 (L18) to 20 (L28)
+|duration=14 Min
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-20 Cold Resist<br>-20 Magic Resist<br>-20 Poison Resist<br>-20 Fire Resist
-}}
-{{RadSpellRow2
-|name=Summoning: Water
-|description=Summons a Water Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summoning: Water
+|kind=Sum: Water
+|targ=Self
+|mana=240
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=240
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1768,36 +1665,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shock of Spikes
-|description=Magic-based Direct Damage (DD) (Max: 176/1.6 DPM)
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=75
-|kind=Damage
+|kind=Magic DD
 |targ=Single
+|mana=75
+|effects=1: Decrease Hitpoints by 196 (L23) to 227 (L39)
 |duration=Instant
-|max=196-227 Dmg
-}}
-{{RadSpellRow2
-|name=Summoning: Fire
-|description=Summons a Fire Elemental
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=240
-|kind=Pet
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summoning: Fire
+|kind=Sum: Fire
 |targ=Self
+|mana=240
+|effects=1: Summons a Fire Elemental Pet
 |duration=Instant
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1810,48 +1704,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Major Shielding
-|description=Self Only Hit Point (HP), Armor Class (AC), and Magic Resist (MR) Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=80
+|effects=1: Increase Max Hitpoints by 68 (L23) to 75 (L30)<br>2: Increase AC by 13 (L23) to 15 (L28)<br>3: Increase Magic Resist by 14
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+75 Max HP<br>+15 AC<br>+14 Magic Resist
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Staff of Runes
-|description=Summons 1 {{:Summoned: Staff of Runes}}
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Summon Weapon
+|targ=Self
 |mana=60
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Staff of Runes}}
 |duration=Instant
-|max=Summon Item #6332
-}}
-{{RadSpellRow2
-|name=Summoning: Air
-|description=Summons an Air Elemental Pet
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=240
-|kind=Pet
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summoning: Air
+|kind=Sum: Air
 |targ=Self
+|mana=240
+|effects=1: Summons an Air Elemental Pet
 |duration=Instant
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1864,60 +1754,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dismiss Summoned
-|description=Single Target Direct Damage (DD) vs Summoned (Max: 162/1.8 DPM)
-|era={{Classic Short}}
+|kind=Summoned DD
+|targ=Construct
+|mana=73
+|effects=1: Decrease Hitpoints by 226 (L23) to 244 (L32)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=73
-|kind=Damage
-|targ=Construct/Elemental
-|duration=Instant
-|max=226-244 Dmg
-}}
-{{RadSpellRow2
-|name=Phantom Chain
-|description=Self Only Armor Class (AC) and Hit Point (HP) Regeneration (+2/tick) (Consumes [[Cat's Eye Agate]] x2 when cast)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Phantom Chain
+|kind=Health
+|targ=Self
+|mana=100
+|effects=1: Increase Hitpoints by 2 per tick<br>2: Increase AC by 9 (L25) to 11 (L34)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Regen
-|targ=Self
-|duration=Permanent
-|max=+2 HP/tick<br>+11 AC
-}}
-{{RadSpellRow2
-|name=Summon Phantom Chain
-|description=Focuses mana into the form of a pack of phantom chain mail.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Phantom Chain
+|kind=Summon Armor
+|targ=Self
+|mana=200
+|effects=1: {{:Summoned: Phantom Satchel}}<br>2: {{:Summoned: Phantom Chain Coif}}<br>3: {{:Summoned: Phantom Chain Coat}}<br>4: {{:Summoned: Phantom Chain Sleeves}}<br>5: {{:Summoned: Phantom Chain Bracer}}<br>6: {{:Summoned: Phantom Chain Gloves}}<br>7: {{:Summoned: Phantom Chain Greaves}}<br>8: {{:Summoned: Phantom Chain Boots}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=200
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #17310
-}}
-{{RadSpellRow2
-|name=Summoning: Earth
-|description=Summons an Earth Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summoning: Earth
+|kind=Sum: Earth
+|targ=Self
+|mana=240
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=240
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1930,48 +1815,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Summoning: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Rain of Spikes
-|description=Area of Effect (AE) spell hits your target with 3 waves (Max: 91)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rain of Spikes
+|kind=Magic DD
+|targ=Targeted AE
+|mana=162
+|effects=1: Decrease Hitpoints by 91
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=162
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=91 Dmg
-}}
-{{RadSpellRow2
-|name=Sword of Runes
-|description=Summons {{:Summoned: Sword of Runes}}
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sword of Runes
+|kind=Summon Weapon
+|targ=Self
+|mana=75
+|effects=1: {{:Summoned: Sword of Runes}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=75
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #5319
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1984,48 +1865,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expedience
-|description=Outdoor Only Pet Movement Speed Buff
-|era={{Classic Short}}
+|kind=Pet Misc Buffs
+|targ=Pet
+|mana=45
+|effects=1: Increase Movement Speed by 20%
+|duration=12 Min
 |school=Alteration
 |location=E. Com.
-|mana=45
-|kind=Pet
-|targ=Pet
-|duration=12 Min
-|max=Run Speed
-}}
-{{RadSpellRow2
-|name=Greater Summoning: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Summoning: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=200
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Leather Mantle
-|description=Focuses mana into the form of a leather mantle that allows many of your beneficial spells to last a longer period of time.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Leather Mantle
+|kind=Summon Focus
+|targ=Self
+|mana=80
+|effects=1: {{:Summoned: Tavee's Leather Mantle}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23504
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2038,48 +1915,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Expel Summoned
-|description=Single Target Direct Damage (DD) vs Summoned (Max: 273)
-|era={{Classic Short}}
+|kind=Summoned DD
+|targ=Construct
+|mana=108
+|effects=1: Decrease Hitpoints by 243 (L28) to 309 (L50)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=108
-|kind=Damage
-|targ=Construct/Elemental
-|duration=Instant
-|max=243-309 Dmg
-}}
-{{RadSpellRow2
-|name=Greater Summoning: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Summoning: Air
+|kind=Sum: Air
+|targ=Self
+|mana=200
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Inferno Shield
-|description=Single Target Damage Shield (DS) & Fire Resist (FR) Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Inferno Shield
+|kind=Damage Shield
+|targ=Friendly
+|mana=80
+|effects=1: Increase Damage Shield by 13 (L28) to 15 (L36)<br>2: Increase Fire Resist by 20
+|duration=15 Min
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=+20 Fire Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2092,48 +1965,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burnout II
-|description=Pet only Strength (STR) and Haste Buff
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=75
+|effects=1: Increase Strength by 39 (L29) to 45 (L40)<br>2: Increase Attack Speed by 29% (L29) to 35% (L40)<br>3: Increase AC by 7
+|duration=60 Min
 |school=Alteration
 |location=Vendor
-|mana=75
-|kind=Pet
-|targ=Pet
-|duration=60 Min
-|max=+45 STR<br>+35% Atkspd<br>+7 AC
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Summoning: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Sum: Earth
+|targ=Self
 |mana=200
-|kind=Pet
-|targ=Self
+|effects=1: Summons an Earth Elemental Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Coldstone
-|description=Summons 1 {{:Summoned: Coldstone}} that gives Ultravision and 5 Armor Class (AC)
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Coldstone
+|kind=Summon Utility
 |targ=Self
+|mana=40
+|effects=1: {{:Summoned: Coldstone}}
 |duration=Instant
-|max=Summon Item #10323
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2146,48 +2015,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dimensional Hole
-|description=Summons 1 {{:Dimensional Hole (Item)}}
-|era={{Classic Short}}
+|kind=Summon Utility
+|targ=Self
+|mana=60
+|effects=1: {{:Summoned: Dimensional Hole}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor: Ak'Anon, Erudin, Neriak
-|mana=60
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #17305
-}}
-{{RadSpellRow2
-|name=Monster Summoning I
-|description=Summon a Monster Pet
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=200
+}}
+{{KhazamSpellRow
+|name=Monster Summoning I
 |kind=Pet
 |targ=Self
+|mana=200
+|effects=1: Summons a Monster Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Shiny Bauble
-|description=Focuses mana into the form of a shiny bauble that sometimes allows you to cast a spell for a reduced mana cost. This item works on spells up to level fifty.
+|school=Conjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Shiny Bauble
+|kind=Summon Focus
+|targ=Self
+|mana=80
+|effects=1: {{:Summoned: Jolum's Shiny Bauble}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23513
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2200,48 +2065,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Blaze
-|description=Single Target Fire-based Direct Damage (DD) (Max: 295/1.9 DPM)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Single
+|mana=136
+|effects=1: Decrease Hitpoints by 418
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=136
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=418 Dmg
-}}
-{{RadSpellRow2
-|name=Minor Conjuration: Water
-|description=Summons a Water Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Conjuration: Water
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Shard of the Core
-|description=Summons 1 {{:Summoned: Shard of the Core}}
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Shard of the Core
+|kind=Summon Utility
+|targ=Self
+|mana=50
+|effects=1: {{:Summoned: Shard of the Core}}
+|duration=Instant
 |school=Conjuration
 |location=NPC Drop
-|mana=50
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #30275
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2254,48 +2115,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Shielding
-|description=Self Only Hit Point (HP), Magic Resist (MR), and Armor Class (AC) Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=120
+|effects=1: Increase Max Hitpoints by 91 (L31) to 100 (L40)<br>2: Increase AC by 16 (L31) to 18 (L39)<br>3: Increase Magic Resist by 16
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=120
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+100 Max HP<br>+18 AC<br>+16 Magic Resist
-}}
-{{RadSpellRow2
-|name=Minor Conjuration: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Conjuration: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=200
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Nullify Magic
-|description=Removes a magical effect from your target
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nullify Magic
+|kind=Dispel
+|targ=Single
+|mana=50
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2308,48 +2165,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cinder Bolt
-|description=Fire Projectile Direct Damage (DD) (Max: 333/1.9 DPM)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Bolt
+|mana=165
+|effects=1: Decrease Hitpoints by 499 (L33) to 510 (L37)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=165
-|kind=Damage
-|targ=Bolt
-|duration=Instant
-|max=499-510 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Conjuration: Air
-|description=Summons an Air Elemental Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Sum: Air
+|targ=Self
 |mana=200
-|kind=Pet
-|targ=Self
+|effects=1: Summons an Air Elemental Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Staff of Symbols
-|description=Summons 1 {{:Summoned: Staff of Symbols}}
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=80
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Staff of Symbols
+|kind=Summon Weapon
 |targ=Self
+|mana=80
+|effects=1: {{:Summoned: Staff of Symbols}}
 |duration=Instant
-|max=Summon Item #6333
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2362,36 +2215,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Conjuration: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=200
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Refresh Summoning
-|description=Renews the health of your elemental pet, healing between 43 and 175 damage, and curing their diseases, poisons, and curses.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Refresh Summoning
+|kind=Heals
+|targ=Pet
+|mana=93
+|effects=1: Increase Hitpoints by 145 (L34) to 175 (L44)<br>2: Cure Disease: 10 counters<br>3: Cure Poison: 10 counters<br>4: Cure Curse: 10 counters
+|duration=Instant
 |school=Alteration
 |location=
-|mana=93
-|kind=Pet
-|targ=Pet
-|duration=Instant
-|max=145-175 HP<br>Cure 10 Disease<br>Cure 10 Poison<br>Cure 10 Curse
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2404,36 +2254,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Dagger of Symbols
-|description=Summons 1 {{:Summoned: Dagger of Symbols}}
-|era={{Classic Short}}
+|kind=Summon Weapon
+|targ=Self
+|mana=100
+|effects=1: {{:Summoned: Dagger of Symbols}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=100
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #7310
-}}
-{{RadSpellRow2
-|name=Rain of Lava
-|description=Area of Effect Fire-based spell that hits your target with 3 waves
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rain of Lava
+|kind=Fire DD
+|targ=Targeted AE
+|mana=250
+|effects=1: Decrease Hitpoints by 172
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=250
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=172 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2446,36 +2293,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lesser Conjuration: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Companion
 |kind=Pet
 |targ=Self
+|mana=50
+|effects=1: Call Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Companion
-|description=Summon your Pet to Your Location
-|era={{Classic Short}}
 |school=Conjuration
 |location=E. Com.
-|mana=50
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2488,48 +2332,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lesser Conjuration: Fire
-|description=Summons a Fire Elemental Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
+|kind=Sum: Fire
+|targ=Self
 |mana=200
-|kind=Pet
-|targ=Self
+|effects=1: Summons a Fire Elemental Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Ring of Flight
-|description=Summons 1 {{:Summoned: Ring of Levitation}} that gives levitation
-|era={{Classic Short}}
 |school=Conjuration
 |location=Vendor
-|mana=100
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10405
-}}
-{{RadSpellRow2
-|name=Summon Twisted Ring
-|description=Focuses mana into the form of a twisted ring allows you to cast many spells faster. This item works on spells up to level fifty.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Ring of Flight
+|kind=Summon Utility
+|targ=Self
+|mana=100
+|effects=1: {{:Summoned: Ring of Flight}}
+|duration=Instant
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Twisted Ring
+|kind=Summon Focus
+|targ=Self
+|mana=80
+|effects=1: {{:Summoned: Naki's Twisted Ring}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23510
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2542,48 +2382,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Barrier of Combustion
-|description=Single Target Damage Shield (DS 18-20) & Fire Resist (FR) Buff
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Friendly
+|mana=100
+|effects=1: Increase Damage Shield by 18 (L38) to 20 (L44)<br>2: Increase Fire Resist by 22
+|duration=15 Min
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=+22 Fire Resist
-}}
-{{RadSpellRow2
-|name=Lesser Conjuration: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Conjuration: Air
+|kind=Sum: Air
+|targ=Self
+|mana=200
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Phantom Plate
-|description=Focuses mana into the form of a pack of phantom plate armor.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Phantom Plate
+|kind=Summon Armor
+|targ=Self
+|mana=300
+|effects=1: {{:Summoned: Phantom Satchel}}<br>2: {{:Summoned: Phantom Plate Helm}}<br>3: {{:Summoned: Phantom Breastplate}}<br>4: {{:Summoned: Phantom Plate Vambraces}}<br>5: {{:Summoned: Phantom Plate Bracers}}<br>6: {{:Summoned: Phantom Plate Gauntlets}}<br>7: {{:Summoned: Phantom Plate Greaves}}<br>8: {{:Summoned: Phantom Plate Boots}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=300
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #17310
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2596,36 +2432,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Flame Arc
-|description=Area of Effect (AE) Point Blank (PB) Fire Direct Damage (DD) (Max: 181)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=PB AE
+|mana=199
+|effects=1: Decrease Hitpoints by 171 (L39) to 181 (L44)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=199
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=171-181 Dmg
-}}
-{{RadSpellRow2
-|name=Lesser Conjuration: Earth
-|description=Summons an Earth Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Conjuration: Earth
+|kind=Sum: Earth
+|targ=Self
+|mana=200
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2638,60 +2471,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Conjuration: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental Armor
-|description=Self Only Cold Resist (CR) and Fire Resist (FR) Buff
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Resist Buff
+|targ=Self
 |mana=100
-|kind=Buff
-|targ=Self
+|effects=1: Increase Cold Resist by 30<br>2: Increase Fire Resist by 30
 |duration=Permanent
-|max=+30 Cold Resist<br>+30 Fire Resist
-}}
-{{RadSpellRow2
-|name=Phantom Plate
-|description=Self Only Hit Point Regeneration (+3/tick) and Armor Class (AC) Buff (Consumes [[Cat's Eye Agate]] x3 when cast)
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Regen
-|targ=Self
-|duration=Permanent
-|max=+3 HP/tick<br>+15 AC
-}}
-{{RadSpellRow2
-|name=Shock of Swords
-|description=Single Target Magic-based Direct Damage (DD) (Max: 600/2.4 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Phantom Plate
+|kind=Health
+|targ=Self
+|mana=200
+|effects=1: Increase Hitpoints by 3 per tick<br>2: Increase AC by 14 (L41) to 15 (L48)
+|duration=Permanent
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Swords
+|kind=Magic DD
+|targ=Single
+|mana=162
+|effects=1: Decrease Hitpoints by 584
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=162
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=584 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2704,60 +2532,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bounce
-|description=Surrounds your body in a reflective aura, providing a chance for all incoming spells to rebound back against the caster.
-|era={{Classic Short}}
+|kind=Reflection
+|targ=Self
+|mana=100
+|effects=1: Increase Spell Reflect by 40
+|duration=12 Sec
 |school=Abjuration
 |location=
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=12 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Conjuration: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Conjuration: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=200
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Summon Opal Bracelet
-|description=Focuses mana into the form of an opal bracelet that increases the damage of many spells. This item works on spells up to level 52.
-|era={{Classic Short}}
-|school=Conjuration
-|location=
+|kind=Summon Focus
+|targ=Self
 |mana=80
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Gallenite's Opal Bracelet}}
 |duration=Instant
-|max=Summon Item #23507
-}}
-{{RadSpellRow2
-|name=Summon: Orb of Exploration
-|description=Focuses mana into an orb of exploration which provides greatly improved night vision and the ability to see normally invisible creatures.
-|era={{Classic Short}}
 |school=Conjuration
 |location=
-|mana=50
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon: Orb of Exploration
+|kind=Summon Utility
 |targ=Self
+|mana=50
+|effects=1: {{:Summoned: Orb of Exploration}}
 |duration=Instant
-|max=Summon Item #59569
+|school=Conjuration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2770,48 +2593,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Arch Shielding
-|description=Self Only Hit Point (HP), Magic Resist (MR), and Armor Class (AC) Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=200
+|effects=1: Increase Max Hitpoints by 140 (L40) to 150 (L50)<br>2: Increase AC by 20 (L40) to 22 (L48)<br>3: Increase Magic Resist by 20
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+150 Max HP<br>+22 AC<br>+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Conjuration: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Conjuration: Air
+|kind=Sum: Air
+|targ=Self
+|mana=200
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Elemental Maelstrom
-|description=Single Target Magic-based Damage over Time (DoT) (Max: 600)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Elemental Maelstrom
+|kind=Magic DoT
+|targ=Single
+|mana=87
+|effects=1: Decrease Hitpoints by 250<br>2: Decrease Hitpoints by 62 (L43) to 69 (L50) per tick
+|duration=30 Sec
 |school=Evocation
 |location=NPC Drop
-|mana=87
-|kind=Damage Over Time
-|targ=Single
-|duration=30 Sec
-|max=-250 Dmg<br>-69 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2824,72 +2643,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Conjuration: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=200
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Malaisement
-|description=Single Target Fire Resist (FR), Cold Resist (CR), Magic Resist (MR), and Poison Resist (PR) Debuff (Max: 40)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Malaisement
+|kind=Resist Debuffs
+|targ=Single
+|mana=100
+|effects=1: Decrease Cold Resist by 36 (L32) to 40 (L40)<br>2: Decrease Magic Resist by 36 (L32) to 40 (L40)<br>3: Decrease Poison Resist by 36 (L32) to 40 (L40)<br>4: Decrease Fire Resist by 36 (L32) to 40 (L40)
+|duration=14 Min
 |school=Alteration
 |location=Vendor.
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-40 Cold Resist<br>-40 Magic Resist<br>-40 Poison Resist<br>-40 Fire Resist
-}}
-{{RadSpellRow2
-|name=Modulating Rod
-|description=Summons 1 {{:Summoned: Modulating Rod}} that can convert Hit Points (HP) to Mana (225 HP to 150 Mana)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Modulating Rod
+|kind=Summon Utility
+|targ=Friendly
+|mana=200
+|effects=1: {{:Summoned: Modulating Rod}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Summon
-|targ=Single Friendly (or Self)
-|duration=Instant
-|max=Summon Item #6346
-}}
-{{RadSpellRow2
-|name=Primal Remedy
-|description=Renews the health of your elemental pet, healing between 120 and 120 damage every 6 seconds for 30s.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Primal Remedy
+|kind=Heals
+|targ=Pet
+|mana=200
+|effects=1: Increase Hitpoints by 120 per tick
+|duration=30 Sec
 |school=Alteration
 |location=
-|mana=200
-|kind=Pet
-|targ=Pet
-|duration=30 Sec
-|max=+120 HoT
-}}
-{{RadSpellRow2
-|name=Summon Stone Bracelet
-|description=Focuses mana into the form of a stone bracelet that increases the damage of many affliction spells. This item works on spells up to level forty four.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Stone Bracelet
+|kind=Summon Focus
+|targ=Self
+|mana=80
+|effects=1: {{:Summoned: Rallican's Stone Bracelet}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=80
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #59562
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2902,36 +2715,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shield of Lava
-|description=Single Target Damage Shield (DS) & Fire Resist (FR) Buff (Max: 25)
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Friendly
+|mana=120
+|effects=1: Increase Damage Shield by 25<br>2: Increase Fire Resist by 25
+|duration=15 Min
 |school=Abjuration
 |location=Vendor
-|mana=120
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=+25 Fire Resist
-}}
-{{RadSpellRow2
-|name=Summon Orb
-|description=Mage Epic: Summons 1 {{:Orb of Mastery}} that can summon a pet at level 46
 |era={{Classic Short}}
-|school=Conjuration
-|location=Quest
-|mana=500
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #28034
 }}
 </table>
 </div>
@@ -2944,36 +2743,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Conjuration: Earth
-|description=Summons an Earth Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Earth
+|targ=Self
+|mana=200
+|effects=1: Summons an Earth Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Ward of Calliav
-|description=Places the Ward of Calliav on your pet, absorbing up to 11747 damage from the next 1 melee strikes or direct damage spells that hit it.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward of Calliav
+|kind=Block
+|targ=Pet
+|mana=200
+|effects=1: Increase Absorb Damage by 1
+|duration=36 Min
 |school=Abjuration
 |location=
-|mana=200
-|kind=Pet
-|targ=Pet
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2986,48 +2782,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Burnout III
-|description=Pet Only Armor Class (AC), Strength (STR) and Haste Buff
-|era={{Classic Short}}
+|kind=Pet Haste
+|targ=Pet
+|mana=150
+|effects=1: Increase Strength by 50<br>2: Increase Attack Speed by 60%<br>3: Increase AC by 11
+|duration=60 Min
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Pet
-|targ=Pet
-|duration=60 Min
-|max=+50 STR<br>+60% Atkspd<br>+11 AC
-}}
-{{RadSpellRow2
-|name=Greater Conjuration: Fire
-|description=Summons a Fire Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Conjuration: Fire
+|kind=Sum: Fire
+|targ=Self
+|mana=200
+|effects=1: Summons a Fire Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Lava Bolt
-|description=Single Target Fire-based Projectile Direct Damage (DD) (Max: 810, 2.7 DPM)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lava Bolt
+|kind=Fire DD
+|targ=Bolt
+|mana=238
+|effects=1: Decrease Hitpoints by 817
+|duration=Instant
 |school=Evocation
 |location=Vendor.
-|mana=238
-|kind=Damage
-|targ=Bolt
-|duration=Instant
-|max=817 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3040,48 +2832,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Banish Summoned
-|description=Single Target Direct Damage (DD) vs Summoned (Max: 585, 2.6 DPM)
-|era={{Classic Short}}
+|kind=Summoned DD
+|targ=Construct
+|mana=136
+|effects=1: Decrease Hitpoints by 529 (L43) to 540 (L47)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=136
-|kind=Damage
-|targ=Construct/Elemental
-|duration=Instant
-|max=529-540 Dmg
-}}
-{{RadSpellRow2
-|name=Greater Conjuration: Air
-|description=Summons an Air Elemental Pet
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Conjuration: Air
+|kind=Sum: Air
+|targ=Self
+|mana=200
+|effects=1: Summons an Air Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Elemental Blanket
-|description=Focuses mana into the form of an elemental blanket.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Elemental Blanket
+|kind=Summon Armor
+|targ=Self
+|mana=220
+|effects=1: {{:Summoned: Elemental Blanket}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=220
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #20075
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3094,36 +2882,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Conjuration: Water
-|description=Summons a Water Elemental Pet
-|era={{Classic Short}}
+|kind=Sum: Water
+|targ=Self
+|mana=200
+|effects=1: Summons a Water Elemental Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Rain of Swords
-|description=Area of Effect (AE) Magic-based Direct Damage (DD) that hits your target(s) with 3 waves (Max: 324 per Wave)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rain of Swords
+|kind=Magic DD
+|targ=Targeted AE
+|mana=375
+|effects=1: Decrease Hitpoints by 324
+|duration=Instant
 |school=Evocation
 |location=Vendor.
-|mana=375
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=324 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3136,36 +2921,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Monster Summoning II
-|description=Summons a Monster Pet
-|era={{Classic Short}}
-|school=Conjuration
-|location=NPC Drop
-|mana=200
 |kind=Pet
 |targ=Self
+|mana=200
+|effects=1: Summons a Monster Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Summon Golden Choker
-|description=Focuses mana into the form of a gold choker that sometimes allows you to cast a spell without consuming any reagents. This item works on spells up to level sixty.
+|school=Conjuration
+|location=NPC Drop
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Summon Golden Choker
+|kind=Summon Focus
+|targ=Self
+|mana=160
+|effects=1: {{:Summoned: Jedah's Golden Choker}}
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=160
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #23502
+|era={{Classic Short}}
 }}
 </table>
 </div>

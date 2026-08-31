@@ -52,7 +52,7 @@ In '''Toxxulia Forest''' you will find 5 named poachers that drop [[Poacher's He
 
 
 
-I have not see a poacher in surefall glade in EQL, so I believe they have been removed.  Information here on Surefall Glade in case it comes back.
+Surefall Glade poacher spawns are partially verified, with [[a poacher]] appearing in the #2 spawn position below. Further verification needed. 
 
 <nowiki>#</nowiki>1 Waterfall Cave (/loc 221,-179): shared spawn point for [[Poacher]] and Mammoth (named bear). Poacher drops a regular [[Poacher's Head]] for coin and faction rewards.  
 

@@ -71,7 +71,8 @@ The rest of this guide will be a departure from the usual format of the guides a
 <td>2</td>
 <td>[[Gavel the Temperant]]</td>
 <td>[[Cleric]]</td>
-<td>[[Armor of the Priest Quests|Armor of the Priest]]</td>
+<td>[[Armor of the Priest Quests|Armor of the Priest]]<br>
+[[Caduceus of Sacrament]]</td>
 </tr>
 
 <tr> 

@@ -56,9 +56,10 @@ Give this to Weligon.
 
 : Weligon Steelherder says 'Fine work, Deepwater Knight.  You have proven yourself an excellent addition to our ranks.  These shall be used to create more Peacekeeper staffs.  Oh yes, I almost forgot your reward.  Here you are. Now, go, and serve Prexus.'
 <div class="facblock">
-* Your faction standing with [[Deepwater Knights]] got better.
-* Your faction standing with [[High Council of Erudin]] got better.
-* Your faction standing with [[Heretics]] got worse.
+* Your faction standing with [[Deepwater Knights]] got better (+5).
+* Your faction standing with [[High Council of Erudin]] got better (+5).
+* Your faction standing with [[Heretics]] got worse (-1).
+* Your faction standing with Kerra Isle got worse (-1).
 </div>
 {{exp}}
 

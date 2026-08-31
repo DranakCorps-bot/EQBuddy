@@ -185,84 +185,77 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Blast of Cold
-|description=Covers your target in a thin layer of frost, causing between 10 and 18 damage.
-|era={{Classic Short}}
-|school=Evocation
-|location=Autogranted<br>Vendor
+|kind=Cold DD
+|targ=Single
 |mana=8
-|kind=Damage
-|targ=Single
+|effects=1: Decrease Hitpoints by 11 (L1) to 18 (L8)
 |duration=Instant
-|max=11-18 Dmg
-}}
-{{RadSpellRow2
-|name=Frost Bolt
-|description=Cold Projectile Direct Damage
-|era={{Classic Short}}
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=6
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=9-14 Dmg
-}}
-{{RadSpellRow2
-|name=Minor Shielding
-|description=Self Only AC and HP Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Bolt
+|kind=Cold DD
+|targ=Single
+|mana=6
+|effects=1: Decrease Hitpoints by 9 (L1) to 14 (L6)
+|duration=Instant
+|school=Evocation
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Shielding
+|kind=Shielding
+|targ=Self
+|mana=10
+|effects=1: Increase Max Hitpoints by 6 (L1) to 10 (L5)<br>2: Increase AC by 2 (L1) to 3 (L5)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 Max HP<br>+3 AC
-}}
-{{RadSpellRow2
-|name=Numbing Cold
-|description=Point Blank Area Effect Cold DD
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Numbing Cold
+|kind=Cold DD
+|targ=PB AE
+|mana=6
+|effects=1: Decrease Hitpoints by 14
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=6
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=14 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sphere of Light
-|description=Summons a globe that provides dim light
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
+|kind=Summon Utility
+|targ=Self
 |mana=10
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Light Globe}}
 |duration=Instant
-|max=Summon Item #10292
-}}
-{{RadSpellRow2
-|name=True North
-|description=Self Only Navigation Spell
-|era={{Classic Short}}
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=True North
+|kind=Utility Beneficial
 |targ=Self
+|mana=5
+|effects=1: Sense Heading
 |duration=Instant
-|max=
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -275,36 +268,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Glimpse
-|description=Self Only Vision Magnification
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=5
+|effects=1: Increase Magnify by 55
+|duration=12 Sec
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Buff
-|targ=Self
-|duration=12 Sec
-|max=55%
-}}
-{{RadSpellRow2
-|name=O`Keil's Radiation
-|description=Surrounds your target in radiating flame that damages any creature that strikes them.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=O`Keil's Radiation
+|kind=Damage Shield
+|targ=Friendly
+|mana=15
+|effects=1: Increase Damage Shield by 2<br>2: Increase Fire Resist by 6 (L2) to 10 (L10)
+|duration=5 Min
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=3 Min
-|max=+10 Fire Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -317,36 +307,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fade
-|description=Self Only Short Distance Teleport
-|era={{Classic Short}}
+|kind=Shadowstep
+|targ=Self
+|mana=10
+|effects=1: Shadow Step
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Utility Beneficial
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Root
-|description=Fast Root
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Root
+|kind=Root
+|targ=Single
+|mana=30
+|effects=1: Root
+|duration=48 Sec
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Utility
-|targ=Single
-|duration=48 Sec
-|max=Root
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -359,48 +346,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gate
-|description=Returns Caster to Their Bind Point
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted<br>Vendor
-|mana=70
 |kind=Transport
 |targ=Self
+|mana=70
+|effects=1: Gate · 98% chance · bind point 1
 |duration=Instant
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=See Invisible
-|description=Allows the Target to See Invisible Creatures
+|school=Alteration
+|location=Autogranted<br>Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=See Invisible
+|kind=Vision
+|targ=Friendly
+|mana=25
+|effects=1: See Invisible
+|duration=27 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=25
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=27 Minute Duration
-}}
-{{RadSpellRow2
-|name=Shock of Fire
-|description=Fire Direct Damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Fire
+|kind=Fire DD
+|targ=Single
+|mana=10
+|effects=1: Decrease Hitpoints by 14 (L4) to 20 (L10)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=10
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=14-20 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -413,36 +396,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fingers of Fire
-|description=PBAOE Fire Damage
-|era={{Classic Short}}
-|school=Evocation
-|location=Autogranted<br>Vendor
-|mana=47
-|kind=Damage
+|kind=Fire DD
 |targ=PB AE
+|mana=47
+|effects=1: Decrease Hitpoints by 19 (L5) to 28 (L14)
 |duration=Instant
-|max=19-28 Dmg
-}}
-{{RadSpellRow2
-|name=Fire Bolt
-|description=Fire Projectile
-|era={{Classic Short}}
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=28
-|kind=Damage
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Fire Bolt
+|kind=Fire DD
 |targ=Single
+|mana=28
+|effects=1: Decrease Hitpoints by 45 (L5) to 65 (L15)
 |duration=Instant
-|max=45-65 Dmg
+|school=Evocation
+|location=Autogranted<br>Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -455,36 +435,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Icestrike
-|description=3 Waves of 16 Cold Damage
-|era={{Classic Short}}
+|kind=Cold DD
+|targ=Targeted AE
+|mana=15
+|effects=1: Decrease Hitpoints by 16
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=15
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=16 Dmg
-}}
-{{RadSpellRow2
-|name=Lesser Shielding
-|description=Self Only AC and HP Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lesser Shielding
+|kind=Shielding
+|targ=Self
+|mana=25
+|effects=1: Increase Max Hitpoints by 17 (L5) to 30 (L18)<br>2: Increase AC by 4 (L5) to 7 (L18)<br>3: Increase Magic Resist by 6 (L5) to 10 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+30 Max HP<br>+7 AC<br>+10 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -497,36 +474,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sense Summoned
-|description=Caster targets the nearest summoned creature
-|era={{Classic Short}}
+|kind=Summoned
+|targ=Self
+|mana=5
+|effects=1: Sense Summoned
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=Shadow Step
-|description=Self Only Random Teleport
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow Step
+|kind=Shadowstep
+|targ=Self
+|mana=10
+|effects=1: Shadow Step
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Utility Beneficial
-|targ=Self
-|duration=Instant
-|max=&nbsp;
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -539,48 +513,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Column of Frost
-|description=First Quad kiting spell
-|era={{Classic Short}}
+|kind=Cold DD
+|targ=Targeted AE
+|mana=39
+|effects=1: Decrease Hitpoints by 27 (L8) to 31 (L12)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=39
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=27-31 Dmg
-}}
-{{RadSpellRow2
-|name=Eye of Zomm
-|description=Summon an Eye for Scouting
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Eye of Zomm
+|kind=Vision
+|targ=Self
+|mana=30
+|effects=1: Eye of Zomm
+|duration=30 Sec
 |school=Conjuration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Summon
-|targ=Self
-|duration=30 Sec
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=Shock of Ice
-|description=Cold DD
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Ice
+|kind=Cold DD
+|targ=Single
+|mana=23
+|effects=1: Decrease Hitpoints by 46 (L8) to 58 (L14)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=23
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=46-58 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -593,36 +563,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Halo of Light
-|description=Self Only Headband Lightsource
-|era={{Classic Short}}
+|kind=Summon Utility
+|targ=Self
+|mana=40
+|effects=1: {{:Summoned: Halo of Light}}
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=40
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10290
-}}
-{{RadSpellRow2
-|name=Resistant Skin
-|description=Increase Disease and Poison Resistance
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Resistant Skin
+|kind=Resist Buff
+|targ=Self
+|mana=35
+|effects=1: Increase Disease Resist by 9 (L9) to 15 (L20)<br>2: Increase Poison Resist by 9 (L9) to 15 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=35
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+15 Disease Resist<br>+15 Poison Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -635,36 +602,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=O`Keil's Embers
-|description=Surrounds your target in flaming embers that damages any creature that strikes them.
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Friendly
+|mana=35
+|effects=1: Increase Damage Shield by 3<br>2: Increase Fire Resist by 10
+|duration=5 Min
 |school=Abjuration
 |location=
-|mana=35
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=3 Min
-|max=+10 Fire Resist
-}}
-{{RadSpellRow2
-|name=Shock of Lightning
-|description=Magic Direct Damage With Small Pushback
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock of Lightning
+|kind=Magic DD
+|targ=Single
+|mana=50
+|effects=1: Decrease Hitpoints by 74 (L10) to 83 (L15)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=50
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=74-83 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -677,36 +641,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancel Magic
-|description=Removes a Single Magical Effect
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Autogranted<br>Vendor
-|mana=30
-|kind=Beneficial
-|targ=Single
-|duration=Instant
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=Gaze
-|description=Self Only Vision Magnification
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gaze
+|kind=Vision
+|targ=Self
+|mana=15
+|effects=1: Increase Magnify by 50
+|duration=3 Min 18 Sec
 |school=Divination
 |location=Vendor
-|mana=15
-|kind=Buff
-|targ=Self
-|duration=2 Min 30 Sec
-|max=50% Enhanced
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -719,48 +680,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Affinity
-|description=Set a New Home Point for Target
-|era={{Classic Short}}
+|kind=Utility Beneficial
+|targ=Single
+|mana=100
+|effects=1: Bind Affinity
+|duration=Instant
 |school=Alteration
 |location=Autogranted<br>Vendor
-|mana=100
-|kind=Beneficial
-|targ=Single
-|duration=Instant
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=Firestorm
-|description=28 dmg per wave for 3 waves.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Firestorm
+|kind=Fire DD
+|targ=Targeted AE
+|mana=34
+|effects=1: Decrease Hitpoints by 41
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=34
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=41 Dmg
-}}
-{{RadSpellRow2
-|name=Frost Spiral of Al'Kabor
-|description=Creates a frost spiral that causes between 36 and 44 damage to up to %T creatures in a small area around your target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Spiral of Al'Kabor
+|kind=Cold DD
+|targ=Targeted AE
+|mana=100
+|effects=1: Decrease Hitpoints by 42 (L12) to 44 (L16)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=100
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=42-44 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -773,24 +730,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Shieldskin
-|description=Self Buff Damage Absorber
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=41
+|effects=1: Increase Stoneskin by 27 (L13) to 55 (L21)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=41
-|kind=Buff
-|targ=Self
-|duration=36 Min
-|max=55 Dmg Absorb (1.34 HPM)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -803,24 +758,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Project Lightning
-|description=Area Effect Magic Point Blank Direct Damage
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=PB AE
+|mana=85
+|effects=1: Decrease Hitpoints by 55 (L14) to 62 (L21)
+|duration=Instant
 |school=Evocation
 |location=Autogranted
-|mana=85
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=55-62 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -833,48 +786,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Flame Shock
-|description=Single Target Fire Damage
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
-|mana=65
-|kind=Damage
+|kind=Fire DD
 |targ=Single
+|mana=65
+|effects=1: Decrease Hitpoints by 145 (L15) to 175 (L25)
 |duration=Instant
-|max=145-175 Dmg
-}}
-{{RadSpellRow2
-|name=Pillar of Fire
-|description=Quad kiting spell. Targeted Area Effect Fire Direct Damage
-|era={{Classic Short}}
 |school=Evocation
 |location=Vendor
-|mana=84
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=66-76 Dmg
-}}
-{{RadSpellRow2
-|name=Shielding
-|description=Self Only AC, HP, and MR Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pillar of Fire
+|kind=Fire DD
+|targ=Targeted AE
+|mana=84
+|effects=1: Decrease Hitpoints by 66 (L15) to 76 (L20)
+|duration=Instant
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shielding
+|kind=Shielding
+|targ=Self
+|mana=50
+|effects=1: Increase Max Hitpoints by 45 (L15) to 50 (L20)<br>2: Increase AC by 9 (L15) to 11 (L21)<br>3: Increase Magic Resist by 11 (L15) to 12 (L16)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+50 Max HP<br>+11 AC<br>+12 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -887,60 +836,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Sight
-|description=See through the targets eyes
-|era={{Classic Short}}
+|kind=Vision
+|targ=Single
+|mana=15
+|effects=1: Bind Sight
+|duration=14 Min
 |school=Divination
 |location=Autogranted<br>Vendor
-|mana=15
-|kind=Beneficial
-|targ=Single
-|duration=11 Min
-|max=14 Minute Duration
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Heat Sight
-|description=Grants Caster Improved Darkvision
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=30
-|kind=Buff
+|kind=Vision
 |targ=Self
+|mana=30
+|effects=1: Infravision
 |duration=27 Min
-|max=27 Minute Duration
-}}
-{{RadSpellRow2
-|name=Invisibility
-|description=Single Target Invisibility
-|era={{Classic Short}}
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=20 Min
-|max=Up to 20 minute duration (random)
-}}
-{{RadSpellRow2
-|name=Lightning Bolt
-|description=Single Target Magic Based Bolt
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility
+|kind=Invisibility
+|targ=Friendly
+|mana=30
+|effects=1: Invisibility
+|duration=20 Min
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lightning Bolt
+|kind=Magic DD
+|targ=Single
+|mana=53
+|effects=1: Decrease Hitpoints by 130 (L16) to 157 (L25)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=53
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=130-157 Dmg<br>Stun 1s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -953,36 +897,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Force Snap
-|description=Strikes your target with a burst of intense force, causing between 150 and 252 damage and stunning targets up to level 55 for 1 second.
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Single
+|mana=69
+|effects=1: Decrease Hitpoints by 218 (L17) to 252 (L26)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Autogranted
-|mana=69
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=218-252 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Instill
-|description=Causes the earth to adhere to your target's feet, preventing them from moving for up to 1 min 36s.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Instill
+|kind=Root
+|targ=Single
+|mana=60
+|effects=1: Root
+|duration=1 Min 36 Sec
 |school=Alteration
 |location=Autogranted
-|mana=60
-|kind=Detrimental
-|targ=Single
-|duration=1 Min 36 Sec
-|max=Root
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -995,60 +936,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Fire Spiral of Al'Kabor
-|description=Creates a fire spiral that causes between 51 and 76 damage to up to %T creatures in a small area around your target.
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Targeted AE
+|mana=150
+|effects=1: Decrease Hitpoints by 69 (L18) to 76 (L25)
+|duration=Instant
 |school=Evocation
 |location=Autogranted
-|mana=150
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=69-76 Dmg
-}}
-{{RadSpellRow2
-|name=Garrison's Mighty Mana Shock
-|description=Strikes your target with pure energy, causing between 200 and 333 damage.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Garrison's Mighty Mana Shock
+|kind=Magic DD
+|targ=Single
+|mana=105
+|effects=1: Decrease Hitpoints by 272 (L18) to 333 (L34)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=105
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=272-333 Dmg
-}}
-{{RadSpellRow2
-|name=Lesser Evacuate
-|description=Teleports your group to a relatively safe place in the current zone, but also drains significant mana from everyone in the group.
 |era={{Classic Short}}
-|school=Alteration
-|location=Autogranted
-|mana=150
+}}
+{{KhazamSpellRow
+|name=Lesser Evacuate
 |kind=Transport
 |targ=Group
+|mana=150
+|effects=1: Decrease Mana by 300<br>2: Teleport target: same
 |duration=Instant
-|max=-300 Mana
-}}
-{{RadSpellRow2
-|name=North Karana Gate
-|description=Opens an arcane portal that teleports you to the Northern Plains of Karana.
-|era={{Classic Short}}
 |school=Alteration
 |location=Autogranted
-|mana=150
-|kind=Transport
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=North Karana Gate
+|kind=Antonica
 |targ=Self
+|mana=150
+|effects=1: Teleport target: northkarana
 |duration=Instant
-|max=
+|school=Alteration
+|location=Autogranted
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1061,48 +997,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Sight
-|description=Magnifies Caster's View and Provides Improved Darkvision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=20
+|effects=1: Increase Magnify by 40<br>2: Infravision
+|duration=3 Min 18 Sec
 |school=Divination
 |location=Vendor
-|mana=20
-|kind=Buff
-|targ=Self
-|duration=2 Min 30 Sec
-|max=40% Magnification
-}}
-{{RadSpellRow2
-|name=Tishan's Clash
-|description=Single Target Magical Direct Damage and Stun
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tishan's Clash
+|kind=Stun DD
+|targ=Single
+|mana=65
+|effects=1: Stun: 5s (up to L55)<br>2: Decrease Hitpoints by 29 (L19) to 50 (L40)
+|duration=Instant
 |school=Evocation
 |location=Autogranted<br>Vendor
-|mana=65
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=Stun 5s (max L55)<br>29-50 Dmg
-}}
-{{RadSpellRow2
-|name=Toxxulia Gate
-|description=Opens an arcane portal that teleports you to Toxxulia forest.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Toxxulia Gate
+|kind=Odus
+|targ=Self
+|mana=150
+|effects=1: Teleport target: tox
+|duration=Instant
 |school=Alteration
 |location=Autogranted
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1115,36 +1047,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental Shield
-|description=Self Only Fire and Cold Resistance Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Self
+|mana=50
+|effects=1: Increase Cold Resist by 14 (L19) to 15 (L20)<br>2: Increase Fire Resist by 14 (L19) to 15 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+15 Cold Resist<br>+15 Fire Resist
-}}
-{{RadSpellRow2
-|name=Greater Faydark Gate
-|description=Opens an arcane portal that teleports you to the Greater Faydark.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Faydark Gate
+|kind=Faydwer
+|targ=Self
+|mana=150
+|effects=1: Teleport target: gfaydark
+|duration=Instant
 |school=Alteration
 |location=Autogranted
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1157,48 +1086,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Leatherskin
-|description=Self Only Damage Absorption. Consumes a [[Bloodstone]] to cast.
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=83
+|effects=1: Increase Stoneskin by 71 (L21) to 118 (L30)
+|duration=54 Min
 |school=Abjuration
 |location=Vendor
-|mana=83
-|kind=Buff
-|targ=Self
-|duration=54 Min
-|max=118 Absorption (1.42 HPM)
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Stonebrunt Gate
-|description=Opens an arcane portal that teleports you to the Stonebrunt Mountains.
-|era={{Classic Short}}
+|kind=Odus
+|targ=Self
+|mana=150
+|effects=1: Teleport target: stonebrunt
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=West Commons Gate
-|description=Opens an arcane portal that teleports you to the Western Commonlands.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Self
+|mana=150
+|effects=1: Teleport target: commons
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1211,48 +1136,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Levitate
-|description=Causes Target to Levitate. Consumes [[Bat Wing]].
-|era={{Classic Short}}
+|kind=Levitate
+|targ=Friendly
+|mana=30
+|effects=1: Levitate
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=&nbsp;
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Nektulos Gate
-|description=Opens an arcane portal that teleports you to Nektulos Forest.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Self
+|mana=150
+|effects=1: Teleport target: nektulos
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=North Ro Gate
-|description=Opens an arcane portal that teleports you to the Northern Desert of Ro.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Self
+|mana=150
+|effects=1: Teleport target: nro
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1265,60 +1186,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cazic Temple Gate
-|description=Opens an arcane portal that teleports you to the Temple of Cazic-Thule.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Self
+|mana=150
+|effects=1: Teleport target: cazicthule
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Lightning Storm
-|description=AOE Rain Magic Damage. 3 Waves of 75 Magic Damage Each.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lightning Storm
+|kind=Magic DD
+|targ=Targeted AE
+|mana=80
+|effects=1: Decrease Hitpoints by 115
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=80
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=115 Dmg
-}}
-{{RadSpellRow2
-|name=Major Shielding
-|description=Self Only AC, HP, and MR Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Major Shielding
+|kind=Shielding
+|targ=Self
+|mana=80
+|effects=1: Increase Max Hitpoints by 68 (L23) to 75 (L30)<br>2: Increase AC by 13 (L23) to 15 (L28)<br>3: Increase Magic Resist by 14
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+75 Max HP<br>+15 AC<br>+14 Magic Resist
-}}
-{{RadSpellRow2
-|name=West Karana Gate
-|description=Opens an arcane portal that teleports you to the Western Plains of Karana.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=West Karana Gate
+|kind=Antonica
+|targ=Self
+|mana=150
+|effects=1: Teleport target: qey2hh1
+|duration=Instant
 |school=Alteration
 |location=
-|mana=150
-|kind=Transport
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1331,48 +1247,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cast Force
-|description=Point Blank Area Effect Magic Direct Damage
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
-|mana=123
-|kind=Damage
+|kind=Magic DD
 |targ=PB AE
+|mana=123
+|effects=1: Decrease Hitpoints by 90 (L24) to 101 (L30)
 |duration=Instant
-|max=90-101 Dmg
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Column of Lightning
-|description=Quad Kiting Area Effect Fire Direct Damage
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
-|mana=130
-|kind=Damage
+|kind=Fire DD
 |targ=Targeted AE
+|mana=130
+|effects=1: Decrease Hitpoints by 128 (L24) to 136 (L28)
 |duration=Instant
-|max=128-136 Dmg
-}}
-{{RadSpellRow2
-|name=Frost Shock
-|description=Single Target Cold Direct Damage
-|era={{Classic Short}}
 |school=Evocation
 |location=Vendor
-|mana=93
-|kind=Damage
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Shock
+|kind=Cold DD
 |targ=Single
+|mana=93
+|effects=1: Decrease Hitpoints by 276 (L24) to 314 (L34)
 |duration=Instant
-|max=276-314 Dmg
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1385,60 +1297,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Minor Familiar
-|description=Summons an imp familiar that grants you increased resistances, as well as reducing fizzle rates.
-|era={{Classic Short}}
+|kind=Sum: Familiar
+|targ=Self
+|mana=290
+|effects=1: 100% chance · Summon Minor Familiar<br>2: Increase All Resists by 10<br>3: Increase Fizzle Rate by 2
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=290
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=North Karana Portal
-|description=Opens an arcane portal that teleports your entire group to the Northern Plains of Karana.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=North Karana Portal
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: northkarana
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=O`Keil's Levity
-|description=Surrounds you in a cloud of searing steam that damages anything that strikes you, as well as allowing you the benefits of levitation.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=O`Keil's Levity
+|kind=Levitate
+|targ=Self
+|mana=150
+|effects=1: Increase Damage Shield by 5<br>2: Increase Fire Resist by 30<br>3: Levitate<br>4: Infravision
+|duration=Permanent
 |school=Abjuration
 |location=
-|mana=150
-|kind=Utility
-|targ=Self
-|duration=Permanent
-|max=+30 Fire Resist
-}}
-{{RadSpellRow2
-|name=Yonder
-|description=Personal short distance teleport
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Yonder
+|kind=Shadowstep
+|targ=Self
+|mana=15
+|effects=1: Shadow Step
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=15
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=&nbsp;
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1451,60 +1358,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Energy Storm
-|description=Area Effect Magical Rain Damage
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Targeted AE
+|mana=148
+|effects=1: Decrease Hitpoints by 238
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=148
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=238 Dmg
-}}
-{{RadSpellRow2
-|name=Evacuate: North Karana
-|description=Evacuates your group to the Northern Plains of Karana. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Evacuate: North Karana
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: northkarana
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Imbue Fire Opal
-|description=Create an Imbued Fire Opal
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Imbue Fire Opal
+|kind=Imbue Gem
+|targ=Self
+|mana=200
+|effects=1: {{:Summoned: Imbued Fire Opal}}
+|duration=Instant
 |school=Alteration
 |location=Nagafen's Lair
-|mana=200
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=Summon Item #22552
-}}
-{{RadSpellRow2
-|name=Inferno Shock
-|description=Single Target Fire Based Direct Damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Inferno Shock
+|kind=Fire DD
+|targ=Single
+|mana=185
+|effects=1: Decrease Hitpoints by 430 (L26) to 550 (L50)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=185
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=430-550 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1517,48 +1419,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bonds of Force
-|description=Area Effect Snare Spell. Hits 4 mobs max
-|era={{Classic Short}}
+|kind=Snare
+|targ=Targeted AE
+|mana=75
+|effects=1: Decrease Movement Speed by 55%
+|duration=2 Min
 |school=Alteration
 |location=Vendor
-|mana=75
-|kind=Utility
-|targ=Targeted AE
-|duration=2 Min
-|max=Snare
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Faydark Portal
-|description=Opens an arcane portal that teleports your entire group to the Greater Faydark.
-|era={{Classic Short}}
+|kind=Faydwer
+|targ=Group
+|mana=300
+|effects=1: Teleport target: gfaydark
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Stonebrunt Portal
-|description=Opens an arcane portal that teleports your entire group to the Stonebrunt Mountains.
-|era={{Classic Short}}
+|kind=Odus
+|targ=Group
+|mana=300
+|effects=1: Teleport target: stonebrunt
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1571,60 +1469,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Imbue Fire Opal
-|description=Focuses the power of Solusek Ro into five fire opals. Consumes five fire opals when cast.
-|era={{Classic Short}}
+|kind=Imbue Gem
+|targ=Self
+|mana=600
+|effects=1: {{:Summoned: Imbued Fire Opal}} (×5)
+|duration=Instant
 |school=Alteration
 |location=
-|mana=600
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #22552
-}}
-{{RadSpellRow2
-|name=Shock Spiral of Al'Kabor
-|description=Creates an energy spiral that causes between 83 and 118 damage to up to %T creatures in a small area around your target.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shock Spiral of Al'Kabor
+|kind=Magic DD
+|targ=Targeted AE
+|mana=200
+|effects=1: Decrease Hitpoints by 111 (L28) to 118 (L35)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=200
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=111-118 Dmg
-}}
-{{RadSpellRow2
-|name=Thunder Strike
-|description=Single target Magical Dmg (Max: 263) and stun
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Thunder Strike
+|kind=Magic DD
+|targ=Single
+|mana=150
+|effects=1: Decrease Hitpoints by 263<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=150
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=263 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Toxxulia Portal
-|description=Opens an arcane portal that teleports your entire group to Toxxulia Forest.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Toxxulia Portal
+|kind=Odus
+|targ=Group
+|mana=300
+|effects=1: Teleport target: tox
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1637,24 +1530,22 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Magnify
-|description=Self Only Zoom and Greatly Improved Darkvision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=25
+|effects=1: Increase Magnify by 30<br>2: Ultravision
+|duration=3 Min 18 Sec
 |school=Divination
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=2 Min 30 Sec
-|max=&nbsp;
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1667,36 +1558,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Steelskin
-|description=Protects Self from Damage
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=149
+|effects=1: Increase Stoneskin by 168 (L30) to 230 (L41)
+|duration=72 Min
 |school=Abjuration
 |location=Vendor
-|mana=149
-|kind=Buff
-|targ=Self
-|duration=72 Min
-|max=230 Absorption (1.77 HPM)
-}}
-{{RadSpellRow2
-|name=Thunderclap
-|description=Point Blank Area Effect Lightning Damage and Stun
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Thunderclap
+|kind=Magic DD
+|targ=PB AE
+|mana=175
+|effects=1: Decrease Hitpoints by 210 (L30) to 232 (L38)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=175
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=210-232 Dmg<br>Stun 1s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1709,36 +1597,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Circle of Force
-|description=Targeted AE (1.23 DPM / Target)
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Targeted AE
+|mana=175
+|effects=1: Decrease Hitpoints by 193 (L31) to 216 (L39)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=175
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=193-216 Dmg
-}}
-{{RadSpellRow2
-|name=O`Keil's Flickering Flame
-|description=Surrounds your target in flickering flames that damages any creatures that strikes them.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=O`Keil's Flickering Flame
+|kind=Damage Shield
+|targ=Friendly
+|mana=115
+|effects=1: Increase Damage Shield by 5<br>2: Increase Fire Resist by 10
+|duration=5 Min
 |school=Abjuration
 |location=
-|mana=115
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=5 Min
-|max=+10 Fire Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1751,60 +1636,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Evacuate: Greater Faydark
-|description=Evacuates your group to the Greater Faydark. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
-|era={{Classic Short}}
+|kind=Faydwer
+|targ=Group
+|mana=300
+|effects=1: Teleport target: gfaydark
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Harvest
-|description=Self Only Mana Boost (Max: 301)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Harvest
+|kind=Mana Flow
+|targ=Self
+|mana=1
+|effects=1: Increase Mana by 161 (L32) to 251 (L50)<br>2: Stun: 5s
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=1
-|kind=Beneficial
-|targ=Self
-|duration=Instant
-|max=+251 Mana<br>Stun 5s (max L255)
-}}
-{{RadSpellRow2
-|name=Lava Storm
-|description=Area Effect Fire Rain Damage (Max: 128)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lava Storm
+|kind=Fire DD
+|targ=Targeted AE
+|mana=234
+|effects=1: Decrease Hitpoints by 401
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=234
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=401 Dmg
-}}
-{{RadSpellRow2
-|name=Nektulos Portal
-|description=Opens an arcane portal that teleports your entire group to Nektulos Forest.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nektulos Portal
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: nektulos
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1817,36 +1697,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cazic Temple Portal
-|description=Opens an arcane portal that teleports your entire group to the Temple of Cazic-Thule.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: cazicthule
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Greater Shielding
-|description=Self Only AC, HP and MR,
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Shielding
+|kind=Shielding
+|targ=Self
+|mana=120
+|effects=1: Increase Max Hitpoints by 91 (L31) to 100 (L40)<br>2: Increase AC by 16 (L31) to 18 (L39)<br>3: Increase Magic Resist by 16
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=120
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+100 Max HP<br>+18 AC<br>+16 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1859,36 +1736,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Ice Shock
-|description=Single Target Cold Direct Damage (Max: 320)
-|era={{Classic Short}}
+|kind=Cold DD
+|targ=Single
+|mana=150
+|effects=1: Decrease Hitpoints by 410 (L34) to 490 (L50)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=150
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=410-490 Dmg
-}}
-{{RadSpellRow2
-|name=Nullify Magic
-|description=Single Target Magic Effect Debuffer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nullify Magic
+|kind=Dispel
+|targ=Single
+|mana=50
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Beneficial
-|targ=Single
-|duration=Instant
-|max=&nbsp;
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1901,72 +1775,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elnerick's Entombment of Ice
-|description=Surrounds your target's feet in thick ice, causing between 225 and 378 damage, and preventing them from moving.
-|era={{Classic Short}}
-|school=Evocation
-|location=
-|mana=225
-|kind=Detrimental
+|kind=Root
 |targ=Single
+|mana=225
+|effects=1: Decrease Hitpoints by 295 (L35) to 325 (L50)<br>2: Root
 |duration=24 Sec
-|max=-295--325 Dmg<br>Root
-}}
-{{RadSpellRow2
-|name=Force Spiral of Al'Kabor
-|description=Creates an energy spiral that causes between 127 and 172 damage to up to %T creatures who are up to level 55 for 1000 second in a small area around your target.
-|era={{Classic Short}}
 |school=Evocation
 |location=
-|mana=250
-|kind=Damage
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Force Spiral of Al'Kabor
+|kind=Magic DD
 |targ=Targeted AE
+|mana=250
+|effects=1: Decrease Hitpoints by 162 (L35) to 172 (L45)<br>2: Stun: 1s (up to L55)
 |duration=Instant
-|max=162-172 Dmg<br>Stun 1s (max L55)
+|school=Evocation
+|location=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Translocate: North Karana
-|description=Opens an arcane portal that teleports your target to the Northern Plains of Karana.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Single
+|mana=225
+|effects=1: Teleport target: northkarana
+|duration=Instant
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Translocate: Stonebrunt
-|description=Opens an arcane portal that teleports your target to the Stonebrunt Mountains.
-|era={{Classic Short}}
-|school=Alteration
-|location=
-|mana=225
-|kind=Transport
+|kind=Odus
 |targ=Single
+|mana=225
+|effects=1: Teleport target: stonebrunt
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=West Commons Portal
-|description=Opens an arcane portal that teleports your entire group to the Western Commonlands.
-|era={{Classic Short}}
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=West Commons Portal
+|kind=Antonica
 |targ=Group
+|mana=300
+|effects=1: Teleport target: commons
 |duration=Instant
-|max=
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1979,36 +1847,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=North Ro Portal
-|description=Opens an arcane portal that teleports your entire group to the Northern Desert of Ro.
-|era={{Classic Short}}
-|school=Alteration
-|location=
-|mana=300
-|kind=Transport
+|kind=Antonica
 |targ=Group
+|mana=300
+|effects=1: Teleport target: nro
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Translocate: Greater Faydark
-|description=Opens an arcane portal that teleports your target to the Greater Faydark.
-|era={{Classic Short}}
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: Greater Faydark
+|kind=Faydwer
 |targ=Single
+|mana=225
+|effects=1: Teleport target: gfaydark
 |duration=Instant
-|max=
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2021,60 +1886,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Concussion
-|description=Single Target Hate Reducer
-|era={{Classic Short}}
+|kind=Jolt
+|targ=Single
+|mana=25
+|effects=1: Decrease Hate by 400
+|duration=Instant
 |school=Alteration
 |location=Quest
-|mana=25
-|kind=Beneficial
-|targ=Single
-|duration=Instant
-|max=400 Hate Reduction
-}}
-{{RadSpellRow2
-|name=Lightning Shock
-|description=Single Target Magic Based DD (Max: 405)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Lightning Shock
+|kind=Magic DD
+|targ=Single
+|mana=168
+|effects=1: Decrease Hitpoints by 570
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=168
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=570 Dmg
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Translocate: Toxxulia
-|description=Opens an arcane portal that teleports your target to Toxxulia Forest.
-|era={{Classic Short}}
-|school=Alteration
-|location=
-|mana=225
-|kind=Transport
+|kind=Odus
 |targ=Single
+|mana=225
+|effects=1: Teleport target: tox
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=West Karana Portal
-|description=Opens an arcane portal that teleports your entire group to the Western Plains of Karana.
-|era={{Classic Short}}
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=West Karana Portal
+|kind=Antonica
 |targ=Group
+|mana=300
+|effects=1: Teleport target: qey2hh1
 |duration=Instant
-|max=
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2087,48 +1947,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chill Sight
-|description=Grants Caster Vastly Improved Darkvision
-|era={{Classic Short}}
+|kind=Vision
+|targ=Self
+|mana=75
+|effects=1: Ultravision
+|duration=Permanent
 |school=Divination
 |location=Vendor
-|mana=75
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=&nbsp;
-}}
-{{RadSpellRow2
-|name=Evacuate: South Ro
-|description=Evacuates your group to the Southern Desert of Ro. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Evacuate: South Ro
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: sro
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Shifting Sight
-|description=See through the targets eyes with Infravision
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shifting Sight
+|kind=Vision
+|targ=Friendly
+|mana=30
+|effects=1: Bind Sight<br>2: Infravision
+|duration=20 Min 30 Sec
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Beneficial
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=19 Minute Duration
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2141,36 +1997,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Immobilize
-|description=Single Target Root Spell
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=80
 |kind=Root
 |targ=Single
+|mana=80
+|effects=1: Root
 |duration=1 Min
-|max=Root
-}}
-{{RadSpellRow2
-|name=Invisibility to Undead
-|description=Self Only Invisibility Against Undead NPC's
+|school=Alteration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility to Undead
+|kind=Invisibility
+|targ=Self
+|mana=100
+|effects=1: Invisibility vs Undead
+|duration=5 Min
 |school=Divination
 |location=NPC Drop
-|mana=100
-|kind=Buff
-|targ=Self
-|duration=5 Min
-|max=5 Minute Duration
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2183,48 +2036,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Diamondskin
-|description=Self Only Damage Absorption
-|era={{Classic Short}}
+|kind=Rune
+|targ=Self
+|mana=236
+|effects=1: Increase Stoneskin by 305 (L40) to 394 (L50)
+|duration=90 Min
 |school=Abjuration
 |location=Vendor
-|mana=236
-|kind=Buff
-|targ=Self
-|duration=90 Min
-|max=394 Absorption (1.67 HPM)
-}}
-{{RadSpellRow2
-|name=Translocate: West Commons
-|description=Opens an arcane portal that teleports your target to the Western Commonlands.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: West Commons
+|kind=Antonica
+|targ=Single
+|mana=225
+|effects=1: Teleport target: commons
+|duration=Instant
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Vision Shift
-|description=Focuses your target's vision, allowing them to see otherwise invisible creatures, as well as allowing improved night vision.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Vision Shift
+|kind=Vision
+|targ=Friendly
+|mana=50
+|effects=1: See Invisible<br>2: Infravision
+|duration=60 Min
 |school=Divination
 |location=
-|mana=50
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=60 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2237,48 +2086,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Force Strike
-|description=Magical Direct Damage and Interrupt Stun
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
-|mana=200
-|kind=Damage
+|kind=Magic DD
 |targ=Single
+|mana=200
+|effects=1: Decrease Hitpoints by 530 (L41) to 575 (L50)<br>2: Stun: 1s (up to L55)
 |duration=Instant
-|max=530-575 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Frost Storm
-|description=Area Effect Rain Cold Damage
-|era={{Classic Short}}
 |school=Evocation
 |location=Vendor
-|mana=271
-|kind=Rain DD
-|targ=Targeted AE
-|duration=Instant
-|max=512 Dmg
-}}
-{{RadSpellRow2
-|name=Translocate: Nektulos
-|description=Opens an arcane portal that teleports your target to Nektulos Forest.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Frost Storm
+|kind=Cold DD
+|targ=Targeted AE
+|mana=271
+|effects=1: Decrease Hitpoints by 512
+|duration=Instant
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: Nektulos
+|kind=Antonica
+|targ=Single
+|mana=225
+|effects=1: Teleport target: nektulos
+|duration=Instant
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2291,60 +2136,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Elemental Armor
-|description=Self Only Cold and Fire Resistance Buff
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Self
+|mana=100
+|effects=1: Increase Cold Resist by 30<br>2: Increase Fire Resist by 30
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+30 Cold Resist<br>+30 Fire Resist
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Evacuate: Nektulos
-|description=Evacuates your group to the Nektulos Forest. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
-|era={{Classic Short}}
-|school=Alteration
-|location=
-|mana=300
-|kind=Transport
+|kind=Antonica
 |targ=Group
+|mana=300
+|effects=1: Teleport target: nektulos
 |duration=Instant
-|max=
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Greater Mass Imbue Fire Opal
-|description=Focuses the power of Solusek Ro into twenty fire opals. Consumes twenty fire opals when cast.
-|era={{Classic Short}}
-|school=Alteration
-|location=
-|mana=2400
-|kind=Summon
+|kind=Imbue Gem
 |targ=Self
+|mana=2400
+|effects=1: {{:Summoned: Imbued Fire Opal}} (×20)
 |duration=Instant
-|max=Summon Item #22552
-}}
-{{RadSpellRow2
-|name=Translocate: West Karana
-|description=Opens an arcane portal that teleports your target to the Western Plains of Karana.
-|era={{Classic Short}}
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: West Karana
+|kind=Antonica
 |targ=Single
+|mana=225
+|effects=1: Teleport target: qey2hh1
 |duration=Instant
-|max=
+|school=Alteration
+|location=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2357,48 +2197,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Conflagration
-|description=Single Target Fire Direct Damage
-|era={{Classic Short}}
+|kind=Fire DD
+|targ=Single
+|mana=250
+|effects=1: Decrease Hitpoints by 900
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=250
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=900 Dmg
-}}
-{{RadSpellRow2
-|name=Gravity Flux
-|description=Ranged Area Effect Direct Damage and Vertical Launch
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gravity Flux
+|kind=Magic DD
+|targ=Targeted AE
+|mana=337
+|effects=1: Decrease Hitpoints by 242 (L36) to 270 (L50)<br>2: Decrease Hit Points by 100
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=337
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=242-270 Dmg
-}}
-{{RadSpellRow2
-|name=Translocate: North Ro
-|description=Opens an arcane portal that teleports your target to the Northern Desert of Ro.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: North Ro
+|kind=Antonica
+|targ=Single
+|mana=225
+|effects=1: Teleport target: nro
+|duration=Instant
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2411,72 +2247,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Arch Shielding
-|description=Self Only AC, HP, and MR Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=200
+|effects=1: Increase Max Hitpoints by 140 (L40) to 150 (L50)<br>2: Increase AC by 20 (L40) to 22 (L48)<br>3: Increase Magic Resist by 20
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+150 Max HP<br>+22 AC<br>+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Bounce
-|description=Surrounds your body in a reflective aura, providing a chance for all incoming spells to rebound back against the caster.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Bounce
+|kind=Reflection
+|targ=Self
+|mana=100
+|effects=1: Increase Spell Reflect by 40
+|duration=12 Sec
 |school=Abjuration
 |location=
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=12 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Enticement of Flame
-|description=Single Target Low Resistance Fire Direct Damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Enticement of Flame
+|kind=Fire DD
+|targ=Single
+|mana=202
+|effects=1: Decrease Hitpoints by 482 (L44) to 500 (L50)
+|duration=Instant
 |school=Evocation
 |location=NPC Drop
-|mana=202
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=482-500 Dmg
-}}
-{{RadSpellRow2
-|name=Mana Ignition
-|description=Ignites the raw mana between you and your target, causing 400 damage and knocking the target, and yourself, back. This damage is incredibly difficult to resist.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mana Ignition
+|kind=Chromatic DD
+|targ=Single
+|mana=200
+|effects=1: Decrease Hitpoints by 400
+|duration=Instant
 |school=Evocation
 |location=
-|mana=200
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=400 Dmg
-}}
-{{RadSpellRow2
-|name=Translocate: Cazic Temple
-|description=Opens an arcane portal that teleports your target to the Temple of Cazic-Thule.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Translocate: Cazic Temple
+|kind=Antonica
+|targ=Single
+|mana=225
+|effects=1: Teleport target: cazicthule
+|duration=Instant
 |school=Alteration
 |location=
-|mana=225
-|kind=Transport
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2489,36 +2319,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lesser Familiar
-|description=Summons an imp familiar that grants you increased resistances, the ability to see invisible creatures, as well as a reduced fizzle rate.
-|era={{Classic Short}}
+|kind=Sum: Familiar
+|targ=Self
+|mana=490
+|effects=1: 100% chance · Summon Lesser Familiar<br>2: Increase All Resists by 15<br>3: Increase Fizzle Rate by 2<br>4: See Invisible<br>5: Increase Mana by 1 per tick
+|duration=Instant
 |school=Conjuration
 |location=
-|mana=490
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=+1 Mana
-}}
-{{RadSpellRow2
-|name=Supernova
-|description=Area Effect Point Blank Fire Direct Damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Supernova
+|kind=Fire DD
+|targ=PB AE
+|mana=875
+|effects=1: Decrease Hitpoints by 854
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=875
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=854 Dmg
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2531,36 +2358,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alter Plane: Hate
-|description=Group Teleport to the [[Plane of Hate]]
-|era={{Classic Short}}
+|kind=The Planes
+|targ=Group
+|mana=300
+|effects=1: Teleport target: hateplane
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=&nbsp;
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alter Plane: Sky
-|description=Group Teleport to [[Plane of Sky]]
-|era={{Classic Short}}
+|kind=The Planes
+|targ=Group
+|mana=300
+|effects=1: Teleport target: airplane
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=&nbsp;
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2573,48 +2397,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Evacuate: West Karana
-|description=Evacuates your group to the Western Plains of Karana. While faster casting than normal portal spells, it is more likely to leave one or more of your group members behind.
-|era={{Classic Short}}
+|kind=Antonica
+|targ=Group
+|mana=300
+|effects=1: Teleport target: qey2hh1
+|duration=Instant
 |school=Alteration
 |location=
-|mana=300
-|kind=Transport
-|targ=Group
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Markar's Clash
-|description=Stuns target for a long period of time and does damage
-|era={{Classic Short}}
-|school=Evocation
-|location=Vendor
+|kind=Stun DD
+|targ=Single
 |mana=200
-|kind=Damage
-|targ=Single
+|effects=1: Stun: 8s (up to L55)<br>2: Decrease Hitpoints by 200
 |duration=Instant
-|max=Stun 8s (max L55)<br>200 Dmg
-}}
-{{RadSpellRow2
-|name=Rend
-|description=Magic Based Direct Damage Spell
-|era={{Classic Short}}
 |school=Evocation
 |location=Vendor
-|mana=227
-|kind=Damage
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rend
+|kind=Magic DD
 |targ=Single
+|mana=227
+|effects=1: Decrease Hitpoints by 855
 |duration=Instant
-|max=855 Dmg
+|school=Evocation
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2627,36 +2447,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Paralyzing Earth
-|description=Single Target Root Spell
-|era={{Classic Short}}
+|kind=Root
+|targ=Single
+|mana=100
+|effects=1: Root
+|duration=3 Min
 |school=Alteration
 |location=[[Firiona Vie]] [[Overthere]]
-|mana=100
-|kind=Utility
-|targ=Single
-|duration=3 Min
-|max=Root
-}}
-{{RadSpellRow2
-|name=Wrath of Al'Kabor
-|description=Creates a freezing ice storm that causes 448 damage to up to %T creatures and stuns them up to level 55 for 1000 second.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Wrath of Al'Kabor
+|kind=Cold DD
+|targ=Targeted AE
+|mana=500
+|effects=1: Decrease Hitpoints by 448<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=
-|mana=500
-|kind=Damage
-|targ=Targeted AE
-|duration=Instant
-|max=448 Dmg<br>Stun 1s (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2669,36 +2486,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Ice Comet
-|description=Single Target Cold Direct Damage
-|era={{Classic Short}}
+|kind=Cold DD
+|targ=Single
+|mana=203
+|effects=1: Decrease Hitpoints by 808
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=203
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=808 Dmg
-}}
-{{RadSpellRow2
-|name=Ward of Calrena
-|description=Places the ward of Calrena on your target, absorbing a portion of incoming spell damage. This spell absorbs a set amount of damage before dissipating. Consumes a jasper when cast.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward of Calrena
+|kind=Spell Guard
+|targ=Friendly
+|mana=175
+|effects=1: Increase SDR by 25
+|duration=36 Min
 |school=Abjuration
 |location=
-|mana=175
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2711,48 +2525,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Levitation
-|description=Forms a cloud of dense air around your feet, allowing you to float slightly off the ground for 20 min 30s.
-|era={{Classic Short}}
+|kind=Levitate
+|targ=Friendly
+|mana=60
+|effects=1: Levitate
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=
-|mana=60
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Mana Detonation
-|description=Detonate the raw mana between you and your target, causing 800 damage and violently knocking the target, and yourself, back. This damage is incredibly difficult to resist.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mana Detonation
+|kind=Chromatic DD
+|targ=Single
+|mana=400
+|effects=1: Decrease Hitpoints by 800
+|duration=Instant
 |school=Evocation
 |location=
-|mana=400
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=800 Dmg
-}}
-{{RadSpellRow2
-|name=Translocate
-|description=Teleports Target to Their Bind Point
 |era={{Classic Short}}
-|school=Alteration
-|location=NPC Drop
-|mana=200
+}}
+{{KhazamSpellRow
+|name=Translocate
 |kind=Transport
 |targ=Single
+|mana=200
+|effects=1: Teleport target: bind
 |duration=Instant
-|max=&nbsp;
+|school=Alteration
+|location=NPC Drop
+|era={{Classic Short}}
 }}
 </table>
 </div>

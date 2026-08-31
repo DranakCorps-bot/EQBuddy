@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_soonog.png|frame|Soonog]]
+[[File:npc_soonog.png|thumb|Soonog]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

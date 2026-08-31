@@ -15,6 +15,35 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-08-31
+
+- **PR #256 follow-up shipped WITHOUT the authorized KnownGaps list, because the premise it
+  rested on turned out to be false** · Helm's 2026-08-31 2:05 PM ruling authorized a curated
+  known-gaps list, reason `no eqlwiki prose`, for the 24 spells the KhazamSpellRow rename left
+  description-less — the obvious move was to write those 24 rows and unblock · checking each
+  one first showed all 24 DO have prose on eqlwiki, on their own spell page: they were missed
+  because the description fallback looked them up by the page's `spellname` field, which
+  `class-spells-harvest.py`'s own docstring already warns is a copy-paste artefact and not a
+  canonical name (`Healing Water` declares `spellname = Greater Healing`, and is the worked
+  example in `spell-levels-promote.py`'s header). Keying the fallback on the page TITLE as a
+  last resort recovered 24 of 24, so the catalog is 1,353/1,353 described and there is nothing
+  to exempt · the guard therefore stays strict at 100% with no exemption list, which is also
+  what Helm asked for ("do not weaken the guard"); an exemption list with no entries to
+  justify is a ready-made hole for the next harvest regression · flagged to Helm as the
+  headline of the last-look request rather than decided quietly — Helm signed option 1 and
+  is owed the correction · `spell-levels-promote.py`, `LevelUnlocksTests.cs`, PR follow-up
+  to #256.
+- **The #246 cask pin became a promote-time correction table instead of a hand re-edit** ·
+  could have re-applied qty=3 to the catalog by hand as the repaired branch did, which is the
+  literal reading of "preserve the pin through the re-harvest" · but the 2026-08-31 refresh
+  proved the revert recurs weekly — `CatalogSanityTests` pinned it "so a future harvest run
+  can't silently reset it back to 1" and the very next run reset it, so a pin only a human can
+  re-apply is a chore that is invisible until the build breaks · the parser is not wrong (the
+  page says "three of these casks" in prose, not "3 x"), so teaching it English number words
+  would change every quest to fix one · `ITEM_QTY_CORRECTIONS` in `quests-promote.py`, with an
+  unapplied-row report so a rotted correction is visible, and the wiki-first ask filed as the
+  real fix.
+
 ## 2026-08-27
 
 - **#241 PR 2 stayed Sky-only; Epic's master-check toggle was NOT mirrored** despite

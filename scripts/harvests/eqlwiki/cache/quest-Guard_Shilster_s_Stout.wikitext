@@ -1,6 +1,6 @@
 {{Classic Era}}
 
-[[File:Npc_guard_shilster.png|frame|Guard Shilster]]
+[[File:Npc_guard_shilster.png|thumb|Guard Shilster]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Northern Karana]]

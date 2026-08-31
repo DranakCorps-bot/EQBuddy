@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_jeet.png|frame|Jeet]]
+[[File:npc_jeet.png|thumb|Jeet]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]
@@ -57,37 +57,55 @@ You say, 'I will collect the gnome profit'
 
 : Jeet says, 'Take this key. Don't lose it!! You will need to use it on a metal rat called a Scrubber. They are all over Ak'Anon. You must find the one which responds to the number, '628'. If it responds then use the key on it. It will hand over a bag with the 'Gnome Take'. Return it to me. Get moving!!.'
 
-''[[clockwork scrubber]]s can be found roaming within [[Ak'Anon]]''
+'''You receive a [[Scrubber Key]].'''
 
-You say, 'Hail, clockwork scrubber'
+Head to [[Ak'Anon]] where [[Clockwork Scrubber|clockwork scrubbers]] roam within.''
 
-''The [[clockwork scrubber]] does not respond, but will pause in its pathing.''
+You say, 'Hail, clockwork scrubber'. The [[Clockwork Scrubber|clockwork scrubber]] does not respond, but will pause in its pathing.
 
 You say, '628'
 
 : clockwork scrubber says 'wiz... tik... 628'
 
-'''If you get the prior response, give the [[clockwork scrubber]] the key you received from [[Jeet]]. You will be given the [[Gnome Take]] in return.'''
+If you get the prior response, give the [[Scrubber Key]] to the [[Clockwork Scrubber|clockwork scrubber]].
 
+<div class="facblock">
 * Your faction standing with [[Clockworks of Ak`Anon]] has been adjusted by -5.
+</div>
 
-'''Hand [[Jeet]] the [[Gnome Take]].'''
+'''You receive the [[Gnome Take]].'''
+
+There are 2 different versions of the [[Gnome Take]], visible in their lore: "Bad Take For Rogues" and "Good Take For Rogues". They will give different rewards when handing them in, with different increases to [[Miners Guild 628]]. 
+
+When you hand [[Jeet]] the [[Gnome Take]] (Bad Take for Rogues):
 
 : Jeet says, 'What is all this junk! That blasted tin rat is supposed to be heisting expensive goods from rich gnomes - not all this garbage! Here. This is your cut of this junk.'
 
-''Alternatively, you might see the text''
+<div class="facblock">
+* Your faction standing with [[Miners Guild 628]] has been adjusted by 5
+* Your faction standing with [[Circle of Unseen Hands]] has been adjusted by -1.
+* Your faction standing with [[Butcherblock Bandits]] has been adjusted by -1.
+* Your faction standing with [[Deeppockets]] has been adjusted by 5.
+* Your faction standing with [[Ebon Mask]] has been adjusted by -1.
+</div>
+{{YouGainExperience}}
+
+'''You receive a minor item.'''
+
+When you hand [[Jeet]] the [[Gnome Take]] (Good Take for Rogues):
 
 : Jeet says, 'Good work miner. This is a fantastic haul! Those wrinkly little gnomes don't know what is going on. Here is your cut. Now get back to work.'
 
 <div class="facblock">
 * Your faction standing with [[Miners Guild 628]] has been adjusted by 25.
-* Your faction standing with [[Circle Of Unseen Hands|Circle of Unseen Hands]] has been adjusted by -1.
+* Your faction standing with [[Circle of Unseen Hands]] has been adjusted by -1.
 * Your faction standing with [[Butcherblock Bandits]] has been adjusted by -1.
-* Your faction standing with [[DeepPockets|Deeppockets]] has been adjusted by 1.
-* Your faction standing with [[Hall of the Ebon Mask|Ebon Mask]] has been adjusted by -3.
+* Your faction standing with [[Deeppockets]] has been adjusted by 5.
+* Your faction standing with [[Ebon Mask]] has been adjusted by -3.
 </div>
-
 {{YouGainExperience}}
+
+'''You receive a better item.'''
 
 [[Category:Quests]]
 [[Category:North Kaladim]]

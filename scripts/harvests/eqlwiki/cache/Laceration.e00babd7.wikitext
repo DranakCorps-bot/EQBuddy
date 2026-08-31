@@ -15,6 +15,7 @@ No eligible class
 
 <ul>
 <li>{{:Sharp Claws}}</li>
+<li>{{:Gladius}}</li>
 </ul>
 
 | slots = 

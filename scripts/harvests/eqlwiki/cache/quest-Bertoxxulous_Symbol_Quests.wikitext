@@ -1,5 +1,5 @@
 __NOTOC__
-{{Kunark Era}}
+{{Classic Era}}
 [[File:npc_evah_xokez.png|frame|Evah Xokez]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -29,7 +29,7 @@ __NOTOC__
 
 == Rewards ==
 
-<ul><li>  {{:Initiate Symbol of Bertoxxulous}}
+<ul><li>  [[Initiate Symbol of Bertoxxulous]]
 </li></ul>
 
 == Part 1: Spread the Plague ==

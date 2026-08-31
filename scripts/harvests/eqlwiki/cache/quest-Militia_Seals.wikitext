@@ -1,0 +1,70 @@
+{{Classic Era}}
+
+{| class="raidMobTopTable"
+! ''' Starts In: '''
+| [[West Freeport]]
+|-
+! ''' Quest Giver: '''
+| [[Guard Jup]]
+|-
+! ''' Minimum Level: '''
+| 35
+|-
+! ''' Classes: '''
+| All
+|-
+! ''' Appropriate Classes: '''
+| [[Bard]], [[Paladin]], [[Ranger]], [[Rogue]], [[Shadowknight]], [[Warrior]]
+|-
+! ''' Related Zones: '''
+| [[Dulak's Harbor]] [[Gulf of Gunthak]]
+|-
+! ''' Related NPCs: '''
+| [[Guard Jup]]
+|}
+
+= Reward =
+
+* {{:Twisted Silver Torque}}
+
+= Dialogue =
+
+'''You say, "Hail, Guard Jup"'''
+
+: Guard Jup says, "Hail, Citizen. In this time of piracy on the high seas, your [duty] is clear, is it not?"
+
+'''You say, "What duty?"'''
+
+: Guard Jup says, "What duty? To your state and your fellow man, that is what duty! These attacks must be stopped, before all order is lost and the city falls to [vermin]! We must strike them down first, with strength and determination; this could get out of hand."
+
+'''You say, "What vermin?"'''
+
+: Guard Jup says, "The pirates of Broken Skull Rock are uncouth and relentless. They take whatever they may want, ruining trade lines without regard to the might of such established cities as Freeport. The rotten thieves are all thrown and mixed together in filthy shantytowns from what I hear, so striking at their heart should not be terribly difficult. Your [mission] is clear."
+
+'''You say, "mission"'''
+
+: Guard Jup says, "Go to Broken Skull Rock! Slay these impudent pirates and wreak havoc on their plans. Some of them carry a seal that grants passage about their society, bring me ten of these such seals and your duty to your city shall be fulfilled. We might even have some form of [reward] for you."
+
+'''You say, "reward"'''
+
+: Guard Jup says, "First the seals, then the reward! Take this to transport them in."
+
+
+= Walkthrough =
+
+# Speak with [[Guard Jup]] in [[West Freeport]] (-80, -158).
+# He will give you [[Militia Crate]].
+# Fill it with 10x [[Pirate's Seal]], then combine it.
+# Return crate to [[Guard Jup]].
+
+= Notes =
+
+* [[Guard Jup]] is located in the Militia House, on the balcony at the end of the corridor. To find him, go to the end of the corridor, then turn left and look up at the balcony. (/waypoint -80,-158)
+
+[[Category:Quests]]
+[[Category:All Classes Quests]]
+
+[[Category:West Freeport]]
+[[Category:Dulak's Harbor]]
+[[Category:Gulf of Gunthak]]
+[[Category:Broken Skull Rock]]

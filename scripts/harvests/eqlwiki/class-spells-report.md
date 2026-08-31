@@ -14,19 +14,19 @@ section for that level, and flagged as derived. This table is what that costs.
 | Beastlord | 76 | 77 | 0 | 1 | 0 |
 | Berserker | 0 | 0 | 0 | 0 | 0 |
 | Cleric | 163 | 198 | 0 | 35 | 0 |
-| Druid | 192 | 231 | 0 | 39 | 0 |
+| Druid | 193 | 232 | 0 | 39 | 0 |
 | Enchanter | 191 | 228 | 0 | 37 | 0 |
-| Magician | 158 | 199 | 0 | 41 | 0 |
+| Magician | 157 | 198 | 0 | 41 | 0 |
 | Monk | 0 | 0 | 0 | 0 | 0 |
-| Necromancer | 143 | 183 | 0 | 40 | 0 |
+| Necromancer | 144 | 184 | 0 | 40 | 0 |
 | Paladin | 71 | 88 | 0 | 17 | 0 |
 | Ranger | 66 | 85 | 0 | 19 | 0 |
 | Rogue | 12 | 19 | 0 | 7 | 0 |
-| Shadow Knight | 68 | 86 | 0 | 18 | 0 |
+| Shadow Knight | 69 | 87 | 0 | 18 | 0 |
 | Shaman | 163 | 204 | 0 | 41 | 0 |
 | Warrior | 0 | 0 | 0 | 0 | 0 |
 | Wizard | 140 | 183 | 0 | 43 | 0 |
-| **Total** | **1504** | **1866** | **0** | **362** | **0** |
+| **Total** | **1506** | **1868** | **0** | **362** | **0** |
 
 ## Per class, by name
 
@@ -60,7 +60,7 @@ silently pad from spell pages" is what makes that honest rather than invisible.
 | Paladin | 43 | 1-50 | 6, 12, 26, 27, 36, 40, 41 |
 | Ranger | 48 | 1-50 | 8, 23 |
 | Rogue | 11 | 1-46 | 3, 6, 8, 10, 12, 13, 14, 16, 17, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45 |
-| Shadow Knight | 48 | 1-50 | 3, 25 |
+| Shadow Knight | 47 | 1-50 | 3, 8, 25 |
 | Shaman | 50 | 1-50 | none |
 | Warrior | 0 | — | no spell table at all |
 | Wizard | 50 | 1-50 | none |
@@ -70,23 +70,7 @@ silently pad from spell pages" is what makes that honest rather than invisible.
 One spell, two spellings. Counted as a match so they do not bury the real
 differences — but they are a catalog defect of their own.
 
-- **Bard**: Anthem de Arms (catalog: Anthem De Arms)
-- **Cleric**: Invisibility versus Undead (catalog: Invisibility Versus Undead)
-- **Druid**: Skin like Wood (catalog: Skin Like Wood)
-- **Druid**: Invisibility versus Animals (catalog: Invisibility Versus Animals)
-- **Druid**: Skin like Rock (catalog: Skin Like Rock)
-- **Druid**: Skin like Steel (catalog: Skin Like Steel)
-- **Druid**: Skin like Diamond (catalog: Skin Like Diamond)
-- **Druid**: Skin like Nature (catalog: Skin Like Nature)
-- **Enchanter**: Invisibility versus Undead (catalog: Invisibility Versus Undead)
 - **Enchanter**: Swift Like the Wind (catalog: Swift Like The Wind)
-- **Necromancer**: Invisibility versus Undead (catalog: Invisibility Versus Undead)
-- **Paladin**: Invisibility versus Undead (catalog: Invisibility Versus Undead)
-- **Ranger**: Skin like Wood (catalog: Skin Like Wood)
-- **Ranger**: Skin like Rock (catalog: Skin Like Rock)
-- **Ranger**: Skin like Steel (catalog: Skin Like Steel)
-- **Shadow Knight**: Invisibility versus Undead (catalog: Invisibility Versus Undead)
-- **Shaman**: Invisibility versus Animals (catalog: Invisibility Versus Animals)
 
 ## THE FINDING: `spellname` is unreliable, and our catalog is missing real spells
 
@@ -151,7 +135,7 @@ a wrong `spellname` is filed under another spell and dropped. **This affects the
 ### Ranger
 
 **In catalog, not on page** (19):
-- Calefaction · Call of Fire · Call of Fire Strike · Call of the Predator · Chill Sight · Cinder Jolt · Drones of Doom · Ensnare · Enveloping Roots · Extinguish Fatigue · Firestrike · Greater Wolf Form · Resist Cold · Shield of Spikes · Skin Like Diamond · Skin Like Nature · Storm Strength · Strength of Nature · Thorncoat
+- Calefaction · Call of Fire · Call of Fire Strike · Call of the Predator · Chill Sight · Cinder Jolt · Drones of Doom · Ensnare · Enveloping Roots · Extinguish Fatigue · Firestrike · Greater Wolf Form · Resist Cold · Shield of Spikes · Skin like Diamond · Skin like Nature · Storm Strength · Strength of Nature · Thorncoat
 
 ### Rogue
 

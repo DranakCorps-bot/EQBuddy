@@ -1,4 +1,4 @@
-<noinclude>{{Velious Era}}</noinclude>
+<noinclude>{{Classic Era}}</noinclude>
 {{Spellpagesmart|
 
 | spellname = Ro's Fiery Sundering

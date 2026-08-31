@@ -37,6 +37,8 @@
 
 {{SpellWhereTable|
 {{SpellWhereRowB | [[Lesser Faydark]] | [[A Brownie Merchant]] | Brownie Villiage | (1814,3118) }}
+
+{{SpellWhereRowB | [[High Keep]] | [[Krystalle Corsair]] | High Keep | (-88.88,-223.07,3.81) }}
 }}
 
 }}

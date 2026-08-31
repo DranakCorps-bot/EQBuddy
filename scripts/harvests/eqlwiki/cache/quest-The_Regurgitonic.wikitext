@@ -78,7 +78,7 @@ If you choose to give the [[Regurgitonic]] to [[Mammoth]]:
 <div class="facblock">
 * Your faction standing with [[Surefall Protected Animals]] has been adjusted by 10.
 * Your faction standing with [[Protectors of Pine]] has been adjusted by 5.
-* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 5. (? needs confirmation)
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 5.
 * Your faction standing with [[Karana Bandits]] has been adjusted by -1.
 </div>
 {{Exp}}
@@ -90,12 +90,11 @@ If you give the [[Bayle List II]] to Te'Anara:
 : Te`Anara says 'Oh my! This must belong to Antonius Bayle. I shall see that he receives it. You have done a great service to Qeynos and Surefall Glade. I rewards you with this. May it be of good use in your future deeds.' 
 
 <div class="facblock">
-* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 10. (? needs confirmation)
+* Your faction standing with [[Jaggedpine Treefolk]] has been adjusted by 10.
 * Your faction standing with [[Protectors of Pine]] has been adjusted by 5.
 * Your faction standing with [[Surefall Protected Animals]] has been adjusted by 5.
-* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5. (? needs confirmation)
 * Your faction standing with [[Unkempt Druids]] has been adjusted by -2.
-* Your faction standing with [[Unkempt Druids]] has been adjusted by -2.
+* Your faction standing with [[Guards of Qeynos]] has been adjusted by 5. (Needs confirmation)
 </div>
 {{Exp}}
 

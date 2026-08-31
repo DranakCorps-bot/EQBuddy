@@ -136,7 +136,6 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |(324,-618)
 |}
 <div id="spells_level_1">
-
 ==Level 1==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -144,132 +143,121 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lull
-|description=Single Target Frenzy Range Debuff
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=10
+|effects=1: Reduce Aggro Radius (up to L30)<br>2: Assist Radius (up to L30)
+|duration=2 Min
 |school=Alteration
 |location=Autogranted Vendor
-|mana=10
-|kind=Detrimental
-|targ=Single
-|duration=2 Min
-|max=Calm (max L30)
-}}
-{{RadSpellRow2
-|name=Minor Illusion
-|description=Self Only Morph to Object
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Illusion
+|kind=Illusion: Other
+|targ=Self
+|mana=10
+|effects=1: UNKNOWN RACE<br>2: Stops movement
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>Snare
-}}
-{{RadSpellRow2
-|name=Minor Shielding
-|description=Self Only HP and AC Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Minor Shielding
+|kind=Shielding
+|targ=Self
+|mana=10
+|effects=1: Increase Max Hitpoints by 6 (L1) to 10 (L5)<br>2: Increase AC by 2 (L1) to 3 (L5)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+10 Max HP<br>+3 AC
-}}
-{{RadSpellRow2
-|name=Pendril's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pendril's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=12
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=12
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Reclaim Energy
-|description=Regain Mana From Your Animation
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=5
+}}
+{{KhazamSpellRow
+|name=Reclaim Energy
 |kind=Pet
 |targ=Pet
+|mana=5
+|effects=1: Reclaim Pet Energy · 75% reclaimed
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Shallow Breath
-|description=Single Target Magical Damage with Debuff (5 damage)
+|school=Conjuration
+|location=Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shallow Breath
+|kind=Disempowering
+|targ=Single
+|mana=7
+|effects=1: Decrease Hitpoints by 3 (L1) to 5 (L4)<br>2: Decrease Strength by 5<br>3: Decrease AGI by 5
+|duration=12 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=7
-|kind=Detrimental
-|targ=Single
-|duration=12 Sec
-|max=-3--5 Dmg<br>-5 STR<br>-5 AGI
-}}
-{{RadSpellRow2
-|name=Strengthen
-|description=Single Target Strength Buff (Max: 10)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Strengthen
+|kind=Strength
+|targ=Friendly
+|mana=10
+|effects=1: Increase Strength by 5 (L1) to 10 (L6)
+|duration=27 Min
 |school=Alteration
 |location=Vendor
-|mana=10
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+10 STR
-}}
-{{RadSpellRow2
-|name=Taper Enchantment
-|description=Single Target Magic Effect Duration Debuffer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Taper Enchantment
+|kind=Dispel
+|targ=Single
+|mana=5
+|effects=1: Dispel (0)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=5
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=True North
-|description=Self Only Navigation Spell
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=True North
+|kind=Utility Beneficial
+|targ=Self
+|mana=5
+|effects=1: Sense Heading
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=5
-|kind=Utility
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Weaken
-|description=Single Target Strength Debuff (Max: 15)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Weaken
+|kind=Disempowering
+|targ=Single
+|mana=8
+|effects=1: Decrease Strength by 10 (L1) to 15 (L10)
+|duration=6 Min
 |school=Alteration
 |location=Vendor
-|mana=8
-|kind=Detrimental
-|targ=Single
-|duration=6 Min
-|max=-15 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -282,66 +270,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Human
-|description=Self Only Morph to Human
-|era={{Classic Short}}
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=10
+|effects=1: Human
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Juli's Animation
-|description=Summon an Animation
-|era={{Classic Short}}
-|school=Conjuration
-|location=Autogranted Vendor
-|mana=24
-|kind=Pet
+|kind=Sum: Animation
 |targ=Self
+|mana=24
+|effects=1: Summons an Animation Pet
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Mesmerize
-|description=Single Target Mesmerize Spell (24 Secs)
-|era={{Classic Short}}
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=15
-|kind=Detrimental
-|targ=Single
-|duration=24 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Tashina
-|description=Magic Resist debuff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mesmerize
+|kind=Enthrall
+|targ=Single
+|mana=15
+|effects=1: Mesmerize (up to L55)
+|duration=24 Sec
+|school=Conjuration
+|location=Autogranted Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tashina
+|kind=Resist Debuffs
+|targ=Single
+|mana=10
+|effects=1: Increase Poison Counter by 1<br>2: Decrease Magic Resist by 7 (L2) to 13 (L8)
+|duration=14 Min
 |school=Abjuration
 |location=Vendor
-|mana=10
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-13 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_3">
-
 ==Level 3==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -349,60 +331,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Color Flux
-|description=Stuns all Targets Around Caster (4 Secs)
-|era={{Classic Short}}
+|kind=Stun DD
+|targ=PB AE
+|mana=20
+|effects=1: Stun: 4s (up to L55)
+|duration=Instant
 |school=Divination
 |location=Autogranted Vendor
-|mana=20
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=Stun 4s (max L55)
-}}
-{{RadSpellRow2
-|name=Fear
-|description=Single Target Fear Spell (18 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Fear
+|kind=Fear
+|targ=Single
+|mana=40
+|effects=1: Fear (up to L52)
+|duration=18 Sec
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=Fear (max L52)
-}}
-{{RadSpellRow2
-|name=Haze
-|description=Single Target AC Buff (Max: 5)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Haze
+|kind=Armor Class
+|targ=Friendly
+|mana=25
+|effects=1: Increase AC by 3
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+3 AC
-}}
-{{RadSpellRow2
-|name=Illusion: Half-Elf
-|description=Self Only Morph to Half Elf
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Half-Elf
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=10
+|effects=1: Half Elf
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -415,60 +392,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enfeeblement
-|description=Single Target Melee Debuff
-|era={{Classic Short}}
+|kind=Disempowering
+|targ=Single
+|mana=20
+|effects=1: Decrease Strength by 18 (L4) to 20 (L8)<br>2: Decrease AC by 2
+|duration=6 Min
 |school=Alteration
 |location=Vendor
-|mana=20
-|kind=Detrimental
-|targ=Single
-|duration=6 Min
-|max=-20 STR<br>-2 AC
-}}
-{{RadSpellRow2
-|name=Gate
-|description=Return to Your Bind Point
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Gate
+|kind=Transport
+|targ=Self
+|mana=70
+|effects=1: Gate · 98% chance · bind point 1
+|duration=Instant
 |school=Alteration
 |location=Autogranted Vendor
-|mana=70
-|kind=Travel
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Invisibility
-|description=Single Target Invisibility Spell
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility
+|kind=Invisibility
+|targ=Friendly
+|mana=30
+|effects=1: Invisibility
+|duration=20 Min
 |school=Divination
 |location=Autogranted Vendor
-|mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=20 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Suffocating Sphere
-|description=Single Target Magical Damage over Time with Debuff (34 damage total)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Suffocating Sphere
+|kind=Magic DoT
+|targ=Single
+|mana=38
+|effects=1: Decrease Hitpoints by 13<br>2: Decrease Strength by 6<br>3: Decrease AGI by 6<br>4: Decrease Hitpoints by 8 (L4) to 10 (L8) per tick
+|duration=42 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=38
-|kind=Damage Over Time
-|targ=Single
-|duration=42 Sec
-|max=-13 Dmg<br>-6 STR<br>-6 AGI<br>-10 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -481,54 +453,49 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Eye of Confusion
-|description=Single Target Blind Spell
-|era={{Classic Short}}
+|kind=Blind
+|targ=Single
+|mana=25
+|effects=1: Blind
+|duration=18 Sec
 |school=Alteration
 |location=Vendor
-|mana=25
-|kind=Detrimental
-|targ=Single
-|duration=18 Sec
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Wood Elf
-|description=Self Only Morph to Wood Elf
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=10
-|kind=Utility
+|kind=Illusion: Adventurer
 |targ=Self
+|mana=10
+|effects=1: Wood Elf
 |duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Sentinel
-|description=Area Surveillance Spell
-|era={{Classic Short}}
 |school=Divination
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sentinel
+|kind=Utility Beneficial
+|targ=Free AE
 |mana=25
-|kind=Utility
-|targ=Free Target AE
+|effects=1: Sentinel
 |duration=Instant
-|max=
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_6">
-
 ==Level 6==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -536,66 +503,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Lesser Shielding
-|description=Self Only HP, MR, and AC Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=25
+|effects=1: Increase Max Hitpoints by 17 (L5) to 30 (L18)<br>2: Increase AC by 4 (L5) to 7 (L18)<br>3: Increase Magic Resist by 6 (L5) to 10 (L20)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=25
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+30 Max HP<br>+7 AC<br>+10 Magic Resist
-}}
-{{RadSpellRow2
-|name=Root
-|description=Single Target Fast Root Spell (Max: 48 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Root
+|kind=Root
+|targ=Single
+|mana=30
+|effects=1: Root
+|duration=48 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=48 Sec
-|max=Root
-}}
-{{RadSpellRow2
-|name=See Invisible
-|description=Single Target Vision Enhancer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=See Invisible
+|kind=Vision
+|targ=Friendly
+|mana=25
+|effects=1: See Invisible
+|duration=27 Min
 |school=Divination
 |location=Autogranted Vendor
-|mana=25
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Soothe
-|description=Single Target Frenzy Range Debuff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Soothe
+|kind=Calm
+|targ=Single
+|mana=30
+|effects=1: Reduce Aggro Radius (up to L40)<br>2: Assist Radius (up to L40)<br>3: Add Hate (Aggro)
+|duration=2 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=2 Min 30 Sec
-|max=Calm (max L40)
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_7">
-
 ==Level 7==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -603,90 +564,82 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cancel Magic
-|description=Single Target Magic Effect Debuffer (Dispell)
-|era={{Classic Short}}
+|kind=Dispel
+|targ=Single
+|mana=30
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Chaotic Feedback
-|description=Single Target Magical Direct Damage (Max: 48)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Chaotic Feedback
+|kind=Magic DD
+|targ=Single
+|mana=16
+|effects=1: Decrease Hitpoints by 28 (L7) to 32 (L14)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Autogranted Vendor
-|mana=16
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=28-32 Dmg<br>Stun 1s (max L55)
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enchant Clay
-|description=Create 1 [[Large Block of Magic Clay]]
-|era={{Classic Short}}
+|kind=Enchant Metal
+|targ=Self
+|mana=60
+|effects=1: {{:Summoned: Large Block of Magic Clay}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=60
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16896
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enchant Silver
-|description=Create 1 [[Enchanted Silver Bar]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Enchant Metal
+|targ=Self
 |mana=60
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Enchanted Silver Bar}}
 |duration=Instant
-|max=Summon Item #16504
-}}
-{{RadSpellRow2
-|name=Mass Enchant Silver
-|description=Create 5 [[Enchanted Silver Bar]]
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=180
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16504
-}}
-{{RadSpellRow2
-|name=Mircyl's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Enchant Silver
+|kind=Enchant Metal
+|targ=Self
+|mana=180
+|effects=1: {{:Summoned: Enchanted Silver Bar}} (×5)
+|duration=Instant
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mircyl's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=45
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=45
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_8">
-
 ==Level 8==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -694,66 +647,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alliance
-|description=Self Only NPC Faction Boost
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Alliance
+|targ=Single
 |mana=35
-|kind=Utility
-|targ=Single
+|effects=1: Increase Faction by 100
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Bind Sight
-|description=See through the targets eyes
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=15
-|kind=Utility
-|targ=Single
-|duration=11 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Illusion: Gnome
-|description=Self Only Morph to Gnome
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=10
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Mass Enchant Clay
-|description=Create 5 [[Large Block of Magic Clay]]
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=180
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Bind Sight
+|kind=Vision
+|targ=Single
+|mana=15
+|effects=1: Bind Sight
+|duration=14 Min
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Gnome
+|kind=Illusion: Adventurer
 |targ=Self
+|mana=10
+|effects=1: Gnome
+|duration=36 Min
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Enchant Clay
+|kind=Enchant Metal
+|targ=Self
+|mana=180
+|effects=1: {{:Summoned: Large Block of Magic Clay}} (×5)
 |duration=Instant
-|max=Summon Item #16896
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_9">
-
 ==Level 9==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -761,66 +708,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Ebbing Strength
-|description=Single Target Strength Debuff (Max: 25)
-|era={{Classic Short}}
+|kind=Disempowering
+|targ=Single
+|mana=35
+|effects=1: Decrease Strength by 19 (L9) to 25 (L20)
+|duration=7 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=35
-|kind=Detrimental
-|targ=Single
-|duration=6 Min
-|max=-25 STR
-}}
-{{RadSpellRow2
-|name=Kilan's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Kilan's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=65
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=65
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Languid Pace
-|description=Single Target Slowing Spell (Max: 30%)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Languid Pace
+|kind=Slow
+|targ=Single
+|mana=50
+|effects=1: Decrease Attack Speed by 17% (L9) to 27% (L50)<br>2: Increase Disease Counter by 6
+|duration=3 Min 30 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=2 Min 30 Sec
-|max=-30% Atkspd
-}}
-{{RadSpellRow2
-|name=Whirl Till You Hurl
-|description=Single Target Distance Stun (Max: 12 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Whirl Till You Hurl
+|kind=Stun DD
+|targ=Single
+|mana=55
+|effects=1: Stun: 7.5s (up to L55)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=55
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_10">
-
 ==Level 10==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -828,66 +769,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Dark Elf
-|description=Self Only Morph to Dark Elf
-|era={{Classic Short}}
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: Dark Elf
+|duration=36 Min
 |school=Divination
 |location=Autogranted Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Memory Blur
-|description=Single Target Memory Blur
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Memory Blur
+|kind=Memory Blur
+|targ=Single
+|mana=40
+|effects=1: Memory Blur · 10% chance
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Mist
-|description=Single Target AC Buff (Max: 8)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mist
+|kind=Armor Class
+|targ=Friendly
+|mana=30
+|effects=1: Increase AC by 4 (L10) to 6 (L16)
+|duration=27 Min
 |school=Abjuration
 |location=Vendor
-|mana=30
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+6 AC
-}}
-{{RadSpellRow2
-|name=Serpent Sight
-|description=Single Target Infravision
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Serpent Sight
+|kind=Vision
+|targ=Friendly
+|mana=30
+|effects=1: Infravision
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_11">
-
 ==Level 11==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -895,90 +830,82 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Charm
-|description=Charm (Level 25 Cap)
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted Vendor
+|kind=Charm
+|targ=Single
 |mana=60
-|kind=Detrimental
-|targ=Single
-|duration=16 Min
-|max=Charm (max L25)
-}}
-{{RadSpellRow2
-|name=Choke
-|description=Single Target Magical Debuff DoT (Max: 80)
-|era={{Classic Short}}
+|effects=1: Charm (up to L25)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Autogranted Vendor
-|mana=73
-|kind=Damage Over Time
-|targ=Single
-|duration=48 Sec
-|max=-32--35 Dmg<br>-10 STR<br>-10 AGI<br>-22 HP/tick
-}}
-{{RadSpellRow2
-|name=Illusion: High Elf
-|description=Self Only Morph to High Elf
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Choke
+|kind=Magic DoT
+|targ=Single
+|mana=73
+|effects=1: Decrease Hitpoints by 32 (L11) to 35 (L16)<br>2: Decrease Strength by 6 (L11) to 10 (L18)<br>3: Decrease AGI by 6 (L11) to 10 (L18)<br>4: Decrease Hitpoints by 19 (L11) to 22 (L16) per tick
+|duration=48 Sec
+|school=Alteration
+|location=Autogranted Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: High Elf
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: High Elf
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Intellectual Advancement
-|description=Reduce fizzle rate
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Fizzle Rate
+|targ=Friendly
 |mana=35
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Fizzle Rate by 3
 |duration=27 Min
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Thicken Mana
-|description=Create 5 [[Vial of Viscous Mana]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Create Item
+|targ=Self
 |mana=300
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Vial of Viscous Mana}} (×5)
 |duration=Instant
-|max=Summon Item #10250
-}}
-{{RadSpellRow2
-|name=Thicken Mana
-|description=Create 1 [[Vial of Viscous Mana]]
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Thicken Mana
+|kind=Create Item
 |targ=Self
+|mana=100
+|effects=1: {{:Summoned: Vial of Viscous Mana}}
 |duration=Instant
-|max=Summon Item #10250
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_12">
-
 ==Level 12==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -986,66 +913,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bind Affinity
-|description=Set a New Home Point for Target
-|era={{Classic Short}}
-|school=Alteration
-|location=Autogranted Vendor
-|mana=100
-|kind=Utility
+|kind=Utility Beneficial
 |targ=Single
+|mana=100
+|effects=1: Bind Affinity
 |duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Enduring Breath
-|description=Allows Breathing Underwater.
+|school=Alteration
+|location=Autogranted Vendor
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Enduring Breath
+|kind=Utility Beneficial
+|targ=Friendly
+|mana=35
+|effects=1: Enduring Breath (Water Breathing)
+|duration=27 Min
 |school=Alteration
 |location=Vendor
-|mana=35
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Illusion: Erudite
-|description=Self Only Morph to Erudite
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Erudite
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: Erudite
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Illusion: Halfling
-|description=Self Only Morph to Halfling
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Halfling
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: Halfling
+|duration=36 Min
 |school=Divination
 |location=Autogranted Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_13">
-
 ==Level 13==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1053,48 +974,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enthrall
-|description=Single Target Mesmerize Spell (48 Secs)
-|era={{Classic Short}}
+|kind=Enthrall
+|targ=Single
+|mana=45
+|effects=1: Mesmerize (up to L55)
+|duration=48 Sec
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=45
-|kind=Detrimental
-|targ=Single
-|duration=48 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Illusion: Dwarf
-|description=Self Only Morph to Dwarf
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Dwarf
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: Dwarf
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Rune I
-|description=Single Target Damage Absorber (Max: 55)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rune I
+|kind=Rune
+|targ=Friendly
+|mana=41
+|effects=1: Increase Stoneskin by 27 (L13) to 55 (L21)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=41
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1107,72 +1024,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Breeze
-|description=Single Target Mana Regeneration Increase (2pts/tick)
-|era={{Classic Short}}
+|kind=Mana
+|targ=Friendly
+|mana=35
+|effects=1: Increase Mana by 4 (L14) to 6 (L20) per tick
+|duration=27 Min
 |school=Alteration
 |location=Autogranted Vendor
-|mana=35
-|kind=Regen
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+6 Mana
-}}
-{{RadSpellRow2
-|name=Enchant Electrum
-|description=Create 1 [[Enchanted Electrum Bar]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Enchant Electrum
+|kind=Enchant Metal
+|targ=Self
+|mana=75
+|effects=1: {{:Summoned: Enchanted Electrum Bar}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=75
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16505
-}}
-{{RadSpellRow2
-|name=Invisibility versus Undead
-|description=Single Target Undead Invisibility Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Invisibility versus Undead
+|kind=Invisibility
+|targ=Friendly
+|mana=40
+|effects=1: Invisibility vs Undead
+|duration=27 Min
 |school=Divination
 |location=Vendor
-|mana=40
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Mass Enchant Electrum
-|description=Create 5 [[Enchanted Electrum Bar]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Enchant Electrum
+|kind=Enchant Metal
+|targ=Self
+|mana=225
+|effects=1: {{:Summoned: Enchanted Electrum Bar}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=225
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16505
-}}
-{{RadSpellRow2
-|name=Shalee's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shalee's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=85
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=85
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1185,60 +1096,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Barbarian
-|description=Self Only Morph to Barbarian
-|era={{Classic Short}}
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=30
+|effects=1: Barbarian
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Tree
-|description=Self Only Morph to Tree
-|era={{Classic Short}}
+|kind=Illusion: Other
+|targ=Self
+|mana=30
+|effects=1: UNKNOWN RACE<br>2: Root
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>Root
-}}
-{{RadSpellRow2
-|name=Levitate
-|description=Single Target Levitation Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Levitate
+|kind=Levitate
+|targ=Friendly
+|mana=30
+|effects=1: Levitate
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Quickness
-|description=Single Target Haste Spell (Max: 30%)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Quickness
+|kind=Haste
+|targ=Friendly
+|mana=80
+|effects=1: Increase Attack Speed by 27% (L15) to 30% (L20)
+|duration=11 Min
 |school=Alteration
 |location=Autogranted Vendor
-|mana=80
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=11 Min
-|max=+30% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1251,72 +1157,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Chase the Moon
-|description=Single Target Fear Spell (36 Secs)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Fear
+|targ=Single
 |mana=70
-|kind=Detrimental
-|targ=Single
+|effects=1: Fear (up to L52)
 |duration=36 Sec
-|max=Fear (max L52)
-}}
-{{RadSpellRow2
-|name=Disempower
-|description=Single Target Melee Debuff
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=45
-|kind=Detrimental
-|targ=Single
-|duration=2 Min
-|max=-20 STA<br>-15 STR<br>-7 AC
-}}
-{{RadSpellRow2
-|name=Mesmerization
-|description=Area Effect Mesmerize(24 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Disempower
+|kind=Disempowering
+|targ=Single
+|mana=45
+|effects=1: Decrease STA by 9 (L12) to 20 (L34)<br>2: Decrease Strength by 13 (L12) to 15 (L16)<br>3: Decrease AC by 5 (L12) to 7 (L28)
+|duration=2 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mesmerization
+|kind=Enthrall
+|targ=Targeted AE
+|mana=60
+|effects=1: Mesmerize (up to L55)
+|duration=24 Sec
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=60
-|kind=Detrimental
-|targ=Targeted AE
-|duration=24 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Sanity Warp
-|description=Single Target Magical Direct Damage (Max: 95)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sanity Warp
+|kind=Magic DD
+|targ=Single
+|mana=38
+|effects=1: Decrease Hitpoints by 81 (L16) to 87 (L22)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=38
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=81-87 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Shielding
-|description=Self Only HP, MR, and AC Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shielding
+|kind=Shielding
+|targ=Self
+|mana=50
+|effects=1: Increase Max Hitpoints by 45 (L15) to 50 (L20)<br>2: Increase AC by 9 (L15) to 11 (L21)<br>3: Increase Magic Resist by 11 (L15) to 12 (L16)
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+50 Max HP<br>+11 AC<br>+12 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1329,72 +1229,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Cloud
-|description=Single Target AC Buff (Max: 11)
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Armor Class
+|targ=Friendly
 |mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AC by 6 (L17) to 8 (L25)
 |duration=36 Min
-|max=+8 AC
-}}
-{{RadSpellRow2
-|name=Endure Magic
-|description=Single Target Magic Resist Buff (Max: 20)
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Illusion: Ogre
-|description=Self Only Morph to Ogre
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Endure Magic
+|kind=Resist Buff
+|targ=Friendly
+|mana=40
+|effects=1: Increase Magic Resist by 20
+|duration=27 Min
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Ogre
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=50
+|effects=1: Ogre
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Intellectual Superiority
-|description=Reduce fizzle rate
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Intellectual Superiority
+|kind=Fizzle Rate
+|targ=Friendly
+|mana=70
+|effects=1: Increase Fizzle Rate by 6
+|duration=27 Min
 |school=Alteration
 |location=Vendor
-|mana=70
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=27 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Sisna's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sisna's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=105
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Autogranted Vendor
-|mana=105
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1407,66 +1301,60 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Calm
-|description=Single Target Frenzy Reduction
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=50
+|effects=1: Reduce Aggro Radius (up to L50)<br>2: Assist Radius (up to L50)<br>3: Add Hate (Aggro)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Calm (max L50)
-}}
-{{RadSpellRow2
-|name=Illusion: Troll
-|description=Self Only Morph to Troll & HP Regen Buff (1hp/tick)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Troll
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=100
+|effects=1: Troll<br>2: Increase Hitpoints by 1 per tick
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>+1 HP/tick
-}}
-{{RadSpellRow2
-|name=Sympathetic Aura
-|description=Single Target Charisma Buff (Max: 18)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sympathetic Aura
+|kind=Charisma
+|targ=Friendly
+|mana=40
+|effects=1: Increase CHA by 15 (L18) to 18 (L24)
+|duration=36 Min
 |school=Alteration
 |location=Vendor
-|mana=40
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+18 CHA
-}}
-{{RadSpellRow2
-|name=Tashani
-|description=Single Target Unresistable Magic Resistance Debuffer (Max: 23)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tashani
+|kind=Resist Debuffs
+|targ=Single
+|mana=20
+|effects=1: Increase Poison Counter by 1<br>2: Decrease Magic Resist by 19 (L18) to 23 (L26)
+|duration=14 Min
 |school=Abjuration
 |location=Vendor
-|mana=20
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-23 Magic Resist
+|era={{Classic Short}}
 }}
 </table>
 </div>
 
 <div id="spells_level_19">
-
 ==Level 19==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1474,60 +1362,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Berserker Strength
-|description=Single Target Melee Buff with Damage Absorb (Max: 50)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Strength
+|targ=Friendly
 |mana=45
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Strength by 19 (L19) to 25 (L30)<br>2: Increase Stoneskin by 29 (L19) to 45 (L50)<br>3: Decrease AGI by 10 (L19) to 15 (L28)
 |duration=3 Min
-|max=+25 STR<br>-15 AGI
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Crystallize Mana
-|description=Create 1 [[Vial of Cloudy Mana]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=200
-|kind=Summon
+|kind=Create Item
 |targ=Self
+|mana=200
+|effects=1: {{:Summoned: Vial of Cloudy Mana}}
 |duration=Instant
-|max=Summon Item #10251
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Feckless Might
-|description=Single Target Strength Debuff
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=45
-|kind=Detrimental
+|kind=Disempowering
 |targ=Single
-|duration=5 Min
-|max=-30 STR
-}}
-{{RadSpellRow2
-|name=Tiny Companion
-|description=Shrink your pet
-|era={{Classic Short}}
+|mana=45
+|effects=1: Decrease Strength by 25 (L19) to 30 (L28)
+|duration=6 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=50
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tiny Companion
 |kind=Pet
 |targ=Pet
+|mana=50
+|effects=1: Increase Shrink Pet by 50
 |duration=Instant
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1540,72 +1423,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Benevolence
-|description=Self Only NPC Faction Boost
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=50
-|kind=Utility
+|kind=Alliance
 |targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Color Shift
-|description=Stuns all Targets Around Caster (6 Secs)
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
-|mana=40
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=Stun 6s (max L55)
-}}
-{{RadSpellRow2
-|name=Illusion: Iksar
-|description=Self Only Morph to Iksar & HP Regen Buff (1hp/tick)
-|era={{Classic Short}}
-|school=Divination
-|location=Vendor
 |mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>+1 HP/tick
-}}
-{{RadSpellRow2
-|name=Mass Crystallize Mana
-|description=Create 5 [[Vial of Cloudy Mana]]
-|era={{Classic Short}}
+|effects=1: Increase Faction by 200
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=600
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10251
-}}
-{{RadSpellRow2
-|name=Shifting Sight
-|description=See through the targets eyes with Infravision.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Color Shift
+|kind=Stun DD
+|targ=PB AE
+|mana=40
+|effects=1: Stun: 6s (up to L55)
+|duration=Instant
 |school=Divination
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Iksar
+|kind=Illusion: Adventurer
+|targ=Self
+|mana=50
+|effects=1: Iksar<br>2: Increase Hitpoints by 1 per tick
+|duration=36 Min
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Crystallize Mana
+|kind=Create Item
+|targ=Self
+|mana=600
+|effects=1: {{:Summoned: Vial of Cloudy Mana}} (×5)
+|duration=Instant
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shifting Sight
+|kind=Vision
+|targ=Friendly
 |mana=30
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=16 Min
-|max=
+|effects=1: Bind Sight<br>2: Infravision
+|duration=20 Min 30 Sec
+|school=Divination
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1618,48 +1495,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Alacrity
-|description=Single Target Haste Spell (Max: 40%)
-|era={{Classic Short}}
+|kind=Haste
+|targ=Friendly
+|mana=115
+|effects=1: Increase Attack Speed by 32% (L21) to 40% (L36)
+|duration=11 Min
 |school=Alteration
 |location=Vendor
-|mana=115
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=11 Min
-|max=+40% Atkspd
-}}
-{{RadSpellRow2
-|name=Chaos Flux
-|description=Single Target Magical Direct Damage (Max: 150)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Chaos Flux
+|kind=Magic DD
+|targ=Single
+|mana=67
+|effects=1: Decrease Hitpoints by 152 (L21) to 175 (L33)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=67
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=152-175 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Illusion: Earth Elemental
-|description=Self Only Morph to Earth Elemental & Strength Buff (Max: 10)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Earth Elemental
+|kind=Illusion: Other
+|targ=Self
+|mana=50
+|effects=1: Elemental<br>2: Increase Strength by 10
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>+10 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1672,48 +1545,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Rune II
-|description=Single Target Damage Absorber (Max: 118)
-|era={{Classic Short}}
+|kind=Rune
+|targ=Friendly
+|mana=83
+|effects=1: Increase Stoneskin by 71 (L22) to 118 (L30)
+|duration=54 Min
 |school=Abjuration
 |location=Vendor
-|mana=83
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=54 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Sagar's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Sagar's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=130
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=130
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Strip Enchantment
-|description=Single Target Magic Buff Remover (Max: 4)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Strip Enchantment
+|kind=Dispel
+|targ=Single
+|mana=70
+|effects=1: Dispel (1)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=70
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1726,48 +1595,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Beguile
-|description=Charm (Level 37 Cap)
-|era={{Classic Short}}
+|kind=Charm
+|targ=Single
+|mana=120
+|effects=1: Charm (up to L37)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=120
-|kind=Detrimental
-|targ=Single
-|duration=16 Min
-|max=Charm (max L37)
-}}
-{{RadSpellRow2
-|name=Major Shielding
-|description=Self Only HP, MR, and AC Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Major Shielding
+|kind=Shielding
+|targ=Self
+|mana=80
+|effects=1: Increase Max Hitpoints by 68 (L23) to 75 (L30)<br>2: Increase AC by 13 (L23) to 15 (L28)<br>3: Increase Magic Resist by 14
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=80
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+75 Max HP<br>+15 AC<br>+14 Magic Resist
-}}
-{{RadSpellRow2
-|name=Tepid Deeds
-|description=Single Target Slowing Spell (Max: 50%)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tepid Deeds
+|kind=Slow
+|targ=Single
+|mana=100
+|effects=1: Decrease Attack Speed by 31% (L23) to 45% (L50)<br>2: Increase Disease Counter by 9
+|duration=3 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=2 Min 30 Sec
-|max=-50% Atkspd
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1780,48 +1645,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enchant Gold
-|description=Create 1 [[Enchanted Gold Bar]]
-|era={{Classic Short}}
+|kind=Enchant Metal
+|targ=Self
+|mana=150
+|effects=1: {{:Summoned: Enchanted Gold Bar}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16506
-}}
-{{RadSpellRow2
-|name=Illusion: Skeleton
-|description=Self Only Morph to Skeleton
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Skeleton
+|kind=Illusion: Other
+|targ=Self
+|mana=50
+|effects=1: Ancient Skeleton
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Mass Enchant Gold
-|description=Create 5 [[Enchanted Gold Bar]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Enchant Gold
+|kind=Enchant Metal
+|targ=Self
+|mana=450
+|effects=1: {{:Summoned: Enchanted Gold Bar}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=450
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #16506
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1834,48 +1695,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Feedback
-|description=Single Target Damage Shield (11 Dmg)
-|era={{Classic Short}}
+|kind=Damage Shield
+|targ=Friendly
+|mana=75
+|effects=1: Increase Damage Shield by 10 (L25) to 11 (L28)
+|duration=15 Min
 |school=Abjuration
 |location=Vendor
-|mana=75
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=15 Min
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Instill
-|description=Root, up to 1 min 36s
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Root
+|targ=Single
 |mana=60
-|kind=Detrimental
-|targ=Single
+|effects=1: Root
 |duration=1 Min 36 Sec
-|max=Root
-}}
-{{RadSpellRow2
-|name=Listless Power
-|description=Single Target Melee Debuff
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=90
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Listless Power
+|kind=Disempowering
 |targ=Single
-|duration=5 Min
-|max=-35 AGI<br>-35 STR<br>-15 AC
+|mana=90
+|effects=1: Decrease AGI by 22 (L25) to 35 (L50)<br>2: Decrease Strength by 22 (L25) to 35 (L50)<br>3: Decrease AC by 8 (L25) to 15 (L50)
+|duration=6 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1888,60 +1745,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Clarity
-|description=Single Target Mana Regeneration Buff( 4 - 7 )
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Mana
+|targ=Friendly
 |mana=75
-|kind=Regen
-|targ=Single Friendly (or Self)
+|effects=1: Increase Mana by 7 (L26) to 9 (L32) per tick
 |duration=27 Min
-|max=+9 Mana
-}}
-{{RadSpellRow2
-|name=Curse of the Simple Mind
-|description=Single Target Wisdom and Intelligence Debuff
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=35
-|kind=Detrimental
-|targ=Single
-|duration=6 Min
-|max=-8 INT
-}}
-{{RadSpellRow2
-|name=Haunting Visage
-|description=Cloaks your target in a haunting visage, drawing more attention to any action they take.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Curse of the Simple Mind
+|kind=Disempowering
+|targ=Single
+|mana=35
+|effects=1: Decrease INT by 14 (L26) to 20 (L48)<br>2: Decrease WIS by 14 (L26) to 20 (L48)
+|duration=9 Min
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Haunting Visage
+|kind=Visages
+|targ=Friendly
+|mana=100
+|effects=1: Increase Hate by 5
+|duration=36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Suffocate
-|description=Single Target Magical Debuff DoT (Max: 263)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Suffocate
+|kind=Magic DoT
+|targ=Single
+|mana=115
+|effects=1: Decrease Hitpoints by 81 (L26) to 86 (L31)<br>2: Decrease Strength by 14 (L26) to 20 (L38)<br>3: Decrease AGI by 14 (L26) to 20 (L38)<br>4: Decrease Hitpoints by 40 (L26) to 42 (L30) per tick
+|duration=48 Sec
 |school=Alteration
 |location=Vendor
-|mana=115
-|kind=Damage Over Time
-|targ=Single
-|duration=48 Sec
-|max=-81--86 Dmg<br>-20 STR<br>-20 AGI<br>-42 HP/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -1954,48 +1806,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Clarify Mana
-|description=Create 1 [[Vial of Clear Mana]]
-|era={{Classic Short}}
+|kind=Create Item
+|targ=Self
+|mana=300
+|effects=1: {{:Summoned: Vial of Clear Mana}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=300
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10252
-}}
-{{RadSpellRow2
-|name=Obscure
-|description=Single Target AC Buff (Max: 14)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Obscure
+|kind=Armor Class
+|targ=Friendly
+|mana=50
+|effects=1: Increase AC by 9 (L27) to 11 (L34)
+|duration=45 Min
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=45 Min
-|max=+11 AC
-}}
-{{RadSpellRow2
-|name=Ultravision
-|description=Single Target Ultravision
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ultravision
+|kind=Vision
+|targ=Friendly
+|mana=55
+|effects=1: Ultravision
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=55
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2008,60 +1856,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Augmentation
-|description=Single Target Super Melee Buff (agi+30, ac+9, haste+28%)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Haste
+|targ=Friendly
 |mana=90
-|kind=Utility
-|targ=Single Friendly (or Self)
+|effects=1: Increase Attack Speed by 22% (L28) to 27% (L50)<br>2: Increase AGI by 19 (L28) to 30 (L50)<br>3: Increase AC by 4 (L28) to 7 (L50)
 |duration=27 Min
-|max=+27% Atkspd<br>+30 AGI<br>+7 AC
-}}
-{{RadSpellRow2
-|name=Dyn's Dizzying Draught
-|description=Single Target Distance Stun (Max: 12 Secs)
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Damage
-|targ=Single
-|duration=12 Sec
-|max=-12 AC<br>-50 Mana<br>-50 AGI
-}}
-{{RadSpellRow2
-|name=Illusion: Water Elemental
-|description=Self Only Morph to Water Elemtal & Enduring Breath
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dyn's Dizzying Draught
+|kind=Stun DD
+|targ=Single
+|mana=150
+|effects=1: Stun: 7.5s (up to L55)<br>2: Decrease AC by 7 (L28) to 12 (L49)<br>3: Decrease Mana by 50 per tick<br>4: Decrease AGI by 29 (L28) to 50 (L49)
+|duration=12 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Water Elemental
+|kind=Illusion: Other
+|targ=Self
+|mana=50
+|effects=1: Elemental<br>2: 100% chance · Illusion Benefit Water Breathing
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Nullify Magic
-|description=Single Target Magic Effect Debuffer (Dispell)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Nullify Magic
+|kind=Dispel
+|targ=Single
+|mana=50
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=50
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2074,60 +1917,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Air Elemental
-|description=Self Only Morph to Air Elemental & Levitate
-|era={{Classic Short}}
+|kind=Illusion: Other
+|targ=Self
+|mana=50
+|effects=1: Elemental<br>2: 100% chance · Illusion Benefit Levitation
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=50
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Mass Clarify Mana
-|description=Create 5 [[Vial of Clear Mana]]
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Clarify Mana
+|kind=Create Item
+|targ=Self
+|mana=900
+|effects=1: {{:Summoned: Vial of Clear Mana}} (×5)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=900
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10252
-}}
-{{RadSpellRow2
-|name=Uleen's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Uleen's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=150
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=150
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Ward of Alendar
-|description=Absorb spell damage
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Ward of Alendar
+|kind=Spell Guard
+|targ=Friendly
+|mana=150
+|effects=1: Increase SDR by 20
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=150
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2140,48 +1978,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Entrance
-|description=Single Target Mesmerize Spell (72 Secs)
-|era={{Classic Short}}
+|kind=Enthrall
+|targ=Single
+|mana=75
+|effects=1: Mesmerize (up to L55)
+|duration=1 Min 12 Sec
 |school=Conjuration
 |location=Vendor
-|mana=75
-|kind=Detrimental
-|targ=Single
-|duration=1 Min 12 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Entrancing Lights
-|description=Point Blank Area of Effect mesmerize. Level 55 cap.
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Entrancing Lights
+|kind=Enthrall
+|targ=PB AE
+|mana=75
+|effects=1: Mesmerize (up to L55)
+|duration=6 Sec
 |school=Divination
 |location=Vendor
-|mana=75
-|kind=Detrimental
-|targ=PB AE
-|duration=6 Sec
-|max=Mez (max L55)
-}}
-{{RadSpellRow2
-|name=Mana Sieve
-|description=Single Target Mana Reducer
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mana Sieve
+|kind=Mana Drain
+|targ=Single
+|mana=150
+|effects=1: Decrease Mana by 190 (L30) to 310 (L50)
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=-310 Mana
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2194,48 +2028,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Boltran's Animation
-|description=Summon an Animation
-|era={{Classic Short}}
+|kind=Sum: Animation
+|targ=Self
+|mana=175
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=175
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Greater Shielding
-|description=Self Only HP, MR, and AC Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Greater Shielding
+|kind=Shielding
+|targ=Self
+|mana=120
+|effects=1: Increase Max Hitpoints by 91 (L31) to 100 (L40)<br>2: Increase AC by 16 (L31) to 18 (L39)<br>3: Increase Magic Resist by 16
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=120
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+100 Max HP<br>+18 AC<br>+16 Magic Resist
-}}
-{{RadSpellRow2
-|name=Radiant Visage
-|description=Single Target Charisma Buff (Max: 30)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Radiant Visage
+|kind=Charisma
+|targ=Friendly
+|mana=65
+|effects=1: Increase CHA by 25 (L31) to 30 (L40)
+|duration=36 Min
 |school=Alteration
 |location=Vendor
-|mana=65
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=+30 CHA
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2248,60 +2078,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Anarchy
-|description=Single Target Magical Direct Damage (Max: 288)
-|era={{Classic Short}}
+|kind=Magic DD
+|targ=Single
+|mana=99
+|effects=1: Decrease Hitpoints by 264 (L32) to 275 (L38)<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=99
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=264-275 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Cast Sight
-|description=See Through Targets Eyes with Ultravision
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cast Sight
+|kind=Vision
+|targ=Single
+|mana=45
+|effects=1: Bind Sight<br>2: Ultravision
+|duration=150 Min
 |school=Divination
 |location=Vendor
-|mana=45
-|kind=Utility
-|targ=Single
-|duration=150 Min
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Enchant Platinum
-|description=Create 1 [[Enchanted Platinum Bar]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Enchant Metal
+|targ=Self
 |mana=225
-|kind=Summon
-|targ=Self
+|effects=1: {{:Summoned: Enchanted Platinum Bar}}
 |duration=Instant
-|max=Summon Item #16507
-}}
-{{RadSpellRow2
-|name=Mass Enchant Platinum
-|description=Create 5 [[Enchanted Platinum Bar]]
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=675
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Enchant Platinum
+|kind=Enchant Metal
 |targ=Self
+|mana=675
+|effects=1: {{:Summoned: Enchanted Platinum Bar}} (×5)
 |duration=Instant
-|max=Summon Item #16507
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2314,36 +2139,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Fire Elemental
-|description=Self Only Morph to Fire Elemental & Damage Shield (Max: 16)
-|era={{Classic Short}}
+|kind=Illusion: Other
+|targ=Self
+|mana=70
+|effects=1: Elemental<br>2: Increase Damage Shield by 10
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=70
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Rune III
-|description=Single Target Damage Absorber (Max: 230)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rune III
+|kind=Rune
+|targ=Friendly
+|mana=149
+|effects=1: Increase Stoneskin by 168 (L33) to 230 (L41)
+|duration=72 Min
 |school=Abjuration
 |location=Vendor
-|mana=149
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=72 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2356,36 +2178,33 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gift of Magic
-|description=Single Target Mana Buff (Max: 50)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Mana
+|targ=Friendly
 |mana=150
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Max Mana by 50
 |duration=60 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Insipid Weakness
-|description=Single Target Strength Debuff (Max: 51)
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=80
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Insipid Weakness
+|kind=Disempowering
 |targ=Single
-|duration=3 Min
-|max=-51 STR
+|mana=80
+|effects=1: Decrease Strength by 35 (L34) to 51 (L50)
+|duration=3 Min 54 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2398,48 +2217,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Insight
-|description=Single Target Wisdom and Intelligence Buff
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Wisdom/Intelligence
+|targ=Friendly
 |mana=125
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase WIS by 9 (L35) to 13 (L50)<br>2: Increase INT by 5 (L35) to 7 (L50)
 |duration=40 Min
-|max=+1 WIS
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Invoke Fear
-|description=Single Target Fear Spell (42 Secs)
-|era={{Classic Short}}
+|kind=Fear
+|targ=Single
+|mana=100
+|effects=1: Fear (up to L52)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Fear (max L52)
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Pacify
-|description=Single Target Frenzy Reduction
-|era={{Classic Short}}
+|kind=Calm
+|targ=Single
+|mana=100
+|effects=1: Reduce Aggro Radius (up to L55)<br>2: Assist Radius (up to L55)<br>3: Add Hate (Aggro)
+|duration=42 Sec
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
-|targ=Single
-|duration=42 Sec
-|max=Calm (max L55)
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2452,48 +2267,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Calming Visage
-|description=Cloaks your target in a calming visage, diverting attention from any action they take.
-|era={{Classic Short}}
+|kind=Visages
+|targ=Friendly
+|mana=100
+|effects=1: Decrease Hate by 5
+|duration=36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Sec
-|max=
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gravity Flux
-|description=Area Effect Direct Damage Spell (Max: 330)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Magic DD
+|targ=Targeted AE
 |mana=337
-|kind=Damage
-|targ=Targeted AE
+|effects=1: Decrease Hitpoints by 242 (L36) to 270 (L50)<br>2: Decrease Hit Points by 100
 |duration=Instant
-|max=242-270 Dmg
-}}
-{{RadSpellRow2
-|name=Mind Wipe
-|description=Area Memory Blur
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mind Wipe
+|kind=Memory Blur
 |targ=Targeted AE
+|mana=100
+|effects=1: Memory Blur · 15% chance
 |duration=Instant
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2506,72 +2317,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Aanya's Animation
-|description=Summon an Animation
-|era={{Classic Short}}
+|kind=Sum: Animation
+|targ=Self
+|mana=200
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=200
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Cajoling Whispers
-|description=Charm (Level 46 Cap)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Cajoling Whispers
+|kind=Charm
+|targ=Single
+|mana=195
+|effects=1: Charm (up to L46)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=195
-|kind=Detrimental
-|targ=Single
-|duration=16 Min
-|max=Charm (max L46)
-}}
-{{RadSpellRow2
-|name=Illusion: Dry Bone
-|description=Self Only Morph to Drybone & Fire Resist Buff (Max: 25)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Dry Bone
+|kind=Illusion: Other
+|targ=Self
+|mana=70
+|effects=1: Ancient Skeleton<br>2: Increase Fire Resist by 25
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=70
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>+25 Fire Resist
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Resist Magic
-|description=Single Target Magic Resist Buff (Max: 40)
-|era={{Classic Short}}
-|school=Abjuration
-|location=Vendor
+|kind=Resist Buff
+|targ=Friendly
 |mana=85
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase Magic Resist by 40
 |duration=36 Min
-|max=+40 Magic Resist
-}}
-{{RadSpellRow2
-|name=Shade
-|description=Single Target AC Buff (Max: 17)
-|era={{Classic Short}}
 |school=Abjuration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shade
+|kind=Armor Class
+|targ=Friendly
 |mana=60
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase AC by 12 (L37) to 13 (L44)
 |duration=72 Min
-|max=+13 AC
+|school=Abjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2584,60 +2389,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Distill Mana
-|description=Create 1 [[Vial of Distilled Mana]]
-|era={{Classic Short}}
+|kind=Create Item
+|targ=Self
+|mana=400
+|effects=1: {{:Summoned: Vial of Distilled Mana}}
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=400
-|kind=Summon
-|targ=Self
-|duration=Instant
-|max=Summon Item #10253
-}}
-{{RadSpellRow2
-|name=Illusion: Spirit Wolf
-|description=Self Only Morph to Wolf & ATK (15), Cold Resist (10)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Spirit Wolf
+|kind=Illusion: Other
+|targ=Self
+|mana=70
+|effects=1: Wolf<br>2: Increase ATK by 15<br>3: Increase Cold Resist by 10
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=70
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion<br>+15 ATK<br>+10 Cold Resist
-}}
-{{RadSpellRow2
-|name=Rampage
-|description=Single Target Melee Buff with Damage Absorb (Max: 90)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rampage
+|kind=Rune
+|targ=Friendly
+|mana=90
+|effects=1: Increase Strength by 29 (L38) to 35 (L50)<br>2: Increase Stoneskin by 78 (L38) to 90 (L50)<br>3: Decrease AGI by 20
+|duration=6 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=90
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=5 Min
-|max=+35 STR<br>-20 AGI
-}}
-{{RadSpellRow2
-|name=Wandering Mind
-|description=Mana Tap over time (Max: 120 Mana)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Wandering Mind
+|kind=Mana Drain
+|targ=Single
+|mana=5
+|effects=1: Decrease Mana by 6 per tick
+|duration=2 Min
 |school=Conjuration
 |location=Vendor
-|mana=5
-|kind=Detrimental
-|targ=Single
-|duration=2 Min
-|max=-6 Mana/tick
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2650,48 +2450,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Celerity
-|description=Single Target Haste Spell (Max: 50%)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Haste
+|targ=Friendly
 |mana=185
-|kind=Utility
-|targ=Single Friendly (or Self)
+|effects=1: Increase Attack Speed by 47% (L39) to 50% (L44)
 |duration=16 Min
-|max=+50% Atkspd
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Immobilize
-|description=Single Target Fast Root Spell (Max: 60 Secs)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=80
-|kind=Detrimental
+|kind=Root
 |targ=Single
+|mana=80
+|effects=1: Root
 |duration=1 Min
-|max=Root
-}}
-{{RadSpellRow2
-|name=Mass Distill Mana
-|description=Create 5 [[Vial of Distilled Mana]]
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=1200
-|kind=Summon
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Mass Distill Mana
+|kind=Create Item
 |targ=Self
+|mana=1200
+|effects=1: {{:Summoned: Vial of Distilled Mana}} (×5)
 |duration=Instant
-|max=Summon Item #10253
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2704,60 +2500,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Arch Shielding
-|description=Self Only HP, MR, and AC Buff
-|era={{Classic Short}}
+|kind=Shielding
+|targ=Self
+|mana=200
+|effects=1: Increase Max Hitpoints by 140 (L40) to 150 (L50)<br>2: Increase AC by 20 (L40) to 22 (L48)<br>3: Increase Magic Resist by 20
+|duration=Permanent
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Self
-|duration=Permanent
-|max=+150 Max HP<br>+22 AC<br>+20 Magic Resist
-}}
-{{RadSpellRow2
-|name=Boon of the Garou
-|description=Single Target Werewolf Form +Dex +LifeTap
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Boon of the Garou
+|kind=Combat Innates
+|targ=Group Member
+|mana=100
+|effects=1: Werewolf<br>2: Procs Lifetap Strike<br>3: Increase ATK by 30<br>4: Increase DEX by 100
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Target Group Member or Self
-|duration=Instant
-|max=Illusion<br>Procs: Lifetap Strike<br>+30 ATK<br>+100 DEX
-}}
-{{RadSpellRow2
-|name=Incapacitate
-|description=Single Target Melee Debuff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Incapacitate
+|kind=Disempowering
+|targ=Single
+|mana=150
+|effects=1: Decrease AGI by 45 (L40) to 55 (L50)<br>2: Decrease Strength by 45 (L40) to 55 (L50)<br>3: Decrease AC by 17 (L40) to 20 (L50)
+|duration=6 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Detrimental
-|targ=Single
-|duration=5 Min
-|max=-55 AGI<br>-55 STR<br>-20 AC
-}}
-{{RadSpellRow2
-|name=Rune IV
-|description=Single Target Damage Absorber (Max: 394)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Rune IV
+|kind=Rune
+|targ=Friendly
+|mana=236
+|effects=1: Increase Stoneskin by 305 (L40) to 394 (L50)
+|duration=90 Min
 |school=Abjuration
 |location=Vendor
-|mana=236
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=90 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2770,60 +2561,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Brilliance
-|description=Single Target Intelligence Buff
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Wisdom/Intelligence
+|targ=Friendly
 |mana=125
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase WIS by 6 (L41) to 7 (L50)<br>2: Increase INT by 11 (L41) to 13 (L50)
 |duration=40 Min
-|max=+1 WIS
-}}
-{{RadSpellRow2
-|name=Shiftless Deeds
-|description=Single Target Slowing Spell (Max: 65%)
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=200
-|kind=Detrimental
-|targ=Single
-|duration=2 Min 30 Sec
-|max=-65% Atkspd
-}}
-{{RadSpellRow2
-|name=Tashania
-|description=Single Target Unresistable Magic Resistance Debuffer (Max: 33)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shiftless Deeds
+|kind=Slow
+|targ=Single
+|mana=200
+|effects=1: Decrease Attack Speed by 46% (L41) to 55% (L50)<br>2: Increase Disease Counter by 12
+|duration=3 Min 30 Sec
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Tashania
+|kind=Resist Debuffs
+|targ=Single
+|mana=30
+|effects=1: Increase Poison Counter by 1<br>2: Decrease Magic Resist by 29 (L41) to 33 (L48)
+|duration=14 Min
 |school=Abjuration
 |location=[[Coin of Tash (Tashania){{!}}Quest]]
-|mana=30
-|kind=Detrimental
-|targ=Single
-|duration=11 Min
-|max=-33 Magic Resist
-}}
-{{RadSpellRow2
-|name=Yegoreff's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Yegoreff's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=250
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=250
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2836,60 +2622,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Boon of the Clear Mind
-|description=Group Clarity
-|era={{Classic Short}}
+|kind=Mana
+|targ=Group
+|mana=175
+|effects=1: Increase Mana by 6 (L42) to 7 (L50) per tick
+|duration=27 Min
 |school=Alteration
 |location=Vendor
-|mana=175
-|kind=Regen
-|targ=Group
-|duration=27 Min
-|max=+1 Mana
-}}
-{{RadSpellRow2
-|name=Illusion: Werewolf
-|description=Self Only Morph to Werewolf and Major Melee Buff
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Werewolf
+|kind=Illusion: Other
+|targ=Self
+|mana=90
+|effects=1: Werewolf
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=90
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Pillage Enchantment
-|description=Single Target Magic Buff Remover (Max: 4) Dispell
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Pillage Enchantment
+|kind=Dispel
+|targ=Single
+|mana=70
+|effects=1: Dispel (4)
+|duration=Instant
 |school=Abjuration
 |location=Vendor
-|mana=70
-|kind=Detrimental
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Weakness
-|description=Single Target Strength Debuff (Max: 65)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Weakness
+|kind=Disempowering
+|targ=Single
+|mana=120
+|effects=1: Decrease Strength by 57 (L42) to 65 (L50)
+|duration=3 Min 54 Sec
 |school=Alteration
 |location=Vendor
-|mana=120
-|kind=Detrimental
-|targ=Single
-|duration=3 Min
-|max=-65 STR
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2902,60 +2683,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Bounce
-|description=Reflect spell chance
-|era={{Classic Short}}
+|kind=Reflection
+|targ=Self
+|mana=100
+|effects=1: Increase Spell Reflect by 40
+|duration=12 Sec
 |school=Abjuration
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Self
-|duration=12 Sec
-|max=
-}}
-{{RadSpellRow2
-|name=Color Skew
-|description=Stuns all Targets Around Caster (8 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Color Skew
+|kind=Stun DD
+|targ=PB AE
+|mana=60
+|effects=1: Stun: 8s (up to L55)
+|duration=Instant
 |school=Divination
 |location=Vendor
-|mana=60
-|kind=Damage
-|targ=PB AE
-|duration=Instant
-|max=Stun 8s (max L55)
-}}
-{{RadSpellRow2
-|name=Discordant Mind
-|description=Single Target Magical Direct Damage (Max: 528)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Discordant Mind
+|kind=Magic DD
+|targ=Single
+|mana=126
+|effects=1: Decrease Hitpoints by 387<br>2: Stun: 1s (up to L55)
+|duration=Instant
 |school=Evocation
 |location=Vendor
-|mana=126
-|kind=Damage
-|targ=Single
-|duration=Instant
-|max=387 Dmg<br>Stun 1s (max L55)
-}}
-{{RadSpellRow2
-|name=Summon Companion
-|description=Summon Your Pet to Your Location
 |era={{Classic Short}}
-|school=Conjuration
-|location=Vendor
-|mana=50
+}}
+{{KhazamSpellRow
+|name=Summon Companion
 |kind=Pet
 |targ=Self
+|mana=50
+|effects=1: Call Pet
 |duration=Instant
-|max=
+|school=Conjuration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -2968,48 +2744,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Guard of Alendar
-|description=Absorb spell damage
-|era={{Classic Short}}
+|kind=Spell Guard
+|targ=Friendly
+|mana=175
+|effects=1: Increase SDR by 20
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=175
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Illusion: Scaled Wolf
-|description=Scaled Wolf illusion
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Illusion: Scaled Wolf
+|kind=Illusion: Other
+|targ=Self
+|mana=150
+|effects=1: Chokidai
+|duration=72 Min
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Utility
-|targ=Self
-|duration=72 Min
-|max=Illusion
-}}
-{{RadSpellRow2
-|name=Leviathan Eyes
-|description=Water breathing, night vision, see invisible
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Leviathan Eyes
+|kind=Vision
+|targ=Friendly
+|mana=100
+|effects=1: See Invisible<br>2: Ultravision<br>3: Enduring Breath (Water Breathing)
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=100
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=36 Min
-|max=
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3022,60 +2794,55 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Illusion: Imp
-|description=Self only Imp illusion, levitation
-|era={{Classic Short}}
+|kind=Illusion: Other
+|targ=Self
+|mana=110
+|effects=1: Imp<br>2: 100% chance · Illusion Benefit Levitation
+|duration=36 Min
 |school=Divination
 |location=Vendor
-|mana=110
-|kind=Utility
-|targ=Self
-|duration=36 Min
-|max=Illusion
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Paralyzing Earth
-|description=Single Target Root Spell (Max: 3 Mins)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=100
-|kind=Detrimental
+|kind=Root
 |targ=Single
+|mana=100
+|effects=1: Root
 |duration=3 Min
-|max=Root
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Purify Mana
-|description=Create 1 [[Vial of Purified Mana]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=500
-|kind=Summon
+|kind=Create Item
 |targ=Self
+|mana=500
+|effects=1: {{:Summoned: Vial of Purified Mana}}
 |duration=Instant
-|max=Summon Item #10254
-}}
-{{RadSpellRow2
-|name=Reoccurring Amnesia
-|description=Persistent Memory Blur
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
-|mana=100
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Reoccurring Amnesia
+|kind=Memory Blur
 |targ=Single
+|mana=100
+|effects=1: Memory Blur · 25% chance
 |duration=24 Sec
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3088,48 +2855,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Adorning Grace
-|description=Single Target Charisma Buff (Max: 40)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
+|kind=Charisma
+|targ=Friendly
 |mana=110
-|kind=Buff
-|targ=Single Friendly (or Self)
+|effects=1: Increase CHA by 40
 |duration=72 Min
-|max=+40 CHA
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Allure
-|description=Charm (Level 51 Cap)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=245
-|kind=Detrimental
+|kind=Charm
 |targ=Single
-|duration=16 Min
-|max=Charm (max L51)
-}}
-{{RadSpellRow2
-|name=Blanket of Forgetfulness
-|description=Area Memory Blur
-|era={{Classic Short}}
+|mana=245
+|effects=1: Charm (up to L51)
+|duration=20 Min 30 Sec
 |school=Alteration
 |location=Vendor
-|mana=175
-|kind=Detrimental
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Blanket of Forgetfulness
+|kind=Memory Blur
 |targ=Targeted AE
+|mana=175
+|effects=1: Memory Blur · 20% chance
 |duration=Instant
-|max=
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3142,72 +2905,66 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Berserker Spirit
-|description=Single Target Melee Buff with Damage Absorb (Max: 200)
-|era={{Classic Short}}
+|kind=Rune
+|targ=Friendly
+|mana=150
+|effects=1: Increase Strength by 40<br>2: Increase Stoneskin by 200<br>3: Decrease AGI by 20
+|duration=5 Min
 |school=Alteration
 |location=Vendor
-|mana=150
-|kind=Utility
-|targ=Single Friendly (or Self)
-|duration=5 Min
-|max=+40 STR<br>-20 AGI
-}}
-{{RadSpellRow2
-|name=Dazzle
-|description=Single Target Mesmerize Spell (96 Secs)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Dazzle
+|kind=Enthrall
+|targ=Single
+|mana=110
+|effects=1: Mesmerize (up to L55)
+|duration=1 Min 36 Sec
 |school=Conjuration
 |location=Vendor
-|mana=110
-|kind=Detrimental
-|targ=Single
-|duration=1 Min 36 Sec
-|max=Mez (max L55)
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Gasping Embrace
-|description=Single Target Magical Debuff DoT (710 Dmg)
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=150
-|kind=Damage Over Time
+|kind=Magic DoT
 |targ=Single
+|mana=150
+|effects=1: Decrease Hitpoints by 113<br>2: Decrease Strength by 28 (L47) to 30 (L50)<br>3: Decrease AGI by 28 (L47) to 30 (L50)<br>4: Decrease Hitpoints by 86 (L47) to 89 (L50) per tick
 |duration=48 Sec
-|max=-113 Dmg<br>-30 STR<br>-30 AGI<br>-89 HP/tick
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Mass Purify Mana
-|description=Create 5 [[Vial of Purified Mana]]
-|era={{Classic Short}}
-|school=Alteration
-|location=Vendor
-|mana=1500
-|kind=Summon
+|kind=Create Item
 |targ=Self
+|mana=1500
+|effects=1: {{:Summoned: Vial of Purified Mana}} (×5)
 |duration=Instant
-|max=Summon Item #10254
-}}
-{{RadSpellRow2
-|name=Swift Like the Wind
-|description=Single Target Haste Spell (60%)
-|era={{Classic Short}}
 |school=Alteration
 |location=Vendor
+|era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Swift Like the Wind
+|kind=Haste
+|targ=Friendly
 |mana=250
-|kind=Utility
-|targ=Single Friendly (or Self)
+|effects=1: Increase Attack Speed by 60%
 |duration=16 Min
-|max=+60% Atkspd
+|school=Alteration
+|location=Vendor
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3220,48 +2977,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Group Resist Magic
-|description=Group Magical Resistance Buff (Max: 55)
-|era={{Classic Short}}
+|kind=Resist Buff
+|targ=Group
+|mana=200
+|effects=1: Increase Magic Resist by 53 (L48) to 55 (L50)
+|duration=36 Min
 |school=Abjuration
 |location=Vendor
-|mana=200
-|kind=Buff
-|targ=Group
-|duration=36 Min
-|max=+55 Magic Resist
-}}
-{{RadSpellRow2
-|name=Kintaz's Animation
-|description=Summon an Animation
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Kintaz's Animation
+|kind=Sum: Animation
+|targ=Self
+|mana=300
+|effects=1: Summons an Animation Pet
+|duration=Instant
 |school=Conjuration
 |location=Vendor
-|mana=300
-|kind=Pet
-|targ=Self
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Shadow
-|description=Single Target AC Buff (Max: 20)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Shadow
+|kind=Armor Class
+|targ=Friendly
+|mana=70
+|effects=1: Increase AC by 16
+|duration=90 Min
 |school=Abjuration
 |location=Vendor
-|mana=70
-|kind=Buff
-|targ=Single Friendly (or Self)
-|duration=90 Min
-|max=+16 AC
+|era={{Classic Short}}
 }}
 </table>
 </div>
@@ -3274,48 +3027,44 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
       <th>Type</th>
       <th>Target</th>
       <th>Mana</th>
-      <th>Max Effect</th>
+      <th>Effects</th>
       <th>Duration</th>
-      <th>Description</th>
       <th>Skill</th>
       <th>Location</th>
       <th>Era</th>
     </tr>
-{{RadSpellRow2
+{{KhazamSpellRow
 |name=Collaboration
-|description=Self Only NPC Faction Boost
-|era={{Classic Short}}
+|kind=Alliance
+|targ=Single
+|mana=75
+|effects=1: Increase Faction by 300
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=75
-|kind=Utility
-|targ=Single
-|duration=Instant
-|max=
-}}
-{{RadSpellRow2
-|name=Improved Invisibility
-|description=Self Only Fixed Duration Invisibility
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Improved Invisibility
+|kind=Invisibility
+|targ=Self
+|mana=75
+|effects=1: Improved Invisibility
+|duration=10 Min
 |school=Divination
 |location=Vendor
-|mana=75
-|kind=Utility
-|targ=Self
-|duration=10 Min
-|max=
-}}
-{{RadSpellRow2
-|name=Theft of Thought
-|description=Single Target Mana Tap (Max: 400)
 |era={{Classic Short}}
+}}
+{{KhazamSpellRow
+|name=Theft of Thought
+|kind=Mana Drain
+|targ=Lifetap
+|mana=25
+|effects=1: Decrease Mana by 340
+|duration=Instant
 |school=Alteration
 |location=Vendor
-|mana=25
-|kind=Detrimental
-|targ=Lifetap
-|duration=Instant
-|max=-340 Mana
+|era={{Classic Short}}
 }}
 </table>
 </div>

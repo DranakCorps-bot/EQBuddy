@@ -68,7 +68,7 @@ You say, 'What word components?'
 
 == Drop Rate Notes ==
 
-* [[Shadowed Book]] is a very rare drop off of any of the shadowed men in any zone. It can take a couple of hours to farm this piece.
+* [[Shadowed Book]] is a very rare drop off of any of the shadowed men in any zone. It can take a couple of hours to farm this piece. One mob that has a 100% drop rate of this item is the [[An Evangelist of Hate]] from the [[Plane of Hate]].
 
 * [[Book of Frost]] (drops off of [[An icy goblin]] in Permafrost); the center mob in the room, PHs are as other mobs in the jail. 
 

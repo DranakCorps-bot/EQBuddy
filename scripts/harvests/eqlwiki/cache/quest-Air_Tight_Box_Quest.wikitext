@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_larkon_theardor.png|frame|Larkon Theardor]]
+[[File:npc_larkon_theardor.png|thumb|Larkon Theardor]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
@@ -70,11 +70,11 @@ You say, 'Larkon sent me'
 : Larkon Theardor says, 'Whew!! What smells of rotting disease? Oh.. It's you. I see you've gathered all the diseased livers. I shall have them incinerated in the scrapyard. The only reason we do this is to keep the Dark Reflection from using these components in their black arts. Take this. I hope you use it wisely. Oh, and.. take a bath. You stink!!'
 
 <div class="facblock">
-* Your faction standing with [[Eldritch Collective]] got better.
-* Your faction standing with [[Gem Choppers]] got better.
-* Your faction standing with [[King AkAnon]] got better.
-* Your faction standing with [[Dark Reflection]] got worse.
-* Your faction standing with [[The Dead]] got worse.
+* Your faction standing with [[Eldritch Collective]] has been adjusted by 10.
+* Your faction standing with [[Gem Choppers]] has been adjusted by 5.
+* Your faction standing with [[King AkAnon]] has been adjusted by 5.
+* Your faction standing with [[Dark Reflection]] has been adjusted by -1.
+* Your faction standing with [[The Dead]] has been adjusted by -1.
 </div> 
 
 {{YouGainExperience}}

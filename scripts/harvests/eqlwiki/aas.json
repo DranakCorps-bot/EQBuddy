@@ -21,7 +21,7 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "3/6/?",
+      "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1."
@@ -32,10 +32,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/25/?%. Requirements: Level 1."
     },
     {
       "name": "Blacksmithing Mastery",
@@ -43,10 +43,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/?%. Requirements: Level 1."
     },
     {
       "name": "Brewing Mastery",
@@ -54,7 +54,7 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1."
@@ -109,7 +109,7 @@
       "class": null,
       "max_rank": 6,
       "ranks_raw": "6",
-      "cost_per_rank_raw": "3/?/?/?/?/?",
+      "cost_per_rank_raw": "3/3/3/3/3/3",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "Training with the sages and merchants of Norrath gives adventurers the chance to hone their crafting skills. This passive ability allows you to raise 1/2/3/4/5/6 additional standard tradeskill (Baking, Blacksmithing, Brewing, Fletching, Jewelcraft, Pottery, or Tailoring) from its initial Specialization cap of 200 up to 300. Requirements: Level 1."
@@ -142,10 +142,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/25/?%. Requirements: Level 1."
     },
     {
       "name": "Foraging",
@@ -197,10 +197,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "1/1/?",
+      "cost_per_rank_raw": "1/1/1",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability increases the amount of air you can hold in your lungs by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability increases the amount of air you can hold in your lungs by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Innate Metabolism",
@@ -208,10 +208,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "1/?/?",
+      "cost_per_rank_raw": "1/1/2",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces your food and drink consumption by 110/125/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces your food and drink consumption by 110/125/150%. Requirements: Level 1."
     },
     {
       "name": "Innate Regeneration",
@@ -222,7 +222,7 @@
       "cost_per_rank_raw": "1/1/1/2/3/5/5",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability increases your health regeneration by 1/1/1/2/3/5/5 point(s). Requirements: Level 1."
+      "effect_text": "This passive ability increases your health regeneration by 1/1/1/1/1/1/1 point(s). Requirements: Level 1."
     },
     {
       "name": "Innate Spell Resistance",
@@ -296,10 +296,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/25/?%. Requirements: Level 1."
     },
     {
       "name": "Quick Buff",
@@ -340,10 +340,10 @@
       "class": null,
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "2/?/?",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/?%. Requirements: Level 1."
     },
     {
       "name": "Acrobatics",

@@ -1,5 +1,5 @@
 <div style="float:right;margin-left:20px;">__TOC__</div>
-[[File:npc_fabian.png|frame|Fabian]]
+[[File:npc_fabian.png|thumb|Fabian]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|East Freeport]]

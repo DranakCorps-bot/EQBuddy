@@ -23,7 +23,7 @@
 |'''soldungb'''
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|22:00
+|11:00
 |-
 ! '''Succor/Evacuate:'''
 | -424, -263 (Zone line to Lavastorm)

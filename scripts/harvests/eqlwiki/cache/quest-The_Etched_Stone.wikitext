@@ -1,6 +1,6 @@
 {{Classic Era}}
 
-[[File:npc_kazzel_d`leryt.png|upright=1.5|thumb|Kazzel D`Leryt]]
+[[File:npc_kazzel_d`leryt.png|thumb|Kazzel D`Leryt]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Rathe Mountains]]

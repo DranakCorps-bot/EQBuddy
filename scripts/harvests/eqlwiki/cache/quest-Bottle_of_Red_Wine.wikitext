@@ -1,6 +1,6 @@
 __NOTOC__
 {{Classic Era}}
-[[File:npc_lokar_tobiath.png|frame|Lokar To`Biath ]]
+[[File:npc_lokar_tobiath.png|thumb|Lokar To`Biath ]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Third Gate]]
