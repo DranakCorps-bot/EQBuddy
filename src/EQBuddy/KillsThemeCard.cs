@@ -24,7 +24,7 @@ internal static class KillsThemeCard
         Func<KillsCardView> newKills,
         Action popOut,
         Action bringWindowForward,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         KillsCardView? kills = null;
         KillsCardView Kills() => kills ??= newKills();
@@ -45,7 +45,7 @@ internal static class KillsThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Kills & Drops window — the full lists, on your second monitor",
-            bodyMaxHeight: bodyMaxHeight);
+            bodyCap: bodyCap);
 
         popOutHost.Content = card.PopOutButton;
         return card;

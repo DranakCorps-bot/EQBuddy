@@ -17,6 +17,17 @@ namespace EQBuddy;
 /// </summary>
 internal static class WidgetDump
 {
+    /// <summary>The cap in force on whichever theme card currently owns a body, or the
+    /// floor when none does (#250). Only one theme is ever inline in the review set, and
+    /// with none open the floor is the honest answer: nothing is being capped.</summary>
+    private static double ThemeBodyCapInForce(MainWindow w) =>
+        w._progressHost.IsInline ? w._progressCard.BodyCap
+        : w._creatureHost.IsInline ? w._killsCard.BodyCap
+        : w._lootHost.IsInline ? w._lootCard.BodyCap
+        : w._questsHost.IsInline ? w._questsCard.BodyCap
+        : w._worldHost.IsInline ? w._worldCard.BodyCap
+        : EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight;
+
     /// <summary>Write the dump when the EXPAND gate is up. Same guard, same file, same
     /// keys as the block always had — the E2E suite's assertions are the contract.</summary>
     public static void MaybeWrite(MainWindow w, StatsSnapshot s)
@@ -69,6 +80,19 @@ internal static class WidgetDump
                         ? $"progressTab={ProgressSurface.KeyFor(w._progressCard.SelectedTab)} " +
                           $"progressTabs={w._progressCard.TabCount} "
                         : "") +
+                    // #250: the expanded theme body's cap, and the height it is derived
+                    // from. 320 on a widget nobody has dragged — which is the assertion
+                    // that matters, because "pixel-identical until you touch the grip" is
+                    // the whole safety of the change and nothing else can see it. The
+                    // WPF layer has no unit tests (docs/TestPlan.md §5), and an absent
+                    // control photographs as an unremarkable panel (trap 29), so a
+                    // screenshot could never say what number is in force.
+                    $"themeBodyCap={ThemeBodyCapInForce(w):0} " +
+                    // Its own key rather than a sentinel inside contentHeight: DumpValue
+                    // answers -1 for "absent", so a NaN spelled as -1 would be a value the
+                    // suite cannot tell from a dump that never mentioned it.
+                    $"contentHeightAuto={(double.IsNaN(w._settings.ContentHeight) ? 1 : 0)} " +
+                    $"contentHeight={(double.IsNaN(w._settings.ContentHeight) ? 0 : w._settings.ContentHeight):0} " +
                     // The other two themes' placement, PR 2 - same contract as the
                     // progress keys above: inline and windowOpen are never both 1, and
                     // the tab keys are emitted only while the CARD owns the body.

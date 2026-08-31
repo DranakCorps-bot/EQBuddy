@@ -387,6 +387,15 @@ internal abstract class SectionCard : Border
         set { }
     }
 
+    /// <summary>What this card costs the stack when only its HEADER is counted, margins
+    /// included — the input <c>WidgetMetrics.ThemeBodyChrome</c> wants (#250).
+    ///
+    /// A collapsed card is all header, so the measured height is already the answer and
+    /// this default serves every card that cannot expand at all. A card that CAN expand
+    /// overrides it, because a sibling's open body is the player asking for two open cards
+    /// rather than a reason to shrink the one being capped (Bevel, 2026-08-31).</summary>
+    public virtual double HeaderExtent => Bounds.Height + Margin.Top + Margin.Bottom;
+
     protected void RaiseExpandedChanged(bool expanded) => ExpandedChanged?.Invoke(expanded);
 }
 
@@ -394,6 +403,12 @@ internal sealed class SectionPanel : SectionCard
 {
     private readonly Border _body;
     private readonly PathIcon _chevron;
+    private readonly Border _headerBorder;
+
+    /// <summary>Expanded, the header alone; collapsed, the whole card IS the header.</summary>
+    public override double HeaderExtent =>
+        (_body.IsVisible ? _headerBorder.Bounds.Height : Bounds.Height)
+        + Margin.Top + Margin.Bottom;
 
     public override bool IsExpanded
     {
@@ -426,7 +441,7 @@ internal sealed class SectionPanel : SectionCard
         Grid.SetColumn(_chevron, 1);
         headerGrid.Children.Add(_chevron);
 
-        var headerBorder = new Border
+        var headerBorder = _headerBorder = new Border
         {
             Background = Brushes.Transparent,
             CornerRadius = new CornerRadius(6),

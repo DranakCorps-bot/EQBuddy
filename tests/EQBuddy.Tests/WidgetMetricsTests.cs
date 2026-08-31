@@ -167,6 +167,84 @@ public class WidgetMetricsTests
         Assert.Equal(WidgetMetrics.ThemeBodyCap(700.6, 180.3), cap);
     }
 
+    /// <summary>The chrome argument, summed the same way on both lanes — which is the
+    /// whole reason it lives here and not in two MainWindows.</summary>
+    [Fact]
+    public void TheChromeIsTheSumOfWhatEveryVisibleCardCosts()
+    {
+        Assert.Equal(150, WidgetMetrics.ThemeBodyChrome([40, 40, 70]));
+        Assert.Equal(0, WidgetMetrics.ThemeBodyChrome([]));
+    }
+
+    /// <summary>ONE card the layout has not measured yet poisons the total on purpose.
+    /// Dropping it would under-count the chrome and quietly over-grant the cap; making the
+    /// whole answer NaN sends ThemeBodyCap to the floor, which is what the widget drew
+    /// before any of this existed. Same instinct as trap 34 — the failure that matters is
+    /// the one you cannot see, so it must not look like a smaller number.</summary>
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void OneUnmeasuredCardSendsTheWholeCapBackToTheFloor(double unmeasured)
+    {
+        var chrome = WidgetMetrics.ThemeBodyChrome([40, unmeasured, 70]);
+        Assert.False(double.IsFinite(chrome));
+        Assert.Equal(WidgetMetrics.ThemeBodyMaxHeight, WidgetMetrics.ThemeBodyCap(900, chrome));
+    }
+
+    /// <summary>A negative extent is a toolkit having a bad day, not room to spend.</summary>
+    [Fact]
+    public void ANegativeCardExtentCountsAsNothingRatherThanAsCredit()
+    {
+        Assert.Equal(110, WidgetMetrics.ThemeBodyChrome([40, -30, 70]));
+    }
+
+    /// <summary>The whole trip, as the widget makes it: five cards visible, one of them
+    /// open. The open card hands over what IT occupies minus its body; the other four hand
+    /// over their headers. 700 − (36×4 + 96) = 460.</summary>
+    [Fact]
+    public void TheWidgetsWholeSumWithFourClosedCardsAndOneOpen()
+    {
+        var chrome = WidgetMetrics.ThemeBodyChrome([36, 36, 96, 36, 36]);
+        Assert.Equal(240, chrome);
+        Assert.Equal(460, WidgetMetrics.ThemeBodyCap(700, chrome));
+        // And the same stack undragged is untouched — the assertion that keeps every
+        // existing player's widget exactly where it was.
+        Assert.Equal(WidgetMetrics.ThemeBodyMaxHeight,
+            WidgetMetrics.ThemeBodyCap(double.NaN, chrome));
+    }
+
+    /// <summary>
+    /// **The drag the player made and the height the stack was GIVEN are different
+    /// numbers, and only the second one may reach the body cap.**
+    ///
+    /// They agree at 100% on a big monitor, which is exactly why this is worth pinning:
+    /// at 125% a 900-unit drag on a 1080p screen becomes 736 units of actual stack, and a
+    /// body sized from the raw 900 would claim room the stack never had. Same family as
+    /// #144 — two numbers that agree at the default and diverge where nobody looks. The
+    /// widgets compose the two calls in this order for this reason.
+    /// </summary>
+    [Fact]
+    public void TheBodyIsSizedFromTheHeightTheMonitorGRANTEDNotTheDragTheplayerMade()
+    {
+        const double screenCap = 920;   // a 1080p work area, less the widget's chrome
+        const double asked = 900;
+        const double chrome = 300;
+
+        var granted = WidgetMetrics.SectionMaxHeight(screenCap, asked, uiScale: 1.25);
+        Assert.Equal(736, granted);     // 920 / 1.25 — the drag did not survive intact
+
+        Assert.Equal(436, WidgetMetrics.ThemeBodyCap(granted, chrome));
+        // What the raw drag would have claimed, and does not: 164 units of body the stack
+        // was never given, which is the scrollbar this cap exists to avoid.
+        Assert.Equal(600, WidgetMetrics.ThemeBodyCap(asked, chrome));
+
+        // At 100% on the same monitor the two agree — the case that hides the bug.
+        var atFullScale = WidgetMetrics.SectionMaxHeight(screenCap, asked, uiScale: 1.0);
+        Assert.Equal(asked, atFullScale);
+        Assert.Equal(WidgetMetrics.ThemeBodyCap(asked, chrome),
+            WidgetMetrics.ThemeBodyCap(atFullScale, chrome));
+    }
+
     // ---- #239 (disberon): the mode swap anchors the RIGHT edge, both directions ----
 
     [Fact]

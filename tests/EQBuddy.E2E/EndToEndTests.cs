@@ -474,6 +474,71 @@ public sealed class EndToEndTests
         Assert.Equal(screenCap, assigned * scale, 1);
     }
 
+    /// <summary>
+    /// #250 (Paineless): **an untouched widget is pixel-identical to what shipped before
+    /// the cap learned to scale.** ContentHeight is NaN until someone drags the grip, and
+    /// this is the assertion that protects every existing player from a change none of
+    /// them asked for.
+    ///
+    /// It has to be a launched app. The WPF layer has no unit tests (docs/TestPlan.md §5),
+    /// the cap is assigned from a measurement no unit test can produce, and an absent or
+    /// wrong MaxHeight photographs as an unremarkable card (trap 29).
+    /// </summary>
+    [Fact]
+    public void AnUndraggedWidgetKeepsTheOldThemeBodyCap()
+    {
+        using var app = new AppHarness();
+        app.Launch();
+        app.WaitForDump("themeBodyCap", 320,
+            "an undragged widget keeps the theme body cap it has always had");
+
+        Assert.Equal(1, app.DumpValue("contentHeightAuto"));
+        // EQBUDDY_EXPAND=1 opens the World theme card, so the number above is a REAL
+        // expanded body's cap and not a default nobody consulted.
+        Assert.Equal(1, app.DumpValue("worldInline"));
+    }
+
+    /// <summary>
+    /// The ask itself, in a launched app: drag the widget taller and the open theme's body
+    /// gets more room. Paineless reached for exactly this control and reported that it did
+    /// nothing — *"cannot just expand window size"* — because the cap was a constant.
+    ///
+    /// 4000 is deliberately further than any monitor allows. The assertion is a RANGE
+    /// rather than 640 on purpose: the drag is clamped to the work area before it reaches
+    /// this arithmetic, so the exact answer depends on the screen this runs on — and a
+    /// test that hard-coded the ceiling would be asserting the monitor, not the feature.
+    /// What must hold on every screen is that the body grew and that it stayed bounded:
+    /// one card may double, and it may not eat the monitor. The exact ceiling is pinned in
+    /// <c>WidgetMetricsTests</c> and in the Avalonia render tests, where the screen is not
+    /// a variable.
+    /// </summary>
+    [Fact]
+    public void DraggingTheWidgetTallerGrowsTheOpenThemesBody()
+    {
+        using var app = new AppHarness(s => s.ContentHeight = 4000);
+        app.Launch();
+        app.WaitForWindow("themeBodyCap", "the expanded theme card reports its body cap");
+
+        var cap = app.DumpValue("themeBodyCap");
+        Assert.Equal(0, app.DumpValue("contentHeightAuto"));
+        Assert.Equal(1, app.DumpValue("worldInline"));
+        Assert.True(cap > 320, $"a dragged widget should grow the open body; cap was {cap}");
+        Assert.True(cap <= 640, $"one card may double, never more; cap was {cap}");
+    }
+
+    /// <summary>Dragged SHORTER than the floor, the body keeps the floor — the direction
+    /// that could have made a crowded widget worse than it was before the change.</summary>
+    [Fact]
+    public void DraggingTheWidgetShorterNeverTakesTheThemeBodyBelowTheFloor()
+    {
+        using var app = new AppHarness(s => s.ContentHeight = 200);
+        app.Launch();
+        app.WaitForDump("themeBodyCap", 320,
+            "a widget dragged shorter than the floor keeps the floor");
+
+        Assert.Equal(0, app.DumpValue("contentHeightAuto"));
+    }
+
     /// <summary>The same check at 100%, where the units coincide — a guard against
     /// "fixing" the conversion in a way that only works when it is needed.</summary>
     [Fact]

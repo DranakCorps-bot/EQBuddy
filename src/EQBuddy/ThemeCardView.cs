@@ -49,6 +49,11 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
     private readonly Action _popOut;
     private readonly Action _bringWindowForward;
 
+    /// <summary>Asked for this body's cap, given how much of the card is NOT the body.
+    /// The widget owns the answer because only it can see the rest of the stack; this
+    /// class owns the one measurement the widget cannot reach (#250).</summary>
+    private readonly Func<double, double> _bodyCap;
+
     private readonly StackPanel _root = new();
     private readonly WrapPanel _stripHost = new();
     private readonly EqSegmentedStrip _strip;
@@ -73,21 +78,24 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
         Action popOut,
         Action bringWindowForward,
         string popOutTip,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         (_section, _host, _tabs, _modeFor, _bodyFor, _glanceFor, _render) =
             (section, host, tabs, modeFor, bodyFor, glanceFor, render);
-        (_popOut, _bringWindowForward) = (popOut, bringWindowForward);
+        (_popOut, _bringWindowForward, _bodyCap) = (popOut, bringWindowForward, bodyCap);
 
         _strip = new EqSegmentedStrip(_stripHost);
         _stripHost.Margin = new Thickness(0, 0, 0, Tok.SpaceS);
 
         // The cap Bevel asked for, WITH a scroller, because a MaxHeight without one is a
         // clip: the body would simply stop, with nothing on screen saying there is more.
+        //
+        // It starts at the FLOOR and follows the height grip from the first render
+        // (ApplyBodyCap). A widget nobody has dragged never leaves this number.
         _bodyScroll = new ScrollViewer
         {
             Content = _bodyHost,
-            MaxHeight = bodyMaxHeight,
+            MaxHeight = WidgetMetrics.ThemeBodyMaxHeight,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         };
@@ -129,6 +137,41 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
     public int TabCount => _strip.Count;
 
     public TTab SelectedTab => _host.SelectedTab;
+
+    /// <summary>The body's cap right now, for the <c>EQBUDDY_EXPAND</c> dump — 320 on a
+    /// widget nobody has dragged, more once they have (#250).</summary>
+    public double BodyCap => _bodyScroll.MaxHeight;
+
+    /// <summary>The open room's list is longer than the cap allows, so there IS something
+    /// a taller widget would show. The height grip's tooltip asks, because "everything you
+    /// selected is on screen" stopped being the same statement as "a drag buys you
+    /// nothing" the moment the cap started following the drag.</summary>
+    public bool BodyIsCapped =>
+        _host.IsInline && _bodyScroll.Visibility == Visibility.Visible
+        && _bodyScroll.ScrollableHeight > 0.5;
+
+    /// <summary>
+    /// Point the body's cap at the height the player dragged (#250, Paineless).
+    ///
+    /// Runs on every render of an expanded card — not on a clock, which matters: trap 12
+    /// is a timer that changes a measured size on a <c>SizeToContent</c> always-on-top
+    /// window, and #173 is what that cost a player. This number moves when the layout
+    /// moves. The assignment is skipped unless it actually changed, and
+    /// <see cref="WidgetMetrics.ThemeBodyCap"/> answers in whole units, so a sub-pixel
+    /// wobble cannot reach the windowing system at all.
+    ///
+    /// The measurement handed over is everything this CARD occupies except the body
+    /// itself — header, tab strip, padding. Subtracting the body is what stops the cap
+    /// feeding back into its own input: the difference does not move when the cap does.
+    /// </summary>
+    private void ApplyBodyCap()
+    {
+        var ownChromeAndHeader = _section.ActualHeight
+                                 + _section.Margin.Top + _section.Margin.Bottom
+                                 - _bodyScroll.ActualHeight;
+        var cap = _bodyCap(ownChromeAndHeader);
+        if (Math.Abs(_bodyScroll.MaxHeight - cap) > 0.5) _bodyScroll.MaxHeight = cap;
+    }
 
     /// <summary>Drive the expander FROM the host, rather than reading it as truth.
     ///
@@ -200,6 +243,7 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
             _built[selected] = body = _bodyFor(selected);
         _bodyHost.Content = body;
         _render(selected, s);
+        ApplyBodyCap();
     }
 
     /// <summary>

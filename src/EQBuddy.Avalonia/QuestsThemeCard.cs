@@ -48,7 +48,8 @@ internal static class QuestsThemeCard
         AppSettings settings,
         Func<(int Done, int Total)?> unlockCounts,
         Action popOut,
-        Action bringWindowForward)
+        Action bringWindowForward,
+        Func<double, double> bodyCap)
     {
         InlineChecklist? body = null;
         InlineChecklist Body() => body ??= new InlineChecklist();
@@ -78,6 +79,6 @@ internal static class QuestsThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Quest Tracker — search, filters, and the working checklists",
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: bodyCap);
     }
 }

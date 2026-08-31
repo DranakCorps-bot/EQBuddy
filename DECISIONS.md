@@ -17,6 +17,28 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-08-31
 
+- **The 320-cap chrome does NOT subtract the widget's title bar, KPI strip or status line,
+  though the signed plan says it should.** · The other way: implement the sign literally and
+  subtract them. · Measured instead: the height grip seeds from `SectionScroll.ActualHeight`
+  and assigns straight back to `SectionScroll.MaxHeight`, so `ContentHeight` IS the card
+  stack's viewport and that chrome is already outside it. Subtracting it again would hand
+  every player less body than they dragged for, invisibly and forever. Formula, floor,
+  ceiling and the sibling-body exclusion are all untouched; only the enumeration changed.
+  Told to Helm in `HELM-FEEDBACK.md` at the time rather than after. (PR 0/1, #250 track)
+- **The body cap is sized from the height the MONITOR granted, not the raw drag.** · The
+  other way: pass `ContentHeight` through as the plan's `playerContentHeight` reads. · The
+  two agree at 100% on a big screen and diverge exactly where nobody looks — a 900-unit drag
+  on a 1032px work area is granted 698 units at 125% scale, and a body sized from 900 would
+  claim room the stack never had. Recomputed through `WidgetMetrics.SectionMaxHeight` rather
+  than read off the control, so the answer cannot depend on which writer ran last (trap 33).
+  NaN is still read from the setting, so "never dragged" still means the floor. (PR 1)
+- **`theme-inline-loot.png` was re-shot on this build although it is not the change's
+  subject.** · The other way: leave the committed 2026-08-26 capture as the baseline. · It
+  is the BASELINE half of the acceptance pair, and a pair shot on two different builds is
+  the exact "reads as a regression" failure trap 51 was written about — the stale one
+  already differed in the last card's title. Same fixture, same shot definition, only the
+  build moved. (PR 1)
+
 - **PR #256 follow-up shipped WITHOUT the authorized KnownGaps list, because the premise it
   rested on turned out to be false** · Helm's 2026-08-31 2:05 PM ruling authorized a curated
   known-gaps list, reason `no eqlwiki prose`, for the 24 spells the KhazamSpellRow rename left

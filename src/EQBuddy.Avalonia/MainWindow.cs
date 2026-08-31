@@ -913,20 +913,28 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         grip.PointerEntered += (_, _) =>
         {
             hint.Opacity = 0.7;
-            var scrolling = _sectionsPanel.Bounds.Height > _sectionScroll.Bounds.Height + 1;
-            ToolTip.SetTip(grip, scrolling
-                ? "Drag down to show more cards (the list is scrolling); drag up to shorten. Double-tap: back to automatic."
-                : "The widget is sizing itself automatically — everything you've selected in Options is shown. "
-                  + "Drag up if you'd rather have it shorter (the list scrolls); double-tap returns to automatic.");
+            // Since #250 a drag buys a SECOND thing — the open theme card's body follows
+            // the widget's height — so the old "everything you've selected is shown"
+            // branch would have started lying in exactly the state Paineless reported.
+            // Both widgets read the same wording out of UI.Shared; only the gesture's
+            // name is this toolkit's business.
+            ToolTip.SetTip(grip, HeightGripTip.For(
+                listIsScrolling: _sectionsPanel.Bounds.Height > _sectionScroll.Bounds.Height + 1,
+                anExpandedBodyIsCapped: AnyThemeBodyIsCapped,
+                resetGesture: "Double-tap"));
         };
         grip.PointerExited += (_, _) => hint.Opacity = 0;
         grip.DragStarted += (_, _) => _heightDragStart = _sectionScroll.Bounds.Height;
         grip.DragDelta += (_, e) =>
         {
             // The thumb reports deltas in the scaled widget's space; ContentHeight
-            // lives in pre-scale units so it survives scale changes.
+            // lives in pre-scale units so it survives scale changes. That is why this
+            // does NOT call WidgetMetrics.ContentHeightFromDrag — the WPF twin reads a
+            // SCREEN cursor and has a conversion to do, and this one does not. The FLOOR
+            // is shared, because a hand-copied 120 beside a tested constant is the
+            // near-copy that carried #122 and #152 to Linux.
             _heightDragStart += e.Vector.Y;
-            _settings.ContentHeight = Math.Max(120, _heightDragStart);
+            _settings.ContentHeight = Math.Max(WidgetMetrics.MinSectionHeight, _heightDragStart);
             ApplySectionMaxHeight();
         };
         grip.DragCompleted += (_, _) => _settings.Save();
@@ -1045,7 +1053,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             Header("kills", "Kills & Drops", _killsHeader), _creatureHost,
             newSurfaces: NewCreatureSurfaces,
             popOut: () => ShowCreatureWindow(),
-            bringWindowForward: () => _creatureWindow?.Activate());
+            bringWindowForward: () => _creatureWindow?.Activate(),
+            bodyCap: own => ThemeBodyCap(_killsCard, own));
         _sections["kills"] = _killsCard;
         ToolTip.SetTip(_sections["kills"],
             "Kills & Drops — what died this session, and what it dropped at what rate. "
@@ -1065,7 +1074,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             tabs: s2 => LootTheme.Tabs(s2, _settings.GearChecklist),
             inventoryCount: () => LatestInventory()?.Counts.Count,
             popOut: () => ShowGearLootWindow(),
-            bringWindowForward: () => _gearLootWindow?.Activate());
+            bringWindowForward: () => _gearLootWindow?.Activate(),
+            bodyCap: own => ThemeBodyCap(_lootCard, own));
         _sections["loot"] = _lootCard;
         ToolTip.SetTip(_sections["loot"],
             "Gear & Loot - everything this session picked up, and what is left on "
@@ -1091,7 +1101,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             settings: _settings,
             unlockCounts: () => QuestSurface.UnlockCounts(RaceUnlocks, ClassUnlocks),
             popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
-            bringWindowForward: () => _questsWindow?.Activate());
+            bringWindowForward: () => _questsWindow?.Activate(),
+            bodyCap: own => ThemeBodyCap(_questsCard, own));
         _sections["quests"] = _questsCard;
         ToolTip.SetTip(_sections["quests"],
             "Quests — your Epic 1.0 and Plane of Sky checklists, and what is ready to "
@@ -1118,7 +1129,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             dingUnlocks: s => DingUnlocks(s).Count,
             raidsDefeated: () => _raidLedger.DefeatedCount(),
             popOut: () => ShowProgressWindow(),
-            bringWindowForward: () => _progressWindow?.Activate());
+            bringWindowForward: () => _progressWindow?.Activate(),
+            bodyCap: own => ThemeBodyCap(_progressCard, own));
         _sections["progress"] = _progressCard;
         ToolTip.SetTip(_sections["progress"],
             "Progress - experience and AAs, coin, faction standing, and the raid targets "
@@ -1141,7 +1153,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             Header("misc", "World", _miscHeader), _worldHost,
             travels: () => _travelsView, currentZone: () => CurrentZoneName,
             runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
-            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate());
+            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate(),
+            bodyCap: own => ThemeBodyCap(_worldCard, own));
         _sections["misc"] = _worldCard;
         ToolTip.SetTip(_sections["misc"],
             "World - your zone map, camp timers, travel routes, deaths and zone markers. "
@@ -1485,8 +1498,13 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
 
         // The section list sits inside the scaled widget. Reserve room for the title,
         // status/session lines, borders, and a little work-area breathing room.
-        var scale = Math.Max(0.5, _settings.UiScale);
-        ApplySectionMaxHeight(Math.Max(160, (workingHeight - 160) / scale));
+        //
+        // Handed over in SCREEN units, exactly as the WPF twin does: the pre-scale
+        // conversion belongs to WidgetMetrics.SectionMaxHeight, which is where it is
+        // unit-tested (#144). This lane used to divide here and clamp by hand below — a
+        // near-copy of tested arithmetic, which is precisely the shape that carried #122
+        // and #152 to Linux after Windows had already paid for both.
+        ApplySectionMaxHeight(Math.Max(120, workingHeight - 160));
     }
 
     /// <summary>The section list's height: automatic (fit the monitor) unless the
@@ -1498,10 +1516,44 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void ApplySectionMaxHeight(double? autoCap = null)
     {
         if (autoCap is { } cap) _sectionAutoCap = cap;
-        _sectionScroll.MaxHeight = double.IsNaN(_settings.ContentHeight)
-            ? _sectionAutoCap
-            : Math.Clamp(_settings.ContentHeight, 120, _sectionAutoCap);
+        _sectionScroll.MaxHeight = WidgetMetrics.SectionMaxHeight(
+            _sectionAutoCap, _settings.ContentHeight, _settings.UiScale);
     }
+
+    /// <summary>
+    /// How tall ONE expanded theme card's body may be, given the height the player dragged
+    /// (#250, Paineless: <i>"cannot just expand window size"</i>). The WPF twin's
+    /// <c>MainWindow.ThemeBodyCap</c> line for line, on purpose — Bevel's clarification
+    /// asks for the SAME ContentHeight and chrome inputs on both lanes, and the only way
+    /// that is a fact rather than an intention is one shared rule with two measurers.
+    ///
+    /// Every other visible card contributes its HEADER only: a second open card is the
+    /// player asking for two open cards, not a reason to shrink this one. The asking card
+    /// hands over everything it occupies except the body being capped. All pre-scale —
+    /// the whole stack is under the UI-scale transform, so no conversion belongs here.
+    /// </summary>
+    private double ThemeBodyCap(SectionCard? askingCard, double askingCardChromeExcludingBody) =>
+        WidgetMetrics.ThemeBodyCap(
+            // The height the player asked for, AS THE MONITOR GRANTED IT — the WPF twin's
+            // note carries the reasoning, including why this recomputes from the tested
+            // helper instead of reading the scroller back. NaN still means "never dragged".
+            double.IsNaN(_settings.ContentHeight)
+                ? double.NaN
+                : WidgetMetrics.SectionMaxHeight(
+                    _sectionAutoCap, _settings.ContentHeight, _settings.UiScale),
+            WidgetMetrics.ThemeBodyChrome(
+                _sectionsPanel.Children.OfType<SectionCard>()
+                    .Where(card => card.IsVisible)
+                    .Select(card => ReferenceEquals(card, askingCard)
+                        ? askingCardChromeExcludingBody
+                        : card.HeaderExtent)));
+
+    /// <summary>True while any expanded theme card's body is holding back rows a taller
+    /// widget would show. The height grip's tooltip asks (#250).</summary>
+    private bool AnyThemeBodyIsCapped =>
+        (_progressCard?.BodyIsCapped ?? false) || (_killsCard?.BodyIsCapped ?? false)
+        || (_lootCard?.BodyIsCapped ?? false) || (_questsCard?.BodyIsCapped ?? false)
+        || (_worldCard?.BodyIsCapped ?? false);
 
     /// <summary>CPU% (share of ALL cores, so 100% = the whole machine) and working
     /// set, sampled every 3 s from the process's own counters — cheap enough that

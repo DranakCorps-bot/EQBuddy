@@ -51,7 +51,7 @@ internal static class ProgressThemeCard
         Func<int> raidsDefeated,
         Action popOut,
         Action bringWindowForward,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         // Built on the FIRST expand and kept — a player who never opens the theme pays
         // nothing for it. The same factory the window uses, deliberately: the card and the
@@ -95,7 +95,7 @@ internal static class ProgressThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Progress window — the full rooms, on your second monitor",
-            bodyMaxHeight: bodyMaxHeight);
+            bodyCap: bodyCap);
 
         popOutHost.Content = card.PopOutButton;
         return card;

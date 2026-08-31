@@ -46,6 +46,13 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
 
     private readonly PathIcon _chevron;
     private readonly Border _bodyBorder;
+    private readonly Border _headerBorder;
+
+    /// <summary>Asked for this body's cap, given how much of the card is NOT the body.
+    /// The widget owns the answer because only it can see the rest of the stack — the WPF
+    /// twin's contract verbatim, which is what makes "both lanes feed ThemeBodyCap the
+    /// same inputs" a fact rather than an intention (#250).</summary>
+    private readonly Func<double, double> _bodyCap;
     private readonly WrapPanel _stripHost = new() { Margin = new Thickness(0, 0, 0, Tok.SpaceS) };
     private readonly EqSegmentedStrip _strip;
     private readonly ContentControl _bodyHost = new();
@@ -68,11 +75,11 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
         Action popOut,
         Action bringWindowForward,
         string popOutTip,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         (_host, _tabs, _modeFor, _bodyFor, _glanceFor, _render) =
             (host, tabs, modeFor, bodyFor, glanceFor, render);
-        _bringWindowForward = bringWindowForward;
+        (_bringWindowForward, _bodyCap) = (bringWindowForward, bodyCap);
 
         Background = AppTheme.PanelBrush;
         CornerRadius = new CornerRadius(6);
@@ -82,10 +89,12 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
         _glance = CardParts.EmptyLine("");
         _glance.IsVisible = false;
 
+        // Starts at the FLOOR and follows the height grip from the first render
+        // (ApplyBodyCap). A widget nobody has dragged never leaves this number.
         _bodyScroll = new ScrollViewer
         {
             Content = _bodyHost,
-            MaxHeight = bodyMaxHeight,
+            MaxHeight = WidgetMetrics.ThemeBodyMaxHeight,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
         };
@@ -112,7 +121,7 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
         Grid.SetColumn(_chevron, 2);
         headerGrid.Children.Add(_chevron);
 
-        var headerBorder = new Border
+        var headerBorder = _headerBorder = new Border
         {
             Background = Brushes.Transparent,
             CornerRadius = new CornerRadius(6),
@@ -157,6 +166,44 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
     public int TabCount => _strip.Count;
 
     public TTab SelectedTab => _host.SelectedTab;
+
+    /// <summary>Expanded, the header alone; collapsed, the whole card IS the header. A
+    /// sibling's open body never counts against the card being capped.</summary>
+    public override double HeaderExtent =>
+        (_bodyBorder.IsVisible ? _headerBorder.Bounds.Height : Bounds.Height)
+        + Margin.Top + Margin.Bottom;
+
+    /// <summary>The body's cap right now — 320 on a widget nobody has dragged, more once
+    /// they have (#250). Read by the render tests, which is the coverage this lane has
+    /// that the WPF one does not.</summary>
+    public double BodyCap => _bodyScroll.MaxHeight;
+
+    /// <summary>The open room's list is longer than the cap allows, so there IS something
+    /// a taller widget would show — the height grip's tooltip asks.</summary>
+    public bool BodyIsCapped =>
+        _host.IsInline && _bodyScroll.IsVisible
+        && _bodyScroll.Extent.Height > _bodyScroll.Viewport.Height + 0.5;
+
+    /// <summary>
+    /// Point the body's cap at the height the player dragged (#250) — the WPF twin's
+    /// <c>ApplyBodyCap</c> line for line.
+    ///
+    /// Runs on every render of an expanded card and NOT on a clock: trap 12 is a timer
+    /// that changes a measured size, and this number moves only when the layout does. The
+    /// assignment is skipped unless it changed, and the cap arrives in whole units, so a
+    /// sub-pixel wobble never reaches the windowing system — which on X11 is a geometry
+    /// change on a window stacked over a fullscreen game (#173).
+    ///
+    /// What is handed over is everything the CARD occupies except the body being capped.
+    /// Subtracting the body is what stops the cap feeding back into its own input.
+    /// </summary>
+    private void ApplyBodyCap()
+    {
+        var ownChromeAndHeader = Bounds.Height + Margin.Top + Margin.Bottom
+                                 - _bodyScroll.Bounds.Height;
+        var cap = _bodyCap(ownChromeAndHeader);
+        if (Math.Abs(_bodyScroll.MaxHeight - cap) > 0.5) _bodyScroll.MaxHeight = cap;
+    }
 
     /// <summary>Land the card on a room, for the render tests — the same transition a
     /// chip click takes.</summary>
@@ -221,6 +268,7 @@ internal sealed class ThemeCardPanel<TTab> : SectionCard where TTab : struct, En
             _built[selected] = body = _bodyFor(selected);
         _bodyHost.Content = body;
         _render(selected, s);
+        ApplyBodyCap();
     }
 
     /// <summary>

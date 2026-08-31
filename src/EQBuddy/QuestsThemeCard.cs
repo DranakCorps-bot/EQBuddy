@@ -59,7 +59,7 @@ internal static class QuestsThemeCard
         Func<(int Done, int Total)?> unlockCounts,
         Action popOut,
         Action bringWindowForward,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         InlineChecklist? body = null;
         InlineChecklist Body() => body ??= new InlineChecklist();
@@ -89,7 +89,7 @@ internal static class QuestsThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Quest Tracker — search, filters, and the working checklists",
-            bodyMaxHeight: bodyMaxHeight);
+            bodyCap: bodyCap);
 
         popOutHost.Content = card.PopOutButton;
         return card;
