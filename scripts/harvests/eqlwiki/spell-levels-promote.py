@@ -142,7 +142,16 @@ def main():
         for name, row in data["spells"].items():
             lv = row["level"]
             if 1 <= lv <= LEVEL_CAP:
-                put(name, cls, lv, SOURCE_CLASS, row.get("description") or "")
+                # eqlwiki's class-row template lost its `description` field when
+                # RadSpellRow2 became KhazamSpellRow (2026-08-31); the replacement
+                # `effects` is a <br>-joined mechanics list, not the prose the tooltip
+                # promises. The SPELL PAGE still carries that prose for 97% of them, and
+                # it is the same source step 2 below already trusts -- so fall back to it
+                # rather than inventing a sentence or showing markup. Without this the
+                # class rows come back description-less: 1,352 of 1,352 described before
+                # the rename, 345 of 1,353 after.
+                desc = row.get("description") or page_descriptions.get(name.casefold(), "")
+                put(name, cls, lv, SOURCE_CLASS, desc)
 
     # 2. Spell pages, ONLY for a (class, level) the class page has no section for.
     derived = 0

@@ -94,7 +94,13 @@ LEVEL_RX = re.compile(r"^==+\s*Level\s+(\d+)\s*==+\s*$", re.IGNORECASE | re.MULT
 # with it because only `name` travelled and it precedes `era`; PR 1 carries era and
 # it came out as the literal "{{Classic Short". One level of nesting is all these
 # rows have.
-ROW_RX = re.compile(r"\{\{RadSpellRow2((?:[^{}]|\{\{[^{}]*\}\})*)\}\}", re.DOTALL)
+# eqlwiki renamed this template RadSpellRow2 -> KhazamSpellRow (seen 2026-08-31, the
+# refresh report's own "Changed templates" line). BOTH are accepted: cached wikitext
+# for pages that have not been re-fetched still carries the old name, and a harvest
+# that only knows the new one would gut those pages exactly as this rename gutted
+# these. The rename cost 1,352 spells -> 347 in one run, which broke LevelUnlocks AND
+# ClassInference (its signals are derived from the shipped catalogs).
+ROW_RX = re.compile(r"\{\{(?:RadSpellRow2|KhazamSpellRow)((?:[^{}]|\{\{[^{}]*\}\})*)\}\}", re.DOTALL)
 FIELD_RX = re.compile(r"^\s*\|\s*([a-z_]+)\s*=\s*(.*?)\s*$", re.MULTILINE)
 ERA_RX = re.compile(r"\{\{\s*([^}|]+?)\s*(?:Short)?\s*\}\}")
 
