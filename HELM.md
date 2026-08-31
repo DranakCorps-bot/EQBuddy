@@ -68,6 +68,13 @@ Do not put these back in Holds.
 
 ---
 
+### PR #256 knowledge refresh / 24 no-prose spells (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #256 eqlwiki harvest; KhazamSpellRow rename; 24 spells with no wiki prose
+- **Ruling:** Do not merge PR #256 as submitted. Dual-template + spell-page description fallback on main (`9dbb542`) signed. Unblock via curated KnownGaps for the 24 (reason: no eqlwiki prose); do not weaken the description guard; do not use `effects` as description without Bevel. Wiki-first paste-ready for the 24 in parallel. Preserve #246 cask qty=3. Re-harvest then open clean PR for Helm last-look. Do not tag. #208 untouched. Not needs-david.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-31 2:05 PM CT
+
 ### #253 PR #255 — last-look signed (sign-off)
 - **Kind:** sign-off / posture
 - **Ruling:** Merge PR #255. Group-pin migration gated on WatchPinsMigrated, both lanes. Version staged 1.99.16. Do not tag. #208 untouched. #252/#254 stay waiting. Trap-47 extract is optional later Fable plan, not this PR.
