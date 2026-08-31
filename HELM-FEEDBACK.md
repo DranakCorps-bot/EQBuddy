@@ -37,6 +37,75 @@ Live hold still only #208.
 
 ---
 
+## 2026-08-31 10:05 PM CT — LAST-LOOK PLEASE: 320-cap PR 1 is up. Not merged. PR 0 merged, thank you.
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/259
+**Head SHA:** `f9d29d7d` · base **`main`** (retargeted after you merged #258) · **not merged, not tagged.**
+
+Both lanes' theme cards call `ThemeBodyCap`. Avalonia grip-path drift fixed inside this PR
+as you asked; the HeightGrip tip fold-in taken (today's "everything you've selected is
+shown" line is false once an open theme body is cut off). Gates: **2,764 unit / 294 Avalonia
+/ 39 E2E**, all green.
+
+### Read this part first — a prediction I got wrong, and what it means for the product
+
+The verify case landed, and one of its predictions did not. Undragged → 320 exactly. Dragged
+at 100% → the window goes 851px to 925px and the Loot room goes 17 rows to 21 with its
+scrollbar gone. **But I predicted the cap would clamp to the 640 ceiling and it is 493.**
+
+Measured off the app's own dump on a 1032px work area:
+
+| | granted stack | chrome | cap |
+|---|---|---|---|
+| 100%, drag 900 | 872 | 379 | **493** |
+| 125%, drag 900 | 698 | 379 | **320 — the floor** |
+| never dragged | — | — | 320 |
+
+**The ceiling is not the operative bound on a 1080p screen; the CHROME is.** Ten sibling
+headers plus the open card's own header, two chip strips and its padding come to 379 units —
+nearly half the stack. And at 125% the drag has nothing left to give at all: 698 − 379 = 319,
+under the floor, so the floor holds and the picture is identical to the undragged baseline.
+
+That is correct behaviour, not a defect — at 125% with ten cards showing, the widget is
+already at full screen height. But it is the **honest limit of this change, and it is yours
+and Bevel's to know before it ships**: #250's fix buys real room at 100% and none at 125% on
+a small screen. I have not acted on it. The alternatives I can see are all product calls, not
+executor calls — raise the floor (the three-class lock forbids it), raise the ceiling (would
+not help; the ceiling is not binding), or let a player collapse cards to buy body (which they
+can already do and nothing tells them so). **No ask attached. If Bevel wants a follow-up, that
+is a new track.**
+
+### Second correction to the map, same reason as the first
+
+The cap is now sized from **the height the monitor GRANTED, not the raw drag**. They agree at
+100% on a big screen and diverge exactly where nobody looks — 900 becomes 698 at 125%, and a
+body sized from 900 would claim room the stack was never given. Recomputed through the tested
+`SectionMaxHeight` rather than read off the control, so no ordering between two writers
+decides one value (trap 33). Both this and the chrome correction are logged in `DECISIONS.md`.
+
+### One thing I did that was not asked for, so you can veto it cheaply
+
+`MainWindow` went 42 lines past its ratchet. I lifted the measurement into
+`EQBuddy/ThemeBodyCapHost.cs` rather than bump the baseline (4,677 → 4,607) — the move
+`WidgetDump` already made. And I **re-shot `theme-inline-loot.png`**, which is not this
+change's subject: it is the baseline half of the acceptance pair, and a pair shot on two
+different builds is trap 51's failure exactly (the committed one already differed in the last
+card's title). Both logged.
+
+### Scope held
+
+#250 own-track Motes/`SectionScroll` OUT — the Paineless shot is **not** the acceptance here.
+#243, #240, Faction restore untouched. #208 not opened. No tag. No `WhatsNew.json` entry —
+per Bevel, that goes in when the release is cut. Nothing merged by me.
+
+**Next:** PR 2 (`GearCardView`'s window-hosted 320 → the window's own `BodyCap`/`BodyScroll`;
+widget-hosted stays `ThemeBodyCap`). Starting it now; it comes here the same way.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-31 9:55 PM CT — LAST-LOOK PLEASE: 320-cap PR 0 is up. Not merged.
 To: Helm
 
