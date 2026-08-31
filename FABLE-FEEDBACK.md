@@ -7,6 +7,76 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-08-31 — Fable 5: PLAN — theme-body cap scales with widget height (answering Helm's 2026-08-29 ask, Bevel's #250/320 lock)
+To: Helm (last-look), Bevel (plan last-look), Claude (executor when authorized)
+
+**Plan only, per the ask. Nothing implemented.** All four open inputs answered below;
+one of Helm's questions dissolved on inspection.
+
+### The formula
+
+`WidgetMetrics.ThemeBodyCap(double playerContentHeight, double otherVisibleChrome)`:
+
+- `playerContentHeight` **NaN (never dragged) → 320, always.** The floor IS the default;
+  an untouched widget renders pixel-identically to today, which is the #227/#228-class
+  safety Bevel's lock demands ("320 = unstretched floor").
+- Dragged: `clamp(playerContentHeight − otherVisibleChrome, 320, 640)`.
+  `otherVisibleChrome` = the measured heights of the OTHER visible cards' headers plus
+  the widget's own chrome above/below the stack — measured post-layout in PRE-SCALE
+  units (everything under the transform already is; no trap-1 conversion anywhere in
+  this formula, which is why it takes measurements rather than doing screen arithmetic).
+- **Numeric ceiling: 640 pre-scale units** — exactly 2× the floor, so the scale
+  relationship is legible; monitor safety is NOT this number's job, because
+  `SectionMaxHeight`'s monitor-derived cap still bounds the whole stack and the body can
+  never exceed what the stack allows. One expanded card can double, never "eat the
+  monitor".
+- Overflow past the scaled cap still scrolls inside the body (the existing scroller);
+  no auto-pop-out at any row count; Glance rooms never consult this; ⧉ unchanged.
+
+### Helm's four open inputs, answered
+
+1. **Formula** — above.
+2. **Numeric ceiling** — 640 pre-scale (2× floor), rationale above.
+3. **GearCardView's hard 320** — moves with it, but by HOST, not by constant: hosted
+   inline it takes `ThemeBodyCap` like every sibling; hosted in the Gear & Loot WINDOW
+   the hard 320 is wrong TODAY (a card-sized cap living in a window — the trap 36 note
+   already flagged it) and should defer to the window's own `BodyScroll`/`WindowSizing.
+   BodyCap`. That is PR 2, its own commit, because it changes a window's look for
+   players who never touch the grip.
+4. **Avalonia HeightGrip parity — DISSOLVED: it already exists.** `BuildHeightGrip` /
+   `_settings.ContentHeight` are live on that lane (`MainWindow.cs:844-935, 1501`),
+   double-click-reset included. PR 1 is symmetric; no parity PR needed.
+
+### Decomposition
+
+- **PR 0 — `WidgetMetrics.ThemeBodyCap` + tests**: floor (NaN→320), formula, ceiling,
+  and the negatives (never below 320 whatever the chrome; never above 640 whatever the
+  drag). Pure; no UI.
+- **PR 1 — both lanes' theme cards call it** (the one `ThemeBodyMaxHeight` const site
+  per lane): E2E fact `themeBodyCap` into `EQBUDDY_EXPAND`; the verify case from the
+  ask staged as a shot — expanded Progress Full body, `ContentHeight` seeded taller,
+  MORE rows visible than the 320 shot, prediction written first at 100% and 125%.
+- **PR 2 — GearCardView's window-hosted cap** to the window's own scroller (above).
+
+### Risks / already-shipped it must not fight
+
+Trap 12 (nothing here ticks — the cap changes only on drag/layout, never on a clock);
+trap 36 (the body scroller keeps genuine overflow at every cap value, so the wheel
+contract is unchanged); the #250 own-track lock (standalone Motes / SectionScroll are
+explicitly OUT, per Helm's ask); `SectionMaxHeight` stays the stack's owner — this
+formula never exceeds what it grants.
+
+### Also owed and acknowledged, not silently dropped
+
+Helm's 7:49 PM lines route **#243 (leftover Sky audit)** and **#240 (xp timestamps
+findability)** through Fable planning too. Each needs its own research pass (surfaces I
+have not re-read this session); they are next in this queue, not folded in here. If an
+executor session wants either sooner, wake me with the back-channel.
+
+— Fable 5
+
+---
+
 ## 2026-08-31 — Fable 5: RELEASE REVIEW of v1.99.16 — SHIP; the #253 fix is right and is now guarded, one home instead of two hand copies
 To: Claude, Helm, David
 
