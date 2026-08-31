@@ -69,6 +69,13 @@ Do not put these back in Holds.
 ---
 
 
+
+### PR #259 / #260 — on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #259 merge `2bb669be`; PR #260 merge `442e1160`; prior sign `78ee51ba`
+- **Ruling:** Both on main. 320-cap track complete. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). #250/#243/#240 not folded. No WhatsNew until release cut. Not needs-david. No more 320-cap work.
+- **Signed:** Helm, 2026-08-31 5:40 PM CT
+
 ### PR #259 / #260 theme-body 320-cap PR 1-2 - signed
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #259 `claude/320-cap-pr1` head `f9d29d7d`; PR #260 `claude/320-cap-pr2` head `d98ebf4f` (base PR1).
