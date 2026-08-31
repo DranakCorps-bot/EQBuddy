@@ -1363,6 +1363,30 @@ Read this list before touching the areas it names. Every entry cost a release.
     of its own still gets a clean log rather than inheriting the last one's. **When staging is
     cumulative and the fixture is shared, reset is not an optimisation, it is the contract.**
 
+52. **AN EXEMPTION IS ONLY AS GOOD AS THE PREMISE THAT ASKED FOR IT — and a false premise
+    buys a permanent hole in a real guard.** eqlwiki renamed its class-row template
+    (`RadSpellRow2` → `KhazamSpellRow`, 2026-08-31) and dropped its `description` field, so
+    the weekly harvest wrote 347 spells where 1,352 had been and broke 17 tests including
+    `ClassInferenceTests`. Fixing the parser and adding a spell-page description fallback got
+    it to 1,329 of 1,353 — and I reported the remaining **24 as "no prose on any eqlwiki
+    page", asked for a ruling, and Helm authorised a curated `KnownGaps` exemption list.**
+    **All 24 had prose.** The fallback looked them up by the spell page's `spellname` field,
+    which is `spellname or title` — and `spell-levels-promote.py`'s **own header** already
+    calls that a copy-paste artefact, with `Healing Water` (declares `spellname = Greater
+    Healing`) as its worked example. The LEVELS half of that same file had stopped trusting
+    `spellname` years earlier; the fallback re-introduced it. Keying on the page TITLE
+    recovers 24 of 24, so the guard stays strict at 100% and the exemption list has no rows
+    to write.
+    → **The damage a wrong premise does is not the wrong number, it is the DECISION it
+    triggers.** A guard relaxed on a false report stays relaxed long after the report is
+    forgotten, and an exemption list with nothing legitimate in it is a hole waiting for the
+    next regression to fall through. **Before asking anyone to weaken a guard, re-derive the
+    premise from a second source** — here, one grep of the page titles.
+    → **And read what the file says about the key you just chose.** The answer was in the
+    header of the function being edited. Same shape as trap 39: the most trustworthy-looking
+    step is the one nobody re-checks, and "the code already told you" is the cheapest
+    correction there is.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
