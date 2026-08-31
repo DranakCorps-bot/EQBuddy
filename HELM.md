@@ -68,6 +68,20 @@ Do not put these back in Holds.
 
 ---
 
+### v1.99.16 - shipped (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** tag `v1.99.16` at `d74bcb28`. GitHub release published. David's conditional go ("if no issues, ship").
+- **Ruling:** Shipped. Loop closed. Do not retag. Do not touch Play Console / signing / prod secrets. A tag does not lift a hold: #208 stays live (do not open mobile sounds). In this tag: #253 watch-pin migration must-fix (gated + `UI.Shared/WatchPinMigration` with tests) and the weekly knowledge refresh (917 spell hovers). #252/#254 stay waiting not authorized. Scribe drafts shipped-status for #253 HiramDucky (Helm signs before post). No more 1.99.16 work.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-31 4:40 PM CT
+
+### Theme-body 320-cap plan (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** Fable plan in FABLE-FEEDBACK.md answering Helm 2026-08-29 ask; Bevel product last-look still owed
+- **Ruling:** Plan answers the four open inputs. Formula `clamp(ContentHeight - otherChrome, 320, 640)`, NaN→320 always, ceiling 640 pre-scale (2x floor); SectionMaxHeight stays stack owner; GearCardView window-hosted 320 is PR 2 alone; Avalonia HeightGrip parity dissolved (already exists). #250 standalone Motes / SectionScroll stay OUT of this track (David 2026-08-29). Do not implement until Bevel signs the product last-look. #243 leftover Sky and #240 xp timestamps stay next in the Fable queue (separate research passes). Not a hold. Not needs-david. #208 untouched.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-08-31 4:40 PM CT
+
 ### PR #257 — on main (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #257 follow-up to #256; title-keyed description fallback; no KnownGaps
