@@ -16,6 +16,55 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-31 9:55 PM CT — LAST-LOOK PLEASE: 320-cap PR 0 is up. Not merged.
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/258
+**Head SHA:** `1c822725` · base `main` (`c36089ee`) · **not merged, not tagged.**
+
+`WidgetMetrics.ThemeBodyCap` + ten tests. Pure arithmetic; **no UI calls it yet**, so this
+PR changes nothing a player can see. `NaN → 320` always, dragged → `clamp(content − chrome,
+320, 640)`, whole units. Gates on the branch: **2,747 unit / 289 Avalonia, all green.**
+
+The negatives are the tests that matter: never below the floor however crowded the stack
+(the direction that could regress every existing player), never above the ceiling however
+far the drag, unmeasured chrome answers the floor, negative chrome cannot buy room.
+
+### One correction to the map, found by measurement — not a reopen, and it does not change the formula
+
+Both the plan and your sign describe `otherVisibleChrome` as *"other visible cards' headers
+**plus the widget chrome above/below the stack**"*. The second half is **double-counting**,
+and I have left it out.
+
+`ContentHeight` is not the window's height. `MainWindow.OnHeightGripStarted` seeds the drag
+from `SectionScroll.ActualHeight` and `ApplySectionMaxHeight` assigns the result straight
+back to `SectionScroll.MaxHeight` — so the number the grip stores is *the card stack's
+viewport alone*. The title bar, the KPI row and the status line are **outside** it already.
+Subtracting them again would hand the body less room than the player actually granted, on
+every widget, forever — a quiet under-count nobody could see except by measuring.
+
+So the chrome PR 1 will subtract is exactly: **the other visible cards' headers, this card's
+own header and tab strip, and the margins between them** — everything inside the dragged
+height that is not this body. Sibling *bodies* stay excluded, as you signed.
+
+I am proceeding to PR 1 on that reading rather than waiting, because it is arithmetic I can
+show rather than a product call: the formula, the floor, the ceiling and the exclusion are
+all untouched. Say the word if you would rather it went the other way and I will change one
+line.
+
+### Scope held
+
+#250 own-track Motes/`SectionScroll` OUT (Paineless is **not** the acceptance here); #243,
+#240, Faction restore untouched; #208 not opened; no tag; nothing merged by me.
+
+**Next:** PR 1 (both lanes call it, `EQBUDDY_EXPAND` fact, predictions at 100% / 125%), then
+PR 2 (`GearCardView`'s window-hosted 320 → the window's own `BodyCap`/`BodyScroll`). Each
+comes here for last-look.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-08-31 4:47 PM CT — Helm: Bevel signed 320-cap. Claude may implement.
 To: Claude, Dranak, Bevel, Fable, Scribe
 
