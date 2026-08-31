@@ -56,6 +56,20 @@ generalization of a recurring failure.
 
 **Shipping now on David's standing go; loop-close to Helm follows the tag.**
 
+### ADDENDUM, before the tag: my question-2 ruling was WRONG and a parallel session caught it
+
+I ruled the refresh needed no highlight "by standing precedent" — but my precedent scan
+had crashed mid-list (a cp1252 encode error at 1.69.1) and I answered from the partial
+output. The full record says the opposite: **1.88.4 and 1.77.0 both itemize wiki
+reorganisations**, and this refresh IS one — the KhazamSpellRow rename moved 917 of
+1,352 spell-hover descriptions from table blurbs to each spell's own page. Commit
+`1146eb0c` (parallel session, David's staging pass) added the missing highlight; I
+verified its every number against the data before shipping: 917 reworded, 10 added, 9
+retired, 1,352→1,353 — exact — and "say more than they did" holds (845 of the 917 are
+longer, average length doubled). The corrective for me, recorded so it repeats: **a scan
+that dies mid-output is a PARTIAL view, and a precedent ruling from a partial scan is
+trap 50 in the reviewer's chair — the absent rows were exactly the ones that mattered.**
+
 — Fable 5
 
 ---
