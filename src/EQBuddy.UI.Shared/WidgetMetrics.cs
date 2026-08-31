@@ -63,8 +63,66 @@ public static class WidgetMetrics
     /// The scroller it implies is the host's problem, and the wheel has to reach the card
     /// stack when there is nothing here to scroll — trap 36, which shipped an Inventory
     /// tab that could only be moved by dragging the outer slider.
+    ///
+    /// **Since 2026-08-31 this is the FLOOR rather than the whole answer** — see
+    /// <see cref="ThemeBodyCap"/>. A widget nobody has dragged still gets exactly this
+    /// number, so the untouched app is pixel-identical to what it was.
     /// </summary>
     public const double ThemeBodyMaxHeight = 320;
+
+    /// <summary>The most one expanded theme body may take, whatever the player drags —
+    /// exactly 2× <see cref="ThemeBodyMaxHeight"/>, so the relationship is legible rather
+    /// than a second unexplained number. Monitor safety is NOT this constant's job:
+    /// <see cref="SectionMaxHeight"/> still bounds the whole stack, so the ceiling only
+    /// says how much of the stack ONE card may claim.</summary>
+    public const double ThemeBodyCeiling = 2 * ThemeBodyMaxHeight;
+
+    /// <summary>
+    /// How tall one expanded theme's body may get ON A WIDGET THE PLAYER HAS RESIZED.
+    ///
+    /// #250 (Paineless) reached for the height grip and got nothing:
+    /// <see cref="ThemeBodyMaxHeight"/> is a constant, so dragging the widget taller
+    /// grew the card STACK and left every expanded body at 320. That is not a cap being
+    /// too small — it is a cap that ignores the one control the player reached for
+    /// (Bevel, 2026-08-28; plan Fable 5, product-signed Bevel and Helm-signed 2026-08-31).
+    ///
+    /// **The floor IS the default.** <paramref name="playerContentHeight"/> is
+    /// <c>AppSettings.ContentHeight</c>, which is NaN until the grip is dragged —
+    /// so an untouched widget answers 320 and renders exactly as it did before. Nothing
+    /// here raises the cap globally; it scales only for a player who has already said how
+    /// much room they want.
+    ///
+    /// <paramref name="otherVisibleChrome"/> is everything else the dragged height has to
+    /// hold: the other visible cards' HEADERS, this card's own header and tab strip, and
+    /// the margins between them. **Not the siblings' bodies** (Bevel, 2026-08-31) — a
+    /// second expanded card is the player asking for two open cards, not a reason to
+    /// shrink this one, and <see cref="SectionMaxHeight"/> arbitrates by scrolling the
+    /// stack. Excluding this body is also what keeps the arithmetic from feeding back
+    /// into its own input.
+    ///
+    /// **Both arguments are PRE-SCALE units** and so is the answer — everything under the
+    /// widget's UI-scale transform already is, which is why this method does no dividing
+    /// (trap 1). A caller that has only screen pixels has the wrong number, not a
+    /// conversion to do here.
+    ///
+    /// **Whole units, deliberately.** The result feeds a <c>MaxHeight</c> on a
+    /// <c>SizeToContent</c> always-on-top window, so a cap that wobbled by a fraction
+    /// would ask the windowing system to resize — #173's cost, from trap 12. Layout
+    /// changes move this number; nothing on a clock does.
+    /// </summary>
+    /// <param name="playerContentHeight">The dragged height of the card stack in pre-scale
+    /// units, or NaN for automatic — the widget as shipped.</param>
+    /// <param name="otherVisibleChrome">Measured height inside the stack that is not this
+    /// body. A measurement that has not happened yet (NaN, infinity) answers the floor,
+    /// because "we cannot tell yet" and "draw what you have always drawn" are the same
+    /// instruction.</param>
+    public static double ThemeBodyCap(double playerContentHeight, double otherVisibleChrome)
+    {
+        if (!double.IsFinite(playerContentHeight)) return ThemeBodyMaxHeight;
+        if (!double.IsFinite(otherVisibleChrome)) return ThemeBodyMaxHeight;
+        var room = playerContentHeight - Math.Max(0, otherVisibleChrome);
+        return Math.Floor(Math.Clamp(room, ThemeBodyMaxHeight, ThemeBodyCeiling));
+    }
 
     /// <summary>A bottom-edge drag turned into a stored height. The cursor travels in
     /// screen pixels while the list it resizes lives under the transform, so the delta
