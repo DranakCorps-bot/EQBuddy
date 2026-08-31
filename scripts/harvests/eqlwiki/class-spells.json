@@ -51,7 +51,313 @@
    50
   ],
   "served": "Bard",
-  "spells": {}
+  "spells": {
+   "Agilmente's Aria of Eagles": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Alenia's Disenchanting Melody": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Amplification": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Angstlich's Appalling Screech": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Anthem de Arms": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Aria of Asceticism": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Brusco's Boastful Bellow": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Cantata of Soothing": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Cassindra's Chant of Clarity": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Cassindra's Chorus of Clarity": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Cassindra's Elegy": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Chant of Battle": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Chords of Dissonance": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Cinda's Charismatic Carillon": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Crission's Pixie Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Denon's Desperate Dirge": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Denon's Disruptive Discord": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Denon's Dissension": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Elemental Rhythms": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Fufil's Curtailing Chant": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Guardian Rhythms": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Hymn of Restoration": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Jaxan's Jig o' Vigor": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Jonthan's Provocation": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Jonthan's Whistling Warsong": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Katta's Song of Sword Dancing": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Kelin's Lucid Lullaby": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Kelin's Lugubrious Lament": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Largo's Melodic Binding": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Lyssa's Solidarity of Vision": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Lyssa's Veracious Concord": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Magical Monologue": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "McVaxius' Berserker Crescendo": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Melanie's Mellifluous Motion": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Melody of Ervaj": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Niv's Melody of Preservation": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Psalm of Cooling": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Psalm of Mystic Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Psalm of Purity": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Psalm of Vitality": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Psalm of Warmth": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Purifying Rhythms": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Rizlona's Embers": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Selo's Accelerando": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Selo's Accelerating Chorus": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Selo's Chords of Cessation": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Selo's Consonant Chain": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Shauri's Sonorous Clouding": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Shield of Songs": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Sionachie's Dreams": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Solon's Bewitching Bravura": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Solon's Song of the Sirens": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Song of Sustenance": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Syvelian's Anti-Magic Aria": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Tarew's Aquatic Ayre": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Tuyen's Chant of Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Tuyen's Chant of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Tuyen's Chant of Frost": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Tuyen's Chant of Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Verses of Victory": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Vilia's Verses of Celerity": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   }
+  }
  },
  "Beastlord": {
   "sections": [
@@ -106,7 +412,388 @@
    50
   ],
   "served": "Beastlord",
-  "spells": {}
+  "spells": {
+   "Blast of Frost": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Counteract Disease": {
+    "description": "",
+    "era": "",
+    "level": 45
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Drowsy": {
+    "description": "",
+    "era": "",
+    "level": 20
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "",
+    "level": 22
+   },
+   "Endure Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Endure Poison": {
+    "description": "",
+    "era": "",
+    "level": 18
+   },
+   "Enduring Breath": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "Envenomed Breath": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Flash of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Fleeting Fury": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Frenzy": {
+    "description": "",
+    "era": "",
+    "level": 47
+   },
+   "Frost Dagger": {
+    "description": "",
+    "era": "",
+    "level": 23
+   },
+   "Frost Shard": {
+    "description": "",
+    "era": "",
+    "level": 47
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Healing": {
+    "description": "",
+    "era": "",
+    "level": 24
+   },
+   "Herikol's Soothing": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Ice Spear": {
+    "description": "",
+    "era": "",
+    "level": 33
+   },
+   "Inner Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Invisibility": {
+    "description": "",
+    "era": "",
+    "level": 43
+   },
+   "Keshuval's Rejuvenation": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Languid Pace": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Levitate": {
+    "description": "",
+    "era": "",
+    "level": 32
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Listless Power": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Malaria": {
+    "description": "",
+    "era": "",
+    "level": 40
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Pack Shrew": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Protect": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Raging Strength": {
+    "description": "",
+    "era": "",
+    "level": 41
+   },
+   "Scale Skin": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Sense Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Serpent Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Sha's Lethargy": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Sharik's Replenishing": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Shrink": {
+    "description": "",
+    "era": "",
+    "level": 23
+   },
+   "Sicken": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Spirit Salve": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Spirit Sight": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Spirit Strength": {
+    "description": "",
+    "era": "",
+    "level": 28
+   },
+   "Spirit Strike": {
+    "description": "",
+    "era": "",
+    "level": 26
+   },
+   "Spirit of Bear": {
+    "description": "",
+    "era": "",
+    "level": 17
+   },
+   "Spirit of Herikol": {
+    "description": "",
+    "era": "",
+    "level": 30
+   },
+   "Spirit of Inferno": {
+    "description": "",
+    "era": "",
+    "level": 28
+   },
+   "Spirit of Kashek": {
+    "description": "",
+    "era": "",
+    "level": 46
+   },
+   "Spirit of Keshuval": {
+    "description": "",
+    "era": "",
+    "level": 21
+   },
+   "Spirit of Khaliz": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Spirit of Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Spirit of Monkey": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Spirit of Ox": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Spirit of Sharik": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Spirit of Vermin": {
+    "description": "",
+    "era": "",
+    "level": 46
+   },
+   "Spirit of Wolf": {
+    "description": "",
+    "era": "",
+    "level": 24
+   },
+   "Spirit of Yekan": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Spirit of the Blizzard": {
+    "description": "",
+    "era": "",
+    "level": 18
+   },
+   "Spirit of the Scorpion": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Spirit of the Shrew": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Spiritual Brawn": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Spiritual Light": {
+    "description": "",
+    "era": "",
+    "level": 41
+   },
+   "Strengthen": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "",
+    "level": 31
+   },
+   "Summon Drink": {
+    "description": "",
+    "era": "",
+    "level": 17
+   },
+   "Summon Food": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Tainted Breath": {
+    "description": "",
+    "era": "",
+    "level": 19
+   },
+   "Tame Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "",
+    "level": 19
+   },
+   "Turtle Skin": {
+    "description": "",
+    "era": "",
+    "level": 26
+   },
+   "Vigor of Zehkes": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Ward of Calliav": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Wild Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Yekan's Quickening": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Yekan's Recovery": {
+    "description": "",
+    "era": "",
+    "level": 36
+   }
+  }
  },
  "Berserker": {
   "sections": [],
@@ -167,7 +854,823 @@
    50
   ],
   "served": "Cleric",
-  "spells": {}
+  "spells": {
+   "Abolish Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Abundant Drink": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Abundant Food": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Armor of Faith": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Armor of Protection": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Armor of the Faithful": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Atone": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Banish Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Blessing of Faith": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Blessing of Piety": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Blessing of the Knight": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Blessing of the Lord Commander": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Blessing of the Page": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Blessing of the Squire": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Blinding Luminance": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Bravery": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Calm": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Celestial Echo": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Celestial Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Celestial Health": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Celestial Remedy": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Center": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Counteract Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Counteract Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Courage": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Cure Blindness": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Daring": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Dismiss Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Dismiss Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Divine Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Divine Barrier": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Earthquake": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Echo of Health": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Echoing Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Endure Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Endure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Expel Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Expel Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Expulse Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Expulse Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Flash of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Force": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Frenzied Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Furor": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Guard": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Guard of Vie": {
+    "description": "",
+    "era": "",
+    "level": 40
+   },
+   "Halo of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Hammer of Requital": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Hammer of Striking": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Hammer of Wrath": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Healing Light": {
+    "description": "",
+    "era": "",
+    "level": 45
+   },
+   "Holy Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Holy Might": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Imbue Amber": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Black Pearl": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Black Sapphire": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Diamond": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Emerald": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Opal": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Peridot": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Plains Pebble": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Rose Quartz": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Ruby": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Sapphire": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Topaz": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Immobilize": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Improved Invisibility to Undead": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Inspire Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Instill": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Invisibility versus Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Invoke Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Lull": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Mass Imbue Amber": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Black Pearl": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Black Sapphire": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Diamond": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Emerald": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Opal": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Peridot": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Plains Pebble": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Rose Quartz": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Ruby": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Sapphire": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Mass Imbue Topaz": {
+    "description": "",
+    "era": "",
+    "level": 29
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Pacify": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Panic the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Promised Renewal": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Reanimation": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Reckless Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Reconstitution": {
+    "description": "",
+    "era": "",
+    "level": 18
+   },
+   "Remove Curse": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Remove Lesser Curse": {
+    "description": "",
+    "era": "",
+    "level": 23
+   },
+   "Remove Minor Curse": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Renewal": {
+    "description": "",
+    "era": "",
+    "level": 32
+   },
+   "Renewing Echo": {
+    "description": "",
+    "era": "",
+    "level": 24
+   },
+   "Reparation": {
+    "description": "",
+    "era": "",
+    "level": 22
+   },
+   "Resist Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Resist Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Resist Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Resist Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Resist Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Resolution": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Restoration": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Resurrection": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Resuscitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Retribution": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Revive": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Sacred Echo": {
+    "description": "",
+    "era": "",
+    "level": 43
+   },
+   "Sacred Word": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Sanctuary": {
+    "description": "",
+    "era": "",
+    "level": 6
+   },
+   "Sense Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Sense the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Sermon of the Righteous": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "Shield of Words": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Smite": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Soothe": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Sound of Force": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Spirit Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Spook the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Stun": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Summon Drink": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Summon Food": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Superior Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Symbol of Naltron": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Symbol of Pinzarn": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Symbol of Ryltan": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Symbol of Transal": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Tremor": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Turning of the Unnatural": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Valor": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Ward Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Ward Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Ward of Vie": {
+    "description": "",
+    "era": "",
+    "level": 20
+   },
+   "Ward of the Divine": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Wave of Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Word Divine": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Word of Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Word of Health": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Word of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Word of Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Word of Souls": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Word of Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Wrath": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Yaulp": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Yaulp II": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Yaulp III": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   }
+  }
  },
  "Druid": {
   "sections": [
@@ -223,7 +1726,973 @@
    50
   ],
   "served": "Druid",
-  "spells": {}
+  "spells": {
+   "Allure of the Wild": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Avalanche": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Banish Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Barbcoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Befriend Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Beguile Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Beguile Plants": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Blooming Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Blossoming Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Bramblecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Budding Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Burst of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Burst of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Calm Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Camouflage": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Careless Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Cascade of Hail": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Charm Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Chloroplast": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Circle of Butcherblock": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Circle of Feerrott": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Circle of Lavastorm": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Circle of Misty Thicket": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Circle of North Karana": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Circle of South Ro": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Circle of Steamfont": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Circle of Stonebrunt": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Circle of Surefall Glade": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Circle of Toxxulia": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Circle of West Commons": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Combust": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Counteract Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Counteract Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Creeping Crud": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Dance of the Fireflies": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Dismiss Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Dizzying Wind": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Drifting Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Drones of Doom": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Dustdevil": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Earthquake": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Efflorescing Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Endure Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Endure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Enduring Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Engulfing Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Ensnare": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Ensnaring Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Enveloping Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Everlasting Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Expel Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Expulse Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Feral Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Firefist": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Firestrike": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Fixation of Ro": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Flame Lick": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Flowering Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Forest's Renewal": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Form of the Great Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Fury of Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Grasping Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Greater Wolf Form": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Halo of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Harmony": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Harmony of Nature": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Healing Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Ice": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Ignite": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Imbue Emerald": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Plains Pebble": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Immolate": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Improved Superior Camouflage": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Invisibility versus Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Invoke Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Legacy of Spike": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Lesser Succor": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Levitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Levitation": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Lightning Blast": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Lightning Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Lull Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Mass Imbue Emerald": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Imbue Plains Pebble": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Nature's Renewal": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Pack Chloroplast": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Pack Regeneration": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Pack Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Pack Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Panic Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Pogonip": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Protection of Diamond": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Protection of Nature": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Protection of Rock": {
+    "description": "",
+    "era": "",
+    "level": 19
+   },
+   "Protection of Steel": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Protection of Wood": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Regeneration": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Remove Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Remove Lesser Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Remove Minor Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Resist Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Resist Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Resist Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Resist Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Resist Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Ring of Butcherblock": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Ring of Feerrott": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Ring of Lavastorm": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Ring of Misty Thicket": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Ring of North Karana": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Ring of South Ro": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Ring of Steamfont": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Ring of Stonebrunt": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Ring of Surefall Glade": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Ring of Toxxulia": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Ring of West Commons": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Ro's Fiery Sundering": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Savage Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Scale of Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "See Invisible": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Sense Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Share Form of the Great Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Share Wolf Form": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Shield of Barbs": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Shield of Brambles": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Shield of Spikes": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Shield of Thistles": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Shield of Thorns": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Skin like Diamond": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Skin like Nature": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Skin like Rock": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Skin like Steel": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Skin like Wood": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Snare": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Spikecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Spirit of Cheetah": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Spirit of Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Spirit of the Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Sprouting Heal": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Starfire": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Starshine": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Stinging Swarm": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Storm Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Strength of Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Strength of Stone": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Succor: Butcherblock": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Succor: East Karana": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Succor: Lavastorm": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Succor: North Karana": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Succor: South Ro": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Summon Drink": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Summon Food": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Sunbeam": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Superior Camouflage": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Superior Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Tangling Weeds": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Terrorize Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Thistlecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Thorncoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Treeform": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Tremor": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Upheaval": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Vengeance of the Wild": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Ward Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Whirling Wind": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Wolf Form": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Zephyr: Butcherblock": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Zephyr: Feerrott": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Zephyr: Lavastorm": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Zephyr: Misty Thicket": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Zephyr: North Karana": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Zephyr: South Ro": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Zephyr: Steamfont": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Zephyr: Stonebrunt": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Zephyr: Surefall Glade": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Zephyr: Toxxulia": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Zephyr: West Commons": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   }
+  }
  },
  "Enchanter": {
   "sections": [
@@ -278,7 +2747,963 @@
    50
   ],
   "served": "Enchanter",
-  "spells": {}
+  "spells": {
+   "Aanya's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Adorning Grace": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Alacrity": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Alliance": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Allure": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Anarchy": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Arch Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Augmentation": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Beguile": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Benevolence": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Berserker Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Berserker Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Bind Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Blanket of Forgetfulness": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Boltran's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Boon of the Clear Mind": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Boon of the Garou": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Bounce": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Breeze": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Brilliance": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Cajoling Whispers": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Calm": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Calming Visage": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Cast Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Celerity": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Chaos Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Chaotic Feedback": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Charm": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Chase the Moon": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Choke": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Clarify Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Clarity": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Cloud": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Collaboration": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Color Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Color Shift": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Color Skew": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Crystallize Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Curse of the Simple Mind": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Dazzle": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Discordant Mind": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Disempower": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Distill Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Dyn's Dizzying Draught": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Ebbing Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Enchant Clay": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Enchant Electrum": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Enchant Gold": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Enchant Platinum": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Enchant Silver": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Enduring Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Enfeeblement": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Enthrall": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Entrance": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Entrancing Lights": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Eye of Confusion": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Feckless Might": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Feedback": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Gasping Embrace": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Gift of Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Gravity Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Greater Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Group Resist Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Guard of Alendar": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Haunting Visage": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Haze": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Illusion: Air Elemental": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Illusion: Barbarian": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Illusion: Dark Elf": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Illusion: Dry Bone": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Illusion: Dwarf": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Illusion: Earth Elemental": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Illusion: Erudite": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Illusion: Fire Elemental": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Illusion: Gnome": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Illusion: Half-Elf": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Illusion: Halfling": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Illusion: High Elf": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Illusion: Human": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Illusion: Iksar": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Illusion: Imp": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Illusion: Ogre": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Illusion: Scaled Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Illusion: Skeleton": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Illusion: Spirit Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Illusion: Tree": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Illusion: Troll": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Illusion: Water Elemental": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Illusion: Werewolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Illusion: Wood Elf": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Immobilize": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Improved Invisibility": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Incapacitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Insight": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Insipid Weakness": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Instill": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Intellectual Advancement": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Intellectual Superiority": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Invisibility": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Invisibility versus Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Invoke Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Juli's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Kilan's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Kintaz's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Languid Pace": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Lesser Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Leviathan Eyes": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Levitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Listless Power": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Lull": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Major Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Mana Sieve": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Mass Clarify Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Crystallize Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Mass Distill Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Mass Enchant Clay": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Mass Enchant Electrum": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Mass Enchant Gold": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Mass Enchant Platinum": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Mass Enchant Silver": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Mass Purify Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Mass Thicken Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Memory Blur": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Mesmerization": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Mesmerize": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Mind Wipe": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Minor Illusion": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Minor Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Mircyl's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Mist": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Obscure": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Pacify": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Paralyzing Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Pendril's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Pillage Enchantment": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Purify Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Quickness": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Radiant Visage": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Rampage": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Reclaim Energy": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Reoccurring Amnesia": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Resist Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Rune I": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Rune II": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Rune III": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Rune IV": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Sagar's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Sanity Warp": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "See Invisible": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Sentinel": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Serpent Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Shade": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Shalee's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Shallow Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Shifting Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Shiftless Deeds": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Sisna's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Soothe": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Strengthen": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Strip Enchantment": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Suffocate": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Suffocating Sphere": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Swift Like The Wind": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Sympathetic Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Taper Enchantment": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Tashani": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Tashania": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Tashina": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Tepid Deeds": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Theft of Thought": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Thicken Mana": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Uleen's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Ultravision": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Wandering Mind": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Ward of Alendar": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Weaken": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Weakness": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Whirl Till You Hurl": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Yegoreff's Animation": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   }
+  }
  },
  "Magician": {
   "sections": [
@@ -333,7 +3758,793 @@
    50
   ],
   "served": "Magician",
-  "spells": {}
+  "spells": {
+   "Arch Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Banish Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Barrier of Combustion": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Blaze": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Bolt of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Bounce": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Burn": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Burnout": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Burnout II": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Burnout III": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Burst of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Cinder Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Column of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Conjuration: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Conjuration: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Conjuration: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Conjuration: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Cornucopia": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Dagger of Symbols": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Dimensional Hole": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Dimensional Pocket": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Dismiss Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Elemental Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Elemental Maelstrom": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Elemental Shield": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Elemental: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Elemental: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Elemental: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Elemental: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Elementaling: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Elementaling: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Elementaling: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Elementaling: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Elementalkin: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Elementalkin: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Elementalkin: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Elementalkin: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Everfount": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Expedience": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Expel Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Expulse Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Eye of Zomm": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Fire Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Flame Arc": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Flame Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Flame Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Flare": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Greater Conjuration: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Greater Conjuration: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Greater Conjuration: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Greater Conjuration: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Greater Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Greater Summoning: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Greater Summoning: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Greater Summoning: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Greater Summoning: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Inferno Shield": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Invisibility": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Lava Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Lesser Conjuration: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Lesser Conjuration: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Lesser Conjuration: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Lesser Conjuration: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Lesser Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Lesser Summoning: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Lesser Summoning: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Lesser Summoning: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Lesser Summoning: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Major Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Malaise": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Malaisement": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Minor Conjuration: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Minor Conjuration: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Minor Conjuration: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Minor Conjuration: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Minor Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Minor Summoning: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Minor Summoning: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Minor Summoning: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Minor Summoning: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Modulating Rod": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Monster Summoning I": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Monster Summoning II": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Phantom Chain": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Phantom Leather": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Phantom Plate": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Primal Remedy": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Rain of Blades": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Rain of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Rain of Lava": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Rain of Spikes": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Rain of Swords": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Reclaim Energy": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Refresh Summoning": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Renew Elements": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Renew Summoning": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "See Invisible": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Sense Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Shield of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Shield of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Shield of Lava": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Shock of Blades": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Shock of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Shock of Spikes": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Shock of Swords": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Spear of Warding": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Staff of Runes": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Staff of Symbols": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Staff of Tracing": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Staff of Warding": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Summon Arrows": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Summon Bandages": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Summon Brass Choker": {
+    "description": "",
+    "era": "",
+    "level": 2
+   },
+   "Summon Coldstone": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Summon Dagger": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Summon Drink": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Summon Elemental Blanket": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Summon Elemental Defender": {
+    "description": "",
+    "era": "",
+    "level": 11
+   },
+   "Summon Fang": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Summon Food": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Summon Golden Choker": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Summon Heatstone": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Summon Jade Bracelet": {
+    "description": "",
+    "era": "",
+    "level": 20
+   },
+   "Summon Leather Mantle": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Summon Linen Mantle": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Summon Opal Bracelet": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Summon Phantom Chain": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "Summon Phantom Leather": {
+    "description": "",
+    "era": "",
+    "level": 17
+   },
+   "Summon Phantom Plate": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Summon Ring of Flight": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Summon Shard of the Core": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Summon Shiny Bauble": {
+    "description": "",
+    "era": "",
+    "level": 30
+   },
+   "Summon Silver Choker": {
+    "description": "",
+    "era": "",
+    "level": 21
+   },
+   "Summon Stone Bracelet": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Summon Tarnished Bauble": {
+    "description": "",
+    "era": "",
+    "level": 10
+   },
+   "Summon Throwing Dagger": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Summon Tiny Ring": {
+    "description": "",
+    "era": "",
+    "level": 16
+   },
+   "Summon Twisted Ring": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Summon Waterstone": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Summon Wisp": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Summon Wooden Bracelet": {
+    "description": "",
+    "era": "",
+    "level": 20
+   },
+   "Summon: Orb of Exploration": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Summoning: Air": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Summoning: Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Summoning: Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Summoning: Water": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Sword of Runes": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Ward Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Ward of Calliav": {
+    "description": "",
+    "era": "",
+    "level": 46
+   }
+  }
  },
  "Monk": {
   "sections": [],
@@ -394,7 +4605,728 @@
    50
   ],
   "served": "Necromancer",
-  "spells": {}
+  "spells": {
+   "Allure of Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Animate Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Arch Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Asystole": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Augment Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Auspice": {
+    "description": "",
+    "era": "",
+    "level": 45
+   },
+   "Banish Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Banshee Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Beguile Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Boil Blood": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Bond of Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Bone Walk": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Bounce": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Breath of the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Cackling Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Cajole Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Call of Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Cancelling of Life": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Cascading Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Cavorting Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Cessation of Life": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Chilling Embrace": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Clinging Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Coldlight": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Convoke Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Corporeal Empathy": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Counteract Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Covetous Subversion": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Dark Empathy": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Dark Pact": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Dark Soul": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Dead Man Floating": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Dead Men Floating": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Deadeye": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Diamondskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Disease Cloud": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Dismiss Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Dominate Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Dooming Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Drain Soul": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Drain Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Engulfing Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Envenomed Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Eternities Torment": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Expel Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Expulse Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Feign Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Focus Death": {
+    "description": "",
+    "era": "",
+    "level": 11
+   },
+   "Form of Bleached Bone": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Form of Chilled Bone": {
+    "description": "",
+    "era": "",
+    "level": 16
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Gather Shadows": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Greater Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Grim Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Harmshield": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Haunting Corpse": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Heart Flutter": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Heat Blood": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Hungry Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Ignite Blood": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Ignite Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Impart Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Improved Invisibility to Undead": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Incinerate Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Infectious Cloud": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Insidious Retrogression": {
+    "description": "",
+    "era": "",
+    "level": 46
+   },
+   "Intensify Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Invisibility versus Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Invoke Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Invoke Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Invoke Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Leatherskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Leech": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Leering Corpse": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Lesser Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Lich": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Lifebite": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Lifedraw": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Lifespike": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Lifetap": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Major Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Malignant Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Mend Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Minor Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Negation of Life": {
+    "description": "",
+    "era": "",
+    "level": 18
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Numb the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Pact of Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Panic the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Paralyzing Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Poison Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Rapacious Subvention": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Reclaim Energy": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Renew Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Resist Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Resist Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Rest the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Restless Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Scent of Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Scent of Dusk": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Scent of Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Scourge": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Screaming Terror": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Sense the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Shackle of Bone": {
+    "description": "",
+    "era": "",
+    "level": 17
+   },
+   "Shackle of Spirit": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Shadow Compact": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Shadow Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Shadow Step": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Shadow Vortex": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Shieldskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Shock of Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Sight Graft": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Siphon Life": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Siphon Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Spirit Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Spirit Tap": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Spook the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Steelskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Summon Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Surge of Enfeeblement": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Torbas' Acid Blast": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Torbas' Poison Blast": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Vampiric Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Vampiric Embrace": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Venom of the Snake": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Voice Graft": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Ward Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Ward of Calliav": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Wave of Enfeeblement": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Word of Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Word of Souls": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Word of Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   }
+  }
  },
  "Paladin": {
   "sections": [
@@ -443,7 +5375,363 @@
    50
   ],
   "served": "Paladin",
-  "spells": {}
+  "spells": {
+   "Armor of Faith": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Brell's Steadfast Aegis": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Calm": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Cease": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Center": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Counteract Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Courage": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Daring": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Desist": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Dismiss Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Divine Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Divine Might": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Divine Purpose": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Divine Vigor": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Endure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Ethereal Cleansing": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Expulse Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Flame of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Flash of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Furor": {
+    "description": "",
+    "era": "",
+    "level": 8
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Guard": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Halo of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Hammer of Striking": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Hammer of Wrath": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Holy Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Holy Might": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Instrument of Nife": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Invisibility versus Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Lull": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Pacify": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Reanimation": {
+    "description": "",
+    "era": "",
+    "level": 22
+   },
+   "Reckless Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Reconstitution": {
+    "description": "",
+    "era": "",
+    "level": 30
+   },
+   "Remove Curse": {
+    "description": "",
+    "era": "",
+    "level": 45
+   },
+   "Remove Lesser Curse": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Remove Minor Curse": {
+    "description": "",
+    "era": "",
+    "level": 19
+   },
+   "Renewal": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Reparation": {
+    "description": "",
+    "era": "",
+    "level": 31
+   },
+   "Resist Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Retribution": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "Revive": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Sense the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Smite": {
+    "description": "",
+    "era": "",
+    "level": 19
+   },
+   "Soothe": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Spirit Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Spook the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Strike": {
+    "description": "",
+    "era": "",
+    "level": 1
+   },
+   "Stun": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Superior Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Symbol of Pinzarn": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Symbol of Ryltan": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Symbol of Transal": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Thunder of Karana": {
+    "description": "",
+    "era": "",
+    "level": 47
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Valor": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Valor of Marr": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Ward Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Wave of Life": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Wrath": {
+    "description": "",
+    "era": "",
+    "level": 34
+   },
+   "Yaulp": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Yaulp II": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   }
+  }
  },
  "Ranger": {
   "sections": [
@@ -497,7 +5785,338 @@
    50
   ],
   "served": "Ranger",
-  "spells": {}
+  "spells": {
+   "Barbcoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Bind Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Bramblecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Burning Arrow": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Burst of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Call of Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Call of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Call of Sky": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Calm Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Camouflage": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Careless Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Dance of the Fireflies": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Dismiss Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Endure Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Enduring Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Ensnaring Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Eyes of the Cat": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Feet like Cat": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Firefist": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Flame Lick": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Flaming Arrow": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Force of Nature": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Glimpse": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Grasping Roots": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Harmony": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Harmony of Nature": {
+    "description": "",
+    "era": "",
+    "level": 39
+   },
+   "Hawk Eye": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Ignite": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Immolate": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Invoke Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Jolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Levitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Lull Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Nature's Precision": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Pack Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Panic Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Resist Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Riftwind's Protection": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Scorching Arrow": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Searing Arrow": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "See Invisible": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Shield of Brambles": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Shield of Thistles": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Skin like Rock": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Skin like Steel": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Skin like Wood": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Snare": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Spikecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Spirit of Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Spirit of the Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Stinging Swarm": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Strength of Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Superior Camouflage": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Swarm of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Tangling Weeds": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Thistlecoat": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Ward Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Wolf Form": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   }
+  }
  },
  "Rogue": {
   "sections": [
@@ -628,7 +6247,353 @@
    50
   ],
   "served": "Shadow Knight",
-  "spells": {}
+  "spells": {
+   "Animate Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Blood of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Bone Walk": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Breath of the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Cancelling of Life": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Clinging Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Convoke Shadow": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Dark Empathy": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Dark Temptation": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Deadeye": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Despair": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Disease Cloud": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Dismiss Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Dooming Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Drain Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Engulfing Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Expulse Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Feign Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Gather Shadows": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Grim Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Harmshield": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Heart Flutter": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Heat Blood": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Invisibility versus Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Invoke Fear": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Leering Corpse": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Life Leech": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Lifebite": {
+    "description": "",
+    "era": "",
+    "level": 10
+   },
+   "Lifedraw": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Lifespike": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Lifetap": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Negation of Life": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Numb the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Resist Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Restless Bones": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Scream of Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Scream of Hate": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Scream of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Scythe of Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Sense the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Shadow Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Shadow Step": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Shadow Vortex": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Shieldskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Shroud of Hate": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Shroud of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Siphon Life": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Siphon Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Spear of Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Spear of Pain": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Spike of Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Spirit Tap": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Spook the Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Strengthen Death": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Summon Dead": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Terror of Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Terror of Shadows": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Vampiric Embrace": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Voice of Darkness": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Voice of Shadows": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Ward Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Wave of Enfeeblement": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Word of Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   }
+  }
  },
  "Shaman": {
   "sections": [
@@ -684,7 +6649,823 @@
    50
   ],
   "served": "Shaman",
-  "spells": {}
+  "spells": {
+   "Abolish Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Affliction": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Agility": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Alacrity": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Alluring Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Assiduous Vision": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Befriend Animal": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Blast of Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Blinding Luminance": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Blizzard Blast": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Burst of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Burst of Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Cannibalize": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Charisma": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Charm Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Chloroplast": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Companion Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Counteract Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Counteract Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Creeping Vision": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Cure Blindness": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Cure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Cure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Deftness": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Dexterity": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Dexterous Aura": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Disempower": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Drowsy": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Endure Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Endure Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Endure Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Endure Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Endure Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Enduring Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Envenomed Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Envenomed Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Feet like Cat": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Flash of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Fleeting Fury": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Form of the Bear": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Frenzied Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Frenzy": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Frost Rift": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Frost Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Furious Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Fury": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Gale of Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Glamour": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Greater Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Grow": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Guardian": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Guardian Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Harnessing of Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Health": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Imbue Amber": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Diamond": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Ivory": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Jade": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Imbue Sapphire": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Impassivity": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Incapacitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Infectious Cloud": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Infusion of Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Inner Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Insidious Fever": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Insidious Malady": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Instill": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Invisibility": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Invisibility versus Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Kragg's Salve": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Levitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Light Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Listless Power": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Malaise": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Malaisement": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Malosi": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Mass Imbue Amber": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Imbue Diamond": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Imbue Ivory": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Imbue Jade": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Mass Imbue Sapphire": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Minor Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Nimble": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Nonchalance": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Odium": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Pack Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Plague": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Poison Storm": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Protect": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Quickness": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Rage": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Raging Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Regeneration": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Remove Curse": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Remove Lesser Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Remove Minor Curse": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Resist Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Resist Disease": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Resist Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Resist Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Resist Poison": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Rising Dexterity": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Scale Skin": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Scale of Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Scourge": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Sense Animals": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Serpent Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Shifting Shield": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Shock of Venom": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Shock of the Tainted": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Shrink": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Sicken": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Slugs Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Snails Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Spirit Pouch": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Spirit Quickening": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Spirit Salve": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Spirit Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Spirit Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Spirit Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Spirit of Bear": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Spirit of Bih`Li": {
+    "description": "",
+    "era": "Classic",
+    "level": 36
+   },
+   "Spirit of Cat": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Spirit of Cheetah": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Spirit of Monkey": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Spirit of Ox": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Spirit of Snake": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Spirit of Wolf": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Spirit of the Puma": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Spirit of the Shrew": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Stamina": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Stoicism": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Strengthen": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Summon Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Summon Drink": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Summon Food": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Superior Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Tagar's Insects": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Tainted Breath": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Talisman of Altuna": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Talisman of Jasinth": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Talisman of Tnarg": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Talisman of the Beast": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Tiny Companion": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Togor's Insects": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Tortoises Healing": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Tumultuous Strength": {
+    "description": "",
+    "era": "Classic",
+    "level": 35
+   },
+   "Turtle Skin": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Ultravision": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Venom of the Snake": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Vigilant Spirit": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Vision": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Walking Sleep": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Winter's Roar": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   }
+  }
  },
  "Warrior": {
   "sections": [],
@@ -745,6 +7526,707 @@
    50
   ],
   "served": "Wizard",
-  "spells": {}
+  "spells": {
+   "Alter Plane: Hate": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Alter Plane: Sky": {
+    "description": "",
+    "era": "Classic",
+    "level": 46
+   },
+   "Arch Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Bind Affinity": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Bind Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Blast of Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Bonds of Force": {
+    "description": "",
+    "era": "Classic",
+    "level": 27
+   },
+   "Bounce": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Cancel Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Cast Force": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Cazic Temple Gate": {
+    "description": "",
+    "era": "",
+    "level": 23
+   },
+   "Cazic Temple Portal": {
+    "description": "",
+    "era": "",
+    "level": 33
+   },
+   "Chill Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Circle of Force": {
+    "description": "",
+    "era": "Classic",
+    "level": 31
+   },
+   "Column of Frost": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Column of Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Concussion": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Conflagration": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Diamondskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 40
+   },
+   "Elemental Armor": {
+    "description": "",
+    "era": "Classic",
+    "level": 42
+   },
+   "Elemental Shield": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Elnerick's Entombment of Ice": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Energy Storm": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Enticement of Flame": {
+    "description": "",
+    "era": "Classic",
+    "level": 44
+   },
+   "Evacuate: Greater Faydark": {
+    "description": "",
+    "era": "",
+    "level": 32
+   },
+   "Evacuate: Nektulos": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Evacuate: North Karana": {
+    "description": "",
+    "era": "",
+    "level": 26
+   },
+   "Evacuate: South Ro": {
+    "description": "",
+    "era": "",
+    "level": 38
+   },
+   "Evacuate: West Karana": {
+    "description": "",
+    "era": "",
+    "level": 47
+   },
+   "Eye of Zomm": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Fade": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "Fingers of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Fire Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 5
+   },
+   "Fire Spiral of Al'Kabor": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Firestorm": {
+    "description": "",
+    "era": "Classic",
+    "level": 12
+   },
+   "Flame Shock": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Force Snap": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Force Spiral of Al'Kabor": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Force Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Frost Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Frost Shock": {
+    "description": "",
+    "era": "Classic",
+    "level": 24
+   },
+   "Frost Spiral of Al'Kabor": {
+    "description": "",
+    "era": "",
+    "level": 12
+   },
+   "Frost Storm": {
+    "description": "",
+    "era": "Classic",
+    "level": 41
+   },
+   "Garrison's Mighty Mana Shock": {
+    "description": "",
+    "era": "",
+    "level": 18
+   },
+   "Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Gaze": {
+    "description": "",
+    "era": "Classic",
+    "level": 11
+   },
+   "Glimpse": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Gravity Flux": {
+    "description": "",
+    "era": "Classic",
+    "level": 43
+   },
+   "Greater Faydark Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 20
+   },
+   "Greater Faydark Portal": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Greater Mass Imbue Fire Opal": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "Greater Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 33
+   },
+   "Halo of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Harvest": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Heat Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Ice Comet": {
+    "description": "",
+    "era": "Classic",
+    "level": 49
+   },
+   "Ice Shock": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Icestrike": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Imbue Fire Opal": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Immobilize": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Inferno Shock": {
+    "description": "",
+    "era": "Classic",
+    "level": 26
+   },
+   "Instill": {
+    "description": "",
+    "era": "Classic",
+    "level": 17
+   },
+   "Invisibility": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Invisibility to Undead": {
+    "description": "",
+    "era": "Classic",
+    "level": 39
+   },
+   "Lava Storm": {
+    "description": "",
+    "era": "Classic",
+    "level": 32
+   },
+   "Leatherskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 21
+   },
+   "Lesser Evacuate": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "Lesser Familiar": {
+    "description": "",
+    "era": "",
+    "level": 45
+   },
+   "Lesser Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 6
+   },
+   "Levitate": {
+    "description": "",
+    "era": "Classic",
+    "level": 22
+   },
+   "Levitation": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Lightning Bolt": {
+    "description": "",
+    "era": "Classic",
+    "level": 16
+   },
+   "Lightning Shock": {
+    "description": "",
+    "era": "Classic",
+    "level": 37
+   },
+   "Lightning Storm": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Magnify": {
+    "description": "",
+    "era": "Classic",
+    "level": 29
+   },
+   "Major Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 23
+   },
+   "Mana Detonation": {
+    "description": "",
+    "era": "",
+    "level": 50
+   },
+   "Mana Ignition": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Markar's Clash": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Mass Imbue Fire Opal": {
+    "description": "",
+    "era": "",
+    "level": 28
+   },
+   "Minor Familiar": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "Minor Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Nektulos Gate": {
+    "description": "",
+    "era": "",
+    "level": 22
+   },
+   "Nektulos Portal": {
+    "description": "",
+    "era": "",
+    "level": 32
+   },
+   "North Karana Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 18
+   },
+   "North Karana Portal": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "North Ro Gate": {
+    "description": "",
+    "era": "",
+    "level": 22
+   },
+   "North Ro Portal": {
+    "description": "",
+    "era": "",
+    "level": 36
+   },
+   "Nullify Magic": {
+    "description": "",
+    "era": "Classic",
+    "level": 34
+   },
+   "Numbing Cold": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "O`Keil's Embers": {
+    "description": "",
+    "era": "",
+    "level": 10
+   },
+   "O`Keil's Flickering Flame": {
+    "description": "",
+    "era": "",
+    "level": 31
+   },
+   "O`Keil's Levity": {
+    "description": "",
+    "era": "",
+    "level": 25
+   },
+   "O`Keil's Radiation": {
+    "description": "",
+    "era": "Classic",
+    "level": 2
+   },
+   "Paralyzing Earth": {
+    "description": "",
+    "era": "Classic",
+    "level": 48
+   },
+   "Pillar of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Project Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 14
+   },
+   "Rend": {
+    "description": "",
+    "era": "Classic",
+    "level": 47
+   },
+   "Resistant Skin": {
+    "description": "",
+    "era": "Classic",
+    "level": 9
+   },
+   "Root": {
+    "description": "",
+    "era": "Classic",
+    "level": 3
+   },
+   "See Invisible": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Sense Summoned": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Shadow Step": {
+    "description": "",
+    "era": "Classic",
+    "level": 7
+   },
+   "Shielding": {
+    "description": "",
+    "era": "Classic",
+    "level": 15
+   },
+   "Shieldskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 13
+   },
+   "Shifting Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 38
+   },
+   "Shock Spiral of Al'Kabor": {
+    "description": "",
+    "era": "",
+    "level": 28
+   },
+   "Shock of Fire": {
+    "description": "",
+    "era": "Classic",
+    "level": 4
+   },
+   "Shock of Ice": {
+    "description": "",
+    "era": "Classic",
+    "level": 8
+   },
+   "Shock of Lightning": {
+    "description": "",
+    "era": "Classic",
+    "level": 10
+   },
+   "Sight": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Sphere of Light": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Steelskin": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Stonebrunt Gate": {
+    "description": "",
+    "era": "",
+    "level": 21
+   },
+   "Stonebrunt Portal": {
+    "description": "",
+    "era": "",
+    "level": 27
+   },
+   "Supernova": {
+    "description": "",
+    "era": "Classic",
+    "level": 45
+   },
+   "Thunder Strike": {
+    "description": "",
+    "era": "Classic",
+    "level": 28
+   },
+   "Thunderclap": {
+    "description": "",
+    "era": "Classic",
+    "level": 30
+   },
+   "Tishan's Clash": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Toxxulia Gate": {
+    "description": "",
+    "era": "Classic",
+    "level": 19
+   },
+   "Toxxulia Portal": {
+    "description": "",
+    "era": "",
+    "level": 28
+   },
+   "Translocate": {
+    "description": "",
+    "era": "Classic",
+    "level": 50
+   },
+   "Translocate: Cazic Temple": {
+    "description": "",
+    "era": "",
+    "level": 44
+   },
+   "Translocate: Greater Faydark": {
+    "description": "",
+    "era": "",
+    "level": 36
+   },
+   "Translocate: Nektulos": {
+    "description": "",
+    "era": "",
+    "level": 41
+   },
+   "Translocate: North Karana": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Translocate: North Ro": {
+    "description": "",
+    "era": "",
+    "level": 43
+   },
+   "Translocate: Stonebrunt": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "Translocate: Toxxulia": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Translocate: West Commons": {
+    "description": "",
+    "era": "",
+    "level": 40
+   },
+   "Translocate: West Karana": {
+    "description": "",
+    "era": "",
+    "level": 42
+   },
+   "True North": {
+    "description": "",
+    "era": "Classic",
+    "level": 1
+   },
+   "Vision Shift": {
+    "description": "",
+    "era": "",
+    "level": 40
+   },
+   "Ward of Calrena": {
+    "description": "",
+    "era": "",
+    "level": 49
+   },
+   "West Commons Gate": {
+    "description": "",
+    "era": "",
+    "level": 21
+   },
+   "West Commons Portal": {
+    "description": "",
+    "era": "",
+    "level": 35
+   },
+   "West Karana Gate": {
+    "description": "",
+    "era": "",
+    "level": 23
+   },
+   "West Karana Portal": {
+    "description": "",
+    "era": "",
+    "level": 37
+   },
+   "Wrath of Al'Kabor": {
+    "description": "",
+    "era": "",
+    "level": 48
+   },
+   "Yonder": {
+    "description": "",
+    "era": "Classic",
+    "level": 25
+   }
+  }
  }
 }

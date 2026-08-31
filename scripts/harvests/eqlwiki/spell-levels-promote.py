@@ -86,6 +86,30 @@ def spell_page_rows():
 
     rows = {}
     descriptions = {}
+    # A SECOND index, keyed on the page's own TITLE rather than its `spellname`.
+    #
+    # `name` above is `spellname or title` (spells-harvest.py), and this file's own
+    # header says why that is not a canonical name: `Healing Water` declares
+    # `spellname = Greater Healing` while describing a 425-point heal. The LEVELS
+    # stopped trusting it when the class page became authoritative — but the
+    # description fallback added for the KhazamSpellRow rename looked prose up by
+    # that same artefact name, so a class-page row whose page files itself under a
+    # copy-pasted `spellname` found nothing and shipped with no tooltip at all.
+    #
+    # That was all 24 of the entries the rename left description-less, and every one
+    # of them HAS wiki prose on its own page: `Circle of Butcherblock` (spellname
+    # `Ring of South Ro`) says "transports your group to the Butcherblock Mountains";
+    # `Leech` (spellname `Leach`) says "Drains the life from your target". The page
+    # title is what the class page names, so it is the key that matches.
+    #
+    # Consulted only AFTER the `spellname` index, so no row that resolves today
+    # changes: this strictly fills blanks.
+    by_page_title = {}
+    for s in spells:
+        title = (s.get("page_title") or "").strip()
+        if title and (d := (s.get("description") or "").strip()):
+            by_page_title.setdefault(title.casefold(), d)
+
     for group in groups.values():
         exact = [e for e in group if e.get("page_title") == e["name"]]
         picked = exact or group
@@ -102,12 +126,12 @@ def spell_page_rows():
                 key = (cls, display.casefold())
                 prev = rows.get(key)
                 rows[key] = (min(prev[0], lv) if prev else lv, display)
-    return rows, descriptions
+    return rows, descriptions, by_page_title
 
 
 def main():
     classes = json.loads((HERE / "class-spells.json").read_text(encoding="utf-8"))
-    page_rows, page_descriptions = spell_page_rows()
+    page_rows, page_descriptions, page_title_descriptions = spell_page_rows()
 
     # class -> the levels its page HAS a section for. A class with no page at all
     # (Warrior, Monk, Berserker) has no sections, so every spell-page row for it
@@ -150,7 +174,11 @@ def main():
                 # rather than inventing a sentence or showing markup. Without this the
                 # class rows come back description-less: 1,352 of 1,352 described before
                 # the rename, 345 of 1,353 after.
-                desc = row.get("description") or page_descriptions.get(name.casefold(), "")
+                # ...and the page-TITLE index last, which is what catches the pages
+                # filed under a copy-pasted `spellname` (see spell_page_rows).
+                desc = (row.get("description")
+                        or page_descriptions.get(name.casefold(), "")
+                        or page_title_descriptions.get(name.casefold(), ""))
                 put(name, cls, lv, SOURCE_CLASS, desc)
 
     # 2. Spell pages, ONLY for a (class, level) the class page has no section for.

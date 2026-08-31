@@ -209,7 +209,12 @@ public class LevelUnlocksTests
         // give the skill/spell description"). Before this the hover was the levels alone,
         // while AA rows had shown the wiki's effect text since the ledger existed.
         var promised = SpellLevelCatalog.Default.Find("Promised Renewal")!;
-        Assert.Equal("Imbues your target with life after 0:00:18, healing for 5000. · Cleric 39",
+        // The wording moved SOURCE on 2026-08-31, not meaning: eqlwiki's class-row template
+        // became KhazamSpellRow and dropped its `description` field, so this prose now comes
+        // from the spell PAGE ("after 18s" where the class row said "after 0:00:18"). Same
+        // fact, same wiki, different page — and the StartsWith below is the assertion that
+        // actually guards the rule, so this literal is a canary for the source moving again.
+        Assert.Equal("Imbues your target with life after 18s, healing for 5000. · Cleric 39",
             LevelUnlockText.SpellTooltip(promised));
         // One LINE, deliberately: both widgets render a tooltip containing a newline in
         // monospace (it is how stat blocks keep their columns), and wiki prose is not a
@@ -227,8 +232,9 @@ public class LevelUnlocksTests
 
         // A spell the wiki describes with nothing hovers its levels rather than an empty
         // box — and a spell with no levels at all still hovers its description. Neither
-        // is reachable from the shipped catalog today (every entry has both), which is
-        // exactly why they are asserted against hand-built entries instead of hoping.
+        // case is reachable from the SHIPPED catalog (the assertion at the end of this
+        // test is that every entry has prose), so both are pinned against hand-built
+        // entries: the behaviour has to survive whatever the catalog happens to contain.
         Assert.Equal("Cleric 39", LevelUnlockText.SpellTooltip(new SpellLevelEntry
         {
             Name = "x", Classes = [new SpellClassLevel { Class = "Cleric", Level = 39 }],
@@ -239,6 +245,17 @@ public class LevelUnlocksTests
         }));
 
         // Every shipped entry carries the wiki's prose, so the hover is never bare.
+        //
+        // **This stays at 100% with NO exemption list, and that was a decision.** The
+        // 2026-08-31 KhazamSpellRow rename left 24 entries description-less and the
+        // proposed unblock was a curated known-gaps list ("no eqlwiki prose") in the
+        // shape of DeadSettingTests.Known. The premise turned out to be false: all 24
+        // HAVE prose on eqlwiki, on their own spell page, and were missed only because
+        // the promote looked them up by the page's `spellname` field — a copy-paste
+        // artefact the harvest's own docstring warns is not a canonical name. Keying the
+        // fallback on the page TITLE recovered all 24, so there is nothing to exempt.
+        // An exemption list with no entries to justify is a hole waiting for the next
+        // harvest regression to be waved through it.
         Assert.All(SpellLevelCatalog.Default.All, e =>
             Assert.False(string.IsNullOrWhiteSpace(e.Description), $"{e.Name} has no description"));
     }

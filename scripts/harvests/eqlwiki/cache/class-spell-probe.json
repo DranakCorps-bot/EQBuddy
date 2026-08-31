@@ -1,55 +1,3414 @@
 {
+ "Aanya's Animation": [],
+ "Abolish Disease": [
+  [
+   "Shaman",
+   "48"
+  ]
+ ],
+ "Abolish Poison": [],
+ "Abundant Drink": [],
+ "Abundant Food": [],
+ "Adorning Grace": [],
+ "Affliction": [
+  [
+   "Shaman",
+   "19"
+  ]
+ ],
+ "Agility": [
+  [
+   "Shaman",
+   "41"
+  ]
+ ],
+ "Agilmente's Aria of Eagles": [
+  [
+   "Bard",
+   "31"
+  ]
+ ],
+ "Alacrity": [
+  [
+   "Enchanter",
+   "21"
+  ],
+  [
+   "Shaman",
+   "42"
+  ]
+ ],
+ "Alenia's Disenchanting Melody": [
+  [
+   "Bard",
+   "22"
+  ]
+ ],
+ "Alliance": [
+  [
+   "Enchanter",
+   "8"
+  ]
+ ],
+ "Allure": [],
+ "Allure of Death": [],
+ "Allure of the Wild": [],
+ "Alluring Aura": [],
+ "Alter Plane: Hate": [
+  [
+   "Wizard",
+   "46"
+  ]
+ ],
+ "Alter Plane: Sky": [
+  [
+   "Wizard",
+   "46"
+  ]
+ ],
+ "Amplification": [
+  [
+   "Bard",
+   "30"
+  ]
+ ],
+ "Anarchy": [],
+ "Angstlich's Appalling Screech": [
+  [
+   "Bard",
+   "26"
+  ]
+ ],
+ "Animate Dead": [
+  [
+   "Shadow Knight",
+   "38"
+  ],
+  [
+   "Necromancer",
+   "20"
+  ]
+ ],
+ "Anthem de Arms": [
+  [
+   "Bard",
+   "10"
+  ]
+ ],
+ "Arch Shielding": [
+  [
+   "Enchanter",
+   "40"
+  ],
+  [
+   "Necromancer",
+   "41"
+  ],
+  [
+   "Magician",
+   "43"
+  ],
+  [
+   "Wizard",
+   "44"
+  ]
+ ],
+ "Aria of Asceticism": [
+  [
+   "Bard",
+   "45"
+  ]
+ ],
+ "Armor of Faith": [
+  [
+   "Cleric",
+   "35"
+  ],
+  [
+   "Paladin",
+   "48"
+  ]
+ ],
+ "Armor of Protection": [
+  [
+   "Cleric",
+   "34"
+  ]
+ ],
+ "Armor of the Faithful": [
+  [
+   "Cleric",
+   "49"
+  ]
+ ],
  "Asp Venom Strike": [],
+ "Assiduous Vision": [
+  [
+   "Shaman",
+   "36"
+  ]
+ ],
+ "Asystole": [
+  [
+   "Necromancer",
+   "40"
+  ],
+  [
+   "Shadowknight",
+   "60"
+  ]
+ ],
+ "Atone": [],
+ "Augment Death": [],
+ "Augmentation": [],
+ "Auspice": [
+  [
+   "Necromancer",
+   "45"
+  ]
+ ],
+ "Avalanche": [],
+ "Banish Summoned": [
+  [
+   "Druid",
+   "43"
+  ],
+  [
+   "Magician",
+   "48"
+  ],
+  [
+   "Cleric",
+   "56"
+  ]
+ ],
+ "Banish Undead": [
+  [
+   "Cleric",
+   "43"
+  ],
+  [
+   "Necromancer",
+   "46"
+  ]
+ ],
  "Banishing Strike": [],
+ "Banshee Aura": [
+  [
+   "Necromancer",
+   "15"
+  ],
+  [
+   "Shadowknight",
+   "54"
+  ]
+ ],
+ "Barbcoat": [
+  [
+   "Druid",
+   "17"
+  ],
+  [
+   "Ranger",
+   "30"
+  ]
+ ],
+ "Barrier of Combustion": [],
+ "Befriend Animal": [
+  [
+   "Druid",
+   "13"
+  ],
+  [
+   "Shaman",
+   "25"
+  ]
+ ],
  "Befuddling Strike": [],
+ "Beguile": [],
+ "Beguile Animals": [],
+ "Beguile Plants": [],
+ "Beguile Undead": [],
+ "Benevolence": [
+  [
+   "Enchanter",
+   "20"
+  ]
+ ],
+ "Berserker Spirit": [],
+ "Berserker Strength": [],
+ "Bind Affinity": [
+  [
+   "Cleric",
+   "10"
+  ],
+  [
+   "Druid",
+   "12"
+  ],
+  [
+   "Enchanter",
+   "12"
+  ],
+  [
+   "Magician",
+   "12"
+  ],
+  [
+   "Necromancer",
+   "12"
+  ],
+  [
+   "Wizard",
+   "12"
+  ],
+  [
+   "Shaman",
+   "14"
+  ]
+ ],
+ "Bind Sight": [
+  [
+   "Enchanter",
+   "8"
+  ],
+  [
+   "Wizard",
+   "16"
+  ],
+  [
+   "Ranger",
+   "17"
+  ]
+ ],
+ "Blanket of Forgetfulness": [],
  "Blast of Cold": [],
+ "Blast of Frost": [
+  [
+   "Beastlord",
+   "12"
+  ]
+ ],
+ "Blast of Poison": [
+  [
+   "Shaman",
+   "42"
+  ]
+ ],
+ "Blaze": [],
+ "Blessing of Faith": [
+  [
+   "Cleric",
+   "35"
+  ]
+ ],
+ "Blessing of Piety": [
+  [
+   "Cleric",
+   "15"
+  ]
+ ],
+ "Blessing of the Knight": [
+  [
+   "Cleric",
+   "34"
+  ]
+ ],
+ "Blessing of the Lord Commander": [
+  [
+   "Cleric",
+   "48"
+  ]
+ ],
+ "Blessing of the Page": [
+  [
+   "Cleric",
+   "8"
+  ]
+ ],
+ "Blessing of the Squire": [
+  [
+   "Cleric",
+   "16"
+  ]
+ ],
+ "Blinding Luminance": [
+  [
+   "Cleric",
+   "34"
+  ],
+  [
+   "Shaman",
+   "39"
+  ]
+ ],
+ "Blizzard Blast": [
+  [
+   "Shaman",
+   "44"
+  ]
+ ],
  "Blood Draw Strike": [],
  "Blood Siphon Strike": [],
+ "Blood of Pain": [
+  [
+   "Shadow Knight",
+   "41"
+  ]
+ ],
+ "Blooming Heal": [
+  [
+   "Druid",
+   "30"
+  ]
+ ],
+ "Blossoming Heal": [
+  [
+   "Druid",
+   "40"
+  ]
+ ],
+ "Boil Blood": [
+  [
+   "Necromancer",
+   "28"
+  ],
+  [
+   "Shadowknight",
+   "53"
+  ]
+ ],
+ "Bolt of Flame": [],
+ "Boltran's Animation": [],
+ "Bond of Death": [
+  [
+   "Necromancer",
+   "49"
+  ]
+ ],
+ "Bonds of Force": [],
+ "Bone Walk": [
+  [
+   "Shadow Knight",
+   "14"
+  ],
+  [
+   "Necromancer",
+   "8"
+  ]
+ ],
+ "Boon of the Clear Mind": [],
+ "Boon of the Garou": [
+  [
+   "Enchanter",
+   "40"
+  ]
+ ],
+ "Bounce": [
+  [
+   "Enchanter",
+   "43"
+  ],
+  [
+   "Magician",
+   "42"
+  ],
+  [
+   "Necromancer",
+   "44"
+  ],
+  [
+   "Wizard",
+   "44"
+  ]
+ ],
+ "Bramblecoat": [
+  [
+   "Druid",
+   "27"
+  ],
+  [
+   "Ranger",
+   "34"
+  ]
+ ],
+ "Bravery": [],
+ "Breath of the Dead": [
+  [
+   "Shadow Knight",
+   "45"
+  ],
+  [
+   "Necromancer",
+   "21"
+  ]
+ ],
+ "Breeze": [],
+ "Brell's Steadfast Aegis": [
+  [
+   "Paladin",
+   "49"
+  ]
+ ],
+ "Brilliance": [],
+ "Brusco's Boastful Bellow": [
+  [
+   "Bard",
+   "12"
+  ]
+ ],
+ "Budding Heal": [
+  [
+   "Druid",
+   "4"
+  ]
+ ],
+ "Burn": [
+  [
+   "Magician",
+   "4"
+  ]
+ ],
+ "Burning Arrow": [
+  [
+   "Ranger",
+   "36"
+  ]
+ ],
+ "Burnout": [],
+ "Burnout II": [
+  [
+   "Magician",
+   "29"
+  ]
+ ],
+ "Burnout III": [],
+ "Burst of Fire": [
+  [
+   "Druid",
+   "3"
+  ],
+  [
+   "Ranger",
+   "14"
+  ]
+ ],
+ "Burst of Flame": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Shaman",
+   "1"
+  ],
+  [
+   "Magician",
+   "1"
+  ]
+ ],
+ "Burst of Strength": [
+  [
+   "Shaman",
+   "11"
+  ]
+ ],
+ "Cackling Bones": [
+  [
+   "Shadow Knight",
+   "58"
+  ],
+  [
+   "Necromancer",
+   "44"
+  ]
+ ],
+ "Cajole Undead": [],
+ "Cajoling Whispers": [],
+ "Call of Bones": [],
+ "Call of Earth": [],
+ "Call of Flame": [
+  [
+   "Ranger",
+   "49"
+  ]
+ ],
+ "Call of Sky": [],
+ "Calm": [
+  [
+   "Cleric",
+   "15"
+  ],
+  [
+   "Enchanter",
+   "18"
+  ],
+  [
+   "Paladin",
+   "43"
+  ]
+ ],
+ "Calm Animal": [
+  [
+   "Druid",
+   "15"
+  ],
+  [
+   "Ranger",
+   "31"
+  ]
+ ],
+ "Calming Visage": [
+  [
+   "Enchanter",
+   "36"
+  ]
+ ],
+ "Camouflage": [
+  [
+   "Druid",
+   "4"
+  ],
+  [
+   "Ranger",
+   "14"
+  ]
+ ],
+ "Cancel Magic": [
+  [
+   "Beastlord",
+   "35"
+  ],
+  [
+   "Cleric",
+   "13"
+  ],
+  [
+   "Druid",
+   "18"
+  ],
+  [
+   "Enchanter",
+   "7"
+  ],
+  [
+   "Magician",
+   "10"
+  ],
+  [
+   "Necromancer",
+   "15"
+  ],
+  [
+   "Paladin",
+   "32"
+  ],
+  [
+   "Ranger",
+   "30"
+  ],
+  [
+   "Shadow Knight",
+   "36"
+  ],
+  [
+   "Shaman",
+   "19"
+  ],
+  [
+   "Wizard",
+   "11"
+  ]
+ ],
+ "Cancelling of Life": [
+  [
+   "Necromancer",
+   "8"
+  ],
+  [
+   "Shadow Knight",
+   "18"
+  ]
+ ],
+ "Cannibalize": [
+  [
+   "Shaman",
+   "23"
+  ]
+ ],
  "Cantata of Soothing": [
   [
    "Bard",
    "34"
   ]
  ],
+ "Careless Lightning": [
+  [
+   "Druid",
+   "16"
+  ],
+  [
+   "Ranger",
+   "37"
+  ]
+ ],
+ "Cascade of Hail": [],
+ "Cascading Darkness": [
+  [
+   "Necromancer",
+   "47"
+  ],
+  [
+   "Shadowknight",
+   "59"
+  ]
+ ],
+ "Cassindra's Chant of Clarity": [
+  [
+   "Bard",
+   "20"
+  ]
+ ],
+ "Cassindra's Chorus of Clarity": [
+  [
+   "Bard",
+   "32"
+  ]
+ ],
+ "Cassindra's Elegy": [
+  [
+   "Bard",
+   "44"
+  ]
+ ],
+ "Cast Force": [
+  [
+   "Wizard",
+   "24"
+  ]
+ ],
+ "Cast Sight": [],
+ "Cavorting Bones": [
+  [
+   "Necromancer",
+   "1"
+  ]
+ ],
+ "Cazic Temple Gate": [
+  [
+   "Wizard",
+   "23"
+  ]
+ ],
+ "Cazic Temple Portal": [
+  [
+   "Wizard",
+   "33"
+  ]
+ ],
+ "Cease": [
+  [
+   "Paladin",
+   "7"
+  ]
+ ],
+ "Celerity": [
+  [
+   "Shaman",
+   "56"
+  ],
+  [
+   "Enchanter",
+   "39"
+  ]
+ ],
+ "Celestial Echo": [
+  [
+   "Cleric",
+   "34"
+  ]
+ ],
+ "Celestial Healing": [
+  [
+   "Cleric",
+   "44"
+  ]
+ ],
+ "Celestial Health": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Celestial Remedy": [
+  [
+   "Cleric",
+   "19"
+  ]
+ ],
+ "Center": [
+  [
+   "Cleric",
+   "7"
+  ],
+  [
+   "Paladin",
+   "20"
+  ]
+ ],
+ "Cessation of Life": [
+  [
+   "Necromancer",
+   "37"
+  ]
+ ],
+ "Chant of Battle": [
+  [
+   "Bard",
+   "1"
+  ]
+ ],
+ "Chaos Flux": [],
+ "Chaotic Feedback": [],
+ "Charisma": [
+  [
+   "Shaman",
+   "47"
+  ]
+ ],
+ "Charm": [],
+ "Charm Animals": [
+  [
+   "Druid",
+   "23"
+  ],
+  [
+   "Shaman",
+   "32"
+  ]
+ ],
+ "Chase the Moon": [
+  [
+   "Enchanter",
+   "16"
+  ]
+ ],
+ "Chill Sight": [
+  [
+   "Wizard",
+   "38"
+  ],
+  [
+   "Ranger",
+   "56"
+  ]
+ ],
+ "Chilling Embrace": [],
+ "Chloroplast": [
+  [
+   "Shaman",
+   "39"
+  ],
+  [
+   "Druid",
+   "42"
+  ]
+ ],
+ "Choke": [],
+ "Chords of Dissonance": [
+  [
+   "Bard",
+   "2"
+  ]
+ ],
+ "Cinda's Charismatic Carillon": [
+  [
+   "Bard",
+   "11"
+  ]
+ ],
+ "Cinder Bolt": [],
  "Circle of Butcherblock": [
   [
    "Druid",
    "25"
   ]
  ],
+ "Circle of Feerrott": [],
+ "Circle of Force": [],
+ "Circle of Lavastorm": [],
+ "Circle of Misty Thicket": [
+  [
+   "Druid",
+   "36"
+  ]
+ ],
  "Circle of North Karana": [],
+ "Circle of South Ro": [
+  [
+   "Druid",
+   "32"
+  ]
+ ],
+ "Circle of Steamfont": [],
+ "Circle of Stonebrunt": [
+  [
+   "Druid",
+   "28"
+  ]
+ ],
+ "Circle of Surefall Glade": [],
+ "Circle of Toxxulia": [],
+ "Circle of West Commons": [
+  [
+   "Druid",
+   "27"
+  ]
+ ],
+ "Clarify Mana": [],
+ "Clarity": [],
+ "Clinging Darkness": [
+  [
+   "Shadow Knight",
+   "11"
+  ],
+  [
+   "Necromancer",
+   "4"
+  ]
+ ],
+ "Cloud": [],
  "Clumsiness Strike": [],
  "Cobra Venom Strike": [],
+ "Coldlight": [
+  [
+   "Necromancer",
+   "1"
+  ]
+ ],
+ "Collaboration": [],
+ "Color Flux": [],
+ "Color Shift": [
+  [
+   "Enchanter",
+   "20"
+  ]
+ ],
+ "Color Skew": [],
+ "Column of Fire": [
+  [
+   "Magician",
+   "12"
+  ]
+ ],
+ "Column of Frost": [
+  [
+   "Wizard",
+   "8"
+  ]
+ ],
+ "Column of Lightning": [
+  [
+   "Wizard",
+   "24"
+  ]
+ ],
+ "Combust": [],
+ "Companion Spirit": [
+  [
+   "Shaman",
+   "32"
+  ]
+ ],
+ "Concussion": [],
  "Concussive Strike": [],
+ "Conflagration": [],
+ "Conjuration: Air": [],
+ "Conjuration: Earth": [
+  [
+   "Magician",
+   "44"
+  ]
+ ],
+ "Conjuration: Fire": [],
+ "Conjuration: Water": [],
+ "Convoke Shadow": [
+  [
+   "Shadow Knight",
+   "22"
+  ],
+  [
+   "Necromancer",
+   "12"
+  ]
+ ],
+ "Cornucopia": [],
+ "Corporeal Empathy": [],
+ "Counteract Disease": [
+  [
+   "Shaman",
+   "22"
+  ],
+  [
+   "Cleric",
+   "28"
+  ],
+  [
+   "Druid",
+   "28"
+  ],
+  [
+   "Necromancer",
+   "36"
+  ],
+  [
+   "Beastlord",
+   "45"
+  ]
+ ],
+ "Counteract Poison": [
+  [
+   "Cleric",
+   "22"
+  ],
+  [
+   "Shaman",
+   "26"
+  ],
+  [
+   "Druid",
+   "28"
+  ],
+  [
+   "Paladin",
+   "34"
+  ]
+ ],
+ "Courage": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "8"
+  ]
+ ],
+ "Covetous Subversion": [],
+ "Creeping Crud": [
+  [
+   "Druid",
+   "24"
+  ]
+ ],
+ "Creeping Vision": [
+  [
+   "Shaman",
+   "20"
+  ]
+ ],
+ "Crission's Pixie Strike": [
+  [
+   "Bard",
+   "28"
+  ]
+ ],
+ "Crystallize Mana": [
+  [
+   "Enchanter",
+   "19"
+  ]
+ ],
+ "Cure Blindness": [
+  [
+   "Cleric",
+   "3"
+  ],
+  [
+   "Shaman",
+   "7"
+  ]
+ ],
+ "Cure Disease": [
+  [
+   "Beastlord",
+   "4"
+  ],
+  [
+   "Cleric",
+   "4"
+  ],
+  [
+   "Druid",
+   "4"
+  ],
+  [
+   "Necromancer",
+   "13"
+  ],
+  [
+   "Paladin",
+   "11"
+  ],
+  [
+   "Ranger",
+   "22"
+  ],
+  [
+   "Shadowknight",
+   "19"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Cure Poison": [
+  [
+   "Beastlord",
+   "13"
+  ],
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Druid",
+   "5"
+  ],
+  [
+   "Paladin",
+   "5"
+  ],
+  [
+   "Ranger",
+   "13"
+  ],
+  [
+   "Shaman",
+   "2"
+  ]
+ ],
+ "Curse": [
+  [
+   "Shaman",
+   "34"
+  ]
+ ],
+ "Curse of the Simple Mind": [],
+ "Dagger of Symbols": [],
+ "Dance of the Fireflies": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "10"
+  ]
+ ],
+ "Daring": [
+  [
+   "Cleric",
+   "17"
+  ],
+  [
+   "Paladin",
+   "37"
+  ]
+ ],
+ "Dark Empathy": [
+  [
+   "Shadow Knight",
+   "21"
+  ],
+  [
+   "Necromancer",
+   "6"
+  ]
+ ],
+ "Dark Pact": [],
+ "Dark Soul": [
+  [
+   "Necromancer",
+   "39"
+  ]
+ ],
+ "Dark Temptation": [
+  [
+   "Shadow Knight",
+   "32"
+  ]
+ ],
+ "Dazzle": [],
+ "Dead Man Floating": [],
+ "Dead Men Floating": [],
+ "Deadeye": [
+  [
+   "Necromancer",
+   "5"
+  ],
+  [
+   "Shadowknight",
+   "17"
+  ]
+ ],
+ "Deftness": [
+  [
+   "Shaman",
+   "39"
+  ]
+ ],
+ "Denon's Desperate Dirge": [
+  [
+   "Bard",
+   "43"
+  ]
+ ],
+ "Denon's Disruptive Discord": [
+  [
+   "Bard",
+   "18"
+  ]
+ ],
+ "Denon's Dissension": [
+  [
+   "Bard",
+   "35"
+  ]
+ ],
+ "Desist": [
+  [
+   "Paladin",
+   "13"
+  ]
+ ],
+ "Despair": [
+  [
+   "Shadow Knight",
+   "9"
+  ]
+ ],
+ "Dexterity": [
+  [
+   "Shaman",
+   "48"
+  ]
+ ],
+ "Dexterous Aura": [
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Diamondskin": [
+  [
+   "Wizard",
+   "40"
+  ],
+  [
+   "Necromancer",
+   "43"
+  ],
+  [
+   "Shadowknight",
+   "59"
+  ]
+ ],
+ "Dimensional Hole": [],
+ "Dimensional Pocket": [
+  [
+   "Magician",
+   "8"
+  ]
+ ],
+ "Discordant Mind": [],
+ "Disease Cloud": [
+  [
+   "Shadow Knight",
+   "5"
+  ],
+  [
+   "Necromancer",
+   "1"
+  ]
+ ],
+ "Disempower": [
+  [
+   "Shaman",
+   "12"
+  ],
+  [
+   "Enchanter",
+   "16"
+  ]
+ ],
+ "Dismiss Summoned": [
+  [
+   "Druid",
+   "23"
+  ],
+  [
+   "Magician",
+   "25"
+  ],
+  [
+   "Ranger",
+   "33"
+  ],
+  [
+   "Cleric",
+   "37"
+  ]
+ ],
+ "Dismiss Undead": [
+  [
+   "Cleric",
+   "23"
+  ],
+  [
+   "Necromancer",
+   "28"
+  ],
+  [
+   "Paladin",
+   "46"
+  ],
+  [
+   "Shadow Knight",
+   "49"
+  ]
+ ],
+ "Distill Mana": [],
+ "Divine Aura": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "48"
+  ]
+ ],
+ "Divine Barrier": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Divine Might": [
+  [
+   "Paladin",
+   "45"
+  ]
+ ],
+ "Divine Purpose": [
+  [
+   "Paladin",
+   "37"
+  ]
+ ],
+ "Divine Vigor": [
+  [
+   "Paladin",
+   "35"
+  ]
+ ],
+ "Dizzying Wind": [],
+ "Dominate Undead": [],
+ "Dooming Darkness": [
+  [
+   "Shadow Knight",
+   "44"
+  ],
+  [
+   "Necromancer",
+   "27"
+  ]
+ ],
+ "Drain Soul": [
+  [
+   "Necromancer",
+   "48"
+  ],
+  [
+   "Shadowknight",
+   "60"
+  ]
+ ],
+ "Drain Spirit": [
+  [
+   "Shadow Knight",
+   "49"
+  ],
+  [
+   "Necromancer",
+   "39"
+  ]
+ ],
+ "Drifting Death": [],
+ "Drones of Doom": [
+  [
+   "Druid",
+   "32"
+  ],
+  [
+   "Ranger",
+   "54"
+  ]
+ ],
+ "Drowsy": [
+  [
+   "Shaman",
+   "5"
+  ],
+  [
+   "Beastlord",
+   "20"
+  ]
+ ],
+ "Dustdevil": [
+  [
+   "Druid",
+   "43"
+  ]
+ ],
+ "Dyn's Dizzying Draught": [],
+ "Earthquake": [
+  [
+   "Druid",
+   "31"
+  ],
+  [
+   "Cleric",
+   "44"
+  ]
+ ],
+ "Ebbing Strength": [],
+ "Echo of Health": [
+  [
+   "Cleric",
+   "8"
+  ]
+ ],
+ "Echoing Light": [
+  [
+   "Cleric",
+   "14"
+  ]
+ ],
+ "Efflorescing Heal": [
+  [
+   "Druid",
+   "48"
+  ]
+ ],
+ "Elemental Armor": [
+  [
+   "Magician",
+   "41"
+  ],
+  [
+   "Wizard",
+   "42"
+  ]
+ ],
+ "Elemental Maelstrom": [],
+ "Elemental Rhythms": [
+  [
+   "Bard",
+   "9"
+  ]
+ ],
+ "Elemental Shield": [
+  [
+   "Magician",
+   "19"
+  ],
+  [
+   "Wizard",
+   "20"
+  ]
+ ],
+ "Elemental: Air": [
+  [
+   "Magician",
+   "12"
+  ]
+ ],
+ "Elemental: Earth": [],
+ "Elemental: Fire": [],
+ "Elemental: Water": [],
+ "Elementaling: Air": [
+  [
+   "Magician",
+   "8"
+  ]
+ ],
+ "Elementaling: Earth": [],
+ "Elementaling: Fire": [],
+ "Elementaling: Water": [],
+ "Elementalkin: Air": [
+  [
+   "Magician",
+   "4"
+  ]
+ ],
+ "Elementalkin: Earth": [],
+ "Elementalkin: Fire": [],
+ "Elementalkin: Water": [],
+ "Elnerick's Entombment of Ice": [
+  [
+   "Wizard",
+   "35"
+  ]
+ ],
+ "Enchant Clay": [],
+ "Enchant Electrum": [
+  [
+   "Enchanter",
+   "14"
+  ]
+ ],
+ "Enchant Gold": [
+  [
+   "Enchanter",
+   "24"
+  ]
+ ],
+ "Enchant Platinum": [
+  [
+   "Enchanter",
+   "32"
+  ]
+ ],
+ "Enchant Silver": [
+  [
+   "Enchanter",
+   "7"
+  ]
+ ],
+ "Endure Cold": [
+  [
+   "Beastlord",
+   "3"
+  ],
+  [
+   "Cleric",
+   "13"
+  ],
+  [
+   "Druid",
+   "9"
+  ],
+  [
+   "Necromancer",
+   "3"
+  ],
+  [
+   "Ranger",
+   "18"
+  ],
+  [
+   "Shadow Knight",
+   "10"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Endure Disease": [
+  [
+   "Beastlord",
+   "22"
+  ],
+  [
+   "Cleric",
+   "11"
+  ],
+  [
+   "Paladin",
+   "38"
+  ],
+  [
+   "Shadow Knight",
+   "26"
+  ],
+  [
+   "Druid",
+   "19"
+  ],
+  [
+   "Shaman",
+   "8"
+  ],
+  [
+   "Necromancer",
+   "11"
+  ]
+ ],
+ "Endure Fire": [
+  [
+   "Beastlord",
+   "9"
+  ],
+  [
+   "Cleric",
+   "8"
+  ],
+  [
+   "Ranger",
+   "9"
+  ],
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Shaman",
+   "5"
+  ]
+ ],
+ "Endure Magic": [
+  [
+   "Cleric",
+   "16"
+  ],
+  [
+   "Paladin",
+   "29"
+  ],
+  [
+   "Druid",
+   "34"
+  ],
+  [
+   "Shaman",
+   "19"
+  ],
+  [
+   "Enchanter",
+   "17"
+  ],
+  [
+   "Beastlord",
+   "34"
+  ]
+ ],
+ "Endure Poison": [
+  [
+   "Cleric",
+   "6"
+  ],
+  [
+   "Paladin",
+   "21"
+  ],
+  [
+   "Druid",
+   "19"
+  ],
+  [
+   "Shaman",
+   "11"
+  ],
+  [
+   "Beastlord",
+   "18"
+  ]
+ ],
+ "Enduring Breath": [
+  [
+   "Ranger",
+   "20"
+  ],
+  [
+   "Druid",
+   "6"
+  ],
+  [
+   "Shaman",
+   "12"
+  ],
+  [
+   "Enchanter",
+   "12"
+  ],
+  [
+   "Beastlord",
+   "25"
+  ]
+ ],
+ "Energy Storm": [],
+ "Enfeeblement": [
+  [
+   "Enchanter",
+   "4"
+  ]
+ ],
+ "Engulfing Darkness": [
+  [
+   "Shadow Knight",
+   "20"
+  ],
+  [
+   "Necromancer",
+   "11"
+  ]
+ ],
+ "Engulfing Roots": [],
+ "Ensnare": [
+  [
+   "Druid",
+   "26"
+  ],
+  [
+   "Ranger",
+   "51"
+  ]
+ ],
+ "Ensnaring Roots": [
+  [
+   "Druid",
+   "21"
+  ],
+  [
+   "Ranger",
+   "45"
+  ]
+ ],
+ "Enthrall": [],
+ "Enticement of Flame": [
+  [
+   "Wizard",
+   "44"
+  ]
+ ],
+ "Entrance": [],
+ "Entrancing Lights": [
+  [
+   "Enchanter",
+   "30"
+  ]
+ ],
+ "Enveloping Roots": [
+  [
+   "Druid",
+   "36"
+  ],
+  [
+   "Ranger",
+   "60"
+  ]
+ ],
+ "Envenomed Bolt": [
+  [
+   "Shaman",
+   "49"
+  ],
+  [
+   "Necromancer",
+   "50"
+  ]
+ ],
+ "Envenomed Breath": [
+  [
+   "Shaman",
+   "24"
+  ],
+  [
+   "Beastlord",
+   "35"
+  ]
+ ],
+ "Eternities Torment": [
+  [
+   "Necromancer",
+   "27"
+  ]
+ ],
+ "Ethereal Cleansing": [
+  [
+   "Paladin",
+   "44"
+  ]
+ ],
+ "Evacuate: Greater Faydark": [
+  [
+   "Wizard",
+   "32"
+  ]
+ ],
  "Evacuate: Nektulos": [
   [
    "Wizard",
    "42"
   ]
  ],
+ "Evacuate: North Karana": [
+  [
+   "Wizard",
+   "26"
+  ]
+ ],
+ "Evacuate: South Ro": [
+  [
+   "Wizard",
+   "38"
+  ]
+ ],
+ "Evacuate: West Karana": [
+  [
+   "Wizard",
+   "47"
+  ]
+ ],
+ "Everfount": [],
+ "Everlasting Breath": [],
+ "Expedience": [],
+ "Expel Summoned": [
+  [
+   "Magician",
+   "28"
+  ],
+  [
+   "Druid",
+   "33"
+  ],
+  [
+   "Cleric",
+   "47"
+  ]
+ ],
+ "Expel Undead": [
+  [
+   "Cleric",
+   "33"
+  ],
+  [
+   "Necromancer",
+   "38"
+  ],
+  [
+   "Paladin",
+   "54"
+  ],
+  [
+   "Shadowknight",
+   "55"
+  ]
+ ],
+ "Expulse Summoned": [
+  [
+   "Druid",
+   "13"
+  ],
+  [
+   "Magician",
+   "18"
+  ],
+  [
+   "Cleric",
+   "27"
+  ]
+ ],
+ "Expulse Undead": [
+  [
+   "Cleric",
+   "13"
+  ],
+  [
+   "Necromancer",
+   "19"
+  ],
+  [
+   "Paladin",
+   "30"
+  ],
+  [
+   "Shadow Knight",
+   "39"
+  ]
+ ],
+ "Eye of Confusion": [],
+ "Eye of Zomm": [
+  [
+   "Magician",
+   "6"
+  ],
+  [
+   "Wizard",
+   "8"
+  ]
+ ],
+ "Eyes of the Cat": [],
+ "Fade": [],
+ "Fear": [
+  [
+   "Cleric",
+   "6"
+  ],
+  [
+   "Shadow Knight",
+   "12"
+  ],
+  [
+   "Necromancer",
+   "2"
+  ],
+  [
+   "Enchanter",
+   "3"
+  ]
+ ],
+ "Feckless Might": [],
+ "Feedback": [],
+ "Feet like Cat": [
+  [
+   "Shaman",
+   "3"
+  ],
+  [
+   "Ranger",
+   "12"
+  ]
+ ],
+ "Feign Death": [
+  [
+   "Shadow Knight",
+   "24"
+  ],
+  [
+   "Necromancer",
+   "16"
+  ]
+ ],
+ "Feral Spirit": [],
+ "Fingers of Fire": [],
+ "Fire": [],
+ "Fire Bolt": [],
+ "Fire Flux": [],
+ "Fire Spiral of Al'Kabor": [],
+ "Firefist": [
+  [
+   "Druid",
+   "6"
+  ],
+  [
+   "Ranger",
+   "17"
+  ]
+ ],
+ "Firestorm": [
+  [
+   "Wizard",
+   "12"
+  ]
+ ],
+ "Firestrike": [
+  [
+   "Druid",
+   "38"
+  ],
+  [
+   "Ranger",
+   "52"
+  ]
+ ],
+ "Fixation of Ro": [],
+ "Flame Arc": [
+  [
+   "Magician",
+   "39"
+  ]
+ ],
+ "Flame Bolt": [],
+ "Flame Flux": [],
+ "Flame Lick": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "3"
+  ]
+ ],
+ "Flame Shock": [],
+ "Flame of Light": [
+  [
+   "Paladin",
+   "50"
+  ]
+ ],
+ "Flaming Arrow": [
+  [
+   "Ranger",
+   "26"
+  ]
+ ],
+ "Flare": [
+  [
+   "Magician",
+   "1"
+  ]
+ ],
+ "Flash of Light": [
+  [
+   "Beastlord",
+   "5"
+  ],
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "2"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Fleeting Fury": [
+  [
+   "Beastlord",
+   "11"
+  ],
+  [
+   "Shaman",
+   "4"
+  ]
+ ],
+ "Flowering Heal": [
+  [
+   "Druid",
+   "20"
+  ]
+ ],
+ "Focus Death": [
+  [
+   "Necromancer",
+   "11"
+  ]
+ ],
+ "Force": [
+  [
+   "Cleric",
+   "31"
+  ],
+  [
+   "Paladin",
+   "52"
+  ]
+ ],
+ "Force Snap": [
+  [
+   "Wizard",
+   "17"
+  ]
+ ],
+ "Force Spiral of Al'Kabor": [],
+ "Force Strike": [],
+ "Force of Nature": [
+  [
+   "Ranger",
+   "50"
+  ]
+ ],
+ "Forest's Renewal": [
+  [
+   "Druid",
+   "49"
+  ]
+ ],
+ "Form of Bleached Bone": [
+  [
+   "Necromancer",
+   "44"
+  ]
+ ],
+ "Form of Chilled Bone": [
+  [
+   "Necromancer",
+   "16"
+  ]
+ ],
+ "Form of the Bear": [],
+ "Form of the Great Wolf": [],
+ "Frenzied Spirit": [
+  [
+   "Shaman",
+   "45"
+  ]
+ ],
+ "Frenzied Strength": [
+  [
+   "Cleric",
+   "31"
+  ],
+  [
+   "Paladin",
+   "52"
+  ]
+ ],
+ "Frenzy": [
+  [
+   "Shaman",
+   "16"
+  ],
+  [
+   "Beastlord",
+   "47"
+  ]
+ ],
+ "Frost Bolt": [
+  [
+   "Wizard",
+   "1"
+  ]
+ ],
+ "Frost Dagger": [
+  [
+   "Beastlord",
+   "23"
+  ]
+ ],
+ "Frost Rift": [
+  [
+   "Shaman",
+   "4"
+  ]
+ ],
+ "Frost Shard": [
+  [
+   "Beastlord",
+   "47"
+  ]
+ ],
+ "Frost Shock": [
+  [
+   "Wizard",
+   "24"
+  ]
+ ],
+ "Frost Spiral of Al'Kabor": [
+  [
+   "Wizard",
+   "12"
+  ]
+ ],
+ "Frost Storm": [],
+ "Frost Strike": [
+  [
+   "Shaman",
+   "23"
+  ]
+ ],
+ "Fufil's Curtailing Chant": [
+  [
+   "Bard",
+   "30"
+  ]
+ ],
+ "Furious Strength": [
+  [
+   "Shaman",
+   "39"
+  ]
+ ],
+ "Furor": [
+  [
+   "Cleric",
+   "5"
+  ],
+  [
+   "Paladin",
+   "8"
+  ]
+ ],
+ "Fury": [
+  [
+   "Shaman",
+   "30"
+  ]
+ ],
+ "Fury of Air": [],
+ "Gale of Poison": [
+  [
+   "Shaman",
+   "36"
+  ]
+ ],
+ "Garrison's Mighty Mana Shock": [
+  [
+   "Wizard",
+   "18"
+  ]
+ ],
+ "Gasping Embrace": [],
+ "Gate": [
+  [
+   "Cleric",
+   "5"
+  ],
+  [
+   "Druid",
+   "5"
+  ],
+  [
+   "Shaman",
+   "5"
+  ],
+  [
+   "Necromancer",
+   "4"
+  ],
+  [
+   "Wizard",
+   "4"
+  ],
+  [
+   "Magician",
+   "4"
+  ],
+  [
+   "Enchanter",
+   "4"
+  ]
+ ],
+ "Gather Shadows": [
+  [
+   "Shadow Knight",
+   "30"
+  ],
+  [
+   "Necromancer",
+   "7"
+  ]
+ ],
+ "Gaze": [],
+ "Gift of Magic": [
+  [
+   "Enchanter",
+   "34"
+  ]
+ ],
+ "Glamour": [
+  [
+   "Shaman",
+   "37"
+  ]
+ ],
+ "Glimpse": [
+  [
+   "Ranger",
+   "2"
+  ],
+  [
+   "Wizard",
+   "2"
+  ]
+ ],
+ "Grasping Roots": [
+  [
+   "Druid",
+   "2"
+  ],
+  [
+   "Ranger",
+   "15"
+  ]
+ ],
+ "Gravity Flux": [
+  [
+   "Enchanter",
+   "36"
+  ],
+  [
+   "Wizard",
+   "43"
+  ]
+ ],
+ "Greater Conjuration: Air": [],
+ "Greater Conjuration: Earth": [],
+ "Greater Conjuration: Fire": [],
+ "Greater Conjuration: Water": [
+  [
+   "Magician",
+   "49"
+  ]
+ ],
+ "Greater Faydark Gate": [
+  [
+   "Wizard",
+   "20"
+  ]
+ ],
+ "Greater Faydark Portal": [
+  [
+   "Wizard",
+   "27"
+  ]
+ ],
+ "Greater Healing": [
+  [
+   "Cleric",
+   "20"
+  ],
+  [
+   "Paladin",
+   "30"
+  ],
+  [
+   "Ranger",
+   "38"
+  ],
+  [
+   "Druid",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ],
+  [
+   "Beastlord",
+   "34"
+  ]
+ ],
+ "Greater Mass Imbue Fire Opal": [
+  [
+   "Wizard",
+   "42"
+  ]
+ ],
+ "Greater Shielding": [
+  [
+   "Enchanter",
+   "31"
+  ],
+  [
+   "Magician",
+   "32"
+  ],
+  [
+   "Necromancer",
+   "33"
+  ],
+  [
+   "Wizard",
+   "33"
+  ]
+ ],
+ "Greater Summoning: Air": [],
+ "Greater Summoning: Earth": [
+  [
+   "Magician",
+   "29"
+  ]
+ ],
+ "Greater Summoning: Fire": [],
+ "Greater Summoning: Water": [],
+ "Greater Wolf Form": [
+  [
+   "Druid",
+   "30"
+  ],
+  [
+   "Ranger",
+   "56"
+  ]
+ ],
+ "Grim Aura": [
+  [
+   "Shadow Knight",
+   "16"
+  ],
+  [
+   "Necromancer",
+   "3"
+  ]
+ ],
  "Grounding Strike": [],
+ "Group Resist Magic": [],
+ "Grow": [
+  [
+   "Shaman",
+   "16"
+  ]
+ ],
+ "Guard": [
+  [
+   "Cleric",
+   "25"
+  ],
+  [
+   "Paladin",
+   "39"
+  ]
+ ],
+ "Guard of Alendar": [
+  [
+   "Enchanter",
+   "44"
+  ]
+ ],
+ "Guard of Vie": [
+  [
+   "Cleric",
+   "40"
+  ]
+ ],
+ "Guardian": [
+  [
+   "Shaman",
+   "42"
+  ]
+ ],
+ "Guardian Rhythms": [
+  [
+   "Bard",
+   "17"
+  ]
+ ],
+ "Guardian Spirit": [
+  [
+   "Shaman",
+   "41"
+  ]
+ ],
+ "Halo of Light": [
+  [
+   "Wizard",
+   "9"
+  ],
+  [
+   "Druid",
+   "11"
+  ],
+  [
+   "Cleric",
+   "12"
+  ],
+  [
+   "Paladin",
+   "16"
+  ]
+ ],
+ "Hammer of Requital": [],
+ "Hammer of Striking": [
+  [
+   "Cleric",
+   "20"
+  ],
+  [
+   "Paladin",
+   "23"
+  ]
+ ],
+ "Hammer of Wrath": [
+  [
+   "Cleric",
+   "7"
+  ],
+  [
+   "Paladin",
+   "14"
+  ]
+ ],
+ "Harmony": [
+  [
+   "Ranger",
+   "22"
+  ],
+  [
+   "Druid",
+   "5"
+  ]
+ ],
+ "Harmony of Nature": [
+  [
+   "Druid",
+   "29"
+  ],
+  [
+   "Ranger",
+   "39"
+  ]
+ ],
+ "Harmshield": [
+  [
+   "Shadow Knight",
+   "50"
+  ],
+  [
+   "Necromancer",
+   "20"
+  ]
+ ],
+ "Harnessing of Spirit": [
+  [
+   "Shaman",
+   "46"
+  ]
+ ],
+ "Harvest": [],
+ "Haunting Corpse": [
+  [
+   "Necromancer",
+   "24"
+  ]
+ ],
+ "Haunting Visage": [],
+ "Hawk Eye": [
+  [
+   "Ranger",
+   "11"
+  ]
+ ],
+ "Haze": [],
+ "Healing": [
+  [
+   "Cleric",
+   "10"
+  ],
+  [
+   "Paladin",
+   "20"
+  ],
+  [
+   "Ranger",
+   "28"
+  ],
+  [
+   "Druid",
+   "19"
+  ],
+  [
+   "Shaman",
+   "19"
+  ],
+  [
+   "Beastlord",
+   "24"
+  ]
+ ],
+ "Healing Light": [
+  [
+   "Cleric",
+   "45"
+  ]
+ ],
  "Healing Water": [
   [
    "Druid",
    "34"
   ]
  ],
+ "Health": [
+  [
+   "Shaman",
+   "30"
+  ]
+ ],
+ "Heart Flutter": [
+  [
+   "Necromancer",
+   "13"
+  ],
+  [
+   "Shadow Knight",
+   "36"
+  ]
+ ],
+ "Heat Blood": [
+  [
+   "Shadow Knight",
+   "28"
+  ],
+  [
+   "Necromancer",
+   "10"
+  ]
+ ],
+ "Heat Sight": [
+  [
+   "Wizard",
+   "16"
+  ]
+ ],
+ "Herikol's Soothing": [
+  [
+   "Beastlord",
+   "27"
+  ]
+ ],
  "Hobbling Strike": [],
+ "Holy Armor": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "15"
+  ]
+ ],
+ "Holy Might": [
+  [
+   "Cleric",
+   "16"
+  ],
+  [
+   "Paladin",
+   "42"
+  ]
+ ],
+ "Hungry Earth": [
+  [
+   "Necromancer",
+   "16"
+  ]
+ ],
+ "Hymn of Restoration": [
+  [
+   "Bard",
+   "6"
+  ]
+ ],
+ "Ice": [],
+ "Ice Comet": [
+  [
+   "Wizard",
+   "49"
+  ]
+ ],
+ "Ice Shock": [
+  [
+   "Wizard",
+   "34"
+  ]
+ ],
+ "Ice Spear": [
+  [
+   "Beastlord",
+   "33"
+  ]
+ ],
+ "Icestrike": [],
+ "Ignite": [
+  [
+   "Druid",
+   "8"
+  ],
+  [
+   "Ranger",
+   "19"
+  ]
+ ],
+ "Ignite Blood": [],
+ "Ignite Bones": [],
+ "Illusion: Air Elemental": [
+  [
+   "Enchanter",
+   "29"
+  ]
+ ],
+ "Illusion: Barbarian": [],
+ "Illusion: Dark Elf": [],
+ "Illusion: Dry Bone": [],
+ "Illusion: Dwarf": [],
+ "Illusion: Earth Elemental": [],
+ "Illusion: Erudite": [
+  [
+   "Enchanter",
+   "12"
+  ]
+ ],
+ "Illusion: Fire Elemental": [],
+ "Illusion: Gnome": [
+  [
+   "Enchanter",
+   "8"
+  ]
+ ],
  "Illusion: Half-Elf": [],
+ "Illusion: Halfling": [
+  [
+   "Enchanter",
+   "12"
+  ]
+ ],
+ "Illusion: High Elf": [],
+ "Illusion: Human": [],
+ "Illusion: Iksar": [
+  [
+   "Enchanter",
+   "20"
+  ]
+ ],
  "Illusion: Imp": [
   [
    "Enchanter",
    "45"
   ]
  ],
+ "Illusion: Ogre": [],
+ "Illusion: Scaled Wolf": [
+  [
+   "Enchanter",
+   "44"
+  ]
+ ],
+ "Illusion: Skeleton": [
+  [
+   "Enchanter",
+   "24"
+  ]
+ ],
+ "Illusion: Spirit Wolf": [],
+ "Illusion: Tree": [],
+ "Illusion: Troll": [],
+ "Illusion: Water Elemental": [],
+ "Illusion: Werewolf": [],
+ "Illusion: Wood Elf": [],
+ "Imbue Amber": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Imbue Black Pearl": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Black Sapphire": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Diamond": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Imbue Emerald": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Druid",
+   "29"
+  ]
+ ],
+ "Imbue Fire Opal": [],
+ "Imbue Ivory": [
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Imbue Jade": [
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Imbue Opal": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Peridot": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Plains Pebble": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Druid",
+   "29"
+  ]
+ ],
+ "Imbue Rose Quartz": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Ruby": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Imbue Sapphire": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Imbue Topaz": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Immobilize": [
+  [
+   "Enchanter",
+   "39"
+  ],
+  [
+   "Wizard",
+   "39"
+  ],
+  [
+   "Cleric",
+   "46"
+  ],
+  [
+   "Shaman",
+   "51"
+  ],
+  [
+   "Necromancer",
+   "58"
+  ]
+ ],
+ "Immolate": [
+  [
+   "Druid",
+   "25"
+  ],
+  [
+   "Ranger",
+   "44"
+  ]
+ ],
+ "Impart Strength": [
+  [
+   "Necromancer",
+   "8"
+  ]
+ ],
+ "Impassivity": [
+  [
+   "Shaman",
+   "16"
+  ]
+ ],
+ "Improved Invisibility": [
+  [
+   "Wizard",
+   "55"
+  ],
+  [
+   "Enchanter",
+   "50"
+  ]
+ ],
+ "Improved Invisibility to Undead": [
+  [
+   "Cleric",
+   "48"
+  ],
+  [
+   "Necromancer",
+   "50"
+  ],
+  [
+   "Shadow Knight",
+   "61"
+  ],
+  [
+   "Paladin",
+   "63"
+  ]
+ ],
  "Improved Superior Camouflage": [],
+ "Incapacitate": [
+  [
+   "Enchanter",
+   "40"
+  ],
+  [
+   "Shaman",
+   "41"
+  ]
+ ],
+ "Incinerate Bones": [],
+ "Infectious Cloud": [
+  [
+   "Necromancer",
+   "15"
+  ],
+  [
+   "Shaman",
+   "15"
+  ]
+ ],
+ "Inferno Shield": [],
+ "Inferno Shock": [],
+ "Infusion of Spirit": [
+  [
+   "Shaman",
+   "49"
+  ]
+ ],
+ "Inner Fire": [
+  [
+   "Beastlord",
+   "7"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Insidious Fever": [
+  [
+   "Shaman",
+   "17"
+  ]
+ ],
+ "Insidious Malady": [
+  [
+   "Shaman",
+   "38"
+  ]
+ ],
+ "Insidious Retrogression": [
+  [
+   "Necromancer",
+   "46"
+  ]
+ ],
+ "Insight": [],
+ "Insipid Weakness": [
+  [
+   "Enchanter",
+   "34"
+  ]
+ ],
+ "Inspire Fear": [],
+ "Instill": [
+  [
+   "Wizard",
+   "17"
+  ],
+  [
+   "Enchanter",
+   "25"
+  ],
+  [
+   "Cleric",
+   "27"
+  ],
+  [
+   "Shaman",
+   "33"
+  ],
+  [
+   "Necromancer",
+   "53"
+  ],
+  [
+   "Paladin",
+   "54"
+  ]
+ ],
+ "Instrument of Nife": [
+  [
+   "Paladin",
+   "15"
+  ]
+ ],
+ "Intellectual Advancement": [
+  [
+   "Enchanter",
+   "11"
+  ]
+ ],
+ "Intellectual Superiority": [
+  [
+   "Enchanter",
+   "17"
+  ]
+ ],
+ "Intensify Death": [],
+ "Invisibility": [
+  [
+   "Enchanter",
+   "4"
+  ],
+  [
+   "Magician",
+   "8"
+  ],
+  [
+   "Wizard",
+   "16"
+  ],
+  [
+   "Shaman",
+   "27"
+  ],
+  [
+   "Beastlord",
+   "43"
+  ]
+ ],
+ "Invisibility to Undead": [
+  [
+   "Wizard",
+   "39"
+  ]
+ ],
+ "Invisibility versus Animals": [
+  [
+   "Druid",
+   "8"
+  ],
+  [
+   "Shaman",
+   "10"
+  ]
+ ],
+ "Invisibility versus Undead": [
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Shadowknight",
+   "4"
+  ],
+  [
+   "Cleric",
+   "11"
+  ],
+  [
+   "Enchanter",
+   "14"
+  ],
+  [
+   "Paladin",
+   "17"
+  ]
+ ],
+ "Invoke Death": [],
+ "Invoke Fear": [
+  [
+   "Cleric",
+   "36"
+  ],
+  [
+   "Enchanter",
+   "35"
+  ],
+  [
+   "Necromancer",
+   "30"
+  ],
+  [
+   "Shadow Knight",
+   "43"
+  ]
+ ],
+ "Invoke Lightning": [
+  [
+   "Druid",
+   "4"
+  ],
+  [
+   "Ranger",
+   "15"
+  ]
+ ],
+ "Invoke Shadow": [],
+ "Jaxan's Jig o' Vigor": [
+  [
+   "Bard",
+   "3"
+  ]
+ ],
+ "Jolt": [],
+ "Jonthan's Provocation": [
+  [
+   "Bard",
+   "45"
+  ]
+ ],
+ "Jonthan's Whistling Warsong": [
+  [
+   "Bard",
+   "7"
+  ]
+ ],
+ "Juli's Animation": [],
  "Katta's Song of Sword Dancing": [
   [
    "Bard",
    "39"
   ]
  ],
+ "Kelin's Lucid Lullaby": [
+  [
+   "Bard",
+   "15"
+  ]
+ ],
+ "Kelin's Lugubrious Lament": [
+  [
+   "Bard",
+   "8"
+  ]
+ ],
+ "Keshuval's Rejuvenation": [
+  [
+   "Beastlord",
+   "15"
+  ]
+ ],
+ "Kilan's Animation": [],
+ "Kintaz's Animation": [],
+ "Kragg's Salve": [
+  [
+   "Shaman",
+   "50"
+  ]
+ ],
+ "Languid Pace": [
+  [
+   "Enchanter",
+   "9"
+  ],
+  [
+   "Beastlord",
+   "35"
+  ]
+ ],
+ "Largo's Melodic Binding": [
+  [
+   "Bard",
+   "20"
+  ]
+ ],
+ "Lava Bolt": [],
+ "Lava Storm": [],
+ "Leatherskin": [
+  [
+   "Wizard",
+   "21"
+  ],
+  [
+   "Necromancer",
+   "22"
+  ]
+ ],
  "Leech": [],
+ "Leering Corpse": [
+  [
+   "Necromancer",
+   "4"
+  ],
+  [
+   "Shadow Knight",
+   "7"
+  ]
+ ],
+ "Legacy of Spike": [],
+ "Lesser Conjuration: Air": [],
+ "Lesser Conjuration: Earth": [
+  [
+   "Magician",
+   "39"
+  ]
+ ],
+ "Lesser Conjuration: Fire": [],
+ "Lesser Conjuration: Water": [],
+ "Lesser Evacuate": [
+  [
+   "Wizard",
+   "18"
+  ]
+ ],
+ "Lesser Familiar": [
+  [
+   "Wizard",
+   "45"
+  ]
+ ],
+ "Lesser Shielding": [
+  [
+   "Magician",
+   "5"
+  ],
+  [
+   "Enchanter",
+   "6"
+  ],
+  [
+   "Wizard",
+   "6"
+  ],
+  [
+   "Necromancer",
+   "8"
+  ]
+ ],
+ "Lesser Succor": [
+  [
+   "Druid",
+   "18"
+  ]
+ ],
+ "Lesser Summoning: Air": [
+  [
+   "Magician",
+   "20"
+  ]
+ ],
+ "Lesser Summoning: Earth": [],
+ "Lesser Summoning: Fire": [],
+ "Lesser Summoning: Water": [],
+ "Leviathan Eyes": [
+  [
+   "Enchanter",
+   "44"
+  ]
+ ],
+ "Levitate": [
+  [
+   "Ranger",
+   "35"
+  ],
+  [
+   "Druid",
+   "14"
+  ],
+  [
+   "Shaman",
+   "10"
+  ],
+  [
+   "Wizard",
+   "22"
+  ],
+  [
+   "Enchanter",
+   "15"
+  ],
+  [
+   "Beastlord",
+   "32"
+  ]
+ ],
+ "Levitation": [
+  [
+   "Druid",
+   "50"
+  ],
+  [
+   "Wizard",
+   "50"
+  ]
+ ],
+ "Lich": [],
+ "Life Leech": [],
+ "Lifebite": [
+  [
+   "Necromancer",
+   "8"
+  ],
+  [
+   "Shadow Knight",
+   "10"
+  ]
+ ],
+ "Lifedraw": [
+  [
+   "Necromancer",
+   "12"
+  ],
+  [
+   "Shadow Knight",
+   "15"
+  ]
+ ],
+ "Lifespike": [
+  [
+   "Necromancer",
+   "3"
+  ],
+  [
+   "Shadow Knight",
+   "8"
+  ]
+ ],
+ "Lifetap": [
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Shadow Knight",
+   "1"
+  ]
+ ],
+ "Light Healing": [
+  [
+   "Cleric",
+   "4"
+  ],
+  [
+   "Druid",
+   "9"
+  ],
+  [
+   "Shaman",
+   "9"
+  ],
+  [
+   "Paladin",
+   "10"
+  ],
+  [
+   "Beastlord",
+   "14"
+  ],
+  [
+   "Ranger",
+   "16"
+  ]
+ ],
+ "Lightning Blast": [],
+ "Lightning Bolt": [
+  [
+   "Wizard",
+   "16"
+  ]
+ ],
+ "Lightning Shock": [],
+ "Lightning Storm": [],
+ "Lightning Strike": [],
+ "Listless Power": [
+  [
+   "Enchanter",
+   "25"
+  ],
+  [
+   "Shaman",
+   "29"
+  ],
+  [
+   "Beastlord",
+   "44"
+  ]
+ ],
+ "Lull": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Enchanter",
+   "1"
+  ],
+  [
+   "Paladin",
+   "10"
+  ]
+ ],
+ "Lull Animal": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "4"
+  ]
+ ],
+ "Lyssa's Solidarity of Vision": [
+  [
+   "Bard",
+   "34"
+  ]
+ ],
+ "Lyssa's Veracious Concord": [
+  [
+   "Bard",
+   "24"
+  ]
+ ],
+ "Magical Monologue": [
+  [
+   "Bard",
+   "9"
+  ]
+ ],
+ "Magnify": [
+  [
+   "Wizard",
+   "29"
+  ]
+ ],
+ "Major Shielding": [
+  [
+   "Enchanter",
+   "23"
+  ],
+  [
+   "Wizard",
+   "23"
+  ],
+  [
+   "Magician",
+   "24"
+  ],
+  [
+   "Necromancer",
+   "24"
+  ]
+ ],
+ "Malaise": [
+  [
+   "Shaman",
+   "18"
+  ],
+  [
+   "Magician",
+   "22"
+  ]
+ ],
  "Malaisement": [
   [
    "Shaman",
@@ -60,7 +3419,126 @@
    "44"
   ]
  ],
+ "Malaria": [
+  [
+   "Beastlord",
+   "40"
+  ]
+ ],
+ "Malignant Dead": [
+  [
+   "Shadow Knight",
+   "52"
+  ],
+  [
+   "Necromancer",
+   "39"
+  ]
+ ],
+ "Malosi": [
+  [
+   "Shaman",
+   "48"
+  ],
+  [
+   "Magician",
+   "51"
+  ]
+ ],
+ "Mana Detonation": [
+  [
+   "Wizard",
+   "50"
+  ]
+ ],
+ "Mana Ignition": [
+  [
+   "Wizard",
+   "44"
+  ]
+ ],
+ "Mana Sieve": [],
  "Markar's Clash": [],
+ "Mass Clarify Mana": [
+  [
+   "Enchanter",
+   "29"
+  ]
+ ],
+ "Mass Crystallize Mana": [
+  [
+   "Enchanter",
+   "20"
+  ]
+ ],
+ "Mass Distill Mana": [
+  [
+   "Enchanter",
+   "39"
+  ]
+ ],
+ "Mass Enchant Clay": [
+  [
+   "Enchanter",
+   "8"
+  ]
+ ],
+ "Mass Enchant Electrum": [
+  [
+   "Enchanter",
+   "14"
+  ]
+ ],
+ "Mass Enchant Gold": [
+  [
+   "Enchanter",
+   "24"
+  ]
+ ],
+ "Mass Enchant Platinum": [
+  [
+   "Enchanter",
+   "32"
+  ]
+ ],
+ "Mass Enchant Silver": [
+  [
+   "Enchanter",
+   "7"
+  ]
+ ],
+ "Mass Imbue Amber": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Mass Imbue Black Pearl": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Black Sapphire": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Diamond": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
  "Mass Imbue Emerald": [
   [
    "Cleric",
@@ -71,19 +3549,1351 @@
    "29"
   ]
  ],
+ "Mass Imbue Fire Opal": [
+  [
+   "Wizard",
+   "28"
+  ]
+ ],
+ "Mass Imbue Ivory": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Mass Imbue Jade": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Mass Imbue Opal": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Peridot": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Plains Pebble": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Druid",
+   "29"
+  ]
+ ],
+ "Mass Imbue Rose Quartz": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Ruby": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Imbue Sapphire": [
+  [
+   "Shaman",
+   "29"
+  ]
+ ],
+ "Mass Imbue Topaz": [
+  [
+   "Cleric",
+   "29"
+  ]
+ ],
+ "Mass Purify Mana": [
+  [
+   "Enchanter",
+   "47"
+  ]
+ ],
+ "Mass Thicken Mana": [
+  [
+   "Enchanter",
+   "11"
+  ]
+ ],
+ "McVaxius' Berserker Crescendo": [
+  [
+   "Bard",
+   "42"
+  ]
+ ],
+ "Melanie's Mellifluous Motion": [
+  [
+   "Bard",
+   "21"
+  ]
+ ],
  "Melody of Ervaj": [
   [
    "Bard",
    "50"
   ]
  ],
+ "Memory Blur": [],
+ "Mend Bones": [],
+ "Mesmerization": [
+  [
+   "Enchanter",
+   "16"
+  ]
+ ],
+ "Mesmerize": [],
+ "Mind Wipe": [],
+ "Minor Conjuration: Air": [],
+ "Minor Conjuration: Earth": [
+  [
+   "Magician",
+   "34"
+  ]
+ ],
+ "Minor Conjuration: Fire": [],
+ "Minor Conjuration: Water": [],
+ "Minor Familiar": [
+  [
+   "Wizard",
+   "25"
+  ]
+ ],
+ "Minor Healing": [
+  [
+   "Beastlord",
+   "1"
+  ],
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Paladin",
+   "1"
+  ],
+  [
+   "Ranger",
+   "1"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Minor Illusion": [
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Minor Shielding": [
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Wizard",
+   "1"
+  ],
+  [
+   "Magician",
+   "1"
+  ],
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Minor Summoning: Air": [
+  [
+   "Magician",
+   "16"
+  ]
+ ],
+ "Minor Summoning: Earth": [],
+ "Minor Summoning: Fire": [],
+ "Minor Summoning: Water": [],
+ "Mircyl's Animation": [],
+ "Mist": [],
+ "Modulating Rod": [
+  [
+   "Magician",
+   "44"
+  ]
+ ],
+ "Monster Summoning I": [],
+ "Monster Summoning II": [
+  [
+   "Magician",
+   "50"
+  ]
+ ],
+ "Nature's Precision": [
+  [
+   "Ranger",
+   "37"
+  ]
+ ],
+ "Nature's Renewal": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Negation of Life": [
+  [
+   "Necromancer",
+   "18"
+  ],
+  [
+   "Shadow Knight",
+   "31"
+  ]
+ ],
+ "Nektulos Gate": [
+  [
+   "Wizard",
+   "22"
+  ]
+ ],
+ "Nektulos Portal": [
+  [
+   "Wizard",
+   "32"
+  ]
+ ],
+ "Nimble": [
+  [
+   "Shaman",
+   "31"
+  ]
+ ],
+ "Niv's Melody of Preservation": [
+  [
+   "Bard",
+   "47"
+  ]
+ ],
+ "Nonchalance": [
+  [
+   "Shaman",
+   "30"
+  ]
+ ],
+ "North Karana Gate": [
+  [
+   "Wizard",
+   "18"
+  ]
+ ],
+ "North Karana Portal": [
+  [
+   "Wizard",
+   "25"
+  ]
+ ],
+ "North Ro Gate": [
+  [
+   "Wizard",
+   "22"
+  ]
+ ],
+ "North Ro Portal": [
+  [
+   "Wizard",
+   "36"
+  ]
+ ],
+ "Nullify Magic": [
+  [
+   "Enchanter",
+   "28"
+  ],
+  [
+   "Magician",
+   "32"
+  ],
+  [
+   "Wizard",
+   "34"
+  ],
+  [
+   "Necromancer",
+   "37"
+  ],
+  [
+   "Cleric",
+   "38"
+  ],
+  [
+   "Druid",
+   "43"
+  ],
+  [
+   "Shaman",
+   "44"
+  ]
+ ],
+ "Numb the Dead": [
+  [
+   "Necromancer",
+   "2"
+  ],
+  [
+   "Shadow Knight",
+   "9"
+  ]
+ ],
+ "Numbing Cold": [
+  [
+   "Wizard",
+   "1"
+  ]
+ ],
+ "O`Keil's Embers": [
+  [
+   "Wizard",
+   "10"
+  ]
+ ],
+ "O`Keil's Flickering Flame": [
+  [
+   "Wizard",
+   "31"
+  ]
+ ],
+ "O`Keil's Levity": [
+  [
+   "Wizard",
+   "25"
+  ]
+ ],
  "O`Keil's Radiation": [],
+ "Obscure": [],
+ "Odium": [
+  [
+   "Shaman",
+   "43"
+  ]
+ ],
+ "Pacify": [
+  [
+   "Enchanter",
+   "35"
+  ],
+  [
+   "Cleric",
+   "36"
+  ],
+  [
+   "Paladin",
+   "49"
+  ]
+ ],
+ "Pack Chloroplast": [],
+ "Pack Regeneration": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Pack Shrew": [
+  [
+   "Shaman",
+   "34"
+  ],
+  [
+   "Druid",
+   "35"
+  ],
+  [
+   "Beastlord",
+   "44"
+  ],
+  [
+   "Ranger",
+   "49"
+  ]
+ ],
+ "Pack Spirit": [],
+ "Pact of Shadow": [
+  [
+   "Necromancer",
+   "44"
+  ]
+ ],
+ "Panic Animal": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "16"
+  ]
+ ],
+ "Panic the Dead": [
+  [
+   "Necromancer",
+   "25"
+  ],
+  [
+   "Cleric",
+   "26"
+  ],
+  [
+   "Shadowknight",
+   "54"
+  ]
+ ],
+ "Paralyzing Earth": [
+  [
+   "Enchanter",
+   "45"
+  ],
+  [
+   "Necromancer",
+   "46"
+  ],
+  [
+   "Wizard",
+   "48"
+  ],
+  [
+   "Cleric",
+   "56"
+  ],
+  [
+   "Shaman",
+   "56"
+  ]
+ ],
+ "Pendril's Animation": [
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Phantom Chain": [],
+ "Phantom Leather": [],
+ "Phantom Plate": [],
+ "Pillage Enchantment": [],
+ "Pillar of Fire": [],
+ "Plague": [
+  [
+   "Shaman",
+   "49"
+  ],
+  [
+   "Necromancer",
+   "52"
+  ]
+ ],
+ "Pogonip": [],
+ "Poison Bolt": [
+  [
+   "Necromancer",
+   "4"
+  ]
+ ],
+ "Poison Storm": [
+  [
+   "Shaman",
+   "22"
+  ]
+ ],
+ "Primal Remedy": [
+  [
+   "Magician",
+   "44"
+  ]
+ ],
+ "Project Lightning": [],
+ "Promised Renewal": [
+  [
+   "Cleric",
+   "39"
+  ]
+ ],
+ "Protect": [
+  [
+   "Shaman",
+   "20"
+  ],
+  [
+   "Beastlord",
+   "48"
+  ]
+ ],
+ "Protection of Diamond": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Protection of Nature": [
+  [
+   "Druid",
+   "49"
+  ]
+ ],
+ "Protection of Rock": [
+  [
+   "Druid",
+   "19"
+  ]
+ ],
+ "Protection of Steel": [
+  [
+   "Druid",
+   "27"
+  ]
+ ],
+ "Protection of Wood": [
+  [
+   "Druid",
+   "9"
+  ]
+ ],
+ "Psalm of Cooling": [
+  [
+   "Bard",
+   "33"
+  ]
+ ],
+ "Psalm of Mystic Shielding": [
+  [
+   "Bard",
+   "41"
+  ]
+ ],
+ "Psalm of Purity": [
+  [
+   "Bard",
+   "37"
+  ]
+ ],
+ "Psalm of Vitality": [
+  [
+   "Bard",
+   "29"
+  ]
+ ],
+ "Psalm of Warmth": [
+  [
+   "Bard",
+   "25"
+  ]
+ ],
+ "Purify Mana": [],
+ "Purifying Rhythms": [
+  [
+   "Bard",
+   "13"
+  ]
+ ],
+ "Quickness": [
+  [
+   "Enchanter",
+   "15"
+  ],
+  [
+   "Shaman",
+   "26"
+  ]
+ ],
+ "Radiant Visage": [],
+ "Rage": [
+  [
+   "Shaman",
+   "45"
+  ]
+ ],
+ "Raging Strength": [
+  [
+   "Shaman",
+   "28"
+  ],
+  [
+   "Beastlord",
+   "41"
+  ]
+ ],
+ "Rain of Blades": [],
+ "Rain of Fire": [],
+ "Rain of Lava": [],
+ "Rain of Spikes": [],
+ "Rain of Swords": [
+  [
+   "Magician",
+   "49"
+  ]
+ ],
+ "Rampage": [],
+ "Rapacious Subvention": [],
+ "Reanimation": [
+  [
+   "Cleric",
+   "12"
+  ],
+  [
+   "Paladin",
+   "22"
+  ]
+ ],
+ "Reckless Strength": [
+  [
+   "Cleric",
+   "2"
+  ],
+  [
+   "Paladin",
+   "18"
+  ]
+ ],
+ "Reclaim Energy": [
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Magician",
+   "1"
+  ],
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Reconstitution": [
+  [
+   "Cleric",
+   "18"
+  ],
+  [
+   "Paladin",
+   "30"
+  ]
+ ],
+ "Refresh Summoning": [
+  [
+   "Magician",
+   "34"
+  ]
+ ],
+ "Regeneration": [
+  [
+   "Druid",
+   "34"
+  ],
+  [
+   "Shaman",
+   "23"
+  ]
+ ],
+ "Remove Curse": [
+  [
+   "Cleric",
+   "38"
+  ],
+  [
+   "Druid",
+   "38"
+  ],
+  [
+   "Paladin",
+   "45"
+  ],
+  [
+   "Shaman",
+   "38"
+  ]
+ ],
+ "Remove Lesser Curse": [
+  [
+   "Cleric",
+   "23"
+  ],
+  [
+   "Druid",
+   "23"
+  ],
+  [
+   "Shaman",
+   "24"
+  ],
+  [
+   "Paladin",
+   "34"
+  ]
+ ],
+ "Remove Minor Curse": [
+  [
+   "Cleric",
+   "8"
+  ],
+  [
+   "Druid",
+   "8"
+  ],
+  [
+   "Shaman",
+   "9"
+  ],
+  [
+   "Paladin",
+   "19"
+  ]
+ ],
+ "Rend": [],
+ "Renew Bones": [],
+ "Renew Elements": [],
+ "Renew Summoning": [],
+ "Renewal": [
+  [
+   "Cleric",
+   "32"
+  ],
+  [
+   "Paladin",
+   "49"
+  ]
+ ],
+ "Renewing Echo": [
+  [
+   "Cleric",
+   "24"
+  ]
+ ],
+ "Reoccurring Amnesia": [],
+ "Reparation": [
+  [
+   "Cleric",
+   "22"
+  ],
+  [
+   "Paladin",
+   "31"
+  ]
+ ],
+ "Resist Cold": [
+  [
+   "Cleric",
+   "38"
+  ],
+  [
+   "Druid",
+   "30"
+  ],
+  [
+   "Necromancer",
+   "24"
+  ],
+  [
+   "Ranger",
+   "55"
+  ],
+  [
+   "Shadow Knight",
+   "35"
+  ],
+  [
+   "Shaman",
+   "24"
+  ]
+ ],
+ "Resist Disease": [
+  [
+   "Beastlord",
+   "51"
+  ],
+  [
+   "Cleric",
+   "36"
+  ],
+  [
+   "Druid",
+   "44"
+  ],
+  [
+   "Necromancer",
+   "31"
+  ],
+  [
+   "Paladin",
+   "50"
+  ],
+  [
+   "Shaman",
+   "30"
+  ]
+ ],
+ "Resist Fire": [
+  [
+   "Druid",
+   "20"
+  ],
+  [
+   "Shaman",
+   "27"
+  ],
+  [
+   "Cleric",
+   "33"
+  ],
+  [
+   "Ranger",
+   "46"
+  ]
+ ],
+ "Resist Magic": [
+  [
+   "Enchanter",
+   "37"
+  ],
+  [
+   "Cleric",
+   "43"
+  ],
+  [
+   "Shaman",
+   "43"
+  ],
+  [
+   "Druid",
+   "49"
+  ],
+  [
+   "Paladin",
+   "55"
+  ]
+ ],
+ "Resist Poison": [
+  [
+   "Cleric",
+   "30"
+  ],
+  [
+   "Shaman",
+   "35"
+  ],
+  [
+   "Druid",
+   "44"
+  ]
+ ],
+ "Resistant Skin": [],
+ "Resolution": [
+  [
+   "Cleric",
+   "42"
+  ],
+  [
+   "Paladin",
+   "60"
+  ]
+ ],
+ "Rest the Dead": [
+  [
+   "Necromancer",
+   "23"
+  ],
+  [
+   "Shadowknight",
+   "52"
+  ]
+ ],
+ "Restless Bones": [
+  [
+   "Necromancer",
+   "16"
+  ],
+  [
+   "Shadow Knight",
+   "30"
+  ]
+ ],
+ "Restoration": [
+  [
+   "Cleric",
+   "42"
+  ],
+  [
+   "Paladin",
+   "55"
+  ]
+ ],
+ "Resurrection": [
+  [
+   "Cleric",
+   "47"
+  ],
+  [
+   "Paladin",
+   "59"
+  ]
+ ],
+ "Resuscitate": [],
+ "Retribution": [
+  [
+   "Cleric",
+   "44"
+  ],
+  [
+   "Paladin",
+   "49"
+  ]
+ ],
+ "Revive": [
+  [
+   "Cleric",
+   "27"
+  ],
+  [
+   "Paladin",
+   "39"
+  ]
+ ],
+ "Riftwind's Protection": [
+  [
+   "Ranger",
+   "29"
+  ]
+ ],
  "Ring of Butcherblock": [],
+ "Ring of Feerrott": [],
+ "Ring of Lavastorm": [],
+ "Ring of Misty Thicket": [
+  [
+   "Druid",
+   "25"
+  ]
+ ],
  "Ring of North Karana": [],
+ "Ring of South Ro": [
+  [
+   "Druid",
+   "20"
+  ]
+ ],
+ "Ring of Steamfont": [],
+ "Ring of Stonebrunt": [
+  [
+   "Druid",
+   "20"
+  ]
+ ],
+ "Ring of Surefall Glade": [
+  [
+   "Druid",
+   "15"
+  ]
+ ],
+ "Ring of Toxxulia": [],
+ "Ring of West Commons": [
+  [
+   "Druid",
+   "17"
+  ]
+ ],
+ "Rising Dexterity": [
+  [
+   "Shaman",
+   "25"
+  ]
+ ],
+ "Rizlona's Embers": [
+  [
+   "Bard",
+   "45"
+  ]
+ ],
+ "Ro's Fiery Sundering": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Root": [
+  [
+   "Wizard",
+   "3"
+  ],
+  [
+   "Enchanter",
+   "6"
+  ],
+  [
+   "Cleric",
+   "7"
+  ],
+  [
+   "Shaman",
+   "12"
+  ],
+  [
+   "Paladin",
+   "19"
+  ],
+  [
+   "Necromancer",
+   "34"
+  ]
+ ],
+ "Rune I": [],
+ "Rune II": [],
+ "Rune III": [],
+ "Rune IV": [],
+ "Sacred Echo": [
+  [
+   "Cleric",
+   "43"
+  ]
+ ],
+ "Sacred Word": [
+  [
+   "Cleric",
+   "39"
+  ]
+ ],
+ "Sagar's Animation": [],
+ "Sanctuary": [
+  [
+   "Cleric",
+   "6"
+  ]
+ ],
+ "Sanity Warp": [
+  [
+   "Enchanter",
+   "16"
+  ]
+ ],
+ "Savage Spirit": [],
+ "Scale Skin": [
+  [
+   "Shaman",
+   "3"
+  ],
+  [
+   "Beastlord",
+   "10"
+  ]
+ ],
+ "Scale of Wolf": [
+  [
+   "Shaman",
+   "22"
+  ],
+  [
+   "Druid",
+   "26"
+  ]
+ ],
+ "Scent of Darkness": [],
+ "Scent of Dusk": [],
+ "Scent of Shadow": [],
+ "Scorching Arrow": [
+  [
+   "Ranger",
+   "46"
+  ]
+ ],
+ "Scourge": [
+  [
+   "Shaman",
+   "31"
+  ],
+  [
+   "Necromancer",
+   "35"
+  ]
+ ],
+ "Scream of Death": [
+  [
+   "Shadow Knight",
+   "37"
+  ]
+ ],
+ "Scream of Hate": [
+  [
+   "Shadow Knight",
+   "15"
+  ]
+ ],
+ "Scream of Pain": [
+  [
+   "Shadow Knight",
+   "23"
+  ]
+ ],
+ "Screaming Terror": [],
+ "Scythe of Darkness": [
+  [
+   "Shadow Knight",
+   "47"
+  ]
+ ],
+ "Searing Arrow": [
+  [
+   "Ranger",
+   "15"
+  ]
+ ],
+ "See Invisible": [
+  [
+   "Wizard",
+   "4"
+  ],
+  [
+   "Enchanter",
+   "6"
+  ],
+  [
+   "Druid",
+   "13"
+  ],
+  [
+   "Magician",
+   "16"
+  ],
+  [
+   "Ranger",
+   "32"
+  ]
+ ],
+ "Selo's Accelerando": [
+  [
+   "Bard",
+   "5"
+  ]
+ ],
+ "Selo's Accelerating Chorus": [
+  [
+   "Bard",
+   "49"
+  ]
+ ],
+ "Selo's Chords of Cessation": [
+  [
+   "Bard",
+   "48"
+  ]
+ ],
+ "Selo's Consonant Chain": [
+  [
+   "Bard",
+   "23"
+  ]
+ ],
+ "Sense Animals": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Beastlord",
+   "2"
+  ],
+  [
+   "Shaman",
+   "7"
+  ]
+ ],
+ "Sense Summoned": [
+  [
+   "Magician",
+   "3"
+  ],
+  [
+   "Wizard",
+   "7"
+  ],
+  [
+   "Cleric",
+   "12"
+  ]
+ ],
+ "Sense the Dead": [
+  [
+   "Cleric",
+   "9"
+  ],
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Paladin",
+   "4"
+  ],
+  [
+   "Shadow Knight",
+   "2"
+  ]
+ ],
+ "Sentinel": [],
+ "Sermon of the Righteous": [
+  [
+   "Cleric",
+   "25"
+  ]
+ ],
+ "Serpent Sight": [
+  [
+   "Shaman",
+   "6"
+  ],
+  [
+   "Enchanter",
+   "10"
+  ],
+  [
+   "Beastlord",
+   "16"
+  ]
+ ],
+ "Sha's Lethargy": [
+  [
+   "Beastlord",
+   "50"
+  ]
+ ],
+ "Shackle of Bone": [
+  [
+   "Necromancer",
+   "17"
+  ]
+ ],
+ "Shackle of Spirit": [
+  [
+   "Necromancer",
+   "38"
+  ]
+ ],
+ "Shade": [],
+ "Shadow": [],
+ "Shadow Compact": [],
+ "Shadow Sight": [
+  [
+   "Necromancer",
+   "22"
+  ],
+  [
+   "Shadow Knight",
+   "40"
+  ]
+ ],
+ "Shadow Step": [
+  [
+   "Necromancer",
+   "5"
+  ],
+  [
+   "Shadow Knight",
+   "13"
+  ],
+  [
+   "Wizard",
+   "7"
+  ]
+ ],
+ "Shadow Vortex": [
+  [
+   "Necromancer",
+   "19"
+  ],
+  [
+   "Shadow Knight",
+   "37"
+  ]
+ ],
+ "Shalee's Animation": [],
+ "Shallow Breath": [
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Share Form of the Great Wolf": [
+  [
+   "Druid",
+   "45"
+  ]
+ ],
+ "Share Wolf Form": [],
+ "Sharik's Replenishing": [
+  [
+   "Beastlord",
+   "9"
+  ]
+ ],
+ "Shauri's Sonorous Clouding": [
+  [
+   "Bard",
+   "19"
+  ]
+ ],
+ "Shield of Barbs": [],
+ "Shield of Brambles": [
+  [
+   "Druid",
+   "27"
+  ],
+  [
+   "Ranger",
+   "43"
+  ]
+ ],
+ "Shield of Fire": [],
+ "Shield of Flame": [],
+ "Shield of Lava": [],
  "Shield of Songs": [
   [
    "Bard",
    "49"
+  ]
+ ],
+ "Shield of Spikes": [
+  [
+   "Druid",
+   "37"
+  ],
+  [
+   "Ranger",
+   "58"
+  ]
+ ],
+ "Shield of Thistles": [
+  [
+   "Druid",
+   "7"
+  ],
+  [
+   "Ranger",
+   "24"
   ]
  ],
  "Shield of Thorns": [
@@ -92,13 +4902,1231 @@
    "47"
   ]
  ],
+ "Shield of Words": [
+  [
+   "Cleric",
+   "45"
+  ],
+  [
+   "Paladin",
+   "60"
+  ]
+ ],
+ "Shielding": [
+  [
+   "Wizard",
+   "15"
+  ],
+  [
+   "Enchanter",
+   "16"
+  ],
+  [
+   "Magician",
+   "16"
+  ],
+  [
+   "Necromancer",
+   "16"
+  ]
+ ],
+ "Shieldskin": [
+  [
+   "Necromancer",
+   "14"
+  ],
+  [
+   "Shadow Knight",
+   "31"
+  ],
+  [
+   "Wizard",
+   "13"
+  ]
+ ],
+ "Shifting Shield": [
+  [
+   "Shaman",
+   "31"
+  ]
+ ],
+ "Shifting Sight": [
+  [
+   "Enchanter",
+   "20"
+  ],
+  [
+   "Wizard",
+   "38"
+  ]
+ ],
+ "Shiftless Deeds": [],
+ "Shock Spiral of Al'Kabor": [],
+ "Shock of Blades": [],
+ "Shock of Fire": [
+  [
+   "Wizard",
+   "4"
+  ]
+ ],
+ "Shock of Flame": [],
+ "Shock of Ice": [
+  [
+   "Wizard",
+   "8"
+  ]
+ ],
+ "Shock of Lightning": [],
+ "Shock of Poison": [],
+ "Shock of Spikes": [],
+ "Shock of Swords": [],
+ "Shock of Venom": [
+  [
+   "Shaman",
+   "47"
+  ]
+ ],
+ "Shock of the Tainted": [
+  [
+   "Shaman",
+   "34"
+  ]
+ ],
+ "Shrink": [
+  [
+   "Shaman",
+   "15"
+  ],
+  [
+   "Beastlord",
+   "23"
+  ]
+ ],
+ "Shroud of Hate": [
+  [
+   "Shadow Knight",
+   "35"
+  ]
+ ],
+ "Shroud of Pain": [
+  [
+   "Shadow Knight",
+   "50"
+  ]
+ ],
+ "Sicken": [
+  [
+   "Beastlord",
+   "14"
+  ],
+  [
+   "Shaman",
+   "4"
+  ]
+ ],
+ "Sight": [],
+ "Sight Graft": [],
+ "Sionachie's Dreams": [
+  [
+   "Bard",
+   "40"
+  ]
+ ],
+ "Siphon Life": [
+  [
+   "Necromancer",
+   "20"
+  ],
+  [
+   "Shadow Knight",
+   "30"
+  ]
+ ],
+ "Siphon Strength": [
+  [
+   "Necromancer",
+   "1"
+  ],
+  [
+   "Shadow Knight",
+   "6"
+  ]
+ ],
+ "Sisna's Animation": [],
+ "Skin like Diamond": [
+  [
+   "Druid",
+   "36"
+  ],
+  [
+   "Ranger",
+   "54"
+  ]
+ ],
+ "Skin like Nature": [
+  [
+   "Druid",
+   "46"
+  ],
+  [
+   "Ranger",
+   "59"
+  ]
+ ],
+ "Skin like Rock": [
+  [
+   "Druid",
+   "14"
+  ],
+  [
+   "Ranger",
+   "21"
+  ]
+ ],
+ "Skin like Steel": [
+  [
+   "Druid",
+   "24"
+  ],
+  [
+   "Ranger",
+   "38"
+  ]
+ ],
+ "Skin like Wood": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "7"
+  ]
+ ],
+ "Slugs Healing": [],
+ "Smite": [
+  [
+   "Cleric",
+   "14"
+  ],
+  [
+   "Paladin",
+   "19"
+  ]
+ ],
+ "Snails Healing": [
+  [
+   "Shaman",
+   "14"
+  ]
+ ],
+ "Snare": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "6"
+  ]
+ ],
  "Solon's Bewitching Bravura": [
   [
    "Bard",
    "39"
   ]
  ],
+ "Solon's Song of the Sirens": [
+  [
+   "Bard",
+   "27"
+  ]
+ ],
+ "Song of Sustenance": [
+  [
+   "Bard",
+   "15"
+  ]
+ ],
+ "Soothe": [
+  [
+   "Cleric",
+   "5"
+  ],
+  [
+   "Enchanter",
+   "6"
+  ],
+  [
+   "Paladin",
+   "25"
+  ]
+ ],
+ "Sound of Force": [],
+ "Spear of Disease": [
+  [
+   "Shadow Knight",
+   "34"
+  ]
+ ],
+ "Spear of Pain": [
+  [
+   "Shadow Knight",
+   "48"
+  ]
+ ],
+ "Spear of Warding": [
+  [
+   "Magician",
+   "20"
+  ]
+ ],
+ "Sphere of Light": [
+  [
+   "Wizard",
+   "1"
+  ]
+ ],
+ "Spike of Disease": [
+  [
+   "Shadow Knight",
+   "1"
+  ]
+ ],
+ "Spikecoat": [
+  [
+   "Druid",
+   "37"
+  ],
+  [
+   "Ranger",
+   "42"
+  ]
+ ],
+ "Spirit Armor": [
+  [
+   "Cleric",
+   "15"
+  ],
+  [
+   "Necromancer",
+   "16"
+  ],
+  [
+   "Paladin",
+   "30"
+  ]
+ ],
+ "Spirit Pouch": [
+  [
+   "Shaman",
+   "2"
+  ]
+ ],
+ "Spirit Quickening": [
+  [
+   "Shaman",
+   "50"
+  ]
+ ],
+ "Spirit Salve": [
+  [
+   "Shaman",
+   "40"
+  ],
+  [
+   "Beastlord",
+   "48"
+  ]
+ ],
+ "Spirit Sight": [
+  [
+   "Shaman",
+   "7"
+  ],
+  [
+   "Beastlord",
+   "29"
+  ]
+ ],
+ "Spirit Strength": [
+  [
+   "Shaman",
+   "18"
+  ],
+  [
+   "Beastlord",
+   "28"
+  ]
+ ],
+ "Spirit Strike": [
+  [
+   "Shaman",
+   "14"
+  ],
+  [
+   "Beastlord",
+   "26"
+  ]
+ ],
+ "Spirit Tap": [
+  [
+   "Necromancer",
+   "26"
+  ],
+  [
+   "Shadow Knight",
+   "36"
+  ]
+ ],
+ "Spirit of Bear": [
+  [
+   "Shaman",
+   "6"
+  ],
+  [
+   "Beastlord",
+   "17"
+  ]
+ ],
+ "Spirit of Bih`Li": [
+  [
+   "Shaman",
+   "36"
+  ]
+ ],
+ "Spirit of Cat": [
+  [
+   "Shaman",
+   "18"
+  ]
+ ],
+ "Spirit of Cheetah": [
+  [
+   "Druid",
+   "21"
+  ],
+  [
+   "Shaman",
+   "21"
+  ]
+ ],
+ "Spirit of Herikol": [
+  [
+   "Beastlord",
+   "30"
+  ]
+ ],
+ "Spirit of Inferno": [
+  [
+   "Beastlord",
+   "28"
+  ]
+ ],
+ "Spirit of Kashek": [
+  [
+   "Beastlord",
+   "46"
+  ]
+ ],
+ "Spirit of Keshuval": [
+  [
+   "Beastlord",
+   "21"
+  ]
+ ],
+ "Spirit of Khaliz": [
+  [
+   "Beastlord",
+   "15"
+  ]
+ ],
+ "Spirit of Lightning": [
+  [
+   "Beastlord",
+   "13"
+  ]
+ ],
+ "Spirit of Monkey": [
+  [
+   "Shaman",
+   "21"
+  ],
+  [
+   "Beastlord",
+   "38"
+  ]
+ ],
+ "Spirit of Ox": [
+  [
+   "Shaman",
+   "21"
+  ],
+  [
+   "Beastlord",
+   "37"
+  ]
+ ],
+ "Spirit of Sharik": [
+  [
+   "Beastlord",
+   "8"
+  ]
+ ],
+ "Spirit of Snake": [
+  [
+   "Shaman",
+   "10"
+  ]
+ ],
+ "Spirit of Vermin": [
+  [
+   "Beastlord",
+   "46"
+  ]
+ ],
+ "Spirit of Wolf": [
+  [
+   "Ranger",
+   "28"
+  ],
+  [
+   "Druid",
+   "10"
+  ],
+  [
+   "Shaman",
+   "9"
+  ],
+  [
+   "Beastlord",
+   "24"
+  ]
+ ],
+ "Spirit of Yekan": [
+  [
+   "Beastlord",
+   "39"
+  ]
+ ],
+ "Spirit of the Blizzard": [
+  [
+   "Beastlord",
+   "18"
+  ]
+ ],
+ "Spirit of the Puma": [
+  [
+   "Shaman",
+   "50"
+  ]
+ ],
+ "Spirit of the Scorpion": [
+  [
+   "Beastlord",
+   "38"
+  ]
+ ],
+ "Spirit of the Shrew": [
+  [
+   "Shaman",
+   "29"
+  ],
+  [
+   "Druid",
+   "30"
+  ],
+  [
+   "Beastlord",
+   "39"
+  ],
+  [
+   "Ranger",
+   "41"
+  ]
+ ],
+ "Spiritual Brawn": [
+  [
+   "Beastlord",
+   "42"
+  ]
+ ],
+ "Spiritual Light": [
+  [
+   "Beastlord",
+   "41"
+  ]
+ ],
+ "Spook the Dead": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Necromancer",
+   "10"
+  ],
+  [
+   "Paladin",
+   "9"
+  ],
+  [
+   "Shadow Knight",
+   "20"
+  ]
+ ],
+ "Sprouting Heal": [
+  [
+   "Druid",
+   "10"
+  ]
+ ],
+ "Staff of Runes": [
+  [
+   "Magician",
+   "24"
+  ]
+ ],
+ "Staff of Symbols": [],
+ "Staff of Tracing": [
+  [
+   "Magician",
+   "8"
+  ]
+ ],
+ "Staff of Warding": [],
+ "Stamina": [],
+ "Starfire": [],
+ "Starshine": [
+  [
+   "Druid",
+   "9"
+  ]
+ ],
+ "Steelskin": [
+  [
+   "Wizard",
+   "30"
+  ],
+  [
+   "Necromancer",
+   "32"
+  ],
+  [
+   "Shadowknight",
+   "56"
+  ]
+ ],
+ "Stinging Swarm": [
+  [
+   "Druid",
+   "10"
+  ],
+  [
+   "Ranger",
+   "25"
+  ]
+ ],
+ "Stoicism": [
+  [
+   "Shaman",
+   "44"
+  ]
+ ],
+ "Stonebrunt Gate": [
+  [
+   "Wizard",
+   "21"
+  ]
+ ],
+ "Stonebrunt Portal": [
+  [
+   "Wizard",
+   "27"
+  ]
+ ],
+ "Storm Strength": [
+  [
+   "Ranger",
+   "53"
+  ],
+  [
+   "Druid",
+   "44"
+  ]
+ ],
+ "Strength": [
+  [
+   "Shaman",
+   "46"
+  ]
+ ],
+ "Strength of Earth": [
+  [
+   "Druid",
+   "7"
+  ],
+  [
+   "Ranger",
+   "26"
+  ]
+ ],
+ "Strength of Stone": [
+  [
+   "Druid",
+   "34"
+  ]
+ ],
+ "Strengthen": [
+  [
+   "Beastlord",
+   "14"
+  ],
+  [
+   "Enchanter",
+   "1"
+  ],
+  [
+   "Shaman",
+   "1"
+  ]
+ ],
+ "Strengthen Death": [
+  [
+   "Shadow Knight",
+   "29"
+  ]
+ ],
+ "Strike": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "1"
+  ]
+ ],
+ "Strip Enchantment": [],
+ "Stun": [
+  [
+   "Cleric",
+   "2"
+  ],
+  [
+   "Paladin",
+   "28"
+  ]
+ ],
  "Stunning Strike": [],
+ "Succor: Butcherblock": [],
+ "Succor: East Karana": [
+  [
+   "Druid",
+   "26"
+  ]
+ ],
+ "Succor: Lavastorm": [
+  [
+   "Druid",
+   "41"
+  ]
+ ],
+ "Succor: North Karana": [
+  [
+   "Druid",
+   "46"
+  ]
+ ],
+ "Succor: South Ro": [
+  [
+   "Druid",
+   "38"
+  ]
+ ],
+ "Suffocate": [],
+ "Suffocating Sphere": [
+  [
+   "Enchanter",
+   "4"
+  ]
+ ],
+ "Summon Arrows": [
+  [
+   "Magician",
+   "20"
+  ]
+ ],
+ "Summon Bandages": [],
+ "Summon Brass Choker": [
+  [
+   "Magician",
+   "2"
+  ]
+ ],
+ "Summon Coldstone": [
+  [
+   "Magician",
+   "29"
+  ]
+ ],
+ "Summon Companion": [
+  [
+   "Beastlord",
+   "31"
+  ],
+  [
+   "Enchanter",
+   "43"
+  ],
+  [
+   "Magician",
+   "36"
+  ],
+  [
+   "Necromancer",
+   "40"
+  ],
+  [
+   "Druid",
+   "41"
+  ],
+  [
+   "Shaman",
+   "40"
+  ]
+ ],
+ "Summon Dagger": [
+  [
+   "Magician",
+   "1"
+  ]
+ ],
+ "Summon Dead": [
+  [
+   "Necromancer",
+   "29"
+  ],
+  [
+   "Shadow Knight",
+   "46"
+  ]
+ ],
+ "Summon Drink": [
+  [
+   "Magician",
+   "1"
+  ],
+  [
+   "Shaman",
+   "2"
+  ],
+  [
+   "Cleric",
+   "3"
+  ],
+  [
+   "Druid",
+   "10"
+  ],
+  [
+   "Beastlord",
+   "17"
+  ]
+ ],
+ "Summon Elemental Blanket": [
+  [
+   "Magician",
+   "48"
+  ]
+ ],
+ "Summon Elemental Defender": [
+  [
+   "Magician",
+   "11"
+  ]
+ ],
+ "Summon Fang": [],
+ "Summon Food": [
+  [
+   "Cleric",
+   "8"
+  ],
+  [
+   "Druid",
+   "11"
+  ],
+  [
+   "Shaman",
+   "6"
+  ],
+  [
+   "Magician",
+   "1"
+  ],
+  [
+   "Beastlord",
+   "29"
+  ]
+ ],
+ "Summon Golden Choker": [
+  [
+   "Magician",
+   "50"
+  ]
+ ],
+ "Summon Heatstone": [],
+ "Summon Jade Bracelet": [
+  [
+   "Magician",
+   "20"
+  ]
+ ],
+ "Summon Leather Mantle": [
+  [
+   "Magician",
+   "27"
+  ]
+ ],
+ "Summon Linen Mantle": [
+  [
+   "Magician",
+   "8"
+  ]
+ ],
+ "Summon Opal Bracelet": [
+  [
+   "Magician",
+   "42"
+  ]
+ ],
+ "Summon Phantom Chain": [
+  [
+   "Magician",
+   "25"
+  ]
+ ],
+ "Summon Phantom Leather": [
+  [
+   "Magician",
+   "17"
+  ]
+ ],
+ "Summon Phantom Plate": [
+  [
+   "Magician",
+   "38"
+  ]
+ ],
+ "Summon Ring of Flight": [],
+ "Summon Shard of the Core": [],
+ "Summon Shiny Bauble": [
+  [
+   "Magician",
+   "30"
+  ]
+ ],
+ "Summon Silver Choker": [
+  [
+   "Magician",
+   "21"
+  ]
+ ],
+ "Summon Stone Bracelet": [
+  [
+   "Magician",
+   "44"
+  ]
+ ],
+ "Summon Tarnished Bauble": [
+  [
+   "Magician",
+   "10"
+  ]
+ ],
+ "Summon Throwing Dagger": [],
+ "Summon Tiny Ring": [
+  [
+   "Magician",
+   "16"
+  ]
+ ],
+ "Summon Twisted Ring": [
+  [
+   "Magician",
+   "37"
+  ]
+ ],
+ "Summon Waterstone": [],
+ "Summon Wisp": [],
+ "Summon Wooden Bracelet": [
+  [
+   "Magician",
+   "20"
+  ]
+ ],
+ "Summon: Orb of Exploration": [
+  [
+   "Magician",
+   "42"
+  ]
+ ],
+ "Summoning: Air": [
+  [
+   "Magician",
+   "24"
+  ]
+ ],
+ "Summoning: Earth": [],
+ "Summoning: Fire": [],
+ "Summoning: Water": [],
+ "Sunbeam": [],
+ "Superior Camouflage": [
+  [
+   "Druid",
+   "18"
+  ],
+  [
+   "Ranger",
+   "47"
+  ]
+ ],
+ "Superior Healing": [
+  [
+   "Cleric",
+   "30"
+  ],
+  [
+   "Druid",
+   "44"
+  ],
+  [
+   "Shaman",
+   "45"
+  ],
+  [
+   "Paladin",
+   "46"
+  ]
+ ],
+ "Supernova": [],
+ "Surge of Enfeeblement": [],
+ "Swarm of Pain": [
+  [
+   "Ranger",
+   "40"
+  ]
+ ],
+ "Sword of Runes": [],
+ "Symbol of Naltron": [
+  [
+   "Cleric",
+   "41"
+  ],
+  [
+   "Paladin",
+   "58"
+  ]
+ ],
+ "Symbol of Pinzarn": [
+  [
+   "Cleric",
+   "31"
+  ],
+  [
+   "Paladin",
+   "46"
+  ]
+ ],
+ "Symbol of Ryltan": [
+  [
+   "Cleric",
+   "21"
+  ],
+  [
+   "Paladin",
+   "33"
+  ]
+ ],
+ "Symbol of Transal": [
+  [
+   "Cleric",
+   "11"
+  ],
+  [
+   "Paladin",
+   "24"
+  ]
+ ],
+ "Sympathetic Aura": [],
+ "Syvelian's Anti-Magic Aria": [
+  [
+   "Bard",
+   "40"
+  ]
+ ],
+ "Tagar's Insects": [
+  [
+   "Shaman",
+   "27"
+  ]
+ ],
+ "Tainted Breath": [
+  [
+   "Shaman",
+   "8"
+  ],
+  [
+   "Beastlord",
+   "19"
+  ]
+ ],
+ "Talisman of Altuna": [
+  [
+   "Shaman",
+   "40"
+  ]
+ ],
+ "Talisman of Jasinth": [
+  [
+   "Shaman",
+   "50"
+  ]
+ ],
+ "Talisman of Tnarg": [
+  [
+   "Shaman",
+   "32"
+  ]
+ ],
+ "Talisman of the Beast": [
+  [
+   "Shaman",
+   "8"
+  ]
+ ],
+ "Tame Spirit": [
+  [
+   "Beastlord",
+   "4"
+  ]
+ ],
+ "Tangling Weeds": [
+  [
+   "Druid",
+   "1"
+  ],
+  [
+   "Ranger",
+   "5"
+  ]
+ ],
+ "Taper Enchantment": [
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
+ "Tarew's Aquatic Ayre": [
+  [
+   "Bard",
+   "16"
+  ]
+ ],
+ "Tashani": [],
+ "Tashania": [],
+ "Tashina": [
+  [
+   "Enchanter",
+   "2"
+  ]
+ ],
+ "Tepid Deeds": [],
+ "Terror of Darkness": [
+  [
+   "Shadow Knight",
+   "33"
+  ]
+ ],
+ "Terror of Shadows": [
+  [
+   "Shadow Knight",
+   "42"
+  ]
+ ],
+ "Terrorize Animal": [],
+ "Theft of Thought": [],
+ "Thicken Mana": [
+  [
+   "Enchanter",
+   "11"
+  ]
+ ],
+ "Thistlecoat": [
+  [
+   "Druid",
+   "7"
+  ],
+  [
+   "Ranger",
+   "13"
+  ]
+ ],
+ "Thorncoat": [
+  [
+   "Druid",
+   "47"
+  ],
+  [
+   "Ranger",
+   "60"
+  ]
+ ],
+ "Thunder Strike": [],
+ "Thunder of Karana": [
+  [
+   "Paladin",
+   "47"
+  ]
+ ],
+ "Thunderclap": [],
+ "Tiny Companion": [
+  [
+   "Beastlord",
+   "19"
+  ],
+  [
+   "Druid",
+   "17"
+  ],
+  [
+   "Enchanter",
+   "19"
+  ],
+  [
+   "Magician",
+   "19"
+  ],
+  [
+   "Necromancer",
+   "19"
+  ],
+  [
+   "Shadow Knight",
+   "19"
+  ],
+  [
+   "Shaman",
+   "16"
+  ]
+ ],
+ "Tishan's Clash": [],
+ "Togor's Insects": [
+  [
+   "Shaman",
+   "38"
+  ]
+ ],
  "Torbas' Acid Blast": [],
  "Torbas' Poison Blast": [
   [
@@ -106,6 +6134,619 @@
    "49"
   ]
  ],
+ "Tortoises Healing": [
+  [
+   "Shaman",
+   "28"
+  ]
+ ],
+ "Toxxulia Gate": [
+  [
+   "Wizard",
+   "19"
+  ]
+ ],
+ "Toxxulia Portal": [
+  [
+   "Wizard",
+   "28"
+  ]
+ ],
+ "Translocate": [
+  [
+   "Wizard",
+   "50"
+  ]
+ ],
+ "Translocate: Cazic Temple": [
+  [
+   "Wizard",
+   "44"
+  ]
+ ],
+ "Translocate: Greater Faydark": [
+  [
+   "Wizard",
+   "36"
+  ]
+ ],
+ "Translocate: Nektulos": [
+  [
+   "Wizard",
+   "41"
+  ]
+ ],
+ "Translocate: North Karana": [
+  [
+   "Wizard",
+   "35"
+  ]
+ ],
+ "Translocate: North Ro": [
+  [
+   "Wizard",
+   "43"
+  ]
+ ],
+ "Translocate: Stonebrunt": [
+  [
+   "Wizard",
+   "35"
+  ]
+ ],
+ "Translocate: Toxxulia": [
+  [
+   "Wizard",
+   "37"
+  ]
+ ],
+ "Translocate: West Commons": [
+  [
+   "Wizard",
+   "40"
+  ]
+ ],
+ "Translocate: West Karana": [
+  [
+   "Wizard",
+   "42"
+  ]
+ ],
+ "Treeform": [],
+ "Tremor": [
+  [
+   "Druid",
+   "21"
+  ],
+  [
+   "Cleric",
+   "34"
+  ]
+ ],
+ "True North": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Enchanter",
+   "1"
+  ],
+  [
+   "Magician",
+   "1"
+  ],
+  [
+   "Shaman",
+   "1"
+  ],
+  [
+   "Wizard",
+   "1"
+  ],
+  [
+   "Necromancer",
+   "2"
+  ],
+  [
+   "Paladin",
+   "3"
+  ]
+ ],
+ "Tumultuous Strength": [
+  [
+   "Shaman",
+   "35"
+  ]
+ ],
+ "Turning of the Unnatural": [],
+ "Turtle Skin": [
+  [
+   "Shaman",
+   "11"
+  ],
+  [
+   "Beastlord",
+   "26"
+  ]
+ ],
+ "Tuyen's Chant of Disease": [
+  [
+   "Bard",
+   "42"
+  ]
+ ],
+ "Tuyen's Chant of Flame": [
+  [
+   "Bard",
+   "38"
+  ]
+ ],
+ "Tuyen's Chant of Frost": [
+  [
+   "Bard",
+   "46"
+  ]
+ ],
+ "Tuyen's Chant of Poison": [
+  [
+   "Bard",
+   "50"
+  ]
+ ],
+ "Uleen's Animation": [
+  [
+   "Enchanter",
+   "29"
+  ]
+ ],
+ "Ultravision": [
+  [
+   "Shaman",
+   "26"
+  ],
+  [
+   "Enchanter",
+   "27"
+  ]
+ ],
+ "Upheaval": [
+  [
+   "Druid",
+   "48"
+  ],
+  [
+   "Cleric",
+   "52"
+  ]
+ ],
+ "Valor": [
+  [
+   "Cleric",
+   "32"
+  ],
+  [
+   "Paladin",
+   "47"
+  ]
+ ],
+ "Valor of Marr": [
+  [
+   "Paladin",
+   "44"
+  ]
+ ],
+ "Vampiric Curse": [
+  [
+   "Shadow Knight",
+   "57"
+  ],
+  [
+   "Necromancer",
+   "29"
+  ]
+ ],
+ "Vampiric Embrace": [
+  [
+   "Necromancer",
+   "7"
+  ],
+  [
+   "Shadow Knight",
+   "15"
+  ]
+ ],
+ "Vengeance of the Wild": [
+  [
+   "Druid",
+   "49"
+  ]
+ ],
+ "Venom of the Snake": [
+  [
+   "Shaman",
+   "37"
+  ],
+  [
+   "Necromancer",
+   "34"
+  ]
+ ],
+ "Verses of Victory": [
+  [
+   "Bard",
+   "50"
+  ]
+ ],
+ "Vigilant Spirit": [
+  [
+   "Shaman",
+   "37"
+  ]
+ ],
+ "Vigor of Zehkes": [
+  [
+   "Beastlord",
+   "49"
+  ]
+ ],
+ "Vilia's Verses of Celerity": [
+  [
+   "Bard",
+   "36"
+  ]
+ ],
+ "Vision": [
+  [
+   "Shaman",
+   "17"
+  ]
+ ],
+ "Vision Shift": [
+  [
+   "Wizard",
+   "40"
+  ]
+ ],
+ "Voice Graft": [],
+ "Voice of Darkness": [
+  [
+   "Shadow Knight",
+   "39"
+  ]
+ ],
+ "Voice of Shadows": [
+  [
+   "Shadow Knight",
+   "46"
+  ]
+ ],
+ "Walking Sleep": [
+  [
+   "Shaman",
+   "13"
+  ]
+ ],
+ "Wandering Mind": [
+  [
+   "Enchanter",
+   "38"
+  ]
+ ],
+ "Ward Summoned": [
+  [
+   "Druid",
+   "2"
+  ],
+  [
+   "Magician",
+   "9"
+  ],
+  [
+   "Ranger",
+   "16"
+  ],
+  [
+   "Cleric",
+   "17"
+  ]
+ ],
+ "Ward Undead": [
+  [
+   "Cleric",
+   "4"
+  ],
+  [
+   "Necromancer",
+   "6"
+  ],
+  [
+   "Paladin",
+   "1"
+  ],
+  [
+   "Shadow Knight",
+   "18"
+  ]
+ ],
+ "Ward of Alendar": [
+  [
+   "Enchanter",
+   "29"
+  ]
+ ],
+ "Ward of Calliav": [
+  [
+   "Magician",
+   "46"
+  ],
+  [
+   "Beastlord",
+   "49"
+  ],
+  [
+   "Necromancer",
+   "49"
+  ]
+ ],
+ "Ward of Calrena": [
+  [
+   "Wizard",
+   "49"
+  ]
+ ],
+ "Ward of Vie": [
+  [
+   "Cleric",
+   "20"
+  ]
+ ],
+ "Ward of the Divine": [
+  [
+   "Cleric",
+   "50"
+  ]
+ ],
+ "Wave of Enfeeblement": [
+  [
+   "Necromancer",
+   "9"
+  ],
+  [
+   "Shadow Knight",
+   "27"
+  ]
+ ],
+ "Wave of Fear": [],
+ "Wave of Life": [
+  [
+   "Paladin",
+   "39"
+  ]
+ ],
+ "Weaken": [
+  [
+   "Enchanter",
+   "1"
+  ]
+ ],
  "Weakening Strike": [],
- "Wrath of Al'Kabor": []
+ "Weakness": [],
+ "West Commons Gate": [
+  [
+   "Wizard",
+   "21"
+  ]
+ ],
+ "West Commons Portal": [
+  [
+   "Wizard",
+   "35"
+  ]
+ ],
+ "West Karana Gate": [
+  [
+   "Wizard",
+   "23"
+  ]
+ ],
+ "West Karana Portal": [
+  [
+   "Wizard",
+   "37"
+  ]
+ ],
+ "Whirl Till You Hurl": [],
+ "Whirling Wind": [],
+ "Wild Spirit": [
+  [
+   "Beastlord",
+   "1"
+  ]
+ ],
+ "Winter's Roar": [
+  [
+   "Shaman",
+   "33"
+  ]
+ ],
+ "Wolf Form": [
+  [
+   "Druid",
+   "20"
+  ],
+  [
+   "Ranger",
+   "48"
+  ]
+ ],
+ "Word Divine": [
+  [
+   "Cleric",
+   "49"
+  ]
+ ],
+ "Word of Healing": [],
+ "Word of Health": [],
+ "Word of Pain": [
+  [
+   "Cleric",
+   "9"
+  ]
+ ],
+ "Word of Shadow": [
+  [
+   "Cleric",
+   "19"
+  ],
+  [
+   "Necromancer",
+   "20"
+  ]
+ ],
+ "Word of Souls": [
+  [
+   "Necromancer",
+   "36"
+  ],
+  [
+   "Cleric",
+   "39"
+  ]
+ ],
+ "Word of Spirit": [
+  [
+   "Cleric",
+   "26"
+  ],
+  [
+   "Necromancer",
+   "27"
+  ],
+  [
+   "Shadow Knight",
+   "45"
+  ]
+ ],
+ "Wrath": [
+  [
+   "Cleric",
+   "29"
+  ],
+  [
+   "Paladin",
+   "34"
+  ]
+ ],
+ "Wrath of Al'Kabor": [],
+ "Yaulp": [
+  [
+   "Cleric",
+   "1"
+  ],
+  [
+   "Paladin",
+   "9"
+  ]
+ ],
+ "Yaulp II": [
+  [
+   "Cleric",
+   "16"
+  ],
+  [
+   "Paladin",
+   "38"
+  ]
+ ],
+ "Yaulp III": [
+  [
+   "Cleric",
+   "41"
+  ],
+  [
+   "Paladin",
+   "56"
+  ]
+ ],
+ "Yegoreff's Animation": [],
+ "Yekan's Quickening": [
+  [
+   "Beastlord",
+   "37"
+  ]
+ ],
+ "Yekan's Recovery": [
+  [
+   "Beastlord",
+   "36"
+  ]
+ ],
+ "Yonder": [],
+ "Zephyr: Butcherblock": [
+  [
+   "Druid",
+   "33"
+  ]
+ ],
+ "Zephyr: Feerrott": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Zephyr: Lavastorm": [
+  [
+   "Druid",
+   "47"
+  ]
+ ],
+ "Zephyr: Misty Thicket": [
+  [
+   "Druid",
+   "45"
+  ]
+ ],
+ "Zephyr: North Karana": [
+  [
+   "Druid",
+   "34"
+  ]
+ ],
+ "Zephyr: South Ro": [
+  [
+   "Druid",
+   "40"
+  ]
+ ],
+ "Zephyr: Steamfont": [
+  [
+   "Druid",
+   "39"
+  ]
+ ],
+ "Zephyr: Stonebrunt": [
+  [
+   "Druid",
+   "35"
+  ]
+ ],
+ "Zephyr: Surefall Glade": [
+  [
+   "Druid",
+   "35"
+  ]
+ ],
+ "Zephyr: Toxxulia": [
+  [
+   "Druid",
+   "32"
+  ]
+ ],
+ "Zephyr: West Commons": [
+  [
+   "Druid",
+   "35"
+  ]
+ ]
 }

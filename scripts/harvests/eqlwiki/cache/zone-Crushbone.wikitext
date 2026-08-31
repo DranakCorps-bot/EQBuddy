@@ -46,13 +46,14 @@ Crushbone is the home of the Crushbone clan of orcs. It is located directly to t
 
 '''Crushbone'''
 
-* 1. Tents, inhabited by legionnaires
-* 2. Castle Crush, where high levels spawn including emissaries, with [[Ambassador DVinn]], and [[Emperor Crush]] in the tower, and with [[Lord Darish]] and [[Bonefire]] in the Throneroom
-** Outside the castle entrance and across the bridge is the camp frequently called Wall
-* 3. Slave Cabin, with inhabitants needed for [[Screaming Mace Quest]]
-* 4. Slaver Caves, with slaves outside
-* 5. Slaver Pit with the [[Orc Taskmaster]] and [[Bloodgurgler]]
-* 6. Trainer Hill with [[Orc Trainer]] ("Where camping was born...")
+<ul><li> 1. Tents, inhabited by legionnaires
+</li><li> 2. Castle Crush, where high levels spawn including emissaries, with [[Ambassador DVinn]], and [[Emperor Crush]] in the tower, and with [[Lord Darish]] and [[Bonefire]] in the Throneroom
+* Outside the castle entrance and across the bridge is the camp frequently called Wall
+</li><li> 3. Slave Cabin, with inhabitants needed for [[Screaming Mace Quest]]
+</li><li> 4. Slaver Caves, with the [[Orc Warden]] who drops {{:Bracers of Battle}} (Rare) and [[Rondo Dunfire]]
+</li><li> 5. Slaver Pit with the [[Orc Taskmaster]] and [[Bloodgurgler]]
+</li><li> 6. Trainer Hill with [[Orc Trainer]] who drops {{:Shiny Brass Shield}} (Common) and {{:Crushbone Cadet's Grimoire}} (Rare) ("Where camping was born...")
+</li></ul>
 
 Note that the map is in error -- there is a land connection along the back wall from area 1 to behind the castle at area 5.
 |}
