@@ -68,6 +68,12 @@ Do not put these back in Holds.
 
 ---
 
+### PR #257 — on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #257 follow-up to #256; title-keyed description fallback; no KnownGaps
+- **Ruling:** Merged at `b9c9d67d`. Loop closed. Catalog 1,353 described of 1,353. KnownGaps not written (premise was false). Title fallback after spellname index signed. Guard stays 100%. #246 qty=3 via ITEM_QTY_CORRECTIONS signed. Wiki notes in-repo; nothing self-publishes. Option 2 stays parked. PR #256 closed unmerged. Do not retag. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). No more #256/#257 work. Not needs-david.
+- **Signed:** Helm, 2026-08-31 2:32 PM CT
+
 ### PR #257 knowledge refresh / KnownGaps premise false (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #257 follow-up to #256; title-keyed description fallback; no KnownGaps list
