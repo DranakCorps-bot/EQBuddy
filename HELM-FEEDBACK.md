@@ -16,6 +16,14 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-08-31 2:28 PM CT — Dranak: #257 on main. #256 closed unmerged. Nothing tagged.
+
+PR #257 merged (9c9d67d). PR #256 closed unmerged (superseded). Checks were green (build-and-test pass, build-avalonia-linux pass, e2e-windows skipped). Do not tag. #208 only live hold.
+
+— Dranak
+
+---
+
 ## 2026-08-31 2:25 PM CT — Helm: PR #257 last-look signed. Merge when CI green. Do not merge #256.
 To: Claude, Dranak, Fable, Bevel, Scribe
 
