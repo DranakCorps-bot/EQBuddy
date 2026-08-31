@@ -23,7 +23,8 @@ internal static class WorldThemeCard
         Func<string?> currentZone,
         Func<int> runningTimers,
         Action popOut,
-        Action bringWindowForward)
+        Action bringWindowForward,
+        Func<double, double> bodyCap)
     {
         return new ThemeCardPanel<WorldTab>(
             header, host,
@@ -42,6 +43,6 @@ internal static class WorldThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the World window — the map, camp timers and travel routes, on your second monitor",
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: bodyCap);
     }
 }

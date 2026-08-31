@@ -18,7 +18,8 @@ internal static class KillsThemeCard
         ThemeHost<CreatureTab> host,
         Func<CreatureSurfaceSet> newSurfaces,
         Action popOut,
-        Action bringWindowForward)
+        Action bringWindowForward,
+        Func<double, double> bodyCap)
     {
         CreatureSurfaceSet? surfaces = null;
         CreatureSurfaceSet Surfaces() => surfaces ??= newSurfaces();
@@ -39,6 +40,6 @@ internal static class KillsThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Kills & Drops window — the full lists, on your second monitor",
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: bodyCap);
     }
 }

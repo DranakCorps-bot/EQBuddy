@@ -20,7 +20,8 @@ internal static class GearThemeCard
         Func<StatsSnapshot, IReadOnlyList<LootTabHeader>> tabs,
         Func<int?> inventoryCount,
         Action popOut,
-        Action bringWindowForward)
+        Action bringWindowForward,
+        Func<double, double> bodyCap)
     {
         LootSurfaceSet? surfaces = null;
         LootSurfaceSet Surfaces() => surfaces ??= newSurfaces();
@@ -49,6 +50,6 @@ internal static class GearThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Gear & Loot window — the full tabs, on your second monitor",
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: bodyCap);
     }
 }

@@ -29,7 +29,7 @@ internal static class GearThemeCard
         Func<int?> inventoryCount,
         Action popOut,
         Action bringWindowForward,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         LootCardView? loot = null;
         LootCardView Loot() => loot ??= newLoot();
@@ -60,7 +60,7 @@ internal static class GearThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Gear & Loot window — the full tabs, on your second monitor",
-            bodyMaxHeight: bodyMaxHeight);
+            bodyCap: bodyCap);
 
         popOutHost.Content = card.PopOutButton;
         return card;

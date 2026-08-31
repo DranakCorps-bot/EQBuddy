@@ -45,7 +45,8 @@ internal static class ProgressThemeCard
         Func<StatsSnapshot, int> dingUnlocks,
         Func<int> raidsDefeated,
         Action popOut,
-        Action bringWindowForward)
+        Action bringWindowForward,
+        Func<double, double> bodyCap)
     {
         ProgressSurfaceSet? surfaces = null;
         ProgressSurfaceSet Surfaces() => surfaces ??= newSurfaces();
@@ -80,6 +81,6 @@ internal static class ProgressThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the Progress window — the full rooms, on your second monitor",
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: bodyCap);
     }
 }

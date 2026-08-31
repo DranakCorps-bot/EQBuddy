@@ -124,6 +124,49 @@ public static class WidgetMetrics
         return Math.Floor(Math.Clamp(room, ThemeBodyMaxHeight, ThemeBodyCeiling));
     }
 
+    /// <summary>
+    /// The <c>otherVisibleChrome</c> argument above, summed from what the card stack
+    /// actually measured. **Both widgets call this** — the measuring is per toolkit, the
+    /// rule about what the measurements MEAN is not, which is the only way the two lanes
+    /// can be said to feed <see cref="ThemeBodyCap"/> the same inputs.
+    ///
+    /// One entry per VISIBLE card in the stack, each already net of any body:
+    /// <list type="bullet">
+    /// <item>a collapsed card is all header, so its whole extent goes in;</item>
+    /// <item>an expanded SIBLING contributes its header only — a second open card is the
+    /// player asking for two open cards, not a reason to shrink this one (Bevel,
+    /// 2026-08-31);</item>
+    /// <item>the card doing the asking contributes everything it occupies MINUS the body
+    /// being capped — its header, its tab strip and its padding. Subtracting the body is
+    /// also what keeps this out of its own input: the difference does not move when the
+    /// cap does.</item>
+    /// </list>
+    ///
+    /// **Widget chrome outside the stack is NOT in here, and that is a correction to the
+    /// plan rather than an omission.** The height grip seeds from the card scroller's own
+    /// height and assigns straight back to it, so <c>ContentHeight</c> IS the stack's
+    /// viewport — the title bar, the KPI strip and the status line are already outside the
+    /// number being divided up. Subtracting them again would hand every player less room
+    /// than they asked for, invisibly.
+    ///
+    /// **A measurement that has not happened poisons the total on purpose.** One card the
+    /// layout has not reached yet is NaN, and dropping it would silently under-count the
+    /// chrome and over-grant the cap; propagating it makes <see cref="ThemeBodyCap"/>
+    /// answer the floor, which is what the widget drew before any of this existed. A
+    /// negative extent is a toolkit having a bad day, not room to spend, so it counts as
+    /// zero.
+    /// </summary>
+    public static double ThemeBodyChrome(IEnumerable<double> visibleCardExtents)
+    {
+        double total = 0;
+        foreach (var extent in visibleCardExtents)
+        {
+            if (!double.IsFinite(extent)) return double.NaN;
+            total += Math.Max(0, extent);
+        }
+        return total;
+    }
+
     /// <summary>A bottom-edge drag turned into a stored height. The cursor travels in
     /// screen pixels while the list it resizes lives under the transform, so the delta
     /// is divided rather than added raw.</summary>

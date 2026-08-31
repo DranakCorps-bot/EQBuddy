@@ -195,6 +195,72 @@ $Shots = [ordered]@{
     'theme-inline-loot' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'loot' }
                            Set = @{} }
+    # ---- #250: the theme body's cap follows the height grip ----
+    #
+    # These two are the ACCEPTANCE for the 320-cap change, and 'theme-inline-loot' above is
+    # their baseline: same card, same room, same fixture, undragged. The Loot room is the
+    # one that overflows 320 on this fixture (the committed baseline shows 17 rows and a
+    # scrollbar), which is what makes "more rows" a thing a picture can settle.
+    #
+    # NOT the Paineless Motes/SectionScroll image: that is #250's OWN track (Helm-signed
+    # 2026-08-29) and using it here would be accepting one change with another's evidence.
+    #
+    # PREDICTIONS, written before the first run (trap 23 — a shot whose numbers you did not
+    # predict in advance has not been reviewed):
+    #
+    #  theme-body-dragged (100%, ContentHeight 900)
+    #    * The widget window is TALLER than the baseline's 851px — the drag is what does
+    #      that, and it is the half Paineless could already see working.
+    #    * The Loot body is capped near the CEILING rather than the floor: 900 units of
+    #      granted stack minus the other cards' headers (eleven of them, plus this card's
+    #      own header and its two chip strips) leaves comfortably more than 640, so the cap
+    #      clamps to 640 — exactly 2x the baseline.
+    #    * So the room shows MORE loot rows than the baseline's 17, and its scrollbar is
+    #      shorter or gone. It must NOT show a different SET of rows: same order, same
+    #      counts, same "×11 Bone Chips" at the top. A changed order would mean the shot is
+    #      of a different state (trap 23), not of a taller body.
+    #    * Every sibling card is still visible and still collapsed. The point of the cap is
+    #      that one open card does not push the glance off the widget, and 640 with the
+    #      stack at 900 leaves room for all of them.
+    #
+    #  theme-body-dragged-125 (125%, same drag)
+    #    * FEWER body units than the 100% shot, not more — and this is the prediction most
+    #      likely to be got wrong by intuition. ContentHeight is pre-scale, so a 900-unit
+    #      drag on a work area of H screen pixels is granted min(900, (H-160)/1.25): on a
+    #      1080p screen that is 736 units, and the cap lands under the ceiling rather than
+    #      on it. Everything is DRAWN 1.25x larger, so the row count drops again.
+    #    * It must still be well above the 320 floor. If this shot shows the same rows as
+    #      the baseline, the monitor clamp is eating the whole drag and the pairing above
+    #      is the thing to re-read — not the formula.
+    #
+    # WHAT ACTUALLY HAPPENED, measured off the app's own dump on a 1032px work area, kept
+    # beside the prediction rather than replacing it — a corrected prediction that erases
+    # the miss teaches nobody anything:
+    #
+    #    100%   sectionCapScreen 872, granted 872, chrome 379, cap 493   (predicted 640)
+    #    125%   sectionCapScreen 872, granted 698, chrome 379, cap 320   (the floor)
+    #    auto   cap 320                                                  (predicted, exact)
+    #
+    #  * Every VISIBLE claim held: 925px vs 851px, 21 rows vs 17, the body scrollbar gone,
+    #    same order and counts, every sibling card still on screen. The 640 was wrong for
+    #    two reasons worth writing down. The drag never gets what it asked for — 900 is
+    #    clamped to the 872-unit work area before the cap sees it — and the CHROME is far
+    #    bigger than a card-count guess suggests: ten sibling headers plus this card's own
+    #    header, two chip strips and its padding come to 379 units, nearly half the stack.
+    #    **The ceiling is not the operative bound on a 1080p screen; the chrome is.**
+    #  * The 125% shot landed on the branch the prediction named as its own falsifier: 698
+    #    granted minus 379 chrome is 319, under the floor, so the floor holds and the
+    #    picture is the baseline's 17 rows. That is CORRECT and not a defect — at 125% with
+    #    ten cards showing, a 1032px screen has no room left to give, and the widget is
+    #    already at its full height. It is also the honest limit of this change: #250's fix
+    #    buys real room at 100% and nothing at 125% on a small screen. Raising the floor
+    #    globally is the alternative, and the three-class lock forbids it.
+    'theme-body-dragged' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'loot' }
+                           Set = @{ ContentHeight = 900 } }
+    'theme-body-dragged-125' = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'loot' }
+                           Set = @{ ContentHeight = 900; UiScale = 1.25 } }
     # The GLANCE room. Raids is the Progress theme's only one, and its contract is that it
     # draws a LINE instead of a body — so a picture of it is the only way to see that the
     # 29-row ledger did not come along for the ride.

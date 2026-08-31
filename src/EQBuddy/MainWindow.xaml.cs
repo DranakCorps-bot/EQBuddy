@@ -148,7 +148,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             raidsDefeated: () => _raidLedger.DefeatedCount(),
             popOut: () => ShowProgressWindow(),
             bringWindowForward: () => { _progressWindow?.Activate(); },
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: own => ThemeBodyCapHost.CapFor(this, ProgressSection, own));
         // The KILLS & DROPS theme's card (PR 2). Kills is the Full room; Drops is the
         // Glance — it reads the wiki, which an expanded card over a running game must
         // not do (Bevel's move, recorded on CreatureSurface.InlineModeFor).
@@ -157,7 +157,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             newKills: () => new KillsCardView(),
             popOut: () => ShowCreatureWindow(),
             bringWindowForward: () => _creatureWindow?.Activate(),
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: own => ThemeBodyCapHost.CapFor(this, KillsSection, own));
         // The GEAR & LOOT theme's card (PR 2). Loot/Items/Wishlist are Full; Inventory
         // is the Glance (Bevel's host rule - a long list with its own filter bar).
         _lootCard = GearThemeCard.Build(
@@ -168,7 +168,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             inventoryCount: () => LatestInventory()?.Counts.Count,
             popOut: () => ShowGearLootWindow(),
             bringWindowForward: () => _gearLootWindow?.Activate(),
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: own => ThemeBodyCapHost.CapFor(this, LootSection, own));
         // The QUESTS theme's card (PR 3). Epic and Sky inline as ONE class's rows,
         // capped (QuestInline owns the arrangement); General is the Glance AND the
         // default (Bevel); Unlocks is a Glance pending its ruling.
@@ -185,13 +185,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             unlockCounts: () => QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes),
             popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
             bringWindowForward: () => _questsWindow?.Activate(),
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: own => ThemeBodyCapHost.CapFor(this, QuestsSection, own));
         _worldCard = WorldThemeCard.Build(   // World PR 3: Travels Full, Map/Camps/Path Glance
             MiscSection, MiscBody, MiscPopOut, _worldHost,
             newTravels: () => _travelsView, currentZone: () => CurrentZoneName,
             runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
             popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate(),
-            bodyMaxHeight: WidgetMetrics.ThemeBodyMaxHeight);
+            bodyCap: own => ThemeBodyCapHost.CapFor(this, MiscSection, own));
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -1368,15 +1368,17 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>The grip's tooltip states what a drag can actually do RIGHT NOW —
     /// with every card already visible, dragging down is a no-op, and a control
     /// that silently does nothing reads as broken (David's 1.66.1 retest). The
-    /// cards themselves aren't hidden height: Buffs/Raids appear with content.</summary>
-    private void OnHeightGripEnter(object sender, MouseEventArgs e)
-    {
-        var scrolling = SectionsPanel.ActualHeight > SectionScroll.ActualHeight + 1;
-        HeightGrip.ToolTip = scrolling
-            ? "Drag down to show more cards (the list is scrolling); drag up to shorten. Double-click: back to automatic."
-            : "The widget is sizing itself automatically — everything you've selected in Options is shown. " +
-              "Drag up if you'd rather have it shorter (the list scrolls); double-click returns to automatic.";
-    }
+    /// cards themselves aren't hidden height: Buffs/Raids appear with content.
+    ///
+    /// Since #250 there is a SECOND thing a drag buys — the open theme card's body follows
+    /// the widget's height — so the old "everything you've selected is shown" branch would
+    /// have started lying in exactly the state Paineless reported. The wording moved into
+    /// <see cref="EQBuddy.UI.Shared.HeightGripTip"/>, which both widgets read.</summary>
+    private void OnHeightGripEnter(object sender, MouseEventArgs e) =>
+        HeightGrip.ToolTip = EQBuddy.UI.Shared.HeightGripTip.For(
+            listIsScrolling: SectionsPanel.ActualHeight > SectionScroll.ActualHeight + 1,
+            anExpandedBodyIsCapped: ThemeBodyCapHost.AnyBodyIsCapped(this),
+            resetGesture: "Double-click");
 
     private void OnHeightGripDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
     {

@@ -28,7 +28,7 @@ internal static class WorldThemeCard
         Func<int> runningTimers,
         Action popOut,
         Action bringWindowForward,
-        double bodyMaxHeight)
+        Func<double, double> bodyCap)
     {
         // Built on the first expand and kept — a player who never opens the theme pays
         // nothing for it, same as every other theme's body.
@@ -52,7 +52,7 @@ internal static class WorldThemeCard
             popOut: popOut,
             bringWindowForward: bringWindowForward,
             popOutTip: "Open the World window — the map, camp timers and travel routes, on your second monitor",
-            bodyMaxHeight: bodyMaxHeight);
+            bodyCap: bodyCap);
 
         popOutHost.Content = card.PopOutButton;
         return card;
