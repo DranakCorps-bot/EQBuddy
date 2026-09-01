@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Server Status Widget (new feature ask)
+- **Priority:** someday (real ask, not this gate; not authorized)
+- **Place:** a NEW transparent / persistent companion widget surface — server status + maintenance updates. Player session, not shared game truth. NOT a catalog / quest-data item (the wiki-first / eqlwiki rule is not triggered by the ask itself). Near the Instance charges timer on the widget and the Progress window, but this is a NEW server-status surface — distinct ask, not a timer on the existing widget. Do not fold into the Instance charges timer item. Not #208 mobile sounds.
+- **Source:** #262 Bigman397 Sep 1 14:28 UTC (~9:28 AM CT). https://github.com/DranakCorps-bot/EQBuddy/discussions/262 New thread. 0 replies. Footer: EQBuddy 1.99.16 - Windows 26200.
+- **Ask (verbatim, the whole entry):** "A transparent widget to show server status and maintenance updates would be sweet so I can pretend to work while waiting for the servers to return <3 Thanks for the hard work, this tool is awesome" Single paragraph plus the client-footer; that is everything the reporter wrote.
+- **Already shipped:** no server-status or maintenance widget. EQBuddy ships an updater (one-hop releases) and a What's-new panel; neither surfaces server status. No server-status claim was made on-thread this run; not verified against a running widget.
+- **Hypothesis, unchecked (labeled):** "server status and maintenance updates" is most likely EQL server up/down plus the maintenance-window wording. The upstream data source for server status is NOT identified and was NOT harvested this pass (do not open third-party status sites). Treat it as a new-surface ask, not a data-source / integration ticket, until Helm opens the product call.
+- **Scribe 2026-09-01 07:20 AM CT:** New intake. Real feature ask, not a gate-blocked bug, not authorized. HELM.md Holds re-read: live hold #208 is do-not-open on mobile sounds (sbaum23) — not this reporter, not this ask; talking to Bigman397 is not the hold, opening the work is. Not #208. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into the Instance charges timer item. Thank-you drafted for Helm's sign-off — NOT posted.
+
+- **Thank-you draft (for Helm's sign-off — DRAFT, NOT POSTED):**
+  > Hi Bigman397 — thanks for the note, and the "pretend to work while waiting for the servers to return" line did earn a smile. A transparent server-status widget is a fun idea. I've captured it and sent it along for review — I can't promise a date on it, but it's logged and in front of us. And thanks back for the kind words.
+
 ### Debuff + hot-ready tracking "similar to GINA" (new feature ask)
 - **Priority:** someday (real ask, not this gate; not authorized)
 - **Place:** companion tracking surface — combined debuff (slow / disease / poison / stun) + hot-ready (cooldown) display. Player session, not shared game truth. NOT a catalog / quest-data item (so the wiki-first / eqlwiki rule is not triggered). Near the slow chip / SpokenAlerts / SlowDebuffCatalog (#94) and the #237 slow-% thread, but this is a NEW GINA-style combined debuff+hot-ready ask, not a fix to the existing slow chip. Do not fold into #94 / #237. Not #208 mobile sounds.
