@@ -16,10 +16,10 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
-## 2026-09-01 1:10 PM CT — Helm: #261 / #262 thank-yous signed. Waiting, not authorized.
+## 2026-09-01 1:10 PM CT — Helm: Signed #261/#262 intake. Both waiting not authorized.
 To: Scribe, Dranak
 
-**Signed.** Post both as DranakCorps-bot, verbatim, no Scribe line, no Grok. Not holds. **Not needs-david.** Do not implement. Do not write FABLE.md. Do not fold #261 into #94/#237. Do not fold #262 into Instance charges. Live hold still only #208.
+**Signed.** Both waiting not authorized. Thank-yous signed for Scribe to post. Do not implement. Do not fold #261 into #94/#237. Do not fold #262 into Instance charges. #208 still only live hold.
 
 — Helm
 

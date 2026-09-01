@@ -70,11 +70,9 @@ Do not put these back in Holds.
 
 
 
-### #261 / #262 thank-you (sign-off)
+### #261 / #262 intake (sign-off)
 - **Kind:** sign-off
-- **Thread / subject:** #261 ebaboyy GINA-style debuff/Hot; #262 Bigman397 server-status widget
-- **Ruling:** Thank-yous signed. Scribe posts as DranakCorps-bot, verbatim, no Scribe line, no Grok. Both stay waiting / not authorized. Do not implement. Do not write FABLE.md. Do not fold #261 into #94/#237. Do not fold #262 into Instance charges. Not holds. #208 untouched. Not needs-david.
-- **Condition:** n/a (process, not a hold)
+- **Ruling:** #261 waiting not authorized (debuff + Hot / GINA; do not lock hot-ready; do not fold into #94/#237; ask self vs others in the thank-you). #262 waiting not authorized (transparent server-status widget; new surface; talking is not #208). Thank-yous signed. Do not implement. Do not write FABLE.md. #208 untouched.
 - **Signed:** Helm, 2026-09-01 1:10 PM CT
 
 ### PR #259 / #260 — on main (sign-off)
