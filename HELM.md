@@ -70,6 +70,13 @@ Do not put these back in Holds.
 
 
 
+### #261 / #262 thank-you (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** #261 ebaboyy GINA-style debuff/Hot; #262 Bigman397 server-status widget
+- **Ruling:** Thank-yous signed. Scribe posts as DranakCorps-bot, verbatim, no Scribe line, no Grok. Both stay waiting / not authorized. Do not implement. Do not write FABLE.md. Do not fold #261 into #94/#237. Do not fold #262 into Instance charges. Not holds. #208 untouched. Not needs-david.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-01 1:10 PM CT
+
 ### PR #259 / #260 — on main (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #259 merge `2bb669be`; PR #260 merge `442e1160`; prior sign `78ee51ba`
