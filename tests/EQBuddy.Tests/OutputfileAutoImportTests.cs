@@ -132,6 +132,83 @@ public class OutputfileAutoImportTests
         Assert.Contains("Read your inventory dump", outcome.Summary);
         Assert.Contains("nothing new to tick", outcome.Summary);
         Assert.Null(outcome.Undo);
+        // No Sky clause and no hover when there is nothing leftover to say — the ordinary
+        // dump's line is EXACTLY what it was before #243 existed.
+        Assert.Equal("Read your inventory dump (18:47) — nothing new to tick.", outcome.Summary);
+        Assert.Null(outcome.Detail);
+    }
+
+    /// <summary>#243, tvongaza: *"when you do an inventory dump"* is the moment he asked
+    /// about, so the dump's own report carries the count — light and secondary, in the same
+    /// `·` idiom the achievements line already uses. The LIST lives on the Plane of Sky tab;
+    /// this is the pointer.
+    ///
+    /// <para>It counts band A only. "Other classes still want this" is a weaker claim and
+    /// must never be told to the player under the words "no longer needed" — Bevel's ruling,
+    /// and the reason the two bands exist apart at all.</para></summary>
+    [Fact]
+    public void TheDumpsReportCountsTheSkyItemsThatAreNoLongerNeeded()
+    {
+        var settings = new AppSettings
+        {
+            SkyQuestChecklist =
+            [
+                new() { Id = "a", ClassName = "Beastlord", Reward = "Windhowl", QuestItem = "Sphinx Claw" },
+                // Band B: turned in for Beastlord, still wanted by Bard. Held, listed on
+                // the tab — and deliberately NOT in this count.
+                new() { Id = "b", ClassName = "Beastlord", Reward = "Azarack Skin Wristwraps", QuestItem = "Wind Rune Heda" },
+                new() { Id = "c", ClassName = "Bard", Reward = "Harmonic Spear", QuestItem = "Wind Rune Heda" },
+            ],
+            SkyQuestCompleted = ["Beastlord|Windhowl", "Beastlord|Azarack Skin Wristwraps"],
+        };
+        var dump = new InventoryFile.Snapshot("Dranak_freeport-Inventory.txt",
+            new DateTime(2026, 8, 20, 18, 47, 0),
+            new(StringComparer.OrdinalIgnoreCase) { ["Sphinx Claw"] = 1, ["Wind Rune Heda"] = 1 })
+        {
+            Entries =
+            [
+                new InventoryFile.Entry("General 1-Slot2", "Sphinx Claw", 1),
+                new InventoryFile.Entry("General 1-Slot3", "Wind Rune Heda", 1),
+            ],
+        };
+
+        var outcome = OutputfileAutoImport.ImportInventory(dump, settings, null, null, ["Beastlord"]);
+
+        Assert.Equal(1, outcome.SkyLeftovers);
+        Assert.Equal(["Sphinx Claw"], outcome.SkyLeftoverItems);
+        Assert.Equal("Read your inventory dump (18:47) — nothing new to tick"
+            + " · 1 Sky item no longer needed.", outcome.Summary);
+        Assert.Contains("every Sky reward that takes it is already turned in: Sphinx Claw",
+            outcome.Detail);
+        // The weaker band never wears the stronger band's words.
+        Assert.DoesNotContain("Wind Rune Heda", outcome.Detail);
+        // A list is not a warning: the report line stays green. `Noted` is what colours it
+        // red, and it means "found something it could not apply" — this found nothing wrong.
+        Assert.Equal(0, outcome.Noted);
+        // And it still offers no undo, because it changed nothing.
+        Assert.Null(outcome.Undo);
+    }
+
+    /// <summary>The count is a join, not a store, so it must not answer for a dump that does
+    /// not hold the item — and the clause disappears entirely rather than reading "0".</summary>
+    [Fact]
+    public void ADumpHoldingNoneOfThemSaysNothingAboutSky()
+    {
+        var settings = new AppSettings
+        {
+            SkyQuestChecklist =
+                [new() { Id = "a", ClassName = "Beastlord", Reward = "Windhowl", QuestItem = "Sphinx Claw" }],
+            SkyQuestCompleted = ["Beastlord|Windhowl"],
+        };
+        var dump = new InventoryFile.Snapshot("Dranak_freeport-Inventory.txt",
+            new DateTime(2026, 8, 20, 18, 47, 0), new(StringComparer.OrdinalIgnoreCase) { ["Bone Chips"] = 47 })
+        { Entries = [new InventoryFile.Entry("General 1-Slot2", "Bone Chips", 47)] };
+
+        var outcome = OutputfileAutoImport.ImportInventory(dump, settings, null, null, ["Beastlord"]);
+
+        Assert.Equal(0, outcome.SkyLeftovers);
+        Assert.DoesNotContain("Sky item", outcome.Summary);
+        Assert.Null(outcome.Detail);
     }
 
     /// <summary>The AUTOMATIC import obeys the auto-grant guard, asserted here rather

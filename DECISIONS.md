@@ -15,6 +15,39 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-02
+
+- **Surplus counts are out of the #243 leftover join; "no longer needed" only.** · The other
+  way: also say "you hold 3 and one open reward wants 1". · A surplus claim on a shared rune
+  needs an allocation across classes that `SkyLootAutoCheck`'s rule 3 already declines to
+  guess (#106), and it is wrong by exactly one class in the case that matters. Its own item
+  if a player asks for it. (PR 0, #243 track — Fable's plan, taken as written)
+- **The "other classes still want this" band is never produced without a class lens.** · The
+  other way: fold other-class demand into "No longer needed", or drop the fact entirely. ·
+  No lens is not a wildcard — #193's rule, one surface over. A weaker claim gets its own
+  heading (Bevel's replace: two separate bands, honest headings), and with no classes known
+  there is no "other" to be other than, so the item is simply still wanted and not listed.
+  (PR 0, `SkyLeftovers`)
+- **Another catalog quest wanting a held Sky item VETOES "no longer needed"**, and the
+  band's hover names the quest rather than the item vanishing. · The other way: judge Sky
+  alone, which is literally what the reporter asked for. · Nothing here destroys anything, so
+  the only cost this feature can impose on a player is a wrong "safe to free" about an item
+  something else needed. (PR 0, `SkyLeftovers.OtherQuestsWanting`)
+- **Bank items are labelled, not excluded** — the row carries bags / bank / worn. · The
+  other way: list only what is in the bags, since the ask is bag space. · The fact costs one
+  word and the player decides. (PR 0, `SkyLeftoverRow.Where`)
+- **`AutoImportOutcome` carries the leftover ITEM NAMES, not a bare count**, and the dump's
+  report counts band A only. · The other way: an `int` as the plan wrote it, with the hover
+  re-deriving the list. · The `Summary` count and the `Detail` list are one fact and must not
+  be able to disagree (trap 4); and counting band B under the words "no longer needed" is the
+  one presentation Bevel's ruling exists to prevent. `Noted` is deliberately unchanged — it
+  colours the report line red, and a list is not a warning. (PR 0, `OutputfileAutoImport`)
+- **`InventoryFile.Entry.InBank` knows the SHARED bank is a bank, and `GearLocker` now calls
+  it** instead of its own `StartsWith("Bank")`. · The other way: leave `GearLocker` alone and
+  spell the rule twice. · A `SharedBank1` row was ranking as worn gear and labelling itself
+  `worn · SharedBank1`; one fact, one place, and the older spelling was the wrong one.
+  (PR 0, drive-by inside the #243 track)
+
 ## 2026-08-31
 
 - **`GearCardView`'s inner scroller was RE-POINTED at the host, not deleted**, though the

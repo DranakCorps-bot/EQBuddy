@@ -211,16 +211,18 @@ public static class GearLocker
         return className.Trim().ToUpperInvariant();
     }
 
+    // "Is this in the bank" is InventoryFile.Entry.InBank, which knows the shared bank is
+    // a bank too. Both rules used to spell it `StartsWith("Bank")` here, so a SharedBank
+    // row ranked as worn gear and labelled itself `worn · SharedBank1`.
     private static int LocationRank(string location) =>
-        location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase) ? 2
+        new InventoryFile.Entry(location, "", 1).InBank ? 2
         : location.Contains("-Slot", StringComparison.Ordinal) ? 1
         : location.StartsWith("General", StringComparison.OrdinalIgnoreCase) ? 1
         : 0;   // a worn slot
 
     public static string WhereLabel(InventoryFile.Entry e) =>
         e.InContainer ? e.ContainerSlot
-        : e.Location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase)
-            || e.Location.StartsWith("General", StringComparison.OrdinalIgnoreCase)
+        : e.InBank || e.Location.StartsWith("General", StringComparison.OrdinalIgnoreCase)
             ? e.Location
             : $"worn · {e.Location}";
 }

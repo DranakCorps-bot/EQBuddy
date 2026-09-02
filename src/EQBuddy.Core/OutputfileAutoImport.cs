@@ -153,8 +153,16 @@ public static class OutputfileAutoImport
     /// one <see cref="AutoImportOutcome"/>, one Undo, for a caller that treats "read the
     /// inventory dump" as a single event even though gear and quest counts are two
     /// different stores underneath.</summary>
+    /// <param name="catalog">Only for the #243 leftover-Sky join: the dump is the moment the
+    /// player asked about ("when you do an inventory dump"), so the count is computed here
+    /// and carried on the outcome rather than each surface running its own join. Null skips
+    /// the join entirely; the bands still compute themselves at render.</param>
+    /// <param name="myClasses">The character's classes, for the same join. Empty is not a
+    /// wildcard — see <see cref="SkyLeftovers.Compute"/>. It does not affect this count,
+    /// which is band A only.</param>
     public static AutoImportOutcome ImportInventory(InventoryFile.Snapshot dump, AppSettings settings,
-        (int Trued, Action? Undo)? questReconcile = null)
+        (int Trued, Action? Undo)? questReconcile = null,
+        QuestCatalog? catalog = null, IReadOnlyList<string>? myClasses = null)
     {
         var before = settings.GearChecklist
             .Where(i => !i.Acquired).Select(GearKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -163,10 +171,17 @@ public static class OutputfileAutoImport
             .Where(i => i.Acquired && before.Contains(GearKey(i))).Select(GearKey).ToList();
         var (questTrued, questUndo) = questReconcile ?? (0, null);
 
+        // Band A only. Band B ("other classes still want this") is a weaker claim and must
+        // never be counted under the words "no longer needed" — Bevel's ruling, and the
+        // reason the two bands exist separately at all.
+        var leftovers = SkyLeftovers.Compute(dump, settings.SkyQuestChecklist,
+            settings.SkyQuestCompleted, myClasses, catalog);
+
         return new AutoImportOutcome(OutputfileKind.Inventory, Path.GetFileName(dump.Path),
             dump.WrittenAt, GearTicked: flipped.Count, RaidsMarked: 0, SkyMarked: 0)
         {
             QuestCountsTrued = questTrued,
+            SkyLeftoverItems = [.. leftovers.NoLongerNeeded.Select(r => r.Item)],
             Undo = flipped.Count == 0 && questUndo is null ? null : () =>
             {
                 if (flipped.Count > 0)
@@ -214,6 +229,15 @@ public sealed record AutoImportOutcome(
     /// progress, so it is the one an unprompted import must never swallow.</summary>
     public int SkyUnrecognized { get; init; }
 
+    /// <summary>Sky items the dump found in the bags that every reward in the game using
+    /// them is already done with (#243, tvongaza) — band A of <see cref="SkyLeftovers"/>,
+    /// never band B. The NAMES rather than a bare count, because <see cref="Detail"/> has
+    /// to say which: one store for one fact, so the count and the list cannot disagree.
+    /// Empty on every kind but <see cref="OutputfileKind.Inventory"/>.</summary>
+    public IReadOnlyList<string> SkyLeftoverItems { get; init; } = [];
+
+    public int SkyLeftovers => SkyLeftoverItems.Count;
+
     public int Applied => GearTicked + RaidsMarked + SkyMarked;
 
     /// <summary>What the import found but did not apply. Kept apart from
@@ -238,16 +262,24 @@ public sealed record AutoImportOutcome(
     /// </summary>
     public string Summary => Kind switch
     {
-        OutputfileKind.Inventory => GearTicked == 0 && QuestCountsTrued == 0
-            ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick."
-            : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
-                new[]
-                {
-                    GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
-                    QuestCountsTrued > 0
-                        ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
-                        : null,
-                }.Where(s => s is not null)) + ".",
+        OutputfileKind.Inventory =>
+            (GearTicked == 0 && QuestCountsTrued == 0
+                ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick"
+                : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
+                    new[]
+                    {
+                        GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
+                        QuestCountsTrued > 0
+                            ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
+                            : null,
+                    }.Where(s => s is not null)))
+            // Light and secondary, in the same `·` idiom the achievements line already uses
+            // for its counted-not-explained clauses. The list itself lives on the Sky tab;
+            // this is only the pointer, at the moment the player asked the question.
+            + (SkyLeftovers > 0
+                ? $" · {SkyLeftovers} Sky item{(SkyLeftovers == 1 ? "" : "s")} no longer needed"
+                : "")
+            + ".",
         OutputfileKind.Achievements =>
             (Applied == 0
                 ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark"
@@ -269,9 +301,9 @@ public sealed record AutoImportOutcome(
     };
 
     /// <summary>
-    /// **The hover half: WHY something was skipped or unmatched.** <c>null</c> when there is
-    /// nothing to explain, so a surface can hang it straight on a tooltip without inventing
-    /// filler for the ordinary case.
+    /// **The hover half: WHY something was skipped, unmatched, or no longer needed.**
+    /// <c>null</c> when there is nothing to explain, so a surface can hang it straight on a
+    /// tooltip without inventing filler for the ordinary case.
     ///
     /// Both clauses survive intact from the first cut, because both were load-bearing: each
     /// names a different way a correct import reads as a broken one. The skipped clause is
@@ -282,6 +314,17 @@ public sealed record AutoImportOutcome(
     {
         get
         {
+            if (Kind == OutputfileKind.Inventory)
+            {
+                if (SkyLeftovers == 0) return null;
+                var one = SkyLeftovers == 1;
+                return $"{SkyLeftovers} Sky item{(one ? "" : "s")} in your bags "
+                    + $"{(one ? "is" : "are")} no longer needed — every Sky reward that takes "
+                    + $"{(one ? "it" : "them")} is already turned in: "
+                    + string.Join(", ", SkyLeftoverItems)
+                    + $".\n\nThe Plane of Sky tab lists {(one ? "it" : "them")}, with what "
+                    + $"{(one ? "it was" : "each one was")} for.";
+            }
             if (Kind != OutputfileKind.Achievements || Noted == 0) return null;
             var parts = new List<string>();
             if (SkySkipped > 0)

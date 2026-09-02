@@ -49,6 +49,13 @@ public static class InventoryFile
         public bool InContainer => Location.Contains("-Slot", StringComparison.Ordinal);
         public string ContainerSlot => InContainer
             ? Location[..Location.IndexOf("-Slot", StringComparison.Ordinal)] : Location;
+        /// <summary>In the bank rather than on the character — including the SHARED bank,
+        /// which the dump writes as "SharedBank1" and a plain "Bank" prefix test misses.
+        /// Said once here because "is this taking up bag space" is the question #243 is
+        /// about, and a second spelling of the rule is how the two answers drift apart.</summary>
+        public bool InBank =>
+            ContainerSlot.StartsWith("Bank", StringComparison.OrdinalIgnoreCase)
+            || ContainerSlot.StartsWith("SharedBank", StringComparison.OrdinalIgnoreCase);
     }
 
     public static List<Entry> ParseEntries(IEnumerable<string> lines)
