@@ -362,6 +362,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         // App.xaml.cs on the WPF side) is keyed on the PROFILE, not the toolkit, so the
         // two builds can no longer both reach this constructor against one settings.json
         // and race for CompanionPort — which is what trap 13 cost.
+        //
+        // The phone's OWN Level-ups memo (#240), like the WPF twin's: a memo is state, so
+        // the Experience card gets its own and this one is captured by Progress below
+        // (trap 45). It is a local rather than a field for the same reason it is one
+        // there — nothing but that callback can ask it anything.
+        var phoneLevels = new LevelHistoryMemo(StoredLevelDings, () => QuestCharacterKey);
         CompanionSources = new EQBuddy.Companion.CompanionSources
         {
             TimerZone = () => _spawnTimers.CurrentZone?.Zone ?? SpawnCatalog.StripTierVariant(CurrentZoneName),
@@ -378,7 +384,8 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             {
                 var snap = CurrentSnapshot();
                 return new Companion.CompanionProgressState(snap.LastLevel,
-                    DingUnlocks(snap), UnlockClasses(snap), PhoneUnlocks.Next(snap));
+                    DingUnlocks(snap), UnlockClasses(snap), PhoneUnlocks.Next(snap),
+                    phoneLevels.Rows(snap));
             },
             // The Progress theme's Raids tab, added to the record on 2026-08-19 —
             // both surfaces or neither (#210).

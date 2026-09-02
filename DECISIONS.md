@@ -17,6 +17,29 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-02
 
+- **The phone's Level-ups fold is a DEVICE-side open/shut state, not the desktop's
+  `ShowLevelUps`** (#240 PR 2, `Web/index.html`). · The other way: ride the setting, which is
+  what Bevel's lock names and what would make the two surfaces agree exactly. · A phone tap
+  would then fold or unfold a window on the PC somebody is playing at, over the LAN, with no
+  way to tell what did it — and the desktop setting is that WINDOW's fold. The page follows
+  `nextGroupOpen`, the fold beside it, which is session-only per device for the same reason.
+  What DOES ride the wire is everything a surface could disagree about: the rows, their order
+  and the label. Default shut on both, which is the half of the lock that is about what a
+  player sees.
+- **The phone's Level-ups list is NOT capped at `MaxRows` (20) like every other list on that
+  wire** (#240 PR 2, `CompanionProjection.Live.cs`). · The other way: cap it, which is the
+  house rule for a wire payload and is what `unlocks`, `loot` and `faction` all do. · The rows
+  are newest-first and bounded by the level cap rather than by how long you played, so a cap
+  drops the EARLIEST dings — the rarest rows, and the ones somebody opens the list to find
+  (trap 50, #234). A trimmed list that looks complete is the failure that took a bug report to
+  find last time; ~60 short rows on a section that only re-sends on a ding is the cheaper side
+  of that trade.
+- **The Progress fingerprint gained the fold LABEL rather than a join over the rows** (#240
+  PR 2, `CompanionProjection.cs`). · The other way: `Join(pr.LevelUps, …)` like the other
+  lists in that key. · The label is "Level-ups (17) · last Aug 23" — the count and the last
+  ding — so it moves on exactly what can change the list while costing one short string per
+  tick instead of a join over a career. Nothing in it drifts on the clock, which is the
+  property trap 8 is about.
 - **The Level-ups What's-new entry NAMES its location but carries no `MOVED:` badge**
   (#240 PR 1, `WhatsNew.json` 1.99.17). · The other way: mark it MOVED, since joeymavity is
   exactly the player the badge exists for — he went looking for something and could not find

@@ -339,6 +339,7 @@ public sealed class CompanionHost : IDisposable
             Unlocks = progress?.Unlocks,
             UnlockClasses = progress?.Classes ?? [],
             NextUnlocks = progress?.Next,
+            LevelUps = progress?.LevelUps ?? [],
             Raids = On(CompanionSurfaces.Progress) ? _sources.Raids : null,
             Quests = quests,
             QuestIndex = quests is null ? null : _questIndex,

@@ -55,7 +55,7 @@ public static partial class CompanionProjection
             Loot = On(CompanionSurfaces.Loot) ? BuildLoot(stats) : null,
             Progress = On(CompanionSurfaces.Progress)
                 ? BuildProgress(stats, input.Level, input.Unlocks, input.Raids,
-                    input.UnlockClasses, input.NextUnlocks)
+                    input.UnlockClasses, input.NextUnlocks, input.LevelUps)
                 : null,
             Quests = On(CompanionSurfaces.Quests)
                 ? BuildQuests(input.Settings, input.Quests, input.QuestIndex) : null,
@@ -205,7 +205,13 @@ public static partial class CompanionProjection
         // drifting value in a key wakes every paired device for nothing.
         if (snap.Progress is { } pr)
             map[CompanionSurfaces.Progress] = Fold(
-                $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}",
+                // The Level-ups LABEL rather than its rows: it is "Level-ups (17) · last
+                // Aug 23", so it moves on exactly the two things that can change the list
+                // — a new ding, or a switch to a character with a different history — and
+                // it is one short fixed string rather than a join over every level a
+                // veteran has ever gained, rebuilt every tick a phone is paired. Nothing
+                // in it drifts on the clock (trap 8), which is the property that matters.
+                $"{pr.Level}|{pr.AaTotal}|{pr.Unlocks.Count}|{(int)pr.XpPercent}|{pr.LevelUpsLabel}",
                 pr.NextLabel + "|" + (pr.NextGrouped ? "g" : "-") + "|" +
                     Join(pr.NextGroups ?? [], g => g.Class + "=" +
                         Join(g.Rows, r => r.Name) + (g.Empty is null ? "" : "!")),

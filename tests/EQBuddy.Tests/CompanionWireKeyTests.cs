@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using EQBuddy.Companion;
 
 namespace EQBuddy.Tests;
@@ -77,6 +78,50 @@ public class CompanionWireKeyTests
         // A group's rows are name/value, the same pair every other row on this wire uses.
         Assert.Contains("\"name\":\"Endure Magic\"", json);
         Assert.Contains("\"value\":\"Druid spell\"", json);
+    }
+
+    /// <summary>The Level-ups block's three keys (#240), pinned the day they were written
+    /// for the reason the class above exists: the page reads <c>levelUps</c>,
+    /// <c>levelUpsLabel</c> and a row's <c>tip</c>, and nothing between the record and the
+    /// phone would object to any other spelling. The negatives are the C# names that would
+    /// emit something plausible-but-wrong — <c>SincePrevious</c> as a row field, or a
+    /// <c>Tooltip</c> that reaches the page as <c>tooltip</c>.</summary>
+    [Fact]
+    public void TheLevelUpsBlockCarriesTheKeysThePageDraws()
+    {
+        var json = JsonSerializer.Serialize(
+            new CompanionProgressSection(
+                XpPercent: 16, XpPerHour: 12.3, XpPerActiveHour: 20, HoursToLevel: 2.5,
+                AaGained: 1, AaTotal: 4, AaPerHour: 0.5, Level: 24,
+                UnlocksLabel: null, Unlocks: [],
+                Tabs: [], Wealth: new CompanionWealthBlock("0c", "0c", "0c", "0c", 0, 0, [], "", []),
+                Faction: [], Raids: new CompanionRaidsBlock(0, 21, []),
+                LevelUpsLabel: "Level-ups (3) · last Aug 23",
+                LevelUps:
+                [
+                    new CompanionLevelUpRow("Level 24", "Aug 23, 7:05 PM",
+                        "1d 22h since the previous level-up"),
+                    new CompanionLevelUpRow("Level 22", "Aug 21, 8:14 PM", null),
+                ]),
+            CompanionSnapshot.JsonOpts);
+
+        // The label up to its separator: `JsonOpts` escapes non-ASCII, so the "·" the
+        // player sees rides as · and asserting the rendered character here would be
+        // asserting the ENCODER rather than the key.
+        Assert.Contains("\"levelUpsLabel\":\"Level-ups (3) ", json);
+        // The list's own key, spelled out rather than left to the label's substring.
+        Assert.Contains("\"levelUps\":[", json);
+        Assert.Contains("\"name\":\"Level 24\"", json);
+        Assert.Contains("\"value\":\"Aug 23, 7:05 PM\"", json);
+        Assert.Contains("\"tip\":\"1d 22h since the previous level-up\"", json);
+        Assert.DoesNotContain("tooltip", json);
+        Assert.DoesNotContain("sincePrevious", json);
+        // The oldest row has no gap. `JsonOpts` is WhenWritingNull, so its `tip` is not on
+        // the wire at all — and the page tests `if (r.tip)`, which reads an absent key and
+        // a null the same way. What must NOT happen is an empty string, which is truthy
+        // nowhere but sets a blank hover box on the row that has nothing to say.
+        Assert.Equal(1, Regex.Matches(json, "\"tip\":").Count);
+        Assert.DoesNotContain("\"tip\":\"\"", json);
     }
 
     /// <summary>

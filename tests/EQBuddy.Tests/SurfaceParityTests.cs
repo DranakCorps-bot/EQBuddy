@@ -195,6 +195,98 @@ public class SurfaceParityTests
             Offered = [CompanionSurfaces.Progress],
         }, DateTime.Now).Progress!;
 
+    // ---- the Level-ups list: one merge, three surfaces (#240, joeymavity) ----
+    //
+    // The phone is the THIRD caller of LevelHistory, and it is the one that could most
+    // easily grow its own answer: the rows arrive as JSON, the page could sort them, cap
+    // them or format a date itself and look entirely correct beside a window nobody had
+    // open at the time. So what is asserted here is not "the phone has a list" but "the
+    // phone has the SAME list", against the module both desktops draw from.
+
+    private static readonly DateTime LevelAug21 = new(2026, 8, 21, 20, 14, 0);
+    private static readonly DateTime LevelAug22 = new(2026, 8, 22, 21, 30, 0);
+    private static readonly DateTime LevelAug23 = new(2026, 8, 23, 19, 5, 0);
+
+    /// <summary>Three dings across two sessions plus the live one — enough for an oldest
+    /// row with no gap, a newest row with one, and a label with a count in it.</summary>
+    private static IReadOnlyList<EQBuddy.UI.Shared.LevelHistory.Row> LevelRows() =>
+        EQBuddy.UI.Shared.LevelHistory.Rows(
+            [new SessionRepository.ProgressPoint(LevelAug21, 0, [(LevelAug21, 22)]),
+             new SessionRepository.ProgressPoint(LevelAug22, 0, [(LevelAug22, 23)])],
+            new StatsSnapshot { Levels = [new TimedDetail(LevelAug23, "Level 24")] });
+
+    private static CompanionProgressSection LevelUps() =>
+        CompanionProjection.Build(new CompanionInputs
+        {
+            Stats = new StatsSnapshot(),
+            Offered = [CompanionSurfaces.Progress],
+            LevelUps = LevelRows(),
+        }, DateTime.Now).Progress!;
+
+    [Fact]
+    public void ThePhoneDrawsTheSameLevelUpRowsAsTheDesktop()
+    {
+        var desktop = EQBuddy.UI.Shared.LevelHistory.CardRows(LevelRows()).ToList();
+
+        Assert.Equal(desktop, LevelUps().LevelUps!.Select(r => (r.Name, r.Value)).ToList());
+    }
+
+    [Fact]
+    public void ThePhoneShowsTheDesktopsFoldedLabelRatherThanCountingForItself()
+    {
+        // The count and the last ding's date are what the fold is closed OVER, so the
+        // string is the feature rather than decoration — and a page formatting its own
+        // "last Aug 23" is a second date formatter for one fact (the FormatCoin lesson,
+        // one tab across).
+        Assert.Equal(EQBuddy.UI.Shared.LevelHistory.FoldLabel(LevelRows()),
+            LevelUps().LevelUpsLabel);
+    }
+
+    [Fact]
+    public void ThePhoneCarriesTheGapAsAHoverAndNeverAsAThirdToken()
+    {
+        // Bevel's call, Helm-signed 2026-09-02. The negative is the half that matters:
+        // "the tip is present" would pass just as happily on rows that ALSO printed the
+        // gap into the value, which is the arrangement the call ruled out.
+        var rows = LevelUps().LevelUps!;
+
+        Assert.Equal(EQBuddy.UI.Shared.LevelHistory.Tooltip(LevelRows()[0]), rows[0].Tip);
+        Assert.Null(rows[^1].Tip);
+        Assert.All(rows, r => Assert.DoesNotContain("since the previous", r.Value));
+        Assert.All(rows, r => Assert.DoesNotContain("ago", r.Value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void ThePhoneKeepsTheOLDESTLevelUpsToo()
+    {
+        // Every other list on this wire is capped at MaxRows, and this one must not be:
+        // the rows are newest-first, so a cap silently drops the EARLIEST dings — the
+        // rarest rows, and the ones somebody opens the list to find (trap 50, #234). A
+        // veteran's list is bounded by the level cap, not by how long they played.
+        var many = Enumerable.Range(1, 60)
+            .Select(i => (Time: LevelAug21.AddDays(-i), Level: 61 - i)).ToArray();
+
+        var section = CompanionProjection.Build(new CompanionInputs
+        {
+            Stats = new StatsSnapshot(),
+            Offered = [CompanionSurfaces.Progress],
+            LevelUps = EQBuddy.UI.Shared.LevelHistory.Rows(
+                [new SessionRepository.ProgressPoint(LevelAug21, 0, [.. many])], null),
+        }, DateTime.Now).Progress!;
+
+        Assert.Equal(60, section.LevelUps!.Count);
+        Assert.Equal("Level 1", section.LevelUps[^1].Name);
+    }
+
+    [Fact]
+    public void NoDingsMeansNoHeadingOnThePhoneEither()
+    {
+        // The desktop hides the fold entirely rather than showing a heading over nothing;
+        // the page draws no card without the label, so this is that same rule on the wire.
+        Assert.Null(Progress().LevelUpsLabel);
+        Assert.Empty(Progress().LevelUps!);
+    }
+
     [Fact]
     public void ThePhoneOffersTheSameProgressTabsInTheSameOrder()
     {

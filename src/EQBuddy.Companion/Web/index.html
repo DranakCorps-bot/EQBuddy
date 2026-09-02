@@ -1161,6 +1161,12 @@ function boot() {
       const li = el("li");
       const rn = el("div", "rn", r.name);
       if (r.sub) rn.appendChild(el("span", "sub", r.sub));
+      // Hover text for the whole row. It reaches a tablet with a pointer and a laptop on
+      // the LAN and does nothing under a thumb — which is the point: it is the row's
+      // SECONDARY fact (Level-ups' gap since the previous ding, #240), and Bevel's lock is
+      // that it never becomes a third token competing with the two facts that were asked
+      // for. Nothing is promised on screen, so nothing is a no-op when touch ignores it.
+      if (r.tip) li.title = r.tip;
       li.appendChild(rn);
       if (r.right != null) li.appendChild(el("div", "rv", r.right));
       if (r.fraction != null) {
@@ -1249,6 +1255,15 @@ function boot() {
   // by position so the choice survives the level moving on.
   const nextGroupOpen = new Map();
 
+  // Whether the Level-ups list is open (#240). Default SHUT, like the two windows: the
+  // list is a career rather than an evening, and the label carries the count and the last
+  // ding's date so the glance is answered folded.
+  //
+  // Page-local and session-only, exactly like nextGroupOpen above — NOT the desktop's
+  // ShowLevelUps. That setting is the WINDOW's fold, and a tap on a phone must not reach
+  // across the LAN to fold something on the PC while somebody is playing at it.
+  let levelUpsOpen = false;
+
   function experienceBody(s, redraw) {
     const wrap = el("div");
     const grid = el("div", "stats");
@@ -1274,6 +1289,26 @@ function boot() {
       card.style.marginTop = "10px";
       card.appendChild(el("h3", "group", s.unlocksLabel || "New at this level"));
       card.appendChild(rowList(s.unlocks, u => ({ name: u.name, right: u.value })));
+      wrap.appendChild(card);
+    }
+    // Every level-up EQBuddy has seen for this character (#240, joeymavity: "leveling
+    // timestamps in an xp dropdown, I can't find it now"), between the ding block and the
+    // next-level preview — the order the two windows put it in, because it is the record
+    // of every level BEFORE the one that just happened.
+    //
+    // The label is the PC's (LevelHistory.FoldLabel): count and last date, so the fold
+    // answers "when did I last ding" without being opened. No card at all when the
+    // character has never dinged while EQBuddy watched — no heading over nothing.
+    if (s.levelUpsLabel && s.levelUps && s.levelUps.length) {
+      const card = el("div", "card");
+      card.style.marginTop = "10px";
+      const open = levelUpsOpen;
+      const head = el("h3", "group", (open ? "▾ " : "▸ ") + s.levelUpsLabel);
+      head.style.cursor = "pointer";
+      head.onclick = () => { levelUpsOpen = !open; redraw(); };
+      card.appendChild(head);
+      if (open) card.appendChild(rowList(s.levelUps,
+        r => ({ name: r.name, right: r.value, tip: r.tip })));
       wrap.appendChild(card);
     }
     // ...and what the NEXT level opens, under its OWN heading. Bevel, on finding this page
