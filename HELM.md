@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #263 — #240 PR 0 LevelHistory (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #263 `claude/240-levelups-pr0` head `ed46a40` → main. Core LevelHistory + tests + DECISIONS wall-clock gap.
+- **Ruling:** Signed. Merge when CI green. Not a hold. Not needs-david. Claude continues PR 1 (desktop fold) after merge; bring each PR for last-look. Do not tag. Do not fold #243/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-02 6:15 AM CT
+
 ### #243 / #240 presentation (sign-off)
 - **Kind:** sign-off
 - **Ruling:** Bevel presentation signed. #243 leftover Sky: two bands (A `No longer needed`, B `Other classes still want`); no Inventory annotate in V1. #240 Level-ups fold under Experience, default folded, SincePrevious tooltip-only. Tracks separate. Claude may implement. #208 untouched.
