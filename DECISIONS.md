@@ -50,6 +50,26 @@ history of the call stays readable. If vetoes become common, the consequence lis
   being remembered is the thing this repo keeps writing traps about. A shallow checkout has
   no tags, so the guard would have skipped cleanly and read as coverage (trap 34). Costs one
   full clone per CI run. `.github/workflows/ci.yml`.
+- **#243 PR 0 — the plan's four "decided without asking" calls, taken as written**: surplus
+  counts are out (a multi-class allocation is the guess #106 declines to make); Band B exists
+  and is never shown without a class lens (#193 — no lens is not a wildcard); another catalog
+  quest wanting the item vetoes "no longer needed" (the reporter asked about Sky alone, but
+  the cost of a wrong Band A row is a destroyed turn-in); bank items are labelled, not
+  excluded (the problem is bag space, and the fact costs one word).
+- **`SkyLeftoverItems` is a LIST on `AutoImportOutcome`, not the count the plan named.** · The
+  other way: an `int SkyLeftovers`, matching `SkySkipped` and `QuestCountsTrued`. · The plan
+  also says *"Detail (the hover) names them"*, and a count cannot. "3 items" is not something
+  anyone can act on standing at a bank; the count is a derived property, so the surfaces still
+  get the number.
+- **Sky leftovers are deliberately NOT part of `AutoImportOutcome.Noted`.** · The other way:
+  add them, since Noted means "there is something to say". · Noted is what paints the report
+  amber (`ImportReportView`, both lanes), and finding free bag space is the one piece of good
+  news an import has. A leftovers-only dump reads green.
+- **`Compute` with a null catalog SKIPS the veto rather than refusing to answer.** · The other
+  way: return nothing without a catalog, so Band A can never be unvetted. · The veto only ever
+  makes the list shorter, and the caller can see it did not run because
+  `HeldBackByOtherQuests` is empty. Refusing would make the function untestable without
+  loading 1,172 quests, which is how a pure rule stops being tested.
 
 ## 2026-08-31
 

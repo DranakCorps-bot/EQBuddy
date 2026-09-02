@@ -202,6 +202,19 @@ public sealed record AutoImportOutcome(
     /// <see cref="OutputfileKind.Inventory"/>.</summary>
     public int QuestCountsTrued { get; init; }
 
+    /// <summary>Sky items the dump found that no reward still wants (#243, tvongaza:
+    /// *"which sky quest items you no longer need ... would help with limited inventory
+    /// space"*). Base names, already graded and vetoed by <see cref="SkyLeftovers"/>; the
+    /// list rather than a count, because the hover has to NAME them — "3 items" is not
+    /// something anyone can act on standing at a bank. Empty on every kind but
+    /// <see cref="OutputfileKind.Inventory"/>.
+    ///
+    /// Deliberately NOT part of <see cref="Noted"/>: Noted decides whether the report reads
+    /// as a warning, and finding free bag space is the one good-news line an import has.</summary>
+    public IReadOnlyList<string> SkyLeftoverItems { get; init; } = [];
+
+    public int SkyLeftovers => SkyLeftoverItems.Count;
+
     /// <summary>Sky rewards the dump flagged obtained and the #101 guard refused, because
     /// the class unlock that flagged them was granted rather than earned. NOT a failure —
     /// the guard working — but the player has to be told, or a dump full of rewards reads
@@ -238,16 +251,24 @@ public sealed record AutoImportOutcome(
     /// </summary>
     public string Summary => Kind switch
     {
-        OutputfileKind.Inventory => GearTicked == 0 && QuestCountsTrued == 0
-            ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick."
-            : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
-                new[]
-                {
-                    GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
-                    QuestCountsTrued > 0
-                        ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
-                        : null,
-                }.Where(s => s is not null)) + ".",
+        OutputfileKind.Inventory =>
+            (GearTicked == 0 && QuestCountsTrued == 0
+                ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick"
+                : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
+                    new[]
+                    {
+                        GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
+                        QuestCountsTrued > 0
+                            ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
+                            : null,
+                    }.Where(s => s is not null)))
+            // Its own clause after a ·, never folded into the comma list: the others are
+            // things EQBuddy CHANGED, and this one is a thing it noticed. A dump that
+            // ticked nothing and freed six slots is a useful dump.
+            + (SkyLeftovers > 0
+                ? $" · {SkyLeftovers} Sky item{(SkyLeftovers == 1 ? "" : "s")} no longer needed"
+                : "")
+            + ".",
         OutputfileKind.Achievements =>
             (Applied == 0
                 ? $"Read your achievements dump ({At:HH:mm}) — nothing new to mark"
@@ -282,6 +303,15 @@ public sealed record AutoImportOutcome(
     {
         get
         {
+            if (Kind == OutputfileKind.Inventory)
+                return SkyLeftovers == 0 ? null
+                    : "Every Sky reward that takes "
+                      + (SkyLeftovers == 1 ? "this item is" : "these items is")
+                      + " already turned in, and no other quest in the catalog wants "
+                      + (SkyLeftovers == 1 ? "it" : "them") + ": "
+                      + string.Join(", ", SkyLeftoverItems)
+                      + ". Nothing has been sold, destroyed or ticked — this is a list.";
+
             if (Kind != OutputfileKind.Achievements || Noted == 0) return null;
             var parts = new List<string>();
             if (SkySkipped > 0)
