@@ -40,14 +40,22 @@ public sealed record SkyLeftoverRow(
     /// player would act on it. Band A names the turned-in rewards that used the item;
     /// band B names the classes that still want it and says plainly that they may become
     /// yours — the difference between "not yours" and "junk", which is the distinction
-    /// the two bands exist to keep.</summary>
+    /// the two bands exist to keep.
+    ///
+    /// **Band B LEADS with the caveat** (Bevel, Helm-signed 2026-09-02 1:13 PM CT). It used
+    /// to lead with "Still wanted by {classes}" and trail the caveat, which is fine in a
+    /// desktop tooltip and wrong on the phone: EQBuddy Mobile draws a row's detail as a
+    /// single ellipsised `.sub` line, so the truncation ate *"so this is 'not yours' rather
+    /// than 'junk'"* — the one sentence the second band exists to say. **Order is a
+    /// decision when one renderer can only show the front of the string.** Fixed here
+    /// rather than by widening the phone line, because a page-side change can sit unseen on
+    /// an open phone for weeks (trap 32) and this fixes the desktop hover's lede too.</summary>
     public string Detail => Band == SkyLeftoverBand.NoLongerNeeded
         ? "Every Sky reward that takes it is turned in"
             + (TurnedInRewards.Count > 0 ? ": " + string.Join(", ", TurnedInRewards) : "")
             + "."
-        : "Still wanted by " + string.Join(", ", OpenClasses)
-            + " — no class this character has. A Legends character can unlock one later, "
-            + "so this is “not yours” rather than “junk”."
+        : "Not yours — still wanted by " + string.Join(", ", OpenClasses)
+            + "; a Legends character can unlock one later."
             + (TurnedInRewards.Count > 0
                 ? "\n\nAlready turned in: " + string.Join(", ", TurnedInRewards) + "."
                 : "");

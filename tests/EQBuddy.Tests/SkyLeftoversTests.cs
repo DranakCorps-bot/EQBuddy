@@ -367,9 +367,40 @@ public class SkyLeftoversTests
         Assert.Equal("Wind Rune Azia ×1 · bags", b.Line);
         // "Not yours", never "junk" — a Legends character can unlock the class later, and
         // saying so is the difference the two bands exist to keep.
-        Assert.Contains("Still wanted by Druid, Monk, Wizard", b.Detail);
-        Assert.Contains("unlock one later", b.Detail);
+        //
+        // Asserted whole, and the LEAD is the point (Bevel, Helm-signed 2026-09-02): the
+        // phone draws this as one ellipsised line, so a `Contains` of the caveat cannot
+        // tell "leads with it" from "trails it and gets cut" — which is the defect this
+        // wording fixed. Order is only pinned by pinning the front of the string.
+        Assert.Equal(
+            "Not yours — still wanted by Druid, Monk, Wizard; "
+                + "a Legends character can unlock one later.",
+            b.Detail);
+        Assert.StartsWith("Not yours", b.Detail);
         Assert.DoesNotContain("no longer needed", b.Detail, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The reorder kept the evidence it was carrying. Band B's hover has a second
+    /// half when some of the item's rewards ARE done — and a suffix nothing asserts is
+    /// exactly the thing a rewrite drops in silence (trap 26's shape: the fold moved the
+    /// string and the tail went missing). It stays BEHIND the caveat on purpose: the phone
+    /// truncates, so the least load-bearing end is the end that should be eaten.</summary>
+    [Fact]
+    public void BandBKeepsItsAlreadyTurnedInEvidenceAfterTheCaveat()
+    {
+        var result = SkyLeftovers.Compute(
+            Dump(("General1-Slot1", "Wind Rune Azia", 1)),
+            Checklist(),
+            [Key("Druid", "Test of Nature")],
+            ["Bard"],                       // a class none of the open rewards belong to
+            catalog: null);
+
+        var b = Assert.Single(result.RowsIn(SkyLeftoverBand.OtherClassesWant));
+        Assert.Equal(
+            "Not yours — still wanted by Monk, Wizard; "
+                + "a Legends character can unlock one later."
+                + "\n\nAlready turned in: Druid · Test of Nature.",
+            b.Detail);
     }
 
     /// <summary>The heading's count and the rows under it come from ONE list, so they
