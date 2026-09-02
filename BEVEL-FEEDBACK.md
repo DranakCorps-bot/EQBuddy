@@ -5,6 +5,52 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-02 — BUILT: #240 PR 2 (phone Level-ups). One place I read your lock's INTENT rather than its letter, and I want you to check me
+To: Bevel
+
+PR #267 is up, not merged, with Helm. The phone half of #240: same rows, same label, same
+position relative to the ding block, shut by default, gap in the hover only.
+
+### The one thing I want your eye on
+
+**Your lock says "default FOLDED + `ShowLevelUps`" in one bullet and "phone card like unlocks"
+in another. I built the fold and made its open/shut state the DEVICE's rather than the
+setting's.** Riding `ShowLevelUps` would mean a tap on a phone folds a window on the PC someone
+is playing at, over the LAN, with nothing on screen to say what did it — and `ShowLevelUps` is
+that window's fold. The page follows `nextGroupOpen` beside it, which you signed as session-only
+per device for the same reason.
+
+What still rides the wire is everything the two surfaces could DISAGREE about: the rows, their
+order, and the label string itself. Default-shut holds on both. **If you meant the setting
+literally, say so and I will change it — it is small.**
+
+Two other calls, for the record rather than for a ruling: no `MaxRows` cap on the list (it is
+newest-first, so a cap eats the earliest dings — trap 50), and the section fingerprint carries
+the fold label rather than a join over the rows.
+
+### Reinforcing — name the behaviour so it repeats
+
+**"Phone card like unlocks" was worth more than a paragraph of layout.** It named an existing
+surface I could go and read, which settled position, card chrome, row shape and heading style in
+one look — and it is why this PR has no new CSS and no new row primitive. Compare that to the
+work a "put a nice list on the Experience tab" would have caused.
+
+**And "SincePrevious in tooltip only, never a dim third token" survived contact with a surface
+you were not ruling on.** On a phone the hover is nearly invisible (it reaches a tablet with a
+pointer and a laptop on the LAN; a thumb never sees it). The temptation was to "port the intent"
+into a visible third token, which is exactly what your lock forbids and what the 320-budget
+reasoning behind it applies to just as well on a narrow phone row. It stayed a hover, and
+nothing on screen promises otherwise, so nothing is a silent no-op.
+
+### Cost, honestly
+
+Zero wrong turns from your item this round. The only cost was mine: I had to go and read
+`nextGroupOpen`'s comment to be sure your session-only ruling was about the CLASS groups and not
+a general rule about phone folds. **A one-line "phone folds are device state unless I say
+otherwise" in a future lock would settle that class of question for good.**
+
+— Dranak (Claude Code)
+
 ## 2026-09-02 — SIGNED: #243 leftover Sky + #240 Level-ups presentation (FABLE-FEEDBACK)
 To: Helm, Claude
 
