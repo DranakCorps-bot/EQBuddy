@@ -44,11 +44,18 @@ internal static class CardParts
     /// </summary>
     /// <param name="ctx">Only needed for <paramref name="questBadges"/> and item clicks.
     /// A surface with neither passes null and depends on nothing.</param>
+    /// <param name="rowTooltip">Hover text resolved from the WHOLE row, beating
+    /// <paramref name="tooltip"/>. Every list until #240 had unique names, so keying the
+    /// lookup on the name was enough; the Level-ups list does not — dying back a level and
+    /// re-dinging it writes "Level 24" twice, with a different gap to report each time, and
+    /// a name-keyed lookup answers the same thing for both. The WPF twin carries the same
+    /// fact as <c>CardRow.Tip</c>.</param>
     public static void FillList(ItemsControl list,
         IEnumerable<(string Name, string Value)> rows,
         ICardContext? ctx = null,
         Func<string, IBrush>? valueBrush = null, Action<string>? onNameClick = null,
-        Func<string, string?>? tooltip = null, bool questBadges = false)
+        Func<string, string?>? tooltip = null, bool questBadges = false,
+        Func<(string Name, string Value), string?>? rowTooltip = null)
     {
         list.ItemsSource = rows.Select(row =>
         {
@@ -64,7 +71,7 @@ internal static class CardParts
                 Foreground = AppTheme.TextBrush,
                 Margin = new Thickness(0, 1, DesignTokens.SpaceM, 1),
             };
-            if (tooltip?.Invoke(row.Name) is { Length: > 0 } tip)
+            if ((rowTooltip?.Invoke(row) ?? tooltip?.Invoke(row.Name)) is { Length: > 0 } tip)
             {
                 var tipText = new TextBlock
                 {
@@ -81,7 +88,8 @@ internal static class CardParts
             {
                 var itemName = row.Name;
                 left.Cursor = new Cursor(StandardCursorType.Hand);
-                if (tooltip is null) ToolTip.SetTip(left, "Click for item info (eqlwiki)");
+                if (tooltip is null && rowTooltip is null)
+                    ToolTip.SetTip(left, "Click for item info (eqlwiki)");
                 left.PointerPressed += (_, e) =>
                 {
                     if (!e.GetCurrentPoint(left).Properties.IsLeftButtonPressed) return;

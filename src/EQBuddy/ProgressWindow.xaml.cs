@@ -273,6 +273,13 @@ public partial class ProgressWindow : Window
         $"progressFaction={_faction.RowCount} " +
         $"progressSkills={_experience.SkillRows} " +
         $"progressSkillLabel={(_experience.SkillLabelShown ? 1 : 0)} " +
+        // The Level-ups fold (#240). THREE facts, because folded and empty look nearly the
+        // same on screen and are opposite states: the heading being down means this
+        // character has never dinged while EQBuddy watched, while rows=0 under a heading
+        // that names a count is the default every player sees.
+        $"progressLevelUpsShown={(_experience.LevelUpsShown ? 1 : 0)} " +
+        $"progressLevelUps={_experience.LevelUps} " +
+        $"progressLevelUpRows={_experience.LevelUpRows} " +
         // The Experience tab's three lists, under the names E2E has asserted on since the
         // Progress CARD existed — kept identical on purpose, because the whole value of
         // ProgressCard_DrawsItsUnlockListsOnADing is that it goes on asking the same

@@ -34,6 +34,10 @@ internal sealed class ProgressCardView : IWidgetCard
     private readonly Func<StatsSnapshot, IReadOnlyList<string>> _classes;
     private readonly Func<int?> _storedLevel;
     private readonly LevelUnlockMemo _unlocks;
+
+    /// <summary>The durable level-up list, recomputed only when a ding or a session roll
+    /// can have moved it — the stored half is a SQLite read and this paints every tick.</summary>
+    private readonly LevelHistoryMemo _levels;
     private readonly StackPanel _panel = new();
 
     private readonly TextBlock _summary = DesignSystem.Text(Tok.TypeRole.BodySecondary);
@@ -47,6 +51,13 @@ internal sealed class ProgressCardView : IWidgetCard
     /// both hosts draw this same view. The ding and AA labels beside it were fields from
     /// the start; this one was the odd one out.</summary>
     private readonly EqFoldLabel _skillLabel = new() { Section = true, Open = true };
+
+    /// <summary>Every level-up EQBuddy has ever seen for this character (#240,
+    /// joeymavity), folded by default — the list is a career rather than a session, and
+    /// the label carries the count and the last ding's date so the glance still answers
+    /// "when did I last ding" with the fold shut.</summary>
+    private readonly EqFoldLabel _levelLabel = new() { Section = true, Open = false };
+    private readonly ItemsControl _levelList = new();
     private readonly TextBlock _aaNewLabel = SectionLabel("AA learned this session");
     private readonly ItemsControl _aaNewList = new();
     private readonly EqFoldLabel _aaAllLabel = new() { Section = true, Open = false };
@@ -97,6 +108,23 @@ internal sealed class ProgressCardView : IWidgetCard
 
     public int SkillRows => _skillList.Items.Count;
 
+    // ---- the Level-ups fold (#240), for the EQBUDDY_EXPAND dump ----
+    //
+    // Three facts rather than one, because "folded" and "nothing to show" render almost
+    // identically and are completely different states: a heading with a count and no rows
+    // is the DEFAULT, and a heading that is down means this character has never dinged
+    // while EQBuddy watched.
+
+    /// <summary>Whether the Level-ups heading is up at all.</summary>
+    public bool LevelUpsShown => _levelLabel.Visibility == Visibility.Visible;
+
+    /// <summary>How many level-ups the list knows about — the number on the folded
+    /// label, whether or not the rows are drawn.</summary>
+    public int LevelUps { get; private set; }
+
+    /// <summary>How many rows are actually on screen: 0 while folded.</summary>
+    public int LevelUpRows => _levelList.Items.Count;
+
     /// <summary>Whether the "Skill-ups" heading is up. Pinned for the reason
     /// <c>MoneyCardView.SoldShown</c> is: a heading that stops appearing is invisible in a
     /// diff, a build and every unit test, and the WPF layer has none of its own.</summary>
@@ -109,14 +137,23 @@ internal sealed class ProgressCardView : IWidgetCard
     /// cannot derive this from its snapshot, so it is handed in.</param>
     /// <param name="storedLevel">The ledger's persisted level, used when the log has not
     /// announced one this session. Without it the preview would vanish on every restart.</param>
+    /// <param name="storedDings">Every archived session's level-ups for the character being
+    /// followed (#240). A function for the same reason <paramref name="storedLevel"/> is
+    /// one: the history repository lives on the widget, and only the widget knows which
+    /// (server, character) its rows are keyed by.</param>
+    /// <param name="characterKey">Who those rows are about, so the memo can tell a
+    /// character switch from a quiet tick.</param>
     public ProgressCardView(ICardContext context, AppSettings settings,
-        Func<StatsSnapshot, IReadOnlyList<string>> classes, Func<int?> storedLevel)
+        Func<StatsSnapshot, IReadOnlyList<string>> classes, Func<int?> storedLevel,
+        Func<IReadOnlyList<SessionRepository.ProgressPoint>> storedDings,
+        Func<string> characterKey)
     {
         _context = context;
         _settings = settings;
         _classes = classes;
         _storedLevel = storedLevel;
         _unlocks = new LevelUnlockMemo(classes, storedLevel);
+        _levels = new LevelHistoryMemo(storedDings, characterKey);
 
         _summary.TextWrapping = TextWrapping.Wrap;
         _summary.Margin = (Thickness)Application.Current.FindResource("ListBlock");
@@ -166,9 +203,26 @@ internal sealed class ProgressCardView : IWidgetCard
             Render(_context.CurrentSnapshot());
         };
 
+        // Level-ups sits under the ding block and above Skill-ups: the ding block is about
+        // the level that just happened, and this is the record of every one before it.
+        _levelLabel.Visibility = Visibility.Collapsed;
+        _levelLabel.Cursor = System.Windows.Input.Cursors.Hand;
+        _levelLabel.ToolTip = "Every level-up EQBuddy has seen for this character, "
+            + "newest first — click to expand or fold";
+        _levelLabel.MouseLeftButtonDown += (_, e) =>
+        {
+            e.Handled = true;
+            _settings.ShowLevelUps = !_settings.ShowLevelUps;
+            _settings.Save();
+            Render(_context.CurrentSnapshot());
+        };
+        _levelList.Visibility = Visibility.Collapsed;
+
         _panel.Children.Add(_summary);
         _panel.Children.Add(_dingLabel);
         _panel.Children.Add(_dingList);
+        _panel.Children.Add(_levelLabel);
+        _panel.Children.Add(_levelList);
         _panel.Children.Add(_skillLabel);
         _panel.Children.Add(_skillList);
         _panel.Children.Add(_aaNewLabel);
@@ -242,6 +296,31 @@ internal sealed class ProgressCardView : IWidgetCard
             RenderNextBody(nx.Level, nx.Unlocks, classes);
         }
         else ClearNextBody();
+
+        // Every level-up this character has, not just this session's (#240, joeymavity —
+        // "leveling timestamps in an xp dropdown, I can't find it now"). The summary line
+        // above still carries this session's dings with their time-in-level; that line is
+        // what he remembers, and it is untouched. This is the durable answer beside it:
+        // the store's dings merged with the live session's, newest first.
+        //
+        // Hidden when there are no dings at all — no heading over nothing (2026-08-22) —
+        // and folded by default, with the count and the last date on the label.
+        var levels = _levels.Rows(s);
+        LevelUps = levels.Count;
+        _levelLabel.Visibility = levels.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        _levelLabel.Set(_settings.ShowLevelUps,
+            _settings.ShowLevelUps ? "Level-ups" : LevelHistory.FoldLabel(levels));
+        _levelList.Visibility = _settings.ShowLevelUps && levels.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
+        if (_settings.ShowLevelUps)
+            // The gap since the previous ding is HOVER text, not a third token (Bevel,
+            // 2026-09-02): the row's 320 units are better spent on the two facts he asked
+            // for. Carried on the row rather than looked up by name, because two rows can
+            // legitimately both say "Level 24" (a death, then the re-ding).
+            EqCardRows.Fill(_levelList, levels.Select(r =>
+                new CardRow(LevelHistory.Name(r), LevelHistory.Format(r.Time),
+                    Tip: LevelHistory.Tooltip(r))));
+        else _levelList.Items.Clear();
 
         // The heading hides when there is nothing under it (2026-08-22); the FOLD is a
         // separate question and only applies once there is. Collapsed keeps the count on

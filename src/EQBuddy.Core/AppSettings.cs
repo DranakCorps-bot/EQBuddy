@@ -195,6 +195,14 @@ public sealed class AppSettings
     /// capability had existed.</summary>
     public bool ShowSkillUps { get; set; } = true;
 
+    /// <summary>Whether the Experience surface's Level-ups list is unfolded (#240,
+    /// joeymavity). **Default FOLDED**, unlike <see cref="ShowSkillUps"/> beside it: a
+    /// veteran's list is every ding EQBuddy has ever seen, and the theme body's floor is
+    /// 320 units — so the folded label carries the count and the last ding's date and the
+    /// rows come out on a click. The fold label is this setting's only writer, which is
+    /// the reader-and-writer pair trap 20 exists to check for.</summary>
+    public bool ShowLevelUps { get; set; }
+
     /// <summary>Chip-stack growth direction (#95): anchored at the bottom edge, new
     /// chips push the stack upward — so boss timers can sit above mez timers with
     /// each growing away from the other.</summary>

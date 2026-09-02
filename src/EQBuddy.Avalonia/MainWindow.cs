@@ -3420,7 +3420,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     internal ProgressSurfaceSet NewProgressSurfaces() => new(
         Experience: new ProgressCardView(_settings, UnlockClasses,
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null,
-            RefreshUi),
+            RefreshUi, StoredLevelDings, () => QuestCharacterKey),
         Money: new MoneyCardView(this),
         Motes: new MotesCardView(this),
         Faction: new FactionCardView(),
@@ -3613,6 +3613,15 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>The pack's history pool (#217 ask 2) — see the interface doc on
     /// <see cref="IDropsHost"/>.</summary>
     public IReadOnlyList<MobHistory.SessionMobs> StoredMobRows() => _repo.MobRows();
+
+    /// <summary>Every archived session's level-ups for the character being followed — the
+    /// stored half of the Experience surface's Level-ups list (#240). Both the archiver
+    /// scoping and the empty-identity rule live in <see cref="LevelHistory.Stored"/>, which
+    /// the WPF twin calls too; this is only the wiring. Called from
+    /// <see cref="LevelHistoryMemo"/>, never per tick — it probes up to a thousand stored
+    /// snapshots.</summary>
+    internal IReadOnlyList<SessionRepository.ProgressPoint> StoredLevelDings() =>
+        LevelHistory.Stored(_archiver.Identity, _repo.ProgressSeries);
 
     public long ActiveSessionRowId => _archiver.ActiveRowId;
 

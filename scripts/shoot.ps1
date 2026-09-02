@@ -558,6 +558,43 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_PROGRESS = '1' }
                            Append = @('You have gained a level! Welcome to level 12!')
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
+    # THE LEVEL-UPS FOLD (#240, joeymavity), UNFOLDED. A new name per trap 21 —
+    # 'progress-card' is embedded in the docs and keeps meaning the old thing, and it will
+    # now also carry the fold's FOLDED label, which is the default state and needs no shot
+    # of its own.
+    #
+    # Trap 22 applies as hard as it does to 'history-window': the whole point of this
+    # surface is that it survives a session roll, and a single live fixture session can
+    # only ever show what the summary line above it already showed. So the store is primed
+    # with THREE finished sessions, each shifted to its own day and carrying its own ding.
+    #
+    # AND THEY ARE PRIMED UNDER THE FIXTURE'S OWN CHARACTER, which no shot had needed
+    # before. 'history-charts' primes as 'Aludra' because its charts take a character
+    # FILTER; this surface takes the archiver's identity and compares it with SQL `=`, so
+    # rows written under any other name are rows it can never match — the picture would be
+    # a correct render of an empty fold, which is trap 23's failure mode exactly.
+    #
+    # PREDICTION, written before the run. The fixture session announces no level of its own
+    # (tests/EQBuddy.E2E asserts precisely that before it appends one), so every row comes
+    # from the store:
+    #   - the heading reads "Level-ups" — unfolded, so the count moves onto the rows.
+    #   - THREE rows, newest first: Level 24 (yesterday), Level 23 (two days ago),
+    #     Level 22 (three days ago), each with a wall-clock stamp like "Aug 30, 7:14 PM".
+    #   - NO third token on any row. The gap since the previous ding is hover text only
+    #     (Bevel, Helm-signed 2026-09-02), so nothing on screen says "3h 20m" or "x ago".
+    #   - the Skill-ups heading below stays DOWN — the fixture has no skill-ups — so the
+    #     fold's own rows are the last thing in the body.
+    'progress-levelups' = @{ Title = 'EQBuddy Progress'
+                           Env = @{ EQBUDDY_PROGRESS = '1' }
+                           Set = @{ ShowLevelUps = $true }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.35; ShiftDays = 3
+                                  Lines = @('You have gained a level! Welcome to level 22!') }
+                               @{ Character = 'Testchar'; Fraction = 0.65; ShiftDays = 2
+                                  Lines = @('You have gained a level! Welcome to level 23!') }
+                               @{ Character = 'Testchar'; Fraction = 0.9;  ShiftDays = 1
+                                  Lines = @('You have gained a level! Welcome to level 24!') }
+                           ) }
     # THREE classes at once, which is what a Legends character actually is (David,
     # 2026-08-23) and what 'progress-card' cannot show: the fixture infers one, and one
     # class draws no expanders at all. A NEW name per trap 21 -- 'progress-card' and
@@ -1169,7 +1206,21 @@ function Invoke-PrimeRun([object[]]$runs) {
         if (-not $proc.WaitForExit(20000)) { $proc.Kill($true); $proc.WaitForExit(5000) | Out-Null }
         # Removed before the capture run: two logs in the folder means the widget follows
         # whichever grew last, and the shot's own character would flip under it.
-        if ($extraLog) { Remove-Item $extraLog -Force -ErrorAction SilentlyContinue }
+        if ($extraLog) {
+            Remove-Item $extraLog -Force -ErrorAction SilentlyContinue
+            # A prime run for the FIXTURE'S OWN character writes eqlog_<char>_test.txt,
+            # which IS the fixture log — so the line above has just deleted the file the
+            # next prime run reads as its $source and the capture run tails. Put it back.
+            #
+            # That case is the only way to stage stored history for the character the shot
+            # actually follows: `ProgressSeries` compares (server, character) with SQL `=`,
+            # so priming under a different name (which is all `history-charts` ever needed)
+            # archives rows the shot's own surface can never match. Harmless for a
+            # different-character prime, where the fixture log was never touched.
+            if (-not (Test-Path $extraLog) -and $extraLog -eq $pristineLog.FullName) {
+                Copy-Item $pristineCopy $extraLog -Force
+            }
+        }
     }
 }
 
@@ -1185,8 +1236,14 @@ try {
         Write-Dump $spec.Dump
         Write-WikiCache $spec.Wiki
         Write-Cycles $spec.Cycles
-        Append-Log $spec.Append
+        # AFTER the prime runs, not before. A prime for the fixture's own character
+        # overwrites the very log an append had just been written into, so staging the
+        # live session first and the stored history second silently discarded the first
+        # half. Append-Log restores the pristine fixture unconditionally before it appends,
+        # which makes this ordering the one that leaves the capture run tailing exactly
+        # what the shot asked for.
         if ($spec.Prime) { Invoke-PrimeRun $spec.Prime }
+        Append-Log $spec.Append
         # A multi-session archive for the review picker: the pristine fixture plus
         # day-shifted copies, oldest first so the file reads chronologically. Built
         # outside the Logs folder so the tail can never adopt it.

@@ -2072,6 +2072,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// from the fold rather than counted twice.</summary>
     internal List<MobHistory.SessionMobs> StoredMobRows() => _repo.MobRows();
 
+    /// <summary>Every archived session's level-ups for the character being followed — the
+    /// stored half of the Experience surface's Level-ups list (#240). Both the archiver
+    /// scoping and the empty-identity rule live in <see cref="LevelHistory.Stored"/>, which
+    /// the Avalonia twin calls too; this is only the wiring. Called from
+    /// <see cref="LevelHistoryMemo"/>, never per tick — it probes up to a thousand stored
+    /// snapshots.</summary>
+    internal IReadOnlyList<SessionRepository.ProgressPoint> StoredLevelDings() =>
+        LevelHistory.Stored(_archiver.Identity, _repo.ProgressSeries);
+
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 
     /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by
@@ -2184,7 +2193,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         return new ProgressSurfaceSet(
             Experience: new ProgressCardView(this, _settings,
                 s => BuffSetClassSource(s).Classes,
-                () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null),
+                () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null,
+                StoredLevelDings, () => QuestCharacterKey),
             Money: money,
             Motes: motes,
             Faction: faction,

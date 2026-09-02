@@ -178,4 +178,50 @@ public class LevelHistoryTests
         Assert.Equal("Level-ups (1) · last Aug 23", LevelHistory.FoldLabel(rows));
         Assert.Equal([("Level 24", "Aug 23, 7:05 PM")], LevelHistory.CardRows(rows));
     }
+
+    // ---- the stored half's scoping (LevelHistory.Stored) ----
+    //
+    // `ProgressSeries` treats a null or empty side as "do not filter on it", so the
+    // difference between "no character yet" and "every character" is one `if` — and it is
+    // the SAME `if` on both widgets and, from PR 2, on the phone. It lives here rather than
+    // three times in three windows.
+
+    /// <summary>A followed character asks the store for exactly its own two strings.</summary>
+    [Fact]
+    public void StoredQueriesTheArchiversOwnIdentity()
+    {
+        (string Server, string Character)? asked = null;
+        var points = new List<SessionRepository.ProgressPoint>
+            { new(Aug21, 0, [(Aug21, 22)]) };
+
+        var got = LevelHistory.Stored(("legends", "Dranak"), (server, character) =>
+        {
+            asked = (server, character);
+            return points;
+        });
+
+        Assert.Equal(("legends", "Dranak"), asked);
+        Assert.Equal(points, got);
+    }
+
+    /// <summary>Before a character is being followed, the store is not asked AT ALL —
+    /// the query that would have gone out is the unfiltered one, and its answer is every
+    /// character's dings under a heading that says they are yours.</summary>
+    [Theory]
+    [InlineData("", "Dranak")]
+    [InlineData("legends", "")]
+    [InlineData("", "")]
+    public void StoredAsksNothingRatherThanAskingForEveryone(string server, string character)
+    {
+        var reads = 0;
+
+        var got = LevelHistory.Stored((server, character), (_, _) =>
+        {
+            reads++;
+            return [new SessionRepository.ProgressPoint(Aug21, 0, [(Aug21, 22)])];
+        });
+
+        Assert.Empty(got);
+        Assert.Equal(0, reads);
+    }
 }

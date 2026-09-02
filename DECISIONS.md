@@ -17,6 +17,30 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-02
 
+- **The Level-ups What's-new entry NAMES its location but carries no `MOVED:` badge**
+  (#240 PR 1, `WhatsNew.json` 1.99.17). · The other way: mark it MOVED, since joeymavity is
+  exactly the player the badge exists for — he went looking for something and could not find
+  it (#219's shape). · Declined because nothing actually moved: the session line he
+  remembers is untouched and the durable list never existed to be relocated, so the badge
+  would be a false claim in the one note a player is told never to skim. The X-is-now-Y
+  duty is met in the sentence instead — the entry leads with "Progress > Experience >
+  Level-ups" and says plainly that nothing was moved or removed to make room.
+- **`LevelHistory.Stored` owns the archiver-scoping rule, rather than each widget owning a
+  copy** (#240 PR 1, `UI.Shared/LevelHistory.cs`). · The other way: leave the four-line
+  method on both `MainWindow`s, which is where it was written and where the repository and
+  the archiver both live. · The WPF ratchet is what forced the question (4638 against a 4635
+  limit) and the answer was the one the ratchet's own message names: it is the same `if` in
+  two lanes with the phone as a third caller in PR 2, and the mistake it prevents — a blank
+  identity asking `ProgressSeries` for EVERY character's dings, since it treats an empty side
+  as "do not filter" — is silent and renders as a plausible list. The baseline was NOT bumped.
+- **The `progress-levelups` shot primes stored history under the FIXTURE'S OWN character**,
+  which needed a two-line fix to `Invoke-PrimeRun` (#240 PR 1, `scripts/shoot.ps1`). · The
+  other way: prime under a second name the way `history-charts` does, or skip the shot. ·
+  Neither works here: the surface matches on the archiver's identity with SQL `=`, so rows
+  written as "Aludra" render as a correct picture of an empty fold — trap 23 exactly — and a
+  surface with no fixture state reads as reviewed anyway (trap 22). Priming as `Testchar`
+  writes the fixture log's own path, so the harness now restores it from the pristine copy
+  rather than leaving the next run with no log, and `Append-Log` moved after the prime.
 - **A level-up's gap is WALL CLOCK across sessions, labelled "since previous"** (#240 PR 0,
   `UI.Shared/LevelHistory.cs`). · The other way: sum played time across the sessions between
   two dings, which is what a player probably pictures. · The miner

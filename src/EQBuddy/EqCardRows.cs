@@ -72,7 +72,9 @@ internal static class EqCardRows
         // MakeItem so a caller that knows more than the item stats can say so. A null or
         // empty answer leaves whatever was there — "no tooltip for this row" must not
         // silently delete the full-name hover that #182 exists for.
-        if (tooltip?.Invoke(row.Name) is { Length: > 0 } rowTip)
+        // The row's OWN tip wins over the name-keyed lookup: a list whose names repeat
+        // (Level-ups, #240) cannot be answered by a function of the name alone.
+        if ((row.Tip ?? tooltip?.Invoke(row.Name)) is { Length: > 0 } rowTip)
         {
             var text = new TextBlock
             {
