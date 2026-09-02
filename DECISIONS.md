@@ -17,6 +17,29 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-02
 
+- **On the phone, the DUMP reaches the render signature through the row ids — not through the
+  dump's timestamp** (#243 PR 2, `CompanionProjection.LeftoverRowId`). · The other way: put
+  `WrittenAt` on the wire and fold it into the Quests section fingerprint, which is the literal
+  translation of what the two desktop signatures do. · The phone's key is computed FROM the
+  projected groups, so the held count and the location riding each row id already move it
+  exactly when a band's claim moves — while a timestamp would also wake every quests-subscribed
+  phone for a dump that changed nothing on that tab (trap 8), and would add a wire field no page
+  reads (trap 43's mirror). The desktop needed the stamp because its signature is built from
+  settings and never looks at the rendered rows; this one does.
+
+- **The group NOTE joined `ChecklistPrint`, for every checklist rather than just the new bands**
+  (#243 PR 2, `CompanionProjection.SectionFingerprints`). · The other way: leave the shared
+  print alone and special-case the leftover bands. · The note is DRAWN by the page and is the
+  one thing a checklist change can move without moving a row — the held-back note names the
+  items another quest vetoed, and those are deliberately not rows. Every note in the system is a
+  state word or a list of names, so nothing that drifts on a clock enters the key.
+
+- **The leftover bands go in the phone's Sky groups as a second non-tickable group, rather than
+  as a new wire section** (#243 PR 2). · The other way: their own section, which would be
+  subscribable on its own. · `index.html` already renders a `tickable === false` group
+  generically — heading, note, row text and detail — so the feature reaches every open phone the
+  moment the PC updates, where a page-side change can sit unseen for weeks (trap 32).
+
 - **The leftover row's words — `{Item} ×{held} · {where}`, both headings, the hover and the
   held-back note — live on `SkyLeftoverRow`/`SkyLeftoversResult` in Core, not in each
   renderer** (#243 PR 1, `Core/SkyLeftovers.cs`). · The other way: format in each window, which

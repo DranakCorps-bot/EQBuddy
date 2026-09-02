@@ -479,4 +479,109 @@ public class ScreenshotFixtureTests
         Assert.Equal(EQBuddy.UI.Shared.GameCommands.OutputfileInventory, snap.Gear.Prompt!.Command);
         Assert.Equal(EQBuddy.UI.Shared.GearChecklistPresentation.EmptyRoute, snap.Gear.Empty);
     }
+
+    /// <summary>
+    /// The Sky tab's LEFTOVER BANDS on the phone (#243, tvongaza) — the third renderer of
+    /// the join PR 0 built and PR 1 drew on both desktops.
+    ///
+    /// Through the real defaults, the real embedded quest catalog and the real projection,
+    /// for the reason the Progress fixture above states in as many words: the one thing a
+    /// hand-typed snapshot cannot check is whether the server sends the shape the page
+    /// reads. It also stages a state the surface cannot otherwise be reviewed in — the
+    /// bands are ABSENT without a dump, so a default profile photographs as a Sky tab with
+    /// nothing to say about them (trap 22).
+    ///
+    /// **Predicted before the run (trap 23), and asserted here so a fixture drift fails
+    /// instead of producing a plausible picture of something else:**
+    ///
+    ///   No longer needed — 2      Amulet of Woven Hair ×1 · bags
+    ///                             Crude Wooden Flute ×1 · bags
+    ///     note: 1 more is still wanted by another quest:
+    ///           Black Silk Cape (Necromancer Epic Quest)
+    ///   Other classes still want — 2
+    ///                             Azure Ring ×1 · bags
+    ///                             Brass Knuckles ×2 · bank
+    ///
+    /// A Bard who has handed in Ervaj's Flute of Flight and the Amulet of the Fae, holding
+    /// four other pieces plus a Necromancer cape the Necro epic still wants. Azure Ring is
+    /// Warrior's and Brass Knuckles are Beastlord's and Monk's — no class this character
+    /// has, which is band B's whole claim — and the cape is band A's veto, so it is named
+    /// in the note rather than silently missing.
+    ///
+    ///   dotnet test --filter FullyQualifiedName~ScreenshotFixture -e EQBUDDY_SHOOT=1     ///     -e EQBUDDY_SHOOT_SKY=&lt;path.json&gt;
+    /// </summary>
+    [Fact]
+    public void WriteSkyLeftoverSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_SKY");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 2, 21, 12, 0);
+        var settings = new AppSettings();
+        settings.ApplyDefaultSkyQuestChecklist();   // the shipped catalog, not a hand list
+        settings.SkyQuestCompleted.AddRange([
+            QuestChecklistLayout.RewardKey("Bard", "Ervaj's Flute of Flight"),
+            QuestChecklistLayout.RewardKey("Bard", "Amulet of the Fae"),
+            // Profile-global, like the checklist itself: the Necro alt's cloak is what
+            // gives band A something to hold back and a quest to name.
+            QuestChecklistLayout.RewardKey("Necromancer", "Cloak of Spiroc Feathers"),
+        ]);
+
+        var dump = new[]
+        {
+            ("General1-Slot1", "Crude Wooden Flute", 1),
+            ("General1-Slot2", "Amulet of Woven Hair", 1),
+            ("General2-Slot1", "Azure Ring", 1),
+            ("General2-Slot2", "Black Silk Cape", 1),
+            ("Bank1", "Brass Knuckles", 2),
+        };
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (_, name, count) in dump)
+            counts[QuestCatalog.BaseItemName(name)] = counts.GetValueOrDefault(name) + count;
+        var inventory = new InventoryFile.Snapshot(
+            "eqbuddy-inventory.txt", now.AddMinutes(-4), counts)
+        {
+            Entries = [.. dump.Select(d => new InventoryFile.Entry(d.Item1, d.Item2, d.Item3))],
+        };
+
+        var catalog = QuestCatalog.LoadEmbedded();
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot { CurrentZone = "Plane of Sky" },
+            Settings = settings,
+            Quests = new CompanionQuestRequest
+            {
+                Catalog = catalog,
+                Inventory = inventory,
+                CharacterClassNames = ["Bard"],
+                ClassSource = ClassSource.Achievements,
+            },
+            QuestIndex = CompanionQuestIndex.Build(catalog),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // The prediction above, as assertions. A shot whose numbers were not predicted in
+        // advance has not been reviewed, and a fixture in the wrong SHAPE renders a state
+        // that is real — which looks exactly like a correct screenshot (trap 23).
+        var bands = snap.Quests!.Sky.Groups
+            .Where(g => !g.Tickable && g.Heading.Contains('—'))
+            .ToList();
+        Assert.Equal(2, bands.Count);
+        Assert.Equal("No longer needed — 2", bands[0].Heading);
+        Assert.Equal(["Amulet of Woven Hair ×1 · bags", "Crude Wooden Flute ×1 · bags"],
+            bands[0].Rows.Select(r => r.Text));
+        Assert.Equal(
+            "1 more is still wanted by another quest: Black Silk Cape (Necromancer Epic Quest).",
+            bands[0].Note);
+        Assert.Equal("Other classes still want — 2", bands[1].Heading);
+        Assert.Equal(["Azure Ring ×1 · bags", "Brass Knuckles ×2 · bank"],
+            bands[1].Rows.Select(r => r.Text));
+    }
 }

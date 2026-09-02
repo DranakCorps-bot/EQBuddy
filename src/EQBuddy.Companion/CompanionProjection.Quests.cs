@@ -62,6 +62,9 @@ public static partial class CompanionProjection
             ClassSourceLabel: req.CharacterClassNames.Count > 0
                 ? EQBuddy.Core.CharacterClasses.SourceLabel(req.ClassSource) : null,
             Epics: BuildEpics(settings),
-            Sky: BuildSky(settings));
+            // The Sky tab is the only checklist that reads anything outside settings: its
+            // leftover bands (#243) are a join against the inventory dump, the character's
+            // classes and the quest catalog, and all three live on the request.
+            Sky: BuildSky(settings, req));
     }
 }

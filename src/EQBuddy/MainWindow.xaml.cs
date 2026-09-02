@@ -319,6 +319,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // release: an open phone runs the page it downloaded weeks ago (trap 32).
                         CharacterClassNames = classes,
                         ClassSource = classSource,
+                        // The Sky leftover bands' dump (#243): the quest window's own call.
+                        Inventory = LatestInventory(),
                     };
                 },
                 QuestLedger = QuestLedger,

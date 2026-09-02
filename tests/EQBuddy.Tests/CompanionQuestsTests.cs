@@ -47,7 +47,8 @@ public class CompanionQuestsTests
         items.ToDictionary(i => i.Item, i => new QuestLedgerStore.Entry { Manual = i.Count },
             StringComparer.OrdinalIgnoreCase);
 
-    private static CompanionSnapshot Build(CompanionQuestRequest req, AppSettings? settings = null)
+    private static CompanionSnapshot Build(
+        CompanionQuestRequest req, AppSettings? settings = null, DateTime? at = null)
     {
         var index = req.Catalog is { } c ? CompanionQuestIndex.Build(c) : null;
         return CompanionProjection.Build(new CompanionInputs
@@ -58,7 +59,7 @@ public class CompanionQuestsTests
             Settings = settings,
             Quests = req,
             QuestIndex = index,
-        }, Now);
+        }, at ?? Now);
     }
 
     // ---------------- the index ----------------
@@ -358,5 +359,200 @@ public class CompanionQuestsTests
         Assert.Equal(["Bard", "Monk"], quests.Epics.Groups.Select(g => g.Class));
         Assert.All(quests.Sky.Groups.Where(g => !g.Heading.StartsWith('★')),
             g => Assert.Equal("Bard", g.Class));
+    }
+
+    // ---------------- the Sky leftover bands ON THE WIRE (#243, tvongaza) ----------------
+    //
+    // What the bands SAY is Core's and is asserted in SkyLeftoversTests and
+    // SurfaceParityTests. What only this file can say is whether they ever REACH a phone:
+    // a paired device is repainted when its section fingerprint moves, so a band that is
+    // correct and never pushed is a band the player does not have.
+    //
+    // Two ways to get that wrong, and they pull in opposite directions. Too little, and a
+    // fresh `/outputfile inventory` looks like a no-op on this tab — the defect the
+    // desktop's `inv:` signature term exists to prevent, Helm-endorsed on PR 1. Too much,
+    // and a value that drifts on the clock wakes every paired phone once a second for
+    // nothing (trap 8, and #202's whole story).
+
+    private static AppSettings SkySettings()
+    {
+        var s = new AppSettings();
+        s.SkyQuestChecklist.AddRange([
+            new SkyQuestChecklistItem { Id = "s1", ClassName = "Bard", Npc = "Cilin", Reward = "Test of Wind", QuestItem = "Wind Rune Azia" },
+            new SkyQuestChecklistItem { Id = "s2", ClassName = "Bard", Npc = "Cilin", Reward = "Test of Song", QuestItem = "Leather Cord" },
+        ]);
+        s.SkyQuestCompleted.AddRange([
+            QuestChecklistLayout.RewardKey("Bard", "Test of Wind"),
+            QuestChecklistLayout.RewardKey("Bard", "Test of Song"),
+        ]);
+        return s;
+    }
+
+    private static InventoryFile.Snapshot Dump(DateTime writtenAt,
+        params (string Location, string Name, int Count)[] rows)
+    {
+        var entries = rows.Select(r => new InventoryFile.Entry(r.Location, r.Name, r.Count)).ToList();
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var e in entries)
+            counts[QuestCatalog.BaseItemName(e.Name)] =
+                counts.GetValueOrDefault(QuestCatalog.BaseItemName(e.Name)) + e.Count;
+        return new InventoryFile.Snapshot("inv.txt", writtenAt, counts) { Entries = entries };
+    }
+
+    /// <summary>The Quests section fingerprint, built with NO catalog index on purpose.
+    /// The index's stamp is hashed over every quest row and rides the same key, so a test
+    /// that changed a quest and shipped the index would move the print whatever the bands
+    /// did — a guard that cannot fail reads exactly like coverage (trap 34). Omitting it
+    /// leaves the catalog reaching this key only through what the bands say about it.</summary>
+    private static string QuestPrint(
+        InventoryFile.Snapshot? dump, QuestCatalog? catalog = null, DateTime? at = null)
+    {
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = "1.88.0",
+            Offered = [CompanionSurfaces.Quests],
+            Settings = SkySettings(),
+            Quests = new CompanionQuestRequest
+            {
+                Inventory = dump,
+                Catalog = catalog,
+                CharacterClassNames = ["Bard"],
+            },
+        }, at ?? Now);
+        return CompanionProjection.SectionFingerprints(snap)[CompanionSurfaces.Quests];
+    }
+
+    [Fact]
+    public void ABandOnlyExistsOnceADumpHasBeenRead()
+    {
+        Assert.DoesNotContain(
+            Build(new CompanionQuestRequest { CharacterClassNames = ["Bard"] }, SkySettings())
+                .Quests!.Sky.Groups,
+            g => g.Heading.StartsWith("No longer needed"));
+
+        var band = Assert.Single(
+            Build(new CompanionQuestRequest
+            {
+                Inventory = Dump(new DateTime(2026, 9, 2, 8, 0, 0), ("General1-Slot1", "Wind Rune Azia", 3)),
+                CharacterClassNames = ["Bard"],
+            }, SkySettings()).Quests!.Sky.Groups,
+            g => g.Heading.StartsWith("No longer needed"));
+
+        Assert.Equal("No longer needed — 1", band.Heading);
+        Assert.Equal("Wind Rune Azia ×3 · bags", Assert.Single(band.Rows).Text);
+    }
+
+    [Fact]
+    public void AFreshDumpIsNotANoOpOnTheQuestTab()
+    {
+        var before = QuestPrint(Dump(new DateTime(2026, 9, 2, 8, 0, 0),
+            ("General1-Slot1", "Wind Rune Azia", 3)));
+        // The player frees two and dumps again: same item, same place, fewer of them.
+        var after = QuestPrint(Dump(new DateTime(2026, 9, 2, 9, 0, 0),
+            ("General1-Slot1", "Wind Rune Azia", 1)));
+
+        Assert.NotEqual(before, after);
+
+        // And where it MOVED to the bank, which is the other half of the row's claim —
+        // the ask is bag space, so "bags" and "bank" are different answers.
+        Assert.NotEqual(after, QuestPrint(Dump(new DateTime(2026, 9, 2, 9, 0, 0),
+            ("Bank1", "Wind Rune Azia", 1))));
+    }
+
+    [Fact]
+    public void AnIdenticalDumpWakesNobody()
+    {
+        // The mirror, and the one that keeps this out of trap 8: a re-read of the same
+        // file, or simply another tick, must not repaint every paired phone. The dump's
+        // TIMESTAMP deliberately does not ride the key — only what the bands draw does.
+        var rows = new (string, string, int)[] { ("General1-Slot1", "Wind Rune Azia", 3) };
+
+        Assert.Equal(
+            QuestPrint(Dump(new DateTime(2026, 9, 2, 8, 0, 0), rows)),
+            QuestPrint(Dump(new DateTime(2026, 9, 2, 9, 30, 0), rows)));
+    }
+
+    [Fact]
+    public void NothingInTheBandsMovesOnTheClock()
+    {
+        var dump = Dump(new DateTime(2026, 9, 2, 8, 0, 0), ("General1-Slot1", "Wind Rune Azia", 3));
+
+        Assert.Equal(
+            QuestPrint(dump, at: Now),
+            QuestPrint(dump, at: Now.AddHours(3)));
+    }
+
+    [Fact]
+    public void TheHeldBackNoteAloneIsEnoughToRePush()
+    {
+        // The note names the quest that vetoed an item out of band A, and those items are
+        // deliberately NOT rows — so a change to it moves nothing the row print can see.
+        // It was invisible to the section fingerprint until the note joined it.
+        var dump = Dump(new DateTime(2026, 9, 2, 8, 0, 0),
+            ("General1-Slot1", "Wind Rune Azia", 3), ("General1-Slot2", "Leather Cord", 1));
+
+        static QuestCatalog Vetoing(string questName) => new()
+        {
+            Quests =
+            [
+                new QuestEntry
+                {
+                    Name = questName, Classes = "ALL",
+                    Items = [new QuestItemNeed { Name = "Leather Cord", Qty = 1 }],
+                },
+            ],
+        };
+
+        var band = Build(new CompanionQuestRequest
+        {
+            Inventory = dump, Catalog = Vetoing("Bone Chip Bounty"), CharacterClassNames = ["Bard"],
+        }, SkySettings()).Quests!.Sky.Groups.Single(g => g.Heading.StartsWith("No longer needed"));
+
+        // Same single row either way — only the note differs.
+        Assert.Equal("Wind Rune Azia ×3 · bags", Assert.Single(band.Rows).Text);
+        Assert.Contains("Bone Chip Bounty", band.Note);
+        Assert.NotEqual(
+            QuestPrint(dump, Vetoing("Bone Chip Bounty")),
+            QuestPrint(dump, Vetoing("Blackburrow Brewers")));
+    }
+
+    /// <summary>
+    /// THE WIRING, which no assertion about the projection can reach: the dump has to be
+    /// PUT on the request by each widget, and <see cref="CompanionQuestRequest"/> is a
+    /// record of init-only properties — so a lane that forgets it compiles, runs, serves
+    /// the tab, and simply never draws the bands.
+    ///
+    /// That is the exact shape of #210 and of <c>CompanionSources.Raids</c>: a surface that
+    /// arrives full on Windows and empty on Linux, found by nobody without a phone and the
+    /// right camp. A source scan because the widgets have no unit tests at all
+    /// (docs/TestPlan.md §5), and both lanes because a fix on Windows otherwise reaches
+    /// Linux three releases later (#122, #152).
+    /// </summary>
+    [Fact]
+    public void BothWidgetsHandTheDumpToTheQuestSurface()
+    {
+        var src = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
+
+        foreach (var relative in new[]
+        {
+            Path.Combine("EQBuddy", "MainWindow.xaml.cs"),
+            Path.Combine("EQBuddy.Avalonia", "MainWindow.cs"),
+        })
+        {
+            var path = Path.Combine(src, relative);
+            Assert.True(File.Exists(path), $"{relative} moved — update this test's paths.");
+
+            var text = File.ReadAllText(path);
+            Assert.True(text.Contains("CompanionQuestRequest"),
+                $"{relative} no longer builds a quest request at all — that is a bigger bug "
+                + "than the one this test guards.");
+            Assert.True(text.Contains("Inventory = LatestInventory()"),
+                $"{relative} builds its CompanionQuestRequest without the inventory dump, so "
+                + "EQBuddy Mobile's Sky tab would serve no leftover bands on this lane (#243) "
+                + "— correct code, invisible feature. Add `Inventory = LatestInventory(),`, the "
+                + "same call the quest window makes.");
+        }
     }
 }

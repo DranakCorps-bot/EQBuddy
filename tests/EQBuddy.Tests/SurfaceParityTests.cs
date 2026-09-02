@@ -50,7 +50,7 @@ public class SurfaceParityTests
         return s;
     }
 
-    private static CompanionChecklistSection Sky(AppSettings s) =>
+    private static CompanionChecklistSection Sky(AppSettings s, CompanionQuestRequest? req = null) =>
         CompanionProjection.Build(
             new CompanionInputs
             {
@@ -58,8 +58,16 @@ public class SurfaceParityTests
                 Character = "Dranak",
                 AppVersion = "1.93.0",
                 Offered = CompanionSurfaces.All,
+                Quests = req,
             },
             new DateTime(2026, 8, 18, 12, 0, 0, DateTimeKind.Local)).Quests!.Sky;
+
+    /// <summary>The checklist proper — every group the player can tick. The summary bands
+    /// (★ Ready, and the #243 leftover bands once a dump has been read) are asserted on
+    /// their own terms below, and counting them by POSITION is how a test that says
+    /// "the checklist" quietly stops meaning it the day a second summary is added.</summary>
+    private static IEnumerable<CompanionChecklistGroup> Checklist(CompanionChecklistSection sky) =>
+        sky.Groups.Where(g => g.Tickable);
 
     private static IReadOnlyList<QuestChecklistGroup> Desktop(AppSettings s) =>
         QuestChecklistLayout.Sky(s.SkyQuestChecklist, s.SkyQuestCompleted);
@@ -69,8 +77,8 @@ public class SurfaceParityTests
     {
         var s = Settings();
 
-        // Skip the ★ Ready band, which is a summary the desktop draws separately.
-        var phone = Sky(s).Groups.Skip(1).Select(g => g.Heading);
+        // Summary bands excluded — the desktop draws those separately.
+        var phone = Checklist(Sky(s)).Select(g => g.Heading);
         var desktop = Desktop(s).Select(g => g.Heading);
 
         Assert.Equal(desktop, phone);
@@ -85,7 +93,7 @@ public class SurfaceParityTests
         Assert.Equal(
             ["Bard · Mask of Song", "Bard · Mantle of the Songweaver",
              "Bard · Spear of Harmony", "Bard · Amulet of the Fae", "Ranger · Bow of Sky"],
-            Sky(Settings()).Groups.Skip(1).Select(g => g.Heading));
+            Checklist(Sky(Settings())).Select(g => g.Heading));
     }
 
     [Fact]
@@ -95,7 +103,7 @@ public class SurfaceParityTests
 
         Assert.Equal(
             Desktop(s).Select(g => g.Note),
-            Sky(s).Groups.Skip(1).Select(g => g.Note));
+            Checklist(Sky(s)).Select(g => g.Note));
     }
 
     [Fact]
@@ -131,7 +139,7 @@ public class SurfaceParityTests
 
         Assert.DoesNotContain(Sky(s).Groups[0].Rows, r => r.Text.Contains("Mask of Song"));
         Assert.Equal("done",
-            Sky(s).Groups.Skip(1).Single(g => g.Heading.EndsWith("Mask of Song")).Note);
+            Checklist(Sky(s)).Single(g => g.Heading.EndsWith("Mask of Song")).Note);
     }
 
     [Fact]
@@ -145,7 +153,7 @@ public class SurfaceParityTests
         var s = Settings();
         s.SkyQuestClass = "Necromancer";   // a class with nothing in this checklist
 
-        Assert.Equal(Desktop(s).Count, Sky(s).Groups.Skip(1).Count());
+        Assert.Equal(Desktop(s).Count, Checklist(Sky(s)).Count());
         Assert.Contains(Sky(s).Groups, g => g.Class == "Bard");
     }
 
@@ -166,7 +174,9 @@ public class SurfaceParityTests
     public void EveryOtherGroupStaysTickable()
     {
         // The fix must not cost the phone its actual checklist — ticking an item there
-        // is the whole point of the surface.
+        // is the whole point of the surface. With no dump in this fixture ★ Ready is the
+        // only summary, so everything after it is a real, tickable group.
+        Assert.Single(Sky(Settings()).Groups, g => !g.Tickable);
         Assert.All(Sky(Settings()).Groups.Skip(1), g => Assert.True(g.Tickable));
     }
 
@@ -178,6 +188,205 @@ public class SurfaceParityTests
 
         Assert.Equal(desktop.Sum(g => g.Done), Sky(s).Done);
         Assert.Equal(desktop.Sum(g => g.Total), Sky(s).Total);
+    }
+
+    // ---- the Sky LEFTOVER BANDS (#243, tvongaza): the phone is the THIRD renderer ----
+    //
+    // PR 1 put the words in Core precisely so this one could not invent its own. The two
+    // desktop bands are covered against `SkyLeftovers` by `SkyLeftoversTests`,
+    // `QuestsRenderTests` (Avalonia) and `EndToEndTests` (WPF); what only a parity test can
+    // say is that the PHONE draws the same rows, in the same bands, from the same join —
+    // and it is the surface with the best track record of drifting in BOTH directions
+    // (#210 one way, #212 the other).
+
+    private static InventoryFile.Snapshot Dump(params (string Location, string Name, int Count)[] rows)
+    {
+        var entries = rows.Select(r => new InventoryFile.Entry(r.Location, r.Name, r.Count)).ToList();
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var e in entries)
+            counts[QuestCatalog.BaseItemName(e.Name)] =
+                counts.GetValueOrDefault(QuestCatalog.BaseItemName(e.Name)) + e.Count;
+        return new InventoryFile.Snapshot("inv.txt", new DateTime(2026, 9, 2, 8, 0, 0), counts)
+        {
+            Entries = entries,
+        };
+    }
+
+    /// <summary>Bard's Amulet of the Fae is turned in (see <see cref="Settings"/>), so its
+    /// piece is band A. The Ranger's bow stave is wanted by a class this Bard does not
+    /// have, so it is band B — one row each, which is what makes "never mixed under one
+    /// heading" a claim the assertions can actually check.</summary>
+    private static InventoryFile.Snapshot LeftoverDump() =>
+        Dump(("General1-Slot1", "Amulet piece", 2), ("Bank1", "Bow stave", 1));
+
+    private static CompanionQuestRequest LeftoverRequest(
+        InventoryFile.Snapshot? dump, QuestCatalog? catalog = null, params string[] classes) =>
+        new() { Inventory = dump, Catalog = catalog, CharacterClassNames = classes };
+
+    private static SkyLeftoversResult Core(AppSettings s, InventoryFile.Snapshot? dump,
+        QuestCatalog? catalog = null, params string[] classes) =>
+        SkyLeftovers.Compute(dump, s.SkyQuestChecklist, s.SkyQuestCompleted, classes, catalog);
+
+    [Fact]
+    public void ThePhonesLeftoverRowsAreCoresRowsExactly()
+    {
+        var s = Settings();
+        var phone = Sky(s, LeftoverRequest(LeftoverDump(), null, "Bard")).Groups
+            .Where(g => g.Heading.StartsWith("No longer needed")
+                || g.Heading.StartsWith("Other classes still want"))
+            .ToList();
+        var core = Core(s, LeftoverDump(), null, "Bard");
+
+        // The headings, the row words and the hover all come off the Core members PR 1
+        // added — nothing in the projection spells any of them.
+        Assert.Equal(
+            [core.NoLongerNeededHeading, core.OtherClassesWantHeading],
+            phone.Select(g => g.Heading));
+        Assert.Equal(
+            core.RowsIn(SkyLeftoverBand.NoLongerNeeded).Select(r => r.Line),
+            phone[0].Rows.Select(r => r.Text));
+        Assert.Equal(
+            core.RowsIn(SkyLeftoverBand.OtherClassesWant).Select(r => r.Line),
+            phone[1].Rows.Select(r => r.Text));
+        Assert.Equal(
+            core.Rows.Select(r => r.Detail),
+            phone.SelectMany(g => g.Rows).Select(r => r.Detail));
+    }
+
+    [Fact]
+    public void TheTwoBandsAreNeverMixedUnderOneHeadingOnThePhone()
+    {
+        // The whole honesty of the feature: band B is a WEAKER claim ("not yours"), and
+        // under band A's heading it would read as "junk you can free".
+        var phone = Sky(Settings(), LeftoverRequest(LeftoverDump(), null, "Bard")).Groups;
+
+        var a = phone.Single(g => g.Heading.StartsWith("No longer needed"));
+        var b = phone.Single(g => g.Heading.StartsWith("Other classes still want"));
+
+        Assert.Equal("Amulet piece ×2 · bags", Assert.Single(a.Rows).Text);
+        Assert.Equal("Bow stave ×1 · bank", Assert.Single(b.Rows).Text);
+        Assert.Contains("Ranger", Assert.Single(b.Rows).Detail);
+    }
+
+    [Fact]
+    public void NoDumpMeansNoBandsOnThePhoneEither()
+    {
+        // Absent rather than empty, and the state EVERY new player is in: "you hold none
+        // of it" and "you were never told" look identical in a count, and only one of
+        // them is a fact.
+        Assert.DoesNotContain(Sky(Settings(), LeftoverRequest(null, null, "Bard")).Groups,
+            g => g.Heading.StartsWith("No longer needed")
+                || g.Heading.StartsWith("Other classes still want"));
+
+        // And the surface is otherwise untouched — this is an addition, not a rewrite.
+        Assert.Equal(
+            Checklist(Sky(Settings())).Select(g => g.Heading),
+            Checklist(Sky(Settings(), LeftoverRequest(null, null, "Bard"))).Select(g => g.Heading));
+    }
+
+    [Fact]
+    public void BandBIsSuppressedWithNoClassLensOnThePhoneToo()
+    {
+        // #193's rule, one surface over: no lens is not a wildcard. Band A is a claim
+        // about the GAME and stands on its own.
+        var phone = Sky(Settings(), LeftoverRequest(LeftoverDump())).Groups;
+
+        Assert.Contains(phone, g => g.Heading.StartsWith("No longer needed"));
+        Assert.DoesNotContain(phone, g => g.Heading.StartsWith("Other classes still want"));
+    }
+
+    [Fact]
+    public void ThePagesClassChipsCannotHideTheBandsThatAnswerAboutClasses()
+    {
+        // index.html drops a group whose `class` sits outside the chip pick. Band B is a
+        // claim ABOUT which classes you have, so a chip narrowing it would hide the very
+        // answer — the same reason ★ Ready carries no class.
+        Assert.All(
+            Sky(Settings(), LeftoverRequest(LeftoverDump(), null, "Bard")).Groups
+                .Where(g => !g.Tickable),
+            g => Assert.Null(g.Class));
+    }
+
+    [Fact]
+    public void ALeftoverRowIsNotAChecklistItem()
+    {
+        // It is something you HOLD, not something you tick — a checkbox on it would be a
+        // silent no-op, and `done` would strike it through as though it were dealt with.
+        foreach (var g in Sky(Settings(), LeftoverRequest(LeftoverDump(), null, "Bard")).Groups
+                     .Where(g => g.Heading.Contains("No longer needed")
+                         || g.Heading.Contains("Other classes still want")))
+        {
+            Assert.False(g.Tickable);
+            Assert.All(g.Rows, r => Assert.False(r.Done));
+        }
+    }
+
+    [Fact]
+    public void TheBandsNeverMoveTheChecklistsOwnCounts()
+    {
+        // The tab badge counts REWARDS. A leftover row is neither done nor outstanding on
+        // that list, and folding it into the badge would make the two screens disagree
+        // about how far along the player is.
+        var s = Settings();
+        var with = Sky(s, LeftoverRequest(LeftoverDump(), null, "Bard"));
+
+        Assert.Equal(Desktop(s).Sum(g => g.Done), with.Done);
+        Assert.Equal(Desktop(s).Sum(g => g.Total), with.Total);
+    }
+
+    [Fact]
+    public void TheHeldBackNoteRidesTheBandOnThePhoneToo()
+    {
+        // The veto: another quest wants the item, so it is NOT band A — and the note names
+        // the quest rather than letting the item vanish. "1 more is still wanted by …" is
+        // the sentence that stops someone selling it, and it is Core's words verbatim.
+        var s = Settings();
+        var catalog = new QuestCatalog
+        {
+            Quests =
+            [
+                new QuestEntry
+                {
+                    Name = "Songweaver's Errand", Classes = "ALL",
+                    Items = [new QuestItemNeed { Name = "Amulet piece", Qty = 1 }],
+                },
+            ],
+        };
+        var core = Core(s, LeftoverDump(), catalog, "Bard");
+        var phone = Sky(s, LeftoverRequest(LeftoverDump(), catalog, "Bard")).Groups;
+
+        Assert.DoesNotContain(phone, g => g.Heading.StartsWith("No longer needed"));
+        Assert.Equal("Amulet piece", Assert.Single(core.HeldBackByOtherQuests).Item);
+
+        // With band A gone the note has nowhere to sit, which is Core's own arrangement —
+        // the note belongs to the band it explains. Band B is unaffected and still drawn.
+        Assert.Contains(phone, g => g.Heading.StartsWith("Other classes still want"));
+    }
+
+    [Fact]
+    public void TheHeldBackNoteIsDrawnWhenBandAIsStillThere()
+    {
+        var s = Settings();
+        var dump = Dump(("General1-Slot1", "Amulet piece", 2),
+            ("General1-Slot2", "Woolen Mask", 1), ("Bank1", "Bow stave", 1));
+        s.SkyQuestCompleted.Add(QuestChecklistLayout.RewardKey("Bard", "Mask of Song"));
+        var catalog = new QuestCatalog
+        {
+            Quests =
+            [
+                new QuestEntry
+                {
+                    Name = "Songweaver's Errand", Classes = "ALL",
+                    Items = [new QuestItemNeed { Name = "Woolen Mask", Qty = 1 }],
+                },
+            ],
+        };
+
+        var band = Sky(s, LeftoverRequest(dump, catalog, "Bard")).Groups
+            .Single(g => g.Heading.StartsWith("No longer needed"));
+
+        Assert.Equal(Core(s, dump, catalog, "Bard").HeldBackNote, band.Note);
+        Assert.Contains("Songweaver's Errand", band.Note);
     }
 
     // ---- the PROGRESS THEME (docs/Themes.md) ----

@@ -74,7 +74,7 @@ public static partial class CompanionProjection
     /// is only true structurally — a shared module they all call — and not as a list of
     /// features someone keeps level by hand.
     /// </summary>
-    private static CompanionChecklistSection BuildSky(AppSettings? settings)
+    private static CompanionChecklistSection BuildSky(AppSettings? settings, CompanionQuestRequest req)
     {
         var items = settings?.SkyQuestChecklist ?? [];
         // The phone reads the player's own grouping choice too — a surface that shows the
@@ -106,6 +106,10 @@ public static partial class CompanionProjection
                     Done: false))],
                 Tickable: false));
 
+        // Then the two leftover bands, beside Ready and for the same reason: both are
+        // cross-class summaries of what to DO with what you are holding.
+        AddLeftoverBands(groups, settings, req);
+
         // EVERY class goes to the phone, and the page's own class chips narrow it there.
         //
         // This used to scope by AppSettings.SkyQuestClass, and NOTHING IN THE CODEBASE
@@ -135,6 +139,80 @@ public static partial class CompanionProjection
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
     }
+
+    /// <summary>
+    /// #243 (tvongaza) on the phone: *"when you do an inventory dump, it could cross check
+    /// which sky quests you've completed and which sky quest items you no longer need."*
+    ///
+    /// TWO groups, never one (Bevel's replace, Helm-signed 2026-09-02) — the same two the
+    /// desktop bands draw, with the same headings, the same row words and the same hover,
+    /// because all four of those live on <see cref="SkyLeftoverRow"/> and
+    /// <see cref="SkyLeftoversResult"/>. This is the third renderer of ONE decision and it
+    /// invents none of it; that is the whole lesson of #184, and of the two days EQBuddy
+    /// Mobile hand-rolled the ready list (#210).
+    ///
+    /// **No page change was needed**, which is the point of routing it through the checklist
+    /// shape: <c>index.html</c> already draws a non-tickable group generically
+    /// (<c>g.tickable === false</c>), heading, note, row text and the row's detail as its
+    /// sub-line. Trap 32 says a page-side fix can sit unseen on an open phone for weeks, so
+    /// a feature that needs none reaches every paired device the moment the PC updates.
+    /// </summary>
+    private static void AddLeftoverBands(
+        List<CompanionChecklistGroup> into, AppSettings? settings, CompanionQuestRequest req)
+    {
+        // The CHARACTER's classes, exactly as the desktop captures them one line before its
+        // view lens narrows to one (#193's rule, one surface over): picks when the player has
+        // picked, the resolved list otherwise. Empty stays empty, which is what suppresses
+        // band B — "only other classes want this" said about a class you actually play is the
+        // one false claim this band exists to avoid, and no lens is not a wildcard.
+        var myClasses = req.Classes.Count > 0 ? req.Classes : req.CharacterClassNames;
+        var leftovers = SkyLeftovers.Compute(
+            req.Inventory, settings?.SkyQuestChecklist, settings?.SkyQuestCompleted,
+            myClasses, req.Catalog);
+        if (leftovers.IsEmpty) return;
+
+        // Band A first: it is the reporter's own sentence and the only strong claim.
+        Band(SkyLeftoverBand.NoLongerNeeded, leftovers.NoLongerNeededHeading, leftovers.HeldBackNote);
+        Band(SkyLeftoverBand.OtherClassesWant, leftovers.OtherClassesWantHeading, note: "");
+
+        void Band(SkyLeftoverBand band, string heading, string note)
+        {
+            var rows = leftovers.RowsIn(band);
+            if (rows.Count == 0) return;   // each band carries its own absence
+            into.Add(new CompanionChecklistGroup(
+                heading,
+                // Band A's note names what was deliberately left OUT and which quest wants
+                // it. An item simply absent from the band reads as a bug in the join.
+                note.Length > 0 ? note : null,
+                [.. rows.Select(r => new CompanionChecklistRow(
+                    LeftoverRowId(r), r.Line, r.Detail, Done: false))],
+                // NO CLASS, so the page's class chips cannot narrow these — the same
+                // treatment ★ Ready gets, and here it is load-bearing: band B is a claim
+                // ABOUT the classes you have, so a chip hiding it would hide the answer.
+                Class: null,
+                // Not items. A leftover row is a summary of something you HOLD, so a
+                // checkbox on it would be a silent no-op (#212, bjstrange).
+                Tickable: false));
+        }
+    }
+
+    /// <summary>A leftover row's identity on the wire — the band plus the row's own words,
+    /// which are its item, its held COUNT and where it is sitting.
+    ///
+    /// **This is how the dump reaches the phone's render signature.** The Quests section
+    /// fingerprint is built from the projected groups' headings, notes and row ids
+    /// (<c>SectionFingerprints</c>), so putting the count and the location in the id is what
+    /// makes a fresh <c>/outputfile inventory</c> push rather than being a no-op on this tab
+    /// — the same defect the desktop's <c>inv:</c> signature term prevents, closed here by
+    /// the rows themselves. It is deliberately NOT the dump's timestamp: that would wake
+    /// every paired phone for a dump that changed nothing on this surface (trap 8), where
+    /// this moves exactly when the band's claim moves.
+    ///
+    /// No tick action accepts an id of this shape, which is the other half of
+    /// <c>Tickable: false</c> — belt and braces, exactly as the ★ Ready band's reward keys
+    /// are (#212).</summary>
+    internal static string LeftoverRowId(SkyLeftoverRow row) =>
+        "sky-leftover|" + row.Band + "|" + row.Line;
 
     /// <summary>The desktop's reward key (class + reward), so "done" means the same
     /// thing on both screens.</summary>
