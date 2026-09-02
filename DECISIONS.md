@@ -17,6 +17,34 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-02
 
+- **The leftover row's words — `{Item} ×{held} · {where}`, both headings, the hover and the
+  held-back note — live on `SkyLeftoverRow`/`SkyLeftoversResult` in Core, not in each
+  renderer** (#243 PR 1, `Core/SkyLeftovers.cs`). · The other way: format in each window, which
+  is what every other band on that tab does today. · The desktop pair and the phone group after
+  them are three renderers of ONE decision, and the honesty of this feature is carried entirely
+  by its words — band B under band A's heading would be the app telling someone an item is
+  finished with when it is not. A format string hand-copied into three files is what drifted
+  before #184. `SkyLeftoversResult`'s shape is unchanged; these are added members only.
+
+- **The bands read the CHARACTER's class list, captured one line before the view lens narrows
+  it** (#243 PR 1, both `QuestsWindow`s' `_myClasses`). · The other way: use the same `classes`
+  everything downstream reads, which is one fewer field. · That variable has been narrowed to
+  the ONE class the player is currently looking at, so "only other classes want this" would be
+  said about a class they play merely because they had it lensed out — a false claim, and the
+  one claim band B exists to make carefully (#193's rule, one surface over).
+
+- **The newest inventory dump's stamp went into both windows' render signature** (#243 PR 1). ·
+  The other way: leave the signature alone — nothing else on that tab moves when a dump is
+  read. · Which is exactly the problem: the bands are a join against the dump, so without it
+  they would go on answering from whichever dump was current when the window opened, and the
+  player's `/outputfile inventory` would appear to do nothing (silent no-ops are broken).
+
+- **This track's What's-new went into the existing unreleased 1.99.17 entry rather than opening
+  1.99.18** (`Core/Data/WhatsNew.json`). · The other way: a version of its own. · 1.99.17 is not
+  tagged and not released — `gh release list` tops out at v1.99.16 — so nothing shipped is being
+  edited (trap 54's guard agrees: the what's-new gate is green). Two tracks landing in one
+  unreleased cut is the normal case, and David still gates the tag.
+
 - **The phone's Level-ups fold is a DEVICE-side open/shut state, not the desktop's
   `ShowLevelUps`** (#240 PR 2, `Web/index.html`). · The other way: ride the setting, which is
   what Bevel's lock names and what would make the two surfaces agree exactly. · A phone tap

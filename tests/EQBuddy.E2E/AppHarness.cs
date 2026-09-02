@@ -25,6 +25,9 @@ internal sealed class AppHarness : IDisposable
     public string ProfileDir { get; }
     public string LogsDir { get; }
     public string LogPath { get; }
+    /// <summary>The "game install" — the Logs folder's PARENT, which is where the game
+    /// writes `/outputfile` dumps and where `InventoryFile.FindLatest` looks for them.</summary>
+    public string GameDir => Path.GetDirectoryName(LogsDir)!;
     public string HistoryDbPath => Path.Combine(ProfileDir, "history.db");
     private string DebugDumpPath => Path.Combine(ProfileDir, "debug.txt");
     private string ErrorLogPath => Path.Combine(ProfileDir, "error.log");
@@ -102,6 +105,37 @@ internal sealed class AppHarness : IDisposable
                     .JsonNumberHandling.AllowNamedFloatingPointLiterals,
             }));
     }
+
+    /// <summary>An `/outputfile inventory` dump sitting where the game writes it, in the
+    /// game's own tab-separated shape (Location / Name / ID / Count / Slots) so it goes
+    /// through the real <c>InventoryFile.ParseEntries</c> rather than a fixture-shaped
+    /// substitute — trap 23: staging in the wrong shape renders a state that is real, and
+    /// the assertion then passes or fails against something else entirely.
+    ///
+    /// Call BEFORE <see cref="Launch"/>; the app reads the newest dump for its character.</summary>
+    public void WriteInventoryDump(params (string Location, string Name, int Count)[] rows)
+    {
+        var lines = new StringBuilder();
+        lines.AppendLine("Location\tName\tID\tCount\tSlots");
+        foreach (var (location, name, count) in rows)
+            lines.AppendLine(CultureInfo.InvariantCulture,
+                $"{location}\t{name}\t0\t{count}\t0");
+        File.WriteAllText(
+            Path.Combine(GameDir, $"{Character}_{Server}-Inventory.txt"), lines.ToString());
+    }
+
+    /// <summary>The Quest Tracker's own class PICKS, which live in quest-ledger.json and
+    /// not in settings.json — so a scenario that needs a character to hold more (or fewer)
+    /// classes than the fixture log infers has to seed them here. Key is the ledger's own
+    /// "{character}_{server}", lowercased.
+    ///
+    /// Call BEFORE <see cref="Launch"/>.</summary>
+    public void WriteLedgerClasses(params string[] classes) =>
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
+            JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                [$"{Character}_{Server}".ToLowerInvariant()] = new { Classes = classes },
+            }, new JsonSerializerOptions { WriteIndented = true }));
 
     /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay
     /// to finish (the fixture has kills, so a live session shows killsTotal &gt; 0).</summary>

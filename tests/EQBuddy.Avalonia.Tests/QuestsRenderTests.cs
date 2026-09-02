@@ -45,7 +45,13 @@ public sealed class QuestsRenderTests : IDisposable
         /// <summary>Settable, so a test can put the Sky tab's import report on screen —
         /// null is the ordinary case (no dump has been read this session).</summary>
         public AutoImportOutcome? LastAchievementsImport { get; set; }
-        public InventoryFile.Snapshot? LatestInventory(bool refresh = false) => null;
+        /// <summary>Settable, so a test can put a real `/outputfile inventory` dump in
+        /// front of the window — null is the honest default (no dump has ever been read),
+        /// and the #243 leftover bands have to be ABSENT in that state rather than empty:
+        /// "you hold none of it" and "you were never told" look identical in a count and
+        /// only one of them is a fact.</summary>
+        public InventoryFile.Snapshot? Inventory { get; set; }
+        public InventoryFile.Snapshot? LatestInventory(bool refresh = false) => Inventory;
 
         // The Unlocks tab's two dumps. Settable so a test can stage them; the default is
         // the honest "this player has never run either command" state, which is the one
@@ -324,6 +330,185 @@ public sealed class QuestsRenderTests : IDisposable
         Assert.Contains(titles, t => t.Contains("Wind Fragment") && t.Contains("Noble Dojorn"));
         // A checklist tab is not the catalog: the general list's quests must not leak in.
         Assert.DoesNotContain(titles, t => t.Contains("The Falchion"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    // ---- the two leftover bands (#243, tvongaza — 2026-09-02) ----
+    //
+    // The join itself is Core's and is covered by SkyLeftoversTests. What can only be
+    // asserted HERE is that the bands exist on screen at all, and that each one carries
+    // its own absence: an absent control photographs as an unremarkable panel (trap 29),
+    // so a screenshot can confirm the band reads well and only an assertion can say it is
+    // there. The bands are found by the Tag each Border carries, never by matching their
+    // heading text — identity is a property you PUT on the object (trap 39).
+
+    private static Border? Band(QuestsWindow window, string tag) =>
+        window.GetVisualDescendants().OfType<Border>()
+            .FirstOrDefault(b => b.Tag as string == tag);
+
+    private static List<string> BandLines(QuestsWindow window, string tag) =>
+        Band(window, tag) is { } band
+            ? [.. band.GetVisualDescendants().OfType<TextBlock>().Select(t => t.Text ?? "")]
+            : [];
+
+    /// <summary>Warrior's own Sky demand for Azure Ring is turned in; Stone Amulet's is
+    /// too. Brass Knuckles is still wanted, but only by Monk and Paladin. Wind Tablet is
+    /// still wanted by Warrior, which IS this character, so it is not a leftover at
+    /// all.</summary>
+    private static AppSettings WithLeftovers(AppSettings settings)
+    {
+        settings.SkyQuestChecklist =
+        [
+            Sky("a1", "Warrior", "Ring of Air", "Azure Ring"),
+            Sky("a2", "Warrior", "Ring of Stone", "Stone Amulet"),
+            Sky("b1", "Monk", "Fist of Wind", "Brass Knuckles"),
+            Sky("b2", "Paladin", "Blade of Light", "Brass Knuckles"),
+            Sky("c1", "Warrior", "Belt of Winds", "Wind Tablet"),
+        ];
+        settings.SkyQuestCompleted = ["Warrior|Ring of Air", "Warrior|Ring of Stone"];
+        return settings;
+
+        static SkyQuestChecklistItem Sky(string id, string cls, string reward, string item) =>
+            new() { Id = id, ClassName = cls, Reward = reward, Npc = "Cilin", QuestItem = item };
+    }
+
+    private static InventoryFile.Snapshot Dump() =>
+        new("Testchar_test-Inventory.txt", DateTime.Now, new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Azure Ring"] = 1,
+            ["Stone Amulet"] = 1,
+            ["Brass Knuckles"] = 2,
+            ["Wind Tablet"] = 1,
+        })
+        {
+            Entries =
+            [
+                new InventoryFile.Entry("General1-Slot3", "Azure Ring", 1),
+                new InventoryFile.Entry("General1-Slot4", "Stone Amulet", 1),
+                // The SHARED bank, which is a bank — the rule InventoryFile.Entry.InBank
+                // now owns for this band and for the Gear tab both.
+                new InventoryFile.Entry("SharedBank1", "Brass Knuckles", 2),
+                new InventoryFile.Entry("General2-Slot1", "Wind Tablet", 1),
+            ],
+        };
+
+    [AvaloniaFact]
+    public void TheTwoLeftoverBandsAreSeparateAndSayDifferentThings()
+    {
+        var host = new FakeHost
+        {
+            QuestCatalog = Catalog(),
+            QuestCharacterKey = "tester_p1999",
+            Inventory = Dump(),
+            Classes = (["Warrior"], ClassSource.Achievements),
+        };
+        WithLeftovers(host.Settings);
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        // Band A: the reporter's own sentence, and the only strong claim.
+        var a = BandLines(window, "skyLeftoverA");
+        Assert.Contains("No longer needed — 2", a);
+        Assert.Contains("Azure Ring ×1 · bags", a);
+        Assert.Contains("Stone Amulet ×1 · bags", a);
+
+        // Band B: a WEAKER claim, under its own honest heading. Mixing it under band A's
+        // words is the one presentation Bevel's ruling exists to prevent, so the heading
+        // is asserted here and its absence from band A below.
+        var b = BandLines(window, "skyLeftoverB");
+        Assert.Contains("Other classes still want — 1", b);
+        // The shared bank reads as "bank", not as a worn slot.
+        Assert.Contains("Brass Knuckles ×2 · bank", b);
+
+        Assert.DoesNotContain(a, t => t.Contains("Brass Knuckles"));
+        Assert.DoesNotContain(b, t => t.Contains("No longer needed"));
+        // Still wanted by a class this character HAS, so it is not leftover in either band.
+        Assert.DoesNotContain(a.Concat(b), t => t.Contains("Wind Tablet"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [AvaloniaFact]
+    public void WithNoDumpNeitherBandIsDrawnAtAll()
+    {
+        var host = new FakeHost
+        {
+            QuestCatalog = Catalog(),
+            QuestCharacterKey = "tester_p1999",
+            Classes = (["Warrior"], ClassSource.Achievements),
+        };
+        WithLeftovers(host.Settings);
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        // ABSENT, not empty. A permanently-present band reading "nothing" is how a player
+        // learns to stop looking at it — the Ready band's own rule, and here it also
+        // covers the state every new player is in.
+        Assert.Null(Band(window, "skyLeftoverA"));
+        Assert.Null(Band(window, "skyLeftoverB"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [AvaloniaFact]
+    public void WithNoClassLensBandBIsSuppressedAndBandAIsNot()
+    {
+        var host = new FakeHost
+        {
+            QuestCatalog = Catalog(),
+            QuestCharacterKey = "tester_p1999",
+            Inventory = Dump(),
+            // No picks, no resolved classes: the honest "we do not know who you are".
+        };
+        WithLeftovers(host.Settings);
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        // No lens is not a wildcard (#193, one surface over): with no classes known there
+        // is no "other" to be other than, so the item is simply still wanted.
+        Assert.Null(Band(window, "skyLeftoverB"));
+        // Band A is a claim about the GAME and is unaffected by who is playing.
+        Assert.Contains("No longer needed — 2", BandLines(window, "skyLeftoverA"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [AvaloniaFact]
+    public void AnItemAnotherQuestWantsLeavesTheBandAndIsExplainedUnderIt()
+    {
+        var catalog = Catalog();
+        catalog.Quests.Add(new QuestEntry
+        {
+            Name = "Blackburrow Brewers", Url = "https://eqlwiki.com/Blackburrow_Brewers",
+            Items = [new QuestItemNeed { Name = "Azure Ring", Qty = 1 }],
+            Rewards = ["Stein of Moggok"],
+        });
+        var host = new FakeHost
+        {
+            QuestCatalog = catalog,
+            QuestCharacterKey = "tester_p1999",
+            Inventory = Dump(),
+            Classes = (["Warrior"], ClassSource.Achievements),
+        };
+        WithLeftovers(host.Settings);
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        var a = BandLines(window, "skyLeftoverA");
+        Assert.Contains("No longer needed — 1", a);
+        Assert.DoesNotContain(a, t => t.StartsWith("Azure Ring", StringComparison.Ordinal));
+        // Not merely absent: an item that vanishes with no reason reads as a bug in the
+        // join, and naming the quest is the sentence that stops someone selling it.
+        Assert.Contains(a, t => t.Contains("Azure Ring") && t.Contains("Blackburrow Brewers"));
 
         window.Close();
         Dispatcher.UIThread.RunJobs();

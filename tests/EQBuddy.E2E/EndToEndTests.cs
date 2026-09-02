@@ -1093,6 +1093,62 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
+    /// #243 (tvongaza): the two leftover bands under Ready, on the WPF lane, against the
+    /// REAL shipped Sky table and the REAL dump parser.
+    ///
+    /// The join is Core's and `SkyLeftoversTests` covers it; the Avalonia twin's bands are
+    /// covered by `QuestsRenderTests`. This is the only thing that can say the WPF window
+    /// actually DRAWS them — a band that is never added photographs as an unremarkable
+    /// panel (trap 29) and no negative assertion can see it (trap 34), which is exactly
+    /// how the Gear tab shipped without its copy button.
+    ///
+    /// Staged against the shipped table, and the prediction written before the run:
+    /// Azure Ring is wanted by ONE reward in the whole game (Warrior · Azure Ruby Ring),
+    /// so completing it puts the ring in band A. Brass Knuckles is wanted by Beastlord and
+    /// Monk and by neither of this character's classes, so it is band B — never band A.
+    /// Wind Tablet is still wanted by Warrior, who this character IS, so it is in neither.
+    /// </summary>
+    [Fact]
+    public void TheSkyTabListsTheLeftoversTheDumpAndTheTurnInsAgreeOn()
+    {
+        using var app = new AppHarness(
+            s => s.SkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
+            new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "sky" });
+        // Two classes, so "only other classes want this" is a claim the window can make
+        // at all: with no lens band B is suppressed on purpose (#193's rule).
+        app.WriteLedgerClasses("Warrior", "Cleric");
+        app.WriteInventoryDump(
+            ("General1-Slot1", "Azure Ring", 1),
+            ("SharedBank1", "Brass Knuckles", 2),
+            ("General1-Slot2", "Wind Tablet", 1));
+        app.Launch();
+
+        Wait.Until(() => app.DumpValue("questsTabs") > 0, TimeSpan.FromSeconds(45),
+            "the Quest Tracker to open on the Sky tab", app.Artifacts);
+        Assert.Equal(1, app.DumpValue("questsSkyLeftoverA"));
+        Assert.Equal(1, app.DumpValue("questsSkyLeftoverB"));
+    }
+
+    /// <summary>The same window with no dump ever read: both bands ABSENT, not empty.
+    /// "You hold none of it" and "you were never told" look identical in a count and only
+    /// one of them is a fact — and a permanently-present band reading "nothing" is how a
+    /// player learns to stop looking at it (the Ready band's own rule).</summary>
+    [Fact]
+    public void WithNoInventoryDumpTheSkyTabDrawsNoLeftoverBands()
+    {
+        using var app = new AppHarness(
+            s => s.SkyQuestCompleted = ["Warrior|Azure Ruby Ring"],
+            new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "sky" });
+        app.WriteLedgerClasses("Warrior", "Cleric");
+        app.Launch();
+
+        Wait.Until(() => app.DumpValue("questsTabs") > 0, TimeSpan.FromSeconds(45),
+            "the Quest Tracker to open on the Sky tab", app.Artifacts);
+        Assert.Equal(0, app.DumpValue("questsSkyLeftoverA"));
+        Assert.Equal(0, app.DumpValue("questsSkyLeftoverB"));
+    }
+
+    /// <summary>
     /// Alt+Tab exclusion is off by default, and the window agrees with the setting.
     ///
     /// Both halves are reported because they are different claims: `altTabWanted` is what
