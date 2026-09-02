@@ -27,7 +27,31 @@ public sealed record SkyLeftoverRow(
     string Where,
     SkyLeftoverBand Band,
     IReadOnlyList<string> TurnedInRewards,
-    IReadOnlyList<string> OpenClasses);
+    IReadOnlyList<string> OpenClasses)
+{
+    /// <summary>The row exactly as every surface draws it — `{Item} ×{held} · {where}`
+    /// (Bevel, Helm-signed 2026-09-02). Said once here because the WPF band, the Avalonia
+    /// band and the phone group are three renderers of ONE decision, and a format string
+    /// hand-copied into three files is precisely what drifts (#184's lesson, and the
+    /// reason <see cref="QuestChecklistLayout"/> exists at all).</summary>
+    public string Line => Where.Length > 0 ? $"{Item} ×{Held} · {Where}" : $"{Item} ×{Held}";
+
+    /// <summary>The hover: the EVIDENCE for the row's claim, which is the whole reason a
+    /// player would act on it. Band A names the turned-in rewards that used the item;
+    /// band B names the classes that still want it and says plainly that they may become
+    /// yours — the difference between "not yours" and "junk", which is the distinction
+    /// the two bands exist to keep.</summary>
+    public string Detail => Band == SkyLeftoverBand.NoLongerNeeded
+        ? "Every Sky reward that takes it is turned in"
+            + (TurnedInRewards.Count > 0 ? ": " + string.Join(", ", TurnedInRewards) : "")
+            + "."
+        : "Still wanted by " + string.Join(", ", OpenClasses)
+            + " — no class this character has. A Legends character can unlock one later, "
+            + "so this is “not yours” rather than “junk”."
+            + (TurnedInRewards.Count > 0
+                ? "\n\nAlready turned in: " + string.Join(", ", TurnedInRewards) + "."
+                : "");
+}
 
 /// <summary>Rows plus the one thing a list of rows cannot say: what was deliberately
 /// left OUT because another quest still wants it.</summary>
@@ -42,6 +66,33 @@ public sealed record SkyLeftoversResult(
 
     public int NoLongerNeeded => Rows.Count(r => r.Band == SkyLeftoverBand.NoLongerNeeded);
     public int OtherClassesWant => Rows.Count(r => r.Band == SkyLeftoverBand.OtherClassesWant);
+
+    /// <summary>Nothing to draw at all. The band's own absence rule, borrowed from the
+    /// Ready band it sits under: *a permanently-present band reading "nothing" is how a
+    /// player learns to stop looking at it.*</summary>
+    public bool IsEmpty => Rows.Count == 0;
+
+    public IReadOnlyList<SkyLeftoverRow> RowsIn(SkyLeftoverBand band) =>
+        [.. Rows.Where(r => r.Band == band)];
+
+    /// <summary>The two headings, verbatim and in ONE place, because the honesty of this
+    /// feature is carried by its words: band B must never appear under band A's heading
+    /// (Bevel's replace, Helm-signed 2026-09-02). A count in the heading and a different
+    /// number of rows under it is trap 4 in miniature, so both come from the same list.</summary>
+    public string NoLongerNeededHeading => $"No longer needed — {NoLongerNeeded}";
+    public string OtherClassesWantHeading => $"Other classes still want — {OtherClassesWant}";
+
+    /// <summary>The hover clause for the items a NON-Sky quest kept out of band A, or ""
+    /// when there are none. They are deliberately not rows — the player is told they
+    /// exist and which quest wants them, so an item missing from the band is EXPLAINED
+    /// rather than simply absent. "1 more is still wanted by Blackburrow Brewers" is the
+    /// sentence that stops someone selling it.</summary>
+    public string HeldBackNote => HeldBackByOtherQuests.Count == 0 ? ""
+        : $"{HeldBackByOtherQuests.Count} more "
+            + (HeldBackByOtherQuests.Count == 1 ? "is" : "are")
+            + " still wanted by another quest: "
+            + string.Join(", ", HeldBackByOtherQuests.Select(h => $"{h.Item} ({h.Quest})"))
+            + ".";
 }
 
 /// <summary>
@@ -178,8 +229,9 @@ public static class SkyLeftovers
         {
             if (!QuestCatalog.BaseItemName(e.Name.TrimEnd('*'))
                     .Equals(item, StringComparison.OrdinalIgnoreCase)) continue;
-            if (e.Location.StartsWith("Bank", StringComparison.OrdinalIgnoreCase) ||
-                e.Location.StartsWith("SharedBank", StringComparison.OrdinalIgnoreCase)) bank = true;
+            // InventoryFile.Entry.InBank owns "is this in the bank", shared bank included
+            // — the same rule GearLocker now asks rather than spelling for itself.
+            if (e.InBank) bank = true;
             else bags = true;
         }
         return (bags, bank) switch

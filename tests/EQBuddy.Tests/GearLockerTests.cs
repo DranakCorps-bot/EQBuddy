@@ -271,4 +271,48 @@ public class GearLockerTests
         Assert.Equal(9, GearLocker.UpgradeTier("Bronze Helm +9"));
         Assert.Equal(12, GearLocker.UpgradeTier("Bronze Helm +12"));
     }
+
+    // ---- the shared bank IS a bank (#243 track, 2026-09-02) ----
+
+    /// <summary>Both of GearLocker's location rules used to spell "is this in the bank"
+    /// as `StartsWith("Bank")` for themselves, and the dump writes the shared bank as
+    /// "SharedBank1". So a shared-bank row fell through to rank 0 — the WORN slot, the
+    /// most prominent location — and then labelled itself `worn · SharedBank1`: an item
+    /// the character is not wearing, presented as the thing they have equipped. The rule
+    /// is now <see cref="InventoryFile.Entry.InBank"/>, asked rather than re-spelled.</summary>
+    [Fact]
+    public void ASharedBankRowIsLabelledAsTheBankAndNotAsWornGear()
+    {
+        Assert.Equal("SharedBank1", GearLocker.WhereLabel(E("SharedBank1", "Bronze Helm")));
+        Assert.Equal("Bank 2", GearLocker.WhereLabel(E("Bank 2", "Bronze Helm")));
+        // The one that was already right, kept as the negative: a real worn slot must
+        // still say so, or the fix has simply moved the wrongness.
+        Assert.Equal("worn · Head", GearLocker.WhereLabel(E("Head", "Bronze Helm")));
+    }
+
+    /// <summary>The rank half of the same bug, and the half a label test cannot see: the
+    /// locker shows the MOST PROMINENT location for an item held in several places, worn
+    /// beating bags beating bank. A shared-bank copy ranking as worn meant the row's whole
+    /// "where" answer came from the bank while the character had one on.</summary>
+    [Fact]
+    public void ASharedBankCopyDoesNotOutrankTheOneActuallyWorn()
+    {
+        var head = Build([], E("SharedBank1", "Bronze Helm"), E("Head", "Bronze Helm"))
+            .Single(g => g.Slot == "HEAD");
+
+        var row = head.Rows.Single(r => r.Name == "Bronze Helm");
+        Assert.Equal("worn · Head", row.Where);
+        Assert.True(row.Worn);
+    }
+
+    [Fact]
+    public void InBankKnowsBothSpellingsAndBothDepths()
+    {
+        Assert.True(new InventoryFile.Entry("SharedBank1", "x", 1).InBank);
+        Assert.True(new InventoryFile.Entry("SharedBank1-Slot4", "x", 1).InBank);
+        Assert.True(new InventoryFile.Entry("Bank 2", "x", 1).InBank);
+        Assert.True(new InventoryFile.Entry("Bank2-Slot1", "x", 1).InBank);
+        Assert.False(new InventoryFile.Entry("General 1", "x", 1).InBank);
+        Assert.False(new InventoryFile.Entry("Head", "x", 1).InBank);
+    }
 }

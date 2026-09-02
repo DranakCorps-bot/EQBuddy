@@ -41,6 +41,12 @@ public partial class QuestsWindow : Window
     // Verified/VerifiedAt fields Progressed() already collapsed to Total.
     private IReadOnlyDictionary<string, QuestLedgerStore.Entry> _owned =
         new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
+    /// <summary>The classes this CHARACTER has, captured before the view lens narrows
+    /// them. The leftover bands need the character's real class list, not the one class
+    /// the player is currently looking at: "only other classes want this" said about a
+    /// class you play — because you had it lensed out — is a false claim, and it is the
+    /// one claim band B exists to make carefully (#193's rule, one surface over).</summary>
+    private IReadOnlyList<string> _myClasses = [];
 
     public QuestsWindow(MainWindow main)
     {
@@ -535,6 +541,9 @@ public partial class QuestsWindow : Window
         // filter." Hiding it the moment they tick the picker hides the game's own answer
         // exactly when they are deciding what to look at.
         var identity = string.Join(" · ", resolved);
+        // Captured HERE, one line before the lens narrows `classes` to a single entry —
+        // see the field's note. Empty stays empty, which is what suppresses band B.
+        _myClasses = classes;
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing it here covers the catalog, the zone view and the
         // item-driven tabs at once. A stale lens (you dropped that class) is ignored
@@ -549,7 +558,11 @@ public partial class QuestsWindow : Window
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", completed.Select(kv => $"{kv.Key}:{kv.Value}"))}" +
-            $"|{string.Join(",", owned.Select(kv => $"{kv.Key}:{kv.Value.Total}"))}";
+            $"|{string.Join(",", owned.Select(kv => $"{kv.Key}:{kv.Value.Total}"))}" +
+            // The leftover bands are a join against the DUMP, and nothing else in this
+            // signature moves when a newer one is read — so without this the bands would
+            // keep answering from the dump that was current when the window opened.
+            $"|inv:{_main.LatestInventory()?.WrittenAt.Ticks ?? 0}";
         if (!force && sig == _signature) return;
         _signature = sig;
 
@@ -868,7 +881,18 @@ public partial class QuestsWindow : Window
         // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
         // control photographs as an unremarkable panel (trap 29), and a bool that nobody
         // resets goes stale without anything noticing.
-        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen()}";
+        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen()} " +
+        // The two #243 bands, counted off the REAL visual tree by the Tag each one
+        // carries — not from a flag the render sets, which goes stale without anything
+        // noticing, and not from the heading string, which is a name and not an identity
+        // (trap 39). 0 is the honest answer for "no dump" and for "nothing leftover".
+        $"questsSkyLeftoverA={LeftoverRowsOnScreen("skyLeftoverA")} " +
+        $"questsSkyLeftoverB={LeftoverRowsOnScreen("skyLeftoverB")}";
+
+    private int LeftoverRowsOnScreen(string tag) => QuestsPanel.Children.OfType<Border>()
+        .Where(b => b.Tag as string == tag)
+        .SelectMany(b => ((StackPanel)b.Child).Children.OfType<TextBlock>())
+        .Count(t => t.Tag is null);   // the held-back note is tagged and is not a row
 
     private int SkyCopyCommandsOnScreen() => QuestsPanel.Children.OfType<StackPanel>()
         .SelectMany(p => p.Children.OfType<Button>())
@@ -1542,6 +1566,94 @@ public partial class QuestsWindow : Window
         QuestsPanel.Children.Add(band);
     }
 
+    /// <summary>#243 (tvongaza): *"cross check which sky quests you've completed and which
+    /// sky quest items you no longer need as you've completed all the quests which use
+    /// them. Would help with limited inventory space."*
+    ///
+    /// TWO bands, never one (Bevel's replace, Helm-signed 2026-09-02). They are claims of
+    /// different strength and a player freeing bag space acts on them differently, so band
+    /// B never appears under band A's heading — the words are the whole feature.
+    ///
+    /// Same shape and same rules as the Ready band above: Sky only, and ABSENT rather than
+    /// empty. Absent also covers "no dump has ever been read", because <see
+    /// cref="SkyLeftovers.Compute"/> answers empty for a null dump — "you hold none of it"
+    /// and "you were never told" look identical in a count and only one of them is a fact.
+    /// The way in is the ⧉ <c>/outputfile inventory</c> the tab already carries.</summary>
+    private void RenderLeftoverBands(QuestTab tab)
+    {
+        if (tab != QuestTab.Sky) return;
+        var leftovers = SkyLeftovers.Compute(
+            _main.LatestInventory(), _settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
+            _myClasses, _main.QuestCatalog);
+        if (leftovers.IsEmpty) return;
+
+        // Band A first: it is the reporter's own sentence and the only strong claim.
+        LeftoverBand(SkyLeftoverBand.NoLongerNeeded, leftovers.NoLongerNeededHeading,
+            "Bag", "AccentBrush", "skyLeftoverA", leftovers.HeldBackNote);
+        LeftoverBand(SkyLeftoverBand.OtherClassesWant, leftovers.OtherClassesWantHeading,
+            "Group", "TextBrush", "skyLeftoverB", note: "");
+
+        void LeftoverBand(SkyLeftoverBand band, string headingText, string icon,
+            string inkKey, string tag, string note)
+        {
+            var rows = leftovers.RowsIn(band);
+            if (rows.Count == 0) return;   // each band carries its own absence
+
+            var panel = new StackPanel();
+            var heading = new StackPanel { Orientation = Orientation.Horizontal };
+            heading.Children.Add(DesignSystem.Icon(icon, inkKey, size: 12));
+            // SemiBold and never dimmer than the rows under it — trap 19's lesson, and
+            // the same reason the Ready band builds its heading by hand.
+            var label = DesignSystem.Text(Role.Caption, headingText);
+            label.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+            label.FontWeight = FontWeights.SemiBold;
+            label.Ink(inkKey);
+            heading.Children.Add(label);
+            panel.Children.Add(heading);
+
+            foreach (var row in rows)
+            {
+                // The row's words come from Core, so this window, its Avalonia twin and
+                // the phone cannot disagree about what a leftover row says.
+                var line = DesignSystem.Text(
+                    band == SkyLeftoverBand.NoLongerNeeded ? Role.Body : Role.BodySecondary,
+                    row.Line);
+                line.TextWrapping = TextWrapping.Wrap;
+                line.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs, 0, 0);
+                line.ToolTip = row.Detail;
+                panel.Children.Add(line);
+            }
+
+            // What was deliberately left OUT, and why. An item that is simply absent from
+            // the band reads as a bug in the join; naming the quest that wants it is the
+            // sentence that stops someone selling it.
+            if (note.Length > 0)
+            {
+                var held = DesignSystem.Text(Role.Caption, note);
+                // Tagged so the dump's row count below cannot mistake the note for a row.
+                held.Tag = tag + "-note";
+                held.TextWrapping = TextWrapping.Wrap;
+                held.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXs, 0, 0);
+                held.Ink("DimBrush");
+                panel.Children.Add(held);
+            }
+
+            var border = new Border
+            {
+                Child = panel,
+                // The band's identity for the EQBUDDY_EXPAND dump, PUT on the object
+                // rather than inferred from its heading text (trap 39).
+                Tag = tag,
+                CornerRadius = new CornerRadius(DesignTokens.RadiusCard),
+                Padding = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceS,
+                    DesignTokens.SpaceM, DesignTokens.SpaceS),
+                Margin = new Thickness(0, 0, 0, DesignTokens.SpaceM),
+            };
+            border.SetResourceReference(BackgroundProperty, "RaisedBrush");
+            QuestsPanel.Children.Add(border);
+        }
+    }
+
     /// <summary>Done / Ready / Partial / Total per class (#136 bjstrange, restored with
     /// the band above) — "how am I doing across all sixteen" without a scroll.
     ///
@@ -1872,6 +1984,11 @@ public partial class QuestsWindow : Window
         // them would leave the player narrowing a list to find out what they were already
         // being told. Both read the class-scoped set, so the class picker still governs.
         RenderReadyBand(tab, inScope);
+        // Under Ready, for the same reason Ready is above the lens: it answers a
+        // cross-class question, and a filter that hid it would leave the player narrowing
+        // a list to find out what they were already being told. Second because Ready names
+        // an ACTION and this names a fact.
+        RenderLeftoverBands(tab);
         RenderClassCounts(tab, inScope);
 
         // SEARCHING IS NOT FILTERING (#108, liminalwarmth). A query rearranges the screen

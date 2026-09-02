@@ -336,4 +336,95 @@ public class SkyLeftoversTests
         Assert.Equal(1, result.NoLongerNeeded);
         Assert.Equal(1, result.OtherClassesWant);
     }
+
+    // ---- the WORDS, said once for all three surfaces (PR 1) ----------------------------
+    //
+    // The desktop bands, and the phone group after them, are three renderers of ONE
+    // decision. A row format or a heading hand-copied into three files is exactly what
+    // drifted before #184, and here the words carry the honesty: band B under band A's
+    // heading would be the app telling someone an item is finished with when it is not.
+
+    [Fact]
+    public void TheRowAndTheHeadingsAreSaidOnceForEverySurface()
+    {
+        var result = SkyLeftovers.Compute(
+            Dump(("General1-Slot1", "Sphinx Claw", 1),
+                 ("Bank2", "Sphinx Claw", 2),
+                 ("General1-Slot2", "Wind Rune Azia", 1)),
+            Checklist(), [Key("Beastlord", "Windhowl/Spirit Render")],
+            ["Beastlord"], catalog: null);
+
+        Assert.Equal("No longer needed — 1", result.NoLongerNeededHeading);
+        Assert.Equal("Other classes still want — 1", result.OtherClassesWantHeading);
+
+        var a = Assert.Single(result.RowsIn(SkyLeftoverBand.NoLongerNeeded));
+        Assert.Equal("Sphinx Claw ×3 · bags and bank", a.Line);
+        Assert.Equal(
+            "Every Sky reward that takes it is turned in: Beastlord · Windhowl/Spirit Render.",
+            a.Detail);
+
+        var b = Assert.Single(result.RowsIn(SkyLeftoverBand.OtherClassesWant));
+        Assert.Equal("Wind Rune Azia ×1 · bags", b.Line);
+        // "Not yours", never "junk" — a Legends character can unlock the class later, and
+        // saying so is the difference the two bands exist to keep.
+        Assert.Contains("Still wanted by Druid, Monk, Wizard", b.Detail);
+        Assert.Contains("unlock one later", b.Detail);
+        Assert.DoesNotContain("no longer needed", b.Detail, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The heading's count and the rows under it come from ONE list, so they
+    /// cannot disagree (trap 4 in miniature — the failure that produces a band headed
+    /// "2" with three rows in it).</summary>
+    [Fact]
+    public void EachHeadingCountsExactlyTheRowsItsBandWillDraw()
+    {
+        var result = SkyLeftovers.Compute(
+            Dump(("General1-Slot1", "Sphinx Claw", 1), ("General1-Slot2", "Wind Rune Azia", 1)),
+            Checklist(), [Key("Beastlord", "Windhowl/Spirit Render")],
+            ["Beastlord"], catalog: null);
+
+        Assert.EndsWith(
+            $"— {result.RowsIn(SkyLeftoverBand.NoLongerNeeded).Count}",
+            result.NoLongerNeededHeading);
+        Assert.EndsWith(
+            $"— {result.RowsIn(SkyLeftoverBand.OtherClassesWant).Count}",
+            result.OtherClassesWantHeading);
+        Assert.False(result.IsEmpty);
+        Assert.True(SkyLeftoversResult.Empty.IsEmpty);
+    }
+
+    /// <summary>An item a NON-Sky quest still wants is deliberately in neither band — and
+    /// the band says so rather than letting it simply vanish. An item missing with no
+    /// reason reads as a bug in the join; naming the quest is the sentence that stops
+    /// someone selling it.</summary>
+    [Fact]
+    public void TheHeldBackNoteNamesTheQuestAndDisappearsWhenThereIsNone()
+    {
+        var catalog = new QuestCatalog
+        {
+            Quests =
+            [
+                new QuestEntry
+                {
+                    Name = "Blackburrow Brewers",
+                    Items = [new QuestItemNeed { Name = "Sphinx Claw", Qty = 1 }],
+                },
+            ],
+        };
+        var result = SkyLeftovers.Compute(
+            Dump(("General1-Slot1", "Sphinx Claw", 1), ("General1-Slot2", "Wind Rune Azia", 1)),
+            Checklist(), [Key("Beastlord", "Windhowl/Spirit Render")],
+            ["Beastlord"], catalog);
+
+        Assert.Empty(result.RowsIn(SkyLeftoverBand.NoLongerNeeded));
+        Assert.Equal(
+            "1 more is still wanted by another quest: Sphinx Claw (Blackburrow Brewers).",
+            result.HeldBackNote);
+
+        // Nothing vetoed, nothing said — the note is a fact, not furniture.
+        var clean = SkyLeftovers.Compute(
+            Dump(("General1-Slot1", "Sphinx Claw", 1)), Checklist(),
+            [Key("Beastlord", "Windhowl/Spirit Render")], ["Beastlord"], catalog: null);
+        Assert.Equal("", clean.HeldBackNote);
+    }
 }
