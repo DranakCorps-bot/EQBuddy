@@ -40,6 +40,20 @@ public sealed class SessionArchiver : IDisposable
         }
     }
 
+    /// <summary>The (server, character) every row this archiver writes is KEYED by, empty
+    /// while no character is being followed.
+    ///
+    /// Exposed because a reader that queries history for "this character" has to use the
+    /// same two strings the writer used, and the two lanes source them differently — WPF
+    /// from the log FILENAME (<c>LogWatcher.MostRecentlyActive</c>), Avalonia from the
+    /// parsed log. `SessionRepository`'s lookups compare with SQL `=`, which is
+    /// case-sensitive, so "close enough" is a query that silently returns nothing.
+    /// Asking the writer is the only way to be sure (trap 4: one fact, two derivations).</summary>
+    public (string Server, string Character) Identity
+    {
+        get { lock (_lock) return (_server, _character); }
+    }
+
     /// <summary>Checkpoint the active session (no-op for noise-only sessions).</summary>
     public void Checkpoint(StatsSnapshot s)
     {

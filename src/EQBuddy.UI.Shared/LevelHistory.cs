@@ -96,6 +96,29 @@ public static class LevelHistory
         && int.TryParse(text[LevelPrefix.Length..], out var level)
             ? level : null;
 
+    /// <summary>
+    /// The stored half of <see cref="Rows"/>, scoped to one character — every archived
+    /// session's mined dings, or nothing at all while no character is being followed.
+    ///
+    /// **The identity must come from the ARCHIVER**, which is what
+    /// <see cref="SessionArchiver.Identity"/> exists to hand over: those are the exact two
+    /// strings the rows were written under, and <see cref="SessionRepository.ProgressSeries"/>
+    /// compares them with SQL <c>=</c>. The two desktop lanes source a character name
+    /// differently (WPF from the log FILENAME, Avalonia from the parsed log), so "close
+    /// enough" is a query that silently returns nothing.
+    ///
+    /// **Empty rather than unscoped when either half is blank.** `ProgressSeries` treats a
+    /// null or empty side as "do not filter on it", so passing one through would answer
+    /// with EVERY character's dings — a list about nobody, rendered under a heading that
+    /// says it is about you. That is the failure this method exists to make impossible to
+    /// re-derive per lane; both widgets call it, and the phone (PR 2) is the third caller.
+    /// </summary>
+    public static IReadOnlyList<SessionRepository.ProgressPoint> Stored(
+        (string Server, string Character) identity,
+        Func<string, string, List<SessionRepository.ProgressPoint>> series) =>
+        identity.Server.Length == 0 || identity.Character.Length == 0
+            ? [] : series(identity.Server, identity.Character);
+
     /// <summary>A row's name column: "Level 24".</summary>
     public static string Name(Row row) => $"{LevelPrefix}{row.Level}";
 

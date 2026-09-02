@@ -783,6 +783,47 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
+    /// THE LEVEL-UPS FOLD (#240, joeymavity: *"leveling timestamps in an xp dropdown, I
+    /// can't find it now"*), on the WPF lane, which has no unit tests of its own.
+    ///
+    /// **Three keys rather than one, because two of the states look almost identical on
+    /// screen and are opposites.** A heading that is DOWN means this character has never
+    /// dinged while EQBuddy watched. A heading that is UP over zero rows is the default
+    /// every player gets — folded, with the count and the last date on the label. Asserting
+    /// only "rows == 0" would pass for both, which is the shape of a guard that reads as
+    /// coverage while being blind to the failure that matters (trap 34).
+    ///
+    /// **The prediction, written before the run** (trap 23). The fixture session announces
+    /// no level, and a headless E2E profile has no `history.db` rows for this character —
+    /// so on launch the heading is DOWN and the count is 0. Appending one ding is the only
+    /// thing that can move it, and it moves it to exactly one: heading UP, count 1, rows
+    /// still 0 because `ShowLevelUps` defaults to FOLDED (Bevel's lock, Helm-signed
+    /// 2026-09-02 — unlike `ShowSkillUps` beside it, which defaults open).
+    /// </summary>
+    [Fact]
+    public void ProgressCard_TheLevelUpsFoldAppearsOnADingAndStaysShut()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_PROGRESS"] = "1",   // Experience, where the fold lives
+        });
+        app.Launch();
+
+        app.WaitForWindow("progressLevelUpsShown", "the Progress window to open on Experience");
+        // No heading over nothing: this character has never dinged while EQBuddy watched.
+        app.WaitForDump("progressLevelUpsShown", 0, "no Level-ups heading before any ding");
+        app.WaitForDump("progressLevelUps", 0, "no level-ups to count yet");
+
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+
+        app.WaitForDump("progressLevelUpsShown", 1, "the Level-ups heading once a ding lands");
+        app.WaitForDump("progressLevelUps", 1, "the ding counted on the folded label");
+        // FOLDED by default — the count is on the label, the rows wait to be asked for.
+        // This is the assertion that fails if someone "helpfully" defaults it open.
+        app.WaitForDump("progressLevelUpRows", 0, "the rows to stay folded by default");
+    }
+
+    /// <summary>
     /// WHO OWNS THE PROGRESS BODY — pinned here BEFORE Inline themes PR 1 turns the
     /// launcher into an expander, which is the only order in which this assertion is
     /// worth anything.

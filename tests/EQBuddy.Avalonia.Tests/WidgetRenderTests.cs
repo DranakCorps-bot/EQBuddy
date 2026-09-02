@@ -1513,17 +1513,24 @@ public class WidgetRenderTests : IDisposable
         params string[] classes) => ExperienceAt(12, classes);
 
     private static (MainWindow Main, Window Host, ProgressCardView View) ExperienceAt(
-        int level, params string[] classes)
+        int level, params string[] classes) => ExperienceRoom(level, new StatsSnapshot(), null, classes);
+
+    /// <summary>The Experience surface with a live snapshot and a stored history of the
+    /// test's choosing — what the Level-ups fold (#240) needs, since its list is a merge of
+    /// the two and a headless profile has no `history.db` at all.</summary>
+    private static (MainWindow Main, Window Host, ProgressCardView View) ExperienceRoom(
+        int level, StatsSnapshot snapshot,
+        IReadOnlyList<SessionRepository.ProgressPoint>? stored, params string[] classes)
     {
         var main = new MainWindow();
         main.Show();
         main.Settings.ShowNextUnlocks = true;   // the rows, not just the fold's label
         ProgressCardView? view = null;
         view = new ProgressCardView(main.Settings, _ => classes, () => level,
-            () => view!.Render(new StatsSnapshot()));
+            () => view!.Render(snapshot), () => stored ?? [], () => "testchar_test");
         var host = new Window { Content = view.Body, Width = 320, Height = 480 };
         host.Show();
-        view.Render(new StatsSnapshot());
+        view.Render(snapshot);
         host.UpdateLayout();
         return (main, host, view);
     }
@@ -1976,5 +1983,91 @@ public class WidgetRenderTests : IDisposable
         Assert.Contains("Inventory — no dump yet", text);
 
         window.Close();
+    }
+
+    // ---- the Level-ups fold (#240, joeymavity) ----
+    //
+    // A rendered frame is this lane's only coverage, and the three states below look
+    // almost identical in a diff: no heading, a heading with a count and no rows, and a
+    // heading with rows. Only the first is "this character has never dinged".
+
+    private static readonly DateTime LevelUpAug21 = new(2026, 8, 21, 20, 14, 0);
+    private static readonly DateTime LevelUpAug23 = new(2026, 8, 23, 19, 5, 0);
+
+    private static StatsSnapshot LiveDing(DateTime time, int level) => new()
+    {
+        SessionStart = time.AddHours(-1),
+        Levels = [new TimedDetail(time, $"Level {level}")],
+    };
+
+    /// <summary>The default a player actually sees: shut, with the count and the last
+    /// ding's date on the label, so the glance answers "when did I last ding" without
+    /// opening anything. Bevel's lock, Helm-signed 2026-09-02.</summary>
+    [AvaloniaFact]
+    public void TheLevelUpsFoldIsShutByDefaultAndSaysHowManyAndWhen()
+    {
+        var (main, host, view) = ExperienceRoom(24, LiveDing(LevelUpAug23, 24),
+            [new SessionRepository.ProgressPoint(LevelUpAug21, 0, [(LevelUpAug21, 22)])],
+            "Druid");
+        main.Settings.ShowLevelUps = false;
+        view.Render(LiveDing(LevelUpAug23, 24));
+        host.UpdateLayout();
+
+        Assert.True(view.LevelUpsShown);
+        Assert.Equal(2, view.LevelUps);
+        Assert.Equal(0, view.LevelUpRows);
+        Assert.Contains("Level-ups (2) · last Aug 23",
+            host.GetVisualDescendants().OfType<EqFoldLabel>().Select(f => f.Text));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>Unfolded: the stored session's ding and the live one, newest first, each
+    /// with its wall-clock time. The merge is the feature — the summary line above can only
+    /// ever show THIS session's dings, which is why he could not find them (#240).</summary>
+    [AvaloniaFact]
+    public void TheLevelUpsRowsMergeTheStoreAndTheLiveSessionNewestFirst()
+    {
+        var (main, host, view) = ExperienceRoom(24, LiveDing(LevelUpAug23, 24),
+            [new SessionRepository.ProgressPoint(LevelUpAug21, 0, [(LevelUpAug21, 22)])],
+            "Druid");
+        main.Settings.ShowLevelUps = true;
+        view.Render(LiveDing(LevelUpAug23, 24));
+        host.UpdateLayout();
+
+        Assert.Equal(2, view.LevelUpRows);
+        var text = host.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains("Level 24", text);
+        Assert.Contains("Aug 23, 7:05 PM", text);
+        Assert.Contains("Level 22", text);
+        Assert.Contains("Aug 21, 8:14 PM", text);
+        // Newest first, and the label drops the count once the rows carry it.
+        Assert.True(text.IndexOf("Level 24") < text.IndexOf("Level 22"));
+        Assert.Contains("Level-ups",
+            host.GetVisualDescendants().OfType<EqFoldLabel>().Select(f => f.Text));
+        // The gap is hover text, never a third token on the row (Bevel's call).
+        Assert.DoesNotContain(text, t => t.Contains("since the previous"));
+
+        host.Close();
+        main.Close();
+    }
+
+    /// <summary>No dings at all: no heading. A heading with nothing under it reads as a
+    /// surface that failed to load — the 2026-08-22 rule the Skill-ups fold beside it
+    /// already follows.</summary>
+    [AvaloniaFact]
+    public void TheLevelUpsHeadingStaysDownForACharacterThatHasNeverDinged()
+    {
+        var (main, host, view) = ExperienceRoom(12, new StatsSnapshot(), null, "Druid");
+
+        Assert.False(view.LevelUpsShown);
+        Assert.Equal(0, view.LevelUps);
+        Assert.DoesNotContain("Level-ups", host.GetVisualDescendants().OfType<EqFoldLabel>()
+            .Select(f => f.Text));
+
+        host.Close();
+        main.Close();
     }
 }
