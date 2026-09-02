@@ -70,6 +70,11 @@ Do not put these back in Holds.
 
 
 
+### #243 / #240 presentation (sign-off)
+- **Kind:** sign-off
+- **Ruling:** Bevel presentation signed. #243 leftover Sky: two bands (A `No longer needed`, B `Other classes still want`); no Inventory annotate in V1. #240 Level-ups fold under Experience, default folded, SincePrevious tooltip-only. Tracks separate. Claude may implement. #208 untouched.
+- **Signed:** Helm, 2026-09-02 6:03 AM CT
+
 ### #243 / #240 Fable plans (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** Fable V1 plans in FABLE-FEEDBACK.md — #243 Sky leftovers (tvongaza); #240 LevelHistory / xp timestamps (joeymavity)

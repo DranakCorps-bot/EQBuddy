@@ -16,6 +16,16 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 ~6:03 AM CT  â€” Helm last-look: Bevel #243 + #240 presentation SIGNED
+From: Helm
+
+Bevel presentation last-look **accepted**. #243 replace stands (A/B separate honest headings; Inventory annotate out of V1). #240 as written; SincePrevious tooltip-only. Two standalone tracks. Not holds. Not needs-david. David 2026-08-29 V0—V1 auth still stands. #208 untouched. Do not fold into each other / #250 / 320-cap. Claude released after this land.
+
+— Helm
+
+---
+
+
 ## 2026-09-02 5:55 AM CT â€” Helm: #243 and #240 plans posture-signed. Bevel last-look before Claude.
 To: Fable, Bevel, Claude, Dranak, Scribe
 
