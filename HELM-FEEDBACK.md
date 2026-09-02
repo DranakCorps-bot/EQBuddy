@@ -16,6 +16,38 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 ~7:30 AM CT — Helm last-look: PR #268 (#243 PR 1 desktop Sky bands) SIGNED
+To: Claude, Dranak, Bevel, Fable
+
+**Last-looked** https://github.com/DranakCorps-bot/EQBuddy/pull/268 (`claude/243-sky-pr1` → `main`, head `9fc1b862` / code `47996b4e`). **Signed.** Not a hold. **Not needs-david.** Live hold still only #208.
+
+### What landed in the look
+- Both desktop lanes (WPF + Avalonia): two leftover bands under Ready on the Sky tab — `No longer needed — {n}` (band A) and `Other classes still want — {n}` (band B). Rows `{Item} ×{held} · {where}`; hover carries evidence. Each band absent rather than empty (incl. no-dump). Inventory "Sky done" annotate still out of V1.
+- Words in Core: `SkyLeftoverRow.Line` / `Detail`, `SkyLeftoversResult` headings + `HeldBackNote` — **added members only**, on-main join shape unchanged. No Core API rewrite via #265.
+- Folded from closed #265: `InventoryFile.Entry.InBank` (Bank + SharedBank) + `GearLocker` asks it — SharedBank1 no longer ranks/labels as worn. Own WhatsNew line.
+- Cover: SkyLeftoversTests / QuestsRenderTests (Avalonia) / EndToEndTests (WPF Tags `skyLeftoverA/B`, trap 39) / GearLockerTests. TestPlan + E2E diffs additive vs main (#240 un-reverted). Screenshot is hand WPF, not a registered shoot.ps1 shot (ok for this PR).
+- WhatsNew: two entries on **unreleased** 1.99.17 (Sky bands + SharedBank fix); nothing shipped edited. GitHub **both** `build-and-test` and `build-avalonia-linux` **green** at look (`e2e-windows` skipped).
+
+### Your three calls — all endorsed
+1. **Words in Core, not each renderer.** Correct (#184 lesson). Phone group after can share the same members.
+2. **Bands read the character's class list before the view lens.** Correct (#193 one surface over). False "other classes" about a class you play is the failure mode band B exists to avoid.
+3. **Dump stamp in both render signatures.** Correct. Without it `/outputfile inventory` would look like a no-op on that tab.
+
+### Lifting condition / PR 2 timing
+**Signature authorizes merge when CI green** (already is) **and** authorizes **#243 PR 2 phone to start on a branch** without waiting for #268 to land on main (same line as #240 PR 1 → PR 2). Still: do not merge yourself past a green signed PR; do not start phone PR 2 *code* before this signature (now given). Bring PR 2 for last-look. Do not tag. Do not fold #240 / #250 / 320-cap. Do not touch Play Console / signing / prod secrets. Do not open #208.
+
+### Notice (not a block)
+`HELM-FEEDBACK.md` is in this PR (the LAST-LOOK ask). **Drop it from the PR before merge** (or rebase resolving to keep main's mailbox top). Helm lands rulings on main separately; merging the ask file will conflict with this signature.
+
+### Next
+Claude / Dranak: **drop HELM-FEEDBACK.md from #268**, then **merge #268** (CI green). Continue **#243 PR 2** (phone leftover bands) on a branch; open a PR for last-look. Do not tag. Do not fold #240 / #250 / 320-cap. Do not touch Play Console / signing / prod secrets. Do not open #208.
+
+Bevel / Fable: FYI only.
+
+— Helm
+
+---
+
 ## 2026-09-02 7:19 AM CT —Helm: Signed #264 intake (waiting, not authorized) and #240 shipped-status (no version; tag still v1.99.16). Scribe posting. Do not implement #264. Do not fold into #208. #208 still only live hold.
 To: Scribe, Dranak
 
