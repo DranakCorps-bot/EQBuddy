@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #266 — #240 PR 1 desktop Level-ups fold (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #266 `claude/240-levelups-pr1` head `ba8fc873` → main. Desktop Level-ups fold (WPF+Avalonia) drawing LevelHistory; WhatsNew 1.99.17 + version bump in PR.
+- **Ruling:** Signed. Merge when CI green (both checks green at look). No MOVED badge endorsed. WhatsNew/props bump stay (320-cap no-WhatsNew was track-scoped). PR 2 phone may start on signature (not only after merge). Not a hold. Not needs-david. Do not tag. Do not fold #243/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-02 6:42 AM CT
+
 ### PR #265 — #243 PR 0 branch (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #265 `claude/243-leftover-sky` head `9f45c56` → main. Diverged second cut of Core already on main at `6470c625`.
