@@ -424,6 +424,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     // release: an open phone runs the page it downloaded weeks ago (trap 32).
                     CharacterClassNames = classes,
                     ClassSource = classSource,
+                    // The dump, for the Sky tab's leftover bands (#243). The SAME call the
+                    // quest window makes — so the phone's bands and this machine's cannot
+                    // answer from two different files, and the log's gains since the dump
+                    // are folded into both by LatestInventory itself.
+                    Inventory = LatestInventory(),
                 };
             },
             QuestLedger = QuestLedger,

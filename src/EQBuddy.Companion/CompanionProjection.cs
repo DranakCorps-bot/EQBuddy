@@ -257,9 +257,15 @@ public static partial class CompanionProjection
             into[surface] = ChecklistPrint(section);
         }
 
+        // The NOTE joins the heading and the rows, because the page draws it and it is the
+        // one thing on a checklist a change can move without moving a row: the Sky leftover
+        // bands' held-back note names the items another quest vetoed (#243), and those are
+        // deliberately not rows. Nothing here drifts on a clock — every note is a state word
+        // ("ready", "in progress") or a list of item and quest names (trap 8).
         static string ChecklistPrint(CompanionChecklistSection section) =>
             Fold($"{section.Done}/{section.Total}",
-                Join(section.Groups, g => g.Heading + "=" + Join(g.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}")));
+                Join(section.Groups, g => g.Heading + "~" + g.Note
+                    + "=" + Join(g.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}")));
     }
 
     /// <summary>The pseudo-section for envelope-level change (who/where/the gate/the

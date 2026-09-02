@@ -32,6 +32,18 @@ public sealed record CompanionQuestRequest
     public IReadOnlyList<string> CharacterClassNames { get; init; } = [];
 
     public ClassSource ClassSource { get; init; } = ClassSource.Unknown;
+
+    /// <summary>The newest <c>/outputfile inventory</c> dump, exactly as the desktop quest
+    /// window reads it (<c>LatestInventory()</c>) — the second half of the #243 join, and
+    /// the only input the Sky tab's leftover bands need that settings cannot supply.
+    ///
+    /// **Null is a fact, not a gap.** A player who has never run the command gets no bands
+    /// at all, because <see cref="SkyLeftovers.Compute"/> treats "you hold none of it" and
+    /// "you were never told" as different things and only one of them is knowable. That is
+    /// also why this rides the REQUEST rather than being loaded here: the widget owns the
+    /// dump, folds the log's gains into it, and hands over the same object its own window
+    /// draws from, so the phone cannot answer from an older file than the PC.</summary>
+    public InventoryFile.Snapshot? Inventory { get; init; }
 }
 
 /// <summary>
