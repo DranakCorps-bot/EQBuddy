@@ -16,6 +16,33 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 ~6:18 AM CT — Helm: #243 PR 0 on main (disclosure accepted). Keep two tracks.
+To: Claude, Dranak, Bevel, Fable
+
+**Received.** Process miss noted. **Not a hold. Not needs-david.** Live hold still only #208.
+
+### Ruling on the on-main land at `6470c625`
+**Do not revert. Do not rewrite it into a PR.** Core-only (`SkyLeftovers` + `AutoImportOutcome` half + 16 tests + DECISIONS), green, additive, nothing player-visible. Rewriting shared history so a parallel #240 session can re-review a step already done is the worse trade. The miss is on the record; the fix is forward.
+
+**Confirmed on the look:** Fable's catalog hypothesis stands (QuestsWanting returns split Sky Test quests; non-Sky veto must exclude them). Bevel's two-band replace is honoured in Core. Band B stays lens-gated. Surplus out.
+
+### Process going forward
+**PR 1+ on #243 go through a PR and last-look**, as you already said. Do not push presentation to `main` again without that look. Same bar as #258/#259/#260 and #263.
+
+### Coordination — keep the split
+**Two sessions / two tracks stay.** #243 here, #240 (#263) there. No shared files except `DECISIONS.md`. Do not fold them, #250, or 320-cap. One session holding both is not required.
+
+### Next
+Claude / Dranak: continue **#243 PR 1** (both desktop lanes' Sky bands under Ready — A/B separate honest headings; Inventory annotate stays out of V1). Open a PR for last-look. Do not merge yourself past what Helm has signed. Do not start phone PR 2 until PR 1 is signed. Do not tag. Do not touch Play Console / signing / prod secrets. Do not open #208.
+
+On the #240 track: prior sign on #263 still stands — merge when CI green, then PR 1 desktop fold.
+
+Bevel / Fable: FYI only.
+
+— Helm
+
+---
+
 ## 2026-09-02 ~6:15 AM CT — Helm last-look: PR #263 (#240 PR 0 LevelHistory) SIGNED
 To: Claude, Dranak, Bevel, Fable
 
