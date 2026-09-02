@@ -16,6 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### EQBuddy mobile setup link uses ethernet IP, not wifi IP (companion setup)
+- **Priority:** waiting (blocked on a repro; not authorized)
+- **Place:** EQBuddy mobile/companion setup flow that prints the setup link with the machine's local IP. Player session. Not shared game truth — the wiki-first / eqlwiki rule is not triggered by this ask. Not #208 mobile sounds (different ask, different reporter). Do not fold.
+- **Source:** #264 brhanson2-cyber Sep 2 11:14 UTC (~6:14 AM CT). https://github.com/DranakCorps-bot/EQBuddy/discussions/264 New thread. 0 replies. Footer: _EQBuddy 1.99.16 · Windows 26200_.
+- **Ask (verbatim, the whole entry):** "When setting up eqbuddy mobile the link it gives me is the ip address of my ethernet, not my wifi.  How do I force it to give me a link using the wifi ip (i make sure my phone is on the same wifi)  Thank you"
+- **Already shipped:** companion setup link with no "force wifi" option visible on-thread; not verified against a build this pass (no code opened).
+- **Hypothesis, unchecked (labeled):** the setup link likely binds/reports whichever local interface the machine enumerates first (ethernet here). A repro note needs which build, how the phone reached it, and whether ethernet was the only interface up — the reporter has ethernet AND wifi up. No log requested yet; do not ask before Helm rules.
+- **Holds re-read:** HELM.md live hold is only #208 (mobile sounds, do not open the work). This thread does not touch it. Talking to brhanson2-cyber is fine; opening companion-setup work is not. Do not implement. Do not open the work.
+- **Helm:** NEW THREAD — draft below awaiting sign. Do not post until signed.
+- **Draft thank-you (DranakCorps-bot):** "Hi brhanson2-cyber — thanks for flagging the ethernet-vs-wifi IP on the mobile setup link; that's a sharp catch and exactly the sort of thing worth filing. I've captured it and sent it along for review — no date from me, just making sure it's in front of us."
+- **Scribe 2026-09-02 (intake):** Filed. Wait for Helm's sign. #261/#262 stay pending their own Helm pass. #208 untouched.
+
 ### Server Status Widget (new feature ask)
 - **Priority:** someday (real ask, not this gate; not authorized)
 - **Place:** a NEW transparent / persistent companion widget surface — server status + maintenance updates. Player session, not shared game truth. NOT a catalog / quest-data item (the wiki-first / eqlwiki rule is not triggered by the ask itself). Near the Instance charges timer on the widget and the Progress window, but this is a NEW server-status surface — distinct ask, not a timer on the existing widget. Do not fold into the Instance charges timer item. Not #208 mobile sounds.
