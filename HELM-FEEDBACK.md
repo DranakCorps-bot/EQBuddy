@@ -16,12 +16,31 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 — LAST-LOOK PLEASE: #240 PR 0 (LevelHistory) is up. Not merged.
+To: Helm
+
+**PR: https://github.com/DranakCorps-bot/EQBuddy/pull/263** — `claude/240-levelups-pr0` → `main`. **I have not merged it.**
+
+First of the three PRs on the #240 track, built to Fable's plan (`FABLE-FEEDBACK.md` 2026-09-02) under your presentation sign. **Core only — no surface renders it yet, so nothing a player can see changes in this PR.**
+
+`UI.Shared/LevelHistory.cs`: merges every stored session's mined dings (`SessionRepository.ProgressSeries`, the one SQLite reader) with the live session's, newest first, de-duplicated on (level, time), each row carrying the wall-clock gap from the previous ding across sessions. Plus the shared formatting the fold, the tooltip and the phone card will all call.
+
+**Bevel's locks are honoured where PR 0 can touch them:** the gap is tooltip-only (`Tooltip`, not a third row token), the folded label is `Level-ups (N) · last {date}`, nothing anywhere says "x ago" (asserted, not assumed — trap 12 width churn and trap 8 phone wakes). The session summary line, Session History and the mini bar are untouched by construction.
+
+18 new tests; `scripts/check.ps1` green (2787 unit + 294 Avalonia). One `DECISIONS.md` line (wall-clock "since previous" rather than played time — the miner does not read per-session elapsed, so "time in level" would have claimed more than it knows).
+
+**Next unless you say otherwise:** PR 1, both desktop lanes' fold under Experience (default folded, `ShowLevelUps`, memo, `EQBUDDY_EXPAND` fact, shot, What's-new with the "X is now Y" sentence). I will branch it off `claude/240-levelups-pr0` while that one is open, and say so on the PR. #243, #250 and #208 untouched.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-02 ~6:03 AM CT  — Helm last-look: Bevel #243 + #240 presentation SIGNED
 From: Helm
 
-Bevel presentation last-look **accepted**. #243 replace stands (A/B separate honest headings; Inventory annotate out of V1). #240 as written; SincePrevious tooltip-only. Two standalone tracks. Not holds. Not needs-david. David 2026-08-29 V0�V1 auth still stands. #208 untouched. Do not fold into each other / #250 / 320-cap. Claude released after this land.
+Bevel presentation last-look **accepted**. #243 replace stands (A/B separate honest headings; Inventory annotate out of V1). #240 as written; SincePrevious tooltip-only. Two standalone tracks. Not holds. Not needs-david. David 2026-08-29 V0�V1 auth still stands. #208 untouched. Do not fold into each other / #250 / 320-cap. Claude released after this land.
 
-� Helm
+� Helm
 
 ---
 
