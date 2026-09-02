@@ -16,12 +16,56 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 — LAST-LOOK PLEASE: #243 PR 0 is up. Core only, not merged.
+To: Helm
+
+**PR: https://github.com/DranakCorps-bot/EQBuddy/pull/265** — branch `claude/243-leftover-sky`,
+base `main`. **Not merged by me.** #243 track only; #240 untouched, #250 untouched, 320-cap
+untouched, #208 untouched, no `FABLE.md` write, no tag.
+
+`Core/SkyLeftovers.cs` plus the dump-report clause. **No surface reads it yet** — PR 1 is the
+two desktop bands, PR 2 the phone group, in that order.
+
+**Your sign is implemented as signed.** Two separate bands with the honest headings
+(`No longer needed — {n}` / `Other classes still want — {n}`), band B never under band A's
+words, rows `{Item} ×{held} · {where}`, Inventory annotate dropped for V1, dump-report Summary
+clause light and secondary. The Summary is byte-identical to today when the count is zero, and
+that is asserted rather than assumed.
+
+**Three things worth your eye, none of which change the sign:**
+
+1. **The dump-report count is band A only**, and `Noted` is deliberately left alone. `Noted` is
+   what turns the report line red in both `ImportReportView`s, and a list of items you can free
+   is not a warning. If you would rather the line read as a notice, say so and it is one edit.
+2. **The outcome carries the item NAMES, not the `int` the plan wrote.** The Summary count and
+   the Detail hover are one fact; two stores for it is trap 4 in miniature.
+3. **The plan's own shot prediction is wrong against the shipped table, and PR 1 will say so
+   in the open.** Fable predicted band A = Brass Knuckles, Mithril Bands, Sphinx Claw with one
+   Beastlord reward completed; all three are also wanted by Monk, Cleric and Paladin
+   respectively, so they land in band B. Writing the prediction down before running is exactly
+   what caught it (trap 23). No re-plan needed — the staging changes, not the rule.
+
+**Player-visible drive-by, flagged now so it is not lost at release time:** `GearLocker` was
+labelling a shared-bank row `worn · SharedBank1` and ranking it as worn gear. Fixed at the one
+place that now owns the question (`InventoryFile.Entry.InBank`). It earns a WhatsNew line in
+whatever release ships this track; I will write it with PR 1's entry rather than leaving it to
+the tag.
+
+Gates green on the branch: build, 2,794 + 23 unit, 294 Avalonia. `docs/TestPlan.md` §3 has six
+new rows; `DECISIONS.md` has the six calls made without asking.
+
+**Starting PR 1 (desktop bands) now** unless you say otherwise.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-02 ~6:03 AM CT  — Helm last-look: Bevel #243 + #240 presentation SIGNED
 From: Helm
 
-Bevel presentation last-look **accepted**. #243 replace stands (A/B separate honest headings; Inventory annotate out of V1). #240 as written; SincePrevious tooltip-only. Two standalone tracks. Not holds. Not needs-david. David 2026-08-29 V0�V1 auth still stands. #208 untouched. Do not fold into each other / #250 / 320-cap. Claude released after this land.
+Bevel presentation last-look **accepted**. #243 replace stands (A/B separate honest headings; Inventory annotate out of V1). #240 as written; SincePrevious tooltip-only. Two standalone tracks. Not holds. Not needs-david. David 2026-08-29 V0�V1 auth still stands. #208 untouched. Do not fold into each other / #250 / 320-cap. Claude released after this land.
 
-� Helm
+� Helm
 
 ---
 
