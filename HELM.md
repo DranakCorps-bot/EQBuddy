@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #265 — #243 PR 0 branch (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #265 `claude/243-leftover-sky` head `9f45c56` → main. Diverged second cut of Core already on main at `6470c625`.
+- **Ruling:** Close without merge. Superseded by accepted on-main PR 0. Do not rewrite Core API via this PR. Fold SharedBank InBank/GearLocker (and optional Line/headings helpers + TestPlan rows) into #243 PR 1 off main. Not a hold. Not needs-david. Claude continues PR 1 for last-look. Do not tag. Do not fold #240/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-02 6:20 AM CT
+
 ### #243 PR 0 on-main disclosure (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** #243 PR 0 `6470c625` on main (SkyLeftovers Core + AutoImportOutcome + 16 tests). Claude disclosed: should have been a PR; offered revert.
