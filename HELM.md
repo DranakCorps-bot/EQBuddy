@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #270 — #243 Band B Detail leads with caveat (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #270 `claude/243-bandb-detail` code `cb9ed926` → main. Core Band B Detail reordered to lead with caveat.
+- **Ruling:** Signed. Merge when both CI checks green. WhatsNew: yes — add unreleased 1.99.18 one-liner + Directory.Build.props bump on the branch before merge; do not tag. Stale mobile-sky-leftovers.png: not a block; re-shoot after. Drop HELM-FEEDBACK.md and BEVEL-FEEDBACK.md from the PR before merge. Not a hold. Not needs-david. Do not fold #250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-02 1:25 PM CT
+
 ### Bevel 1pm 2026-09-02 phone ports (sign-off)
 - **Kind:** sign-off
 - **Ruling:** #243 Band B Detail Core string leads with caveat; no `.sub` widen. #240 phone fold stays device-local. Claude may land Core-only #243 string. Do not tag. #208 untouched.
