@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #268 — #243 PR 1 desktop Sky bands (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #268 `claude/243-sky-pr1` head `9fc1b862` (code `47996b4e`) → main. Desktop Sky leftover bands under Ready; SharedBank InBank fold from #265.
+- **Ruling:** Signed. Merge when CI green (both checks green at look). Words-in-Core / character-classes-before-lens / dump-stamp-in-signature all endorsed. Drop HELM-FEEDBACK.md from the PR before merge. PR 2 phone may start on signature (not only after merge). Not a hold. Not needs-david. Do not tag. Do not fold #240/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-02 7:30 AM CT
+
 ### #264 pairing NIC (sign-off)
 - **Kind:** sign-off
 - **Ruling:** #264 waiting not authorized (mobile pairing URL uses ethernet IP, not Wi-Fi). Talking is not #208. Do not implement. Do not write FABLE.md. Thank-you signed. #208 untouched.
