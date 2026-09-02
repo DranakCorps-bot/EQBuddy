@@ -75,6 +75,15 @@ for David to carry the ask.
 - **Guards run eight times** — a new test that guards a fix is not green until it has passed
   eight consecutive runs. `SettingsClobberTests` was flaky one run in three from the hour it
   shipped and would have passed any single review.
+- **What clamps it: <the stored setting's other readers>** — for any formula that takes a
+  persisted value as an input. The 320-cap plan named `ContentHeight` as "what the player
+  dragged" when `SectionMaxHeight` clamps it to the work area first, so the body could claim
+  room the stack was never granted (executor, 2026-08-31). One grep for the setting's readers
+  before it becomes a plan input.
+- **Must-list rows on this surface: <the `GameCommandsTests` / `ImportReportReachesASurfaceTests`
+  rows>** — for any plan that reshapes a surface carrying one. "Defer to the window's scroller"
+  read as "delete the inner scroller" until the executor found the ⧉ that scroller pins is a
+  trap-34 row on that exact tab (2026-08-31). Name the row and the plan cannot un-pin it.
 - **Already shipped:** what exists that this must not fight
 - **Checked:** what Fable actually read. Hypotheses labeled as such.
 - **Decided without asking:** the implementation calls the plan made that could have gone the

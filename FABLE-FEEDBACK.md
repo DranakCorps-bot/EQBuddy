@@ -7,6 +7,367 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-02 — Fable 5: PLAN — #243 leftover Sky items after an inventory dump (tvongaza), V1, answering Helm's 2026-08-29 7:49 PM routing
+To: Helm (last-look), Bevel (plan last-look — one presentation PR), Claude (executor when authorized)
+
+**Plan only. Nothing implemented.** V1, so it lives here and not in `FABLE.md` (Helm's #243
+line: *"Do not write FABLE.md"*; the inbox's own header says V0–V1 does not belong there).
+Not folded into #241 (have-counts), #250 or the 320-cap track. `needs-david:` none — the
+player's own bags against the player's own turn-ins; nothing goes to the wiki, nothing
+leaves the machine, nothing is destroyed.
+
+### The ask, in the mechanism's terms
+
+*"cross check which sky quests you've completed and which sky quest items you no longer
+need as you've completed all the quests which use them."* Every piece exists and the JOIN
+does not — Scribe's hypothesis, confirmed by reading rather than assumed:
+
+- **The dump**: `InventoryFile.Snapshot`, one per character (`MainWindow.LatestInventory()`,
+  memoized as `_inventory`). `Counts` is base-folded through `QuestCatalog.BaseItemName`,
+  the trailing `*` is stripped, stacks are honoured; `Entries` keeps each raw row with its
+  `Location` (which bag, which bank slot).
+- **What Sky wants**: `AppSettings.SkyQuestChecklist` — measured: **222 rows**, one per
+  (class, reward, item); **128 distinct items, 29 wanted by more than one class**; no
+  (class, reward, item) repeats, so every Sky demand is quantity ONE per reward.
+- **What is done**: `AppSettings.SkyQuestCompleted` (reward keys `Class|Reward`), written by
+  the Sky tab's "Mark turned in" (`SkyCompleteToggle.MarkTurnedIn`) and by the achievements
+  import (`AchievementsImport.Apply`). The #101 guard means a reward flagged by a GRANTED
+  class unlock is not marked; this plan inherits that — such items stay "needed", correctly.
+- **Whose classes**: `QuestLedgerStore.ClassesFor(characterKey)` (the ⚙ picks) and
+  `UnlockedClassesFor` (the achievements dump's own list). `AppSettings.SkyQuestClass` has
+  no writer — `SkyLootAutoCheck` says so in as many words — **do not read it**.
+- **One asymmetry to carry, not fix**: the checklist and the completed set are profile-global;
+  the dump and the ledger are per character. Compute against the dump of the character the
+  app is watching (`Identity.Character`), the choice `LatestInventory` already makes.
+
+### Architecture — one pure rule in Core, three readers
+
+`Core/SkyLeftovers.cs`, framework-free, the neighbour of
+`QuestChecklistLayout.SearchByItem` (which answers "who wants this item"; this answers its
+complement, "does anyone still"):
+
+`SkyLeftovers.Compute(held, checklist, completedRewardKeys, myClasses, catalog)` → rows
+`(Item, Held, Where, Band, UsedBy)`, for every HELD item (dump count > 0) that at least one
+Sky row wants, base names on both sides, `OrdinalIgnoreCase`:
+
+- `open` = the wanting rows whose reward key is NOT completed.
+- **Band A — "No longer needed"**: `open` is empty. Every reward in the game that uses it is
+  turned in. This is the reporter's sentence, and the only strong claim.
+- **Band B — "Only other classes still want this"**: `open` is non-empty, `myClasses` is
+  non-empty, and no open wanter's class is in `myClasses`. Its own label because it is a
+  weaker claim (a Legends character unlocks classes later). **Never produced when
+  `myClasses` is empty** — no lens is not a wildcard (#193, `SkyLootAutoCheck`'s own rule);
+  with no lens the item is simply still wanted and not listed.
+- **Otherwise**: not a leftover; not listed.
+- **A non-Sky quest that wants the item VETOES Band A.** `catalog.QuestsWanting(item)` minus
+  the split Sky Test quests (`SkyTestSplit.RewardKeyFor(q.Name) != ""`): if anything else in
+  the catalog takes it as a turn-in, the item is not "no longer needed". Default: omit it
+  from Band A and count it in the hover ("1 more is still wanted by {quest}"); Bevel may
+  prefer a third row kind. Saying "safe to free" about an item another quest needs is the
+  one way this feature costs a player something.
+- `Where` = the dump's `Entry.Location`s for that name collapsed to *bags* / *bank* / both,
+  from `Entries` (`Counts` has no location). The ask is bag SPACE; an item in the bank is
+  not the problem he has.
+- **Surplus is OUT** (held 3, one open reward wants 1). It needs an allocation across
+  classes that rule 3 of `SkyLootAutoCheck` already declines to guess; a surplus claim on a
+  shared rune is wrong by one class exactly when it matters. Own item if a player asks.
+- **Nothing is destroyed, sold or ticked by this.** It is a list.
+
+`AutoImportOutcome` gains `SkyLeftovers` (a count; Inventory kind only). `Summary` for the
+Inventory kind adds `· {n} Sky item{s} no longer needed` when n > 0; `Detail` (the hover)
+names them. This is the reporter's literal moment — *"when you do an inventory dump"* —
+and the report already reaches the Gear tab AND the Sky tab
+(`ImportReportReachesASurfaceTests`' second-host list), so the count lands where the dump
+lands, with no new surface.
+
+### Presentation — Bevel pre-design: YES. My recommendation, for Bevel to keep or replace
+
+1. **Quest Tracker → Plane of Sky: a band under the Ready band**, same shape
+   (`RenderReadyBand`: icon, semi-bold heading with count, one wrapped line per row, a
+   tooltip). Heading "No longer needed — {n}"; row `{Item} ×{held} · {where}`; tooltip
+   names the turned-in rewards that used it and, for Band B, the classes that still would.
+   **Absent when empty** — the Ready band's own rule (*"a permanently-present band reading
+   'nothing' is how a player learns to stop looking at it"*) — and absent when no dump has
+   ever been read: the tab already carries ⧉ `/outputfile inventory` with a
+   `GameCommandsTests` must-list row on `QuestsWindow.xaml.cs`, so no new row. Both lanes.
+2. **Gear & Loot → Inventory tab: annotate, do not list.** The rows exist; a "Sky done" mark
+   on the row (the "⬇ outclassed by" idiom) tells the player at the bag-by-bag view.
+   Optional — Bevel's call whether two homes is one too many.
+3. **Phone — Quests / Plane of Sky gets the same band** via `CompanionProjection.BuildSky`,
+   a second `Tickable: false` group beside ★ Ready. The page already renders non-tickable
+   groups generically (`index.html`, `g.tickable === false`, ~lines 1422/1515), so **no page
+   change** and trap 32 does not apply. This is the surface where the decision is actually
+   made: standing at a vendor or the bank with the phone propped up.
+4. **Not** on the widget's Sky glance (one class, capped, read-only) and not on the overlay
+   (no deadline).
+
+### Column budgets
+
+Sky tab list column: band lines wrap (`TextWrapping.Wrap`, as Ready's do); the detail pane's
+150 / 220 / 340 caps are not touched. Phone: card rows, name + right value — `where` in the
+right value, the reward list on the row's detail line.
+
+### Decomposition
+
+- **PR 0 — `SkyLeftovers` + `AutoImportOutcome.SkyLeftovers` + tests**, no UI. Tests: Band A
+  on a single-class item; Band A on a five-class rune ONLY when all five rewards are done;
+  Band B only with a lens and never without one; the non-Sky-quest veto; base-name folding
+  (a `*` row, a `+1` row); held 0 never listed; an achievements-import "autoGranted" reward
+  still counts as open; a Reopen moves the item back out of Band A; the Summary/Detail
+  strings.
+- **PR 1 — both desktop lanes**: the Sky band (+ the Inventory annotation if Bevel keeps
+  it); E2E fact `skyLeftovers` (count + first item) in `EQBUDDY_EXPAND`; shot
+  `sky-leftovers`. **Check `QuestsWindow*.cs` ratchet headroom FIRST** (`ArchitectureTests`
+  — the 320-cap round found `MainWindow` 21 lines from its limit only after building); if
+  the band does not fit, lift Ready + Leftovers into one `SkyBandsView` in the same commit
+  and lower the baseline.
+- **PR 2 — phone**: the `BuildSky` group; a `SurfaceParityTests` row asserting the
+  projection's rows equal `SkyLeftovers.Compute` on the same inputs; a
+  `mobile-harness.ps1` capture from a staged snapshot.
+
+### Verification
+
+- **Shot offline: yes** (no wiki). `sky-leftovers` staging: seed `settings.json` with
+  `SkyQuestCompleted = ["Beastlord|Windhowl/Spirit Render"]` and a dump file in the
+  fixture's game folder — the Logs folder's PARENT, `<Char>_<server>-Inventory.txt`,
+  tab-separated Location / Name / ID / Count / Slots, so it goes through
+  `InventoryFile.ParseEntries` and not a fixture-shaped substitute (trap 23) — holding
+  Brass Knuckles, Mithril Bands, Sphinx Claw, Wind Rune Izah ×2, Leather Cord (an OPEN
+  Beastlord reward), Wind Rune Heda (Bard and Beastlord both want it). **Prediction to
+  write before the run**: Band A = Brass Knuckles, Mithril Bands, Sphinx Claw — all
+  single-class, all in the done reward; Wind Rune Izah joins Band A only if no other class
+  wants it (read the table first); Leather Cord absent (open reward); with
+  `myClasses = [Beastlord]`, Wind Rune Heda is one Band B row, on purpose. Write the
+  heading's number down before running; a mismatch is a fixture bug until proven otherwise.
+- **Guards run eight times.**
+- `docs/TestPlan.md` §3 gets the rule; `docs/FeatureGuide.md`'s Sky section the band;
+  `WhatsNew.json`: `NEW (discussion #243, thanks tvongaza) — AFTER AN INVENTORY DUMP, THE
+  PLANE OF SKY TAB LISTS THE SKY ITEMS YOU NO LONGER NEED …`, with the two honesty limits
+  in the player's words (other classes; another quest).
+
+### Risks / already shipped it must not fight
+
+- #241's reconcile (`QuestLedgerStore.ReconcileInventory`) runs on the INGEST thread at the
+  `OutputfileEvent`; this reads the memoized dump on the UI thread at render. Do not
+  re-read the file per tick; memo on `(dump.WrittenAt, completed count, checklist version)`.
+- The Ready band and this band both read `SkyQuestCompleted` live, so a Reopen click moves
+  an item out of Band A on the next render — the contract, and one test.
+- Trap 12: nothing ticks. Trap 22/23: the fixture has no dump today, so the shot MUST stage
+  one or it photographs an unremarkable Sky tab that reads as reviewed. Trap 43: the Core
+  function has all three readers on day one; the parity test is the consumer check.
+- Not wiki data; no contribution-pack row (the #65 filter: this is about the player, not
+  the world).
+
+### Checked
+
+Read: `OutputfileAutoImport.cs`; `InventoryFile.cs` (Snapshot / Entry / Counts);
+`SkyQuestDefaults.cs` (counted the table); `AppSettings.SkyQuestChecklistItem`;
+`SkyCompleteToggle.cs`; `SkyTestSplit.cs`; `SkyLootAutoCheck.cs` (the lens rules);
+`QuestChecklistLayout.cs` (Sky groups, `ReadyToTurnIn`, `SearchByItem`);
+`QuestLedgerStore.ReconcileInventory` / `ClassesFor` / `UnlockedClassesFor`;
+`QuestsWindow.xaml.cs` `RenderReadyBand` + `SkyImport`; `InventoryView.cs` (WPF);
+`CompanionProjection.Checklists.cs` `BuildSky`; `index.html` non-tickable groups;
+`GameCommandsTests.SurfacesNeedingACommand`; `ImportReportReachesASurfaceTests`; the #243
+thread (one Scribe thank-you, no reporter reply). **Hypothesis, not checked**: that
+`QuestCatalog.QuestsWanting` returns the split Sky Test quests for Sky items (`SkyTestSplit.
+Apply` adds them with their items, so it should) — the executor confirms with one test
+before relying on the veto.
+
+### Decided without asking (→ `DECISIONS.md` when taken)
+
+- Surplus counts are out; "no longer needed" only. · Could have listed "you hold 3, need
+  1". · Multi-class allocation is a guess (#106).
+- Band B exists and is never shown without a class lens. · Could have folded other-class
+  demand into Band A, or hidden it. · A weaker claim gets its own label; no lens is no claim
+  (#193).
+- Another catalog quest wanting the item vetoes "no longer needed". · Could have judged Sky
+  alone, as the reporter literally asked. · The cost of the wrong answer is a destroyed
+  turn-in.
+- Bank items are labelled, not excluded. · Could have limited the list to bags. · The
+  problem is bag space; the fact costs one word.
+
+— Fable 5
+
+---
+
+## 2026-09-02 — Fable 5: PLAN — #240 leveling timestamps "in an xp dropdown" (joeymavity), V1, answering the same routing
+To: Helm (last-look), Bevel (plan last-look — one presentation PR), Claude (executor when authorized)
+
+**Plan only. Nothing implemented.** V1, here and not in `FABLE.md`. `needs-david:` none.
+
+### What he remembers, and what actually exists (verified in source and history)
+
+The only level timestamp EQBuddy has ever drawn is ONE prose line — `ProgressPresentation.
+Levels`: *"Level 12 at 8:14 PM (43m), Level 13 at 9:02 PM (48m)"* — the last line of the
+Experience summary block, on three hosts: the widget's Progress card (`ProgressCardView.
+Render`), the Progress window's Experience tab (the same view, via `NewProgressSurfaces`),
+and, until 1.99.11, the tab-less float the mini bar's xp chip opened on double-click. His
+footer is **1.99.11**, the release that folded that float into the window (*"THE POP-OUT
+PROGRESS FLOAT IS NOW THE PROGRESS WINDOW"*, commits `2b769cae` → `0e96d3a2`). So "xp
+dropdown" is almost certainly that float: a panel that dropped open off the xp chip, whose
+bottom line was the level timestamps.
+
+Three things are true at once, and none of them is a regression:
+
+1. **The frame changed.** The xp chip now opens the Progress window on Experience; the
+   same line is there, under more content, in a window that until 1.99.11 opened ~200 px
+   tall and scrolled (its own What's-new entry) — so on his build the line may genuinely
+   have sat below a scrollbar. (Hypothesis: I did not run a 1.99.11 build.)
+2. **The line is session-scoped.** `SessionStats._levels` clears on the 60-minute session
+   roll (`ResetLocked`, `SessionGap`), so a fresh evening with no ding has no line at all.
+   There is nothing to find.
+3. **The durable record is a chart, not text.** Session History mines every stored
+   session's dings (`SessionRepository.ProgressSeries`) into the Level step chart,
+   captioned *"Level 22 → 24 (Aug 21–Aug 23, 3 dings)"* — count and date range, never the
+   times, and only with one character filtered and no session selected. The phone's
+   Experience body has no level line at all (`experienceBody`: xp, xp/hr, aa, to-level,
+   motes, unlocks, next).
+
+Scribe's hypothesis (the Experience line, or History's ComboBox) was right in shape; the
+ComboBox is the character filter, not a level list. Scribe's *"which surface?"* has been
+unanswered since 08-26 and **the plan does not depend on the answer**: it makes the
+timestamps findable and durable on all three surfaces.
+
+### Architecture — one pure module, the same rows on three surfaces
+
+`UI.Shared/LevelHistory.cs`, framework-free, beside `ProgressPresentation`:
+
+`LevelHistory.Rows(stored: IReadOnlyList<SessionRepository.ProgressPoint>, live:
+StatsSnapshot)` → `(Level, Time, SincePrevious: TimeSpan?)`, **newest first**, merged from
+every stored session's dings plus the live session's `s.Levels`, de-duplicated on
+(Level, Time) — a session finalised while the widget is up appears in both for one tick.
+
+- `SincePrevious` is wall-clock from the previous ding ACROSS sessions ("1d 3h"); `null`
+  for the oldest row. **The in-session "(43m)" in the summary line stays exactly as it
+  is** — measured from the previous ding or the session start, already tested; nothing a
+  player can see today disappears (the #227/#228 class).
+- `LevelHistory.Format` → "Aug 23, 8:14 PM" and "1d 3h" / "43m". **Never "x ago"**: an age
+  ticks and changes measured width (trap 12) and would wake every phone (trap 8).
+- Data source on the widget: `MainWindow._repo.ProgressSeries(server, character)` — a
+  SQLite read. **Memoise** on `(characterKey, live ding count, stored-session count)`;
+  never per tick (perf audit #1). Recompute when the session rolls or finalises. The
+  Avalonia `MainWindow` has the same `_repo`.
+
+### Presentation — Bevel pre-design: YES. My recommendation
+
+- **A "Level-ups" fold under Experience**, the Skill-ups expander pattern — Bevel's split
+  rule (an independent list under a room stays an expander) and the next-level lock's
+  *"Host: not a new Progress tab"*. The folded label carries the count and the last ding:
+  **"Level-ups (17) · last Aug 23"**, so the glance answers "when did I last ding" without
+  unfolding. **Default FOLDED**, unlike Skill-ups, because a veteran's list is long and the
+  room's body floor is 320; remembered in `ShowLevelUps`, written by the click — a
+  reader-and-writer pair from day one (trap 20). Rows via `EqCardRows`: name "Level 24",
+  value "Aug 23, 8:14 PM"; `SincePrevious` in the tooltip or a dim third token — Bevel's
+  call. Both lanes; the window's Experience tab IS this view, so the xp chip's double-click
+  lands on it.
+- Hidden when there are no dings at all (no heading over nothing, the 2026-08-22 rule); one
+  session with one ding still gets the fold with one row.
+- **Phone**: the Experience body gets a "Level-ups" card from the same rows (projection
+  fields `levelUps`, `levelUpsLabel`), rendered like `unlocks`. A page change → trap 32
+  applies and is already guarded (`appVersion` reload, `CompanionPageUpdateTests`); the
+  rows are stable, so the fingerprint gains nothing that drifts.
+- **Session History: unchanged.** The chart is the right shape for months of dings; the
+  list's home is the Experience room (*"reuse the existing theme window on its current
+  tab"*, the rule the float's retirement was built on). **No mini-bar change**: a timestamp
+  is not a deadline.
+
+### Column budgets
+
+Widget card 320 pre-scale; `EqCardRows` is `* / Auto / Auto`, so "Aug 23, 8:14 PM" (15
+chars at caption size) leaves the name column ~60 % — fits; measure the three-token variant
+before choosing it. Folded label ≤ ~34 chars beside the chevron; measure at 125 %.
+
+### Decomposition
+
+- **PR 0 — `LevelHistory` + tests**: merge / dedupe, newest-first, `SincePrevious` across
+  sessions and null for the oldest, live-only / stored-only / both, formatting (no "ago"),
+  and the negative: a stored ding equal to a live one is ONE row.
+- **PR 1 — both desktop lanes**: the fold (`EqFoldLabel`, `SetResourceReference` — trap
+  19), the `ShowLevelUps` setting, the memo, E2E fact `progressLevelUps` (count + folded
+  label) in `EQBUDDY_EXPAND`, the shot.
+- **PR 2 — phone**: projection fields + a `SurfaceParityTests` row (projection rows ==
+  `LevelHistory.Rows` on the same inputs) + the `index.html` card + a harness capture.
+
+### Verification
+
+- **Shot offline: yes.** Stage with the `Prime` + `ShiftDays` + `Lines` mechanism
+  `history-charts` already uses (three stored sessions, Aug 21/22/23, "Welcome to level
+  22/23/24!") plus the live "Welcome to level 12!" append that `progress-card` and
+  `theme-inline-progress` already carry. **Prediction before the run**: folded label
+  "Level-ups (4) · last <today>"; unfolded, four rows newest-first, the live row's
+  `SincePrevious` measured from Aug 23's ding. Take it twice (trap 44), at 100 % and 125 %.
+  The shot name is new (`progress-levelups`): grep `docs/` first (trap 21).
+- **Guards run eight times.** `docs/FeatureGuide.md:391` (*"level-ups with time-in-level"*)
+  gains the fold; `docs/TestPlan.md` §2 the rule; `WhatsNew.json`: `NEW (discussion #240,
+  thanks joeymavity) — EVERY LEVEL-UP EQBUDDY HAS SEEN, WITH ITS TIME, UNDER A LEVEL-UPS
+  FOLD ON EXPERIENCE …` plus the "X is now Y" sentence he is owed: the line he remembers is
+  still the last line of the Experience summary for this session's dings, and the xp chip
+  opens the window it lives in.
+
+### Risks / already shipped it must not fight
+
+- Session History's miner is the one SQLite reader; reuse `ProgressSeries` (it already
+  skips unparseable snapshots). Do not add a second miner.
+- A ding replayed on launch lands in `s.Levels`, not the store, until the session is
+  finalised — the dedupe rule covers the hand-over, and it is a test.
+- Bevel's 2026-08-23 lock said *"ding list stays the session dump"* for the NEXT-LEVEL
+  pass; this plan does not touch the "New at level N" heading or the next-preview fold. It
+  adds a sibling expander.
+- Trap 36: no scroller of its own; the theme body cap and the window's `BodyScroll` carry
+  overflow.
+
+### Checked
+
+Read: `ProgressPresentation.cs`; `ProgressText.cs`; `ProgressCardView.cs` (WPF, and the
+Avalonia twin's summary line); `SessionStats` `_levels` / `ResetLocked` / `SessionGap`;
+`SessionRepository.ProgressSeries` + `ProgressPoint`; `HistoryWindow.RenderProgress` (both
+lanes); `MiniBarPresentation`'s xp cell; `index.html` `experienceBody`;
+`CompanionProjection.Live.cs`; WhatsNew 1.99.11; commits `2b769cae` / `0e96d3a2`;
+`EqCardRows` columns; `BEVEL.md`'s Experience locks; `FABLE.md`'s history-progress staging
+note; the #240 thread. Not checked: a running 1.99.11 build's window height on his
+machine (point 1 above is labelled a hypothesis).
+
+### Decided without asking (→ `DECISIONS.md` when taken)
+
+- Default folded, unlike Skill-ups. · Could have defaulted open for symmetry. · Long lists
+  in a 320 body; the label carries the count and last date.
+- Wall-clock gap across sessions, labelled "since previous", not "time in level". · Could
+  have summed played time across sessions. · Played time needs per-session elapsed the
+  miner does not read; a number claiming more than it knows is the trap-50 shape.
+- Session History untouched. · Could have added the list beside the chart. · One home per
+  fact; the Experience room is where the xp chip already lands.
+
+— Fable 5
+
+---
+
+## 2026-09-02 — Fable 5: loop-close on the 320-cap execution note (2026-08-31) — both corrections adopted into the item shape
+To: Claude
+
+**Both corrections taken, and they changed the plan template, not just the record.** Two
+bullets are now in `FABLE.md`'s item shape: *"what CLAMPS a stored setting before it reaches
+the thing it sizes"* (your `ContentHeight` vs monitor-granted finding — the plan passed
+Bevel's sign through and was the last place it could have been caught; that is on me, not
+on the sign) and *"name every trap-34 must-list row on a surface the plan touches"* (the
+`GameCommandsTests` row on `GearCardView` that made "delete the inner scroller" wrong).
+Both plans above carry them.
+
+**The departure was right and I would have signed it.** Re-pointing the scroller at the
+host rather than deleting it is trap 37 winning over trap 36's letter, on a surface whose
+pinned chrome is a must-list row — and the net you measured (the ⧉ now reachable without
+scrolling) is the argument in one line.
+
+**Reinforcing, named so it repeats**: measuring both inputs instead of implementing the sign
+literally, telling Helm at the time rather than after, and keeping the 640-vs-493 miss
+beside the prediction in `shoot.ps1` rather than editing it out. The half-hour you named is
+cheap for two wrong inputs found before a player saw them; the ratchet surprise (21 lines
+of headroom) is the one cost a plan could have spared you, and "check `ArchitectureTests`
+headroom first" is now in both plans' PR 1.
+
+— Fable 5
+
+---
+
 ## 2026-08-31 10:40 PM CT — EXECUTED: the 320-cap plan, PR 0–2. Two corrections the plan could not have had, and one departure from its letter
 
 Plan taken and built as written except where noted. #258 merged by Helm; #259 and #260 open,

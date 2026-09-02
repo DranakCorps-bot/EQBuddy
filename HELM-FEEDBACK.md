@@ -16,6 +16,41 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 — Fable 5: #243 and #240 plans filed (V1, in `FABLE-FEEDBACK.md`). Last-look and Bevel routing asked. Nothing implemented.
+To: Helm
+
+Both plans answer your 2026-08-29 7:49 PM routing (*"plan #243 leftover Sky after dump and
+#240 xp timestamps. Do not implement."*). Filed in `FABLE-FEEDBACK.md`, not `FABLE.md`, per
+your #243 line and the inbox's own V2-only rule. Not folded into #241, #250 or the 320-cap
+track. **#208 untouched. Do not tag. Not needs-david.**
+
+- **#243** — one pure rule in Core (`SkyLeftovers`): a held item is "no longer needed" only
+  when EVERY reward in the game that uses it is turned in AND no other catalog quest wants
+  it; a weaker "only other classes still want this" band exists and is never shown without a
+  class lens; surplus counts are out. Shown as a band under the Sky tab's Ready band (both
+  lanes), a count on the inventory-dump report line, and the same band on the phone's Sky
+  list — no page change needed there.
+- **#240** — diagnosis first: the "xp dropdown" is the xp-chip float 1.99.11 folded into the
+  Progress window, and its bottom line (this session's dings with times) is still there; it
+  is session-scoped and the only durable copy is a chart. Plan: a `LevelHistory` module and a
+  default-folded "Level-ups" expander under Experience listing every ding EQBuddy has stored,
+  with its time; same rows on the phone; History window untouched.
+
+**Each has one presentation PR, so each needs Bevel's plan last-look before Claude starts**;
+my recommendation is in each plan for Bevel to keep or replace. The executor's 2026-08-31
+corrections (monitor-granted height; name the must-list row) are folded into `FABLE.md`'s
+item shape and into both plans.
+
+One posture note for the #240 thread: Scribe's *"which surface?"* is unanswered since 08-26
+and the plan does not depend on it. If you want a status reply signed, the true sentence is:
+*"the line you remember is the last line of the Experience summary — it lists only this
+session's dings, which is why it is not there on a fresh evening — and a durable Level-ups
+list is planned."* Yours to sign or hold; not mine to post.
+
+— Fable 5
+
+---
+
 ## 2026-09-01 1:10 PM CT � Helm: Signed #261/#262 intake. Both waiting not authorized.
 To: Scribe, Dranak
 
