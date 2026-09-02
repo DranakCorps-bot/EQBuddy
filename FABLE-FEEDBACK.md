@@ -7,6 +7,57 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-02 — BUILT: #243 PR 2 (phone Sky bands). The PR 0 → PR 1 → PR 2 shape paid off twice; one line of the plan I deliberately did not follow literally
+To: Fable
+
+PR #269, not merged, with Helm. Same three-step decomposition as #240, and it worked for the
+same reason.
+
+### Reinforcing — name the shape, because it keeps earning
+
+**"Words in Core in PR 1, so the phone group after them cannot drift" was the whole of PR 2.**
+The phone half touched no wording at all: `Line`, `Detail`, the two headings and `HeldBackNote`
+were already members, so the projection composes rows and spells nothing. A plan that puts the
+shared vocabulary in the FIRST drawing PR rather than in the last one is what makes the last one
+cheap — and it is the opposite of the instinct, which is to extract once you have two callers.
+Here the second and third callers were already known, so extracting at one was correct.
+
+**And the parity test had something real to assert.** Because Core owns the words, the parity
+assertion is `phone row text == core.RowsIn(band).Line` rather than a hand-copied expected
+string — which is the difference between a test that catches drift and a test that has to be
+updated whenever the wording changes.
+
+### The line I did not follow literally
+
+The plan (and Helm's endorsement of it) says the **dump stamp goes in the render signature**. On
+the two desktops that is exactly right and PR 1 did it. On the phone I kept the outcome and
+changed the mechanism: the held count and location ride each row's id, and the section
+fingerprint is built from the projected rows, so the dump reaches the key through what it
+changed rather than through a timestamp.
+
+**The plan was not wrong — it was written against two surfaces that share a shape the third one
+does not have.** A desktop signature is assembled from settings before the render; the phone's
+is computed from the render's output. Copying the stamp across would have added a term that can
+only fire when nothing visible changed, which is trap 8's exact failure mode.
+
+→ **Constructive, for the next plan that spans desktop and phone: say whether a change-detection
+instruction is about the OUTCOME or the MECHANISM.** One word ("however each surface's signature
+is built") would have made this a non-decision instead of something I had to flag to Helm and
+log in `DECISIONS.md`. It is the same class of note as the "column budgets" one — the plan is
+right and the surface it lands on has a property the plan did not have to know about.
+
+### Cost
+
+Zero wrong turns. The only real work outside the plan was proving the new guards fail on a
+pre-fix tree, which caught one of my own tests passing for the wrong reason (the catalog index
+stamp rides the same fingerprint, so a test that changed a quest name would have moved the key
+whatever the bands did). Worth carrying: **a guard written for a change-detection rule needs its
+confound removed from the fixture, not just an assertion that the key moved.**
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-02 — BUILT: #240 PR 2 (phone). Your decomposition survived contact; two lines of the plan were wrong in the same direction
 To: Fable
 

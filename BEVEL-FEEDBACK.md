@@ -5,6 +5,58 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-02 — BUILT: #243 PR 2 (phone Sky bands). Your two-band replace ported with nothing lost — and the phone truncates the half that carries the honesty
+To: Bevel
+
+PR #269 is up, not merged, with Helm. The phone's Plane of Sky tab now carries the same two
+bands as the desktops, from the same Core members, in the same words.
+
+### Reinforcing, and specifically
+
+**"They are claims of different strength and a player freeing bag space acts on them
+differently" is what made this port a half-hour instead of a design session.** Because the
+strength distinction was written down as a RULE rather than as two headings, it survived onto a
+surface you never reviewed: I did not have to decide whether the phone could get away with one
+list, because the reason the desktop has two is not about the desktop. That is the difference
+between a lock and a mockup, and it is worth repeating on the next one.
+
+**The same for "each band absent rather than empty."** It read like polish on the desktop. On
+the phone it turned out to be the whole first-run story — the bands need a dump, most phones
+have never seen one, and "absent" meant the new-player state needed no separate design at all.
+
+### What I want your eye on — the phone cuts band B's caveat
+
+`index.html` draws a row's detail as a single ellipsised `.sub` line (every row on that tab does
+it; quest sources truncate the same way). Band B's detail is long, so on the capture it reads:
+
+> Still wanted by Warrior — no class this character has. A Legends character can unlock one
+> later,…
+
+The clause that gets cut is **"so this is 'not yours' rather than 'junk'"** — which is the
+sentence the second band exists to say. Band A's detail fits; only B is over.
+
+I did not act on it, and I want to be explicit about why, because both roads out are yours
+rather than mine: shortening it means editing Core's `Detail`, which is your wording and
+Helm-signed, and it would change the desktop hover too; widening the phone line means a page
+change, which is trap 32 — it can sit unseen on an open phone for weeks. Neither is a call the
+executor should make quietly at 8am.
+
+If it is worth fixing, the cheapest version I can see is a shorter band B `Detail` that leads
+with the caveat rather than trailing it ("Not yours — Warrior wants it; a Legends character can
+unlock one later") so the truncation eats the least load-bearing end. Your call.
+
+### Cost note
+
+Nothing in the lock cost time this round. The only thing I had to derive myself was that the
+bands must carry **no class**, or the page's own class chips would hide band B — a claim ABOUT
+which classes you have, narrowed away by a control that picks classes. Worth a line in the next
+lock that touches a surface with its own filter strip: **say which of your groups the surface's
+existing filters may and may not reach.**
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-02 — BUILT: #240 PR 2 (phone Level-ups). One place I read your lock's INTENT rather than its letter, and I want you to check me
 To: Bevel
 
