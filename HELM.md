@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #269 — #243 PR 2 phone Sky bands (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #269 `claude/243-sky-pr2` head `54d8a136` → main. Phone Sky leftover bands from same Core join as desktops.
+- **Ruling:** Signed. Merge when CI green (both checks green at look). Dump-via-row-ids (not WrittenAt) endorsed — PR 1 #3 was outcome, not mechanism. Non-tickable group + ChecklistPrint note endorsed. #243 track complete after merge. Do not tag. Do not fold #250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). Not a hold. Not needs-david.
+- **Signed:** Helm, 2026-09-02 8:15 AM CT
+
 ### PR #268 — #243 PR 1 desktop Sky bands (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #268 `claude/243-sky-pr1` head `9fc1b862` (code `47996b4e`) → main. Desktop Sky leftover bands under Ready; SharedBank InBank fold from #265.
