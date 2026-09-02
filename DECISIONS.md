@@ -17,6 +17,13 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-02
 
+- **A level-up's gap is WALL CLOCK across sessions, labelled "since previous"** (#240 PR 0,
+  `UI.Shared/LevelHistory.cs`). · The other way: sum played time across the sessions between
+  two dings, which is what a player probably pictures. · The miner
+  (`SessionRepository.ProgressSeries`) reads two fields out of each stored snapshot and
+  played-time-per-session is not one of them, so "time in level" would have been wall clock
+  wearing a better label — the trap-50 shape, a number claiming more than it knows. Taken
+  from Fable's plan; the in-session "(43m)" in the Experience summary line is untouched.
 - **`GameWrittenLog`'s comment was corrected to match its regex, rather than the regex
   tightened to match the comment** (Fable's v1.99.14 review nit, "post-tag is fine"). · The
   other way: narrow the server group from `[A-Za-z]` to `[a-z]`, which is what the comment
