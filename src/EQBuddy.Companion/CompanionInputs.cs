@@ -1,4 +1,5 @@
 ﻿using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
 
@@ -10,15 +11,26 @@ namespace EQBuddy.Companion;
 /// they are all nullable or empty-by-default rather than required.
 /// </summary>
 /// <summary>The desktop's Experience state for one tick: what the ding opened, what the
-/// NEXT level opens, and the classes both were filtered by. A record rather than a tuple
-/// because it grew from two members to four in one change, and a four-tuple of
-/// <c>(int?, LevelUnlockSet, IReadOnlyList&lt;string&gt;, …)</c> is where a caller swaps
-/// two arguments and nothing complains.</summary>
+/// NEXT level opens, the classes both were filtered by, and every level-up this character
+/// has. A record rather than a tuple because it grew from two members to four in one
+/// change, and a four-tuple of <c>(int?, LevelUnlockSet, IReadOnlyList&lt;string&gt;, …)</c>
+/// is where a caller swaps two arguments and nothing complains.</summary>
+/// <param name="LevelUps">Every level-up EQBuddy has seen for the character being followed
+/// (#240), newest first, from the widget's own <see cref="LevelHistoryMemo"/> —
+/// <see cref="LevelHistory.Rows"/>, exactly as the Experience room draws them.
+///
+/// **POSITIONAL on purpose.** A member added here is a compile error on the lane that
+/// forgets it, which is the only guard the WPF widget has: the Avalonia twin's wiring is
+/// covered by reflection (`CompanionWiringTests`) and this one has no unit tests at all.
+/// `Raids` and `Progress` were added to `CompanionSources` five days after the record and a
+/// port from an older mental model would have looked complete without them — the same
+/// failure this shape makes impossible.</param>
 public sealed record CompanionProgressState(
     int? Level,
     LevelUnlockSet Unlocks,
     IReadOnlyList<string> Classes,
-    (int Level, LevelUnlockSet Unlocks)? Next);
+    (int Level, LevelUnlockSet Unlocks)? Next,
+    IReadOnlyList<LevelHistory.Row> LevelUps);
 
 public sealed record CompanionInputs
 {
@@ -81,6 +93,17 @@ public sealed record CompanionInputs
     public IReadOnlyList<string> UnlockClasses { get; init; } = [];
 
     public (int Level, LevelUnlockSet Unlocks)? NextUnlocks { get; init; }
+
+    /// <summary>Every level-up EQBuddy has seen for this character, newest first (#240,
+    /// joeymavity) — the rows the desktop's Experience room folds under "Level-ups".
+    ///
+    /// **Resolved desktop-side, like <see cref="Unlocks"/>**, and for a harder reason: the
+    /// stored half is a SQLite read over up to a thousand snapshots
+    /// (<see cref="SessionRepository.ProgressSeries"/>), scoped to the exact two strings the
+    /// ARCHIVER wrote its rows under. The widget owns both the repository and that identity,
+    /// and it hands over the finished list through a <see cref="LevelHistoryMemo"/> so a
+    /// paired phone does not put a database probe on every tick.</summary>
+    public IReadOnlyList<LevelHistory.Row> LevelUps { get; init; } = [];
 
     /// <summary>This character's raid clears, for the Progress theme's Raids tab. The
     /// LEDGER rather than a pre-built block: the projection needs to ask it per boss, and

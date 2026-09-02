@@ -259,6 +259,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // Every phone surface reads through these callbacks, which the host invokes
         // only for surfaces the owner offers and only while a device is paired — the
         // point of handing over lambdas rather than a pile of references.
+        // The phone's OWN Level-ups memo (#240) — a memo is state, so the Experience card
+        // keeps its own (trap 45); this one is captured by the Progress callback below.
+        var phoneLevels = new LevelHistoryMemo(StoredLevelDings, () => QuestCharacterKey);
         _companion = new Companion.CompanionHost(_settings, UpdateChecker.CurrentVersion.ToString(),
             new Companion.CompanionSources
             {
@@ -276,7 +279,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 {
                     var snap = CurrentSnapshot();
                     return new Companion.CompanionProgressState(snap.LastLevel,
-                        ProgressDingUnlocks(snap), UnlockClasses(snap), NextUnlockPreview(snap));
+                        ProgressDingUnlocks(snap), UnlockClasses(snap), NextUnlockPreview(snap),
+                        phoneLevels.Rows(snap));
                 },
                 // The Progress theme's Raids tab, wired in the same change as the desktop
                 // fold — both surfaces or neither (#210).

@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using EQBuddy.Companion;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -147,7 +148,23 @@ public class ScreenshotFixtureTests
             // So the Experience room's mote line has something to say — the other half
             // of what shipped that day, and it is drawn by the same body.
             Loot = [new LootDetail("Mote of Lesser Potential", 3, "a ghoul")],
+            // The live half of the Level-ups list: the ding that got this character to 12,
+            // an hour into the session. Stored dings below carry the three before it.
+            Levels = [new TimedDetail(now.AddHours(-1), $"Level {level}")],
         };
+
+        // Every level-up this character has (#240), through the REAL merge — three
+        // archived sessions plus the live ding, which is the state the fold is about: a
+        // list that outlives the session, with a gap between rows that spans nights. A
+        // hand-written list here would be trap 23 with a JSON key, exactly as the
+        // next-level split was.
+        var levelUps = LevelHistory.Rows(
+            [
+                new SessionRepository.ProgressPoint(now.AddDays(-2), 0,
+                    [(now.AddDays(-2).AddHours(-2), 9), (now.AddDays(-2), 10)]),
+                new SessionRepository.ProgressPoint(now.AddDays(-1), 0, [(now.AddDays(-1), 11)]),
+            ],
+            stats);
 
         var snap = CompanionProjection.Build(new CompanionInputs
         {
@@ -159,6 +176,7 @@ public class ScreenshotFixtureTests
             Unlocks = LevelUnlocks.UnlocksAt(classes, level),
             UnlockClasses = classes,
             NextUnlocks = LevelUnlocks.Next(classes, level),
+            LevelUps = levelUps,
             Theme = CompanionTheme.Project("midnight",
                 EQBuddy.UI.Shared.CustomTheme.PaletteFor(new AppSettings { Theme = "midnight" })),
         }, now);
@@ -178,6 +196,16 @@ public class ScreenshotFixtureTests
         Assert.Equal(3, progress.NextGroups![1].Rows.Count);
         Assert.Equal("Nothing new at 13", progress.NextGroups![0].Empty);
         Assert.Equal("3 motes · 1.5/hr", progress.MoteLine);
+        // And the Level-ups fold the harness is about to photograph: four rows newest
+        // first, the label the PC decided, and a gap on every row but the oldest. Written
+        // down BEFORE the run (trap 23) — a picture whose numbers nobody predicted has not
+        // been reviewed.
+        Assert.Equal("Level-ups (4) · last Aug 23", progress.LevelUpsLabel);
+        Assert.Equal(["Level 12", "Level 11", "Level 10", "Level 9"],
+            progress.LevelUps!.Select(r => r.Name));
+        Assert.Equal("Aug 23, 8:12 PM", progress.LevelUps[0].Value);
+        Assert.Equal("23h since the previous level-up", progress.LevelUps[0].Tip);
+        Assert.Null(progress.LevelUps[^1].Tip);
     }
 
     /// <summary>The quest surface's snapshot for the mobile harness and the README

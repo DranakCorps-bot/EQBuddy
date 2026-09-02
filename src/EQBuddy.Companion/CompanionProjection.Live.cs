@@ -124,7 +124,8 @@ public static partial class CompanionProjection
 
     private static CompanionProgressSection BuildProgress(
         StatsSnapshot? s, int? level, LevelUnlockSet? unlocks, RaidKillLedger? raids,
-        IReadOnlyList<string> classes, (int Level, LevelUnlockSet Unlocks)? next)
+        IReadOnlyList<string> classes, (int Level, LevelUnlockSet Unlocks)? next,
+        IReadOnlyList<LevelHistory.Row> levelUps)
     {
         unlocks ??= LevelUnlockSet.Empty;
         var stats = s ?? new StatsSnapshot();
@@ -182,7 +183,20 @@ public static partial class CompanionProjection
             ],
             NextGrouped: nextGroups is not null && LevelUnlockGroups.WorthGrouping(nextGroups),
             NextOpenIndex: nextGroups is null ? 0 : LevelUnlockGroups.DefaultOpenIndex(nextGroups),
-            MoteLine: MotesPresentation.RateLine(Motes.Summarize(stats.Loot, stats.Elapsed)));
+            MoteLine: MotesPresentation.RateLine(Motes.Summarize(stats.Loot, stats.Elapsed)),
+            // Every level-up this character has (#240, joeymavity), from the same
+            // LevelHistory rows the two windows fold under Experience — the phone gets the
+            // ROWS, not the two sources, so it cannot merge or de-duplicate them
+            // differently than the desktop does (#210's lesson, applied before the bug).
+            //
+            // Null label when there are no dings at all: no heading over nothing, the same
+            // rule the desktop fold follows, and the page draws no card for it.
+            LevelUpsLabel: levelUps.Count == 0 ? null : LevelHistory.FoldLabel(levelUps),
+            LevelUps:
+            [
+                .. levelUps.Select(r => new CompanionLevelUpRow(
+                    LevelHistory.Name(r), LevelHistory.Format(r.Time), LevelHistory.Tooltip(r))),
+            ]);
     }
 
     /// <summary>Coin and motes. Coin arrives PRE-FORMATTED because the phone cannot do

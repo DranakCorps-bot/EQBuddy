@@ -433,7 +433,38 @@ public sealed record CompanionProgressSection(
     /// from <c>MotesPresentation.RateLine</c> — the phone's Wealth tab carries the Motes
     /// card's own summary and this is the Experience room's line, both off one
     /// formatter.</summary>
-    string? MoteLine = null);
+    string? MoteLine = null,
+    /// <summary>The Level-ups fold's label — "Level-ups (17) · last Aug 23" — or null when
+    /// this character has never dinged while EQBuddy watched, which is the phone's "no
+    /// heading over nothing" (#240). It is <c>LevelHistory.FoldLabel</c>'s answer rather
+    /// than a count the page formats: the count and the last date are the glance the fold
+    /// is closed over, and a second formatter is how the phone and the window start
+    /// disagreeing about a string a player reads on both.</summary>
+    string? LevelUpsLabel = null,
+    /// <summary>Every level-up, newest first — the SAME rows the two windows draw, from
+    /// <c>LevelHistory</c> (<c>SurfaceParityTests</c> holds them to it).
+    ///
+    /// **Deliberately not capped at <c>MaxRows</c> like the lists above it.** This one is
+    /// bounded by the level cap rather than by how long you played, and it is ordered
+    /// newest-first — so a cap would drop the EARLIEST dings, which are the rarest rows and
+    /// the ones a player goes looking for (trap 50, #234). The desktop draws all of them;
+    /// a phone that quietly showed twenty would be a different answer to the same
+    /// question.</summary>
+    IReadOnlyList<CompanionLevelUpRow>? LevelUps = null);
+
+/// <summary>One level-up on the phone: "Level 24" · "Aug 23, 8:14 PM", plus the hover.
+///
+/// A record of its own rather than <see cref="CompanionUnlockRow"/> because of
+/// <see cref="Tip"/>, and the tip is Bevel's call (2026-09-02, Helm-signed): the gap since
+/// the previous level-up is HOVER text on all three surfaces, never a dim third token and
+/// never "x ago" — an age ticks, and a ticking string wakes every paired device on the
+/// section fingerprint (trap 8).</summary>
+/// <param name="Tip">Null for the oldest row, which has no previous ding to measure from.
+/// Carried per ROW rather than looked up by name: dying back a level and re-dinging it
+/// writes "Level 24" twice with a different gap each time, so a name-keyed lookup would
+/// answer the same thing for both — the same fact the desktop's <c>CardRow.Tip</c>
+/// exists for.</param>
+public sealed record CompanionLevelUpRow(string Name, string Value, string? Tip);
 
 /// <summary>One class's share of a level's unlocks. <see cref="Empty"/> is the words a
 /// class that gains nothing shows — a class row is KEPT rather than dropped (Bevel,

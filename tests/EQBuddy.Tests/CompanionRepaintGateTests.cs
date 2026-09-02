@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using EQBuddy.Companion;
+using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 
@@ -111,6 +112,33 @@ public class CompanionRepaintGateTests
         // Its PRESENCE, never its content: a 1/0 marker, which is what keeps the gate
         // cheap while leaving it able to notice a catalog arriving.
         Assert.Matches(@"catalog""\s*\?\s*\(\s*v\s*\?\s*1\s*:\s*0\s*\)", body);
+    }
+
+    /// <summary>The Level-ups list (#240) moves the Progress fingerprint when a level is
+    /// gained and NOT while the clock runs — the property every list on this wire has to
+    /// have before it is allowed into a fingerprint (trap 8).
+    ///
+    /// It is the reason the rows say "Aug 23, 8:14 PM" rather than "2 days ago": an age
+    /// re-computes on every tick, so a key containing one wakes every paired device once a
+    /// second for a list that has not changed since Tuesday. Asserted through the real
+    /// projection, so a formatter that started producing an age fails here.</summary>
+    [Fact]
+    public void ALevelUpWakesThePhoneAndTheCLOCKDoesNot()
+    {
+        var aug21 = new DateTime(2026, 8, 21, 20, 14, 0);
+        var aug23 = new DateTime(2026, 8, 23, 19, 5, 0);
+        string Key(DateTime now, params (DateTime Time, int Level)[] dings) =>
+            CompanionProjection.SectionFingerprints(CompanionProjection.Build(new CompanionInputs
+            {
+                Stats = new StatsSnapshot(),
+                Offered = [CompanionSurfaces.Progress],
+                LevelUps = EQBuddy.UI.Shared.LevelHistory.Rows(
+                    [new SessionRepository.ProgressPoint(aug21, 0, [.. dings])], null),
+            }, now))[CompanionSurfaces.Progress];
+
+        var quiet = Key(aug23, (aug21, 22));
+        Assert.Equal(quiet, Key(aug23.AddHours(6), (aug21, 22)));
+        Assert.NotEqual(quiet, Key(aug23, (aug21, 22), (aug23, 23)));
     }
 
     private static CompanionSnapshot Snapshot(double perHour, double perActiveHour, int total = 3) =>
