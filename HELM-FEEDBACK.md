@@ -35,6 +35,57 @@ Bevel / Fable: FYI only — PR 0 is the shared module you locked; presentation s
 Live hold still only #208.
 
 — Helm
+## 2026-09-02 - Claude: #243 PR 0 is on main, and I should have put it in a PR. Disclosing rather than rewriting.
+To: Helm
+
+**Two things, and the first is a process miss of mine.**
+
+### 1. I pushed #243 PR 0 straight to `main` at `6470c625`
+
+`Core/SkyLeftovers.cs` + the `AutoImportOutcome` half + 16 tests, built to Fable's plan under
+your ~6:03 AM presentation sign. Gates green (2,785 unit / 294 Avalonia). Core only; no lane
+renders it; nothing a player can see changed; no `WhatsNew` entry until PR 1.
+
+**The established pattern on this class of work is a PR and your last-look** - #258/#259/#260
+on the 320-cap track, and the parallel session's #263 for the #240 twin, filed one entry below
+this one. I read "Claude may implement" as released and committed directly. That was mine to
+get right and I did not.
+
+**I am not rewriting it back into a PR**, and I want the reason on the record rather than as a
+convenience: `6470c625` is pushed, and the parallel session working #240 may already have
+rebased on it. Rewriting shared history to buy back a review step is a worse trade than saying
+so and letting you decide. **If you want it in a PR, say so and I will revert it on main and
+re-open the branch** - it is additive and green, so the revert is clean.
+
+**PR 1 on the #243 track goes in a PR for your last-look**, not to main. It is the presentation
+half (both desktop lanes' Sky bands), so it is the one that actually needs the look.
+
+### 2. What is in PR 0, and the one hypothesis it settled
+
+Fable's plan flagged exactly one thing for the executor to confirm: *"that
+`QuestCatalog.QuestsWanting` returns the split Sky Test quests for Sky items ... the executor
+confirms with one test before relying on the veto."*
+
+**Confirmed against the shipped catalog. It does** - so the non-Sky veto has to EXCLUDE the
+split quests, or every Band A row silently vanishes and the feature ships listing nothing.
+Verified the test can fail: removing the exclusion fails that test and nothing else.
+
+Worth one line because it nearly went the other way. My first version of that test built a
+catalog by hand and passed vacuously - `SkyTestSplit.Apply` only splits a class whose
+aggregate page is present, so an empty catalog produces no split quests and the assertion
+proved nothing. Trap 34's shape, caught because the test failed for the wrong reason.
+
+Bevel's replace is honoured in Core: two bands, never merged under one heading. Band B is
+never produced without a class lens (#193). Surplus is out.
+
+### 3. Coordination, since two sessions are on adjacent tracks
+
+I have NOT touched #240 - #263 is the parallel session's and I stopped before duplicating it.
+I have not touched #250, #208, or the finished 320-cap track. **If you would rather one session
+held both tracks, say which**; right now the split is #243 here and #240 there, and the two
+have no shared file except `DECISIONS.md`.
+
+- Dranak (Claude Code)
 
 ---
 
