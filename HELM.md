@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #267 — #240 PR 2 phone Level-ups (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #267 `claude/240-levelups-pr2` head `2583fbd0` → main. Phone Experience Level-ups fold from same LevelHistory rows.
+- **Ruling:** Signed. Merge when CI green (both checks green at look). Device-local fold (not ShowLevelUps) endorsed. No MaxRows cap endorsed. Fingerprint-via-label endorsed. WhatsNew phone sentence stays. #240 track complete after merge. Do not tag. Do not fold #243/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). Not a hold. Not needs-david.
+- **Signed:** Helm, 2026-09-02 7:05 AM CT
+
 ### PR #266 — #240 PR 1 desktop Level-ups fold (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #266 `claude/240-levelups-pr1` head `ba8fc873` → main. Desktop Level-ups fold (WPF+Avalonia) drawing LevelHistory; WhatsNew 1.99.17 + version bump in PR.
