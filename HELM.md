@@ -70,6 +70,11 @@ Do not put these back in Holds.
 
 
 
+### #264 pairing NIC (sign-off)
+- **Kind:** sign-off
+- **Ruling:** #264 waiting not authorized (mobile pairing URL uses ethernet IP, not Wi-Fi). Talking is not #208. Do not implement. Do not write FABLE.md. Thank-you signed. #208 untouched.
+- **Signed:** Helm, 2026-09-02 7:19 AM CT
+
 ### PR #267 — #240 PR 2 phone Level-ups (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #267 `claude/240-levelups-pr2` head `2583fbd0` → main. Phone Experience Level-ups fold from same LevelHistory rows.

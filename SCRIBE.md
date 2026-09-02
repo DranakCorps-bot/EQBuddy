@@ -16,17 +16,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
-### EQBuddy mobile setup link uses ethernet IP, not wifi IP (companion setup)
-- **Priority:** waiting (blocked on a repro; not authorized)
-- **Place:** EQBuddy mobile/companion setup flow that prints the setup link with the machine's local IP. Player session. Not shared game truth — the wiki-first / eqlwiki rule is not triggered by this ask. Not #208 mobile sounds (different ask, different reporter). Do not fold.
-- **Source:** #264 brhanson2-cyber Sep 2 11:14 UTC (~6:14 AM CT). https://github.com/DranakCorps-bot/EQBuddy/discussions/264 New thread. 0 replies. Footer: _EQBuddy 1.99.16 · Windows 26200_.
-- **Ask (verbatim, the whole entry):** "When setting up eqbuddy mobile the link it gives me is the ip address of my ethernet, not my wifi.  How do I force it to give me a link using the wifi ip (i make sure my phone is on the same wifi)  Thank you"
-- **Already shipped:** companion setup link with no "force wifi" option visible on-thread; not verified against a build this pass (no code opened).
-- **Hypothesis, unchecked (labeled):** the setup link likely binds/reports whichever local interface the machine enumerates first (ethernet here). A repro note needs which build, how the phone reached it, and whether ethernet was the only interface up — the reporter has ethernet AND wifi up. No log requested yet; do not ask before Helm rules.
-- **Holds re-read:** HELM.md live hold is only #208 (mobile sounds, do not open the work). This thread does not touch it. Talking to brhanson2-cyber is fine; opening companion-setup work is not. Do not implement. Do not open the work.
-- **Helm:** NEW THREAD — draft below awaiting sign. Do not post until signed.
-- **Draft thank-you (DranakCorps-bot):** "Hi brhanson2-cyber — thanks for flagging the ethernet-vs-wifi IP on the mobile setup link; that's a sharp catch and exactly the sort of thing worth filing. I've captured it and sent it along for review — no date from me, just making sure it's in front of us."
-- **Scribe 2026-09-02 (intake):** Filed. Wait for Helm's sign. #261/#262 stay pending their own Helm pass. #208 untouched.
+### mobile pairing link uses ethernet IP, not Wi-Fi
+- **Priority:** waiting (new thread; not authorized.)
+- **Place:** EQBuddy Mobile pairing URL / QR (the address a phone scans). Player LAN. Not shared game truth / eqlwiki. Not a group meter. Nearby #208 is mobile sounds — talking is fine; do not open that work. Do not fold.
+- **Source:** #264 brhanson2-cyber Sep 2, 6:14 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/264 New thread. Category: Q&A. 0 replies. Footer: EQBuddy 1.99.16 — Windows 26200.
+- **Replied:** 2026-09-02 ~7:20 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/264#discussioncomment-18249434
+- **Ask:** "When setting up eqbuddy mobile the link it gives me is the ip address of my ethernet, not my wifi. How do I force it to give me a link using the wifi ip (i make sure my phone is on the same wifi) Thank you"
+- **Already shipped:** latest tag v1.99.16 (reporter is on it). Pairing URL is `http://{BoundAddresses[0]}:{port}/#{token}` (`CompanionHost.PairingUrl`). The pairing window prints that one URL and QR (`CompanionWindow`: `_urlBox.Text = url`). `LanAddresses()` ranks NICs with `LanAddressRank`: default gateway beats no-gateway; virtual/VPN description fragments (Hyper-V, vethernet, WSL, Tailscale, —) are penalized; RFC1918 is a tiebreak. Equal scores keep OS enumeration order. Copy talks about same-Wi-Fi / guest isolation / firewall (`CompanionPairingText`). No Wi-Fi-vs-ethernet preference and no "force this NIC" control was grepped. Regenerating mints a new token, not a new NIC.
+- **Checked:** WINDOW (EQBuddy Mobile pairing, source). WIDGET (📱 / Options Behavior opens that window, source). PHONE (the scan target; it does not pick the PC’s NIC). I could not check the binary. No screenshot.
+- **Hypothesis, checked against source, unchecked against his NICs:** ethernet and Wi-Fi both have gateways, rank the same, and Windows enumerated ethernet first, so BoundAddresses[0] is ethernet. Named SOURCE is the quoted sentences plus the 1.99.16 footer. Do not claim a force-Wi-Fi setting exists.
+- **Class:** V0—V1 (which BoundAddresses[0] the QR prints). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Helm 2026-09-02 7:19 AM CT:** Thank-you signed. Waiting, not authorized. Do not implement. Do not fold into #208. #208 untouched.
 
 ### Server Status Widget (new feature ask)
 - **Priority:** someday (real ask, not this gate; not authorized)
@@ -182,6 +183,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Priority:** authorized V0–V1 (Helm/David 7:49 PM CT)
 - **Place:** player history (level times). Not shared game truth / eqlwiki. Not a group meter. Nearby #215 is rollback/archives (xp, levelups) — different ask; do not fold. #228 joeymavity is motes / mez / respawn — do not fold.
 - **Source:** #240 joeymavity Aug 26, 11:44 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/240 New thread. Category: Ideas. 0 replies. Footer: EQBuddy 1.99.11 · Windows 26200.
+- **Replied:** 2026-09-02 ~7:20 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/240#discussioncomment-18249435
 - **Ask:** "At one point I thought you had leveling timestamps in an xp dropdown, I can't find it now."
 - **Already shipped:** no control whose label is "xp dropdown" was grepped. Latest tag is v1.99.12 (shipped today; reporter's footer is 1.99.11). FeatureGuide Experience tab: "level-ups with **time-in-level**". Desktop Experience summary (`ProgressCardView` → `ProgressPresentation.SummaryLines`) adds that line only when this session has dings: `Level {N} at {h:mm tt} ({minutes}m)` (`SessionStats.cs:1882` Text is `$"Level {l.Level}"`; `ProgressPresentation.cs:58`). WhatsNew 1.65.0: "character progress charts in Session History — pick a character and see Level over time (every ding, exact times, a staircase not a slope)". History WINDOW: ComboBox `CharFilter` (character picker, not labeled XP); `HistoryWindow.xaml.cs:233` "Levels come from ding lines (exact times)"; caption "Character progress — every stored session" / `Level {min} → {max} ({MMM d}–{MMM d}, {n} dings)` only when a single character is filtered. Mini-bar key `xp` is named "Experience" (`MiniBarPresentation.cs:64`). WhatsNew 1.99.11: "Double-clicking the xp chip on the minimized bar used to open a small fixed panel that showed Experience and nothing else" — it now opens the Progress window, Experience first. Phone Experience (`experienceBody`) draws xp / xp/hr / aa / to level / mote line / unlocks / next; Companion does not call `ProgressPresentation.Levels`.
 - **Checked:** WIDGET (Progress Experience + mini-bar xp name, source). WINDOW (Session History + Progress window, source). PHONE (Companion / `experienceBody`, source). I could not check the binary.

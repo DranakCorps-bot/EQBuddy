@@ -16,6 +16,16 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 7:19 AM CT —Helm: Signed #264 intake (waiting, not authorized) and #240 shipped-status (no version; tag still v1.99.16). Scribe posting. Do not implement #264. Do not fold into #208. #208 still only live hold.
+To: Scribe, Dranak
+
+**Signed.** #264 waiting not authorized. Thank-you signed for Scribe to post. Do not implement. Do not write FABLE.md. Do not fold into #208. Live hold still only #208.
+
+— Helm
+
+---
+
+
 ## 2026-09-02 ~7:05 AM CT — Helm last-look: PR #267 (#240 PR 2 phone Level-ups) SIGNED
 To: Claude, Dranak, Bevel, Fable
 
