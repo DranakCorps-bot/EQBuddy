@@ -600,7 +600,7 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_EXPAND = 'progress' }
                            Ledger = @{ Classes = @('Warrior', 'Druid', 'Monk'); Level = 12 }
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
-    'spawns-window'   = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
+    'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:
     # 'spawns-window' is embedded by the docs and stays Runnyeye. PREDICTION, written
     # before the shot: Bzzzt, Bazzt Zzzt, The Spiroc Guardian and The Spiroc Lord read
@@ -610,8 +610,11 @@ $Shots = [ordered]@{
     # prediction here said "7d"/"6h" and was wrong, because RaidInstanced blanks the
     # default (trap 23: the render was right, the prediction was not). Only the four
     # catalog names outside that list (a presence, Gwan, Key Master, Sirran) read "8h".
+    # 2026-09-02 re-shoot (World title fix): held, with the enumeration above corrected -
+    # Bzzazzt is a fourth non-triggered, non-instanced row and reads 12h, not 8h. The
+    # catalog did not change; the prediction was written short.
     # Nothing is seeded: the rows ARE the shipped catalog, which is the point.
-    'spawns-sky'      = @{ Title = 'Spawn'; Env = @{ EQBUDDY_SPAWNS = 'Plane of Sky' }; Set = @{ TrackSpawns = $true } }
+    'spawns-sky'      = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Plane of Sky' }; Set = @{ TrackSpawns = $true } }
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     # Options → Cards & windows, which is the screen a player opens when a card has gone
     # missing — #219 (typical-usual-chaos) went looking for Motes here and found nothing
@@ -701,7 +704,7 @@ $Shots = [ordered]@{
     'whats-new'       = @{ Title = "What's new in EQBuddy"
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
-    'zone-map'        = @{ Title = 'Zone Map'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
+    'zone-map'        = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
     # The KILLS & DROPS theme (2026-08-21). Both were reachable before the fold — one as
     # a widget card, one as a cog-menu window — and both are tabs now, so both get a shot:
     # a tab nobody photographs is a tab nobody reviews (trap 22).

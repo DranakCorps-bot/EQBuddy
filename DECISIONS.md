@@ -15,6 +15,42 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-02
+
+- **`GameWrittenLog`'s comment was corrected to match its regex, rather than the regex
+  tightened to match the comment** (Fable's v1.99.14 review nit, "post-tag is fine"). · The
+  other way: narrow the server group from `[A-Za-z]` to `[a-z]`, which is what the comment
+  claimed and would shrink the destructive target slightly. · Declined because it changes
+  what a DESTRUCTIVE gate does to a player's files on no evidence: Fable's own 2026-08-29
+  check found eqlwiki has no server list at all, so "every server short name is lower case"
+  is an assumption — and the assumption already written down is the thing being removed.
+  Replacing one unevidenced claim with an unevidenced behaviour change is a worse trade than
+  telling the truth about the character set. Trap 47/48's family; `src/EQBuddy.Core/GameWrittenLog.cs`.
+- **The What's-new guard FAILS the build rather than warning**, and it compares against the
+  newest tag only. · The other way: warn (an old entry might legitimately need a typo fix),
+  or compare every entry against its own tag. · A shipped entry is the record of what players
+  were told, so amending one is the defect, not an exception to it — and a warning on a gate
+  that fires twice in three releases is a line people stop reading. Newest-tag-only is not a
+  shortcut: that tag's copy of the file already contains every older entry, so one `git show`
+  covers the whole history. `scripts/whatsnew-guard.ps1`, wired into `check.ps1` (first stage)
+  and `release.ps1` (`-Releasing`, before anything is built or signed).
+- **README's two un-regenerable World captures were RE-CAPTIONED, not replaced or deleted.**
+  · The other way: shoot new ones, or drop the rows. · `map-window.png` and
+  `travel-window.png` show surfaces that still exist in content and are gone in chrome; a new
+  Map shot needs a maps folder the throwaway profile has not got, and a new Path shot needs a
+  destination no env hook can set. So each caption now names the current home in the repo's
+  own "X is now Y" form — the moved-surface rule applied to the README instead of to a
+  release note — and says plainly that the capture predates the fold. Dropping the rows would
+  have removed the only picture of a real feature. `README.md`; the residual shot work stays
+  on the `FABLE.md` README-screenshots item.
+- **The What's-new guard also runs in CI, which Fable's follow-up did not ask for**, and the
+  checkout in `ci.yml` goes to `fetch-depth: 0` to make that possible. · The other way: leave
+  it at the two homes named (`check.ps1`, `release.ps1`). · Both of those need a human to run
+  them, and the defect being guarded is one nobody noticed twice — a gate that depends on
+  being remembered is the thing this repo keeps writing traps about. A shallow checkout has
+  no tags, so the guard would have skipped cleanly and read as coverage (trap 34). Costs one
+  full clone per CI run. `.github/workflows/ci.yml`.
+
 ## 2026-08-31
 
 - **`GearCardView`'s inner scroller was RE-POINTED at the host, not deleted**, though the

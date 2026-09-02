@@ -287,6 +287,7 @@ guards below are the deliverable and not a nicety.
 | **A running EQBuddy is stood down before shooting and relaunched afterwards** — it is always-on-top and holds the same titles, so a capture of it is the wrong app in whatever unseeded state it happens to be in. Closed gracefully, so the live session still finalizes into `history.db` | **Auto** — `shoot.ps1` |
 | **The quick tour's illustrations show the app that ships** — every page can be opened directly (`EQBUDDY_TOUR=<page>`, 1-based) so the pictures can be looked at without installing and clicking Next. They were a month stale, showing emoji card icons, a card called "Tracked" and no KPI strip, for exactly that reason | **Manual** — `pwsh scripts/shoot.ps1 -Shot tour-widget,tour-combat,tour-watch,tour-mini,tour-history` |
 | **A shot's staging list that enumerates an enum by hand grows with it** — `mini-bar` disables every `BreakoutKind`, and when `Progress` joined the enum the shot silently began photographing the Progress breakout instead of the mini bar — the same list needed editing again on 2026-08-25 when `Progress` LEFT the enum | **Manual** — `pwsh scripts/shoot.ps1 -Shot mini-bar`; the capture must be the wide pill, not a window |
+| **A shot fixture's `Title` survives the window it names being FOLDED AWAY** - `shoot.ps1` stops on the first failure, so one stale title takes the whole batch down and every shot after it with it. `spawns-window`, `spawns-sky` and `zone-map` matched the three windows World PR 2 deleted, and a batch run died at shot 37 for six days and four releases while single `-Shot` runs kept working | **Manual** - `pwsh scripts/shoot.ps1` with no `-Shot`, which is the only run that proves the rest |
 | **A capture pins the palette it is shooting** — `AppTheme`'s brushes are process-wide singletons and `AppThemeTests` walks the whole catalog, so an unpinned capture renders in whatever theme ran last | **Auto** — `WidgetSheetTests` |
 
 ## 4f. Surfaces that ask you to run an in-game command
@@ -481,6 +482,7 @@ Fixture logs: see [FeatureGuide.md](FeatureGuide.md) §"Testing without playing"
 | Every test class cited in the Held-by column above exists | **Auto** — `DocumentationTests` |
 | The ratchet table in `docs/Architecture.md` matches `ArchitectureTests`' baselines | **Auto** — `DocumentationTests` |
 | `CLAUDE.md` links the other docs, so none is orphaned | **Auto** — `DocumentationTests` |
+| **A What's-new entry that has already SHIPPED is never edited afterwards, and a release never reuses a tagged version's heading** - the entry is the record of what players were told, and twice in three releases a session wrote new work under an already-tagged heading, where it would never have reached any popup. No unit test can see it: the defect is a disagreement with a git tag | **Auto** - `scripts/whatsnew-guard.ps1`, first stage of `check.ps1`; `-Releasing` in `release.ps1` before anything is built or signed |
 
 This is the mechanism behind §7. Documentation rots when keeping it true is a habit;
 it stops rotting when the build fails. It caught a wrong path in `CLAUDE.md` on its

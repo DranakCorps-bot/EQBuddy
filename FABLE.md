@@ -703,6 +703,33 @@ is unreachable at any fraction below 1.0 — and repeated same-character primes 
 not three. Staging this needs per-prime-run log content, which `Prime` does not currently
 support. **That is the actual work item, and it is bigger than a shot.**
 
+**Update 2026-09-02 (Claude): the three that "got worse" are addressed, and the batch that
+takes all of them was BROKEN and nobody knew.** `spawns-window`, `spawns-sky` and `zone-map`
+still matched on the titles of the windows World PR 2 deleted, so `shoot.ps1` with no `-Shot`
+died at shot 37 and the 23 shots after it were unreachable in a batch from 1.99.13 to
+2026-09-02 — new trap 53. Titles now match `EQBuddy World`; all three re-shot and committed
+(`spawns-window` is the World ▸ Camps tab at Runnyeye, prediction written first and held).
+`zone-map` re-shot honestly as the **no-maps-folder empty state**, because the throwaway
+profile has no maps folder — a real state, and NOT a replacement for `map-window.png`.
+README's two un-regenerable World captures were re-captioned in the repo's own "X is now Y"
+form (Zone map → World ▸ Map, Travel route → World ▸ Path, plus the Camps and Map-tab
+pointers on the spawn-timer, spawn-circle and zone-share cells), each saying plainly that the
+capture predates the fold. Logged in `DECISIONS.md`.
+
+**Still open on this item, and now scoped rather than guessed:**
+- `map-window` / `spawn-circles` need a **maps folder** in the throwaway profile.
+  `ZoneMap` looks for `<game>/maps` beside `Logs` (`ZoneMap.cs:164-171`), and David's install
+  has one (214 files). A `Maps = @('commons')` staging block in `shoot.ps1` that copies from
+  the real install when present and skips with a note when absent would make both
+  regenerable — on a machine with the game installed, which `shoot.ps1` already requires in
+  spirit. The `/loc` marker needs one appended `Your Location` line; the fixture has none.
+- `travel-window` needs `EQBUDDY_TRAVEL` to take a DESTINATION zone the way `EQBUDDY_SPAWNS`
+  already takes a zone; `TravelView` routes only on a typed destination plus a click and has
+  no settings-backed one. **Check `ArchitectureTests.Hotspots` first** — `MainWindow` had 16
+  lines of headroom on 2026-09-02.
+- Unrelated finding while reading `TravelView.cs:74`: the route list draws a 📍 **emoji**,
+  not an `IconPaths` vector (#148/#166). Not touched; not this item.
+
 ### The other 12, for whoever picks this up
 
 `cursor-ring`, `feedback-and-alert`, `fight-timeline`, `map-window`, `mobile-map-phone`,

@@ -26,7 +26,7 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ## Things worth knowing before reviewing this codebase
 
-- `CLAUDE.md` is the orientation and carries a **42-entry trap list**, every entry a bug
+- `CLAUDE.md` is the orientation and carries a **trap list — 54 entries on 2026-09-02** and still growing, every entry a bug
   that reached a release. Read it before asserting anything about how the app behaves.
 - **Both UIs, always.** WPF (`src/EQBuddy`) and Avalonia (`src/EQBuddy.Avalonia`) ship
   together; a fix on one lane only is how #122 and #152 reached Linux.
@@ -36,8 +36,9 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 - **`docs/screenshots/` is committed and current** — real captures of real windows against
   a seeded fixture. It is the fastest way to see what the app actually looks like without
   running it.
-- The gates are `pwsh -NoProfile -File scripts/check.ps1` (2,256 unit + 264 Avalonia) plus
-  a separate 18-test E2E suite that launches the real app.
+- The gates are `pwsh -NoProfile -File scripts/check.ps1` (the What's-new guard, build, unit
+  and Avalonia suites — the counts move every week, so read the run rather than a number here)
+  plus a separate E2E suite that launches the real app.
 
 ---
 

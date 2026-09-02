@@ -34,9 +34,21 @@ namespace EQBuddy.Core;
 /// </summary>
 public static class GameWrittenLog
 {
-    // Anchored, and deliberately not IgnoreCase on the server: the game writes the
-    // server short name in lower case. Case-insensitivity here would buy nothing and
-    // would widen the target back toward the thing being fixed.
+    // Anchored, and case is deliberately NOT a discriminator on either segment.
+    //
+    // This comment used to say the opposite — "deliberately not IgnoreCase on the server:
+    // the game writes the server short name in lower case" — while the pattern below spells
+    // [A-Za-z], which accepts either case by construction. The claim and the regex
+    // disagreed, and on a gate that DESTROYS a player's file the comment is the thing a
+    // reader trusts. Narrowing to [a-z] was the other way to reconcile them and is not
+    // taken: no server list exists anywhere to say that every short name is lower case
+    // (searched on eqlwiki, 2026-08-29 — there is no Servers page), so tightening would
+    // rest on an assumption, and the one it replaced is the same assumption written down.
+    //
+    // What actually separates a game-written name from a rename is the character SET, not
+    // its case: a rename adds digits, a dash, a space, a dot, "(1)", " - Copy". Case buys
+    // nothing against any of those. The residual letters-only-rename gap is unchanged and
+    // is stated in the type's own summary above.
     private static readonly Regex Shape = new(
         @"^eqlog_[A-Za-z]+_[A-Za-z][A-Za-z_]*\.txt$", RegexOptions.CultureInvariant);
 

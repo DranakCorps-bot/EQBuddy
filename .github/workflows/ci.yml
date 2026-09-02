@@ -19,7 +19,19 @@ jobs:
   build-and-test:
     runs-on: windows-latest
     steps:
+      # fetch-depth: 0 so the tags are here. The What's-new guard below compares the file
+      # against the newest tag's copy of it, and a shallow checkout has no tags at all — the
+      # guard would skip cleanly and prove nothing, which is the shape of a gate that reads
+      # as coverage (CLAUDE.md trap 34).
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      # Before the build, because it costs a second and it is the only gate that can see a
+      # What's-new entry edited after its version shipped — a disagreement with a git tag,
+      # which no unit test can reach. Twice in three releases before it existed.
+      - name: What's-new entries that already shipped are unchanged
+        run: pwsh -NoProfile -File scripts/whatsnew-guard.ps1
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

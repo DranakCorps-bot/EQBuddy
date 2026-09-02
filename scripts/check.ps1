@@ -40,7 +40,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -53,6 +53,11 @@ function Step([string] $name, [scriptblock] $body) {
     }
 }
 
+# First, because it costs a second and it is the one gate that can see a defect the whole
+# suite is blind to: a What's-new entry edited after its version shipped. 6>&1 folds the
+# guard's Write-Host into the captured output so its reasons reach the log like any other
+# stage's.
+Step "what's-new  " { & "$PSScriptRoot\whatsnew-guard.ps1" 6>&1 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
 if (-not $Quick) {

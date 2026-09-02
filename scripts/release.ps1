@@ -23,6 +23,14 @@ if (-not $entry) {
     throw "No What's-new entry for $version in src\EQBuddy.Core\Data\WhatsNew.json — add one before releasing."
 }
 
+# ...and finding an entry is not the same as finding the RIGHT one. The check above searches
+# by version, so it is equally satisfied when this release's work was written into a heading
+# that already shipped — which happened twice in three releases. That defect cannot be seen
+# from inside the file; it is a disagreement with a git tag. scripts/whatsnew-guard.ps1 is
+# the only thing here that knows about tags, so it runs before anything is built or signed.
+& "$PSScriptRoot\whatsnew-guard.ps1" -Releasing
+if ($LASTEXITCODE -ne 0) { throw "What's-new guard failed — see above. Nothing was built." }
+
 # The SAME words go on the GitHub release page. --generate-notes produced an empty body
 # for v1.80.0 (a merge with no PR behind it has nothing to generate FROM), so anyone who
 # hadn't installed yet — the people deciding whether to — landed on a bare changelog

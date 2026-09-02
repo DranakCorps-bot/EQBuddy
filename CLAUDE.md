@@ -1387,6 +1387,43 @@ Read this list before touching the areas it names. Every entry cost a release.
     step is the one nobody re-checks, and "the code already told you" is the cheapest
     correction there is.
 
+53. **A SHOT'S `Title` IS AN IDENTITY THE SURFACE CAN INVALIDATE WITHOUT TOUCHING THE SHOT —
+    and because `shoot.ps1` runs under `$ErrorActionPreference = 'Stop'`, ONE stale title
+    stops the whole batch at that row.** The World fold (1.99.13) deleted `MapWindow`,
+    `SpawnsWindow` and `TravelWindow` and re-pointed their env hooks at `WorldWindow` — the
+    author even wrote "kept apart because they already appear in shot fixtures and docs" at
+    the hook. The `Title` fields those fixtures match on stayed `'Spawn'` and `'Zone Map'`,
+    and nothing on earth carries a window title but the window. So from 2026-08-27 to
+    2026-09-02, across four releases, `scripts/shoot.ps1` with no `-Shot` **could not get
+    past shot 37**: `spawns-window`, `spawns-sky`, `zone-map` and the twenty-three shots
+    after them were unreachable in a batch. Individual `-Shot` runs kept working, which is
+    why it went unnoticed — every session that re-shot one image got a picture and moved on.
+    → **The acceptance criterion this whole file leans on had been dark for six days, and
+    nothing said so.** That is the cost, not the three titles. It is trap 51's cost sentence
+    ("`shoot.ps1` was not usable as the acceptance criterion") arriving through a different
+    door, and trap 30's lesson (a staging list is code that cannot be type-checked) with the
+    stale token being a window title rather than an enum member.
+    → **When you delete, rename or fold a WINDOW, grep `scripts/` for its title before its
+    class name.** The class name is what a compiler follows; the title is what the harness
+    follows, and only one of those two has a compiler. And **run the batch, not one shot** —
+    a green `-Shot` proves one row, and the batch is the only thing that proves the rest.
+
+54. **POWERSHELL DECODES A NATIVE COMMAND'S STDOUT WITH `[Console]::OutputEncoding`, WHICH
+    IS NOT UTF-8 HERE — so a guard that compares a file against `git show` will find every
+    non-ASCII line "changed" on a tree `git diff` calls identical.** The first run of
+    `scripts/whatsnew-guard.ps1` reported **111 of 129 shipped What's-new entries as edited
+    after they shipped**. Every one was a false positive: the entries carry em dashes,
+    arrows and ✦, and those came back through the OEM code page mangled. The failure is
+    maximally convincing — a long, specific, per-version list — and maximally wrong, and it
+    took `git diff v1.99.16 -- <file>` returning empty to disprove it.
+    → **A guard's first red run deserves the same scepticism as a green one.** Trap 34 says
+    a guard that forbids the wrong thing reads as coverage; this is the mirror — a guard that
+    cries wolf gets switched off, and it would have been switched off on its first day.
+    → **Read git's bytes, not PowerShell's decode of them.** Wrap the call:
+    `[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)` around it (restore in a
+    `finally`). The same trap waits for any `git show`/`git log`/`gh api` output this repo
+    reads back and compares, and all of it runs through `pwsh`.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
