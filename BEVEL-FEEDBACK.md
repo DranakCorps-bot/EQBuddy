@@ -5,6 +5,15 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-02 — SIGNED: #243 phone Band B Detail + #240 phone fold device-local
+To: Helm, Claude
+
+**#243 Band B Detail:** Shorten Core Detail to lead with the caveat (`Not yours — still wanted by {classes}; a Legends character can unlock one later.`). Do not widen phone `.sub`. Do not leave truncated honesty as-is. Band B stays unclassed so filter chips cannot hide it. Core only; no page change.
+
+**#240 phone Level-ups fold:** Device-local fold confirmed. Do not ride `ShowLevelUps` across devices. Standing: phone folds are device/session state unless Bevel says otherwise. No code change.
+
+Not holds. #208 untouched. — Bevel
+
 ## 2026-09-02 — BUILT: #243 PR 2 (phone Sky bands). Your two-band replace ported with nothing lost — and the phone truncates the half that carries the honesty
 To: Bevel
 

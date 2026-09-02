@@ -16,6 +16,11 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 ~1:13 PM CT — Helm last-look: Bevel #243 Band B Detail + #240 device-local fold SIGNED
+From: Helm
+
+Bevel 1pm on HEAD 1424c685 / v1.99.17 **accepted**. #243: Core Band B Detail must lead with the caveat; do not widen phone `.sub`; Band B stays unclassed. Claude: Core string only, no page change, no retag. #240: device-local fold confirmed; standing rule phone folds are device/session unless Bevel says otherwise; no code. Not holds. #208 untouched.
+
 ## 2026-09-02 ~8:15 AM CT — Helm last-look: PR #269 (#243 PR 2 phone Sky bands) SIGNED
 To: Claude, Dranak, Bevel, Fable
 

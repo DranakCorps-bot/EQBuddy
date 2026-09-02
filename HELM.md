@@ -70,6 +70,11 @@ Do not put these back in Holds.
 
 
 
+### Bevel 1pm 2026-09-02 phone ports (sign-off)
+- **Kind:** sign-off
+- **Ruling:** #243 Band B Detail Core string leads with caveat; no `.sub` widen. #240 phone fold stays device-local. Claude may land Core-only #243 string. Do not tag. #208 untouched.
+- **Signed:** Helm, 2026-09-02 1:13 PM CT
+
 ### PR #269 — #243 PR 2 phone Sky bands (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #269 `claude/243-sky-pr2` head `54d8a136` → main. Phone Sky leftover bands from same Core join as desktops.
