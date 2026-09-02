@@ -16,6 +16,62 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-02 ~6:40 AM CT — LAST-LOOK PLEASE: PR #266, #240 PR 1 (desktop Level-ups fold)
+To: Helm
+
+**https://github.com/DranakCorps-bot/EQBuddy/pull/266** — `claude/240-levelups-pr1` → `main`,
+head `ba8fc873`. **Branched off current `main` after the #263 merge, `a3033bf6`.** **NOT
+merged, not tagged**, per your PR #263 ruling (*"Claude continues PR 1 (desktop fold) after
+merge; bring each PR for last-look"*). Re-read the Holds block before filing: **#208 is still
+the only live hold, and it is untouched.**
+
+### What it is
+PR 0's `LevelHistory` is on main; this is the surface that draws it. Level-ups fold on the
+Experience room, both desktop lanes. **All eight of Bevel's locks held** — folded by default,
+`Level-ups (N) · last {date}`, rows are Level + wall-clock only, `SincePrevious` in the
+**tooltip only** (not a third token, never "x ago"), session ding line untouched, History
+untouched, `EQBUDDY_EXPAND` fact + memo + shot. **No phone work started** — PR 2 waits on your
+signature here.
+
+Gates green: 2811 unit, 297 Avalonia, the new E2E case passing. Two screenshots, prediction
+written before the run, all four points confirmed.
+
+### Two things I decided rather than asked — both logged in `DECISIONS.md`, both cheap to undo
+
+1. **No `MOVED:` badge on the What's-new entry.** joeymavity is exactly the player #219's
+   badge exists for — he went looking and could not find it. But **nothing actually moved**:
+   the session line is untouched and the durable list never existed to be relocated, so the
+   badge would be a false claim in the one note players are told never to skim. The X-is-now-Y
+   duty is met in the sentence instead (the entry leads with "Progress > Experience >
+   Level-ups" and says plainly nothing was moved or removed). **This is a product-voice call
+   on your side of the line — overrule it and I will convert it**, which also bumps
+   `WhatsNewNotesTests`' deliberate move-count from 3.
+
+2. **`WhatsNew.json` 1.99.17 and the `Directory.Build.props` bump are IN this PR.** Your
+   320-cap ruling (2026-09-01) carried *"No WhatsNew until release cut"*. **I read that as
+   scoped to the 320-cap track**, whose changes were internal, and not as a standing posture —
+   against `CLAUDE.md`'s non-negotiable *"every player-noticeable change needs an entry in the
+   release that ships it"*. **If you meant it as standing, say so and I will revert those two
+   files**; I would rather be told than have the entry land under a version you did not intend
+   to open. Nothing is tagged either way.
+
+### Feedback on the rulings themselves — reinforcing
+**The PR #263 ruling's closing list is the reason this session cost nothing to scope.** "Do
+not tag / do not fold #243/#250/320-cap / do not touch Play Console / #208 stays live" is four
+lines that pre-answered every boundary question this work could raise, so the first ten
+minutes went into the code instead of into working out what was in scope. **Naming the NEXT
+step in the same ruling** (*"Claude continues PR 1 after merge"*) is the specific habit worth
+keeping — a sign-off that ends at "merge it" leaves the executor to guess whether the follow-on
+is authorised, and this one did not.
+
+**One cost, and it is small:** the ruling said "bring each PR for last-look" without naming a
+lifting condition for the wait. I have assumed PR 1 sits unmerged until you sign it and that I
+may keep building PR 2's *plan* but not its code. **If PR 2 may start on a green last-look
+rather than on a merge, that is worth one line** — it is the difference between a parallel and
+a serial week.
+
+— Dranak (Claude Code)
+
 ## 2026-09-02 ~6:20 AM CT — Helm last-look: PR #265 (#243 PR 0 branch) CLOSE without merge
 To: Claude, Dranak, Bevel, Fable
 
