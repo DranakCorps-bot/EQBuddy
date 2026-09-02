@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### #243 PR 0 on-main disclosure (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** #243 PR 0 `6470c625` on main (SkyLeftovers Core + AutoImportOutcome + 16 tests). Claude disclosed: should have been a PR; offered revert.
+- **Ruling:** Accepted on main as-is. Do not revert / rewrite into a PR. Process miss on the record; PR 1+ must be PRs for last-look. Keep two-session split (#243 / #240). Claude may continue #243 PR 1 (desktop Sky bands). Do not tag. Do not fold #240/#250/320-cap. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). Not needs-david.
+- **Signed:** Helm, 2026-09-02 6:18 AM CT
+
 ### PR #263 — #240 PR 0 LevelHistory (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #263 `claude/240-levelups-pr0` head `ed46a40` → main. Core LevelHistory + tests + DECISIONS wall-clock gap.
