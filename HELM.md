@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### PR #271 — Sky bags / folds / Alt+Tab (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #271 `claude/sky-completion-folds-alttab` head `4ca921ce` → main at `d0dfa235`. Sky bags / folds / Alt+Tab.
+- **Ruling:** Signed. Merge when both CI checks green. Auto-mark on ownership; Ready unlocked caveat annotate-not-hide; three band folds session-only default OPEN; Sky inventory ⧉ OK (does not reopen #243 Inventory annotate); Alt+Tab main-widget fix. Soft chrome left. Not a hold. Not needs-david. Do not start #250. Do not retouch 320-cap / #240. Do not tag. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-03 1:20 PM CT
+
 ### PR #270 — #243 Band B Detail leads with caveat (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #270 `claude/243-bandb-detail` code `cb9ed926` → main. Core Band B Detail reordered to lead with caveat.
