@@ -1127,6 +1127,16 @@ public sealed class EndToEndTests
             "the Quest Tracker to open on the Sky tab", app.Artifacts);
         Assert.Equal(1, app.DumpValue("questsSkyLeftoverA"));
         Assert.Equal(1, app.DumpValue("questsSkyLeftoverB"));
+        // The bands open EXPANDED on every launch — the fold is session-only, a field
+        // and never a setting (Hateborne, 2026-09-03; the ProgressCardView precedent).
+        Assert.Equal(1, app.DumpValue("questsSkyReadyOpen"));
+        Assert.Equal(1, app.DumpValue("questsSkyLeftoverAOpen"));
+        Assert.Equal(1, app.DumpValue("questsSkyLeftoverBOpen"));
+        // And the tab names BOTH of its dumps (Hateborne, 2026-09-03): the achievements
+        // ⧉ it always had, and the inventory ⧉ that used to exist only as the header's
+        // "scan bags" button — which is chrome, not the tab saying what feeds it.
+        Assert.Equal(1, app.DumpValue("questsSkyCopyCmd"));
+        Assert.Equal(1, app.DumpValue("questsSkyInvCopyCmd"));
     }
 
     /// <summary>The same window with no dump ever read: both bands ABSENT, not empty.
@@ -1164,6 +1174,29 @@ public sealed class EndToEndTests
 
         Assert.Equal(0, app.DumpValue("altTabWanted"));
         Assert.Equal(0, app.DumpValue("altTabStyle"));
+        // The default's other half: taskbar button present, and the APPWINDOW bit WPF
+        // asserts for it actually on the HWND.
+        Assert.Equal(1, app.DumpValue("altTabAppWindow"));
+        Assert.Equal(1, app.DumpValue("altTabTaskbar"));
+    }
+
+    /// <summary>
+    /// The ON path, which shipped untested and did not work (Hateborne, 2026-09-03): the
+    /// tool-window style was set correctly and WS_EX_APPWINDOW — asserted by WPF for
+    /// MainWindow's ShowInTaskbar="True" — overrides it for switcher membership, so every
+    /// satellite left Alt+Tab and the main widget never did. Hidden means BOTH bits agree:
+    /// style on, APPWINDOW off. On the pre-fix tree this fails at the appWindow line.
+    /// </summary>
+    [Fact]
+    public void TheWidgetActuallyLeavesAltTabWhenAskedTo()
+    {
+        using var app = new AppHarness(s => s.HideFromAltTab = true);
+        app.Launch();
+
+        Assert.Equal(1, app.DumpValue("altTabWanted"));
+        Assert.Equal(1, app.DumpValue("altTabStyle"));
+        Assert.Equal(0, app.DumpValue("altTabAppWindow"));
+        Assert.Equal(0, app.DumpValue("altTabTaskbar"));
     }
 
     /// <summary>

@@ -424,6 +424,9 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                     // release: an open phone runs the page it downloaded weeks ago (trap 32).
                     CharacterClassNames = classes,
                     ClassSource = classSource,
+                    // The Ready rows' already-unlocked caveat: the same ledger read the
+                    // desktop band makes (Hateborne, 2026-09-03).
+                    UnlockedClasses = QuestLedger?.UnlockedClassesFor(QuestCharacterKey) ?? [],
                     // The dump, for the Sky tab's leftover bands (#243). The SAME call the
                     // quest window makes — so the phone's bands and this machine's cannot
                     // answer from two different files, and the log's gains since the dump
@@ -4471,7 +4474,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// <summary>What the last auto-import did, for the Gear and Raids surfaces to report.
     /// In memory only — a report about something that happened while the player watched
     /// has no business outliving the session.</summary>
-    internal AutoImportOutcome? LastInventoryImport { get; private set; }
+    public AutoImportOutcome? LastInventoryImport { get; private set; }
 
     /// <inheritdoc cref="LastInventoryImport"/>
     public AutoImportOutcome? LastAchievementsImport { get; private set; }
@@ -4503,7 +4506,7 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 // thread (SessionStats' OutputfileEvent case, #241) — folded into one
                 // report rather than a second surface for the same announcement.
                 LastInventoryImport = OutputfileAutoImport.ImportInventory(
-                    dump, _settings, _stats.LastQuestReconcile);
+                    dump, _settings, _stats.LastQuestReconcile, QuestLedger, QuestCharacterKey);
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
                 // The Inventory tab IS this file — tell an open window to repaint on

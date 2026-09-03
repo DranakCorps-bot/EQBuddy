@@ -53,33 +53,45 @@ public class ImportReportReachesASurfaceTests
     /// was being read above a list of raid bosses — by a player who may never open that
     /// surface at all. Bevel: *"a Quest-Tracker job being read on a raid-clear list."*
     ///
-    /// Listed separately from <see cref="MustReachASurface"/> because it is a SECOND host
-    /// for an outcome that already has one — the scan above asks "does anything read this",
-    /// and the answer was yes while a whole audience still could not see it.</summary>
-    public static readonly (string Project, string File, string Why)[] SecondHosts =
+    /// Listed separately from <see cref="MustReachASurface"/> because these are SECOND hosts
+    /// for outcomes that already have one — the scan above asks "does anything read this",
+    /// and the answer was yes while a whole audience still could not see it.
+    ///
+    /// Each row names the PROPERTY it asserts. The first cut hardcoded
+    /// <c>LastAchievementsImport</c> in the test body, so a new row for the inventory
+    /// report would have passed by finding the achievements line in the same file —
+    /// trap 34's shape, a guard that reads as coverage and checks nothing.</summary>
+    public static readonly (string Project, string File, string Property, string Why)[] SecondHosts =
     [
-        ("EQBuddy", "QuestsWindow.xaml.cs",
+        ("EQBuddy", "QuestsWindow.xaml.cs", "LastAchievementsImport",
             "The Sky tab. Same ImportReportView, not a Sky-flavoured variant — one more "
             + "host, one more line, and the Undo rule stays in one place."),
-        ("EQBuddy.Avalonia", "QuestsWindow.cs", "The Avalonia twin of the same tab."),
+        ("EQBuddy.Avalonia", "QuestsWindow.cs", "LastAchievementsImport",
+            "The Avalonia twin of the same tab."),
+        ("EQBuddy", "QuestsWindow.xaml.cs", "LastInventoryImport",
+            "The inventory dump proves Sky rewards turned in (Hateborne, 2026-09-03), so "
+            + "its report has the same second audience the achievements one does."),
+        ("EQBuddy.Avalonia", "QuestsWindow.cs", "LastInventoryImport",
+            "The Avalonia twin of the same tab."),
     ];
 
-    /// <summary>Both lanes' Sky tab builds one. A ruling that shipped on one UI only is how
-    /// #122 and #152 reached Linux after Windows had already paid for them.</summary>
+    /// <summary>Both lanes' Sky tab builds one per outcome. A ruling that shipped on one UI
+    /// only is how #122 and #152 reached Linux after Windows had already paid for them.</summary>
     [Theory]
     [MemberData(nameof(SecondHostRows))]
-    public void TheSkyTabReportsTheImportToo(string project, string file, string why)
+    public void TheSkyTabReportsTheImportToo(string project, string file, string property, string why)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
 
-        Assert.Contains("new ImportReportView(() => _main.LastAchievementsImport", text);
+        Assert.Contains($"new ImportReportView(() => _main.{property}", text);
         Assert.NotEmpty(why);
     }
 
-    public static TheoryData<string, string, string> SecondHostRows()
+    public static TheoryData<string, string, string, string> SecondHostRows()
     {
-        var data = new TheoryData<string, string, string>();
-        foreach (var (project, file, why) in SecondHosts) data.Add(project, file, why);
+        var data = new TheoryData<string, string, string, string>();
+        foreach (var (project, file, property, why) in SecondHosts)
+            data.Add(project, file, property, why);
         return data;
     }
 

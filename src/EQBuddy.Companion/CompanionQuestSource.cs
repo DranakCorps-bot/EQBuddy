@@ -31,6 +31,15 @@ public sealed record CompanionQuestRequest
     /// to a list of rows).</summary>
     public IReadOnlyList<string> CharacterClassNames { get; init; } = [];
 
+    /// <summary>Classes whose unlock achievement the dump says is complete
+    /// (<c>QuestLedgerStore.UnlockedClassesFor</c>, the same read the desktop Ready band
+    /// makes) — what lets the phone's ★ Ready rows carry the already-unlocked caveat
+    /// (Hateborne, 2026-09-03). The caveat's WORDS come from
+    /// <c>QuestChecklistLayout.ReadyDetail</c>; only the input rides the request. Distinct
+    /// from <see cref="CharacterClassNames"/>, which is what the character PLAYS — a
+    /// primary class is played and unlocked, an earned unlock may never be played.</summary>
+    public IReadOnlyList<string> UnlockedClasses { get; init; } = [];
+
     public ClassSource ClassSource { get; init; } = ClassSource.Unknown;
 
     /// <summary>The newest <c>/outputfile inventory</c> dump, exactly as the desktop quest

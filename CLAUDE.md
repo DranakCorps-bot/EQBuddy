@@ -1455,6 +1455,16 @@ Read this list before touching the areas it names. Every entry cost a release.
   output for every command, mid-session. Run scripts as `pwsh -NoProfile -File …` through
   Bash instead, and never read a silent failure as "nothing happened" — check the side
   effects first.
+- **The scripts assume pwsh 7; Windows PowerShell 5.1 runs them DIFFERENTLY, not just
+  slower** (Hateborne's machine, 2026-09-03 — no pwsh installed). Two real casualties in
+  one day: `whatsnew-guard.ps1` re-produced trap 54's mass false positives (its UTF-8
+  wrap was not enough under 5.1's decode — trust `git diff <tag> -- <file>` over the
+  guard's list before acting on it), and `shoot.ps1`'s `$proc.Kill($true)` tree-kill
+  overload does not exist on 5.1's .NET Framework, so every kill-fallback THREW instead
+  of killing, leaked the shot app and wedged the run (now `Stop-Hard`, a plain
+  `Stop-Process -Force` — EQBuddy spawns no children). On a machine without pwsh, prefer
+  installing it; failing that, treat a 5.1 run's first surprising result as a host
+  difference until git or the side effects confirm it.
 
 ## Screenshots of the desktop UI
 

@@ -33,4 +33,17 @@ public static class AltTabPolicy
     public const string TaskbarWarning =
         "Also removes EQBuddy's taskbar button — Windows treats the two as one setting. "
         + "The tray icon is how you get the widget back.";
+
+    /// <summary>Whether the ONE window that normally owns a taskbar button should keep it,
+    /// given the hide-from-Alt+Tab setting.
+    ///
+    /// This is the half the feature shipped without, and why it read as a dead tick-box on
+    /// the main widget while every satellite hid correctly (Hateborne, 2026-09-03):
+    /// `WS_EX_TOOLWINDOW` alone does not remove a window from the switcher when the
+    /// toolkit has ALSO asserted `WS_EX_APPWINDOW` for ShowInTaskbar=true — Windows lets
+    /// APPWINDOW override TOOLWINDOW for switcher membership. So hiding from Alt+Tab must
+    /// drop ShowInTaskbar too, which is exactly the cost <see cref="TaskbarWarning"/> has
+    /// promised the player all along; this keeps the behaviour and the warning from
+    /// disagreeing.</summary>
+    public static bool MainWindowShowsInTaskbar(bool hideFromAltTab) => !hideFromAltTab;
 }

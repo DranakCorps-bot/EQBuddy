@@ -17,6 +17,13 @@ internal static class AltTabHide
     public static void Apply(Window window, bool on)
     {
         if (!AltTabPolicy.Available) return;
+        // The main widget is the ONE window owning a taskbar button, and ShowInTaskbar
+        // is asserted as WS_EX_APPWINDOW on the HWND — which OVERRIDES the tool-window
+        // style for switcher membership, so the style alone hid every satellite and
+        // never the widget itself (Hateborne, 2026-09-03). First, so the tool-window
+        // flip below re-samples with the taskbar bit already decided.
+        if (window is MainWindow)
+            window.ShowInTaskbar = AltTabPolicy.MainWindowShowsInTaskbar(on);
         if (OperatingSystem.IsWindows()) WinClickThrough.SetToolWindow(window, on);
     }
 

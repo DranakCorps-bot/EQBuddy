@@ -213,6 +213,12 @@ public partial class QuestsWindow : Window
             _state = state;
             StateCombo.SelectedItem = state;
         }
+        // "folded" collapses the three Sky bands — screenshot-only state with no settings
+        // backing (the fold is session-only by design), so this hook is the ONLY way the
+        // collapsed rendering can be photographed at all (trap 22).
+        else if (state == "folded")
+            foreach (var id in new[] { "skyReady", "skyLeftoverA", "skyLeftoverB" })
+                _skyBandOpen[id] = false;
         // Anything else after the colon is a SEARCH. The item-grouped result (#108) only
         // exists while a query is live, so without this hook the layout that answers "who
         // wants this drop" could not be photographed at all — trap 22, the same reason
@@ -881,23 +887,34 @@ public partial class QuestsWindow : Window
         // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
         // control photographs as an unremarkable panel (trap 29), and a bool that nobody
         // resets goes stale without anything noticing.
-        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen()} " +
-        // The two #243 bands, counted off the REAL visual tree by the Tag each one
+        $"questsSkyCopyCmd={SkyCopyCommandsOnScreen(GameCommands.OutputfileAchievements)} " +
+        // The Sky tab's own ⧉ of /outputfile inventory (Hateborne, 2026-09-03): the tab
+        // is fed by two dumps and only ever named one. Counted the same way, for the
+        // same trap-29 reason.
+        $"questsSkyInvCopyCmd={SkyCopyCommandsOnScreen(GameCommands.OutputfileInventory)} " +
+        // The three #243/#129 bands, counted off the REAL visual tree by the Tag each one
         // carries — not from a flag the render sets, which goes stale without anything
         // noticing, and not from the heading string, which is a name and not an identity
-        // (trap 39). 0 is the honest answer for "no dump" and for "nothing leftover".
-        $"questsSkyLeftoverA={LeftoverRowsOnScreen("skyLeftoverA")} " +
-        $"questsSkyLeftoverB={LeftoverRowsOnScreen("skyLeftoverB")}";
+        // (trap 39). 0 is the honest answer for "no dump" and for "nothing leftover" —
+        // and for a FOLDED band, whose open flag is dumped beside it so the two states
+        // cannot be confused.
+        $"questsSkyReady={BandRowsOnScreen("skyReady")} " +
+        $"questsSkyLeftoverA={BandRowsOnScreen("skyLeftoverA")} " +
+        $"questsSkyLeftoverB={BandRowsOnScreen("skyLeftoverB")} " +
+        $"questsSkyReadyOpen={(BandOpen("skyReady") ? 1 : 0)} " +
+        $"questsSkyLeftoverAOpen={(BandOpen("skyLeftoverA") ? 1 : 0)} " +
+        $"questsSkyLeftoverBOpen={(BandOpen("skyLeftoverB") ? 1 : 0)}";
 
-    private int LeftoverRowsOnScreen(string tag) => QuestsPanel.Children.OfType<Border>()
+    private int BandRowsOnScreen(string tag) => QuestsPanel.Children.OfType<Border>()
         .Where(b => b.Tag as string == tag)
         .SelectMany(b => ((StackPanel)b.Child).Children.OfType<TextBlock>())
         .Count(t => t.Tag is null);   // the held-back note is tagged and is not a row
 
-    private int SkyCopyCommandsOnScreen() => QuestsPanel.Children.OfType<StackPanel>()
-        .SelectMany(p => p.Children.OfType<Button>())
+    private int SkyCopyCommandsOnScreen(string command) => QuestsPanel.Children.OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<Button>()
+            .Concat(p.Children.OfType<WrapPanel>().SelectMany(w => w.Children.OfType<Button>())))
         .Count(b => b.Content is string s
-            && s.Contains(GameCommands.OutputfileAchievements, StringComparison.Ordinal));
+            && s.Contains(command, StringComparison.Ordinal));
 
     // ---- the list ----
 
@@ -1520,43 +1537,53 @@ public partial class QuestsWindow : Window
         if (tab != QuestTab.Sky) return;
         var ready = QuestChecklistLayout.ReadyToTurnIn(groups);
         if (ready.Count == 0) return;
+        var open = BandOpen("skyReady");
+        var unlocked = _main.QuestLedger?.UnlockedClassesFor(_main.QuestCharacterKey);
 
         var panel = new StackPanel();
-        // Built here rather than through IconLabel, which leaves its text at the caption
-        // default: this heading names the one actionable thing on the page and cannot be
-        // the dimmest line in its own band.
-        var heading = new StackPanel { Orientation = Orientation.Horizontal };
-        heading.Children.Add(DesignSystem.Icon("Check", "GoodBrush", size: 12));
-        var headingText = DesignSystem.Text(Role.Caption, $"Ready to turn in — {ready.Count}");
-        headingText.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
-        headingText.FontWeight = FontWeights.SemiBold;
-        headingText.Ink("GoodBrush");
-        heading.Children.Add(headingText);
-        panel.Children.Add(heading);
+        panel.Children.Add(BandHeading("skyReady", open,
+            $"Ready to turn in — {ready.Count}", "Check", "GoodBrush"));
 
-        foreach (var group in ready)
-        {
-            var line = DesignSystem.Text(Role.Body, "");
-            line.TextWrapping = TextWrapping.Wrap;
-            line.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs, 0, 0);
-            line.Inlines.Add(new System.Windows.Documents.Run(
-                $"{QuestClassFilter.Abbrev(group.ClassName)} — {group.Title}")
-            { FontWeight = FontWeights.SemiBold });
-            if (group.TurnInNpc is { Length: > 0 } npc)
+        if (open)
+            foreach (var group in ready)
             {
-                var to = new System.Windows.Documents.Run($"   {npc}");
-                to.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
-                line.Inlines.Add(to);
+                var line = DesignSystem.Text(Role.Body, "");
+                line.TextWrapping = TextWrapping.Wrap;
+                line.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs, 0, 0);
+                line.Inlines.Add(new System.Windows.Documents.Run(
+                    $"{QuestClassFilter.Abbrev(group.ClassName)} — {group.Title}")
+                { FontWeight = FontWeights.SemiBold });
+                if (group.TurnInNpc is { Length: > 0 } npc)
+                {
+                    var to = new System.Windows.Documents.Run($"   {npc}");
+                    to.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
+                    line.Inlines.Add(to);
+                }
+                // The already-unlocked caveat, worded in Core (Hateborne, 2026-09-03):
+                // the row stays — the item is still worth collecting — and this says what
+                // the turn-in still buys.
+                if (QuestChecklistLayout.ReadyNote(group, unlocked) is { } note)
+                {
+                    var caveat = new System.Windows.Documents.Run($"   {note}");
+                    caveat.SetResourceReference(
+                        System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
+                    caveat.FontStyle = FontStyles.Italic;
+                    line.Inlines.Add(caveat);
+                }
+                line.ToolTip = $"{group.ClassName}: all {group.Total} "
+                    + (group.Total == 1 ? "item" : "items") + " acquired"
+                    + (group.TurnInNpc is { Length: > 0 } n ? $" — turn in to {n}" : "")
+                    + (QuestChecklistLayout.ReadyNote(group, unlocked) is { } tip
+                        ? $" — {tip}" : "");
+                panel.Children.Add(line);
             }
-            line.ToolTip = $"{group.ClassName}: all {group.Total} "
-                + (group.Total == 1 ? "item" : "items") + " acquired"
-                + (group.TurnInNpc is { Length: > 0 } n ? $" — turn in to {n}" : "");
-            panel.Children.Add(line);
-        }
 
         var band = new Border
         {
             Child = panel,
+            // The band's identity for the EQBUDDY_EXPAND dump, same rule as the
+            // leftover bands below (trap 39: identity is put on the object).
+            Tag = "skyReady",
             CornerRadius = new CornerRadius(DesignTokens.RadiusCard),
             Padding = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceS,
                 DesignTokens.SpaceM, DesignTokens.SpaceS),
@@ -1564,6 +1591,49 @@ public partial class QuestsWindow : Window
         };
         band.SetResourceReference(BackgroundProperty, "RaisedBrush");
         QuestsPanel.Children.Add(band);
+    }
+
+    /// <summary>Which Sky bands are open, keyed by band id ("skyReady", "skyLeftoverA",
+    /// "skyLeftoverB"). **A field, never a setting** (the ProgressCardView precedent —
+    /// Bevel, Helm-signed 2026-08-23: session-only): folding a band away to read the list
+    /// under it is a decision about the next thirty seconds, not about how the app opens
+    /// tomorrow, and <c>DeadSettingTests</c> exists because settings outlive the surfaces
+    /// that wrote them. Default OPEN — the bands are the tab's answers, not its chrome.</summary>
+    private readonly Dictionary<string, bool> _skyBandOpen = new(StringComparer.Ordinal);
+
+    private bool BandOpen(string id) => _skyBandOpen.GetValueOrDefault(id, true);
+
+    /// <summary>A Sky band's clickable fold heading: the band's identity icon, then an
+    /// <see cref="EqFoldLabel"/> carrying the chevron and the heading-with-count — which
+    /// is the whole band while it is folded (Hateborne, 2026-09-03: three uncollapsible
+    /// boxes were most of the tab). SemiBold and never dimmer than the rows under it —
+    /// trap 19's lesson, kept from the hand-built headings this replaces.</summary>
+    private UIElement BandHeading(string id, bool open, string text, string icon, string inkKey)
+    {
+        var heading = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ToolTip = open ? "Click to fold this box to one line" : "Click to expand",
+            Background = System.Windows.Media.Brushes.Transparent,   // hit-testable across the whole row
+        };
+        var identity = DesignSystem.Icon(icon, inkKey, size: 12);
+        identity.VerticalAlignment = VerticalAlignment.Center;
+        heading.Children.Add(identity);
+        var fold = new EqFoldLabel { Section = true };
+        fold.Set(open, text);
+        // After Section, so the band keeps its identity colour rather than the section
+        // heading's dim ink.
+        fold.Ink = inkKey;
+        fold.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        heading.Children.Add(fold);
+        heading.MouseLeftButtonDown += (_, e) =>
+        {
+            e.Handled = true;
+            _skyBandOpen[id] = !BandOpen(id);
+            Refresh(force: true);
+        };
+        return heading;
     }
 
     /// <summary>#243 (tvongaza): *"cross check which sky quests you've completed and which
@@ -1598,44 +1668,40 @@ public partial class QuestsWindow : Window
         {
             var rows = leftovers.RowsIn(band);
             if (rows.Count == 0) return;   // each band carries its own absence
+            var open = BandOpen(tag);
 
             var panel = new StackPanel();
-            var heading = new StackPanel { Orientation = Orientation.Horizontal };
-            heading.Children.Add(DesignSystem.Icon(icon, inkKey, size: 12));
-            // SemiBold and never dimmer than the rows under it — trap 19's lesson, and
-            // the same reason the Ready band builds its heading by hand.
-            var label = DesignSystem.Text(Role.Caption, headingText);
-            label.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
-            label.FontWeight = FontWeights.SemiBold;
-            label.Ink(inkKey);
-            heading.Children.Add(label);
-            panel.Children.Add(heading);
+            panel.Children.Add(BandHeading(tag, open, headingText, icon, inkKey));
 
-            foreach (var row in rows)
+            if (open)
             {
-                // The row's words come from Core, so this window, its Avalonia twin and
-                // the phone cannot disagree about what a leftover row says.
-                var line = DesignSystem.Text(
-                    band == SkyLeftoverBand.NoLongerNeeded ? Role.Body : Role.BodySecondary,
-                    row.Line);
-                line.TextWrapping = TextWrapping.Wrap;
-                line.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs, 0, 0);
-                line.ToolTip = row.Detail;
-                panel.Children.Add(line);
-            }
+                foreach (var row in rows)
+                {
+                    // The row's words come from Core, so this window, its Avalonia twin and
+                    // the phone cannot disagree about what a leftover row says.
+                    var line = DesignSystem.Text(
+                        band == SkyLeftoverBand.NoLongerNeeded ? Role.Body : Role.BodySecondary,
+                        row.Line);
+                    line.TextWrapping = TextWrapping.Wrap;
+                    line.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXxs, 0, 0);
+                    line.ToolTip = row.Detail;
+                    panel.Children.Add(line);
+                }
 
-            // What was deliberately left OUT, and why. An item that is simply absent from
-            // the band reads as a bug in the join; naming the quest that wants it is the
-            // sentence that stops someone selling it.
-            if (note.Length > 0)
-            {
-                var held = DesignSystem.Text(Role.Caption, note);
-                // Tagged so the dump's row count below cannot mistake the note for a row.
-                held.Tag = tag + "-note";
-                held.TextWrapping = TextWrapping.Wrap;
-                held.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXs, 0, 0);
-                held.Ink("DimBrush");
-                panel.Children.Add(held);
+                // What was deliberately left OUT, and why. An item that is simply absent from
+                // the band reads as a bug in the join; naming the quest that wants it is the
+                // sentence that stops someone selling it. Folded away with the rows: a
+                // collapsed band is one line, literally.
+                if (note.Length > 0)
+                {
+                    var held = DesignSystem.Text(Role.Caption, note);
+                    // Tagged so the dump's row count below cannot mistake the note for a row.
+                    held.Tag = tag + "-note";
+                    held.TextWrapping = TextWrapping.Wrap;
+                    held.Margin = new Thickness(DesignTokens.SpaceM, DesignTokens.SpaceXs, 0, 0);
+                    held.Ink("DimBrush");
+                    panel.Children.Add(held);
+                }
             }
 
             var border = new Border
@@ -1748,6 +1814,15 @@ public partial class QuestsWindow : Window
 
     private ImportReportView? _skyImport;
 
+    /// <summary>The inventory dump's report, beside the achievements one (Hateborne,
+    /// 2026-09-03): the dump now proves Sky rewards turned in, and a change the player
+    /// did not watch happen has to say so where they are looking. Same class, one more
+    /// host — the precedent SkyImport's own comment states.</summary>
+    private ImportReportView SkyInventoryImport => _skyInventoryImport ??=
+        new ImportReportView(() => _main.LastInventoryImport, () => Refresh(force: true));
+
+    private ImportReportView? _skyInventoryImport;
+
     /// <summary>
     /// The Sky tab's route to its own data source.
     ///
@@ -1766,20 +1841,25 @@ public partial class QuestsWindow : Window
     {
         var wrap = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceS) };
         wrap.Children.Add(Note(
-            "Turned rewards in before EQBuddy? The game's achievements dump knows. Run this "
-            + "in game and EQBuddy reads the file it writes — it never scans the game itself.",
+            "Turned rewards in before EQBuddy? The game's achievements dump knows — and "
+            + "your bags are evidence too: owning a reward's finished item marks it turned "
+            + "in, and leftover ingredients get flagged below. Run these in game and "
+            + "EQBuddy reads the files the game writes — it never scans the game itself.",
             "Info"));
-        var b = new Button
-        {
-            Style = (Style)FindResource("ActionButton"),
-            FontSize = DesignTokens.Spec(Role.Caption).Size,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            Margin = new Thickness(0, DesignTokens.SpaceXs, 0, 0),
-            ToolTip = "Copies the command — paste it into the game's chat. The game writes "
-                + "<name>_<server>-Achievements.txt beside its own folders and EQBuddy "
-                + "imports it on its own; the report appears here.",
-        };
-        wrap.Children.Add(Theming.WireCopyCommand(b, GameCommands.OutputfileAchievements));
+        // Both commands side by side, the Unlocks tab's own shape (Hateborne, 2026-09-03:
+        // this tab is fed by two dumps and only ever named one of them).
+        var row = new WrapPanel();
+        row.Children.Add(CommandPrompt(GameCommands.OutputfileAchievements,
+            "Copies the command — paste it into the game's chat. The game writes "
+            + "<name>_<server>-Achievements.txt beside its own folders and EQBuddy "
+            + "imports it on its own; the report appears here. This is what says which "
+            + "rewards were turned in before EQBuddy existed."));
+        row.Children.Add(CommandPrompt(GameCommands.OutputfileInventory,
+            "Copies the command — paste it into the game's chat. The game writes "
+            + "<name>_<server>-Inventory.txt beside its own folders and EQBuddy imports "
+            + "it on its own; the report appears here. Owning a reward's finished item "
+            + "proves its turn-in, and it is what the leftover boxes below read."));
+        wrap.Children.Add(row);
         return wrap;
     }
 
@@ -1944,6 +2024,8 @@ public partial class QuestsWindow : Window
         {
             SkyImport.Render();
             QuestsPanel.Children.Add(SkyImport.Body);
+            SkyInventoryImport.Render();
+            QuestsPanel.Children.Add(SkyInventoryImport.Body);
             QuestsPanel.Children.Add(SkyAchievementsPrompt());
         }
         // Grouping, ordering and the detail line come from Core so this window, the

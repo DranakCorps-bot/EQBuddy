@@ -22,6 +22,7 @@ internal static class NoActivate
     private const int GwlExStyle = -20;
     private const int WsExNoActivate = 0x08000000;
     private const int WsExToolWindow = 0x80;
+    private const int WsExAppWindow = 0x00040000;
 
     /// <summary>Call from the constructor; the styles land as soon as the HWND
     /// exists, before the window is first shown.</summary>
@@ -93,12 +94,30 @@ internal static class NoActivate
                 if (sender is Window w && !ReferenceEquals(w, main)) SetToolWindow(w, wanted());
             }));
 
+    /// <summary>
+    /// The MAIN window's application: the taskbar bit first, then the style.
+    ///
+    /// This is the half the feature shipped without, and why it read as a dead tick-box on
+    /// the widget while every satellite hid correctly (Hateborne, 2026-09-03): WPF answers
+    /// ShowInTaskbar=true by asserting WS_EX_APPWINDOW on the HWND, and APPWINDOW
+    /// OVERRIDES TOOLWINDOW for switcher membership. MainWindow is the one window shipping
+    /// ShowInTaskbar="True", so the style landed and did nothing there. Dropping the
+    /// taskbar button is the cost <see cref="UI.Shared.AltTabPolicy.TaskbarWarning"/> has
+    /// promised the player all along; the satellites are always ShowInTaskbar="False" and
+    /// must not be touched.
+    /// </summary>
+    public static void ApplyMain(Window main, bool on)
+    {
+        main.ShowInTaskbar = UI.Shared.AltTabPolicy.MainWindowShowsInTaskbar(on);
+        SetToolWindow(main, on);
+    }
+
     /// <summary>Apply to every open window at once, for the moment the box is flipped — a
     /// setting that waits for a relaunch is indistinguishable from a broken one.</summary>
     public static void ApplyToAll(Window main, bool on)
     {
         foreach (Window w in Application.Current.Windows) SetToolWindow(w, on);
-        SetToolWindow(main, on);
+        ApplyMain(main, on);
     }
 
     /// <summary>Is the style actually ON the window right now? For the E2E dump, which
@@ -110,6 +129,18 @@ internal static class NoActivate
         var hwnd = new WindowInteropHelper(window).Handle;
         return hwnd != IntPtr.Zero
             && (GetWindowLong(hwnd, GwlExStyle) & WsExToolWindow) != 0;
+    }
+
+    /// <summary>Is WS_EX_APPWINDOW on the window right now? The bit WPF asserts for
+    /// ShowInTaskbar=true, and the one that OVERRIDES the tool-window style for switcher
+    /// membership — so `IsToolWindow=1, HasAppWindowStyle=1` is precisely the "present in
+    /// the build, not in effect" state trap 42 exists for, and the E2E dump has to be
+    /// able to see it.</summary>
+    public static bool HasAppWindowStyle(Window window)
+    {
+        var hwnd = new WindowInteropHelper(window).Handle;
+        return hwnd != IntPtr.Zero
+            && (GetWindowLong(hwnd, GwlExStyle) & WsExAppWindow) != 0;
     }
 
     [DllImport("user32.dll")] private static extern int GetWindowLong(IntPtr hwnd, int index);

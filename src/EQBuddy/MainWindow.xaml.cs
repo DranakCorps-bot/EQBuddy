@@ -319,6 +319,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // release: an open phone runs the page it downloaded weeks ago (trap 32).
                         CharacterClassNames = classes,
                         ClassSource = classSource,
+                        UnlockedClasses = QuestLedger?.UnlockedClassesFor(QuestCharacterKey) ?? [],
                         // The Sky leftover bands' dump (#243): the quest window's own call.
                         Inventory = LatestInventory(),
                     };
@@ -3059,7 +3060,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 // thread (SessionStats' OutputfileEvent case, #241) — folded into one
                 // report rather than a second surface for the same announcement.
                 LastInventoryImport = OutputfileAutoImport.ImportInventory(
-                    dump, _settings, _stats.LastQuestReconcile);
+                    dump, _settings, _stats.LastQuestReconcile, QuestLedger, QuestCharacterKey);
                 _settings.GearInventoryAppliedStamp = $"{dump.Path}|{dump.WrittenAt:O}";
                 _settings.Save();
                 // The Wishlist tab needs no explicit call — GearLootWindow.MaybeRefresh
@@ -4335,10 +4336,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         ApplyHotkeys();
         // Under Wine + opt-in only: don't steal focus from a fullscreen game when clicked.
         WineOverlay.MakeNonActivating(this);
-        // Opt-in only. Here rather than in the Loaded class handler below because this is
-        // the ONE window with ShowInTaskbar="True", and the style has to land before the
-        // first Show() or Windows has already decided this window belongs in the switcher.
-        NoActivate.SetToolWindow(this, _settings.HideFromAltTab);
+        // Opt-in only, and before the first Show() — this is the ONE window with
+        // ShowInTaskbar="True"; NoActivate.ApplyMain says why that bit is half the feature.
+        NoActivate.ApplyMain(this, _settings.HideFromAltTab);
         NoActivate.ArmSatellites(this, () => _settings.HideFromAltTab);
     }
 
