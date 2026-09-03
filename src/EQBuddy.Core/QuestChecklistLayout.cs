@@ -271,6 +271,33 @@ public static class QuestChecklistLayout
                 .ThenBy(g => g.Title, StringComparer.OrdinalIgnoreCase),
         ];
 
+    /// <summary>The Ready band's caveat when the reward's class is ALREADY unlocked
+    /// (Hateborne, 2026-09-03: ENC unlocked at character creation, and its rewards still
+    /// read as plain "ready"). The #101 guard rightly refuses to mark the reward itself
+    /// off a granted-not-earned achievement — the items may genuinely still be worth
+    /// collecting — so the row stays, and this one line says what the turn-in still buys.
+    /// Null when there is nothing to caveat, so a surface adds nothing for the ordinary
+    /// case. Core computes the words; every surface renders them (#184).</summary>
+    public static string? ReadyNote(
+        QuestChecklistGroup group, IReadOnlyCollection<string>? unlockedClasses) =>
+        unlockedClasses is { Count: > 0 } u
+            && u.Contains(group.ClassName, StringComparer.OrdinalIgnoreCase)
+            ? $"{group.ClassName} already unlocked — turn in for the item only"
+            : null;
+
+    /// <summary>The NPC plus <see cref="ReadyNote"/>, when there is one — the single
+    /// string EQBuddy Mobile's Detail field carries. The desktops may draw the two halves
+    /// separately, but the WORDS come from here either way, or the three surfaces drift
+    /// (#184's lesson).</summary>
+    public static string ReadyDetail(
+        QuestChecklistGroup group, IReadOnlyCollection<string>? unlockedClasses)
+    {
+        var npc = group.TurnInNpc ?? "";
+        var note = ReadyNote(group, unlockedClasses);
+        if (note is null) return npc;
+        return npc.Length == 0 ? note : npc + " — " + note;
+    }
+
     /// <summary>Done / Ready / Partial / Total per class (#136, bjstrange), so "how am I
     /// doing across all sixteen" is one glance rather than a scroll. Classes come back in
     /// the order the groups arrive, which is already alphabetical.</summary>
@@ -294,6 +321,29 @@ public static class QuestChecklistLayout
     /// <summary>The desktop's reward key (class + reward), so "done" means the same
     /// thing on every screen.</summary>
     public static string RewardKey(string className, string reward) => className + "|" + reward;
+
+    /// <summary>
+    /// The settings-only half of "mark a Sky reward turned in" — idempotent, and returns
+    /// whether THIS call was the transition into turned-in.
+    ///
+    /// Extracted from <c>SkyCompleteToggle.MarkTurnedIn</c> (UI.Shared) so that Core's
+    /// inventory-driven auto-complete and a player's own click cannot define "turned in"
+    /// two different ways: Core cannot reference UI.Shared, so the shared definition has
+    /// to live down here. The rules are the old card's, unchanged: turning in acquires
+    /// every item in the reward, and resolves any parked auto-tick (the * rows).
+    /// </summary>
+    public static bool MarkRewardTurnedIn(AppSettings settings, string rewardKey,
+        IEnumerable<SkyQuestChecklistItem> rewardItems)
+    {
+        var already = settings.SkyQuestCompleted.Contains(rewardKey, StringComparer.OrdinalIgnoreCase);
+        if (!already) settings.SkyQuestCompleted.Add(rewardKey);
+        foreach (var item in rewardItems)
+        {
+            item.Acquired = true;
+            item.AcquiredUnassigned = false;
+        }
+        return !already;
+    }
 
     // ---- "who wants this drop?" (#108, liminalwarmth) --------------------------------
     //

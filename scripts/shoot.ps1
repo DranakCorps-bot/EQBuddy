@@ -369,6 +369,86 @@ $Shots = [ordered]@{
                                    @{ Id = 'sky-041'; Acquired = $true }
                                )
                            } }
+    # The #243 leftover bands plus the inventory import report (Hateborne, 2026-09-03),
+    # staged through the real seam: a dump beside the log and the game's own announcement.
+    # PREDICTED before shooting (trap 23): Ready band "— 2" (WAR Belt of the Four Winds,
+    # CLR Necklace of Resolution); report "1 Sky reward marked turned in" naming
+    # Enchanter · Ivory Mask (the dump holds the finished reward, its class unplayed);
+    # band A "No longer needed — 1" (Azure Ring — its one Sky wanter is the completed
+    # Azure Ruby Ring); band B "Other classes still want — 1" (Silken Strands — Monk
+    # only, and Monk is not played); and BOTH ⧉ copy buttons above the bands.
+    'sky-leftovers'   = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'sky' }
+                           Ledger = @{ Classes = @('Warrior', 'Cleric') }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "General 1-Slot1`tAzure Ring`t0`t1`t10"
+                               "General 1-Slot2`tSilken Strands`t0`t1`t10"
+                               "Bank1-Slot1`tIvory Mask`t0`t1`t10"
+                           ) }
+                           Append = @('Outputfile Complete: Testchar_test-Inventory.txt')
+                           Set = @{
+                               SkyQuestCompleted = @('Warrior|Azure Ruby Ring')
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }
+                                   @{ Id = 'sky-195'; Acquired = $true }
+                                   @{ Id = 'sky-200'; Acquired = $true }
+                                   @{ Id = 'sky-201'; Acquired = $true }
+                                   @{ Id = 'sky-202'; Acquired = $true }
+                                   @{ Id = 'sky-203'; Acquired = $true }
+                                   @{ Id = 'sky-050'; Acquired = $true }
+                                   @{ Id = 'sky-051'; Acquired = $true }
+                                   @{ Id = 'sky-041'; Acquired = $true }
+                               )
+                           } }
+    # The same staging with all three bands FOLDED (sky:folded — a screenshot-only hook,
+    # because the fold is session-only by design and has no settings backing; trap 22).
+    # PREDICTED: three one-line RaisedBrush boxes reading "Ready to turn in — 2",
+    # "No longer needed — 1", "Other classes still want — 1", chevrons pointing right.
+    'sky-folded'      = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'sky:folded' }
+                           Ledger = @{ Classes = @('Warrior', 'Cleric') }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "General 1-Slot1`tAzure Ring`t0`t1`t10"
+                               "General 1-Slot2`tSilken Strands`t0`t1`t10"
+                           ) }
+                           Append = @('Outputfile Complete: Testchar_test-Inventory.txt')
+                           Set = @{
+                               SkyQuestCompleted = @('Warrior|Azure Ruby Ring')
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }
+                                   @{ Id = 'sky-195'; Acquired = $true }
+                                   @{ Id = 'sky-200'; Acquired = $true }
+                                   @{ Id = 'sky-201'; Acquired = $true }
+                                   @{ Id = 'sky-202'; Acquired = $true }
+                                   @{ Id = 'sky-203'; Acquired = $true }
+                                   @{ Id = 'sky-050'; Acquired = $true }
+                                   @{ Id = 'sky-051'; Acquired = $true }
+                                   @{ Id = 'sky-041'; Acquired = $true }
+                               )
+                           } }
+    # sky-ready's staging with Cleric's unlock already complete (Hateborne, 2026-09-03).
+    # PREDICTED: the Ready view's CLR — Necklace of Resolution row carries "Cleric
+    # already unlocked — turn in for the item only" and the WAR row does not.
+    'sky-ready-unlocked' = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'sky:ready' }
+                           Ledger = @{ Classes = @('Warrior', 'Cleric')
+                                       UnlockedClasses = @('Cleric') }
+                           Set = @{
+                               SkyQuestCompleted = @('Warrior|Azure Ruby Ring')
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }
+                                   @{ Id = 'sky-195'; Acquired = $true }
+                                   @{ Id = 'sky-200'; Acquired = $true }
+                                   @{ Id = 'sky-201'; Acquired = $true }
+                                   @{ Id = 'sky-202'; Acquired = $true }
+                                   @{ Id = 'sky-203'; Acquired = $true }
+                                   @{ Id = 'sky-050'; Acquired = $true }
+                                   @{ Id = 'sky-051'; Acquired = $true }
+                                   @{ Id = 'sky-041'; Acquired = $true }
+                               )
+                           } }
     # The Epic tab's per-class master check (#138, restored for #210). Two classes, so
     # the band is visibly PER CLASS rather than a single header that could be anything.
     'epic-checklist'  = @{ Title = 'Quest Tracker'
@@ -1086,6 +1166,15 @@ function Write-WikiCache([hashtable]$pages) {
     }
 }
 
+# The force-stop, spelled once. `$proc.Kill($true)` (kill the tree) exists only on the
+# .NET Core runtime pwsh 7 rides on — Windows PowerShell 5.1's .NET Framework has no
+# such overload, so on a machine with only 5.1 every "fallback" below THREW instead of
+# killing, the shot app outlived its shot, and the run wedged (Hateborne's machine,
+# 2026-09-03). EQBuddy spawns no children, so a plain force-stop is the same act.
+function Stop-Hard([Diagnostics.Process]$proc) {
+    Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+}
+
 # --- stand the real EQBuddy down, and put it back afterwards ------------------------
 # The running app is a worse problem than a mismatched capture. It is always-on-top, it
 # holds the very window titles these shots ask for, and a capture of it would commit a
@@ -1104,8 +1193,8 @@ foreach ($proc in @(Get-Process EQBuddy -ErrorAction SilentlyContinue)) {
     if ($path) { $relaunch += $path }
     Write-Host "Standing down the running EQBuddy (pid $($proc.Id)) — it will be relaunched."
     try {
-        if (-not $proc.CloseMainWindow()) { $proc.Kill($true) }
-        if (-not $proc.WaitForExit(15000)) { $proc.Kill($true); $proc.WaitForExit(5000) | Out-Null }
+        if (-not $proc.CloseMainWindow()) { Stop-Hard $proc }
+        if (-not $proc.WaitForExit(15000)) { Stop-Hard $proc; $proc.WaitForExit(5000) | Out-Null }
     }
     catch { }   # already gone between the enumerate and the close
 }
@@ -1203,7 +1292,7 @@ function Invoke-PrimeRun([object[]]$runs) {
         # nothing on screen would say why.
         Start-Sleep -Seconds $Settle
         if (-not $proc.HasExited) { $proc.CloseMainWindow() | Out-Null }
-        if (-not $proc.WaitForExit(20000)) { $proc.Kill($true); $proc.WaitForExit(5000) | Out-Null }
+        if (-not $proc.WaitForExit(20000)) { Stop-Hard $proc; $proc.WaitForExit(5000) | Out-Null }
         # Removed before the capture run: two logs in the folder means the widget follows
         # whichever grew last, and the shot's own character would flip under it.
         if ($extraLog) {
@@ -1301,7 +1390,7 @@ try {
             $taken += $png
         }
         finally {
-            if (-not $proc.HasExited) { $proc.Kill($true) }
+            if (-not $proc.HasExited) { Stop-Hard $proc }
             $proc.WaitForExit(10000) | Out-Null
         }
     }

@@ -98,7 +98,10 @@ public static partial class CompanionProjection
                     // reward key, which no tick action accepts.
                     g.CompletionKey ?? QuestChecklistLayout.RewardKey(g.ClassName, g.Title),
                     $"{g.ClassName} — {g.Title}",
-                    g.TurnInNpc,
+                    // The NPC plus the already-unlocked caveat, joined in Core so the
+                    // phone's sub-line and the desktops' inline note cannot drift
+                    // (Hateborne, 2026-09-03).
+                    QuestChecklistLayout.ReadyDetail(g, req.UnlockedClasses),
                     // NOT done — ready is the opposite of done, and the phone strikes a
                     // done row through. bjstrange's screenshot on #212 shows all three of
                     // his ready rewards ticked and crossed out, which reads as "handed

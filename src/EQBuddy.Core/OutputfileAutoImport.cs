@@ -154,7 +154,8 @@ public static class OutputfileAutoImport
     /// inventory dump" as a single event even though gear and quest counts are two
     /// different stores underneath.</summary>
     public static AutoImportOutcome ImportInventory(InventoryFile.Snapshot dump, AppSettings settings,
-        (int Trued, Action? Undo)? questReconcile = null)
+        (int Trued, Action? Undo)? questReconcile = null,
+        QuestLedgerStore? ledger = null, string characterKey = "")
     {
         var before = settings.GearChecklist
             .Where(i => !i.Acquired).Select(GearKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -163,19 +164,44 @@ public static class OutputfileAutoImport
             .Where(i => i.Acquired && before.Contains(GearKey(i))).Select(GearKey).ToList();
         var (questTrued, questUndo) = questReconcile ?? (0, null);
 
+        // The dump's other half (Hateborne, 2026-09-03): owning a reward's FINISHED item
+        // proves the turn-in happened, no matter how long before EQBuddy existed. Same
+        // before/after capture as the achievements path — an undo restores exactly what
+        // this import changed, never ticks the player made in between.
+        var skyMatches = SkyRewardAutoComplete.FindTurnedIn(
+            dump, settings.SkyQuestChecklist, settings.SkyQuestCompleted);
+        var skyBefore = settings.SkyQuestChecklist
+            .Where(i => !i.Acquired).Select(i => i.Id).ToHashSet(StringComparer.Ordinal);
+        var completedBefore = settings.SkyQuestCompleted.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var skyMarked = SkyRewardAutoComplete.Apply(skyMatches, settings, ledger, characterKey);
+        var skyFlipped = settings.SkyQuestChecklist
+            .Where(i => i.Acquired && skyBefore.Contains(i.Id)).Select(i => i.Id).ToList();
+        var completedAdded = settings.SkyQuestCompleted
+            .Where(k => !completedBefore.Contains(k)).ToList();
+
         return new AutoImportOutcome(OutputfileKind.Inventory, Path.GetFileName(dump.Path),
-            dump.WrittenAt, GearTicked: flipped.Count, RaidsMarked: 0, SkyMarked: 0)
+            dump.WrittenAt, GearTicked: flipped.Count, RaidsMarked: 0, SkyMarked: skyMarked)
         {
             QuestCountsTrued = questTrued,
-            Undo = flipped.Count == 0 && questUndo is null ? null : () =>
+            // FindTurnedIn already excludes completed keys, so every match IS newly marked
+            // and the report can name the list without re-deriving what Apply did.
+            SkyRewardsMarkedItems = [.. skyMatches.Select(m => m.ClassName + " · " + m.Reward)],
+            Undo = flipped.Count == 0 && questUndo is null && skyMarked == 0 ? null : () =>
             {
                 if (flipped.Count > 0)
                 {
                     var undo = flipped.ToHashSet(StringComparer.OrdinalIgnoreCase);
                     foreach (var item in settings.GearChecklist)
                         if (undo.Contains(GearKey(item))) item.Acquired = false;
-                    settings.Save();
                 }
+                if (skyMarked > 0)
+                {
+                    var undoIds = skyFlipped.ToHashSet(StringComparer.Ordinal);
+                    foreach (var item in settings.SkyQuestChecklist)
+                        if (undoIds.Contains(item.Id)) item.Acquired = false;
+                    foreach (var key in completedAdded) settings.SkyQuestCompleted.Remove(key);
+                }
+                if (flipped.Count > 0 || skyMarked > 0) settings.Save();
                 questUndo?.Invoke();
             },
         };
@@ -215,6 +241,13 @@ public sealed record AutoImportOutcome(
 
     public int SkyLeftovers => SkyLeftoverItems.Count;
 
+    /// <summary>The Sky rewards an INVENTORY dump proved already turned in — "Class ·
+    /// Reward", because the class is half the identity of a Sky reward key. The list
+    /// rather than a count for the same reason as <see cref="SkyLeftoverItems"/>: the
+    /// hover has to NAME what was marked, or an unwatched change is unaccountable.
+    /// Count matches <see cref="SkyMarked"/> on this kind; empty on every other.</summary>
+    public IReadOnlyList<string> SkyRewardsMarkedItems { get; init; } = [];
+
     /// <summary>Sky rewards the dump flagged obtained and the #101 guard refused, because
     /// the class unlock that flagged them was granted rather than earned. NOT a failure —
     /// the guard working — but the player has to be told, or a dump full of rewards reads
@@ -252,7 +285,7 @@ public sealed record AutoImportOutcome(
     public string Summary => Kind switch
     {
         OutputfileKind.Inventory =>
-            (GearTicked == 0 && QuestCountsTrued == 0
+            (GearTicked == 0 && QuestCountsTrued == 0 && SkyMarked == 0
                 ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick"
                 : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
                     new[]
@@ -260,6 +293,9 @@ public sealed record AutoImportOutcome(
                         GearTicked > 0 ? $"{GearTicked} item{(GearTicked == 1 ? "" : "s")} ticked" : null,
                         QuestCountsTrued > 0
                             ? $"{QuestCountsTrued} quest count{(QuestCountsTrued == 1 ? "" : "s")} trued"
+                            : null,
+                        SkyMarked > 0
+                            ? $"{SkyMarked} Sky reward{(SkyMarked == 1 ? "" : "s")} marked turned in"
                             : null,
                     }.Where(s => s is not null)))
             // Its own clause after a ·, never folded into the comma list: the others are
@@ -304,13 +340,26 @@ public sealed record AutoImportOutcome(
         get
         {
             if (Kind == OutputfileKind.Inventory)
-                return SkyLeftovers == 0 ? null
-                    : "Every Sky reward that takes "
-                      + (SkyLeftovers == 1 ? "this item is" : "these items is")
-                      + " already turned in, and no other quest in the catalog wants "
-                      + (SkyLeftovers == 1 ? "it" : "them") + ": "
-                      + string.Join(", ", SkyLeftoverItems)
-                      + ". Nothing has been sold, destroyed or ticked — this is a list.";
+            {
+                var paragraphs = new List<string>();
+                if (SkyMarked > 0)
+                    paragraphs.Add("Your own bags and bank hold "
+                        + (SkyMarked == 1 ? "the finished item for this Sky reward"
+                            : "the finished items for these Sky rewards")
+                        + ", which proves the turn-in already happened: "
+                        + string.Join(", ", SkyRewardsMarkedItems)
+                        + ". Right-click "
+                        + (SkyMarked == 1 ? "the reward" : "a reward")
+                        + " on the Sky tab to reopen it if EQBuddy has this wrong.");
+                if (SkyLeftovers > 0)
+                    paragraphs.Add("Every Sky reward that takes "
+                        + (SkyLeftovers == 1 ? "this item is" : "these items is")
+                        + " already turned in, and no other quest in the catalog wants "
+                        + (SkyLeftovers == 1 ? "it" : "them") + ": "
+                        + string.Join(", ", SkyLeftoverItems)
+                        + ". Nothing has been sold, destroyed or ticked — this is a list.");
+                return paragraphs.Count == 0 ? null : string.Join("\n\n", paragraphs);
+            }
 
             if (Kind != OutputfileKind.Achievements || Noted == 0) return null;
             var parts = new List<string>();

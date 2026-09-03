@@ -126,6 +126,28 @@ public class SurfaceParityTests
             Sky(Settings()).Groups[0].Rows.Single(r => r.Text.StartsWith("Ranger")).Detail);
     }
 
+    /// <summary>The already-unlocked caveat (Hateborne, 2026-09-03) reaches the phone as
+    /// the SAME string Core builds for the desktops — <see
+    /// cref="QuestChecklistLayout.ReadyDetail"/>, asserted against the module rather than
+    /// re-spelled here. And it is opt-in: a class nobody has unlocked keeps the bare NPC,
+    /// which is what keeps <see cref="TheReadyBandNamesWhoTakesTheHandInOnThePhoneToo"/>
+    /// true unchanged.</summary>
+    [Fact]
+    public void TheReadyBandAnnotatesAnAlreadyUnlockedClassOnThePhoneToo()
+    {
+        var s = Settings();
+        var band = Sky(s, new CompanionQuestRequest { UnlockedClasses = ["Ranger"] }).Groups[0];
+
+        var desktop = QuestChecklistLayout.ReadyToTurnIn(Desktop(s))
+            .Single(g => g.ClassName == "Ranger");
+        Assert.Equal(QuestChecklistLayout.ReadyDetail(desktop, ["Ranger"]),
+            band.Rows.Single(r => r.Text.StartsWith("Ranger")).Detail);
+        Assert.Contains("Ranger already unlocked",
+            band.Rows.Single(r => r.Text.StartsWith("Ranger")).Detail);
+        Assert.Equal("Cilin Spellsinger",
+            band.Rows.Single(r => r.Text.StartsWith("Bard")).Detail);
+    }
+
     [Fact]
     public void ARewardTurnedInOnEitherScreenIsTurnedInOnBoth()
     {

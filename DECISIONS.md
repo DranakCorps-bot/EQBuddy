@@ -15,6 +15,46 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-03
+
+_All four items this day were direct owner-session requests from Hateborne (fold, Sky
+completion detection, inventory prompt, Alt+Tab); the calls below are the defaults each
+one could have gone the other way on._
+
+- **Owning a Sky reward's finished item auto-MARKS it turned in — not "suggests"** (`SkyRewardAutoComplete`,
+  wired into `OutputfileAutoImport.ImportInventory`). · The other way: a suggest-only row the
+  player confirms, the `SuggestRarity` bar. · Ownership is decisive (the game's own unlock
+  criterion is "Obtain X" and the item existing IS the obtain), the mark is add-only, the report
+  names each reward with an Undo beside it, and the way back is the same right-click Reopen a
+  mis-click already has. Verified zero name collisions between the 95 reward names and any
+  ingredient or "(Exaltation)" item before trusting the match.
+
+- **The Sky band folds are SESSION-ONLY, per Hateborne's explicit pick** (asked with the
+  question tool; he chose session-only over persisted). · The other way: three remembered
+  flags. · Matches the ProgressCardView precedent (Bevel/Helm 2026-08-23) and adds no setting
+  for `DeadSettingTests` to outlive.
+
+- **The already-unlocked caveat ANNOTATES the ready row rather than hiding it** (Hateborne's
+  pick, same question round). · The other way: drop rows for unlocked classes from Ready. ·
+  The turn-in still yields a real item, so the row stays and says what the errand still buys.
+
+- **The Sky tab's achievements prompt became a two-button command row** (achievements +
+  inventory ⧉ side by side, one combined note) rather than two stacked note-plus-button
+  blocks. · The other way: a second free-standing prompt under the first. · The Unlocks tab
+  already renders exactly this shape for its two dumps, and Hateborne's ask was consistency
+  with it. HELM.md's "#243 no Inventory annotate in V1" was read as covering band-row
+  annotations, not the tab naming its own data source; logged in HELM-FEEDBACK.md.
+
+- **WPF's fold click has no E2E coverage** — Avalonia's real click tests plus the
+  word-for-word-twins rule are the mitigation; the E2E dump pins the default-open facts only.
+  · The other way: a UI-automation dependency for one feature. · Not worth the harness.
+
+- **`shoot.ps1`'s `Kill($true)` became `Stop-Hard` (`Stop-Process -Force`)** — the tree-kill
+  overload exists only on pwsh 7's runtime, and on a machine with only Windows PowerShell 5.1
+  every kill-fallback THREW, leaking the shot app and wedging the run. · The other way:
+  require pwsh 7. · EQBuddy spawns no children, so a plain force-stop is the same act and the
+  script now runs on both hosts.
+
 ## 2026-09-02
 
 - **On the phone, the DUMP reaches the render signature through the row ids — not through the

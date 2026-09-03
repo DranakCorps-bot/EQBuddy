@@ -47,18 +47,13 @@ public static class SkyCompleteToggle
         QuestLedgerStore? ledger = null, string characterKey = "")
     {
         var items = rewardItems.ToList();
-        // Captured before the write: the consume below must fire only on the transition
-        // INTO turned-in, or a second call (achievements import racing a click, a
-        // re-render) would consume the reward's items twice.
-        var alreadyTurnedIn = IsTurnedIn(settings, rewardKey);
-        if (!alreadyTurnedIn)
-            settings.SkyQuestCompleted.Add(rewardKey);
-        foreach (var item in items)
-        {
-            item.Acquired = true;
-            item.AcquiredUnassigned = false;
-        }
-        if (!alreadyTurnedIn && ledger is not null && characterKey.Length > 0 && items.Count > 0)
+        // The settings half lives in Core (QuestChecklistLayout.MarkRewardTurnedIn) so the
+        // inventory-driven auto-complete and this click share one definition of "turned in".
+        // Its return is the transition INTO turned-in, and the consume below must fire only
+        // then — a second call (achievements import racing a click, a re-render) would
+        // consume the reward's items twice.
+        var newlyTurnedIn = QuestChecklistLayout.MarkRewardTurnedIn(settings, rewardKey, items);
+        if (newlyTurnedIn && ledger is not null && characterKey.Length > 0 && items.Count > 0)
             ledger.RecordCompletion(characterKey,
                 SkyTestSplit.QuestName(items[0].ClassName, items[0].Reward),
                 items.Select(i => new QuestItemNeed { Name = i.QuestItem }));

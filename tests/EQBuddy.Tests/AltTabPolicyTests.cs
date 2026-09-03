@@ -53,4 +53,18 @@ public class AltTabPolicyTests
         Assert.Contains("taskbar", AltTabPolicy.TaskbarWarning);
         Assert.Contains("tray icon", AltTabPolicy.TaskbarWarning);
     }
+
+    /// <summary>
+    /// The behaviour finally matches the warning (Hateborne, 2026-09-03): hiding from
+    /// Alt+Tab takes the main window's taskbar button, because ShowInTaskbar=true is
+    /// asserted as WS_EX_APPWINDOW and APPWINDOW overrides TOOLWINDOW for switcher
+    /// membership. For a week the warning promised a cost the feature never charged —
+    /// and the switcher exclusion it was the price OF never happened either.
+    /// </summary>
+    [Fact]
+    public void HidingFromAltTabIsExactlyWhatCostsTheTaskbarButton()
+    {
+        Assert.False(AltTabPolicy.MainWindowShowsInTaskbar(hideFromAltTab: true));
+        Assert.True(AltTabPolicy.MainWindowShowsInTaskbar(hideFromAltTab: false));
+    }
 }

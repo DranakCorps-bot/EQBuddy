@@ -469,4 +469,85 @@ public class OutputfileAutoImportTests
         outcome.Undo!();
         Assert.False(settings.GearChecklist[0].Acquired);
     }
+
+    // ---- the dump's Sky half: owning the finished reward proves the turn-in ----
+    //      (Hateborne, 2026-09-03: Ivory Mask in the bank, still listed as ready)
+
+    private static AppSettings WithSkyReward()
+    {
+        var s = new AppSettings { GearChecklist = [] };
+        s.SkyQuestChecklist.AddRange(
+        [
+            new SkyQuestChecklistItem
+            {
+                Id = "a", ClassName = "Enchanter", Reward = "Ivory Mask",
+                Npc = "Enchanter Jolas", QuestItem = "Silken Mask",
+            },
+            new SkyQuestChecklistItem
+            {
+                Id = "b", ClassName = "Enchanter", Reward = "Ivory Mask",
+                Npc = "Enchanter Jolas", QuestItem = "Wind Rune Beza",
+            },
+        ]);
+        return s;
+    }
+
+    private static InventoryFile.Snapshot SkyDump()
+    {
+        var lines = new[]
+        {
+            "Location\tName\tID\tCount\tSlots",
+            "Bank15-Slot3\tIvory Mask\t1275\t1\t10",
+        };
+        return new InventoryFile.Snapshot("Hateborne_neriak-Inventory.txt",
+            new DateTime(2026, 9, 3, 12, 0, 0), InventoryFile.Parse(lines))
+        { Entries = InventoryFile.ParseEntries(lines) };
+    }
+
+    [Fact]
+    public void AnInventoryDumpMarksOwnedSkyRewardsTurnedIn()
+    {
+        var settings = WithSkyReward();
+        var outcome = OutputfileAutoImport.ImportInventory(SkyDump(), settings);
+
+        Assert.Equal(1, outcome.SkyMarked);
+        Assert.Contains("1 Sky reward marked turned in", outcome.Summary);
+        Assert.Contains("Enchanter · Ivory Mask", outcome.Detail);
+        Assert.Contains(QuestChecklistLayout.RewardKey("Enchanter", "Ivory Mask"),
+            settings.SkyQuestCompleted);
+        Assert.All(settings.SkyQuestChecklist, i => Assert.True(i.Acquired));
+    }
+
+    /// <summary>The undo puts back exactly what THIS import changed: the completed key
+    /// goes, and only the item ticks the import itself flipped — a tick the player made
+    /// beforehand survives.</summary>
+    [Fact]
+    public void TheInventoryUndoReopensAutoMarkedSkyRewards()
+    {
+        var settings = WithSkyReward();
+        settings.SkyQuestChecklist[0].Acquired = true;   // the player's own tick
+
+        var outcome = OutputfileAutoImport.ImportInventory(SkyDump(), settings);
+        Assert.NotNull(outcome.Undo);
+        outcome.Undo!();
+
+        Assert.Empty(settings.SkyQuestCompleted);
+        Assert.True(settings.SkyQuestChecklist[0].Acquired);    // untouched
+        Assert.False(settings.SkyQuestChecklist[1].Acquired);   // the import's flip, undone
+    }
+
+    /// <summary>A second read of the same dump is a no-op: the completed key makes the
+    /// finder skip the reward, so the summary reads "nothing new" and no Undo is
+    /// offered.</summary>
+    [Fact]
+    public void ARepeatDumpMarksNoSkyRewardTwice()
+    {
+        var settings = WithSkyReward();
+        OutputfileAutoImport.ImportInventory(SkyDump(), settings);
+        var again = OutputfileAutoImport.ImportInventory(SkyDump(), settings);
+
+        Assert.Equal(0, again.SkyMarked);
+        Assert.Contains("nothing new to tick", again.Summary);
+        Assert.Null(again.Undo);
+    }
 }

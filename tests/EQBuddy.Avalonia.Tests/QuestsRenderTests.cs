@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -45,6 +46,8 @@ public sealed class QuestsRenderTests : IDisposable
         /// <summary>Settable, so a test can put the Sky tab's import report on screen —
         /// null is the ordinary case (no dump has been read this session).</summary>
         public AutoImportOutcome? LastAchievementsImport { get; set; }
+        /// <summary>The inventory dump's own report (Hateborne, 2026-09-03) — same rule.</summary>
+        public AutoImportOutcome? LastInventoryImport { get; set; }
         /// <summary>Settable, so a test can put a real `/outputfile inventory` dump in
         /// front of the window — null is the honest default (no dump has ever been read),
         /// and the #243 leftover bands have to be ABSENT in that state rather than empty:
@@ -509,6 +512,157 @@ public sealed class QuestsRenderTests : IDisposable
         // Not merely absent: an item that vanishes with no reason reads as a bug in the
         // join, and naming the quest is the sentence that stops someone selling it.
         Assert.Contains(a, t => t.Contains("Azure Ring") && t.Contains("Blackburrow Brewers"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    // ---- the session-only band folds (Hateborne, 2026-09-03) ----
+    //
+    // Fold state is a FIELD, never a setting (the ProgressCardView precedent — Bevel,
+    // Helm-signed 2026-08-23): these tests prove the click works, that folding one band
+    // leaves its neighbour alone, and that a fresh window opens expanded — the assertion
+    // that would fail the day someone "helpfully" persists it.
+
+    /// <summary>Rows built through Inlines have no <c>Text</c>, so the plain BandLines
+    /// helper cannot see them — this one flattens Runs too.</summary>
+    private static List<string> BandTexts(QuestsWindow window, string tag) =>
+        Band(window, tag) is { } band
+            ? [.. band.GetVisualDescendants().OfType<TextBlock>()
+                .Select(t => t.Inlines is { Count: > 0 } inl
+                    ? string.Concat(inl.OfType<global::Avalonia.Controls.Documents.Run>()
+                        .Select(r => r.Text))
+                    : t.Text ?? "")]
+            : [];
+
+    private static void FoldClick(QuestsWindow window, string tag)
+    {
+        // A control's bounds exist only after a layout pass — without this the click
+        // lands at (4, 0) of an un-arranged tree and toggles nothing.
+        window.UpdateLayout();
+        var fold = Band(window, tag)!.GetVisualDescendants().OfType<EqFoldLabel>().Single();
+        var point = global::Avalonia.VisualExtensions.TranslatePoint(
+            fold, new global::Avalonia.Point(4, fold.Bounds.Height / 2), window);
+        Assert.True(point.HasValue, $"{tag}'s heading is not laid out — it cannot be clicked");
+        window.MouseDown(point!.Value, global::Avalonia.Input.MouseButton.Left);
+        window.MouseUp(point!.Value, global::Avalonia.Input.MouseButton.Left);
+        window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    private static FakeHost LeftoverHost()
+    {
+        var host = new FakeHost
+        {
+            QuestCatalog = Catalog(),
+            QuestCharacterKey = "tester_p1999",
+            Inventory = Dump(),
+            Classes = (["Warrior"], ClassSource.Achievements),
+        };
+        WithLeftovers(host.Settings);
+        return host;
+    }
+
+    [AvaloniaFact]
+    public void ClickingABandHeadingFoldsItToOneLineAndClickingAgainReopensIt()
+    {
+        var window = new QuestsWindow(LeftoverHost());
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        Assert.Contains("Azure Ring ×1 · bags", BandLines(window, "skyLeftoverA"));
+
+        FoldClick(window, "skyLeftoverA");
+        var a = BandLines(window, "skyLeftoverA");
+        // Collapsed is one line in the SAME box: the Border stays, the heading keeps its
+        // count, and the rows are gone.
+        Assert.NotNull(Band(window, "skyLeftoverA"));
+        Assert.Contains("No longer needed — 2", a);
+        Assert.DoesNotContain(a, t => t.Contains("Azure Ring"));
+        // The neighbour is untouched — one fold per band, not one for the tab.
+        Assert.Contains("Brass Knuckles ×2 · bank", BandLines(window, "skyLeftoverB"));
+
+        FoldClick(window, "skyLeftoverA");
+        Assert.Contains("Azure Ring ×1 · bags", BandLines(window, "skyLeftoverA"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    [AvaloniaFact]
+    public void TheReadyBandFoldsTheSameWayAndAFreshWindowOpensExpanded()
+    {
+        var host = LeftoverHost();
+        // Belt of Winds' one piece in hand: a ready reward, so the Ready band draws.
+        host.Settings.SkyQuestChecklist.Single(i => i.Id == "c1").Acquired = true;
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        Assert.Contains(BandTexts(window, "skyReady"), t => t.Contains("Belt of Winds"));
+
+        FoldClick(window, "skyReady");
+        var folded = BandTexts(window, "skyReady");
+        Assert.Contains("Ready to turn in — 1", folded);
+        Assert.DoesNotContain(folded, t => t.Contains("Belt of Winds"));
+
+        // Session-only, literally: the fold dies with the window, not with the session's
+        // settings file — a FRESH window opens expanded.
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+        var fresh = new QuestsWindow(host);
+        fresh.Show();
+        fresh.SetTab(QuestTab.Sky);
+        Assert.Contains(BandTexts(fresh, "skyReady"), t => t.Contains("Belt of Winds"));
+
+        fresh.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>The already-unlocked caveat (Hateborne, 2026-09-03): a ready reward for a
+    /// class whose unlock the achievements dump says is complete carries Core's one-line
+    /// note, and other classes' rows do not.</summary>
+    [AvaloniaFact]
+    public void TheReadyBandAnnotatesAnAlreadyUnlockedClass()
+    {
+        var ledger = new QuestLedgerStore(Path.Combine(_profile, "quest-ledger.json"));
+        ledger.SetUnlockedClasses("tester_p1999", ["Warrior"]);
+        var host = new FakeHost
+        {
+            QuestCatalog = Catalog(),
+            QuestLedger = ledger,
+            QuestCharacterKey = "tester_p1999",
+            Classes = (["Warrior"], ClassSource.Achievements),
+        };
+        WithLeftovers(host.Settings);
+        host.Settings.SkyQuestChecklist.Single(i => i.Id == "c1").Acquired = true;
+        var window = new QuestsWindow(host);
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+
+        Assert.Contains(BandTexts(window, "skyReady"), t => t.Contains("Belt of Winds")
+            && t.Contains("Warrior already unlocked — turn in for the item only"));
+
+        window.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>The Sky tab names BOTH of its dumps (Hateborne, 2026-09-03): the
+    /// achievements ⧉ it always had, and an inventory ⧉ in the tab body — the header's
+    /// "scan bags" is chrome, not the tab saying what feeds it.</summary>
+    [AvaloniaFact]
+    public void TheSkyTabDrawsItsOwnInventoryPrompt()
+    {
+        var window = new QuestsWindow(LeftoverHost());
+        window.Show();
+        window.SetTab(QuestTab.Sky);
+        // The ⧉ buttons' content is materialized by the layout pass, not by Children.Add.
+        window.UpdateLayout();
+
+        var labels = window.GetVisualDescendants().OfType<TextBlock>()
+            .Select(t => t.Text ?? "").ToList();
+        Assert.Contains(UI.Shared.GameCommands.OutputfileInventory, labels);
+        Assert.Contains(UI.Shared.GameCommands.OutputfileAchievements, labels);
 
         window.Close();
         Dispatcher.UIThread.RunJobs();

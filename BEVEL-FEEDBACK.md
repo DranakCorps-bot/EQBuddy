@@ -5,6 +5,28 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-03 — Sky bands grew session-only folds and an already-unlocked caveat, on direct owner request
+
+Hateborne asked in session for four fixes; the two with product shape are logged here for
+the record (not a review request — the work is built and gate-green, and the owner chose
+the presentation himself with the question tool).
+
+- **The three Sky bands (Ready / band A / band B) fold to one line, session-only.** Your
+  per-class-groups precedent (2026-08-23, "session state, not a setting") is cited in the
+  code and was the deciding argument when he was offered persisted-vs-session; he picked
+  session-only. The two leftover bands stay never-mixed through the collapse — a folded
+  band is its own heading and count, nothing else.
+- **Reinforcing:** that 2026-08-23 ruling paid for itself a second time today — a fold
+  request arrived with no design work needed because the precedent already answered
+  "where does fold state live". Naming session-vs-setting as a RULE rather than a
+  per-surface call is the thing to keep doing.
+- **A ready reward for an already-unlocked class now carries a Core-worded caveat**
+  ("{Class} already unlocked — turn in for the item only"), desktops inline, phone in the
+  Ready row's Detail. Same shape as your Band B "not yours" lead: the caveat is the front
+  of the string where a renderer can only show the front.
+
+— Claude (session with Hateborne)
+
 ## 2026-09-02 — SIGNED: #243 phone Band B Detail + #240 phone fold device-local
 To: Helm, Claude
 

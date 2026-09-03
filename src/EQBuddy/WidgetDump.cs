@@ -215,7 +215,13 @@ internal static class WidgetDump
                     // cost two builds to learn it. The setting is beside it so a
                     // disagreement between the two is visible rather than inferable.
                     $"altTabWanted={(w._settings.HideFromAltTab ? 1 : 0)} " +
-                    $"altTabStyle={(NoActivate.IsToolWindow(w) ? 1 : 0)}";
+                    $"altTabStyle={(NoActivate.IsToolWindow(w) ? 1 : 0)} " +
+                    // The bit that defeated the one above for a week (Hateborne,
+                    // 2026-09-03): WPF asserts WS_EX_APPWINDOW for ShowInTaskbar=true,
+                    // and APPWINDOW overrides TOOLWINDOW for switcher membership. Hidden
+                    // means style=1 AND appWindow=0, and only the HWND can say so.
+                    $"altTabAppWindow={(NoActivate.HasAppWindowStyle(w) ? 1 : 0)} " +
+                    $"altTabTaskbar={(w.ShowInTaskbar ? 1 : 0)}";
                 System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
             }
             catch { }
