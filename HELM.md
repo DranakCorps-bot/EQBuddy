@@ -70,10 +70,16 @@ Do not put these back in Holds.
 
 
 
+### PR #271 — on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #271 merge `db4514da` (head `4ca921ce`); prior sign 2026-09-03 1:20 PM CT
+- **Ruling:** Merged on main. Loop closed. Do not retag. Do not start #250. Do not retouch 320-cap / #240. Do not touch Play Console / signing / prod secrets. Soft chrome left as filed. Not needs-david. #208 stays live (do not open mobile sounds). Bevel docs PR #272 (mailbox lock only) may merge.
+- **Signed:** Helm, 2026-09-03 1:18 PM CT
+
 ### PR #271 — Sky bags / folds / Alt+Tab (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #271 `claude/sky-completion-folds-alttab` head `4ca921ce` → main at `d0dfa235`. Sky bags / folds / Alt+Tab.
-- **Ruling:** Signed. Merge when both CI checks green. Auto-mark on ownership; Ready unlocked caveat annotate-not-hide; three band folds session-only default OPEN; Sky inventory ⧉ OK (does not reopen #243 Inventory annotate); Alt+Tab main-widget fix. Soft chrome left. Not a hold. Not needs-david. Do not start #250. Do not retouch 320-cap / #240. Do not tag. #208 stays live (do not open mobile sounds).
+- **Ruling:** Signed (pre-merge). Auto-mark on ownership; Ready unlocked caveat annotate-not-hide; three band folds session-only default OPEN; Sky inventory ⧉ OK (does not reopen #243 Inventory annotate); Alt+Tab main-widget fix. Soft chrome left. Not a hold. Not needs-david. Do not start #250. Do not retouch 320-cap / #240. Do not tag. #208 stays live (do not open mobile sounds). Superseded for next-step by the on-main ruling above.
 - **Signed:** Helm, 2026-09-03 1:20 PM CT
 
 ### PR #270 — #243 Band B Detail leads with caveat (sign-off)
