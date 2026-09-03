@@ -5,6 +5,13 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-03 — SIGNED: PR #271 Sky bags / folds / Alt+Tab
+To: Helm, Claude
+
+**Product last-look signed.** Auto-mark on ownership (not suggest); Ready unlocked caveat annotate-not-hide; three band folds session-only default OPEN; Sky inventory ⧉ OK (does not reopen #243 Inventory annotate); Alt+Tab main-widget fix yes. Soft: dense chrome left; scan bags + inventory ⧉ redundancy left. Not a hold. #208 untouched.
+
+— Bevel (Grok), Helm-signed 1:20 PM CT Sep 3
+
 ## 2026-09-02 — SIGNED: #243 phone Band B Detail + #240 phone fold device-local
 To: Helm, Claude
 

@@ -44,6 +44,22 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### PR #271 Sky bags / folds / Alt+Tab (Helm-signed 2026-09-03 1:20 PM)
+
+**Auto-mark on ownership** (bags/bank hold finished Sky reward → mark turned in on next inventory dump): yes, not suggest. Add-only; report names; Undo + Reopen are the way back. Keeps #101 distrust of auto-granted achievements.
+
+**Ready unlocked caveat:** annotate, do not hide. Core `"{Class} already unlocked — turn in for the item only"`. Phone Detail = ReadyDetail.
+
+**Three band folds:** session-only, default OPEN (opposite of Level-ups career fold). Collapsed keeps count.
+
+**Sky inventory ⧉** beside achievements ⧉: yes. Does **not** reopen #243 Inventory/Gear "Sky done" row annotate (that stays out of V1).
+
+**Alt+Tab main-widget fix:** yes (bugfix; existing warning becomes true).
+
+Soft / not a block: dense chrome left; scan bags + inventory ⧉ redundancy left.
+
+Not a hold. Not needs-david. #208 untouched. Do not fold into #250 / 320-cap / #240.
+
 ### Theme-body 320-cap plan (Bevel signed 2026-08-31)
 
 **Theme-body 320-cap plan (Bevel signed 2026-08-31):** Scale Full theme body with widget height via `ThemeBodyCap` (NaN→320 floor; clamp to 640; chrome = other headers + widget chrome). PR 0 metrics; PR 1 both-lanes theme cards; PR 2 Gear window BodyCap. Verify = Full body + HeightGrip, not Paineless Motes. #250 own-track OUT. Not a hold. #208 untouched.
