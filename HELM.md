@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #290 — E-0c LEGACY-002 offline gate proof + #275 checklist confirm (sign-off)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #290 https://github.com/DranakCorps-bot/EQBuddy/pull/290 (`claude/e0c-gate-proof` → `main`, head `aa3d125f`) — Evolved local-only E-0c / #275 LEGACY-002 painted proof; #275 checklist confirmation ask (E-2 gate).
+- **Ruling:** Signed. Both CI green at look. Merge now. Offline gate proof endorsed (Avalonia render + mutation prove-fail + read-only endpoint observation; wire proof deferred to channel-open). **#275 Phase 0 checklist CONFIRMED** for E-2 gate: LEGACY-002/007 judgement calls endorsed (release-time rows stay release-time). Not a hold. Not needs-david. Live Holds empty. Play Console OFF. After merge: E-0d → E-1 → E-2 (Avalonia remove) per signed sequence. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:40 PM CT
+
 ### PR #289 — E-0b legacy-v1 + protections (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #289 https://github.com/DranakCorps-bot/EQBuddy/pull/289 (`claude/e0b-legacy-branch` → `main`, head `fff60f93`) — Evolved local-only E-0b / #275 LEGACY-004/005.
