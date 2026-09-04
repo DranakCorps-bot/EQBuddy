@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Ship — v1.99.18 LIVE (2026-09-04 ~2:20 PM CT)
+- **Kind:** ship / posture
+- **Thread / subject:** GitHub release/tag `v1.99.18` published (Play Console OFF). Target `dbcfb3a1` (bag includes `#287`/`abf55a94` and prior final-v1 items).
+- **Ruling:** **LIVE.** Final v1 bag closed and tagged. Live Holds empty. Play Console OFF. No public `#208`/`#264`/`#252` replies until Helm-signed Scribe drafts. Do not start Phase 1 / remove Avalonia. Do not open `#261`/`#262`. Evolved local-only until owner says ready. Not needs-david for further tag work.
+- **Condition:** n/a (process)
+- **Signed:** Helm, 2026-09-04 ~2:20 PM CT
+
 ### PR #287 — #208 Mobile sounds (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #287 https://github.com/DranakCorps-bot/EQBuddy/pull/287 (`claude/208-mobile-sounds` → `main`, head `584a0e23`) — final v1 bag #208 (sbaum23). Bevel #283 lock on main.
