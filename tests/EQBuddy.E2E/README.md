@@ -34,9 +34,23 @@ has one, which is what the un-gating rests on.
 tall monitor is asserting the desk it was written on:
 `DraggingTheWidgetTallerGrowsTheOpenThemesBody` did exactly that, and the fix was to put
 the arithmetic's two inputs in the dump and assert the relationship instead of a number.
-Same for the fixture replay — `Launch` waits for it to STOP moving before any test samples
-a baseline, because `WaitForDump` is an equality and a counter still climbing sails past
-the expected value between two polls.
+**And nothing may assert the CLOCK either.** `WaitForDump` is an equality, so a counter
+still climbing when a baseline is sampled sails past the expected value between two polls
+and the wait can never be satisfied. `Launch` settles that before any test samples
+anything — and it does so by ASKING the app, never by watching for stillness, which was
+wrong three times running (trap 56). Three keys, all of them together:
+
+| key | means |
+|---|---|
+| `ingestDone=1` | the watcher has finished the startup replay — the totals have stopped |
+| `logPending=0` | the tail has consumed every byte the log holds |
+| `surfacesBehind=0` | every open satellite window has PAINTED that same snapshot |
+
+The last one is the one that is easy to forget: the six theme windows follow the widget's
+tick on their own throttle (1–3 s), so a row count and the total beside it in one dump line
+come from two different moments. `AppendLogLines` waits for `logPending` to return to 0 as
+a post-condition, so a stalled tail fails at the append that caused it instead of 90 s
+later as a wrong row count.
 
 ## How the harness works
 

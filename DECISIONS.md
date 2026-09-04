@@ -17,6 +17,24 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **Fixed a SECOND flake in the same PR as the E2E one — `EqlWikiMobsTests
+  .NoMoreThanTwoFetchesAreEverInFlight`, which is a Core test, not an E2E one.** It asserted
+  the in-flight count 100 ms after starting eight thread-pool lookups, so a hosted runner that
+  had not scheduled them all failed it with 1 (run `33925423795`). The other way: leave it and
+  keep the PR to Helm's stated scope. It landed as a fix because the bar on #294 is eight
+  consecutive greens on one head, and a ~1-in-8 flake anywhere in CI makes that bar
+  unreachable — so "in scope" and "achievable" pointed the same way. Polling replaces the
+  delay; the cap is now checked on every poll rather than sampled once, which is more
+  coverage, not less. Called out explicitly in the last-look ask rather than folded in
+  silently.
+- **Added four diagnostic keys to the `EQBUDDY_EXPAND` dump (`surfacesBehind`, `logPending`,
+  `logSelects`, `killKinds`/`lootKinds`) instead of taking a fourth guess at what "settled"
+  means.** The other way: raise the stillness timeout from 2.5 s, which is what the previous
+  three rounds did in effect. Two CI failures were provably indistinguishable from outside
+  (a stalled tail and a line that parsed without counting both read as "the counter will not
+  move"), and one dump showed `kills=13` against `killsTotal=82` with nothing able to say
+  which number was lying. `LogWatcher.PendingBytes`/`SelectCount` are new public API on Core
+  for this — diagnostics, documented as such. Trap 56, `WidgetDump.cs`, `AppHarness.cs`.
 - **The `/SILENT` local install is inside `release.ps1`'s `-EvolvedLocal` region too, not
   just the OneDrive copy and `gh release create`** (E-1 commit 2, `scripts/release.ps1`). ·
   The other way: the signed plan's commit 2 lists three things `-EvolvedLocal` does and the

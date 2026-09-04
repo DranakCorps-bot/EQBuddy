@@ -175,21 +175,31 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
-    /// Waits until the app SAYS the startup replay is finished — `LogWatcher
-    /// .InitialIngestDone`, reported as `ingestDone` in the dump — and then for one more
-    /// tick, so the surfaces have drawn what was ingested.
+    /// Waits until the app SAYS it is settled — on BOTH counts, because they are two
+    /// different facts and the suite needed each of them:
     ///
-    /// **Two earlier versions inferred this from stillness and both were wrong on a slow
-    /// machine.** Watching `killsTotal` + `lootTotal` missed the fixture's trailing sale
-    /// lines (`TheWealthTabDrawsBothCardsItAbsorbed`: "progressMoneySold to reach 24; last
-    /// seen 10"). Watching the WHOLE dump missed the fact that a mid-ingest pause looks
-    /// exactly like a finished one: on a hosted runner, four of eight runs still failed —
-    /// two of them at "killsTotal to reach 83; last seen 82", where the baseline had been
-    /// taken during a lull and the appended line was queued behind the rest of the fixture.
+    /// 1. `ingestDone` — `LogWatcher.InitialIngestDone`. The startup replay has finished,
+    ///    so the session TOTALS have stopped climbing.
+    /// 2. `surfacesBehind` — how many open satellite windows have not yet painted the
+    ///    snapshot those totals came from. `RefreshUi` ticks the windows BEFORE it builds
+    ///    the snapshot it dumps, and each window throttles on top of that (1 s for Kills
+    ///    &amp; Drops and Gear &amp; Loot, 2 s for Progress and Quests, 3 s for the wiki
+    ///    pack), so a ROW COUNT can be a whole creature behind its own total for seconds.
     ///
-    /// **Quiet is not done, and the watcher already knew the difference.** Asking it is one
-    /// dump key; guessing cost three rounds and eight runner-minutes each. Ship the
-    /// instrument before the third theory (trap 33's closing line, earning itself again).
+    /// **Three earlier versions guessed at this from stillness and all three were wrong on
+    /// a slow machine.** Watching `killsTotal` + `lootTotal` missed the fixture's trailing
+    /// sale lines ("progressMoneySold to reach 24; last seen 10"). Watching the WHOLE dump
+    /// missed that a mid-ingest pause looks exactly like a finished one ("killsTotal to
+    /// reach 83; last seen 82"). Adding `ingestDone` fixed the log half and left the render
+    /// half: `SessionGoesLive…` still failed at "kills to reach 12; last seen 13" beside a
+    /// dump reading `ingestDone=1` — the log was fully read and the Kills window was one
+    /// row short when the baseline was taken, then jumped past 12. And 2.5 s of quiet
+    /// cannot cover a 2 s throttle plus a tick, which is why the fourth guess would have
+    /// been a bigger number rather than an answer.
+    ///
+    /// **Quiet is not done, and the app knew the difference both times.** Every wait here
+    /// is now a question the app answers; nothing is inferred from a timer.
+    /// (Trap 33's closing line, earning itself twice: ship the instrument, not the theory.)
     /// </summary>
     private void WaitForReplayToSettle()
     {
@@ -197,48 +207,17 @@ internal sealed class AppHarness : IDisposable
             "the startup replay to FINISH (debug.txt ingestDone=1) before any test samples " +
             "a baseline — the app's own answer, not a guess from stillness", Artifacts);
 
-        // **And then for the SURFACES to catch up, which is a second thing entirely.**
-        // `ingestDone` says the log has been read; the windows render on their own
-        // throttle, so a row count sampled the instant the ingest finished can still be
-        // climbing. `SessionGoesLive…` failed that way on a runner even with ingestDone in
-        // hand — "kills to reach 14; last seen 13" — because the Kills window was three
-        // rows behind when the baseline was taken and then jumped past 14.
-        //
-        // So: every value in the dump unchanged across two consecutive reads a tick apart,
-        // the ticking keys aside. Neither signal alone was enough — asking the watcher
-        // cannot see a lagging window, and stillness cannot tell a lull from an ending.
-        var seen = SteadyDump();
-        var stableSince = DateTime.UtcNow;
-        Wait.Until(() =>
-        {
-            var now = SteadyDump();
-            if (now.Length == 0 || now != seen)
-            {
-                (seen, stableSince) = (now, DateTime.UtcNow);
-                return false;
-            }
-            return DateTime.UtcNow - stableSince >= SurfaceSettle;
-        }, AssertTimeout,
-            "the surfaces to stop catching up after the ingest finished (every dump value " +
-            $"except the ticking pair unchanged for {SurfaceSettle.TotalSeconds:0.#}s)",
-            Artifacts);
-    }
-
-    /// <summary>Two UI ticks of quiet, measured after the app has SAID the ingest is done —
-    /// so this is only ever waiting on rendering, never on the log.</summary>
-    private static readonly TimeSpan SurfaceSettle = TimeSpan.FromSeconds(2.5);
-
-    /// <summary>The dump with the two ticking keys dropped — the ones the app increments on
-    /// a clock rather than on an event, which would make every read look different.</summary>
-    private string SteadyDump()
-    {
-        try
-        {
-            return string.Join(' ', File.ReadAllText(DebugDumpPath).Split(' ')
-                .Where(pair => !pair.StartsWith("companionPumpTicks=", StringComparison.Ordinal)
-                            && !pair.StartsWith("companionPushes=", StringComparison.Ordinal)));
-        }
-        catch (IOException) { return ""; }
+        // Both, together and re-read each poll: an open window that is still catching up
+        // will report 0 for a tick only if the totals are also quiet, and asserting the
+        // pair rules out the one ordering that could sneak through — surfaces level with
+        // a snapshot that the log is about to move on from.
+        Wait.Until(() => DumpValue("ingestDone") == 1 && DumpValue("surfacesBehind") == 0
+                         && DumpValue("logPending") == 0,
+            AssertTimeout,
+            "every open surface to have PAINTED the settled session (debug.txt " +
+            "surfacesBehind=0 alongside ingestDone=1, with logPending=0) — the windows " +
+            "follow the widget's tick on their own throttle, so a row count sampled the " +
+            "instant the ingest finished can still be climbing", Artifacts);
     }
 
     /// <summary>
@@ -300,12 +279,21 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>Appends messages to the character log with live timestamps, the way the
-    /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.</summary>
+    /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.
+    ///
+    /// **Returns only once the app has READ the bytes** — `logPending` back to 0. That is
+    /// a post-condition, not patience: a tail that has stopped and a line that parsed
+    /// without counting produce the same symptom from out here (a counter that will not
+    /// move), and a whole round went to the wrong one of the two. Failing at the append
+    /// names the tail; failing at the assertion after it names the parse.</summary>
     public void AppendLogLines(params string[] messages)
     {
         var now = DateTime.Now;
         var text = string.Concat(messages.Select(m => FixtureLog.Stamp(now, m) + "\r\n"));
         File.AppendAllText(LogPath, text, Encoding.Latin1);
+        Wait.Until(() => DumpValue("logPending") == 0, AssertTimeout,
+            $"the app's tail to READ the {messages.Length} appended line(s) " +
+            "(debug.txt logPending back to 0)", Artifacts);
     }
 
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is

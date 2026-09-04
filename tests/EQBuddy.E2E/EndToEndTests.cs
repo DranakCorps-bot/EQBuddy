@@ -249,6 +249,12 @@ public sealed class EndToEndTests
         Assert.True(kills > 0, "fixture replay should land kills");
         app.WaitForWindow("kills", "the Kills & Drops window to open and report its rows");
         var killRows = app.DumpValue("kills");
+        // The BASELINE is only worth taking if the window has caught up with the data —
+        // it is subtracted from an expected value below, so a window still climbing makes
+        // the wait unsatisfiable and reports as a 90 s timeout on the wrong line. Launch()
+        // guarantees this (debug.txt surfacesBehind=0); saying it here turns a regression
+        // in that guarantee into an immediate, legible failure instead.
+        Assert.Equal(app.DumpValue("killKinds"), killRows);
         Assert.Equal(1, app.DumpValue("killsCard"));   // the door is on the widget
         Assert.True(app.DumpValue("killsSummaryLen") > 0,
             "the launcher should summarise the theme; dump was: " + app.Artifacts());
@@ -256,6 +262,8 @@ public sealed class EndToEndTests
         app.AppendLogLines(MeleeHit, Kill);
 
         app.WaitForDump("killsTotal", kills + 1, "the fresh kill to reach the widget");
+        app.WaitForDump("killKinds", killRows + 1, "the training dummy to be a creature " +
+            "this session has not killed before");
         app.WaitForDump("kills", killRows + 1, "the new creature to get its own kill row");
     }
 
@@ -276,11 +284,20 @@ public sealed class EndToEndTests
         Assert.True(lootTotal > 0, "fixture replay should land loot");
         app.WaitForWindow("lootRows", "the Gear & Loot window to open and report its rows");
         var lootRows = app.DumpValue("lootRows");
+        var lootKinds = app.DumpValue("lootKinds");
+        // No equality to assert here the way SessionGoesLive… can: the Loot surface is a
+        // SLICE with its own strips (UI.Shared/LootPresentation), so its row count is not
+        // the snapshot's item count and never was. What both tests need is that the
+        // baseline is settled, and Launch() is what guarantees that (surfacesBehind=0).
+        Assert.True(lootRows > 0 && lootKinds > 0,
+            $"the fixture should land loot on both sides (rows={lootRows}, kinds={lootKinds})");
 
         app.AppendLogLines(MeleeHit, Kill,
             "--You have looted a Harness Test Trinket from a training dummy's corpse.--");
 
         app.WaitForDump("lootTotal", lootTotal + 1, "the looted item to reach the widget");
+        app.WaitForDump("lootKinds", lootKinds + 1, "the trinket to be an item this " +
+            "session has not looted before");
         app.WaitForDump("lootRows", lootRows + 1, "the new item to get its own loot row");
     }
 

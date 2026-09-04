@@ -316,17 +316,33 @@ public class EqlWikiMobsTests
                 .Select(i => svc.LookupAsync($"Creature{i}"))
                 .ToList();
 
-            // Give the eight tasks every chance to over-subscribe.
-            await Task.Delay(100);
-            int asked; lock (gate) asked = parked.Count;
-            Assert.Equal(EqlWikiMobService.MaxInFlight, asked);
+            // **Not `await Task.Delay(100)` — that was a claim about the machine.** The
+            // eight lookups reach the fetcher on the thread pool, so "how many have been
+            // asked" 100 ms later is a fact about how many cores are free; a hosted runner
+            // failed this line with 1, which reads as a broken cap and is a slow start.
+            // Polling asserts the same two things without the assumption: the cap is
+            // never EXCEEDED (checked on every poll, which is strictly more coverage than
+            // one sample) and it is eventually REACHED.
+            Assert.Equal(EqlWikiMobService.MaxInFlight, await AskedToSettle(EqlWikiMobService.MaxInFlight));
 
             // Releasing one admits exactly one more.
             TaskCompletionSource<WikiPageText?> one; lock (gate) one = parked[0];
             one.SetResult(new WikiPageText("Creature0", LockjawWithVest));
-            await Task.Delay(100);
-            lock (gate) asked = parked.Count;
-            Assert.Equal(EqlWikiMobService.MaxInFlight + 1, asked);
+            Assert.Equal(EqlWikiMobService.MaxInFlight + 1,
+                await AskedToSettle(EqlWikiMobService.MaxInFlight + 1));
+
+            async Task<int> AskedToSettle(int cap)
+            {
+                var deadline = DateTime.UtcNow.AddSeconds(30);
+                while (true)
+                {
+                    int asked; lock (gate) asked = parked.Count;
+                    Assert.True(asked <= cap,
+                        $"more than {cap} fetches had been asked for at once: {asked}");
+                    if (asked == cap || DateTime.UtcNow > deadline) return asked;
+                    await Task.Delay(10);
+                }
+            }
 
             // Drain so the temp dir can be deleted; each creature resolves on its first candidate.
             while (true)

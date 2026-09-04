@@ -509,9 +509,15 @@ public partial class QuestsWindow : Window
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh(force: false);
     }
 
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's
+    /// throttle is TWO seconds, which is what made a 2.5 s stillness guess unsafe.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
+        RenderedVersion = _main.CurrentSnapshot().Version;
         var key = _main.QuestCharacterKey;
         var character = key.Length > 0 ? key.Split('_')[0] : "";
         _titleText.Text = character.Length > 0

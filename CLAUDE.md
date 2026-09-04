@@ -1473,6 +1473,41 @@ Read this list before touching the areas it names. Every entry cost a release.
     one-time, undoing the player each launch). Two in three weeks: when a settings symptom is
     "my choice does not stick", suspect a migration before you suspect the save.
 
+56. **ONE DUMP LINE, TWO MOMENTS — a satellite window follows the widget's tick on its own
+    throttle, so its ROW COUNTS and the widget's TOTALS beside them are read off different
+    snapshots.** `RefreshUi` ticks the six theme windows *before* it builds the snapshot it
+    dumps, and each one throttles again on top of that (1 s for Kills & Drops and Gear &
+    Loot, 2 s for Progress and Quests, 3 s for the wiki pack). So `kills` can be a whole
+    creature behind `killsTotal` for seconds, with nothing wrong anywhere.
+    → **It cost the E2E suite four rounds and about forty runner-minutes**, because the
+    suite's shape is "sample a baseline, append a line, wait for baseline + 1" and
+    `WaitForDump` is an EQUALITY: a baseline taken off a window that is still catching up
+    makes the expected number one the counter passes *between two polls*, and the wait can
+    then never be satisfied. Every failure reads as a broken feature —
+    `SessionGoesLive…`'s "kills to reach 12; last seen 13" is a correct app and a wrong
+    question.
+    → **Three of the four rounds guessed at "settled" from STILLNESS, and each guess was a
+    claim about the machine.** Watching two totals missed the fixture's trailing sale
+    lines; watching the whole dump could not tell a mid-ingest lull from an ending; adding
+    `ingestDone` (the watcher's own answer) fixed the LOG half and left the RENDER half
+    untouched — and 2.5 s of quiet cannot cover a 2 s throttle plus a tick, so the fourth
+    guess would only have been a bigger number.
+    → **Now guarded, by asking instead of inferring:** every satellite records the snapshot
+    version it painted (`RenderedVersion`), `WidgetDump.SurfacesBehind` counts the open ones
+    that are behind, and `AppHarness.WaitForReplayToSettle` waits for `ingestDone=1`,
+    `surfacesBehind=0` and `logPending=0` together. Nothing in the harness is timed any
+    more. **The general rule: when a dump carries two numbers about one thing, say which
+    moment each came from — or make them come from the same one.** Trap 4 with the two
+    sources a tick apart instead of twenty lines apart.
+    → **And the diagnostics went in before the last theory, because two failures were
+    indistinguishable from outside.** A counter that will not move is a stalled TAIL or a
+    line that parsed without counting, and only the app can tell you which:
+    `logPending` (bytes the tail has not read), `logSelects` (a re-Select resets and
+    replays the session underneath you) and `killKinds`/`lootKinds` (the DATA's count
+    beside the window's rendered one). `AppHarness.AppendLogLines` now returns only once
+    `logPending` is back to 0, so a stalled tail fails at the append and names itself
+    rather than surfacing 90 s later as a wrong row count.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

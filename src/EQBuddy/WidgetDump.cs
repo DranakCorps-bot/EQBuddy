@@ -42,6 +42,43 @@ internal static class WidgetDump
         (card.BodyCap, ThemeBodyCapHost.RoomFor(w),
          ThemeBodyCapHost.ChromeFor(w, section, card.BodyChrome));
 
+    /// <summary>
+    /// How many OPEN satellite windows have NOT yet painted this tick's snapshot.
+    ///
+    /// **The widget's totals and a window's row counts sit in one dump line and describe
+    /// two different moments.** `RefreshUi` gives each satellite its follow tick BEFORE it
+    /// builds the snapshot this dump reports, and each satellite throttles on top of that
+    /// — one second for Kills &amp; Drops and Gear &amp; Loot, two for Progress and Quests,
+    /// three for the wiki pack. So `kills` can be a whole creature behind `killsTotal`,
+    /// for seconds, with nothing wrong.
+    ///
+    /// That cost the E2E suite two flakes on a hosted runner: a test samples a row count
+    /// as its baseline, appends a line and waits for baseline + 1, and a window still
+    /// catching up goes PAST the expected number between two polls
+    /// (`SessionGoesLive…`: "kills to reach 12; last seen 13", beside a dump reading
+    /// `ingestDone=1` — the log was fully read and the window was not fully drawn).
+    /// Watching the dump for stillness instead cannot tell a throttle's lull from an
+    /// ending, and 2.5 s of quiet is shorter than a 2 s throttle plus a tick.
+    ///
+    /// So the app ANSWERS the question, the way `ingestDone` already answers it for the
+    /// log: zero means every open window has painted the same snapshot the totals beside
+    /// it came from. The guard is the one `RefreshUi` refreshes under — a loaded but
+    /// hidden window is never ticked, so counting it would wait forever.
+    /// </summary>
+    private static int SurfacesBehind(MainWindow w, long version)
+    {
+        var behind = 0;
+        if (w._questsWindow is { IsLoaded: true, IsVisible: true } q) Count(q.RenderedVersion);
+        if (w._progressWindow is { IsLoaded: true, IsVisible: true } p) Count(p.RenderedVersion);
+        if (w._gearLootWindow is { IsLoaded: true, IsVisible: true } g) Count(g.RenderedVersion);
+        if (w._creatureWindow is { IsLoaded: true, IsVisible: true } c) Count(c.RenderedVersion);
+        if (w._wikiPackWindow is { IsLoaded: true, IsVisible: true } k) Count(k.RenderedVersion);
+        if (w._worldWindow is { IsLoaded: true, IsVisible: true } o) Count(o.RenderedVersion);
+        return behind;
+
+        void Count(long rendered) { if (rendered != version) behind++; }
+    }
+
     /// <summary>A dump value is an integer the suite parses, and -1 is its "absent". A
     /// measurement that has not happened (NaN — never dragged, or a card the layout has not
     /// reached) is exactly that, so it is spelled -1 rather than "NaN".</summary>
@@ -117,6 +154,12 @@ internal static class WidgetDump
                     // flakes this key exists for both read as "settled" to a harness that
                     // was watching for stillness instead of asking.
                     $"ingestDone={(w._watcher.InitialIngestDone ? 1 : 0)} " +
+                    // And the OTHER half of "is this dump settled?", which ingestDone
+                    // cannot answer: how many open satellite windows have not yet painted
+                    // the snapshot the totals below came from. See SurfacesBehind — the
+                    // log being read and the windows being drawn are two facts, and the
+                    // E2E flake this pair exists for needed both.
+                    $"surfacesBehind={SurfacesBehind(w, s.Version)} " +
                     $"themeBodyCap={body.Cap:0} " +
                     // ...and the two numbers it was computed FROM, so a test can assert the
                     // relationship instead of a constant. -1 means "no measurement": the
@@ -163,6 +206,23 @@ internal static class WidgetDump
                     // (never pinned before this PR) — DebugFacts() carries all three.
                     $"{w._travelsView.DebugFacts()} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
+                    // The DATA's distinct-creature count, beside the window's RENDERED
+                    // one (`kills`, from CreatureWindow.DebugFacts). Two keys for one
+                    // fact on purpose: they are read off different snapshots — the
+                    // window follows on its own throttle — and a run where they disagree
+                    // is a render lag, which is a different bug from a run where they
+                    // agree and the total is wrong. One CI failure showed kills=13
+                    // against killsTotal=82 and nothing in the dump could say which of
+                    // the two was lying.
+                    $"killKinds={s.YourKills.Count} lootKinds={s.Loot.Count} " +
+                    // …and whether the tail has anything left to read. See
+                    // LogWatcher.PendingBytes: a total that will not move with bytes
+                    // pending is a stalled TAIL; the same total with 0 pending is a line
+                    // that parsed and did not count.
+                    $"logPending={w._watcher.PendingBytes} " +
+                    // …and whether the log was re-SELECTED, which resets the session and
+                    // replays the file. 1 is a normal launch.
+                    $"logSelects={w._watcher.SelectCount} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
                     // The Watch card's RENDERED shape, not just its total. The total
                     // above proves the data arrived; these prove the card drew it, and

@@ -166,10 +166,15 @@ public partial class GearLootWindow : Window
         Refresh(force: false);
     }
 
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
+        RenderedVersion = s.Version;
         BuildTabs(s);
         // Only the active tab paints, and its body is swapped in rather than both being
         // stacked and hidden — a hidden panel still measures on every layout pass, and a

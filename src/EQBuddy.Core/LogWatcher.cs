@@ -52,6 +52,33 @@ public sealed class LogWatcher : IDisposable
     public bool InitialIngestDone { get; private set; }
     public Exception? LastError { get; private set; }
 
+    /// <summary>
+    /// How many bytes of the selected log the tail has NOT consumed yet — 0 when every
+    /// byte the file holds has been parsed. Diagnostic only: it exists for the
+    /// <c>EQBUDDY_EXPAND</c> dump, which is the WPF layer's one test seam
+    /// (docs/TestPlan.md §5), and it separates two failures that look identical from the
+    /// outside. A counter that will not move with bytes still pending is a TAIL that has
+    /// stopped; the same counter with nothing pending is a line that was read and did not
+    /// COUNT. The E2E suite spent a round on the wrong one of those.
+    ///
+    /// -1 when no log is selected or the file cannot be measured.
+    ///
+    /// **Deliberately does NOT take `_lock`.** `Poll` holds it for the whole full-file
+    /// ingest, so a caller on the UI thread — the dump runs on the widget's tick — would
+    /// block behind the very replay it is trying to measure. The fields it reads are a
+    /// `string?` and two `long`s, whose reads are atomic on the platforms this ships to;
+    /// the answer is a diagnostic sample and is allowed to be one poll out of date.
+    /// </summary>
+    public long PendingBytes
+    {
+        get
+        {
+            if (_path is not { } path) return -1;
+            try { return Math.Max(0, Math.Min(new FileInfo(path).Length, _endOffset) - _offset); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return -1; }
+        }
+    }
+
     /// <summary>Optional second consumer of the parsed event stream. Spawn timers ride
     /// the same replay-then-tail pipeline as stats, which is what lets a restart
     /// re-derive running countdowns from the log's own timestamps.</summary>
@@ -304,6 +331,13 @@ public sealed class LogWatcher : IDisposable
 
     /// <summary>Tests only: the generation the most recent Select minted.</summary>
     internal long SelectGeneration { get { lock (_lock) return _selectGen; } }
+
+    /// <summary>How many times a log has been SELECTED on this watcher — 1 after a normal
+    /// launch. Diagnostic, for the same dump as <see cref="PendingBytes"/>: a Select
+    /// resets the session and replays the file underneath whatever is reading it, and
+    /// nothing else in the dump would say so. Lock-free for the same reason as
+    /// <see cref="PendingBytes"/>.</summary>
+    public long SelectCount => _selectGen;
 
     private void Poll()
     {

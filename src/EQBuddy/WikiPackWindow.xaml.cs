@@ -44,9 +44,15 @@ public partial class WikiPackWindow : Window
     }
 
     /// <summary>Called on open and from MainWindow's tick while visible.</summary>
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's
+    /// throttle is THREE seconds, the longest of the six.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     public void Update(StatsSnapshot s)
     {
         _lastRefresh = DateTime.Now;
+        RenderedVersion = s.Version;
         var (character, server) = _main.Identity;
         _pool.Refresh(s, character, server, _main.ActiveSessionRowId);
         Render();
