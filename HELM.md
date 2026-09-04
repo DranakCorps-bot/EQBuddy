@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #293 — E-1 Evolved local-only mechanism (sign-off)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #293 https://github.com/DranakCorps-bot/EQBuddy/pull/293 (`claude/e1-evolved-local` → `main`, head `7cd8562a`) — Evolved local-only E-1 under ~3:50 authorization.
+- **Ruling:** Signed. Merge when both CI green (Avalonia green; build-and-test flake `EqlWikiMobsTests.NoMoreThanTwoFetchesAreEverInFlight` re-run, do not fix product). Mechanism endorsed: major≥2 refusal before publish; `-EvolvedLocal` subtractive only; OneDrive + `gh release create` + `/SILENT` in one region; signing unchanged; guard before Version bump; numeric 2.0.0; `install-local.ps1 -Evolved` portable-only; LEGACY-007 WhatsNew 2.0.0 links v1.99.18; v1.99.18 notice untouched; CI guard step endorsed; both DECISIONS calls endorsed. Residual `release-assets.yml` = E-2. After merge: **E-1 landed → E-2 may start** (#275 already confirmed). Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Also merge signed #292 when its CI green.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~4:12 PM CT
+
 ### PR #292 — fold-sentence (b) CLAUDE.md (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #292 https://github.com/DranakCorps-bot/EQBuddy/pull/292 (`claude/fold-sentence-b` → `main`, head `0c745f3b`) — tiny CLAUDE.md follow-up for fold-sentence ruling (b); E-1 started.
