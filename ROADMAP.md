@@ -14,6 +14,31 @@ Deeper material: `CLAUDE.md` (rules, traps, where things live), `docs/DesignSyst
 
 ---
 
+## EQBuddy Evolved (2026-09)
+
+The owner-approved next major direction is **EQBuddy Evolved** (v2): consolidation,
+polish, and personalization — not another feature-count race.
+
+- Product identity: [PRODUCT.md](PRODUCT.md)
+- Player-facing vision: [EQBuddy-Evolved.md](EQBuddy-Evolved.md)
+- 1.x preservation: [LEGACY-V1.md](LEGACY-V1.md)
+- Bridge work: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275)
+
+**Supported** for Evolved: Windows desktop + EQBuddy Mobile hosted by Windows.
+**Preserved, not taken down:** final Linux/macOS/Windows 1.x builds stay downloadable
+and usable; support for that line stops. Current public releases remain 1.x until
+the Phase 0 bridge and an Evolved channel exist.
+
+**Licensing:** Evolved is proprietary ([LICENSE-EVOLVED.md](LICENSE-EVOLVED.md));
+published 1.x stays MIT ([LICENSE](LICENSE)). Community-fork language below
+applies to **LEGACY / v1 only** — never to Evolved.
+
+The gate/theme language below remains historical triage context for the 1.x line
+until this file is rewritten. Place incoming 1.x asks against it as before. Place
+v2 asks against [PRODUCT.md](PRODUCT.md).
+
+---
+
 ## 1. What EQBuddy is becoming
 
 The **personal operating companion** for EverQuest Legends — private, local, personal,
@@ -51,8 +76,9 @@ all three call, never from a feature list kept level by hand.
 
 - **Never measure other players.** No party DPS, no raid meters, no rankings, no
   leaderboards, no watching anyone else. This is a values line, not a technical one.
-  Decline warmly, point at the MIT licence, invite a fork. **Do not file these asks as
-  requirements**, however they are phrased.
+  Decline warmly, point at the MIT licence on the published **1.x / LEGACY**
+  tree, and invite a fork of **that** tree only. Never invite a fork of Evolved.
+  **Do not file these asks as requirements**, however they are phrased.
 - **Log-only.** Never reads game memory, never inspects packets, never phones home.
 - **No gameplay automation, input broadcasting, or hidden information** the log doesn't
   already give a player.

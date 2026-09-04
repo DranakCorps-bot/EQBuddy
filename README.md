@@ -1,4 +1,17 @@
-﻿# EQBuddy — EverQuest Legends Session Tracker
+﻿# EQBuddy — Your Personalized Guide to Norrath
+
+> **EQBuddy Evolved** is the next major direction: a finished, personal companion
+> for EverQuest Legends — not another feature-count race. **Current public
+> downloads remain the 1.x line** until the v2 channel opens. Evolved is not a
+> download yet.
+>
+> | | |
+> |---|---|
+> | **Identity & vision** | [PRODUCT.md](PRODUCT.md) · [EQBuddy-Evolved.md](EQBuddy-Evolved.md) |
+> | **1.x stays up** | [LEGACY-V1.md](LEGACY-V1.md) · [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275) |
+> | **Supported** | Windows Evolved desktop + EQBuddy Mobile hosted by Windows |
+> | **Preserved** | Linux/macOS (and Windows) 1.x final builds — downloadable and usable. We are **not** removing them. |
+> | **Licensing** | **Evolved is proprietary** (permission required — [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md)). **1.x stays MIT.** |
 
 An always-on-top widget that reads your EverQuest Legends `/log` file live and turns
 it into everything worth knowing about your session: kills and DPS, a **fight
@@ -33,10 +46,11 @@ your own log says. When knowledge moves between players, it moves because a play
 chose to move it: zone spawn archives export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
 EQBuddy itself go through a public review on GitHub — streamlined collaboration from
-within the community, never a quiet upload. Windows first (WPF), with a cross-platform
-build ([Avalonia](#for-developers)) that tracks closely: **Linux** (built and
-maintained by Don Thompson) and **macOS** (click-through, spoken alerts, and
-Wine-prefix log detection contributed by quasarj).
+within the community, never a quiet upload. **Windows is the supported desktop** for
+EQBuddy Evolved. Linux and macOS 1.x builds remain downloadable — Linux was built and
+maintained by Don Thompson; macOS click-through, spoken alerts, and Wine-prefix log
+detection were contributed by quasarj — and we are **not** taking those builds down.
+See [LEGACY-V1.md](LEGACY-V1.md) for the support matrix.
 
 **Download:** grab `EQBuddySetup.exe` from the
 [latest release](https://github.com/DranakCorps-bot/EQBuddy/releases/latest).
@@ -133,8 +147,8 @@ page instead.
 > bug. An opt-in setup fixes it so the widget floats over the fullscreen game (and
 > clicking it doesn't disturb the game or pop the Mac menu bar): see
 > [docs/CrossOver-macOS-overlay.md](docs/CrossOver-macOS-overlay.md). It does nothing on
-> Windows or unless you turn it on. (Prefer a native Mac app? The Avalonia build ships as
-> a `.app` on every release — see the developer section.)
+> Windows or unless you turn it on. (A native Mac 1.x `.app` still ships on current
+> releases — see [LEGACY-V1.md](LEGACY-V1.md) for how that line is preserved.)
 
 Mini dashboard:
 - Click the **★ star** next to any section header to include that stat in the mini dashboard.
@@ -548,10 +562,11 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 - `src/EQBuddy` — WPF app (.NET 10, `net10.0-windows`). Build on Windows:
   `dotnet build src/EQBuddy/EQBuddy.csproj -c Release`. From non-Windows machines,
   add `-p:EnableWindowsTargeting=true`.
-- `src/EQBuddy.Avalonia` — cross-platform Avalonia app (.NET 10), created and
+- `src/EQBuddy.Avalonia` — the 1.x cross-platform Avalonia app (.NET 10), created and
   maintained by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) —
-  including the X11 click-through implementation. It may trail the WPF app by a few
-  releases; a linux-x64 build is attached to GitHub releases.
+  including the X11 click-through implementation. It remains in the tree and on
+  current 1.x releases; Evolved (v2) is Windows-only — see [LEGACY-V1.md](LEGACY-V1.md).
+  A linux-x64 build is attached to current GitHub releases.
   Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
   It also builds and runs on macOS with no extra dependencies (the .NET 10 SDK is
   enough), which is useful when the game itself runs under a Windows compatibility
@@ -615,9 +630,10 @@ corrected.
 ### Code
 
 - **[Don Thompson](https://github.com/DonThompson)** — created and maintains
-  **`EQBuddy.Avalonia`**, the entire cross-platform build, including the X11
+  **`EQBuddy.Avalonia`**, the entire cross-platform 1.x build, including the X11
   click-through implementation, and carried it through release after release of parity
-  work. Linux and macOS exist because Don built them.
+  work. Linux and macOS exist because Don built them. Evolved is Windows-only;
+  those 1.x builds stay downloadable — see [LEGACY-V1.md](LEGACY-V1.md).
 - **[Liminal Warmth](https://github.com/liminalwarmth)** — the Wine font work that made
   text and icons render at all in a prefix (#148, #166), the opt-in macOS/Wine overlay
   that floats the widget over fullscreen EverQuest (#178), potion buffs in the buff
@@ -664,9 +680,19 @@ features without ever becoming an issue number.
 [What's New](src/EQBuddy.Core/Data/WhatsNew.json), with the discussion number.** That is
 the durable record; this section is the roll call.
 
-## License — use freely, credit visibly
+## License — 1.x MIT; Evolved proprietary
 
-MIT — see [LICENSE](LICENSE). Use the code, port it, build on it, ship your own
+**EQBuddy Evolved** (v2) is **proprietary / All Rights Reserved** — see
+[LICENSE-EVOLVED.md](LICENSE-EVOLVED.md). You cannot use, copy, modify,
+redistribute, or fork Evolved without David Edwards’ prior written permission.
+That is not the open-source-with-credit model, and it is not the same
+licensing posture as JMoyer’s EQL Companion.
+
+**Already-published 1.x / LEGACY stays MIT** — see [LICENSE](LICENSE). Those
+grants stay; we do not revoke them. The invitation below applies to that
+published 1.x work only — never to Evolved.
+
+MIT (1.x): use the published 1.x code, port it, build on it, ship your own
 tool from it — freely, commercially, no permission needed. The license's one
 condition (and it is a condition, not a request): the copyright notice comes
 along with any substantial portion of the code you take. In practice, do it the
