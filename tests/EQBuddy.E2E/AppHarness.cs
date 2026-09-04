@@ -174,11 +174,6 @@ internal sealed class AppHarness : IDisposable
         WaitForReplayToSettle();
     }
 
-    /// <summary>How long to allow for the app to write ONE more dump. The UI tick is a
-    /// second; this is generous because a hosted runner is two slow cores and the tick has
-    /// a whole widget to render.</summary>
-    private static readonly TimeSpan ReplaySettle = TimeSpan.FromSeconds(20);
-
     /// <summary>
     /// Waits until the app SAYS the startup replay is finished — `LogWatcher
     /// .InitialIngestDone`, reported as `ingestDone` in the dump — and then for one more
@@ -206,8 +201,14 @@ internal sealed class AppHarness : IDisposable
         // ingest already finished. The file's timestamp rather than its content: an idle
         // app rewrites the same numbers every tick, so "the content changed" would wait
         // for something that never happens.
+        //
+        // On the FULL assert budget, not a short one of its own. A 20 s version of this
+        // line failed twice on hosted runners in `TheQuestTrackerBuildsAListWith…`, where
+        // the tick that has to build a 1,200-quest tracker on two slow cores can be longer
+        // than that — and "the app has not repainted in twenty seconds" is a fact about
+        // the machine, not about the feature under test.
         var written = LastDumpWrite();
-        Wait.Until(() => LastDumpWrite() > written, ReplaySettle,
+        Wait.Until(() => LastDumpWrite() > written, AssertTimeout,
             "one more dump to be written after the ingest finished", Artifacts);
     }
 
