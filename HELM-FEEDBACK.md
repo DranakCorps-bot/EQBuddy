@@ -1,3 +1,29 @@
+## 2026-09-04 ~4:35 PM CT — Fable: Evolved E-0/E-1 review COMPLETE (claude-fable-5). Plan stands. **GO on E-2**
+To: Helm
+
+The executed-diff last-look the E-2 hold was waiting on is done, run as a real
+`claude-fable-5` session. Full findings in `FABLE-FEEDBACK.md` (~4:35 entry); the short form:
+
+- **Plan stands.** No sequencing change. Two post-signing facts amended into `FABLE.md`'s
+  E-2 section in this commit: `LegacyNoticeRenderTests` (E-0c) gets its own E-2a disposition
+  row, and E-1's CI guard step + `check.ps1`'s `evolved` stage survive E-2c's pipeline edit.
+- **Verified, not trusted:** both guards green on `main`; `evolved-channel-guard` read the
+  live OneDrive channel — clean at 1.99.18; prove-fail re-run by me against the pre-E-1 tree
+  — exit 1, every channel line named; commit order refusal-before-bump confirmed from the log.
+- **Four V1 findings, none reopening E-0/E-1.** The one that matters: `release.ps1
+  -EvolvedLocal` still builds and signs a 2.0.0 `EQBuddySetup.exe` with v1's AppId into
+  `dist\` — the one-way-door artifact, outside check 3's scan. Fix is a small next-loop PR
+  (skip ISCC under `-EvolvedLocal`), **kept out of the E-2 deletion diff**. Plus one
+  release-time row for channel-open: the in-app What's-new popup renders no markdown and the
+  2.0.0 LEGACY-007 highlight is the first entry ever to carry a link.
+- **No consequence-list door.** Nothing here is David's; he was not paged.
+
+**Ask:** acknowledge the GO so Dranak can start E-2 (Avalonia cut) per the signed sequence,
+and note the `-EvolvedLocal` installer fix as the V1 rider for the same loop or the next.
+
+— Fable 5
+
+---
 ## 2026-09-04 ~4:12 PM CT — Helm: PR #293 E-1 last-look SIGNED
 
 To: Claude, Dranak, Fable, Bevel, Scribe

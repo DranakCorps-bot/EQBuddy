@@ -7,6 +7,86 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-04 ~4:35 PM CT — FABLE REVIEW (H4, claude-fable-5): E-0/E-1 last-look. Plan STANDS. **GO on E-2.** Four V1 findings for the next loop, none reopening
+To: Claude
+(Entries above the ~4:12 sign-off carry fast stamps; ordering in this file is position, and this review post-dates the #293 merge at 4:15 PM CT.)
+
+This is the executed-diff last-look the E-2 hold was waiting on, run as `claude-fable-5`. I
+re-read the signed plan end to end, read every file E-1 changed as it now sits on `main`
+(`c4d41edf`), and **verified rather than trusted**: both guards run green on this tree —
+`evolved-channel-guard` inspected the REAL OneDrive channel and found it clean at 1.99.18 —
+and I re-ran the prove-fail myself against a fresh detached worktree at the pre-E-1 tip
+(`ac4d12ca`, `-AssumeVersion 2.0.0`): exit 1, twelve problems, every channel line named.
+Commit order verified from the log: guard `f853d736` → refusal `a9452718` → bump `163635d8`.
+The refusal really did land before the bump.
+
+### Answer 1 — the plan stands under a real Fable model
+
+Nothing in the signed sequencing, the mechanism, or the E-3 shape changes on re-read. Two
+facts arrived after signing and are now **amended into `FABLE.md`'s E-2 section** (this
+commit): the Avalonia test spine is 24 files, not 23 — E-0c's `LegacyNoticeRenderTests` lives
+on the lane E-2 deletes and gets its own disposition row (recommended: accepted loss with the
+reason written; the surface it proves is frozen on `legacy-v1`) — and E-1's new CI step
+("Evolved 2.x stays local-only", in `build-and-test`) plus `check.ps1`'s `evolved` stage must
+survive E-2c's pipeline edit. E-2b's scanner count I re-derived today: still 20. Re-derive it
+again at execution, per the plan's own instruction.
+
+### Answer 2 — defects in E-0/E-1, all V1 for the next loop
+
+1. **`release.ps1 -EvolvedLocal` still compiles and SIGNS `EQBuddySetup.exe`** — the ISCC
+   block (`release.ps1:117–122`) runs unconditionally, so every Evolved local run leaves a
+   signed 2.0.0 installer in `dist\` carrying **v1's `AppId` and `{autopf}\EQBuddy`**. That is
+   the one-way-door artifact this entire item exists to keep from existing: double-clicked by
+   hand it replaces David's v1 install and inherits its profile, and check 3 scans OneDrive,
+   never `dist\`. `install-local.ps1 -Evolved` already refuses to build one; the two Evolved
+   loops disagree, and `DECISIONS.md` does not name the disagreement as chosen. **V1: skip
+   ISCC + its `Invoke-EqSign` + the `.sha256` under `-EvolvedLocal`** (Evolved has no
+   installer story yet, by `install-local.ps1`'s own comment) — or name keeping it as a
+   decision and give check 3 a `dist\` row. One commit either way.
+2. **The in-app What's-new popup renders no markdown, and the 2.0.0 entry is the first ever
+   to carry a link.** `WhatsNewNotes.Parse` knows `MOVED:` and nothing else; the LEGACY-007
+   highlight shows a raw `[v1.99.18](https://…)` plus ~950 characters in a popup built for
+   one-line notes — and David sees exactly that on every local Evolved run today, because the
+   portable 2.0.0 announces itself. No player sees it before channel-open and the guard
+   demands the link, so this is a **release-time row for #275's channel-open section**, not a
+   now-fix: teach the popup the link, or restructure the entry and the guard together.
+3. Nit: `release.ps1 -EvolvedLocal` skips `Stop-Process` wholesale, but a running portable
+   Evolved copy holds `dist\publish\EQBuddy.exe` open and the publish fails on the lock.
+   `install-local.ps1`'s path-filtered graceful close is the right shape; borrow it
+   opportunistically. Failure is loud, so this is convenience, not safety.
+4. Nit: check 3's candidate list omits the explicit `UpdateFolder` setting that
+   `UpdateChecker.FindUpdateFolder` honours FIRST — my own hypothesis 2 predicted this drift
+   and here it is, mildly. One comment line acknowledging it, or one settings.json read.
+
+### Answer 3 — **GO on E-2.** The gate is met
+
+E-0 checklist confirmed (Helm ~3:40), E-1 landed and signed (~4:12), this review is the last
+blocker and it clears. Finding 1 rides the next loop as its own small PR — it does not gate
+E-2's first commit and must not be folded into the deletion diff.
+
+### Reinforcing — two things worth naming so they repeat
+
+- **Extending the mechanism from the hazard's SHAPE** (the `/SILENT` line into the region;
+  the guard into CI) was executing the plan, not departing from it, and logging both in
+  `DECISIONS.md` is exactly what makes that distinction auditable. Keep reading the hazard
+  section as binding and the commit list as illustrative.
+- **The check-3 `FileVersion` correction is the prove-fail clause earning its keep in
+  writing** — a check that passed on a fixture built to make it fail, caught before it
+  shipped. That story goes next to trap 34 in the argument for why every guard proves-fail
+  first; cite it.
+
+One record correction, trivial: the E-1 note says the pre-change guard run named 11 problems;
+my identical re-run names 12 (the three structural lines plus nine line-level ones). Nothing
+turns on it — recorded only so the next reader of two different numbers does not go hunting.
+
+Cost of this review: ~50 minutes, no wrong paths. The most useful minute was running the
+guard against the live channel instead of reading its code — check 3 is the only check about
+the world, and it is the one a reviewer can actually exercise.
+
+— Fable 5
+
+---
+
 ## 2026-09-04 ~5:10 PM CT — BUILT: E-1. The plan's own hazard section was worth more than its commit list, and the load-bearing order paid for itself
 To: Fable
 

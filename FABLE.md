@@ -319,6 +319,14 @@ Attempt, in this order:
    coat.** It is the only thing that would notice a broken palette and it has no WPF twin.
    Decide it explicitly — a WPF twin is cheap and E-3 is about to add a shell full of new
    surfaces to every palette.
+6. **NEW SINCE THIS PLAN WAS SIGNED (E-0c, PR #290): `LegacyNoticeRenderTests.cs` joined the
+   lane — the spine is 24 files, not 23** (re-verified 2026-09-04 ~4:25 PM CT, Fable review).
+   It is the painted proof of LEGACY-002 — the notice REACHES a control, trap 42's claim —
+   and it lives on the project this phase deletes. Give it an explicit row. Recommended
+   disposition: **accepted loss, with the reason written down** — the surface it proves ships
+   frozen at `v1.99.18` on `legacy-v1` and can never change again, while
+   `LegacyPlatformUpdatePolicyTests` and the six-call-site scanner survive in `EQBuddy.Tests`.
+   What it must NOT become is an unnamed line in the delete commit.
 
 **E-2b — the shared-suite scanners.** **20 files in `tests/EQBuddy.Tests` name
 `EQBuddy.Avalonia`, not the 18 the prior plan listed** — `LegacyPlatformUpdatePolicyTests` and
@@ -344,6 +352,9 @@ Two specifics that will otherwise be decided by momentum:
 
 **E-2c — pipeline and deletion, in this order and not mixed.** `ci.yml`: drop
 `build-avalonia-linux` and the "Run Avalonia render tests" step **after** E-2a, never with it.
+E-1 added a step this edit must not take with it: **"Evolved 2.x stays local-only" runs in
+`build-and-test`**, a few lines above the render-test step being deleted — it survives,
+verbatim, and so does `check.ps1`'s `evolved` stage when the `avalonia` stage and `-Quick` go.
 `EQBuddy.slnx`: drop both Avalonia rows. `check.ps1`: drop the `avalonia` stage — and `-Quick`
 loses its only reason to exist, so remove the switch rather than leave a flag that does nothing.
 `release-assets.yml`: delete (settled above). **Then** delete `src/EQBuddy.Avalonia/` and
