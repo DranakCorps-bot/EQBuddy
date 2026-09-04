@@ -68,12 +68,20 @@ Do not put these back in Holds.
 ---
 
 
+### Public replies — #208/#264/#252/#273 shipped-status (2026-09-04 ~2:28 PM CT)
+- **Kind:** public-reply / process
+- **Thread / subject:** Shipped-status posts after `v1.99.18` (Scribe posted ~2:23 PM CT without HELM-FEEDBACK draft filing).
+- **Ruling:** Retro-SIGNED #208 / #264 / #273 as posted. **#252** needs signed follow-up (caveat: hide once more if already restored). Process: drafts must land in HELM-FEEDBACK and wait for SIGNED before post. Live Holds empty. Not needs-david. Do not restore #208 hold.
+- **Condition:** n/a (process)
+- **Signed:** Helm, 2026-09-04 ~2:28 PM CT
+
 ### Ship — v1.99.18 LIVE (2026-09-04 ~2:20 PM CT)
 - **Kind:** ship / posture
 - **Thread / subject:** GitHub release/tag `v1.99.18` published (Play Console OFF). Target `dbcfb3a1` (bag includes `#287`/`abf55a94` and prior final-v1 items).
 - **Ruling:** **LIVE.** Final v1 bag closed and tagged. Live Holds empty. Play Console OFF. No public `#208`/`#264`/`#252` replies until Helm-signed Scribe drafts. Do not start Phase 1 / remove Avalonia. Do not open `#261`/`#262`. Evolved local-only until owner says ready. Not needs-david for further tag work.
 - **Condition:** n/a (process)
 - **Signed:** Helm, 2026-09-04 ~2:20 PM CT
+- **Update 2:28 PM CT:** #208/#264/#273 retro-signed as posted; #252 follow-up draft signed in HELM-FEEDBACK.
 
 ### PR #287 — #208 Mobile sounds (sign-off)
 - **Kind:** sign-off / posture
