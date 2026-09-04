@@ -1,4 +1,5 @@
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Avalonia;
 
@@ -23,22 +24,12 @@ namespace EQBuddy.Avalonia;
 /// </summary>
 internal static class UpdateOffer
 {
-    /// <summary>Which desktop this copy is running on. Architecture rides along because
-    /// macOS ships two builds and handing an Intel Mac the arm64 zip is the same class of
-    /// mistake as handing it the Linux tarball.</summary>
-    internal enum Desktop { Windows, Linux, MacArm64, MacX64 }
-
-    /// <summary>The running platform. Kept here rather than at the call site so the
-    /// mapping is one decision with one place to be wrong.</summary>
-    internal static Desktop Current() =>
-        OperatingSystem.IsWindows() ? Desktop.Windows
-        : !OperatingSystem.IsMacOS() ? Desktop.Linux
-        : System.Runtime.InteropServices.RuntimeInformation.OSArchitecture
-            == System.Runtime.InteropServices.Architecture.Arm64
-            ? Desktop.MacArm64
-            : Desktop.MacX64;
-
-    private static bool IsWindows(Desktop d) => d == Desktop.Windows;
+    /// <summary><see cref="Desktop"/> and its <c>Current()</c> mapping moved to
+    /// <see cref="LegacyPlatformUpdatePolicy"/> in <c>UI.Shared</c> (P0-2), because both
+    /// lanes now need to ask which platform this is — the WPF widget has no reference to
+    /// this assembly. The artifact and wording functions below stayed: they are about
+    /// which FILE a platform can use, which is still only this lane's question.</summary>
+    private static bool IsWindows(Desktop d) => LegacyPlatformUpdatePolicy.IsWindows(d);
 
     /// <summary>The artifact this platform can actually use, or null when the release has
     /// not got one attached. Null is a real state and not an error: CI attaches the

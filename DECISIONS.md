@@ -17,6 +17,30 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **`UpdateChecker.GitHubLegacyReleasePage` points at the RUNNING BUILD's own tag, not a
+  hard-coded bridge tag** (P0-2, `src/EQBuddy.Core/UpdateChecker.cs`). · The other way: the
+  literal the plan asked for, `.../releases/tag/v1.99.N`. · That literal has to be written
+  before the tag it names exists, and a 404 is the worst possible last thing EQBuddy ever
+  says to a Linux or macOS player — nothing in CI would catch it. Only installs that took
+  the bridge can ever see the notice, so for every reader of this value the bridge tag and
+  the running version are the same string; a copy that later takes a legacy patch points at
+  that patch, which is the right answer rather than a stale one. The negative the plan
+  actually cares about (`DoesNotContain("releases/latest")`) is asserted either way.
+- **P0-2 ships no `WhatsNew.json` entry; the transition announcement stays with the bridge
+  release** (P0-3 / P0-1 item 4). · The other way: add a highlight to the in-flight 1.99.18
+  entry now. · Nothing changes for any player until a v2 release exists, and the plan
+  assigns the one in-app announcement Linux and macOS users will ever get to the bridge
+  release's own entry, alongside the `LEGACY-V1.md` / README / FeatureGuide wording P0-3
+  owns. Written into `FABLE-FEEDBACK.md` as an explicit handoff rather than left to be
+  assumed — a rule everyone thinks someone else satisfied is how a bridge ships silent.
+- **The WPF hotspot baseline moved 4,214 → 4,273, the minimum that fits** (P0-2,
+  `tests/EQBuddy.Tests/ArchitectureTests.cs`, `docs/Architecture.md`). · The other way:
+  lift a surface out of `MainWindow.xaml.cs` instead, which is the standing move. · `main`
+  was already at 4,635 of a 4,635 limit, so the ratchet was full before this PR and any WPF
+  change would have failed it; the only surface P0-2 could have lifted is the update banner,
+  and Phase 0 was told not to touch it. The decision itself did leave, into
+  `UI.Shared/LegacyPlatformUpdatePolicy`. The bump grants exactly one line, so the pressure
+  the table exists to apply is intact and the next WPF change has to do the lift.
 - **`release.ps1 -Prerelease` THROWS when there is no `-Tag`, rather than being ignored**
   (P0-1, `scripts/release.ps1`). · The other way: accept it silently, since the flag only
   reaches `gh release create` and that block already only runs with a tag. · A tagless run

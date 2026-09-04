@@ -130,11 +130,21 @@ Nothing is shared now, so nothing can be moved.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,214 | 4,605 | 4,635 | 30 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,273 | 4,699 | 4,700 | 1 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,411 | 5,752 | 341 |
+| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,566 | 5,752 | 186 |
+
+**Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
+the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any
+WPF change at all would have failed here; this one adds 64 lines of window plumbing —
+a policy call, a browser-open branch, a guarded settings write. The decision itself did
+leave, into `UI.Shared/LegacyPlatformUpdatePolicy`, where it is unit tested and shared
+with the Avalonia lane; what stayed cannot leave without moving the update banner, and
+Phase 0 was told not to touch it. The bump is the MINIMUM that fits (4,273 × 1.1 = 4,700
+against 4,699), so it grants one line and keeps-if-it-fits intact. **The next WPF change
+lifts a surface** — there is no room left to argue with.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

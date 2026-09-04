@@ -8,6 +8,14 @@ public sealed class AppSettings
     public string? LogFolder { get; set; }
     /// <summary>Folder holding EQBuddySetup.exe for updates; null = auto-detect OneDrive.</summary>
     public string? UpdateFolder { get; set; }
+    /// <summary>This copy has been told that EQBuddy v2 is Windows-only and that it is
+    /// staying on the final v1 build (charter LEGACY-002 / #275). Set the first time the
+    /// notice is shown, so the automatic 6-hourly check says it ONCE — the Help menu's
+    /// "Check for updates" always answers, whatever this says. Read and written in exactly
+    /// one place per lane, both of them through
+    /// <c>EQBuddy.UI.Shared.LegacyPlatformUpdatePolicy</c>; nothing on Windows ever touches
+    /// it.</summary>
+    public bool LegacyFinalNoticeAcknowledged { get; set; }
     public bool Minimized { get; set; }
     public List<string> MiniStats { get; set; } = ["kills", "dps"];
     public double WindowLeft { get; set; } = double.NaN;

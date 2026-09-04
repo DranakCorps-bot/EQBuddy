@@ -1,5 +1,5 @@
 using EQBuddy.Core;
-using Desktop = EQBuddy.Avalonia.UpdateOffer.Desktop;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Avalonia.Tests;
 
@@ -39,10 +39,11 @@ public class UpdateOfferTests
 
     // ---- Nothing off Windows touches the installer ----
 
-    /// <summary>Looped rather than a [Theory]: Desktop is internal to the Avalonia
-    /// assembly (this project sees it through InternalsVisibleTo), and an internal type
-    /// cannot appear in a public test signature. The platform is named in each assert so
-    /// a failure still says which one.</summary>
+    /// <summary>Looped rather than a [Theory]: this was written when Desktop was internal
+    /// to the Avalonia assembly. It moved to <c>UI.Shared</c> in P0-2 (both lanes ask the
+    /// platform question now), so a [Theory] would compile today — the loops stay because
+    /// <c>UpdateOffer</c> itself is still internal and the rows are unchanged. The
+    /// platform is named in each assert so a failure still says which one.</summary>
     private static readonly Desktop[] OffWindows =
         [Desktop.Linux, Desktop.MacArm64, Desktop.MacX64];
 
@@ -160,14 +161,66 @@ public class UpdateOfferTests
 
     /// <summary>The platform mapping itself. It cannot be asserted against a fixed answer
     /// — the suite runs on all three — so it is checked for CONSISTENCY with the runtime,
-    /// which is what a wrong branch would break.</summary>
+    /// which is what a wrong branch would break. It lives in <c>UI.Shared</c> since P0-2;
+    /// this row stayed here because this is the lane the code actually runs on.</summary>
     [Fact]
     public void CurrentAgreesWithTheRunningOperatingSystem()
     {
-        var current = UpdateOffer.Current();
+        var current = LegacyPlatformUpdatePolicy.Current();
         if (OperatingSystem.IsWindows()) Assert.Equal(Desktop.Windows, current);
         else if (OperatingSystem.IsMacOS())
             Assert.True(current is Desktop.MacArm64 or Desktop.MacX64, $"macOS resolved to {current}");
         else Assert.Equal(Desktop.Linux, current);
+    }
+
+    // ---- LEGACY-002 / LEGACY-003, on the lane that actually runs off Windows ----
+
+    /// <summary>A v2 release, carrying non-Windows artifacts because
+    /// <c>release-assets.yml</c> is unchanged. Their existence is not a reason to offer
+    /// the update: v2 is Windows-only, and these files would be a v1 tarball wearing a
+    /// v2 version number.</summary>
+    private static UpdateInfo V2Release => new(new Version(2, 0, 0), SetupPath: null,
+        DownloadUrl: "https://gh/EQBuddySetup.exe",
+        Sha256Url: "https://gh/EQBuddySetup.exe.sha256",
+        LinuxTarballUrl: "https://gh/EQBuddy-linux-x64.tar.gz",
+        MacArm64Url: "https://gh/EQBuddy-osx-arm64.zip",
+        MacX64Url: "https://gh/EQBuddy-osx-x64.zip");
+
+    /// <summary>LEGACY-002 (#275) on the Avalonia lane: the shared policy refuses the
+    /// offer for every non-Windows desktop, whichever path asked, and sends the click to
+    /// the final legacy release rather than to <c>releases/latest</c> — which IS the v2
+    /// release page the moment v2 ships, with a Windows installer at the top of it.</summary>
+    [Fact]
+    public void NoDesktopOffWindowsIsOfferedVersionTwo()
+    {
+        foreach (var platform in OffWindows)
+            foreach (var manual in new[] { false, true })
+                foreach (var acknowledged in new[] { false, true })
+                {
+                    var d = LegacyPlatformUpdatePolicy.Decide(V2Release, platform,
+                        manual, acknowledged);
+                    Assert.False(d.ShowUpdateOffer, $"{platform} manual:{manual} ack:{acknowledged}");
+                    if (d.BrowserTarget is not { } target) continue;
+                    Assert.DoesNotContain("releases/latest", target);
+                    Assert.DoesNotContain(UpdateChecker.LinuxTarballName, target);
+                }
+    }
+
+    /// <summary>LEGACY-003, stated as its own negative rather than left implied: nothing
+    /// off Windows is ever staged, run or overwritten. <c>CanAutoInstall</c> has required
+    /// <c>IsWindows</c> since #93; this is the assertion that stops a future edit removing
+    /// the guarantee quietly, and it covers the v2 feed as well as v1.</summary>
+    [Fact]
+    public void NothingOffWindowsIsEverAutoInstalledIncludingFromAV2Release()
+    {
+        foreach (var platform in OffWindows)
+        {
+            Assert.False(UpdateOffer.CanAutoInstall(V2Release, platform), $"{platform}");
+            Assert.False(UpdateOffer.CanAutoInstall(V2Release, platform, isInstalled: true), $"{platform}");
+            Assert.False(UpdateOffer.CanAutoInstall(V2Release, platform, isInstalled: false), $"{platform}");
+            Assert.False(UpdateOffer.CanAutoInstall(FullRelease, platform), $"{platform}");
+        }
+        // The positive that keeps the negative honest: Windows still installs.
+        Assert.True(UpdateOffer.CanAutoInstall(V2Release, Desktop.Windows));
     }
 }

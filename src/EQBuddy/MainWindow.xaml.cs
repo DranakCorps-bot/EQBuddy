@@ -44,6 +44,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private DateTime _lastJanitorRun = DateTime.MinValue;
     private DateTime _lastUpdateCheck = DateTime.MinValue;
     private UpdateInfo? _pendingUpdate;
+    /// <summary>Set instead of <see cref="_pendingUpdate"/> when the banner carries the
+    /// final-legacy notice: nothing to take, so a click opens the legacy release page.
+    /// Windows never sets it — see <c>UI.Shared/LegacyPlatformUpdatePolicy</c>.</summary>
+    private string? _legacyNoticeTarget;
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
 
@@ -3880,6 +3884,18 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 if (_installingUpdate) return;
                 if (info is not null && UpdateChecker.IsNewer(info))
                 {
+                    // LEGACY-002, the same policy both lanes ask. On Windows it always
+                    // answers "behave as today" — the diff here is a call site, not a
+                    // behaviour — and it is wired anyway so no seventh site can decide
+                    // this for itself (trap 47's four-copies shape).
+                    var decision = LegacyPlatformUpdatePolicy.Decide(info,
+                        LegacyPlatformUpdatePolicy.Current(), manual,
+                        _settings.LegacyFinalNoticeAcknowledged);
+                    if (!decision.ShowUpdateOffer)
+                    {
+                        ShowFinalLegacyNotice(info, decision);
+                        return;
+                    }
                     _pendingUpdate = info;
                     // Portable copies never get the silent-install path (#119): the
                     // installer lands elsewhere and the portable exe stays old, which
@@ -3904,9 +3920,57 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         });
     }
 
+    /// <summary>Apply a LEGACY-002 decision that said "do not offer this" — the WPF half
+    /// of one shared rule, unreachable on Windows by construction. The acknowledgement
+    /// write is guarded on a real change because a save rewrites the whole file from the
+    /// startup snapshot (trap 13); the click means BOTH open-the-page and I-have-read-this,
+    /// which the policy keeps as two fields so Bevel can rule either way.</summary>
+    private void ShowFinalLegacyNotice(UpdateInfo info, LegacyUpdateDecision decision)
+    {
+        _pendingUpdate = null;
+        if (decision.RecordAcknowledgement) AcknowledgeFinalLegacyNotice();
+        if (!decision.ShowFinalLegacyNotice) return;
+        _legacyNoticeTarget = decision.BrowserTarget;
+        UpdateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyNoticeText(info,
+            LegacyPlatformUpdatePolicy.Current());
+        UpdateBanner.Visibility = Visibility.Visible;
+        // Sticky: this one is not a six-second "you're up to date" toast.
+        _upToDateNoticeUntil = DateTime.MinValue;
+    }
+
+    private void AcknowledgeFinalLegacyNotice()
+    {
+        if (_settings.LegacyFinalNoticeAcknowledged) return;
+        _settings.LegacyFinalNoticeAcknowledged = true;
+        _settings.Save();
+    }
+
     private void OnUpdateBannerClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
+
+        // The banner is carrying the final-legacy notice: nothing to install, and the
+        // target is the legacy release page rather than releases/latest (LEGACY-002).
+        if (_legacyNoticeTarget is { } legacy)
+        {
+            _legacyNoticeTarget = null;
+            // Both: open the page AND record that it has been read.
+            AcknowledgeFinalLegacyNotice();
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                    legacy) { UseShellExecute = true });
+                UpdateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyOpenedText();
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+                UpdateText.Text = $"Couldn't open browser — visit {legacy}";
+            }
+            _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
+            return;
+        }
+
         if (_pendingUpdate is not { } info || _installingUpdate) return;
 
         if ((info.SetupPath is null && info.DownloadUrl is null) || !UpdateChecker.IsInstalledCopy)

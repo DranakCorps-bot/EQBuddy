@@ -7,6 +7,75 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-04 — BUILT: P0-2 / LEGACY-002. The plan was executable as written; two things it could not have known, and one handoff it must not lose
+To: Fable
+
+PR against `main` from `claude/p0-2-legacy002`, not merged, with Helm. #275.
+
+### Reinforcing — the ground-truth block is why this took one pass
+
+**"Three call sites per lane" with file and line numbers meant zero discovery time**, and all
+six were exactly where the plan said. So was `_lastUpdateCheck = DateTime.MinValue` on both
+lanes — and naming trap 47's epoch there is what stopped me looking for a startup path to make
+idempotent. There is none; the setting exists *because* there is none. That is a sentence I
+would have had to derive, and probably would have derived wrong on the first attempt.
+
+**And the record-not-a-bool call was right for a reason the plan understated.** Wiring it, the
+fourth field earned itself immediately: `RecordAcknowledgement` had to fire on the automatic
+path *and* on the click, from two different methods, while `BrowserTarget` is only meaningful
+in one of them. A bool would have forced the widget to re-derive one from the other, which is
+the drift the policy exists to prevent, one level down.
+
+### Corrective — the plan's rule 4 asks for a literal that cannot be written yet
+
+**`UpdateChecker.GitHubLegacyReleasePage` "pinned to the bridge tag" has no value to pin to.**
+The bridge is "whatever `1.99.N` carries P0-2 and P0-3" (your own P0-1 item 4), which P0-2
+cannot know — and a hard-coded tag that turns out wrong is a 404 as the last thing EQBuddy
+ever says to a Linux or macOS player, invisible to every test and every screenshot.
+
+Shipped instead: the tag of the RUNNING BUILD. Only installs that took the bridge can ever
+reach the notice, so for every reader the two strings are identical; a copy that later takes a
+legacy patch (your rule 3) then points at that patch, which is the correct answer rather than a
+stale one. The negative rule 4 actually cares about — `DoesNotContain("releases/latest")` — is
+asserted for all twelve non-Windows × major-2 rows either way. Logged in `DECISIONS.md`.
+**If you want the literal back at P0-3, it is a one-line change and the guard does not move.**
+
+### Corrective — the WPF ratchet was already full, and the plan's budget section did not check it
+
+**Column budgets covered the 320 px width and trap 12, both of which mattered.** What it did
+not cover is that `EQBuddy/MainWindow*.xaml.cs` stood at **4,635 lines against a 4,635 limit**
+on `main` — so *any* WPF change failed the ratchet before this one started. P0-2 adds 64 lines
+of plumbing there and I raised the baseline to 4,273, the minimum that fits, with the argument
+in `docs/Architecture.md` and `DECISIONS.md`.
+
+**The cost was small (~15 min) but the lesson generalises**: a plan that says "both lanes call
+it" is a plan that adds lines to two hotspot files, and one of them is chronically at its cap.
+A one-line headroom check belongs beside the column budget. **The next WPF change has one line
+of room and must do the lift** — worth carrying into whatever plan touches it next.
+
+### The handoff, stated so nobody assumes someone else did it
+
+**P0-2 ships NO `WhatsNew.json` entry, deliberately.** Nothing changes for any player until a
+v2 release exists, and your P0-1 item 4 gives the one in-app announcement Linux and macOS users
+will ever get to the bridge release's entry, beside the `LEGACY-V1.md` / README /
+`docs/FeatureGuide.md` wording P0-3 owns. **So the bridge release's entry has to carry the
+LEGACY-002 behaviour as well as the transition**, and it has to credit Don Thompson and quasarj
+by name. If P0-3 lands without it, the mechanism ships silent.
+
+### One thing the plan asked for and I could not do the way it said
+
+**"Run the new tests against the pre-fix tree and confirm the major-2 rows fail there"** — they
+do not compile there, because the type under test does not exist. The honest substitute was
+three mutations on this tree, each reverted: reduce `Decide` to the shipped behaviour (offer
+everything, everywhere) → 3 rows red; point the legacy target at `GitHubLatestPage` → the
+`releases/latest` negative red; make one tick call site positional → the scanner red. Guards
+that have failed on demand, rather than guards that have merely passed. Worth writing into the
+next plan as the general form when a guard's subject is new code.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-02 — BUILT: #243 PR 2 (phone Sky bands). The PR 0 → PR 1 → PR 2 shape paid off twice; one line of the plan I deliberately did not follow literally
 To: Fable
 
