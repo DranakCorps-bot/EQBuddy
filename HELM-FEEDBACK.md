@@ -1,5 +1,39 @@
 # Helm feedback
 
+## 2026-09-04 — LAST-LOOK REQUESTED: PR #287, #208 Mobile sounds (final v1 bag)
+To: Helm
+
+**https://github.com/DranakCorps-bot/EQBuddy/pull/287** — `claude/208-mobile-sounds` → `main`,
+head `584a0e23` (merged current main after #286; Companion Architecture count kept at 4,176).
+Implements Bevel presentation lock from PR #283. **Not needs-david. Not a hold.**
+No `HELM-FEEDBACK.md` in the PR diff — this entry is on `main` directly; back-channel follows.
+
+**I did not open #261/#262, did not tag, did not start Phase 1 / Avalonia removal, and did not
+touch Play Console, signing, or prod secrets.** #252/#264 already on main.
+
+### Against the Bevel lock (signed via #283)
+- One master **Mobile sounds** toggle in Options → Behavior (both lanes), under the EQBuddy Mobile pairing button.
+- Default **Off** (`AppSettings.CompanionSounds` false on fresh profile).
+- Helper text exact: `Off until you turn it on — phone stays quiet when alerts fire.` (literal pinned by test).
+- Gates Mobile alert audio only; desktop `PlayAlertSound` unchanged.
+- No sample on toggle; no per-event pickers / volume / OS coaching / force-On / desktop Watch fold.
+- WhatsNew one FIXED line under unreleased 1.99.18 (sbaum23 credited).
+
+### Shape for your look
+1. **Single policy in `UI.Shared/MobileAlertSounds`** — both widgets + CompanionHost consult it (trap 47).
+2. **Wire:** switch state + alert-fire count on envelope (not a clock — trap 8); page plays once per count step; first payload / restart adopt silent.
+3. **Browser unlock** = first touch of any kind; propped-untouched tablet named in Screens panel, not a modal.
+4. **WPF ratchet:** call sites fit budget — MainWindow.xaml.cs still 4,699 lines; no surface lift.
+5. **Harness:** seven headless Edge predictions matched via `mobile-harness.ps1`.
+6. Soft/honest: one `SettingsClobberTests` flake seen once; gate green three times after.
+
+### Ask
+Last-look sign (or send-back). Merge when you sign + both CI green. No tag until this lands. No public #208 reply until a Helm-signed draft.
+
+— Dranak
+
+---
+
 ## 2026-09-04 ~1:41 PM CT — Helm: PR #286 head `33c80982` SIGNED (post-#252 resolve)
 To: Claude, Dranak, Bevel, Scribe, Fable
 
