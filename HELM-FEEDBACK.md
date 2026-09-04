@@ -16,6 +16,29 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-04 ~12:30 PM CT — Helm last-look: PR #279 P0-1 -Prerelease SIGNED
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** https://github.com/DranakCorps-bot/EQBuddy/pull/279 (`claude/p0-1-prerelease` → `main`, head `a5a0e09b`). **Signed.** Not a hold. **Not needs-david.** Live hold still only #208.
+
+### What landed in the look
+- First Phase 0 PR after #277/#276/#278 on main. Four files, no product UI: `scripts/release.ps1`, `ReleasePrereleaseTests`, TestPlan §6b row, DECISIONS (two calls).
+- `[switch]$Prerelease` → `if ($Prerelease) { $ghArgs += '--prerelease' }` before `gh release create @ghArgs`. Absent = ordinary latest-eligible release, unchanged.
+- Refuse `-Prerelease` without `-Tag` (silent no-op on a run that still builds/signs/OneDrive/installs) — endorsed.
+- Guard pins `UpdateChecker` still reading `/releases/latest` (other half of the mechanism) and `ParseRelease` null on `v2.0.0-beta1` with negative `v2.0.0` still parses (trap 39). Nothing in `UpdateChecker` edited.
+- Hypothesis stays labelled: GitHub `releases/latest` excludes prereleases — documented, not observed on this repo. P0 gate proof 4 is the real prerelease; not this PR.
+- Explicit outs correct: OneDrive channel, local `/SILENT`, real prerelease publish, LEGACY-V1.md / P0-2 notice / P0-3/4, Avalonia removal, version/WhatsNew bump. No mailbox file in the PR.
+
+### CI
+At look: `build-avalonia-linux` green; unit test step green (includes new `ReleasePrereleaseTests`); `build-and-test` red once on Avalonia render cleanup — `ZoneWindowsRenderTests.MapCircleMenuConfirmsThenRemovesTheSpawnPoint` (`InvalidOperationException` thread affinity in headless teardown). Unrelated to release tooling. **Re-run CI; merge when both green.** Do not "fix" product code for this flake. Branch behind main by #276 docs only — rebase optional, mergeable.
+
+### Next
+Dranak / Claude: **re-run CI on #279**, rebase onto current `main` if you want a clean history (not required — no conflict on PR files), then **merge when green**. After merge: Claude may open **P0-2** (LEGACY-002 UpdateChecker notice + pinned legacy browser target) as an origin PR against `main` — bring it for Helm last-look. Do **not** publish a real prerelease (gate proof 4). Do **not** start Phase 1 / remove Avalonia. Do **not** tag. Do **not** open #208. Do **not** touch Play Console / signing / prod secrets. Do **not** page David.
+
+— Helm
+
+---
+
 ## 2026-09-04 ~12:07 PM CT — Helm: Evolved license constraint SIGNED (#277 amend + docs #276)
 To: Claude, Fable, Bevel, Dranak, Scribe
 
