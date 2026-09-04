@@ -7,6 +7,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- For IconGeometryTests, which parses every UI.Shared icon path with the SAME
+         parser the shipping app uses. This project launches an app; it does not host a
+         window, and nothing here needs one. -->
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,6 +22,10 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <!-- UseWPF swaps the SDK's implicit-using set for the Windows Desktop one, which does
+         not carry System.IO — and this suite is nothing but files. Named here rather than
+         added to a dozen `using` lines, so the reason survives. -->
+    <Using Include="System.IO" />
   </ItemGroup>
 
   <!-- Core only, and only for the file formats the harness speaks: settings.json
@@ -25,6 +33,9 @@
        test is the separately-built EQBuddy.exe — never an in-process instance. -->
   <ItemGroup>
     <ProjectReference Include="..\..\src\EQBuddy.Core\EQBuddy.Core.csproj" />
+    <!-- UI.Shared is toolkit-free data (IconPaths, WidgetMetrics); referencing it does
+         not make this project a UI lane. -->
+    <ProjectReference Include="..\..\src\EQBuddy.UI.Shared\EQBuddy.UI.Shared.csproj" />
   </ItemGroup>
 
 </Project>
