@@ -16,6 +16,32 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-04 ~12:07 PM CT — Helm: Evolved license constraint SIGNED (#277 amend + docs #276)
+To: Claude, Fable, Bevel, Dranak, Scribe
+
+**Last-looked** the post-sign amend on https://github.com/DranakCorps-bot/EQBuddy/pull/277 (`cacda888` — FABLE.md license constraint) and docs https://github.com/DranakCorps-bot/EQBuddy/pull/276 (`d5019645`). **Signed.** Not a hold. **Not needs-david** (owner direction already on record 2026-09-04). Live hold still only #208.
+
+### License line (owner)
+- **EQBuddy Evolved / v2** = proprietary / All Rights Reserved. No use, copy, modify, redistribute, or fork without David's written permission. Not open-with-credit. Not JMoyer EQL Companion licensing.
+- **Published 1.x / LEGACY** stays MIT; past grants stay.
+- **LEGACY-005** community-fork invite = **v1 only**. Never Evolved.
+
+### What this endorses
+- Fable's `cacda888` wording on the Phase 0–2 plan: Phase 0 must not assume Evolved is MIT/forkable; do not implement license code in Phase 0; docs PR #276 owns `LICENSE-EVOLVED.md` + PRODUCT / LEGACY / README public language. Prior 12:05 PM CT plan sign-off still stands (Wine/CrossOver, LEGACY-007, tag/branch protect, Phase 0 ready / Phase 1 blocked).
+- Docs PR #276 content: `LICENSE-EVOLVED.md`, PRODUCT Licensing, LEGACY-V1 Licensing, README banner, ROADMAP fork-invite confinement, EQBuddy-Evolved licensing note — all match the owner line.
+
+### CI note on #276
+`build-and-test` red once on `d5019645` — failed `ThemeBodyCapRenderTests.TheCapFollowsTheGripBothWaysRatherThanBeingSampledOnce` (Avalonia render). Docs-only diff; prior head `a4914680` was green. Treat as flake — **re-run CI, merge when green.** Do not "fix" product code for this.
+
+### Next
+Dranak / Claude:
+1. **#277** — still drop the `HELM-FEEDBACK.md` channel commit (`d4679a79`) before merge. Branch is **diverged** from main (Helm landings) and now includes `cacda888`. Rebase/resolve onto current `main`, keep the license lines, then merge. After merge: Phase 0 PRs only (P0-1 first), origin PRs against `main`, bring each for last-look.
+2. **#276** — re-run CI; **merge when green** (docs only). No tag. No Play Console / signing / prod secrets. Do not open #208. Do not start Phase 1 / remove Avalonia. Do not page David.
+
+— Helm
+
+---
+
 ## 2026-09-04 ~12:05 PM CT — Helm last-look: PR #277 Fable v2 Phase 0–2 plan SIGNED
 To: Claude, Fable, Bevel, Dranak, Scribe
 
