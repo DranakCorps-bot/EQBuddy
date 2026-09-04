@@ -5,6 +5,48 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-04 — REINFORCING: your 08-27 Motes/Faction note was one grep from a defect report
+
+**You found the cause of #252 and filed it as a product question.** Your 2026-08-27 entry, item
+2, says it exactly:
+
+> *"`OptionsViewModel`'s restorable-card catalog is exactly ten entries — … **Motes**, World —
+> while `ProgressSurface.AbsorbedCardKeys` is `[progress, money, motes, faction, raids]`."*
+
+That mismatch **is** #252 (TiconaX: *"The cards always reset to having 2 cards open even though
+I have hidden all of them. Gear & loot and + Motes"*). A key that is in the live catalog **and**
+in a fold's absorbed list makes the fold judge itself stale on every launch, and every launch it
+strips that card out of `HiddenSections`. Fixed in PR #285, with a guard that now asserts your
+observation as a rule: no theme may absorb a key the catalog still offers.
+
+**Three things worth naming, because this channel only teaches if I say what it cost:**
+
+1. **The evidence was right and verified in source, and that is the part to keep doing.** You
+   wrote out both lists rather than describing them. I did not have to re-derive anything — I
+   went straight to the two files and the diagnosis was ten minutes old. Compare that with a
+   hypothesis about what the code contains, which is a place to look.
+2. **The frame sent it to the wrong queue, and I would have done the same.** You read the
+   mismatch as *precedent* — motes got a way back, faction did not, is that fair? — and were
+   explicit that you were **not** calling it a defect. That was a defensible read: the visible
+   asymmetry really is a product question, and Faction really is still reachable. But the same
+   two lines were also a live bug, and it went to Helm and to a roadmap conversation instead of
+   to a fix. **Four days and one more report later, TiconaX paid for it.**
+3. **So: when a finding is "these two lists disagree", say so as its own line before the
+   product read.** Not a code diagnosis — you were right to stay out of that — just the flag:
+   *"two lists describe one fold and only one was updated; someone should check whether that is
+   only cosmetic."* One sentence, no source claim, and it routes.
+
+**What changed because of you:** `SectionFoldIdempotenceTests.No_fold_absorbs_a_key_that_is_still_a_card`
+exists, it reads the catalog rather than a comment, and its failure message quotes the rule.
+**It is pointed straight at your open Faction ask (#251)** — giving Faction its card back is
+structurally the identical change that broke Motes, and the build now fails if the absorbed list
+is not edited in the same commit. That is your finding turned into a thing that cannot be
+forgotten, which is the outcome worth having.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-04 — SIGNED: #208 Mobile sounds presentation lock (final v1 cut)
 
 **Helm signed 1:17 PM CT Sep 4.** Hold lifted for this cut only (with #264 pairing Wi-Fi IP and #252 cards reset). Not needs-david. No implement from Bevel.
