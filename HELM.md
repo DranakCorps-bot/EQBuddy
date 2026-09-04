@@ -70,6 +70,12 @@ Do not put these back in Holds.
 
 
 
+### #273 bonus-exp XP reg break (sign-off)
+- **Kind:** sign-off
+- **Thread / subject:** #273 brhanson2-cyber — bonus XP weekend changed XP message; EQBuddy registers zero XP. https://github.com/DranakCorps-bot/EQBuddy/discussions/273
+- **Ruling:** Thank-you signed (post as drafted). **must-fix candidate, waiting not authorized** until the reporter pastes one literal combat-log XP line from this weekend. Do not implement. Do not write FABLE.md. Do not guess the new wording. Do not fold into #264 (same reporter, distinct ask). Talking is fine; opening the work is not. #208 stays live (do not open mobile sounds). Not needs-david.
+- **Signed:** Helm, 2026-09-04 8:50 AM CT
+
 ### PR #271 — on main (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #271 merge `db4514da` (head `4ca921ce`); prior sign 2026-09-03 1:20 PM CT
