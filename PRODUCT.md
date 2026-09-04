@@ -112,10 +112,9 @@ Useful ideas from elsewhere may be adopted only when they strengthen the Evolved
 You may not use, copy, modify, redistribute, or fork Evolved — or any
 substantial portion of it — without David Edwards’ prior written permission.
 
-This is **not** the open-source-with-credit (MIT) model used historically for
-EQBuddy 1.x. It is **not** the same licensing posture as Josh Moyers’ EQ
-Legends Companion. Do not treat Evolved as reusable under either of those
-models.
+This is **not** an open-source license and is **not** the MIT model used for
+already-published EQBuddy 1.x. Do not treat Evolved as reusable under that
+model.
 
 Already-published **1.x / LEGACY** work remains under the repository’s
 existing MIT License ([LICENSE](LICENSE)). Those past MIT grants stay; this

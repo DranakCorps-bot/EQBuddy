@@ -685,8 +685,8 @@ the durable record; this section is the roll call.
 **EQBuddy Evolved** (v2) is **proprietary / All Rights Reserved** — see
 [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md). You cannot use, copy, modify,
 redistribute, or fork Evolved without David Edwards’ prior written permission.
-That is not the open-source-with-credit model, and it is not the same
-licensing posture as JMoyer’s EQL Companion.
+This is not an open-source license and is not the MIT model used for
+already-published 1.x.
 
 **Already-published 1.x / LEGACY stays MIT** — see [LICENSE](LICENSE). Those
 grants stay; we do not revoke them. The invitation below applies to that

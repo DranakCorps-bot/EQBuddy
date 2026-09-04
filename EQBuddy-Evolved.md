@@ -87,8 +87,8 @@ Linux and macOS players keep the 1.x build they have. Evolved does not require t
 **Evolved is proprietary.** Code, assets, and Evolved-specific docs are All
 Rights Reserved (Copyright David Edwards) — [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md).
 You may not use, copy, modify, redistribute, or fork them without prior written
-permission. That is not the historical MIT / open-with-credit model, and it is
-not the same licensing posture as JMoyer’s EQL Companion.
+permission. This is not an open-source license and is not the MIT model used
+for already-published 1.x.
 
 Already-published **1.x stays MIT** ([LICENSE](LICENSE)). Those grants are not
 revoked. Fork invitations apply to LEGACY / v1 only. Full text:
