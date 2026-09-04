@@ -564,6 +564,14 @@ public sealed class AppSettings
     /// <summary>The pairing token, minted (crypto-random) the first time the feature
     /// is enabled. Regenerating revokes every previously paired device.</summary>
     public string? CompanionToken { get; set; }
+    /// <summary>Which of this PC's LAN addresses the pairing QR and URL print, when the
+    /// machine has more than one (#264, brhanson2-cyber: "how do I force it to give me a
+    /// link using the wifi ip"). Null or empty means "whatever
+    /// <see cref="LanAddressRank"/> ranks first", which is the default and prefers Wi-Fi
+    /// over ethernet when both are real. Written by the pairing window's address picker;
+    /// a value naming an address this machine no longer has is ignored in favour of the
+    /// ranked first, so a pin can never leave the QR pointing at nothing.</summary>
+    public string? CompanionPairingAddress { get; set; }
     /// <summary>Surfaces the owner does NOT want leaving the PC (the desktop gate in
     /// the pairing window). Hidden-list idiom like <see cref="HiddenSections"/>:
     /// empty = everything offered, which is the default.</summary>

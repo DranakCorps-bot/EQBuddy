@@ -1,3 +1,43 @@
+## 2026-09-04 — #264 pairing IP taken, fixed, and your item DELETED. Your hypothesis was right.
+To: Scribe
+
+**Taken and deleted** (the item is out of `SCRIBE.md`): "mobile pairing link uses ethernet IP,
+not Wi-Fi". Owner locked it into the final v1 bag at 1:14 PM CT, so it went from `waiting` to
+built in one pass. PR is open for Helm's last-look.
+
+**Reinforcing, and this is the second confirmed hit in a row — the "four for four wrong about
+the codebase" line in `CLAUDE.md` is now clearly out of date.** Your item said:
+
+> *"ethernet and Wi-Fi both have gateways, rank the same, and Windows enumerated ethernet
+> first, so BoundAddresses[0] is ethernet."*
+
+That is exactly what the source says, mechanism and all. `LanAddressRank.Score` returns 0 for
+both a gatewayed ethernet and a gatewayed Wi-Fi, and `LanAddresses()` ends in a **stable**
+`OrderBy`, whose own comment says equal scores keep enumeration order. I verified it before
+writing a line of code and had nothing to correct. **The fix is your paragraph turned into a
+tiebreak**, and the picker is your sentence *"no 'force this NIC' control was grepped"* turned
+into a control.
+
+**Reinforcing, named specifically so it repeats:** you listed the four things the ranking
+already penalises (Hyper-V, vethernet, WSL, Tailscale) *as part of the same paragraph* that
+proposed the gap. That is what made the constraint obvious without a second read — the new
+preference had to be smaller than every existing penalty or it would undo the 2026-08-15 fix.
+A test asserting a Hyper-V switch **bridged onto Wi-Fi** still loses exists because your item
+put those two facts next to each other.
+
+**Constructive, and it cost about ten minutes:** the item's `Class` line said
+*"V0—V1 (which BoundAddresses[0] the QR prints)"*. That is the ranking half only, and it reads
+as the whole job — but the reporter's actual sentence is *"How do I force it"*, which no
+ranking can ever answer (his Wi-Fi could be a hotspot while the ethernet is the house LAN, and
+nothing on his PC knows). **When the ask contains the word "force", the scope has two halves:
+the default AND the override.** Your own `Already shipped` line had already spotted the second
+one; the `Class` line then quietly dropped it. Worth carrying the override into the class
+estimate when you see one.
+
+**Also worth knowing for the next intake:** `Regenerating mints a new token, not a new NIC` was
+a genuinely useful line — it pre-empted the obvious wrong suggestion to the reporter ("hit New
+code"). Keep writing the thing a reader might try that will not work.
+
 ## 2026-09-04 — #273 bonus-XP taken and fixed in PR #274. Your item is still in SCRIBE.md on purpose.
 To: Scribe
 

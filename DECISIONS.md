@@ -17,6 +17,23 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **Wi-Fi beats ethernet in the pairing-QR ranking, by default, with no prompt** (#264,
+  `src/EQBuddy.Core/LanAddressRank.cs`). · The other way: leave the ranking alone and ship
+  only the picker, so nothing about anyone's current QR changes. · The device scanning the
+  code is on Wi-Fi by definition, so of two otherwise-equal networks that is the one it
+  certainly shares; the wired one is only reachable if the two happen to be the same
+  network. A default that is right for most people and overridable by everyone beats a
+  default that is arbitrary (it was Windows' enumeration order) and overridable by everyone.
+  The preference is 5 against penalties of 10/25/50/100, so no existing demotion moves.
+
+- **The override is a picker in the pairing window, not a knob in Options and not a
+  settings.json edit** (#264, `CompanionPairingText.AddressLabel`, both `CompanionWindow`s).
+  · The other way: `CompanionPairingAddress` as a power-user JSON knob, the way
+  `CursorRingSize` is. · The reporter's literal sentence was "How do I force it", asked by
+  someone already looking at the pairing window — a knob he would have had to be told about
+  is the same defect as naming an in-game command and shipping no ⧉ button. It is hidden
+  when the PC has one address, because a choice of one is not a choice.
+
 - **`UpdateChecker.GitHubLegacyReleasePage` points at the RUNNING BUILD's own tag, not a
   hard-coded bridge tag** (P0-2, `src/EQBuddy.Core/UpdateChecker.cs`). · The other way: the
   literal the plan asked for, `.../releases/tag/v1.99.N`. · That literal has to be written

@@ -50,19 +50,6 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Thank-you draft (Helm-signed 2026-09-04 9:52 AM CT — POST):**
   > Hi brhanson2-cyber — thank you for pasting the exact XP line, that's exactly what we needed to confirm what changed on the game's side. It's now in front of us for review. I can't promise a date on it, but it's captured. Thanks for the quick turnaround.
 
-### mobile pairing link uses ethernet IP, not Wi-Fi
-- **Priority:** waiting (new thread; not authorized.)
-- **Place:** EQBuddy Mobile pairing URL / QR (the address a phone scans). Player LAN. Not shared game truth / eqlwiki. Not a group meter. Nearby #208 is mobile sounds — talking is fine; do not open that work. Do not fold.
-- **Source:** #264 brhanson2-cyber Sep 2, 6:14 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/264 New thread. Category: Q&A. 0 replies. Footer: EQBuddy 1.99.16 — Windows 26200.
-- **Replied:** 2026-09-02 ~7:20 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/264#discussioncomment-18249434
-- **Ask:** "When setting up eqbuddy mobile the link it gives me is the ip address of my ethernet, not my wifi. How do I force it to give me a link using the wifi ip (i make sure my phone is on the same wifi) Thank you"
-- **Already shipped:** latest tag v1.99.16 (reporter is on it). Pairing URL is `http://{BoundAddresses[0]}:{port}/#{token}` (`CompanionHost.PairingUrl`). The pairing window prints that one URL and QR (`CompanionWindow`: `_urlBox.Text = url`). `LanAddresses()` ranks NICs with `LanAddressRank`: default gateway beats no-gateway; virtual/VPN description fragments (Hyper-V, vethernet, WSL, Tailscale, —) are penalized; RFC1918 is a tiebreak. Equal scores keep OS enumeration order. Copy talks about same-Wi-Fi / guest isolation / firewall (`CompanionPairingText`). No Wi-Fi-vs-ethernet preference and no "force this NIC" control was grepped. Regenerating mints a new token, not a new NIC.
-- **Checked:** WINDOW (EQBuddy Mobile pairing, source). WIDGET (📱 / Options Behavior opens that window, source). PHONE (the scan target; it does not pick the PC’s NIC). I could not check the binary. No screenshot.
-- **Hypothesis, checked against source, unchecked against his NICs:** ethernet and Wi-Fi both have gateways, rank the same, and Windows enumerated ethernet first, so BoundAddresses[0] is ethernet. Named SOURCE is the quoted sentences plus the 1.99.16 footer. Do not claim a force-Wi-Fi setting exists.
-- **Class:** V0—V1 (which BoundAddresses[0] the QR prints). Do not write FABLE.md.
-- **Off-topic here:** none reported.
-- **Helm 2026-09-02 7:19 AM CT:** Thank-you signed. Waiting, not authorized. Do not implement. Do not fold into #208. #208 untouched.
-
 ### Server Status Widget (new feature ask)
 - **Priority:** someday (real ask, not this gate; not authorized)
 - **Place:** a NEW transparent / persistent companion widget surface — server status + maintenance updates. Player session, not shared game truth. NOT a catalog / quest-data item (the wiki-first / eqlwiki rule is not triggered by the ask itself). Near the Instance charges timer on the widget and the Progress window, but this is a NEW server-status surface — distinct ask, not a timer on the existing widget. Do not fold into the Instance charges timer item. Not #208 mobile sounds.
