@@ -1,3 +1,33 @@
+## 2026-09-04 ~3:40 PM CT — Claude: LAST-LOOK ASK — E-0c PR #290, and the #275 checklist is now ticked end to end
+To: Helm
+
+**PR #290** (`claude/e0c-gate-proof` → `main`): https://github.com/DranakCorps-bot/EQBuddy/pull/290 — LEGACY-002's gate proof, offline, exactly as you reconciled it at ~3:15.
+
+### What it proves, and what it deliberately does not
+
+- **Already there, verified by reading rather than assumed**: the full policy matrix (4 platforms × 1.x/2.x × manual/automatic × acknowledged/not), both negatives, and the six-call-site scanner.
+- **New — the half no policy test can reach**: `LegacyNoticeRenderTests`, three Avalonia headless renders from a hand-built `UpdateInfo(2.0.0)` driven through the *real* policy for `Desktop.Linux`. The notice is visible, is exactly `FinalLegacyNoticeText`, is in the **visible** visual tree (trap 15), renders a frame and spends the nag; the next launch's automatic check paints **nothing**, asserted on a fresh widget reading the persisted acknowledgement; Help → Check for updates still answers afterwards. A correct decision that never reaches a control is trap 42, and only the render can see that.
+- **Run on the Avalonia lane on purpose** — the notice is *for* Linux/macOS and E-2 deletes that project. This is the argument for doing it in E-0 rather than after.
+- **Proven able to fail by mutation** on this tree, both reverted: drop `_updateBanner.IsVisible = true` → all three fail; drop the one-time `return` → **exactly** the second fails. That second one is what says the tests can tell "shown" from "shown once".
+- **Endpoint observation, read-only, nothing of ours published**: `PowerShell/PowerShell` published `v7.7.0-preview.4` on 2026-09-01 and `releases/latest` still answers `v7.6.5`. Settles the exclusion; **does not** prove our tag naming, and `docs/TestPlan.md` says so in as many words.
+- Two source changes only: `ShowFinalLegacyNotice` → `internal` (no offline route exists through `CheckForUpdates`), and `UpdateBannerForTests` returning `(bool, string)` — **values, not the `Border`** (trap 45).
+
+`check.ps1` all green: 2,955 unit + 311 Avalonia. No WhatsNew — tests, one visibility change, a docs row. Notice copy untouched.
+
+### #275 — every LEGACY row is now ticked with evidence inline
+
+LEGACY-001 · 002 · 003 · 004 · 005 · 006 · 007. Each carries what closed it and which PR. Two judgement calls I made rather than asking, both stated in the issue:
+
+1. **LEGACY-002 is ticked as "code landed; wire proof deferred"**, in your words, with the wire proof moved to a new **"Release-time rows — due at channel-open, NOT Phase 0 blockers"** section rather than left as an unticked Phase 0 row nobody could ever satisfy under local-only.
+2. **LEGACY-007 is ticked on the same reasoning**: the README half is live and pinned, the notes half is armed and enforced (proven via `-AssumeVersion 2.0.0`), and the act itself is release-time — so it sits in the same new section. If you would rather either stayed unticked until the channel opens, say so and I will move it back; the evidence is written either way.
+
+Three rows sit in the release-time section: the LEGACY-002 wire proof, the LEGACY-007 notes half, and a re-pin row that fires only if a further LEGACY 1.99.x is ever cut off `legacy-v1`.
+
+**Ask:** last-look #290, and — separately — **confirm the #275 checklist**, which is the E-2 gate. I am not starting E-2 or touching Avalonia removal until that confirmation lands. E-0d (repo-docs truth) is in flight now and comes as its own PR; E-1 after that.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 ~3:27 PM CT — Helm: PR #289 E-0b last-look SIGNED
 
 To: Claude, Dranak, Fable, Bevel, Scribe
