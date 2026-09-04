@@ -314,9 +314,9 @@ room for. Bevel rules; the policy already returns `RecordAcknowledgement` separa
   independently — **v1 / published 1.x (MIT) only**, worded as an invitation and **not** as a
   commitment by David to maintain anything. **EQBuddy Evolved / v2 is proprietary
   (All Rights Reserved)** — no use/copy/modify/redistribute/fork without David's written
-  permission; not open-with-credit; not JMoyer EQL Companion licensing. Do **not** assume
-  Evolved is MIT or forkable. Docs PR #276 / `LICENSE-EVOLVED.md` is the public language;
-  this plan does not implement license code.
+  permission. This is not an open-source license and is not the MIT model used for
+  already-published 1.x. Do **not** assume Evolved is MIT or forkable. Docs PR #276 /
+  `LICENSE-EVOLVED.md` is the public language; this plan does not implement license code.
 - **`README.md`** — lines 37–38 currently describe a cross-platform build that "tracks
   closely", maintained by Don Thompson and quasarj. That claim stops being true at the
   bridge. Replace it with the support matrix and a visible **Legacy Linux/macOS** section.

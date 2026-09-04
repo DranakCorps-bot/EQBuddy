@@ -58,6 +58,5 @@ published tree is still the invitation that applied to v1.
 **Evolved is separate and proprietary.** EQBuddy Evolved (v2) code, assets,
 and Evolved-specific docs are All Rights Reserved — see
 [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md) and [PRODUCT.md](PRODUCT.md#licensing).
-They are not MIT, not “use freely, credit visibly,” and not the same
-licensing posture as JMoyer’s EQL Companion. The v1 fork invitation never
+They are not MIT and not an open-source license. The v1 fork invitation never
 applies to Evolved.

@@ -9,10 +9,9 @@ You may **not** use, copy, modify, redistribute, sublicense, or fork EQBuddy
 Evolved, or any substantial portion of it, without **prior written permission**
 from David Edwards.
 
-This is **not** an open-source license. It is **not** the MIT “use freely,
-credit visibly” model that applied to already-published EQBuddy 1.x. It is
-**not** the same licensing posture as Josh Moyers’ EQ Legends Companion.
-Do not treat Evolved as reusable under either of those models.
+This is **not** an open-source license and is **not** the MIT model used for
+already-published EQBuddy 1.x. Do not treat Evolved as reusable under that
+model.
 
 Viewing the published product-direction pages in this repository
 ([PRODUCT.md](PRODUCT.md), [EQBuddy-Evolved.md](EQBuddy-Evolved.md),
