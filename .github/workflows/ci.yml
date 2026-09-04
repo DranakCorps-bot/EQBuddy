@@ -33,6 +33,17 @@ jobs:
       - name: What's-new entries that already shipped are unchanged
         run: pwsh -NoProfile -File scripts/whatsnew-guard.ps1
 
+      # EQBuddy Evolved (2.x) develops local-only, and release.ps1 is the only thing in the
+      # repo that can break that. The guard is in check.ps1 and in release.ps1 already —
+      # this is the copy that does not depend on anyone remembering to run either. A PR that
+      # re-adds the OneDrive copy, or a reachable `gh release create`, fails HERE.
+      #
+      # Its third check reads the live update folder, which no runner has; it fails open with
+      # a loud SKIPPED line, so what CI enforces is the script's shape. That is the half a
+      # pull request can get wrong.
+      - name: Evolved 2.x stays local-only
+        run: pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
+
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x
