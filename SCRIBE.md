@@ -17,7 +17,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 ---
 
 ### bonus-exp weekend changed the XP message — EQBuddy registering zero XP (player-facing break)
-- **Priority:** must-fix (player-facing break, live this weekend; not authorized yet).
+- **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT; evidence line in).
 - **Place:** XP-event parsing — `XpRx` in `src/EQBuddy.Core/LogParser.cs`. Player session, not shared game truth / eqlwiki. Downstream: Progress surface / XP% tracking that consumes `XpEvent`. Not a catalog / quest-data item, so the wiki-first rule is not the fix surface here. Not #264, not #262, not #261, not #208. Do not fold.
 - **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. Footer: EQBuddy 1.99.17 — Windows 26200. (Newer client tag than the Aug 30–Sep 2 batch, which were on 1.99.16.)
 - **Replied:** 2026-09-04 ~9:05 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18290485
@@ -35,17 +35,18 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 - **Thank-you draft (Helm-signed 2026-09-04 8:50 AM CT — POSTED):**
   > Hi brhanson2-cyber — thanks for flagging this, and bad timing with the bonus XP weekend live right now. A changed XP line during the bonus weeks is exactly the kind of thing the tracker catches, and it's logged and in front of us for review. If it's easy, a one-line paste of an actual XP hit from your combat log this weekend would be the fastest way to confirm what changed on the game's side. I can't promise a date on it, but it's captured and sent along for review. Thanks for the report.
-### bonus-exp weekend XP line — reporter's literal line IN (unblocks; Helm call needed)
-- **Priority:** must-fix candidate, waiting not authorized — the blocking piece Helm asked for has now arrived. Not yet authorized to open.
+### bonus-exp weekend XP line — reporter's literal line IN (AUTHORIZED)
+- **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT). Weekend live; evidence gate cleared.
 - **Source:** #273 thread reply, 2026-09-04 9:08 AM CT (14:08 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18290556
 - **New in-thread (verbatim):** `[Fri Sep 04 09:04:24 2026] You gain experience (with a bonus)! (3.200%)` — the one literal combat-log XP line Helm's 8:50 AM sign-off said was the blocker. Thread now has exactly two comments: our signed thank-you (9:05 AM CT) and this line (9:08 AM CT).
 - **What the line confirms:** the bonus-weekend XP hit no longer ends `experience!(...)`; the wording is now `experience (with a bonus)! (3.200%)`. Not party XP; no extra metadata beyond the `(with a bonus)!` phrase and the pct.
 - **Unverified this pass, do not assert:** I did NOT re-grep `LogParser.cs` on main this run — whether `XpRx` on current main already accepts `(with a bonus)!` is unconfirmed (as of this morning's intake it was anchored `You gain (?<party>party )?experience!`, which this line will NOT match). Claude/Helm can confirm on the file.
 - **Holds re-read (HELM.md origin/main, this run):** only live hold is #208 (do not open mobile sounds) — this is an XP-log parse item, not #208; talking to the reporter is not the hold.
-- **Status → NEEDS HELM CALL:** item is past its evidence gate; same #273, now unblocked. No new GitHub item created. Do not implement. Do not write FABLE.md. Do not open the work until Helm rules (e.g. authorize V0–V1 on the regex or hold for the weekend to end).
-- **Scribe 2026-09-04 09:49 AM CT (cron intake):** update appended under the existing #273 entry (newest on top). Thank-you to the reporter for pasting the line is DRAFTED below for Helm's sign — NOT posted.
+- **Status:** Helm ruled 9:52 AM CT — authorize V0–V1 now (not hold-until-Sunday). Claude kick via Dranak. Do not write FABLE.md. Do not fold into #264. #208 untouched.
+- **Scribe 2026-09-04 09:49 AM CT (cron intake):** update appended under the existing #273 entry (newest on top). Thank-you to the reporter for pasting the line drafted for Helm's sign.
+- **Helm 2026-09-04 9:52 AM CT:** Authorized V0–V1. Thank-you for the paste signed — post as drafted.
 
-- **Thank-you draft (for Helm's sign-off — DRAFT, NOT POSTED):**
+- **Thank-you draft (Helm-signed 2026-09-04 9:52 AM CT — POST):**
   > Hi brhanson2-cyber — thank you for pasting the exact XP line, that's exactly what we needed to confirm what changed on the game's side. It's now in front of us for review. I can't promise a date on it, but it's captured. Thanks for the quick turnaround.
 
 ### mobile pairing link uses ethernet IP, not Wi-Fi
