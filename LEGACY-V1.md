@@ -84,9 +84,9 @@ Linux and macOS 1.x exist because people built them — notably [Don Thompson](h
 
 The final legacy release's **assets, notes, tag, and the source state it was built from are retained permanently**. Nothing in a source tree can enforce that — a future `gh release delete` would not ask a test for permission — so it is backed where it can be: a GitHub **tag protection rule** on the final legacy tag and **branch protection** on the preserved branch, plus this page saying so in public.
 
-A **`legacy-v1` branch** is cut from the final cross-platform state before the Avalonia project leaves the v2 mainline, so the last cross-platform tree stays browsable and buildable without resurrecting it from a tag under time pressure. **It is preserved, not maintained**: no CI is wired to it, and a green badge on it would be a support promise nobody made.
+The **[`legacy-v1`](https://github.com/DranakCorps-bot/EQBuddy/tree/legacy-v1) branch** is cut from the final cross-platform state — it is `v1.99.18` exactly — so the last cross-platform tree stays browsable and buildable without resurrecting it from a tag under time pressure. **It is preserved, not maintained**: no CI is wired to it, and a green badge on it would be a support promise nobody made.
 
-Both are Phase 0 work on [#275](https://github.com/DranakCorps-bot/EQBuddy/issues/275) and are not done yet.
+**Both are in place now** (2026-09-04): the branch exists at the bridge commit, it cannot be deleted or force-pushed — by anyone, administrators included — and the `v1.99.18` tag is covered by a repository rule that refuses deletion and any non-fast-forward move. Both were verified by trying: the delete was rejected in each case. What they do *not* do is freeze the branch: a later 1.99.x LEGACY patch, if one is ever published, is still cut from here, which is the door [above](#what-this-means-if-you-already-have-1x) deliberately left open. Tracked on [#275](https://github.com/DranakCorps-bot/EQBuddy/issues/275).
 
 ---
 
