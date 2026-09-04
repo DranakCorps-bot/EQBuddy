@@ -110,6 +110,62 @@ that is the repo's one Windows-targeted test project, not because it needs the h
 
 ---
 
+# E-2b — the shared-suite scanners, one explicit call per file
+
+**Re-derived at execution rather than copied forward, as the plan instructs: 20 files in
+`tests/EQBuddy.Tests` named `EQBuddy.Avalonia`** — the same number the E-0/E-1 review
+re-counted on 2026-09-04, and the same list.
+
+Every one of them exists because two lanes could drift. With one lane that reason is gone,
+and the plan's warning is the thing to hold on to: *a scanner that scans one file it will
+always find is a guard that cannot fail, and it passes forever while reading as coverage.*
+So no row was dropped without asking what the guard was FOR once the parity half is
+removed — and in every case but one the answer was that the parity half was the SECOND
+reason, not the first.
+
+| File | Call | What it is for now |
+|---|---|---|
+| `ArchitectureTests` | **Row removed, with a tombstone** | The Avalonia widget was the largest file in the repo. The comment that replaces it says the WPF row did **not** inherit its headroom: 4,273 stands, one line from its cap. A deletion that quietly raises someone else's ceiling is exactly the re-anchor this table exists to make somebody argue for out loud. |
+| `ChipStackPlanTests` | Row dropped, reason rewritten | Was "two lanes ask the plan"; is "the decision stays LIFTED". A widget that regrows its own placeholder wording passes every unit test in the file — `ChipStackPlan` would still be correct and simply not consulted. |
+| `ClassSourceWritersTests` | **Row KEPT — it goes with the FILE, in E-2c** | The discovery that set this PR's boundary. Dropping the Avalonia writer row turned `NoOtherFileParsesAnAchievementsDumpUnnoticed` red immediately: that guard is a catch-all, an un-listed file that still parses a dump is precisely what it reports, and it was right. **A row may only be dropped once the thing it names has stopped existing.** |
+| `CompanionQuestsTests` | Row dropped, reason rewritten | The cross-lane half goes; the half that made it a scan stays — an init-only property left unset compiles, runs and serves an empty tab. |
+| `CompanionSnapshotArgumentTests` | Row dropped, reason CORRECTED | The #202 defect was never cross-lane: it was **two push sites in one widget** disagreeing about arguments, and both are in the file that remains. |
+| `DesignRatchetTests` | Five rows dropped | "The list only ever grows" is a rule about migration, not about deletion. The glyph ban is not about Linux: a dingbat renders as a box under Wine, and a hardcoded size argues with `DesignTokens` on any platform — including E-3's shell. |
+| `DesignSystemTests` | Comment re-pointed (in the E-2a commit) | It named `IconGeometryTests` as living in the Avalonia suite; it now says where the test actually is. |
+| `DocumentationTests` | **No change here; one comment updates in E-2c** | Its scan reads every test project from source, so it keeps working. The comment naming `EQBuddy.Avalonia.Tests` as a legitimate citation target becomes false only when the project goes. **See the E-2c note below — this test is the one that will fail loudest at deletion time, and that is it doing its job.** |
+| `FocusHideTests` | **Replaced, and the old one had never worked** | `TheTwoUisNameTheirWindowsTheSameWay` was doubly unable to fail: with one lane it is `Assert.Subset(x, {})`, and its regex carried two literal **backspace characters** (0x08) where `\b` was meant — a `\b` eaten as an escape by whatever wrote the file, exactly the hazard CLAUDE.md's tooling note describes. It matched nothing in either lane, ever, and passed. Replaced by `EveryDenyListedWindowNameStillExists`, which guards what survives: `FollowsWidgetHide` compares a type NAME, and a name has no compiler behind it (trap 53). |
+| `GameCommandsTests` | Seven rows dropped, rule restated | The rule was never about parity: a surface that names an `/outputfile` command and offers no way to run it is the same defect as a silent no-op, worst in the empty state. E-3 adds rows as the shell takes these surfaces over. |
+| `ImportReportReachesASurfaceTests` | Three rows dropped | The remaining rows are per-OUTCOME, not per-lane, and the trap-43 shape they guard is untouched. |
+| `LegacyPlatformUpdatePolicyTests` | Row dropped, **weight kept deliberately** | The one policy whose subject IS the platforms being cut, so "the question is settled" is the tempting wrong read. The remaining widget is what tells a Linux or macOS player on the final v1 where their build ends. |
+| `LogJanitorPolicyTests` | Row dropped | The count of lanes was never the point; the count of DECIDERS was, and three of the original four are in the file that remains. |
+| `MobileAlertSoundsTests` | Row dropped | The must-list is per call site, and the sites it counts are all in the remaining file. |
+| `OverlayActivationTests` | Seven rows dropped | The first reason is untouched: a window that takes the foreground mid-fight steals the player's keyboard. |
+| `QuestLedgerClearCountTests` | Row dropped | The hand-rolled offset it forbids is a within-lane regression. |
+| `QuestReconcileWiringTests` | Row dropped | A constructor is where wiring goes missing, nothing in Core can see it, and the widget's constructor is edited on every theme change. |
+| `SurfaceOwnershipTests` | **Re-pointed at the WPF lane, and a false claim fixed** | The plan says the exemptions must not be re-justified as "one lane, so ownership does not matter", and this file would have gone vacuous the other way: every check in its first group read `EQBuddy.Avalonia`, and its own header claimed "the same scan runs over both lanes" — the WPF half was a claim, not a scan. Now it scans the five WPF hosts, matching the SHAPE (`UIElement`/`FrameworkElement`/`Control … TabBody(`) rather than four Avalonia signatures, and the silent `if (!File.Exists) return;` is an assertion. Trap 45 was found by Avalonia and is not about Avalonia: a WPF `UIElement` has one parent too, and there the symptom is a surface silently vanishing rather than an exception. |
+| `WatchPinMigrationTests` | Row dropped | A migration inlined back into the widget is invisible to every other test in the file; `DoesNotContain` on the setting name is what keeps that honest. |
+| `WikiRecheckPathTests` | Row dropped, renamed | The whole original defect was the WINDOW defeating a correct Core. |
+
+**After this pass, five files still name `EQBuddy.Avalonia`**: two as provenance in a doc
+comment (`CompanionSourcesAreWiredTests`, `DesignSystemTests`), one as history in a
+rewritten header (`SurfaceOwnershipTests`), and **two that E-2c must handle** — the
+`ClassSourceWritersTests` writer row, and `DocumentationTests`' comment.
+
+### What E-2c inherits, found here
+
+**`DocumentationTests` will fail on the deletion commit unless the docs move with it.** It
+asserts that every suite named in `CLAUDE.md`, `docs/TestPlan.md` and
+`docs/Architecture.md` exists, and **15 of the deleted suites are cited across those three
+files** — `WidgetRenderTests`, `DropsRenderTests`, `OptionsRenderTests`,
+`QuestsRenderTests`, `IconSheetTests`, `WidgetSheetTests`, `ThemeBodyCapRenderTests`,
+`AppThemeTests`, `ChipStackTests`, `CompanionWiringTests`, `LegacyNoticeRenderTests`,
+`UpdateOfferTests`, `WindowZoomTests`, `WikiPackRenderTests`, `IconGeometryTests`. That is
+the guard doing exactly its job — *a trap that names a guard which no longer exists is
+worse than a trap with no guard at all* — so the doc edits belong **in** the deletion
+commit, beside the `docs/Architecture.md` size numbers `DocumentationSizeTests` pins.
+
+---
+
 ## The ledger: what is genuinely gone
 
 Six things, and no row of the table hides one of them:

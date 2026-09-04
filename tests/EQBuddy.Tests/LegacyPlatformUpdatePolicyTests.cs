@@ -261,10 +261,16 @@ public class LegacyPlatformUpdatePolicyTests
     /// Same shape as <c>LogJanitorPolicyTests.NoWidgetDecidesPruningForItself</c> and
     /// <c>CompanionSnapshotArgumentTests</c>: a seventh call site that decides for itself
     /// fails the build instead of reaching a player on a platform we can no longer ship to.
+    ///
+    /// **E-2 removed the Avalonia row (2026-09-04) and the guard KEEPS ITS FULL WEIGHT** —
+    /// this is the one policy on the list whose subject is the platforms being cut, so it
+    /// is tempting to read the deletion as "the question is settled". It is not. The
+    /// remaining widget is the one that will tell a Linux or macOS player, running the
+    /// final v1, where their build ends; `LegacyPlatformUpdatePolicy` is what decides that
+    /// and the three participants above are what could still route around it.
     /// </summary>
     [Theory]
     [InlineData("src/EQBuddy/MainWindow.xaml.cs")]
-    [InlineData("src/EQBuddy.Avalonia/MainWindow.cs")]
     public void NoWidgetDecidesTheLegacyPlatformQuestionForItself(string relative)
     {
         var source = File.ReadAllText(Path.Combine(RepoRoot(), relative));

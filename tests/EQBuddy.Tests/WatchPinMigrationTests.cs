@@ -81,12 +81,17 @@ public class WatchPinMigrationTests
         Assert.False(s.PinWatchChips);
     }
 
-    /// <summary>Both lanes must CALL the shared migration and neither may keep its own
-    /// copy — two hand copies of one migration is the condition that produced #253.</summary>
+    /// <summary>The widget must CALL the shared migration and may not keep its own copy.
+    ///
+    /// **Two hand copies of one migration is the condition that produced #253 — and with
+    /// one lane the danger changes shape rather than going away.** A migration inlined back
+    /// into the widget is invisible to every test above, because `WatchPinMigration` would
+    /// go on being correct and simply not be the thing that runs. `Assert.DoesNotContain`
+    /// on the setting name is what keeps that honest. (Scanned two lanes until E-2,
+    /// 2026-09-04.)</summary>
     [Theory]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
-    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
-    public void BothLanesUseTheSharedMigration(string project, string file)
+    public void TheWidgetUsesTheSharedMigration(string project, string file)
     {
         var src = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));

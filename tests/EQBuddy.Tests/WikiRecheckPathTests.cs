@@ -25,8 +25,12 @@ namespace EQBuddy.Tests;
 /// </summary>
 public sealed class WikiRecheckPathTests
 {
+    /// <summary>Scanned both lanes until E-2 (2026-09-04). What the second lane bought was
+    /// the #122/#152 half — a fix landing on one and not the other; what remains is the
+    /// half that made this a source scan rather than a Core test, and it is the whole
+    /// original defect: the WINDOW defeated a correct Core by calling Forget first.</summary>
     [Fact]
-    public void NeitherWindowDeletesTheCacheOnTheRecheckPath()
+    public void TheWindowDoesNotDeleteTheCacheOnTheRecheckPath()
     {
         var src = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
@@ -34,7 +38,6 @@ public sealed class WikiRecheckPathTests
         foreach (var relative in new[]
         {
             Path.Combine("EQBuddy", "MainWindow.xaml.cs"),
-            Path.Combine("EQBuddy.Avalonia", "MainWindow.cs"),
         })
         {
             var path = Path.Combine(src, relative);
@@ -44,14 +47,14 @@ public sealed class WikiRecheckPathTests
             // The re-check exists at all: a guard that passes because the feature is gone
             // would be worse than no guard (trap 34).
             Assert.Contains("RecheckMobLookup", text);
-            // Each window spells the bypass its own way — WPF through its own wrapper's
-            // `bypass:`, Avalonia straight through to Core's `bypassCache:`. Assert the
-            // FACT (a re-check asks past the cache), not one spelling of it.
+            // Two spellings are still accepted — WPF goes through its own wrapper's
+            // `bypass:`, and Core's own parameter is `bypassCache:`. Assert the FACT (a
+            // re-check asks past the cache), not one spelling of it.
             Assert.True(text.Contains("bypass: true") || text.Contains("bypassCache: true"),
                 $"{relative}: nothing on the re-check path asks past the cache — the "
                 + "feature is gone, which a guard must never read as passing (trap 34).");
 
-            // …and nowhere in either file does the re-check delete the cache first.
+            // …and nowhere in the file does the re-check delete the cache first.
             var body = Body(text, "RecheckMobLookup");
             Assert.False(body.Contains("Forget("),
                 $"{relative}: RecheckMobLookup calls Forget — that deletes the file the "

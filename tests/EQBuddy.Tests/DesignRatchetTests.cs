@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace EQBuddy.Tests;
 
@@ -34,7 +34,6 @@ public class DesignRatchetTests
     [
         "EQBuddy/QuestsWindow.xaml",
         "EQBuddy/QuestsWindow.xaml.cs",
-        "EQBuddy.Avalonia/QuestsWindow.cs",
         // Renamed EQBuddy/SpawnsWindow.xaml(.cs) -> SpawnsView.xaml(.cs) in World PR 1:
         // the Gate 3 content moved into the view. World PR 2 retired the thin
         // SpawnsWindow.cs/MapWindow.cs/TravelWindow.cs hosts (both lanes) into
@@ -45,7 +44,6 @@ public class DesignRatchetTests
         "EQBuddy.UI.Shared/LootPresentation.cs",
         "EQBuddy/LootCardView.cs",
         "EQBuddy/LootBreakoutView.cs",
-        "EQBuddy.Avalonia/LootCardView.cs",
         // Gate 5: the widget's own markup — the FIRST widget file to join, and the one
         // the ratchet was written for. 473 violations were measured across the widget
         // files at the start of the gate. The two BreakoutWindow files
@@ -69,22 +67,20 @@ public class DesignRatchetTests
         "EQBuddy.UI.Shared/WikiPackPresentation.cs",
         "EQBuddy/WikiPackWindow.xaml",
         "EQBuddy/WikiPackWindow.xaml.cs",
-        "EQBuddy.Avalonia/WikiPackWindow.cs",
-        // Gate 5, the other widget: 5,127 lines, 30 glyphs and 91 literal sizes, and the
-        // build that actually runs under Wine — where PRs #148/#166 record emoji failing
-        // to render AT ALL. Windows gave its glyphs up in 5c and this side kept them for
-        // a fortnight, which is the parity gap CLAUDE.md's "neither surface is allowed to
-        // quietly fall behind" is about.
-        //
-        // Two off-scale tuples were SNAPPED rather than re-decided, by copying the choice
-        // the WPF twin already made: the hand-nudged KPI cell (11,6,4,7) and the grip
-        // hairline (18,0,18,2). A migration that invents its own answer to a question the
-        // other surface already settled is how the two drift again.
-        "EQBuddy.Avalonia/MainWindow.cs",
-        "EQBuddy.Avalonia/EqFoldLabel.cs",
         // Gate 5b: the first of the three heavy card BODIES to leave MainWindow. Built on
         // the system as it moved, so it joins on the day it lands rather than later.
         "EQBuddy/ProgressCardView.cs",
+
+        // ---- Five Avalonia rows left this list with the platform in E-2 (2026-09-04):
+        // the widget, EqFoldLabel, Quests, Loot and the wiki pack. **The list only ever
+        // grows was a rule about MIGRATION, not about deletion** — a surface that stops
+        // existing takes its row with it, and the ratchet is still one-way for everything
+        // that does exist.
+        //
+        // Their reason for being here does not leave with them, and it is the reverse of
+        // what the Wine argument suggests: the glyph ban is not about Linux. A dingbat
+        // renders as a box under Wine (#148/#166), and a hardcoded size is a surface
+        // arguing with DesignTokens on any platform — including the one shell E-3 builds.
     ];
 
     public static TheoryData<string> MigratedFiles()

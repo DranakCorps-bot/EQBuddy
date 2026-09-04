@@ -6,20 +6,23 @@ namespace EQBuddy.Tests;
 /// followed character live, so a lane that forgets the resolver silently keeps DasGud's bug
 /// (have-counts drift from the ledger forever, because the dump is never read). No unit test
 /// inside Core can see a missing call in a widget's constructor; this is the
-/// <c>CompanionSnapshotArgumentTests</c> shape applied to the same class of miss (#122/#152:
-/// a fix that lands on one lane and never reaches the other because nothing scans for it).
+/// <c>CompanionSnapshotArgumentTests</c> shape applied to the same class of miss.
+///
+/// **It scanned two lanes until E-2 (2026-09-04), and the reason survives the second one.**
+/// The original framing was #122/#152 — a fix that lands on one lane and never reaches the
+/// other. What is left is the half that was never about lanes: a constructor is where
+/// wiring goes missing, nothing in Core can see it, and the widget's constructor is edited
+/// on every theme change.
 /// </summary>
 public sealed class QuestReconcileWiringTests
 {
     private static readonly (string Ui, string File)[] Widgets =
     [
         ("WPF", Path.Combine("EQBuddy", "MainWindow.xaml.cs")),
-        ("Avalonia", Path.Combine("EQBuddy.Avalonia", "MainWindow.cs")),
     ];
 
     [Theory]
     [InlineData("WPF")]
-    [InlineData("Avalonia")]
     public void EveryWidgetWiresTheResolverBesideTheQuestStore(string ui)
     {
         var (_, relative) = Widgets.Single(w => w.Ui == ui);

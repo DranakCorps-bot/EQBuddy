@@ -28,11 +28,15 @@ public class OverlayActivationTests
             "..", "..", "..", "..", "..", "src"));
 
     /// <summary>The surfaces that appear on a timer or a log event — nobody clicked
-    /// anything to summon these. Both UIs, because the WPF/Avalonia split is exactly how
-    /// #122 and #152 reached Linux after Windows had already paid for them.</summary>
+    /// anything to summon these.
+    ///
+    /// **Seven Avalonia rows went with the platform in E-2 (2026-09-04).** The lane split
+    /// was the old second reason (#122/#152: Windows pays, Linux inherits three releases
+    /// later); the first reason is untouched and is the one that matters — a window that
+    /// takes the foreground while the player is fighting steals their keyboard, and every
+    /// row below is a surface that opens without anybody asking.</summary>
     public static TheoryData<string> UnpromptedSurfaces =>
     [
-        // Windows
         "EQBuddy/MezChipsWindow.xaml",
         "EQBuddy/SpawnChipsWindow.xaml",
         "EQBuddy/AlertWindow.xaml",
@@ -42,14 +46,6 @@ public class OverlayActivationTests
         // The breakouts pop on the minimize pass — the star was clicked minutes ago,
         // the show happens mid-fight.
         "EQBuddy/BreakoutWindow.xaml",
-        // Linux / macOS
-        "EQBuddy.Avalonia/MezChipsWindow.cs",
-        "EQBuddy.Avalonia/SpawnChipsWindow.cs",
-        "EQBuddy.Avalonia/AlertWindow.cs",
-        "EQBuddy.Avalonia/ClickThroughChip.cs",
-        "EQBuddy.Avalonia/CursorRingWindow.cs",
-        "EQBuddy.Avalonia/GridOverlayWindow.cs",
-        "EQBuddy.Avalonia/BreakoutWindow.cs",
     ];
 
     [Theory]

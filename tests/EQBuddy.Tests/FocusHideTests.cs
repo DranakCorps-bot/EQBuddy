@@ -104,14 +104,55 @@ public class FocusHideTests
     public void AWindowNobodyHasThoughtOfYetFollowsByDefault() =>
         Assert.True(FocusHide.FollowsWidgetHide("SomeWindowNobodyHasWrittenYet"));
 
-    /// <summary>Both UIs name their windows identically and read this one list, so a
-    /// class that exists in only one of them is a parity gap worth seeing. The Avalonia
-    /// build is deliberately allowed to lag (it has no CompanionWindow), so this asserts
-    /// the direction that matters: nothing exists there that Windows lacks.</summary>
+    /// <summary>
+    /// **Every NAME the deny-list excepts still belongs to a real window.**
+    ///
+    /// This replaces `TheTwoUisNameTheirWindowsTheSameWay`, and BOTH halves of that
+    /// replacement are worth reading, because the old test was doubly unable to fail.
+    ///
+    /// **One: with one lane, a parity check is `Assert.Subset(x, {})`** — true for every
+    /// possible x. E-2 (2026-09-04) removed the second lane, so it had to go.
+    ///
+    /// **Two: it never worked in the first place.** <see cref="WindowNames"/>'s pattern
+    /// carried two literal BACKSPACE characters (0x08) where `\b` was meant — a `\b`
+    /// interpreted as an escape by whatever wrote the file, which is exactly the hazard
+    /// CLAUDE.md's tooling note describes about authoring code through heredocs. The regex
+    /// therefore asked for a backspace before "class" and matched nothing, in either lane,
+    /// ever. Both sets were empty, `Assert.Subset` passed, and a parity guard read as
+    /// coverage for as long as it existed (trap 34, and trap 39's exact shape: the
+    /// assertion could not fail).
+    ///
+    /// What replaces it guards the half that survives, and it is a real one:
+    /// <see cref="FocusHide.FollowsWidgetHide"/> compares a window's type NAME, and a name
+    /// is a string with no compiler behind it (trap 53 cost this repo six dark days on
+    /// exactly that). An exception whose window has been renamed or folded away goes on
+    /// excepting nothing, and the next window to take that name inherits an exemption
+    /// nobody granted it.
+    /// </summary>
     [Fact]
-    public void TheTwoUisNameTheirWindowsTheSameWay()
+    public void EveryDenyListedWindowNameStillExists()
     {
-        Assert.Subset(WindowNames("EQBuddy"), WindowNames("EQBuddy.Avalonia"));
+        var windows = WindowNames("EQBuddy");
+        // The scan itself finds windows — the assertion the old version needed and did
+        // not have. Without this line the guard below passes on an empty set.
+        Assert.True(windows.Count > 10,
+            $"the window scan found {windows.Count} classes, so nothing below can fail: " +
+            string.Join(", ", windows.OrderBy(n => n, StringComparer.Ordinal)));
+
+        var excepted = new[]
+        {
+            "MainWindow", "BreakoutWindow", "SpawnChipsWindow", "MezChipsWindow",
+            "ClickThroughChip", "AlertWindow", "CursorRingWindow", "GridOverlayWindow",
+        }.Where(name => !FocusHide.FollowsWidgetHide(name)).ToList();
+
+        Assert.Equal(8, excepted.Count);   // all eight are really excepted, not merely listed
+        foreach (var name in excepted)
+            Assert.True(windows.Contains(name),
+                $"FocusHide excepts '{name}' from following the widget, and no window class " +
+                "by that name exists any more. Either it was renamed — in which case the " +
+                "exception is now granted to nobody and the window follows the widget down " +
+                "with its own gate still running — or it was folded away and the row goes " +
+                "with it.");
     }
 
     private static HashSet<string> WindowNames(string project)
@@ -122,7 +163,7 @@ public class FocusHideTests
             .Where(p => !p.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
                      && !p.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
             .SelectMany(p => System.Text.RegularExpressions.Regex
-                .Matches(File.ReadAllText(p), @"class\s+([A-Za-z0-9_]+)\s*:\s*(?:System\.Windows\.)?Window")
+                .Matches(File.ReadAllText(p), @"\bclass\s+([A-Za-z0-9_]+)\s*:\s*(?:System\.Windows\.)?Window\b")
                 .Select(m => m.Groups[1].Value))
             .ToHashSet(StringComparer.Ordinal);
     }

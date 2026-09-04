@@ -524,13 +524,17 @@ public class CompanionQuestsTests
     /// the tab, and simply never draws the bands.
     ///
     /// That is the exact shape of #210 and of <c>CompanionSources.Raids</c>: a surface that
-    /// arrives full on Windows and empty on Linux, found by nobody without a phone and the
-    /// right camp. A source scan because the widgets have no unit tests at all
-    /// (docs/TestPlan.md §5), and both lanes because a fix on Windows otherwise reaches
-    /// Linux three releases later (#122, #152).
+    /// arrives full on one host and empty on another, found by nobody without a phone and
+    /// the right camp. A source scan because the widget has no unit tests at all
+    /// (docs/TestPlan.md §5).
+    ///
+    /// **Scanned both lanes until E-2 (2026-09-04).** The cross-lane half of the reason
+    /// (#122, #152) goes with the second lane; the half that remains is the one that made
+    /// this a scan in the first place — an init-only property left unset compiles, runs and
+    /// serves an empty tab, and no test that exercises the projection can see it.
     /// </summary>
     [Fact]
-    public void BothWidgetsHandTheDumpToTheQuestSurface()
+    public void TheWidgetHandsTheDumpToTheQuestSurface()
     {
         var src = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
@@ -538,7 +542,6 @@ public class CompanionQuestsTests
         foreach (var relative in new[]
         {
             Path.Combine("EQBuddy", "MainWindow.xaml.cs"),
-            Path.Combine("EQBuddy.Avalonia", "MainWindow.cs"),
         })
         {
             var path = Path.Combine(src, relative);

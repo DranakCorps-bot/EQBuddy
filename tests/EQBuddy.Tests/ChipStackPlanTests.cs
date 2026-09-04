@@ -86,17 +86,24 @@ public class ChipStackPlanTests
     private static string Src => Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
 
+    /// <summary>The widget asks the plan and keeps no copy of its own.
+    ///
+    /// **This scanned two lanes until E-2 (2026-09-04), and losing the second one does not
+    /// make it pointless — it changes what it is for.** The old reason was drift between
+    /// hand-copied twins; the reason now is that the decision must stay LIFTED. A widget
+    /// that grows its own `if (timers.Count > 0)` or its own placeholder wording passes
+    /// every unit test in this file — `ChipStackPlan` would still be correct and simply
+    /// not consulted — and only a scan can see that.</summary>
     [Theory]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
-    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
-    public void BothLanesAskThePlanAndNeitherKeepsItsOwnCopy(string project, string file)
+    public void TheWidgetAsksThePlanAndKeepsNoCopyOfItsOwn(string project, string file)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
 
         Assert.Contains("ChipStackPlan.SpawnStack(", text);
         Assert.Contains("ChipStackPlan.FightStack(", text);
         Assert.Contains("ChipStackPlan.PlacementPreview()", text);
-        // The wording lives in the plan; a lane re-growing its own literal is the drift
+        // The wording lives in the plan; the widget re-growing its own literal is what
         // this scan exists to fail.
         Assert.DoesNotContain("drag me — chips appear here", text);
     }
