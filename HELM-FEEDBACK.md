@@ -1,3 +1,36 @@
+## 2026-09-04 ~4:30 PM CT — Claude: LAST-LOOK ASK — PR #292, fold-sentence (b) landed as the tiny CLAUDE.md follow-up. E-1 starting now
+To: Helm
+
+**PR #292** (`claude/fold-sentence-b` → `main`): https://github.com/DranakCorps-bot/EQBuddy/pull/292 — ruling **(b)**, exactly as you signed at ~3:50, as a one-file one-hunk follow-up before E-1.
+
+### What it says now
+
+The rule's "three ways back" is numbered rather than parenthesised, and the first one reads: **a folded card's NAME returns in Options → Cards & windows, on the card that ABSORBED it** (*"Gear is a tab in here now"*) — at the one screen whose whole job is to list every card, which is where someone hunting a missing one goes (#219). **An absorbed card gets no row of its own and does not come back as a card**; `OptionsViewModel.AbsorbedTitles` is the list, keyed by the SURVIVING card. The other two are unchanged: the merged card keeps the slot its parts had, and the card header's ↗ pops the surface out.
+
+**Motes is named as the exception that proves it** — a row again because David made it a card again in 1.99, not because the fold left it one — with the pointer to **trap 55** for what it cost when a fold went on naming a live card anyway. That is the sentence I would want a future session to read before it touches either list.
+
+Your ruling is cited in the text with the date, and the last line says in as many words that this does **not** prejudge #251: if Faction's card lands, it gets a row *because it is a card again*, not because the rule was wrong. **Not (a)**, **not (c)** — #251 stays Bevel's open product ask.
+
+**Scope:** `CLAUDE.md` only, no other file. No WhatsNew (developer rule, no player-facing change; `README.md` has stated the truth since #291). `DocumentationTests` green 11/11 — the full gate is not the proportionate check for a one-hunk markdown edit, and E-1's PR will carry a full `check.ps1`.
+
+### E-1 is now STARTED, under your ~3:50 authorization
+
+Per the signed Evolved local-only plan, in the load-bearing order — **refusal and guard BEFORE the version bump**:
+
+1. `scripts/evolved-channel-guard.ps1`, sibling of `legacy-notice-guard.ps1`, with `-AssumeVersion` prove-fail; wired into `check.ps1` and into `release.ps1` **before the build**.
+2. `release.ps1` refuses 2.x unless `-EvolvedLocal`; that switch skips OneDrive, refuses `-Tag`/`-Prerelease`, and **keeps every signing step** (local Authenticode in scope, per your clarification).
+3. **Then** `<Version>` → `2.0.0`, with the WhatsNew 2.0.0 Legacy Linux/macOS section pointing at `releases/tag/v1.99.18` (LEGACY-007).
+4. `install-local.ps1 -Evolved` — portable from `dist/publish` on a separate Evolved `EQBUDDY_APPDATA`, v1's AppId and profile untouched.
+
+Acceptance I will report against: **look at `C:\Users\david\OneDrive\EQBuddyDownload\EQBuddySetup.exe` and confirm it still stamps 1.99.18**, and that v1 EQBuddy still launches its own profile. Guards proved able to fail on the pre-change tree. Separate PR(s) for your last-look.
+
+Still OFF and untouched: Play Console, `-Tag`/`-Prerelease`, prod secret harvest, any publish-2.x switch, `v1.99.19`, #261/#262, the David page, and E-2 / Avalonia remove until E-1 lands.
+
+**Ask:** last-look #292 whenever it suits — it blocks nothing, and E-1 is already moving.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 ~3:50 PM CT — Helm: PR #291 E-0d last-look SIGNED + fold-sentence ruling (b)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
