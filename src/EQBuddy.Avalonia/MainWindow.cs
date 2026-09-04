@@ -250,6 +250,10 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private DateTime _lastJanitorRun = DateTime.MinValue;
     private DateTime _lastUpdateCheck = DateTime.MinValue;
     private UpdateInfo? _pendingUpdate;
+    /// <summary>Set instead of <see cref="_pendingUpdate"/> when the banner is carrying the
+    /// final-legacy notice (LEGACY-002): there is no update to take, so a click opens the
+    /// legacy release page rather than staging or offering anything.</summary>
+    private string? _legacyNoticeTarget;
     private DateTime _upToDateNoticeUntil = DateTime.MinValue;
     private bool _installingUpdate;
     private bool _clickThrough;
@@ -4908,8 +4912,18 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 if (_installingUpdate) return;
                 if (info is not null && UpdateChecker.IsNewer(info))
                 {
+                    // LEGACY-002: off Windows, a v2 release is not an update this machine
+                    // can take. One shared policy answers for both lanes and all six sites.
+                    var decision = LegacyPlatformUpdatePolicy.Decide(info,
+                        LegacyPlatformUpdatePolicy.Current(), manual,
+                        _settings.LegacyFinalNoticeAcknowledged);
+                    if (!decision.ShowUpdateOffer)
+                    {
+                        ShowFinalLegacyNotice(info, decision);
+                        return;
+                    }
                     _pendingUpdate = info;
-                    _updateText.Text = UpdateOffer.OfferText(info, UpdateOffer.Current(),
+                    _updateText.Text = UpdateOffer.OfferText(info, LegacyPlatformUpdatePolicy.Current(),
                         UpdateChecker.IsInstalledCopy);
                     _updateBanner.IsVisible = true;
                 }
@@ -4924,6 +4938,37 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
                 }
             });
         });
+    }
+
+    /// <summary>Apply a LEGACY-002 decision that said "do not offer this". The write is
+    /// guarded on a real change rather than saved every time: a settings save rewrites the
+    /// whole file from the snapshot loaded at startup (trap 13), so the cheapest correct
+    /// thing is not to write when nothing moved.
+    ///
+    /// The click means BOTH "open the legacy page" and "I have read this" — a 320 px
+    /// banner has exactly one gesture, and a notice needing two would grow a control the
+    /// widget has no room for. That is why the acknowledgement is recorded on SHOW here
+    /// and again on click: the policy hands back <c>RecordAcknowledgement</c> separately
+    /// from <c>BrowserTarget</c>, so if Bevel rules the click should mean only one of the
+    /// two, it is a wiring change and not a redesign.</summary>
+    private void ShowFinalLegacyNotice(UpdateInfo info, LegacyUpdateDecision decision)
+    {
+        _pendingUpdate = null;
+        if (decision.RecordAcknowledgement) AcknowledgeFinalLegacyNotice();
+        if (!decision.ShowFinalLegacyNotice) return;
+        _legacyNoticeTarget = decision.BrowserTarget;
+        _updateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyNoticeText(info,
+            LegacyPlatformUpdatePolicy.Current());
+        _updateBanner.IsVisible = true;
+        // Sticky: this one is not a six-second "you're up to date" toast.
+        _upToDateNoticeUntil = DateTime.MinValue;
+    }
+
+    private void AcknowledgeFinalLegacyNotice()
+    {
+        if (_settings.LegacyFinalNoticeAcknowledged) return;
+        _settings.LegacyFinalNoticeAcknowledged = true;
+        _settings.Save();
     }
 
     /// <summary>Freedesktop sound-theme equivalents of the shared palette. The NAMES
@@ -5139,16 +5184,38 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     private void OnUpdateBannerClick(object? sender, PointerPressedEventArgs e)
     {
         e.Handled = true;
+
+        // The banner is carrying the final-legacy notice: there is nothing to install, and
+        // the target is the legacy release page rather than releases/latest (LEGACY-002).
+        if (_legacyNoticeTarget is { } legacy)
+        {
+            _legacyNoticeTarget = null;
+            // Both: open the page AND record that it has been read.
+            AcknowledgeFinalLegacyNotice();
+            try
+            {
+                Process.Start(new ProcessStartInfo(legacy) { UseShellExecute = true });
+                _updateText.Text = LegacyPlatformUpdatePolicy.FinalLegacyOpenedText();
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+                _updateText.Text = $"Couldn't open browser - visit {legacy}";
+            }
+            _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
+            return;
+        }
+
         if (_pendingUpdate is not { } info || _installingUpdate) return;
 
-        if (!UpdateOffer.CanAutoInstall(info, UpdateOffer.Current(), UpdateChecker.IsInstalledCopy))
+        if (!UpdateOffer.CanAutoInstall(info, LegacyPlatformUpdatePolicy.Current(), UpdateChecker.IsInstalledCopy))
         {
-            var target = UpdateOffer.BrowserTarget(info, UpdateOffer.Current());
+            var target = UpdateOffer.BrowserTarget(info, LegacyPlatformUpdatePolicy.Current());
             try
             {
                 Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });
                 _pendingUpdate = null;
-                _updateText.Text = UpdateOffer.OpenedText(info, UpdateOffer.Current(),
+                _updateText.Text = UpdateOffer.OpenedText(info, LegacyPlatformUpdatePolicy.Current(),
                     UpdateChecker.IsInstalledCopy);
                 _upToDateNoticeUntil = DateTime.Now.AddSeconds(10);
             }

@@ -36,6 +36,26 @@ public static class UpdateChecker
     private const string GitHubLatestApi = "https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases/latest";
     public const string GitHubLatestPage = "https://github.com/DranakCorps-bot/EQBuddy/releases/latest";
 
+    /// <summary>The tag of the FINAL LEGACY release for this copy — the last v1 build it
+    /// will ever be offered. It is the running build's own tag, and that is not a
+    /// shortcut: the only installs that can ever see the legacy notice are the ones that
+    /// took the bridge, so for every reader of this value the bridge tag and
+    /// <see cref="CurrentVersion"/> are the same string. A LATER legacy patch is still
+    /// offerable (<c>LegacyPlatformUpdatePolicy</c> rule 3), and a copy that takes one
+    /// then points at that patch — which is the correct answer, not a stale one.
+    ///
+    /// The alternative, a hard-coded literal, has to be written before the tag it names
+    /// exists. A 404 is the worst possible last thing EQBuddy ever says to a Linux or
+    /// macOS player, and nothing in CI would catch it.</summary>
+    public static string LegacyFinalTag => "v" + CurrentVersion.ToString(3);
+
+    /// <summary>Where a non-Windows v1 copy is sent once the feed starts carrying v2 —
+    /// the final legacy release, NEVER <see cref="GitHubLatestPage"/>. This is charter
+    /// LEGACY-002 point 3: `releases/latest` becomes the v2 release page the moment v2
+    /// ships, and the most prominent asset on it is a Windows installer.</summary>
+    public static string GitHubLegacyReleasePage =>
+        "https://github.com/DranakCorps-bot/EQBuddy/releases/tag/" + LegacyFinalTag;
+
     /// <summary>Probing the releases API: a short timeout, because this runs unprompted at
     /// startup and every 6 h, and a slow answer should just mean "no update this time".</summary>
     private static readonly HttpClient Http = CreateClient(TimeSpan.FromSeconds(15));

@@ -107,7 +107,19 @@ public class ArchitectureTests
         // re-anchor that raises the ceiling erases the pressure that drives the next
         // lift. Raising a baseline is the one move this table exists to make someone
         // argue for out loud; make the argument in the commit TITLE.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4214),
+        //
+        // 4214 → 4273 on 2026-09-04 (P0-2, LEGACY-002, #275). **The argument, out loud:**
+        // main was sitting at 4,635 of a 4,635 limit, so the ratchet was already full
+        // before this PR — ANY WPF change would have failed it. What P0-2 adds here is 64
+        // lines: a policy call, a browser-open branch and a guarded settings write. The
+        // decision itself went to `UI.Shared/LegacyPlatformUpdatePolicy` and is unit
+        // tested there, which is exactly what the message above asks for; what is left is
+        // window plumbing that cannot leave without moving the update banner, and moving
+        // the update banner is precisely what Phase 0 was told not to do.
+        // Bumped to the MINIMUM that fits (4273 × 1.1 = 4700 against 4,699 lines), so
+        // this grants one line and no more. **The next WPF change must lift a surface** —
+        // that is the pressure this number exists to keep, and it is now at its maximum.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4273),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
