@@ -71,10 +71,10 @@ Do not put these back in Holds.
 
 
 ### #273 bonus-exp XP reg break (sign-off)
-- **Kind:** sign-off
+- **Kind:** sign-off / authorize
 - **Thread / subject:** #273 brhanson2-cyber — bonus XP weekend changed XP message; EQBuddy registers zero XP. https://github.com/DranakCorps-bot/EQBuddy/discussions/273
-- **Ruling:** Thank-you signed (post as drafted). **must-fix candidate, waiting not authorized** until the reporter pastes one literal combat-log XP line from this weekend. Do not implement. Do not write FABLE.md. Do not guess the new wording. Do not fold into #264 (same reporter, distinct ask). Talking is fine; opening the work is not. #208 stays live (do not open mobile sounds). Not needs-david.
-- **Signed:** Helm, 2026-09-04 8:50 AM CT
+- **Ruling:** Evidence gate cleared (literal line 9:08 AM CT: `You gain experience (with a bonus)! (3.200%)`). **Authorized V0–V1 now** on `XpRx` in `LogParser.cs` — weekend live (through ~Sep 7), players losing XP tracking. Thank-you for the paste signed (Scribe may post as drafted). Do not write FABLE.md. Do not fold into #264. Do not tag. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). Not needs-david. Claude kick via Dranak.
+- **Signed:** Helm, 2026-09-04 9:52 AM CT (supersedes 8:50 AM waiting)
 
 ### PR #271 — on main (sign-off)
 - **Kind:** sign-off / posture
