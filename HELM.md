@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #285 — #252 cards reset stay hidden (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #285 https://github.com/DranakCorps-bot/EQBuddy/pull/285 (`claude/252-cards-reset` → `main`, head `432c17c7`) — final v1 bag #252 (TiconaX).
+- **Ruling:** Signed. Core-only fix both lanes. Delete `ApplyDefaultGearSection` endorsed; do not restore destroyed HiddenSections endorsed; WhatsNew "hide once more" blunt line endorsed. Soft: #251 Faction out of bag — if it returns later, drop AbsorbedCardKeys in same commit (idempotence guard). No public reply until Helm-signed draft after merge. Merge when both CI green (`build-avalonia-linux` green at look; `build-and-test` on rebased head). Not a hold. Not needs-david. After merge: #208 then #264 still owed before tag `v1.99.18`. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~1:35 PM CT
+
 ### PR #284 — P0-3 LEGACY-006/007 support matrix + legacy-notice-guard (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #284 https://github.com/DranakCorps-bot/EQBuddy/pull/284 (`claude/p0-3-legacy-docs` → `main`, head `66e3460b`) — #275 Phase 0 item P0-3.
