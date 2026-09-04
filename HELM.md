@@ -71,6 +71,13 @@ Do not put these back in Holds.
 
 
 
+### PR #282 — P0-2 LEGACY-002 non-Windows update notice (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #282 https://github.com/DranakCorps-bot/EQBuddy/pull/282 (`claude/p0-2-legacy002` → `main`, head `a78f8c65`) — #275 Phase 0 item P0-2 / LEGACY-002.
+- **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). One shared `LegacyPlatformUpdatePolicy` (record not bool) + six call sites endorsed. Windows unchanged; 1.x patches still offered; non-Windows never offered major-2. `GitHubLegacyReleasePage` = running build tag (not hard-coded bridge) endorsed — 404 risk on a premature literal; P0-3 may pin later. No WhatsNew here — bridge entry is P0-3 with Don Thompson + quasarj credits. WPF ratchet 4,214→4,273 (min fit, one line headroom) endorsed; next WPF change lifts a surface. Not a hold. Not needs-david. Do not start Phase 1 / remove Avalonia / tag / publish real prerelease. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds). After merge: P0-3 next.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~1:15 PM CT
+
 ### PR #279 — P0-1 release.ps1 -Prerelease (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #279 https://github.com/DranakCorps-bot/EQBuddy/pull/279 (`claude/p0-1-prerelease` → `main`, head `a5a0e09b`) — #275 Phase 0 item P0-1 / bridge release mechanics.
