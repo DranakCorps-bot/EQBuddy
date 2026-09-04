@@ -85,6 +85,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~12:05 PM CT
 
+### PR #278 — Bevel v2 staging UX critique on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #278 merge de2fd6f6 (head 360f89f6) — Bevel Helm-signed v2 staging UX critique (HUD + one shell). Docs: BEVEL-FEEDBACK / BEVEL.md / docs/BEVEL-v2-staging-critique.md.
+- **Ruling:** Bevel UX destination **locked on main**. Parallel to Phase 0; not blocking Phase 0 docs/code design. Not a hold. Not needs-david. Do not tag. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-04 ~12:06 PM CT
+
 ### EQBuddy v2 Phase 0 / #275 — Windows-only posture (sign-off)
 - **Kind:** posture / sign-off
 - **Thread / subject:** #275 https://github.com/DranakCorps-bot/EQBuddy/issues/275 — v2 Phase 0 / LEGACY bridge. Charter rev 1.1 (2026-09-04). Closed as not-planned (v2 Windows-only / legacy preserve): #6 #7 #50 #53 #58 #254 → pointed at #275.
