@@ -95,6 +95,638 @@ next loop, not a reopening of the plan.
 
 ---
 
+## EQBuddy Evolved — LOCAL-ONLY development start (owner GO 2026-09-04 ~2:52 PM CT)
+
+- **Priority:** `ready` — E-0 and E-1 may start immediately. E-2 is gated on E-0 closing the
+  #275 LEGACY checklist (Helm, 2026-09-04 11:50 AM CT: Avalonia removal waits on the Phase 0
+  gate). E-3 is gated on E-2 plus a Bevel nav pre-design. **No `needs-david:` line** — see
+  "Doors considered and refused" below; the owner GO already carries every call in here.
+- **Class:** `V3`. It cuts a supported platform out from under live users, it changes what
+  the repo's release script is *allowed to do*, and its central defect is a one-way door:
+  one `release.ps1` run on a 2.x tree pushes an Evolved build into the family's auto-update
+  folder and every v1 install takes it within six hours. Not V0–V1 because the obvious
+  version of "develop v2 locally" — just build it — is the thing that leaks.
+- **Source:** owner GO via Helm 2026-09-04 ~2:52 PM CT (1-shot as much as possible; Evolved
+  local start; professional/consumer-grade bar; engage David only for a real door);
+  `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` rev 1.1 §§3 / 16 / 19 / 20 / 23 / 26;
+  `docs/BEVEL-v2-staging-critique.md` (Helm-signed 2026-09-04 11:55 AM CT); `HELM.md` sign-offs
+  for #277 / #278 / #279 / #282 / #284 and the 2:20 PM CT `v1.99.18` LIVE ruling; issue #275.
+- **Already shipped — what this must not fight:**
+  - `v1.99.18` is **LIVE and is the bridge** (verified: `gh release view v1.99.18` carries all
+    three non-Windows assets plus both Windows artifacts; `prerelease=false`; target `main`;
+    tag SHA `dbcfb3a1`). LEGACY-001's *artifact* half is done.
+  - `release.ps1 -Prerelease` (#279), `UI.Shared/LegacyPlatformUpdatePolicy` + six routed call
+    sites (#282), `LEGACY-V1.md` + README Legacy section + `scripts/legacy-notice-guard.ps1`
+    (#284) are all on `main`.
+  - `UpdateChecker.GitHubLegacyReleasePage` resolves from the **running build's own tag**, by
+    design (`UpdateChecker.cs:39–57`). Do not "fix" it into a literal.
+  - Bevel's IA is the signed destination and it is **not** a work order —
+    `docs/BEVEL-v2-staging-critique.md` says *"When Fable is asked for a v2 plan, this file is
+    input."* This plan is that ask; it consumes the file and does not re-open it.
+  - **Bevel's staging pass #2 (`103d8fec`, 2026-09-04 ~3:05 PM CT) landed while this plan was
+    being written and is folded in below.** Two consequences: **§6 door 2 of the signed critique
+    is RETIRED, not waiting** — LEGACY-002's notice copy shipped in `v1.99.18` and is kept
+    verbatim, so **do not schedule a voice pass on it** (that would be the #228 class: rewriting
+    shipped player-facing text for no player benefit). Doors 1 and 3 stand. And its §1/§2 are
+    evidence about the *starting condition* Evolved inherits, which produced E-0d.
+  - Final v1 stays up. Nothing here deletes, hides, or de-links a v1 artifact.
+- **Bevel pre-design: E-0/E-1/E-2 no; E-3 YES and it gates E-3's first pixel.** E-0 to E-2 are
+  docs, scripts, guards, tests and deletions with no new player-facing surface (the one player
+  string they touch — the legacy notice — was designed in P0-2 and is unchanged). E-3 is a new
+  shell: Bevel owns the nav *design* (rail vs tabs, chrome, density, the Search affordance).
+  The critique fixes the rooms and the rules; it does not draw the navigation.
+- **Shot offline: N/A for E-0/E-1. E-2 and E-3 are `shoot.ps1` BATCH runs, not `-Shot`.**
+  Trap 53 cost this repo six dark days precisely on a window fold, and E-2/E-3 delete and
+  rename windows. `shoot.ps1` is not offline by default; any Evolved shot that names a wiki
+  state must seed through the same key and parser the app uses (trap 23).
+- **Column budgets:** none for E-0/E-1/E-2 — no new string enters an existing fixed-width
+  surface. **E-3 has no 320 px budget and that is the point**: the shell is a normal resizable
+  Windows window. The HUD keeps the widget's constraint, and **trap 12 is the standing HUD
+  rule** — `SizeToContent` means a timer-driven string is a geometry change on an always-on-top
+  window over a fullscreen game (#173). Every HUD readout reserves a fixed width;
+  `UI.Shared/PerfReadout` is the worked example.
+- **Must-list rows on these surfaces:** none on E-0/E-1. **E-2e and E-3 are where they decide
+  the outcome.** `GameCommandsTests.SurfacesNeedingACommand`, `ImportReportReachesASurfaceTests`
+  and `DeadSettingTests.Known` are the three curated lists that catch a fold losing a writer
+  (traps 20, 26, 43 are one event told three times), and a whole-product disposition pass is
+  that event at maximum scale. Revisit rows **per moved surface**, never at the end.
+- **What clamps it:** the new `<Version>` is read by four separate consumers with four
+  different parsers, and they do not agree. `release.ps1:21`, `install-local.ps1`,
+  `legacy-notice-guard.ps1:88` and `installer/EQBuddy.iss` all match `<Version>([\d.]+)</Version>`
+  — which **fails outright on `2.0.0-alpha.1`**, because the regex requires `</Version>`
+  immediately after the digits. `UpdateChecker.CurrentVersion` uses `Version.TryParse`;
+  `LegacyPlatformUpdatePolicy` keys on `Latest.Major >= 2`. **Keep `<Version>` strictly
+  numeric.** See E-1 decision 3.
+- **Guards run eight times.** Every new guard here (`evolved-channel-guard.ps1`, the
+  final-tag check in `legacy-notice-guard.ps1`, the E-2 scanners) passes eight consecutive
+  runs before its PR is called green, **and is proven to fail on the pre-change tree** — a
+  guard that has never failed has not been shown to guard anything (traps 34, 39).
+
+---
+
+### What "local-only" has to mean, or it means nothing
+
+The owner said Evolved develops local-only: no public channel, no auto-publish, no Play
+Console, until he says ready. **Today that is a promise with a hole in it, and P0-1 did not
+close the hole — it closed the other one.**
+
+`release.ps1:96–97` copies `EQBuddySetup.exe`, its `.sha256` and the portable zip into
+`C:\Users\david\OneDrive\EQBuddyDownload` **unconditionally**: before the `if ($Tag)` block,
+on every run, with or without `-Tag`, with or without `-Prerelease`. `UpdateChecker` is
+local-first by design — `Check(folder)` reads that exe's `FileVersionInfo`, `IsNewer` compares
+it to the running build, and `FindBestAsync` returns it as a `SetupPath`, "a local file ready
+to install as-is". The widget checks at startup and every six hours.
+
+So one `release.ps1` run on a 2.x tree auto-updates every family v1 install to a Windows-only
+Evolved build inside six hours, with no tag, no GitHub release and no prerelease flag anywhere
+in the story. The script's own comment at line 133–136 states this plainly — *"The OneDrive
+copy above is a SEPARATE channel … so a prerelease still reaches the family's widgets"* — and
+it is correct and deliberate **for v1**. It is the leak for Evolved.
+
+Two smaller edges of the same shape:
+
+- `release.ps1:153` ends with `/SILENT`, and `installer/EQBuddy.iss` uses one `AppId` and
+  `DefaultDirName={autopf}\EQBuddy`. An Evolved build therefore **replaces David's working v1
+  install in place** and inherits its profile — `settings.json`, `history.db`, archives. The
+  installer's `EQBuddy.previous.exe` rollback (#158) gives back the binary and not the profile.
+- `install-local.ps1` is already the correct local loop and says so — *"Touches neither
+  OneDrive nor GitHub."* It is the thing to build on, not to replace.
+
+**The rule this plan adopts: local-only is enforced structurally or it is not enforced.** The
+repo already knows this shape — `release.ps1` has no `-SkipSign` on purpose, because a
+protection you can pass a flag to opt out of is a protection nobody has. E-1 gives the 2.x line
+the same treatment: with the script as written, **you cannot publish a 2.x build at all**, and
+opening the channel is a deliberate future edit gated on the owner's release go.
+
+---
+
+### E-0 — Close the Phase 0 gate (do this first; it is small and everything waits on it)
+
+Three of the four Phase 0 PRs merged (#279, #282, #284). **P0-4 never ran, and the #275 LEGACY
+checklist is entirely unticked.** Verified on this tip:
+
+- `git ls-remote --heads origin legacy-v1` → **empty**. LEGACY-005 does not exist.
+- `README.md:79–86` and `LEGACY-V1.md` (4 occurrences) still say the bridge *"is planned as
+  `v1.99.18`"* and *"has not been published yet"*, and link every asset to **`v1.99.17`**.
+  `v1.99.18` has been live since ~2:20 PM CT. Helm's #284 ruling authorised exactly this in
+  advance: *"keep asset links on published `v1.99.17` until bridge tag exists … re-pin on
+  publish."* The tag exists. This is a public promise page describing a state that stopped
+  being true — the pathology `CLAUDE.md`'s hold block exists to prevent, in a file players read.
+
+**E-0a (PR) — re-pin, and teach the guard to see this class of staleness.**
+
+1. Re-pin all six asset links plus the tag links in `LEGACY-V1.md` and `README.md`'s Legacy
+   Linux/macOS section from `v1.99.17` to `v1.99.18`. Delete the "planned / not published yet"
+   prose in both; replace the LEGACY-V1 paragraph with the plain statement that `v1.99.18` **is**
+   the final legacy tag and there will not be a second one.
+2. **`legacy-notice-guard.ps1` cannot currently see this, and that is the finding.** It checks
+   that links are *pinned to some v1 tag* (`releases/(tag|download)/v1\.`, line 141) and that
+   nothing targets `releases/latest`. `v1.99.17` satisfies both, forever. A Mac user following
+   the README would download the **pre-bridge** build — the one that has no LEGACY-002 policy in
+   it and goes on chasing v2 for the life of the install. Trap 34's exact shape: the guard
+   forbids the wrong thing and is blind to the missing thing, and it reads as coverage.
+   → Add check 4: every pinned `v1.*` link target in `LEGACY-V1.md` and in the README's Legacy
+   section names **one** tag, and that tag is the newest `v1.*` tag in the repo. Read git through
+   the existing `Invoke-GitUtf8` wrapper (trap 54; and per the tooling note, a red first run
+   under Windows PowerShell 5.1 is a host difference until `git diff` says otherwise). Prove it
+   with the existing `-Repo` / `-AssumeVersion` hooks by running it against the pre-fix tree,
+   where it must fail on `v1.99.17`.
+3. Tick the #275 rows this actually closes, with the evidence inline (asset list, guard run).
+   **The checklist is the gate; leaving it unticked is why nobody can tell the gate is open.**
+
+**E-0b (out of tree) — LEGACY-005 and LEGACY-004.** `git branch legacy-v1 v1.99.18` and push;
+tag protection on `v1.99.18`; branch protection on `legacy-v1`. Helm has already signed both
+("Tag/branch protection on bridge + `legacy-v1`: yes when they exist", #277 sign-off), so this
+needs no new ruling — only doing. `legacy-v1` is **preserved, not maintained**: wire no CI to
+it, and say so in `LEGACY-V1.md` (it already does — keep it true).
+
+→ **Ordering finding, stronger than LEGACY-005's literal words.** LEGACY-005 says the branch
+exists before Avalonia leaves the mainline. It must actually exist **before E-1's version bump**,
+because the moment `main` reads `2.0.0` it is no longer a tree a v1 patch can be cut from, and
+`legacy-v1` becomes the only v1 line. Any later LEGACY 1.99.19 comes off that branch, where
+`release.ps1` behaves exactly as it does today.
+
+**E-0c — the gate proof, honestly reconciled with local-only.** The Phase 0 gate's strongest
+proof as written was "publish the first v2 milestone as a prerelease and watch a bridged client
+be offered nothing." **Local-only forbids that** — a GitHub prerelease is a publish, and there
+is no channel. Do not quietly drop the proof and do not tick LEGACY-002 as wire-proved.
+
+- **What is provable now, offline:** `LegacyPlatformUpdatePolicyTests`' full matrix and both
+  negatives; the six-call-site scanner; the Avalonia headless render of the banner from a
+  hand-built `UpdateInfo(2.0.0)` twice (notice, then nothing) — while that lane still exists,
+  which is an argument for running it in E-0 rather than after E-2 deletes it.
+- **What is provable read-only:** GitHub's `releases/latest` prerelease-exclusion semantics can
+  be observed against **any** public repo whose newest release is a prerelease — one
+  `gh api repos/<owner>/<repo>/releases/latest` against its `/releases` list. That settles the
+  endpoint's behaviour without publishing anything of ours. It does **not** prove our tag
+  naming; say so.
+- **What stays open:** the real-channel confirmation. It becomes a **release-time row on #275**,
+  due at channel-open, not a Phase 0 blocker. Name the residual in the same breath, as the prior
+  plan did: the notice only reaches installs that took the bridge, so the re-pinned README and
+  release page are the only thing that reaches anyone still on an older 1.x.
+
+**E-0d — the docs truth pass, because charter §20 already fails and Evolved has not written a
+line yet.** Bevel's pass #2 §1–§2 read tip and found that the two surfaces a skeptical consumer
+meets first describe a product that has not existed since 2026-08-26. The charter's Definition of
+Done asks for *"no stale screenshots describing retired UI"* and *"no documentation pointing to
+windows that no longer exist"*. Both fail today.
+
+**Scope this precisely, because the neighbouring thing is a Helm scope call and not ours:**
+
+- **In scope — repo markdown on `main`, which needs no release to become true.** `README.md:100`
+  claims every folded card *"can be switched back on individually in ⚙ Options → Cards & windows"*;
+  of the eight named, **only Motes has a row in `OverlaySections.Catalog`**, and the claim
+  contradicts the Helm-signed #251 lock. `README.md:352` and `:402` still say *"right-click → Zone
+  map…"* / *"Travel route…"* — both deleted by the World fold. `README.md:589` and
+  `docs/FeatureGuide.md:394` still call the World card "Travels & Deaths". Fix all five, and give
+  every remaining pre-fold screenshot embed either a refresh or the honest italic caveat the map
+  rows already carry — that caveat is the right instinct and should become the house habit.
+- **In scope — the recipe rule, as a standing rule rather than a one-time sweep.**
+  `docs/screenshots/` holds 111 committed captures; **42 have no `shoot.ps1` recipe and therefore
+  cannot be regenerated by anyone.** `options-cards.png` *does* have a recipe and is simply stale
+  across a fold that changed its contents — re-shoot it. **The rule is now a Helm-signed lock**
+  (2026-09-04 ~3:08 PM CT): *an illustration of our own UI is a capture with a recipe, or it does
+  not ship.* It binds E-3 as an acceptance criterion and E-0d as a standing rule.
+- **NOT in scope — the in-app first-run tour, and this is settled rather than deferred.**
+  `Assets/tutorial/t-widget.png` and `TutorialWindow`'s pages 3 and 6 carry the same rot, and on
+  the preserved line it is a *permanent* first impression (LEGACY-004 retains `v1.99.18` forever).
+  Helm weighed exactly that and ruled (~3:08 PM CT): **final v1 bag stays closed, no `v1.99.19`
+  without owner go, and Evolved must not port those assets or that copy — `must-fix` before any
+  large presentation PR.** So E-0d fixes what needs no release and stops there; **what Evolved
+  does with the tour is E-3's problem, and the answer is: do not port it.**
+- Note the mechanism while fixing it: **the three tour pages with no `tour-*` shot are the three
+  with defects.** `EQBUDDY_TOUR` covers pages 2, 4, 5, 7, 8; the rot is on 1, 3 and 6. Trap 22
+  landing on the surface that was instrumented against it, six days later.
+
+---
+
+### E-1 — Make local-only a mechanism (the headline PR)
+
+One PR, three commits, and **the order is load-bearing: the refusal lands before the bump.**
+
+**Commit 1 — `scripts/evolved-channel-guard.ps1`**, a sibling of `legacy-notice-guard.ps1`,
+same idiom (`-AssumeVersion` / `-Repo` verification hooks so it can be proven to fail on a 1.x
+tree), wired into `check.ps1` and into `release.ps1` before anything is built. At major ≥ 2 it
+asserts:
+
+1. **No path in `release.ps1` copies into an update folder.** A source scanner, in
+   `LogJanitorPolicyTests`' shape — the guard reads the script text, so a future edit that
+   re-adds the copy fails the build rather than the family's widgets.
+2. **No `gh release create` is reachable on a 2.x tree.** There is deliberately **no switch**
+   that re-enables it. Publishing Evolved is a future edit to the script, made when the owner
+   gives the channel go — the same posture as "no `-SkipSign`".
+3. **The live channel is clean**: the resolved update folder (`UpdateChecker.FindUpdateFolder`'s
+   rule, re-implemented in PowerShell or invoked through a tiny console entry — prefer reading
+   the same env roots) contains no `EQBuddySetup.exe` stamped 2.x. This is the positive check;
+   1 and 2 only prove the script, and trap 43's lesson is that proving the producer is not
+   proving the effect.
+
+**Commit 2 — `release.ps1` refuses 2.x.** At major ≥ 2: throw unless `-EvolvedLocal`, and
+`-EvolvedLocal` (a) skips the OneDrive copy, (b) refuses `-Tag` and `-Prerelease` outright,
+(c) keeps **every** signing step exactly as it is. Nothing in this plan touches
+`scripts/signing.ps1`, adds a bypass, or weakens a verification — a local Evolved build is
+signed and timestamped like any other, because an unsigned local build is testing a different
+artifact from the one players get (`install-local.ps1` says so, and it is right).
+
+**Commit 3 — the version bump and the Evolved local install loop.**
+
+- `Directory.Build.props` `<Version>` → **`2.0.0`**, numeric, no suffix (see "What clamps it").
+  The moment it reads 2.x, `legacy-notice-guard`'s check 3 arms and `evolved-channel-guard`
+  arms. That is the point of bumping early rather than at the end.
+- Arming `legacy-notice-guard` at 2.x demands a `Legacy Linux/macOS` section in the shipping
+  `WhatsNew.json` entry for `2.0.0`, linking `releases/tag/v1.99.18`. **Write it now.** It is
+  LEGACY-007's obligation, it is cheap while nobody is waiting on it, it keeps `check.ps1`
+  green, and writing the promise before the release that must carry it is the entire argument
+  for having the guard.
+- `install-local.ps1 -Evolved`: build, sign, and run **portable from `dist/publish`** with
+  `EQBUDDY_APPDATA` pointed at a separate Evolved profile directory. Do not install; do not
+  touch the v1 `AppId`. David keeps a working v1 install and an untouched v1 profile while
+  Evolved is under construction — which is DATA-003's intent arriving before there is anything
+  destructive to back up, and it costs one script switch.
+  → The heavier alternative (a second `AppId` + `EQBuddy Evolved` install directory + its own
+  shortcut) is the right move **when Evolved becomes the daily driver**, not now. Named here so
+  the next session does not re-derive it.
+
+**Decision 3, recorded because it could have gone the other way:** `<Version>` stays numeric
+`2.0.0` for the whole local phase rather than `2.0.0-alpha.N`. The suffix reads better and
+breaks three scripts and the installer at the regex on line 21 (`([\d.]+)</Version>`), and there
+is no channel for a milestone number to communicate to. Human-readable milestone identity goes
+in the informational version / About line as `2.0.0 (Evolved local · <short sha>)`; the numeric
+version is a machine contract, and the machines are `UpdateChecker`, Inno Setup and three
+guards. Re-decide the public number at channel-open.
+
+**Verification for E-1** — the one that counts is #3, because 1 and 2 are claims about a script:
+
+1. `evolved-channel-guard.ps1 -AssumeVersion 2.0.0` fails on the pre-change tree (it will: the
+   OneDrive copy is there and unconditional), passes after. Eight runs.
+2. `release.ps1` with a 2.x `<Version>` and no `-EvolvedLocal` throws **before** the 172 MB
+   publish, like every other refusal in that script.
+3. **Run `install-local.ps1 -Evolved` on the real machine and then confirm, by looking, that
+   `C:\Users\david\OneDrive\EQBuddyDownload\EQBuddySetup.exe` still stamps 1.99.18 and that the
+   installed v1 EQBuddy still launches and still reads its own profile.** A green suite is not
+   this; the whole defect class here is "the script reported success and the side effect
+   happened anyway" (`CLAUDE.md`: *a silent failure is not proof nothing happened* — the mirror
+   applies).
+
+---
+
+### E-2 — Phase 1: subtract the platform (gated on E-0 complete)
+
+**Gate to open E-2:** every #275 LEGACY row ticked with evidence, `legacy-v1` pushed and
+protected, `v1.99.18` tag protected. Helm confirms the checklist; that confirmation is the
+existing blocker being lifted, not a new ruling to invent.
+
+Two of the prior plan's labelled hypotheses are now settled, both for free, and one of them
+reverses a risk:
+
+> **SETTLED — `release-assets.yml` runs from the TAG's own tree, not from `main`.** The
+> `v1.99.18` run reports `event=release`, `headBranch=v1.99.18`, `headSha=dbcfb3a1`, while
+> `main` is `c877d61d` (four commits ahead). Observed, not read from documentation.
+> **Therefore: delete `release-assets.yml` on the Evolved mainline.** Legacy tags keep their own
+> copy and can be re-published forever, which is what LEGACY-004 asks for. The guarded-job
+> alternative in the prior plan is unnecessary, and it was the expensive branch.
+
+> **SETTLED — LEGACY-001's asset half.** All three non-Windows artifacts plus both Windows
+> artifacts are attached to `v1.99.18`. The `fail-fast: false` matrix worry did not bite.
+
+**E-2a — Test disposition, and the prerequisite that reorders it.** `docs/TestPlan.md` §5
+records the WPF layer has no unit tests, so `tests/EQBuddy.Avalonia.Tests` — **21 test files
+plus `GlobalUsings.cs` and `TestAppBuilder.cs`** — is the repo's only rendering coverage that
+runs on a push. `ci.yml`'s `e2e-windows` job is `if: github.event_name == 'workflow_dispatch' &&
+inputs.run-e2e`, so E2E runs on nobody's push today. Deleting the Avalonia tests and "porting to
+E2E" without changing that ships guards nobody runs, which is worse than deleting them honestly.
+
+Deliverable **before** any deletion: a table, one row per file, naming where its assertion went.
+Attempt, in this order:
+
+1. **Un-gate `e2e-windows`** to run on push/PR. It is `windows-latest` and it launches the built
+   WPF exe. If it cannot be made stable in a bounded number of attempts, **stop and take the
+   fallback** rather than iterating: port what can be pure into `EQBuddy.Tests` and write down,
+   per remaining file, that the rendering assertion is accepted as lost and why. Name the
+   decision point in the PR; do not let "port to E2E" become a row nobody can run.
+2. Likely pure ports: `BreakdownRowsTests`, `WindowZoomTests`, `HotkeyManagerTests`,
+   `ChipStackTests`, `IconGeometryTests`, `UpdateOfferTests`.
+3. Likely E2E-via-`EQBUDDY_EXPAND`: the eleven `*RenderTests` plus `CompanionWiringTests`.
+4. Likely accepted losses, each with its reason written down: `ClickThroughTests`,
+   `MacOverlayLevel` coverage, `IconSheetTests`, `WidgetSheetTests` (both opt-in capture
+   surfaces photographing the lane being removed).
+5. **`AppThemeTests.EveryCatalogThemeAppliesCleanly` is a catalog guard wearing an Avalonia
+   coat.** It is the only thing that would notice a broken palette and it has no WPF twin.
+   Decide it explicitly — a WPF twin is cheap and E-3 is about to add a shell full of new
+   surfaces to every palette.
+
+**E-2b — the shared-suite scanners.** **20 files in `tests/EQBuddy.Tests` name
+`EQBuddy.Avalonia`, not the 18 the prior plan listed** — `LegacyPlatformUpdatePolicyTests` and
+`MobileAlertSoundsTests` joined since it was written, which is itself the argument: **re-derive
+the list with one `grep`, do not copy it forward.** Every one exists because two lanes could
+drift; with one lane each becomes a single-lane must-list or becomes vacuous. **A scanner that
+scans one file it will always find is a guard that cannot fail, and it passes forever while
+reading as coverage.** One explicit call per file: keep with the reason rewritten, or delete
+with the reason. Do not let any of them narrow silently.
+
+Two specifics that will otherwise be decided by momentum:
+
+- `ArchitectureTests` carries `EQBuddy.Avalonia/MainWindow.cs, 5229` and
+  `EQBuddy/MainWindow*.xaml.cs, 4273`. Remove the Avalonia row; **do not let the WPF row's
+  headroom grow in the same commit.** E-3's decomposition budget is exactly that number, and it
+  is spent before it starts if this commit inflates it.
+- `SurfaceOwnershipTests`' two curated exemptions (Gear & Loot, Kills & Drops) each name the PR
+  that removes them. Those PRs are E-3. **The exemptions must not be re-justified as "one lane,
+  so ownership does not matter"** — trap 45 is about a method that returns a long-lived UI object
+  being a transfer of ownership wearing a getter's clothes. It was *found* by Avalonia; it is not
+  *about* Avalonia, and the WPF shell is about to become a second host for surfaces the widget
+  still renders.
+
+**E-2c — pipeline and deletion, in this order and not mixed.** `ci.yml`: drop
+`build-avalonia-linux` and the "Run Avalonia render tests" step **after** E-2a, never with it.
+`EQBuddy.slnx`: drop both Avalonia rows. `check.ps1`: drop the `avalonia` stage — and `-Quick`
+loses its only reason to exist, so remove the switch rather than leave a flag that does nothing.
+`release-assets.yml`: delete (settled above). **Then** delete `src/EQBuddy.Avalonia/` and
+`tests/EQBuddy.Avalonia.Tests/` in their own commit; a deletion mixed with a port is a diff
+nobody can review. `DocumentationSizeTests` measures `src/<project>` line counts against numbers
+written into `docs/Architecture.md` — that doc edit belongs **in** the deletion commit, not in a
+follow-up.
+
+→ **Trap 53 lives here.** `scripts/` matches windows by **title**, and three stale titles left
+the whole `shoot.ps1` batch unreachable past shot 37 for six days across four releases. Before
+any window is deleted, renamed or folded, grep `scripts/` for its **title** — the class name is
+what a compiler follows, the title is what the harness follows, and only one of those has a
+compiler. **Run the batch, not one `-Shot`**: a green `-Shot` proves one row.
+
+**E-2d — Wine/CrossOver: already ruled, do not re-open.** Helm's #277 sign-off settled it —
+*"drop three Options knobs; keep `TextRenderingPolicy` + `WineText`; overlay/crossover scripts go
+with the platform cut."* So: remove `AppSettings.WineFloatOverFullscreen`,
+`WineKeepGameFullscreen`, `WineWholePixelText` from the v2 Options UI (UX-010 names *settings*);
+keep `src/EQBuddy.UI.Shared/TextRenderingPolicy.cs` and `src/EQBuddy/WineText.cs`, which serve
+people running the **supported Windows artifact** under CrossOver and cost one `OverrideMetadata`
+call (traps 40–42, several rounds each). `WineOverlay.cs`, `scripts/crossover/` and
+`MacOverlayLevel` go with the platform. **`WineFonts.cs` and `TextProbeWindow.cs` are not named
+by that ruling** — `TextProbeWindow` is the `--textprobe` diagnostic that finally separated three
+states that had looked identical for two builds (trap 42), and it runs on Windows. Keep both;
+say so in the PR rather than deleting by adjacency. When you remove the three settings, check
+what stops writing them (trap 20) and whether `DeadSettingTests.Known` needs a row.
+
+**E-2e — the v1 feature disposition table, with Bevel's IA as the destination authority.**
+Output to `docs/v2/v1-feature-disposition.md` (charter §21.1), one row per feature:
+name · today's door(s) · v2 room · class (Keep / Merge / Replace / Advanced / Remove) · why ·
+**what writes it**. Spine: `docs/FeatureGuide.md`'s 13 `##` sections, `docs/Themes.md`'s seven
+themes, ~200 `AppSettings` properties, `BreakoutKind`'s six members, and the **43** `*Window*`
+files under `src/EQBuddy/`.
+
+- The destination column is **not** invented here. `docs/BEVEL-v2-staging-critique.md` §2 is a
+  signed Keep/Merge/Replace table with the old name on the left, and its two live Helm-locked
+  doors bind: Home is identity + readiness (recommendations wait Phase 5), and **Raids hosts on
+  Live** while Progress is personal progression with Faction as Advanced. (Door 2, the LEGACY
+  notice voice pass, is retired — the shipped copy stays.) Do not re-litigate them and do not
+  drag #250, #251 or the 320-cap into this table.
+- **`Options → Cards & windows` is a routing exercise, not a cleanup.** Bevel pass #2 §4 read the
+  tab and found five jobs on it: overlay cards (→ nothing; the shell nav replaces them), the gear
+  checklist import (→ **Gear**; an import workflow is a domain action), the 12 mini-dashboard
+  checkboxes (→ **HUD, edited on the HUD**), the eight breakout toggles (→ **Live** boards and
+  **HUD** chips), and two genuine settings stranded among them. Four of the five are deletions
+  with a destination. **The rows get routed, not carried** — and the tab currently prints
+  *"Double-click a mini pill chip to open/close its breakout"*, one sentence containing three
+  pieces of our own architecture, all three on the signed terminology ban list.
+- **Every `Remove` and `Merge` row names what stops writing.** This pass is a fold of the entire
+  product, and a fold is exactly the event that produces traps 20, 26 and 43.
+- **Trap 30 applies to the tooling**: `shoot.ps1` enumerates `BreakoutKind` by hand. Touching
+  that enum means grepping `scripts/` in the same change.
+- The table is what makes the Phase 2 gate a test rather than an opinion: *every `Keep`/`Merge`
+  row names a v2 door, and no row's only door is the context menu.*
+
+**E-2 gate (charter):** no v2 requirement is blocked on non-Windows desktop parity — provable
+mechanically from the removed CI jobs plus a disposition table with no row whose blocker is a
+non-Windows desktop.
+
+---
+
+### E-3 — Phase 2 PR 1: the shell host (gated on E-2 + Bevel nav pre-design)
+
+**Bevel's IA is signed, so the prior plan's "first PR waits on Bevel's IA" condition is
+satisfied.** What is *not* signed is the navigation's visual design. File the ask in
+`BEVEL-FEEDBACK.md` (`To: Bevel`) when E-2 lands; do not open E-3 before it answers.
+
+**Shape, and it is smaller than "build a shell" sounds.** `docs/Themes.md`'s four BUILT themes
+are already shell pages that ship as their own windows — Quests, Progress, World, Gear & Loot.
+v2's shell is **two genuinely new pages (Home, Search) and a navigation host over four surfaces
+that already exist as hosted views.** Charter §16.4's "MainWindow should lose responsibility,
+not just lines" has already begun.
+
+**First PR = host + nav + exactly ONE page moved in.** The World fold is this repo's own
+precedent (five PRs, host first) and it is the only shape that keeps a half-finished shell
+shippable. **Move Progress first**, not Quests or World: `MainWindow.NewProgressSurfaces()`
+already exists as the trap-45 factory, so PR 1 exercises the host without also having to invent
+an ownership seam in the same diff. Gear & Loot and Kills & Drops are the two surfaces that
+still carry `SurfaceOwnershipTests` exemptions — they come later, and moving them is what
+removes those rows.
+
+**Four seams; three already exist.**
+
+1. **A surface factory per host** — every page builds its own instances; no host interface
+   returns a `Control` it did not just create (trap 45).
+2. **Framework-free presentation** — `UI.Shared` is **95 files** and already holds
+   `LootPresentation`, `QuestPresentation`, `QuestChecklistLayout`, `DesignTokens`, `ChipStyle`,
+   `WidgetMetrics`, `ChipStackAnchor`, `AlertSoundPlan`, `LogJanitorPolicy`,
+   `TextRenderingPolicy`, `LegacyPlatformUpdatePolicy`. **Charter §16.3's `EQBuddy.Presentation`
+   IS this project.** Do not rename: §16.3 says the boundary matters more than the namespace, and
+   a rename is 95 files of churn plus every doc path `DocumentationTests` resolves.
+3. **The mobile projection is the parity proof.** `CompanionProjection*` reads the same shared
+   modules the windows do and `SurfaceParityTests` asserts it. **Standing rule for every shell
+   page: if a page hand-rolls a rule the projection reads from `UI.Shared`, that is #210 happening
+   again** — and #210's direction surprised people, because the *phone* was ahead.
+4. **Navigation — the one new seam.** Smallest thing that works, per §16.5: a `ShellPage` enum, a
+   content host, a page factory registry. **No DI container, no message bus, no plugin host.**
+   Reuse the string grammar already in the wild: `EQBUDDY_EXPAND` takes `progress:raids` on both
+   lanes since 2026-08-26. Making `page:room` the shell's navigation address means "Guide Me
+   There" (UX-005), Search results (SEARCH-002) and HUD click targets resolve to one destination
+   spelling on day one — which is what WORLD-006 asks for.
+
+**The consumer-grade bar, made concrete.** These are acceptance criteria for E-3, not aspirations,
+and they come from Bevel §4 and §8 plus the charter's Definition of Done:
+
+- **No unexplained empties.** Every first-run and no-data surface uses the inventory-dump voice:
+  what is missing, the action, where (in game), what happens next. A surface that shows `0` or a
+  chevron that opens nothing does not ship. Where a surface names an in-game command it offers a
+  ⧉ copy from `UI.Shared/GameCommands` — and **`GameCommandsTests.SurfacesNeedingACommand` gets a
+  row per new surface**, because that must-list is the only thing that can see an affordance that
+  was never drawn (trap 34/44's shape; a missing control photographs as an unremarkable panel).
+- **No implementation vocabulary on screen** — Bevel's ban list: card, card key, breakout, theme,
+  theme body, overlay section, cog menu, widget-as-product-name. Worth a cheap source scanner over
+  the shell's user-visible strings; a terminology rule with no guard is a rule that lasts one PR.
+- **Alt+Tab and focus honest.** The shell is a normal Windows window and is what Windows tabs to;
+  the HUD stays overlay. #271 started this.
+- **Keyboard navigation** for the primary rooms, and `Ctrl+K` for Search if it fits (SEARCH-001).
+- **Settings is settings.** The ⚙ does not list windows that have a nav item (Bevel gate 4). This
+  is the single loudest piece of v1 debt — #219's reporter opened *Cards & windows* looking for
+  Motes and found a deletion.
+- **Every illustration of our own UI is a capture with a recipe, or it does not ship** —
+  Helm-signed lock, 2026-09-04 ~3:08 PM CT. No hand-taken picture of EQBuddy in `Assets/`, the
+  README, or the docs. If a surface is worth illustrating it is worth a `shoot.ps1` entry; if it
+  cannot be captured it cannot be reviewed (trap 22). E-0d is what the absence of this rule
+  already cost, twice.
+- **Evolved's first run is designed, not ported.** Do not carry the 8-page tour or its assets
+  forward. Charter UX-011 describes the replacement — contextual, self-clearing readiness that
+  *"never make[s] a permanent onboarding checklist another navigation destination"* — and Bevel's
+  locked Phase 2 Home (identity · readiness · recent session · deep links) is that surface. A tour
+  is eight pages to remember before you have done anything; readiness is one line at the moment it
+  matters. The tour going stale twice is not a maintenance accident; it is what a static narrative
+  of a moving product does.
+  → **THE ONE CARVE-OUT, AND IT IS A DOOR: tour page 1 is not a tour page.** It is consent to
+  **empty the player's log files**, asked before they know what EQBuddy is, and trap 47 is what
+  happened the last time two code paths disagreed about it — StrIIker-TV ticked the box and lost
+  everything anyway. **E-3 must not move, re-time, re-default, or re-word that consent.** Where it
+  lives and what it defaults to is consequence-list item 8 (a player's own files), and a plan that
+  proposes changing it carries a real `needs-david:` line and asks him with the question tool.
+  Until then the consent stays exactly where and how it is, whatever happens to the other seven
+  pages, and `UI.Shared/LogJanitorPolicy` stays the single answer for both paths.
+
+**The migration nobody has named yet, and it is the likeliest way E-3 hurts a real player.**
+Folding v1's cards, breakouts and `SectionOrder`/`HiddenSections` state into v2 rooms is a
+settings migration (DATA-002), and this repo has shipped that exact bug twice in three weeks:
+#253 (a one-time upgrade step not marked one-time, undoing the player every launch) and #252
+(two folds re-running forever and re-showing cards the player had hidden). `AppSettings.ApplyMigrations` runs **eleven** one-time
+steps on every launch already. Trap 55's rule is the one to carry: **the chain goes through
+`ApplyMigrations` so a test can run the whole thing twice**, `SectionFoldIdempotenceTests` is the
+shape, and a fold may only name keys that are **no longer cards** — checked against
+`OverlaySections.Catalog`, never against a hand-maintained comment. **The tell is a migration
+chain that reports work on every launch**, which means `Load()` is rewriting `settings.json` on
+every start (trap 13's loaded gun).
+
+**Two migration rules from Bevel pass #2 §5, carried verbatim because they are presentation calls
+and better than "run it twice":**
+
+1. **A v1 player's hidden card must never become a hidden ROOM.** *"I hid Combat"* meant "keep
+   this off my always-on-top overlay while I play." It never meant "I do not want combat
+   analysis." Translating `HiddenSections` into shell-navigation visibility would delete features
+   from people's products on upgrade — #219/#233 industrialised. **`HiddenSections` translates to
+   HUD content and to nothing else.** Charter DATA-002 explicitly permits that.
+2. **`MiniStats` is the one v1 setting that IS a HUD statement** — the best evidence we will ever
+   have about what each player watches while playing. **It seeds the Evolved HUD.** Everything
+   else about card order is furniture (`SectionOrder`, `SectionMaxHeight`, `DisabledBreakouts`,
+   the theme card keys) and becomes a v2 default, not a recreated surface.
+
+→ **One grep before Phase 2 wires either** (Bevel's hypothesis, unverified by it and by me): the
+phone's `⚙ Screens` picker is a *second* per-device store of "which surfaces do I show". If the
+shell's room list and the phone's picks are not built from one definition, trap 38's shape — a
+sticky payload whose memo records the wrong thing — has an obvious second home.
+
+**HUD (Surface A), for the PR after the host.** The HUD is `MainWindow` minus what the shell
+takes: log tail wiring, live snapshot, mini/expanded state, chip windows, tray and context menu —
+and **no card rendering**. `ArchitectureTests`' hotspot entry is a glob that **sums** its matches,
+so splitting the file buys nothing; **the ratchet baseline comes down in the same commit as each
+move**, or the freed room refills. Chip placement (LIVE-008) has **three actors, not two** —
+`MezChipsWindow`, `SpawnChipsWindow` and the HUD all observe it, `UI.Shared/ChipStackAnchor`
+already owns the anchoring, and **the participants go in the test names** (trap 49: thirteen green
+tests agreed with a bug because the model had two actors and the world had three). UX-003:
+**change `AppSettings.DisabledBreakouts` defaults, do not delete** — David uses the damage
+breakout.
+
+**E-3 gate (Bevel §8, and it is a product gate not a ratchet):** a player can find every retained
+primary feature without cog archaeology; the HUD is usable in combat with no layout jump on a
+timer and no focus steal; seven rooms in one app with honest Alt+Tab; Settings is not a launcher;
+no unexplained empties; no loot modals. Provable against E-2e's disposition table.
+
+---
+
+### Out of scope for this item
+
+Charter Phases 3–6 (CharacterProfile, golden corpus, Gear +0→+10 math, Home recommendations,
+Search depth). #250, #251, #240 / the 320-cap, #264. #261 / #262 — do not open. Any public
+Evolved channel, prerelease, announcement, Reddit post or Play Console action. Any change to
+`scripts/signing.ps1` or to the signing rule. Taking v1 down, de-linking it, or letting a v1
+artifact rot. Product-direction debate — the charter wins. Renaming `UI.Shared`. Any framing of
+Evolved as MIT, forkable, or open to community continuation: **published 1.x stays MIT, Evolved is
+proprietary / All Rights Reserved / permission-required, and the LEGACY-005 fork invitation is v1
+only.** No third-party license name-checks in public docs.
+
+### Doors considered and refused — why there is no `needs-david:` line
+
+Each was run against both tests in `CLAUDE.md` ("would he plausibly answer differently from the
+obvious default" / "does the answer change *direction* rather than *implementation*"):
+
+- **Removing Linux and macOS support** — already the owner-approved charter (§3.1, §16.2) and
+  Helm's 2026-09-04 11:50 AM CT posture ruling. Settled, not open.
+- **Re-pinning the public legacy links** — executing Helm's #284 ruling verbatim ("re-pin on
+  publish"). A factual correction to an approved page, not an announcement.
+- **The Evolved version number and the local install loop** — implementation; §26 lists the
+  legacy branch name and the bridge version as agent decisions, and this is the same class.
+- **Refusing to publish 2.x from `release.ps1`** — it *protects* the release go rather than
+  exercising it. Opening the channel is the door, and this plan explicitly does not open it.
+- **A separate Evolved profile directory** — protective of David's own data and squarely inside
+  DATA-003's intent. It changes nothing about what the app does with a player's files.
+- **Wine/CrossOver boundary** — Helm ruled it on 2026-09-04 ~12:05 PM CT. Cite, do not re-ask.
+
+**Two things that WOULD be doors, both deliberately kept out of this plan:**
+
+- **Opening the Evolved channel** — the first public 2.x release, its number, its announcement.
+  Release go plus public posture. It comes to David when the shell is real, not before.
+- **The auto-empty consent** (tour page 1). Bevel named it and did not open it; neither does this
+  plan. E-3 is forbidden from touching it, and the first plan that wants to carries a real
+  `needs-david:` line — consequence-list item 8. Naming a door and refusing to walk through it is
+  not the same as having no doors; it is what keeps this item honestly free of one.
+
+One scope call that looked like it might become a door **has already been answered by Helm**
+(~3:08 PM CT): the shipped v1 tour and README rot on the preserved line does **not** earn a
+`v1.99.19` without owner go, the final v1 bag stays closed, and Evolved must not port the assets
+or the copy. Cite that ruling; do not re-raise it and do not carry it to David.
+
+### Checked — what Fable actually read on this tip
+
+`git log`/`ls-remote`/`gh` state for `main` (`c877d61d`), tag `v1.99.18` (`dbcfb3a1`), the
+absence of `legacy-v1`, PRs #276–#287, and issue #275's body and checklist; `CLAUDE.md`;
+`HELM.md` Holds + Retired + the sixteen newest sign-offs; `FABLE.md` item shape and the Phase 0–2
+decomposition in full; `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` rev 1.1 in full;
+`docs/BEVEL-v2-staging-critique.md` in full **including the pass-#2 addendum**, and `BEVEL.md`'s
+*Evolved staging IA pass #2* entry (`103d8fec`) in full, pulled and read mid-write;
+`PRODUCT.md`, `EQBuddy-Evolved.md`, `LEGACY-V1.md`,
+`LICENSE-EVOLVED.md`, `OWNER-BAR.md`, `OWNER-ENGAGE.md`; `scripts/release.ps1` in full;
+`scripts/legacy-notice-guard.ps1` in full; `scripts/install-local.ps1` head;
+`src/EQBuddy.Core/UpdateChecker.cs` (constants, `LegacyFinalTag`, `FindUpdateFolder`, `Check`,
+`IsNewer`, `FindBestAsync`); `installer/EQBuddy.iss` in full; `Directory.Build.props`;
+`.github/workflows/ci.yml` triggers and all three jobs; `scripts/check.ps1` stage list;
+`EQBuddy.slnx`; the `release-assets.yml` run history via `gh run list`; README lines 64–86; file
+counts for `tests/EQBuddy.Avalonia.Tests` (23), the shared scanners naming Avalonia (20),
+`tests/EQBuddy.E2E` (5), `src/EQBuddy.UI.Shared` (95) and `src/EQBuddy/*Window*` (43);
+`ArchitectureTests` hotspot rows; `AppSettings`' three Wine properties.
+
+**Hypotheses, labelled — not verified:**
+
+1. **`e2e-windows` can be made to run reliably on push/PR.** Not tested. E-2a carries an explicit
+   fallback precisely because this may be false; do not let it become an open-ended iteration.
+2. **The `evolved-channel-guard` live-folder check can resolve the update folder from PowerShell
+   without a console entry point.** `FindUpdateFolder` reads three env vars and does a shallow
+   scan; re-implementing that in the guard is plausible and unproven. If it drifts from the C#,
+   invoke the C# instead — two sources for one rule is trap 4.
+3. **The E-2a port/loss buckets** are a first pass over file names. The table is the deliverable;
+   these are where to start, not the answer.
+4. **`WineFonts.cs`'s disposition.** Kept by argument (it serves the Windows artifact under
+   CrossOver), not by a ruling. If Helm reads the #277 wording as covering it, it goes.
+
+### Decided without asking — for `DECISIONS.md` when this is taken
+
+- **Local-only is enforced by a refusal in `release.ps1`, with no opt-out switch.** The default
+  was a documented convention; conventions are what the OneDrive comment already was.
+- **`<Version>` is bumped to `2.0.0` early, and the guard lands before the bump.** The default
+  was to bump last, which leaves the leak live for the whole of Phase 1.
+- **`<Version>` stays numeric, milestone identity moves to the informational version.** The
+  default, `2.0.0-alpha.N`, breaks four consumers at the regex.
+- **The `2.0.0` What's-new entry is written now, not at channel-open.** It is what keeps
+  `check.ps1` green after the bump and it pre-pays LEGACY-007.
+- **`legacy-notice-guard` gains a final-tag check.** The default was to re-pin the links and move
+  on, which leaves the guard blind to the same staleness next time.
+- **`release-assets.yml` is deleted rather than guarded** — settled by observation, not doc.
+- **Evolved local runs portable against a separate profile rather than installing over v1.**
+- **Progress moves into the shell first**, because its factory seam already exists.
+- **`UI.Shared` is not renamed to `EQBuddy.Presentation`.** Churn outweighs clarity (§16.3).
+- **`WineFonts.cs` and `TextProbeWindow.cs` are kept** though the Helm ruling names neither.
+- **E-0d fixes repo markdown and stops at the app's tutorial assets.** The default was to sweep
+  both; reaching a player with the second needs a release, and that scope is Helm's.
+- **`HiddenSections` migrates to HUD content only; `MiniStats` seeds the HUD.** Adopted from
+  Bevel rather than decided here — the default (translate hidden cards to hidden rooms) is the
+  one that would have deleted features from people's products on upgrade.
+
+---
+
 ## EQBuddy v2 Phase 0–2 — technical decomposition (charter §25 item 6, issue #275)
 
 - **Priority:** `ready` — **for Phase 0 only.** Phase 1 is written here in full and is
