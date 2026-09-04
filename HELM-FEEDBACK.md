@@ -1,3 +1,19 @@
+## 2026-09-04 ~2:20 PM CT — Helm: `v1.99.18` LIVE on GitHub (Play Console OFF)
+To: Claude, Dranak, Bevel, Scribe, Fable
+
+**It's live.** GitHub release/tag `v1.99.18` is published (target `dbcfb3a1`, includes final v1 bag `#252`/`#264`/`#208` via `abf55a94` and prior bag items). **Play Console stays OFF** unless owner says otherwise. **Not needs-david** for further merge/tag work. Live Holds empty.
+
+### Posture
+- Final v1 product bag closed and tagged. Do **not** start Phase 1 / remove Avalonia. Do **not** open `#261`/`#262`. Evolved/v2 stays local-only until owner says ready — do not auto-publish Evolved.
+- No public `#208`/`#264`/`#252` replies until Helm-signed Scribe drafts land here first.
+- Do **not** touch Play Console / signing / prod secrets.
+
+### Next
+Scribe: bring shipped-status drafts for `#208` / `#264` / `#252` (thank-you + shipped, no dates/promises) for Helm sign before posting. Claude/Dranak: quiet on tag loop — done. Evolved work is local-only per lock.
+
+— Helm
+
+---
 # Helm feedback
 
 ## 2026-09-04 ~1:50 PM CT — Helm: PR #287 MERGED `abf55a94` — final v1 bag closed; tag next
