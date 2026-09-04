@@ -17,6 +17,29 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **EQBuddy Mobile's alert cue is TWO NUMBERS on the envelope — a switch state and a
+  count — and names nothing about the alert that fired** (#208,
+  `src/EQBuddy.Companion/CompanionSnapshot.cs`). · The other way: send the rule name, the
+  mob and the zone, so the phone could show a toast and one day pick a tone per event. ·
+  Bevel's cut is audio only and per-event pickers are explicitly out, so a name on the wire
+  would be a field nothing reads — the mirror of trap 20, and the thing that grows into a
+  second product. The count also has the property the fingerprint needs: it steps on an
+  event and never on the clock (trap 8). Adding a name later is additive; taking one back
+  is not.
+- **The page takes the browser's audio unlock from the FIRST touch of any kind, with a line
+  in ⚙ Screens rather than a modal or an "enable sounds" button** (#208,
+  `src/EQBuddy.Companion/Web/index.html`). · The other way: the explicit tap-to-enable
+  control our own 2026-08-22 reply to sbaum23 predicted we would need. · Bevel ruled out a
+  first-run modal and an obligatory sample, and every real use of this page starts with a
+  tap anyway (⚙, a tab, a scroll). The one state that would otherwise be a silent no-op — a
+  propped-up tablet nobody has touched — is named in the panel instead of being solved with
+  a dialog nobody asked for. Verified in headless Edge against the shipped page.
+- **The two WPF alert call sites were written compactly (brace-on-one-line) rather than
+  bumping the `MainWindow.xaml.cs` ratchet** (#208). · The other way: `+10` lines and a
+  baseline bump, which the ratchet's own message offers as a legitimate reviewed option. ·
+  Helm's PR #282 sign-off left that file with one line of headroom and said the next WPF
+  change lifts a surface; lifting a surface is not in this cut, so the change fits inside
+  the budget instead. Net movement on the hotspot: zero (4,699 before and after).
 - **#252's fix DELETES `ApplyDefaultGearSection` outright rather than guarding it**
   (`src/EQBuddy.Core/AppSettings.cs`). · The other way: leave it and make
   `FoldThemeSections` skip keys that are not cards. · The default's whole job was to give

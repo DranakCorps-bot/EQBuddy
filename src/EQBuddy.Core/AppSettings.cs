@@ -582,6 +582,17 @@ public sealed class AppSettings
     /// hold "what did the phone last ask for" than the settings file every other piece of
     /// companion state already lives in.</summary>
     public string? CompanionTravelDestination { get; set; }
+    /// <summary>Whether EQBuddy Mobile may make a noise when an alert fires (#208,
+    /// sbaum23). OFF by default and staying off: a phone propped beside the keyboard is
+    /// the one surface where an unrequested sound is worse than no sound at all, and the
+    /// desktop's own alert sounds are untouched by it — they have their own controls.
+    ///
+    /// Deliberately ONE switch rather than a per-event set: the desktop already decides
+    /// which alerts are worth a noise (a muted watch rule, a spawn row with its alert
+    /// off), and this gates whether that same decision reaches the phone. A second set of
+    /// pickers here would be a second product deciding the same question
+    /// (<c>UI.Shared/MobileAlertSounds</c> is where the decision lives).</summary>
+    public bool CompanionSounds { get; set; }
 
     private static string FilePath => AppPaths.File("settings.json");
 

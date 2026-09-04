@@ -353,6 +353,15 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
         get => _settings.ShowTargetDrops;
         set { _settings.ShowTargetDrops = value; PersistAnd(); }
     }
+    /// <summary>EQBuddy Mobile's alert audio (#208, sbaum23). Sits beside the pairing
+    /// button in Options → Behavior rather than with the desktop's alert sounds: it is a
+    /// property of the phone, and the player who wants it is the player who just paired
+    /// one. See <see cref="MobileAlertSounds"/> for why it is one switch.</summary>
+    public bool MobileSounds
+    {
+        get => _settings.CompanionSounds;
+        set { _settings.CompanionSounds = value; PersistAnd(); }
+    }
     public bool HideWhenGameUnfocused
     {
         get => _settings.HideWhenGameUnfocused;

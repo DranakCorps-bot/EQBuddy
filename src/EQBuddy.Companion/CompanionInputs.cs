@@ -113,4 +113,9 @@ public sealed record CompanionInputs
 
     /// <summary>The live palette. Not gateable — see CompanionSnapshot.Theme.</summary>
     public CompanionThemeSection? Theme { get; init; }
+
+    /// <summary>The phone's alert audio (#208): the owner's switch and the running count
+    /// of alerts the PC has fired. Null on the projection's older call shapes, which is
+    /// why the page treats a missing section as "stay quiet" rather than as a default.</summary>
+    public CompanionAlertsSection? Alerts { get; init; }
 }

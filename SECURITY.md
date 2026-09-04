@@ -81,6 +81,12 @@ here is exactly what it does:
   desktop theme's colors, and whichever of the above screens are both offered
   and picked. It is the same information the desktop's own cards are showing
   you; nothing is sent that isn't on a screen you could already see.
+- **Mobile sounds**, if you turn them on (Options → Behavior; off by default),
+  add exactly two values to that: the switch's own state, and a count of alerts
+  raised since EQBuddy started. The count is what tells the device to play a
+  tone. It names nothing — not the rule, not the mob, not the zone — and it is
+  not one of the screens above, because a device showing only the map is still
+  a device that should be able to hear a camp come due.
 - **What comes back from the device:** its screen picks, and ticks on the Epic,
   Sky and Gear checklists — the same tick a click on the PC makes. There is no
   other write: a device cannot change settings, run commands, or touch

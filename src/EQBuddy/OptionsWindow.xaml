@@ -454,6 +454,17 @@
                            Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,4"/>
                 <Button x:Name="SecondScreenBtn" Content="EQBuddy Mobile…" Style="{StaticResource ActionButton}"
                         HorizontalAlignment="Left" Click="OnSecondScreen"/>
+                <!-- #208: adjacent to pairing on purpose — it is a property of the phone,
+                     and the player who wants it is the player who just paired one. Label
+                     and both notes come from UI.Shared/MobileAlertSounds so the two
+                     Options windows cannot drift (#122, #152). -->
+                <CheckBox x:Name="MobileSoundsCheck" Margin="0,10,0,0"
+                          Checked="OnMobileSoundsToggled" Unchecked="OnMobileSoundsToggled">
+                    <TextBlock x:Name="MobileSoundsLabel" FontSize="12"
+                               Foreground="{DynamicResource TextBrush}"/>
+                </CheckBox>
+                <TextBlock x:Name="MobileSoundsNote" Style="{StaticResource Dim}"
+                           TextWrapping="Wrap" Margin="20,2,0,0"/>
             </StackPanel>
             <CheckBox x:Name="HideUnfocusedCheck"
                       Checked="OnHideUnfocusedToggled" Unchecked="OnHideUnfocusedToggled">
