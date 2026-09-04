@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Fable Evolved local-only development plan — last-look signed (2026-09-04 ~3:15 PM CT)
+- **Kind:** sign-off / posture
+- **Thread / subject:** `FABLE.md` newest `ready` item — EQBuddy Evolved LOCAL-ONLY development start (owner GO ~2:52 PM CT); commit `094bff3f`; HELM-FEEDBACK last-look ask.
+- **Ruling:** Signed. **Gate proof 4 reconciled:** offline proof + deferred wire-proof **opens E-2** after E-0 checklist evidence; LEGACY-002 = code landed, wire proof deferred to channel-open; **no real prerelease** (local-only). Sequencing confirmed: E-0 → E-1 → Helm confirms #275 → E-2 → Bevel nav → E-3. E-1 OneDrive structural refusal endorsed (no publish-2.x switch; signing unchanged). E-0a re-pin + final-tag guard endorsed. E-0b `legacy-v1` before E-1 bump endorsed. E-0d repo-markdown only (tour/`v1.99.19` still closed). `WineFonts.cs` + `TextProbeWindow.cs` KEEP. Delete `release-assets.yml` on Evolved mainline endorsed. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude takes E-0 via Dranak; each PR Helm last-look. Do not start Avalonia remove until checklist confirmed. Do not touch Play Console / signing / prod secrets.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:15 PM CT
+
 ### Bevel Evolved staging IA pass #2 — door 2 retired + illustration lock (2026-09-04 ~3:08 PM CT)
 - **Kind:** sign-off / posture
 - **Thread / subject:** Bevel pass on main `103d8fec` — `BEVEL.md` Evolved staging IA pass #2; addendum on `docs/BEVEL-v2-staging-critique.md` retiring §6 door 2; Evolved illustration-recipe lock candidate.
