@@ -139,8 +139,16 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
     public TTab SelectedTab => _host.SelectedTab;
 
     /// <summary>The body's cap right now, for the <c>EQBUDDY_EXPAND</c> dump — 320 on a
-    /// widget nobody has dragged, more once they have (#250).</summary>
+    /// widget nobody has dragged, more once they have (#250). Read off the CONTROL, so it
+    /// is what the body is actually held to rather than what was computed for it.</summary>
     public double BodyCap => _bodyScroll.MaxHeight;
+
+    /// <summary>The measurement this card last handed the widget: everything the card
+    /// occupies except the body being capped. One of the two inputs behind
+    /// <see cref="BodyCap"/>, exposed so the dump can report what the arithmetic was fed —
+    /// a cap on its own can only be checked against a constant, and the constant would be
+    /// a claim about the monitor (see <c>ThemeBodyCapHost.RoomFor</c>).</summary>
+    public double BodyChrome { get; private set; } = double.NaN;
 
     /// <summary>The open room's list is longer than the cap allows, so there IS something
     /// a taller widget would show. The height grip's tooltip asks, because "everything you
@@ -169,6 +177,7 @@ internal sealed class ThemeCardView<TTab> where TTab : struct, Enum
         var ownChromeAndHeader = _section.ActualHeight
                                  + _section.Margin.Top + _section.Margin.Bottom
                                  - _bodyScroll.ActualHeight;
+        BodyChrome = ownChromeAndHeader;
         var cap = _bodyCap(ownChromeAndHeader);
         if (Math.Abs(_bodyScroll.MaxHeight - cap) > 0.5) _bodyScroll.MaxHeight = cap;
     }

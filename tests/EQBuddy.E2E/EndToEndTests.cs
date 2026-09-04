@@ -546,14 +546,14 @@ public sealed class EndToEndTests
     /// gets more room. Paineless reached for exactly this control and reported that it did
     /// nothing — *"cannot just expand window size"* — because the cap was a constant.
     ///
-    /// 4000 is deliberately further than any monitor allows. The assertion is a RANGE
-    /// rather than 640 on purpose: the drag is clamped to the work area before it reaches
-    /// this arithmetic, so the exact answer depends on the screen this runs on — and a
-    /// test that hard-coded the ceiling would be asserting the monitor, not the feature.
-    /// What must hold on every screen is that the body grew and that it stayed bounded:
-    /// one card may double, and it may not eat the monitor. The exact ceiling is pinned in
-    /// <c>WidgetMetricsTests</c> and in the Avalonia render tests, where the screen is not
-    /// a variable.
+    /// 4000 is deliberately further than any monitor allows, and the assertion is a
+    /// RELATIONSHIP rather than a number: the drag is clamped to the work area before it
+    /// reaches this arithmetic, so any hard-coded answer — 640, or even "more than the
+    /// floor" — is a claim about the screen this happens to run on. What holds everywhere
+    /// is that the cap in force IS the tested formula applied to the room this machine
+    /// granted, bounded by the floor and the ceiling. The formula itself is pinned without
+    /// a screen in <c>WidgetMetricsTests</c>; what only a launched app can say is that the
+    /// answer reached the control (trap 42).
     /// </summary>
     [Fact]
     public void DraggingTheWidgetTallerGrowsTheOpenThemesBody()
@@ -565,8 +565,32 @@ public sealed class EndToEndTests
         var cap = app.DumpValue("themeBodyCap");
         Assert.Equal(0, app.DumpValue("contentHeightAuto"));
         Assert.Equal(1, app.DumpValue("worldInline"));
-        Assert.True(cap > 320, $"a dragged widget should grow the open body; cap was {cap}");
+        Assert.True(cap >= 320, $"the floor is a floor; cap was {cap}");
         Assert.True(cap <= 640, $"one card may double, never more; cap was {cap}");
+
+        // **The relationship, not a number — because a number here is a claim about the
+        // MONITOR.** The drag is clamped to the work area before it reaches the arithmetic,
+        // so a display that cannot spare the room correctly answers the floor: this
+        // assertion read `cap > 320` until 2026-09-04, and it failed on a 1024x768 hosted
+        // runner that had granted the stack 560 units, with the feature working perfectly.
+        // The dump now carries the two INPUTS, so what is pinned is that the tested
+        // arithmetic (WidgetMetricsTests owns the formula) reached the control's MaxHeight
+        // over the room this machine actually granted — equally strong on any screen, and
+        // it is the "in effect at runtime, not merely present in the build" claim of
+        // trap 42 that the deleted ThemeBodyCapRenderTests made on the other lane.
+        var room = app.DumpValue("themeBodyRoom");
+        var chrome = app.DumpValue("themeBodyChrome");
+        Assert.True(room > 0, $"a dragged widget reports the room it was granted; room was {room}");
+        Assert.True(chrome > 0, $"the open card reports the chrome around its body; chrome was {chrome}");
+        // ±1: the dump rounds each measurement to a whole unit, so the difference of two
+        // rounded numbers can sit a unit either side of the rounded difference. The cap
+        // itself is whole by construction (trap 12 — a wobbling MaxHeight on a
+        // SizeToContent always-on-top window is a geometry change).
+        var predicted = Math.Clamp(room - chrome, 320, 640);
+        Assert.True(Math.Abs(cap - predicted) <= 1,
+            $"the cap in force should be the tested arithmetic over this machine's own " +
+            $"numbers: room {room} - chrome {chrome} clamped to [320, 640] is {predicted}, " +
+            $"and the body is held to {cap}");
     }
 
     /// <summary>Dragged SHORTER than the floor, the body keeps the floor — the direction

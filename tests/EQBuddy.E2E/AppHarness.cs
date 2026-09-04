@@ -137,8 +137,19 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character}_{Server}".ToLowerInvariant()] = new { Classes = classes },
             }, new JsonSerializerOptions { WriteIndented = true }));
 
-    /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay
-    /// to finish (the fixture has kills, so a live session shows killsTotal &gt; 0).</summary>
+    /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay to
+    /// finish — first for it to START (the fixture has kills, so a live session shows
+    /// killsTotal &gt; 0), then for it to STOP moving.
+    ///
+    /// **The second wait is the one that was missing, and the first one reads exactly like
+    /// it is there.** A test's usual shape is "sample a baseline, append a line, wait for
+    /// baseline + 1", and <see cref="WaitForDump(string,int,string)"/> is an EQUALITY: a
+    /// counter that is still climbing through the rest of the fixture sails past the
+    /// expected number between two polls and the wait can never be satisfied again. On a
+    /// dev machine the replay finishes inside the first tick and nothing shows; on a
+    /// hosted runner it does not, and `SessionGoesLive_AndFreshKillUpdatesLiveStats` failed
+    /// there with "kills to reach 10; last seen 9" beside a dump reading kills=14 —
+    /// the counter had gone past 10 while the harness was sleeping.</summary>
     public void Launch()
     {
         if (_process is { HasExited: false })
@@ -155,6 +166,35 @@ internal sealed class AppHarness : IDisposable
 
         Wait.Until(() => DumpValue("killsTotal") > 0, LaunchTimeout,
             "app to launch and replay the fixture into a live session (debug.txt killsTotal > 0)",
+            Artifacts);
+        WaitForReplayToSettle();
+    }
+
+    /// <summary>How long the ingest totals must hold still before a baseline sampled off
+    /// them can be trusted. The app rewrites the dump once per UI tick (1 s), so this is
+    /// two ticks of quiet — long enough that a chunk still being tailed shows up, short
+    /// enough that it costs the suite seconds rather than minutes.</summary>
+    private static readonly TimeSpan ReplaySettle = TimeSpan.FromSeconds(2.2);
+
+    /// <summary>Waits until the two totals every ingest moves — kills and loot — stop
+    /// changing. Both, not one: the fixture's last lines could be loot after the final
+    /// kill, and a settle that watched only kills would call the replay done with rows
+    /// still arriving on the other surface.</summary>
+    private void WaitForReplayToSettle()
+    {
+        var last = (Kills: -1, Loot: -1);
+        var stableSince = DateTime.UtcNow;
+        Wait.Until(() =>
+        {
+            var now = (Kills: DumpValue("killsTotal"), Loot: DumpValue("lootTotal"));
+            if (now != last)
+            {
+                (last, stableSince) = (now, DateTime.UtcNow);
+                return false;
+            }
+            return DateTime.UtcNow - stableSince >= ReplaySettle;
+        }, LaunchTimeout, "the fixture replay to stop moving (killsTotal and lootTotal " +
+            $"unchanged for {ReplaySettle.TotalSeconds:0.#}s) before any test samples a baseline",
             Artifacts);
     }
 

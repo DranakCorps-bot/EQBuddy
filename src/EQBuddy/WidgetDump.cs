@@ -17,16 +17,35 @@ namespace EQBuddy;
 /// </summary>
 internal static class WidgetDump
 {
-    /// <summary>The cap in force on whichever theme card currently owns a body, or the
-    /// floor when none does (#250). Only one theme is ever inline in the review set, and
-    /// with none open the floor is the honest answer: nothing is being capped.</summary>
-    private static double ThemeBodyCapInForce(MainWindow w) =>
-        w._progressHost.IsInline ? w._progressCard.BodyCap
-        : w._creatureHost.IsInline ? w._killsCard.BodyCap
-        : w._lootHost.IsInline ? w._lootCard.BodyCap
-        : w._questsHost.IsInline ? w._questsCard.BodyCap
-        : w._worldHost.IsInline ? w._worldCard.BodyCap
-        : EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight;
+    /// <summary>The cap in force on whichever theme card currently owns a body, AND the two
+    /// inputs it was computed from, or the floor when no card owns one (#250). Only one
+    /// theme is ever inline in the review set, and with none open the floor is the honest
+    /// answer: nothing is being capped.
+    ///
+    /// **The inputs travel with the answer, from one selection.** A test that has only the
+    /// cap can compare it to a constant, and the constant is a claim about the MONITOR —
+    /// the room is clamped to the work area, so a 4000-unit drag on a 1024x768 hosted
+    /// runner correctly yields the floor and "the body grew" cannot be asserted there. With
+    /// room and chrome in the dump, E2E asserts cap == ThemeBodyCap(room, chrome) against
+    /// the control's real MaxHeight, which holds on every screen.</summary>
+    private static (double Cap, double Room, double Chrome) ThemeBodyFactsInForce(MainWindow w) =>
+        w._progressHost.IsInline ? Facts(w, w._progressCard, w.ProgressSection)
+        : w._creatureHost.IsInline ? Facts(w, w._killsCard, w.KillsSection)
+        : w._lootHost.IsInline ? Facts(w, w._lootCard, w.LootSection)
+        : w._questsHost.IsInline ? Facts(w, w._questsCard, w.QuestsSection)
+        : w._worldHost.IsInline ? Facts(w, w._worldCard, w.MiscSection)
+        : (EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight, double.NaN, double.NaN);
+
+    private static (double Cap, double Room, double Chrome) Facts<TTab>(
+        MainWindow w, ThemeCardView<TTab> card, System.Windows.Controls.Expander section)
+        where TTab : struct, Enum =>
+        (card.BodyCap, ThemeBodyCapHost.RoomFor(w),
+         ThemeBodyCapHost.ChromeFor(w, section, card.BodyChrome));
+
+    /// <summary>A dump value is an integer the suite parses, and -1 is its "absent". A
+    /// measurement that has not happened (NaN — never dragged, or a card the layout has not
+    /// reached) is exactly that, so it is spelled -1 rather than "NaN".</summary>
+    private static double Dumpable(double value) => double.IsFinite(value) ? value : -1;
 
     /// <summary>Write the dump when the EXPAND gate is up. Same guard, same file, same
     /// keys as the block always had — the E2E suite's assertions are the contract.</summary>
@@ -36,6 +55,9 @@ internal static class WidgetDump
         {
             try
             {
+                // One selection of the card that owns a body, read once: the cap and the
+                // two inputs it came from have to describe the SAME card.
+                var body = ThemeBodyFactsInForce(w);
                 // Row counts say "a new name appeared"; the snapshot totals say "the
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={w.DamageSourceList.Items.Count} dmgTaken={w.DamageTakenList.Items.Count} " +
@@ -87,7 +109,12 @@ internal static class WidgetDump
                     // WPF layer has no unit tests (docs/TestPlan.md §5), and an absent
                     // control photographs as an unremarkable panel (trap 29), so a
                     // screenshot could never say what number is in force.
-                    $"themeBodyCap={ThemeBodyCapInForce(w):0} " +
+                    $"themeBodyCap={body.Cap:0} " +
+                    // ...and the two numbers it was computed FROM, so a test can assert the
+                    // relationship instead of a constant. -1 means "no measurement": the
+                    // widget was never dragged, or no card owns a body.
+                    $"themeBodyRoom={Dumpable(body.Room):0} " +
+                    $"themeBodyChrome={Dumpable(body.Chrome):0} " +
                     // Its own key rather than a sentinel inside contentHeight: DumpValue
                     // answers -1 for "absent", so a NaN spelled as -1 would be a value the
                     // suite cannot tell from a dump that never mentioned it.
