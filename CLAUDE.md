@@ -1423,6 +1423,41 @@ Read this list before touching the areas it names. Every entry cost a release.
     `finally`). The same trap waits for any `git show`/`git log`/`gh api` output this repo
     reads back and compares, and all of it runs through `pwsh`.
 
+55. **UNFOLDING A CARD DOES NOT UNDO ITS FOLD — the MIGRATION goes on absorbing it, once per
+    launch, forever.** #252 (TiconaX): *"The cards always reset to having 2 cards open even
+    though I have hidden all of them. Gear & loot and + Motes."* Both halves were a fold
+    running long after its fold was over, because something kept handing it a key it believed
+    it still owned. **Motes:** it became a top-level card again on 2026-08-21, and
+    `ProgressSurface.AbsorbedCardKeys` was never told — so `FoldThemeSections` saw a LIVE
+    catalog key in every profile's `SectionOrder`, judged itself stale on every launch, and
+    stripped `motes` out of `HiddenSections` each time. **Gear & Loot:**
+    `ApplyDefaultGearSection` re-created the `gear` key every launch and `MigrateLootSections`
+    absorbed it again every launch — and the re-hide rule (`hidden >= present`) refused to
+    re-hide `loot` because it was counting a `gear` **no player could ever have hidden**, that
+    key having had no row in Options since the fold removed it from the catalog. (`progress`
+    came back too, by the same arithmetic, on anyone who had hidden it.)
+    → **The fold is written to be idempotent and each half genuinely is.** The bug lived in
+    what two migrations did to EACH OTHER across a restart, so nothing testing one migration
+    once could see it — `ProgressSectionFoldTests` has run it twice and asserted silence since
+    the day it was written, and passed throughout. **Now guarded:** the chain is
+    `AppSettings.ApplyMigrations`, a method for exactly one reason — so a test can run *the
+    whole thing* twice. `SectionFoldIdempotenceTests` does, and 14 of its 29 rows fail on the
+    pre-fix tree.
+    → **And the premise check is the one that would have cost nothing: a fold may only name
+    keys that are NO LONGER CARDS.** `OptionsViewModel.AbsorbedTitles` had already dropped
+    Motes and says why in as many words — two hand-maintained lists describing one fold, and
+    only one of them updated. Trap 30's lesson (a staging list is code that cannot be
+    type-checked) with the stale token being a card key; trap 20's (the thing you are looking
+    for is what is *not there*) as to why nothing flagged it. The guard now checks the
+    absorbed lists against `OverlaySections.Catalog` instead of trusting either comment, and
+    it matters right now: Bevel has a live ask to give **Faction** its card back (#251), which
+    is the same change that broke Motes.
+    → **The tell, next time: a migration chain that reports work on every launch.** It meant
+    `Load()` was rewriting `settings.json` on every start of the app — trap 13's loaded gun —
+    and #253 was *the same shape* two releases earlier (a one-time upgrade step not marked
+    one-time, undoing the player each launch). Two in three weeks: when a settings symptom is
+    "my choice does not stick", suspect a migration before you suspect the save.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

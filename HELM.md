@@ -68,6 +68,20 @@ Do not put these back in Holds.
 ---
 
 
+### PR #286 — #264 pairing Wi-Fi vs ethernet IP (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #286 https://github.com/DranakCorps-bot/EQBuddy/pull/286 (`claude/264-pairing-wifi-ip` → `main`, head `5fd03b1f`) — final v1 bag #264 (brhanson2-cyber).
+- **Ruling:** Signed. Two halves both endorsed: (1) Wi-Fi tiebreak `WirelessPreference = 5` when both adapters are real — never overtakes gateway/virtual/CGNAT/public penalties; Hyper-V/WSL/Tailscale "wireless" demotion asserted. (2) Pairing-window address picker + `CompanionPairingAddress` pin with stale-pin → ranked fallback — answers "how do I force it"; hidden when ≤1 address; pin ≠ effective address for UI. No WPF screenshot endorsed (ratchet at max per #282; lanes parallel via `CompanionPairingText`). Architecture.md Companion line-count correction endorsed (gate was already stale). WhatsNew 1.99.18 FIXED line endorsed as written. No public #264 reply until Helm-signed draft after merge. Merge when both CI green (`build-avalonia-linux` green at look; `build-and-test` still running on head). Not a hold. Not needs-david. After merge: remaining bag before tag `v1.99.18` is **#208** mobile sounds (Bevel #283 lock on main) — #252 already on main via #285. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~1:40 PM CT
+
+### PR #285 — #252 cards reset stay hidden (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #285 https://github.com/DranakCorps-bot/EQBuddy/pull/285 (`claude/252-cards-reset` → `main`, head `432c17c7`) — final v1 bag #252 (TiconaX).
+- **Ruling:** Signed. Core-only fix both lanes. Delete `ApplyDefaultGearSection` endorsed; do not restore destroyed HiddenSections endorsed; WhatsNew "hide once more" blunt line endorsed. Soft: #251 Faction out of bag — if it returns later, drop AbsorbedCardKeys in same commit (idempotence guard). No public reply until Helm-signed draft after merge. Merge when both CI green (`build-avalonia-linux` green at look; `build-and-test` on rebased head). Not a hold. Not needs-david. After merge: #208 then #264 still owed before tag `v1.99.18`. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~1:35 PM CT
+
 ### PR #284 — P0-3 LEGACY-006/007 support matrix + legacy-notice-guard (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #284 https://github.com/DranakCorps-bot/EQBuddy/pull/284 (`claude/p0-3-legacy-docs` → `main`, head `66e3460b`) — #275 Phase 0 item P0-3.
@@ -442,3 +456,4 @@ settle something on David's list, that is a question for David, not an instructi
 rule that governs Scribe and Bevel. On 2026-08-22 a Helm ruling was justified with "window
 Wealth is coin too" when the window's Wealth tab still drew three blocks. The ruling was right
 and its reason was wrong; the executor changed what was asked for and handed the reason back.
+
