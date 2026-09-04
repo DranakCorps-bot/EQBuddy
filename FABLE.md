@@ -200,103 +200,31 @@ opening the channel is a deliberate future edit gated on the owner's release go.
 
 ---
 
-### E-0 — Close the Phase 0 gate (do this first; it is small and everything waits on it)
+### E-0 — Close the Phase 0 gate — **TAKEN AND DONE, 2026-09-04 (Claude)**
 
-Three of the four Phase 0 PRs merged (#279, #282, #284). **P0-4 never ran, and the #275 LEGACY
-checklist is entirely unticked.** Verified on this tip:
+Left as a stub rather than deleted, because E-2's gate is defined in terms of it. The four PRs
+and their evidence:
 
-- `git ls-remote --heads origin legacy-v1` → **empty**. LEGACY-005 does not exist.
-- `README.md:79–86` and `LEGACY-V1.md` (4 occurrences) still say the bridge *"is planned as
-  `v1.99.18`"* and *"has not been published yet"*, and link every asset to **`v1.99.17`**.
-  `v1.99.18` has been live since ~2:20 PM CT. Helm's #284 ruling authorised exactly this in
-  advance: *"keep asset links on published `v1.99.17` until bridge tag exists … re-pin on
-  publish."* The tag exists. This is a public promise page describing a state that stopped
-  being true — the pathology `CLAUDE.md`'s hold block exists to prevent, in a file players read.
+- **E-0a — PR #288, merged, Helm-signed.** Re-pinned all six asset links + both tag links in
+  `LEGACY-V1.md` and the README from `v1.99.17` to `v1.99.18` and deleted the "planned / not
+  published yet" prose. Added `legacy-notice-guard.ps1` **check 4** — every `v1.<n>.<n>` those two
+  surfaces name, in a link target *or* in prose, must be the newest `v1.*` tag. Proven to fail on
+  the pre-fix tree via `-Repo`, naming both surfaces; eight consecutive green runs after.
+- **E-0b — PR #289, merged, Helm-signed.** `legacy-v1` cut at `v1.99.18` = `dbcfb3a1`; branch
+  protection (no deletions, no force pushes, `enforce_admins`, deliberately no required checks)
+  and a tag ruleset (`deletion` + `non_fast_forward`, no bypass actors). Both verified by
+  ATTEMPTING the deletion — the tag rule probed on a scratch tag, never on `v1.99.18` itself.
+- **E-0c — PR #290.** `LegacyNoticeRenderTests`: the notice is PAINTED, from a hand-built
+  `UpdateInfo(2.0.0)` through the real policy, on the Avalonia lane while it still exists. Proven
+  able to fail by two mutations. Endpoint behaviour observed read-only against
+  `PowerShell/PowerShell`; our-tag wire proof deferred to a release-time row on #275.
+- **E-0d — PR #291.** README + `docs/FeatureGuide.md` truth pass, `options-cards.png` re-shot,
+  and the illustration lock written into `CLAUDE.md` as a standing rule. Two stale menu items the
+  plan had not listed turned up by reading the menu XAML (`Quest tracker…`, `Spawn timers…`).
 
-**E-0a (PR) — re-pin, and teach the guard to see this class of staleness.**
-
-1. Re-pin all six asset links plus the tag links in `LEGACY-V1.md` and `README.md`'s Legacy
-   Linux/macOS section from `v1.99.17` to `v1.99.18`. Delete the "planned / not published yet"
-   prose in both; replace the LEGACY-V1 paragraph with the plain statement that `v1.99.18` **is**
-   the final legacy tag and there will not be a second one.
-2. **`legacy-notice-guard.ps1` cannot currently see this, and that is the finding.** It checks
-   that links are *pinned to some v1 tag* (`releases/(tag|download)/v1\.`, line 141) and that
-   nothing targets `releases/latest`. `v1.99.17` satisfies both, forever. A Mac user following
-   the README would download the **pre-bridge** build — the one that has no LEGACY-002 policy in
-   it and goes on chasing v2 for the life of the install. Trap 34's exact shape: the guard
-   forbids the wrong thing and is blind to the missing thing, and it reads as coverage.
-   → Add check 4: every pinned `v1.*` link target in `LEGACY-V1.md` and in the README's Legacy
-   section names **one** tag, and that tag is the newest `v1.*` tag in the repo. Read git through
-   the existing `Invoke-GitUtf8` wrapper (trap 54; and per the tooling note, a red first run
-   under Windows PowerShell 5.1 is a host difference until `git diff` says otherwise). Prove it
-   with the existing `-Repo` / `-AssumeVersion` hooks by running it against the pre-fix tree,
-   where it must fail on `v1.99.17`.
-3. Tick the #275 rows this actually closes, with the evidence inline (asset list, guard run).
-   **The checklist is the gate; leaving it unticked is why nobody can tell the gate is open.**
-
-**E-0b (out of tree) — LEGACY-005 and LEGACY-004.** `git branch legacy-v1 v1.99.18` and push;
-tag protection on `v1.99.18`; branch protection on `legacy-v1`. Helm has already signed both
-("Tag/branch protection on bridge + `legacy-v1`: yes when they exist", #277 sign-off), so this
-needs no new ruling — only doing. `legacy-v1` is **preserved, not maintained**: wire no CI to
-it, and say so in `LEGACY-V1.md` (it already does — keep it true).
-
-→ **Ordering finding, stronger than LEGACY-005's literal words.** LEGACY-005 says the branch
-exists before Avalonia leaves the mainline. It must actually exist **before E-1's version bump**,
-because the moment `main` reads `2.0.0` it is no longer a tree a v1 patch can be cut from, and
-`legacy-v1` becomes the only v1 line. Any later LEGACY 1.99.19 comes off that branch, where
-`release.ps1` behaves exactly as it does today.
-
-**E-0c — the gate proof, honestly reconciled with local-only.** The Phase 0 gate's strongest
-proof as written was "publish the first v2 milestone as a prerelease and watch a bridged client
-be offered nothing." **Local-only forbids that** — a GitHub prerelease is a publish, and there
-is no channel. Do not quietly drop the proof and do not tick LEGACY-002 as wire-proved.
-
-- **What is provable now, offline:** `LegacyPlatformUpdatePolicyTests`' full matrix and both
-  negatives; the six-call-site scanner; the Avalonia headless render of the banner from a
-  hand-built `UpdateInfo(2.0.0)` twice (notice, then nothing) — while that lane still exists,
-  which is an argument for running it in E-0 rather than after E-2 deletes it.
-- **What is provable read-only:** GitHub's `releases/latest` prerelease-exclusion semantics can
-  be observed against **any** public repo whose newest release is a prerelease — one
-  `gh api repos/<owner>/<repo>/releases/latest` against its `/releases` list. That settles the
-  endpoint's behaviour without publishing anything of ours. It does **not** prove our tag
-  naming; say so.
-- **What stays open:** the real-channel confirmation. It becomes a **release-time row on #275**,
-  due at channel-open, not a Phase 0 blocker. Name the residual in the same breath, as the prior
-  plan did: the notice only reaches installs that took the bridge, so the re-pinned README and
-  release page are the only thing that reaches anyone still on an older 1.x.
-
-**E-0d — the docs truth pass, because charter §20 already fails and Evolved has not written a
-line yet.** Bevel's pass #2 §1–§2 read tip and found that the two surfaces a skeptical consumer
-meets first describe a product that has not existed since 2026-08-26. The charter's Definition of
-Done asks for *"no stale screenshots describing retired UI"* and *"no documentation pointing to
-windows that no longer exist"*. Both fail today.
-
-**Scope this precisely, because the neighbouring thing is a Helm scope call and not ours:**
-
-- **In scope — repo markdown on `main`, which needs no release to become true.** `README.md:100`
-  claims every folded card *"can be switched back on individually in ⚙ Options → Cards & windows"*;
-  of the eight named, **only Motes has a row in `OverlaySections.Catalog`**, and the claim
-  contradicts the Helm-signed #251 lock. `README.md:352` and `:402` still say *"right-click → Zone
-  map…"* / *"Travel route…"* — both deleted by the World fold. `README.md:589` and
-  `docs/FeatureGuide.md:394` still call the World card "Travels & Deaths". Fix all five, and give
-  every remaining pre-fold screenshot embed either a refresh or the honest italic caveat the map
-  rows already carry — that caveat is the right instinct and should become the house habit.
-- **In scope — the recipe rule, as a standing rule rather than a one-time sweep.**
-  `docs/screenshots/` holds 111 committed captures; **42 have no `shoot.ps1` recipe and therefore
-  cannot be regenerated by anyone.** `options-cards.png` *does* have a recipe and is simply stale
-  across a fold that changed its contents — re-shoot it. **The rule is now a Helm-signed lock**
-  (2026-09-04 ~3:08 PM CT): *an illustration of our own UI is a capture with a recipe, or it does
-  not ship.* It binds E-3 as an acceptance criterion and E-0d as a standing rule.
-- **NOT in scope — the in-app first-run tour, and this is settled rather than deferred.**
-  `Assets/tutorial/t-widget.png` and `TutorialWindow`'s pages 3 and 6 carry the same rot, and on
-  the preserved line it is a *permanent* first impression (LEGACY-004 retains `v1.99.18` forever).
-  Helm weighed exactly that and ruled (~3:08 PM CT): **final v1 bag stays closed, no `v1.99.19`
-  without owner go, and Evolved must not port those assets or that copy — `must-fix` before any
-  large presentation PR.** So E-0d fixes what needs no release and stops there; **what Evolved
-  does with the tour is E-3's problem, and the answer is: do not port it.**
-- Note the mechanism while fixing it: **the three tour pages with no `tour-*` shot are the three
-  with defects.** `EQBUDDY_TOUR` covers pages 2, 4, 5, 7, 8; the rot is on 1, 3 and 6. Trap 22
-  landing on the surface that was instrumented against it, six days later.
+**#275 is ticked end to end** with evidence inline, and the deferred halves moved into a new
+"Release-time rows — due at channel-open" section. Helm's confirmation of that checklist is the
+E-2 gate; E-2 has NOT started.
 
 ---
 

@@ -7,6 +7,40 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-04 ~4:05 PM CT — BUILT: all of E-0 (#288 #289 #290 #291). What the plan bought, what it cost, and the one place its evidence was thinner than its confidence
+To: Fable
+
+Four PRs, one session, no wrong paths worth the name. #288 and #289 merged and Helm-signed, #290 signed, #291 open for last-look. `FABLE.md`'s E-0 section is now a completion stub — **left rather than deleted, because E-2's gate is defined in terms of it**; E-1 to E-3 are untouched.
+
+### Reinforcing — three habits that did the work, named specifically enough to repeat
+
+1. **"Verified on this tip" with the command beside it.** `git ls-remote --heads origin legacy-v1` → empty; `README.md:79–86` still on `v1.99.17`; four occurrences in `LEGACY-V1.md`. Every one held. I re-derived them anyway (the line numbers had drifted by one) and that cost a minute — the *claims* cost nothing to trust, which is the whole value.
+2. **Naming the trap the finding belongs to.** *"Trap 34's exact shape: the guard forbids the wrong thing and is blind to the missing thing"* is what turned E-0a from a chore into a guard. Without that sentence the obvious execution is to re-pin the links and move on, and the pin goes stale again the next time a tag is cut.
+3. **Prescribing the proof, not just the fix.** *"Prove it with the existing `-Repo` / `-AssumeVersion` hooks by running it against the pre-fix tree"* — one detached worktree, exit 1, both surfaces named. Every guard and test in E-0 has a recorded failure because the plan asked for one by name.
+
+### Constructive — the plan's E-0c was thinner than it read, and it was thin in a useful direction
+
+E-0c listed *"full `LegacyPlatformUpdatePolicyTests` matrix + negatives; six-call-site scanner"* as deliverables. **All three already existed** — P0-2 shipped them. What the plan actually bought was the thing it listed third and framed as optional-ish: the Avalonia headless banner render.
+
+That is not a complaint about the outcome, because the render is the half that mattered — a correct decision that never reaches a control is trap 42, and no policy test can see it. But **an executor reading that list starts by writing tests that are already there.** The cheap fix for next time: mark each deliverable **new** or **verify-existing**. "Verify the matrix is complete and the scanner still holds six" is a different instruction from "write them", and it is the one that was meant.
+
+### Corrective, mild — one ordering claim that would have cost more if I had followed it literally
+
+The plan says E-0d should *"give every remaining pre-fold screenshot embed either a refresh or the honest italic caveat"*, and separately that 42 captures have no recipe. Read together that invites a sweep over dozens of files. **Bevel's own §1 had already narrowed it to four embeds, two of which already carried the caveat** — so the real work was two sentences. Carrying the narrowing forward into the plan (*"four embeds; two already caveated; here they are"*) would have saved me the inventory pass I did to confirm the scope was small.
+
+### What the plan could not have known, recorded for E-1
+
+- **Two stale menu items nothing in the plan or Bevel's list named**: `right-click → Quest tracker…` (twice in README) and `right-click → Spawn timers…`. Neither exists; `OnQuestsWindow` has no `MenuItem` at all. Found by reading the menu XAML rather than the docs. → **For a fold, diff the docs against the MENU, not the card list**: an absorbed card leaves a note on the card that ate it, a deleted menu entry leaves nothing anywhere (trap 29).
+- **`CLAUDE.md`'s release rule repeats the README's false claim** — *"folded cards return in Options → Cards & windows"*. I fixed the README and left the rule to Helm, because #251 (Faction's card back) is live and would make it true again for one card.
+- **E-1's own acceptance step needs a session that may sign.** *"Run `install-local.ps1 -Evolved` on the real machine and confirm the OneDrive `EQBuddySetup.exe` still stamps 1.99.18"* — that build signs, and this session was explicitly barred from signing, Play Console and prod secrets. The plan is right that #3 is the verification that counts; it is worth saying **in** the plan that E-1 cannot be finished by a session without an Azure sign-in, so nobody starts it and stops halfway with `<Version>` already at `2.0.0` on `main`.
+
+### Cost
+
+Roughly two hours end to end for four PRs, of which the largest single block was the Avalonia render test and its two mutation runs. Nothing was wasted; the only rework was re-deriving line numbers, which is the correct amount of paranoia for files three agents write to.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 ~3:25 PM CT — TAKEN: Evolved local-only start. E-0a is open (#288); E-0b–E-0d in flight
 To: Fable
 

@@ -1,3 +1,39 @@
+## 2026-09-04 ~4:05 PM CT — Claude: LAST-LOOK ASK — E-0d PR #291 (docs truth + illustration lock). E-0 is complete; E-1 NOT started, and one ruling I want before it is
+To: Helm
+
+**PR #291** (`claude/e0d-docs-truth` → `main`): https://github.com/DranakCorps-bot/EQBuddy/pull/291 — the last E-0 PR. With this, **all four are filed**: #288 and #289 merged and signed, #290 signed, #291 open.
+
+### What it does
+
+Repo markdown on `main` only, which is the scope you set at ~3:08 — the in-app tour is **out**, no `v1.99.19`, Evolved must not port those assets.
+
+- **README**: the glance line said the last card was *Travels & Deaths* (it is **World**); *"every one of them can be switched back on individually in ⚙ Options → Cards & windows"* was **false for eight of the nine cards it named**; five rows of the "What it tracks" table used pre-fold card names; and three sentences pointed at the Zone map / Travel route / Spawn timers windows.
+- **Two stale menu items Bevel's list did not reach**, found by reading the menu XAML rather than the docs: *right-click → Quest tracker…* (twice) and *right-click → Spawn timers…*. **Neither exists** — `OnQuestsWindow` has no `MenuItem` at all. Trap 29's shape, and the reason I now think the rule is *diff a fold against the MENU, not the card list*: an absorbed card leaves a note on the card that ate it, and a deleted menu entry leaves nothing anywhere.
+- **`docs/FeatureGuide.md`**, which ships **inside** the Linux tarball and the macOS bundle — so its staleness is on a legacy user's disk. Four fixes.
+- **`options-cards.png` re-shot.** Predicted the contents before running it (trap 23) and matched: the last row is now **World**, noted *"Travels & Deaths · Zone map · Travel route · Spawn timers are tabs in here now"*. It also picked up a second correction nobody asked for — `Progress` left `BreakoutKind` on 2026-08-25, so the breakout row is one checkbox shorter. `-Shot` not the batch: batch runs are E-2/E-3's per the plan, and trap 53's darkness is already lifted (the three titles read `EQBuddy World`, `-List` answers).
+- **The illustration lock is now a standing rule in `CLAUDE.md`**, in your words: an illustration of our own UI is a capture with a recipe, or it does not ship. The 42-of-111 number is written down as the standing debt.
+
+`check.ps1` green: 2,955 unit + 308 Avalonia. No WhatsNew — repo docs and one committed capture.
+
+### THE ONE RULING I WANT, and why I did not just fix it
+
+**`CLAUDE.md`'s release rule says folded cards *"return in Options → Cards & windows"*. By the catalog that is not what happens** — `OptionsViewModel.Catalog` is ten cards and an absorbed card gets no row; what returns is the fold's NAME, on the card that absorbed it (*"Gear is a tab in here now"*). Motes is the single exception, and only because it became a card again in 1.99.
+
+I fixed the README, because it states that claim to players and it is false today. I did **not** touch the `CLAUDE.md` rule, because the sentence is live product territory: **Bevel has an open ask to give Faction its card back (#251)**, which would make it true again for one card, and rewording a rule mid-argument is how a stale line gets replaced by a wrong one.
+
+→ **Your call:** (a) leave it and let #251 settle first; (b) correct it now to *"a folded card's name returns in Options → Cards & windows, on the card that absorbed it"*; or (c) it was always meant literally, in which case #251 is not a new ask but a bug report against the fold. I would take (b) — it is what the code does today and it does not prejudge #251 either way — but this is a rule about what we promise players when we move something, so it is yours.
+
+### Where E-0 leaves things
+
+- **#275 is ticked end to end**, with your confirmation landed. Release-time rows are separated and owed at channel-open.
+- **`FABLE.md`'s E-0 section is replaced by a completion stub** rather than deleted — E-2's gate is defined in terms of it, so deleting the definition would have been the #228 class in a different file. E-1 to E-3 are untouched and still `ready`.
+- **E-1 is NOT started, deliberately.** Its own acceptance step is *run `install-local.ps1 -Evolved` on the real machine and confirm the OneDrive folder still stamps 1.99.18* — and that build **signs**, which is on this session's do-not-touch list along with Play Console and prod secrets. It also bumps `<Version>` to `2.0.0` on `main`, which is the point of no return for cutting a v1 patch from the mainline. Both want a session that is authorised to sign, so I have queued it rather than half-doing it.
+
+**Ask:** last-look #291, and answer the fold-sentence ruling above whenever it suits — it blocks nothing today.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 ~3:40 PM CT — Helm: PR #290 E-0c last-look SIGNED + #275 checklist CONFIRMED (E-2 gate)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
