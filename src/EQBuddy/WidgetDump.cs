@@ -109,6 +109,14 @@ internal static class WidgetDump
                     // WPF layer has no unit tests (docs/TestPlan.md §5), and an absent
                     // control photographs as an unremarkable panel (trap 29), so a
                     // screenshot could never say what number is in force.
+                    // Has the startup replay FINISHED? The watcher's own answer, which is
+                    // the only honest one: every test samples a baseline and waits for
+                    // baseline + 1, and a counter still climbing through the fixture sails
+                    // past the expected value between two polls. Quiet is not the same as
+                    // done — a slow machine pauses mid-ingest, and the two hosted-runner
+                    // flakes this key exists for both read as "settled" to a harness that
+                    // was watching for stillness instead of asking.
+                    $"ingestDone={(w._watcher.InitialIngestDone ? 1 : 0)} " +
                     $"themeBodyCap={body.Cap:0} " +
                     // ...and the two numbers it was computed FROM, so a test can assert the
                     // relationship instead of a constant. -1 means "no measurement": the

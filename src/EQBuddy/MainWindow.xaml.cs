@@ -24,7 +24,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // Attached at construction (not in SessionStats itself) so tests never touch disk.
     private void AttachSpellStore() =>
         _stats.Spells.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "spell-categories.json"));
-    private readonly LogWatcher _watcher;
+    // internal, not private: WidgetDump reads InitialIngestDone off it for the
+    // EQBUDDY_EXPAND dump, the same way it reads the rest of this window's state.
+    internal readonly LogWatcher _watcher;
     private readonly SessionRepository _repo = new(SessionRepository.DefaultDbPath);
     private readonly SessionArchiver _archiver;
     private DateTime _lastCheckpoint = DateTime.MinValue;

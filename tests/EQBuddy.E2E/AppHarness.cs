@@ -15,8 +15,12 @@ namespace EQBuddy.E2E;
 /// </summary>
 internal sealed class AppHarness : IDisposable
 {
-    private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(90);
-    private static readonly TimeSpan AssertTimeout = TimeSpan.FromSeconds(45);
+    private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(180);
+    // 45 s on a dev machine was never close to tight; a `windows-latest` runner is two
+    // slow cores rendering a whole widget per tick, and the suite runs on every push as of
+    // 2026-09-04. A timeout is patience, not a claim — the assertions are unchanged, and
+    // a genuine failure still reports in the same second it would have before.
+    private static readonly TimeSpan AssertTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan ExitTimeout = TimeSpan.FromSeconds(30);
 
     private readonly string _root;
@@ -170,54 +174,47 @@ internal sealed class AppHarness : IDisposable
         WaitForReplayToSettle();
     }
 
-    /// <summary>How long the ingest totals must hold still before a baseline sampled off
-    /// them can be trusted. The app rewrites the dump once per UI tick (1 s), so this is
-    /// two ticks of quiet — long enough that a chunk still being tailed shows up, short
-    /// enough that it costs the suite seconds rather than minutes.</summary>
-    private static readonly TimeSpan ReplaySettle = TimeSpan.FromSeconds(2.2);
+    /// <summary>How long to allow for the app to write ONE more dump. The UI tick is a
+    /// second; this is generous because a hosted runner is two slow cores and the tick has
+    /// a whole widget to render.</summary>
+    private static readonly TimeSpan ReplaySettle = TimeSpan.FromSeconds(20);
 
-    /// <summary>Ticking keys — the two the app increments on a clock rather than on an
-    /// event. Everything else in the dump is a count, a flag or a measurement, so it holds
-    /// still the moment the ingest does.</summary>
-    private static readonly string[] TickingKeys = ["companionPumpTicks", "companionPushes"];
-
-    /// <summary>Waits until the WHOLE dump stops changing, ticking keys aside.
+    /// <summary>
+    /// Waits until the app SAYS the startup replay is finished — `LogWatcher
+    /// .InitialIngestDone`, reported as `ingestDone` in the dump — and then for one more
+    /// tick, so the surfaces have drawn what was ingested.
     ///
-    /// **Watching two totals was not enough, and the way it failed is the argument for
-    /// watching all of them.** The first version waited on `killsTotal` and `lootTotal`;
-    /// `TheWealthTabDrawsBothCardsItAbsorbed` then failed on a hosted runner waiting for
-    /// `progressMoneySold` to reach 24 with 10 seen — the fixture's trailing sale lines
-    /// were still arriving after the last kill and the last loot. Any per-surface list
-    /// picked here would have the same hole for whichever surface is not on it, so the
-    /// list to check is "everything the app is reporting".</summary>
+    /// **Two earlier versions inferred this from stillness and both were wrong on a slow
+    /// machine.** Watching `killsTotal` + `lootTotal` missed the fixture's trailing sale
+    /// lines (`TheWealthTabDrawsBothCardsItAbsorbed`: "progressMoneySold to reach 24; last
+    /// seen 10"). Watching the WHOLE dump missed the fact that a mid-ingest pause looks
+    /// exactly like a finished one: on a hosted runner, four of eight runs still failed —
+    /// two of them at "killsTotal to reach 83; last seen 82", where the baseline had been
+    /// taken during a lull and the appended line was queued behind the rest of the fixture.
+    ///
+    /// **Quiet is not done, and the watcher already knew the difference.** Asking it is one
+    /// dump key; guessing cost three rounds and eight runner-minutes each. Ship the
+    /// instrument before the third theory (trap 33's closing line, earning itself again).
+    /// </summary>
     private void WaitForReplayToSettle()
     {
-        var last = "";
-        var stableSince = DateTime.UtcNow;
-        Wait.Until(() =>
-        {
-            var now = SteadyDump();
-            if (now.Length == 0 || now != last)
-            {
-                (last, stableSince) = (now, DateTime.UtcNow);
-                return false;
-            }
-            return DateTime.UtcNow - stableSince >= ReplaySettle;
-        }, LaunchTimeout, "the fixture replay to stop moving (every dump value except " +
-            $"{string.Join(" and ", TickingKeys)} unchanged for {ReplaySettle.TotalSeconds:0.#}s) " +
-            "before any test samples a baseline", Artifacts);
+        Wait.Until(() => DumpValue("ingestDone") == 1, LaunchTimeout,
+            "the startup replay to FINISH (debug.txt ingestDone=1) before any test samples " +
+            "a baseline — the app's own answer, not a guess from stillness", Artifacts);
+
+        // One more WRITE of the dump, so what a test reads next was measured with the
+        // ingest already finished. The file's timestamp rather than its content: an idle
+        // app rewrites the same numbers every tick, so "the content changed" would wait
+        // for something that never happens.
+        var written = LastDumpWrite();
+        Wait.Until(() => LastDumpWrite() > written, ReplaySettle,
+            "one more dump to be written after the ingest finished", Artifacts);
     }
 
-    /// <summary>The dump with the ticking keys dropped, or "" while it is missing or
-    /// mid-write — which is never "settled", so the caller keeps waiting.</summary>
-    private string SteadyDump()
+    private DateTime LastDumpWrite()
     {
-        try
-        {
-            return string.Join(' ', File.ReadAllText(DebugDumpPath).Split(' ')
-                .Where(pair => !TickingKeys.Any(k => pair.StartsWith(k + "=", StringComparison.Ordinal))));
-        }
-        catch (IOException) { return ""; }
+        try { return File.GetLastWriteTimeUtc(DebugDumpPath); }
+        catch (IOException) { return DateTime.MinValue; }
     }
 
     /// <summary>
