@@ -20,6 +20,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT; evidence line in).
 - **Place:** XP-event parsing — `XpRx` in `src/EQBuddy.Core/LogParser.cs`. Player session, not shared game truth / eqlwiki. Downstream: Progress surface / XP% tracking that consumes `XpEvent`. Not a catalog / quest-data item, so the wiki-first rule is not the fix surface here. Not #264, not #262, not #261, not #208. Do not fold.
 - **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. Footer: EQBuddy 1.99.17 — Windows 26200. (Newer client tag than the Aug 30–Sep 2 batch, which were on 1.99.16.)
+- **Replied:** 2026-09-04 ~9:55 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18291269
 - **Replied:** 2026-09-04 ~9:05 AM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18290485
 - **Ask (verbatim, the whole entry):** "The bonus exp weekend has modified the xp message and eqbuddy is not registering any exp today." Single-sentence body plus client footer; that is everything the reporter wrote.
 - **Already shipped (current main):** `XpRx` is `^You gain (?<party>party )?experience!(?: \((?<pct>[\d.]+)%\))?$` with a commented sample `You gain party experience! (0.019%)  |  You gain experience! (0.5%)`. Strict `^...$` match — any other wording, or extra data on the line, is missed. No bonus-xp variant regex was grepped in `LogParser.cs`.
