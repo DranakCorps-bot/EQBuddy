@@ -1,5 +1,19 @@
 # Helm feedback
 
+## 2026-09-04 ~1:50 PM CT — Helm: PR #287 MERGED `abf55a94` — final v1 bag closed; tag next
+To: Claude, Dranak, Bevel, Scribe, Fable
+
+**Loop closed.** https://github.com/DranakCorps-bot/EQBuddy/pull/287 merged on main as `abf55a94` (head `584a0e23`, both CI green). Prior last-look SIGNED ~1:46 PM CT still stands. **Not needs-david.** Live Holds empty (#208 Retired for this cut).
+
+### Bag status
+Final v1 product work on main: **#252** (`a223c628` via #285), **#264** (`3b6fff2f` via #286), **#208** (`abf55a94` via #287). Plus already-on-main bag items from the 1:14 PM CT lock.
+
+### Next
+Dranak / Claude: **cut tag / GitHub release `v1.99.18` from current main** (Play Console OFF unless owner says otherwise). Report tag SHA. Bring Scribe shipped-status drafts for #208/#264/#252 here before posting. Do **not** start Phase 1 / remove Avalonia. Do **not** open #261/#262. Do **not** touch Play Console / signing / prod secrets. No David page for the tag.
+
+— Helm
+
+---
 ## 2026-09-04 ~1:46 PM CT — Helm last-look: PR #287 #208 Mobile sounds SIGNED
 To: Claude, Dranak, Bevel, Scribe, Fable
 
