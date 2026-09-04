@@ -16,8 +16,14 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### mobile pairing link uses ethernet IP, not Wi-Fi
+- **Priority:** **FIXED-shipped 2026-09-04** in `v1.99.18` (PR #286 `3b6fff2f`; tag `dbcfb3a1`). Wi-Fi tiebreak + pairing address picker. Item was taken/deleted at build; re-noted here for the shipped-status loop only.
+- **Source:** #264 brhanson2-cyber. https://github.com/DranakCorps-bot/EQBuddy/discussions/264
+- **Ask:** pairing QR used ethernet IP; wanted to force Wi-Fi.
+- **Replied:** 2026-09-04 ~2:23 PM CT Helm-signed shipped-status (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/264#discussioncomment-18294975 — prefers Wi-Fi and you can pick; in the latest release (`v1.99.18`).
+
 ### bonus XP weekend line not parsed (with a bonus)
-- **Priority:** FIXED 2026-09-04 (Claude). Must-fix while live: XP hits stopped registering during the bonus weekend. On main via PR #274 (`XpRx`); not in a tagged release yet (latest public tag still v1.99.17).
+- **Priority:** **FIXED-shipped 2026-09-04** in `v1.99.18` (tag `dbcfb3a1`). On main via PR #274 (`XpRx`); public tag/release cut. Loop closed on the thread with Helm-signed shipped-status.
 - **Place:** log XP parse / Experience session rates. Player session. Not shared game truth / eqlwiki. Not a group meter. Not #208 mobile sounds. Not #264 pairing (same reporter, different ask — do not fold).
 - **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. Footer: EQBuddy 1.99.17 · Windows 26200.
 - **Ask:** "The bonus exp weekend has modified the xp message and eqbuddy is not registering any exp today."
@@ -25,7 +31,8 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Off-topic follow-up (own line, not thread colour):** after the second thank-you, reporter: "Awesome response on your side. Have a great long weekend!"
 - **Already shipped:** origin `main` `LogParser` XpRx is now `^You gain (?<party>party )?experience(?: \(with a bonus\))?!(?: \((?<pct>[\d.]+)%\))?$` (PR #274 https://github.com/DranakCorps-bot/EQBuddy/pull/274 merged 2026-09-04T15:07:40Z). Local WC may still show the old regex until pull — quote origin, not stale WC.
 - **Checked:** DISCUSSION body + nested log paste. ORIGIN main LogParser XpRx (via contents API). Not checked against a live bonus-weekend session after the merge.
-- **Replied:** 2026-09-04 ~9:03 AM CT (capture thank-you, asked for a paste) and ~9:55 AM CT (thanks for the exact line) — both DranakCorps-bot on #273. No further public reply this run.
+- **Replied:** 2026-09-04 ~9:03 AM CT (capture thank-you, asked for a paste) and ~9:55 AM CT (thanks for the exact line) — both DranakCorps-bot on #273.
+- **Replied:** 2026-09-04 ~2:23 PM CT Helm-signed shipped-status (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/273#discussioncomment-18294977 — "You gain experience (with a bonus)!" counted again; in the latest release (`v1.99.18`).
 - **Class:** V0-V1 (one regex). Do not write FABLE.md.
 - **Scribe 2026-09-04 1:16 PM CT:** Mid-window miss — opened after 5 AM catch-up; Claude already fixed before this 1 PM run. Backfill only so SCRIBE matches evidence. No new thank-you. #208 untouched by this item.
 
@@ -92,7 +99,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
   > Hi ebaboyy — thanks for sending this in. The debuff + hot-ready idea, and the GINA reference, are a really helpful way to point us at what you're picturing, and it's exactly the kind of thing the tracker is for. I've captured it and sent it along for review. It's now in the team's queue — I can't promise timelines or a fixed date on my end, but it's logged and in front of us. Thanks again for the note.
 
 ### cards reset to Gear & loot + Motes
-- **Priority:** waiting (not authorized)
+- **Priority:** **FIXED-shipped 2026-09-04** in `v1.99.18` (PR #285 `a223c628`; tag `dbcfb3a1`). Hidden cards stay hidden. Loop closed with Helm-signed shipped-status.
 - **Place:** widget card visibility / Options Cards & windows. Player session. Not shared wiki. Nearby #250 motes scroll; #227/#228 motes card restore — same theme area, not the same report (reset-after-hide vs stretch/scroll). Do not fold. #208 mobile sounds — not this (reporter wants existing mez alerts + DPS, not new mobile sound work).
 - **Source:** #252 TiconaX Aug 29/30 night CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/252 New thread. Category: as filed. 0 replies. Footer: EQBuddy 1.99.15 · Windows 26200.
 - **Ask:** "The cards always reset to having 2 cards open even though I have hidden all of them. Gear & loot and + Motes. I just need the DPS and sound alerts for mez dropping."
@@ -100,6 +107,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Checked:** GitHub discussion body via harvest. Not grepped settings keys this pass.
 - **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228/#250. #208 untouched.
 - **Replied:** https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18207017
+- **Replied:** 2026-09-04 ~2:23 PM CT Helm-signed shipped-status (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18294976 — cards you have hidden now stay hidden; in the latest release (`v1.99.18`).
 
 ### Show watch chips re-enables on every launch
 - **Priority:** must-fix (authorized V0–V1)
@@ -786,15 +794,16 @@ stops two voices on one account, and it is the half that worked.
 - **Where it might live:** existing eqlwiki item-lookup popup, if it already searches by name — then this is surfacing, not a second search. Hypothesis.
 
 ### Chips and alerts ignore the parked monitor
-- **Priority:** waiting. Helm hold Aug 21, 6:19 PM CT: do not open #208. Not a must. No new sprint.
-- **David's ruling, 2026-08-22 (in session):** EQBuddy Mobile making sound is **opt-in, off by default** -- "I don't need to mandate that for everyone." The design decision is made; the work is not started (hold stands). When it is built: an explicit enable tap on the page (browser autoplay rules), defaulting off, and the desktop's own alerts untouched.
+- **Priority:** **FIXED-shipped 2026-09-04** for the Mobile-sounds half in `v1.99.18` (PR #287 `abf55a94`; tag `dbcfb3a1`; Bevel lock via #283). Options → Behavior → Mobile sounds, default Off. Cosmic/Wayland parked-monitor chip placement is still compositor-limited (not claimed fixed). Hold lifted for this cut only; now Retired.
+- **David's ruling, 2026-08-22 (in session):** EQBuddy Mobile making sound is **opt-in, off by default** -- "I don't need to mandate that for everyone." Built that way for `v1.99.18`.
 - **Place:** Avalonia chip/alert restore vs Wayland compositor placement. Not overlay-over-fullscreen.
 - **Source:** #208 sbaum23 (opened Aug 17) + follow-up Aug 18, 7:37 PM CT. Old thread — did not reply.
 - **Ask:** Widget is on the non-EQ monitor. Chips and alerts still appear on the EQ monitor after he saves positions in Options, and that minimizes EQ.
 - **New evidence (follow-up):** PopOS Cosmic / Wayland. `settings.json` DID write second-monitor coords (`AlertLeft` 3753 / `AlertTop` 228; `MezChipsLeft` 3131 / `MezChipsTop` 88 / `MezChipsBottom` 291; first monitor 2560×1440). Screenshot: Options lives on monitor 2; after close, a mez chip appears on EQ's main monitor (behind EQ, not at the dragged location). Extra: if nothing else is on the EQ screen, chips overlay EQ, FPS tanks, game loses focus until click; if another window is behind EQ, the EQ window disappears when chips show. Also asked that EQBuddy not fight to be the top window when parked on the second screen.
 - **Already shipped:** he can move and save positions; the write path is no longer the missing fact.
-- **Follow-up Aug 20, 6:54 PM CT:** sbaum23 on cosmic-comp: new windows spawn at the cursor; ConfigureRequest is ignored once showing. Chips/alerts are recreated, so they land on the EQ screen (where the mouse is). Keep-open option worked for him but felt clunky. Prefers Mobile on the second screen; wants desktop chips/alerts off while Mobile keeps them, including alert sounds in the browser. EQBuddy Mobile on Linux worked. Did not reply (old thread; Claude is in it).
-- **Where it might live:** hypothesis — Wayland compositor ignores requested chip/alert coordinates (Claude already said this if the settings wrote). Do not assert Avalonia source without a quote.
+- **Follow-up Aug 20, 6:54 PM CT:** sbaum23 on cosmic-comp: new windows spawn at the cursor; ConfigureRequest is ignored once showing. Chips/alerts are recreated, so they land on the EQ screen (where the mouse is). Keep-open option worked for him but felt clunky. Prefers Mobile on the second screen; wants desktop chips/alerts off while Mobile keeps them, including alert sounds in the browser. EQBuddy Mobile on Linux worked.
+- **Replied:** 2026-09-04 ~2:23 PM CT Helm-signed shipped-status (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/208#discussioncomment-18294973 — Mobile can play a sound when an alert fires; off until Options → Behavior → Mobile sounds; in the latest release (`v1.99.18`).
+- **Where it might live:** hypothesis — Wayland compositor ignores requested chip/alert coordinates (Claude already said this if the settings wrote). Do not assert Avalonia source without a quote. Mobile-sounds half shipped; placement half remains compositor.
 
 ### Custom alert volume is still contested
 - **Priority:** waiting (need a fact, not a fix)
