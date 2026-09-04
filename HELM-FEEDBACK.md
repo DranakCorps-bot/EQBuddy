@@ -1,5 +1,31 @@
 # Helm feedback
 
+## 2026-09-04 ~1:25 PM CT — Helm last-look: PR #284 P0-3 LEGACY-006/007 SIGNED
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** https://github.com/DranakCorps-bot/EQBuddy/pull/284 (`claude/p0-3-legacy-docs` → `main`, head `66e3460b`). **Signed.** Not a hold. **Not needs-david.** Live Holds empty (#208 in Retired for this final-v1 cut).
+
+### Rulings (the two asks)
+1. **Pinned download links stay on `v1.99.17` until the bridge publishes** — **endorsed.** Same premature-literal risk as `GitHubLegacyReleasePage` on #282. Prose may name `v1.99.18` as the planned final tag (already done on the follow-up commit). Re-pin the three asset links to `v1.99.18` as a checklist row when that tag exists — do not 404 today.
+2. **Bridge What's-new highlight on the unreleased 1.99.18 entry** — **endorsed** (already assigned from the #282 ruling: Don Thompson + quasarj by name, no URL / trap 12). Soft: it is the longest highlight in the file; keep as-is for this cut. Bevel may later propose a shorter in-app line; not a block.
+
+### What landed in the look
+- Docs + one release-time guard; no product behaviour. Scope matches Fable P0-3 + Final v1 "P0-3 docs-only OK."
+- `LEGACY-V1.md`: matrix, final-tag plan, three tagged asset links, quarantine, continues/stops, LEGACY-004/007, LEGACY-005 fork invite = v1/MIT only, Evolved ARR in LICENSE-EVOLVED words. No third-party product name-checks. Credits named, not scrubbed.
+- README visible `## Legacy Linux/macOS` above the fold; credits block untouched. FeatureGuide §Updates is the on-disk legacy paragraph (tarball/bundle copy) — highest-value edit, endorsed.
+- `scripts/legacy-notice-guard.ps1` + wire into `check.ps1` / `release.ps1`: every-version LEGACY-V1 asset + no `releases/latest` link targets; README Legacy section at 2.x; What's-new Legacy section on **first** 2.x only. Trap 54/`ReadAllText` path endorsed. Proven-to-fail via `-AssumeVersion` endorsed.
+- No mailbox files in the diff (#270). No tag / Phase 1 / Avalonia remove / Play Console / signing / prod secrets.
+
+### CI
+At look: `build-and-test` **green**; `build-avalonia-linux` red once on `EqlWikiMobsTests.NoMoreThanTwoFetchesAreEverInFlight` (concurrency flake, unrelated to docs/guard). `e2e-windows` skipped. **Re-run Avalonia; merge when both green.** Do not "fix" product code for this.
+
+### Next
+Dranak / Claude: **re-run CI on #284, merge when green.** After merge: implement the Final v1 bag product work next — **#208 mobile sounds** (Bevel presentation lock already on main via #283: one Options → Mobile master toggle, default Off), then **#264** pairing Wi-Fi IP, then **#252** cards reset — each as origin PRs against `main`, Helm last-look each. P0-4 tag/branch protect stays blocked until the bridge tag and `legacy-v1` exist. Do **not** tag `v1.99.18` until those three merge + CI green. Do **not** touch Play Console / signing / prod secrets. Do **not** start Phase 1 / remove Avalonia. Do **not** page David.
+
+— Helm
+
+---
+
 ## Final v1 scope LOCKED + #208 HOLD lifted (2026-09-04 ~1:14 PM CT)
 
 Owner locked final v1 bag for `v1.99.18`. #208 mobile-sounds HOLD lifted for this cut only (opt-in/off). Authorize V0–V1: #208, #264, #252. Out: #261/#262. Tag after those three merge. P0-3 docs-only may continue. Signed Helm (owner 1:14 PM CT).
