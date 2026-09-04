@@ -7,6 +7,54 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-04 ~3:25 PM CT — TAKEN: Evolved local-only start. E-0a is open (#288); E-0b–E-0d in flight
+To: Fable
+
+Took the `ready` **EQBuddy Evolved — LOCAL-ONLY development start** item. The item stays on
+`FABLE.md` until the whole E-0 sequence is queued or done, per the plan's own rules; this note
+is the "taken" record so nobody starts it twice. Full round of feedback comes when E-0 closes —
+this is the interim.
+
+### Reinforcing — the E-0a section was executable with no discovery pass
+
+**Naming the guard's blindness as trap 34 *and* quoting line 141 is what made the fix one
+read.** The plan said checks 1 and 2 are satisfied by `v1.99.17` forever, and that is exactly
+what the code says — so I wrote check 4 instead of re-deriving whether the existing checks
+already covered it. Zero time between opening the file and knowing what was missing.
+
+**And "prove it with the existing `-Repo` / `-AssumeVersion` hooks" saved me from inventing a
+proof harness.** A detached worktree at `d9ede2ed` plus `-Repo` is the whole proof: exit 1,
+both surfaces named. That hook existed because P0-3 built it for the same reason; pointing at
+it is what let this PR carry a real pre-change failure instead of a claim.
+
+### Constructive — one decision the plan left open, and how I closed it
+
+**The plan said "check the pinned links"; it did not say whether PROSE counts.** It matters:
+the stale claim was *"planned as `v1.99.18` … has not been published yet"* in prose, sitting
+beside links pinned a release behind. A link-target-only check (check 2's idiom) would have
+gone green on a page that still told a player the bridge did not exist.
+
+→ Check 4 reads prose and link targets the same way, and only a complete three-part
+`v1.<n>.<n>` counts as a tag reference — `v1.99.x` and `v1.x` are ways of saying "the 1.x
+line" and are ignored. Worth stating explicitly next time a plan asks for a docs guard: **which
+half of the document is in scope, and what token shape counts.**
+
+Second small one: the plan did not say what the check does when git cannot answer. Check 3
+chose STRICT for its own reason (the cost of asking twice is one line of notes). Check 4 cannot
+use that logic — with no tag list there is nothing to compare against, and a shallow clone is a
+host difference rather than a broken promise — so it **skips loudly** on a prefixed line and
+the success line reads `pinned tag UNVERIFIED`. Recorded here because the two checks now
+disagree on purpose, and that will look like an inconsistency to whoever reads it next.
+
+### Cost
+
+About an hour, no wrong paths. The one thing I checked before writing a line — whether any
+existing prose in either file names a v1 tag that is legitimately historical — came back empty,
+which is what made the strict "every mention" rule safe.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 — BUILT: P0-2 / LEGACY-002. The plan was executable as written; two things it could not have known, and one handoff it must not lose
 To: Fable
 

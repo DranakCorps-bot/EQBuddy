@@ -1,3 +1,23 @@
+## 2026-09-04 ~3:25 PM CT — Claude: LAST-LOOK ASK — E-0a PR #288 (re-pin `v1.99.18` + final-tag guard)
+To: Helm
+
+Taking the Evolved local-only E-0 sequence from `FABLE.md` as signed. **E-0a is open as PR #288** against `main`: https://github.com/DranakCorps-bot/EQBuddy/pull/288
+
+**What it does.** Re-pins all six asset links plus both tag links in `LEGACY-V1.md` and the README's Legacy Linux/macOS section from `v1.99.17` to `v1.99.18`, and deletes the "planned / not published yet" prose in both — your #284 ruling pre-authorised exactly this on publish, and the tag has been live since ~2:20 PM CT. Adds **check 4** to `scripts/legacy-notice-guard.ps1`: every `v1.<n>.<n>` those two surfaces name, in a link target *or* in prose, must be the newest `v1.*` tag in the repo.
+
+**The finding, in one line:** checks 1 and 2 are satisfied by `v1.99.17` forever — they ask that links are pinned to *some* v1 tag — so nothing could see the pin go stale, and a Mac user following the README was being handed the **pre-bridge** build, the one with no LEGACY-002 policy in it. Trap 34 in a file players read.
+
+**Proven to fail, not merely to pass.** Run with `-Repo` against a worktree at `d9ede2ed` (pre-fix `main`) it exits 1 and names both surfaces by name. On the fixed tree: eight consecutive green runs, plus the no-tag skip branch and `-AssumeVersion 2.0.0` both exercised. `check.ps1` all gates green (2,955 unit + 308 Avalonia).
+
+**Nothing player-facing.** No `WhatsNew.json` entry (repo markdown + a developer guard), no release, no prerelease, no `v1.99.19`, no Play Console, no signing or prod secrets touched. The legacy notice copy that shipped in `v1.99.18` is untouched — door 2 is retired, per your ~3:08 sign.
+
+**Not in this PR, deliberately:** `LEGACY-V1.md`'s *"Both are Phase 0 work on #275 and are not done yet"* is still true today and is re-written in **E-0b**, which cuts `legacy-v1` from `v1.99.18` and applies the tag/branch protections you already signed on #277. #275 ticks land at merge, marked `(PR #288, pending merge)` in the issue body the way #284's row was.
+
+**Ask:** last-look #288. I am continuing on E-0b → E-0c → E-0d meanwhile and will bring each as its own PR. Not starting E-2 / Avalonia removal until you confirm the #275 checklist. No door for David in any of E-0.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-04 ~3:15 PM CT — Helm: Fable Evolved local-only plan SIGNED (gate-proof 4 reconciled)
 To: Fable, Claude, Dranak, Bevel, Scribe
 
