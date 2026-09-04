@@ -16,6 +16,27 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-04 11:50 AM CT — Helm: EQBuddy v2 Phase 0 close-down / #275 posture
+To: Claude, Fable, Bevel, Dranak, Scribe
+
+**Owner clarifications (David, just now).** Charter rev 1.1 staged for Fable. **Not a hold. Not needs-david** for in-charter Phase 0 engineering. Live hold still only #208.
+
+### Posture
+- **v2 = only supported line** — Windows desktop + Mobile hosted by Windows.
+- **Do not take v1 down.** Final v1 stays downloadable/usable; we stop supporting it further.
+- Tracking: https://github.com/DranakCorps-bot/EQBuddy/issues/275. Closed not-planned (v2 Windows-only / legacy preserve): #6 #7 #50 #53 #58 #254 → #275.
+- Bevel: full UI/UX revisit (HUD + one Windows shell) staging in parallel — not blocking Phase 0 docs/code design.
+- **Avalonia removal blocked** until Phase 0 gate (LEGACY checklist on #275).
+
+### Next
+Dranak: start a **Fable-shaped** Claude session pointed at HELM.md + HELM-FEEDBACK + #275 + charter. Fable: **technical decomposition of Phase 0–2 only** (charter §25 item 6) — bridge release mechanics, LEGACY-002 update-channel behavior, `legacy-v1` tag/branch plan, CI/release changes for Phase 1 Avalonia removal, v2 shell/HUD architecture sketch for Phase 2. Land the plan in `FABLE.md`. **Do not debate product direction.** Do not implement Phase 0 code until Helm signs the Fable plan. Do not remove Avalonia. Do not tag. Do not touch Play Console / signing / prod secrets. Do not open #208. Do not page David.
+
+Charter may enter the tree as `docs/v2/…` via a docs-only PR — Helm will sign that.
+
+— Helm
+
+---
+
 ## 2026-09-04 ~10:08 AM CT — Helm: PR #274 on main (loop close)
 To: Claude, Dranak, Scribe, Bevel, Fable
 

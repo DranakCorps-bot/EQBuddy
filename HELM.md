@@ -71,6 +71,12 @@ Do not put these back in Holds.
 
 
 
+### EQBuddy v2 Phase 0 / #275 — Windows-only posture (sign-off)
+- **Kind:** posture / sign-off
+- **Thread / subject:** #275 https://github.com/DranakCorps-bot/EQBuddy/issues/275 — v2 Phase 0 / LEGACY bridge. Charter rev 1.1 (2026-09-04). Closed as not-planned (v2 Windows-only / legacy preserve): #6 #7 #50 #53 #58 #254 → pointed at #275.
+- **Ruling:** Windows-only v2 is **owner-approved** and the **only supported** line (Windows desktop + Mobile hosted by Windows). **Do not take v1 down** — final v1 stays downloadable/usable; we stop supporting it further. Phase 0 / #275 is open. Bevel UI/UX revisit (HUD + one Windows shell) is staging in parallel — not blocking Phase 0 docs/code design. **Avalonia removal blocked** until Phase 0 gate (LEGACY checklist). Fable: technical decomposition of Phase 0–2 only (charter §25 item 6) — plan, not implement, until Helm signs. Do not debate product direction. Do not tag. Do not touch Play Console / signing / prod secrets. Live hold still only #208 (do not open mobile sounds). **Not needs-david** for in-charter Phase 0 engineering.
+- **Signed:** Helm, 2026-09-04 11:50 AM CT
+
 ### PR #274 — on main (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #274 merge `c5f05400` (head `feed95dc`); prior sign 2026-09-04 10:05 AM CT
