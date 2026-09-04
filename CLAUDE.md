@@ -1,4 +1,4 @@
-﻿# EQBuddy — working notes for AI agents
+# EQBuddy — working notes for AI agents
 
 This file is loaded automatically at the start of every session. It exists so an agent
 does not spend its first hour rediscovering the codebase. Keep it **short and true** —
@@ -489,8 +489,7 @@ a guess, and the guess is discovered three commits later.
 
 - **Never measure other players.** EQBuddy is not a group monitoring tool and never
   will be as long as David owns it. No party DPS, no raid meters, no rankings, no
-  leaderboards, no watching other people. Decline warmly, point at the MIT licence,
-  invite a fork. This is a values line, not a technical one. Do not file these asks
+  leaderboards, no watching other people. Decline warmly. Community forks of the published 1.x / LEGACY tree under MIT remain a LEGACY matter only — do not invite a fork of Evolved / v2 (proprietary / permission-required). This is a values line, not a technical one. Do not file these asks
   as requirements.
 - **Hold releases** until David explicitly says ship. Commit and push source freely.
 - **Nothing ships unsigned, ever.** Every artifact a player can run — `EQBuddy.exe`,
