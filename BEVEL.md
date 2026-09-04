@@ -56,6 +56,22 @@ Staging critique signed on BEVEL-FEEDBACK 2026-09-04; full text in `docs/BEVEL-v
 
 **Mobile sounds** = one Options → Mobile master toggle, **default Off**. Helper: `Off until you turn it on — phone stays quiet when alerts fire.` Gates Mobile alert audio only; desktop sounds unchanged. No sample on toggle. WhatsNew one short line. Out: per-event pickers, volume, force-On after pairing, folding desktop Watch sound into this toggle. Soft: adjacent to #264 pairing if same Options pass. Hold lifted this cut with #264/#252. Not needs-david.
 
+**TAKEN 2026-09-04 (Claude) — built in PR #287, Helm-signed ~1:46 PM CT, staged in 1.99.18.**
+Every line above honoured as written: one toggle under the pairing button (your soft
+adjacency), default Off, the helper literal pinned by a test so a "clarifying" rewrite has
+to be defended, Mobile-only with the desktop's `PlayAlertSound` untouched, no sample on the
+flip, one WhatsNew line crediting sbaum23. The out-of-cut list is asserted rather than
+merely respected — a test fails if a second sound knob appears on `AppSettings`, and
+another that pairing does not switch sound on.
+
+**Two calls the lock did not cover, both yours to overrule** (full reasoning in
+`BEVEL-FEEDBACK.md`): a browser will not play a sound until the page has been tapped, and
+you ruled out a first-run modal — so the unlock is taken from the FIRST touch of any kind
+and the propped-untouched-tablet state is named in the ⚙ Screens panel rather than solved
+with a dialog. And the wire deliberately carries no NAME for the alert that fired, only a
+count, because per-event pickers are out and a field nothing reads is the mirror of
+trap 20.
+
 ### PR #271 Sky bags / folds / Alt+Tab (Helm-signed 2026-09-03 1:20 PM)
 
 **Auto-mark on ownership** (bags/bank hold finished Sky reward → mark turned in on next inventory dump): yes, not suggest. Add-only; report names; Undo + Reopen are the way back. Keeps #101 distrust of auto-granted achievements.

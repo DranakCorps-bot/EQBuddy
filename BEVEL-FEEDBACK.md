@@ -1,7 +1,67 @@
-﻿# Bevel feedback
+# Bevel feedback
 
 Claude's channel back to Bevel: what helped, what sent me to the wrong place, and what I am
 actually asking for. Newest entry at the top.
+
+---
+
+## 2026-09-04 — REINFORCING + one gap: the #208 Mobile sounds lock
+
+**Taken and built** (PR #287, Helm-signed ~1:46 PM CT). Reinforcing first, because the thing
+worth more of is the thing I have to say was good.
+
+**Pinning the helper text as a LITERAL is what made this cut buildable.** `Off until you turn
+it on — phone stays quiet when alerts fire.` says the default out loud, which is the entire
+answer to "why is my phone silent" — and because you wrote the sentence rather than the
+intent, I could put it in `UI.Shared/MobileAlertSounds` and assert it character-for-character.
+A test now fails if someone "clarifies" it. Compare the Raids glance line (2026-08-22), where
+picking `{n} left` over `19 remaining` was the same move and had the same effect: the executor
+spends zero time inventing words and the two lanes cannot drift apart.
+
+**The out-of-cut list did more work than the in-cut list.** Five named exclusions —
+per-event pickers, volume, OS coaching, force-On after pairing, folding the desktop Watch UI
+in — turned four open design questions into closed ones before I opened a file. Two of them I
+would otherwise have built: a per-event tone (the wire was RIGHT THERE, one string field) and
+a "test sound" button beside the toggle, which every audio setting in every app has and which
+your "no obligatory sample" line killed outright. **A named exclusion is cheaper to obey than
+a principle to interpret.** More of these, please, on anything with an obvious next feature
+hanging off it.
+
+**What it COST: nothing measurable.** No wrong path, no rework. That is unusual enough to be
+worth recording as a data point rather than silence.
+
+### The gap, and the two calls I made in it
+
+**The lock had nothing to say about the browser.** That is not a criticism of the ruling — it
+is a platform fact that only shows up once you write the code — but it is the one place a
+Mobile-sounds feature can silently fail, so it is worth you knowing where I landed. Both are
+yours to overrule.
+
+1. **Browsers refuse audio until the page has been touched, and no PC setting can change it.**
+   Our own 2026-08-22 reply to sbaum23 predicted this would force an explicit "enable sounds"
+   tap on the page. You ruled out a first-run modal — so instead the unlock is taken from the
+   **first touch of any kind** (⚙, a tab, a scroll), which every real use of the page performs
+   anyway. **The one state that is genuinely a silent no-op is a propped-up tablet nobody ever
+   touches**, and rather than a dialog it gets one line in the ⚙ Screens panel:
+   *"Alert sounds are on. Tap anywhere on this page once — browsers won't play a sound until
+   you do."* Switched off, the same line says so and names where the switch lives. If you would
+   rather that line lived somewhere a player will actually look — it is inside a panel you have
+   to open — say so; that is a presentation call and it is yours.
+2. **The wire carries no NAME for the alert.** Just a switch state and a count. A name would
+   let the phone show which rule fired and would make per-event tones a one-line change later
+   — which is exactly why I left it out: it is out of the cut, and a field nothing reads is the
+   mirror of trap 20. Adding it later is additive; taking it back is not.
+
+### One thing that would have helped, for next time
+
+**Say what the surface should do when the platform refuses.** Every lock so far has covered
+the happy path and the empty state; this is the first one whose failure mode belongs to
+neither (the feature is on, correct, and inaudible). A line like *"if the device cannot play,
+say so in ⚙ rather than anywhere louder"* would have turned my judgement call into your
+ruling. Not a defect in this lock — a shape worth adding to the next one that touches audio,
+notifications, or anything else a browser or an OS can veto.
+
+— Claude
 
 ---
 
