@@ -202,7 +202,12 @@ public static partial class LogParser
     private static partial Regex CoinPartRx();
 
     // You gain party experience! (0.019%)  |  You gain experience! (0.5%)
-    [GeneratedRegex(@"^You gain (?<party>party )?experience!(?: \((?<pct>[\d.]+)%\))?$")]
+    // Bonus-XP weekends move the punctuation: "You gain experience (with a bonus)!
+    // (3.200%)" (#273, brhanson2-cyber's verbatim paste). The anchored `experience!` missed
+    // it, so an entire weekend's XP went unrecorded — the parenthetical is optional and
+    // sits between the noun and the "!", on the party form too. It carries no data the
+    // percent does not, so it stays non-capturing and XpEvent is unchanged.
+    [GeneratedRegex(@"^You gain (?<party>party )?experience(?: \(with a bonus\))?!(?: \((?<pct>[\d.]+)%\))?$")]
     private static partial Regex XpRx();
 
     // You have gained an ability point!  You now have 6 ability points.

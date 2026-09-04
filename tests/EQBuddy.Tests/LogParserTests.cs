@@ -373,6 +373,31 @@ public class LogParserTests
         Assert.True(e.Party);
     }
 
+    // #273 (brhanson2-cyber): a bonus-XP weekend writes "(with a bonus)" between the noun and
+    // the "!", which the anchored regex missed — every XP line for the weekend parsed as
+    // nothing at all. The pre-weekend forms are here beside it because they are what the
+    // fix had to keep, and the party+bonus row is the same server phrasing on the party
+    // line. Percent and Party are asserted per TEST-005, not merely the match.
+    [Theory]
+    [InlineData("You gain experience! (0.5%)", 0.5, false)]
+    [InlineData("You gain party experience! (0.019%)", 0.019, true)]
+    [InlineData("You gain experience (with a bonus)! (3.200%)", 3.2, false)]
+    [InlineData("You gain party experience (with a bonus)! (0.081%)", 0.081, true)]
+    [InlineData("You gain experience!", 0, false)]
+    [InlineData("You gain experience (with a bonus)!", 0, false)]
+    public void Xp(string line, double pct, bool party)
+    {
+        var e = Parse<XpEvent>(line);
+        Assert.Equal(pct, e.Percent, 3);
+        Assert.Equal(party, e.Party);
+    }
+
+    // The "!" is still required — the parenthetical was added as an optional phrase, not
+    // as a licence to match any "You gain experience" prose.
+    [Fact]
+    public void XpBonusStillNeedsThePunctuation() =>
+        AssertIgnored("You gain experience (with a bonus) (3.200%)");
+
     [Fact]
     public void LevelUp()
     {
