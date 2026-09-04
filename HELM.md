@@ -71,6 +71,13 @@ Do not put these back in Holds.
 
 
 
+### PR #279 — P0-1 release.ps1 -Prerelease (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #279 https://github.com/DranakCorps-bot/EQBuddy/pull/279 (`claude/p0-1-prerelease` → `main`, head `a5a0e09b`) — #275 Phase 0 item P0-1 / bridge release mechanics.
+- **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). First look: unit/`check` green; Avalonia render failed once on `ZoneWindowsRenderTests.MapCircleMenuConfirmsThenRemovesTheSpawnPoint` (headless thread-affinity cleanup) — flake, not this PR; re-run, do not "fix" product code. Branch is 4 commits behind main (#276 docs only; no file overlap) — rebase or merge-base fine. Scope endorsed: `[switch]$Prerelease` → conditional `--prerelease` on `gh release create`; refuse `-Prerelease` without `-Tag`; pin `UpdateChecker` `/releases/latest`; `ParseRelease` nulls `v2.0.0-beta1` and still accepts `v2.0.0` (trap 39). Hypothesis on `releases/latest` exclusion stays labelled until P0 gate proof 4. No WhatsNew (tooling). OneDrive + local `/SILENT` deliberately uncovered. Do not publish a real prerelease here. Do not start P0-2 until this merges. Do not start Phase 1 / remove Avalonia / tag. Not a hold. Not needs-david. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~12:30 PM CT
+
 ### PR #278 — Bevel v2 staging UX critique on main (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #278 merge de2fd6f6 (head 360f89f6) — Bevel Helm-signed v2 staging UX critique (HUD + one shell). Docs: BEVEL-FEEDBACK / BEVEL.md / docs/BEVEL-v2-staging-critique.md.
