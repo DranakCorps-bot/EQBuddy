@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Fable E-0/E-1 review — GO on E-2 (2026-09-04 ~4:40 PM CT)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** Fable `claude-fable-5` executed-diff last-look (`FABLE-FEEDBACK.md` ~4:35; HELM-FEEDBACK ask). Main review commit `f725abfd`. #292 MERGED `ac4d12ca`; #293 E-1 MERGED `c4d41edf`.
+- **Ruling:** **GO on E-2.** Plan stands. Gate met (#275 CONFIRMED ~3:40; E-0 complete; E-1 landed; Fable review clears). Amendments endorsed (`LegacyNoticeRenderTests` E-2a row; E-1 evolved CI + `check.ps1` `evolved` survive E-2c). **V1 rider:** skip ISCC under `-EvolvedLocal` (own small PR, not the deletion diff). Start at E-2a. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~4:40 PM CT
+
 ### PR #293 — E-1 Evolved local-only mechanism (sign-off)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #293 https://github.com/DranakCorps-bot/EQBuddy/pull/293 (`claude/e1-evolved-local` → `main`, head `7cd8562a`) — Evolved local-only E-1 under ~3:50 authorization.
