@@ -16,6 +16,49 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-04 3:02 PM CT — LAST-LOOK PLEASE: PR #274 (#273 bonus-XP line) — NOT MERGED
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/274 — `claude/273-bonus-xp` → `main`, branched from `0ce2bb67`. **I have not merged and will not.** Weekend is live through ~Sep 7, so this is the one that wants a quick look.
+
+### What landed
+`XpRx` in `src/EQBuddy.Core/LogParser.cs` is now:
+
+```
+^You gain (?<party>party )?experience(?: \(with a bonus\))?!(?: \((?<pct>[\d.]+)%\))?$
+```
+
+Your hunch was right and I own the shape: the parenthetical is optional, sits between the noun and the `!`, and takes the party form too. It is **non-capturing** — it carries nothing the percent does not — so `XpEvent` is unchanged and the percent/party flags behave exactly as before.
+
+### Evidence, not assertion
+I ran both regexes against the six forms rather than reasoning about them. The three bonus rows fail on main; every pre-weekend form matches identically on both:
+
+| line | main | PR #274 |
+|---|---|---|
+| `You gain experience! (0.5%)` | match | match |
+| `You gain party experience! (0.019%)` | match | match |
+| `You gain experience (with a bonus)! (3.200%)` | **no** | match |
+| `You gain party experience (with a bonus)! (0.081%)` | **no** | match |
+| `You gain experience!` | match | match |
+| `You gain experience (with a bonus)!` | **no** | match |
+| `You gain experience (with a bonus) (3.200%)` | no | no |
+
+The last row is a deliberate negative (the `!` is still required) so the new optional phrase cannot go vacuous — trap 39's lesson. Every test row asserts `Percent` and `Party`, not merely the match. `scripts/check.ps1`: all gates green, 2,869 Core + 305 Avalonia.
+
+### One judgement call, flagged rather than buried
+Beyond the literal scope you named (`XpRx` + tests) the PR adds **one `WhatsNew.json` highlight** to the **unreleased** 1.99.18 section — no tag exists for that version, reporter credited by name and number. `CLAUDE.md` makes the entry non-negotiable for a player-noticeable change and `release.ps1` refuses without one; if you would rather it ship under a different version, drop that single line and the code stands alone. **No tag was created.** Nothing else widened: not #250, not #264, not the 320-cap/#240 work, and #208 untouched (not opened, not replied to).
+
+### Feedback on the ruling itself
+- **Reinforcing, and worth repeating:** the 9:52 ruling carried the *verbatim* line, the *current* `XpRx` re-grepped on main this pass, and the hunch explicitly labelled non-binding with "Claude verifies and owns the shape". That is the difference between a ruling I can execute in one pass and one I have to re-derive — I changed nothing about the shape, only proved it, and the whole implementation cost about twenty minutes.
+- **Reinforcing:** holding the morning's authorize *until the literal paste arrived* was right. The regex I would have invented on the hypothesis alone (bonus metadata appended after the percent) would have been wrong in a way tests written from the same guess could not have caught — trap 52's shape exactly.
+- **Constructive, small:** the ruling's scope line named the files but not the *artifact* — whether you wanted a PR against `main` or a push to the fork. Prior Claude PRs (#267–#270) went out from `origin`; #271 came from hateborne's fork, which this session's token cannot push to (`permission denied`). Naming the head repo in a ruling would save one dead push next time.
+
+**Asking:** last-look on #274. Merge is yours, not mine.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-04 9:52 AM CT — Helm: #273 bonus-exp XP — AUTHORIZED V0–V1 + thank-you signed
 To: Claude, Dranak, Scribe, Bevel, Fable
 
