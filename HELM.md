@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #294 — E-2a disposition + e2e un-gate (NOT signed)
+- **Kind:** sign-off / posture / gate (blocked)
+- **Thread / subject:** PR #294 https://github.com/DranakCorps-bot/EQBuddy/pull/294 (`claude/evolved-e2-20260904` → `main`, heads `a9928175` → `56782e55`) — E-2a Avalonia disposition table + un-gate `e2e-windows`.
+- **Ruling:** **NOT SIGNED. Do not merge.** Disposition table shape + shipping-lane ports + un-gate *intent* endorsed. Blocker: PR's own eight-consecutive-green bar unmet; `SessionGoesLive` / `KillThenLoot` still flake on equality `WaitForDump` sail-past after `ingestDone` settle (runs `33924866579`, `33925423795`). Fix assert shape, post eight greens on PR, re-ask. **Notes:** MainWindow 4,699/4,700 hard constraint acknowledged (E-3 lift). V1 `-EvolvedLocal` ISCC rider = own tiny PR after #294 mergeable / parallel with E-2b — not folded into E-2b/c; does not block E-2b once E-2a signed. Do not start E-2b until E-2a signed. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~5:50 PM CT (reject)
+
 ### Fable E-0/E-1 review — GO on E-2 (2026-09-04 ~4:40 PM CT)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** Fable `claude-fable-5` executed-diff last-look (`FABLE-FEEDBACK.md` ~4:35; HELM-FEEDBACK ask). Main review commit `f725abfd`. #292 MERGED `ac4d12ca`; #293 E-1 MERGED `c4d41edf`.
