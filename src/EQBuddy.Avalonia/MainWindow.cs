@@ -4950,6 +4950,16 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         });
     }
 
+    /// <summary>What the update banner is showing right now — visibility and text, not the
+    /// control. LEGACY-002's gate proof has to assert the EFFECT rather than the intent
+    /// (trap 42: "present in the build" and "in effect at runtime" are different claims),
+    /// and there is no offline route through <see cref="CheckForUpdates"/> to reach it: that
+    /// path needs either GitHub or a real 2.x installer on disk to read a FileVersionInfo
+    /// from. Values, not the <c>Border</c>: a member that hands out a live control is a
+    /// transfer of ownership wearing a getter's clothes (trap 45).</summary>
+    internal (bool Visible, string Text) UpdateBannerForTests =>
+        (_updateBanner.IsVisible, _updateText.Text ?? "");
+
     /// <summary>Apply a LEGACY-002 decision that said "do not offer this". The write is
     /// guarded on a real change rather than saved every time: a settings save rewrites the
     /// whole file from the snapshot loaded at startup (trap 13), so the cheapest correct
@@ -4960,8 +4970,11 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
     /// widget has no room for. That is why the acknowledgement is recorded on SHOW here
     /// and again on click: the policy hands back <c>RecordAcknowledgement</c> separately
     /// from <c>BrowserTarget</c>, so if Bevel rules the click should mean only one of the
-    /// two, it is a wiring change and not a redesign.</summary>
-    private void ShowFinalLegacyNotice(UpdateInfo info, LegacyUpdateDecision decision)
+    /// two, it is a wiring change and not a redesign.
+    ///
+    /// Internal rather than private so <c>LegacyNoticeRenderTests</c> can drive it from a
+    /// hand-built <see cref="UpdateInfo"/>; see <see cref="UpdateBannerForTests"/>.</summary>
+    internal void ShowFinalLegacyNotice(UpdateInfo info, LegacyUpdateDecision decision)
     {
         _pendingUpdate = null;
         if (decision.RecordAcknowledgement) AcknowledgeFinalLegacyNotice();
