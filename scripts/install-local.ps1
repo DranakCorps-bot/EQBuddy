@@ -5,6 +5,22 @@
 # versions than the one running.
 #
 #   pwsh scripts\install-local.ps1
+#
+# -Evolved is the 2.x loop, and it does NOT install. EQBuddy Evolved is under
+# construction: it builds and signs the same way, then runs PORTABLE out of dist\publish
+# against its own profile directory, so David keeps a working v1 install and an untouched
+# v1 profile the whole time it is being built. That matters because the installer uses one
+# AppId and {autopf}\EQBuddy — installing an Evolved build would REPLACE v1 in place and
+# inherit its settings.json, history.db and archives, and #158's EQBuddy.previous.exe
+# rollback gives back the binary, not the profile. It is DATA-003's intent arriving before
+# there is anything destructive to back up, and it costs one switch.
+#
+# The heavier version — a second AppId, an "EQBuddy Evolved" install directory and its own
+# shortcut — is the right move when Evolved becomes the daily driver. Named here so the
+# next session does not re-derive it.
+#
+#   pwsh scripts\install-local.ps1 -Evolved
+param([switch] $Evolved)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 . "$PSScriptRoot\signing.ps1"
@@ -12,7 +28,25 @@ $repo = Split-Path $PSScriptRoot -Parent
 $props = Get-Content "$repo\Directory.Build.props" -Raw
 if ($props -notmatch '<Version>([\d.]+)</Version>') { throw 'No <Version> in Directory.Build.props' }
 $version = $Matches[1]
-Write-Host "Installing EQBuddy $version locally (no release)"
+$major = [int]($version.Split('.')[0])
+
+# Both directions, because both are a mistake with a cost. Installing 2.x over v1 is the
+# one-way door above; -Evolved on a 1.x tree would run the released product portable on a
+# throwaway profile and look like nothing happened.
+if ($major -ge 2 -and -not $Evolved) {
+    throw "EQBuddy $version is the Evolved line: it must not be INSTALLED over your v1 install (same AppId, same profile). Pass -Evolved to build, sign and run it portable on its own profile."
+}
+if ($Evolved -and $major -lt 2) {
+    throw "-Evolved is for the 2.x line; $version is 1.x. Run this script with no switch to install it normally."
+}
+
+# The Evolved profile. Beside the v1 one and never inside it — EQBUDDY_APPDATA is the
+# supported way to run against an isolated profile (AppPaths), and it is what keeps the
+# two lines' settings, history and archives apart while both exist on this machine.
+$evolvedProfile = Join-Path $env:APPDATA 'EQBuddy Evolved'
+
+Write-Host $(if ($Evolved) { "Building EQBuddy $version (Evolved, local-only: portable, own profile, no install)" }
+             else { "Installing EQBuddy $version locally (no release)" })
 
 # Same toolchain as release.ps1, resolved BEFORE the build for the same reason: a broken
 # signing setup should cost a second, not a 172 MB publish.
@@ -30,9 +64,19 @@ Initialize-EqSigning -Repo $repo
 # Gracefully, not Stop-Process -Force. EQBuddy finalizes its session into history.db on
 # exit, and the cost of a test build must never be someone's session record — the same
 # reason shoot.ps1 stands the app down with CloseMainWindow. Force is the fallback only.
-$running = Get-Process EQBuddy -ErrorAction SilentlyContinue
+#
+# Under -Evolved, only the PORTABLE copy is closed — the one running out of dist\publish,
+# which has to go because the publish below overwrites its exe. The installed v1 widget is
+# left alone: it is a different binary on a different profile, and closing it would cost a
+# session for a build that never touches it. Filtering by path is the whole difference, and
+# it is why this asks Path rather than name (both processes are called EQBuddy.exe).
+$publishDir = "$repo\dist\publish"
+$running = @(Get-Process EQBuddy -ErrorAction SilentlyContinue | Where-Object {
+    (-not $Evolved) -or ($_.Path -and $_.Path.StartsWith($publishDir, [StringComparison]::OrdinalIgnoreCase))
+})
 if ($running) {
-    Write-Host 'Closing the running EQBuddy (gracefully, so it finalizes its session)'
+    Write-Host $(if ($Evolved) { 'Closing the running portable Evolved copy (gracefully, so it finalizes its session)' }
+                 else { 'Closing the running EQBuddy (gracefully, so it finalizes its session)' })
     foreach ($p in $running) {
         $p.CloseMainWindow() | Out-Null
         if (-not $p.WaitForExit(15000)) { $p | Stop-Process -Force }
@@ -49,6 +93,30 @@ if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
 # timestamped signature — no warn-and-continue here either, because "it installed but
 # quietly unsigned" is the state this script sat in for a day without anyone noticing.
 Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
+
+# ---- the Evolved loop stops here: run it, do not install it ------------------------
+if ($Evolved) {
+    New-Item -ItemType Directory -Force $evolvedProfile | Out-Null
+
+    # Set on THIS process so the child inherits it; restored afterwards so nothing else
+    # this shell does inherits a redirected profile by accident.
+    $previous = $env:EQBUDDY_APPDATA
+    try {
+        $env:EQBUDDY_APPDATA = $evolvedProfile
+        Start-Process "$repo\dist\publish\EQBuddy.exe" -WorkingDirectory "$repo\dist\publish"
+    }
+    finally { $env:EQBUDDY_APPDATA = $previous }
+
+    Write-Host ''
+    Write-Host "EQBuddy Evolved $version is running, PORTABLE, from $repo\dist\publish" -ForegroundColor Cyan
+    Write-Host "  profile:   $evolvedProfile   (v1's %AppData%\EQBuddy is untouched)" -ForegroundColor Cyan
+    Write-Host '  installed: nothing. Your v1 install, its shortcut and its profile are exactly as they were.' -ForegroundColor Cyan
+    Write-Host '  signed:    yes — same certificate, same verification as a release build.' -ForegroundColor Cyan
+    # No unins000.exe beside a portable exe, so UpdateChecker.IsInstalledCopy is false and
+    # the update banner offers the release page rather than installing over anything (#119).
+    Write-Host '  updates:   portable copies are never auto-installed over; the banner links out instead.' -ForegroundColor Cyan
+    return
+}
 
 $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
           "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1

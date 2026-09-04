@@ -4,12 +4,6 @@
 param([string]$Tag, [switch]$Prerelease, [switch]$EvolvedLocal)
 $ErrorActionPreference = 'Stop'
 
-# -Prerelease only means anything to `gh release create`, which only runs with a -Tag.
-# Without one it would be a switch that silently does nothing on a run that still builds,
-# signs, copies to OneDrive and installs locally — and the person who passed it would have
-# no way to tell. Refuse here, before the 172 MB publish, rather than after it.
-if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
-
 $repo = Split-Path $PSScriptRoot -Parent
 . "$PSScriptRoot\signing.ps1"
 
@@ -38,7 +32,19 @@ if ($major -ge 2 -and -not $EvolvedLocal) {
 }
 if ($EvolvedLocal -and $major -lt 2) { throw "-EvolvedLocal is for the 2.x Evolved line; $version is 1.x, where the local loop is scripts\install-local.ps1." }
 if ($EvolvedLocal -and $Tag)         { throw '-EvolvedLocal refuses -Tag: a tag is a public release, and the Evolved channel is not open. This is the second lock — the publish block is skipped anyway.' }
-if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease: it is a flag on a GitHub release, and -EvolvedLocal makes none. A switch that silently does nothing is the defect the -Prerelease/-Tag refusal above was written for.' }
+if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease: it is a flag on a GitHub release, and -EvolvedLocal makes none. A switch that silently does nothing is the defect the -Prerelease-without-Tag refusal below was written for.' }
+
+# -Prerelease only means anything to `gh release create`, which only runs with a -Tag.
+# Without one it would be a switch that silently does nothing on a run that still builds,
+# signs, copies to OneDrive and installs locally — and the person who passed it would have
+# no way to tell. Refuse here, before the 172 MB publish, rather than after it.
+#
+# It sits BELOW the -EvolvedLocal refusals, and the order is load-bearing rather than
+# cosmetic: above them it made the line before it unreachable. `-EvolvedLocal -Prerelease`
+# (no tag) would have been caught here first, so the refusal that names the actual reason
+# could never fire — a check that cannot fire is the exact shape this file keeps finding
+# (traps 20, 34). Moving four lines makes both reachable and each says its own reason.
+if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
 
 Write-Host "Releasing EQBuddy $version"
 
