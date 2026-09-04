@@ -523,9 +523,24 @@ a guess, and the guess is discovered three commits later.
   logical and much better for a new player; a long-term user experiences only the
   disruption. Say both — the second half is what makes the first half credible.
 
-  The three ways back (folded cards return in Options → Cards & windows, a merged card
-  keeps the slot its parts had, and every card header's ↗ pops the surface out) are what
-  makes this true rather than a promise, so **do not remove one without replacing it.**
+  The three ways back are what makes this true rather than a promise, so **do not remove
+  one without replacing it:**
+
+  1. **A folded card's NAME returns in Options → Cards & windows — on the card that
+     ABSORBED it** ("Gear is a tab in here now"), at the one screen whose whole job is to
+     list every card, which is where someone hunting a missing card goes (#219). **An
+     absorbed card does not get its own row**, and it does not come back as a card:
+     `OptionsViewModel.AbsorbedTitles` is the list, keyed by the SURVIVING card. Motes is
+     the exception that proves it — it has a row again because David made it a card again
+     in 1.99, not because the fold left it one (and see trap 55 for what it cost when a
+     fold went on naming it anyway).
+  2. **A merged card keeps the slot its parts had.**
+  3. **Every card header's ↗ pops the surface out** into its own window.
+
+  Helm-signed ruling (b), 2026-09-04: this sentence used to read *"folded cards return in
+  Options → Cards & windows"*, which the catalog has never done. It does not prejudge #251
+  (Faction's card back) either way — if that lands, Faction gets a row because it is a card
+  again, not because the fold rule was wrong.
 - **Tests must never touch the real profile.** A module initializer redirects
   `EQBUDDY_APPDATA` to temp; it exists because a test once overwrote David's live
   `settings.json`. Do not weaken it.
