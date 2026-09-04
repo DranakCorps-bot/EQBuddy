@@ -11,7 +11,7 @@
     them. A promise whose only enforcement is the memory of the session that made it is
     the shape every stale line in this repo started as.
 
-    Three things are checked. Two hold at EVERY version, because they are cheap and they
+    Four things are checked. Three hold at EVERY version, because they are cheap and they
     are about a page that already exists:
 
       1. LEGACY-V1.md names all three non-Windows assets, so the page a legacy user is
@@ -21,6 +21,17 @@
          its most prominent asset is a Windows installer - a legacy page pointing there
          would look correct in every screenshot and hand a Mac user something that cannot
          run. Prose may still discuss `releases/latest`; only link targets are checked.
+      4. Every `v1.x.y` those two surfaces name - in a link target OR in prose - is the
+         NEWEST v1 tag in the repo. Checks 1 and 2 were both satisfied by `v1.99.17`
+         forever: they ask that the links are pinned to SOME v1 tag, and they cannot see
+         that the tag stopped being the final one. That is trap 34's exact shape, and it
+         was live between the `v1.99.18` publish and this check - a Mac user following the
+         README would have downloaded the PRE-BRIDGE build, the one with no LEGACY-002
+         policy in it, which goes on chasing v2 for the life of the install. Prose counts
+         here (unlike check 2) because the stale claim was prose as much as link: both
+         files said the bridge "is planned as v1.99.18 and has not been published yet"
+         while it was live. `v1.99.x` and `v1.x` are not tags and are ignored; only a
+         complete three-part `v1.<n>.<n>` is read as a tag reference.
 
     The third applies once <Version> reaches 2.x:
 
@@ -34,6 +45,8 @@
     Exits non-zero on a violation. Today's tree is 1.99.x, so check 3 does not fire yet;
     that is exactly the state in which a guard quietly stops being able to fail, so it
     takes -AssumeVersion and -Repo purely so it can be PROVEN to fail (traps 34, 39).
+    -Repo is what proves check 4: run this script against a worktree pinned to v1.99.17
+    and it must fail there.
 
     Files are read with [IO.File]::ReadAllText rather than Get-Content: Windows
     PowerShell 5.1 decodes with the ANSI code page and this repo's docs are full of em
@@ -134,6 +147,51 @@ if ($section) {
     }
 }
 
+# ---- 4: the pinned tag is the FINAL v1 tag, at every version -----------------------
+
+# A complete three-part v1.<n>.<n> only. `v1.99.x` and `v1.x` are ways of saying "the 1.x
+# line" and are not tag references, so they are not matched and not checked. Prose is read
+# the same way as a link target here - unlike check 2 - because the staleness this exists
+# for lived in both halves at once ("planned as v1.99.18 ... has not been published yet"
+# beside three download links pinned to v1.99.17).
+$tagRefRx = 'v1\.\d+\.\d+'
+
+$v1TagOut = @()
+$gitTagsOk = $true
+try {
+    $v1TagOut = @(Invoke-GitUtf8 @('tag', '--list', 'v1.*', '--sort=-v:refname'))
+    $gitTagsOk = ($LASTEXITCODE -eq 0)
+}
+catch { $gitTagsOk = $false }
+$newestV1 = if ($gitTagsOk) { @($v1TagOut | Where-Object { $_ -match "^$tagRefRx$" }) | Select-Object -First 1 }
+
+if (-not $newestV1) {
+    # Fail OPEN, and say so on a prefixed line so check.ps1's filter prints it: with no tag
+    # list there is nothing to compare the docs against, and a shallow clone is a host
+    # difference rather than a broken promise. A silent skip here would be the thing this
+    # check was added to stop - a gate that reads as coverage while seeing nothing.
+    Write-Host "legacy-notice-guard: check 4 SKIPPED - no v1.x.y tag visible from $Repo (shallow clone?). The pinned links were NOT verified." -ForegroundColor Yellow
+}
+else {
+    $surfaces = @()
+    if ($legacy) { $surfaces += , @('LEGACY-V1.md', $legacy) }
+    if ($section) { $surfaces += , @("The README's Legacy Linux/macOS section", $section) }
+
+    foreach ($surface in $surfaces) {
+        $named = @([regex]::Matches($surface[1], $tagRefRx) | ForEach-Object { $_.Value } | Sort-Object -Unique)
+        if ($named.Count -eq 0) {
+            $problems += "$($surface[0]) names no v1 release at all. It is the page a legacy user is sent to; it has to say which build is theirs."
+            continue
+        }
+        foreach ($t in $named) {
+            if ($t -ne $newestV1) {
+                $problems += "$($surface[0]) names $t, but the newest v1 tag in this repo is $newestV1. " +
+                             'A pinned link to a superseded tag passes checks 1 and 2 forever and hands a legacy user the wrong build - re-pin it, in prose as well as in the link.'
+            }
+        }
+    }
+}
+
 if ($major -ge 2) {
     if (-not $section) {
         $problems += 'README.md has no "Legacy Linux/macOS" heading. LEGACY-007: a 2.x release says in the README what happened to the Linux and macOS builds.'
@@ -191,5 +249,6 @@ if ($problems.Count -gt 0) {
 }
 
 $scope = if ($major -ge 2) { 'README section + release notes checked' } else { "1.x - LEGACY-007 notes check arms at 2.x" }
-Write-Host "legacy-notice-guard: ok  (version $version; $scope)" -ForegroundColor Green
+$pin = if ($newestV1) { "; pinned to $newestV1" } else { '; pinned tag UNVERIFIED' }
+Write-Host "legacy-notice-guard: ok  (version $version; $scope$pin)" -ForegroundColor Green
 exit 0
