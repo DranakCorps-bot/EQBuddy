@@ -33,14 +33,20 @@ public class ProgressSurfaceTests
         Assert.Equal("progress", ProgressSurface.KeyFor(ProgressTab.Experience));
     }
 
-    /// <summary>All five cards named in the plan, and no others — the fold reads this list,
+    /// <summary>The cards this theme still owns, and no others — the fold reads this list,
     /// so an omission here silently leaves a card behind and an extra one deletes a card
-    /// this theme does not own.</summary>
+    /// this theme does not own.
+    ///
+    /// **"motes" is deliberately absent** (#252). The plan named five; David gave Motes its
+    /// own card back on 2026-08-21 and this list kept naming it, so the fold saw a live
+    /// catalog key, ran on every launch and stripped the card out of HiddenSections each
+    /// time. <c>SectionFoldIdempotenceTests</c> holds the general rule.</summary>
     [Fact]
-    public void It_absorbs_exactly_the_five_cards_the_plan_names()
+    public void It_absorbs_exactly_the_cards_it_still_owns()
     {
-        Assert.Equal(["progress", "money", "motes", "faction", "raids"],
+        Assert.Equal(["progress", "money", "faction", "raids"],
             ProgressSurface.AbsorbedCardKeys);
+        Assert.DoesNotContain("motes", ProgressSurface.AbsorbedCardKeys);
     }
 
     [Fact]

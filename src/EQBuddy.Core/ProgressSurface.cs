@@ -101,9 +101,27 @@ public static class ProgressSurface
 
     /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
     /// reads this so the list of what disappears lives in ONE place rather than being
-    /// spelled again in each UI's settings migration.</summary>
+    /// spelled again in each UI's settings migration.
+    ///
+    /// **"motes" LEFT THIS LIST on 2026-09-04 (#252, TiconaX), and the rule it is the first
+    /// instance of: a fold may only name keys that are no longer cards.** Motes stopped
+    /// being absorbed on 2026-08-21, when David gave it its own top-level card back — but
+    /// this list was not told, so <c>FoldThemeSections</c> went on seeing a live catalog key
+    /// in every profile's <c>SectionOrder</c>, judged itself stale, and re-ran on EVERY
+    /// launch. Each run stripped "motes" out of <c>HiddenSections</c>, so a player who hid
+    /// the card found it back the next time they started the app, forever.
+    ///
+    /// <c>OptionsViewModel.AbsorbedTitles</c> had already dropped Motes for the same reason
+    /// and says so in as many words. Two lists describing one fold, and only one of them was
+    /// updated — which is the whole hazard, and why
+    /// <c>SectionFoldIdempotenceTests.No_fold_absorbs_a_key_that_is_still_a_card</c> now
+    /// checks this list against the catalog rather than trusting either comment.
+    ///
+    /// <see cref="TabForKey"/> still resolves "motes" to Wealth, and must: that is about a
+    /// saved TAB choice landing somewhere true, which has nothing to do with whether the
+    /// card exists.</summary>
     public static readonly IReadOnlyList<string> AbsorbedCardKeys =
-        ["progress", "money", "motes", "faction", "raids"];
+        ["progress", "money", "faction", "raids"];
 
     /// <summary>The key the folded theme takes — the one card slot the five collapse into.
     /// Deliberately one OF the absorbed keys rather than a new one; see
