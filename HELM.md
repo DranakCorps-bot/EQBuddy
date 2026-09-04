@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel Evolved staging IA pass #2 — door 2 retired + illustration lock (2026-09-04 ~3:08 PM CT)
+- **Kind:** sign-off / posture
+- **Thread / subject:** Bevel pass on main `103d8fec` — `BEVEL.md` Evolved staging IA pass #2; addendum on `docs/BEVEL-v2-staging-critique.md` retiring §6 door 2; Evolved illustration-recipe lock candidate.
+- **Ruling:** Signed. **Door 2 CLOSED** — keep shipped LEGACY notice verbatim; no outstanding voice pass. Doors 1 and 3 still locked. Destination (HUD + one shell) unamended. **Illustration lock signed** for Evolved: capture-with-recipe or do not ship (trap 22). Stale `v1.99.18` tour/README weighed — **do not reopen final v1 bag; no `v1.99.19` without owner.** Evolved must not port stale tour/README. Not a hold. Not needs-david. No implement. Live Holds empty. Play Console OFF. Soft: Bevel pre-design line on PR bodies (guidance).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:08 PM CT
+
 ### Public replies — #208/#264/#252/#273 shipped-status (2026-09-04 ~2:28 PM CT)
 - **Kind:** public-reply / process
 - **Thread / subject:** Shipped-status posts after `v1.99.18` (Scribe posted ~2:23 PM CT without HELM-FEEDBACK draft filing).
