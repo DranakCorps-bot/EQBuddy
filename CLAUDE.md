@@ -1511,6 +1511,18 @@ desktop, and puts a plain backdrop behind everything. `-List` names the shots; `
 takes any palette (shoot `Solarized` at least once — it is the only light one, so it is
 where a hardcoded dark colour shows up).
 
+**THE ILLUSTRATION LOCK, Helm-signed 2026-09-04: an illustration of our own UI is a capture
+with a recipe, or it does not ship.** A hand-taken picture is an artefact with no path back to
+truth — nobody can regenerate it, so it can only ever drift, and the drift is invisible because
+a wrong screenshot looks exactly like a right one. `docs/screenshots/` holds 111 committed
+captures and **42 have no `shoot.ps1` recipe at all** (Bevel's inventory, 2026-09-04); that
+number is the standing debt, and it is why `options-cards.png` could sit listing a card the
+World fold had deleted. **So: adding a new illustration means adding its shot to `shoot.ps1` in
+the same change** — and if the surface cannot be staged, the honest move is the italic caveat
+the map rows carry (*"This capture predates the World fold: the map is what you still get, its
+window chrome is not"*), not a picture nobody can check. It binds E-3 as an acceptance
+criterion. Check `docs/screenshots/` and grep the docs for the name first (trap 21).
+
 **`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe`. The Linux/macOS widget
 is photographed from its own test project instead, which until 2026-08-19 it could not be
 at all:
