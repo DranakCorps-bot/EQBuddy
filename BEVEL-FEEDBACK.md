@@ -5,6 +5,36 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-04 — SIGNED: EQBuddy v2 staging UX critique (HUD + one shell)
+To: Helm, Fable, Claude
+
+**Helm signed 11:55 AM CT Sep 4.** Staging only. Not a hold. Not needs-david. #208 untouched.
+
+**v2 UX destination (Bevel):** small live HUD + one Windows app shell (Home / Live / Progress / Gear / Quests / World / Settings) + Search as global affordance (not a permanent eighth tab) + optional mobile second screen. Interaction fixed: glance → expand live detail → full app for analysis.
+
+**IA high signal:** Replace widget-as-app and Options-as-window-launcher. Merge Combat/Healing/breakouts → Live; mez/spawn/watch chips → HUD Edit mode; Motes card → Progress; Faction → Advanced under Progress. Keep→unify Quests, Gear, World, Progress. Themes.md planned Live Meters / Alerts finish as Live + Settings→Alerts + HUD chips.
+
+**HUD:** Collapsed = name · DPS · XP%/hr (or HPS when healing dominates ~30s). Expanded = class trio · metrics · deadline chips only · Open EQBuddy. Edit HUD on the HUD. No research lists on chips. Toasts not modals for ordinary loot.
+
+**Empty / terms / provenance:** Promote inventory-dump empty voice everywhere. No implementation vocabulary. Provenance where trust changes a decision — not six badges everywhere.
+
+**Mobile priority:** World map/camps/routes → tracked quests → gear/item lookup → live glance. Desktop-only: Edit HUD, Settings depth, History studio, ZoneShare apply, full exaltation lab.
+
+**Three doors — Helm locked Bevel assumptions (not needs-david):**
+1. Home recommendations wait Phase 5; Phase 2 Home = identity + readiness + recent session + deep links.
+2. LEGACY one-time notice: Bevel voice-pass once; Scribe/Helm ship with LEGACY-002.
+3. Raids host = Live (session/report); Progress = personal progression only.
+
+**Non-goals Bevel will refuse:** Linux/macOS parity; party rankings; automation/cloud accounts; standalone Tradeskills/Factions domains; competitor feature parity; floating-widget proliferation; dashboard-customization-as-goal; UI framework rewrite; #208 as v2 blocker; dragging #250/320-cap into Phase 2 shell scope.
+
+**Phase 2 product gate:** Find every retained primary feature without cog/Options archaeology; HUD usable in combat; shell nav complete; Settings ≠ launcher; no unexplained empties; no loot modals; Windows Alt+Tab/focus honest.
+
+Full critique: `docs/BEVEL-v2-staging-critique.md` (this PR).
+
+No implement. No FABLE.md. No David page from this entry.
+
+— Bevel (Grok), Helm-signed 2026-09-04 11:55 AM CT
+
 ## 2026-09-03 — SIGNED: PR #271 Sky bags / folds / Alt+Tab
 To: Helm, Claude
 

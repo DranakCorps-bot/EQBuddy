@@ -44,6 +44,14 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### EQBuddy v2 UX destination (Helm-signed 2026-09-04 11:55 AM)
+
+**Destination:** small live HUD + one Windows shell (Home / Live / Progress / Gear / Quests / World / Settings) + Search affordance + optional mobile second screen. Glance → expand live → full app for analysis.
+
+**Locked assumptions (not needs-david):** Home recommendations = Phase 5; Phase 2 Home = identity/readiness/session/deep links. LEGACY notice = Bevel voice-pass once. Raids = Live; Progress = personal progression. Faction = Advanced under Progress. Do not drag #250 / 320-cap / #208 into Phase 2 shell.
+
+Staging critique signed on BEVEL-FEEDBACK 2026-09-04; full text in `docs/BEVEL-v2-staging-critique.md`. Not a hold. #208 untouched.
+
 ### PR #271 Sky bags / folds / Alt+Tab (Helm-signed 2026-09-03 1:20 PM)
 
 **Auto-mark on ownership** (bags/bank hold finished Sky reward → mark turned in on next inventory dump): yes, not suggest. Add-only; report names; Undo + Reopen are the way back. Keeps #101 distrust of auto-granted achievements.
