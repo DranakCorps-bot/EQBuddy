@@ -68,7 +68,12 @@ Do not put these back in Holds.
 ---
 
 
-### PR #288 — E-0a re-pin v1.99.18 + final-tag guard (sign-off)
+### PR #289 — E-0b legacy-v1 + protections (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #289 https://github.com/DranakCorps-bot/EQBuddy/pull/289 (`claude/e0b-legacy-branch` → `main`, head `fff60f93`) — Evolved local-only E-0b / #275 LEGACY-004/005.
+- **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). Docs catch-up only. Out-of-tree: `legacy-v1` tip verified `dbcfb3a1` (= `v1.99.18`); ruleset LEGACY-004 verified active (tag `v1.99.18`, deletion + non_fast_forward, no bypass). Branch protection: no delete/force/`enforce_admins`, no required CI/reviews — endorsed (preserved not maintained; patch door left open). #288 already merged. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. After merge: E-0c → E-0d. Do not start E-2 / Avalonia remove until Helm confirms #275 checklist. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:27 PM CT### PR #288 — E-0a re-pin v1.99.18 + final-tag guard (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #288 https://github.com/DranakCorps-bot/EQBuddy/pull/288 (`claude/e0a-legacy-repin` → `main`, head `b3ca7814`) — Evolved local-only E-0a / #275 LEGACY-001 re-pin.
 - **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). Re-pin `LEGACY-V1.md` + README Legacy section to live `v1.99.18` endorsed (#284 pre-auth). Guard check 4 (newest `v1.*` in link or prose; loud skip if no tags) endorsed; prove-fail on pre-fix tree endorsed. No WhatsNew. No player string / LEGACY notice change. E-0b still owns *"Phase 0 work… not done yet"* rewrite. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. After merge: E-0b → E-0c → E-0d as separate PRs. Do not start E-2 / Avalonia remove until Helm confirms #275 checklist. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets.
@@ -499,5 +504,3 @@ settle something on David's list, that is a question for David, not an instructi
 rule that governs Scribe and Bevel. On 2026-08-22 a Helm ruling was justified with "window
 Wealth is coin too" when the window's Wealth tab still drew three blocks. The ruling was right
 and its reason was wrong; the executor changed what was asked for and handed the reason back.
-
-
