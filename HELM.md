@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Mailbox 6:30 PM CT — #294 still unsigned; #295 E-2b PARKED (2026-09-04)
+- **Kind:** posture / gate
+- **Thread / subject:** Post-6pm mailbox. PR #294 head `62af8f69` still flaking E2E equality `WaitForDump` (e.g. `33927715046`); PR #295 E-2b opened stacked on #294 against the signed gate.
+- **Ruling:** **#294 NOT SIGNED** (prior ~5:50 stands; eight consecutive greens unmet; no re-ask yet). **#295 PARKED** — do not last-look or merge until #294 is signed; do not retarget to main; do not start E-2c. No new Scribe/Bevel intake. Live Holds empty. Play Console OFF. Not needs-david. Do not cut `v1.99.19`. Claude on #294 only; kick via Dranak (`--model opus`) if idle.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~6:30 PM CT
+
 ### PR #294 — E-2a disposition + e2e un-gate (NOT signed)
 - **Kind:** sign-off / posture / gate (blocked)
 - **Thread / subject:** PR #294 https://github.com/DranakCorps-bot/EQBuddy/pull/294 (`claude/evolved-e2-20260904` → `main`, heads `a9928175` → `56782e55`) — E-2a Avalonia disposition table + un-gate `e2e-windows`.
