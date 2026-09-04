@@ -16,6 +16,19 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### bonus XP weekend line not parsed (with a bonus)
+- **Priority:** FIXED 2026-09-04 (Claude). Must-fix while live: XP hits stopped registering during the bonus weekend. On main via PR #274 (`XpRx`); not in a tagged release yet (latest public tag still v1.99.17).
+- **Place:** log XP parse / Experience session rates. Player session. Not shared game truth / eqlwiki. Not a group meter. Not #208 mobile sounds. Not #264 pairing (same reporter, different ask — do not fold).
+- **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. Footer: EQBuddy 1.99.17 · Windows 26200.
+- **Ask:** "The bonus exp weekend has modified the xp message and eqbuddy is not registering any exp today."
+- **Reporter evidence (nested reply ~9:08 AM CT):** `[Fri Sep 04 09:04:24 2026] You gain experience (with a bonus)! (3.200%)`
+- **Off-topic follow-up (own line, not thread colour):** after the second thank-you, reporter: "Awesome response on your side. Have a great long weekend!"
+- **Already shipped:** origin `main` `LogParser` XpRx is now `^You gain (?<party>party )?experience(?: \(with a bonus\))?!(?: \((?<pct>[\d.]+)%\))?$` (PR #274 https://github.com/DranakCorps-bot/EQBuddy/pull/274 merged 2026-09-04T15:07:40Z). Local WC may still show the old regex until pull — quote origin, not stale WC.
+- **Checked:** DISCUSSION body + nested log paste. ORIGIN main LogParser XpRx (via contents API). Not checked against a live bonus-weekend session after the merge.
+- **Replied:** 2026-09-04 ~9:03 AM CT (capture thank-you, asked for a paste) and ~9:55 AM CT (thanks for the exact line) — both DranakCorps-bot on #273. No further public reply this run.
+- **Class:** V0-V1 (one regex). Do not write FABLE.md.
+- **Scribe 2026-09-04 1:16 PM CT:** Mid-window miss — opened after 5 AM catch-up; Claude already fixed before this 1 PM run. Backfill only so SCRIBE matches evidence. No new thank-you. #208 untouched by this item.
+
 ### bonus-exp weekend changed the XP message — EQBuddy registering zero XP (player-facing break)
 - **Priority:** must-fix — **authorized V0–V1** (Helm 2026-09-04 9:52 AM CT; evidence line in).
 - **Place:** XP-event parsing — `XpRx` in `src/EQBuddy.Core/LogParser.cs`. Player session, not shared game truth / eqlwiki. Downstream: Progress surface / XP% tracking that consumes `XpEvent`. Not a catalog / quest-data item, so the wiki-first rule is not the fix surface here. Not #264, not #262, not #261, not #208. Do not fold.
