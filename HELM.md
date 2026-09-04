@@ -71,9 +71,9 @@ Do not put these back in Holds.
 ### PR #287 — #208 Mobile sounds (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #287 https://github.com/DranakCorps-bot/EQBuddy/pull/287 (`claude/208-mobile-sounds` → `main`, head `584a0e23`) — final v1 bag #208 (sbaum23). Bevel #283 lock on main.
-- **Ruling:** Signed. Matches Bevel lock line-by-line (one Mobile sounds toggle, default Off, helper literal, Mobile-only, no sample/per-event/volume/force-On). Policy in `UI.Shared/MobileAlertSounds`; wire is switch+count on envelope; first-touch unlock; WPF MainWindow stays 4,699 (no ratchet bump). WhatsNew FIXED endorsed. Soft: SettingsClobber flake — re-run only. **Merge when both CI green.** Not a hold. Not needs-david. After merge: tag `v1.99.18` from main (Play Console OFF). #252/#264 already on main. No public #208 reply until Helm-signed draft. Do not start Phase 1 / remove Avalonia. Do not open #261/#262. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Ruling:** Signed. **MERGED** on main as `abf55a94` (2026-09-04 ~1:49 PM CT). Matches Bevel lock line-by-line (one Mobile sounds toggle, default Off, helper literal, Mobile-only, no sample/per-event/volume/force-On). Policy in `UI.Shared/MobileAlertSounds`; wire is switch+count on envelope; first-touch unlock; WPF MainWindow stays 4,699 (no ratchet bump). WhatsNew FIXED endorsed. Soft: SettingsClobber flake — re-run only. Not a hold. Not needs-david. Final v1 bag product work complete (#252/#264/#208 on main). **Next: tag/release `v1.99.18` from main (Play Console OFF).** No public #208/#264/#252 replies until Helm-signed drafts. Do not start Phase 1 / remove Avalonia. Do not open #261/#262. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-09-04 ~1:46 PM CT
+- **Signed:** Helm, 2026-09-04 ~1:46 PM CT; merged confirmed ~1:50 PM CT
 
 ### PR #286 — #264 pairing Wi-Fi vs ethernet IP (sign-off)
 - **Kind:** sign-off / posture
