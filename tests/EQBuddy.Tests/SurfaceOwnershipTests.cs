@@ -1,4 +1,4 @@
-namespace EQBuddy.Tests;
+﻿namespace EQBuddy.Tests;
 
 /// <summary>
 /// **A control NEVER moves between two windows on Avalonia** — the rule PR A exists to make
@@ -21,10 +21,21 @@ namespace EQBuddy.Tests;
 /// the inline theme card — the first host alive at the same time as the window — threw on
 /// its first run and blocked Inline themes PR 1 outright.
 ///
-/// → **Every host builds its own instance through a factory, and no host interface returns
-/// a <c>Control</c> it did not just create.** That is what this scans for. WPF is exempt:
-/// it has had the <c>IWidgetCard</c> seam since Gate 5b and its toolkit does not have the
-/// bug — but the rule is cheap there too, so the same scan runs over both lanes.
+/// → **Every host builds its own instance through a factory, and no host hands out a UI
+/// object it did not just create.** That is what this scans for.
+///
+/// **E-2 (2026-09-04) removed the lane the crash was ON, and this file follows the WPF one
+/// instead of retiring** — the plan is explicit that the exemptions must not be
+/// re-justified as "one lane, so ownership does not matter". Trap 45 was FOUND by Avalonia
+/// and is not ABOUT Avalonia: a method returning a long-lived UI object is a transfer of
+/// ownership wearing a getter's clothes, a WPF <c>UIElement</c> has exactly one parent too,
+/// and there the symptom is not an exception but a surface silently vanishing from
+/// whichever host drew it first. E-3's shell is about to become a second host for surfaces
+/// the widget still renders, which is the condition that produced this in the first place.
+///
+/// One correction made in the same pass: the header used to say "the same scan runs over
+/// both lanes" while the first four checks read `EQBuddy.Avalonia` and nothing else. The
+/// WPF half was a claim, not a scan.
 /// </summary>
 public class SurfaceOwnershipTests
 {
@@ -55,31 +66,47 @@ public class SurfaceOwnershipTests
     /// not a blanket skip.</summary>
     public static readonly (string File, string Accessor, string Why)[] StillHandingOutBodies = [];
 
-    /// <summary>The accessor shape that was the bug: <c>Control SomethingTabBody(Tab)</c>.
-    /// It reads like a getter and it is a transfer of ownership between two windows.</summary>
+    /// <summary>
+    /// The accessor shape that was the bug: a host handing out a BUILT body per tab. It
+    /// reads like a getter and it is a transfer of ownership between two windows.
+    ///
+    /// **Re-pointed at the WPF lane in E-2 (2026-09-04), and this is the row where "one
+    /// lane, so ownership does not matter" would have been the easy wrong answer.** The
+    /// crash was Avalonia's, but the trap is not: a method that returns a long-lived UI
+    /// object is a transfer of ownership wearing a getter's clothes, and a WPF UIElement
+    /// still has exactly one parent — a shared instance gets torn out of whichever host
+    /// drew it last, silently, with no exception to point at. The scan had been declaring
+    /// in its own header that it "runs over both lanes" while every path in this group read
+    /// `EQBuddy.Avalonia`; now it does what it said.
+    ///
+    /// It matches the SHAPE rather than four literal signatures, because a WPF host would
+    /// spell the return type `UIElement` or `FrameworkElement` where Avalonia spelled it
+    /// `Control` — and because E-3's shell is about to add hosts nobody has named yet.
+    /// </summary>
     [Theory]
-    [InlineData("ProgressWindow.cs")]
-    [InlineData("GearLootWindow.cs")]
-    [InlineData("CreatureWindow.cs")]
-    [InlineData("QuestsWindow.cs")]
+    [InlineData("ProgressWindow.xaml.cs")]
+    [InlineData("GearLootWindow.xaml.cs")]
+    [InlineData("CreatureWindow.xaml.cs")]
+    [InlineData("QuestsWindow.xaml.cs")]
+    [InlineData("WorldWindow.xaml.cs")]
     public void NoHostInterfaceHandsOutATabBody(string file)
     {
-        var path = Path.Combine(Src, "EQBuddy.Avalonia", file);
-        if (!File.Exists(path)) return;
+        var path = Path.Combine(Src, "EQBuddy", file);
+        Assert.True(File.Exists(path),
+            $"{file} moved or was folded away — move this row with it rather than letting " +
+            "the scan skip a host (a guard that silently skips is not a guard).");
         var text = File.ReadAllText(path);
         var exempt = StillHandingOutBodies.FirstOrDefault(r => r.File == file);
 
-        foreach (var accessor in new[]
-        {
-            "Control ProgressTabBody(ProgressTab tab);",
-            "Control LootTabBody(LootTab tab);",
-            "Control CreatureTabBody(CreatureTab tab);",
-            "Control QuestTabBody(QuestTab tab);",
-        })
-        {
-            if (exempt.Accessor == accessor) continue;
-            Assert.DoesNotContain(accessor, text);
-        }
+        var accessors = System.Text.RegularExpressions.Regex.Matches(text,
+            @"\b(?:UIElement|FrameworkElement|Control)\s+(\w*TabBody)\s*\(")
+            .Select(m => m.Value.Trim())
+            .Where(a => a != exempt.Accessor)
+            .ToList();
+
+        Assert.True(accessors.Count == 0,
+            $"{file} hands a built body out per tab ({string.Join(", ", accessors)}). Each " +
+            "host builds its own surfaces through a factory instead — trap 45.");
     }
 
     /// <summary>And the exemptions are real ones. A row that no longer describes the file
@@ -90,43 +117,46 @@ public class SurfaceOwnershipTests
     {
         foreach (var (file, accessor, why) in StillHandingOutBodies)
         {
-            var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.Avalonia", file));
+            var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", file));
             Assert.Contains(accessor, text);
             Assert.NotEmpty(why);
         }
     }
 
-    /// <summary>The positive half, per trap 34: forbidding the old name is not the same as
-    /// requiring the new shape. A future <c>ProgressBody(tab)</c> would sail past the scan
-    /// above, so every lane is asserted to actually have its factory.</summary>
+    /// <summary>The positive half, per trap 34: forbidding a shape is not the same as
+    /// requiring the right one. A future <c>ProgressBody(tab)</c> would sail past the scan
+    /// above, so the host is asserted to actually build its own set.</summary>
     [Fact]
     public void TheProgressHostHandsOutAFreshSetInstead()
     {
-        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.Avalonia", "ProgressWindow.cs"));
+        var window = File.ReadAllText(Path.Combine(Src, "EQBuddy", "ProgressWindow.xaml.cs"));
+        var widget = File.ReadAllText(Path.Combine(Src, "EQBuddy", "MainWindow.xaml.cs"));
 
-        Assert.Contains("ProgressSurfaceSet NewProgressSurfaces();", text);
+        Assert.Contains("ProgressSurfaceSet NewProgressSurfaces()", widget);
         // And the window uses it in its CONSTRUCTOR — a set fetched later, per render,
         // would rebuild the surfaces under the player and lose their fold states.
-        Assert.Contains("_surfaces = main.NewProgressSurfaces();", text);
+        Assert.Contains("var surfaces = main.NewProgressSurfaces();", window);
     }
 
-    /// <summary>PR 2's two lanes got the same shape, and the windows build their sets in
-    /// their constructors, exactly as Progress does.</summary>
+    /// <summary>The other theme windows build their own surfaces in their own constructors,
+    /// exactly as Progress does — by calling a factory on the widget, or by constructing
+    /// the view outright, which is just as fresh. What none of them may do is take one the
+    /// widget is already rendering.</summary>
     [Theory]
-    [InlineData("CreatureWindow.cs", "CreatureSurfaceSet NewCreatureSurfaces();",
-        "var set = main.NewCreatureSurfaces();")]
-    // The Loot factory takes the host's gear-list cap since #250 PR 2 (the window's own
-    // BodyScroll decides, not a card-sized 320), so the call no longer ends in "();". The
-    // open paren is deliberate and still pins what this guard is FOR: the window builds its
-    // own set, in its constructor, through the factory.
-    [InlineData("GearLootWindow.cs",
-        "LootSurfaceSet NewLootSurfaces(Func<double, double> gearListCap);",
-        "var set = main.NewLootSurfaces(")]
-    public void TheOtherTwoHostsHandOutFreshSetsToo(string file, string factory, string ctorUse)
+    // A field initialiser rather than a constructor line — same thing for ownership, and
+    // asserted as it is written rather than as it might have been.
+    [InlineData("CreatureWindow.xaml.cs", "KillsCardView _kills = new();")]
+    [InlineData("CreatureWindow.xaml.cs", "new DropsCardView(main)")]
+    [InlineData("GearLootWindow.xaml.cs", "new LootCardView(main, _settings)")]
+    // The gear factory takes the host's list cap since #250 PR 2 (the window's own
+    // BodyScroll decides, not a card-sized 320), so the call does not end in "()". The
+    // open paren is deliberate and still pins what this guard is FOR.
+    [InlineData("GearLootWindow.xaml.cs", "main.NewGearCard(")]
+    [InlineData("GearLootWindow.xaml.cs", "new InventoryView(main)")]
+    public void TheOtherHostsBuildTheirOwnSurfacesToo(string file, string ctorUse)
     {
-        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.Avalonia", file));
+        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", file));
 
-        Assert.Contains(factory, text);
         Assert.Contains(ctorUse, text);
     }
 
@@ -135,14 +165,13 @@ public class SurfaceOwnershipTests
     /// set, unlike Progress/Creature/Loot, because MapView/SpawnsView do real
     /// construction-time work (file I/O, ledger reads) a shared factory would fire
     /// needlessly for every sibling. WPF's <c>WorldWindow</c> (PR 2) calls all four from
-    /// its own constructor; Avalonia still opens three separate standalone windows until
-    /// its own PR 2 fold. Both lanes name the same four methods, which is what a reader
-    /// of one lane checks against the other.
+    /// its own constructor. (The Avalonia row went with the platform in E-2; the four
+    /// factories are named here because a World surface built once and shared is the same
+    /// ownership transfer as a tab body handed over.)
     /// </summary>
     [Theory]
-    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
-    public void BothLanesNameTheSameFourWorldFactories(string project, string file)
+    public void TheWidgetNamesTheSameFourWorldFactories(string project, string file)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
 
@@ -169,10 +198,6 @@ public class SurfaceOwnershipTests
     [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewSpawnsView(initialZone)")]
     [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewTravelView()")]
     [InlineData("EQBuddy", "WorldWindow.xaml.cs", "main.NewTravelsView()")]
-    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "new MapView(main)")]
-    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "main.NewSpawnsView(initialZone)")]
-    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "new TravelView(main)")]
-    [InlineData("EQBuddy.Avalonia", "WorldWindow.cs", "main.NewTravelsView()")]
     public void EveryWorldHostBuildsItsOwnFreshView(string project, string file, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
@@ -184,7 +209,6 @@ public class SurfaceOwnershipTests
     /// the store the accessor read from, and leaving it behind would leave the next person
     /// a loaded gun with the trigger guard removed.</summary>
     [Theory]
-    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
     public void NoWidgetKeepsATableOfBuiltBodies(string project, string file)
     {
@@ -194,13 +218,13 @@ public class SurfaceOwnershipTests
         Assert.DoesNotContain("HandThemeBodyTo", text);
     }
 
-    /// <summary>Both lanes build their Progress set the same way, from a factory named the
-    /// same thing. The two seams drifting apart is what carried #122 and #152 to Linux
-    /// after Windows had already paid for both.</summary>
+    /// <summary>The widget builds its Progress set from the same factory the window calls,
+    /// so the two hosts can never end up sharing one set. (Two lanes until E-2, 2026-09-04
+    /// — and E-3 makes this row matter more, not less: the shell is a second host for
+    /// surfaces the widget still renders.)</summary>
     [Theory]
-    [InlineData("EQBuddy.Avalonia", "MainWindow.cs")]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
-    public void BothLanesBuildProgressSurfacesThroughAFactory(string project, string file)
+    public void TheWidgetBuildsProgressSurfacesThroughAFactory(string project, string file)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
 
@@ -208,13 +232,12 @@ public class SurfaceOwnershipTests
         Assert.Contains("new ProgressSurfaceSet(", text.Replace("=> new(", "=> new ProgressSurfaceSet("));
     }
 
-    /// <summary>And the seam exists on both lanes, with the same three members. A reader of
-    /// one lane should be able to read the other; that was the argument for mirroring the
-    /// WPF file name for name rather than inventing an Avalonia shape.</summary>
+    /// <summary>And the seam itself still exists, with its three members. Without this the
+    /// scans above could all pass on a lane that had quietly stopped having an IWidgetCard
+    /// at all (trap 34). One lane since E-2, 2026-09-04.</summary>
     [Theory]
-    [InlineData("EQBuddy.Avalonia")]
     [InlineData("EQBuddy")]
-    public void TheSeamIsTheSameOnBothLanes(string project)
+    public void TheSeamStillHasItsThreeMembers(string project)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, "IWidgetCard.cs"));
 

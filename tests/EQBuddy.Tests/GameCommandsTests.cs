@@ -93,25 +93,18 @@ public class GameCommandsTests
         ("EQBuddy/MapView.cs", nameof(GameCommands.LocSocial),
             "the /loc social is the map's whole trick"),
 
-        // ---- Avalonia: the same surfaces, per CLAUDE.md's both-UIs-in-one-change rule.
-        // A gap here is how #122 and #152 reached Linux after Windows had already paid.
-        // Lifted out of MainWindow.cs on 2026-08-21, and this row moving is the notice the
-        // list exists to give — the third time in two days it has followed a surface.
-        ("EQBuddy.Avalonia/GearCardView.cs", nameof(GameCommands.OutputfileInventory),
-            "the checklist auto-ticks from the inventory dump — WPF's GearCardView twin"),
-        ("EQBuddy.Avalonia/MainWindow.cs", nameof(GameCommands.OutputfileAchievements),
-            "hosts the Raids section inline"),
-        // ONE row where there were two, a day after Windows made the same trade: the Gear
-        // Locker and the Inventory window read the same dump and folded into one tab with
-        // two pivots. This list has now followed that surface on BOTH builds, which is the
-        // notice a curated list exists to give.
-        ("EQBuddy.Avalonia/InventoryView.cs", nameof(GameCommands.OutputfileInventory),
-            "the tab IS the dump — ranked by slot, or listed by bag"),
-        ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileInventory), "WPF twin"),
-        ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileAchievements), "WPF twin"),
-        ("EQBuddy.Avalonia/QuestsWindow.cs", nameof(GameCommands.OutputfileFaction), "WPF twin"),
-        // Moved from EQBuddy.Avalonia/MapWindow.cs to MapView.cs in World PR 1.
-        ("EQBuddy.Avalonia/MapView.cs", nameof(GameCommands.LocSocial), "WPF twin"),
+        // ---- The seven Avalonia rows that used to sit here went with the platform in E-2
+        // (2026-09-04). They were the same surfaces, per the both-UIs-in-one-change rule,
+        // and the list following them across two folds is the notice this list exists to
+        // give — including on the way out.
+        //
+        // **What must not be inferred from their removal: the RULE is unchanged.** It was
+        // never about parity between lanes. A surface that names an /outputfile command
+        // and hands the player no way to run it is the same defect as a silent no-op, and
+        // it is worse in the empty state, which is the only state a new player sees
+        // (trap 34: the ban this list sits beside cannot see a surface with no copy source
+        // at all). Every row above still earns its place on its own, and E-3's shell adds
+        // rows here as it takes these surfaces over.
     ];
 
     public static TheoryData<string, string, string> SurfaceRows()

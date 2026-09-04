@@ -48,12 +48,16 @@ public class LogJanitorPolicyTests
     /// DateTime.MinValue, that copy ran on the first one-second tick and emptied
     /// everything while the consent dialog was still on page 1.
     ///
-    /// This scans both widgets' source so a fifth call site cannot reintroduce it.
-    /// Same shape as CompanionSnapshotArgumentTests (trap 33).
+    /// This scans the widget's source so a fifth call site cannot reintroduce it. Same
+    /// shape as CompanionSnapshotArgumentTests (trap 33).
+    ///
+    /// **It scanned two widgets until E-2 (2026-09-04), and the count of lanes was never
+    /// the point — the count of DECIDERS was.** Four places decided one destructive
+    /// question and the one that disagreed did so in the direction that destroys data;
+    /// three of those four were in the file this row still reads.
     /// </summary>
     [Theory]
     [InlineData("src/EQBuddy/MainWindow.xaml.cs")]
-    [InlineData("src/EQBuddy.Avalonia/MainWindow.cs")]
     public void NoWidgetDecidesPruningForItself(string relative)
     {
         var source = File.ReadAllText(Path.Combine(RepoRoot(), relative));

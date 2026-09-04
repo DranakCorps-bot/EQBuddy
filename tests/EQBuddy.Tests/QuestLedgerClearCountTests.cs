@@ -86,13 +86,14 @@ public sealed class QuestLedgerClearCountTests : IDisposable
         Assert.Empty(store.For("dranak_freeport"));
     }
 
-    /// <summary>Both windows must CALL the store's ClearCount, and neither may hand-roll
-    /// the offset again — the hand-rolled copy is exactly what went stale (trap 34's
-    /// positive half beside the fix).</summary>
+    /// <summary>The quest window must CALL the store's ClearCount and may not hand-roll the
+    /// offset again — the hand-rolled copy is exactly what went stale (trap 34's positive
+    /// half beside the fix). Scanned both lanes until E-2 (2026-09-04); the row that
+    /// remains is the one that ships, and the hand-rolled subtraction it forbids is a
+    /// within-lane regression, not a cross-lane one.</summary>
     [Theory]
     [InlineData("EQBuddy", "QuestsWindow.xaml.cs")]
-    [InlineData("EQBuddy.Avalonia", "QuestsWindow.cs")]
-    public void BothWindowsUseTheStoresClearCount(string project, string file)
+    public void TheQuestWindowUsesTheStoresClearCount(string project, string file)
     {
         var src = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));

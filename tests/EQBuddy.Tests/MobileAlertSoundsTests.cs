@@ -187,9 +187,10 @@ public class MobileAlertSoundsTests
     /// also tells the phone.
     ///
     /// A source scan, for <see cref="CompanionSnapshotArgumentTests"/>'s reason — the
-    /// widgets have no unit tests at all (docs/TestPlan.md §5) and this feature lives
-    /// entirely in which call sites remembered. Both lanes are checked in one loop: a fix
-    /// on Windows alone is how #122 and #152 reached Linux three releases later.
+    /// widget has no unit tests at all (docs/TestPlan.md §5) and this feature lives
+    /// entirely in which call sites remembered. **It looped over two lanes until E-2
+    /// (2026-09-04); the loop stays, because the list is per-call-site and the sites it
+    /// counts are all in the file that remains.**
     ///
     /// It is written as trap 34's shape — a curated must-list rather than a ban — because
     /// the failure mode here is an ABSENCE. "No call site may play a sound without cueing"
@@ -202,7 +203,6 @@ public class MobileAlertSoundsTests
         foreach (var relative in new[]
         {
             Path.Combine("EQBuddy", "MainWindow.xaml.cs"),
-            Path.Combine("EQBuddy.Avalonia", "MainWindow.cs"),
         })
         {
             var path = Path.Combine(Src, relative);

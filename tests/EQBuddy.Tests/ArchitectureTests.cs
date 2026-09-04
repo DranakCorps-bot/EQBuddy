@@ -139,63 +139,15 @@ public class ArchitectureTests
         (@"EQBuddy.Core/SessionStats*.cs", 2375),
         (@"EQBuddy/OptionsWindow.xaml.cs", 1547),
         (@"EQBuddy.Core/LogParser.cs", 853),
-        // THE LARGEST FILE IN THE REPO, and until 2026-08-19 the only big one with no
-        // ratchet at all — 5,127 lines, ~700 more than the WPF widget this list was
-        // written for. It was missed because the hotspots were chosen while the WPF
-        // decomposition was the work in front of us, and nothing since has looked at the
-        // list itself: the Avalonia twin grew unwatched the whole time the Windows one
-        // was being pulled apart.
-        //
-        // Entered at its CURRENT size rather than at some aspirational number, because a
-        // ratchet's job is to stop growth today; the 10% is the same grant every other
-        // entry gets. It should come down the way SessionStats did — the widget's card
-        // bodies here have never been lifted, and LootCardView.cs is the worked example
-        // of doing it (the Avalonia card that was a whole feature behind, Gate 4).
-        //
-        // NOT bumped for the Progress theme on 2026-08-19, and worth saying why, because
-        // the file GREW: 5,127 → 5,291, still legal inside the 10% grant. Its twin came
-        // down 31 lines for the same change and this went up 164, because the WPF fold
-        // moved five card VIEWS to a window while this one only re-parented five card
-        // BODIES — the bodies are still built and rendered here, and the IProgressHost
-        // implementation is new on top. That was the right call for the fold itself (it
-        // keeps "the tabs draw what the cards drew" literally true, with no rewrite to
-        // review) but it is not decomposition, and this entry should not be allowed to
-        // read as though it were. The headroom this file has left is now ~350 lines.
-        //
-        // 2026-08-20: the GEAR & LOOT fold took the same shape and cost another ~90 lines
-        // (IGearLootHost, the launcher, ShowGearLootWindow), so the headroom is ~100 and
-        // this note is the warning the next fold needs. **The next theme on this build must
-        // be preceded by a LIFT, not followed by one.** The obvious candidate is already
-        // named by its WPF twin: the gear checklist here is ~275 contiguous lines
-        // (BuildGearSection, RenderGearChecklist, GearRow, the auto-check high-water marks)
-        // and Windows lifted exactly that into GearCardView.cs. Note this build has no E2E
-        // suite, so CLAUDE.md's "pin the behaviour before the move" has to be paid in
-        // WidgetRenderTests instead — write the assertions first.
-        //
-        // 5,127 → 5,422 on 2026-08-21, and this is a LOWERING even though the number went
-        // up — the same distinction the WPF entry above had to make. The file had drifted
-        // to 5,637 against the 5,127 baseline: legal inside the grant, and THREE lines from
-        // failing. The gear checklist came out into GearCardView.cs (215 lines, plus
-        // CopyCommandButton into DesignSystem so a lifted surface does not have to copy it),
-        // exactly the lift the note above named, and 5,422 is what is honestly left.
-        //
-        // Lowered in the SAME commit as the lift, because room that is freed and not
-        // claimed quietly refills — and the thing about to claim it is the Inventory tab
-        // that closes the 1.98.1 parity gap, which is precisely why the lift came first.
-        //
-        // 5,422 → 5,229 on 2026-08-22 (PR A, Fable 5's plan), and this one is the lowering
-        // the 2026-08-19 note above asked for in as many words: *"the WPF fold moved five
-        // card VIEWS to a window while this one only re-parented five card BODIES"*. The
-        // five bodies are now five views — ProgressCardView, MoneyCardView, MotesCardView,
-        // FactionCardView, RaidsCardView on an Avalonia IWidgetCard seam, plus CardParts
-        // for the row builder they share. 369 lines left this file.
-        //
-        // **It was not a tidiness exercise.** Handing a Control built here to a window is a
-        // cross-TopLevel re-parent, which Avalonia throws on and has since 11.2 — the crash
-        // that shipped to Linux and macOS in every theme window (fixed in 1.99.4) and the
-        // blocker that stopped Inline themes PR 1. Nothing is shared now, so nothing can be
-        // moved, and the headroom PR 2 and PR 3 need on this lane exists.
-        (@"EQBuddy.Avalonia/MainWindow.cs", 5229),
+        // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
+        // in E-2 (2026-09-04). It was the largest file in the repo and it carried the
+        // longest baseline history here, most of it about lifts that were forced by a
+        // toolkit bug (trap 45) rather than by size — which is exactly why the row is not
+        // simply forgotten: **the WPF row above did NOT inherit its headroom.** A
+        // deletion that quietly raises someone else's ceiling is the "re-anchor erases
+        // the pressure" move this table exists to make somebody argue for out loud, and
+        // nobody is arguing for it. 4,273 stands, one line from its cap, and E-3's shell
+        // still has to be preceded by a lift.
     ];
 
     private const double AllowedGrowth = 1.10;
