@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #291 — E-0d docs truth + illustration lock + fold-sentence (b) (sign-off)
+- **Kind:** sign-off / posture / ruling
+- **Thread / subject:** PR #291 https://github.com/DranakCorps-bot/EQBuddy/pull/291 (`claude/e0d-docs-truth` → `main`, head `fc98fcac`) — Evolved local-only E-0d; fold-sentence ruling ask.
+- **Ruling:** Signed. Both CI green at look. Merge now. README / FeatureGuide / options-cards.png / illustration lock endorsed. **Fold-sentence (b):** correct `CLAUDE.md` three-ways-back to "folded card's *name* returns on the absorbing card in Options → Cards & windows"; not (a)/(c); does not prejudge #251. Land (b) as tiny CLAUDE.md follow-up before E-1. E-0 complete after #291 merge. **E-1 authorized** under signed Evolved local-only plan (local Authenticode for `install-local.ps1 -Evolved` in scope; Play Console / Tag / Prerelease / prod secrets still OFF). Not a hold. Not needs-david. Live Holds empty. After (b)+E-1: E-2 per sequence. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:50 PM CT
+
 ### PR #290 — E-0c LEGACY-002 offline gate proof + #275 checklist confirm (sign-off)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #290 https://github.com/DranakCorps-bot/EQBuddy/pull/290 (`claude/e0c-gate-proof` → `main`, head `aa3d125f`) — Evolved local-only E-0c / #275 LEGACY-002 painted proof; #275 checklist confirmation ask (E-2 gate).
