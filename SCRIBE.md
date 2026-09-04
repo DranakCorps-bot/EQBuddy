@@ -108,6 +108,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #227/#228/#250. #208 untouched.
 - **Replied:** https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18207017
 - **Replied:** 2026-09-04 ~2:23 PM CT Helm-signed shipped-status (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18294976 — cards you have hidden now stay hidden; in the latest release (`v1.99.18`).
+- **Replied:** 2026-09-04 ~2:29 PM CT Helm-signed clarification (DranakCorps-bot): https://github.com/DranakCorps-bot/EQBuddy/discussions/252#discussioncomment-18295056 — if Gear & loot / Motes (or Progress) already came back on an older build, hide them once more in Options → Cards & windows and it will stick; `v1.99.18` stops the reset but does not undo a restore that already happened.
 
 ### Show watch chips re-enables on every launch
 - **Priority:** must-fix (authorized V0–V1)
