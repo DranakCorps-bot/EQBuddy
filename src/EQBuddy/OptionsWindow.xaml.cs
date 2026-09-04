@@ -47,6 +47,10 @@ public partial class OptionsWindow : Window
             GridSpacingSlider.Minimum, GridSpacingSlider.Maximum);
         GridSpacingLabel.Text = $"{GridSpacingSlider.Value:0} px";
         TargetDropsCheck.IsChecked = _vm.ShowTargetDrops;
+        MobileSoundsCheck.IsChecked = _vm.MobileSounds;
+        MobileSoundsLabel.Text = EQBuddy.UI.Shared.MobileAlertSounds.Label;
+        MobileSoundsNote.Text = EQBuddy.UI.Shared.MobileAlertSounds.HelperText
+            + " " + EQBuddy.UI.Shared.MobileAlertSounds.ScopeNote;
         HideUnfocusedCheck.IsChecked = _vm.HideWhenGameUnfocused;
         HideNotRunningCheck.IsChecked = _vm.HideWhenGameNotRunning;
         HideAltTabCheck.IsChecked = _vm.HideFromAltTab;
@@ -564,6 +568,14 @@ public partial class OptionsWindow : Window
 
     /// <summary>Transient message shown in the recording button after a rejected press.</summary>
     private string? _recordingHint;
+
+    /// <summary>#208. No sample plays on the flip — Bevel's lock is explicit about that,
+    /// and a demo noise from a PC while the phone is the surface under discussion would be
+    /// answering a different question.</summary>
+    private void OnMobileSoundsToggled(object sender, RoutedEventArgs e)
+    {
+        if (_ready) _vm.MobileSounds = MobileSoundsCheck.IsChecked == true;
+    }
 
     private void OnHideUnfocusedToggled(object sender, RoutedEventArgs e)
     {

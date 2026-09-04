@@ -38,6 +38,7 @@ public static partial class CompanionProjection
             Identity = new CompanionIdentity(input.Character, stats?.CurrentZone ?? "", input.AppVersion),
             Offered = offered,
             Theme = input.Theme,
+            Alerts = input.Alerts,
             Map = On(CompanionSurfaces.Map) ? input.Map : null,
             Spawns = On(CompanionSurfaces.Spawns) ? new CompanionSpawnSection(BuildTimers(input.Timers, now)) : null,
             Travel = On(CompanionSurfaces.Travel)
@@ -137,8 +138,15 @@ public static partial class CompanionProjection
     {
         var map = new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            // The alert cue rides the ENVELOPE, which wakes every connected device
+            // whatever it subscribed to — and that is the point: a tablet showing only
+            // the map is exactly the device that needs to hear a camp pop. Both members
+            // are step changes (a switch flipped, an alert fired), so nothing here drifts
+            // on the clock (trap 8); a timestamp in this slot would wake every paired
+            // phone once a second forever.
             [EnvelopeSection] =
-                $"{snap.Identity.Character}|{snap.Identity.Zone}|{string.Join(',', snap.Offered)}|{snap.Theme?.Stamp}",
+                $"{snap.Identity.Character}|{snap.Identity.Zone}|{string.Join(',', snap.Offered)}|{snap.Theme?.Stamp}" +
+                $"|{(snap.Alerts is { } al ? $"{(al.SoundEnabled ? 1 : 0)}:{al.Seq}" : "-")}",
         };
 
         if (snap.Map is { } m)

@@ -2552,8 +2552,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // banner on top of it was double notification (David's call). Each named
             // can carry its own sound; "Default" maps to Alarm — a camp popping
             // deserves a louder default than a loot ding (also David's call).
-            foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))
-                PlayAlertSound(sound);
+            foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))   // + the phone, #208
+                { PlayAlertSound(sound); _companion.RaiseAlert(); }    // see MobileAlertSounds
 
             // The chip hide-rule and its one exception live in ChipStackPlan.
             var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
@@ -3257,7 +3257,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             AlertTile.ShowAlert($"{ruleName}: {label}",
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
-            PlayAlertSound(sound, coalesce: true);
+            { PlayAlertSound(sound, coalesce: true); _companion.RaiseAlert(); }   // + phone, #208
         if (rule.AlertSpeech)
             EQBuddy.UI.Shared.SpokenAlerts.Speak(
                 EQBuddy.UI.Shared.SpokenAlerts.ResolvePhrase(rule.SpokenPhrase, label));

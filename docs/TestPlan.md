@@ -149,6 +149,13 @@ Audited at **v1.82.0 (2026-08-14)**: 1,317 unit + 45 Avalonia + 6 E2E, all green
 | Theme reaches the page for every `var(--x)` it uses | **Auto** — `CompanionThemeTests` |
 | **A page left open across a PC update reloads itself once** — it never re-fetches otherwise, so the phone would run the JavaScript it downloaded when the tab was opened while both sides report the same version | **Auto** — `CompanionPageUpdateTests` |
 | A reload that does not take says so rather than looping | **Auto** — `CompanionPageUpdateTests` |
+| **Mobile sounds are off until the owner turns them on** (#208) — one switch in Options → Behavior, beside the pairing button, and a fresh profile is silent | **Auto** — `MobileAlertSoundsTests` |
+| A cue needs the listener AND the switch; neither stands in for the other, and the decision is made in one place rather than at each alert site | **Auto** — `MobileAlertSoundsTests` |
+| **Every alert that makes a noise on the PC makes one on the phone**, on both lanes — a muted watch rule stays muted on both, because the phone inherits the desktop's own per-rule choice | **Auto** — `MobileAlertSoundsTests` (source scan, both widgets) |
+| The cue wakes every paired device whatever it subscribed to, and a quiet tick wakes nobody — the count rides the envelope and never moves on the clock | **Auto** — `MobileAlertSoundsTests` |
+| A page plays once per step of the count, never on its first payload and never after the PC restarts — a deadline heard late is worse than silence | **Auto** — `MobileAlertSoundsTests` (reads the shipped page) |
+| A silenced phone is TOLD it is silenced; a phone the browser has not unlocked says how to unlock it, in the ⚙ Screens panel and not a modal | **Auto** — `MobileAlertSoundsTests`; **Manual** — tap-once behaviour needs a real browser |
+| Desktop alert sounds are untouched by the switch — they keep their own controls, volume and per-rule pickers | **Auto** — `MobileAlertSoundsTests`, `AlertSoundPlanTests` |
 | The widget's Quests card shows, opens the Quest Tracker, and keeps both checklists' counts on screen | **Auto** — `EndToEndTests` (EQBUDDY_EXPAND) |
 | The old `sky`/`epic` card keys fold onto `quests`, keeping position; hidden only if BOTH were hidden | **Auto** — `OptionsViewModelTests` |
 | **The widget's Progress card shows, opens the Progress window, and keeps all five folded headers' numbers on one line** — the PROGRESS THEME (docs/Themes.md) | **Auto** — `EndToEndTests` |

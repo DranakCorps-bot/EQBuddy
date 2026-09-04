@@ -82,6 +82,9 @@ public sealed class CompanionHost : IDisposable
     private readonly ConcurrentQueue<CompanionMapAction> _mapActions = new();
     private readonly ConcurrentQueue<CompanionTravelAction> _travelActions = new();
     private int _pendingMarkerDrops;
+    /// <summary>Alerts the PC has fired that the phone was allowed to hear (#208). A
+    /// count, never a clock — see <see cref="CompanionAlertsSection"/>.</summary>
+    private long _alertSeq;
     private CompanionServer? _server;
     private CompanionThemeSection? _theme;
     /// <summary>The searchable quest index, built once from the immutable catalog on
@@ -127,6 +130,33 @@ public sealed class CompanionHost : IDisposable
     /// work at all, so an unpaired EQBuddy pays one field read per pump and nothing
     /// else — the same "zero cost while idle" contract <see cref="Tick"/> keeps.</summary>
     public bool HasClients => _server is { ClientCount: > 0 };
+
+    /// <summary>
+    /// An alert just fired on the PC — let the phone make a noise about it (#208,
+    /// sbaum23). Called from the SAME places the desktop plays its own alert sound, so
+    /// the phone hears exactly what the PC decided was worth hearing: a muted watch rule
+    /// and a spawn row with its alert off never reach either surface.
+    ///
+    /// The switch is consulted HERE rather than at the call sites, so neither widget can
+    /// answer the question differently (trap 47), and a cue is not minted at all when the
+    /// answer is no — a phone that is not allowed to play a sound is never told there was
+    /// one to play.
+    ///
+    /// No push of its own: the count rides the next tick's envelope. At a one-second tick
+    /// that is the same latency the chips and every other surface already have, and a
+    /// second push path is how #202 happened.
+    /// </summary>
+    public void RaiseAlert()
+    {
+        if (!EQBuddy.UI.Shared.MobileAlertSounds.ShouldCue(_settings)) return;
+        Interlocked.Increment(ref _alertSeq);
+    }
+
+    /// <summary>What the wire says about the phone's audio this tick. The switch is sent
+    /// even when it is off: a page that knows it has been silenced can say so, and a page
+    /// that is told nothing can only look broken.</summary>
+    private CompanionAlertsSection AlertsSection() =>
+        new(_settings.CompanionSounds, Interlocked.Read(ref _alertSeq));
 
     /// <summary>Why the last Start failed (port in use, no permission), for the
     /// pairing window to show honestly; null when all is well.</summary>
@@ -312,6 +342,7 @@ public sealed class CompanionHost : IDisposable
             Offered = offered,
             Stats = stats,
             Theme = _theme,
+            Alerts = AlertsSection(),
             Settings = _settings,
             Timers = On(CompanionSurfaces.Spawns) ? timers : [],
             Mezzes = On(CompanionSurfaces.Mez) ? _sources.Mezzes?.Invoke(now) ?? [] : [],

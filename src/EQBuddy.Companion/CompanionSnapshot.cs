@@ -56,6 +56,12 @@ public sealed record CompanionSnapshot
     /// a phone with no colors is a broken phone); sent on connect and after a swap.</summary>
     public CompanionThemeSection? Theme { get; init; }
 
+    /// <summary>Whether this phone may make a noise, and the count of alerts the PC has
+    /// fired (#208). Not a surface either — it is not a screen the ⚙ picker can turn off,
+    /// and gating it behind one would mean a device showing only the map could never be
+    /// told an alert fired.</summary>
+    public CompanionAlertsSection? Alerts { get; init; }
+
     // ---- sections, one nullable property per surface ----
     public CompanionMapSection? Map { get; init; }
     public CompanionSpawnSection? Spawns { get; init; }
@@ -177,3 +183,25 @@ public sealed class CompanionClientState
 
 /// <summary>Who and where the data comes from — the page's header line.</summary>
 public sealed record CompanionIdentity(string Character, string Zone, string AppVersion);
+
+/// <summary>
+/// EQBuddy Mobile's alert audio, as two numbers (#208, sbaum23).
+///
+/// <para><paramref name="Seq"/> is a COUNT, not a timestamp and not a payload: it steps by
+/// one each time the PC fires an alert the phone is allowed to hear, and stands still
+/// otherwise. That is the property that makes it safe to ride the envelope fingerprint —
+/// trap 8 forbids a value that drifts every tick, and this one moves only when something
+/// happened. A page compares it against the last value it saw and plays once per step; a
+/// reconnecting page adopts the current value silently rather than replaying a camp that
+/// popped while it was away.</para>
+///
+/// <para>There is deliberately nothing here naming WHICH alert fired. One tone, one
+/// switch: per-event sounds are out of this cut (Bevel, Helm-signed 2026-09-04), and a
+/// field nothing reads is the mirror of trap 20 — the app doing something with the
+/// player's data and telling nobody.</para>
+/// </summary>
+/// <param name="SoundEnabled">The owner's master switch (Options → EQBuddy Mobile). Sent
+/// even when false, so a silent phone can say WHY it is silent instead of looking broken.</param>
+/// <param name="Seq">Alerts fired since this EQBuddy started, counting only those the
+/// switch above let through. Zero means nothing has fired yet this run.</param>
+public sealed record CompanionAlertsSection(bool SoundEnabled, long Seq);

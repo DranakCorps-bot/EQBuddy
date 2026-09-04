@@ -1976,7 +1976,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
         {
             // Sound only: the chip changing to DUE is already the visual notification.
             foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))
+            {
                 PlayAlertSound(sound);
+                // …and let a paired phone hear it too (#208). Off unless the owner turned
+                // Mobile sounds on; the host owns that decision, not this call site.
+                _companion.RaiseAlert();
+            }
 
             // The chip hide-rule and its one exception live in ChipStackPlan.
             var worldOnCamps = _worldWindow is { IsVisible: true } ww2 && ww2.CurrentTab == WorldTab.Camps;
@@ -2624,7 +2629,12 @@ public sealed class MainWindow : Window, IZoneHost, IQuestsHost, IDropsHost, IBu
             AlertTile.ShowAlert($"{ruleName}: {label}",
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
+        {
             PlayAlertSound(sound, coalesce: true);
+            // A muted rule resolves to null above and never gets here, so the phone
+            // inherits the per-rule choice without a second set of pickers (#208).
+            _companion.RaiseAlert();
+        }
         if (rule.AlertSpeech)
             EQBuddy.UI.Shared.SpokenAlerts.Speak(
                 EQBuddy.UI.Shared.SpokenAlerts.ResolvePhrase(rule.SpokenPhrase, label));

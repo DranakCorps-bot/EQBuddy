@@ -1928,9 +1928,20 @@ public sealed class OptionsWindow : Window
             new Thickness(0, 2, 0, 4)));
         var mobileBtn = AppTheme.ActionButton("EQBuddy Mobile…");
         mobileBtn.HorizontalAlignment = HorizontalAlignment.Left;
-        mobileBtn.Margin = new Thickness(0, 0, 0, 14);
+        mobileBtn.Margin = new Thickness(0, 0, 0, 0);
         mobileBtn.Click += (_, _) => _main.OpenCompanionWindow();
         panel.Children.Add(mobileBtn);
+
+        // #208: adjacent to pairing on purpose — it is a property of the phone, and the
+        // player who wants it is the player who just paired one. Label and both notes come
+        // from UI.Shared/MobileAlertSounds so this cannot drift from the WPF tab (#122,
+        // #152). No sample plays on the flip (Bevel's lock says so in as many words).
+        panel.Children.Add(Check(EQBuddy.UI.Shared.MobileAlertSounds.Label,
+            _vm.MobileSounds, on => _vm.MobileSounds = on, new Thickness(0, 10, 0, 0)));
+        panel.Children.Add(AppTheme.DimText(
+            EQBuddy.UI.Shared.MobileAlertSounds.HelperText + " "
+            + EQBuddy.UI.Shared.MobileAlertSounds.ScopeNote,
+            new Thickness(20, 2, 0, 14)));
 
         _hideUnfocusedCheck = Check("Hide the widget while the game is running but not focused",
             _vm.HideWhenGameUnfocused, on => _vm.HideWhenGameUnfocused = on, new Thickness(0));

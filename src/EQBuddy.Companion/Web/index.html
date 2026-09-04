@@ -460,6 +460,7 @@
       narrow screen the picks stack down the page; on a tablet they lay out side by side in
       this order, with the map taking the big panel. The PC decides which screens are
       offered at all (EQBuddy → Options).</div>
+    <div class="note" id="soundNote"></div>
     <div class="note">No browser chrome: tap ⛶ at the top for this visit, or use your
       browser's <b>Add to Home Screen</b> — that launches EQBuddy Mobile in its own window
       with no address bar at all, and it survives closing the tab.</div>
@@ -613,6 +614,115 @@ function boot() {
   const painted = {};        // surface -> JSON of what that panel currently shows
   const scope = {};          // combat board -> "fight" | "session"
 
+  // ---------- alert audio (#208, sbaum23) ----------
+  // The ask, verbatim: "As long as I can turn off alerts/chip in EQBuddy but leave them
+  // on in mobile (with the sounds for alerts happening in the browser)". Cosmic/Wayland
+  // will not let his overlay chips land on the monitor he put them on, so this page IS
+  // his overlay — and an overlay that cannot make a noise is one he has to keep watching.
+  //
+  // The PC decides WHEN. It sends `alerts.seq`, a count that steps once per alert it
+  // judged worth a sound, and `alerts.soundEnabled`, the owner's master switch. This end
+  // owns only two things the PC cannot know: whether the browser will let us make a noise
+  // at all, and what the noise is.
+  //
+  // Nothing here is a second product deciding which alerts matter — no thresholds, no
+  // per-event rules, no reading of chips or watch rows. If the count did not move, we are
+  // silent, whatever is on screen.
+  const alertAudio = (function () {
+    let ctx = null;
+    let seen = null;      // last seq acted on; null until the first payload
+    let enabled = false;  // what the PC last said about the switch
+    let ready = false;    // the browser has actually let us have a running context
+
+    // Browsers refuse to play audio until the page has been touched, and no setting on
+    // the PC can change that — it is the wrinkle #208's own reply promised out loud
+    // ("it can never be silent-by-default-then-just-works"). So we take the FIRST touch
+    // of any kind, whatever it was for: no modal, no "enable sounds" button, no sample.
+    // A propped-up tablet nobody ever touches stays silent, and the ⚙ panel says so
+    // rather than leaving it looking broken.
+    function unlock() {
+      if (!enabled) return;               // nothing to unlock for
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;                  // no Web Audio: stays honest, stays quiet
+        if (!ctx) ctx = new AC();
+        const settle = () => { const was = ready; ready = ctx.state === "running"; if (was !== ready) renderSoundNote(); };
+        const r = ctx.resume();
+        if (r && typeof r.then === "function") r.then(settle, settle); else settle();
+      } catch { /* a browser that refuses is a quiet phone, not a broken one */ }
+    }
+
+    // One tone, deliberately. Per-event sounds are out of this cut, and a synthesized
+    // two-note chirp ships no audio file — nothing to 404, nothing to cache, and no
+    // second thing that can be missing behind the switch (#153's lesson, one layer up).
+    function chirp() {
+      if (!ctx || ctx.state !== "running") return;
+      try {
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.setValueAtTime(1174, t + 0.11);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.32);
+      } catch { }
+    }
+
+    // Called with every snapshot. `a` is undefined against an older PC, which reads as
+    // "stay quiet" rather than as a default — the page never invents permission.
+    function apply(a) {
+      const was = enabled;
+      enabled = !!(a && a.soundEnabled);
+      if (was !== enabled) { if (enabled) unlock(); renderSoundNote(); }
+      if (!a) { seen = null; return; }
+      const seq = a.seq || 0;
+      // First payload of this page's life: adopt the count without playing. A phone that
+      // reconnects after a walk to the fridge must not replay the camp it missed —
+      // an alert is a deadline, and a deadline you hear late is worse than silence.
+      // A LOWER count means the PC restarted; adopt that silently for the same reason.
+      if (seen === null || seq < seen) { seen = seq; return; }
+      if (seq === seen) return;
+      seen = seq;
+      // Several alerts inside one tick are one noise. The count still advances, so
+      // nothing is "missed" — there is just no version of two beeps 40 ms apart that
+      // helps anybody.
+      if (enabled) chirp();
+    }
+
+    function state() {
+      return { enabled: enabled, ready: ready, supported: !!(window.AudioContext || window.webkitAudioContext) };
+    }
+
+    for (const evt of ["pointerdown", "touchend", "keydown"])
+      document.addEventListener(evt, unlock, { passive: true });
+    // Mobile browsers suspend the context when the tab goes to the background, and a
+    // tablet propped on a desk goes to the background constantly.
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) unlock(); });
+
+    return { apply: apply, state: state };
+  })();
+
+  // The ⚙ panel's one line about sound. Not a modal, not a button, not a sample: it
+  // exists because a silent phone with the switch ON would otherwise be indistinguishable
+  // from a broken one, and "silent no-ops are broken" cuts both ways.
+  function renderSoundNote() {
+    const note = $("soundNote");
+    if (!note) return;
+    const s = alertAudio.state();
+    note.textContent =
+      !s.enabled
+        ? "Alert sounds are off. Turn on Mobile sounds on the PC (EQBuddy → Options → Behavior) to hear alerts here."
+        : !s.supported
+          ? "Alert sounds are on, but this browser has no audio support — this device will stay quiet."
+          : s.ready
+            ? "Alert sounds are on. This device plays a tone when the PC raises an alert."
+            : "Alert sounds are on. Tap anywhere on this page once — browsers won't play a sound until you do.";
+  }
+
   function ensureChoice() {
     if (!choice) choice = { order: [], enabled: {} };
     for (const s of offered) {
@@ -663,6 +773,10 @@ function boot() {
         msg.quests.catalog = latest.quests.catalog;
       latest = msg; receivedAt = Date.now();
       applyTheme(msg.theme);
+      // Before the render, and outside it: a noise is not a repaint, and the repaint gate
+      // (#202) legitimately skips a push whose sections did not move — an alert cue is
+      // exactly such a push, because the count rides the envelope rather than a surface.
+      alertAudio.apply(msg.alerts);
       const offerChanged = JSON.stringify(msg.offered) !== JSON.stringify(offered);
       offered = msg.offered || [];
       ensureChoice();
@@ -2510,6 +2624,7 @@ function boot() {
       row.append(label, up, dn);
       rows.appendChild(row);
     });
+    renderSoundNote();
   }
   function mkMove(txt, disabled, fn) {
     const b = el("button", "mv", txt);
