@@ -68,12 +68,19 @@ Do not put these back in Holds.
 ---
 
 
+### PR #287 — #208 Mobile sounds (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #287 https://github.com/DranakCorps-bot/EQBuddy/pull/287 (`claude/208-mobile-sounds` → `main`, head `584a0e23`) — final v1 bag #208 (sbaum23). Bevel #283 lock on main.
+- **Ruling:** Signed. Matches Bevel lock line-by-line (one Mobile sounds toggle, default Off, helper literal, Mobile-only, no sample/per-event/volume/force-On). Policy in `UI.Shared/MobileAlertSounds`; wire is switch+count on envelope; first-touch unlock; WPF MainWindow stays 4,699 (no ratchet bump). WhatsNew FIXED endorsed. Soft: SettingsClobber flake — re-run only. **Merge when both CI green.** Not a hold. Not needs-david. After merge: tag `v1.99.18` from main (Play Console OFF). #252/#264 already on main. No public #208 reply until Helm-signed draft. Do not start Phase 1 / remove Avalonia. Do not open #261/#262. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~1:46 PM CT
+
 ### PR #286 — #264 pairing Wi-Fi vs ethernet IP (sign-off)
 - **Kind:** sign-off / posture
-- **Thread / subject:** PR #286 https://github.com/DranakCorps-bot/EQBuddy/pull/286 (`claude/264-pairing-wifi-ip` → `main`, head `33c80982`) — final v1 bag #264 (brhanson2-cyber). Head bump from `5fd03b1f` after merge `origin/main` + WhatsNew/DECISIONS resolve keeping #252/#264 FIXED lines.
-- **Ruling:** Signed (still). Two halves both endorsed: (1) Wi-Fi tiebreak `WirelessPreference = 5` when both adapters are real — never overtakes gateway/virtual/CGNAT/public penalties; Hyper-V/WSL/Tailscale "wireless" demotion asserted. (2) Pairing-window address picker + `CompanionPairingAddress` pin with stale-pin → ranked fallback — answers "how do I force it"; hidden when ≤1 address; pin ≠ effective address for UI. No WPF screenshot endorsed (ratchet at max per #282; lanes parallel via `CompanionPairingText`). Architecture.md Companion line-count correction endorsed (gate was already stale). WhatsNew 1.99.18 FIXED line endorsed as written. Soft: WPF CompanionWindow change flagged vs ratchet — bag-authorized, OK. No public #264 reply until Helm-signed draft after merge/tag unless asked. **Both CI green** (`build-and-test` + `build-avalonia-linux`); `e2e-windows` skipped. **Merge now.** Not a hold. Not needs-david. After merge: remaining bag before tag `v1.99.18` is **#208** mobile sounds (Bevel #283 lock on main) — #252 already on main via #285 (`a223c628`). Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
+- **Thread / subject:** PR #286 https://github.com/DranakCorps-bot/EQBuddy/pull/286 (`claude/264-pairing-wifi-ip` → `main`, head `33c80982`) — final v1 bag #264 (brhanson2-cyber).
+- **Ruling:** Signed. **MERGED** on main as `3b6fff2f` (2026-09-04 ~1:43 PM CT). Two halves both endorsed (Wi-Fi tiebreak + pairing address picker). No public #264 reply until Helm-signed draft after tag unless asked. Not a hold. Not needs-david. Remaining before tag `v1.99.18`: merge **#287** (#208). #252 already on main via #285. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-09-04 ~1:40 PM CT; head bump confirmed ~1:41–1:42 PM CT
+- **Signed:** Helm, 2026-09-04 ~1:40 PM CT; head bump ~1:41–1:42 PM CT; merged confirmed ~1:46 PM CT
 
 ### PR #285 — #252 cards reset stay hidden (sign-off)
 - **Kind:** sign-off / posture
@@ -456,4 +463,5 @@ settle something on David's list, that is a question for David, not an instructi
 rule that governs Scribe and Bevel. On 2026-08-22 a Helm ruling was justified with "window
 Wealth is coin too" when the window's Wealth tab still drew three blocks. The ruling was right
 and its reason was wrong; the executor changed what was asked for and handed the reason back.
+
 
