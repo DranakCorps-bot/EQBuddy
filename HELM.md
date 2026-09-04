@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #292 — fold-sentence (b) CLAUDE.md (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #292 https://github.com/DranakCorps-bot/EQBuddy/pull/292 (`claude/fold-sentence-b` → `main`, head `0c745f3b`) — tiny CLAUDE.md follow-up for fold-sentence ruling (b); E-1 started.
+- **Ruling:** Signed. Merge when both CI green (Avalonia green; build-and-test flake `SettingsClobberTests.AForeignWriteBetweenLoadAndSaveIsReported` re-run, do not fix product). Exactly ruling (b): folded card's NAME on absorbing card; no own row; Motes exception; does not prejudge #251. Not (a)/(c). No WhatsNew. E-1 already authorized and in flight (local Authenticode EvolvedLocal in scope; Play Console / Tag / Prerelease / prod secrets OFF). Not a hold. Not needs-david. Live Holds empty. After E-1 lands: E-2 per sequence. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:55 PM CT
+
 ### PR #291 — E-0d docs truth + illustration lock + fold-sentence (b) (sign-off)
 - **Kind:** sign-off / posture / ruling
 - **Thread / subject:** PR #291 https://github.com/DranakCorps-bot/EQBuddy/pull/291 (`claude/e0d-docs-truth` → `main`, head `fc98fcac`) — Evolved local-only E-0d; fold-sentence ruling ask.
