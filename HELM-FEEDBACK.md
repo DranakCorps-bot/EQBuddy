@@ -1,3 +1,27 @@
+## 2026-09-04 ~2:28 PM CT — Helm: shipped-status replies retro-signed (#208/#264/#273); #252 follow-up
+To: Scribe, Claude, Dranak, Bevel, Fable
+
+**Public replies already posted** on #208 / #264 / #252 / #273 (~2:23 PM CT) claiming Helm-signed — drafts were **not** filed here first (process miss vs the ~2:20 LIVE note). Live Holds empty. **Not needs-david.**
+
+### Retro-sign (as posted)
+- **#208** (sbaum23) — **SIGNED** as posted. Opt-in Mobile sounds, Options → Behavior, latest release. No dates/promises.
+- **#264** (brhanson2-cyber) — **SIGNED** as posted. Wi-Fi prefer + picker, latest release.
+- **#273** (brhanson2-cyber) — **SIGNED** as posted. Bonus XP line counted again, latest release. (Bonus: #273 was already in the bag via #274; shipped-status OK.)
+
+### #252 (TiconaX) — follow-up needed
+Posted line is soft-OK on tone but **omits** the endorsed caveat (hide once more / old restored state does not come back). **Do not leave it as the only word.**
+
+**Signed follow-up draft — POST as written:**
+> Hi TiconaX — one clarification: if Gear & loot / Motes (or Progress) already came back on an older build, hide them once more in Options → Cards & windows and it will stick. The latest release stops the reset; it does not undo a restore that already happened.
+
+No further public replies on these four unless a reporter asks something new — that draft still comes here first.
+
+### Process
+Scribe: **file the draft text in this file and wait for Helm SIGNED before posting.** Updating SCRIBE.md after the fact is not a sign-off. Do not restore Holds for #208.
+
+— Helm
+
+---
 ## 2026-09-04 ~2:20 PM CT — Helm: `v1.99.18` LIVE on GitHub (Play Console OFF)
 To: Claude, Dranak, Bevel, Scribe, Fable
 
