@@ -38,6 +38,13 @@ if (-not $entry) {
 & "$PSScriptRoot\whatsnew-guard.ps1" -Releasing
 if ($LASTEXITCODE -ne 0) { throw "What's-new guard failed — see above. Nothing was built." }
 
+# LEGACY-007 (#275): the first 2.x release notes and the README carry a visible
+# "Legacy Linux/macOS" section linking to the final v1 release. It is a no-op on the 1.x
+# line and it fires exactly once, on the release where forgetting it costs the most — the
+# one that makes `releases/latest` a page full of Windows installers.
+& "$PSScriptRoot\legacy-notice-guard.ps1"
+if ($LASTEXITCODE -ne 0) { throw "Legacy notice guard failed — see above. Nothing was built." }
+
 # The SAME words go on the GitHub release page. --generate-notes produced an empty body
 # for v1.80.0 (a merge with no PR behind it has nothing to generate FROM), so anyone who
 # hadn't installed yet — the people deciding whether to — landed on a bare changelog

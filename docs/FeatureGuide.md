@@ -675,6 +675,36 @@ the install and deletes the staged file.
 Linux always goes to the release page — the staged file is a Windows installer run with
 Inno Setup's `/SILENT`, which has no meaning there.
 
+### Linux and macOS: this build is the final one, and it keeps working
+
+EQBuddy v2 ("Evolved") is Windows-only. **The Linux and macOS 1.x builds are not being
+taken down** — this copy keeps working exactly as it does today, offline, with your
+history and settings untouched. What stops is new work on this line, not this line.
+
+So the update check changes on these two platforms, and only on these two:
+
+- **A further 1.99.x update is still offered**, on every platform, exactly as before.
+  Preserved does not mean welded shut.
+- **A 2.x release is never offered here.** The automatic six-hourly check says so **once**
+  — a short notice that v2 is Windows-only and that this copy stays on v1 and keeps
+  working — and then stops. Help → "Check for updates" always answers with the same
+  notice, because a check that returns silence would be a bug.
+- **Clicking that notice opens the final v1 release page**, pinned to its own tag —
+  never `releases/latest`, which becomes the v2 page the moment v2 ships and whose most
+  prominent asset is a Windows installer you cannot run.
+- **Nothing is ever downloaded, staged, run or overwritten off Windows.** There is no
+  forced migration, no self-removal, and no history wipe.
+
+The final Linux tarball and macOS `.app` bundles stay on GitHub permanently, together
+with their release notes, tag and source state. The published 1.x tree is MIT, so
+continuing it independently is welcome — an invitation, not a promise that anyone here
+will maintain, review or host it.
+
+The whole promise, the support matrix and the direct download links live in
+**LEGACY-V1.md** in the repository:
+<https://github.com/DranakCorps-bot/EQBuddy/blob/main/LEGACY-V1.md>, and the work is
+tracked on <https://github.com/DranakCorps-bot/EQBuddy/issues/275>.
+
 ## Log hygiene
 
 `Log=1` is forced in `eqclient.ini` ([Defaults] section only, byte-preserving

@@ -61,6 +61,37 @@ against the published SHA-256, installs, and restarts — no browser trip. If th
 hash isn't published it won't download anything and points you at the release
 page instead.
 
+## Legacy Linux/macOS
+
+**EQBuddy Evolved (v2) is Windows-only. The Linux and macOS 1.x builds are not being
+taken down.** They stay downloadable and they keep working — we simply stop adding to
+them. [**LEGACY-V1.md**](LEGACY-V1.md) is the full support matrix and the promise in
+detail; the short version:
+
+| Surface | Status |
+|---|---|
+| Windows desktop (Evolved / v2) | **Supported** product line |
+| EQBuddy Mobile hosted by Windows | **Supported** second screen |
+| Linux desktop 1.x | **Preserved legacy** — final build stays downloadable and usable |
+| macOS desktop 1.x | **Preserved legacy** — final build stays downloadable and usable |
+| Windows desktop 1.x | **Preserved** until the Evolved channel opens; current public downloads are still 1.x |
+
+Final 1.x downloads (the final cross-platform release is planned as `v1.99.18` and is not
+published yet — these point at the current 1.x release,
+[v1.99.17](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.17), and move to
+the final tag when it exists):
+
+- Linux x64 — [`EQBuddy-linux-x64.tar.gz`](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v1.99.17/EQBuddy-linux-x64.tar.gz)
+- macOS Apple Silicon — [`EQBuddy-osx-arm64.zip`](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v1.99.17/EQBuddy-osx-arm64.zip)
+- macOS Intel — [`EQBuddy-osx-x64.zip`](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v1.99.17/EQBuddy-osx-x64.zip)
+
+The macOS bundles are unsigned: **first launch needs right-click → Open**, or
+`xattr -dr com.apple.quarantine EQBuddy.app`. A Linux or macOS copy is never offered a
+Windows v2 installer — once a 2.x release is public it shows a one-time notice and points
+at the final v1 release instead. Everything already on your disk stays yours, and the
+published 1.x tree is MIT: [continuing it independently](LEGACY-V1.md#forking-and-continuing-1x-yourself--an-invitation-not-a-commitment)
+is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275).
+
 ## Screenshots
 
 | | |
@@ -564,8 +595,13 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   add `-p:EnableWindowsTargeting=true`.
 - `src/EQBuddy.Avalonia` — the 1.x cross-platform Avalonia app (.NET 10), created and
   maintained by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) —
-  including the X11 click-through implementation. It remains in the tree and on
-  current 1.x releases; Evolved (v2) is Windows-only — see [LEGACY-V1.md](LEGACY-V1.md).
+  including the X11 click-through implementation.
+  **This bullet is legacy-v1 developer documentation.** Evolved (v2) is Windows-only,
+  so everything from here to the end of this bullet describes how to build and package
+  the *preserved* 1.x cross-platform line, not the supported product — see
+  [LEGACY-V1.md](LEGACY-V1.md). The project remains in the tree and on current 1.x
+  releases, and it stays reachable on the final legacy tag and the `legacy-v1` branch
+  after it leaves the v2 mainline.
   A linux-x64 build is attached to current GitHub releases.
   Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
   It also builds and runs on macOS with no extra dependencies (the .NET 10 SDK is
@@ -596,7 +632,10 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   tag, and publish a GitHub release (CI attaches the Linux tarball and the macOS
   `.app` bundles). Bump `<Version>`
   in `Directory.Build.props` and add a `WhatsNew.json` entry first — the script refuses
-  to release without one.
+  to release without one. Add `-Prerelease` (only meaningful with `-Tag`) to publish
+  outside `releases/latest`, which is how a v2 milestone stays invisible to 1.x clients.
+  A 2.x release must also carry a **Legacy Linux/macOS** section in its notes and in
+  this README; `scripts/legacy-notice-guard.ps1` refuses one that does not.
 - Knowledge refresh: wiki-derived catalogs (quests, fade messages, zone graph) refresh
   weekly via `.github/workflows/knowledge-refresh.yml`, which runs
   `scripts/harvests/refresh.py` (incremental, RecentChanges-driven) and opens a review
