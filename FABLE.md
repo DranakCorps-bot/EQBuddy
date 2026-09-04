@@ -102,7 +102,10 @@ next loop, not a reopening of the plan.
   Phase 0 gate, and charter LEGACY-005 says the legacy tag and branch exist *before*
   Avalonia leaves the mainline. Phase 2 is an **architecture sketch for Bevel's parallel
   staging**, not buildable work — its first PR waits on Bevel's IA.
-  **Not `needs-david`.** Every call below is inside the owner-approved charter; the two
+  **License constraint (owner 2026-09-04):** Evolved/v2 = proprietary ARR; published 1.x stays MIT;
+  LEGACY-005 fork invite = v1 only. Phase 0 must not assume Evolved is MIT/forkable. Do not
+  implement license code in Phase 0 — docs PR #276 owns `LICENSE-EVOLVED.md` + PRODUCT/LEGACY/README.
+- **Not `needs-david`.** Every call below is inside the owner-approved charter; the two
   places a line could have been drawn differently are marked **→ Helm** and named, not
   guessed. Nothing here touches the values line, the release go, public posture, money,
   roadmap direction, eqlwiki policy, third-party policy or player privacy.
@@ -308,8 +311,12 @@ room for. Bevel rules; the policy already returns `RecordAcknowledgement` separa
   LEGACY-006 table verbatim; the final legacy tag; direct links to all three non-Windows
   assets; what continues to work and what stops; the macOS quarantine instruction that
   today lives only in `README.md`; and the LEGACY-005 invitation to fork or continue
-  independently, worded as an invitation and **not** as a commitment by David to maintain
-  anything.
+  independently — **v1 / published 1.x (MIT) only**, worded as an invitation and **not** as a
+  commitment by David to maintain anything. **EQBuddy Evolved / v2 is proprietary
+  (All Rights Reserved)** — no use/copy/modify/redistribute/fork without David's written
+  permission; not open-with-credit; not JMoyer EQL Companion licensing. Do **not** assume
+  Evolved is MIT or forkable. Docs PR #276 / `LICENSE-EVOLVED.md` is the public language;
+  this plan does not implement license code.
 - **`README.md`** — lines 37–38 currently describe a cross-platform build that "tracks
   closely", maintained by Don Thompson and quasarj. That claim stops being true at the
   bridge. Replace it with the support matrix and a visible **Legacy Linux/macOS** section.
