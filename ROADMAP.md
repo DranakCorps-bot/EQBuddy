@@ -14,6 +14,27 @@ Deeper material: `CLAUDE.md` (rules, traps, where things live), `docs/DesignSyst
 
 ---
 
+## EQBuddy Evolved (2026-09)
+
+The owner-approved next major direction is **EQBuddy Evolved** (v2): consolidation,
+polish, and personalization — not another feature-count race.
+
+- Product identity: [PRODUCT.md](PRODUCT.md)
+- Player-facing vision: [EQBuddy-Evolved.md](EQBuddy-Evolved.md)
+- 1.x preservation: [LEGACY-V1.md](LEGACY-V1.md)
+- Bridge work: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275)
+
+**Supported** for Evolved: Windows desktop + EQBuddy Mobile hosted by Windows.
+**Preserved, not taken down:** final Linux/macOS/Windows 1.x builds stay downloadable
+and usable; support for that line stops. Current public releases remain 1.x until
+the Phase 0 bridge and an Evolved channel exist.
+
+The gate/theme language below remains historical triage context for the 1.x line
+until this file is rewritten. Place incoming 1.x asks against it as before. Place
+v2 asks against [PRODUCT.md](PRODUCT.md).
+
+---
+
 ## 1. What EQBuddy is becoming
 
 The **personal operating companion** for EverQuest Legends — private, local, personal,
