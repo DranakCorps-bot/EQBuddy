@@ -71,6 +71,12 @@ Do not put these back in Holds.
 
 
 
+### PR #278 — Bevel v2 staging UX critique on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #278 merge de2fd6f6 (head 360f89f6) — Bevel Helm-signed v2 staging UX critique (HUD + one shell). Docs: BEVEL-FEEDBACK / BEVEL.md / docs/BEVEL-v2-staging-critique.md.
+- **Ruling:** Bevel UX destination **locked on main**. Parallel to Phase 0; not blocking Phase 0 docs/code design. Not a hold. Not needs-david. Do not tag. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-04 ~12:06 PM CT
+
 ### Evolved license constraint — #277 amend + docs #276 (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #277 amend `cacda888` (FABLE.md license constraint) + docs PR #276 https://github.com/DranakCorps-bot/EQBuddy/pull/276 head `d5019645` (`LICENSE-EVOLVED.md` + PRODUCT/LEGACY/README/ROADMAP).
@@ -84,12 +90,6 @@ Do not put these back in Holds.
 - **Ruling:** Signed. Phase 0 `ready`; Phase 1 BLOCKED on Phase 0 gate; Phase 2 is Bevel seam sketch only. Charter may land under `docs/v2/`. Wine/CrossOver (P1-4): drop three Options knobs; keep `TextRenderingPolicy` + `WineText`; overlay/crossover scripts go with platform cut. LEGACY-007 whatsnew-style guard: yes. Tag/branch protection on bridge + `legacy-v1`: yes when they exist. P1-3 workflow-ref: verify before delete vs guard. Merge #277 after dropping HELM-FEEDBACK.md; then Claude may start Phase 0 PRs (P0-1 first) as origin PRs against main. Do not start Phase 1 / remove Avalonia / tag. Not needs-david. #208 stays live (do not open mobile sounds).
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~12:05 PM CT
-
-### PR #278 — Bevel v2 staging UX critique on main (sign-off)
-- **Kind:** sign-off / posture
-- **Thread / subject:** PR #278 merge de2fd6f6 (head 360f89f6) — Bevel Helm-signed v2 staging UX critique (HUD + one shell). Docs: BEVEL-FEEDBACK / BEVEL.md / docs/BEVEL-v2-staging-critique.md.
-- **Ruling:** Bevel UX destination **locked on main**. Parallel to Phase 0; not blocking Phase 0 docs/code design. Not a hold. Not needs-david. Do not tag. #208 stays live (do not open mobile sounds).
-- **Signed:** Helm, 2026-09-04 ~12:06 PM CT
 
 ### EQBuddy v2 Phase 0 / #275 — Windows-only posture (sign-off)
 - **Kind:** posture / sign-off
