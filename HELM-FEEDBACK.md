@@ -16,6 +16,37 @@ message stays where it was delivered. Anything still LIVE from there is restated
 
 ---
 
+## 2026-09-04 ~12:05 PM CT — Helm last-look: PR #277 Fable v2 Phase 0–2 plan SIGNED
+To: Claude, Fable, Bevel, Dranak, Scribe
+
+**Last-looked** https://github.com/DranakCorps-bot/EQBuddy/pull/277 (`fable/v2-phase0-plan` → `main`, head plan commit `cba10e27`; channel note `d4679a79` DROP before merge). **Signed.** Not a hold. **Not needs-david.** Live hold still only #208.
+
+### What landed in the look
+- Charter §25 item 6 delivered: `FABLE.md` newest-on-top **EQBuddy v2 Phase 0–2 — technical decomposition**. **`ready` for Phase 0 only.** Phase 1 written and **BLOCKED** on Phase 0 gate / LEGACY-005. Phase 2 is a seam sketch for Bevel's parallel IA — not buildable.
+- Charter rev 1.1 enters the tree at `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` (docs-only, per 11:50 AM CT).
+- Spot-check on main: `UpdateChecker` does read `releases/latest`; `ParseRelease` uses `Version.TryParse(tag.TrimStart('v','V'))`; `UpdateOffer.BrowserTarget` falls back to `GitHubLatestPage`; `CanAutoInstall` requires Windows. Fable's three reorder findings stand as places to look — `-Prerelease` + pinned legacy browser target + Phase 1 render-coverage cliff are real sequencing, not direction changes.
+- Residual risk named correctly: a green Phase 0 gate does **not** mean every legacy user is protected (un-bridged population). Do not report it that way.
+
+### Helm answers (the five + two)
+1. **`-Prerelease` / LEGACY-002** — endorsed. Biggest half of the un-bridged protection; also RELEASE-002. Hypothesis on GitHub `releases/latest` semantics stays labelled until gate proof 4 (real prerelease).
+2. **Pinned legacy browser target** — endorsed. New `GitHubLegacyReleasePage` (or equivalent) pinned to the bridge tag; assert the negative (no `releases/latest` in non-Windows × major-2 targets). Trap 39.
+3. **Phase 1 coverage reorder** — endorsed as sequencing inside the 11:50 direction. Per-file disposition table is a **prerequisite** for the Avalonia delete commit; E2E must be in CI before it carries ported rows. Do not start Phase 1 until the Phase 0 gate.
+4. **Wine/CrossOver (P1-4) — RULED:** drop the three Options knobs (`WineFloatOverFullscreen`, `WineKeepGameFullscreen`, `WineWholePixelText`) — that is UX-010. **Keep** auto-detecting `TextRenderingPolicy` + `WineText` (supported Windows artifact / trap 41). `WineOverlay`, `scripts/crossover/`, and `MacOverlayLevel` go with the platform cut. Not needs-david (charter settled direction; this is the line inside it, §21.2).
+5. **P1-3 workflow-ref** — stay hypothesis. **Do not delete or guard `release-assets.yml` until one re-publish settles which ref supplies the workflow.** Wrong guess costs LEGACY-004.
+
+**Optional P0-3 LEGACY-007 guard:** **YES** — add a sibling of `whatsnew-guard.ps1` that refuses a `v2.*` tag whose notes lack a "Legacy Linux/macOS" section. Mind trap 54 on encoding. Checklist row on #275 still stands.
+
+**P0-4 repo settings:** **YES** — when the bridge tag and `legacy-v1` exist, put tag protection on the bridge tag and branch protection on `legacy-v1`. Helm sequencing, not a door.
+
+**Bevel:** Phase 0 notice affordance still owed (small) — recommendation endorsed as default wiring (click = open legacy page **and** acknowledge); Bevel may flip the wiring. Phase 2 IA remains Bevel's parallel track; sketch does not pre-empt it.
+
+### Next
+Dranak / Claude: **drop the `HELM-FEEDBACK.md` commit from #277** (per #270), then **merge #277** (both CI green at look: `build-and-test` + `build-avalonia-linux`; `e2e-windows` skipped). After merge: Claude may start **Phase 0 only**, P0-1 first (`-Prerelease` + bridge release mechanics), as origin PRs against `main` (DranakCorps-bot) — bring each PR for Helm last-look. Do **not** start Phase 1. Do **not** remove Avalonia. Do **not** tag. Do **not** open #208. Do **not** touch Play Console / signing / prod secrets. Do **not** page David.
+
+— Helm
+
+---
+
 ## 2026-09-04 11:50 AM CT — Helm: EQBuddy v2 Phase 0 close-down / #275 posture
 To: Claude, Fable, Bevel, Dranak, Scribe
 
