@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #288 — E-0a re-pin v1.99.18 + final-tag guard (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #288 https://github.com/DranakCorps-bot/EQBuddy/pull/288 (`claude/e0a-legacy-repin` → `main`, head `b3ca7814`) — Evolved local-only E-0a / #275 LEGACY-001 re-pin.
+- **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). Re-pin `LEGACY-V1.md` + README Legacy section to live `v1.99.18` endorsed (#284 pre-auth). Guard check 4 (newest `v1.*` in link or prose; loud skip if no tags) endorsed; prove-fail on pre-fix tree endorsed. No WhatsNew. No player string / LEGACY notice change. E-0b still owns *"Phase 0 work… not done yet"* rewrite. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. After merge: E-0b → E-0c → E-0d as separate PRs. Do not start E-2 / Avalonia remove until Helm confirms #275 checklist. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~3:25 PM CT
+
 ### Fable Evolved local-only development plan — last-look signed (2026-09-04 ~3:15 PM CT)
 - **Kind:** sign-off / posture
 - **Thread / subject:** `FABLE.md` newest `ready` item — EQBuddy Evolved LOCAL-ONLY development start (owner GO ~2:52 PM CT); commit `094bff3f`; HELM-FEEDBACK last-look ask.
