@@ -390,8 +390,8 @@ XP gains + %/hr (session and recent window), AA points + AA/hr, estimated time t
 next level (exact after a level-up this session, else an upper bound), level-ups with
 **time-in-level**, skill-ups per skill.
 
-### Faction tab — Progress window · Travels & Deaths card
-*Faction folded into the Progress theme 2026-08-19. Travels & Deaths is still a card.*
+### Faction tab — Progress window · Travels tab — World window
+*Faction folded into the Progress theme 2026-08-19; Travels & Deaths became the World card's Travels tab in the World fold, 2026-08-27.*
 
 Net faction standing per faction. A standing at the cap shows **maxed** — the game
 says `Your faction standing with X could not possibly get any better.` and EQBuddy
@@ -418,7 +418,7 @@ death is the caster of the finishing tick; with nothing to blame it reads "Somet
 `knocked unconscious` line is deliberately not parsed — it precedes both forms and would
 double every death.
 
-## Spawns window (Track Spawns)
+## Camps tab of the World window (Track Spawns)
 
 **On by default, chicklets first** (`TrackSpawns`, default true; the shape is David's
 design, arrived at over three iterations — always-open was noise, pop-the-full-window
@@ -523,7 +523,7 @@ sentence the desktop's status bar would show, including when nothing changed.
 surface on the desktop → the device says "Not shared by the PC". Pick a different
 subset on the device → the desktop is unaffected. Tick an Epic row on the device → the
 desktop card repaints. On the map, tap a spawn point and remove it → a notice appears
-on *every* connected device and the PC's own map window drops the circle within a
+on *every* connected device and the PC's own Map tab drops the circle within a
 tick. Press **New code** → paired devices drop and refuse to reconnect. Finally set
 `CompanionEnabled=false` in settings.json, restart, and confirm nothing is listening
 (`Get-NetTCPConnection -State Listen` shows no EQBuddy port).
@@ -722,7 +722,7 @@ which the history dedup makes safe.
 - Invocations went unparsed until 2026-08-03 (they log nothing until you change one);
   "You begin reciting the &lt;name&gt; invocation." now drives DPS-by-invocation brackets.
   The "You begin to change your invocation." precursor is deliberately ignored.
-- The Spawns window is WPF-only so far (Avalonia parity: issue #5); Core/UI.Shared
+- The World window's Camps tab is WPF-only so far (Avalonia parity: issue #5); Core/UI.Shared
   hold all the logic, so the port is a thin view.
 - The History DPS-over-time graph, the Custom-theme color editor, the History
   fight-by-fight review (expandable per-encounter breakdowns), the mez-target

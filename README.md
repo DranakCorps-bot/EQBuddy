@@ -96,7 +96,7 @@ is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/is
 | | |
 |---|---|
 | ![Compact view](docs/screenshots/widget-cards.png) | ![Expanded details](docs/screenshots/widget-expanded.png) |
-| **The widget at a glance** — one line per card: Combat, Healing, Kills & Drops, Quests, Gear & Loot, Watch, Buffs, Progress, Motes and Travels & Deaths. Click any card to expand it. (The 1.98/1.99 organizing pass folded the old Money, Faction, Raids and Motes cards into **Progress**, Loot and Gear into **Gear & Loot**, Kills and Drops-by-Creature into **Kills & Drops**, and Sky Quest and Epics into **Quests** — every one of them can be switched back on individually in ⚙ Options → Cards & windows.) | **Full drill-down** — damage per skill with crit *and miss* rates inline, hit ranges on hover, last-fight breakdowns, and both session DPS models labeled: in-combat and wall-clock |
+| **The widget at a glance** — one line per card: Combat, Healing, Kills & Drops, Quests, Gear & Loot, Watch, Buffs, Progress, Motes and World. Click any card to expand it. (The 1.98/1.99 organizing pass folded the old Money, Faction and Raids cards into **Progress**, Gear into **Gear & Loot**, Drops by creature into **Kills & Drops**, Sky Quest and Epics into **Quests**, and Travels & Deaths — together with the Zone map, Travel route and Spawn timers windows — into **World**. A folded card does not come back as its own card: ⚙ Options → Cards & windows lists the cards above and names on each one what folded into it — *"Gear is a tab in here now"* — so a card you cannot find tells you where it went, the merged card keeps the slot its parts had, and any of those surfaces pops out of its card header into its own window. **Motes** is the one that came back as a card in its own right, in 1.99.) | **Full drill-down** — damage per skill with crit *and miss* rates inline, hit ranges on hover, last-fight breakdowns, and both session DPS models labeled: in-combat and wall-clock |
 | ![Fight timeline](docs/screenshots/fight-timeline.png) | ![Raid targets in the Progress window](docs/screenshots/raids-card.png) |
 | **Fight timeline** — the whole pull on one canvas: a lane per skill, solid bars for hits (taller = harder, bright = critical), hollow outlines for misses and resists with the log's own words on hover, dotted markers where you swapped stance or invocation, and a smoothed DPS-over-time graph whose curves mathematically can't exaggerate — colors are colorblind-validated, and damage you took wears blue so red always means trouble | **Buff timers & raid targets** — buffs count down with honest `est` labels until a natural fade teaches your character's *real* duration; the Progress window's Raids tab remembers every raid target your log saw die, now with **D0–D4 difficulty badges** for the highest tier a witnessed kill proves |
 | ![Inventory tab of Gear & Loot](docs/screenshots/gearloot-inventory.png) | ![Behavior options](docs/screenshots/options-behavior.png) |
@@ -104,7 +104,7 @@ is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/is
 | ![Drops by Creature](docs/screenshots/drops-window.png) | ![Quest Tracker](docs/screenshots/quest-tracker.png) |
 | **Drops by Creature** — your personal drop rates per mob, with ✦ marking drops the [community wiki](https://eqlwiki.com) doesn't know yet and **✦ Copy for wiki** building a paste-ready contribution | **Quest Tracker** — 1,172 wiki quests as a scannable list beside a detail pane; loot something a quest wants and its row flips to **ready** with a green rule down its edge, sorted by how close the quest is to where you're standing |
 | ![Sky checklist in the Quest Tracker](docs/screenshots/sky-checklist.png) | ![Spawn timers](docs/screenshots/spawns-window.png) |
-| **The Sky Quest card is now the Plane of Sky tab of the Quest Tracker** (right-click → *Quest tracker…*, or the Quests card) — all 222 turn-in items, filtered by a class chip strip rather than a card per class; loot auto-checks *your* class's boxes, a **Ready to turn in** block leads with what you can hand in right now, and a reward's own checkbox marks the quest turned in | **Spawn timers are now the Camps tab of the World window** (right-click → *World…*, or the World card) — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
+| **The Sky Quest card is now the Plane of Sky tab of the Quest Tracker** (pop it out of the Quests card) — all 222 turn-in items, filtered by a class chip strip rather than a card per class; loot auto-checks *your* class's boxes, a **Ready to turn in** block leads with what you can hand in right now, and a reward's own checkbox marks the quest turned in | **Spawn timers are now the Camps tab of the World window** (right-click → *World…*, or the World card) — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
 | ![Session history with progress charts](docs/screenshots/history-charts.png) | ![Review an archived session](docs/screenshots/session-picker.png) |
 | **Session history & progress charts** — every session in a local, searchable database (notes, tags, compare, export), and per-character **level and AA charts**: every ding at its exact time, a staircase not a slope | **Archive review** — replay any saved log read-only; a multi-session file asks which evening you meant. Drops and wiki export work on the past |
 | ![Mini dashboard](docs/screenshots/mini-bar.png) | ![Breakout windows](docs/screenshots/damage-breakout.png) |
@@ -114,7 +114,7 @@ is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/is
 | ![Zone map](docs/screenshots/map-window.png) | ![Travel route](docs/screenshots/travel-window.png) |
 | **The Zone map is now the Map tab of the World window** (right-click → *World…*, or the World card) — classic map packs with your `/loc` marker, a comet-tail breadcrumb trail, and **spawn-point circles** learned from your own kills; every running spawn timer shows in the side panel **and** as a camp pin with its countdown. *This capture predates the World fold: the map is what you still get, its window chrome is not.* | **The Travel route is now the Path tab of the World window** — hop-by-hop directions from where you stand to any zone, from the same graph that sorts quests by distance. *This capture predates the World fold: the route is what you still get, its window chrome is not.* |
 | ![Spawn-point circles with named labels](docs/screenshots/spawn-circles.png) | ![Share zone knowledge](docs/screenshots/zone-share.png) |
-| **Spawn-point circles, up close** (on the World window's Map tab) — named spawns wear the theme accent *with their name beside them* (a running timer's camp pin takes over with a countdown, like Bloodgurgler here); trash camps sit dim; circles pulse when a respawn is due within ten seconds. All learned from your own kills near your own `/loc`s — this is real Crushbone data | **Share zone knowledge** (the door is on the World window's Map tab) — a zone's spawn points and timers as one paste-safe string; imports preview every change first, and a timer far off the zone's known clock arrives flagged |
+| **Spawn-point circles, up close** (on the World window's Map tab) — named spawns wear the theme accent *with their name beside them* (a running timer's camp pin takes over with a countdown, like Bloodgurgler here); trash camps sit dim; circles pulse when a respawn is due within ten seconds. All learned from your own kills near your own `/loc`s — this is real Crushbone data. *This capture predates the World fold: the circles are what you still get, their window chrome is not.* | **Share zone knowledge** (the door is on the World window's Map tab) — a zone's spawn points and timers as one paste-safe string; imports preview every change first, and a timer far off the zone's known clock arrives flagged. *This capture predates the World fold: the panel is what you still get, its window chrome is not.* |
 | ![Cursor ring](docs/screenshots/cursor-ring.png) | ![Send feedback and a color-coded alert](docs/screenshots/feedback-and-alert.png) |
 | **Cursor ring** — a click-through halo that rides your pointer, for everyone who's ever lost the tiny cursor mid-fight | **Send feedback** opens a pre-written GitHub Discussion for your review — most of the features on this page started as one |
 | ![EQBuddy Mobile on a tablet](docs/screenshots/mobile-map-tablet.png) | ![EQBuddy Mobile on a phone](docs/screenshots/mobile-map-phone.png) |
@@ -289,7 +289,7 @@ Spawn timers (on by default):
   **every timer you have running in any zone**, survive an app restart, and flip to a
   **DUE** badge at zero (with a sound, if that named's bell is on) for one minute before
   tidying themselves away — click sooner to dismiss.
-- **Double-click a chicklet** (or right-click → **Spawn timers…**) for the full zone
+- **Double-click a chicklet** — it opens the World window's **Camps** tab (right-click → **World…** gets you there too) — for the full zone
   list, which follows you zone to zone (pick another zone from the dropdown to plan
   ahead; Follow snaps back when you actually zone). Every respawn time is editable in
   place, ▶ starts a timer by hand for camps you arrived at late ("died 5m ago"), and
@@ -348,9 +348,9 @@ Encounters, mob farming, and stances:
   **Import log…** parses any old eqlog file into your session history.
 
 Maps & travel:
-- **Zone map** (right-click → *Zone map…*): drop a classic map pack into the game's
+- **Zone map** (the **Map** tab of the World window: right-click → *World…*, or the World card): drop a classic map pack into the game's
   `maps` folder and EQBuddy draws your zone — following you as you zone, wheel to
-  zoom, drag to pan. The map window's **Get maps…** button takes you straight to
+  zoom, drag to pan. The Map tab's **Get maps…** button takes you straight to
   [Brewall's EverQuest Maps](https://www.eqmaps.info/eq-map-files/) (unzip the pack
   into `maps`, next to `Logs`); any classic-format pack works. Type `/loc` in game and your position appears
   as a marker, honestly labeled with how old it is: EQBuddy reads only the log, so
@@ -372,7 +372,7 @@ Maps & travel:
   confirmation travels when you share the zone. Whole zone gone stale?
   **Right-click empty map space → Reset** wipes the zone's archive (with an
   are-you-sure showing the count) and it learns fresh from your next kills.
-- **Share zone knowledge** (map window, bottom of the named panel): export a zone's
+- **Share zone knowledge** (World window → Map tab, bottom of the named panel): export a zone's
   spawn points and timers — learned ones and ones you typed alike — as one
   paste-safe `EQBZ` string for a friend, or
   import theirs — with a **full preview first**: every new point and timer change is
@@ -398,12 +398,12 @@ Maps & travel:
   next kill pins it), with the wiki's location field as fallback. Spawn timers, camp
   positions, and your own route on one screen — ShowEQ's greatest hits, rebuilt from
   nothing but your log and public wiki pages.
-- **Travel route** (right-click → *Travel route…*): pick any zone and get hop-by-hop
+- **Travel route** (the **Path** tab of the World window): pick any zone and get hop-by-hop
   directions from where you're standing — walking connections from client-mined atlas
   data plus the wiki's boat and port adjacencies.
 
 Quests (tracker, Sky checklist, ledger):
-- **Quest Tracker** (right-click → *Quest tracker…*): 1,100+ quests from the community
+- **Quest Tracker** (pop it out of the Quests card, or bind a hotkey to it): 1,100+ quests from the community
   wiki, filterable by class, era, and zone — sorted by how many zones away each quest
   giver is from where you're standing. **Type anything in the search box** and the
   whole catalog answers — quest names, turn-in items ("what needs Bone Chips?"),
@@ -550,7 +550,7 @@ Checklist rows tick from the device too.
 - **Your screen will sleep.** Browsers won't hold a screen awake over plain HTTP, even
   from a Home Screen launch, so raise your device's screen timeout if you're camping.
 - The **breadcrumb trail** is the last minute of movement, and it only moves when a `/loc`
-  reaches the log — the map window's ⧉ button copies a social that makes that one keypress.
+  reaches the log — the Map tab's ⧉ button copies a social that makes that one keypress.
 
 ## How DPS is measured
 
@@ -580,12 +580,12 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 |---|---|---|
 | Combat | Session DPS (+ live fight DPS) | Details!-style damage breakdown per attack/spell/song — every row shows total, hits, average, **per-ability DPS** (that ability's damage ÷ time in combat — its contribution rate; burst rate in the tooltip), and crit rate; sortable by total/dps/hits/avg with the bar following the sorted column; accuracy, melee avoidance %, biggest hit, time in combat, damage taken per mob — self-inflicted damage (HP-cost casting, falls, drowning) shows as "Yourself" and never counts as being in combat — recent fights with DPS bars, fizzles/resists |
 | Healing | HPS (healing ÷ time in combat) | Healing done and received — including heal-over-time ticks ("healed you over time for…"), which carry real amounts — heals cast per spell with the same breakdown as Combat (total, casts, average, **per-spell HPS**; sortable by total/hps/casts/avg with matching bars), who healed you, hymn/regen tick counts (the log gives no amounts for those) |
-| Kills | Your kills incl. pet (+ group kills) | Count per creature type, kills/hour, group-member kill counts; per-creature farming: avg fight length, coin, XP, and observed drops with your personal rate (e.g. `×2 · 22%`) |
-| Loot | Items looted (+ items made) | Every item with counts (hover for stats, click for wiki item info), items created by merging, and *(new, beta)* live **target drops** for the creature you're fighting |
-| Money | Coin earned (p/g/s/c) | Corpse coin vs merchant-sale income, items sold with prices, biggest drop, money per hour |
-| Progress | XP % gained (+ levels, + AA) | XP ticks, %/hour, AA points gained with AA/hour, estimated time to next level, level-ups with times, skill-ups per skill, and *(new, beta)* every **AA ability you own** with its rank and what it does (hover for the wiki effect text) — remembered per character even after log cleanup |
-| Faction | Factions touched | Net standing change per faction; a standing at the cap shows **maxed** (or `+120 · maxed`) instead of silently freezing |
-| Travels & Deaths | Death count | Each death (what killed you, when), zones visited with times |
+| Kills & Drops → Kills tab | Your kills incl. pet (+ group kills) | Count per creature type, kills/hour, group-member kill counts; per-creature farming: avg fight length, coin, XP, and observed drops with your personal rate (e.g. `×2 · 22%`) |
+| Gear & Loot → Loot tab | Items looted (+ items made) | Every item with counts (hover for stats, click for wiki item info), items created by merging, and *(new, beta)* live **target drops** for the creature you're fighting |
+| Progress → Wealth tab | Coin earned (p/g/s/c) | Corpse coin vs merchant-sale income, items sold with prices, biggest drop, money per hour |
+| Progress → Experience tab | XP % gained (+ levels, + AA) | XP ticks, %/hour, AA points gained with AA/hour, estimated time to next level, level-ups with times, skill-ups per skill, and *(new, beta)* every **AA ability you own** with its rank and what it does (hover for the wiki effect text) — remembered per character even after log cleanup |
+| Progress → Faction tab | Factions touched | Net standing change per faction; a standing at the cap shows **maxed** (or `+120 · maxed`) instead of silently freezing |
+| World → Travels tab | Death count | Each death (what killed you, when), zones visited with times |
 
 ## For developers
 
