@@ -121,23 +121,28 @@ function Get-Depth([string] $line) {
 
 # ---- 1: one region, and the refusal in front of it ---------------------------------
 
-$regionStart = -1
+# ALL of them, not the first. The script skips more than one thing under -EvolvedLocal -
+# the publish channel, and separately the Stop-Process that only exists because a /SILENT
+# install is coming - and a guard that locked on to the first `if (-not $EvolvedLocal) {`
+# it found would declare everything after it "outside the region" and fail a correct tree.
+$regions = @()
 for ($i = 0; $i -lt $lines.Count; $i++) {
-    if ($lines[$i] -match '^\s*if\s*\(\s*-not\s+\$EvolvedLocal\s*\)\s*\{') { $regionStart = $i; break }
+    if ($lines[$i] -notmatch '^\s*if\s*\(\s*-not\s+\$EvolvedLocal\s*\)\s*\{') { continue }
+    $depth = 0
+    $end = -1
+    for ($j = $i; $j -lt $lines.Count; $j++) {
+        $depth += Get-Depth $lines[$j]
+        if ($depth -le 0) { $end = $j; break }
+    }
+    if ($end -lt 0) {
+        $problems += "scripts/release.ps1 opens ``if (-not `$EvolvedLocal) {`` at line $($i + 1) and never closes it. Unbalanced braces mean this guard cannot say what is inside the region, so it refuses to say anything is."
+        continue
+    }
+    $regions += , @($i, $end)
 }
 
-$regionEnd = -1
-if ($regionStart -ge 0) {
-    $depth = 0
-    for ($i = $regionStart; $i -lt $lines.Count; $i++) {
-        $depth += Get-Depth $lines[$i]
-        if ($depth -le 0) { $regionEnd = $i; break }
-    }
-    if ($regionEnd -lt 0) {
-        $problems += 'scripts/release.ps1 opens `if (-not $EvolvedLocal) {` and never closes it. Unbalanced braces mean this guard cannot say what is inside the region, so it refuses to say anything is.'
-    }
-}
-else {
+$regionStart = if ($regions.Count -gt 0) { ($regions | ForEach-Object { $_[0] } | Measure-Object -Minimum).Minimum } else { -1 }
+if ($regions.Count -eq 0) {
     $problems += 'scripts/release.ps1 has no `if (-not $EvolvedLocal) {` region. At 2.x every statement that reaches the family - the OneDrive copy, the /SILENT install, `gh release create` - belongs inside one, so that skipping it is a single decision rather than three.'
 }
 
@@ -181,7 +186,9 @@ $channelTokens = @(
 for ($i = 0; $i -lt $lines.Count; $i++) {
     $line = $lines[$i]
     if ($line -match '^\s*#') { continue }
-    if ($regionStart -ge 0 -and $regionEnd -ge $regionStart -and $i -ge $regionStart -and $i -le $regionEnd) { continue }
+    $inside = $false
+    foreach ($r in $regions) { if ($i -ge $r[0] -and $i -le $r[1]) { $inside = $true; break } }
+    if ($inside) { continue }
     foreach ($t in $channelTokens) {
         if ($line -match $t.Rx) {
             $problems += "scripts/release.ps1 line $($i + 1) $($t.What) outside the -EvolvedLocal region: $($line.Trim()). At 2.x that line is reachable, and reachable means the family's widgets take an Evolved build within six hours."
@@ -199,7 +206,12 @@ foreach ($line in $lines) {
 if (-not $tagRefusal) {
     $problems += 'scripts/release.ps1 does not refuse -Tag under -EvolvedLocal. The region check makes `gh release create` unreachable; this is the second, independent lock, and two locks is the point - the first one is a claim about braces.'
 }
-if ($releaseText -match '(?m)^\s*param\(.*\$EvolvedLocal' -and $releaseText -notmatch 'EvolvedLocal[^\r\n]*Prerelease|Prerelease[^\r\n]*EvolvedLocal') {
+$prereleaseRefusal = $false
+foreach ($line in $lines) {
+    if ($line -match '^\s*#') { continue }
+    if ($line -match '\$EvolvedLocal' -and $line -match '\$Prerelease' -and $line -match 'throw') { $prereleaseRefusal = $true }
+}
+if (-not $prereleaseRefusal) {
     $problems += 'scripts/release.ps1 does not refuse -Prerelease under -EvolvedLocal. -Prerelease is a flag on a GitHub release, so under a switch that cannot make one it is a switch that silently does nothing - the exact defect the -Prerelease/-Tag refusal at the top of that script was written for.'
 }
 
