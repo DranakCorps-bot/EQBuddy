@@ -1,17 +1,10 @@
 # EQBuddy release: publish exe, sign, compile installer, sign it, refresh zip,
 # push to OneDrive (the family's install + auto-update channel).
 # Commit + `git push` your source changes too; git is the source-code backup.
-param([string]$Tag, [switch]$Prerelease)
+param([string]$Tag, [switch]$Prerelease, [switch]$EvolvedLocal)
 $ErrorActionPreference = 'Stop'
 
-# -Prerelease only means anything to `gh release create`, which only runs with a -Tag.
-# Without one it would be a switch that silently does nothing on a run that still builds,
-# signs, copies to OneDrive and installs locally — and the person who passed it would have
-# no way to tell. Refuse here, before the 172 MB publish, rather than after it.
-if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
-
 $repo = Split-Path $PSScriptRoot -Parent
-$oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
 . "$PSScriptRoot\signing.ps1"
 
 # Version comes from Directory.Build.props (single source for BOTH apps — issue #30:
@@ -20,6 +13,39 @@ $oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
 $props = Get-Content "$repo\Directory.Build.props" -Raw
 if ($props -notmatch '<Version>([\d.]+)</Version>') { throw 'No <Version> in Directory.Build.props' }
 $version = $Matches[1]
+$major = [int]($version.Split('.')[0])
+
+# EQBuddy Evolved (2.x) develops LOCAL-ONLY until the owner opens the channel, and this
+# script is the only thing in the repo that can break that. So the 2.x line cannot be
+# published AT ALL: the refusal is here, before the 172 MB publish, and there is
+# deliberately no switch that re-enables the channel. Opening it is a future EDIT to this
+# file, made when the owner gives the go — the same posture as having no -SkipSign,
+# because a protection you can pass a flag to opt out of is a protection nobody has.
+#
+# -EvolvedLocal is the opposite of an escape hatch: it is the ONLY way to run this script
+# on a 2.x tree, and everything it does is subtractive. It skips the family's update
+# folder, refuses to tag or publish, and does not install over this machine's v1 copy.
+# What it keeps is every signing step, unchanged — an unsigned local build is testing a
+# different artifact from the one players get.
+if ($major -ge 2 -and -not $EvolvedLocal) {
+    throw "EQBuddy $version is the Evolved line and it is LOCAL-ONLY: this script will not publish it. Pass -EvolvedLocal to build and sign into dist\ without touching OneDrive, GitHub or this machine's v1 install — or use scripts\install-local.ps1 -Evolved to build, sign and RUN it on a separate profile."
+}
+if ($EvolvedLocal -and $major -lt 2) { throw "-EvolvedLocal is for the 2.x Evolved line; $version is 1.x, where the local loop is scripts\install-local.ps1." }
+if ($EvolvedLocal -and $Tag)         { throw '-EvolvedLocal refuses -Tag: a tag is a public release, and the Evolved channel is not open. This is the second lock — the publish block is skipped anyway.' }
+if ($EvolvedLocal -and $Prerelease)  { throw '-EvolvedLocal refuses -Prerelease: it is a flag on a GitHub release, and -EvolvedLocal makes none. A switch that silently does nothing is the defect the -Prerelease-without-Tag refusal below was written for.' }
+
+# -Prerelease only means anything to `gh release create`, which only runs with a -Tag.
+# Without one it would be a switch that silently does nothing on a run that still builds,
+# signs, copies to OneDrive and installs locally — and the person who passed it would have
+# no way to tell. Refuse here, before the 172 MB publish, rather than after it.
+#
+# It sits BELOW the -EvolvedLocal refusals, and the order is load-bearing rather than
+# cosmetic: above them it made the line before it unreachable. `-EvolvedLocal -Prerelease`
+# (no tag) would have been caught here first, so the refusal that names the actual reason
+# could never fire — a check that cannot fire is the exact shape this file keeps finding
+# (traps 20, 34). Moving four lines makes both reachable and each says its own reason.
+if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
+
 Write-Host "Releasing EQBuddy $version"
 
 # The in-app "What's new" popup reads embedded notes; a release without an entry
@@ -45,6 +71,14 @@ if ($LASTEXITCODE -ne 0) { throw "What's-new guard failed — see above. Nothing
 & "$PSScriptRoot\legacy-notice-guard.ps1"
 if ($LASTEXITCODE -ne 0) { throw "Legacy notice guard failed — see above. Nothing was built." }
 
+# EQBuddy Evolved develops LOCAL-ONLY until the owner opens the channel, and this script
+# is the only thing in the repo that can break that promise. The guard runs here, before
+# anything is built, for the same reason the two above do — and it checks THIS FILE's
+# text as well as the family's update folder, so an edit that re-opens the channel fails
+# a gate rather than a household.
+& "$PSScriptRoot\evolved-channel-guard.ps1"
+if ($LASTEXITCODE -ne 0) { throw "Evolved channel guard failed — see above. Nothing was built." }
+
 # The SAME words go on the GitHub release page. --generate-notes produced an empty body
 # for v1.80.0 (a merge with no PR behind it has nothing to generate FROM), so anyone who
 # hadn't installed yet — the people deciding whether to — landed on a bare changelog
@@ -61,8 +95,15 @@ Initialize-EqSigning -Repo $repo
 
 # The kill is loud on purpose (v1.39.0 shipped mid-fight and the widget just
 # vanished); the /SILENT install at the end brings the app back — on the NEW build.
-Get-Process EQBuddy -ErrorAction SilentlyContinue | Stop-Process -Force
-Start-Sleep -Seconds 1
+#
+# Skipped under -EvolvedLocal, because the install that would bring it back is skipped
+# too: killing the running v1 widget and then never replacing it would cost David his
+# session (EQBuddy finalizes into history.db on exit) in exchange for nothing. An Evolved
+# build never touches the installed v1 copy, so it has no reason to close it.
+if (-not $EvolvedLocal) {
+    Get-Process EQBuddy -ErrorAction SilentlyContinue | Stop-Process -Force
+    Start-Sleep -Seconds 1
+}
 
 dotnet publish "$repo\src\EQBuddy\EQBuddy.csproj" -c Release -r win-x64 --self-contained `
     -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "$repo\dist\publish"
@@ -93,6 +134,25 @@ Compress-Archive -Path "$repo\dist\publish\EQBuddy.exe", "$repo\README.md" `
 (Get-FileHash "$repo\dist\EQBuddy-portable.zip" -Algorithm SHA256).Hash |
     Set-Content "$repo\dist\EQBuddy-portable.zip.sha256" -NoNewline
 
+# ===================================================================================
+# THE PUBLISH / INSTALL CHANNEL — everything below here REACHES SOMEBODY.
+#
+# Three things that leave this machine's dist\ folder, and all three are one decision:
+#   * the OneDrive copy, which every family widget checks at startup and every 6 hours;
+#   * `gh release create`, which is the public channel;
+#   * the /SILENT install, which replaces THIS machine's v1 install in place — one
+#     AppId, {autopf}\EQBuddy — and inherits its profile: settings.json, history.db,
+#     archives. The installer's EQBuddy.previous.exe rollback (#158) gives back the
+#     binary and not the profile.
+#
+# They live in one region so that skipping them is a single decision rather than three,
+# and scripts\evolved-channel-guard.ps1 asserts from the TEXT of this file that nothing
+# of that shape has crept out of it. At 2.x this region is unreachable: -EvolvedLocal is
+# mandatory there, and it is the thing this region is conditioned on.
+# ===================================================================================
+if (-not $EvolvedLocal) {
+
+$oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
 New-Item -ItemType Directory -Force $oneDrive | Out-Null
 Copy-Item "$repo\dist\EQBuddySetup.exe", "$repo\dist\EQBuddySetup.exe.sha256", "$repo\dist\EQBuddy-portable.zip" $oneDrive -Force
 Write-Host "Released $version to $oneDrive (family widgets will offer the update within 6 h)"
@@ -152,3 +212,13 @@ if ($Tag) {
 # copy, installs, and relaunches — same path install-local.ps1 uses.
 Start-Process "$repo\dist\EQBuddySetup.exe" -ArgumentList '/SILENT'
 Write-Host "Installing $version locally (/SILENT); EQBuddy relaunches when it finishes."
+
+}
+else {
+    Write-Host ''
+    Write-Host "EvolvedLocal: $version is built and SIGNED in $repo\dist — and it went nowhere." -ForegroundColor Cyan
+    Write-Host '  * OneDrive:  not touched. The family channel still holds whatever v1 build it held.' -ForegroundColor Cyan
+    Write-Host '  * GitHub:    not touched. No tag, no release; -Tag and -Prerelease are refused above.' -ForegroundColor Cyan
+    Write-Host '  * This PC:   not installed. Your v1 install and its profile are untouched.' -ForegroundColor Cyan
+    Write-Host '  To run it:   pwsh -NoProfile -File scripts\install-local.ps1 -Evolved' -ForegroundColor Cyan
+}

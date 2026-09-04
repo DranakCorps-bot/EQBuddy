@@ -40,7 +40,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -61,6 +61,11 @@ Step "what's-new  " { & "$PSScriptRoot\whatsnew-guard.ps1" 6>&1 }
 # Same shape, same second: a promise about a release, checkable from the tree. It is a
 # no-op while <Version> is 1.x and arms itself at 2.0.0 (LEGACY-007, #275).
 Step 'legacy notice' { & "$PSScriptRoot\legacy-notice-guard.ps1" 6>&1 }
+# And the third of the same family: EQBuddy Evolved develops local-only, which is a
+# promise about what release.ps1 is ALLOWED to do. Also a no-op at 1.x, also armed by
+# <Version> reaching 2.0.0 — and the one that reads the world as well as the tree, since
+# the family's update folder is where the promise is actually kept or broken.
+Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
 if (-not $Quick) {

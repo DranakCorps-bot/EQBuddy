@@ -17,6 +17,26 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **The `/SILENT` local install is inside `release.ps1`'s `-EvolvedLocal` region too, not
+  just the OneDrive copy and `gh release create`** (E-1 commit 2, `scripts/release.ps1`). ·
+  The other way: the signed plan's commit 2 lists three things `-EvolvedLocal` does and the
+  local install is not one of them, so leaving it live would have been the literal reading. ·
+  It is the same defect at one machine's scale — the installer has one `AppId` and
+  `{autopf}\EQBuddy`, so an Evolved build installed by that line REPLACES David's working v1
+  in place and inherits its profile, and #158's `EQBuddy.previous.exe` rollback returns the
+  binary and not the profile. The plan's own hazard section names it as "a smaller edge of
+  the same shape", so this is executing its reasoning rather than departing from it. The
+  `Stop-Process` above it went the same way: it exists only because that install was coming.
+
+- **`evolved-channel-guard.ps1` runs in CI as well as in `check.ps1` and `release.ps1`**
+  (`.github/workflows/ci.yml`). · The other way: the plan says check.ps1 + release.ps1, and
+  `legacy-notice-guard.ps1` is not in CI either, so precedent was to leave it out. · A
+  local-only gate that only fires when someone remembers to run `check.ps1` is exactly the
+  enforcement-by-memory the guard exists to replace, and the failure it prevents arrives as a
+  pull request. Check 3 needs a live update folder no runner has and fails open with a loud
+  SKIPPED line, so what CI adds is the script-shape half — which is the half a PR can get
+  wrong. Cheap to revert if Fable or Helm would rather keep CI to the plan's letter.
+
 - **EQBuddy Mobile's alert cue is TWO NUMBERS on the envelope — a switch state and a
   count — and names nothing about the alert that fired** (#208,
   `src/EQBuddy.Companion/CompanionSnapshot.cs`). · The other way: send the rule name, the

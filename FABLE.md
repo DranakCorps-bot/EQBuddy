@@ -228,75 +228,52 @@ E-2 gate; E-2 has NOT started.
 
 ---
 
-### E-1 — Make local-only a mechanism (the headline PR)
+### E-1 — Make local-only a mechanism — **TAKEN AND DONE, 2026-09-04 (Claude)**
 
-One PR, three commits, and **the order is load-bearing: the refusal lands before the bump.**
+Left as a stub rather than deleted: "What clamps it" above points at **decision 3**, and E-2
+opens on E-1 having landed, so deleting the definition would be the #228 class in a different
+file. Three commits, in the plan's load-bearing order — **the refusal landed before the bump.**
 
-**Commit 1 — `scripts/evolved-channel-guard.ps1`**, a sibling of `legacy-notice-guard.ps1`,
-same idiom (`-AssumeVersion` / `-Repo` verification hooks so it can be proven to fail on a 1.x
-tree), wired into `check.ps1` and into `release.ps1` before anything is built. At major ≥ 2 it
-asserts:
+- **Commit 1 — `scripts/evolved-channel-guard.ps1`.** Sibling of `legacy-notice-guard.ps1`,
+  same idiom, `-AssumeVersion` / `-Repo` / `-AssumeUpdateFolder` prove-fail hooks. Wired into
+  `check.ps1`, into `release.ps1` before anything is built, **and into CI** (an addition to the
+  plan's letter, logged in `DECISIONS.md`: a local-only gate that only fires when someone
+  remembers to run `check.ps1` is enforcement by memory, and the failure it prevents arrives as
+  a pull request). Proven to fail on the pre-change tree — 11 problems naming lines 14, 96, 97,
+  98, 142, 153, 154. Eight consecutive green runs after.
+- **Commit 2 — `release.ps1` refuses 2.x** unless `-EvolvedLocal`, before the publish. That
+  switch skips the OneDrive copy, refuses `-Tag` and `-Prerelease` on their own lines, does not
+  `/SILENT`-install over v1, skips the `Stop-Process` that only existed because that install was
+  coming, and **keeps every signing step unchanged**. All three refusals run and confirmed to
+  throw before signing is even resolved.
+- **Commit 3 — `<Version>` → `2.0.0`** (numeric, per decision 3), the LEGACY-007 `WhatsNew`
+  2.0.0 Legacy Linux/macOS section linking `releases/tag/v1.99.18`, and `install-local.ps1
+  -Evolved` — build, sign, run **portable** from `dist\publish` on `%AppData%\EQBuddy Evolved`.
 
-1. **No path in `release.ps1` copies into an update folder.** A source scanner, in
-   `LogJanitorPolicyTests`' shape — the guard reads the script text, so a future edit that
-   re-adds the copy fails the build rather than the family's widgets.
-2. **No `gh release create` is reachable on a 2.x tree.** There is deliberately **no switch**
-   that re-enables it. Publishing Evolved is a future edit to the script, made when the owner
-   gives the channel go — the same posture as "no `-SkipSign`".
-3. **The live channel is clean**: the resolved update folder (`UpdateChecker.FindUpdateFolder`'s
-   rule, re-implemented in PowerShell or invoked through a tiny console entry — prefer reading
-   the same env roots) contains no `EQBuddySetup.exe` stamped 2.x. This is the positive check;
-   1 and 2 only prove the script, and trap 43's lesson is that proving the producer is not
-   proving the effect.
+**The acceptance step that counts was run on the real machine.** After
+`install-local.ps1 -Evolved`: OneDrive's `EQBuddySetup.exe` still stamps **1.99.18**, all three
+files unchanged in size and mtime; the installed v1 exe is still `1.99.18.0` with its mtime
+untouched; `%AppData%\EQBuddy\settings.json` was not rewritten; no installer was built; and
+**both widgets ran side by side** — portable `2.0.0.0` and installed `1.99.18.0`, each on its own
+profile and therefore its own `SingleInstance` lock.
 
-**Commit 2 — `release.ps1` refuses 2.x.** At major ≥ 2: throw unless `-EvolvedLocal`, and
-`-EvolvedLocal` (a) skips the OneDrive copy, (b) refuses `-Tag` and `-Prerelease` outright,
-(c) keeps **every** signing step exactly as it is. Nothing in this plan touches
-`scripts/signing.ps1`, adds a bypass, or weakens a verification — a local Evolved build is
-signed and timestamped like any other, because an unsigned local build is testing a different
-artifact from the one players get (`install-local.ps1` says so, and it is right).
+**Two additions beyond the plan's letter, both logged in `DECISIONS.md`**: the `/SILENT` install
+inside the region (the plan's own hazard section names it as "a smaller edge of the same shape"),
+and the CI step. **One defect found while proving the refusals**: `-EvolvedLocal`'s `-Prerelease`
+refusal sat below the existing `-Prerelease`-without-`-Tag` line, which caught the same
+invocation first — so it could never fire. Four lines moved; both reachable now.
 
-**Commit 3 — the version bump and the Evolved local install loop.**
+Three rows added to `docs/TestPlan.md`. `check.ps1` green at 2.0.0: 2,955 unit + 311 Avalonia.
 
-- `Directory.Build.props` `<Version>` → **`2.0.0`**, numeric, no suffix (see "What clamps it").
-  The moment it reads 2.x, `legacy-notice-guard`'s check 3 arms and `evolved-channel-guard`
-  arms. That is the point of bumping early rather than at the end.
-- Arming `legacy-notice-guard` at 2.x demands a `Legacy Linux/macOS` section in the shipping
-  `WhatsNew.json` entry for `2.0.0`, linking `releases/tag/v1.99.18`. **Write it now.** It is
-  LEGACY-007's obligation, it is cheap while nobody is waiting on it, it keeps `check.ps1`
-  green, and writing the promise before the release that must carry it is the entire argument
-  for having the guard.
-- `install-local.ps1 -Evolved`: build, sign, and run **portable from `dist/publish`** with
-  `EQBUDDY_APPDATA` pointed at a separate Evolved profile directory. Do not install; do not
-  touch the v1 `AppId`. David keeps a working v1 install and an untouched v1 profile while
-  Evolved is under construction — which is DATA-003's intent arriving before there is anything
-  destructive to back up, and it costs one script switch.
-  → The heavier alternative (a second `AppId` + `EQBuddy Evolved` install directory + its own
-  shortcut) is the right move **when Evolved becomes the daily driver**, not now. Named here so
-  the next session does not re-derive it.
-
-**Decision 3, recorded because it could have gone the other way:** `<Version>` stays numeric
-`2.0.0` for the whole local phase rather than `2.0.0-alpha.N`. The suffix reads better and
-breaks three scripts and the installer at the regex on line 21 (`([\d.]+)</Version>`), and there
-is no channel for a milestone number to communicate to. Human-readable milestone identity goes
-in the informational version / About line as `2.0.0 (Evolved local · <short sha>)`; the numeric
-version is a machine contract, and the machines are `UpdateChecker`, Inno Setup and three
-guards. Re-decide the public number at channel-open.
-
-**Verification for E-1** — the one that counts is #3, because 1 and 2 are claims about a script:
-
-1. `evolved-channel-guard.ps1 -AssumeVersion 2.0.0` fails on the pre-change tree (it will: the
-   OneDrive copy is there and unconditional), passes after. Eight runs.
-2. `release.ps1` with a 2.x `<Version>` and no `-EvolvedLocal` throws **before** the 172 MB
-   publish, like every other refusal in that script.
-3. **Run `install-local.ps1 -Evolved` on the real machine and then confirm, by looking, that
-   `C:\Users\david\OneDrive\EQBuddyDownload\EQBuddySetup.exe` still stamps 1.99.18 and that the
-   installed v1 EQBuddy still launches and still reads its own profile.** A green suite is not
-   this; the whole defect class here is "the script reported success and the side effect
-   happened anyway" (`CLAUDE.md`: *a silent failure is not proof nothing happened* — the mirror
-   applies).
-
----
+**Decision 3, kept in full because "What clamps it" above points here and it decides the next
+version number too:** `<Version>` stays numeric `2.0.0` for the whole local phase rather than
+`2.0.0-alpha.N`. The suffix reads better and breaks three scripts and the installer at the regex
+on `release.ps1`'s version line (`([\d.]+)</Version>`), and there is no channel for a milestone
+number to communicate to. Human-readable milestone identity goes in the informational version /
+About line as `2.0.0 (Evolved local · <short sha>)`; the numeric version is a machine contract,
+and the machines are `UpdateChecker`, Inno Setup and three guards. **Re-decide the public number
+at channel-open.** *Executed as written — the four consumers were re-read before the bump and
+all four still match that regex.*
 
 ### E-2 — Phase 1: subtract the platform (gated on E-0 complete)
 
