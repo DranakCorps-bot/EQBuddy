@@ -79,6 +79,12 @@ public sealed class CompanionServer : IDisposable
     /// <summary>Addresses actually listening — the pairing UI picks its URL from these.</summary>
     public IReadOnlyList<IPAddress> BoundAddresses { get; private set; } = [];
 
+    /// <summary>The same list as <see cref="BoundAddresses"/>, in the same order, with the
+    /// adapter facts kept — what the pairing window's address picker offers (#264). Only
+    /// addresses that actually bound appear here: an address a player can pick and cannot
+    /// be reached on would be a picker that lies.</summary>
+    public IReadOnlyList<LanAddressCandidate> BoundCandidates { get; private set; } = [];
+
     public int ClientCount => _clients.Count;
 
     /// <summary>Raised (on a worker thread) when a phone connects or drops.</summary>
@@ -106,15 +112,24 @@ public sealed class CompanionServer : IDisposable
 
     /// <summary>The machine's LAN IPv4s: up interfaces, skipping loopback and
     /// link-local (169.254 — an address that means "no network"). Ordered by
-    /// <see cref="LanAddressRank"/>, so BoundAddresses[0] is the one to print on the QR.
+    /// <see cref="LanAddressRank"/>, so BoundAddresses[0] is the DEFAULT for the QR —
+    /// the player can pin a different one of them (<c>CompanionHost.SetPairingAddress</c>).
     ///
     /// <para>Ordering used to be "private first", which ranked a Hyper-V/VirtualBox host
     /// adapter equal to the real LAN and let NIC enumeration order decide the QR — a
     /// scan that silently reaches nothing (David, 2026-08-15). A default gateway is what
-    /// separates them, so the ranking asks for one.</para></summary>
-    public static IReadOnlyList<IPAddress> LanAddresses()
+    /// separates them, so the ranking asks for one. Ethernet and Wi-Fi both have one, so
+    /// enumeration order was deciding again until #264 added the wireless tiebreak.</para></summary>
+    public static IReadOnlyList<IPAddress> LanAddresses() =>
+        [.. LanCandidates().Select(c => IPAddress.Parse(c.Address))];
+
+    /// <summary>The same enumeration as <see cref="LanAddresses"/>, keeping the facts the
+    /// ranking used so the pairing window can OFFER the list. #264: a PC on both ethernet
+    /// and Wi-Fi ranks the wireless address first now, but the ranking cannot know which
+    /// network the phone is on — only the player can, so the picker reads from here.</summary>
+    public static IReadOnlyList<LanAddressCandidate> LanCandidates()
     {
-        var result = new List<(IPAddress Address, int Score)>();
+        var result = new List<LanAddressCandidate>();
         try
         {
             foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
@@ -128,19 +143,24 @@ public sealed class CompanionServer : IDisposable
                     .Any(g => g.Address is { } a
                         && a.AddressFamily == AddressFamily.InterNetwork
                         && !a.Equals(IPAddress.Any));
+                // What the OS says, not what the name looks like — the description is the
+                // fallback and lives in LanAddressRank so the label cannot disagree with
+                // the score.
+                var isWireless = nic.NetworkInterfaceType
+                    == System.Net.NetworkInformation.NetworkInterfaceType.Wireless80211;
                 foreach (var addr in props.UnicastAddresses)
                 {
                     if (addr.Address.AddressFamily != AddressFamily.InterNetwork) continue;
                     var bytes = addr.Address.GetAddressBytes();
                     if (bytes[0] == 169 && bytes[1] == 254) continue;
-                    result.Add((addr.Address,
-                        LanAddressRank.Score(addr.Address.ToString(), hasGateway, nic.Description)));
+                    result.Add(new LanAddressCandidate(
+                        addr.Address.ToString(), nic.Description ?? "", hasGateway, isWireless));
                 }
             }
         }
         catch (Exception ex) { CoreLog.Error(ex); }
         // OrderBy is stable, so equally-ranked addresses keep enumeration order.
-        return [.. result.OrderBy(r => r.Score).Select(r => r.Address)];
+        return LanAddressRank.Rank(result);
     }
 
     /// <summary>Bind and begin accepting. Throws SocketException if the port is taken
@@ -150,15 +170,23 @@ public sealed class CompanionServer : IDisposable
         if (_started) throw new InvalidOperationException("Already started.");
         _started = true;
 
-        var addresses = _options.Addresses ?? LanAddresses();
+        // Candidates rather than bare addresses, so the adapter facts survive the bind
+        // and the picker can name each row (#264). A caller that named its own addresses
+        // (tests) gets rows with nothing to say about the adapter, which is honest.
+        IReadOnlyList<LanAddressCandidate> candidates = _options.Addresses is { } chosen
+            ? [.. chosen.Select(a => new LanAddressCandidate(a.ToString(), "", false, false))]
+            : LanCandidates();
         // No LAN at all (airplane mode, cable out): bind loopback so the feature is
         // at least testable on the PC's own browser; the UI explains why no QR works.
-        if (addresses.Count == 0) addresses = [IPAddress.Loopback];
+        if (candidates.Count == 0)
+            candidates = [new LanAddressCandidate(IPAddress.Loopback.ToString(), "", false, false)];
 
         var port = _options.Port;
         var bound = new List<IPAddress>();
-        foreach (var addr in addresses)
+        var boundCandidates = new List<LanAddressCandidate>();
+        foreach (var candidate in candidates)
         {
+            var addr = IPAddress.Parse(candidate.Address);
             var listener = new TcpListener(addr, port);
             try { listener.Start(); }
             catch (SocketException ex)
@@ -170,10 +198,12 @@ public sealed class CompanionServer : IDisposable
             if (port == 0) port = ((IPEndPoint)listener.LocalEndpoint).Port;
             _listeners.Add(listener);
             bound.Add(addr);
+            boundCandidates.Add(candidate);
             _ = AcceptLoopAsync(listener, _cts.Token);
         }
         Port = port;
         BoundAddresses = bound;
+        BoundCandidates = boundCandidates;
         _ = HeartbeatLoopAsync(_cts.Token);
     }
 

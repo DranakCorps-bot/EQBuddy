@@ -31,6 +31,13 @@ public sealed class CompanionWindow : Window
         Visibility = Visibility.Collapsed, Margin = new Thickness(0, 4, 0, 0),
     };
     private readonly StackPanel _pairPanel = new();
+    /// <summary>The address picker and its two lines of copy, together — this whole block
+    /// is absent on a PC with one address, because a choice of one is not a choice (#264).</summary>
+    private readonly StackPanel _addressPanel = new() { Margin = new Thickness(0, 6, 0, 0) };
+    private readonly ComboBox _addressBox = new() { FontSize = 12, Margin = new Thickness(0, 2, 0, 0) };
+    /// <summary>Refresh() writes the selection itself; without this the write is
+    /// indistinguishable from a click and would re-enter through SelectionChanged.</summary>
+    private bool _syncingAddress;
 
     public CompanionWindow(CompanionHost host)
     {
@@ -72,6 +79,27 @@ public sealed class CompanionWindow : Window
         _pairPanel.Children.Add(urlHint);
         _urlBox.SetResourceReference(Control.ForegroundProperty, "AccentBrush");
         _pairPanel.Children.Add(_urlBox);
+
+        // ---- which of this PC's addresses the code points at (#264) ----
+        var addressHead = new TextBlock
+        {
+            Text = EQBuddy.UI.Shared.CompanionPairingText.AddressLabel, FontSize = 12,
+            FontWeight = FontWeights.SemiBold,
+        };
+        addressHead.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        _addressPanel.Children.Add(addressHead);
+        _addressPanel.Children.Add(Dim(EQBuddy.UI.Shared.CompanionPairingText.AddressHint));
+        _addressBox.SelectionChanged += (_, _) =>
+        {
+            if (_syncingAddress) return;
+            _host.SetPairingAddress(_addressBox.SelectedIndex <= 0
+                ? null
+                : _host.PairingAddresses[_addressBox.SelectedIndex - 1].Address);
+            Refresh();
+        };
+        _addressPanel.Children.Add(_addressBox);
+        _pairPanel.Children.Add(_addressPanel);
+
         _statusLine.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         _pairPanel.Children.Add(_statusLine);
 
@@ -151,12 +179,48 @@ public sealed class CompanionWindow : Window
             _host.LastError is null ? "DimBrush" : "BadBrush");
         _enable.IsChecked = _host.Running;
 
+        RefreshAddresses();
         if (_host.PairingUrl is { } url)
         {
             _urlBox.Text = url;
             _qrImage.Source = QrBitmap.Render(QrEncoder.Encode(url));
         }
         UpdateStatus();
+    }
+
+    /// <summary>Rebuild the address picker from what is actually BOUND. Hidden unless the
+    /// machine has a real choice, which is the common case — one NIC, one address, no
+    /// control implying otherwise.</summary>
+    private void RefreshAddresses()
+    {
+        var choices = _host.PairingAddresses;
+        _addressPanel.Visibility = choices.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        if (choices.Count <= 1) return;
+
+        _syncingAddress = true;
+        try
+        {
+            _addressBox.Items.Clear();
+            _addressBox.Items.Add(EQBuddy.UI.Shared.CompanionPairingText.AddressAuto);
+            foreach (var choice in choices)
+                _addressBox.Items.Add(EQBuddy.UI.Shared.CompanionPairingText.AddressChoice(
+                    choice.Address, choice.AdapterDescription, choice.Wireless));
+            // The pin, or Automatic — read back through the host so a pin naming an
+            // address this machine no longer has shows as Automatic rather than as a row
+            // that is not there.
+            var pinned = _host.PinnedPairingAddress;
+            var index = pinned is null ? -1 : IndexOf(choices, pinned);
+            _addressBox.SelectedIndex = index < 0 ? 0 : index + 1;
+            _addressBox.ToolTip = (string)_addressBox.Items[_addressBox.SelectedIndex];
+        }
+        finally { _syncingAddress = false; }
+    }
+
+    private static int IndexOf(IReadOnlyList<EQBuddy.Core.LanAddressCandidate> choices, string address)
+    {
+        for (var i = 0; i < choices.Count; i++)
+            if (string.Equals(choices[i].Address, address, StringComparison.OrdinalIgnoreCase)) return i;
+        return -1;
     }
 
     private void UpdateStatus() =>

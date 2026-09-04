@@ -1,5 +1,7 @@
 using System.Reflection;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using EQBuddy.Companion;
 using EQBuddy.Core;
@@ -107,6 +109,41 @@ public sealed class CompanionWiringTests : IDisposable
             code.PixelSize.Width);
         Assert.Equal(code.PixelSize.Width, code.PixelSize.Height);
 
+        window.Close();
+        main.Close();
+        Dispatcher.UIThread.RunJobs();
+    }
+
+    /// <summary>#264's picker EXISTS on this lane, and is shown exactly when there is a
+    /// choice to make.
+    ///
+    /// <para>Trap 29 is why this is an assertion rather than a screenshot: a control that
+    /// is never drawn photographs as an unremarkable panel, and the WPF twin's title-bar
+    /// Mobile button spent six days invisible with nothing able to see it. The count of
+    /// addresses is a fact about the machine — one on CI, several on a desk — so what is
+    /// pinned here is the RULE ("more than one, and only then"), never a number.</para>
+    /// </summary>
+    [AvaloniaFact]
+    public void ThePairingWindowOffersAnAddressPickerWhenThereIsAChoice()
+    {
+        var main = new MainWindow();
+        main.Show();
+        main.Companion.SetEnabled(true);
+        var window = new CompanionWindow(main.Companion);
+        window.Show();
+
+        var picker = Assert.Single(window.GetLogicalDescendants().OfType<ComboBox>());
+        Assert.Equal(main.Companion.PairingAddresses.Count > 1, picker.IsEffectivelyVisible);
+        if (main.Companion.PairingAddresses.Count > 1)
+        {
+            // Automatic, then one row per bound address — and Automatic is selected,
+            // because a fresh profile has pinned nothing.
+            Assert.Equal(main.Companion.PairingAddresses.Count + 1,
+                picker.ItemsSource!.Cast<object>().Count());
+            Assert.Equal(0, picker.SelectedIndex);
+        }
+
+        main.Companion.SetEnabled(false);
         window.Close();
         main.Close();
         Dispatcher.UIThread.RunJobs();
