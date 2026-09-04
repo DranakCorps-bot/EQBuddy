@@ -70,6 +70,14 @@ Do not put these back in Holds.
 
 
 
+
+### PR #274 — #273 bonus-XP XpRx (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #274 `claude/273-bonus-xp` head `feed95dc` → main. Bonus-weekend `XpRx` parse for discussion #273.
+- **Ruling:** Signed. Merge now (both CI green at look). Optional non-capturing `(with a bonus)` between noun and `!` endorsed; WhatsNew 1.99.18 FIXED line stays; no props bump; no tag. Not a hold. Not needs-david. Do not start #250. Do not fold #264. Do not retouch 320-cap / #240. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-04 10:05 AM CT
+
+
 ### #273 bonus-exp XP reg break (sign-off)
 - **Kind:** sign-off / authorize
 - **Thread / subject:** #273 brhanson2-cyber — bonus XP weekend changed XP message; EQBuddy registers zero XP. https://github.com/DranakCorps-bot/EQBuddy/discussions/273
