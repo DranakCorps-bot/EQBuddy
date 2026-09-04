@@ -264,21 +264,12 @@ public sealed class OptionsViewModelTests
         Assert.False(settings.ApplyDefaultSkyQuestChecklist());   // refreshed once, then quiet
     }
 
-    [Fact]
-    public void GearSectionSlotsInAfterQuests()
-    {
-        var settings = new AppSettings { SectionOrder = ["combat", "motes", "quests", "tracked"] };
-
-        Assert.True(settings.ApplyDefaultGearSection());
-        Assert.Equal(["combat", "motes", "quests", "gear", "tracked"], settings.SectionOrder);
-        Assert.False(settings.ApplyDefaultGearSection());
-
-        var noQuests = new AppSettings { SectionOrder = ["combat", "motes", "tracked"] };
-        Assert.True(noQuests.ApplyDefaultGearSection());
-        Assert.Equal(["combat", "motes", "gear", "tracked"], noQuests.SectionOrder);
-
-        Assert.False(new AppSettings().ApplyDefaultGearSection());
-    }
+    // GearSectionSlotsInAfterQuests was DELETED with ApplyDefaultGearSection on 2026-09-04
+    // (#252). It asserted that the migration inserts a "gear" key — which stopped being a
+    // card at the 2026-08-20 Gear & Loot fold, so the test was pinning the creation of a key
+    // no surface could draw and the loot fold re-absorbed on every launch. See
+    // SectionFoldIdempotenceTests for what that cost a player, and for the guards that
+    // replace this one.
 
     [Fact]
     public void EpicQuestDefaultsMergeOnce()

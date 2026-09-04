@@ -25,13 +25,18 @@ public class ProgressSectionFoldTests
         return s;
     }
 
+    /// <summary>The plan named five. **Motes is not one of them any more** — it got its own
+    /// card back on 2026-08-21 and the fold must walk straight past it (#252, TiconaX: the
+    /// fold that kept absorbing it re-ran on every launch and un-hid the card each time).
+    /// It sits in the middle of the input here on purpose, so a regression shows up as a
+    /// missing card rather than only as a hidden one.</summary>
     [Fact]
-    public void The_five_cards_become_one()
+    public void The_folded_cards_become_one_and_motes_is_left_alone()
     {
         var s = With(["combat", "progress", "money", "motes", "faction", "raids", "loot"]);
 
         Assert.True(s.MigrateProgressSections());
-        Assert.Equal(["combat", "progress", "loot"], s.SectionOrder);
+        Assert.Equal(["combat", "progress", "motes", "loot"], s.SectionOrder);
     }
 
     /// <summary>A player who dragged Money to the top finds the THEME at the top — not
@@ -47,21 +52,24 @@ public class ProgressSectionFoldTests
         Assert.Equal(["progress", "combat", "loot"], s.SectionOrder);
     }
 
-    /// <summary>Hiding one of five must not hide the theme. Showing a card that was hidden
+    /// <summary>Hiding one of them must not hide the theme. Showing a card that was hidden
     /// is one click to undo; hiding one the player wanted is invisible.</summary>
     [Fact]
     public void One_hidden_card_does_not_hide_the_theme()
     {
-        var s = With(["progress", "money", "motes", "faction", "raids"], "motes");
+        var s = With(["progress", "money", "faction", "raids"], "money");
 
         s.MigrateProgressSections();
 
         Assert.DoesNotContain("progress", s.HiddenSections);
-        Assert.DoesNotContain("motes", s.HiddenSections);
+        Assert.DoesNotContain("money", s.HiddenSections);
     }
 
     /// <summary>But someone who hid ALL of them was saying "I don't want this", and the
-    /// theme should honour it rather than resurrect five cards as one.</summary>
+    /// theme should honour it rather than resurrect four cards as one.
+    ///
+    /// A hidden MOTES card rides along untouched — it is not this theme's to judge, and
+    /// counting it either way is what #252 was.</summary>
     [Fact]
     public void Hiding_every_absorbed_card_hides_the_theme()
     {
@@ -71,7 +79,8 @@ public class ProgressSectionFoldTests
         s.MigrateProgressSections();
 
         Assert.Contains("progress", s.HiddenSections);
-        Assert.Equal(["progress", "combat"], s.SectionOrder);
+        Assert.Contains("motes", s.HiddenSections);
+        Assert.Equal(["progress", "motes", "combat"], s.SectionOrder);
     }
 
     /// <summary>Hidden state is judged against the cards the profile ACTUALLY had. A
@@ -103,7 +112,7 @@ public class ProgressSectionFoldTests
     [Fact]
     public void Running_it_twice_changes_nothing_the_second_time()
     {
-        var s = With(["combat", "progress", "money", "motes", "faction", "raids"], "money");
+        var s = With(["combat", "progress", "money", "faction", "raids"], "money");
 
         Assert.True(s.MigrateProgressSections());
         var order = s.SectionOrder.ToList();

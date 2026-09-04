@@ -17,6 +17,23 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **#252's fix DELETES `ApplyDefaultGearSection` outright rather than guarding it**
+  (`src/EQBuddy.Core/AppSettings.cs`). · The other way: leave it and make
+  `FoldThemeSections` skip keys that are not cards. · The default's whole job was to give
+  older profiles the `gear` card, and the 2026-08-20 Gear & Loot fold removed `gear` from
+  `OverlaySections.Catalog` and from both widgets' `SectionMap` — so since that day the key
+  it inserted could not draw anything, and its only remaining effect was to feed the loot
+  fold a phantom absorbed key every launch. Guarding it would have kept a migration whose
+  successful outcome is a no-op. Old profiles carrying their own `gear` key are untouched:
+  the fold reads `SectionOrder`, not this default, and `SectionFoldIdempotenceTests` pins
+  that case.
+- **#252 does not try to restore hidden state the bug already destroyed** (same commit). ·
+  The other way: re-hide Gear & Loot and Motes for profiles that look like they were bitten.
+  · `HiddenSections` carries no provenance — the entry the bug removed and a card the player
+  deliberately switched on are indistinguishable, which is the same reasoning
+  `MigrateMotesCard` already records for the #228 restore. Re-hiding on a guess would take a
+  card away from someone who wants it, invisibly; the What's-new says plainly to hide them
+  once more and that it will stick. Nothing is forced visible either.
 - **The legacy download links in `LEGACY-V1.md` and the README pin `v1.99.17`, the current
   1.x release, rather than waiting for the bridge tag** (P0-3). · The other way: leave the
   asset links out until the bridge release exists, or point them at `releases/latest`. · A

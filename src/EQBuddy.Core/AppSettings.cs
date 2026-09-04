@@ -607,34 +607,7 @@ public sealed class AppSettings
         // it cares a lot: see MigrateMotesCard.
         var hadFile = settings._fileStamp is not null;
         settings._fileStamp = StampOf(FilePath);
-        // Non-short-circuiting on purpose: rules saved before ids existed get theirs
-        // assigned at construction, and persisting them NOW is what makes the id stable
-        // across restarts rather than re-rolled every launch until some unrelated edit
-        // happens to save settings.
-        var changed = settings.ApplyDefaultRules();
-        // Fold the two old quest cards onto one BEFORE the gear default runs — gear
-        // anchors itself to the quests slot.
-        changed |= settings.MigrateQuestSections();
-        // And the five Progress-theme cards onto one, the same way and for the same
-        // reason (docs/Themes.md step 5). After the gear default, because gear anchors
-        // itself to the quests slot and must not be pushed around by a fold that happens
-        // to land nearby; before nothing else, because nothing else reads SectionOrder.
-        changed |= settings.ApplyDefaultGearSection();
-        changed |= settings.MigrateProgressSections();
-        // The window exists now, so the fold runs (docs/Themes.md step 5). It was written
-        // and held back deliberately for two commits — a migration that rearranges a
-        // player's widget before the surface it folds into exists buys them nothing.
-        changed |= settings.MigrateLootSections();
-        // The Motes card came back on 2026-08-21 and must arrive HIDDEN, or every player
-        // who never asked for it gets a taller widget on update. Runs after the folds
-        // because it reads what they left behind.
-        changed |= settings.MigrateMotesCard(hadFile);
-        changed |= settings.MigrateSkyRewardRenames();
-        changed |= settings.ApplyDefaultSkyQuestChecklist();
-        changed |= settings.ApplyDefaultEpicQuestChecklist();
-        changed |= settings.MigrateBuffSetsToClassBuckets();
-        changed |= settings.MigrateArchiveDefault();
-        changed |= settings.MigrateWindowHeights();
+        var changed = settings.ApplyMigrations(hadFile);
         // A READ that writes, and the reason is good: an id assigned at construction is
         // only stable across restarts if it is persisted now. But it means Load() is a
         // writer, and a caller that has not taken the single-instance lock must be able to
@@ -643,6 +616,48 @@ public sealed class AppSettings
         if (persistMigrations && (changed | settings.TrackedRules.Any(r => r.IdWasGenerated)))
             settings.Save();
         return settings;
+    }
+
+    /// <summary>
+    /// Every one-time migration this profile still owes, in the order they have to run.
+    /// Returns true when something changed and the file needs writing.
+    ///
+    /// **It is a method rather than a run of lines inside <see cref="Load"/> so it can be
+    /// run TWICE in a test** — and that is not a convenience, it is the guard #252 needed.
+    /// Every migration below is idempotent on its own, and the bug was in the way two of
+    /// them fed each other: <c>ApplyDefaultGearSection</c> re-created the <c>gear</c> key
+    /// every launch and <c>MigrateLootSections</c> absorbed it again every launch, and each
+    /// round trip dropped <c>loot</c> out of <see cref="HiddenSections"/>. Nothing that
+    /// tested one migration could see it. <c>SectionFoldIdempotenceTests</c> runs the chain
+    /// and asserts the second pass is silent, which is the only shape of test that can.
+    /// </summary>
+    public bool ApplyMigrations(bool hadFile)
+    {
+        // Non-short-circuiting on purpose: rules saved before ids existed get theirs
+        // assigned at construction, and persisting them NOW is what makes the id stable
+        // across restarts rather than re-rolled every launch until some unrelated edit
+        // happens to save settings.
+        var changed = ApplyDefaultRules();
+        changed |= MigrateQuestSections();
+        // The Progress and Gear & Loot folds (docs/Themes.md step 5). Both are no-ops on a
+        // profile that has already been through them; see FoldThemeSections' stale check,
+        // and #252 for what happened when something outside them re-created an absorbed key.
+        changed |= MigrateProgressSections();
+        // The window exists now, so the fold runs. It was written and held back
+        // deliberately for two commits — a migration that rearranges a player's widget
+        // before the surface it folds into exists buys them nothing.
+        changed |= MigrateLootSections();
+        // The Motes card came back on 2026-08-21 and must arrive HIDDEN, or every player
+        // who never asked for it gets a taller widget on update. Runs after the folds
+        // because it reads what they left behind.
+        changed |= MigrateMotesCard(hadFile);
+        changed |= MigrateSkyRewardRenames();
+        changed |= ApplyDefaultSkyQuestChecklist();
+        changed |= ApplyDefaultEpicQuestChecklist();
+        changed |= MigrateBuffSetsToClassBuckets();
+        changed |= MigrateArchiveDefault();
+        changed |= MigrateWindowHeights();
+        return changed;
     }
 
     /// <summary>
@@ -981,15 +996,21 @@ public sealed class AppSettings
         return changed;
     }
 
-    public bool ApplyDefaultGearSection()
-    {
-        if (SectionOrder.Count == 0 || SectionOrder.Contains("gear")) return false;
-        var quests = SectionOrder.IndexOf("quests");
-        var motes = SectionOrder.IndexOf("motes");
-        var anchor = quests >= 0 ? quests : motes;
-        SectionOrder.Insert(anchor < 0 ? SectionOrder.Count : anchor + 1, "gear");
-        return true;
-    }
+    // ApplyDefaultGearSection was DELETED on 2026-09-04 (#252, TiconaX). It gave older
+    // profiles the then-new "gear" card by inserting that key into SectionOrder — and the
+    // 2026-08-20 Gear & Loot fold made "gear" stop being a card. It is not in
+    // OverlaySections.Catalog and not in either widget's SectionMap, so from that day the
+    // key it inserted could never draw anything.
+    //
+    // What it COULD still do was feed MigrateLootSections a phantom absorbed key on every
+    // single launch: the default re-created "gear", the fold absorbed it and removed BOTH
+    // absorbed keys from HiddenSections, and then declined to re-hide "loot" because
+    // `hidden >= present` counted a "gear" that no player could ever have hidden (it has no
+    // row in Options). One launch, one un-hidden Gear & Loot card, for as long as the
+    // player kept launching. See SectionFoldIdempotenceTests.
+    //
+    // A genuinely old profile that still carries its own "gear" key is unaffected: the fold
+    // reads SectionOrder, not this default, and folds it exactly as it always did.
 
     public bool ApplyDefaultSkyQuestChecklist()
     {
