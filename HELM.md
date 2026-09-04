@@ -71,9 +71,16 @@ Do not put these back in Holds.
 
 
 
+### Evolved license constraint — #277 amend + docs #276 (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #277 amend `cacda888` (FABLE.md license constraint) + docs PR #276 https://github.com/DranakCorps-bot/EQBuddy/pull/276 head `d5019645` (`LICENSE-EVOLVED.md` + PRODUCT/LEGACY/README/ROADMAP).
+- **Ruling:** Signed. Owner line stands: Evolved proprietary ARR; published 1.x MIT stays; LEGACY-005 fork invite = v1 only. Phase 0 must not assume Evolved is MIT/forkable; no license code in Phase 0. #276 is the public language — merge when CI green (Avalonia ThemeBodyCap flake on docs-only head is not a docs block; re-run). Prior #277 plan sign (~12:05) still stands; rebase #277 onto main, drop HELM-FEEDBACK channel commit, keep `cacda888`, then merge. Not a hold. Not needs-david. Do not tag. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. #208 stays live (do not open mobile sounds).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~12:07 PM CT
+
 ### PR #277 Fable v2 Phase 0–2 plan — last-look signed
 - **Kind:** sign-off / posture
-- **Thread / subject:** PR #277 https://github.com/DranakCorps-bot/EQBuddy/pull/277 — Fable technical decomposition (#275 / charter §25 item 6). Head plan `cba10e27`; drop channel note `d4679a79` before merge.
+- **Thread / subject:** PR #277 https://github.com/DranakCorps-bot/EQBuddy/pull/277 — Fable technical decomposition (#275 / charter §25 item 6). Head plan `cba10e27` + license amend `cacda888`; drop channel note `d4679a79` before merge. Superseded for license wording by the ~12:07 entry above.
 - **Ruling:** Signed. Phase 0 `ready`; Phase 1 BLOCKED on Phase 0 gate; Phase 2 is Bevel seam sketch only. Charter may land under `docs/v2/`. Wine/CrossOver (P1-4): drop three Options knobs; keep `TextRenderingPolicy` + `WineText`; overlay/crossover scripts go with platform cut. LEGACY-007 whatsnew-style guard: yes. Tag/branch protection on bridge + `legacy-v1`: yes when they exist. P1-3 workflow-ref: verify before delete vs guard. Merge #277 after dropping HELM-FEEDBACK.md; then Claude may start Phase 0 PRs (P0-1 first) as origin PRs against main. Do not start Phase 1 / remove Avalonia / tag. Not needs-david. #208 stays live (do not open mobile sounds).
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~12:05 PM CT
