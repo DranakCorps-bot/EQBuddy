@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -197,25 +197,48 @@ internal sealed class AppHarness : IDisposable
             "the startup replay to FINISH (debug.txt ingestDone=1) before any test samples " +
             "a baseline — the app's own answer, not a guess from stillness", Artifacts);
 
-        // One more WRITE of the dump, so what a test reads next was measured with the
-        // ingest already finished. The file's timestamp rather than its content: an idle
-        // app rewrites the same numbers every tick, so "the content changed" would wait
-        // for something that never happens.
+        // **And then for the SURFACES to catch up, which is a second thing entirely.**
+        // `ingestDone` says the log has been read; the windows render on their own
+        // throttle, so a row count sampled the instant the ingest finished can still be
+        // climbing. `SessionGoesLive…` failed that way on a runner even with ingestDone in
+        // hand — "kills to reach 14; last seen 13" — because the Kills window was three
+        // rows behind when the baseline was taken and then jumped past 14.
         //
-        // On the FULL assert budget, not a short one of its own. A 20 s version of this
-        // line failed twice on hosted runners in `TheQuestTrackerBuildsAListWith…`, where
-        // the tick that has to build a 1,200-quest tracker on two slow cores can be longer
-        // than that — and "the app has not repainted in twenty seconds" is a fact about
-        // the machine, not about the feature under test.
-        var written = LastDumpWrite();
-        Wait.Until(() => LastDumpWrite() > written, AssertTimeout,
-            "one more dump to be written after the ingest finished", Artifacts);
+        // So: every value in the dump unchanged across two consecutive reads a tick apart,
+        // the ticking keys aside. Neither signal alone was enough — asking the watcher
+        // cannot see a lagging window, and stillness cannot tell a lull from an ending.
+        var seen = SteadyDump();
+        var stableSince = DateTime.UtcNow;
+        Wait.Until(() =>
+        {
+            var now = SteadyDump();
+            if (now.Length == 0 || now != seen)
+            {
+                (seen, stableSince) = (now, DateTime.UtcNow);
+                return false;
+            }
+            return DateTime.UtcNow - stableSince >= SurfaceSettle;
+        }, AssertTimeout,
+            "the surfaces to stop catching up after the ingest finished (every dump value " +
+            $"except the ticking pair unchanged for {SurfaceSettle.TotalSeconds:0.#}s)",
+            Artifacts);
     }
 
-    private DateTime LastDumpWrite()
+    /// <summary>Two UI ticks of quiet, measured after the app has SAID the ingest is done —
+    /// so this is only ever waiting on rendering, never on the log.</summary>
+    private static readonly TimeSpan SurfaceSettle = TimeSpan.FromSeconds(2.5);
+
+    /// <summary>The dump with the two ticking keys dropped — the ones the app increments on
+    /// a clock rather than on an event, which would make every read look different.</summary>
+    private string SteadyDump()
     {
-        try { return File.GetLastWriteTimeUtc(DebugDumpPath); }
-        catch (IOException) { return DateTime.MinValue; }
+        try
+        {
+            return string.Join(' ', File.ReadAllText(DebugDumpPath).Split(' ')
+                .Where(pair => !pair.StartsWith("companionPumpTicks=", StringComparison.Ordinal)
+                            && !pair.StartsWith("companionPushes=", StringComparison.Ordinal)));
+        }
+        catch (IOException) { return ""; }
     }
 
     /// <summary>
