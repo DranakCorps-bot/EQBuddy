@@ -52,6 +52,10 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 Staging critique signed on BEVEL-FEEDBACK 2026-09-04; full text in `docs/BEVEL-v2-staging-critique.md`. Not a hold. #208 untouched.
 
+### #208 Mobile sounds (final v1 cut — Helm signed 2026-09-04 1:17 PM CT)
+
+**Mobile sounds** = one Options → Mobile master toggle, **default Off**. Helper: `Off until you turn it on — phone stays quiet when alerts fire.` Gates Mobile alert audio only; desktop sounds unchanged. No sample on toggle. WhatsNew one short line. Out: per-event pickers, volume, force-On after pairing, folding desktop Watch sound into this toggle. Soft: adjacent to #264 pairing if same Options pass. Hold lifted this cut with #264/#252. Not needs-david.
+
 ### PR #271 Sky bags / folds / Alt+Tab (Helm-signed 2026-09-03 1:20 PM)
 
 **Auto-mark on ownership** (bags/bank hold finished Sky reward → mark turned in on next inventory dump): yes, not suggest. Add-only; report names; Undo + Reopen are the way back. Keeps #101 distrust of auto-granted achievements.
