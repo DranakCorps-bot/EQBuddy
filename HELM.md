@@ -68,21 +68,12 @@ Do not put these back in Holds.
 ---
 
 
-
-
 ### PR #284 — P0-3 LEGACY-006/007 support matrix + legacy-notice-guard (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #284 https://github.com/DranakCorps-bot/EQBuddy/pull/284 (`claude/p0-3-legacy-docs` → `main`, head `66e3460b`) — #275 Phase 0 item P0-3.
 - **Ruling:** Signed. Docs + `scripts/legacy-notice-guard.ps1` only; no product behaviour. **Ask 1 endorsed:** keep asset links on published `v1.99.17` until bridge tag exists; prose may name planned `v1.99.18`; re-pin on publish. **Ask 2 endorsed:** bridge WhatsNew highlight on unreleased 1.99.18 with Don Thompson + quasarj by name, no URL. LEGACY-005 = v1/MIT only; Evolved ARR. Merge when both CI green (`build-and-test` was green at look; Avalonia `EqlWikiMobsTests` concurrency flake — re-run, do not "fix" product). Not a hold. Not needs-david. After merge: Final v1 bag implement next (#208 per Bevel #283 lock, then #264, #252). Do not tag until those three land. Do not start Phase 1 / remove Avalonia. Do not touch Play Console / signing / prod secrets. Live Holds empty (#208 Retired for this cut).
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~1:25 PM CT
-
-### PR #284 — P0-3 LEGACY-006/007 docs + legacy-notice-guard (sign-off)
-- **Kind:** sign-off / posture
-- **Thread / subject:** PR #284 https://github.com/DranakCorps-bot/EQBuddy/pull/284 (`claude/p0-3-legacy-docs` → `main`, head `66e3460b`) — #275 Phase 0 item P0-3.
-- **Ruling:** Signed. Merge when both CI green (`build-and-test` + `build-avalonia-linux`). Scope endorsed: LEGACY-V1.md support matrix + final-tag plan naming `v1.99.18` with download links still on published `v1.99.17` (re-pin at bridge publish — same premature-literal avoidance as P0-2); README above-fold Legacy Linux/macOS; FeatureGuide §Updates on-disk paragraph; WhatsNew 1.99.18 bridge highlight crediting Don Thompson + quasarj by name (no URL — trap 12); `scripts/legacy-notice-guard.ps1` (LEGACY-007) wired into check.ps1 + release.ps1 with mutation proof via `-AssumeVersion`/`-Repo`; every link pins a TAG, never `releases/latest`; LEGACY-005 fork invite = v1/MIT only; Evolved ARR; no third-party license name-checks; credits block untouched; no mailbox files. At look: `build-and-test` green; `build-avalonia-linux` red once on `EqlWikiMobsTests.NoMoreThanTwoFetchesAreEverInFlight` (Expected 3 / Actual 2) — concurrency flake, unrelated to docs/scripts; re-run, do not "fix" product code. Not a hold. Not needs-david. No live holds (#208 lifted for final v1 cut only). After merge: P0-4 waits on bridge tag + `legacy-v1`; final v1 bag still #208/#264/#252 then tag `v1.99.18` (Play Console OFF). Do not start Phase 1 / remove Avalonia / publish real prerelease / tag from this PR. Do not touch Play Console / signing / prod secrets.
-- **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-09-04 ~1:30 PM CT
 
 ### Final v1 scope LOCKED — owner 2026-09-04 1:14 PM CT (priority)
 - **Kind:** priority / posture
