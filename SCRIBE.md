@@ -16,6 +16,23 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### bonus-exp weekend changed the XP message — EQBuddy registering zero XP (player-facing break)
+- **Priority:** must-fix (player-facing break, live this weekend; not authorized yet).
+- **Place:** XP-event parsing — `XpRx` in `src/EQBuddy.Core/LogParser.cs`. Player session, not shared game truth / eqlwiki. Downstream: Progress surface / XP% tracking that consumes `XpEvent`. Not a catalog / quest-data item, so the wiki-first rule is not the fix surface here. Not #264, not #262, not #261, not #208. Do not fold.
+- **Source:** #273 brhanson2-cyber Sep 4, 8:18 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/273 New thread. 0 replies. Unanswered. Footer: EQBuddy 1.99.17 — Windows 26200. (Newer client tag than the Aug 30–Sep 2 batch, which were on 1.99.16.)
+- **Ask (verbatim, the whole entry):** "The bonus exp weekend has modified the xp message and eqbuddy is not registering any exp today." Single-sentence body plus client footer; that is everything the reporter wrote.
+- **Already shipped (current main):** `XpRx` is `^You gain (?<party>party )?experience!(?: \((?<pct>[\d.]+)%\))?$` with a commented sample `You gain party experience! (0.019%)  |  You gain experience! (0.5%)`. Strict `^...$` match — any other wording, or extra data on the line, is missed. No bonus-xp variant regex was grepped in `LogParser.cs`.
+- **Event context (external, unverified in-client):** EQL community chatter (reddit r/EQLegends, untrusted source) says Bonus XP Weekend is Sep 4–7, 25% bonus XP. I did NOT open the client or a zone; that is context, not a confirmed in-game message.
+- **Checked:** WINDOW — no. WIDGET — no. PHONE — no. Read the regex in source only. I could NOT verify the actual bonus-weekend message text the game prints; there is no live game log from the reporter in hand.
+- **Hypothesis, checked against source, unchecked against the game:** the bonus week changed the XP line's wording (or appended bonus metadata) so the anchored `XpRx` stops matching, hence zero `XpEvent`s. The reporter's claim is the only in-game evidence so far. Do not assert the new message text until we have it verbatim from a reporter log or the game.
+- **Needed from reporter (blocking, waiting-class):** the exact combat-log line for an XP hit during the bonus weekend (one literal line, not a paraphrase). Without it, the fix is guessing at the new wording.
+- **Class:** V0—V1 (regex shape against a new in-game message). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Scribe 2026-09-04 (cron intake):** New intake. Player-facing break, live event this weekend, not authorized. HELM.md Holds re-read: live hold #208 is do-not-open on mobile sounds (sbaum23) — not this reporter, not this ask; talking to brhanson2-cyber is not the hold, opening the work is. Not #208. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #264/#262/#261. Note: brhanson2-cyber is also the reporter on #264 (mobile pairing IP) — same player, distinct asks, do not fold. Thank-you drafted for Helm's sign-off — NOT posted.
+
+- **Thank-you draft (for Helm's sign-off — DRAFT, NOT POSTED):**
+  > Hi brhanson2-cyber — thanks for flagging this, and bad timing with the bonus XP weekend live right now. A changed XP line during the bonus weeks is exactly the kind of thing the tracker catches, and it's logged and in front of us for review. If it's easy, a one-line paste of an actual XP hit from your combat log this weekend would be the fastest way to confirm what changed on the game's side. I can't promise a date on it, but it's captured and sent along for review. Thanks for the report.
+
 ### mobile pairing link uses ethernet IP, not Wi-Fi
 - **Priority:** waiting (new thread; not authorized.)
 - **Place:** EQBuddy Mobile pairing URL / QR (the address a phone scans). Player LAN. Not shared game truth / eqlwiki. Not a group meter. Nearby #208 is mobile sounds — talking is fine; do not open that work. Do not fold.
