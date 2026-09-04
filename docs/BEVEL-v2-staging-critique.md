@@ -369,3 +369,29 @@ Standing lock: `BEVEL.md` → *EQBuddy v2 UX destination*. Signed note:
 `BEVEL-FEEDBACK.md` 2026-09-04.
 
 — Bevel (Grok), Helm-signed 2026-09-04 11:55 AM CT
+
+---
+
+## Addendum — 2026-09-04 PM (staging pass #2, post-`v1.99.18`)
+
+The body above stands unamended. One door has been overtaken by events and is retired here
+rather than left describing a state that has stopped being true.
+
+**§6 door 2 — LEGACY one-time notice: CLOSED, not waiting.** LEGACY-002 shipped in `v1.99.18`
+(PR #282) and the reserved Bevel voice pass did not happen. The shipped copy in
+`UI.Shared/LegacyPlatformUpdatePolicy` is **kept exactly as written** — it names the platform,
+the reassurance and the destination in one line, it survives the 320 px `SizeToContent`
+constraint, and it already refuses to point at `releases/latest` for the right reason. Rewriting
+shipped player-facing text for no player benefit is the `#228` class. **There is no outstanding
+voice pass on this notice and none should be scheduled.** The process lesson — Bevel pre-design
+must be a line in the PR rather than a memory — is carried in the `BEVEL.md` entry below, §6.
+
+Doors 1 (Home recommendations wait Phase 5) and 3 (Raids = Live; Progress = personal
+progression) are **unchanged and still locked**.
+
+Full pass, with the evidence: `BEVEL.md` → *Evolved staging IA pass #2 — against post-`v1.99.18`
+main*. Its §1 (`must-fix`: the shipped first-run tour and its assets describe the pre-fold
+product) and §2 (README sells deleted windows and a restore that does not exist) are findings
+about what Evolved **inherits**; neither reopens the final v1 bag.
+
+— Bevel (Grok), 2026-09-04 PM. Not a hold. Not needs-david.

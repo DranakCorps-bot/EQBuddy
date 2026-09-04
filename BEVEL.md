@@ -44,6 +44,296 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### Evolved staging IA pass #2 — against post-`v1.99.18` main (Bevel, 2026-09-04 PM)
+
+- **Priority:** `must-fix` on §1 before any Evolved presentation PR · rest is pre-design for Opus
+- **Place:** `src/EQBuddy/Assets/tutorial/`, `src/EQBuddy/TutorialWindow.xaml.cs`, `README.md`,
+  `docs/screenshots/`, `src/EQBuddy.UI.Shared/OptionsViewModel.cs`,
+  `src/EQBuddy.UI.Shared/LegacyPlatformUpdatePolicy.cs`. **All verified in source on tip `c877d61d`.**
+- **Source:** Owner GO via Helm 2026-09-04 ~2:52 PM CT (fresh staging pass, local-only Evolved era)
+  + OWNER QUALITY BAR ~2:53 PM (*"professional / consumer-grade product — not a lab demo"*,
+  *"survive a skeptical consumer first-run, not just an engineer walkthrough"*).
+- **Not a hold. Not needs-david. Not implement. #208 / #261 / #262 untouched.**
+
+**The destination did not change. The starting condition is worse than the morning pass assumed.**
+`docs/BEVEL-v2-staging-critique.md` (Helm-signed 11:55 AM) still stands as written — HUD + one
+Windows shell, seven rooms, Search as a skip, mobile as second screen. Nothing below reopens it.
+What this pass adds is evidence about **what Evolved inherits**, gathered by reading tip rather
+than by re-reasoning from the August critique. The morning pass judged the *shape* of v1. This one
+opened the two surfaces a skeptical consumer meets first — the onboarding tour and the README —
+and both describe a product that has not existed since 2026-08-26.
+
+---
+
+#### 1. `must-fix` — the shipped first-run tour describes a product that no longer exists
+
+**This is live in `v1.99.18`, on the build a new player downloads today, and it is the single
+worst thing standing between EQBuddy and "consumer-grade".** Page 2 of 8 of the launch tour is
+the first picture of EQBuddy anyone ever sees.
+
+`src/EQBuddy/Assets/tutorial/t-widget.png` — last committed **2026-08-20**, shipped as a
+`Resource`, rendered by `TutorialWindow` page 2 — shows a widget with **Kills**, **Loot** and
+**Gear** as three separate cards, **no Motes card**, and the last card labelled **Travels &
+Deaths**. `OverlaySections.Catalog` (`OptionsViewModel.cs:114`) on tip is: Combat · Healing ·
+**Kills & Drops** · Quests · **Gear & Loot** · Watch · Buffs · Progress · **Motes** · **World**.
+Four labels differ. The picture is of the pre-fold app.
+
+The prose has drifted with it, and the two pages carrying the false statements are the two pages
+that have no illustration and no shot:
+
+| Tour page | What it says on tip | What is true on tip |
+|---|---|---|
+| 3 — "Cards that open windows" | *"**Three** cards are doors."* | **Five.** `ProgressSurface`, `QuestSurface`, `LootSurface`, `CreatureSurface`, `WorldSurface` all have an `OpenWindow` host (`MainWindow.xaml.cs:2054, 2161, 2254, 2963, 4558`). |
+| 3 — same page | *"if you are looking for one that used to be on the widget — Money, **Motes**, Faction, Raids, Sky Quest, Epics, Gear — it is a tab inside one of these now"* | Motes has been **its own card again since 2026-08-21**. |
+| 6 — "Spawn timers" | *"right-click → **Spawn timers…**"* | That menu entry is gone. `MainWindow.xaml`'s context menu is Options… · EQBuddy Mobile (Beta)… · **World…** · Session history… |
+
+**The Motes line is the one that stings**, because the codebase already wrote the rule down and
+the tour is the copy that did not get it. `OverlaySections.AbsorbedTitles` deliberately dropped
+Motes from the Progress note, with a comment saying why in as many words:
+
+> *"naming a card that is two rows above it in the same list is worse than saying nothing — it
+> sends someone looking in the window for a card that is right there."*
+
+The tour does precisely that, to every new player, on page 3.
+
+**Why nothing caught it, and why that is the transferable part.** `TutorialWindow`'s own doc
+comment (`:116`) says: *"every one of those illustrations went stale for a month without anyone
+noticing — because the only way to see page 4 was to install the app, launch it, and click Next
+three times. A surface nobody can capture reads as reviewed (trap 22)."* The `EQBUDDY_TOUR` hook
+and five `tour-*` shots were built to fix exactly this — and they cover pages **2, 4, 5, 7, 8**.
+Pages **1, 3 and 6** have no shot. **The three unreviewable pages are the three with problems**,
+and page 1 is the destructive-consent page. Trap 22 landing on the same surface that was
+instrumented against it, six days later.
+
+**What I am asking for, and what I am not.** I am **not** asking to reopen the final v1 bag — the
+scope lock is Helm's and this is not in it. I am filing two things:
+
+- **For Evolved:** these assets and this text are what Phase 2 inherits. Do not port them. §7 has
+  the rule I want instead.
+- **A fact for Helm to weigh, not an ask from me:** `LEGACY-004` retains the final v1 artifacts
+  **permanently**, and Linux/macOS players keep this exact build forever. So a wrong onboarding
+  tour is not a bug that ages out on those two platforms — it is the permanent first impression
+  of the preserved line. Whether that earns a `v1.99.19` is a scope call I do not own.
+
+---
+
+#### 2. The README's lead screenshots and prose sell windows that were deleted
+
+The README is the first artifact a skeptical consumer reads, and it is currently the strongest
+argument that EQBuddy is a lab demo. Four verified defects, all on tip:
+
+1. **A promise the app does not keep.** Line 100: *"the 1.98/1.99 organizing pass folded the old
+   Money, Faction, Raids and Motes cards into Progress, Loot and Gear into Gear & Loot, Kills and
+   Drops-by-Creature into Kills & Drops, and Sky Quest and Epics into Quests — **every one of them
+   can be switched back on individually in ⚙ Options → Cards & windows**."* Of the eight cards
+   named, **exactly one — Motes — is in `OverlaySections.Catalog`.** Money, Faction, Raids, Gear,
+   Sky Quest, Epics and Drops-by-Creature have no row and cannot be switched back on. This
+   directly contradicts the Helm-signed `#251` lock (*"No Faction card restore"*), and it is
+   `#219`'s defect — a player hunting a card in the one screen whose job is to list them — written
+   into the README as a feature.
+2. **Instructions to menu entries that do not exist.** Lines 352 and 402 still say *"right-click →
+   **Zone map…**"* and *"right-click → **Travel route…**"*. The World fold deleted both.
+3. **Stale card label in the lead caption.** Line 100 ends the card list *"…Motes and **Travels &
+   Deaths**"*; the card is titled **World**. `widget-cards.png`, the README's own first
+   screenshot, shows the same stale label.
+4. **Four pictures of three deleted windows.** Lines 115–117 embed `map-window.png`,
+   `travel-window.png`, `spawn-circles.png`, `zone-share.png`. **Credit where it is due:** two of
+   those rows carry an honest italic caveat — *"This capture predates the World fold: the map is
+   what you still get, its window chrome is not."* That is the right instinct and I would keep the
+   habit. The other two rows do not, and **none of the four can be refreshed**: they have no
+   `shoot.ps1` recipe.
+
+Also stale: `README.md:589` (a table row still reading "Travels & Deaths") and
+`docs/FeatureGuide.md:394` (*"Travels & Deaths is still a card."*).
+
+**The inventory behind that last point, stated carefully.** `docs/screenshots/` holds **111**
+committed captures. **85** were last committed before the World fold (`87e2a743`, 2026-08-26).
+**42 have no recipe in `shoot.ps1` at all** and therefore cannot be regenerated by anyone.
+*I am not claiming 85 pictures are wrong* — most depict surfaces the fold never touched, and I did
+not open them. The load-bearing number is **42**: that is how many of our published pictures are
+hand-taken artefacts with no path back to truth. `options-cards.png` **is** verified wrong (I read
+it: it lists "Travels & Deaths" and has no World row), and it *does* have a recipe — it simply has
+not been re-shot since 2026-08-21, across a fold that changed its contents. Trap 53 is the
+mechanism: the `shoot.ps1` batch was dark from 2026-08-27 to 2026-09-02 and every session that
+re-shot one image got a green `-Shot` and moved on.
+
+Charter §20 Definition of Done already asks for *"no stale screenshots describing retired UI"* and
+*"no documentation pointing to windows that no longer exist."* Both fail today, before Evolved has
+written a line.
+
+---
+
+#### 3. Door 2 of the signed critique is now a RECORD, not a door — LEGACY-002 copy has shipped
+
+`docs/BEVEL-v2-staging-critique.md` §6 door 2 says: *"One notice. Bevel writes the voice **once**.
+Scribe / Helm ship that copy with **LEGACY-002**."* LEGACY-002 shipped in `v1.99.18` (PR #282,
+Helm-signed ~1:15 PM CT) and the voice pass did not happen. The copy on tip is:
+
+> `EQBuddy v{version} is Windows-only. This {Linux|macOS} copy stays on v1 and keeps working -
+> click for the final v1 release page.`
+> `Release page opened - keep this copy, it will not be updated again.`
+
+**I am leaving that copy exactly as it is, and door 2 is closed with it.** Not because it is
+untouchable, but because it is *good* and because reopening it would be the worse move. It says
+the platform, the reassurance and the destination in one line; it survives the 320 px
+`SizeToContent` constraint trap 12 imposes; and `LegacyPlatformUpdatePolicy`'s own comment already
+reasons about the affordance the way I would have — *"whether the click means 'open the page', 'I
+have read this', or both is a wiring decision, not a redesign"*, and the deliberate refusal to
+point at `releases/latest` because *"a correct-looking notice that ends there is LEGACY-002
+arriving through the back door, and it would read as a working feature in every screenshot."*
+That is Bevel's own reasoning, arrived at without me. **A voice pass now would be a rewrite of
+shipped player-facing text for no player benefit, which is the `#228` class.**
+
+**What matters is the process fact, not the copy.** A door I signed reserved a step; the step was
+skipped; nobody noticed until a Bevel pass three hours later read the file. `CLAUDE.md`'s Helm
+section is explicit about what a stale line costs — *"a stale line here does not merely mislead —
+it suppresses"* — so I am retiring the door rather than letting it sit describing a state that has
+stopped being true. Addendum landed on the critique doc. **The lesson for the Evolved era is §7's
+first bullet: Bevel pre-design has to be a line in the PR, not a memory.**
+
+---
+
+#### 4. Options → Cards & windows is five jobs on one tab — this is the concrete thing Opus inherits
+
+The morning critique said *"Settings ≠ launcher"* and *"the cog became the index."* Here is the
+same claim with the receipt, read off the committed `options-cards.png` and confirmed against
+`OptionsViewModel`. One Options tab carries:
+
+| On the tab | Whose job it is in Evolved |
+|---|---|
+| **Overlay cards** — 10 rows, eye + reorder, with "…are tabs in here now" notes | Nothing. The cards are gone; the shell nav replaces them. |
+| **Gear checklist** — *Open EQ Legends Tools* / *Import gear list…* / *Clear* | **Gear.** An import workflow is a domain action, not a setting. |
+| **Mini dashboard** — 12 checkboxes picking which stats the mini pill shows | **HUD, on the HUD** (Edit HUD). Signed critique §3. |
+| **Breakout windows** — 8 checkboxes enabling floating windows, plus *"Double-click a mini pill chip to open/close its breakout"* | **Live** (the boards) and **HUD** (the chips). Breakouts do not survive. |
+| **Show target above the Loot card** / **Recent-rate window `15 min`** | Two genuine settings, stranded among four things that are not. |
+
+**The instruction that gives the whole game away** is printed on that tab today: *"Double-click a
+mini pill chip to open/close its breakout."* That is one sentence containing three pieces of our
+own architecture — mini pill, chip, breakout — teaching a player a gesture that exists only
+because the product has no shell. The signed terminology ban (§4) covers all three words.
+
+**For Opus:** the tab does not get "cleaned up". Four of its five blocks are deletions with a
+destination, and the fifth is what Settings actually is. The rows must be *routed*, not carried.
+
+---
+
+#### 5. The migration chain is Evolved's highest-risk presentation surface, and `#252` was its rehearsal
+
+`AppSettings.ApplyMigrations` runs **eleven** one-time steps on every launch. `#252` (TiconaX:
+*"The cards always reset to having 2 cards open even though I have hidden all of them. Gear & loot
+and + Motes."*) was two of those steps feeding each other across a restart — each idempotent
+alone, the pair not — and the symptom the player could see was *"my choice does not stick."*
+Trap 55 records it; `SectionFoldIdempotenceTests` now runs the whole chain twice.
+
+**Evolved is that same event at ten times the scale.** Charter DATA-001 through DATA-004 require
+migrating v1 state; the shell deletes the concepts half that state describes. `SectionOrder`,
+`HiddenSections`, `MiniStats`, `DisabledBreakouts`, `SectionMaxHeight` and the theme card keys all
+become settings about furniture that no longer exists — and trap 20's mirror (a value with a
+producer and no consumer) is exactly how `LastAchievementsImport` shipped documented as read by a
+surface that never read it.
+
+**Two Bevel positions on that migration, both presentation calls rather than architecture:**
+
+1. **A v1 player's hidden card must not become a hidden ROOM.** "I hid Combat" meant "keep this
+   off my always-on-top overlay while I play." It never meant "I do not want combat analysis."
+   Translating `HiddenSections` into shell navigation visibility would delete features from
+   people's products on upgrade — the `#219`/`#233` defect, industrialised. `HiddenSections`
+   translates to **HUD** content, and to nothing else. Charter DATA-002 already permits this:
+   *"Old settings that exist only because v1 had duplicate surfaces may be translated into
+   sensible v2 defaults instead of recreating the old surface."*
+2. **Starred stats (`MiniStats`) are the one v1 setting that IS a HUD statement**, and it is the
+   best evidence we will ever have about what each player watches while playing. It should seed
+   the Evolved HUD. Everything else about card order is furniture.
+
+**Hypothesis, not verified** — I did not open the mobile projection this pass: the phone's `⚙
+Screens` picker is a *second* per-device store of "which surfaces do I show", and if the shell's
+room list and the phone's picks are not built from one definition, trap 38's shape (a sticky
+payload whose memo records the wrong thing) has an obvious second home. Worth one grep before
+Phase 2 wires either.
+
+---
+
+#### 6. What Opus needs before cutting a large Evolved presentation PR
+
+Seven asks. The first is the one I most want.
+
+1. **An illustration of our own UI is a capture with a recipe, or it does not ship.** No
+   hand-taken picture of EQBuddy in `Assets/`, the README, or the docs. If a surface is worth
+   illustrating it is worth a `shoot.ps1` entry, and if it cannot be captured it cannot be
+   reviewed (trap 22). **§1 is what the absence of this rule costs**: a shipped onboarding asset
+   that nobody could regenerate went wrong twice, and the second time it was wrong on the page
+   that introduces the product. This is the rule I would most like signed as a lock.
+2. **Run the batch, not the shot.** A green `-Shot` proves one row (trap 53). A presentation PR's
+   evidence is the batch, or a named subset with the reason. And per trap 51, predict the picture
+   before you take it — a number you did not predict has not been reviewed.
+3. **Name the room, then the control.** Every presentation PR ask should open with which of the
+   seven rooms it lands in and which job it serves, before any layout. A PR that cannot name its
+   room is a PR that is inventing an eighth.
+4. **Bevel pre-design is a line in the PR body, not a memory** (see §3). `FABLE.md`'s item shape
+   already requires *"Bevel pre-design: yes / no, because…"*. I want the same line on the PR.
+   Where the answer is `no, because…`, that is fine and I will not ask for a pass — an
+   invisible parser fix does not need me. Where it is `yes`, the pass is a prerequisite, not a
+   parallel activity.
+5. **Column budgets and empty states arrive with the plan, not after the screenshot.** Standing
+   asks from earlier rounds; they hold. Every empty in the Evolved shell uses the inventory-dump
+   voice (signed critique §4): what is missing, the action, where, what happens next.
+6. **Terminology: the ban list in §4 of the signed critique is the acceptance criterion**, and
+   §1/§4 above prove it needs enforcement rather than goodwill — "card", "breakout", "mini pill"
+   and "chip" are all currently on screen in shipped copy. **Hypothesis worth one grep:** a
+   `BannedVocabularyTests` over player-facing string sources would catch the class mechanically,
+   the way `GameCommandsTests` does for commands. I have not checked whether the strings are
+   reachable from one place; if they are not, that is itself the finding.
+7. **Evolved's first run is a surface to be designed, not an artefact to be ported.** My
+   recommendation, and it is a recommendation rather than a lock because it needs a Fable plan:
+   **retire the 8-page tour.** Charter UX-011 already describes its replacement — contextual,
+   self-clearing readiness that *"never make[s] a permanent onboarding checklist another
+   navigation destination"* — and Home's Phase 2 contents (identity · readiness · recent session ·
+   deep links) are that surface. A tour is eight pages of things to remember before you have done
+   anything; readiness is one line at the moment it matters. **The tour going stale twice is not
+   an accident of maintenance — it is what a static narrative of a moving product does.**
+
+   **One carve-out, and it is a door I am naming rather than opening.** Tour page 1 is not a tour
+   page: it is consent to **empty the player's log files**, asked before they know what EQBuddy
+   is. Trap 47 is what happened when the two code paths behind that consent disagreed
+   (StrIIker-TV ticked the box and lost everything anyway — *"didn't take hold properly"*). Where
+   that consent lives in Evolved, and whether its default moves, touches a player's own files —
+   **consequence list item 8.** If a Phase 2 plan proposes changing the timing or the default,
+   that plan carries `needs-david:`. I am not asking now, and this is not one.
+
+---
+
+#### 7. What does NOT change
+
+The signed destination stands unamended except for door 2. Specifically still true: HUD is not a
+miniaturised widget and does not grow cards; five rooms plus Home and Settings; Search is the
+skip, not an eighth tab; Raids on Live and Progress as personal progression only; Home
+recommendations wait Phase 5; the §7 refuse list, including **do not drag `#250` / the 320-cap /
+`#208` into Phase 2 shell scope**, and **no Linux/macOS parity as a Phase 2 gate**. Nothing in
+this pass is a hold, and nothing here restrains a v1 fix or a Fable plan.
+
+---
+
+- **Already shipped (checked on tip):** `v1.99.18` LIVE; Phase 0 `#279`/`#282`/`#284` on main;
+  `LegacyPlatformUpdatePolicy` + `LegacyFinalNoticeAcknowledged` wired on both lanes;
+  `AltTabPolicy` (the tick-box now drops the taskbar button, and `TaskbarWarning` says so —
+  behaviour and warning agree, which is the right resolution); `MobileAlertSounds` opt-in Off;
+  `SectionFoldIdempotenceTests` running the whole chain twice.
+- **Checked:** tip `c877d61d`; `docs/BEVEL-v2-staging-critique.md`; `HELM.md` (all Evolved
+  entries; Live Holds empty); `PRODUCT.md`; `EQBuddy-Evolved.md`; `LEGACY-V1.md` header;
+  `ROADMAP.md` Evolved block; `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` in full;
+  `WhatsNew.json` 1.99.16–1.99.18; `OptionsViewModel.cs`; `AppSettings.ApplyMigrations`;
+  `LegacyPlatformUpdatePolicy.cs`; `AltTabPolicy.cs`; `TutorialWindow.xaml.cs`;
+  `MainWindow.xaml` context menu; `scripts/shoot.ps1` shot table; `README.md`;
+  `docs/FeatureGuide.md:393-394`; the images `t-widget.png`, `t-mini.png`, `options-cards.png`,
+  `widget-cards.png`, `tour-widget.png`; git dates for all 111 committed screenshots.
+- **Not checked this run:** the mobile projection and `⚙ Screens` (§5's hypothesis is unverified);
+  `t-combat` / `t-watch` / `t-history` pixels — **same 2026-08-20 vintage as `t-widget`, so treat
+  them as suspect until re-shot, but I am claiming nothing about them**; the running app (I did
+  not run `shoot.ps1` — it stands David's real EQBuddy down); `#261` / `#262` (out of bag, not
+  opened); Avalonia's tutorial lane.
+
+— Bevel (Grok)
+
 ### EQBuddy v2 UX destination (Helm-signed 2026-09-04 11:55 AM)
 
 **Destination:** small live HUD + one Windows shell (Home / Live / Progress / Gear / Quests / World / Settings) + Search affordance + optional mobile second screen. Glance → expand live → full app for analysis.
