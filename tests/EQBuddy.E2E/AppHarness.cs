@@ -176,26 +176,48 @@ internal sealed class AppHarness : IDisposable
     /// enough that it costs the suite seconds rather than minutes.</summary>
     private static readonly TimeSpan ReplaySettle = TimeSpan.FromSeconds(2.2);
 
-    /// <summary>Waits until the two totals every ingest moves — kills and loot — stop
-    /// changing. Both, not one: the fixture's last lines could be loot after the final
-    /// kill, and a settle that watched only kills would call the replay done with rows
-    /// still arriving on the other surface.</summary>
+    /// <summary>Ticking keys — the two the app increments on a clock rather than on an
+    /// event. Everything else in the dump is a count, a flag or a measurement, so it holds
+    /// still the moment the ingest does.</summary>
+    private static readonly string[] TickingKeys = ["companionPumpTicks", "companionPushes"];
+
+    /// <summary>Waits until the WHOLE dump stops changing, ticking keys aside.
+    ///
+    /// **Watching two totals was not enough, and the way it failed is the argument for
+    /// watching all of them.** The first version waited on `killsTotal` and `lootTotal`;
+    /// `TheWealthTabDrawsBothCardsItAbsorbed` then failed on a hosted runner waiting for
+    /// `progressMoneySold` to reach 24 with 10 seen — the fixture's trailing sale lines
+    /// were still arriving after the last kill and the last loot. Any per-surface list
+    /// picked here would have the same hole for whichever surface is not on it, so the
+    /// list to check is "everything the app is reporting".</summary>
     private void WaitForReplayToSettle()
     {
-        var last = (Kills: -1, Loot: -1);
+        var last = "";
         var stableSince = DateTime.UtcNow;
         Wait.Until(() =>
         {
-            var now = (Kills: DumpValue("killsTotal"), Loot: DumpValue("lootTotal"));
-            if (now != last)
+            var now = SteadyDump();
+            if (now.Length == 0 || now != last)
             {
                 (last, stableSince) = (now, DateTime.UtcNow);
                 return false;
             }
             return DateTime.UtcNow - stableSince >= ReplaySettle;
-        }, LaunchTimeout, "the fixture replay to stop moving (killsTotal and lootTotal " +
-            $"unchanged for {ReplaySettle.TotalSeconds:0.#}s) before any test samples a baseline",
-            Artifacts);
+        }, LaunchTimeout, "the fixture replay to stop moving (every dump value except " +
+            $"{string.Join(" and ", TickingKeys)} unchanged for {ReplaySettle.TotalSeconds:0.#}s) " +
+            "before any test samples a baseline", Artifacts);
+    }
+
+    /// <summary>The dump with the ticking keys dropped, or "" while it is missing or
+    /// mid-write — which is never "settled", so the caller keeps waiting.</summary>
+    private string SteadyDump()
+    {
+        try
+        {
+            return string.Join(' ', File.ReadAllText(DebugDumpPath).Split(' ')
+                .Where(pair => !TickingKeys.Any(k => pair.StartsWith(k + "=", StringComparison.Ordinal))));
+        }
+        catch (IOException) { return ""; }
     }
 
     /// <summary>
