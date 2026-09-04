@@ -40,6 +40,36 @@ public static class CompanionPairingText
         "address bar, and remembers the pairing code. The fullscreen button at the top of " +
         "the page does the same for one visit.";
 
+    /// <summary>The address picker's heading. It only appears when this PC actually has
+    /// more than one address to offer — a picker with one row is furniture that implies
+    /// a choice the player does not have.</summary>
+    public const string AddressLabel = "Address the code points at";
+
+    /// <summary>#264, brhanson2-cyber: "the link it gives me is the ip address of my
+    /// ethernet, not my wifi... How do I force it to give me a link using the wifi ip".
+    /// The ranking now prefers Wi-Fi, and this is the part a ranking cannot do — say what
+    /// the choice means and hand it over.</summary>
+    public const string AddressHint =
+        "This PC is on more than one network. EQBuddy picks the Wi-Fi one, because that is " +
+        "the network your phone is on — pick a different one here if the page won't load.";
+
+    /// <summary>The "let EQBuddy decide" row, which is where a fresh profile starts and
+    /// the way back from a pin that turned out to be wrong.</summary>
+    public const string AddressAuto = "Choose automatically";
+
+    /// <summary>One row of the picker. Wireless is NAMED because it is the whole question
+    /// being asked; nothing is called "wired", because the list also holds VPN and virtual
+    /// adapters and calling one of those ethernet would be a guess presented as a
+    /// fact.</summary>
+    public static string AddressChoice(string address, string adapterDescription, bool wireless)
+    {
+        var desc = (adapterDescription ?? "").Trim();
+        var suffix = wireless
+            ? desc.Length == 0 ? "Wi-Fi" : $"Wi-Fi · {desc}"
+            : desc;
+        return suffix.Length == 0 ? address : $"{address} — {suffix}";
+    }
+
     public const string RegenerateLabel = "New code (disconnects every paired device)";
 
     public const string RegenerateTip =

@@ -34,6 +34,23 @@ history of the call stays readable. If vetoes become common, the consequence lis
   `MigrateMotesCard` already records for the #228 restore. Re-hiding on a guess would take a
   card away from someone who wants it, invisibly; the What's-new says plainly to hide them
   once more and that it will stick. Nothing is forced visible either.
+
+- **Wi-Fi beats ethernet in the pairing-QR ranking, by default, with no prompt** (#264,
+  src/EQBuddy.Core/LanAddressRank.cs). · The other way: leave the ranking alone and ship
+  only the picker, so nothing about anyone's current QR changes. · The device scanning the
+  code is on Wi-Fi by definition, so of two otherwise-equal networks that is the one it
+  certainly shares; the wired one is only reachable if the two happen to be the same
+  network. A default that is right for most people and overridable by everyone beats a
+  default that is arbitrary (it was Windows' enumeration order) and overridable by everyone.
+  The preference is 5 against penalties of 10/25/50/100, so no existing demotion moves.
+
+- **The override is a picker in the pairing window, not a knob in Options and not a
+  settings.json edit** (#264, CompanionPairingText.AddressLabel, both CompanionWindows).
+  · The other way: CompanionPairingAddress as a power-user JSON knob, the way
+  CursorRingSize is. · The reporter's literal sentence was "How do I force it", asked by
+  someone already looking at the pairing window — a knob he would have had to be told about
+  is the same defect as naming an in-game command and shipping no ⧉ button. It is hidden
+  when the PC has one address, because a choice of one is not a choice.
 - **The legacy download links in `LEGACY-V1.md` and the README pin `v1.99.17`, the current
   1.x release, rather than waiting for the bridge tag** (P0-3). · The other way: leave the
   asset links out until the bridge release exists, or point them at `releases/latest`. · A

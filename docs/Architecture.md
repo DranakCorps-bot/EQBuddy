@@ -37,7 +37,7 @@ nobody re-measures rots without anyone touching it.
 |---|---:|---:|---|
 | `EQBuddy.Core` | 95 | 21,223 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
 | `EQBuddy.UI.Shared` | 87 | 9,014 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
-| `EQBuddy.Companion` | 16 | 3,726 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
+| `EQBuddy.Companion` | 16 | 4,171 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
 | `EQBuddy` | 69 | 21,746 | The WPF widget and its windows. |
 | `EQBuddy.Avalonia` | 68 | 23,201 | Cross-platform build, trails by a few releases. Now the largest project in the repo — see the ratchet note on `MainWindow.cs`. |
 

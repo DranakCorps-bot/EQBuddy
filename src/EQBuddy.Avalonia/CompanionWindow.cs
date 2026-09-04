@@ -51,6 +51,17 @@ public sealed class CompanionWindow : Window
         Margin = new Thickness(0, 4, 0, 0), Foreground = AppTheme.BadBrush,
     };
     private readonly StackPanel _pairPanel = new();
+    /// <summary>The address picker and its two lines of copy, together — absent on a PC
+    /// with one address, because a choice of one is not a choice (#264).</summary>
+    private readonly StackPanel _addressPanel = new() { Margin = new Thickness(0, 6, 0, 0) };
+    private readonly ComboBox _addressBox = new()
+    {
+        FontSize = 12, Margin = new Thickness(0, 2, 0, 0),
+        HorizontalAlignment = HorizontalAlignment.Stretch,
+    };
+    /// <summary>Refresh() writes the selection itself; without this the write is
+    /// indistinguishable from a click and would re-enter through SelectionChanged.</summary>
+    private bool _syncingAddress;
 
     public CompanionWindow(CompanionHost host)
     {
@@ -88,6 +99,25 @@ public sealed class CompanionWindow : Window
         urlHint.Margin = new Thickness(0, 4, 0, 0);
         _pairPanel.Children.Add(urlHint);
         _pairPanel.Children.Add(_urlBox);
+
+        // ---- which of this PC's addresses the code points at (#264) ----
+        _addressPanel.Children.Add(new TextBlock
+        {
+            Text = EQBuddy.UI.Shared.CompanionPairingText.AddressLabel, FontSize = 12,
+            FontWeight = FontWeight.SemiBold, Foreground = AppTheme.AccentBrush,
+        });
+        _addressPanel.Children.Add(Dim(EQBuddy.UI.Shared.CompanionPairingText.AddressHint));
+        _addressBox.SelectionChanged += (_, _) =>
+        {
+            if (_syncingAddress) return;
+            _host.SetPairingAddress(_addressBox.SelectedIndex <= 0
+                ? null
+                : _host.PairingAddresses[_addressBox.SelectedIndex - 1].Address);
+            Refresh();
+        };
+        _addressPanel.Children.Add(_addressBox);
+        _pairPanel.Children.Add(_addressPanel);
+
         _pairPanel.Children.Add(_statusLine);
 
         var chrome = Dim(EQBuddy.UI.Shared.CompanionPairingText.HomeScreenHint);
@@ -170,12 +200,46 @@ public sealed class CompanionWindow : Window
         _errorLine.Foreground = _host.LastError is null ? AppTheme.DimBrush : AppTheme.BadBrush;
         _enable.IsChecked = _host.Running;
 
+        RefreshAddresses();
         if (_host.PairingUrl is { } url)
         {
             _urlBox.Text = url;
             _qrImage.Source = QrBitmap.Render(QrEncoder.Encode(url));
         }
         UpdateStatus();
+    }
+
+    /// <summary>Rebuild the address picker from what is actually BOUND — the WPF twin's
+    /// RefreshAddresses, same order and same words (they come from UI.Shared).</summary>
+    private void RefreshAddresses()
+    {
+        var choices = _host.PairingAddresses;
+        _addressPanel.IsVisible = choices.Count > 1;
+        if (choices.Count <= 1) return;
+
+        _syncingAddress = true;
+        try
+        {
+            var items = new List<string> { EQBuddy.UI.Shared.CompanionPairingText.AddressAuto };
+            foreach (var choice in choices)
+                items.Add(EQBuddy.UI.Shared.CompanionPairingText.AddressChoice(
+                    choice.Address, choice.AdapterDescription, choice.Wireless));
+            _addressBox.ItemsSource = items;
+            // The PIN, not the effective address: a pin naming an adapter this machine no
+            // longer has must read as Automatic rather than as a row the player chose.
+            var pinned = _host.PinnedPairingAddress;
+            var index = pinned is null ? -1 : IndexOf(choices, pinned);
+            _addressBox.SelectedIndex = index < 0 ? 0 : index + 1;
+            ToolTip.SetTip(_addressBox, items[_addressBox.SelectedIndex]);
+        }
+        finally { _syncingAddress = false; }
+    }
+
+    private static int IndexOf(IReadOnlyList<EQBuddy.Core.LanAddressCandidate> choices, string address)
+    {
+        for (var i = 0; i < choices.Count; i++)
+            if (string.Equals(choices[i].Address, address, StringComparison.OrdinalIgnoreCase)) return i;
+        return -1;
     }
 
     private void UpdateStatus() =>
