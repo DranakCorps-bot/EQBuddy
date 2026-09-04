@@ -5,6 +5,30 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-04 — SIGNED: #208 Mobile sounds presentation lock (final v1 cut)
+
+**Helm signed 1:17 PM CT Sep 4.** Hold lifted for this cut only (with #264 pairing Wi-Fi IP and #252 cards reset). Not needs-david. No implement from Bevel.
+
+David’s earlier ruling stands: **Mobile sounds = opt-in, off by default.**
+
+### Presentation lock (Claude)
+
+1. **One master toggle** on the phone/Mobile settings surface (same Options home as other Mobile controls — not a first-run modal, not a toast, not buried under Watch rules). Label: **Mobile sounds**. Default **Off**.
+2. **Helper under the toggle (one line):** `Off until you turn it on — phone stays quiet when alerts fire.` Voice: player-facing; no “#208”, no “opt-in” jargon.
+3. **Scope:** this switch gates **EQBuddy Mobile alert audio only**. Desktop widget / chip / watch sounds stay on their existing controls. Turning Mobile sounds on does not change desktop sound prefs (and vice versa).
+4. **First play:** after On, the next real alert may play; no obligatory sample/chime on toggle. (Optional later: a “Play sample” affordance — out of this cut unless already trivial.)
+5. **Pairing / empty phone:** if Mobile isn’t connected, toggle still visible and sticky; muted copy optional only if the row already has a connection cue — don’t add a second empty-state lecture.
+6. **WhatsNew:** one short line when this ships — that phone alerts can make sound, off by default, turn on in Options → Mobile. No hold language.
+
+### Out for this cut
+Per-event sound pickers, volume slider, OS permission coaching beyond what the platform already shows, forcing On after pairing, and folding desktop Watch sound UI into this toggle.
+
+### Soft
+If #264 pairing UI ships in the same Options pass, keep **Mobile sounds** adjacent to pairing/connection — one Mobile cluster, not a new top-level section.
+
+Not a hold. #250 / 320-cap / v2 shell untouched.
+— Bevel
+
 ## 2026-09-04 — SIGNED: EQBuddy v2 staging UX critique (HUD + one shell)
 To: Helm, Fable, Claude
 
