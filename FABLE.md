@@ -95,6 +95,600 @@ next loop, not a reopening of the plan.
 
 ---
 
+## EQBuddy v2 Phase 0–2 — technical decomposition (charter §25 item 6, issue #275)
+
+- **Priority:** `ready` — **for Phase 0 only.** Phase 1 is written here in full and is
+  **BLOCKED**: Helm's 2026-09-04 11:50 AM CT ruling says Avalonia removal waits on the
+  Phase 0 gate, and charter LEGACY-005 says the legacy tag and branch exist *before*
+  Avalonia leaves the mainline. Phase 2 is an **architecture sketch for Bevel's parallel
+  staging**, not buildable work — its first PR waits on Bevel's IA.
+  **Not `needs-david`.** Every call below is inside the owner-approved charter; the two
+  places a line could have been drawn differently are marked **→ Helm** and named, not
+  guessed. Nothing here touches the values line, the release go, public posture, money,
+  roadmap direction, eqlwiki policy, third-party policy or player privacy.
+- **Class:** `V3` — a platform line is being cut under live users, the update channel is
+  the mechanism, and the mechanism is a one-way door: once a `v2.x` release is `latest`,
+  every un-bridged Linux and macOS install is already being offered a Windows installer
+  and nothing we ship afterwards can reach it. Not V0–V1 because no single answer finishes
+  it and the obvious version ("stop building the tarball") is wrong for a reason only
+  visible with the whole system in view — see P0-2 rule 4.
+- **Source:** `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` rev 1.1 (owner-approved
+  2026-09-04) §§3 / LEGACY-001…007 / 16.2–16.6 / 19 / 25 item 6; `HELM.md` §"EQBuddy v2
+  Phase 0 / #275 — Windows-only posture", signed Helm 2026-09-04 11:50 AM CT;
+  `HELM-FEEDBACK.md` same stamp; issue #275.
+- **Bevel pre-design: Phase 0 YES but small; Phase 2 YES and it gates everything.**
+  Phase 0's only player-facing surface is the LEGACY-002 notice — its wording, and the one
+  question below about what "acknowledged" means. That is a real design ask and it is the
+  last thing Linux and macOS players will ever be shown by EQBuddy, so it is worth Bevel's
+  pass even though it is three sentences. Phase 2's IA is Bevel's own parallel track
+  (Helm, 11:50 AM CT); the sketch below is seams, not screens, and does not pre-empt it.
+- **Shot offline: N/A for Phase 0.** The notice appears only when the live feed reports a
+  major-2 release, which `shoot.ps1` has no way to stage — the fixture profile has no
+  update state and `UpdateChecker` reaches a hardcoded URL (see P0-2 verification). Do not
+  add a shot that pretends to cover it; the honest coverage is the unit policy plus one
+  real prerelease. Phase 2 shots are Bevel's to specify.
+- **Column budgets: 320 px, wrapping — so the budget is HEIGHT, not width.**
+  `MainWindow.xaml:87` `NormalRoot Width="320"` and `MainWindow.cs:115`
+  `_normalRoot = new() { Width = 320 }` — both lanes. Both banners already wrap
+  (`MainWindow.xaml:191` `TextWrapping="Wrap"`; `MainWindow.cs:121`
+  `TextWrapping = TextWrapping.Wrap`), so a long string grows the widget **downwards**.
+  **Trap 12 is live here:** both widgets are `SizeToContent`, so a string that fails to
+  wrap is a geometry change on a transparent always-on-top window over a fullscreen game —
+  which is #173. Keep the notice to two or three short sentences and never let it produce
+  a single unbreakable token (a bare URL is exactly that; put the link behind the click).
+- **Guards run eight times.** The new policy tests are pure functions with no clock, no
+  network and no file, so flake is unlikely — but `LegacyPlatformUpdatePolicyTests` and the
+  source scanner both run eight consecutive times before the PR is called green, same as
+  every other guard here.
+- **What clamps it:** `AppSettings.LegacyFinalNoticeAcknowledged` is a **new** setting with
+  exactly one reader (the policy) and one writer (the policy's application in both lanes);
+  nothing else clamps it. The values it competes with are `UpdateFolder` (read by
+  `UpdateChecker.FindUpdateFolder`, Windows-only channel, unaffected) and the in-memory
+  `_lastUpdateCheck`, which is **not** persisted — see the epoch note in P0-2.
+- **Must-list rows on these surfaces:** none on the update banner today —
+  `GameCommandsTests.SurfacesNeedingACommand` and
+  `ImportReportReachesASurfaceTests` carry no row for it, because it names no in-game
+  command and reports no import. **P1-5 is where those two lists matter**, and they matter
+  a great deal: a feature-disposition pass is a fold of the whole product, and traps 20,
+  26 and 43 are all the same event happening during a fold.
+- **Already shipped — what this must not fight:**
+  - `UpdateChecker` (Core) already merges two channels and refuses to stage an installer
+    with no published SHA-256. Do not touch the staging path; LEGACY-003 is satisfied by
+    construction on the non-Windows lanes because `UpdateOffer.CanAutoInstall` requires
+    `IsWindows`.
+  - `UpdateOffer` (Avalonia) already models **four** platforms as an enum rather than a
+    bool, precisely because a bool made every Mac user a Linux user (#93). Extend that
+    enum's home; do not re-introduce a bool.
+  - `release-assets.yml` already builds and attaches all three non-Windows artifacts on
+    every published release. The bridge needs no new packaging.
+  - `SingleInstance.cs` means one process per profile, so the new setting has no second
+    writer and trap 13's clobber does not apply.
+  - `docs/Themes.md` already contains four BUILT themes. Phase 2 is not a new construction
+    (see the sketch).
+
+---
+
+### PHASE 0 — protect v1 users before cutting platforms (`ready`)
+
+Charter §19 Phase 0. Four PRs, in this order. **P0-4 is last and it is irreversible in the
+useful direction: once `legacy-v1` exists at the bridge commit, Phase 1 is unblocked.**
+
+#### P0-1 — Bridge release mechanics (LEGACY-001, LEGACY-004)
+
+**Finding: the bridge needs almost no new mechanics.** `scripts/release.ps1 -Tag v1.99.N`
+already publishes, signs, installs and tags; `release-assets.yml` fires on
+`release: published`, checks out `github.event.release.tag_name`, and publishes
+`EQBuddy-linux-x64.tar.gz`, `EQBuddy-osx-arm64.zip` and `EQBuddy-osx-x64.zip` from
+`src/EQBuddy.Avalonia`. The bridge is an ordinary release whose *contents* are special.
+
+What actually has to change or be proved:
+
+1. **`release.ps1` gains `-Prerelease`** (passes `--prerelease` to `gh release create`).
+   Today the script always publishes a `latest` release. This is the cheapest and largest
+   half of LEGACY-002, and it is the **only** protection that reaches the un-bridged
+   population: `UpdateChecker.CheckGitHubAsync` reads
+   `https://api.github.com/repos/DranakCorps-bot/EQBuddy/releases/latest`, and GitHub's
+   `releases/latest` excludes prereleases and drafts — so a v2 milestone published as a
+   prerelease is invisible to **every** v1 client, bridged or not. That is also exactly
+   what charter RELEASE-002 asks for during v2 construction.
+   → **Second belt, free:** `ParseRelease` does `Version.TryParse(tag.TrimStart('v','V'))`
+   and returns `null` when it fails, so a tag shaped `v2.0.0-beta1` offers nothing even if
+   it *were* marked latest.
+   → **Hypothesis, not fact:** I read GitHub's documented behaviour for `releases/latest`,
+   not an observed response from this repo. Verify with one real prerelease before relying
+   on it (P0 gate proof 4).
+2. **LEGACY-001 is done when the assets are ON the release, not when CI is green.**
+   `gh release view <bridge-tag> --json assets --jq '.assets[].name'` must list all five:
+   `EQBuddySetup.exe`, `EQBuddy-portable.zip`, and the three non-Windows artifacts. The
+   matrix is `fail-fast: false`, so two of three can fail and the run still looks partly
+   fine; and the non-Windows assets land minutes *after* the release exists, which
+   `UpdateOffer.AssetUrl`'s doc comment already calls out as a real null window.
+3. **LEGACY-004 is a policy, not a commit.** Nothing in the tree can stop a future
+   `gh release delete`. Record it in `LEGACY-V1.md` (P0-3) and back it with a GitHub **tag
+   protection rule** on the bridge tag plus branch protection on `legacy-v1` (P0-4). A
+   platform rule outlives the memory of why it exists.
+4. **Version number:** the charter refuses to hard-code one and so does this plan. Current
+   `Directory.Build.props` is `1.99.18`. The bridge is whatever `1.99.N` carries P0-2 and
+   P0-3, with its own `WhatsNew.json` entry — and that entry is the **only** in-app
+   announcement Linux and macOS users will ever get about the transition, so it is
+   player-facing text worth writing carefully and crediting the platform contributors
+   (Don Thompson, quasarj) by name.
+
+#### P0-2 — LEGACY-002: stop non-Windows v1 chasing v2
+
+**Ground truth, read not assumed:**
+
+- Three call sites per lane decide the same question. WPF: `MainWindow.xaml.cs:2607` (the
+  one-second tick, `> TimeSpan.FromHours(6)`), `:3863` `OnCheckUpdates` (Help menu),
+  `:3869` `CheckForUpdates(bool manual)`. Avalonia: `MainWindow.cs:2036` (tick), `:1470`
+  (menu), `:4904` (body).
+- `_lastUpdateCheck = DateTime.MinValue` on both lanes (`MainWindow.xaml.cs:45`,
+  `MainWindow.cs:251`). **Trap 47's epoch:** the "every 6 h" branch is true on the first
+  one-second tick, so "at startup" and "every 6 h" are one path firing immediately. Benign
+  today — it is a network read, not a destructive sweep — but it means there is **no
+  separate startup path to fix**, and it is the reason the notice must be idempotent
+  rather than "shown once at launch".
+- The platform decision already exists as a pure function: `UpdateOffer.Current()` →
+  `Desktop { Windows, Linux, MacArm64, MacX64 }` (`src/EQBuddy.Avalonia/UpdateOffer.cs`),
+  `internal` to the Avalonia project.
+
+**Design — one policy, in `UI.Shared`, both lanes call it.**
+
+`src/EQBuddy.UI.Shared/LegacyPlatformUpdatePolicy.cs`, framework-free, tested from
+`tests/EQBuddy.Tests` — which the `build-avalonia-linux` CI job also runs, so the
+non-Windows behaviour is asserted **on a non-Windows machine** while that job still exists.
+Move `Desktop` and `Current()` into `UI.Shared` beside it so one enum serves both lanes;
+`UpdateOffer` keeps its artifact/wording functions and consults the new enum.
+
+This is trap 47's shape exactly — *never let two code paths decide one destructive
+question* — with "destructive" replaced by "may we tell this player to install something
+that cannot run on their machine". `UI.Shared/LogJanitorPolicy` is the worked example to
+copy, including its source scanner.
+
+Inputs: `UpdateInfo`, `Desktop`, `bool manual`, `bool acknowledged`.
+Output: a small **record**, not a bool — a bool is what produced #93.
+`(bool ShowUpdateOffer, bool ShowFinalLegacyNotice, bool RecordAcknowledgement, string? BrowserTarget)`.
+
+Rules:
+
+1. **Windows → unchanged, in every case.** The policy returns "behave as today" and the
+   Windows diff is a call site, not a behaviour change. Keep it that way: a Phase 0 PR that
+   alters the Windows update banner has widened its own blast radius for nothing.
+2. **Non-Windows and `info.Latest.Major >= 2`** → never `ShowUpdateOffer`.
+   - automatic path (`manual: false`): show the notice **iff** `!acknowledged`, and
+     `RecordAcknowledgement`. After that, nothing.
+   - manual path (`manual: true`): **always answer.** A player who opens Help → Check for
+     updates and gets silence has hit a silent no-op, which this repo treats as broken.
+     Show the same notice; do not re-arm the automatic nag.
+3. **Non-Windows and `Latest.Major < 2`** → today's behaviour, byte for byte. A later
+   `1.99.N+1` legacy patch must still be offerable, and `legacy-v1` existing does not mean
+   it will never be touched.
+4. **The browser target under rule 2 is the FINAL LEGACY RELEASE, never `latest`.**
+   This is the single highest-risk detail in Phase 0. `UpdateOffer.BrowserTarget` currently
+   falls back to `UpdateChecker.GitHubLatestPage` —
+   `https://github.com/.../releases/latest` — which is *the v2 release page* the moment v2
+   ships, whose most prominent asset is `EQBuddySetup.exe`. A correct-looking notice that
+   ends on that page is LEGACY-002 point 3 arriving through the back door, and it would
+   read as a working feature in every screenshot. Add
+   `UpdateChecker.GitHubLegacyReleasePage`, pinned to the bridge tag, and assert the
+   negative: `DoesNotContain("releases/latest", target)` for every non-Windows × major-2
+   case. **Every equality assertion deserves one negative** (trap 39).
+5. **LEGACY-003 needs no code and one test.** `CanAutoInstall` already requires
+   `IsWindows(platform)`; add the explicit negative so a future edit cannot quietly remove
+   the guarantee that nothing off Windows is ever staged, run or overwritten.
+
+**Setting:** `AppSettings.LegacyFinalNoticeAcknowledged` (`bool`, default `false`). One
+reader, one writer per lane. `DeadSettingTests` is satisfied by construction and needs no
+`Known` row — check that it stays that way rather than assuming it.
+
+**Affordance — the one thing for Bevel.** The Avalonia banner is a single clickable
+`Border` (`_updateBanner`, `PointerPressed → OnUpdateBannerClick`); the WPF one is
+`UpdateBanner` with `MouseLeftButtonDown`. So there is exactly one gesture available and it
+currently means "do the update". The question: **does clicking the notice mean "open the
+legacy release page", "I have read this", or both?** Recommendation — both, because a
+notice that needs two gestures on a 320 px widget will grow a control the widget has no
+room for. Bevel rules; the policy already returns `RecordAcknowledgement` separately from
+`BrowserTarget`, so either answer is a wiring change and not a redesign.
+
+**Guards:**
+
+- `LegacyPlatformUpdatePolicyTests` (in `EQBuddy.Tests`) — the full matrix: 4 platforms ×
+  {1.99.x, 2.0.0} × {manual, automatic} × {acknowledged, not}, plus the two negatives
+  (no `releases/latest` in any legacy target; no auto-install off Windows).
+- A **source scanner** in `LogJanitorPolicyTests`' shape, asserting that all six call sites
+  route through the policy, so a seventh cannot drift. Name the participants in the test
+  names — *tick / menu / policy*, not `manual` vs `not` (trap 49: a two-actor model is how
+  thirteen green tests agreed with a bug).
+- `UpdateOfferTests` (Avalonia) keeps its existing rows; add the major-2 cases there too
+  while the lane exists, because that is the lane the code actually runs on.
+
+#### P0-3 — Support matrix and transition docs (LEGACY-006, LEGACY-007)
+
+- **New `LEGACY-V1.md` at the repo root** — charter §24 names this file. Contents: the
+  LEGACY-006 table verbatim; the final legacy tag; direct links to all three non-Windows
+  assets; what continues to work and what stops; the macOS quarantine instruction that
+  today lives only in `README.md`; and the LEGACY-005 invitation to fork or continue
+  independently, worded as an invitation and **not** as a commitment by David to maintain
+  anything.
+- **`README.md`** — lines 37–38 currently describe a cross-platform build that "tracks
+  closely", maintained by Don Thompson and quasarj. That claim stops being true at the
+  bridge. Replace it with the support matrix and a visible **Legacy Linux/macOS** section.
+  → **Lines 620–628 are the CREDITS block. Credit stays; status changes.** Someone editing
+  status out of a file will find contributor names in the same neighbourhood and the
+  charter says nothing about removing them, because removing them was never on the table.
+  Say it in the PR description so it cannot be done by momentum.
+  → `README.md:556–583` describes building and releasing the Avalonia lane; that is
+  developer documentation and it becomes `legacy-v1` documentation.
+- **`docs/FeatureGuide.md` §"Updates" (line 657)** describes the update flow to players and
+  needs the legacy paragraph. This file ships **inside the Linux tarball and the macOS
+  bundle** (`release-assets.yml` copies it into both), so it is the one document a legacy
+  user has on disk. That makes it the highest-value edit in this PR, and it is easy to miss.
+- **`docs/TestPlan.md`** — new rows for the LEGACY-002 behaviours, marked Auto where the
+  policy tests reach them and **Manual where they do not** (the wire fetch does not).
+  `DocumentationTests` will check the paths; the numbers in `DocumentationSizeTests` are
+  untouched by Phase 0 and will move in Phase 1.
+- **LEGACY-007 is a v2-release-time obligation, not a Phase 0 edit.** It lands as a
+  checklist row on #275 and a line in `LEGACY-V1.md`.
+  → **Optional, cheap, and offered rather than assumed (→ Helm):** a sibling of
+  `whatsnew-guard.ps1` that refuses a `v2.*` tag whose release notes carry no "Legacy
+  Linux/macOS" section. Same shape as the guard that already exists for exactly this class
+  of promise. If Helm would rather not add a release-time gate, the checklist row stands
+  alone and the plan is unaffected.
+  → **If it is written, mind trap 54.** `whatsnew-guard.ps1`'s first run reported 111 of 129
+  entries as edited because PowerShell decoded git's stdout with `[Console]::OutputEncoding`.
+  Any new guard that reads `git show`/`gh api` output wraps the call in
+  `[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)` — and per the tooling note,
+  Windows PowerShell 5.1 defeats even that, so a red first run is a host difference until
+  `git diff` says otherwise.
+
+#### P0-4 — Final legacy tag and `legacy-v1` branch (LEGACY-005)
+
+- **The bridge tag IS the final legacy tag.** Do not mint a second one; two tags for one
+  state is the shape that produced every stale-hold problem in `HELM.md`.
+- `git branch legacy-v1 <bridge-tag>` then `git push origin legacy-v1`. Exact name is an
+  implementation decision (charter §26); `legacy-v1` is what the charter suggests and there
+  is no reason to differ.
+- **Order is load-bearing:** the branch exists before the first Avalonia-removal commit
+  reaches `main`. LEGACY-005 says so; and once `main` has lost the Avalonia project,
+  recreating the branch means resurrecting from a tag under time pressure.
+- Protect the tag and the branch through GitHub settings so LEGACY-004 is enforced by the
+  platform. **→ Helm** — repo settings are Helm's sequencing call, not a consequence-list
+  door (not values, release go, posture, money, roadmap, wiki policy, third-party policy or
+  privacy).
+- `legacy-v1` is **preserved, not maintained**. No new CI is wired to it. Say that in
+  `LEGACY-V1.md` so nobody later reads a green branch as a support promise.
+
+#### PHASE 0 GATE — and how it is actually proved
+
+> A Linux or Mac user on the final bridge build can continue using v1 after v2 ships
+> without being asked to install an incompatible Windows build.
+
+"The suite is green" does not prove this. Four proofs, in ascending strength:
+
+1. **Unit** — `LegacyPlatformUpdatePolicyTests`, the full matrix and both negatives.
+   Verify by running the new tests against the **pre-fix tree** and confirming the
+   major-2 rows fail there. A guard that has never failed has not been shown to guard
+   anything (traps 34, 39).
+2. **Scanner** — all six call sites route through the policy; a seventh fails the build.
+3. **Rendered** — the Avalonia headless harness (`WidgetRenderTests`' constructor pattern,
+   isolated `EQBUDDY_APPDATA`) drives the banner from a hand-built `UpdateInfo(2.0.0)`
+   twice and asserts: notice, then nothing; and that the string wraps inside 320 px rather
+   than widening the root (trap 12).
+   → **Known limit, stated rather than papered over:** `UpdateChecker.CheckGitHubAsync`
+   reaches a `private const` URL, so the wire fetch itself is not reachable from a test.
+   Options are (a) make the URL an `internal` settable field, or (b) test `ParseRelease`
+   plus the policy and leave the fetch uncovered — which is where it already is. **Prefer
+   (b)**: (a) adds a mutable global to Core to cover an `HttpClient.GetStringAsync` call
+   that has never been the defect, and Phase 0 should not widen Core's surface.
+4. **Real, and this is the one that counts** — publish the first v2 milestone as a
+   **prerelease** and confirm a bridged Linux or macOS client is offered nothing at all;
+   then, before `2.0.0` goes latest, confirm on a bridged client against a real major-2
+   release that the notice appears once and the click lands on the legacy release page.
+   This is the only proof that exercises GitHub's own `releases/latest` semantics, which
+   proof 1 assumes.
+
+**And name what the gate does NOT cover, because it is the real residual risk:** the
+notice only reaches installs that took the bridge. Anyone still on an older 1.x sees the
+generic release page — which is precisely why LEGACY-007 exists, why the `-Prerelease`
+switch matters more than the in-app notice, and why the bridge's own What's-new entry is
+worth writing well. Do not let a green gate read as "every legacy user is protected".
+
+---
+
+### PHASE 1 — subtract platform debt (**BLOCKED on the Phase 0 gate — do not start**)
+
+Charter §19 Phase 1 and §16.2. Written now so Phase 0 is executed with the destination in
+view; **no Phase 1 PR opens until Helm confirms the LEGACY checklist on #275 is complete.**
+
+#### P1-1 — Disposition of the 23 Avalonia test files, BEFORE any deletion
+
+**This is the finding that reorders Phase 1.** `docs/TestPlan.md` §5 records that the WPF
+layer has no unit tests. `tests/EQBuddy.Avalonia.Tests` (23 files) is therefore the repo's
+**only** place where a widget is rendered and asserted, and `ci.yml` gates the E2E suite on
+`workflow_dispatch` — so it is also the only rendering coverage that runs on a push.
+Charter §16.2's "remove Avalonia-only tests from v2" is correct as direction and, executed
+literally as a deletion, removes the repo's rendering coverage in one commit. That is trap
+34 at project scale: what is left reads as coverage.
+
+Deliverable **before** the delete commit: a table, one row per file, each naming where its
+assertion went.
+
+- Likely **port to `EQBuddy.Tests`** (already close to pure): `BreakdownRowsTests`,
+  `WindowZoomTests`, `HotkeyManagerTests`, `ChipStackTests`, `IconGeometryTests`,
+  `UpdateOfferTests`.
+- Likely **port to E2E via `EQBUDDY_EXPAND`**: `WidgetRenderTests`, `OptionsRenderTests`,
+  `QuestsRenderTests`, `DropsRenderTests`, `InventoryRenderTests`, `HistoryRenderTests`,
+  `WikiPackRenderTests`, `ZoneWindowsRenderTests`, `ThemeBodyCapRenderTests`,
+  `FightTimelineRenderTests`, `CompanionWiringTests`.
+- Likely **accept the loss, with the reason written down**: `ClickThroughTests`,
+  `MacOverlayLevel` coverage, and the capture surfaces `IconSheetTests` / `WidgetSheetTests`
+  (both opt-in, both photographing the lane being removed).
+- `AppThemeTests.EveryCatalogThemeAppliesCleanly` is a **catalog** guard wearing an Avalonia
+  coat — it is the thing that would notice a broken palette, and it has no WPF twin. Decide
+  it explicitly.
+
+**Prerequisite this exposes: E2E must run in CI before it is asked to carry that load.**
+Today it needs a desktop session and is opt-in. Either that changes, or the ported rows are
+guards nobody runs — which is worse than deleting them honestly.
+
+#### P1-2 — The 18 shared-suite tests that scan the Avalonia source
+
+`ArchitectureTests`, `ChipStackPlanTests`, `ClassSourceWritersTests`, `CompanionQuestsTests`,
+`CompanionSnapshotArgumentTests`, `DesignRatchetTests`, `DesignSystemTests`,
+`DocumentationTests`, `FocusHideTests`, `GameCommandsTests`,
+`ImportReportReachesASurfaceTests`, `LogJanitorPolicyTests`, `OverlayActivationTests`,
+`QuestLedgerClearCountTests`, `QuestReconcileWiringTests`, `SurfaceOwnershipTests`,
+`WatchPinMigrationTests`, `WikiRecheckPathTests`.
+
+Every one exists because **two lanes could drift**. With one lane, each becomes either a
+single-lane must-list (still valuable — trap 34 and trap 43 are both single-lane guards) or
+vacuous. **A scanner that scans one file it will always find is a guard that cannot fail**,
+and it will keep passing forever while reading as coverage. One explicit call per file:
+keep as a must-list with its reason rewritten, or delete with a reason. Do not let them
+narrow silently — that is the failure mode of every guard in the trap list.
+
+Specifically: `ArchitectureTests` carries `EQBuddy.Avalonia/MainWindow.cs, 5229` in the
+hotspot table. Removing the row is right; **do not let the WPF row's headroom grow in the
+same commit**, or Phase 2's decomposition budget is spent before it starts.
+`SurfaceOwnershipTests`' two curated exemptions (Gear & Loot, Kills & Drops) each name the
+PR that removes them — those PRs are Phase 2 work (see the sketch) and the exemption list
+must not be quietly re-justified as "one lane, so it does not matter". Trap 45's rule is
+about ownership, not about Avalonia; it happens to have been *found* by Avalonia.
+
+#### P1-3 — CI and release pipeline
+
+- **`ci.yml`** — delete the `build-avalonia-linux` job and the "Run Avalonia render tests"
+  step. Unambiguous: this workflow triggers on `push`/`pull_request` and runs from the
+  branch. Do this **after** P1-1, not with it.
+- **`release-assets.yml`** — **verify before deciding, and I did not.** The open question is
+  which ref supplies the workflow file for a `release: published` event: the release's
+  target commit, or the default branch. It decides the action:
+  - if the tag's own copy runs → **delete the file** on v2 mainline; legacy tags keep theirs
+    and can be re-published forever, satisfying LEGACY-004;
+  - if the default branch's copy runs → **do not delete it.** Guard the job instead
+    (`if: ${{ !startsWith(github.event.release.tag_name, 'v2') }}` or a check that the
+    Avalonia csproj exists), because deleting it means every future legacy re-publish
+    silently loses its three assets and every v2 release shows a red X.
+  One check settles it: re-publish the bridge release after the removal lands on `main` and
+  see whether the assets reattach. Cheap, and the wrong guess is expensive in exactly the
+  direction LEGACY-004 forbids.
+- **`EQBuddy.slnx`** — drop both Avalonia rows.
+- **`scripts/check.ps1`** — drop the `avalonia` stage (line 64); the `-Quick` switch loses
+  its reason for existing and should go with it rather than becoming a no-op flag.
+- **`scripts/release.ps1`** — `-Prerelease` lands in Phase 0 (P0-1); noted here so the
+  pipeline picture is complete.
+- **Delete `src/EQBuddy.Avalonia/` and `tests/EQBuddy.Avalonia.Tests/` LAST**, in their own
+  commit, after P1-1 and P1-2 have landed. A deletion mixed with a port is a diff nobody
+  can review.
+- **`DocumentationSizeTests`** measures `src/<project>` line counts against numbers written
+  in `docs/Architecture.md`. Removing a project changes those numbers; the doc edit belongs
+  in the deletion commit, not in a follow-up.
+
+#### P1-4 — Wine/CrossOver: name the boundary before deleting (**→ Helm**)
+
+**Fact, and it is the opposite of the intuition:** 40 files mention Wine or CrossOver, and
+the load-bearing ones are on the **Windows** lane — `src/EQBuddy/WineText.cs`,
+`WineFonts.cs`, `WineOverlay.cs`, `TextProbeWindow.cs`,
+`src/EQBuddy.UI.Shared/TextRenderingPolicy.cs`, plus `AppSettings.WineFloatOverFullscreen`,
+`WineKeepGameFullscreen`, `WineWholePixelText` and `scripts/crossover/`. They exist for
+players running **`EQBuddy.exe` under CrossOver on macOS** — traps 40, 41 and 42, which cost
+several rounds each. They are not Avalonia and they do not leave with it.
+
+The charter says two things at different widths: UX-010 forbids "Wine/CrossOver-specific
+**settings** in the v2 UI"; §16.2 removes "Wine/CrossOver **UI accommodations** from v2
+Windows UI".
+
+**Recommendation:** remove the three Options **knobs** — that is what UX-010 names — and
+keep `TextRenderingPolicy` + `WineText`. An auto-detecting rendering policy is not a UI
+accommodation, it costs one `OverrideMetadata` call at startup, and deleting it re-breaks
+trap 41 for people running the **supported Windows artifact**. `WineOverlay`,
+`scripts/crossover/` and `MacOverlayLevel` are macOS-overlay work and go with the platform.
+
+**This belongs to Helm, not David**: the charter settled the direction, and this is where
+the line falls inside it — scope, which §21.2 gives Helm. It is deliberately not decided
+inside a deletion PR, because that is where a boundary question becomes an executor's
+guess. If Helm reads it as "all of it goes", the executor deletes all of it; the point is
+that it should be a stated ruling.
+
+#### P1-5 — v1 feature inventory and classification
+
+The deliverable is the table; this is the method.
+
+- **Spine:** `docs/FeatureGuide.md`'s 13 `##` sections, `docs/Themes.md`'s seven themes
+  (four BUILT), the ~200 `AppSettings` properties, `BreakoutKind`'s six members, and the 22
+  WPF window classes in `src/EQBuddy/*Window*`.
+- **One row per feature:** name · today's door(s) · v2 domain (Home / Live / Progress /
+  Gear / Quests / World / Search / Settings) · class (Keep / Merge / Replace / Advanced /
+  Remove) · why · **what writes it**.
+- **Every `Remove` and `Merge` row names what stops writing.** Traps 20, 26 and 43 are one
+  event told three times — a surface folds, the data survives, the write path does not —
+  and this pass is a fold of the entire product. `DeadSettingTests.Known`,
+  `ImportReportReachesASurfaceTests` and `GameCommandsTests.SurfacesNeedingACommand` are
+  the three existing lists that will catch it, and each needs its rows revisited per moved
+  surface rather than at the end.
+- **Trap 30 applies to the tooling:** `scripts/shoot.ps1` enumerates `BreakoutKind` by hand
+  and `scripts/` matches windows by **title** (trap 53 — three stale titles dark-lit the
+  whole batch for six days). Any row that renames or removes a window is a `scripts/` grep
+  before it is a code change, and the batch — not a single `-Shot` — is what proves it.
+- **Output** goes to repo markdown (charter §21.1) — propose
+  `docs/v2/v1-feature-disposition.md` — with per-feature GitHub issues carrying the work
+  state.
+- **Gate (charter):** no v2 requirement is blocked on non-Windows desktop parity. Provable
+  mechanically: the removed CI jobs, plus a disposition table with no row whose blocker is
+  a non-Windows desktop.
+
+---
+
+### PHASE 2 — v2 shell and HUD: architecture sketch (for Bevel's parallel staging)
+
+**This is a seam sketch, not a design.** Bevel owns the IA and the visuals and is staging
+that in parallel (Helm, 11:50 AM CT). Nothing here should be read as pre-empting it; it
+exists so Bevel's design lands on seams that already exist rather than on ones that must be
+invented.
+
+#### The shell already half-exists, and it is called the theme program
+
+`docs/Themes.md` names seven themes; four are BUILT (Quests, Progress, World, Kills &
+Drops). **A "theme" is exactly a v2 shell page that currently ships as its own window.**
+The mapping is close to one-to-one:
+
+| Today | Charter §4.2 domain |
+|---|---|
+| Quests theme (`QuestsWindow`) | **Quests** |
+| Progress theme (`ProgressWindow`: Experience / Wealth / Faction / Raids) | **Progress** |
+| World theme (`WorldWindow`: Map / Camps / Path / Travels) | **World** |
+| Gear & Loot theme (`GearLootWindow`) | **Gear** |
+| Live Meters theme (planned) + `BreakoutKind` + `FightTimelineWindow` | **Live** |
+| Kills & Drops theme (`CreatureWindow`, `DropsCardView`) | folds into Live / World per P1-5 — *not* a top-level domain |
+| Alerts theme (planned), `OptionsWindow`, `WikiPackWindow` | **Settings** + HUD edit mode |
+| `HistoryWindow`, `SessionPickerWindow` | **Progress** / **Live** history |
+| — | **Home** and **Search** are the only genuinely new pages |
+
+That is the useful shape of this phase: v2's shell is **two new pages and a navigation host
+over four surfaces that already exist as hosted views**, not a rebuild. It also means the
+charter's §16.4 ("MainWindow should lose responsibility, not just lines") has already begun
+— `QuestChecklistView`, `WorldWindow` and the Progress fold are that work.
+
+#### Four seams — three of them already exist
+
+1. **A surface factory per host.** `MainWindow.NewProgressSurfaces()` and the trap-45 rule:
+   *a method that returns a long-lived UI object is a transfer of ownership wearing a
+   getter's clothes.* Every shell page builds its own instances; the HUD builds its own.
+   `SurfaceOwnershipTests`' two remaining exemptions are removed **by** this phase — the
+   shell is the host that makes keeping them impossible.
+2. **Framework-free presentation.** `UI.Shared` (94 files) already holds
+   `LootPresentation`, `QuestPresentation`, `QuestChecklistLayout`, `DesignTokens`,
+   `ChipStyle`, `WidgetMetrics`, `ChipStackAnchor`, `AlertSoundPlan`, `LogJanitorPolicy`,
+   `TextRenderingPolicy`. **Charter §16.3's `EQBuddy.Presentation` IS this project.**
+   *Recommend not renaming* — §16.3 says the boundary matters more than the namespace, and
+   a rename is 94 files of churn plus every doc path `DocumentationTests` resolves, for no
+   behavioural gain. One line in `DECISIONS.md` when the item is taken.
+3. **The mobile projection is the parity proof, and it survives Phase 1 untouched.**
+   `CompanionProjection*` reads the same shared modules the windows do, and
+   `SurfaceParityTests` asserts it. That is charter §16.6 already enforced. **The standing
+   rule for every shell page: if a page hand-rolls a rule the projection reads from
+   `UI.Shared`, that is #210 happening again** — and #210's direction surprised people,
+   because it was the *phone* that was ahead.
+4. **Navigation — the one genuinely new seam.** Smallest thing that works, per §16.5 (no
+   DI container, no message bus, no plugin host): a `ShellPage` enum, a content host, and a
+   page factory registry. **Reuse a string grammar that already exists in the wild:**
+   `EQBUDDY_EXPAND` already takes `progress:raids` — a `page:room` deep link, on both lanes
+   since 2026-08-26. Making that the shell's navigation address means "Guide Me There"
+   (UX-005), Search results (SEARCH-002) and HUD click targets all resolve to one
+   destination spelling on day one, which is what WORLD-006 asks for.
+
+#### HUD (Surface A)
+
+- **The HUD is `MainWindow` minus what the shell takes.** Target responsibilities after
+  Phase 2: log tail wiring, live snapshot, mini/expanded state, chip windows, tray and
+  context menu — and **no card rendering**. `ArchitectureTests`' hotspot entry is a glob
+  that **sums** its matches, so splitting the file buys nothing; and per the standing rule,
+  **the ratchet baseline comes down in the same commit as each move**, or the freed room
+  refills.
+- **Chip placement (LIVE-008) has three actors, not two.** `MezChipsWindow`,
+  `SpawnChipsWindow` and the HUD itself all observe placement, and `UI.Shared/ChipStackAnchor`
+  already owns the anchoring (traps 1 and 2 were both paid for here). One "Edit HUD" unlock
+  state belongs in `UI.Shared` beside it. **Put the participants in the test names** —
+  trap 49 is thirteen green tests agreeing with a bug because the model had two actors and
+  the world had three.
+- **Trap 12 is the standing HUD constraint.** The HUD is `SizeToContent`, so any
+  timer-driven string is a geometry change on an always-on-top window over a fullscreen
+  game. Every new readout reserves a fixed width; `UI.Shared/PerfReadout` is the worked
+  example.
+- **UX-003 (kill the breakout choreography): change defaults, do not delete.**
+  `AppSettings.DisabledBreakouts` already gates all six kinds, the Live page becomes the
+  detail home, and **David uses the damage breakout**. Trap 30: touching `BreakoutKind`
+  means grepping `scripts/` in the same change.
+
+#### What Phase 2 must not do
+
+Rewrite Core for aesthetics (§16.1). Introduce DI, a message bus or a plugin host (§16.5).
+Start before Bevel's IA is signed. And the shell's **first** PR is a host with **one**
+existing page moved into it — the World fold is the precedent this repo already has (five
+PRs, host first), and it is the only shape that keeps a half-finished shell shippable.
+
+#### Phase 2 gate
+
+> A user can find every retained primary feature without the legacy context-menu maze.
+
+Provable against P1-5's disposition table rather than by judgement: every `Keep` and `Merge`
+row names a v2 door, and no row's only door is the context menu (UX-002). Once the table
+exists that is a test, not an opinion — and it is worth writing as one, because "every
+retained feature has a home" is exactly the claim that rots silently.
+
+---
+
+### Out of scope for this item
+
+Phases 3–6. #250. #240 / the 320-cap. #264. #208 (live hold — do not open). Play Console,
+signing and production secrets. Product-direction debate — the charter wins (Helm,
+11:50 AM CT). Avalonia removal in the session that takes Phase 0. Tagging. Merging.
+
+### Checked — what I actually read
+
+`docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` rev 1.1 in full; `HELM.md` and
+`HELM-FEEDBACK.md` newest entries; issue #275 body; `src/EQBuddy.Core/UpdateChecker.cs`
+in full; `src/EQBuddy.Avalonia/UpdateOffer.cs` in full; both lanes' update call sites and
+`_lastUpdateCheck` declarations; `scripts/release.ps1` in full; `.github/workflows/ci.yml`
+and `release-assets.yml` in full; `scripts/check.ps1`'s stage list; `EQBuddy.slnx`; the
+banner XAML and the two `NormalRoot` widths; the file lists for
+`tests/EQBuddy.Avalonia.Tests` (23), `tests/EQBuddy.E2E` (5) and the 18 shared-suite files
+that name `EQBuddy.Avalonia`; `docs/Themes.md`'s theme headings; `docs/FeatureGuide.md`'s
+section headings; `src/EQBuddy/*Window*` (22 classes); the Wine/CrossOver file list.
+
+**Hypotheses, labelled as such — none of these were verified:**
+
+1. GitHub's `releases/latest` excludes prereleases. Read from documentation, not observed
+   against this repo. P0-1 item 1 depends on it; gate proof 4 settles it.
+2. Which ref supplies the workflow file for a `release: published` event (P1-3). **Do not
+   act on either branch of this until it is checked** — the wrong guess costs LEGACY-004.
+3. The P1-1 port/loss buckets are a first pass over file names and what each file is for.
+   The table is the deliverable; these are where to start, not the answer.
+
+### Decided without asking — for `DECISIONS.md` when this is taken
+
+- **The policy lives in `UI.Shared`, not in `UpdateChecker`.** Core stays a data/parse
+  layer; "may we show this offer" is presentation. The default could have been Core, which
+  would have put a platform rule where the fetch lives.
+- **Windows behaviour is byte-identical through Phase 0.** Could have unified the two
+  lanes' banner text while in there; deliberately not, to keep the blast radius at a call
+  site.
+- **Manual "Check for updates" always answers, even when suppressed.** Could have made
+  suppression total, which is simpler and is a silent no-op.
+- **The legacy browser target is a new pinned constant, not `GitHubLatestPage`.** The
+  default was to reuse the existing fallback, and it is wrong the day v2 ships.
+- **`ParseRelease` + policy tests, and the wire fetch stays uncovered.** Could have made
+  the API URL injectable; that adds mutable global state to Core for a call that has never
+  been the defect.
+- **`UI.Shared` is not renamed to `EQBuddy.Presentation`.** §16.3 permits either; churn
+  outweighs clarity.
+- **`legacy-v1` and the bridge tag are the same commit, and there is only one tag.**
+- **Recommend keeping `TextRenderingPolicy` while removing the three Wine Options knobs**
+  — raised to Helm as a scope question rather than settled here, because it lands on people
+  running the supported Windows artifact.
+
+---
+
 ## The WORLD theme — Travels & Deaths + Map, Spawns, Travel, ZoneShare become one theme
 
 - **Priority:** **DONE 2026-08-27 — all five PRs executed, merged, staged in 1.99.13.**
