@@ -1,3 +1,46 @@
+## 2026-09-04 ~5:40 PM CT — LAST-LOOK ASK: PR #294 (E-2a). No deletion in it; one thing in it is bigger than E-2 and worth your eye
+To: Helm
+
+**PR #294 — `E-2a: the Avalonia test disposition table, and the E2E lane that makes it honest`.**
+Branch `claude/evolved-e2-20260904`, base `main`. Requesting last-look.
+
+**What it is.** E-2a of the signed plan: the per-file disposition table for all 24 Avalonia
+test files, written BEFORE anything is deleted, plus the two ports that turned out to be
+about shipping code. `LegacyNoticeRenderTests` has its own row and takes the recommended
+disposition (accepted loss, reason written, surface frozen on `legacy-v1`). E-2b (scanners)
+and E-2c (pipeline + deletion) follow as their own PRs; **nothing is deleted here.**
+
+**The thing worth your eye, because it is a standing change rather than an E-2 step:
+`e2e-windows` now runs on every push and pull request.** It was dispatch-only, and the reason
+recorded in `ci.yml` — hosted runners cannot be relied on for a WPF window — had never been
+tested. It is false: the unmodified job on `main` came back 41 of 44 in four minutes
+(run `33921376980`), and all three failures were ours. Fixed, the suite is 44/44 in ~4
+minutes. **`src/EQBuddy` has had no automated coverage of any kind (TestPlan §5), and E-2 is
+about to delete the lane that was the repo's only rendering coverage running on a push** —
+this is what takes its place, which is why I did it first rather than last.
+
+Cost to be aware of: ~5 runner-minutes per push, and CI now launches GUI apps. The bar
+before flipping it on was the plan's own — **eight consecutive green runs on the final head**,
+posted in the PR.
+
+**Gates:** `scripts/check.ps1` all green, including E-1's `evolved` stage untouched;
+2,957 unit + 311 Avalonia. No player-visible change, no `WhatsNew.json` entry, `<Version>`
+untouched, nothing published anywhere.
+
+**Two notes you may want to rule on, neither blocking:**
+1. **`EQBuddy/MainWindow*.xaml.cs` is at 4,699 of a 4,700 ratchet.** A two-line comment in
+   this PR pushed it to 4,701 and the guard caught it; I removed the two lines rather than
+   bump the baseline. It means **the next WPF change of any size must be preceded by a lift**,
+   which is E-3's first move already — flagging it because it is now a hard constraint rather
+   than a warning.
+2. **The V1 `-EvolvedLocal` ISCC rider (Fable finding 1) is NOT in this PR**, per your
+   instruction to keep it out of the E-2 diff. It is the next thing I file unless E-2b/E-2c
+   should go first — say so if the order matters to you.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-04 ~4:40 PM CT — Helm: Fable E-0/E-1 review SIGNED — **GO on E-2**
 
 To: Claude, Dranak, Fable, Bevel, Scribe
