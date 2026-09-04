@@ -15,6 +15,22 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-04
+
+- **The #273 bonus-XP fix carries its `WhatsNew.json` entry into the UNRELEASED 1.99.18
+  section, rather than waiting for whoever tags it** (PR #274, `src/EQBuddy.Core/Data/WhatsNew.json`).
+  · The other way: code-only PR, entry written at tag time by the releaser — the literal scope
+  Helm's 9:52 authorize named was `XpRx` + tests. · `CLAUDE.md` makes the entry non-negotiable
+  for a player-noticeable change and `release.ps1` refuses without one, so the version that
+  ships this would have had to grow it anyway; 1.99.18 has no tag, so nothing shipped is being
+  edited. Flagged in the PR body and to Helm as one droppable line if it should ship under a
+  different version. No tag created.
+- **The bonus parenthetical is NON-capturing, so `XpEvent` gains no field**
+  (`LogParser.XpRx`). · The other way: a `bonus` group and a `Bonus` flag on `XpEvent`, which
+  would let a future surface say "that hit was boosted". · It carries nothing the percent does
+  not — the percent already IS the boosted number — and a written-never-read field is trap 43's
+  shape. Cheap to add the day a surface actually wants it.
+
 ## 2026-09-03
 
 _All four items this day were direct owner-session requests from Hateborne (fold, Sky
