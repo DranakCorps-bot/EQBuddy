@@ -1,8 +1,15 @@
 # EQBuddy release: publish exe, sign, compile installer, sign it, refresh zip,
 # push to OneDrive (the family's install + auto-update channel).
 # Commit + `git push` your source changes too; git is the source-code backup.
-param([string]$Tag)
+param([string]$Tag, [switch]$Prerelease)
 $ErrorActionPreference = 'Stop'
+
+# -Prerelease only means anything to `gh release create`, which only runs with a -Tag.
+# Without one it would be a switch that silently does nothing on a run that still builds,
+# signs, copies to OneDrive and installs locally — and the person who passed it would have
+# no way to tell. Refuse here, before the 172 MB publish, rather than after it.
+if ($Prerelease -and -not $Tag) { throw '-Prerelease has no effect without -Tag (it is a flag on the GitHub release).' }
+
 $repo = Split-Path $PSScriptRoot -Parent
 $oneDrive = 'C:\Users\david\OneDrive\EQBuddyDownload'
 . "$PSScriptRoot\signing.ps1"
@@ -103,11 +110,32 @@ if ($Tag) {
     # of commit subjects, which read as in-jokes to anyone who didn't write them.
     $notesFile = Join-Path ([System.IO.Path]::GetTempPath()) "eqbuddy-notes-$version.md"
     Set-Content -Path $notesFile -Value $releaseNotes -Encoding UTF8
-    gh release create $Tag "$repo\dist\EQBuddySetup.exe" "$repo\dist\EQBuddySetup.exe.sha256" "$repo\dist\EQBuddy-portable.zip" "$repo\dist\EQBuddy-portable.zip.sha256" `
-        --title "EQBuddy $Tag" --notes-file $notesFile
+    $ghArgs = @($Tag,
+        "$repo\dist\EQBuddySetup.exe", "$repo\dist\EQBuddySetup.exe.sha256",
+        "$repo\dist\EQBuddy-portable.zip", "$repo\dist\EQBuddy-portable.zip.sha256",
+        '--title', "EQBuddy $Tag", '--notes-file', $notesFile)
+
+    # -Prerelease marks the GitHub release as a prerelease, and that ONE flag is what keeps a
+    # v2 milestone away from every v1 client: `UpdateChecker.CheckGitHubAsync` reads
+    # `/releases/latest`, and GitHub's latest-release endpoint excludes prereleases and
+    # drafts. So a prerelease is invisible to the in-app updater without any client change —
+    # which matters because the clients that need protecting are the ones already installed,
+    # where no fix of ours can reach them. Charter RELEASE-002 asks for exactly this posture
+    # during v2 construction (docs/v2, #275 / P0-1).
+    #
+    # Two things it does NOT do, both deliberate:
+    #  * The OneDrive copy above is a SEPARATE channel — FindBestAsync checks the synced
+    #    folder as well as GitHub — so a prerelease still reaches the family's widgets. That
+    #    is the point of that folder; it is not covered by this flag.
+    #  * It is not the only belt. `ParseRelease` runs `Version.TryParse` on the tag and
+    #    returns null when it fails, so a tag shaped `v2.0.0-beta1` offers nothing even if it
+    #    were marked latest. Belt, not replacement: a `v2.0.0` tag parses fine.
+    if ($Prerelease) { $ghArgs += '--prerelease' }
+
+    gh release create @ghArgs
     Remove-Item $notesFile -ErrorAction SilentlyContinue
     if ($LASTEXITCODE -ne 0) { throw 'gh release failed' }
-    Write-Host "GitHub release $Tag published"
+    Write-Host ("GitHub release $Tag published" + $(if ($Prerelease) { ' as a PRERELEASE (excluded from releases/latest, so v1 clients will not be offered it)' } else { '' }))
 }
 
 # Bring THIS machine current too. Relaunching $runningApp shipped the machine that

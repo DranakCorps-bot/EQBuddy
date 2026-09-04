@@ -17,6 +17,20 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **`release.ps1 -Prerelease` THROWS when there is no `-Tag`, rather than being ignored**
+  (P0-1, `scripts/release.ps1`). · The other way: accept it silently, since the flag only
+  reaches `gh release create` and that block already only runs with a tag. · A tagless run
+  still builds, signs, copies to OneDrive and installs locally, so the switch would have
+  looked honoured while doing nothing — "silent no-ops are broken" with the switch on the
+  other side. The check is the first thing in the script, so it costs a second rather than a
+  172 MB publish. Pinned by `ReleasePrereleaseTests`.
+- **The P0-1 guard also pins `UpdateChecker`'s `/releases/latest` URL, which is product code
+  outside the PR's edit scope** (`tests/EQBuddy.Tests/ReleasePrereleaseTests.cs`). · The other
+  way: assert only on `release.ps1`, staying strictly inside the scoped file. · The flag
+  protects nobody if the client is ever pointed at `/releases` instead, and that is the
+  natural edit for anyone wanting the updater to see more than one release — two files that
+  must agree, which is the shape `WeeklyRefreshWiringTests` already guards. Nothing in
+  `UpdateChecker` was changed; the test only reads it.
 - **The #273 bonus-XP fix carries its `WhatsNew.json` entry into the UNRELEASED 1.99.18
   section, rather than waiting for whoever tags it** (PR #274, `src/EQBuddy.Core/Data/WhatsNew.json`).
   · The other way: code-only PR, entry written at tag time by the releaser — the literal scope
