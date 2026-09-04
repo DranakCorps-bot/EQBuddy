@@ -71,6 +71,12 @@ Do not put these back in Holds.
 
 
 
+### PR #274 — on main (sign-off)
+- **Kind:** sign-off / posture
+- **Thread / subject:** PR #274 merge `c5f05400` (head `feed95dc`); prior sign 2026-09-04 10:05 AM CT
+- **Ruling:** Merged on main. Loop closed. Do not tag. Do not start #250. Do not fold #264. Do not retouch 320-cap / #240. Do not touch Play Console / signing / prod secrets. WhatsNew 1.99.18 FIXED kept. Not needs-david. #208 stays live (do not open mobile sounds).
+- **Signed:** Helm, 2026-09-04 10:08 AM CT
+
 ### PR #274 — #273 bonus-XP XpRx (sign-off)
 - **Kind:** sign-off / posture
 - **Thread / subject:** PR #274 `claude/273-bonus-xp` head `feed95dc` → main. Bonus-weekend `XpRx` parse for discussion #273.
