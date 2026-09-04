@@ -34,6 +34,34 @@ history of the call stays readable. If vetoes become common, the consequence lis
   is the same defect as naming an in-game command and shipping no ⧉ button. It is hidden
   when the PC has one address, because a choice of one is not a choice.
 
+- **The legacy download links in `LEGACY-V1.md` and the README pin `v1.99.17`, the current
+  1.x release, rather than waiting for the bridge tag** (P0-3). · The other way: leave the
+  asset links out until the bridge release exists, or point them at `releases/latest`. · A
+  support page with no download on it is not a support page, and `releases/latest` is the
+  one URL that must never appear there — it becomes the v2 page the moment v2 ships. The
+  pin is stated as a pin in both files ("these move to the final tag when it is published"),
+  so it reads as pending rather than as a claim, and the guard below fails any link that
+  reverts to `releases/latest`. Re-pinning is a P0-1 checklist row on #275.
+- **The LEGACY-007 obligation ships as a GUARD as well as a checklist row**
+  (`scripts/legacy-notice-guard.ps1`, wired into `check.ps1` and `release.ps1`). · The other
+  way: the checklist row alone, which is what the plan offered as sufficient. · Helm signed
+  "LEGACY-007 whatsnew-style guard: yes" (2026-09-04 ~12:05 PM CT) and it came out cheap —
+  file reads only, no git parsing beyond a tag list, so trap 54's encoding hole is not on
+  its path. It is a no-op on the 1.x line and arms at 2.0.0.
+- **That guard asks for the "Legacy Linux/macOS" release-notes section on the FIRST 2.x
+  release only, while the README check applies to every 2.x** (same file). · The other way:
+  demand it in every 2.x release's notes. · A line written to satisfy a guard on every patch
+  release is a line players stop reading, and the README is permanent once written. If git
+  cannot answer whether a v2 tag already exists, the strict branch is taken: the cost of
+  asking twice is one line of notes, the cost of skipping is the promise going unenforced on
+  the one release it was written for.
+- **The bridge What's-new highlight lands in P0-3, on the unreleased 1.99.18 entry**
+  (`src/EQBuddy.Core/Data/WhatsNew.json`). · The other way: leave it to whichever PR cuts the
+  bridge release. · Helm's PR #282 ruling assigns it here ("bridge entry is P0-3 with Don
+  Thompson + quasarj credits") and P0-2's own decision line above hands it forward to the
+  P0-3 wording pass. It is the only in-app announcement Linux and macOS users will ever get,
+  and it carries no URL — no highlight in the file ever has, and an unbreakable token is a
+  geometry change on a `SizeToContent` window (trap 12).
 - **`UpdateChecker.GitHubLegacyReleasePage` points at the RUNNING BUILD's own tag, not a
   hard-coded bridge tag** (P0-2, `src/EQBuddy.Core/UpdateChecker.cs`). · The other way: the
   literal the plan asked for, `.../releases/tag/v1.99.N`. · That literal has to be written
