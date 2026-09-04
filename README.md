@@ -76,9 +76,10 @@ detail; the short version:
 | macOS desktop 1.x | **Preserved legacy** — final build stays downloadable and usable |
 | Windows desktop 1.x | **Preserved** until the Evolved channel opens; current public downloads are still 1.x |
 
-Final 1.x downloads (the final cross-platform release has not been cut yet — these point
-at the current 1.x release, [v1.99.17](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.17),
-and move to the final tag when it is published):
+Final 1.x downloads (the final cross-platform release is planned as `v1.99.18` and is not
+published yet — these point at the current 1.x release,
+[v1.99.17](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.17), and move to
+the final tag when it exists):
 
 - Linux x64 — [`EQBuddy-linux-x64.tar.gz`](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v1.99.17/EQBuddy-linux-x64.tar.gz)
 - macOS Apple Silicon — [`EQBuddy-osx-arm64.zip`](https://github.com/DranakCorps-bot/EQBuddy/releases/download/v1.99.17/EQBuddy-osx-arm64.zip)

@@ -26,7 +26,7 @@ Current GitHub releases remain the 1.x line. Evolved is not a download yet.
 
 **The final cross-platform release is the "bridge" release** — one ordinary 1.99.x release whose contents are special. It carries the update-channel change that stops a Linux or macOS copy from ever being offered a Windows v2 installer, and it is the last build those platforms will be offered. **Its tag is the final legacy tag; there will not be a second one.**
 
-**It has not been cut yet.** The current public 1.x release is [**v1.99.17**](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.17) and the links below point at it. When the bridge release is published, this section and those links move to the bridge tag, and this paragraph says which tag it is instead of saying it is pending. Progress is tracked on [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275).
+**It is planned as `v1.99.18` and has not been published yet.** Until it is, the links below point at the current public 1.x release, [**v1.99.17**](https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.17) — a link to a tag that does not exist yet would simply be a 404, which is a poor last thing to say to anyone. When `v1.99.18` is published, this section and those links move to it. Progress is tracked on [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275).
 
 ### Direct downloads — Linux and macOS
 
