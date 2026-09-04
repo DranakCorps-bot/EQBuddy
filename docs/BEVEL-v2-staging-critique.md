@@ -313,7 +313,7 @@ sent back.
 | Refuse | Why |
 |---|---|
 | **Linux / macOS parity as a Phase 2 gate** | Avalonia tracks a few releases behind on purpose. The v2 destination is a Windows HUD + Windows shell. Do not hold the shell on toolkit twins. Shared decisions still go through Core / UI.Shared so a later port does not invent a fourth copy. |
-| **Party rankings / measuring other players** | Values line. Not a feature request. Decline, MIT, invite a fork. |
+| **Party rankings / measuring other players** | Values line. Not a feature request. Decline for v2. (Community forks of final 1.x/legacy remain a LEGACY matter only — v2/Evolved is proprietary / permission-required, not MIT.) |
 | **Automation / cloud accounts** | Log-only, local, no phone-home. |
 | **Standalone Tradeskills or Factions domains** | Faction is Advanced under Progress. Tradeskills is not a seventh primary. Do not mint rooms to match a competitor's sidebar. |
 | **Competitor feature parity** | Overlay + DPS is table stakes and we already have them. The uncontested ground is the chain and the second screen. Copying a raid meter is how we lose the values line. |
