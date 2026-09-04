@@ -82,6 +82,20 @@ Linux and macOS players keep the 1.x build they have. Evolved does not require t
 
 ---
 
+## Licensing
+
+**Evolved is proprietary.** Code, assets, and Evolved-specific docs are All
+Rights Reserved (Copyright David Edwards) — [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md).
+You may not use, copy, modify, redistribute, or fork them without prior written
+permission. That is not the historical MIT / open-with-credit model, and it is
+not the same licensing posture as JMoyer’s EQL Companion.
+
+Already-published **1.x stays MIT** ([LICENSE](LICENSE)). Those grants are not
+revoked. Fork invitations apply to LEGACY / v1 only. Full text:
+[PRODUCT.md](PRODUCT.md#licensing).
+
+---
+
 ## North star
 
 A finished Evolved release should make this feel ordinary: you log in, EQBuddy already knows the character you are playing, and when you want more than a glance you open the app and get a useful next step — without having to understand EQBuddy’s internal windows, cards, menus, files, or data pipelines.

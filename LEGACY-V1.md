@@ -45,3 +45,19 @@ Linux and macOS 1.x exist because people built them — notably [Don Thompson](h
 The work that makes the promise above true *before* Evolved can ship as its own channel is tracked in **[issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275)** (Phase 0 — final 1.x bridge, update-channel honesty, retained artifacts).
 
 Until that gate is done, public downloads stay 1.x, and this page is the support matrix to read — not a claim that Evolved is already shipping.
+
+---
+
+## Licensing
+
+**1.x / LEGACY stays MIT.** Already-published 1.x code and the existing
+[LICENSE](LICENSE) remain the open-with-credit grant they always were. Those
+past MIT grants stay; we do not revoke them. A community fork of that
+published tree is still the invitation that applied to v1.
+
+**Evolved is separate and proprietary.** EQBuddy Evolved (v2) code, assets,
+and Evolved-specific docs are All Rights Reserved — see
+[LICENSE-EVOLVED.md](LICENSE-EVOLVED.md) and [PRODUCT.md](PRODUCT.md#licensing).
+They are not MIT, not “use freely, credit visibly,” and not the same
+licensing posture as JMoyer’s EQL Companion. The v1 fork invitation never
+applies to Evolved.

@@ -11,6 +11,7 @@
 > | **1.x stays up** | [LEGACY-V1.md](LEGACY-V1.md) · [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275) |
 > | **Supported** | Windows Evolved desktop + EQBuddy Mobile hosted by Windows |
 > | **Preserved** | Linux/macOS (and Windows) 1.x final builds — downloadable and usable. We are **not** removing them. |
+> | **Licensing** | **Evolved is proprietary** (permission required — [LICENSE-EVOLVED.md](LICENSE-EVOLVED.md)). **1.x stays MIT.** |
 
 An always-on-top widget that reads your EverQuest Legends `/log` file live and turns
 it into everything worth knowing about your session: kills and DPS, a **fight
@@ -679,9 +680,19 @@ features without ever becoming an issue number.
 [What's New](src/EQBuddy.Core/Data/WhatsNew.json), with the discussion number.** That is
 the durable record; this section is the roll call.
 
-## License — use freely, credit visibly
+## License — 1.x MIT; Evolved proprietary
 
-MIT — see [LICENSE](LICENSE). Use the code, port it, build on it, ship your own
+**EQBuddy Evolved** (v2) is **proprietary / All Rights Reserved** — see
+[LICENSE-EVOLVED.md](LICENSE-EVOLVED.md). You cannot use, copy, modify,
+redistribute, or fork Evolved without David Edwards’ prior written permission.
+That is not the open-source-with-credit model, and it is not the same
+licensing posture as JMoyer’s EQL Companion.
+
+**Already-published 1.x / LEGACY stays MIT** — see [LICENSE](LICENSE). Those
+grants stay; we do not revoke them. The invitation below applies to that
+published 1.x work only — never to Evolved.
+
+MIT (1.x): use the published 1.x code, port it, build on it, ship your own
 tool from it — freely, commercially, no permission needed. The license's one
 condition (and it is a condition, not a request): the copyright notice comes
 along with any substantial portion of the code you take. In practice, do it the

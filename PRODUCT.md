@@ -103,6 +103,27 @@ Useful ideas from elsewhere may be adopted only when they strengthen the Evolved
 
 ---
 
+## Licensing
+
+**EQBuddy Evolved** (v2) code, assets, and Evolved-specific documentation are
+**proprietary / All Rights Reserved** (Copyright David Edwards). See
+[LICENSE-EVOLVED.md](LICENSE-EVOLVED.md).
+
+You may not use, copy, modify, redistribute, or fork Evolved — or any
+substantial portion of it — without David Edwards’ prior written permission.
+
+This is **not** the open-source-with-credit (MIT) model used historically for
+EQBuddy 1.x. It is **not** the same licensing posture as Josh Moyers’ EQ
+Legends Companion. Do not treat Evolved as reusable under either of those
+models.
+
+Already-published **1.x / LEGACY** work remains under the repository’s
+existing MIT License ([LICENSE](LICENSE)). Those past MIT grants stay; this
+direction does not revoke them. A community-fork invitation applies to
+**LEGACY / v1 only** — never to Evolved.
+
+---
+
 ## North star
 
 A finished Evolved release should make this feel ordinary:
