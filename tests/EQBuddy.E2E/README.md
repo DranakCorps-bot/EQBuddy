@@ -1,8 +1,18 @@
 # EQBuddy.E2E — the end-to-end suite
 
-The only tests that launch the **real** `EQBuddy.exe`, grow a **real** log file under
-it, and assert on the **rendered** result. Everything else in `tests/` exercises code
-in-process; this suite exercises the app.
+The tests that launch the **real** `EQBuddy.exe`, grow a **real** log file under it, and
+assert on the **rendered** result. Everything else in `tests/` exercises code in-process;
+this suite exercises the app.
+
+**It runs on every push and pull request as of 2026-09-04** (`e2e-windows` in `ci.yml`),
+and that is load-bearing: `src/EQBuddy` has no unit tests (`docs/TestPlan.md` §5), and
+E-2 removes the Avalonia lane that had been the repo's only rendering coverage running on
+a push. A flake here is a bug to fix, not a reason to gate the job again.
+
+*One exception to "launches the app": `IconGeometryTests` parses every `UI.Shared` icon
+path with WPF's own geometry parser and starts nothing. It lives here for the target
+framework — this is the repo's one `net10.0-windows` test project — and for no other
+reason.*
 
 ## Running locally
 
@@ -17,9 +27,16 @@ Release build → every test fails fast with a message pointing here.
 
 **Expect widget windows to appear briefly.** Each test starts its own always-on-top
 EQBuddy against an isolated profile; tests run sequentially (one app at a time) and
-kill + clean up on teardown. A desktop session is required — this is why the suite is
-**not** part of push/PR CI. It runs from the manually-dispatched `e2e-windows` job
-(`workflow_dispatch` with `run-e2e`) or, the supported path, on a dev machine.
+kill + clean up on teardown. A Windows session is required — a `windows-latest` runner
+has one, which is what the un-gating rests on.
+
+**Nothing may assert the SCREEN.** A hosted runner is 1024×768, so a test that needs a
+tall monitor is asserting the desk it was written on:
+`DraggingTheWidgetTallerGrowsTheOpenThemesBody` did exactly that, and the fix was to put
+the arithmetic's two inputs in the dump and assert the relationship instead of a number.
+Same for the fixture replay — `Launch` waits for it to STOP moving before any test samples
+a baseline, because `WaitForDump` is an equality and a counter still climbing sails past
+the expected value between two polls.
 
 ## How the harness works
 

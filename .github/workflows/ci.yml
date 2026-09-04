@@ -4,12 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
+  # No `run-e2e` input any more: the end-to-end suite runs in every event this workflow
+  # handles, so a switch that turned it on would be a flag that does nothing.
   workflow_dispatch:
-    inputs:
-      run-e2e:
-        description: "Also run the end-to-end suite (launches the real WPF EQBuddy.exe)"
-        type: boolean
-        default: false
 
 # Build-and-test only: nothing here writes to the repo.
 permissions:
@@ -61,12 +58,22 @@ jobs:
         run: dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release --no-build --logger "console;verbosity=normal"
 
   # End-to-end: launches the real EQBuddy.exe against an isolated profile and asserts on
-  # its rendered state (tests/EQBuddy.E2E). Deliberately NOT part of push/PR CI — it
-  # needs a desktop session, which hosted runners don't guarantee a WPF window on. The
-  # supported way to run it is locally: `dotnet test tests/EQBuddy.E2E -c Release` after a
-  # Release build. This job is the opt-in remote attempt, gated on manual dispatch.
+  # its rendered state (tests/EQBuddy.E2E). It runs on EVERY push and pull request as of
+  # 2026-09-04 (E-2a).
+  #
+  # It used to be dispatch-only, and the reason given was that it "needs a desktop
+  # session, which hosted runners don't guarantee a WPF window on". That was an assumption
+  # nobody had tested: the first dispatch of this job on `main` came back 41 passed / 3
+  # failed in four minutes, and all three failures were ours — two tests sampling a
+  # baseline while the fixture was still replaying, and one asserting a cap that only a
+  # monitor taller than the runner's 1024x768 can grant. With those fixed the suite is
+  # 44/44 in ~4 minutes.
+  #
+  # WHY IT MATTERS THAT IT RUNS HERE: `src/EQBuddy` has no unit tests at all
+  # (docs/TestPlan.md §5), and E-2 removes the Avalonia lane, which was the repo's only
+  # rendering coverage that ran on a push. This job is what takes its place — so a flake
+  # here is a bug to fix, not a reason to gate it again.
   e2e-windows:
-    if: github.event_name == 'workflow_dispatch' && inputs.run-e2e
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

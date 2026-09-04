@@ -459,6 +459,17 @@ bugs of the kind a small pure helper *could* pin.
    window behaviour, dump the fact and assert it from E2E.** It is cheaper than it looks
    and it is the only route that sees real WPF layout.
 
+   **And since 2026-09-04 it RUNS ON EVERY PUSH** (44 scenarios, ~4 minutes,
+   `e2e-windows` in `ci.yml`), which changes what this recommendation is worth: it used
+   to be dispatch-only, so a scenario added here was a guard nobody ran. The gating
+   reason — "hosted runners don't guarantee a WPF window" — had never been tested, and
+   the first attempt came back 41 of 44 passing, with all three failures ours (two
+   baselines sampled mid-replay, one assertion about the runner's 1024×768 screen).
+   **The rule that follows: nothing in E2E may assert the SCREEN.** Put the arithmetic's
+   inputs in the dump and assert the relationship, the way
+   `DraggingTheWidgetTallerGrowsTheOpenThemesBody` now does with `themeBodyRoom` and
+   `themeBodyChrome`.
+
    *Note on the road not taken:* a WPF unit-test project (recommendation 2) is harder
    than the Avalonia precedent suggests, because Avalonia ships a headless platform for
    exactly this and WPF does not. E2E already launches the real app; extending it beats

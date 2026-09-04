@@ -1574,8 +1574,12 @@ the game's own map files. This harness found trap 6 above; unit tests could not 
 ## Before you finish
 
 - Run the gates. `scripts/check.ps1` is the whole set (E2E is separate — it launches the
-  real app and needs a desktop session: `dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release`,
+  real app and needs a Windows session: `dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release`,
   after `dotnet build`, since it runs the BUILD output and not `dist/publish`).
+  **Since 2026-09-04 CI runs it too, on every push and PR** — so a failure there is real,
+  and **nothing in that suite may assert the SCREEN**: a hosted runner is 1024×768, and a
+  test needing a taller monitor is asserting the desk it was written on. Dump the
+  arithmetic's inputs and assert the relationship.
 - Player-visible change? `WhatsNew.json` entry, reporter credited.
 - Behaviour change? Update [docs/TestPlan.md](docs/TestPlan.md) — that file is the
   contract for what EQBuddy is expected to do, and it is only useful if it stays true.
