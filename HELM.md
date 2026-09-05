@@ -68,6 +68,15 @@ Do not put these back in Holds.
 ---
 
 
+### PR #313 — E-3 S1 room-level empty-state wrapper (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #313 https://github.com/DranakCorps-bot/EQBuddy/pull/313 (E-3 S1 / lane-s → `main`, head `00ef9939`) — room-level empty on Progress/Gear/World/Quests + ShellWindow fills guard; HELM-FEEDBACK ~11:20 AM CT ask; tip channel `71428d11`.
+- **Ruling:** **SIGNED. Merge now** (`build-and-test` + `e2e-windows` both SUCCESS at look). (1) Four rooms whole-room empty in Home/Live shape SIGNED. (2) One root / four sentences SIGNED. (3) Per-room guards (wishlist / markers / Epic+Sky ticks) SIGNED. (4) No ⧉ ORDER SIGNED. (5) `ShellRoomIdentity` SIGNED.
+- **Ask answers:** (1) Measured-no-fix + `shellRoomFills` vs CELL SIGNED as right ShellWindow discharge. (2) Unphotographed empty NOT merge gate (same #303 / I-15). (3) Per-surface tab empty ACK stays open / own ask.
+- **Unchanged gates:** No WhatsNew/Version/publish/player door; Play Console OFF; no signing/prod secrets; do not cut `v1.99.19`; `EQBUDDY_SHELL` only. After merge: S2 Drops + History implement unblocked (pre-designs already signed). Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:50 AM CT
+
 ### Bevel History this-session half (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` HistoryWindow this-session merge Live parked; HELM-FEEDBACK ask; tip `54fc1dc3`; channel #310 `5eac16e9`.
