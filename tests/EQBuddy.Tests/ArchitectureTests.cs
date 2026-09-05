@@ -131,7 +131,24 @@ public class ArchitectureTests
         // top. Bumped down to the MINIMUM that fits (4158 × 1.1 = 4573 against 4,572
         // lines), by the same "one line and no more" rule the bump above used — so the
         // NEXT E-3 move must lift again, which is the whole point of the pressure.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4158),
+        //
+        // 4158 → 4123 on 2026-09-05 (E-3 PR 5, the Live room). **The lift came first
+        // again, and this time the ratchet is what forced it**: the file sat at 4,535
+        // against a 4,573 cap, so the Live room's ~35 lines of factory and accessors could
+        // not have been added at all without one. That is the pressure working exactly as
+        // the note above intended — "the NEXT E-3 move must lift again".
+        //
+        // What came out: `FillList` (the plain name/value row builder, ~70 lines) and
+        // `FillStatList` beside it, into `BreakdownRows.FillPairRows`/`FillStatRows`. **It
+        // is a lift and not a move because it has a SECOND CONSUMER** — the Live room's
+        // Damage tab draws the same procs, stances, area-spell and damage-taken lists the
+        // Combat card draws, and two builders for one row shape is trap 33's shape. The
+        // ~40 call sites in this file read unchanged through a one-line forwarder, which is
+        // what kept the diff to the extraction rather than to every caller.
+        //
+        // Bumped down to the MINIMUM that fits (4123 × 1.1 = 4535.3 against 4,535 lines),
+        // by the same "one line and no more" rule the two entries above used.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4123),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,158 | 4,572 | 4,573 | 1 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,123 | 4,535 | 4,535 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -165,6 +165,21 @@ one (`_gearLootWindow?.InventoryChanged()` → `FollowingSurfaces.InventoryChang
 which is where the list of satellite surfaces already lives). So the baseline is untouched
 and the pressure above still stands, unspent: **the next E-3 move that needs a line here
 lifts a surface first.** A PR that needs no room does not get to bank any.
+
+**Lowered 4,158 → 4,123 on 2026-09-05 (E-3 PR 5, the Live room), and the sentence above is
+what made it happen.** The file sat at 4,535 against a 4,573 cap, and the Live room needed
+about 35 lines of factory and accessors on the widget — so the lift came first, exactly as
+the pressure was designed to force. `FillList` (the plain name/value row builder) and
+`FillStatList` beside it moved into `BreakdownRows.FillPairRows` / `FillStatRows`.
+
+**It is a lift and not a relocation, and the difference is the second consumer.** The Live
+room's Damage tab draws the same procs, stances, area-spell and damage-taken lists the
+widget's Combat card draws; leaving the builder in the window would have meant a second
+one in the room, which is trap 33's shape (two producers of one row layout, each current,
+drifting the day one of them gains a column). The ~40 call sites in `MainWindow` read
+unchanged through a one-line forwarder, so the diff is the extraction rather than every
+caller. New baseline is again the MINIMUM that fits (4,123 × 1.1 = 4,535.3 against 4,535),
+which leaves zero headroom — the next WPF change lifts again.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment
