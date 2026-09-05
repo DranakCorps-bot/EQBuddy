@@ -44,194 +44,227 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
-### World Drops — the camp-worth-it half of Kills & Drops — pre-design (Bevel, 2026-09-05)
+### HistoryWindow's this-session half — the merge Live parked — pre-design (Bevel, 2026-09-05)
 
-**Priority:** `approved` (pre-design, last-look ask; unlocks Opus for World's fifth tab)
-**Place:** `src/EQBuddy.Core/WorldSurface.cs` (`WorldTab` enum, `LabelFor`/`KeyFor`/
-`TabForKey`/`Tabs`); `src/EQBuddy/WorldRoom.cs` (constructor, `Render`, `BuildTabs`,
-`DebugFacts`, doc comment lines 204-215); `src/EQBuddy/DropsCardView.cs` (own-instance
-construction, five `Debug*` int properties, no `DebugFacts()` method); `src/EQBuddy/
-CreatureWindow.xaml.cs` (existing v1 host, untouched — `new DropsCardView(main)` line 55);
-`src/EQBuddy/LiveRoom.cs` (the sibling precedent for both questions this ask turns on —
-`main.NewLiveSurfaces()` and its hand-written `shellLiveKillRows`/`shellLivePartyRows`
-facts); `src/EQBuddy/KillsCardView.cs` (checked for `DebugFacts()` absence, matching
-`DropsCardView`); `src/EQBuddy/DebugHooks.cs:40-52` (`EQBUDDY_DROPS`/`EQBUDDY_CREATURE`,
-both pointed at `CreatureWindow` only); `src/EQBuddy.UI.Shared/ShellPages.cs` (`RoomTabs`
-:154, `Describe` :216); `tests/EQBuddy.Tests/SurfaceOwnershipTests.cs` (`StillHandingOutBodies`
-empty; `TheOtherHostsBuildTheirOwnSurfacesToo` theory rows); `docs/BEVEL-v2-staging-critique.md`
-§2 Kills & Drops row; `FABLE.md`'s P1-5 disposition table.
-**Source:** tonight's ask. PR #306's own header (`LiveRoom.cs` lines 27-34, merged) named
-this out loud as the thing it deliberately did NOT take: *"`CreatureWindow`'s Drops tab is
-camp research — 'is this camp worth it' — which the disposition table's own Why column
-sends to World… Both are their own asks."* This is that ask, filed now that Live is landed
-and the HUD subtraction first-cut (Quests) is also filed. **All verified in source on tip
-`d55de151`** (post-#307 merge, current `main`). **Not a hold. Not needs-david. No player
-door proposed. No HUD subtraction — Drops was never a `MiniStats` card, so nothing here
-touches `OverlaySections`/`MiniStats`; this whole ask is additive to the shell only.
+**Priority:** `approved` (pre-design, last-look ask; unlocks Opus for `HistoryWindow`'s
+this-session half — Live's own PR named it and left it out, and my own Live pre-design §1
+named it a second time as "its own ask, same shape and same answer" as Kills & Drops' split)
+**Place:** `src/EQBuddy/HistoryWindow.xaml.cs` (398 lines, all of it — `RenderFights`/
+`OnCopyEncounter` :83-148, `RenderProgress` :236-261, `OnSaveMeta`/`OnCopySummary`/
+`OnExportJson`/`OnDelete`/`OnImportLog` :345-397); `src/EQBuddy.UI.Shared/HistoryViewModel.cs`
+(`UpdateSelectionDetail` :150-191 — one-shot snapshot load, no re-tick); `HistoryPresentation.cs`
+(`BuildDetail` :215, `BuildDpsGraph` :247); `src/EQBuddy.Core/SessionRepository.cs`
+(`ActiveEndReason` :32, `Query` :179 — does not filter it out); `src/EQBuddy/MainWindow.xaml.cs`
+(the 5-minute checkpoint gate :2551-2557; `OnHistory`/ctor :3415-3426); `MainWindow.xaml:39`
+(the one door — "Session history…", context menu only, no hotkey); `src/EQBuddy.Core/
+SessionStats.cs` (`StatsSnapshot.DamageTimeline` :2059, `.DamageBySource` :2067,
+`.HealsBySpell` :2092, `.Encounters` :2190/`.RecentEncounters` :2186 — all already-live,
+already-ticking fields); `src/EQBuddy/LiveRoom.cs` (doc comment :27-34 naming this ask and
+parking it; the five built sources :19-25); `src/EQBuddy/BreakoutWindow.xaml.cs` (`_lastFight`
+:406/456 — single fight only, no multi-pull list); `src/EQBuddy.UI.Shared/FightExport.cs` (the
+one shared Discord-export function, already called from `MainWindow`, `BreakoutWindow` AND
+`HistoryWindow`); `src/EQBuddy/ProgressRoom.cs:169-189` (`BuildTabs`, reads
+`ProgressTheme.Tabs`/`ProgressSurface.MovedToLive` — the one shared definition desktop, the v1
+window and the phone all read); `docs/BEVEL-v2-staging-critique.md` §2 row *History window*.
+**Source:** tonight's ask. Against the signed disposition table
+(`docs/BEVEL-v2-staging-critique.md` §2: *"History window | Merge | Progress (career) + Live
+(this session) | History studio depth stays desktop-only"*), Live's own PR #306 header (which
+names this exact split and explicitly does not build it), and my own Live pre-design §1 (which
+named it a second time, alongside Kills & Drops, as "its own ask"). **All verified in source on
+tip `54fc1dc3`** (post-#306 merge). **Not a hold. Not needs-david. No player door proposed.
 #208/#261/#262 untouched. No implement.**
 
 ---
 
-#### 1. Drops is the second-cleanest item in this whole shell effort, for the same reason Quests was the first
+#### 1. The disposition table names two destinations; the file actually does seven jobs, and the binary split hides which of them has nowhere named to go
 
-`CreatureSurface`'s own doc comment says it plainly: *"Drops has never been a card at all,
-only a menu entry."* No `OverlaySections` row, no `MiniStats` key, no settings migration —
-the same absence that made Quests the HUD subtraction pre-design's only clean first cut,
-arriving here from the opposite direction (nothing to subtract, because nothing was ever a
-card, rather than nothing to subtract despite being one). `WorldSurface.AbsorbedCardKeys`
-stays `["misc"]`; a fifth `WorldTab` member needs no entry there and no `SectionOrder`/
-`HiddenSections` migration, because Drops was never in either.
+Reading `HistoryWindow.xaml.cs` end to end rather than trusting the one-line table entry, it
+does: (a) filter/browse the full session list for a character, (b) select **two** sessions and
+render a comparison, (c) render one selected session's detail — overview, DPS-over-time graph,
+damage/heal breakdown rows, a chronological list of every pull with per-pull expand and a
+Discord-ready copy, (d) draw cross-session level/AA step charts for one character, (e) edit
+notes/tags on a session, (f) export a session's full snapshot as JSON, (g) delete a session, and
+(h) import an external log file as a new stored session. That is eight, not two, and "career +
+this session" is a real split only for (c) — the rest cluster on one side or don't cluster at
+all:
 
-**The concrete shape:** a fifth `WorldTab.Drops` member in `WorldSurface`, with
-`LabelFor`/`KeyFor("drops")`/`TabForKey`/`Tabs()` entries — mirroring what `LiveSurface`
-already did one PR ago, absorbing `LiveTab.Kills` and `LiveTab.Raids` alongside three meter
-tabs that were never card-shaped either. This is not an invented pattern; it is the second
-time this exact move has been made in this codebase, by the room built immediately before
-this one. `WorldRoom`'s constructor builds `new DropsCardView(main)` directly — the exact
-line `CreatureWindow.xaml.cs:55` already uses, and the exact shape `SurfaceOwnershipTests`'
-`TheOtherHostsBuildTheirOwnSurfacesToo` theory already permits for that file. No new
-`MainWindow` factory is needed: `DropsCardView`'s constructor takes only `MainWindow main`,
-and unlike `KillsCardView`/`RaidsCardView` (which needed `main.NewLiveSurfaces()` because the
-widget itself was also drawing a `KillsCardView` instance it could not share), nothing else
-in this codebase currently holds a `DropsCardView` — it was only ever the window's.
+| Job | Career or this-session | Where the table's wording puts it | Confidence |
+|---|---|---|---|
+| (a) Browse/filter session list | Career | Progress | High — it is literally "which past sessions" |
+| (b) Two-session comparison | Career | **Not named** | The table says nothing about comparison; it is career-shaped by nature (you cannot compare a running session against itself) so it reads onto Progress, but nobody has said so |
+| (c) Selected-session detail (graph/breakdown/encounters) | **Both, depending on WHICH session is selected** | Progress for an ended row, Live for the active one | This is the one row the table's wording actually describes — see §2 for why it is not a clean cut |
+| (d) Cross-session level/AA charts | Career | Progress | High — explicitly "every stored session" |
+| (e) Notes/Tags | Career | **Not named** | Per-session metadata on a row that only exists once a session is stored; Progress |
+| (f) Export JSON | Career | **Not named** | Same as (e) |
+| (g) Delete | Career | **Not named** | Same |
+| (h) Import log | Career | **Not named** | Adds a stored row; Progress, by the same reasoning as (a) |
 
----
-
-#### 2. The navigation grammar already carries a fifth tab for free — verify it, don't build it
-
-`ShellPages.RoomTabs(ShellPage.World)` (`ShellPages.cs:154`) already reads live off
-`WorldSurface.Tabs()` rather than a hand-maintained list — the exact "one grammar" seam
-`FABLE.md`'s Phase 2 sketch asked for. Once `WorldTab.Drops` exists in `WorldSurface`,
-`world:drops` becomes a valid `page:room` address with **no edit to `ShellPages.cs` or
-`ShellHost.cs` beyond what `WorldSurface` itself defines** — this is the grammar's first
-real test past the four tabs it launched with, and it should just work if `WorldSurface` is
-built correctly. Worth stating as a thing to CONFIRM rather than assume, per this codebase's
-own trap 55 lesson about staging lists that look complete and aren't.
-
-**One thing to say out loud so nobody wires it the other way:** `EQBUDDY_DROPS` and
-`EQBUDDY_CREATURE` (`DebugHooks.cs:40-52`) stay pointed at `CreatureWindow` — the v1 lane,
-untouched, per Live's own header for the Kills half applied here to Drops. The shell's Drops
-tab gets its own address through the `page:room` grammar (`EQBUDDY_SHELL=world:drops`), not
-a shared hook. Two independent doors to two independent hosts of the same content, exactly
-the shape Live and `CreatureWindow`'s Kills tab already have today.
+**Five of eight jobs have no destination in the signed table at all.** That is not a defect in
+the table — "History window | Merge | Progress (career) + Live (this session)" was written as a
+one-line disposition entry for a whole-product pass, not a room-level spec — but an executor
+reading only that line would be handed four jobs ((b), (e), (f), (g)) with nowhere to put them,
+and the honest reading of "not named" is "goes with the rest of career, on Progress," not
+"drop it." I am naming that reading here so it is a decision someone made rather than an
+omission nobody notices until a player asks where the Delete button went.
 
 ---
 
-#### 3. The debug-facts shape has two live precedents in this codebase, and Drops matches the one `WorldRoom`'s own comment doesn't mention
+#### 2. The one row the table DOES describe is not a clean cut, because "this session" in `HistoryWindow` today is not live
 
-`WorldRoom`'s own doc comment (lines 204-215) states a rule for its dump: ask each child view
-for its own `DebugFacts()` string and mechanically re-prefix it
-(`ShellDumpFacts.Prefixed("shellWorld", _map.DebugFacts())`, etc.) rather than hand-writing a
-list — true, and checked, for all four of today's views: `MapView`, `SpawnsView.xaml.cs`,
-`TravelView.cs` and `TravelsView.xaml.cs` all define `DebugFacts()`.
+Job (c) is the only piece the table actually splits by session state, and reading how it is
+built today, the split is not "the same feature, read from two sources" — it is one feature that
+happens to look like it covers the live case and does not, in a way that would be genuinely
+worse if carried into Live unexamined.
 
-**`DropsCardView` does not, and neither does `KillsCardView` — checked, neither file defines
-it.** `LiveRoom` went through this exact question for Kills one PR ago and did NOT add one:
-it hand-writes `shellLiveKillRows={_kills.KillRowCount}` and
-`shellLivePartyRows={_kills.PartyRowCount}` straight off the two int properties
-`KillsCardView` already exposes (`LiveRoom.cs`'s own `DebugFacts()`, and its comment
-explains why — two of its facts exist "to be COMPARED with a v1 window that is still open").
+**The data is up to five minutes stale, and it never refreshes after that.**
+`MainWindow.xaml.cs:2553` checkpoints the active session into the store only every five minutes
+(`DateTime.Now - _lastCheckpoint > TimeSpan.FromMinutes(5)`) — "so a crash loses little," per its
+own comment, which is the right reason for a checkpoint and the wrong shape for a live view.
+`SessionRepository.Query` does not filter `ActiveEndReason` rows out (`SessionRepository.cs:32`,
+`:179`), so a player who opens History mid-session and clicks the top row **can** select the
+running session today — and `HistoryViewModel.UpdateSelectionDetail` (`:150-191`) loads that
+row's snapshot **once**, on selection, with nothing wired to reload it while the window stays
+open. So the picture a player sees is frozen at whatever the last five-minute checkpoint caught,
+for as long as they keep the window up — in the one surface whose replacement's entire reason
+for existing is that the numbers move.
 
-Drops is the same shape: five int properties already sitting on `DropsCardView`
-(`DebugMobCount`, `DebugRowCount`, `DebugItemCount`, `DebugFilterLength`,
-`DebugRecheckCount`), no `DebugFacts()` string, and `CreatureWindow.xaml.cs`'s own
-`DebugFacts()` already hand-assembles them the same way (`dropsMobs=`, `dropsRows=`, etc.).
-**The precedent-consistent move is `shellWorldDropsMobs={_drops.DebugMobCount}` etc.,
-hand-written the way Live just did for Kills** — not a new `DebugFacts()` method invented
-for `DropsCardView` that nothing else would call. I am naming this because `WorldRoom`'s own
-comment reads like a rule that would steer an implementer toward the WRONG precedent for
-this specific case if they matched the letter of the comment instead of checking what its
-own sibling room did for the same-shaped view one PR earlier — the two precedents agree on
-the principle (facts come from the view, not re-derived) and disagree on the mechanism only
-because the views themselves are shaped differently, which is exactly the kind of thing that
-doesn't show up in a comment written before the second case existed.
-
-**No collision, but the pairing is the point, same as Live's:** `shellWorldDropsRows` next
-to `CreatureWindow`'s existing unprefixed `dropsRows=` lets the E2E suite assert the two
-describe the same moment — the same comparison `shellLiveKillRows`/`kills=` already buys for
-Kills, and trap 58's fix (one flat dump namespace, prefixed per host) is exactly what keeps
-the two from colliding while still being comparable.
-
-**Mechanical, and belongs in the same diff:** `SurfaceOwnershipTests.TheOtherHostsBuildTheirOwnSurfacesToo`
-needs a new row — `[InlineData("WorldRoom.cs", "new DropsCardView(main)")]` — the positive
-half of the guard that would otherwise sail past a `WorldRoom` that reached for a shared
-accessor instead of building its own.
+**This is not a data-availability problem, so the fix is not "checkpoint more often."**
+`StatsSnapshot` — the same object `MainWindow.CombatSection`, `HealingSection` and all five of
+Live's other sources already read every tick — already carries `DamageTimeline`
+(`SessionStats.cs:2059`), `DamageBySource` (`:2067`), `HealsBySpell` (`:2092`) and the full
+`Encounters` list (`:2190`) as live, in-memory fields, recomputed every tick whether or not
+anyone ever checkpoints them to disk. `HistoryPresentation.BuildDetail` (`:215`) is built
+entirely from a `SessionRow` plus a `StatsSnapshot` — it does not know or care that the one it is
+handed came from a five-minute-old JSON blob rather than this tick's live object. **The merge's
+correct shape is: for the active session, build the same `HistoryDetail` from
+`MainWindow.CurrentSnapshot()` directly, the way Live's other five sources already do, and never
+route through the checkpoint at all.** Reading the checkpoint is right for what it is for
+(crash recovery, and — after the split — Progress's career browse of sessions that have
+actually ended); reading it for what Live needs would import a five-minute lie into the one room
+David is looking at while it is happening.
 
 ---
 
-#### 4. One rail-copy gap this uncovers — named, not blocking
+#### 3. What's genuinely new content for Live, and one real naming collision to avoid
 
-`ShellPages.Describe(ShellPage.World)` reads *"The zone's map, your camps, spawn timers and
-how to get there"* — four clauses for four tabs. It should gain a fifth when Drops lands,
-the same discipline `Describe`/`Label`/`IconName` already got for Live and Quests when their
-own disposition-table entries shipped. Small, but it is player-visible text (the rail's only
-copy when collapsed to icons) and this PR is the moment it stops being accurate to leave as
-written.
+Comparing job (c)'s four pieces against Live's five already-built sources (`LiveRoom.cs:19-25`)
+turns up an even split — two are duplicates waiting to happen, two are real gaps:
 
-**Adjacent, and explicitly not this PR's to close:** `Describe(ShellPage.Gear)` already says
-*"…and what dropped for you"* — the disposition table's FOURTH Kills & Drops destination,
-which the HUD subtraction pre-design's own inventory already marked as one of the "3 of 4
-destinations [that] don't exist yet." That gap predates this ask. Naming it only so nobody
-reads Gear's tooltip as evidence the four-way split is further along than it is — World
-landing does not make Gear's or Search's halves any less their own asks.
+| History's this-session piece | Reads from | Already in Live? |
+|---|---|---|
+| Damage/heal breakdown rows (by ability/spell) | `DamageBySource` / `HealsBySpell` | **Yes** — Live's Damage and Healing meter panes already read the identical fields off the identical snapshot |
+| DPS-over-time graph (one point per minute, whole session) | `DamageTimeline` | **No** — Live's `TimelinePane` is sourced from `FightTimelineWindow`, which draws one PULL's per-event lanes, not the whole session's per-minute polyline. Different granularity, same word |
+| Chronological pull-by-pull list, expand + Discord copy per pull | `Encounters` grouped via `EncounterGrouping` | **No** — checked `BreakoutWindow.xaml.cs:406/456`: its Damage tab tracks only `LastFightInfo`, the single most recent fight. Nothing in Live today shows more than one fight at a time |
+| Per-pull Discord export | `FightExport.ToText` | **Already shared** — this one function is already called from `MainWindow` (Combat card, live), `BreakoutWindow` (Damage breakout, live) and `HistoryWindow` (any stored pull). Live's per-pull button is a fourth caller of an already-correct seam, not a new one |
 
----
+**The naming collision is worth flagging before anyone writes a tab label.** Live already has a
+tab called "Timeline" (source #4, `FightTimelineWindow`'s per-event lanes for one fight). A plan
+that reads "History has a DPS-over-time graph" and reaches for the obvious label would put a
+second, differently-scoped thing under the same word on the same strip — the per-event zoom
+timeline and the per-minute session overview answer different questions ("what happened in this
+one pull" vs. "how has this whole sitting gone") and a player has no way to tell which one a tab
+labelled "Timeline" is about to show. Whoever builds this should name the session-wide graph
+something that is not "Timeline," or fold it into an existing tab's header rather than adding a
+seventh strip entry.
 
-#### 5. Layout — checked, not assumed, same discipline every room here has gotten
-
-`DropsCardView.Body` is a single-column `StackPanel` (filter/export bar, footer, mob list) —
-no list beside a detail pane, so `WorldRoom.ApplyLayout` should stay exactly as empty as it
-is today; nothing about Drops changes the "no `RoomSinglePane` case" reasoning already in the
-room's own comment.
-
-**One real width risk, named as a thing to shoot first, not a ruling:** the filter/export bar
-is a four-column `Grid` — the filter as the star column, three auto-sized, text-labelled
-buttons ("Copy text", "Copy CSV", "Save CSV…") — and the file's own remarks say it was "sized
-for a 560px window." `MinRoomWidth` is 520. Predict the picture before shooting it (trap
-23/51): three labelled buttons beside a filter box is exactly the row shape that clips or
-wraps ugly first at a floor width, the same shape Quests' `SplitRoomWidth` bump (640→700) was
-picture-proven for. Not asking for a bump now — asking that this specific row be the first
-thing shot at 520, rather than assumed fine because Map/Camps/Routes/Travels already are.
+**And the two duplicates are a real design question, not a foregone one.** Does the merge ADD a
+pull-by-pull list and a session graph as new tabs on Live, or does it ENRICH the existing
+Damage/Healing tabs with that depth (the breakdown-by-ability rows Live already shows plus the
+pull list underneath)? I am not answering that — it is a layout call for whoever builds the
+room, not a product-boundary question — but naming it now is cheaper than discovering it after
+two competing renderings of `DamageBySource` ship on the same room.
 
 ---
 
-#### 6. What is NOT in this pass
+#### 4. Progress's half is a bigger IA change than "career" sounds, and it breaks an assumption the shared tab module currently makes
 
-- **No HUD subtraction.** Drops was never a `MiniStats` card; there is nothing to remove
-  from the widget. The HUD subtraction pre-design's `kills` row (blocked, its own ask, star
-  writer with no fallback) is unaffected and not reopened here.
-- **`CreatureWindow` (v1) is untouched.** Both its Kills and Drops tabs keep working exactly
-  as they do today — the same rule Live's own header already stated for the Kills half,
-  applied here to Drops.
-- **Search's lookup destination and Gear's "what dropped for you" destination** — both
-  unbuilt, both their own asks, not riders on this one (per §4 and per Live's §1, which
-  already ruled the same for the other two of the four-way split).
-- **The player door.** Reachable only via `EQBUDDY_SHELL`, as every room so far.
+`ProgressRoom.BuildTabs` (`:169-189`) reads its tab strip from `ProgressTheme.Tabs`, filtered by
+`ProgressSurface.MovedToLive` — **one definition** that the v1 `ProgressWindow` and EQBuddy
+Mobile both read too, which is exactly the shared-seam discipline that stopped #184/#210 from
+happening a third time. Today that module knows three live tabs (Experience, Wealth, Faction)
+plus Raids, filtered out because it moved. Adding History's career half means adding a genuinely
+new tab to that same shared list — and the table's own Why column says *"History studio depth
+stays desktop-only,"* which is the first tab in Progress's short life that is NOT meant to show
+up wherever the other three do. `ProgressSurface.MovedToLive` is a filter for "this tab left
+Progress entirely, everywhere"; there is no existing filter for "this tab exists on Progress but
+only on the desktop shell, never on the phone." **That is a new kind of row in a module three
+surfaces already trust to agree, not an addition to the existing pattern** — worth deciding
+before the tab is built, because getting it wrong is exactly the shape (#184: one surface
+quietly behind the other two) this module exists to prevent.
+
+**And the content itself is list-shaped, not arithmetic-shaped.** Every tab Progress has built
+so far — Experience, Wealth, Faction — is a `RoomSinglePane`, one-column arithmetic surface, the
+same case Home and Progress's other tabs already have three empty `ApplyLayout` implementations
+of. A session-browse tab carrying a filterable list, a two-item comparison, notes/tags editing
+and per-session detail is the same list-beside-detail shape Quests' Turn-ins tab exercised at the
+640px `RoomSinglePane` threshold — the first time Progress would need that layout rather than
+assume the arithmetic case. Predict the picture before it is shot, the same way Quests' entry
+asked for, rather than discovering the layout needs a second axis after it is built.
 
 ---
 
-- **Already shipped (checked on tip `d55de151`):** World room at four tabs, `Landed`;
-  `WorldSurface.AbsorbedCardKeys` = `["misc"]` only, no Drops-shaped migration needed since
-  Drops was never a card; `LiveRoom`'s Kills-tab precedent for both the own-instance
-  construction question and the hand-written-facts-over-a-new-`DebugFacts()`-method
-  question; `ShellPages.RoomTabs`/`Describe`/`SurfaceOwnershipTests` all read as cited.
-- **Checked:** `WorldRoom.cs`, `WorldSurface.cs`, `CreatureSurface.cs`,
-  `CreatureWindow.xaml.cs`, `DropsCardView.cs` in full; `KillsCardView.cs` (for
-  `DebugFacts()` absence only); `LiveRoom.cs` in full; `ShellPages.cs`'s `RoomTabs`/`Key`/
-  `Label`/`IconName`/`Describe`; `SurfaceOwnershipTests.cs` in full; `DebugHooks.cs`'s
-  `EQBUDDY_DROPS`/`EQBUDDY_CREATURE` block; `docs/BEVEL-v2-staging-critique.md` §2's Kills &
-  Drops row; `FABLE.md`'s disposition-table reference to World; `HELM.md`'s #306 sign-off
-  and the Live pre-design entry above.
-- **Not checked this run:** `CompanionSurfaces.cs`/EQBuddy Mobile's own Drops routing —
-  grepped, and found no mapping at all, only a comment placeholder naming the eventual
-  four-way split. That means mobile parity for World's Drops tab is a real, separate gap;
-  naming it as a place to look rather than ruling on it, since the task scope named World
-  only and trap 35's rule (an affordance the phone cannot honour is not parity) applies to
-  whoever takes that ask, not to this one. The running app (did not run `shoot.ps1`).
+#### 5. What happens to `HistoryWindow` itself is not decided by "Merge," and it has exactly one door today
+
+`HistoryWindow` has a single way in — `MainWindow.xaml:39`, the widget's context menu, "Session
+history…" — and no second, independent path the way Quests had `toggleQuests`. The disposition
+table's "Merge" verdict does not say whether the v1 pop-out retires once its two halves land on
+Progress and Live (the way Motes and the folded cards did) or survives beside them as the deep
+"studio" surface (the way `ProgressWindow`/`GearLootWindow`/`WorldWindow`/`QuestsWindow` still do
+next to their rooms) — and "History studio depth stays desktop-only" in the table's Why column
+reads as evidence for the second reading (something is being called "studio depth" and kept
+somewhere), but it does not say where. **I am not ruling on this — it is a Fable/Opus call once
+the two rooms exist — but §1's four homeless jobs make it load-bearing rather than cosmetic**:
+Compare, Export JSON, Delete and Import log have no named destination in the table at all, and
+if the answer turns out to be "`HistoryWindow` retires," those four need a home on Progress's new
+tab BEFORE the window that currently carries them goes away, not as a follow-up once a player
+asks where Delete went. If the answer is "`HistoryWindow` survives as the studio," the one
+context-menu door needs to keep working exactly as it does today, and the split only changes
+what Live/Progress ALSO show, not what the window itself does.
+
+---
+
+#### 6. What does NOT change / not in this pass
+
+- **Nothing is subtracted from the widget.** `MainWindow.CombatSection`/`HealingSection`,
+  `BreakoutWindow`, `FightTimelineWindow`, `CreatureWindow`'s Kills tab and `RaidsCardView` all
+  keep working exactly as they ship today — this pass is additive to Live and to Progress, per
+  the same per-item HUD gate my own prior entries already ruled (room landed + chip shipped +
+  screenshot parity, and `HistoryWindow` was never a `MiniStats`/`OverlaySections` card to begin
+  with, so that gate does not even apply to it directly).
+- **Live's five already-built sources are not re-opened.** This entry adds to Live's tab set (or
+  enriches two of its existing tabs, per §3); it does not change how Damage, Healing, Pet,
+  Timeline or Kills render today.
+- **`CreatureWindow`'s Drops tab and the rest of Kills & Drops' four-way split** — still its own
+  ask, unchanged from Live's §1 and my own HUD-subtraction §6.
+- **No WhatsNew/Version/publish/player door.** Every room this touches is reachable today only
+  by a dev session under `EQBUDDY_SHELL`.
+- **The room-level empty-state wrapper gap** (signed 2026-09-04, still unbuilt per my last two
+  entries) applies here too and is not this pass's to close — whoever builds Progress's new tab
+  should know a genuinely empty one (a fresh profile with one session and nothing to compare) is
+  the state a new player sees first, same as Quests and Home already found.
+
+---
+
+- **Already shipped (checked on tip `54fc1dc3`):** Live's five sources and its own header
+  explicitly naming and parking this exact split; `FightExport.ToText` already shared across
+  three call sites; `ProgressTheme.Tabs`/`ProgressSurface.MovedToLive` as the one definition
+  desktop, the v1 window and the phone all read; the disposition table row and its Why column.
+- **Checked:** `HistoryWindow.xaml.cs`, `HistoryViewModel.cs`, `HistoryPresentation.cs` in full;
+  `SessionRepository.cs`'s `Query`/`ActiveEndReason`/checkpoint schema; the 5-minute checkpoint
+  gate in `MainWindow.xaml.cs`; `StatsSnapshot`'s `DamageTimeline`/`DamageBySource`/
+  `HealsBySpell`/`Encounters`/`RecentEncounters` fields; `LiveRoom.cs` in full;
+  `BreakoutWindow.xaml.cs`'s `_lastFight` field and its Damage-tab scope; `FightExport.cs`'s
+  three call sites; `ProgressRoom.cs`'s `BuildTabs`; `MainWindow.xaml`'s context menu for
+  `HistoryWindow`'s one door.
+- **Not checked this run:** whether `EncounterGrouping.Group` includes a pull that is still
+  in progress (an unfinished fight) or only completed ones — matters for whether Live's
+  pull-list would show "fighting now" as its own row; the running app (did not run
+  `shoot.ps1`); the Avalonia-era mobile `⚙ Screens` picker's current behavior for Progress
+  (its mapping table was read for the Live entry, not re-read here); whether a comparison of
+  two sessions makes sense to keep as a feature at all once career browsing has a room of its
+  own, rather than a question this pre-design needs to answer.
 
 — Bevel (Claude Sonnet 5)
-
----
 
 ---
 
