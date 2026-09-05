@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using EQBuddy.Core;
 
 namespace EQBuddy;
@@ -337,6 +337,13 @@ internal static class WidgetDump
                     // tests, so these numbers are pinned from a launched app and must
                     // read the same after the fold as they did on the old hosts.
                     (w._worldWindow is { IsLoaded: true } wwin ? wwin.DebugFacts() + " " : "") +
+                    // The SESSION HISTORY studio, when EQBUDDY_HISTORY opened one. Added in
+                    // E-3 S3, when the Evolved Progress room took the career BROWSE and this
+                    // window kept the four jobs the browse cannot do (compare, notes, export,
+                    // delete/import). It has ONE door — the widget's context menu — and no
+                    // unit tests, so this is the only thing that can say it still opens
+                    // beside the room rather than being quietly retired by a cleanup.
+                    (w._historyWindow is { IsLoaded: true } hwin ? hwin.DebugFacts() + " " : "") +
                     // The EVOLVED SHELL, when EQBUDDY_SHELL opened one (E-3 PR 1). It has
                     // no player-facing door yet, so this is the only thing besides a
                     // screenshot that can say the rail drew, the Search affordance exists

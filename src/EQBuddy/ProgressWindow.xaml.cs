@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using EQBuddy.Core;
@@ -249,9 +249,16 @@ public partial class ProgressWindow : Window, IFollowingSurface
     private void BuildTabs(StatsSnapshot s)
     {
         _tabs.Clear();
+        // **The v1 window draws no History tab, and the refusal is the point.**
+        // `HistoryWindow` is already the desktop's career surface and it keeps its one
+        // context-menu door this pass (Helm, 2026-09-05, item 5); a third host for one
+        // surface is trap 58 before it is anything else. The predicate is
+        // `ProgressSurface.DesktopShellOnly` rather than a `!= History` typed here, so the
+        // four hosts of this module read one answer instead of four (trap 55).
         foreach (var header in ProgressTheme.Tabs(
                      s, _main.ProgressDingUnlockCount(s),
-                     _raids.DefeatedCount, RaidTargetCatalog.Default.BossCount))
+                     _raids.DefeatedCount, RaidTargetCatalog.Default.BossCount)
+                 .Where(h => !ProgressSurface.DesktopShellOnly(h.Tab)))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>

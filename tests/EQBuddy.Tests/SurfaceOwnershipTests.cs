@@ -1,4 +1,4 @@
-﻿namespace EQBuddy.Tests;
+namespace EQBuddy.Tests;
 
 /// <summary>
 /// **A control NEVER moves between two windows on Avalonia** — the rule PR A exists to make
@@ -94,6 +94,15 @@ public class SurfaceOwnershipTests
     [InlineData("QuestsView.xaml.cs")]
     [InlineData("QuestsRoom.cs")]
     [InlineData("WorldWindow.xaml.cs")]
+    // E-3 PR 5 / S3: the two shell rooms that host surfaces the widget and the v1 windows
+    // ALSO draw. They are the live case this scan's header predicts — *"E-3's shell is about
+    // to become a second host for surfaces the widget still renders"* — and a room is the
+    // most natural place for somebody to write a `TabBody(tab)` accessor, because it has one
+    // body slot and several tabs to fill it from.
+    [InlineData("ProgressRoom.cs")]
+    [InlineData("LiveRoom.cs")]
+    [InlineData("CareerHistoryView.cs")]
+    [InlineData("LiveSessionPanes.cs")]
     public void NoHostInterfaceHandsOutATabBody(string file)
     {
         var path = Path.Combine(Src, "EQBuddy", file);
@@ -171,6 +180,17 @@ public class SurfaceOwnershipTests
     // in a diff, a build and a screenshot. No factory: nothing else in the codebase holds a
     // DropsCardView, so constructing it outright is as fresh as calling one.
     [InlineData("WorldRoom.cs", "new DropsCardView(main)")]
+// E-3 PR 5: the Live room builds the widget's two Live surfaces through the factory and
+    // its own four panes outright — never the breakout's or the widget's instances.
+    [InlineData("LiveRoom.cs", "main.NewLiveSurfaces()")]
+    // E-3 S3: the History merge's two panes and the career browse, each constructed by the
+    // one room that shows it. The career view is the interesting row — `HistoryWindow` is
+    // still open beside it (it is not retired this pass), so a shared instance would be
+    // exactly the two-hosts-one-UIElement condition, silently, on WPF.
+    [InlineData("LiveRoom.cs", "new LiveSessionPanes.PacePane(this)")]
+    [InlineData("LiveRoom.cs", "new LiveSessionPanes.EncountersPane(this, Who)")]
+    [InlineData("ProgressRoom.cs", "new CareerHistoryView(")]
+    [InlineData("ProgressRoom.cs", "main.NewProgressSurfaces()")]
     public void TheOtherHostsBuildTheirOwnSurfacesToo(string file, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", file));

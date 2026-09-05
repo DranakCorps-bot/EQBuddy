@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -64,8 +64,15 @@ internal static class ProgressThemeCard
 
         var card = new ThemeCardView<ProgressTab>(
             section, bodyHost, host,
+            // **The inline card draws no History tab.** A 320-unit card cannot hold a list
+            // beside a detail pane, and nothing is lost by the refusal: the career browse is
+            // the Evolved Progress room's and the studio window is one context-menu click
+            // away. `ProgressSurface.DesktopShellOnly` is the one place that decides, so
+            // this host and the phone and the v1 window cannot answer it three ways
+            // (trap 55).
             tabs: s => ProgressTheme
                 .Tabs(s, dingUnlocks(s), raidsDefeated(), RaidTargetCatalog.Default.BossCount)
+                .Where(t => !ProgressSurface.DesktopShellOnly(t.Tab))
                 .Select(t => new ThemeCardTab<ProgressTab>(t.Tab, t.Label, t.Value))
                 .ToList(),
             modeFor: ProgressSurface.InlineModeFor,

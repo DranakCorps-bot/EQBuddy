@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -51,6 +51,21 @@ namespace EQBuddy;
 ///    typed here**, so the desktop room and the phone read one answer rather than two
 ///    hand-maintained lists (trap 55, which cost #252).
 ///
+/// **A FIFTH TAB ARRIVED IN E-3 S3, and it is a new KIND of tab** — History, the career
+/// half of <c>HistoryWindow</c>'s merge (Bevel's History pre-design §1/§4, Helm-signed
+/// 2026-09-05 ~10:10 AM CT). Two things about it are unlike the other four:
+///
+///  * **It is the only tab in <see cref="ProgressSurface"/> that is not on every surface.**
+///    <see cref="ProgressSurface.DesktopShellOnly"/> is the predicate, and this room is the
+///    one host that does NOT filter it out — the phone, the v1 <see cref="ProgressWindow"/>
+///    and the widget's inline card all do. That is a second kind of row in a module three
+///    surfaces trust to agree, which is exactly why it is a predicate on the surface rather
+///    than a list typed in four places (trap 55, which cost #252).
+///  * **It is the first Progress tab that is not one column of arithmetic**, so
+///    <see cref="ApplyLayout"/> stops being empty: a list beside a detail pane is the one
+///    thing <see cref="ShellLayout.RoomSinglePane"/> decides, and Quests was its only
+///    consumer until now.
+///
 /// **Scrolling belongs to the host** (trap 36), and the host here is the room's own
 /// bounded <c>*</c> cell in the shell — a real overflow, not the infinite-height measure
 /// that makes a child scroller swallow the wheel and scroll nothing. The tab strip stays
@@ -68,15 +83,27 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     /// them.</summary>
     public void Release() { }
 
-    /// <summary>Nothing to arrange. Every Progress tab is a single column of arithmetic —
-    /// there is no list beside a detail pane to collapse, which is the only thing
-    /// <see cref="ShellLayout.RoomSinglePane"/> decides. Empty with a reason rather than
-    /// absent, per the interface's own contract.</summary>
-    public void ApplyLayout(ShellLayout layout) { }
+    /// <summary>
+    /// **No longer empty, and the sentence it used to carry is why the History tab needed
+    /// this note.** It said *"every Progress tab is a single column of arithmetic — there is
+    /// no list beside a detail pane to collapse"*, which was true of Experience, Wealth and
+    /// Faction and stopped being true the moment a session browse landed here. Bevel §4
+    /// predicted exactly that.
+    ///
+    /// Handed straight to the view, which owns the arrangement. A one-line forward on
+    /// purpose: the room must not cache the answer or re-derive it, or there would be two
+    /// producers of one boolean disagreeing at exactly the boundary a resize bug lives on
+    /// (trap 33). The three arithmetic tabs are unaffected — they never look at it.
+    /// </summary>
+    public void ApplyLayout(ShellLayout layout) => _career.SinglePane = layout.RoomSinglePane;
 
     private readonly MainWindow _main;
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();
+
+    /// <summary>The room's one scroller. A field since E-3 S3 because the History tab turns
+    /// it OFF — see <see cref="Render"/>.</summary>
+    private readonly ScrollViewer _scroll;
 
     /// <summary>Everything this room draws when it has something to draw: the tab strip and
     /// the body under it, in their own Grid so the whole page is ONE thing to collapse when
@@ -95,6 +122,8 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     private bool _empty;
 
     private ProgressTab _tab = ProgressSurface.DefaultInlineTab;
+
+    private readonly CareerHistoryView _career;
 
     private readonly ProgressCardView _experience;
     private readonly MoneyCardView _money;
@@ -123,14 +152,14 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         _page.Children.Add(strip);
         _tabs = new EqSegmentedStrip(strip);
 
-        var scroll = new ScrollViewer
+        _scroll = new ScrollViewer
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Margin = new Thickness(Tok.SpaceL, Tok.SpaceM, Tok.SpaceL, Tok.SpaceM),
             Content = _body,
         };
-        SetRow(scroll, 1);
-        _page.Children.Add(scroll);
+        SetRow(_scroll, 1);
+        _page.Children.Add(_scroll);
 
         // FOUR of the five, since E-3 PR 5. `surfaces.Raids` is still built — the v1
         // `ProgressWindow` needs it — and this room simply does not take it; see the type's
@@ -143,6 +172,13 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         _wealthBody.Children.Add(_money.Body);
         _wealthBody.Children.Add(CardParts.BlockLabel("Motes", hidden: false));
         _wealthBody.Children.Add(_motes.Body);
+
+        // The career browse. It is handed the two accessors rather than the widget: the
+        // repository lives on `MainWindow` and only the widget knows which (server,
+        // character) its rows are keyed by, which is the same shape `LevelHistoryMemo`
+        // already takes for the expensive half.
+        _career = new CareerHistoryView(
+            main.StoredSessions, main.StoredLevelDings, () => main.QuestCharacterKey);
     }
 
     /// <summary>Land on a tab by its wire key — the second half of a <c>page:room</c>
@@ -160,6 +196,10 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         if (ProgressSurface.TabForKey(key) is not { } tab) return;
         if (ProgressSurface.MovedToLive(tab)) return;
         _tab = tab;
+        // Entering History re-reads the store. Its memo is keyed on what can add a row while
+        // the app runs (a session ending), and an IMPORT from the studio is the one event
+        // that adds one without a session rolling — so arriving at the tab asks again.
+        if (tab == ProgressTab.History) _career.Invalidate();
         Render(_main.CurrentSnapshot());
     }
 
@@ -190,12 +230,23 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         {
             ProgressTab.Wealth => _wealthBody,
             ProgressTab.Faction => _faction.Body,
+            ProgressTab.History => _career,
             _ => _experience.Body,
         };
+        // **History is a CELL-FILLING pair of panes and everything else is a column.** A
+        // ScrollViewer whose vertical scrolling is DISABLED constrains its child to the
+        // viewport instead of measuring it with infinite height, which is what a
+        // list-beside-detail layout needs and exactly what a column of arithmetic must not
+        // have. One line rather than a second scroller per tab, and it is the host deciding
+        // — scrolling belongs to the host (trap 36). `LiveRoom` makes the same call for its
+        // Timeline canvas.
+        _scroll.VerticalScrollBarVisibility = _tab == ProgressTab.History
+            ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
         switch (_tab)
         {
             case ProgressTab.Wealth: _money.Render(s); _motes.Render(s); break;
             case ProgressTab.Faction: _faction.Render(s); break;
+            case ProgressTab.History: _career.Render(s); break;
             default: _experience.Render(s); break;
         }
     }
@@ -222,9 +273,14 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         // and the v1 window uses the fourth — and this room filters the one that moved. The
         // filter is `ProgressSurface.MovedToLive` rather than a `!= Raids` typed here, so
         // there is one place that says where a Progress tab lives and the phone reads it too.
+        // The History badge is the ROW COUNT the career view already has, not a second
+        // read of the store: the view memoises the query (a session joins the store when one
+        // ends), and a badge that queried SQLite on its own every tick would be both the
+        // cost and trap 33's two producers of one number.
         foreach (var header in ProgressTheme.Tabs(
                      s, _main.ProgressDingUnlockCount(s),
-                     _main.RaidsDefeatedCount, RaidTargetCatalog.Default.BossCount)
+                     _main.RaidsDefeatedCount, RaidTargetCatalog.Default.BossCount,
+                     _career.RowCount)
                  .Where(h => !ProgressSurface.MovedToLive(h.Tab)))
         {
             var tab = header.Tab;
@@ -258,5 +314,9 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         $"shellProgressTabs={_tabs.Count} " +
         $"shellProgressMotesRows={_motes.RowCount} " +
         $"shellProgressFaction={_faction.RowCount} " +
-        $"shellProgressSkills={_experience.SkillRows}";
+        $"shellProgressSkills={_experience.SkillRows} " +
+        // The career tab's own facts, re-keyed mechanically rather than re-implemented —
+        // the dump is one flat namespace and a second host of this view would otherwise
+        // write the same keys (trap 58).
+        ShellDumpFacts.Prefixed("shellProgress", _career.DebugFacts());
 }

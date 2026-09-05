@@ -1,4 +1,4 @@
-using EQBuddy.Companion;
+﻿using EQBuddy.Companion;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -519,19 +519,49 @@ public class SurfaceParityTests
         Assert.Empty(Progress().LevelUps!);
     }
 
-    /// <summary>The phone's strip is the Evolved ROOM's tab list, in the surface's own
-    /// order. **It was every <c>ProgressTab</c> until E-3 PR 5** — the enum still has four
-    /// and the v1 window still draws four; what both Evolved hosts draw is the enum minus
-    /// what the reshape moved, and reading that from the same predicate rather than from a
-    /// list typed here is the whole anti-drift argument (trap 55).</summary>
+    /// <summary>
+    /// The phone's strip, in the surface's own order, filtered by BOTH predicates.
+    ///
+    /// **It was every <c>ProgressTab</c> until E-3 PR 5**, then the enum minus what the
+    /// reshape moved. **Since E-3 S3 it is also minus what only the desktop shell draws** —
+    /// History, the career browse, which the disposition table's own Why column keeps
+    /// desktop-only. Reading both from the surface's predicates rather than from a list
+    /// typed here is the whole anti-drift argument (trap 55).
+    ///
+    /// **This is deliberately no longer "the same tabs as the desktop room"** — see
+    /// <see cref="TheDesktopRoomHasExactlyOneTabThePhoneDoesNot"/>, which asserts the
+    /// difference so it stays a decision rather than becoming a #210-shaped lag.
+    /// </summary>
     [Fact]
     public void ThePhoneOffersTheSameProgressTabsInTheSameOrder()
     {
         var expected = Enum.GetValues<ProgressTab>()
-            .Where(t => !ProgressSurface.MovedToLive(t))
+            .Where(t => !ProgressSurface.MovedToLive(t) && !ProgressSurface.DesktopShellOnly(t))
             .Select(ProgressSurface.KeyFor).ToList();
 
         Assert.Equal(expected, Progress().Tabs.Select(t => t.Key).ToList());
+    }
+
+    /// <summary>
+    /// **The one tab the phone refuses, asserted as a refusal rather than an absence.**
+    ///
+    /// #210 is what happens when a surface QUIETLY falls behind, and the fix this repo
+    /// settled on is parity by shared MODULE — so a deliberate difference has to be as
+    /// checkable as a deliberate equality, or the next reader cannot tell which one they are
+    /// looking at. The desktop room draws History; the phone does not; the predicate is the
+    /// only thing that says so, and every other tab is on both.
+    /// </summary>
+    [Fact]
+    public void TheDesktopRoomHasExactlyOneTabThePhoneDoesNot()
+    {
+        var roomKeys = ShellPages.Rooms(ShellPage.Progress).Select(r => r.Key).ToList();
+        var phoneKeys = Progress().Tabs.Select(t => t.Key).ToList();
+
+        Assert.Equal([ProgressSurface.KeyFor(ProgressTab.History)],
+            roomKeys.Except(phoneKeys).ToList());
+        // And nothing the other way: a phone with a tab the room lacks would be the mirror
+        // defect and is the half nobody thinks to check (#210 arrived in that direction).
+        Assert.Empty(phoneKeys.Except(roomKeys));
     }
 
     [Fact]
@@ -599,12 +629,18 @@ public class SurfaceParityTests
         var roomKeys = ShellPages.Rooms(ShellPage.Progress).Select(r => r.Key).ToList();
         var phoneKeys = Progress().Tabs.Select(t => t.Key).ToList();
 
-        Assert.Equal(roomKeys, phoneKeys);
+        // **NOT an equality any more, and the change is the point.** Until E-3 S3 the room's
+        // list and the phone's were the same list; History is the first tab that is one
+        // host's alone, so what has to hold is that RAIDS is off both — which is what this
+        // test has always been about — while the desktop-only difference is asserted on its
+        // own in `TheDesktopRoomHasExactlyOneTabThePhoneDoesNot`.
         Assert.DoesNotContain(ProgressSurface.KeyFor(ProgressTab.Raids), roomKeys);
+        Assert.DoesNotContain(ProgressSurface.KeyFor(ProgressTab.Raids), phoneKeys);
         // The negative that keeps this from going vacuous (trap 39): the three that stayed
         // are still on both, so a filter that emptied the strip would fail here too.
-        Assert.Equal(3, roomKeys.Count);
+        Assert.Equal(3, phoneKeys.Count);
         Assert.Contains(ProgressSurface.KeyFor(ProgressTab.Experience), roomKeys);
+        Assert.Contains(ProgressSurface.KeyFor(ProgressTab.Experience), phoneKeys);
 
         // And the destination, on both surfaces: the desktop room's key list and the phone
         // screen the join routes to Live.

@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -140,6 +140,13 @@ public static class ShellPages
         // disagree), and it is a predicate rather than a second list so a fifth Progress tab
         // appears in the room automatically — trap 55's lesson about two hand-maintained
         // lists describing one arrangement.
+        //
+        // **It filters `MovedToLive` and deliberately NOT `DesktopShellOnly`.** Since E-3 S3
+        // the Progress room has a History tab the phone and the v1 window both refuse — but
+        // this table is the DESKTOP SHELL's address grammar, and every room the shell draws
+        // must be reachable by an address or `progress:history` is a room with no way in.
+        // Two predicates, two questions: one is "did this tab leave Progress", the other is
+        // "which hosts draw it", and only the first one is about what is IN this room.
         ShellPage.Progress =>
             [.. ProgressSurface.Tabs()
                 .Where(h => !ProgressSurface.MovedToLive(h.Tab))

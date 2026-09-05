@@ -342,6 +342,29 @@ public partial class HistoryWindow : Window
         return false;
     }
 
+    /// <summary>
+    /// **The studio's own facts for the <c>EQBUDDY_EXPAND</c> dump, added in E-3 S3 for a
+    /// reason that is about the SHELL rather than about this window.**
+    ///
+    /// The Evolved Progress room's History tab now carries the career BROWSE, and the four
+    /// jobs it does not carry — compare, notes/tags, export JSON, delete/import — are
+    /// exactly why this window is not retired in that pass (Helm, 2026-09-05, item 5). A
+    /// door that is load-bearing and has no assertion behind it is a door somebody breaks
+    /// while cleaning up: this window has ONE way in (the widget's context menu) and no
+    /// unit tests at all, so nothing but a launched app can say it still opens and still
+    /// holds something.
+    ///
+    /// <c>historyDetail</c> is presence rather than content — the detail pane is most of
+    /// this window, and an empty one photographs as a window that exists and holds nothing
+    /// (trap 22). <c>historyCharts</c> is the state <c>EQBUDDY_HISTORY=charts</c> exists to
+    /// reach and the one a screenshot could otherwise never prove was there.
+    /// </summary>
+    internal string DebugFacts() =>
+        $"historySessions={SessionList.Items.Count} " +
+        $"historyDetail={(_vm.SelectedDetail is not null ? 1 : 0)} " +
+        $"historyFights={_vm.SelectedDetail?.Fights.Count ?? 0} " +
+        $"historyCharts={(ProgressBorder.Visibility == Visibility.Visible ? 1 : 0)}";
+
     private void OnSaveMeta(object sender, RoutedEventArgs e)
     {
         if (!_vm.HasSelectedSession) return;

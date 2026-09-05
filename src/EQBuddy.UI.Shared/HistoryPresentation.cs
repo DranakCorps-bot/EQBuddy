@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using EQBuddy.Core;
 
@@ -353,4 +353,158 @@ public static class HistoryPresentation
 
     private static string ShareBar(double fraction) =>
         new('█', Math.Clamp((int)Math.Round(fraction * 10), 1, 10));
+
+    // ================================================================================
+    // THE CAREER HALF — the Evolved shell's Progress → History tab
+    // ================================================================================
+
+    /// <summary>
+    /// **The career tab's words, and the boundary it is honest about.**
+    ///
+    /// Bevel's History pre-design §1 sorts <c>HistoryWindow</c>'s eight jobs into a career
+    /// side and a this-session side; Helm signed the career side onto Progress on
+    /// 2026-09-05 (~10:10 AM CT), and signed <c>HistoryWindow</c> KEPT as the studio for
+    /// this pass (item 5, soft lean). So this module builds the two career jobs the
+    /// disposition table names with high confidence — browse the stored sittings, and the
+    /// cross-session ladders — from the rows themselves.
+    ///
+    /// **What it deliberately does not build, and the reason is structural rather than a
+    /// choice.** The per-session deep detail (the damage/heal breakdown, the pull list, the
+    /// graph) needs <c>SessionRepository.LoadSnapshot</c>, and the four studio jobs
+    /// (compare, notes/tags, export JSON, delete, import) need the repository outright. The
+    /// shell reaches the widget through <c>MainWindow</c>'s existing accessors —
+    /// <c>StoredSessions()</c> and <c>StoredLevelDings()</c> — and there is no accessor for
+    /// the repository itself. Opening a SECOND <c>SessionRepository</c> on the same file
+    /// would be a second connection and a second writer to a database the archiver
+    /// checkpoints into, which is trap 13's shape with a SQLite file instead of a settings
+    /// file. So the depth stays in the studio, which still has its door, and the sentence
+    /// that says so is <see cref="StudioPointer"/> rather than an absence a player has to
+    /// discover.
+    /// </summary>
+    public sealed record CareerRow(long Id, string Title, string Detail);
+
+    /// <summary>One stored sitting as a list row: when and where on the first line, the
+    /// numbers on the second. Deliberately the same FACTS as
+    /// <see cref="BuildSessionRow"/> — the studio's list row — in the shape a two-line
+    /// native row wants, so the two lists cannot start describing a session differently.
+    ///
+    /// The character is not repeated: this list is already scoped to one character by
+    /// <c>SessionSummary.Stored</c>, and a name on every row is the one word that is the
+    /// same on all of them.</summary>
+    public static CareerRow BuildCareerRow(SessionRow row)
+    {
+        var duration = TimeSpan.FromSeconds(row.ElapsedSeconds);
+        var parts = new List<string>
+        {
+            $"{(int)duration.TotalHours}h {duration.Minutes}m",
+            $"{row.Kills} kill{(row.Kills == 1 ? "" : "s")}",
+            $"{row.XpPercent:0.#}% xp",
+            StatsSnapshot.FormatCoin(row.Copper),
+        };
+        if (row.Deaths > 0) parts.Add($"{row.Deaths} death{(row.Deaths == 1 ? "" : "s")}");
+        if (row.EndReason == SessionRepository.RecoveredEndReason) parts.Add("recovered");
+        return new CareerRow(row.Id,
+            $"{row.StartLocal:ddd MMM d, h:mm tt}" +
+                (row.PrimaryZone.Length > 0 ? $" — {row.PrimaryZone}" : ""),
+            string.Join(" · ", parts));
+    }
+
+    /// <summary>
+    /// The detail pane for one stored sitting, built from the ROW alone.
+    ///
+    /// **Every line here comes off <see cref="SessionRow"/>**, which is the queryable
+    /// summary the repository keeps beside the snapshot JSON — so this is a complete
+    /// reading of what the career browse can see rather than a trimmed reading of the
+    /// studio's. Where a number is missing it is missing from the row, and
+    /// <see cref="StudioPointer"/> names where it lives instead.
+    /// </summary>
+    public static string BuildCareerDetail(SessionRow row)
+    {
+        var text = new StringBuilder();
+        var duration = TimeSpan.FromSeconds(row.ElapsedSeconds);
+        var active = TimeSpan.FromSeconds(row.ActiveSeconds);
+        text.AppendLine($"Duration   {(int)duration.TotalHours}h {duration.Minutes}m " +
+                        $"— active {(int)active.TotalMinutes}m");
+        if (row.PrimaryZone.Length > 0) text.AppendLine($"Zone       {row.PrimaryZone}");
+        text.AppendLine($"Kills      {row.Kills}");
+        text.AppendLine($"XP         {row.XpPercent:0.#}%");
+        text.AppendLine($"Damage     {row.Dps:0.#} dps");
+        text.AppendLine($"Deaths     {row.Deaths}");
+        text.AppendLine($"Loot       {row.LootCount} item{(row.LootCount == 1 ? "" : "s")}");
+        text.AppendLine($"Money      {StatsSnapshot.FormatCoin(row.Copper)}");
+        text.AppendLine($"Ended      {row.EndReason}");
+        if (row.Note.Length > 0) text.AppendLine($"{Environment.NewLine}Note  {row.Note}");
+        if (row.Tags.Length > 0) text.AppendLine($"Tags  {row.Tags}");
+        return text.ToString().TrimEnd();
+    }
+
+    /// <summary>The heading over the detail pane — who, when.</summary>
+    public static string BuildCareerHeading(SessionRow row) =>
+        $"{row.Character} ({row.Server}) — {row.StartLocal:dddd MMM d, h:mm tt}";
+
+    /// <summary>
+    /// **The one sentence that keeps this tab from being a silent no-op.**
+    ///
+    /// A career browse that shows nine numbers where the studio shows a graph, a pull list
+    /// and two breakdowns, and says nothing about the difference, is the "trimmed list that
+    /// looks complete" defect #234 cost us — the player cannot tell a thin session from a
+    /// thin surface. So the surface says which one it is and where the rest is, and the
+    /// door it names is real: <c>HistoryWindow</c> keeps its context-menu entry this pass
+    /// (Helm, 2026-09-05, item 5).
+    /// </summary>
+    public const string StudioPointer =
+        "This is the browse. The full breakdown, the pull-by-pull review, session "
+        + "comparison, notes, export and delete are in the History studio — right-click "
+        + "the EQBuddy widget and choose “Session history…”.";
+
+    /// <summary>What the career tab says with nothing stored. Not "no data": a sitting is
+    /// recorded when it ENDS, so the honest fact for a first-time player is that the one
+    /// they are in has not finished yet — and Live is where it can be watched meanwhile.
+    /// </summary>
+    public const string CareerEmptyHeading = "No finished sittings yet";
+
+    public const string CareerEmptyExplanation =
+        "EQBuddy records a sitting when it ends, so this fills in after your first one. "
+        + "The session you are in right now is on Live, where the numbers move as the log "
+        + "arrives.";
+
+    /// <summary>The prompt in the detail pane before a row is picked. The v1 studio says
+    /// "Select a session."; this one says what picking one gets you, because the career
+    /// tab's default state is the two ladders and a player has no reason to guess that a
+    /// row hides more.</summary>
+    public const string CareerSelectPrompt =
+        "Pick a sitting on the left to see what it was worth.";
+
+    /// <summary>The caption over the two cross-session ladders — <see cref="BuildStepGraph"/>
+    /// applied to every stored sitting for this character. The studio's own words, kept
+    /// verbatim so the two surfaces cannot describe one chart two ways.</summary>
+    public const string CareerLaddersCaption = "Character progress — every stored session";
+
+    /// <summary>
+    /// The two ladder series, read off the same <c>ProgressPoint</c> list the studio reads.
+    ///
+    /// Levels come from ding lines (exact times); AA totals from each session's last AA
+    /// event, so a sitting that saw no AA holds the previous value — a hold, not a lie.
+    /// Both rules are the studio's; this is the extraction, and the arithmetic moving into
+    /// <c>UI.Shared</c> is what finally makes them testable (the WPF layer has none).
+    /// </summary>
+    public static (List<(DateTime Time, double Value)> Dings, List<(DateTime Time, double Value)> Aa)
+        CareerLadders(IReadOnlyList<SessionRepository.ProgressPoint> points) =>
+        ([.. points.SelectMany(p => p.Dings).Select(d => (d.Time, (double)d.Level))],
+         [.. points.Where(p => p.AaTotal > 0).Select(p => (p.EndLocal, (double)p.AaTotal))]);
+
+    /// <summary>The level ladder's caption, or null when there is no ladder to caption.
+    /// Null rather than an empty string so a host cannot render a bare label over a blank
+    /// canvas, which is trap 17's shape in typography.</summary>
+    public static string? CareerLevelCaption(
+        HistoryGraph? graph, IReadOnlyList<(DateTime Time, double Value)> dings) =>
+        graph is null || dings.Count == 0 ? null
+            : $"Level {dings.Min(d => d.Value):0} → {dings.Max(d => d.Value):0} " +
+              $"({graph.Start:MMM d}–{graph.End:MMM d}, {dings.Count} dings)";
+
+    public static string? CareerAaCaption(
+        HistoryGraph? graph, IReadOnlyList<(DateTime Time, double Value)> aa) =>
+        graph is null || aa.Count == 0 ? null
+            : $"AA earned, cumulative — {aa[^1].Value:0} total " +
+              $"({graph.Start:MMM d}–{graph.End:MMM d})";
 }
