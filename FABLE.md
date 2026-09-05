@@ -175,48 +175,29 @@ next loop, not a reopening of the plan.
 6. **Out of pass:** pet-idle chip question (open, unruled); card cuts; player door;
    `v1.99.19`; Play Console; I-11.
 
-### SA-1 — Collapsed HUD numbers: promote xp + dps/hps, and the bar lifts out of MainWindow
+### SA-1 — TAKEN 2026-09-05, built and green (Claude, lane W)
 
-1. **`UI.Shared/HudGlance.cs`** — one decision, unit-tested with no window: the collapsed
-   trio (Name · DPS · XP%/hr, third slot ↔ HPS while healing dominates ~30 s, swap back
-   the moment damage-combat returns — spec §3's words). Hysteresis both directions tested;
-   every output a fixed-shape string (trap 12). `CharacterName` can be empty until the log
-   names one — the empty slot renders at reserved width, not as a collapsing hole.
-2. **Core grows the dominance signal.** Nothing windowed exists for healing today
-   (`CurrentHps` — no matches in the tree; `Hps` is session-scope). `SessionStats` adds a
-   recent heal-vs-damage fact to the snapshot; `CurrentDps`'s live-fight window and its
-   memo caveat (`SessionStats.cs:1665–1680` — the one wall-clock-reading field) are the
-   in-file precedent, and the new field must extend that memo condition or be derived
-   purely from event totals — executor's call, logged in `DECISIONS.md`.
-3. **The lift.** The mini-bar render path (`MainWindow.xaml.cs:3683` loop and its cell
-   chrome) moves to a new **`EQBuddy/HudBarView.cs`** — a view class like `QuestsView`,
-   NOT a partial (the glob sums partials on purpose). In-PR order: dump facts first
-   (`hudGlance=`, `hudCells=` into `EQBUDDY_EXPAND` — **no mini-bar facts exist today**,
-   verified), E2E assertions green on the pre-move tree, then the move, **ratchet down in
-   the same commit**.
-4. **Promotion mechanics.** `StarDps`/`StarHps` leave `StarButtons()`
-   (`MainWindow.xaml.cs:3438`); the xp star leaves `ProgressWindow.xaml.cs:136` (its
-   sibling money/motes stars stay — they are the ONLY writers for their keys, per that
-   file's own header); `OptionsCardsView.BuildMiniStats` drops the three rows. The trio
-   renders always-on, ahead of any surviving starred cells.
-5. **The migration, specified** (the trap-20 landmine this plan exists to defuse): for
-   Damage/`dps` and Healing/`hps` only — `xp` maps to no `BreakoutKind` — *read the star
-   before stripping it*: if the key is absent from `MiniStats` at migration time, add the
-   kind to `DisabledBreakouts` (preserving "closed"); then strip `xp`/`dps`/`hps` from
-   `MiniStats`; then re-key the `:3530` gate to `DisabledBreakouts` alone for those two
-   kinds. A player's open breakout stays open, a closed one stays closed, and the second
-   run is a no-op because the keys are already gone. Run-twice tested through the whole
-   chain.
-6. **Vocabulary rider:** `OptionsCardsView.cs`'s breakout tooltip says "mini pill" — the
-   phrase Helm banned at #323(b)/#326. The shell scanner deliberately does not cover v1
-   Options, which is how it survived; SA-1 edits this file anyway, so the tooltip rewrites
-   to the bar's real name in passing.
-7. **What's-new staging** in the unreleased 2.0.0 Evolved block (#314 precedent): "XP and
-   DPS/HPS are always-on HUD numbers now" — naming the removed un-star toggle, because a
-   removed capability described only by its replacement is the #233 complaint.
-8. **Shots:** `mini-bar` + `mini-tour` re-shot with predictions rewritten first (their
-   staging seeds all ten keys; post-migration prediction is trio-first plus seven staged
-   legacy cells). Batch run.
+Its eight steps are struck rather than left to be re-read as pending — the take-then-delete
+contract. What landed, so SA-2 does not have to re-derive it:
+
+- `UI.Shared/HudGlance.cs` (the trio and the one swap, unit-tested with no window, every
+  output a fixed-shape string) and `Core`'s `RecentEffort` (heal-vs-damage weight, derived
+  purely from event totals over TWO windows — 30 s dominance, 5 s resume — so the snapshot
+  memo's wall-clock caveat is untouched).
+- **The bar is out of `MainWindow` and in `EQBuddy/HudBarView.cs`**, a view class, with
+  `hudCells` pinned green on the pre-move tree first. **The ratchet is 3964 on the merged
+  tree** — SA-2 inherits zero headroom again, exactly as this plan predicted, so its two
+  window deletions are the room.
+- `hudGlance=` / `hudCells=` are in `EQBUDDY_EXPAND`; `hudChips=` (SA-2's) does not clash.
+- The migration is `AppSettings.MigratePromotedHudStats`, run-twice tested through the whole
+  chain AND through the real `Load` — see the note below, which SA-2 needs.
+- **`Load`'s `hadFile` argument was BROKEN and is fixed here** (it read a private field
+  `System.Text.Json` never sets, so it was always false). Any later migration in this series
+  that takes it now gets the truth; before this PR it did not.
+- `BreakoutPresentation.StarKey` answers null for Damage, Healing and Progress;
+  `NeedsPinnedRule` is what tells Watch's null apart from theirs. SA-2 touches neither.
+
+Feedback, including the one plan defect and what it cost, is in `FABLE-FEEDBACK.md`.
 
 ### SA-2 — One chip row: fold spawn + mez, retire two windows and eight settings
 

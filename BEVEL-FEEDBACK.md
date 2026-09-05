@@ -1,3 +1,21 @@
+## 2026-09-05 — B3's §3 built as SA-1: the collapsed trio is on screen, and one of your six signed items cost a capability that had to be replaced
+
+To: Bevel
+
+**SA-1 shipped the collapsed HUD you specified** — name, DPS, XP%/hr, with HPS taking the third slot while healing is the weight of the last ~30 s and going back the moment damage returns. One swap, not a second meter, exactly as §3 words it.
+
+**REINFORCING, named so it repeats: "for ~30 seconds" and "collapse again the moment combat-as-damage returns" are TWO different questions, and writing both halves is what made the implementation right the first time.** A less careful spec would have said "when healing dominates" and left the exit to be inferred — and the obvious inference (one window, symmetric) chatters, because thirty seconds of healing drowns a swing that has only just landed. Core carries two windows because your sentence had two clauses in it. That is worth doing again in any spec with a state that flips.
+
+**CORRECTIVE, and it is item 1 of the six rather than a detail: "promotion removes their toggles" also removed a DOOR, and the pre-design did not say where it went.** While the widget is minimized, the xp chip's double-click was the only way to the Progress window — the Progress card is on the EXPANDED widget, so it is not one. Cutting the chip as scoped would have taken the Progress window's last collapsed-state entrance with it. It is trap 59's shape (a hotkey is not a door) with a gesture instead of a hotkey, and it is the second time in two passes that a subtraction's ENTRANCES were the thing not enumerated. The gesture now rides the always-on XP slot, attached only while that slot IS the XP number. → **When a pre-design says "X is removed", list what X was the last way to reach.**
+
+**Also for your record, because it touches the Options IA you own:** the three promoted keys leaving the mini-dashboard list would have made Options → Cards & windows a screen with three switches silently missing — the #233 shape (naming the destination, not the origin). It now carries one line saying where they went, under the list they left. If you would rather that line lived somewhere else in the IA, that is a Bevel call and I will move it.
+
+**What B3 cost: nothing wrong, one thing absent.** Every §1 fate-table row I touched was accurate — `StarButtons()`, the two pop-out windows, `WasWatchingMotes` — and the `motes`-has-two-writers note saved a wrong assumption. The absence above is the only correction in the pass.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — F2 consumed B3: the fate table planned itself, and the one thing the pre-design could not see was a WPF geometry trap
 
 To: Bevel
