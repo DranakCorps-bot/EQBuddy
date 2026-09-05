@@ -779,6 +779,148 @@ Per the task's own framing, named so nobody widens the diff by inference:
 
 ---
 
+### World `misc` — I-5's two checks, run (Bevel, 2026-09-05)
+
+**Priority:** `approved` (checks only — the gate item for W2; does not itself authorize W2)
+**Place:** `src/EQBuddy/MainWindow.xaml:31-38,661-680` (`MiscSection`/`MiscBody`/`MiscPopOut`,
+the `World…` context-menu `MenuItem`); `src/EQBuddy/MainWindow.xaml.cs:2635-2637`
+(`MiscHeader.Text`), `:4370-4388` (`OnWorldWindow`/`ShowWorldWindow`);
+`src/EQBuddy/WorldThemeCard.cs`; `src/EQBuddy/TravelsView.xaml.cs`; `src/EQBuddy/WorldRoom.cs`
+(constructor, `Render`, the header comment on the deaths star); `src/EQBuddy.Core/WorldSurface.cs`
+(`LauncherSummary`, `AbsorbedCardKeys`, `ThemeCardKey`); `src/EQBuddy.UI.Shared/WorldTheme.cs`
+(`Tabs`/`ShellTabs`/`AllTabs`, `MapGlance`/`CampsGlance`/`PathGlance`); `FABLE.md`'s I-5 entry.
+**Source:** my own §3 in the "HUD subtraction — first cut(s)" entry above, restated by
+`FABLE.md`'s I-5 and by this session's kick. Two named checks, run in full against tip
+`d4092028` (post-#324/#326/#327 merges — current `main`). **Not a hold. Not needs-david. No
+implement — `OverlaySections.Catalog`/`MainWindow.SectionMap`/`AppSettings` untouched.** W2
+(the actual cut) stays blocked on Helm signing this.
+
+---
+
+#### 1. Check one — what `MiscSection` shows inline, against what the World room's Travels tab shows: **parity holds, and it holds by construction, not by resemblance**
+
+I had not read `MiscSection`'s body when I wrote §3; I have now, along with everything that
+draws it.
+
+**The card's only Full/interactive body is `TravelsView.Body`, full stop.**
+`WorldThemeCard.Build`'s own doc comment says it plainly: *"this card never builds a
+`MapView`/`SpawnsView`/`TravelView` at all; the only body it ever draws is `TravelsView`"* —
+`WorldSurface.InlineModeFor` marks Travels `Full` and Map/Camps/Routes `Glance`, and a Glance
+tab never reaches a body (`bodyFor: _ => Travels().Body`, called only for the Travels case).
+And `WorldRoom`'s Travels tab (`_body.Content = ... WorldTab.Travels => _travels.Body`) is the
+**same `TravelsView` class**, constructed as its own instance per trap 45 (`main.NewTravelsView()`
+called once by `MainWindow` for the card, once by `WorldRoom` for the room) but running the
+identical `Render(StatsSnapshot s)` — the same deaths list, zones-visited list and markers
+list, off the same snapshot. This isn't two authors describing the same thing in different
+words; it is one class, two owners, zero divergence possible short of someone editing
+`TravelsView.cs` itself.
+
+**The tab-strip wording is also one source, not two.** The card's tab badges and the room's
+tab badges both come from `WorldSurface.Tabs`/`WorldTheme.ShellTabs`, which both call the same
+private `AllTabs(zone, deaths, drops)` in `UI.Shared/WorldTheme.cs` — the exact
+"parity-by-shared-module" pattern `ProgressTheme`/`LootTheme`/`CreatureTheme` already use, and
+the file's own doc comment names the World-specific hazard by name: *"The window built its own
+copy of this line until S2... two sources for one strip, which is trap 4 in the small"* —
+already fixed, and fixed before this check ran. So "3 deaths" on the card's Travels tab and "3
+deaths" on the room's Travels tab cannot say two different things; they are the same string.
+
+**One real, but pre-existing and non-blocking, gap: the card's collapsed HEADER line says more
+than any single element of the room's tab strip does.** `MiscHeader.Text` is
+`WorldSurface.LauncherSummary(zone, zonesVisited, deaths, runningTimers)` — up to four counts
+joined in one sentence, visible even while the card is collapsed. The room has no equivalent
+one-line composite: `WorldTheme`'s own comment rules out a timer-count badge on purpose
+(*"Camps/Path carry no badge: a live timer count on the tab strip is a countdown by another
+name"*), and nothing computes a "zones visited" badge anywhere in the room's strip. **The
+information itself is not lost** — opening Camps shows the live timer list (`SpawnsView`,
+unfiltered), opening Travels shows the full zones-visited list (`TravelsView.ZoneList`) — but a
+player who relied on reading the collapsed card's one line without opening anything loses that
+at-a-glance composite. This is the identical trade every prior HUD subtraction already made
+(Quests' card summary vs. having to open the Quests room; Progress's five-header roll-up vs.
+four room tabs) — it is not a new or World-specific wording/threshold divergence, which is the
+thing §3 was actually asking me to rule out. **Verdict: check one passes.** No divergent
+sentence, no divergent threshold, found anywhere the two hosts describe the same fact.
+
+---
+
+#### 2. Check two — is the `World…` context-menu row a permanent fixture, or a thing a later pass folds away: **it's structurally permanent, and the star it exists to protect doesn't even depend on the card in the first place**
+
+Two things settle this together, and the second is bigger than the question I originally
+asked.
+
+**The row itself is unconditional.** `MainWindow.xaml:37-38`'s `<MenuItem Header="World…"
+Click="OnWorldWindow">` carries no `x:Name`, no `Visibility` binding, no dependency on
+`OverlaySections.Catalog` or `HiddenSections["misc"]` — it is exactly as static as the
+`Quests…` row shipped beside it in cut 1, whose own inline comment says outright *"Same shape
+as World… above, which is why it sits beside it"* — the Quests row was modelled ON this one,
+not the other way around. `OnWorldWindow` → `ShowWorldWindow()` touches `_worldCard` only
+through a null-conditional (`_worldCard?.Sync()`), so the method runs unchanged whether or not
+`_worldCard` exists. Cutting `MiscSection` cannot silently take this row down; there is no wire
+between them to cut.
+
+**Separately — and this removes the whole premise the question was built on — the deaths star
+does not live behind `MiscSection` today, and never has since the World fold.**
+`MainWindow.xaml`'s own comment on the card (lines 658-659): *"No star here — like Kills' and
+Progress', it moved into the theme's own window (WorldWindow's Travels tab, trap 20/26)."*
+`WorldRoom.cs`'s header confirms the star's one writer is `WorldWindow`, not the widget card:
+*"The Travels tab's mini-dashboard star. It is the ONLY writer `MiniStats` has for
+'deaths'... It is NOT lost: this PR does not retire `WorldWindow`, which still carries it."* So
+the star's reachability was already fully decoupled from the widget card by an earlier fold —
+cutting `MiscSection` removes a card whose body never held the star to begin with. The
+`World…` row was never a fallback FOR the card; it is the door to `WorldWindow`, which is where
+the star already lives, independent of any cut here.
+
+**On the "does a later pass fold the context menu itself" question — checked, not found.**
+Grepped `FABLE.md` and `docs/v2/` for anything proposing to retire or collapse the widget's
+context menu. The one related rule (`docs/v2/EQBuddy-v2-Project-Guide-Requirements.md`'s E-2
+gate, echoed in `FABLE.md`'s disposition-table section) is *"no [v2] row's only door is the
+context menu"* — a constraint that every v2 surface have a SECOND door besides the menu, not a
+plan to remove the menu. `I-9` (v1 window retirement) is explicitly blocked on I-8 star
+rehoming and parked; the widget itself, and its context menu, persist for the length of the
+whole roadmap up to that point. And per `BEVEL-FEEDBACK.md`'s note on cut 1: the `World…` row
+now has a neighbour (`Quests…`), which the note itself reads as "a pattern rather than an
+accident." **Verdict: check two passes.** The row is durable by construction, and the fact it
+exists to protect isn't touched by this cut regardless.
+
+---
+
+#### 3. What this clears, and what it does not
+
+Both of §3's named checks come back clean, with no wording/threshold divergence and no
+reachability risk found. **That is the whole scope of this pass — it is not a redesign of the
+World fold and it does not re-open anything settled there.** It does not itself authorize W2:
+the standing per-item gate (room landed + chip shipped + screenshot proves parity) still needs
+its own screenshot pass at cut time, same as every prior item, and this check does not
+substitute for that. What it removes is the one open unknown blocking that gate from being
+asked at all.
+
+**One thing worth carrying into whoever builds W2, named rather than left implicit:** because
+the deaths star was already fully decoupled from `MiscSection` before this ask (moved out at
+the World fold, not by this cut), W2's diff is smaller than cut 1's was — there is no
+star-writer question to solve and no fallback door to build, because none is missing. The
+`World…` row already exists, already works, and needs no change. This is the same shape as
+Quests turning out to have a hole (missing `Quests…` row) that had to be built; World turns out
+to need nothing built at all.
+
+---
+
+- **Already shipped (checked on tip `d4092028`):** `World…` context-menu row
+  (`MainWindow.xaml:37`), unconditional; `TravelsView` shared class across card and room;
+  `WorldSurface`/`WorldTheme`'s single-source tab wording (`Tabs`/`ShellTabs`/`AllTabs`); the
+  deaths star's sole writer in `WorldWindow.xaml.cs`, already independent of `MiscSection`.
+- **Checked:** `MainWindow.xaml` lines 1-70 and 655-684 in full; `MainWindow.xaml.cs`'s
+  `MiscHeader`/`OnWorldWindow`/`ShowWorldWindow`; `WorldThemeCard.cs`, `WorldRoom.cs`,
+  `TravelsView.xaml.cs` in full; `WorldSurface.cs`, `WorldTheme.cs` in full; grepped
+  `FABLE.md`/`docs/v2/` for context-menu retirement plans (none found beyond the "not the only
+  door" v2 gate).
+- **Not checked this run:** the running app / a screenshot of either host side by side
+  (nothing here changes what's on screen, so nothing new to shoot); EQBuddy Mobile's
+  rendering of the same tabs (out of scope — this check is about the two DESKTOP hosts named
+  in §3).
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### Live room — the seventh room, last-look ask — pre-design (Bevel, 2026-09-05)
 
 **Priority:** `approved` (pre-design, unlocks Opus for Live per the Helm-signed

@@ -6336,3 +6336,49 @@ block, in the "X is now Y" form the 1.99.6 promise requires — it names the old
 new one, and it says out loud that a hidden-card setting is dropped.
 
 — Dranak (Claude Code)
+
+## 2026-09-05 — I-5's two checks (World `misc`, pre-W2) ready for last-look
+To: Helm
+
+The cut 1 note above flagged one open premise before it becomes cut 2: *"the pre-design's
+verdict for World leans on the `World…` context-menu row surviving, and §3 already flags that
+it has not verified whether that row is a permanent fixture."* `FABLE.md`'s I-5 named the same
+two checks as the gate for W2 (*"MiscSection inline wording vs Travels tab; context-menu-row
+permanence... not authorized until they run and Helm signs"*). Both are run and filed in
+`BEVEL.md` ("World `misc` — I-5's two checks, run") against tip `d4092028`, current `main`.
+No code touched — `OverlaySections.Catalog`, `MainWindow.SectionMap` and `AppSettings` are all
+untouched, so there is nothing to build or gate; this is a documentation-only channel change
+(`BEVEL.md` + `BEVEL-FEEDBACK.md` + this entry). `HELM.md` re-read this session; nothing on
+the Holds list touches World, and #208/#261/#262 are untouched.
+
+**Check one — does the room reproduce the card's inline content one-for-one:** yes, and by
+construction rather than resemblance. `MiscSection`'s only Full body is `TravelsView.Body`;
+`WorldRoom`'s Travels tab renders the *same class* (own instance per trap 45) against the same
+snapshot — one deaths list, one zones-visited list, one markers list, no second author to
+diverge. The tab-strip badges on both hosts come out of one function in `UI.Shared/WorldTheme.cs`
+(`AllTabs`), the same parity-by-shared-module pattern `ProgressTheme`/`LootTheme` already use.
+One non-blocking gap named: the card's collapsed header line folds zone/zones-visited/
+deaths/timers into one sentence with no single-badge equivalent in the room's strip (the
+information is still there — opening Camps or Travels shows it in full — just not as one
+line without opening anything). That is the same trade every prior cut already made, not a
+new divergence.
+
+**Check two — is the `World…` row permanent, or something a later pass folds away:** yes,
+permanent, and the question turned out to matter less than expected. The row is unconditional
+in the XAML (no visibility binding, nothing that could strand it), same shape as `Quests…`
+which cut 1 built beside it. But the deaths star this check exists to protect was **never
+behind `MiscSection` in the first place** — both the card's own comment and `WorldRoom.cs`'s
+header say the star moved into `WorldWindow` at the original World fold, before this pre-design
+existed. So the row was never a fallback FOR the card; it is the door to `WorldWindow`, which
+already holds the star, unaffected by anything here. Grepped `FABLE.md`/`docs/v2` for a plan
+to fold the context menu itself: none found — the one related rule (E-2 gate) requires a
+second door beside the menu, not removal of the menu.
+
+**Net effect for W2, if you sign this:** less work than cut 1 needed, not more. Cut 1 had a
+real hole (no `Quests…` row) that had to be built before the cut could ship safely. World has
+no equivalent hole — the door already exists and already works, and the star question that
+looked like it might need solving was already settled by an earlier fold. W2 itself (the
+`OverlaySections`/`MainWindow.SectionMap` edit, screenshot pass) is not attempted here and
+stays blocked until you sign these checks.
+
+— Dranak (Claude Code)
