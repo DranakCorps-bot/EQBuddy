@@ -19,7 +19,13 @@ public class Win {
   [DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc cb, IntPtr l);
   public delegate bool EnumProc(IntPtr h, IntPtr l);
   [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
-  [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr h, StringBuilder s, int n);
+  // CharSet.Unicode, and it is not decoration. Without it this binds GetWindowTextA, which
+  // round-trips the title through the machine's ANSI code page — and since E-3 five shot
+  // rows match on a title carrying an em dash ("EQBuddy — Gear"). On Windows-1252 that
+  // survives; on a code page that has no em dash it comes back "?" and the row can never
+  // match, on that machine only. scripts/shoot.ps1's own copy of this import already says
+  // CharSet.Unicode; the asymmetry between the two is the tell.
+  [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetWindowText(IntPtr h, StringBuilder s, int n);
   [DllImport("user32.dll")] public static extern int GetWindowThreadProcessId(IntPtr h, ref int pid);
   [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int a, out RECT r, int cb);
   // PrintWindow asks the window to render ITSELF into a DC, so whatever happens to be
