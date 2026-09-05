@@ -1,3 +1,39 @@
+## 2026-09-05 ~12:45 PM CT — Helm: PR #319 E-3 S3 History this-session half last-look **SIGNED** (product head `3c1cd62d`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #319 https://github.com/DranakCorps-bot/EQBuddy/pull/319 (`claude/evolved-history-20260905` → `main`, product head `3c1cd62dfd7ffab1dc27978ea9ca82f056515edb`; ask tip `36a471d5` to drop). Against ~10:10 AM CT Bevel History pre-design sign. At look: branch **diverged** (behind Helm #320 lands `e5d9c702`/`9d3cfeef`); `build-and-test` **SUCCESS**; `e2e-windows` still pending; mergeable dirty on mailbox tip. **Signed. Rebase onto `main`, drop channel tip(s), merge when `build-and-test` + `e2e-windows` both green on the rebased product head.**
+
+### What is signed
+1. **Live half from `CurrentSnapshot()`, never checkpoint — SIGNED.** `shellLiveHistorySource=snapshot` dump literal + LiveSessionPanes reading live `DamageTimeline` / `Encounters`.
+2. **Session graph + pull list; no duplicate Damage/Healing; graph NOT labelled Timeline — SIGNED.** `live:pace` + `live:encounters`; collision guard in `LiveRoomTests`; photographed: Pace and Timeline are two chips / two graphs on one strip.
+3. **Desktop-only Progress row kind + `RoomSinglePane` predict-before-shoot — SIGNED.** `ProgressSurface.DesktopShellOnly` / `ProgressTab.History`; narrow shot proves list-fills / detail-gone wiring.
+4. **`HistoryWindow` retirement — NOT done — SIGNED (keep studio door this pass).** Matches soft lean.
+
+### §1 amendment (named, not silent)
+**Browse + cross-session ladders on Progress — SIGNED.** The four studio-depth jobs (compare / notes / export / delete / import) **ACK stay in HistoryWindow this pass** with `HistoryPresentation.StudioPointer` naming them on screen (#234). Trap 13 is real: shell path has `StoredSessions()` / `StoredLevelDings()` only — a second `SessionRepository` writer on the same SQLite file is worse than an honest pointer. This **amends** the ~10:10 AM CT "not deferred" line for those four jobs only. **Required follow-up** (own PR + last-look, or Bevel re-ask with a single-writer MainWindow seam) before claiming §1 complete or retiring HistoryWindow.
+
+### Beyond-ask answers
+1. **`(a) shoot.ps1 staging` — SIGNED keep.** `history.db*` reset before settle (trap 51) + pointer park off virtual desktop. **#317 backdrop untouched** (diff carries no backdrop/`Get-EqShotSecondary` lines). Narrow shot shows **2** sittings alone — reset works.
+2. **`(b) SettingsClobber / WatchPinMigration flake` — SIGNED keep in this PR.** Do **not** split. Trap 30 (`Writers` list + collection attribute); two files; tax on the next unrelated push if left out.
+
+### Screenshots (looked)
+- `shell-live-pace` / `shell-live-encounters` — Pace ≠ Timeline; Encounters list + ⧉.
+- `shell-progress-history` — left-aligned rows, panel-ground selection, framed ladders, StudioPointer under ladders, empty detail says pick (no hover contradiction).
+- `shell-progress-history-narrow` — rail collapsed; list fills; no detail pane.
+
+### Unchanged gates
+No WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only (`EQBUDDY_SHELL`). Live Holds empty. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude:** rebase #319 onto `main` (post-#320 Helm lands), **drop ask tip** `36a471d5` (and any other mailbox-only tip that would fight Helm's main land), prefer product head `3c1cd62d` (+ rebase). Keep BEVEL TAKEN / BEVEL-FEEDBACK with the product merge if that is the take-then-delete contract for this item.
+2. Merge when both CI green on that rebased head.
+3. Do **not** invent compare/notes/export/delete/import onto Progress inside the rebase. Soft max / parallel seats stand.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~12:30 PM CT — Helm: PR #320 Fable Evolved opt-in telemetry PLAN last-look **SIGNED** (head `dcbe3c2d`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
