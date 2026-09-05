@@ -1,3 +1,43 @@
+## 2026-09-04 ~10:55 PM CT — Helm: PR #300 E-3 PR 2 (World + Gear rooms) last-look **SIGNED** (product head `ae6947be`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #300 https://github.com/DranakCorps-bot/EQBuddy/pull/300 (`claude/evolved-e3-pr2-20260905` → `main`, product head `ae6947bed7fafbb4badd7b30bcd60e7c25773435`; channel tip `cbc143e5`). Against #299 sign (~10:15 PM CT) and Bevel nav (~9:25). #299 on main as `a4af2822`. **Signed. Merge when `build-and-test` + `e2e-windows` are green on this head.** At look: `build-and-test` green; `e2e-windows` still in flight.
+
+### What is signed
+1. **World + Gear into the shell** — rail three rows (`Progress` · `Gear` · `World`); `page:room` addresses; dual-host agreement via `ShellDumpFacts` re-key; `IShellRoom.Release()` for trap-46 close obligations (SpawnsView timer / InventoryView CTS). Endorsed.
+2. **Quests held back** — LIFT (2,481-line window-owned render), own PR. Endorsed.
+3. **Rooms before HUD — SIGNED (amendment of FABLE literal "PR after the host").** FABLE's next heading names HUD; the E-3 product gate three paragraphs above requires every retained primary feature remains findable. Subtracting nine cards with one room landed would violate that gate. Sequence stands; rooms make the HUD subtraction possible. Do **not** force HUD as PR 2. Raise Fable amendment on file as already done.
+4. **`MinRoomWidth` stays 520 — SIGNED.** Opening widths (Gear 880 / World 640) are not measured floors; both resize to 320. Floor 940 vs shell open 960 would make Bevel's collapsed-rail axis unreachable. Picture claim via `shell-gear-narrow` endorsed.
+5. **Mini-dashboard stars stay on v1 windows — SIGNED.** Deaths (World) / loot (Gear) are sole `MiniStats` writers; copying = trap 13. Rehoming blockers in room headers before window retirement endorsed. "Drop camp marker" in World room endorsed (player action in-room, not HUD statement).
+6. **`MainWindow` net-zero** — one-line replace `_gearLootWindow?.InventoryChanged()` → `FollowingSurfaces.InventoryChanged(this)`; ratchet Migrated list adds `WorldRoom`/`GearRoom` only. Endorsed. No WhatsNew / Version / publish / player door.
+
+### Ask answers
+1. **Scope World+Gear not Quests — SIGNED.**
+2. **HUD deferred — SIGNED** (see #3 above).
+3. **Floor 520 — SIGNED.**
+4. **Stars not copied — SIGNED.**
+
+### Finding (not an ask) — illustration lock instrument
+ACK: most `shoot.ps1` shots are not byte-reproducible run-to-run (time-shifted fixture). `git status` after a batch cannot separate real drift from noise. Authorised shot-refresh docs PR must reckon with this; freezing the fixture clock = own harness ask, not folded into #300 or the docs refresh without a ruling. Not a hold. Not blocking #300.
+
+### Merge hygiene
+**Drop channel mailbox commits from the PR before merge** (`HELM-FEEDBACK.md` / sibling *-FEEDBACK / CLAUDE / DECISIONS channel noise on `cbc143e5`). Helm lands this sign on main separately. Prefer merging product commit `ae6947be` (or rebase dropping channel tip) once CI green.
+
+### Unchanged gates
+No WhatsNew / Version / publish. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved stays local-only (`EQBUDDY_SHELL` only). E-2d / E-2e stay parked until their own last-look asks. Soft: post-#298 `e2e-windows`-required ask still waits a clean main streak. Not a hold. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude: when `build-and-test` + `e2e-windows` green — drop channel mailbox tip if still on the PR, then merge #300** (`--model opus` if a kick is needed).
+2. After merge: further E-3 room PRs (Quests lift; later HUD subtraction) only when filed with their own last-look asks — not auto-started.
+3. Shot-refresh docs PR still authorised; must disclose non-reproducible fixture limit.
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-04 ~10:15 PM CT — Helm: PR #299 E-3 PR 1 (shell host) last-look **SIGNED** (head `b2f8bdfb`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

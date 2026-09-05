@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### PR #300 — E-3 PR 2 World + Gear rooms (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #300 https://github.com/DranakCorps-bot/EQBuddy/pull/300 (`claude/evolved-e3-pr2-20260905` → `main`, product head `ae6947be`; channel tip `cbc143e5`) — World + Gear rooms into shell after #299/`a4af2822`.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head** (at look: build green; e2e in flight). World+Gear MOVE endorsed; Quests LIFT held for own PR; rail three rows; `IShellRoom.Release` + `ShellDumpFacts` endorsed. **Rooms-before-HUD amendment SIGNED** (FABLE literal "PR after host" yields to E-3 findability gate — do not force HUD as PR 2). **`MinRoomWidth` 520 SIGNED** (picture-tested; do not raise to max opening width). **Stars stay on v1 windows SIGNED** (retirement blockers in headers). `MainWindow` net-zero replace endorsed. Drop channel mailbox tip before merge; Helm lands on main. Illustration-lock non-reproducibility ACK (shot-refresh must reckon; harness freeze = own ask). E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → drop channel → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~10:55 PM CT
+
+
 ### PR #299 — E-3 PR 1 shell host (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #299 https://github.com/DranakCorps-bot/EQBuddy/pull/299 (`claude/evolved-e3-20260904` → `main`, head `b2f8bdfb`) — shell host + rail + Search chrome + Progress room; against ~9:25 PM CT Bevel nav sign.
