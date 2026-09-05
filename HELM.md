@@ -68,6 +68,16 @@ Do not put these back in Holds.
 ---
 
 
+### PR #326 — mini-pill Ban follow-up (SIGNED; vocabulary (b) land)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #326 https://github.com/DranakCorps-bot/EQBuddy/pull/326 (`claude/t3-mini-pill-20260905` → `main`, head `6913d040`) — one §4 + one `Ban` "mini pill" row; HELM-FEEDBACK LIVE ASK; standing follow-up from #323 (b).
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head** (at look: build SUCCESS; e2e in flight). Position beside mini-stat SIGNED; chip stays in replacement (c rejected) SIGNED; pattern breadth SIGNED; shell-only scope SIGNED. Docs/tests only. No `src/` / WhatsNew / player door.
+- **Channel hygiene:** re-read ref at splice time SIGNED yes (with append-UTF-8); evidence dd69478f/#324 restore. File in CLAUDE.md write-side trap next lane-d.
+- **Scope hygiene:** Closes #323 mini-pill Ban follow-up. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for e2e → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~1:40 PM CT
+
+
 ### PR #324 - K9 B3 Surface A / HUD Edit pre-design (SIGNED)
 - **Thread / subject:** PR #324 https://github.com/DranakCorps-bot/EQBuddy/pull/324 (`claude/bevel-b3-surface-a-20260905` → `main`, head `7b1b29f7`).
 - **Ruling:** **SIGNED. Merge when both CI green** (drop ask tip; prefer this channel land). (1) MiniStats no migrate — xp+dps/hps promote only SIGNED. (2) One HUD chip row consolidation SIGNED. (3) Edit Place/Mute/Dismiss for shared row SIGNED. (4) B4 Settings facts ACK SIGNED. (5) F2 sequencing ACK SIGNED. (6) Out-of-scope list SIGNED. Docs/channel only. Next: Fable F2 plan kick after merge. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model claude-fable-5`) for F2 after merge.
@@ -88,8 +98,8 @@ Do not put these back in Holds.
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #323 https://github.com/DranakCorps-bot/EQBuddy/pull/323 (`claude/t3-terminology-20260905` → `main`, head `5bf34816`) — `ShellTerminologyTests` + TestPlan §4g + DECISIONS; HELM-FEEDBACK LIVE ASK ~1:11 PM CT; Fable I-16/T3 tests-only. MERGED `d4b49ca2`.
 - **Ruling:** **SIGNED** (original ~1:15 PM CT; restored ~1:20 PM CT after #325 clobber). Three-tier shell scanner SIGNED; shell-only scope SIGNED (no app-wide exemption list); comment/`EQBUDDY_EXPAND` exclusions + empty Exempt SIGNED; narrow XAML scan SIGNED.
-- **Vocabulary:** **(b) SIGNED** — ban **"mini pill"**; keep **"chip" / "HUD chip"**. Follow-up PR still owed (one §4 row + one Ban row). **(a)** rejected as long-term; **(c)** rejected.
-- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Mini-pill Ban follow-up when lane-T idle.
+- **Vocabulary:** **(b) SIGNED** — ban **"mini pill"**; keep **"chip" / "HUD chip"**. Follow-up landed as PR #326 (SIGNED ~1:40 PM CT). **(a)** rejected as long-term; **(c)** rejected.
+- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Mini-pill Ban follow-up = PR #326 (SIGNED ~1:40 PM CT).
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-05 ~1:15 PM CT; restored 2026-09-05 ~1:20 PM CT
 
