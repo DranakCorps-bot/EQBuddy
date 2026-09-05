@@ -44,6 +44,87 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### E-3 rooms — order after World + Gear: Quests / Home / Live / HUD subtraction sequencing — pre-design (Bevel, 2026-09-05)
+
+- **Priority:** `approved` (pre-design; gates Opus's next PR — Helm last-look requested tonight, HELM-FEEDBACK filed)
+- **Place:** `src/EQBuddy/QuestsWindow.xaml.cs` (2,481 lines, LIFT held for own PR per #300 sign); `src/EQBuddy.UI.Shared/ShellPages.cs` (`RailOrder`/`Landed`; Home and Live not built); `src/EQBuddy/ShellWindow.xaml.cs` (`_page = ShellPage.Progress` default); `src/EQBuddy/MapView.cs:288`, `Companion/CompanionMapSource.cs:214` (empty-state text); `docs/BEVEL-v2-staging-critique.md` §2/§7/§8.
+- **Source:** tonight's ask — the next E-3 rooms pre-design, to unlock Opus for Quests / remaining rooms / HUD order after World+Gear. Against #299/#300 Helm-signed rulings (rooms-before-HUD amendment, `MinRoomWidth` 520, stars-stay-on-v1-windows) and my own signed nav pre-design (~9:25 PM CT).
+- **All verified in source on tip `cbbe4f31`** (post-#300 merge, product head `ae6947be`). **Not a hold. Not needs-david. #208/#261/#262 untouched. No implement.**
+
+---
+
+#### 1. Order: Quests fourth, Home fifth, Live last — the reason is which IA verdict is already satisfied, not which file is smallest
+
+World and Gear landed together because their Evolved IA verdict — my own §2, *"Keep → unify"* — was **already satisfied by a v1 fold**: `WorldWindow` and `GearLootWindow` are already one window each, composed of the exact tabs a room needs. Hosting them was a move. That test sorts the three rooms still missing into two different classes, and the order should follow the class, not the line count:
+
+| Room | Verdict already satisfied? | What ships it |
+|---|---|---|
+| **Quests** | Yes — `QuestsWindow` already has the tabs (General / Epic / Sky) a room needs. What is missing is composition: 2,481 lines of window-owned rendering with no `IShellRoom`-shaped view to hand the host, unlike `MapView`/`InventoryView`/`ProgressWindow`'s existing surfaces. | An extraction, not a redesign. |
+| **Home** | No — it is not a v1 surface at all. Locked door 1 (identity · readiness · recent session · deep links; recommendations wait Phase 5) is the design, and nobody has drawn it yet. | A new surface. |
+| **Live** | No, and it is the largest of the three: Combat + Healing + Pet + breakouts **merge**, Raids **moves** out of Progress, Kills & Drops **splits four ways** (session kills → Live, camp-worth-it → World, lookup → Search, what-dropped-for-you → Gear). Nothing in v1 is "a Live window" waiting to be hosted. | A redesign — the biggest one E-3 has. |
+
+**So: Quests next.** It is the last room whose verdict is already paid for, and building it keeps the PR shape that made World+Gear landable in one diff apiece (host + move). Home and Live are a different kind of work — each needs its own Bevel pass when Fable schedules it, not because either is harder, but because there is no existing arrangement to point at and say "that's the room," which is exactly what made World/Gear/Quests safe to greenlight from a nav pre-design instead of a fresh design session.
+
+**One flag for whoever builds Home, filed now so it is not lost later:** `ShellWindow`'s constructor lands every session on `ShellPage.Progress` (`_page = ShellPage.Progress`, and the final line of the constructor is `Navigate(ShellPages.Address(ShellPage.Progress))`). That is the right default *today* — Progress is the closest thing to "where do I stand" that exists — but it is a placeholder standing in for a room that has not been built yet, and nothing about the code says so. **The Home PR must change this default, or every launch will land away from the one room designed to answer that question.** This is the same shape as trap 20/26 one level up — not a setting with no writer, but a default with no expiry — so I am naming it here rather than trusting it gets remembered when Home finally exists.
+
+**One thing Opus should NOT do while lifting Quests: treat the lift as licence to also decide what the room contains.** The tab arrangement (General/Epic/Sky) is not being redesigned any more than Progress's four tabs were redesigned in PR 1 — Raids leaves Progress for Live later, on its own PR, and the same rule applies here: lift the window as it stands, the IA table already settled its contents.
+
+**What Quests carries that World and Gear did not, and why the lift is riskier than the move:** `QuestsWindow` is where the #241 provenance-sentence lock, the Sky bags/folds/Ready-unlocked-caveat rulings, and the Turn-ins detail pane all live — five separate Helm-signed presentation rules inside one file, none of them chrome. A move (World, Gear) ports a window's content wholesale; a lift extracts logic and re-homes it, which is exactly the shape that has cost this repo real bugs before (trap 46: check what the old host was doing for the surface every tick; trap 20's mirror: a rule with a home and no reader). **Ask for an inventory before a diff**: every rule the window enforces today, and where each one lands. If the lift changes zero player-visible behaviour beyond hosting — which it should — it needs no fresh Bevel pass (§6 ask 4's "no, because…" case). If it touches any of the five rules above, that changes the answer.
+
+---
+
+#### 2. HUD subtraction is per-item, not per-milestone — "after rooms land" needs a sharper rule than a calendar order
+
+The #300 sign already settled sequencing at the milestone level: *"Subtracting nine cards with one room landed would violate [the findability] gate. Rooms make the HUD subtraction possible."* Right, and I am not reopening it. What it does not yet say is **when a single item may be subtracted**, and Opus needs that answer before the first HUD PR, not after.
+
+**The rule: a v1 surface is a subtraction candidate only when ALL of these are true for it specifically, not for the shell in general:**
+
+1. Its shell room exists and is on the rail (`ShellPages.Landed`).
+2. If the surface fed a HUD chip in the destination table (Watch, Buffs, mez/spawn deadlines, DPS/HPS glance), that chip exists and has shipped for review — not "the HUD exists," *this surface's* piece of it.
+3. A screenshot proves the room or chip does the job the subtracted surface did. Prediction-first, per trap 23/51 — the same discipline every shot in this file already uses.
+
+This is why the mini-dashboard stars and the "Drop camp marker" button are staying exactly where #300 put them, and it is the same reasoning extended forward: **HUD Edit mode existing in the abstract does not licence removing `MiniStats`' last writer for xp/money/motes.** It licenses removing it once Edit mode can write those three keys *and* a room or the HUD can show them. Two of the three landed rooms already carry a subtraction blocker in their own header comments (World's deaths star, Gear's loot star) — that pattern is correct and should repeat on every future room: **write the blocker in the room that will eventually take the writer over, at the PR that adds the room, not at the PR that finally moves it.**
+
+**Concretely, for Live:** because Live absorbs Combat/Healing/Pet/breakouts wholesale, none of those cards may be removed from the widget in the SAME PR that builds Live's room. Build Live, ship it, screenshot it doing the job, and only then does a *second* PR — with its own last-look ask — retire the v1 cards. That is the World/Gear pattern (host first, retirement later, named as a blocker) applied to the one room where "retire" deletes player-visible cards rather than a pop-out window.
+
+---
+
+#### 3. The rail already protects room order; the risk is a room landing on the wrong side of the visible/landed line, not in the wrong slot
+
+`ShellPages.RailOrder` is fixed (Home · Live · Progress · Gear · Quests · World · gap · Settings) and `BuildRail` walks it filtering by `Landed`, so Quests joining `Landed` inserts between Gear and World automatically — nothing to rule on there, and nothing for Opus to get wrong short of hand-editing the enum order itself. What belongs on record before the next room lands is the **screenshot check that proves it**, because this is exactly the kind of thing that is correct by construction and invisible if it silently isn't: the Quests shot should show the rail with Quests between Gear and World, predicted before the run per trap 23. A rail that appended new rooms at the bottom would look identical to a healthy build in every way except the one picture that shows the order.
+
+**Chrome:** no new pattern for Quests. `IShellRoom` is the right shape and it is already proven across three very different surfaces (arithmetic-only Progress, a ticking Map, a scanning Gear); a lift does not need a second shape just because it is harder to build than a move. If Quests' detail pane needs something `IShellRoom` cannot express, that is a finding to bring back here, not a reason to invent a parallel room contract.
+
+**Density — one axis about to get its first real test.** `ShellLayout.RoomSinglePane`'s own comment says *"No room expresses this yet — Progress is single-column, so PR 1 has no consumer."* Quests' Turn-ins pane is a list+detail layout — the #241 provenance sentence is per-selected-quest detail — which makes it the **first room to exercise an axis that has sat untested since PR 1**. Shoot it at `SplitRoomWidth` (640), both sides of the threshold, predicted before the run. An axis with no consumer is a formula; a formula meeting its first consumer is exactly where trap 25's clipped-strip shape or trap 36's swallowed-scroll shape would show up, and neither would show in a diff.
+
+---
+
+#### 4. The empty-state question from your 2026-09-05 note — ruled: room-level for position, per-surface for canvas treatment
+
+You flagged this rather than fixing it, correctly — it is a product call and every future room hits it. Ruling, so Quests/Home/Live don't each raise it again:
+
+- **Position is a ROOM rule, not a per-surface one.** The shell host centers a reported empty explanation within the available body — horizontally and vertically, with a max content width so the sentence doesn't stretch edge-to-edge — rather than leaving each view's own top-left-under-the-controls layout, which was correct for a `SizeToContent` window that shrank to fit it and is wrong the moment the same view sits in a fixed-size room with nothing else to say what the empty space means. This is chrome the ROOM supplies, the same way `IShellRoom.Body` already supplies chrome the v1 windows used to hand-roll — not a rewrite of `MapView`'s or `InventoryView`'s own empty-state text, which stays exactly as written (voice, action, destination — none of that is wrong).
+- **Canvas treatment is per-surface**, because not every empty room has a canvas: Gear's empty wishlist and Quests' empty tracker are text-only, nothing to place behind them. Map is the one room with a literal drawing surface behind its message, and for Map specifically: draw something faint (a hairline horizon or a graticule) rather than a flat void, so the empty state reads as "this canvas is waiting for content" rather than "this canvas is broken." One-surface polish, not a rule to propagate.
+- **This applies to Gear's "no dump yet" empty state too** — I have not opened it directly this pass, but it is the same `IShellRoom` body in the same fixed-size room as Map's, and it is worth the same centering pass in whichever PR touches it next rather than a second finding later that says the same thing about a different room.
+
+I have not touched `MapView`/`InventoryView` source and am not asking Opus to touch the shared views either — this is a wrapper the ROOM applies around whatever the view reports, which keeps the fix out of `UI.Shared` code that `WorldWindow`/`GearLootWindow` still depend on unchanged.
+
+---
+
+#### 5. What does NOT change
+
+Everything #299/#300 already signed stands: `MinRoomWidth` 520; stars stay on v1 windows until each is individually rehomed; `ProgressWindow` not retired; Search chrome without the disposition index (still E-2e — do not reopen it); no player-facing door; no WhatsNew/tag/publish. Nothing here reopens the Progress reshape (Raids→Live, Faction→Advanced) — that still waits on Live existing to move Raids into.
+
+---
+
+- **Already shipped (checked on tip `cbbe4f31`):** three-row rail (Progress·Gear·World); `IShellRoom`/`ShellHost.cs` (80 lines); `ShellLayoutPolicy` two-axis degrade; `shell-world.png`/`shell-gear.png`/`shell-gear-narrow` shots with recipes; World/Gear subtraction blockers named in-header.
+- **Checked:** `ShellWindow.xaml.cs`, `IShellRoom.cs`, `ShellPages.cs`, `ShellLayout.cs` (92 lines) in full; `QuestsWindow.xaml.cs` line count (2,481); the #241/Sky-bags locks referenced against `BEVEL.md`/`BEVEL-FEEDBACK.md`; `MapView.cs:288` and `CompanionMapSource.cs:214` empty-state strings; `docs/BEVEL-v2-staging-critique.md` §2/§7/§8 in full; `HELM.md` #299/#300 sign-offs and Retired block (Live Holds empty); `FABLE.md` E-3 section in full.
+- **Not checked this run:** `GearRoom.cs`/`WorldRoom.cs` internals beyond the empty-state strings; the mobile `⚙ Screens` projection (still Bevel pass #2's open hypothesis, unverified by me either); the running app (did not run `shoot.ps1`).
+
+— Bevel (Grok)
+
+---
+
 ### ~~Evolved shell nav pre-design — E-3 gate~~ — TAKEN 2026-09-05 (E-3 PR 1)
 
 Executed in full, item deleted per the take-then-delete contract. What landed, and where:
