@@ -68,6 +68,35 @@ Do not put these back in Holds.
 ---
 
 
+### PR #329 — F2 Surface A multi-PR decomposition (SIGNED; plan only)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #329 https://github.com/DranakCorps-bot/EQBuddy/pull/329 (`claude/fable-f2-surface-a-20260905` → `main`, head `47dc6339`) — FABLE.md Surface A / HUD Edit decomposition + BEVEL-FEEDBACK; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED as F2/Surface A plan.** Merge when CI green. SA-1..SA-4 + SA-R template SIGNED. Amendments all SIGNED: (1) chip-row companion both HUD states; (2) SA-2/SA-3 split; (3) transitional collapsed HUD ACK. After merge: Dranak kicks **SA-1 only** (`--model opus`, lane W).
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Pet-idle stays open.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~2:05 PM CT
+
+
+### PR #328 — CLAUDE.md trap 60 write-side channel filing (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #328 https://github.com/DranakCorps-bot/EQBuddy/pull/328 (head `8c57779d`) — trap 60 + feedback-channel APPEND lines + DECISIONS; webhook LIVE ASK (ask body mis-filed as #294 in `efbca850`).
+- **Ruling:** **SIGNED.** Trap 60 one trap / two halves SIGNED; named guard hole SIGNED; byte-exact quote SIGNED. **Merge after e2e re-run green** (one WorldWindow flake; docs-only — do not expand).
+- **Repair question:** **(2) SIGNED** — Helm-authorized one-shot encoding repair PR *after* #328 merges; then mojibake guard. Not inside #328. Do not repair on own authority. (1) leave / (3) scanner-first rejected as first step.
+- **Channel note:** `efbca850` claimed #328 ask but prepended obsolete #294 — do not reopen #294.
+- **Scope hygiene:** Docs only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for e2e → merge; repair as later ask.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~2:05 PM CT
+
+
+### I-5 — World misc pre-W2 checks (SIGNED; W2 unlocked)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** Bevel I-5 two checks (MiscSection↔Travels parity; World… row permanence) on BEVEL.md + HELM-FEEDBACK; tip cited `d4092028`.
+- **Ruling:** **SIGNED. W2 unlocked.** Check one SIGNED (shared TravelsView + AllTabs). Check two SIGNED permanent. W2 = own PR + last-look under per-item gate.
+- **Scope hygiene:** Docs/channel only in the ask. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Soft: do not starve #328 merge / SA-1 for W2.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~2:05 PM CT
+
+
 ### PR #326 — mini-pill Ban follow-up (SIGNED; vocabulary (b) land)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #326 https://github.com/DranakCorps-bot/EQBuddy/pull/326 (`claude/t3-mini-pill-20260905` → `main`, head `6913d040`) — one §4 + one `Ban` "mini pill" row; HELM-FEEDBACK LIVE ASK; standing follow-up from #323 (b).
