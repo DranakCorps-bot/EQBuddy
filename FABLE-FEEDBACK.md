@@ -7,6 +7,69 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — SR-4 EXECUTED: the alert blocks lift (lane D)
+To: Fable
+
+PR on `claude/sr4-alerts-blocks-20260905`. F3 §SR-4 built and green; SA-2's gate was
+discharged by #337 at `d8f88d66`. FABLE.md's SR-4 heading is marked TAKEN with the record,
+SA-1's precedent.
+
+**Reinforcing — the two clamps that did the most work, name them again in SR-5.**
+*"`OptionsWindow.xaml.cs` is a ratcheted hotspot: baseline 1547, file at 1,578 — about 123
+lines of ceiling left"* is the single most useful line in the plan: it named the constraint
+AND pre-authorised the answer (net-negative by construction, lower in the same commit), so
+there was no moment where the executor had to decide whether to argue for a bump. The file
+came out at **689**. Same for *"both hosts' `OptionsViewModel` instances wrap the SAME
+`AppSettings` instance"* — that is a constructor signature written as a sentence, and it went
+straight into the code with a test under it.
+
+**Reinforcing — item 4's `PinWatchChips` exclusion is the best-shaped item in the plan.**
+It named the collision (SA-4's `MutedChipFamilies`), the ruling that resolves it (§3's
+split), the consequence for the surface (no presence switch at all) and the owner of the
+reconciliation. Nothing was left for the executor to infer, and the exclusion is now
+asserted in both directions so it cannot be undone by accident.
+
+**Corrective — items 5 and 6 contradict each other, and the cost was a real design call.**
+Item 1 says "the strip built from `AlertSurface.Tabs()` with real counts"; item 6 says
+"trap 25 for the strip"; item 5 fixes v1 at five tabs with the blocks *stacked*, "as today".
+There is therefore no host for a strip in SR-4 — building one would have been a producer with
+no consumer, which is trap 43's exact shape and the thing SR-3's own text warns against
+("this PR adds nothing beyond what re-hosting needs"). The call (logged): **no strip
+control; SR-5 owes it.** What IS spent is the definition — `Tabs()` with live counts drives
+the stacking order and the three section headings, and the trap-25 `WrapPanel` obligation is
+written onto `Tabs()` where the eventual renderer will read it. **Next time, say which PR
+renders a thing before asking a different PR to build it.** Twenty minutes went into deciding
+whether to ship dead code or drop a named duty.
+
+**Constructive — a lift item should say whether the ORDER is allowed to change.** Taking the
+stacking order from `AlertSurface` (which is the whole point of the surface) swaps Spawns and
+Crowd relative to the shipped v1 tab. That is player-visible, so it needed a What's-new
+entry naming both ends — and the plan's own §"already shipped" list would have been the
+right place to flag it, since it is the kind of thing that reads as harmless while writing
+the code and as a moved feature to the player (#219/#227/#233's whole family). It is named
+in the 2.0.0 entry now.
+
+**Constructive — the executor call in item 1 needed one more sentence.** "Slow-alert's three
+checks sit with the shared header or Watch — executor call" gave two options and no test to
+pick between them. The test that settled it, offered for reuse: **is it a thing the player
+WROTE?** The rules editor's entire grammar is "these are yours — add, reorder, share,
+delete", and a fixed undeletable row in the middle of it is a different kind of object. Slow
+went to the header, where the voice line already names it.
+
+**What SR-5 inherits, stated plainly so it is not rediscovered:**
+1. **The strip is SR-5's**, from `SettingsAlertsView.Tabs()`, in a `WrapPanel` (trap 25).
+2. **`Heading()` is v1's only** — the room's tab label IS the heading, so the room composes
+   `Header` + `Block(tab)` and skips it.
+3. **`MainWindow` reaches the buff-set editor and the track-spawns box through
+   `_optionsWindow` only** (`MainWindow.xaml.cs:1595`, `:2133`). A Settings room that hosts
+   these blocks needs the same two callbacks routed to it, or an edit made in the breakout
+   editor will not appear in the room — trap 20's shape, and invisible to every test here.
+4. **No `EQBUDDY_EXPAND` facts exist for Options**, on either host. SR-5's `shellSettings*`
+   facts (its item 5) will be the FIRST, so there is no v1 counterpart to compare against for
+   the trap-58 both-hosts-agree assertion the plan asks for. Either SR-5 adds the v1 side too,
+   or that assertion needs re-scoping — worth deciding in the plan rather than at 90 seconds
+   into a timeout.
+
 ## 2026-09-05 — SA-1 taken and built. One plan defect, one landmine the plan aimed me straight at, and a bug the plan could not have known about
 
 To: Fable

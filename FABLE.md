@@ -506,33 +506,35 @@ until retirement day: #210's mechanism with a bigger surface.
    `OptionsWindow` the tab keeps its current label — the ban's own scope line exempts v1,
    and renaming shipped v1 copy for no player benefit is the #228 class.
 
-### SR-4 — Alerts blocks: the `AlertSurface` spend (D lane; **gated: after SA-2 merges**)
+### SR-4 — TAKEN 2026-09-05, built and green (Claude, lane D)
 
-1. Four sub-tab blocks keyed by `AlertTab`, the strip built from `AlertSurface.Tabs()` with
-   real counts — the first consumer of scaffolding idle since before the pivot (signed item
-   1): **Watch** = the rules editor (`BuildRulesEditor` lift: add/import/export/reorder);
-   **Buffs** = buff-expiring-only + warn seconds + the buff-set builder (`BuildBuffSetPanel`
-   lift); **Spawns** = track-spawns + whatever spawn config survives SA-2; **Crowd** = mez
-   chips enabled + `MezDurationsView` re-host. Slow-alert's three checks sit with the shared
-   header or Watch — executor call, logged in `DECISIONS.md`.
-2. The shared sound/voice/volume/rate block renders ONCE as a header above the strip — the
-   IA's ruling: a cross-cutting default every rule can override (`AlertSoundCatalog`), not
-   one family's content.
-3. **Why the SA-2 gate:** SA-2's fold obligation deletes the spawn/mez grow-up toggles and
-   the Options placement affordance from exactly these XAML regions. Lifting first would put
-   two lanes in one region and land SA-2's obligation in a file mid-flight. SA-2 is in
-   flight now — the gate is short, and it is a WAIT, not a change to SA-2.
-4. **`PinWatchChips` does NOT lift.** It stays a v1-`OptionsWindow`-only row. It is the
-   named collision with SA-4's `MutedChipFamilies` (two switches converging on "does this
-   chip show"), and the signed spec's §3 split is the ruling to apply: Settings → Alerts
-   owns what-fires/sound/volume; the HUD owns on-screen presence. So the new Alerts tab
-   carries NO presence switch at all, and **whoever lands SA-4 owns the reconciliation**
-   (fold `PinWatchChips` into mute, or retire it with its readers) — finding one switch,
-   not two. This plan changes nothing in SA-4.
-5. v1 `OptionsWindow` keeps five tabs re-hosting the same blocks in the old arrangement
-   (the `watch` tab = Watch block + its native `PinWatchChips` row; the `alerts` tab =
-   header + Buffs/Spawns/Crowd blocks stacked, as today).
-6. Trap 25 for the strip; the trap-26 enumeration covers BOTH source tabs.
+Its six steps are struck rather than left to be re-read as pending — the take-then-delete
+contract, SA-1's precedent. **The SA-2 gate is discharged: #337 merged at `d8f88d66`.**
+
+**What landed** (`EQBuddy/SettingsAlertsView.cs`, 1,481 lines; `OptionsWindow.xaml.cs`
+1,569 → 689, baseline lowered in the same commit):
+
+- The four blocks and the shared sound/voice/volume/rate header, host-neutral, taking
+  `(MainWindow, OptionsViewModel, ready-gate, resource-resolver, owner-window)`. Watch =
+  the rules editor + examples + log-line picker + share import; Buffs = expiring-only, warn
+  seconds, buff-set builder; Spawns = track spawns; Crowd = mez chips + `MezDurationsView`.
+- **The `AlertSurface` spend is real**: `Tabs()` with live counts (rules written, buff
+  buckets assembled, timers running; `crowd: null` because that tab configures a switch, not
+  a list) drives the v1 stacking ORDER and the three section headings. `OptionsWindow` spells
+  no tab label itself, asserted.
+- **`PinWatchChips` did not lift** — asserted in both directions, so SA-4 finds one switch.
+- v1 keeps five tabs. The one player-visible consequence of taking the order from Core is
+  that Spawns and Crowd swapped; named in the 2.0.0 What's-new entry.
+- **Two executor calls, logged in `DECISIONS.md`:** the slow alert sits with the shared
+  header (it is a built-in, not a rule the player wrote), and **SR-4 builds no strip
+  control** — item 5 fixes v1 at five tabs, so a strip here would have had no consumer until
+  SR-5 (trap 43). The trap-25 `WrapPanel` obligation is written onto `SettingsAlertsView.Tabs()`
+  where whoever renders it will read it. **SR-5 owes the strip.**
+- The vocab sweep ran over the block (four v1 sentences reworded); the file joins
+  `ShellTerminologyTests.ShellStringSources`, prove-failed on a seeded violation.
+- **Owed and NOT done here:** the `options-window`-family re-shoot and any `EQBUDDY_EXPAND`
+  facts. Both need the screen and SA-3 holds it (trap 61). 43 source-level assertions stand
+  in; all 39 trap-26 enumeration rows prove-fail against the pre-lift tree.
 
 ### SR-5 — the Settings room lands (S lane; after SR-1/SR-3/SR-4; SR-2 independent)
 
