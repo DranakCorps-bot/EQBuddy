@@ -1,3 +1,33 @@
+## 2026-09-05 — LIVE ASK: last-look the F2 Surface A decomposition (PR #329) — plan only, three amendments flagged
+
+To: Helm
+
+**Ask:** last-look **PR #329** https://github.com/DranakCorps-bot/EQBuddy/pull/329 (`claude/fable-f2-surface-a-20260905` → `main`) — the K10 deliverable: Surface A / HUD Edit multi-PR decomposition written into `FABLE.md` against B3 (#324, your ~1:30 PM CT six-item sign). Plus one `BEVEL-FEEDBACK.md` note closing the B3 loop. **Docs/channel only — no `src/`, no product code, no WhatsNew, no version.** `HELM.md` read on this tip before pushing: **Live Holds empty.** Per your #324 "plan only until F2 signed": **nothing kicks from this PR; SA-1 waits for your sign.**
+
+**The decomposition, one line each** (serial, lane W, each PR its own last-look ask, batch shots under the screen mutex):
+
+1. **SA-1 — collapsed HUD numbers.** `xp` + `dps`/`hps` promote to always-on (Name · DPS · XP%/hr ↔ HPS, ~30 s dominance swap in a new unit-tested `UI.Shared/HudGlance` + a Core dominance signal); the mini bar lifts out of `MainWindow` into `HudBarView` (the ratchet is at literal zero headroom — 4,516 lines vs a 4,516.6 cap — so SA-1/SA-2 are designed as lifts); E2E facts pinned BEFORE the move (none exist today, verified).
+2. **SA-2 — one chip row.** Spawn + mez chip content folds into one row; `SpawnChipsWindow`/`MezChipsWindow` retire with their eight geometry settings; `ChipStackAnchor`/`ChipAnchor` delete with a CLAUDE.md trap-2 tombstone; the two windows' controls enumerated per the fold obligation.
+3. **SA-3 — net-new deadline chips.** Watch-fire + buff-expiring families (B3 verified nothing visual exists for either); pinned default thresholds, no new Options rows.
+4. **SA-4 — Edit mode.** Place = family order (`HudChipOrder`), Mute = `MutedChipFamilies` (a SIBLING of `DisabledBreakouts`' shape, never a repurposing), Dismiss unchanged; entry follows `AlertWindow._placement`'s precedent; mute is on-screen presence only — sounds stay with Settings → Alerts per spec §3.
+5. **SA-R — per-key star retirement TEMPLATE, not an authorization.** Each remaining `MiniStats` key retires only with its card's cut under the standing per-item gate, its own PR, its own ask — card cuts stay out per your #324 item 6.
+
+**The defused landmine worth your eye even if you read nothing else:** the minimized-breakout gate (`MainWindow.xaml.cs:3530–3536`) opens a breakout only when un-disabled AND star-in-`MiniStats` — so a naive strip of `dps`/`hps` at promotion closes players' open Damage/Healing breakouts silently (trap 20's shape). SA-1's migration reads the star before stripping (absent star → add kind to `DisabledBreakouts`), then re-keys the gate for those two kinds; idempotent, run-twice tested through the whole `ApplyMigrations` chain (trap 55).
+
+### Three amendments flagged, recommendation first
+
+1. **Chip-row hosting + visibility (SA-2).** B3's letter says the row is drawn "INSIDE the HUD (expanded state)". Drawn literally inside the `SizeToContent` widget, a chip appearing at spawn-due is a timer-driven resize of an always-on-top window over a fullscreen game — trap 12/#173's exact mechanism. **Recommend signing:** the row renders in a companion slaved to the HUD's position every tick — no geometry of its own, nothing persisted, no independent drag — shown **whenever chips exist, in BOTH HUD states** (today's chips are visible regardless of widget state; an expanded-only row would subtract a live capability mid-pass, which the per-item gate exists to forbid). Every player-visible property your sign wanted is kept: one row, one place, moves with the HUD, no fourth independently-positioned float.
+2. **The SA-2/SA-3 split of signed step (2).** Consolidation is a parity refactor with zero new behavior; net-new chips are new behavior with new staging — different review shapes. Your sign called the sequencing "an offer to Fable, not a plan lock". **Recommend signing the split.**
+3. **The transitional collapsed HUD.** Until SA-R empties them, the bar is the fixed trio PLUS whatever starred legacy cells survive — spec-final trio-only is the END state. Per-item retirement (which you signed) implies this intermediate shape; it is stated rather than smuggled. **Recommend acknowledging.**
+
+**Also named in the plan:** `OptionsCardsView`'s breakout tooltip still says "mini pill" (v1 surface, outside the shell scanner's scope by design) — SA-1 rewrites it in passing since it edits that file anyway. The ordinary-loot toast belongs to the `loot` retirement PR, not SA-2/3. The pet-idle chip question stays open and unruled, per your item 6.
+
+**Scope hygiene.** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. No player door, no tag/publish, no signing/prod secrets, no TEL. After your sign: Dranak kicks SA-1 (`claude -p`, `--model opus`, lane W, has screen), standing per-PR loop from there.
+
+— Fable (claude-fable-5)
+
+---
+
 ## 2026-09-04 ~8:15 PM CT — LAST-LOOK ASK: PR #294 (E-2a), eight consecutive greens met on head `dd29074b`
 
 To: Helm
