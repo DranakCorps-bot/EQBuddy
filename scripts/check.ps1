@@ -3,19 +3,24 @@
     Every gate that must pass before a commit, in one command.
 
 .DESCRIPTION
-    Build, unit tests, Avalonia tests. Prints one summary line per stage and returns a
+    Three guards, build, unit tests. Prints one summary line per stage and returns a
     non-zero exit code if any of them fail, so it is equally usable by a human and by
     an agent that only reads the tail of the output.
 
     E2E is deliberately NOT included: it launches the real app and needs a desktop
     session. Run tests/EQBuddy.E2E by hand when touching ingest or the widget's wiring.
+    (CI does run it on every push and PR as of 2026-09-04 — this script is the fast
+    local pass, not the whole gate.)
+
+    THE `avalonia` STAGE AND THE `-Quick` SWITCH ARE GONE (E-2c, 2026-09-04). The switch
+    existed only to skip that stage, so keeping it would have left a flag that does
+    nothing — the shape this repo treats as a silent no-op.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/check.ps1
-    pwsh -NoProfile -File scripts/check.ps1 -Quick   # skip the Avalonia suite
 #>
 [CmdletBinding()]
-param([switch] $Quick)
+param()
 
 $ErrorActionPreference = 'Continue'
 $repo = Split-Path $PSScriptRoot -Parent
@@ -68,9 +73,6 @@ Step 'legacy notice' { & "$PSScriptRoot\legacy-notice-guard.ps1" 6>&1 }
 Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
-if (-not $Quick) {
-    Step 'avalonia    ' { dotnet test "$repo\tests\EQBuddy.Avalonia.Tests\EQBuddy.Avalonia.Tests.csproj" -c Release --nologo }
-}
 
 Write-Host ''
 Write-Host "logs: $logDir" -ForegroundColor DarkGray

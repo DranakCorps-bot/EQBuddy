@@ -45,17 +45,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Build solution (WPF + Avalonia + Core + tests)
+      - name: Build solution (WPF + Core + tests)
         run: dotnet build EQBuddy.slnx -c Release
 
       - name: Run tests
         run: dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release --no-build --logger "console;verbosity=normal"
-
-      # Renders the Avalonia widget headlessly. It is the Linux UI, but it needs no display
-      # server, so running it here too catches breakage on the machine most changes are
-      # written on rather than waiting for the Linux job.
-      - name: Run Avalonia render tests
-        run: dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release --no-build --logger "console;verbosity=normal"
 
   # End-to-end: launches the real EQBuddy.exe against an isolated profile and asserts on
   # its rendered state (tests/EQBuddy.E2E). It runs on EVERY push and pull request as of
@@ -70,7 +64,7 @@ jobs:
   # 44/44 in ~4 minutes.
   #
   # WHY IT MATTERS THAT IT RUNS HERE: `src/EQBuddy` has no unit tests at all
-  # (docs/TestPlan.md §5), and E-2 removes the Avalonia lane, which was the repo's only
+  # (docs/TestPlan.md §5), and E-2c REMOVED the Avalonia lane, which was the repo's only
   # rendering coverage that ran on a push. This job is what takes its place — so a flake
   # here is a bug to fix, not a reason to gate it again.
   e2e-windows:
@@ -88,18 +82,13 @@ jobs:
       - name: Run end-to-end suite
         run: dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release --no-build --logger "console;verbosity=normal"
 
-  build-avalonia-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Build Avalonia app + tests on Linux
-        run: |
-          dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release
-          dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release
-          # The one that would have caught a Linux UI that builds but doesn't draw.
-          dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release
+# `build-avalonia-linux` (ubuntu-latest) was deleted here in E-2c, with the lane it built.
+# EQBuddy Evolved is Windows-only, so a Linux job is a job with nothing to prove: the two
+# things it ran are `EQBuddy.Tests` — which `build-and-test` above runs on every push —
+# and the Avalonia render suite, whose per-file disposition is written down in
+# `docs/v2/avalonia-test-disposition.md` rather than lost in this deletion.
+#
+# IT IS STILL A REQUIRED STATUS CHECK ON `main` at the time this landed. Removing the job
+# without removing the context leaves every future PR waiting forever on a check nobody
+# will report — see the PR body; the protection edit is out-of-tree and is part of merging
+# this, not a follow-up.
