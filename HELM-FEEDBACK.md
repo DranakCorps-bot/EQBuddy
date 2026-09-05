@@ -1,3 +1,34 @@
+## 2026-09-05 ~11:30 AM CT — Helm: PR #316 T2 harnesses default to Evolved last-look **SIGNED** (head `9e1b62ca`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #316 https://github.com/DranakCorps-bot/EQBuddy/pull/316 (`claude/harness-shell-20260905-b` → `main`, head `9e1b62ca0f2611616a5d3cec9540558bd1256d97`). Against David's standing order (no bare v1 suite pops during Evolved build-out) and Fable labelled hypothesis (3) (#303 MONITOR-2 did not cover shell-launch default). Ask filed on branch (~11:25 AM CT); not yet on `main`. At look: `build-and-test` + `e2e-windows` **in flight**; mergeable. **Signed. Merge when both CI green on this head.**
+
+### What is signed
+1. **`AppHarness.Launch` defaults `EQBUDDY_SHELL=1` before caller dict; same one-liner in `shoot.ps1` (captures + primes) and `mode-swap-verify.ps1` — SIGNED.** Opt-out `""` (hook `is { Length: > 0 }`) SIGNED. No new env var.
+2. **Both windows on monitor 2 via the same `WindowPlacement.SecondaryOrigin` the shell asks; widget offset by `ShellLayoutPolicy.OpenWidth` — SIGNED.** Null/single-screen fallback untouched. Trap-4 shape (two answers to one monitor question) correctly refused.
+3. **`shot.ps1` exact-title wins over substring — SIGNED.** Trap 24 half `-OwnerPid` cannot cover; fragment titles still fragment-match.
+4. **Graceful close aims at widget by exact title (`CloseGracefully` / `Close-EqWidget`) — SIGNED.** Only widget `OnClosed` finalizes `history.db` + shutdown; two unowned top-levels after E-3.
+5. **Guard `TheHarnessOpensTheEvolvedShellWithNoScenarioAskingForIt` (+ `""` opt-out) — SIGNED.** Negative control named; teeth confirmed.
+
+### Ask answers (omissions)
+1. **`drag-verify.ps1` / `drag-check.ps1` stay bare-v1 — SIGNED (stay out).** Hand-driven single-window v1 diagnostics; not T2 scope. One-line follow-up OK later if wanted — do not invent into #316.
+2. **`docs/screenshots/quest-tracker.png` stale (880×658 vs 880×868) — ACK, not this PR.** Surfaced not caused; Fable T1 batch look. Do not regenerate a picture inside a tests-only PR.
+
+### Soft / hygiene
+- **Fable T2 letter collision — ACK.** Kick-prompt T2 (harness Evolved default) ≠ plan-table T2/I-15 (empty-profile harness). I-15 untouched. Fable should renumber one before an idle seat takes the wrong "T2." Not a merge block.
+- Tests/scripts/docs/mailbox only — **no `src/`**. Changes what harnesses open, never what an installed/released build opens. Player door / `ShellHost.ApplyEnvHook` reasoning untouched.
+
+### Unchanged gates
+No WhatsNew / Version / publish / player door / tag. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only. Live Holds empty. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude: merge #316** when `build-and-test` + `e2e-windows` SUCCESS on head `9e1b62ca` (no channel tip to drop on main for this ask — ask lived on the PR branch).
+2. Do not fold drag scripts or quest-tracker reshoot into the merge.
+3. Soft max / parallel seats stand; I-15 empty-profile harness remains its own later ask.
+
+— Helm
+
 ## 2026-09-05 ~11:20 AM CT — Helm: PR #315 E-3 S2 World Drops last-look **SIGNED** (product head `75312797`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
