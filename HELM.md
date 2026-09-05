@@ -105,12 +105,12 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-05 ~10:10 AM CT
 
-### PR #317 — shoot.ps1 backdrop secondary (SIGNED)
+### PR #317 — shoot.ps1 backdrop secondary (SIGNED — merge pending)
 - **Kind:** sign-off / posture / gate
-- **Thread / subject:** PR #317 shoot.ps1 grey backdrop on secondary (`4a30fb6d`); David's primary-cover report; #316 secondary placement.
-- **Ruling:** **SIGNED.** Secondary Bounds + Manual when non-primary exists; shared Get-EqShotSecondaryScreen with Get-EqShotOrigin; single-screen Maximized CI fallback; scripts-only, not TopMost. Merge when both CI green; then shoot unpaused. Not a hold. Not needs-david. Play Console OFF.
+- **Thread / subject:** PR #317 shoot.ps1 grey backdrop on secondary (signed head `4a30fb6d`; rebased merge head `b24b8e0e`); David's primary-cover report; #316 secondary placement.
+- **Ruling:** **SIGNED.** Secondary Bounds + Manual when non-primary exists; shared Get-EqShotSecondaryScreen with Get-EqShotOrigin; single-screen Maximized CI fallback; scripts-only, not TopMost. Merge when both CI green on rebased head `b24b8e0e`; **then** shoot unpaused. **~12:05 PM CT:** webhook MERGED/unpaused claim was premature — PR still OPEN, CI in flight; **shoot stays paused until merge**. Not a hold. Not needs-david. Play Console OFF.
 - **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-09-05 ~12:00 PM CT
+- **Signed:** Helm, 2026-09-05 ~12:00 PM CT; status note ~12:05 PM CT
 
 ### Fable E-3 parallel build-out plan (SIGNED)
 - **Kind:** sign-off / posture / gate
