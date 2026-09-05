@@ -68,10 +68,24 @@ Do not put these back in Holds.
 ---
 
 
-### PR #322 - E-2d Wine (a) knob drop (SIGNED)
-- **Thread / subject:** PR #322 https://github.com/DranakCorps-bot/EQBuddy/pull/322 (`claude/evolved-e2d-wine-a-20260905` → `main`, product `6d85af6d`; tip `81065fb4` to drop).
-- **Ruling:** **SIGNED. Merge when both CI green on rebased product head** (drop ask tip). (1) WholePixel Options UI + handler gone SIGNED. (2) DeadSettingTests.Known `WineWholePixelText` SIGNED. (3) WineText kept; Reapply/IsOfferedHere removed SIGNED (not b/c). (4) WineOverlay/crossover/CrossOver doc untouched SIGNED. (5) No WhatsNew/Version/v1.99.19/Play Console SIGNED. D2 (a) only per #321. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for tip-drop → CI → merge.
-- **Signed:** Helm, 2026-09-05 ~1:11 PM CT
+### PR #322 — E-2d Wine (a) knob drop (SIGNED; head note ~1:20 PM CT)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #322 https://github.com/DranakCorps-bot/EQBuddy/pull/322 (`claude/evolved-e2d-wine-a-20260905` → `main`, signed product `6d85af6d`; current head `b39b5ef9` same product, tip dropped). HELM-FEEDBACK ask ef329a83.
+- **Ruling:** **SIGNED** (~1:11 PM CT). Merge when both CI green on `b39b5ef9`. (1) WholePixel Options UI + handler gone SIGNED. (2) DeadSettingTests.Known `WineWholePixelText` SIGNED. (3) WineText kept (`ApplyIfNeeded`/`Resolve`); Reapply/IsOfferedHere removed SIGNED (#210 shape; not byte-for-byte). (4) WineOverlay/crossover/CrossOver doc untouched SIGNED — (b)/(c) still rejected. (5) No WhatsNew/Version/v1.99.19/Play Console SIGNED.
+- **Channel hygiene:** APPEND UTF-8 for non-interactive `*-FEEDBACK.md` writes (no whole-file rewrite) — SIGNED yes. CLAUDE.md write-side trap (sibling of 54) — SIGNED yes; file next lane-d round.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~1:11 PM CT; head/channel note ~1:20 PM CT
+
+
+### PR #323 — T3 shell terminology scanner (SIGNED; vocabulary=(b)) — restored after #325 clobber
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #323 https://github.com/DranakCorps-bot/EQBuddy/pull/323 (`claude/t3-terminology-20260905` → `main`, head `5bf34816`) — `ShellTerminologyTests` + TestPlan §4g + DECISIONS; HELM-FEEDBACK LIVE ASK ~1:11 PM CT; Fable I-16/T3 tests-only. MERGED `d4b49ca2`.
+- **Ruling:** **SIGNED** (original ~1:15 PM CT; restored ~1:20 PM CT after #325 clobber). Three-tier shell scanner SIGNED; shell-only scope SIGNED (no app-wide exemption list); comment/`EQBUDDY_EXPAND` exclusions + empty Exempt SIGNED; narrow XAML scan SIGNED.
+- **Vocabulary:** **(b) SIGNED** — ban **"mini pill"**; keep **"chip" / "HUD chip"**. Follow-up PR still owed (one §4 row + one Ban row). **(a)** rejected as long-term; **(c)** rejected.
+- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Mini-pill Ban follow-up when lane-T idle.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~1:15 PM CT; restored 2026-09-05 ~1:20 PM CT
 
 ### PR #321 — K4 D1 E-2e disposition + D2 E-2d formality (SIGNED; D2=(a))
 - **Kind:** sign-off / posture / gate
