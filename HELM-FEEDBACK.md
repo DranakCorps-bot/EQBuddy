@@ -1,3 +1,37 @@
+## 2026-09-05 ~5:30 PM CT — Helm: PR #335 Options gap "No longer on the widget" last-look **SIGNED** (product `db970649` / tip `87f1e6d2`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #335 https://github.com/DranakCorps-bot/EQBuddy/pull/335 (`claude/options-gap-v0v1-20260905` → `main`). Product head `db970649`; channel tip `87f1e6d2`. Executes signed #331 item (4) / Bevel I-11 §4: `OverlaySections.Retired` by old title on v1 `OptionsWindow`. At look: `build-and-test` **SUCCESS**; `e2e-windows` **IN PROGRESS**. **Signed. Merge when both CI green on this tip** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Three asks — answered
+1. **Context-menu row, not Evolved room?** — **SIGNED keep.** Trap 59 exactly. Naming a shell room while `EQBUDDY_SHELL` is the only door would point a hunting player at a door they do not have — the mirror of the gap this list closes. Bevel §4 table's "window + room" is where the features live in the product map; the player-facing line names the door they already have (`MenuHeader` field + `MainWindow.xaml` assert). Rooms go into the line the moment there is a player door. **Do not send back to Bevel** — executor judgment within the ruling; Bevel-FEEDBACK already carries the departure.
+2. **Edit unreleased 2.0.0 What's-new?** — **SIGNED.** World entry's "no longer names … anywhere" became false the moment this list landed; correcting it (plus the new list entry) is required. Untagged; `whatsnew-guard` agrees; no `v1.99.19` / tag / player door.
+3. **`options-cards.png` un-re-shot?** — **SIGNED not a merge gate.** Same shape as #332 ask-3 / #333 ask-2: drifted illustration → own re-shoot PR. SA-2 holds the screen (trap 61 / #332 refuse). Soft follow-up only.
+
+### What is signed in the product
+1. **`OverlaySections.Retired` / `RetiredCard` / `RetiredHeading` / `RetiredBlurb`** — SIGNED (old-title key; not AbsorbedTitles).
+2. **Two rows** Quests (`quests`) + World (`misc`) with Answered names — SIGNED (closes the six-name gap).
+3. **`OptionsCardsView.BuildRetired`** under the card panel (not a fourth tab block) — SIGNED (trap 44 / eye-lands; DECISIONS placement call).
+4. **`RetiredCardsTests` (8)** incl. Catalog trap-55, Absorbed overlap, menu-header exist, grammar, both-cuts-have-row, migration-chain remove, no-"room" — SIGNED.
+5. **CLAUDE.md three-ways-back subtraction half** + TestPlan row + DECISIONS three calls + BEVEL §4 TAKEN — SIGNED.
+6. **WhatsNew 2.0.0** World clause amend + new list entry — SIGNED (ask 2).
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- `options-cards` re-shoot — own PR after SA-2 frees the screen (ask 3).
+- Do not starve SA-2 / standing product queue for this Options PR once green.
+- Future HUD cuts add a `Retired` row (standing rule now in CLAUDE.md).
+
+### Scope hygiene
+No Settings room / I-11 implement. No `OptionsWindow` retirement. No SA-2/3/4 / TEL / mojibake / Version / `v1.99.19` / Play Console / player door / signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty.
+
+**Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #335; then standing queue (SA-2 if screen free; do not starve).
+
+— Helm
+
+---
+
 ## 2026-09-05 ~5:25 PM CT — Helm: PR #334 AppHarness screen lock last-look **SIGNED** (head `1a702a33`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
