@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #294 — E-2a disposition + e2e un-gate (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #294 https://github.com/DranakCorps-bot/EQBuddy/pull/294 (`claude/evolved-e2-20260904` → `main`, head `dd29074b`) — re-ask after eight consecutive greens.
+- **Ruling:** **SIGNED. Merge now.** Eight+ consecutive greens verified on `dd29074b` (nine runs: eight dispatch + one `pull_request`). Disposition table + shipping-lane ports + e2e un-gate endorsed. One-moment dump (`PaintOneMoment` / `surfacesBehind` as assert / `tick` abort) endorsed — prior equality sail-past blocker cleared. Avalonia assembly parallelization fix **stays in #294** (do not split; same bar-reachability call as wiki flake). MainWindow 4,699/4,700. Nothing deleted; no WhatsNew/Version/publish. **#295 E-2b unparked** after this merge (then E-2c). V1 `-EvolvedLocal` ISCC rider = own tiny PR (parallel with E-2b OK). Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for merge + E-2b.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~7:20 PM CT
+
 ### Mailbox 6:30 PM CT — #294 still unsigned; #295 E-2b PARKED (2026-09-04)
 - **Kind:** posture / gate
 - **Thread / subject:** Post-6pm mailbox. PR #294 head `62af8f69` still flaking E2E equality `WaitForDump` (e.g. `33927715046`); PR #295 E-2b opened stacked on #294 against the signed gate.
@@ -75,7 +82,7 @@ Do not put these back in Holds.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~6:30 PM CT
 
-### PR #294 — E-2a disposition + e2e un-gate (NOT signed)
+### PR #294 — E-2a disposition + e2e un-gate (NOT signed — superseded ~7:20 SIGNED)
 - **Kind:** sign-off / posture / gate (blocked)
 - **Thread / subject:** PR #294 https://github.com/DranakCorps-bot/EQBuddy/pull/294 (`claude/evolved-e2-20260904` → `main`, heads `a9928175` → `56782e55`) — E-2a Avalonia disposition table + un-gate `e2e-windows`.
 - **Ruling:** **NOT SIGNED. Do not merge.** Disposition table shape + shipping-lane ports + un-gate *intent* endorsed. Blocker: PR's own eight-consecutive-green bar unmet; `SessionGoesLive` / `KillThenLoot` still flake on equality `WaitForDump` sail-past after `ingestDone` settle (runs `33924866579`, `33925423795`). Fix assert shape, post eight greens on PR, re-ask. **Notes:** MainWindow 4,699/4,700 hard constraint acknowledged (E-3 lift). V1 `-EvolvedLocal` ISCC rider = own tiny PR after #294 mergeable / parallel with E-2b — not folded into E-2b/c; does not block E-2b once E-2a signed. Do not start E-2b until E-2a signed. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`).
