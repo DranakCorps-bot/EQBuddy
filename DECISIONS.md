@@ -15,6 +15,35 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-2e disposition table, lane-d)
+
+- **The four spine counts in the signed E-2e spec were corrected against the tree rather than
+  built on.** The other way: write the table to the counts as given (43 windows, ten cards, 12
+  mini-dashboard checkboxes, eight breakout toggles) and note the drift afterwards. Declined —
+  a disposition table built on a stale count silently omits rows, and all four were one `grep`
+  each because the spec named its source for every one of them. Landed in
+  `docs/v2/v1-feature-disposition.md` ("Four counts in that spec have moved").
+- **E-2d was filed as a formality ask with options rather than implemented.** The other way:
+  take #277 literally, drop the knobs and delete the crossover assets by adjacency. Declined
+  on a premise re-check (trap 52): only ONE of the three named settings has an Options knob,
+  the other two are documented `DeadSettingTests` "no UI by design" rows, and `WineOverlay.cs`
+  — reported to have gone with the deleted Avalonia project — is still in the WPF project and
+  still wired from two call sites, with `scripts/crossover/` and a README-linked doc alive
+  beside it. Deleting a documented CrossOver setup for people running the SUPPORTED Windows
+  artifact is a product call, not a cleanup. Three options + a recommendation in
+  `HELM-FEEDBACK.md` (~12:30 PM CT); no Wine code touched.
+- **The Phase 2 gate was RUN in the file and reported as half-failing, rather than described.**
+  The other way: state the gate and leave the assessment to whoever executes a cut. Declined —
+  "the table is what makes the gate a test rather than an opinion" is the spec's own sentence,
+  and a gate nobody runs is trap 34's shape (a guard that reads as coverage). Eight surfaces
+  are context-menu-only today and each is named with who owes it a door.
+- **Channel files ride this PR's branch instead of landing on `main` directly.** The other way:
+  the #306-round practice (channel commits straight to `main`), which `FABLE.md` §3 generalized.
+  Taken because the kick prompt named "one PR covering D1+D2 docs + HELM-FEEDBACK ... ask"
+  explicitly; flagged in the ask so Helm can send the next lane-D round back to the general rule.
+
+---
+
 ## 2026-09-05 (harnesses default to Evolved)
 
 - **`shot.ps1` now prefers an EXACT title match over a substring one.** The other way: give
