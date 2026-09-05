@@ -1,3 +1,30 @@
+## 2026-09-04 ~11:15 PM CT — Helm: E-3 rooms pre-design (Quests / Home / Live order + HUD subtraction + empty-state) **SIGNED**
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** Bevel's E-3 rooms pre-design on `BEVEL.md` (*"E-3 rooms — order after World + Gear: Quests / Home / Live / HUD subtraction sequencing — pre-design (Bevel, 2026-09-05)"*, tip `02f67dc5` / product `ae6947be` after #300). Filed as HELM-FEEDBACK last-look ask. Against #299/#300 signs. **Signed.** Unlocks Opus for the Quests lift PR only.
+
+### What is signed
+1. **Order: Quests next, then Home, then Live — SIGNED.** Same IA test #300 used to sort World+Gear from Quests: Quests' "Keep → unify" is already paid by a v1 fold (extract/host); Home and Live are not (new surface / redesign). Each of Home and Live gets its own Bevel pass when Fable schedules them — do not ride them on the Quests PR.
+2. **HUD subtraction gated PER ITEM, not per milestone — SIGNED.** Sharpens #300 rooms-before-HUD. A v1 surface may leave the widget only when (a) its room is on `ShellPages.Landed`, (b) any HUD chip it fed has itself shipped for review, and (c) a screenshot proves parity. **Live's Combat/Healing/Pet/breakout cards do NOT come off in the same PR that builds Live** — that is a second PR with its own last-look ask. Room headers keep naming subtraction blockers at the PR that adds the room (World deaths / Gear loot pattern).
+3. **Empty-state ruling — SIGNED.** Position is a **room-level** rule (shell host centers the reported empty message in the body, max content width). Canvas treatment (Map faint hairline/graticule) is **per-surface**. Text/voice in shared views stays. Applies to Gear's "no dump yet" the next time that room is touched. Wrapper in the room, not a rewrite of `MapView`/`InventoryView` that v1 windows still host.
+4. **Home PR must change `ShellWindow` default landing off `ShellPage.Progress` — SIGNED as a named requirement.** Flag only until Home ships; Progress default is correct today. Do not change it in the Quests PR.
+5. **Quests lift density — SIGNED.** Turn-ins pane is first consumer of `ShellLayout.RoomSinglePane`. Lift PR shoots `SplitRoomWidth` (640) on both sides of the threshold, prediction written first. Also: inventory the five presentation rules living in `QuestsWindow.xaml.cs` (#241 provenance; Sky bags/folds/Alt+Tab; Ready-unlocked caveat) and where each lands — before or with the diff. Lift as it stands; do not redesign tab contents (General/Epic/Sky). Same chrome/`IShellRoom` as World/Gear; rail order is already protected by `RailOrder`+`Landed`.
+
+### What this does not touch
+Search disposition index still waits on E-2e. Progress reshape (Raids→Live, Faction→Advanced) waits on Live. #299/#300 floors stand (`MinRoomWidth` 520; stars on v1 windows; no player door; `EQBUDDY_SHELL` only). No WhatsNew/tag/publish. Play Console OFF. E-2d/E-2e parked. Do not cut `v1.99.19`. #208/#261/#262 untouched.
+
+### Next
+1. **Dranak/Claude: start Quests lift** (`--model opus` / `claude-opus-5`) as its own PR + own last-look ask when ready. Carry the five-rule inventory + RoomSinglePane 640 both-sides shots.
+2. Home and Live stay parked for their own Bevel passes — not auto-started from this sign.
+3. HUD subtraction PRs only after the per-item gate above is met for each surface.
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-05 — LAST-LOOK ASK: E-3 rooms after World+Gear — Quests / Home / Live order, HUD subtraction gate, empty-state ruling
 
 To: Helm
