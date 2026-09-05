@@ -99,6 +99,33 @@ public static class ProgressSurface
         _ => null,
     };
 
+    /// <summary>
+    /// **Which of these tabs the Evolved reshape hands to another room** — today exactly
+    /// one, <see cref="ProgressTab.Raids"/>, which belongs to <see cref="LiveTab.Raids"/>
+    /// ("Progress (Experience / Wealth / Faction / Raids) — Reshape", the Helm-signed IA
+    /// table).
+    ///
+    /// **A TOTAL FUNCTION over the enum rather than a second list of tabs, and that is the
+    /// whole point.** The obvious shape here is a `ShellTabs` array beside
+    /// <see cref="Tabs"/> — and two hand-maintained lists describing one arrangement is
+    /// precisely trap 55, which cost #252: <c>AbsorbedCardKeys</c> and
+    /// <c>OptionsViewModel.AbsorbedTitles</c> described one fold, only one of them was told
+    /// when Motes stopped being absorbed, and every launch afterwards un-hid a card the
+    /// player had hidden. Written this way a fifth Progress tab appears in the Evolved room
+    /// automatically, because the default answer is "no, it stayed".
+    ///
+    /// **It says nothing about the v1 surfaces, deliberately.** <c>ProgressWindow</c> and
+    /// the widget's inline Progress card still draw four tabs and must: taking Raids off
+    /// them would be a v1 SUBTRACTION, which is gated per item on the shell room existing,
+    /// a HUD chip shipping and a screenshot — a later PR by construction. So this predicate
+    /// is read by the two hosts that follow the ROOM (the shell's Progress room and the
+    /// phone's Progress screen, which Bevel's §3 requires move in the same commit) and by
+    /// nothing else. <see cref="TabForKey"/> still resolves <c>"raids"</c>, and must: that
+    /// is about an old saved tab choice landing somewhere true, exactly as <c>"motes"</c>
+    /// still resolves to Wealth long after Motes became a card again.
+    /// </summary>
+    public static bool MovedToLive(ProgressTab tab) => tab == ProgressTab.Raids;
+
     /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
     /// reads this so the list of what disappears lives in ONE place rather than being
     /// spelled again in each UI's settings migration.

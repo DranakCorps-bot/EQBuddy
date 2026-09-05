@@ -51,7 +51,12 @@ public static partial class CompanionProjection
                     Kills: stats?.YourKillCount ?? 0,
                     XpPerHour: stats?.XpPerHour ?? 0,
                     SessionSeconds: stats?.Elapsed.TotalSeconds ?? 0,
-                    SessionDps: stats?.SessionDps ?? 0)
+                    SessionDps: stats?.SessionDps ?? 0,
+                    // What you CLEARED, which moved here from Progress with the desktop's
+                    // Raids tab (E-3 PR 5). Built even with a null ledger, because the
+                    // block's empty state is what carries the achievements-dump prompt —
+                    // withholding it would take away the one affordance that fills it.
+                    Raids: BuildRaids(input.Raids, RaidTargetCatalog.Default))
                 : null,
             Loot = On(CompanionSurfaces.Loot) ? BuildLoot(stats) : null,
             Progress = On(CompanionSurfaces.Progress)
@@ -193,8 +198,14 @@ public static partial class CompanionProjection
 
         // Session's numbers all drift every tick; its identity is the kill count (the
         // one step change), and the forced refresh carries the rest.
+        //
+        // **The raid clear count joined it in E-3 PR 5**, arriving with the block from
+        // Progress. It is a step change too — a boss dies, or a dump lands — so it belongs
+        // in a key rather than riding the forced refresh, which is exactly the argument the
+        // Progress fold made for it before the move.
         if (snap.Session is { } se)
-            map[CompanionSurfaces.Session] = se.Kills.ToString();
+            map[CompanionSurfaces.Session] = Fold(
+                se.Kills.ToString(), (se.Raids?.Defeated ?? 0).ToString());
 
         if (snap.Loot is { } lt)
             map[CompanionSurfaces.Loot] = Fold($"{lt.Total}/{lt.CraftedTotal}",
@@ -231,8 +242,11 @@ public static partial class CompanionProjection
                 // xp/hr and the rest (trap 8).
                 pr.Wealth.Total + "/" + Join(pr.Wealth.Motes, m => $"{m.Name}={m.Count}"),
                 Join(pr.Wealth.Sold, i => $"{i.Name}={i.Count}"),
-                Join(pr.Faction, f => $"{f.Name}={f.Count}"),
-                pr.Raids.Defeated.ToString());
+                // `pr.Raids.Defeated` was the last part of this fold until E-3 PR 5. It
+                // moved to Session's key with the block itself — a fingerprint that went on
+                // naming a field this section no longer has would have kept waking devices
+                // for a change on a different screen.
+                Join(pr.Faction, f => $"{f.Name}={f.Count}"));
 
         // Quests: everything here is a step change (a loot, a pin, a tick) — no clock
         // drifts through it, so nothing needs excluding. The catalog itself rides only

@@ -30,6 +30,27 @@ namespace EQBuddy;
 /// v1 chrome scheduled for retirement. Extracting a shared view now would couple the two
 /// exactly where they are about to diverge, and then be unpicked one PR later.
 ///
+/// **RAIDS LEFT THIS ROOM IN E-3 PR 5, and this is where it went** (trap 26's rule: when a
+/// surface moves, name it and say where — a fold that leaves the reader to notice is how
+/// #204/#209, #210 and #212 all happened). Bevel's signed IA has always said *"Progress
+/// (Experience / Wealth / Faction / Raids) — Reshape"*, and the reshape needed a room to
+/// move Raids INTO; <c>LiveRoom</c> is that room, and <c>live:raids</c> is the address.
+///
+///  * **It is a MOVE between two shell rooms, not a subtraction from the widget.** The v1
+///    <see cref="ProgressWindow"/> and the widget's inline Progress card both still draw
+///    four tabs, and must: taking Raids off THEM is a v1 retirement, gated per item on a
+///    HUD chip and a screenshot, and a later PR by construction. So
+///    <see cref="MainWindow.NewProgressSurfaces"/> still builds a Raids card; this room
+///    stops taking it.
+///  * **The phone moved in the same commit**, which is the half that would otherwise rot:
+///    <c>CompanionSurfaces.PageFor</c>'s own comment said the phone's progress screen
+///    *"follows the room, not this line, so it stays Progress until that PR moves it"*, and
+///    two hosts of "what's in Progress" disagreeing is trap 33 one level up, from data into
+///    which room a fact lives in.
+///  * **The filter is <see cref="ProgressSurface.MovedToLive"/> and not a <c>!= Raids</c>
+///    typed here**, so the desktop room and the phone read one answer rather than two
+///    hand-maintained lists (trap 55, which cost #252).
+///
 /// **Scrolling belongs to the host** (trap 36), and the host here is the room's own
 /// bounded <c>*</c> cell in the shell — a real overflow, not the infinite-height measure
 /// that makes a child scroller swallow the wheel and scroll nothing. The tab strip stays
@@ -63,7 +84,6 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     private readonly MoneyCardView _money;
     private readonly MotesCardView _motes;
     private readonly FactionCardView _faction;
-    private readonly RaidsCardView _raids;
 
     /// <summary>The Wealth tab's body: the two surfaces it merges, each under its own
     /// label. Built once and kept — a tab switch must not rebuild element trees that
@@ -95,9 +115,12 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         SetRow(scroll, 1);
         Children.Add(scroll);
 
+        // FOUR of the five, since E-3 PR 5. `surfaces.Raids` is still built — the v1
+        // `ProgressWindow` needs it — and this room simply does not take it; see the type's
+        // summary for why the Raids tab left and where it went.
         var surfaces = main.NewProgressSurfaces();
-        (_experience, _money, _motes, _faction, _raids) =
-            (surfaces.Experience, surfaces.Money, surfaces.Motes, surfaces.Faction, surfaces.Raids);
+        (_experience, _money, _motes, _faction) =
+            (surfaces.Experience, surfaces.Money, surfaces.Motes, surfaces.Faction);
 
         _wealthBody.Children.Add(CardParts.BlockLabel("Coin", hidden: false));
         _wealthBody.Children.Add(_money.Body);
@@ -107,10 +130,18 @@ internal sealed class ProgressRoom : Grid, IShellRoom
 
     /// <summary>Land on a tab by its wire key — the second half of a <c>page:room</c>
     /// address. An unknown key is left alone rather than snapped to a default: showing
-    /// the wrong room silently is worse than showing the one already open.</summary>
+    /// the wrong room silently is worse than showing the one already open.
+    ///
+    /// **<c>progress:raids</c> is now one of the keys this refuses**, and refusing it is
+    /// the point rather than an oversight. <see cref="ProgressSurface.TabForKey"/> still
+    /// resolves <c>"raids"</c> — it must, so an old saved tab choice lands somewhere true —
+    /// but this room no longer draws that tab, and setting <c>_tab</c> to it would leave
+    /// the body on whatever was showing while the strip lit nothing. The address that
+    /// reaches the surface is <c>live:raids</c>.</summary>
     public void SetTab(string key)
     {
         if (ProgressSurface.TabForKey(key) is not { } tab) return;
+        if (ProgressSurface.MovedToLive(tab)) return;
         _tab = tab;
         Render(_main.CurrentSnapshot());
     }
@@ -118,21 +149,19 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     public void Render(StatsSnapshot s)
     {
         BuildTabs(s);
-        // Only the ACTIVE tab paints, and its body is swapped in rather than all four
+        // Only the ACTIVE tab paints, and its body is swapped in rather than all three
         // being stacked and hidden — a hidden StackPanel still measures on every layout
-        // pass, and the Raids list is 29 rows of it.
+        // pass (trap 46's cost half).
         _body.Content = _tab switch
         {
             ProgressTab.Wealth => _wealthBody,
             ProgressTab.Faction => _faction.Body,
-            ProgressTab.Raids => _raids.Body,
             _ => _experience.Body,
         };
         switch (_tab)
         {
             case ProgressTab.Wealth: _money.Render(s); _motes.Render(s); break;
             case ProgressTab.Faction: _faction.Render(s); break;
-            case ProgressTab.Raids: _raids.Render(s); break;
             default: _experience.Render(s); break;
         }
     }
@@ -144,9 +173,14 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     private void BuildTabs(StatsSnapshot s)
     {
         _tabs.Clear();
+        // The raid counts are still PASSED — `ProgressTheme.Tabs` builds all four headers
+        // and the v1 window uses the fourth — and this room filters the one that moved. The
+        // filter is `ProgressSurface.MovedToLive` rather than a `!= Raids` typed here, so
+        // there is one place that says where a Progress tab lives and the phone reads it too.
         foreach (var header in ProgressTheme.Tabs(
                      s, _main.ProgressDingUnlockCount(s),
-                     _raids.DefeatedCount, RaidTargetCatalog.Default.BossCount))
+                     _main.RaidsDefeatedCount, RaidTargetCatalog.Default.BossCount)
+                 .Where(h => !ProgressSurface.MovedToLive(h.Tab)))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
@@ -165,10 +199,14 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     /// <c>progress*</c> keys <see cref="ProgressWindow"/> reports from the same surfaces.
     /// Two hosts of one room is exactly where a silent divergence would live, and the
     /// WPF layer has no unit tests to catch it any other way.</summary>
+    /// <summary>**<c>shellProgressRaidsRows</c> LEFT THIS DUMP with the tab** (E-3 PR 5),
+    /// and it is reported as <c>shellLiveRaidsRows</c> by the room that draws it now. A key
+    /// left behind here would have gone on answering 0 forever — a fact about a surface
+    /// this room no longer has, which is worse than an absent key because an assertion on it
+    /// would still pass.</summary>
     public string DebugFacts() =>
         $"shellProgressTab={ProgressSurface.KeyFor(_tab)} " +
         $"shellProgressTabs={_tabs.Count} " +
-        $"shellProgressRaidsRows={_raids.RowCount} " +
         $"shellProgressMotesRows={_motes.RowCount} " +
         $"shellProgressFaction={_faction.RowCount} " +
         $"shellProgressSkills={_experience.SkillRows}";

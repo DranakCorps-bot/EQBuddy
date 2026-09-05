@@ -309,6 +309,7 @@ public partial class ShellWindow : Window, IFollowingSurface
             ShellPage.Gear => new GearRoom(_main),
             ShellPage.World => new WorldRoom(_main),
             ShellPage.Quests => new QuestsRoom(_main),
+            ShellPage.Live => new LiveRoom(_main),
             // Home is handed THIS window's Navigate rather than building its own dispatch:
             // its deep-links block is a navigation surface inside a room, which is the same
             // relationship the rail has to the shell, and two ways to land on a room is

@@ -130,6 +130,114 @@ internal static class BreakdownRows
         return row;
     }
 
+    /// <summary>Multi-line tooltips are stat blocks — monospace keeps their columns
+    /// readable. A static family because the item catalog makes that branch always-taken,
+    /// and a fresh <c>FontFamily</c> per row per render second was measurable churn
+    /// (2026-08-13 review).</summary>
+    private static readonly FontFamily MonoFamily = new("Consolas");
+
+    /// <summary>
+    /// The plain name/value list the un-migrated card BODIES still draw with — the
+    /// breakdown lists, the ding unlocks, deaths and zones. <c>EqCardRows</c> is what
+    /// replaced it for every card that has been through the seam; the rest is a later
+    /// batch (docs/DesignSystem.md §11.9).
+    ///
+    /// **It lived in <c>MainWindow</c> until E-3's Live room needed it too**, and the
+    /// second consumer is the whole argument for the move rather than a copy: the Damage
+    /// tab draws the same procs, stances, area-spell and damage-taken lists the Combat card
+    /// draws, and two builders for one row shape would drift the way every pair in this
+    /// repo eventually has (trap 33). It takes the host as <c>resources</c>, exactly as
+    /// every other method here does, because the brushes are resource lookups and a room is
+    /// as legitimate a resource scope as a window.
+    ///
+    /// It used to take a <c>questBadges</c> flag that hung a quest map-pin on each item
+    /// row. Nothing has passed it since the Loot card moved onto <c>EqCardRows</c>, which
+    /// draws that badge itself — so the branch was unreachable, and it was unreachable in
+    /// the #211 shape: a bare clickable vector with holes you could click through. Dead
+    /// code carrying a bug already paid for is worse than no code.
+    /// </summary>
+    public static void FillPairRows(FrameworkElement resources, ItemsControl list,
+        IEnumerable<(string Name, string Value)> rows,
+        Func<string, Brush>? valueBrush = null, Action<string>? onNameClick = null,
+        Func<string, string?>? tooltip = null, Func<string, Brush?>? nameBrush = null,
+        Func<string, string?>? noteFor = null)
+    {
+        var items = rows.ToList();
+        list.Items.Clear();
+        foreach (var (name, value) in items)
+        {
+            // A GRID and never a horizontal StackPanel: a stack measures its children with
+            // infinite width, so the value would be pushed off the edge and the name would
+            // be clipped with no ellipsis to say so (trap 14).
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            var left = new TextBlock
+            {
+                FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Body).Size,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                Foreground = nameBrush?.Invoke(name)
+                    ?? (Brush)resources.FindResource("TextBrush"),
+                Margin = new Thickness(0, 1, DesignTokens.SpaceM, 1),
+            };
+            // Provenance rides inline as a muted "(Foraged)"/"(Crafted)"/… after the name —
+            // a separate run, not part of the name, so the click still looks up the base item.
+            if (noteFor?.Invoke(name) is { Length: > 0 } note)
+            {
+                left.Inlines.Add(new System.Windows.Documents.Run(name));
+                left.Inlines.Add(new System.Windows.Documents.Run($" {note}")
+                {
+                    FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+                    Foreground = (Brush)resources.FindResource("DimBrush"),
+                });
+            }
+            else left.Text = name;
+            if (tooltip?.Invoke(name) is { Length: > 0 } tip)
+            {
+                var tipText = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = 340 };
+                if (tip.Contains('\n')) tipText.FontFamily = MonoFamily;
+                left.ToolTip = new ToolTip { Content = tipText };
+            }
+            if (onNameClick is not null)
+            {
+                var clickName = name;
+                left.Cursor = System.Windows.Input.Cursors.Hand;
+                left.ToolTip ??= "Click for item info (eqlwiki)";
+                // Swallow the down so it can't start a window DragMove and eat the Up
+                // (the discussion #46 failure mode, same fix as the breakout rows).
+                left.MouseLeftButtonDown += (_, ev) => ev.Handled = true;
+                left.MouseLeftButtonUp += (_, _) => onNameClick(clickName);
+            }
+            var right = new TextBlock
+            {
+                Text = value,
+                FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Body).Size,
+                Foreground = valueBrush?.Invoke(value)
+                    ?? (Brush)resources.FindResource("DimBrush"),
+            };
+            Grid.SetColumn(right, 1);
+            grid.Children.Add(left);
+            grid.Children.Add(right);
+            list.Items.Add(grid);
+        }
+    }
+
+    /// <summary>A Total/Count/Avg stat list in the chosen sort order — "Damage you took",
+    /// on the widget's Combat card and on the Live room's Damage tab. Lifted with
+    /// <see cref="FillPairRows"/> and for the same reason.</summary>
+    public static void FillStatRows(FrameworkElement resources, ItemsControl list,
+        IEnumerable<SourceDamage> stats, StatSort sort, string unit)
+    {
+        var sorted = sort switch
+        {
+            StatSort.Hits => stats.OrderByDescending(d => d.Hits),
+            StatSort.Avg => stats.OrderByDescending(d => (double)d.Total / d.Hits),
+            _ => stats.OrderByDescending(d => d.Total),
+        };
+        FillPairRows(resources, list, sorted.Select(d =>
+            (d.Name, $"{d.Total:N0} · {d.Hits} {unit}{(d.Hits == 1 ? "" : "s")} · avg {(double)d.Total / d.Hits:0.#}")));
+    }
+
     /// <summary>Render pre-built shared-presentation rows (HistoryPresentation).</summary>
     public static void FillRows(FrameworkElement resources, ItemsControl list,
         IEnumerable<HistoryBreakdownRow> rows)

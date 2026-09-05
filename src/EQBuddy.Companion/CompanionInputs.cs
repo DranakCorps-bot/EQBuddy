@@ -105,7 +105,7 @@ public sealed record CompanionInputs
     /// paired phone does not put a database probe on every tick.</summary>
     public IReadOnlyList<LevelHistory.Row> LevelUps { get; init; } = [];
 
-    /// <summary>This character's raid clears, for the Progress theme's Raids tab. The
+    /// <summary>This character's raid clears, for the Session screen's raids block. The
     /// LEDGER rather than a pre-built block: the projection needs to ask it per boss, and
     /// it is per character and rebuilt when the followed character changes, so a snapshot
     /// taken once would answer for the wrong one.</summary>

@@ -407,57 +407,24 @@ public partial class BreakoutWindow : Window
         _deaths = s.Deaths;
         _resists = MainWindow.SpellResistLookup(s);
         _blockedBy = Main?.BlockedByLookup(s);
-        var f = s.LastFight;
-        var (title, rows, secs, rateLabel) = _kind switch
-        {
-            BreakoutKind.Damage => (BreakoutPresentation.Title(BreakoutPresentation.Damage),
-                _fightScope ? f?.ByAbility ?? [] : s.DamageBySource,
-                _fightScope ? f?.DurationSeconds ?? 0 : s.CombatSeconds, "dps"),
-            BreakoutKind.Healing => (BreakoutPresentation.Title(BreakoutPresentation.Healing),
-                _fightScope ? f?.HealsBySpell ?? [] : s.HealsBySpell,
-                _fightScope ? f?.DurationSeconds ?? 0 : s.CombatSeconds, "hps"),
-            _ => (BreakoutPresentation.PetTitle(s.PetName, s.CharmedSince, DateTime.Now),
-                _fightScope ? f?.PetAbilities ?? [] : s.PetAbilities,
-                _fightScope ? f?.DurationSeconds ?? 0 : s.CombatSeconds, "dps"),
-        };
-        TitleText.Text = title;
-        TitleIcon.Glyph = BreakoutPresentation.Icon(_kind switch
-        {
-            BreakoutKind.Damage => BreakoutPresentation.Damage,
-            BreakoutKind.Healing => BreakoutPresentation.Healing,
-            _ => BreakoutPresentation.Pet,
-        });
 
-        var total = rows.Sum(r => r.Total);
-        var rate = total / Math.Max(1, secs);
-        // Hymn/regen ticks carry no amounts in the log, so they can never join the HPS
-        // rows — but a bard mid-song staring at "no healing" reads it as broken (David,
-        // live test 2026-08-06). Count them where healing lives; estimate when attributed.
-        var regen = _kind == BreakoutKind.Healing && s.RegenTicks > 0
-            ? s.RegenEstimatedHealed > 0
-                ? $" · est. ~{s.RegenEstimatedHealed:N0} regen ({s.RegenTicks} ticks)"
-                : $" · {s.RegenTicks} regen ticks"
-            : "";
-        SubText.Text = (_fightScope
-            ? f is null ? "No fights yet"
-                : $"{f.Name} · {f.DurationSeconds:0}s · {f.Outcome} · {rate:0.#} {rateLabel}"
-            : $"Session · {s.CombatSeconds / 60:0}m in combat · {rate:0.#} {rateLabel}") + regen;
+        // **WHAT this window shows is decided in UI.Shared since E-3 PR 5**, because the
+        // Evolved shell's Live room shows the same three meters and will for as long as HUD
+        // subtraction stays gated per item. Two hosts asking "which rows does Fight scope
+        // mean" is trap 33's shape — not a stale answer and a fresh one, but two answers,
+        // each current, that a later change has to be taught twice. The decision moved; the
+        // drawing stayed here, which is the split every window sum in this repo takes.
+        var kind = MeterKind();
+        var meter = LivePresentation.Meter(kind, s, _fightScope, DateTime.Now);
+        TitleText.Text = meter.Title;
+        TitleIcon.Glyph = BreakoutPresentation.Icon(kind);
+        SubText.Text = meter.Subtext;
 
-        var empty = rows.Count == 0;
+        var empty = meter.Empty is not null;
         EmptyText.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
         if (empty)
         {
-            EmptyText.Text = _kind switch
-            {
-                BreakoutKind.Healing when s.RegenEstimatedHealed > 0 =>
-                    $"{s.RegenSpell}: est. ~{s.RegenEstimatedHealed:N0} healed over {s.RegenTicks} ticks.\n" +
-                    "The game logs no amounts — this is ticks × your Options\nhp/tick (or the wiki base), so it stays labeled est.",
-                BreakoutKind.Healing when s.RegenTicks > 0 =>
-                    $"{s.RegenTicks} hymn/regen ticks — the game logs no amounts for these,\nso they count but can't join the HPS rows.",
-                BreakoutKind.Healing => "No healing seen yet.",
-                BreakoutKind.Pet => "No pet damage seen yet.",
-                _ => "No damage seen yet.",
-            };
+            EmptyText.Text = meter.Empty!;
             Rows.Items.Clear();
             _signature = "";
             return;
@@ -465,15 +432,26 @@ public partial class BreakoutWindow : Window
 
         // Signature: rebuilding ten bar rows every second is cheap but pointless between
         // fights — only re-render when a number moved or the scope/fight/sort changed.
-        var sig = $"{_fightScope}|{_sort}|{f?.Name}|{secs:0}|{string.Join(",", rows.Select(r => $"{r.Name}:{r.Total}"))}";
+        var sig = LivePresentation.MeterSignature(kind, _fightScope, _sort.ToString(), meter);
         if (sig == _signature) return;
         _signature = sig;
         // Resist % rides only the session-scope damage rows — the tallies are
         // session-wide, and stamping them on a single fight would misstate it.
         var resists = _kind == BreakoutKind.Damage && !_fightScope ? _resists : null;
-        BreakdownRows.FillAbilityRowsSorted(this, Rows, rows, _sort, Math.Max(1, secs), rateLabel,
+        BreakdownRows.FillAbilityRowsSorted(this, Rows, meter.Rows, _sort,
+            Math.Max(1, meter.Seconds), meter.RateLabel,
             max: 10, resists: resists, blockedBy: resists is null ? null : _blockedBy);
     }
+
+    /// <summary>This window's kind as the shared decision spells it. <c>BreakoutKind</c> is
+    /// a WPF enum and <see cref="BreakoutPresentation"/> is keyed by string for exactly this
+    /// reason — see that file's own note on why it does not take a side.</summary>
+    private string MeterKind() => _kind switch
+    {
+        BreakoutKind.Healing => BreakoutPresentation.Healing,
+        BreakoutKind.Pet => BreakoutPresentation.Pet,
+        _ => BreakoutPresentation.Damage,
+    };
 
     private LastFightInfo? _lastFight;
     private IReadOnlyList<TimedDetail> _deaths = [];

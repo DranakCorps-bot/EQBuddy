@@ -94,21 +94,27 @@ public class ShellNavigationTests
     ///
     /// **Home is FIRST here, and it did not have to be arranged.** `RailOrder` has had Home
     /// at the top since PR 1, so the room joining `Landed` put its row above Progress on its
-    /// own — which is the property this assertion exists to prove rather than assume.</summary>
+    /// own — which is the property this assertion exists to prove rather than assume.
+    ///
+    /// **PR 5 landed Live, and it slotted itself SECOND for the same reason.** `RailOrder`
+    /// has had Live between Home and Progress since PR 1, so nothing about the rail was
+    /// edited to place it — a build that appended Live at the bottom would be identical to a
+    /// healthy one everywhere except this line and the `shell-live` screenshot.</summary>
     [Fact]
-    public void FiveRoomsHaveLandedSoFar() =>
+    public void SixRoomsHaveLandedSoFar() =>
         Assert.Equal(
-            [ShellPage.Home, ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World],
+            [ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+             ShellPage.Gear, ShellPage.Quests, ShellPage.World],
             ShellPages.Landed);
 
-    /// <summary>The two that have NOT landed, named — because "which rooms are missing"
+    /// <summary>The one that has NOT landed, named — because "which rooms are missing"
     /// is the question a reader of `Landed` actually has, and a positive list cannot
-    /// answer it. Each is held back by a decision rather than by effort: Live does not
-    /// exist yet (and gets its own Bevel pass rather than riding another room's PR, per the
-    /// Helm-signed Quests → Home → Live order), and Settings is a room whose whole job is
-    /// not being a launcher.</summary>
+    /// answer it. It is held back by a decision rather than by effort: Settings is a room
+    /// whose whole job is not being a launcher.
+    ///
+    /// **Live left this list in PR 5**, which is exactly what it was written to make into a
+    /// deliberate edit rather than a line someone slid in.</summary>
     [Theory]
-    [InlineData(ShellPage.Live)]
     [InlineData(ShellPage.Settings)]
     public void TheRoomsThatHaveNotLandedDrawNoRailRow(ShellPage page) =>
         Assert.DoesNotContain(page, ShellPages.Landed);
@@ -169,6 +175,8 @@ public class ShellNavigationTests
                 Assert.NotEmpty(key);
                 var resolved = page switch
                 {
+                    ShellPage.Live => LiveSurface.TabForKey(key) is { } t
+                        ? LiveSurface.KeyFor(t) : null,
                     ShellPage.Progress => ProgressSurface.TabForKey(key) is { } t
                         ? ProgressSurface.KeyFor(t) : null,
                     ShellPage.Gear => LootSurface.TabForKey(key) is { } t
@@ -200,10 +208,37 @@ public class ShellNavigationTests
     [Fact]
     public void TheRoomListsComeFromTheSurfacesThemselves()
     {
-        Assert.Equal(ProgressSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Progress).Count);
+        Assert.Equal(LiveSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Live).Count);
         Assert.Equal(LootSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Gear).Count);
         Assert.Equal(QuestSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Quests).Count);
         Assert.Equal(WorldSurface.Tabs().Count, ShellPages.Rooms(ShellPage.World).Count);
+    }
+
+    /// <summary>
+    /// **Progress is the ONE room whose list is not a straight read of its surface**, and it
+    /// is asserted as a subtraction rather than as a number so nothing here has to be
+    /// re-typed when a Progress tab is added.
+    ///
+    /// The Evolved IA moves Raids to Live. The v1 `ProgressWindow` and the widget's inline
+    /// card still draw four tabs and must — retiring a tab from them is a subtraction, gated
+    /// separately — so `ProgressSurface.Tabs()` still returns four while the ROOM shows
+    /// three. Written this way, the assertion follows a fifth tab automatically, which is
+    /// the same property `MovedToLive` being a predicate rather than a second list buys.
+    /// </summary>
+    [Fact]
+    public void ProgresssRoomListIsItsSurfaceMinusWhatTheReshapeMoved()
+    {
+        var moved = ProgressSurface.Tabs().Count(h => ProgressSurface.MovedToLive(h.Tab));
+
+        Assert.Equal(1, moved);
+        Assert.Equal(ProgressSurface.Tabs().Count - moved,
+            ShellPages.Rooms(ShellPage.Progress).Count);
+        Assert.DoesNotContain(ProgressSurface.KeyFor(ProgressTab.Raids),
+            ShellPages.Rooms(ShellPage.Progress).Select(r => r.Key));
+        // And it landed somewhere rather than nowhere — the half a subtraction test cannot
+        // see on its own, and the reason the move is one commit (Bevel §3).
+        Assert.Contains(LiveSurface.KeyFor(LiveTab.Raids),
+            ShellPages.Rooms(ShellPage.Live).Select(r => r.Key));
     }
 
     // ---- 2c. two hosts, one flat dump namespace --------------------------------

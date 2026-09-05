@@ -314,15 +314,27 @@ public class HomeRoomTests
         });
     }
 
-    /// <summary>The negative that keeps the row above from going vacuous: Live is not
-    /// offered while Live has not landed. **This assertion is meant to be DELETED by the
-    /// Live PR**, in the same commit that adds Live to `Landed` — which is the point of
-    /// writing it as a named room rather than as a count.</summary>
+    /// <summary>
+    /// The negative that keeps the row above from going vacuous, **rewritten by the Live PR
+    /// rather than deleted by it** — which is what the assertion it replaces asked for in as
+    /// many words ("meant to be DELETED by the Live PR, in the same commit that adds Live to
+    /// `Landed`").
+    ///
+    /// Deleting it outright would have taken the guard down with the case: Home's links are
+    /// filtered by <c>ShellPages.Landed</c>, and the property worth holding is not "Live is
+    /// absent" but "the list tracks what has landed, in both directions". Settings is now
+    /// the room that carries the negative, and it carries it for a different reason — it has
+    /// not landed AND Home would not link to it if it had, because it configures the tool
+    /// rather than describing the character.
+    /// </summary>
     [Fact]
-    public void LiveIsNotOfferedBecauseLiveDoesNotExistYet()
+    public void LiveIsOfferedNowThatLiveHasLandedAndSettingsIsStillNot()
     {
-        Assert.DoesNotContain(ShellPage.Live, ShellPages.Landed);
-        Assert.DoesNotContain(HomeReadout.Links(), link => link.Page == ShellPage.Live);
+        Assert.Contains(ShellPage.Live, ShellPages.Landed);
+        Assert.Contains(HomeReadout.Links(), link => link.Page == ShellPage.Live);
+
+        Assert.DoesNotContain(ShellPage.Settings, ShellPages.Landed);
+        Assert.DoesNotContain(HomeReadout.Links(), link => link.Page == ShellPage.Settings);
     }
 
     /// <summary>Home does not link to itself (a no-op wearing an affordance) and does not

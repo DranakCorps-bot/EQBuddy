@@ -21,12 +21,25 @@ public sealed record CompanionSpawnTimer(
     bool Imminent,
     double? DurationSeconds);
 
-/// <summary>Session basics for the footer strip.</summary>
+/// <summary>
+/// Session basics for the footer strip — and, since E-3 PR 5, what you CLEARED.
+///
+/// **<see cref="Raids"/> arrived here from <see cref="CompanionProgressSection"/> in the
+/// same commit that moved the desktop's Raids tab from the Progress room to the Live
+/// room**, which is Bevel's §3 requirement rather than tidiness: the phone's progress
+/// screen follows the ROOM, and <c>CompanionSurfaces.PageFor</c>'s own comment had said so
+/// since PR 1 (*"it stays Progress until that PR moves it"*). Session is the screen that
+/// <c>PageFor</c> routes to <c>ShellPage.Live</c>, so it is where Raids belongs on this
+/// surface. Moving one host and not the other would leave the desktop and the phone
+/// disagreeing about what "Progress" contains — trap 33's shape, one level up from data
+/// into which room a fact lives in.
+/// </summary>
 public sealed record CompanionSessionSection(
     int Kills,
     double XpPerHour,
     double SessionSeconds,
-    double SessionDps);
+    double SessionDps,
+    CompanionRaidsBlock? Raids = null);
 
 // ---------------- map ----------------
 
@@ -380,10 +393,21 @@ public sealed record CompanionQuestNeed(string N, int Q);
 // ---------------- progress ----------------
 
 /// <summary>
-/// The PROGRESS THEME on a phone (docs/Themes.md): the same four tabs the desktop window
-/// shows — Experience, Wealth, Faction, Raids — from the same
+/// The PROGRESS THEME on a phone (docs/Themes.md): the same tabs the desktop ROOM shows —
+/// Experience, Wealth and Faction — from the same
 /// <see cref="EQBuddy.Core.ProgressSurface"/> definition and the same
 /// <see cref="EQBuddy.UI.Shared.ProgressTheme"/> badges.
+///
+/// **RAIDS LEFT THIS SECTION IN E-3 PR 5**, in the same commit that moved the desktop's
+/// Raids tab out of the shell's Progress room, and it is on
+/// <see cref="CompanionSessionSection"/> now — the phone screen
+/// <c>CompanionSurfaces.PageFor</c> routes to the Live room. The tab strip loses its fourth
+/// chip through <see cref="EQBuddy.Core.ProgressSurface.MovedToLive"/> rather than through
+/// a filter typed here, which is what stops the two hosts drifting (trap 55).
+///
+/// **The v1 desktop <c>ProgressWindow</c> still shows four**, and that is not a
+/// disagreement: retiring a tab from a v1 window is a subtraction, gated per item on a
+/// screenshot and a later PR, while this section mirrors the room the phone's picker names.
 ///
 /// It grew the three new blocks in the SAME change as the desktop fold, which is the whole
 /// lesson of #210: EQBuddy Mobile went on building the cross-class ready list for two days
@@ -408,7 +432,6 @@ public sealed record CompanionProgressSection(
     IReadOnlyList<CompanionProgressTab> Tabs,
     CompanionWealthBlock Wealth,
     IReadOnlyList<CompanionCountRow> Faction,
-    CompanionRaidsBlock Raids,
     /// <summary>The NEXT level's preview — "At level 34: 2 new AA abilities, 3 new
     /// spells" — and its per-class groups. Null when no level is known, no class is in
     /// play, or the catalogs have nothing further (Bevel's three empty rules,

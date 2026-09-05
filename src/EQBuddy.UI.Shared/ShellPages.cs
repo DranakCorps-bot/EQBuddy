@@ -89,13 +89,22 @@ public static class ShellPages
     /// designed to answer "where do I stand", and the placeholder outlived its excuse the
     /// moment that room existed.
     ///
-    /// **The two still missing are held back by a decision.** Live does not exist yet (and
-    /// Raids cannot leave Progress until it does) — it gets its own Bevel pass rather than
-    /// riding another room's PR, which is what the Helm-signed order Quests → Home → Live
-    /// says in as many words. Settings is a room whose whole job is not being a launcher.
+    /// **PR 5 added Live, and it is the first room that is a MERGE.** World and Gear were a
+    /// MOVE, Quests a LIFT, Home a BUILD; Live is five separate v1 places that all answer
+    /// "what is happening in this sitting" — two inline widget sections, three breakout
+    /// kinds, a pop-out and one tab of another window — brought under one room while every
+    /// one of them goes on shipping unchanged. It is also what finally let Raids leave
+    /// Progress, which had been waiting on a room to move INTO since PR 1
+    /// (<see cref="ProgressSurface.MovedToLive"/>).
+    ///
+    /// **The one still missing is held back by a decision**: Settings is a room whose whole
+    /// job is not being a launcher.
     /// </summary>
     public static readonly IReadOnlyList<ShellPage> Landed =
-        [ShellPage.Home, ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World];
+    [
+        ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+        ShellPage.Gear, ShellPage.Quests, ShellPage.World,
+    ];
 
     /// <summary>
     /// The rooms INSIDE a room — the second half of a <c>page:room</c> address — read from
@@ -120,7 +129,21 @@ public static class ShellPages
     /// </summary>
     public static IReadOnlyList<(string Label, string Key)> Rooms(ShellPage page) => page switch
     {
-        ShellPage.Progress => [.. ProgressSurface.Tabs().Select(h => (h.Label, h.Key))],
+        ShellPage.Live => [.. LiveSurface.Tabs().Select(h => (h.Label, h.Key))],
+        // **FILTERED, and it is the one row here that is not a straight read.** The Evolved
+        // IA moves Raids to Live, so the Progress ROOM has three tabs while
+        // `ProgressSurface.Tabs()` still returns four — the v1 `ProgressWindow` and the
+        // widget's inline card both still draw it, and taking it off them would be a v1
+        // subtraction, which is gated separately and is a later PR. The predicate lives on
+        // the surface rather than here so the phone's Progress screen reads the same answer
+        // (Bevel's §3: the two hosts of "what's in Progress" move in one commit or they
+        // disagree), and it is a predicate rather than a second list so a fifth Progress tab
+        // appears in the room automatically — trap 55's lesson about two hand-maintained
+        // lists describing one arrangement.
+        ShellPage.Progress =>
+            [.. ProgressSurface.Tabs()
+                .Where(h => !ProgressSurface.MovedToLive(h.Tab))
+                .Select(h => (h.Label, h.Key))],
         ShellPage.Gear => [.. LootSurface.Tabs().Select(h => (h.Label, h.Key))],
         // Counts omitted deliberately: this table names the rooms, and a badge is a
         // reading of the player's progress that belongs to the strip the room draws for

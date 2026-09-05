@@ -139,6 +139,10 @@ $Shots = [ordered]@{
     # else.
     #
     # PREDICTION, written before the shot (trap 23):
+    #   'shell-progress'  — the strip is THREE chips since E-3 PR 5 (Experience · Wealth ·
+    #     Faction), not four: Raids moved to the Live room. The v1 Progress WINDOW still
+    #     shows four, so 'progress-window' and this shot legitimately differ, and a fourth
+    #     chip appearing here again would mean the room stopped reading `MovedToLive`.
     #   'shell-progress'  — a native title bar reading "EQBuddy — Progress" with real
     #     minimise / maximise / close and a taskbar entry, NOT the hand-drawn chrome
     #     every theme window has. Under it a title row: app icon, "EQBuddy", and a search
@@ -147,29 +151,28 @@ $Shots = [ordered]@{
     #     — a chart icon and "Progress" — and it is FIVE now** (Home · Progress · Gear ·
     #     Quests · World), because a room's row lands in the PR that lands the room. What
     #     has not changed and is still the assertion: Progress is lit as selected, and there
-    #     are no Live or Settings rows, because those rooms do not exist and a disabled row
-    #     is an affordance that opens nothing. To its right, the
-    #     Progress room: a four-chip wrapped strip (Experience · Wealth · Faction · Raids)
-    #     with the same badges the Progress WINDOW's strip carries, Experience lit, and
-    #     the Experience body under it.
-    #   'shell-progress-raids' — the same frame, addressed straight to a room inside the
-    #     room via page:room. Raids chip lit; the raid ledger in the body.
-    #
-    # THE RAIDS PREDICTION WAS WRONG, and the miss is the useful half. There is no ledger:
-    # this shot seeds no raid-kills.json (that is 'raids-card' / 'raids-import'), so what
-    # the picture shows is the EMPTY state — "Nothing defeated yet …" plus the ⧉ copy of
-    # /outputfile achievements. Kept rather than seeded, because that button is the thing
-    # worth photographing here: the room reuses the real RaidsCardView, so the "a surface
-    # that needs an in-game command must SHIP the command" rule survived the host change
-    # for free, and trap 34's whole lesson is that a missing affordance is invisible to
-    # everything except a picture or a must-list.
+    #     is no Settings row, because that room does not exist and a disabled row is an
+    #     affordance that opens nothing. (There IS a Live row now — E-3 PR 5 — and this
+    #     prediction has been amended rather than left, since a stale prediction is worse
+    #     than none: it makes a correct picture look like a regression.) To its right, the
+    #     Progress room: a THREE-chip wrapped strip (Experience · Wealth · Faction) with the
+    #     same badges the Progress WINDOW's strip carries, Experience lit, and the Experience
+    #     body under it. The window's own fourth chip, Raids, is on `shell-live-raids` now.
     #   'shell-narrow' — the SAME window at the floor width. The rail must be icons only
     #     (chart glyph, no "Progress" word) with the room name still on hover, and the
     #     room content must not clip. That is degrade axis 1, and it is the half of the
     #     resize story no unit test can photograph.
+    #
+    # **'shell-progress-raids' IS GONE, and its disappearance is the point** (E-3 PR 5). The
+    # Raids tab moved from the Progress room to the Live room, so `progress:raids` no longer
+    # resolves — and trap 53 is exactly what happens to a shot whose address a surface
+    # invalidated without touching this file: `$ErrorActionPreference = 'Stop'` makes one
+    # stale row stop the whole batch at that line, which is how `shoot.ps1` was dark for six
+    # days across four releases. The replacement is 'shell-live-raids' below; the committed
+    # `docs/screenshots/shell-progress-raids.png` is DELETED rather than left, because an
+    # illustration of a state the code no longer produces is precisely the drift the
+    # illustration lock exists to stop.
     'shell-progress'  = @{ Title = 'EQBuddy — Progress'; Env = @{ EQBUDDY_SHELL = 'progress' }; Set = @{} }
-    'shell-progress-raids' = @{ Title = 'EQBuddy — Progress'
-                                Env = @{ EQBUDDY_SHELL = 'progress:raids' }; Set = @{} }
     'shell-narrow'    = @{ Title = 'EQBuddy — Progress'
                            Env = @{ EQBUDDY_SHELL = 'progress'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{} }
@@ -341,6 +344,57 @@ $Shots = [ordered]@{
     # (`HomeRoomTests`) and `shellHomeEmpty` is in the dump; the POSITION — centred in the
     # room's cell — is the part still unphotographed. Whoever adds that profile shape gets
     # the shot with it.
+    # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
+    #
+    # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
+    # way its rail row does. Title is 'EQBuddy — Live', derived from ShellPages.Label — trap
+    # 53 applies, and it should indeed fail rather than photograph something else if the room
+    # is renamed.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-live' — native chrome and the title row as every shell shot has, with the rail
+    #     now SIX rows in RailOrder: Home (tray), LIVE (bolt), Progress (chart), Gear (bag),
+    #     Quests (quest), World (pin). **Live must sit BETWEEN Home and Progress** — the rail
+    #     walks RailOrder filtering by Landed, so this is correct by construction and would
+    #     look identical to a healthy build if it silently were not, which is the whole reason
+    #     this line is written down. Live lit, the other five dim.
+    #     The room: a session report at the top — "This sitting — <fixture zone>" in accent
+    #     ink with a facts line under it (elapsed · N kills · dps), then a SIX-chip wrapped
+    #     strip Damage · Healing · Pet · Timeline · Kills · Raids carrying their real badges,
+    #     Damage lit. Under it the Damage body: the title "Your damage", a subtext line, the
+    #     compact Fight/Session toggle with **Session** selected (the room is about the
+    #     sitting; the floating breakout defaults the other way, deliberately), the four-chip
+    #     sort strip, the Combat card's own summary lines, and the ability bar rows.
+    #     **And one thing that must NOT be there**: a "0 deaths" anywhere in the report. The
+    #     one number whose absence is the good news is omitted rather than printed as a zero,
+    #     and a picture is the only thing that can confirm an absence like that.
+    #   'shell-live-raids' — the same frame addressed straight to a room inside the room, and
+    #     the DESTINATION half of the Raids move (the departure half is `shell-progress`
+    #     showing three chips). Raids chip lit, badged "0 / 21".
+    #     THE BODY IS THE EMPTY STATE, and that is the prediction rather than a miss: this
+    #     shot seeds no raid-kills.json (that is 'raids-card' / 'raids-import'), so what
+    #     shows is "Nothing defeated yet …" plus the ⧉ copy of /outputfile achievements.
+    #     That button is the thing worth photographing here — the room reuses the real
+    #     RaidsCardView, so "a surface that needs an in-game command must SHIP the command"
+    #     survived a SECOND host change for free, and trap 34's whole lesson is that a
+    #     missing affordance is invisible to everything except a picture or a must-list.
+    #     (The predecessor shot, 'shell-progress-raids', predicted a ledger and was wrong for
+    #     the same reason; the note is carried rather than re-learned.)
+    #   'shell-live-timeline' — the tab that is a CANVAS rather than a list, which is the one
+    #     layout claim in this room no unit test can make. Predicted: the fight name and its
+    #     "m:ss · N events · peak N dps @ m:ss" line, a DPS graph 96 units tall, and under it
+    #     the lanes filling the rest of the cell — a lane per skill with the 176-unit name
+    #     gutter on the left. **No vertical scrollbar**: the room disables that scroller for
+    #     this tab so the canvas gets the viewport instead of an infinite measure. If a
+    #     scrollbar is there, the canvas is being measured with infinite height and the lanes
+    #     are the wrong size (trap 36's arithmetic, on the axis that hides).
+    'shell-live'      = @{ Title = 'EQBuddy — Live'
+                           Env = @{ EQBUDDY_SHELL = 'live' }; Set = @{} }
+    'shell-live-raids' = @{ Title = 'EQBuddy — Live'
+                           Env = @{ EQBUDDY_SHELL = 'live:raids' }; Set = @{} }
+    'shell-live-timeline' = @{ Title = 'EQBuddy — Live'
+                           Env = @{ EQBUDDY_SHELL = 'live:timeline' }; Set = @{} }
     'shell-home'      = @{ Title = 'EQBuddy — Home'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{} }
     'shell-home-narrow' = @{ Title = 'EQBuddy — Home'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '580x480' }

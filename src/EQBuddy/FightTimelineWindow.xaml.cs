@@ -52,6 +52,9 @@ public partial class FightTimelineWindow : Window
         Graph.View = _view;
         Lanes.View = _view;
         Lanes.HoverChanged += OnHover;
+        // The window owns the viewport, so the window owns the pan — see LanesPanel.Panned
+        // for why the panel no longer reaches up the tree to find out who that is.
+        Lanes.Panned += Pan;
 
         var restored = ScreenGuard.OnScreen(_settings.TimelineLeft, _settings.TimelineTop,
             Math.Max(420, _settings.TimelineWidth), 200);
@@ -414,6 +417,24 @@ internal sealed class LanesPanel : FrameworkElement
     internal TimelineViewport? View;
     internal event Action<TimelineMark?, TimelineLane?, Point>? HoverChanged;
 
+    /// <summary>
+    /// A pan drag, in pixels, handed to whoever owns the viewport.
+    ///
+    /// **It was `((FightTimelineWindow)Window.GetWindow(this)!).Pan(…)` until E-3's Live
+    /// room, and that hard cast was a crash waiting for a second host.** The panel reached
+    /// UP through the visual tree for the one window it had ever hung in; drawn inside the
+    /// shell it would have found a `ShellWindow` and thrown `InvalidCastException` on the
+    /// first left-drag across the lanes — not at build time, not in a test, and not in a
+    /// screenshot, but the first time somebody dragged a zoomed-in fight. That is trap 46's
+    /// rule (*"when a surface moves to a new host, check what the OLD host was doing for
+    /// it"*) with the host doing something for the surface at DRAG time rather than at tick
+    /// or close time, which is the shape that hides longest.
+    ///
+    /// An event rather than a nullable host reference, so a panel with nobody listening is
+    /// a panel that does not pan — the honest no-op — rather than one that throws.
+    /// </summary>
+    internal event Action<double>? Panned;
+
     /// <summary>This render's lane height: lanes STRETCH to fill the window (David's
     /// pass on a 5-lane, 28-second fight: 24px lanes huddled at the top of a half-empty
     /// window). A crowded fight falls back to the minimum and scrolls.</summary>
@@ -558,7 +579,7 @@ internal sealed class LanesPanel : FrameworkElement
         var pos = e.GetPosition(this);
         if (_panFrom is { } from && e.LeftButton == MouseButtonState.Pressed)
         {
-            ((FightTimelineWindow)Window.GetWindow(this)!).Pan(pos.X - from);
+            Panned?.Invoke(pos.X - from);
             _panFrom = pos.X;
             return;
         }

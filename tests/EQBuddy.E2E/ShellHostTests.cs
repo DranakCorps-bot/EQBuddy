@@ -1,3 +1,4 @@
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.E2E;
@@ -123,9 +124,14 @@ public class ShellHostTests
         Assert.Equal(1, app.DumpValue("shellSearch"));
         // Search is a shortcut past the nav, not a page: it must not be OPEN on arrival.
         Assert.Equal(0, app.DumpValue("shellPalette"));
-        // The room actually painted. Four tabs, from Core's ProgressSurface — the same
-        // four the Progress WINDOW builds from the same definition.
-        Assert.Equal(4, app.DumpValue("shellProgressTabs"));
+        // The room actually painted. THREE tabs since E-3 PR 5 — Core's ProgressSurface
+        // still names four and the Progress WINDOW still draws four; the Evolved room draws
+        // the surface MINUS what the reshape moved, which today is Raids. Written as the
+        // subtraction rather than as a literal 3, so a fifth Progress tab does not have to
+        // be typed here twice.
+        Assert.Equal(
+            ProgressSurface.Tabs().Count(h => !ProgressSurface.MovedToLive(h.Tab)),
+            app.DumpValue("shellProgressTabs"));
         // "progress", not "experience": `ProgressSurface.KeyFor(Experience)` is the card
         // key the five surfaces folded into, deliberately one OF the absorbed keys rather
         // than a new one. So the Experience room's address is `progress:progress`, which
@@ -144,11 +150,35 @@ public class ShellHostTests
     [Fact]
     public void AnAddressLandsInsideTheRoomAndNotJustOnIt()
     {
+        using var app = new AppHarness(environment: OpenOn("progress:faction"));
+        app.Launch();
+
+        app.WaitForDump("shellProgressTab", "faction", "the address's room half to be honoured");
+        app.WaitForDump("shellPage", "progress", "and its page half");
+    }
+
+    /// <summary>
+    /// **`progress:raids` is a dead address now, and it must land NOWHERE rather than
+    /// somewhere wrong.** E-3 PR 5 moved Raids to the Live room; `ProgressSurface.TabForKey`
+    /// still resolves `"raids"` (an old saved tab choice has to land somewhere true), so the
+    /// room's own refusal is the only thing between that key and a Progress room lighting no
+    /// chip over a body it did not change. This asserts the refusal from outside, which is
+    /// the only place it can be seen: nothing in a diff, a build or a screenshot shows a
+    /// `SetTab` that returned early.
+    ///
+    /// The shell still opens — an unrecognised room half leaves the page alone rather than
+    /// refusing the whole address, which is what `Navigate` has always done.
+    /// </summary>
+    [Fact]
+    public void TheOldRaidsAddressUnderProgressLandsOnNoTabRatherThanTheWrongOne()
+    {
         using var app = new AppHarness(environment: OpenOn("progress:raids"));
         app.Launch();
 
-        app.WaitForDump("shellProgressTab", "raids", "the address's room half to be honoured");
-        app.WaitForDump("shellPage", "progress", "and its page half");
+        app.WaitForDump("shellPage", "progress", "the page half to still be honoured");
+        // The room's DEFAULT tab, untouched by a key it no longer draws.
+        Assert.Equal("progress", app.DumpText("shellProgressTab"));
+        Assert.Equal(3, app.DumpValue("shellProgressTabs"));
     }
 
     /// <summary>
@@ -168,16 +198,22 @@ public class ShellHostTests
     {
         using var app = new AppHarness(environment: new Dictionary<string, string>
         {
-            ["EQBUDDY_SHELL"] = "progress:raids",
-            ["EQBUDDY_PROGRESS"] = "raids",
+            ["EQBUDDY_SHELL"] = "progress:faction",
+            ["EQBUDDY_PROGRESS"] = "faction",
         });
         app.Launch();
 
-        app.WaitForDump("shellProgressTab", "raids", "both hosts to reach the Raids room");
-        Assert.Equal(app.DumpValue("progressTabs"), app.DumpValue("shellProgressTabs"));
-        Assert.Equal(app.DumpValue("progressRaidsRows"), app.DumpValue("shellProgressRaidsRows"));
+        app.WaitForDump("shellProgressTab", "faction", "both hosts to reach the Faction room");
         Assert.Equal(app.DumpValue("progressFaction"), app.DumpValue("shellProgressFaction"));
         Assert.Equal(app.DumpValue("progressMotesRows"), app.DumpValue("shellProgressMotesRows"));
+        Assert.Equal(app.DumpValue("progressSkills"), app.DumpValue("shellProgressSkills"));
+
+        // **The tab COUNTS deliberately differ now, and asserting the difference is the
+        // point.** E-3 PR 5 moved Raids to the Live room; the v1 window still draws four
+        // tabs because retiring one from IT is a subtraction, gated separately. An equality
+        // here would have to be "fixed" by taking Raids off the window too — which is
+        // exactly the change this PR is not allowed to make.
+        Assert.Equal(app.DumpValue("progressTabs") - 1, app.DumpValue("shellProgressTabs"));
     }
 
     // ---- E-3 PR 2: the World and Gear rooms ------------------------------------
@@ -594,5 +630,164 @@ public class ShellHostTests
         Assert.Equal(
             ShellLayoutPolicy.For(width).RailLabelsVisible ? 1 : 0,
             app.DumpValue("shellRailLabels"));
+    }
+
+    // ---- E-3 PR 5: the Live room -----------------------------------------------
+
+    /// <summary>
+    /// Every one of Live's six rooms, reachable by its own address.
+    ///
+    /// **`live:raids` is the row that matters most here**, because it is the destination
+    /// half of a MOVE: `progress:raids` stopped resolving in the same commit, and a move
+    /// where only the departure lands is a surface dropped on the floor between two rooms.
+    /// The pair of assertions — this one and
+    /// `TheOldRaidsAddressUnderProgressLandsOnNoTabRatherThanTheWrongOne` — is what says the
+    /// surface arrived rather than merely left.
+    /// </summary>
+    [Theory]
+    [InlineData("live", "damage")]
+    [InlineData("live:damage", "damage")]
+    [InlineData("live:healing", "healing")]
+    [InlineData("live:pet", "pet")]
+    [InlineData("live:timeline", "timeline")]
+    [InlineData("live:kills", "kills")]
+    [InlineData("live:raids", "raids")]
+    // The old names, which have to keep landing: `combat` is what the widget's card and the
+    // phone's screen are called, and a script or a habit reaching for it should land
+    // somewhere true rather than nowhere.
+    [InlineData("live:combat", "damage")]
+    [InlineData("live:fight", "timeline")]
+    public void EveryLiveRoomIsReachableByItsOwnAddress(string address, string room)
+    {
+        using var app = new AppHarness(environment: OpenOn(address));
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", room, $"the shell to land on {address}");
+        Assert.Equal("live", app.DumpText("shellPage"));
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        Assert.Equal(Enum.GetValues<LiveTab>().Length, app.DumpValue("shellLiveTabs"));
+    }
+
+    /// <summary>
+    /// **Live is a SECOND host for surfaces the widget still draws, and this is the
+    /// comparison that says the two agree.** Nothing was subtracted from the widget by this
+    /// PR — that is gated per item on a HUD chip and a screenshot — so `CreatureWindow` and
+    /// `ProgressWindow` are open here alongside the room, on purpose, which is the exact
+    /// condition trap 45's exemption note calls out. On WPF the symptom of getting it wrong
+    /// is not a crash but a surface silently vanishing from whichever host drew it first,
+    /// and these row counts are the only thing that can see it.
+    ///
+    /// The room builds its OWN `KillsCardView` and `RaidsCardView` through
+    /// `MainWindow.NewLiveSurfaces()`; a shared instance would be torn out of one of the two
+    /// parents, and one of these numbers would go to zero.
+    ///
+    /// **It takes two launches rather than one, and the reason is trap 56.** Only the
+    /// VISIBLE tab paints — a room that painted its idle tabs would put a second MOMENT in a
+    /// dump whose whole contract is to describe one — so a single run opened on Kills
+    /// reports `shellLiveRaidsRows=0` for a Raids card that is correct and simply has not
+    /// been drawn. The first version of this test did exactly that and read as a lost
+    /// surface; the honest fix is one launch per comparison, not a room that paints more.
+    /// </summary>
+    [Fact]
+    public void TheLiveRoomAndTheKillsWindowAgreeAboutTheSessionsKills()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "live:kills",
+            ["EQBUDDY_CREATURE"] = "kills",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", "kills", "both hosts to reach the session kills");
+        // The fixture replays a real session, so this is a comparison of numbers that are
+        // not both zero — which is what keeps it from passing vacuously (trap 39).
+        Assert.True(app.DumpValue("killKinds") > 0,
+            $"the fixture produced no kills; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("shellLiveKillRows") > 0,
+            $"the Live room drew no kill rows; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("kills"), app.DumpValue("shellLiveKillRows"));
+        Assert.Equal(app.DumpValue("party"), app.DumpValue("shellLivePartyRows"));
+    }
+
+    /// <summary>
+    /// The Raids half of the same comparison — and the half that also proves the MOVE, since
+    /// `progressRaidsRows` is the key the shell's PROGRESS room used to answer and now does
+    /// not. The v1 `ProgressWindow` still draws the tab, which is what makes it available to
+    /// compare against at all.
+    /// </summary>
+    [Fact]
+    public void TheLiveRoomAndTheProgressWindowAgreeAboutTheRaidLedger()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "live:raids",
+            ["EQBUDDY_PROGRESS"] = "raids",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", "raids", "both hosts to reach the raid ledger");
+        Assert.True(app.DumpValue("progressRaidsRows") > 0,
+            $"the v1 window drew no raid rows; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("progressRaidsRows"), app.DumpValue("shellLiveRaidsRows"));
+        Assert.Equal(app.DumpValue("progressRaidsDefeated"), app.DumpValue("shellLiveRaidsDefeated"));
+        // And the key it left: the shell's Progress room does not report raid rows any more,
+        // which is the assertion that says the departure happened rather than being assumed
+        // from the arrival. `DumpText` (not `DumpValue`) because an absent key is "" rather
+        // than 0, and 0 is what a room that still drew an empty ledger would report.
+        Assert.Equal("", app.DumpText("shellProgressRaidsRows"));
+    }
+
+    /// <summary>
+    /// **The leak check Bevel asked for by name, asserted rather than promised.**
+    ///
+    /// Live is the room most likely to want its own redraw cadence — it is the one whose
+    /// content genuinely changes every second, and `FightTimelineWindow`, one of its five
+    /// sources, owns exactly such a `DispatcherTimer`. It starts none: the shell already
+    /// ticks the visible room once a second, so the room takes that instead. `Release()` is
+    /// therefore empty, and this is what stops that being a claim nobody can check — a
+    /// leaked timer shows in nothing else, not a diff, not a build, not a screenshot.
+    ///
+    /// Opened on the Timeline tab specifically, because that is the tab where a timer would
+    /// have gone in.
+    /// </summary>
+    [Fact]
+    public void TheLiveRoomStartsNoTickOfItsOwn()
+    {
+        using var app = new AppHarness(environment: OpenOn("live:timeline"));
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", "timeline", "the shell to land on the fight timeline");
+        Assert.Equal(0, app.DumpValue("shellLiveTimers"));
+        // And it is still painting, which is what makes the line above mean "it takes the
+        // shell's tick" rather than "it does nothing".
+        Assert.True(app.DumpValue("tick") > 0,
+            $"the widget stopped ticking; dump was: {app.Artifacts()}");
+    }
+
+    /// <summary>
+    /// **The Home/Live boundary from LIVE's side.** Home reports the running session and
+    /// refuses its numbers; Live reports the same session and draws them. Both read one
+    /// `SessionSummary.Pick`, so the state must MATCH while the content differs — a
+    /// disagreement here is the drift the sibling record exists to prevent, and it is
+    /// invisible from either room alone.
+    /// </summary>
+    [Fact]
+    public void HomeAndLiveDescribeTheSameSittingAndOnlyLiveCountsIt()
+    {
+        using var app = new AppHarness(environment: OpenOn("live"));
+        app.Launch();
+
+        app.WaitForDump("shellLiveSession", "inprogress",
+            "Live to report the running session as in progress");
+        Assert.True(app.DumpValue("killsTotal") > 0,
+            $"the fixture did not produce a live session; dump was: {app.Artifacts()}");
+        // Live counts the kills Home is not allowed to. Read from the session record rather
+        // than from the snapshot, so this is the boundary being crossed on purpose and not
+        // a second path to the same number.
+        Assert.Equal(app.DumpValue("killsTotal"), app.DumpValue("shellLiveKills"));
+        // And the room is not showing its whole-room empty over a session that has fights
+        // in it — the state that would make every assertion above pass while the player saw
+        // "nothing has happened yet".
+        Assert.Equal(0, app.DumpValue("shellLiveEmpty"));
     }
 }

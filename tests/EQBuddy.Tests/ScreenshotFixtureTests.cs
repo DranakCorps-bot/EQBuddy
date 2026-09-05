@@ -399,7 +399,11 @@ public class ScreenshotFixtureTests
             Character = "Testchar",
             AppVersion = "test",
             Stats = stats,
-            Offered = [CompanionSurfaces.Progress],
+            // SESSION as well as Progress since E-3 PR 5: the raid clears this fixture
+            // exists to stage now ride the Session screen, so a harness run offered only
+            // Progress would photograph a page with no raids on it at all — a real state,
+            // and therefore an invisible fixture bug (trap 23).
+            Offered = [CompanionSurfaces.Progress, CompanionSurfaces.Session],
             Raids = raids,
             Level = 12,
             Theme = CompanionTheme.Project("midnight",
@@ -408,11 +412,13 @@ public class ScreenshotFixtureTests
 
         File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
 
-        // Predicted before the run (trap 23): four tabs, the catalog's own boss total, and
-        // two clears in two different shapes.
-        Assert.Equal(4, snap.Progress!.Tabs.Count);
-        Assert.Equal(RaidTargetCatalog.Default.BossCount, snap.Progress.Raids.Total);
-        Assert.Equal(2, snap.Progress.Raids.Defeated);
+        // Predicted before the run (trap 23): THREE tabs — it was four until E-3 PR 5 moved
+        // Raids to the Session screen with the desktop's Raids tab — the catalog's own boss
+        // total, and two clears in two different shapes.
+        Assert.Equal(3, snap.Progress!.Tabs.Count);
+        Assert.DoesNotContain("raids", snap.Progress.Tabs.Select(t => t.Key));
+        Assert.Equal(RaidTargetCatalog.Default.BossCount, snap.Session!.Raids!.Total);
+        Assert.Equal(2, snap.Session.Raids.Defeated);
         Directory.Delete(dir, true);
     }
 

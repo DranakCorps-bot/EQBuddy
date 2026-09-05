@@ -38,7 +38,7 @@ public class CompanionWireKeyTests
             AaGained: 1, AaTotal: 4, AaPerHour: 0.5, Level: 33,
             UnlocksLabel: null, Unlocks: [],
             Tabs: [], Wealth: new CompanionWealthBlock("0c", "0c", "0c", "0c", 0, 0, [], "", []),
-            Faction: [], Raids: new CompanionRaidsBlock(0, 21, []),
+            Faction: [],
             NextLabel: "At level 34: 3 new spells",
             NextGroups:
             [
@@ -95,7 +95,7 @@ public class CompanionWireKeyTests
                 AaGained: 1, AaTotal: 4, AaPerHour: 0.5, Level: 24,
                 UnlocksLabel: null, Unlocks: [],
                 Tabs: [], Wealth: new CompanionWealthBlock("0c", "0c", "0c", "0c", 0, 0, [], "", []),
-                Faction: [], Raids: new CompanionRaidsBlock(0, 21, []),
+                Faction: [],
                 LevelUpsLabel: "Level-ups (3) · last Aug 23",
                 LevelUps:
                 [

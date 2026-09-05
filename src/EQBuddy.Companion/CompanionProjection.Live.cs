@@ -161,13 +161,20 @@ public static partial class CompanionProjection
             // the SAME two the desktop window reads. Sending it rather than rebuilding it
             // on the page is the #210 fix applied before the bug: the phone can't name a
             // different tab, order them differently, or compute a different badge.
+            //
+            // **FILTERED by ProgressSurface.MovedToLive since E-3 PR 5**, which is the same
+            // predicate the desktop's Progress ROOM reads. The Raids chip and its content
+            // left together, in one commit, for the screen PageFor routes to Live — a strip
+            // that still offered a tab whose body had moved would be the rail's own
+            // forbidden shape ("an affordance that opens nothing is a trap") on a phone.
             Tabs: [.. ProgressTheme
                 .Tabs(stats, unlocks.Count, defeated, catalog.BossCount)
+                .Where(t => ProgressSurface.TabForKey(t.Key) is { } tab
+                            && !ProgressSurface.MovedToLive(tab))
                 .Select(t => new CompanionProgressTab(t.Key, t.Label, t.Value))],
             Wealth: BuildWealth(stats),
             Faction: [.. stats.Faction.Take(MaxRows)
                 .Select(f => new CompanionCountRow(f.Faction, f.Net))],
-            Raids: BuildRaids(raids, catalog),
             // Its OWN heading, never the ding's — Bevel, Helm-signed: "do not steal that
             // heading". NextWords rather than NextLabel: the page draws its own chevron,
             // and a glyph baked into a wire string is one the page cannot restyle and the

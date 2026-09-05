@@ -52,6 +52,48 @@ history of the call stays readable. If vetoes become common, the consequence lis
   to the placement decision ("is there a band wide enough to hold this window"), so a number
   in the XAML and again in a test is one that disagrees with itself silently, with both sides
   internally consistent — the same argument `MinWidth` was already carrying one line up.
+## 2026-09-05 (E-3 PR 5, the Live room)
+
+- **Live's six rooms are Damage · Healing · Pet · Timeline · Kills · Raids, and the first is
+  labelled "Damage" rather than "Combat".** The other way: keep the v1 card's name, since
+  that is what the widget and the phone screen both call it. Declined because on a strip
+  that already says Healing and Pet, "Combat" is the only label naming a category rather
+  than a number, and a player looking for their DPS would have to know that Combat is where
+  it lives — the breakout window has said "Your damage" since it shipped.
+  `LiveSurface.TabForKey` still resolves `combat`, `dps`, `hps` and `fight`, so no old
+  habit lands nowhere (`src/EQBuddy.Core/LiveSurface.cs`).
+- **The Raids move is expressed as `ProgressSurface.MovedToLive(tab)`, a total predicate,
+  rather than a `ShellTabs` list beside `Tabs()`.** The other way: a second array, which is
+  what the file's shape suggests. Declined on trap 55 — two hand-maintained lists describing
+  one arrangement is exactly what cost #252 — and because a predicate defaulting to "no, it
+  stayed" means a fifth Progress tab reaches the Evolved room and the phone with no edit.
+- **The phone's raids block moved to the SESSION screen**, not to Combat and not to a new
+  screen. The other way: a `live` screen of its own. Declined because
+  `CompanionSurfaces.PageFor` already routes `Session` to `ShellPage.Live` and adding a
+  twelfth screen would change the wire protocol and the ⚙ picker for a fact that already had
+  a home. `CompanionHost`'s ledger gate moved from `Progress` to `Session` with it, or the
+  ledger would have been sent to a screen that no longer draws it.
+- **Live's Fight/Session scope and sort are room state and are NOT persisted.** The other
+  way: reuse `AppSettings.BreakoutDamageScope` and friends, which are right there. Declined
+  because that would make two writers of one settings key (trap 13's loaded gun — a save
+  writes the whole file from the startup snapshot). Evolved is behind `EQBUDDY_SHELL` with no
+  player door, so a preference it forgets on close costs nobody anything. The room defaults
+  to **Session** where the floating breakout defaults to Fight: a bar over the game is about
+  the pull, a room called "This sitting" is about the sitting.
+- **`live:raids` replaces `progress:raids`, and `ProgressRoom.SetTab` REFUSES the old key**
+  rather than resolving it. The other way: leave `TabForKey` to answer and let the room land
+  on a tab it no longer draws. Declined — the strip would light nothing over an unchanged
+  body. `ProgressSurface.TabForKey` still resolves `"raids"`, which is about an old saved tab
+  choice landing somewhere true and is a different question.
+- **The retired `shell-progress-raids` shot and its committed PNG are DELETED, not
+  re-pointed.** The other way: keep the file and change the address. Declined under the
+  illustration lock: a picture of a state the code no longer produces is exactly the drift it
+  exists to stop. `shell-live-raids` is the replacement, and `docs/TestPlan.md` moved with it.
+- **`LanesPanel` raises a `Panned` event instead of casting `Window.GetWindow(this)` to
+  `FightTimelineWindow`.** Not really a choice — the cast is an `InvalidCastException` the
+  moment a second host draws the panel — but it is a change to a shipped v1 window made from
+  the Live PR, so it is logged rather than buried. Found by reading what the old host did for
+  the surface, not by a failure.
 
 ## 2026-09-05 (E-3 PR 4, the Home room)
 

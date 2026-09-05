@@ -2085,8 +2085,37 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             Money: money,
             Motes: motes,
             Faction: faction,
-            Raids: new RaidsCardView(() => _raidLedger, () => LastAchievementsImport));
+            Raids: NewRaidsCard());
     }
+
+    /// <summary>The Raids surface, freshly built for whichever host asks. **Its own factory
+    /// since E-3's Live room**, which is where Raids lives in the Evolved IA — the shell's
+    /// Progress room no longer builds one, and <see cref="ProgressWindow"/> still does
+    /// through the set above. A <c>UIElement</c> has one parent, so each host builds its own
+    /// or one of them silently loses the surface (trap 45).</summary>
+    internal RaidsCardView NewRaidsCard() => new(() => _raidLedger, () => LastAchievementsImport);
+
+    /// <summary>How many raid targets are cleared — the Progress tab strip's badge, which
+    /// the shell's Progress room still has to compute even though it no longer draws the
+    /// tab. Read from the ledger rather than from a card, so a host with no Raids surface
+    /// does not have to build one to ask.</summary>
+    internal int RaidsDefeatedCount => _raidLedger.DefeatedCount();
+
+    /// <summary>The three surfaces the Live room hosts that the widget cannot lend it: the
+    /// session kills counter (the Kills tab of Kills &amp; Drops — never the Drops tab, which
+    /// is camp research and World's) and the raid ledger. Same rule as
+    /// <see cref="NewProgressSurfaces"/>: built for the caller, handed out once, never
+    /// shared.</summary>
+    internal (KillsCardView Kills, RaidsCardView Raids) NewLiveSurfaces() =>
+        (new KillsCardView(), NewRaidsCard());
+
+    /// <summary>The fight timeline's data pull and the version it is gated on, for a host
+    /// that is not <see cref="FightTimelineWindow"/>. The Live room's Timeline tab draws the
+    /// same lanes from the same source rather than re-slicing the journal itself.</summary>
+    internal (LastFightInfo? Fight, List<GameEvent> Events, string Pet) FightTimelineSource() =>
+        TimelineSource();
+
+    internal long StatsVersion => _stats.CurrentVersion;
 
     // World theme (World PR 1): four separate factories rather than one combined set —
     // three SEPARATE standalone windows share no host yet, and Map/SpawnsView do real
@@ -3943,18 +3972,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         BreakdownRows.FillAbilityRowsSorted(this, list, stats, sort, combatSeconds, rateLabel,
             CardRowCap, resists: resists, blockedBy: blockedBy);
 
-    /// <summary>Render a Total/Count/Avg stat list in the chosen sort order.</summary>
-    private void FillStatList(ItemsControl list, IEnumerable<SourceDamage> stats, StatSort sort, string unit)
-    {
-        var sorted = sort switch
-        {
-            StatSort.Hits => stats.OrderByDescending(d => d.Hits),
-            StatSort.Avg => stats.OrderByDescending(d => (double)d.Total / d.Hits),
-            _ => stats.OrderByDescending(d => d.Total),
-        };
-        FillList(list, sorted.Select(d =>
-            (d.Name, $"{d.Total:N0} · {d.Hits} {unit}{(d.Hits == 1 ? "" : "s")} · avg {(double)d.Total / d.Hits:0.#}")));
-    }
+    /// <summary>Render a Total/Count/Avg stat list in the chosen sort order. Lifted with
+    /// <see cref="FillList"/> — the Live room's Damage tab draws the same "Damage you took"
+    /// list, and two sorters over one list is trap 33's shape.</summary>
+    private void FillStatList(ItemsControl list, IEnumerable<SourceDamage> stats, StatSort sort, string unit) =>
+        BreakdownRows.FillStatRows(this, list, stats, sort, unit);
 
     // The three sort strips, on the chip primitive (Gate 5). They were bare TextBlocks
     // with a Tag, a click handler and a hand-written ApplyVisual — the exact pattern the
@@ -4017,77 +4039,17 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         ShowQuestsWindow();
     }
 
-    /// <summary>The plain name/value list the un-migrated card BODIES still draw with —
-    /// the breakdown lists, the ding unlocks, deaths and zones. <c>EqCardRows</c> is what
-    /// replaced it for every card that has been through the seam; the rest is a later
-    /// batch (docs/DesignSystem.md §11.9).
-    ///
-    /// It used to take a <c>questBadges</c> flag that hung a quest map-pin on each item
-    /// row. Nothing has passed it since the Loot card moved onto <c>EqCardRows</c>, which
-    /// draws that badge itself — so the branch was unreachable, and it was unreachable in
-    /// the #211 shape: a bare clickable vector with holes you could click through. Dead
-    /// code carrying a bug already paid for is worse than no code.</summary>
+    /// <summary>The plain name/value list the un-migrated card BODIES still draw with.
+    /// **Lifted into <see cref="BreakdownRows.FillPairRows"/> for E-3's Live room**, which
+    /// draws the same procs / stances / area-spell / damage-taken lists in a second host —
+    /// see that method for why it moved rather than being copied. This stays as the
+    /// window's own spelling of it so the ~40 call sites below read unchanged.</summary>
     private void FillList(ItemsControl list, IEnumerable<(string Name, string Value)> rows,
         Func<string, Brush>? valueBrush = null, Action<string>? onNameClick = null,
         Func<string, string?>? tooltip = null, Func<string, Brush?>? nameBrush = null,
-        Func<string, string?>? noteFor = null)
-    {
-        var items = rows.ToList();
-        list.Items.Clear();
-        foreach (var (name, value) in items)
-        {
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var left = new TextBlock
-            {
-                FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                Foreground = nameBrush?.Invoke(name) ?? (Brush)FindResource("TextBrush"),
-                Margin = new Thickness(0, 1, Tok.SpaceM, 1),
-            };
-            // Provenance rides inline as a muted "(Foraged)"/"(Crafted)"/… after the name —
-            // a separate run, not part of the name, so the click still looks up the base item.
-            if (noteFor?.Invoke(name) is { Length: > 0 } note)
-            {
-                left.Inlines.Add(new System.Windows.Documents.Run(name));
-                left.Inlines.Add(new System.Windows.Documents.Run($" {note}")
-                {
-                    FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
-                    Foreground = (Brush)FindResource("DimBrush"),
-                });
-            }
-            else left.Text = name;
-            if (tooltip?.Invoke(name) is { Length: > 0 } tip)
-            {
-                var tipText = new TextBlock { Text = tip, TextWrapping = TextWrapping.Wrap, MaxWidth = 340 };
-                // Multi-line tips are stat blocks — monospace keeps their columns readable.
-                // (Static family: the item catalog made this branch always-taken, and a
-                // fresh FontFamily per row per render second was churn — 2026-08-13 review.)
-                if (tip.Contains('\n')) tipText.FontFamily = MonoFamily;
-                left.ToolTip = new System.Windows.Controls.ToolTip { Content = tipText };
-            }
-            if (onNameClick is not null)
-            {
-                var clickName = name;
-                left.Cursor = System.Windows.Input.Cursors.Hand;
-                left.ToolTip ??= "Click for item info (eqlwiki)";
-                // Swallow the down so it can't start a window DragMove and eat the Up
-                // (the discussion #46 failure mode, same fix as the breakout rows).
-                left.MouseLeftButtonDown += (_, ev) => ev.Handled = true;
-                left.MouseLeftButtonUp += (_, _) => onNameClick(clickName);
-            }
-            var right = new TextBlock
-            {
-                Text = value, FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
-                Foreground = valueBrush?.Invoke(value) ?? (Brush)FindResource("DimBrush"),
-            };
-            Grid.SetColumn(right, 1);
-            grid.Children.Add(left);
-            grid.Children.Add(right);
-            list.Items.Add(grid);
-        }
-    }
+        Func<string, string?>? noteFor = null) =>
+        BreakdownRows.FillPairRows(this, list, rows, valueBrush, onNameClick, tooltip,
+            nameBrush, noteFor);
 
     // ---- hide while the game is unfocused (FOCUS-*, discussion #41) ----
 
