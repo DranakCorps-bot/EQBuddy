@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #334 — AppHarness screen lock / trap 61 other half (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #334 https://github.com/DranakCorps-bot/EQBuddy/pull/334 (`claude/appharness-screen-lock-20260905` → `main`, head `1a702a33`) — E2E takes same `%TEMP%\eqbuddy-screen.lock` as `shoot.ps1`; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Tests/docs only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) `DisableTestParallelization` keep — SIGNED (trap 57; CI cost accepted). (2) Gate on CI e2e — SIGNED (no local launching re-run; SA-2 held screen). (3) #332 batch verification still owed — ACK.
+- **Signed items:** ScreenLock same file/share/refuse; whole-run hold; FORCE env; no symmetric build-output check; C# duplicate not `src/`; assembly serialize; ScreenLockTests + docs.
+- **Soft:** drop channel tip; #332 full-batch duty remains on next screen lane; do not starve SA-2.
+- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:25 PM CT
+
+
 ### PR #331 — Bevel I-11 Settings IA + Options-gap (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #331 https://github.com/DranakCorps-bot/EQBuddy/pull/331 (`claude/bevel-i11-settings-ia-20260905` → `main`, head `fb3da48e`) — Settings room IA pre-design + Options-gap ruling; HELM-FEEDBACK LIVE ASK.
