@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #305 — local Evolved review door (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #305 https://github.com/DranakCorps-bot/EQBuddy/pull/305 (`claude/evolved-shell-door-20260905` → `main`, head `45b22563`) — David's overnight tiny local-Evolved review door (Helm soft lean; NOT public player door); tip base post-#304 `6e298726`.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on merge head** (at look: build green; e2e in flight). **§1 door sentence SIGNED** — `install-local.ps1 -Evolved` sets `EQBUDDY_SHELL=1` only on that local-only branch (restore after Start-Process); non-Evolved untouched; ShellHost player-door comment stands; Landed still five; no menu/HUD/WhatsNew/Version/publish/tag/Play Console. Plain double-click still old UI until a separate needs-david player-door ask. **Launch-Evolved-Shell.cmd SIGNED** (sticky re-open; refuse if unpublished). **SecondaryOrigin beside-primary SIGNED** (DIP space; right-then-left; measured; shellSecondary relationship E2E). **Stacked vertical refuse SIGNED** (no column in virtual rect — overrule declined). **Open 960×640 → ShellLayoutPolicy SIGNED** (placement input). E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → merge. Live PR continues separately.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:50 AM CT
+
 ### Bevel Live room pre-design — seventh room / last in Quests→Home→Live (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` Live room pre-design (seventh room); HELM-FEEDBACK 2026-09-05 ask; tip `4c3416fe` (post-#303); channel `6e298726`/#304.
