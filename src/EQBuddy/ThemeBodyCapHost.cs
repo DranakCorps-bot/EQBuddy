@@ -108,8 +108,9 @@ internal static class ThemeBodyCapHost
     /// before it promises anything (#250).</summary>
     public static bool AnyBodyIsCapped(MainWindow w) =>
         (w._progressCard?.BodyIsCapped ?? false) || (w._killsCard?.BodyIsCapped ?? false)
-        // Quests is not in this list because it has no card since 2026-09-05 (HUD
-        // subtraction cut 1) — there is no inline body of its to cap.
-        || (w._lootCard?.BodyIsCapped ?? false)
-        || (w._worldCard?.BodyIsCapped ?? false);
+        // Neither Quests nor World is in this list: both lost their cards to HUD
+        // subtraction on 2026-09-05 (cuts 1 and 2), so neither has an inline body to cap.
+        // Three theme cards remain, and one of them is missing from this list the day a
+        // fourth arrives — which is the reason it is spelled out rather than looped.
+        || (w._lootCard?.BodyIsCapped ?? false);
 }

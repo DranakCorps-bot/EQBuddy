@@ -84,25 +84,66 @@ public sealed class WorldOpenersTests
         Assert.Equal("spawns", app.DumpText("worldTab"));
     }
 
-    /// <summary>The Travels &amp; Deaths card body (the misc card, <c>TravelsView</c> as
-    /// of this PR) — EQBUDDY_EXPAND=1 already expands it, so this needs no extra hook.
+    /// <summary>
+    /// The Travels &amp; Deaths body — <c>TravelsView</c>, in the World window's Travels
+    /// tab.
+    ///
+    /// **This test read the WIDGET's copy until 2026-09-05.** Travels was the one World
+    /// room the widget drew itself, on the `misc` card, and `EQBUDDY_EXPAND=1` reached it
+    /// for free — so it was also the one room with no `EQBUDDY_*` hook of its own. HUD
+    /// subtraction cut 2 removed that card, which would have left the surface with no way
+    /// to be put on screen by a test or a shot at all (trap 22, a surface with no fixture
+    /// state reading as reviewed anyway). `EQBUDDY_WORLD` landed with the cut for exactly
+    /// this, and it is the same `ShowWorldWindow` call the `World…` menu row makes.
+    ///
+    /// The keys are unchanged (`zones`/`deaths`/`travelsMarkers`) because the VIEW is
+    /// unchanged — one class, now with one owner instead of two, which is the parity
+    /// Bevel's I-5 check one verified by construction rather than by resemblance. It also
+    /// removes a two-host dump-key collision before it could happen (trap 58).
+    ///
     /// The fixture zones twice during replay; a death line is appended here because the
-    /// fixture has none on its own, and an empty deaths list would prove nothing about
-    /// the row underneath (trap 22).</summary>
+    /// fixture has none on its own, and an empty deaths list would prove nothing about the
+    /// row underneath.
+    /// </summary>
     [Fact]
-    public void TheTravelsCardDrawsZonesAndDeaths()
+    public void TheTravelsTabDrawsZonesAndDeaths()
     {
-        using var app = new AppHarness();
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_WORLD"] = "1",
+        });
         app.Launch();
-        // EQBUDDY_EXPAND=1 (set by every harness launch) already expands MiscSection,
-        // and Launch() already waited for the dump to exist (killsTotal > 0), so zones
-        // and deaths are both readable the moment this line runs.
+        app.WaitForWindow("zones", "the World window to open on Travels and dump its facts");
+
+        // "1" lands on the theme's default room, which is Travels — the room the card was.
+        Assert.Equal("misc", app.DumpText("worldTab"));
         Assert.True(app.DumpValue("zones") > 0,
             "the fixture zones into Befallen and West Commonlands during replay");
         Assert.Equal(0, app.DumpValue("deaths"));
 
         app.AppendLogLines("You have been slain by a training dummy!");
-        app.WaitForDump("deaths", 1, "the appended death to reach the Travels card");
+        app.WaitForDump("deaths", 1, "the appended death to reach the Travels tab");
         Assert.True(app.DumpValue("travelsMarkers") >= 0);
+    }
+
+    /// <summary>A named room, in the same grammar the other hooks use — and "camps" rather
+    /// than "spawns" on purpose: the hook resolves through <c>WorldSurface.TabForKey</c>,
+    /// so it answers every alias that method does, and an assertion on the canonical word
+    /// alone could not tell that apart from a hook that only matched wire keys. An
+    /// unrecognised word falls back to the default room rather than throwing, which is what
+    /// keeps a typo in a shot fixture from stopping the whole batch (trap 53).</summary>
+    [Fact]
+    public void TheWorldHookOpensARoomNamedByAnyOfItsAliases()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_WORLD"] = "camps",
+        });
+        app.Launch();
+        // The TEXT overload: `worldTab` is a word, and `WaitForWindow`/`DumpValue` parse
+        // integers and answer -1 for anything else — so waiting for it that way can never
+        // be satisfied, however correct the app is. That is exactly how this test failed
+        // its first run, against a dump plainly reading `worldTab=spawns`.
+        app.WaitForDump("worldTab", "spawns", "the World window to open on the named room");
     }
 }

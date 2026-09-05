@@ -93,6 +93,11 @@ public sealed class OptionsViewModelTests
         // It arrives HIDDEN for existing profiles (AppSettings.MigrateMotesCard), so being
         // in this list is exactly the difference between "off" and "gone".
         Assert.Contains(vm.Cards, c => c.Key == "motes" && c.Title == "Motes");
+        // WORLD IS NOT A CARD ANY MORE either (HUD subtraction cut 2, 2026-09-05), and the
+        // key it leaves behind is "misc" — the old Travels & Deaths card's own settings
+        // key, which every 1.x profile carries. Asserted ABSENT for the same reason as
+        // "quests": a key with no catalog row throws in `Cards`'s own First(...).
+        Assert.DoesNotContain(vm.Cards, c => c.Key == "misc");
 
         vm.MoveCard("kills", -1);                        // top can't move up
         Assert.Equal("kills", s.SectionOrder[0]);
@@ -211,6 +216,45 @@ public sealed class OptionsViewModelTests
 
         // A fresh install's empty order stays empty — the UI appends the catalog.
         Assert.False(new AppSettings().MigrateQuestSections());
+    }
+
+    /// <summary>
+    /// HUD subtraction cut 2 (2026-09-05): the World card leaves, and its key goes with it.
+    ///
+    /// **"misc" is not a 1.99-era key — it is the oldest one in the file.** The card has
+    /// been in `SectionOrder` under that name since before it was called World (it was
+    /// Travels &amp; Deaths, and `misc` is a name from before it had a proper one), and the
+    /// World fold kept the key precisely so nobody's slot moved. So this migration runs on
+    /// essentially every profile in existence, and it has to clear BOTH lists: a key left
+    /// in `HiddenSections` with no catalog row is exactly what #252 was made of.
+    ///
+    /// The other half is the one a subtraction can get wrong quietly — that it removes only
+    /// what it names. `map`, `spawns` and `travel` were never cards (they were menu-only
+    /// windows), so nothing about them is in these lists to remove; `motes` sits beside
+    /// `misc` here to prove a neighbour survives.
+    /// </summary>
+    [Fact]
+    public void TheWorldCardsKeyLeavesTheWidgetEntirely()
+    {
+        var settings = new AppSettings
+        {
+            SectionOrder = ["combat", "misc", "motes", "tracked", "bogus"],
+            HiddenSections = ["misc", "motes"],
+        };
+
+        Assert.True(settings.MigrateWorldSections());
+        Assert.Equal(["combat", "motes", "tracked", "bogus"], settings.SectionOrder);
+        Assert.Equal(["motes"], settings.HiddenSections);
+        Assert.False(settings.MigrateWorldSections());   // idempotent — trap 13
+
+        // A profile that had the card visible loses the key just the same: the question the
+        // removal answers is "is this a card", not "did you hide it".
+        var visible = new AppSettings { SectionOrder = ["combat", "misc"] };
+        Assert.True(visible.MigrateWorldSections());
+        Assert.Equal(["combat"], visible.SectionOrder);
+
+        // And a fresh install's empty order stays empty.
+        Assert.False(new AppSettings().MigrateWorldSections());
     }
 
     [Fact]

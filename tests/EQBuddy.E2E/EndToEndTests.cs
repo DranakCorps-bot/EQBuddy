@@ -548,15 +548,22 @@ public sealed class EndToEndTests
     [Fact]
     public void AnUndraggedWidgetKeepsTheOldThemeBodyCap()
     {
-        using var app = new AppHarness();
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_EXPAND"] = "loot",
+        });
         app.Launch();
         app.WaitForDump("themeBodyCap", 320,
             "an undragged widget keeps the theme body cap it has always had");
 
         Assert.Equal(1, app.DumpValue("contentHeightAuto"));
-        // EQBUDDY_EXPAND=1 opens the World theme card, so the number above is a REAL
-        // expanded body's cap and not a default nobody consulted.
-        Assert.Equal(1, app.DumpValue("worldInline"));
+        // A THEME CARD HAS TO BE OPEN, or the number above is a floor nobody consulted.
+        // This said `worldInline` and rode the default EQBUDDY_EXPAND=1 review set until
+        // 2026-09-05, when HUD subtraction cut 2 removed the World card — which was the
+        // LAST theme card in that set. Naming the card is the fix and it is the better
+        // shape anyway: the scenario is about a capped body, so it should say which body
+        // rather than depend on what someone else's review set happens to contain.
+        Assert.Equal(1, app.DumpValue("lootInline"));
     }
 
     /// <summary>
@@ -576,13 +583,16 @@ public sealed class EndToEndTests
     [Fact]
     public void DraggingTheWidgetTallerGrowsTheOpenThemesBody()
     {
-        using var app = new AppHarness(s => s.ContentHeight = 4000);
+        using var app = new AppHarness(s => s.ContentHeight = 4000,
+            new Dictionary<string, string> { ["EQBUDDY_EXPAND"] = "loot" });
         app.Launch();
         app.WaitForWindow("themeBodyCap", "the expanded theme card reports its body cap");
 
         var cap = app.DumpValue("themeBodyCap");
         Assert.Equal(0, app.DumpValue("contentHeightAuto"));
-        Assert.Equal(1, app.DumpValue("worldInline"));
+        // Named rather than inherited from the review set since 2026-09-05 — see the note
+        // in AnUndraggedWidgetKeepsTheOldThemeBodyCap.
+        Assert.Equal(1, app.DumpValue("lootInline"));
         Assert.True(cap >= 320, $"the floor is a floor; cap was {cap}");
         Assert.True(cap <= 640, $"one card may double, never more; cap was {cap}");
 
@@ -616,12 +626,18 @@ public sealed class EndToEndTests
     [Fact]
     public void DraggingTheWidgetShorterNeverTakesTheThemeBodyBelowTheFloor()
     {
-        using var app = new AppHarness(s => s.ContentHeight = 200);
+        using var app = new AppHarness(s => s.ContentHeight = 200,
+            new Dictionary<string, string> { ["EQBUDDY_EXPAND"] = "loot" });
         app.Launch();
         app.WaitForDump("themeBodyCap", 320,
             "a widget dragged shorter than the floor keeps the floor");
 
         Assert.Equal(0, app.DumpValue("contentHeightAuto"));
+        // With no theme card open the floor is what an EMPTY answer looks like too, so
+        // without this the assertion above would pass on a widget drawing nothing —
+        // trap 39's vacuous shape, which HUD subtraction cut 2 made reachable here by
+        // taking the last theme card out of the default review set.
+        Assert.Equal(1, app.DumpValue("lootInline"));
     }
 
     /// <summary>The same check at 100%, where the units coincide — a guard against
@@ -640,8 +656,13 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
-    /// **HUD SUBTRACTION, CUT 1 (2026-09-05): the widget draws NINE cards, and the Quest
+    /// **HUD SUBTRACTION (2026-09-05): the widget draws EIGHT cards, and the Quest
     /// Tracker is still reachable.**
+    ///
+    /// Nine after cut 1 took the Quests card; eight after cut 2 took the World card the
+    /// same day. **The count is the only line either cut had to edit here**, which is
+    /// exactly what `cards`/`cardsVisible` were introduced for — see the note on them in
+    /// `WidgetDump`, written by cut 1 and collected on by cut 2.
     ///
     /// This test has been the Quests card's twice over. It pinned the Epic and Sky cards'
     /// tab and row counts (2026-08-15, to prove the QuestChecklistView extraction moved
@@ -652,29 +673,29 @@ public sealed class EndToEndTests
     /// **The card count is asserted as a NUMBER rather than by naming Quests.** A key
     /// called <c>questsCard</c> could only ever speak for the card it was named after, and
     /// a subtraction is a claim about the STACK — every later cut wants this same
-    /// assertion. Nine is the catalog's length today, and the number moving is exactly the
+    /// assertion. Eight is the catalog's length today, and the number moving is exactly the
     /// event that should make somebody look.
     ///
     /// Three ways this can go wrong are all in here, because none of them is visible in a
-    /// diff, a build or a screenshot: the card could still be drawn (cards would be 10),
-    /// the key could have left the catalog and stayed in <c>SectionMap</c> (the app would
-    /// not start at all — the Gear &amp; Loot fold's own crash), and the checklists could
-    /// have gone with the card that used to render them.
+    /// diff, a build or a screenshot: a cut card could still be drawn (cards would be 9 or
+    /// 10), a key could have left the catalog and stayed in <c>SectionMap</c> (the app
+    /// would not start at all — the Gear &amp; Loot fold's own crash), and the checklists
+    /// could have gone with the card that used to render them.
     ///
     /// Bard is still the seeded class: its epic is the one whose rows we have argued
     /// about most (#150 / #139), so a wrong count here is a number someone recognizes.
     /// </summary>
     [Fact]
-    public void TheWidgetDrawsNineCardsAndTheQuestChecklistsSurviveTheCut()
+    public void TheWidgetDrawsEightCardsAndTheQuestChecklistsSurviveTheCut()
     {
         using var app = new AppHarness(s => s.EpicQuestClass = "Bard");
         app.Launch();
 
-        Assert.Equal(9, app.DumpValue("cards"));
-        // Motes ships hidden, so the visible count is one lower. Asserted so that "nine
-        // cards" cannot be satisfied by nine collapsed-away slots, and so that a future cut
+        Assert.Equal(8, app.DumpValue("cards"));
+        // Motes ships hidden, so the visible count is one lower. Asserted so that "eight
+        // cards" cannot be satisfied by eight collapsed-away slots, and so that a future cut
         // which HIDES a card instead of removing it fails here rather than passing.
-        Assert.Equal(8, app.DumpValue("cardsVisible"));
+        Assert.Equal(7, app.DumpValue("cardsVisible"));
 
         // The checklists still build with no card of their own to render into — they feed
         // the Quest Tracker window, the Evolved shell's Quests room and EQBuddy Mobile, and
@@ -713,9 +734,38 @@ public sealed class EndToEndTests
         app.Launch();
 
         app.WaitForDump("questsHostWindowOpen", 1, "the Quest Tracker to open with no card");
-        // The widget behind it is still nine cards: opening the window must not resurrect a
+        // The widget behind it is still eight cards: opening the window must not resurrect a
         // launcher, which is the shape trap 55 caught when a fold kept running.
-        Assert.Equal(9, app.DumpValue("cards"));
+        Assert.Equal(8, app.DumpValue("cards"));
+    }
+
+    /// <summary>
+    /// **HUD subtraction cut 2's door, and the reason it needed no work.** Removing a card
+    /// removes the entrance its header was, and Bevel's I-5 check two answered this one
+    /// before the diff: the <c>World…</c> context-menu row is unconditional XAML with no
+    /// dependency on the catalog or on <c>HiddenSections</c>, so there was nothing to build
+    /// — the opposite of cut 1, which had to SHIP its row because nothing is bound by
+    /// default and the card's ⧉ was the only entrance a fresh profile had (trap 59).
+    ///
+    /// <c>EQBUDDY_WORLD</c> is what a test can drive, and it makes the same
+    /// <c>ShowWorldWindow</c> call the menu row's <c>OnWorldWindow</c> makes, so this
+    /// asserts the destination rather than the doorknob. The hook itself is new with this
+    /// cut: Travels was the one World room the widget drew itself, so it was the one room
+    /// with no <c>EQBUDDY_*</c> way in — and with the card gone, no test or shot could put
+    /// that body on screen at all (trap 22).
+    /// </summary>
+    [Fact]
+    public void TheWorldWindowStillOpensWithNoCardToOpenIt()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_WORLD"] = "1" });
+        app.Launch();
+
+        app.WaitForDump("worldWindowOpen", 1, "the World window to open with no card");
+        // On its DEFAULT room, which is the one the card used to be: Travels, keyed "misc"
+        // — the wire key that outlives the card of that name.
+        app.WaitForDump("worldTab", "misc", "the World window's default room");
+        Assert.Equal(8, app.DumpValue("cards"));
     }
 
     /// <summary>
@@ -747,10 +797,10 @@ public sealed class EndToEndTests
         using var app = new AppHarness(s => s.EpicQuestClassicOnly = true);
         app.Launch();   // waits for killsTotal > 0; a window that never built never gets there
 
-        // Was `questsCard=1` until the 2026-09-05 subtraction. The card is gone; the claim
+        // Was `questsCard=1` until the 2026-09-05 subtractions. The card is gone; the claim
         // this test makes never was about the card — the app reached a live session with
         // the setting on, which a half-built window cannot do.
-        Assert.Equal(9, app.DumpValue("cards"));
+        Assert.Equal(8, app.DumpValue("cards"));
     }
 
     /// <summary>

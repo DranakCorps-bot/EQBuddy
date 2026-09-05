@@ -89,7 +89,10 @@ public class SectionFoldIdempotenceTests
     [InlineData("motes")]
     [InlineData("progress")]
     [InlineData("combat")]
-    [InlineData("misc")]
+    // "misc" had a row here until 2026-09-05: the World card was cut (HUD subtraction cut
+    // 2) and its key now has no card, so hiding it is not a thing a player can do. The
+    // migration REMOVING it is asserted in OptionsViewModelTests, beside the same claim
+    // for "quests" — this list is only for keys that are still cards.
     public void A_single_hidden_card_stays_hidden_across_a_restart(string key)
     {
         var settings = Current(key);
@@ -154,6 +157,17 @@ public class SectionFoldIdempotenceTests
             MotesCardOffered = true,
             MotesCardRestored = true,
         });
+        // A 1.99.x profile frozen before HUD subtraction cut 2 — the shape EVERY existing
+        // install is in, since "misc" has been in SectionOrder since long before the card
+        // was called World. Hidden as well as present, because a removal that only handles
+        // one of the two lists leaves the other holding a key with no card (#252's shape).
+        data.Add("pre World cut", new AppSettings
+        {
+            SectionOrder = ["combat", "misc", "tracked"],
+            HiddenSections = ["misc"],
+            MotesCardOffered = true,
+            MotesCardRestored = true,
+        });
         return data;
     }
 
@@ -190,7 +204,13 @@ public class SectionFoldIdempotenceTests
         { "ProgressSurface", ProgressSurface.ThemeCardKey, ProgressSurface.AbsorbedCardKeys },
         { "LootSurface", LootSurface.ThemeCardKey, LootSurface.AbsorbedCardKeys },
         { "CreatureSurface", CreatureSurface.ThemeCardKey, CreatureSurface.AbsorbedCardKeys },
-        { "WorldSurface", WorldSurface.ThemeCardKey, WorldSurface.AbsorbedCardKeys },
+        // WorldSurface's row went on 2026-09-05 with the World card (HUD subtraction cut 2)
+        // — and it went because the guard above is exactly what says it had to. A fold may
+        // only name keys that are NO LONGER CARDS; "misc" stopped being one, and rather
+        // than leave a fold naming a dead key, the two constants were deleted. That theme
+        // was the one whose absorbed list no `FoldThemeSections` call ever read (it
+        // absorbed one card and kept that card's key), so this table was their only reader
+        // and the row could not outlive them.
     };
 
     /// <summary>The other half of the same premise: nothing in the chain may CREATE a key

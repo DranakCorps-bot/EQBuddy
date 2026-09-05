@@ -176,12 +176,28 @@ public static class OverlaySections
         // ApplySectionLayout throws on startup for everybody — the crash the Gear & Loot
         // fold found. Both have it.
         ("motes", "Motes"),
-        // The WORLD THEME (docs/Themes.md theme 6, World PR 3). Absorbs this card's own
-        // former self plus MapWindow/SpawnsWindow/TravelWindow (World PR 2) — the KEY
-        // stays "misc" (WorldSurface.ThemeCardKey's own doc comment explains why: this
-        // theme absorbs exactly one card, so there is no settings migration at all).
-        // Only the TITLE moved, from "Travels & Deaths" to "World".
-        ("misc", "World"),
+        // THE WORLD CARD IS NOT HERE ANY MORE — HUD subtraction, cut 2 (Bevel's I-5
+        // checks, Helm-signed 2026-09-05). The key was "misc", the old Travels & Deaths
+        // card's own settings key, kept through the World fold precisely so no player's
+        // slot moved; it leaves now with the card it named.
+        //
+        // Where it went: THE WORLD CARD IS NOW THE WORLD WINDOW (right-click the widget →
+        // World…) AND THE WORLD ROOM in the Evolved shell. Nothing about the World
+        // surfaces themselves changed — the map, the camp timers, the travel router and
+        // the Travels & Deaths lists are the same four tabs, drawn by the same views.
+        //
+        // It went second because it strands nothing either, and Bevel checked both halves
+        // rather than assuming them (I-5): the card's only inline body was `TravelsView`,
+        // which the World window builds its own instance of and renders identically; and
+        // the `deaths` star — the ONE writer MiniStats has for that key — has lived in
+        // WorldWindow's Travels tab since the World fold, never on this card. The
+        // "World…" context-menu row already existed and needed no change, which is the
+        // difference from cut 1: that one had to SHIP its door (trap 59).
+        //
+        // What this cut does cost, knowingly: the collapsed card's one-line composite
+        // ("Befallen · 2 zones · 1 death · 3 timers") has no equivalent in the window's
+        // tab strip, and the four absorbed names below leave Options with it. Recorded in
+        // HELM-FEEDBACK.md rather than papered over.
     ];
 
     /// <summary>The card's icon, by section key — one table both widgets read (Gate 5).
@@ -207,7 +223,10 @@ public static class OverlaySections
         ["tracked"] = "Target",
         ["buffs"] = "Timer",
         ["progress"] = "Chart",
-        ["misc"] = "Location",
+        // "misc" → "Location" left with the World card on 2026-09-05 (HUD subtraction
+        // cut 2). The Location pin itself is still drawn — the Evolved shell's rail uses
+        // it for the World room — so this is one table losing a row, not an icon going
+        // unused (trap 29's other half, where an orphaned IconPaths entry is the tell).
     };
 
     public static string Icon(string key) => Icons.GetValueOrDefault(key, "Info");
@@ -253,10 +272,17 @@ public static class OverlaySections
         // menu entry that disappears is exactly as invisible as a card that does
         // (trap 29 from the other side). Cards & windows is the screen people look at.
         ["kills"] = ["Drops by creature"],
-        // 2026-08-27: the WORLD THEME (World PR 3). Names the card's own former title
-        // alongside the three menu-only windows it absorbed (World PR 2) — the same
-        // "Drops by creature" shape, since none of the three ever had a card either.
-        ["misc"] = ["Travels & Deaths", "Zone map", "Travel route", "Spawn timers"],
+        // THE "misc" ROW LEFT THIS LIST on 2026-09-05, with the World card itself (HUD
+        // subtraction cut 2). It read ["Travels & Deaths", "Zone map", "Travel route",
+        // "Spawn timers"] and it is keyed by the SURVIVING card — there is no World card
+        // for the note to hang under any more, and an entry here for a key that is not in
+        // Catalog can never be rendered (trap 55's stale-list shape, which cost #252).
+        //
+        // This is the biggest gap either subtraction has left on this screen: FOUR names
+        // a player might hunt for now have no row at all, where cut 1 lost two. The
+        // answer they used to give — "these live in the World window now" — is still true
+        // and is now only said by the "World…" context-menu row's tooltip and by
+        // docs/FeatureGuide.md. Written into HELM-FEEDBACK.md, not hidden here.
     };
 
     /// <summary>The one-line "these live in here now" note for a card, or null for a card

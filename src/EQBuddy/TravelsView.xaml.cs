@@ -3,35 +3,45 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
-using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
+// `Role` went with the Drop-camp-marker row on 2026-09-05 (HUD subtraction cut 2) — it was
+// that label's only use in this file.
 using Tok = EQBuddy.UI.Shared.DesignTokens;
 
 namespace EQBuddy;
 
 /// <summary>
-/// The Travels and Deaths card body: deaths, zones visited, camp markers.
-/// Drop camp marker (Helm-signed World pre-design question 6) lives here so the
-/// inline Full Travels card calls the same handler WorldWindow chrome already uses.
-/// Glance tabs never reach this body.
+/// The Travels and Deaths body: deaths, zones visited, camp markers. Two hosts build their
+/// own instance of it (trap 45) — <see cref="WorldWindow"/>'s Travels tab and the Evolved
+/// shell's World room — and it was three until 2026-09-05, when HUD subtraction cut 2 took
+/// the widget's World card.
+///
+/// **THIS VIEW'S OWN "Drop camp marker" ROW WENT WITH THAT CARD, and it was a DUPLICATE the
+/// whole time.** The row was inserted at the top of this body by the constructor, and the
+/// comment here said why in as many words: *"lives here so the inline Full Travels card
+/// calls the same handler WorldWindow chrome already uses"*. The card was the reason; both
+/// surviving hosts pin their OWN copy as chrome on every tab (<c>WorldWindow.BuildActionRow</c>,
+/// <c>WorldRoom</c>'s pinned row), so on the Travels tab the affordance was drawn twice —
+/// once inside the scroller and once below it.
+///
+/// **Nothing routine could see it, and the cut's own screenshot could.** It is not a
+/// regression: it has rendered twice since the World fold, in a window no committed
+/// illustration had ever photographed. `world-travels` is that picture, it landed with this
+/// cut, and it showed the duplicate on its first run — which is trap 22 paying out in the
+/// direction it is usually described from, a surface with no fixture state hiding a defect
+/// rather than hiding a feature.
 /// </summary>
 public partial class TravelsView : UserControl
 {
-    private readonly IZoneHost _host;
-
+    /// <param name="host">Kept, and now unread here: the Drop-marker row was the only thing
+    /// in this view that ever called back into the host, and it went with the card. The
+    /// parameter is what makes <c>MainWindow.NewTravelsView()</c> a FACTORY rather than a
+    /// shared accessor — one instance per host, which is the whole point of trap 45's guard
+    /// and the shape <c>SurfaceOwnershipTests</c> asserts. A view that renders from a
+    /// snapshot and reaches for nothing is the destination, not a loose end.</param>
     public TravelsView(IZoneHost host)
     {
         InitializeComponent();
-        _host = host;
-        var row = new StackPanel { Orientation = Orientation.Horizontal };
-        var button = DesignSystem.IconButton("Location",
-            "Drop a marker at your current zone - see it on the Travels tab and on your phone map",
-            (_, _) => { _host.DropCampMarker(); Render(_host.CurrentSnapshot()); }, "AccentBrush");
-        row.Children.Add(button);
-        var label = DesignSystem.Text(Role.Caption, "Drop camp marker");
-        label.Margin = new Thickness(Tok.SpaceS, 0, 0, 0);
-        label.VerticalAlignment = VerticalAlignment.Center;
-        row.Children.Add(label);
-        Root.Children.Insert(0, row);
+        _ = host;
     }
 
     public UIElement Body => this;

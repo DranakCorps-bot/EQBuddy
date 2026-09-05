@@ -18,15 +18,17 @@ namespace EQBuddy;
 /// second-cleanest item in the whole shell effort for the same reason Quests was the
 /// first — <c>CreatureSurface</c>'s own comment says *"Drops has never been a card at all,
 /// only a menu entry"*, so there is no <c>OverlaySections</c> row, no <c>MiniStats</c> key
-/// and no settings migration to get wrong. <c>WorldSurface.AbsorbedCardKeys</c> stays
-/// <c>["misc"]</c>.
+/// and no settings migration to get wrong. (<c>WorldSurface.AbsorbedCardKeys</c> stayed
+/// <c>["misc"]</c> for this; it and <c>ThemeCardKey</c> were deleted on 2026-09-05 when the
+/// World card itself was cut, because a fold may only name keys that are no longer cards.)
 ///
 /// **Nothing is subtracted from v1.** <see cref="CreatureWindow"/> keeps both its tabs and
 /// both its hooks (<c>EQBUDDY_DROPS</c>, <c>EQBUDDY_CREATURE</c>) — the shell's Drops tab is
 /// reached through the <c>page:room</c> grammar as <c>world:drops</c>, not by sharing a
 /// door. Two independent doors to two independent hosts of one surface, exactly the shape
-/// Live and <c>CreatureWindow</c>'s Kills tab already have. So does the widget's World card
-/// and <see cref="WorldWindow"/> itself: both are v1 hosts, both still show four tabs, and
+/// Live and <c>CreatureWindow</c>'s Kills tab already have. <see cref="WorldWindow"/> is the
+/// v1 host — the widget's World card was the second until it was cut on 2026-09-05 — it
+/// still shows four tabs, and
 /// <see cref="WorldSurface.ShellOnly"/> is the one predicate keeping the fifth off a window
 /// that would answer it with the Travels list.
 ///
@@ -94,7 +96,7 @@ internal sealed class WorldRoom : Grid, IShellRoom
 
     private bool _empty;
 
-    private WorldTab _tab = WorldSurface.DefaultInlineTab;
+    private WorldTab _tab = WorldSurface.DefaultTab;
 
     private readonly MapView _map;
     private readonly SpawnsView _spawns;

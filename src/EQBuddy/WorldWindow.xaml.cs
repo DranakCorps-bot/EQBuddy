@@ -32,7 +32,7 @@ public partial class WorldWindow : Window, IFollowingSurface
     private readonly AppSettings _settings;
     private DateTime _lastRefresh = DateTime.MinValue;
 
-    private WorldTab _tab = WorldSurface.DefaultInlineTab;
+    private WorldTab _tab = WorldSurface.DefaultTab;
 
     private readonly EqSegmentedStrip _tabs;
     private readonly MapView _map;

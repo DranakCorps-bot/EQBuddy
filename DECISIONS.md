@@ -17,6 +17,67 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (HUD subtraction cut 2 — the World `misc` card, lane-w)
+
+- **Deleted `WorldSurface.LauncherSummary` / `InlineModeFor` and `WorldTheme`'s four glance
+  methods instead of leaving them.** Could have kept them — they are pure, tested and cost
+  nothing to run — but the cut card was every one of their callers, so their tests would have
+  gone on asserting the wording of sentences nothing renders, which is trap 34's shape (a
+  guard that cannot fail reading as coverage). Exactly what W1 did to `QuestSurface`'s three
+  inline members hours earlier. `src/EQBuddy.Core/WorldSurface.cs`,
+  `src/EQBuddy.UI.Shared/WorldTheme.cs`.
+- **Deleted `WorldSurface.AbsorbedCardKeys` and `ThemeCardKey` rather than leaving the fold's
+  record in place.** The alternative was to keep them as history and drop only the
+  `SectionFoldIdempotenceTests` row. But a fold may only name keys that are no longer cards —
+  that guard's own premise (trap 55, #252) — and no `FoldThemeSections` call ever read these
+  two, uniquely among the five themes, because this theme absorbed one card and kept its key.
+  A fold record with no reader and a false premise is a hole waiting for the next regression.
+- **Added `EQBUDDY_WORLD` rather than re-pointing the E2E Travels assertions at nothing.**
+  Travels was the one World room the widget drew itself, so it was the one room with no
+  `EQBUDDY_*` hook — and the cut would have left it unphotographable and unassertable while
+  reading as reviewed (trap 22). Could have dropped the assertions instead; that trades a
+  covered surface for a smaller diff. `src/EQBuddy/DebugHooks.cs`, and `world-travels` is now
+  the first `shoot.ps1` recipe the Travels tab has ever had (illustration lock).
+- **Moved the theme-body-cap E2E scenarios onto `EQBUDDY_EXPAND=loot` instead of adding a
+  theme card back to the `EQBUDDY_EXPAND=1` review set.** World was the last theme card in
+  that set, so three scenarios silently lost the open body they were measuring. Restoring one
+  would have kept the tests unchanged and left them depending on somebody else's list; naming
+  the card is the assertion those tests were always making. One of the three needed a new
+  `lootInline` assertion or it would have passed on an empty widget (trap 39).
+- **Kept the tombstone comments after the ratchet failed the change, and compressed them
+  rather than deleting them.** First pass removed 19 lines of code and added 32 of
+  commentary, so `MainWindow.xaml.cs` GREW by 13 and `ArchitectureTests` refused it — the
+  guard doing a job it was not written for. Could have cut the comments entirely for a bigger
+  ratchet drop; a cut nobody can find afterwards is what CLAUDE.md's "three ways back" and
+  trap 55 both refuse, so the reasoning moved to `docs/Architecture.md`'s ratchet history and
+  the call sites kept a line each. Baseline 4,106 → 4,100.
+- **Removed `TravelsView`'s own "Drop camp marker" row, which was one line outside the
+  scoped cut.** Its doc comment named the inline card as its reason (*"lives here so the
+  inline Full Travels card calls the same handler"*), and both surviving hosts pin their own
+  copy as chrome — so on the World window's Travels tab the affordance had been drawn twice
+  since the World fold, in a window no committed illustration had ever photographed. Could
+  have left it as a pre-existing defect out of scope; that would have shipped the new
+  `world-travels` capture with a visible duplicate in it, which the illustration lock makes
+  worse rather than better. Found by the shot, not by the diff. `src/EQBuddy/TravelsView.xaml.cs`.
+- **Re-shot only the images this change actually alters, not the whole batch.** Every widget
+  shot, `options-cards` and the new `world-travels`; the shell and window shots that a
+  re-run changes only through the fixture's shifting clock are left alone. The alternative
+  — commit every re-shot PNG — is ~30 more binaries of pure timestamp churn in a PR two
+  agents have to read. **The full batch could not be completed in one invocation regardless:
+  another seat's EQBuddy was running on the same desktop and `shoot.ps1` stands the running
+  app down and relaunches it, so multi-shot runs died at a different shell shot each time
+  and every one of them passed alone.** Screen work is meant to be mutexed across seats
+  (`FABLE.md`'s T-kick note); this is the first time that has bitten, and it is reported in
+  the last-look ask rather than presented as a green batch.
+- **Rewrote README's widget-card caption to name what a SUBTRACTION costs, rather than only
+  updating the list.** It still described a ten-card widget after cut 1. The honest version
+  has to say the thing the fold rule does not cover: a card that leaves this way has no row
+  in Options → Cards & windows at all, which is the gap both cuts knowingly leave. `README.md`.
+
+---
+
+---
+
 ## 2026-09-05 (CLAUDE.md write-side channel trap, lane-d)
 
 - **Filed the channel write hazard as ONE trap (60) with two lettered halves, not two traps.**

@@ -165,7 +165,28 @@ public class ArchitectureTests
         //
         // Bumped down to the MINIMUM that fits (4106 × 1.1 = 4516.6 against 4,516 lines),
         // by the same "one line and no more" rule as every entry above.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4106),
+        //
+        // 4106 → 4100 on 2026-09-05 (HUD subtraction cut 2, the World card). **Six lines,
+        // and the small number is the interesting part.** The code that left is 19 lines —
+        // the card build block, the widget's own `TravelsView` field and construction, the
+        // `EQBUDDY_EXPAND` member, the SectionMap row, the `_worldCard` field, the render
+        // call, the `MiscHeader` launcher line and three `_worldCard?.Sync()` calls — and
+        // the first pass of tombstones came to MORE than that: the file grew 13 lines and
+        // **the ratchet failed the change**, which is the only reason anyone measured.
+        //
+        // That is the guard doing a job it was not obviously written for. Cut 1's own note
+        // above already said "the honest number is 19 lines, and it is much smaller than
+        // the deletion" because half of what left came back as commentary; here the same
+        // habit went past break-even. The tombstones stayed — a cut that cannot be found
+        // afterwards is what CLAUDE.md's "three ways back" and trap 55 both refuse — but
+        // they were compressed to a line or two each, with the reasoning kept HERE and in
+        // the surface files rather than repeated at every call site. `WorldThemeCard.cs`
+        // (60 lines) left the repo outright and is not in this sum; so did
+        // `WorldSurface.LauncherSummary`/`InlineModeFor` and `WorldTheme`'s glance family,
+        // in Core and UI.Shared.
+        //
+        // Minimum that fits again: 4100 × 1.1 = 4510 against 4,509 lines.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4100),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
