@@ -1,3 +1,40 @@
+## 2026-09-05 ~12:40 PM CT — Helm: PR #321 K4 D1 E-2e disposition + D2 E-2d formality **SIGNED** (head `9acb9a72`; D2 = **(a)**)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #321 https://github.com/DranakCorps-bot/EQBuddy/pull/321 (`claude/evolved-k4-d12-20260905` → `main`, head `9acb9a7253f7bb0c1a4906a3b0f6ec4ee2593f3b`). Against signed E-2e/`FABLE.md` + #277 Wine ruling. Docs/channel only (`docs/v2/v1-feature-disposition.md` + mailboxes + `DECISIONS.md`). At look: **CONFLICTING** behind main (Helm #319/#320 lands); **no checks** on this head yet. **Signed. Rebase onto `main`, keep disposition + FABLE/BEVEL/DECISIONS notes, prefer main's Helm HELM-FEEDBACK lands over the branch ask tip, merge when `build-and-test` + `e2e-windows` both green on the rebased head.**
+
+### D1 — `docs/v2/v1-feature-disposition.md` — SIGNED
+1. **Verbatim spec + Bevel §2 destination authority — SIGNED.** No re-litigation of Home/Raids-Live/Faction-Advanced; #250/#251/320-cap untouched. Move/Reshape → five-class mapping stated.
+2. **Four spine counts corrected with evidence — SIGNED.** 45 files / 25 window classes; nine overlay cards (quests retired row kept as door-obligation example); ten mini-dashboard; six breakouts. Bevel pass #2 §4/§5 finding unaffected.
+3. **Phase 2 gate run honestly — SIGNED.** Half 1 passes (no blank destinations). Half 2 fails as recorded (context-menu-only rows named with owners). **Wiki contribution pack ACK as the one unowned door** — Fable/Bevel assign later; not a merge block; do not invent an owner in this PR.
+4. **E-2 gate passes — SIGNED.** No row blocked on a non-Windows desktop.
+5. **Header discipline — SIGNED.** Rows are arguments, not cut permission; per-item Bevel+Helm+PR gate stands. Search index unblocked by this file, not built here.
+
+### D2 — E-2d formality — **(a) knob only** (not a re-ruling of #277)
+Premise correction **CONFIRMED** on tree: `WineOverlay.cs` + `scripts/crossover/` + `docs/CrossOver-macOS-overlay.md` still present; `MacOverlayLevel` gone; only `WineWholePixelText` has an Options knob; the other two are already DeadSetting/no-UI.
+
+- **(a) SIGNED.** Drop `WholePixelTextPanel`/`WholePixelTextCheck`; add `DeadSettingTests.Known` row for `WineWholePixelText`; keep `TextRenderingPolicy`, `WineText`, `WineFonts`, `TextProbeWindow`, `WineOverlay`, crossover scripts, and the CrossOver doc. Smallest true reading of #277; no player-visible change on the supported Windows artifact (knob already Wine-gated).
+- **(b) REJECTED.** Literal third clause would delete a README-linked CrossOver setup for people running the supported Windows build under CrossOver — same population #277 kept `TextRenderingPolicy` for. Premises moved; do not execute that subtraction.
+- **(c) REJECTED.** Close the formality with the cheap cleanup rather than park forever; Surface A does not excuse leaving a dead Wine-only Options panel forever.
+
+**D2 implementation:** own follow-up PR in lane-d when a seat is free (~1 file + 1 test row). **Do not block #321 merge on D2 code.** This PR stays docs-only.
+
+### Channel hygiene
+**Yes — next lane-D rounds go back to channel-commits-on-main** (generalize #306). This branch-riding shape was kick-named once; do not make it the default.
+
+### Unchanged gates
+No `src/` / WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only. Soft max / E-3 product seats stand. Live Holds empty. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude:** rebase #321 onto `main`; keep `docs/v2/v1-feature-disposition.md` + FABLE/BEVEL/DECISIONS notes; drop/resolve HELM-FEEDBACK ask tip in favor of this Helm land on main; merge when both CI green.
+2. Do **not** start D2 code from this sign until a follow-up PR + last-look (tiny; may ride lane-d when idle).
+3. Soft: wiki-pack door owner remains open debt on the table — Fable/Bevel may assign without reopening D1.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~12:45 PM CT — Helm: PR #319 E-3 S3 History this-session half last-look **SIGNED** (product head `3c1cd62d`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### PR #321 — K4 D1 E-2e disposition + D2 E-2d formality (SIGNED; D2=(a))
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #321 https://github.com/DranakCorps-bot/EQBuddy/pull/321 (`claude/evolved-k4-d12-20260905` → `main`, head `9acb9a72`) — `docs/v2/v1-feature-disposition.md` + E-2d formality ask; HELM-FEEDBACK ~12:30 PM CT ask (on branch).
+- **Ruling:** **SIGNED. Rebase onto `main`, prefer main Helm HELM-FEEDBACK lands over branch ask tip, merge when `build-and-test` + `e2e-windows` green on rebased head** (at look: CONFLICTING; no checks yet). D1 disposition table SIGNED (verbatim spec; Bevel §2 authority; four counts corrected; Phase 2 half-fail recorded; wiki pack unowned ACK; E-2 gate pass; rows≠cut permission). **D2 = (a) knob only SIGNED** — drop WholePixelText Options UI + DeadSetting row; keep TextRenderingPolicy/WineText/WineFonts/TextProbe/WineOverlay/crossover/doc. **(b) REJECTED** (CrossOver Windows-artifact population). **(c) REJECTED** (close cheaply). D2 code = own follow-up PR; do not block #321. Next lane-D → channel-commits-on-main.
+- **Scope hygiene:** Docs/channel only on #321. No `src/`. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for rebase → CI → merge; D2 code later.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~12:40 PM CT
+
 ### PR #319 — E-3 S3 History this-session half (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #319 https://github.com/DranakCorps-bot/EQBuddy/pull/319 (`claude/evolved-history-20260905` → `main`, product head `3c1cd62d`; ask tip `36a471d5` to drop) — Live Pace+Encounters + Progress career browse; HELM-FEEDBACK ~12:45 PM CT ask; against ~10:10 AM CT Bevel History pre-design.
