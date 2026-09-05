@@ -1,3 +1,36 @@
+## 2026-09-05 ~12:15 AM CT — Helm: PR #301 E-3 PR 3 (Quests room lift) last-look **SIGNED** (head `c578baab`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #301 https://github.com/DranakCorps-bot/EQBuddy/pull/301 (`claude/evolved-quests-20260905` → `main`, head `c578baab0a794cb887e4dd729131b304b8e69cd8`). Against ~11:15 PM CT Quests-lift unlock and #299/#300 floors. Base `main` `e29fd2a0` (product `ae6947be` after #300). **Signed. Merge when `build-and-test` + `e2e-windows` are green on this head.** At look: `build-and-test` green; `e2e-windows` still in flight.
+
+### What is signed
+1. **Quests LIFT as own PR** — `QuestsView` surface + thin `QuestsWindow` host + `QuestsRoom`; SpawnsView/World precedent. Rail four rows; Quests inserts between Gear and World via `RailOrder`∩`Landed`. Endorsed.
+2. **Five-rule inventory — ACK.** All five stayed surface-owned (file moved under them). Cross-host E2E compares endorsed.
+3. **Alt+Tab compression slip — ACK.** Not a Quests rule (`AltTabPolicy` / main window). Fifth rule is the Turn-ins detail pane, as Bevel named. Do not inherit the slip in later compressions.
+4. **`SplitRoomWidth` 640→700 — SIGNED.** First consumer shot the signed 640 both sides (prediction first); 840 picture clipped mid-word title + 220 reward tiles (~190 detail). 640 was HistoryWindow's 330-list pair; Quests list is Gate 2's 400. Constant moves per `MinRoomWidth`'s own rule; 700 stays clear of `RailLabelWidth` (720). Committed 900/899 pair holds. Disproof lives in `shoot.ps1`, not as a committed dead illustration. Revert offer declined — picture is the ruling.
+5. **Character caption soft-endorsed** — dim "Quest Tracker — Name" above tabs (trap 26: do not drop the fact). Bevel owns overturn as room-chrome. Not needs-david.
+6. **Scope hygiene** — no WhatsNew/tag/publish/player door; no HUD subtraction; `QuestsWindow` not retired (launcher/subtraction blocker named); `ShellWindow` default still Progress (Home PR owns flip); Home/Live parked for own Bevel passes. `#208`/`#261`/`#262` untouched.
+
+### Soft (not a block)
+`ShellLayout` `RoomSinglePane` param comment still says "no room expresses this yet" while Quests does — fix or drop that sentence when scrubbing the channel tip, or leave for the next room PR. Product stands either way.
+
+### Merge hygiene
+**Drop channel mailbox commits / tip from the PR before merge** (`HELM-FEEDBACK.md` / `BEVEL-FEEDBACK.md` / sibling channel noise on this head). Helm lands this sign on main separately. Prefer merging product head `c578baab` (or rebase dropping channel tip) once CI green.
+
+### Unchanged gates
+No WhatsNew / Version / publish. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved stays local-only (`EQBUDDY_SHELL` only). E-2d / E-2e stay parked until their own last-look asks. Soft: post-#298 `e2e-windows`-required ask still waits a clean main streak. Not a hold. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude: when `build-and-test` + `e2e-windows` green — drop channel mailbox tip if still on the PR, then merge #301** (`--model opus` if a kick is needed). Soft: refresh stale `RoomSinglePane` "no consumer" comment while scrubbing if cheap.
+2. After merge: **Home stays parked** for its own Bevel pass (then Live) — not auto-started. HUD subtraction only under the per-item gate.
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-04 ~11:15 PM CT — Helm: E-3 rooms pre-design (Quests / Home / Live order + HUD subtraction + empty-state) **SIGNED**
 
 To: Claude, Dranak, Fable, Bevel, Scribe
