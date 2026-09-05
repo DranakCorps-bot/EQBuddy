@@ -298,6 +298,84 @@ public static class OverlaySections
         var verb = titles.Length == 1 ? " is a tab in here now" : " are tabs in here now";
         return string.Join(" · ", titles) + verb;
     }
+
+    /// <summary>
+    /// A card that has LEFT the widget entirely, and where it went.
+    ///
+    /// <paramref name="Key"/> is the settings key it used to occupy (asserted absent from
+    /// <see cref="Catalog"/>, so a row here can never describe a live card — trap 55).
+    /// <paramref name="Title"/> is the card's OLD TITLE, which is the whole reason this list
+    /// is keyed differently from <see cref="AbsorbedTitles"/>. <paramref name="MenuHeader"/>
+    /// is the context-menu row that opens it, verbatim from <c>MainWindow.xaml</c> — a door a
+    /// player who has configured nothing still has (trap 59), which is why it is a field the
+    /// tests can check rather than prose. <paramref name="Answered"/> are the names this card
+    /// used to answer for, in the words a player is scanning the screen for.
+    /// </summary>
+    public sealed record RetiredCard(
+        string Key, string Title, string Now, string MenuHeader, IReadOnlyList<string> Answered)
+    {
+        /// <summary>The one line this card gets, in CLAUDE.md's "X is now Y" form — the old
+        /// place AND the new one, because naming only the destination is what #219, #227 and
+        /// #233 each arrived as.</summary>
+        public string Line
+        {
+            get
+            {
+                var names = Answered.Count == 0 ? "" :
+                    $" — {string.Join(" · ", Answered)} "
+                    + (Answered.Count == 1 ? "is a tab in it" : "are tabs in it");
+                return $"{Title} is now {Now}{names}. Right-click EQBuddy and choose “{MenuHeader}”.";
+            }
+        }
+    }
+
+    /// <summary>
+    /// **"NO LONGER ON THE WIDGET" — the cards that were SUBTRACTED rather than folded.**
+    ///
+    /// <see cref="AbsorbedTitles"/> answers "where did my card go" by hanging the old names
+    /// under the card that ABSORBED them. A subtraction leaves no such card: the Quests and
+    /// World cards did not merge into anything, they left, so both of those comments in
+    /// <see cref="Catalog"/> record the same knowing cost — six names a player might hunt for
+    /// with no row on this screen at all. That is the gap Helm signed a fix for on 2026-09-05
+    /// (Bevel's Options-gap ruling, §4 of the I-11 pre-design), and this is it: **a second
+    /// list, keyed by the OLD TITLE rather than by a surviving card.**
+    ///
+    /// It renders directly under the live card list, which is the screen someone opens when a
+    /// card is missing — #219's own route, and the only one this app has ever had for that
+    /// question.
+    ///
+    /// **Every future HUD subtraction adds its row here**, the same obligation a fold has to
+    /// <see cref="AbsorbedTitles"/>. Seven more cards are queued behind Surface A, so the cost
+    /// of not having this list is seven more "now I can't get it back" reports, not one.
+    ///
+    /// **The door is named, not implied.** A hotkey is not a door — nothing is bound by
+    /// default (trap 59) — so the sentence names the context-menu row, and
+    /// <c>RetiredCardsTests</c> checks that row still exists in <c>MainWindow.xaml</c>. The
+    /// Evolved shell's rooms are deliberately NOT named: <c>EQBUDDY_SHELL</c> is the only way
+    /// in today, so telling a player about a room they cannot open would be the mirror of the
+    /// defect this list exists to fix.
+    /// </summary>
+    public static readonly IReadOnlyList<RetiredCard> Retired =
+    [
+        // HUD subtraction cut 1, 2026-09-05. The names are the ones the Quests card's own
+        // AbsorbedTitles row carried until it left with the card.
+        new("quests", "Quests", "the Quest Tracker window", "Quests…", ["Sky Quest", "Epics"]),
+        // HUD subtraction cut 2, 2026-09-05. Four names — the biggest hole either cut left,
+        // and the reason this list is worth its own screen space rather than a docs line.
+        new("misc", "World", "the World window", "World…",
+            ["Travels & Deaths", "Zone map", "Travel route", "Spawn timers"]),
+    ];
+
+    /// <summary>The heading the list renders under. Player words: it says what is true from
+    /// where they are standing, not that a "card was retired from the catalog".</summary>
+    public const string RetiredHeading = "No longer on the widget";
+
+    /// <summary>One line under the heading. It says the features are intact BEFORE it says
+    /// where they moved — a player reading this has just failed to find something, and
+    /// "it is still here" is the sentence they need first.</summary>
+    public const string RetiredBlurb =
+        "These are not cards any more. Nothing about them changed — each one is a window, "
+        + "and here is the way in.";
 }
 
 /// <param name="Absorbed">"Money · Motes · Faction · Raids are tabs in here now", or null.
