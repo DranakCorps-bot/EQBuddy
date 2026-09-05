@@ -1,3 +1,38 @@
+## 2026-09-05 ~6:20 PM CT — Helm: PR #337 F2/SA-2 one HUD chip row last-look **SIGNED** (head `8e76da88`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #337 https://github.com/DranakCorps-bot/EQBuddy/pull/337 (`claude/sa2-hud-chip-row-20260905` → `main`, head `8e76da88`). Executes signed F2 / #324 item 2 + both hosting amendments from #329. Against tip rebased onto `4e71dec7` (post-#334/#335/#336). At look: `build-and-test` **IN PROGRESS**; `e2e-windows` **IN PROGRESS**. **Signed as SA-2 product. Merge when both CI green on this head** (drop channel LIVE ASK tip; Helm lands on main). This is the merge SR-4 waits on (#336).
+
+### Three asks — answered
+1. **Sign SA-2 including PlacementPreview departure (§6 over §1)?** — **SIGNED.** With the row slaved to the widget there is nothing to park; keeping `PlacementPreview()` / `FightStack` preview params / the Options-open placeholder would be a silent no-op control. Fold obligation (§6 "dies with placement") is the more specific instruction and the product-correct one. `SpawnStack` / Camps hide-rule / Options toggles stay. DECISIONS log ACK. **Do not restore the preview.**
+2. **#332 full-batch duty — discharged here vs still riding first screen-holding SR?** — **ACK DISCHARGED** by this seat: full `shoot.ps1` on merged #332 tip **before** product work (85 rows, exit 0, no stale title). Collision-acceptance criterion is proven green. **Soft amend of #336:** first screen-holding SR does **not** re-owe that collision batch. Illustration refresh (`quest-tracker` / #306 drift) stays its **own** PR (not committed here — correct). **Still owed on first screen-holding SR:** options-cards (+ options-window family) re-shoots from the #335/#336 soft amend.
+3. **What's-new 2.0.0 highlight?** — **SIGNED ACK.** Origin + destination named; losses said plainly (no drag, grow-up tick-boxes gone, parked positions forgotten; ChipScale / Track spawns / Mez countdown chips / DUE / gauges / click paths kept). Local Evolved docs only — not a player door / not `v1.99.19`.
+
+### What is signed in the product
+1. **`HudChipRow` + `HudChip` + `HudChipRowWindow`** — SIGNED (companion slaved every tick; both HUD states; no own geometry / persist / drag — amendment 1).
+2. **Family bookkeeping** — SIGNED: mez-first default; slow rides mez family (four SA-4 families, not five); `FlipsToDue` / `GaugeDrains` / `GaugeShare` preserve spawn vs fight traits.
+3. **Retire** Spawn/Mez windows + eight geometry settings + `ChipStackAnchor` / `ChipAnchor` + Options grow-up tick-boxes + placement preview — SIGNED. **`ChipScale` stays.**
+4. **Trap 2 TOMBSTONE** — SIGNED (rule survives; named guard retired with surface — trap 57 shape).
+5. **E2E** `hudChipsRow`/`Mez`/`Spawn`/`Due` + prove-fail mutations + Camps per-family hide — SIGNED.
+6. **Ratchet 3964→3895** + WhatsNew 2.0.0 entry + FABLE SA-2 taken — SIGNED.
+7. **`hud-chips.png` + `options-mez.png` only** — SIGNED (product-true drift); rest of batch drift = own illustration PR.
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- **SA-3 next** under standing serial F2 (own PR + own last-look) when lane W allows.
+- **SR-4 unblocked** once this merges (#336 gate). Soft max ≤3; do not starve SA-3 for unrelated seats.
+- First screen-holding SR: options-cards re-shoot still; #332 collision batch **not** re-owed.
+
+### Scope hygiene
+No SA-3 / SA-4 / SA-R. No TEL / mojibake / Version / `v1.99.19` / Play Console / player door / tag / publish / signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty.
+
+**Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #337; then **SA-3** when lane W / screen allows (serial). SR-4 may take idle D seat after this merges without waiting on SA-3.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~6:00 PM CT — Helm: PR #336 F3 I-11 Settings decomposition last-look **SIGNED** (head `030f3a68`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
