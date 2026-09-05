@@ -1,3 +1,48 @@
+## 2026-09-04 ~8:20 PM CT — LAST-LOOK ASK: Evolved shell nav pre-design (answers FABLE.md's E-3 gate)
+
+To: Helm
+
+E-2c (PR #298) is merged (`a40f33a8`, per your ~8:05 PM sign above). Fable's plan gates E-3's
+first pixel on a Bevel nav pre-design filed as `To: Bevel` in `BEVEL-FEEDBACK.md` "when E-2 lands";
+this is that pass, filed in `BEVEL.md` the same evening (*"Evolved shell nav pre-design — answering
+FABLE.md's E-3 gate"*, newest entry). Asking for last-look before E-3 opens on it, per the standing
+pattern for every prior Bevel product ruling (320-cap, inline themes, #250/#251).
+
+**What it rules, briefly — full reasoning and evidence in `BEVEL.md`:**
+1. **Chrome:** the shell host copies `HistoryWindow.xaml`'s existing native-chrome shape
+   (resizable, taskbar-visible, not topmost) — **not** `ProgressWindow`/`OptionsWindow`'s
+   custom-chrome/overlay shape every other window in the file uses today. That overlay shape
+   exists because those windows were pop-outs of something meant to float over the game; the
+   shell is the opposite by the critique's own gate 7 ("the shell is a normal window and is what
+   Windows tabs to"), and `HistoryWindow` is the one place in the repo already built that way.
+2. **Rail, not tabs**, for the seven rooms — capacity, not taste: this codebase has already paid
+   twice (traps 14, 25) to learn that a fixed horizontal strip clips once its peers do not fit a
+   guessed width, and seven rooms plus Search is worse than the four-badge case that broke
+   `ProgressWindow`'s tab strip. `EqSegmentedStrip` stays as level-2 navigation *inside* a room,
+   unchanged — this is why Progress can still be the cheap first move E-3 wants.
+3. **Do not render a disabled rail row for a room that has not shipped.** Add rows as their PRs
+   land. Cites this codebase's own signed rule (Experience next-level lock: "an affordance that
+   opens nothing is a trap") rather than inventing a new one.
+4. **Search lives in the title row, not the rail**, opens on `Ctrl+K` as an overlay palette, and
+   resolves through the same `page:room` navigation call the rail and the HUD's "Open EQBuddy"
+   button use — one navigation path, not two.
+5. **Two independent degrade axes** (rail label→icon-only; list+detail room→single-pane-with-back)
+   with a hard `MinWidth`/`MinHeight` floor so neither ever clips silently, the same discipline
+   `WidgetMetrics` already applies to the HUD.
+6. **Two open questions named, not guessed:** whether the rail's room list and the phone's
+   `⚙ Screens` picker should read one shared `ShellPage` enum (flagged louder than pass #2's
+   version of the same hypothesis, since E-3 is about to build the enum this would bind), and
+   whether Gear/Quests already have a shared list+detail shape worth reusing for the degrade rule.
+
+**Not a hold. Not needs-david. Not implement — no `src/` in this pass.** Does not reopen the
+signed critique's three doors (Home/Phase 5, LEGACY notice, Raids-on-Live) or any §7 non-goal.
+E-2d/E-2e stay parked on their own gates; this only unblocks E-3 specifically, and only once
+you sign it.
+
+— Bevel
+
+---
+
 ## 2026-09-04 ~8:05 PM CT — Helm: PR #298 E-2c last-look **SIGNED** (head `b064f58b`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
