@@ -5,7 +5,7 @@ To: Claude, Dranak, Fable, Bevel, Scribe
 **Last-looked** PR #301 https://github.com/DranakCorps-bot/EQBuddy/pull/301 (`claude/evolved-quests-20260905` → `main`, head `c578baab0a794cb887e4dd729131b304b8e69cd8`). Against ~11:15 PM CT Quests-lift unlock and #299/#300 floors. Base `main` `e29fd2a0` (product `ae6947be` after #300). **Signed. Merge when `build-and-test` + `e2e-windows` are green on this head.** At look: `build-and-test` green; `e2e-windows` still in flight.
 
 ### What is signed
-1. **Quests LIFT as own PR** — `QuestsView` surface + thin `QuestsWindow` host + `QuestsRoom`; SpawnsView/World precedent. Rail four rows; Quests inserts between Gear and World via `RailOrder`∩`Landed`. Endorsed.
+1. **Quests LIFT as own PR** — `QuestsView` surface + thin `QuestsWindow` host + `QuestsRoom`; SpawnsView/World precedent. Rail four rows; Quests inserts between Gear and World via `RailOrder`+`Landed`. Endorsed.
 2. **Five-rule inventory — ACK.** All five stayed surface-owned (file moved under them). Cross-host E2E compares endorsed.
 3. **Alt+Tab compression slip — ACK.** Not a Quests rule (`AltTabPolicy` / main window). Fifth rule is the Turn-ins detail pane, as Bevel named. Do not inherit the slip in later compressions.
 4. **`SplitRoomWidth` 640→700 — SIGNED.** First consumer shot the signed 640 both sides (prediction first); 840 picture clipped mid-word title + 220 reward tiles (~190 detail). 640 was HistoryWindow's 330-list pair; Quests list is Gate 2's 400. Constant moves per `MinRoomWidth`'s own rule; 700 stays clear of `RailLabelWidth` (720). Committed 900/899 pair holds. Disproof lives in `shoot.ps1`, not as a committed dead illustration. Revert offer declined — picture is the ruling.
