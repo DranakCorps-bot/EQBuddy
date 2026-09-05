@@ -44,215 +44,24 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
-### Evolved shell nav pre-design — answering FABLE.md's E-3 gate (Bevel, 2026-09-04 evening)
+### ~~Evolved shell nav pre-design — E-3 gate~~ — TAKEN 2026-09-05 (E-3 PR 1)
 
-- **Priority:** `approved` (pre-design; gates E-3's first pixel per Fable's plan) — awaiting Helm sign
-- **Place:** not built. A new shell host window (no file yet) plus a `ShellPage` enum/registry
-  Fable's plan names but has not written. **Read against tip `a40f33a8`** (E-2c merged, Avalonia
-  gone) — `src/EQBuddy/ProgressWindow.xaml`, `OptionsWindow.xaml`, `HistoryWindow.xaml`,
-  `QuestsWindow.xaml`, `MainWindow.xaml` (widget chrome), `UI.Shared/DesignTokens.cs`,
-  `UI.Shared/ChipStackAnchor.cs`, `UI.Shared/WidgetMetrics.cs`.
-- **Source:** `FABLE.md` E-3 section (*"Bevel owns the nav design (rail vs tabs, chrome, density,
-  the Search affordance)… File the ask in BEVEL-FEEDBACK.md when E-2 lands; do not open E-3 before
-  it answers"*), written 2026-09-04 ~3:15 PM CT off the signed critique. E-2c (PR #298) merged
-  ~8:05 PM CT (`a40f33a8`). This is that answer, filed the same evening E-2 finished.
-- **Not a hold. Not needs-david. Not implement.** No `src/` from this entry. #208 / #250 / 320-cap
-  / #251 untouched. Does not reopen the signed critique's doors (Home = Phase 5 recommendations;
-  LEGACY notice retired; Raids = Live).
+Executed in full, item deleted per the take-then-delete contract. What landed, and where:
 
-#### 0. The one fact that decides half of this: v1 already built the wrong chrome AND the right chrome, and they sit three files apart
-
-Every "theme window" in the codebase today — `ProgressWindow`, `QuestsWindow`, `GearLootWindow`,
-`CreatureWindow`, `WorldWindow`, `OptionsWindow` — is `WindowStyle="None" AllowsTransparency="True"
-Topmost="True" ShowInTaskbar="False"`, hand-drawn chrome with an `OnDrag` handler standing in for
-the title bar Windows would otherwise give it for free. That shape exists because these windows
-were born as **pop-outs of an overlay that sits over the game** — the doc comment on
-`ProgressWindow.xaml` says so in as many words (*"every one of these is RETROSPECTIVE… what it
-earns instead is room to be read"*), and `Topmost`/`ShowInTaskbar="False"` are exactly the
-properties the signed critique's gate 7 is naming when it says **"the shell is a normal window and
-is what Windows tabs to."** Building the shell out of this chrome would ship gate 7 broken on day
-one, and nothing about it would show in a diff — it would just be a `Window` tag with the same
-four attributes every other window in the file already has, which is precisely how a copy-paste
-default becomes invisible (the shape of trap 29: absent from review because it looks unremarkable).
-
-**`HistoryWindow.xaml` is already the other thing, and it has been sitting there the whole time.**
-`Width="860" Height="560" MinWidth="640" MinHeight="400"` with `WindowStartupLocation="CenterScreen"`
-and no `WindowStyle`, no `AllowsTransparency`, no `Topmost`, no `ShowInTaskbar="False"` — a plain
-resizable `Window` with native chrome, a taskbar entry, and Alt+Tab that works, because nobody ever
-needed it to float over the game. **It is the one existing precedent in this repo for what the
-shell host should be**, and the fact that it already exists means E-3's first PR is copying a
-pattern, not inventing one.
-
-**Ruling: the shell host is `HistoryWindow`'s chrome, not `ProgressWindow`'s.** Native
-`WindowStyle`, resizable, `ShowInTaskbar` default (true), not `Topmost`, `CenterScreen` or
-last-position on first open. This is a one-line consequence with a large blast radius: it also
-means the shell needs **no drag handler, no hand-rolled close button, no custom corner radius** —
-delete that code rather than port it, the same call the World fold made for four cog menu entries.
-
-#### 1. Rail, not tabs — and the reason is capacity, not taste
-
-**Seven rooms plus Search will not fit a horizontal tab strip, and this codebase has already paid
-to learn that lesson twice.** `ProgressWindow.xaml`'s own doc comment describes a `WrapPanel`
-built specifically because a `StackPanel` tab strip clipped its fourth item with no ellipsis and
-no error (trap 25, itself a repeat of trap 14). That was **four** peers. The shell has **seven**
-plus a Search affordance, and unlike Progress's badges ("16.0% xp, +1 lvl…") the rail labels are
-short nouns — but seven short nouns at a comfortable click target still run past a sensible window
-width once the room content next to them needs room to breathe (Gear and Quests both want a
-list+detail split; World wants a map canvas). A horizontal strip forces a choice between clipping
-and shrinking the content pane to feed the tabs. A **vertical rail** does not: it grows down, not
-sideways, and Windows players already have the idiom from Settings, Outlook, and every IDE.
-
-**Two navigation levels, not one, and the existing in-room tab strip does not change.** The rail
-is level 1 (which room). `EqSegmentedStrip` — the control `ProgressWindow`/`QuestsWindow` already
-use for Experience/Wealth/Faction/Raids and Epic/Sky/Quests — stays level 2, unchanged, inside
-each room. **This is exactly why Fable's plan can move Progress first cheaply**: `ProgressWindow`'s
-`TabStrip`/`TabBody` (lines 62–71 of the XAML) becomes the *content* the rail hosts for the
-Progress room; nothing about the four-tab arrangement inside it has to be redesigned, only the
-window it used to float in.
-
-**Rail contents, top to bottom:** Home · Live · Progress · Gear · Quests · World, then a visual
-gap, then Settings. Search is **not a rail row** — see §3. Settings sits below the gap because it
-answers a different question than the other six ("configure the tool" vs "show me something about
-my character"), the same distinction Windows' own Settings app and VS Code both draw by putting
-the gear at the bottom, separated.
-
-**Do not render a rail row for a room that has not shipped yet.** E-3 PR 1 moves only Progress.
-The honest options are (a) a rail with one row, or (b) seven rows where six are disabled. This
-codebase already has a signed ruling on the second shape and it is a refusal: the Experience
-next-level lock says, verbatim, *"an empty class row gets no chevron — an affordance that opens
-nothing is a trap."* A disabled rail row is that chevron wearing a different control. **Add rows
-as their rooms land, in the same PR that lands them.** This costs nothing external because Evolved
-is local-only until the owner opens the channel (per Fable's plan) — an incomplete rail is a fact
-about a build nobody outside this room is looking at yet, not a player-facing empty state, so the
-"no unexplained empties" gate applies at channel-open, not at every intermediate commit.
-
-#### 2. Chrome and density
-
-**Chrome:** `HistoryWindow`'s shape (§0), resized to shell scale. Window icon in the title bar is
-the app icon, not a vector glyph — this is the one place a native title bar draws one for free,
-so there is nothing to build. No custom min/max/close; native chrome supplies them and they are
-correct for a taskbar-visible window in a way a hand-drawn `✕` glyph has never had to be.
-
-**Density is inherited, not invented, for room content — and new only for the rail and title
-row.** Every room's *content* — Progress's tab bodies, Quests' rows, Gear's rows — already exists
-and is already sized against `UI.Shared/DesignTokens`. Lifting a room into the shell changes its
-container, not its internal spacing; re-deriving density for content that already reads correctly
-on a screen would be the un-folding-in-costume mistake the 2026-08-21 inline-themes ruling already
-named once (*"un-folding is un-folding in costume"* — same principle, one level up). The **only**
-new density decisions are the rail row (icon + label, height generous enough for a mouse target —
-directional ~40–44px logical, build-to and measure rather than lock, the same discipline the
-320-cap plan used) and the title row holding the window icon, app name, and the Search affordance.
-Both should pull from `DesignTokens` rather than a new literal, the same rule `DesignRatchetTests`
-already enforces on every other window in the file.
-
-**Rail width is two states, not a slider.** Expanded (icon + label, directional ~180–220px,
-build-to) and collapsed (icon only, directional ~56–64px, build-to) — see §4 for what triggers the
-switch. A manually-resizable/pinnable rail is a real feature some apps have and is explicitly
-**not** required for E-3; if it is wanted later it is additive and does not change anything below.
-
-#### 3. Search: a global affordance, and `Ctrl+K` earns it, but it is not a room
-
-**Placement: the title row, not the rail.** A rail row implies "this is one of the seven things
-you navigate to." Search is not a destination, it is a shortcut past the other seven — exactly the
-signed critique's own line: *"Search is how you skip the nav, not a domain of its own"* (§0, §2).
-Putting it in the title row next to the window controls signals that difference visually for free;
-putting it in the rail (even visually separated) still teaches "there are eight rows," which is
-the thing the critique explicitly refused.
-
-**`Ctrl+K` opens it as an overlay palette, not a navigated page.** Bound at the shell-window level
-(so it fires regardless of which room has focus — `EventManager.RegisterClassHandler` is already
-the pattern this codebase reaches for when a behavior must apply window-wide regardless of which
-control has focus, per `WineText`/trap 42), it raises a floating results panel over the current
-room rather than replacing it. Selecting a result calls the **same navigation call the rail and the
-HUD's "Open EQBuddy" button call** — the `page:room` address already in the wire grammar
-(`EQBUDDY_EXPAND`'s `progress:raids` shape, per Fable's E-3 seam 4). **One navigation path, not
-two** — if Search had its own way of landing on a room, a future change to how rooms resolve would
-have to be taught twice, which is exactly the shape of trap 33 (two callers, two answers) one
-level up from data into navigation.
-
-**Nearest existing precedent, and why it does not transfer directly:** `HistoryWindow.SearchBox`
-(`HistoryWindow.xaml:26`) already exists and already has a tooltip naming its scope ("character,
-zone, notes, tags, loot, or creature names") — but it searches **one room's own data**, not the
-disposition table of everything the shell can show. The shell's Search needs a source that spans
-rooms (features, settings, retained v1 capabilities) — which is exactly what E-2e's
-`docs/v2/v1-feature-disposition.md` is for. **Hypothesis, not verified:** that disposition table,
-once it exists, is the natural index Search resolves against, so a feature the table calls `Keep`
-or `Merge` is findable by its **old v1 name** as well as its new one — a player who remembers
-"Watch" should find the Alerts settings and HUD chips, not a dead end. Worth confirming once E-2e
-lands; I have not opened it because it does not exist yet.
-
-#### 4. How seven rooms degrade at a small window
-
-**Two independent degrade axes — the rail, and the room content — and they do not share a
-threshold.** Conflating them is how a resize bug hides: the rail can have plenty of room to show
-labels while the room underneath it is already too narrow for a list+detail split, or vice versa.
-
-1. **Rail: label → icon-only.** Below a width threshold (directional, measure against real icon
-   glyphs from `IconPaths` rather than assume — the same "predict before measuring" discipline
-   as trap 51/the 320-cap plan), the rail drops labels and keeps icons, each still carrying a
-   tooltip so the room name is one hover away. This is reversible glance information, not lost
-   capability — closer to how a ribbon collapses than to a card disappearing.
-2. **Room content: list+detail → single pane with back.** Gear, Quests, and (once it exists) a
-   Search-results view are the list+detail-shaped rooms; Home, Live, Progress are single-column
-   already and this axis does not apply to them. Below a second, narrower threshold, the detail
-   pane takes the full room width and a back affordance returns to the list — the same shape
-   phones already use for this exact problem, and worth checking whether `UI.Shared`'s existing
-   list/detail split (if any room already expresses one as a shared type) can carry both desktop
-   and this collapsed desktop state without a second implementation. **Not verified this pass** —
-   I did not open Gear or Quests' current window code to check whether their list+detail split is
-   already a reusable shared shape or hand-rolled per window; that is a one-grep question for
-   whoever takes E-3's Gear/Quests migration.
-3. **A floor, not a third state.** Below both thresholds, `MinWidth`/`MinHeight` stop the window
-   from shrinking further — `HistoryWindow`'s existing `640×400` is the nearest real number in the
-   codebase and a reasonable starting floor to re-measure against the rail's actual icon-only
-   width plus a room's minimum readable content, rather than invent a fresh guess. **Never let the
-   rail or a room clip silently** — trap 14 and trap 25 are both, in the end, "a fixed-width
-   assumption met content it could not measure," and a WPF `MinWidth` is the cheap, already-idiomatic
-   way this codebase prevents that everywhere else.
-
-**What does NOT degrade:** the rail's row order and the Home/Settings top/bottom split stay fixed
-at every width — collapsing to icons must not also reorder or drop a room, which would turn a
-resize into a silent capability loss (the #219/#233 shape, this time triggered by a window edge
-instead of a release).
-
-#### 5. Two open questions this pass could not close, named rather than guessed
-
-- **The mobile room-list / shell rail single-source question from pass #2 §5 is now load-bearing,
-  not hypothetical.** If the rail's seven-room list and the phone's `⚙ Screens` picker are two
-  hand-maintained lists rather than one Core enumeration, they will drift the way `AbsorbedTitles`
-  and `AbsorbedCardKeys` drifted (trap 55) — same shape, new surface. **This pass asks that the
-  `ShellPage` enum Fable's plan names be the one place both the rail and the mobile picker read
-  from**, not a ruling I can make alone since I have not opened `CompanionProjection`'s screen-list
-  this pass either. Flagging louder than pass #2 did because E-3 is now about to build the enum
-  this would bind.
-- **Whether Gear/Quests already have a shared list+detail shape to reuse for §4.2.** Named above;
-  a one-grep question for the executor, not a design call.
-
-#### 6. What does not change
-
-Everything in the signed critique (§0–§8) and pass #2 stand unamended. This entry answers Fable's
-one open gap — *"the critique fixes the rooms and the rules; it does not draw the navigation"* —
-and nothing here reopens Home/Phase-5, the LEGACY notice, Raids-on-Live, or any non-goal in §7.
-`EqSegmentedStrip` inside a room, the disposition table's destination column, and the four
-already-built theme *contents* (as opposed to their windows) are untouched.
-
-- **Already shipped (checked on tip `a40f33a8`):** E-2c merged (Avalonia gone); `HistoryWindow`,
-  `OptionsWindow`, `ProgressWindow`, `QuestsWindow` chrome as described; `EqSegmentedStrip` in use
-  on Progress/Quests; `EQBUDDY_EXPAND`'s `progress:raids` address grammar already live per E-3's
-  own seam note.
-- **Checked:** `FABLE.md` E-3 section in full; `docs/BEVEL-v2-staging-critique.md` §0/§2/§7/§8;
-  `BEVEL.md`'s own pass #2 §5 (mobile hypothesis); `HELM.md` PR #298 sign-off; source —
-  `ProgressWindow.xaml`, `OptionsWindow.xaml`, `HistoryWindow.xaml` in full; `MainWindow.xaml`
-  widget chrome (topmost/no-taskbar, for contrast); git log/status confirming E-2c merged and
-  E-2d/E-2e/E-3 parked.
-- **Not checked this pass:** `CompanionProjection`'s `⚙ Screens` picker source (§5's hypothesis
-  stays unverified); Gear/Quests window code for an existing list+detail shape (§4's open
-  question); the running app (no `shoot.ps1` run — nothing here is built to photograph yet);
-  `docs/v2/v1-feature-disposition.md` (does not exist until E-2e lands).
-
-— Bevel (Grok)
-
----
+- **§0 chrome** → `src/EQBuddy/ShellWindow.xaml` is `HistoryWindow`'s shape, not
+  `ProgressWindow`'s. No drag handler, no hand-rolled close, no custom radius — deleted
+  rather than ported, as the entry asked.
+- **§1 rail** → vertical, `ShellPages.RailOrder`, Settings below the gap, **one row drawn**
+  (`ShellPages.Landed`). No disabled rows.
+- **§2 density** → three new tokens (`RailWidthExpanded` / `RailWidthCollapsed` /
+  `RailRowHeight`) at the middles of your ranges; room content untouched.
+- **§3 Search** → title row + `Ctrl+K` overlay palette, resolving through the same
+  `Navigate` the rail calls. Index is the landed rooms and their tabs; the disposition
+  index waits on E-2e per Helm.
+- **§4 degrade** → `UI.Shared/ShellLayoutPolicy`, both axes, different thresholds, floor
+  derived from `ProgressWindow`'s 520 plus the collapsed rail.
+- **§5 open questions** → **both answered, one of them against your hypothesis.** See
+  `BEVEL-FEEDBACK.md`.
 
 ### Evolved staging IA pass #2 — against post-`v1.99.18` main (Bevel, 2026-09-04 PM)
 

@@ -15,6 +15,61 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 PR 1, the Evolved shell host)
+
+- **The `ShellPage` single-source join is a total MAPPING from the phone's screen registry
+  into the enum, not a replacement of `CompanionSurfaces.All`.** Helm required `ShellPage`
+  to single-source the desktop rail and the mobile ⚙ Screens picker; Bevel filed the ask
+  having explicitly not opened `CompanionSurfaces` and said so. Opening it is the grep it
+  asked for, and it says the two lists are at different granularities BY A SIGNED PRODUCT
+  DECISION — eleven phone screens against seven rooms, with `CompanionSurfaces.Travel`
+  stating in as many words that the phone does not fold to match the desktop (World PR 4).
+  The other way: collapse `All` onto the enum, which is literally what "single source"
+  reads as. It would break the wire protocol AND undo that call. `CompanionSurfaces.PageFor`
+  is a total function into `ShellPage` instead, so renaming or removing a room stops the
+  file COMPILING — more coupling than two hand-maintained lists could ever have (trap 55's
+  shape). `ShellNavigationTests` asserts totality plus a negative, so the join cannot go
+  vacuous (trap 39).
+- **The shell has no player-facing door in PR 1 — `EQBUDDY_SHELL` only.** The other way: a
+  right-click menu entry, which is how every other window in the app is reached. Declined
+  because the rail has one row, Evolved is local-only until the owner opens the channel,
+  and a door into a one-room shell is the unexplained empty the Phase 2 gate forbids. It is
+  still reachable for review (hook + three `shoot.ps1` rows + five E2E assertions), which
+  is what trap 22 and trap 29 actually require. The player's door lands with the HUD's
+  "Open EQBuddy".
+- **`ProgressWindow` is NOT retired in this PR, so the Progress room is a second
+  composition rather than a view extracted from it.** The other way: extract a shared
+  `ProgressRoomView` both hosts render, which is this repo's standing "two producers, one
+  builder" move (trap 33). Declined because every RULE is already shared — tabs, order,
+  labels, keys and badges all come from `ProgressSurface`/`ProgressTheme`, and the bodies
+  from one factory — while Bevel's signed IA RESHAPES this room for Evolved (Raids leave
+  for Live, Faction becomes Advanced). Extracting now would couple the two exactly where
+  they are about to diverge, then be unpicked one PR later. An E2E test asserts the two
+  hosts report the same four row counts, so a divergence fails rather than ships.
+- **The shell's title bar carries the room ("EQBuddy — Progress").** The other way: plain
+  "EQBuddy", which is what the product calls it. Changed because `MainWindow.xaml`'s title
+  is exactly `EQBuddy`, so `shot.ps1`'s `-TitleLike` would match the widget too — trap 24
+  INSIDE one process, where `-OwnerPid` cannot separate them. `HistoryWindow` already had
+  this shape, and naming the room is what a shell application should do anyway.
+- **The mini-dashboard stars did not come into the shell's Progress room.** The other way:
+  carry them, since they are the only writers `MiniStats` has for xp/money/motes and
+  dropping the last writer of a setting is the #204/#210/#212 shape (trap 20/26). Safe
+  because `ProgressWindow` still carries them this PR — but the room is the wrong home
+  regardless: Bevel's IA sends HUD configuration to the HUD's Edit mode and to Settings.
+  **Written into `ShellWindow`'s header as a blocker on retiring that window**, because
+  that is the commit where this becomes a real bug.
+- **Degrade axis 2 (list+detail → one pane) is DECIDED in `ShellLayoutPolicy` with no
+  consumer yet.** The other way: leave it until a list+detail room lands, since Progress is
+  single-column and nothing calls it. Built now because Helm's sign names two axes and the
+  point of two is that they have DIFFERENT thresholds — a policy that answers only one
+  cannot be tested for the thing that matters, and conflating them is how a resize bug
+  hides.
+- **`EQBUDDY_SHELL_SIZE` exists purely so the DEGRADED rail can be photographed.** The
+  other way: no hook, and prove the collapse with the unit test alone. Declined because a
+  unit test proves the arithmetic and cannot prove the window applied it, which is exactly
+  the gap trap 42 cost two builds — and the sixteen hooks in `DebugHooks` are all built on
+  the same argument.
+
 ## 2026-09-05 (E-2c, the Avalonia deletion)
 
 - **`evolved-channel-guard.ps1` gained a fourth check — no workflow answers a `release:`

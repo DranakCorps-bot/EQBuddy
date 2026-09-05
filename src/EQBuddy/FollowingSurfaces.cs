@@ -43,6 +43,13 @@ internal static class FollowingSurfaces
         if (w._creatureWindow is { IsLoaded: true, IsVisible: true } c) yield return c;
         if (w._wikiPackWindow is { IsLoaded: true, IsVisible: true } k) yield return k;
         if (w._worldWindow is { IsLoaded: true, IsVisible: true } o) yield return o;
+        // The Evolved shell (E-3 PR 1) is the seventh, and it is the line this file's own
+        // header predicted: "adding a seventh pop-out now means adding one line here, and
+        // both callers get it." It is not a pop-out — it is a normal window with native
+        // chrome — but it hosts live surfaces off the same snapshot, so the tick and the
+        // dump's surfacesBehind count both have to see it or the dump describes two
+        // moments again (trap 56).
+        if (w._shellWindow is { IsLoaded: true, IsVisible: true } sh) yield return sh;
     }
 
     /// <summary>The widget's once-a-second follow tick. Lives here rather than in

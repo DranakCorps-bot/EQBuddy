@@ -70,6 +70,16 @@ public class DesignRatchetTests
         // Gate 5b: the first of the three heavy card BODIES to leave MainWindow. Built on
         // the system as it moved, so it joins on the day it lands rather than later.
         "EQBuddy/ProgressCardView.cs",
+        // E-3 PR 1: the Evolved shell host, its rail rows and the first room moved into
+        // it. Built on the system rather than migrated onto it, so — like WikiPackWindow
+        // and ProgressCardView above — they join on the day they land. The rail is the
+        // only genuinely NEW density in the shell (rooms arrive already sized), and its
+        // three numbers are named in DesignTokens rather than typed here, so the two
+        // states of the rail cannot disagree with the arithmetic that switches them.
+        "EQBuddy/ShellWindow.xaml",
+        "EQBuddy/ShellWindow.xaml.cs",
+        "EQBuddy/RailRow.cs",
+        "EQBuddy/ProgressRoom.cs",
 
         // ---- Five Avalonia rows left this list with the platform in E-2 (2026-09-04):
         // the widget, EqFoldLabel, Quests, Loot and the wiki pack. **The list only ever

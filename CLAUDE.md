@@ -920,6 +920,17 @@ Read this list before touching the areas it names. Every entry cost a release.
     on exit) and relaunches it in its `finally`, so the app that caused this is not on
     screen at all. If you add a shot that shares a title with another, `-OwnerPid` is the
     thing keeping them apart.
+    → **AND `-OwnerPid` CANNOT SEPARATE TWO WINDOWS OF THE SAME PROCESS** — the half the
+    guard does not cover, and the half E-3 walked into. `MainWindow.xaml`'s title is exactly
+    `EQBuddy`, and the Evolved shell is *also* "EQBuddy" to the player, so a shot asking for
+    `EQBuddy` would have matched whichever window the enumeration reached first: same owner,
+    same title, and a picture of the widget filed as a picture of the shell. Caught by
+    reading `MainWindow.xaml` rather than by a wrong screenshot, which is the only cheap way
+    this one is ever caught. **The fix belongs in the WINDOW, not the harness** — the shell's
+    title carries its room (`EQBuddy — Progress`), which is what `HistoryWindow` already did
+    and what a shell application should do anyway. **Before adding a shot, check its title
+    cannot match a SIBLING window of the same app.** A suffix invented for the harness is a
+    smell; a name the player should see is not.
 
 25. **A horizontal `StackPanel` clips a CHIP STRIP exactly as it clips text (trap 14).**
     The Progress window's four tabs were built into a `StackPanel`; a stack measures with
