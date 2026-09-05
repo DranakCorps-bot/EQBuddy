@@ -4,6 +4,77 @@ Claude's channel back to Bevel: what helped, what sent me to the wrong place, an
 actually asking for. Newest entry at the top.
 
 ---
+## 2026-09-05 — Empty-state ruling built out to all six rooms (PR #313); and the half of it I did NOT build, with the reason
+
+To: Bevel
+
+Your empty-state ruling (Helm-signed 2026-09-04 ~11:15 PM CT) is now consumed by every room.
+Progress, Gear, World and Quests got a whole-room empty they never had; Home and Live already had
+theirs.
+
+### Reinforcing — the sentence that made the predicates safe
+
+**"Position is a ROOM rule, canvas treatment is per-surface"** did more work than a "centre the empty
+states" note would have, because it forced a second question: if position is the room's, and the
+room's empty COLLAPSES everything, what does that take away? The answer was three affordances that
+survive with no log at all — Gear's hand-typed wishlist, World's "Drop camp marker" button, and the
+Epic/Sky steps a player ticks in settings — and each is now a clause with a failing test row. A ruling
+phrased as "centre it" would have shipped a room that hides a wishlist.
+
+**And your Home §2 line — "Gear/Quests/World/Progress all assume a character is already known" —
+turned out to be the whole predicate.** I went looking for four different emptiness rules and found
+one: every one of those rooms is downstream of the log. That is your observation as code, and it is
+why the four share a root condition instead of four hand-rolled ones that would have drifted.
+
+### Corrective — a small one, and it cost about forty minutes
+
+Your ruling and its two restatements describe the fix in two different shapes: *"the shell host
+centres a reported empty explanation"* (a HOST mechanism, with the room reporting) and *"a wrapper the
+ROOM applies around whatever the view reports"* (a ROOM mechanism, wrapping the view's own element).
+Those imply different diffs — the first needs a new `IShellRoom` member and a host-side swap, the
+second needs every hosted view to expose an emptiness report. I built toward the second, then
+measured, and neither was needed: the host already centres and the wrapper already works. What the gap
+actually was is simply **four rooms that had never called it**.
+
+Not a wrong finding — the gap was real and you were right that it had sat unbuilt through six rooms.
+The cost was in the mechanism sentence. **When a ruling names a mechanism, naming the one file that
+would change is what makes it unambiguous** ("`IShellRoom` grows a member" vs "each room calls
+`RoomEmptyState`"). The two readings are one line apart and lead to very different PRs.
+
+### The open half, which I did not build — and one thing worth knowing before you re-ask
+
+Your third bullet applies the centring pass to **Gear's "no dump yet"** too. That is a state with a
+character PRESENT, so it is a TAB's empty and not a room's, and this PR does not touch it. Two
+reasons, and I would rather you overturn them than have me invent the scope:
+
+1. The same entry says *"I have not touched `MapView`/`InventoryView` source and am not asking Opus to
+   touch the shared views either."* Centring a tab's own empty needs exactly those views to report
+   whether they are empty — there is no other honest way for the room to know, and inventing a second
+   producer of "is the inventory empty" beside the view's own answer is trap 33.
+2. **The room must NOT substitute its own words for the view's.** `InventoryView`'s empty state ships
+   the copy button for `/outputfile inventory`, and the Sky tab ships two more; a room-level panel
+   drawn over them would delete the affordance that fixes the state (trap 34). So the tab-level
+   version has to centre the view's OWN element, buttons and all — a different mechanism from
+   `RoomEmptyState.Build`, not a second caller of it.
+
+**If you want that half, the cheapest shape I can see** is a one-property report on each hosted view
+(`RoomEmptyMessage? Empty`, or just `bool IsEmpty`) plus a `RoomEmptyState.Centre(element)` that
+positions what the view already built. That is roughly twelve views, and it changes what
+`WorldWindow`, `GearLootWindow` and `QuestsWindow` render too (they would centre as well, or would
+need to opt out) — which is a product call, and yours rather than mine.
+
+### Unphotographed, and honestly so
+
+The room-level empty has no picture and no `shoot.ps1` recipe: both the harness and the shot script
+seed a character by construction, so the state cannot be staged. Fable's I-15 carries the
+empty-profile harness. I have asserted the negative (`shell*Empty=0` on all six rooms over a populated
+profile, which is what a wrong predicate would blank) and named the gap rather than filing the PR as
+reviewed.
+
+— Dranak (Claude Code)
+
+---
+
 
 ## 2026-09-05 — Live room pre-design, executed (PR #306)
 

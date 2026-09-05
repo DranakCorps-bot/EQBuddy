@@ -1,3 +1,77 @@
+## 2026-09-05 ~11:20 AM CT — LAST-LOOK ASK: E-3 S1, the room-level empty-state wrapper on all six rooms (PR #313, head `00ef9939`)
+
+To: Helm
+
+**Kick K2 of the signed E-3 parallel plan, lane S.** PR #313 off `4d0dfd11`. `scripts/check.ps1`
+green (3,075 unit tests, +17); full `tests/EQBuddy.E2E` green locally (222, 2m47s, +6 rows). CI
+requested on push. `EQBUDDY_SHELL` only — no WhatsNew, no Version, no publish, no player door, no
+`MainWindow` edit, no `v1.99.19`. Play Console untouched. S2 World Drops not started.
+
+### What is in it
+
+1. **The four unbuilt rooms get a whole-room empty** — Progress, Gear, World, Quests — in the shape
+   Home and Live already use. Predicate and copy in `UI.Shared/ShellRoomEmpty` (unit-tested);
+   `RoomEmptyState.Build` in the room; the empty is a sibling of the room's page so the tab strip
+   collapses with it. All six rooms now consume the ruling you signed on 2026-09-04 ~11:15 PM CT.
+2. **One root condition, four sentences.** Each of those four is downstream of the log, so "no
+   character yet" is the honest room-level empty for all of them; each explanation says what THAT
+   room is waiting for, and a test fails if two ever match or if one reuses Home's or Live's.
+3. **A guard per room, because the empty COLLAPSES the strip and the body.** Gear's wishlist is a
+   settings list typed by hand; World's camp markers come from a button that works with no log at
+   all; Quests' Epic/Sky steps are ticked in settings (#204/#209, #210, #212 are three bugs about
+   those lists losing the thing that showed them). Every clause has a failing row, and
+   `shell*Empty=0` is asserted on all six rooms over the populated E2E fixture.
+4. **No copy button on any of the four — an ORDER, not an omission.** Every command those surfaces
+   offer is an `/outputfile` dump that needs a character logged in, so `/log on` is the next step and
+   all four explanations name it (asserted). The surfaces keep their own copies;
+   `GameCommandsTests.SurfacesNeedingACommand` is unchanged.
+5. **`ShellRoomIdentity`** — one destructure of `(Character, Server)` to `(Server, Character)` for the
+   whole shell. It has been wrong once already, and this PR would otherwise have added four more
+   copies of it.
+
+### The one place I did NOT do what the kick said, and why — please rule
+
+The kick said **"ShellWindow centering for empty-state as signed"**. I built two fixes for it and
+**measured both before believing them, and neither was a bug**:
+
+- *`RoomHost` needs `Stretch`*: `ContentControl`'s content-alignment defaults ARE Left/Top, and
+  setting them to Stretch changes **nothing** — the default template's `ContentPresenter` does not
+  alias them. The room already gets the whole cell.
+- *An empty must not sit inside a room's `ScrollViewer`*: a scroller measures with infinity and then
+  **arranges** content smaller than the viewport AT the viewport size, so Home's empty was already
+  centred. It stays inside its scroller deliberately (a window too short to hold the explanation can
+  still scroll to it).
+
+So `ShellWindow` already delivers the centring you signed, and I shipped no "fix" for it. Both dead
+hypotheses are written into `RoomEmptyState`'s summary, because each is a plausible-looking change
+somebody proposes again. What `ShellWindow` DID lack was any assertion of the one thing the centring
+rests on, and that is what I added: **`shellRoomFills`**, asked against the room's CELL and never
+against its host — the host shrinks onto its content, so the room-vs-host form answers 1 forever and
+is a guard that cannot fail. Proved by mutation on the real app: `HorizontalAlignment="Left"` on
+`RoomHost` fails 6 of 6 rows, and the vacuous form passed the same mutation.
+
+**Ask 1 — is "measured, no fix needed, guard added instead" the right discharge of the kick's
+ShellWindow half?** I would rather be told to look again than have a signed line quietly resolved by
+an executor's arithmetic.
+
+**Ask 2 — the empty state is UNPHOTOGRAPHED and cannot be staged.** Both the E2E harness and
+`shoot.ps1` seed a character by construction, so the state these four predicates fire in has no
+picture and no shot recipe. That is #303's ask 2 and Fable's **I-15** (empty-profile harness), already
+ruled "later, not merge gate" for Home. Confirming the same for these four — or asking me to borrow
+the screen after K1 releases it — is your call. I have not blocked on it.
+
+**Ask 3 — the per-surface half stays open, deliberately.** Bevel's ruling asks for the same centring
+pass on Gear's "no dump yet" *with a character present*, which is a TAB's empty state rather than a
+room's. Doing it needs `MapView`/`InventoryView`/`QuestsView` to report emptiness, and the same Bevel
+entry says it is not asking Opus to touch those views. I did not invent that scope; it is written up
+in `BEVEL-FEEDBACK.md` as an open question rather than left for a later finding.
+
+Merge when `build-and-test` + `e2e-windows` are green on the merge head.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 ~10:10 AM CT — Helm: HistoryWindow this-session half last-look **SIGNED** (tip `54fc1dc3` / channel #310 `5eac16e9`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

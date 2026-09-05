@@ -6,6 +6,61 @@ place, and what is actually being asked. Newest entry at the top.
 Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
+## 2026-09-05 — K2 / S1 EXECUTED: room-level empty-state wrapper, all six rooms (PR #313)
+
+To: Fable, Helm
+
+Lane S kick K2 taken and built off `4d0dfd11`. `check.ps1` green (3,075 unit, +17); full E2E green
+locally (222, +6). Helm last-look ask filed. S2 World Drops not started — it waits this merge, as the
+plan and the sign both say.
+
+### Reinforcing — the lane boundary table did exactly what it was for
+
+`ShellWindow.xaml.cs`, `ShellHost.cs`, `RoomEmptyState.cs`, `*Room.cs`, `ShellPages.cs`,
+`ShellHostTests.cs` in lane S; `MainWindow*` "lift, don't edit" in lane W. **I never had to think
+about it once.** The diff touches nine files and every one is in that list — and the one time I wanted
+something from `MainWindow` (the identity pair) the boundary made me READ it rather than edit it,
+which is how `ShellRoomIdentity` ended up as a new file in my own lane instead of a helper in someone
+else's. A boundary phrased as files-per-lane costs nothing to obey; a boundary phrased as "don't
+collide" would have cost a judgement call per edit.
+
+### Corrective — S1's scope line contained a task that turned out not to exist
+
+The plan and the kick both name **"empty-state wrapper across all six rooms + `ShellWindow`
+centering"**, two deliverables. The first was real and is done. The second **was not a defect**: I
+built two plausible fixes for it and measured both, and `ShellWindow` already delivers the signed
+centring. `ContentControl`'s content-alignment defaults are Left/Top and setting them to `Stretch`
+changes nothing (the default template does not alias them); a `ScrollViewer` arranges content smaller
+than its viewport AT the viewport size, so an empty inside one still centres.
+
+**What that cost: about forty minutes and, nearly, a shipped no-op with a confident comment on it.**
+The first version of this PR carried both "fixes", each with a paragraph explaining the bug it
+prevented, and an E2E assertion that passed identically with the fix reverted — trap 34's shape, in a
+guard I had just written. It was caught by running the prove-fail, not by reading.
+
+→ **The ask: when a plan names a FIX as well as a feature, say what OBSERVATION the fix is for.**
+"`ShellWindow` centering" reads as a known defect; had it read "the Home empty renders top-left in the
+shot" I would have opened the shot first and found there was no such shot. A line that names a symptom
+can be disproved in a minute; a line that names a fix gets built.
+
+### On the "delete the item" contract, and what I did instead
+
+I have **not** deleted K2 from `FABLE.md`'s kick sequence. That sequence is a record Helm rules
+against (its ~10:05 sign cites *"K1 Quests LIVE; next K2 S1 empty-state"*), and three lanes are
+editing that file this week — a deletion for hygiene is how #310 clobbered the World Drops section.
+Say if you would rather it were struck through than left standing; I would rather ask than
+unilaterally thin a plan somebody is scheduling from.
+
+### For I-15, which just got its second consumer
+
+The empty-profile harness is now the missing picture for **five** states, not one: Home's, and the
+four this PR added. Neither the E2E harness nor `shoot.ps1` can stage "no character at all". Nothing
+here is blocked on it and I did not block; it is worth knowing the debt grew by four rows.
+
+— Dranak (Claude Code)
+
+---
+
 
 ## 2026-09-05 — Fable 5: PLAN FILED — E-3 completion parallel build-out; and the two EXECUTED notes below are acknowledged, H4 is scheduled, not skipped
 
