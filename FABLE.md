@@ -376,6 +376,258 @@ live gates are comments/blockers, not readers — SA-1's in-PR enumeration prove
 
 ---
 
+## I-11 Settings room — the F3 multi-PR decomposition (Fable, 2026-09-05, on tip `6336933c`)
+
+- **Priority:** `ready` — **after Helm signs this decomposition** (the LIVE ASK is in
+  `HELM-FEEDBACK.md`; #331's soft — *"Fable may decompose I-11 after this sign"* — authorizes
+  the plan, and each SR PR below then follows the standing per-PR Helm last-look loop exactly
+  as #299–#335 did). **No `needs-david:`** — everything here executes the six-item #331 sign
+  (four tabs Look / Alerts / HUD / Behavior; "HUD" not "Cards & windows"; gear checklist
+  import → Gear; the out-list); no consequence-list door is touched.
+- **Class:** `V2` — cross-cutting two-host architecture. Not V0–V1 because the obvious
+  reading — "build a Settings page in the shell and copy the controls over" — is exactly the
+  parity-by-feature-list drift #210 already paid for (two hosts of one surface hand-rolling
+  one decision each), and because `OptionsWindow` must keep working UNRETIRED beside the room
+  for this whole arc, which turns every tab into a shared-module question rather than a move.
+- **Source:** Bevel's I-11 Settings IA (`BEVEL.md` 2026-09-05, PR #331, Helm-signed ~5:10 PM
+  CT); `ShellPages.cs`'s own Settings doc comment (*"configures the tool rather than
+  describing the character"*); PR #335 (the Options-gap V0–V1, SHIPPED — consumed as-is
+  below, never re-opened). The IA stays in `BEVEL.md` as the executors' reference, the same
+  contract B3 runs under for Surface A.
+- **Bevel pre-design: yes — I-11 (#331).** Two residuals Bevel named ride inside this plan
+  rather than as separate work: the vocab sweep before shell land (structural — see the ban
+  clamp below) and the **Theme color-picker ≠ banned "theme"** caveat, written into SR-1 so
+  no mechanical rewrite misfires on the wrong token (trap 34's shape).
+- **Shot offline: yes** — every staged Settings state is settings + fixture-log driven;
+  nothing on these tabs fetches the wiki. Predictions written before shooting (trap 23), and
+  the BATCH runs, not `-Shot` (trap 53 — no window is deleted or renamed in this series, but
+  SR-5 adds shots and the batch is the only thing that proves the rest).
+- **Column budgets:** none in the fixed-width sense — `OptionsWindow` and the shell are both
+  resizable. The one strip rule: **the Alerts sub-tab strip carries `AlertSurface` badges, so
+  it is not fixed-width — `WrapPanel`, never a horizontal `StackPanel` (trap 25, the exact
+  bug that clipped the Progress tabs at their fourth chip).**
+- **Guards run eight times:** the new `ShellTerminologyTests` file rows prove-fail against a
+  seeded violation; the `shellSettings*` E2E facts prove-fail on the pre-change tree; the
+  `SettingsSurface` round-trip row in `ShellNavigationTests`; then eight consecutive greens.
+- **What clamps it (verified this pass):**
+  - **`OptionsWindow.xaml.cs` is a ratcheted hotspot: baseline 1547, file at 1,578** — about
+    123 lines of ceiling left (1547 × 1.1 = 1,701.7, `ArchitectureTests:222`). Every SR lift
+    is net-negative there by construction and **lowers the baseline in the same commit**, the
+    standing rule.
+  - **Trap 13 as a constructor contract:** both hosts' `OptionsViewModel` instances wrap the
+    SAME `AppSettings` instance and the same persist delegate (`_main.Settings`,
+    `_main.PersistSettings` — what `OptionsWindow.xaml.cs:25` already does). A room that
+    called `AppSettings.Load` for itself would hold a second snapshot and clobber wholesale.
+  - **The §4 terminology ban binds every string a shared block carries.** The ban exempts v1
+    `OptionsWindow`, but one block serving two hosts has ONE string set, and it must pass in
+    shell scope — so lifting a block IS that block's vocab sweep. "Theme" (the color picker)
+    survives; the "widget"/"card"/"breakout"/"mini pill" copy Bevel §5 verified does not.
+  - **`PinWatchChips` has two live readers in lane W's own files** (`HudBarView.cs:298`, the
+    minimized-breakout gate at `MainWindow.xaml.cs:3534`) plus `WatchPinMigration` — which is
+    why it is EXCLUDED from the lift (SR-4 item 4) rather than carried into the new tab.
+- **Must-list rows:** `GameCommandsTests.SurfacesNeedingACommand`'s Gear row is untouched —
+  the ⧉ lives on `GearCardView`, which SR-2 adds to and never un-pins.
+  `ImportReportReachesASurfaceTests` carries `LastInventoryImport → Gear` (untouched).
+  **Hypothesis, labelled:** the EQ Legends Tools checklist import has NO import-report row
+  today — SR-2 checks both curated lists by subject and, if confirmed, ADDS the row naming
+  the Gear surface, prove-failed: trap 43's posture arriving with the relocation instead of
+  after it. `DeadSettingTests`: this series removes no settings; if SR-5 persists a room-tab
+  choice it ships writer + reader in the same PR.
+- **Already shipped — what this must not fight:** `ShellPage.Settings` + `BelowTheGap` + the
+  rail machinery (Settings absent from `Landed` — it joins in SR-5's own commit, the
+  registry's stated rule); `AlertSurface`/`AlertTab` (built, zero consumers — **spent at
+  SR-4, the first spend, per signed item 1**); `OptionsCardsView` including `BuildRetired`
+  (#335); `MezDurationsView`; `WatchPinMigration`; `ShellTerminologyTests` (eight bans + the
+  curated file list new files must join); the SA series (SA-2 in flight and holding the
+  screen at this writing).
+
+### The architecture in one paragraph
+
+**Blocks, not tabs, are the unit that moves.** Options content lifts out of
+`OptionsWindow.xaml(.cs)` into host-neutral view classes — new files, the
+`OptionsCardsView`/`QuestsView` precedent — each of which builds its own controls, takes
+`(MainWindow, OptionsViewModel, ready-gate)`, and carries its own visibility and spacing
+(trap 15). `OptionsWindow` keeps its five tabs and re-hosts the blocks in the old
+arrangement; the Settings room composes the SAME blocks under the signed four-tab IA. Each
+host constructs its own instances (trap 45 — no control ever crosses hosts), both wrap one
+`AppSettings` (trap 13), and the room's dump facts are the blocks' facts re-keyed through
+`ShellDumpFacts.Prefixed("shellSettings", …)` (trap 58). The rejected alternative — building
+the room fresh beside a live `OptionsWindow` — is two copies of ~40 control wirings drifting
+until retirement day: #210's mechanism with a bigger surface.
+
+### SR-1 — Look + Behavior blocks lift (D lane; startable on sign, no SA dependency)
+
+1. New `EQBuddy/SettingsLookView.cs` and `EQBuddy/SettingsBehaviorView.cs` (the executor may
+   split finer; the boundary that matters is host-neutrality). Look: theme picker + custom
+   colors, widget-size/chip-size/opacity×2 sliders, grid overlay + spacing, cursor ring.
+   Behavior: EQBuddy Mobile pairing + mobile sounds, the hide-when rules + alt-tab note,
+   keep-above, hotkeys, regen override, auto-empty + archive, tutorial, perf stats.
+2. `OptionsWindow`'s `look`/`behavior` panels become bare hosts — no `Visibility`, no
+   `Margin` of their own (trap 15). Window chrome (WindowZoom, width persistence, monitor
+   clamping, `SelectTab`/`OptionsTab`) stays with the window; the trap-26 enumeration of
+   what the window did for each block rides the PR description.
+3. Ban sweep of both blocks' strings — Behavior is where "hide the widget" ×3 and the
+   "Overlay apps…" paragraph live (Bevel §5's verified hits); **the "Theme" label survives**
+   (color picker, not the banned window-grouping sense). Both files join the
+   `ShellTerminologyTests` curated list with reasons.
+4. Mobile: the pairing panel moves with the block; **the title-bar 📱 button is untouched
+   and stays the standing second door** (CLAUDE.md's own carve-out — Settings must never
+   become the only path in).
+
+### SR-2 — Gear checklist import leaves Settings (D lane; independent; before SR-3 so the HUD block never carries it)
+
+1. The import block (`OptionsWindow.xaml:371–385`, handlers `:1497–1558` — import button,
+   EQ Legends Tools link, `GearImportStatus` line) leaves Options entirely — signed item 3.
+2. Destination: **`GearCardView`**, the surface whose data the import produces, beside the
+   `/outputfile inventory` ⧉ and the achievements report — and because both hosts
+   (`GearLootWindow`, `GearRoom`) already build their own instances of that view, both get
+   the affordance in one commit. Placement above the fold (trap 44: read on arrival).
+3. Duties: the trap-26 enumeration (every control, where it went); the import-report row
+   check/add from the must-list bullet, prove-failed where added.
+4. What's-new: a player-noticeable MOVE — the unreleased 2.0.0 entry says "X is now Y"
+   naming BOTH ends, per the rule that is not up for renegotiation.
+
+### SR-3 — HUD block (D lane; after SR-2; deliberately NOT gated on SA-R)
+
+1. The `cards` tab's surviving content becomes host-neutral: `OptionsCardsView` already owns
+   the three editors and the Retired list; this PR gives it (or a thin `SettingsHudView`
+   around it) the ability to build its own panels instead of rendering into XAML-declared
+   ones, and folds in the tab's strays (double-click-chip toggle, target-drops toggle,
+   recent-rate picker).
+2. Strings: "Overlay cards" / "Breakout windows" headings and the "mini-pill" tooltip
+   reworded ban-compliant ONCE, serving both hosts (Bevel §5's hits; #326 already banned
+   that tooltip's sentence in shell scope).
+3. **No SA-R gate, by design:** the tab is transitional per the sign and shrinks as SA-R
+   retires keys — each SA-R PR edits this ONE block and both hosts follow, which is the
+   entire argument for the shared module. Gating on SA-R would park the room behind a
+   multi-month per-card series; building extra structure "as if it will stay this size" is
+   what the sign warns against, so this PR adds nothing beyond what re-hosting needs.
+4. In the shell this block renders under the tab name **"HUD"** (signed item 2); in v1
+   `OptionsWindow` the tab keeps its current label — the ban's own scope line exempts v1,
+   and renaming shipped v1 copy for no player benefit is the #228 class.
+
+### SR-4 — Alerts blocks: the `AlertSurface` spend (D lane; **gated: after SA-2 merges**)
+
+1. Four sub-tab blocks keyed by `AlertTab`, the strip built from `AlertSurface.Tabs()` with
+   real counts — the first consumer of scaffolding idle since before the pivot (signed item
+   1): **Watch** = the rules editor (`BuildRulesEditor` lift: add/import/export/reorder);
+   **Buffs** = buff-expiring-only + warn seconds + the buff-set builder (`BuildBuffSetPanel`
+   lift); **Spawns** = track-spawns + whatever spawn config survives SA-2; **Crowd** = mez
+   chips enabled + `MezDurationsView` re-host. Slow-alert's three checks sit with the shared
+   header or Watch — executor call, logged in `DECISIONS.md`.
+2. The shared sound/voice/volume/rate block renders ONCE as a header above the strip — the
+   IA's ruling: a cross-cutting default every rule can override (`AlertSoundCatalog`), not
+   one family's content.
+3. **Why the SA-2 gate:** SA-2's fold obligation deletes the spawn/mez grow-up toggles and
+   the Options placement affordance from exactly these XAML regions. Lifting first would put
+   two lanes in one region and land SA-2's obligation in a file mid-flight. SA-2 is in
+   flight now — the gate is short, and it is a WAIT, not a change to SA-2.
+4. **`PinWatchChips` does NOT lift.** It stays a v1-`OptionsWindow`-only row. It is the
+   named collision with SA-4's `MutedChipFamilies` (two switches converging on "does this
+   chip show"), and the signed spec's §3 split is the ruling to apply: Settings → Alerts
+   owns what-fires/sound/volume; the HUD owns on-screen presence. So the new Alerts tab
+   carries NO presence switch at all, and **whoever lands SA-4 owns the reconciliation**
+   (fold `PinWatchChips` into mute, or retire it with its readers) — finding one switch,
+   not two. This plan changes nothing in SA-4.
+5. v1 `OptionsWindow` keeps five tabs re-hosting the same blocks in the old arrangement
+   (the `watch` tab = Watch block + its native `PinWatchChips` row; the `alerts` tab =
+   header + Buffs/Spawns/Crowd blocks stacked, as today).
+6. Trap 25 for the strip; the trap-26 enumeration covers BOTH source tabs.
+
+### SR-5 — the Settings room lands (S lane; after SR-1/SR-3/SR-4; SR-2 independent)
+
+1. New `EQBuddy/SettingsRoom.cs : IShellRoom`, built with `_main` like every room; composes
+   FRESH instances of the four tabs' blocks under Look / Alerts / HUD / Behavior. New Core
+   `SettingsSurface` (labels/keys `look`/`alerts`/`hud`/`behavior`) so `ShellPages.Rooms`
+   maps and does not translate; `ShellNavigationTests` round-trips it like every other room.
+2. **`ShellPages.Landed` gains Settings in this same PR** — the registry's own rule ("a room
+   joins this list in the same PR that lands it"). `Describe`, icon and the below-the-gap
+   row already exist.
+3. The `IShellRoom` contract answered explicitly: `Release()` empty-with-reason unless a
+   lifted block holds something (the hotkey-capture rows are the ones to check);
+   `ApplyLayout` empty-with-reason (single-column); the room-level empty wrapper
+   deliberately NOT used — Settings always has content, stated on the implementation.
+4. `SetTab` resolves the four `SettingsSurface` keys, with `AlertSurface.TabForKey` as a
+   fallthrough that lands `settings:crowd` on Alerts → Crowd — reusing the existing key
+   grammar rather than inventing a third address level.
+5. Facts: `ShellDumpFacts.Prefixed("shellSettings", …)` (trap 58); E2E asserts room
+   presence, tab landing, and — the comparison trap 58 exists for — that a block reports
+   the same facts from both hosts while both are open.
+6. **Terminology: this is where the signed "vocab sweep before shell land" lands
+   structurally.** `SettingsRoom.cs` + `SettingsSurface` join the curated list; the scanner
+   over everything the room composes is the sweep, in the gate PR rather than as a separate
+   pass — every string the room can show has passed the ban by construction of SR-1/3/4.
+7. Shots: new `shell-settings-<tab>` names checked against `docs/screenshots/` and a docs
+   grep first (trap 21); staged states seeded — rules for Watch (the `tracked-card` staging
+   already matches the fixture log), a buff set, a gear checklist (trap 22); predictions in
+   writing (trap 23); the BATCH runs under the screen lock.
+8. `OptionsWindow` stays unretired, unrenamed, fully working beside the room — retirement
+   is I-9-shaped, later, with its own gates.
+
+### Sequencing, lanes, screen
+
+**SR-1 → SR-2 → SR-3 → SR-4 → SR-5, serial in one seat.** SR-1…SR-4 all touch
+`OptionsWindow.xaml(.cs)` — D-lane files per the E-3 lane table; SR-5 is S-lane files
+(`SettingsRoom`, `ShellPages`, shell tests). Only SR-4 carries an external gate (SA-2
+merge); SR-1/SR-2 are startable the moment this is signed. **Nothing in this series touches
+`MainWindow*` or anything lane W owns — the SR and SA series are file-disjoint by
+construction** (the one shared subject, `PinWatchChips`, is handled by exclusion), so
+SR-1…SR-3 run beside SA-2/SA-3 with no coordination beyond the mailbox. Screen: SR PRs that
+change Options composition owe the `options-window`-family re-shoots, and SR-5 owes the
+new-room batch; SA-2 holds the screen at this writing, and **the first SR PR to hold it
+runs the full `shoot.ps1` batch first** — the #332 duty, still owed.
+
+### Out — matching the #331 sign, restated so no SR PR drifts
+
+- **No `OptionsWindow` retirement this arc.** It keeps working beside the room until a later
+  PR with its own gates says otherwise (I-9's standing rule: landing a room is separate from
+  and earlier than retiring the surface it replaces).
+- **No SA-2/SA-3/SA-4 change from this plan.** SR-4's gate is a wait; the `PinWatchChips`
+  handoff is a deliberate non-action here.
+- **No TEL.** TEL-PR3 takes "the settings surface of the day" per its own plan; nothing in
+  this series builds for it.
+- **No player door.** `EQBUDDY_SHELL` stays the only way into the shell; landing the room
+  changes nothing about that, and no Settings copy may imply otherwise.
+- **No `v1.99.19`, no tag/publish, no Play Console.**
+- **No re-opening #335** — the Retired list is consumed as-is (SR-3 re-hosts, never
+  redesigns); future HUD cuts keep adding their rows per the standing rule.
+- **No re-litigating the §4 ban or the "HUD" name** (signed items 1–2).
+- **No mobile Settings surface** — the phone's ⚙ Screens picker is its own subject, outside
+  the IA's scope.
+
+### Checked — what Fable actually read on this tip
+
+`BEVEL.md` I-11 §0–§6 in full; `HELM.md` #331/#332/#333/#334/#335 signs and Live Holds
+(empty); `HELM-FEEDBACK.md` through the ~5:40 PM CT entries; `ShellPages.cs` in full;
+`IShellRoom.cs` in full; `AlertSurface.cs` in full; `OptionsWindow.xaml.cs` construction
+`:21–120` and the gear import block `:1497–1558`; `GearRoom.cs:1–80` (the two-host view
+pattern and the star-refusal comment); `ShellWindow.RoomFor` (`:303–323` — rooms take
+`_main`); `ArchitectureTests:222` (OptionsWindow baseline 1547; file measured 1,578);
+`PinWatchChips` readers by grep (`HudBarView.cs:298`, `MainWindow.xaml.cs:3534`,
+`WatchPinMigration.cs`); `ImportReportReachesASurfaceTests:43` (`LastInventoryImport →
+Gear`); `ShellTerminologyTests` curated-list shape and `Ban` head; the Surface A item and
+the E-3 lane table above. **Hypotheses, labelled:** (1) the checklist import has no
+import-report row — SR-2 checks by subject; (2) `BuildRulesEditor`/`BuildBuffSetPanel` lift
+cleanly as blocks — believed from the `OptionsCardsView` precedent, the 1,578-line file was
+not read end-to-end; (3) callers of `OptionsWindow.SelectTab`/`OptionsTab` beyond the
+window's own persistence — enumerated in SR-1 before the lift, not this pass.
+
+### Decided without asking — to `DECISIONS.md` when taken
+
+- **Blocks over fresh-build** — could have built the room fresh and let retirement delete
+  the duplication; #210 is why not.
+- **v1 `OptionsWindow` keeps its five-tab arrangement re-hosting the blocks** — could have
+  collapsed v1 to four tabs too; that reshapes a shipped surface for no player benefit
+  before the room is even reachable.
+- **`PinWatchChips` excluded from the lift** — could have moved it; the SA-4 collision and
+  the spec's presence-split are why not.
+- **SR-2 before SR-3**, so the HUD block never carries the gear import.
+- **`SettingsSurface` in Core** rather than a room-private tab list — map, don't translate.
+- **`settings:crowd`-style fallthrough** rather than a three-level address grammar.
+- **Shell tab named "HUD" while v1 keeps its label** — the ban's own scope line, applied.
+
+---
+
 ## Evolved opt-in telemetry — heartbeats, own backend, public metrics (Fable, 2026-09-05, on tip `3ec285aa`)
 
 - **Priority:** `someday` — **captured for later sequencing, on David's explicit instruction.**
@@ -654,7 +906,9 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
   for you" (own ask, later). The card itself stays until 3 of 4 destinations exist.
 - **I-11 · Settings room** — `ShellPage.Settings` exists, not in `Landed`, held by the
   stated decision ("a room whose whole job is not being a launcher"). Needs a Bevel
-  Settings-IA pre-design; design can run now, build waits.
+  Settings-IA pre-design; design can run now, build waits. → **Both halves exist now:**
+  the Bevel IA (PR #331, Helm-signed 2026-09-05 ~5:10 PM CT) and the F3 decomposition
+  above (SR-1…SR-5); build starts when Helm signs F3.
 - **I-12 · Player door — OFF.** Not designed, not implemented here. Bevel §6's coupling
   stands: HUD subtraction and the door meet at release time. When it opens it is a
   consequence-list conversation (roadmap/release posture) — a real ask, later, not a lane.
