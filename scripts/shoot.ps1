@@ -219,6 +219,74 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_SHELL = 'world:map' }; Set = @{} }
     'shell-gear'      = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear' }; Set = @{} }
+    # ---- E-3 PR 3: the Quests room, and the split threshold ---------------------------
+    #
+    # Same illustration lock: a room's shot lands in the PR that lands the room. Title is
+    # 'EQBuddy — Quests', derived from ShellPages.Label — trap 53 applies, and it should
+    # indeed fail rather than photograph something else if the room is renamed.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-quests' — native chrome and the title row as every shell shot has, with the
+    #     rail now FOUR rows in RailOrder: Progress (chart), Gear (bag), QUESTS (quest
+    #     icon), World (pin). **Quests must sit BETWEEN Gear and World** — the rail walks
+    #     RailOrder filtering by Landed, so this is correct by construction and would look
+    #     identical to a healthy build if it silently were not, which is the whole reason
+    #     this line is written down. Quests lit, the other three dim.
+    #     The room: the character caption ("Quest Tracker — <name>", dim, one line), then
+    #     a four-chip wrapped strip Quests · Epic 1.0 · Plane of Sky · Unlocks with their
+    #     real badges, the search box spanning the header with its placeholder, the
+    #     era/state/class filter row, the mode strip on the right, and under it the LIST at
+    #     400 wide beside the DETAIL pane — the fixture's ledger picks a first row and the
+    #     pane shows its rewards and turn-ins.
+    #     **And one thing that must NOT be there**: the view's own title row with the app
+    #     icon and the close button. QuestsRoom calls HideOwnTitleBar(), and a second title
+    #     bar under the shell's native one is exactly what a picture is for.
+    #
+    #   'shell-quests-sky' — the same frame addressed to a room inside the room. Plane of
+    #     Sky lit; the two ⧉ command buttons (/outputfile achievements and /outputfile
+    #     inventory) side by side above the rows; the #243 leftover boxes if the fixture's
+    #     dump produces any; and NO detail pane — a checklist has nothing to select, so its
+    #     width goes back to the rows. This is the shot that says the five presentation
+    #     rules came across the lift.
+    #
+    #   THE SPLIT THRESHOLD, both sides, which is what the signed ruling asked for. The
+    #   room's share is the window minus the 200-wide rail, so at 900 the room is EXACTLY
+    #   SplitRoomWidth and at 899 it is one unit short. The rail is expanded at both
+    #   (RailLabelWidth is 520 + 200 = 720), so the pair isolates axis 2 from axis 1 —
+    #   which is the whole reason the two thresholds are separate numbers.
+    #
+    #   **THE FIRST RUN OF THIS PAIR DISPROVED THE CONSTANT, which is what it was for.**
+    #   The ruling said to shoot SplitRoomWidth = 640 both sides, so the pair was 840/839
+    #   and the prediction was "two panes, then one". The 840 picture came back with two
+    #   panes and a detail column of about 190 units: the quest title broke MID-WORD
+    #   ("Bone / Chips / (Kaladi / m)") and the 220-capped reward tiles clipped. 640 was
+    #   HistoryWindow's measured pair (a 330-wide list), and this room's list is 400 —
+    #   Gate 2's shipped number, which a lift may not re-decide. So the CONSTANT moved to
+    #   700 and this pair with it, per MinRoomWidth's own rule: the number is a claim, the
+    #   screenshot is what tests it, and a room that clips at the threshold moves the
+    #   number rather than the shot. The 840 picture is not committed — an illustration of
+    #   a state the code no longer produces is exactly the drift the lock exists to stop.
+    #
+    #   PREDICTION for the second run, written before it:
+    #   'shell-quests-split' (900) — two panes: the 400-wide list and a ~300 detail pane
+    #     beside it. The title reads on one or two lines with NO mid-word break, and a
+    #     reward tile shows its whole name or ellipsizes cleanly. No back button.
+    #   'shell-quests-narrow' (899) — ONE unit narrower and a different layout: the list
+    #     takes the full width, the detail pane is gone, and no back button is on screen
+    #     yet (there is nothing to come back from until a row is clicked). The rail must
+    #     still show its labels in BOTH — if it collapses in one of them, the two axes are
+    #     not independent and it is the arithmetic that moves, not this shot.
+    'shell-quests'    = @{ Title = 'EQBuddy — Quests'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general' }; Set = @{} }
+    'shell-quests-sky' = @{ Title = 'EQBuddy — Quests'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky' }; Set = @{} }
+    'shell-quests-split' = @{ Title = 'EQBuddy — Quests'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }
+    'shell-quests-narrow' = @{ Title = 'EQBuddy — Quests'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '899x640' }; Set = @{} }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{

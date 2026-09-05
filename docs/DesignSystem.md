@@ -407,7 +407,7 @@ state-coloured leading rule, both carrying readiness at a glance.
 | State vocabulary | `UI.Shared/QuestPresentation.cs` | Badge, rule colour, ready summary, meta line, distance wording — decided once for both desktops |
 | Capture | `UI.Shared/CaptureTheme.cs` | `EQBUDDY_OPAQUE=1` makes the window ground opaque, and nothing else |
 | WPF composition | `EQBuddy/DesignSystem.cs`, `EQBuddy/Theme.xaml` | Token ResourceDictionary + the `Eq*` component styles |
-| The surface | `EQBuddy/QuestsWindow.xaml{,.cs}` | |
+| The surface | `EQBuddy/QuestsView.xaml{,.cs}` | Was `QuestsWindow.xaml{,.cs}` until E-3 PR 3 lifted the surface out of the window so the Evolved shell could host it too. The Gate 2 content is unchanged by that move; `QuestsWindow` is now a thin host and `QuestsRoom` is the shell's, and both files are on the ratchet |
 
 *(An `EQBuddy.Avalonia/DesignSystem.cs` composed the same tokens against native controls, and
 the rule for this gate was that both surfaces changed together, never "a release behind". That

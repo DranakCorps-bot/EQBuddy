@@ -169,6 +169,13 @@ internal sealed class GearRoom : Grid, IShellRoom
     /// 46's rule covers close as well as tick.</summary>
     public void Release() => _inventory.Dispose();
 
+    /// <summary>Nothing to arrange. Loot, Wishlist and Inventory are each one column of
+    /// rows that reflow — `shell-gear-narrow` shoots the widest of them at the floor for
+    /// exactly that claim. There is no list beside a detail pane to collapse, which is the
+    /// only thing <see cref="ShellLayout.RoomSinglePane"/> decides. Empty with a reason
+    /// rather than absent, per the interface's own contract.</summary>
+    public void ApplyLayout(ShellLayout layout) { }
+
     /// <summary>The room's facts, under <c>shellGear*</c> — the same numbers
     /// <see cref="GearLootWindow"/> reports from the same surfaces, re-keyed mechanically
     /// so two open hosts cannot write over each other in the dump's one flat namespace

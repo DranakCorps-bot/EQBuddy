@@ -692,7 +692,8 @@ busier.
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
-| Quest window (all three tabs) | `EQBuddy/QuestsWindow.xaml.cs` — the widget's Quests card just opens it |
+| Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs` — lifted out of the window in E-3 PR 3. `QuestsWindow` is a thin host (position, zoom, height cap); `QuestsRoom` is the shell's. **Both build their own instance** |
+| The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs` is the room list and the `page:room` address grammar, `ShellLayout.cs` the two degrade axes. `EQBUDDY_SHELL` is the only door |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop World theme (Map/Camps/Path/Travels) | `EQBuddy/WorldWindow.xaml.cs` — Map/Spawns/Travel windows retired into it (World PR 2) |
 | Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs` |
@@ -811,7 +812,8 @@ Read this list before touching the areas it names. Every entry cost a release.
     "pick classes ab" in both UIs, and no unit test could see it; the first real screenshot
     could, which is the argument for screenshot review being an acceptance criterion.
     → **Use a two-column `Grid` (`Auto,*`)** whenever an icon sits beside wrapping text.
-    `QuestsWindow.IconLine` is the worked example, in both UIs.
+    `QuestsView.IconLine` is the worked example (it was `QuestsWindow.IconLine` until the
+    E-3 PR 3 lift took the surface out of the window).
 15. **A control that hides itself, inside a host that also hides itself, has two switches
     for one state — and only one of them is ever wired.** The Gate 4 Loot breakout built
     its filter strips, selected the right chips and painted them into a `ContentControl`

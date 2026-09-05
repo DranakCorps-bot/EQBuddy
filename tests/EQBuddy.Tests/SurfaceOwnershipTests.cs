@@ -88,6 +88,11 @@ public class SurfaceOwnershipTests
     [InlineData("GearLootWindow.xaml.cs")]
     [InlineData("CreatureWindow.xaml.cs")]
     [InlineData("QuestsWindow.xaml.cs")]
+    // The Gate 2 content after E-3 PR 3 lifted it out of the window beside it. Both rows
+    // stay: the window is still a host, and the view is where a tab-body accessor would
+    // now be written if anyone reached for one.
+    [InlineData("QuestsView.xaml.cs")]
+    [InlineData("QuestsRoom.cs")]
     [InlineData("WorldWindow.xaml.cs")]
     public void NoHostInterfaceHandsOutATabBody(string file)
     {
@@ -153,6 +158,13 @@ public class SurfaceOwnershipTests
     // open paren is deliberate and still pins what this guard is FOR.
     [InlineData("GearLootWindow.xaml.cs", "main.NewGearCard(")]
     [InlineData("GearLootWindow.xaml.cs", "new InventoryView(main)")]
+    // E-3 PR 3: the Quests surface became a view with TWO hosts, which is precisely the
+    // condition trap 45 is about — a WPF UIElement has one parent, so a view shared
+    // between the window and the shell's room would be torn out of whichever painted it
+    // last, silently. Each host constructs its own, and this is the positive half that
+    // says so (forbidding the wrong shape is not the same as requiring the right one).
+    [InlineData("QuestsWindow.xaml.cs", "new QuestsView(main)")]
+    [InlineData("QuestsRoom.cs", "new QuestsView(main)")]
     public void TheOtherHostsBuildTheirOwnSurfacesToo(string file, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", file));

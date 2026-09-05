@@ -194,6 +194,13 @@ internal sealed class WorldRoom : Grid, IShellRoom
     /// surface, and at close as well as on the tick.</summary>
     public void Release() => _spawns.StopTicking();
 
+    /// <summary>Nothing to arrange. All four World tabs are one column — the map is a
+    /// canvas that reflows, and Camps/Path/Travels are vertical lists. There is no list
+    /// beside a detail pane to collapse, which is the only thing
+    /// <see cref="ShellLayout.RoomSinglePane"/> decides. Empty with a reason rather than
+    /// absent, per the interface's own contract.</summary>
+    public void ApplyLayout(ShellLayout layout) { }
+
     /// <summary>
     /// The room's facts, under <c>shellWorld*</c>.
     ///

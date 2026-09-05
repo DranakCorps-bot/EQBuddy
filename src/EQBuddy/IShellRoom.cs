@@ -1,5 +1,6 @@
 using System.Windows;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -64,4 +65,24 @@ internal interface IShellRoom
     /// empty and says so — an empty method with a reason is a decision, and a missing one
     /// is a question nobody asked.</summary>
     void Release();
+
+    /// <summary>
+    /// The shell's width answer, pushed down: whether this room is now too narrow to draw
+    /// a list beside a detail pane (<see cref="ShellLayout.RoomSinglePane"/>). Called
+    /// whenever the window is resized, and once on a room's first arrival so a room built
+    /// after the last resize is not a beat behind.
+    ///
+    /// **Pushed rather than pulled, and that is the whole reason it is on the interface**
+    /// (E-3 PR 3, whose Quests room is the axis's first consumer since PR 1 decided it).
+    /// The threshold is about the ROOM's share of the window AFTER the rail takes its
+    /// own — arithmetic only the host has both halves of — so a room measuring itself
+    /// would be a second producer of one answer, and the two would disagree at exactly the
+    /// boundary where a resize bug lives (trap 33).
+    ///
+    /// **A single-column room implements it empty and says so**, the same contract
+    /// <see cref="Release"/> already sets: an empty method with a reason is a decision, and
+    /// a missing one is a question nobody asked. Three of the four rooms are in that case
+    /// today, and each one says why on its own implementation rather than here.
+    /// </summary>
+    void ApplyLayout(ShellLayout layout);
 }
