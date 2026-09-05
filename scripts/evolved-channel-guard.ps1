@@ -37,6 +37,15 @@
          is positioned BEFORE that region and before the 172 MB publish. A future edit
          that re-adds a copy outside the region fails the build rather than the family's
          widgets. In LogJanitorPolicyTests' shape: the guard reads the script text.
+
+         Since 2026-09-05 that list has a fourth member which reaches NOBODY and is on it
+         anyway: compiling, signing or hashing EQBuddySetup.exe. The other three are about
+         a file leaving the machine; the installer only has to EXIST. It carries v1's
+         AppId and {autopf}\EQBuddy, so a signed 2.0.0 one sitting in dist\ is one
+         double-click from replacing the v1 install and inheriting its profile - and
+         check 3 watches the family's update folder, never dist\. release.ps1
+         -EvolvedLocal built and signed one on every run while install-local.ps1 -Evolved
+         refused to; two loops disagreeing about a one-way door is what this row ends.
       2. `gh release create` is unreachable on a 2.x tree, by two independent locks -
          it is inside the region above, and -EvolvedLocal refuses -Tag and -Prerelease
          outright. There is deliberately NO switch that re-enables it.
@@ -177,10 +186,28 @@ if ($refusalLine -ge 0 -and $regionStart -ge 0 -and $refusalLine -gt $regionStar
 
 # Comment lines are exempt on purpose: a comment cannot copy a file, and the region
 # needs the prose that explains what the channel IS. Every executable line is read.
+#
+# The fourth token is a different KIND of hazard from the first three and carries its own
+# Why for that reason. The first three describe things that LEAVE the machine; the
+# installer never has to leave anything to do its damage. Compiling it is enough: a signed
+# 2.0.0 EQBuddySetup.exe in dist\ carries v1's AppId and {autopf}\EQBuddy, so one
+# double-click replaces the v1 install in place and inherits its profile. Check 3 watches
+# the family's update folder and has never watched dist\, which is exactly how the two
+# Evolved loops came to disagree - install-local.ps1 -Evolved refused to build one and
+# release.ps1 -EvolvedLocal built and signed one on every run (Fable 5, E-0/E-1 review).
+#
+# It matches the ACTS - compile, sign, hash - and not the filename, deliberately. The
+# -EvolvedLocal summary block names EQBuddySetup.exe in prose to tell David what was NOT
+# built, and a token that fired on the sentence explaining the fix would be the guard
+# arguing with its own reason for existing.
+$channelReach = 'At 2.x that line is reachable, and reachable means the family''s widgets take an Evolved build within six hours.'
 $channelTokens = @(
-    @{ Rx = 'EQBuddyDownload|\$oneDrive'; What = 'names the family update folder' },
-    @{ Rx = 'gh\s+release\s+create';     What = 'creates a GitHub release' },
-    @{ Rx = '/SILENT';                   What = 'installs over this machine''s v1 install' }
+    @{ Rx = 'EQBuddyDownload|\$oneDrive'; What = 'names the family update folder';                Why = $channelReach },
+    @{ Rx = 'gh\s+release\s+create';      What = 'creates a GitHub release';                      Why = $channelReach },
+    @{ Rx = '/SILENT';                    What = 'installs over this machine''s v1 install';      Why = $channelReach },
+    @{ Rx = 'ISCC|EQBuddy\.iss|(Invoke-EqSign|Get-FileHash|Set-Content).*EQBuddySetup'
+       What = 'builds, signs or hashes the INSTALLER'
+       Why  = 'At 2.x that leaves a signed 2.0.0 EQBuddySetup.exe in dist\ carrying v1''s AppId and {autopf}\EQBuddy - one double-click replaces this machine''s v1 install in place and inherits its profile (settings.json, history.db, archives), and #158''s rollback gives back the binary, not the profile. Nothing scans dist\: check 3 watches the update folder. scripts/install-local.ps1 -Evolved builds no installer, and these two loops must not disagree about a one-way door.' }
 )
 
 for ($i = 0; $i -lt $lines.Count; $i++) {
@@ -191,7 +218,7 @@ for ($i = 0; $i -lt $lines.Count; $i++) {
     if ($inside) { continue }
     foreach ($t in $channelTokens) {
         if ($line -match $t.Rx) {
-            $problems += "scripts/release.ps1 line $($i + 1) $($t.What) outside the -EvolvedLocal region: $($line.Trim()). At 2.x that line is reachable, and reachable means the family's widgets take an Evolved build within six hours."
+            $problems += "scripts/release.ps1 line $($i + 1) $($t.What) outside the -EvolvedLocal region: $($line.Trim()). $($t.Why)"
         }
     }
 }
