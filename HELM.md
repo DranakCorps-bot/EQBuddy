@@ -68,6 +68,17 @@ Do not put these back in Holds.
 ---
 
 
+### PR #336 — F3 I-11 Settings room multi-PR decomposition (SIGNED; plan only)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #336 https://github.com/DranakCorps-bot/EQBuddy/pull/336 (`claude/fable-i11-settings-decompose-20260905` → `main`, head `030f3a68`) — F3 SR-1…SR-5; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED as F3 / I-11 multi-PR plan. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Docs/channel only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) SR-1…SR-5 + lanes + SR-4←SA-2 gate + out-list — SIGNED. (2) options-cards re-shoot rides first screen-holding SR PR — SIGNED (#335 soft amend; #332 batch still first). (3) PinWatchChips exclusion / SA-4 owns MutedChipFamilies reconciliation — SIGNED ACK.
+- **Signed items:** Blocks-not-tabs; OptionsWindow unretired all arc; SR startability as planned; no blanket implement — each SR last-looks.
+- **Soft:** drop channel tip; do not starve SA-2 (soft max ≤3); SR-1 idle D seat OK after merge; first screen-holding SR: #332 full batch then options re-shoots.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for CI → merge; then prefer SA-2 over SR-1.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:00 PM CT
+
 ### PR #335 — Options gap "No longer on the widget" (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #335 https://github.com/DranakCorps-bot/EQBuddy/pull/335 (`claude/options-gap-v0v1-20260905` → `main`, product `db970649` / tip `87f1e6d2`) — `OverlaySections.Retired` by old title; executes #331 item (4) / Bevel I-11 §4; HELM-FEEDBACK LIVE ASK.
