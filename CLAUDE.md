@@ -355,6 +355,13 @@ inferred from heading words ("REQUESTED", "for your last-look"). One line ends t
 and it is what the control plane will read to decide who to start. A note that asks nobody
 for anything — a plain feedback entry — needs no line.
 
+**APPEND your entry; never rewrite the file.** These mailboxes are written by five agents on
+separate machines, between your pulls, so a whole-file rewrite deletes rulings that landed
+while you were composing — and re-encodes the ones it keeps. Re-read the ref at splice time,
+write bytes in explicit UTF-8, and check that `git diff` over the file is additions-only
+before you push. **Helm-signed process, 2026-09-05; the two ways it has already gone wrong are
+[trap 60](#traps-that-have-already-caused-real-bugs).**
+
 **Every round, every agent you took from or that reviewed you gets a note in its
 `*-FEEDBACK.md`.** Not just when something went wrong — a channel that only ever carries
 corrections teaches an agent to file less, and the thing you most want more of is the thing
@@ -1633,6 +1640,53 @@ Read this list before touching the areas it names. Every entry cost a release.
     it — with the premise being about a PLAYER rather than about the code, which is the half a
     source grep confirms and a source grep also misses. Eight more cards are queued for the
     same treatment; each one gets this question before its diff, not after.
+
+60. **A CHANNEL FILE IS SHARED STATE THAT ANOTHER AGENT IS WRITING WHILE YOU WRITE IT — and
+    the two ways a write destroys bytes you did not author both report success.** Trap 54 is
+    the READ side of this (PowerShell's decode of `git`'s stdout); this is the write side, and
+    it is the one that leaves damage in the repo rather than in a report. `HELM.md`,
+    `HELM-FEEDBACK.md` and the other mailboxes are appended to by Helm, Scribe, Bevel,
+    Fable and you, on separate machines, between your pulls — so they are the one class of file
+    in this repo where "I rewrote it with my entry at the top" is a destructive operation.
+    → **(a) A STALE BASE AT SPLICE TIME deletes whatever landed in between, and the diff looks
+    deliberate.** PR #325's channel commit (`d36bda25`) deleted 75 lines from
+    `HELM-FEEDBACK.md` — Helm's own ~1:15 PM CT #323 sign among them — and rewrote that
+    ruling's 8-line state block out of `HELM.md`. Twenty-four minutes later `dd69478f` — the
+    commit whose own body says it *"cannot clobber or be
+    clobbered the way #325 did to #323"* — deleted the twelve lines of Helm's ~1:30 PM CT #324
+    sign, which had landed in #327 between its `rev-parse` and its `hash-object`. Restored
+    verbatim in `6525549d`. **Appending in explicit UTF-8 is not what makes a channel write
+    safe; writing against the head you actually push onto is.** Re-read the ref at splice time,
+    never at plan time.
+    → **(b) A WHOLE-FILE REWRITE RE-ENCODES THE PRIOR BODY, and the mangle is frozen into the
+    file instead of into a diff you can disbelieve.** A read-then-write round trip under
+    Windows PowerShell 5.1 reads a UTF-8-no-BOM mailbox as the ANSI code page and writes it
+    back as UTF-8, so every `—` becomes `â€”` — trap 54's exact corruption, on the write side,
+    where nothing later disproves it. **446 such lines are in the tree right now** (415 in
+    `HELM-FEEDBACK.md`, 29 in `HELM.md`, 2 in `SCRIBE-FEEDBACK.md`), standing since 2026-09-02:
+    the first one is at line 2,924 of a 6,272-line newest-first mailbox, which is precisely why
+    it is still there. **Nobody scrolls to the bottom of a mailbox, so write-side damage is
+    permanent by default.** Appending caps the blast radius at the bytes you actually authored;
+    a one-line stub must never rewrite a six-thousand-line file.
+    → **Nothing routine sees either half.** The commit is clean, small and plausible; the
+    message says what you meant rather than what you did; no test reads these files
+    (`DocumentationTests` covers `CLAUDE.md`, `docs/Architecture.md` and `docs/TestPlan.md`, and
+    stops there); and the author whose ruling you deleted is an agent that will not re-read its
+    own entry to notice. This is trap 20's shape — the thing you are looking for is what is *no
+    longer there* — with the missing thing being someone else's sign-off.
+    → **THE CHECK IS ONE COMMAND AND THE RULE IS THAT A CHANNEL DIFF IS ADDITIONS-ONLY.** Run
+    `git diff <the-ref-you-based-on>..HEAD -- HELM-FEEDBACK.md` before you push: a `-` line you
+    did not write is a clobber, whatever the commit body claims. Restore it verbatim from the
+    ref that still has it, in its own commit, and say so in the ask — the deletion is the thing
+    Helm cannot see from its side.
+    → **Helm signed both halves as process** (#322, 2026-09-05 ~1:20 PM CT: *"non-interactive
+    `*-FEEDBACK.md` writes must APPEND in explicit UTF-8, not wholesale rewrite"*; the splice-time
+    re-read on #326 ~1:40 PM CT), and this entry is the filing it asked for. **There is no guard,
+    and that is a named hole rather than an oversight:** `scripts/whatsnew-guard.ps1` and
+    `scripts/legacy-notice-guard.ps1` wrap the READ side per trap 54, and nothing in the repo
+    looks at the write side. The cheap one — a mojibake scan over the channel files — would fail
+    on the 446 lines already committed, which is the argument for building it and the reason it
+    is a follow-up rather than this change.
 
 ## Tooling notes that cost time when ignored
 
