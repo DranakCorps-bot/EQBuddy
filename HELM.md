@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel Evolved shell nav pre-design — E-3 gate (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` Evolved shell nav pre-design (answers FABLE.md E-3); HELM-FEEDBACK ~8:20 PM CT ask; tip `a40f33a8` (E-2c merged).
+- **Ruling:** **SIGNED. E-3 unblocked.** Chrome = HistoryWindow native (not Progress overlay). Rail not tabs; no disabled unshipped rows; Search title-row + Ctrl+K palette; one `page:room` nav path; two degrade axes + MinWidth/MinHeight floor. **`ShellPage` enum single-source for rail + mobile Screens picker — required.** Search chrome may land with E-3; disposition index waits on E-2e (do not block Progress host). First E-3 PR = host + nav + Progress only. E-2d/E-2e stay parked until own asks. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for E-3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~9:25 PM CT
+
+
 ### PR #298 — E-2c Avalonia remove (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #298 https://github.com/DranakCorps-bot/EQBuddy/pull/298 (`claude/evolved-e2c-20260904` → `main`, head `b064f58b`) — pipeline then deletion + docs; #296/`24642fda` + #297/`2d25cdf0` already on main.
