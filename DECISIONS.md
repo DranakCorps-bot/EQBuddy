@@ -15,6 +15,35 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05
+
+- **`release.ps1 -EvolvedLocal` stops building the installer, and KEEPS the portable zip.**
+  Fable's V1 defect 1 named "skip ISCC + its `Invoke-EqSign` + the `.sha256`", and which
+  `.sha256` was left open — there are two. The other way: drop the zip and its hash as well,
+  which would make `-EvolvedLocal` produce nothing but `dist\publish\`. It landed on the
+  hazard rather than on tidiness: `EQBuddySetup.exe` carries v1's `AppId` and
+  `{autopf}\EQBuddy`, so a signed 2.0.0 one is a double-click from replacing the v1 install
+  and inheriting its profile, while the zip is a copy of an exe that runs portable and can
+  overwrite nothing. The zip is also the artifact `-EvolvedLocal` is *for*. Named for Helm in
+  the E-2b ask so it can be ruled the other way cheaply. `scripts/release.ps1`.
+- **Paired it with a guard row rather than shipping the one-line fix alone.** Fable said "one
+  commit either way", and the other way was to make the edit and stop. It landed as fix +
+  guard because the guard was **green on the pre-rider tree at `-AssumeVersion 2.0.0`** — it
+  had never been able to see this, which is trap 34's "reads as coverage while seeing
+  nothing", and the whole point of `evolved-channel-guard.ps1` is that local-only is
+  structural or it is not enforced. The row matches the ACTS (compile / sign / hash) and not
+  the filename, so the summary block's prose about what was not built does not trip it.
+  Proven to fail by `-Repo` at a pre-rider worktree: 7 lines named.
+  `scripts/evolved-channel-guard.ps1`, `docs/TestPlan.md`.
+- **A leftover 2.x installer in `dist\` is NAMED, not deleted.** The fix stops new ones; it
+  does nothing about one a pre-fix run already made, and a fix that leaves the artifact it
+  was written to prevent sitting on disk has shut the door behind the horse (trap 43 —
+  proving the producer is not proving the effect). The other way: `Remove-Item` it. It landed
+  as a loud yellow warning in the `-EvolvedLocal` summary because `dist\` is build output but
+  it is still David's, and a script that quietly removes signed binaries is a worse habit
+  than one that points at them. Verified on this machine: nothing 2.x is in `dist\` today —
+  the E-1 acceptance used `install-local.ps1 -Evolved`, which never built one.
+
 ## 2026-09-04
 
 - **Stopped WAITING for the satellite windows to agree with the widget and made them agree
