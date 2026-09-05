@@ -95,6 +95,188 @@ next loop, not a reopening of the plan.
 
 ---
 
+## Evolved opt-in telemetry — heartbeats, own backend, public metrics (Fable, 2026-09-05, on tip `3ec285aa`)
+
+- **Priority:** `someday` — **captured for later sequencing, on David's explicit instruction.**
+  This item authorizes nothing today. It becomes `ready` per-PR when Helm names its slot
+  against the E-3 lanes; TEL-PR4 (the public copy) is additionally gated on channel-open,
+  which is its own consequence-list conversation. **No `needs-david:` line** — David is the
+  SOURCE of this requirement (2026-09-05 kick), so the consequence-list item 8 decision
+  ("what the app sends off the machine") is already his and already made: opt-in, default
+  off, heartbeats only. Two conditional doors are named inline, not asked now.
+- **Class:** `V2` — privacy/security is this file's charter in as many words, and this is
+  the **first feature in the product's history that sends anything off the player's
+  machine**. Not V0–V1 because the payload allow-list, the backend's retention/delete
+  contract, and the rewrite of two public promises (README, SECURITY.md) are decisions that
+  are not the executor's to make mid-diff.
+- **Source:** David, 2026-09-05, verbatim requirements: (1) default-OFF opt-in anonymous
+  telemetry; (2) heartbeats only — install id / app version / OS, **no** logs, character,
+  chat, paths, or EQ account data; (3) own backend with retention + delete path; (4) public
+  README/repo-main marketing metrics — unique users, concurrent + peak concurrent, version
+  mix; GitHub download totals may show separately and **must be labeled downloads≠uniques**;
+  (5) Evolved requirement for later sequencing — not folded into live shell/nav lanes.
+- **Already shipped — what this must not fight:**
+  - **`SECURITY.md` §"Zero telemetry" is a self-enforcing promise**: *"If you ever catch
+    EQBuddy sending something this page doesn't list, that is a vulnerability — report it as
+    one."* That sentence is the best thing on the page and it stays — the telemetry ship
+    MUST amend that section in the same release, so the heartbeat is listed and the rule
+    keeps its teeth. An endpoint that ships before its SECURITY.md row is, by our own
+    definition, a vulnerability.
+  - **`README.md:43` "Zero telemetry, always contribution"** — a public promise. It changes
+    to the charter's wording ("no telemetry by default") **only in the release that ships
+    the client**, never before. `README.md:535`'s "no telemetry — nothing leaves your
+    network" is scoped to EQBuddy Mobile and stays true of Mobile; TEL-PR4 re-reads it so
+    the global change doesn't silently falsify the scoped sentence or vice versa.
+  - **`LEGACY-V1.md:60` "Nothing expires, phones home, or switches itself off" — stays true
+    FOREVER.** v1/legacy never gets telemetry, and the legacy promise is one reason the
+    Evolved copy must say "Evolved, opt-in" rather than weasel-wording both lines at once.
+  - **The charter already permits exactly this shape**: `EQBuddy-v2-Project-Guide-Requirements.md`
+    §2.2 says "no telemetry **by default**" (not "never"), and **NFR-PRIV-002** — *"Telemetry,
+    if ever added, must be opt-in and separately documented"* — reads like it was written for
+    this item. NFR-PRIV-004 (no paths/character names off-machine) is satisfied by
+    construction: the payload cannot carry them.
+  - **E-1's local-only mechanism** means the client can ship fully live during the local
+    phase — the only installs that exist are David's, so "dark launch" needs no extra flag.
+
+### The requirement, pinned (TEL-001 … TEL-006)
+
+- **TEL-001 — Consent.** Telemetry is OFF on every install, forever, until the player turns
+  it on in the settings surface. No first-run prompt, no nag, no dark pattern; the toggle
+  carries the entire payload in its own copy ("here is everything it sends"). Turning it
+  OFF stops sends **and destroys the local install id** — re-enabling mints a fresh one, so
+  opting out is also an identity reset. Trap 47 binds: **one policy module decides
+  consent + cadence, and every send path goes through it** — never two code paths deciding
+  an off-machine question — and the periodic timer's epoch is "time of opt-in", never
+  `DateTime.MinValue`.
+- **TEL-002 — Payload.** Exactly three fields: `installId` (random GUID minted at opt-in —
+  never derived from hardware, user name, or paths), `appVersion`, `os` (coarse platform +
+  version string). **The field list is a curated must-list with a guard** (trap 34's pair):
+  a unit test asserts the serialized key set equals exactly this list, so adding a fourth
+  field fails the build until this plan is amended and re-signed. No logs, no character or
+  chat data, no file paths, no EQ account data, no hardware ids, no locale, no geo.
+- **TEL-003 — Cadence, and what "concurrent" means.** One heartbeat shortly after launch
+  (~2-minute dwell, so a crash-loop never spams), then every 5 minutes while running.
+  Nothing on exit. Server-side: **concurrent** = distinct ids in the last 10 minutes;
+  **peak concurrent** = max over 10-minute buckets; **unique users** = distinct ids
+  trailing 30 days; **version mix** = share by `appVersion` among trailing-7-day uniques.
+  These definitions are part of the requirement because they are what makes the public
+  numbers honest — publish them beside the numbers.
+- **TEL-004 — Backend, retention, delete.** Our own backend, no third-party analytics.
+  Raw heartbeats retained **90 days** then deleted by scheduled job; aggregates (counts
+  only, no ids) kept indefinitely. **IPs are never persisted or logged** — transport sees
+  them, storage never does; say so in the docs. Delete path: an in-app "Delete my telemetry
+  data" action posts the install id to a delete endpoint; the backend hard-deletes every
+  raw row for that id. (Aggregates need no scrub — they contain no ids.)
+- **TEL-005 — Public metrics.** README/repo-main shows: unique users, concurrent now, peak
+  concurrent, version mix — fed live from the backend's public `metrics.json` (badges/
+  fetch), not by a bot editing the README on a clock. GitHub download totals may appear
+  **separately, labeled** — the shipped wording must say downloads count fetches, not
+  people, and point at the uniques number as the honest one.
+- **TEL-006 — Scope freeze.** Heartbeat only. No crash reporting, no feature-usage events,
+  no session stats, no error strings, ever, under this plan — any of those is a NEW plan
+  with its own Helm last-look and its own David decision, and TEL-002's guard is what makes
+  that structural rather than aspirational.
+
+### Decomposition — four PRs plus one Bevel pass, lane `TEL`
+
+**TEL is its own lane** — disjoint by construction from W/S/D/T (no `MainWindow`, no
+`ShellWindow`, no `*Room.cs`): a new `UI.Shared` policy file, a small sender, Options rows,
+docs, and a repo that isn't this one. It slots into any idle seat when Helm names the time.
+
+1. **TEL-PR1 — requirement page** (docs only, this repo): `docs/v2/telemetry.md` carrying
+   TEL-001…006 verbatim plus the payload JSON, cadence, retention table, and delete
+   contract — NFR-PRIV-002's "separately documented", written before the code exists so the
+   code is written to the page and not the reverse. Includes DRAFT (clearly marked
+   unshipped) replacement copy for README §log-only and SECURITY.md §Zero telemetry, so
+   TEL-PR4 is a copy-move, not a composition under release pressure.
+2. **TEL-PR2 — backend** (own PUBLIC repo, recommended `DranakCorps-bot/eqbuddy-telemetry`):
+   smallest thing that works — Cloudflare Worker + D1: `POST /heartbeat` (validate, upsert),
+   `POST /delete`, cron rollup (10-min buckets → daily aggregates → public `metrics.json`),
+   90-day raw purge, basic per-id rate limiting. Tests for delete, retention, and rollup
+   math. **Public repo on purpose**: the payload claim becomes checkable the same way the
+   client's is — a player can read exactly what the endpoint stores. Free tier; the moment
+   this needs a paid plan it is a **David door (consequence item 4, money)** — named here so
+   it is asked then, not smuggled.
+3. **TEL-PR3 — client** (this repo): `UI.Shared/TelemetryHeartbeat.cs` (pure policy:
+   consent, id lifecycle, cadence, payload — unit-tested, no network); one thin sender the
+   policy drives (fire-and-forget, bounded backoff, never blocks UI, failures to
+   `error.log` only); `AppSettings.TelemetryEnabled` (default false) +
+   `TelemetryInstallId` (nullable; cleared on disable) with `DeadSettingTests` rows;
+   Options toggle + payload copy + a "last heartbeat" status line (silent no-ops are
+   broken: the player who opted in can see it working, fixed-shape string per trap 12) +
+   the delete button. Guards: the TEL-002 key-set test; a source scanner asserting the
+   endpoint literal exists in exactly one module and no second `HttpClient` reaches it
+   (trap 47's four-copies lesson, pre-empted); an E2E dump fact (`telemetry=off sends=0`
+   on the default profile) asserting the OFF path from the real exe. Ships fully live in
+   the local-only phase — the endpoint's only traffic is David's installs.
+4. **TEL-PR4 — the public face** (this repo, **at channel-open only**): flip README and
+   SECURITY.md to the TEL-PR1 drafts, add `docs/Telemetry.md` = the player-facing page,
+   the README metrics block + labeled downloads row, `WhatsNew.json` entry. This is
+   consequence item 3 (public, under the project's name) — Helm signs the copy, and it
+   rides the channel-open release David already gates, which is why it carries no
+   `needs-david:` of its own.
+
+- **Bevel pre-design: yes, before TEL-PR3** — the toggle, the consent copy, the status
+  line and the delete affordance are player-facing surface and wording, and consent copy
+  is exactly the kind of thing Bevel catches overpromising or burying. TEL-PR1/2 need
+  none (docs, and a repo with no players in it).
+- **Shot offline: yes** — TEL-PR3 adds an Options shot of the toggle in both states; the
+  fixture has no network, so the staged state is OFF + "never sent", predicted before
+  shooting (trap 23).
+- **Column budgets:** none — new Options rows, no fixed-width surface. The status line
+  reserves a fixed shape anyway (trap 12's rule for anything clock-driven).
+- **Guards run eight times:** the key-set test, the endpoint scanner, and the E2E OFF fact
+  each prove-fail on a mutated tree, then eight consecutive greens.
+- **What clamps it:** `AppSettings.Save` writes the whole file (trap 13) — the id mint on
+  opt-in is an ordinary settings write, no new writer needed; no migration exists or is
+  allowed (new keys default off; nothing to migrate means trap 55 cannot arise).
+- **Must-list rows:** TEL-002's payload key-set list (new, curated, reasoned) and two
+  `DeadSettingTests` rows are the ones this plan creates; no existing
+  `GameCommandsTests` / `ImportReportReachesASurfaceTests` row is touched.
+
+### Sequencing vs E-3 — the answer to "when"
+
+**Not now, and not in the shell/nav lanes.** Nothing in TEL blocks or is blocked by
+I-1…I-17; the E-3 kick sequence (K1–K11) does not change. Recommended slot: TEL-PR1 and
+TEL-PR2 any time an idle seat exists after Surface A (I-8) is underway — they touch no
+product surface and no screen. TEL-PR3 after the Bevel pass, in whatever settings surface
+exists at kick time (Settings room I-11 if landed, else Options → Behavior — the executor
+takes the surface of the day, not a dependency on I-11). TEL-PR4 **only** at channel-open,
+in the channel-open bag. Public metrics before there is a public channel would be a
+dashboard of one machine — the sequencing is the honesty.
+
+### Checked — what Fable actually read on this tip
+
+`SECURITY.md` §Zero telemetry in full (the self-enforcing sentence is verbatim);
+`README.md:38–49` and `:525–545` (both "no telemetry" claims and their scopes);
+`LEGACY-V1.md:60`; charter §2.2 non-negotiables and §18.3 NFR-PRIV-001…004;
+`AdditionalRequirements.md:1392` and `:1712` (opt-in telemetry already contemplated twice);
+`HELM.md` Holds (empty at this writing) and the E-3 plan's lane table + kick sequence
+(this item collides with none of it); the E-1 stub above (local-only means TEL-PR3 can be
+live without a dark-launch flag). **Hypotheses, labelled:** (1) Cloudflare free tier
+comfortably covers heartbeats at any plausible player count — believed from published
+limits, not load-tested; TEL-PR2 verifies before relying on it. (2) shields.io endpoint
+badges cache acceptably for "concurrent now" — if their cache is too coarse, the README
+shows trailing uniques + peak (slow-moving) and the live number lives on a linked page.
+
+### Decided without asking — for `DECISIONS.md` when taken
+
+- **Opt-out destroys the install id; re-opt-in mints a new one.** Could have kept a stable
+  id across toggles; anonymity-reset is worth more than continuity of one row.
+- **90-day raw retention / indefinite id-free aggregates.** Could have kept raw forever or
+  aggregates windowed; this is the smallest thing that still yields all four public numbers.
+- **Backend is a separate PUBLIC repo.** Could have been private or in-tree; public is the
+  trust story, out-of-tree keeps the log-only app's source free of any server code.
+- **Cloudflare Worker + D1** as the recommended stack. Could have been Azure (where signing
+  lives); free tier + one-file worker + public repo won. Executor may substitute equivalent
+  if reality disagrees — the contract is TEL-004, not the vendor.
+- **Live badges/JSON over a bot editing README on a schedule.** A scheduled README-writing
+  job is commit noise and an unattended writer; badges keep the repo inert.
+- **No first-run consent prompt.** Could have asked during onboarding; a prompt before the
+  player knows the product is trap 47's shape, and default-off needs no ceremony.
+
+---
+
 ## E-3 completion — the parallel build-out plan (Fable, 2026-09-05, on tip `d55de151`)
 
 - **Priority:** `ready` — with per-lane gates NAMED inline. The plan itself is the
