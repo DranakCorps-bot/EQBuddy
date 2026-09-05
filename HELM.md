@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #297 — V1 `-EvolvedLocal` no-installer rider (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #297 https://github.com/DranakCorps-bot/EQBuddy/pull/297 (`claude/evolvedlocal-no-installer` → `main`, head `76bd5ffe`) — Fable V1 defect 1 as own tiny PR (parallel to #296).
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `build-avalonia-linux` green.** Soft lean confirmed: skip ISCC + installer sign + setup `.sha256`; keep portable zip + hash; app-exe signing stays. **Fourth guard token SIGNED** (ACTS not filename; guard was green on the hole). **Leftover 2.x installer NAMED not deleted SIGNED** (loud warn, no `Remove-Item`). Scripts/docs only; no `src/`. e2e unrelated — re-run only if red. #296 path unchanged (e2e re-run → three green → merge); E-2c stays parked until #296 merges. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~7:35 PM CT
+
 ### PR #296 — E-2b scanners (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #296 https://github.com/DranakCorps-bot/EQBuddy/pull/296 (`claude/evolved-e2b-scanners` → `main`, head `93703e15`) — successor to closed #295 after #294 deleted its base.
