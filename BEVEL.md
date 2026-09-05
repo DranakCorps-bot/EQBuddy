@@ -44,6 +44,237 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### Settings room IA — the I-11 pre-design, plus the Options → Cards & windows gap ruling (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, last-look ask; unlocks Fable/build for I-11; the gap
+ruling in §3 is separately shippable as its own small V0–V1 fix, ungated)
+**Place:** `src/EQBuddy/OptionsWindow.xaml` (five tabs: `TabLook`/`TabAlerts`/`TabWatch`/
+`TabCards`/`TabBehavior`, `SelectTab` :430); `src/EQBuddy/OptionsWindow.xaml.cs`
+(construction :21-100, `SelectTab` :430); `src/EQBuddy.UI.Shared/OptionsViewModel.cs`
+(`OverlaySections.Catalog`/`Icons`/`AbsorbedTitles`/`AbsorbedNote` :112-301, `OptionsCardRow`
+:306, `OptionsViewModel.Cards`/`MoveCard`/`ToggleCard` :633-655); `src/EQBuddy.Core/
+AlertSurface.cs` (`AlertTab`, `AlertSurface` — unconsumed scaffolding); `src/EQBuddy.UI.Shared/
+ShellPages.cs` (`ShellPage.Settings`, `BelowTheGap` :168, `Describe` :228); `src/EQBuddy/
+OptionsCardsView.cs` (`BuildMiniStats`/`BuildBreakouts`); `docs/BEVEL-v2-staging-critique.md`
+§4 (the signed terminology ban, Helm-signed 2026-09-04, amended 2026-09-05); `tests/
+EQBuddy.Tests/ShellTerminologyTests.cs` (`Ban` :64-91, the row that already retires "Cards &
+windows (as a *finder*)"); `FABLE.md` I-11; `HELM-FEEDBACK.md` #330 sign item 5.
+**Source:** `FABLE.md` I-11 (*"`ShellPage.Settings` exists, not `Landed`... Needs a Bevel
+Settings-IA pre-design; design can run now, build waits"*); PR #330's Helm sign item 5
+(*"Costs said plainly — ACK SIGNED... Bevel still owns the Options-gap design question; not
+a hold, not papered over"*); B3's §4 (`BEVEL.md`, the "B4 rides along" facts — full pass
+parked to here). **All verified in source on tip `1baf0122`** (post-#330 merge, eight-card
+widget). Not a hold. Not needs-david. No player door proposed. No `src/` change. #208/#261/
+#262 untouched. No implement — this is docs/channel only, same shape as B3.
+
+---
+
+#### 0. What Settings is FOR, and why that framing does the work
+
+`ShellPages.cs`'s own doc comment already rules on this, correctly, before any Bevel pass
+touched it: Settings sits below the rail's visual gap *"because it configures the tool rather
+than describing the character — the same separation Windows' own Settings app and VS Code both
+draw."* Every decision below is that one sentence applied to a screen that has never been
+designed as a whole — today's five `OptionsWindow` tabs (`look`, `alerts`, `watch`, `cards`,
+`behavior`) grew one at a time since 1.67.0 (the tab strip's own comment: *"a wall of
+options... needs serious reorganization"*) and were never asked whether they belong together.
+
+**This pass answers three questions, not one:** (1) what does each of today's five tabs become
+in the shell — a straight move, a rebuild, or something that dies; (2) what does the
+`AlertSurface`/`AlertTab` scaffolding B3 found finally get spent on, now that its home has a
+name; (3) what closes the Options → Cards & windows gap that #330's sign explicitly left open
+and named as mine to rule on. None of it is implementation — Fable owns the decomposition when
+this is signed, the same contract B3 ran under.
+
+---
+
+#### 1. Today's five tabs, read in full (not assumed) — the inventory this pass reorganizes
+
+Checked against the actual XAML, not the tab names alone, because a tab's *label* undersells
+what's inside it:
+
+| Tab (`Tag`) | Label shown | Contents, verified |
+|---|---|---|
+| `look` | "Look" | Color theme picker, widget-size/chip-size/opacity×2 sliders, grid overlay + spacing, cursor ring |
+| `alerts` | "Alerts & chips" | Alert sound/voice/volume/rate (one shared default); slow-alert (3 checks); buff-expiring-only + warn seconds + buff-set builder; mez chips enabled + mez durations; track-spawns + spawn/mez grow-up toggles |
+| `watch` | "Watch rules" | The rule editor (add/import/export/reorder), pin-to-mini-dashboard toggle |
+| `cards` | "Cards & windows" | Card visibility/order list; **gear checklist import** (EQ Legends Tools shopping-list HTML); mini-dashboard star grid; breakout-window toggles; double-click-chip toggle; target-drops toggle; recent-rate window picker |
+| `behavior` | "Behavior" | EQBuddy Mobile pairing + mobile sounds; hide-when-unfocused/not-running/alt-tab; keep-above-overlays; global hotkeys; regen-per-tick override; auto-empty + archive; tutorial toggle; perf-stats toggle |
+
+**Two things this inventory surfaces that the tab names hide.** First, `alerts` and `watch` are
+already the same *subject* split across two tabs for no reason but history — both configure "if
+X happens, alert me how" (`AlertSurface.AlertTab` already models this as one four-way split:
+Watch/Buffs/Spawns/Crowd, built and unconsumed per B3 §4). Second, the "gear checklist import"
+block (`OptionsWindow.xaml:371-385`) lives on the `cards` tab for no reason connected to cards
+at all — it is an import action that produces Gear-room content, the same shape as the
+achievements-import report that trap 43 says belongs on the surface it affects, not on a
+settings screen that happens to have room.
+
+---
+
+#### 2. The proposed Settings room IA — four tabs, not five, and why the count changes
+
+| Settings tab | Absorbs | Fate |
+|---|---|---|
+| **Look** | today's `look` tab, verbatim | **MOVE** — nothing here is contested by any in-flight lane |
+| **Alerts** | `watch` tab (→ Watch sub-tab) + the Buffs/Spawns/Crowd portions of `alerts` (→ their sub-tabs); the shared sound/voice/volume/rate block sits as one header ABOVE the four sub-tabs, since it is a cross-cutting default every rule can individually override (`AlertSoundCatalog.Resolve`), not content that belongs to one family | **BUILD** — the first real consumer of `AlertSurface`/`AlertTab`, spending scaffolding that has sat idle since before the Evolved pivot (B3 §4) |
+| **HUD** *(renamed — see §3)* | `cards` tab MINUS the gear checklist import (→ relocates to the Gear room, see below); PLUS the new "no longer on the widget" list (§4) | **TRANSITIONAL** — shrinks toward empty as Surface A's SA-R star-retirement empties the mini-dashboard grid and the breakout list card-by-card (FABLE.md I-8); do not build this tab as if it will stay this size |
+| **Behavior** | today's `behavior` tab, verbatim | **MOVE** — EQBuddy Mobile's pairing panel moves WITH it, but the title-bar 📱 button stays the primary, standing SECOND door per CLAUDE.md's own rule (*"Settings live in Options — except EQBuddy Mobile, which David wanted as its own title-bar button"*); Settings must not become the only path in, or that rule is violated by omission rather than by edit |
+
+**Gear checklist import leaves Settings entirely.** It configures nothing about the tool — it
+is an import that produces the Gear room's own checklist data, and CLAUDE.md's "which surface"
+test (*"is there something the player must do, and a moment by which they must do it"*) plus
+trap 43's precedent both point the same direction: an import belongs on the surface its output
+lives on. This is named, not designed here — the Gear room already owns other imports (the
+achievements report, trap 43) and is the natural host for a third.
+
+**Four tabs, not five, because Watch and Alerts were never two subjects.** This is the one
+place this pass changes the *shape* of Options rather than just moving it — everything else in
+the table above is a relabeling of an existing grouping.
+
+---
+
+#### 3. "HUD," not "Cards & windows" — and this was already ruled on before this pass started
+
+Checked, and it resolves B4's naming collision more cleanly than either of the shapes it named.
+`docs/BEVEL-v2-staging-critique.md` §4 (Helm-signed) already bans **"cog menu / Cards & windows
+(as a *finder*)"** from the shell, the HUD and Settings copy — the ban's own words, not mine —
+and its "say instead" column is explicit: *"Settings, or the nav item."* `ShellTerminologyTests
+.Ban` (`tests/EQBuddy.Tests/ShellTerminologyTests.cs:81`) pins this row and enforces it in both
+directions already, for the rooms that have landed. **This was decided before I-11 was asked
+for**, and this pass's job is to apply it, not re-litigate it: no tab inside the Settings room
+may be named or framed as "Cards & windows," and the "where did my card go" job that name used
+to name moves to the ROOM ("Settings"), not to a sub-screen carrying the old label.
+
+That leaves the `cards` tab's *surviving* content (§2's transitional grid — mini-dashboard
+stars, breakout toggles, card order) needing an actual new name, since it is real content and
+still needs a tab to sit on. **I am calling it "HUD."** Two reasons, not one: it is the
+sanctioned replacement noun (used as the "say instead" answer in three of the ban's eight rows
+— breakout, overlay section/mini-stat, and mini pill all resolve to "the HUD" or "HUD /..."),
+and Surface A (FABLE.md I-8, in flight now) is actively turning everything this tab configures
+into literal HUD content — naming it what it is becoming, while it is still becoming that,
+avoids inventing a throwaway transitional label that would itself need retiring in a few PRs.
+The tab is honest about being ahead of the code for a short, already-scheduled window rather
+than about being wrong.
+
+**B4's OTHER naming worry (the `alerts`/`Alerts & chips` tab tag colliding with a future
+`Settings → Alerts` room) resolves by attrition rather than by a rename.** The v1 `alerts` tab
+identity does not need to coexist with the new one — B3's finding was about what happens if
+BOTH exist at once, and per §2 the whole `alerts` tab's content is absorbed into the new Alerts
+room wholesale, not renamed in place beside it. The collision is real only during the build
+itself (both tags briefly present in the same PR range); it is not a standing naming conflict
+the shipped shell has to live with.
+
+---
+
+#### 4. The Options → Cards & windows gap, ruled — a real answer to what #330's sign left open
+
+**The gap, stated exactly, from the code's own comments rather than from memory.** Two HUD
+subtractions have shipped (`OverlaySections.cs` :124-200) and both left the exact hole B3
+warned §4's mechanism cannot cover, because `AbsorbedTitles` is keyed by a SURVIVING catalog
+member and a subtraction, by definition, leaves none:
+
+| Cut | Old card | Names it used to answer for | Where it lives now | Today's pointer |
+|---|---|---|---|---|
+| W1 — Quests (2026-09-05, `#314`) | Quests | "Sky Quest", "Epics" | Quest Tracker window + Quests shell room | "Quests…" context-menu row; "Quest tracker" hotkey |
+| W2 — World `misc` (2026-09-05, `#330`) | World | "Travels & Deaths", "Zone map", "Travel route", "Spawn timers" | World window + World shell room | "World…" context-menu row (unchanged) |
+
+**Six names, two cuts, zero rows in Options naming any of them as a destination.** Both
+`AbsorbedTitles` comments say so themselves in the source (`OptionsViewModel.cs:252-259`,
+`:275-285`) — this was recorded as a known cost at ship time, not discovered here. And it
+recurs: FABLE.md's I-8 gates the subtraction of seven more cards behind Surface A (Combat,
+Healing, Watch, Buffs, Gear, Motes, Progress) — without a fix, every one of those ships the
+identical gap, seven more times, each one a fresh "now I can't get it back" (#219's shape,
+exactly).
+
+**The ruling: a second list, independent of `AbsorbedTitles`, keyed by the OLD title rather
+than a surviving card — call it what it is, "no longer on the widget."** It renders on the
+Settings → HUD tab (§3), directly under the live card list, one line per retired card: the old
+title(s) it used to answer for, and where it lives now, in the same "X is now Y" words
+CLAUDE.md already requires of a What's-new entry for a moved surface. Two cuts already know
+their own sentence verbatim from `OverlaySections`' own comments — nothing here needs to be
+invented, only surfaced where a player who is hunting will actually look.
+
+**This is NOT gated on the rest of I-11, and should not wait for it.** The gap lives in
+`OverlaySections`/`OptionsCardsView` TODAY, on the v1 `OptionsWindow` — `ShellPage.Settings`
+does not need to exist for this fix to ship, and the ban in §3 does not apply to v1 `OptionsWindow`
+copy (the ban's own doc comment: *"The v1 widget, `OptionsWindow`... are outside it"*), so the
+existing tab can carry this list under its current name and current wording without waiting on
+any renaming. **Recommend this as its own small, independent V0–V1 PR, next loop** — it is
+cheap, it closes an ACK'd real gap, and every future HUD-subtraction PR should add its own row
+to the same list rather than re-opening this question.
+
+---
+
+#### 5. Vocabulary compliance — what has to be reworded, and one ambiguity worth flagging now
+
+Grepped `OptionsWindow.xaml` and `OptionsViewModel.cs` against §4's ban (`ShellTerminologyTests
+.Ban`), since the ban explicitly covers *"the HUD, the shell, Settings copy"* — meaning every
+string that survives from Options into the Settings room has to pass it, even though the same
+string is exempt today sitting in v1 `OptionsWindow`. Real hits, not hypothetical: "Overlay
+cards" (heading, `:367`), "Breakout windows" (heading, `:399`), "Double-click a mini-pill chip
+to open/close its breakout" (`:407` — the exact sentence PR #326 already banned in shell scope
+for "mini pill"), "the star on the card header" (`:388`, `:395`), "Show target drops in the
+**Loot card**" (`:415`), "hide the **widget**" ×3 (`:455`/`:458`/`:463`), "**Overlay** apps...
+hiding the **widget**... every EQBuddy **window**" (`:481`). None of this is a surprise — it is
+what four releases of "card"/"breakout"/"widget" as ordinary Options vocabulary look like once
+the ban actually applies to the screen that inherits this copy.
+
+**One ambiguity worth flagging before anyone runs a mechanical rewrite: "Theme" is two different
+words wearing one spelling.** The ban's regex (`\bthemes?\b`) is written against the v1 sense —
+"the Progress theme," "the Gear & Loot theme," meaning a folded window grouping, which is
+implementation vocabulary. But `OptionsWindow.xaml:61`'s **"Theme"** label is the COLOR theme
+picker (Parchment & Brass, Solarized, etc.) — a real, player-facing, David-ruled feature
+(`ThemeCatalog`), not a window grouping, and it must not be reworded away just because the
+string matches the pattern. A mechanical find-replace against the ban would misfire here
+exactly the way trap 34 describes a guard misfiring on the wrong token — flagging it now so
+whoever builds this tab does not spend a cycle relearning it from a wrong diff.
+
+---
+
+#### 6. What is NOT in this pass
+
+- **No implementation.** No `OptionsWindow`/`OptionsViewModel`/`ShellPages`/`AppSettings` edit.
+- **No `Settings` room build** — that is Fable's to decompose once this is signed, the same
+  contract B3 ran under for Surface A.
+- **No ruling on Surface A's own settings** (`HudChipOrder`, `MutedChipFamilies`, per #329's
+  sign) beyond naming the coordination risk: `PinWatchChips` (today's watch-chips-on-mini-dashboard
+  switch) and the incoming per-chip-family mute are two switches converging on one question —
+  "does this chip show" — from two different lanes on two different timelines. Not resolved
+  here; named so whoever lands second does not invent a duplicate.
+- **No OptionsWindow retirement decision.** Same logic as I-9's own standing rule for the v1
+  theme windows: landing a shell room is separate from and earlier than retiring the v1 surface
+  it replaces. `OptionsWindow` keeps working, unrenamed, until whatever PR actually retires it
+  says so.
+- **The player door, `v1.99.19`, Play Console, any tag/publish. `#208`/`#261`/`#262`.**
+- **The gap fix in §4 is scoped narrowly to what already shipped** (Quests, World `misc`) — it
+  does not pre-populate rows for the seven cards Surface A has not cut yet; each future cut adds
+  its own row, same as `AbsorbedTitles` already requires for a fold.
+
+---
+
+- **Already shipped (checked on tip `1baf0122`):** eight-card widget (post-#330); `AlertSurface`/
+  `AlertTab` presentation logic (built, unconsumed); `ShellPages.Settings`/`BelowTheGap` (room
+  exists, not `Landed`); `ShellTerminologyTests.Ban` (eight rows, enforced for landed rooms);
+  `OverlaySections.AbsorbedTitles`/`AbsorbedNote` (the fold mechanism this gap ruling explicitly
+  does NOT reuse, and says why).
+- **Checked:** `OptionsWindow.xaml` in full (all five tab panels, line by line); `OptionsWindow
+  .xaml.cs` construction block and `SelectTab`; `OptionsViewModel.cs` in full; `AlertSurface.cs`
+  in full; `ShellPages.cs` in full; `ShellTerminologyTests.cs` (`Ban` table, doc comment,
+  scope-exemption comment for v1/`OptionsWindow`) in full; `docs/BEVEL-v2-staging-critique.md`
+  §4 table in full; grepped `OptionsWindow.xaml`/`OptionsViewModel.cs` for every §4 ban pattern;
+  `FABLE.md` I-11 and I-8's SA-4 settings names; `HELM-FEEDBACK.md` #330 and #329 signs.
+- **Not checked this run:** `OptionsCardsView.cs`'s `BuildMiniStats`/`BuildBreakouts` bodies in
+  full (cited by B3 already; not re-read line by line — no new claim made about their internals
+  beyond what B3 already verified); whether any *other* WPF surface besides `OptionsWindow`
+  strings the same banned vocabulary into player-facing text outside the shell (out of scope —
+  the ban's own doc comment says v1 surfaces are excluded until their room lands); the running
+  app (docs-only, nothing here is screenshot-able — no implementation exists yet).
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### HUD Edit mode / Surface A — the long pole's first pre-design (Bevel, 2026-09-05)
 
 **Priority:** `approved` (pre-design, last-look ask; unlocks Fable's F2 decomposition per K10)
