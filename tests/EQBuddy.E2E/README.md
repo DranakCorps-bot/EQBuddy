@@ -31,6 +31,35 @@ profile; tests run sequentially (one app at a time) and kill + clean up on teard
 Windows session is required — a `windows-latest` runner has one, which is what the
 un-gating rests on.
 
+*"Sequentially" was a claim about intent until 2026-09-05.* Three of the five classes
+carried `[Collection("e2e")]`; `ShellHostTests` launches a real app and carried nothing, so
+xUnit gave it a collection of its own and ran it abreast of the others — trap 57's shape.
+`AssemblyInfo.cs` now says it once, for the assembly, because what is shared is the desktop
+and not a list of class names.
+
+## It takes the screen, and so does `scripts/shoot.ps1`
+
+The first `Launch()` opens `%TEMP%\eqbuddy-screen.lock` — the same file the screenshot
+harness opens, with the same share mode — and holds it until the test host exits. **Both
+harnesses drive always-on-top windows on one desktop and both find their target by title**,
+so a run that starts while the other is up closes that job's fixture app mid-settle, and
+the failure surfaces as whichever row or test happened to be on screen (`CLAUDE.md` trap
+61). The lock makes them mutually exclusive.
+
+It **refuses rather than waits**, matching `shoot.ps1`: a batch is ~45 minutes, and a
+silent block that long is worse than a message naming the holder's pid.
+
+```
+Another screen job holds C:\...\Temp\eqbuddy-screen.lock — pid 40080 | 2026-09-05T17:08:44 |
+C:\...\worktrees\claude-sa2-hud-chip-row-20260905. tests/EQBuddy.E2E and scripts/shoot.ps1
+own the desktop exclusively (FABLE.md §4) …
+```
+
+Wait for the holder, or set `EQBUDDY_SCREEN_FORCE=1` if you know it is gone — the
+counterpart of `shoot.ps1 -Force`. It cannot go stale: the handle dies with the process,
+so there is no path where a crashed run leaves the desktop claimed. `ScreenLockTests`
+covers the contract and launches nothing.
+
 `AppHarness.Launch` sets **`EQBUDDY_SHELL=1` by default** — the owner's standing order
 while E-3 is being built: a suite run must not pop a bare v1 widget on the monitor the
 game is on. A test that wants a room passes an address (`ShellHostTests.OpenOn`); a test

@@ -1727,6 +1727,21 @@ Read this list before touching the areas it names. Every entry cost a release.
     one failure end the run *there*, leaving every later row unreachable — which is trap 53's
     real cost, six dark days in which each session re-shot one image, got a picture and moved
     on. The run still FAILS (a stale title must); it now names every failing row in one pass.
+    → **AND THE GUARD WAS ONE-SIDED FOR A DAY, WHICH IS THE HALF WORTH REMEMBERING.**
+    `shoot.ps1` took the lock; `tests/EQBuddy.E2E` launched the same exe, on the same
+    desktop, and took nothing — so the second guard above (refuse over a `bin\Release` app)
+    was standing in for a lock the other party never took, and it can only see this suite
+    once its app is already UP. **A mutex only one participant acquires is a convention with
+    extra steps.** `AppHarness.Launch` now takes the same file, with the same share mode, for
+    the whole test-host run — the mirror of a batch holding it — and refuses the same way.
+    Two things fell out of building it that a regex-only check would have missed: the
+    rendezvous is between C# and PowerShell, so `ScreenLockTests` runs a real PowerShell
+    holder against it rather than only asserting that both files still *say* the same thing;
+    and the suite had never actually been the "one app at a time" its README claimed —
+    `ShellHostTests` launches a real always-on-top app and carried no `[Collection]`, so
+    xUnit gave it one of its own and ran it in parallel with the others. That is **trap 57
+    exactly**, found by asking what the lock would be worth if the holder ran two, and fixed
+    the way that trap says: `[assembly: CollectionBehavior(DisableTestParallelization = true)]`.
 
 ## Tooling notes that cost time when ignored
 
@@ -1800,6 +1815,16 @@ EQBuddy is already running out of a `bin\Release` / `bin\Debug` path — which i
 row* of each other's batch and both failures read as a defect in whatever was being reviewed
 (trap 61). `-Force` overrides the refusal; nothing overrides the rule that another harness's
 fixture app is never stood down.
+
+**And `tests/EQBuddy.E2E` takes the SAME lock, as of 2026-09-05.** It launches the same exe onto
+the same desktop, so the mutex is only a mutex if both parties acquire it: `AppHarness.Launch`
+opens `%TEMP%\eqbuddy-screen.lock` on the first launch and holds it for the whole test-host run
+(the mirror of a batch holding it), refusing with the holder's pid rather than waiting.
+`EQBUDDY_SCREEN_FORCE=1` is that side's `-Force`. **So the two are now mutually exclusive: start
+one while the other is up and the second one refuses, immediately and by name, instead of
+closing the first one's window mid-shot.** Held by `ScreenLockTests`, which drives a real
+PowerShell holder against the C# side — the two halves agree on a filename and a share mode and
+neither has a compiler that can see the other.
 
 **`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe` — and since E-2c it is
 **the only capture surface in the repo.** There used to be a second one: the Linux/macOS
