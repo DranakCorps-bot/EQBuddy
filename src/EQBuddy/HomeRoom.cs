@@ -144,11 +144,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// (<c>ReadinessAsksForTheDumpsThatAreMissingAndStopsAskingForTheOneThatLanded</c>);
     /// an assertion that only checked "three rows appear" would have passed forever.
     /// </summary>
-    private (string Server, string Character) Who()
-    {
-        var (character, server) = _main.Identity;
-        return (Server: server, Character: character);
-    }
+    private (string Server, string Character) Who() => ShellRoomIdentity.Of(_main);
 
     public void Render(StatsSnapshot s)
     {
@@ -203,6 +199,15 @@ internal sealed class HomeRoom : Grid, IShellRoom
         _empty = HomeReadout.Identity(identity) == IdentityState.NoCharacter;
         if (_empty)
         {
+            // **INSIDE the scroller here, where the other five rooms make it a sibling of
+            // their page, and the difference is content rather than centring.** Home has
+            // no tab strip to collapse — the four blocks ARE the room — so the scroller is
+            // the whole page, and leaving the empty inside it keeps the explanation
+            // reachable on a window too short to hold it. It still centres: a ScrollViewer
+            // ARRANGES content smaller than its viewport at the viewport's size, so the
+            // wrapper's VerticalAlignment.Center has real slack (measured, not assumed —
+            // the same probe that found `ContentControl`'s alignment defaults are not what
+            // takes a room's cell away).
             _scroll.Content = RoomEmptyState.Build(
                 HomeReadout.IdentityHeadline(identity), HomeReadout.EmptyIdentity);
             return;

@@ -103,7 +103,15 @@
                  state and only one of them is ever wired (trap 15). Scrolling belongs to
                  the room, which gets a bounded * cell to overflow inside (trap 36 is
                  about a child scroller measured with INFINITE height; this one is not). -->
-            <Grid Grid.Column="1">
+            <!-- NAMED so the dump can say the room got the WHOLE cell — see
+                 ShellWindow.RoomFills. Nothing else reads it. Measured, not assumed: a
+                 bare ContentControl's HorizontalContentAlignment/VerticalContentAlignment
+                 default to Left/Top, and adding Stretch here changes NOTHING, because the
+                 default template's ContentPresenter does not alias them. What DOES take the
+                 cell away is an alignment or a size on the host or on this Grid, and that
+                 is what shellRoomFills is watching for: it is the precondition every
+                 room-level empty state centres inside (RoomEmptyState). -->
+            <Grid x:Name="RoomCell" Grid.Column="1">
                 <ContentControl x:Name="RoomHost"/>
 
                 <!-- The Ctrl+K palette, drawn OVER the room rather than replacing it —

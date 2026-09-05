@@ -510,6 +510,31 @@ public partial class ShellWindow : Window, IFollowingSurface
     /// whole contract is to describe one, and every E2E wait on it would then have to get
     /// lucky. <c>shellRooms</c> says how many have been built, so "the room I asked for is
     /// not the one reporting" is answerable rather than inferred.</summary>
+    /// <summary>
+    /// Whether the room on screen is as tall and as wide as the CELL the shell set aside
+    /// for it.
+    ///
+    /// **Against <c>RoomCell</c> and not against <c>RoomHost</c>, and the difference is the
+    /// whole value of the fact.** A room compared to its own <c>ContentControl</c> can never
+    /// disagree with it — the host shrinks onto its content, so the two match at 100×600 as
+    /// contentedly as at 800×600 and the answer is 1 forever. That is a guard that cannot
+    /// fail, which reads as coverage and is not (trap 34, and trap 39's vacuous equality).
+    /// Measured before it was written: with <c>HorizontalAlignment.Left</c> on the host, the
+    /// room-vs-host form still says 1 and this form says 0.
+    ///
+    /// Answered here rather than by a room, because the rail's width and the title row's
+    /// height are the host's arithmetic — the same reason <see cref="ApplyLayout"/> pushes
+    /// the width answer down instead of letting a room measure itself (trap 33).
+    ///
+    /// A one-unit tolerance: layout rounding under a non-integer DPI scale would otherwise
+    /// make this a test about the monitor rather than about the layout.
+    /// </summary>
+    private bool RoomFills() =>
+        RoomHost.Content is FrameworkElement room
+        && RoomCell.ActualHeight > 0
+        && Math.Abs(room.ActualHeight - RoomCell.ActualHeight) <= 1
+        && Math.Abs(room.ActualWidth - RoomCell.ActualWidth) <= 1;
+
     public string DebugFacts() =>
         $"shellPage={ShellPages.Key(_page)} " +
         $"shellRail={_rows.Count} " +
@@ -529,6 +554,16 @@ public partial class ShellWindow : Window, IFollowingSurface
         // so what gets asserted is the relationship (a desk wider than its primary puts
         // the shell off the primary), never a number off the monitor it was written on.
         $"shellSecondary={(_onSecondary ? 1 : 0)} " +
+        // **THE ROOM FILLS ITS CELL — the precondition every room-level empty state is
+        // built on, and the one thing a screenshot cannot tell you.** A room-level empty
+        // centres with VerticalAlignment.Center, which centres inside the slack its parent
+        // gives it; a room that had been sized down to its own content would have none, and
+        // the explanation would render against the top-left corner — the page-failed-to-load
+        // reading the signed ruling exists to prevent. It holds today; this is what says so
+        // the day somebody puts an alignment, a Margin or a size on the host or its cell.
+        // Reported as a relationship, so it is true on a 1024×768 hosted runner as well as
+        // on a desk.
+        $"shellRoomFills={(RoomFills() ? 1 : 0)} " +
         $"shellSearch={(SearchBox.IsVisible ? 1 : 0)} " +
         $"shellPalette={(PaletteLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
         (_rooms.TryGetValue(_page, out var shown) ? shown.DebugFacts() : "");

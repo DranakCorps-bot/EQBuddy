@@ -61,6 +61,20 @@ internal sealed class WorldRoom : Grid, IShellRoom
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();
 
+    /// <summary>Everything this room draws when it has something to draw — the tab strip,
+    /// the scrolling body and the pinned "Drop camp marker" row — in their own Grid, so the
+    /// whole page is ONE thing to collapse when the room-level empty takes over.</summary>
+    private readonly Grid _page = new();
+
+    /// <summary>The whole-room empty, built on the first render that needs one and kept
+    /// afterwards. A SIBLING of <see cref="_page"/> rather than something dropped into the
+    /// body, because a whole-room empty has to take the TAB STRIP with it: an empty room
+    /// under a live strip of tabs is four invitations to open something that is not there.
+    /// <c>LiveRoom</c> set this shape and the other three follow it.</summary>
+    private FrameworkElement? _emptyRoom;
+
+    private bool _empty;
+
     private WorldTab _tab = WorldSurface.DefaultInlineTab;
 
     private readonly MapView _map;
@@ -74,9 +88,10 @@ internal sealed class WorldRoom : Grid, IShellRoom
     {
         _main = main;
 
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _page.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        Children.Add(_page);
 
         // WRAPS, and it has to: a horizontal StackPanel measures its children with INFINITE
         // width, so a chip never reaches a boundary to wrap at and the last one is simply
@@ -84,7 +99,7 @@ internal sealed class WorldRoom : Grid, IShellRoom
         // with chips). "Map — Everfrost Peaks" and "Travels — 3 deaths" are tab labels.
         var strip = new WrapPanel { Margin = new Thickness(Tok.SpaceL, Tok.SpaceM, Tok.SpaceL, 0) };
         SetRow(strip, 0);
-        Children.Add(strip);
+        _page.Children.Add(strip);
         _tabs = new EqSegmentedStrip(strip);
 
         var scroll = new ScrollViewer
@@ -94,7 +109,7 @@ internal sealed class WorldRoom : Grid, IShellRoom
             Content = _body,
         };
         SetRow(scroll, 1);
-        Children.Add(scroll);
+        _page.Children.Add(scroll);
 
         _map = main.NewMapView();
         _spawns = main.NewSpawnsView();
@@ -130,7 +145,26 @@ internal sealed class WorldRoom : Grid, IShellRoom
         label.VerticalAlignment = VerticalAlignment.Center;
         row.Children.Add(label);
         SetRow(row, 2);
-        Children.Add(row);
+        _page.Children.Add(row);
+    }
+
+    /// <summary>
+    /// The room-level empty, positioned by the shared wrapper Home built and worded for THIS
+    /// room.
+    ///
+    /// **The "Drop camp marker" button goes with the page it is pinned to, and that is
+    /// safe because of a clause rather than because of luck.** The button works whether or
+    /// not a log has ever been read, so hiding it would be trap 34's shape — an affordance
+    /// removed by something that reads as polish. <c>ShellRoomEmpty.WorldIsEmpty</c> refuses
+    /// to fire on a profile that already has markers, and a unit test fails on that clause;
+    /// a profile with no character AND no markers has nothing to drop a marker relative to,
+    /// since the marker is labelled with the zone the log says you are in.
+    /// </summary>
+    private FrameworkElement AddEmptyRoom()
+    {
+        var built = RoomEmptyState.Build(ShellRoomEmpty.World);
+        Children.Add(built);
+        return built;
     }
 
     public void SetTab(string key)
@@ -142,6 +176,23 @@ internal sealed class WorldRoom : Grid, IShellRoom
 
     public void Render(StatsSnapshot s)
     {
+        // **The whole-room empty, and the only state that gets one.** All four tabs start
+        // from the zone the log says you are standing in — including Path, which looks
+        // character-independent and is not (`TravelView` plans FROM the current zone and
+        // says so when there is none). With no zone, no travel history and no markers there
+        // is nothing for any of them to be about; the clauses are in `ShellRoomEmpty` where
+        // a unit test can reach them.
+        _empty = ShellRoomEmpty.WorldIsEmpty(ShellRoomIdentity.Of(_main), s);
+        if (_empty)
+        {
+            _emptyRoom ??= AddEmptyRoom();
+            _emptyRoom.Visibility = Visibility.Visible;
+            _page.Visibility = Visibility.Collapsed;
+            return;
+        }
+        if (_emptyRoom is not null) _emptyRoom.Visibility = Visibility.Collapsed;
+        _page.Visibility = Visibility.Visible;
+
         BuildTabs(s);
         _body.Content = _tab switch
         {
@@ -214,6 +265,10 @@ internal sealed class WorldRoom : Grid, IShellRoom
     /// seventh one — trap 30, again.
     /// </summary>
     public string DebugFacts() =>
+        // Zero on any profile with a character. A predicate that fired while the room had
+        // content would collapse the tab strip, the four tabs and the "Drop camp marker"
+        // row with them.
+        $"shellWorldEmpty={(_empty ? 1 : 0)} " +
         $"shellWorldTab={WorldSurface.KeyFor(_tab)} " +
         $"shellWorldTabs={_tabs.Count} " +
         ShellDumpFacts.Prefixed("shellWorld", _map.DebugFacts()) + " " +
