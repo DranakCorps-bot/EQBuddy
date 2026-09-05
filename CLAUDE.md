@@ -545,6 +545,18 @@ a guess, and the guess is discovered three commits later.
      the exception that proves it — it has a row again because David made it a card again
      in 1.99, not because the fold left it one (and see trap 55 for what it cost when a
      fold went on naming it anyway).
+
+     **A SUBTRACTED card is the other half, and it takes a SECOND list.** A cut leaves no
+     surviving card, so `AbsorbedTitles` cannot key it at all — which is how the Quests and
+     World cuts each shipped a knowing gap on that screen, two names then four, recorded in
+     `OverlaySections.Catalog`'s own comments at ship time. `OverlaySections.Retired` is the
+     answer, keyed by the **OLD TITLE**, rendered under the card rows as *"No longer on the
+     widget"* in the same "X is now Y" form this rule already requires of a What's-new entry,
+     and naming the CONTEXT-MENU row that opens the surface — a hotkey is not a door
+     (trap 59), and an Evolved room is not one either while `EQBUDDY_SHELL` is the only way
+     in. Helm signed it 2026-09-05 on Bevel's Options-gap ruling (I-11 §4). **Every future
+     HUD cut adds its row**, exactly as a fold owes one to `AbsorbedTitles`;
+     `RetiredCardsTests` fails a row that names a card which is still live.
   2. **A merged card keeps the slot its parts had.**
   3. **Every card header's ↗ pops the surface out** into its own window.
 

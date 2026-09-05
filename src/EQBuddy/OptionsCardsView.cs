@@ -95,6 +95,52 @@ internal sealed class OptionsCardsView
                 _cards.Children.Add(note);
             }
         }
+
+        BuildRetired();
+    }
+
+    /// <summary>
+    /// "No longer on the widget" — the cards that LEFT, under the list of the ones that
+    /// stayed.
+    ///
+    /// The note above hangs a fold's old names under the card that absorbed them, and a
+    /// SUBTRACTION has no such card: Quests and World did not merge into anything. Six names
+    /// a player might hunt for had no row on this screen at all — recorded as a known cost
+    /// when each cut shipped, ruled on by Bevel (I-11 §4) and Helm-signed 2026-09-05.
+    ///
+    /// It sits inside the same panel as the card rows, deliberately: this is the list a
+    /// player is reading when they discover the row they came for is missing, and an answer
+    /// one heading below where the question is asked is an answer they will find.
+    /// </summary>
+    private void BuildRetired()
+    {
+        if (OverlaySections.Retired.Count == 0) return;
+
+        var heading = new TextBlock
+        {
+            Text = OverlaySections.RetiredHeading,
+            FontSize = 12, FontWeight = FontWeights.SemiBold,
+            Margin = new Thickness(0, 12, 0, 2),
+        };
+        heading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        _cards.Children.Add(heading);
+        _cards.Children.Add(Dim(OverlaySections.RetiredBlurb, top: 0));
+
+        foreach (var gone in OverlaySections.Retired)
+            _cards.Children.Add(Dim(gone.Line, top: 2));
+    }
+
+    private static TextBlock Dim(string text, double top)
+    {
+        var block = new TextBlock
+        {
+            Text = text,
+            FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Metadata).Size,
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, top, 0, 0),
+        };
+        block.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+        return block;
     }
 
     private void Apply()

@@ -17,52 +17,26 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
-## 2026-09-05 (the AppHarness screen lock — trap 61's other half)
+## 2026-09-05 (Options gap — "No longer on the widget")
 
-- **Closed the one-sided guard in the HARNESS rather than leaving it to kick order.**
-  `scripts/shoot.ps1` took a `%TEMP%\eqbuddy-screen.lock` earlier today; `tests/EQBuddy.E2E`
-  launches the same exe onto the same desktop and took nothing, so the interlock only bound one
-  of the two parties. The other way: rely on `shoot.ps1`'s stand-in guard (refuse when an
-  EQBuddy runs out of a `bin\Release` path). Declined — that check can only see this suite once
-  its app is already UP, which leaves the whole window between `dotnet test` starting and the
-  first `Process.Start` uncovered, and a mutex only one participant acquires is a convention
-  with extra steps. `tests/EQBuddy.E2E/ScreenLock.cs`, `AppHarness.Launch`.
-- **Held for the whole TEST-HOST RUN, not per harness.** The prompt's letter was "for the launch
-  lifetime"; the mirror of `shoot.ps1` holding it for a whole batch is holding it for a whole
-  run. Releasing between tests would leave a gap a shoot batch could take, and the suite would
-  then fail at whichever test came next — the same "random row fails" pathology, arriving from
-  the other direction. It cannot go stale either way: the handle dies with the process.
-- **REFUSES rather than waits, matching `shoot.ps1`** and its `DECISIONS` line from the same
-  day. `EQBUDDY_SCREEN_FORCE=1` is this side's `-Force`. The other way: block until free.
-  Declined for the same reason — a silent 45-minute block is worse than a message naming the
-  holder's pid.
-- **No symmetric "an EQBuddy is running from a build output" check on this side.** That guard
-  exists in `shoot.ps1` *because* E2E took no lock; from here it would refuse on our own
-  straggler — a previous test's app in the seconds between `Kill` and the OS reaping it — and
-  turn a tidy teardown race into a red suite. The lock covers the collision it stood in for.
-- **The contract is duplicated in C# rather than lifted into `src/`.** The other way: a shared
-  helper both halves call. Declined — the other half is PowerShell and could not call it anyway,
-  and it is thirty lines describing a file path and a share mode; a shipping assembly should not
-  grow a test-harness concern to save that. The duplication is held by `ScreenLockTests`
-  instead, which reads `shoot.ps1`'s literals AND spawns a real PowerShell holder against the
-  C# side — the two regex rows prove the files still *say* the same thing, only the spawned
-  holder proves the operating system agrees.
-- **Serialized the E2E assembly while here, which was NOT in the ask.** `ShellHostTests` launches
-  a real always-on-top app and carried no `[Collection]`, so xUnit ran it abreast of the other
-  three classes and the README's "one app at a time" had been false since that file was added.
-  It is trap 57 exactly, and its tombstone in `CLAUDE.md` asks for this in advance. The other
-  way: leave it, since the lock is per-process and works regardless. Declined — a lock whose
-  holder puts two always-on-top widgets up at once is a half-truth, and the fix is the
-  assembly-level attribute rather than a fifth `[Collection]` (a hand-kept list stops covering
-  the set the day it grows — trap 30). **Cost, stated because it is the reason this could go the
-  other way: E2E CI wall-clock goes from two collections abreast to one line** — roughly 4
-  minutes becoming 6-7 on a two-core runner. Cheap to veto; `tests/EQBuddy.E2E/AssemblyInfo.cs`.
-- **The launching tests were NOT re-run locally, and the lock is why.** SA-2 held the real screen
-  lock for the whole of this work (`pid 40080 … claude-sa2-hud-chip-row-20260905`, read live off
-  the file), so running them would have been the collision this change exists to prevent. The
-  other way: `EQBUDDY_SCREEN_FORCE=1`. Declined on sight. CI `e2e-windows` answers for the 69
-  launching tests; the 9 that do not launch were run here and are green, and the refusal path
-  was proven cross-process against a real PowerShell holder.
+- **The list names the CONTEXT-MENU row and says nothing about the Evolved rooms.** Bevel's
+  ruling said "where it lives now"; both cuts live in two places, a v1 window and a shell room.
+  The other way: name the room too, as `WhatsNew`'s cut entries already do. Declined —
+  `EQBUDDY_SHELL` is the only way into a room today, so naming one would point a hunting player
+  at a door they do not have, which is the mirror of the defect this list exists to fix. The
+  menu header is a field (`RetiredCard.MenuHeader`) rather than prose, so `RetiredCardsTests`
+  can check the row still exists in `MainWindow.xaml`. `OptionsViewModel.cs`, trap 59.
+- **It renders inside the card panel, not as a fourth block on the tab.** The other way: its own
+  heading below the mini dashboard, beside "Breakout windows". Declined — this is the answer to
+  a question asked while reading the card list, and an answer one heading below the question is
+  one a player finds (trap 44's "notifications go where the eye lands", from the other end).
+  `OptionsCardsView.BuildRetired`.
+- **Amended the unreleased 2.0.0 What's-new rather than adding a `v1.99.19` note.** The World
+  entry said Options "no longer names Travels & Deaths, Zone map, Travel route or Spawn timers
+  anywhere", which this change makes false; the entry is not tagged, so it is editable and the
+  guard agrees. The other way: leave it and let the release ship a sentence contradicting the
+  screen. Declined — a What's-new entry that is false on arrival is the one thing that rule has
+  never allowed. `src/EQBuddy.Core/Data/WhatsNew.json`.
 
 ## 2026-09-05 (T1 — the `shoot.ps1` intermittent full-batch look)
 
