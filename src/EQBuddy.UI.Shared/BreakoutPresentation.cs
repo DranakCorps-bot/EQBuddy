@@ -68,23 +68,58 @@ public static class BreakoutPresentation
     /// the pet damage window (relayed by David, 2026-08-20).
     ///
     /// Watch is the null: it opens for any 📌-pinned rule, which is a thing the player
-    /// has to pick rather than a switch Options can flip for them.
+    /// has to pick rather than a switch Options can flip for them — see
+    /// <see cref="NeedsPinnedRule"/>, which is what tells that null apart from the others.
+    ///
+    /// **Damage, Healing and Progress are null since Surface A / SA-1**, and for a
+    /// different reason again: <c>dps</c>, <c>hps</c> and <c>xp</c> are the always-on HUD
+    /// numbers now, so no star exists to gate them and the Options tick is the whole
+    /// switch. <c>AppSettings.MigratePromotedHudStats</c> is what carries each player's
+    /// old star into <c>DisabledBreakouts</c> before the keys go, so an open window stays
+    /// open and a closed one stays closed.
     /// </summary>
     public static string? StarKey(string kind) => kind switch
     {
-        Damage => "dps",
-        Healing => "hps",
         Pet => "pet",
         Loot => "loot",
-        // The Progress card's star is the xp one — the same key gates its mini chip.
-        Progress => "xp",
-        // "buffs" renders no mini chip at all (MiniStatOrder skips it), so this key
-        // exists only to gate the window. It is the proof that the two concepts are
+        // "buffs" renders no HUD cell at all (MiniBarPresentation.Order skips it), so this
+        // key exists only to gate the window. It is the proof that the two concepts are
         // separable — and the reason unticking must not strip a star, since for every
-        // OTHER kind the same key is also a cell in the minimised pill.
+        // OTHER kind that still has one the same key is also a cell on the HUD.
         Buffs => "buffs",
         _ => null,
     };
+
+    /// <summary>Watch, and only Watch: the one kind whose window needs something Options
+    /// cannot tick for you.
+    ///
+    /// It exists because a null <see cref="StarKey"/> used to MEAN "this is Watch" — three
+    /// kinds joined that null in SA-1 and the inference stopped holding. Reading it as
+    /// Watch would have told a Damage row that it opens for a pinned rule, which is the
+    /// "tick box that lies" this screen already had to fix once.</summary>
+    public static bool NeedsPinnedRule(string kind) => kind == Watch;
+
+    /// <summary>The row's hover text on Options → Cards &amp; windows, keyed on the kind
+    /// rather than inferred from whether a star exists (see
+    /// <see cref="NeedsPinnedRule"/>).</summary>
+    public static string Note(string kind) => kind switch
+    {
+        Watch => WatchNote,
+        Damage or Healing => PromotedNote,
+        _ => StarNote,
+    };
+
+    /// <summary>For a kind that still has a ★. Says the second thing the tick does, since
+    /// it is doing it on the player's behalf.</summary>
+    public const string StarNote =
+        "Opens while the widget is minimised. Ticking this also stars the stat, so it "
+        + "shows on the HUD too.";
+
+    /// <summary>For Damage and Healing, whose stats are on the HUD whatever this says.
+    /// Naming the removed toggle rather than only the replacement is the #233 rule.</summary>
+    public const string PromotedNote =
+        "Opens while the widget is minimised. DPS and HPS are always-on HUD numbers now, "
+        + "so there is no star to set and this tick is the whole switch.";
 
     /// <summary>The kind for a <c>BreakoutKind</c> member, whichever UI's enum it came
     /// from. The two enums disagree about membership but not about spelling.</summary>
@@ -99,9 +134,9 @@ public static class BreakoutPresentation
     /// true of every row and therefore explained none of them.</summary>
     public const string Blurb =
         "Floating windows that open while the widget is minimised. Ticking one turns it "
-        + "on — it also stars that stat, so it appears in the mini pill too. Untick to "
-        + "stop the window opening; the star stays, so anything you keep in the pill "
-        + "stays put.";
+        + "on — where the stat still has a star, it sets that too, so it appears on the "
+        + "HUD as well. Untick to stop the window opening; the star stays, so anything "
+        + "you keep on the HUD stays put.";
 
     /// <summary>The Watch row's extra sentence: the one window a tick cannot finish
     /// switching on.</summary>

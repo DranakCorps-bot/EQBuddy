@@ -116,26 +116,30 @@ public partial class ProgressWindow : Window, IFollowingSurface
     }
 
     /// <summary>
-    /// The three mini-dashboard stars the Progress, Money and Motes cards used to carry.
+    /// The mini-dashboard stars the Progress, Money and Motes cards used to carry.
     ///
-    /// They are the ONLY writers <c>MiniStats</c> has for "xp", "money" and "motes", so
-    /// folding those cards away without rehoming them would have left three settings that
-    /// only readers touch — the exact signature CLAUDE.md trap 20 names, and the one that
-    /// produced #204/#209, #210 and #212. Here each finally gets a WORD beside it, which
-    /// is more than the widget's bare star ever offered.
+    /// They are the ONLY writers <c>MiniStats</c> has for "money" and "motes", so folding
+    /// those cards away without rehoming them would have left settings that only readers
+    /// touch — the exact signature CLAUDE.md trap 20 names, and the one that produced
+    /// #204/#209, #210 and #212. Here each finally gets a WORD beside it, which is more
+    /// than the widget's bare star ever offered.
+    ///
+    /// **"xp" left this row in Surface A / SA-1** and took nothing with it: XP%/hr is the
+    /// collapsed HUD's third number now, always on, so there is no toggle left to rehome.
+    /// Its two siblings stay exactly as they were — the promotion was of one key, not of
+    /// this row.
     /// </summary>
     private void BuildMiniStars()
     {
-        var intro = DesignSystem.Text(Role.Caption, "Show in mini dashboard:");
+        var intro = DesignSystem.Text(Role.Caption, "Show on the HUD:");
         intro.Ink("DimBrush");
         intro.VerticalAlignment = VerticalAlignment.Center;
         MiniRow.Children.Add(intro);
 
         foreach (var (key, label, tip) in new[]
         {
-            ("xp", "XP", "Show XP in the mini dashboard — and, while minimized, open the Progress breakout"),
-            ("money", "Money", "Show money in the mini dashboard"),
-            ("motes", "Motes", "Show motes in the mini dashboard"),
+            ("money", "Money", "Show money on the HUD while the widget is minimized"),
+            ("motes", "Motes", "Show motes on the HUD while the widget is minimized"),
         })
         {
             var star = new ToggleButton

@@ -186,7 +186,22 @@ public class ArchitectureTests
         // in Core and UI.Shared.
         //
         // Minimum that fits again: 4100 × 1.1 = 4510 against 4,509 lines.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4100),
+        //
+        // 4100 → 3964 on 2026-09-05 (Surface A / SA-1). **A LIFT again**, and the entry
+        // had ZERO headroom when the pass started — 4,516 against 4,516.6 — which is why
+        // the collapsed HUD bar left rather than being edited in place. `HudBarView.cs`
+        // took the chip builder, the divider trim and the per-tick rebuild; what stayed
+        // is WHEN the bar is on screen, which is the host's (trap 15). It is a VIEW CLASS
+        // and not a `MainWindow.Hud.xaml.cs` partial, because this glob SUMS its matches
+        // on purpose and a partial would have bought nothing.
+        //
+        // Bumped down to the MINIMUM that fits the MERGED tree (3964 × 1.1 = 4360
+        // against 4,360 lines), by the same "one line and no more" rule as every entry
+        // above. Cut 2 landed on `main` while this branch was in flight and the two
+        // changes touch different parts of the file, so the number is the one the MERGE
+        // produces rather than either branch's own — which is also why it is set once,
+        // here, instead of per commit.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3964),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

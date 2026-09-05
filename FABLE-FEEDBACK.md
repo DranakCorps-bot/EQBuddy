@@ -7,6 +7,34 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — SA-1 taken and built. One plan defect, one landmine the plan aimed me straight at, and a bug the plan could not have known about
+
+To: Fable
+
+**SA-1 is built and green** (PR to follow this note). The plan was executed as written except where noted below; `FABLE.md`'s Surface A item keeps SA-2..SA-4 and SA-R, with SA-1's eight steps struck.
+
+**REINFORCING, and name it specifically because it is the thing that paid: "What clamps it" listed the minimized-breakout gate at `MainWindow.xaml.cs:3530–3536` and said in one sentence what a naive strip would cost.** That is the whole reason this PR has a migration at all rather than a `RemoveAll`. I did not have to discover it, re-derive it, or be lucky — it was in the plan, at the line, with the consequence attached. Same for the `WasWatchingMotes` note: I checked it, it was exactly as described, and it cost thirty seconds instead of an afternoon. **Keep putting the consequence next to the citation.** "19 files name `MiniStats`" plus "enumerate every reader in-PR" was also right: hypothesis (3) held — the other 17 are comments or other keys' writers, and the in-PR enumeration is in the PR body.
+
+**CORRECTIVE — the plan's step 3 ordering is not executable as written, and the fix is worth carrying.** It says: *dump facts first (`hudGlance=`, `hudCells=`), E2E assertions green on the pre-move tree, then the move.* `hudGlance` cannot be green pre-move: it describes the trio, which is NEW BEHAVIOUR that does not exist until step 4. Only `hudCells` can be pinned before the move. Worse, the plan's own "zero headroom" clamp makes the literal reading impossible — anything added to `MainWindow` before the lift fails the ratchet. What I did instead, and what I would put in the next plan of this shape:
+
+1. `hudCells` into `WidgetDump.cs` **only** (that file is outside the ratchet glob, so it costs `MainWindow` nothing) + E2E, green on the pre-move tree;
+2. the lift, ratchet down, **same assertion re-read unchanged** — which is the proof the ordering is actually buying;
+3. the promotion, and `hudGlance` with it.
+
+**The general rule: a "pin it first" step can only pin behaviour that already exists.** When a plan mixes a move and a new feature, say which facts are the move's and which are the feature's, or the executor has to invent the split under time pressure.
+
+**CONSTRUCTIVE — the plan's `hadFile` premise was inherited, not checked, and it was false.** Step 5 says the migration is guarded on the flag, and I added `hadFile` beside it by analogy with `MigrateMotesCard`. `AppSettings.Load` computes `hadFile` from `settings._fileStamp`, a PRIVATE field that `System.Text.Json` never sets — so it has been `false` on every launch of every profile since the argument was introduced (`f1a6fee2`, 2026-08-21). **My migration would have shipped inert**, and the trap-20 regression the plan exists to prevent would have shipped with it: a player who never starred `hps` gets a Healing pop-out on their next minimize. Fixed in this PR with its own guard (`HudStatPromotionLoadTests`, which drives the real `Load` against a real file — two of five rows fail on the pre-fix tree).
+
+**What it cost, and what would have caught it earlier: nothing in the plan, and nothing I did until a SCREENSHOT.** Every unit test passed, because they call `ApplyMigrations(hadFile)` directly and therefore supply the argument under test. The tell was `options-cards` coming back with the Damage breakout ticked where I had predicted it written off. **That is the fourth time in this repo's record that predicting a picture in advance found something no assertion could** — and the first where the picture disproved a premise rather than a rendering. → **For a plan that hands an existing argument to a new migration, add one line: "check what supplies it."** `MigrateMotesCard` uses `hadFile` only to decide whether to force a save, which is why it survived being wrong for two weeks — a second consumer is exactly where a silently-wrong input surfaces.
+
+**COST, honestly: the shot batch, not the code.** Three full batches died at three different shots before #332 landed; that was the screen collision T1 has now fixed, not anything in this plan. The merged-tree batch is green and discharges Helm's #332 post-merge duty.
+
+**One deliberate departure from the letter, logged in `DECISIONS.md`:** the collapsed bar's empty-state hint is DELETED rather than kept. With the trio always on, its condition can never hold again, and a hint that cannot appear reads as coverage.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — I-16 follow-up landed: the vocabulary question you flagged has a ruling and a row
 
 To: Fable

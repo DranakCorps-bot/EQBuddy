@@ -392,9 +392,16 @@
                  reachable ONLY by opening the window a player was complaining about. -->
             <TextBlock Text="Mini dashboard" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
-            <TextBlock Text="Which stats show in the pill while EQBuddy is minimised. Each of these is the same switch as the star on the card header — two views of one setting, not two settings."
+            <TextBlock Text="Which stats show on the HUD while EQBuddy is minimised. Each of these is the same switch as the star on the card header — two views of one setting, not two settings."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
             <WrapPanel x:Name="MiniStatsPanel"/>
+            <!-- WHERE THE THREE MISSING SWITCHES WENT. This screen is where someone looks
+                 when a switch they used to have is gone, and three of them are (SA-1) — the
+                 same reason a folded card's name comes back on the card that absorbed it.
+                 Saying only "the HUD shows XP" would be the #233 complaint: naming the
+                 destination without naming the origin. -->
+            <TextBlock Text="XP, DPS and HPS are not in this list because they are always on the HUD now — the collapsed bar shows your name, your DPS and your XP%/hr whatever you pick here, and the third number becomes HPS while healing is the weight of the last half-minute. Their stars are gone; there is nothing left to switch off."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,4,0,2"/>
 
             <TextBlock Text="Breakout windows" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
@@ -404,10 +411,10 @@
 
             <CheckBox x:Name="DoubleClickChipsCheck" Margin="0,10,0,0"
                       Checked="OnDoubleClickChipsToggled" Unchecked="OnDoubleClickChipsToggled">
-                <TextBlock Text="Double-click a mini-pill chip to open/close its breakout" FontSize="12"
+                <TextBlock Text="Double-click a HUD chip to open/close its breakout" FontSize="12"
                            Foreground="{DynamicResource TextBrush}"/>
             </CheckBox>
-            <TextBlock Text="With this on, double-click the 🎒 Loot, ⚔ dps, ✚ hps, 🐾 pet or 🎯 watch chip to pop its window up or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings it right back."
+            <TextBlock Text="With this on, double-click the 🎒 Loot, 🐾 pet or 🎯 watch chip to pop its window up or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings it right back. The always-on XP number opens the Progress window the same way; Damage and Healing no longer have a chip of their own, so their windows are switched on above."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
 
             <CheckBox x:Name="TargetDropsCheck" Margin="0,12,0,0"

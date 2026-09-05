@@ -1,4 +1,4 @@
-<Window x:Class="EQBuddy.MainWindow"
+﻿<Window x:Class="EQBuddy.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:EQBuddy"
@@ -273,8 +273,12 @@
                         </Grid.ColumnDefinitions>
                         <local:EqCardTitle Icon="Swords" Text="Combat"/>
                         <TextBlock x:Name="CombatHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 dps"/>
-                        <ToggleButton x:Name="StarDps" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="dps" Click="OnStarChanged" ToolTip="Show DPS in mini dashboard"/>
+                        <!-- The dps ★ is gone (Surface A / SA-1): DPS is an always-on
+                             HUD number now, so there is nothing left to toggle. Its column
+                             stays for the pet/procs stars that still live in this header.
+                             AppSettings.MigratePromotedHudStats carried each player's old
+                             star into DisabledBreakouts before the key went, so the Damage
+                             breakout keeps whatever state the ★ was holding for it. -->
                         <!-- Pet damage has no card of its own (it's the fold-out below), but its
                              watch-toggle lives up here with the other stars per David: one place
                              to say what you watch when minimized. The 🐾 tells the two stars apart. -->
@@ -412,8 +416,9 @@
                         </Grid.ColumnDefinitions>
                         <local:EqCardTitle Icon="Heal" Text="Healing"/>
                         <TextBlock x:Name="HealingHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 hps"/>
-                        <ToggleButton x:Name="StarHps" Grid.Column="2" Style="{StaticResource StarToggle}"
-                                      Tag="hps" Click="OnStarChanged" ToolTip="Show HPS in mini dashboard"/>
+                        <!-- The hps ★ is gone with the dps one above (SA-1): HPS takes
+                             the collapsed HUD's third slot whenever healing is the weight
+                             of the last half-minute, so it is on screen without a toggle. -->
                     </Grid>
                 </Expander.Header>
                 <StackPanel>

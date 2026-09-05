@@ -30,16 +30,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private DateTime _lastCheckpoint = DateTime.MinValue;
     private readonly DispatcherTimer _uiTimer;
     private readonly DispatcherTimer _companionPump;
-    // Window-level double-click state for the mini-bar breakout chips (see MiniChip): the
-    // chips are rebuilt every tick, so per-element ClickCount can't be trusted. Threshold
-    // reads the user's own Windows double-click speed; add a floor for a stray zero.
-    private string? _lastChipClickKey;
-    private DateTime _lastChipClickAt = DateTime.MinValue;
-    private static readonly TimeSpan DoubleClickWindow =
-        TimeSpan.FromMilliseconds(Math.Max(200, GetDoubleClickTime()));
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern uint GetDoubleClickTime();
     private DateTime _lastCharScan = DateTime.MinValue;
     private DateTime _lastJanitorRun = DateTime.MinValue;
     private DateTime _lastUpdateCheck = DateTime.MinValue;
@@ -93,6 +83,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal WatchCardView _watch = null!;
     // The widget's own TravelsView was here (World PR 1) and went with the World card on
     // 2026-09-05 (cut 2). NewTravelsView() below is untouched: two hosts, two instances.
+    // The collapsed HUD bar's contents (SA-1). Same shape as _watch: what it cannot
+    // answer from a snapshot — the cue map, and the two windows a chip double-click
+    // opens — is handed in, and it is not a card so it takes no ICardContext.
+    internal HudBarView _hudBar = null!;
 
     // ---- ICardContext ----
     //
@@ -135,6 +129,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
+        // The collapsed HUD bar (SA-1). It fills a panel this window owns and shows or
+        // hides nothing — WHEN the bar is on screen stays here (trap 15).
+        _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
+            ToggleBreakout, () => ShowProgressWindow());
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -2537,7 +2535,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
 
         if (MiniRoot.Visibility == Visibility.Visible)
-            UpdateMiniChips(s);
+            _hudBar.Render(s, _stats.CharacterName);
         // BEFORE the breakouts and the focus-hide gate: loss transitions must be
         // detected every tick, whatever's visible — a hidden Buffs card must not
         // mean a blind history (#120 stage 3) — and the Buffs breakout should show
@@ -3431,8 +3429,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
         yield return ("motes", StarMotes);
-        yield return ("dps", StarDps);
-        yield return ("hps", StarHps);
+        // "dps" and "hps" left this list in Surface A / SA-1: they are the always-on
+        // collapsed HUD numbers now, and a promotion removes the toggle. Their stars are
+        // gone from the Combat and Healing headers with them; what carried each player's
+        // stored state across is AppSettings.MigratePromotedHudStats, not this method.
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
         yield return ("buffs", StarBuffs);
@@ -3494,10 +3494,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         HeightGrip.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
         _settings.Save();
         var snap = _stats.Snapshot();
-        if (mini) UpdateMiniChips(snap);
+        if (mini) _hudBar.Render(snap, _stats.CharacterName);
         UpdateBreakouts(snap);
         // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
-        // ~87, a starred one 300+), so anchoring before UpdateMiniChips computes
+        // ~87, a starred one 300+), so anchoring before the bar renders computes
         // against a width the player never sees — the first harness run did exactly
         // that and walked the window 230px right. UpdateLayout is what makes the
         // SizeToContent re-measure land before Left is read; a deferred layout would
@@ -3519,16 +3519,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
+            // Which star opens which window comes from UI.Shared, not from a switch here.
+            // It was a switch here, and Options grew a tick box for the same question that
+            // could not answer it — so a player ticking "Pet" changed nothing and went to
+            // ask on Reddit. Since SA-1 the two halves are separate conditions rather than
+            // one ternary: Damage and Healing have no star (dps/hps are always-on HUD
+            // numbers), so "no star" and "needs a pinned rule" stopped being one case.
+            var name = BreakoutPresentation.Kind(kind);
             var want = _settings.Minimized && !_hiddenForFocus &&
                        !_settings.DisabledBreakouts.Contains(kind.ToString())
-                       // Which star opens which window comes from UI.Shared, not from a
-                       // switch here. It was a switch here, and Options grew a tick box
-                       // for the same question that could not answer it — so a player
-                       // ticking "Pet" changed nothing and went to ask on Reddit.
-                       && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(kind)) is { } star
-                           ? _settings.MiniStats.Contains(star)
-                           : _settings.PinWatchChips
-                             && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
+                       && (BreakoutPresentation.StarKey(name) is not { } star
+                           || _settings.MiniStats.Contains(star))
+                       && (!BreakoutPresentation.NeedsPinnedRule(name)
+                           || (_settings.PinWatchChips
+                               && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned)));
             _breakouts.TryGetValue(kind, out var w);
             if (want)
             {
@@ -3577,166 +3581,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (_latestSnapshot is { } snap) UpdateBreakouts(snap);
     }
 
-    /// <summary>One mini-dashboard stat (2026-08-11, take two — David: no ovals):
-    /// glyph + semibold tabular value as clean text, separated from its neighbor by
-    /// a thin hairline divider rather than any chip chrome. A counting-down watch
-    /// rule still announces itself by color alone. A chip whose stat has a breakout
-    /// window takes a double-click to toggle it.</summary>
-    /// <summary>
-    /// <paramref name="onDoubleClick"/> is what the gesture DOES, and it is pluggable because
-    /// not every chip toggles a breakout any more: the xp chip opens the Progress WINDOW, which
-    /// has the tabs (Bevel's fold, Helm-signed — "reuse existing theme window on current tab …
-    /// retire tab-less 272×135 float"). The gesture is keyed on <paramref name="clickKey"/>
-    /// rather than on a BreakoutKind so a chip with no breakout can still own a double-click.
-    /// </summary>
-    private StackPanel MiniChip(string iconName, string value, string valueBrush, string? edgeBrush = null,
-        BreakoutKind? breakout = null, string? clickKey = null, Action? onDoubleClick = null,
-        string? doubleClickHint = null)
-    {
-        var panel = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Margin = new Thickness(0, 0, Tok.SpaceL, 0),
-        };
-        var key = clickKey ?? breakout?.ToString();
-        var act = onDoubleClick ?? (breakout is { } bk ? () => ToggleBreakout(bk) : null);
-        if (key is not null && act is not null && _settings.DoubleClickChipsToggleBreakouts)
-        {
-            // Transparent (not null) so the gaps between glyph and value are hit-testable
-            // too. Two things conspired against WPF's own double-click here, so we detect it
-            // ourselves at the window level:
-            //   1. The bar's OnDrag starts a modal window DragMove on the FIRST left-click
-            //      anywhere on the bar; that capture disrupted the click sequence and the
-            //      cursor flickered into drag mode (the tell). Eating the click stops it.
-            //   2. UpdateMiniChips rebuilds these panels every 1s tick, so a rebuild landing
-            //      between the two clicks left the second click on a brand-new element and
-            //      reset ClickCount to 1 — an intermittent miss.
-            // Keying the double-click on (kind, time) on the window survives both: the panel
-            // can be replaced mid-gesture and the second click still lands. The widget is
-            // still dragged from any non-chip part of the bar; when the opt-in is off the
-            // chip stays inert and a double-click expands the widget as before.
-            panel.Background = System.Windows.Media.Brushes.Transparent;
-            panel.Cursor = System.Windows.Input.Cursors.Hand;
-            panel.ToolTip = doubleClickHint ?? $"Double-click to show or hide the {key} breakout";
-            panel.MouseLeftButtonDown += (_, e) =>
-            {
-                e.Handled = true;
-                var now = DateTime.Now;
-                if (_lastChipClickKey == key && now - _lastChipClickAt <= DoubleClickWindow)
-                {
-                    _lastChipClickKey = null;   // consume, so a third click starts fresh
-                    act();
-                }
-                else
-                {
-                    _lastChipClickKey = key;
-                    _lastChipClickAt = now;
-                }
-            };
-        }
-        // A vector, not a glyph (#148, #166): the minimized bar is on screen the whole
-        // time a player farms, and it is exactly where a box instead of a skull would go
-        // unnoticed on a Wine prefix.
-        var icon = DesignSystem.Icon(iconName, "AccentBrush", size: UI.Shared.DesignTokens.IconInline);
-        icon.Opacity = 0.9;
-        icon.Margin = new Thickness(0, 0, UI.Shared.DesignTokens.SpaceS, 0);
-        panel.Children.Add(icon);
-        var v = new TextBlock
-        {
-            Text = value, FontSize = Tok.Spec(Tok.TypeRole.TitleSection).Size,
-            FontWeight = FontWeights.SemiBold,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-        v.SetResourceReference(TextBlock.ForegroundProperty, edgeBrush ?? valueBrush);
-        panel.Children.Add(v);
-        var divider = new Border
-        {
-            Width = 1,
-            Margin = new Thickness(Tok.SpaceL, Tok.SpaceXxs, 0, Tok.SpaceXxs),
-        };
-        divider.SetResourceReference(Border.BackgroundProperty, "HairlineBrush");
-        panel.Children.Add(divider);
-        return panel;
-    }
-
-    /// <summary>The last chip's divider has nothing to divide — trim it.</summary>
-    private static void TrimLastMiniDivider(Panel chips)
-    {
-        if (chips.Children.Count > 0 && chips.Children[^1] is StackPanel { Children.Count: > 0 } last
-            && last.Children[^1] is Border divider)
-            divider.Visibility = Visibility.Collapsed;
-    }
-
-    private void UpdateMiniChips(StatsSnapshot s)
-    {
-        MiniChips.Children.Clear();
-        // Which cells, in which order, with which icon and what each reads: all from
-        // UI.Shared. Both widgets carried this table by hand, identically, comments and
-        // all — and the Avalonia one is the lane that historically drifts.
-        foreach (var cell in UI.Shared.MiniBarPresentation.Cells(s, _settings.MiniStats))
-        {
-            BreakoutKind? breakout = cell.Key switch
-            {
-                "dps" => BreakoutKind.Damage,
-                "hps" => BreakoutKind.Healing,
-                "pet" => BreakoutKind.Pet,
-                "loot" => BreakoutKind.Loot,
-                _ => null,   // kills/procs/motes/money/deaths have no breakout
-            };
-            // xp is the exception: it opens the PROGRESS WINDOW, which has the Experience /
-            // Wealth / Faction / Raids tabs, rather than the tab-less 272x135 float it used to
-            // (Bevel, Helm-signed 2026-08-24: "Fold Progress breakout into that pop-out. Retire
-            // tab-less 272x135 float."). Same gesture, same one gate, a surface with tabs.
-            MiniChips.Children.Add(cell.Key == "xp"
-                ? MiniChip(cell.Icon, cell.Text, "AccentBrush", clickKey: "xp",
-                    onDoubleClick: () => ShowProgressWindow(),
-                    doubleClickHint: "Double-click to open the Progress window")
-                : MiniChip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout));
-        }
-
-        // Per-rule pins: only the rules you picked (📌 in Options), not every enabled one.
-        // The master toggle still gates the lot, so turning chips off is one click.
-        var due = _delayedAlerts.NextDueByRule(DateTime.Now);
-        foreach (var rule in _settings.PinWatchChips
-                     ? _settings.TrackedRules.Where(r => r.Enabled && r.Pinned)
-                     : [])
-        {
-            var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
-            var result = s.Tracked.FirstOrDefault(t => t.Id == rule.Id);
-            // A rule with a cue in flight shows time remaining instead of its count: while
-            // something is counting down, when it fires is the only thing you want to know.
-            var counting = due.TryGetValue(rule.Id, out var at);
-            // A counting-down chip wears the warn edge too — state has a shape.
-            MiniChips.Children.Add(counting
-                ? MiniChip("Timer", $"{name} {EQBuddy.UI.Shared.Countdown.Format(at - DateTime.Now)}",
-                    "WarnBrush", edgeBrush: "WarnBrush", breakout: BreakoutKind.Watch)
-                : MiniChip("Target", $"{name} {result?.TotalQuantity ?? 0}", "AccentBrush",
-                    breakout: BreakoutKind.Watch));
-        }
-
-        TrimLastMiniDivider(MiniChips);
-        // The hint belongs at the end, and only when there's genuinely nothing to show. It
-        // used to return early when no stats were starred, which meant someone who pinned
-        // watch rules but starred nothing got the hint instead of their chips.
-        if (MiniChips.Children.Count == 0)
-        {
-            // The hollow star is the CONTROL it points at — the one beside every card
-            // header — so it is the same vector those wear rather than a lookalike glyph.
-            // Safe as a StackPanel: one short line that never wraps (trap 14).
-            var hint = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                VerticalAlignment = VerticalAlignment.Center,
-            };
-            var star = DesignSystem.Icon("Star", "DimBrush", size: Tok.IconInline);
-            star.Margin = new Thickness(0, 0, Tok.SpaceS, 0);
-            hint.Children.Add(star);
-            hint.Children.Add(DesignSystem.Text(Tok.TypeRole.Body, "star stats in full view")
-                .Ink("DimBrush"));
-            MiniChips.Children.Add(hint);
-        }
-    }
-
+    // The COLLAPSED HUD BAR's render path — the chip builder, the divider trim and the
+    // per-tick rebuild — moved to EQBuddy/HudBarView.cs (Surface A / SA-1). A view class,
+    // not another MainWindow partial: ArchitectureTests SUMS the glob's matches on
+    // purpose, so a partial leaves exactly as much untestable window logic as before.
+    // What stayed here is the one thing the host owns — WHEN the bar is on screen
+    // (SetMode / RefreshUi) — per trap 15: visibility belongs to the host, contents to
+    // the lifted view. Its cell count is pinned from tests/EQBuddy.E2E as hudCells.
 
     private void OnMinimize(object sender, RoutedEventArgs e) => SetMode(true);
     private void OnRestore(object sender, RoutedEventArgs e) => SetMode(false);

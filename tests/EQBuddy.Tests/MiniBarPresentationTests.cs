@@ -28,16 +28,16 @@ public class MiniBarPresentationTests
     [Fact]
     public void OnlyTheStatsYouStarredAppear()
     {
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["dps", "loot"]);
-        Assert.Equal(["dps", "loot"], cells.Select(c => c.Key));
+        var cells = MiniBarPresentation.Cells(Snapshot(), ["kills", "loot"]);
+        Assert.Equal(["kills", "loot"], cells.Select(c => c.Key));
     }
 
     [Fact]
     public void CellsFollowTheFixedOrderNotTheOrderYouPickedThem()
     {
         // A bar that reshuffles as you toggle stats is a bar you re-read every time.
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["money", "kills", "dps"]);
-        Assert.Equal(["kills", "dps", "money"], cells.Select(c => c.Key));
+        var cells = MiniBarPresentation.Cells(Snapshot(), ["money", "kills", "loot"]);
+        Assert.Equal(["kills", "loot", "money"], cells.Select(c => c.Key));
     }
 
     [Fact]
@@ -71,16 +71,26 @@ public class MiniBarPresentationTests
     [Fact]
     public void AKeyFromALaterVersionIsSkippedRatherThanDrawnBlank()
     {
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["dps", "somethingNew"]);
-        Assert.Equal(["dps"], cells.Select(c => c.Key));
+        var cells = MiniBarPresentation.Cells(Snapshot(), ["kills", "somethingNew"]);
+        Assert.Equal(["kills"], cells.Select(c => c.Key));
     }
 
-    [Fact]
-    public void DpsPrefersTheCurrentRateAndFallsBackToTheSessionRate()
+    /// <summary>The three keys Surface A / SA-1 PROMOTED draw no cell here at all.
+    ///
+    /// A negative assertion on purpose (trap 39): every one of the positive tests above
+    /// would still pass with "dps" quietly back in the table drawing a second, differently
+    /// formatted damage number beside the HUD trio's. The fallback rule those keys used to
+    /// carry moved to HudGlance and is asserted there — the current rate while a fight is
+    /// live, the session rate between pulls.</summary>
+    [Theory]
+    [InlineData("dps")]
+    [InlineData("hps")]
+    [InlineData("xp")]
+    public void ThePromotedHudNumbersDrawNoCellHere(string key)
     {
-        Assert.Equal("55 dps", MiniBarPresentation.Text(Snapshot(), "dps"));
-
-        Assert.Equal("41 dps", MiniBarPresentation.Text(Snapshot(currentDps: 0), "dps"));
+        Assert.DoesNotContain(key, MiniBarPresentation.Order);
+        Assert.Empty(MiniBarPresentation.Cells(Snapshot(), [key]));
+        Assert.Equal("", MiniBarPresentation.Text(Snapshot(), key));
     }
 
     [Fact]

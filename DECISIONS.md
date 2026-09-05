@@ -133,6 +133,67 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+---
+
+## 2026-09-05 (Surface A / SA-1 — collapsed HUD numbers, lane W)
+
+- **The heal-vs-damage dominance signal is derived PURELY from event totals, anchored on the
+  last log timestamp** — the plan named this as the executor's call. Could have extended
+  `CurrentDps`'s wall-clock read and its snapshot-memo caveat instead; that would have made the
+  whole snapshot un-memoizable while healing was in play and made the unit test a test about the
+  clock. Cost, stated: a player who stops playing keeps the last thirty seconds' weight until
+  they act again — the same way XP%/hr, the number beside it, freezes on idle.
+  (`Core/SessionStats.cs` `RecentEffort`, `EffortWindow`/`EffortResumeWindow`.)
+- **TWO windows rather than one — 30 s for dominance, 5 s for "damage-combat returned".** The
+  signed spec asks for a slow entry and an instant exit, and one window cannot answer both:
+  thirty seconds of healing drowns a swing that has only just landed. Could have used a single
+  window and accepted a laggy swap back.
+- **The migration is guarded by a one-time flag AND by `hadFile`.** It reads a star's absence as
+  "that window was off", and after run one all three keys are absent — so without the flag it
+  would close two windows on every launch (trap 55), and without `hadFile` it would read the NEW
+  defaults on a fresh profile as an old choice and take away the Damage window a fresh install
+  has always had. Could have inferred "already done" from the keys being gone.
+- **`DisabledBreakouts` defaults to `["Healing"]` and `MiniStats` to `["kills"]`.** Preserved
+  behaviour, not a new opinion: `hps` was unstarred out of the box and `dps` was starred, so
+  this is what the two stars used to say. Could have left both defaults empty and quietly given
+  every new player a Healing pop-out.
+- **The collapsed bar's empty-state hint ("★ star stats in full view") is DELETED, not kept.**
+  With the trio always on, its condition can never hold again; a hint that cannot appear reads
+  as coverage while being unreachable. Could have kept it as dead code.
+- **The xp chip's double-click SURVIVES on the slot that replaced it** — while minimized it was
+  the only door to the Progress window. Could have let the gesture lapse with the cell. The
+  dps/hps chips' double-clicks do lapse: that gesture is opt-in and off by default, so no
+  default profile loses a way to those windows, and Options is still their switch.
+- **The bar lifted into `HudBarView.cs` rather than being edited in place** (the plan's own
+  logged call, restated here because it was taken): the ratchet had zero headroom, and "lift a
+  surface, don't split the file" is the standing move.
+- **The ratchet number is set once, in the lift commit, against the SERIES' final tree**
+  (3971). Could have set the lift's own minimum and then raised it six lines later in the
+  promotion commit, which is the move this table exists to make someone argue for out loud.
+- **`AppSettings.Load`'s `hadFile` was FIXED rather than worked around.** It read a private
+  field `System.Text.Json` never sets, so it has answered "brand new profile" on every launch
+  of every profile since 2026-08-21 — which would have made this PR's migration a no-op on
+  exactly the profiles it exists for. Could have picked a different discriminator and left the
+  wrong one for the next migration to trip over. Blast radius checked: the only other caller,
+  `MigrateMotesCard`, uses `hadFile` solely to decide whether to force a save and changes its
+  state unconditionally, so nothing a player can see moves. A corrupted parse now counts as
+  "no file", because defaults are not the player's stored choices.
+- **Options → Cards & windows gained a line saying where the three switches WENT.** This is the
+  screen someone opens when a switch they had is missing, and three of them now are — the same
+  reason a folded card's name comes back on the card that absorbed it. Could have left the list
+  three rows shorter with no explanation, which is #233's complaint (naming the destination
+  without naming the origin) arriving as an absence.
+- **`mini-tour`'s staging seeds `PinWatchChips` explicitly**, found by the re-shoot: its two
+  watch chips were being produced by #253's bug (the group-pin line running above its own gate)
+  and vanished when `9b7f4daf` fixed that on 2026-08-31, six days after the committed PNG was
+  taken. Could have accepted the chipless picture as the new truth and left the quick tour's
+  sentence promising chips the shot does not show.
+- **`BreakoutPresentation.Blurb` and the Options double-click copy were rewritten too**, beyond
+  the tooltip the plan's vocabulary rider named — they had become untrue for Damage and
+  Healing, which is a correctness matter rather than a scope creep. `OptionsWindow.xaml`'s
+  "mini-pill" label went with it; `TutorialWindow` and the rest of the v1 "mini pill" debt did
+  NOT, and stays for the #326 follow-up.
+
 ## 2026-09-05 (CLAUDE.md write-side channel trap, lane-d)
 
 - **Filed the channel write hazard as ONE trap (60) with two lettered halves, not two traps.**

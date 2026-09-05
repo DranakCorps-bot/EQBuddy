@@ -957,9 +957,23 @@ $Shots = [ordered]@{
                            # to photograph the band's two states and the locked rows; do
                            # not read the count as evidence of anything.
                            Set = @{ EpicQuestCompleted = @('Cleric') } }
-    # The minimized bar with EVERY cell up — the only way to see all ten icons at once,
+    # The collapsed HUD with EVERY cell up — the only way to see all the icons at once,
     # and the surface that is on screen for the whole session. Its icons were glyphs
     # until Gate 5c; a glyph that fails to render is a blank here and nowhere else.
+    #
+    # PREDICTION, rewritten BEFORE the re-shoot (trap 23), for Surface A / SA-1. The seed
+    # below still names all ten keys on purpose — it is the pre-promotion profile, which
+    # is what most players are updating FROM — and AppSettings.MigratePromotedHudStats
+    # strips three of them on load. So expect, left to right:
+    #   * the ALWAYS-ON TRIO first: the character name slot ("Testchar"), a Swords + dps
+    #     reading, and a Chart + %/hr reading. The fixture session is melee, so the third
+    #     slot is the XP rate and NOT hps.
+    #   * then SEVEN starred cells in MiniBarPresentation.Order: kills, pet, procs, loot,
+    #     motes, money, deaths. dps, hps and xp are NOT among them — they are the trio now,
+    #     and a duplicate of any of the three is the bug this prediction exists to catch.
+    #   * hairline dividers between all ten, none after the last.
+    # The three metric slots are FIXED WIDTH (HudGlance), so the bar's width must not
+    # change between takes of the same seed — a wobble there is trap 12 arriving.
     'mini-bar'        = @{ Title = 'EQBuddy'
                            Env = @{}
                            # Every breakout OFF: starring dps/hps/pet/loot while minimized
@@ -1065,16 +1079,33 @@ $Shots = [ordered]@{
                                    TierKills = @{}
                                }
                            } }
-    # The mini bar as the quick tour's page describes it — "a tiny pill shows just those,
-    # plus watch-rule chips" — rather than as mini-bar shoots it, which is every cell up so
-    # all ten icons can be reviewed at once. Two stats and two PINNED rules: pinning is
+    # The collapsed HUD as the quick tour's page describes it — the few stats you picked,
+    # plus watch-rule chips — rather than as mini-bar shoots it, which is every cell up so
+    # all the icons can be reviewed at once. Two stats and two PINNED rules: pinning is
     # what puts a rule on the bar, so without it the chips the sentence promises are absent
     # and the picture quietly contradicts the words beside it.
+    #
+    # PREDICTION, rewritten before the re-shoot (SA-1): the always-on trio (name, dps,
+    # %/hr), then TWO starred cells — kills and loot — because the seed's third key, dps,
+    # is now the trio's own second slot and the migration strips it. Then the two watch
+    # chips, Motes and Ghouls. Seven cells; a bar with a dps reading TWICE on it is the
+    # failure this names in advance.
+    #
+    # THE PIN IS SEEDED EXPLICITLY, and it had to be. This shot's chips were being
+    # produced by a BUG, not by its staging: `Write-Settings` sets `WatchPinsMigrated`,
+    # so `WatchPinMigration` skips and `PinWatchChips` stays at its default false — but
+    # until 2026-08-31 the "any per-rule pin turns on the group pin" line sat ABOVE that
+    # gate and ran every launch, which is #253 (HiramDucky) itself. `9b7f4daf` moved it
+    # inside the gate, and from that day this shot's two chips were gone and nobody
+    # noticed, because the committed PNG was last taken on 2026-08-24. Trap 22 exactly:
+    # a surface with no fixture state photographs as an unremarkable bar, and the
+    # sentence beside it in the tour goes on promising chips.
     'mini-tour'       = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','loot')
+                                    PinWatchChips = $true
                                     TrackedRules = @(
                                         @{ Id = 'shot-mote'; Name = 'Motes'
                                            Pattern = 'mote'; Kind = 0; Pinned = $true }

@@ -274,6 +274,28 @@ internal static class WidgetDump
                     // a level was announced this session), the next-milestone preview
                     // (hidden until a level is known at all, and folded behind a setting)
                     // and the AA split into session-new vs the full ledger.
+                    // THE COLLAPSED HUD BAR's rendered cell count, pinned here BEFORE the
+                    // surface moves (Surface A / SA-1). No mini-bar fact has ever existed
+                    // in this dump, and the WPF layer has no unit tests (docs/TestPlan.md
+                    // §5) — so this assertion, green on the pre-move tree, is the only
+                    // thing standing between the lift into HudBarView and a silent
+                    // regression. Exactly what watchRows/progress*/gear* did for the four
+                    // surfaces lifted before it.
+                    //
+                    // It counts what is ON THE BAR: one cell per starred stat, plus one
+                    // per pinned watch rule. Zero while the widget is expanded, because
+                    // UpdateMiniChips only runs while MiniRoot is visible.
+                    $"hudCells={w._hudBar.CellCount} " +
+                    // …and WHICH number the glance's third slot currently is: "xp" or
+                    // "hps". A word, not a count, because the dump is space-separated
+                    // key=value and the suite has a string wait for exactly this shape.
+                    //
+                    // The SWAP is the one piece of SA-1 that a screenshot cannot settle:
+                    // both states render correctly and look equally right, so only the app
+                    // can say which rule fired. HudGlance decides it and is unit-tested
+                    // with no window; this proves the decision reaches the control, which
+                    // is the half a unit test cannot see (trap 42).
+                    $"hudGlance={w._hudBar.GlanceKey} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +
