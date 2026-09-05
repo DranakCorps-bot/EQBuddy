@@ -128,6 +128,30 @@ public class ShellRoomEmptyTests
     }
 
     /// <summary>
+    /// **The fifth tab had to reach the predicate, or the room would hide it.** A room-level
+    /// empty collapses the strip and every tab under it, so a World predicate still written
+    /// over four tabs would hide Drops on exactly the profiles the other four have nothing
+    /// to say about — a surface removed by something that reads as untouched code, which is
+    /// trap 34's shape.
+    ///
+    /// The kill with NO loot is the row that keeps this honest: the Drops tab shows
+    /// creatures that dropped something, so a kill on its own is not content for it.
+    /// </summary>
+    [Fact]
+    public void WorldStaysOpenForAcreatureThatDroppedSomething()
+    {
+        Assert.False(ShellRoomEmpty.WorldIsEmpty(Nobody, new StatsSnapshot
+        {
+            Mobs = [Mob([new MobLoot("Fine Steel Long Sword", 1, null)])],
+        }));
+
+        Assert.True(ShellRoomEmpty.WorldIsEmpty(Nobody, new StatsSnapshot { Mobs = [Mob([])] }));
+
+        static MobSummary Mob(List<MobLoot> loot) =>
+            new("a froglok tad", 3, 3, 8.0, 0.4, 0, loot);
+    }
+
+    /// <summary>
     /// **Epic and Sky steps are ticked in SETTINGS and survive a profile that has never seen
     /// a log line.** #204/#209, #210 and #212 are three separate bugs about those very lists
     /// losing the thing that showed them; a room that hid them because the identity was

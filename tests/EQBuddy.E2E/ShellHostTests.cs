@@ -234,6 +234,12 @@ public class ShellHostTests
     [InlineData("world:map", "shellWorldTab", "map")]
     [InlineData("world:spawns", "shellWorldTab", "spawns")]
     [InlineData("world:travel", "shellWorldTab", "travel")]
+    // E-3 lane S, S2's tab, and the first test of the `page:room` grammar past the four
+    // rooms World launched with. Nothing in `ShellPages` or `ShellHost` was edited to make
+    // this address resolve — `Rooms(World)` reads `WorldSurface.Tabs()` live, so a fifth tab
+    // in Core IS a fifth address. Asserted rather than assumed, because "it should just
+    // work" is how a grammar quietly stops covering its own surface (trap 55).
+    [InlineData("world:drops", "shellWorldTab", "drops")]
     [InlineData("gear", "shellGearTab", "loot")]
     [InlineData("gear:gear", "shellGearTab", "gear")]
     [InlineData("gear:inventory", "shellGearTab", "inventory")]
@@ -281,11 +287,68 @@ public class ShellHostTests
 
         app.WaitForDump("shellWorldTab", "spawns", "both hosts to reach the Camps room");
         app.WaitForDump("worldTab", "spawns", "and the v1 window with them");
-        Assert.Equal(app.DumpValue("worldTabs"), app.DumpValue("shellWorldTabs"));
+        // **The tab COUNTS deliberately differ since S2, and asserting the difference is the
+        // point** — the same shape the Progress pair above already carries, from the other
+        // direction: Progress lost a tab to Live, World GAINED one from Kills & Drops. The
+        // v1 window cannot draw it (`_ => _travels.Body`), so `WorldSurface.ShellOnly` keeps
+        // it off that strip; an equality here would have to be "fixed" either by breaking
+        // the window or by taking the room's fifth tab away. Written as the predicate's own
+        // count rather than as a 1, so a sixth shell-only tab needs no edit here.
+        Assert.Equal(
+            app.DumpValue("worldTabs") + WorldSurface.Tabs().Count(h => WorldSurface.ShellOnly(h.Tab)),
+            app.DumpValue("shellWorldTabs"));
         Assert.Equal(app.DumpValue("spawnsRows"), app.DumpValue("shellWorldSpawnsRows"));
         Assert.Equal(app.DumpValue("spawnsZones"), app.DumpValue("shellWorldSpawnsZones"));
         Assert.Equal(app.DumpValue("mapZones"), app.DumpValue("shellWorldMapZones"));
         Assert.Equal(app.DumpValue("travelZones"), app.DumpValue("shellWorldTravelZones"));
+    }
+
+    /// <summary>
+    /// **The Drops surface, from its two live hosts at once** — the shell's World room and
+    /// the v1 `CreatureWindow`, each with its own `DropsCardView` (a UIElement has one
+    /// parent, trap 45). Every number behind them is shared, so a divergence would be a real
+    /// defect and an invisible one: both windows render, both look right.
+    ///
+    /// Two doors, not one: `EQBUDDY_SHELL=world:drops` is the room's address through the
+    /// `page:room` grammar, `EQBUDDY_DROPS=1` is the v1 window's own hook, and the two stay
+    /// independent on purpose. This is the assertion those five hand-written
+    /// `shellWorldDrops*` facts exist FOR — `dropsRows` beside `shellWorldDropsRows` is the
+    /// comparison trap 58's per-host prefixing keeps possible instead of colliding.
+    ///
+    /// `dropsRecheck` is the row a screenshot could never supply: the wiki re-check ↻ on
+    /// every creature heading (#226) is a control, and an absent control photographs as an
+    /// unremarkable header (trap 29/34). Nothing but a launched app comparing two hosts can
+    /// say the new one kept it.
+    ///
+    /// **The room paints Drops on every tick rather than only when it is the visible tab**,
+    /// which is what makes this assertion hold from a room sitting on Camps as readily as
+    /// from one sitting on Drops — the same reason `CreatureWindow` renders both of its own
+    /// tabs, written down there as "the inactive tab's BADGE has to stay true".
+    /// </summary>
+    [Fact]
+    public void TheShellAndTheCreatureWindowAgreeAboutTheDropsTheyBothShow()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "world:drops",
+            ["EQBUDDY_DROPS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellWorldTab", "drops", "the shell to land on World's Drops tab");
+        app.WaitForDump("creatureTab", "drops", "and the v1 window with it");
+        // The negative that stops the five rows below going vacuous (trap 39): two hosts
+        // that both showed NOTHING would agree perfectly and prove nothing. The fixture
+        // kills things and loots them, so this is a wait rather than a hope — and it has to
+        // be a wait, because the replay lands after the windows do.
+        app.WaitForDumpAtLeast("shellWorldDropsMobs", 1,
+            "the fixture replay to land at least one creature with a drop in the shell's room");
+
+        Assert.Equal(app.DumpValue("dropsMobs"), app.DumpValue("shellWorldDropsMobs"));
+        Assert.Equal(app.DumpValue("dropsRows"), app.DumpValue("shellWorldDropsRows"));
+        Assert.Equal(app.DumpValue("dropsItems"), app.DumpValue("shellWorldDropsItems"));
+        Assert.Equal(app.DumpValue("dropsFilterLen"), app.DumpValue("shellWorldDropsFilterLen"));
+        Assert.Equal(app.DumpValue("dropsRecheck"), app.DumpValue("shellWorldDropsRecheck"));
     }
 
     /// <summary>

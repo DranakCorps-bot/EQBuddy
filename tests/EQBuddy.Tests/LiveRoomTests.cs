@@ -75,12 +75,19 @@ public class LiveRoomTests
     /// <summary>**`drops` is the one in that list worth saying out loud.** The Drops tab
     /// ships from the same v1 window as the Kills tab this room takes, and it belongs to
     /// World — a Live that quietly answered to its key would be the first step of building
-    /// World's half here by accident.</summary>
+    /// World's half here by accident.
+    ///
+    /// **Since S2 that sentence has somewhere to point**, so the second half is asserted
+    /// too: it is not enough that Live refuses the key, because a key nothing answers to is
+    /// a room nobody can reach. `world:drops` is where it went.</summary>
     [Fact]
     public void DropsIsNotALiveRoomBecauseCampResearchIsWorlds()
     {
         Assert.Null(LiveSurface.TabForKey("drops"));
         Assert.DoesNotContain("drops", ShellPages.Rooms(ShellPage.Live).Select(r => r.Key));
+
+        Assert.Equal(WorldTab.Drops, WorldSurface.TabForKey("drops"));
+        Assert.Contains("drops", ShellPages.Rooms(ShellPage.World).Select(r => r.Key));
     }
 
     /// <summary>A badge with nothing to say is null rather than a zero — a strip reading

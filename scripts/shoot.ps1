@@ -47,6 +47,32 @@ if ($Out -eq '') { $Out = Join-Path $repo 'docs/screenshots' }
 # Title  = the window to capture, matched as a substring (scripts/shot.ps1).
 # Env    = the EQBUDDY_* hook that opens it (the same family MainWindow already reads).
 # Set    = extra settings.json overrides for this shot.
+
+# EVERY creature the fixture drops from, seeded once and shared by every shot that
+# photographs a Drops surface. It is a variable rather than three copies because a staging
+# list is code a compiler cannot check (trap 30) — and this one has a specific way of going
+# wrong: a PARTIAL seed does not fail, it makes the app correctly fetch the rest from the
+# live wiki, so the capture becomes a picture of whatever eqlwiki said that minute. That is
+# trap 23, and it cost two wrong 'wiki-pack' shots before anyone noticed.
+# Skeleton is deliberately five days old: inside the 7-day lifetime (so it is not re-fetched)
+# and outside the 30-second "just now" rule, which is the only way a shot can show the
+# freshness caption doing anything at all.
+$DropsFixtureWiki = @{
+    'Orc pawn' = @()
+    'Puma' = @('Chunk of Meat')
+    'Giant spider' = @('Spider Silk', 'Spider Legs')
+    'Skeleton' = @{ Loot = @('Bone Chips', 'Rusty Scimitar'); AgeDays = 5 }
+    'Asp' = @('Giant Snake Fang', 'Giant Snake Rattle', 'Snake Meat')
+    'Large rattlesnake' = @('Snake Egg', 'Snake Fang')
+    'Rattlesnake' = @('Snake Fang')
+    'Willowisp' = @('Burned Out Lightstone')
+    'Young kodiak' = @('Bear Meat', 'Chunk of Meat', 'Thick Grizzly Bear Skin')
+    'Zombie' = @('Cloth Cape', 'Zombie Skin')
+    'Ghoul' = @('Mote of Infinitesimal Potential')
+    'Lesser mummy' = @('Rusty Morning Star', 'Splintering Club')
+    'Plains cat' = @('Ruined Cat Pelt')
+}
+
 $Shots = [ordered]@{
     # NINE CARDS, not ten, since 2026-09-05 (HUD subtraction cut 1). Eight of them visible
     # on the default profile - Motes ships hidden. PREDICTION for both of these shots, in
@@ -423,6 +449,72 @@ $Shots = [ordered]@{
                                    @{ Slot = 'HEAD'; Item = 'Exquisite Velium Shard'; IsExaltation = $true
                                       ExaltationEffect = '+15 hp'; Source = 'Kael Drakkel' }
                                ) } }
+    # ---- E-3 lane S, S2: World's fifth tab -------------------------------------------
+    #
+    # Same illustration lock: a room's shot lands in the PR that lands the room, and this is
+    # a tab ARRIVING in a room that already had four. Both use $DropsFixtureWiki, seeded at
+    # the top of this file for the reason recorded there — a partial seed does not fail, it
+    # sends the app to the live wiki and turns the capture into a picture of whatever
+    # eqlwiki said that minute.
+    #
+    # PREDICTIONS, written before the shots (trap 23/51):
+    #
+    #   'shell-world-drops' — native chrome reading "EQBuddy — World", the rail of SIX in
+    #     RailOrder with World lit. The room's wrapped strip is FIVE chips now —
+    #     Map · Camps · Path · Travels · Drops — with DROPS lit and badged "13 creatures"
+    #     (the fixture's creatures-with-loot: the same thirteen seeded above and the same
+    #     number 'drops-window' shows). Map is badged with the fixture's zone; Camps and
+    #     Path carry no badge, because a running timer count on a tab strip is a countdown
+    #     by another name. Under it the Drops body exactly as 'drops-window' draws it: the
+    #     filter box with Copy text / Copy CSV / Save CSV… beside it, the dim orientation
+    #     footer ABOVE the rows (trap 37 — it carries the only in-app pointer to where the
+    #     wiki pack went), then a heading per creature with its drop rows, each reading
+    #     "wiki read just now" with a dim ↻ except Skeleton at "wiki read 5d ago" with a
+    #     live one. Pinned BELOW the body, as on every other World tab: "Drop camp marker".
+    #     **Two things that must NOT be there**: the deaths star and its "Show in mini
+    #     dashboard" label, which stay with WorldWindow because that star is the only writer
+    #     MiniStats has for "deaths" (trap 13/20); and any second title bar, since the room
+    #     is a view in the shell's chrome rather than a window shrink-wrapped into one.
+    #
+    #   'shell-world-drops-narrow' — THE ONE THAT CAN DISPROVE SOMETHING, and the reason it
+    #     is here rather than for illustration. Bevel's pre-design §5 named one real width
+    #     risk before any of this was built: the filter/export bar is a four-column Grid —
+    #     the filter as the STAR column, three auto-sized TEXT buttons — and
+    #     DropsCardView's own remarks say it was "sized for a 560px window". MinRoomWidth is
+    #     520. This is that row at the floor (520 + the 60-unit collapsed rail).
+    #     Predicted: the rail is icons only, six glyphs and no words; the three buttons keep
+    #     their full labels, because auto columns take what they ask for; the filter box
+    #     absorbs the whole squeeze as the star column and stays wide enough to type in; and
+    #     the creature headings and drop rows read without horizontal clipping.
+    #     **The failure this can show is the star column collapsing to nothing** — three
+    #     buttons crushed against a filter box with no width left. If it does, the fix is
+    #     the BAR (wrap it, the way the Inventory bar already had to be) and NOT
+    #     MinRoomWidth, which is ProgressWindow's shipped width and a measured floor rather
+    #     than a fresh guess.
+    #
+    # OUTCOME, both taken 2026-09-05 and both matching, which is worth writing down
+    # because the narrow one was taken to DISPROVE something and did not:
+    #  * 946x633 / 566x473. Five chips on one wrapped row at both widths, Drops lit and
+    #    badged "13 creatures"; Map badged "West Commonlands"; Camps, Path and Travels
+    #    unbadged (the fixture has no deaths, so Travels has nothing to say either).
+    #  * The freshness captions read "wiki just now" and Skeleton "wiki 5d ago" — the
+    #    prediction said "wiki read just now", which is the surface's older wording. The
+    #    behaviour predicted is what shipped; only my quotation of it was stale.
+    #  * **THE WIDTH RISK IS CLOSED AND `MinRoomWidth` DOES NOT MOVE.** At the floor the
+    #    three buttons keep their full labels, the filter box absorbs the whole squeeze
+    #    as the star column and is still comfortably typable, and no creature heading or
+    #    drop row clips horizontally. The bar "sized for a 560px window" survives 520
+    #    because the only thing that had to give was the star column, which is what a
+    #    star column is for.
+    #  * Neither picture shows the deaths star or a second title bar — the two absences
+    #    only a picture can confirm were deliberate.
+    'shell-world-drops' = @{ Title = 'EQBuddy — World'
+                           Env = @{ EQBUDDY_SHELL = 'world:drops' }; Set = @{}
+                           Wiki = $DropsFixtureWiki }
+    'shell-world-drops-narrow' = @{ Title = 'EQBuddy — World'
+                           Env = @{ EQBUDDY_SHELL = 'world:drops'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{}
+                           Wiki = $DropsFixtureWiki }
     # The PROGRESS theme EXPANDED IN PLACE (Inline themes PR 1). Title is 'EQBuddy' — this
     # is the widget, not the window, which is the whole point of the change. A NEW name,
     # per trap 21: 'progress-card' and 'section-progress' are both embedded in the docs and
@@ -1149,21 +1241,7 @@ $Shots = [ordered]@{
     # than that is expired, re-fetched live, and "just now" again.
     'drops-window'    = @{ Title = 'Kills & Drops'
                            Env = @{ EQBUDDY_CREATURE = 'drops' }; Set = @{}
-                           Wiki = @{
-                               'Orc pawn' = @()
-                               'Puma' = @('Chunk of Meat')
-                               'Giant spider' = @('Spider Silk', 'Spider Legs')
-                               'Skeleton' = @{ Loot = @('Bone Chips', 'Rusty Scimitar'); AgeDays = 5 }
-                               'Asp' = @('Giant Snake Fang', 'Giant Snake Rattle', 'Snake Meat')
-                               'Large rattlesnake' = @('Snake Egg', 'Snake Fang')
-                               'Rattlesnake' = @('Snake Fang')
-                               'Willowisp' = @('Burned Out Lightstone')
-                               'Young kodiak' = @('Bear Meat', 'Chunk of Meat', 'Thick Grizzly Bear Skin')
-                               'Zombie' = @('Cloth Cape', 'Zombie Skin')
-                               'Ghoul' = @('Mote of Infinitesimal Potential')
-                               'Lesser mummy' = @('Rusty Morning Star', 'Splintering Club')
-                               'Plains cat' = @('Ruined Cat Pelt')
-                           } }
+                           Wiki = $DropsFixtureWiki }
     'creature-kills'  = @{ Title = 'Kills & Drops'
                            Env = @{ EQBUDDY_CREATURE = 'kills' }; Set = @{} }
     # The quick tour's last page illustrates this window. Trap 22 applies hard: history

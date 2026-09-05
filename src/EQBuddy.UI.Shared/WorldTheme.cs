@@ -49,15 +49,46 @@ public static class WorldTheme
         WorldTab.Map => MapGlance(zone),
         WorldTab.Camps => CampsGlance(runningTimers),
         WorldTab.Routes => PathGlance(from, destination),
-        _ => "",   // Travels is Full; a Glance line is never drawn for it.
+        // Travels is Full, so a Glance line is never drawn for it; Drops never reaches the
+        // inline card at all (WorldSurface.ShellOnly keeps it off the v1 strip).
+        _ => "",
     };
 
-    /// <summary>The full strip, badges included — Map gets the current zone, Travels gets
-    /// the death count (the same two facts the card's launcher line already carries).
-    /// Camps/Path carry no badge: a live timer count on the tab strip is a countdown by
-    /// another name the moment a player watches it tick.</summary>
+    /// <summary>
+    /// **The v1 strip: the World window and the widget's inline card.** Badges included —
+    /// Map gets the current zone, Travels gets the death count (the same two facts the
+    /// card's launcher line already carries). Camps/Path carry no badge: a live timer count
+    /// on the tab strip is a countdown by another name the moment a player watches it tick.
+    ///
+    /// **Shell-only tabs are filtered out here, and this is the ONLY place that does it.**
+    /// Neither v1 host can draw <see cref="WorldTab.Drops"/> — both fall through
+    /// <c>_ =&gt; _travels.Body</c> — so an unfiltered header would put a chip on a shipped
+    /// window that answers with the wrong list. Both hosts call this method rather than
+    /// <see cref="WorldSurface.Tabs"/> so that fact lives once
+    /// (<see cref="WorldSurface.ShellOnly"/> is the predicate; this is its one v1 reader).
+    /// The window built its own copy of this line until S2 and the comment above already
+    /// claimed otherwise — two sources for one strip, which is trap 4 in the small.
+    /// </summary>
     public static IReadOnlyList<WorldTabHeader> Tabs(string? zone, int deaths) =>
+        [.. AllTabs(zone, deaths, drops: null).Where(h => !WorldSurface.ShellOnly(h.Tab))];
+
+    /// <summary>
+    /// **The Evolved shell's strip: everything, Drops included.** The room's own tab list,
+    /// built from the same words the v1 strip uses so the two cannot describe one tab
+    /// differently — the parity-by-shared-module rule this file exists for (#210).
+    ///
+    /// <paramref name="drops"/> is the Drops view's OWN badge, threaded through rather than
+    /// recomputed here: the card counts the mobs its filter leaves, so a count derived from
+    /// the snapshot beside it would be a second producer of one number and would disagree
+    /// with the body the moment a player typed in the filter box (trap 33). Same shape as
+    /// the Gear room handing <c>LootTheme.Tabs</c> its Inventory view's badge.
+    /// </summary>
+    public static IReadOnlyList<WorldTabHeader> ShellTabs(string? zone, int deaths, string? drops) =>
+        AllTabs(zone, deaths, drops);
+
+    private static IReadOnlyList<WorldTabHeader> AllTabs(string? zone, int deaths, string? drops) =>
         WorldSurface.Tabs(
             map: zone,
-            travels: deaths > 0 ? $"{deaths} death{(deaths == 1 ? "" : "s")}" : null);
+            travels: deaths > 0 ? $"{deaths} death{(deaths == 1 ? "" : "s")}" : null,
+            drops: drops);
 }

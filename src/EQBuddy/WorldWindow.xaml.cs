@@ -213,9 +213,14 @@ public partial class WorldWindow : Window, IFollowingSurface
     private void BuildTabs(StatsSnapshot s)
     {
         _tabs.Clear();
-        var deaths = s.Deaths.Count > 0 ? $"{s.Deaths.Count} death{(s.Deaths.Count == 1 ? "" : "s")}" : null;
         var zone = _main.CurrentZoneName is { Length: > 0 } z ? z : null;
-        foreach (var header in WorldSurface.Tabs(map: zone, travels: deaths))
+        // THE V1 STRIP, from UI.Shared — which its own doc comment already claimed "the card
+        // and the window both build from" while this method hand-rolled a second copy. It is
+        // one call rather than two since S2 because the shell's World room gained a fifth
+        // tab this window cannot draw: `WorldTheme.Tabs` filters `WorldSurface.ShellOnly`,
+        // and a window that read the raw definition would grow a "Drops" chip answering with
+        // the Travels list.
+        foreach (var header in WorldTheme.Tabs(zone, s.Deaths.Count))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
