@@ -365,6 +365,18 @@ internal sealed class AppHarness : IDisposable
         Until(() => DumpValue(key) >= 0, AssertTimeout,
             $"{reason} (debug.txt has no {key} yet)");
 
+    /// <summary>Wait until a key reaches AT LEAST a value.
+    ///
+    /// **It exists because a size is not a count.** A window's measured height is 0 until
+    /// WPF has laid it out, and layout happens after the window is shown — so a test that
+    /// reads one the moment its page appears in the dump is asserting against a number the
+    /// app has not computed yet. An equality wait cannot be used for it either: the value
+    /// is whatever the monitor allows, and a test that named it would be asserting the desk
+    /// it was written on (the rule the whole shell suite follows).</summary>
+    public void WaitForDumpAtLeast(string key, int minimum, string reason) =>
+        Until(() => DumpValue(key) >= minimum, AssertTimeout,
+            $"{reason} (debug.txt {key} to reach at least {minimum}; last seen {DumpValue(key)})");
+
     public void WaitForDump(string key, int expected, string reason) =>
         Until(() => DumpValue(key) == expected, AssertTimeout,
             $"{reason} (debug.txt {key} to reach {expected}; last seen {DumpValue(key)})");

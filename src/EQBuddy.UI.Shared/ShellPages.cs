@@ -1,3 +1,5 @@
+using EQBuddy.Core;
+
 namespace EQBuddy.UI.Shared;
 
 /// <summary>
@@ -60,8 +62,50 @@ public static class ShellPages
     /// **A room joins this list in the same PR that lands it**, which is what stops the
     /// list and the rooms drifting apart in either direction: a room with no row is
     /// unreachable, and a row with no room is a trap.
+    ///
+    /// **PR 2 added Gear and World, and it added exactly those two for a reason worth
+    /// writing down.** Both are surfaces whose Evolved IA verdict — Bevel §2, *"Keep →
+    /// unify"* — was already SATISFIED by a v1 fold: <c>GearLootWindow</c> is bags plus
+    /// wishlist plus what you picked up, and <c>WorldWindow</c> is the map, the camps, the
+    /// route and the travels. So hosting them is a move rather than a redesign, which is
+    /// the only shape that keeps a half-built shell coherent at every commit. The rooms
+    /// that are NOT here are held back by a decision and not by effort: Live does not
+    /// exist yet (and Raids cannot leave Progress until it does), Home and Search are
+    /// genuinely new surfaces, Settings is a room whose whole job is not being a launcher,
+    /// and Quests is 2,481 lines of window-owned rendering — a lift, not a host, and one
+    /// that deserves its own diff.
     /// </summary>
-    public static readonly IReadOnlyList<ShellPage> Landed = [ShellPage.Progress];
+    public static readonly IReadOnlyList<ShellPage> Landed =
+        [ShellPage.Progress, ShellPage.Gear, ShellPage.World];
+
+    /// <summary>
+    /// The rooms INSIDE a room — the second half of a <c>page:room</c> address — read from
+    /// the SAME Core surface definition the room's own tab strip is built from.
+    ///
+    /// **The shell must never re-spell a room.** <c>ProgressSurface.KeyFor(Experience)</c>
+    /// is <c>"progress"</c>, deliberately, because it is the card key the five folded
+    /// surfaces collapsed into; so the Experience room's address is
+    /// <c>progress:progress</c>, which reads oddly and is correct. <c>WorldTab.Travels</c>
+    /// is <c>"misc"</c> for the same kind of reason (the old card's settings key, kept so
+    /// the fold needed no migration at all), and <c>WorldTab.Routes</c> is <c>"travel"</c>
+    /// while its label says "Path". Every one of those looks like a typo and every one of
+    /// them is load-bearing history. A shell that invented <c>world:path</c> beside the
+    /// surface's own <c>world:travel</c> would be a second name for one destination, which
+    /// is trap 33 lifted from data into navigation — the exact thing the one-address rule
+    /// exists to prevent.
+    ///
+    /// So this table maps and does not translate, and <c>ShellNavigationTests</c> asserts
+    /// that every key it hands out round-trips through the surface's own
+    /// <c>TabForKey</c> — a mapping that quietly stopped matching would otherwise read as
+    /// a working palette that lands nowhere.
+    /// </summary>
+    public static IReadOnlyList<(string Label, string Key)> Rooms(ShellPage page) => page switch
+    {
+        ShellPage.Progress => [.. ProgressSurface.Tabs().Select(h => (h.Label, h.Key))],
+        ShellPage.Gear => [.. LootSurface.Tabs().Select(h => (h.Label, h.Key))],
+        ShellPage.World => [.. WorldSurface.Tabs().Select(h => (h.Label, h.Key))],
+        _ => [],
+    };
 
     /// <summary>True for the pages drawn under the rail's visual gap. Settings sits
     /// there because it configures the tool rather than describing the character — the

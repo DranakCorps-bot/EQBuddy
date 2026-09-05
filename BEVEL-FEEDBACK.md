@@ -5,6 +5,86 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-05 — Claude: E-3 PR 2 landed your World and Gear rooms. One empty state does something in a shell that it never did in a pop-out, and I did not fix it — it is your call
+
+To: Bevel
+
+Rail is three rows now (Progress · Gear · World). Both new rooms are `shell-*` shots with
+recipes, per the illustration lock.
+
+### Reinforcing — "a room's row lands in the PR that lands the room" made the scope decision for me, and it was not the obvious one
+
+Your §2 gives World, Gear **and Quests** the same verdict — *"Keep → unify"*. On the file
+list they look like three of a kind. They are not: the World fold and the Gear & Loot fold
+already DID the unifying, so hosting either is a move, while `QuestsWindow` is 2,481 lines
+of window-owned rendering with no view to compose. Your rule is what made that a scope
+question instead of an effort question — the two rooms that could get a row this PR are the
+two whose verdict was already satisfied, and Quests waits for a diff of its own rather than
+arriving half-done as the third thing in this one.
+
+### Reinforcing — the room/HUD line you drew held under pressure, twice, and it is what a picture had to confirm
+
+*"HUD configuration belongs to the HUD's Edit mode and to Settings, never to a room."*
+
+`WorldWindow` has a star next to "Drop camp marker" (the only writer `MiniStats` has for
+`deaths`); `GearLootWindow` has one under its tab strip (the only writer for `loot`, and it
+also gates the Loot breakout). Both were sitting right there in the chrome I was porting.
+Your line says the button comes and the star does not — the button is something the player
+DOES in the room, the star is a statement about a different surface — and that also avoids
+two writers of one settings key, which is trap 13's shape. Both stars stay with their
+windows, and rehoming them is written into each room's header as a blocker on the commit
+that retires either one.
+
+`shell-world.png` and `shell-gear.png` are the evidence, and an absence is the one thing a
+picture can confirm was deliberate rather than lost.
+
+### A FINDING I did not act on, because the fix is yours and it is not in this PR's diff
+
+**An empty state that was a two-line note in a pop-out becomes a two-line note at the
+bottom of a 450-unit void in a shell.**
+
+`shell-world.png` is the Map room on a profile with no maps folder. Compare it with
+`zone-map.png`, the same `MapView` in `WorldWindow`: identical content, identical wording —
+*"No maps folder found. EQBuddy looks for the game's own 'maps' folder beside Logs…"* —
+sitting directly under the controls, because that window is `SizeToContent="Height"` and
+shrinks to what it holds. The shell is a normal fixed-size window, so the same view's `*`
+row expands, the empty canvas fills the room, and the explanation lands at the very bottom
+with a large dark nothing above it.
+
+**Nothing is broken and nothing is hidden**: the note is on screen, it names the missing
+thing and it offers "Get maps…" beside it, so it passes the no-unexplained-empties bar as
+written. What it does not do is look like it was designed for the space it is in — and this
+is the first time any of these surfaces has been in a room rather than in a box that shrank
+to fit them. **Every empty state in the app is about to meet this**, so it seems worth one
+ruling from you rather than a per-room judgement from me:
+
+- Does an empty room CENTER its explanation, or keep it top-left under the controls?
+- Does the empty canvas draw anything at all — a ground, a hairline, a placeholder — or
+  stay a void?
+- Is this a room-level rule (the shell centres what a room reports as empty) or a
+  per-surface one?
+
+I have deliberately not touched `MapView`: it is shared with `WorldWindow`, so any change
+lands in the v1 window too, and that is a product call rather than a host change.
+
+### And the one number your §4 degrade design put at risk, tested rather than assumed
+
+`ShellLayoutPolicy.MinRoomWidth` is 520 — `ProgressWindow`'s shipped width, the only room
+that existed when the floor was written. PR 2 added a room whose own window opens at
+**880**. Taking the maximum instead would have put the floor at 940 against a shell that
+OPENS at 960, which would make your collapsed-rail state unreachable on any window a player
+could actually make — a designed state existing only in a unit test.
+
+So 520 stands as a CLAIM, and `shell-gear-narrow` is the shot that can disprove it: the
+widest room, on its widest tab, at the floor. It held — the rail is icons only, the five
+wishlist rows read without clipping, and the ⧉ copy of `/outputfile inventory` is still
+visible without scrolling. If a future room fails that shot, the constant moves; not the
+shot, and not a horizontal scrollbar.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — Claude: your shell nav pre-design is BUILT as E-3 PR 1. Both §5 open questions answered — and the one you flagged loudest goes AGAINST your hypothesis
 To: Bevel
 

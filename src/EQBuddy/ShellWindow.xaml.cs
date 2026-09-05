@@ -10,18 +10,23 @@ namespace EQBuddy;
 
 /// <summary>
 /// The Evolved shell — one normal Windows window with a navigation rail down its left
-/// edge and one room in it at a time. E-3 Phase 2 PR 1: **the host, the nav, and exactly
-/// one room moved in** (Progress), which is the World fold's own shape — host first — and
-/// the only one that keeps a half-finished shell coherent at every commit.
+/// edge and one room in it at a time. E-3 Phase 2 PR 1 landed **the host, the nav, and
+/// exactly one room** (Progress), which is the World fold's own shape — host first — and
+/// the only one that keeps a half-finished shell coherent at every commit. **PR 2 adds the
+/// other two rooms that are a MOVE rather than a redesign**: World and Gear, whose Evolved
+/// IA verdict (*"Keep → unify"*) a v1 fold has already satisfied. Three rows, three rooms.
 ///
 /// **What is deliberately NOT here, and why each absence is a decision:**
 ///
-///  * **Six of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
+///  * **Four of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
 ///    that exist, and the rail draws that list rather than the full one. The honest
-///    options for a half-built shell were a rail with one row or seven rows with six
-///    disabled, and this codebase already ruled on the second: *"an empty class row gets
-///    no chevron — an affordance that opens nothing is a trap."* A room's row lands in
-///    the PR that lands the room.
+///    options for a half-built shell were a rail with the rooms that exist or seven rows
+///    with the rest disabled, and this codebase already ruled on the second: *"an empty
+///    class row gets no chevron — an affordance that opens nothing is a trap."* A room's
+///    row lands in the PR that lands the room. Live does not exist yet (and Raids cannot
+///    leave Progress until it does), Home and Search are new surfaces, Settings is a room
+///    whose whole job is not being a launcher, and Quests is a lift rather than a host —
+///    2,481 lines of window-owned rendering, which deserves its own diff.
 ///  * **The Search INDEX.** The palette resolves against what the shell can currently
 ///    reach — the landed rooms and their tabs. The disposition-backed index that lets a
 ///    player find a feature by its old v1 name is E-2e's table, and Helm's sign is
@@ -61,7 +66,19 @@ public partial class ShellWindow : Window, IFollowingSurface
     private TextBox _searchInput = null!;
     private TextBlock _searchHint = null!;
 
-    private readonly ProgressRoom _progress;
+    /// <summary>
+    /// The rooms that have actually been OPENED, built on first arrival and kept.
+    ///
+    /// **Lazy on purpose, and it is a cost question rather than a style one.** Progress is
+    /// arithmetic over a snapshot the widget already holds, but <see cref="WorldRoom"/>
+    /// starts a one-second <c>DispatcherTimer</c> and reads the spawn ledger off disk, and
+    /// <see cref="GearRoom"/> scans the game folder. Building all three in the constructor
+    /// would pay every one of those costs on a shell opened to look at experience — which
+    /// is exactly the argument <c>SurfaceOwnershipTests</c> already records for World
+    /// having FOUR factories instead of one combined set: construction-time work a shared
+    /// factory would fire needlessly for every sibling.
+    /// </summary>
+    private readonly Dictionary<ShellPage, IShellRoom> _rooms = [];
 
     public ShellWindow(MainWindow main)
     {
@@ -74,7 +91,13 @@ public partial class ShellWindow : Window, IFollowingSurface
         MinWidth = ShellLayoutPolicy.MinWidth;
         MinHeight = ShellLayoutPolicy.MinHeight;
 
-        _progress = new ProgressRoom(main);
+        // **Every room gives back what it borrowed, once.** SpawnsView owns a ticking
+        // DispatcherTimer and InventoryView holds a CancellationTokenSource; both are
+        // released by the v1 windows' own Closed handlers, and a shell that did not do the
+        // same would leak one of each per open, for the life of the process, with nothing
+        // in a diff, a test or a screenshot able to see it. Trap 46's rule — check what the
+        // old host was doing for the surface — covers close as well as tick.
+        Closed += (_, _) => { foreach (var room in _rooms.Values) room.Release(); };
 
         BuildTitleRow();
         BuildRail();
@@ -185,16 +208,46 @@ public partial class ShellWindow : Window, IFollowingSurface
         Title = $"EQBuddy — {ShellPages.Label(_page)}";
         foreach (var (page, row) in _rows) row.Select(page == _page);
 
-        RoomHost.Content = _page switch
-        {
-            ShellPage.Progress => _progress,
-            _ => null,
-        };
-        if (target.Room is { Length: > 0 } room && _page == ShellPage.Progress)
-            _progress.SetTab(room);
+        var landed = RoomFor(_page);
+        RoomHost.Content = landed?.Body;
+        if (target.Room is { Length: > 0 } room) landed?.SetTab(room);
 
         ClosePalette();
         Refresh(force: true);
+    }
+
+    /// <summary>
+    /// The room for a page, built on first arrival and kept afterwards.
+    ///
+    /// **This switch is the ONE place a room is named**, which is the whole reason
+    /// <see cref="IShellRoom"/> exists. Before it there were four of them — the content
+    /// cell, the address's room half, the paint and the dump — and four hand-written
+    /// switches over one list of rooms is trap 30's shape: a staging list is code that
+    /// cannot be type-checked, and the failure is not an error, it is a room that paints on
+    /// arrival and never again because whoever added it updated three.
+    /// </summary>
+    private IShellRoom? RoomFor(ShellPage page)
+    {
+        if (_rooms.TryGetValue(page, out var existing)) return existing;
+        IShellRoom? room = page switch
+        {
+            ShellPage.Progress => new ProgressRoom(_main),
+            ShellPage.Gear => new GearRoom(_main),
+            ShellPage.World => new WorldRoom(_main),
+            _ => null,
+        };
+        if (room is not null) _rooms[page] = room;
+        return room;
+    }
+
+    /// <summary>A new inventory dump landed; the Gear room re-reads it if it is the one on
+    /// screen. Reached through <c>FollowingSurfaces.InventoryChanged</c>, which is what
+    /// makes sure the shell and <c>GearLootWindow</c> both hear about it — a notification
+    /// that reached only one of two hosts would leave the other showing the old bags, which
+    /// is the "EQBuddy did nothing" reading the auto-import exists to prevent.</summary>
+    public void InventoryChanged()
+    {
+        if (_rooms.TryGetValue(ShellPage.Gear, out var gear)) ((GearRoom)gear).InventoryChanged();
     }
 
     // ---- Ctrl+K palette --------------------------------------------------------
@@ -276,13 +329,13 @@ public partial class ShellWindow : Window, IFollowingSurface
             if (!ShellPages.Landed.Contains(page)) continue;
             yield return (ShellPages.Label(page), ShellPages.Address(page),
                 ShellPages.Describe(page));
-            if (page != ShellPage.Progress) continue;
-            // The rooms INSIDE the room, from the same Core definition the tab strip is
-            // built from — so the palette cannot offer a tab that does not exist, or miss
-            // one the surface gains.
-            foreach (var header in ProgressSurface.Tabs())
-                yield return ($"{ShellPages.Label(page)} · {header.Label}",
-                    ShellPages.Address(page, header.Key), ShellPages.Describe(page));
+            // The rooms INSIDE the room, from the same Core definition each room's tab
+            // strip is built from (`ShellPages.Rooms`) — so the palette cannot offer a
+            // room that does not exist, or miss one a surface gains, and cannot spell one
+            // differently from the address the rail resolves.
+            foreach (var (label, key) in ShellPages.Rooms(page))
+                yield return ($"{ShellPages.Label(page)} · {label}",
+                    ShellPages.Address(page, key), ShellPages.Describe(page));
         }
     }
 
@@ -326,12 +379,16 @@ public partial class ShellWindow : Window, IFollowingSurface
     /// surfaces that are behind, and it can only do that if each one says.</summary>
     public long RenderedVersion { get; private set; } = -1;
 
+    /// <summary>Only the VISIBLE room paints. The others are built and idle, which is the
+    /// same split every theme window makes between its active tab and the rest — and the
+    /// same reason: a hidden surface still measures on every layout pass, so painting one
+    /// costs the tick for nothing anybody can see (trap 46's cost half).</summary>
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
         RenderedVersion = s.Version;
-        if (_page == ShellPage.Progress) _progress.Render(s);
+        if (_rooms.TryGetValue(_page, out var room)) room.Render(s);
     }
 
     /// <summary>The shell's own facts for the <c>EQBUDDY_EXPAND</c> dump, in the shape
@@ -341,10 +398,18 @@ public partial class ShellWindow : Window, IFollowingSurface
     ///
     /// <c>shellRail</c> is the count of rows DRAWN, which is the fact worth pinning: the
     /// day a room lands without joining <see cref="ShellPages.Landed"/> — or a row is
-    /// drawn for a room that does not exist — this number is what says so.</summary>
+    /// drawn for a room that does not exist — this number is what says so.
+    ///
+    /// **Only the CURRENT room's facts are reported, and that is trap 56's rule rather
+    /// than laziness.** Rooms are built on first arrival and kept, but only the visible one
+    /// paints; reporting an idle room's numbers would put a second MOMENT in a dump whose
+    /// whole contract is to describe one, and every E2E wait on it would then have to get
+    /// lucky. <c>shellRooms</c> says how many have been built, so "the room I asked for is
+    /// not the one reporting" is answerable rather than inferred.</summary>
     public string DebugFacts() =>
         $"shellPage={ShellPages.Key(_page)} " +
         $"shellRail={_rows.Count} " +
+        $"shellRooms={_rooms.Count} " +
         // The INPUT beside the ANSWER. A hosted CI runner is 1024×768, so an E2E test
         // that asserted "the rail shows labels" would be asserting the desk it was
         // written on; asserting that the answer follows from the width it was computed
@@ -353,5 +418,5 @@ public partial class ShellWindow : Window, IFollowingSurface
         $"shellRailLabels={(ShellLayoutPolicy.For(ActualWidth).RailLabelsVisible ? 1 : 0)} " +
         $"shellSearch={(SearchBox.IsVisible ? 1 : 0)} " +
         $"shellPalette={(PaletteLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
-        _progress.DebugFacts();
+        (_rooms.TryGetValue(_page, out var shown) ? shown.DebugFacts() : "");
 }

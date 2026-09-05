@@ -1582,6 +1582,31 @@ Read this list before touching the areas it names. Every entry cost a release.
     E-3 adds test projects. When you write one that shares something, write the
     assembly-level attribute in the same commit, not after the third flake.
 
+58. **THE `EQBUDDY_EXPAND` DUMP IS ONE FLAT NAMESPACE, AND A SECOND HOST OF A SURFACE
+    WRITES THE SAME KEYS INTO IT — the later writer wins, silently, and every existing
+    assertion on those keys quietly starts reading the other window.** `MapView.DebugFacts()`
+    reports `mapShown`, `mapZones`, `mapNamedRows`, and it reports them identically whether
+    it is hanging in `WorldWindow` or in the Evolved shell's World room. Open both — which
+    is exactly what the two-host E2E assertions do, on purpose — and the dump carries one
+    `mapZones=` whose value depends on the order the facts were concatenated in. Nothing
+    about that shows in a diff, a build or a screenshot: both windows render, both are
+    right, and the TEST is what changes meaning.
+    → **This is trap 4 (one entry, two sources for one fact) with the two sources being two
+    HOSTS rather than two lines twenty apart**, and E-3 makes it structural rather than
+    accidental: the shell is a second host for every surface it takes, for as long as the v1
+    window survives beside it — which is deliberately several PRs.
+    → **The fix is NOT to hand-write the second host's facts under new names.** That is a
+    second producer of a number the first host already reports (trap 33 one level up), and
+    it stops covering the surface the day it gains a seventh fact (trap 30). Ask the SAME
+    view for the SAME string and re-key it: `UI.Shared/ShellDumpFacts.Prefixed("shellWorld",
+    _map.DebugFacts())`. The two hosts then cannot report different facts, because there is
+    only one place the facts are written — and the comparison assertion becomes possible to
+    write at all.
+    → **Recorded before it bit, which is why it is worth writing down.** It was caught by
+    asking "what does the dump look like with both hosts open?" while wiring the second
+    room, not by a wrong test result — and a wrong test result here would not have looked
+    like a defect, it would have looked like a passing suite.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

@@ -157,6 +157,15 @@ of the wrong window on top. The new baseline is again the MINIMUM that fits (4,1
 4,573 against 4,572), so the next E-3 move lifts again — which is the pressure, not a
 side effect.
 
+**E-3 PR 2 (two more rooms: World and Gear) changed this file by ZERO lines, and that is
+worth saying rather than leaving to be inferred from an unchanged number.** The rooms are
+new files; the only thing they needed from the widget was for one existing notification to
+reach two hosts instead of one, and that was done by REPLACING a line rather than adding
+one (`_gearLootWindow?.InventoryChanged()` → `FollowingSurfaces.InventoryChanged(this)`,
+which is where the list of satellite surfaces already lives). So the baseline is untouched
+and the pressure above still stands, unspent: **the next E-3 move that needs a line here
+lifts a surface first.** A PR that needs no room does not get to bank any.
+
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment
 Fable's plan prescribed — ~140 lines of pure string-building the hotspot glob was paying

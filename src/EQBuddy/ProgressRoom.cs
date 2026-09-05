@@ -36,8 +36,17 @@ namespace EQBuddy;
 /// pinned above it rather than being concatenated into the scrolling body, which is what
 /// trap 37 cost the Drops tab's footer.
 /// </summary>
-internal sealed class ProgressRoom : Grid
+internal sealed class ProgressRoom : Grid, IShellRoom
 {
+    public UIElement Body => this;
+
+    /// <summary>Nothing to give back. Every surface this room builds is arithmetic over a
+    /// snapshot the widget already holds — no timer, no token, no file handle — which is
+    /// exactly why Fable's plan named Progress as the first room to move. The World and
+    /// Gear rooms are not so lucky, and <see cref="IShellRoom.Release"/> exists because of
+    /// them.</summary>
+    public void Release() { }
+
     private readonly MainWindow _main;
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();

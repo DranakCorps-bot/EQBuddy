@@ -59,4 +59,27 @@ internal static class FollowingSurfaces
     {
         foreach (var surface in OpenOn(w)) surface.MaybeFollow();
     }
+
+    /// <summary>
+    /// A new <c>/outputfile inventory</c> dump landed — tell every host that draws it.
+    ///
+    /// **It is a fan-out rather than one call because the Evolved shell became a second
+    /// host of the Gear room (E-3 PR 2), and the surface it hosts paints on ARRIVAL rather
+    /// than on the tick.** Both hosts deliberately skip the once-a-second repaint for the
+    /// Inventory room — it re-scans the game folder and rebuilds every row, which clears a
+    /// StackPanel out from under the player's cursor — so this notification is the ONLY
+    /// thing that fills it in while they are watching. A notification that reached one host
+    /// and not the other would leave the second showing the old bags indefinitely: exactly
+    /// the "EQBuddy did nothing" reading the auto-import exists to prevent, and invisible
+    /// to a diff, a test and a screenshot alike.
+    ///
+    /// It lives here rather than at the call site for the reason this whole file exists —
+    /// a list of satellite surfaces that has to be kept in step by hand is trap 30's shape,
+    /// and adding the third host should be one line in one place.
+    /// </summary>
+    public static void InventoryChanged(MainWindow w)
+    {
+        w._gearLootWindow?.InventoryChanged();
+        w._shellWindow?.InventoryChanged();
+    }
 }

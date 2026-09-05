@@ -1,4 +1,5 @@
 ﻿using EQBuddy.Companion;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Tests;
@@ -76,12 +77,28 @@ public class ShellNavigationTests
         Assert.Equal(Enum.GetValues<ShellPage>().Length, ShellPages.RailOrder.Count);
     }
 
-    /// <summary>E-3 PR 1 landed exactly one room. **This row is meant to be edited** — a
-    /// room joins `Landed` in the PR that lands it, and this assertion is the reminder
-    /// that doing so is a deliberate act rather than a line someone slid in.</summary>
+    /// <summary>E-3 PR 1 landed one room; PR 2 landed two more. **This row is meant to be
+    /// edited** — a room joins `Landed` in the PR that lands it, and this assertion is the
+    /// reminder that doing so is a deliberate act rather than a line someone slid in. It
+    /// asserts the ORDER too, because `Landed` is filtered through `RailOrder` when the
+    /// rail is drawn and a list that agreed on membership while disagreeing on order would
+    /// be a rail nobody could predict from this file.</summary>
     [Fact]
-    public void OnlyProgressHasLandedSoFar() =>
-        Assert.Equal([ShellPage.Progress], ShellPages.Landed);
+    public void ThreeRoomsHaveLandedSoFar() =>
+        Assert.Equal([ShellPage.Progress, ShellPage.Gear, ShellPage.World], ShellPages.Landed);
+
+    /// <summary>The four that have NOT landed, named — because "which rooms are missing"
+    /// is the question a reader of `Landed` actually has, and a positive list cannot
+    /// answer it. Each is held back by a decision rather than by effort: Live does not
+    /// exist yet, Home and Search are new surfaces, Settings is a room whose whole job is
+    /// not being a launcher, and Quests is a lift rather than a host.</summary>
+    [Theory]
+    [InlineData(ShellPage.Home)]
+    [InlineData(ShellPage.Live)]
+    [InlineData(ShellPage.Quests)]
+    [InlineData(ShellPage.Settings)]
+    public void TheRoomsThatHaveNotLandedDrawNoRailRow(ShellPage page) =>
+        Assert.DoesNotContain(page, ShellPages.Landed);
 
     /// <summary>Settings is the one page under the rail's gap, at every width.</summary>
     [Fact]
@@ -104,6 +121,96 @@ public class ShellNavigationTests
             Assert.NotNull(IconPaths.Path(ShellPages.IconName(page)));
         }
     }
+
+    // ---- 2b. the rooms INSIDE a room, spelled once ------------------------------
+
+    /// <summary>
+    /// **Every room the shell can address round-trips through the SURFACE's own key
+    /// table.** This is the assertion behind `ShellPages.Rooms` mapping rather than
+    /// translating, and the failure it catches is a shell that invents a second spelling
+    /// for one destination — `world:path` beside the surface's `world:travel` — which is
+    /// trap 33 lifted from data into navigation.
+    ///
+    /// It matters because the real keys look like typos and are not:
+    /// `ProgressSurface.KeyFor(Experience)` is `"progress"` (the card key five folded
+    /// surfaces collapsed into), `WorldTab.Travels` is `"misc"` (the old card's settings
+    /// key, kept so the fold needed no migration at all), and `WorldTab.Routes` is
+    /// `"travel"` while its label reads "Path". Every one of those is load-bearing
+    /// history that a well-meaning rename would destroy silently.
+    /// </summary>
+    [Fact]
+    public void EveryRoomKeyResolvesBackThroughItsOwnSurface()
+    {
+        foreach (var page in ShellPages.Landed)
+        {
+            var rooms = ShellPages.Rooms(page);
+            Assert.NotEmpty(rooms);
+            foreach (var (label, key) in rooms)
+            {
+                Assert.NotEmpty(label);
+                Assert.NotEmpty(key);
+                var resolved = page switch
+                {
+                    ShellPage.Progress => ProgressSurface.TabForKey(key) is { } t
+                        ? ProgressSurface.KeyFor(t) : null,
+                    ShellPage.Gear => LootSurface.TabForKey(key) is { } t
+                        ? LootSurface.KeyFor(t) : null,
+                    ShellPage.World => WorldSurface.TabForKey(key) is { } t
+                        ? WorldSurface.KeyFor(t) : null,
+                    _ => null,
+                };
+                Assert.Equal(key, resolved);
+                // And the whole address parses, which is what the rail, the palette and
+                // EQBUDDY_SHELL all hand to one Navigate().
+                Assert.Equal((page, (string?)key),
+                    ShellPages.ParseAddress(ShellPages.Address(page, key)));
+            }
+        }
+    }
+
+    /// <summary>The negative that keeps the row above from going vacuous (trap 39): a
+    /// page with no room list answers empty rather than answering something.</summary>
+    [Fact]
+    public void APageWithNoRoomsInsideItAnswersEmpty() =>
+        Assert.Empty(ShellPages.Rooms(ShellPage.Settings));
+
+    /// <summary>The room list is the surface's, not a copy of it — asserted against the
+    /// COUNT each Core definition reports, so a room added to a surface reaches the
+    /// palette without anyone editing the shell.</summary>
+    [Fact]
+    public void TheRoomListsComeFromTheSurfacesThemselves()
+    {
+        Assert.Equal(ProgressSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Progress).Count);
+        Assert.Equal(LootSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Gear).Count);
+        Assert.Equal(WorldSurface.Tabs().Count, ShellPages.Rooms(ShellPage.World).Count);
+    }
+
+    // ---- 2c. two hosts, one flat dump namespace --------------------------------
+
+    /// <summary>
+    /// **The re-key that stops two hosts writing over each other in the dump.** The shell
+    /// asks `MapView` for the same string `WorldWindow` asks it for, so the two can never
+    /// report different facts — and then renames the keys, because the dump is one flat
+    /// namespace and with both windows open the later writer would silently win.
+    /// </summary>
+    [Theory]
+    [InlineData("shellWorld", "mapZones=4", "shellWorldMapZones=4")]
+    [InlineData("shellWorld", "a=1 b=2", "shellWorldA=1 shellWorldB=2")]
+    [InlineData("shellWorld", "spawnsRows=0 spawnsFollow=1",
+        "shellWorldSpawnsRows=0 shellWorldSpawnsFollow=1")]
+    public void FactsAreRekeyedUnderTheHostsPrefix(string prefix, string facts, string expected) =>
+        Assert.Equal(expected, ShellDumpFacts.Prefixed(prefix, facts));
+
+    /// <summary>A token that is not a `key=value` pair is passed through untouched. The
+    /// dump has no such token today; a reader that silently renamed something it did not
+    /// understand would be the more expensive of the two mistakes.</summary>
+    [Fact]
+    public void ATokenThatIsNotAPairIsLeftAlone() =>
+        Assert.Equal("shellWorldA=1 loose", ShellDumpFacts.Prefixed("shellWorld", "a=1 loose"));
+
+    [Fact]
+    public void AnEmptyFactStringStaysEmpty() =>
+        Assert.Equal("", ShellDumpFacts.Prefixed("shellWorld", ""));
 
     // ---- 3. two degrade axes, and a floor --------------------------------------
 

@@ -80,6 +80,12 @@ public class DesignRatchetTests
         "EQBuddy/ShellWindow.xaml.cs",
         "EQBuddy/RailRow.cs",
         "EQBuddy/ProgressRoom.cs",
+        // E-3 PR 2's two rooms, joining on the day they land for the same reason. They
+        // are compositions over surfaces that were already on the system, so the only
+        // numbers they carry are spacing tokens — which is exactly the state this list
+        // exists to keep a file in.
+        "EQBuddy/WorldRoom.cs",
+        "EQBuddy/GearRoom.cs",
 
         // ---- Five Avalonia rows left this list with the platform in E-2 (2026-09-04):
         // the widget, EqFoldLabel, Quests, Loot and the wiki pack. **The list only ever

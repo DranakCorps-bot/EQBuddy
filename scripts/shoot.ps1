@@ -171,6 +171,66 @@ $Shots = [ordered]@{
     'shell-narrow'    = @{ Title = 'EQBuddy — Progress'
                            Env = @{ EQBUDDY_SHELL = 'progress'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{} }
+    # ---- E-3 PR 2: the World and Gear rooms ------------------------------------------
+    #
+    # Same lock, same reason: an illustration of our own UI is a capture with a recipe or
+    # it does not ship, so a room's shot lands in the PR that lands the room — exactly the
+    # way its rail row does.
+    #
+    # Titles are 'EQBuddy — World' and 'EQBuddy — Gear', derived from ShellPages.Label.
+    # Trap 53 applies: these are identities the WINDOW can invalidate without touching this
+    # file, and one stale title stops the whole batch at its row. They should indeed fail if
+    # a room is renamed.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-world' — the same native chrome and title row as 'shell-progress', with a
+    #     rail of THREE rows now, in RailOrder: Progress (chart), Gear (bag), World (pin).
+    #     World lit, the other two dim. Still no Home / Live / Quests / Settings row — those
+    #     rooms do not exist and a disabled row is an affordance that opens nothing.
+    #     The room: a four-chip wrapped strip Map · Camps · Path · Travels with Map lit and
+    #     badged with the fixture's zone, and under it the zone map canvas 'zone-map' shows
+    #     — the same MapView, in a different host. Pinned BELOW the body, on every tab: a
+    #     location icon and the words "Drop camp marker".
+    #     **And one thing that must NOT be there**: the star and "Show in mini dashboard"
+    #     that sit beside that button in WorldWindow. It is the only writer MiniStats has
+    #     for "deaths" and it stays with the window this PR does not retire — copying it
+    #     here would make two writers of one settings key (trap 13). A picture is the only
+    #     thing that can confirm an absence like that was deliberate rather than lost.
+    #
+    #   'shell-gear' — rail of three with Gear lit; a three-chip strip Loot · Wishlist ·
+    #     Inventory carrying the same badges 'gearloot-loot' shows (a loot count on Loot;
+    #     no wishlist badge and no inventory badge, since this profile seeds neither); and
+    #     the loot list itself in the body. Again one deliberate absence: the
+    #     "Show in mini dashboard: ★ Loot" row stays with GearLootWindow, for the same
+    #     reason and with the same retirement blocker recorded against it.
+    #
+    #   'shell-gear-narrow' — THE ONE THAT CAN DISPROVE SOMETHING, and it is here for that
+    #     rather than for illustration. ShellLayoutPolicy.MinRoomWidth is 520 —
+    #     ProgressWindow's shipped width — and PR 2 added a room whose own window opens at
+    #     880. This is that room, on its widest tab, at the floor (520 + the 60-unit
+    #     collapsed rail). Predicted: the rail is icons only, three glyphs and no words,
+    #     room names on hover; the five seeded wishlist rows read without horizontal
+    #     clipping; and the ⧉ copy of /outputfile inventory is still visible without
+    #     scrolling, which is the affordance trap 34 keeps a must-list row for on this
+    #     surface. **If a row clips, the constant moves — not this shot, and not a
+    #     horizontal scrollbar, which would hide a layout failure behind an affordance.**
+    'shell-world'     = @{ Title = 'EQBuddy — World'
+                           Env = @{ EQBUDDY_SHELL = 'world:map' }; Set = @{} }
+    'shell-gear'      = @{ Title = 'EQBuddy — Gear'
+                           Env = @{ EQBUDDY_SHELL = 'gear' }; Set = @{} }
+    'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
+                           Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{
+                               GearChecklistName = 'Kael push'
+                               GearChecklist = @(
+                                   @{ Slot = 'HEAD'; Item = 'Crown of Narandi'; Source = 'Kael Drakkel' }
+                                   @{ Slot = 'HANDS'; Item = 'Gloves of Dark Embers'; Source = 'Sebilis'; Acquired = $true }
+                                   @{ Slot = 'PRIMARY'; Item = 'Blade of Carnage'; Source = 'Kael Drakkel' }
+                                   @{ Slot = 'NECK'; Item = 'Silver Chain of Dread'; Source = 'Plane of Fear' }
+                                   @{ Slot = 'HEAD'; Item = 'Exquisite Velium Shard'; IsExaltation = $true
+                                      ExaltationEffect = '+15 hp'; Source = 'Kael Drakkel' }
+                               ) } }
     # The PROGRESS theme EXPANDED IN PLACE (Inline themes PR 1). Title is 'EQBuddy' — this
     # is the widget, not the window, which is the whole point of the change. A NEW name,
     # per trap 21: 'progress-card' and 'section-progress' are both embedded in the docs and
