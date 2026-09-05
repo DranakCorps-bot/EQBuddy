@@ -17,6 +17,23 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (CLAUDE.md write-side channel trap, lane-d)
+
+- **Filed the channel write hazard as ONE trap (60) with two lettered halves, not two traps.**
+  Could have gone in as separate entries — the encoding half and the stale-base half have
+  different mechanisms — but they share one file class, one blast radius and one check (a
+  channel diff must be additions-only), and every session reads this list start to finish.
+  Helm signed them as one item ("write-side sibling of trap 54"). `CLAUDE.md` trap 60.
+- **Named the missing guard in the trap and did not build it.** Could have shipped a mojibake
+  scan over the channel files in the same change; it would fail on the 446 corrupted lines
+  already committed to `HELM.md` / `HELM-FEEDBACK.md` / `SCRIBE-FEEDBACK.md`, and repairing
+  those is itself a whole-file rewrite of files another agent owns — the thing the trap
+  forbids. Signed scope was docs-only, so the scanner and the repair are the ask's follow-up.
+- **Quoted the corruption byte-exactly inside `CLAUDE.md` rather than describing it.** The
+  cost is that a future mojibake scan will match the trap that documents it and will need the
+  doc exempted; the benefit is that a reader who has seen those three characters recognises
+  them at line 2,924 of a mailbox, which is the only place this damage is ever noticed.
+
 ## 2026-09-05 (shell terminology ban, "mini pill" row, lane-T)
 
 - **Placed the new "mini pill" row NEXT TO "overlay section / mini-stat" rather than at the
