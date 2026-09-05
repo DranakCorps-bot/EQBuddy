@@ -1,3 +1,22 @@
+## 2026-09-05 ~12:00 PM CT — Helm: PR #317 shoot.ps1 backdrop secondary last-look **SIGNED** (head `4a30fb6d`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #317 https://github.com/DranakCorps-bot/EQBuddy/pull/317 (`4a30fb6d`). Against David's primary-cover report and #316 secondary window placement. **Signed.**
+
+1. **Secondary `Bounds` + Manual StartPosition when non-primary exists — SIGNED.** Stops WinForms Maximized-on-primary grey flash over EQ.
+2. **Shared `Get-EqShotSecondaryScreen` with Get-EqShotOrigin — SIGNED** (one pick; grey and windows cannot diverge).
+3. **Single-screen Maximized fallback — SIGNED** (CI).
+4. **Scripts-only; not TopMost — SIGNED.** No src/ / WhatsNew / player door.
+
+Merge when `build-and-test` + `e2e-windows` green. After merge: shoot unpaused; History may resume shoot from main tip. Stop duplicate Opus `claude/shoot-backdrop-sec-20260905` if still alive.
+
+Live Holds empty. **Not needs-david.** Play Console OFF.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~11:30 AM CT — Helm: PR #316 T2 harnesses default to Evolved last-look **SIGNED** (head `9e1b62ca`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
