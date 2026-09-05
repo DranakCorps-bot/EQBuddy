@@ -1,5 +1,4 @@
 using System.Windows;
-using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -32,24 +31,41 @@ internal static class ShellHost
     {
         if (main._shellWindow is not { IsLoaded: true })
         {
-            main._shellWindow = new ShellWindow(main);
+            // The address goes to the CONSTRUCTOR. Building the window and then navigating
+            // it would land on the default room first — building and painting a room nobody
+            // asked for, which stopped being free the moment the default became Home.
+            main._shellWindow = new ShellWindow(main, address);
             main._shellWindow.Closed += (_, _) => main._shellWindow = null;
             main._shellWindow.Show();
         }
-        if (address is { Length: > 0 }) main._shellWindow.Navigate(address);
+        else if (address is { Length: > 0 }) main._shellWindow.Navigate(address);
         main._shellWindow.Activate();
     }
 
-    /// <summary>The review hook. <c>EQBUDDY_SHELL=1</c> opens the shell on its default
-    /// room; <c>EQBUDDY_SHELL=progress:raids</c> opens it there, in the address grammar
-    /// every other navigation path uses.</summary>
+    /// <summary>
+    /// The review hook. <c>EQBUDDY_SHELL=1</c> opens the shell on its default room;
+    /// <c>EQBUDDY_SHELL=progress:raids</c> opens it there, in the address grammar every
+    /// other navigation path uses.
+    ///
+    /// **The bare form passes NO address, and that is a fix rather than a tidy-up.** It used
+    /// to translate <c>"1"</c> into an explicit <c>progress</c> address — a third copy of
+    /// "what the default room is", in a third file, and the one every capture built on this
+    /// hook actually exercises. Nothing forced it to agree with
+    /// <see cref="ShellWindow"/>'s own default, so a screenshot taken through it would have
+    /// gone on showing the old room after the window changed, and looked entirely healthy
+    /// doing it (trap 24's shape, reached through the hook instead of through a title).
+    /// **A hook that says "open on the default" must not know what the default is** — so
+    /// <see cref="Show"/> is called with none and the window's constructor is the only
+    /// place the answer exists. <c>TheShellOpensOnHomeWithNoAddressAtAll</c> is the E2E that
+    /// walks this exact path; before E-3 PR 4 nothing did.
+    /// </summary>
     public static void ApplyEnvHook(MainWindow main)
     {
         if (Environment.GetEnvironmentVariable("EQBUDDY_SHELL") is not { Length: > 0 } address)
             return;
         main.Loaded += (_, _) => main.Dispatcher.BeginInvoke(() =>
         {
-            Show(main, address == "1" ? ShellPages.Address(ShellPage.Progress) : address);
+            Show(main, address == "1" ? null : address);
             ApplySizeHook(main);
         }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }

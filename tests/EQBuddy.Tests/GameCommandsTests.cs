@@ -89,6 +89,18 @@ public class GameCommandsTests
         // copy is not empty-state-only either).
         ("EQBuddy/QuestsView.xaml.cs", nameof(GameCommands.OutputfileFaction),
             "the Unlocks tab's race progress is faction standings, which the log never sees"),
+        // E-3 PR 4's Home room. Its READINESS block exists to answer "what has EQBuddy not
+        // been told yet", and every row of it that says "Not run yet" is a surface naming a
+        // command — three of them, which is why there are three rows here rather than one.
+        // This is the room a brand-new player's shell OPENS on, so it is the surface where
+        // an ask with no ⧉ beside it costs the most: the empty state is the only state a new
+        // player sees, and it is the whole state of this block on a fresh profile.
+        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileInventory),
+            "the Bags readiness row asks for the dump the wishlist and quest turn-ins read"),
+        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileAchievements),
+            "the Achievements readiness row asks for what Sky turn-ins and raid clears read"),
+        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileFaction),
+            "the Factions readiness row asks for standings the log can never see"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),

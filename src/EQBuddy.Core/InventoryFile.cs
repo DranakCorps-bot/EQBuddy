@@ -88,20 +88,16 @@ public static class InventoryFile
     }
 
     /// <summary>The newest dump for the followed character in the game folder (the
-    /// Logs folder's parent — where /outputfile writes). Character match is on the
-    /// filename prefix; server tags vary in case. Null when none exists yet.</summary>
+    /// Logs folder's parent — where /outputfile writes), parsed. Finding it is
+    /// <see cref="OutputfileAutoImport.FindLatest"/>'s job, which is the one place the
+    /// root and the filename shape are decided; this adds the parse. Null when none
+    /// exists yet.</summary>
     public static Snapshot? FindLatest(string? logFolder, string character)
     {
-        if (logFolder is null || character.Length == 0) return null;
-        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
-        if (root is null || !Directory.Exists(root)) return null;
+        var file = OutputfileAutoImport.FindLatest(logFolder, character, OutputfileKind.Inventory);
+        if (file is null) return null;
         try
         {
-            var file = Directory.EnumerateFiles(root, $"{character}_*-Inventory.txt")
-                .Select(f => new FileInfo(f))
-                .OrderByDescending(f => f.LastWriteTime)
-                .FirstOrDefault();
-            if (file is null) return null;
             var entries = ParseEntries(File.ReadLines(file.FullName));
             var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             foreach (var e in entries)

@@ -96,21 +96,16 @@ public static class FactionsFile
         return result;
     }
 
-    /// <summary>The newest faction dump for this character, found the same way and in the
-    /// same place as <see cref="InventoryFile.FindLatest"/> — the log folder's PARENT,
-    /// said in one place so the two cannot disagree about where a dump lives.</summary>
+    /// <summary>The newest faction dump for this character, parsed. Finding it is
+    /// <see cref="OutputfileAutoImport.FindLatest"/>'s job — the log folder's PARENT and
+    /// the filename shape are decided there, in one place, so no two finders can disagree
+    /// about where a dump lives.</summary>
     public static Snapshot? FindLatest(string? logFolder, string character)
     {
-        if (logFolder is null || character.Length == 0) return null;
-        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
-        if (root is null || !Directory.Exists(root)) return null;
+        var file = OutputfileAutoImport.FindLatest(logFolder, character, OutputfileKind.Factions);
+        if (file is null) return null;
         try
         {
-            var file = Directory.EnumerateFiles(root, $"{character}_*-Factions.txt")
-                .Select(f => new FileInfo(f))
-                .OrderByDescending(f => f.LastWriteTime)
-                .FirstOrDefault();
-            if (file is null) return null;
             return new Snapshot(file.FullName, file.LastWriteTime,
                 Parse(File.ReadLines(file.FullName)));
         }

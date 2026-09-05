@@ -24,7 +24,7 @@ $version = ([xml](Get-Content (Join-Path $repo 'Directory.Build.props'))).Projec
 @{
     LogFolder = $logsDir.FullName; ShowTutorial = $false; LastSeenVersion = $version
     TruncateLogs = $false; UpdateFolder = (Join-Path $Root 'updates'); Theme = 'Midnight'
-    WindowLeft = 900.0; WindowTop = 200.0
+    WindowLeft = (& { Add-Type -AssemblyName System.Windows.Forms -EA SilentlyContinue; $s = [System.Windows.Forms.Screen]::AllScreens | Where-Object { -not $_.Primary } | Select-Object -First 1; if ($s) { [double]($s.WorkingArea.X + 120) } else { 900.0 } }); WindowTop = (& { Add-Type -AssemblyName System.Windows.Forms -EA SilentlyContinue; $s = [System.Windows.Forms.Screen]::AllScreens | Where-Object { -not $_.Primary } | Select-Object -First 1; if ($s) { [double]($s.WorkingArea.Y + 120) } else { 200.0 } })
 } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $profileDir 'settings.json') -Encoding utf8
 
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes

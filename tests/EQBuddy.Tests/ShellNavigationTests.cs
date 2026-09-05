@@ -77,7 +77,8 @@ public class ShellNavigationTests
         Assert.Equal(Enum.GetValues<ShellPage>().Length, ShellPages.RailOrder.Count);
     }
 
-    /// <summary>E-3 PR 1 landed one room; PR 2 landed two more; PR 3 landed Quests.
+    /// <summary>E-3 PR 1 landed one room; PR 2 landed two more; PR 3 landed Quests; PR 4
+    /// landed Home, at the TOP.
     /// **This row is meant to be edited** — a room joins `Landed` in the PR that lands it,
     /// and this assertion is the reminder that doing so is a deliberate act rather than a
     /// line someone slid in. It asserts the ORDER too, because `Landed` is filtered through
@@ -89,20 +90,24 @@ public class ShellNavigationTests
     /// joining inserts itself in the fixed order automatically — correct by construction,
     /// and invisible if it silently is not. A build that appended new rooms at the bottom
     /// would look identical in every way except this line and the `shell-quests`
-    /// screenshot, which is why the pre-design asked for both.</summary>
+    /// screenshot, which is why the pre-design asked for both.
+    ///
+    /// **Home is FIRST here, and it did not have to be arranged.** `RailOrder` has had Home
+    /// at the top since PR 1, so the room joining `Landed` put its row above Progress on its
+    /// own — which is the property this assertion exists to prove rather than assume.</summary>
     [Fact]
-    public void FourRoomsHaveLandedSoFar() =>
-        Assert.Equal([ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World],
+    public void FiveRoomsHaveLandedSoFar() =>
+        Assert.Equal(
+            [ShellPage.Home, ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World],
             ShellPages.Landed);
 
-    /// <summary>The three that have NOT landed, named — because "which rooms are missing"
+    /// <summary>The two that have NOT landed, named — because "which rooms are missing"
     /// is the question a reader of `Landed` actually has, and a positive list cannot
     /// answer it. Each is held back by a decision rather than by effort: Live does not
-    /// exist yet, Home is a new surface (and each gets its own Bevel pass rather than
-    /// riding another room's PR, per the Helm-signed Quests → Home → Live order), and
-    /// Settings is a room whose whole job is not being a launcher.</summary>
+    /// exist yet (and gets its own Bevel pass rather than riding another room's PR, per the
+    /// Helm-signed Quests → Home → Live order), and Settings is a room whose whole job is
+    /// not being a launcher.</summary>
     [Theory]
-    [InlineData(ShellPage.Home)]
     [InlineData(ShellPage.Live)]
     [InlineData(ShellPage.Settings)]
     public void TheRoomsThatHaveNotLandedDrawNoRailRow(ShellPage page) =>
@@ -152,6 +157,11 @@ public class ShellNavigationTests
         foreach (var page in ShellPages.Landed)
         {
             var rooms = ShellPages.Rooms(page);
+            // Home is the exception, and it is a real one rather than a gap: four blocks on
+            // one page IS the room, so there is nothing for an address's room half to name.
+            // Asserted rather than skipped silently — a landed room that lost its tabs by
+            // accident would otherwise slip through this loop the same way.
+            if (page == ShellPage.Home) { Assert.Empty(rooms); continue; }
             Assert.NotEmpty(rooms);
             foreach (var (label, key) in rooms)
             {

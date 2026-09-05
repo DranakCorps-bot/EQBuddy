@@ -1,4 +1,4 @@
-﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #
@@ -143,10 +143,12 @@ $Shots = [ordered]@{
     #     minimise / maximise / close and a taskbar entry, NOT the hand-drawn chrome
     #     every theme window has. Under it a title row: app icon, "EQBuddy", and a search
     #     field on the right with a magnifier and the hint "Search  Ctrl+K". Down the left,
-    #     a rail on a panel ground with ONE row — a chart icon and "Progress", lit as
-    #     selected. No
-    #     Home / Live / Gear / Quests / World / Settings rows: those rooms do not exist
-    #     yet and a disabled row is an affordance that opens nothing. To its right, the
+    #     a rail on a panel ground. **This prediction was written at PR 1 and said ONE row
+    #     — a chart icon and "Progress" — and it is FIVE now** (Home · Progress · Gear ·
+    #     Quests · World), because a room's row lands in the PR that lands the room. What
+    #     has not changed and is still the assertion: Progress is lit as selected, and there
+    #     are no Live or Settings rows, because those rooms do not exist and a disabled row
+    #     is an affordance that opens nothing. To its right, the
     #     Progress room: a four-chip wrapped strip (Experience · Wealth · Faction · Raids)
     #     with the same badges the Progress WINDOW's strip carries, Experience lit, and
     #     the Experience body under it.
@@ -198,7 +200,8 @@ $Shots = [ordered]@{
     #     here would make two writers of one settings key (trap 13). A picture is the only
     #     thing that can confirm an absence like that was deliberate rather than lost.
     #
-    #   'shell-gear' — rail of three with Gear lit; a three-chip strip Loot · Wishlist ·
+    #   'shell-gear' — rail of five (three when this was written) with Gear lit; a
+    #     three-chip strip Loot · Wishlist ·
     #     Inventory carrying the same badges 'gearloot-loot' shows (a loot count on Loot;
     #     no wishlist badge and no inventory badge, since this profile seeds neither); and
     #     the loot list itself in the body. Again one deliberate absence: the
@@ -287,6 +290,66 @@ $Shots = [ordered]@{
     'shell-quests-narrow' = @{ Title = 'EQBuddy — Quests'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '899x640' }; Set = @{} }
+    # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------
+    #
+    # **`EQBUDDY_SHELL = '1'` is deliberate and is half of what these shots prove.** Every
+    # other shell row above names an explicit address; the bare hook asks for no room at
+    # all, so the picture is evidence about the WINDOW's own default rather than about
+    # whatever the harness typed. That is the same reason the E2E for it exists — until
+    # PR 4 nothing walked this path, and the default was written in three places that were
+    # never forced to agree.
+    #
+    # PREDICTION, written before the shot (trap 23):
+    #   'shell-home' — a native title bar reading "EQBuddy — Home". The rail now has FIVE
+    #     rows and Home is the TOP one, above Progress, lit as selected — it did not have to
+    #     be arranged there, `RailOrder` has had Home first since PR 1 and the room joining
+    #     `Landed` put it in place. A rail that appended Home at the BOTTOM, or a shell that
+    #     still opened on Progress, is a build that looks healthy in every way except this
+    #     picture. Under it, four blocks with small-caps headings, in this order:
+    #       Character  — "Testchar" in accent ink, "test · <zone>" under it.
+    #       Readiness — heading "Readiness — 3 not run yet"; three rows (Bags, Achievements,
+    #         Factions), each with "Not run yet" in accent ink on the right, a dim line
+    #         saying what it feeds, and a ⧉ copy button under it. Three buttons, because the
+    #         shoot profile has no dumps.
+    #       Recent session — "Session in progress" and one sentence. **No numbers**: the
+    #         fixture IS a live session with 82 kills in it and the Home/Live boundary says
+    #         Home does not draw them.
+    #       Go to — four rows (Progress, Gear, Quests, World) with their one-line pitches.
+    #         NOT five: Home does not link to itself. NOT six: Live has not landed, and a
+    #         link that opens nothing is the rail's forbidden shape one level in.
+    #     The block column is capped at `MinRoomWidth` and pinned LEFT — the first take of
+    #     this shot is what asked for that, with "Not run yet" stranded about 600 units from
+    #     the row it belonged to. If the answers drift back toward the right edge as the
+    #     window widens, it is the cap that has come off.
+    #   'shell-home-narrow' — the SAME room at the floor. The rail is icons only and the
+    #     block column must look UNCHANGED, because its cap IS the floor's room width: this
+    #     is the shot that can disprove that, the way 'shell-gear-narrow' can disprove
+    #     MinRoomWidth itself. Anything clipping horizontally here means the cap is wrong,
+    #     not the shot — and never a horizontal scrollbar, which hides a layout failure
+    #     behind an affordance.
+    #   'shell-home-ready' — the SAME room with an inventory dump staged, which is the only
+    #     way to photograph the difference the Readiness block exists to draw. Heading reads
+    #     "Readiness — 2 not run yet"; the Bags row now carries a DATE in dim ink and an
+    #     "Open" link instead of a ⧉ button, and the other two are unchanged. If the two
+    #     pictures are indistinguishable, never-scanned and healthy have collapsed into one
+    #     state, which is exactly what the pre-design forbade.
+    #
+    # There is NO shot of the room-level empty (no character at all), and that is a gap
+    # named rather than hidden: this harness seeds a fixture log by construction, so
+    # "EQBuddy has never seen a character" cannot be staged without a second profile shape
+    # that nothing else here needs. `RoomEmptyState` and its words are unit-tested
+    # (`HomeRoomTests`) and `shellHomeEmpty` is in the dump; the POSITION — centred in the
+    # room's cell — is the part still unphotographed. Whoever adds that profile shape gets
+    # the shot with it.
+    'shell-home'      = @{ Title = 'EQBuddy — Home'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{} }
+    'shell-home-narrow' = @{ Title = 'EQBuddy — Home'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{} }
+    'shell-home-ready' = @{ Title = 'EQBuddy — Home'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{}
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "General1`tBone Chips`t0`t12`t0"
+                               "General2`tFlawless Diamond`t0`t1`t0") } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{
@@ -1242,15 +1305,26 @@ function Append-Log([string[]]$lines) {
     foreach ($line in $lines) { Add-Content -Path $log.FullName -Value "$stamp $line" -Encoding utf8 }
 }
 
+
+# Prefer the secondary display for fixture windows so overnight shoot/E2E does not cover
+# EQ on the primary. Falls back to 120,120 when only one screen is attached (CI).
+function Get-EqShotOrigin {
+    Add-Type -AssemblyName System.Windows.Forms -ErrorAction SilentlyContinue
+    $sec = [System.Windows.Forms.Screen]::AllScreens | Where-Object { -not $_.Primary } | Select-Object -First 1
+    if ($sec) {
+        return @{ Left = [int]($sec.WorkingArea.X + 120); Top = [int]($sec.WorkingArea.Y + 120) }
+    }
+    return @{ Left = 120; Top = 120 }
+}
 function Write-Settings([hashtable]$extra) {
     $s = @{
         LogFolder    = $logsDir.FullName
         UpdateFolder = $updateDir.FullName
         Theme        = $Theme
-        WindowLeft   = 120
-        WindowTop    = 120
-        QuestsLeft   = 120
-        QuestsTop    = 120
+        WindowLeft   = (Get-EqShotOrigin).Left
+        WindowTop    = (Get-EqShotOrigin).Top
+        QuestsLeft   = (Get-EqShotOrigin).Left
+        QuestsTop    = (Get-EqShotOrigin).Top
         Minimized    = $false
         # Every popup that would cover a shot, pre-answered.
         ShowTutorial = $false
@@ -1295,7 +1369,22 @@ function Write-Raids([hashtable]$records) {
 # it, this is the only way to photograph the auto-import REPORT — the surface that exists
 # solely in response to a dump, and the one that shipped unreachable on 2026-08-20 because
 # nothing rendered it (see ImportReportReachesASurfaceTests).
+#
+# **IT CLEARS FIRST, UNCONDITIONALLY AND BEFORE THE EARLY RETURN.** Staging here used to be
+# additive only, so a dump written for one shot sat in the game folder for every shot after
+# it — trap 51's cumulative-staging failure with an /outputfile dump in place of a log
+# append, and the damage is the same shape: a picture that depends on which shots ran
+# before it, correct for the state that was actually there and not for the state the shot
+# is about. It went unnoticed because the only three dump-staging shots were near the END
+# of the table and each wrote the one it needed. E-3 PR 4's Home shots are the first pair
+# near the TOP, and an inventory dump leaking forward auto-ticks the wishlist that
+# `shell-gear-narrow` photographs — a committed screenshot changing because a shot forty
+# rows earlier gained a fixture. Reset is the contract, not an optimisation.
 function Write-Dump([hashtable]$dump) {
+    # Only the game folder itself, never its Logs child: the fixture log lives down there
+    # and is restored by its own path.
+    Get-ChildItem (Join-Path $root 'game') -Filter 'Testchar_*.txt' -File `
+        -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
     if ($null -eq $dump) { return }
     foreach ($file in $dump.Keys) {
         Set-Content -Path (Join-Path $root "game/$file") -Value $dump[$file] -Encoding UTF8

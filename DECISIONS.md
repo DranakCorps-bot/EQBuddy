@@ -15,6 +15,51 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 PR 4, the Home room)
+
+- **`ShellHost.Show` passes the address to the CONSTRUCTOR rather than navigating after
+  it.** The other way: leave the two-step alone, since it worked. Declined because it
+  stopped being free the moment the default became Home — every addressed open built the
+  default room, painted it (three file stats and a SQLite query on Home's first paint) and
+  threw it away. `ShellHostTests`'s existing `shellRooms=1` is what caught it, which is the
+  assertion doing exactly the job its comment claims. `ShellWindow.Navigate` returns
+  `bool` now, read by the constructor alone so an unresolvable address still lands
+  somewhere instead of showing an empty content cell.
+- **Home's content column is capped at `ShellLayoutPolicy.MinRoomWidth` and pinned left.**
+  The other way: let it stretch like every other room. Declined on the first `shell-home`
+  capture, which put "Not run yet" about 600 units from the row it belonged to at a 946-wide
+  window — two columns rather than one row. `MinRoomWidth` rather than a new constant
+  because it is the narrowest this content is ever drawn, already measured and signed; the
+  room now reads the same at every width, and `shell-home-narrow` is the picture that can
+  disprove it.
+- **`RecentSession` carries no combat field at all**, so the Home/Live boundary is a
+  property of the type rather than of reviewer attention. The other way: put the whole
+  session row on the record and rely on Home not rendering the meters. Declined because the
+  temptation is one property access away in the room's own file, and "a reviewer notices" is
+  not a mechanism. Live reads the same record and adds its meters on its own surface.
+- **Readiness has two states, not three — there is no "stale".** The other way: an age past
+  which a dump is called out. Declined because nobody has signed a threshold, and an invented
+  one arrives as a nag on a player who ran the command this morning. Bevel asked only that
+  never-scanned and healthy not be collapsed; the date is reported and the reading is theirs.
+- **The four `/outputfile` dump finders became one.** `InventoryFile.FindLatest`,
+  `FactionsFile.FindLatest` and two inside `UnlockSource` each carried their own copy of
+  "newest file matching a character-and-kind glob in the log folder's parent" — each one's
+  comment claiming the root rule lived in exactly one place. Home would have been the fifth
+  and sixth. The other way: add Home's lookups beside them and leave the four. Declined;
+  they all route through `OutputfileAutoImport.FindLatest` now, with the first test any of
+  them has ever had.
+- **`scripts/shoot.ps1`'s `Write-Dump` clears before it writes.** The other way: leave it
+  additive, as it has always been. Declined because it is trap 51 with an `/outputfile` dump
+  in place of a log append — the three dump-staging shots were near the END of the table so
+  nothing downstream ever inherited one, and `shell-home-ready` is the first near the top:
+  its inventory dump would have auto-ticked the wishlist `shell-gear-narrow` photographs.
+- **Deleted a stranded doc comment in `MainWindow.xaml.cs`** (a second `<summary>` on
+  `StoredMobRows`, describing the ✦ marker route into the wiki pack). It was dead text —
+  C# takes the last summary — and `DropsCardView.cs`'s player-visible tooltip already
+  documents that route in more detail. It is also what paid for `StoredSessions`: the file
+  had exactly one line of ratchet headroom, deliberately, and this PR leaves it at
+  4,573/4,573. **The next WPF change must lift a surface.**
+
 ## 2026-09-05 (E-3 PR 3, the Quests room)
 
 - **The lift is a `UserControl` carrying the WHOLE bordered panel, not a chrome/content

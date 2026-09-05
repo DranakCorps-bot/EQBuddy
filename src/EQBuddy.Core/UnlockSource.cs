@@ -13,8 +13,10 @@ namespace EQBuddy.Core;
 /// whenever the player asks, and re-reading a 60 KB text file when its timestamp changes
 /// costs nothing. Nothing here writes.
 ///
-/// Both dumps live where <see cref="InventoryFile.FindLatest"/> looks — the log folder's
-/// PARENT — which is said in those two finders and nowhere else, so they cannot disagree.
+/// Both dumps are located by <see cref="OutputfileAutoImport.FindLatest"/> — the log
+/// folder's PARENT, and the character-and-kind filename shape, said in ONE place so no two
+/// finders can disagree about where a dump lives. This class used to carry its own copy of
+/// that walk; it was the third and fourth of four.
 /// </summary>
 public sealed class UnlockSource
 {
@@ -54,13 +56,11 @@ public sealed class UnlockSource
     {
         if (string.IsNullOrWhiteSpace(logFolder) || string.IsNullOrWhiteSpace(character))
             return false;
-        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
-        if (root is null || !Directory.Exists(root)) return false;
 
         var changed = false;
         try
         {
-            if (Newest(root, $"{character}_*-Achievements.txt") is { } ach
+            if (Newest(logFolder, character, OutputfileKind.Achievements) is { } ach
                 && (ach.FullName != _achievementsPath || ach.LastWriteTime != _achievementsAt))
             {
                 _achievementsPath = ach.FullName;
@@ -71,7 +71,7 @@ public sealed class UnlockSource
                 changed = true;
             }
 
-            if (Newest(root, $"{character}_*-Factions.txt") is { } fac
+            if (Newest(logFolder, character, OutputfileKind.Factions) is { } fac
                 && (fac.FullName != _factionsPath || fac.LastWriteTime != _factionsAt))
             {
                 _factionsPath = fac.FullName;
@@ -85,9 +85,6 @@ public sealed class UnlockSource
         return changed;
     }
 
-    private static FileInfo? Newest(string root, string pattern) =>
-        Directory.EnumerateFiles(root, pattern)
-            .Select(f => new FileInfo(f))
-            .OrderByDescending(f => f.LastWriteTime)
-            .FirstOrDefault();
+    private static FileInfo? Newest(string logFolder, string character, OutputfileKind kind) =>
+        OutputfileAutoImport.FindLatest(logFolder, character, kind);
 }

@@ -16,26 +16,23 @@ namespace EQBuddy;
 /// other two rooms that are a MOVE rather than a redesign**: World and Gear, whose Evolved
 /// IA verdict (*"Keep → unify"*) a v1 fold has already satisfied. **PR 3 adds the one that
 /// is a LIFT** — Quests, whose 2,481 lines of window-owned rendering had no view to hand a
-/// host until <see cref="QuestsView"/> came out of <see cref="QuestsWindow"/>. Four rows,
-/// four rooms.
+/// host until <see cref="QuestsView"/> came out of <see cref="QuestsWindow"/>. **PR 4 adds
+/// the one that is NEITHER** — <see cref="HomeRoom"/>, a new surface with no v1 window
+/// behind it — and moves the default landing onto it. Five rows, five rooms.
 ///
 /// **What is deliberately NOT here, and why each absence is a decision:**
 ///
-///  * **Three of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
+///  * **Two of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
 ///    that exist, and the rail draws that list rather than the full one. The honest
 ///    options for a half-built shell were a rail with the rooms that exist or seven rows
 ///    with the rest disabled, and this codebase already ruled on the second: *"an empty
 ///    class row gets no chevron — an affordance that opens nothing is a trap."* A room's
 ///    row lands in the PR that lands the room. Live does not exist yet (and Raids cannot
-///    leave Progress until it does), Home is a new surface — each of those two gets its own
-///    Bevel pass rather than riding another room's PR, per the Helm-signed Quests → Home →
-///    Live order — and Settings is a room whose whole job is not being a launcher.
-///  * **The default landing.** <see cref="_page"/> is <see cref="ShellPage.Progress"/>,
-///    which is right TODAY because it is the closest thing to "where do I stand" that
-///    exists — and it is a placeholder for a room nobody has built. **The Home PR must
-///    change it**, or every launch will land away from the one room designed to answer that
-///    question. Bevel filed the flag rather than trusting it would be remembered; PR 3 did
-///    not touch it, because Home owns it.
+///    leave Progress until it does) and gets its own Bevel pass rather than riding another
+///    room's PR, per the Helm-signed Quests → Home → Live order; Settings is a room whose
+///    whole job is not being a launcher. **The same refusal now applies one level in**:
+///    Home's deep-links block reads the same <c>Landed</c> list, so it cannot offer a way
+///    into a room that does not exist either.
 ///  * **The Search INDEX.** The palette resolves against what the shell can currently
 ///    reach — the landed rooms and their tabs. The disposition-backed index that lets a
 ///    player find a feature by its old v1 name is E-2e's table, and Helm's sign is
@@ -63,7 +60,25 @@ public partial class ShellWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
 
-    private ShellPage _page = ShellPage.Progress;
+    /// <summary>
+    /// **THE DEFAULT LANDING, and this field is now the ONLY place it is written.**
+    ///
+    /// It was <see cref="ShellPage.Progress"/> from PR 1 until E-3 PR 4, as an explicit
+    /// placeholder: the closest thing to "where do I stand" that existed, flagged in this
+    /// file's own comment as the Home PR's to change. <see cref="HomeRoom"/> is the room
+    /// that was actually designed to answer it.
+    ///
+    /// **The flip was three edits and not one, which is the part worth remembering.** The
+    /// same fact was written in three places — here, again in the constructor's own
+    /// <see cref="Navigate"/> call ten lines down, and a third time in
+    /// <c>ShellHost.ApplyEnvHook</c>, which is what every capture built on
+    /// <c>EQBUDDY_SHELL=1</c> actually exercises. Trap 4 arriving in navigation instead of
+    /// in data, and the third copy was the dangerous one: a screenshot taken through the
+    /// hook would have gone on showing the old default long after this line changed, with
+    /// nothing forcing the two to agree. The constructor now derives its address from this
+    /// field and the hook passes no address at all.
+    /// </summary>
+    private ShellPage _page = ShellPage.Home;
     private DateTime _lastRefresh = DateTime.MinValue;
 
     /// <summary>The rail rows, by page, so a navigation can paint the selection without
@@ -89,7 +104,16 @@ public partial class ShellWindow : Window, IFollowingSurface
     /// </summary>
     private readonly Dictionary<ShellPage, IShellRoom> _rooms = [];
 
-    public ShellWindow(MainWindow main)
+    /// <param name="address">Where to land, or null for <see cref="_page"/>'s default.
+    /// **Taken here rather than navigated afterwards, which is a cost fix rather than a
+    /// tidy-up.** <c>ShellHost.Show</c> used to construct and then navigate, so every
+    /// addressed open BUILT the default room, painted it, and threw it away — free while the
+    /// default was Progress (arithmetic over a snapshot the widget already holds) and not
+    /// free once it became Home, which stats three files and runs a database query on its
+    /// first paint. That is the same argument the lazy `_rooms` dictionary is built on, one
+    /// step earlier: a shell opened to look at experience must not pay for a room nobody
+    /// asked for. `shellRooms=1` is the assertion that says so.</param>
+    public ShellWindow(MainWindow main, string? address = null)
     {
         InitializeComponent();
         _main = main;
@@ -119,7 +143,11 @@ public partial class ShellWindow : Window, IFollowingSurface
         // shell owns its whole visual tree; nothing in a room swallows Ctrl+K.
         PreviewKeyDown += OnShellKey;
 
-        Navigate(ShellPages.Address(ShellPage.Progress));
+        // ONE navigation. The default is DERIVED from the field and never written as a
+        // second literal (see the note on `_page`), and it is only reached when the caller
+        // asked for nothing or asked for somewhere that does not exist — the same refusal
+        // Navigate already makes, read back rather than re-implemented here.
+        if (!Navigate(address)) Navigate(ShellPages.Address(_page));
     }
 
     // ---- chrome ----------------------------------------------------------------
@@ -198,10 +226,16 @@ public partial class ShellWindow : Window, IFollowingSurface
     /// showing the wrong room is worse than showing the one already open, which is the
     /// rule <see cref="ProgressWindow.SetTab"/> already follows.
     /// </summary>
-    public void Navigate(string? address)
+    /// <returns>Whether it landed. **Only the constructor reads this**, so that a window
+    /// opened on an address nobody can resolve still ends up somewhere rather than showing
+    /// an empty content cell. Every other caller navigates a window that is already on a
+    /// room, which is precisely the state the refusal above exists to preserve — a returned
+    /// <c>false</c> there means "you are still where you were", not "something went
+    /// wrong".</returns>
+    public bool Navigate(string? address)
     {
-        if (ShellPages.ParseAddress(address) is not { } target) return;
-        if (!ShellPages.Landed.Contains(target.Page)) return;
+        if (ShellPages.ParseAddress(address) is not { } target) return false;
+        if (!ShellPages.Landed.Contains(target.Page)) return false;
 
         _page = target.Page;
         // The title bar carries the room, the way every shell application does — and it
@@ -223,6 +257,7 @@ public partial class ShellWindow : Window, IFollowingSurface
 
         ClosePalette();
         Refresh(force: true);
+        return true;
     }
 
     /// <summary>
@@ -244,6 +279,11 @@ public partial class ShellWindow : Window, IFollowingSurface
             ShellPage.Gear => new GearRoom(_main),
             ShellPage.World => new WorldRoom(_main),
             ShellPage.Quests => new QuestsRoom(_main),
+            // Home is handed THIS window's Navigate rather than building its own dispatch:
+            // its deep-links block is a navigation surface inside a room, which is the same
+            // relationship the rail has to the shell, and two ways to land on a room is
+            // trap 33 lifted into navigation.
+            ShellPage.Home => new HomeRoom(_main, a => Navigate(a)),
             _ => null,
         };
         if (room is null) return null;
@@ -264,6 +304,11 @@ public partial class ShellWindow : Window, IFollowingSurface
     public void InventoryChanged()
     {
         if (_rooms.TryGetValue(ShellPage.Gear, out var gear)) ((GearRoom)gear).InventoryChanged();
+        // Home's readiness block is the OTHER surface that says something about that dump —
+        // "Not run yet" seconds after the game wrote the file is the same "EQBuddy did
+        // nothing" reading, on the room a new player is most likely to be looking at. It
+        // caches its disk reads on a timer, so this is what makes the answer immediate.
+        if (_rooms.TryGetValue(ShellPage.Home, out var home)) ((HomeRoom)home).Refreshed();
     }
 
     // ---- Ctrl+K palette --------------------------------------------------------

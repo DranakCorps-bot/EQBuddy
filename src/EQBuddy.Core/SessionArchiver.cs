@@ -75,7 +75,7 @@ public sealed class SessionArchiver : IDisposable
     internal void RunCheckpoint(long gen, long id, StatsSnapshot s, string server, string character)
     {
         lock (_lock) { if (_sessionGen != gen) return; }   // session already finalized — stale work
-        var newId = _repo.Checkpoint(id, s, server, character, "Active");
+        var newId = _repo.Checkpoint(id, s, server, character, SessionRepository.ActiveEndReason);
         lock (_lock) { if (_sessionGen == gen && _activeId == id) _activeId = newId; }
     }
 
