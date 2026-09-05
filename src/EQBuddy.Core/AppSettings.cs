@@ -17,7 +17,14 @@ public sealed class AppSettings
     /// it.</summary>
     public bool LegacyFinalNoticeAcknowledged { get; set; }
     public bool Minimized { get; set; }
-    public List<string> MiniStats { get; set; } = ["kills", "dps"];
+    /// <summary>Which stats have a ★ and therefore a cell on the collapsed HUD bar.
+    ///
+    /// **"xp", "dps" and "hps" are no longer members of this list** — they were PROMOTED
+    /// to the always-on HUD numbers in Surface A / SA-1 (the collapsed trio: name, DPS,
+    /// XP%/hr with HPS taking the third slot while healing dominates), and a promotion
+    /// removes the toggle. <see cref="MigratePromotedHudStats"/> strips them from
+    /// existing profiles; the default lost "dps" for the same reason.</summary>
+    public List<string> MiniStats { get; set; } = ["kills"];
     public double WindowLeft { get; set; } = double.NaN;
     public double WindowTop { get; set; } = double.NaN;
     public double Opacity { get; set; } = 0.96;
@@ -288,6 +295,15 @@ public sealed class AppSettings
     /// <summary>Has the one-time <see cref="MigrateWindowHeights"/> clear run? See there
     /// for why every stored window height written before 2026-08-25 is discarded.</summary>
     public bool WindowHeightsReset { get; set; }
+    /// <summary>Has the one-time <see cref="MigratePromotedHudStats"/> pass run?
+    ///
+    /// **A flag rather than inferring it from "the keys are gone", and that distinction is
+    /// the whole bug this migration could otherwise be.** The pass reads a star's absence
+    /// as "the player had this window closed" — and after the first run every one of the
+    /// three keys IS absent, so a second run would read three deliberate ONs as OFFs and
+    /// close windows the player never touched. Trap 55 in one sentence: a migration
+    /// re-deciding on state its own previous run produced.</summary>
+    public bool HudStatsPromoted { get; set; }
     /// <summary>Whether the watch-rule examples panel in Options is expanded. Remembered so
     /// someone still learning the feature doesn't have to reopen it every time, and someone
     /// who doesn't need it never sees it again.</summary>
@@ -491,16 +507,29 @@ public sealed class AppSettings
     // They open while the widget is minimized with the matching star set.
 
     /// <summary>Breakout kinds the player ✕-closed for good ("Damage", "Loot", …): the
-    /// star keeps its mini-pill chip, the window stays away until re-enabled in Options
+    /// star keeps its HUD cell, the window stays away until re-enabled in Options
     /// (Frankthetankk, discussion #45 — ✕-until-next-minimize made the window a
-    /// whack-a-mole).</summary>
-    public List<string> DisabledBreakouts { get; set; } = [];
+    /// whack-a-mole).
+    ///
+    /// **"Healing" is in the default since SA-1, and that is a preserved behaviour rather
+    /// than a new opinion.** Damage and Healing used to need BOTH this list and their ★;
+    /// "hps" was unstarred out of the box, so a fresh profile has never opened a Healing
+    /// breakout on minimize. With the stars promoted away this list is the whole switch
+    /// for those two kinds, so the default has to carry what the star used to say.
+    /// "Damage" is deliberately absent for the same reason — "dps" WAS starred by
+    /// default.</summary>
+    public List<string> DisabledBreakouts { get; set; } = ["Healing"];
 
-    /// <summary>Double-click a mini-pill chip (dps, hps, pet, loot, watch) to open or
-    /// close its breakout window on demand. Opt-in, off by default. While it's on, a
-    /// breakout closed with its ✕ stays silent — no "hidden, re-enable in Options" alert —
-    /// because a double-click brings it right back (asked for: pop the Loot or DPS window
-    /// up only when you want it, without the nag).</summary>
+    /// <summary>Double-click a HUD chip (pet, loot, watch — and the always-on XP number,
+    /// which opens the Progress window) to open or close its window on demand. Opt-in, off
+    /// by default. While it's on, a breakout closed with its ✕ stays silent — no "hidden,
+    /// re-enable in Options" alert — because a double-click brings it right back (asked
+    /// for: pop the Loot window up only when you want it, without the nag).
+    ///
+    /// dps and hps left this list in SA-1 with their chips: they are always-on HUD numbers
+    /// now, so there is no chip to double-click. Their windows are unchanged and Options →
+    /// Cards &amp; windows is their switch — which is the door a default profile has
+    /// anyway, since this gesture is off out of the box.</summary>
     public bool DoubleClickChipsToggleBreakouts { get; set; }
 
     public double BreakoutDamageLeft { get; set; } = double.NaN;
@@ -676,7 +705,53 @@ public sealed class AppSettings
         changed |= MigrateBuffSetsToClassBuckets();
         changed |= MigrateArchiveDefault();
         changed |= MigrateWindowHeights();
+        // xp / dps / hps leave MiniStats for the always-on HUD numbers (SA-1). Last in
+        // the chain because it reads MiniStats and DisabledBreakouts as they finally
+        // stand, and nothing above it touches either.
+        changed |= MigratePromotedHudStats(hadFile);
         return changed;
+    }
+
+    /// <summary>
+    /// SA-1: "xp", "dps" and "hps" leave <see cref="MiniStats"/> because they became the
+    /// always-on collapsed HUD numbers, and a promotion removes the toggle.
+    ///
+    /// **The landmine this exists to defuse is trap 20's shape.** The ★ for dps and hps
+    /// was never only a HUD cell — <c>MainWindow.UpdateBreakouts</c> opened the Damage and
+    /// Healing breakout windows only when the kind was NOT in
+    /// <see cref="DisabledBreakouts"/> **and** its key was in <see cref="MiniStats"/>. So
+    /// stripping the keys naively would silently close a player's open breakout: the
+    /// switch survives the promotion, the state it carried does not. "xp" has no
+    /// <c>BreakoutKind</c> at all (the Progress float was retired in 2026-08-24's fold),
+    /// so it simply leaves.
+    ///
+    /// **Read the star BEFORE stripping it**, which is the whole order of operations here:
+    /// a key ABSENT at migration time means that window was off, so the kind is written
+    /// into <see cref="DisabledBreakouts"/> to say so out loud; a key PRESENT means it was
+    /// on, and an absent entry in that list already says exactly that. Afterwards the gate
+    /// reads <see cref="DisabledBreakouts"/> alone for those two kinds
+    /// (<c>BreakoutPresentation.StarKey</c> answers null for them), so an open breakout
+    /// stays open and a closed one stays closed.
+    ///
+    /// **Guarded on <paramref name="hadFile"/> as well as on the flag.** A brand-new
+    /// profile has no star to read — the new defaults (<see cref="MiniStats"/> without
+    /// "dps", <see cref="DisabledBreakouts"/> with "Healing") already ARE the promoted
+    /// state — and running the pass against them would read the new default as a player's
+    /// old choice and disable the Damage window a fresh install has always had.
+    /// <c>MigrateMotesCard</c> takes <paramref name="hadFile"/> for the same reason.
+    /// </summary>
+    public bool MigratePromotedHudStats(bool hadFile)
+    {
+        if (HudStatsPromoted) return false;
+        HudStatsPromoted = true;
+        if (!hadFile) return true;   // born promoted; the defaults carry it
+
+        foreach (var (key, kind) in new[] { ("dps", "Damage"), ("hps", "Healing") })
+            if (!MiniStats.Contains(key) && !DisabledBreakouts.Contains(kind))
+                DisabledBreakouts.Add(kind);
+
+        MiniStats.RemoveAll(k => k is "xp" or "dps" or "hps");
+        return true;
     }
 
     /// <summary>

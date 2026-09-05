@@ -2541,7 +2541,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
 
         if (MiniRoot.Visibility == Visibility.Visible)
-            _hudBar.Render(s);
+            _hudBar.Render(s, _stats.CharacterName);
         // BEFORE the breakouts and the focus-hide gate: loss transitions must be
         // detected every tick, whatever's visible — a hidden Buffs card must not
         // mean a blind history (#120 stage 3) — and the Buffs breakout should show
@@ -3436,8 +3436,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
         yield return ("motes", StarMotes);
-        yield return ("dps", StarDps);
-        yield return ("hps", StarHps);
+        // "dps" and "hps" left this list in Surface A / SA-1: they are the always-on
+        // collapsed HUD numbers now, and a promotion removes the toggle. Their stars are
+        // gone from the Combat and Healing headers with them; what carried each player's
+        // stored state across is AppSettings.MigratePromotedHudStats, not this method.
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
         yield return ("buffs", StarBuffs);
@@ -3499,7 +3501,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         HeightGrip.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
         _settings.Save();
         var snap = _stats.Snapshot();
-        if (mini) _hudBar.Render(snap);
+        if (mini) _hudBar.Render(snap, _stats.CharacterName);
         UpdateBreakouts(snap);
         // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
         // ~87, a starred one 300+), so anchoring before the bar renders computes
@@ -3524,16 +3526,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
+            // Which star opens which window comes from UI.Shared, not from a switch here.
+            // It was a switch here, and Options grew a tick box for the same question that
+            // could not answer it — so a player ticking "Pet" changed nothing and went to
+            // ask on Reddit. Since SA-1 the two halves are separate conditions rather than
+            // one ternary: Damage and Healing have no star (dps/hps are always-on HUD
+            // numbers), so "no star" and "needs a pinned rule" stopped being one case.
+            var name = BreakoutPresentation.Kind(kind);
             var want = _settings.Minimized && !_hiddenForFocus &&
                        !_settings.DisabledBreakouts.Contains(kind.ToString())
-                       // Which star opens which window comes from UI.Shared, not from a
-                       // switch here. It was a switch here, and Options grew a tick box
-                       // for the same question that could not answer it — so a player
-                       // ticking "Pet" changed nothing and went to ask on Reddit.
-                       && (BreakoutPresentation.StarKey(BreakoutPresentation.Kind(kind)) is { } star
-                           ? _settings.MiniStats.Contains(star)
-                           : _settings.PinWatchChips
-                             && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
+                       && (BreakoutPresentation.StarKey(name) is not { } star
+                           || _settings.MiniStats.Contains(star))
+                       && (!BreakoutPresentation.NeedsPinnedRule(name)
+                           || (_settings.PinWatchChips
+                               && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned)));
             _breakouts.TryGetValue(kind, out var w);
             if (want)
             {

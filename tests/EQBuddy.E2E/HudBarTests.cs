@@ -57,8 +57,10 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        // Three stars plus one pinned rule.
-        app.WaitForDump("hudCells", 4, "the collapsed bar to draw a cell per star and pin");
+        // THE PREDICTION, written before it ran (trap 23). "dps" is no longer a
+        // MiniStats key — MigratePromotedHudStats strips it on load — so the seed's three
+        // stars land as TWO cells, plus one pinned rule, plus the always-on trio: 3 + 2 + 1.
+        app.WaitForDump("hudCells", 6, "the trio, a cell per surviving star, and the pin");
     }
 
     /// <summary>Un-pinning is the other direction, and it is the one a refactor drops
@@ -83,6 +85,53 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        app.WaitForDump("hudCells", 1, "the one starred stat, and no chip for the rule");
+        // Trio plus the one starred stat; nothing for the unpinned rule.
+        app.WaitForDump("hudCells", 4, "the trio and the one starred stat, and no chip for the rule");
+    }
+
+    /// <summary>
+    /// The trio's third number, and the one swap it makes (Surface A / SA-1).
+    ///
+    /// **A screenshot cannot settle this and no unit test can reach it.** Both states
+    /// render correctly and look equally right, so a picture proves only that ONE of them
+    /// drew; <c>HudGlanceTests</c> proves the rule, and this proves the rule reaches the
+    /// control — "present in the build" and "in effect at runtime" being different claims
+    /// (trap 42).
+    ///
+    /// It drives the app through its real seam: log lines appended to the file the widget
+    /// is tailing, exactly as the game would write them.
+    /// </summary>
+    [Fact]
+    public void HealingTakesTheThirdSlotAndOneSwingGivesItBack()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.PinWatchChips = false;
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        // The fixture session is a melee one, so the third slot starts where it should.
+        app.WaitForDump("hudGlance", "xp", "the third number to start as the XP rate");
+
+        // Healing with nothing else happening: enough to outweigh anything the fixture's
+        // last half-minute could still hold, so the assertion is about the RULE and not
+        // about how the fixture happens to end.
+        app.AppendLogLines(
+            "You healed Grimwold for 9000 hit points by Light Healing.",
+            "You healed Grimwold for 9000 hit points by Light Healing.",
+            "You healed Grimwold for 9000 hit points by Light Healing.");
+        app.WaitForDump("hudGlance", "hps", "healing to take the third slot");
+
+        // …and one swing takes it straight back. The thirty-second window is still almost
+        // entirely healing at this point, which is the whole point of the second, shorter
+        // window: "the moment combat-as-damage returns", not "once healing stops winning".
+        app.AppendLogLines("You crush a training dummy for 25 points of damage.");
+        app.WaitForDump("hudGlance", "xp", "one swing to bring the XP rate back");
     }
 }

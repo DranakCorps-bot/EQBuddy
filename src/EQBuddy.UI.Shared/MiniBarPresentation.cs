@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -36,9 +36,16 @@ public static class MiniBarPresentation
     /// bar you have to re-read every time.
     ///
     /// "buffs" is deliberately absent — it is a valid <see cref="AppSettings.MiniStats"/>
-    /// entry that gates the Buffs breakout window and never draws a cell here.</summary>
+    /// entry that gates the Buffs breakout window and never draws a cell here.
+    ///
+    /// **"xp", "dps" and "hps" are absent for the opposite reason since Surface A / SA-1:
+    /// they are always ON.** They were promoted to the collapsed HUD's fixed trio (name,
+    /// DPS, XP%/hr — HPS taking the third slot while healing dominates), which is drawn by
+    /// <see cref="HudGlance"/> ahead of every cell in this list. A key that is drawn
+    /// unconditionally has no business in a table whose whole job is "which subset did the
+    /// player switch on", and leaving one here would have drawn it twice.</summary>
     public static readonly IReadOnlyList<string> Order =
-        ["kills", "dps", "hps", "pet", "procs", "loot", "motes", "money", "xp", "deaths"];
+        ["kills", "pet", "procs", "loot", "motes", "money", "deaths"];
 
     /// <summary>What each cell is CALLED, for the one screen that lists them.
     ///
@@ -54,14 +61,11 @@ public static class MiniBarPresentation
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["kills"] = "Kills",
-            ["dps"] = "Damage per second",
-            ["hps"] = "Healing per second",
             ["pet"] = "Pet damage",
             ["procs"] = "Weapon procs",
             ["loot"] = "Loot",
             ["motes"] = "Motes",
             ["money"] = "Coin",
-            ["xp"] = "Experience",
             ["deaths"] = "Deaths",
         };
 
@@ -70,14 +74,11 @@ public static class MiniBarPresentation
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["kills"] = "Skull",
-            ["dps"] = "Swords",
-            ["hps"] = "Heal",
             ["pet"] = "Paw",
             ["procs"] = "Bolt",
             ["loot"] = "Bag",
             ["motes"] = "Sparkle",
             ["money"] = "Coin",
-            ["xp"] = "Chart",
             ["deaths"] = "Skull",
         };
 
@@ -100,8 +101,10 @@ public static class MiniBarPresentation
     public static string Text(StatsSnapshot s, string key) => key switch
     {
         "kills" => $"{s.YourKillCount}",
-        "dps" => s.CurrentDps > 0 ? $"{s.CurrentDps:0} dps" : $"{s.SessionDps:0} dps",
-        "hps" => $"{s.Hps:0.#} hps",
+        // No "dps"/"hps"/"xp" rows: those three are the always-on HUD trio since SA-1 and
+        // HudGlance formats them. Leaving a second formatter here would be two sources for
+        // one number (trap 4), and the day one of them gained a decimal only the other
+        // would move.
         "pet" => $"{s.PetAbilities.Sum(p => p.Total) / Math.Max(1, s.CombatSeconds):0.#} dps",
         // Same denominator as the Procs card: combat minutes, so downtime doesn't
         // flatter the weapon.
@@ -110,10 +113,6 @@ public static class MiniBarPresentation
         "motes" => Motes.Summarize(s.Loot, s.Elapsed) is { Total: > 0 } mo
             ? $"{mo.Total} · {mo.PerHour:0.#}/hr" : "0",
         "money" => StatsSnapshot.FormatCoin(s.Copper),
-        // Rate, not total: minimized is farming mode, and "how fast am I gaining" is the
-        // number a farmer watches (MorrolanTV, discussion #63).
-        "xp" => $"{s.XpPerHour:0.#}%/hr"
-            + (s.HoursToLevel is { } eta ? $" · lvl {ProgressPresentation.FormatEta(eta)}" : ""),
         "deaths" => $"{s.Deaths.Count}",
         _ => "",
     };

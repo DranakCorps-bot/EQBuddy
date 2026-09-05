@@ -279,6 +279,16 @@ internal static class WidgetDump
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
                     $"hudCells={w._hudBar.CellCount} " +
+                    // …and WHICH number the glance's third slot currently is: "xp" or
+                    // "hps". A word, not a count, because the dump is space-separated
+                    // key=value and the suite has a string wait for exactly this shape.
+                    //
+                    // The SWAP is the one piece of SA-1 that a screenshot cannot settle:
+                    // both states render correctly and look equally right, so only the app
+                    // can say which rule fired. HudGlance decides it and is unit-tested
+                    // with no window; this proves the decision reaches the control, which
+                    // is the half a unit test cannot see (trap 42).
+                    $"hudGlance={w._hudBar.GlanceKey} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +

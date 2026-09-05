@@ -17,6 +17,13 @@ public sealed partial class SessionStats
     // (or their pet's) last own action — brief participation in a group fight must not
     // inherit the whole fight's duration.
     private static readonly TimeSpan BystanderGrace = TimeSpan.FromSeconds(20);
+    /// <summary>How far back <see cref="RecentEffort"/> looks to decide whether healing
+    /// outweighs damage — the signed spec's "~30 seconds" (SA-1).</summary>
+    public static readonly TimeSpan EffortWindow = TimeSpan.FromSeconds(30);
+    /// <summary>…and the short window that answers "has damage-combat returned". One
+    /// window cannot do both jobs: thirty seconds of healing would drown a swing that has
+    /// only just landed, and the spec asks for the swap back to be immediate.</summary>
+    public static readonly TimeSpan EffortResumeWindow = TimeSpan.FromSeconds(5);
 
     private readonly object _lock = new();
 
@@ -1698,6 +1705,40 @@ public sealed partial class SessionStats
                 Math.Max(elapsed.TotalSeconds, ActiveBucket.TotalSeconds));
             var activeHours = Math.Max(activeSeconds / 3600.0, 1.0 / 60);
 
+            // The collapsed HUD's heal-vs-damage weight (SA-1). Computed on EVERY
+            // snapshot, not only when a caller asked for a recent window, because the
+            // HUD is drawn from the plain Snapshot() the widget already builds — and
+            // one builder for one number is the rule two callers with different
+            // arguments taught us (trap 33). The walk is bounded by EffortWindow, so it
+            // touches only the last thirty seconds of journal however long the session.
+            var effort = RecentEffort.None;
+            if (_lastEventTime is { } effortEnd)
+            {
+                var effortStart = effortEnd - EffortWindow;
+                var resumeStart = effortEnd - EffortResumeWindow;
+                long effDamage = 0, effHealed = 0, effResumeDamage = 0;
+                // Backward from the end and stop at the first entry older than the
+                // window, exactly as the recent-rates walk below does — the journal is
+                // appended in log order.
+                for (var i = _journal.Count - 1; i >= 0; i--)
+                {
+                    var evt = _journal[i];
+                    if (evt.Time < effortStart) break;
+                    switch (evt)
+                    {
+                        case DamageDealtEvent dd:
+                            effDamage += dd.Amount;
+                            if (dd.Time >= resumeStart) effResumeDamage += dd.Amount;
+                            break;
+                        // Outgoing only: being healed by somebody else is not you
+                        // healing, and the HUD number is HPS — yours.
+                        case HealEvent { Outgoing: true } h: effHealed += h.Amount; break;
+                    }
+                }
+                effort = new RecentEffort(EffortWindow, effDamage, effHealed,
+                    EffortResumeWindow, effResumeDamage);
+            }
+
             RecentRates? recent = null;
             if (recentWindow is { } w && _lastEventTime is { } winEnd)
             {
@@ -1923,6 +1964,7 @@ public sealed partial class SessionStats
                 CopperPerActiveHour = (long)((_copper + _vendorCopper) / activeHours),
                 KillsPerActiveHour = _yourKills.Values.Sum() / activeHours,
                 Recent = recent,
+                Effort = effort,
                 Tracked = tracked,
                 Markers = _markers.Select(m => new MarkerDetail(m.Time, m.Label, m.LocY, m.LocX)).ToList(),
                 LastFight = BuildLastFight(),
@@ -1991,6 +2033,48 @@ public sealed partial class SessionStats
 }
 
 public record NameCount(string Name, int Count);
+
+/// <summary>
+/// What the player has actually been DOING lately — the recent heal-versus-damage weight
+/// the collapsed HUD's third number swaps on (<see cref="EQBuddy.UI.Shared"/>'s
+/// <c>HudGlance</c>, Surface A / SA-1).
+///
+/// **Derived purely from event totals, anchored on the last log timestamp** — no wall
+/// clock anywhere in it. That was a choice with a real alternative: <see
+/// cref="StatsSnapshot.CurrentDps"/> reads <c>DateTime.Now</c> to decide whether a fight
+/// is still live, and it is the one field the snapshot memo has to carry a caveat for
+/// (see the memo block in <c>BuildSnapshotLocked</c>). A second wall-clock field would
+/// have meant extending that caveat and making the whole snapshot un-memoizable while
+/// healing was in play. Anchoring on <c>_lastEventTime</c> instead keeps the memo exactly
+/// as it is, makes the value deterministic for a unit test, and matches what <see
+/// cref="RecentRates"/> already does with its window. Logged in <c>DECISIONS.md</c>.
+///
+/// The cost is honest and small: a player who stops playing keeps whatever weight the
+/// last thirty seconds of their log had until they act again. The number beside it —
+/// XP%/hr — freezes on idle for the same reason, so the two agree.
+///
+/// **Two windows, because entering and leaving are different questions.** The signed
+/// spec (docs/BEVEL-v2-staging-critique.md §3) says HPS replaces XP%/hr "when healing
+/// dominates for ~30 seconds" and collapses back "the moment combat-as-damage returns".
+/// Dominance is a claim about a long window; "returns" is a claim about right now, and
+/// one window cannot answer both — thirty seconds of healing would drown a swing that
+/// has only just landed.
+/// </summary>
+/// <param name="Window">The dominance window (~30 s of log time).</param>
+/// <param name="DamageDone">Damage the player dealt inside <paramref name="Window"/>.</param>
+/// <param name="HealingDone">Healing the player cast inside <paramref name="Window"/>.</param>
+/// <param name="ResumeWindow">The short window that answers "is damage-combat back".</param>
+/// <param name="DamageDoneInResumeWindow">Damage dealt inside
+/// <paramref name="ResumeWindow"/>.</param>
+public sealed record RecentEffort(
+    TimeSpan Window, long DamageDone, long HealingDone,
+    TimeSpan ResumeWindow, long DamageDoneInResumeWindow)
+{
+    /// <summary>No events yet — a session that has not started has neither weight.</summary>
+    public static readonly RecentEffort None =
+        new(TimeSpan.Zero, 0, 0, TimeSpan.Zero, 0);
+}
+
 /// <summary>Rolling-window rates computed from journal events (never proportional estimates).</summary>
 public record RecentRates(TimeSpan Window, bool HasFullWindow, double XpPercent, double XpPerHour,
     int Kills, long Copper, double Dps, double Hps);
@@ -2178,6 +2262,11 @@ public sealed class StatsSnapshot
     public long CopperPerActiveHour { get; init; }
     public double KillsPerActiveHour { get; init; }
     public RecentRates? Recent { get; init; }
+
+    /// <summary>The recent heal-versus-damage weight the collapsed HUD's third number
+    /// swaps on. Always present (never null) — see <see cref="RecentEffort"/> for why it
+    /// is derived from event totals rather than the wall clock.</summary>
+    public RecentEffort Effort { get; init; } = RecentEffort.None;
     public List<TrackedRuleResult> Tracked { get; init; } = [];
     public List<MarkerDetail> Markers { get; init; } = [];
     /// <summary>The fight in progress, or the last one that finished; null before the first

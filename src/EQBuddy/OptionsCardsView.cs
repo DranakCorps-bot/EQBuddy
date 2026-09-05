@@ -210,10 +210,11 @@ internal sealed class OptionsCardsView
                 IsChecked = IsOn(name),
                 Margin = new Thickness(0, 2, 14, 0),
                 Content = content,
-                ToolTip = BreakoutPresentation.StarKey(pk) is null
-                    ? BreakoutPresentation.WatchNote
-                    : "Opens while the widget is minimised. Ticking this also stars the "
-                      + "stat, so it shows in the mini pill too.",
+                // Keyed on the KIND, from UI.Shared. It used to be "no star means this is
+                // Watch" and a literal typed here — which said "mini pill", the phrase
+                // Helm banned at #323(b)/#326, and which stopped being true the day SA-1
+                // promoted dps and hps and left three kinds sharing that null.
+                ToolTip = BreakoutPresentation.Note(pk),
             };
             check.Checked += (_, _) => Set(name, enabled: true);
             check.Unchecked += (_, _) => Set(name, enabled: false);

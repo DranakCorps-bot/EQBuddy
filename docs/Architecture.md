@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 3,965 | 4,361 | 4,361 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 3,971 | 4,367 | 4,368 | 1 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -209,7 +209,9 @@ glob sums its matches on purpose and a partial leaves exactly as much untestable
 logic as before. Its cell count was pinned from `tests/EQBuddy.E2E` (`hudCells`) and
 proved green on the pre-move tree first, since the WPF layer has no unit tests and that
 assertion is the only thing between a move and a silent regression. New baseline is once
-more the MINIMUM that fits (3,965 × 1.1 = 4,361.5 against 4,361).
+more the MINIMUM that fits (3,971 × 1.1 = 4,368.1 against 4,367) — measured against the
+whole series' final tree, since the promotion commit that follows the lift spends six of
+the lines it freed on the re-keyed breakout gate.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

@@ -404,10 +404,10 @@
 
             <CheckBox x:Name="DoubleClickChipsCheck" Margin="0,10,0,0"
                       Checked="OnDoubleClickChipsToggled" Unchecked="OnDoubleClickChipsToggled">
-                <TextBlock Text="Double-click a mini-pill chip to open/close its breakout" FontSize="12"
+                <TextBlock Text="Double-click a HUD chip to open/close its breakout" FontSize="12"
                            Foreground="{DynamicResource TextBrush}"/>
             </CheckBox>
-            <TextBlock Text="With this on, double-click the 🎒 Loot, ⚔ dps, ✚ hps, 🐾 pet or 🎯 watch chip to pop its window up or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings it right back."
+            <TextBlock Text="With this on, double-click the 🎒 Loot, 🐾 pet or 🎯 watch chip to pop its window up or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings it right back. The always-on XP number opens the Progress window the same way; Damage and Healing no longer have a chip of their own, so their windows are switched on above."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
 
             <CheckBox x:Name="TargetDropsCheck" Margin="0,12,0,0"

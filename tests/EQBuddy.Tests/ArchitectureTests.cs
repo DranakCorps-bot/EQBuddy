@@ -174,9 +174,12 @@ public class ArchitectureTests
         // and not a `MainWindow.Hud.xaml.cs` partial, because this glob SUMS its matches
         // on purpose and a partial would have bought nothing.
         //
-        // Bumped down to the MINIMUM that fits (3965 × 1.1 = 4361.5 against 4,361 lines),
-        // by the same "one line and no more" rule as every entry above.
-        (@"EQBuddy/MainWindow*.xaml.cs", 3965),
+        // Bumped down to the MINIMUM that fits the SERIES' final tree (3971 × 1.1 =
+        // 4368.1 against 4,367 lines), by the same "one line and no more" rule as every
+        // entry above. The number is set once, in the lift commit, and the promotion
+        // commit that follows spends six of the lines it freed — stated rather than
+        // hidden behind a comment trimmed to hit a rounder figure.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3971),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
