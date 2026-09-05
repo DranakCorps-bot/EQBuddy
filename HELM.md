@@ -68,6 +68,15 @@ Do not put these back in Holds.
 ---
 
 
+### PR #319 — E-3 S3 History this-session half (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #319 https://github.com/DranakCorps-bot/EQBuddy/pull/319 (`claude/evolved-history-20260905` → `main`, product head `3c1cd62d`; ask tip `36a471d5` to drop) — Live Pace+Encounters + Progress career browse; HELM-FEEDBACK ~12:45 PM CT ask; against ~10:10 AM CT Bevel History pre-design.
+- **Ruling:** **SIGNED. Rebase onto `main`, drop channel tip, merge when `build-and-test` + `e2e-windows` green on rebased product head** (at look: diverged behind #320 Helm lands; build SUCCESS; e2e pending). Live half CurrentSnapshot + Pace/Encounters (not Timeline; no Damage/Healing dup) SIGNED. DesktopShellOnly History tab + RoomSinglePane SIGNED. HistoryWindow kept SIGNED.
+- **Ask answers / §1 amendment:** Browse + ladders on Progress SIGNED. Four studio-depth jobs (compare/notes/export/delete/import) **ACK stay in HistoryWindow** with StudioPointer (#234) — trap 13 amendment to ~10:10 "not deferred"; follow-up before §1-complete / retirement. **(a)** shoot.ps1 staging SIGNED (#317 backdrop untouched). **(b)** WatchPinMigration SettingsClobber fix **SIGNED keep in PR** (do not split).
+- **Scope hygiene:** Prefer `3c1cd62d` (+ rebase). Drop ask tip. No WhatsNew/Version/publish/player door; `EQBUDDY_SHELL` only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for rebase → drop tip → CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~12:45 PM CT
+
 ### PR #320 — Fable Evolved opt-in telemetry plan (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #320 https://github.com/DranakCorps-bot/EQBuddy/pull/320 (`claude/fable-telemetry-20260905` → `main`, head `dcbe3c2d`; tip base `3ec285aa`) — `FABLE.md` Evolved opt-in telemetry item (TEL-001…006) + HELM-FEEDBACK LIVE ASK; docs/channel only.
