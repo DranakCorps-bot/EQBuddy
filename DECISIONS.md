@@ -17,6 +17,27 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ## 2026-09-04
 
+- **Stopped WAITING for the satellite windows to agree with the widget and made them agree
+  instead** — `RefreshUi` now ticks them after it builds the snapshot rather than before, and
+  the `EQBUDDY_EXPAND` dump paints any open surface still behind before it reads a row count
+  off one (`WidgetDump.PaintOneMoment`). The other way: raise the `surfacesBehind=0` timeout,
+  which is the fifth version of "wait longer" and would have been the fourth to fail. It
+  landed as a fix because the wait was on a COINCIDENCE — the windows' 1–3 s throttles were
+  never obliged to line up with the tick that writes the dump, and CI showed the wait timing
+  out at 90 s beside `ingestDone=1 logPending=0 killKinds=14 kills=13`. Carries a player-side
+  improvement with it: every satellite used to paint LAST tick's snapshot, so it was a second
+  behind the widget beside it, always. Trap 56, `FollowingSurfaces.cs`, `WidgetDump.cs`.
+- **Fixed a THIRD flake, pre-existing on `main`: the Avalonia suite ran two tests at once
+  against one headless session.** Nineteen of twenty-one classes carried
+  `[Collection("avalonia")]`; the ones without it got a collection each and xUnit ran them in
+  parallel, so `EnsureIsolatedApplication` rebuilt the app on the wrong thread and blamed
+  whichever test was in cleanup (runs `33920002880`, `33918054739` on main, both green on
+  re-run). The other way: leave it — it is not this PR's code, and touching it widens the
+  diff. It landed as a fix for the same reason the wiki one did: eight consecutive greens on
+  one head is unreachable with a 1-in-5 flake in another lane, and re-running until lucky
+  would be proving the wrong thing. Assembly-wide `DisableTestParallelization` rather than one
+  more `[Collection]` attribute, because the constraint is a fact about the session and not
+  about which classes someone remembered to label. Trap 57, `TestAppBuilder.cs`.
 - **Fixed a SECOND flake in the same PR as the E2E one — `EqlWikiMobsTests
   .NoMoreThanTwoFetchesAreEverInFlight`, which is a Core test, not an E2E one.** It asserted
   the in-flight count 100 ms after starting eight thread-pool lookups, so a hosted runner that
