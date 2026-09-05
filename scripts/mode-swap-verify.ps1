@@ -60,6 +60,12 @@ $psi = New-Object Diagnostics.ProcessStartInfo $exe
 $psi.UseShellExecute = $false
 $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
 $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
+# The Evolved shell comes up with it, on the same second display, for the same reason
+# AppHarness and shoot.ps1 now do: while E-3 is being built no harness may pop a bare v1
+# widget on the monitor the game is on. It changes nothing this script measures — the
+# window it finds is matched on the EXACT name 'EQBuddy' (the shell's carries its room),
+# and the widget is Topmost, so the real mouse clicks below still land on it.
+$psi.EnvironmentVariables['EQBUDDY_SHELL'] = '1'
 $proc = [Diagnostics.Process]::Start($psi)
 try {
     $deadline = (Get-Date).AddSeconds(30); $win = $null

@@ -1585,6 +1585,48 @@ function Stop-Hard([Diagnostics.Process]$proc) {
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
 }
 
+# The graceful close, aimed at the WIDGET by name rather than at whatever
+# `CloseMainWindow()` picks.
+#
+# `Process.MainWindowHandle` is "the first visible, unowned top-level window of the
+# process" — a description that fitted exactly one window until E-3, and now fits two:
+# ShellWindow sets no Owner, and both the prime runs below and David's own
+# `install-local.ps1 -Evolved` copy have it open. Only the widget's OnClosed finalizes the
+# session into history.db and calls Application.Current.Shutdown(); closing the shell
+# instead leaves the app running, which costs a prime run its stored session (staged
+# history that silently is not there — trap 23's shape) and costs the stand-down a hard
+# kill of a real player's session.
+#
+# The widget's title is exactly "EQBuddy"; the shell's carries its room. Returns $false
+# when no such window is up, so the caller can fall back rather than assume.
+Add-Type -Namespace EqShot -Name Win -MemberDefinition @'
+[DllImport("user32.dll")] public static extern bool EnumWindows(EnumProc cb, IntPtr l);
+public delegate bool EnumProc(IntPtr h, IntPtr l);
+[DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+[DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetWindowText(IntPtr h, System.Text.StringBuilder s, int n);
+[DllImport("user32.dll")] public static extern int GetWindowThreadProcessId(IntPtr h, ref int pid);
+[DllImport("user32.dll")] public static extern bool PostMessage(IntPtr h, uint msg, IntPtr w, IntPtr l);
+'@
+function Close-EqWidget([Diagnostics.Process]$proc) {
+    $hit = [IntPtr]::Zero
+    $cb = [EqShot.Win+EnumProc]{ param($h, $l)
+        if ([EqShot.Win]::IsWindowVisible($h)) {
+            $owner = 0
+            [EqShot.Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
+            if ($owner -eq $proc.Id) {
+                $sb = New-Object System.Text.StringBuilder 256
+                [EqShot.Win]::GetWindowText($h, $sb, 256) | Out-Null
+                if ($sb.ToString() -eq 'EQBuddy') { $script:hit = $h; return $false }
+            }
+        }
+        return $true
+    }
+    [EqShot.Win]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
+    if ($hit -eq [IntPtr]::Zero) { return $false }
+    [EqShot.Win]::PostMessage($hit, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null   # WM_CLOSE
+    return $true
+}
+
 # --- stand the real EQBuddy down, and put it back afterwards ------------------------
 # The running app is a worse problem than a mismatched capture. It is always-on-top, it
 # holds the very window titles these shots ask for, and a capture of it would commit a
@@ -1603,7 +1645,7 @@ foreach ($proc in @(Get-Process EQBuddy -ErrorAction SilentlyContinue)) {
     if ($path) { $relaunch += $path }
     Write-Host "Standing down the running EQBuddy (pid $($proc.Id)) — it will be relaunched."
     try {
-        if (-not $proc.CloseMainWindow()) { Stop-Hard $proc }
+        if (-not (Close-EqWidget $proc)) { if (-not $proc.CloseMainWindow()) { Stop-Hard $proc } }
         if (-not $proc.WaitForExit(15000)) { Stop-Hard $proc; $proc.WaitForExit(5000) | Out-Null }
     }
     catch { }   # already gone between the enumerate and the close
@@ -1690,6 +1732,10 @@ function Invoke-PrimeRun([object[]]$runs) {
         $psi.UseShellExecute = $false
         $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
         $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
+        # A prime run is a launch like any other, so it opens the shell like any other —
+        # the order is about what appears on the monitor, and this is the one launch in
+        # the script that used to put a bare v1 widget there for eight seconds.
+        $psi.EnvironmentVariables['EQBUDDY_SHELL'] = '1'
         $proc = [Diagnostics.Process]::Start($psi)
         $deadline = (Get-Date).AddSeconds(60)
         while ((Get-Date) -lt $deadline -and $proc.MainWindowHandle -eq 0) {
@@ -1701,7 +1747,15 @@ function Invoke-PrimeRun([object[]]$runs) {
         # one — the numbers in the picture would then be smaller than the fixture's and
         # nothing on screen would say why.
         Start-Sleep -Seconds $Settle
-        if (-not $proc.HasExited) { $proc.CloseMainWindow() | Out-Null }
+        # The WIDGET, by name. This close is the whole point of a prime run — only the
+        # widget's OnClosed finalizes the session into history.db — and with the shell up
+        # `CloseMainWindow()` is no longer guaranteed to be aiming at it (see
+        # Close-EqWidget). A prime that closed the wrong window would leave the app
+        # running, be killed twenty seconds later, and stage history that is simply not
+        # there, with the shot rendering a real empty state over it (trap 23).
+        if (-not $proc.HasExited) {
+            if (-not (Close-EqWidget $proc)) { $proc.CloseMainWindow() | Out-Null }
+        }
         if (-not $proc.WaitForExit(20000)) { Stop-Hard $proc; $proc.WaitForExit(5000) | Out-Null }
         # Removed before the capture run: two logs in the folder means the widget follows
         # whichever grew last, and the shot's own character would flip under it.
@@ -1770,6 +1824,16 @@ try {
         $psi.UseShellExecute = $false
         $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
         $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
+        # THE EVOLVED SHELL COMES UP FOR EVERY SHOT, not just the shell-* ones. The owner's
+        # standing order while E-3 is being built: a capture run must not pop a bare v1
+        # widget on the monitor the game is on. It rides BEFORE $spec.Env so a shot that
+        # names an address ('shell-quests-sky') still gets exactly the room it asked for.
+        #
+        # It does not change any picture. shot.ps1 uses PrintWindow, so occlusion is
+        # already irrelevant, and it now prefers an EXACT title match — which is what keeps
+        # the widget's 'EQBuddy' from resolving to the shell's 'EQBuddy — Home' in the same
+        # process (trap 24's uncovered half).
+        $psi.EnvironmentVariables['EQBUDDY_SHELL'] = '1'
         foreach ($k in $spec.Env.Keys) { $psi.EnvironmentVariables[$k] = $spec.Env[$k] }
         if ($reviewLog) { $psi.EnvironmentVariables['EQBUDDY_REVIEW'] = $reviewLog }
         $proc = [Diagnostics.Process]::Start($psi)
