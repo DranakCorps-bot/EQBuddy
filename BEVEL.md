@@ -44,6 +44,218 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### Home room — sixth room, first Bevel pass — pre-design (Bevel, 2026-09-05 night)
+
+**Priority:** `approved` (pre-design, unlocks Opus for the Home room per the Helm-signed
+Quests → Home → Live order)
+**Place:** `src/EQBuddy/ShellWindow.xaml.cs` (`_page` field :66, doc comment :33-38,
+constructor `Navigate` :122); `src/EQBuddy/ShellHost.cs:52` (`ApplyEnvHook`);
+`src/EQBuddy.UI.Shared/ShellPages.cs` (`RailOrder` :45-48, `Landed` :89-90, `Describe`
+:180); `tests/EQBuddy.E2E/ShellHostTests.cs:41-64` (`TheShellOpensOnProgressWith…`);
+`src/EQBuddy/GearRoom.cs:177`, `ProgressRoom.cs:54`, `WorldRoom.cs:202`, `QuestsRoom.cs:135`
+(`ApplyLayout` precedent); `docs/BEVEL-v2-staging-critique.md` §2 row *Session picker*, §6
+door 1, §8.
+**Source:** tonight's ask, so Opus can be unlocked for Home the moment #301 is on `main`.
+Against the Helm-signed E-3 rooms order (2026-09-04 ~11:15 PM CT, re-signed on #301
+~12:15 AM CT) and my own §1 flag naming the `ShellWindow` default as the Home PR's to fix.
+**All verified in source on tip `41d6830d`** (post-#301 merge). **Not a hold. Not
+needs-david. #208/#261/#262 untouched. No implement.**
+
+---
+
+#### 1. Default landing — the fact lives in TWO files, not one, and only one of them is obviously "the default"
+
+§1 of the last item named the requirement (*"the Home PR must change this default"*) and
+pointed at `ShellWindow._page`. Reading the actual code tonight turns up a second,
+independent copy of the same fact, and it is exactly trap 4's shape — one entry, two
+sources — arriving in navigation instead of data:
+
+- `ShellWindow.xaml.cs:66` — `private ShellPage _page = ShellPage.Progress;`
+- `ShellWindow.xaml.cs:122` — the constructor's own `Navigate(ShellPages.Address(ShellPage.Progress))`, which is the SAME fact written a second time in the same class rather than derived from the field above it.
+- `ShellHost.cs:52` — `Show(main, address == "1" ? ShellPages.Address(ShellPage.Progress) : address)`. This is the **review hook's** copy of "what the default room is," in a different file, reached only when `EQBUDDY_SHELL=1` (no address) opens the shell. **This is the dangerous one**: it is what `shoot.ps1` or any capture built on the env hook actually exercises, and it can drift from the constructor silently — a screenshot taken through the hook would go on showing Progress as "the default" even after the constructor changed, because nothing forces the two to agree.
+
+**And there is a live E2E assertion that already encodes the old answer three ways.**
+`ShellHostTests.cs:41` is named `TheShellOpensOnProgressWithARailRowPerLandedRoomAndASearchAffordance`,
+opens with `OpenOn("progress")` (which sets `EQBUDDY_SHELL=progress` — an explicit address,
+not the bare default), and asserts `WaitForDump("shellPage", "progress", …)` twice more at
+lines 46/80/413 across the file. None of these exercise the constructor's bare default
+directly (every one navigates to an explicit `progress` address), which means **today there
+is no E2E coverage of what `EQBUDDY_SHELL=1` with no address actually lands on** — the one
+path that would catch `ShellHost.cs:52` disagreeing with `ShellWindow.xaml.cs:66`.
+
+**What I am asking the Home PR to do, concretely, not just "change the default":**
+
+1. Change `ShellWindow._page`'s initializer and derive the constructor's `Navigate` call
+   from it (`Navigate(ShellPages.Address(_page))`) instead of repeating the literal — one
+   source inside the class instead of two.
+2. Change `ShellHost.cs:52`'s literal to match, or better, delete the literal entirely and
+   let `address == "1"` resolve to `null`/omitted so `ShellWindow`'s own constructor default
+   is the only place the fact is ever written. A hook that says "open on the default" should
+   not need to know what the default is.
+3. Add (or rename) an E2E test that launches with `EQBUDDY_SHELL=1` — bare, no address —
+   and asserts `shellPage=home`. Rename `TheShellOpensOnProgressWith…` to name Progress
+   explicitly as an addressed case (it already is one), so a future room's default flip
+   does not require reading the method body to know whether the name lied.
+
+This is not scope creep on a UX pre-design — it is the same discipline trap 55 and trap 20
+already established for settings (*"a fold may only name keys that are no longer cards,
+checked against the catalog, never against a hand-maintained comment"*) applied to a
+navigation default instead of a settings key. **A default that is a comment's promise
+instead of a single source is exactly the shape that drifted quietly for six days in
+trap 53.**
+
+---
+
+#### 2. Empty-state for Home — four blocks, four independent readiness states, and Home is the room most likely to be seen with NOTHING in any of them
+
+Door 1 locks Home's Phase 2 contents as **Identity · Readiness · Recent session · Deep
+links**. Each of those four can be empty independently of the other three, and each needs
+its own sentence in the inventory-dump voice (§4 of the signed critique) rather than one
+blanket "nothing here yet" for the room:
+
+| Block | Can be empty when | What the empty should say |
+|---|---|---|
+| Identity | No log opened yet at all — a truly fresh profile | What is missing (no character log found), the action (`/log` or point EQBuddy at the log folder), where, what happens next — **this is the ONE empty state in the whole shell that can occur with zero game data of any kind**, which the other six rooms cannot say (Gear/Quests/World/Progress all assume a character is already known) |
+| Readiness | Nothing is stale (healthy) OR nothing has ever been dumped | These are two DIFFERENT states with the same "no problem to report" shape as a healthy state, and a Fable plan should not collapse them — "never scanned" earns a call to action, "scanned recently" earns silence or a quiet checkmark, and treating them the same either nags a healthy player or reassures one who has never run the command |
+| Recent session | No completed session yet, or the current session is still live | See §5 — this is a boundary question with Live, not just an empty-copy question |
+| Deep links | N/A structurally, but see §5's second point — a deep link to a room that is not in `ShellPages.Landed` is the rail's own forbidden shape (*"an affordance that opens nothing is a trap"*) applied to Home's own body |
+
+**The stakes are higher here than on any room built so far.** Once §1 lands, Home's empty
+state — specifically the Identity block on a profile that has never seen a log line — is
+**the first thing a brand-new player's Evolved shell ever shows**, before the Bevel-recorded
+staging-IA-pass-#2 recommendation to retire the 8-page tour has been actioned by anyone.
+That recommendation is still a recommendation, not a lock, and I am not asking Opus to
+retire the tour tonight — but whoever builds Home's empty Identity state should know it is
+being compared, whether we ask for that or not, against the thing it is the eventual
+replacement for. A weaker empty state than the tour's page 2 would be a regression nobody
+filed a bug for.
+
+**One piece of unfinished business this pre-design does NOT get to skip past.** §4 of the
+prior item ruled that empty-state POSITION is a room-level wrapper (`IShellRoom`/the shell
+host centers a reported empty explanation) and canvas treatment is per-surface — and
+reading `IShellRoom.cs` and all four landed rooms tonight, **that wrapper has not been
+built by any of the three rooms that have shipped since.** `GearRoom.cs:177` and
+`ProgressRoom.cs:54` and `WorldRoom.cs:202` all implement `ApplyLayout` empty (single-pane,
+correctly), but none of them route their empty text through a centering wrapper — because
+none of the three has actually been *shot* in its empty state since landing in the shell
+(World and Gear both carry populated fixture data in every committed shot). **Home is
+positioned to be the first room whose default, most-likely-seen state is a room-level
+empty**, which makes it the first real consumer of a ruling that has sat unbuilt since PR 2,
+the same shape `RoomSinglePane` was for two PRs before Quests exercised it. Build the
+wrapper here rather than trusting it will get remembered when Gear's or World's turn comes;
+predict the picture before shooting it, per trap 23/51.
+
+---
+
+#### 3. Order and rail position — no change, one thing to shoot
+
+`ShellPages.RailOrder` already has Home first: `Home, Live, Progress, Gear, Quests, World,
+Settings` (`ShellPages.cs:47`). Home joining `Landed` puts it at the top of the drawn rail,
+above Progress, automatically — nothing to rule on in the ordering itself. `Describe(Home)`
+is already written (*"Who you are playing, what is ready, and where you left off"*) and
+matches door 1's contents exactly, so the room's own one-line pitch does not need
+rewriting when it ships.
+
+**What to shoot, predicted first (trap 23):** the rail with Home now drawn above Progress,
+and the shell landing there by default per §1. A rail that silently appended Home at the
+bottom, or a shell that still opened on Progress after the flip, would look like a healthy
+build in every way except that one picture — trap 24's shape (a window that renders
+correctly and is not the state under review).
+
+---
+
+#### 4. Density and chrome — Home is single-pane like Progress, and its deep-links block must reuse the rail's own navigation call, not a second one
+
+Nothing about Home needs a new `IShellRoom` shape or a new layout axis. Four stacked
+blocks (identity, readiness, recent session, deep links) is a single-column arrangement —
+the same case `RoomSinglePane` already has three implementations of
+(`ApplyLayout(ShellLayout layout) { }`, empty with the interface's own "empty with a
+reason" contract). Home's `ApplyLayout` should be the fourth empty one, and its own
+comment should say why, the way `GearRoom.cs:175-177` already does.
+
+**One concrete risk, and it is a trap-4 risk again, not a new one.** The deep-links block
+is itself a small navigation surface sitting inside a room, the same relationship the rail
+has to the shell. **It must call the exact same `Navigate(ShellPages.Address(page, room))`
+the rail's `RailRow` click handler already calls** — not a hand-rolled second dispatch that
+happens to look the same. Two ways to land on a room is the navigation version of trap 33
+(two producers of one fact disagreeing at the boundary), and the whole reason `page:room`
+was built as one grammar (per the signed nav pre-design) was so the rail, `Ctrl+K`, and a
+future HUD button would never need a second implementation. Home's deep links are the
+fourth caller of that grammar, not a reason to write a fifth path.
+
+**A second, sharper version of the same risk: a deep link that opens nothing.** Home ships
+before Live (signed order). If a plan puts a "Live" deep link in Home's body ahead of the
+Live room actually landing, that is the rail's own forbidden shape — *"an affordance that
+opens nothing is a trap"* — reappearing inside a room's content instead of on the rail.
+**Home's deep-links block must read from `ShellPages.Landed`, the same list the rail reads
+from, and simply not offer a link to a room that is not on it yet.** This is not a new rule;
+it is the existing one, applied to a second place in the UI that can now violate it.
+
+---
+
+#### 5. What Home is vs Live — the disposition table already drew the line; the risk is Home quietly doing Live's job while Live does not exist
+
+`docs/BEVEL-v2-staging-critique.md` §2's Session-picker row already splits this:
+**Home** gets "recent session" (identity, what you just did, one screen); **Live** gets
+"this sitting" (the meters, the analysis). That line is correct and I am not redrawing it.
+What is worth naming explicitly, because Home is being built first and Live is still
+parked:
+
+- **If the current session is still live when a player opens Home, Home shows identity and
+  a "session in progress" note with nothing to click yet (Live is not `Landed`) — it does
+  not render combat numbers.** The temptation is real: `MainWindow`'s current snapshot is
+  sitting right there, reachable, and rendering a DPS or kill count on Home's "recent
+  session" card would look like a small, harmless convenience. It is also exactly the job
+  §0's stance table gives to the HUD glance and to Live's eventual room, not to a desk
+  surface. Home's own doc says its category (Desktop: *"before and after play"*), and mid-
+  fight numbers are neither.
+- **"Recent session" for a session that has ALREADY ended is Home's real content today**,
+  and it has nowhere established to read from — I grepped for a "last completed session"
+  concept in `Core` and found none (`MobHistory.cs` is the closest neighbor and is not it;
+  I did not open `HistoryWindow`'s full view-model, so treat this as a place to look, not a
+  confirmed gap). **Whatever computes "what you just did" for Home should live in
+  `Core`/`UI.Shared`, not inside the Home room's own code**, because Live's own PR will need
+  the identical fact once it exists (a session summary is exactly the kind of thing the
+  History-window merge row already says splits into "Progress (career) + Live (this
+  session)" — Home's one-screen version is a THIRD reader of the same underlying record).
+  Building it once now, shared, is cheaper than Live re-deriving it later and the two
+  drifting the way #202's two snapshot builders did (trap 33).
+- **Home does not get a raid or faction glance either**, even though both are one property
+  read away. Door 3 already settled this: Raids goes to Live, Faction stays Advanced-under-
+  Progress-you-open-on-purpose. Home names deep links to those rooms; it does not preview
+  their contents.
+
+---
+
+#### 6. What does NOT change
+
+Everything #299/#300/#301 already signed stands. `MinRoomWidth` 520. `IShellRoom` is the
+right shape, no new one needed. No player-facing door. No WhatsNew/tag/publish. Live stays
+parked for its own Bevel pass — nothing here is a Live design, only the boundary Home must
+not cross while Live does not exist. HUD subtraction stays per-item gated exactly as §2 of
+the prior item ruled; Home shipping does not licence removing anything from the widget.
+
+---
+
+- **Already shipped (checked on tip `41d6830d`):** four-row rail (Progress·Gear·Quests·World,
+  Home/Live in `RailOrder` but not `Landed`); `ShellPages.Describe(Home)` already written;
+  `IShellRoom` proven across four different surfaces; `ApplyLayout` empty-with-reason
+  pattern in three of four rooms; `RoomSinglePane` with its first real consumer (Quests).
+- **Checked:** `ShellWindow.xaml.cs` in full; `ShellHost.cs` in full; `ShellPages.cs` in
+  full; `IShellRoom.cs` in full; `GearRoom.cs`/`ProgressRoom.cs`/`WorldRoom.cs`/
+  `QuestsRoom.cs` for `ApplyLayout` and empty-state handling; `ShellHostTests.cs` for
+  existing default-landing coverage; `docs/BEVEL-v2-staging-critique.md` §0/§2/§6/§8 in
+  full; `HELM.md` #299/#300/#301 signs and Retired block (Live Holds empty); `FABLE.md` E-3
+  section in full, including the migration and HUD-after-host guidance.
+- **Not checked this run:** the mobile `⚙ Screens` picker (still an open hypothesis from the
+  prior pass, unverified by either of us); `HistoryWindow`'s view-model for what "last
+  session" data already exists in a computable shape; the running app (did not run
+  `shoot.ps1`).
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### E-3 rooms — order after World + Gear: Quests / Home / Live / HUD subtraction sequencing — pre-design (Bevel, 2026-09-05)
 
 > **PARTIALLY TAKEN 2026-09-05 (E-3 PR 3).** §1's first verdict — *Quests next, and it is
