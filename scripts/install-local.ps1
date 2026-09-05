@@ -19,6 +19,11 @@
 # shortcut — is the right move when Evolved becomes the daily driver. Named here so the
 # next session does not re-derive it.
 #
+# -Evolved also opens the SHELL (EQBUDDY_SHELL=1), because a local Evolved smoke that does
+# not show the thing E-3 is building is a smoke of the half that has not changed. It is a
+# review door, not a player one, and it is set only on this branch — see the launch block
+# below. scripts\Launch-Evolved-Shell.cmd re-opens the same portable copy without rebuilding.
+#
 #   pwsh scripts\install-local.ps1 -Evolved
 param([switch] $Evolved)
 $ErrorActionPreference = 'Stop'
@@ -98,18 +103,37 @@ Invoke-EqSign "$repo\dist\publish\EQBuddy.exe"
 if ($Evolved) {
     New-Item -ItemType Directory -Force $evolvedProfile | Out-Null
 
-    # Set on THIS process so the child inherits it; restored afterwards so nothing else
-    # this shell does inherits a redirected profile by accident.
-    $previous = $env:EQBUDDY_APPDATA
+    # Set on THIS process so the child inherits them; restored afterwards so nothing else
+    # this shell does inherits a redirected profile — or an auto-opening shell — by accident.
+    #
+    # EQBUDDY_SHELL=1 is THE REVIEW DOOR, and it is set HERE and nowhere else on purpose.
+    # The Evolved shell has no player-facing entry point yet (ShellHost says why, and
+    # DECISIONS.md logs it): its rail draws five rooms of a planned seven, so a menu entry
+    # into it would be the unexplained-empty the Phase 2 gate forbids. But a surface nobody
+    # can reach reads as reviewed anyway (trap 22), and this script is the ONLY way David
+    # runs an Evolved build — so a local -Evolved smoke that does not open the shell is a
+    # local smoke of the half of Evolved that has not changed.
+    #
+    # It rides the local-only switch that already exists rather than becoming a new one:
+    # the branch below is the same one that refuses to install, refuses to touch OneDrive
+    # and refuses to touch the v1 profile. The installed and released builds go through
+    # neither this branch nor this variable and are untouched by it.
+    $previousProfile = $env:EQBUDDY_APPDATA
+    $previousShell = $env:EQBUDDY_SHELL
     try {
         $env:EQBUDDY_APPDATA = $evolvedProfile
+        $env:EQBUDDY_SHELL = '1'
         Start-Process "$repo\dist\publish\EQBuddy.exe" -WorkingDirectory "$repo\dist\publish"
     }
-    finally { $env:EQBUDDY_APPDATA = $previous }
+    finally {
+        $env:EQBUDDY_APPDATA = $previousProfile
+        $env:EQBUDDY_SHELL = $previousShell
+    }
 
     Write-Host ''
     Write-Host "EQBuddy Evolved $version is running, PORTABLE, from $repo\dist\publish" -ForegroundColor Cyan
     Write-Host "  profile:   $evolvedProfile   (v1's %AppData%\EQBuddy is untouched)" -ForegroundColor Cyan
+    Write-Host '  shell:     open — EQBUDDY_SHELL=1, the local review door. Installed and released builds never set it.' -ForegroundColor Cyan
     Write-Host '  installed: nothing. Your v1 install, its shortcut and its profile are exactly as they were.' -ForegroundColor Cyan
     Write-Host '  signed:    yes — same certificate, same verification as a release build.' -ForegroundColor Cyan
     # No unins000.exe beside a portable exe, so UpdateChecker.IsInstalledCopy is false and

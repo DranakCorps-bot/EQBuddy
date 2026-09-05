@@ -1,7 +1,7 @@
 <Window x:Class="EQBuddy.ShellWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="EQBuddy" Width="960" Height="640"
+        Title="EQBuddy"
         Background="{DynamicResource BgBrush}" WindowStartupLocation="CenterScreen">
     <!-- THE EVOLVED SHELL HOST (E-3 Phase 2 PR 1). Bevel's shell nav pre-design,
          Helm-signed 2026-09-04 ~9:25 PM CT.
@@ -25,9 +25,20 @@
          DELETED rather than ported, the same call the World fold made for four cog menu
          entries. The title-bar icon is the app icon, which native chrome draws for free.
 
-         Sizes: MinWidth/MinHeight come from ShellLayoutPolicy in code, not from literals
-         here, because they are DERIVED (a room's minimum plus the collapsed rail) and a
-         number typed in two places is a number that will disagree with itself.
+         Sizes: MinWidth/MinHeight AND the opening Width/Height all come from
+         ShellLayoutPolicy in code, not from literals here. The floor because it is DERIVED
+         (a room's minimum plus the collapsed rail); the opening size because it is an INPUT
+         to the secondary-monitor placement below — "is there a band wide enough to hold
+         this window" — and a number typed here and again in the test that asks that question
+         is a number that will disagree with itself, silently, with both sides internally
+         consistent.
+
+         WindowStartupLocation is the ONE-MONITOR ANSWER, not the rule. CenterScreen means
+         the PRIMARY screen, which is where EverQuest is — so the constructor overrides it
+         with Manual and a secondary-monitor origin whenever the desk has a display beside
+         the primary one. Left here rather than replaced because null from
+         ScreenGuard.SecondaryOrigin means "you decide", and this is the decision: a
+         one-monitor desk (and a 1024×768 CI runner) keeps exactly the behaviour it had.
 
          Nothing below carries a literal font size, radius or spacing value — every number
          resolves out of the token dictionary DesignSystem.Tokens() composes from

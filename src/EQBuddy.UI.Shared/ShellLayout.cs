@@ -61,6 +61,23 @@ public static class ShellLayoutPolicy
     public const double MinHeight = 400;
 
     /// <summary>
+    /// The size the shell OPENS at — comfortably above both thresholds, so a first launch
+    /// shows the labelled rail and a two-pane room rather than either degraded state.
+    ///
+    /// **These were XAML literals until the secondary-monitor placement needed them**, and
+    /// that is the whole reason they moved: the placement asks "is there a band wide enough
+    /// to hold this window", so the window's size is an INPUT to a decision a unit test and
+    /// an E2E both have to be able to ask. A number typed in the XAML and again in a test is
+    /// a number that will disagree with itself the day the shell opens wider — and it would
+    /// disagree silently, because both sides would still be internally consistent. The same
+    /// argument <see cref="MinWidth"/> was already carrying one line up.
+    /// </summary>
+    public const double OpenWidth = 960;
+
+    /// <inheritdoc cref="OpenWidth"/>
+    public const double OpenHeight = 640;
+
+    /// <summary>
     /// Axis 1's threshold: the rail keeps its labels only while an expanded rail AND a
     /// full-width room both fit. Derived from the two numbers rather than typed, so a
     /// change to either moves the threshold with it.
