@@ -295,7 +295,7 @@ premise, re-derived from the tree, because acting on a stale one is what trap 52
 
 | Feature | Today's door(s) | v2 room | Class | Why | What writes it |
 |---|---|---|---|---|---|
-| **Whole-pixel text** | Options → Look — **and only under Wine** | **Settings** (or nothing) | see below | `WineText.IsOfferedHere()` is `IsRunningUnderWine() && no EQBUDDY_TEXTMODE override`, so on the supported v2 platform this control **is already invisible**. Removing it is a source cleanup, not a player-facing change. | `WineWholePixelText` ← `OptionsWindow.xaml.cs:253`, its only writer. |
+| **Whole-pixel text** | ~~Options → Look, and only under Wine~~ — **removed 2026-09-05** | **Settings** (or nothing) | **Remove — DONE** | `WineText.IsOfferedHere()` was `IsRunningUnderWine() && no EQBUDDY_TEXTMODE override`, so on the supported v2 platform this control **was already invisible**. Removing it was a source cleanup, not a player-facing change. | Nothing now. `WineWholePixelText` is a hand-edited `settings.json` knob with a `DeadSettingTests.Known` row, the same shape as the two rows below it. |
 | **CrossOver overlay opt-in** | **No UI, by design** | — | Keep as-is | `DeadSettingTests.Known` already carries both rows, verbatim: *"no UI by design — Wine/Proton escape hatch"*. | `WineFloatOverFullscreen`, `WineKeepGameFullscreen` — hand-edited JSON only. |
 | `TextRenderingPolicy` + `WineText` | — | — | **Keep** | Named by #277. Serves people running the **supported Windows artifact** under CrossOver, and costs one `OverrideMetadata` call. | — |
 | `WineFonts.cs`, `TextProbeWindow.cs` | `--textprobe` | — | **Keep** | Not named by #277; kept deliberately rather than deleted by adjacency. `TextProbeWindow` is the instrument that ended trap 42, and it runs on Windows. | — |
@@ -325,6 +325,23 @@ people running the supported Windows artifact on a Mac — the same population #
 `TextRenderingPolicy` for. Both readings are defensible from the signed text and they lead to
 different diffs, so the ask goes to Helm with the evidence rather than to a guess. It is filed
 in `HELM-FEEDBACK.md` as a **formality ask with a corrected premise, not a re-ruling**.
+
+**Helm ruled on 2026-09-05 (~12:40 PM CT), and clause (a) has landed.** The ask offered three
+readings; Helm signed **(a) — the knob only** and rejected the other two by name. **(b)** would
+have executed the literal *"overlay/crossover scripts go with the platform"* clause and deleted
+a README-linked CrossOver setup for people running the **supported Windows artifact** on a Mac
+— the same population #277 kept `TextRenderingPolicy` for, so the premise had moved.
+**(c)** (park it) was refused on the ground that Surface A does not excuse leaving a dead
+Wine-only Options panel forever.
+
+So the first row above is now **done** and the rest of this section is a record rather than a
+plan. What went: `WholePixelTextPanel`/`WholePixelTextCheck` in `OptionsWindow.xaml`, their
+three wiring lines and the `OnWholePixelTextToggled` handler, and the two `WineText` members
+that had no other caller (`Reapply`, `IsOfferedHere`). What stayed, by name: `TextRenderingPolicy`,
+`WineText.ApplyIfNeeded`/`Resolve`, `WineFonts`, `TextProbeWindow`, `WineOverlay.cs`,
+`scripts/crossover/` and `docs/CrossOver-macOS-overlay.md`. **The capability is not lost**, which
+is the question `DeadSettingTests` exists to ask: a player who already unticked the box keeps
+the setting, `Resolve()` still reads it, and `EQBUDDY_TEXTMODE` overrides on either platform.
 
 ---
 
