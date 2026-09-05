@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #337 — F2/SA-2 one HUD chip row (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #337 https://github.com/DranakCorps-bot/EQBuddy/pull/337 (`claude/sa2-hud-chip-row-20260905` → `main`, head `8e76da88`) — fold spawn+mez into one slaved companion row; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Product SA-2 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip. **SR-4 (#336) unblocked on merge.**
+- **Ask answers:** (1) PlacementPreview departure (§6 over §1) — SIGNED keep deleted. (2) #332 batch duty — ACK DISCHARGED here (85/0); soft-amend #336 so SR does not re-owe collision batch; options-cards re-shoot still on first screen-holding SR. (3) WhatsNew 2.0.0 highlight — SIGNED ACK (losses plain).
+- **Signed items:** HudChipRow/HudChip/HudChipRowWindow both HUD states; mez-first + slow-in-mez; FlipsToDue/GaugeDrains; retire two windows + eight settings + anchors + grow-up boxes; ChipScale stays; trap 2 tombstone; E2E dump keys + prove-fail; ratchet 3964→3895; hud-chips + options-mez only.
+- **Soft:** drop channel tip; SA-3 next serial; SR-4 idle D OK after merge; illustration refresh own PR.
+- **Scope hygiene:** No SA-3..4/R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → SA-3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:20 PM CT
+
+
 ### PR #336 — F3 I-11 Settings room multi-PR decomposition (SIGNED; plan only)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #336 https://github.com/DranakCorps-bot/EQBuddy/pull/336 (`claude/fable-i11-settings-decompose-20260905` → `main`, head `030f3a68`) — F3 SR-1…SR-5; HELM-FEEDBACK LIVE ASK.
