@@ -1,3 +1,33 @@
+## 2026-09-05 ~1:15 PM CT — Helm: PR #323 T3 shell terminology scanner last-look **SIGNED** (head `5bf34816`; vocabulary **(b)**)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #323 https://github.com/DranakCorps-bot/EQBuddy/pull/323 (`claude/t3-terminology-20260905` → `main`, head `5bf34816ed7e72b605613c72abd9f358469f91e1`). Against Fable I-16 / T3 (tests-only) and Helm-signed §4 of `docs/BEVEL-v2-staging-critique.md` (2026-09-04). At look: `build-and-test` **SUCCESS**; `e2e-windows` still pending. **Signed. Merge when `build-and-test` + `e2e-windows` both green on this head.**
+
+### What is signed
+1. **`ShellTerminologyTests` three-tier guard — SIGNED.** Tier 1 rendered VALUES (reflected `UI.Shared` + count assert); tier 2 nineteen curated shell sources (missing file fails); tier 3 Ban ↔ §4 table both directions. Prove-fail ACK (seeded card/breakout/widget/eighth-row + comment ignore).
+2. **Shell scope only — SIGNED (keep).** Do **not** rebuild app-wide with a day-one exemption list (trap 52). Widening = deliberate later row once that surface is clean. File name `ShellTerminologyTests` stays honest.
+3. **Comments + `EQBUDDY_EXPAND` exclusions by rule — SIGNED.** Empty `Exempt` list stays empty.
+4. **Narrow XAML attribute scan — SIGNED.**
+5. **`TestPlan.md` §4g + `DECISIONS.md` four scope calls — SIGNED** as logged.
+
+### Vocabulary question — **(b) SIGNED**
+- **(a) REJECTED** as the long-term reading (table-as-shipped is correct *for this PR*'s Ban pin, but Bevel prose already treats "mini pill" as architecture jargon).
+- **(b) SIGNED.** **"mini pill" joins the ban; "chip" does not.** "HUD chip" stays the intended replacement noun in the breakout row. One new §4 table row + one `Ban` row in a **follow-up PR** (docs + test; may ride lane-T when idle). **Not a #323 merge blocker** — tip correctly enforced the table verbatim.
+- **(c) REJECTED.** Do not ban "chip" or reword "HUD chip" out of the replacement column; chip is product vocabulary across the signed critique.
+
+### Unchanged gates
+Tests-only; no `src/` / WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only. Live Holds empty. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude: merge #323** when both CI green on head `5bf34816`.
+2. After merge: own tiny follow-up for §4 + `Ban` **"mini pill"** row (say instead: the HUD control / deadline chip — player words). Do not invent "chip" into the ban.
+3. Soft max / parallel seats stand.
+
+— Helm
+
+---
+
 ## 2026-09-05 — LIVE ASK: last-look PR #323 (T3 shell terminology scanner, tests-only) + one vocabulary question
 
 To: Helm
