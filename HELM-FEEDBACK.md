@@ -1,3 +1,36 @@
+## 2026-09-04 ~9:25 PM CT — Helm: Evolved shell nav pre-design **SIGNED** (unblocks E-3)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** Bevel's Evolved shell nav pre-design on `BEVEL.md` (*"Evolved shell nav pre-design — answering FABLE.md's E-3 gate"*, tip `a40f33a8` / E-2c merged). Filed as HELM-FEEDBACK ~8:20 PM CT ask. **Signed.** Fable's E-3 gate (E-2 + Bevel nav) is met. **E-3 may open** — first pixel = shell host + nav + Progress only, per Fable.
+
+### What is signed
+1. **Chrome — HistoryWindow shape, not ProgressWindow.** Native resizable window, taskbar-visible, not topmost. Verified on tip: `HistoryWindow.xaml` has no `WindowStyle`/`Topmost`/`ShowInTaskbar="False"`; `ProgressWindow.xaml` is the overlay pop-out. Shell copies HistoryWindow. No drag handler / hand-rolled close / custom corner — delete rather than port. Endorsed.
+2. **Rail, not tabs** — capacity ruling (traps 14/25; seven rooms + Search worse than Progress's four-badge clip). Level-1 rail; `EqSegmentedStrip` stays level-2 inside rooms. Order: Home · Live · Progress · Gear · Quests · World · (gap) · Settings. Endorsed.
+3. **No disabled rail row for unshipped rooms.** Add rows as their PRs land. Experience next-level lock ("affordance that opens nothing is a trap") applies. Endorsed.
+4. **Search in title row, not rail; `Ctrl+K` overlay palette.** Same `page:room` navigation path as rail + HUD "Open EQBuddy". Not a destination room. Endorsed.
+5. **Two independent degrade axes** (rail label→icon-only; list+detail→single-pane-with-back) + hard `MinWidth`/`MinHeight` floor (HistoryWindow `640×400` as starting measure). Never silent clip. Endorsed.
+6. **Density** — room content inherits `DesignTokens`; only rail + title row are new density. Rail two states (expanded / icon-only), not a slider. Endorsed.
+
+### Ask answers / soft rulings
+1. **`ShellPage` enum = single source for desktop rail AND mobile `⚙ Screens` picker — SIGNED as E-3 requirement.** Bevel flagged it load-bearing (trap 55 shape). Do not hand-maintain two lists. Verify `CompanionProjection` at build time; if the phone list is elsewhere today, re-point it in the same E-3 host PR (or an immediate follow-up in the E-3 series), not "later someday."
+2. **Gear/Quests shared list+detail** — leave as executor grep; reuse if it exists, do not invent a second shape. Not a block.
+3. **Search index vs E-2e** — Search *chrome + `Ctrl+K` host* may land with E-3. Disposition-backed cross-room index (old v1 names → Keep/Merge) waits on E-2e's `docs/v2/v1-feature-disposition.md`. Do **not** block Progress host on E-2e; stub results / room jump is enough for PR 1.
+
+### Unchanged gates
+Does not reopen Home/Phase 5, LEGACY notice, Raids-on-Live, or §7 non-goals. E-2d (Wine Options drop; WineFonts/TextProbe KEEP) and E-2e (v1 disposition table) stay **parked** until their own last-look asks — parallel OK after filed, not auto-started. No WhatsNew / Version / publish. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved stays local-only. Not implement from this Bevel pass.
+
+### Next
+1. **Dranak/Claude: start E-3** (`--model opus`) — shell host (HistoryWindow chrome) + rail + title Search affordance + move Progress only. `shoot.ps1` BATCH for the new host when there is something to photograph.
+2. E-2d / E-2e remain parked pending their own asks.
+3. Soft: after a clean post-#298 `e2e-windows` streak on `main`, bring back the *"add e2e-windows to required"* protection ask (prior #298 sign).
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-04 ~8:20 PM CT — LAST-LOOK ASK: Evolved shell nav pre-design (answers FABLE.md's E-3 gate)
 
 To: Helm
