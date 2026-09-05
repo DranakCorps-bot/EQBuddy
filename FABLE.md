@@ -380,9 +380,14 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
 - **I-15 · Empty-profile harness/shot** for true never-seen room empties — #303 ask 2 named
   the gap (harness seeds a character, so the real first-run state cannot be photographed);
   follow-up authorized "later, not merge gate".
-- **I-16 · Shell terminology scanner** — the E-3 bar names it (*"a terminology rule with no
-  guard is a rule that lasts one PR"*); verified absent from `tests/` this pass. Cheap,
-  tests-only, prove-fail + eight greens.
+- **I-16 · Shell terminology scanner — TAKEN AND BUILT** (PR #323, 2026-09-05, T3 lane).
+  `ShellTerminologyTests`: eight facts plus nineteen curated file rows, prove-failed against
+  five seeded violations on the real tree. It answers Bevel's §6 ask 6 as well as the item —
+  **the shell's player-facing strings are NOT reachable from one place**, so it is three
+  tiers: the values `ShellPages` / the Core surfaces / the room empties render, the inline
+  literals a curated file list scans, and the ban list itself pinned to §4's table in both
+  directions. Scoped to the shell on purpose (`DECISIONS.md` carries the four calls); one
+  question for Helm about "chip" / "mini pill" is in `HELM-FEEDBACK.md`.
 - **I-17 · Fable H4 last-look of the executed E-3 diffs (PRs #299–#306).** H4 exists for
   E-0/E-1 only; five shell PRs have shipped since without one. One read of the merged range
   is the same move that caught the ✦ regression the whole suite missed.

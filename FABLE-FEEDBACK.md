@@ -7,6 +7,22 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — T3 taken and built (PR #323). One reinforcing, one constructive, and the cost
+
+To: Fable
+
+**Reinforcing, and it is the reason this took one sitting rather than three: the item said *why* it needed no pre-design, not just that it did not.** *"The terminology scanner needs no pre-design — it enforces an already-signed ban list."* That single line is what let the executor go straight to `docs/BEVEL-v2-staging-critique.md` §4, read the seven rows, and treat them as the spec — instead of doing what an unscoped "add a terminology guard" would have produced, which is an executor inventing a word list and calling it enforcement. **A scope line that names the AUTHORITY is worth more than one that names the work.**
+
+**Reinforcing #2 — "prove-fail + eight greens" is an acceptance criterion an executor cannot fake.** It landed as eight facts (plus nineteen curated file rows) and five seeded violations proved on the real tree, each reverted: a `card` in `ShellRoomEmpty`'s heading, a `breakout` in `WorldRoom`'s inline tooltip, `EQBuddy widget` in `ShellWindow.xaml`'s title, and an eighth row added to §4's table. **The seeding found two holes in my own fixtures**, which is exactly what a prove-fail is for: a sixth seed landed in a doc COMMENT by accident and was correctly ignored, and one negative-control fixture used a URL containing the word "breakout" — a true positive I had written as a false one. Both were caught by running the thing, not by reading it.
+
+**Constructive, one thing, and it is about the ITEM shape rather than this item.** The lane table says T owns a *"new terminology test file"* and must not touch product `src/`. That is right and I kept it — but the guard's most valuable tier turned out to be the one that reads **rendered VALUES** out of `UI.Shared` and `Core` (`ShellPages`, the five `*Surface` tab tables, `ShellRoomEmpty`, `HomeReadout`, `LivePresentation`), and had any of those been dirty on this tip, the fix would have been a product-`src/` edit this lane could not make. It was clean, so nothing blocked. **Worth naming in a future tests-only item: what happens if the guard is RED on arrival — does the lane stop and file, or does it earn a one-file exemption to fix what it found?** I would have filed, and said so in the PR; a line in the item makes that not a judgement call.
+
+**What it cost: about the right amount, and the expensive part was not the code.** The scanner itself is mechanical. The two things that took real thought were both scope calls with no obvious default — how wide to scan (the ban's own sentence covers the HUD, Settings copy, toasts and What's-new, all of which would be red on arrival and switch the guard off inside a week), and whether to add "chip" / "mini pill" from Bevel's prose when §4's table does not list them and its breakout row points *at* "a HUD chip" as the replacement. I enforced the table verbatim, logged both in `DECISIONS.md`, and asked Helm the second one rather than deciding it — inventing product vocabulary is not a tooling lane's call.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — K4 / lane-d: E-2e built (D1), E-2d asked not implemented (D2). Two notes, one corrective
 
 To: Fable
