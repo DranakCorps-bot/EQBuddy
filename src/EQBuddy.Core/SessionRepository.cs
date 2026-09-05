@@ -20,6 +20,21 @@ public sealed class SessionRepository : IDisposable
 {
     public const int CurrentSchemaVersion = 1;
 
+    /// <summary>The end reason a session carries while it is still being played — the mark
+    /// <c>SessionArchiver</c> checkpoints under, and the one thing that separates the row
+    /// being written right now from the rows that are history.
+    ///
+    /// **Named once because a second reader arrived.** It was a literal in three places for
+    /// as long as only the archiver and the history list cared; <see cref="UI.Shared.SessionSummary"/>
+    /// is the fourth, and it is the one that would be WRONG rather than merely untidy if the
+    /// string drifted — Home would describe the sitting a player is in the middle of as
+    /// "where you left off". Trap 4's shape, caught before it cost anything.</summary>
+    public const string ActiveEndReason = "Active";
+
+    /// <summary>What an <see cref="ActiveEndReason"/> row becomes when the app that was
+    /// writing it did not get to finish. See <see cref="MarkInterruptedAsRecovered"/>.</summary>
+    public const string RecoveredEndReason = "RecoveredAfterCrash";
+
     // Rate fields can legitimately hit Infinity in degenerate sessions; never let
     // that kill a checkpoint write (observed in the wild via error.log).
     private static readonly JsonSerializerOptions JsonOpts = new()
@@ -143,7 +158,8 @@ public sealed class SessionRepository : IDisposable
     public int MarkInterruptedAsRecovered()
     {
         lock (_lock)
-            return Exec("UPDATE Sessions SET EndReason='RecoveredAfterCrash' WHERE EndReason='Active'");
+            return Exec($"UPDATE Sessions SET EndReason='{RecoveredEndReason}' "
+                + $"WHERE EndReason='{ActiveEndReason}'");
     }
 
     public List<(string Server, string Character)> Characters()

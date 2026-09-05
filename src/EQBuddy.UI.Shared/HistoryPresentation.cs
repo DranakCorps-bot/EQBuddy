@@ -63,8 +63,8 @@ public static class HistoryPresentation
                $"   {(row.PrimaryZone.Length > 0 ? row.PrimaryZone : "-")} - " +
                $"{(int)duration.TotalHours}h {duration.Minutes}m - " +
                $"{row.Kills} kills - {row.XpPercent:0.#}% xp - {StatsSnapshot.FormatCoin(row.Copper)}" +
-               (row.EndReason == "RecoveredAfterCrash" ? " - (recovered)" : "") +
-               (row.EndReason == "Active" ? " - (in progress)" : "");
+               (row.EndReason == SessionRepository.RecoveredEndReason ? " - (recovered)" : "") +
+               (row.EndReason == SessionRepository.ActiveEndReason ? " - (in progress)" : "");
     }
 
     public static string BuildOverview(SessionRow row, StatsSnapshot snapshot)

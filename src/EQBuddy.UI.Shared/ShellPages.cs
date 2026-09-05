@@ -80,14 +80,22 @@ public static class ShellPages
     /// than for its size. <c>QuestsView</c> is that lift; <c>QuestsWindow</c> is now a thin
     /// host beside it.
     ///
-    /// **The three still missing are held back by a decision.** Live does not exist yet
-    /// (and Raids cannot leave Progress until it does) and Home is a genuinely new surface
-    /// — each gets its own Bevel pass rather than riding another room's PR, which is what
-    /// the Helm-signed order Quests → Home → Live says in as many words. Settings is a
-    /// room whose whole job is not being a launcher.
+    /// **PR 4 added Home, and it is the first room that is NEITHER a move nor a lift.**
+    /// There was no v1 window to host and no view to extract: the four blocks its signed
+    /// door 1 locks — Identity, Readiness, Recent session, Deep links — are a new surface
+    /// composed from facts the app already had and had never put on one screen. That is also
+    /// why it is the room the shell now OPENS on: <c>ShellWindow._page</c> had been
+    /// <see cref="ShellPage.Progress"/> since PR 1 as an explicit placeholder for the room
+    /// designed to answer "where do I stand", and the placeholder outlived its excuse the
+    /// moment that room existed.
+    ///
+    /// **The two still missing are held back by a decision.** Live does not exist yet (and
+    /// Raids cannot leave Progress until it does) — it gets its own Bevel pass rather than
+    /// riding another room's PR, which is what the Helm-signed order Quests → Home → Live
+    /// says in as many words. Settings is a room whose whole job is not being a launcher.
     /// </summary>
     public static readonly IReadOnlyList<ShellPage> Landed =
-        [ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World];
+        [ShellPage.Home, ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World];
 
     /// <summary>
     /// The rooms INSIDE a room — the second half of a <c>page:room</c> address — read from

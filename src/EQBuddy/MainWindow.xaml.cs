@@ -1946,9 +1946,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// wiki".</summary>
     private void OnWikiPackWindow(object sender, RoutedEventArgs e) => ShowWikiPackWindow();
 
-    /// <summary>Also reached from the ✦ marker on a Drops by Creature row, which used to
-    /// copy the pack straight to the clipboard. Opening the surface instead is the point
-    /// of the move: the marker says "there is something here", and the window says what.</summary>
     /// <summary>The pack's history pool reads these (#217 ask 2): every stored session's
     /// mob aggregates, and the live session's own checkpointed row id so it is excluded
     /// from the fold rather than counted twice.</summary>
@@ -1962,6 +1959,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// snapshots.</summary>
     internal IReadOnlyList<SessionRepository.ProgressPoint> StoredLevelDings() =>
         LevelHistory.Stored(_archiver.Identity, _repo.ProgressSeries);
+
+    /// <summary>Every archived session for the followed character, newest first — Home's "where
+    /// you left off", Live's later. Identity, scoping and the never-unscoped rule: <see cref="SessionSummary.Stored"/>.</summary>
+    internal IReadOnlyList<SessionRow> StoredSessions() => SessionSummary.Stored(_archiver.Identity, (s, c) => _repo.Query(s, c));
 
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 

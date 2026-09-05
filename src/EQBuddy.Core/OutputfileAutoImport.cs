@@ -78,6 +78,66 @@ public static class OutputfileAutoImport
         return File.Exists(full) ? full : null;
     }
 
+    /// <summary>
+    /// The filename shape one kind of dump takes for one character, as a directory glob.
+    /// The character match is on the PREFIX and the kind on the SUFFIX, because the middle
+    /// is not ours: the server tag varies in case and `faction` splices the class code in
+    /// (`Hateborne_neriak-ENC-Factions.txt`). Counting segments would refuse a legitimate
+    /// dump forever — trap 48's lesson wearing a different filename, and the same reason
+    /// <see cref="KindOf"/> matches on a suffix.
+    /// </summary>
+    public static string? Pattern(string character, OutputfileKind kind)
+    {
+        if (string.IsNullOrWhiteSpace(character)) return null;
+        return kind switch
+        {
+            OutputfileKind.Inventory => $"{character}_*-Inventory.txt",
+            OutputfileKind.Achievements => $"{character}_*-Achievements.txt",
+            OutputfileKind.Factions => $"{character}_*-Factions.txt",
+            _ => null,
+        };
+    }
+
+    /// <summary>
+    /// The newest dump of one kind for this character, or null when the player has never
+    /// run the command.
+    ///
+    /// **This is the one finder, and the count of copies is why it exists.** "Newest file
+    /// matching a character-and-kind glob, in the log folder's parent" was written out four
+    /// times — <see cref="InventoryFile.FindLatest"/>, <see cref="FactionsFile.FindLatest"/>
+    /// and twice inside <see cref="UnlockSource"/> — each one saying in its own comment that
+    /// the root rule lived in exactly one place so the finders could not disagree. They were
+    /// already four. Home's readiness block asks the same question about all three dumps at
+    /// once and would have been the fifth and sixth, so the shape became worth naming: trap
+    /// 4, one fact with several sources, arriving by accretion rather than at once.
+    ///
+    /// It returns the <see cref="FileInfo"/> rather than parsed content because its three
+    /// callers want different things from it — counts, standings, and (Home) nothing but
+    /// <c>LastWriteTime</c>, which is the whole readiness answer and costs no read at all.
+    /// </summary>
+    public static FileInfo? FindLatest(string? logFolder, string character, OutputfileKind kind)
+    {
+        if (string.IsNullOrWhiteSpace(logFolder)) return null;
+        if (Pattern(character, kind) is not { } pattern) return null;
+        var root = Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(logFolder));
+        if (root is null || !Directory.Exists(root)) return null;
+        try
+        {
+            return Directory.EnumerateFiles(root, pattern)
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .FirstOrDefault();
+        }
+        catch { return null; }
+    }
+
+    /// <summary>When the game last wrote this dump, or null when it never has. **Null is a
+    /// real state and not a zero**: it is the difference between "you have not run the
+    /// command" and "you ran it and nothing was in your bags", which is the distinction
+    /// Home's readiness block exists to keep apart.</summary>
+    public static DateTime? WrittenAt(string? logFolder, string character, OutputfileKind kind) =>
+        FindLatest(logFolder, character, kind)?.LastWriteTime;
+
     /// <summary>Read the achievements dump and apply it: raid clears from before EQBuddy,
     /// and Sky rewards whose class-unlock achievement says they were turned in.
     ///

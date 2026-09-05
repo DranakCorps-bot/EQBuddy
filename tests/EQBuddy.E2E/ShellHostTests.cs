@@ -28,17 +28,51 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE DEFAULT LANDING, walked the way nothing walked it before E-3 PR 4.**
+    ///
+    /// `EQBUDDY_SHELL=1` is the bare form of the hook: no address, open on whatever the
+    /// window's own default is. Every other assertion in this file navigates to an EXPLICIT
+    /// address, which means that until this test existed there was no coverage at all of the
+    /// one path that could catch `ShellHost` disagreeing with `ShellWindow` about what the
+    /// default room is — and they disagreed by construction, because the fact was written in
+    /// three places (the field, the constructor's own `Navigate` call, and the hook's
+    /// literal). The hook now passes no address at all, so the window's constructor is the
+    /// only place the answer exists; this is what says so from outside.
+    ///
+    /// **It was Progress until PR 4 and it is Home now**, which is the flip Bevel's
+    /// pre-design named and Helm signed: Progress was an explicit placeholder for a room
+    /// nobody had built, and `HomeRoom` is the room designed to answer "where do I stand".
+    /// </summary>
+    [Fact]
+    public void TheShellOpensOnHomeWhenTheHookNamesNoRoomAtAll()
+    {
+        using var app = new AppHarness(environment: OpenOn("1"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the bare hook to land on the shell's default room");
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        // The room actually painted, rather than merely being selected on the rail.
+        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
+    }
+
+    /// <summary>
     /// The host opens, the rail draws, the Search affordance is there, and the Progress
     /// room paints — the four things E-3 PR 1 claims to have built.
     ///
-    /// **`shellRail=1` is the assertion with teeth.** The signed pre-design refuses a
+    /// **This is an ADDRESSED case and its name now says so.** It opens on
+    /// `EQBUDDY_SHELL=progress`, which is an explicit address and has always been one; the
+    /// old name (*"TheShellOpensOnProgress…"*) read as coverage of the DEFAULT landing and
+    /// was not, which is how the default could have flipped underneath it with everything
+    /// green. The bare-hook default is the test above.
+    ///
+    /// **`shellRail` is the assertion with teeth.** The signed pre-design refuses a
     /// disabled row for a room that has not shipped (*"an affordance that opens nothing
     /// is a trap"*), so this number is the count of rows DRAWN and it must equal the
     /// number of rooms that exist. The day a seventh row appears without a room behind
     /// it — or a room lands without joining the rail — this is what says so.
     /// </summary>
     [Fact]
-    public void TheShellOpensOnProgressWithARailRowPerLandedRoomAndASearchAffordance()
+    public void TheProgressRoomIsReachableByItsOwnAddressWithARailRowPerLandedRoom()
     {
         using var app = new AppHarness(environment: OpenOn("progress"));
         app.Launch();
@@ -138,6 +172,10 @@ public class ShellHostTests
     [InlineData("quests:epic", "shellQuestsTab", "epic")]
     [InlineData("quests:sky", "shellQuestsTab", "sky")]
     [InlineData("quests:unlocks", "shellQuestsTab", "unlocks")]
+    // E-3 PR 4's room, and the only one whose page key IS the assertion: Home has no rooms
+    // inside it (`ShellPages.Rooms(Home)` is empty — four blocks on one page IS the room),
+    // so there is no tab key to land on and `shellPage` is what there is to check.
+    [InlineData("home", "shellPage", "home")]
     public void EveryLandedRoomIsReachableByItsOwnAddress(string address, string key, string room)
     {
         using var app = new AppHarness(environment: OpenOn(address));
@@ -392,6 +430,107 @@ public class ShellHostTests
         // together.
         Assert.Equal(ShellLayoutPolicy.For(width).RailLabelsVisible ? 1 : 0,
             app.DumpValue("shellRailLabels"));
+    }
+
+    // ---- E-3 PR 4: the Home room ------------------------------------------------
+
+    /// <summary>
+    /// The four blocks Bevel's door 1 locks, and the deep-links block's own refusal to
+    /// offer a room that does not exist.
+    ///
+    /// **`shellHomeDeadLinks` is the row with teeth, and it is the rail's rule one level
+    /// in.** The rail cannot draw a row for an unlanded room because `BuildRail` filters
+    /// `ShellPages.Landed` — but Home's body is a SECOND navigation surface, inside a room,
+    /// where the rail's guard cannot see it. A hand-written link list with a "Live" row on
+    /// it would compile, render, photograph perfectly and open nothing, which is the exact
+    /// shape this codebase already ruled on (*"an empty class row gets no chevron — an
+    /// affordance that opens nothing is a trap"*). The count comes from `ShellPages` on
+    /// both sides, so the day Live lands it is offered without anyone editing this test.
+    ///
+    /// **A floor before the equalities**, per trap 39: a room that rendered nothing at all
+    /// would report zero links and zero dead links and agree with a naive assertion
+    /// perfectly.
+    /// </summary>
+    [Fact]
+    public void TheHomeRoomDrawsFourBlocksAndOffersNoLinkThatOpensNothing()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
+        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
+        // The room-level empty is for a profile with NO character; this one is following.
+        Assert.Equal(0, app.DumpValue("shellHomeEmpty"));
+        Assert.Equal(1, app.DumpValue("shellHomeIdentity"));
+
+        var expected = ShellPages.RailOrder.Count(page =>
+            ShellPages.Landed.Contains(page)
+            && page != ShellPage.Home
+            && !ShellPages.BelowTheGap(page));
+        Assert.True(app.DumpValue("shellHomeLinks") >= 1,
+            $"the Home room offered no deep links at all; dump was: {app.Artifacts()}");
+        Assert.Equal(expected, app.DumpValue("shellHomeLinks"));
+        Assert.Equal(0, app.DumpValue("shellHomeDeadLinks"));
+    }
+
+    /// <summary>
+    /// Readiness, and the ⧉ copies that are the whole point of its empty rows.
+    ///
+    /// **Only a launched app can say a control EXISTS.** A surface that asks the player for
+    /// an output file and hands them no way to run it is the defect David reported on
+    /// 2026-08-20, it is worst in the empty state (the only state a new player sees), and an
+    /// absent control photographs as an unremarkable panel (trap 29).
+    /// `GameCommandsTests.SurfacesNeedingACommand` proves this file NAMES the three
+    /// commands; this proves the buttons are on screen — and that they go away for a dump
+    /// that has actually landed, which is the half a "greater than zero" assertion could
+    /// never see.
+    ///
+    /// The inventory dump is staged in the game's own tab-separated shape through the
+    /// harness, so it goes through the real finder and the real parser (trap 23).
+    /// </summary>
+    [Fact]
+    public void ReadinessAsksForTheDumpsThatAreMissingAndStopsAskingForTheOneThatLanded()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.WriteInventoryDump(("General1", "Bone Chips", 12));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
+        // Three dumps reported on: bags, achievements, factions.
+        Assert.Equal(3, app.DumpValue("shellHomeReadiness"));
+        // Bags landed; the other two never have. **The equality is the assertion** — a room
+        // that had silently lost the affordance entirely would report 0 waiting and 0
+        // buttons and pass a "some are missing" check.
+        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 2,
+            $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
+        Assert.Equal(2, app.DumpValue("shellHomeCopyCmd"));
+    }
+
+    /// <summary>
+    /// **The Home/Live boundary, asserted where it is most tempting to cross.** The fixture
+    /// log is a live session with kills in it, so Home is drawn in exactly the state Bevel's
+    /// §5 warns about: the meters exist, they are moving, and `CurrentSnapshot()` is one
+    /// property access away in the room's own file. Home reports the session as in progress
+    /// and nothing else about it.
+    ///
+    /// The unit suite proves `RecentSession` has no combat field to render
+    /// (`HomeRoomTests.TheRecentSessionRecordCarriesNoCombatNumbersToRender`); this proves
+    /// the running app reaches that state rather than some other one — which is the gap
+    /// between "correct in the diff" and "in effect at runtime" that trap 42 cost two
+    /// builds.
+    /// </summary>
+    [Fact]
+    public void AliveSessionIsReportedAsInProgressAndNotAsWhereYouLeftOff()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
+        // The fixture replays a session with kills, so the widget IS following one.
+        Assert.True(app.DumpValue("killsTotal") > 0,
+            $"the fixture did not produce a live session; dump was: {app.Artifacts()}");
+        app.WaitForDump("shellHomeSession", "inprogress",
+            "Home to report the running session as in progress rather than as history");
     }
 
     /// <summary>

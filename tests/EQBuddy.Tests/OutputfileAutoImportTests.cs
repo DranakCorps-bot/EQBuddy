@@ -77,6 +77,84 @@ public class OutputfileAutoImportTests
         finally { game.Delete(true); }
     }
 
+    /// <summary>
+    /// **The ONE finder, exercised for all three kinds.** "Newest file matching a
+    /// character-and-kind glob, in the log folder's parent" had been written out four times
+    /// — <c>InventoryFile.FindLatest</c>, <c>FactionsFile.FindLatest</c> and twice inside
+    /// <c>UnlockSource</c> — each one's comment claiming the root rule lived in exactly one
+    /// place. Home's readiness block asks the same question about all three at once, which
+    /// is what made the accretion worth naming; all four now route through here.
+    ///
+    /// The faction case is the one that has to be asserted rather than assumed: the real
+    /// file is <c>Hateborne_neriak-ENC-Factions.txt</c>, with the class code spliced into
+    /// the middle, so a finder that counted segments would refuse a legitimate dump forever
+    /// (trap 48's lesson wearing a different filename).
+    /// </summary>
+    [Fact]
+    public void TheOneFinderLocatesEveryKindOfDumpBesideTheGamesOwnFolders()
+    {
+        var game = Directory.CreateTempSubdirectory("eqb-finder");
+        try
+        {
+            var logs = Directory.CreateDirectory(Path.Combine(game.FullName, "Logs")).FullName;
+            void Write(string name) => File.WriteAllText(Path.Combine(game.FullName, name), "");
+
+            // Nothing there yet: null is a real state, and it is the difference between
+            // "you have not run the command" and "you ran it and it was empty".
+            foreach (var kind in new[]
+                     {
+                         OutputfileKind.Inventory, OutputfileKind.Achievements,
+                         OutputfileKind.Factions,
+                     })
+                Assert.Null(OutputfileAutoImport.WrittenAt(logs, "Dranak", kind));
+
+            Write("Dranak_freeport-Inventory.txt");
+            Write("Dranak_freeport-Achievements.txt");
+            Write("Dranak_freeport-ENC-Factions.txt");
+
+            Assert.Equal("Dranak_freeport-Inventory.txt",
+                OutputfileAutoImport.FindLatest(logs, "Dranak", OutputfileKind.Inventory)?.Name);
+            Assert.Equal("Dranak_freeport-Achievements.txt",
+                OutputfileAutoImport.FindLatest(logs, "Dranak", OutputfileKind.Achievements)?.Name);
+            Assert.Equal("Dranak_freeport-ENC-Factions.txt",
+                OutputfileAutoImport.FindLatest(logs, "Dranak", OutputfileKind.Factions)?.Name);
+
+            // Somebody else's dumps in the same folder are not yours, and an unreadable
+            // kind answers nothing rather than the first file it trips over.
+            Assert.Null(OutputfileAutoImport.FindLatest(logs, "Nobody", OutputfileKind.Inventory));
+            Assert.Null(OutputfileAutoImport.FindLatest(logs, "Dranak", OutputfileKind.Unknown));
+            Assert.Null(OutputfileAutoImport.FindLatest(logs, "", OutputfileKind.Inventory));
+            Assert.Null(OutputfileAutoImport.FindLatest(null, "Dranak", OutputfileKind.Inventory));
+
+            // And the parsing finders that now sit on top of it still find their dumps.
+            Assert.NotNull(InventoryFile.FindLatest(logs, "Dranak"));
+            Assert.NotNull(FactionsFile.FindLatest(logs, "Dranak"));
+        }
+        finally { game.Delete(true); }
+    }
+
+    /// <summary>The NEWEST of several, which is the whole reason this is a search rather
+    /// than a path join: the game writes a new file per server tag and never cleans up.</summary>
+    [Fact]
+    public void TheNewestDumpWins()
+    {
+        var game = Directory.CreateTempSubdirectory("eqb-finder-newest");
+        try
+        {
+            var logs = Directory.CreateDirectory(Path.Combine(game.FullName, "Logs")).FullName;
+            var old = Path.Combine(game.FullName, "Dranak_freeport-Inventory.txt");
+            var fresh = Path.Combine(game.FullName, "Dranak_erollisi-Inventory.txt");
+            File.WriteAllText(old, "");
+            File.WriteAllText(fresh, "");
+            File.SetLastWriteTime(old, DateTime.Now.AddDays(-3));
+            File.SetLastWriteTime(fresh, DateTime.Now.AddMinutes(-1));
+
+            Assert.Equal("Dranak_erollisi-Inventory.txt",
+                OutputfileAutoImport.FindLatest(logs, "Dranak", OutputfileKind.Inventory)?.Name);
+        }
+        finally { game.Delete(true); }
+    }
+
     [Fact]
     public void AnInventoryDumpTicksWhatYouOwnAndTheUndoPutsBackOnlyThat()
     {
