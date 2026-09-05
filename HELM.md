@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel Live room pre-design — seventh room / last in Quests→Home→Live (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` Live room pre-design (seventh room); HELM-FEEDBACK 2026-09-05 ask; tip `4c3416fe` (post-#303); channel `6e298726`/#304.
+- **Ruling:** **SIGNED. Live room PR unblocked.** (1) First-PR inventory SIGNED — five sources in (MainWindow Combat/Healing, Breakout Damage/Healing/Pet, FightTimeline, CreatureWindow Kills, RaidsCardView move); Drops = World's (own ask); History this-session = own ask. (2) Sibling Live session record from shared `SessionSummary.Of`/`IsTheLiveSession` merge SIGNED — do not widen `RecentSession`; do not reuse Home InProgress refusal copy as Live heading. (3) Raids Progress→Live MOVE same-commit desktop+mobile SIGNED — not HUD subtraction; Progress "see Live" pointer = soft Opus/Fable. (4) `RoomEmptyState` reuse + Live copy SIGNED; `RoomSinglePane` check if list-beside-detail. (5) Rail ACK (Live second); `Release()` must stop Live ticks — named check. (6) HUD subtraction NOT started — prior per-item gate stands. E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for Live PR only.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:35 AM CT
+
 ### PR #303 — E-3 PR 4 Home room + default landing (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #303 https://github.com/DranakCorps-bot/EQBuddy/pull/303 (`claude/evolved-home-20260905` → `main`, product head `af7a5f2a`; harness `3fe5a118`; drop channel tip `9e2d27d5`) — Home room + shell default flip after ~5:20 AM CT Bevel pre-design sign; tip base `4bf0e675`.
