@@ -44,6 +44,232 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### HUD subtraction — first cut(s), now that all six rooms are landed — pre-design (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, last-look ask; unlocks Opus for the first HUD
+subtraction diff)
+**Place:** `src/EQBuddy.UI.Shared/OverlaySections.cs` (`Catalog`, ten cards);
+`src/EQBuddy/MainWindow.xaml.cs:646-662` (`SectionMap`), `:116` (`MiniStatOrder`),
+`:3459-3464` (mini-dashboard star enumeration), `:2151`/`:4289` (`OnQuestsWindow` /
+`toggleQuests` hotkey); `src/EQBuddy/MainWindow.xaml:17-63` (widget context menu — four
+top-level items, one of which is a theme window); `src/EQBuddy/BreakoutWindow.xaml.cs:14`
+(`BreakoutKind`); `src/EQBuddy/ShellHost.cs:64,89` (`EQBUDDY_SHELL`/`EQBUDDY_SHELL_SIZE` —
+the only two lines that gate the shell at all); `src/EQBuddy/GearRoom.cs`,
+`src/EQBuddy/WorldRoom.cs`, `src/EQBuddy/LiveRoom.cs` (subtraction-blocker header
+comments); `src/EQBuddy/MotesCardView.cs`; `src/EQBuddy.UI.Shared/ShellPages.cs:103-107`
+(`Landed`, all six rooms); `docs/BEVEL-v2-staging-critique.md` §2/§3; `FABLE.md`'s "HUD
+(Surface A), for the PR after the host" section.
+**Source:** tonight's ask — file a per-item HUD subtraction critique now that Live merged
+(#306) and `Landed` carries all six rooms Bevel's IA named (Home, Live, Progress, Gear,
+Quests, World). Against my own per-item gate (E-3 rooms pre-design §2, Helm-signed
+2026-09-04 ~11:15 PM CT: *"a v1 surface may leave the widget only when (a) its room is on
+`ShellPages.Landed`, (b) any HUD chip it fed has itself shipped for review, and (c) a
+screenshot proves parity"*) and Live's own header (§6: *"Nothing here licenses touching
+`OverlaySections.Catalog`, `MiniStats`, or any card the widget currently draws"*).
+**All verified in source on tip `54fc1dc3`** (post-#306 merge). **Not a hold. Not
+needs-david. No player door proposed. #208/#261/#262 untouched. No implement.**
+
+---
+
+#### 0. The gate as signed asks three questions per item; this pass adds a fourth the prior wording didn't need until now
+
+The signed gate is room-landed + chip-shipped + screenshot. All six rooms are landed, so
+for the first time every item's answer to question (a) is yes — which means the gate now
+turns entirely on (b) and (c), and reading the actual cards against them surfaces a
+mechanism the gate's wording never had to name before: **most of these ten cards are not
+just glance content, they are the only reachable ENTRANCE to a v1 pop-out window.**
+`ProgressSurface`, `QuestSurface`, `LootSurface`, `CreatureSurface` and `WorldSurface` each
+have an `OpenWindow` host wired to their card's own header (Live's entry cited the five
+line numbers; not re-verified this pass). Removing a card removes that entrance, and the
+widget's context menu (`MainWindow.xaml:17-63`) backs up exactly **one** of them —
+`World…` — not the other four. `Quests` has a second, independent way in
+(`toggleQuests` at `:4289`, wired straight to `OnQuestsWindow` — a hotkey, not a menu
+row); `Progress`, `Gear & Loot` and `Motes` have neither.
+
+**So the fourth question, added here because it has never mattered before:** *if this
+card disappears, does anything that lived only behind its header become unreachable by any
+means a player still has?* Screenshot parity (the signed question c) proves the ROOM shows
+the same information; it does not by itself prove the WINDOW behind the card — and
+whatever `MiniStats` star writer lives inside that window — is still reachable once the
+card that opened it is gone. That is a different claim, and it is the one that decides the
+order below.
+
+---
+
+#### 1. The inventory — all ten cards, six breakouts, and the two chip families, against the gate plus the fourth question
+
+| Item | Destination | Chip needed? | `MiniStats` star lives here? | Second way in besides the card? | Verdict |
+|---|---|---|---|---|---|
+| **Quests** (`quests`) | Quests room (General/Epic/Sky/Turn-ins, full lift, PR #301) | No — quests are a review surface, never a glance one (the fold's own 2026-08-16 rationale, unchanged since) | No — `quests` is not in `MiniStatOrder` (`kills, dps, hps, pet, procs, loot, motes, money, xp, deaths`) | **Yes — `toggleQuests` hotkey** | **Eligible now** |
+| **World** (`misc`) | World room (Map/Camps/Path/Travels) | No | Yes — the deaths star, named in `WorldRoom.cs`'s own header as the retirement blocker | **Yes — `World…` context menu row**, independent of the card | **Plausible second — see §3, not authorized yet** |
+| **Gear & Loot** (`loot`) | Gear room (Bags/Wishlist/lookup) | No | Yes — the loot star, `GearRoom.cs`'s header names it as the ONLY writer | No | **Blocked — star writer has no fallback door** |
+| **Motes** (`motes`) | Progress room, Wealth tab (already shows the same numbers — the 2026-08-21 restoration's own comment: *"a second VIEW of them… not a fold being undone"*) | No | **Yes, and it is the sharpest case** — `StarMotes` (`:3459`) draws on the card itself; `MotesCardView` has no theme window at all to fall back to | No — there is no pop-out to fall back to | **Blocked — no fallback door exists, full stop** |
+| **Progress** (`progress`) | Progress room (Experience/Wealth/Faction, Raids already moved to Live) | Partial — collapsed HUD's third number is XP%/hr, not yet built | Yes — xp/money star writers live in `ProgressWindow` per trap 26 | No | **Blocked — chip AND star writer** |
+| **Kills & Drops** (`kills`) | Splits four ways: Live (built) · World's Drops tab (not built) · Search lookup (not built — no disposition index yet) · Gear "what dropped for you" (not built) | No chip, but — | Yes — the kills star | No | **Blocked — 3 of 4 destinations don't exist yet; this is exactly the item the task asks me to keep OUT of this pass** |
+| **Combat** (`combat`) | Live room, HUD DPS | **Yes — not built** | dps/pet/procs stars | No | **Blocked — needs the HUD chip; Live's own §6 already rules this, not reopened here** |
+| **Healing** (`healing`) | Live room, HUD HPS | **Yes — not built** | hps star | No | **Blocked — same as Combat** |
+| **Watch** (`tracked`) | HUD deadline chips (fire) + Settings → Alerts (rules) | **Yes — not built.** This is a *Replace*, not a *Merge*: nothing in a room does this card's job | none named | No | **Blocked — the whole destination is HUD Edit mode, which does not exist** |
+| **Buffs** (`buffs`) | HUD deadline chips (expiring) + Settings → Alerts | **Yes — not built**, same shape as Watch | none named | No | **Blocked — same as Watch** |
+
+**The six `BreakoutKind` pop-outs** (Damage, Healing, Pet, Watch, Loot, Buffs) are a
+second layer of the same five blocked rows and inherit their verdicts — Live's own header
+already says Damage/Healing/Pet "stay on the widget, unchanged" pending the DPS/HPS chip,
+and Watch/Loot/Buffs breakouts route to destinations (Alerts, World, Gear) that are either
+unbuilt or already covered by the `tracked`/`loot` rows above. None are eligible.
+
+**Spawn and mez chips are not a subtraction question at all.** They already earn the
+overlay (`docs/BEVEL-v2-staging-critique.md`'s own chip-earn rule: a deadline the player
+must act on). Their disposition is "Keep (host) → HUD Edit mode" — they are waiting to
+become *editable*, not to be removed. Nothing about this pass touches them.
+
+---
+
+#### 2. First cut: Quests, and only Quests
+
+**Quests clears every row of the table and the fourth question.** No `MiniStats` star to
+strand, no HUD chip to wait for, full room parity already shipped (PR #301's five-rule
+inventory), and the one thing removing the card would otherwise take away — the path to
+`QuestsWindow` — survives on its own hotkey, wired independently of the card
+(`OnQuestsWindow` at both `toggleQuests` and the card's own `↗`, `:2151`/`:4289`). This is
+the same shape as the World/Gear stars, run to its other conclusion: where the fallback
+door exists and is independent of the card, the card is free to go; where it does not, the
+card is not.
+
+**Nothing else in the ten is a clean second item today.** I want to be explicit that this
+is not a hedge to avoid naming one — I looked for a second eligible row and the table above
+is the reason there isn't one: every other card either strands a star writer with no
+fallback (Gear, Motes, Progress), needs a chip that does not exist (Combat, Healing,
+Watch, Buffs), or has an incomplete destination (Kills & Drops). **§3 names the one row
+that is close, not clear**, so it is not lost track of, and so Opus does not read "Quests
+only" as me having missed World.
+
+**What "first cut" should ship, concretely:** `quests` leaves `OverlaySections.Catalog`
+and `MainWindow.SectionMap`; `AppSettings` needs no migration (the key was never a
+`MiniStats` entry, so there is nothing to fold — this is a materially smaller diff than
+any prior fold in this codebase's history, all of which existed because a key needed
+rehoming). The screenshot to predict first: the widget with nine cards instead of ten,
+`toggleQuests` still opening `QuestsWindow`, and `shell-quests` unchanged (the room does
+not move — only the widget's copy of it goes).
+
+---
+
+#### 3. World is the one worth checking next, not authorizing now
+
+The `World…` context-menu row means the deaths star's only writer stays reachable even
+without the card — which is the exact property that makes Quests safe and is the reason
+I am not simply repeating "wait for HUD Edit mode" for every remaining row. But I have
+**not verified two things** that would need checking before this becomes a second signed
+item, and I would rather name them than guess:
+
+1. **What the `misc` card actually shows inline today.** I have not read `MiscSection`'s
+   body. If it is glance content the World room's Travels tab reproduces one-for-one, the
+   parity argument holds; if the card shows something the room presents differently (a
+   different sentence, a different threshold for what counts as "recent"), that is a
+   product call about wording, not a room-existence question, and it is not mine to
+   answer from a header comment.
+2. **Whether the context-menu row is itself considered a permanent fixture or a thing this
+   very effort intends to fold away later.** If a future pass collapses the context menu
+   into the shell's own Search/rail (plausible, since the shell is the whole point), then
+   "the row survives" is a today-only fact and the star would strand on a later commit
+   nobody would think to check because World already "shipped" its subtraction.
+
+Neither is a large check. I am naming them rather than either blocking on them (they are
+not needed for Quests) or waving them through (the star-writer mechanism is exactly the
+kind of thing this codebase's own trap list says photographs as nothing wrong — trap 20's
+family, a setting whose writer disappears when its host does).
+
+---
+
+#### 4. What stays exactly where it is — nothing here moves it
+
+- **All four remaining v1 pop-out windows** (`ProgressWindow`, `GearLootWindow`,
+  `WorldWindow`, `QuestsWindow`) — none retire in this pass, including `QuestsWindow`,
+  which stays reachable by hotkey after its card goes. Retiring a window is a
+  `SurfaceOwnershipTests`-exemption question, separate from and later than subtracting the
+  card that used to open it.
+- **Every `MiniStats` star writer** — World's deaths, Gear's loot, Progress's xp/money,
+  Motes' own — stays exactly where #300 and the 2026-08-21 restoration put it. HUD Edit
+  mode is what eventually gives each of these a second home; nothing here builds that.
+- **All six `BreakoutKind` pop-outs**, unchanged, per Live's own header — this pass does
+  not reopen that ruling.
+- **Spawn and mez chips**, unchanged — already on the overlay, not a subtraction target.
+- **The mini-dashboard itself** (the minimized-state star row) is untouched structurally;
+  only the full-size widget's card stack loses one row.
+
+---
+
+#### 5. Empty-state and density — the room-level wrapper gap is still open, and Quests is where it starts to matter
+
+Helm signed the room-level empty-state ruling on 2026-09-04 (~11:15 PM CT): position is a
+room rule (the shell host centers a reported empty message), canvas treatment is
+per-surface. **It has not been built by any of the six rooms that have shipped since.**
+The Home pre-design found it unbuilt in World/Gear/Progress; the Quests PR's own report
+says its empty states are "the view's own text and nothing was re-centred"; Live's entry
+does not mention building it either. Six rooms, one signed ruling, zero implementations —
+this is not a new finding, I am restating one that has been visible in this channel since
+the Home pass and has not moved.
+
+**It has been a cosmetic gap up to now because every room has had a working card sitting
+next to it as the primary surface.** A player who saw an unpolished empty Quests room
+today could still fall back to the widget's Quests card, which is real content in a
+familiar place. **The moment the card leaves, the room is the only thing left, in every
+state, including the empty one** — a brand-new profile that has never dumped an inventory
+or scanned a bag sees the Quests room's un-wrapped empty text as the ENTIRE Quests
+experience, not a second opinion next to a working card. I am not asking Opus to build the
+wrapper as a precondition for the Quests subtraction — that would be inventing scope this
+pre-design was not asked to carry — but the subtraction PR is exactly the moment this stops
+being free to defer, and whoever takes it should know that going in rather than discover it
+from a screenshot.
+
+---
+
+#### 6. What is NOT in this pass
+
+Per the task's own framing, named so nobody widens the diff by inference:
+
+- **`Kills & Drops`'s split — its own ask.** Three of its four destinations (World's
+  Drops tab, Search lookup, Gear's "what dropped for you") do not exist. Building any one
+  of them is scoped work with its own pre-design, not a rider on Quests.
+- **`HistoryWindow`'s this-session half — its own ask**, same as Live's §1 already ruled.
+- **HUD Edit mode / "Surface A"** — the PR `FABLE.md` already names as the one after the
+  host. Nothing here builds a chip, a DPS/HPS glance, or an editable deadline chip. Every
+  "blocked — needs the chip" row above waits on that PR, not on this one.
+- **`MiniStats` star rehoming as a system** — I have named which four keys (loot, xp,
+  money, motes — and deaths if World follows) are stranded behind a card, but designing
+  where those stars go once their cards leave is HUD Edit mode's job, not a per-item
+  subtraction's.
+- **The Search disposition index** — still waits on E-2e, unrelated to this ask.
+- **The player door.** Nothing here proposes opening `EQBUDDY_SHELL` to real players.
+  Worth naming once, plainly: every one of these rooms is currently reachable by nobody
+  but a dev session, so "screenshot parity" in every item above was checked and will be
+  checked against `EQBUDDY_SHELL=1`, not against what a player can reach today. That gap
+  is real and it is not this pre-design's to close — it is named so the eventual channel
+  ask for opening the door remembers that HUD subtraction and the door are coupled at
+  release time even though neither is decided now.
+
+---
+
+- **Already shipped (checked on tip `54fc1dc3`):** six-room rail, all `Landed`; Live's
+  own header explicitly refusing to touch `OverlaySections`/`MiniStats`; World/Gear's
+  star-writer blockers named in their own room headers since #300; `ShellHost.cs`'s two
+  env-var gates with no other trigger.
+- **Checked:** `OverlaySections.Catalog` and `MainWindow.SectionMap` in full;
+  `MiniStatOrder` and the mini-dashboard star enumeration (`:3459-3464`); the widget's
+  context menu (`MainWindow.xaml:17-63`) in full; `toggleQuests`/`OnQuestsWindow`;
+  `BreakoutKind`; `GearRoom.cs`/`WorldRoom.cs`/`LiveRoom.cs` header comments in full;
+  `MotesCardView.cs`'s existence and `StarMotes`'s call site; `ShellPages.Landed`;
+  `docs/BEVEL-v2-staging-critique.md` §2/§3; `FABLE.md`'s HUD/Surface-A section.
+- **Not checked this run:** `MiscSection`'s and `QuestsSection`'s actual inline rendered
+  content (structure verified — both go through the same `ThemeBodyCapHost` pattern —
+  wording not read); whether `ProgressSection`'s xp/money stars are drawn in
+  `ProgressWindow` only or also reachable elsewhere; the running app (did not run
+  `shoot.ps1`); whether a fifth `OpenWindow` host besides the five Live's entry named has
+  since appeared.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### Live room — the seventh room, last-look ask — pre-design (Bevel, 2026-09-05)
 
 **Priority:** `approved` (pre-design, unlocks Opus for Live per the Helm-signed
