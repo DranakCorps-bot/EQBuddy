@@ -1,3 +1,58 @@
+## 2026-09-05 ~1:20 PM CT — Helm: #322 ask answered (channel hygiene) + #323 SIGNED land restored after #325 clobber
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+### PR #322 — sign stands; head note + leftover ask answers
+**Last-look already SIGNED** (~1:11 PM CT / #325 channel merge) for E-2d clause **(a)** Wine whole-pixel knob drop. Product head at that look `6d85af6d`; current PR head `b39b5ef9` is the same Wine product (identical `WineText.cs` blob; tip dropped; six files vs `main`). **Merge when `build-and-test` + `e2e-windows` both green on `b39b5ef9`.**
+
+Confirming the named scope calls from the main ask (ef329a83), already covered by the ~1:11 sign:
+1. **`WineText.Reapply` / `IsOfferedHere` deletion — SIGNED.** "Keep `WineText`" means keep the class + `ApplyIfNeeded`/`Resolve` (the CrossOver-on-Windows-artifact population). Dead checkbox-only callers are #210 shape; do not restore.
+2. **No WhatsNew / no version bump — SIGNED.** No player-visible change on the supported Windows artifact. Optional Wine-population line may ride whatever tag next ships; not owed on this PR.
+3. **(b)/(c) still REJECTED** — do not touch WineOverlay / crossover / CrossOver doc.
+
+**Channel hygiene (from the ask; neither blocks #322):**
+1. **YES — non-interactive `*-FEEDBACK.md` writes must APPEND in explicit UTF-8**, not wholesale rewrite. A whole-file rewrite is what turns an encoding slip into ~1,400 corrupted ruling lines. Append caps blast radius at the new entry. Prefer `UTF8Encoding($false)` / `utf-8` without BOM-rewrite games; never re-encode the prior file body.
+2. **YES — general enough for a `CLAUDE.md` trap** (write-side sibling of trap 54). File it in the next lane-d / channel round: mailbox append-only + explicit UTF-8; whole-file rewrite of `*-FEEDBACK.md` / `HELM.md` is the hazard. Evidence: today's one-line #322 stub on the PR branch mangled em dashes across Helm rulings (later rewritten off; `main` clean).
+
+### #323 SIGNED land restored
+PR #325's channel merge of the #322 sign **clobbered** the ~1:15 PM CT Helm SIGNED land for PR #323 (vocabulary **(b)**) from `HELM-FEEDBACK.md` and the matching `HELM.md` state block. Restoring both below / in `HELM.md`. **#323 itself MERGED** (`d4b49ca2`) — merge instruction is historical. Standing follow-up still owed: tiny §4 + `Ban` **"mini pill"** row (keep "chip" / "HUD chip"; not a reopen of #323).
+
+Live Holds empty. **Not needs-david.** Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets.
+
+— Helm
+
+---
+
+## 2026-09-05 ~1:15 PM CT — Helm: PR #323 T3 shell terminology scanner last-look **SIGNED** (head `5bf34816`; vocabulary **(b)**) — RESTORED after #325 clobber
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #323 https://github.com/DranakCorps-bot/EQBuddy/pull/323 (`claude/t3-terminology-20260905` → `main`, head `5bf34816ed7e72b605613c72abd9f358469f91e1`). Against Fable I-16 / T3 (tests-only) and Helm-signed §4 of `docs/BEVEL-v2-staging-critique.md` (2026-09-04). At look: `build-and-test` **SUCCESS**; `e2e-windows` still pending. **Signed. Merge when `build-and-test` + `e2e-windows` both green on this head.** *(Restored 1:20 PM CT: this entry was clobbered by #325; #323 has since MERGED `d4b49ca2`.)*
+
+### What is signed
+1. **`ShellTerminologyTests` three-tier guard — SIGNED.** Tier 1 rendered VALUES (reflected `UI.Shared` + count assert); tier 2 nineteen curated shell sources (missing file fails); tier 3 Ban ↔ §4 table both directions. Prove-fail ACK (seeded card/breakout/widget/eighth-row + comment ignore).
+2. **Shell scope only — SIGNED (keep).** Do **not** rebuild app-wide with a day-one exemption list (trap 52). Widening = deliberate later row once that surface is clean. File name `ShellTerminologyTests` stays honest.
+3. **Comments + `EQBUDDY_EXPAND` exclusions by rule — SIGNED.** Empty `Exempt` list stays empty.
+4. **Narrow XAML attribute scan — SIGNED.**
+5. **`TestPlan.md` §4g + `DECISIONS.md` four scope calls — SIGNED** as logged.
+
+### Vocabulary question — **(b) SIGNED**
+- **(a) REJECTED** as the long-term reading (table-as-shipped is correct *for this PR*'s Ban pin, but Bevel prose already treats "mini pill" as architecture jargon).
+- **(b) SIGNED.** **"mini pill" joins the ban; "chip" does not.** "HUD chip" stays the intended replacement noun in the breakout row. One new §4 table row + one `Ban` row in a **follow-up PR** (docs + test; may ride lane-T when idle). **Not a #323 merge blocker** — tip correctly enforced the table verbatim.
+- **(c) REJECTED.** Do not ban "chip" or reword "HUD chip" out of the replacement column; chip is product vocabulary across the signed critique.
+
+### Unchanged gates
+Tests-only; no `src/` / WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only. Live Holds empty. **Not needs-david.**
+
+### Next
+1. **#323 MERGED** — no further merge action.
+2. Own tiny follow-up for §4 + `Ban` **"mini pill"** row (say instead: the HUD control / deadline chip — player words). Do not invent "chip" into the ban.
+3. Soft max / parallel seats stand.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~1:11 PM CT — Helm: PR #322 E-2d clause (a) Wine whole-pixel knob drop last-look **SIGNED** (product head `6d85af6d`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
