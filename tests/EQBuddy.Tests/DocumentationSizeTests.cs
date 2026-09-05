@@ -68,8 +68,11 @@ public class DocumentationSizeTests
         var rows = Regex.Matches(text, @"^\|\s*`(?<proj>EQBuddy(?:\.[A-Za-z.]+)?)`\s*\|\s*(?<files>[\d,]+)\s*\|\s*(?<lines>[\d,]+)\s*\|",
             RegexOptions.Multiline);
 
-        Assert.True(rows.Count >= 5,
-            $"expected the five-project size table in Architecture.md §1; found {rows.Count} rows");
+        // Four since E-2c removed EQBuddy.Avalonia. The floor is here so a table that
+        // quietly loses rows cannot pass by having nothing left to check — which is the
+        // failure mode a deletion phase is most likely to produce.
+        Assert.True(rows.Count >= 4,
+            $"expected the four-project size table in Architecture.md §1; found {rows.Count} rows");
 
         foreach (Match row in rows)
         {

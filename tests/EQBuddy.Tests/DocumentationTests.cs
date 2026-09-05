@@ -83,9 +83,12 @@ public class DocumentationTests
         // is closed, and that reader is the one deciding whether to be careful.
         //
         // Scanned from SOURCE across every test project rather than by reflection over
-        // this assembly: the plan legitimately cites suites in EQBuddy.Avalonia.Tests and
-        // EQBuddy.E2E, which this project does not reference and should not. (Caught by
-        // this very test on the day E2E scenarios were first cited here.)
+        // this assembly: the docs legitimately cite suites in EQBuddy.E2E, which this
+        // project does not reference and should not. (Caught by this very test on the day
+        // E2E scenarios were first cited here. It also cited EQBuddy.Avalonia.Tests until
+        // E-2c deleted that project — and this test is what forced the 15 citations of its
+        // suites to be corrected in the same commit as the deletion, rather than left
+        // pointing at guards that no longer exist.)
         var known = Directory
             .EnumerateFiles(Path.Combine(Repo, "tests"), "*.cs", SearchOption.AllDirectories)
             .Where(p => !p.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")

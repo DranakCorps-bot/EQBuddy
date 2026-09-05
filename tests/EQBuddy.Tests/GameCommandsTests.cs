@@ -117,7 +117,8 @@ public class GameCommandsTests
     /// <summary>The positive half of the rule: a listed surface must name the exact command
     /// it needs, off <see cref="GameCommands"/>. Naming the constant is what makes the
     /// affordance possible — that the CONTROL is on screen is pinned where controls can be
-    /// seen: <c>gearCopyCmd</c> in E2E for WPF, <c>WidgetRenderTests</c> for Avalonia.</summary>
+    /// seen: <c>gearCopyCmd</c> in E2E, against the real exe. (Its Avalonia twin was
+    /// <c>WidgetRenderTests</c>, deleted with that lane in E-2c.)</summary>
     [Theory]
     [MemberData(nameof(SurfaceRows))]
     public void EverySurfaceThatNeedsACommandHandsItOver(string file, string command, string why)

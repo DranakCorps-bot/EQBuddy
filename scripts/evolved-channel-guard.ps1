@@ -28,7 +28,7 @@
     script as written you cannot publish a 2.x build at all; opening the channel is a
     deliberate future EDIT, made when the owner gives the channel go.
 
-    Three checks, all at major >= 2 only (this is a no-op on the 1.x line, which is
+    Four checks, all at major >= 2 only (this is a no-op on the 1.x line, which is
     finished and lives on `legacy-v1`):
 
       1. Every statement in release.ps1 that reaches the family - the OneDrive copy, the
@@ -55,13 +55,21 @@
          2.x setup is sitting in that folder, every family widget is six hours from
          installing it and no amount of correct script text helps.
 
-    RESIDUAL, named rather than papered over: `.github/workflows/release-assets.yml`
-    attaches non-Windows assets on a `release: published` event. It cannot fire without
-    a release, and creating one is what checks 1 and 2 block - but a release made by
-    hand in the GitHub UI would still trigger it. E-2 deletes that workflow from the
-    Evolved mainline (legacy tags keep their own copy and can be re-published forever,
-    which is LEGACY-004). It is not checked here because failing on it today would
-    fail a gate for work that is already scheduled and owned.
+      4. CLOSED 2026-09-04 (E-2c), and it used to be this file's named RESIDUAL: no
+         workflow under .github/workflows/ fires on a `release:` event. The residual was
+         `release-assets.yml`, which attached non-Windows assets on `release: published` -
+         unreachable through release.ps1, since checks 1 and 2 make the release itself
+         unreachable, but a release made BY HAND in the GitHub UI would still have
+         triggered it, and then the first Evolved release ever published would have
+         carried Linux and macOS artifacts of a Windows-only product.
+
+         E-2c deletes that workflow from the Evolved mainline; this check is what keeps
+         it deleted. Legacy tags keep their own copy of it in their own tree and can be
+         re-published forever, which is LEGACY-004 - `release-assets.yml` runs from the
+         TAG's tree, not from main, which is the observation that made deleting it safe.
+
+         Same shape as check 1's fourth token: deleting the thing without guarding the
+         shape leaves the mechanism exactly as blind as it was.
 
     Exits non-zero on a violation. The tree is 1.99.x until E-1's third commit lands, so
     -AssumeVersion exists purely so this can be PROVEN to fail before it can ever fire
@@ -77,6 +85,7 @@
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0        # prove 1 and 2 fail
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -AssumeUpdateFolder C:\tmp\fake  # prove 3 fails
+    pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -Repo <pre-E-2c worktree>        # prove 4 fails
 #>
 [CmdletBinding()]
 param(
@@ -300,6 +309,27 @@ else {
     }
 }
 
+# ---- 4: no workflow answers a `release:` event -------------------------------------
+
+# Checks 1 and 2 are about the script that MAKES a release. This one is about what would
+# answer if a release appeared anyway - by hand in the GitHub UI, which no amount of
+# correct PowerShell can prevent. `release-assets.yml` was that answer until E-2c, and it
+# published Linux and macOS artifacts for a product that is Windows-only.
+#
+# Matched on the TRIGGER, not on a filename: a re-added workflow under any name is the
+# same hazard, and this repo has learnt (E-2c's own sibling token) that a filename token
+# guards a filename. Anchored to a line that is only `release:` at YAML trigger depth, so
+# `-c Release` and prose cannot trip it.
+$workflowDir = Join-Path $Repo '.github/workflows'
+if (Test-Path $workflowDir) {
+    foreach ($wf in Get-ChildItem -Path $workflowDir -Filter '*.yml' -File) {
+        $text = [IO.File]::ReadAllText($wf.FullName)
+        if ($text -match '(?m)^\s{0,4}release:\s*$') {
+            $problems += ".github/workflows/$($wf.Name) fires on a ``release:`` event. At 2.x nothing may answer a release: checks 1 and 2 stop release.ps1 from making one, but a release created by hand in the GitHub UI still fires workflows, and the one this replaced attached Linux and macOS artifacts to it. Evolved is Windows-only; legacy tags keep their own copy of that workflow in their own tree (LEGACY-004) and lose nothing by its absence here."
+        }
+    }
+}
+
 # ---- verdict -----------------------------------------------------------------------
 
 if ($problems.Count -gt 0) {
@@ -308,6 +338,9 @@ if ($problems.Count -gt 0) {
     exit 1
 }
 
-$scope = if ($looked.Count -gt 0) { "script + live channel ($($looked -join ', '))" } else { 'script only - live channel not inspected' }
+# The scope line names what was ACTUALLY read, because a reassuring summary over a check
+# that saw nothing is how this guard could have been green on the installer hole (#297).
+# Workflows are always readable, so they are always in scope; the live channel is not.
+$scope = if ($looked.Count -gt 0) { "script + workflows + live channel ($($looked -join ', '))" } else { 'script + workflows only - live channel not inspected' }
 Write-Host "evolved-channel-guard: ok  (version $version; $scope)" -ForegroundColor Green
 exit 0

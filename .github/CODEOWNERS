@@ -1,5 +1,8 @@
 # PRs touching these paths auto-request review from the right owner.
 # See CONTRIBUTING.md for the ownership model.
+# /src/EQBuddy.Avalonia/ was @DonThompson's and left with the platform on 2026-09-04
+# (E-2c). Its owner row goes with the path: a CODEOWNERS entry for a directory that does
+# not exist requests review from nobody, silently. The UI.Shared row below stays — that
+# code is still his, and it still runs on every launch.
 *                          @DranakCorps-bot
-/src/EQBuddy.Avalonia/     @DonThompson
 /src/EQBuddy.UI.Shared/    @DranakCorps-bot @DonThompson

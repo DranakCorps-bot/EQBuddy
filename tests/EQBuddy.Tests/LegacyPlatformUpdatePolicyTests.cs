@@ -29,10 +29,12 @@ public class LegacyPlatformUpdatePolicyTests
     private static readonly Desktop[] OffWindows =
         [Desktop.Linux, Desktop.MacArm64, Desktop.MacX64];
 
-    /// <summary>A v2 release, shaped like the real feed: it carries a Windows installer
-    /// and — because `release-assets.yml` has not been changed — non-Windows artifacts
-    /// too. That is the point: the artifacts EXISTING is not a reason to offer the
-    /// update, because a v2 tarball is not a thing v2 will ever produce.</summary>
+    /// <summary>A v2 release, shaped like the worst case rather than like today's feed:
+    /// it carries a Windows installer AND non-Windows artifacts. E-2c deleted
+    /// `release-assets.yml`, so nothing on the Evolved mainline attaches those any more —
+    /// which is exactly why this fixture keeps them. The policy must not start depending
+    /// on their absence: the artifacts EXISTING was never the reason to offer the update,
+    /// and a rule that only works while nobody re-adds a workflow is not a rule.</summary>
     private static UpdateInfo V2 => new(new Version(2, 0, 0), SetupPath: null,
         DownloadUrl: "https://gh/EQBuddySetup.exe",
         Sha256Url: "https://gh/EQBuddySetup.exe.sha256",

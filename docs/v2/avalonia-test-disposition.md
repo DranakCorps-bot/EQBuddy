@@ -1,5 +1,19 @@
 # The Avalonia test spine — one row per file, and where its assertion went
 
+> **EXECUTED 2026-09-04 (E-2c).** `src/EQBuddy.Avalonia/` and `tests/EQBuddy.Avalonia.Tests/`
+> are deleted; `ci.yml`'s `build-avalonia-linux`, its render-test step, `check.ps1`'s
+> `avalonia` stage and `release-assets.yml` went with them. **This file is now the record
+> rather than the plan**, and it is the reason the deletion could be reviewed at all: every
+> row below was written and signed while the code still existed, so nothing became an
+> unnamed line in a delete commit. The three destinations it promised were all honoured —
+> two ports landed in E-2a, twenty scanner rows were re-decided one by one in E-2b, and the
+> six genuine losses in the ledger at the bottom are named rather than absorbed.
+>
+> `docs/TestPlan.md` rows that this suite used to hold now say so in their Held-by column,
+> and point back here. **The one thing that could still go wrong is silent re-coverage**: a
+> future PR that claims one of these six is covered again should have to show which test,
+> because the whole cost of this phase was paid to keep that honest.
+
 **E-2a of the Evolved plan (`FABLE.md` → "Phase 1: subtract the platform"), written BEFORE
 anything is deleted.** `tests/EQBuddy.Avalonia.Tests` is 24 files and ~170 assertions, and
 until this phase it was **the repo's only rendering coverage that runs on a push** — the WPF

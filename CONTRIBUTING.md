@@ -24,31 +24,34 @@ XP — are fine; the line is measuring and comparing individuals' performance.)
 | Area | Owner | Notes |
 |---|---|---|
 | `src/EQBuddy.Core` | maintainer (David) | Parser, aggregation, journal, SQLite, settings. Ships with tests, always. |
-| `src/EQBuddy.UI.Shared` | shared | ViewModels + presentation. Framework-neutral: **no WPF or Avalonia references, ever.** Logic added here needs tests. |
-| `src/EQBuddy` (WPF) | maintainer (David) | The primary Windows app. Thin views over UI.Shared where migrated. |
-| `src/EQBuddy.Avalonia` | Don Thompson | The Linux/cross-platform app. Thin views over UI.Shared where migrated. |
+| `src/EQBuddy.UI.Shared` | shared | ViewModels + presentation. Framework-neutral: **no UI-toolkit references, ever** — `ArchitectureTests` enforces it, and it is why the mobile projection and the widget can read one answer. Logic added here needs tests. |
+| `src/EQBuddy` (WPF) | maintainer (David) | The app. Thin views over UI.Shared where migrated. |
 
-Don't edit the other lane's UI directory except by agreed handoff; cross-lane
-changes go through a PR the owner reviews.
+`src/EQBuddy.Avalonia` was the Linux/cross-platform app, owned by Don Thompson. **EQBuddy
+Evolved (v2) is Windows-only, so it left this branch on 2026-09-04** — it lives on at the
+`v1.99.18` tag and on `legacy-v1`, where a 1.x patch can still be built and released. Work on
+that line happens there, not here.
 
 ## The shared-first rule
 
-New features land with their **logic in Core or UI.Shared** (tested), and UIs get
+New features land with their **logic in Core or UI.Shared** (tested), and the UI gets
 thin views. If you find yourself writing a mapping, format string, or workflow in
-a code-behind file, it probably belongs in UI.Shared. This is what keeps the
-cross-platform port cost near zero and is the road to a single UI (issue #6).
+a code-behind file, it probably belongs in UI.Shared. The original argument was port cost
+across two desktops; with one desktop the argument is **coverage** — the widget has no unit
+tests at all (`docs/TestPlan.md` §5), so anything left in a code-behind file is untested by
+construction. EQBuddy Mobile is still a second reader of every decision in there.
 
 ## Workflow
 
 - **Maintainer lane:** works on `main`. Changes are field-tested locally FIRST via
   `scripts/install-local.ps1` (builds + silently installs on this machine only);
   releases happen deliberately, bundled, when the maintainer says so, via
-  `scripts/release.ps1 -Tag vX.Y.Z` (version comes from `Directory.Build.props` at the repo root — single-sourced for BOTH apps, issue #30; `EQBuddy.csproj` carries a comment saying so, and the
-  Avalonia csproj inherits the same property — there is nothing to keep in sync). Every release needs a matching entry in
+  `scripts/release.ps1 -Tag vX.Y.Z` (version comes from `Directory.Build.props` at the repo root — single-sourced for every project, issue #30 — there is nothing to keep in sync). Every release needs a matching entry in
   `src/EQBuddy.Core/Data/WhatsNew.json` — release.ps1 refuses without one, because
   that entry is what the in-app "What's new" popup shows users after they update.
-- **Contributor lane:** feature branches → PRs. Every PR gets CI (build both UIs +
-  tests) plus, for Avalonia changes, a **Windows smoke-run** by the maintainer
+- **Contributor lane:** feature branches → PRs. Every PR gets CI: build, the unit suite,
+  and the end-to-end suite that launches the real exe (`e2e-windows`, on every push and
+  pull request since 2026-09-04). A UI change also gets a **smoke-run** by the maintainer
   against a fixture profile, with findings posted in the PR.
 - **Issues are the only sync channel.** Design-before-code for shared features.
   Decisions live in issue threads, not in chat memories.

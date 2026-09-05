@@ -113,7 +113,7 @@ weighting from #154 belongs.
 
 **Shipped as:** `Core/ProgressSurface.cs` (tabs, labels, keys, absorbed-card list),
 `UI.Shared/ProgressTheme.cs` (badges + the launcher line), `EQBuddy/ProgressWindow.xaml`
-and `EQBuddy.Avalonia/ProgressWindow.cs`, `AppSettings.MigrateProgressSections`, and the
+(the Avalonia twin went with that lane on 2026-09-04), `AppSettings.MigrateProgressSections`, and the
 four-tab `CompanionProgressSection` on the phone. 14 cards → 10.
 
 **What the build taught, beyond the recipe:**

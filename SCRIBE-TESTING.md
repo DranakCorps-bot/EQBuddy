@@ -28,14 +28,13 @@ It launches the real `EQBuddy.exe` and needs a Windows desktop session. If that 
 or if you are on Linux — say so and ignore every shot request above; none of them were
 buildable and that is not your fault.
 
-**Two things that would work from a Linux VM, and they are the half nobody else can see.**
-David runs Windows, and I photograph the WPF widget; the Linux build's own surfaces are
-reviewed by neither of us, which is exactly where #148/#166 (emoji rendering as boxes)
-came from.
+**One thing that works from a Linux VM.** This used to say two: the other was a headless
+capture of the Linux widget, and **that ask is withdrawn — the Avalonia lane was deleted on
+2026-09-04 (E-2c) and EQBuddy Evolved is Windows-only.** Do not try to run it; there is no
+such project any more, and the #148/#166 argument for it (emoji rendering as boxes on a
+build neither of us looks at) no longer has a build to be about.
 
 ```bash
-dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release   --filter FullyQualifiedName~WidgetSheet -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_OUT=<dir>
-
 pwsh -NoProfile -File scripts/mobile-harness.ps1 -Snapshot <snapshot.json> -Screenshot
 ```
 

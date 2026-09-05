@@ -147,13 +147,12 @@ is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/is
 > If Defender quarantines the file, restore it and add an exclusion only after the
 > hash check passes.
 >
-> **Quality, concretely.** Every push runs 1,152 automated tests — 1,107 on the
-> parser, stats, and shared logic plus 45 headless render tests of the Avalonia
-> UI — on both Windows (WPF + Avalonia) and Ubuntu (Avalonia + Core), and a
-> release doesn't ship until it has passed CI and been played against a real
-> session by the maintainer. CI workflows are pinned to exact commit SHAs and
-> run with read-only permissions by default. What the app touches on disk and
-> on the network — all of it — is written down in [SECURITY.md](SECURITY.md).
+> **Quality, concretely.** Every push runs 2,914 automated tests on the parser, stats and
+> shared logic, plus a 44-scenario end-to-end suite that launches the real EQBuddy.exe and
+> asserts what it actually draws — and a release doesn't ship until it has passed CI and
+> been played against a real session by the maintainer. CI workflows are pinned to exact
+> commit SHAs and run with read-only permissions by default. What the app touches on disk
+> and on the network — all of it — is written down in [SECURITY.md](SECURITY.md).
 >
 > **How to check the signature yourself.** Right-click `EQBuddySetup.exe` →
 > **Properties** → **Digital Signatures**. It should name FlossworksCross-Stitch and
@@ -592,32 +591,22 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
 - `src/EQBuddy` — WPF app (.NET 10, `net10.0-windows`). Build on Windows:
   `dotnet build src/EQBuddy/EQBuddy.csproj -c Release`. From non-Windows machines,
   add `-p:EnableWindowsTargeting=true`.
-- `src/EQBuddy.Avalonia` — the 1.x cross-platform Avalonia app (.NET 10), created and
-  maintained by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) —
-  including the X11 click-through implementation.
-  **This bullet is legacy-v1 developer documentation.** Evolved (v2) is Windows-only,
-  so everything from here to the end of this bullet describes how to build and package
-  the *preserved* 1.x cross-platform line, not the supported product — see
-  [LEGACY-V1.md](LEGACY-V1.md). The project remains in the tree and on current 1.x
-  releases, and it stays reachable on the final legacy tag and the `legacy-v1` branch
-  after it leaves the v2 mainline.
-  A linux-x64 build is attached to current GitHub releases.
-  Build: `dotnet build src/EQBuddy.Avalonia/EQBuddy.Avalonia.csproj -c Release`.
-  It also builds and runs on macOS with no extra dependencies (the .NET 10 SDK is
-  enough), which is useful when the game itself runs under a Windows compatibility
-  layer. The macOS features — click-through (`ClickThrough.cs` dispatches to X11
-  input shapes or NSWindow `ignoresMouseEvents`), spoken alerts (`say`), and
-  Wine/CrossOver/Whisky log-folder auto-detection — were contributed by
-  [quasarj](https://github.com/quasarj) (PR #90; thanks!). Releases attach
-  **`EQBuddy-osx-arm64.zip`** (Apple Silicon) and **`EQBuddy-osx-x64.zip`** (Intel)
-  alongside the Linux tarball. Each unzips to `EQBuddy.app` — drag it to
-  Applications and open it like any Mac app (thanks to
-  [pmcginn](https://github.com/pmcginn), discussion #157, for pointing out that the
-  old loose-files tarball gave a new Mac user nothing obviously openable).
-  They're unsigned — **first launch needs right-click → Open** (not a double-click),
-  or `xattr -dr com.apple.quarantine EQBuddy.app`.
+- `src/EQBuddy.Avalonia` — **gone from this branch as of 2026-09-04, and preserved rather
+  than lost.** It was the 1.x cross-platform Avalonia app (.NET 10), created and maintained
+  by [Don Thompson](https://github.com/DonThompson) (thanks, Don!) — including the X11
+  click-through implementation — with macOS click-through, spoken alerts and
+  Wine/CrossOver/Whisky log-folder auto-detection contributed by
+  [quasarj](https://github.com/quasarj) (PR #90; thanks!), and a real `EQBuddy.app` bundle
+  after [pmcginn](https://github.com/pmcginn) pointed out (discussion #157) that a
+  loose-files tarball gave a new Mac user nothing obviously openable.
+
+  EQBuddy Evolved (v2) is Windows-only, so that project left the v2 mainline. **To build,
+  package or patch the cross-platform line, use the `legacy-v1` branch or the `v1.99.18`
+  tag**, where the source, its CI job and its release packaging all still live and still
+  work. The final Linux and macOS builds stay downloadable from that release — see
+  [LEGACY-V1.md](LEGACY-V1.md) and the *Legacy Linux/macOS* section above.
 - `src/EQBuddy.Core` — shared parser, watcher, settings, update, and session-stat logic.
-  Both UI projects reference this; UI-independent code goes here.
+  The widget and the mobile server both reference this; UI-independent code goes here.
 - `src/EQBuddy.Core/LogParser.cs` — one regex per log-line type; add new patterns here.
 - `src/EQBuddy.Core/SessionStats.cs` — aggregation + DPS fight tracking + session rollover.
 - `src/EQBuddy.Core/LogWatcher.cs` — file tailing (500 ms polls, offset-based, truncation-safe).
@@ -628,8 +617,9 @@ Session DPS = your damage ÷ time actually **in combat**, so downtime never dilu
   single source for every project), publishes, signs both exes (Azure Artifact Signing —
   see `scripts\signing.ps1`), compiles the installer with the matching version
   stamp, and copies the artifacts to the update channel. Pass `-Tag vX.Y.Z` to push,
-  tag, and publish a GitHub release (CI attaches the Linux tarball and the macOS
-  `.app` bundles). Bump `<Version>`
+  tag, and publish a GitHub release. (The workflow that attached the Linux tarball and the
+  macOS `.app` bundles was deleted with the platform on 2026-09-04; it runs from a tag's own
+  tree, so every legacy tag keeps its copy and can still be re-published.) Bump `<Version>`
   in `Directory.Build.props` and add a `WhatsNew.json` entry first — the script refuses
   to release without one. Add `-Prerelease` (only meaningful with `-Tag`) to publish
   outside `releases/latest`, which is how a v2 milestone stays invisible to 1.x clients.
@@ -667,11 +657,15 @@ corrected.
 
 ### Code
 
-- **[Don Thompson](https://github.com/DonThompson)** — created and maintains
-  **`EQBuddy.Avalonia`**, the entire cross-platform 1.x build, including the X11
+- **[Don Thompson](https://github.com/DonThompson)** — created and maintained
+  **EQBuddy.Avalonia**, the entire cross-platform 1.x build, including the X11
   click-through implementation, and carried it through release after release of parity
-  work. Linux and macOS exist because Don built them. Evolved is Windows-only;
-  those 1.x builds stay downloadable — see [LEGACY-V1.md](LEGACY-V1.md).
+  work. Linux and macOS exist because Don built them. Evolved is Windows-only, so that
+  project left the mainline on 2026-09-04 — it is not gone: the code, the builds and the
+  releases stay at `v1.99.18` and on `legacy-v1`, permanently
+  ([LEGACY-V1.md](LEGACY-V1.md)). Removing a platform is not a judgement on the work that
+  built it, and thousands of lines of Don's remain in `EQBuddy.Core` and
+  `EQBuddy.UI.Shared`, where they run on every launch of the Windows app.
 - **[Liminal Warmth](https://github.com/liminalwarmth)** — the Wine font work that made
   text and icons render at all in a prefix (#148, #166), the opt-in macOS/Wine overlay
   that floats the widget over fullscreen EverQuest (#178), potion buffs in the buff

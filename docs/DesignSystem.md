@@ -407,8 +407,11 @@ state-coloured leading rule, both carrying readiness at a glance.
 | State vocabulary | `UI.Shared/QuestPresentation.cs` | Badge, rule colour, ready summary, meta line, distance wording — decided once for both desktops |
 | Capture | `UI.Shared/CaptureTheme.cs` | `EQBUDDY_OPAQUE=1` makes the window ground opaque, and nothing else |
 | WPF composition | `EQBuddy/DesignSystem.cs`, `EQBuddy/Theme.xaml` | Token ResourceDictionary + the `Eq*` component styles |
-| Avalonia composition | `EQBuddy.Avalonia/DesignSystem.cs`, `AppTheme.BrushFor` | Same numbers, native controls |
-| The surface | `EQBuddy/QuestsWindow.xaml{,.cs}`, `EQBuddy.Avalonia/QuestsWindow.cs` | Both in the same change, never "a release behind" |
+| The surface | `EQBuddy/QuestsWindow.xaml{,.cs}` | |
+
+*(An `EQBuddy.Avalonia/DesignSystem.cs` composed the same tokens against native controls, and
+the rule for this gate was that both surfaces changed together, never "a release behind". That
+lane was deleted on 2026-09-04; the tokens above are the part that was always the point.)*
 | Fixture | `scripts/shoot.ps1` | Seeded session + opaque render + plain backdrop |
 
 Nine of the twelve §3 primitives got their first real use: card, section header, list row,
@@ -615,7 +618,6 @@ only way it gets covered at all.
 | Decisions | `EQBuddy.UI.Shared/LootPresentation.cs` | Strip options + tooltips, view/sort normalization, strip visibility, empty-slice wording, both headers, the target heading |
 | WPF card | `EQBuddy/LootCardView.cs` | Lifted out of `MainWindow.xaml`, the way `QuestChecklistView` was |
 | WPF breakout | `EQBuddy/LootBreakoutView.cs` | Lifted out of `BreakoutWindow`, which serves six kinds |
-| Avalonia card | `EQBuddy.Avalonia/LootCardView.cs` | See below — this lane was a whole feature behind |
 | Icon | `IconPaths["Target"]` | The 🎯 that was baked into a heading STRING |
 | Token | `DesignTokens.IconInline` | 12 — an icon inside a line of text. `IconButtonSize` (24) would make every loot row a third taller, and on the widget row height is window height |
 | Token | `DesignTokens.IconInlineHit` | 16 — the TARGET of an inline icon that is clickable, which is bigger than the icon drawn in it. A vector only hit-tests where it is painted, so the map-pin badge that replaced an emoji had gaps you could click through (#211). Fits inside one line of body text, so the target grows and the row does not |
