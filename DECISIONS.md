@@ -17,6 +17,61 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (T1 — the `shoot.ps1` intermittent full-batch look)
+
+- **Diagnosed the intermittency as a CROSS-SEAT COLLISION rather than a per-shot defect, and
+  fixed it in the harness instead of in the kick order.** `Get-Process EQBuddy` matches by
+  process name, so a second seat's `shoot.ps1` stands down the first seat's in-flight fixture
+  app; the row that fails is whichever was on screen at that moment, which is exactly why
+  `shell-gear-narrow`, `options-window` and `drops-window` failed across three runs of #306's
+  batch and each passed alone. The other way: leave it to `FABLE.md` §4's kick-order convention
+  and treat the failures as flakes. Declined — a convention with no interlock has now cost two
+  batches, and the acceptance criterion this repo leans on cannot be the thing that is unreliable.
+  `scripts/shoot.ps1`, `CLAUDE.md` trap 61.
+- **The guard REFUSES rather than waits.** A lock file held for the batch (it cannot go stale —
+  the handle dies with the process), plus a refusal when any EQBuddy is already running from a
+  `bin\Release` / `bin\Debug` path, since `tests/EQBuddy.E2E` launches the same exe and takes no
+  lock. The other way: queue and wait for the holder. Declined for now because a shoot batch is
+  ~45 minutes and a silent 45-minute block is worse than a message naming the holder's pid;
+  `-Force` is the override. **This is the OPPOSITE call from `UI.Shared/SingleInstance`** on
+  purpose — there a widget that will not launch is worse than two of them, here a batch that
+  runs anyway corrupts someone else's acceptance criterion at a random row.
+- **A build-output PATH is the discriminator for "not the player's app".** The other way: read
+  each process's `EQBUDDY_APPDATA` and check for a temp profile. Declined — reading another
+  process's environment from PowerShell is WMI-shaped and fails on access-denied, while a
+  player's EQBuddy never runs from `bin\Release` and a harness's always does. Same move
+  `Core/GameWrittenLog` makes for log names (trap 48).
+- **The batch now CONTINUES past a failed row and exits 1 with a summary, instead of stopping at
+  it.** The other way: keep `$ErrorActionPreference = 'Stop'` ending the run there, on the
+  argument that a stale title should fail loudly. Declined: it does still fail loudly, and
+  stopping is what left ~25 rows unreachable for six days across four releases (trap 53) while
+  every session that re-shot one image got a picture and moved on. One run now names every
+  stale row rather than the first.
+- **Changed the readiness wait to wait for the shot's own window, and made the change unable to
+  be worse than today.** It was satisfied by the widget on every satellite/room shot, so the
+  90-second deadline was dead code and the target's whole budget was the 8-second settle. On a
+  miss the new code does not throw — it falls through to the capture exactly as before, so it
+  can only ever wait longer, never fail where the old code succeeded. The other way: raise
+  `$Settle`. Declined — a bigger guess is still a guess (trap 56's third round).
+- **Patched the harness without running a batch to verify it, and said so rather than holding
+  the finding.** SA-1 owns the desktop; running the batch is precisely the collision this change
+  is about. Verified what could be verified without the app: both scripts parse, `-List` still
+  enumerates all 84 shots, the two new window helpers were exercised against a real 1×1 probe
+  window (exact title, substring, wrong title, wrong pid, and the em-dash path), and the lock
+  was proved to refuse a second process and to name the holder. The other way: file the
+  diagnosis only and leave the patch to a screen-holding lane. Declined because the diagnosis
+  without the guard is what the last two rounds already produced. **The next lane that holds the
+  screen runs the batch first** — named in the Helm ask, not left implicit.
+- **`shot.ps1`'s `GetWindowText` P/Invoke bound the ANSI entry point** (no `CharSet`), while
+  `shoot.ps1`'s own copy of the same import says `CharSet.Unicode`. Five shot rows have matched
+  on em-dash titles since E-3. Fixed rather than left as a latent, machine-dependent risk; it is
+  not claimed as a cause of the reported failures.
+- **`docs/screenshots/quest-tracker.png` is STILL left stale** (880×658 vs a committed 880×868),
+  and this is the second round it has been named in. The other way: re-shoot it here. Declined —
+  it needs the screen, which this pass explicitly does not have. Carried as a named follow-up in
+  `FABLE.md` I-14 rather than dropped, alongside the 17 committed illustrations that no longer
+  match what `main` renders.
+
 ## 2026-09-05 (HUD subtraction cut 2 — the World `misc` card, lane-w)
 
 - **Deleted `WorldSurface.LauncherSummary` / `InlineModeFor` and `WorldTheme`'s four glance
