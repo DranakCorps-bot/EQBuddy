@@ -95,6 +95,245 @@ next loop, not a reopening of the plan.
 
 ---
 
+## E-3 completion — the parallel build-out plan (Fable, 2026-09-05, on tip `d55de151`)
+
+- **Priority:** `ready` — with per-lane gates NAMED inline. The plan itself is the
+  decomposition; nothing in it starts without the sign its lane names. Two lanes (W1, S1)
+  are startable the moment Helm signs the Bevel HUD-subtraction ask already sitting in
+  `HELM-FEEDBACK.md` (filed ~7:55 AM CT, unanswered at this writing) plus this plan's own
+  last-look. **No `needs-david:` line** — every kick below is inside signed rulings or the
+  established per-PR Helm last-look loop; the two real doors (player door, channel-open)
+  are parked, named, and not walked through.
+- **Class:** `V2` — complex parallel decomposition, which is this file's charter in as many
+  words. The individual items are mostly V1-sized; what is V2 is deciding which of them can
+  run at once on one machine, under one bot account, against two files (`MainWindow.xaml.cs`,
+  `ShellWindow.xaml.cs`) that every naive assignment would make every lane touch.
+- **Source:** David via the kick prompt — *"parallel not serial"* — plus `HELM.md`'s
+  eleven E-3-era signs (#299–#306), Bevel's HUD-subtraction pre-design (`BEVEL.md`
+  2026-09-05, tip `54fc1dc3`), the Live/Home/Quests pre-designs, `PRODUCT.md`, and the
+  parked halves of the signed Evolved item above (E-2d, E-2e).
+- **Bevel pre-design: per lane, and three lanes ARE Bevel work** — see the kick sequence.
+  Nothing user-facing starts without its pre-design; the ones already signed are cited.
+- **Shot offline:** every subtraction and room PR runs the `shoot.ps1` BATCH, not one
+  `-Shot` (trap 53), with predicted counts written first (trap 23) — e.g. cut W1's
+  prediction is a nine-card widget. Screen work is MUTEXED — see concurrency.
+- **Column budgets:** none for the subtractions (rows leave, none arrive). The HUD chips
+  (lane W3+) carry trap 12 as a standing budget: every timer-driven readout reserves fixed
+  width (`PerfReadout` is the worked example).
+- **Guards run eight times:** the terminology scanner (S-lane, new) and any new E2E
+  assertion prove-fail on the pre-change tree, then eight consecutive greens.
+- **What clamps it:** the WPF ratchet is `4123` with **zero headroom** (4,535 lines against
+  4123 × 1.1 = 4,535.3 — verified in `ArchitectureTests` this pass). Every MainWindow-touching
+  lane is clamped by it, which is itself a scheduling fact: **the Quests card subtraction
+  frees lines and therefore goes FIRST in the widget lane**; nothing else may touch
+  MainWindow until it lands and lowers the baseline in the same commit.
+- **Must-list rows:** every moved/deleted surface re-checks
+  `GameCommandsTests.SurfacesNeedingACommand`, `ImportReportReachesASurfaceTests` and
+  `DeadSettingTests.Known` per move (traps 20/26/34/43); E-2d adds a `DeadSettingTests` row
+  per removed Wine knob.
+
+---
+
+### 1. Remaining-work inventory (verified on `d55de151` unless labelled)
+
+**In flight / awaiting sign:**
+
+- **I-1 · Quests card subtraction (HUD subtraction cut 1).** Bevel pre-design filed with
+  Helm ask ~7:55 AM CT. Diff per Bevel §2: `quests` leaves `OverlaySections.Catalog` and
+  `MainWindow.SectionMap`; no settings migration (never a `MiniStats` key); `toggleQuests`
+  hotkey door survives. Smallest fold in repo history, and it frees ratchet lines.
+- **I-2 · Room-level empty-state wrapper.** Helm-signed 2026-09-04 ~11:15 PM CT; **built by
+  zero of the six rooms** (Bevel §5 restates it). Stops being deferrable the moment I-1
+  merges — a new profile then sees the un-wrapped Quests room as the entire Quests
+  experience.
+
+**Own-ask items already ruled "own ask" by signed entries:**
+
+- **I-3 · World's Drops tab** (Kills & Drops split, destination 1 of 4; Live §1 + Bevel §6).
+- **I-4 · History this-session half** (Live §1).
+- **I-5 · World `misc` card subtraction (cut 2)** — named by Bevel §3 as next candidate
+  pending two checks (MiscSection inline wording vs Travels tab; context-menu-row
+  permanence). Checks are cheap; not authorized until they run and Helm signs.
+- **I-6 · E-2d Wine/CrossOver knobs** — ruled at #277 (*"drop three Options knobs; keep
+  `TextRenderingPolicy` + `WineText`"*), parked since; the three settings verified still in
+  `AppSettings.cs:89–110`. Keep `WineFonts.cs` + `TextProbeWindow.cs` per the signed plan.
+- **I-7 · E-2e v1 feature disposition table** (`docs/v2/v1-feature-disposition.md`) —
+  parked since E-2; docs-only; it is what unblocks the **Search disposition index**
+  (SEARCH), which is why it stops being deferrable now that Search chrome exists with
+  nothing to search.
+
+**The long pole:**
+
+- **I-8 · HUD Edit mode / Surface A** — the signed plan's "PR after the host": DPS/HPS
+  glance chips, editable deadline chips, `MiniStats` star rehoming (loot/xp/money/motes,
+  deaths if I-5 lands), `HiddenSections` → HUD-content-only migration, `MiniStats` seeds
+  the HUD, chip placement with three actors in the test names (trap 49). **It gates the
+  subtraction of seven of the remaining nine cards** (Combat, Healing, Watch, Buffs, Gear,
+  Motes, Progress — Bevel's inventory table) and, behind them, every window retirement.
+  Multi-PR by construction; needs its own Bevel pre-design (the chips are pixels) and its
+  own Fable decomposition against that pre-design.
+
+**Blocked / parked, with the gate named so nobody re-derives it:**
+
+- **I-9 · v1 window retirements** (`ProgressWindow`, `QuestsWindow`, `GearLootWindow`,
+  `WorldWindow`) and the two `SurfaceOwnershipTests` exemptions — blocked on I-8 star
+  rehoming + card cuts; Bevel §4: retiring a window is separate from and later than
+  subtracting its card.
+- **I-10 · Kills & Drops split remainder** — Search lookup (waits I-7), Gear "what dropped
+  for you" (own ask, later). The card itself stays until 3 of 4 destinations exist.
+- **I-11 · Settings room** — `ShellPage.Settings` exists, not in `Landed`, held by the
+  stated decision ("a room whose whole job is not being a launcher"). Needs a Bevel
+  Settings-IA pre-design; design can run now, build waits.
+- **I-12 · Player door — OFF.** Not designed, not implemented here. Bevel §6's coupling
+  stands: HUD subtraction and the door meet at release time. When it opens it is a
+  consequence-list conversation (roadmap/release posture) — a real ask, later, not a lane.
+- **I-13 · Progress "see Live" pointer — CLOSED** (signed omit, #306). Named so no lane
+  reintroduces it.
+
+**Infrastructure / process:**
+
+- **I-14 · `shoot.ps1` intermittent full-batch look** — authorized as own look/ask by the
+  #306 sign, explicitly not auto-started. The batch is the acceptance criterion for every
+  lane above; six dark days (trap 53) is what an unreliable batch costs.
+- **I-15 · Empty-profile harness/shot** for true never-seen room empties — #303 ask 2 named
+  the gap (harness seeds a character, so the real first-run state cannot be photographed);
+  follow-up authorized "later, not merge gate".
+- **I-16 · Shell terminology scanner** — the E-3 bar names it (*"a terminology rule with no
+  guard is a rule that lasts one PR"*); verified absent from `tests/` this pass. Cheap,
+  tests-only, prove-fail + eight greens.
+- **I-17 · Fable H4 last-look of the executed E-3 diffs (PRs #299–#306).** H4 exists for
+  E-0/E-1 only; five shell PRs have shipped since without one. One read of the merged range
+  is the same move that caught the ✦ regression the whole suite missed.
+
+### 2. Dependency graph — what serializes, what does not
+
+```
+Helm sign (HUD ask + this plan)
+  ├─ W1 Quests card cut ──────────► W2 World misc cut (needs I-5 checks + Bevel/Helm)
+  │        │                              │
+  │        └──────► (ratchet freed) ──────┴─► W3+ Surface A series (needs Bevel HUD
+  │                                            pre-design B3 + Fable decomposition F2)
+  │                                            ──► remaining card cuts ──► I-9 retirements
+  ├─ S1 empty-state wrapper ─► S2 World Drops tab (needs Bevel B1 + Helm)
+  │                         └► S3 History this-session (needs Bevel B2 + Helm)
+  ├─ D1 E-2e disposition table ─► Search index (later)
+  ├─ D2 E-2d Wine knobs (cite #277)
+  ├─ T1 shoot.ps1 batch look · T2 empty-profile harness · T3 terminology scanner
+  ├─ B1/B2 Bevel pre-designs (Drops, History) · B3 HUD Edit pre-design · B4 Settings IA
+  └─ F1 Fable H4 of #299–#306 · F2 Surface A decomposition (after B3)
+```
+
+Serial by necessity: everything inside the W lane (one file, zero ratchet headroom);
+S1 before S2/S3 (S1 touches all six room files; S2/S3 each touch one). Everything else is
+parallel by construction — disjoint files, or no files at all.
+
+### 3. Lanes and file-ownership boundaries (the anti-thrash contract)
+
+**The rule that makes the lanes disjoint: new content arrives as NEW FILES.** A lane that
+needs something currently rendered by `MainWindow` lifts it into its own view class
+(`QuestsView` is the precedent) rather than editing `MainWindow` — that keeps the widget
+lane's exclusive lock real, and it is the direction the ratchet pushes anyway.
+
+| Lane | Owns exclusively | Must not touch |
+|---|---|---|
+| **W (widget)** — W1 Quests cut, W2 misc cut, W3+ Surface A | `MainWindow.xaml`, `MainWindow*.xaml.cs`, `OverlaySections.cs`, `BreakoutWindow.*`, `EndToEndTests.cs` widget facts | `ShellWindow`, `*Room.cs` |
+| **S (shell)** — S1 wrapper, then forks S2/S3 | `ShellWindow.xaml.cs`, `ShellHost.cs`, `RoomEmptyState.cs`, `*Room.cs`, `ShellPages.cs`, `ShellHostTests.cs`; S2 adds a new `DropsView` file, S3 owns `HistoryWindow` | `MainWindow*` (lift, don't edit) |
+| **D (docs/settings)** — D1, D2 | `docs/v2/`, `OptionsWindow`/`OptionsViewModel`, `AppSettings` Wine rows, `DeadSettingTests` | any window file |
+| **T (tooling)** — T1–T3 | `scripts/shoot.ps1` batch logic, harness profile seeding, new terminology test file | product `src/` |
+| **B (Bevel)** / **F (Fable)** | `BEVEL.md`/`FABLE.md` + feedback files | everything else |
+
+Shared-file exceptions, named: `shoot.ps1` per-shot blocks are additive and cheap to merge,
+but **only one lane runs the batch at a time** (below); `docs/TestPlan.md` rows merge
+trivially; channel files follow the existing hygiene — **channel commits go to `main`
+directly, never onto product branches** (the #306 round's own practice), which removes the
+"drop channel tip before merge" step from every PR.
+
+### 4. Concurrency on David2026
+
+**Recommended: 3 concurrent `claude -p` steady state, 4 peak.** Concretely: two product
+lanes building .NET in their own worktrees (own `obj/`/`bin/` — trap 18 stays per-tree), one
+docs/design lane (no build contention), and at peak a fourth that is Bevel/Fable channel
+work (no build at all). Beyond that the cost is not CPU, it is Helm: every product PR takes
+a last-look, and five simultaneous asks serialize inside Helm's mailbox anyway — a queue in
+front of the signer is parallelism spent on waiting.
+
+**The one hard mutex is the SCREEN.** `e2e-windows` and `shoot.ps1` launch and stand down
+the real exe, enumerate windows by title+pid, and own the desktop (traps 24/51/53). Exactly
+one lane holds the screen at a time; the others push and let CI's `e2e-windows` answer
+(it runs on every push since 2026-09-04). Dranak enforces this by kick order, not by tooling:
+a lane's kick prompt says whether it has the screen.
+
+### 5. Ordered kick sequence (Helm/Dranak-executable; no David page)
+
+Each kick is `claude -p` via Dranak, `--model opus` unless noted; each product PR ends in a
+`HELM-FEEDBACK.md` last-look ask exactly as #299–#306 did.
+
+- **K0 (Helm, now):** last-look **two** asks in one sitting — Bevel's HUD-subtraction ask
+  (~7:55 AM CT, pending) and this plan's. One Helm session, two signs.
+- **K1 (Opus, worktree `lane-w`, HAS SCREEN):** W1 — Quests card subtraction per Bevel §2.
+  Ratchet down same commit; batch shot with predicted nine-card widget; PR + ask.
+- **K2 (Opus, worktree `lane-s`):** S1 — empty-state wrapper across all six rooms +
+  `ShellWindow` centering. No screen — CI e2e; screenshots ride the next S-lane PR or
+  borrow the screen after K1 releases it. PR + ask.
+- **K3 (Sonnet, Bevel):** B1 World-Drops pre-design, B2 History-this-session pre-design,
+  and the two I-5 checks — one Bevel session, three entries, one combined Helm ask.
+- **K4 (Opus, worktree `lane-d`):** D1 — E-2e disposition table (docs only, cites the
+  signed E-2e section verbatim as its spec). Then D2 — E-2d in the same lane, asking Helm
+  with the #277 citation (a formality ask, not a re-ruling).
+- **K5 (Fable, this seat or next):** F1 — H4 last-look of #299–#306 merged range;
+  findings are V1 items for the next loop per the standing contract.
+- **K6 (Opus, `lane-s` after S1 merges + B1 signed):** S2 — World Drops tab (new
+  `DropsView` lift; `WorldRoom`; no `MainWindow` edits).
+- **K7 (Opus, fourth seat or `lane-d` after D2, after B2 signed):** S3 — History
+  this-session, respecting the signed Home/Live boundary (no combat fields by construction).
+- **K8 (Opus, `lane-w` after W1 merges + I-5 checks + Helm):** W2 — World misc card cut.
+- **K9 (Sonnet, Bevel, after W1+S1 merge):** B3 — HUD Edit mode / Surface A pre-design
+  (chips, Edit mode, star destinations, `MiniStats` seeding). B4 Settings IA may ride along.
+- **K10 (Fable, after B3 signed):** F2 — Surface A multi-PR decomposition into this file.
+- **K11 (Opus, `lane-w`, serial):** Surface A PRs per F2, each Helm last-looked; remaining
+  card cuts follow as their gates clear; I-9 retirements close the arc.
+- **T-kicks (any idle seat, screen-mutexed):** T1 batch look (already authorized), T3
+  terminology scanner (tests-only, no ask needed beyond PR last-look), T2 empty-profile
+  harness when a screen slot is free.
+
+**Still OFF throughout, restated so no kick drifts:** Play Console, any tag/publish, the
+player door (design or implement), `v1.99.19`, signing/prod secrets, channel-open. No David
+page — the only door-shaped things here (I-12, channel-open) are parked, not asked.
+
+### Checked — what Fable actually read on this tip
+
+`HELM.md` in full through the #306 sign; Bevel's HUD-subtraction entry and its HELM ask
+(diffs of `09e73458`); the #306-round channel commit (`456fd5c1`); the signed Evolved item
+above (E-2/E-3/Surface A sections) and this file's item shape; `PRODUCT.md` and
+`EQBuddy-Evolved.md` in full; `ShellPages.cs` (`ShellPage` enum — no Search member,
+Settings not `Landed`; `Landed` = six), `GearRoom.cs`/`WorldRoom.cs`/`LiveRoom.cs` headers
+(star-writer blockers verbatim); `AppSettings.cs:89–110` (three Wine knobs live — E-2d not
+done); `ArchitectureTests` ratchet rows (4123, zero headroom, dated 2026-09-05);
+`tests/EQBuddy.E2E/` file list + `ShellHostTests` method inventory (793 lines);
+`FABLE-FEEDBACK.md` headings (H4 exists for E-0/E-1 only); open PRs (none) and open issues
+(#210, #153 — both pre-Evolved, neither in scope); absence of any terminology scanner in
+`tests/`.
+
+**Hypotheses, labelled:** (1) S2's Drops content can be lifted without touching
+`MainWindow` — the Drops view's current home was not read this pass; if it is
+MainWindow-owned, S2 coordinates one factory-lift commit with lane W rather than editing in
+place. (2) Two concurrent .NET builds on David2026 are comfortable — inferred from build
+times in the record, not measured. (3) The #303 "MONITOR-2" harness commit covers what the
+kick prompt calls the "shell-only e2e harness"; if a separate shell-only-launch mode was
+intended, T2 is where it lands.
+
+### Decided without asking — for `DECISIONS.md` when taken
+
+- **Three steady / four peak concurrent sessions, screen single-owner.** Could have gone
+  "as many as CPU allows"; the binding constraint is Helm's mailbox and the desktop, not cores.
+- **S1 (empty-state wrapper) is its own PR before the content forks**, not folded into W1 —
+  Bevel said "not a precondition"; making it one PR earlier is scheduling, not scope.
+- **E-2e restarts now on the Search argument** rather than waiting for a quiet week.
+- **The terminology scanner needs no pre-design** — it enforces an already-signed ban list.
+- **Channel commits land on `main` directly**, generalized from the #306 round's practice.
+
+---
+
 ## EQBuddy Evolved — LOCAL-ONLY development start (owner GO 2026-09-04 ~2:52 PM CT)
 
 - **Priority:** `ready` — E-0 and E-1 may start immediately. E-2 is gated on E-0 closing the
