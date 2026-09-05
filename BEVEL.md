@@ -44,6 +44,247 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### Live room — the seventh room, last-look ask — pre-design (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, unlocks Opus for Live per the Helm-signed
+Quests → Home → Live order, now that #303 is on `main`)
+**Place:** `src/EQBuddy.UI.Shared/ShellPages.cs` (`ShellPage.Live` already an enum member,
+`RailOrder` position 2, not yet in `Landed`); `src/EQBuddy.Companion/CompanionSurfaces.cs`
+(`PageFor` already routes `Mez`/`Buffs`/`Combat`/`Session` → `Live`, and its own comment
+already says Raids "leave for Live when the Live room lands"); `src/EQBuddy/MainWindow.xaml.cs`
+(inline `CombatSection`/`HealingSection`, :646 `OverlaySections` map); `src/EQBuddy/BreakoutWindow.xaml.cs`
+(Damage/Healing/Pet, 888 lines); `src/EQBuddy/FightTimelineWindow.xaml.cs` (536 lines);
+`src/EQBuddy/CreatureWindow.xaml.cs` (Kills tab only — Drops is out of scope, see §1);
+`src/EQBuddy/RaidsCardView.cs` (182 lines, currently hosted by `ProgressRoom.cs`);
+`src/EQBuddy.UI.Shared/SessionSummary.cs` (`RecentSession`, deliberately combat-field-free);
+`tests/EQBuddy.Tests/HomeRoomTests.cs:153` (`TheRecentSessionRecordCarriesNoCombatNumbersToRender`);
+`docs/BEVEL-v2-staging-critique.md` §2 (Combat/Healing/Pet/Fight-timeline/Kills&Drops/Raids/
+History/Session-picker rows), §3 (HUD), §6 door 3.
+**Source:** tonight's last-look ask, so Opus can be unlocked for Live the moment Helm signs.
+Against the Helm-signed E-3 rooms order and my own §1/§2 (HUD subtraction is per-item) from
+the prior E-3 rooms pre-design. **All verified in source on tip `4c3416fe`** (PR #303 merged).
+**Not a hold. Not needs-david. #208/#261/#262 untouched. No implement. No HUD subtraction
+started by this entry.**
+
+---
+
+#### 1. Live is not one v1 window, and the first PR must say out loud which pieces it takes and which it leaves for later
+
+Every room before this one had a single existing thing to point at: World and Gear were
+already-folded windows (a *move*), Quests was one window with no view (a *lift*), Home had
+no v1 surface at all (a *build*). **Live has neither shape.** Reading the disposition table's
+own six rows for it against what actually exists on tip:
+
+| Disposition row | Lives where today | In Live's first PR? |
+|---|---|---|
+| Combat card + Damage breakout | `MainWindow.CombatSection` (inline) + `BreakoutWindow.xaml.cs` (Damage tab) | Yes |
+| Healing card + Healing breakout | `MainWindow.HealingSection` (inline) + `BreakoutWindow.xaml.cs` (Healing tab) | Yes |
+| Pet breakout | `BreakoutWindow.xaml.cs` (Pet tab) | Yes |
+| Fight timeline | `FightTimelineWindow.xaml.cs` (536 lines, its own pop-out) | Yes |
+| Kills & Drops → **session kills** half | `CreatureWindow.xaml.cs`, `CreatureTab.Kills` | Yes |
+| Kills & Drops → **camp-worth-it** half | `CreatureWindow.xaml.cs`, `CreatureTab.Drops` | **No — this is World's, not Live's** |
+| Raids card / Progress → Raids | `RaidsCardView.cs`, hosted by `ProgressRoom.cs` | Yes (see §3 — this one moves, it doesn't merge) |
+| History window | `HistoryWindow` (career half → Progress, this-session half → Live) | **No — out of scope, its own ask** |
+| Session picker | Already split: Home got "recent session" in #303 | **No — Home's half already shipped** |
+
+**Two rows in that table are not Live's to build, and saying so now is cheaper than
+discovering it mid-PR.** Drops-by-creature is camp research — "is this camp worth it" —
+which is World's job by the disposition table's own reasoning (§2's Why column: *"camp
+worth-it → World"*), not Live's, even though it ships from the same v1 window as the kills
+counter that IS Live's. Splitting one window's two tabs across two different shell rooms in
+one PR is exactly the shape that produced Bevel §1's "biggest redesign in E-3" warning, and
+the honest way to keep it from becoming two rooms' worth of half-finished work in one diff is
+to take the half that has a destination NAMED already (Live) and leave the half that would be
+inventing World's Drops tab as its own ask when World's own PR wants it. **The History
+window's this-session half is the same shape and the same answer**: it is a real Live-shaped
+fact, but `HistoryWindow` is not gated on Live existing and touching it is its own scope, not
+a precondition for Live's first PR.
+
+**One row moves rather than merges, and it changes a file Live's PR does not otherwise touch
+— see §3.**
+
+**What this means concretely for the PR ask:** name the five sources (two inline `MainWindow`
+sections, one breakout window, one standalone window, one card view file) in the PR body
+before any layout, the way §1 of the prior E-3 entry asked every presentation PR to open with
+which room and which job. A PR that silently also solves World's Drops tab, or Search's
+lookup, or `HistoryWindow`'s merge, is a PR that grew a second room's redesign inside its own.
+
+---
+
+#### 2. The Home/Live boundary runs in both directions, and Live's half is a real trap, not a formality
+
+The signed boundary (#303, ~5:20 AM CT) says Home carries no combat numbers. Read from
+Live's side rather than Home's, the same boundary says something sharper: **Live must not
+try to satisfy its need for Kills/Deaths/Dps by widening `RecentSession`.**
+
+`SessionSummary.RecentSession` (`src/EQBuddy.UI.Shared/SessionSummary.cs:35`) deliberately
+has no `Dps`, `Kills`, `Deaths`, `Damage` or `Healing` field, and it is not a convention —
+`HomeRoomTests.cs:153`, `TheRecentSessionRecordCarriesNoCombatNumbersToRender`, reads the
+type by reflection and fails the build if one of those five names appears on it. **That test
+exists to stop Home from acquiring combat numbers later, not to stop Live from reading
+them** — but the type it locks is the one the task description points Live at ("reuse the
+session-summary fact already placed for Live"), and taking that literally would mean either
+widening `RecentSession` (which breaks the signed test on sight) or building a parallel type
+that duplicates the merge logic `SessionSummary.Of` already got right.
+
+**`SessionSummary.Of`'s hard part is not the fields, it is the MERGE** — deciding whether the
+newest stored row IS the live session or a different, earlier one, so a session that is
+running is never reported twice by two different names. `SessionRow` itself already carries
+`Kills`, `Deaths` and `Dps` (`SessionRepository.cs:8-12`) — the merge throws them away on the
+way into `RecentSession`, it does not lack them at the source. **The ask for Live's PR:**
+factor `SessionSummary.Of`'s merge decision (which stored row is "the same session" as the
+live snapshot, via `IsTheLiveSession`) so both `RecentSession` and a sibling Live-shaped
+record are built from one answer to "which session is this", rather than Live re-deriving
+`IsTheLiveSession`'s one-second tolerance and end-reason check independently and drifting
+from it the way two producers of one fact always eventually do (trap 33). The new type is
+Live's to name; the merge is not Live's to re-derive.
+
+**And the InProgress case is the one place Live's job and Home's job look most alike and
+must not become one control.** Home's `Detail` for `InProgress` is a sentence — *"You are
+playing in {Zone} right now… will record it here when the session ends"* — specifically
+because "the meters exist and are moving" is Live's job stated as a boundary. Live's own
+InProgress state is where those meters actually render. If a plan reuses `SessionSummary.
+Headline`/`Detail` verbatim for Live's own heading, it would be borrowing Home's *refusal*
+sentence for the one room whose entire point is not refusing.
+
+---
+
+#### 3. Raids leaving Progress is a MOVE between two shell rooms already built, and it is not gated the way HUD subtraction is
+
+My own §2 last time drew the line for HUD subtraction: a v1 widget surface may not be
+retired from the overlay until its shell room exists, its HUD chip (if any) exists, and a
+screenshot proves the replacement does the job — and that gate is why World's deaths star
+and Gear's loot star are still exactly where #300 put them. **Raids is a different shape and
+the same gate does not apply to it**, and conflating the two would either stall Live's PR on
+a HUD chip Raids never needed, or — worse — let Raids linger on both Progress and Live at
+once because "moves are gated like retirements."
+
+Raids today lives entirely inside the shell already: `RaidsCardView` is hosted by
+`ProgressRoom.cs`, not by the widget overlay. There is no HUD chip for a raid clear and the
+disposition table names none — a raid clear is not a deadline, it has already happened by
+the time it is reported. So moving it is IA housekeeping between two rooms that both already
+exist, not a subtraction from the always-on-top surface HUD subtraction is protecting.
+**The correct rule for this one: Progress's Raids tab and Live's session-report block change
+in the SAME commit**, not two. `CompanionSurfaces.PageFor`'s own comment already says as much
+for the phone half — *"the phone's progress screen follows the room, not this line, so it
+stays Progress until that PR moves it"* — which means the mobile `Progress` screen's Raids
+content and the desktop `ProgressRoom`'s Raids tab have to come out together, or the two
+hosts of "what's in Progress" disagree at exactly the boundary a resize or a page reload
+would expose (trap 33/58's shape, one level up from data into which rooms a fact lives in).
+
+**What I am not ruling on:** whether Progress's Raids *tab* disappears entirely or becomes a
+one-line "see Live" pointer for a session while one is running. That is a Fable/Opus call
+once the tab strip is in front of someone, not a product question I need to answer before
+the PR starts.
+
+---
+
+#### 4. Empty-state, density and chrome — reuse what Home built rather than re-deriving it
+
+`RoomEmptyState.Build` (`src/EQBuddy/RoomEmptyState.cs`) exists now, built for Home, and its
+own doc comment already frames itself as a rule three rooms shipped without consuming and
+Home was "the first thing that could consume." **Live is the second, and it has at least two
+real empty states of its own, not variants of Home's:** no session ever recorded (genuinely
+new profile — though Home's whole-room empty already covers "no character" one level up, so
+Live's version is narrower: a known character with a live session but nothing has happened
+in it yet — 0 kills, 0 damage, nothing to report), and a raid report block with nothing to
+show because nothing has been imported. Both should route through `RoomEmptyState.Build`
+with their own heading/explanation pair in `UI.Shared`, the same shape `HomeReadout` set for
+Home — not a fresh centering implementation, and not Home's copy reused verbatim, since
+"nothing has happened in this session yet" is a different fact from "no character is known."
+
+**Density — Live is a strong `RoomSinglePane` candidate, and it should be checked rather
+than assumed.** Unlike Home (four stacked blocks, genuinely one column) and Progress
+(arithmetic, one column), Live's merge brings in at least one thing that reads as a list —
+the fight timeline, and possibly a raid-clears list if the report is more than one line. If
+either ends up as a list-beside-detail arrangement the way Quests' Turn-ins pane is, it
+should exercise `ShellLayout.RoomSinglePane` at the 640 threshold the same way Quests did,
+predicted before the shot per trap 23/51 — not decided by feel once the layout exists.
+
+**Chrome — no new pattern needed.** `IShellRoom` has proven itself across a ticking surface
+(World's `SpawnsView` timer), a scanning one (Gear), a database-and-disk-reading one (Home),
+and an arithmetic one (Progress). Live's tick source is `MainWindow.CurrentSnapshot()`, the
+same one every room already reads — nothing about "this room shows numbers that change every
+second" is new to the shell; only the numbers are new to Live's room specifically.
+
+---
+
+#### 5. Rail order and findability — one thing to predict, one thing to check for a leak
+
+`ShellPages.RailOrder` already has Live second (Home, **Live**, Progress, Gear, Quests,
+World, Settings), so joining `Landed` puts its row between Home and Progress automatically —
+nothing to rule on in ordering. `Describe(Live)` is already written (*"This sitting: damage,
+healing, pet, kills and what you cleared"*) and matches the disposition table, so it needs no
+rewording when the room ships.
+
+**What to shoot, predicted first:** the rail with six rows (Home through World), Live drawn
+in its signed slot between Home and Progress — the same discipline every prior room's entry
+has asked for, because a rail that silently appended Live at the bottom would look identical
+to a correct build except in that one picture (trap 24's shape).
+
+**The leak to check for, because Release's own §5 named exactly this failure mode already:**
+`Release()` must stop whatever Live's room starts on the tick, the same obligation
+`WorldRoom`'s `SpawnsView` timer and `GearRoom`'s `CancellationTokenSource` already discharge
+(`IShellRoom.cs`'s own doc comment: *"a shell that closed without doing both would leak a
+ticking timer per open, silently, for as long as the process lives"*). Live is the room most
+likely to want its own redraw cadence for a fight timeline or a live meter, which makes it
+the room most likely to reintroduce exactly the leak `IShellRoom.Release` exists to prevent —
+worth naming now rather than discovering after the fact, since nothing about a leaked timer
+shows in a diff, a build, or a screenshot.
+
+---
+
+#### 6. HUD subtraction — named so it is not silently assumed, not started here
+
+My own §2 from the prior E-3 rooms pre-design already rules this in full and I am not
+reopening it: a v1 surface may be subtracted from the widget only when its shell room is
+landed, its HUD chip (if any) has shipped for review, and a screenshot proves the
+replacement does the job — and that is a **second PR**, never the same one that builds the
+room. For Live specifically that means: **Combat, Healing, the Damage/Healing/Pet breakouts,
+Fight timeline and the Kills tab of Kills & Drops all stay on the widget, unchanged, in the
+same PR that builds Live's room.** Nothing here licenses touching `OverlaySections.Catalog`,
+`MiniStats`, or any card the widget currently draws. The DPS/HPS HUD chip work that Live's
+existence eventually makes possible is its own ask when the HUD gets its Edit mode, per
+`FABLE.md`'s "HUD (Surface A), for the PR after the host."
+
+---
+
+#### 7. What does NOT change
+
+Everything #299–#303 already signed stands. `MinRoomWidth` 520. `IShellRoom` is the right
+shape. No player-facing door. No WhatsNew/tag/publish. HUD subtraction stays per-item gated
+exactly as §2 of the prior item ruled — Live shipping does not licence removing anything
+from the widget (§6 above). Home is not reopened. `CompanionSurfaces.PageFor`'s existing
+Live routing is not re-litigated — it is exactly the disposition table, transcribed.
+
+---
+
+- **Already shipped (checked on tip `4c3416fe`):** five-row rail (Home·Progress·Gear·
+  Quests·World) with Home the default landing; `RoomEmptyState` built and consumed by Home;
+  `ShellPage.Live` / `RailOrder` position / `Describe`/`Label`/`IconName` all already written;
+  `CompanionSurfaces.PageFor` already routes Mez/Buffs/Combat/Session to `ShellPage.Live` and
+  its own comment already anticipates Raids' move; `SessionSummary`/`RecentSession` shipped
+  combat-field-free with a reflection test enforcing it.
+- **Checked:** `ShellPages.cs`, `ShellWindow.xaml.cs`, `IShellRoom.cs`, `RoomEmptyState.cs`,
+  `HomeRoom.cs`, `SessionSummary.cs` in full; `HomeRoomTests.cs` for the reflection test;
+  `SessionRepository.cs`'s `SessionRow` fields; `CompanionSurfaces.cs` in full;
+  `MainWindow.xaml.cs` for `CombatSection`/`HealingSection`/`OverlaySections` map (grep, not
+  full read); `BreakoutWindow.xaml.cs`, `FightTimelineWindow.xaml.cs`, `CreatureWindow.xaml.cs`,
+  `RaidsCardView.cs`, `CreatureSurface.cs`, `LootSurface.cs` line counts and headers;
+  `docs/BEVEL-v2-staging-critique.md` §2/§3/§6 in full; `HELM.md` #299–#303 signs and Retired
+  block (Live Holds empty); `FABLE.md` E-3 section in full.
+- **Not checked this run:** `HistoryWindow`'s view-model in full (still the prior pass's open
+  hypothesis, unverified by either of us — only its existence and its disposition-table row);
+  the mobile `⚙ Screens` picker's actual runtime behaviour (its mapping table is read, its
+  live page is not); the running app (did not run `shoot.ps1`); whether `MainWindow`'s
+  `CombatSection`/`HealingSection` share any presentation logic with the Damage/Healing
+  breakout tabs today — worth a grep before the PR starts, filed as a place to look rather
+  than a claim.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### Home room — sixth room, first Bevel pass — pre-design (Bevel, 2026-09-05 night)
 
 **Priority:** `approved` (pre-design, unlocks Opus for the Home room per the Helm-signed
