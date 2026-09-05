@@ -1,3 +1,33 @@
+## 2026-09-05 ~11:20 AM CT — Helm: PR #315 E-3 S2 World Drops last-look **SIGNED** (product head `75312797`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #315 https://github.com/DranakCorps-bot/EQBuddy/pull/315 (`claude/evolved-drops-20260905` → `main`, product head `7531279727b219a4156b32d80aaae93657ed7695`; channel tip `46d0e966` to drop). Against World Drops pre-design sign (~10:05 AM CT / #309) and S1 #313 already on `main`. At look: branch **diverged** (`ahead 1` / `behind 4` after #314 merge); CI on product head **in flight**; mergeable dirty. **Signed. Rebase onto `main`, drop channel tip, merge when `build-and-test` + `e2e-windows` both green on the rebased merge head.**
+
+### What is signed
+1. **Fifth `WorldTab.Drops` + `WorldRoom` own `new DropsCardView(main)` — SIGNED.** Exact CreatureWindow line; no MainWindow factory; `AbsorbedCardKeys` stays `["misc"]`; no MiniStats / OverlaySections / settings migration. CreatureWindow + both hooks untouched.
+2. **`world:drops` via live `WorldSurface.Tabs()` — SIGNED (confirmed).** No ShellPages/ShellHost edit beyond Describe clause.
+3. **Hand-written `shellWorldDrops*` + SurfaceOwnership InlineData WorldRoom→DropsCardView — SIGNED.** Live/Kills precedent, not mechanical re-prefix.
+4. **`Describe(World)` fifth clause — SIGNED.**
+5. **Layout as-is; width risk closed by picture — SIGNED.** `MinRoomWidth` does not move; narrow shot proves buttons keep labels / filter absorbs squeeze.
+6. **Out of pass — SIGNED:** Search lookup, Gear drops dest, Mobile Drops routing, player door, HUD subtraction.
+
+### Ask answers
+1. **`(a) WorldSurface.ShellOnly` + WorldTheme v1 filter + WorldWindow.BuildTabs via `WorldTheme.Tabs` — SIGNED (required).** Three hosts read `Tabs()`; unfiltered fifth header would ship a Drops chip on v1 WorldWindow/widget answering Travels. Mirror of `ProgressSurface.MovedToLive` from the opposite direction. Behaviour-identical for the v1 lane (still four tabs). Named WorldWindow edit is inside "additive shell only," not HUD subtraction and not a v1 product change.
+2. **`(b) ShellRoomEmpty.World` copy + `WorldIsEmpty` drops clause — SIGNED as written.** Room-level empty collapses the strip; four-tab predicate/copy would hide the new surface. Wording *"…and the drop list from what you kill there"* is honest and minimal. Not a Bevel re-ask.
+
+### Unchanged gates
+No WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only (`EQBUDDY_SHELL`). Live Holds empty. **Not needs-david.**
+
+### Next
+1. **Dranak/Claude:** rebase #315 onto `main` (post-#314), **drop channel tip** `46d0e966`, merge when both CI green on that head. Prefer product head `75312797` (+ rebase).
+2. History this-session implement remains unblocked for its own PR + last-look (S1 already merged; anti-thrash with S2 was the only gate).
+3. Soft max / parallel seats stand; do not invent Search/Gear/Mobile Drops into this PR.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~10:56 AM CT — Helm: PR #314 E-3 W1 Quests-only HUD subtraction last-look **SIGNED** (head `184e506e`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
