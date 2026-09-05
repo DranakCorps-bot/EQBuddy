@@ -9,13 +9,13 @@ namespace EQBuddy.Tests;
 /// <summary>
 /// **THE EVOLVED SHELL'S TERMINOLOGY BAN, AS A BUILD STEP.**
 ///
-/// §4 of `docs/BEVEL-v2-staging-critique.md` (Helm-signed 2026-09-04) lists seven kinds of
-/// word that are OURS and must never reach a player: card, breakout, theme, overlay
-/// section / mini-stat, cog menu, "widget" as the product's name, and raw type names. Bevel
-/// asked for the guard twice and gave the reason both times — *"a terminology rule with no
-/// guard is a rule that lasts one PR"* — and its §6 ask 6 named the shape (`GameCommandsTests`)
-/// and the open question with it: **are the player-facing strings reachable from one place,
-/// and if not, that is itself the finding.**
+/// §4 of `docs/BEVEL-v2-staging-critique.md` (Helm-signed 2026-09-04, amended 2026-09-05)
+/// lists eight kinds of word that are OURS and must never reach a player: card, breakout,
+/// theme, overlay section / mini-stat, mini pill, cog menu, "widget" as the product's name,
+/// and raw type names. Bevel asked for the guard twice and gave the reason both times —
+/// *"a terminology rule with no guard is a rule that lasts one PR"* — and its §6 ask 6 named
+/// the shape (`GameCommandsTests`) and the open question with it: **are the player-facing
+/// strings reachable from one place, and if not, that is itself the finding.**
 ///
 /// **The finding, answered on this tip: NO, and by design.** The shell's words arrive from
 /// three different places and no single scan can see all three, which is why this file has
@@ -75,6 +75,9 @@ public class ShellTerminologyTests
         new("overlay section / mini-stat", @"\boverlay\s+sections?\b|\bmini[-\s]?stats?\b",
             "HUD / the number",
             "Pick which mini-stats the pill shows."),
+        new("mini pill", @"\bmini[-\s]?pills?\b",
+            "the HUD, or the chip by its job — the DPS chip, the mez chip",
+            "Double-click a mini pill chip to open its window."),
         new("cog menu / Cards & windows (as a *finder*)", @"\bcog\s+menu\b|\bcards?\s*&\s*windows\b",
             "Settings, or the nav item",
             "Find it again in the cog menu."),
@@ -92,7 +95,7 @@ public class ShellTerminologyTests
     // ---------------------------------------------------------------------------------
 
     /// <summary>
-    /// The seven rows above ARE the seven rows of §4, in order, verbatim. Both directions
+    /// The eight rows above ARE the eight rows of §4, in order, verbatim. Both directions
     /// on purpose: a row deleted from this file and a row added to the doc are the same
     /// defect — a guard that has stopped covering the rule it cites — and only one of them
     /// is visible in a diff of this file.
@@ -394,7 +397,8 @@ public class ShellTerminologyTests
             $"'{h}' → {Ban.First(b => b.DocRow == h).SayInstead}"));
         Assert.Fail(
             $"{where} says \"{text}\" — that is implementation vocabulary on screen. {say}. "
-            + "The ban is §4 of docs/BEVEL-v2-staging-critique.md, Helm-signed 2026-09-04; "
+            + "The ban is §4 of docs/BEVEL-v2-staging-critique.md, Helm-signed 2026-09-04 and "
+            + "amended 2026-09-05; "
             + "these words are ours, not the player's. If the word genuinely is not player-"
             + "visible, add a row to ShellTerminologyTests.Exempt saying why.");
     }

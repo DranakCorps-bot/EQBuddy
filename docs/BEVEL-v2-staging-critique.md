@@ -205,9 +205,15 @@ toasts, or What's-new player text:
 | breakout | window, or nothing — if it still exists it is a Live panel or a HUD chip |
 | theme / theme body | the room: Live, Progress, Gear, Quests, World |
 | overlay section / mini-stat | HUD / the number |
+| mini pill | the HUD, or the chip by its job — the DPS chip, the mez chip |
 | cog menu / Cards & windows (as a *finder*) | Settings, or the nav item |
 | widget (as the name of the product) | EQBuddy, or the HUD |
 | IWidgetCard, AbsorbedTitles, SectionScroll, dump of internals | never |
+
+*The **mini pill** row was added 2026-09-05 by Helm's vocabulary ruling **(b)** on PR #323:
+"mini pill" is ours, **"chip" is not** — "HUD chip" stays the replacement noun the
+breakout row points at, and neither "chip" nor that column is re-worded. The row is
+pinned by `ShellTerminologyTests.Ban`, which fails in both directions if the two drift.*
 
 What's-new still names the **old place and the new place** when a surface moves
 ("X is now Y"). That is a player sentence, not an implementation sentence.

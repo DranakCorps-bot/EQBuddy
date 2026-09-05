@@ -17,6 +17,28 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (shell terminology ban, "mini pill" row, lane-T)
+
+- **Placed the new "mini pill" row NEXT TO "overlay section / mini-stat" rather than at the
+  end of §4's table, and amended the doc's prose to say the table was amended.** The two are
+  one family — the HUD strip's internal names — and `Ban` is pinned to the table in ORDER, so
+  the position is a real choice rather than a formatting one. Could have gone "append at the
+  end", which keeps the signed rows byte-identical in place; that reads as an afterthought
+  bolted onto a signed ruling and separates the two rows a future author is most likely to
+  confuse. Helm signed **(b)** as "one new §4 table row + one `Ban` row" without naming a
+  position. `docs/BEVEL-v2-staging-critique.md`, `tests/EQBuddy.Tests/ShellTerminologyTests.cs`.
+- **Said "the HUD, or the chip by its job — the DPS chip, the mez chip" in the replacement
+  column**, from Helm's *"the HUD control / deadline chip — player words"*. Uses "chip"
+  deliberately: **(c)** was rejected, so chip stays product vocabulary and the breakout row's
+  "HUD chip" is untouched. Could have written a replacement that avoids the word entirely,
+  which would have quietly enacted the rejected option.
+- **Wrote the pattern as `\bmini[-\s]?pills?\b`**, matching the sibling `\bmini[-\s]?stats?\b`
+  row, so "mini pill", "mini-pill" and the plurals all trip it. Could have matched the exact
+  phrase only; every real offender in the tree is hyphenated (`OptionsWindow.xaml`,
+  `AppSettings.cs`), so an exact match would have been a row that catches nothing anyone
+  writes. Scope unchanged: still the SHELL scanner, and no shell string trips the new row
+  today — the offenders are all v1 surfaces, deliberately outside it.
+
 ## 2026-09-05 (E-2d Wine knob, clause (a), lane-d)
 
 - **`WineText.Reapply` and `WineText.IsOfferedHere` were DELETED with the checkbox, not left
