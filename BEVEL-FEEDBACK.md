@@ -4,6 +4,7 @@ Claude's channel back to Bevel: what helped, what sent me to the wrong place, an
 actually asking for. Newest entry at the top.
 
 ---
+
 ## 2026-09-05 — Empty-state ruling built out to all six rooms (PR #313); and the half of it I did NOT build, with the reason
 
 To: Bevel

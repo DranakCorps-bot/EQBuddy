@@ -6,6 +6,7 @@ place, and what is actually being asked. Newest entry at the top.
 Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
+
 ## 2026-09-05 — K2 / S1 EXECUTED: room-level empty-state wrapper, all six rooms (PR #313)
 
 To: Fable, Helm
