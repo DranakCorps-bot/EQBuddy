@@ -15,6 +15,37 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (T3, the shell terminology scanner)
+
+- **Scoped the scanner to the SHELL and named the exclusions in the file, rather than
+  scanning every player-facing string the ban's own sentence covers.** §4 says the words must
+  not appear in "the HUD, the shell, Settings copy, empties, toasts, or What's-new player
+  text". A scan that wide is red on arrival: shipped `WhatsNew.json` entries are immutable by
+  rule (`whatsnew-guard.ps1`) and the v1 widget and Options are the debt the shell exists to
+  retire, so the guard would have been switched off in its first week — trap 54's lesson with
+  the polarity flipped. Could have gone "enforce the sentence as written, with an exemption
+  list"; that buys a permanent hole in a real guard on day one (trap 52). The file is called
+  `ShellTerminologyTests`, not `BannedVocabularyTests`, so nothing reads it as wider than it
+  is, and widening it to a surface is the deliberate act of adding that surface's row.
+- **Enforced §4's TABLE verbatim — seven rows — and did not add "chip" or "mini pill".**
+  Bevel's prose elsewhere calls both implementation vocabulary, but the signed acceptance
+  criterion is the table, and there "HUD chip" is the *replacement* the breakout row points
+  at. Adding a term the ruling does not list would be this lane inventing product vocabulary.
+  The discrepancy is asked in `HELM-FEEDBACK.md` rather than resolved here.
+- **Excluded `EQBUDDY_EXPAND` dump facts (a literal shaped `key=`) and comments from the
+  source scan, by rule rather than by exemption row.** The rooms carry dozens of dump keys and
+  this codebase argues about `card`/`breakout`/`theme` by name in its own doc comments; both
+  are ours and neither is a surface. Could have gone "flag them and exempt each one", which is
+  an exemption list with nothing legitimate in it. The `Exempt` list exists and is empty.
+- **XAML is scanned narrowly — only `Text`/`Content`/`ToolTip`/`Header`/`Title`, bindings
+  skipped.** Every other attribute value is a type name or a resource key, and
+  `Style="{StaticResource CardPanel}"` is our architecture correctly named. Flagging it is the
+  false positive that gets the file deleted. The trade is that a new player-visible attribute
+  kind is missed; the shell's XAML is 131 lines of chrome and every room is code, so tier 1
+  (the rendered VALUES) carries that weight.
+
+---
+
 ## 2026-09-05 (E-2e disposition table, lane-d)
 
 - **The four spine counts in the signed E-2e spec were corrected against the tree rather than
