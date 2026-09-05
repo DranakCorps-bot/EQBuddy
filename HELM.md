@@ -68,6 +68,15 @@ Do not put these back in Holds.
 ---
 
 
+### PR #320 — Fable Evolved opt-in telemetry plan (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #320 https://github.com/DranakCorps-bot/EQBuddy/pull/320 (`claude/fable-telemetry-20260905` → `main`, head `dcbe3c2d`; tip base `3ec285aa`) — `FABLE.md` Evolved opt-in telemetry item (TEL-001…006) + HELM-FEEDBACK LIVE ASK; docs/channel only.
+- **Ruling:** **SIGNED as the standing Evolved telemetry requirement.** Capture stays `someday` until Helm names a per-PR slot — **authorizes nothing today; do not kick TEL-PR1/2/3/4 from this sign.** Matches David's 2026-09-05 source (default-OFF opt-in; installId/appVersion/os heartbeats only; own backend + retention/delete; public README metrics with downloads≠uniques labeled; not folded into W/S/D/T).
+- **Ask answers:** (1) **Shape TEL-001…006 SIGNED as written** (consent + id-destroy on opt-out; key-set payload guard; cadence/definitions; own backend 90-day raw / id-free aggregates / IPs never persisted / delete endpoint; public metrics.json; heartbeat-only scope freeze). (2) **Sequencing SIGNED:** TEL-PR1/2 eligible for an idle seat **after Surface A (I-8) is underway**; TEL-PR3 after Bevel consent-copy pre-design; TEL-PR4 **only** at channel-open. Soft: do not steal E-3 product seats for TEL while soft-max (~2–3) is still on shell/nav. (3) **Backend location SIGNED:** separate public repo `DranakCorps-bot/eqbuddy-telemetry` (Cloudflare Worker + D1 recommended; TEL-004 is the contract, vendor may substitute). **Do not create the repo until TEL-PR2 starts.** Paid hosting = David money ask when it arises. (4) **SECURITY.md constraint SIGNED as binding** — "unlisted send = vulnerability" stays; heartbeat listed in the **same release** that ships the client; README "Zero telemetry" flips only then; Mobile scoped sentence re-read in TEL-PR4; **LEGACY-V1 "nothing phones home" stays forever** (v1 never gets telemetry).
+- **Scope hygiene:** Docs/channel only on #320 (`FABLE.md` + ask). No `src/`, no WhatsNew, no player door, no endpoint live yet. Bevel pre-design required before TEL-PR3. No crash/feature/session telemetry under this plan (TEL-006). Not a hold. **Not needs-david** (item 8 already David's; money + channel-open doors named inline). Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Soft parallel: #317 MERGED `3ec285aa` — prior shoot-pause lifts.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~12:30 PM CT
+
 ### PR #316 — T2 harnesses default to Evolved (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #316 https://github.com/DranakCorps-bot/EQBuddy/pull/316 (`claude/harness-shell-20260905-b` → `main`, head `9e1b62ca`) — AppHarness/shoot/mode-swap default `EQBUDDY_SHELL=1` + monitor 2; HELM-FEEDBACK ~11:25 AM CT ask (on branch).
