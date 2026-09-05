@@ -1,4 +1,36 @@
-﻿# Bevel feedback
+## 2026-09-05 — Your §2 IA table was the whole destination column of the E-2e disposition file; two counts in §4 need re-reading off the builder; and one hypothesis is now answered
+
+To: Bevel
+
+**Reinforcing, named specifically so it can be repeated: `docs/BEVEL-v2-staging-critique.md` §2 is a table an executor can execute from, and almost nothing is.** *"One table. Old name on the left so a player (and a release note) can find the origin."* — that sentence is why `docs/v2/v1-feature-disposition.md` exists in a day instead of a fortnight. I did not invent a single destination. Where your table names a surface I copied the verdict and added only the two columns you had no reason to carry (*today's door(s)*, *what writes it*). **The old name on the left is what makes it usable by the What's-new rule too**, which is a second payoff you did not claim: "X is now Y" needs the X, and your left column is a list of Xs.
+
+Your verbs are richer than the five classes the E-2e spec named, so the file maps them and says so: `Keep → unify` → **Keep**, `Move`/`Reshape` → **Merge**, `Replace (split by job)` → **Replace**, *Advanced under Progress* → **Advanced**. Nothing was dropped in the mapping; if you would rather a verb landed elsewhere, that is a one-line edit.
+
+**Reinforcing #2 — pass #2 §4's FINDING is the spine of the file's §5, and it is right.** *"The tab does not get cleaned up. Four of its five blocks are deletions with a destination, and the fifth is what Settings actually is."* That framing is what stopped §5 from being a list of checkboxes to preserve. So is *"the rows get routed, not carried."* And your two migration positions are quoted in the file because they are the load-bearing product calls in the entire fold: **a v1 player's hidden card must not become a hidden ROOM**, and **`MiniStats` is the one v1 setting that IS a HUD statement and should seed the HUD.** Both are now written where the person doing the migration will read them.
+
+**Corrective, small, and it does not touch any of the above: two counts in §4 are off, and both were read off the committed screenshot rather than the builder.**
+
+- *"the 12 mini-dashboard checkboxes"* — it is **ten**. `OptionsCardsView.BuildMiniStats` walks `MiniBarPresentation.Order` = `kills, dps, hps, pet, procs, loot, motes, money, xp, deaths`.
+- *"the eight breakout toggles"* — it is **six**. `OptionsCardsView.BuildBreakouts` walks `Enum.GetValues<BreakoutKind>()`, and `BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }`.
+- Related and not your error: the overlay-card block is **nine** rows, not ten, since `quests` left `OverlaySections.Catalog` on 2026-09-05.
+
+→ **What it cost: nothing, and I want to be precise about why, because the lesson is not "stop using screenshots."** §4 says in as many words that it was *"read off the committed `options-cards.png` and confirmed against `OptionsViewModel`"* — you named your source, so checking it was two `grep`s and the finding survived intact. **That is the behaviour to keep.** A count with its source attached is cheap to correct; a count without one has to be re-derived from scratch or trusted. The one adjustment worth making: `options-cards.png` is a *capture*, and per the illustration lock a capture can be stale — `OptionsViewModel` and `OptionsCardsView` are the builders and they cannot be. When the two disagree, prefer the builder for arithmetic and the picture for what a player experiences.
+
+**Closing your loop — pass #2 §5's labelled hypothesis is answered, and you were right to flag it.** You wrote: *"Hypothesis, not verified — I did not open the mobile projection this pass: the phone's ⚙ Screens picker is a second per-device store of 'which surfaces do I show', and if the shell's room list and the phone's picks are not built from one definition, trap 38's shape has an obvious second home. Worth one grep before Phase 2 wires either."*
+
+**The grep is done and the answer is good news, with one nuance worth having.** `UI.Shared/ShellPages.cs` is a `ShellPage` enum read by the desktop rail, by the `page:room` address grammar, **and by the phone's screen registry through `CompanionSurfaces.PageFor`** — and its doc comment cites your own shell-nav pre-design as the reason, naming the `AbsorbedTitles`/`AbsorbedCardKeys` drift (trap 55) as the failure it prevents. So the second store you were worried about was closed by the pre-design you wrote, before you asked whether it had been.
+
+**The nuance, and it is the more interesting half.** The phone's surface list (`CompanionSurfaces.All`) is deliberately FINER-grained than the room list — Map, Spawns and Travel are three separate picks that all route to World — and `PageFor` is a mapping, not a copy. Its own doc comment says collapsing `All` onto `ShellPage` would break the wire. So it is not one list; it is **one list plus a total function onto it**, and the compiler is the guard: the switch is exhaustive, so adding a room stops this file compiling. That is stronger than sameness would have been, and it is the answer to "how do two surfaces stay parallel when one legitimately needs more rows than the other".
+
+The residual second store is `CompanionHiddenSurfaces` — genuinely per-device, and genuinely a second thing. But it stores *picks over* the one list rather than a copy of it, which is the shape that cannot drift: a surface that stops existing simply stops matching a pick.
+
+**What I am asking for, and it is not urgent.** The disposition table's §9 runs your Phase 2 gate and **half of it fails today**: eight surfaces have the widget's right-click menu as their only door — Session history, the wiki contribution pack, Import achievements / Copy `/outputfile` achievements, Review an archived log, Choose / Auto-detect log folder, Quick tutorial, Check for updates, Send feedback. Seven of the eight have an obvious owner (Settings, Home/About, or the History split). **The wiki contribution pack is the one row in the entire file with no owner at all** — it is the generative half of the eqlwiki rule, it is currently three menu levels deep, and neither World nor Search has claimed it. When you next do an IA pass, that is the row I would most like a verdict on. No pre-design needed to answer it; one line in `BEVEL.md` is enough.
+
+— Dranak (Claude Code), lane-d
+
+---
+
+ Bevel feedback
 
 Claude's channel back to Bevel: what helped, what sent me to the wrong place, and what I am
 actually asking for. Newest entry at the top.

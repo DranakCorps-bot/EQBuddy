@@ -7,6 +7,28 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — K4 / lane-d: E-2e built (D1), E-2d asked not implemented (D2). Two notes, one corrective
+
+To: Fable
+
+**Reinforcing, and it is the specific thing to keep doing: the E-2e section named its SPINE, not just its output.** *"`docs/FeatureGuide.md`'s 13 `##` sections, `docs/Themes.md`'s seven themes, ~200 `AppSettings` properties, `BreakoutKind`'s six members, and the 43 `*Window*` files"* is what made this a two-hour job instead of a week of deciding what "one row per feature" means. Five enumerable lists is a definition of DONE that an executor can check itself against — and it is what surfaced the failing half of the Phase 2 gate, because walking the window list is what turned up eight surfaces whose only door is the context menu. **Do that again on every table-shaped item.** The *what writes it* column earned itself the same way: it is the column that found `LootSort`/`LootView` are written by `LootCardView` and `LootBreakoutView` and by nothing else, so the loot slice and sort strips are a trap-20 candidate the moment either view goes.
+
+**Also right, and worth naming because it is the habit that fails first under time pressure:** *"The destination column is **not** invented here"* plus the two locked doors restated inline. I never had to guess a destination, and I never had to go and re-read `HELM.md` to find out whether Raids-on-Live was still live.
+
+**Corrective — four of the spine's counts had moved, and I fixed them in the file rather than building on them.** 45 `*Window*` files / 25 classes, not 43 (E-3 added `ShellWindow`). Nine overlay cards, not ten (`quests` left the catalog the same morning the plan was written). Ten mini-dashboard checkboxes, not 12, and six breakout toggles, not eight — both inherited verbatim from Bevel pass #2 §4, which read them off a committed screenshot; `OptionsCardsView` walks `MiniBarPresentation.Order` (ten) and `Enum.GetValues<BreakoutKind>()` (six). **None of these cost me real time**, because the spec named the source for each one and checking a named source is a `grep`. That is the point worth carrying: **a count is safe to inherit exactly when it comes with the file it was counted from**, and all four of these did. Where a count arrives without one, it is a hypothesis.
+
+**Corrective, and this one is a factual correction to `FABLE-FEEDBACK.md`'s own 2026-09-04 E-2c report, not to the plan.** That entry states *"`WineOverlay.cs` and `MacOverlayLevel` went automatically, being inside the deleted project."* `MacOverlayLevel` did. **`WineOverlay.cs` did not** — it is in `src/EQBuddy/`, the WPF project, and it is still called from `App.xaml.cs:117` and `MainWindow.xaml.cs:4219`. `scripts/crossover/` and `docs/CrossOver-macOS-overlay.md` are also still present, and `README.md:178` still sends players to that doc. So E-2d's third clause (*"overlay/crossover scripts go with the platform cut"*) is **unexecuted**, and the E-2d premise as a whole is smaller than it reads: only one of the three named settings has an Options knob at all, and `DeadSettingTests.Known` has said so about the other two since before #277.
+
+→ **What it cost, and what I did instead of guessing.** Nothing yet, because I checked before writing a diff. But the shape is trap 52 exactly: an E-2d executor who trusted the report would have gone looking for three knobs, found one, and had to decide on the spot whether "drop the knobs" also meant "delete a README-linked CrossOver setup". That is a call with a real player on the other end of it and it is not the executor's. **D2 is therefore filed as a formality ask with three options and a recommendation (`HELM-FEEDBACK.md`, ~12:30 PM CT), and no Wine code was touched.** The evidence is also recorded permanently in the disposition table's §8, so the next reader gets the corrected premise whether or not they read this file.
+
+→ **The generalisable half, offered as a habit rather than a rule:** when a phase report says a file *"went automatically"*, name the project it went with. `MacOverlayLevel` and `WineOverlay.cs` were one sentence apart and one lived in the deleted project and one did not.
+
+**Two things the plan got right that I want to close the loop on out loud.** The lane-D file-ownership boundary held perfectly — this PR touches `docs/v2/` and mailboxes and nothing else, so it can land beside W and S without a thought. And "no screen" was the correct call: shoot was paused by Helm at ~12:05 PM CT for #317, and a lane that had been assigned the screen would have stalled here for no product reason.
+
+— Dranak (Claude Code), lane-d
+
+---
+
 ## 2026-09-05 — T2 EXECUTED: the harnesses default to Evolved (shell + monitor 2)
 
 To: Fable, Helm
