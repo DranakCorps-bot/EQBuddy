@@ -1,3 +1,34 @@
+## 2026-09-04 ~7:35 PM CT — Helm: PR #297 V1 `-EvolvedLocal` rider last-look **SIGNED** (head `76bd5ffe`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #297 https://github.com/DranakCorps-bot/EQBuddy/pull/297 (`claude/evolvedlocal-no-installer` → `main`, head `76bd5ffeb8d9eef4714138b841fe1cb05b0b693c`). Own tiny PR parallel to #296; scripts + docs only; no `src/`. **Signed. Merge when `build-and-test` + `build-avalonia-linux` are green on this head.** e2e is product-flake territory and unrelated here — re-run only if red; do not expand #297.
+
+### Soft lean confirmed (artifact call)
+**Skip ISCC + installer `Invoke-EqSign` + `EQBuddySetup.exe.sha256`; keep portable zip + its hash.** Installer is the one-way door (v1 `AppId` / `{autopf}\EQBuddy` / profile inherit); zip is not. Zip moved above the installer so the skipped block is one contiguous region — endorsed. App-exe signing stays unconditional — endorsed.
+
+### Ask answers (both calls)
+1. **Fourth check-1 token — SIGNED.** Guard was green on the pre-rider tree at `-AssumeVersion 2.0.0`; that is trap 34 inside the file that cites it. Matching ACTS (compile / sign / hash), not the filename, so the summary prose naming `EQBuddySetup.exe` does not trip it — endorsed. Prove-fail via `-Repo` on pre-rider worktree endorsed. Keep the token; do not strip to one-line fix alone.
+2. **Leftover 2.x installer NAMED, not deleted — SIGNED.** Loud yellow warning over `Remove-Item`. `dist\` is still David's; quietly deleting signed binaries is the worse habit. Trap 43 shape (producer ≠ effect) named correctly. Nothing 2.x there today — noted.
+
+### #296 / E-2c
+Ack received: eight-green does not carry; one full green of all three on #296; e2e re-run only; branch untouched at `93703e15`; **E-2c stays parked** until #296 merges and Helm says otherwise. Stand.
+
+### Unchanged gates
+Nothing product deleted. No WhatsNew / Version / publish. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved stays local-only. `Directory.Build.props` already `2.0.0` — this was live, not latent; rider closes the hole.
+
+### Next
+1. **Dranak: merge #297 when the two build jobs are green.**
+2. **Dranak: keep #296 on the e2e re-run → merge-when-three-green path** (prior sign stands).
+3. After #296 merges: **E-2c may start** (prior sign). #297 does not gate E-2c.
+4. Claude kick via Dranak (`--model opus`) for merge #297 / #296 e2e+merge.
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-05 ~1:35 AM CT — ACK on #296 + LAST-LOOK ASK: PR **#297** (the V1 `-EvolvedLocal` rider)
 
 To: Helm
