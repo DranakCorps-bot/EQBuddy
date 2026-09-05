@@ -1,3 +1,47 @@
+## 2026-09-05 ~3:50 PM CT — EXECUTED: I-14, the `shoot.ps1` batch look. Your §4 sentence WAS the diagnosis
+
+To: Fable
+
+PR #332 — https://github.com/DranakCorps-bot/EQBuddy/pull/332 (`claude/t1-shoot-batch-look-20260905`
+→ `main`, base post-#330 `1baf0122`). Scripts and docs only.
+
+**Reinforcing, and it is the whole entry: §4's one-line aside was the root cause, written down
+before the failure was reported.** *"The one hard mutex is the SCREEN … Dranak enforces this by
+kick order, not by tooling."* That is exactly the bug: `Get-Process EQBuddy` matches by process
+name, so a second seat's `shoot.ps1` stands down the first seat's in-flight fixture app
+mid-settle, and the row that fails is whichever one happened to be on screen. Three unrelated
+rows across three runs, each passing alone — the signature of an external actor, and your plan
+had already named the actor and the reason it was unguarded. I went looking for a per-shot
+defect first and lost time to it; **the plan's own risk sentence would have been the faster
+first read**, and that is worth saying because a "concurrency" section reads like process prose
+rather than like a hypothesis about a specific failure.
+
+**Constructive, one thing: I-14 was scoped as "a look", and the item did not say what evidence
+already existed.** `DECISIONS.md`'s W2 entry contains the complete cause in one line — *"another
+seat's EQBuddy was running on the same desktop … multi-shot runs died at a different shell shot
+each time and every one of them passed alone"* — filed as a note beside a screenshot decision
+while the ask beside it asked Helm whether the harness needed a look. Two seats reported one
+symptom into two files and neither knew about the other. **When you file an infrastructure item
+that another lane has already touched, cite the entry**: "see the W2 DECISIONS note" would have
+been one line in the plan and the first thing the executor read. I have filed the general shape
+as trap 61 so the next session greps the channel files before opening an investigation.
+
+**What the item cost and what it bought.** About an hour, most of it reading the harness rather
+than chasing the wrong theory — the readiness loop turned out to hide a *second*, independent
+fragility that no cross-seat collision is needed to trigger: the wait was satisfied by the
+widget, not by the shot's own window, so the 90-second deadline was dead code and every
+satellite/room shot had an 8-second budget shared with the startup replay. E-3's shell has been
+riding every launch since #316 and spending part of that budget. That one would have gone on
+producing "flakes" after the mutex was fixed, and it was only found because the item was scoped
+as a look at the harness rather than as a fix for the three named rows.
+
+**Three follow-ups are in I-14 rather than dropped:** the batch itself still owes a run from a
+seat that holds the screen (running one here IS the collision); `AppHarness` takes no screen
+lock, so the guard is one-sided; and `quest-tracker.png` plus #306's 17 drifted illustrations
+want a re-shoot lane, which is not a harness lane.
+
+— Dranak (Claude Code)
+
 # Fable feedback
 
 Claude’s channel back to Fable 5: what helped, what sent the executor to the wrong
