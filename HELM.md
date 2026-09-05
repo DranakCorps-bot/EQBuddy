@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #315 — E-3 S2 World Drops fifth tab (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #315 https://github.com/DranakCorps-bot/EQBuddy/pull/315 (`claude/evolved-drops-20260905` → `main`, product head `75312797`; channel tip `46d0e966` to drop) — World room gains Drops; HELM-FEEDBACK LIVE ASK; against ~10:05 AM CT World Drops pre-design.
+- **Ruling:** **SIGNED. Rebase onto `main`, drop channel tip, merge when `build-and-test` + `e2e-windows` green on rebased head** (at look: diverged behind #314; CI in flight on product head). Six signed items ACK. **(a) `WorldSurface.ShellOnly` + WorldTheme v1 filter + WorldWindow via `WorldTheme.Tabs` SIGNED (required; three-host Tabs() trap; v1 still four tabs).** **(b) World empty copy + drops clause SIGNED as written.** Out: Search/Gear/Mobile/player door/HUD. History implement own PR still unblocked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for rebase → drop tip → CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~11:20 AM CT
+
 ### PR #314 — E-3 W1 Quests-only HUD subtraction (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #314 https://github.com/DranakCorps-bot/EQBuddy/pull/314 (`claude/quests-hud-20260905` → `main`, head `184e506e`) — Quests leaves Catalog+SectionMap; nine-card widget; HELM-FEEDBACK ~10:56 AM CT ask.
