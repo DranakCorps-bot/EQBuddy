@@ -46,7 +46,21 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ### E-3 rooms — order after World + Gear: Quests / Home / Live / HUD subtraction sequencing — pre-design (Bevel, 2026-09-05)
 
-- **Priority:** `approved` (pre-design; gates Opus's next PR — Helm last-look requested tonight, HELM-FEEDBACK filed)
+> **PARTIALLY TAKEN 2026-09-05 (E-3 PR 3).** §1's first verdict — *Quests next, and it is
+> an extraction rather than a redesign* — is **done**: `QuestsView` is the lift,
+> `QuestsWindow` is a thin host beside it, `QuestsRoom` is the shell's, and Quests is on
+> the rail between Gear and World. §3's density ask is done with it: `RoomSinglePane` has
+> its first consumer and is shot at 840/839 (the 640 threshold, both sides), predicted
+> first. The five-rule inventory §1 asked for is answered in full in `BEVEL-FEEDBACK.md`.
+>
+> **What is still live in this item, and is why it is not deleted:** §1's Home and Live
+> verdicts (each still needs its own Bevel pass when Fable schedules it), §1's flag that the
+> **Home PR must change `ShellWindow`'s `ShellPage.Progress` default** — untouched by PR 3,
+> deliberately — §2's per-item HUD subtraction gate, §4's empty-state ruling (which PR 3 did
+> not reach: the Quests room's empty states are the view's own text and nothing was
+> re-centred), and §5.
+
+- **Priority:** `approved` (pre-design; §1-Quests and §3 taken by E-3 PR 3, the rest live)
 - **Place:** `src/EQBuddy/QuestsWindow.xaml.cs` (2,481 lines, LIFT held for own PR per #300 sign); `src/EQBuddy.UI.Shared/ShellPages.cs` (`RailOrder`/`Landed`; Home and Live not built); `src/EQBuddy/ShellWindow.xaml.cs` (`_page = ShellPage.Progress` default); `src/EQBuddy/MapView.cs:288`, `Companion/CompanionMapSource.cs:214` (empty-state text); `docs/BEVEL-v2-staging-critique.md` §2/§7/§8.
 - **Source:** tonight's ask — the next E-3 rooms pre-design, to unlock Opus for Quests / remaining rooms / HUD order after World+Gear. Against #299/#300 Helm-signed rulings (rooms-before-HUD amendment, `MinRoomWidth` 520, stars-stay-on-v1-windows) and my own signed nav pre-design (~9:25 PM CT).
 - **All verified in source on tip `cbbe4f31`** (post-#300 merge, product head `ae6947be`). **Not a hold. Not needs-david. #208/#261/#262 untouched. No implement.**

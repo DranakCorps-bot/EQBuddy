@@ -47,6 +47,12 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     /// them.</summary>
     public void Release() { }
 
+    /// <summary>Nothing to arrange. Every Progress tab is a single column of arithmetic —
+    /// there is no list beside a detail pane to collapse, which is the only thing
+    /// <see cref="ShellLayout.RoomSinglePane"/> decides. Empty with a reason rather than
+    /// absent, per the interface's own contract.</summary>
+    public void ApplyLayout(ShellLayout layout) { }
+
     private readonly MainWindow _main;
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();

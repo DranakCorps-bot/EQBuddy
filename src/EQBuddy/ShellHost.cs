@@ -13,9 +13,11 @@ namespace EQBuddy;
 /// the same argument <c>FollowingSurfaces</c> and <c>WidgetDump</c> already carry.
 ///
 /// **The shell has no player-facing door yet, and that is a decision rather than an
-/// oversight** (logged in DECISIONS.md). Its rail has one row, Evolved is local-only
-/// until the owner opens the channel, and a menu entry into a one-room shell is the
-/// unexplained-empty the Phase 2 gate forbids. What it DOES have is a reviewable door —
+/// oversight** (logged in DECISIONS.md). Its rail has four rows of a planned seven (PR 3),
+/// Evolved is local-only until the owner opens the channel, and a menu entry into a
+/// half-built shell is the unexplained-empty the Phase 2 gate forbids — a count that rises
+/// with each room does not change that answer, only the date it stops applying. What it
+/// DOES have is a reviewable door —
 /// <c>EQBUDDY_SHELL</c>, the same family as <c>EQBUDDY_PROGRESS</c> / <c>EQBUDDY_QUESTS</c>
 /// — because a surface nobody can reach reads as reviewed anyway (trap 22) and an absent
 /// control photographs as an unremarkable window (trap 29). The door for players lands

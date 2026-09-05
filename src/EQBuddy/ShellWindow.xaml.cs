@@ -14,19 +14,28 @@ namespace EQBuddy;
 /// exactly one room** (Progress), which is the World fold's own shape — host first — and
 /// the only one that keeps a half-finished shell coherent at every commit. **PR 2 adds the
 /// other two rooms that are a MOVE rather than a redesign**: World and Gear, whose Evolved
-/// IA verdict (*"Keep → unify"*) a v1 fold has already satisfied. Three rows, three rooms.
+/// IA verdict (*"Keep → unify"*) a v1 fold has already satisfied. **PR 3 adds the one that
+/// is a LIFT** — Quests, whose 2,481 lines of window-owned rendering had no view to hand a
+/// host until <see cref="QuestsView"/> came out of <see cref="QuestsWindow"/>. Four rows,
+/// four rooms.
 ///
 /// **What is deliberately NOT here, and why each absence is a decision:**
 ///
-///  * **Four of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
+///  * **Three of the seven rail rows.** <see cref="ShellPages.Landed"/> holds the rooms
 ///    that exist, and the rail draws that list rather than the full one. The honest
 ///    options for a half-built shell were a rail with the rooms that exist or seven rows
 ///    with the rest disabled, and this codebase already ruled on the second: *"an empty
 ///    class row gets no chevron — an affordance that opens nothing is a trap."* A room's
 ///    row lands in the PR that lands the room. Live does not exist yet (and Raids cannot
-///    leave Progress until it does), Home and Search are new surfaces, Settings is a room
-///    whose whole job is not being a launcher, and Quests is a lift rather than a host —
-///    2,481 lines of window-owned rendering, which deserves its own diff.
+///    leave Progress until it does), Home is a new surface — each of those two gets its own
+///    Bevel pass rather than riding another room's PR, per the Helm-signed Quests → Home →
+///    Live order — and Settings is a room whose whole job is not being a launcher.
+///  * **The default landing.** <see cref="_page"/> is <see cref="ShellPage.Progress"/>,
+///    which is right TODAY because it is the closest thing to "where do I stand" that
+///    exists — and it is a placeholder for a room nobody has built. **The Home PR must
+///    change it**, or every launch will land away from the one room designed to answer that
+///    question. Bevel filed the flag rather than trusting it would be remembered; PR 3 did
+///    not touch it, because Home owns it.
 ///  * **The Search INDEX.** The palette resolves against what the shell can currently
 ///    reach — the landed rooms and their tabs. The disposition-backed index that lets a
 ///    player find a feature by its old v1 name is E-2e's table, and Helm's sign is
@@ -234,9 +243,16 @@ public partial class ShellWindow : Window, IFollowingSurface
             ShellPage.Progress => new ProgressRoom(_main),
             ShellPage.Gear => new GearRoom(_main),
             ShellPage.World => new WorldRoom(_main),
+            ShellPage.Quests => new QuestsRoom(_main),
             _ => null,
         };
-        if (room is not null) _rooms[page] = room;
+        if (room is null) return null;
+        _rooms[page] = room;
+        // A room built AFTER the last resize has never been told the width. Without this
+        // the Quests room would arrive two-pane in a window that is already too narrow to
+        // hold two, and would only correct itself the next time the player dragged an
+        // edge — a wrong first frame, which is the frame a screenshot takes.
+        room.ApplyLayout(_layout);
         return room;
     }
 
@@ -355,14 +371,26 @@ public partial class ShellWindow : Window, IFollowingSurface
 
     // ---- degrade ---------------------------------------------------------------
 
+    /// <summary>The layout in force, kept so a room BUILT between two resizes can be told
+    /// it on arrival rather than waiting for the next drag. One field, written in exactly
+    /// one place — a second copy of the answer is trap 33.</summary>
+    private ShellLayout _layout = ShellLayoutPolicy.For(ShellLayoutPolicy.MinWidth);
+
     /// <summary>Apply the layout policy for this width. The arithmetic is in
     /// <see cref="ShellLayoutPolicy"/> where a unit test can reach it; this method is the
-    /// wiring, which is all the WPF layer should ever hold of a sum.</summary>
+    /// wiring, which is all the WPF layer should ever hold of a sum.
+    ///
+    /// **Both axes are applied here, to the rail and to the rooms.** PR 1 decided two
+    /// thresholds and could only wire one, because no room expressed the second; E-3 PR 3's
+    /// Quests room is the first that does. Pushing the answer down rather than letting each
+    /// room measure itself is deliberate — the room's share is what is left after the rail,
+    /// so only this window has both halves of the arithmetic.</summary>
     private void ApplyLayout()
     {
-        var layout = ShellLayoutPolicy.For(ActualWidth);
-        RailColumn.Width = new GridLength(layout.RailWidth);
-        foreach (var row in _rows.Values) row.ShowLabel(layout.RailLabelsVisible);
+        _layout = ShellLayoutPolicy.For(ActualWidth);
+        RailColumn.Width = new GridLength(_layout.RailWidth);
+        foreach (var row in _rows.Values) row.ShowLabel(_layout.RailLabelsVisible);
+        foreach (var room in _rooms.Values) room.ApplyLayout(_layout);
     }
 
     // ---- following the widget's tick -------------------------------------------
@@ -416,6 +444,10 @@ public partial class ShellWindow : Window, IFollowingSurface
         // against is a relationship, and holds on any monitor.
         $"shellWidth={(int)ActualWidth} " +
         $"shellRailLabels={(ShellLayoutPolicy.For(ActualWidth).RailLabelsVisible ? 1 : 0)} " +
+        // Axis 2 beside axis 1, and for the same reason: the two have DIFFERENT thresholds
+        // and conflating them is how a resize bug hides. Reported from the width so E2E can
+        // assert the relationship rather than a number off the desk it was written on.
+        $"shellRoomSinglePane={(ShellLayoutPolicy.For(ActualWidth).RoomSinglePane ? 1 : 0)} " +
         $"shellSearch={(SearchBox.IsVisible ? 1 : 0)} " +
         $"shellPalette={(PaletteLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
         (_rooms.TryGetValue(_page, out var shown) ? shown.DebugFacts() : "");

@@ -92,7 +92,7 @@ public sealed class QuestLedgerClearCountTests : IDisposable
     /// remains is the one that ships, and the hand-rolled subtraction it forbids is a
     /// within-lane regression, not a cross-lane one.</summary>
     [Theory]
-    [InlineData("EQBuddy", "QuestsWindow.xaml.cs")]
+    [InlineData("EQBuddy", "QuestsView.xaml.cs")]
     public void TheQuestWindowUsesTheStoresClearCount(string project, string file)
     {
         var src = Path.GetFullPath(Path.Combine(

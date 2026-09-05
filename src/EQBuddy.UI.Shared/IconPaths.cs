@@ -46,6 +46,11 @@ public static class IconPaths
         ["Star"] = "M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73-1.64 7.03L12 17.27 18.18 21l-1.63-7.03L22 9.24ZM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4Z",
         ["StarFilled"] = "M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27Z",
         ["ChevronRight"] = "M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41Z",
+        // ChevronRight mirrored about x=12, so the pair reads as one control at one
+        // optical weight. Added in E-3 PR 3 for the single-pane room's "back to the list"
+        // — the first place in the app that points BACKWARD, and a vector rather than the
+        // ‹ it would otherwise have been (#148, #166).
+        ["ChevronLeft"] = "M15.41 16.59 10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41Z",
         ["ChevronDown"] = "M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41Z",
         ["Map"] = "M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5ZM15 19l-6-2.11V5l6 2.11V19Z",
         ["Quest"] = "M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6Z",

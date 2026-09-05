@@ -34,6 +34,13 @@ public class DesignRatchetTests
     [
         "EQBuddy/QuestsWindow.xaml",
         "EQBuddy/QuestsWindow.xaml.cs",
+        // The Gate 2 CONTENT after E-3 PR 3 lifted it out of the window above and into a
+        // view the Evolved shell can host too. The rows move WITH the surface — a ratchet
+        // that stayed pointed at the window would read as coverage of 2,400 lines that had
+        // walked out from under it (trap 34's shape), and the window rows stay because
+        // what is left there is still held to the system.
+        "EQBuddy/QuestsView.xaml",
+        "EQBuddy/QuestsView.xaml.cs",
         // Renamed EQBuddy/SpawnsWindow.xaml(.cs) -> SpawnsView.xaml(.cs) in World PR 1:
         // the Gate 3 content moved into the view. World PR 2 retired the thin
         // SpawnsWindow.cs/MapWindow.cs/TravelWindow.cs hosts (both lanes) into
@@ -86,6 +93,10 @@ public class DesignRatchetTests
         // exists to keep a file in.
         "EQBuddy/WorldRoom.cs",
         "EQBuddy/GearRoom.cs",
+        // E-3 PR 3's room, on the day it lands. It is chrome over a view that is already
+        // on the system — one caption and two grid rows — so the only numbers it carries
+        // are spacing tokens, which is exactly the state this list keeps a file in.
+        "EQBuddy/QuestsRoom.cs",
 
         // ---- Five Avalonia rows left this list with the platform in E-2 (2026-09-04):
         // the widget, EqFoldLabel, Quests, Loot and the wiki pack. **The list only ever

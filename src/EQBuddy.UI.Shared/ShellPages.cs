@@ -69,14 +69,25 @@ public static class ShellPages
     /// wishlist plus what you picked up, and <c>WorldWindow</c> is the map, the camps, the
     /// route and the travels. So hosting them is a move rather than a redesign, which is
     /// the only shape that keeps a half-built shell coherent at every commit. The rooms
-    /// that are NOT here are held back by a decision and not by effort: Live does not
-    /// exist yet (and Raids cannot leave Progress until it does), Home and Search are
-    /// genuinely new surfaces, Settings is a room whose whole job is not being a launcher,
-    /// and Quests is 2,481 lines of window-owned rendering — a lift, not a host, and one
-    /// that deserves its own diff.
+    /// that are NOT here are held back by a decision and not by effort.
+    ///
+    /// **PR 3 added Quests, and it took its own diff to do it.** Bevel's signed pre-design
+    /// sorts rooms by which IA verdict is already PAID FOR: World and Gear were a MOVE
+    /// because a v1 fold had already made each of them one window of exactly the tabs a
+    /// room needs. Quests had the tabs and no view — 2,481 lines of window-owned rendering
+    /// with nothing an <c>IShellRoom</c> could be handed — so it was a LIFT, which is the
+    /// shape that has cost this repo real bugs, and it landed alone for that reason rather
+    /// than for its size. <c>QuestsView</c> is that lift; <c>QuestsWindow</c> is now a thin
+    /// host beside it.
+    ///
+    /// **The three still missing are held back by a decision.** Live does not exist yet
+    /// (and Raids cannot leave Progress until it does) and Home is a genuinely new surface
+    /// — each gets its own Bevel pass rather than riding another room's PR, which is what
+    /// the Helm-signed order Quests → Home → Live says in as many words. Settings is a
+    /// room whose whole job is not being a launcher.
     /// </summary>
     public static readonly IReadOnlyList<ShellPage> Landed =
-        [ShellPage.Progress, ShellPage.Gear, ShellPage.World];
+        [ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World];
 
     /// <summary>
     /// The rooms INSIDE a room — the second half of a <c>page:room</c> address — read from
@@ -103,6 +114,12 @@ public static class ShellPages
     {
         ShellPage.Progress => [.. ProgressSurface.Tabs().Select(h => (h.Label, h.Key))],
         ShellPage.Gear => [.. LootSurface.Tabs().Select(h => (h.Label, h.Key))],
+        // Counts omitted deliberately: this table names the rooms, and a badge is a
+        // reading of the player's progress that belongs to the strip the room draws for
+        // itself. `QuestSurface.Tabs()` returns all four either way — an empty checklist
+        // still gets its tab, because a Sky room that vanished when nothing was ticked
+        // would be unreachable to exactly the player who most needs to find it.
+        ShellPage.Quests => [.. QuestSurface.Tabs().Select(h => (h.Label, h.Key))],
         ShellPage.World => [.. WorldSurface.Tabs().Select(h => (h.Label, h.Key))],
         _ => [],
     };

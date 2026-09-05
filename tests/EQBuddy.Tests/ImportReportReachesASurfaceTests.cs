@@ -63,10 +63,10 @@ public class ImportReportReachesASurfaceTests
     /// trap 34's shape, a guard that reads as coverage and checks nothing.</summary>
     public static readonly (string Project, string File, string Property, string Why)[] SecondHosts =
     [
-        ("EQBuddy", "QuestsWindow.xaml.cs", "LastAchievementsImport",
+        ("EQBuddy", "QuestsView.xaml.cs", "LastAchievementsImport",
             "The Sky tab. Same ImportReportView, not a Sky-flavoured variant — one more "
             + "host, one more line, and the Undo rule stays in one place."),
-        ("EQBuddy", "QuestsWindow.xaml.cs", "LastInventoryImport",
+        ("EQBuddy", "QuestsView.xaml.cs", "LastInventoryImport",
             "The inventory dump proves Sky rewards turned in (Hateborne, 2026-09-03), so "
             + "its report has the same second audience the achievements one does."),
     ];

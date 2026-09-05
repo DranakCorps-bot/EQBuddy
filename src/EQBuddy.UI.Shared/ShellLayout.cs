@@ -5,8 +5,8 @@ namespace EQBuddy.UI.Shared;
 /// <param name="RailLabelsVisible">False once the rail is icons-only.</param>
 /// <param name="RoomSinglePane">
 /// True once a list+detail room must collapse to one pane with a back affordance.
-/// **No room expresses this yet** — Progress is single-column, so PR 1 has no consumer.
-/// It is decided here anyway because the two axes have DIFFERENT thresholds and
+/// Quests is the first consumer (E-3 PR 3); Progress stays single-column.
+/// It is decided here because the two axes have DIFFERENT thresholds and
 /// conflating them is how a resize bug hides: the rail can have plenty of room for
 /// labels while the room under it is already too narrow to split, and vice versa.
 /// </param>
@@ -69,10 +69,31 @@ public static class ShellLayoutPolicy
 
     /// <summary>
     /// Axis 2's threshold: a list+detail room collapses to one pane once the room itself
-    /// is under the width its two panes need. <c>HistoryWindow</c>'s shipped 330-wide
-    /// list beside its detail is the measured pair this comes from.
+    /// is under the width its two panes need.
+    ///
+    /// **640 → 700 in E-3 PR 3, and a PICTURE is what moved it.** The old number came from
+    /// <c>HistoryWindow</c>'s shipped 330-wide list beside its detail — a real measured
+    /// pair, and the wrong room's. This axis had no consumer at all from PR 1 until the
+    /// Quests room arrived, and that room's list is <b>400</b> wide (Gate 2's shipped
+    /// number, not something the shell may re-decide), so at a 640 room the detail pane got
+    /// what was left: about 190 units. The shot at that width broke a quest title mid-word
+    /// — *"Bone / Chips / (Kaladi / m)"* — and clipped the reward tiles, which are capped
+    /// at 220 and are the widest thing that pane draws.
+    ///
+    /// **700 is the measured pair for the room that actually consumes it**: 400 for the
+    /// list, and ~300 for a detail pane that can hold a 220-unit reward tile plus the
+    /// card's own padding and border. It stays clear of
+    /// <see cref="RailLabelWidth"/> (720) on purpose — the two axes must not collapse into
+    /// one number, which is the whole reason they are separate constants.
+    ///
+    /// **The rule this follows is <see cref="MinRoomWidth"/>'s own**: the constant is a
+    /// CLAIM, the screenshot is what tests it, and when a room clips at the threshold it is
+    /// the number that moves — not the shot, and not a horizontal scrollbar, which would
+    /// hide a layout failure behind an affordance. Widening the room was the only fix in
+    /// scope; making the 400 list proportional would have been redesigning a surface this
+    /// PR was signed to lift unchanged.
     /// </summary>
-    public const double SplitRoomWidth = 640;
+    public const double SplitRoomWidth = 700;
 
     /// <summary>Decide both axes for a window width. Callers pass the WINDOW width; the
     /// room's share is what is left after the rail, which is why the two answers cannot

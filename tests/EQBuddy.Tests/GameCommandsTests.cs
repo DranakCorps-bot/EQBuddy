@@ -68,7 +68,12 @@ public class GameCommandsTests
         // the notice a curated list exists to give.
         ("EQBuddy/InventoryView.cs", nameof(GameCommands.OutputfileInventory),
             "the tab IS the dump — ranked by slot, or listed by bag"),
-        ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileInventory),
+        // All three Quests rows moved from EQBuddy/QuestsWindow.xaml.cs to QuestsView.xaml.cs
+        // in E-3 PR 3 (the content lift into the Evolved shell) — the same move MapView's
+        // row made in World PR 1, and this list following the surface is exactly the notice
+        // it exists to give. The commands did not change; their host did, and there are two
+        // of them now.
+        ("EQBuddy/QuestsView.xaml.cs", nameof(GameCommands.OutputfileInventory),
             "the held and ready views answer what-can-I-turn-in from bags and bank"),
         // The Sky tab is FED by the achievements dump — a hand-in never appears in the
         // log, so that dump is the only thing that can say a reward was turned in before
@@ -76,13 +81,13 @@ public class GameCommandsTests
         // widget menu and the Raids card, neither of which is where someone looking at
         // Sky rewards is looking. Same absence as the Gear tab in 2026-08-20, found the
         // same way: by asking what a surface needs rather than what it must not carry.
-        ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileAchievements),
+        ("EQBuddy/QuestsView.xaml.cs", nameof(GameCommands.OutputfileAchievements),
             "the Sky tab's turn-in state comes from the achievements dump"),
         // The Unlocks tab is built from TWO dumps and neither is a one-off — a race unlock
         // moves every time you grind faction — so both buttons are on the populated
         // surface, not only in an empty state (#217's rule, and the reason the Gear tab's
         // copy is not empty-state-only either).
-        ("EQBuddy/QuestsWindow.xaml.cs", nameof(GameCommands.OutputfileFaction),
+        ("EQBuddy/QuestsView.xaml.cs", nameof(GameCommands.OutputfileFaction),
             "the Unlocks tab's race progress is faction standings, which the log never sees"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),

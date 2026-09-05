@@ -15,6 +15,55 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 PR 3, the Quests room)
+
+- **The lift is a `UserControl` carrying the WHOLE bordered panel, not a chrome/content
+  split.** `QuestsView.xaml` takes the title row, the close button and the drag handler
+  with it; the window is a `ContentControl` around it. The other way: leave the title row
+  in the window and lift only the body, which reads tidier. Declined because the window is
+  borderless and hand-drawn — there is no clean seam — and `SpawnsView` (World PR 1) had
+  the identical shape for the identical reason. `HideOwnTitleBar()` is how the shell's room
+  stops a second title bar drawing under the native one, exactly as `WorldRoom` does.
+- **The room draws the character heading ("Quest Tracker — Dranak") as a caption; the
+  window keeps it in its title row.** The other way: drop it in the room, the way World and
+  Gear dropped their window titles. Declined because no other room's title carried the
+  CHARACTER and the shell's native title bar reads "EQBuddy — Quests" and cannot say it —
+  dropping it is trap 26's sentence verbatim, the data surviving a move and the thing that
+  showed it not. Eight lines, one producer (`QuestsView.Heading`), two consumers. Flagged
+  to Bevel as a room-chrome ruling that is theirs to overturn.
+- **`IShellRoom` grew `ApplyLayout(ShellLayout)` rather than the room measuring itself.**
+  The other way: have `QuestsRoom` read its own `ActualWidth` and skip touching an
+  interface three other rooms implement. Declined because the threshold is about the room's
+  share of the window AFTER the rail, arithmetic only the host has both halves of — a room
+  computing it would be a second producer of one boolean, disagreeing exactly at the
+  boundary where a resize bug lives (trap 33). The other three implement it empty with a
+  stated reason, the contract `Release()` already set.
+- **The shell's room paints with `PaintNow()` every tick, dropping the view's 2-second
+  throttle.** The other way: forward `MaybeRefresh()` the way `WorldRoom` forwards
+  `MapView.MaybeRefresh()`. Declined because a 2 s throttle nested inside the shell's 1 s
+  tick makes the room report last tick's row counts beside this tick's totals in a dump
+  whose whole contract is one moment — trap 56, which cost the E2E suite four rounds. The
+  signature check inside `Refresh` is what makes the un-throttled call free. The v1 window
+  keeps its throttle; its own tick is the only thing driving it.
+- **`ShellLayoutPolicy.SplitRoomWidth` 640 → 700, because the shot the signed ruling asked
+  for disproved the 640.** The other way: keep the constant a Helm-signed number names and
+  let the room live with it. Declined on the picture: at a 640 room the detail column is
+  ~190 units, the quest title breaks MID-WORD and the 220-capped reward tiles clip. 640 was
+  `HistoryWindow`'s measured pair off a 330-wide list; this room's list is 400, Gate 2's
+  shipped number that a lift may not re-decide. `MinRoomWidth`'s own rule is the precedent —
+  *"if a room clips horizontally there, this constant is what moves, not the shot"* — and
+  Bevel §3 predicted the class of finding. 700 stays clear of `RailLabelWidth` (720) so the
+  two axes cannot collapse into one number. **Flagged to Helm as an edit to a number its
+  sign named**, with the offer to revert. The disproving picture is NOT committed: an
+  illustration of a state the code no longer produces is the drift the lock exists to stop.
+- **`docs/Architecture.md` §1 and `docs/TestPlan.md` §5 project sizes re-measured** (EQBuddy
+  75→85 files / 23,159→25,053 lines; UI.Shared and Companion likewise). They were inside
+  `DocumentationSizeTests`' 10% tolerance before this PR and two new files tipped the file
+  count out. Re-measured rather than re-anchored — the numbers are the repo's, not a guess.
+- **`IconPaths` gained `ChevronLeft`** (ChevronRight mirrored about x=12) for the
+  single-pane "all quests" button. The other way: reuse `Undo`, which exists. Declined —
+  it means something else, and a vector is what this repo uses instead of a `‹` (#148/#166).
+
 ## 2026-09-05 (E-3 PR 2, the World and Gear rooms)
 
 - **PR 2 moves two rooms in, and they are the two whose Evolved IA verdict a v1 fold has

@@ -77,25 +77,33 @@ public class ShellNavigationTests
         Assert.Equal(Enum.GetValues<ShellPage>().Length, ShellPages.RailOrder.Count);
     }
 
-    /// <summary>E-3 PR 1 landed one room; PR 2 landed two more. **This row is meant to be
-    /// edited** — a room joins `Landed` in the PR that lands it, and this assertion is the
-    /// reminder that doing so is a deliberate act rather than a line someone slid in. It
-    /// asserts the ORDER too, because `Landed` is filtered through `RailOrder` when the
-    /// rail is drawn and a list that agreed on membership while disagreeing on order would
-    /// be a rail nobody could predict from this file.</summary>
+    /// <summary>E-3 PR 1 landed one room; PR 2 landed two more; PR 3 landed Quests.
+    /// **This row is meant to be edited** — a room joins `Landed` in the PR that lands it,
+    /// and this assertion is the reminder that doing so is a deliberate act rather than a
+    /// line someone slid in. It asserts the ORDER too, because `Landed` is filtered through
+    /// `RailOrder` when the rail is drawn and a list that agreed on membership while
+    /// disagreeing on order would be a rail nobody could predict from this file.
+    ///
+    /// **Quests sits between Gear and World here, and that is the whole assertion about
+    /// rail position.** `BuildRail` walks `RailOrder` filtering by this list, so a room
+    /// joining inserts itself in the fixed order automatically — correct by construction,
+    /// and invisible if it silently is not. A build that appended new rooms at the bottom
+    /// would look identical in every way except this line and the `shell-quests`
+    /// screenshot, which is why the pre-design asked for both.</summary>
     [Fact]
-    public void ThreeRoomsHaveLandedSoFar() =>
-        Assert.Equal([ShellPage.Progress, ShellPage.Gear, ShellPage.World], ShellPages.Landed);
+    public void FourRoomsHaveLandedSoFar() =>
+        Assert.Equal([ShellPage.Progress, ShellPage.Gear, ShellPage.Quests, ShellPage.World],
+            ShellPages.Landed);
 
-    /// <summary>The four that have NOT landed, named — because "which rooms are missing"
+    /// <summary>The three that have NOT landed, named — because "which rooms are missing"
     /// is the question a reader of `Landed` actually has, and a positive list cannot
     /// answer it. Each is held back by a decision rather than by effort: Live does not
-    /// exist yet, Home and Search are new surfaces, Settings is a room whose whole job is
-    /// not being a launcher, and Quests is a lift rather than a host.</summary>
+    /// exist yet, Home is a new surface (and each gets its own Bevel pass rather than
+    /// riding another room's PR, per the Helm-signed Quests → Home → Live order), and
+    /// Settings is a room whose whole job is not being a launcher.</summary>
     [Theory]
     [InlineData(ShellPage.Home)]
     [InlineData(ShellPage.Live)]
-    [InlineData(ShellPage.Quests)]
     [InlineData(ShellPage.Settings)]
     public void TheRoomsThatHaveNotLandedDrawNoRailRow(ShellPage page) =>
         Assert.DoesNotContain(page, ShellPages.Landed);
@@ -155,6 +163,8 @@ public class ShellNavigationTests
                         ? ProgressSurface.KeyFor(t) : null,
                     ShellPage.Gear => LootSurface.TabForKey(key) is { } t
                         ? LootSurface.KeyFor(t) : null,
+                    ShellPage.Quests => QuestSurface.TabForKey(key) is { } t
+                        ? QuestSurface.KeyFor(t) : null,
                     ShellPage.World => WorldSurface.TabForKey(key) is { } t
                         ? WorldSurface.KeyFor(t) : null,
                     _ => null,
@@ -182,6 +192,7 @@ public class ShellNavigationTests
     {
         Assert.Equal(ProgressSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Progress).Count);
         Assert.Equal(LootSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Gear).Count);
+        Assert.Equal(QuestSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Quests).Count);
         Assert.Equal(WorldSurface.Tabs().Count, ShellPages.Rooms(ShellPage.World).Count);
     }
 
@@ -198,6 +209,14 @@ public class ShellNavigationTests
     [InlineData("shellWorld", "a=1 b=2", "shellWorldA=1 shellWorldB=2")]
     [InlineData("shellWorld", "spawnsRows=0 spawnsFollow=1",
         "shellWorldSpawnsRows=0 shellWorldSpawnsFollow=1")]
+    // **The convention is `shell` + THE VIEW'S OWN KEY, and the two spellings above and
+    // below both mean that.** `MapView` reports `mapZones`, which carries no room name, so
+    // the World room passes `shellWorld`. `QuestsView` reports `questsTab`, which already
+    // does, so the Quests room passes `shell` — and passing `shellQuests` produced
+    // `shellQuestsQuestsTab`, which the E2E suite caught on its first run. Pinned here so
+    // the next room with a self-naming view does not rediscover it the same way.
+    [InlineData("shell", "questsTab=general questsRows=21",
+        "shellQuestsTab=general shellQuestsRows=21")]
     public void FactsAreRekeyedUnderTheHostsPrefix(string prefix, string facts, string expected) =>
         Assert.Equal(expected, ShellDumpFacts.Prefixed(prefix, facts));
 
@@ -248,6 +267,32 @@ public class ShellNavigationTests
     {
         Assert.True(ShellLayoutPolicy.For(ShellLayoutPolicy.RailLabelWidth).RailLabelsVisible);
         Assert.False(ShellLayoutPolicy.For(ShellLayoutPolicy.RailLabelWidth - 1).RailLabelsVisible);
+    }
+
+    /// <summary>
+    /// Axis 2's boundary, asserted exactly — and it was worth writing the day the axis got
+    /// its first consumer (E-3 PR 3's Quests room), because until then
+    /// `RoomSinglePane` was a formula nothing exercised.
+    ///
+    /// **Derived from the two constants rather than typed**, so it follows a change to
+    /// either. The room's share is what is left after the rail, which is exactly the
+    /// arithmetic a room measuring itself would get wrong — and the boundary is where a
+    /// resize bug lives, so it is asserted rather than implied by a wide case and a floor
+    /// case.
+    /// </summary>
+    [Fact]
+    public void TheRoomSplitThresholdIsExactAtItsOwnWidth()
+    {
+        // Wide enough to leave the room exactly SplitRoomWidth once the rail has taken its
+        // share. One unit narrower and the room can no longer hold two panes.
+        var atThreshold = ShellLayoutPolicy.SplitRoomWidth + DesignTokens.RailWidthExpanded;
+        Assert.False(ShellLayoutPolicy.For(atThreshold).RoomSinglePane);
+        Assert.True(ShellLayoutPolicy.For(atThreshold - 1).RoomSinglePane);
+        // And the rail is expanded on BOTH sides of it, which is what makes this a test of
+        // one axis rather than of two moving together — the whole reason the thresholds
+        // are separate numbers.
+        Assert.True(ShellLayoutPolicy.For(atThreshold).RailLabelsVisible);
+        Assert.True(ShellLayoutPolicy.For(atThreshold - 1).RailLabelsVisible);
     }
 
     /// <summary>A layout pass can run before the window has a measured size. It must

@@ -130,6 +130,14 @@ public class ShellHostTests
     [InlineData("gear", "shellGearTab", "loot")]
     [InlineData("gear:gear", "shellGearTab", "gear")]
     [InlineData("gear:inventory", "shellGearTab", "inventory")]
+    // E-3 PR 3's room. `general` is the catalog and the only tab with a detail pane;
+    // `unlocks` is the one whose own window could not be opened for review at all until
+    // SetTab started resolving through Core's key table, which is why it is asserted here
+    // rather than assumed to come along with the other three.
+    [InlineData("quests", "shellQuestsTab", "general")]
+    [InlineData("quests:epic", "shellQuestsTab", "epic")]
+    [InlineData("quests:sky", "shellQuestsTab", "sky")]
+    [InlineData("quests:unlocks", "shellQuestsTab", "unlocks")]
     public void EveryLandedRoomIsReachableByItsOwnAddress(string address, string key, string room)
     {
         using var app = new AppHarness(environment: OpenOn(address));
@@ -226,6 +234,164 @@ public class ShellHostTests
         // than the host body it is nested inside.
         Assert.True(list >= 120 && list <= Math.Max(120, body),
             $"gear list cap {list} does not follow room body {body}; dump was: {app.Artifacts()}");
+    }
+
+    // ---- E-3 PR 3: the Quests room ---------------------------------------------
+
+    /// <summary>
+    /// **Two hosts of the LIFTED surface must report the same numbers**, and this is the
+    /// row that makes the lift a lift rather than a rewrite.
+    ///
+    /// World and Gear were a MOVE: their v1 windows were already compositions of shared
+    /// views, so "both hosts agree" mostly asserted that nothing had been retyped. Quests
+    /// was 2,481 lines of window-owned rendering with no view at all, and the whole claim
+    /// of E-3 PR 3 is that those lines came out INTACT — same rules, same wording, same
+    /// counts, now with two hosts instead of one. Every key below is the SAME string
+    /// <c>QuestsView.DebugFacts</c> hands both of them, re-prefixed for the shell
+    /// (<c>ShellDumpFacts</c>), so this comparison could not have been written at all if
+    /// the room had reported hand-written copies of the numbers (trap 58).
+    ///
+    /// Both hosts are open at once and both are on the catalog tab — the only tab with a
+    /// list to count. On WPF a shared view would not throw, it would silently vanish from
+    /// whichever host drew it first (trap 45), which these counts would catch.
+    /// </summary>
+    [Fact]
+    public void TheShellAndTheQuestsWindowAgreeAboutTheSameRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "quests:general",
+            ["EQBUDDY_QUESTS"] = "general",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellQuestsTab", "general", "both hosts to reach the catalog room");
+        app.WaitForDump("questsTab", "general", "and the v1 window with them");
+        // A floor before the comparisons, per trap 39: two hosts that both rendered
+        // NOTHING would agree perfectly, and that is the failure a lift is most likely to
+        // produce. The number itself is the fixture's and is not asserted.
+        Assert.True(app.DumpValue("shellQuestsRows") >= 1,
+            $"the room rendered no quest rows at all; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("questsTabs"), app.DumpValue("shellQuestsTabs"));
+        Assert.Equal(app.DumpValue("questsModes"), app.DumpValue("shellQuestsModes"));
+        Assert.Equal(app.DumpValue("questsRows"), app.DumpValue("shellQuestsRows"));
+        Assert.Equal(app.DumpValue("questsSuppressed"), app.DumpValue("shellQuestsSuppressed"));
+        Assert.Equal(app.DumpValue("questsSelected"), app.DumpValue("shellQuestsSelected"));
+        Assert.Equal(app.DumpValue("questsReadySummary"),
+            app.DumpValue("shellQuestsReadySummary"));
+    }
+
+    /// <summary>
+    /// The five Helm-signed presentation rules, asserted to have survived the lift into the
+    /// second host — which is the thing Bevel's pre-design flagged as the risk of a LIFT
+    /// over a MOVE (*"a rule with a home and no reader"*, trap 20's mirror).
+    ///
+    /// **A picture cannot say any of this.** Four of the five are on the Sky tab, and an
+    /// absent control photographs as an unremarkable panel (trap 29): the ⧉ copies of
+    /// <c>/outputfile achievements</c> and <c>/outputfile inventory</c> that feed the tab,
+    /// and the two #243 leftover bands whose fold state is session-only. So they are
+    /// counted off the real visual tree in BOTH hosts and compared.
+    ///
+    /// The counts themselves are whatever the fixture produces — asserting a number would
+    /// be asserting the profile this was written against. What must hold is that the two
+    /// hosts see the same thing.
+    /// </summary>
+    [Fact]
+    public void TheSkyTabsRulesSurvivedTheLiftIntoTheSecondHost()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "quests:sky",
+            ["EQBUDDY_QUESTS"] = "sky",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellQuestsTab", "sky", "both hosts to reach the Sky room");
+        app.WaitForDump("questsTab", "sky", "and the v1 window with them");
+        // The two commands the tab is FED by. `GameCommandsTests` proves the source is
+        // shared; only a launched app can say the buttons are on screen in both hosts.
+        //
+        // **Asserted as PRESENT and then as equal, in that order** — trap 39's lesson:
+        // `Assert.Equal(0, 0)` passes forever and reads as coverage, and 0 is exactly what
+        // a room that had silently lost the affordance would report. These two rows have a
+        // must-list guarantee behind them (`GameCommandsTests.SurfacesNeedingACommand`), so
+        // there is a floor to assert; the band counts below have none and stay equality-only.
+        Assert.True(app.DumpValue("shellQuestsSkyCopyCmd") >= 1,
+            $"the room's ⧉ /outputfile achievements is missing; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("shellQuestsSkyInvCopyCmd") >= 1,
+            $"the room's ⧉ /outputfile inventory is missing; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("questsSkyCopyCmd"), app.DumpValue("shellQuestsSkyCopyCmd"));
+        Assert.Equal(app.DumpValue("questsSkyInvCopyCmd"),
+            app.DumpValue("shellQuestsSkyInvCopyCmd"));
+        // The three #243/#129 bands and their session-only folds.
+        Assert.Equal(app.DumpValue("questsSkyReady"), app.DumpValue("shellQuestsSkyReady"));
+        Assert.Equal(app.DumpValue("questsSkyLeftoverA"),
+            app.DumpValue("shellQuestsSkyLeftoverA"));
+        Assert.Equal(app.DumpValue("questsSkyLeftoverB"),
+            app.DumpValue("shellQuestsSkyLeftoverB"));
+        Assert.Equal(app.DumpValue("questsSkyReadyOpen"),
+            app.DumpValue("shellQuestsSkyReadyOpen"));
+        // A checklist tab has nothing to select, so BOTH hosts collapse the detail pane
+        // and give its width to the rows — the Gate 2 rule, unchanged by the lift and
+        // unchanged by single-pane, which only ever applies to the catalog.
+        Assert.Equal(0, app.DumpValue("shellQuestsDetailShown"));
+        Assert.Equal(1, app.DumpValue("shellQuestsListShown"));
+        // And the caption that replaced the window's title row still says something. Its
+        // LENGTH, not its text: the name in it is the player's character.
+        Assert.True(app.DumpValue("shellQuestsHeading") > 0,
+            $"the room's character caption is empty; dump was: {app.Artifacts()}");
+    }
+
+    /// <summary>
+    /// **Degrade axis 2, reaching a room for the first time since PR 1 decided it.**
+    /// `ShellLayout.RoomSinglePane`'s own comment has said *"no room expresses this yet"*
+    /// for two PRs; the Quests catalog is a list beside a detail pane, so it is the first
+    /// thing that can disprove the formula.
+    ///
+    /// **Asserted as the RELATIONSHIP, never as a picture.** A hosted runner is 1024×768,
+    /// so "the room shows one pane" would be an assertion about the desk this was written
+    /// on. The dump carries the INPUT (`shellWidth`) beside the shell's answer
+    /// (`shellRoomSinglePane`) beside the room's state (`shellQuestsSinglePane`), and what
+    /// is asserted is that all three follow from each other — which holds at any size the
+    /// window is actually given.
+    ///
+    /// **The third of those is the one with teeth**, and it is trap 42's shape: PR 1's
+    /// arithmetic was correct, green and unwired, and the gap between "the policy says so"
+    /// and "the room did it" is exactly where a fix can sit in the binary for two builds
+    /// without being in effect.
+    /// </summary>
+    [Theory]
+    // Both sides of the threshold: the room's share is the window minus the 200-wide rail,
+    // so at 900 it is exactly SplitRoomWidth (700) and splits, and one unit narrower it
+    // cannot. The rail is expanded at both (RailLabelWidth is 720), which is what makes
+    // this a test of ONE axis. The pair moved from 840/839 when the first screenshot at
+    // the old 640 threshold broke a quest title mid-word — see ShellLayoutPolicy.
+    [InlineData("900x640")]
+    [InlineData("899x640")]
+    [InlineData(null)]
+    public void TheQuestsRoomFollowsTheSplitThresholdTheWindowActuallyHas(string? size)
+    {
+        using var app = new AppHarness(environment: OpenOn("quests:general", size));
+        app.Launch();
+        app.WaitForDump("shellQuestsTab", "general", "the catalog room to paint");
+
+        var width = app.DumpValue("shellWidth");
+        var expected = ShellLayoutPolicy.For(width).RoomSinglePane;
+        Assert.Equal(expected ? 1 : 0, app.DumpValue("shellRoomSinglePane"));
+        // The ROOM did it, not just the policy.
+        Assert.Equal(expected ? 1 : 0, app.DumpValue("shellQuestsSinglePane"));
+        // And the arrangement follows: split shows both panes, single shows the list and
+        // no way back (there is nothing to come back FROM until a row is clicked).
+        Assert.Equal(1, app.DumpValue("shellQuestsListShown"));
+        Assert.Equal(expected ? 0 : 1, app.DumpValue("shellQuestsDetailShown"));
+        Assert.Equal(0, app.DumpValue("shellQuestsBackShown"));
+        // **The two axes moved independently**, which is the claim the separate thresholds
+        // exist to make and the one a single number could not. At 839 the room has already
+        // collapsed while the rail still has room for its labels; asserting the rail's
+        // answer from the same width is what says the two were decided apart rather than
+        // together.
+        Assert.Equal(ShellLayoutPolicy.For(width).RailLabelsVisible ? 1 : 0,
+            app.DumpValue("shellRailLabels"));
     }
 
     /// <summary>
