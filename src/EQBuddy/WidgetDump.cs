@@ -278,7 +278,7 @@ internal static class WidgetDump
                     // It counts what is ON THE BAR: one cell per starred stat, plus one
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
-                    $"hudCells={w.MiniChips.Children.Count} " +
+                    $"hudCells={w._hudBar.CellCount} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +

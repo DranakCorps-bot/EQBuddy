@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,106 | 4,516 | 4,516 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 3,965 | 4,361 | 4,361 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -198,6 +198,18 @@ cheaper than the next session re-deriving the answer. The new baseline is once a
 MINIMUM that fits (4,106 × 1.1 = 4,516.6 against 4,516). **Deleting a surface beats
 extracting one** — but only the lines that actually leave count, and here fewer left than
 it looks.
+
+**Lowered 4,106 → 3,965 on 2026-09-05 (Surface A / SA-1, the collapsed HUD bar), with
+ZERO headroom on the row when the pass started.** 4,516 against 4,516.6 is not a squeeze,
+it is a stop, and it is exactly why the plan specified a lift rather than an edit in
+place: the bar's chip builder, its divider trim and its per-tick rebuild moved into
+`EQBuddy/HudBarView.cs`, and what stayed is WHEN the bar is on screen — the host's job,
+per trap 15. It is a **view class, not a `MainWindow.Hud.xaml.cs` partial**, because this
+glob sums its matches on purpose and a partial leaves exactly as much untestable window
+logic as before. Its cell count was pinned from `tests/EQBuddy.E2E` (`hudCells`) and
+proved green on the pre-move tree first, since the WPF layer has no unit tests and that
+assertion is the only thing between a move and a silent regression. New baseline is once
+more the MINIMUM that fits (3,965 × 1.1 = 4,361.5 against 4,361).
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

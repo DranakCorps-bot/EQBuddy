@@ -165,7 +165,18 @@ public class ArchitectureTests
         //
         // Bumped down to the MINIMUM that fits (4106 × 1.1 = 4516.6 against 4,516 lines),
         // by the same "one line and no more" rule as every entry above.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4106),
+        //
+        // 4106 → 3965 on 2026-09-05 (Surface A / SA-1). **A LIFT again**, and the entry
+        // had ZERO headroom when the pass started — 4,516 against 4,516.6 — which is why
+        // the collapsed HUD bar left rather than being edited in place. `HudBarView.cs`
+        // took the chip builder, the divider trim and the per-tick rebuild; what stayed
+        // is WHEN the bar is on screen, which is the host's (trap 15). It is a VIEW CLASS
+        // and not a `MainWindow.Hud.xaml.cs` partial, because this glob SUMS its matches
+        // on purpose and a partial would have bought nothing.
+        //
+        // Bumped down to the MINIMUM that fits (3965 × 1.1 = 4361.5 against 4,361 lines),
+        // by the same "one line and no more" rule as every entry above.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3965),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
