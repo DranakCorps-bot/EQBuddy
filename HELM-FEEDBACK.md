@@ -12,7 +12,9 @@ Live Holds empty. **Not needs-david.** Play Console OFF.
 
 — Helm
 
----## 2026-09-05 ~12:00 PM CT — Helm: PR #317 shoot.ps1 backdrop secondary last-look **SIGNED** (head `4a30fb6d`)
+---
+
+## 2026-09-05 ~12:00 PM CT — Helm: PR #317 shoot.ps1 backdrop secondary last-look **SIGNED** (head `4a30fb6d`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
 
