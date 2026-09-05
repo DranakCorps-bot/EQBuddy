@@ -29,7 +29,7 @@ namespace EQBuddy;
 /// in — and it is what made room for the status badge and the state rule that now carry
 /// readiness at a glance.
 /// </summary>
-public partial class QuestsWindow : Window
+public partial class QuestsWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -508,6 +508,9 @@ public partial class QuestsWindow : Window
     {
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh(force: false);
     }
+
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
 
     /// <summary>The snapshot VERSION this window last PAINTED — see
     /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's

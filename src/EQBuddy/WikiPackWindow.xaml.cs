@@ -25,7 +25,7 @@ namespace EQBuddy;
 /// Drops by Creature keeps its live view untouched: "is this trip worth it" is a different
 /// question from "what can I give the wiki", and Frankthetankk asked for both to survive.
 /// </summary>
-public partial class WikiPackWindow : Window
+public partial class WikiPackWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly WikiPackPool _pool;
@@ -62,6 +62,12 @@ public partial class WikiPackWindow : Window
     {
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 3) Update(_main.CurrentSnapshot());
     }
+
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    // Painting more often does NOT ask eqlwiki more often: EnsureMobLookup keys on the
+    // creature name and no-ops once one is in flight or cached, so the request count is
+    // the number of distinct creatures either way (the consequence list's rule 7).
+    void IFollowingSurface.PaintNow() => Update(_main.CurrentSnapshot());
 
     /// <summary>The same observations the clipboard export consumes, so what is on screen
     /// is what gets pasted. POOLED across every stored session plus the live one (#217

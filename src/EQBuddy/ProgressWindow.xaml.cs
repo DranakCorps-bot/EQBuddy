@@ -27,7 +27,7 @@ namespace EQBuddy;
 /// Only the ACTIVE tab renders. A tab nobody is looking at costs nothing, which is the
 /// rule the widget's collapsed cards have always followed.
 /// </summary>
-public partial class ProgressWindow : Window
+public partial class ProgressWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -192,6 +192,9 @@ public partial class ProgressWindow : Window
     {
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh(force: false);
     }
+
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
 
     /// <summary>The snapshot VERSION this window last PAINTED — see
     /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's

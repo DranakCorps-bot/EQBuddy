@@ -251,9 +251,10 @@ public sealed class EndToEndTests
         var killRows = app.DumpValue("kills");
         // The BASELINE is only worth taking if the window has caught up with the data —
         // it is subtracted from an expected value below, so a window still climbing makes
-        // the wait unsatisfiable and reports as a 90 s timeout on the wrong line. Launch()
-        // guarantees this (debug.txt surfacesBehind=0); saying it here turns a regression
-        // in that guarantee into an immediate, legible failure instead.
+        // the wait unsatisfiable and reports as a 90 s timeout on the wrong line. The dump
+        // guarantees this now (WidgetDump.PaintOneMoment paints every open surface from
+        // the snapshot it reports, so these two are one moment); saying it here turns a
+        // regression in that guarantee into an immediate, legible failure instead.
         Assert.Equal(app.DumpValue("killKinds"), killRows);
         Assert.Equal(1, app.DumpValue("killsCard"));   // the door is on the widget
         Assert.True(app.DumpValue("killsSummaryLen") > 0,
@@ -288,7 +289,7 @@ public sealed class EndToEndTests
         // No equality to assert here the way SessionGoesLive… can: the Loot surface is a
         // SLICE with its own strips (UI.Shared/LootPresentation), so its row count is not
         // the snapshot's item count and never was. What both tests need is that the
-        // baseline is settled, and Launch() is what guarantees that (surfacesBehind=0).
+        // baseline is settled: Launch() for the log half, PaintOneMoment for the render.
         Assert.True(lootRows > 0 && lootKinds > 0,
             $"the fixture should land loot on both sides (rows={lootRows}, kinds={lootKinds})");
 

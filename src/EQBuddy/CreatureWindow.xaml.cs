@@ -23,7 +23,7 @@ namespace EQBuddy;
 /// window's OWN instance rather than borrowed from the widget: a UIElement has one parent,
 /// and a shared instance gets torn out of whichever host drew it last.
 /// </summary>
-public partial class CreatureWindow : Window
+public partial class CreatureWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -159,6 +159,9 @@ public partial class CreatureWindow : Window
         if (DateTime.Now - _lastRefresh < TimeSpan.FromSeconds(1)) return;
         Refresh(force: false);
     }
+
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
 
     /// <summary>The snapshot VERSION this window last PAINTED, for the
     /// <c>EQBUDDY_EXPAND</c> dump's <c>surfacesBehind</c> count. A satellite renders from
