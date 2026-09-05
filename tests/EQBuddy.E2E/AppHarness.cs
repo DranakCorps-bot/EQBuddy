@@ -176,6 +176,14 @@ internal sealed class AppHarness : IDisposable
     {
         if (_process is { HasExited: false })
             throw new InvalidOperationException("App already running — one instance per harness at a time.");
+        // THE SCREEN IS A MUTEX, AND THIS SIDE OF IT USED TO BE HONOUR-SYSTEM ONLY.
+        // `scripts/shoot.ps1` takes the same lock file for its whole batch; this takes it
+        // for the whole test-host run, on the first launch that asks. Before this line the
+        // guard was one-sided (trap 61), so a shoot batch and a suite run could sit on one
+        // desktop closing each other's always-on-top windows — and the failure surfaces as
+        // whichever row or test happened to be on screen, which is why it read as a flake.
+        // Refuses rather than waits; EQBUDDY_SCREEN_FORCE=1 is the override.
+        ScreenLock.Acquire();
         // A dump left by a previous launch of this profile must not satisfy this one's waits.
         File.Delete(DebugDumpPath);
         _lastTick = -1;

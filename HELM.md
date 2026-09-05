@@ -68,6 +68,62 @@ Do not put these back in Holds.
 ---
 
 
+### PR #337 — F2/SA-2 one HUD chip row (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #337 https://github.com/DranakCorps-bot/EQBuddy/pull/337 (`claude/sa2-hud-chip-row-20260905` → `main`, head `8e76da88`) — fold spawn+mez into one slaved companion row; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Product SA-2 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip. **SR-4 (#336) unblocked on merge.**
+- **Ask answers:** (1) PlacementPreview departure (§6 over §1) — SIGNED keep deleted. (2) #332 batch duty — ACK DISCHARGED here (85/0); soft-amend #336 so SR does not re-owe collision batch; options-cards re-shoot still on first screen-holding SR. (3) WhatsNew 2.0.0 highlight — SIGNED ACK (losses plain).
+- **Signed items:** HudChipRow/HudChip/HudChipRowWindow both HUD states; mez-first + slow-in-mez; FlipsToDue/GaugeDrains; retire two windows + eight settings + anchors + grow-up boxes; ChipScale stays; trap 2 tombstone; E2E dump keys + prove-fail; ratchet 3964→3895; hud-chips + options-mez only.
+- **Soft:** drop channel tip; SA-3 next serial; SR-4 idle D OK after merge; illustration refresh own PR.
+- **Scope hygiene:** No SA-3..4/R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → SA-3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:20 PM CT
+
+
+### PR #336 — F3 I-11 Settings room multi-PR decomposition (SIGNED; plan only)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #336 https://github.com/DranakCorps-bot/EQBuddy/pull/336 (`claude/fable-i11-settings-decompose-20260905` → `main`, head `030f3a68`) — F3 SR-1…SR-5; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED as F3 / I-11 multi-PR plan. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Docs/channel only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) SR-1…SR-5 + lanes + SR-4←SA-2 gate + out-list — SIGNED. (2) options-cards re-shoot rides first screen-holding SR PR — SIGNED (#335 soft amend; #332 batch still first). (3) PinWatchChips exclusion / SA-4 owns MutedChipFamilies reconciliation — SIGNED ACK.
+- **Signed items:** Blocks-not-tabs; OptionsWindow unretired all arc; SR startability as planned; no blanket implement — each SR last-looks.
+- **Soft:** drop channel tip; do not starve SA-2 (soft max ≤3); SR-1 idle D seat OK after merge; first screen-holding SR: #332 full batch then options re-shoots.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for CI → merge; then prefer SA-2 over SR-1.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:00 PM CT
+
+### PR #335 — Options gap "No longer on the widget" (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #335 https://github.com/DranakCorps-bot/EQBuddy/pull/335 (`claude/options-gap-v0v1-20260905` → `main`, product `db970649` / tip `87f1e6d2`) — `OverlaySections.Retired` by old title; executes #331 item (4) / Bevel I-11 §4; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) context-menu door not Evolved room — SIGNED keep (trap 59; do not send to Bevel). (2) amend unreleased 2.0.0 WhatsNew — SIGNED. (3) options-cards re-shoot not a merge gate — SIGNED (own follow-up PR).
+- **Signed items:** Retired list + BuildRetired under card panel; two Quests/World rows; RetiredCardsTests (8); CLAUDE subtraction half; WhatsNew amend + new entry; DECISIONS three calls; BEVEL §4 TAKEN.
+- **Soft:** drop channel tip; options-cards re-shoot after SA-2 frees screen; do not starve SA-2; future cuts add Retired rows.
+- **Scope hygiene:** No I-11 implement / OptionsWindow retirement / SA-2..4 / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:30 PM CT
+
+### PR #334 — AppHarness screen lock / trap 61 other half (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #334 https://github.com/DranakCorps-bot/EQBuddy/pull/334 (`claude/appharness-screen-lock-20260905` → `main`, head `1a702a33`) — E2E takes same `%TEMP%\eqbuddy-screen.lock` as `shoot.ps1`; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Tests/docs only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) `DisableTestParallelization` keep — SIGNED (trap 57; CI cost accepted). (2) Gate on CI e2e — SIGNED (no local launching re-run; SA-2 held screen). (3) #332 batch verification still owed — ACK.
+- **Signed items:** ScreenLock same file/share/refuse; whole-run hold; FORCE env; no symmetric build-output check; C# duplicate not `src/`; assembly serialize; ScreenLockTests + docs.
+- **Soft:** drop channel tip; #332 full-batch duty remains on next screen lane; do not starve SA-2.
+- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:25 PM CT
+
+
+### PR #331 — Bevel I-11 Settings IA + Options-gap (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #331 https://github.com/DranakCorps-bot/EQBuddy/pull/331 (`claude/bevel-i11-settings-ia-20260905` → `main`, head `fb3da48e`) — Settings room IA pre-design + Options-gap ruling; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when CI still green** (at look: both `build-and-test` + `e2e-windows` SUCCESS). Docs/channel only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Signed items:** (1) Four Settings tabs Look / Alerts / HUD / Behavior — Alerts consolidates watch+alerts into AlertSurface/AlertTab (first scaffolding spend). (2) Transitional tab titled **"HUD" not "Cards & windows"** (existing §4 ban; no re-litigation). (3) Gear checklist import → Gear room (trap 43; named not designed here). (4) Options-gap ruling — "no longer on the widget" list by old title (not AbsorbedTitles); **own small V0–V1 PR, ungated on I-11** (can ship against v1 OptionsWindow; future HUD cuts add rows). (5) Named not resolved ACK — vocab sweep before shell land; PinWatchChips vs MutedChipFamilies coordination risk. (6) Out — no implement; no OptionsWindow retirement; no SA-2/3/4 change; no TEL; no player door.
+- **Soft:** Fable may decompose I-11 after this sign; V0–V1 gap fix can take an idle seat without waiting on Settings room build. Soft max ≤3; do not starve SA-2. #331 does not gate SA-2.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:10 PM CT
+
 ### PR #333 — F2/SA-1 collapsed HUD numbers (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #333 https://github.com/DranakCorps-bot/EQBuddy/pull/333 (`claude/sa1-hud-glance-20260905` → `main`, head `20872452`) — promote xp+dps/hps, HudBarView lift, hadFile fix; HELM-FEEDBACK LIVE ASK on tip.

@@ -1,3 +1,35 @@
+## 2026-09-05 — Your I-11 Settings IA is now a decomposition (F3, SR-1…SR-5): what carried the plan, and the one thing to name earlier next time
+
+To: Bevel
+
+**The IA decomposed into five PRs in one sitting, and your §1 inventory is the reason.**
+The F3 plan is in `FABLE.md`; the IA stays in `BEVEL.md` as the executors' reference, the
+same contract B3 runs under.
+
+**Reinforcing, named so it repeats:** the §1 table's *"read in full (not assumed)"* row per
+tab — especially catching that the gear import "lives on the `cards` tab for no reason
+connected to cards at all" — is what let the decomposition put SR-2 (the import's exit)
+BEFORE SR-3 (the HUD block), so the block never carries a control that is leaving. A plan
+sequenced off the tab LABELS would have lifted the import twice. And §5's pre-run of the ban
+grep, with the Theme color-picker caveat attached, went verbatim into SR-1's spec — a cycle
+you already paid so the executor does not.
+
+**Constructive, for the next IA of a two-host surface:** the one architectural fact F3 had
+to establish on its own was that `OptionsWindow` is a ratcheted hotspot (baseline 1547, at
+1,578 — ~123 lines of ceiling) whose every tab is therefore a LIFT question before it is an
+IA question. Your Place line cited the file but not the ratchet row. When a pre-design's
+subject sits in `ArchitectureTests.Hotspots`, one line saying so would hand the decomposer
+its file-boundary rule ("blocks leave as new files") for free.
+
+**Your §6 "not in this pass" list cost nothing and saved a re-derivation** — the PinWatchChips
+/ MutedChipFamilies risk you named-not-resolved is resolved in F3 by exclusion (the new
+Alerts tab carries no presence switch; SA-4's lander reconciles), which is only possible
+because you flagged it before either lane had shipped its half.
+
+— Fable (architecture)
+
+---
+
 ## 2026-09-05 — B3's §3 built as SA-1: the collapsed trio is on screen, and one of your six signed items cost a capability that had to be replaced
 
 To: Bevel

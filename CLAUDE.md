@@ -545,6 +545,18 @@ a guess, and the guess is discovered three commits later.
      the exception that proves it — it has a row again because David made it a card again
      in 1.99, not because the fold left it one (and see trap 55 for what it cost when a
      fold went on naming it anyway).
+
+     **A SUBTRACTED card is the other half, and it takes a SECOND list.** A cut leaves no
+     surviving card, so `AbsorbedTitles` cannot key it at all — which is how the Quests and
+     World cuts each shipped a knowing gap on that screen, two names then four, recorded in
+     `OverlaySections.Catalog`'s own comments at ship time. `OverlaySections.Retired` is the
+     answer, keyed by the **OLD TITLE**, rendered under the card rows as *"No longer on the
+     widget"* in the same "X is now Y" form this rule already requires of a What's-new entry,
+     and naming the CONTEXT-MENU row that opens the surface — a hotkey is not a door
+     (trap 59), and an Evolved room is not one either while `EQBUDDY_SHELL` is the only way
+     in. Helm signed it 2026-09-05 on Bevel's Options-gap ruling (I-11 §4). **Every future
+     HUD cut adds its row**, exactly as a fold owes one to `AbsorbedTitles`;
+     `RetiredCardsTests` fails a row that names a card which is still live.
   2. **A merged card keeps the slot its parts had.**
   3. **Every card header's ↗ pops the surface out** into its own window.
 
@@ -1738,6 +1750,21 @@ Read this list before touching the areas it names. Every entry cost a release.
     one failure end the run *there*, leaving every later row unreachable — which is trap 53's
     real cost, six dark days in which each session re-shot one image, got a picture and moved
     on. The run still FAILS (a stale title must); it now names every failing row in one pass.
+    → **AND THE GUARD WAS ONE-SIDED FOR A DAY, WHICH IS THE HALF WORTH REMEMBERING.**
+    `shoot.ps1` took the lock; `tests/EQBuddy.E2E` launched the same exe, on the same
+    desktop, and took nothing — so the second guard above (refuse over a `bin\Release` app)
+    was standing in for a lock the other party never took, and it can only see this suite
+    once its app is already UP. **A mutex only one participant acquires is a convention with
+    extra steps.** `AppHarness.Launch` now takes the same file, with the same share mode, for
+    the whole test-host run — the mirror of a batch holding it — and refuses the same way.
+    Two things fell out of building it that a regex-only check would have missed: the
+    rendezvous is between C# and PowerShell, so `ScreenLockTests` runs a real PowerShell
+    holder against it rather than only asserting that both files still *say* the same thing;
+    and the suite had never actually been the "one app at a time" its README claimed —
+    `ShellHostTests` launches a real always-on-top app and carried no `[Collection]`, so
+    xUnit gave it one of its own and ran it in parallel with the others. That is **trap 57
+    exactly**, found by asking what the lock would be worth if the holder ran two, and fixed
+    the way that trap says: `[assembly: CollectionBehavior(DisableTestParallelization = true)]`.
 
 ## Tooling notes that cost time when ignored
 
@@ -1811,6 +1838,16 @@ EQBuddy is already running out of a `bin\Release` / `bin\Debug` path — which i
 row* of each other's batch and both failures read as a defect in whatever was being reviewed
 (trap 61). `-Force` overrides the refusal; nothing overrides the rule that another harness's
 fixture app is never stood down.
+
+**And `tests/EQBuddy.E2E` takes the SAME lock, as of 2026-09-05.** It launches the same exe onto
+the same desktop, so the mutex is only a mutex if both parties acquire it: `AppHarness.Launch`
+opens `%TEMP%\eqbuddy-screen.lock` on the first launch and holds it for the whole test-host run
+(the mirror of a batch holding it), refusing with the holder's pid rather than waiting.
+`EQBUDDY_SCREEN_FORCE=1` is that side's `-Force`. **So the two are now mutually exclusive: start
+one while the other is up and the second one refuses, immediately and by name, instead of
+closing the first one's window mid-shot.** Held by `ScreenLockTests`, which drives a real
+PowerShell holder against the C# side — the two halves agree on a filename and a share mode and
+neither has a compiler that can see the other.
 
 **`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe` — and since E-2c it is
 **the only capture surface in the repo.** There used to be a second one: the Linux/macOS
