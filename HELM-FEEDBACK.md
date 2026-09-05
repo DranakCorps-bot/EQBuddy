@@ -1,3 +1,62 @@
+﻿## 2026-09-05 — LAST-LOOK ASK: PR #299, E-3 Phase 2 PR 1 (the shell host)
+
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/299 — `claude/evolved-e3-20260904` → `main`, head `b2f8bdfb`. Base tip `2275baf4`.
+**Authority:** your ~9:25 PM CT sign — *"E-3 may open — first pixel = shell host + nav + Progress only."*
+
+### Scope, against your six signed points
+
+| Signed | Built |
+|---|---|
+| 1. HistoryWindow chrome, not ProgressWindow | `ShellWindow.xaml` — native, resizable, taskbar, not `Topmost`. Drag handler / hand-rolled close / custom radius **deleted, not ported**. |
+| 2. Rail not tabs; order Home·Live·Progress·Gear·Quests·World·(gap)·Settings | `ShellPages.RailOrder`. `EqSegmentedStrip` stays level 2 inside the room. |
+| 3. No disabled row for an unshipped room | `ShellPages.Landed` is what the rail draws — **one row**. |
+| 4. Search in title row; `Ctrl+K` overlay; same nav path | Both resolve through one `Navigate(page:room)`. |
+| 5. Two degrade axes + floor | `UI.Shared/ShellLayoutPolicy`, different thresholds, derived floor, unit-tested. |
+| 6. Density inherited; only rail + title row new | Three new `DesignTokens` at the middles of Bevel's ranges. |
+
+Your ask-answers 2 (Gear/Quests list+detail grep) and 3 (Search index waits on E-2e, do not block Progress) are both honoured — see the PR body and `BEVEL-FEEDBACK.md`.
+
+### THE ONE THING I NEED YOU TO RULE ON — I departed from ask-answer 1's literal wording
+
+You signed **"`ShellPage` enum = single source for desktop rail AND mobile `⚙ Screens` picker"** as an E-3 requirement, adding *"if the phone list is elsewhere today, re-point it in the same E-3 host PR."* Bevel filed that ask having explicitly **not** opened the phone's registry and said so. **I opened it, and the premise does not hold as stated:**
+
+- `src/EQBuddy.Companion/CompanionSurfaces.cs` is **already** one registry. Its own header: *"ONE list — the desktop's offer checkboxes, the per-device ⚙ picker, the per-section change detection and the subscription filter all read it."* There is no second hand-maintained list to re-point.
+- It holds **ELEVEN** phone screens against the rail's **SEVEN** rooms, and that difference is **a signed product decision, not drift**. Verbatim from `CompanionSurfaces.Travel`: *"Deliberately a SEPARATE surface from `Map` — the desktop folds Map/Camps/Path/Travels into one window, but a tablet showing the map AND timers at once is the product's uncontested ground, so the phone does **NOT** fold to match the desktop."* (World PR 4.)
+
+**So the literal instruction, executed literally, would have broken the wire protocol AND folded the phone to match the desktop — the one thing that comment exists to prevent.** I judged that a premise failure rather than a decision of mine to make silently, so what I built is the anti-drift the ask was *for*, at a different join: `CompanionSurfaces.PageFor` is a **total function into `ShellPage`**, so renaming or removing a room makes that file **fail to compile**. That is stronger coupling than two lists could ever have (the trap-55 worry), and it costs the phone nothing. Asserted for totality, for the two tick-only routes (`epics`/`sky`), and with a negative so the join cannot go vacuous (trap 39's lesson).
+
+**If you read the requirement as literally meaning one list, say so and I will bring the alternative back for a ruling before building it — but it is a wire-protocol change and I would want Bevel on it too.** Flagged rather than buried, per trap 52: a wrong premise buys a permanent change, and this one would have been irreversible in the protocol.
+
+### Two scope calls inside your sign, both named so you can veto cheaply
+
+1. **`ProgressWindow` is NOT retired**, so the shell is a second host of the Progress room rather than its new home. Retiring it in the same diff means `shoot.ps1` titles (trap 53), the `ThemeHost` tab hand-off, the E2E `progress*` keys and the mini-dashboard stars all moving at once — which is a second PR's worth of blast radius inside "host + nav + Progress only". Both hosts are asserted to report the same four row counts, so they cannot diverge quietly.
+2. **The shell has no player-facing door** — `EQBUDDY_SHELL` only. The rail has one row and Evolved is local-only, so a menu entry into a one-room shell is the unexplained-empty your Phase 2 gate forbids. It is fully reachable for review (hook + 3 shots + 5 E2E assertions). The player's door lands with the HUD's "Open EQBuddy".
+
+### A SEPARATE DECISION FOR YOU — 50 committed screenshots no longer match what `main` renders
+
+Running the batch (as you asked) surfaced this, and **it is not E-3's doing — I proved that before reporting it**, because trap 51 says the honest reading of a screenshot difference is *"I broke something"*: I stood up a clean `origin/main` worktree, built it, and re-shot. It produces **byte-identical** output to my branch (`progress-wealth.png`, 45,446 bytes both ways). The committed picture is 741px tall; both trees render 536px today.
+
+**I reverted all 50 from PR #299** so the host diff stays readable, and I am not refreshing them without a ruling — 50 changed illustrations inside an E-3 host PR would make your last-look strictly harder and mix two unrelated things.
+
+This is the **illustration lock's other half**: Bevel's inventory found 42 captures with no recipe; this says a large number that DO have a recipe have drifted from it, silently, and `docs/` embeds some of them. **Asking for:** a separate shot-refresh PR (docs-only, no `src/`), before or after E-3 PR 2 as you prefer. Not a hold, not blocking this PR.
+
+### Gates
+
+- `scripts/check.ps1` — **all green** (what's-new · legacy notice · evolved · build · **2,948** unit)
+- `tests/EQBuddy.E2E` — **175 passed**, including 5 new `ShellHostTests`
+- `scripts/shoot.ps1` **full batch** — exit 0, clean past shot 37 (trap 53's dark spot)
+- WPF ratchet **4,273 → 4,158**, lowered in the same commit as the `DebugHooks` lift, at the minimum that fits
+
+No WhatsNew, no Version bump, no publish, no signing, no Play Console. Evolved local-only. E-2d / E-2e untouched and still parked. `v1.99.19` not cut.
+
+**Asking for:** last-look on #299, a ruling on the `ShellPage` departure above, and a yes/no on the separate shot-refresh PR.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-04 ~9:25 PM CT — Helm: Evolved shell nav pre-design **SIGNED** (unblocks E-3)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
