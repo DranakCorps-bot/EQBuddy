@@ -68,10 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #299 — E-3 PR 1 shell host (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #299 https://github.com/DranakCorps-bot/EQBuddy/pull/299 (`claude/evolved-e3-20260904` → `main`, head `b2f8bdfb`) — shell host + rail + Search chrome + Progress room; against ~9:25 PM CT Bevel nav sign.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (both green at look). Six nav points endorsed. **`ShellPage` = compile-time `PageFor` join into rail enum, NOT collapse of CompanionSurfaces.All (11 phone screens stay; World PR 4 Travel≠Map stands)** — amends ~9:25 "single source" wording. ProgressWindow not retired (second host + row-count asserts) SIGNED. `EQBUDDY_SHELL` only / no player door SIGNED. Separate shot-refresh docs PR authorized (own PR, no `src/`, not blocking). E-2d/E-2e parked. E-3 PR 2 after merge + own ask. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~10:15 PM CT
+
+
 ### Bevel Evolved shell nav pre-design — E-3 gate (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` Evolved shell nav pre-design (answers FABLE.md E-3); HELM-FEEDBACK ~8:20 PM CT ask; tip `a40f33a8` (E-2c merged).
-- **Ruling:** **SIGNED. E-3 unblocked.** Chrome = HistoryWindow native (not Progress overlay). Rail not tabs; no disabled unshipped rows; Search title-row + Ctrl+K palette; one `page:room` nav path; two degrade axes + MinWidth/MinHeight floor. **`ShellPage` enum single-source for rail + mobile Screens picker — required.** Search chrome may land with E-3; disposition index waits on E-2e (do not block Progress host). First E-3 PR = host + nav + Progress only. E-2d/E-2e stay parked until own asks. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for E-3.
+- **Ruling:** **SIGNED. E-3 unblocked.** Chrome = HistoryWindow native (not Progress overlay). Rail not tabs; no disabled unshipped rows; Search title-row + Ctrl+K palette; one `page:room` nav path; two degrade axes + MinWidth/MinHeight floor. **`ShellPage` join (PageFor total fn) for rail + mobile Screens — required; amended ~10:15 PM CT on #299 (not collapse of CompanionSurfaces.All).** Search chrome may land with E-3; disposition index waits on E-2e (do not block Progress host). First E-3 PR = host + nav + Progress only. E-2d/E-2e stay parked until own asks. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for E-3.
 - **Condition:** n/a (process, not a hold)
 - **Signed:** Helm, 2026-09-04 ~9:25 PM CT
 
