@@ -15,6 +15,7 @@ public class WorldSurfaceTests
         Assert.Equal("Camps", WorldSurface.LabelFor(WorldTab.Camps));
         Assert.Equal("Path", WorldSurface.LabelFor(WorldTab.Routes));
         Assert.Equal("Travels", WorldSurface.LabelFor(WorldTab.Travels));
+        Assert.Equal("Drops", WorldSurface.LabelFor(WorldTab.Drops));
     }
 
     /// <summary>The wire keys reuse the four absorbed windows'/card's own names — nothing
@@ -26,6 +27,10 @@ public class WorldSurfaceTests
         Assert.Equal("spawns", WorldSurface.KeyFor(WorldTab.Camps));
         Assert.Equal("travel", WorldSurface.KeyFor(WorldTab.Routes));
         Assert.Equal("misc", WorldSurface.KeyFor(WorldTab.Travels));
+        // The fifth is the name DropsWindow answered to and the name CreatureSurface still
+        // answers to — one surface, one word, in both lanes.
+        Assert.Equal("drops", WorldSurface.KeyFor(WorldTab.Drops));
+        Assert.Equal(CreatureSurface.KeyFor(CreatureTab.Drops), WorldSurface.KeyFor(WorldTab.Drops));
     }
 
     [Theory]
@@ -38,6 +43,10 @@ public class WorldSurfaceTests
     [InlineData("misc", WorldTab.Travels)]
     [InlineData("travels", WorldTab.Travels)]
     [InlineData("deaths", WorldTab.Travels)]
+    // Resolves whether or not the host asking can DRAW it — see ShellOnly. An address
+    // landing somewhere true is a different question from who may show it.
+    [InlineData("drops", WorldTab.Drops)]
+    [InlineData(" DROPS ", WorldTab.Drops)]
     [InlineData("nonsense", null)]
     [InlineData(null, null)]
     public void EveryWordTheseSurfacesHaveBeenCalledStillResolves(string? key, WorldTab? expected) =>
@@ -66,11 +75,41 @@ public class WorldSurfaceTests
     [Fact]
     public void TabsCarryTheirHeadlinesAndOmitEmptyOnes()
     {
-        var tabs = WorldSurface.Tabs(map: "Crushbone", travels: "2 deaths").ToList();
-        Assert.Equal(4, tabs.Count);
+        var tabs = WorldSurface.Tabs(map: "Crushbone", travels: "2 deaths", drops: "3 creatures").ToList();
+        Assert.Equal(5, tabs.Count);
         Assert.Equal("Crushbone", tabs.Single(t => t.Tab == WorldTab.Map).Value);
         Assert.Null(tabs.Single(t => t.Tab == WorldTab.Camps).Value);
         Assert.Equal("2 deaths", tabs.Single(t => t.Tab == WorldTab.Travels).Value);
+        Assert.Equal("3 creatures", tabs.Single(t => t.Tab == WorldTab.Drops).Value);
+        // The definition is UNFILTERED, which is what makes `world:drops` a valid page:room
+        // address with no edit to ShellPages: the shell reads this list to build the
+        // grammar, so a tab the room can land on has to be in it.
+        Assert.Null(WorldSurface.Tabs().Single(t => t.Tab == WorldTab.Drops).Value);
+    }
+
+    /// <summary>
+    /// **The fifth tab is the shell's and the v1 lane cannot draw it** — <c>WorldWindow</c>
+    /// and the inline card both map a <see cref="WorldTab"/> to a body with a
+    /// <c>_ =&gt; _travels.Body</c> default, so an unfiltered header would put a "Drops"
+    /// chip on a shipped window that answers with the Travels list. One predicate, read by
+    /// <c>WorldTheme</c>, keeps it off both.
+    ///
+    /// The negative row is what stops this going vacuous (trap 39): a predicate that
+    /// answered true for everything would hide the whole strip and read as coverage.
+    /// </summary>
+    [Fact]
+    public void OnlyDropsIsTheShellsAloneAndTheOtherFourAreNot()
+    {
+        Assert.True(WorldSurface.ShellOnly(WorldTab.Drops));
+
+        Assert.False(WorldSurface.ShellOnly(WorldTab.Map));
+        Assert.False(WorldSurface.ShellOnly(WorldTab.Camps));
+        Assert.False(WorldSurface.ShellOnly(WorldTab.Routes));
+        Assert.False(WorldSurface.ShellOnly(WorldTab.Travels));
+
+        // And the theme absorbs no new card for it — Drops was never a card at all, only a
+        // menu entry, which is why this whole tab needs no settings migration.
+        Assert.Equal(["misc"], WorldSurface.AbsorbedCardKeys);
     }
 
     /// <summary>Counts, never countdowns — a deadline belongs to the spawn-due chips, not

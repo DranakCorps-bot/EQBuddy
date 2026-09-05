@@ -165,6 +165,12 @@ public class SurfaceOwnershipTests
     // says so (forbidding the wrong shape is not the same as requiring the right one).
     [InlineData("QuestsWindow.xaml.cs", "new QuestsView(main)")]
     [InlineData("QuestsRoom.cs", "new QuestsView(main)")]
+    // E-3 lane S, S2: World's fifth tab. `DropsCardView` now has TWO hosts — the v1
+    // `CreatureWindow` above and the shell's World room — which is the same trap-45
+    // condition Quests hit, and the room reaching for a shared instance would be invisible
+    // in a diff, a build and a screenshot. No factory: nothing else in the codebase holds a
+    // DropsCardView, so constructing it outright is as fresh as calling one.
+    [InlineData("WorldRoom.cs", "new DropsCardView(main)")]
     public void TheOtherHostsBuildTheirOwnSurfacesToo(string file, string ctorUse)
     {
         var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", file));

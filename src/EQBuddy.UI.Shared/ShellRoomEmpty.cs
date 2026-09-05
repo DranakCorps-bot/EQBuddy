@@ -118,7 +118,8 @@ public static class ShellRoomEmpty
     public static readonly RoomEmptyMessage World = new(
         "No zone seen yet",
         "The map, your camps, the route planner and your travels all start from the zone "
-        + "your log says you are standing in. Turn logging on in game with /log on, then "
+        + "your log says you are standing in, and the drop list from what you kill there. "
+        + "Turn logging on in game with /log on, then "
         + "point EQBuddy at your Logs folder in Options — zone once and the map draws itself.");
 
     /// <summary>
@@ -132,11 +133,21 @@ public static class ShellRoomEmpty
     /// The markers clause is the other one that is not decoration: "Drop camp marker" is
     /// room chrome and its button works whether or not a log has been read, so a profile
     /// with markers on it has something this room must keep showing.
+    ///
+    /// **The drops clause arrived with the fifth tab (S2), and adding it was the whole job
+    /// of adding a tab to a room that can hide itself.** A room-level empty COLLAPSES the
+    /// strip and every tab under it, so a predicate that kept answering over four tabs after
+    /// a fifth landed would hide the new surface on exactly the profiles the old four had
+    /// nothing to say about — trap 34's shape, arriving as something that reads as
+    /// untouched code. The heading above stays true: a session with drops in it has been
+    /// somewhere, so this clause is the belt to the zone clauses' braces rather than a
+    /// second story about what the room is for.
     /// </summary>
     public static bool WorldIsEmpty((string Server, string Character) identity, StatsSnapshot s) =>
         NoCharacterYet(identity)
         && s.CurrentZone.Length == 0 && s.Zones.Count == 0
-        && s.Markers.Count == 0 && s.Deaths.Count == 0;
+        && s.Markers.Count == 0 && s.Deaths.Count == 0
+        && !s.Mobs.Any(m => m.Loot.Count > 0);
 
     // ---- Quests -------------------------------------------------------------------
 

@@ -25,6 +25,12 @@ public enum WorldTab
     /// <summary>The old Travels &amp; Deaths card body: deaths, zones visited, markers —
     /// small, player-driven lists, which is why this is the one Full-inline tab.</summary>
     Travels,
+    /// <summary>What dropped, by creature — <i>"is this camp worth it?"</i>, which is a
+    /// question about the WORLD rather than about your bags. The Evolved shell's World room
+    /// only; the v1 lane still ships it as <c>CreatureWindow</c>'s Drops tab. See
+    /// <see cref="WorldSurface.ShellOnly"/>, which is what keeps those two facts from
+    /// becoming a fifth tab on a window that cannot draw it.</summary>
+    Drops,
 }
 
 /// <summary>A tab as a UI should draw it. <see cref="Value"/> is the tab's headline, kept
@@ -48,6 +54,7 @@ public static class WorldSurface
         // visited). The enum member and wire key stay Routes/"travel"; only the label moved.
         WorldTab.Routes => "Path",
         WorldTab.Travels => "Travels",
+        WorldTab.Drops => "Drops",
         _ => tab.ToString(),
     };
 
@@ -55,13 +62,16 @@ public static class WorldSurface
     /// rename of the human-facing label. Every key here is a name one of the four absorbed
     /// windows already answered to, not a new invention:
     /// <c>map</c> (MapWindow), <c>spawns</c> (SpawnsWindow), <c>travel</c> (TravelWindow),
-    /// <c>misc</c> (the Travels &amp; Deaths card's own settings key).</summary>
+    /// <c>misc</c> (the Travels &amp; Deaths card's own settings key), <c>drops</c>
+    /// (<c>DropsWindow</c>, and <see cref="CreatureSurface"/>'s key for the same tab today —
+    /// one surface answering to one name in both lanes).</summary>
     public static string KeyFor(WorldTab tab) => tab switch
     {
         WorldTab.Map => "map",
         WorldTab.Camps => "spawns",
         WorldTab.Routes => "travel",
         WorldTab.Travels => "misc",
+        WorldTab.Drops => "drops",
         _ => tab.ToString().ToLowerInvariant(),
     };
 
@@ -75,6 +85,11 @@ public static class WorldSurface
         "spawns" or "camps" or "timers" => WorldTab.Camps,
         "travel" or "routes" => WorldTab.Routes,
         "misc" or "travels" or "deaths" => WorldTab.Travels,
+        // The name DropsWindow answered to, and the one CreatureSurface still answers to.
+        // It resolves here whether or not the host asking can DRAW the tab — the same rule
+        // ProgressSurface.TabForKey keeps for "raids" after the move to Live: this method is
+        // about an old address landing somewhere true, not about who may show it.
+        "drops" => WorldTab.Drops,
         _ => null,
     };
 
@@ -86,11 +101,37 @@ public static class WorldSurface
     /// "do not shrink-wrap the full window onto a SizeToContent always-on-top panel"), and
     /// conservative-glance is the ratified posture: a Glance understates and never lies,
     /// and promoting one later costs no migration.</summary>
+    /// <remarks><see cref="WorldTab.Drops"/> has no row here and needs none: the inline card
+    /// never draws it, because <see cref="ShellOnly"/> keeps it off the v1 strip entirely.
+    /// The Glance default is what an answer would be, not a place it is asked.</remarks>
     public static InlineMode InlineModeFor(WorldTab tab) => tab switch
     {
         WorldTab.Travels => InlineMode.Full,
         _ => InlineMode.Glance,
     };
+
+    /// <summary>
+    /// **The tabs the Evolved shell's World room has and the v1 lane does not** — today,
+    /// exactly <see cref="WorldTab.Drops"/>.
+    ///
+    /// It is the mirror of <see cref="ProgressSurface.MovedToLive"/> and it exists for the
+    /// same reason, from the opposite direction: that one hides a tab the ROOM has moved
+    /// away, this one hides a tab the room has GAINED. Drops arrives in World because the
+    /// Evolved IA sends camp research here — but the v1 lane still ships it as
+    /// <c>CreatureWindow</c>'s Drops tab, and <c>WorldWindow</c>/the inline card cannot
+    /// draw it at all: both map <see cref="WorldTab"/> to a body with a
+    /// <c>_ =&gt; _travels.Body</c> default, so an unfiltered fifth header would put a
+    /// "Drops" chip on a shipped window that answers it with the Travels list. That is a
+    /// player-visible defect reachable with no code change to either host, which is exactly
+    /// why the predicate is here rather than in one of them.
+    ///
+    /// **A predicate rather than a second list** (trap 30/55): a sixth World tab is drawn by
+    /// the room automatically, and adding one to the v1 lane means deleting a row here
+    /// rather than remembering to edit two strips. <see cref="TabForKey"/> deliberately does
+    /// NOT consult it — an address resolving is a different question from a host being able
+    /// to draw it.
+    /// </summary>
+    public static bool ShellOnly(WorldTab tab) => tab == WorldTab.Drops;
 
     /// <summary>The tab an expanded World card opens on: the room that already lived on
     /// the widget as its own card.</summary>
@@ -118,8 +159,15 @@ public static class WorldSurface
     /// </summary>
     public const string ThemeCardKey = "misc";
 
+    /// <summary>Every tab this theme defines, in order — including the ones only the Evolved
+    /// shell can draw. Callers that are a v1 host filter with <see cref="ShellOnly"/>;
+    /// <c>UI.Shared</c>'s <c>WorldTheme</c> is where both strips are actually built, so no
+    /// UI has to remember. Kept unfiltered here on purpose: <c>ShellPages.Rooms</c> reads
+    /// this for the <c>page:room</c> grammar, and an address the shell can land on must
+    /// exist in the definition the shell reads.</summary>
     public static IReadOnlyList<WorldTabHeader> Tabs(
-        string? map = null, string? camps = null, string? routes = null, string? travels = null)
+        string? map = null, string? camps = null, string? routes = null, string? travels = null,
+        string? drops = null)
     {
         return
         [
@@ -127,6 +175,7 @@ public static class WorldSurface
             Header(WorldTab.Camps, camps),
             Header(WorldTab.Routes, routes),
             Header(WorldTab.Travels, travels),
+            Header(WorldTab.Drops, drops),
         ];
 
         static WorldTabHeader Header(WorldTab tab, string? value) =>

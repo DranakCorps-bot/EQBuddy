@@ -213,7 +213,11 @@ public static class ShellPages
         ShellPage.Progress => "Experience, wealth, faction and raid targets.",
         ShellPage.Gear => "Your bags, your wishlist, and what dropped for you.",
         ShellPage.Quests => "Your quest tracker, Epic 1.0 and Plane of Sky.",
-        ShellPage.World => "The zone's map, your camps, spawn timers and how to get there.",
+        // Five clauses for five tabs since S2. The rail's tooltip is the room's only copy
+        // once the rail collapses to icons, so a tab that arrives and is not named here is
+        // a room that quietly stops describing itself.
+        ShellPage.World =>
+            "The zone's map, your camps, spawn timers, how to get there and what drops there.",
         ShellPage.Settings => "Configure EQBuddy.",
         _ => "",
     };
