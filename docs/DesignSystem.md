@@ -813,7 +813,8 @@ rule that gets relitigated every time it is inconvenient.
    So on the Wine prefixes of #148/#166 the fight-side stack distinguished its three kinds
    with three identical boxes — on the surface a player watches mid-pull, on the platform
    this build exists to serve. It is an `IconPaths` name now, drawn in its own column by
-   `SpawnChipsWindow`, `MezChipsWindow` and both Avalonia twins.
+   `HudChip` — one renderer since Surface A / SA-2 folded the two chip windows (and both
+   Avalonia twins went with the lane in E-2c).
 
    **The snail did not survive as a snail.** A spiral shell legible at 12px is more drawing
    than `IconPaths` should carry, and the chip's own label already says what it is

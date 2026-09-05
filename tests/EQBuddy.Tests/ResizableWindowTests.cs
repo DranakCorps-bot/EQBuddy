@@ -137,7 +137,7 @@ public class ResizableWindowTests
         var furniture = new HashSet<string>(StringComparer.Ordinal)
         {
             "AlertWindow", "ClickThroughChip", "CursorRingWindow", "GridOverlayWindow",
-            "MezChipsWindow", "SpawnChipsWindow", "MainWindow", "TutorialWindow",
+            "HudChipRowWindow", "MainWindow", "TutorialWindow",
             "WhatsNewWindow", "FeedbackWindow", "CompanionWindow", "TextProbeWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",

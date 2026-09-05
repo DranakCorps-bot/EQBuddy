@@ -249,11 +249,11 @@ where each of its assertions went.
 | The card list covers the same screen height at any UI scale; the last card is always reachable by scrolling | **Auto** — `WidgetMetricsTests` (#144) |
 | A dragged height is stored pre-scale and clamped against a cap in the same units | **Auto** — `WidgetMetricsTests` |
 | The list never collapses below one card, and no scale can make the cap infinite | **Auto** — `WidgetMetricsTests` |
-| A grow-up chip stack holds its bottom edge as chips come and go | **Auto** — `ChipStackAnchorTests` (#122) |
-| A closing window (height 0) cannot move the anchor; the stack returns to the same spot across repeated empty/refill cycles | **Auto** — `ChipStackAnchorTests` (#152) |
-| A drag moves the anchor; a grow-down stack is never repositioned | **Auto** — `ChipStackAnchorTests` |
+| The chip row parks under the widget, and flips above it when there is no room below | **Auto** — `HudChipRowTests` |
+| Nothing about the chip row's position is persisted — it is recomputed from the widget every tick | **Auto** — `HudChipRowTests` (the three rows above, held by ChipStackAnchorTests, retired with the two chip stacks in Surface A / SA-2: #122 and #152 were both about a stack's SAVED position, and there is no longer one) |
+| Spawn chips flip to DUE and fill their gauge; fight chips keep counting and drain theirs | **Auto** — `HudChipRowTests` |
+| Both families reach the row, the Camps hide-rule takes only the spawn one off it, and the row is up in both HUD states | **Auto** — `HudChipRowTests` (E2E) |
 | The card list's cap is converted at the point of assignment, in the real app at a real scale | **Auto** — `EndToEndTests` (E2E; #144's other half) |
-| The chip anchor is actually wired to the window's events | **Manual** — §6 items 2–3 |
 | **Nothing on a timer may change the widget's measured size.** The title-bar CPU/memory readout formats to a fixed shape and its label reserves a fixed width, so a new sample repaints and never asks the windowing system to resize | **Auto** — `PerfReadoutTests` (#173) |
 | The readout stays off by default and costs no title-bar width until it is turned on | **Manual** — §6. *(Held by the Avalonia render suite until E-2c; see [v2/avalonia-test-disposition.md](v2/avalonia-test-disposition.md).)* (#112) |
 | That an always-on-top widget resizing does not disturb a fullscreen game underneath | **Manual** — §6 item 10; no headless test can see it |
@@ -509,7 +509,9 @@ things that are genuinely gone, named rather than absorbed into a deletion.
 
 **Partly closed 2026-08-14.** The *arithmetic* behind both reported bugs now lives in
 `UI.Shared` and is unit-tested — `WidgetMetricsTests` (screen-to-pre-scale conversions,
-#144) and `ChipStackAnchorTests` (grow-up anchoring, #122 and #152). Both suites were
+#144) and, until Surface A / SA-2 retired it with the two chip stacks, ChipStackAnchorTests
+(grow-up anchoring, #122 and #152 — the chip row saves no position, so there is nothing left
+to anchor; `HudChipRowTests` holds where it parks). Both suites were
 verified by reintroducing the original bugs and watching them go red. The windows keep
 only the wiring, which is the part a human still has to look at.
 
@@ -517,7 +519,7 @@ Everything below remains **Manual** and can only be caught by a human or a playe
 
 - Window placement, screen guards, and the wiring of the transform to the controls
 - Card expand/collapse, section order, star/pin behaviour, the mini pill
-- Chip stacks — that the tested anchoring is actually wired to the window events
+- The chip row — that the tested placement is actually wired to the widget's tick
 - Click-through, see-through, focus-hide, tray icon, hotkeys
 - The zone map window: rendering, pan/zoom, context menus, camp pins
 - Alert banners and sounds at the moment they fire
@@ -530,7 +532,7 @@ bugs of the kind a small pure helper *could* pin.
 ### Recommended, in order of value per effort
 
 1. ~~**Extract the arithmetic, then test it.**~~ **Done 2026-08-14** — see
-   `UI.Shared/WidgetMetrics.cs` and `UI.Shared/ChipStackAnchor.cs`. Apply the same move
+   `UI.Shared/WidgetMetrics.cs` and `UI.Shared/HudChipRow.cs`. Apply the same move
    to the next window bug rather than fixing it in place: if it is a sum, it belongs in
    `UI.Shared` where it can be pinned.
 2. ~~**A WPF render-test project** mirroring the Avalonia one.~~ **Withdrawn 2026-09-04.**

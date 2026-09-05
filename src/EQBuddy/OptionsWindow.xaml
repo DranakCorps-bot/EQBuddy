@@ -263,7 +263,7 @@
                 <TextBlock Text="Mez countdown chips (who's asleep, wake-up timers)" FontSize="12"
                            Foreground="{DynamicResource TextBrush}"/>
             </CheckBox>
-            <TextBlock Text="Untick if your class never mezzes — the stack stops appearing entirely."
+            <TextBlock Text="Untick if your class never mezzes — mez chips stop appearing entirely."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
 
             <!-- Mez durations, the same contract spawn durations have: your number
@@ -283,21 +283,14 @@
                 <TextBlock Text="🕒 Track spawns (named respawn timers)" FontSize="12"
                            Foreground="{DynamicResource TextBrush}"/>
             </CheckBox>
-            <TextBlock Text="Kill a named — or its placeholder — and a small countdown chicklet appears (⏳ Asaka L`Rei 3:12). Chicklets stack, drag anywhere as one, show every timer you have running in any zone, and flip to DUE for a minute (click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the full zone list, which follows you zone to zone. We captured the respawn times we could from community sources — if you notice a discrepancy in game, type over the duration: your number wins and survives updates."
+            <TextBlock Text="Kill a named — or its placeholder — and a small countdown chicklet appears (⏳ Asaka L`Rei 3:12). Chicklets sit in one row under the widget and move with it, show every timer you have running in any zone, and flip to DUE for a minute (click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the full zone list, which follows you zone to zone. We captured the respawn times we could from community sources — if you notice a discrepancy in game, type over the duration: your number wins and survives updates."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
 
-            <CheckBox x:Name="SpawnGrowUpCheck" Margin="0,10,0,0"
-                      Checked="OnChipGrowToggled" Unchecked="OnChipGrowToggled">
-                <TextBlock Text="Spawn chips grow upward" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <CheckBox x:Name="MezGrowUpCheck" Margin="0,4,0,0"
-                      Checked="OnChipGrowToggled" Unchecked="OnChipGrowToggled">
-                <TextBlock Text="Mez chips grow upward" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="A stack normally holds its top edge and grows downward as chips arrive. Grown-upward it holds its BOTTOM edge instead — park boss timers above mez timers and each grows away from the other."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+            <!-- The two "grow upward" tick-boxes retired here in Surface A / SA-2, with the
+                 two separately-placed stacks they arbitrated between (#95: "park boss timers
+                 above mez timers and each grows away from the other"). Spawn and mez chips
+                 are ONE row now, under the widget, so there is no second stack to grow away
+                 from and no saved position for either. -->
         </StackPanel>
 
         <!-- ========================= WATCH RULES ========================= -->

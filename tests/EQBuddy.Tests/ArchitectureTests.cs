@@ -201,7 +201,21 @@ public class ArchitectureTests
         // changes touch different parts of the file, so the number is the one the MERGE
         // produces rather than either branch's own — which is also why it is set once,
         // here, instead of per commit.
-        (@"EQBuddy/MainWindow*.xaml.cs", 3964),
+        // 3964 → 3895 on 2026-09-05 (Surface A / SA-2). **A DELETION this time, not a
+        // lift**, which is the better of the two and the one this ratchet exists to buy:
+        // `SpawnChipsWindow` and `MezChipsWindow` folded into one HUD chip row, and their
+        // two construction blocks, the `CloseChips` teardown, the two window fields and
+        // the four chip-BUILDING helpers (`MezChips`, `SlowChips`, `FightChips`,
+        // `SlowChipsVisible`) left with them — the builders into `UI.Shared/HudChipRow.cs`,
+        // where the mez numbering that had never been assertable now is, and the rest into
+        // `HudChipRowWindow`.
+        //
+        // The entry had zero headroom AGAIN when the pass started (4,360 against 3964 ×
+        // 1.1 = 4,360), exactly as F2 predicted, which is why SA-2's scope was two window
+        // deletions rather than an edit that squeezes under the bar. Set to the MINIMUM
+        // that fits, by the same "one line and no more" rule as every entry above:
+        // 3895 × 1.1 = 4,284.5 against 4,284 lines.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3895),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

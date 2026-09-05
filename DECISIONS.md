@@ -17,26 +17,50 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
-## 2026-09-05 (Options gap — "No longer on the widget")
+## 2026-09-05 (F2 / SA-2 — one HUD chip row)
 
-- **The list names the CONTEXT-MENU row and says nothing about the Evolved rooms.** Bevel's
-  ruling said "where it lives now"; both cuts live in two places, a v1 window and a shell room.
-  The other way: name the room too, as `WhatsNew`'s cut entries already do. Declined —
-  `EQBUDDY_SHELL` is the only way into a room today, so naming one would point a hunting player
-  at a door they do not have, which is the mirror of the defect this list exists to fix. The
-  menu header is a field (`RetiredCard.MenuHeader`) rather than prose, so `RetiredCardsTests`
-  can check the row still exists in `MainWindow.xaml`. `OptionsViewModel.cs`, trap 59.
-- **It renders inside the card panel, not as a fourth block on the tab.** The other way: its own
-  heading below the mini dashboard, beside "Breakout windows". Declined — this is the answer to
-  a question asked while reading the card list, and an answer one heading below the question is
-  one a player finds (trap 44's "notifications go where the eye lands", from the other end).
-  `OptionsCardsView.BuildRetired`.
-- **Amended the unreleased 2.0.0 What's-new rather than adding a `v1.99.19` note.** The World
-  entry said Options "no longer names Travels & Deaths, Zone map, Travel route or Spawn timers
-  anywhere", which this change makes false; the entry is not tagged, so it is editable and the
-  guard agrees. The other way: leave it and let the release ship a sentence contradicting the
-  screen. Declined — a What's-new entry that is false on arrival is the one thing that rule has
-  never allowed. `src/EQBuddy.Core/Data/WhatsNew.json`.
+- **The Options-open PLACEMENT PREVIEW and its draggable placeholder were deleted, not
+  ported.** `ChipStackPlan.PlacementPreview()` and `FightStack`'s `optionsOpen` /
+  `mezEnabled` / `slowEnabled` parameters existed so an empty fight stack would appear while
+  Options was open, to be parked before the first mid-fight debuff. The one row is slaved to
+  the HUD and saves no coordinates, so there is nothing left to park; keeping a preview of a
+  choice the player no longer makes would be a control that does nothing. Could have kept the
+  API and fed it `optionsOpen: false` forever. **This is the one place SA-2 departs from the
+  plan's letter** — F2 §1 says "its tests keep passing unchanged" while §6 says the
+  placeholder "dies with placement"; the fold obligation is the more specific instruction and
+  the product-correct one. Named in the Helm ask. → `ChipStackPlan.cs`, `ChipStackPlanTests`.
+- **The eight chip-geometry settings were removed outright rather than kept for round-trip**
+  (`SpawnChips{Left,Top,Bottom,GrowUp}`, `MezChips{Left,Top,Bottom,GrowUp}`), as the plan
+  specified: the windows they positioned no longer exist, JSON load ignores unknown keys, and
+  a stored value nothing can act on is trap 20's own shape. `SpawnSound`'s
+  keep-for-round-trip precedent predates the one-lane world. → `AppSettings.cs`.
+- **`ChipStackAnchor`, `ChipAnchor` and `ChipStackAnchorTests` were deleted and CLAUDE.md's
+  trap 2 got a TOMBSTONE rather than a rewrite.** The trap (`ActualHeight` is 0 in a `Closed`
+  handler) is still true and still binds every surface that persists geometry; what retired is
+  its named guard, because the chip row persists none. Could have kept them as dead guards.
+  → `CLAUDE.md` trap 2, `docs/TestPlan.md` §5.
+- **Mez before spawn as the default family order**, per the plan — combat-urgent first, which
+  is the distinction the two retired windows' own doc comments drew. Could have been
+  spawn-first or alphabetical. → `HudChipRow.DefaultOrder`.
+- **Slow chips ride in the MEZ family rather than becoming a fifth family.** They shared one
+  window and one saved position before this, they agree on every family-level trait (drain,
+  no DUE flip), and the Helm-signed SA-4 order names four families. Inventing a fifth would
+  hand an executor an order and a mute that Bevel never ruled on. → `HudChipFamily`.
+- **The two chip-BUILDING helpers moved to `UI.Shared` with the row** (`MezChips`,
+  `SlowChips`, plus the fight-family concatenation and the raid-only slow gate). Not in the
+  plan's letter; the ratchet had zero headroom again and "lift a surface, don't split the
+  file" is the standing move. It also put the mez numbering ("orc pawn (2)", #32) under a
+  unit test for the first time. → `HudChipRow.cs`, `HudChipRowTests`.
+- **The row keeps the chip stacks' existing per-second measure change; it is NOT given
+  reserved-width countdown slots.** Trap 12 binds the WIDGET, which is precisely what the
+  slaved companion protects — F2's own reason for the hosting amendment. Fixing a resize the
+  two stacks have always had would have been new behaviour in a parity refactor, and it would
+  have cost a fixed ~46 units of HUD per chip. Flagged rather than smuggled: if a player
+  reports it, it is a V1 follow-up. → `HudChipRowWindow`, `HudChip`.
+- **The chip row's left-click DRAG died with free placement, and the chips are otherwise
+  unchanged.** Double-click (spawn → the World window's Camps tab), click-to-clear on a DUE
+  spawn chip and right-click dismiss all carry over. Full fold enumeration is in the PR
+  description. → `HudChipRowWindow.ClickOf/DoubleClickOf/DismissOf`.
 
 ## 2026-09-05 (T1 — the `shoot.ps1` intermittent full-batch look)
 

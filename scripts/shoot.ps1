@@ -1245,6 +1245,55 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_EXPAND = 'progress' }
                            Ledger = @{ Classes = @('Warrior', 'Druid', 'Monk'); Level = 12 }
                            Set = @{ ShowNextUnlocks = $true; ShowAllAAs = $true } }
+    # THE ONE CHIP ROW (Surface A / SA-2) — the companion window that replaced
+    # SpawnChipsWindow and MezChipsWindow. A NEW name, checked against docs/screenshots/ and
+    # the docs first (trap 21): nothing embeds 'hud-chips', and the two existing chip images
+    # (mini-pet-chip, widget-mini-chips) are about the collapsed HUD bar's cells, not these.
+    #
+    # It is the only surface in this file that cannot be staged from settings alone: with no
+    # running countdown and no mez, the row does not exist at all and a capture would be of an
+    # empty desktop (trap 22 at its purest). So both families are seeded — spawn through
+    # `Timers` (spawn-timers.json, the app's own file and shape), mez through two appended log
+    # lines the game itself writes.
+    #
+    # PREDICTION, written BEFORE the shot (trap 23). Expect ONE horizontal row of four
+    # chicklets, left to right, in HudChipRow.DefaultOrder — the MEZ family first:
+    #   1. 💤-moon "Skeleton" with a counting mm:ss and a DRAINING gauge along its bottom.
+    #      One skeleton only, so no "(1)" suffix.
+    #   2. ⏳-timer "Bones Brackins" reading the word DUE in the warn ink, warn border, and
+    #      its gauge SOLID in the bad ink — the flip the spawn family has and mez does not.
+    #   3. ⏳-timer "Fright" — 20 minutes into a 30-minute cycle, so about 10:00 left and a
+    #      gauge two-thirds filled.
+    #   4. ⏳-timer "Kizdean Gix" — 60 s into a 30-minute cycle, so a countdown near 29:00
+    #      and a gauge FILLING from the left, barely started.
+    # Chicklets are separated by 3 units horizontally, each with the 7-radius border and the
+    # BgBrush ground. The row sits under the widget, left edges aligned; this capture is of
+    # the ROW WINDOW alone, so the widget is not in frame.
+    #
+    # A gauge direction that is the same on all four, or a fourth chicklet reading a
+    # countdown instead of DUE, is the fold flattening a difference the two windows had —
+    # which is precisely what this picture exists to catch and what no diff would show.
+    # SHOT 2026-09-05: four chicklets, mez first, exactly as above — EXCEPT that the
+    # PREDICTION had the three spawn chips in SEED order and they come out SOONEST-FIRST
+    # (Bones DUE, Fright 9:50, Kizdean 28:50). That is not a render bug and not a staging
+    # bug: SpawnTimers.Snapshot has always ordered by DueAt, and HudChipRow.Merge preserves
+    # each family's own order rather than imposing one. The prediction was written from the
+    # seed list instead of from the family's order; corrected above rather than quietly
+    # accepted (trap 23 — a mismatch is a fixture bug until proven otherwise, and this one
+    # was proven a prediction bug in one read of Snapshot).
+    'hud-chips'       = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{}
+                           Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
+                           Timers = @(
+                               @{ Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix'
+                                  KilledSecondsAgo = 60; DurationSeconds = 1800 }
+                               @{ Zone = 'Befallen'; Name = 'Bones Brackins'
+                                  KilledSecondsAgo = 30; DurationSeconds = 10 }
+                               @{ Zone = 'Lower Guk'; Name = 'Fright'
+                                  KilledSecondsAgo = 1200; DurationSeconds = 1800 }
+                           )
+                           Append = @('You begin casting Mesmerization.'
+                                      'a skeleton has been mesmerized.') }
     'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:
     # 'spawns-window' is embedded by the docs and stays Runnyeye. PREDICTION, written
@@ -1717,6 +1766,29 @@ function Write-Cycles([hashtable]$cycles) {
     $cycles | ConvertTo-Json -Depth 6 | Set-Content $path -Encoding utf8
 }
 
+function Write-Timers([array]$timers) {
+    $path = Join-Path $profileDir 'spawn-timers.json'
+    if ($null -eq $timers) { Remove-Item $path -Force -ErrorAction SilentlyContinue; return }
+    # SpawnTimers.LoadPersisted's own shape: a list of SpawnTimerState.
+    #
+    # Server is 'test' — the FIXTURE CHARACTER'S server, and the whole staging turns on it.
+    # LogWatcher assigns Spawns.Server from the character log it selects, and
+    # SpawnTimers.Snapshot FILTERS on that value: seeded with anything else the timers load,
+    # survive every purge, and are filtered out of every snapshot, so the row simply does not
+    # appear. That is trap 23 exactly — a real state, and a picture of a different one.
+    # Ages are relative to now so a countdown is always mid-cycle at capture time.
+    $now = Get-Date
+    @($timers | ForEach-Object {
+        [pscustomobject]@{
+            Server = 'test'
+            Zone = $_.Zone
+            Name = $_.Name
+            KilledAt = $now.AddSeconds(-$_.KilledSecondsAgo).ToString('o')
+            DurationSeconds = $_.DurationSeconds
+        }
+    }) | ConvertTo-Json -Depth 4 -AsArray | Set-Content $path -Encoding utf8
+}
+
 function Write-WikiCache([hashtable]$pages) {
     $dir = Join-Path $profileDir 'wiki-cache/mobs'
     if ($null -eq $pages) { Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue; return }
@@ -2138,6 +2210,7 @@ try {
         Write-Dump $spec.Dump
         Write-WikiCache $spec.Wiki
         Write-Cycles $spec.Cycles
+        Write-Timers $spec.Timers
         # AFTER the prime runs, not before. A prime for the fixture's own character
         # overwrites the very log an append had just been written into, so staging the
         # live session first and the stored history second silently discarded the first

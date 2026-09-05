@@ -218,11 +218,14 @@ public sealed class AppSettings
     /// the reader-and-writer pair trap 20 exists to check for.</summary>
     public bool ShowLevelUps { get; set; }
 
-    /// <summary>Chip-stack growth direction (#95): anchored at the bottom edge, new
-    /// chips push the stack upward — so boss timers can sit above mez timers with
-    /// each growing away from the other.</summary>
-    public bool SpawnChipsGrowUp { get; set; }
-    public bool MezChipsGrowUp { get; set; }
+    // SpawnChipsGrowUp / MezChipsGrowUp retired here in Surface A / SA-2, with the two
+    // windows they aimed (#95's "boss timers above mez timers, each growing away from the
+    // other" was an answer to there being two independently-placed stacks). There is one
+    // row now, slaved to the HUD, and it has a single growth direction. Removed outright
+    // rather than kept for round-trip: JSON load ignores unknown keys, so an old profile
+    // still loads, and a stored value nothing can act on is the setting-with-no-reader
+    // trap 20 exists to catch. See DECISIONS.md, 2026-09-05.
+
     /// <summary>Section-list height chosen by dragging the widget's bottom edge, in
     /// pre-scale units so it survives UiScale changes (Reddit ask, 2026-08-09: grow the
     /// window without growing the text). NaN = automatic, fit the monitor.</summary>
@@ -448,21 +451,13 @@ public sealed class AppSettings
     /// "Default" now follows <see cref="AlertSound"/>, the same default watch rules use —
     /// a second spawn-specific default made "Default" mean silence, which read as broken.</summary>
     public string SpawnSound { get; set; } = "Off";
-    /// <summary>Position of the spawn-chicklet stack; NaN = a default spot near the
-    /// top-left, clear of the widget's home edge.</summary>
-    public double SpawnChipsLeft { get; set; } = double.NaN;
-    public double SpawnChipsTop { get; set; } = double.NaN;
-    /// <summary>Bottom edge of the spawn-chip stack at last close. Grow-up stacks
-    /// anchor their BOTTOM, and the top edge depends on chip count at close — so the
-    /// bottom is what restores when growing upward (#122). NaN = never saved.</summary>
-    public double SpawnChipsBottom { get; set; } = double.NaN;
-
-    /// <summary>Position of the mez-chip stack — its own window, deliberately separate
-    /// from the spawn chips (mez chips are combat-urgent, spawn chips are ambient).</summary>
-    public double MezChipsLeft { get; set; } = double.NaN;
-    public double MezChipsTop { get; set; } = double.NaN;
-    /// <summary>See <see cref="SpawnChipsBottom"/> — same rule, mez stack.</summary>
-    public double MezChipsBottom { get; set; } = double.NaN;
+    // SpawnChips{Left,Top,Bottom} and MezChips{Left,Top,Bottom} retired in Surface A /
+    // SA-2, with the two windows whose positions they were. **Nothing persists chip
+    // geometry any more**: the one row is recomputed from the widget's own position every
+    // tick (HudChipRow.Placement), which is what retires ChipStackAnchor and the whole
+    // trap-2/#122/#152 family of bugs with it — a stack that saves no position cannot walk
+    // up the screen across reopens. Removed outright, not kept for round-trip; see the
+    // note on the two GrowUp flags above and DECISIONS.md, 2026-09-05.
 
     /// <summary>Target-drops block in the Loot card (wiki drops for the creature being
     /// fought). Default on; the toggle exists for lean-card people.</summary>

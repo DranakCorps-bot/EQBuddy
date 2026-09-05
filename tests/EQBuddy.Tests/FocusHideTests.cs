@@ -88,8 +88,7 @@ public class FocusHideTests
     [Theory]
     [InlineData("MainWindow")]
     [InlineData("BreakoutWindow")]
-    [InlineData("SpawnChipsWindow")]
-    [InlineData("MezChipsWindow")]
+    [InlineData("HudChipRowWindow")]
     [InlineData("ClickThroughChip")]
     [InlineData("AlertWindow")]
     [InlineData("CursorRingWindow")]
@@ -141,11 +140,12 @@ public class FocusHideTests
 
         var excepted = new[]
         {
-            "MainWindow", "BreakoutWindow", "SpawnChipsWindow", "MezChipsWindow",
+            "MainWindow", "BreakoutWindow", "HudChipRowWindow",
             "ClickThroughChip", "AlertWindow", "CursorRingWindow", "GridOverlayWindow",
         }.Where(name => !FocusHide.FollowsWidgetHide(name)).ToList();
 
-        Assert.Equal(8, excepted.Count);   // all eight are really excepted, not merely listed
+        // Seven since Surface A / SA-2 folded the two chip stacks into one row.
+        Assert.Equal(7, excepted.Count);   // all seven are really excepted, not merely listed
         foreach (var name in excepted)
             Assert.True(windows.Contains(name),
                 $"FocusHide excepts '{name}' from following the widget, and no window class " +

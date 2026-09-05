@@ -747,7 +747,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public void SetChipScale(double scale)
     {
         _settings.ChipScale = Math.Clamp(scale, 0.5, 2.0);
-        foreach (var w in new Window?[] { _chipsWindow, _mezWindow, _alertWindow })
+        foreach (var w in new Window?[] { _hudChips, _alertWindow })
             if (w is not null) ChipScale.Apply(w, _settings.ChipScale);
         _settings.Save();
     }
@@ -858,8 +858,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             ? new Version(v.Major, Math.Max(0, v.Minor - 1), 0).ToString()
             : current;
 
-    private SpawnChipsWindow? _chipsWindow;
-    private MezChipsWindow? _mezWindow;
+    /// <summary>The ONE chip row (Surface A / SA-2). It replaced <c>SpawnChipsWindow</c>
+    /// and <c>MezChipsWindow</c>, which is why there is one field here instead of two —
+    /// and why nothing on it is ever persisted (<see cref="HudChipRowWindow"/>).</summary>
+    internal HudChipRowWindow? _hudChips;   // internal: WidgetDump reports its hudChips facts
     private readonly MezTracker _mezTracker = new();
     private MezOverrides _mezDurations = new();
     /// <summary>The mez tracker and the durations the player typed over it — the Options
@@ -1401,37 +1403,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
             "https://github.com/DranakCorps-bot/EQBuddy") { UseShellExecute = true });
 
-    /// <summary>Mez chips: who's asleep, wake-up countdown ("?" until the spell's
-    /// duration is known), warning tint inside the last tick. Same-named entries are
-    /// numbered — "orc pawn (2)" — since the log can't tell the creatures apart
-    /// (issue #32 asked for separate timers rather than one merged chip).</summary>
-    private List<SpawnChip> MezChips(DateTime now)
-    {
-        var states = _mezTracker.Snapshot(now);
-        var seen = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        return states.Select(m =>
-        {
-            var n = seen[m.Target] = seen.GetValueOrDefault(m.Target) + 1;
-            var dupe = states.Count(x => x.Target.Equals(m.Target, StringComparison.OrdinalIgnoreCase)) > 1;
-            var remaining = m.RemainingSeconds(now);
-            var text = remaining is { } r
-                ? $"{(int)r / 60}:{(int)r % 60:00}"
-                : "?";
-            return new SpawnChip(
-                Zone: "", Name: dupe ? $"{m.Target} ({n})" : m.Target, CountdownText: text,
-                IsDue: remaining is <= 6,
-                Detail: $"{m.Spell} by {m.Caster} · landed {m.LandedAt:h:mm:ss tt}",
-                Icon: "Moon")
-            {
-                // Elapsed share for the gauge; the mez view draws the REMAINING side
-                // (a draining bar, like a buff), so 1 - this.
-                Fraction = m.ExpiresAt is { } exp && (exp - m.LandedAt).TotalSeconds is > 0 and var dur
-                    ? Math.Clamp((now - m.LandedAt).TotalSeconds / dur, 0, 1)
-                    : null,
-            };
-        }).ToList();
-    }
-
     /// <summary>
     /// The Buffs card: every buff believed active on you, soonest-fading first, with
     /// a countdown. "est" marks a wiki-base duration (ranks and AAs lengthen buffs;
@@ -1789,46 +1760,46 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         return button;
     }
 
-    /// <summary>Everything the fight-side chip stack shows: mez chips and slow chips,
-    /// each behind its own Options toggle, sharing one window and saved position.</summary>
-    private List<SpawnChip> FightChips(DateTime now)
+    /// <summary>
+    /// THE ONE CHIP ROW, once per tick (Surface A / SA-2).
+    ///
+    /// **Two questions, two homes.** <see cref="ChipStackPlan"/> answers "should this family
+    /// be on screen at all" — the Bevel-signed Camps hide-rule, focus-hide, the two Options
+    /// toggles — and is unit-tested; <see cref="HudChipRow"/> answers what the row looks
+    /// like once they have, and is unit-tested too. What is left here is WHICH trackers to
+    /// ask, which is the window's own business (trap 15).
+    ///
+    /// Also the row's only door: it is created on the first tick that has a chip and hidden
+    /// on the first that has none, with nothing saved either way.
+    /// </summary>
+    internal void RefreshHudChips()
     {
-        var chips = _settings.MezChipsEnabled ? MezChips(now) : [];
-        if (SlowChipsVisible(now)) chips.AddRange(SlowChips(now));
-        if (chips.Count == 0 && _optionsWindow is { IsLoaded: true })
-            chips.Add(ChipStackPlan.PlacementPreview());
-        return chips;
+        var now = DateTime.Now;
+        // The spawn family's hide-rule and its one exception live in ChipStackPlan.
+        var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
+            && ww3.CurrentTab == WorldTab.Camps;
+        var spawn = ChipStackPlan.SpawnStack(_settings.TrackSpawns, _hiddenForFocus,
+            worldOnCamps, _spawnsVm.HasActiveTimers(now))
+            ? _spawnsVm.Chips(now) : [];
+
+        var mezOn = _settings.MezChipsEnabled;
+        var slowOn = _settings.SlowAlertEnabled
+            && (!_settings.SlowAlertRaidOnly || _slowTracker.InRaid(now));
+        // Emptiness is probed cheaply first so the full chip list isn't built twice a
+        // second just to learn it was empty.
+        var fight = ChipStackPlan.FightStack(_hiddenForFocus,
+            mezHasChips: mezOn && _mezTracker.Any(now),
+            slowHasChips: slowOn && _slowTracker.Any(now))
+            ? [.. mezOn ? HudChipRow.MezChips(_mezTracker, now) : [],
+               .. slowOn ? HudChipRow.SlowChips(_slowTracker, now) : []]
+            : new List<SpawnChip>();
+
+        var row = HudChipRow.Merge(fight, spawn);
+        if (row.Count == 0) { _hudChips?.Hide(); return; }
+        _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
+        if (!_hudChips.IsVisible) _hudChips.Show();
+        _hudChips.Follow(row);
     }
-
-    private bool SlowChipsVisible(DateTime now) =>
-        _settings.SlowAlertEnabled
-        && (!_settings.SlowAlertRaidOnly || _slowTracker.InRaid(now));
-
-    /// <summary>Slow chips (#94): the debuff's honest % (a range when several slows
-    /// share the landing line), time left when the wiki documents a duration, and the
-    /// cure line in the tooltip — "how do I get rid of this" attached to the alert.</summary>
-    private List<SpawnChip> SlowChips(DateTime now) =>
-        _slowTracker.Snapshot(now).Select(s =>
-        {
-            var remaining = s.RemainingSeconds(now);
-            var detail = string.Join(" · ", new[]
-            {
-                s.Spells.Length == 1 ? s.Spells[0] : "One of: " + string.Join(", ", s.Spells),
-                s.CounterText,
-                _slowTracker.CureLine(s),
-                $"landed {s.LandedAt:h:mm:ss tt}",
-            }.Where(part => part.Length > 0));
-            return new SpawnChip(
-                Zone: "", Name: EQBuddy.UI.Shared.SlowChipText.Label(s),
-                CountdownText: remaining is { } r ? $"{(int)r / 60}:{(int)r % 60:00}" : "?",
-                IsDue: false, Detail: detail + " · right-click to dismiss", Icon: "ChevronsDown")
-            {
-                Fraction = s.ExpiresAt is { } exp && (exp - s.LandedAt).TotalSeconds is > 0 and var dur
-                    ? Math.Clamp((now - s.LandedAt).TotalSeconds / dur, 0, 1)
-                    : null,
-                OnDismiss = () => _slowTracker.Dismiss(s.Message),
-            };
-        }).ToList();
 
     /// <summary>
     /// A slow landed on the player, straight off the ingest thread. Speaks once per
@@ -1846,13 +1817,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             ? $"{state.PctMax} percent"
             : $"up to {state.PctMax} percent";
         EQBuddy.UI.Shared.SpokenAlerts.Speak($"Slowed {pct}");
-    }
-
-    private void CloseChips()
-    {
-        if (_chipsWindow is not { IsLoaded: true } cw) { _chipsWindow = null; return; }
-        _chipsWindow = null;
-        cw.Close();   // saves the stack position on the way out
     }
 
     /// <summary>The regen-tick line for healing surfaces: count always; estimate when a
@@ -2167,7 +2131,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _settings.TrackSpawns = on;
         _settings.Save();
         if (_optionsWindow is { IsLoaded: true } ow) ow.SyncTrackSpawns(on);
-        if (!on) CloseChips();
+        RefreshHudChips();   // the spawn family leaves the row on the same tick
     }
 
     internal void OnOptions(object sender, RoutedEventArgs e)
@@ -2431,51 +2395,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // deserves a louder default than a loot ding (also David's call).
             foreach (var sound in _spawnsVm.DueSounds(DateTime.Now))   // + the phone, #208
                 { PlayAlertSound(sound); _companion.RaiseAlert(); }    // see MobileAlertSounds
-
-            // The chip hide-rule and its one exception live in ChipStackPlan.
-            var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
-                && ww3.CurrentTab == WorldTab.Camps;
-            if (ChipStackPlan.SpawnStack(true, _hiddenForFocus, worldOnCamps,
-                    _spawnsVm.HasActiveTimers(DateTime.Now)))
-            {
-                if (_chipsWindow is not { IsLoaded: true })
-                {
-                    _chipsWindow = new SpawnChipsWindow(this, _spawnsVm);
-                    _chipsWindow.Show();
-                }
-                _chipsWindow.RefreshChips(DateTime.Now);
-            }
-            else
-            {
-                CloseChips();
-            }
-        }
-        else
-        {
-            CloseChips();
         }
 
-        // Why the fight stack is its own window, and why Options-open forces it: see
-        // ChipStackPlan, which owns the rule for both lanes.
-        var chipsNow = DateTime.Now;
-        if (ChipStackPlan.FightStack(_hiddenForFocus,
-                optionsOpen: _optionsWindow is { IsLoaded: true },
-                _settings.MezChipsEnabled, _settings.SlowAlertEnabled,
-                mezHasChips: _settings.MezChipsEnabled && _mezTracker.Any(chipsNow),
-                slowHasChips: SlowChipsVisible(chipsNow) && _slowTracker.Any(chipsNow)))
-        {
-            if (_mezWindow is not { IsLoaded: true })
-            {
-                _mezWindow = new MezChipsWindow(_settings, FightChips, SetChipScale);
-                _mezWindow.Show();
-            }
-            _mezWindow.RefreshChips(DateTime.Now);
-        }
-        else if (_mezWindow is { IsLoaded: true } mw)
-        {
-            _mezWindow = null;
-            mw.Close();   // saves the stack position on the way out
-        }
+        // ONE ROW for both families now (Surface A / SA-2). This used to be two blocks
+        // building two always-on-top windows with two saved positions.
+        RefreshHudChips();
 
         // Every 5s: re-check which character's log is growing and follow them.
         if (DateTime.Now - _lastCharScan > TimeSpan.FromSeconds(5))
