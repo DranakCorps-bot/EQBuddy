@@ -19,8 +19,14 @@ namespace EQBuddy;
 /// build (and cost a round trip proving it was). See CLAUDE.md trap 41.
 ///
 /// So the mode is SET on each window — the one form inheritance is guaranteed to carry to
-/// children — both as windows load and, when the player flips the switch in Options, on
-/// every window already open.
+/// children — as windows load, and on every window already open at the moment the policy
+/// is applied.
+///
+/// **The Options checkbox that used to flip it is gone** (E-2d, #277 clause (a),
+/// Helm-signed 2026-09-05). It only ever appeared under Wine, so it was invisible on the
+/// supported Windows artifact; <c>AppSettings.WineWholePixelText</c> survives as a
+/// hand-edited settings.json knob, the same shape as its two Wine siblings, and
+/// <c>EQBUDDY_TEXTMODE</c> is the override that works on either platform.
 /// </summary>
 internal static class WineText
 {
@@ -52,15 +58,6 @@ internal static class WineText
         ApplyToOpenWindows();
     }
 
-    /// <summary>Live, from the Options checkbox. TextFormattingMode is registered
-    /// AffectsMeasure, so setting it invalidates layout down the whole tree and the text
-    /// redraws in place — no restart, and no window has to be reopened.</summary>
-    public static void Reapply(AppSettings settings)
-    {
-        _mode = ToWpf(Resolve(settings));
-        ApplyToOpenWindows();
-    }
-
     /// <summary>The mode this process should be using, for the probe to report. Kept
     /// beside the application of it so the diagnostic can never drift from the decision
     /// it is meant to be checking.</summary>
@@ -68,13 +65,6 @@ internal static class WineText
         WineFonts.IsRunningUnderWine(),
         settings.WineWholePixelText,
         Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable));
-
-    /// <summary>Whether the player is offered the choice at all. Off Wine the switch has
-    /// nothing to change, and a control that cannot do anything is worse than an absent
-    /// one — it is the silent no-op rule with the switch on the other side.</summary>
-    public static bool IsOfferedHere() =>
-        WineFonts.IsRunningUnderWine() &&
-        Environment.GetEnvironmentVariable(TextRenderingPolicy.OverrideVariable) is null or "";
 
     private static void ApplyToOpenWindows()
     {

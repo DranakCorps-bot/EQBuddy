@@ -73,13 +73,6 @@ public partial class OptionsWindow : Window
         BuffExpiringOnlyCheck.IsChecked = _main.Settings.BuffTimersExpiringOnly;
         BuffWarnBox.Text = _main.Settings.BuffWarnSeconds.ToString("0");
         CursorRingCheck.IsChecked = _main.Settings.ShowCursorRing;
-        // Both branches set explicitly. A control that is only ever un-hidden is one
-        // gate change away from being invisible forever (trap 29), and this one is
-        // invisible on the machine most of the development happens on.
-        WholePixelTextPanel.Visibility = WineText.IsOfferedHere()
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        WholePixelTextCheck.IsChecked = _main.Settings.WineWholePixelText;
         PerfStatsCheck.IsChecked = _main.Settings.ShowPerfStats;
         SelectTab(_main.Settings.OptionsTab);
         BuildHotkeyRows();
@@ -241,18 +234,6 @@ public partial class OptionsWindow : Window
     private void OnCursorRingToggled(object sender, RoutedEventArgs e)
     {
         if (_ready) _main.SetCursorRing(CursorRingCheck.IsChecked == true);
-    }
-
-    /// <summary>Live: TextFormattingMode is registered AffectsMeasure, so re-setting it
-    /// invalidates layout down every open window's tree and the text redraws in place.
-    /// No restart, and no window has to be closed and reopened — which matters, because
-    /// the player is toggling this precisely to compare the two.</summary>
-    private void OnWholePixelTextToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.WineWholePixelText = WholePixelTextCheck.IsChecked == true;
-        _main.Settings.Save();
-        WineText.Reapply(_main.Settings);
     }
 
     private void OnPerfStatsToggled(object sender, RoutedEventArgs e)

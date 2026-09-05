@@ -15,6 +15,34 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+---
+
+## 2026-09-05 (E-2d Wine knob, clause (a), lane-d)
+
+- **`WineText.Reapply` and `WineText.IsOfferedHere` were DELETED with the checkbox, not left
+  in place.** The other way: remove only what Helm named — the XAML panel, its wiring and the
+  handler — and keep `WineText` byte-for-byte, since the ruling's KEEP list says "`WineText`".
+  Declined: the checkbox was the only caller of either, so keeping them leaves two methods no
+  code can reach, which is #210's exact shape (*"the helper that did the work had passing tests
+  and NO CALLER"*) and the mirror of the very list this PR adds a row to. `WineText` itself
+  stays, and the two members #277 actually kept it for — `ApplyIfNeeded` and `Resolve` — are
+  untouched, so the CrossOver-on-Windows-artifact population loses nothing. Named in the Helm
+  ask so a scope call is visible rather than inferred from a diff.
+- **No `WhatsNew.json` entry and no version bump.** The other way: treat the loss of an
+  Options control as player-noticeable and cut a release for it. Declined — the control was
+  drawn only under Wine, Helm's sign says in as many words that there is *"no player-visible
+  change on the supported Windows artifact"*, the existing 1.99.2 entry describing the box is a
+  shipped record that must not be edited (`whatsnew-guard.ps1`), and the kick forbids
+  `v1.99.19`. If Helm reads the Wine population as owed a line, it is one entry on whatever tag
+  next ships and it is cheap; flagged in the ask rather than decided silently.
+- **`docs/v2/v1-feature-disposition.md` §8 was updated to record the landing.** The other way:
+  leave the signed E-2e text alone as a snapshot of the ask. Declined on CLAUDE.md's own
+  opening rule — the row said `OptionsWindow.xaml.cs:253` "its only writer", and after this
+  commit that line is false, which is worse than absent. The argument and the ruling are
+  untouched; the row's state and a dated "clause (a) has landed" note are what changed.
+
+---
+
 ## 2026-09-05 (T3, the shell terminology scanner)
 
 - **Scoped the scanner to the SHELL and named the exclusions in the file, rather than

@@ -86,6 +86,14 @@ public class DeadSettingTests
         ["UpdateFolder"] = "no UI by design — edit settings.json",
         ["WineFloatOverFullscreen"] = "no UI by design — Wine/Proton escape hatch",
         ["WineKeepGameFullscreen"] = "no UI by design — Wine/Proton escape hatch",
+        // JOINED this list on 2026-09-05 (E-2d, #277 clause (a), Helm-signed). Its only
+        // writer was OptionsWindow's "Keep letters on whole pixels" checkbox, and that
+        // control was drawn only under Wine — so on the supported Windows artifact it has
+        // never been reachable. Dropping it makes all three Wine settings the same shape:
+        // read by TextRenderingPolicy, changed by hand. The capability is NOT lost, which
+        // is the question this list exists to ask — a player who set it keeps it, and
+        // EQBUDDY_TEXTMODE overrides on either platform.
+        ["WineWholePixelText"] = "no UI since E-2d — Wine/Proton escape hatch; EQBUDDY_TEXTMODE overrides",
     };
 
     [Fact]
