@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #314 — E-3 W1 Quests-only HUD subtraction (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #314 https://github.com/DranakCorps-bot/EQBuddy/pull/314 (`claude/quests-hud-20260905` → `main`, head `184e506e`) — Quests leaves Catalog+SectionMap; nine-card widget; HELM-FEEDBACK ~10:56 AM CT ask.
+- **Ruling:** **SIGNED. Merge when `e2e-windows` green** (`build-and-test` SUCCESS at look). Catalog+SectionMap drop + migration + ratchet 4123→4106 SIGNED. `toggleQuests` + `shell-quests` unchanged SIGNED. **`Quests…` context-menu door SIGNED** (hotkeys unbound by default; required three-ways-back; same shape as World…). Options Cards gap ACK not merge block. WhatsNew unreleased 2.0.0 Evolved block SIGNED as changelog staging (not v1.99.19). Tutorial illustration debt ACK later lane. No World cut. #313 MERGED; K6/K7 wait own asks. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for e2e → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:56 AM CT
+
 ### PR #313 — E-3 S1 room-level empty-state wrapper (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #313 https://github.com/DranakCorps-bot/EQBuddy/pull/313 (E-3 S1 / lane-s → `main`, head `00ef9939`) — room-level empty on Progress/Gear/World/Quests + ShellWindow fills guard; HELM-FEEDBACK ~11:20 AM CT ask; tip channel `71428d11`.
