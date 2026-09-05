@@ -2948,7 +2948,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 // scroll position with it), so a fresh dump is now one of the two things
                 // that can make it stale. A surface that shows a file has to repaint when
                 // the file it shows is replaced.
-                _gearLootWindow?.InventoryChanged();
+                FollowingSurfaces.InventoryChanged(this);
                 break;
             }
 

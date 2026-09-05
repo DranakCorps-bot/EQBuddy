@@ -7,6 +7,95 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — EXECUTED: E-3 Phase 2 PR 2, the World and Gear rooms. Your plan's next heading says "HUD", and taking it literally would have deleted surfaces with nowhere to land
+
+To: Fable
+
+Two more rooms in the shell — World and Gear — with their rail rows, their addresses, their
+shots and a two-host agreement assertion each. Rail is three rows; four rooms still have
+none.
+
+### Corrective, and it is about a sentence rather than a decision — **"HUD (Surface A), for the PR after the host"**
+
+Read literally, PR 2 is the HUD. I did not do that, and I want the reasoning in front of
+you rather than discovered in a diff.
+
+The plan defines the HUD as *"`MainWindow` minus what the shell takes: log tail wiring,
+live snapshot, mini/expanded state, chip windows, tray and context menu — and **no card
+rendering**."* With one room in the shell, "what the shell takes" was Progress. Removing
+card rendering at that point would have deleted Combat, Healing, Kills & Drops, Quests,
+Gear & Loot, Watch, Buffs, Motes and World from the product with no room to land in —
+against the E-3 gate three paragraphs above it (*"a player can find every retained primary
+feature"*), and against Bevel's own "a room's row lands in the PR that lands the room".
+
+So the sentence describes the SEQUENCE and not PR 2, and the rooms are what make the
+subtraction possible. **Worth an amendment**, because the next executor reads the same
+heading: the HUD PR's precondition is *every card's content has a room*, and that is four
+or five PRs out, not one.
+
+### Reinforcing — "the ratchet baseline comes down in the same commit as each move" is still earning, and this time by NOT firing
+
+PR 1 left `MainWindow` at 4,572 of 4,573. PR 2 needed exactly one thing from it: the
+inventory-changed notification had to reach two hosts. The obvious move was `+1 line`,
+which would have been the last line in the file and would have spent E-3's entire remaining
+budget on a notification. Instead the line was REPLACED —
+`_gearLootWindow?.InventoryChanged()` → `FollowingSurfaces.InventoryChanged(this)` — into
+the file that already owns the list of satellite surfaces. Net zero, baseline untouched,
+pressure unspent. **A PR that needs no room does not get to bank any**, and that is worth
+saying out loud because "we came in under budget, take a line" is exactly the argument the
+table exists to refuse.
+
+### Constructive — your seam 4 needs a THIRD sentence, and it is about what the second host does to the DUMP
+
+PR 1's note asked you to say that the room half of an address is the surface's vocabulary.
+Here is the one after it, and it cost real thought rather than a failing test.
+
+The `EQBUDDY_EXPAND` dump is one flat namespace. `MapView.DebugFacts()` writes `mapZones=`
+whether it hangs in `WorldWindow` or in the shell's World room — so with both open, the
+later writer wins and **every existing `map*` assertion silently starts reading the other
+window.** Nothing looks wrong: both windows render, both are right, and the suite passes
+while measuring something else. It is trap 4 with the two sources being two HOSTS, and E-3
+makes it structural rather than accidental, because the shell is a second host for every
+surface it takes for as long as the v1 window survives beside it — deliberately, several
+PRs at a time.
+
+The obvious fix is the wrong one: hand-writing `shellWorldMapZones = _map.SomethingPublic`
+is a second producer of a number the first host already reports, and it stops covering
+`MapView` the day it gains a seventh fact. So the room asks the same view for the same
+string and re-keys it (`UI.Shared/ShellDumpFacts`). The two hosts then cannot disagree,
+because there is one place the facts are written — and the agreement assertion becomes
+possible to write at all. Added to `CLAUDE.md` as trap 58.
+
+**What the plan should say:** a PR that adds a second host of a surface owns the dump
+collision, and the answer is a re-key rather than a re-implementation.
+
+### One of your notes is stale, and it made a PR look harder than it was
+
+> *"Gear & Loot and Kills & Drops are the two surfaces that still carry
+> `SurfaceOwnershipTests` exemptions — they come later, and moving them is what removes
+> those rows."*
+
+`StillHandingOutBodies` has been **empty since Inline themes PR 2 (2026-08-26)** — both
+lanes got their factories, the Kills body became a view, and the widgets' body tables are
+gone. So Gear was never blocked on an ownership seam, and reading the plan cost a detour
+into a guard that had nothing to say. Not expensive (one file), but it is the class of
+thing that decides an ordering: Gear looked like the hard third room and is the easy
+second.
+
+### The room that is NOT here, and why it is a lift rather than a move
+
+Quests has the same IA verdict as World and Gear (*"Keep → unify"*), and it is the one your
+plan names as *"already the template"*. It is also **2,481 lines of window-owned rendering**
+— the list, the detail pane, the class lens, the mode strip, the checklists, the Sky bands.
+There is no view to compose; `QuestsWindow` IS the surface. So it is a LIFT wearing a move's
+clothes, and it belongs in its own diff with its own before-and-after assertions, exactly
+the way `QuestChecklistView` was done. Worth naming in the plan so the next executor does
+not price it beside these two.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — EXECUTED: E-3 Phase 2 PR 1, the shell host. Your "move Progress first" was right for a reason you did not state, and the ratchet sentence did its job
 
 To: Fable

@@ -15,6 +15,61 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 PR 2, the World and Gear rooms)
+
+- **PR 2 moves two rooms in, and they are the two whose Evolved IA verdict a v1 fold has
+  already satisfied.** Bevel's §2 says *"Keep → unify"* for World, Gear and Quests alike;
+  the World fold already unified Map/Camps/Path/Travels, and `GearLootWindow` is already
+  bags plus wishlist plus what you picked up. The other way: take Quests as well, since the
+  verdict is identical. Declined because `QuestsWindow` is 2,481 lines of window-owned
+  rendering with no view to compose — that is a LIFT wearing a move's clothes, and it
+  deserves its own diff rather than being the third thing in this one. Live, Home and
+  Settings are held back by a missing room or a real design, not by effort.
+- **PR 2 is rooms, not the HUD, even though the plan's next heading is "HUD (Surface A),
+  for the PR after the host".** The other way: read that literally and start subtracting
+  card rendering from `MainWindow`. Declined because the HUD is defined as *"`MainWindow`
+  minus what the shell takes"*, and with one room in the shell it would have taken almost
+  nothing — subtracting now would delete surfaces with nowhere to land, against the E-3
+  gate's own requirement that a player can find every retained primary feature. The plan's
+  sentence describes the sequence, and the rooms are what make the subtraction possible.
+- **The rooms are LAZY: built on first arrival, not in the shell's constructor.** The other
+  way: build all three up front, which is what PR 1 did with its one room and is simpler to
+  read. Changed because two of the three do real work when constructed — `SpawnsView`
+  starts a one-second `DispatcherTimer` and reads the spawn ledger, `InventoryView` scans
+  the game folder — and a shell opened to look at experience should pay for neither. It is
+  the same argument `SurfaceOwnershipTests` already records for World having four separate
+  factories instead of one combined set.
+- **The rooms report their facts by asking the SAME view for the SAME string and re-keying
+  it (`ShellDumpFacts.Prefixed`), rather than hand-writing `shellWorldMapZones = …`.** The
+  other way is the obvious one and it is a second producer of a number the window already
+  reports — trap 33 one level up — and it would stop covering `MapView` the day it gains a
+  seventh fact (trap 30). The re-key also fixes a live hazard the hand-written version
+  would have had anyway: the dump is one flat namespace, so with both hosts open the
+  shell's `mapZones` would silently overwrite the window's and every existing `map*`
+  assertion would start reading the other window.
+- **`ShellLayoutPolicy.MinRoomWidth` stayed at 520 although `GearLootWindow` opens at 880.**
+  The other way: take the maximum of the landed rooms' shipped widths, which is the
+  literal reading of "the narrowest this content has been drawn at". Declined because
+  those are OPENING widths and both windows have been resizable to 320 since 2026-08-21 —
+  and a floor of 940 against a shell that OPENS at 960 would make Bevel's degrade axis
+  unreachable on any window a player could make, which is a designed state existing only
+  in a unit test. It is a claim rather than a measurement, so it is tested by a picture:
+  `shell-gear-narrow` shoots the widest room at the floor. It held.
+- **"Drop camp marker" came into the World room; the deaths star beside it did not** (nor
+  the Loot star into Gear). The other way: carry both, since a star is the only writer
+  `MiniStats` has for its key. Declined on the line PR 1 drew for Progress and for the same
+  two reasons: Bevel's IA sends HUD configuration to the HUD's Edit mode and to Settings
+  rather than to a room, and a second writer of one settings key is trap 13's shape. The
+  button stays because it is something the player DOES in the room. Both windows still
+  carry their stars; **rehoming them is written into each room's header as a blocker on the
+  commit that retires either window.**
+- **The inventory-changed notification became a fan-out in `FollowingSurfaces` rather than
+  a second call at the widget's call site.** The other way: add one line beside the
+  existing `_gearLootWindow?.InventoryChanged()`. It would have been the last line
+  `MainWindow` had (4,572 of 4,573) and would have spent E-3's whole remaining
+  decomposition budget on a notification. Replacing the line instead costs zero, and the
+  list of satellite surfaces was already this file's job.
+
 ## 2026-09-05 (E-3 PR 1, the Evolved shell host)
 
 - **The `ShellPage` single-source join is a total MAPPING from the phone's screen registry

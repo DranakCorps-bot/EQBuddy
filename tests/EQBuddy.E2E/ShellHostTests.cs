@@ -38,13 +38,17 @@ public class ShellHostTests
     /// it — or a room lands without joining the rail — this is what says so.
     /// </summary>
     [Fact]
-    public void TheShellOpensOnProgressWithOneRailRowAndASearchAffordance()
+    public void TheShellOpensOnProgressWithARailRowPerLandedRoomAndASearchAffordance()
     {
         using var app = new AppHarness(environment: OpenOn("progress"));
         app.Launch();
 
         app.WaitForDump("shellPage", "progress", "the shell to land on the Progress room");
         Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        // ONE room is built, not three: rooms are constructed on first arrival, and two of
+        // them do real work when they are (a ticking timer and its ledger read, a scan of
+        // the game folder). A shell opened to look at experience must not pay for either.
+        Assert.Equal(1, app.DumpValue("shellRooms"));
         Assert.Equal(1, app.DumpValue("shellSearch"));
         // Search is a shortcut past the nav, not a page: it must not be OPEN on arrival.
         Assert.Equal(0, app.DumpValue("shellPalette"));
@@ -103,6 +107,125 @@ public class ShellHostTests
         Assert.Equal(app.DumpValue("progressRaidsRows"), app.DumpValue("shellProgressRaidsRows"));
         Assert.Equal(app.DumpValue("progressFaction"), app.DumpValue("shellProgressFaction"));
         Assert.Equal(app.DumpValue("progressMotesRows"), app.DumpValue("shellProgressMotesRows"));
+    }
+
+    // ---- E-3 PR 2: the World and Gear rooms ------------------------------------
+
+    /// <summary>
+    /// The two rooms PR 2 moved in, each opened by ADDRESS and each landing inside the
+    /// room rather than merely on it.
+    ///
+    /// **The room keys here look like typos and are not**, which is the point of asserting
+    /// them from outside. `WorldTab.Camps` is `"spawns"` (the window it absorbed),
+    /// `WorldTab.Travels` is `"misc"` (the old card's settings key, kept so the World fold
+    /// needed no settings migration at all), and `LootTab.Gear` is `"gear"` while its label
+    /// reads "Wishlist". The shell maps those; it must never re-spell one, because a second
+    /// name for one destination is trap 33 lifted into navigation.
+    /// </summary>
+    [Theory]
+    [InlineData("world", "shellWorldTab", "misc")]
+    [InlineData("world:map", "shellWorldTab", "map")]
+    [InlineData("world:spawns", "shellWorldTab", "spawns")]
+    [InlineData("world:travel", "shellWorldTab", "travel")]
+    [InlineData("gear", "shellGearTab", "loot")]
+    [InlineData("gear:gear", "shellGearTab", "gear")]
+    [InlineData("gear:inventory", "shellGearTab", "inventory")]
+    public void EveryLandedRoomIsReachableByItsOwnAddress(string address, string key, string room)
+    {
+        using var app = new AppHarness(environment: OpenOn(address));
+        app.Launch();
+
+        app.WaitForDump(key, room, $"the shell to land on {address}");
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+    }
+
+    /// <summary>
+    /// **Two hosts of the World room must report the same numbers.** The shell builds its
+    /// OWN `MapView`, `SpawnsView`, `TravelView` and `TravelsView` (a UIElement has one
+    /// parent — trap 45), and every rule behind them is shared, so a divergence would be a
+    /// real defect and an invisible one: both windows render, both look right.
+    ///
+    /// Both are open at once and both are on Camps, which is the only tab both hooks can
+    /// address. The `shellWorld*` keys are the SAME strings the views hand `WorldWindow`,
+    /// re-prefixed — so this asserts that the two hosts agree, and it could not have been
+    /// written at all if the shell had reported its own hand-written copies of the numbers.
+    /// </summary>
+    [Fact]
+    public void TheShellAndTheWorldWindowAgreeAboutTheSameRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "world:spawns",
+            ["EQBUDDY_SPAWNS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellWorldTab", "spawns", "both hosts to reach the Camps room");
+        app.WaitForDump("worldTab", "spawns", "and the v1 window with them");
+        Assert.Equal(app.DumpValue("worldTabs"), app.DumpValue("shellWorldTabs"));
+        Assert.Equal(app.DumpValue("spawnsRows"), app.DumpValue("shellWorldSpawnsRows"));
+        Assert.Equal(app.DumpValue("spawnsZones"), app.DumpValue("shellWorldSpawnsZones"));
+        Assert.Equal(app.DumpValue("mapZones"), app.DumpValue("shellWorldMapZones"));
+        Assert.Equal(app.DumpValue("travelZones"), app.DumpValue("shellWorldTravelZones"));
+    }
+
+    /// <summary>
+    /// The same comparison for the Gear room — and it carries one extra row that no
+    /// screenshot could ever supply.
+    ///
+    /// **`gearCopyCmd` is the ⧉ copy of `/outputfile inventory`**, the only in-app route to
+    /// the command that makes the wishlist tick itself. An absent control photographs as an
+    /// unremarkable panel (trap 29), so a picture of the new host cannot say whether the
+    /// affordance survived the move; a launched app comparing the two hosts can. That is
+    /// trap 34's whole lesson — a missing thing is invisible to everything except a
+    /// must-list or an assertion.
+    /// </summary>
+    [Fact]
+    public void TheShellAndTheGearLootWindowAgreeAboutTheSameRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "gear",
+            ["EQBUDDY_GEARLOOT"] = "loot",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellGearTab", "loot", "both hosts to reach the Loot room");
+        app.WaitForDump("gearLootTab", "loot", "and the v1 window with them");
+        Assert.Equal(app.DumpValue("gearLootTabs"), app.DumpValue("shellGearTabs"));
+        Assert.Equal(app.DumpValue("lootRows"), app.DumpValue("shellGearLootRows"));
+        Assert.Equal(app.DumpValue("gearRows"), app.DumpValue("shellGearRows"));
+        Assert.Equal(app.DumpValue("gearPivotShown"), app.DumpValue("shellGearPivotShown"));
+        Assert.Equal(app.DumpValue("gearCopyCmd"), app.DumpValue("shellGearCopyCmd"));
+    }
+
+    /// <summary>
+    /// The gear list's cap FOLLOWS the room's body rather than being a card-sized
+    /// constant — asserted as the relationship, because a hosted runner is 1024×768 and a
+    /// number would be an assertion about the desk this was written on.
+    ///
+    /// `#250` PR 2 made this true for the window (dragging it taller used to grow the
+    /// window and leave the gear list exactly where it was, which is a resize that visibly
+    /// does nothing). The room has to inherit that, and the failure it prevents is the one
+    /// that reads as "the list stops one row early" — which photographs as a list.
+    /// </summary>
+    [Fact]
+    public void TheGearListCapComesFromTheRoomsBodyAndNotFromAConstant()
+    {
+        using var app = new AppHarness(environment: OpenOn("gear:gear"));
+        app.Launch();
+
+        app.WaitForDump("shellGearTab", "gear", "the Wishlist room to paint");
+        // A measured height is 0 until WPF has laid the room out, which happens after the
+        // window is shown — so this waits for the app to have COMPUTED the number rather
+        // than asserting against one it has not.
+        app.WaitForDumpAtLeast("shellGearBodyCap", 1, "the room to measure its own body");
+        var body = app.DumpValue("shellGearBodyCap");
+        var list = app.DumpValue("shellGearListCap");
+        // NestedBodyCap's own two rules: never below the 120-unit floor, and never more
+        // than the host body it is nested inside.
+        Assert.True(list >= 120 && list <= Math.Max(120, body),
+            $"gear list cap {list} does not follow room body {body}; dump was: {app.Artifacts()}");
     }
 
     /// <summary>

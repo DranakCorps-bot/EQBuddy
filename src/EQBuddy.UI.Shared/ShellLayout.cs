@@ -31,9 +31,25 @@ public readonly record struct ShellLayout(double RailWidth, bool RailLabelsVisib
 /// </summary>
 public static class ShellLayoutPolicy
 {
-    /// <summary>The narrowest a room's content is drawn — <c>ProgressWindow</c>'s
-    /// shipped 520, which is the width the Progress tabs were designed and screenshotted
-    /// against.</summary>
+    /// <summary>
+    /// The narrowest a room's content is drawn — <c>ProgressWindow</c>'s shipped 520,
+    /// which is the width the Progress tabs were designed and screenshotted against.
+    ///
+    /// **PR 2 added two rooms whose v1 windows are WIDER, and this number deliberately did
+    /// not move.** <c>WorldWindow</c> opens at 640 and <c>GearLootWindow</c> at 880 — but
+    /// those are OPENING widths, not measured minimums: both windows have been resizable
+    /// down to <c>WindowSizing.MinWidth</c> (320) since 2026-08-21, and their content is
+    /// vertical lists that reflow. Taking the maximum instead would put the shell's floor
+    /// at 940, which is within 20 units of the width it OPENS at — the degrade axis Bevel
+    /// designed would then be unreachable on any window a player could make, and a
+    /// collapsed rail would be a state that exists only in a unit test.
+    ///
+    /// **So this is a claim, and the claim is tested by a picture rather than believed.**
+    /// <c>scripts/shoot.ps1</c>'s <c>shell-gear-narrow</c> shoots the WIDEST room at this
+    /// floor precisely because it is the one that can disprove the number. If a room clips
+    /// horizontally there, this constant is what moves — not the shot, and not a
+    /// horizontal scrollbar, which would hide a layout failure behind an affordance.
+    /// </summary>
     public const double MinRoomWidth = 520;
 
     /// <summary>The window's floor width: the room's minimum plus the rail collapsed to
