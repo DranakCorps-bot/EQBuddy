@@ -38,6 +38,38 @@ public sealed record RecentSession(
     double XpPercent, long Copper, int LootCount);
 
 /// <summary>
+/// The same session as <see cref="RecentSession"/> describes, read by the room whose job
+/// the meters ARE — <c>LiveRoom</c>'s session-report block.
+///
+/// **A SIBLING RECORD RATHER THAN A WIDER <see cref="RecentSession"/>, and that is a
+/// signed requirement rather than a preference** (Bevel's Live pre-design §2, Helm-signed
+/// 2026-09-05 ~6:35 AM CT). <c>RecentSession</c> is combat-field-free BY TEST —
+/// <c>HomeRoomTests.TheRecentSessionRecordCarriesNoCombatNumbersToRender</c> reads it by
+/// reflection and fails the build if <c>Dps</c>, <c>Kills</c>, <c>Deaths</c>,
+/// <c>Damage</c> or <c>Healing</c> appears on it — because that is the Home/Live boundary
+/// expressed as a type. Live's need for those numbers is real and is exactly what that
+/// test was written to keep OFF Home; satisfying it by widening the record would delete
+/// the boundary rather than cross it.
+///
+/// **What is NOT duplicated is the part that would actually drift.** Both records are
+/// built from one <see cref="SessionSummary.Pick"/> — the decision about WHICH session
+/// this is, which is the hard half (a running sitting exists in the store and in the live
+/// snapshot at once, and read naively the newest stored row IS the live one). Two
+/// independent derivations of that would disagree at exactly the boundary a race exposes,
+/// which is trap 33 one level up from data into records.
+///
+/// **Three of <c>SessionRow</c>'s twelve columns, and the two left out are deliberate.**
+/// Damage and healing totals are not on the stored row at all, so a record carrying them
+/// would answer honestly for a running session and zero for a finished one — a field that
+/// is only sometimes true is worse than one that is absent. Those two are per-tab facts
+/// read straight off the snapshot by the tab that shows them, not session-report facts.
+/// </summary>
+public sealed record LiveSession(
+    RecentSessionState State, string Character, string Server, string Zone,
+    DateTime? StartedLocal, DateTime? EndedLocal, TimeSpan Elapsed,
+    int Kills, int Deaths, double Dps);
+
+/// <summary>
 /// "Where you left off" — the last session on record for the character being followed,
 /// merged with the one running now so the two cannot be reported as three.
 ///
@@ -63,6 +95,12 @@ public sealed record RecentSession(
 /// <c>SizeToContent</c> window (trap 12) and would re-wake every phone on the fingerprint
 /// (trap 8). Times are wall clock and durations are fixed strings.
 /// </summary>
+/// <summary>Which session the store and the live snapshot agree on, and which of the two
+/// carries its numbers. <see cref="Row"/> and <see cref="Live"/> are mutually exclusive by
+/// construction — see <see cref="SessionSummary.Pick"/>.</summary>
+public readonly record struct SessionPick(
+    RecentSessionState State, SessionRow? Row, StatsSnapshot? Live);
+
 public static class SessionSummary
 {
     /// <summary>
@@ -88,28 +126,56 @@ public static class SessionSummary
             ? [] : query(identity.Server, identity.Character);
 
     /// <summary>
-    /// The one session Home describes, from the store and the live snapshot together.
+    /// WHICH session this is — the one answer both records are built from.
+    ///
+    /// **This is the part that had to be factored, and the fields are the part that did
+    /// not.** Bevel's Live pre-design §2 puts it exactly: *"`SessionSummary.Of`'s hard part
+    /// is not the fields, it is the MERGE"*. A sitting that is running exists in BOTH
+    /// sources at once — <c>SessionArchiver</c> checkpoints it into the store under
+    /// <see cref="SessionRepository.ActiveEndReason"/> on the tick, and the live snapshot
+    /// carries it too — so "the newest stored row" is the running session until something
+    /// says otherwise. <see cref="IsTheLiveSession"/> is that something, with its
+    /// end-reason check and its one-second tolerance, and a second room re-deriving it
+    /// would drift from this one at exactly the boundary a race exposes.
     ///
     /// Either side may be empty: a fresh profile has only the live session, and a launch
     /// before the first tick has only the store.
+    ///
+    /// <see cref="SessionPick.Row"/> is set only for <see cref="RecentSessionState.Ended"/>
+    /// and <see cref="SessionPick.Live"/> only for <see cref="RecentSessionState.InProgress"/>,
+    /// so a caller cannot read the wrong source for the state it was handed.
     /// </summary>
-    public static RecentSession Of(
-        (string Server, string Character) identity,
-        IReadOnlyList<SessionRow>? stored, StatsSnapshot? live)
+    public static SessionPick Pick(IReadOnlyList<SessionRow>? stored, StatsSnapshot? live)
     {
         var liveStart = live?.SessionStart;
         if (live is not null && liveStart is not null && SessionRepository.IsMeaningful(live))
-            return new RecentSession(
-                RecentSessionState.InProgress, identity.Character, identity.Server,
-                live.CurrentZone, liveStart, null, live.Elapsed,
-                live.XpPercent, live.Copper, live.LootTotal);
+            return new SessionPick(RecentSessionState.InProgress, null, live);
 
         var last = stored is null
             ? null
             : stored.Where(row => !IsTheLiveSession(row, liveStart))
                 .OrderByDescending(row => row.StartLocal)
                 .FirstOrDefault();
-        if (last is null)
+        return last is null
+            ? new SessionPick(RecentSessionState.NeverPlayed, null, null)
+            : new SessionPick(RecentSessionState.Ended, last, null);
+    }
+
+    /// <summary>
+    /// The one session Home describes, from the store and the live snapshot together.
+    /// </summary>
+    public static RecentSession Of(
+        (string Server, string Character) identity,
+        IReadOnlyList<SessionRow>? stored, StatsSnapshot? live)
+    {
+        var pick = Pick(stored, live);
+        if (pick is { State: RecentSessionState.InProgress, Live: { } s })
+            return new RecentSession(
+                RecentSessionState.InProgress, identity.Character, identity.Server,
+                s.CurrentZone, s.SessionStart, null, s.Elapsed,
+                s.XpPercent, s.Copper, s.LootTotal);
+
+        if (pick.Row is not { } last)
             return new RecentSession(
                 RecentSessionState.NeverPlayed, identity.Character, identity.Server, "",
                 null, null, TimeSpan.Zero, 0, 0, 0);
@@ -119,6 +185,40 @@ public static class SessionSummary
             last.StartLocal, last.EndLocal ?? last.StartLocal,
             TimeSpan.FromSeconds(Math.Max(0, last.ElapsedSeconds)),
             last.XpPercent, last.Copper, last.LootCount);
+    }
+
+    /// <summary>
+    /// The same session, as the room that draws the meters needs it — <see cref="Of"/>'s
+    /// sibling, built from the same <see cref="Pick"/> so the two can never disagree about
+    /// which sitting they are describing.
+    ///
+    /// **The numbers come from the SOURCE the pick named**, never from whichever one
+    /// happens to be non-null: a running session's counts are the snapshot's, and a
+    /// finished one's are the stored row's. Reading the live snapshot for an
+    /// <see cref="RecentSessionState.Ended"/> state would report the sitting the player is
+    /// NOT in, under a heading saying they had finished it.
+    /// </summary>
+    public static LiveSession LiveOf(
+        (string Server, string Character) identity,
+        IReadOnlyList<SessionRow>? stored, StatsSnapshot? live)
+    {
+        var pick = Pick(stored, live);
+        if (pick is { State: RecentSessionState.InProgress, Live: { } s })
+            return new LiveSession(
+                RecentSessionState.InProgress, identity.Character, identity.Server,
+                s.CurrentZone, s.SessionStart, null, s.Elapsed,
+                s.YourKillCount, s.Deaths.Count, s.SessionDps);
+
+        if (pick.Row is not { } last)
+            return new LiveSession(
+                RecentSessionState.NeverPlayed, identity.Character, identity.Server, "",
+                null, null, TimeSpan.Zero, 0, 0, 0);
+
+        return new LiveSession(
+            RecentSessionState.Ended, last.Character, last.Server, last.PrimaryZone,
+            last.StartLocal, last.EndLocal ?? last.StartLocal,
+            TimeSpan.FromSeconds(Math.Max(0, last.ElapsedSeconds)),
+            last.Kills, last.Deaths, last.Dps);
     }
 
     /// <summary>
