@@ -52,25 +52,35 @@ public class WorldSurfaceTests
     public void EveryWordTheseSurfacesHaveBeenCalledStillResolves(string? key, WorldTab? expected) =>
         Assert.Equal(expected, WorldSurface.TabForKey(key));
 
-    /// <summary>The theme absorbs exactly ONE card — the old Travels &amp; Deaths card —
-    /// and keeps its <c>misc</c> key so there is no settings migration at all.</summary>
+    /// <summary>
+    /// **The <c>misc</c> WIRE KEY outlives the <c>misc</c> CARD**, and that distinction is
+    /// the whole content of this test since HUD subtraction cut 2 (2026-09-05).
+    ///
+    /// It used to assert <c>AbsorbedCardKeys</c> and <c>ThemeCardKey</c> — a fold's
+    /// statement about a card — and both went with the card, because a fold may only name
+    /// keys that are no longer cards (trap 55, and #252 is what leaving one cost). What
+    /// stays is the address: <c>world:misc</c> is how the shell, a saved tab choice and
+    /// every old habit reach the Travels room, and it must not move just because the
+    /// widget stopped drawing a card of that name.
+    /// </summary>
     [Fact]
-    public void TheThemeTakesTheMiscCardSlotAndNoOther()
+    public void TheTravelsRoomKeepsTheMiscWireKeyAfterTheCardIsCut()
     {
-        Assert.Equal(["misc"], WorldSurface.AbsorbedCardKeys);
-        Assert.Equal("misc", WorldSurface.ThemeCardKey);
-        Assert.Equal(WorldSurface.ThemeCardKey, WorldSurface.KeyFor(WorldTab.Travels));
+        Assert.Equal("misc", WorldSurface.KeyFor(WorldTab.Travels));
+        Assert.Equal(WorldTab.Travels, WorldSurface.TabForKey("misc"));
+
+        // And no card in the app answers to it any more — the premise check that pairs
+        // with the migration, asserted here rather than assumed.
+        Assert.DoesNotContain("misc",
+            EQBuddy.UI.Shared.OverlaySections.Catalog.Select(c => c.Key));
     }
 
+    /// <summary>The room three hosts land on when nobody names one. Was
+    /// <c>DefaultInlineTab</c> until 2026-09-05: there is no inline card for it to be the
+    /// default OF, and `InlineModeFor` — which only a card ever asked — went with it.</summary>
     [Fact]
-    public void InlineTableIsTravelsFullEverythingElseGlance()
-    {
-        Assert.Equal(InlineMode.Full, WorldSurface.InlineModeFor(WorldTab.Travels));
-        Assert.Equal(InlineMode.Glance, WorldSurface.InlineModeFor(WorldTab.Map));
-        Assert.Equal(InlineMode.Glance, WorldSurface.InlineModeFor(WorldTab.Camps));
-        Assert.Equal(InlineMode.Glance, WorldSurface.InlineModeFor(WorldTab.Routes));
-        Assert.Equal(WorldTab.Travels, WorldSurface.DefaultInlineTab);
-    }
+    public void TravelsIsTheDefaultRoom() =>
+        Assert.Equal(WorldTab.Travels, WorldSurface.DefaultTab);
 
     [Fact]
     public void TabsCarryTheirHeadlinesAndOmitEmptyOnes()
@@ -106,21 +116,14 @@ public class WorldSurfaceTests
         Assert.False(WorldSurface.ShellOnly(WorldTab.Camps));
         Assert.False(WorldSurface.ShellOnly(WorldTab.Routes));
         Assert.False(WorldSurface.ShellOnly(WorldTab.Travels));
-
-        // And the theme absorbs no new card for it — Drops was never a card at all, only a
-        // menu entry, which is why this whole tab needs no settings migration.
-        Assert.Equal(["misc"], WorldSurface.AbsorbedCardKeys);
     }
 
-    /// <summary>Counts, never countdowns — a deadline belongs to the spawn-due chips, not
-    /// this launcher line (trap 12/8). A part with nothing to say is omitted, not printed
-    /// as a zero, which is what keeps this readable on a brand new character.</summary>
-    [Fact]
-    public void TheLauncherCarriesCountsNeverCountdowns()
-    {
-        Assert.Equal("Crushbone · 4 zones · 2 deaths · 3 timers",
-            WorldSurface.LauncherSummary(zone: "Crushbone", zonesVisited: 4, deaths: 2, runningTimers: 3));
-        Assert.Equal("1 zone", WorldSurface.LauncherSummary(zonesVisited: 1));
-        Assert.Equal("no travels yet", WorldSurface.LauncherSummary());
-    }
+    // `TheLauncherCarriesCountsNeverCountdowns` WAS HERE and went with
+    // `WorldSurface.LauncherSummary` on 2026-09-05 (HUD subtraction cut 2) — the collapsed
+    // World card's one line, whose only caller was `MainWindow.RefreshUi`. Keeping the
+    // assertion would have pinned a sentence nothing renders, which is trap 34's shape.
+    //
+    // **The RULE it protected is still enforced, one file over**: `WorldThemeTests` asserts
+    // that Camps and Path carry no badge, which is the same "counts, never countdowns"
+    // (trap 12 resizes an always-on-top window every second; trap 8 wakes every phone).
 }

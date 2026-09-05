@@ -391,7 +391,7 @@ next level (exact after a level-up this session, else an upper bound), level-ups
 **time-in-level**, skill-ups per skill.
 
 ### Faction tab — Progress window · Travels tab — World window
-*Faction folded into the Progress theme 2026-08-19; Travels & Deaths became the World card's Travels tab in the World fold, 2026-08-27.*
+*Faction folded into the Progress theme 2026-08-19; Travels & Deaths became the World card's Travels tab in the World fold, 2026-08-27, and the World card itself left the widget on 2026-09-05 — the tab is unchanged, and the way in is right-click → **World…**, or the World room in the new EQBuddy window.*
 
 Net faction standing per faction. A standing at the cap shows **maxed** — the game
 says `Your faction standing with X could not possibly get any better.` and EQBuddy

@@ -74,13 +74,19 @@ $DropsFixtureWiki = @{
 }
 
 $Shots = [ordered]@{
-    # NINE CARDS, not ten, since 2026-09-05 (HUD subtraction cut 1). Eight of them visible
-    # on the default profile - Motes ships hidden. PREDICTION for both of these shots, in
-    # order down the stack: Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs,
-    # Progress, World - with NO "Quests" header between Kills & Drops and Gear & Loot.
-    # Writing the order down is the point: an absent control photographs as an
-    # unremarkable panel (trap 29), so the only way to review a subtraction in a picture
-    # is to have said first what should NOT be in it.
+    # EIGHT CARDS since 2026-09-05 - nine after HUD subtraction cut 1 took Quests, eight
+    # after cut 2 took World the same day. Seven of them visible on the default profile:
+    # Motes ships hidden. PREDICTION for both of these shots, in order down the stack:
+    # Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs, Progress - with NO
+    # "Quests" header between Kills & Drops and Gear & Loot, and NO "World" header at the
+    # BOTTOM of the stack, which is where it was. Writing the order down is the point: an
+    # absent control photographs as an unremarkable panel (trap 29), so the only way to
+    # review a subtraction in a picture is to have said first what should NOT be in it.
+    #
+    # 'widget-expanded' loses a body as well as a header: EQBUDDY_EXPAND=1 opened Combat,
+    # Healing, Watch AND World, and World was the only theme card in that set - so the
+    # deaths/zones/markers lists at the bottom of that picture are gone with it. What is
+    # expanded now is Combat, Healing and Watch, and nothing else.
     'widget-cards'    = @{ Title = 'EQBuddy'; Env = @{}; Set = @{} }
     'widget-expanded' = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = '1' }; Set = @{} }
     # The title area with a LONG zone name. The zone and the session line shared one grid
@@ -127,13 +133,13 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_EXPAND = 'combat' }
                            Set = @{ HiddenSections = @(
                                'healing','kills','loot','tracked',
-                               'buffs','progress','misc') } }
+                               'buffs','progress') } }
     # The Watch card alone, same reason, with the same three seeded rules as tracked-card.
     'watch-solo'      = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'tracked' }
                            Set = @{ HiddenSections = @(
                                        'combat','healing','kills','loot',
-                                       'buffs','progress','misc')
+                                       'buffs','progress')
                                     TrackedRules = @(
                                    @{ Id = 'shot-spider'; Name = 'Spider parts'
                                       Pattern = 'Spider'; Kind = 0 }
@@ -1236,12 +1242,17 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
                                     WindowZooms = @{ options = 0.55 } } }
-    # PREDICTION since 2026-09-05 (HUD subtraction cut 1): NINE rows in the card list, and
-    # no "Quests" among them - and no "Sky Quest / Epics are tabs in here now" note either,
-    # because that note hangs under the surviving card and there is none. This screen is the
-    # one #219 was filed from, so it is the picture that says out loud what the cut costs:
-    # someone hunting for the Quests card finds no row here at all. That gap is recorded in
-    # HELM-FEEDBACK.md rather than papered over.
+    # PREDICTION since 2026-09-05 (HUD subtraction cuts 1 and 2): EIGHT rows in the card
+    # list - Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs, Progress, Motes -
+    # with no "Quests" and no "World" among them, and none of the four notes those two
+    # carried: no "Sky Quest / Epics are tabs in here now", and no "Travels & Deaths / Zone
+    # map / Travel route / Spawn timers are tabs in here now". A note hangs under the
+    # SURVIVING card and there is none in either case.
+    #
+    # This screen is the one #219 was filed from, so it is the picture that says out loud
+    # what the two cuts cost: someone hunting for any of those six names finds no row here
+    # at all. Recorded in HELM-FEEDBACK.md rather than papered over - and cut 2's half is
+    # the bigger one, four names against two.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
@@ -1316,6 +1327,34 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
+    # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
+    # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
+    # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
+    # left the surface unphotographable and therefore unreviewable-but-looking-reviewed
+    # (trap 22) - so EQBUDDY_WORLD landed with the cut and this row landed with the hook.
+    # It is also the illustration lock working the way it is supposed to: a capture arrives
+    # WITH its recipe, in the same change.
+    #
+    # PREDICTION: the World window, native chrome reading "World", a four-chip strip (Map
+    # badged with the fixture's last zone, Camps, Path, Travels - Travels lit), and under it
+    # the Travels body: a "Deaths" heading with no rows (the fixture has no death line), a
+    # "Zones visited" heading over SIX rows with times - the replay zones Befallen / West
+    # Commonlands / Befallen / West Commonlands / East Commonlands / West Commonlands - and
+    # NO markers heading at all (MarkersLabel collapses when the list is empty). Pinned
+    # BELOW the body, exactly once: the "Drop camp marker" action row with the "Show in mini
+    # dashboard" star and its label, which appear on the Travels tab alone - that star is
+    # the only writer MiniStats has for 'deaths', and this shot is the only picture of it.
+    #
+    # TWO PREDICTION MISSES ON THE FIRST RUN, and the second is why this row was worth
+    # adding at all. (a) "Befallen and West Commonlands" undercounted: the fixture zones
+    # SIX times, not twice, and the number came from a doc line rather than from the log -
+    # trap 23's rule is to derive the prediction, and a phrase copied from another comment
+    # is not a derivation. (b) "Drop camp marker" appeared TWICE, once inside the scroller
+    # and once pinned. That was not new: `TravelsView` inserted its own copy at the top of
+    # the body FOR THE INLINE CARD - its own doc comment said so - while both surviving
+    # hosts pin one as chrome. It had rendered twice since the World fold in a window no
+    # committed illustration had ever photographed. The in-body copy went with the card.
+    'world-travels'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_WORLD = '1' }; Set = @{} }
     # The KILLS & DROPS theme (2026-08-21). Both were reachable before the fold — one as
     # a widget card, one as a cog-menu window — and both are tabs now, so both get a shot:
     # a tab nobody photographs is a tab nobody reviews (trap 22).

@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,106 | 4,516 | 4,516 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,100 | 4,509 | 4,510 | 1 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -198,6 +198,24 @@ cheaper than the next session re-deriving the answer. The new baseline is once a
 MINIMUM that fits (4,106 × 1.1 = 4,516.6 against 4,516). **Deleting a surface beats
 extracting one** — but only the lines that actually leave count, and here fewer left than
 it looks.
+
+**Lowered 4,106 → 4,100 on 2026-09-05 (HUD subtraction cut 2, the World card), and six
+lines is the whole story — the first draft of this change made the file BIGGER.** The code
+that left is 19 lines: the card build block, the widget's own `TravelsView` field and its
+construction, the `EQBUDDY_EXPAND` member, the `SectionMap` row, the `_worldCard` field,
+the render call, the `MiscHeader` launcher line and three `_worldCard?.Sync()` calls. The
+tombstones written to record all of that came to 32, so `MainWindow` grew by 13 and **the
+ratchet failed the commit** — which is the only reason anybody counted.
+
+**That is the entry worth reading, not the number.** The note above already observed that
+half of cut 1's deletion came back as commentary; cut 2 went past break-even doing the same
+thing, and nothing but this test would have said so. The tombstones stayed — a cut nobody
+can find afterwards is what CLAUDE.md's "three ways back" and trap 55 exist to refuse — but
+they were compressed to a line or two each, with the reasoning kept in this file and in the
+surface files instead of repeated at every call site. `WorldThemeCard.cs` (60 lines) left
+the repo outright and is not in this sum, and neither are `WorldSurface.LauncherSummary` /
+`InlineModeFor` or `WorldTheme`'s four glance methods, all of which had the cut card as
+their only caller. Minimum that fits: 4,100 × 1.1 = 4,510 against 4,509.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

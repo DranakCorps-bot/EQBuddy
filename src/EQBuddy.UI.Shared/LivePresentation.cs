@@ -130,8 +130,10 @@ public static class LivePresentation
     /// The strip's headline numbers — what each tab is worth at a glance, so the room
     /// answers before it is opened.
     ///
-    /// **Counts and rates, never countdowns** (<see cref="WorldSurface.LauncherSummary"/>'s
-    /// rule, for the same two reasons: trap 8 wakes every phone and trap 12 resizes a
+    /// **Counts and rates, never countdowns** (the World theme's rule — see
+    /// <see cref="WorldTheme"/> on why Camps and Path carry no badge; it was written on
+    /// <c>WorldSurface.LauncherSummary</c> until that card was cut on 2026-09-05, and it
+    /// holds for the same two reasons: trap 8 wakes every phone and trap 12 resizes a
     /// window). A tab with nothing to say gets null rather than a zero — a strip of
     /// "0 dps · 0 hps · 0 kills" on a fresh launch is noise where an unbadged chip is an
     /// honest "not yet".
