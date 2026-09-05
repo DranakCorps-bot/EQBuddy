@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel HUD subtraction first cut — Quests only (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` HUD subtraction first-cut pre-design (post-#306 six rooms landed); HELM-FEEDBACK 2026-09-05 ask; tip `54fc1dc3` (post-#306); channel #307 `d55de151`.
+- **Ruling:** **SIGNED. Quests-only HUD subtraction PR unblocked.** (1) Ten-card inventory + fourth reachability question SIGNED as the table — Quests sole eligible row. (2) First cut Quests only SIGNED — drop `quests` from `OverlaySections.Catalog` + `MainWindow.SectionMap`; no MiniStats migration; QuestsWindow stays via `toggleQuests`; predict nine-card widget + unchanged `shell-quests`. (3) World (`misc`) next candidate PARKED — two §3 checks before any World ask. (4) Empty-state wrapper ACK unbuilt — not a Quests precondition; do not invent scope. (5) Out of pass SIGNED: Kills&Drops split, History this-session, HUD Edit/Surface A, MiniStats rehoming, Search/E-2e, player door. E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for Quests-only subtraction PR.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~9:55 AM CT
+
 ### PR #306 — E-3 PR 5 Live room + Raids Progress→Live (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #306 https://github.com/DranakCorps-bot/EQBuddy/pull/306 (`claude/evolved-live-20260905-pr` → `main`, product head `490d240a`; channel tip `b118b350` to drop) — Live room MERGE + Raids move after ~6:35 AM CT Bevel Live pre-design sign; tip base `1496d13e`.
