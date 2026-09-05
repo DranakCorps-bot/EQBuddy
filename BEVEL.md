@@ -44,6 +44,197 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### World Drops — the camp-worth-it half of Kills & Drops — pre-design (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, last-look ask; unlocks Opus for World's fifth tab)
+**Place:** `src/EQBuddy.Core/WorldSurface.cs` (`WorldTab` enum, `LabelFor`/`KeyFor`/
+`TabForKey`/`Tabs`); `src/EQBuddy/WorldRoom.cs` (constructor, `Render`, `BuildTabs`,
+`DebugFacts`, doc comment lines 204-215); `src/EQBuddy/DropsCardView.cs` (own-instance
+construction, five `Debug*` int properties, no `DebugFacts()` method); `src/EQBuddy/
+CreatureWindow.xaml.cs` (existing v1 host, untouched — `new DropsCardView(main)` line 55);
+`src/EQBuddy/LiveRoom.cs` (the sibling precedent for both questions this ask turns on —
+`main.NewLiveSurfaces()` and its hand-written `shellLiveKillRows`/`shellLivePartyRows`
+facts); `src/EQBuddy/KillsCardView.cs` (checked for `DebugFacts()` absence, matching
+`DropsCardView`); `src/EQBuddy/DebugHooks.cs:40-52` (`EQBUDDY_DROPS`/`EQBUDDY_CREATURE`,
+both pointed at `CreatureWindow` only); `src/EQBuddy.UI.Shared/ShellPages.cs` (`RoomTabs`
+:154, `Describe` :216); `tests/EQBuddy.Tests/SurfaceOwnershipTests.cs` (`StillHandingOutBodies`
+empty; `TheOtherHostsBuildTheirOwnSurfacesToo` theory rows); `docs/BEVEL-v2-staging-critique.md`
+§2 Kills & Drops row; `FABLE.md`'s P1-5 disposition table.
+**Source:** tonight's ask. PR #306's own header (`LiveRoom.cs` lines 27-34, merged) named
+this out loud as the thing it deliberately did NOT take: *"`CreatureWindow`'s Drops tab is
+camp research — 'is this camp worth it' — which the disposition table's own Why column
+sends to World… Both are their own asks."* This is that ask, filed now that Live is landed
+and the HUD subtraction first-cut (Quests) is also filed. **All verified in source on tip
+`d55de151`** (post-#307 merge, current `main`). **Not a hold. Not needs-david. No player
+door proposed. No HUD subtraction — Drops was never a `MiniStats` card, so nothing here
+touches `OverlaySections`/`MiniStats`; this whole ask is additive to the shell only.
+#208/#261/#262 untouched. No implement.**
+
+---
+
+#### 1. Drops is the second-cleanest item in this whole shell effort, for the same reason Quests was the first
+
+`CreatureSurface`'s own doc comment says it plainly: *"Drops has never been a card at all,
+only a menu entry."* No `OverlaySections` row, no `MiniStats` key, no settings migration —
+the same absence that made Quests the HUD subtraction pre-design's only clean first cut,
+arriving here from the opposite direction (nothing to subtract, because nothing was ever a
+card, rather than nothing to subtract despite being one). `WorldSurface.AbsorbedCardKeys`
+stays `["misc"]`; a fifth `WorldTab` member needs no entry there and no `SectionOrder`/
+`HiddenSections` migration, because Drops was never in either.
+
+**The concrete shape:** a fifth `WorldTab.Drops` member in `WorldSurface`, with
+`LabelFor`/`KeyFor("drops")`/`TabForKey`/`Tabs()` entries — mirroring what `LiveSurface`
+already did one PR ago, absorbing `LiveTab.Kills` and `LiveTab.Raids` alongside three meter
+tabs that were never card-shaped either. This is not an invented pattern; it is the second
+time this exact move has been made in this codebase, by the room built immediately before
+this one. `WorldRoom`'s constructor builds `new DropsCardView(main)` directly — the exact
+line `CreatureWindow.xaml.cs:55` already uses, and the exact shape `SurfaceOwnershipTests`'
+`TheOtherHostsBuildTheirOwnSurfacesToo` theory already permits for that file. No new
+`MainWindow` factory is needed: `DropsCardView`'s constructor takes only `MainWindow main`,
+and unlike `KillsCardView`/`RaidsCardView` (which needed `main.NewLiveSurfaces()` because the
+widget itself was also drawing a `KillsCardView` instance it could not share), nothing else
+in this codebase currently holds a `DropsCardView` — it was only ever the window's.
+
+---
+
+#### 2. The navigation grammar already carries a fifth tab for free — verify it, don't build it
+
+`ShellPages.RoomTabs(ShellPage.World)` (`ShellPages.cs:154`) already reads live off
+`WorldSurface.Tabs()` rather than a hand-maintained list — the exact "one grammar" seam
+`FABLE.md`'s Phase 2 sketch asked for. Once `WorldTab.Drops` exists in `WorldSurface`,
+`world:drops` becomes a valid `page:room` address with **no edit to `ShellPages.cs` or
+`ShellHost.cs` beyond what `WorldSurface` itself defines** — this is the grammar's first
+real test past the four tabs it launched with, and it should just work if `WorldSurface` is
+built correctly. Worth stating as a thing to CONFIRM rather than assume, per this codebase's
+own trap 55 lesson about staging lists that look complete and aren't.
+
+**One thing to say out loud so nobody wires it the other way:** `EQBUDDY_DROPS` and
+`EQBUDDY_CREATURE` (`DebugHooks.cs:40-52`) stay pointed at `CreatureWindow` — the v1 lane,
+untouched, per Live's own header for the Kills half applied here to Drops. The shell's Drops
+tab gets its own address through the `page:room` grammar (`EQBUDDY_SHELL=world:drops`), not
+a shared hook. Two independent doors to two independent hosts of the same content, exactly
+the shape Live and `CreatureWindow`'s Kills tab already have today.
+
+---
+
+#### 3. The debug-facts shape has two live precedents in this codebase, and Drops matches the one `WorldRoom`'s own comment doesn't mention
+
+`WorldRoom`'s own doc comment (lines 204-215) states a rule for its dump: ask each child view
+for its own `DebugFacts()` string and mechanically re-prefix it
+(`ShellDumpFacts.Prefixed("shellWorld", _map.DebugFacts())`, etc.) rather than hand-writing a
+list — true, and checked, for all four of today's views: `MapView`, `SpawnsView.xaml.cs`,
+`TravelView.cs` and `TravelsView.xaml.cs` all define `DebugFacts()`.
+
+**`DropsCardView` does not, and neither does `KillsCardView` — checked, neither file defines
+it.** `LiveRoom` went through this exact question for Kills one PR ago and did NOT add one:
+it hand-writes `shellLiveKillRows={_kills.KillRowCount}` and
+`shellLivePartyRows={_kills.PartyRowCount}` straight off the two int properties
+`KillsCardView` already exposes (`LiveRoom.cs`'s own `DebugFacts()`, and its comment
+explains why — two of its facts exist "to be COMPARED with a v1 window that is still open").
+
+Drops is the same shape: five int properties already sitting on `DropsCardView`
+(`DebugMobCount`, `DebugRowCount`, `DebugItemCount`, `DebugFilterLength`,
+`DebugRecheckCount`), no `DebugFacts()` string, and `CreatureWindow.xaml.cs`'s own
+`DebugFacts()` already hand-assembles them the same way (`dropsMobs=`, `dropsRows=`, etc.).
+**The precedent-consistent move is `shellWorldDropsMobs={_drops.DebugMobCount}` etc.,
+hand-written the way Live just did for Kills** — not a new `DebugFacts()` method invented
+for `DropsCardView` that nothing else would call. I am naming this because `WorldRoom`'s own
+comment reads like a rule that would steer an implementer toward the WRONG precedent for
+this specific case if they matched the letter of the comment instead of checking what its
+own sibling room did for the same-shaped view one PR earlier — the two precedents agree on
+the principle (facts come from the view, not re-derived) and disagree on the mechanism only
+because the views themselves are shaped differently, which is exactly the kind of thing that
+doesn't show up in a comment written before the second case existed.
+
+**No collision, but the pairing is the point, same as Live's:** `shellWorldDropsRows` next
+to `CreatureWindow`'s existing unprefixed `dropsRows=` lets the E2E suite assert the two
+describe the same moment — the same comparison `shellLiveKillRows`/`kills=` already buys for
+Kills, and trap 58's fix (one flat dump namespace, prefixed per host) is exactly what keeps
+the two from colliding while still being comparable.
+
+**Mechanical, and belongs in the same diff:** `SurfaceOwnershipTests.TheOtherHostsBuildTheirOwnSurfacesToo`
+needs a new row — `[InlineData("WorldRoom.cs", "new DropsCardView(main)")]` — the positive
+half of the guard that would otherwise sail past a `WorldRoom` that reached for a shared
+accessor instead of building its own.
+
+---
+
+#### 4. One rail-copy gap this uncovers — named, not blocking
+
+`ShellPages.Describe(ShellPage.World)` reads *"The zone's map, your camps, spawn timers and
+how to get there"* — four clauses for four tabs. It should gain a fifth when Drops lands,
+the same discipline `Describe`/`Label`/`IconName` already got for Live and Quests when their
+own disposition-table entries shipped. Small, but it is player-visible text (the rail's only
+copy when collapsed to icons) and this PR is the moment it stops being accurate to leave as
+written.
+
+**Adjacent, and explicitly not this PR's to close:** `Describe(ShellPage.Gear)` already says
+*"…and what dropped for you"* — the disposition table's FOURTH Kills & Drops destination,
+which the HUD subtraction pre-design's own inventory already marked as one of the "3 of 4
+destinations [that] don't exist yet." That gap predates this ask. Naming it only so nobody
+reads Gear's tooltip as evidence the four-way split is further along than it is — World
+landing does not make Gear's or Search's halves any less their own asks.
+
+---
+
+#### 5. Layout — checked, not assumed, same discipline every room here has gotten
+
+`DropsCardView.Body` is a single-column `StackPanel` (filter/export bar, footer, mob list) —
+no list beside a detail pane, so `WorldRoom.ApplyLayout` should stay exactly as empty as it
+is today; nothing about Drops changes the "no `RoomSinglePane` case" reasoning already in the
+room's own comment.
+
+**One real width risk, named as a thing to shoot first, not a ruling:** the filter/export bar
+is a four-column `Grid` — the filter as the star column, three auto-sized, text-labelled
+buttons ("Copy text", "Copy CSV", "Save CSV…") — and the file's own remarks say it was "sized
+for a 560px window." `MinRoomWidth` is 520. Predict the picture before shooting it (trap
+23/51): three labelled buttons beside a filter box is exactly the row shape that clips or
+wraps ugly first at a floor width, the same shape Quests' `SplitRoomWidth` bump (640→700) was
+picture-proven for. Not asking for a bump now — asking that this specific row be the first
+thing shot at 520, rather than assumed fine because Map/Camps/Routes/Travels already are.
+
+---
+
+#### 6. What is NOT in this pass
+
+- **No HUD subtraction.** Drops was never a `MiniStats` card; there is nothing to remove
+  from the widget. The HUD subtraction pre-design's `kills` row (blocked, its own ask, star
+  writer with no fallback) is unaffected and not reopened here.
+- **`CreatureWindow` (v1) is untouched.** Both its Kills and Drops tabs keep working exactly
+  as they do today — the same rule Live's own header already stated for the Kills half,
+  applied here to Drops.
+- **Search's lookup destination and Gear's "what dropped for you" destination** — both
+  unbuilt, both their own asks, not riders on this one (per §4 and per Live's §1, which
+  already ruled the same for the other two of the four-way split).
+- **The player door.** Reachable only via `EQBUDDY_SHELL`, as every room so far.
+
+---
+
+- **Already shipped (checked on tip `d55de151`):** World room at four tabs, `Landed`;
+  `WorldSurface.AbsorbedCardKeys` = `["misc"]` only, no Drops-shaped migration needed since
+  Drops was never a card; `LiveRoom`'s Kills-tab precedent for both the own-instance
+  construction question and the hand-written-facts-over-a-new-`DebugFacts()`-method
+  question; `ShellPages.RoomTabs`/`Describe`/`SurfaceOwnershipTests` all read as cited.
+- **Checked:** `WorldRoom.cs`, `WorldSurface.cs`, `CreatureSurface.cs`,
+  `CreatureWindow.xaml.cs`, `DropsCardView.cs` in full; `KillsCardView.cs` (for
+  `DebugFacts()` absence only); `LiveRoom.cs` in full; `ShellPages.cs`'s `RoomTabs`/`Key`/
+  `Label`/`IconName`/`Describe`; `SurfaceOwnershipTests.cs` in full; `DebugHooks.cs`'s
+  `EQBUDDY_DROPS`/`EQBUDDY_CREATURE` block; `docs/BEVEL-v2-staging-critique.md` §2's Kills &
+  Drops row; `FABLE.md`'s disposition-table reference to World; `HELM.md`'s #306 sign-off
+  and the Live pre-design entry above.
+- **Not checked this run:** `CompanionSurfaces.cs`/EQBuddy Mobile's own Drops routing —
+  grepped, and found no mapping at all, only a comment placeholder naming the eventual
+  four-way split. That means mobile parity for World's Drops tab is a real, separate gap;
+  naming it as a place to look rather than ruling on it, since the task scope named World
+  only and trap 35's rule (an affordance the phone cannot honour is not parity) applies to
+  whoever takes that ask, not to this one. The running app (did not run `shoot.ps1`).
+
+— Bevel (Claude Sonnet 5)
+
+---
+
+---
+
 ### HUD subtraction — first cut(s), now that all six rooms are landed — pre-design (Bevel, 2026-09-05)
 
 **Priority:** `approved` (pre-design, last-look ask; unlocks Opus for the first HUD

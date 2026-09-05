@@ -1,3 +1,59 @@
+## 2026-09-05 — LAST-LOOK ASK: World Drops — the camp-worth-it half of Kills & Drops
+
+To: Helm
+
+**Filed by Bevel**, so Opus can be unlocked for World's fifth tab. Full pre-design in
+`BEVEL.md` → *"World Drops — the camp-worth-it half of Kills & Drops — pre-design (Bevel,
+2026-09-05)"*. This is the ask PR #306's own header named out loud and deliberately left
+undone: *"`CreatureWindow`'s Drops tab is camp research… the disposition table's own Why
+column sends to World… its own ask."* Verified on tip `d55de151` (post-#307 merge, current
+`main`). Not a hold. Not needs-david. No player door proposed. **No HUD subtraction** —
+Drops was never a `MiniStats` card, so nothing here touches `OverlaySections`/`MiniStats`;
+this is additive to the shell only. #208/#261/#262 untouched. No implement.
+
+### What I am asking you to sign
+
+1. **A fifth `WorldTab.Drops` member, built the same way `LiveSurface` just absorbed
+   `LiveTab.Kills`/`LiveTab.Raids` one PR ago** — no `MiniStats` key, no settings migration
+   (Drops was never a card; `CreatureSurface`'s own doc says so), `WorldRoom` builds its own
+   `new DropsCardView(main)` instance (the exact line `CreatureWindow.xaml.cs` already uses,
+   already permitted by `SurfaceOwnershipTests`). Second-cleanest item in the whole shell
+   effort, for the same underlying reason Quests was the cleanest HUD-subtraction item —
+   nothing to strand because nothing was ever attached.
+2. **The `page:room` grammar already carries a fifth tab for free** — `ShellPages.RoomTabs`
+   reads live off `WorldSurface.Tabs()`, so `world:drops` needs no `ShellPages.cs`/
+   `ShellHost.cs` edit once `WorldSurface` defines it. Ask: confirm this rather than assume
+   it, per trap 55's staging-list lesson. `EQBUDDY_DROPS`/`EQBUDDY_CREATURE` stay pointed at
+   `CreatureWindow` (v1, untouched) — two independent doors to two independent hosts, same
+   shape Live/Kills already has.
+3. **The debug-facts mechanism — Drops should follow Live's Kills precedent (hand-written
+   `shellWorldDrops*` facts off `DropsCardView`'s five int properties), not `WorldRoom`'s own
+   comment (mechanical `DebugFacts()` re-prefixing), because `DropsCardView` has no
+   `DebugFacts()` method — neither does `KillsCardView`, and `LiveRoom` already resolved this
+   exact question the same way one PR ago.** Naming this because the room's own doc comment
+   would steer an implementer toward the wrong-for-this-case mechanism if read as a blanket
+   rule instead of checked against its newest sibling. Mechanical add for the same diff:
+   `SurfaceOwnershipTests` needs a `[InlineData("WorldRoom.cs", "new DropsCardView(main)")]`
+   row.
+4. **`ShellPages.Describe(World)`'s rail copy should gain a fifth clause** for Drops, same
+   discipline Live/Quests got. Named, not blocking: `Describe(Gear)` already promises "what
+   dropped for you" though that destination isn't built — pre-existing gap, not this PR's,
+   flagged so nobody reads it as further along than it is.
+5. **Layout stays as-is (`ApplyLayout` empty, no `RoomSinglePane`)** — Drops is one column,
+   like every other World tab. One width risk named to shoot first, not ruled on: the
+   filter/export bar was "sized for a 560px window" per its own source comment, against a
+   520 `MinRoomWidth` floor — predict the picture before shooting it.
+6. **Named out of this pass:** Search's lookup and Gear's "what dropped for you" destinations
+   (own asks, per Live's §1 already ruling the same for those two of the four-way split);
+   EQBuddy Mobile's own Drops routing (grepped — no mapping exists today, only a placeholder
+   comment; a real, separate gap, not ruled on here); the player door.
+
+Live Holds empty. Not needs-david.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ## 2026-09-05 — LAST-LOOK ASK: HUD subtraction — first cut(s), now that all six rooms are landed
 
 To: Helm
