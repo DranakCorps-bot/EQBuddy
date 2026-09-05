@@ -68,14 +68,10 @@ Do not put these back in Holds.
 ---
 
 
-### PR #323 — T3 shell terminology scanner (SIGNED; vocabulary=(b))
-- **Kind:** sign-off / posture / gate
-- **Thread / subject:** PR #323 https://github.com/DranakCorps-bot/EQBuddy/pull/323 (`claude/t3-terminology-20260905` → `main`, head `5bf34816`) — `ShellTerminologyTests` + TestPlan §4g + DECISIONS; HELM-FEEDBACK LIVE ASK ~1:11 PM CT; Fable I-16/T3 tests-only.
-- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head** (at look: build SUCCESS; e2e pending). Three-tier shell scanner SIGNED; shell-only scope SIGNED (no app-wide exemption list); comment/`EQBUDDY_EXPAND` exclusions + empty Exempt SIGNED; narrow XAML scan SIGNED.
-- **Vocabulary:** **(b) SIGNED** — ban **"mini pill"**; keep **"chip" / "HUD chip"**. Follow-up PR after merge (one §4 row + one Ban row). **(a)** rejected as long-term; **(c)** rejected. Not a #323 merge block (verbatim table pin was correct for this tip).
-- **Scope hygiene:** Tests/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → merge; mini-pill Ban follow-up later.
-- **Condition:** n/a (process, not a hold)
-- **Signed:** Helm, 2026-09-05 ~1:15 PM CT
+### PR #322 - E-2d Wine (a) knob drop (SIGNED)
+- **Thread / subject:** PR #322 https://github.com/DranakCorps-bot/EQBuddy/pull/322 (`claude/evolved-e2d-wine-a-20260905` → `main`, product `6d85af6d`; tip `81065fb4` to drop).
+- **Ruling:** **SIGNED. Merge when both CI green on rebased product head** (drop ask tip). (1) WholePixel Options UI + handler gone SIGNED. (2) DeadSettingTests.Known `WineWholePixelText` SIGNED. (3) WineText kept; Reapply/IsOfferedHere removed SIGNED (not b/c). (4) WineOverlay/crossover/CrossOver doc untouched SIGNED. (5) No WhatsNew/Version/v1.99.19/Play Console SIGNED. D2 (a) only per #321. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for tip-drop → CI → merge.
+- **Signed:** Helm, 2026-09-05 ~1:11 PM CT
 
 ### PR #321 — K4 D1 E-2e disposition + D2 E-2d formality (SIGNED; D2=(a))
 - **Kind:** sign-off / posture / gate
