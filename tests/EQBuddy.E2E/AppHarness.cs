@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -15,9 +15,19 @@ namespace EQBuddy.E2E;
 /// </summary>
 internal sealed class AppHarness : IDisposable
 {
-    private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(90);
-    private static readonly TimeSpan AssertTimeout = TimeSpan.FromSeconds(45);
+    private static readonly TimeSpan LaunchTimeout = TimeSpan.FromSeconds(180);
+    // 45 s on a dev machine was never close to tight; a `windows-latest` runner is two
+    // slow cores rendering a whole widget per tick, and the suite runs on every push as of
+    // 2026-09-04. A timeout is patience, not a claim — the assertions are unchanged, and
+    // a genuine failure still reports in the same second it would have before.
+    private static readonly TimeSpan AssertTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan ExitTimeout = TimeSpan.FromSeconds(30);
+    /// <summary>How long the dump's `tick` may stand still before a wait stops blaming
+    /// its own assertion and says the APP has stopped. The UI tick is once a second and
+    /// the initial ingest runs off it, so this is thirty ticks of slack on a runner that
+    /// is already two slow cores — generous enough never to fire on lateness, short
+    /// enough to name the failure well inside the 90 s budget.</summary>
+    private static readonly TimeSpan StallTimeout = TimeSpan.FromSeconds(30);
 
     private readonly string _root;
     private Process? _process;
@@ -137,14 +147,27 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character}_{Server}".ToLowerInvariant()] = new { Classes = classes },
             }, new JsonSerializerOptions { WriteIndented = true }));
 
-    /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay
-    /// to finish (the fixture has kills, so a live session shows killsTotal &gt; 0).</summary>
+    /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay to
+    /// finish — first for it to START (the fixture has kills, so a live session shows
+    /// killsTotal &gt; 0), then for it to STOP moving.
+    ///
+    /// **The second wait is the one that was missing, and the first one reads exactly like
+    /// it is there.** A test's usual shape is "sample a baseline, append a line, wait for
+    /// baseline + 1", and <see cref="WaitForDump(string,int,string)"/> is an EQUALITY: a
+    /// counter that is still climbing through the rest of the fixture sails past the
+    /// expected number between two polls and the wait can never be satisfied again. On a
+    /// dev machine the replay finishes inside the first tick and nothing shows; on a
+    /// hosted runner it does not, and `SessionGoesLive_AndFreshKillUpdatesLiveStats` failed
+    /// there with "kills to reach 10; last seen 9" beside a dump reading kills=14 —
+    /// the counter had gone past 10 while the harness was sleeping.</summary>
     public void Launch()
     {
         if (_process is { HasExited: false })
             throw new InvalidOperationException("App already running — one instance per harness at a time.");
         // A dump left by a previous launch of this profile must not satisfy this one's waits.
         File.Delete(DebugDumpPath);
+        _lastTick = -1;
+        _tickMovedAt = DateTime.UtcNow;
 
         var psi = new ProcessStartInfo(ExePath) { UseShellExecute = false };
         psi.Environment["EQBUDDY_APPDATA"] = ProfileDir;
@@ -153,10 +176,90 @@ internal sealed class AppHarness : IDisposable
         _process = Process.Start(psi)
             ?? throw new InvalidOperationException($"Process.Start returned null for {ExePath}");
 
-        Wait.Until(() => DumpValue("killsTotal") > 0, LaunchTimeout,
-            "app to launch and replay the fixture into a live session (debug.txt killsTotal > 0)",
-            Artifacts);
+        Until(() => DumpValue("killsTotal") > 0, LaunchTimeout,
+            "app to launch and replay the fixture into a live session (debug.txt killsTotal > 0)");
+        WaitForReplayToSettle();
     }
+
+    // The dump's `tick` (RefreshUi's count) as this harness last saw it, and when it last
+    // moved. See WhyTheAppCannotAnswer.
+    private long _lastTick = -1;
+    private DateTime _tickMovedAt = DateTime.UtcNow;
+
+    /// <summary>
+    /// Why a wait should stop early instead of blaming its own assertion — or null while
+    /// the app is still capable of answering.
+    ///
+    /// **Two failures are indistinguishable from out here, and they cost a round apart.**
+    /// "kills will never reach 14" and "this app stopped ticking twelve seconds ago" both
+    /// present as a value that does not change, and the timeout message names the value.
+    /// The dump's `tick` separates them in one line, and the process itself answers the
+    /// third case — an app that has EXITED leaves a debug.txt that looks perfectly healthy
+    /// and perfectly frozen, which reads as a broken feature for the full 90 s.
+    /// </summary>
+    private string? WhyTheAppCannotAnswer()
+    {
+        if (_process is { HasExited: true } dead)
+            return $"the app EXITED with code {dead.ExitCode}. Its last dump is below; " +
+                   "the values in it are whatever was true when it went, not a verdict on the assertion.";
+        var tick = DumpValue("tick");
+        if (tick < 0) return null;   // no dump yet — too early to conclude anything
+        if (tick != _lastTick)
+        {
+            _lastTick = tick;
+            _tickMovedAt = DateTime.UtcNow;
+            return null;
+        }
+        var still = DateTime.UtcNow - _tickMovedAt;
+        return still < StallTimeout ? null
+            : $"the app STOPPED TICKING: debug.txt tick has read {tick} for {still.TotalSeconds:0}s " +
+              $"(process alive, Responding={IsResponding()}). Every number in the dump below is " +
+              "frozen at that tick, so none of them is evidence about the assertion.";
+    }
+
+    private string IsResponding()
+    {
+        try { _process?.Refresh(); return _process?.Responding.ToString() ?? "no process"; }
+        catch (InvalidOperationException) { return "unknown"; }
+    }
+
+    /// <summary>Every wait about a RUNNING app goes through here, so all of them get the
+    /// artifact dump and the early abort. The shutdown waits deliberately do not — an
+    /// exited process is the POINT there, not a diagnosis.</summary>
+    private void Until(Func<bool> condition, TimeSpan timeout, string reason) =>
+        Wait.Until(condition, timeout, reason, Artifacts, WhyTheAppCannotAnswer);
+
+    /// <summary>
+    /// Waits until the app SAYS the startup replay is over, so a test can sample a
+    /// baseline that will not move under it. Two facts, both the app's own answer:
+    ///
+    /// 1. `ingestDone` — `LogWatcher.InitialIngestDone`: the full-file replay has finished.
+    /// 2. `logPending` — `LogWatcher.PendingBytes`: nothing the tail has not read.
+    ///
+    /// **The RENDER half is no longer waited for, because it can no longer be behind.**
+    /// It used to be the third condition (`surfacesBehind=0`), and it was the one that
+    /// would not come: the satellite windows follow the widget's tick on their own
+    /// throttles, so a row count in the dump described a different moment from the total
+    /// beside it, and a wait for the two to coincide is a wait on a coincidence. The dump
+    /// now paints every open surface from the snapshot it is about to report
+    /// (`WidgetDump.PaintOneMoment`), so `kills == killKinds` in every dump by
+    /// construction. `surfacesBehind` stays in the dump as the assertion that this holds.
+    ///
+    /// **Four rounds went into inferring this instead.** Watching `killsTotal` +
+    /// `lootTotal` for stillness missed the fixture's trailing sale lines
+    /// ("progressMoneySold to reach 24; last seen 10"). Watching the WHOLE dump could not
+    /// tell a mid-ingest lull from an ending ("killsTotal to reach 83; last seen 82").
+    /// `ingestDone` answered the log half honestly and left the render half, which then
+    /// timed out on its own terms ("surfacesBehind=0", 90 s, beside `ingestDone=1
+    /// logPending=0 killKinds=14 kills=13` — a complete log, complete data, and one row
+    /// short on screen). Quiet was never the question; the question was whose moment a
+    /// number came from, and the honest fix was to make there be one moment.
+    /// </summary>
+    private void WaitForReplayToSettle() =>
+        Until(() => DumpValue("ingestDone") == 1 && DumpValue("logPending") == 0,
+            LaunchTimeout,
+            "the startup replay to FINISH before any test samples a baseline (debug.txt " +
+            "ingestDone=1 with logPending=0) — the app's own answer, not a guess from stillness");
 
     /// <summary>
     /// Seeds the raid-kill ledger, which lives in its own file rather than in
@@ -217,12 +320,21 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>Appends messages to the character log with live timestamps, the way the
-    /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.</summary>
+    /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.
+    ///
+    /// **Returns only once the app has READ the bytes** — `logPending` back to 0. That is
+    /// a post-condition, not patience: a tail that has stopped and a line that parsed
+    /// without counting produce the same symptom from out here (a counter that will not
+    /// move), and a whole round went to the wrong one of the two. Failing at the append
+    /// names the tail; failing at the assertion after it names the parse.</summary>
     public void AppendLogLines(params string[] messages)
     {
         var now = DateTime.Now;
         var text = string.Concat(messages.Select(m => FixtureLog.Stamp(now, m) + "\r\n"));
         File.AppendAllText(LogPath, text, Encoding.Latin1);
+        Until(() => DumpValue("logPending") == 0, AssertTimeout,
+            $"the app's tail to READ the {messages.Length} appended line(s) " +
+            "(debug.txt logPending back to 0)");
     }
 
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
@@ -250,21 +362,19 @@ internal sealed class AppHarness : IDisposable
     /// Kills fold landed, and the Progress tests had carried the same race silently
     /// since their own fold — so it lives HERE rather than in each test.</summary>
     public void WaitForWindow(string key, string reason) =>
-        Wait.Until(() => DumpValue(key) >= 0, AssertTimeout,
-            $"{reason} (debug.txt has no {key} yet)", Artifacts);
+        Until(() => DumpValue(key) >= 0, AssertTimeout,
+            $"{reason} (debug.txt has no {key} yet)");
 
     public void WaitForDump(string key, int expected, string reason) =>
-        Wait.Until(() => DumpValue(key) == expected, AssertTimeout,
-            $"{reason} (debug.txt {key} to reach {expected}; last seen {DumpValue(key)})",
-            Artifacts);
+        Until(() => DumpValue(key) == expected, AssertTimeout,
+            $"{reason} (debug.txt {key} to reach {expected}; last seen {DumpValue(key)})");
 
     /// <summary>The same wait for a fact that is a WORD rather than a count — a sort
     /// mode, a state name. The dump is space-separated <c>key=value</c>, so the value
     /// may not contain a space.</summary>
     public void WaitForDump(string key, string expected, string reason) =>
-        Wait.Until(() => DumpText(key) == expected, AssertTimeout,
-            $"{reason} (debug.txt {key} to read '{expected}'; last seen '{DumpText(key)}')",
-            Artifacts);
+        Until(() => DumpText(key) == expected, AssertTimeout,
+            $"{reason} (debug.txt {key} to read '{expected}'; last seen '{DumpText(key)}')");
 
     /// <summary>The raw value for a key, or "" when the dump has not appeared yet.</summary>
     public string DumpText(string key)

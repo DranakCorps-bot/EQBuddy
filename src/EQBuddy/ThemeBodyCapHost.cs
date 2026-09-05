@@ -38,7 +38,21 @@ internal static class ThemeBodyCapHost
     /// conversion belongs in this file, and one appearing would be the bug.
     /// </summary>
     public static double CapFor(MainWindow w, Expander askingCard, double askingCardChromeExcludingBody) =>
-        WidgetMetrics.ThemeBodyCap(
+        WidgetMetrics.ThemeBodyCap(RoomFor(w), ChromeFor(w, askingCard, askingCardChromeExcludingBody));
+
+    /// <summary>
+    /// The first of <see cref="CapFor"/>'s two inputs, on its own so the
+    /// <c>EQBUDDY_EXPAND</c> dump can report what the arithmetic was actually fed.
+    ///
+    /// **The E2E suite needs the INPUTS, not only the answer.** `themeBodyCap` alone can
+    /// only be checked against a constant, and the constant is a claim about the MONITOR:
+    /// the room below is clamped to the work area, so on a 1024x768 hosted runner a
+    /// 4000-unit drag yields the floor and "the body grew" is untestable there. With the
+    /// inputs in the dump a test asserts the whole relationship — cap == ThemeBodyCap(room,
+    /// chrome) against the control's real MaxHeight — which is exactly as strong on a
+    /// short screen as on a tall one, and is the "reaches the control" claim of trap 42.
+    /// </summary>
+    public static double RoomFor(MainWindow w) =>
             // The height the player asked for, AS THE MONITOR GRANTED IT.
             // ContentHeight is the raw drag and the stack does not necessarily get it —
             // ApplySectionMaxHeight clamps it to the work area, hardest at a UI scale
@@ -56,13 +70,18 @@ internal static class ThemeBodyCapHost
             double.IsNaN(w._settings.ContentHeight)
                 ? double.NaN
                 : WidgetMetrics.SectionMaxHeight(
-                    w._sectionAutoCap, w._settings.ContentHeight, w._settings.UiScale),
+                    w._sectionAutoCap, w._settings.ContentHeight, w._settings.UiScale);
+
+    /// <summary>The second input: everything in the stack that is not the body being
+    /// capped. Split out for the same reason as <see cref="RoomFor"/> — one producer, read
+    /// by the cap and by the dump, never re-derived by either.</summary>
+    public static double ChromeFor(MainWindow w, Expander askingCard, double askingCardChromeExcludingBody) =>
             WidgetMetrics.ThemeBodyChrome(
                 w.SectionsPanel.Children.OfType<FrameworkElement>()
                     .Where(card => card.Visibility == Visibility.Visible)
                     .Select(card => ReferenceEquals(card, askingCard)
                         ? askingCardChromeExcludingBody
-                        : HeaderExtentOf(card))));
+                        : HeaderExtentOf(card)));
 
     /// <summary>What a card costs the stack when only its header is counted. A collapsed
     /// card is ALL header, so its measured height is the answer; an expanded one is

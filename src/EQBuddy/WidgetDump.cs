@@ -17,16 +17,79 @@ namespace EQBuddy;
 /// </summary>
 internal static class WidgetDump
 {
-    /// <summary>The cap in force on whichever theme card currently owns a body, or the
-    /// floor when none does (#250). Only one theme is ever inline in the review set, and
-    /// with none open the floor is the honest answer: nothing is being capped.</summary>
-    private static double ThemeBodyCapInForce(MainWindow w) =>
-        w._progressHost.IsInline ? w._progressCard.BodyCap
-        : w._creatureHost.IsInline ? w._killsCard.BodyCap
-        : w._lootHost.IsInline ? w._lootCard.BodyCap
-        : w._questsHost.IsInline ? w._questsCard.BodyCap
-        : w._worldHost.IsInline ? w._worldCard.BodyCap
-        : EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight;
+    /// <summary>The cap in force on whichever theme card currently owns a body, AND the two
+    /// inputs it was computed from, or the floor when no card owns one (#250). Only one
+    /// theme is ever inline in the review set, and with none open the floor is the honest
+    /// answer: nothing is being capped.
+    ///
+    /// **The inputs travel with the answer, from one selection.** A test that has only the
+    /// cap can compare it to a constant, and the constant is a claim about the MONITOR —
+    /// the room is clamped to the work area, so a 4000-unit drag on a 1024x768 hosted
+    /// runner correctly yields the floor and "the body grew" cannot be asserted there. With
+    /// room and chrome in the dump, E2E asserts cap == ThemeBodyCap(room, chrome) against
+    /// the control's real MaxHeight, which holds on every screen.</summary>
+    private static (double Cap, double Room, double Chrome) ThemeBodyFactsInForce(MainWindow w) =>
+        w._progressHost.IsInline ? Facts(w, w._progressCard, w.ProgressSection)
+        : w._creatureHost.IsInline ? Facts(w, w._killsCard, w.KillsSection)
+        : w._lootHost.IsInline ? Facts(w, w._lootCard, w.LootSection)
+        : w._questsHost.IsInline ? Facts(w, w._questsCard, w.QuestsSection)
+        : w._worldHost.IsInline ? Facts(w, w._worldCard, w.MiscSection)
+        : (EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight, double.NaN, double.NaN);
+
+    private static (double Cap, double Room, double Chrome) Facts<TTab>(
+        MainWindow w, ThemeCardView<TTab> card, System.Windows.Controls.Expander section)
+        where TTab : struct, Enum =>
+        (card.BodyCap, ThemeBodyCapHost.RoomFor(w),
+         ThemeBodyCapHost.ChromeFor(w, section, card.BodyChrome));
+
+    /// <summary>
+    /// ONE MOMENT PER DUMP: bring every open satellite level with the snapshot this dump
+    /// is about to report, before reading a single row count off it.
+    ///
+    /// **The widget's totals and a window's row counts sit in one dump line and used to
+    /// describe two different moments.** Each satellite throttles its follow tick — one
+    /// second for Kills &amp; Drops and Gear &amp; Loot, two for Progress and Quests, three
+    /// for the wiki pack — so `kills` could be a whole creature behind `killsTotal`, for
+    /// seconds, with nothing wrong anywhere.
+    ///
+    /// That cost the E2E suite four rounds on a hosted runner. A test samples a row count
+    /// as its baseline, appends a line and waits for baseline + 1, and `WaitForDump` is an
+    /// EQUALITY — so a window still catching up sails PAST the expected number between two
+    /// polls and the wait can never be satisfied again (`SessionGoesLive…`: "kills to reach
+    /// 14; last seen 13", beside a dump reading `ingestDone=1 logPending=0 killKinds=14` —
+    /// the log fully read, the data complete, and the window one row short).
+    ///
+    /// **The first three rounds guessed at "settled" from stillness; the fourth asked the
+    /// app and then waited for an answer the throttles alone were never obliged to give.**
+    /// Reporting `surfacesBehind` made the disagreement VISIBLE, which was the right half
+    /// of the lesson and only half: a dump that says "these two numbers are a tick apart"
+    /// is still a dump carrying two moments. This closes it — trap 56's own general rule,
+    /// taken to its second clause: *say which moment each number came from, or MAKE THEM
+    /// COME FROM THE SAME ONE.*
+    ///
+    /// Costs a player nothing: the whole path is behind the <c>EQBUDDY_EXPAND</c> gate,
+    /// which already opens every card. It is not free licence either — <c>PaintNow</c> is
+    /// the window's own throttled paint with the throttle skipped, never a heavier one
+    /// (Gear &amp; Loot stays <c>force: false</c> so the Inventory tab does not re-scan the
+    /// game folder, and the wiki pack's lookups are keyed per creature, not per paint).
+    /// </summary>
+    private static void PaintOneMoment(MainWindow w, long version)
+    {
+        foreach (var surface in FollowingSurfaces.OpenOn(w))
+            if (surface.RenderedVersion != version) surface.PaintNow();
+    }
+
+    /// <summary>How many OPEN satellite windows have NOT painted this tick's snapshot —
+    /// zero by construction now that <see cref="PaintOneMoment"/> runs first, and kept as
+    /// the assertion that it IS. A non-zero here means a window's paint did not record the
+    /// version it painted, which is the one way the guarantee above can rot silently.</summary>
+    private static int SurfacesBehind(MainWindow w, long version) =>
+        FollowingSurfaces.OpenOn(w).Count(s => s.RenderedVersion != version);
+
+    /// <summary>A dump value is an integer the suite parses, and -1 is its "absent". A
+    /// measurement that has not happened (NaN — never dragged, or a card the layout has not
+    /// reached) is exactly that, so it is spelled -1 rather than "NaN".</summary>
+    private static double Dumpable(double value) => double.IsFinite(value) ? value : -1;
 
     /// <summary>Write the dump when the EXPAND gate is up. Same guard, same file, same
     /// keys as the block always had — the E2E suite's assertions are the contract.</summary>
@@ -36,6 +99,13 @@ internal static class WidgetDump
         {
             try
             {
+                // FIRST, before anything is read: every open satellite paints THIS
+                // snapshot, so the row counts below and the totals beside them are one
+                // moment. See PaintOneMoment.
+                PaintOneMoment(w, s.Version);
+                // One selection of the card that owns a body, read once: the cap and the
+                // two inputs it came from have to describe the SAME card.
+                var body = ThemeBodyFactsInForce(w);
                 // Row counts say "a new name appeared"; the snapshot totals say "the
                 // session moved" — the E2E suite (tests/EQBuddy.E2E) asserts on both.
                 var dump = $"dmgSrc={w.DamageSourceList.Items.Count} dmgTaken={w.DamageTakenList.Items.Count} " +
@@ -87,7 +157,26 @@ internal static class WidgetDump
                     // WPF layer has no unit tests (docs/TestPlan.md §5), and an absent
                     // control photographs as an unremarkable panel (trap 29), so a
                     // screenshot could never say what number is in force.
-                    $"themeBodyCap={ThemeBodyCapInForce(w):0} " +
+                    // Has the startup replay FINISHED? The watcher's own answer, which is
+                    // the only honest one: every test samples a baseline and waits for
+                    // baseline + 1, and a counter still climbing through the fixture sails
+                    // past the expected value between two polls. Quiet is not the same as
+                    // done — a slow machine pauses mid-ingest, and the two hosted-runner
+                    // flakes this key exists for both read as "settled" to a harness that
+                    // was watching for stillness instead of asking.
+                    $"ingestDone={(w._watcher.InitialIngestDone ? 1 : 0)} " +
+                    // And the OTHER half of "is this dump settled?", which ingestDone
+                    // cannot answer: how many open satellite windows have not yet painted
+                    // the snapshot the totals below came from. See SurfacesBehind — the
+                    // log being read and the windows being drawn are two facts, and the
+                    // E2E flake this pair exists for needed both.
+                    $"surfacesBehind={SurfacesBehind(w, s.Version)} " +
+                    $"themeBodyCap={body.Cap:0} " +
+                    // ...and the two numbers it was computed FROM, so a test can assert the
+                    // relationship instead of a constant. -1 means "no measurement": the
+                    // widget was never dragged, or no card owns a body.
+                    $"themeBodyRoom={Dumpable(body.Room):0} " +
+                    $"themeBodyChrome={Dumpable(body.Chrome):0} " +
                     // Its own key rather than a sentinel inside contentHeight: DumpValue
                     // answers -1 for "absent", so a NaN spelled as -1 would be a value the
                     // suite cannot tell from a dump that never mentioned it.
@@ -128,6 +217,28 @@ internal static class WidgetDump
                     // (never pinned before this PR) — DebugFacts() carries all three.
                     $"{w._travelsView.DebugFacts()} " +
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
+                    // The DATA's distinct-creature count, beside the window's RENDERED
+                    // one (`kills`, from CreatureWindow.DebugFacts). Two keys for one
+                    // fact on purpose — and since PaintOneMoment they are read off the
+                    // SAME snapshot, so they are now an EQUALITY the suite can assert
+                    // rather than two moments it has to reconcile. A run where they
+                    // disagree is a render bug; a run where they agree and the total is
+                    // wrong is a parse bug. One CI failure showed kills=13 against
+                    // killKinds=14 and nothing else in the dump could say which was lying.
+                    $"killKinds={s.YourKills.Count} lootKinds={s.Loot.Count} " +
+                    // How many times RefreshUi has run. Nothing asserts a value; it is
+                    // there so the E2E harness can tell "this counter will never move"
+                    // from "this APP is no longer moving" — two failures that look
+                    // identical from outside and cost a whole round apart.
+                    $"tick={w._uiTicks} " +
+                    // …and whether the tail has anything left to read. See
+                    // LogWatcher.PendingBytes: a total that will not move with bytes
+                    // pending is a stalled TAIL; the same total with 0 pending is a line
+                    // that parsed and did not count.
+                    $"logPending={w._watcher.PendingBytes} " +
+                    // …and whether the log was re-SELECTED, which resets the session and
+                    // replays the file. 1 is a normal launch.
+                    $"logSelects={w._watcher.SelectCount} " +
                     $"tracked={s.Tracked.Sum(t => t.TotalQuantity)} " +
                     // The Watch card's RENDERED shape, not just its total. The total
                     // above proves the data arrived; these prove the card drew it, and

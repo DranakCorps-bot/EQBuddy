@@ -1473,6 +1473,81 @@ Read this list before touching the areas it names. Every entry cost a release.
     one-time, undoing the player each launch). Two in three weeks: when a settings symptom is
     "my choice does not stick", suspect a migration before you suspect the save.
 
+56. **ONE DUMP LINE, TWO MOMENTS — a satellite window follows the widget's tick on its own
+    throttle, so its ROW COUNTS and the widget's TOTALS beside them are read off different
+    snapshots.** `RefreshUi` ticks the six theme windows *before* it builds the snapshot it
+    dumps, and each one throttles again on top of that (1 s for Kills & Drops and Gear &
+    Loot, 2 s for Progress and Quests, 3 s for the wiki pack). So `kills` can be a whole
+    creature behind `killsTotal` for seconds, with nothing wrong anywhere.
+    → **It cost the E2E suite four rounds and about forty runner-minutes**, because the
+    suite's shape is "sample a baseline, append a line, wait for baseline + 1" and
+    `WaitForDump` is an EQUALITY: a baseline taken off a window that is still catching up
+    makes the expected number one the counter passes *between two polls*, and the wait can
+    then never be satisfied. Every failure reads as a broken feature —
+    `SessionGoesLive…`'s "kills to reach 12; last seen 13" is a correct app and a wrong
+    question.
+    → **Three of the five rounds guessed at "settled" from STILLNESS, and each guess was a
+    claim about the machine.** Watching two totals missed the fixture's trailing sale
+    lines; watching the whole dump could not tell a mid-ingest lull from an ending; adding
+    `ingestDone` (the watcher's own answer) fixed the LOG half and left the RENDER half
+    untouched — and 2.5 s of quiet cannot cover a 2 s throttle plus a tick, so the fourth
+    guess would only have been a bigger number.
+    → **The fourth round asked instead of inferring, and STILL waited on a coincidence.**
+    Every satellite recorded the version it painted (`RenderedVersion`), the dump counted
+    the open ones that were behind (`surfacesBehind`), and `WaitForReplayToSettle` waited
+    for that count to reach zero. It reported the disagreement honestly and then timed out
+    at 90 s on `ingestDone=1 logPending=0 killKinds=14 kills=13` — a complete log, complete
+    data, one row short on screen. **Making a two-moment dump legible is not the same as
+    making it one moment, and only the second one is a thing a wait can rely on**: the
+    throttles were never obliged to line up with the tick that writes the dump.
+    → **Now fixed at the source.** `MainWindow.RefreshUi` ticks the satellites AFTER it
+    builds the snapshot rather than before (they read `CurrentSnapshot()`, so the old order
+    painted every satellite from LAST tick's — a second behind the widget beside it, for
+    players too), and `WidgetDump.PaintOneMoment` paints any open surface still behind
+    before reading a row count off it. One dump is ONE MOMENT; `kills == killKinds` by
+    construction; `surfacesBehind` stays as the assertion that this holds, not as something
+    to wait for. `FollowingSurfaces` owns the list of open satellites so the tick and the
+    count cannot drift. **The general rule: when a dump carries two numbers about one
+    thing, say which moment each came from — or make them come from the same one. Prefer
+    the second: the first still leaves a wait that has to get lucky.** Trap 4 with the two
+    sources a tick apart instead of twenty lines apart.
+    → **And the diagnostics went in before the last theory, because two failures were
+    indistinguishable from outside.** A counter that will not move is a stalled TAIL or a
+    line that parsed without counting, and only the app can tell you which:
+    `logPending` (bytes the tail has not read), `logSelects` (a re-Select resets and
+    replays the session underneath you) and `killKinds`/`lootKinds` (the DATA's count
+    beside the window's rendered one). `AppHarness.AppendLogLines` now returns only once
+    `logPending` is back to 0, so a stalled tail fails at the append and names itself
+    rather than surfacing 90 s later as a wrong row count.
+    → **And a THIRD failure hides behind the same symptom: the app is no longer there.** An
+    EQBuddy that has exited, or whose tick has stopped, leaves a `debug.txt` that looks
+    perfectly healthy and is perfectly frozen — every wait then runs its full 90 s and
+    blames the assertion. The dump carries `tick` (RefreshUi's own count) and every harness
+    wait aborts early, naming the app, when the process has exited or `tick` has stood
+    still for 30 s. **A polling wait needs a liveness question as well as a value one**, or
+    it will confidently misattribute a dead process to whatever it happened to be reading.
+
+57. **`[Collection("name")]` ON MOST OF A TEST ASSEMBLY IS NOT SERIALIZATION — the classes
+    that lack it get a collection each, and xUnit runs collections in PARALLEL.** The
+    Avalonia suite has ONE headless session on ONE thread, and
+    `HeadlessUnitTestSession.EnsureIsolatedApplication` tears the `Application` down and
+    stands a fresh one up around every dispatched test. Two threads doing that to one
+    session interleave, and the rebuild lands where the dispatcher belongs to the other
+    thread: *"The calling thread cannot access this object because a different thread owns
+    it"*, thrown from `DefaultRenderLoop.Add` inside `AvaloniaHeadlessPlatform.Initialize`,
+    reported as a **Test Case Cleanup Failure** — so the test that FAILS is not the test
+    that is wrong, and it is a different one every time (`MezTargets…`,
+    `ClosingAndReopening…`, `MapCircleMenu…`). Nineteen of twenty-one classes carried the
+    attribute; `WindowZoomTests` did not, and two `[AvaloniaFact]`s were enough.
+    → **It read as three unrelated flakes for as long as CI was asked once per commit.**
+    It only became one bug when PR #294 ran the same head nine times: 2 of 9 red on the
+    Avalonia lane, on both Windows and Linux, green on every re-run. **A flake you meet
+    once a day is a race you have not counted yet.**
+    → **Now guarded:** `[assembly: CollectionBehavior(DisableTestParallelization = true)]`
+    in `TestAppBuilder.cs`, not another `[Collection]` attribute — the constraint is a fact
+    about the SESSION, and a hand-labelled list stops covering the set the day the set
+    grows (trap 30). Costs nothing: 311 tests, 19 s either way.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
@@ -1574,8 +1649,12 @@ the game's own map files. This harness found trap 6 above; unit tests could not 
 ## Before you finish
 
 - Run the gates. `scripts/check.ps1` is the whole set (E2E is separate — it launches the
-  real app and needs a desktop session: `dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release`,
+  real app and needs a Windows session: `dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release`,
   after `dotnet build`, since it runs the BUILD output and not `dist/publish`).
+  **Since 2026-09-04 CI runs it too, on every push and PR** — so a failure there is real,
+  and **nothing in that suite may assert the SCREEN**: a hosted runner is 1024×768, and a
+  test needing a taller monitor is asserting the desk it was written on. Dump the
+  arithmetic's inputs and assert the relationship.
 - Player-visible change? `WhatsNew.json` entry, reporter credited.
 - Behaviour change? Update [docs/TestPlan.md](docs/TestPlan.md) — that file is the
   contract for what EQBuddy is expected to do, and it is only useful if it stays true.

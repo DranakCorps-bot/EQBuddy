@@ -89,10 +89,12 @@ public class DesignSystemTests
     /// nothing in the string but path grammar — a stray letter from a copy-paste, or a
     /// unicode minus out of a design tool, lands here.
     ///
-    /// The REAL check is <c>IconGeometryTests</c> in EQBuddy.Avalonia.Tests, which parses
-    /// every path with an actual geometry parser and measures it against the 24×24 grid.
-    /// That one cannot live here: UI.Shared and its test project are deliberately
-    /// toolkit-free (ArchitectureTests), so there is no parser to call.</summary>
+    /// The REAL check is <c>IconGeometryTests</c>, which parses every path with an actual
+    /// geometry parser and measures it against the 24×24 grid. That one cannot live here:
+    /// UI.Shared and its test project are deliberately toolkit-free (ArchitectureTests),
+    /// so there is no parser to call. It lived in EQBuddy.Avalonia.Tests until 2026-09-04
+    /// and is now in <c>tests/EQBuddy.E2E</c>, where it runs through WPF's parser — the
+    /// one the shipping app hands these strings to.</summary>
     [Theory]
     [MemberData(nameof(IconNames))]
     public void EveryIconPathIsWellFormed(string name)

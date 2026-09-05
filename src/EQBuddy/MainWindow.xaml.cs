@@ -24,7 +24,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // Attached at construction (not in SessionStats itself) so tests never touch disk.
     private void AttachSpellStore() =>
         _stats.Spells.AttachStore(System.IO.Path.Combine(Core.AppPaths.Dir, "spell-categories.json"));
-    private readonly LogWatcher _watcher;
+    internal readonly LogWatcher _watcher;   // internal: WidgetDump reads its ingest state
     private readonly SessionRepository _repo = new(SessionRepository.DefaultDbPath);
     private readonly SessionArchiver _archiver;
     private DateTime _lastCheckpoint = DateTime.MinValue;
@@ -737,8 +737,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // did any work. E2E asserts the second is zero while no device is paired — the
     // "free when idle" claim is the one that costs a core if it's wrong, and a unit
     // test of the gate can't show that the real timer is wired to the real gate.
-    internal long _companionPumpTicks;
-    internal long _companionPushes;
+    // ...and how many times RefreshUi has run: a dump whose tick is not advancing is an
+    // app that has stopped, which from outside is indistinguishable from a value that
+    // will never change. The E2E suite spent a round on that ambiguity (trap 56).
+    internal long _companionPumpTicks, _companionPushes, _uiTicks;
 
     public AppSettings Settings => _settings;
     /// <summary>
@@ -2532,6 +2534,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     private void RefreshUi()
     {
+        _uiTicks++;
         AnswerSecondLaunch();
         UpdateFocusHide();
         ReassertTopmost();
@@ -2539,13 +2542,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
         // Spawn timers crossing zero: banner always, sound only if one is chosen. Runs
         // off the shared tick so a hidden window can't silence a camp.
-        if (_questsWindow is { IsLoaded: true, IsVisible: true } qw) qw.MaybeRefresh();
-        if (_progressWindow is { IsLoaded: true, IsVisible: true } pw) pw.MaybeRefresh();
-        if (_gearLootWindow is { IsLoaded: true, IsVisible: true } glw) glw.MaybeRefresh();
-        if (_creatureWindow is { IsLoaded: true, IsVisible: true } cw) cw.MaybeRefresh();
-        if (_wikiPackWindow is { IsLoaded: true, IsVisible: true } wp) wp.MaybeRefresh();
-        if (_worldWindow is { IsLoaded: true, IsVisible: true } ww) ww.MaybeRefresh();
-
         if (_settings.TrackSpawns)
         {
             // Sound only — no banner. The chip flipping to DUE is the visual, and a
@@ -2642,6 +2638,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
         var s = BuildSnapshot();
         _latestSnapshot = s;   // satellites reuse this tick's snapshot (perf audit #12)
+        // AFTER the snapshot exists, never before it: these read CurrentSnapshot(), so
+        // ticking them at the top of the method painted them from LAST tick's — every
+        // satellite a second behind the widget beside it, by construction (trap 56).
+        FollowingSurfaces.TickAll(this);
 
         ProcessTrackedAlerts(s);
 

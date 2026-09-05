@@ -23,7 +23,7 @@ namespace EQBuddy;
 /// window's OWN instance rather than borrowed from the widget: a UIElement has one parent,
 /// and a shared instance gets torn out of whichever host drew it last.
 /// </summary>
-public partial class CreatureWindow : Window
+public partial class CreatureWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -160,10 +160,22 @@ public partial class CreatureWindow : Window
         Refresh(force: false);
     }
 
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
+
+    /// <summary>The snapshot VERSION this window last PAINTED, for the
+    /// <c>EQBUDDY_EXPAND</c> dump's <c>surfacesBehind</c> count. A satellite renders from
+    /// the widget's shared snapshot on its own throttle, so its row counts and the
+    /// widget's totals in one dump line can describe two different moments; this is what
+    /// lets the E2E suite ASK whether they agree instead of inferring it from stillness.
+    /// -1 until the first paint.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
+        RenderedVersion = s.Version;
         BuildTabs(s);
         // Only the active tab is swapped in rather than both being stacked and hidden — a
         // hidden panel still measures on every layout pass, and a drops list can be forty

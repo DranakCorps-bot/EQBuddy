@@ -26,7 +26,7 @@ namespace EQBuddy;
 /// this window's <see cref="TabChanged"/> event and <see cref="SetTab(WorldTab)"/>,
 /// exactly as it does for the other three theme windows.
 /// </summary>
-public partial class WorldWindow : Window
+public partial class WorldWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -172,10 +172,19 @@ public partial class WorldWindow : Window
         Refresh(force);
     }
 
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
+
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c>. It answers for the WINDOW; the Map tab's
+    /// own view keeps a throttle of its own, so this is not a claim about the map.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
+        RenderedVersion = s.Version;
         BuildTabs(s);
         var onTravels = _tab == WorldTab.Travels ? Visibility.Visible : Visibility.Collapsed;
         _deathsStar.Visibility = onTravels;

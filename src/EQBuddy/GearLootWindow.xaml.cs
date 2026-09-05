@@ -21,7 +21,7 @@ namespace EQBuddy;
 /// of one — so <see cref="LootSurface.Hosted"/> lists the two that are real today and this
 /// window renders exactly what it lists.
 /// </summary>
-public partial class GearLootWindow : Window
+public partial class GearLootWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -166,10 +166,20 @@ public partial class GearLootWindow : Window
         Refresh(force: false);
     }
 
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    // force: false deliberately — the Inventory tab re-reads the game folder off a forced
+    // paint, and the dump must not turn a state question into a disk scan every tick.
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
+
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
         var s = _main.CurrentSnapshot();
+        RenderedVersion = s.Version;
         BuildTabs(s);
         // Only the active tab paints, and its body is swapped in rather than both being
         // stacked and hidden — a hidden panel still measures on every layout pass, and a

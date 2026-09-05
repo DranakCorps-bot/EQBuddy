@@ -29,7 +29,7 @@ namespace EQBuddy;
 /// in — and it is what made room for the status badge and the state rule that now carry
 /// readiness at a glance.
 /// </summary>
-public partial class QuestsWindow : Window
+public partial class QuestsWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -509,9 +509,18 @@ public partial class QuestsWindow : Window
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh(force: false);
     }
 
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
+
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's
+    /// throttle is TWO seconds, which is what made a 2.5 s stillness guess unsafe.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
+        RenderedVersion = _main.CurrentSnapshot().Version;
         var key = _main.QuestCharacterKey;
         var character = key.Length > 0 ? key.Split('_')[0] : "";
         _titleText.Text = character.Length > 0

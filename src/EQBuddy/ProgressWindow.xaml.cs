@@ -27,7 +27,7 @@ namespace EQBuddy;
 /// Only the ACTIVE tab renders. A tab nobody is looking at costs nothing, which is the
 /// rule the widget's collapsed cards have always followed.
 /// </summary>
-public partial class ProgressWindow : Window
+public partial class ProgressWindow : Window, IFollowingSurface
 {
     private readonly MainWindow _main;
     private readonly AppSettings _settings;
@@ -193,6 +193,14 @@ public partial class ProgressWindow : Window
         if ((DateTime.Now - _lastRefresh).TotalSeconds >= 2) Refresh(force: false);
     }
 
+    void IFollowingSurface.MaybeFollow() => MaybeRefresh();
+    void IFollowingSurface.PaintNow() => Refresh(force: false);
+
+    /// <summary>The snapshot VERSION this window last PAINTED — see
+    /// <c>CreatureWindow.RenderedVersion</c> for why the dump carries it. This window's
+    /// throttle is TWO seconds, which is what made a 2.5 s stillness guess unsafe.</summary>
+    public long RenderedVersion { get; private set; } = -1;
+
     private void Refresh(bool force)
     {
         _lastRefresh = DateTime.Now;
@@ -203,6 +211,7 @@ public partial class ProgressWindow : Window
             : "Progress";
 
         var s = _main.CurrentSnapshot();
+        RenderedVersion = s.Version;
         BuildTabs(s);
         // Only the active tab paints. Its body is swapped in rather than all four being
         // stacked and hidden — a hidden StackPanel still measures on every layout pass,

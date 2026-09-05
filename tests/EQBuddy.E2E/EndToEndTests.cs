@@ -249,6 +249,13 @@ public sealed class EndToEndTests
         Assert.True(kills > 0, "fixture replay should land kills");
         app.WaitForWindow("kills", "the Kills & Drops window to open and report its rows");
         var killRows = app.DumpValue("kills");
+        // The BASELINE is only worth taking if the window has caught up with the data —
+        // it is subtracted from an expected value below, so a window still climbing makes
+        // the wait unsatisfiable and reports as a 90 s timeout on the wrong line. The dump
+        // guarantees this now (WidgetDump.PaintOneMoment paints every open surface from
+        // the snapshot it reports, so these two are one moment); saying it here turns a
+        // regression in that guarantee into an immediate, legible failure instead.
+        Assert.Equal(app.DumpValue("killKinds"), killRows);
         Assert.Equal(1, app.DumpValue("killsCard"));   // the door is on the widget
         Assert.True(app.DumpValue("killsSummaryLen") > 0,
             "the launcher should summarise the theme; dump was: " + app.Artifacts());
@@ -256,6 +263,8 @@ public sealed class EndToEndTests
         app.AppendLogLines(MeleeHit, Kill);
 
         app.WaitForDump("killsTotal", kills + 1, "the fresh kill to reach the widget");
+        app.WaitForDump("killKinds", killRows + 1, "the training dummy to be a creature " +
+            "this session has not killed before");
         app.WaitForDump("kills", killRows + 1, "the new creature to get its own kill row");
     }
 
@@ -276,11 +285,20 @@ public sealed class EndToEndTests
         Assert.True(lootTotal > 0, "fixture replay should land loot");
         app.WaitForWindow("lootRows", "the Gear & Loot window to open and report its rows");
         var lootRows = app.DumpValue("lootRows");
+        var lootKinds = app.DumpValue("lootKinds");
+        // No equality to assert here the way SessionGoesLive… can: the Loot surface is a
+        // SLICE with its own strips (UI.Shared/LootPresentation), so its row count is not
+        // the snapshot's item count and never was. What both tests need is that the
+        // baseline is settled: Launch() for the log half, PaintOneMoment for the render.
+        Assert.True(lootRows > 0 && lootKinds > 0,
+            $"the fixture should land loot on both sides (rows={lootRows}, kinds={lootKinds})");
 
         app.AppendLogLines(MeleeHit, Kill,
             "--You have looted a Harness Test Trinket from a training dummy's corpse.--");
 
         app.WaitForDump("lootTotal", lootTotal + 1, "the looted item to reach the widget");
+        app.WaitForDump("lootKinds", lootKinds + 1, "the trinket to be an item this " +
+            "session has not looted before");
         app.WaitForDump("lootRows", lootRows + 1, "the new item to get its own loot row");
     }
 
@@ -546,14 +564,14 @@ public sealed class EndToEndTests
     /// gets more room. Paineless reached for exactly this control and reported that it did
     /// nothing — *"cannot just expand window size"* — because the cap was a constant.
     ///
-    /// 4000 is deliberately further than any monitor allows. The assertion is a RANGE
-    /// rather than 640 on purpose: the drag is clamped to the work area before it reaches
-    /// this arithmetic, so the exact answer depends on the screen this runs on — and a
-    /// test that hard-coded the ceiling would be asserting the monitor, not the feature.
-    /// What must hold on every screen is that the body grew and that it stayed bounded:
-    /// one card may double, and it may not eat the monitor. The exact ceiling is pinned in
-    /// <c>WidgetMetricsTests</c> and in the Avalonia render tests, where the screen is not
-    /// a variable.
+    /// 4000 is deliberately further than any monitor allows, and the assertion is a
+    /// RELATIONSHIP rather than a number: the drag is clamped to the work area before it
+    /// reaches this arithmetic, so any hard-coded answer — 640, or even "more than the
+    /// floor" — is a claim about the screen this happens to run on. What holds everywhere
+    /// is that the cap in force IS the tested formula applied to the room this machine
+    /// granted, bounded by the floor and the ceiling. The formula itself is pinned without
+    /// a screen in <c>WidgetMetricsTests</c>; what only a launched app can say is that the
+    /// answer reached the control (trap 42).
     /// </summary>
     [Fact]
     public void DraggingTheWidgetTallerGrowsTheOpenThemesBody()
@@ -565,8 +583,32 @@ public sealed class EndToEndTests
         var cap = app.DumpValue("themeBodyCap");
         Assert.Equal(0, app.DumpValue("contentHeightAuto"));
         Assert.Equal(1, app.DumpValue("worldInline"));
-        Assert.True(cap > 320, $"a dragged widget should grow the open body; cap was {cap}");
+        Assert.True(cap >= 320, $"the floor is a floor; cap was {cap}");
         Assert.True(cap <= 640, $"one card may double, never more; cap was {cap}");
+
+        // **The relationship, not a number — because a number here is a claim about the
+        // MONITOR.** The drag is clamped to the work area before it reaches the arithmetic,
+        // so a display that cannot spare the room correctly answers the floor: this
+        // assertion read `cap > 320` until 2026-09-04, and it failed on a 1024x768 hosted
+        // runner that had granted the stack 560 units, with the feature working perfectly.
+        // The dump now carries the two INPUTS, so what is pinned is that the tested
+        // arithmetic (WidgetMetricsTests owns the formula) reached the control's MaxHeight
+        // over the room this machine actually granted — equally strong on any screen, and
+        // it is the "in effect at runtime, not merely present in the build" claim of
+        // trap 42 that the deleted ThemeBodyCapRenderTests made on the other lane.
+        var room = app.DumpValue("themeBodyRoom");
+        var chrome = app.DumpValue("themeBodyChrome");
+        Assert.True(room > 0, $"a dragged widget reports the room it was granted; room was {room}");
+        Assert.True(chrome > 0, $"the open card reports the chrome around its body; chrome was {chrome}");
+        // ±1: the dump rounds each measurement to a whole unit, so the difference of two
+        // rounded numbers can sit a unit either side of the rounded difference. The cap
+        // itself is whole by construction (trap 12 — a wobbling MaxHeight on a
+        // SizeToContent always-on-top window is a geometry change).
+        var predicted = Math.Clamp(room - chrome, 320, 640);
+        Assert.True(Math.Abs(cap - predicted) <= 1,
+            $"the cap in force should be the tested arithmetic over this machine's own " +
+            $"numbers: room {room} - chrome {chrome} clamped to [320, 640] is {predicted}, " +
+            $"and the body is held to {cap}");
     }
 
     /// <summary>Dragged SHORTER than the floor, the body keeps the floor — the direction
