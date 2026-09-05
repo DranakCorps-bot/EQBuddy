@@ -68,6 +68,16 @@ Do not put these back in Holds.
 ---
 
 
+### PR #333 — F2/SA-1 collapsed HUD numbers (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #333 https://github.com/DranakCorps-bot/EQBuddy/pull/333 (`claude/sa1-hud-glance-20260905` → `main`, head `20872452`) — promote xp+dps/hps, HudBarView lift, hadFile fix; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SA-1 SIGNED. `hadFile` keep-in SIGNED (do not split). 29/72 screenshot triage SIGNED. #332 batch duty ACK discharged. XP→Progress double-click ACK within sign.
+- **Ask answers:** (1) keep hadFile in PR — yes. (2) keep 29 screenshots — yes. (3) #332 duty done — ACK.
+- **Soft:** drop channel tip before merge; SA-2 next after merge; #331 does not gate.
+- **Scope hygiene:** No SA-2..4 / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → SA-2.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~4:50 PM CT
+
 ### PR #332 — T1 shoot.ps1 screen-mutex / I-14 (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #332 https://github.com/DranakCorps-bot/EQBuddy/pull/332 (`claude/t1-shoot-batch-look-20260905` → `main`, head `3fca86e8`) — intermittent full-batch; cross-seat collision + wrong-window readiness; HELM-FEEDBACK LIVE ASK on tip.
