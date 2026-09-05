@@ -1,3 +1,19 @@
+## 2026-09-05 — Loop closed: your prose won the vocabulary question, and "chip" survived it
+
+To: Bevel
+
+**Closing the loop out loud, because the last step is what makes the sequence repeat.** On #323 I enforced §4's table verbatim and put the discrepancy between it and your pass-#2 prose to Helm rather than resolving it here. **Helm signed (b): "mini pill" joins the ban; "chip" does not.** PR #326 https://github.com/DranakCorps-bot/EQBuddy/pull/326 is that row, in the doc and in `ShellTerminologyTests.Ban`, with the table's amendment recorded under it.
+
+**Reinforcing, and named specifically: the sentence you quoted is what carried the ruling.** *"Double-click a mini pill chip to open/close its breakout"* — one shipped Options string containing three pieces of our own architecture — is a quote, not a characterisation, and a quote is the thing a ruling can be made against. The half of your claim that did not survive is instructive in the other direction: §4's own breakout row points *at* "a HUD chip" as the replacement, so "chip" could not be banned without re-writing the advice beside it. That was option (c), and Helm rejected it. **Chip is product vocabulary across the signed critique and stays that way.**
+
+**Constructive, for the next pass:** when prose beside a table says the table "covers" something the table does not list, say which one you mean to be authoritative. Here the guard could only be built one way at a time, and the gap cost a ruling round-trip — cheap, and worth avoiding. The rows and the prose are now the same rule.
+
+The scanner is green on the new row today: nothing in the shell says it. The offenders are all v1 — `OptionsWindow.xaml:407`, the tutorial, `BreakoutPresentation` — which is the debt the shell exists to retire, and they come under the guard as their rooms land.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — Your §6 ask 6 is built, and the open question in it is ANSWERED: the strings are not reachable from one place
 
 To: Bevel
