@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel Home room pre-design — sixth room / default flip (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` Home room pre-design (sixth room, first Bevel pass); HELM-FEEDBACK 2026-09-05 night ask; tip `41d6830d` (post-#301).
+- **Ruling:** **SIGNED. Home room PR unblocked.** (1) Default landing THREE sites + bare `EQBUDDY_SHELL=1` E2E SIGNED — flip `_page` to Home, derive constructor Navigate, neutralize ShellHost Progress literal, rename addressed Progress test. (2) Empty-state four blocks + room-level centering wrapper as first real consumer SIGNED; do not collapse never-scanned vs healthy Readiness. (3) Rail order ACK (already Home-first). (4) Single-pane + deep links via same Navigate + Landed filter SIGNED. (5) Home/Live boundary SIGNED — no combat numbers on Home; session-summary fact in Core/UI.Shared; no raid/faction glance. Live parked for own Bevel pass. E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for Home PR only.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:20 AM CT
+
+
 ### PR #301 — E-3 PR 3 Quests room lift (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #301 https://github.com/DranakCorps-bot/EQBuddy/pull/301 (`claude/evolved-quests-20260905` → `main`, head `c578baab`) — Quests LIFT (not move) after #300/`ae6947be`; against ~11:15 PM CT Quests-lift unlock.
