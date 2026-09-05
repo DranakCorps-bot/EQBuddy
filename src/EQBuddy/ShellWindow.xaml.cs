@@ -81,6 +81,13 @@ public partial class ShellWindow : Window, IFollowingSurface
     private ShellPage _page = ShellPage.Home;
     private DateTime _lastRefresh = DateTime.MinValue;
 
+    /// <summary>Whether the constructor placed this window on a monitor beside the primary
+    /// one. Recorded because "present in the build" and "in effect at runtime" are different
+    /// claims and only the second one is the feature (trap 42) — a unit test can prove the
+    /// arithmetic and cannot prove the wiring applied it, and a placement is invisible in a
+    /// diff, a build and a screenshot alike.</summary>
+    private bool _onSecondary;
+
     /// <summary>The rail rows, by page, so a navigation can paint the selection without
     /// rebuilding the rail — and so the two states of a row (labelled, icon-only) are one
     /// object rather than two lists that have to agree.</summary>
@@ -123,6 +130,29 @@ public partial class ShellWindow : Window, IFollowingSurface
         // them. A number typed here as well would be a second producer of one fact.
         MinWidth = ShellLayoutPolicy.MinWidth;
         MinHeight = ShellLayoutPolicy.MinHeight;
+        Width = ShellLayoutPolicy.OpenWidth;
+        Height = ShellLayoutPolicy.OpenHeight;
+
+        // **OPEN BESIDE THE GAME, NOT ON TOP OF IT.** The XAML says CenterScreen, and
+        // CenterScreen means the PRIMARY screen — which is where EverQuest is. The widget
+        // already lands on David's second display because it restores a saved position;
+        // this window has none to restore, so every review open dropped a 960×640 window
+        // over the game. `ScreenGuard.SecondaryOrigin` answers null on a one-monitor desk
+        // (and on a 1024×768 CI runner), and null deliberately leaves the XAML's
+        // CenterScreen in force rather than substituting a default of its own — the
+        // untouched single-screen behaviour, unchanged.
+        //
+        // The arithmetic is in `WindowPlacement` where a unit test can reach it; this is
+        // the wiring, which is all the WPF layer should ever hold of a sum. `Width` and
+        // `Height` are the XAML's literals and are real here — `ActualWidth` is not, and
+        // asking for it before the first measure would place against a zero-sized window.
+        if (ScreenGuard.SecondaryOrigin(Width, Height) is { } origin)
+        {
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = origin.Left;
+            Top = origin.Top;
+            _onSecondary = true;
+        }
 
         // **Every room gives back what it borrowed, once.** SpawnsView owns a ticking
         // DispatcherTimer and InventoryView holds a CancellationTokenSource; both are
@@ -493,6 +523,11 @@ public partial class ShellWindow : Window, IFollowingSurface
         // and conflating them is how a resize bug hides. Reported from the width so E2E can
         // assert the relationship rather than a number off the desk it was written on.
         $"shellRoomSinglePane={(ShellLayoutPolicy.For(ActualWidth).RoomSinglePane ? 1 : 0)} " +
+        // The ANSWER to "did it open beside the game". Its INPUTS are the desk's own
+        // metrics, which the E2E reads from the same SystemParameters this process did —
+        // so what gets asserted is the relationship (a desk wider than its primary puts
+        // the shell off the primary), never a number off the monitor it was written on.
+        $"shellSecondary={(_onSecondary ? 1 : 0)} " +
         $"shellSearch={(SearchBox.IsVisible ? 1 : 0)} " +
         $"shellPalette={(PaletteLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
         (_rooms.TryGetValue(_page, out var shown) ? shown.DebugFacts() : "");

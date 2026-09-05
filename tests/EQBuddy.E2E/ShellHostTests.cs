@@ -56,6 +56,43 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **The shell opens beside the game, not on top of it — and this asserts the
+    /// RELATIONSHIP rather than a monitor.** The XAML's `CenterScreen` centres on the
+    /// PRIMARY screen, which is where EverQuest is; the constructor overrides it whenever
+    /// the desk has a display beside the primary one.
+    ///
+    /// `WindowPlacement.SecondaryOrigin` is unit-tested, so the arithmetic is covered
+    /// without a screen. What no unit test can say is whether the WINDOW applied it —
+    /// "present in the build" and "in effect at runtime" are different claims and only the
+    /// second is the feature (trap 42), and a placement shows up in neither a diff nor a
+    /// screenshot. So this reads the same `SystemParameters` the app did and asserts that
+    /// the answer follows from the desk: wide desk → placed, single screen → the XAML's
+    /// default left alone. On a 1024×768 hosted runner it proves the fallback; on a
+    /// two-monitor desk it proves the feature. Neither run asserts a number.
+    /// </summary>
+    [Fact]
+    public void TheShellOpensOffThePrimaryScreenWhenTheDeskHasRoomBesideIt()
+    {
+        using var app = new AppHarness(environment: OpenOn("1"));
+        app.Launch();
+        app.WaitForDump("shellPage", "home", "the shell to open");
+
+        // The same question the window asked, asked again from the same desk — with the
+        // size out of `ShellLayoutPolicy` rather than retyped, because a band that cannot
+        // hold the window is not a place to open one and the window's size is therefore
+        // part of the question.
+        var expected = EQBuddy.Core.WindowPlacement.SecondaryOrigin(
+            System.Windows.SystemParameters.VirtualScreenLeft,
+            System.Windows.SystemParameters.VirtualScreenTop,
+            System.Windows.SystemParameters.VirtualScreenWidth,
+            System.Windows.SystemParameters.VirtualScreenHeight,
+            System.Windows.SystemParameters.PrimaryScreenWidth,
+            ShellLayoutPolicy.OpenWidth, ShellLayoutPolicy.OpenHeight) is not null;
+
+        Assert.Equal(expected ? 1 : 0, app.DumpValue("shellSecondary"));
+    }
+
+    /// <summary>
     /// The host opens, the rail draws, the Search affordance is there, and the Progress
     /// room paints — the four things E-3 PR 1 claims to have built.
     ///

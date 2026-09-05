@@ -15,6 +15,44 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (the local Evolved review door)
+
+- **`install-local.ps1 -Evolved` now sets `EQBUDDY_SHELL=1` and opens the shell.** The other
+  way: leave the switch alone and have David set the variable himself each time. Declined
+  because that script is the only way an Evolved build ever gets run on this machine, so a
+  smoke that does not open the shell is a smoke of the half of Evolved that has not changed
+  — trap 22 (a surface nobody can reach reads as reviewed anyway) arriving through the
+  launcher. **Deliberately confined to the `-Evolved` branch**, which is already the branch
+  that refuses to install, refuses to touch OneDrive and refuses to touch the v1 profile; no
+  installed or released build goes through it, so this does not open the player door that
+  `ShellHost` and the entry above it are still holding shut.
+- **`scripts/Launch-Evolved-Shell.cmd` re-opens the already-published copy without
+  rebuilding.** The other way: nothing — the install script was the only door. Declined
+  because coming back to the shell an hour later meant a 172 MB re-publish or remembering two
+  environment variables. It builds nothing and refuses with instructions when
+  `dist\publish\EQBuddy.exe` is absent, rather than quietly starting a publish that looks
+  like a hang. A `.cmd` because it is double-clicked from Explorer, where a `.ps1` opens
+  Notepad.
+- **The shell opens on a monitor BESIDE the primary when there is one.** The other way: keep
+  `CenterScreen`. Declined because CenterScreen means the PRIMARY screen, which is where
+  EverQuest is — the widget lands on DISPLAY2 because it restores a saved position and the
+  shell has none, so every review open dropped a 960×640 window over the game. The
+  arithmetic is `WindowPlacement.SecondaryOrigin` (unit-tested, in the same DIP space as
+  `Window.Left` — reading `GetMonitorInfo`'s physical-pixel rects instead would be trap 1);
+  the window is the wiring. Verified against the launched app, not just the tests: the shell
+  came back at (1980, 60) on a 1920-wide primary.
+- **A monitor ABOVE or BELOW the primary is refused rather than guessed at.** The other way:
+  place into the vertical band too. Declined because the virtual-screen rectangle says how
+  far the desk extends, never which COLUMN a stacked monitor occupies — a guess would put the
+  shell half on a screen and half on nothing, which is worse than the primary-centred window
+  it replaces. A stacked desk keeps today's behaviour, and a single-monitor desk (or a
+  1024×768 CI runner) is untouched.
+- **The shell's opening 960×640 moved out of the XAML into `ShellLayoutPolicy`.** The other
+  way: leave the literals and retype them in the test. Declined because the size is an INPUT
+  to the placement decision ("is there a band wide enough to hold this window"), so a number
+  in the XAML and again in a test is one that disagrees with itself silently, with both sides
+  internally consistent — the same argument `MinWidth` was already carrying one line up.
+
 ## 2026-09-05 (E-3 PR 4, the Home room)
 
 - **`ShellHost.Show` passes the address to the CONSTRUCTOR rather than navigating after
