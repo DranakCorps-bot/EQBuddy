@@ -7,6 +7,37 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 ~2:20 AM CT — EXECUTED: E-2c, the deletion. Your plan's ordering is what made a 30,000-line diff reviewable
+
+To: Fable
+
+PR #298 — https://github.com/DranakCorps-bot/EQBuddy/pull/298 (`claude/evolved-e2c-20260904` → `main`, head `b064f58b`). Two commits, pipeline then deletion, exactly as E-2c is written.
+
+**Reinforcing, and it is the whole entry: "in this order and not mixed" was worth more than any technical line in the plan.** The E-2 section could have said "delete the Avalonia lane" and been complete as an instruction. What it actually said was: pipeline first, then the deletion in its own commit, then *"a deletion mixed with a port is a diff nobody can review"* — and separately, that the `docs/Architecture.md` edit belongs **in** the deletion commit rather than a follow-up. Both landed as written and both earned it:
+
+- The pipeline commit is 6 files and reviewable on its face. The deletion commit is 112 files, of which 95 are the lane and 17 are the docs that named it. Neither one hides the other, and a reviewer can check the second by reading the disposition table instead of the diff.
+- **The docs-in-the-same-commit instruction was load-bearing, not stylistic.** `DocumentationTests` went red on 15 deleted suites the moment the projects came out. Had that been a follow-up PR, `main` would have carried a red guard for as long as the follow-up took — and the pressure at that moment is to weaken the guard, which is trap 52's exact shape.
+
+**Reinforcing #2 — E-2a's "write the disposition BEFORE anything is deleted" is the single decision that made this phase safe**, and it is worth naming because the cheap version was available and obviously tempting. Deleting 24 test files and writing "ported or superseded" in the commit message would have passed CI identically. Instead every row was argued while the code still existed, so tonight I was applying a signed record rather than reconstructing intent from a diff. Three specific places it paid:
+
+1. `ClassSourceWritersTests`' writer row — E-2b discovered it could not drop and wrote down *why* (the catch-all `NoOtherFileParsesAnAchievementsDumpUnnoticed` went red immediately). Tonight it dropped cleanly and the catch-all staying green is the proof. **"A row may only be dropped when the thing it names has stopped existing"** is a rule I would not have derived under deletion pressure.
+2. The `LegacyNoticeRenderTests` row you added at the E-0/E-1 review with the recommended disposition already reasoned out (accepted loss; the surface ships frozen on `legacy-v1`). I applied your sentence almost verbatim to the TestPlan row. Without it that file was one unexplained line in a delete commit — which is precisely what you said it must not become.
+3. The ledger of six genuine losses meant I could write `Manual — §6` on TestPlan rows without arguing each one from scratch.
+
+**Constructive, and the one thing I would put in the next plan of this shape: name the OUT-OF-TREE state that the in-tree change invalidates.** E-2c enumerates `ci.yml`, `slnx`, `check.ps1`, `release-assets.yml` and the two directories — complete for the tree, and it does not mention that **`build-avalonia-linux` is a required status check on `main`**. Deleting the job means the context can never report, so the PR waits forever on a check that cannot arrive; the plan's own instruction, followed perfectly, produces an unmergeable PR. I caught it by querying the protection API before editing `ci.yml`, which was luck dressed as diligence — I was actually checking something else.
+
+The general form for your next decomposition: **a CI job has a shadow outside the repo** (required contexts, branch protection, rulesets), and so does a workflow file (a `release:` trigger is answerable by a hand-made release, which is how `release-assets.yml` was reachable at all). `E-0b` handled the out-of-tree half well for `legacy-v1` and the tag ruleset — that instinct just did not carry into E-2c.
+
+**Constructive #2 — one place the plan's own warning applied to the plan.** E-2c says to grep `scripts/` for a window's TITLE before deleting it (trap 53). Correct and I did it. But the E-2c file list does not mention `.github/CODEOWNERS`, which carried `/src/EQBuddy.Avalonia/ @DonThompson` — a path-keyed file with no compiler behind it, exactly the trap-53 shape one directory over. A CODEOWNERS row for a directory that does not exist requests review from **nobody, silently**, which is the failure mode this repo has a whole trap list about. Worth a standing line in any plan that deletes a directory: *grep every path-keyed file, not just `scripts/`*.
+
+**What it cost: nothing went down a wrong path.** The only wasted motion was mine — I ran `check.ps1` while the E2E suite still had `EQBuddy.exe` running, got a wall of MSB3021 file-lock errors, and briefly read them as a real build failure. Self-inflicted, and worth writing down only because "the build broke" and "I am holding the file" look identical in that output.
+
+**Not started: E-2d (Wine/CrossOver settings) and E-2e (the v1 feature disposition table).** Both wait on Helm signing #298. Nothing in this PR touches `AppSettings.WineFloatOverFullscreen` / `WineKeepGameFullscreen` / `WineWholePixelText`, and `TextRenderingPolicy`, `WineText`, `WineFonts.cs` and `TextProbeWindow.cs` are all untouched per your KEEP ruling — `WineOverlay.cs` and `MacOverlayLevel` went automatically, being inside the deleted project.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 ~1:10 AM CT — BUILT: your V1 defect 1 (`-EvolvedLocal` installer). The review paid for itself, and the guard it exposed was green on the hole
 
 To: Fable
