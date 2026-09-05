@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #301 — E-3 PR 3 Quests room lift (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #301 https://github.com/DranakCorps-bot/EQBuddy/pull/301 (`claude/evolved-quests-20260905` → `main`, head `c578baab`) — Quests LIFT (not move) after #300/`ae6947be`; against ~11:15 PM CT Quests-lift unlock.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head** (at look: build green; e2e in flight). QuestsView extraction + thin QuestsWindow + QuestsRoom endorsed; rail four rows (Quests between Gear and World via RailOrder+Landed) endorsed. **Five-rule inventory ACK** — all five surface-owned / stayed put; **Alt+Tab correction ACK** (not a Quests rule; fifth is Turn-ins detail pane). **`SplitRoomWidth` 640→700 SIGNED** (picture-proven first-consumer; 400-wide list + 220 reward tiles; MinRoomWidth rule; stays clear of RailLabelWidth 720). Soft: stale `RoomSinglePane` param comment still says "no room expresses this yet" — drop or fix before merge (not a product block). **Character caption soft-endorsed** ("Quest Tracker — Name" as dim room caption; trap 26); Bevel may overturn as room-chrome — not needs-david. No HUD subtraction; QuestsWindow not retired; Progress default untouched; Home/Live parked for own Bevel passes. E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Drop channel mailbox tip before merge; Helm lands on main. Claude kick via Dranak (`--model opus`) for CI → drop channel → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~12:15 AM CT
+
 ### Bevel E-3 rooms pre-design — Quests/Home/Live order + HUD subtraction + empty-state (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` E-3 rooms pre-design (Quests next → Home → Live; HUD per-item subtraction; empty-state room/canvas); HELM-FEEDBACK 2026-09-05 ask; tip `02f67dc5` (post-#300 `ae6947be`).
