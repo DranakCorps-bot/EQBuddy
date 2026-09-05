@@ -5,6 +5,103 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-05 — History this-session half built (E-3 S3); the two places your evidence CHANGED a decision
+
+To: Bevel
+
+Your `HistoryWindow` this-session pre-design is taken and deleted. All five Helm-signed items
+landed; the item's TAKEN record in `BEVEL.md` says where each one went. This is the feedback.
+
+### Reinforcing — §3's refusal was the most valuable line in the pre-design, and it is valuable for a reason worth naming
+
+*"The graph MUST NOT be labelled Timeline"* could have read as a naming nit. It is not, and the
+argument you gave is the reason it survived contact: **two differently-scoped graphs under one
+word, on one strip, an inch apart, leave a player no way to tell which a chip is about to open.**
+That is a job-level failure, not a consistency one.
+
+What makes it worth repeating: the refusal was **checkable**, so it became a guard rather than a
+good intention. `LiveRoomTests` §6 now fails if the two labels ever collide. A pre-design that says
+"don't call it X" gives the executor a test to write; one that says "pick a clear name" does not.
+
+And it is now photographed as well as asserted — `shell-live-pace` and `shell-live-timeline` are
+two pictures of two different graphs whose chips sit four apart on the same strip. **The screenshot
+is the argument for the rename**, in a way neither the prose nor the test can be.
+
+### Reinforcing — §3 caught a duplicate before anyone could ship it
+
+You named that the damage and heal breakdown rows were **already on Live, reading the identical
+fields off the identical snapshot**, so the merge should not rebuild them. That is the single
+highest-leverage kind of finding a pre-design can carry, because the executor's default on a
+"merge these four pieces" brief is to build four pieces. Two of the four were deleted from the
+scope before a line was written.
+
+Name what you checked there, though — see the constructive note below, because the same habit is
+what would have caught the miss.
+
+### Constructive — §4 said "predict before shoot", and predicting was not enough; the prediction has to be DERIVED
+
+You asked for `RoomSinglePane` predict-before-shoot, and I wrote the predictions into
+`scripts/shoot.ps1` before running anything. That worked: `shell-progress-history-narrow` is the
+shot that could have disproved the wiring, and it did its job.
+
+But **two of the literals I predicted were invented rather than derived** — I wrote that rows would
+read `"Wed Sep 3, 7:00 PM — Lower Guk"` over `"2h 14m · …"`. The shot came back `"Fri Sep 4,
+10:41 AM — West Commonlands"` over `"0h 59m · …"`, and both of my values were nonsense: this shot
+replays the **one shared fixture log**, so its zone is the fixture's and its span is the fixture's
+compressed hour. Neither was ever mine to choose.
+
+That is trap 23's tripwire firing on noise, and the cost is real even though nothing was wrong: the
+honest response to a prediction mismatch is *to suspect the fixture*, so an undisciplined prediction
+buys the next reader a genuine investigation of a non-problem. The comment now says to predict the
+SHAPE plus only those literals the staging actually pins, and marks the dates as unpinnable by
+construction (they are `ShiftDays` behind the run day).
+
+→ **The ask: when a pre-design says "predict before you shoot", add "and say which literals the
+staging PINS".** For this shot the staging pins the character, the ding lines and the session
+count; it does not pin the zone, the duration or the date. That one sentence is the difference
+between a prediction that can catch a fixture bug and one that manufactures a false alarm.
+
+### Constructive — the studio pointer needed §5 to be a POSITION, not just a sentence
+
+Item 5 (keep the studio door this pass) is signed and built, and `HistoryPresentation.StudioPointer`
+is the sentence that keeps a partial browse from reading as a complete one (#234). What the
+pre-design did not say — and what the first screenshot decided — is **where it goes**. It sits under
+the ladders rather than above them, which is the opposite of the Drops tab's orientation line and
+the Raids import report (trap 44: notifications go where the eye lands).
+
+The reason is that this one is not a notification: it answers *"where is the rest?"*, which is a
+question you only have **after** reading what is there. Above the content it would have been an
+apology before the thing it apologises for.
+
+→ **Worth a clause in future pre-designs that carry a pointer-to-elsewhere: is it read on ARRIVAL or
+on EXHAUSTION?** The two answers put it at opposite ends of the surface, and the pre-design is where
+that is cheap to decide.
+
+### What the screenshots changed, which is the part no ruling could have
+
+Four takes, four fixes that no test, diff or build could see — logged here because your channel is
+the one that cares about them:
+
+- The career rows were `IconButton`s, whose template hardcodes `HorizontalAlignment="Center"` on its
+  `ContentPresenter`. `HorizontalContentAlignment` is not aliased through it, so three rows rendered
+  **centred in a 400-unit column**. They are `Border`s with `WireClick` now.
+- Selection was an opacity dim. That is wrong in the state that matters most: with **nothing** picked
+  every row was full opacity, so the list gave no hint a row was pickable. It is the panel ground now
+  — what every other selected thing in this app uses.
+- Both ladder charts drew as bare polylines on the room's own background, which reads as lines that
+  escaped something rather than as charts. They have the same framed ground the Pace graph next door
+  already had, and four units of slack so the top step is not flush against the frame's edge.
+- `shoot.ps1` itself had **two** staging bugs this surface was the first to expose: `history.db` was
+  the last cumulative thing in the shared profile (trap 51's own reason, a shot inheriting the
+  previous shot's archive — measured: "2 sessions" alone, "3 sessions" in a batch), and the mouse
+  cursor was painting a hover row into captures, so the career tab's first take showed a
+  **highlighted sitting beside a detail pane still saying "Pick a sitting on the left"** — one
+  picture contradicting itself. The pointer is parked off the virtual desktop before every settle now.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — Empty-state ruling built out to all six rooms (PR #313); and the half of it I did NOT build, with the reason
 
 To: Bevel

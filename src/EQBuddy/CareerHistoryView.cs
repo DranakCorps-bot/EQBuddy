@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -66,6 +66,21 @@ internal sealed class CareerHistoryView : Grid
     private readonly TextBlock _levelCaption;
     private readonly TextBlock _aaCaption;
     private readonly TextBlock _pointer;
+    private readonly Border _levelFrame;
+    private readonly Border _aaFrame;
+
+    /// <summary>A step chart's ground. The studio draws its two charts inside a bordered
+    /// panel and the first shot of this tab did not — two bare polylines on the room's own
+    /// background read as lines that had escaped something rather than as charts, and the
+    /// Pace graph next door already had the frame.</summary>
+    private Border Frame(Canvas canvas) => new()
+    {
+        Background = (Brush)FindResource("PanelBrush"),
+        CornerRadius = new CornerRadius(Tok.RadiusCard),
+        Padding = new Thickness(Tok.SpaceS, Tok.SpaceXs, Tok.SpaceS, Tok.SpaceXs),
+        Margin = new Thickness(0, Tok.SpaceXxs, 0, Tok.SpaceM),
+        Child = canvas,
+    };
 
     /// <summary>The list pane's width when both panes are up. Quests' catalog uses 400 and
     /// this list carries the same shape of row (a title line over a facts line), so it takes
@@ -166,12 +181,14 @@ internal sealed class CareerHistoryView : Grid
         _levelCaption.TextWrapping = TextWrapping.Wrap;
         _levelCaption.Ink("DimBrush");
         _ladderBlock.Children.Add(_levelCaption);
-        _ladderBlock.Children.Add(_levelCanvas);
+        _levelFrame = Frame(_levelCanvas);
+        _ladderBlock.Children.Add(_levelFrame);
         _aaCaption = DesignSystem.Text(Role.Caption, "");
         _aaCaption.TextWrapping = TextWrapping.Wrap;
         _aaCaption.Ink("DimBrush");
         _ladderBlock.Children.Add(_aaCaption);
-        _ladderBlock.Children.Add(_aaCanvas);
+        _aaFrame = Frame(_aaCanvas);
+        _ladderBlock.Children.Add(_aaFrame);
         bodyStack.Children.Add(_ladderBlock);
 
         // **ABOVE nothing and BELOW the content, deliberately, and it is the one placement
@@ -263,10 +280,22 @@ internal sealed class CareerHistoryView : Grid
         ApplyPanes();
     }
 
+    /// <summary>
+    /// One sitting as a clickable two-line row.
+    ///
+    /// **A <c>Border</c> with <see cref="DesignSystem.WireClick"/> and NOT an
+    /// <c>IconButton</c>, and the first screenshot is why.** That style's template hardcodes
+    /// <c>HorizontalAlignment="Center"</c> on its <c>ContentPresenter</c>, so
+    /// <c>HorizontalContentAlignment</c> on the button is not aliased and does nothing — the
+    /// three rows rendered centred in a 400-unit column, which reads as a layout accident
+    /// and is invisible to a diff, a build and every test in the suite. Same family as
+    /// <c>RoomEmptyState</c>'s own note about <c>ContentControl</c>'s defaults: a hardcoded
+    /// alignment inside a template beats the property that looks like it sets it.
+    /// </summary>
     private UIElement BuildRow(SessionRow row)
     {
         var career = HistoryPresentation.BuildCareerRow(row);
-        var stack = new StackPanel { Margin = new Thickness(0, Tok.SpaceXxs, 0, Tok.SpaceXxs) };
+        var stack = new StackPanel();
         var title = DesignSystem.Text(Role.Body, career.Title);
         title.TextWrapping = TextWrapping.Wrap;
         stack.Children.Add(title);
@@ -275,15 +304,18 @@ internal sealed class CareerHistoryView : Grid
         detail.Ink("DimBrush");
         stack.Children.Add(detail);
 
-        var button = new Button
+        var border = new Border
         {
-            Style = (Style)FindResource("IconButton"),
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            HorizontalContentAlignment = HorizontalAlignment.Left,
-            Content = stack,
+            CornerRadius = new CornerRadius(Tok.RadiusCard),
+            Padding = new Thickness(Tok.SpaceS, Tok.SpaceXs, Tok.SpaceS, Tok.SpaceXs),
+            Margin = new Thickness(0, 0, Tok.SpaceS, Tok.SpaceXxs),
+            Background = System.Windows.Media.Brushes.Transparent,
+            Child = stack,
             Tag = row.Id,
         };
-        button.Click += (_, _) =>
+        border.MouseEnter += (_, _) => Paint(border, hover: true);
+        border.MouseLeave += (_, _) => Paint(border, hover: false);
+        DesignSystem.WireClick(border, () =>
         {
             _selected = row.Id;
             // In one pane, picking a sitting IS the navigation — there is nowhere else for
@@ -292,20 +324,25 @@ internal sealed class CareerHistoryView : Grid
             if (_singlePane) _paneDetail = true;
             ApplyDetail();
             ApplyPanes();
-            Highlight();
-        };
-        return button;
+        });
+        return border;
     }
 
-    /// <summary>Which row reads as picked. An opacity change rather than a background: the
-    /// row is an <c>IconButton</c>, whose whole point is that it has no chrome, and giving
-    /// one row a panel behind it would make the list look like a table with one filled
-    /// cell.</summary>
+    /// <summary>Which row reads as picked: the panel ground, which is what every other
+    /// selected thing in this app uses. It was an opacity dim in the first build and that
+    /// was wrong in the state that matters most — with NOTHING picked, every row was full
+    /// opacity, so the list gave no hint that a row was a thing you could pick.</summary>
     private void Highlight()
     {
-        foreach (var child in _rows.Children.OfType<Button>())
-            child.Opacity = _selected == 0 || (long?)child.Tag == _selected ? 1.0 : 0.65;
+        foreach (var child in _rows.Children.OfType<Border>()) Paint(child, hover: false);
     }
+
+    private void Paint(Border row, bool hover) =>
+        row.Background = (long?)row.Tag == _selected
+            ? (System.Windows.Media.Brush)FindResource("PanelHoverBrush")
+            : hover
+                ? (System.Windows.Media.Brush)FindResource("PanelBrush")
+                : System.Windows.Media.Brushes.Transparent;
 
     private void ApplyDetail()
     {
@@ -344,8 +381,12 @@ internal sealed class CareerHistoryView : Grid
     {
         var (dings, aa) = HistoryPresentation.CareerLadders(_ladders());
         var width = _levelCanvas.ActualWidth > 0 ? _levelCanvas.ActualWidth : 300;
-        var levels = HistoryPresentation.BuildStepGraph(dings, width, LadderHeight - 4);
-        var aaGraph = HistoryPresentation.BuildStepGraph(aa, width, LadderHeight - 4);
+        // Eight units of slack, four of which the draw below adds back as an offset — the
+        // same breathing room the Pace graph takes. The first shot of this tab drew the top
+        // step flush against the frame's edge, which reads as a chart that has been clipped
+        // rather than one that reached its maximum.
+        var levels = HistoryPresentation.BuildStepGraph(dings, width, LadderHeight - 8);
+        var aaGraph = HistoryPresentation.BuildStepGraph(aa, width, LadderHeight - 8);
         LaddersShown = levels is not null || aaGraph is not null;
 
         Step(_levelCanvas, _levelCaption, levels, "AccentBrush",
@@ -362,7 +403,9 @@ internal sealed class CareerHistoryView : Grid
         canvas.Children.Clear();
         caption.Text = text ?? "";
         // Caption and canvas move together — one switch, not two (trap 17).
-        caption.Visibility = canvas.Visibility =
+        // Caption, canvas AND its frame — three things, one state (trap 17).
+        var frame = ReferenceEquals(canvas, _levelCanvas) ? _levelFrame : _aaFrame;
+        caption.Visibility = canvas.Visibility = frame.Visibility =
             graph is null ? Visibility.Collapsed : Visibility.Visible;
         if (graph is null) return;
         var line = new Polyline
@@ -371,7 +414,7 @@ internal sealed class CareerHistoryView : Grid
             StrokeThickness = 1.5,
             StrokeLineJoin = PenLineJoin.Miter,
         };
-        foreach (var (x, y) in graph.Points) line.Points.Add(new Point(x, y + 2));
+        foreach (var (x, y) in graph.Points) line.Points.Add(new Point(x, y + 4));
         canvas.Children.Add(line);
     }
 

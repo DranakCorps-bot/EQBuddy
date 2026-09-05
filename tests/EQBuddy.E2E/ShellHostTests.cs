@@ -1033,6 +1033,16 @@ public class ShellHostTests
         Assert.Equal(1, app.DumpValue("historyDetail"));
         // The room is still painting beside it — the half that would go silently wrong.
         Assert.Equal(0, app.DumpValue("shellProgressEmpty"));
+
+        // **AND THIS IS THE EXCLUSION, PROVEN RATHER THAN ASSERTED AGAINST A ZERO.** Two
+        // hosts, one store, one running sitting: the studio lists it (it always has — the
+        // archiver checkpoints it under `ActiveEndReason`, and the studio will happily show
+        // you a picture up to five minutes old) and the career browse does not. A career tab
+        // that had simply failed to render would report 0 too, which is why the pair is the
+        // assertion and neither number alone is.
+        Assert.True(app.DumpValue("historySessions") > 0,
+            $"the store held no sitting to exclude; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("shellProgressCareerRows"));
     }
 
     // ---- E-3 S1: the room-level empty-state wrapper ------------------------------

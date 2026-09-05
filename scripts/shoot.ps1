@@ -1,4 +1,4 @@
-# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
+﻿# Screenshot fixture: a real EQBuddy.exe, a seeded session, an OPAQUE render.
 #
 # Two things made a capture unusable before this existed (2026-08-17):
 #
@@ -428,6 +428,102 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_SHELL = 'live:raids' }; Set = @{} }
     'shell-live-timeline' = @{ Title = 'EQBuddy — Live'
                            Env = @{ EQBUDDY_SHELL = 'live:timeline' }; Set = @{} }
+    # E-3 S3 — HistoryWindow's this-session half, the two rooms it brings.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-live-pace' — the same 'EQBuddy — Live' chrome and six-row rail as
+    #     'shell-live', and an EIGHT-chip wrapped strip: Damage · Healing · Pet · Timeline ·
+    #     PACE · ENCOUNTERS · Kills · Raids. **Pace must sit between Timeline and
+    #     Encounters** — narrowest scope first — and it must NOT read "Timeline", which is
+    #     the whole signed §3 refusal and the one thing this picture can disprove that a
+    #     unit test cannot make obvious: two chips, two different words, on one strip, an
+    #     inch apart.
+    #     Pace lit, badged "peak N dps" from the fixture's own timeline.
+    #     The body: a dim caption "DPS over time — peak N/s (h:mm PM–h:mm PM, per minute)"
+    #     over a 120-unit panel-backed frame carrying ONE accent polyline. Nothing else —
+    #     no lanes, no gutter, no names. That is the difference from 'shell-live-timeline'
+    #     photographed rather than described, and the two pictures side by side are the
+    #     argument for the rename.
+    #     **What must NOT be there**: the "Not enough of this sitting has happened…" empty
+    #     line. The caption, the frame and that line are one switch (trap 17), so a picture
+    #     with both is a pair that has drifted apart.
+    #   'shell-live-encounters' — the same frame with Encounters lit, badged "N pulls".
+    #     The body is a list of COLLAPSED rows, oldest first, each "▸ <creature> — h:mm tt ·
+    #     N dmg · N dps · Ns · took N" with a dim ⧉ beside it. No row is open on first
+    #     paint, and the ⧉ is the thing worth photographing: it is the fourth caller of
+    #     `FightExport.ToText`, and a missing affordance is invisible to a diff, a build and
+    #     a test alike (trap 34).
+    #     A vertical scrollbar is EXPECTED here and not on Pace — the room's scroller is
+    #     Auto for both, and this is the tab with real overflow.
+    #   'shell-progress-history' — 'EQBuddy — Progress' chrome, rail of six with Progress
+    #     lit, and a FOUR-chip strip: Experience · Wealth · Faction · HISTORY. That fourth
+    #     chip is the picture's point: it is the first tab in `ProgressSurface` that only
+    #     one host draws, so a phone screenshot or a v1 `ProgressWindow` shot taken the same
+    #     day must show THREE and four respectively — the two shots together are what says
+    #     `DesktopShellOnly` is wired and not merely written.
+    #     History lit, badged "3 sittings" from the three primed sessions.
+    #     The body is a LIST BESIDE A DETAIL PANE — the first time Progress has needed the
+    #     second axis (`RoomSinglePane`, Bevel §4's predict-before-shoot). Left: "3
+    #     sessions" over three two-line rows, newest first, each "<Day> <Mon d>, <h:mm tt> —
+    #     West Commonlands" over "0h NNm · N kills · N% xp · <coin>".
+    #     **The zone and the duration are DERIVED, not invented** — this shot replays the
+    #     one shared fixture log, so its zone is the fixture's (West Commonlands, never a
+    #     zone of one's choosing) and its span is the fixture's own compressed hour. The
+    #     first draft of this block guessed "Lower Guk" and "2h 14m" and the shot came back
+    #     disagreeing with its own prediction on two literals that were never predictions at
+    #     all. That is trap 23's tripwire firing on noise: a prediction you did not derive
+    #     costs the next reader a real investigation, because the honest response to a
+    #     mismatch is to suspect the fixture. Predict the SHAPE and only those literals the
+    #     staging actually pins. The DATES are `ShiftDays` behind the run day and so are
+    #     unpinnable by construction. Right, with nothing picked: the
+    #     ladders block — "Character progress — every stored session" in small caps, a level
+    #     caption "Level 22 → 24 (…, 3 dings)" over an accent staircase, an AA caption over
+    #     a green one — and under it the dim studio-pointer paragraph naming
+    #     "Session history…".
+    #     **The ladders are the half that can be wrong and look right**: they need dings
+    #     across MORE THAN ONE stored session, which is exactly what the three primes are
+    #     for, and an unprimed profile would render a correct picture of an empty career.
+    #     Primed under the FIXTURE'S OWN character for the reason 'progress-levelups'
+    #     already records: `SessionSummary.Stored` compares (server, character) with SQL
+    #     `=`, so rows under any other name are rows this surface can never match.
+    'shell-live-pace' = @{ Title = 'EQBuddy — Live'
+                           Env = @{ EQBUDDY_SHELL = 'live:pace' }; Set = @{} }
+    'shell-live-encounters' = @{ Title = 'EQBuddy — Live'
+                           Env = @{ EQBUDDY_SHELL = 'live:encounters' }; Set = @{} }
+    #   'shell-progress-history-narrow' — THE ONE THAT CAN DISPROVE SOMETHING, and it is
+    #     here for the reason 'shell-gear-narrow' is. `RoomSinglePane` is arithmetic
+    #     `ShellLayoutPolicyTests` already covers; what no unit test can say is whether the
+    #     ROOM applied it — "present in the build" and "in effect at runtime" are different
+    #     claims and only the second is the feature (trap 42). At 580 wide the room is below
+    #     `SplitRoomWidth`, so: rail collapsed to icons, the LIST filling the whole room, no
+    #     detail pane, and NO "‹ All sittings" button — that appears only after a row is
+    #     picked, and an affordance that opens nothing is a trap. If the detail pane is still
+    #     beside the list here, the forward from `ProgressRoom.ApplyLayout` is not wired.
+    'shell-progress-history' = @{ Title = 'EQBuddy — Progress'
+                           Env = @{ EQBUDDY_SHELL = 'progress:history' }
+                           Set = @{}
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.35; ShiftDays = 3
+                                  Lines = @('You have gained a level! Welcome to level 22!',
+                                            'You have gained an ability point!  You now have 3 ability points.') }
+                               @{ Character = 'Testchar'; Fraction = 0.65; ShiftDays = 2
+                                  Lines = @('You have gained a level! Welcome to level 23!',
+                                            'You have gained 3 ability point(s)!  You now have 6 ability point(s).') }
+                               @{ Character = 'Testchar'; Fraction = 0.9;  ShiftDays = 1
+                                  Lines = @('You have gained a level! Welcome to level 24!',
+                                            'You have gained 3 ability point(s)!  You now have 9 ability point(s).') }
+                           ) }
+    'shell-progress-history-narrow' = @{ Title = 'EQBuddy — Progress'
+                           Env = @{ EQBUDDY_SHELL = 'progress:history'
+                                    EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{}
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.35; ShiftDays = 3
+                                  Lines = @('You have gained a level! Welcome to level 22!') }
+                               @{ Character = 'Testchar'; Fraction = 0.9;  ShiftDays = 1
+                                  Lines = @('You have gained a level! Welcome to level 24!') }
+                           ) }
     'shell-home'      = @{ Title = 'EQBuddy — Home'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{} }
     'shell-home-narrow' = @{ Title = 'EQBuddy — Home'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '580x480' }
@@ -1800,6 +1896,18 @@ try {
     foreach ($name in $wanted) {
         $spec = $Shots[$name]
         Write-Host "`n=== $name → $($spec.Title) ==="
+        # THE ARCHIVE IS STAGING TOO, AND IT WAS THE ONE CUMULATIVE THING LEFT.
+        # Trap 51 made the fixture LOG pristine before every shot; history.db sat in the
+        # shared profile and accumulated every prime run in the batch, so a Prime shot
+        # photographed its own sittings plus whatever earlier shots had archived.
+        # Measured, not assumed: 'shell-progress-history-narrow' primes two sittings and
+        # says "2 sessions" on its own, and said "3 sessions" in a batch behind
+        # 'shell-progress-history' — same code, same spec, two pictures, and the batch one
+        # is the picture that gets committed. It hid because the extra rows are PLAUSIBLE:
+        # a career browse with one more sitting in it looks exactly like a career browse.
+        # Unconditional and before the early return, for trap 51's own reason — a shot with
+        # no Prime of its own must not inherit the last shot's archive either.
+        Remove-Item (Join-Path $profileDir 'history.db*') -Force -ErrorAction SilentlyContinue
         Write-Settings $spec.Set
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
@@ -1871,6 +1979,21 @@ try {
             }
             if (-not $seen) { throw "No window appeared for '$name' within 90s." }
             $backdropForm.Refresh()
+            # PARK THE POINTER OFF EVERY WINDOW BEFORE THE SETTLE, or the capture is a
+            # picture of where the mouse happened to be. WPF paints :hover from the real
+            # cursor whether or not anyone is driving it, so a surface with hover-painted
+            # rows photographs one row filled — and a filled row reads as SELECTED, which
+            # is a state the shot may be asserting is absent. The career tab's first take
+            # showed exactly that: a highlighted sitting beside a detail pane still saying
+            # "Pick a sitting on the left", one picture contradicting itself.
+            # It is trap 51's shape from outside the app rather than inside it — the same
+            # code, the same profile, two different pictures — and the ambient state is the
+            # desktop's rather than the fixture's, so no amount of seeding reaches it.
+            # Bottom-right of the virtual desktop: outside every window this harness opens,
+            # and defined however many monitors are attached.
+            $vs = [System.Windows.Forms.SystemInformation]::VirtualScreen
+            [System.Windows.Forms.Cursor]::Position =
+                New-Object System.Drawing.Point (($vs.Right - 1), ($vs.Bottom - 1))
             Start-Sleep -Seconds $Settle
 
             $png = Join-Path $Out "$name.png"
