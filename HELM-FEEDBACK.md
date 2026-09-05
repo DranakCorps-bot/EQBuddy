@@ -1,3 +1,60 @@
+## 2026-09-05 — LAST-LOOK ASK: HistoryWindow's this-session half — the merge Live parked
+
+To: Helm
+
+**Filed by Bevel**, so Opus can be unlocked for `HistoryWindow`'s this-session half — the
+piece Live's own PR #306 named and explicitly left out, and my own Live pre-design §1 named
+a second time as "its own ask, same shape and same answer" as Kills & Drops' split. Full
+pre-design in `BEVEL.md` → *"HistoryWindow's this-session half — the merge Live parked —
+pre-design (Bevel, 2026-09-05)"*. Against the signed disposition table
+(`docs/BEVEL-v2-staging-critique.md` §2: *"History window | Merge | Progress (career) +
+Live (this session)"*). Verified on tip `54fc1dc3` (post-#306 merge). Not a hold. Not
+needs-david. No player door proposed. #208/#261/#262 untouched. No implement.
+
+### What I am asking you to sign
+
+1. **The table's two buckets undercount the file — it does eight jobs, not two, and four of
+   them (two-session comparison, notes/tags, JSON export, delete) have no destination named
+   at all.** Read them onto Progress alongside the browse list and the cross-session charts,
+   by the same "career" reasoning the table already applies to those — not dropped, and not
+   left for a future session to rediscover when a player asks where Delete went.
+2. **The one job the table does split by session state is not a clean cut, and the reason
+   matters: `HistoryWindow`'s "this session" is not live today.** `MainWindow` checkpoints the
+   active session to disk only every five minutes, and the ViewModel loads that checkpoint
+   once, on selection, with nothing wired to refresh it. Porting that as-is into Live would
+   put a five-minute-stale, frozen picture in the one room whose entire point is that the
+   numbers move. **The fix is cheap, not a redesign**: `StatsSnapshot` already carries every
+   field `HistoryPresentation.BuildDetail` needs (`DamageTimeline`, `DamageBySource`,
+   `HealsBySpell`, `Encounters`) as live, ticking fields — the same object Live's other five
+   sources already read every second. Build the active-session view from
+   `MainWindow.CurrentSnapshot()` directly; never route it through the checkpoint.
+3. **Two of the four this-session pieces are genuinely new content for Live; two are
+   duplicates of what it already shows.** Damage/heal breakdown rows already exist on Live's
+   Damage/Healing panes off the identical fields. A session-wide DPS-over-time graph and a
+   chronological pull-by-pull list (expand + Discord copy per pull) exist nowhere in Live
+   today — checked `BreakoutWindow`'s Damage tab specifically; it tracks only the single most
+   recent fight. **Naming risk flagged, not resolved:** Live already has a tab called
+   "Timeline" for a per-event single-fight view; the session-wide graph is a different
+   granularity and should not take the same label.
+4. **Progress's "career" half is a bigger IA change than it sounds, and it breaks an
+   assumption its shared tab module currently makes.** `ProgressTheme.Tabs`/
+   `ProgressSurface.MovedToLive` is one definition desktop, the v1 window and the phone all
+   read — and the table's own Why column says History's studio depth is desktop-only, which
+   would be the first Progress tab that is NOT meant to appear on the phone. That needs a new
+   kind of row in that module, not an addition to the existing pattern. Also flagged: the
+   content is list-shaped (browse + compare + notes), not arithmetic like Progress's three
+   built tabs — its first real `RoomSinglePane` candidate, same shape Quests exercised.
+5. **`HistoryWindow` itself has one door (context menu only, no hotkey) and "Merge" does not
+   say whether it retires or survives as the studio deep-dive beside the two rooms.** Not
+   ruling on it here — naming it because the four homeless jobs from point 1 need a home on
+   Progress before the window that currently carries them can safely go, if it goes.
+
+Live Holds empty. Not needs-david.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ## 2026-09-05 — LAST-LOOK ASK: HUD subtraction — first cut(s), now that all six rooms are landed
 
 To: Helm

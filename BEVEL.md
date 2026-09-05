@@ -44,6 +44,230 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### HistoryWindow's this-session half — the merge Live parked — pre-design (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, last-look ask; unlocks Opus for `HistoryWindow`'s
+this-session half — Live's own PR named it and left it out, and my own Live pre-design §1
+named it a second time as "its own ask, same shape and same answer" as Kills & Drops' split)
+**Place:** `src/EQBuddy/HistoryWindow.xaml.cs` (398 lines, all of it — `RenderFights`/
+`OnCopyEncounter` :83-148, `RenderProgress` :236-261, `OnSaveMeta`/`OnCopySummary`/
+`OnExportJson`/`OnDelete`/`OnImportLog` :345-397); `src/EQBuddy.UI.Shared/HistoryViewModel.cs`
+(`UpdateSelectionDetail` :150-191 — one-shot snapshot load, no re-tick); `HistoryPresentation.cs`
+(`BuildDetail` :215, `BuildDpsGraph` :247); `src/EQBuddy.Core/SessionRepository.cs`
+(`ActiveEndReason` :32, `Query` :179 — does not filter it out); `src/EQBuddy/MainWindow.xaml.cs`
+(the 5-minute checkpoint gate :2551-2557; `OnHistory`/ctor :3415-3426); `MainWindow.xaml:39`
+(the one door — "Session history…", context menu only, no hotkey); `src/EQBuddy.Core/
+SessionStats.cs` (`StatsSnapshot.DamageTimeline` :2059, `.DamageBySource` :2067,
+`.HealsBySpell` :2092, `.Encounters` :2190/`.RecentEncounters` :2186 — all already-live,
+already-ticking fields); `src/EQBuddy/LiveRoom.cs` (doc comment :27-34 naming this ask and
+parking it; the five built sources :19-25); `src/EQBuddy/BreakoutWindow.xaml.cs` (`_lastFight`
+:406/456 — single fight only, no multi-pull list); `src/EQBuddy.UI.Shared/FightExport.cs` (the
+one shared Discord-export function, already called from `MainWindow`, `BreakoutWindow` AND
+`HistoryWindow`); `src/EQBuddy/ProgressRoom.cs:169-189` (`BuildTabs`, reads
+`ProgressTheme.Tabs`/`ProgressSurface.MovedToLive` — the one shared definition desktop, the v1
+window and the phone all read); `docs/BEVEL-v2-staging-critique.md` §2 row *History window*.
+**Source:** tonight's ask. Against the signed disposition table
+(`docs/BEVEL-v2-staging-critique.md` §2: *"History window | Merge | Progress (career) + Live
+(this session) | History studio depth stays desktop-only"*), Live's own PR #306 header (which
+names this exact split and explicitly does not build it), and my own Live pre-design §1 (which
+named it a second time, alongside Kills & Drops, as "its own ask"). **All verified in source on
+tip `54fc1dc3`** (post-#306 merge). **Not a hold. Not needs-david. No player door proposed.
+#208/#261/#262 untouched. No implement.**
+
+---
+
+#### 1. The disposition table names two destinations; the file actually does seven jobs, and the binary split hides which of them has nowhere named to go
+
+Reading `HistoryWindow.xaml.cs` end to end rather than trusting the one-line table entry, it
+does: (a) filter/browse the full session list for a character, (b) select **two** sessions and
+render a comparison, (c) render one selected session's detail — overview, DPS-over-time graph,
+damage/heal breakdown rows, a chronological list of every pull with per-pull expand and a
+Discord-ready copy, (d) draw cross-session level/AA step charts for one character, (e) edit
+notes/tags on a session, (f) export a session's full snapshot as JSON, (g) delete a session, and
+(h) import an external log file as a new stored session. That is eight, not two, and "career +
+this session" is a real split only for (c) — the rest cluster on one side or don't cluster at
+all:
+
+| Job | Career or this-session | Where the table's wording puts it | Confidence |
+|---|---|---|---|
+| (a) Browse/filter session list | Career | Progress | High — it is literally "which past sessions" |
+| (b) Two-session comparison | Career | **Not named** | The table says nothing about comparison; it is career-shaped by nature (you cannot compare a running session against itself) so it reads onto Progress, but nobody has said so |
+| (c) Selected-session detail (graph/breakdown/encounters) | **Both, depending on WHICH session is selected** | Progress for an ended row, Live for the active one | This is the one row the table's wording actually describes — see §2 for why it is not a clean cut |
+| (d) Cross-session level/AA charts | Career | Progress | High — explicitly "every stored session" |
+| (e) Notes/Tags | Career | **Not named** | Per-session metadata on a row that only exists once a session is stored; Progress |
+| (f) Export JSON | Career | **Not named** | Same as (e) |
+| (g) Delete | Career | **Not named** | Same |
+| (h) Import log | Career | **Not named** | Adds a stored row; Progress, by the same reasoning as (a) |
+
+**Five of eight jobs have no destination in the signed table at all.** That is not a defect in
+the table — "History window | Merge | Progress (career) + Live (this session)" was written as a
+one-line disposition entry for a whole-product pass, not a room-level spec — but an executor
+reading only that line would be handed four jobs ((b), (e), (f), (g)) with nowhere to put them,
+and the honest reading of "not named" is "goes with the rest of career, on Progress," not
+"drop it." I am naming that reading here so it is a decision someone made rather than an
+omission nobody notices until a player asks where the Delete button went.
+
+---
+
+#### 2. The one row the table DOES describe is not a clean cut, because "this session" in `HistoryWindow` today is not live
+
+Job (c) is the only piece the table actually splits by session state, and reading how it is
+built today, the split is not "the same feature, read from two sources" — it is one feature that
+happens to look like it covers the live case and does not, in a way that would be genuinely
+worse if carried into Live unexamined.
+
+**The data is up to five minutes stale, and it never refreshes after that.**
+`MainWindow.xaml.cs:2553` checkpoints the active session into the store only every five minutes
+(`DateTime.Now - _lastCheckpoint > TimeSpan.FromMinutes(5)`) — "so a crash loses little," per its
+own comment, which is the right reason for a checkpoint and the wrong shape for a live view.
+`SessionRepository.Query` does not filter `ActiveEndReason` rows out (`SessionRepository.cs:32`,
+`:179`), so a player who opens History mid-session and clicks the top row **can** select the
+running session today — and `HistoryViewModel.UpdateSelectionDetail` (`:150-191`) loads that
+row's snapshot **once**, on selection, with nothing wired to reload it while the window stays
+open. So the picture a player sees is frozen at whatever the last five-minute checkpoint caught,
+for as long as they keep the window up — in the one surface whose replacement's entire reason
+for existing is that the numbers move.
+
+**This is not a data-availability problem, so the fix is not "checkpoint more often."**
+`StatsSnapshot` — the same object `MainWindow.CombatSection`, `HealingSection` and all five of
+Live's other sources already read every tick — already carries `DamageTimeline`
+(`SessionStats.cs:2059`), `DamageBySource` (`:2067`), `HealsBySpell` (`:2092`) and the full
+`Encounters` list (`:2190`) as live, in-memory fields, recomputed every tick whether or not
+anyone ever checkpoints them to disk. `HistoryPresentation.BuildDetail` (`:215`) is built
+entirely from a `SessionRow` plus a `StatsSnapshot` — it does not know or care that the one it is
+handed came from a five-minute-old JSON blob rather than this tick's live object. **The merge's
+correct shape is: for the active session, build the same `HistoryDetail` from
+`MainWindow.CurrentSnapshot()` directly, the way Live's other five sources already do, and never
+route through the checkpoint at all.** Reading the checkpoint is right for what it is for
+(crash recovery, and — after the split — Progress's career browse of sessions that have
+actually ended); reading it for what Live needs would import a five-minute lie into the one room
+David is looking at while it is happening.
+
+---
+
+#### 3. What's genuinely new content for Live, and one real naming collision to avoid
+
+Comparing job (c)'s four pieces against Live's five already-built sources (`LiveRoom.cs:19-25`)
+turns up an even split — two are duplicates waiting to happen, two are real gaps:
+
+| History's this-session piece | Reads from | Already in Live? |
+|---|---|---|
+| Damage/heal breakdown rows (by ability/spell) | `DamageBySource` / `HealsBySpell` | **Yes** — Live's Damage and Healing meter panes already read the identical fields off the identical snapshot |
+| DPS-over-time graph (one point per minute, whole session) | `DamageTimeline` | **No** — Live's `TimelinePane` is sourced from `FightTimelineWindow`, which draws one PULL's per-event lanes, not the whole session's per-minute polyline. Different granularity, same word |
+| Chronological pull-by-pull list, expand + Discord copy per pull | `Encounters` grouped via `EncounterGrouping` | **No** — checked `BreakoutWindow.xaml.cs:406/456`: its Damage tab tracks only `LastFightInfo`, the single most recent fight. Nothing in Live today shows more than one fight at a time |
+| Per-pull Discord export | `FightExport.ToText` | **Already shared** — this one function is already called from `MainWindow` (Combat card, live), `BreakoutWindow` (Damage breakout, live) and `HistoryWindow` (any stored pull). Live's per-pull button is a fourth caller of an already-correct seam, not a new one |
+
+**The naming collision is worth flagging before anyone writes a tab label.** Live already has a
+tab called "Timeline" (source #4, `FightTimelineWindow`'s per-event lanes for one fight). A plan
+that reads "History has a DPS-over-time graph" and reaches for the obvious label would put a
+second, differently-scoped thing under the same word on the same strip — the per-event zoom
+timeline and the per-minute session overview answer different questions ("what happened in this
+one pull" vs. "how has this whole sitting gone") and a player has no way to tell which one a tab
+labelled "Timeline" is about to show. Whoever builds this should name the session-wide graph
+something that is not "Timeline," or fold it into an existing tab's header rather than adding a
+seventh strip entry.
+
+**And the two duplicates are a real design question, not a foregone one.** Does the merge ADD a
+pull-by-pull list and a session graph as new tabs on Live, or does it ENRICH the existing
+Damage/Healing tabs with that depth (the breakdown-by-ability rows Live already shows plus the
+pull list underneath)? I am not answering that — it is a layout call for whoever builds the
+room, not a product-boundary question — but naming it now is cheaper than discovering it after
+two competing renderings of `DamageBySource` ship on the same room.
+
+---
+
+#### 4. Progress's half is a bigger IA change than "career" sounds, and it breaks an assumption the shared tab module currently makes
+
+`ProgressRoom.BuildTabs` (`:169-189`) reads its tab strip from `ProgressTheme.Tabs`, filtered by
+`ProgressSurface.MovedToLive` — **one definition** that the v1 `ProgressWindow` and EQBuddy
+Mobile both read too, which is exactly the shared-seam discipline that stopped #184/#210 from
+happening a third time. Today that module knows three live tabs (Experience, Wealth, Faction)
+plus Raids, filtered out because it moved. Adding History's career half means adding a genuinely
+new tab to that same shared list — and the table's own Why column says *"History studio depth
+stays desktop-only,"* which is the first tab in Progress's short life that is NOT meant to show
+up wherever the other three do. `ProgressSurface.MovedToLive` is a filter for "this tab left
+Progress entirely, everywhere"; there is no existing filter for "this tab exists on Progress but
+only on the desktop shell, never on the phone." **That is a new kind of row in a module three
+surfaces already trust to agree, not an addition to the existing pattern** — worth deciding
+before the tab is built, because getting it wrong is exactly the shape (#184: one surface
+quietly behind the other two) this module exists to prevent.
+
+**And the content itself is list-shaped, not arithmetic-shaped.** Every tab Progress has built
+so far — Experience, Wealth, Faction — is a `RoomSinglePane`, one-column arithmetic surface, the
+same case Home and Progress's other tabs already have three empty `ApplyLayout` implementations
+of. A session-browse tab carrying a filterable list, a two-item comparison, notes/tags editing
+and per-session detail is the same list-beside-detail shape Quests' Turn-ins tab exercised at the
+640px `RoomSinglePane` threshold — the first time Progress would need that layout rather than
+assume the arithmetic case. Predict the picture before it is shot, the same way Quests' entry
+asked for, rather than discovering the layout needs a second axis after it is built.
+
+---
+
+#### 5. What happens to `HistoryWindow` itself is not decided by "Merge," and it has exactly one door today
+
+`HistoryWindow` has a single way in — `MainWindow.xaml:39`, the widget's context menu, "Session
+history…" — and no second, independent path the way Quests had `toggleQuests`. The disposition
+table's "Merge" verdict does not say whether the v1 pop-out retires once its two halves land on
+Progress and Live (the way Motes and the folded cards did) or survives beside them as the deep
+"studio" surface (the way `ProgressWindow`/`GearLootWindow`/`WorldWindow`/`QuestsWindow` still do
+next to their rooms) — and "History studio depth stays desktop-only" in the table's Why column
+reads as evidence for the second reading (something is being called "studio depth" and kept
+somewhere), but it does not say where. **I am not ruling on this — it is a Fable/Opus call once
+the two rooms exist — but §1's four homeless jobs make it load-bearing rather than cosmetic**:
+Compare, Export JSON, Delete and Import log have no named destination in the table at all, and
+if the answer turns out to be "`HistoryWindow` retires," those four need a home on Progress's new
+tab BEFORE the window that currently carries them goes away, not as a follow-up once a player
+asks where Delete went. If the answer is "`HistoryWindow` survives as the studio," the one
+context-menu door needs to keep working exactly as it does today, and the split only changes
+what Live/Progress ALSO show, not what the window itself does.
+
+---
+
+#### 6. What does NOT change / not in this pass
+
+- **Nothing is subtracted from the widget.** `MainWindow.CombatSection`/`HealingSection`,
+  `BreakoutWindow`, `FightTimelineWindow`, `CreatureWindow`'s Kills tab and `RaidsCardView` all
+  keep working exactly as they ship today — this pass is additive to Live and to Progress, per
+  the same per-item HUD gate my own prior entries already ruled (room landed + chip shipped +
+  screenshot parity, and `HistoryWindow` was never a `MiniStats`/`OverlaySections` card to begin
+  with, so that gate does not even apply to it directly).
+- **Live's five already-built sources are not re-opened.** This entry adds to Live's tab set (or
+  enriches two of its existing tabs, per §3); it does not change how Damage, Healing, Pet,
+  Timeline or Kills render today.
+- **`CreatureWindow`'s Drops tab and the rest of Kills & Drops' four-way split** — still its own
+  ask, unchanged from Live's §1 and my own HUD-subtraction §6.
+- **No WhatsNew/Version/publish/player door.** Every room this touches is reachable today only
+  by a dev session under `EQBUDDY_SHELL`.
+- **The room-level empty-state wrapper gap** (signed 2026-09-04, still unbuilt per my last two
+  entries) applies here too and is not this pass's to close — whoever builds Progress's new tab
+  should know a genuinely empty one (a fresh profile with one session and nothing to compare) is
+  the state a new player sees first, same as Quests and Home already found.
+
+---
+
+- **Already shipped (checked on tip `54fc1dc3`):** Live's five sources and its own header
+  explicitly naming and parking this exact split; `FightExport.ToText` already shared across
+  three call sites; `ProgressTheme.Tabs`/`ProgressSurface.MovedToLive` as the one definition
+  desktop, the v1 window and the phone all read; the disposition table row and its Why column.
+- **Checked:** `HistoryWindow.xaml.cs`, `HistoryViewModel.cs`, `HistoryPresentation.cs` in full;
+  `SessionRepository.cs`'s `Query`/`ActiveEndReason`/checkpoint schema; the 5-minute checkpoint
+  gate in `MainWindow.xaml.cs`; `StatsSnapshot`'s `DamageTimeline`/`DamageBySource`/
+  `HealsBySpell`/`Encounters`/`RecentEncounters` fields; `LiveRoom.cs` in full;
+  `BreakoutWindow.xaml.cs`'s `_lastFight` field and its Damage-tab scope; `FightExport.cs`'s
+  three call sites; `ProgressRoom.cs`'s `BuildTabs`; `MainWindow.xaml`'s context menu for
+  `HistoryWindow`'s one door.
+- **Not checked this run:** whether `EncounterGrouping.Group` includes a pull that is still
+  in progress (an unfinished fight) or only completed ones — matters for whether Live's
+  pull-list would show "fighting now" as its own row; the running app (did not run
+  `shoot.ps1`); the Avalonia-era mobile `⚙ Screens` picker's current behavior for Progress
+  (its mapping table was read for the Live entry, not re-read here); whether a comparison of
+  two sessions makes sense to keep as a feature at all once career browsing has a room of its
+  own, rather than a question this pre-design needs to answer.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### HUD subtraction — first cut(s), now that all six rooms are landed — pre-design (Bevel, 2026-09-05)
 
 **Priority:** `approved` (pre-design, last-look ask; unlocks Opus for the first HUD
