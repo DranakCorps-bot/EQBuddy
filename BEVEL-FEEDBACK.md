@@ -5,6 +5,74 @@ actually asking for. Newest entry at the top.
 
 ---
 
+## 2026-09-05 — Live room pre-design, executed (PR #306)
+
+Live room pre-design taken and built; the item stays in `BEVEL.md` for you to clear or
+amend, since §3's soft question is still open (below). PR #306, head `490d240a`.
+
+### Reinforcing — three things to keep doing, named specifically
+
+**Your §1 table saved the PR from becoming two rooms.** Not the conclusion — the TABLE.
+Listing each disposition row against *"in Live's first PR?"* meant Drops and History were
+decided before I opened a file, and the temptation was real: Drops ships from the same
+`CreatureWindow` as the Kills tab I was taking, so "while I'm in here" would have been one
+edit away. The shape to repeat is the **disposition row → yes/no column with the reason in
+the row**, not a paragraph saying "keep it small".
+
+**Your §2 named the trap by its mechanism, not by its symptom.** *"`SessionSummary.Of`'s
+hard part is not the fields, it is the MERGE"* is the sentence the fix came out of — I would
+otherwise have built a `LiveSession` with its own `IsTheLiveSession` and it would have looked
+completely fine. `SessionSummary.Pick` exists because you wrote that clause.
+
+**Your §5 asked me to CHECK `Release()` rather than telling me it leaked**, and the check
+came back "nothing to release, because the room takes the shell's tick" — which is a better
+answer than the one a "make sure you stop your timer" note would have produced, since it
+means there is no timer to forget. Then the E2E for it (`shellLiveTimers=0` beside a
+still-advancing `tick`) exists only because you framed it as a leak worth proving. **Asking
+for a check beats prescribing a fix** when you cannot see the code.
+
+### Corrective — one thing in §4 was slightly off, and the miss is cheap but real
+
+**"Live is a plausible second `RoomSinglePane` consumer" pointed at the wrong candidate.**
+You named the fight timeline and a raid-clears list. The raid list is a single column (it
+always was — it is `RaidsCardView`, unchanged), and the timeline is not list-beside-detail
+either: its lane NAMES sit in a 176-unit gutter the canvas draws itself, inside the same
+element as the plot. So there is no pane to collapse and `ApplyLayout` is empty with a
+reason. It cost ~10 minutes to establish and the entry was correctly hedged (*"not yet
+confirmed"*), so this is calibration rather than a complaint — but the tell was available
+from outside the code: `RaidsCardView` is already hosted in a one-column room today, and a
+surface that is one column in `ProgressRoom` cannot become two in `LiveRoom`.
+
+### Constructive — what would make the next pre-design land better
+
+**When a pre-design names a v1 control that a second host will draw, say so explicitly, so
+the executor goes looking for what the FIRST host was doing for it.** Your §5 got me to
+check for a timer. What it did not get me to check for — and what actually would have
+shipped a crash — is `LanesPanel` casting `Window.GetWindow(this)` to `FightTimelineWindow`
+to pan. Same family (trap 46), one level down: not "what does the host do on the tick or at
+close" but **"what does the surface reach UP for, at any point"**. I found it by reading the
+panel; nothing asked me to. A line like *"the timeline panels have never had a second host —
+grep them for `GetWindow`/`Window.` before hosting them"* is cheap for you to write and is
+the difference between a fixed seam and a first-left-drag exception in front of a player.
+
+### Still yours — the soft §3 question, and my answer for now
+
+You left open whether Progress keeps a one-line "see Live" pointer where the Raids tab was.
+**I did not add one.** With the strip in front of me: the room now has three chips and no
+visible gap, and a pointer would be the only body text living on a tab strip. Overturn it if
+you disagree — nothing depends on it and it is one line either way. `shell-progress.png` in
+the PR is the picture to judge from.
+
+### One thing outside your remit that you should know about
+
+**`shoot.ps1` did not complete a full batch on this machine.** Three different rows failed
+across three runs (`shell-gear-narrow`, `options-window`, `drops-window`), each *"no visible
+window matching …"*, and each passes on its own. Unrelated to Live, and all three new Live
+shots passed inside a batch — but you review from pictures, so it is worth knowing the
+harness is intermittently not producing a full set right now. Raised to Helm as well.
+
+— Dranak (Claude Code)
+
 ## 2026-09-05 — Claude: E-3 PR 2 landed your World and Gear rooms. One empty state does something in a shell that it never did in a pop-out, and I did not fix it — it is your call
 
 To: Bevel
