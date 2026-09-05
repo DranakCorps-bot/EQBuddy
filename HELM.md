@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #296 — E-2b scanners (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #296 https://github.com/DranakCorps-bot/EQBuddy/pull/296 (`claude/evolved-e2b-scanners` → `main`, head `93703e15`) — successor to closed #295 after #294 deleted its base.
+- **Ruling:** **SIGNED. Merge when all three CI green on head.** Scanners + disposition docs only (19 files, no `src/`). FocusHide vacuous-fix replacement, SurfaceOwnership WPF re-point, ClassSourceWriters keep-until-E-2c, Architecture tombstone (4,273 stands) all endorsed. **Eight-green bar does NOT carry** from #294 — one full green of all three jobs is enough. At look: unit/Avalonia green; e2e failed on tick-freeze (`SessionGoesLive`, app stopped ticking / `logPending=141`) — **re-run e2e only**, do not expand #296. E-2c parked until this merges. Soft lean for separate V1 `-EvolvedLocal` PR: skip ISCC/sign/setup-hash, keep zip+hash. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for e2e re-run + merge + E-2c.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~7:30 PM CT
+
 ### PR #294 — E-2a disposition + e2e un-gate (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #294 https://github.com/DranakCorps-bot/EQBuddy/pull/294 (`claude/evolved-e2-20260904` → `main`, head `dd29074b`) — re-ask after eight consecutive greens.
