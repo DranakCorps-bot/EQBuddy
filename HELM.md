@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel E-3 rooms pre-design — Quests/Home/Live order + HUD subtraction + empty-state (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` E-3 rooms pre-design (Quests next → Home → Live; HUD per-item subtraction; empty-state room/canvas); HELM-FEEDBACK 2026-09-05 ask; tip `02f67dc5` (post-#300 `ae6947be`).
+- **Ruling:** **SIGNED. Quests lift unblocked.** Order Quests→Home→Live SIGNED (IA-satisfied first). HUD subtraction **per item** SIGNED (room on rail + chip shipped + screenshot parity; Live cards ≠ Live room PR). Empty-state: room centers position; canvas treatment per-surface; Gear "no dump yet" same when touched — SIGNED. Home PR must flip `ShellWindow` default off Progress — named requirement. Quests: inventory five presentation rules; shoot RoomSinglePane at 640 both sides. Home/Live parked for own Bevel passes. E-2d/E-2e parked. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for Quests lift only.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~11:15 PM CT
+
+
 ### PR #300 — E-3 PR 2 World + Gear rooms (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #300 https://github.com/DranakCorps-bot/EQBuddy/pull/300 (`claude/evolved-e3-pr2-20260905` → `main`, product head `ae6947be`; channel tip `cbc143e5`) — World + Gear rooms into shell after #299/`a4af2822`.
