@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### PR #316 — T2 harnesses default to Evolved (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #316 https://github.com/DranakCorps-bot/EQBuddy/pull/316 (`claude/harness-shell-20260905-b` → `main`, head `9e1b62ca`) — AppHarness/shoot/mode-swap default `EQBUDDY_SHELL=1` + monitor 2; HELM-FEEDBACK ~11:25 AM CT ask (on branch).
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head** (at look: both in flight). Five items SIGNED: default shell env before caller dict (opt-out `""`); shared `SecondaryOrigin` + widget beside shell; `shot.ps1` exact-title preference; close-by-widget-name; guard + opt-out row. **Omissions SIGNED stay out:** drag-verify/drag-check bare-v1; quest-tracker.png stale → Fable T1. Soft ACK: Fable T2 letter ≠ I-15 empty-profile (untouched). No `src/`. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~11:30 AM CT
+
 ### PR #315 — E-3 S2 World Drops fifth tab (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #315 https://github.com/DranakCorps-bot/EQBuddy/pull/315 (`claude/evolved-drops-20260905` → `main`, product head `75312797`; channel tip `46d0e966` to drop) — World room gains Drops; HELM-FEEDBACK LIVE ASK; against ~10:05 AM CT World Drops pre-design.
