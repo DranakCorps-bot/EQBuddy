@@ -44,6 +44,295 @@ Copied from `SCRIBE.md`, which has been through several rounds of this and works
 
 ---
 
+### HUD Edit mode / Surface A — the long pole's first pre-design (Bevel, 2026-09-05)
+
+**Priority:** `approved` (pre-design, last-look ask; unlocks Fable's F2 decomposition per K10)
+**Place:** `src/EQBuddy/MainWindow.xaml.cs` (`StarButtons` :3438-3446, `SyncStarsFromSettings`
+:3451, `OnStarGlyphClick`/`OnStarChanged` :3459-3485, `MiniStatOrder` :116, `AlertTile`/
+`AlertWindow` construction :2800, `SpawnChipsWindow`/`MezChipsWindow` construction :2451/
+:2477); `src/EQBuddy.UI.Shared/MiniBarPresentation.cs` (`Order`, `Names`, `Icons`);
+`src/EQBuddy/OptionsCardsView.cs` (`BuildMiniStats` :135, `BuildBreakouts` :184);
+`src/EQBuddy/SpawnChipsWindow.xaml(.cs)`, `src/EQBuddy/MezChipsWindow.xaml(.cs)` (two
+independent always-on-top chip stacks); `src/EQBuddy/AlertWindow.xaml(.cs)` (a third,
+independent always-on-top floating toast); `src/EQBuddy.Core/AlertSurface.cs` (`AlertTab`,
+`AlertSurface`); `src/EQBuddy/BreakoutWindow.xaml.cs` (`BreakoutKind`),
+`src/EQBuddy.UI.Shared/BreakoutPresentation.cs`; `src/EQBuddy/GearLootWindow.xaml.cs:124-134`,
+`src/EQBuddy/WorldWindow.xaml.cs:137-148`, `src/EQBuddy/ProgressWindow.xaml.cs:127-159`,
+`src/EQBuddy/CreatureWindow.xaml.cs:118-128` (the pop-out windows that own the loot/deaths/
+xp+money/kills star toggles today); `src/EQBuddy.Core/AppSettings.cs` (`MiniStats`,
+`HiddenSections`, `DisabledBreakouts`, `SpawnChips*`/`MezChips*` position fields :437-449);
+`src/EQBuddy.UI.Shared/OptionsViewModel.cs` (`OverlaySections.Catalog`, nine cards, :112-);
+`src/EQBuddy/OptionsWindow.xaml.cs` (tab list :453); `docs/BEVEL-v2-staging-critique.md`
+§0/§2/§3/§4 (the signed HUD spec); `FABLE.md`'s I-8 and its lane table.
+**Source:** K9 kick, filed after W1 (`#314`, Quests-only HUD subtraction) and S1 (`#313`,
+room-level empty-state wrapper) both merged. Against `docs/BEVEL-v2-staging-critique.md` §3
+(the signed HUD stance, Helm-signed 2026-09-04 11:55 AM CT) and `FABLE.md`'s I-8 (*"the
+signed plan's 'PR after the host': DPS/HPS glance chips, editable deadline chips, `MiniStats`
+star rehoming… `MiniStats` seeds the HUD"*). **All verified in source on tip `9fabaa96`.**
+Not a hold. Not needs-david. No player door proposed. #208/#261/#262 untouched. No implement.
+
+---
+
+#### 0. I-8's own wording and the spec it cites are not the same design, and reconciling them is this pre-design's actual job
+
+I-8 (`FABLE.md`) describes Surface A as *"`MiniStats` star rehoming… `MiniStats` seeds the
+HUD."* Read literally, that is: take today's mini-dashboard — a flat, player-configurable
+list of up to ten cells (`MiniBarPresentation.Order` = `kills, dps, hps, pet, procs, loot,
+motes, money, xp, deaths`), each switched on by its own star — and carry it forward as-is
+into the new HUD.
+
+**§3 of the signed spec does not say that, and it rules against it in three separate
+places.** The collapsed HUD is a *fixed* three numbers — name, DPS, and XP%/hr (swapped for
+HPS when healing dominates ~30s) — not a player-chosen subset of ten. The expanded HUD's
+"Metrics" row is "the glance plus the one or two numbers that explain it," still bounded,
+still not a free list. And the stance section (§0) says outright: *"The HUD is not a
+miniaturised widget. It does not grow cards."* A ten-key, freely-combined pill is exactly a
+miniaturised widget — it is the mini-dashboard, unchanged, wearing the word HUD.
+
+**So "MiniStats seeds the HUD" cannot mean "the mini-dashboard becomes the HUD's body."** It
+can only mean what §2's own destination table already answered for each of those ten keys
+individually: most are Merge/Replace targets landing in Live, Progress, Gear or World, not
+HUD content at all. Read against the spec rather than against I-8's paraphrase of it, only
+**two** of the ten keys have a home on the HUD: `dps`/`hps` (the collapsed third slot, or the
+expanded metrics row) and `xp` (also the collapsed third slot, before healing pre-empts it).
+Everything else the star mechanism exists for today is either already destined for a room
+(`kills` → Live, `loot` → Gear, `money`/`motes` → Progress, `deaths` → World) or was never
+HUD-shaped in the first place (`pet`/`procs` merge into Live's board; `buffs` never drew a
+cell, it only gated a breakout).
+
+**The concrete ruling this pre-design is asking Helm to sign:** `MiniStats`, as the flat
+ten-key list that seeds `MainWindow`'s minimized bar, does not migrate into Surface A. It
+**retires with the widget's card stack**, key by key, on the same per-item HUD-subtraction
+gate already signed (room landed → chip/room shipped for review → screenshot proves parity)
+— not in one Surface A commit. `xp` and `dps`/`hps` do not retire; they **promote** from "one
+of ten optional pill cells" to "one of the collapsed HUD's two always-on numbers," which is a
+real, player-visible behavior change (today a player can un-star `xp`; the signed collapsed
+HUD has no such toggle) worth stating in those words rather than folding it silently into
+"seeds the HUD."
+
+---
+
+#### 1. Per-key fate — the table `MiniBarPresentation.Order` needs, read against §2/§3 rather than assumed
+
+| Key | Today's star lives in | §2/§3 destination | Surface A fate |
+|---|---|---|---|
+| `xp` | `ProgressWindow.xaml.cs:136` (the ONLY writer) | HUD collapsed slot 3 (XP%/hr) | **Promotes** — always-on, not a toggle |
+| `dps` | `MainWindow.xaml.cs` `StarButtons()` (inline Combat card) | HUD collapsed slot 2, or expanded Metrics | **Promotes** — always-on |
+| `hps` | same, inline Healing card | HUD collapsed slot 2 when healing dominates ~30s | **Promotes**, conditionally |
+| `pet` | same, inline Pet breakout | Live board; a pet-idle *binary* might earn a chip (§0's own open question, line 57) | **Retires** as a mini-bar cell; the binary chip is a separate, unruled design question — named, not answered, here |
+| `procs` | same | Live board (Damage) | **Retires** |
+| `buffs` | same (gates the Buffs breakout only — never draws a cell, per `MiniBarPresentation`'s own comment) | Deadline chips (expiring) + Settings → Alerts | **Retires** — its job is fully absorbed by the chip-earn mechanism once Buffs chips exist |
+| `loot` | `GearLootWindow.xaml.cs:124-134` (the ONLY writer) | Toast (ordinary loot) + Gear room | **Retires** — a loot toast is net-new UI (§3 "Toasts, not modals"), not a promoted star |
+| `motes` | `MainWindow.xaml.cs` `StarButtons()` (inline Motes card) **and** a duplicate convenience toggle in `ProgressWindow.xaml.cs:138` (Wealth tab) — two writers for one key today | Progress (Wealth); explicitly ruled OFF the HUD unless it becomes a deadline (§2: *"A mote rate you review after the pull is Progress. Do not drag #250 into Phase 2."*) | **Retires** |
+| `money` | `ProgressWindow.xaml.cs:137` (the ONLY writer) | Progress (Wealth) | **Retires** |
+| `kills` | `CreatureWindow.xaml.cs:118-128` (the ONLY writer) | Live (session kills half) | **Retires** |
+| `deaths` | `WorldWindow.xaml.cs:137-148` (the ONLY writer) | World (Travels & Deaths) | **Retires**, pending I-5's own two checks (unrelated to this pass) |
+
+**The fate column is the whole finding, and it says something I-8's wording does not: "star
+rehoming" undersells this.** Rehoming implies a wall of ten cells becomes a wall of ten cells
+somewhere else. What actually happens is eight of ten cells disappear because the number they
+carried already has a better home (a room, a toast, a chip that only exists when it's a
+deadline), and two cells graduate into fixed HUD furniture that was never a switch before.
+Calling both of those "seeding" flattens a retirement into a promotion and would read to Opus
+as license to keep the mini-bar's shape.
+
+---
+
+#### 2. Chips are not one thing today — they are three separate always-on-top windows, and Surface A's job is exactly the "floating-widget proliferation" the spec bans
+
+Checked in source, not assumed: **there is no single chip surface to extend.** Three
+different classes, each its own `Window`, each independently positioned and persisted, all
+owned and instantiated by `MainWindow` itself (`MainWindow.xaml.cs:2451`, `:2477`, `:2800`):
+
+- **`SpawnChipsWindow`** — spawn-due countdowns. Own doc comment: *"the stack exists exactly
+  while timers do."* Persists `SpawnChipsLeft/Top/Bottom`, `SpawnChipsGrowUp` independently.
+- **`MezChipsWindow`** — mez/charm countdowns. Own doc comment: *"a separate window with its
+  own saved position — mez chips get parked next to the fight, spawn chips are ambient."*
+  Persists `MezChipsLeft/Top/Bottom`, `MezChipsGrowUp` independently — a **second, unrelated**
+  x/y.
+- **`AlertWindow`** — the floating alert toast (not a settings window, despite the name
+  overlap with `AlertSurface`/`AlertTab` below). Own doc comment: *"a tiny always-on-top
+  window, independent of the widget… permanently click-through and never takes focus, except
+  while Options is open (placement mode)."* This is already close to §3's "toast, not modal"
+  rule for loot, and it is the one existing thing with a documented *edit-like* affordance
+  (`_placement`, becomes draggable while Options is open) — worth studying as a precedent for
+  Edit mode's interaction shape rather than inventing one from nothing.
+
+**Watch and Buffs have no visual chip at all today.** Grepped for `WatchChips`/`BuffsChips`/
+`Toast`/`Balloon`/`NotifyIcon` across `src/EQBuddy` — nothing. Their "firing" today is the
+inline Watch/Buffs card plus a sound (`AlertSoundPlan`, trap 10) plus, generically,
+`AlertWindow.ShowAlert(...)` text. So of the four chip families §2 names (spawn, mez,
+Watch-fire, buff-expiring), **two exist as dedicated chips, one exists as a generic toast with
+no per-rule chip shape, and one has never had any visual form.** A plan that reads "editable
+deadline chips" as "add Edit mode to the two chip windows we already have" would ship half
+the destination.
+
+**The proliferation itself is the thing to name to Helm.** §0's anti-pattern table says
+outright: *"Floating-widget proliferation — Breakouts were the v1 answer to 'the widget is
+too small.' The v2 answer is HUD + shell. Do not grow a new float for a job the shell already
+owns."* Three independently-positioned always-on-top windows plus the widget itself is not a
+HUD, it is the exact debt that line describes with a different feature list. **The
+recommendation: Surface A's chip row is drawn INSIDE the HUD (expanded state), one shared
+row, one position, not a fourth floating window.** `SpawnChipsWindow` and `MezChipsWindow`
+retire as `Window` subclasses; their content (the countdown chicklet, the drain-gauge fill,
+the DUE flip) is real, tested UI (`ChipStackAnchor`, `ChipStackPlan`) that should be *reused
+as a control*, not rebuilt — but the **window** each currently lives in should not survive
+Surface A. `AlertWindow`'s toast behavior (auto-hide, click-through, placement-drag) is the
+one existing thing close enough to reuse for ordinary-loot toasts.
+
+---
+
+#### 3. Edit mode, made concrete against what "place, mute, dismiss" has to mean once there is one chip row instead of three windows
+
+§3: *"You edit the HUD on the HUD… Edit mode is how mez / spawn / Watch chips are placed,
+muted, and dismissed."* Against today's mechanism (independent drag-anywhere-on-screen
+windows, one anchor each), a single shared chip row changes what each verb can mean:
+
+- **Place** cannot mean "drag this window to an x/y coordinate" once there is one row and no
+  second window to drag — `SpawnChipsLeft`/`MezChipsLeft` etc. have nothing to mean once the
+  windows are gone. It has to mean **order within the row** (which chip type sits first) and,
+  per the chip-earn rule (§3: *"no research lists on chips"*), nothing more — there is no
+  sub-window to reposition once a chip is not its own window.
+- **Mute** is a per-chip-*family* setting (turn off spawn chips without turning off mez
+  chips), which `DisabledBreakouts` already has the shape of for breakout windows — the
+  natural new setting is a sibling list keyed by chip family, not a repurposing of
+  `DisabledBreakouts` itself (breakouts and HUD chips are different objects even where they
+  share a name).
+- **Dismiss** is per-*instance* (this one mez target, this one spawn timer) and already exists
+  today as "click it away" (`SpawnChipsWindow`'s own doc: *"click it away sooner if you're
+  watching"*) — the only change Surface A makes is that the click target moves from a
+  floating chip to a chip inside the HUD row; the underlying dismiss semantics carry over
+  unchanged.
+
+**What this means for the settings shape Fable's F2 needs to design, named as a question
+rather than answered here:** `SpawnChipsLeft/Top/Bottom/GrowUp` and `MezChipsLeft/Top/Bottom/
+GrowUp` (eight fields, `AppSettings.cs:437-449`) are retirement candidates, not migration
+candidates — there is one HUD position now, not four. A new, much smaller settings surface
+(HUD position + per-chip-family mute + maybe chip order) replaces eight fields of per-window
+geometry that a single shared row has no use for. This is exactly the shape
+`DeadSettingTests`/trap 20 exists to catch on the way OUT — F2 should schedule the removal in
+the same PR that stops writing them, not leave four settled fields with no reader.
+
+---
+
+#### 4. B4 rides along: "Settings → Alerts" is not a rename of something built — it is scaffolding with zero consumers, and Settings' own IA has a naming collision already
+
+Checked, and this surprised me enough to verify twice: `src/EQBuddy.Core/AlertSurface.cs`
+defines `AlertTab { Watch, Buffs, Spawns, Crowd }` and a full `AlertSurface` presentation
+class (labels, keys, `TabForKey`) — the exact shape `QuestSurface`/`WorldSurface`/
+`ProgressSurface` have for their theme windows. **Grepped the whole `src/` tree for
+`AlertTab.`/`AlertSurface.` and found exactly one file: the one that defines them.** No
+window, no view, nothing reads this class. `docs/Themes.md`'s "Alerts theme… lands as its own
+WINDOW with tabs" was written and the presentation logic was built ahead of the window, and
+then the window was never built before the product pivoted to Evolved. §2's "Settings →
+Alerts" destination for Watch/Buffs config is not a move of an existing surface — it is the
+FIRST time this configuration gets a home, built from scaffolding that has been sitting idle.
+
+**And what actually configures Watch/Buffs/Spawn/Mez today is scattered across
+`OptionsWindow`'s existing tabs in a way that already collides with the destination's name:**
+`OptionsWindow` has a tab literally called **"Alerts"** (`OnTabClick`/`SelectTab`,
+`TabAlerts` — sound/volume/voice config) that is a *different* thing from
+`AlertSurface.AlertTab`'s Watch/Buffs/Spawns/Crowd, and a separate **"Watch"** tab
+(`TabWatch` — rule authoring) that overlaps in subject with `AlertTab.Watch` without being
+built from it. **A Settings → Alerts room that reuses the name "Alerts" for the new
+consolidated surface would collide with a tab of the same name that already exists and does
+something narrower** (just sound config) — worth naming to whoever writes I-11's Bevel
+Settings-IA pass in full, since renaming or merging `OptionsWindow`'s current "Alerts" tab is
+now part of that ask, not a detail it can defer.
+
+**This is B4 in miniature, not the full pass I-11 asks for** (I-11 is its own Bevel
+pre-design, parked, and this pre-design is not attempting it). What I am naming, scoped to
+what Surface A's own chip-config touches:
+
+1. `OptionsWindow`'s five current tabs (`look`, `alerts`, `watch`, `cards`, `behavior`) are
+   the closest thing to today's "Settings," and none of them is a shell room —
+   `ShellPage.Settings` exists (`ShellPages.cs`) but is not `Landed`, per I-11.
+2. The `cards` tab (`OptionsCardsView` — `BuildMiniStats`/`BuildBreakouts`) is **mostly
+   retired by §1's table, not migrated**: once `MiniStats`'s ten-key list is gone, the
+   checkbox grid this tab exists for has nothing left to check apart from whatever
+   chip-family mute settings Surface A invents. This tab shrinks to almost nothing, which is
+   worth knowing before anyone designs its replacement — there may not be a "Cards & windows"
+   screen at all once the cards are gone.
+3. `AlertSurface`'s unused scaffolding is ready to be spent, and doing so (rather than
+   starting a sixth presentation class for the same four categories) is the cheap win B4
+   offers Fable's F2 for free.
+
+---
+
+#### 5. Sequencing this hands to Fable's F2 — what the per-item gate means for a "long pole" this size
+
+The signed per-item HUD-subtraction gate (E-3 rooms pre-design §2, still standing) requires,
+per surface: room landed, chip/room shipped **for review**, screenshot proves parity — in
+that order, before a card leaves the widget. Surface A is not one PR against that gate, it is
+the PR that makes the *middle* step possible for seven remaining cards at once (Combat,
+Healing, Watch, Buffs, Gear, Motes, Progress — the blocked rows from the earlier
+HUD-subtraction inventory). That argues for decomposing F2 along the boundary this pre-design
+already found, not by card:
+
+1. **Collapsed HUD** (fixed name/DPS/XP↔HPS) — touches only `MainWindow`'s minimized-bar
+   rendering path and `MiniBarPresentation`'s consumer, not the chip windows. Shippable and
+   screenshot-able alone.
+2. **Chip-row consolidation** (fold `SpawnChipsWindow`+`MezChipsWindow` content into the
+   HUD's expanded state as one row; build Watch-fire/buff-expiring chips that do not exist
+   yet) — the biggest lift, touches three files plus two net-new chip types.
+3. **Edit mode** (place/mute/dismiss on the consolidated row) — depends on (2) existing
+   first; cannot be built against three separate windows.
+4. **Star retirement** (§1's table, key by key) — each key's retirement is *itself* gated on
+   its own card's room/chip/screenshot per the existing per-item rule, so this is not one
+   commit; it is the same "Quests first, because it strands nothing" logic run across the
+   remaining eight, and `xp`/`dps`/`hps` retire from the star mechanism specifically *because*
+   (1) already promoted them, not because their card left.
+
+None of this is a plan — Fable owns the decomposition and the risk calls (F2). It is the
+shape this pre-design found while reading the spec against the code, offered so F2 does not
+have to re-derive it.
+
+---
+
+#### 6. What is NOT in this pass
+
+- **No implementation.** No `MainWindow`/`OverlaySections`/`AppSettings` edit.
+- **No ruling on the pet-idle binary chip** (§0's own open question) — named in §1's table as
+  unresolved, not decided here.
+- **I-11's full Settings-IA pass** — §4 is scoped to what Surface A's chip config touches,
+  not a redesign of Options/Settings end to end. A separate Bevel pass still owns Hotkeys/
+  Paths/Janitor/Look and the rest of `OptionsWindow`.
+- **The player door, `v1.99.19`, Play Console, any tag/publish.**
+- **`#208`/`#261`/`#262`.**
+- **Card cuts themselves** (World `misc`, Gear, Motes, Progress, Combat, Healing, Watch,
+  Buffs) — each still waits on its own room/chip/screenshot per the standing per-item gate;
+  this pre-design does not authorize any of them.
+
+---
+
+- **Already shipped (checked on tip `9fabaa96`):** nine-card widget (`quests` retired,
+  W1/#314 merged); room-level empty-state wrapper across six rooms (S1/#313 merged);
+  `ChipStackAnchor`/`ChipStackPlan`/`ChipScale` as tested, reusable chip-geometry logic;
+  `AlertWindow`'s toast/placement-drag behavior; `AlertSurface`'s Watch/Buffs/Spawns/Crowd
+  presentation logic (built, unconsumed); `BreakoutKind`↔`MiniStats` coupling in
+  `OptionsCardsView.BuildBreakouts`.
+- **Checked:** `MainWindow.xaml.cs` `StarButtons`/`SyncStarsFromSettings`/`OnStarChanged`/
+  `MiniStatOrder` in full; `MiniBarPresentation.cs` in full; `OptionsCardsView.cs`
+  `BuildMiniStars`/`BuildMiniStats`/`BuildBreakouts` in full; `GearLootWindow.xaml.cs`,
+  `WorldWindow.xaml.cs`, `ProgressWindow.xaml.cs`, `CreatureWindow.xaml.cs` star-toggle
+  blocks; `SpawnChipsWindow.xaml.cs`, `MezChipsWindow.xaml.cs`, `AlertWindow.xaml.cs`
+  construction and doc comments in full; `AlertSurface.cs`/`AlertTab` in full, and grepped
+  for any consumer (none); `AppSettings.cs` chip-position fields (`:437-449`) and
+  `ChipScale`/`GrowUp` fields; `OptionsWindow.xaml.cs` tab list (`:453`);
+  `OverlaySections.Catalog` (nine cards, `OptionsViewModel.cs:112-`);
+  `docs/BEVEL-v2-staging-critique.md` §0/§2/§3/§4 in full; `FABLE.md` I-8, its dependency
+  graph and lane table in full; `HELM.md` #313/#314 signs.
+- **Not checked this run:** `WatchCardView.cs`/the Buffs section's exact firing code path
+  (confirmed no chip window exists via grep; did not read the sound/inline-card path in
+  full); whether `BreakoutPresentation.Progress` (a seventh string constant with no matching
+  `BreakoutKind` member) is dead or used elsewhere — named as a loose end, not chased; the
+  Avalonia lane (deleted with E-2c, not relevant to Surface A); the running app (did not run
+  `shoot.ps1` — nothing here is screenshot-able yet, there is no implementation).
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ### ~~HistoryWindow's this-session half — the merge Live parked~~ — TAKEN 2026-09-05 (E-3 S3)
 
 Executed, item deleted per the take-then-delete contract. Helm signed it ~10:10 AM CT; all
