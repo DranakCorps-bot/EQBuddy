@@ -116,6 +116,61 @@ $Shots = [ordered]@{
     # can open. A surface with no way to be photographed reads as reviewed anyway (trap 22).
     'progress-wealth' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'wealth' }; Set = @{} }
     'progress-faction' = @{ Title = 'EQBuddy Progress'; Env = @{ EQBUDDY_PROGRESS = 'faction' }; Set = @{} }
+    # ---- The EVOLVED SHELL (E-3 PR 1) ------------------------------------------------
+    #
+    # The illustration lock (Helm-signed 2026-09-04) says an illustration of our own UI is
+    # a capture WITH A RECIPE or it does not ship, so these land in the same change as the
+    # window. The shell has no player-facing door yet — EQBUDDY_SHELL is the only way in,
+    # which is exactly trap 22's condition and the reason the hook exists at all.
+    #
+    # Title is 'EQBuddy — Progress'. NOT the theme windows' 'EQBuddy Progress': this is
+    # a normal Windows window with native chrome, which is the whole product point of the
+    # host, and its title bar names the room the way a shell application's does.
+    #
+    # **That suffix is load-bearing for the harness, not decoration.** MainWindow.xaml's
+    # title is exactly 'EQBuddy', so a bare 'EQBuddy' here would match the widget too —
+    # trap 24 arriving INSIDE one process, where -OwnerPid cannot separate them because
+    # both windows have the same owner. HistoryWindow already had this shape.
+    #
+    # Trap 53 applies from here on: this Title is an identity the WINDOW can invalidate
+    # without touching this file, and one stale title stops the whole batch at its row.
+    # It is derived from ShellPages.Label(page), so it moves only if a room is renamed —
+    # at which point these three rows should indeed fail rather than photograph something
+    # else.
+    #
+    # PREDICTION, written before the shot (trap 23):
+    #   'shell-progress'  — a native title bar reading "EQBuddy — Progress" with real
+    #     minimise / maximise / close and a taskbar entry, NOT the hand-drawn chrome
+    #     every theme window has. Under it a title row: app icon, "EQBuddy", and a search
+    #     field on the right with a magnifier and the hint "Search  Ctrl+K". Down the left,
+    #     a rail on a panel ground with ONE row — a chart icon and "Progress", lit as
+    #     selected. No
+    #     Home / Live / Gear / Quests / World / Settings rows: those rooms do not exist
+    #     yet and a disabled row is an affordance that opens nothing. To its right, the
+    #     Progress room: a four-chip wrapped strip (Experience · Wealth · Faction · Raids)
+    #     with the same badges the Progress WINDOW's strip carries, Experience lit, and
+    #     the Experience body under it.
+    #   'shell-progress-raids' — the same frame, addressed straight to a room inside the
+    #     room via page:room. Raids chip lit; the raid ledger in the body.
+    #
+    # THE RAIDS PREDICTION WAS WRONG, and the miss is the useful half. There is no ledger:
+    # this shot seeds no raid-kills.json (that is 'raids-card' / 'raids-import'), so what
+    # the picture shows is the EMPTY state — "Nothing defeated yet …" plus the ⧉ copy of
+    # /outputfile achievements. Kept rather than seeded, because that button is the thing
+    # worth photographing here: the room reuses the real RaidsCardView, so the "a surface
+    # that needs an in-game command must SHIP the command" rule survived the host change
+    # for free, and trap 34's whole lesson is that a missing affordance is invisible to
+    # everything except a picture or a must-list.
+    #   'shell-narrow' — the SAME window at the floor width. The rail must be icons only
+    #     (chart glyph, no "Progress" word) with the room name still on hover, and the
+    #     room content must not clip. That is degrade axis 1, and it is the half of the
+    #     resize story no unit test can photograph.
+    'shell-progress'  = @{ Title = 'EQBuddy — Progress'; Env = @{ EQBUDDY_SHELL = 'progress' }; Set = @{} }
+    'shell-progress-raids' = @{ Title = 'EQBuddy — Progress'
+                                Env = @{ EQBUDDY_SHELL = 'progress:raids' }; Set = @{} }
+    'shell-narrow'    = @{ Title = 'EQBuddy — Progress'
+                           Env = @{ EQBUDDY_SHELL = 'progress'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{} }
     # The PROGRESS theme EXPANDED IN PLACE (Inline themes PR 1). Title is 'EQBuddy' — this
     # is the widget, not the window, which is the whole point of the change. A NEW name,
     # per trap 21: 'progress-card' and 'section-progress' are both embedded in the docs and

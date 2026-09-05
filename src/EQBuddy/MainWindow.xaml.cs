@@ -487,141 +487,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // dictionary probe.
         Task.Run(() => Core.ItemCatalog.Default);
 
-        // Screenshot/debug hook, same family as EQBUDDY_OPTIONS: open the Quest Tracker
-        // after the startup replay has fed the ledger. "1" opens the default view;
-        // "zone"/"all" open that mode directly.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_DROPS") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => ShowCreatureWindow(CreatureTab.Drops),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // Same family as EQBUDDY_PROGRESS / EQBUDDY_GEARLOOT: a theme window that can only
-        // be opened from a card cannot be reviewed, and a surface nobody can review reads
-        // as reviewed anyway (trap 22). A tab key opens it there; anything else opens it
-        // on Kills.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_CREATURE") is { Length: > 0 } cvTab)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => ShowCreatureWindow(CreatureSurface.TabForKey(cvTab) ?? CreatureTab.Kills),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_WIKIPACK") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(ShowWikiPackWindow,
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_QUESTS") is { Length: > 0 } questsMode)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
-            {
-                ShowQuestsWindow();
-                if (QuestSurface.TabForKey(questsMode.Split(':')[0]) is not null)
-                    _questsWindow?.SetTab(questsMode);
-                else if (questsMode is "zone" or "all") _questsWindow?.SetMode(questsMode);
-            }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // Same family. The Progress window is where five card BODIES went, and a card
-        // body has never been photographable except through a hook — so without this the
-        // theme's four tabs could not be reviewed, and a surface nobody can review reads
-        // as "reviewed" anyway (trap 22). "1" opens it on Experience; a tab key
-        // (wealth / faction / raids) opens it there.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_PROGRESS") is { Length: > 0 } progressTab)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => ShowProgressWindow(progressTab == "1" ? null : progressTab),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // The WORLD theme's window (World PR 2). Same family, and the one that was
-        // missing: the Spawns tab deliberately stays hidden until a countdown exists, so
-        // scripts/shoot.ps1 could never capture it and Gate 3 shipped without a
-        // screenshot review. "1" opens the World window on Camps at the current zone;
-        // EQBUDDY_MAP/EQBUDDY_TRAVEL open it on Map/Path — three separate env names for
-        // one shared window now, kept apart because they already appear in shot fixtures
-        // and docs.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_SPAWNS") is { Length: > 0 } spawnZone)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => ShowWorldWindow(WorldTab.Camps, spawnZone == "1" ? null : spawnZone),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_OPTIONS") == "1")
-            Loaded += (_, _) => OnOptions(this, new RoutedEventArgs());
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_MAP") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => ShowWorldWindow(WorldTab.Map),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_TRAVEL") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => ShowWorldWindow(WorldTab.Routes),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // EQBUDDY_INVENTORY and EQBUDDY_GEARLOCKER both open the same TAB now — the two
-        // windows merged on 2026-08-20. Kept as separate names because both appear in
-        // shot fixtures and docs, and a hook that silently stops working is worse than a
-        // redundant one.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_INVENTORY") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnGearLocker(this, new RoutedEventArgs()),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOCKER") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => OnGearLocker(this, new RoutedEventArgs()),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_TIMELINE") == "1")
-            Loaded += (_, _) => Dispatcher.BeginInvoke(OpenFightTimeline,
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // Screenshot/debug hook, same family as EQBUDDY_QUESTS: open straight into
-        // archive review of the given file (#74), skipping the file dialog.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_REVIEW") is { Length: > 0 } reviewPath)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() => EnterReview(reviewPath),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_FEEDBACK") == "1")
-            Loaded += (_, _) => OnFeedback(this, new RoutedEventArgs());
-
-
-        // Same family as EQBUDDY_PROGRESS / EQBUDDY_QUESTS: a theme window that can only
-        // be opened from a menu cannot be reviewed, and a surface nobody can review reads
-        // as reviewed anyway (trap 22). "1" opens it on Loot; a tab key opens it there.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_GEARLOOT") is { Length: > 0 } glTab)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(() =>
-            {
-                ShowGearLootWindow();
-                if (LootSurface.TabForKey(glTab) is { } t) _gearLootWindow?.SetTab(t);
-            }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        // "1" opens on the newest session; "charts" opens with NOTHING selected and one
-        // character filtered — the only state the cross-session level/AA charts render in
-        // (RenderProgress needs a single-character filter AND no selection AND dings across
-        // more than one session). Without this mode those charts could not be photographed
-        // at all, which is how README's chart shot went stale with nobody able to re-take
-        // it: a surface with no way to reach its state reads as reviewed anyway (trap 22).
-        if (Environment.GetEnvironmentVariable("EQBUDDY_HISTORY") is { Length: > 0 } historyMode)
-            Loaded += async (_, _) =>
-            {
-                await Task.Delay(4000); // let initial ingest finish
-                OnHistory(this, new RoutedEventArgs());
-                // Opened on the newest session rather than on "Select a session.": the
-                // detail pane is most of this window and an empty one photographs as a
-                // window that exists and holds nothing (trap 22).
-                if (historyMode == "charts") _historyWindow?.SelectFirstCharacterFilter();
-                else _historyWindow?.SelectNewest();
-            };
-
-        // The quick tour, on a page of your choosing (1-based). Same family, same reason
-        // as the rest: without it the tour's five illustrations could not be reviewed
-        // without a human installing the app and clicking Next, which is how they came to
-        // be a month out of date with nobody noticing.
-        if (Environment.GetEnvironmentVariable("EQBUDDY_TOUR") is { Length: > 0 } tourPage)
-            Loaded += (_, _) => Dispatcher.BeginInvoke(
-                () => new TutorialWindow(this, int.TryParse(tourPage, out var n) ? n : 1).Show(),
-                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-
-        if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
-            Loaded += (_, _) =>
-            {
-                if (RootBorder().ContextMenu is not { } m) return;
-                m.StaysOpen = true;
-                m.PlacementTarget = RootBorder();
-                m.Placement = System.Windows.Controls.Primitives.PlacementMode.Left;
-                m.IsOpen = true;
-            };
+        // Every EQBUDDY_* window hook now lives in DebugHooks — one job, one place, and
+        // not window logic (the FollowingSurfaces / WidgetDump argument). The lift is what
+        // paid for the shell's field below: this file was at 4,699 of 4,700.
+        DebugHooks.Apply(this);
 
         // What's-new notes, once per update. A fresh install (tutorial still pending)
         // skips them and just records the baseline — onboarding is the tutorial's job.
@@ -1067,7 +936,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// same dump, so two tabs off one file made people wonder which was the real one
     /// (David, 2026-08-20). Their cog entries are gone at his request; this stays because
     /// EQBUDDY_GEARLOCKER and the shot fixtures still open the surface by name.</summary>
-    private void OnGearLocker(object sender, RoutedEventArgs e)
+    internal void OnGearLocker(object sender, RoutedEventArgs e)
     {
         ShowGearLootWindow();
         _gearLootWindow?.SetTab(LootTab.Inventory);
@@ -2126,6 +1995,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     internal ProgressWindow? _progressWindow;
 
+    /// <summary>The Evolved shell, when it is open (E-3 PR 1). Opened by
+    /// <see cref="ShellHost"/>, never from here — the widget does not own it.</summary>
+    internal ShellWindow? _shellWindow;
+
     /// <summary>Who owns the Progress body right now — the card, the window, or neither.
     ///
     /// Introduced while the launcher is still a plain Button that can only ever reach
@@ -2289,7 +2162,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (!on) CloseChips();
     }
 
-    private void OnOptions(object sender, RoutedEventArgs e)
+    internal void OnOptions(object sender, RoutedEventArgs e)
     {
         if (_optionsWindow is { IsLoaded: true })
         {
@@ -2317,7 +2190,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
     }
 
-    private System.Windows.Controls.Border RootBorder() => RootBorderElement;
+    internal System.Windows.Controls.Border RootBorder() => RootBorderElement;
 
     private void OnChooseLogFolder(object sender, RoutedEventArgs e)
     {
@@ -2371,7 +2244,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (dlg.ShowDialog(this) == true) EnterReview(dlg.FileName);
     }
 
-    private void EnterReview(string path)
+    internal void EnterReview(string path)
     {
         // A pre-splitter log holds days of sessions; ask which one (#74 round two —
         // Snagglefern's 10 MB archive replayed as a 10-minute evening). Splitter
@@ -3506,12 +3379,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     private void OnTutorial(object sender, RoutedEventArgs e) => new TutorialWindow(this).Show();
 
-    private void OnFeedback(object sender, RoutedEventArgs e) =>
+    internal void OnFeedback(object sender, RoutedEventArgs e) =>
         new FeedbackWindow { Owner = this }.Show();
 
-    private HistoryWindow? _historyWindow;
+    internal HistoryWindow? _historyWindow;
 
-    private void OnHistory(object sender, RoutedEventArgs e)
+    internal void OnHistory(object sender, RoutedEventArgs e)
     {
         // Flush the live session so it appears in the list as "(in progress)".
         _archiver.CheckpointSync(_stats.Snapshot());

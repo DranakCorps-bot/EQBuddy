@@ -140,6 +140,31 @@ public static class DesignTokens
     /// §8a). Carries <c>ready</c> / <c>in progress</c> / <c>done</c>, which is real.</summary>
     public const double StateRuleWidth = 3;
 
+    // ---- the Evolved shell's navigation rail (E-3 PR 1) ----
+    //
+    // The ONLY new density decisions the shell makes. Every room's CONTENT arrives
+    // already sized against the tokens above; re-deriving spacing for content that
+    // already reads correctly on a screen would be un-folding in costume. These three
+    // are new because the rail and its rows did not exist before, and they are named
+    // here rather than typed into ShellWindow.xaml so the two states of the rail cannot
+    // disagree with the arithmetic in ShellLayoutPolicy that switches between them.
+    //
+    // Bevel's pre-design gave directional ranges and said BUILD-TO AND MEASURE rather
+    // than lock: rail 180–220 expanded, 56–64 collapsed, rows 40–44. These are the
+    // middles, and the shell-progress shot is what they were measured against.
+
+    /// <summary>Rail width with icon and label.</summary>
+    public const double RailWidthExpanded = 200;
+
+    /// <summary>Rail width once labels degrade away and only icons remain. Each row
+    /// keeps a tooltip, so the room's name is one hover rather than lost.</summary>
+    public const double RailWidthCollapsed = 60;
+
+    /// <summary>A rail row's height — a comfortable mouse target, and taller than
+    /// <see cref="RowHeight"/> because a rail row is a destination rather than a line
+    /// of a list.</summary>
+    public const double RailRowHeight = 40;
+
     /// <summary>Name → value for every numeric token above, so a UI can compose the whole
     /// set in a loop and a test can assert the two UIs got the same list rather than
     /// trusting that someone typed it twice correctly. Names are the resource keys.</summary>
@@ -163,6 +188,9 @@ public static class DesignTokens
             ["IconInline"] = IconInline,
             ["IconInlineHit"] = IconInlineHit,
             ["StateRuleWidth"] = StateRuleWidth,
+            ["RailWidthExpanded"] = RailWidthExpanded,
+            ["RailWidthCollapsed"] = RailWidthCollapsed,
+            ["RailRowHeight"] = RailRowHeight,
             ["FontTitleWindow"] = 14,
             ["FontTitleSection"] = 12.5,
             ["FontMetric"] = 16,

@@ -119,7 +119,19 @@ public class ArchitectureTests
         // Bumped to the MINIMUM that fits (4273 × 1.1 = 4700 against 4,699 lines), so
         // this grants one line and no more. **The next WPF change must lift a surface** —
         // that is the pressure this number exists to keep, and it is now at its maximum.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4273),
+        //
+        // 4273 → 4158 on 2026-09-04 (E-3 PR 1, the Evolved shell host). **Lowered, and
+        // the lift came first**, which is the sentence the row below has been waiting to
+        // be able to say. The sixteen EQBUDDY_* window hooks — 135 contiguous lines of
+        // `if (env) Loaded += … call a method`, sharing one job and owing nothing to the
+        // widget's own state — went to `DebugHooks.cs`. That paid for what the shell
+        // needs here, which is one field. Registration ORDER was preserved exactly: these
+        // are Loaded handlers that open windows which stack, so a re-order would be
+        // invisible in a diff and would surface as a screenshot of the wrong window on
+        // top. Bumped down to the MINIMUM that fits (4158 × 1.1 = 4573 against 4,572
+        // lines), by the same "one line and no more" rule the bump above used — so the
+        // NEXT E-3 move must lift again, which is the whole point of the pressure.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4158),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read
@@ -146,8 +158,8 @@ public class ArchitectureTests
         // simply forgotten: **the WPF row above did NOT inherit its headroom.** A
         // deletion that quietly raises someone else's ceiling is the "re-anchor erases
         // the pressure" move this table exists to make somebody argue for out loud, and
-        // nobody is arguing for it. 4,273 stands, one line from its cap, and E-3's shell
-        // still has to be preceded by a lift.
+        // nobody is arguing for it. 4,273 stood, one line from its cap, and E-3's shell
+        // had to be preceded by a lift. It was (see the 4154 note above).
     ];
 
     private const double AllowedGrowth = 1.10;

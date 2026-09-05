@@ -1,0 +1,112 @@
+<Window x:Class="EQBuddy.ShellWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EQBuddy" Width="960" Height="640"
+        Background="{DynamicResource BgBrush}" WindowStartupLocation="CenterScreen">
+    <!-- THE EVOLVED SHELL HOST (E-3 Phase 2 PR 1). Bevel's shell nav pre-design,
+         Helm-signed 2026-09-04 ~9:25 PM CT.
+
+         **NATIVE CHROME, AND IT IS THE FIRST DECISION RATHER THAN A DETAIL.** Every
+         theme window in this repo — ProgressWindow, QuestsWindow, GearLootWindow,
+         CreatureWindow, WorldWindow, OptionsWindow — is
+         `WindowStyle="None" AllowsTransparency="True" Topmost="True" ShowInTaskbar="False"`
+         with a hand-drawn OnDrag standing in for the title bar. They are shaped that way
+         because they were born as POP-OUTS OF AN OVERLAY that sits over the game. The
+         shell is not: it is a normal Windows window and is what Windows tabs to, which is
+         the pre-design's gate 7. Copying the theme-window header here would have shipped
+         that gate broken on day one, and NOTHING ABOUT IT WOULD SHOW IN A DIFF — it would
+         be a Window tag with the same four attributes every other window in the folder
+         already has, which is exactly how a copy-paste default becomes invisible.
+
+         HistoryWindow.xaml is the precedent and it has been sitting there the whole time:
+         a plain resizable Window with native chrome, a taskbar entry and working Alt+Tab,
+         because nobody ever needed it to float over the game. So this window carries no
+         drag handler, no hand-rolled close button and no custom corner radius — those are
+         DELETED rather than ported, the same call the World fold made for four cog menu
+         entries. The title-bar icon is the app icon, which native chrome draws for free.
+
+         Sizes: MinWidth/MinHeight come from ShellLayoutPolicy in code, not from literals
+         here, because they are DERIVED (a room's minimum plus the collapsed rail) and a
+         number typed in two places is a number that will disagree with itself.
+
+         Nothing below carries a literal font size, radius or spacing value — every number
+         resolves out of the token dictionary DesignSystem.Tokens() composes from
+         EQBuddy.UI.Shared.DesignTokens. DesignRatchetTests fails the build if a literal
+         reappears; this surface joins that list on the day it lands rather than later. -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TITLE ROW. Search lives HERE and not on the rail, and the reason is a
+             product one: a rail row says "this is one of the rooms you navigate to", and
+             Search is how you SKIP the rooms rather than a domain of its own. Putting it
+             in the rail — even visually separated — still teaches "there are eight rows".
+             The window's own name is drawn beside it because native chrome puts the title
+             in the title bar, where it is small and far from the content. -->
+        <Grid Grid.Row="0" Margin="{DynamicResource PadCard}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel x:Name="TitleRow" Grid.Column="0" Orientation="Horizontal"
+                        VerticalAlignment="Center"/>
+            <Grid x:Name="SearchBox" Grid.Column="2" VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="RailColumn" Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- THE RAIL — vertical, not a horizontal tab strip, and the reason is
+                 capacity rather than taste. This codebase has already paid twice to learn
+                 that a horizontal strip clips its overflow silently with no ellipsis and
+                 no error (trap 14, then trap 25 with chips, on FOUR peers). The shell has
+                 seven rooms plus a Search affordance, and the rooms next to them want
+                 room to breathe. A rail grows DOWN.
+
+                 It is a Grid of two rows rather than one stack so Settings can sit under
+                 a gap at the bottom: it configures the tool, where the others describe
+                 the character. That split holds at EVERY width — collapsing the rail to
+                 icons must never also reorder or drop a room, which would turn a resize
+                 into a silent capability loss. -->
+            <Border Grid.Column="0" Background="{DynamicResource PanelBrush}"
+                    BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="0,0,1,0">
+                <Grid x:Name="Rail">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel x:Name="RailRows" Grid.Row="0" Margin="{DynamicResource StackS}"/>
+                    <StackPanel x:Name="RailBelowGap" Grid.Row="1" Margin="{DynamicResource StackS}"/>
+                </Grid>
+            </Border>
+
+            <!-- THE ROOM. The host owns the bounds and the room owns everything inside
+                 them: no Visibility and no Margin here, because a control that hides
+                 itself inside a host that also hides itself has two switches for one
+                 state and only one of them is ever wired (trap 15). Scrolling belongs to
+                 the room, which gets a bounded * cell to overflow inside (trap 36 is
+                 about a child scroller measured with INFINITE height; this one is not). -->
+            <Grid Grid.Column="1">
+                <ContentControl x:Name="RoomHost"/>
+
+                <!-- The Ctrl+K palette, drawn OVER the room rather than replacing it —
+                     Search is a shortcut past the nav, so landing on it must not cost you
+                     the room you were reading. Collapsed until asked for. -->
+                <Border x:Name="PaletteLayer" Visibility="Collapsed"
+                        Background="{DynamicResource BgBrush}"
+                        BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="1"
+                        CornerRadius="{DynamicResource CornerPanel}"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Top"
+                        Margin="{DynamicResource PadCard}">
+                    <StackPanel x:Name="PaletteBody" Margin="{DynamicResource PadCard}"/>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

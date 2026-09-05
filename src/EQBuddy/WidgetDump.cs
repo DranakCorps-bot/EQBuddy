@@ -316,6 +316,15 @@ internal static class WidgetDump
                     // tests, so these numbers are pinned from a launched app and must
                     // read the same after the fold as they did on the old hosts.
                     (w._worldWindow is { IsLoaded: true } wwin ? wwin.DebugFacts() + " " : "") +
+                    // The EVOLVED SHELL, when EQBUDDY_SHELL opened one (E-3 PR 1). It has
+                    // no player-facing door yet, so this is the only thing besides a
+                    // screenshot that can say the rail drew, the Search affordance exists
+                    // and the room painted — and an absent control photographs as an
+                    // unremarkable window (trap 29), so a picture alone would not.
+                    // Its Progress numbers come out under shellProgress* BESIDE the
+                    // window's progress* keys on purpose: two hosts of one room is
+                    // exactly where a silent divergence would live.
+                    (w._shellWindow is { IsLoaded: true } shwin ? shwin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={w._companionPumpTicks} " +

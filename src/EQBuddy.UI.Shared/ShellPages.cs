@@ -1,0 +1,167 @@
+namespace EQBuddy.UI.Shared;
+
+/// <summary>
+/// The rooms of the Evolved shell — ONE definition, read by the desktop rail, by the
+/// navigation address grammar, and (through <c>CompanionSurfaces.PageFor</c>) by the
+/// phone's screen registry.
+///
+/// **Why an enum and not two lists.** Bevel's shell nav pre-design (Helm-signed
+/// 2026-09-04 ~9:25 PM CT) asked for exactly this and named the failure it prevents:
+/// *"If the rail's seven-room list and the phone's ⚙ Screens picker are two
+/// hand-maintained lists rather than one Core enumeration, they will drift the way
+/// AbsorbedTitles and AbsorbedCardKeys drifted (trap 55) — same shape, new surface."*
+/// A hand-maintained list is code that cannot be type-checked (trap 30); an enum is one
+/// the compiler walks for you.
+///
+/// Order is the RAIL order, top to bottom, from the same pre-design: the six rooms that
+/// answer "show me something about my character", then <see cref="ShellPage.Settings"/>
+/// below a visual gap because it answers a different question. That split does not
+/// change at any window width (see <see cref="ShellLayout"/>): collapsing the rail to
+/// icons must not also reorder or drop a room, which would turn a resize into a silent
+/// capability loss — the #219/#233 shape triggered by a window edge instead of a release.
+/// </summary>
+public enum ShellPage
+{
+    Home,
+    Live,
+    Progress,
+    Gear,
+    Quests,
+    World,
+    Settings,
+}
+
+/// <summary>
+/// The registry around <see cref="ShellPage"/>: rail order, labels, icons, which rooms
+/// have actually landed, and the <c>page:room</c> address grammar every navigation path
+/// resolves through.
+/// </summary>
+public static class ShellPages
+{
+    /// <summary>Rail order, top to bottom. <see cref="ShellPage.Settings"/> is last and
+    /// is drawn below a gap — see <see cref="BelowTheGap"/>.</summary>
+    public static readonly IReadOnlyList<ShellPage> RailOrder =
+    [
+        ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+        ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings,
+    ];
+
+    /// <summary>
+    /// The rooms that have a room to show TODAY, and therefore the only rows the rail
+    /// draws.
+    ///
+    /// **This is not a feature flag, it is the refusal to draw a dead affordance.** The
+    /// signed pre-design is explicit: the honest options for a half-built shell are a
+    /// rail with one row or seven rows where six are disabled, and this codebase already
+    /// ruled on the second shape — the Experience next-level lock says, verbatim, *"an
+    /// empty class row gets no chevron — an affordance that opens nothing is a trap."*
+    /// A disabled rail row is that chevron wearing a different control.
+    ///
+    /// **A room joins this list in the same PR that lands it**, which is what stops the
+    /// list and the rooms drifting apart in either direction: a room with no row is
+    /// unreachable, and a row with no room is a trap.
+    /// </summary>
+    public static readonly IReadOnlyList<ShellPage> Landed = [ShellPage.Progress];
+
+    /// <summary>True for the pages drawn under the rail's visual gap. Settings sits
+    /// there because it configures the tool rather than describing the character — the
+    /// same separation Windows' own Settings app and VS Code both draw.</summary>
+    public static bool BelowTheGap(ShellPage page) => page == ShellPage.Settings;
+
+    /// <summary>The wire spelling of a page: the first half of a <c>page:room</c>
+    /// address. Lower-case and stable — these appear in <c>EQBUDDY_SHELL</c>, in the
+    /// <c>EQBUDDY_EXPAND</c> dump, and in every navigation call.</summary>
+    public static string Key(ShellPage page) => page switch
+    {
+        ShellPage.Home => "home",
+        ShellPage.Live => "live",
+        ShellPage.Progress => "progress",
+        ShellPage.Gear => "gear",
+        ShellPage.Quests => "quests",
+        ShellPage.World => "world",
+        ShellPage.Settings => "settings",
+        _ => "",
+    };
+
+    /// <summary>The rail's label. Short nouns on purpose: the rail grows DOWN, but a
+    /// long label is what forces the collapsed state early.</summary>
+    public static string Label(ShellPage page) => page switch
+    {
+        ShellPage.Home => "Home",
+        ShellPage.Live => "Live",
+        ShellPage.Progress => "Progress",
+        ShellPage.Gear => "Gear",
+        ShellPage.Quests => "Quests",
+        ShellPage.World => "World",
+        ShellPage.Settings => "Settings",
+        _ => "",
+    };
+
+    /// <summary>The rail's icon, by name in <see cref="IconPaths"/> — never a glyph
+    /// (#148, #166), and never a name the table does not hold, which
+    /// <c>ShellNavigationTests</c> asserts rather than trusts.</summary>
+    public static string IconName(ShellPage page) => page switch
+    {
+        ShellPage.Home => "Tray",
+        ShellPage.Live => "Bolt",
+        ShellPage.Progress => "Chart",
+        ShellPage.Gear => "Bag",
+        ShellPage.Quests => "Quest",
+        ShellPage.World => "Map",
+        ShellPage.Settings => "Settings",
+        _ => "Info",
+    };
+
+    /// <summary>One line naming what the room is for — the rail's tooltip, and the only
+    /// thing carrying the room's name when the rail is collapsed to icons.</summary>
+    public static string Describe(ShellPage page) => page switch
+    {
+        ShellPage.Home => "Who you are playing, what is ready, and where you left off.",
+        ShellPage.Live => "This sitting: damage, healing, pet, kills and what you cleared.",
+        ShellPage.Progress => "Experience, wealth, faction and raid targets.",
+        ShellPage.Gear => "Your bags, your wishlist, and what dropped for you.",
+        ShellPage.Quests => "Your quest tracker, Epic 1.0 and Plane of Sky.",
+        ShellPage.World => "The zone's map, your camps, spawn timers and how to get there.",
+        ShellPage.Settings => "Configure EQBuddy.",
+        _ => "",
+    };
+
+    /// <summary>Resolve a page key. Unknown keys answer null rather than falling back to
+    /// a default — silently landing somewhere the caller did not ask for is the shape
+    /// <c>ProgressWindow.SetTab</c> already refuses.</summary>
+    public static ShellPage? ForKey(string? key)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return null;
+        foreach (var page in RailOrder)
+            if (string.Equals(Key(page), key.Trim(), StringComparison.OrdinalIgnoreCase))
+                return page;
+        return null;
+    }
+
+    /// <summary>
+    /// THE ONE NAVIGATION ADDRESS, parsed. <c>progress</c> or <c>progress:raids</c> —
+    /// the grammar <c>EQBUDDY_EXPAND</c> has taken since 2026-08-26, reused rather than
+    /// reinvented so the rail, the Ctrl+K palette, a future HUD "Open EQBuddy" button and
+    /// "Guide me there" all resolve to one destination spelling.
+    ///
+    /// **Two ways to land on a room is trap 33 one level up from data into navigation**:
+    /// two callers with different arguments do not produce a stale answer and a fresh
+    /// one, they produce two answers that a later change has to be taught twice.
+    ///
+    /// Returns null for an unrecognised page. The room half is handed back verbatim for
+    /// the page to resolve — <see cref="ShellPages"/> knows the rooms exist, not what
+    /// their tabs are called.
+    /// </summary>
+    public static (ShellPage Page, string? Room)? ParseAddress(string? address)
+    {
+        if (string.IsNullOrWhiteSpace(address)) return null;
+        var parts = address.Trim().Split(':', 2);
+        if (ForKey(parts[0]) is not { } page) return null;
+        var room = parts.Length > 1 && parts[1].Length > 0 ? parts[1] : null;
+        return (page, room);
+    }
+
+    /// <summary>The inverse: the address string for a page and optional room.</summary>
+    public static string Address(ShellPage page, string? room = null) =>
+        string.IsNullOrEmpty(room) ? Key(page) : $"{Key(page)}:{room}";
+}

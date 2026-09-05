@@ -267,6 +267,25 @@ where each of its assertions went.
 | **"Keep EQBuddy out of Alt+Tab" only ever ADDS the tool-window bit to focusable windows** — turning it off must not strip the bit that chips, the alert tile and the overlays set for themselves, or every chip joins the switcher (found in #238 review; the guard is the `WS_EX_NOACTIVATE` check in both lanes' `SetToolWindow`) | **Manual** — only a live desktop shows switcher membership; the E2E dump pins the main window's EFFECT (`altTabStyle`) beside the setting |
 | **Hiding from Alt+Tab also drops the MAIN window's taskbar button, and only then does the widget actually leave the switcher** (Hateborne, 2026-09-03) — ShowInTaskbar=true is asserted as `WS_EX_APPWINDOW`, which overrides `WS_EX_TOOLWINDOW` for switcher membership, so for a week the style landed on every window and the one window a player could see stayed. The taskbar cost is the one `AltTabPolicy.TaskbarWarning` always promised; satellites are always `ShowInTaskbar=false` and are never touched. Hidden means BOTH bits agree: style on, APPWINDOW off | **Auto** — `EndToEndTests.TheWidgetActuallyLeavesAltTabWhenAskedTo` (real HWND, setting seeded ON: `altTabStyle=1`, `altTabAppWindow=0`, `altTabTaskbar=0`), the OFF-default twin asserts the inverse; `AltTabPolicyTests.HidingFromAltTabIsExactlyWhatCostsTheTaskbarButton` |
 
+## 4g. The Evolved shell (E-3)
+
+One normal Windows window with a navigation rail and one room in it at a time — the host
+Bevel's shell nav pre-design specifies (Helm-signed 2026-09-04). It is **not** a theme
+pop-out: it has native chrome, a taskbar entry and honest Alt+Tab, because it is not meant
+to sit over the game. It has no player-facing door yet; `EQBUDDY_SHELL` is how it is
+reached, and the HUD's "Open EQBuddy" is what will replace that.
+
+| Expectation | Held by |
+|---|---|
+| **The shell is a normal window, not an overlay pop-out** — native `WindowStyle`, resizable, in the taskbar, not `Topmost`, no hand-drawn drag/close chrome. `HistoryWindow` is the precedent it copies; every theme window is the shape it deliberately does not | **Shot** — `shell-progress` (a native title bar is the thing a picture shows and an assertion cannot) |
+| **ONE navigation path**, the `page:room` grammar `EQBUDDY_EXPAND` already takes: the rail, the Ctrl+K palette and the env hook all resolve through `ShellWindow.Navigate`. An unknown address is refused, never snapped to a default | **Auto** — `ShellNavigationTests` (parse, round-trip, refusals), `ShellHostTests` (a launched app lands *inside* the room from `progress:raids`) |
+| **No rail row for a room that has not landed** — a disabled row is an affordance that opens nothing. Rooms join `ShellPages.Landed` in the PR that lands them, and the rail draws that list | **Auto** — `ShellNavigationTests`, `ShellHostTests` (`shellRail` equals the landed count); **Shot** — `shell-progress` (one row, no greyed six) |
+| **Search is in the title row and `Ctrl+K` opens it as an overlay palette** — a shortcut past the nav, not an eighth room, and not open on arrival. It indexes what the shell can currently reach and says so plainly when it cannot match; the disposition-backed index is E-2e's | **Auto** — `ShellHostTests` (`shellSearch=1`, `shellPalette=0`); **Shot** — `shell-progress` |
+| **Two degrade axes with different thresholds, and a floor** — the rail drops labels for icons (tooltip keeps the room's name); a list+detail room collapses to one pane; below both, `MinWidth`/`MinHeight` stop the shrink so nothing clips silently. The floor is derived (a room's minimum plus the collapsed rail), not typed | **Auto** — `ShellNavigationTests` (both thresholds, the boundary, the unmeasured-width case, and that the floor still leaves the room its minimum), `ShellHostTests` (the window's real width and the policy's answer for it — never the screen); **Shot** — `shell-narrow` |
+| **`ShellPage` is the one definition the rail and the phone's ⚙ Screens picker both answer to.** The two are at different granularities by a signed decision (the phone does not fold to match the desktop — World PR 4), so the join is a total mapping: every phone screen names a room that exists, and a renamed room breaks the build | **Auto** — `ShellNavigationTests` (totality, the two tick-only routes, and a negative so it cannot go vacuous) |
+| **Two hosts of one room report the same numbers.** The shell builds its own surface instances (a `UIElement` has one parent — trap 45) while the Progress window still exists; a silent divergence would render correctly in both and be invisible to everything else | **Auto** — `ShellHostTests` (both windows open at once; four row counts compared) |
+| The Progress room hosts the four tabs **exactly as they ship** — the Evolved reshape (Raids to Live, Faction to Advanced) waits for a Live room to move Raids into | **Auto** — `ShellHostTests` (`shellProgressTabs=4`); **Shot** — `shell-progress`, `shell-progress-raids` |
+
 ## 4e. The design system
 
 Typography, spacing, shape, control size and icon geometry live in `UI.Shared` as data
