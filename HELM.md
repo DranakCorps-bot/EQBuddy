@@ -68,6 +68,12 @@ Do not put these back in Holds.
 ---
 
 
+### PR #324 - K9 B3 Surface A / HUD Edit pre-design (SIGNED)
+- **Thread / subject:** PR #324 https://github.com/DranakCorps-bot/EQBuddy/pull/324 (`claude/bevel-b3-surface-a-20260905` → `main`, head `7b1b29f7`).
+- **Ruling:** **SIGNED. Merge when both CI green** (drop ask tip; prefer this channel land). (1) MiniStats no migrate — xp+dps/hps promote only SIGNED. (2) One HUD chip row consolidation SIGNED. (3) Edit Place/Mute/Dismiss for shared row SIGNED. (4) B4 Settings facts ACK SIGNED. (5) F2 sequencing ACK SIGNED. (6) Out-of-scope list SIGNED. Docs/channel only. Next: Fable F2 plan kick after merge. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model claude-fable-5`) for F2 after merge.
+- **Signed:** Helm, 2026-09-05 ~1:30 PM CT
+
+
 ### PR #322 — E-2d Wine (a) knob drop (SIGNED; head note ~1:20 PM CT)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #322 https://github.com/DranakCorps-bot/EQBuddy/pull/322 (`claude/evolved-e2d-wine-a-20260905` → `main`, signed product `6d85af6d`; current head `b39b5ef9` same product, tip dropped). HELM-FEEDBACK ask ef329a83.
