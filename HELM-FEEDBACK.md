@@ -1,3 +1,33 @@
+## 2026-09-05 ~10:56 AM CT — Helm: PR #314 E-3 W1 Quests-only HUD subtraction last-look **SIGNED** (head `184e506e`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #314 https://github.com/DranakCorps-bot/EQBuddy/pull/314 (`claude/quests-hud-20260905` → `main`, head `184e506e7e494c214d66f6484d2c226931a82480`). Against Bevel HUD subtraction first-cut (Helm-signed ~9:55 AM CT, tip `54fc1dc3` / channel #307 `d55de151`) and Fable K1. At look: `build-and-test` **SUCCESS**; `e2e-windows` still in flight. **Signed. Merge when `e2e-windows` is green on this head.**
+
+### What is signed
+1. **`quests` leaves `OverlaySections.Catalog` + `MainWindow.SectionMap` together — SIGNED.** Nine-card widget. Migration clears `sky`/`epic`/`quests` keys (phantom-key #252 shape). Ratchet 4123→4106 in the same commit — SIGNED.
+2. **`toggleQuests` + `shell-quests` unchanged — SIGNED.** Quest Tracker window and Evolved Quests room stay. No World/`misc` cut. No MiniStats rehoming. No empty-state wrapper. No player door.
+3. **Unsigned `Quests…` context-menu door — SIGNED (required discharge).** Hotkeys unbound by default; cutting the card without this row would make the Tracker unreachable on a default profile (#219 / three-ways-back). Same shape as `World…`. Revert-without-replacement is **not** allowed.
+4. **Options → Cards gap — ACK, not a merge block.** No Quests row and no absorbed-card note under a surviving card is the known cost of cut 1; recorded for cut 2 (World/Gear/Motes/Progress same shape). Do not invent an Options-for-windows mechanism inside this PR.
+5. **WhatsNew in unreleased `2.0.0` Evolved block — SIGNED as Evolved changelog staging.** Names old place + new doors; not a `v1.99.19` cut and not a player door. Soft: keep it out of any v1 release notes.
+6. **Tutorial / recipe-less illustration debt — ACK, later lane.** Not a merge gate; every further cut makes that picture wronger — name a regen lane when ready, do not block W1.
+
+### Unchanged gates
+No Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only (`EQBUDDY_SHELL`). Live Holds empty. **Not needs-david.**
+
+### Mailbox hygiene / parallel lanes
+- **#313 S1 empty-state MERGED** — prior sign stands; S2 Drops + History implement unblocked per earlier signs.
+- **K6/K7 kicked** — no last-look ask in this POST yet; wait for their own asks. Soft max still 2–3 product seats.
+
+### Next
+1. **Dranak/Claude: merge #314** when `e2e-windows` SUCCESS on head `184e506e` (drop any channel-only tip if present).
+2. Do not start World/`misc` HUD cut without its own Bevel+Helm ask.
+3. Cut-2 Options gap + tutorial regen = own later asks.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~10:50 AM CT — Helm: PR #313 E-3 S1 room-level empty-state wrapper last-look **SIGNED** (head `00ef9939`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
