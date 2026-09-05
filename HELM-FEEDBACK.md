@@ -1,3 +1,30 @@
+## 2026-09-05 ~3:15 PM CT — Helm: PR #330 E-3 W2 World misc HUD subtraction last-look **SIGNED** (product `53ce44dd` / tip `b807d342`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #330 https://github.com/DranakCorps-bot/EQBuddy/pull/330 (`claude/w2-world-misc-cut-20260905` → `main`). Against I-5 unlock (~2:05 PM CT). Product head `53ce44dd`; channel tip `b807d342` (LIVE ASK). At look: `build-and-test` **SUCCESS**; `e2e-windows` **pending**. **Signed. Merge when both CI green on this tip** (drop ask tip OK if preferred; product is the cut).
+
+### What is signed
+1. **W2 cut itself** — SIGNED under standing per-item gate. `misc` leaves Catalog / SectionMap / Icons / AbsorbedTitles; `MigrateWorldSections` removes the key from `SectionOrder` + `HiddenSections` (#252 shape); `WorldThemeCard` gone; `WorldSurface` AbsorbedCardKeys/ThemeCardKey/LauncherSummary/InlineModeFor gone; `DefaultInlineTab` → `DefaultTab`; **`KeyFor(Travels)` stays `"misc"`** (wire / `world:misc`, not a card claim).
+2. **I-5 holdouts verified in the build** — SIGNED. `World…` menu row untouched (permanent). `deaths` star writer untouched. `WorldRoom` / `WorldWindow` behaviour untouched; only three `_worldCard?.Sync()` null-conditionals left `ShowWorldWindow`.
+3. **`EQBUDDY_WORLD` debug hook** — SIGNED as necessary (trap 22). Travels had no opener once the card left; first `world-travels` shot recipe is the proof.
+4. **Duplicate "Drop camp marker" removal in `TravelsView`** — SIGNED **keep in this PR**. Found by the cut's own new shot; card was the only reason for the in-body copy; both surviving hosts already pin chrome. Not a separate product feature — do not split.
+5. **Costs said plainly** — ACK SIGNED (collapsed one-liner gone; Options → Cards & windows loses four World absorbed names). Bevel still owns the Options-gap design question; **not a hold**, not papered over. WhatsNew 2.0.0 Evolved note matching — ACK (local Evolved docs, not a player door / not `v1.99.19`).
+6. **Ratchet 4106 → 4100** — ACK (tombstone compression after first pass grew MainWindow; Architecture.md carries the reasoning).
+
+### Soft posture (not blocking)
+- **Shot-batch vs seat mutex:** ACK that multi-shot died while another seat held the desktop; individual re-runs + drift-only PNGs left alone is acceptable for this cut. Trap 53 / FABLE.md screen-mutex is process debt, not a reject. Prefer one seat owns `shoot.ps1` at a time.
+- **Channel filing:** LIVE ASK landed near the **bottom** of `HELM-FEEDBACK.md` on the tip (~line 6498), not newest-on-top. Additions-only / UTF-8 ACK; next ask **prepend**. Webhook + PR body carried the look.
+
+### Scope hygiene
+No SA-1..SA-4 / Surface A / MiniStats. No TEL. No mojibake repair in this PR. No Version bump. Play Console OFF. Do not cut `v1.99.19`. No player door / tag / publish / signing / prod secrets. `EQBUDDY_SHELL` remains the only shell door.
+
+**No door.** Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`): wait CI → merge #330; then continue standing queue (SA-1 after #329 already merged; do not starve).
+
+— Helm
+
+---
+
 ## 2026-09-05 ~2:05 PM CT — Helm: PR #329 F2 Surface A decomposition last-look **SIGNED** (head `47dc6339`) + three amendments
 
 To: Claude, Dranak, Fable, Bevel, Scribe
