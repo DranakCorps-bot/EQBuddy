@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 
@@ -66,17 +66,15 @@ public class ImportReportReachesASurfaceTests
         ("EQBuddy", "QuestsWindow.xaml.cs", "LastAchievementsImport",
             "The Sky tab. Same ImportReportView, not a Sky-flavoured variant — one more "
             + "host, one more line, and the Undo rule stays in one place."),
-        ("EQBuddy.Avalonia", "QuestsWindow.cs", "LastAchievementsImport",
-            "The Avalonia twin of the same tab."),
         ("EQBuddy", "QuestsWindow.xaml.cs", "LastInventoryImport",
             "The inventory dump proves Sky rewards turned in (Hateborne, 2026-09-03), so "
             + "its report has the same second audience the achievements one does."),
-        ("EQBuddy.Avalonia", "QuestsWindow.cs", "LastInventoryImport",
-            "The Avalonia twin of the same tab."),
     ];
 
-    /// <summary>Both lanes' Sky tab builds one per outcome. A ruling that shipped on one UI
-    /// only is how #122 and #152 reached Linux after Windows had already paid for them.</summary>
+    /// <summary>The Sky tab builds one per outcome. Two Avalonia rows left this list with
+    /// the platform in E-2 (2026-09-04); what they were buying was the cross-lane half
+    /// (#122/#152), and what remains is the half the list was created for — an import that
+    /// changes a player's ledger and reports it nowhere they are looking (trap 43).</summary>
     [Theory]
     [MemberData(nameof(SecondHostRows))]
     public void TheSkyTabReportsTheImportToo(string project, string file, string property, string why)
@@ -98,7 +96,6 @@ public class ImportReportReachesASurfaceTests
     private static readonly (string Ui, string File)[] Widgets =
     [
         ("WPF", Path.Combine("EQBuddy", "MainWindow.xaml.cs")),
-        ("Avalonia", Path.Combine("EQBuddy.Avalonia", "MainWindow.cs")),
     ];
 
     /// <summary>The assertion the two-day-old bug fails: the property is READ somewhere,
@@ -137,14 +134,14 @@ public class ImportReportReachesASurfaceTests
             $"{ui}: {property} is not handed to a surface as a Func<AutoImportOutcome?>.");
     }
 
-    /// <summary>Both UIs route BOTH reports through <c>ImportReportView</c> — the class
-    /// that owns "offer Undo only when something actually changed". A surface that
-    /// printed the summary itself would be a second copy of that rule, which is exactly
-    /// how the WPF and Avalonia chip anchors drifted apart and carried #122 and #152 to
-    /// Linux after Windows had already paid for both.</summary>
+    /// <summary>Every report goes through <c>ImportReportView</c> — the class that owns
+    /// "offer Undo only when something actually changed". A surface that printed the
+    /// summary itself would be a second copy of that rule, and a second copy of a rule is
+    /// how the chip anchors drifted apart (#122, #152). The Avalonia row went with the
+    /// platform in E-2 (2026-09-04); the count is per-outcome, so it still fails when a
+    /// surface in MustReachASurface has no report.</summary>
     [Theory]
     [InlineData("WPF", "EQBuddy")]
-    [InlineData("Avalonia", "EQBuddy.Avalonia")]
     public void EachUiBuildsTwoImportReportViews(string ui, string project)
     {
         var uses = Directory
@@ -177,7 +174,6 @@ public class ImportReportReachesASurfaceTests
         foreach (var file in new[]
         {
             Path.Combine(Src, "EQBuddy", "RaidsCardView.cs"),
-            Path.Combine(Src, "EQBuddy.Avalonia", "MainWindow.cs"),
         })
         {
             var text = File.ReadAllText(file);

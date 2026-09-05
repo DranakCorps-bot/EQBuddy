@@ -86,11 +86,15 @@ public sealed class CompanionSnapshotArgumentTests
     /// THE WIRING, which is the half no unit test could otherwise see: every push to a
     /// paired device must build its snapshot the same way.
     ///
-    /// A source scan rather than a behavioural assertion, because the widgets have no unit
+    /// A source scan rather than a behavioural assertion, because the widget has no unit
     /// tests at all (docs/TestPlan.md §5) and this bug lives entirely in which overload a
-    /// call site picked. Both builds are checked: the Avalonia pump had the identical bug,
-    /// because it was copied from the WPF one — which is how a fix on Windows reaches Linux
-    /// three releases later if nobody looks (#122, #152).
+    /// call site picked.
+    ///
+    /// **Both lanes were scanned until E-2 (2026-09-04), and the original defect was never
+    /// cross-lane: it was TWO PUSH SITES IN ONE WIDGET** — `RefreshUi` once a second and
+    /// the 50 ms pump — disagreeing about arguments. Both of those are in the file below.
+    /// The Avalonia copy had inherited the same bug, which is why the scan covered it; the
+    /// thing it guards against is a third push site here.
     /// </summary>
     [Fact]
     public void EveryCompanionPushBuildsItsSnapshotTheSameWay()
@@ -101,7 +105,6 @@ public sealed class CompanionSnapshotArgumentTests
         foreach (var relative in new[]
         {
             Path.Combine("EQBuddy", "MainWindow.xaml.cs"),
-            Path.Combine("EQBuddy.Avalonia", "MainWindow.cs"),
         })
         {
             var path = Path.Combine(src, relative);
@@ -121,8 +124,8 @@ public sealed class CompanionSnapshotArgumentTests
                     $"{relative}:{number} pushes a snapshot built WITHOUT rules, so its "
                     + "Tracked list is empty and the phone's loot card will churn against "
                     + "whatever the other push site sends (#202). Use the widget's own "
-                    + "snapshot builder — BuildSnapshot() in WPF, CurrentSnapshot() in "
-                    + "Avalonia — so every push carries the same arguments.");
+                    + "snapshot builder — BuildSnapshot() — so every push carries the "
+                    + "same arguments.");
         }
     }
 }
