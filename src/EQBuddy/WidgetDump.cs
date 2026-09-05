@@ -32,10 +32,14 @@ internal static class WidgetDump
         w._progressHost.IsInline ? Facts(w, w._progressCard, w.ProgressSection)
         : w._creatureHost.IsInline ? Facts(w, w._killsCard, w.KillsSection)
         : w._lootHost.IsInline ? Facts(w, w._lootCard, w.LootSection)
-        // Quests is absent here on purpose: it has no card since 2026-09-05 (HUD
-        // subtraction cut 1), so its host can never be Inline and there is no body to
-        // measure. Its window placement is still reported, as questsHostWindowOpen.
-        : w._worldHost.IsInline ? Facts(w, w._worldCard, w.MiscSection)
+        // Quests and World are absent here on purpose: neither has had a card since
+        // 2026-09-05 (HUD subtraction cuts 1 and 2), so neither host can be Inline and
+        // there is no body to measure. Their window placements are still reported, as
+        // questsHostWindowOpen and worldWindowOpen.
+        //
+        // World was the LAST theme card in the EQBUDDY_EXPAND=1 review set, so a bare
+        // EXPAND=1 launch now falls through to the floor here — correctly, since nothing
+        // is being capped. The E2E scenarios about a capped body name their card.
         : (EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight, double.NaN, double.NaN);
 
     private static (double Cap, double Room, double Chrome) Facts<TTab>(
@@ -215,19 +219,22 @@ internal static class WidgetDump
                     // context-menu row, the hotkey, or EQBUDDY_QUESTS.
                     $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
-                    // The WORLD theme's placement (World PR 3) — same contract as the
-                    // three above: inline and windowOpen are never both 1, and the tab
-                    // keys are emitted only while the CARD owns the body.
-                    $"worldInline={(w._worldHost.IsInline ? 1 : 0)} " +
+                    // The WORLD theme's placement. `worldInline`, and the `worldTab`/
+                    // `worldTabs` pair the CARD emitted, went with the card on 2026-09-05
+                    // (HUD subtraction cut 2) — the same shape as Quests above. The window
+                    // still reports worldTab/worldTabs from its own DebugFacts(), which is
+                    // where WorldOpenersTests reads them; the widget no longer has an
+                    // opinion, so the dump can no longer carry two answers to one key
+                    // (trap 58, avoided by subtraction rather than by prefixing).
                     $"worldWindowOpen={(w._worldHost.IsWindowOpen ? 1 : 0)} " +
-                    (w._worldHost.IsInline
-                        ? $"worldTab={WorldSurface.KeyFor(w._worldCard.SelectedTab)} " +
-                          $"worldTabs={w._worldCard.TabCount} "
-                        : "") +
-                    // The Travels tab's body, lifted into TravelsView (World PR 1). Same
-                    // keys (zones/deaths) the misc card always dumped, plus travelsMarkers
-                    // (never pinned before this PR) — DebugFacts() carries all three.
-                    $"{w._travelsView.DebugFacts()} " +
+                    // THE WIDGET'S OWN TravelsView DUMPED zones/deaths/travelsMarkers HERE
+                    // (World PR 1) and went with the card. Those three keys are still in
+                    // the dump — from `WorldWindow.DebugFacts()`, off the window's own
+                    // instance — but only while that window is open AND on Travels, since
+                    // Refresh paints the visible tab alone (trap 46). `EQBUDDY_WORLD=1` is
+                    // the hook that puts it there, and it exists because this cut removed
+                    // the last default way to reach that body from a test or a shot
+                    // (trap 22: a surface with no fixture state reads as reviewed anyway).
                     $"killsTotal={s.YourKillCount} lootTotal={s.LootTotal} " +
                     // The DATA's distinct-creature count, beside the window's RENDERED
                     // one (`kills`, from CreatureWindow.DebugFacts). Two keys for one
@@ -313,13 +320,17 @@ internal static class WidgetDump
                     $"sectionMaxH={w.SectionScroll.MaxHeight:0} " +
                     // HOW MANY CARDS THE WIDGET IS ACTUALLY DRAWING, and how many of them
                     // the player can see. `cards` is the catalog's length as realised in
-                    // the panel — nine since 2026-09-05, when Quests left (HUD subtraction
-                    // cut 1) — and `cardsVisible` subtracts whatever is hidden in Options.
+                    // the panel — eight since 2026-09-05, when Quests and then World left
+                    // (HUD subtraction cuts 1 and 2) — and `cardsVisible` subtracts
+                    // whatever is hidden in Options.
                     //
                     // A COUNT rather than a per-card key, deliberately: `questsCard=1` was
                     // the old shape and it could only ever say something about the card it
                     // was named after. A subtraction is a claim about the STACK, and the
                     // next cut wants the same assertion without anyone editing this file.
+                    // Cut 2 (the World card, 2026-09-05) is the first to collect on that:
+                    // eight cards now, and not a line of CODE here changed to say so —
+                    // only the count in the E2E assertion and the sentence above.
                     $"cards={w.SectionsPanel.Children.Count} " +
                     $"cardsVisible={CountVisible(w)} " +
                     // The checklists are still BUILT with no card of their own to render

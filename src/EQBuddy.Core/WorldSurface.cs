@@ -62,7 +62,10 @@ public static class WorldSurface
     /// rename of the human-facing label. Every key here is a name one of the four absorbed
     /// windows already answered to, not a new invention:
     /// <c>map</c> (MapWindow), <c>spawns</c> (SpawnsWindow), <c>travel</c> (TravelWindow),
-    /// <c>misc</c> (the Travels &amp; Deaths card's own settings key), <c>drops</c>
+    /// <c>misc</c> (the Travels &amp; Deaths card's own settings key — the card is gone as
+    /// of 2026-09-05, HUD subtraction cut 2, and the key stays: this is the address a
+    /// shell room and a saved tab choice resolve through, not a claim that a card exists),
+    /// <c>drops</c>
     /// (<c>DropsWindow</c>, and <see cref="CreatureSurface"/>'s key for the same tab today —
     /// one surface answering to one name in both lanes).</summary>
     public static string KeyFor(WorldTab tab) => tab switch
@@ -93,22 +96,14 @@ public static class WorldSurface
         _ => null,
     };
 
-    /// <summary>Initial table (Bevel may move any row, per the plan — PR 2-4 wait for its
-    /// pre-design answers). Travels is the current card body: small, player-driven lists
-    /// (deaths, zones, markers), which fits a widget the way the other themes' Full tabs
-    /// do. Map, Camps and Routes are Glance — a map canvas, a timer list with its own bell
-    /// pickers, and a destination picker all carry their own chrome (Bevel's host rule:
-    /// "do not shrink-wrap the full window onto a SizeToContent always-on-top panel"), and
-    /// conservative-glance is the ratified posture: a Glance understates and never lies,
-    /// and promoting one later costs no migration.</summary>
-    /// <remarks><see cref="WorldTab.Drops"/> has no row here and needs none: the inline card
-    /// never draws it, because <see cref="ShellOnly"/> keeps it off the v1 strip entirely.
-    /// The Glance default is what an answer would be, not a place it is asked.</remarks>
-    public static InlineMode InlineModeFor(WorldTab tab) => tab switch
-    {
-        WorldTab.Travels => InlineMode.Full,
-        _ => InlineMode.Glance,
-    };
+    // `InlineModeFor` LEFT THIS FILE ON 2026-09-05, with the widget's World card (HUD
+    // subtraction cut 2). It answered a question only a CARD asks — which rooms draw a
+    // body inline (Travels, alone) and which answer with a glance line — and
+    // `WorldThemeCard` was its one caller in the repo. Keeping it would have left a
+    // contract asserted for a surface nobody draws, which is trap 34's shape: a guard
+    // that cannot fail reads as coverage. The tabs, the labels, the wire keys and
+    // ShellOnly below are untouched — the World window, the shell's World room and
+    // EQBuddy Mobile all still read them.
 
     /// <summary>
     /// **The tabs the Evolved shell's World room has and the v1 lane does not** — today,
@@ -133,31 +128,32 @@ public static class WorldSurface
     /// </summary>
     public static bool ShellOnly(WorldTab tab) => tab == WorldTab.Drops;
 
-    /// <summary>The tab an expanded World card opens on: the room that already lived on
-    /// the widget as its own card.</summary>
-    public const WorldTab DefaultInlineTab = WorldTab.Travels;
+    /// <summary>The room an opener lands on when it does not name one: Travels, the room
+    /// that lived on the widget as its own card until 2026-09-05. Was
+    /// <c>DefaultInlineTab</c> until that cut, and the rename is the point — there is no
+    /// inline card for it to be the default OF, only three hosts that open somewhere.</summary>
+    public const WorldTab DefaultTab = WorldTab.Travels;
 
-    /// <summary>The card keys this theme absorbs — exactly one, unlike every other theme so
-    /// far. Read by the fold so the list of what disappears lives in ONE place rather than
-    /// being spelled again in each UI's settings migration.</summary>
-    public static readonly IReadOnlyList<string> AbsorbedCardKeys = ["misc"];
-
-    /// <summary>
-    /// The key the folded theme takes — <c>misc</c>, deliberately, and this is the thing
-    /// the ask flagged as needing a doc comment so nobody "fixes" it later.
-    ///
-    /// Every theme so far kept an absorbed card's key precisely so nobody's card slot
-    /// moved (see <see cref="CreatureSurface.ThemeCardKey"/> = <c>kills</c>). This theme
-    /// absorbs exactly ONE card — the old Travels &amp; Deaths card, whose settings key has
-    /// always been <c>misc</c> (a name from before that card had a proper one) — so keeping
-    /// <c>misc</c> means there is **no settings migration at all**: <c>SectionOrder</c>,
-    /// <c>HiddenSections</c> and <c>MiniStats</c> all keep pointing at the same string, and
-    /// the step Themes.md calls "where silent data loss lives" simply does not run.
-    /// Renaming the key to <c>world</c> would buy an aesthetic and cost a migration for
-    /// zero player benefit — the card's TITLE becomes "World" (PR 3); the KEY stays
-    /// <c>misc</c> forever, the same way <c>kills</c> stayed <c>kills</c>.
-    /// </summary>
-    public const string ThemeCardKey = "misc";
+    // `AbsorbedCardKeys` (["misc"]) AND `ThemeCardKey` ("misc") LEFT THIS FILE ON
+    // 2026-09-05, with the World card (HUD subtraction cut 2).
+    //
+    // **They were the fold's statement about a card, and there is no card.** This theme
+    // absorbed exactly one card and KEPT its key, so no `FoldThemeSections` call ever read
+    // either constant — `AppSettings` calls it for Progress and Loot only, and the sole
+    // reader of these two was `SectionFoldIdempotenceTests.Folds`. Leaving them would have
+    // left a fold naming a key with no catalog row, which is the premise check that guard
+    // exists to make (trap 55, and #252 is what it cost when Motes came back and nobody
+    // edited the list). The row went out of `Folds()` in the same commit.
+    //
+    // `CreatureSurface`'s pair has the identical shape (one card, key kept) and stays,
+    // because `kills` IS still a card. That is the whole distinction.
+    //
+    // What replaces them is a REMOVAL, not a fold: `AppSettings.MigrateWorldSections`
+    // strips "misc" out of `SectionOrder` and `HiddenSections`, because every 1.x profile
+    // in the world carries that key and a key with no card can never draw anything.
+    // `KeyFor(WorldTab.Travels)` is still "misc" and always will be — that is the WIRE
+    // key for the Travels room (`world:misc` in the shell's address grammar), which is a
+    // different question from whether a card by that name exists.
 
     /// <summary>Every tab this theme defines, in order — including the ones only the Evolved
     /// shell can draw. Callers that are a v1 host filter with <see cref="ShellOnly"/>;
@@ -182,27 +178,16 @@ public static class WorldSurface
             new(tab, LabelFor(tab), KeyFor(tab), string.IsNullOrWhiteSpace(value) ? null : value);
     }
 
-    /// <summary>
-    /// The launcher card's one-line summary — the line that has to justify replacing the
-    /// Travels &amp; Deaths card's own header.
-    ///
-    /// **Counts, never countdowns — in the launcher AND the tab badges.** A countdown
-    /// changes measured size every second (trap 12, the #173 keyboard-killer over a
-    /// fullscreen game) and would wake every phone every second (trap 8). Deadlines belong
-    /// to the spawn-due chips, which this theme does not touch. So the line says how many
-    /// timers are running, never how soon one is due.
-    ///
-    /// A part with nothing to say is omitted rather than printed as a zero — the line a
-    /// brand new character sees, exactly who is looking at a fresh widget.
-    /// </summary>
-    public static string LauncherSummary(
-        string? zone = null, int zonesVisited = 0, int deaths = 0, int runningTimers = 0)
-    {
-        var parts = new List<string>(4);
-        if (!string.IsNullOrWhiteSpace(zone)) parts.Add(zone!);
-        if (zonesVisited > 0) parts.Add($"{zonesVisited} zone{(zonesVisited == 1 ? "" : "s")}");
-        if (deaths > 0) parts.Add($"{deaths} death{(deaths == 1 ? "" : "s")}");
-        if (runningTimers > 0) parts.Add($"{runningTimers} timer{(runningTimers == 1 ? "" : "s")}");
-        return parts.Count > 0 ? string.Join(" · ", parts) : "no travels yet";
-    }
+    // `LauncherSummary` LEFT THIS FILE ON 2026-09-05, with the World card (HUD subtraction
+    // cut 2). It built the collapsed card's one line — "Befallen · 2 zones · 1 death ·
+    // 3 timers" — and `MainWindow.RefreshUi` was its only caller. Bevel's I-5 check named
+    // this composite as the one thing the cut actually costs: the window's tab strip
+    // carries the zone and the death count as badges, and Camps/Path deliberately carry
+    // none, so nothing puts all four numbers on one line any more.
+    //
+    // **The rule it enforced outlives it and is not optional: COUNTS, NEVER COUNTDOWNS.**
+    // A countdown changes measured size every second (trap 12, the #173 keyboard-killer
+    // over a fullscreen game) and would wake every phone every second (trap 8). It is
+    // still written down, in `UI.Shared/WorldTheme`'s own comment on why Camps and Path
+    // have no badge, and `LivePresentation` cites the same rule for its rates.
 }

@@ -36,6 +36,9 @@ param(
     # so it cannot be forced on every shot) — this is a settle, not a handshake.
     [int]$Settle = 8,
     [switch]$KeepProfile,
+    # Run even though another screen job appears to hold the desktop. See the screen-lock
+    # block below for what it overrides and what it deliberately does not.
+    [switch]$Force,
     [switch]$List
 )
 $ErrorActionPreference = 'Stop'
@@ -74,13 +77,19 @@ $DropsFixtureWiki = @{
 }
 
 $Shots = [ordered]@{
-    # NINE CARDS, not ten, since 2026-09-05 (HUD subtraction cut 1). Eight of them visible
-    # on the default profile - Motes ships hidden. PREDICTION for both of these shots, in
-    # order down the stack: Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs,
-    # Progress, World - with NO "Quests" header between Kills & Drops and Gear & Loot.
-    # Writing the order down is the point: an absent control photographs as an
-    # unremarkable panel (trap 29), so the only way to review a subtraction in a picture
-    # is to have said first what should NOT be in it.
+    # EIGHT CARDS since 2026-09-05 - nine after HUD subtraction cut 1 took Quests, eight
+    # after cut 2 took World the same day. Seven of them visible on the default profile:
+    # Motes ships hidden. PREDICTION for both of these shots, in order down the stack:
+    # Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs, Progress - with NO
+    # "Quests" header between Kills & Drops and Gear & Loot, and NO "World" header at the
+    # BOTTOM of the stack, which is where it was. Writing the order down is the point: an
+    # absent control photographs as an unremarkable panel (trap 29), so the only way to
+    # review a subtraction in a picture is to have said first what should NOT be in it.
+    #
+    # 'widget-expanded' loses a body as well as a header: EQBUDDY_EXPAND=1 opened Combat,
+    # Healing, Watch AND World, and World was the only theme card in that set - so the
+    # deaths/zones/markers lists at the bottom of that picture are gone with it. What is
+    # expanded now is Combat, Healing and Watch, and nothing else.
     'widget-cards'    = @{ Title = 'EQBuddy'; Env = @{}; Set = @{} }
     'widget-expanded' = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = '1' }; Set = @{} }
     # The title area with a LONG zone name. The zone and the session line shared one grid
@@ -127,13 +136,13 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_EXPAND = 'combat' }
                            Set = @{ HiddenSections = @(
                                'healing','kills','loot','tracked',
-                               'buffs','progress','misc') } }
+                               'buffs','progress') } }
     # The Watch card alone, same reason, with the same three seeded rules as tracked-card.
     'watch-solo'      = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'tracked' }
                            Set = @{ HiddenSections = @(
                                        'combat','healing','kills','loot',
-                                       'buffs','progress','misc')
+                                       'buffs','progress')
                                     TrackedRules = @(
                                    @{ Id = 'shot-spider'; Name = 'Spider parts'
                                       Pattern = 'Spider'; Kind = 0 }
@@ -1267,12 +1276,17 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
                                     WindowZooms = @{ options = 0.55 } } }
-    # PREDICTION since 2026-09-05 (HUD subtraction cut 1): NINE rows in the card list, and
-    # no "Quests" among them - and no "Sky Quest / Epics are tabs in here now" note either,
-    # because that note hangs under the surviving card and there is none. This screen is the
-    # one #219 was filed from, so it is the picture that says out loud what the cut costs:
-    # someone hunting for the Quests card finds no row here at all. That gap is recorded in
-    # HELM-FEEDBACK.md rather than papered over.
+    # PREDICTION since 2026-09-05 (HUD subtraction cuts 1 and 2): EIGHT rows in the card
+    # list - Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs, Progress, Motes -
+    # with no "Quests" and no "World" among them, and none of the four notes those two
+    # carried: no "Sky Quest / Epics are tabs in here now", and no "Travels & Deaths / Zone
+    # map / Travel route / Spawn timers are tabs in here now". A note hangs under the
+    # SURVIVING card and there is none in either case.
+    #
+    # This screen is the one #219 was filed from, so it is the picture that says out loud
+    # what the two cuts cost: someone hunting for any of those six names finds no row here
+    # at all. Recorded in HELM-FEEDBACK.md rather than papered over - and cut 2's half is
+    # the bigger one, four names against two.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
@@ -1347,6 +1361,34 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
+    # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
+    # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
+    # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
+    # left the surface unphotographable and therefore unreviewable-but-looking-reviewed
+    # (trap 22) - so EQBUDDY_WORLD landed with the cut and this row landed with the hook.
+    # It is also the illustration lock working the way it is supposed to: a capture arrives
+    # WITH its recipe, in the same change.
+    #
+    # PREDICTION: the World window, native chrome reading "World", a four-chip strip (Map
+    # badged with the fixture's last zone, Camps, Path, Travels - Travels lit), and under it
+    # the Travels body: a "Deaths" heading with no rows (the fixture has no death line), a
+    # "Zones visited" heading over SIX rows with times - the replay zones Befallen / West
+    # Commonlands / Befallen / West Commonlands / East Commonlands / West Commonlands - and
+    # NO markers heading at all (MarkersLabel collapses when the list is empty). Pinned
+    # BELOW the body, exactly once: the "Drop camp marker" action row with the "Show in mini
+    # dashboard" star and its label, which appear on the Travels tab alone - that star is
+    # the only writer MiniStats has for 'deaths', and this shot is the only picture of it.
+    #
+    # TWO PREDICTION MISSES ON THE FIRST RUN, and the second is why this row was worth
+    # adding at all. (a) "Befallen and West Commonlands" undercounted: the fixture zones
+    # SIX times, not twice, and the number came from a doc line rather than from the log -
+    # trap 23's rule is to derive the prediction, and a phrase copied from another comment
+    # is not a derivation. (b) "Drop camp marker" appeared TWICE, once inside the scroller
+    # and once pinned. That was not new: `TravelsView` inserted its own copy at the top of
+    # the body FOR THE INLINE CARD - its own doc comment said so - while both surviving
+    # hosts pin one as chrome. It had rendered twice since the World fold in a window no
+    # committed illustration had ever photographed. The in-body copy went with the card.
+    'world-travels'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_WORLD = '1' }; Set = @{} }
     # The KILLS & DROPS theme (2026-08-21). Both were reachable before the fold — one as
     # a widget card, one as a cog-menu window — and both are tabs now, so both get a shot:
     # a tab nobody photographs is a tab nobody reviews (trap 22).
@@ -1759,6 +1801,137 @@ function Close-EqWidget([Diagnostics.Process]$proc) {
     return $true
 }
 
+# THE WINDOW THIS SHOT IS ABOUT, found the way shot.ps1 finds it — the same enumeration,
+# the same owner check, and the same exact-wins-over-substring rule, so the readiness wait
+# below cannot answer "yes" about a window the capture will then refuse.
+#
+# It exists because that wait was satisfied by the WRONG window (see the loop), and because
+# a failed capture carried no evidence: "no visible window matching 'Options'" says nothing
+# about what the process DID have on screen, which is the one fact that separates "the hook
+# never fired" from "the window was still coming" from "something closed my app underneath
+# me". Ship the instrument before the third theory (traps 33, 49, 56).
+#
+# Returns the matched TITLE (a non-empty string is the truthy answer) or $null. Note the
+# $script: prefixes: the callback runs at script scope, so a plain $exact here would be a
+# local the delegate never writes — a helper that always answers $null, which is the exact
+# shape of guard that reads as coverage while being blind (trap 34).
+function Find-EqShotWindow([string]$titleLike, [int]$ownerPid) {
+    $script:eqShotExact = $null
+    $script:eqShotLoose = $null
+    $cb = [EqShot.Win+EnumProc]{ param($h, $l)
+        if ([EqShot.Win]::IsWindowVisible($h)) {
+            $owner = 0
+            [EqShot.Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
+            if ($owner -eq $ownerPid) {
+                $sb = New-Object System.Text.StringBuilder 256
+                [EqShot.Win]::GetWindowText($h, $sb, 256) | Out-Null
+                $t = $sb.ToString()
+                if ($t -like "*$titleLike*") {
+                    if ($t -eq $titleLike) { $script:eqShotExact = $t; return $false }
+                    if ($null -eq $script:eqShotLoose) { $script:eqShotLoose = $t }
+                }
+            }
+        }
+        return $true
+    }
+    [EqShot.Win]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
+    if ($script:eqShotExact) { return $script:eqShotExact }
+    return $script:eqShotLoose
+}
+
+# Every visible window one process owns, for the failure message. An empty list and a list
+# of four windows that are all the wrong one are two different diagnoses and they used to
+# print identically — as nothing at all.
+function Get-EqShotWindowTitles([int]$ownerPid) {
+    $script:eqShotTitles = @()
+    $cb = [EqShot.Win+EnumProc]{ param($h, $l)
+        if ([EqShot.Win]::IsWindowVisible($h)) {
+            $owner = 0
+            [EqShot.Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
+            if ($owner -eq $ownerPid) {
+                $sb = New-Object System.Text.StringBuilder 256
+                [EqShot.Win]::GetWindowText($h, $sb, 256) | Out-Null
+                if ($sb.Length -gt 0) { $script:eqShotTitles += $sb.ToString() }
+            }
+        }
+        return $true
+    }
+    [EqShot.Win]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
+    return $script:eqShotTitles
+}
+
+# --- THE SCREEN IS A MUTEX, AND UNTIL NOW NOTHING ENFORCED IT ----------------------
+#
+# `FABLE.md` §4 says it in as many words: *"The one hard mutex is the SCREEN … Dranak
+# enforces this by kick order, not by tooling."* A convention with no interlock fails
+# silently, and this is what the failure looks like from inside a batch:
+#
+#   `Get-Process EQBuddy` matches every EQBuddy on the machine by PROCESS NAME. Another
+#   seat's `shoot.ps1` starting up therefore stands down THIS batch's in-flight fixture
+#   app — and records its exe path for a relaunch it will do, with no EQBUDDY_APPDATA,
+#   into the real profile. The shot that was mid-settle then finds its window gone:
+#   *"no visible window matching 'EQBuddy — Gear' in process N"*. Three different rows
+#   failed across three runs of #306's batch, each passing alone, and `DECISIONS.md`
+#   (2026-09-05) already records the cause in one line: *"another seat's EQBuddy was
+#   running on the same desktop … multi-shot runs died at a different shell shot each
+#   time and every one of them passed alone."* The row that fails is whichever one was on
+#   screen when the other seat started; nothing about it is a defect in that row.
+#
+# Two guards, because they catch different collisions:
+#
+#   1. A LOCK FILE held for the whole batch. It cannot go stale — the handle dies with the
+#      process — and it is opened FileShare.Read so a refused seat can say WHO holds it.
+#      This is the opposite call from UI.Shared/SingleInstance, deliberately: there, a
+#      widget that will not launch is worse than two of them; here, a batch that runs
+#      anyway corrupts someone else's acceptance criterion at a random row.
+#   2. A RUNNING EQBUDDY OUT OF A BUILD OUTPUT. `tests/EQBuddy.E2E` launches the same exe
+#      and takes no lock, so the lock alone cannot see it. A player's EQBuddy never runs
+#      from `bin\Release`; a harness's always does, which makes the path the discriminator
+#      — the same "what does the real thing actually write" move Core/GameWrittenLog makes
+#      for log names (trap 48).
+#
+# -Force overrides both, for the case where the holder is known dead. It does NOT make the
+# stand-down touch a build-output app: closing another harness's fixture app is the damage.
+$screenLockPath = Join-Path ([IO.Path]::GetTempPath()) 'eqbuddy-screen.lock'
+$screenLock = $null
+try {
+    $screenLock = [IO.File]::Open($screenLockPath, [IO.FileMode]::OpenOrCreate,
+        [IO.FileAccess]::Write, [IO.FileShare]::Read)
+}
+catch [IO.IOException] {
+    $holder = try { (Get-Content $screenLockPath -Raw -ErrorAction Stop).Trim() } catch { '(unreadable)' }
+    $msg = "Another screen job holds $screenLockPath — $holder. " +
+           "shoot.ps1 and the E2E suite own the desktop exclusively (FABLE.md §4); " +
+           "running anyway kills that job's fixture app and fails a random row of BOTH batches. " +
+           "Wait for it, or pass -Force if you know the holder is gone."
+    if (-not $Force) { throw $msg }
+    Write-Warning "$msg`n-Force given; continuing."
+}
+if ($screenLock) {
+    $screenLock.SetLength(0)
+    # ASCII only, deliberately: this line is read back by another process with Get-Content,
+    # and under Windows PowerShell 5.1 that decodes as the ANSI code page. A holder line
+    # nobody can read is trap 54 in a file whose whole job is to be read by a stranger.
+    $stamp = [Text.Encoding]::UTF8.GetBytes(
+        "pid $PID | $(Get-Date -Format o) | $repo")
+    $screenLock.Write($stamp, 0, $stamp.Length)
+    $screenLock.Flush()
+}
+
+$fixtureApps = @(Get-Process EQBuddy -ErrorAction SilentlyContinue | Where-Object {
+    $p = try { $_.Path } catch { $null }
+    $p -and $p -match '[\\/]bin[\\/](Release|Debug)[\\/]'
+})
+if ($fixtureApps.Count -gt 0) {
+    $where = ($fixtureApps | ForEach-Object { "pid $($_.Id) $(try { $_.Path } catch { '?' })" }) -join "`n  "
+    $msg = "An EQBuddy is already running from a BUILD OUTPUT, which means another harness " +
+           "(shoot.ps1 or tests/EQBuddy.E2E) has the screen:`n  $where`n" +
+           "It is not the player's app and this script will not close it. " +
+           "Wait for that run, or pass -Force."
+    if (-not $Force) { throw $msg }
+    Write-Warning "$msg`n-Force given; continuing."
+}
+
 # --- stand the real EQBuddy down, and put it back afterwards ------------------------
 # The running app is a worse problem than a mismatched capture. It is always-on-top, it
 # holds the very window titles these shots ask for, and a capture of it would commit a
@@ -1771,9 +1944,21 @@ function Close-EqWidget([Diagnostics.Process]$proc) {
 # ApplicationExit, so a hard kill would throw away whatever the player was in the middle
 # of — the cost of a screenshot must never be someone's session record. Force is the
 # fallback for a window that will not go, not the opening move.
+#
+# AND IT STANDS DOWN THE PLAYER'S APP ONLY. `Get-Process EQBuddy` matches by process NAME,
+# so it used to include another harness's in-flight fixture app — closing it mid-capture,
+# failing a random row of that batch with "no visible window", and then relaunching its exe
+# from the `finally` with no EQBUDDY_APPDATA, pointing a stray widget at the real profile.
+# A build-output path is never a player's installed copy; the screen-lock block above
+# refuses the run over it, and this loop leaves it alone even under -Force.
 $relaunch = @()
 foreach ($proc in @(Get-Process EQBuddy -ErrorAction SilentlyContinue)) {
     $path = try { $proc.Path } catch { $null }   # Access denied on a process we can't read
+    if ($path -and $path -match '[\\/]bin[\\/](Release|Debug)[\\/]') {
+        Write-Warning ("Leaving pid $($proc.Id) alone — it runs from a build output " +
+            "($path), so it is another harness's fixture app, not the player's EQBuddy.")
+        continue
+    }
     if ($path) { $relaunch += $path }
     Write-Host "Standing down the running EQBuddy (pid $($proc.Id)) — it will be relaunched."
     try {
@@ -1923,8 +2108,16 @@ function Invoke-PrimeRun([object[]]$runs) {
 
 New-Item -ItemType Directory -Force $Out | Out-Null
 $taken = @()
+$failed = @()
 try {
     foreach ($name in $wanted) {
+      # ONE BAD ROW MUST NOT DARKEN THE REST OF THE BATCH.
+      # `$ErrorActionPreference = 'Stop'` made a single failure end the run AT that row, so
+      # the ~25 shots after it were simply unreachable — which is trap 53's actual cost:
+      # three stale titles took the batch dark for six days across four releases, and every
+      # session that re-shot ONE image got a picture and moved on. The run still FAILS (a
+      # stale title must), it just says so about every row rather than the first one.
+      try {
         $spec = $Shots[$name]
         Write-Host "`n=== $name → $($spec.Title) ==="
         # THE ARCHIVE IS STAGING TOO, AND IT WAS THE ONE CUMULATIVE THING LEFT.
@@ -1994,21 +2187,56 @@ try {
         if ($reviewLog) { $psi.EnvironmentVariables['EQBUDDY_REVIEW'] = $reviewLog }
         $proc = [Diagnostics.Process]::Start($psi)
         try {
-            # Wait for the window this shot is about, then let the replay settle.
+            # WAIT FOR THE WINDOW THIS SHOT IS ABOUT — which is not what this loop used to do.
+            #
+            # It asked two questions and the second one answered first, every time. Both
+            # `MainWindowTitle` and `MainWindowHandle` describe ONE window: "the first
+            # visible, unowned top-level window of the process", which is the widget. So for
+            # every shot whose target is a satellite or a room — Options, Drops, the theme
+            # windows, the shell — the `MainWindowHandle -ne 0` escape fired as soon as the
+            # WIDGET appeared, the 90-second deadline was dead code, and the target window's
+            # entire budget was $Settle: eight seconds, shared with the startup replay.
+            #
+            # Eight seconds is usually plenty and is not a wait. Every hook in DebugHooks
+            # opens its window from a `Loaded` handler at DispatcherPriority.ApplicationIdle
+            # — deliberately, so the replay lands first — and ApplicationIdle work is
+            # starved for exactly as long as the app is busy. E-3 then put a second full
+            # window (the shell, on every launch since #316) into that same eight seconds.
+            # A budget that used to be generous is now a race, and losing it presents as
+            # "no visible window matching …" on whichever row happened to draw the slow
+            # launch. The escape hatch's comment was right about satellites not being
+            # MainWindowTitle; the conclusion it drew — hand off to shot.ps1 immediately —
+            # is what turned a 90-second wait into an 8-second gamble.
+            #
+            # Now it waits for the same window shot.ps1 will look for, by the same rule, and
+            # $Settle goes back to being a settle. On a miss it does NOT throw here: it falls
+            # through to the capture exactly as before, so this can only ever wait LONGER
+            # than the old code, never fail where the old code succeeded.
             $deadline = (Get-Date).AddSeconds(90)
-            $seen = $false
+            $started = Get-Date
+            $seen = $null
             while ((Get-Date) -lt $deadline) {
                 Start-Sleep -Milliseconds 500
                 if ($proc.HasExited) { throw "$exe exited early (code $($proc.ExitCode))." }
-                $proc.Refresh()
-                if (Get-Process -Id $proc.Id | Where-Object { $_.MainWindowTitle -like "*$($spec.Title)*" }) {
-                    $seen = $true; break
-                }
-                # Satellite windows are not MainWindowTitle; shot.ps1 enumerates properly,
-                # so once the app has ANY window, hand off to it after the settle.
-                if ($proc.MainWindowHandle -ne 0) { $seen = $true; break }
+                $seen = Find-EqShotWindow $spec.Title $proc.Id
+                if ($seen) { break }
             }
-            if (-not $seen) { throw "No window appeared for '$name' within 90s." }
+            if ($seen) {
+                $waited = [int]((Get-Date) - $started).TotalMilliseconds
+                Write-Host "  '$($spec.Title)' up after ${waited}ms"
+            }
+            else {
+                # The instrument, not a guess: say what the process DID have on screen.
+                # "nothing at all" (the app is still starting, or the hook never fired) and
+                # "four windows, none of them this one" (a stale Title — trap 53) are
+                # different diagnoses that used to print identically, as nothing.
+                $had = @(Get-EqShotWindowTitles $proc.Id)
+                $what = if ($had.Count -eq 0) { '(no visible windows at all)' }
+                        else { ($had | ForEach-Object { "'$_'" }) -join ', ' }
+                Write-Warning ("No window matching '$($spec.Title)' in pid $($proc.Id) after 90s. " +
+                    "Visible windows of that process: $what. Capturing anyway so shot.ps1 " +
+                    "reports the same failure it always did.")
+            }
             $backdropForm.Refresh()
             # PARK THE POINTER OFF EVERY WINDOW BEFORE THE SETTLE, or the capture is a
             # picture of where the mouse happened to be. WPF paints :hover from the real
@@ -2036,11 +2264,28 @@ try {
         }
         finally {
             if (-not $proc.HasExited) { Stop-Hard $proc }
-            $proc.WaitForExit(10000) | Out-Null
+            # The return value used to go to Out-Null. A wait that times out and says
+            # nothing leaves the next shot launching a SECOND app on one profile — two log
+            # tails and two whole-file writers of settings.json, which is trap 13's shape
+            # arriving through the harness. Say so, and give it one more push.
+            if (-not $proc.WaitForExit(10000)) {
+                Write-Warning ("pid $($proc.Id) did not exit within 10s after '$name'; " +
+                    "forcing again before the next shot starts on the same profile.")
+                Stop-Hard $proc
+                if (-not $proc.WaitForExit(5000)) {
+                    Write-Warning "pid $($proc.Id) is STILL alive — the next shot shares its profile."
+                }
+            }
         }
+      }
+      catch {
+        $failed += [pscustomobject]@{ Shot = $name; Error = $_.Exception.Message }
+        Write-Warning "SHOT FAILED — $name : $($_.Exception.Message)"
+      }
     }
 }
 finally {
+    if ($screenLock) { $screenLock.Dispose() }
     $backdropForm.Close()
     $backdropForm.Dispose()
     if ($KeepProfile) { Write-Host "`nProfile kept at $root" }
@@ -2060,3 +2305,11 @@ finally {
 
 Write-Host "`n$($taken.Count) shot(s):"
 $taken | ForEach-Object { Write-Host "  $_" }
+
+# The summary is the point of continuing past a failure: every stale row in ONE run,
+# and a non-zero exit so nothing reads a partial batch as a green acceptance criterion.
+if ($failed.Count -gt 0) {
+    Write-Host "`n$($failed.Count) shot(s) FAILED:" -ForegroundColor Red
+    $failed | ForEach-Object { Write-Host "  $($_.Shot): $($_.Error)" -ForegroundColor Red }
+    exit 1
+}

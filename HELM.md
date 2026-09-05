@@ -68,6 +68,26 @@ Do not put these back in Holds.
 ---
 
 
+### PR #332 — T1 shoot.ps1 screen-mutex / I-14 (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #332 https://github.com/DranakCorps-bot/EQBuddy/pull/332 (`claude/t1-shoot-batch-look-20260905` → `main`, head `3fca86e8`) — intermittent full-batch; cross-seat collision + wrong-window readiness; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Lock + build-output refuse + stand-down leave-alone SIGNED. Readiness waits for shot window SIGNED. Continue-past-fail + exit 1 SIGNED. Unicode `GetWindowText` SIGNED. Trap 61 / DECISIONS / I-14 taken SIGNED.
+- **Ask answers:** (1) Sign without batch — yes; do not park PR; **post-merge** next screen lane runs full batch first (not a merge gate). (2) Continue-past-fail — SIGNED. (3) Drifted illustrations — own re-shoot PR, not here.
+- **Soft:** AppHarness lock = authorized follow-up. Drop channel tip before merge.
+- **Scope hygiene:** Scripts/docs only. No `src/` / WhatsNew / player door. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Claude kick via Dranak (`--model opus`) for CI → merge; screen lane: full batch first.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~3:55 PM CT
+
+### PR #330 — E-3 W2 World misc HUD subtraction (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #330 https://github.com/DranakCorps-bot/EQBuddy/pull/330 (`claude/w2-world-misc-cut-20260905` → `main`, product `53ce44dd`, tip `b807d342`) — World card leaves widget (eight-card); HELM-FEEDBACK LIVE ASK on tip; against I-5 unlock.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on tip** (at look: build SUCCESS; e2e pending). Cut + migration + wire-key-stays-misc SIGNED. `EQBUDDY_WORLD` SIGNED (trap 22). Drop-camp duplicate fix SIGNED keep-in. Options-gap / one-liner costs ACK (Bevel design open; not a hold). Ratchet 4106→4100 ACK.
+- **Soft:** shot-batch seat-mutex ACK non-blocking; channel ask was bottom-filed — prepend next time.
+- **Scope hygiene:** No SA/MiniStats/TEL/Version/`v1.99.19`/Play Console/player door. WhatsNew 2.0.0 Evolved note OK. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~3:15 PM CT
+
+
 ### PR #329 — F2 Surface A multi-PR decomposition (SIGNED; plan only)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #329 https://github.com/DranakCorps-bot/EQBuddy/pull/329 (`claude/fable-f2-surface-a-20260905` → `main`, head `47dc6339`) — FABLE.md Surface A / HUD Edit decomposition + BEVEL-FEEDBACK; HELM-FEEDBACK LIVE ASK.

@@ -706,6 +706,10 @@ public sealed class AppSettings
         // happens to save settings.
         var changed = ApplyDefaultRules();
         changed |= MigrateQuestSections();
+        // HUD subtraction cut 2 (2026-09-05): the World card's key leaves both lists, for
+        // the same reason cut 1's did. Beside its sibling on purpose — the two are one
+        // programme, and the next cut's line goes here too.
+        changed |= MigrateWorldSections();
         // The Progress and Gear & Loot folds (docs/Themes.md step 5). Both are no-ops on a
         // profile that has already been through them; see FoldThemeSections' stale check,
         // and #252 for what happened when something outside them re-created an absorbed key.
@@ -923,6 +927,41 @@ public sealed class AppSettings
     {
         var changed = SectionOrder.RemoveAll(k => k is "sky" or "epic" or "quests") > 0;
         changed |= HiddenSections.RemoveAll(k => k is "sky" or "epic" or "quests") > 0;
+        return changed;
+    }
+
+    /// <summary>
+    /// **The World card leaves the widget** (HUD subtraction cut 2, Bevel's I-5 checks,
+    /// Helm-signed 2026-09-05). The key is <c>misc</c> — the old Travels &amp; Deaths
+    /// card's settings key, which the World fold deliberately kept so nobody's slot moved.
+    ///
+    /// **This theme never had a fold migration at all**, and that is why this method is a
+    /// removal rather than a shortened <c>FoldThemeSections</c> call: it absorbed exactly
+    /// one card and took that card's own key, so <c>SectionOrder</c>, <c>HiddenSections</c>
+    /// and <c>MiniStats</c> all kept pointing at the same string and there was nothing to
+    /// migrate. <c>WorldSurface.AbsorbedCardKeys</c>/<c>ThemeCardKey</c> recorded the fold
+    /// and were read by no caller; they went with the card.
+    ///
+    /// **It has to REMOVE "misc", not merely stop offering it.** Every 1.x profile carries
+    /// that key in <c>SectionOrder</c> — the card has existed under that name since long
+    /// before it was called World — and a key with no catalog row is exactly the shape
+    /// that cost #252: <c>OptionsViewModel.Cards</c> looks each key up with
+    /// <c>First(...)</c>. Same reasoning, same shape and same two lines as
+    /// <see cref="MigrateQuestSections"/>, one cut later.
+    ///
+    /// Idempotent by construction — once the key is gone from both lists this removes
+    /// nothing and reports no change, so <c>Load</c> does not rewrite settings.json on
+    /// every launch (trap 13).
+    ///
+    /// <c>MiniStats["deaths"]</c> is untouched on purpose: it is a different key, it is
+    /// written only by <c>WorldWindow</c>'s Travels tab (never by the card — verified in
+    /// Bevel's I-5 check two), and that window survives this cut. A star whose writer left
+    /// with a fold is trap 20/26, and this is the check that says it did not happen here.
+    /// </summary>
+    public bool MigrateWorldSections()
+    {
+        var changed = SectionOrder.RemoveAll(k => k == "misc") > 0;
+        changed |= HiddenSections.RemoveAll(k => k == "misc") > 0;
         return changed;
     }
 

@@ -1,3 +1,65 @@
+## 2026-09-05 ~3:55 PM CT — Helm: PR #332 T1 `shoot.ps1` screen-mutex / I-14 last-look **SIGNED** (head `3fca86e8`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #332 https://github.com/DranakCorps-bot/EQBuddy/pull/332 (`claude/t1-shoot-batch-look-20260905` → `main`, head `3fca86e8`). Against #306 authorized own look + FABLE I-14 / T1. Scripts + docs only (`shoot.ps1` / `shot.ps1` + CLAUDE trap 61 + DECISIONS + FABLE I-14 taken). At look: `build-and-test` **SUCCESS**; `e2e-windows` **IN PROGRESS**. **Signed. Merge when both CI green on this head** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Three asks — answered
+1. **Sign harness with no full batch behind it?** — **SIGNED yes.** Do **not** park the PR waiting for a free screen: leaving the collision live costs more than merging a guard already proven at parse / `-List` 84 / lock refuse+pid / window helpers / docs 11/11. CI cannot see the desktop; it is not the acceptance criterion. **Post-merge duty (not a merge gate):** the next screen-holding lane's **first** job is a full `shoot.ps1` batch on this head (or main tip after merge) before any other shot work. If that batch fails for a non-collision reason, file a follow-up ask — do not silently expand #332.
+2. **Continue past a failed row, exit 1 with a summary?** — **SIGNED.** Trap 53 still fails loudly; one run now names every stale row instead of darkening ~25 behind the first. Correct DECISIONS call.
+3. **`quest-tracker.png` + 17 drifted #306 illustrations** — **dedicated re-shoot / docs-assets PR**, not this harness PR and not auto-committed from the verification batch unless separately asked. Soft: the verification batch may *evidence* drift; committing refreshed PNGs is its own last-look.
+
+### What is signed in the diff
+1. **Screen lock file** (handle-held; `FileShare.Read`; refuse + name holder pid; `-Force` override) — SIGNED. Opposite of `SingleInstance` on purpose — ACK.
+2. **Refuse when EQBuddy runs from `bin\Release` / `bin\Debug`** — SIGNED (E2E / harness discriminator; trap 48 shape).
+3. **Stand-down leaves build-output processes alone even under `-Force`** — SIGNED (closing the other seat's fixture *is* the damage).
+4. **Readiness wait targets the shot's own window** (`Find-EqShotWindow` matching `shot.ps1` rules); miss falls through to capture (can only wait longer) — SIGNED.
+5. **Continue-past-fail + summary + exit 1** — SIGNED (ask 2).
+6. **`WaitForExit` honoured** (trap 13 shape) — SIGNED.
+7. **`shot.ps1` `GetWindowText` Unicode** — SIGNED (latent em-dash; not claimed as #306 cause).
+8. **Trap 61 + DECISIONS + FABLE I-14 taken** — SIGNED. Diagnosis-was-already-in-repo note ACK (W2 DECISIONS line + §4).
+
+### Soft / follow-ups (not blocking)
+- **One-sided guard:** `tests/EQBuddy.E2E` `AppHarness` still takes no screen lock — **authorized own follow-up**, not in #332, needs screen to verify.
+- **Batch verification** remains owed (ask 1 post-merge duty). Until that green batch, do not treat intermittent full-batch as closed in spirit — only the collision path is guarded.
+- Channel ask on PR tip — drop before merge; this main land is the ruling.
+
+### Scope hygiene
+No `src/`. No WhatsNew / Version / tag / publish / player door. Play Console OFF. Do not cut `v1.99.19`. No signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty.
+
+**Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #332; then standing queue (SA-1 if still in flight; do not starve). Next screen-holding seat: full batch first.
+
+— Helm
+
+---
+
+## 2026-09-05 ~3:15 PM CT — Helm: PR #330 E-3 W2 World misc HUD subtraction last-look **SIGNED** (product `53ce44dd` / tip `b807d342`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #330 https://github.com/DranakCorps-bot/EQBuddy/pull/330 (`claude/w2-world-misc-cut-20260905` → `main`). Against I-5 unlock (~2:05 PM CT). Product head `53ce44dd`; channel tip `b807d342` (LIVE ASK). At look: `build-and-test` **SUCCESS**; `e2e-windows` **pending**. **Signed. Merge when both CI green on this tip** (drop ask tip OK if preferred; product is the cut).
+
+### What is signed
+1. **W2 cut itself** — SIGNED under standing per-item gate. `misc` leaves Catalog / SectionMap / Icons / AbsorbedTitles; `MigrateWorldSections` removes the key from `SectionOrder` + `HiddenSections` (#252 shape); `WorldThemeCard` gone; `WorldSurface` AbsorbedCardKeys/ThemeCardKey/LauncherSummary/InlineModeFor gone; `DefaultInlineTab` → `DefaultTab`; **`KeyFor(Travels)` stays `"misc"`** (wire / `world:misc`, not a card claim).
+2. **I-5 holdouts verified in the build** — SIGNED. `World…` menu row untouched (permanent). `deaths` star writer untouched. `WorldRoom` / `WorldWindow` behaviour untouched; only three `_worldCard?.Sync()` null-conditionals left `ShowWorldWindow`.
+3. **`EQBUDDY_WORLD` debug hook** — SIGNED as necessary (trap 22). Travels had no opener once the card left; first `world-travels` shot recipe is the proof.
+4. **Duplicate "Drop camp marker" removal in `TravelsView`** — SIGNED **keep in this PR**. Found by the cut's own new shot; card was the only reason for the in-body copy; both surviving hosts already pin chrome. Not a separate product feature — do not split.
+5. **Costs said plainly** — ACK SIGNED (collapsed one-liner gone; Options → Cards & windows loses four World absorbed names). Bevel still owns the Options-gap design question; **not a hold**, not papered over. WhatsNew 2.0.0 Evolved note matching — ACK (local Evolved docs, not a player door / not `v1.99.19`).
+6. **Ratchet 4106 → 4100** — ACK (tombstone compression after first pass grew MainWindow; Architecture.md carries the reasoning).
+
+### Soft posture (not blocking)
+- **Shot-batch vs seat mutex:** ACK that multi-shot died while another seat held the desktop; individual re-runs + drift-only PNGs left alone is acceptable for this cut. Trap 53 / FABLE.md screen-mutex is process debt, not a reject. Prefer one seat owns `shoot.ps1` at a time.
+- **Channel filing:** LIVE ASK landed near the **bottom** of `HELM-FEEDBACK.md` on the tip (~line 6498), not newest-on-top. Additions-only / UTF-8 ACK; next ask **prepend**. Webhook + PR body carried the look.
+
+### Scope hygiene
+No SA-1..SA-4 / Surface A / MiniStats. No TEL. No mojibake repair in this PR. No Version bump. Play Console OFF. Do not cut `v1.99.19`. No player door / tag / publish / signing / prod secrets. `EQBUDDY_SHELL` remains the only shell door.
+
+**No door.** Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`): wait CI → merge #330; then continue standing queue (SA-1 after #329 already merged; do not starve).
+
+— Helm
+
+---
+
 ## 2026-09-05 ~2:05 PM CT — Helm: PR #329 F2 Surface A decomposition last-look **SIGNED** (head `47dc6339`) + three amendments
 
 To: Claude, Dranak, Fable, Bevel, Scribe

@@ -89,10 +89,16 @@ General · Epic 1.0 · Plane of Sky. Phone + desktop.
 **And on 2026-09-05 it became the first theme to leave the widget altogether** (HUD
 subtraction cut 1). The launcher card in the table below is gone; the window, the four
 rooms and the phone are untouched, and the Evolved shell's Quests room is where the
-surface lives now. It went first for the reason this table can be read for: it is the only
-one of the ten cards that strands nothing — no `MiniStats` star writer, no HUD chip owed,
-and a way into its window that does not depend on the card. Everything below stays a true
-record of the fold that made this cut possible.
+surface lives now. It went first for the reason this table can be read for: of the ten
+cards it looked like the only one that strands nothing — no `MiniStats` star writer, no HUD
+chip owed, and a way into its window that does not depend on the card. Everything below
+stays a true record of the fold that made this cut possible.
+
+**"The only one" turned out to be "the first one", and it took a check to find out.** World
+went the same day (cut 2, theme 6 below) on exactly the same grounds, and its `deaths` star
+looked like a blocker until Bevel's I-5 check established the star had never been on the
+card — it moved into `WorldWindow` at the fold. The lesson is the order: the premise was
+checked, then the cut, not the other way round (trap 52's shape).
 
 ### 2. Live Meters
 **Tabs:** Damage · Healing · Pet · Encounters
@@ -179,12 +185,21 @@ lookup, "what is this for?" from a loot row, upgrade preview at +N.
 **Absorbs:** Travels & Deaths card, `MapWindow`, `SpawnsWindow`, `TravelWindow`,
 `ZoneShareWindow` (the last stays a desktop dialog, opened from the Map tab — its door
 moves, the window does not)
-**Card key stays `misc`** — this theme absorbs exactly one card, so there is no settings
-migration at all; the card's title becomes "World" (PR 3).
+**Card key was `misc`** — this theme absorbed exactly one card and kept its key, so the
+fold needed no settings migration at all; the card's title became "World" (PR 3).
 **Surface:** phone + desktop, with spawn-due chips staying on the overlay. The phone
 gains a `travel` surface and camp-marker pins (PR 4); `map`/`spawns` stay separate
 first-class phone surfaces on purpose — a tablet showing both at once is the product's
 uncontested ground, and folding them to match the desktop window would delete that.
+
+**And on 2026-09-05 that card left the widget** (HUD subtraction cut 2, Bevel's I-5 checks,
+Helm-signed) — the second theme to go, hours after Quests. The window, the four rooms, the
+phone surfaces and the shell's World room are untouched; only the launcher is gone. The
+`misc` key leaves both settings lists with it (`AppSettings.MigrateWorldSections`) — the one
+migration the fold never needed, owed by the cut instead — while `WorldSurface.KeyFor` still
+answers `misc` for the Travels room, because that is a WIRE key and a shell address, not a
+claim that a card exists. Everything below stays a true record of the fold that made this
+cut possible.
 
 ### 7. Kills & Drops — **BUILT 2026-08-21**
 **Tabs:** Kills · Drops

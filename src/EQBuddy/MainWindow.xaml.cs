@@ -81,8 +81,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // is due. That is scheduled by the alert path, not by the session, so it is handed
     // in rather than reached for — and ICardContext stays six methods wide.
     internal WatchCardView _watch = null!;
-    // The World theme's Travels tab body, on the widget's own misc card (World PR 1).
-    internal TravelsView _travelsView = null!;
+    // The widget's own TravelsView was here (World PR 1) and went with the World card on
+    // 2026-09-05 (cut 2). NewTravelsView() below is untouched: two hosts, two instances.
     // The collapsed HUD bar's contents (SA-1). Same shape as _watch: what it cannot
     // answer from a snapshot — the cue map, and the two windows a chip double-click
     // opens — is handed in, and it is not a card so it takes no ICardContext.
@@ -133,8 +133,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // hides nothing — WHEN the bar is on screen stays here (trap 15).
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
             ToggleBreakout, () => ShowProgressWindow());
-        // The Travels tab's body; WorldThemeCard.Build below reads this same instance.
-        _travelsView = new TravelsView(this);
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -171,15 +169,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             popOut: () => ShowGearLootWindow(),
             bringWindowForward: () => _gearLootWindow?.Activate(),
             bodyCap: own => ThemeBodyCapHost.CapFor(this, LootSection, own));
-        // THE QUESTS CARD WAS BUILT HERE UNTIL 2026-09-05 (HUD subtraction cut 1). The
-        // theme HOST survives below — the Quest Tracker window still hands its placement
-        // back and forth with the openers — but there is no card for it to be inline in.
-        _worldCard = WorldThemeCard.Build(   // World PR 3: Travels Full, Map/Camps/Path Glance
-            MiscSection, MiscBody, MiscPopOut, _worldHost,
-            newTravels: () => _travelsView, currentZone: () => CurrentZoneName,
-            runningTimers: () => _spawnTimers.Snapshot(DateTime.Now).Count,
-            popOut: () => ShowWorldWindow(), bringWindowForward: () => _worldWindow?.Activate(),
-            bodyCap: own => ThemeBodyCapHost.CapFor(this, MiscSection, own));
+        // THE QUESTS AND WORLD CARDS WERE BUILT HERE UNTIL 2026-09-05 (HUD subtraction
+        // cuts 1 and 2). Both theme HOSTS survive below — each window still hands its
+        // placement back through one — but neither has a card to be inline in.
 
         BuildSortStrips();
         // Before the watcher's startup replay, so already-logged charms classify with
@@ -416,8 +408,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // contract is that it draws a line INSTEAD of a body.
         var expand = Environment.GetEnvironmentVariable("EQBUDDY_EXPAND");
         if (expand == "1")
-            foreach (var ex in new[] { CombatSection, HealingSection,
-                         TrackedSection, MiscSection })
+            // MiscSection was the fourth member until 2026-09-05 (cut 2) and the only THEME
+            // card in it, so themeBodyCap now answers the floor on a bare EXPAND=1 launch —
+            // correctly, and the E2E body-cap scenarios name their card instead.
+            foreach (var ex in new[] { CombatSection, HealingSection, TrackedSection })
                 ex.IsExpanded = true;
         else if (!string.IsNullOrWhiteSpace(expand))
         {
@@ -643,7 +637,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // appends every catalog key and then looks each one up in this map, and a key in
         // one and not the other throws on STARTUP, for everybody.
         ["motes"] = MotesSection,
-        ["misc"] = MiscSection,
+        // …and no "misc" row since cut 2, by the same pairing rule as "quests" above.
     };
 
     /// <summary>Apply saved card order + hidden set (OVERLAY-001..003). Hidden cards keep collecting.</summary>
@@ -2011,8 +2005,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// still the thing that knows which room the next opener lands on, and the window's
     /// own tab changes still ride back through it.</summary>
     internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultTab);
-    internal readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultInlineTab);   // World PR 3
-    internal ThemeCardView<WorldTab> _worldCard = null!;
+    /// <summary>Same story since cut 2 (2026-09-05): no card, so Collapsed or Window.</summary>
+    internal readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultTab);
 
     /// <summary>Open (or front) the Progress window — the PROGRESS THEME's four tabs, and
     /// the only way to reach five surfaces that used to be five cards.</summary>
@@ -2629,10 +2623,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _progressCard.Render(s);
         _killsCard.Render(s);
         _lootCard.Render(s);
-        _worldCard.Render(s);
-        MiscHeader.Text = WorldSurface.LauncherSummary(zone: CurrentZoneName,   // counts, never countdowns
-            zonesVisited: s.Zones.Count, deaths: s.Deaths.Count,
-            runningTimers: _spawnTimers.Snapshot(DateTime.Now).Count);
+        // The World card's Render and its MiscHeader line ("Befallen · 2 zones · 1 death ·
+        // 3 timers") were the next two statements until cut 2. Nothing replaces the
+        // composite — see WorldTheme on why Camps/Path carry no badge. Named by I-5.
         ApplySessionSubsections();
 
         // Perf audit #1: identical content was re-rendered every tick — hundreds of
@@ -4220,23 +4213,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     private void OnWorldWindow(object sender, RoutedEventArgs e) => ShowWorldWindow();
 
-    // Host learns the room first, card gives the body up — other themes' handshake (PR 3).
+    // The host learns the room first; there is no card to take the body from since cut 2,
+    // so the handshake is one-sided. The three `_worldCard?.Sync()` calls went with the
+    // field — all null-conditional, which is why I-5 could say this method is unchanged.
     internal void ShowWorldWindow(WorldTab? tab = null, string? spawnZone = null)
     {
         _worldHost.OpenWindow(tab);
         if (_worldWindow is { IsLoaded: true })
         {
             if (tab is { } t) _worldWindow.SetTab(t);
-            _worldCard?.Sync();
             _worldWindow.Activate();
             return;
         }
         var w = new WorldWindow(this, spawnZone) { Owner = this };
         w.TabChanged += t2 => _worldHost.SelectTab(t2);
         w.Closed += (_, _) =>
-            { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; _worldHost.WindowClosed(); _worldCard?.Sync(); };
+            { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; _worldHost.WindowClosed(); };
         _worldWindow = w;
-        _worldCard?.Sync();
         if (tab is { } t3) w.SetTab(t3);
         w.Show();
     }

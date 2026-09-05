@@ -97,6 +97,19 @@ internal static class DebugHooks
             w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(() => w.ShowWorldWindow(WorldTab.Routes),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        // The theme's own name, added 2026-09-05 with HUD subtraction cut 2 — and it is
+        // the cut that made it necessary rather than tidy. Three of the four World rooms
+        // already had a hook (MAP / SPAWNS / TRAVEL); TRAVELS had none, because it was the
+        // one room the widget drew itself, so `EQBUDDY_EXPAND=1` reached it for free. With
+        // the card gone there was no way for a test or a shot to put the Travels body on
+        // screen at all — trap 22, a surface with no fixture state reading as reviewed
+        // anyway. "1" opens the World window on its default room (Travels); a tab key
+        // (map / spawns / travel / misc, or any alias TabForKey answers) opens it there.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_WORLD") is { Length: > 0 } worldTab)
+            w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(
+                () => w.ShowWorldWindow(WorldSurface.TabForKey(worldTab) ?? WorldSurface.DefaultTab),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         // EQBUDDY_INVENTORY and EQBUDDY_GEARLOCKER both open the same TAB now — the two
         // windows merged on 2026-08-20. Kept as separate names because both appear in
         // shot fixtures and docs, and a hook that silently stops working is worse than a

@@ -79,17 +79,10 @@ public class WorldThemeTests
         Assert.Null(WorldTheme.Tabs(null, deaths: 0).Single(h => h.Tab == WorldTab.Map).Value);
     }
 
-    /// <summary>A Glance line is drawn for the three Glance tabs and for nothing else.
-    /// Drops never reaches the inline card at all, so it has no line — and the assertion
-    /// that it answers empty is the one that says the card cannot half-draw it.</summary>
-    [Fact]
-    public void GlanceLinesExistForTheThreeGlanceTabsAndNoOthers()
-    {
-        Assert.Equal("Map — Crushbone", WorldTheme.GlanceFor(WorldTab.Map, "Crushbone", 0, null, null));
-        Assert.Equal("Camps — 2 timers", WorldTheme.GlanceFor(WorldTab.Camps, null, 2, null, null));
-        Assert.Equal("Path — no route", WorldTheme.GlanceFor(WorldTab.Routes, null, 0, null, null));
-
-        Assert.Equal("", WorldTheme.GlanceFor(WorldTab.Travels, "Crushbone", 2, null, null));
-        Assert.Equal("", WorldTheme.GlanceFor(WorldTab.Drops, "Crushbone", 2, null, null));
-    }
+    // `GlanceLinesExistForTheThreeGlanceTabsAndNoOthers` WAS HERE and went with
+    // `WorldTheme`'s glance family on 2026-09-05 (HUD subtraction cut 2). A Glance line is
+    // what an INLINE CARD draws in place of a tab body it is too small for, and there is no
+    // World card — the window and the shell's room both draw every tab for real. Asserting
+    // the wording of a sentence nothing renders is trap 34's shape: a guard that cannot
+    // fail, reading as coverage.
 }

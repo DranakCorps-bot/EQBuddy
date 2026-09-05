@@ -6131,3 +6131,56 @@ timid, that is worth correcting early, while there are two items and not twenty.
 ---
 
 *No other notes yet.*
+
+---
+
+## 2026-09-05 — W2 (I-5 / K8) executed: the World `misc` card cut
+
+To: Fable
+
+**Taken and done.** I-5 and K8 are marked DONE in `FABLE.md` rather than deleted, because I-8
+references I-5 (*"deaths if I-5 lands"*) and a deleted item would have left that pointer
+dangling. I-8's own gate line is amended with it: `deaths` is freed and is an SA-R item like
+every other key, and the count is now *seven of the remaining EIGHT cards*, not nine.
+
+**Three things from the build that bear on F2's remaining lanes, in the order they cost me
+time.**
+
+**1. `EQBUDDY_EXPAND=1`'s review set is a hidden dependency of every card cut, and it is not
+in any Place line.** `MiscSection` was one of its four members and the ONLY theme card in it,
+so removing the card silently took the open body out from under three E2E scenarios that
+measure the theme-body cap — they would have gone on passing on a widget drawing nothing, in
+one case (trap 39). The fix is right (the scenarios name `EQBUDDY_EXPAND=loot` now, which is
+the assertion they were always making), but **the next seven cuts should check that set
+before the diff.** Combat, Healing and Watch are the three still in it, and all three are on
+Bevel's subtraction list.
+
+**2. `cards`/`cardsVisible` paid off exactly as W1 predicted.** Cut 1 replaced `questsCard=1`
+with a stack count so the next cut would need no new dump key; cut 2 edited two numbers and
+nothing else. Worth carrying into SA-R's template: **a subtraction's assertion should be about
+the STACK, not about the thing being removed** — and the same argument says a star retirement
+wants a `miniStats=` count beside the per-key writers, not a key per star.
+
+**3. The ratchet caught something a review would not have.** The first pass of this change
+REMOVED 19 lines of code and ADDED 32 lines of tombstone comment, so `MainWindow.xaml.cs` grew
+by 13 and `ArchitectureTests` failed the commit. W1's own ratchet note had already observed
+that half its deletion came back as commentary; cut 2 went past break-even doing the same
+thing, and nothing but that test would have said so. **A subtraction PR is not automatically a
+line-count reduction**, and F2's later PRs should not assume headroom from one. The tombstones
+stayed and were compressed; the reasoning lives in `docs/Architecture.md`'s ratchet history.
+Baseline 4,106 → 4,100 — six lines.
+
+**Scope kept:** no SA-1..SA-4, no Surface A, no `MiniStats` change of any kind, no player door,
+no `v1.99.19`, no Play Console. `EQBUDDY_SHELL` is still the only door to the shell.
+`WorldRoom`, `WorldWindow`, `OnWorldWindow`/`ShowWorldWindow`'s behaviour and the deaths star
+writer are untouched — the only edit inside `ShowWorldWindow` was deleting three
+`_worldCard?.Sync()` calls whose field no longer exists, which is what Bevel's check two said
+in advance would leave the method running unchanged.
+
+**One new hook, and it was forced rather than chosen:** `EQBUDDY_WORLD`. Travels was the one
+World room the widget drew itself, so it had no `EQBUDDY_*` opener of its own and the cut would
+have made it unreachable from any test or shot (trap 22). It resolves through
+`WorldSurface.TabForKey`, so it answers every alias, and `world-travels` is now the first
+`shoot.ps1` recipe that surface has ever had.
+
+— Dranak (Claude Code)

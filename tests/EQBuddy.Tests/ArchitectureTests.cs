@@ -166,7 +166,28 @@ public class ArchitectureTests
         // Bumped down to the MINIMUM that fits (4106 × 1.1 = 4516.6 against 4,516 lines),
         // by the same "one line and no more" rule as every entry above.
         //
-        // 4106 → 3965 on 2026-09-05 (Surface A / SA-1). **A LIFT again**, and the entry
+        // 4106 → 4100 on 2026-09-05 (HUD subtraction cut 2, the World card). **Six lines,
+        // and the small number is the interesting part.** The code that left is 19 lines —
+        // the card build block, the widget's own `TravelsView` field and construction, the
+        // `EQBUDDY_EXPAND` member, the SectionMap row, the `_worldCard` field, the render
+        // call, the `MiscHeader` launcher line and three `_worldCard?.Sync()` calls — and
+        // the first pass of tombstones came to MORE than that: the file grew 13 lines and
+        // **the ratchet failed the change**, which is the only reason anyone measured.
+        //
+        // That is the guard doing a job it was not obviously written for. Cut 1's own note
+        // above already said "the honest number is 19 lines, and it is much smaller than
+        // the deletion" because half of what left came back as commentary; here the same
+        // habit went past break-even. The tombstones stayed — a cut that cannot be found
+        // afterwards is what CLAUDE.md's "three ways back" and trap 55 both refuse — but
+        // they were compressed to a line or two each, with the reasoning kept HERE and in
+        // the surface files rather than repeated at every call site. `WorldThemeCard.cs`
+        // (60 lines) left the repo outright and is not in this sum; so did
+        // `WorldSurface.LauncherSummary`/`InlineModeFor` and `WorldTheme`'s glance family,
+        // in Core and UI.Shared.
+        //
+        // Minimum that fits again: 4100 × 1.1 = 4510 against 4,509 lines.
+        //
+        // 4100 → 3964 on 2026-09-05 (Surface A / SA-1). **A LIFT again**, and the entry
         // had ZERO headroom when the pass started — 4,516 against 4,516.6 — which is why
         // the collapsed HUD bar left rather than being edited in place. `HudBarView.cs`
         // took the chip builder, the divider trim and the per-tick rebuild; what stayed
@@ -174,12 +195,13 @@ public class ArchitectureTests
         // and not a `MainWindow.Hud.xaml.cs` partial, because this glob SUMS its matches
         // on purpose and a partial would have bought nothing.
         //
-        // Bumped down to the MINIMUM that fits the SERIES' final tree (3971 × 1.1 =
-        // 4368.1 against 4,367 lines), by the same "one line and no more" rule as every
-        // entry above. The number is set once, in the lift commit, and the promotion
-        // commit that follows spends six of the lines it freed — stated rather than
-        // hidden behind a comment trimmed to hit a rounder figure.
-        (@"EQBuddy/MainWindow*.xaml.cs", 3971),
+        // Bumped down to the MINIMUM that fits the MERGED tree (3964 × 1.1 = 4360
+        // against 4,360 lines), by the same "one line and no more" rule as every entry
+        // above. Cut 2 landed on `main` while this branch was in flight and the two
+        // changes touch different parts of the file, so the number is the one the MERGE
+        // produces rather than either branch's own — which is also why it is set once,
+        // here, instead of per commit.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3964),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

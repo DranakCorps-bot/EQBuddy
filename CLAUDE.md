@@ -1688,6 +1688,46 @@ Read this list before touching the areas it names. Every entry cost a release.
     on the 446 lines already committed, which is the argument for building it and the reason it
     is a follow-up rather than this change.
 
+61. **THE SCREEN IS A MUTEX NOTHING ENFORCED, AND `shoot.ps1`'S OWN STAND-DOWN IS WHAT TURNS A
+    BREACH INTO A RANDOM ROW FAILING MID-BATCH.** `FABLE.md` §4 says it plainly — *"The one hard
+    mutex is the SCREEN … Dranak enforces this by kick order, not by tooling"* — and a convention
+    with no interlock fails silently. The mechanism: `Get-Process EQBuddy` matches by PROCESS
+    NAME, so a second seat starting `shoot.ps1` stands down the first seat's **in-flight fixture
+    app**, mid-settle, and records its exe path for a relaunch it will perform with no
+    `EQBUDDY_APPDATA` — pointing a stray widget at the real profile. The first seat's shot then
+    reports *"no visible window matching 'EQBuddy — Gear' in process N"*. **Which row fails is
+    just whichever one was on screen when the other seat started**, which is why #306's batch
+    failed at `shell-gear-narrow`, `options-window` and `drops-window` across three runs and
+    **every one of them passed alone.** Nothing is wrong with those rows.
+    → **The diagnosis was already written down and read as a different bug.** `DECISIONS.md`
+    (2026-09-05, the W2 round) records *"another seat's EQBuddy was running on the same desktop
+    … multi-shot runs died at a different shell shot each time and every one of them passed
+    alone"* — a complete root cause, filed as a note beside a screenshot decision, while the ask
+    that went to Helm asked whether the harness needed a look. **Two seats reporting one symptom
+    in two files is how a solved problem stays open**; grep the channel files for the symptom
+    before opening an investigation into it.
+    → **Now guarded, in the harness rather than in the kick order:** a lock file held for the
+    batch (it cannot go stale — the handle dies with the process), plus a refusal when any
+    EQBuddy is already running out of a `bin\Release` / `bin\Debug` path, because `EQBuddy.E2E`
+    launches the same exe and takes no lock. **A player's EQBuddy never runs from a build
+    output**; that path is the discriminator, the same "what does the real thing actually write"
+    move `Core/GameWrittenLog` makes for log names (trap 48). The stand-down leaves those
+    processes alone even under `-Force`: closing another harness's app *is* the damage.
+    → **And the second half, which bites with no second seat at all: the readiness wait was
+    satisfied by the WRONG WINDOW.** Both `MainWindowTitle` and `MainWindowHandle` name one
+    window — "the first visible, unowned top-level window of the process", i.e. the widget — so
+    for every shot whose target is a satellite or a room the `MainWindowHandle -ne 0` escape
+    fired the moment the widget appeared, the 90-second deadline was dead code, and **the target
+    window's entire budget was `$Settle`: eight seconds, shared with the startup replay.** Every
+    hook in `DebugHooks` opens its window at `DispatcherPriority.ApplicationIdle` — starved for
+    exactly as long as the app is busy — and E-3 put a second full window (the shell, on every
+    launch since #316) into those same eight seconds. A budget that was generous is now a race.
+    It waits for the window `shot.ps1` will actually look for now, by the same exact-wins rule.
+    → **A batch no longer stops at the first bad row.** `$ErrorActionPreference = 'Stop'` made
+    one failure end the run *there*, leaving every later row unreachable — which is trap 53's
+    real cost, six dark days in which each session re-shot one image, got a picture and moved
+    on. The run still FAILS (a stale title must); it now names every failing row in one pass.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
@@ -1752,6 +1792,14 @@ the same change** — and if the surface cannot be staged, the honest move is th
 the map rows carry (*"This capture predates the World fold: the map is what you still get, its
 window chrome is not"*), not a picture nobody can check. It binds E-3 as an acceptance
 criterion. Check `docs/screenshots/` and grep the docs for the name first (trap 21).
+
+**It holds the screen, and since 2026-09-05 it says so rather than trusting you to.** A batch
+takes a lock file for its whole run and refuses to start when another one holds it, or when any
+EQBuddy is already running out of a `bin\Release` / `bin\Debug` path — which is what
+`tests/EQBuddy.E2E` looks like. That is not tidiness: two seats on one desktop fail a *random
+row* of each other's batch and both failures read as a defect in whatever was being reviewed
+(trap 61). `-Force` overrides the refusal; nothing overrides the rule that another harness's
+fixture app is never stood down.
 
 **`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe` — and since E-2c it is
 **the only capture surface in the repo.** There used to be a second one: the Linux/macOS

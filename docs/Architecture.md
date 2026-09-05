@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 3,971 | 4,367 | 4,368 | 1 |
+| `EQBuddy/MainWindow*.xaml.cs` | 3,964 | 4,360 | 4,360 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -199,9 +199,27 @@ MINIMUM that fits (4,106 × 1.1 = 4,516.6 against 4,516). **Deleting a surface b
 extracting one** — but only the lines that actually leave count, and here fewer left than
 it looks.
 
-**Lowered 4,106 → 3,965 on 2026-09-05 (Surface A / SA-1, the collapsed HUD bar), with
-ZERO headroom on the row when the pass started.** 4,516 against 4,516.6 is not a squeeze,
-it is a stop, and it is exactly why the plan specified a lift rather than an edit in
+**Lowered 4,106 → 4,100 on 2026-09-05 (HUD subtraction cut 2, the World card), and six
+lines is the whole story — the first draft of this change made the file BIGGER.** The code
+that left is 19 lines: the card build block, the widget's own `TravelsView` field and its
+construction, the `EQBUDDY_EXPAND` member, the `SectionMap` row, the `_worldCard` field,
+the render call, the `MiscHeader` launcher line and three `_worldCard?.Sync()` calls. The
+tombstones written to record all of that came to 32, so `MainWindow` grew by 13 and **the
+ratchet failed the commit** — which is the only reason anybody counted.
+
+**That is the entry worth reading, not the number.** The note above already observed that
+half of cut 1's deletion came back as commentary; cut 2 went past break-even doing the same
+thing, and nothing but this test would have said so. The tombstones stayed — a cut nobody
+can find afterwards is what CLAUDE.md's "three ways back" and trap 55 exist to refuse — but
+they were compressed to a line or two each, with the reasoning kept in this file and in the
+surface files instead of repeated at every call site. `WorldThemeCard.cs` (60 lines) left
+the repo outright and is not in this sum, and neither are `WorldSurface.LauncherSummary` /
+`InlineModeFor` or `WorldTheme`'s four glance methods, all of which had the cut card as
+their only caller. Minimum that fits: 4,100 × 1.1 = 4,510 against 4,509.
+
+**Lowered 4,100 → 3,964 on 2026-09-05 (Surface A / SA-1, the collapsed HUD bar), and the
+row had ZERO headroom when the pass started.** 4,516 against 4,516.6 is not a squeeze, it
+is a stop, and it is exactly why the plan specified a lift rather than an edit in
 place: the bar's chip builder, its divider trim and its per-tick rebuild moved into
 `EQBuddy/HudBarView.cs`, and what stayed is WHEN the bar is on screen — the host's job,
 per trap 15. It is a **view class, not a `MainWindow.Hud.xaml.cs` partial**, because this
@@ -209,9 +227,10 @@ glob sums its matches on purpose and a partial leaves exactly as much untestable
 logic as before. Its cell count was pinned from `tests/EQBuddy.E2E` (`hudCells`) and
 proved green on the pre-move tree first, since the WPF layer has no unit tests and that
 assertion is the only thing between a move and a silent regression. New baseline is once
-more the MINIMUM that fits (3,971 × 1.1 = 4,368.1 against 4,367) — measured against the
-whole series' final tree, since the promotion commit that follows the lift spends six of
-the lines it freed on the re-keyed breakout gate.
+more the MINIMUM that fits (3,964 × 1.1 = 4,360 against 4,360), measured on the merged
+tree: cut 2 (above) landed while this branch was in flight, and the two changes touch
+different parts of the file, so the number here is the one the MERGE produces rather than
+either branch's own.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

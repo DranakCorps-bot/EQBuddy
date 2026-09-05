@@ -17,6 +17,124 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (T1 — the `shoot.ps1` intermittent full-batch look)
+
+- **Diagnosed the intermittency as a CROSS-SEAT COLLISION rather than a per-shot defect, and
+  fixed it in the harness instead of in the kick order.** `Get-Process EQBuddy` matches by
+  process name, so a second seat's `shoot.ps1` stands down the first seat's in-flight fixture
+  app; the row that fails is whichever was on screen at that moment, which is exactly why
+  `shell-gear-narrow`, `options-window` and `drops-window` failed across three runs of #306's
+  batch and each passed alone. The other way: leave it to `FABLE.md` §4's kick-order convention
+  and treat the failures as flakes. Declined — a convention with no interlock has now cost two
+  batches, and the acceptance criterion this repo leans on cannot be the thing that is unreliable.
+  `scripts/shoot.ps1`, `CLAUDE.md` trap 61.
+- **The guard REFUSES rather than waits.** A lock file held for the batch (it cannot go stale —
+  the handle dies with the process), plus a refusal when any EQBuddy is already running from a
+  `bin\Release` / `bin\Debug` path, since `tests/EQBuddy.E2E` launches the same exe and takes no
+  lock. The other way: queue and wait for the holder. Declined for now because a shoot batch is
+  ~45 minutes and a silent 45-minute block is worse than a message naming the holder's pid;
+  `-Force` is the override. **This is the OPPOSITE call from `UI.Shared/SingleInstance`** on
+  purpose — there a widget that will not launch is worse than two of them, here a batch that
+  runs anyway corrupts someone else's acceptance criterion at a random row.
+- **A build-output PATH is the discriminator for "not the player's app".** The other way: read
+  each process's `EQBUDDY_APPDATA` and check for a temp profile. Declined — reading another
+  process's environment from PowerShell is WMI-shaped and fails on access-denied, while a
+  player's EQBuddy never runs from `bin\Release` and a harness's always does. Same move
+  `Core/GameWrittenLog` makes for log names (trap 48).
+- **The batch now CONTINUES past a failed row and exits 1 with a summary, instead of stopping at
+  it.** The other way: keep `$ErrorActionPreference = 'Stop'` ending the run there, on the
+  argument that a stale title should fail loudly. Declined: it does still fail loudly, and
+  stopping is what left ~25 rows unreachable for six days across four releases (trap 53) while
+  every session that re-shot one image got a picture and moved on. One run now names every
+  stale row rather than the first.
+- **Changed the readiness wait to wait for the shot's own window, and made the change unable to
+  be worse than today.** It was satisfied by the widget on every satellite/room shot, so the
+  90-second deadline was dead code and the target's whole budget was the 8-second settle. On a
+  miss the new code does not throw — it falls through to the capture exactly as before, so it
+  can only ever wait longer, never fail where the old code succeeded. The other way: raise
+  `$Settle`. Declined — a bigger guess is still a guess (trap 56's third round).
+- **Patched the harness without running a batch to verify it, and said so rather than holding
+  the finding.** SA-1 owns the desktop; running the batch is precisely the collision this change
+  is about. Verified what could be verified without the app: both scripts parse, `-List` still
+  enumerates all 84 shots, the two new window helpers were exercised against a real 1×1 probe
+  window (exact title, substring, wrong title, wrong pid, and the em-dash path), and the lock
+  was proved to refuse a second process and to name the holder. The other way: file the
+  diagnosis only and leave the patch to a screen-holding lane. Declined because the diagnosis
+  without the guard is what the last two rounds already produced. **The next lane that holds the
+  screen runs the batch first** — named in the Helm ask, not left implicit.
+- **`shot.ps1`'s `GetWindowText` P/Invoke bound the ANSI entry point** (no `CharSet`), while
+  `shoot.ps1`'s own copy of the same import says `CharSet.Unicode`. Five shot rows have matched
+  on em-dash titles since E-3. Fixed rather than left as a latent, machine-dependent risk; it is
+  not claimed as a cause of the reported failures.
+- **`docs/screenshots/quest-tracker.png` is STILL left stale** (880×658 vs a committed 880×868),
+  and this is the second round it has been named in. The other way: re-shoot it here. Declined —
+  it needs the screen, which this pass explicitly does not have. Carried as a named follow-up in
+  `FABLE.md` I-14 rather than dropped, alongside the 17 committed illustrations that no longer
+  match what `main` renders.
+
+## 2026-09-05 (HUD subtraction cut 2 — the World `misc` card, lane-w)
+
+- **Deleted `WorldSurface.LauncherSummary` / `InlineModeFor` and `WorldTheme`'s four glance
+  methods instead of leaving them.** Could have kept them — they are pure, tested and cost
+  nothing to run — but the cut card was every one of their callers, so their tests would have
+  gone on asserting the wording of sentences nothing renders, which is trap 34's shape (a
+  guard that cannot fail reading as coverage). Exactly what W1 did to `QuestSurface`'s three
+  inline members hours earlier. `src/EQBuddy.Core/WorldSurface.cs`,
+  `src/EQBuddy.UI.Shared/WorldTheme.cs`.
+- **Deleted `WorldSurface.AbsorbedCardKeys` and `ThemeCardKey` rather than leaving the fold's
+  record in place.** The alternative was to keep them as history and drop only the
+  `SectionFoldIdempotenceTests` row. But a fold may only name keys that are no longer cards —
+  that guard's own premise (trap 55, #252) — and no `FoldThemeSections` call ever read these
+  two, uniquely among the five themes, because this theme absorbed one card and kept its key.
+  A fold record with no reader and a false premise is a hole waiting for the next regression.
+- **Added `EQBUDDY_WORLD` rather than re-pointing the E2E Travels assertions at nothing.**
+  Travels was the one World room the widget drew itself, so it was the one room with no
+  `EQBUDDY_*` hook — and the cut would have left it unphotographable and unassertable while
+  reading as reviewed (trap 22). Could have dropped the assertions instead; that trades a
+  covered surface for a smaller diff. `src/EQBuddy/DebugHooks.cs`, and `world-travels` is now
+  the first `shoot.ps1` recipe the Travels tab has ever had (illustration lock).
+- **Moved the theme-body-cap E2E scenarios onto `EQBUDDY_EXPAND=loot` instead of adding a
+  theme card back to the `EQBUDDY_EXPAND=1` review set.** World was the last theme card in
+  that set, so three scenarios silently lost the open body they were measuring. Restoring one
+  would have kept the tests unchanged and left them depending on somebody else's list; naming
+  the card is the assertion those tests were always making. One of the three needed a new
+  `lootInline` assertion or it would have passed on an empty widget (trap 39).
+- **Kept the tombstone comments after the ratchet failed the change, and compressed them
+  rather than deleting them.** First pass removed 19 lines of code and added 32 of
+  commentary, so `MainWindow.xaml.cs` GREW by 13 and `ArchitectureTests` refused it — the
+  guard doing a job it was not written for. Could have cut the comments entirely for a bigger
+  ratchet drop; a cut nobody can find afterwards is what CLAUDE.md's "three ways back" and
+  trap 55 both refuse, so the reasoning moved to `docs/Architecture.md`'s ratchet history and
+  the call sites kept a line each. Baseline 4,106 → 4,100.
+- **Removed `TravelsView`'s own "Drop camp marker" row, which was one line outside the
+  scoped cut.** Its doc comment named the inline card as its reason (*"lives here so the
+  inline Full Travels card calls the same handler"*), and both surviving hosts pin their own
+  copy as chrome — so on the World window's Travels tab the affordance had been drawn twice
+  since the World fold, in a window no committed illustration had ever photographed. Could
+  have left it as a pre-existing defect out of scope; that would have shipped the new
+  `world-travels` capture with a visible duplicate in it, which the illustration lock makes
+  worse rather than better. Found by the shot, not by the diff. `src/EQBuddy/TravelsView.xaml.cs`.
+- **Re-shot only the images this change actually alters, not the whole batch.** Every widget
+  shot, `options-cards` and the new `world-travels`; the shell and window shots that a
+  re-run changes only through the fixture's shifting clock are left alone. The alternative
+  — commit every re-shot PNG — is ~30 more binaries of pure timestamp churn in a PR two
+  agents have to read. **The full batch could not be completed in one invocation regardless:
+  another seat's EQBuddy was running on the same desktop and `shoot.ps1` stands the running
+  app down and relaunches it, so multi-shot runs died at a different shell shot each time
+  and every one of them passed alone.** Screen work is meant to be mutexed across seats
+  (`FABLE.md`'s T-kick note); this is the first time that has bitten, and it is reported in
+  the last-look ask rather than presented as a green batch.
+- **Rewrote README's widget-card caption to name what a SUBTRACTION costs, rather than only
+  updating the list.** It still described a ten-card widget after cut 1. The honest version
+  has to say the thing the fold rule does not cover: a card that leaves this way has no row
+  in Options → Cards & windows at all, which is the gap both cuts knowingly leave. `README.md`.
+
+---
+
+---
+
+---
+
 ## 2026-09-05 (Surface A / SA-1 — collapsed HUD numbers, lane W)
 
 - **The heal-vs-damage dominance signal is derived PURELY from event totals, anchored on the

@@ -781,6 +781,14 @@ Per the task's own framing, named so nobody widens the diff by inference:
 
 ### World `misc` — I-5's two checks, run (Bevel, 2026-09-05)
 
+> **TAKEN 2026-09-05 by Claude — W2 is built and filed as its own PR** (HUD subtraction
+> cut 2). Both verdicts held in the build: the card's only body was `TravelsView`, and the
+> `World…` row needed no change. **Left in place rather than deleted**, against the
+> take-then-delete contract, because three live things cite this item by name — `FABLE.md`'s
+> I-5, `HELM.md`'s sign, and the tombstone comments in `OptionsViewModel`/`WorldSurface` —
+> and a mailbox delete would strand all three. Nothing here is still planned; say so in
+> `BEVEL-FEEDBACK.md` if you would rather it went.
+
 **Priority:** `approved` (checks only — the gate item for W2; does not itself authorize W2)
 **Place:** `src/EQBuddy/MainWindow.xaml:31-38,661-680` (`MiscSection`/`MiscBody`/`MiscPopOut`,
 the `World…` context-menu `MenuItem`); `src/EQBuddy/MainWindow.xaml.cs:2635-2637`

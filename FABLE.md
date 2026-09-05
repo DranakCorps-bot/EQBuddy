@@ -633,9 +633,15 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
 
 - **I-3 · World's Drops tab** (Kills & Drops split, destination 1 of 4; Live §1 + Bevel §6).
 - **I-4 · History this-session half** (Live §1).
-- **I-5 · World `misc` card subtraction (cut 2)** — named by Bevel §3 as next candidate
-  pending two checks (MiscSection inline wording vs Travels tab; context-menu-row
-  permanence). Checks are cheap; not authorized until they run and Helm signs.
+- **I-5 · World `misc` card subtraction (cut 2)** — **DONE 2026-09-05.** Bevel ran both
+  checks (BEVEL.md, tip `d4092028`): parity holds by construction (one `TravelsView`, two
+  owners) and the `World…` row is structurally permanent — and check two established that
+  the `deaths` star was never behind `MiscSection` at all, which removed the premise of the
+  question. Helm SIGNED and unlocked W2 (HELM.md, ~2:05 PM CT); built and filed as its own
+  PR under the standing per-item gate. `misc` left `OverlaySections.Catalog`,
+  `MainWindow.SectionMap` and both settings lists; `AppSettings.MigrateWorldSections` is the
+  removal, and `WorldSurface.KeyFor(Travels)` is still `"misc"` because that is the WIRE key.
+  Ratchet 4106 → 4100.
 - **I-6 · E-2d Wine/CrossOver knobs** — ruled at #277 (*"drop three Options knobs; keep
   `TextRenderingPolicy` + `WineText`"*), parked since; the three settings verified still in
   `AppSettings.cs:89–110`. Keep `WineFonts.cs` + `TextProbeWindow.cs` per the signed plan.
@@ -649,9 +655,10 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
 - **I-8 · HUD Edit mode / Surface A** — the signed plan's "PR after the host": DPS/HPS
   glance chips, editable deadline chips, `MiniStats` star rehoming (loot/xp/money/motes,
   deaths if I-5 lands), `HiddenSections` → HUD-content-only migration, `MiniStats` seeds
-  the HUD, chip placement with three actors in the test names (trap 49). **It gates the
-  subtraction of seven of the remaining nine cards** (Combat, Healing, Watch, Buffs, Gear,
-  Motes, Progress — Bevel's inventory table) and, behind them, every window retirement.
+  the HUD, chip placement with three actors in the test names (trap 49). `deaths` is now
+  freed by I-5 landing, and is an SA-R item like every other key. **It gates the
+  subtraction of seven of the remaining EIGHT cards** (Combat, Healing, Watch, Buffs, Gear,
+  Motes, Progress — Bevel's inventory table; the eighth is Kills & Drops) and, behind them, every window retirement.
   Multi-PR by construction; needs its own Bevel pre-design (the chips are pixels) and its
   own Fable decomposition against that pre-design. → **Both exist now:** B3 (#324,
   Helm-signed 2026-09-05 ~1:30 PM CT) and the F2 decomposition above (SA-1…SA-4 + SA-R).
@@ -675,9 +682,25 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
 
 **Infrastructure / process:**
 
-- **I-14 · `shoot.ps1` intermittent full-batch look** — authorized as own look/ask by the
-  #306 sign, explicitly not auto-started. The batch is the acceptance criterion for every
-  lane above; six dark days (trap 53) is what an unreliable batch costs.
+- **I-14 · `shoot.ps1` intermittent full-batch look — TAKEN, DIAGNOSED AND GUARDED** (T1 lane,
+  2026-09-05; PR + `HELM-FEEDBACK.md` LIVE ASK). **Root cause is a cross-seat collision, not a
+  per-shot defect:** `Get-Process EQBuddy` matches by process NAME, so a second seat's
+  `shoot.ps1` stands down the first seat's in-flight fixture app mid-settle — the failing row is
+  whichever was on screen at that moment, which is why three unrelated rows failed across three
+  runs and each passed alone. **The answer was already in the repo**: `DECISIONS.md`'s W2 entry
+  states it in one line while the ask beside it asked whether the harness needed a look. §4's
+  *"enforced by kick order, not by tooling"* is now enforced by tooling: a batch-held lock file
+  plus a refusal when an EQBuddy is running from a `bin\Release`/`bin\Debug` path (which is what
+  `EQBuddy.E2E` looks like, and it takes no lock). A second, independent fragility was fixed with
+  it — **the readiness wait was satisfied by the widget rather than by the shot's own window**, so
+  the 90-second deadline was dead code and every satellite/room shot had an 8-second budget that
+  E-3's always-on shell now shares. Filed as trap 61. **Three follow-ups this could not do:**
+  (a) the batch was NOT run — SA-1 held the screen, and running it is the collision itself, so
+  the next screen-holding lane runs it first; (b) `tests/EQBuddy.E2E`'s `AppHarness` takes no
+  screen lock, so the guard is one-sided until it does (C# in `tests/`, needs the screen to
+  verify); (c) `docs/screenshots/quest-tracker.png` is stale for the second round (880×658 vs a
+  committed 880×868), and it sits with the 17 committed illustrations #306 measured as no longer
+  matching what `main` renders — a re-shoot lane, not a harness lane.
 - **I-15 · Empty-profile harness/shot** for true never-seen room empties — #303 ask 2 named
   the gap (harness seeds a character, so the real first-run state cannot be photographed);
   follow-up authorized "later, not merge gate".
@@ -774,13 +797,15 @@ Each kick is `claude -p` via Dranak, `--model opus` unless noted; each product P
   `DropsView` lift; `WorldRoom`; no `MainWindow` edits).
 - **K7 (Opus, fourth seat or `lane-d` after D2, after B2 signed):** S3 — History
   this-session, respecting the signed Home/Live boundary (no combat fields by construction).
-- **K8 (Opus, `lane-w` after W1 merges + I-5 checks + Helm):** W2 — World misc card cut.
+- ~~**K8 (Opus, `lane-w` after W1 merges + I-5 checks + Helm):** W2 — World misc card cut.~~ **DONE 2026-09-05** — own PR, HELM-FEEDBACK last-look filed. Widget is eight cards.
 - **K9 (Sonnet, Bevel, after W1+S1 merge):** B3 — HUD Edit mode / Surface A pre-design
   (chips, Edit mode, star destinations, `MiniStats` seeding). B4 Settings IA may ride along.
 - **K10 (Fable, after B3 signed):** F2 — Surface A multi-PR decomposition into this file.
 - **K11 (Opus, `lane-w`, serial):** Surface A PRs per F2, each Helm last-looked; remaining
   card cuts follow as their gates clear; I-9 retirements close the arc.
-- **T-kicks (any idle seat, screen-mutexed):** T1 batch look (already authorized), T3
+- **T-kicks (any idle seat, screen-mutexed):** ~~T1 batch look~~ **DONE 2026-09-05** — own PR,
+  diagnosed as the cross-seat collision §4 predicted and guarded in the harness; the batch
+  itself still owes a run from a seat that holds the screen. T3
   terminology scanner (tests-only, no ask needed beyond PR last-look), T2 empty-profile
   harness when a screen slot is free.
 
