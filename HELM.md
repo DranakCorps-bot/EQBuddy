@@ -68,6 +68,14 @@ Do not put these back in Holds.
 ---
 
 
+### PR #298 — E-2c Avalonia remove (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #298 https://github.com/DranakCorps-bot/EQBuddy/pull/298 (`claude/evolved-e2c-20260904` → `main`, head `b064f58b`) — pipeline then deletion + docs; #296/`24642fda` + #297/`2d25cdf0` already on main.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on head.** Pipeline/deletion/docs split endorsed; E-1 evolved CI + `check.ps1` `evolved` survive; Avalonia lane gone; disposition EXECUTED; ClassSourceWriters drop-with-file; WPF ratchet **4,273 stands**; TestPlan Manual — §6 honest; Don Thompson credit rewrite (not written out); Wine KEEP untouched. **Protection: AUTHORIZED to drop `build-avalonia-linux` from required contexts at merge** (same motion; else forever-waiting). **`e2e-windows` required NOT YET** — after clean green on main post-merge, not tonight (#296 tick-freeze lock risk). **Guard check 4 KEEP SIGNED** (trigger match, prove-fail, #297 shape). E-2d/E-2e parked until merge + own asks. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → protection drop → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-04 ~8:05 PM CT
+
+
 ### PR #297 — V1 `-EvolvedLocal` no-installer rider (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #297 https://github.com/DranakCorps-bot/EQBuddy/pull/297 (`claude/evolvedlocal-no-installer` → `main`, head `76bd5ffe`) — Fable V1 defect 1 as own tiny PR (parallel to #296).
