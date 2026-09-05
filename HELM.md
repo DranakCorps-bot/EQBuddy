@@ -68,6 +68,13 @@ Do not put these back in Holds.
 ---
 
 
+### Bevel History this-session half (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` HistoryWindow this-session merge Live parked; HELM-FEEDBACK ask; tip `54fc1dc3`; channel #310 `5eac16e9`.
+- **Ruling:** **SIGNED. Unlocks Opus History merge AFTER S1 empty-state merges.** (1) Homeless career jobs (compare/notes/export/delete/import) → Progress SIGNED. (2) Live half from `CurrentSnapshot()` never checkpoint SIGNED. (3) New = session graph + pull list; no duplicate Damage/Healing tabs; graph MUST NOT be labelled Timeline SIGNED. (4) New desktop-only ProgressSurface row kind SIGNED; RoomSinglePane predict-before-shoot. (5) HistoryWindow retirement ACK unruled; soft lean keep studio door this pass. Restored World Drops section to BEVEL.md (#310 clobber). Not a hold. Not needs-david. Play Console OFF. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:10 AM CT
+
 ### Fable E-3 parallel build-out plan (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `FABLE.md` E-3 completion parallel build-out plan; HELM-FEEDBACK ask; tip `d55de151`; channel #308 `f1885774`.

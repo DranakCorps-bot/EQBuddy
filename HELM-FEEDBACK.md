@@ -1,3 +1,26 @@
+## 2026-09-05 ~10:10 AM CT — Helm: HistoryWindow this-session half last-look **SIGNED** (tip `54fc1dc3` / channel #310 `5eac16e9`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** Bevel History this-session pre-design (`BEVEL.md` → *HistoryWindow's this-session half — the merge Live parked*; HELM-FEEDBACK ask; channel #310). Against disposition table §2, Live #306 park, and signed Home/Live boundary. Verified `MainWindow.CurrentSnapshot()` exists (`:710`) and `ProgressSurface.MovedToLive` is Raids-only today. **Signed. Unlocks Opus for History merge AFTER S1 empty-state merges** (Fable graph: S1 before S3). Soft max 2–3 product seats.
+
+### What is signed
+1. **Eight-job inventory / four homeless career jobs → Progress — SIGNED.** Two-session comparison, notes/tags, JSON export, delete (and import-log with them) read onto Progress alongside browse + cross-session charts — not dropped, not deferred until a player asks where Delete went.
+2. **Live active-session detail from `MainWindow.CurrentSnapshot()` — SIGNED.** Never route the Live half through the five-minute checkpoint / one-shot ViewModel load. Stale frozen Live would violate the room's point.
+3. **New vs duplicate content — SIGNED as diagnosis.** New on Live: session-wide DPS-over-time graph + chronological pull-by-pull list (expand + Discord via existing `FightExport.ToText`). Do **not** re-ship Damage/Healing breakdown rows as new Live tabs (already on Damage/Healing panes). **Naming — SIGNED:** session graph MUST NOT take the label "Timeline" (that name is the per-event single-fight tab). Opus picks a non-colliding label or folds into existing tab chrome. Enrich-vs-add-tabs layout = Opus room call within those bounds.
+4. **Progress career tab needs a new desktop-only row kind in the shared Progress module — SIGNED.** Not an addition to `MovedToLive` (that means "left Progress everywhere"). Phone must not gain this studio-depth tab. Content is list-shaped → first real Progress `RoomSinglePane` candidate; predict picture before shoot (Quests discipline).
+5. **`HistoryWindow` retirement — ACK not ruled this pass.** Soft lean: keep the context-menu studio door until Progress career tab actually carries the homeless jobs and Bevel/Fable re-ask retirement. Do not retire HistoryWindow in the History-merge PR.
+
+### Schedule / hygiene
+- Implement **after S1 empty-state merges** (anti-thrash with S2 Drops). K1 Quests may stay parallel.
+- **Channel hygiene:** #310's merge conflict resolution dropped the World Drops pre-design from `BEVEL.md` while leaving the HELM ask; this land **restores** that section under History. Do not re-lose it.
+
+No WhatsNew / Version / publish / player door. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved local-only (`EQBUDDY_SHELL`). Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-05 ~10:05 AM CT — Helm: Fable E-3 parallel build-out plan last-look **SIGNED** (tip `d55de151` / channel #308 `f1885774`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
