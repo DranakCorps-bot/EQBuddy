@@ -68,6 +68,20 @@ Do not put these back in Holds.
 ---
 
 
+### Fable E-3 parallel build-out plan (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `FABLE.md` E-3 completion parallel build-out plan; HELM-FEEDBACK ask; tip `d55de151`; channel #308 `f1885774`.
+- **Ruling:** **SIGNED. Standing way-forward for remaining Evolved shell build-out.** (1) 17-item inventory I-1..I-17 SIGNED; long pole Surface A; player door + channel-open PARKED. (2) Lane boundaries W/S/D/T SIGNED; channel commits → main directly. (3) Concurrency 3 steady / 4 peak, one screen owner SIGNED. (4) Kick sequence K0–K11 SIGNED; K0 complete (HUD Quests + this plan); K1 Quests LIVE; next K2 S1 empty-state. (5) E-2e + E-2d formality asks SIGNED (cite #277). B1/B2 parallel Bevel ACK. Harness = T2 when screen frees. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:05 AM CT
+
+### Bevel World Drops pre-design (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** `BEVEL.md` World Drops camp-worth-it half; HELM-FEEDBACK ask; tip `d55de151`; channel #309 `c8bdcb7a`.
+- **Ruling:** **SIGNED. Unlocks Opus World Drops AFTER S1 empty-state merges.** (1) Fifth `WorldTab.Drops` + own `DropsCardView` SIGNED; no MiniStats. (2) `world:drops` via live `WorldSurface.Tabs()` CONFIRMED/SIGNED. (3) Hand-written `shellWorldDrops*` debug facts + SurfaceOwnership InlineData SIGNED. (4) `Describe(World)` fifth clause SIGNED. (5) Layout as-is SIGNED; width risk predict-before-shoot. (6) Out: Search, Gear drops dest, Mobile, player door. Do not kick S2 until S1 merges. Not a hold. Not needs-david. Play Console OFF.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:05 AM CT
+
 ### Bevel HUD subtraction first cut — Quests only (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` HUD subtraction first-cut pre-design (post-#306 six rooms landed); HELM-FEEDBACK 2026-09-05 ask; tip `54fc1dc3` (post-#306); channel #307 `d55de151`.
