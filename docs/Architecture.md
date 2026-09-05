@@ -22,24 +22,32 @@ Measured 2026-08-14 at v1.82.0.
                     StatsSnapshot|  ONE immutable snapshot per UI tick
                                  |
             +--------------------+--------------------+
-            v                    v                    v
-      WPF MainWindow      Avalonia MainWindow    CompanionHost
-      (the widget)        (Linux/macOS)          (EQBuddy Mobile, LAN)
+            v                                         v
+      WPF MainWindow                            CompanionHost
+      (the widget)                              (EQBuddy Mobile, LAN)
 ```
 
-Sizes re-measured 2026-08-27 (World PR 0, `.cs` under each project, excluding `obj/` and
-`bin/`); the previous set had drifted far enough to mislead — UI.Shared had doubled and the
-Avalonia build tripled since they were written. It then drifted 10-15% again in FOUR DAYS,
-which is why `DocumentationSizeTests` now checks this table against the repo: a measurement
-nobody re-measures rots without anyone touching it.
+**There used to be a third arm on that fork.** `EQBuddy.Avalonia` — the cross-platform
+Linux/macOS widget, 68 files and 23,201 lines, the largest project in the repo — was deleted
+on 2026-09-04 (E-2c). EQBuddy Evolved is Windows-only, by the owner-approved charter; the
+final v1 build for Linux and macOS is preserved, downloadable and usable at `v1.99.18` and on
+the `legacy-v1` branch, which is where that code still lives. Nothing about it is lost, and
+nothing about it is maintained here. See [LEGACY-V1.md](../LEGACY-V1.md), and
+[docs/v2/avalonia-test-disposition.md](v2/avalonia-test-disposition.md) for what its 24 test
+files proved and where each assertion went.
+
+Sizes re-measured 2026-09-04 (E-2c, `.cs` under each project, excluding `obj/` and `bin/`).
+An earlier set had drifted far enough to mislead — UI.Shared had doubled and the Avalonia
+build tripled since they were written — and then drifted 10-15% again in FOUR DAYS, which is
+why `DocumentationSizeTests` checks this table against the repo: a measurement nobody
+re-measures rots without anyone touching it.
 
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 95 | 21,223 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
-| `EQBuddy.UI.Shared` | 87 | 9,014 | View-model/formatting shared by both UIs. **Framework-free — enforced by `ArchitectureTests`.** |
-| `EQBuddy.Companion` | 16 | 4,176 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** - and since 1.96.2 the Avalonia build hosts it too, which is what that was for. |
-| `EQBuddy` | 69 | 21,746 | The WPF widget and its windows. |
-| `EQBuddy.Avalonia` | 68 | 23,201 | Cross-platform build, trails by a few releases. Now the largest project in the repo — see the ratchet note on `MainWindow.cs`. |
+| `EQBuddy.Core` | 97 | 22,185 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
+| `EQBuddy.UI.Shared` | 95 | 9,897 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Companion` | 16 | 4,243 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
+| `EQBuddy` | 75 | 23,159 | The WPF widget and its windows. Now the largest project in the repo. |
 
 ## 2. Load-bearing invariants
 
@@ -100,33 +108,24 @@ file and not one was unreferenced. There is no free room in it.
 
 **`LogParser.cs` is the tight one now** — 14 lines. It is the next to need this treatment.
 
-**And the biggest file in the repo had no ratchet at all until 2026-08-19.**
-`EQBuddy.Avalonia/MainWindow.cs` was 5,127 lines then — some 700 more than the WPF widget
-this table was written for — and it was missed because the hotspots were picked while the
-WPF decomposition was the work in front of us, and nothing since had re-read the list. The
-Avalonia twin grew unwatched for the entire time the Windows one was being pulled apart.
-It was entered at its current size, because a ratchet's job is to stop growth today.
+**TOMBSTONE — the largest row in this table was the Avalonia widget, and it left with its
+lane on 2026-09-04 (E-2c). The row is gone; the lesson it bought is not, and it is the
+reason this paragraph stays.** That file had no ratchet at all until 2026-08-19, by which
+time it was 5,127 lines — some 700 MORE than the WPF widget the table was written for. It
+was missed because the hotspots were picked while the WPF decomposition was the work in
+front of us, and nothing since had re-read the list. **A hotspot list is a hand-written list
+(trap 30): it stops covering the repo the day the repo grows, and the file it stops covering
+is the one nobody is looking at.** Re-read this table when a project is added, not when
+something fails.
 
-**It came down for the first time on 2026-08-21, and the entry means something different
-now.** The file had drifted to 5,637 — legal inside the grant and THREE lines from failing —
-and the gear checklist came out into `EQBuddy.Avalonia/GearCardView.cs` (215 lines), the
-lift the 2026-08-19 note had named in advance. `CopyCommandButton` went with it, into
-`DesignSystem`, because a builder only the widget can call is a builder every lifted surface
-has to copy. The baseline came down to the honest 5,422 in the same commit — and the reason
-it had to come first rather than after is that the thing about to claim that room is the
-Inventory tab which closes the 1.98.1 parity gap.
+It came down twice under that ratchet before it was deleted (5,637 → 5,422 when the gear
+checklist lifted out; 369 more lines when the Progress fold made the two lanes the same
+shape), which is the ratchet doing exactly its job right up to the end.
 
-**And it came down again on 2026-08-22, for the reason the 2026-08-19 note had named.**
-That note said the Progress fold cost this file 164 lines because *"the WPF fold moved five
-card VIEWS to a window while this one only re-parented five card BODIES"*. PR A made the two
-lanes the same shape: the five bodies are five views on an Avalonia `IWidgetCard` seam
-(`ProgressCardView`, `MoneyCardView`, `MotesCardView`, `FactionCardView`, `RaidsCardView`),
-with `CardParts` carrying the row builder they share. 369 lines left the file.
-
-It was not decomposition for its own sake. Handing a `Control` built here to a window is a
-cross-`TopLevel` re-parent, which Avalonia has thrown on since 11.2 — the crash that reached
-Linux and macOS in every theme window, and the blocker that stopped Inline themes PR 1.
-Nothing is shared now, so nothing can be moved.
+**Nothing here inherited its headroom.** The WPF row stands at 4,273 with one line of room,
+the number it had before the deletion — a deletion that quietly raises somebody else's
+ceiling is the re-anchor this table exists to make someone argue for out loud, and E-3's
+decomposition budget is exactly that number.
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
@@ -134,14 +133,13 @@ Nothing is shared now, so nothing can be moved.
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
-| `EQBuddy.Avalonia/MainWindow.cs` | 5,229 | 5,566 | 5,752 | 186 |
 
 **Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
 the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any
 WPF change at all would have failed here; this one adds 64 lines of window plumbing —
 a policy call, a browser-open branch, a guarded settings write. The decision itself did
-leave, into `UI.Shared/LegacyPlatformUpdatePolicy`, where it is unit tested and shared
-with the Avalonia lane; what stayed cannot leave without moving the update banner, and
+leave, into `UI.Shared/LegacyPlatformUpdatePolicy`, where it is unit tested and was shared
+with the Avalonia lane while that lane existed; what stayed cannot leave without moving the update banner, and
 Phase 0 was told not to touch it. The bump is the MINIMUM that fits (4,273 × 1.1 = 4,700
 against 4,699), so it grants one line and keeps-if-it-fits intact. **The next WPF change
 lifts a surface** — there is no room left to argue with.
@@ -177,12 +175,11 @@ also ADDED ~75 lines of window plumbing (`ShowProgressWindow`, `NewProgressSurfa
 `SetMiniStat`), which is where that file already keeps every satellite's launcher. The
 surfaces move; the doors to them stay.
 
-Its Avalonia twin went the other way, 5,127 → 5,291, and was deliberately not re-baselined.
-The WPF fold moved five card VIEWS into a window; the Avalonia one only re-parented five
-card BODIES, which are still built and rendered in `MainWindow.cs` with an `IProgressHost`
-implementation new on top. That was the right call for the fold — it keeps "the tabs draw
-what the cards drew" literally true, with no rewrite to review — but it is not
-decomposition, and the table should not read as though it were.
+The Avalonia twin went the other way at the time — 5,127 → 5,291, deliberately not
+re-baselined — because that fold only re-parented five card BODIES where the WPF one moved
+five card VIEWS. **The lesson outlived the lane (deleted 2026-09-04): re-parenting is not
+decomposition, and a size table must not read as though it were.** A fold that leaves the
+building and rendering where they were has moved a reference, not a responsibility.
 
 **`SessionStats` is a GLOB entry as of 2026-08-18, and that is the interesting half.** It
 was a literal path, and `SessionStats` is a partial class — so `SessionStats.Tracked.cs`
@@ -282,7 +279,11 @@ clock is not news, and including one would wake every device on every pump.
 - A firewall prompts on first listen and a dismissed prompt fails silently from the
   device's side. Windows asks; macOS asks once and remembers; most Linux desktops need
   the port opened by hand, and the pairing window says so per platform.
-- Avalonia trails WPF by a few releases. It **does** host EQBuddy Mobile as of 1.96.2
-  (#208): same `CompanionHost`, same `CompanionSources` record, same 50 ms pump gated by
-  `CompanionPumpGate`, and `CompanionWiringTests` fails the build if a source the record
-  declares is left unwired here.
+- **One host, since E-2c (2026-09-04): the WPF widget.** The Avalonia build hosted EQBuddy
+  Mobile too from 1.96.2 (#208) — same `CompanionHost`, same `CompanionSources` record, same
+  50 ms pump gated by `CompanionPumpGate` — and the guard that a declared source is never
+  left unwired moved to the lane that ships it. `CompanionSourcesAreWiredTests` scans
+  `src/EQBuddy`'s `new CompanionSources { … }` from source and fails the build on a member
+  the record declares and the widget forgets. **Nothing checked the Windows lane's wiring
+  before that port**, which is the point of it — the deleted test guarded the build that was
+  about to go, not the one that ships the feature.

@@ -18,7 +18,7 @@ namespace EQBuddy;
 /// screenshot can see, because an absent control photographs as an unremarkable card.
 ///
 /// It is a class rather than a copied method for the reason the Avalonia twin
-/// (<c>EQBuddy.Avalonia/ImportReportView.cs</c>) already is: the rule *"offer Undo only
+/// (<c>EQBuddy.Avalonia/ImportReportView.cs</c>, deleted with that lane in E-2c) already was: the rule *"offer Undo only
 /// when the import actually changed something"* is a decision, and a decision copied into
 /// two cards is a decision that will disagree with itself. A <c>UIElement</c> has one
 /// parent, so each host builds its own instance — the same rule as the cards themselves.

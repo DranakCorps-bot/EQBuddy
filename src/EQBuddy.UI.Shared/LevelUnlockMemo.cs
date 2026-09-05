@@ -11,7 +11,7 @@ namespace EQBuddy.UI.Shared;
 /// is the kind of steady-state allocation perf audit #1 exists to remove.
 ///
 /// **It lives here because there were two of it.** `ProgressCardView` (WPF) and
-/// `EQBuddy.Avalonia/MainWindow` each carried the same three memo fields and the same
+/// `EQBuddy.Avalonia/MainWindow` (since deleted) each carried the same three memo fields and the same
 /// method, hand-copied — the shape CLAUDE.md warns about, and the one that carried #122
 /// and #152 to Linux and macOS after Windows had already paid for both. The immediate
 /// reason to extract it now is smaller and more concrete: the Progress THEME takes the

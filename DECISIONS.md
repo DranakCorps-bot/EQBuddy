@@ -15,6 +15,39 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-2c, the Avalonia deletion)
+
+- **`evolved-channel-guard.ps1` gained a fourth check — no workflow answers a `release:`
+  event — rather than just deleting `release-assets.yml`.** That file was the guard's own
+  named RESIDUAL: unreachable through `release.ps1` (checks 1 and 2 make the release itself
+  unreachable) but perfectly reachable by making a release BY HAND in the GitHub UI, after
+  which the first Evolved release ever published would have carried Linux and macOS
+  artifacts of a Windows-only product. The other way: delete the file and close the
+  residual paragraph, which the E-2 plan literally authorises and which is one line shorter.
+  It landed on the guard because deleting the thing without guarding the shape leaves the
+  mechanism exactly as blind as it was — the argument Helm signed for check 1's fourth token
+  on #297. Matched on the TRIGGER, not the filename, for the same reason that token matched
+  acts. Proven to fail at the pre-E-2c main tip `24642fda` (one problem, exit 1).
+  `scripts/evolved-channel-guard.ps1`.
+- **`e2e-windows` was NOT made a required status check while removing `build-avalonia-linux`
+  from the required list.** Dropping the Avalonia context is forced — the job is gone, so it
+  can never report and every future PR would wait on it forever. The other way, and the
+  tempting one: add `e2e-windows` in its place, since the whole disposition argument is that
+  E2E replaces the rendering coverage Avalonia used to run on a push, and leaving only
+  `build-and-test` required is a weaker bar than yesterday's. It landed on *not yet*: that
+  suite launches GUI apps and failed on #296 with a tick-freeze as recently as tonight, and
+  a required check that flakes blocks every merge in the repo, including the fix for the
+  flake. Reversible in one API call once it has a clean run of green. Named in the Helm ask
+  as the residual rather than left for someone to notice. Out-of-tree (branch protection).
+- **The `TestPlan` rows whose only holder was a deleted suite say `Manual — §6` and point at
+  the disposition doc, rather than being re-pointed at a plausible-looking survivor.** The
+  other way: cite the nearest Core/UI.Shared suite, which would have kept every row reading
+  **Auto** and cost nothing today. It landed on the honest mark because this file is the
+  contract for what EQBuddy is expected to do, and a row that names a guard which does not
+  cover it is worth less than a row that admits a human has to look — the same reason the
+  disposition doc has a ledger of six genuine losses instead of absorbing them.
+  `docs/TestPlan.md`.
+
 ## 2026-09-05
 
 - **`release.ps1 -EvolvedLocal` stops building the installer, and KEEPS the portable zip.**

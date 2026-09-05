@@ -12,8 +12,12 @@ link to them rather than growing this file.
 
 An always-on-top WPF widget that reads the EverQuest Legends `/log` file and reports
 your session. **Log-only, by principle**: never reads game memory, never phones home,
-never measures other players. A cross-platform Avalonia build tracks it a few releases
-behind. EQBuddy Mobile serves a phone/tablet over the LAN from inside `EQBuddy.exe`.
+never measures other players. **Windows-only since 2026-09-04** — the cross-platform
+Avalonia build that used to track it a few releases behind was deleted in E-2c and is
+preserved, downloadable and usable, at `v1.99.18` and on the `legacy-v1` branch
+([LEGACY-V1.md](LEGACY-V1.md)). One lane now; when a trap below says "both lanes", it is
+telling you what the bug cost, not what the repo contains. EQBuddy Mobile serves a
+phone/tablet over the LAN from inside `EQBuddy.exe`.
 
 **What it is becoming:** the personal operating companion for EverQuest Legends —
 private, local, personal, non-judgmental. Not a parser recap of what happened, and
@@ -44,9 +48,10 @@ instructions.
 that "it can run commands on that PC" was questioned):
 
 - **Its agent runs on a Linux VM with NO checkout of this repo**, and it will not clone
-  one. So nothing that needs the source tree runs there — including the two things a Linux
-  box would otherwise be perfect for, the Avalonia headless sheet captures and
-  `mobile-harness.ps1`.
+  one. So nothing that needs the source tree runs there — which used to be the argument
+  for asking it to run the Avalonia headless sheet captures. Those are gone with the lane
+  (E-2c, 2026-09-04), and so is the last reason a Linux box would have helped here:
+  everything that photographs this product now needs Windows.
 - **David's Windows PC IS reachable**, per-command, with David approving each one in the
   desktop app. `scripts/shoot.ps1 -List` has been run there successfully. So the Windows
   screenshot work is real — but every command costs David a click, which is the budget to
@@ -410,8 +415,7 @@ losing a ✦ with the wiki down), at no cost in Founder time.
 
 ```bash
 dotnet build EQBuddy.slnx -c Release
-dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release              # ~2,500 tests, seconds
-dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release
+dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release              # ~2,900 tests, seconds
 pwsh -NoProfile -File scripts/check.ps1                                      # all gates, one command
 ```
 
@@ -654,7 +658,7 @@ it.** If you find yourself porting a feature *to* the phone, stop: that is the s
 logic never went through the shared layer in the first place.
 
 **Breakout windows straddle the line and were built before the rule existed.**
-`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }` on WPF (the Avalonia twin is a deliberately smaller `{ Damage, Healing, Pet, Buffs }`; `DocumentationSizeTests` pins the WPF list — it caught the list going stale when `Progress` was ADDED, then failed again the moment `Progress` was REMOVED, which is a guard doing its job in both directions).
+`BreakoutKind` is `{ Damage, Healing, Pet, Watch, Loot, Buffs }` (`DocumentationSizeTests` pins this list — it caught it going stale when `Progress` was ADDED, then failed again the moment `Progress` was REMOVED, which is a guard doing its job in both directions; the deleted Avalonia twin carried a deliberately smaller set, and the two never had to agree).
 
 **`Progress` stopped being a breakout on 2026-08-25, deliberately** (Bevel's fold, Helm-signed
 2026-08-24; built on David's call). The tab-less 272×135 float is retired and the mini bar's xp
@@ -696,7 +700,7 @@ busier.
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` — data, like `ThemePalettes`; each UI composes it |
 | Icon geometry (and reward slot silhouettes) | `UI.Shared/IconPaths.cs` — vectors, never glyphs (#148, #166) |
 | The selectable pill (tabs, lenses, filter and sort strips) | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip` in each UI's `DesignSystem.cs`. **Never hand-build another one** — there are 8 `ToggleButton`s left in `MainWindow.xaml`/`BreakoutWindow.xaml` waiting to be converted |
-| What a Loot surface shows (slice, order, strips, empty wording) | `UI.Shared/LootPresentation.cs` — rows from `LootRows`, everything around them from here. Read by `EQBuddy/LootCardView.cs`, `EQBuddy/LootBreakoutView.cs`, `EQBuddy.Avalonia/LootCardView.cs` and both `MainWindow`s |
+| What a Loot surface shows (slice, order, strips, empty wording) | `UI.Shared/LootPresentation.cs` — rows from `LootRows`, everything around them from here. Read by `EQBuddy/LootCardView.cs`, `EQBuddy/LootBreakoutView.cs` and `MainWindow` |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
 
@@ -983,15 +987,18 @@ Read this list before touching the areas it names. Every entry cost a release.
     list is code that cannot be type-checked, so the enum has to be checked by hand — and
     the failure mode is never an error, it is a plausible picture of something else.
 
-31. **A capture surface must pin its own theme.** `AppTheme`'s brushes are process-wide
-    singletons and `AppThemeTests.EveryCatalogThemeAppliesCleanly` applies every theme in
-    the catalog, so a headless capture renders in whichever palette ran last — the first
-    EQBuddy Mobile capture came back in Turquoise while its seeded `settings.json` said
-    ParchmentBrass. Correctly rendered, real palette, wrong state, and only obvious if you
-    happen to know what the theme under review looks like.
+31. **A capture surface must pin its own theme.** `AppTheme`'s brushes were process-wide
+    singletons and the suite applied every theme in the catalog, so a headless capture
+    rendered in whichever palette ran last — the first EQBuddy Mobile capture came back in
+    Turquoise while its seeded `settings.json` said ParchmentBrass. Correctly rendered, real
+    palette, wrong state, and only obvious if you happen to know what the theme under review
+    looks like.
     → Same family as the profile isolation those captures already needed: **a capture's
-    entire output is a picture of whatever global state it found.** `WidgetSheetTests`
-    calls `AppTheme.Apply` before it shoots.
+    entire output is a picture of whatever global state it found.** The capture that earned
+    this went with the Avalonia lane in E-2c, so there is no guard here any more — which
+    makes it a rule to KEEP rather than one you have inherited. `shoot.ps1` is the surviving
+    capture surface and it takes `-Theme`; anything new that shoots must apply its palette
+    first rather than trusting the process it happens to run in.
 
 32. **The EQBuddy Mobile page NEVER re-fetches itself, so a page-side fix does not reach
     an open phone.** The socket reconnects forever with backoff; updating the PC restarts
@@ -1046,8 +1053,10 @@ Read this list before touching the areas it names. Every entry cost a release.
     the pre-fix tree, not merely that they pass on this one.
     → **And the same absence hides from a screenshot** (trap 29): a control that was never
     drawn photographs as an unremarkable panel. So `gearCopyCmd` goes into `EQBUDDY_EXPAND`
-    for WPF and `WidgetRenderTests` asserts the Avalonia twin — a picture can confirm the
-    affordance reads well, but only an assertion can say it exists.
+    and `EndToEndTests` asserts it against the real exe — a picture can confirm the
+    affordance reads well, but only an assertion can say it exists. (The Avalonia twin of
+    that assertion went with the lane in E-2c; the dump key is what survives, and it is the
+    half that was always about the build players run.)
 
 35. **An affordance the phone cannot honour is not parity, it is a lie with the right
     shape.** The desktop rule is "name a command, offer a ⧉ copy". Copying that literally to
@@ -1112,7 +1121,7 @@ Read this list before touching the areas it names. Every entry cost a release.
     the second half missing; the harness is what found it.
 
 39. **An assertion that compares `ToString()` of two objects can be comparing two TYPE
-    NAMES, and it passes forever.** `DropsRenderTests` proved the #211 fix ("the badge is a
+    NAMES, and it passes forever.** A render suite proved the #211 fix ("the badge is a
     clickable vector, not a glyph") by parsing the expected icon path and comparing
     `StreamGeometry.ToString()` on both sides. Avalonia's `StreamGeometry.ToString()` returns
     `"Avalonia.Media.StreamGeometry"` — so every icon equalled every other icon, and the
@@ -1123,7 +1132,7 @@ Read this list before touching the areas it names. Every entry cost a release.
     one was written *because of* a real bug, so it looked like the most trustworthy test in
     the file.
     → **Identity is a property you PUT on the object, not a string you hope it renders to.**
-    `DesignSystem.Icon` stamps the catalog name on `Tag` in both UIs; tests read that. And
+    `DesignSystem.Icon` stamps the catalog name on `Tag`; tests read that. And
     **every equality assertion deserves one negative** — `DoesNotContain("Phone", icons)` is
     what keeps it from going vacuous again.
 40. **A missing FONT WEIGHT does not fail — it gets SYNTHESISED, and the result looks like
@@ -1258,15 +1267,22 @@ Read this list before touching the areas it names. Every entry cost a release.
     1.99.4), and the inline theme card — the first host alive at the same time as the
     window — threw on its first run and blocked Inline themes PR 1 outright.
     → **Now guarded:** every host builds its own instance through a factory
-    (`NewProgressSurfaces()` on both lanes) and no host interface returns a `Control` it did
-    not just create. `SurfaceOwnershipTests` scans for the accessor shape and carries a
-    curated list of the two lanes that still have it (Gear & Loot, Kills & Drops) with the
-    reason and the PR that removes each — an exemption nobody can see is a blind spot, not
-    an exemption.
+    (`NewProgressSurfaces()`) and no host interface returns a `Control` it did not just
+    create. `SurfaceOwnershipTests` scans for the accessor shape and carries a curated list
+    of the two surfaces that still have it (Gear & Loot, Kills & Drops) with the reason and
+    the PR that removes each — an exemption nobody can see is a blind spot, not an
+    exemption.
     → **The general shape, and it outlives this toolkit bug: a method that returns a
     long-lived UI object is a transfer of ownership wearing a getter's clothes.** The WPF
     lane never had the crash because its cards were objects from the start, and "each host
     builds its own" cost nothing there either.
+    → **AND THE GUARD OUTLIVED THE LANE THAT FOUND IT.** E-2c deleted Avalonia; E-2b had
+    already re-pointed this scan at the five WPF hosts, because its first group read
+    `EQBuddy.Avalonia` only while its header claimed it covered both — one more line from
+    going silently vacuous. **Do not let the two exemptions be re-justified as "one lane, so
+    ownership does not matter."** A WPF `UIElement` has one parent too; there the symptom is
+    a surface silently vanishing rather than an exception, which is harder to notice, not
+    easier. E-3's shell becomes a second host for surfaces the widget still renders.
 
 46. **When a surface moves to a new host, check what the OLD host was doing for it every
     tick.** PR A moved the Progress rooms into views the window owns. The window already had
@@ -1538,15 +1554,22 @@ Read this list before touching the areas it names. Every entry cost a release.
     reported as a **Test Case Cleanup Failure** — so the test that FAILS is not the test
     that is wrong, and it is a different one every time (`MezTargets…`,
     `ClosingAndReopening…`, `MapCircleMenu…`). Nineteen of twenty-one classes carried the
-    attribute; `WindowZoomTests` did not, and two `[AvaloniaFact]`s were enough.
+    attribute; **one did not, and two of its tests were enough.**
     → **It read as three unrelated flakes for as long as CI was asked once per commit.**
     It only became one bug when PR #294 ran the same head nine times: 2 of 9 red on the
     Avalonia lane, on both Windows and Linux, green on every re-run. **A flake you meet
     once a day is a race you have not counted yet.**
-    → **Now guarded:** `[assembly: CollectionBehavior(DisableTestParallelization = true)]`
-    in `TestAppBuilder.cs`, not another `[Collection]` attribute — the constraint is a fact
-    about the SESSION, and a hand-labelled list stops covering the set the day the set
-    grows (trap 30). Costs nothing: 311 tests, 19 s either way.
+    → **The fix was `[assembly: CollectionBehavior(DisableTestParallelization = true)]`,
+    not another `[Collection]` attribute** — the constraint is a fact about the SESSION, and
+    a hand-labelled list stops covering the set the day the set grows (trap 30). It cost
+    nothing: 311 tests, 19 s either way.
+    → **TOMBSTONE, and the reason this entry is still here.** That suite was deleted in E-2c
+    (2026-09-04) with the Avalonia lane, so the guard is gone and nothing in the repo
+    re-teaches this. **The shape is not about Avalonia**: any test project sharing ONE
+    stateful thing — a headless session, a UI thread, a server, a fixed port — has this
+    exact race, and the tell is a flake that names a different innocent test each time.
+    E-3 adds test projects. When you write one that shares something, write the
+    assembly-level attribute in the same commit, not after the third flake.
 
 ## Tooling notes that cost time when ignored
 
@@ -1613,26 +1636,25 @@ the map rows carry (*"This capture predates the World fold: the map is what you 
 window chrome is not"*), not a picture nobody can check. It binds E-3 as an acceptance
 criterion. Check `docs/screenshots/` and grep the docs for the name first (trap 21).
 
-**`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe`. The Linux/macOS widget
-is photographed from its own test project instead, which until 2026-08-19 it could not be
-at all:
-
-```bash
-dotnet test tests/EQBuddy.Avalonia.Tests/EQBuddy.Avalonia.Tests.csproj -c Release --filter FullyQualifiedName~WidgetSheet -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_OUT=<dir>
-```
-
-`WidgetSheetTests` (opt-in, like `IconSheetTests`) seeds a snapshot and captures the widget
-with the cards open. It earned itself twice within ten minutes of existing: its first
-capture photographed **David's live profile** — spotted by the character name in the title
-bar, though the name is fine (see above); what made it wrong is that a capture surface was
-photographing an arbitrary, unseeded profile — and its second showed a rule name and its
-countdown drawn on top of each other, because a new child of a two-column `Grid` silently
-defaults to column 0.
+**`shoot.ps1` is Windows-only** — it drives the real `EQBuddy.exe` — and since E-2c it is
+**the only capture surface in the repo.** There used to be a second one: the Linux/macOS
+widget was photographed from its own headless test project, and both of those opt-in sheets
+(the widget, the icon sheet) went with the lane on 2026-09-04. Nothing is unphotographable
+as a result — everything they shot was the build that is now preserved on `legacy-v1` — but
+it does mean `shoot.ps1` carries the whole illustration lock alone.
 
 → **A capture surface needs `EQBUDDY_APPDATA` isolation MORE than an assertion does**, since
-its entire output is a picture of whatever profile it finds. Mirror `WidgetRenderTests`'
-constructor. `EQBUDDY_EXPAND` reached parity on 2026-08-26 (Inline themes PR B): both
-lanes take `1`, card keys (`loot,motes`), and a theme's room (`progress:raids`).
+its entire output is a picture of whatever profile it finds. That rule was learned the
+expensive way and it outlived the surface that taught it: the deleted widget sheet's very
+first capture photographed **David's live profile** — spotted by the character name in the
+title bar, though the name is fine (see above); what made it wrong is that a capture surface
+was photographing an arbitrary, unseeded profile. Its second showed a rule name and its
+countdown drawn on top of each other, because a new child of a two-column `Grid` silently
+defaults to column 0. `shoot.ps1` seeds its own throwaway profile for exactly this reason;
+**anything new that captures must do the same before it shoots.**
+
+`EQBUDDY_EXPAND` takes `1`, card keys (`loot,motes`), and a theme's room
+(`progress:raids`).
 
 ## Working on EQBuddy Mobile
 
@@ -1668,9 +1690,13 @@ has no unit tests — gets covered at all beyond pure arithmetic.
 extract it into `UI.Shared` and unit-test it there instead of fixing it in place. Both
 bugs that reached players on 2026-08-14 were sums. The WPF layer has no test project
 (see [docs/TestPlan.md](docs/TestPlan.md) §5), so this is the only way its logic gets
-covered at all. **If a fix exists in `UI.Shared`, both UIs must use it** — the Avalonia
-chip stacks shipped a hand-copied older version of the WPF anchor and carried #122 and
-#152 to Linux and macOS after Windows had already paid for both.
+covered at all. **A fix belongs in `UI.Shared`, not in the window** — and with one lane left
+that is easier to skip and no less true: the reason to lift a sum out is that the window
+cannot be unit-tested, which has nothing to do with how many windows there are. The old
+argument was drift (the Avalonia chip stacks shipped a hand-copied older version of the WPF
+anchor and carried #122 and #152 to Linux and macOS after Windows had already paid for
+both); the surviving argument is **coverage**, and E-3's shell is about to become a second
+consumer of everything in there anyway.
 
 **When MainWindow runs out of ratchet room, lift a surface out — don't split the file.**
 The hotspot entry is a glob and `ArchitectureTests` **sums** its matches, so another

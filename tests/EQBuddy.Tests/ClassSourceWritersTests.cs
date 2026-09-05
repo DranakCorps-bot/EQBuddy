@@ -47,21 +47,17 @@ public class ClassSourceWritersTests
         },
         {
             "src/EQBuddy/QuestChecklistView.cs",
-            "the manual path — ⚙ → Import achievements. It reads as 'the WINDOWS manual "
-            + "path' in the row below's company; it becomes the ONLY manual route when "
-            + "that one goes"
+            "the manual path — ⚙ → Import achievements, and since E-2c the ONLY manual "
+            + "route. It used to read as 'the WINDOWS manual path' beside an Avalonia twin"
         },
-        {
-            // **This row leaves with the FILE, in E-2c, and not before** — the discovery
-            // that set E-2b's boundary. Dropping it in the scanner pass turned
-            // `NoOtherFileParsesAnAchievementsDumpUnnoticed` red on the spot: that guard
-            // is a catch-all, so an un-listed file that still parses a dump is exactly what
-            // it exists to report, and it was right to. A row may only be dropped when the
-            // thing it names has stopped existing.
-            "src/EQBuddy.Avalonia/MainWindow.cs",
-            "the Linux/macOS manual path, hand-written separately from its WPF twin, "
-            + "which is precisely how a lane gets missed (#210)"
-        },
+        // The third row was `src/EQBuddy.Avalonia/MainWindow.cs` — the Linux/macOS manual
+        // path, hand-written separately from its WPF twin, which is precisely how a lane
+        // gets missed (#210). E-2b tried to drop it with the other scanner rows and
+        // `NoOtherFileParsesAnAchievementsDumpUnnoticed` went red on the spot: that guard
+        // is a catch-all, an un-listed file that still parses a dump is exactly what it
+        // reports, and it was right to. **A row may only be dropped when the thing it
+        // names has stopped existing** — which is now, with the file, in this commit.
+        // The catch-all is what proves the drop is clean rather than merely quiet.
     };
 
     /// <summary>
