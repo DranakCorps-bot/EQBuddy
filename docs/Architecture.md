@@ -130,7 +130,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 4,123 | 4,535 | 4,535 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 4,106 | 4,516 | 4,516 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
@@ -180,6 +180,24 @@ drifting the day one of them gains a column). The ~40 call sites in `MainWindow`
 unchanged through a one-line forwarder, so the diff is the extraction rather than every
 caller. New baseline is again the MINIMUM that fits (4,123 × 1.1 = 4,535.3 against 4,535),
 which leaves zero headroom — the next WPF change lifts again.
+
+**Lowered 4,123 → 4,106 on 2026-09-05 (HUD subtraction cut 1, the Quests card), and this
+is the first row in this history that got its room by DELETING a surface rather than
+moving one.** `quests` left `OverlaySections.Catalog` and `MainWindow.SectionMap` together
+— the pairing whose absence is a startup crash for everybody — and with it went the card
+build block, the `EQBUDDY_EXPAND` branch, the render call, the launcher header line and
+two card-sync calls. QuestsThemeCard.cs (97 lines) and Core's QuestInline.cs (63) left the
+repo outright and are not in this sum at all — unlinked here on purpose, since a doc that
+points at a deleted path is the rot this file's own tests refuse.
+
+**The honest number is 19 lines, and it is much smaller than the deletion.** About half of
+what came out came back as comments recording where the card went and why `_questsHost`
+outlived it. That trade is deliberate: a cut that cannot be found afterwards is the shape
+CLAUDE.md's "three ways back" and trap 55 both exist to refuse, and a ten-line tombstone is
+cheaper than the next session re-deriving the answer. The new baseline is once again the
+MINIMUM that fits (4,106 × 1.1 = 4,516.6 against 4,516). **Deleting a surface beats
+extracting one** — but only the lines that actually leave count, and here fewer left than
+it looks.
 
 Re-measured 2026-08-26, when the `EQBUDDY_EXPAND` dump block lifted into
 `EQBuddy/WidgetDump.cs` (Inline themes PR 2's first commit, exactly the ratchet amendment

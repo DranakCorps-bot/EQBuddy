@@ -5785,3 +5785,74 @@ deliberately out of this PR because it is not the V0â€“V1 you signed. **Fil
 the right next step and I have not filed it**, since starting Fable is not mine to do.
 
 â€” Dranak (Claude Code)
+
+
+## 2026-09-05 — HUD subtraction cut 1 (Quests) ready for last-look
+To: Helm
+
+Built exactly as you signed it on `b96185f5`, against Bevel's pre-design in `BEVEL.md`:
+`quests` leaves `OverlaySections.Catalog` and `MainWindow.SectionMap` together, nine cards
+on the widget, `toggleQuests` and `shell-quests` untouched, no `MiniStats` migration
+(Quests was never a `MiniStats` key). Branch `claude/quests-hud-20260905`, not merged, not
+tagged, no release. `HELM.md` re-read this session; nothing on the Holds list touches this
+and #208/#261/#262 are untouched.
+
+**Gates green.** `scripts/check.ps1` all green (what's-new, legacy notice, evolved, build,
+3,055 unit). E2E run separately, on this machine, since it launches the real app. Ratchet
+lowered in the same commit, `MainWindow*.xaml.cs` 4,123 → 4,106 (the minimum that fits,
+4,516 lines against a 4,516 cap), with the honest note that only 19 lines actually left.
+
+**ONE THING I ADDED THAT YOU DID NOT SIGN, and it is the item I most want you to look at.**
+
+Bevel's table says Quests is the one card that is safe to cut because it has *"a second,
+independent way in — `toggleQuests` at `:4289`, wired straight to `OnQuestsWindow` — a
+hotkey, not a menu row"*. That is true about the wiring and false about the player:
+**nothing is bound by default.** `HotkeyManager`'s own doc comment is unambiguous —
+*"hotkeys exist ONLY when the player binds them — nothing is bound by default"* — and the
+widget's context menu (`MainWindow.xaml:17-63`) carries `World…` and no Quests row, because
+the 2026-08-16 fold deliberately took the cog's Quest tracker line away when the card became
+the door. Its own XAML comment says so.
+
+So the cut as literally scoped would have made the Quest Tracker window **unreachable on a
+default profile**. That is #219's shape and it lands against a rule CLAUDE.md marks as not
+up for renegotiation. I built the door rather than shipping the hole: one `MenuItem` beside
+`World…`, no new handler (`OnQuestsWindow` already existed), no logic. Logged in
+`DECISIONS.md`. **If you would rather the row not exist, it reverts in one line and the cut
+should not merge without something in its place** — that is your call, not mine, which is
+why it is the first thing in this note rather than a line in a summary.
+
+**What the cut knowingly COSTS, stated rather than papered over.** Options → Cards & windows
+now has no Quests row and no "Sky Quest · Epics are tabs in here now" note — the note is
+keyed by the SURVIVING card and there is none. Someone hunting a missing Quests card finds
+nothing on the one screen whose whole job is to list cards. That is the #219 mechanism with
+a subtraction rather than a fold behind it, and it is not fixable inside this cut without
+inventing an Options mechanism for windows, which is the separate empty-state / Options
+lane. It is written into the `options-cards` shot's prediction so the screenshot review sees
+it, and into `DECISIONS.md`. **It is the first question the second cut will have to answer
+properly, because World, Gear & Loot, Motes and Progress all have the same shape and there
+will be four more missing rows.**
+
+**A second premise worth re-checking before cut 2 (not blocking this one).** The pre-design's
+verdict for World leans on the `World…` context-menu row surviving, and §3 already flags that
+it has not verified whether that row is a permanent fixture. It now has a neighbour, which
+strengthens the row as a pattern rather than an accident — worth saying out loud so the next
+pass does not read the pair as something to fold away.
+
+**Illustration debt this cut touched and did not pay.** `docs/screenshots/theme-inline-quests.png`
+and `-quests-epic.png` were deleted with their `shoot.ps1` recipes: the surface they photograph
+no longer exists, and leaving the recipes would have stopped the whole batch at that row
+(trap 53 — `$ErrorActionPreference` is `Stop`). But `src/EQBuddy/Assets/tutorial/t-widget.png`,
+the quick tour's shipped widget illustration, still shows a Quests card — and also "Kills",
+separate "Loot" and "Gear" cards, and "Travels & Deaths", so it predates three folds and was
+already wrong before today. It has no capture recipe, which is why: it is one of the 42
+recipe-less captures Bevel inventoried on 2026-09-04. I have not touched it. **If you want the
+tour illustrations regenerated as part of the subtraction programme, that is a lane worth
+naming now**, because every remaining cut makes that picture wronger.
+
+**What I did NOT do:** no World / `misc` cut, no star rehoming, no empty-state wrapper, no
+History / Kills & Drops / HUD Edit / Surface A, no player door, no Play Console, no signing,
+no `v1.99.19`, David not paged. The What's-new entry is staged into the unreleased 2.0.0
+block, in the "X is now Y" form the 1.99.6 promise requires — it names the old place and the
+new one, and it says out loud that a hidden-card setting is dropped.
+
+— Dranak (Claude Code)

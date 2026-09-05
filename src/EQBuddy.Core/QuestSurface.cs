@@ -47,43 +47,25 @@ public static class QuestSurface
         _ => tab.ToString(),
     };
 
+    // THE THREE INLINE MEMBERS LEFT THIS FILE ON 2026-09-05, with the widget's Quests card
+    // (HUD subtraction cut 1). `InlineModeFor`, `GeneralGlance` and `UnlocksGlance` each
+    // answered a question only a CARD asks — which rooms draw a body inline, and what the
+    // one-line glance says when they do not — and the card was their only caller in the
+    // repo. Keeping them would have left `InlineModeTests` asserting a contract for a
+    // surface nobody draws, which is trap 34's shape: a guard that cannot fail reads as
+    // coverage. The tab table, the labels, the keys and the counting rules above are
+    // untouched — the Quest Tracker window, the Evolved shell's Quests room and EQBuddy
+    // Mobile all still read them.
+
+    /// <summary>The room an opener lands on when it does not name one. General,
+    /// deliberately: it is the catalog you search, and it is what someone opening the Quest
+    /// Tracker with no particular errand in mind is looking for.</summary>
+    public const QuestTab DefaultTab = QuestTab.General;
+
     /// <summary>The wire/DOM key for a tab — lowercase and stable, so the mobile page's
-    /// saved tab choice survives a rename of the human-facing label.</summary>
-    /// <summary>Inline (Bevel, Helm-signed 2026-08-22). The two checklists are rooms and
-    /// go inline CAPPED — Epic to one class, Sky to the current class. General is a search
-    /// box over 1,200 quests plus a detail pane, which is Bevel's host rule verbatim: it
-    /// glances as <c>{n} quests ready to turn in</c> and the tracker is one ⧉ away.</summary>
-    public static InlineMode InlineModeFor(QuestTab tab) => tab switch
-    {
-        // Unlocks joined the strip with #238, AFTER Bevel's table — it is a Glance
-        // pending a ruling (flagged in the Unlocks review ask), because it is a review
-        // checklist over two dump files with its own section lens, which is the same
-        // host-rule shape as Inventory. Making the NEW tab conservative and one ⧉ from
-        // its window beats shipping an unruled full body on the widget.
-        QuestTab.Epic or QuestTab.Sky => InlineMode.Full,
-        _ => InlineMode.Glance,
-    };
-
-    /// <summary>The General room's glance line (Bevel's wording): what a player expands
-    /// the card to learn, in one line.</summary>
-    public static string GeneralGlance(int readyCount) => readyCount switch
-    {
-        0 => "Quest Tracker",
-        1 => "1 quest ready to turn in",
-        _ => $"{readyCount} quests ready to turn in",
-    };
-
-    /// <summary>The Unlocks room's glance line — the badge's fraction as a sentence, or
-    /// the route in when no dump has ever been read.</summary>
-    public static string UnlocksGlance((int Done, int Total)? counts) => counts is { } c
-        ? $"Unlocks — {c.Done} / {c.Total}"
-        : "Unlocks — run /outputfile achievements in game";
-
-    /// <summary>The tab an expanded Quests card opens on. General, deliberately, though it
-    /// is a Glance: "3 quests ready to turn in" is the thing a player expands the card to
-    /// learn, and it is one line rather than a checklist they have to read.</summary>
-    public const QuestTab DefaultInlineTab = QuestTab.General;
-
+    /// saved tab choice survives a rename of the human-facing label. (This comment was
+    /// stranded two members above the method it describes until 2026-09-05, when the
+    /// members between them were deleted and left it sitting on a constant.)</summary>
     public static string KeyFor(QuestTab tab) => tab switch
     {
         QuestTab.General => "general",

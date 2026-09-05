@@ -86,6 +86,14 @@ Six, covering 13 of the 14 cards and most of the windows.
 ### 1. Quests — **done, and the template**
 General · Epic 1.0 · Plane of Sky. Phone + desktop.
 
+**And on 2026-09-05 it became the first theme to leave the widget altogether** (HUD
+subtraction cut 1). The launcher card in the table below is gone; the window, the four
+rooms and the phone are untouched, and the Evolved shell's Quests room is where the
+surface lives now. It went first for the reason this table can be read for: it is the only
+one of the ten cards that strands nothing — no `MiniStats` star writer, no HUD chip owed,
+and a way into its window that does not depend on the card. Everything below stays a true
+record of the fold that made this cut possible.
+
 ### 2. Live Meters
 **Tabs:** Damage · Healing · Pet · Encounters
 **Absorbs:** Combat card, Healing card, the Damage/Healing/Pet breakout

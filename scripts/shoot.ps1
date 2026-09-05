@@ -48,6 +48,13 @@ if ($Out -eq '') { $Out = Join-Path $repo 'docs/screenshots' }
 # Env    = the EQBUDDY_* hook that opens it (the same family MainWindow already reads).
 # Set    = extra settings.json overrides for this shot.
 $Shots = [ordered]@{
+    # NINE CARDS, not ten, since 2026-09-05 (HUD subtraction cut 1). Eight of them visible
+    # on the default profile - Motes ships hidden. PREDICTION for both of these shots, in
+    # order down the stack: Combat, Healing, Kills & Drops, Gear & Loot, Watch, Buffs,
+    # Progress, World - with NO "Quests" header between Kills & Drops and Gear & Loot.
+    # Writing the order down is the point: an absent control photographs as an
+    # unremarkable panel (trap 29), so the only way to review a subtraction in a picture
+    # is to have said first what should NOT be in it.
     'widget-cards'    = @{ Title = 'EQBuddy'; Env = @{}; Set = @{} }
     'widget-expanded' = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = '1' }; Set = @{} }
     # The title area with a LONG zone name. The zone and the session line shared one grid
@@ -93,13 +100,13 @@ $Shots = [ordered]@{
     'combat-solo'     = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'combat' }
                            Set = @{ HiddenSections = @(
-                               'healing','kills','loot','quests','gear','tracked',
+                               'healing','kills','loot','tracked',
                                'buffs','progress','misc') } }
     # The Watch card alone, same reason, with the same three seeded rules as tracked-card.
     'watch-solo'      = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'tracked' }
                            Set = @{ HiddenSections = @(
-                                       'combat','healing','kills','loot','quests','gear',
+                                       'combat','healing','kills','loot',
                                        'buffs','progress','misc')
                                     TrackedRules = @(
                                    @{ Id = 'shot-spider'; Name = 'Spider parts'
@@ -472,22 +479,15 @@ $Shots = [ordered]@{
     'theme-inline-kills-glance' = @{ Title = 'EQBuddy'
                            Env = @{ EQBUDDY_EXPAND = 'kills:drops' }
                            Set = @{} }
-    # PR 3. PREDICTION: the Quests card expanded with a FOUR-chip strip (Quests lit,
-    # Epic 1.0 with its 0/486 badge, Plane of Sky 0/222, Unlocks with no badge on this
-    # profile), and under the strip ONE dim line - the General GLANCE, reading "Quest
-    # Tracker" on this fixture (nothing is ready to turn in). No search box, no detail
-    # pane, no checklist: General is the default AND a glance, which is Bevel's ruling
-    # verbatim.
-    'theme-inline-quests' = @{ Title = 'EQBuddy'
-                           Env = @{ EQBUDDY_EXPAND = 'quests' }
-                           Set = @{} }
-    # The Epic FULL room. PREDICTION: the Epic 1.0 chip lit and under it ONE class's
-    # checklist - a heading naming the class, up to 12 read-only rows (name plus a check
-    # for acquired), and "... and N more" if the class's list is longer. No class picker,
-    # no state combo, no search - window chrome stays with the window.
-    'theme-inline-quests-epic' = @{ Title = 'EQBuddy'
-                           Env = @{ EQBUDDY_EXPAND = 'quests:epic' }
-                           Set = @{} }
+    # 'theme-inline-quests' AND 'theme-inline-quests-epic' WERE HERE, and both went with
+    # the Quests card on 2026-09-05 (HUD subtraction cut 1). There is no card to expand and
+    # EQBUDDY_EXPAND no longer answers 'quests', so leaving the rows would have stopped the
+    # whole batch dead at this line - $ErrorActionPreference is 'Stop' and a shot whose
+    # window never appears takes every shot after it with it (trap 53, which cost six days
+    # of a dark acceptance criterion). Their committed PNGs were deleted in the same commit:
+    # an illustration is a capture WITH A RECIPE or it does not ship, and these two no
+    # longer have one. What they showed is still shot, by 'shell-quests' and
+    # 'shell-quests-sky' - the same four rooms, in the room that owns them now.
     # PR 2's second theme. PREDICTION: the Gear & Loot card expanded with a three-chip
     # strip (Loot with the item count badge, Wishlist, Inventory), and under it the Loot
     # room's slice strip and rows, capped by the shared body height with its own
@@ -1048,6 +1048,12 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
                                     WindowZooms = @{ options = 0.55 } } }
+    # PREDICTION since 2026-09-05 (HUD subtraction cut 1): NINE rows in the card list, and
+    # no "Quests" among them - and no "Sky Quest / Epics are tabs in here now" note either,
+    # because that note hangs under the surviving card and there is none. This screen is the
+    # one #219 was filed from, so it is the picture that says out loud what the cut costs:
+    # someone hunting for the Quests card finds no row here at all. That gap is recorded in
+    # HELM-FEEDBACK.md rather than papered over.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'

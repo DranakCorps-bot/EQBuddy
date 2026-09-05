@@ -39,18 +39,10 @@ internal sealed class QuestChecklistView
         _raidLedger = raidLedger;
     }
 
-    /// <summary>The Quests card's one line: both checklists at a glance, so folding two
-    /// cards into a launcher costs no information. Empty when neither checklist has been
-    /// built yet — a card reading "0/0 · 0/0" would look broken rather than unstarted.</summary>
-    public string SummaryLine()
-    {
-        var epic = _settings.EpicQuestChecklist;
-        var sky = _settings.SkyQuestChecklist;
-        var parts = new List<string>(2);
-        if (epic.Count > 0) parts.Add($"Epic {epic.Count(i => i.Acquired)}/{epic.Count}");
-        if (sky.Count > 0) parts.Add($"Sky {sky.Count(i => i.Acquired)}/{sky.Count}");
-        return string.Join(" · ", parts);
-    }
+    // SummaryLine() was the Quests CARD's one line ("Epic 1/12 · Sky 3/40") and went with
+    // the card on 2026-09-05 (HUD subtraction cut 1). Nothing else ever read it. The
+    // counts it formatted are still on screen — the Quest Tracker's own tab badges carry
+    // them, from QuestSurface.CountOf, which is where the rule lives.
 
     // High-water marks for the loot auto-checkers: only the newly-looted delta ticks a
     // step, so a re-render can never double-count.

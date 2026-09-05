@@ -36,6 +36,15 @@
                      chrome (every tab), not a cog entry at all. -->
                 <MenuItem Header="World…" Click="OnWorldWindow"
                           ToolTip="Zone map, camp timers, travel routes, deaths and zone markers — one window, four tabs"/>
+                <!-- HUD subtraction cut 1 (2026-09-05): this row exists because the Quests
+                     CARD does not. Its ⧉ was the way into the Quest Tracker for anyone who
+                     had not bound the hotkey — and nothing is bound by default
+                     (HotkeyManager's own rule) — so removing the card without this row
+                     would have made the window unreachable on a default profile, which is
+                     the #219 shape CLAUDE.md's "three ways back" exists to refuse. Same
+                     shape as World… above, which is why it sits beside it. -->
+                <MenuItem Header="Quests…" Click="OnQuestsWindow"
+                          ToolTip="The Quest Tracker — search every quest, your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in"/>
                 <MenuItem Header="Session history…" Click="OnHistory"/>
                 <Separator/>
                 <MenuItem x:Name="ClickThroughItem" Header="Click-through (game clicks pass through)"
@@ -538,34 +547,10 @@
                 <ContentControl x:Name="LootBody"/>
             </Expander>
 
-            <!-- ONE card for every quest surface (David, 2026-08-16). It replaced the
-                 "Sky Quest" and "Epics" cards, each of which carried a full tabbed
-                 checklist on the widget — a review surface by the rule in CLAUDE.md, not
-                 a glance one. The Quest Tracker window owns that job on its own three
-                 tabs (General · Epic 1.0 · Plane of Sky), and this card is the way in,
-                 which is also why the ⚙ menu no longer carries a Quest tracker line.
-                 The header still reports both checklists, so the glance survives. -->
-            <Expander x:Name="QuestsSection" Style="{StaticResource Section}"
-                      ToolTip="Quests — your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in. Expands in place; the arrow opens the Quest Tracker.">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <local:EqCardTitle Icon="Map" Text="Quests"/>
-                        <TextBlock x:Name="QuestsHeader" Grid.Column="1" Style="{StaticResource StatValue}"
-                                   HorizontalAlignment="Right" VerticalAlignment="Center"
-                                   Margin="{DynamicResource IndentM}"
-                                   TextTrimming="CharacterEllipsis" Text=""/>
-                        <ContentControl x:Name="QuestsPopOut" Grid.Column="2"
-                                        VerticalAlignment="Center"/>
-                    </Grid>
-                </Expander.Header>
-                <ContentControl x:Name="QuestsCardBody"/>
-            </Expander>
-
+            <!-- THE QUESTS CARD IS GONE (HUD subtraction cut 1, 2026-09-05). Nine cards
+                 here now. The Quest Tracker window it launched is unchanged and is
+                 reached by the "Quests…" context-menu row above, by the "Quest tracker"
+                 hotkey, and by the Evolved shell's Quests room. -->
 
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">
                 <Expander.Header>

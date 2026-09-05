@@ -121,11 +121,22 @@ public static class OverlaySections
         // MiniStats — so there is nothing for a migration to fold and the card keeps
         // whatever slot the player put it in. Only the LABEL moved.
         ("kills", "Kills & Drops"),
-        // One card for every quest surface (David, 2026-08-16). It replaced the separate
-        // "Sky Quest" and "Epics" cards, which each carried a full tabbed checklist on the
-        // widget — a review surface, not a glance one, and now a click away in the Quest
-        // Tracker window. AppSettings.MigrateQuestSections folds the two old keys onto it.
-        ("quests", "Quests"),
+        // QUESTS IS NOT HERE ANY MORE — HUD subtraction, cut 1 (Bevel's pre-design,
+        // Helm-signed 2026-09-05). It is the first v1 card retired to the Evolved shell,
+        // and it went first because it is the only one of the ten that strands nothing:
+        // "quests" was never a MiniStats key, so no star writer leaves with it, and the
+        // Quest Tracker window it used to open survives on doors of its own.
+        //
+        // Where it went, in the words the What's-new uses: THE QUESTS CARD IS NOW THE
+        // QUEST TRACKER WINDOW (right-click the widget → Quests…, or the "Quest tracker"
+        // hotkey) AND THE QUESTS ROOM in the Evolved shell. Nothing about the quest
+        // surfaces themselves changed — only the widget's copy of the launcher.
+        //
+        // A subtraction has the same obligation as a fold (CLAUDE.md's "three ways back"):
+        // the ⧉ on the card header was one of them and it is the one being removed, so the
+        // context-menu row went in with this cut. Options → Cards & windows loses the row
+        // outright, which is the gap this cut knowingly leaves — recorded in
+        // HELM-FEEDBACK.md rather than papered over.
         // One card for the GEAR & LOOT theme (docs/Themes.md, David 2026-08-20). It
         // replaced the separate Loot and Gear cards, which are tabs in that window now;
         // AppSettings.MigrateLootSections folds the old keys onto this one, and
@@ -192,7 +203,6 @@ public static class OverlaySections
         ["kills"] = "Skull",
         ["loot"] = "Bag",
         ["motes"] = "Sparkle",
-        ["quests"] = "Map",
         ["gear"] = "Gear",
         ["tracked"] = "Target",
         ["buffs"] = "Timer",
@@ -220,8 +230,13 @@ public static class OverlaySections
     /// </summary>
     private static readonly Dictionary<string, string[]> AbsorbedTitles = new(StringComparer.Ordinal)
     {
-        // 2026-08-16: the Sky Quest and Epics cards became tabs in the Quest Tracker.
-        ["quests"] = ["Sky Quest", "Epics"],
+        // THE "quests" ROW LEFT THIS LIST on 2026-09-05, with the card itself (HUD
+        // subtraction cut 1). It is keyed by the SURVIVING card, and there is no longer a
+        // Quests card for the note to hang under — an entry here for a key that is not in
+        // Catalog can never be rendered, and leaving one is exactly the stale-list shape
+        // that cost #252 (trap 55). The names it carried, "Sky Quest" and "Epics", are now
+        // two tabs of a window with no row on this screen at all; that is the gap the cut
+        // leaves and it is written down in HELM-FEEDBACK.md, not hidden here.
         // 2026-08-19: the PROGRESS THEME (docs/Themes.md).
         //
         // MOTES LEFT THIS LIST on 2026-08-21, when it became a card again. The note answers
