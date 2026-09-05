@@ -1446,9 +1446,14 @@ function Append-Log([string[]]$lines) {
 
 # Prefer the secondary display for fixture windows so overnight shoot/E2E does not cover
 # EQ on the primary. Falls back to 120,120 when only one screen is attached (CI).
-function Get-EqShotOrigin {
+# Same AllScreens pick as the backdrop below — one function, so the grey and the
+# windows cannot land on different monitors.
+function Get-EqShotSecondaryScreen {
     Add-Type -AssemblyName System.Windows.Forms -ErrorAction SilentlyContinue
-    $sec = [System.Windows.Forms.Screen]::AllScreens | Where-Object { -not $_.Primary } | Select-Object -First 1
+    return [System.Windows.Forms.Screen]::AllScreens | Where-Object { -not $_.Primary } | Select-Object -First 1
+}
+function Get-EqShotOrigin {
+    $sec = Get-EqShotSecondaryScreen
     if ($sec) {
         return @{ Left = [int]($sec.WorkingArea.X + 120); Top = [int]($sec.WorkingArea.Y + 120) }
     }
@@ -1653,16 +1658,28 @@ foreach ($proc in @(Get-Process EQBuddy -ErrorAction SilentlyContinue)) {
 $relaunch = @($relaunch | Select-Object -Unique)
 
 # --- the backdrop ------------------------------------------------------------------
-# A plain maximized form, NOT topmost, so the app's own always-on-top windows stay above
+# A plain full-screen form, NOT topmost, so the app's own always-on-top windows stay above
 # it. This is what stops a rounded corner photographing the desktop.
 # One assembly per call: the comma-list form silently loads neither here (pwsh 7).
+#
+# WinForms Maximized lands on the PRIMARY display, with no screen assignment. Fixture
+# windows already go to the secondary via Get-EqShotOrigin / EQBuddy SecondaryOrigin
+# (#316); a Maximized backdrop would cover EverQuest on the primary while shots run.
+# When a non-primary screen exists, pin Bounds to that screen (same pick as
+# Get-EqShotOrigin). Single-screen (CI) keeps the Maximized fallback.
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 $backdropForm = New-Object System.Windows.Forms.Form
 $backdropForm.FormBorderStyle = 'None'
-$backdropForm.WindowState = 'Maximized'
-$backdropForm.BackColor = [System.Drawing.ColorTranslator]::FromHtml($Backdrop)
 $backdropForm.ShowInTaskbar = $false
+$backdropForm.BackColor = [System.Drawing.ColorTranslator]::FromHtml($Backdrop)
+$backdropScreen = Get-EqShotSecondaryScreen
+if ($backdropScreen) {
+    $backdropForm.StartPosition = 'Manual'
+    $backdropForm.Bounds = $backdropScreen.Bounds
+} else {
+    $backdropForm.WindowState = 'Maximized'
+}
 $backdropForm.Show()
 $backdropForm.Refresh()
 
