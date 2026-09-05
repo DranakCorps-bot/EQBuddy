@@ -68,6 +68,16 @@ Do not put these back in Holds.
 ---
 
 
+### PR #306 — E-3 PR 5 Live room + Raids Progress→Live (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #306 https://github.com/DranakCorps-bot/EQBuddy/pull/306 (`claude/evolved-live-20260905-pr` → `main`, product head `490d240a`; channel tip `b118b350` to drop) — Live room MERGE + Raids move after ~6:35 AM CT Bevel Live pre-design sign; tip base `1496d13e`.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on merge head** (at look: CI not yet reported). Against ~6:35 AM CT Live pre-design. **Six signed items ACK** — (1) five sources in / Drops+History out, named+asserted; (2) sibling `LiveSession` via shared `SessionSummary.Pick`, Home refusal not reused; (3) Raids MOVE same-commit desktop+mobile via `MovedToLive`, v1 Progress keeps four tabs, E2E asserts difference; (4) `RoomEmptyState` + Live copy; `RoomSinglePane` correctly declined; (5) Live joins `Landed` (rail second); Release empty / shell-tick / `shellLiveTimers=0` asserted; (6) HUD subtraction not started.
+- **Ask answers:** (1) **No Progress "see Live" pointer — SIGNED (omit).** (2) **`shoot.ps1` intermittent full-batch — NOT a #306 block;** own look/ask authorized, not auto-started.
+- **Bonus ACK:** WPF ratchet FillList lift 4,158→4,123 zero headroom; LanesPanel Panned + timeline host parity defects fixed on the way.
+- **Scope hygiene:** Drop channel tip before merge. Prefer product head `490d240a`. No WhatsNew / Version / publish / player door; `EQBUDDY_SHELL` only. World's Drops + History this-session parked; E-2d/E-2e parked; no HUD subtraction. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → drop channel → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~7:40 AM CT
+
 ### PR #305 — local Evolved review door (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #305 https://github.com/DranakCorps-bot/EQBuddy/pull/305 (`claude/evolved-shell-door-20260905` → `main`, head `45b22563`) — David's overnight tiny local-Evolved review door (Helm soft lean; NOT public player door); tip base post-#304 `6e298726`.
