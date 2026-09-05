@@ -1550,3 +1550,56 @@ one genuinely does. Each line below is a decision I made instead of a question I
   the reviewer rather than taken by me.**
   → Worth considering: `check.ps1` discarding test output is what made this unrecoverable. A
   gate that fails without leaving a name behind costs exactly one incident like this.
+
+
+## 2026-09-05 — HUD subtraction cut 1 (the Quests card)
+
+- **Added a `Quests…` row to the widget's right-click menu, in the same commit as the cut.**
+  The default it could have gone the other way on: Bevel's pre-design says Quests is safe to
+  cut because it has "a second, independent way in — the `toggleQuests` hotkey", and the
+  literal scope was two deletions. **The premise is half true and the half that is false is
+  the one that decides it: nothing is bound by default.** `HotkeyManager`'s own doc comment
+  is explicit — *"hotkeys exist ONLY when the player binds them"* — and the widget's context
+  menu carries `World…` and no Quests row, because the 2026-08-16 fold deliberately removed
+  the cog's Quest tracker line when the card became the door. So on a fresh profile, cutting
+  the card with nothing else would have left the Quest Tracker window unreachable by any
+  means. That is #219's shape exactly, and CLAUDE.md lists the three ways back as not up for
+  renegotiation. Where it landed: build the row, log it here, and say so plainly in the ask
+  to Helm rather than treat a one-line XAML addition as scope creep. Trap 52's lesson —
+  re-derive the premise before acting on the decision it triggers; one `grep` of
+  `HotkeyManager.cs` was the whole check.
+- **`MigrateQuestSections` now REMOVES `quests` instead of creating it.** Could have gone the
+  other way: leave the migration alone, since `ApplySectionLayout` filters `SectionOrder` by
+  the map and `NormalizeSectionOrder` filters by the catalog, so a stale key is harmless
+  *today*. It is not harmless as a pattern — every 1.x profile carries the key,
+  `OptionsViewModel.Cards` resolves each one with `First(...)`, and a phantom key fed to a
+  fold on every launch is precisely what #252 was made of (trap 55). The migration is the
+  one place that can drain it, and `SectionFoldIdempotenceTests` already fails any migration
+  that invents a non-card key. Cost: one test rewritten from asserting a fold to asserting a
+  subtraction.
+- **The card count went into the dump as `cards` / `cardsVisible`, not as a per-card key.**
+  `questsCard=1` was the old shape and could only ever speak for the card it was named
+  after. A subtraction is a claim about the STACK, and there are eight more cuts behind this
+  one; a count means the next one needs no new dump fact and no new assertion, only a
+  different number. `cardsVisible` is there so "nine cards" cannot be satisfied by nine
+  hidden slots.
+- **Deleted rather than left dead: `QuestsThemeCard.cs`, `Core/QuestInline.cs`,
+  `QuestSurface.InlineModeFor` / `GeneralGlance` / `UnlocksGlance`,
+  `QuestChecklistView.SummaryLine()`, and the `QuestRooms` theory in `InlineModeTests`.**
+  Each had exactly one consumer and it was the card. Leaving them would have left a test
+  file asserting inline-mode rules for a surface nobody draws — trap 34's shape, a guard
+  that cannot fail reading as coverage. `QuestSurface`'s tab table, labels, keys and
+  counting rules are untouched: the window, the shell's Quests room and EQBuddy Mobile all
+  still read them.
+- **Did NOT re-home the "Sky Quest · Epics are tabs in here now" note.** It is keyed by the
+  SURVIVING card and there is none, so the entry was removed with the row. That leaves
+  Options → Cards & windows with no mention of Quests at all, which is a real gap of the
+  #219 family and is the one thing this cut knowingly costs. Inventing an Options mechanism
+  for it is the empty-state/Options lane's work, not this one; it is written into the Helm
+  ask and into the `options-cards` shot's prediction rather than papered over.
+- **Left `src/EQBuddy/Assets/tutorial/t-widget.png` alone.** It is the quick tour's widget
+  illustration and it does show a Quests card — but it also shows "Kills", separate "Loot"
+  and "Gear" cards, and "Travels & Deaths", so it predates three folds and was already
+  wrong before today. It is one of the 42 recipe-less captures Bevel inventoried on
+  2026-09-04. Fixing it needs a capture recipe that does not exist, which is the standing
+  illustration debt and not this cut's scope; flagged to Helm with that evidence.

@@ -173,23 +173,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             popOut: () => ShowGearLootWindow(),
             bringWindowForward: () => _gearLootWindow?.Activate(),
             bodyCap: own => ThemeBodyCapHost.CapFor(this, LootSection, own));
-        // The QUESTS theme's card (PR 3). Epic and Sky inline as ONE class's rows,
-        // capped (QuestInline owns the arrangement); General is the Glance AND the
-        // default (Bevel); Unlocks is a Glance pending its ruling.
-        _questsCard = QuestsThemeCard.Build(
-            QuestsSection, QuestsCardBody, QuestsPopOut, _questsHost,
-            tabs: () => QuestSurface
-                .Tabs(QuestSurface.CountOf(_settings.EpicQuestChecklist, i => i.Acquired),
-                      QuestSurface.CountOf(_settings.SkyQuestChecklist, i => i.Acquired),
-                      QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes))
-                .Select(t => new ThemeCardTab<QuestTab>(t.Tab, t.Label, t.Badge))
-                .ToList(),
-            classes: () => BuffSetClassSource(_stats.Snapshot()).Classes,
-            settings: _settings,
-            unlockCounts: () => QuestSurface.UnlockCounts(Unlocks.Races, Unlocks.Classes),
-            popOut: () => ShowQuestsWindow(tab: _questsHost.SelectedTab),
-            bringWindowForward: () => _questsWindow?.Activate(),
-            bodyCap: own => ThemeBodyCapHost.CapFor(this, QuestsSection, own));
+        // THE QUESTS CARD WAS BUILT HERE UNTIL 2026-09-05 (HUD subtraction cut 1). The
+        // theme HOST survives below — the Quest Tracker window still hands its placement
+        // back and forth with the openers — but there is no card for it to be inline in.
         _worldCard = WorldThemeCard.Build(   // World PR 3: Travels Full, Map/Camps/Path Glance
             MiscSection, MiscBody, MiscPopOut, _worldHost,
             newTravels: () => _travelsView, currentZone: () => CurrentZoneName,
@@ -451,9 +437,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             if (wanted.TryGetValue("loot", out var lootRoom)
                 && LootSurface.TabForKey(lootRoom) is { } lootOn)
                 _lootHost.SelectTab(lootOn);
-            if (wanted.TryGetValue("quests", out var questsRoom)
-                && QuestSurface.TabForKey(questsRoom) is { } questsOn)
-                _questsHost.SelectTab(questsOn);
             foreach (var (key, element) in SectionMap())
                 if (element is Expander card && wanted.ContainsKey(key))
                     card.IsExpanded = true;
@@ -644,7 +627,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private Dictionary<string, UIElement> SectionMap() => new()
     {
         ["combat"] = CombatSection, ["healing"] = HealingSection, ["kills"] = KillsSection,
-        ["quests"] = QuestsSection,
+        // No "quests" row since 2026-09-05: the card left OverlaySections.Catalog and this
+        // map in the same commit, which is the pairing the Gear & Loot fold's startup
+        // crash bought — a key in one and not the other throws in ApplySectionLayout, for
+        // everybody.
         // One key for the whole GEAR & LOOT theme, and deliberately "loot" — one OF the
         // two it absorbs rather than a new name, so a player who dragged that card keeps
         // its slot through the fold (LootSurface.ThemeCardKey).
@@ -2022,8 +2008,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal ThemeCardView<CreatureTab> _killsCard = null!;
     internal readonly ThemeHost<LootTab> _lootHost = new(LootSurface.DefaultInlineTab);
     internal ThemeCardView<LootTab> _lootCard = null!;
-    internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultInlineTab);
-    internal ThemeCardView<QuestTab> _questsCard = null!;
+    /// <summary>The Quest Tracker's placement. It has had no CARD since 2026-09-05 (HUD
+    /// subtraction cut 1), so it only ever moves between Collapsed and Window — but it is
+    /// still the thing that knows which room the next opener lands on, and the window's
+    /// own tab changes still ride back through it.</summary>
+    internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultTab);
     internal readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultInlineTab);   // World PR 3
     internal ThemeCardView<WorldTab> _worldCard = null!;
 
@@ -2154,23 +2143,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// item's quests — the 🗺 badge path from the Loot views.</summary>
     internal void ShowQuestsWindow(string? filterItem = null, QuestTab? tab = null)
     {
-        // The host learns the room first and the CARD gives the body up — the same
-        // handshake the other three themes make.
+        // The host learns the room first. The other three themes hand the body over from
+        // their card here; this one has no card to take it from (HUD subtraction cut 1),
+        // so the handshake is one-sided and the host is only recording where the surface
+        // is — which is what questsHostWindowOpen reports.
         _questsHost.OpenWindow(tab);
         if (_questsWindow is not { IsLoaded: true })
         {
             _questsWindow = new QuestsWindow(this);
             _questsWindow.TabChanged += t2 => _questsHost.SelectTab(t2);
-            _questsWindow.Closed += (_, _) =>
-            {
-                _questsHost.WindowClosed();
-                _questsCard?.Sync();
-            };
+            _questsWindow.Closed += (_, _) => _questsHost.WindowClosed();
             _questsWindow.Show();
         }
         if (tab is { } t0) _questsWindow.SetTab(QuestSurface.KeyFor(t0));
         if (filterItem is { Length: > 0 }) _questsWindow.FilterToItem(filterItem);
-        _questsCard?.Sync();
         _questsWindow.Activate();
     }
 
@@ -2645,7 +2631,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _progressCard.Render(s);
         _killsCard.Render(s);
         _lootCard.Render(s);
-        _questsCard.Render(s);
         _worldCard.Render(s);
         MiscHeader.Text = WorldSurface.LauncherSummary(zone: CurrentZoneName,   // counts, never countdowns
             zonesVisited: s.Zones.Count, deaths: s.Deaths.Count,
@@ -2748,10 +2733,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // BOTH card headers carried, so the glance survives the fold rather than being
         // traded for a click. The rows happen in the window.
         LootHeader.Text = LootTheme.LauncherSummary(s, _settings.GearChecklist);
-
-        // The Quests card is a launcher, not a checklist: its one line reports both
-        // checklists so the glance survives, and the work happens in the window.
-        QuestsHeader.Text = _quests.SummaryLine();
 
 
         // The card is hidden for everyone who has not ticked it, and a hidden card is

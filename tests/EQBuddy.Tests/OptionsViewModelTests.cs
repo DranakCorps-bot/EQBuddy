@@ -69,9 +69,12 @@ public sealed class OptionsViewModelTests
         Assert.Equal("kills", s.SectionOrder[0]);
         Assert.Equal(OverlaySections.Catalog.Length, s.SectionOrder.Count);
         Assert.DoesNotContain("bogus", s.SectionOrder);
-        Assert.Contains(vm.Cards, c => c.Key == "quests" && c.Title == "Quests");
-        // The two cards "quests" replaced are gone from the catalog for good.
-        Assert.DoesNotContain(vm.Cards, c => c.Key is "sky" or "epic");
+        // QUESTS IS NOT A CARD ANY MORE (HUD subtraction cut 1, 2026-09-05) — the first v1
+        // card retired to the Evolved shell. It is asserted ABSENT rather than simply not
+        // mentioned, because Options is the only place a player can see the card list and
+        // a key with no catalog row throws in `Cards`'s own First(...). The two cards it
+        // had itself replaced went with it, as they already had.
+        Assert.DoesNotContain(vm.Cards, c => c.Key is "quests" or "sky" or "epic");
         // And the one "loot" replaced — the GEAR & LOOT theme (docs/Themes.md). The card
         // KEEPS the "loot" key and takes a new title: a player who dragged Loot somewhere
         // keeps that slot through the fold (LootSurface.ThemeCardKey).
@@ -117,7 +120,10 @@ public sealed class OptionsViewModelTests
         // than saying nothing. It is still a Wealth-tab block too; being in two places is
         // not the same as having moved.
         Assert.DoesNotContain("Motes", progress);
-        Assert.Contains("Sky Quest", vm.Cards.Single(c => c.Key == "quests").Absorbed!);
+        // The "Sky Quest · Epics are tabs in here now" note went with the Quests card on
+        // 2026-09-05 — a note is keyed by the SURVIVING card, and there is none. That the
+        // three names now have no row on this screen at all is the gap this cut leaves
+        // knowingly; it is written into HELM-FEEDBACK.md rather than faked here.
         // The GEAR & LOOT theme absorbs exactly ONE card, which is the case the sentence
         // was never written for: it read "Gear are tabs in here now" until 2026-08-20.
         // A line whose whole job is to be read by someone hunting a vanished card cannot
@@ -157,45 +163,51 @@ public sealed class OptionsViewModelTests
     }
 
     [Fact]
-    public void SkyQuestSectionSlotsInAfterMotes()
+    public void QuestSectionsLeaveTheWidgetEntirely()
     {
-        // Insert-only on purpose: unknown-key cleanup stays the UI layer's job
-        // (CardsNormalizeMoveAndToggle above), so Core never carries a section
-        // catalog copy. Hidden sections and stray keys pass through untouched.
+        // This test used to be SkyQuestSectionSlotsInAfterMotes and asserted a FOLD: sky +
+        // epic became "quests", in the earlier of their two slots. On 2026-09-05 the Quests
+        // card itself left OverlaySections.Catalog (HUD subtraction cut 1), so all three
+        // keys are now keys that can never draw anything and the migration removes them.
+        //
+        // Removing "quests" is the half that matters, and it is not tidiness: EVERY 1.x
+        // profile carries that key in SectionOrder. A key with no catalog row is exactly
+        // what #252 was made of — OptionsViewModel.Cards looks each one up with First(...),
+        // and a fold that is handed a phantom key chews on it every launch.
         var settings = new AppSettings
         {
-            SectionOrder = ["combat", "motes", "tracked", "bogus"],
+            SectionOrder = ["combat", "motes", "sky", "gear", "epic", "tracked", "bogus"],
             HiddenSections = ["loot"],
         };
-
-        // The two old quest cards fold onto one, in the EARLIER of their slots — the
-        // place the player already looked for quests.
-        settings.SectionOrder = ["combat", "motes", "sky", "gear", "epic", "tracked", "bogus"];
         Assert.True(settings.MigrateQuestSections());
-        Assert.Equal(["combat", "motes", "quests", "gear", "tracked", "bogus"], settings.SectionOrder);
+        Assert.Equal(["combat", "motes", "gear", "tracked", "bogus"], settings.SectionOrder);
         Assert.Equal(["loot"], settings.HiddenSections);
         Assert.False(settings.MigrateQuestSections());   // idempotent
 
-        // Hiding BOTH old cards said quests stay off the widget, so the merged card
-        // inherits that; the dead keys leave the hidden list either way, because a key
-        // matching no catalog entry is invisible in Options and would sit there forever.
+        // The ordinary 1.99.x profile: the folded card, present and possibly hidden. Both
+        // lists lose it, and the second launch reports no change — which is what keeps
+        // Load from rewriting settings.json on every start (trap 13).
+        var folded = new AppSettings
+        {
+            SectionOrder = ["combat", "quests", "tracked"],
+            HiddenSections = ["quests"],
+        };
+        Assert.True(folded.MigrateQuestSections());
+        Assert.Equal(["combat", "tracked"], folded.SectionOrder);
+        Assert.Empty(folded.HiddenSections);
+        Assert.False(folded.MigrateQuestSections());
+
+        // Unknown-key cleanup is still the UI layer's job (CardsNormalizeMoveAndToggle
+        // above), so Core never carries a section catalog copy: "bogus" and "gear" above
+        // pass through untouched, and only the three quest keys are named here.
         var hidBoth = new AppSettings
         {
             SectionOrder = ["combat", "sky", "epic"],
             HiddenSections = ["sky", "epic"],
         };
         Assert.True(hidBoth.MigrateQuestSections());
-        Assert.Equal(["combat", "quests"], hidBoth.SectionOrder);
-        Assert.Equal(["quests"], hidBoth.HiddenSections);
-
-        // Keeping either one visible was a statement that quests belong on the widget.
-        var hidOne = new AppSettings
-        {
-            SectionOrder = ["combat", "sky", "epic"],
-            HiddenSections = ["epic"],
-        };
-        Assert.True(hidOne.MigrateQuestSections());
-        Assert.Empty(hidOne.HiddenSections);
+        Assert.Equal(["combat"], hidBoth.SectionOrder);
+        Assert.Empty(hidBoth.HiddenSections);
 
         // A fresh install's empty order stays empty — the UI appends the catalog.
         Assert.False(new AppSettings().MigrateQuestSections());

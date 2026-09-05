@@ -32,7 +32,9 @@ internal static class WidgetDump
         w._progressHost.IsInline ? Facts(w, w._progressCard, w.ProgressSection)
         : w._creatureHost.IsInline ? Facts(w, w._killsCard, w.KillsSection)
         : w._lootHost.IsInline ? Facts(w, w._lootCard, w.LootSection)
-        : w._questsHost.IsInline ? Facts(w, w._questsCard, w.QuestsSection)
+        // Quests is absent here on purpose: it has no card since 2026-09-05 (HUD
+        // subtraction cut 1), so its host can never be Inline and there is no body to
+        // measure. Its window placement is still reported, as questsHostWindowOpen.
         : w._worldHost.IsInline ? Facts(w, w._worldCard, w.MiscSection)
         : (EQBuddy.UI.Shared.WidgetMetrics.ThemeBodyMaxHeight, double.NaN, double.NaN);
 
@@ -85,6 +87,15 @@ internal static class WidgetDump
     /// version it painted, which is the one way the guarantee above can rot silently.</summary>
     private static int SurfacesBehind(MainWindow w, long version) =>
         FollowingSurfaces.OpenOn(w).Count(s => s.RenderedVersion != version);
+
+    /// <summary>Cards on the widget the player can actually see — the panel's children
+    /// minus whatever is hidden in Options → Cards &amp; windows. Read off the SAME panel
+    /// ApplySectionLayout fills, so it counts what is on screen rather than re-deriving it
+    /// from the catalog, which is the half a subtraction could get wrong (a key can leave
+    /// the catalog and stay in the map, and that pair is what throws on startup).</summary>
+    private static int CountVisible(MainWindow w) =>
+        w.SectionsPanel.Children.OfType<System.Windows.FrameworkElement>()
+            .Count(e => e.Visibility == Visibility.Visible);
 
     /// <summary>A dump value is an integer the suite parses, and -1 is its "absent". A
     /// measurement that has not happened (NaN — never dragged, or a card the layout has not
@@ -197,10 +208,11 @@ internal static class WidgetDump
                         ? $"lootTab={LootSurface.KeyFor(w._lootCard.SelectedTab)} " +
                           $"lootTabs={w._lootCard.TabCount} "
                         : "") +
-                    (w._questsHost.IsInline
-                        ? $"questsInline=1 questsCardTab={QuestSurface.KeyFor(w._questsCard.SelectedTab)} " +
-                          $"questsCardTabs={w._questsCard.TabCount} "
-                        : "questsInline=0 ") +
+                    // Quests has no card to be inline in since 2026-09-05 (HUD subtraction
+                    // cut 1), so questsInline/questsCardTab/questsCardTabs are gone with
+                    // it. What is left is the only placement the surface still has, and
+                    // the one this cut has to keep true: the WINDOW opens, from the
+                    // context-menu row, the hotkey, or EQBUDDY_QUESTS.
                     $"questsHostWindowOpen={(w._questsHost.IsWindowOpen ? 1 : 0)} " +
                     $"raidsDefeated={w._raidLedger.DefeatedCount()} " +
                     // The WORLD theme's placement (World PR 3) — same contract as the
@@ -277,15 +289,24 @@ internal static class WidgetDump
                     $"uiScale100={w._settings.UiScale * 100:0} " +
                     $"sectionCapScreen={w._sectionAutoCap:0} " +
                     $"sectionMaxH={w.SectionScroll.MaxHeight:0} " +
-                    // The Quests card (2026-08-16). It replaced the Epic and Sky cards,
-                    // whose tab and row counts used to be asserted here. What a reader
-                    // sees now is one launcher line, so that is what E2E pins: the card
-                    // is present, and folding two cards into it kept BOTH checklists'
-                    // counts on screen rather than quietly losing the glance.
-                    $"questsCard={(w.QuestsSection.Visibility == Visibility.Visible ? 1 : 0)} " +
+                    // HOW MANY CARDS THE WIDGET IS ACTUALLY DRAWING, and how many of them
+                    // the player can see. `cards` is the catalog's length as realised in
+                    // the panel — nine since 2026-09-05, when Quests left (HUD subtraction
+                    // cut 1) — and `cardsVisible` subtracts whatever is hidden in Options.
+                    //
+                    // A COUNT rather than a per-card key, deliberately: `questsCard=1` was
+                    // the old shape and it could only ever say something about the card it
+                    // was named after. A subtraction is a claim about the STACK, and the
+                    // next cut wants the same assertion without anyone editing this file.
+                    $"cards={w.SectionsPanel.Children.Count} " +
+                    $"cardsVisible={CountVisible(w)} " +
+                    // The checklists are still BUILT with no card of their own to render
+                    // into — they feed the Quest Tracker, the Evolved shell's Quests room
+                    // and EQBuddy Mobile, and the loot auto-checkers tick them whether or
+                    // not anything is on screen. That is what these two pin now that the
+                    // launcher line is gone.
                     $"questsEpicTotal={w._settings.EpicQuestChecklist.Count} " +
                     $"questsSkyTotal={w._settings.SkyQuestChecklist.Count} " +
-                    $"questsSummaryLen={w.QuestsHeader.Text.Length} " +
                     // The Quest Tracker WINDOW, when EQBUDDY_QUESTS opened one. The WPF
                     // layer has no unit tests (docs/TestPlan.md §5), so the Gate 2
                     // rebuild's structure — list rows, a selection, a populated detail

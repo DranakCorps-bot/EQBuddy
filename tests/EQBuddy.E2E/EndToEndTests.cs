@@ -640,39 +640,82 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
-    /// The Quests card, which replaced the Epic and Sky cards on 2026-08-16.
+    /// **HUD SUBTRACTION, CUT 1 (2026-09-05): the widget draws NINE cards, and the Quest
+    /// Tracker is still reachable.**
     ///
-    /// This test used to pin those two cards' tab and row counts — written on
-    /// 2026-08-15 to prove the QuestChecklistView extraction moved behaviour and not
-    /// just lines. Both cards are now one launcher that opens the Quest Tracker, so the
-    /// tabs it asserted no longer exist on the widget; what has to stay true is the
-    /// reason the cards existed at all. The card SHOWS (a hidden launcher is an
-    /// unreachable window), both checklists are still built and populated behind it, and
-    /// its one line is non-empty — which is the whole glance that two cards used to
-    /// carry, and the thing a consolidation can silently drop.
+    /// This test has been the Quests card's twice over. It pinned the Epic and Sky cards'
+    /// tab and row counts (2026-08-15, to prove the QuestChecklistView extraction moved
+    /// behaviour and not just lines), then the launcher those two folded into
+    /// (2026-08-16). Now the launcher is gone as well, and what has to stay true is what
+    /// was always underneath it: <b>the data survives the move, and so does the way in.</b>
+    ///
+    /// **The card count is asserted as a NUMBER rather than by naming Quests.** A key
+    /// called <c>questsCard</c> could only ever speak for the card it was named after, and
+    /// a subtraction is a claim about the STACK — every later cut wants this same
+    /// assertion. Nine is the catalog's length today, and the number moving is exactly the
+    /// event that should make somebody look.
+    ///
+    /// Three ways this can go wrong are all in here, because none of them is visible in a
+    /// diff, a build or a screenshot: the card could still be drawn (cards would be 10),
+    /// the key could have left the catalog and stayed in <c>SectionMap</c> (the app would
+    /// not start at all — the Gear &amp; Loot fold's own crash), and the checklists could
+    /// have gone with the card that used to render them.
     ///
     /// Bard is still the seeded class: its epic is the one whose rows we have argued
     /// about most (#150 / #139), so a wrong count here is a number someone recognizes.
     /// </summary>
     [Fact]
-    public void TheQuestsCardShowsAndKeepsBothChecklistsGlanceable()
+    public void TheWidgetDrawsNineCardsAndTheQuestChecklistsSurviveTheCut()
     {
         using var app = new AppHarness(s => s.EpicQuestClass = "Bard");
         app.Launch();
 
-        Assert.Equal(1, app.DumpValue("questsCard"));
+        Assert.Equal(9, app.DumpValue("cards"));
+        // Motes ships hidden, so the visible count is one lower. Asserted so that "nine
+        // cards" cannot be satisfied by nine collapsed-away slots, and so that a future cut
+        // which HIDES a card instead of removing it fails here rather than passing.
+        Assert.Equal(8, app.DumpValue("cardsVisible"));
 
-        // The checklists still build with no card of their own to render into — they
-        // feed the Quest Tracker window and EQBuddy Mobile, and the loot auto-checkers
-        // tick them whether or not anything is on screen.
+        // The checklists still build with no card of their own to render into — they feed
+        // the Quest Tracker window, the Evolved shell's Quests room and EQBuddy Mobile, and
+        // the loot auto-checkers tick them whether or not anything is on screen. This is
+        // trap 20's question asked at the moment that creates it: when a surface is folded
+        // or cut, what still writes the things it owned?
         Assert.True(app.DumpValue("questsEpicTotal") > 0,
-            "the epic checklist should still be built behind the card; dump was: " + app.Artifacts());
+            "the epic checklist should still be built with no card; dump was: " + app.Artifacts());
         Assert.True(app.DumpValue("questsSkyTotal") > 0,
-            "the sky checklist should still be built behind the card; dump was: " + app.Artifacts());
+            "the sky checklist should still be built with no card; dump was: " + app.Artifacts());
 
-        // "Epic 1/12 · Sky 3/40" — folding two cards into one must not cost the numbers.
-        Assert.True(app.DumpValue("questsSummaryLen") > 0,
-            "the Quests card should summarise both checklists; dump was: " + app.Artifacts());
+        // And no window opened by itself. The card's arrow is gone; the doors that replace
+        // it are all explicit, which is the next test.
+        Assert.Equal(0, app.DumpValue("questsHostWindowOpen"));
+    }
+
+    /// <summary>
+    /// **The door that survives the cut.** Removing a card removes the entrance its header
+    /// was, and Bevel's fourth question for this whole subtraction programme is whether
+    /// anything that lived only behind that header becomes unreachable. For Quests the
+    /// answer is no — but only because the doors below exist, and only ONE of them existed
+    /// before this cut.
+    ///
+    /// <c>EQBUDDY_QUESTS</c> is what a test can drive, and it is the same call the
+    /// context-menu row and the <c>toggleQuests</c> hotkey make
+    /// (<c>OnQuestsWindow</c> → <c>ShowQuestsWindow</c>), so this asserts the destination
+    /// rather than the doorknob. The row itself is XAML with no logic in it — see the note
+    /// beside it in MainWindow.xaml for why it had to land in the same commit as the cut:
+    /// nothing is bound by default, so the hotkey is not a door on a fresh profile.
+    /// </summary>
+    [Fact]
+    public void TheQuestTrackerStillOpensWithNoCardToOpenIt()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "1" });
+        app.Launch();
+
+        app.WaitForDump("questsHostWindowOpen", 1, "the Quest Tracker to open with no card");
+        // The widget behind it is still nine cards: opening the window must not resurrect a
+        // launcher, which is the shape trap 55 caught when a fold kept running.
+        Assert.Equal(9, app.DumpValue("cards"));
     }
 
     /// <summary>
@@ -704,7 +747,10 @@ public sealed class EndToEndTests
         using var app = new AppHarness(s => s.EpicQuestClassicOnly = true);
         app.Launch();   // waits for killsTotal > 0; a window that never built never gets there
 
-        Assert.Equal(1, app.DumpValue("questsCard"));
+        // Was `questsCard=1` until the 2026-09-05 subtraction. The card is gone; the claim
+        // this test makes never was about the card — the app reached a live session with
+        // the setting on, which a half-built window cannot do.
+        Assert.Equal(9, app.DumpValue("cards"));
     }
 
     /// <summary>
@@ -1019,26 +1065,13 @@ public sealed class EndToEndTests
             "the header should still summarise the theme; dump was: " + app.Artifacts());
     }
 
-    /// <summary>Inline themes PR 3: the QUESTS card expands in place. Epic is a Full
-    /// room (one class's rows, capped — QuestInline's arrangement); General and Unlocks
-    /// are Glances. General is also the DEFAULT (Bevel: "3 quests ready to turn in" is
-    /// the thing a player expands the card to learn).</summary>
-    [Fact]
-    public void TheQuestsThemeExpandsInPlaceOnItsEpicRoom()
-    {
-        using var app = new AppHarness(environment: new Dictionary<string, string>
-        {
-            ["EQBUDDY_EXPAND"] = "quests:epic",
-        });
-        app.Launch();
-
-        app.WaitForDump("questsInline", 1, "the Quests card to own the body");
-        Assert.Equal(0, app.DumpValue("questsHostWindowOpen"));
-        app.WaitForDump("questsCardTab", "epic", "the room named in EQBUDDY_EXPAND");
-        app.WaitForDump("questsCardTabs", 4, "all four rooms in the card's strip");
-        Assert.True(app.DumpValue("questsSummaryLen") > 0,
-            "the header should still summarise both checklists; dump was: " + app.Artifacts());
-    }
+    // TheQuestsThemeExpandsInPlaceOnItsEpicRoom WAS HERE (Inline themes PR 3: the Quests
+    // card expanded in place, Epic as a Full room). It went with the card on 2026-09-05,
+    // HUD subtraction cut 1 — there is no Quests card to expand and EQBUDDY_EXPAND no
+    // longer answers "quests". The four rooms it asserted are all still drawn, by the Quest
+    // Tracker window and by the Evolved shell's Quests room. What replaces it is
+    // TheWidgetDrawsNineCardsAndTheQuestChecklistsSurviveTheCut and
+    // TheQuestTrackerStillOpensWithNoCardToOpenIt, above.
 
     /// <summary>Opening a theme's WINDOW keeps the card collapsed — one owner, PR 2's
     /// lanes behaving exactly as Progress does.</summary>

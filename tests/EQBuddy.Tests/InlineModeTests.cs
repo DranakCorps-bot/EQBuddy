@@ -20,12 +20,15 @@ public class InlineModeTests
     public void ProgressRooms(ProgressTab tab, InlineMode mode) =>
         Assert.Equal(mode, ProgressSurface.InlineModeFor(tab));
 
-    [Theory]
-    [InlineData(QuestTab.Epic, InlineMode.Full)]
-    [InlineData(QuestTab.Sky, InlineMode.Full)]
-    [InlineData(QuestTab.General, InlineMode.Glance)]     // search over 1,200 + a detail pane
-    public void QuestRooms(QuestTab tab, InlineMode mode) =>
-        Assert.Equal(mode, QuestSurface.InlineModeFor(tab));
+    // QuestRooms WAS HERE, and it went with the Quests CARD on 2026-09-05 (HUD subtraction
+    // cut 1). Inline mode is a question only a card asks — which rooms draw a real body
+    // under the header and which get one line — and Quests has no header on the widget any
+    // more. `QuestSurface.InlineModeFor` was deleted in the same commit rather than left
+    // for these rows to keep asserting: a rule about a surface nobody draws passes forever
+    // and reads as coverage (trap 34).
+    //
+    // Nothing about the Quest Tracker's rooms changed. The window and the Evolved shell's
+    // Quests room draw all four in full, as they always have.
 
     [Theory]
     [InlineData(CreatureTab.Kills, InlineMode.Full)]
@@ -44,23 +47,21 @@ public class InlineModeTests
     /// behind it — and every default room must be one the theme draws in FULL, or clicking
     /// a card would expand it onto a single line.
     ///
-    /// Only Kills &amp; Drops and Gear &amp; Loot publish a `Hosted` list; Progress and
-    /// Quests host their whole enum. Enumerating the enum is therefore the honest check for
-    /// those two, and it is stricter: a tab added later is covered without anyone
-    /// remembering this file.</summary>
+    /// Only Kills &amp; Drops and Gear &amp; Loot publish a `Hosted` list; Progress hosts
+    /// its whole enum. Enumerating the enum is therefore the honest check for that one, and
+    /// it is stricter: a tab added later is covered without anyone remembering this
+    /// file.</summary>
     [Fact]
     public void NoThemeGlancesEveryTabAndEveryDefaultRoomIsAFullOne()
     {
         Assert.Equal(InlineMode.Full, ProgressSurface.InlineModeFor(ProgressSurface.DefaultInlineTab));
         Assert.Equal(InlineMode.Full, CreatureSurface.InlineModeFor(CreatureSurface.DefaultInlineTab));
         Assert.Equal(InlineMode.Full, LootSurface.InlineModeFor(LootSurface.DefaultInlineTab));
-        // Quests is the deliberate exception, and it is worth stating rather than hiding:
-        // its default room is the General GLANCE, because "3 quests ready to turn in" is
-        // the thing a player expands that card to learn (Bevel, Helm-signed 2026-08-22).
-        Assert.Equal(InlineMode.Glance, QuestSurface.InlineModeFor(QuestSurface.DefaultInlineTab));
+        // Quests used to be the deliberate exception here (its default room was the General
+        // GLANCE). It has no card since 2026-09-05, so it has no default INLINE room to
+        // check — see the note where QuestRooms used to be.
 
         Assert.Contains(Enum.GetValues<ProgressTab>(), t => ProgressSurface.InlineModeFor(t) == InlineMode.Full);
-        Assert.Contains(Enum.GetValues<QuestTab>(), t => QuestSurface.InlineModeFor(t) == InlineMode.Full);
         Assert.Contains(CreatureSurface.Hosted, t => CreatureSurface.InlineModeFor(t) == InlineMode.Full);
         Assert.Contains(LootSurface.Hosted, t => LootSurface.InlineModeFor(t) == InlineMode.Full);
     }

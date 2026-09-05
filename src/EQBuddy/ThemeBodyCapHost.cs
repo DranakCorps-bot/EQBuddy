@@ -108,6 +108,8 @@ internal static class ThemeBodyCapHost
     /// before it promises anything (#250).</summary>
     public static bool AnyBodyIsCapped(MainWindow w) =>
         (w._progressCard?.BodyIsCapped ?? false) || (w._killsCard?.BodyIsCapped ?? false)
-        || (w._lootCard?.BodyIsCapped ?? false) || (w._questsCard?.BodyIsCapped ?? false)
+        // Quests is not in this list because it has no card since 2026-09-05 (HUD
+        // subtraction cut 1) — there is no inline body of its to cap.
+        || (w._lootCard?.BodyIsCapped ?? false)
         || (w._worldCard?.BodyIsCapped ?? false);
 }

@@ -148,7 +148,24 @@ public class ArchitectureTests
         //
         // Bumped down to the MINIMUM that fits (4123 × 1.1 = 4535.3 against 4,535 lines),
         // by the same "one line and no more" rule the two entries above used.
-        (@"EQBuddy/MainWindow*.xaml.cs", 4123),
+        //
+        // 4123 → 4106 on 2026-09-05 (HUD subtraction cut 1, the Quests card). **Not a lift
+        // this time — a SUBTRACTION**, which is the first entry here that got its room by
+        // deleting a surface rather than moving one, and the room has to be claimed the
+        // same way or it quietly refills.
+        //
+        // **The honest number is 19 lines, and it is smaller than the deletion.** The card
+        // build block, the SectionMap row, the EQBUDDY_EXPAND branch, the render call, the
+        // header line and the two card-sync calls came to about 40; roughly half came back
+        // as comments saying where the card went and why the host outlived it. That trade
+        // is deliberate — CLAUDE.md's rule is that a fold or a cut must be findable
+        // afterwards, and a tombstone that costs ten lines is cheaper than the next session
+        // re-deriving why `_questsHost` has no card. `QuestsThemeCard.cs` (97 lines) and
+        // `Core/QuestInline.cs` (63) left the repo entirely and are not in this sum at all.
+        //
+        // Bumped down to the MINIMUM that fits (4106 × 1.1 = 4516.6 against 4,516 lines),
+        // by the same "one line and no more" rule as every entry above.
+        (@"EQBuddy/MainWindow*.xaml.cs", 4106),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

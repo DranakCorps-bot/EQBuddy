@@ -1609,6 +1609,31 @@ Read this list before touching the areas it names. Every entry cost a release.
     room, not by a wrong test result — and a wrong test result here would not have looked
     like a defect, it would have looked like a passing suite.
 
+59. **A HOTKEY IS NOT A DOOR — nothing is bound by default, so "there is a second way in"
+    can be true of the WIRING and false of every player who has not configured anything.**
+    HUD subtraction cut 1 removed the Quests card, and the pre-design cleared it on exactly
+    that ground: *"Quests has a second, independent way in (`toggleQuests`, wired straight to
+    `OnQuestsWindow` — a hotkey, not a menu row)"*. The wiring is real. But
+    `src/EQBuddy/HotkeyManager.cs` says in its own doc comment that **hotkeys exist ONLY when
+    the player binds them — nothing is bound by default**, and the widget's context menu
+    carries `World…` and had no Quests row, because the 2026-08-16 fold deliberately removed
+    the cog's Quest tracker line *when the card became the door*. So the card's ⧉ was the only
+    entrance a default profile had, and cutting it as scoped would have made the Quest Tracker
+    unreachable — CLAUDE.md's "three ways back" with all three gone at once, which is #219's
+    mechanism with a subtraction behind it instead of a fold.
+    → **Nothing routine sees this.** The app builds, every test passes, and an absent menu row
+    photographs as an unremarkable context menu (trap 29). The check that found it was one
+    `grep` of `HotkeyManager.cs`, run only because the scope line said "hotkey / **door**" and
+    it was worth knowing which.
+    → **So when you subtract a surface, enumerate its entrances and ask of each one: does a
+    player who has never configured anything have it?** A context-menu row, a bound hotkey and
+    an `EQBUDDY_*` variable are three different answers to "is there a second way in", and only
+    the first is a door. The row went in with the cut, beside `World…`.
+    → **This is trap 52's shape** — an exemption is only as good as the premise that asked for
+    it — with the premise being about a PLAYER rather than about the code, which is the half a
+    source grep confirms and a source grep also misses. Eight more cards are queued for the
+    same treatment; each one gets this question before its diff, not after.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

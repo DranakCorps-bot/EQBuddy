@@ -807,38 +807,28 @@ public sealed class AppSettings
     }
 
     /// <summary>
-    /// The "Sky Quest" and "Epics" cards became ONE "Quests" card (David, 2026-08-16).
-    /// Both used to carry a full tabbed checklist on the widget — a review surface, not
-    /// a glance one — and the Quest Tracker window now owns that on its own three tabs,
-    /// which the new card opens.
+    /// **The quest cards leave the widget.** This used to be a FOLD — the "Sky Quest" and
+    /// "Epics" cards became one "Quests" card (David, 2026-08-16), and this method created
+    /// the "quests" key in the earlier of their two slots. On 2026-09-05 the Quests card
+    /// itself left <see cref="UI.Shared.OverlaySections.Catalog"/> (HUD subtraction cut 1,
+    /// Bevel's pre-design, Helm-signed), so the key this used to CREATE is now a key that
+    /// can never draw anything — and the fold becomes a subtraction of all three.
     ///
-    /// The surviving key takes the EARLIER of the two old slots, so the card appears
-    /// where the player already looked for quests instead of arriving at the bottom of
-    /// the list, where a new card reads as missing (the 1.66 lesson recorded in
-    /// NormalizeSectionOrder). It is hidden only when BOTH old cards were hidden:
-    /// keeping either one visible was a statement that quests belong on the widget.
+    /// **It has to remove "quests", not merely stop adding it.** Every 1.x profile in the
+    /// world carries that key in <c>SectionOrder</c>, and a key with no catalog row is the
+    /// exact shape that cost #252: <c>OptionsViewModel.Cards</c> looks each key up with
+    /// <c>First(...)</c>, and the phantom "gear" key is what a fold chewed on every launch
+    /// (see the ApplyDefaultGearSection tombstone above, and SectionFoldIdempotenceTests's
+    /// "migrations never invent a key that is not a card").
     ///
-    /// Idempotent — once neither old key is present there is nothing left to fold.
+    /// Idempotent by construction — once none of the three keys is present, nothing here
+    /// removes anything and it reports no change, so <c>Load</c> does not rewrite
+    /// settings.json on every launch (trap 13).
     /// </summary>
     public bool MigrateQuestSections()
     {
-        var firstSlot = -1;
-        for (var i = 0; i < SectionOrder.Count && firstSlot < 0; i++)
-            if (SectionOrder[i] is "sky" or "epic") firstSlot = i;
-
-        var hidSky = HiddenSections.Remove("sky");
-        var hidEpic = HiddenSections.Remove("epic");
-        var changed = hidSky || hidEpic;
-
-        if (firstSlot >= 0)
-        {
-            SectionOrder.RemoveAll(k => k is "sky" or "epic");
-            if (!SectionOrder.Contains("quests"))
-                SectionOrder.Insert(Math.Min(firstSlot, SectionOrder.Count), "quests");
-            changed = true;
-        }
-        if (hidSky && hidEpic && !HiddenSections.Contains("quests"))
-            HiddenSections.Add("quests");
+        var changed = SectionOrder.RemoveAll(k => k is "sky" or "epic" or "quests") > 0;
+        changed |= HiddenSections.RemoveAll(k => k is "sky" or "epic" or "quests") > 0;
         return changed;
     }
 

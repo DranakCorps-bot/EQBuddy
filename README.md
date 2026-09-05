@@ -104,7 +104,7 @@ is welcome. Progress: [issue #275](https://github.com/DranakCorps-bot/EQBuddy/is
 | ![Drops by Creature](docs/screenshots/drops-window.png) | ![Quest Tracker](docs/screenshots/quest-tracker.png) |
 | **Drops by Creature** — your personal drop rates per mob, with ✦ marking drops the [community wiki](https://eqlwiki.com) doesn't know yet and **✦ Copy for wiki** building a paste-ready contribution | **Quest Tracker** — 1,172 wiki quests as a scannable list beside a detail pane; loot something a quest wants and its row flips to **ready** with a green rule down its edge, sorted by how close the quest is to where you're standing |
 | ![Sky checklist in the Quest Tracker](docs/screenshots/sky-checklist.png) | ![Spawn timers](docs/screenshots/spawns-window.png) |
-| **The Sky Quest card is now the Plane of Sky tab of the Quest Tracker** (pop it out of the Quests card) — all 222 turn-in items, filtered by a class chip strip rather than a card per class; loot auto-checks *your* class's boxes, a **Ready to turn in** block leads with what you can hand in right now, and a reward's own checkbox marks the quest turned in | **Spawn timers are now the Camps tab of the World window** (right-click → *World…*, or the World card) — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
+| **The Sky Quest card is now the Plane of Sky tab of the Quest Tracker** (right-click the widget → *Quests…*) — all 222 turn-in items, filtered by a class chip strip rather than a card per class; loot auto-checks *your* class's boxes, a **Ready to turn in** block leads with what you can hand in right now, and a reward's own checkbox marks the quest turned in | **Spawn timers are now the Camps tab of the World window** (right-click → *World…*, or the World card) — kill a named (or its placeholder) and a countdown chip appears; timers tighten themselves from your own kills, every duration editable |
 | ![Session history with progress charts](docs/screenshots/history-charts.png) | ![Review an archived session](docs/screenshots/session-picker.png) |
 | **Session history & progress charts** — every session in a local, searchable database (notes, tags, compare, export), and per-character **level and AA charts**: every ding at its exact time, a staircase not a slope | **Archive review** — replay any saved log read-only; a multi-session file asks which evening you meant. Drops and wiki export work on the past |
 | ![Mini dashboard](docs/screenshots/mini-bar.png) | ![Breakout windows](docs/screenshots/damage-breakout.png) |
@@ -402,7 +402,7 @@ Maps & travel:
   data plus the wiki's boat and port adjacencies.
 
 Quests (tracker, Sky checklist, ledger):
-- **Quest Tracker** (pop it out of the Quests card, or bind a hotkey to it): 1,100+ quests from the community
+- **Quest Tracker** (right-click the widget → *Quests…*, or bind a hotkey to it): 1,100+ quests from the community
   wiki, filterable by class, era, and zone — sorted by how many zones away each quest
   giver is from where you're standing. **Type anything in the search box** and the
   whole catalog answers — quest names, turn-in items ("what needs Bone Chips?"),
