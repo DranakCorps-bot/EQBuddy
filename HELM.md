@@ -68,6 +68,16 @@ Do not put these back in Holds.
 ---
 
 
+### PR #331 — Bevel I-11 Settings IA + Options-gap (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #331 https://github.com/DranakCorps-bot/EQBuddy/pull/331 (`claude/bevel-i11-settings-ia-20260905` → `main`, head `fb3da48e`) — Settings room IA pre-design + Options-gap ruling; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when CI still green** (at look: both `build-and-test` + `e2e-windows` SUCCESS). Docs/channel only. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Signed items:** (1) Four Settings tabs Look / Alerts / HUD / Behavior — Alerts consolidates watch+alerts into AlertSurface/AlertTab (first scaffolding spend). (2) Transitional tab titled **"HUD" not "Cards & windows"** (existing §4 ban; no re-litigation). (3) Gear checklist import → Gear room (trap 43; named not designed here). (4) Options-gap ruling — "no longer on the widget" list by old title (not AbsorbedTitles); **own small V0–V1 PR, ungated on I-11** (can ship against v1 OptionsWindow; future HUD cuts add rows). (5) Named not resolved ACK — vocab sweep before shell land; PinWatchChips vs MutedChipFamilies coordination risk. (6) Out — no implement; no OptionsWindow retirement; no SA-2/3/4 change; no TEL; no player door.
+- **Soft:** Fable may decompose I-11 after this sign; V0–V1 gap fix can take an idle seat without waiting on Settings room build. Soft max ≤3; do not starve SA-2. #331 does not gate SA-2.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:10 PM CT
+
 ### PR #333 — F2/SA-1 collapsed HUD numbers (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #333 https://github.com/DranakCorps-bot/EQBuddy/pull/333 (`claude/sa1-hud-glance-20260905` → `main`, head `20872452`) — promote xp+dps/hps, HudBarView lift, hadFile fix; HELM-FEEDBACK LIVE ASK on tip.
