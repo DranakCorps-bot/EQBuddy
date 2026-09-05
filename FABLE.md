@@ -95,6 +95,306 @@ next loop, not a reopening of the plan.
 
 ---
 
+## Surface A — HUD Edit mode: the F2 multi-PR decomposition (Fable, 2026-09-05, on tip `d4092028`)
+
+- **Priority:** `ready` — **after Helm signs this decomposition** (the last-look ask is in
+  `HELM-FEEDBACK.md`; K10's own kick prompt says plan-only until F2 is signed). Once signed,
+  each SA PR below follows the standing per-PR Helm last-look loop exactly as #299–#326 did —
+  no further blanket authorization exists or is needed. **No `needs-david:`** — everything
+  here is inside the #324 sign (Helm, 2026-09-05 ~1:30 PM CT, six items) and the signed spec
+  §0/§3; no consequence-list door is touched. Serial in lane W (K11), one screen owner.
+- **Class:** `V2` — the long pole by the E-3 plan's own name (I-8). Three always-on-top
+  windows fold into one surface, a settings family retires with a behavior-preserving
+  migration, and the decomposition decides what seven later card cuts are gated on. Not
+  V0–V1 because the obvious reading of I-8 ("MiniStats seeds the HUD") is the thing the
+  signed pre-design just ruled OUT — an executor without this plan would build the
+  mini-dashboard again and call it a HUD.
+- **Source:** Bevel's B3 pre-design (`BEVEL.md` 2026-09-05, PR #324, Helm-signed ~1:30 PM CT
+  — the six signed items are restated below so no SA PR needs to re-derive them);
+  `docs/BEVEL-v2-staging-critique.md` §0/§3 (the signed HUD spec); `FABLE.md` I-8; the K10
+  kick. B3 stays in `BEVEL.md` as the executors' reference — its §1 per-key fate table is
+  the authority; the condensed copy below is a cross-reference, not a second list.
+- **Bevel pre-design: yes — B3 (#324).** One residual: B3 named the Edit-mode *verbs* and
+  pointed at `AlertWindow`'s `_placement` behavior as the interaction precedent but did not
+  draw the Edit entry affordance. SA-4 follows that precedent; a departure from it is a
+  Bevel question **before** it ships, not after.
+- **Shot offline: yes** — every staged state is fixture-log + settings driven, no wiki
+  fetch anywhere in Surface A. Predictions written before shooting (trap 23), and the
+  **BATCH** runs, not `-Shot` (trap 53) — SA-2 deletes two windows, which is trap 53's
+  exact trigger: **grep `scripts/` for `SpawnChipsWindow`/`MezChipsWindow` TITLES in the
+  same commit that deletes them.**
+- **Column budgets:** the HUD is `SizeToContent`, so trap 12 binds every readout:
+  `HudGlance` emits fixed-shape strings (pinned by its unit tests) and the bar reserves
+  widths — `PerfReadout` is the worked example. No new string enters an existing
+  fixed-width surface. The chip-hosting decision below exists *because* of this budget.
+- **Guards run eight times:** every new E2E fact and the SA-1 migration prove-fail on the
+  pre-change tree, then eight consecutive greens.
+- **What clamps it (all verified this pass):**
+  - **The WPF ratchet is `4106` with zero headroom** — 4,516 lines against 4106 × 1.1 =
+    4,516.6 (`ArchitectureTests`). Every SA PR must be net-non-positive in the
+    `MainWindow*` glob **or lift a surface out** — and SA-1/SA-2 are designed as lifts, not
+    as edits that squeeze under the bar.
+  - **`MiniStats` has readers beyond the bar.** The minimized-breakout gate
+    (`MainWindow.xaml.cs:3530–3536`) opens a breakout only when the kind is not in
+    `DisabledBreakouts` **and** its star key is in `MiniStats` — so stripping `dps`/`hps`
+    naively closes a player's open Damage/Healing breakout silently (trap 20's shape).
+    SA-1's migration is specified against this. `WasWatchingMotes`
+    (`AppSettings.cs:904`) also reads the list and is untouched (motes is not a promoted
+    key). 19 files name `MiniStats`; SA-1 enumerates every reader in-PR before the strip.
+  - **`AppSettings.Save` writes the whole file** (trap 13); the SA-1 migration is
+    idempotent, lives in the `ApplyMigrations` chain, and is run-TWICE tested through the
+    whole chain (trap 55, `SectionFoldIdempotenceTests` shape).
+- **Must-list rows:** no `GameCommandsTests.SurfacesNeedingACommand` or
+  `ImportReportReachesASurfaceTests` row names the mini bar or any chip window (no command
+  copy, no import report lives on a Surface A surface — checked both curated lists by
+  subject). `DeadSettingTests`: eight chip-geometry fields leave in SA-2 *with the windows
+  that wrote them*; SA-4's two new settings arrive with writer + reader in the same PR.
+- **Already shipped — what this must not fight:** nine-card widget (W1/#314); the standing
+  per-item HUD-subtraction gate (rooms pre-design §2: room landed → chip/room shipped for
+  review → screenshot parity, per surface); `ChipStackPlan`/`SlowChipText` as tested chip
+  logic (both survive, re-consumed); `AlertWindow`'s toast + placement-drag;
+  `AlertSurface`/`AlertTab` scaffolding (zero consumers — B4 fact; **spent at I-11, not
+  here**); `MiniBarPresentation` as the one place bar contents are decided; the `mini-bar`
+  and `mini-tour` shots and their staging blocks.
+
+### The signed rulings, restated so no SA PR drifts (#324, all six SIGNED)
+
+1. **`MiniStats` does not migrate.** The flat ten-key mini-dashboard retires with the card
+   stack, key by key, under the per-item gate. Only `xp` and `dps`/`hps` **promote** to
+   always-on collapsed numbers — and promotion removes their toggles, which is a
+   player-visible change the What's-new must say in those words.
+2. **One HUD chip row** — consolidation, not extension. `SpawnChipsWindow` and
+   `MezChipsWindow` retire; Watch-fire and buff-expiring chips are **net-new UI**, not a
+   port (nothing visual exists for either today — grep-verified by B3).
+3. **Edit verbs re-scoped for one row:** Place = order in the row (not x/y — the signed
+   ruling already accepts that mez chips lose their "parked next to the fight" drag);
+   Mute = per-chip-family; Dismiss = per-instance, semantics unchanged.
+4. **B4 facts ride along as facts only** — full Settings IA stays I-11.
+5. **Sequencing (1) collapsed numbers (2) chip-row consolidation (3) Edit mode (4) star
+   retirement per-item** — signed as an offer to F2, not a plan lock.
+6. **Out of pass:** pet-idle chip question (open, unruled); card cuts; player door;
+   `v1.99.19`; Play Console; I-11.
+
+### SA-1 — Collapsed HUD numbers: promote xp + dps/hps, and the bar lifts out of MainWindow
+
+1. **`UI.Shared/HudGlance.cs`** — one decision, unit-tested with no window: the collapsed
+   trio (Name · DPS · XP%/hr, third slot ↔ HPS while healing dominates ~30 s, swap back
+   the moment damage-combat returns — spec §3's words). Hysteresis both directions tested;
+   every output a fixed-shape string (trap 12). `CharacterName` can be empty until the log
+   names one — the empty slot renders at reserved width, not as a collapsing hole.
+2. **Core grows the dominance signal.** Nothing windowed exists for healing today
+   (`CurrentHps` — no matches in the tree; `Hps` is session-scope). `SessionStats` adds a
+   recent heal-vs-damage fact to the snapshot; `CurrentDps`'s live-fight window and its
+   memo caveat (`SessionStats.cs:1665–1680` — the one wall-clock-reading field) are the
+   in-file precedent, and the new field must extend that memo condition or be derived
+   purely from event totals — executor's call, logged in `DECISIONS.md`.
+3. **The lift.** The mini-bar render path (`MainWindow.xaml.cs:3683` loop and its cell
+   chrome) moves to a new **`EQBuddy/HudBarView.cs`** — a view class like `QuestsView`,
+   NOT a partial (the glob sums partials on purpose). In-PR order: dump facts first
+   (`hudGlance=`, `hudCells=` into `EQBUDDY_EXPAND` — **no mini-bar facts exist today**,
+   verified), E2E assertions green on the pre-move tree, then the move, **ratchet down in
+   the same commit**.
+4. **Promotion mechanics.** `StarDps`/`StarHps` leave `StarButtons()`
+   (`MainWindow.xaml.cs:3438`); the xp star leaves `ProgressWindow.xaml.cs:136` (its
+   sibling money/motes stars stay — they are the ONLY writers for their keys, per that
+   file's own header); `OptionsCardsView.BuildMiniStats` drops the three rows. The trio
+   renders always-on, ahead of any surviving starred cells.
+5. **The migration, specified** (the trap-20 landmine this plan exists to defuse): for
+   Damage/`dps` and Healing/`hps` only — `xp` maps to no `BreakoutKind` — *read the star
+   before stripping it*: if the key is absent from `MiniStats` at migration time, add the
+   kind to `DisabledBreakouts` (preserving "closed"); then strip `xp`/`dps`/`hps` from
+   `MiniStats`; then re-key the `:3530` gate to `DisabledBreakouts` alone for those two
+   kinds. A player's open breakout stays open, a closed one stays closed, and the second
+   run is a no-op because the keys are already gone. Run-twice tested through the whole
+   chain.
+6. **Vocabulary rider:** `OptionsCardsView.cs`'s breakout tooltip says "mini pill" — the
+   phrase Helm banned at #323(b)/#326. The shell scanner deliberately does not cover v1
+   Options, which is how it survived; SA-1 edits this file anyway, so the tooltip rewrites
+   to the bar's real name in passing.
+7. **What's-new staging** in the unreleased 2.0.0 Evolved block (#314 precedent): "XP and
+   DPS/HPS are always-on HUD numbers now" — naming the removed un-star toggle, because a
+   removed capability described only by its replacement is the #233 complaint.
+8. **Shots:** `mini-bar` + `mini-tour` re-shot with predictions rewritten first (their
+   staging seeds all ten keys; post-migration prediction is trio-first plus seven staged
+   legacy cells). Batch run.
+
+### SA-2 — One chip row: fold spawn + mez, retire two windows and eight settings
+
+1. **`UI.Shared/HudChipRow.cs`** — the merge decision: which families are present
+   (spawn + mez now, SA-3 adds two), family order (default mez first — combat-urgent, the
+   distinction the two windows' own doc comments draw), instance order within a family
+   preserved from today's plans, DUE flip carried over. `ChipStackPlan` survives as the
+   per-family "should this stack show" answer, re-consumed here; its tests keep passing
+   unchanged.
+2. **Hosting — the one place this plan amends B3's letter, flagged in the Helm ask.** The
+   row renders in a companion window **slaved to the HUD's position every tick** — shown
+   only while chips exist, with **no geometry of its own and nothing persisted**. B3 says
+   "inside the HUD (expanded state)"; drawn literally *inside* the `SizeToContent` widget,
+   a chip appearing at spawn-due is a timer-driven resize of an always-on-top window over
+   a fullscreen game — trap 12/#173's exact mechanism. The slaved companion keeps every
+   player-visible property B3 wanted (one row, one place, moves with the HUD, no fourth
+   independently-positioned float, no saved x/y) and keeps the widget's measured size
+   still. **Visibility: whenever chips exist, in BOTH HUD states** — today's chips are
+   visible regardless of widget state ("the stack exists exactly while timers do"), and an
+   expanded-only row would subtract a live capability mid-pass, which is what the per-item
+   gate exists to forbid. Recommendation to Helm: sign both halves as an amendment.
+3. **The chicklet lifts as a control** (`EQBuddy/HudChip.cs` or a `DesignSystem` addition):
+   countdown, drain-gauge fill, DUE flip, click-to-dismiss — from the two windows' render
+   code, reused not rebuilt. `SlowChipText` keeps its job.
+4. **Retired:** `SpawnChipsWindow.xaml(.cs)` (215 lines), `MezChipsWindow.xaml(.cs)` (174),
+   their `MainWindow` construction sites (`:2451`, `:2477` — net-negative in the glob,
+   ratchet down same commit), and **eight settings**: `SpawnChips{Left,Top,Bottom,GrowUp}`,
+   `MezChips{Left,Top,Bottom,GrowUp}` — removed outright, not kept for round-trip (the
+   windows they position no longer exist; JSON load ignores unknown keys; logged in
+   `DECISIONS.md`). **`ChipScale` STAYS** — it is the player's chip-size choice and the row
+   obeys it.
+5. **`ChipStackAnchor` + `ChipAnchor.cs` + `ChipStackAnchorTests` delete with the
+   windows** — their entire subject is per-window geometry persistence (the trap 2/#122/
+   #152 guard), and nothing persists chip geometry any more. CLAUDE.md's trap 2 entry gets
+   a tombstone line in the same PR (the trap stays true; its named guard is retiring with
+   the surface it guarded — trap 57's precedent for how to record that).
+6. **Fold obligation (traps 20/26/46):** enumerate every control and interaction the two
+   windows carried and say where each went — the known ones: click-to-dismiss (→ the chip
+   control, unchanged), Options-open placement mode and its draggable placeholder
+   (`ChipStackPlan.Placeholder` — dies with placement; the Options affordance that
+   summoned it must not dangle), grow-up/grow-down (dies with free placement — the row has
+   one growth direction), mez-duration editor and spawn toggles in Options (rules, not
+   geometry — untouched). The PR carries this list in its description.
+7. **E2E + shots:** `hudChips=` fact family (per-family count, due flags, row visible)
+   prove-failed then asserted; a new staged `hud-chips` shot (name checked against
+   `docs/screenshots/` and the docs first — trap 21) with spawn timers + a mez chip
+   seeded and the picture predicted in writing before it runs.
+
+### SA-3 — Net-new deadline chips: Watch-fire and buff-expiring
+
+1. Two new families on the row SA-2 built, per §3's earn table (both are deadlines with
+   actions). **Watch-fire:** chip appears when a tracked rule fires — same event that
+   drives `AlertSoundPlan` — lingers a fixed short window or until dismissed. **Buff
+   expiring:** chip appears at a fixed T-minus threshold from the buff timer data the
+   Buffs surface already draws (hypothesis to verify in-PR: that data is on the snapshot;
+   the Buffs breakout implies it, not read this pass).
+2. **Defaults are pinned constants, not new Options rows.** Threshold tuning is a later
+   ask if players ask; SA-3 ships no settings surface (mute arrives with SA-4).
+3. The `buffs` `MiniStats` key does NOT retire here — it retires with the Buffs card cut
+   under the per-item gate (SA-R). SA-3 merely builds the destination that unblocks that
+   row's gate.
+4. E2E facts + staged shot with a rule-fire and an expiring buff in the fixture window;
+   predictions first.
+
+### SA-4 — Edit mode: Place / Mute / Dismiss on the one row
+
+1. **Entry:** an "Edit HUD…" row in the widget context menu, and while active the HUD
+   carries the edit affordances — `AlertWindow._placement`'s shape (edit only while the
+   mode is on, normal and click-through otherwise), which B3 itself named as the precedent
+   worth reusing.
+2. **Place** = family order: new setting `HudChipOrder` (list; default mez, spawn,
+   watch-fire, buff — urgency order). Edit UI is per-family nudge left/right — cheap,
+   testable; drag-reorder is gold-plating this pass.
+3. **Mute** = new setting `MutedChipFamilies` — a *sibling* of `DisabledBreakouts`' shape,
+   never a repurposing of it (B3 §3's explicit line: breakouts and HUD chips are different
+   objects). **Mute is on-screen presence only** — spec §3 splits the jobs: Settings →
+   Alerts owns volume/sound/what-fires; the HUD owns what is on screen right now. A muted
+   family's sounds are untouched by SA-4.
+4. **Dismiss** — already exists (click-away), carries over unchanged; it is a live-mode
+   gesture, not an Edit-mode one.
+5. Both settings ship with writer + reader in the same PR (`DeadSettingTests` posture); no
+   migration (new keys, defaults). Unit tests in `HudChipRow` for order + mute
+   application; E2E `hudChipOrder=` / `hudMuted=` facts.
+
+### SA-R — per-key star retirement: a template, NOT an authorization
+
+Card cuts stay signed OUT of this pass (#324 item 6). Each remaining `MiniStats` key
+retires only with its card's cut, under the standing per-item gate, its own PR, its own
+Helm ask. What F2 contributes is the template each of those PRs follows and the coupling
+table (condensed from B3 §1, which remains the authority):
+
+| Key | Retires with card | Destination that must exist first |
+|---|---|---|
+| `kills` | Kills & Drops | Live (session kills half — shipped) |
+| `loot` | Gear | Gear room + **the ordinary-loot toast** (net-new; belongs to THIS retirement, not to SA-2/3 — named so nobody bolts it in early) |
+| `motes`, `money` | Motes / Progress | Progress Wealth (shipped) — note `motes` has TWO writers today (B3 §1) |
+| `deaths` | World `misc` | World Travels & Deaths, pending I-5's own checks |
+| `pet`, `procs` | Combat/Healing family | Live board |
+| `buffs` | Buffs | SA-3's buff-expiring chips |
+
+Template per retirement PR: destination shipped + reviewed → screenshot parity → star
+writer removed + cell removed + migration strips the key + `HiddenSections` handling for
+the card → `DeadSettingTests` / must-list re-check per move (traps 20/26/34/43) →
+What's-new "X is now Y" naming origin AND destination → Helm last-look. `xp`/`dps`/`hps`
+never appear in this series — SA-1 already retired their stars by promotion.
+
+### Sequencing and lane
+
+SA-1 → SA-2 → SA-3 → SA-4, **serial, lane W** (they share `MainWindow`, the row, and the
+ratchet), each PR batch-shot under the screen mutex and each ending in a `HELM-FEEDBACK.md`
+ask. SA-R PRs interleave afterwards as their card-cut gates clear, still lane W. Nothing
+here blocks S/D/T-lane work; TEL stays parked per its own sign (eligible seat only after
+Surface A is *underway*, which SA-1 satisfies).
+
+### Flagged to Helm in the ask (divergences from B3's letter, recommendation first)
+
+1. **Chip-row hosting + visibility** (SA-2 item 2): position-slaved companion, no geometry
+   of its own, visible in both HUD states whenever chips exist. Diverges from "(expanded
+   state)" read literally; keeps every player-visible property the sign wanted; trap 12 is
+   the reason. Recommend: sign as amendment.
+2. **The SA-2/SA-3 split** of signed step (2): consolidation is a parity refactor with
+   zero new behavior; net-new chips are new behavior with new staging — different review
+   shapes, and the sign said the sequencing was an offer, not a lock. Recommend: sign.
+3. **The transitional collapsed HUD** = fixed trio + surviving starred legacy cells until
+   SA-R empties them. Spec-final trio-only is the END state; per-item retirement (which
+   Helm signed) *implies* this intermediate shape, so it is stated rather than smuggled.
+   Recommend: acknowledge.
+
+### Checked — what Fable actually read on this tip
+
+`HELM.md` through the #326 sign (Live Holds empty; the #324 six-item sign verbatim);
+`HELM-FEEDBACK.md` ~1:30 PM CT #324 entry; B3 in `BEVEL.md` in full;
+`docs/BEVEL-v2-staging-critique.md` §0 + §3 in full; `MiniBarPresentation.cs` in full
+(`Order`, `Names`, `Icons`, `Cells`, the buffs-never-draws comment);
+`MainWindow.xaml.cs` `MiniStatOrder:116`, `StarButtons:3438–3446` (six keys — dps/hps/pet/
+procs/buffs/motes), `SyncStarsFromSettings:3451`, chip construction `:2451`/`:2477`,
+`AlertTile:2800`, the mini-bar loop `:3683`, the breakout gate `:3530–3548`;
+`AppSettings.cs` chip fields (six position `:437–449` + two GrowUp `:217–218` + `ChipScale
+:27`), `MiniStats:20` default `["kills","dps"]`, `WasWatchingMotes:904`;
+`ProgressWindow.xaml.cs:121,136` (xp star + the only-writers header);
+`OptionsCardsView.BuildBreakouts` in full (the both-halves gate comment, the "mini pill"
+tooltip); `ChipStackPlan.cs` headers + consumer list (ChipAnchor, MainWindow, two test
+files); window line counts (SpawnChips 215 / MezChips 174 / AlertWindow 121);
+`SessionStats.cs` `CurrentDps` memo block `:1665–1680`, `CharacterName:138`, snapshot
+fields `:2083–2093`; `ArchitectureTests` ratchet row (4106; 4,516 vs 4,516.6);
+`WidgetDump.cs` (zero mini/chip facts — grep); `scripts/shoot.ps1` `mini-bar`/`mini-tour`
+blocks and their staging; `OverlaySections.Catalog` head + the W1 subtraction comment;
+grep for `CurrentHps`/"healing dominat" (nothing) and `WatchChips`/`BuffsChips` visuals
+(nothing, confirming B3). **Hypotheses, labelled:** (1) buff-timer data is snapshot-reachable
+for SA-3 — implied by the Buffs breakout, not read; verified in-PR before SA-3 is scoped
+final. (2) The chicklet render code lifts cleanly as a control — the two windows are thin
+(215/174 lines), believed not proven. (3) The 19 `MiniStats`-naming files beyond the two
+live gates are comments/blockers, not readers — SA-1's in-PR enumeration proves it.
+
+### Decided without asking — to `DECISIONS.md` when taken
+
+- **The mini bar lifts out of `MainWindow` in SA-1** rather than being edited in place —
+  the ratchet has zero headroom and "lift a surface, don't split the file" is the standing
+  move; could have squeezed under the bar instead.
+- **Chip row hosted as a position-slaved companion** rather than in the widget's visual
+  tree (trap 12) — flagged to Helm rather than silently decided, but the default is mine.
+- **Mez before spawn** as default family order (combat-urgent first, the two windows' own
+  distinction); could have been spawn-first or alphabetical.
+- **Eight chip-geometry fields removed outright**, not kept-for-round-trip — the surfaces
+  they position are gone and 2.0.0 is local-only; `SpawnSound`'s keep-for-round-trip
+  precedent predates the one-lane world.
+- **`ChipStackAnchor`/`ChipAnchor` deleted with tests + trap 2 tombstone** — could have
+  kept them as dead guards, which trap 45's "an exemption nobody can see" logic argues
+  against.
+- **SA-3 ships pinned default thresholds, no Options rows** — tuning waits for a player
+  ask; the alternative (a settings row per family) is I-11's surface arriving early.
+- **Nudge-reorder, not drag-reorder, for Place** — cheap and testable; drag can arrive
+  later without changing the setting's shape.
+- **Loot toast deferred to the `loot` retirement PR** — it is that gate's destination, not
+  Surface A core.
+
+---
+
 ## Evolved opt-in telemetry — heartbeats, own backend, public metrics (Fable, 2026-09-05, on tip `3ec285aa`)
 
 - **Priority:** `someday` — **captured for later sequencing, on David's explicit instruction.**
@@ -353,7 +653,8 @@ shows trailing uniques + peak (slow-moving) and the live number lives on a linke
   subtraction of seven of the remaining nine cards** (Combat, Healing, Watch, Buffs, Gear,
   Motes, Progress — Bevel's inventory table) and, behind them, every window retirement.
   Multi-PR by construction; needs its own Bevel pre-design (the chips are pixels) and its
-  own Fable decomposition against that pre-design.
+  own Fable decomposition against that pre-design. → **Both exist now:** B3 (#324,
+  Helm-signed 2026-09-05 ~1:30 PM CT) and the F2 decomposition above (SA-1…SA-4 + SA-R).
 
 **Blocked / parked, with the gate named so nobody re-derives it:**
 

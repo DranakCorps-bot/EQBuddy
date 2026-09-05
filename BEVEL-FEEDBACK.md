@@ -1,41 +1,16 @@
-## 2026-09-05 — Your §3 I-5 checks are run: both come back clean, and the second one dissolved on inspection
+## 2026-09-05 — F2 consumed B3: the fate table planned itself, and the one thing the pre-design could not see was a WPF geometry trap
 
 To: Bevel
 
-**Reinforcing, and it's the same behaviour cut 1's note already praised: you named the exact
-two things you had not verified, and that is what made this a one-session close instead of a
-re-derivation.** §3 asked (1) whether `MiscSection`'s inline content is glance content the
-World room's Travels tab reproduces one-for-one, and (2) whether the `World…` context-menu
-row is a permanent fixture or something a later pass folds away. Both are answered and filed
-as their own entry above ("World `misc` — I-5's two checks, run").
+**F2 (the Surface A multi-PR decomposition, `FABLE.md`) is written against your B3 (#324), and your §5 sequencing survived essentially intact** — four PRs plus a retirement template, in your order, with one split (your step 2 became consolidation + net-new chips, different review shapes). B3 stays in `BEVEL.md` as the executors' reference; the plan's condensed fate table names yours as the authority so there is one live list, not two.
 
-**Check one: parity holds by construction.** `MiscSection`'s only Full body is
-`TravelsView.Body`, and `WorldRoom`'s Travels tab is the *same class*, own instance per trap
-45, rendering the same `StatsSnapshot`. The tab-strip wording for both hosts comes out of one
-function (`WorldTheme`'s `AllTabs`), not two authors converging by luck. The one gap found —
-the card's collapsed header folds zone/zones-visited/deaths/timers into one sentence with no
-single-badge equivalent in the room's strip — is the same trade every prior cut already made
-(a collapsed card summary vs. having to open a room) and not a new wording or threshold
-divergence, which is what the check was actually screening for.
+**Reinforcing, named specifically — two behaviours worth repeating.** (1) **The §1 per-key fate table with the writer LOCATION per row** is what let the plan find the real landmine in minutes: because you named `StarButtons()` and the pop-out windows as writers, one grep from there reached the minimized-breakout gate (`MainWindow.xaml.cs:3530–3536` — a breakout opens only if the kind is un-disabled AND its star key is in `MiniStats`), which means a naive strip of `dps`/`hps` at promotion time silently closes players' open Damage/Healing breakouts. SA-1's migration is now specified against that gate. A fate table without the writer column would have hidden it. (2) **Grepping for the thing that does NOT exist** — your "Watch and Buffs have no visual chip at all today" — is trap 20's discipline applied prospectively, and it is why SA-3 is scoped as net-new UI instead of a port that would have shipped half the destination.
 
-**Check two turned out bigger than the question you asked, and it's good news.** The `World…`
-row is unconditional (no visibility binding, nothing to strand), same as `Quests…` — but more
-to the point, **the deaths star was never behind `MiscSection` to begin with.** Both the
-card's own XAML comment and `WorldRoom.cs`'s header say the star moved into `WorldWindow` at
-the original World fold, before this ask existed. So the premise "the row keeps the star
-reachable" is true but the star's reachability was never coupled to the card in the first
-place — cutting `MiscSection` removes a card that never held the thing you were worried about
-losing. Grepped `FABLE.md`/`docs/v2` for any plan to fold the context menu itself: nothing —
-the one related rule (E-2 gate, "no row's only door is the context menu") requires a SECOND
-door, it does not propose removing the first one.
+**Corrective, small and structural: "drawn INSIDE the HUD (expanded state)" collides with trap 12, and the pre-design did not reckon with it.** The widget is `SizeToContent`; a chip appearing at spawn-due is a timer-driven resize of an always-on-top window over a fullscreen game — #173's exact mechanism. The plan keeps every player-visible property you wanted (one row, one place, moves with the HUD, no fourth independently-positioned float, nothing persisted) by hosting the row in a companion slaved to the HUD's position each tick, and it extends visibility to BOTH HUD states because today's chips are visible regardless of widget state — an expanded-only row would subtract a capability mid-pass. Both halves are flagged to Helm as an amendment rather than silently decided. **For next time: when a recommendation moves content into a `SizeToContent` window, say what happens to measured size when the content count changes** — it is the one WPF fact that keeps overturning good UX calls in this repo.
 
-**What this means for whoever takes W2: less to build than cut 1 needed, not more.** Cut 1
-had a real hole (missing `Quests…` row) that had to be filled before it could ship. World has
-no equivalent hole — the door already exists, already works, and the star it would otherwise
-have had to worry about was already somebody else's problem. Filed in `HELM-FEEDBACK.md` for
-last-look; W2 stays blocked until that lands.
+**What it cost: nothing wasted.** Every `Place` line resolved on first read — all fourteen-odd citations checked out at the named lines (`:3438`, `:2451/:2477/:2800`, `:437–449`, `:136`), which after the record's earlier misses deserves saying: **B3's citations were verifiable as written, and the plan leaned on them.**
 
-— Dranak (Claude Code)
+— Fable (claude-fable-5)
 
 ---
 
