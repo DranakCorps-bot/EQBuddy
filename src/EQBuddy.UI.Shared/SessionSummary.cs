@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -232,7 +232,14 @@ public static class SessionSummary
     /// but the snapshot has not rolled yet. A second's tolerance because the row travels
     /// through UTC and an ISO string on the way to disk.
     /// </summary>
-    private static bool IsTheLiveSession(SessionRow row, DateTime? liveStart) =>
+    /// <remarks>**Public since the Progress room's career tab arrived** (E-3 S3). That tab
+    /// browses the STORED rows and must not offer the running one: the checkpoint behind it
+    /// is up to five minutes old and never reloads while a surface holds it, which is Bevel's
+    /// History pre-design §2 and the whole reason Live reads the snapshot instead. The tab
+    /// needs the same answer this file already computes, and re-spelling
+    /// <c>EndReason == ActiveEndReason</c> at a second call site would drift from the
+    /// start-time tolerance below at exactly the boundary a race exposes (trap 33).</remarks>
+    public static bool IsTheLiveSession(SessionRow row, DateTime? liveStart) =>
         row.EndReason == SessionRepository.ActiveEndReason
         || (liveStart is { } start && Math.Abs((row.StartLocal - start).TotalSeconds) < 1);
 

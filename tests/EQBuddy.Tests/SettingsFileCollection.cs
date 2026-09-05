@@ -47,6 +47,21 @@ public class SettingsFileCollectionTests
         "CompanionHost",
         // Writes the settings back after an import it accepted — OutputfileAutoImport.cs:108,132.
         "OutputfileAutoImport",
+        // The #253 one-time watch-pin migration ends in settings.Save() —
+        // WatchPinMigration.cs:40. **This row is the one that proves the list is the weak
+        // half of this guard, and it was added on 2026-09-05 after the flake it was built
+        // to prevent came back.** `WatchPinMigration` arrived in v1.99.16, months after
+        // the three rows above, and nothing asked whether it belonged here — so
+        // `WatchPinMigrationTests` sat outside the collection landing a full default
+        // settings.json (5,125 bytes) on top of the two-byte `{}` that
+        // `LoadCanBeAskedNotToPersistMigrations` had just written. Same test, same
+        // mechanism, same one-in-several rate as 2026-08-22; only the writer was new.
+        // Trap 30 to the letter: a hand-maintained list stops covering the set the day the
+        // set grows, and it cannot be type-checked, so the set has to be re-derived by hand.
+        // → **When you add a `settings.Save()` anywhere in Core or UI.Shared, add its row
+        //   here in the same commit.** The cost of forgetting is not a red build; it is a
+        //   flake in somebody else's file, weeks later, that reads as their bug.
+        "WatchPinMigration",
     ];
 
     [Fact]

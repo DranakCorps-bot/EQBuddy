@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.E2E;
@@ -159,11 +159,10 @@ public class ShellHostTests
         Assert.Equal(1, app.DumpValue("shellSearch"));
         // Search is a shortcut past the nav, not a page: it must not be OPEN on arrival.
         Assert.Equal(0, app.DumpValue("shellPalette"));
-        // The room actually painted. THREE tabs since E-3 PR 5 — Core's ProgressSurface
-        // still names four and the Progress WINDOW still draws four; the Evolved room draws
-        // the surface MINUS what the reshape moved, which today is Raids. Written as the
-        // subtraction rather than as a literal 3, so a fifth Progress tab does not have to
-        // be typed here twice.
+        // The room actually painted. FOUR tabs since E-3 S3 — Core's ProgressSurface names
+        // five, the Progress WINDOW draws four, and this room draws five minus what the
+        // reshape moved (Raids). Written as the subtraction rather than as a literal, so a
+        // sixth Progress tab does not have to be typed here twice.
         Assert.Equal(
             ProgressSurface.Tabs().Count(h => !ProgressSurface.MovedToLive(h.Tab)),
             app.DumpValue("shellProgressTabs"));
@@ -213,7 +212,9 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "progress", "the page half to still be honoured");
         // The room's DEFAULT tab, untouched by a key it no longer draws.
         Assert.Equal("progress", app.DumpText("shellProgressTab"));
-        Assert.Equal(3, app.DumpValue("shellProgressTabs"));
+        Assert.Equal(
+            ProgressSurface.Tabs().Count(h => !ProgressSurface.MovedToLive(h.Tab)),
+            app.DumpValue("shellProgressTabs"));
     }
 
     /// <summary>
@@ -243,12 +244,18 @@ public class ShellHostTests
         Assert.Equal(app.DumpValue("progressMotesRows"), app.DumpValue("shellProgressMotesRows"));
         Assert.Equal(app.DumpValue("progressSkills"), app.DumpValue("shellProgressSkills"));
 
-        // **The tab COUNTS deliberately differ now, and asserting the difference is the
-        // point.** E-3 PR 5 moved Raids to the Live room; the v1 window still draws four
-        // tabs because retiring one from IT is a subtraction, gated separately. An equality
-        // here would have to be "fixed" by taking Raids off the window too — which is
-        // exactly the change this PR is not allowed to make.
-        Assert.Equal(app.DumpValue("progressTabs") - 1, app.DumpValue("shellProgressTabs"));
+        // **The tab counts deliberately differ, in BOTH directions now, and asserting each
+        // difference from its own predicate is the point.** E-3 PR 5 moved Raids to Live, so
+        // the v1 window has one the room does not; E-3 S3 added History to the room alone, so
+        // the room has one the window does not. The two happen to cancel to the same NUMBER
+        // today, which is exactly why neither is asserted as a count: a `-1` or an equality
+        // here would pass while either filter silently stopped working.
+        Assert.Equal(
+            ProgressSurface.Tabs().Count(h => !ProgressSurface.MovedToLive(h.Tab)),
+            app.DumpValue("shellProgressTabs"));
+        Assert.Equal(
+            ProgressSurface.Tabs().Count(h => !ProgressSurface.DesktopShellOnly(h.Tab)),
+            app.DumpValue("progressTabs"));
     }
 
     // ---- E-3 PR 2: the World and Gear rooms ------------------------------------
@@ -748,6 +755,10 @@ public class ShellHostTests
     [InlineData("live:healing", "healing")]
     [InlineData("live:pet", "pet")]
     [InlineData("live:timeline", "timeline")]
+    // E-3 S3: the History merge's two rooms. `live:pace` is the one that must NOT be
+    // reachable as `live:timeline` — the signed §3 refusal, from outside.
+    [InlineData("live:pace", "pace")]
+    [InlineData("live:encounters", "encounters")]
     [InlineData("live:kills", "kills")]
     [InlineData("live:raids", "raids")]
     // The old names, which have to keep landing: `combat` is what the widget's card and the
@@ -755,6 +766,8 @@ public class ShellHostTests
     // somewhere true rather than nowhere.
     [InlineData("live:combat", "damage")]
     [InlineData("live:fight", "timeline")]
+    [InlineData("live:pulls", "encounters")]
+    [InlineData("live:dpsovertime", "pace")]
     public void EveryLiveRoomIsReachableByItsOwnAddress(string address, string room)
     {
         using var app = new AppHarness(environment: OpenOn(address));
@@ -887,6 +900,149 @@ public class ShellHostTests
         // in it — the state that would make every assertion above pass while the player saw
         // "nothing has happened yet".
         Assert.Equal(0, app.DumpValue("shellLiveEmpty"));
+    }
+
+    // ---- E-3 S3: HistoryWindow's this-session half -------------------------------
+
+    /// <summary>
+    /// **THE SIGNED DATA-SOURCE RULE, asserted from outside the app.**
+    ///
+    /// Bevel's History pre-design §2 is that the studio's version of these two surfaces is
+    /// up to five minutes stale by construction: the archiver checkpoints every five minutes
+    /// and `HistoryViewModel` loads the row's snapshot ONCE, on selection. Helm's item (2)
+    /// signs the fix — the Live room builds them from `CurrentSnapshot()` and never touches
+    /// the checkpoint.
+    ///
+    /// **Nothing in a diff, a build or a screenshot can tell those two apart**: a graph off a
+    /// five-minute-old snapshot renders perfectly. `shellLiveHistorySource` is a literal the
+    /// room has to edit to keep true, and this is the assertion that makes editing it
+    /// visible — the same device `shellLiveTimers=0` already uses.
+    ///
+    /// The pull COUNT beside the ROW count is the second half: one is what the grouping
+    /// found, the other is what the list drew, and a list that silently stopped taking rows
+    /// would otherwise look like a short session (#234's shape).
+    /// </summary>
+    [Fact]
+    public void TheLiveEncountersTabReadsTheSnapshotAndDrawsEveryPull()
+    {
+        using var app = new AppHarness(environment: OpenOn("live:encounters"));
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", "encounters", "the shell to land on the pull list");
+        Assert.Equal("snapshot", app.DumpText("shellLiveHistorySource"));
+        // The fixture replays a real session, so this is not a comparison of two zeros —
+        // which is what keeps it from passing vacuously (trap 39).
+        Assert.True(app.DumpValue("shellLivePulls") > 0,
+            $"the fixture produced no finished pulls; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("shellLivePulls"), app.DumpValue("shellLivePullRows"));
+        // And the room is not showing its whole-room empty over a session with fights in it.
+        Assert.Equal(0, app.DumpValue("shellLiveEmpty"));
+    }
+
+    /// <summary>
+    /// **The session graph draws, and it is NOT the Timeline tab.**
+    ///
+    /// Two claims, and the second is the one the sign is about: `live:pace` and
+    /// `live:timeline` are different rooms with different content, so an address that
+    /// resolved one to the other would be the collision Bevel §3 refused, and it would look
+    /// entirely healthy — a graph is a graph in a screenshot.
+    ///
+    /// `shellLivePacePoints` is a real state at zero (a sitting under two minutes long
+    /// cannot be plotted), so it is asserted with the fixture's own session behind it rather
+    /// than asserted away.
+    /// </summary>
+    [Fact]
+    public void ThePaceTabDrawsTheSessionGraphAndIsNotTheTimeline()
+    {
+        using var app = new AppHarness(environment: OpenOn("live:pace"));
+        app.Launch();
+
+        app.WaitForDump("shellLiveTab", "pace", "the shell to land on the session graph");
+        Assert.NotEqual(LiveSurface.KeyFor(LiveTab.Timeline), app.DumpText("shellLiveTab"));
+        Assert.True(app.DumpValue("shellLivePacePoints") > 1,
+            $"the session graph plotted nothing; dump was: {app.Artifacts()}");
+        // The timeline's own lane count is NOT what this tab reports — two surfaces, two
+        // numbers, and reading one where the other was meant is exactly trap 58's failure.
+        Assert.Equal(0, app.DumpValue("shellLiveTimers"));
+    }
+
+    /// <summary>
+    /// **The career half: the Progress room's History tab, and the row it must not offer.**
+    ///
+    /// The archiver checkpoints the RUNNING sitting into the store, so it is in
+    /// `StoredSessions()` — and the browse excludes it, because the picture behind it is up
+    /// to five minutes old while the live copy is one room away. `careerRows` is the count
+    /// after that filter; `killsTotal` proves there IS a running session to have excluded,
+    /// which is what stops this passing on a profile with nothing in it.
+    ///
+    /// **`shellProgressCareerSinglePane` is asserted as a RELATIONSHIP, never a number** —
+    /// a hosted runner is 1024×768 and a test that expected two panes would be asserting the
+    /// desk it was written on. The input (`shellWidth`) and the answer come from the same
+    /// `ShellLayoutPolicy` the window used.
+    /// </summary>
+    [Fact]
+    public void TheProgressCareerTabBrowsesStoredSittingsAndNotTheRunningOne()
+    {
+        using var app = new AppHarness(environment: OpenOn("progress:history"));
+        app.Launch();
+
+        app.WaitForDump("shellProgressTab", "history", "the shell to land on the career browse");
+        Assert.Equal("progress", app.DumpText("shellPage"));
+        // There IS a live session — so an empty browse here would mean the filter took
+        // everything rather than that the profile is fresh.
+        Assert.True(app.DumpValue("killsTotal") > 0,
+            $"the fixture produced no live session; dump was: {app.Artifacts()}");
+        // The running sitting is checkpointed into the store and must not be listed. The
+        // fixture's profile has no ENDED sittings, so the honest expectation is zero rows —
+        // which is also the empty state, and the room-level empty must NOT have fired over
+        // it (Progress has a character and three other tabs full of numbers).
+        Assert.Equal(0, app.DumpValue("shellProgressCareerRows"));
+        Assert.Equal(0, app.DumpValue("shellProgressEmpty"));
+        Assert.Equal(0, app.DumpValue("shellProgressCareerSelected"));
+
+        var width = app.DumpValue("shellWidth");
+        Assert.Equal(
+            ShellLayoutPolicy.For(width).RoomSinglePane ? 1 : 0,
+            app.DumpValue("shellProgressCareerSinglePane"));
+    }
+
+    /// <summary>
+    /// **`HistoryWindow` is NOT retired by this PR, and its door still works** — Helm's item
+    /// (5), soft lean, asserted rather than assumed. The four studio jobs the career tab does
+    /// not carry (compare, notes, export, delete) live behind that one context-menu entry, so
+    /// a PR that quietly broke it would take them with it and nothing else would say so.
+    ///
+    /// Both hosts are open at once on purpose: that is the two-hosts condition trap 45 is
+    /// about, and on WPF the symptom of getting it wrong is a surface vanishing from
+    /// whichever one drew it first rather than an exception.
+    /// </summary>
+    [Fact]
+    public void TheHistoryStudioStillOpensBesideTheCareerTab()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "progress:history",
+            ["EQBUDDY_HISTORY"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellProgressTab", "history", "both hosts to reach session history");
+        app.WaitForDump("historySessions", 1, "the studio window to open and list the sitting");
+        // Its detail pane is populated — the hook selects the newest row, so a studio that
+        // opened and held nothing would be trap 22's "reviewed anyway" state.
+        Assert.Equal(1, app.DumpValue("historyDetail"));
+        // The room is still painting beside it — the half that would go silently wrong.
+        Assert.Equal(0, app.DumpValue("shellProgressEmpty"));
+
+        // **AND THIS IS THE EXCLUSION, PROVEN RATHER THAN ASSERTED AGAINST A ZERO.** Two
+        // hosts, one store, one running sitting: the studio lists it (it always has — the
+        // archiver checkpoints it under `ActiveEndReason`, and the studio will happily show
+        // you a picture up to five minutes old) and the career browse does not. A career tab
+        // that had simply failed to render would report 0 too, which is why the pair is the
+        // assertion and neither number alone is.
+        Assert.True(app.DumpValue("historySessions") > 0,
+            $"the store held no sitting to exclude; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("shellProgressCareerRows"));
     }
 
     // ---- E-3 S1: the room-level empty-state wrapper ------------------------------

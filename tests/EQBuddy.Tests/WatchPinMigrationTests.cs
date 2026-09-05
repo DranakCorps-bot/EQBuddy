@@ -11,7 +11,17 @@ namespace EQBuddy.Tests;
 /// two window constructors where nothing could call it. `WatchPinMigration.Apply` is one
 /// home now; the scan at the bottom keeps the lanes from growing hand copies again, which
 /// is how #253 happened.
+///
+/// **In the serial collection because <c>Apply</c> ends in <c>settings.Save()</c>** — it
+/// writes the shared throwaway profile's settings.json, so it cannot run beside the tests
+/// that assert on that file. It was outside the collection from v1.99.16 until 2026-09-05,
+/// and the cost landed in someone else's file: <c>SettingsClobberTests</c> went
+/// intermittently red with "Expected 2, Actual 5125" — this migration's default settings
+/// written over the two-byte fixture that test had just laid down. See
+/// <see cref="SettingsFileCollectionTests"/> for why the curated writer list is the half
+/// that needs re-deriving whenever a new <c>Save()</c> appears.
 /// </summary>
+[Collection(SettingsFileCollection.Name)]
 public class WatchPinMigrationTests
 {
     private static AppSettings Settings(bool migrated, bool groupPin, params TrackedRule[] rules)

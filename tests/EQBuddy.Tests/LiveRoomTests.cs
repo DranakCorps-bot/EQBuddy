@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -19,6 +19,8 @@ namespace EQBuddy.Tests;
 ///  3. Live's words are its OWN — never Home's refusal sentence.
 ///  4. One producer for the three meters the breakout window also draws.
 ///  5. Nothing on this surface ticks on the clock inside a repaint gate.
+///  6. **The History merge** (E-3 S3): the two rooms it brings, the Timeline collision it
+///     is signed to avoid, and the two duplicates it is signed NOT to build.
 /// </summary>
 public class LiveRoomTests
 {
@@ -55,6 +57,12 @@ public class LiveRoomTests
     [InlineData("  hps  ", LiveTab.Healing)]
     [InlineData("heals", LiveTab.Healing)]
     [InlineData("fight", LiveTab.Timeline)]
+    // The History merge's two. `dpsovertime` is the v1 studio's own label squashed;
+    // `pulls`/`fights` is the word an EQ player reaches for.
+    [InlineData("dpsovertime", LiveTab.Pace)]
+    [InlineData("PACE", LiveTab.Pace)]
+    [InlineData("pulls", LiveTab.Encounters)]
+    [InlineData("  fights  ", LiveTab.Encounters)]
     [InlineData("creatures", LiveTab.Kills)]
     [InlineData("raids", LiveTab.Raids)]
     public void TheOldNamesForTheseSurfacesStillLand(string key, LiveTab expected) =>
@@ -109,13 +117,14 @@ public class LiveRoomTests
         var tabs = LivePresentation.Tabs(
             new StatsSnapshot { SessionDps = 118.42, Hps = 30, PetName = "Gharuk",
                 PetAbilities = [new SourceDamage("Bite", 4, 100)] },
-            killKinds: 3, raidsDefeated: 2, raidsTotal: 21);
+            killKinds: 3, raidsDefeated: 2, raidsTotal: 21, pulls: 4);
 
         string? Badge(LiveTab tab) => tabs.Single(t => t.Tab == tab).Value;
         Assert.Equal("118.4 dps", Badge(LiveTab.Damage));
         Assert.Equal("30 hps", Badge(LiveTab.Healing));
         Assert.Equal("Gharuk", Badge(LiveTab.Pet));
         Assert.Equal("3 kinds", Badge(LiveTab.Kills));
+        Assert.Equal("4 pulls", Badge(LiveTab.Encounters));
         // The same "2 / 21" the Raids card's own header carried under Progress, so the
         // badge did not change meaning when the room did.
         Assert.Equal("2 / 21", Badge(LiveTab.Raids));
@@ -489,8 +498,6 @@ public class LiveRoomTests
         Assert.Equal("a froglok knight", first.Single(t => t.Tab == LiveTab.Timeline).Value);
     }
 
-    // ---- and one thing this room deliberately does NOT do ---------------------
-
     /// <summary>
     /// **Live folds nothing, so it names no absorbed card key** — and that absence is a
     /// decision worth an assertion rather than a comment.
@@ -502,6 +509,174 @@ public class LiveRoomTests
     /// would be trap 55 with nothing on the other side of it — a migration naming keys that
     /// are still live cards, re-running on every launch.
     /// </summary>
+    // ---- 6. the History merge (E-3 S3) ----------------------------------------
+
+    /// <summary>
+    /// **THE SIGNED REFUSAL: the session graph is not called Timeline.**
+    ///
+    /// Bevel's History pre-design §3 named this before anything was built — Live already
+    /// has a Timeline tab (one PULL's per-event lanes) and the merge brings a second graph
+    /// (the whole sitting, per minute). Two differently-scoped things under one word on one
+    /// strip leaves a player no way to tell which one a chip is about to open. This is the
+    /// row that fails if somebody "tidies" the label later, and it checks the LABEL rather
+    /// than the enum name, because the label is the part a player reads.
+    /// </summary>
+    [Fact]
+    public void TheSessionGraphIsNotCalledTimeline()
+    {
+        Assert.Equal("Pace", LiveSurface.LabelFor(LiveTab.Pace));
+        Assert.NotEqual(LiveSurface.LabelFor(LiveTab.Timeline),
+            LiveSurface.LabelFor(LiveTab.Pace));
+        // Every label on the strip is distinct, which is the general form of the rule and
+        // the one that keeps this from being satisfied by renaming Timeline instead.
+        var labels = Enum.GetValues<LiveTab>().Select(LiveSurface.LabelFor).ToList();
+        Assert.Equal(labels.Count, labels.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        // And the old word still lands on the old surface: `fight` is what the Combat card's
+        // ⧗ opens, and it must not have been quietly re-pointed at the new graph.
+        Assert.Equal(LiveTab.Timeline, LiveSurface.TabForKey("fight"));
+    }
+
+    /// <summary>
+    /// **The merge brings TWO rooms and not four**, which is the other half of the signed
+    /// §3. The studio's selected-session detail has four pieces; two of them — the damage
+    /// and heal breakdown rows — were already on this room reading the identical fields off
+    /// the identical snapshot, so adding them again would be two renderings of
+    /// `DamageBySource` on one strip.
+    /// </summary>
+    [Fact]
+    public void TheMergeAddsTheTwoPiecesLiveDidNotAlreadyHave()
+    {
+        var keys = ShellPages.Rooms(ShellPage.Live).Select(r => r.Key).ToList();
+
+        Assert.Contains("pace", keys);
+        Assert.Contains("encounters", keys);
+        // The two duplicates, asserted as an absence: no second damage room and no second
+        // healing room appeared beside the ones that were already here.
+        Assert.Single(keys, k => k == LiveSurface.KeyFor(LiveTab.Damage));
+        Assert.Single(keys, k => k == LiveSurface.KeyFor(LiveTab.Healing));
+        Assert.Equal(Enum.GetValues<LiveTab>().Length, keys.Count);
+    }
+
+    /// <summary>The Pace badge is the PEAK, and it agrees with the graph about whether
+    /// there is anything to show. A chip promising a peak over a tab that draws nothing is
+    /// the chip-disagrees-with-body defect #227 already cost us once.</summary>
+    [Fact]
+    public void ThePaceBadgeAndTheGraphAgreeAboutWhetherThereIsAnythingToDraw()
+    {
+        var thin = new StatsSnapshot { DamageTimeline = [new TimelinePoint(Start, 600)] };
+        Assert.Null(LivePresentation.PeakDps(thin.DamageTimeline));
+        Assert.Null(HistoryPresentation.BuildDpsGraph(thin.DamageTimeline, 300, 100));
+        Assert.Null(LivePresentation.Tabs(thin, 0, 0, 0).Single(t => t.Tab == LiveTab.Pace).Value);
+
+        var real = new StatsSnapshot
+        {
+            DamageTimeline =
+            [
+                new TimelinePoint(Start, 6000),
+                new TimelinePoint(Start.AddMinutes(1), 3000),
+                new TimelinePoint(Start.AddMinutes(2), 12000),
+            ],
+        };
+        Assert.Equal(200, LivePresentation.PeakDps(real.DamageTimeline));
+        Assert.NotNull(HistoryPresentation.BuildDpsGraph(real.DamageTimeline, 300, 100));
+        Assert.Equal("peak 200 dps",
+            LivePresentation.Tabs(real, 0, 0, 0).Single(t => t.Tab == LiveTab.Pace).Value);
+    }
+
+    /// <summary>The graph's caption is the STUDIO's sentence, word for word — it is the same
+    /// graph read from a live snapshot instead of a stored one, and a player who knows the
+    /// studio should recognise it without being told.</summary>
+    [Fact]
+    public void ThePaceCaptionIsTheStudiosOwnSentence()
+    {
+        var graph = HistoryPresentation.BuildDpsGraph(
+            [new TimelinePoint(Start, 6000), new TimelinePoint(Start.AddMinutes(2), 3000)],
+            300, 100)!;
+
+        Assert.Equal("DPS over time — peak 100/s (8:00 PM–8:02 PM, per minute)",
+            LivePresentation.PaceCaption(graph));
+    }
+
+    /// <summary>
+    /// **The pull list's repaint gate carries no clock**, which is trap 8's rule with a
+    /// specific and expensive consequence here: the room paints once a second, and
+    /// rebuilding this list closes every pull a player has expanded. A gate keyed on a
+    /// duration would rebuild forever.
+    /// </summary>
+    [Fact]
+    public void ThePullListRepaintsOnlyWhenAPullLands()
+    {
+        var pulls = EncounterGrouping.Group([
+            new EncounterInfo("a froglok knight", Start, 30, 900, 100, 30, "Killed"),
+        ]);
+        var baseline = LivePresentation.EncountersSignature(pulls);
+
+        // Same pulls, seven minutes later: nothing about the key may have moved.
+        Assert.Equal(baseline, LivePresentation.EncountersSignature(pulls));
+
+        var more = EncounterGrouping.Group([
+            new EncounterInfo("a froglok knight", Start, 30, 900, 100, 30, "Killed"),
+            new EncounterInfo("a froglok shaman", Start.AddMinutes(5), 20, 400, 50, 20, "Killed"),
+        ]);
+        Assert.NotEqual(baseline, LivePresentation.EncountersSignature(more));
+        Assert.Equal(2, more.Count);
+    }
+
+    /// <summary>The Pace gate is the same rule on the other surface: the polyline is
+    /// redrawn when its SHAPE would change and never because a minute passed.</summary>
+    [Fact]
+    public void ThePaceGraphRepaintsOnlyWhenTheLineWouldMove()
+    {
+        IReadOnlyList<TimelinePoint> line =
+            [new TimelinePoint(Start, 6000), new TimelinePoint(Start.AddMinutes(1), 3000)];
+        var baseline = LivePresentation.PaceSignature(line);
+
+        Assert.Equal(baseline, LivePresentation.PaceSignature(line));
+        Assert.NotEqual(baseline, LivePresentation.PaceSignature(
+            [.. line, new TimelinePoint(Start.AddMinutes(2), 1)]));
+        // A minute whose DAMAGE changed moves it too, even at the same point count.
+        Assert.NotEqual(baseline, LivePresentation.PaceSignature(
+            [new TimelinePoint(Start, 6001), new TimelinePoint(Start.AddMinutes(1), 3000)]));
+    }
+
+    /// <summary>A pull's identity across rebuilds is its START, not its index in the list.
+    /// The expansion set is keyed on it: an index is the wrong key the day the order or the
+    /// grouping gap changes, and nothing would fail loudly when it did.</summary>
+    [Fact]
+    public void APullsIdentitySurvivesTheListGrowing()
+    {
+        var first = EncounterGrouping.Group([
+            new EncounterInfo("a froglok knight", Start, 30, 900, 100, 30, "Killed"),
+        ])[0];
+        var later = EncounterGrouping.Group([
+            new EncounterInfo("a froglok shaman", Start.AddMinutes(-5), 20, 400, 50, 20, "Killed"),
+            new EncounterInfo("a froglok knight", Start, 30, 900, 100, 30, "Killed"),
+        ])[1];
+
+        Assert.Equal(LivePresentation.PullKey(first), LivePresentation.PullKey(later));
+        Assert.NotEqual(LivePresentation.PullKey(first), LivePresentation.PullKey(
+            EncounterGrouping.Group([
+                new EncounterInfo("a froglok shaman", Start.AddMinutes(-5), 20, 400, 50, 20, "Killed"),
+            ])[0]));
+    }
+
+    /// <summary>Both new tabs have words for having nothing, and neither says "no data".
+    /// The Encounters one names where the fight you are IN lives, which is the honest answer
+    /// to why an active session's list can be empty.</summary>
+    [Fact]
+    public void BothNewTabsExplainTheirOwnEmptyState()
+    {
+        Assert.NotEmpty(LivePresentation.EmptyPace);
+        Assert.NotEmpty(LivePresentation.EmptyEncounters);
+        Assert.Contains("Damage", LivePresentation.EmptyEncounters);
+        Assert.DoesNotContain("no data", LivePresentation.EmptyPace,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("no data", LivePresentation.EmptyEncounters,
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    // ---- and one thing this room deliberately does NOT do ---------------------
+
     [Fact]
     public void LiveAbsorbsNoCardBecauseNothingHasBeenSubtractedFromTheWidget()
     {

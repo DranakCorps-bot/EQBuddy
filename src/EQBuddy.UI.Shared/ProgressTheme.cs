@@ -96,15 +96,41 @@ public static class ProgressTheme
     /// know about.</summary>
     public static string Raids(int defeated, int total) => $"{defeated} / {total}";
 
+    /// <summary>The History badge — how many sittings this character has stored, which is
+    /// the one number a career browse answers before it is opened.
+    ///
+    /// **A COUNT, never an age.** "3h ago" is the obvious alternative and it is the one
+    /// thing this badge may not be: the Live room repaints on the widget's one-second tick,
+    /// and a chip whose text changes width every tick is trap 12 wearing a chip — the #173
+    /// keyboard-killer, on a <c>SizeToContent</c> surface. The same rule
+    /// <see cref="LivePresentation.Tabs"/> already states for its own strip.
+    ///
+    /// Null at zero rather than "0 sittings": an unbadged chip is an honest "not yet", and
+    /// the tab still opens onto its own empty state, which has words.</summary>
+    public static string? History(int storedSessions) => storedSessions switch
+    {
+        <= 0 => null,
+        1 => "1 sitting",
+        var n => $"{n} sittings",
+    };
+
     /// <summary>The full strip, badges included — what a window's tab row and the mobile
-    /// page's tab row both build from.</summary>
+    /// page's tab row both build from.
+    ///
+    /// **It returns EVERY tab, and each host filters.** Two of the five are not on every
+    /// surface — <see cref="ProgressSurface.MovedToLive"/> (Raids, gone to Live on both
+    /// Evolved hosts) and <see cref="ProgressSurface.DesktopShellOnly"/> (History, on the
+    /// Evolved desktop room alone). Building a second, shorter list here for the hosts that
+    /// want less is trap 55's shape; a predicate the hosts read is not.</summary>
     public static IReadOnlyList<ProgressTabHeader> Tabs(
-        StatsSnapshot s, int dingUnlocks, int raidsDefeated, int raidsTotal) =>
+        StatsSnapshot s, int dingUnlocks, int raidsDefeated, int raidsTotal,
+        int storedSessions = 0) =>
         ProgressSurface.Tabs(
             experience: Experience(s, dingUnlocks),
             wealth: Wealth(s),
             faction: Faction(s),
-            raids: Raids(raidsDefeated, raidsTotal));
+            raids: Raids(raidsDefeated, raidsTotal),
+            history: History(storedSessions));
 
     /// <summary>The launcher card's one line — the line that has to justify replacing
     /// five card headers with one. Delegates the assembly (and the "omit a part that has

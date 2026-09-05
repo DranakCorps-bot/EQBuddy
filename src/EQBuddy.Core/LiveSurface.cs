@@ -1,10 +1,20 @@
-namespace EQBuddy.Core;
+﻿namespace EQBuddy.Core;
 
 /// <summary>
 /// The LIVE room's tabs — the sixth sibling of <see cref="ProgressSurface"/>,
 /// <see cref="QuestSurface"/>, <see cref="CreatureSurface"/>, <see cref="LootSurface"/>
 /// and <see cref="WorldSurface"/>. One definition of what the tabs ARE, read by the shell
 /// room and by the address grammar, so a room cannot be spelled twice (#122, #152, #184).
+///
+/// **Two of its rooms are HistoryWindow's this-session half** (Bevel's History pre-design,
+/// Helm-signed 2026-09-05 ~10:10 AM CT): <see cref="LiveTab.Pace"/> and
+/// <see cref="LiveTab.Encounters"/> are the two pieces of that window's selected-session
+/// detail Live did not already have. The other two — the damage and heal breakdown rows —
+/// were already here reading the identical fields off the identical snapshot, so they are
+/// deliberately NOT added a second time. And the merge reads
+/// <c>MainWindow.CurrentSnapshot()</c> rather than the five-minute checkpoint the v1 window
+/// loads, which is the whole reason it is a merge rather than a move: the stored row is up
+/// to five minutes stale and never reloads while the window is open.
 ///
 /// **It is the first of these that is NOT a v1 theme, and the difference is the whole
 /// shape of the room.** Every other surface in this family describes a fold that already
@@ -42,6 +52,39 @@ public enum LiveTab
     /// <summary>The whole pull on one canvas — a lane per skill over a DPS graph.</summary>
     Timeline,
 
+    /// <summary>
+    /// **How the whole sitting has gone** — one point per minute of session DPS, drawn as a
+    /// polyline across the session's own clock. <c>HistoryWindow</c>'s "DPS over time"
+    /// graph, read from the LIVE snapshot instead of from a stored one.
+    ///
+    /// **It is NOT called Timeline, and the refusal is signed** (Bevel's History pre-design
+    /// §3, Helm 2026-09-05 ~10:10 AM CT). <see cref="Timeline"/> is one PULL's per-event
+    /// lanes; this is every minute of the whole sitting. Same word, different scope, on the
+    /// same strip — and a player has no way to tell which one a tab called "Timeline" is
+    /// about to show. "Pace" says the thing this one answers: not what happened in that
+    /// fight, but whether the sitting is going faster or slower than it was.
+    /// </summary>
+    Pace,
+
+    /// <summary>
+    /// **Every pull of this sitting, oldest first, each one expandable** — the
+    /// chronological review <c>HistoryWindow</c> has always had for a STORED session, on
+    /// the sitting that is still running.
+    ///
+    /// **It is not the Damage tab's "Recent fights" block with more rows.** That block is
+    /// the last eight per-CREATURE fights as unexpandable bars. This is
+    /// <c>EncounterGrouping.Group</c>'s PULLS — adds included — with the per-pull damage,
+    /// incoming and heal breakdowns underneath and the same Discord-ready ⧉ copy the
+    /// Combat card and the Damage breakout already offer for one fight.
+    ///
+    /// **Only FINISHED pulls are here, and that is the data rather than a choice**:
+    /// <c>StatsSnapshot.Encounters</c> is appended to when a fight CLOSES, so the pull you
+    /// are in the middle of is <c>LastFight</c> and lives on Damage. It also means no row
+    /// on this tab carries a duration that ticks, which is what keeps a once-a-second
+    /// repaint from throwing the expansion away (trap 8).
+    /// </summary>
+    Encounters,
+
     /// <summary>What died: this session's kills by creature, the farming rollup and the
     /// party-kill split. The <em>other</em> half of Kills &amp; Drops — drops-by-creature
     /// is camp research and belongs to World, per the disposition table's own Why column,
@@ -78,6 +121,12 @@ public static class LiveSurface
         LiveTab.Healing => "Healing",
         LiveTab.Pet => "Pet",
         LiveTab.Timeline => "Timeline",
+        LiveTab.Pace => "Pace",
+        // "Encounters", which is what HistoryWindow's own section header says and what
+        // `StatsSnapshot.Encounters` is called. "Pulls" is the better EQ word and it is
+        // deliberately NOT used: a second name for one surface, invented at the moment a
+        // second host arrives, is exactly the drift `ShellPages` refuses one level up.
+        LiveTab.Encounters => "Encounters",
         LiveTab.Kills => "Kills",
         LiveTab.Raids => "Raids",
         _ => tab.ToString(),
@@ -97,6 +146,8 @@ public static class LiveSurface
         LiveTab.Healing => "healing",
         LiveTab.Pet => "pet",
         LiveTab.Timeline => "timeline",
+        LiveTab.Pace => "pace",
+        LiveTab.Encounters => "encounters",
         LiveTab.Kills => "kills",
         LiveTab.Raids => "raids",
         _ => tab.ToString().ToLowerInvariant(),
@@ -114,6 +165,10 @@ public static class LiveSurface
         "healing" or "heals" or "hps" => LiveTab.Healing,
         "pet" => LiveTab.Pet,
         "timeline" or "fight" => LiveTab.Timeline,
+        // "dpsovertime" is the v1 History window's own label for this graph, squashed;
+        // "pulls" is the word an EQ player reaches for. Both land where they mean.
+        "pace" or "dpsovertime" => LiveTab.Pace,
+        "encounters" or "pulls" or "fights" => LiveTab.Encounters,
         "kills" or "creatures" => LiveTab.Kills,
         "raids" => LiveTab.Raids,
         _ => null,
@@ -126,14 +181,21 @@ public static class LiveSurface
 
     public static IReadOnlyList<LiveTabHeader> Tabs(
         string? damage = null, string? healing = null, string? pet = null,
-        string? timeline = null, string? kills = null, string? raids = null)
+        string? timeline = null, string? pace = null, string? encounters = null,
+        string? kills = null, string? raids = null)
     {
         return
         [
             Header(LiveTab.Damage, damage),
             Header(LiveTab.Healing, healing),
             Header(LiveTab.Pet, pet),
+            // The three "over time" rooms sit together, narrowest scope first: one pull's
+            // events (Timeline), then the whole sitting's shape (Pace), then every pull as
+            // a list (Encounters). Kills and Raids stay last — they are what DIED, not how
+            // it went.
             Header(LiveTab.Timeline, timeline),
+            Header(LiveTab.Pace, pace),
+            Header(LiveTab.Encounters, encounters),
             Header(LiveTab.Kills, kills),
             Header(LiveTab.Raids, raids),
         ];

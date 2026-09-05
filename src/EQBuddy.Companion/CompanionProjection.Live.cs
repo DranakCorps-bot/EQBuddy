@@ -167,10 +167,25 @@ public static partial class CompanionProjection
             // left together, in one commit, for the screen PageFor routes to Live — a strip
             // that still offered a tab whose body had moved would be the rail's own
             // forbidden shape ("an affordance that opens nothing is a trap") on a phone.
+            //
+            // **AND by ProgressSurface.DesktopShellOnly since E-3 S3**, which is a different
+            // question with the same answer shape. History is the career browse — a
+            // filterable list beside a per-sitting detail pane, with two cross-session step
+            // charts under it — and the disposition table's own Why column keeps that
+            // "desktop-only" (Bevel's History pre-design §4, Helm-signed 2026-09-05).
+            //
+            // **This is the FIRST tab in this strip that the phone does not get, and the
+            // difference is a decision rather than a lag.** #210 is about a surface QUIETLY
+            // falling behind; parity by shared module is the fix, and a predicate both hosts
+            // read is that fix — the phone is not missing History, it is refusing it, and
+            // `SurfaceParityTests` asserts the refusal rather than an equality that would
+            // now be false. The look-away surface is for what you want mid-play; a session
+            // browser is desk work.
             Tabs: [.. ProgressTheme
                 .Tabs(stats, unlocks.Count, defeated, catalog.BossCount)
                 .Where(t => ProgressSurface.TabForKey(t.Key) is { } tab
-                            && !ProgressSurface.MovedToLive(tab))
+                            && !ProgressSurface.MovedToLive(tab)
+                            && !ProgressSurface.DesktopShellOnly(tab))
                 .Select(t => new CompanionProgressTab(t.Key, t.Label, t.Value))],
             Wealth: BuildWealth(stats),
             Faction: [.. stats.Faction.Take(MaxRows)

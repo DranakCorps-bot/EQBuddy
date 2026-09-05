@@ -1,7 +1,7 @@
 ﻿namespace EQBuddy.Core;
 
 /// <summary>
-/// The four progress surfaces, in the order every UI shows them — the Progress THEME
+/// The progress surfaces, in the order every UI shows them — the Progress THEME
 /// (docs/Themes.md; David ruled themes a direction on 2026-08-19, and this one goes first
 /// because Gate 5b had already lifted four of its five cards).
 ///
@@ -25,6 +25,20 @@ public enum ProgressTab
     Faction,
     /// <summary>Raid targets cleared, witnessed or imported.</summary>
     Raids,
+
+    /// <summary>
+    /// **Your career: every sitting this character has stored, and the ladders they add
+    /// up to.** The Progress half of <c>HistoryWindow</c>'s merge (Bevel's History
+    /// pre-design §1, Helm-signed 2026-09-05 ~10:10 AM CT) — the *"which past sessions"*
+    /// browse and the cross-session level/AA step charts, which are the two career jobs
+    /// the signed disposition table names outright.
+    ///
+    /// **It is the first tab in this enum that is not on every surface**, which is a new
+    /// kind of row rather than a fifth of the same kind — see
+    /// <see cref="DesktopShellOnly"/>, which is where that difference is decided and the
+    /// only place it may be.
+    /// </summary>
+    History,
 }
 
 /// <summary>A tab as a UI should draw it. <see cref="Value"/> is the tab's headline —
@@ -50,6 +64,10 @@ public static class ProgressSurface
         ProgressTab.Wealth => "Wealth",
         ProgressTab.Faction => "Faction",
         ProgressTab.Raids => "Raids",
+        // "History", the word the v1 window and its one context-menu door already use.
+        // A new word here ("Sessions", "Career") would be a second name for a surface a
+        // player can still reach under the old one, which is trap 33 lifted into naming.
+        ProgressTab.History => "History",
         _ => tab.ToString(),
     };
 
@@ -72,6 +90,11 @@ public static class ProgressSurface
     public static InlineMode InlineModeFor(ProgressTab tab) => tab switch
     {
         ProgressTab.Raids => InlineMode.Glance,
+        // <see cref="ProgressTab.History"/> never reaches an inline card — the widget's
+        // Progress card filters <see cref="DesktopShellOnly"/> out before it builds a chip
+        // — so this answer is unreachable rather than chosen. It is left as the total
+        // function's default deliberately: inventing a Glance body for a tab no inline
+        // host draws would be a second description of a surface with no host to describe.
         _ => InlineMode.Full,
     };
 
@@ -85,6 +108,7 @@ public static class ProgressSurface
         ProgressTab.Wealth => "wealth",
         ProgressTab.Faction => "faction",
         ProgressTab.Raids => "raids",
+        ProgressTab.History => "history",
         _ => tab.ToString().ToLowerInvariant(),
     };
 
@@ -96,6 +120,9 @@ public static class ProgressSurface
         "wealth" or "money" or "motes" => ProgressTab.Wealth,
         "faction" => ProgressTab.Faction,
         "raids" => ProgressTab.Raids,
+        // "sessions" is what the v1 window's door is called ("Session history…"), so the
+        // word a player would type lands on the room that answers it.
+        "history" or "sessions" => ProgressTab.History,
         _ => null,
     };
 
@@ -125,6 +152,42 @@ public static class ProgressSurface
     /// still resolves to Wealth long after Motes became a card again.
     /// </summary>
     public static bool MovedToLive(ProgressTab tab) => tab == ProgressTab.Raids;
+
+    /// <summary>
+    /// **The second kind of row this module carries, and it is genuinely a new kind rather
+    /// than a fifth tab** — Bevel's History pre-design §4 named the gap in as many words:
+    /// <see cref="MovedToLive"/> is a filter for *"this tab left Progress entirely,
+    /// everywhere"*, and there was no filter for *"this tab exists on Progress but only on
+    /// the Evolved desktop shell"*. The signed disposition table's Why column asks for
+    /// exactly that — *"History studio depth stays desktop-only"* — and Helm signed the new
+    /// row kind on 2026-09-05 (~10:10 AM CT).
+    ///
+    /// **True means EXACTLY ONE host draws it: the Evolved shell's Progress room.** Four
+    /// hosts read this module and three of them filter this predicate OUT:
+    ///
+    ///  * <c>ProgressRoom</c> (the Evolved shell) — DRAWS it. The only one.
+    ///  * <c>CompanionProjection</c> (the phone) — refuses it. This is the half Bevel's §4
+    ///    is about: a session browser with a filterable list, per-session detail and two
+    ///    step charts is desk work, and the phone is the look-away surface.
+    ///  * <c>ProgressWindow</c> (the v1 pop-out) — refuses it. Not because it is not a
+    ///    desktop, but because <c>HistoryWindow</c> is already the desktop's career surface
+    ///    and it keeps its one context-menu door this pass (Helm, same sign, item 5). A
+    ///    third host for one surface is trap 58's shape before it is anything else.
+    ///  * <c>ProgressThemeCard</c> (the widget's inline card) — refuses it. A 320-unit card
+    ///    cannot hold a list beside a detail pane, and the ⧉ on its header opens the window
+    ///    rather than losing anything.
+    ///
+    /// **A TOTAL FUNCTION over the enum, for <see cref="MovedToLive"/>'s own reason** (trap
+    /// 55): the default answer is "no, every host draws it", so a sixth Progress tab
+    /// appears everywhere automatically and only a deliberate row here holds it back.
+    ///
+    /// **The two predicates are independent and must stay so.** A tab could in principle be
+    /// both; nothing here assumes otherwise, and each host applies the one that is about
+    /// it. <c>ShellPages.Rooms(Progress)</c> filters <see cref="MovedToLive"/> only — the
+    /// shell's address grammar must reach every room the shell draws, and
+    /// <c>progress:history</c> is one.
+    /// </summary>
+    public static bool DesktopShellOnly(ProgressTab tab) => tab == ProgressTab.History;
 
     /// <summary>The card keys this theme absorbs, in the widget's own vocabulary. The fold
     /// reads this so the list of what disappears lives in ONE place rather than being
@@ -157,7 +220,7 @@ public static class ProgressSurface
 
     public static IReadOnlyList<ProgressTabHeader> Tabs(
         string? experience = null, string? wealth = null,
-        string? faction = null, string? raids = null)
+        string? faction = null, string? raids = null, string? history = null)
     {
         return
         [
@@ -165,6 +228,10 @@ public static class ProgressSurface
             Header(ProgressTab.Wealth, wealth),
             Header(ProgressTab.Faction, faction),
             Header(ProgressTab.Raids, raids),
+            // Last, and not by accident: the other four are what this sitting is doing and
+            // History is what every sitting before it added up to. A career browser between
+            // Wealth and Faction would put the review surface inside the live ones.
+            Header(ProgressTab.History, history),
         ];
 
         static ProgressTabHeader Header(ProgressTab tab, string? value) =>

@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using EQBuddy.Core;
@@ -24,14 +24,30 @@ namespace EQBuddy;
 ///  4. <see cref="FightTimelineWindow"/> — its own pop-out.
 ///  5. <see cref="CreatureWindow"/>'s **Kills** tab, and <see cref="RaidsCardView"/>.
 ///
+/// **A SIXTH SOURCE ARRIVED IN E-3 S3: <see cref="HistoryWindow"/>'s this-session half**
+/// (Bevel's History pre-design, Helm-signed 2026-09-05 ~10:10 AM CT), and it is the source
+/// this file's own comment below parked as "its own ask". It brings exactly two rooms —
+/// <see cref="LiveTab.Pace"/> and <see cref="LiveTab.Encounters"/>, built in
+/// <see cref="LiveSessionPanes"/> — because the studio's other two pieces (the damage and
+/// heal breakdown rows) were ALREADY here, reading the identical fields off the identical
+/// snapshot. Adding them again would have been two renderings of <c>DamageBySource</c> on
+/// one room, which is the thing Bevel §3 named before anyone could build it.
+///
+/// **And the merge reads <c>CurrentSnapshot()</c>, never the checkpoint.** The studio's
+/// version of these two surfaces is up to five minutes stale by construction — the archiver
+/// checkpoints every five minutes, and the view model loads the row's snapshot once — which
+/// is why this is a merge and not a move. See <see cref="LiveSessionPanes"/>.
+///
 /// **Two things that look like they belong here and do not.** <c>CreatureWindow</c>'s
 /// **Drops** tab is camp research — *"is this camp worth it"* — which the disposition
 /// table's own Why column sends to World, even though it ships from the same v1 window as
 /// the kills counter that IS Live's; splitting one window's two tabs across two rooms in
 /// one PR is the shape Bevel §1 flagged as *"the biggest redesign in E-3"*. And
 /// <c>HistoryWindow</c>'s this-session half is a real Live-shaped fact whose window is not
-/// gated on this room existing. Both are their own asks. A PR that quietly also built them
-/// would be a PR that grew a second room's redesign inside its own.
+/// gated on this room existing. Both were their own asks; the History half is the one that
+/// has since been signed and built (above), and <c>CreatureWindow</c>'s Drops tab is still
+/// World's. A PR that quietly also built one would be a PR that grew a second room's
+/// redesign inside its own.
 ///
 /// **NOTHING IS SUBTRACTED FROM THE WIDGET HERE.** All five sources go on working exactly
 /// as they ship, in the same PR that builds this room. A v1 surface may be retired only
@@ -84,6 +100,20 @@ internal sealed class LiveRoom : Grid, IShellRoom
     private readonly TimelinePane _timeline;
     private readonly KillsCardView _kills;
     private readonly RaidsCardView _raids;
+    private readonly LiveSessionPanes.PacePane _pace;
+    private readonly LiveSessionPanes.EncountersPane _encounters;
+
+    /// <summary>This sitting's finished pulls, grouped once per paint and shared by the tab
+    /// badge and the tab body.
+    ///
+    /// **Memoised on the ENCOUNTER COUNT, which is the only thing that can change it.**
+    /// <c>StatsSnapshot.Encounters</c> is appended to when a fight closes and never
+    /// rewritten, so a count that has not moved means a grouping that would come back
+    /// identical — and this room paints every second. Re-grouping for the badge and again
+    /// for the body would also be two producers of one number (trap 33), which is why both
+    /// read this field rather than calling <c>EncounterGrouping.Group</c> themselves.</summary>
+    private IReadOnlyList<PullInfo> _pulls = [];
+    private int _pulledFrom = -1;
 
     private LiveSession _session =
         new(RecentSessionState.NeverPlayed, "", "", "", null, null, TimeSpan.Zero, 0, 0, 0);
@@ -152,6 +182,11 @@ internal sealed class LiveRoom : Grid, IShellRoom
             Repaint, main.BlockedByLookup);
         _timeline = new TimelinePane(main);
         (_kills, _raids) = main.NewLiveSurfaces();
+        // The two the History merge brought. `this` is handed in as the RESOURCE root, the
+        // same way the meters take it — a pane that walked back up to its host to find a
+        // brush would be the shape `LanesPanel.Panned` already paid for.
+        _pace = new LiveSessionPanes.PacePane(this);
+        _encounters = new LiveSessionPanes.EncountersPane(this, Who);
 
         // The blocks the Combat card carries under its breakdown, in its own order. Built
         // here rather than at their declarations because the panes they hang in do not
@@ -239,6 +274,7 @@ internal sealed class LiveRoom : Grid, IShellRoom
     {
         _session = SessionSummary.LiveOf(Who(), _main.StoredSessions(), s);
         var defeated = _raids.DefeatedCount;
+        Regroup(s);
 
         // **The whole-room empty, and the only state that gets one.** With no fight, no
         // kill, no heal and no clear there is nothing for any of the six tabs to be about,
@@ -269,6 +305,8 @@ internal sealed class LiveRoom : Grid, IShellRoom
             LiveTab.Healing => _healing.Body,
             LiveTab.Pet => _pet.Body,
             LiveTab.Timeline => _timeline.Body,
+            LiveTab.Pace => _pace.Body,
+            LiveTab.Encounters => _encounters.Body,
             LiveTab.Kills => _kills.Body,
             LiveTab.Raids => _raids.Body,
             _ => _damage.Body,
@@ -286,6 +324,8 @@ internal sealed class LiveRoom : Grid, IShellRoom
             case LiveTab.Healing: _healing.Render(s); RenderHealingExtras(s); break;
             case LiveTab.Pet: _pet.Render(s); break;
             case LiveTab.Timeline: _timeline.Render(); break;
+            case LiveTab.Pace: _pace.Render(s); break;
+            case LiveTab.Encounters: _encounters.Render(s, _pulls); break;
             case LiveTab.Kills: _kills.Render(s); break;
             case LiveTab.Raids: _raids.Render(s); break;
             default: _damage.Render(s); RenderDamageExtras(s); break;
@@ -304,6 +344,15 @@ internal sealed class LiveRoom : Grid, IShellRoom
         return built;
     }
 
+    /// <summary>Group this sitting's finished fights into pulls, at most once per new
+    /// pull. See <see cref="_pulls"/> for why the memo is keyed on the count.</summary>
+    private void Regroup(StatsSnapshot s)
+    {
+        if (s.Encounters.Count == _pulledFrom) return;
+        _pulledFrom = s.Encounters.Count;
+        _pulls = EncounterGrouping.Group(s.Encounters);
+    }
+
     /// <summary>Build the strip from Core's <see cref="LiveSurface"/> with UI.Shared's
     /// badges — the same split every other room makes, so the arithmetic stays where a unit
     /// test can reach it and this method only draws.</summary>
@@ -311,7 +360,8 @@ internal sealed class LiveRoom : Grid, IShellRoom
     {
         _tabs.Clear();
         foreach (var header in LivePresentation.Tabs(
-                     s, s.YourKills.Count, defeated, RaidTargetCatalog.Default.BossCount))
+                     s, s.YourKills.Count, defeated, RaidTargetCatalog.Default.BossCount,
+                     _pulls.Count))
         {
             var tab = header.Tab;
             _tabs.Add(header.Label, tab, header.Value, onClick: () =>
@@ -454,6 +504,20 @@ internal sealed class LiveRoom : Grid, IShellRoom
         $"shellLiveRaidsRows={_raids.RowCount} " +
         $"shellLiveRaidsDefeated={_raids.DefeatedCount} " +
         $"shellLiveTimelineLanes={_timeline.LaneCount} " +
+        // **The History merge's two, and the pair is the assertion.** `shellLivePulls` is
+        // the grouping's answer and `shellLivePullRows` is what the list actually drew, so a
+        // pane that silently stopped taking rows shows as a difference rather than as a
+        // shorter picture nobody photographed (trap 50's shape: a list that looks complete).
+        $"shellLivePulls={_pulls.Count} " +
+        $"shellLivePullRows={_encounters.RowCount} " +
+        $"shellLivePacePoints={_pace.PointCount} " +
+        // **A literal, and it is the signed item (2) asserted from outside.** These two
+        // panes read `MainWindow.CurrentSnapshot()` and never `SessionRepository`; nothing
+        // in a diff, a build or a screenshot can tell a live snapshot from a five-minute-old
+        // checkpoint, because both render perfectly. The day somebody wires the store in
+        // here, this line is what has to be edited to stay true — and editing it is the
+        // moment the rule gets read. Same device as `shellLiveTimers` below.
+        "shellLiveHistorySource=snapshot " +
         // Must be 0, always. See Release().
         "shellLiveTimers=0";
 

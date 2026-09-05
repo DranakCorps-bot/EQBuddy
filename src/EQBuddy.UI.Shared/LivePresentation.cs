@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -137,7 +137,7 @@ public static class LivePresentation
     /// honest "not yet".
     /// </summary>
     public static IReadOnlyList<LiveTabHeader> Tabs(
-        StatsSnapshot s, int killKinds, int raidsDefeated, int raidsTotal) =>
+        StatsSnapshot s, int killKinds, int raidsDefeated, int raidsTotal, int pulls = 0) =>
         LiveSurface.Tabs(
             damage: s.SessionDps > 0 ? $"{s.SessionDps:0.#} dps" : null,
             healing: s.Hps > 0 ? $"{s.Hps:0.#} hps"
@@ -147,10 +147,90 @@ public static class LivePresentation
             // live, and a tab label that changes width every second is trap 12 wearing a
             // chip. Null between fights rather than "no fight" — the tab still opens.
             timeline: s.LastFight?.Name,
+            // The PEAK rather than the elapsed span, and for the rule directly above: a
+            // "27m" that becomes "28m" is a width change on a clock. A peak only moves when
+            // a minute actually beats the best one, and it is the number the graph's own
+            // caption leads with, so the chip and the body agree.
+            pace: PeakDps(s.DamageTimeline) is { } peak ? $"peak {peak:0.#} dps" : null,
+            // The pull COUNT is handed in for the same reason the kill kinds and the raid
+            // clears are: grouping the session's encounters is the room's work, done once
+            // per paint, and a badge that regrouped them a second time would be a second
+            // producer of one number (trap 33) as well as twice the work.
+            encounters: pulls > 0 ? $"{pulls} pull{(pulls == 1 ? "" : "s")}" : null,
             kills: killKinds > 0 ? $"{killKinds} kind{(killKinds == 1 ? "" : "s")}" : null,
             // The same "2 / 21" the Raids card's own header carried under Progress, so the
             // badge did not change meaning when the room did.
             raids: raidsTotal > 0 ? $"{raidsDefeated} / {raidsTotal}" : null);
+
+    // ---- Pace: the whole sitting's shape ----------------------------------------
+
+    /// <summary>The best MINUTE the sitting has had, as a rate. Null when the timeline
+    /// cannot be drawn at all, so the badge and the graph agree about whether there is
+    /// anything to see — <see cref="HistoryPresentation.BuildDpsGraph"/> refuses under two
+    /// points, and a chip promising a peak over a tab that draws nothing is the
+    /// chip-disagrees-with-body defect #227 already cost us once.
+    ///
+    /// Per-minute buckets over 60, which is the same arithmetic the graph does; the two
+    /// read the same list and neither is allowed to invent a different denominator.</summary>
+    public static double? PeakDps(IReadOnlyList<TimelinePoint> timeline)
+    {
+        if (timeline.Count < 2) return null;
+        var peak = timeline.Max(p => p.Damage) / 60.0;
+        return peak > 0 ? peak : null;
+    }
+
+    /// <summary>The Pace tab's caption — the v1 History window's own sentence, word for
+    /// word, because it is the same graph read from a live snapshot instead of a stored
+    /// one. Keeping the words identical is what lets a player who knows the studio
+    /// recognise this without being told.
+    ///
+    /// **The clock times are the session's own and do not tick**: they are the first and
+    /// last point the timeline holds, which move a minute at a time rather than a second at
+    /// a time, and only when a new minute has damage in it.</summary>
+    public static string PaceCaption(HistoryGraph graph) =>
+        $"DPS over time — peak {graph.PeakDps:0.#}/s " +
+        $"({graph.Start:h:mm tt}–{graph.End:h:mm tt}, per minute)";
+
+    public const string EmptyPace =
+        "Not enough of this sitting has happened to draw a line yet. The graph plots one "
+        + "point per minute of the session, so it appears once EQBuddy has seen damage in "
+        + "two different minutes.";
+
+    /// <summary>The repaint gate for the Pace graph. Point COUNT and the total, which
+    /// together move exactly when the polyline would change shape and never otherwise —
+    /// no elapsed time and no age in it (trap 8), so a quiet minute costs no redraw.
+    /// </summary>
+    public static string PaceSignature(IReadOnlyList<TimelinePoint> timeline) =>
+        $"{timeline.Count}|{timeline.Sum(p => p.Damage)}";
+
+    // ---- Encounters: every pull of this sitting ----------------------------------
+
+    public const string EmptyEncounters =
+        "No pull has finished yet. Each one lands here when the fight closes — with what "
+        + "you dealt, what hit you, what healed, and a ⧉ copy of the whole encounter as "
+        + "Discord-ready text. The fight you are in is on Damage until it ends.";
+
+    /// <summary>
+    /// The repaint gate for the pull list, and the one that has to be right: rebuilding
+    /// this list throws away every pull a player has EXPANDED, and the room paints once a
+    /// second.
+    ///
+    /// **Count plus the last pull's start, and neither of them ticks.**
+    /// <c>StatsSnapshot.Encounters</c> is appended to when a fight CLOSES, so a finished
+    /// pull's start and duration are fixed facts — the value only moves when a new pull
+    /// lands, which is exactly when the list must be rebuilt. Putting a duration or an "x
+    /// ago" in here would make every tick a rebuild (trap 8) and every rebuild a lost
+    /// expansion.
+    /// </summary>
+    public static string EncountersSignature(IReadOnlyList<PullInfo> pulls) =>
+        $"{pulls.Count}|{(pulls.Count > 0 ? pulls[^1].Start.Ticks : 0)}";
+
+    /// <summary>A pull's stable identity across rebuilds — its start instant, which is
+    /// unique per pull and fixed once the fight has closed. The expansion set is keyed on
+    /// this rather than on the list INDEX: a new pull is appended at the end today, and an
+    /// index would still be the wrong key the day the order or the grouping gap changes.
+    /// </summary>
+    public static string PullKey(PullInfo pull) => pull.Start.Ticks.ToString();
 
     // ---- the session report ----------------------------------------------------
 

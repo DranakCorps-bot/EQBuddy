@@ -1,4 +1,4 @@
-using EQBuddy.Core;
+﻿using EQBuddy.Core;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -14,12 +14,68 @@ namespace EQBuddy.Tests;
 /// </summary>
 public class ProgressSurfaceTests
 {
+    /// <summary>**FIVE since E-3 S3**, and the strip is still the whole enum in one fixed
+    /// order — the filtering is each host's, never this list's. History is last because the
+    /// other four are what this sitting is doing and it is what every sitting before it
+    /// added up to.</summary>
     [Fact]
-    public void The_strip_is_always_all_four_tabs_in_a_fixed_order()
+    public void The_strip_is_always_every_tab_in_a_fixed_order()
     {
         Assert.Equal(
-            [ProgressTab.Experience, ProgressTab.Wealth, ProgressTab.Faction, ProgressTab.Raids],
+            [ProgressTab.Experience, ProgressTab.Wealth, ProgressTab.Faction,
+             ProgressTab.Raids, ProgressTab.History],
             ProgressSurface.Tabs().Select(t => t.Tab));
+    }
+
+    // ---- the two host filters, and the fact that they are independent ----
+
+    /// <summary>
+    /// **The new kind of row (Bevel's History pre-design §4, Helm-signed 2026-09-05).**
+    /// <c>MovedToLive</c> answers "did this tab leave Progress"; <c>DesktopShellOnly</c>
+    /// answers "which hosts draw it". They are different questions and the enum is walked
+    /// for both, so a sixth tab is on every host until somebody deliberately says otherwise
+    /// — trap 55's lesson, applied to a predicate rather than a list.
+    /// </summary>
+    [Fact]
+    public void Exactly_one_tab_is_desktop_shell_only()
+    {
+        Assert.True(ProgressSurface.DesktopShellOnly(ProgressTab.History));
+        Assert.Equal([ProgressTab.History],
+            Enum.GetValues<ProgressTab>().Where(ProgressSurface.DesktopShellOnly));
+    }
+
+    /// <summary>The negative that keeps the predicate from going vacuous (trap 39): the
+    /// default over the enum is "no", so the four that were here before are untouched.
+    /// </summary>
+    [Theory]
+    [InlineData(ProgressTab.Experience)]
+    [InlineData(ProgressTab.Wealth)]
+    [InlineData(ProgressTab.Faction)]
+    [InlineData(ProgressTab.Raids)]
+    public void Every_other_tab_is_drawn_by_every_host(ProgressTab tab)
+    {
+        Assert.False(ProgressSurface.DesktopShellOnly(tab));
+    }
+
+    /// <summary>The two filters do not overlap today and nothing assumes they cannot: a tab
+    /// that both left Progress AND was desktop-only would be a contradiction a host should
+    /// notice, so this asserts the state rather than the impossibility.</summary>
+    [Fact]
+    public void No_tab_both_moved_to_live_and_is_desktop_shell_only()
+    {
+        Assert.Empty(Enum.GetValues<ProgressTab>()
+            .Where(t => ProgressSurface.MovedToLive(t) && ProgressSurface.DesktopShellOnly(t)));
+    }
+
+    /// <summary>**A fold may only name keys that are NO LONGER CARDS** (trap 55, #252).
+    /// History was never a card, so it must not appear in the absorbed list — the guard is
+    /// here as well as in <c>SectionFoldIdempotenceTests</c> because this is the file
+    /// somebody edits when they add a tab.</summary>
+    [Fact]
+    public void The_new_tab_absorbs_no_card()
+    {
+        Assert.DoesNotContain(ProgressSurface.KeyFor(ProgressTab.History),
+            ProgressSurface.AbsorbedCardKeys);
     }
 
     /// <summary>The theme inherits the Progress card's own slot. A NEW key would append the
@@ -78,6 +134,9 @@ public class ProgressSurfaceTests
     [InlineData("xp", ProgressTab.Experience)]
     [InlineData("faction", ProgressTab.Faction)]
     [InlineData("raids", ProgressTab.Raids)]
+    [InlineData("history", ProgressTab.History)]
+    // The v1 door is called "Session history…", so the word a player would type lands.
+    [InlineData("sessions", ProgressTab.History)]
     [InlineData("  Motes  ", ProgressTab.Wealth)]
     public void Every_absorbed_card_key_resolves_to_the_tab_that_now_holds_it(
         string key, ProgressTab expected)
