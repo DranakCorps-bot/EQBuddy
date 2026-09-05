@@ -28,9 +28,10 @@ public sealed record CompanionSources
     /// two lists of strings.</summary>
     public Func<CompanionProgressState>? Progress { get; init; }
 
-    /// <summary>This character's raid clears — the Progress theme's Raids tab
-    /// (docs/Themes.md). Wired in the same change as the desktop fold: a surface that
-    /// exists on two screens gets one decision, and the two days EQBuddy Mobile spent
+    /// <summary>This character's raid clears — the SESSION screen's "what you cleared"
+    /// block since E-3 PR 5, and the Progress theme's Raids tab (docs/Themes.md) before
+    /// that. Both wirings landed in the same change as the matching desktop move: a surface
+    /// that exists on two screens gets one decision, and the two days EQBuddy Mobile spent
     /// ahead of the desktop on #210 is the reason that rule is written down.</summary>
     public RaidKillLedger? Raids { get; init; }
 
@@ -408,7 +409,13 @@ public sealed class CompanionHost : IDisposable
             UnlockClasses = progress?.Classes ?? [],
             NextUnlocks = progress?.Next,
             LevelUps = progress?.LevelUps ?? [],
-            Raids = On(CompanionSurfaces.Progress) ? _sources.Raids : null,
+            // **Gated on SESSION since E-3 PR 5, not on Progress.** The ledger feeds the
+            // raids block, and that block moved to the Session screen with the desktop's
+            // Raids tab. Leaving this on Progress would have sent the ledger to a screen
+            // that no longer draws it and withheld it from the one that does — which reads
+            // on the phone as a permanently empty raid list for anyone whose ⚙ picks are
+            // Session without Progress.
+            Raids = On(CompanionSurfaces.Session) ? _sources.Raids : null,
             Quests = quests,
             QuestIndex = quests is null ? null : _questIndex,
         };

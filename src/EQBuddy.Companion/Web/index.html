@@ -1156,7 +1156,18 @@ function boot() {
   }
 
   // ---------- session ----------
+  // The session strip — and, since E-3 PR 5, what you CLEARED underneath it.
+  //
+  // Raids moved here from the progress screen in the same change that moved the desktop's
+  // Raids tab out of the Progress room and into Live. This screen is the one
+  // CompanionSurfaces.PageFor routes to that room, so the phone follows the room rather
+  // than a list of its own — which is the whole of #210's lesson.
+  //
+  // `s.raids` may be absent on a page that booted before the move (trap 32: this page is
+  // never re-fetched, so an open phone can be running weeks-old JavaScript against a fresh
+  // PC — the version reload handles it, but the guard costs one `if`).
   function renderSession(p, s) {
+    const wrap = el("div");
     const grid = el("div", "stats");
     const stats = [
       [num(s.kills), "kills"],
@@ -1169,7 +1180,12 @@ function boot() {
       d.append(el("div", "v", v), el("div", "k", k));
       grid.appendChild(d);
     }
-    p.body.replaceChildren(grid);
+    wrap.appendChild(grid);
+    if (s.raids) {
+      wrap.appendChild(el("h3", "group", "Cleared"));
+      wrap.appendChild(raidsBody(s.raids));
+    }
+    p.body.replaceChildren(wrap);
   }
 
   // ---------- mez ----------
@@ -1324,12 +1340,17 @@ function boot() {
 
   // ---------- progress (the PROGRESS THEME) ----------
   //
-  // Four tabs — Experience, Wealth, Faction, Raids — mirroring the desktop's Progress
-  // window, which replaced five separate widget cards (docs/Themes.md). The strip ARRIVES
-  // on the wire, labels and badges already decided by Core's ProgressSurface and
-  // UI.Shared's ProgressTheme: this page does not get to name a tab or compute a badge,
+  // Three tabs — Experience, Wealth, Faction — mirroring the desktop's Progress ROOM. The
+  // strip ARRIVES on the wire, labels and badges already decided by Core's ProgressSurface
+  // and UI.Shared's ProgressTheme: this page does not get to name a tab or compute a badge,
   // which is precisely the freedom that let the quest checklists drift here for two days
   // before #210.
+  //
+  // **It was four until E-3 PR 5, and Raids is on the SESSION screen now** — the phone
+  // screen that maps to the shell's Live room, moved in the same commit as the desktop tab.
+  // The loop below draws whatever the strip carries, so this page needed no filter of its
+  // own: the server stopped sending the chip and the body left with it, which is the only
+  // way a tab and its content cannot get out of step.
   //
   // The picked tab is per device and remembered, like the quest surface's.
   const progressTab = new Map();
@@ -1353,7 +1374,6 @@ function boot() {
 
     if (tab === "wealth") wrap.appendChild(wealthBody(s.wealth));
     else if (tab === "faction") wrap.appendChild(factionBody(s.faction));
-    else if (tab === "raids") wrap.appendChild(raidsBody(s.raids));
     else wrap.appendChild(experienceBody(s, () => renderProgress(p, s)));
 
     p.head.textContent = s.level != null ? "level " + s.level : "";

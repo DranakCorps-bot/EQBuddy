@@ -1,5 +1,6 @@
 using EQBuddy.Companion;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -518,10 +519,17 @@ public class SurfaceParityTests
         Assert.Empty(Progress().LevelUps!);
     }
 
+    /// <summary>The phone's strip is the Evolved ROOM's tab list, in the surface's own
+    /// order. **It was every <c>ProgressTab</c> until E-3 PR 5** — the enum still has four
+    /// and the v1 window still draws four; what both Evolved hosts draw is the enum minus
+    /// what the reshape moved, and reading that from the same predicate rather than from a
+    /// list typed here is the whole anti-drift argument (trap 55).</summary>
     [Fact]
     public void ThePhoneOffersTheSameProgressTabsInTheSameOrder()
     {
-        var expected = Enum.GetValues<ProgressTab>().Select(ProgressSurface.KeyFor).ToList();
+        var expected = Enum.GetValues<ProgressTab>()
+            .Where(t => !ProgressSurface.MovedToLive(t))
+            .Select(ProgressSurface.KeyFor).ToList();
 
         Assert.Equal(expected, Progress().Tabs.Select(t => t.Key).ToList());
     }
@@ -550,16 +558,60 @@ public class SurfaceParityTests
             Progress(stats).Tabs.Single(t => t.Key == "wealth").Badge);
     }
 
+    /// <summary>The raids block, on the SESSION screen since E-3 PR 5 — the phone screen
+    /// <c>CompanionSurfaces.PageFor</c> routes to the shell's Live room, moved in the same
+    /// commit as the desktop's Raids tab.</summary>
+    private static CompanionRaidsBlock Raids() =>
+        CompanionProjection.Build(new CompanionInputs
+        {
+            Stats = new StatsSnapshot(),
+            Offered = [CompanionSurfaces.Session],
+        }, DateTime.Now).Session!.Raids!;
+
     [Fact]
-    public void ThePhonesRaidsTabNamesEveryCatalogTarget()
+    public void ThePhonesRaidsBlockNamesEveryCatalogTarget()
     {
         // With no ledger there are no clears to show, but the TOTAL is still the
         // catalog's — a phone reporting "0 / 0" would read as "there are no raid targets"
         // rather than "you have cleared none of them".
-        var raids = Progress().Raids;
+        var raids = Raids();
 
         Assert.Equal(RaidTargetCatalog.Default.BossCount, raids.Total);
         Assert.Equal(0, raids.Defeated);
+    }
+
+    /// <summary>
+    /// **The move itself, asserted from both ends** — Bevel's §3 rule is that the desktop's
+    /// Progress room and the phone's progress screen change in ONE commit, and the only way
+    /// that stays true is a test that fails if either half drifts back.
+    ///
+    /// The v1 <c>ProgressWindow</c> keeps its fourth tab and that is deliberate, so this
+    /// asserts the ROOM's list and not <c>ProgressSurface.Tabs()</c>: the surface still
+    /// names four, the two Evolved hosts draw three, and the predicate is the single place
+    /// that says which (trap 55's lesson about two lists describing one arrangement).
+    /// </summary>
+    [Fact]
+    public void RaidsLeftProgressOnTheDesktopRoomAndOnThePhoneTogether()
+    {
+        Assert.Contains(ProgressTab.Raids, ProgressSurface.Tabs().Select(t => t.Tab));
+        Assert.True(ProgressSurface.MovedToLive(ProgressTab.Raids));
+
+        var roomKeys = ShellPages.Rooms(ShellPage.Progress).Select(r => r.Key).ToList();
+        var phoneKeys = Progress().Tabs.Select(t => t.Key).ToList();
+
+        Assert.Equal(roomKeys, phoneKeys);
+        Assert.DoesNotContain(ProgressSurface.KeyFor(ProgressTab.Raids), roomKeys);
+        // The negative that keeps this from going vacuous (trap 39): the three that stayed
+        // are still on both, so a filter that emptied the strip would fail here too.
+        Assert.Equal(3, roomKeys.Count);
+        Assert.Contains(ProgressSurface.KeyFor(ProgressTab.Experience), roomKeys);
+
+        // And the destination, on both surfaces: the desktop room's key list and the phone
+        // screen the join routes to Live.
+        Assert.Contains(LiveSurface.KeyFor(LiveTab.Raids),
+            ShellPages.Rooms(ShellPage.Live).Select(r => r.Key));
+        Assert.Equal(ShellPage.Live, CompanionSurfaces.PageFor(CompanionSurfaces.Session));
+        Assert.NotNull(Raids());
     }
 
     // ---- the character's classes: one Resolve, three lanes ----
