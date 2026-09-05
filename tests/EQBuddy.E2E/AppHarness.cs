@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
@@ -90,8 +90,9 @@ internal sealed class AppHarness : IDisposable
         {
             LogFolder = LogsDir,
             UpdateFolder = updateDir,
-            WindowLeft = 60,
-            WindowTop = 60,
+            // Prefer secondary monitor when virtual desktop is wider than primary (David: EQ on primary).
+            WindowLeft = SecondaryShotOrigin().left,
+            WindowTop = SecondaryShotOrigin().top,
             Minimized = false,
             ShowTutorial = false,
             LastSeenVersion = $"{v.Major}.{v.Minor}.{Math.Max(v.Build, 0)}",
@@ -435,6 +436,19 @@ internal sealed class AppHarness : IDisposable
         catch (IOException) { return null; }
     }
 
+
+    // Dual-monitor local: place harness windows on the display to the right of primary.
+    // Single-screen CI: VirtualScreenWidth == PrimaryScreenWidth → 60,60.
+    private static (double left, double top) SecondaryShotOrigin()
+    {
+        var primaryW = System.Windows.SystemParameters.PrimaryScreenWidth;
+        var virtL = System.Windows.SystemParameters.VirtualScreenLeft;
+        var virtT = System.Windows.SystemParameters.VirtualScreenTop;
+        var virtW = System.Windows.SystemParameters.VirtualScreenWidth;
+        if (virtW > primaryW + 10)
+            return (virtL + primaryW + 60, virtT + 60);
+        return (60, 60);
+    }
     public void Dispose()
     {
         if (_process is { } p)
