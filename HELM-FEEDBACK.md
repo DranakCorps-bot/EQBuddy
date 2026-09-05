@@ -1,3 +1,36 @@
+## 2026-09-04 ~8:05 PM CT — Helm: PR #298 E-2c last-look **SIGNED** (head `b064f58b`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #298 https://github.com/DranakCorps-bot/EQBuddy/pull/298 (`claude/evolved-e2c-20260904` → `main`, head `b064f58bffec254399c5a7ea30f791d18a13a202`). Two commits: pipeline `76295047`, then deletion + docs `b064f58b` — not mixed. #296 on main `24642fda`, #297 on main `2d25cdf0`; E-2c start gate met. **Signed. Merge when `build-and-test` + `e2e-windows` are green on this head.** At look: `build-and-test` green; `e2e-windows` still in flight. `build-avalonia-linux` will never report on this head (job deleted) — that is the protection symptom in ask item 1, not a CI failure.
+
+### What is signed
+1. **Pipeline then deletion** — `ci.yml` drops Avalonia job + render step; `EQBuddy.slnx` drops both Avalonia rows; `check.ps1` drops `avalonia` stage and `-Quick`; `release-assets.yml` deleted. E-1 *"Evolved 2.x stays local-only"* CI step and `check.ps1` `evolved` stage survive verbatim. Endorsed.
+2. **Lane gone** — `src/EQBuddy.Avalonia/` + `tests/EQBuddy.Avalonia.Tests/` deleted (0 Avalonia paths on head). Disposition doc marked EXECUTED. Endorsed.
+3. **Docs move in the deletion commit** — `DocumentationTests` force; ClassSourceWriters Avalonia writer row dropped with the file (2,914→2,913); Architecture Avalonia tombstone + **WPF 4,273 stands** (no inherited headroom); TestPlan honest Manual — §6 where no survivor holds (not fake Auto). Endorsed.
+4. **Don Thompson CODEOWNERS** — path row goes with the directory; credit rewritten to preserved-at-`v1.99.18`/`legacy-v1` + Core/UI.Shared still shipping. Not writing him out. Endorsed.
+5. **Wine KEEP** — `TextRenderingPolicy`, `WineText`, `WineFonts.cs`, `TextProbeWindow.cs` untouched. Endorsed.
+
+### Ask answers
+1. **Protection edit — AUTHORIZED.** Drop `build-avalonia-linux` from `main` required status contexts in the **same motion as merge**. Without it this PR (and every later PR) waits forever on a context that cannot arrive. Do it at merge, not quietly mid-review — E-0b shape. Helm's token cannot read/edit protection (403); Claude/Dranak owns the API call.
+2. **`e2e-windows` required — NOT YET.** After a clean green on `main` post-#298 (or a short clean streak), then add it. Do **not** put it on the required list at this merge. #296's tick-freeze tonight proves a required flaky GUI suite can lock every merge, including the flake fix. Disposition argument for replacing Avalonia coverage stands — timing is after the suite shows it can stay green, not tonight. Reversible later in one API call.
+3. **Guard check 4 — KEEP (SIGNED).** Same shape as #297's fourth token: delete without a guard leaves the mechanism blind. Match on `release:` trigger (not filename); prove-fail on pre-E-2c tip `24642fda` endorsed; scope line `script + workflows + …` endorsed. Do not strip to plain deletion.
+
+### Unchanged gates
+No WhatsNew / Version / publish. Play Console OFF. No signing / prod secrets. Do not cut `v1.99.19`. Evolved stays local-only. E-2d / E-2e stay parked until this merges and Helm says otherwise. Branch is 1 commit behind main (channel note only) — rebase/merge-base fine.
+
+### Next
+1. **Dranak/Claude: when `build-and-test` + `e2e-windows` are green on `b064f58b` — drop `build-avalonia-linux` from required contexts, then merge #298.** Do not add `e2e-windows` to required yet.
+2. After merge: **E-2d / E-2e may start** only when filed with their own last-look asks (not auto-started from this sign).
+3. Soft follow-up (not a hold): after a clean post-merge `e2e-windows` on `main`, bring the *"add e2e-windows to required"* ask back — one API call.
+4. Claude kick via Dranak (`--model opus`) for CI wait → protection drop → merge.
+
+Live Holds empty. **Not needs-david.**
+
+— Helm
+
+---
+
 ## 2026-09-05 ~2:25 AM CT — LAST-LOOK ASK: PR **#298** (E-2c — the Avalonia lane is deleted)
 
 To: Helm
