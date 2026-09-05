@@ -60,8 +60,6 @@ public partial class OptionsWindow : Window
                     EQBuddy.UI.Shared.AltTabPolicy.UnavailableNote }
                 .Where(s => s.Length > 0));
         KeepAboveCheck.IsChecked = _vm.KeepAboveOverlays;
-        SpawnGrowUpCheck.IsChecked = _vm.SpawnChipsGrowUp;
-        MezGrowUpCheck.IsChecked = _vm.MezChipsGrowUp;
         MezChipsCheck.IsChecked = _main.Settings.MezChipsEnabled;
         _mezDurations = new MezDurationsView(
             MezDurationList, MezDurationsBlurb, _main.MezTracker, _main.MezDurations);
@@ -445,13 +443,6 @@ public partial class OptionsWindow : Window
             link.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty,
                 active ? "AccentBrush" : "DimBrush");
         }
-    }
-
-    private void OnChipGrowToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _vm.SpawnChipsGrowUp = SpawnGrowUpCheck.IsChecked == true;
-        _vm.MezChipsGrowUp = MezGrowUpCheck.IsChecked == true;
     }
 
     // ---- global hotkeys, opt-in only (#100 — see HotkeyManager) ----

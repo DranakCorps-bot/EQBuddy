@@ -162,8 +162,9 @@ window wins: four places to say *"alert me, at this volume, with this sound"* is
 problem being solved, and moving three of them into a fourth tab of Options would leave
 the per-named bells in the Spawns window out in the cold anyway. Options keeps what is
 genuinely global; the window owns what belongs to a rule, a buff, a named or a mez.
-**Absorbs:** Watch card, Buffs card, and the *management* of `SpawnChipsWindow`,
-`MezChipsWindow`, `AlertWindow`
+**Absorbs:** Watch card, Buffs card, and the *management* of the HUD chip row
+(`HudChipRowWindow`, which is where `SpawnChipsWindow` and `MezChipsWindow` went in
+Surface A / SA-2) and `AlertWindow`
 **Surface:** the **chips stay on the overlay** — every one of them is a deadline with
 an action, which is exactly what earns that space. What consolidates is the
 *configuration*: four different places to say "alert me, at this volume, with this

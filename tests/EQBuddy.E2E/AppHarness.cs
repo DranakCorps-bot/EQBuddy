@@ -325,6 +325,41 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
+    /// Seeds running spawn countdowns, which live in <c>spawn-timers.json</c> rather than in
+    /// settings.json — so a scenario that wants chips on the HUD row cannot get there through
+    /// <c>configureSettings</c>. Trap 22: with no timers the spawn family contributes nothing
+    /// and an assertion about the row would be an assertion about an empty one.
+    ///
+    /// **Seeded through the app's own file and its own shape** (trap 23): a
+    /// <c>List&lt;SpawnTimerState&gt;</c> where <c>SpawnTimers.LoadPersisted</c> reads one.
+    ///
+    /// <c>Server</c> is <see cref="Server"/> and that is the whole staging, learned the
+    /// expensive way: <c>LogWatcher</c> assigns <c>Spawns.Server</c> from the CHARACTER LOG's
+    /// name the moment it selects one, and <c>SpawnTimers.Snapshot</c> filters on it. Seeded
+    /// with anything else — <c>""</c>, which is what the field holds before a log is picked —
+    /// the timers load, persist, survive every purge, and are filtered out of every snapshot:
+    /// a real state, invisible on screen, indistinguishable from a broken feature (trap 23).
+    ///
+    /// <paramref name="timers"/> gives each countdown's age and its full cycle, in seconds:
+    /// <c>(zone, name, killedSecondsAgo, durationSeconds)</c>. A duration SHORTER than the
+    /// age is a chip that has gone DUE. Call before <see cref="Launch"/>.
+    /// </summary>
+    public void SeedSpawnTimers(
+        params (string Zone, string Name, double KilledSecondsAgo, double DurationSeconds)[] timers)
+    {
+        var now = DateTime.Now;
+        File.WriteAllText(Path.Combine(ProfileDir, "spawn-timers.json"),
+            JsonSerializer.Serialize(timers.Select(t => new
+            {
+                Server,
+                t.Zone,
+                t.Name,
+                KilledAt = now.AddSeconds(-t.KilledSecondsAgo),
+                DurationSeconds = (double?)t.DurationSeconds,
+            }), new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    /// <summary>
     /// Seeds the Quest Tracker's picked classes for the harness character — the source
     /// every level-unlock surface filters by (<c>UnlockClasses</c>: picks first, the
     /// combat-inferred class second).

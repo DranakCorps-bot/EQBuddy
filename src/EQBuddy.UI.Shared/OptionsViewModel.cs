@@ -423,16 +423,11 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
         get => _settings.KeepAboveOverlays;
         set { _settings.KeepAboveOverlays = value; PersistAnd(); }
     }
-    public bool SpawnChipsGrowUp
-    {
-        get => _settings.SpawnChipsGrowUp;
-        set { _settings.SpawnChipsGrowUp = value; PersistAnd(); }
-    }
-    public bool MezChipsGrowUp
-    {
-        get => _settings.MezChipsGrowUp;
-        set { _settings.MezChipsGrowUp = value; PersistAnd(); }
-    }
+    // SpawnChipsGrowUp / MezChipsGrowUp retired with their two Options tick-boxes in
+    // Surface A / SA-2 — there is one chip row now and it has one growth direction. A
+    // property whose setting no longer exists is exactly the dangling affordance the
+    // fold obligation exists to catch.
+
     /// <summary>0 = wiki base. Clamped to a sane band — a typo of 90000 would turn the
     /// estimate into an absurdity that outlives the typo.</summary>
     public int RegenPerTickOverride

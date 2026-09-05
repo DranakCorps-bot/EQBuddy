@@ -422,14 +422,17 @@ double every death.
 
 **On by default, chicklets first** (`TrackSpawns`, default true; the shape is David's
 design, arrived at over three iterations — always-open was noise, pop-the-full-window
-was still too much). The ambient face of the feature is `SpawnChipsWindow`: one small
-chip per running countdown (`⏳ Asaka L`Rei 3:12`), stacked vertically, the whole
-stack draggable as one (position persisted in `SpawnChipsLeft/Top`). The stack shows
+was still too much). The ambient face of the feature is the HUD chip row
+(`HudChipRowWindow`, which folded `SpawnChipsWindow` and `MezChipsWindow` into one in
+Surface A / SA-2): one small chip per running countdown (`⏳ Asaka L`Rei 3:12`), laid out
+in a row that sits under the widget and moves with it. **Nothing about its position is
+saved** — it is recomputed from the widget every tick, and the old per-stack
+`SpawnChipsLeft/Top` and grow-up settings retired with the two windows. The row shows
 **every timer on the server regardless of zone** — a Befallen camp timer keeps its
 chip while you bank in WC — sorted soonest-first. At zero a chip flips to a
 warn-colored **DUE** and a single click acknowledges it (clears the timer); a
 double-click on any chip opens the full zone window on that chip's zone. The stack
-exists exactly while timers do and the full window is closed; MainWindow's shared 1 s
+family exists exactly while timers do and the full window is closed; MainWindow's shared 1 s
 tick drives refresh, visibility, and the due sounds (`ConsumeDueAlerts` primes at
 startup so a camp that expired while the app was closed doesn't re-alert). Due
 notification is **sound-only** — the chip flipping to DUE is the visual, and a banner

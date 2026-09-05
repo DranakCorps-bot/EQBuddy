@@ -725,8 +725,19 @@ Read this list before touching the areas it names. Every entry cost a release.
 2. **`ActualHeight` is 0 in a `Closed` handler.** The window is already torn down.
    Persisting geometry there records nonsense. Caused #152 — chips walked up the screen
    one row per reopen.
-   → **Now guarded:** `UI.Shared/ChipStackAnchor.cs` owns the anchoring and ignores
-   non-positive heights; `ChipAnchor.cs` is only the WPF wiring.
+   → **TOMBSTONE, 2026-09-05 (Surface A / SA-2). The trap is still true; its named guard is
+   gone with the surface it guarded.** UI.Shared/ChipStackAnchor.cs and ChipAnchor.cs
+   owned the anchoring — they ignored non-positive heights, and ChipStackAnchorTests held
+   it. (Un-backticked deliberately: `DocumentationTests` fails a doc that cites a file or a
+   suite which no longer exists, and a tombstone must be able to NAME what it is burying.) Both chip stacks folded into one HUD chip row that is recomputed from the widget's own
+   position every tick and **persists no geometry at all**, so there is nothing left to save
+   in a `Closed` handler and the three files retired together (trap 57's precedent for how to
+   record a guard leaving with its subject).
+   → **What survives is the RULE, and it binds anything that still saves a size or a
+   position at teardown.** Do not read `ActualHeight` (or anything derived from it) in a
+   `Closed` handler; capture it while the window is alive, or — better, and what SA-2 did —
+   find out whether the value needs persisting at all. The widget itself and every satellite
+   still persist geometry; this trap is about all of them, and it always was.
 3. **`redirects=1` means the page you get is not the page you asked for.** Record the
    *served* title (`WikiPageText.Title`), never the requested one. Caused the same
    article-dropping bug in #65 **twice**.

@@ -75,7 +75,7 @@ Break one of these and something quietly goes wrong rather than failing loudly.
 **`src/EQBuddy` — 14,432 lines, and no test project references it.** Two routes now
 reach into it anyway, and neither is a unit test:
 
-- **Pure arithmetic extracted to `UI.Shared`** (`WidgetMetrics`, `ChipStackAnchor`) —
+- **Pure arithmetic extracted to `UI.Shared`** (`WidgetMetrics`, `HudChipRow`) —
   ordinary unit tests, because sums do not need a window.
 - **The `EQBUDDY_EXPAND` dump read by E2E** — the real app, launched, reporting facts
   about itself. This is the only thing that sees whether the arithmetic is *wired* to
@@ -86,8 +86,10 @@ mouse does to it.
 
 This is not academic. Both bugs players reported on 2026-08-14 — the clipped card (#144)
 and the drifting chips (#152) — live in this layer, and on the morning they were reported
-nothing here could have caught either. Both are now held: their arithmetic by
-`WidgetMetricsTests` and `ChipStackAnchorTests`, and #144's wiring by two E2E scenarios.
+nothing here could have caught either. #144 is held by `WidgetMetricsTests`, with its
+wiring on two E2E scenarios; #152's whole subject — a chip stack's saved position — was
+deleted rather than guarded in Surface A / SA-2, which is the better outcome and the reason
+ChipStackAnchorTests is no longer here.
 That is the shape of progress to aim for — each escape converts a manual row into an
 automated one. See [TestPlan.md](TestPlan.md) §5.
 
@@ -130,7 +132,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 3,964 | 4,360 | 4,360 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |

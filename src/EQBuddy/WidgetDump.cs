@@ -296,6 +296,26 @@ internal static class WidgetDump
                     // with no window; this proves the decision reaches the control, which
                     // is the half a unit test cannot see (trap 42).
                     $"hudGlance={w._hudBar.GlanceKey} " +
+                    // THE ONE CHIP ROW (Surface A / SA-2). Four keys, because the fold has
+                    // four separable ways to go wrong and a single "is the row up" could
+                    // not tell them apart: the row's presence, each family's contribution,
+                    // and how many chicklets are showing a DUE face.
+                    //
+                    // hudChipsRow is the ROW WINDOW's own visibility, which is the half a
+                    // count cannot claim — "present in the build" and "on screen" are
+                    // different claims (trap 42), and this row replaced two windows whose
+                    // whole job was being on screen at the right moment. The per-family
+                    // counts come from the merge rather than off the panel, so a family
+                    // that silently stopped contributing is visible as a 0 beside a live
+                    // row rather than as an absence nothing names (trap 20's shape).
+                    //
+                    // Emitted whether or not the row exists: a key that disappears with its
+                    // window is a key a test cannot assert is ZERO, and "the spawn family
+                    // left the row" is exactly the assertion the Camps hide-rule needs.
+                    $"hudChipsRow={(w._hudChips is { IsVisible: true } ? 1 : 0)} " +
+                    $"hudChipsMez={w._hudChips?.MezChips ?? 0} " +
+                    $"hudChipsSpawn={w._hudChips?.SpawnChips ?? 0} " +
+                    $"hudChipsDue={w._hudChips?.DueChips ?? 0} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +

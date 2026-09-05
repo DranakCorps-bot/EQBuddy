@@ -40,8 +40,9 @@ public static class FocusHide
     /// The exceptions are the surfaces that are already driven by the widget's own tick,
     /// where a second hand on the switch is the bug: the breakouts (which re-derive their
     /// visibility from settings plus this same flag every tick, so hiding one here and
-    /// showing it back could resurrect one the player dismissed with its ✕), the chip
-    /// stacks, and the transient alert tile. The click-through and cursor-ring overlays
+    /// showing it back could resurrect one the player dismissed with its ✕), the one chip
+    /// row (whose families are gated per tick by ChipStackPlan, which reads this same
+    /// flag), and the transient alert tile. The click-through and cursor-ring overlays
     /// belong to the GAME window rather than to the widget, so the widget's visibility is
     /// not theirs to answer.
     ///
@@ -53,8 +54,7 @@ public static class FocusHide
         windowTypeName is not (
             "MainWindow"            // the widget itself; hidden directly
             or "BreakoutWindow"     // re-derived every tick from DisabledBreakouts + this flag
-            or "SpawnChipsWindow"
-            or "MezChipsWindow"
+            or "HudChipRowWindow"  // the one chip row; ChipStackPlan gates it per family
             or "ClickThroughChip"
             or "AlertWindow"        // transient, dismisses itself
             or "CursorRingWindow"   // draws on the GAME, not beside the widget

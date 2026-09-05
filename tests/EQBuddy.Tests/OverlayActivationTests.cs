@@ -37,8 +37,10 @@ public class OverlayActivationTests
     /// row below is a surface that opens without anybody asking.</summary>
     public static TheoryData<string> UnpromptedSurfaces =>
     [
-        "EQBuddy/MezChipsWindow.xaml",
-        "EQBuddy/SpawnChipsWindow.xaml",
+        // The one chip row, which the two chip stacks folded into (Surface A / SA-2).
+        // Built in code rather than XAML, so the scan reads the .cs — the attribute it
+        // checks for is ShowActivated = false either way.
+        "EQBuddy/HudChipRowWindow.cs",
         "EQBuddy/AlertWindow.xaml",
         "EQBuddy/ClickThroughChip.cs",
         "EQBuddy/CursorRingWindow.cs",
