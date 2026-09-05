@@ -640,9 +640,26 @@ public sealed class AppSettings
     public static AppSettings Load(bool persistMigrations = true)
     {
         AppSettings settings;
+        // Whether this profile had a settings.json to READ — asked of the file, here,
+        // because it is the one question the loaded object cannot answer about itself.
+        //
+        // **It used to be `settings._fileStamp is not null`, and that was ALWAYS FALSE.**
+        // `_fileStamp` is a private field; `System.Text.Json` only touches public members
+        // (the comment beside its declaration says so), so nothing sets it during a load
+        // and the very next line is what assigns it. So every migration taking `hadFile`
+        // has been told "brand new profile" on every launch of every profile since the
+        // argument was introduced (2026-08-21). `MigrateMotesCard` survived it because it
+        // uses `hadFile` only to decide whether to FORCE a save and its state changes are
+        // unconditional; `MigratePromotedHudStats` would not have — it reads a stored star
+        // before stripping it, so an always-false `hadFile` makes it a no-op on precisely
+        // the profiles it exists for. Trap 42's shape at the settings layer: the migration
+        // is present in the build and was never in effect. Guarded by
+        // `HudStatPromotionLoadTests`, which drives the real `Load` against a real file and
+        // fails on the pre-fix tree.
+        var hadFile = File.Exists(FilePath);
         try
         {
-            settings = File.Exists(FilePath)
+            settings = hadFile
                 ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath), JsonOpts) ?? new()
                 : new AppSettings();
         }
@@ -650,10 +667,12 @@ public sealed class AppSettings
         {
             CoreLog.Error(ex); // corrupted settings — start fresh, but say so
             settings = new AppSettings();
+            // …and a fresh object is a fresh PROFILE as far as the migrations are
+            // concerned. Nothing the player chose survived the parse, so reading these
+            // defaults as their stored choices would be a migration acting on evidence
+            // that is not there.
+            hadFile = false;
         }
-        // Whether this profile had a settings.json at all. Only one migration cares, and
-        // it cares a lot: see MigrateMotesCard.
-        var hadFile = settings._fileStamp is not null;
         settings._fileStamp = StampOf(FilePath);
         var changed = settings.ApplyMigrations(hadFile);
         // A READ that writes, and the reason is good: an id assigned at construction is

@@ -1081,11 +1081,22 @@ $Shots = [ordered]@{
     # is now the trio's own second slot and the migration strips it. Then the two watch
     # chips, Motes and Ghouls. Seven cells; a bar with a dps reading TWICE on it is the
     # failure this names in advance.
+    #
+    # THE PIN IS SEEDED EXPLICITLY, and it had to be. This shot's chips were being
+    # produced by a BUG, not by its staging: `Write-Settings` sets `WatchPinsMigrated`,
+    # so `WatchPinMigration` skips and `PinWatchChips` stays at its default false — but
+    # until 2026-08-31 the "any per-rule pin turns on the group pin" line sat ABOVE that
+    # gate and ran every launch, which is #253 (HiramDucky) itself. `9b7f4daf` moved it
+    # inside the gate, and from that day this shot's two chips were gone and nobody
+    # noticed, because the committed PNG was last taken on 2026-08-24. Trap 22 exactly:
+    # a surface with no fixture state photographs as an unremarkable bar, and the
+    # sentence beside it in the tour goes on promising chips.
     'mini-tour'       = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','loot')
+                                    PinWatchChips = $true
                                     TrackedRules = @(
                                         @{ Id = 'shot-mote'; Name = 'Motes'
                                            Pattern = 'mote'; Kind = 0; Pinned = $true }

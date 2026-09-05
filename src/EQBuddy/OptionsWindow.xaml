@@ -392,9 +392,16 @@
                  reachable ONLY by opening the window a player was complaining about. -->
             <TextBlock Text="Mini dashboard" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
-            <TextBlock Text="Which stats show in the pill while EQBuddy is minimised. Each of these is the same switch as the star on the card header — two views of one setting, not two settings."
+            <TextBlock Text="Which stats show on the HUD while EQBuddy is minimised. Each of these is the same switch as the star on the card header — two views of one setting, not two settings."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
             <WrapPanel x:Name="MiniStatsPanel"/>
+            <!-- WHERE THE THREE MISSING SWITCHES WENT. This screen is where someone looks
+                 when a switch they used to have is gone, and three of them are (SA-1) — the
+                 same reason a folded card's name comes back on the card that absorbed it.
+                 Saying only "the HUD shows XP" would be the #233 complaint: naming the
+                 destination without naming the origin. -->
+            <TextBlock Text="XP, DPS and HPS are not in this list because they are always on the HUD now — the collapsed bar shows your name, your DPS and your XP%/hr whatever you pick here, and the third number becomes HPS while healing is the weight of the last half-minute. Their stars are gone; there is nothing left to switch off."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,4,0,2"/>
 
             <TextBlock Text="Breakout windows" FontSize="12" FontWeight="SemiBold"
                        Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>

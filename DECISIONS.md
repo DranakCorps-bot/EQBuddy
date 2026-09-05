@@ -52,6 +52,24 @@ history of the call stays readable. If vetoes become common, the consequence lis
 - **The ratchet number is set once, in the lift commit, against the SERIES' final tree**
   (3971). Could have set the lift's own minimum and then raised it six lines later in the
   promotion commit, which is the move this table exists to make someone argue for out loud.
+- **`AppSettings.Load`'s `hadFile` was FIXED rather than worked around.** It read a private
+  field `System.Text.Json` never sets, so it has answered "brand new profile" on every launch
+  of every profile since 2026-08-21 — which would have made this PR's migration a no-op on
+  exactly the profiles it exists for. Could have picked a different discriminator and left the
+  wrong one for the next migration to trip over. Blast radius checked: the only other caller,
+  `MigrateMotesCard`, uses `hadFile` solely to decide whether to force a save and changes its
+  state unconditionally, so nothing a player can see moves. A corrupted parse now counts as
+  "no file", because defaults are not the player's stored choices.
+- **Options → Cards & windows gained a line saying where the three switches WENT.** This is the
+  screen someone opens when a switch they had is missing, and three of them now are — the same
+  reason a folded card's name comes back on the card that absorbed it. Could have left the list
+  three rows shorter with no explanation, which is #233's complaint (naming the destination
+  without naming the origin) arriving as an absence.
+- **`mini-tour`'s staging seeds `PinWatchChips` explicitly**, found by the re-shoot: its two
+  watch chips were being produced by #253's bug (the group-pin line running above its own gate)
+  and vanished when `9b7f4daf` fixed that on 2026-08-31, six days after the committed PNG was
+  taken. Could have accepted the chipless picture as the new truth and left the quick tour's
+  sentence promising chips the shot does not show.
 - **`BreakoutPresentation.Blurb` and the Options double-click copy were rewritten too**, beyond
   the tooltip the plan's vocabulary rider named — they had become untrue for Damage and
   Healing, which is a correctness matter rather than a scope creep. `OptionsWindow.xaml`'s
