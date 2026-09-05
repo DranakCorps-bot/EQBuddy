@@ -68,6 +68,17 @@ Do not put these back in Holds.
 ---
 
 
+### PR #335 — Options gap "No longer on the widget" (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #335 https://github.com/DranakCorps-bot/EQBuddy/pull/335 (`claude/options-gap-v0v1-20260905` → `main`, product `db970649` / tip `87f1e6d2`) — `OverlaySections.Retired` by old title; executes #331 item (4) / Bevel I-11 §4; HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) context-menu door not Evolved room — SIGNED keep (trap 59; do not send to Bevel). (2) amend unreleased 2.0.0 WhatsNew — SIGNED. (3) options-cards re-shoot not a merge gate — SIGNED (own follow-up PR).
+- **Signed items:** Retired list + BuildRetired under card panel; two Quests/World rows; RetiredCardsTests (8); CLAUDE subtraction half; WhatsNew amend + new entry; DECISIONS three calls; BEVEL §4 TAKEN.
+- **Soft:** drop channel tip; options-cards re-shoot after SA-2 frees screen; do not starve SA-2; future cuts add Retired rows.
+- **Scope hygiene:** No I-11 implement / OptionsWindow retirement / SA-2..4 / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~5:30 PM CT
+
 ### PR #334 — AppHarness screen lock / trap 61 other half (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #334 https://github.com/DranakCorps-bot/EQBuddy/pull/334 (`claude/appharness-screen-lock-20260905` → `main`, head `1a702a33`) — E2E takes same `%TEMP%\eqbuddy-screen.lock` as `shoot.ps1`; HELM-FEEDBACK LIVE ASK.
