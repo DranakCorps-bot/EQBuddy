@@ -790,4 +790,53 @@ public class ShellHostTests
         // "nothing has happened yet".
         Assert.Equal(0, app.DumpValue("shellLiveEmpty"));
     }
+
+    // ---- E-3 S1: the room-level empty-state wrapper ------------------------------
+
+    /// <summary>
+    /// **The two halves of the room-level empty that only a launched app can see, asserted
+    /// together on every one of the six rooms.**
+    ///
+    /// `shellRoomFills` is the PRECONDITION. `RoomEmptyState` centres with
+    /// `VerticalAlignment.Center`, which centres inside the slack a parent gives you — so
+    /// the whole wrapper rests on the room being handed the shell's whole content cell. It
+    /// is today. **This is the guard against the day it stops**, and it is asked against the
+    /// CELL rather than against the room's own `ContentControl`: the host shrinks onto its
+    /// content, so a room-vs-host comparison agrees at 100×600 as contentedly as at 800×600
+    /// and answers 1 forever — a guard that cannot fail, which reads as coverage and is not
+    /// (trap 34). Measured before this was written: with `HorizontalAlignment.Left` on the
+    /// host the room-vs-host form still says 1 and this one says 0. It is a relationship,
+    /// never a number, so it holds on a 1024×768 hosted runner as well as on a desk.
+    ///
+    /// `shell*Empty=0` is the GUARD. A room-level empty COLLAPSES the tab strip and the
+    /// body, so a predicate that fired while the room had content would not be a cosmetic
+    /// slip — it would take away the tabs, the Sky tab's two ⧉ commands, Gear's ⧉ copy of
+    /// `/outputfile inventory` and World's "Drop camp marker" button.
+    /// `ShellRoomEmptyTests` proves each predicate's clauses in isolation; this is the
+    /// populated profile they must all say NO to, which is the half a unit test cannot stand
+    /// in for.
+    ///
+    /// **What is deliberately NOT here: the empty state itself.** The harness seeds a
+    /// character, so the state these predicates fire in cannot be reached from this suite at
+    /// all — the gap #303's ask 2 already named and Fable's I-15 already carries as an
+    /// empty-profile harness. Asserting the negative against a real app is what there is.
+    /// </summary>
+    [Theory]
+    [InlineData("home", "shellPage", "home", "shellHomeEmpty")]
+    [InlineData("live", "shellLiveTab", "damage", "shellLiveEmpty")]
+    [InlineData("progress", "shellProgressTab", "progress", "shellProgressEmpty")]
+    [InlineData("gear", "shellGearTab", "loot", "shellGearEmpty")]
+    [InlineData("world", "shellWorldTab", "misc", "shellWorldEmpty")]
+    [InlineData("quests", "shellQuestsTab", "general", "shellQuestsEmpty")]
+    public void EveryRoomFillsItsCellAndNoneOfThemHidesItselfOverApopulatedProfile(
+        string address, string key, string room, string emptyKey)
+    {
+        using var app = new AppHarness(environment: OpenOn(address));
+        app.Launch();
+
+        app.WaitForDump(key, room, $"the shell to land on {address}");
+        app.WaitForDump("shellRoomFills", "1",
+            $"the {address} room to fill the cell the host gave it");
+        Assert.Equal(0, app.DumpValue(emptyKey));
+    }
 }

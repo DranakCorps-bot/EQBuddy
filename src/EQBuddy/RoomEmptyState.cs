@@ -37,9 +37,42 @@ namespace EQBuddy;
 /// live in <c>UI.Shared</c> where a unit test can read them (<see cref="HomeReadout"/> is
 /// the first set), and a room with nothing in it still SHOWS — "silent no-ops are broken",
 /// and a room that drew nothing at all would be the same defect as a blank card.
+///
+/// **ALL SIX ROOMS CONSUME IT SINCE E-3 S1**, which is what the paragraphs above were
+/// waiting for: Home and Live built it for themselves, and Progress, Gear, World and
+/// Quests reach it through <see cref="ShellRoomEmpty"/>.
+///
+/// **THE CENTRING ITSELF WAS MEASURED AT THAT PASS RATHER THAN REASONED ABOUT, and two
+/// confident hypotheses about it were both WRONG.** They are written down because each one
+/// is a plausible-looking change somebody will propose again:
+///
+///  * *"A bare <c>ContentControl</c> aligns its content top-left, so <c>RoomHost</c> needs
+///    <c>Stretch</c>."* Its <c>HorizontalContentAlignment</c>/<c>VerticalContentAlignment</c>
+///    defaults ARE <c>Left</c>/<c>Top</c> — and setting them to <c>Stretch</c> changes
+///    nothing, because the default template's <c>ContentPresenter</c> does not alias them.
+///    The room already gets the whole cell.
+///  * *"A room must not put this inside its own <c>ScrollViewer</c>, because a scroller
+///    measures its content with infinite height."* It measures with infinity and then
+///    ARRANGES content smaller than the viewport at the VIEWPORT's size, so the centring has
+///    real slack. Home keeps its empty inside its scroller deliberately, so a window too
+///    short to hold the explanation can still scroll to it.
+///
+/// So the one thing the centring depends on is that the room is given the whole content
+/// cell, and <c>shellRoomFills</c> is the assertion for exactly that — against the CELL, not
+/// against the host, which is the form that can actually fail (see
+/// <c>ShellWindow.RoomFills</c>). A room-level empty is still a SIBLING of a room's page
+/// wherever the room has a tab strip, but that is about taking the strip away with it, not
+/// about layout.
 /// </summary>
 internal static class RoomEmptyState
 {
+    /// <summary>The same thing, handed the heading and the explanation as the PAIR they
+    /// are. <see cref="RoomEmptyMessage"/> is what the four data rooms carry, so a room
+    /// cannot ship one half of its own empty state — and the pair is one value, so a
+    /// caller cannot swap the two strings and get a plausible-looking panel.</summary>
+    public static FrameworkElement Build(RoomEmptyMessage message, FrameworkElement? action = null) =>
+        Build(message.Heading, message.Explanation, action);
+
     /// <summary>
     /// A room's whole-room empty: a heading, an explanation, and optionally something to
     /// do about it — centred in whatever cell the shell gives the room.

@@ -75,14 +75,28 @@ internal sealed class QuestsRoom : Grid, IShellRoom
     private readonly QuestsView _view;
     private readonly TextBlock _heading;
 
+    /// <summary>The caption and the view under it, in their own Grid so the whole page is
+    /// ONE thing to collapse when the room-level empty takes over.</summary>
+    private readonly Grid _page = new();
+
+    /// <summary>The whole-room empty, built on the first render that needs one and kept
+    /// afterwards. A SIBLING of <see cref="_page"/> rather than something dropped into the
+    /// body, because a whole-room empty has to take the TAB STRIP with it: an empty room
+    /// under a live strip of tabs is four invitations to open something that is not there.
+    /// <c>LiveRoom</c> set this shape and the other three follow it.</summary>
+    private FrameworkElement? _emptyRoom;
+
+    private bool _empty;
+
     public UIElement Body => this;
 
     public QuestsRoom(MainWindow main)
     {
         _main = main;
 
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _page.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        Children.Add(_page);
 
         // The character, and only the character — a caption, not a second title bar. It
         // carries no icon and no app name, because the shell's title bar and rail already
@@ -91,7 +105,7 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         _heading.Ink("DimBrush");
         _heading.Margin = new Thickness(Tok.SpaceL, Tok.SpaceM, Tok.SpaceL, 0);
         SetRow(_heading, 0);
-        Children.Add(_heading);
+        _page.Children.Add(_heading);
 
         _view = new QuestsView(main);
         // Its own title row would be a second one under the shell's native chrome — the
@@ -100,7 +114,24 @@ internal sealed class QuestsRoom : Grid, IShellRoom
         _view.HeadingChanged += text => _heading.Text = text;
         _heading.Text = _view.Heading;
         SetRow(_view, 1);
-        Children.Add(_view);
+        _page.Children.Add(_view);
+    }
+
+    /// <summary>
+    /// The room-level empty, positioned by the shared wrapper Home built and worded for THIS
+    /// room.
+    ///
+    /// **No ⧉ copy on it, and that is an ORDER rather than an omission** (trap 34 is about a
+    /// room-level empty SWALLOWING an affordance the surface under it was offering). The Sky
+    /// tab's two ⧉ commands are the view's and stay there — but both are <c>/outputfile</c>
+    /// dumps the game names after the character, so on a profile with no character neither is
+    /// the next thing to do. <c>/log on</c> is, and the explanation says so.
+    /// </summary>
+    private FrameworkElement AddEmptyRoom()
+    {
+        var built = RoomEmptyState.Build(ShellRoomEmpty.Quests);
+        Children.Add(built);
+        return built;
     }
 
     /// <summary>Land on a tab by its wire key — the second half of a <c>page:room</c>
@@ -121,7 +152,34 @@ internal sealed class QuestsRoom : Grid, IShellRoom
     /// the E2E suite four rounds and forty runner-minutes. The signature check inside
     /// <c>Refresh</c> is what makes the un-throttled call free when nothing has moved.
     /// </summary>
-    public void Render(StatsSnapshot s) => _view.PaintNow();
+    public void Render(StatsSnapshot s)
+    {
+        // **The whole-room empty, and the only state that gets one.** The tracker follows
+        // the log for turn-ins and ticks Epic and Sky steps off as the pieces arrive, so
+        // with no character there is nothing for any of the four tabs to be about.
+        //
+        // **The ticked-step count is why this is a call and not a `NoCharacter` test.**
+        // `EpicQuestCompleted` and `SkyQuestCompleted` are SETTINGS a player can tick by
+        // hand, and three separate bugs (#204/#209, #210, #212) are about those very lists
+        // losing the thing that showed them; a room that hid them because the identity was
+        // unknown would be a fourth in the same family.
+        _empty = ShellRoomEmpty.QuestsIsEmpty(ShellRoomIdentity.Of(_main),
+            _main.Settings.EpicQuestCompleted.Count + _main.Settings.SkyQuestCompleted.Count);
+        if (_empty)
+        {
+            // The view is not painted while it is collapsed, so `shellQuests*` below report
+            // its own zeros — which is the truth on the only profile that can reach this
+            // state, and the dump still describes ONE moment (trap 56).
+            _emptyRoom ??= AddEmptyRoom();
+            _emptyRoom.Visibility = Visibility.Visible;
+            _page.Visibility = Visibility.Collapsed;
+            return;
+        }
+        if (_emptyRoom is not null) _emptyRoom.Visibility = Visibility.Collapsed;
+        _page.Visibility = Visibility.Visible;
+
+        _view.PaintNow();
+    }
 
     /// <summary>
     /// The shell says this room is too narrow to split. Handed straight to the view, which
@@ -167,6 +225,9 @@ internal sealed class QuestsRoom : Grid, IShellRoom
     /// the state that would mean the caption had been lost in the move.
     /// </summary>
     public string DebugFacts() =>
+        // Zero on any profile with a character. A predicate that fired while the room had
+        // content would collapse all four tabs and the Sky tab's two ⧉ copies with them.
+        $"shellQuestsEmpty={(_empty ? 1 : 0)} " +
         $"shellQuestsHeading={_heading.Text.Length} " +
         ShellDumpFacts.Prefixed("shell", _view.DebugFacts());
 }

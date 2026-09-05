@@ -78,6 +78,22 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     private readonly EqSegmentedStrip _tabs;
     private readonly ContentControl _body = new();
 
+    /// <summary>Everything this room draws when it has something to draw: the tab strip and
+    /// the body under it, in their own Grid so the whole page is ONE thing to collapse when
+    /// the room-level empty takes over. The alternative — the rows on the room itself and
+    /// the empty spanning them — makes the empty's height depend on which rows happen to be
+    /// Auto, which is a layout decision hiding inside a visibility one.</summary>
+    private readonly Grid _page = new();
+
+    /// <summary>The whole-room empty, built on the first render that needs one and kept
+    /// afterwards. A SIBLING of <see cref="_page"/> rather than something dropped into the
+    /// body, because a whole-room empty has to take the TAB STRIP with it: an empty room
+    /// under a live strip of tabs is four invitations to open something that is not there.
+    /// <c>LiveRoom</c> set this shape and the other three follow it.</summary>
+    private FrameworkElement? _emptyRoom;
+
+    private bool _empty;
+
     private ProgressTab _tab = ProgressSurface.DefaultInlineTab;
 
     private readonly ProgressCardView _experience;
@@ -94,8 +110,9 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     {
         _main = main;
 
-        RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        _page.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        _page.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        Children.Add(_page);
 
         // WRAPS, and it has to: a horizontal StackPanel measures its children with
         // INFINITE width, so a chip never reaches a boundary to wrap at and the last one
@@ -103,7 +120,7 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         // itself trap 14 with chips). These badges carry real sentences.
         var strip = new WrapPanel { Margin = new Thickness(Tok.SpaceL, Tok.SpaceM, Tok.SpaceL, 0) };
         SetRow(strip, 0);
-        Children.Add(strip);
+        _page.Children.Add(strip);
         _tabs = new EqSegmentedStrip(strip);
 
         var scroll = new ScrollViewer
@@ -113,7 +130,7 @@ internal sealed class ProgressRoom : Grid, IShellRoom
             Content = _body,
         };
         SetRow(scroll, 1);
-        Children.Add(scroll);
+        _page.Children.Add(scroll);
 
         // FOUR of the five, since E-3 PR 5. `surfaces.Raids` is still built — the v1
         // `ProgressWindow` needs it — and this room simply does not take it; see the type's
@@ -148,6 +165,23 @@ internal sealed class ProgressRoom : Grid, IShellRoom
 
     public void Render(StatsSnapshot s)
     {
+        // **The whole-room empty, and the only state that gets one.** Every Progress tab is
+        // arithmetic over a session, and a session is a log being read — so with no
+        // character there is nothing for any of the three tabs to be about, and three
+        // separate "nothing yet" panels would be three ways of saying the one thing that
+        // matters. The clauses are in `ShellRoomEmpty` where a unit test can reach them;
+        // what this method keeps is the wiring.
+        _empty = ShellRoomEmpty.ProgressIsEmpty(ShellRoomIdentity.Of(_main), s);
+        if (_empty)
+        {
+            _emptyRoom ??= AddEmptyRoom();
+            _emptyRoom.Visibility = Visibility.Visible;
+            _page.Visibility = Visibility.Collapsed;
+            return;
+        }
+        if (_emptyRoom is not null) _emptyRoom.Visibility = Visibility.Collapsed;
+        _page.Visibility = Visibility.Visible;
+
         BuildTabs(s);
         // Only the ACTIVE tab paints, and its body is swapped in rather than all three
         // being stacked and hidden — a hidden StackPanel still measures on every layout
@@ -164,6 +198,17 @@ internal sealed class ProgressRoom : Grid, IShellRoom
             case ProgressTab.Faction: _faction.Render(s); break;
             default: _experience.Render(s); break;
         }
+    }
+
+    /// <summary>The room-level empty, positioned by the shared wrapper Home built and worded
+    /// for THIS room — what Progress is waiting for, not Home's "no character" sentence.
+    /// Same pair the other five rooms draw, so the six cannot drift into six centrings.
+    /// </summary>
+    private FrameworkElement AddEmptyRoom()
+    {
+        var built = RoomEmptyState.Build(ShellRoomEmpty.Progress);
+        Children.Add(built);
+        return built;
     }
 
     /// <summary>Build the strip from Core's <see cref="ProgressSurface"/> and UI.Shared's
@@ -205,6 +250,10 @@ internal sealed class ProgressRoom : Grid, IShellRoom
     /// this room no longer has, which is worse than an absent key because an assertion on it
     /// would still pass.</summary>
     public string DebugFacts() =>
+        // Zero on any profile with a character, which is the row with teeth: a predicate
+        // that fired while the room had content would COLLAPSE the tab strip and the body,
+        // and the E2E fixture is exactly the populated profile that would catch it.
+        $"shellProgressEmpty={(_empty ? 1 : 0)} " +
         $"shellProgressTab={ProgressSurface.KeyFor(_tab)} " +
         $"shellProgressTabs={_tabs.Count} " +
         $"shellProgressMotesRows={_motes.RowCount} " +

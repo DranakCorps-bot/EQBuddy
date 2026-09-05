@@ -233,11 +233,7 @@ internal sealed class LiveRoom : Grid, IShellRoom
     /// round. The rows themselves are scoped by the ARCHIVER's identity inside
     /// <c>MainWindow.StoredSessions</c>; these two strings only name the character on
     /// screen.</summary>
-    private (string Server, string Character) Who()
-    {
-        var (character, server) = _main.Identity;
-        return (Server: server, Character: character);
-    }
+    private (string Server, string Character) Who() => ShellRoomIdentity.Of(_main);
 
     public void Render(StatsSnapshot s)
     {
