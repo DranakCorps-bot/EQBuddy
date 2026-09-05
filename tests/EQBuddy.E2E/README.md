@@ -25,10 +25,25 @@ The suite launches the built exe from `src/EQBuddy/bin/Release/net10.0-windows/`
 never builds the app itself, so a test run can't mutate build outputs mid-flight. No
 Release build → every test fails fast with a message pointing here.
 
-**Expect widget windows to appear briefly.** Each test starts its own always-on-top
-EQBuddy against an isolated profile; tests run sequentially (one app at a time) and
-kill + clean up on teardown. A Windows session is required — a `windows-latest` runner
-has one, which is what the un-gating rests on.
+**Expect a widget AND the Evolved shell to appear briefly, on the display beside your
+primary one.** Each test starts its own always-on-top EQBuddy against an isolated
+profile; tests run sequentially (one app at a time) and kill + clean up on teardown. A
+Windows session is required — a `windows-latest` runner has one, which is what the
+un-gating rests on.
+
+`AppHarness.Launch` sets **`EQBUDDY_SHELL=1` by default** — the owner's standing order
+while E-3 is being built: a suite run must not pop a bare v1 widget on the monitor the
+game is on. A test that wants a room passes an address (`ShellHostTests.OpenOn`); a test
+that wants the widget alone passes an empty string, because the hook reads
+`is { Length: > 0 }`. `ShellHostTests.TheHarnessOpensTheEvolvedShellWithNoScenarioAskingForIt`
+asserts both halves — a default nobody asserts is a default that comes back off, and
+every other test in the suite would go on passing without it.
+
+Both windows land on the second display when the desk has one, and beside each other
+rather than stacked: the shell asks `WindowPlacement.SecondaryOrigin` and the harness
+asks the *same* function, then offsets the widget by the shell's open width. On a
+single-screen desk — and on a 1024×768 hosted runner — that function answers null and
+both fall back to where they always were.
 
 **Nothing may assert the SCREEN.** A hosted runner is 1024×768, so a test that needs a
 tall monitor is asserting the desk it was written on:

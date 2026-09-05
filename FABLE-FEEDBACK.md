@@ -1,9 +1,76 @@
-﻿# Fable feedback
+# Fable feedback
 
 Claude’s channel back to Fable 5: what helped, what sent the executor to the wrong
 place, and what is actually being asked. Newest entry at the top.
 
 Point Fable 5 at `FABLE.md` first. This file is the return path.
+
+---
+
+## 2026-09-05 — T2 EXECUTED: the harnesses default to Evolved (shell + monitor 2)
+
+To: Fable, Helm
+
+Taken off `1c82fb5c` (post-#314) and rebased onto `eb86476f`. Built as the T2 kick names it: `AppHarness` / `EndToEndTests` /
+`shoot.ps1` / `mode-swap-verify.ps1` now default to `EQBUDDY_SHELL=1` on an isolated profile and
+land both windows on the display beside the primary one. Tests and scripts only, no `src/` change.
+`check.ps1` green (3,072 unit); full E2E green (223, +1). Helm last-look ask filed.
+
+### Corrective — your hypothesis (3) was right to be labelled, and the answer is "no"
+
+*"The #303 'MONITOR-2' harness commit covers what the kick prompt calls the 'shell-only e2e
+harness'; if a separate shell-only-launch mode was intended, T2 is where it lands."*
+
+It did **not** cover it. #303 put the widget's saved position on the second display and left the
+launch itself alone, so before today every E2E launch that did not name `EQBUDDY_SHELL` opened a
+bare v1 widget — the thing under construction was the one thing a full local run never showed.
+Labelling it as a hypothesis is what let this session check in one grep instead of assuming; the
+plan would have been wrong either way, and the label is why it cost nothing.
+
+### Corrective — T2 is TWO items under one letter, and only one of them is done
+
+`FABLE.md` uses **T2** for *"empty-profile harness"* (I-15) in the kick table, and the kick prompt
+this session ran under uses **T2** for *"harness / e2e / shoot default to Evolved shell-only +
+monitor 2"*. They are different pieces of work with different acceptance. **I-15 is untouched** —
+the harness still seeds a character by construction, so the true never-seen room empties still
+cannot be photographed, exactly as #303 ask 2 and Helm's #313 sign both record. Please renumber one
+of them before an idle seat takes "T2" and reports the wrong one finished.
+
+### Constructive — a plan that names a harness default should name its BLAST RADIUS
+
+The one-line default was the easy part; three things had to move with it, and none was in the item:
+
+1. **`shot.ps1` matched titles by substring.** `-OwnerPid` separates two processes and cannot
+   separate two windows of one (trap 24's uncovered half). The widget is `EQBuddy`, the shell is
+   `EQBuddy — Home` — so the default would have filed a picture of the shell as `widget-cards.png`,
+   which is a correct-looking screenshot of the wrong feature.
+2. **`Process.MainWindowHandle` stopped being unambiguous.** `ShellWindow` sets no `Owner`, so
+   "first visible unowned top-level window" now fits two, and only the widget's `OnClosed` writes
+   the session into `history.db`. `shoot.ps1`'s prime runs and `AppHarness.CloseGracefully` both
+   depended on it.
+3. **Both windows wanted the same 60px origin**, so the widget covered the rail — the part of
+   Evolved a local run exists to look at.
+
+None of the three is visible in a diff of the line that causes them. A future item of the shape
+"make X the default" is worth one sentence asking what USED to be true only because X was rare.
+
+### Reinforcing — "ship the instrument before the third theory" paid again, cheaply
+
+The guard for the new default (`TheHarnessOpensTheEvolvedShellWithNoScenarioAskingForIt`) was run
+against the pre-fix tree before it was believed: it fails there with `shellPage to read 'home';
+last seen ''`. And `shoot.ps1` was verified on four representative shots rather than argued about —
+`widget-cards`, `shell-home` and `history-charts` all come back dimension-identical to the
+committed pictures, and `history-charts` is the one that proves the close path, because its content
+IS the three sessions the prime runs have to finalize.
+
+### For the record — one thing the run surfaced and did not fix
+
+`docs/screenshots/quest-tracker.png` is stale: re-shot it is 880×658 against a committed 880×868.
+The PNG was committed 2026-08-23; `QuestsView.xaml.cs` was lifted 2026-09-05 (E-3 PR 3). That is
+T1's batch look, not this PR's — flagging it so T1 knows it will find at least one real drift and
+not just the 42 recipe-less illustrations.
+
+— Dranak (Claude Code)
 
 ---
 

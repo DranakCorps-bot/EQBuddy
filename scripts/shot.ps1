@@ -33,23 +33,40 @@ public class Win {
   public static RECT Frame(IntPtr h) { RECT r; DwmGetWindowAttribute(h, 9, out r, Marshal.SizeOf(typeof(RECT))); return r; }
 }
 '@
-$hit = [IntPtr]::Zero
+# EVERY match is collected, and an EXACT title wins over a substring one.
+#
+# -OwnerPid separates two PROCESSES; it cannot separate two windows of one process, which
+# is the half of trap 24 the guard never covered — and E-3 made it live. The widget's
+# title is exactly "EQBuddy"; the Evolved shell's carries its room ("EQBuddy — Home"), and
+# since scripts/shoot.ps1 opens the shell on every launch the two are in the same process
+# at the same time. `-like "*EQBuddy*"` matches both, and the winner would be whichever
+# EnumWindows reached first — a picture of the shell filed as `widget-cards.png`, which
+# looks exactly like a correct screenshot of the wrong feature.
+#
+# Preferring the exact match is not a new rule so much as the one the shot table already
+# assumed: a Title that IS a window's whole name is naming that window, and a Title that
+# is a fragment ('Quest Tracker', 'Options') is still matched as a fragment, unchanged.
+$exact = [IntPtr]::Zero
+$loose = [IntPtr]::Zero
 $cb = [Win+EnumProc]{ param($h, $l)
   if ([Win]::IsWindowVisible($h)) {
     $sb = New-Object System.Text.StringBuilder 256
     [Win]::GetWindowText($h, $sb, 256) | Out-Null
-    if ($sb.ToString() -like "*$TitleLike*") {
+    $title = $sb.ToString()
+    if ($title -like "*$TitleLike*") {
       if ($OwnerPid -gt 0) {
         $owner = 0
         [Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
         if ($owner -ne $OwnerPid) { return $true }   # right title, wrong app
       }
-      $script:hit = $h; return $false
+      if ($title -eq $TitleLike) { $script:exact = $h; return $false }
+      if ($script:loose -eq [IntPtr]::Zero) { $script:loose = $h }
     }
   }
   return $true
 }
 [Win]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
+$hit = if ($exact -ne [IntPtr]::Zero) { $exact } else { $loose }
 if ($hit -eq [IntPtr]::Zero) {
   throw "no visible window matching '$TitleLike'" +
         $(if ($OwnerPid -gt 0) { " in process $OwnerPid" } else { "" })

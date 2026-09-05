@@ -57,6 +57,41 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **EVERY LAUNCH IN THIS SUITE OPENS THE EVOLVED SHELL, and this is the row that
+    /// says so.** The owner's standing order while E-3 is being built is that a suite run
+    /// must not pop a bare v1 widget: `AppHarness.Launch` therefore sets
+    /// `EQBUDDY_SHELL=1` for every test that does not name an address of its own.
+    ///
+    /// A default nobody asserts is a default that comes back off — silently, because
+    /// every other test in this file passes its own address and would go on passing with
+    /// the harness line deleted, and every test in `EndToEndTests` asks about the widget
+    /// and would not notice either. Trap 34's shape: the thing to check is the one nobody
+    /// is looking at, and it is checked by asking for NOTHING and finding the shell there
+    /// anyway.
+    ///
+    /// The opt-out is asserted beside it, for the same reason a "no X may do Y" guard
+    /// needs its "these must do Y" list — an empty value is what a scenario that wants
+    /// the widget alone passes, and if it stopped working nothing else would say so.
+    /// </summary>
+    [Fact]
+    public void TheHarnessOpensTheEvolvedShellWithNoScenarioAskingForIt()
+    {
+        using (var app = new AppHarness())
+        {
+            app.Launch();
+            app.WaitForDump("shellPage", "home",
+                "the harness's own default to bring the Evolved shell up beside the widget");
+        }
+
+        using var widgetOnly = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_SHELL"] = "" });
+        widgetOnly.Launch();
+        // The widget is up (Launch waited for a live session), the shell is not: the hook
+        // reads `is { Length: > 0 }`, so an empty value is the opt-out.
+        Assert.Equal("", widgetOnly.DumpText("shellPage"));
+    }
+
+    /// <summary>
     /// **The shell opens beside the game, not on top of it — and this asserts the
     /// RELATIONSHIP rather than a monitor.** The XAML's `CenterScreen` centres on the
     /// PRIMARY screen, which is where EverQuest is; the constructor overrides it whenever

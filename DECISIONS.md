@@ -15,6 +15,41 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (harnesses default to Evolved)
+
+- **`shot.ps1` now prefers an EXACT title match over a substring one.** The other way: give
+  the widget a harness-only title suffix so the substring stayed unambiguous. Declined —
+  CLAUDE.md's trap 24 already calls a title invented for the harness a smell, and the shot
+  table has always meant "this window" when a `Title` is a window's whole name. Without it,
+  `Title = 'EQBuddy'` would match the shell's `EQBuddy — Home` in the same process, which is
+  the half of trap 24 that `-OwnerPid` cannot cover.
+- **The graceful close in `shoot.ps1` (and `AppHarness`) aims at the widget by name, not at
+  `MainWindowHandle`.** The other way: keep `CloseMainWindow()` and trust Z-order. Declined
+  because "the first visible, unowned top-level window" fitted exactly one window until E-3
+  and now fits two — and only the widget's `OnClosed` finalizes the session into
+  `history.db`. Closing the other one leaves the app running, stages history that is not
+  there, and photographs a real empty state over it.
+- **Prime runs open the shell too.** The other way: leave them v1-only, since they stage
+  history rather than being reviewed. Declined once the close above was aimed properly — the
+  order is about what appears on the monitor, and a prime run is eight seconds of bare v1
+  widget like any other launch.
+- **The harness places the widget BESIDE the shell, off the same `SecondaryOrigin` call the
+  shell makes.** The other way: leave both at the band's 60px margin. Declined because the
+  widget is `Topmost` and 320 wide, so it lands squarely over the rail — a local run would
+  show the shell with its navigation covered, which is the part of Evolved the run exists to
+  look at. Asked of the same function rather than re-derived: two answers to "where is the
+  second monitor" is trap 4's shape, and the disagreement would be invisible.
+- **`drag-verify.ps1` and `drag-check.ps1` still pop a bare v1 widget.** The other way:
+  give them the same default for consistency. Declined for now — both are hand-driven
+  diagnostics for one v1 window's drag behaviour, neither was in the T2 scope, and
+  `drag-verify`'s close would have needed the by-name fix for no benefit. Named in the Helm
+  ask rather than left silent; one line each if Helm wants them in.
+- **`docs/screenshots/quest-tracker.png` is left stale.** Re-shooting it here comes back
+  880×658 against a committed 880×868 — real drift (the PNG is 2026-08-23, `QuestsView`
+  was lifted 2026-09-05), and not caused by this change. The other way: regenerate it in
+  passing. Declined because a tests-only PR is the wrong door for an illustration, and
+  Fable's T1 batch look is the right one; flagged there instead.
+
 ## 2026-09-05 (the local Evolved review door)
 
 - **`install-local.ps1 -Evolved` now sets `EQBUDDY_SHELL=1` and opens the shell.** The other

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.E2E;
 
@@ -12,6 +13,13 @@ namespace EQBuddy.E2E;
 /// needed for setup) and a temp "game install" whose Logs\ holds the shifted fixture.
 /// EQBUDDY_EXPAND=1 makes the app expand every card and write a debug.txt state dump
 /// each UI tick — that dump is the suite's assertion channel.
+///
+/// **EQBUDDY_SHELL=1 is a default here, not a scenario.** While E-3 is being built, a
+/// launch from this harness brings the Evolved shell up beside the widget and puts both
+/// on the display beside the primary one — the owner's standing order, because a suite
+/// that pops a bare v1 widget on the game's monitor is neither the thing under
+/// construction nor out of the way. A test that wants an address passes one; a test that
+/// wants the widget alone passes an empty string. See <see cref="Launch"/>.
 /// </summary>
 internal sealed class AppHarness : IDisposable
 {
@@ -86,13 +94,16 @@ internal sealed class AppHarness : IDisposable
         // Core's own assembly version is Directory.Build.props' — the same number
         // EQBuddy.exe reports — so the What's-new gate stays satisfied across bumps.
         var v = typeof(AppSettings).Assembly.GetName().Version ?? new Version(0, 0, 0);
+        // Asked once: it reads the desk's metrics, and two calls are two answers to one
+        // question even when they agree today.
+        var (widgetLeft, widgetTop) = SecondaryShotOrigin();
         var settings = new AppSettings
         {
             LogFolder = LogsDir,
             UpdateFolder = updateDir,
             // Prefer secondary monitor when virtual desktop is wider than primary (David: EQ on primary).
-            WindowLeft = SecondaryShotOrigin().left,
-            WindowTop = SecondaryShotOrigin().top,
+            WindowLeft = widgetLeft,
+            WindowTop = widgetTop,
             Minimized = false,
             ShowTutorial = false,
             LastSeenVersion = $"{v.Major}.{v.Minor}.{Math.Max(v.Build, 0)}",
@@ -173,6 +184,25 @@ internal sealed class AppHarness : IDisposable
         var psi = new ProcessStartInfo(ExePath) { UseShellExecute = false };
         psi.Environment["EQBUDDY_APPDATA"] = ProfileDir;
         psi.Environment["EQBUDDY_EXPAND"] = "1";
+        // THE EVOLVED SHELL COMES UP WITH EVERY LAUNCH, and the default is the point.
+        // David's order while E-3 is being built: a suite run must not pop a bare v1
+        // widget. Before this line the only launches that opened the shell were the ones
+        // that named it, so the thing under construction was the one thing a full local
+        // run never put on screen — trap 22's shape ("a surface with no fixture state
+        // cannot be reviewed, and reads as reviewed anyway") reached through the harness
+        // rather than through a shot's staging.
+        //
+        // Set BEFORE the caller's dictionary, so a scenario still wins: ShellHostTests
+        // pass an address (`EQBUDDY_SHELL=progress:raids`) and get exactly that, and a
+        // test that needs the widget ALONE passes "" — the hook reads
+        // `is { Length: > 0 }`, so an empty value is the opt-out rather than a second
+        // variable to invent.
+        //
+        // It costs a second window per test and buys the two things nothing else could:
+        // every v1 assertion in this suite now runs with the shell alive beside it (which
+        // is how a player will run it), and the room facts land in the same dump as the
+        // widget's, which is where a second-host divergence would show (trap 58).
+        psi.Environment["EQBUDDY_SHELL"] = "1";
         foreach (var (name, value) in _environment) psi.Environment[name] = value;
         _process = Process.Start(psi)
             ?? throw new InvalidOperationException($"Process.Start returned null for {ExePath}");
@@ -402,20 +432,82 @@ internal sealed class AppHarness : IDisposable
         return "";
     }
 
-    /// <summary>Closes the main window (WM_CLOSE — the same path as the user's ✕) and
-    /// waits for the process to exit, so shutdown-time persistence has run.</summary>
+    /// <summary>Closes the WIDGET (WM_CLOSE — the same path as the user's ✕) and waits
+    /// for the process to exit, so shutdown-time persistence has run.
+    ///
+    /// **It asks for the widget BY NAME rather than taking `MainWindowHandle`, and that
+    /// stopped being paranoia the day the shell opened on every launch.**
+    /// `Process.MainWindowHandle` is "the first visible, unowned top-level window of the
+    /// process" — a description that fitted exactly one window until E-3, and now fits
+    /// two: `ShellWindow` sets no `Owner`. Only the widget's `OnClosed` finalizes the
+    /// session into `history.db` and calls `Application.Current.Shutdown()`, so closing
+    /// the wrong one of the two would leave the app running, time out here after 30 s,
+    /// and — for the two tests that use this — assert against history the app never
+    /// wrote. That is trap 24's lesson (a title is not an identity) arriving from the
+    /// other side: here the title IS the identity, and the handle is the ambiguous
+    /// thing.</summary>
     public void CloseGracefully()
     {
         var p = _process ?? throw new InvalidOperationException("App not launched.");
-        Wait.Until(() => { p.Refresh(); return p.MainWindowHandle != IntPtr.Zero; },
-            AssertTimeout, "main window handle to exist before closing", Artifacts);
-        Wait.Until(() => p.HasExited || p.CloseMainWindow(), AssertTimeout,
-            "WM_CLOSE to be accepted", Artifacts);
+        var widget = IntPtr.Zero;
+        Wait.Until(() => (widget = WidgetWindow(p.Id)) != IntPtr.Zero,
+            AssertTimeout, "the widget window (title exactly \"EQBuddy\") to exist before closing",
+            Artifacts, WhyTheAppCannotAnswer);
+        Wait.Until(() => p.HasExited || Native.PostMessage(widget, Native.WmClose, 0, 0),
+            AssertTimeout, "WM_CLOSE to be accepted by the widget", Artifacts);
         if (!p.WaitForExit((int)ExitTimeout.TotalMilliseconds))
             throw new TimeoutException(
                 $"App did not exit within {ExitTimeout.TotalSeconds:0}s of its main window closing." +
                 Environment.NewLine + Artifacts());
         _process = null;
+    }
+
+    /// <summary>The widget's HWND in a process — the visible top-level window whose title
+    /// is EXACTLY "EQBuddy" (`MainWindow.xaml`), or zero while none is up.
+    ///
+    /// Exactly, not "starts with": the shell's title carries its room ("EQBuddy — Home"),
+    /// which is the naming `HistoryWindow` already used and which is what keeps these two
+    /// apart. If the widget ever gains a suffix of its own, this is the line that says so
+    /// — loudly, by finding nothing — rather than by closing the wrong window.</summary>
+    private static IntPtr WidgetWindow(int processId)
+    {
+        var found = IntPtr.Zero;
+        Native.EnumWindows((hwnd, _) =>
+        {
+            if (!Native.IsWindowVisible(hwnd)) return true;
+            var owner = 0;
+            Native.GetWindowThreadProcessId(hwnd, ref owner);
+            if (owner != processId) return true;
+            var title = new StringBuilder(256);
+            Native.GetWindowText(hwnd, title, title.Capacity);
+            if (title.ToString() != "EQBuddy") return true;
+            found = hwnd;
+            return false;
+        }, IntPtr.Zero);
+        return found;
+    }
+
+    private static class Native
+    {
+        public const uint WmClose = 0x0010;
+
+        public delegate bool EnumProc(IntPtr hwnd, IntPtr lparam);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool EnumWindows(EnumProc callback, IntPtr lparam);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool IsWindowVisible(IntPtr hwnd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet =
+            System.Runtime.InteropServices.CharSet.Unicode)]
+        public static extern int GetWindowText(IntPtr hwnd, StringBuilder text, int max);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern int GetWindowThreadProcessId(IntPtr hwnd, ref int processId);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool PostMessage(IntPtr hwnd, uint message, nint wparam, nint lparam);
     }
 
     /// <summary>Failure diagnostics: the state dump and the tail of the profile's
@@ -437,18 +529,48 @@ internal sealed class AppHarness : IDisposable
     }
 
 
-    // Dual-monitor local: place harness windows on the display to the right of primary.
-    // Single-screen CI: VirtualScreenWidth == PrimaryScreenWidth → 60,60.
+    /// <summary>
+    /// Where the WIDGET opens: the display beside the primary one when the desk has one,
+    /// and BESIDE the shell rather than on top of it.
+    ///
+    /// **The second half is new and it is the whole reason this is not one line.** The
+    /// shell opens at <c>WindowPlacement.SecondaryOrigin</c> — the same band, the same
+    /// 60px margin — so a widget placed at that margin too lands squarely over the rail,
+    /// which is the part of Evolved a local run exists to look at. The widget is
+    /// `Topmost`, so it wins, and the reviewer sees the shell with its navigation covered.
+    /// Offsetting by the shell's open width puts them side by side.
+    ///
+    /// Asked of the SAME function the shell asks, rather than re-deriving the band: two
+    /// answers to "where is the second monitor" is exactly the shape trap 4 names, and
+    /// here the disagreement would be invisible — both windows would be on a screen, just
+    /// not the arrangement anybody intended. Null (a single-screen desk, a 1024×768 hosted
+    /// runner) keeps the old on-primary fallback, unchanged.
+    /// </summary>
     private static (double left, double top) SecondaryShotOrigin()
     {
-        var primaryW = System.Windows.SystemParameters.PrimaryScreenWidth;
         var virtL = System.Windows.SystemParameters.VirtualScreenLeft;
         var virtT = System.Windows.SystemParameters.VirtualScreenTop;
         var virtW = System.Windows.SystemParameters.VirtualScreenWidth;
-        if (virtW > primaryW + 10)
-            return (virtL + primaryW + 60, virtT + 60);
-        return (60, 60);
+        var virtH = System.Windows.SystemParameters.VirtualScreenHeight;
+        var primaryW = System.Windows.SystemParameters.PrimaryScreenWidth;
+        if (WindowPlacement.SecondaryOrigin(virtL, virtT, virtW, virtH, primaryW,
+                ShellLayoutPolicy.OpenWidth, ShellLayoutPolicy.OpenHeight) is not { } shell)
+            return (60, 60);
+
+        // Clamped inside the desk, so a band that is wide enough for the shell but not for
+        // both simply stacks them again rather than parking the widget off the edge — an
+        // overlap is untidy, a window nobody can see is a lost review.
+        var beside = shell.Left + ShellLayoutPolicy.OpenWidth + 24;
+        var rightmost = virtL + virtW - WidgetBudget;
+        return (beside <= rightmost ? beside : shell.Left, shell.Top);
     }
+
+    /// <summary>Room to leave for the widget when placing it beside the shell. It is
+    /// `SizeToContent`, so it has no width to ask for before it exists — this is the
+    /// widget's XAML `NormalRoot` width (320) plus slack for the UI scale a test may set.
+    /// Too small only risks the overlap this avoids; too large only risks the same.</summary>
+    private const double WidgetBudget = 420;
+
     public void Dispose()
     {
         if (_process is { } p)
