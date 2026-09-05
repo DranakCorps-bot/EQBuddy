@@ -68,6 +68,15 @@ Do not put these back in Holds.
 ---
 
 
+### PR #303 — E-3 PR 4 Home room + default landing (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #303 https://github.com/DranakCorps-bot/EQBuddy/pull/303 (`claude/evolved-home-20260905` → `main`, product head `af7a5f2a`; harness `3fe5a118`; drop channel tip `9e2d27d5`) — Home room + shell default flip after ~5:20 AM CT Bevel pre-design sign; tip base `4bf0e675`.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green on merge head** (at look: build green; e2e in flight on tip). Against ~5:20 AM CT Home pre-design. **Five signed items ACK** — (1) three-site flip: `_page=Home`, constructor derives Navigate, `ApplyEnvHook` passes null for bare `EQBUDDY_SHELL=1`; E2E `TheShellOpensOnHomeWhenTheHookNamesNoRoomAtAll`; Progress test renamed as addressed. (2) Four empty blocks + shared `RoomEmptyState` centering wrapper. Readiness never-scanned ≠ healthy; no invented stale threshold (DECISIONS). (3) Rail ACK — `Landed` joins Home first via existing `RailOrder`. (4) Single-pane + deep links via same `Navigate`, filtered to `ShellPages.Landed` (no Live); `shellHomeDeadLinks` asserted. (5) Home/Live boundary stronger: `SessionSummary`/`RecentSession` in UI.Shared with **no combat fields by construction** (reflection test); merge of active store+live snapshot tested.
+- **Ask answers:** (1) **WPF ratchet net-zero via stranded second `<summary>` deletion SIGNED** — acceptable pay for `StoredSessions()`; next WPF change must lift a surface; do not bump headroom inside Home-only. (2) **Unphotographed room-empty POSITION — NOT a block** — named gap (unit words + `shellHomeEmpty` dump; harness seeds a character so true never-seen cannot shoot); follow-up shot/harness profile OK later, not merge gate. (3) Wide single-column label/answer (`MinRoomWidth` cap) — Bevel's room-level call, not blocking #303.
+- **Scope hygiene:** Keep harness commit `3fe5a118` (MONITOR-2 secondary display). **Drop channel mailbox tip** before merge. No WhatsNew / Version / publish / player door; `EQBUDDY_SHELL` only. Live parked; E-2d/E-2e parked; no HUD subtraction. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Do not cut `v1.99.19`. Do not touch Play Console / signing / prod secrets. Claude kick via Dranak (`--model opus`) for CI → drop channel → merge. Live Bevel pass after merge (not auto).
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~6:15 AM CT
+
 ### Bevel Home room pre-design — sixth room / default flip (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** `BEVEL.md` Home room pre-design (sixth room, first Bevel pass); HELM-FEEDBACK 2026-09-05 night ask; tip `41d6830d` (post-#301).
