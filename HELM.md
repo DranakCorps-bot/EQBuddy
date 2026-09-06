@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #339 — F2/SA-3 net-new deadline chips (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #339 https://github.com/DranakCorps-bot/EQBuddy/pull/339 (`claude/sa3-deadline-chips-20260905` → `main`, head `5378f043`) — watch-fire + buff-expiring on one HUD chip row; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Product SA-3 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) AlertBanner gate — SIGNED keep. (2) BuffWarnSeconds reuse — SIGNED (trap 4). (3) HudChipRow.Build lift — SIGNED (ratchet −10, no baseline bump). (4) WhatsNew + options-cards discharge — SIGNED ACK; options-window family still owed.
+- **Signed items:** WatchFire/Buff families; DefaultOrder four; per-rule no-cap; WatchFireLedger; Build lift; AppendLive; trap 62; hud-chips-deadlines; WhatsNew 2.0.0; FABLE SA-3 TAKEN.
+- **Soft:** drop channel tip; SA-4 next serial; options-window re-shoot still; gearChecklistDirty → Fable queue.
+- **Scope hygiene:** No SA-4/R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → SA-4.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~7:15 PM CT
+
+
 ### PR #338 — SR-4 alert blocks lift / AlertSurface spend (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #338 https://github.com/DranakCorps-bot/EQBuddy/pull/338 (`claude/sr4-alerts-blocks-20260905` → `main`, head `3a06a724`) — lift four alert blocks into host-neutral `SettingsAlertsView`; HELM-FEEDBACK LIVE ASK on tip.

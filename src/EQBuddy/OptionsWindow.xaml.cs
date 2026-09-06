@@ -60,44 +60,16 @@ public partial class OptionsWindow : Window
                     EQBuddy.UI.Shared.AltTabPolicy.UnavailableNote }
                 .Where(s => s.Length > 0));
         KeepAboveCheck.IsChecked = _vm.KeepAboveOverlays;
-        MezChipsCheck.IsChecked = _main.Settings.MezChipsEnabled;
-        _mezDurations = new MezDurationsView(
-            MezDurationList, MezDurationsBlurb, _main.MezTracker, _main.MezDurations);
-        _mezDurations.Render();
         DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
-        SlowAlertCheck.IsChecked = _main.Settings.SlowAlertEnabled;
-        SlowSpokenCheck.IsChecked = _main.Settings.SlowAlertSpoken;
-        SlowRaidOnlyCheck.IsChecked = _main.Settings.SlowAlertRaidOnly;
-        BuffExpiringOnlyCheck.IsChecked = _main.Settings.BuffTimersExpiringOnly;
-        BuffWarnBox.Text = _main.Settings.BuffWarnSeconds.ToString("0");
         CursorRingCheck.IsChecked = _main.Settings.ShowCursorRing;
         PerfStatsCheck.IsChecked = _main.Settings.ShowPerfStats;
         SelectTab(_main.Settings.OptionsTab);
         BuildHotkeyRows();
         RegenPerTickBox.Text = _vm.RegenPerTickOverride > 0 ? _vm.RegenPerTickOverride.ToString() : "";
-        TrackSpawnsCheck.IsChecked = _main.Settings.TrackSpawns;
 
         foreach (var choice in OptionsViewModel.WindowChoices) WindowCombo.Items.Add(choice);
         WindowCombo.SelectedIndex = _vm.RecentWindowIndex;
 
-        foreach (var choice in OptionsViewModel.SoundChoices) SoundCombo.Items.Add(choice);
-        SoundCombo.SelectedIndex = _vm.SoundIndex;
-        AlertVolumeSlider.Value = Math.Clamp(_vm.Settings.AlertVolume, 0.1, 1.0);
-        AlertVolumeLabel.Text = $"{AlertVolumeSlider.Value:P0}";
-        UpdateSoundFileNote();
-
-        // Enumerated once per Options open — voices install with language packs, not
-        // mid-session, and the SAPI walk isn't free.
-        _installedVoices = EQBuddy.UI.Shared.SpokenAlerts.InstalledVoiceNames();
-        foreach (var choice in OptionsViewModel.VoiceChoices(_installedVoices)) VoiceCombo.Items.Add(choice);
-        VoiceCombo.SelectedIndex = _vm.VoiceIndex(_installedVoices);
-        SpeechRateSlider.Value = _vm.SpeechRate;
-        SpeechRateLabel.Text = _vm.SpeechRateLabel;
-        SpeechVolumeSlider.Value = _vm.SpeechVolume;
-        SpeechVolumeLabel.Text = _vm.SpeechVolumeLabel;
-
-        BuildRulesEditor();
-        BuildBuffSetPanel();
         UpdateGearImportStatus();
         UpdateCustomColorsPanel();
         // The Cards & windows tab's three editors, lifted into OptionsCardsView.cs when
@@ -106,9 +78,7 @@ public partial class OptionsWindow : Window
         _cardsView = new OptionsCardsView(_main, _vm, () => _ready,
             CardsPanel, MiniStatsPanel, BreakoutsPanel, BreakoutsBlurb, FindResource);
         _cardsView.RenderAll();
-
-        // Restore the examples panel without persisting — this isn't the user changing it.
-        ApplyGuideOpen(_main.Settings.ShowWatchGuide, persist: false);
+        BuildAlertsTabs();
 
         UpdateLabels();
         _ready = true;
@@ -206,26 +176,10 @@ public partial class OptionsWindow : Window
         if (_ready) _vm.KeepAboveOverlays = KeepAboveCheck.IsChecked == true;
     }
 
-    private void OnMezChipsToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.MezChipsEnabled = MezChipsCheck.IsChecked == true;
-        _main.Settings.Save();
-    }
-
     private void OnDoubleClickChipsToggled(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
         _main.Settings.DoubleClickChipsToggleBreakouts = DoubleClickChipsCheck.IsChecked == true;
-        _main.Settings.Save();
-    }
-
-    private void OnSlowAlertToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.SlowAlertEnabled = SlowAlertCheck.IsChecked == true;
-        _main.Settings.SlowAlertSpoken = SlowSpokenCheck.IsChecked == true;
-        _main.Settings.SlowAlertRaidOnly = SlowRaidOnlyCheck.IsChecked == true;
         _main.Settings.Save();
     }
 
@@ -241,179 +195,46 @@ public partial class OptionsWindow : Window
         _main.Settings.Save();
     }
 
-    private void OnBuffDisplayChanged(object sender, RoutedEventArgs e)
+    /// <summary>MainWindow calls this when the breakout editor writes the same storage,
+    /// so an edit made there appears here immediately too. Forwarded: the editor is
+    /// SettingsAlertsView's now, and this window is one of its two hosts.</summary>
+    internal void RefreshBuffSetEditor() => _alerts?.RefreshBuffSetEditor();
+
+    // ---- the four alert blocks (SR-4) ----
+
+    /// <summary>
+    /// This window's own instance of the alert blocks — never a shared one. A WPF
+    /// <c>UIElement</c> has exactly one parent, so a block borrowed from another host would
+    /// be torn out of whichever painted it last, silently (trap 45).
+    /// </summary>
+    private SettingsAlertsView? _alerts;
+
+    /// <summary>
+    /// The v1 arrangement, rebuilt from the lifted blocks: Watch keeps its own tab (with the
+    /// <c>PinWatchChips</c> row XAML still declares beneath it), and the Alerts tab stacks the
+    /// shared sound header over Buffs, Spawns and Crowd.
+    ///
+    /// **Order and headings come from <see cref="AlertSurface"/>, not from this file** — the
+    /// first spend of a definition that has been sitting unused since before the pivot, and
+    /// the reason the shell's Settings room cannot end up showing a different set of tabs in
+    /// a different order from the window it replaces. The badges are real counts: rules
+    /// written, buff buckets assembled, timers running.
+    /// </summary>
+    private void BuildAlertsTabs()
     {
-        if (!_ready) return;
-        _main.Settings.BuffTimersExpiringOnly = BuffExpiringOnlyCheck.IsChecked == true;
-        if (double.TryParse(BuffWarnBox.Text, out var seconds))
-            _main.Settings.BuffWarnSeconds = Math.Clamp(seconds, 10, 3600);
-        BuffWarnBox.Text = _main.Settings.BuffWarnSeconds.ToString("0");   // shows any clamp
-        _main.Settings.Save();
-    }
+        _alerts = new SettingsAlertsView(_main, _vm, () => _ready, FindResource, () => this);
 
-    // ---- buff set (#120, Frankthetankk — the missing line's editor) ----
-    // Stage 2: the set lives PER CLASS in Settings.BuffSetsByClass (BuffSetStore owns
-    // the shape) and assembles from the active class combination plus "(any class)".
-    // This editor shows every bucket — active or parked — because it is the one place
-    // a stored pick can always be removed. Every edit routes through
-    // MainWindow.OnBuffSetEdited: card, breakout window and this panel repaint at
-    // once — an edit whose effect waits for the next tick reads as a silent no-op.
+        WatchBlockHost.Children.Add(_alerts.Block(AlertTab.Watch));
 
-    /// <summary>The breakout editor writes the same storage; MainWindow calls this so
-    /// its edits appear here immediately too.</summary>
-    internal void RefreshBuffSetEditor() => BuildBuffSetPanel();
-
-    private void BuildBuffSetPanel()
-    {
-        var key = _main.BuffSetKey;
-        var (classes, picked) = _main.BuffSetClassSource(_main.CurrentSnapshot());
-        BuffSetCharNote.Text = key.Length > 0
-            ? $"Saved for {_main.BuffSetCharacterName}, per class — the live set is "
-              + "(any class) plus "
-              + (classes.Count > 0
-                  ? $"{string.Join(", ", classes.Select(QuestClassFilter.Abbrev))} "
-                    + (picked
-                        ? "(picked in the Quest Tracker — picks WIDEN what EQBuddy already "
-                          + "knows about your character rather than replacing it)."
-                        // "(inferred)" was one of three things this can be, and said nothing
-                        // at all when the GAME had told us through an achievements dump.
-                        : $"({CharacterClasses.SourceLabel(ClassSource.Inferred)} — pick classes "
-                          + "in the Quest Tracker to widen).")
-                  : "your classes — none known yet: pick them in the Quest Tracker, or use (any class).")
-            : "No character detected yet — once today's log names one, reopen Options and the editor unlocks.";
-        BuffSetAddBox.IsEnabled = key.Length > 0;
-        BuffSetClassBox.IsEnabled = key.Length > 0;
-        RefreshBuffSetClassChoices();
-        BuffSetPanel.Children.Clear();
-        if (key.Length == 0) return;
-
-        var stored = _main.Settings.BuffSetsByClass.GetValueOrDefault(key);
-        // Active buckets first, in assembly order; then parked ones (stored picks
-        // whose class isn't in the current combination) — visible and editable, so a
-        // swap never strands a pick out of reach. That parked picks SURVIVE the swap
-        // is the requester's whole design.
-        // Shared with the breakout (BuffSetStore.EditableSections) so the two editors
-        // cannot disagree about which buckets are visible — they did, and a pick added
-        // to a parked class vanished from the breakout entirely (#120, Frankthetankk).
-        // Options additionally hides EMPTY active sections; the breakout keeps them,
-        // because there they are the place you add.
-        var sections = BuffSetStore.EditableSections(stored, classes)
-            .Where(r => r.Section.Spells.Count > 0)
-            .Select(r => (r.Section.Class, Spells: r.Section.Spells, r.Parked))
-            .ToList();
-        if (sections.Count == 0)
+        TabAlertsPanel.Children.Add(_alerts.Header);
+        foreach (var tab in _alerts.Tabs())
         {
-            var none = new TextBlock
-            {
-                Text = "Nothing picked yet — pick a class bucket and search below to build the set.",
-                FontSize = 11, Margin = new Thickness(0, 2, 0, 0),
-            };
-            none.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-            BuffSetPanel.Children.Add(none);
-            return;
+            // Watch is the one that has a tab of its own here — it is the biggest editor in
+            // Options and it had its own tab before the lift. Nothing else is skipped.
+            if (tab.Tab == AlertTab.Watch) continue;
+            TabAlertsPanel.Children.Add(_alerts.Heading(tab));
+            TabAlertsPanel.Children.Add(_alerts.Block(tab.Tab));
         }
-        foreach (var (cls, spells, parked) in sections)
-        {
-            var header = new TextBlock
-            {
-                Text = cls + (parked ? "  · not in your current classes — kept for the swap back" : ""),
-                FontSize = 11, FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 4, 0, 0),
-            };
-            header.SetResourceReference(TextBlock.ForegroundProperty, parked ? "DimBrush" : "AccentBrush");
-            BuffSetPanel.Children.Add(header);
-            foreach (var spell in spells)
-            {
-                var row = new Grid { Margin = new Thickness(6, 2, 0, 0) };
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                var label = new TextBlock
-                {
-                    Text = spell, FontSize = 12, VerticalAlignment = VerticalAlignment.Center,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                };
-                label.SetResourceReference(TextBlock.ForegroundProperty, parked ? "DimBrush" : "TextBrush");
-                row.Children.Add(label);
-                var remove = new Button
-                {
-                    Style = (Style)FindResource("IconButton"), Content = "✕", FontSize = 11,
-                    Margin = new Thickness(4, 0, 0, 0), ToolTip = $"Remove {spell} from {cls}",
-                };
-                var (doomedClass, doomed) = (cls, spell);
-                remove.Click += (_, _) =>
-                {
-                    BuffSetStore.Remove(_main.Settings.BuffSetsByClass, key, doomedClass, doomed);
-                    _main.Settings.Save();
-                    _main.OnBuffSetEdited();   // repaints card + breakout + this panel
-                };
-                Grid.SetColumn(remove, 1);
-                row.Children.Add(remove);
-                BuffSetPanel.Children.Add(row);
-            }
-        }
-    }
-
-    /// <summary>Add-target buckets: "(any class)" plus the FULL class list — unlike
-    /// the breakout's active-only list, so a coming swap can be configured here in
-    /// advance. Selection survives rebuilds.</summary>
-    private void RefreshBuffSetClassChoices()
-    {
-        var keep = BuffSetClassBox.SelectedItem as string;
-        if (BuffSetClassBox.Items.Count == 0)
-        {
-            BuffSetClassBox.Items.Add(BuffSetStore.AnyClass);
-            foreach (var cls in QuestClassFilter.Classes) BuffSetClassBox.Items.Add(cls);
-        }
-        BuffSetClassBox.SelectedItem = keep ?? BuffSetStore.AnyClass;
-    }
-
-    private string SelectedBuffSetClass =>
-        BuffSetClassBox.SelectedItem as string ?? BuffSetStore.AnyClass;
-
-    private void OnBuffSetSearchChanged(object sender, TextChangedEventArgs e)
-    {
-        if (!_ready) return;
-        var query = BuffSetAddBox.Text.Trim();
-        if (query.Length < 2) { BuffSetPopup.IsOpen = false; return; }
-        BuffSetChrome.SetResourceReference(Border.BackgroundProperty, "PopupBrush");
-        BuffSetChrome.SetResourceReference(Border.BorderBrushProperty, "AccentBrush");
-        BuffSetMatches.SetResourceReference(Control.BackgroundProperty, "PopupBrush");
-        BuffSetMatches.SetResourceReference(Control.ForegroundProperty, "TextBrush");
-        BuffSetMatches.Items.Clear();
-
-        // Seen first (the buffs this player demonstrably casts), then the whole buff
-        // catalog — BuffSetSearch, shared with the breakout editor. Both draw from
-        // BuffDurationCatalog's attributable spells, so nothing can be added that
-        // would sit at "not seen" forever. Only the TARGET bucket's picks are
-        // excluded: the same buff under another class is a legitimate pick.
-        var inBucket = BuffSetStore.SpellsFor(
-            _main.Settings.BuffSetsByClass.GetValueOrDefault(_main.BuffSetKey), SelectedBuffSetClass);
-        foreach (var (s, seen) in BuffSetSearch.Rank(query, _main.SeenBuffCasts(),
-                     inBucket, BuffDurationCatalog.Default.SpellNames))
-            BuffSetMatches.Items.Add(new ListBoxItem
-            {
-                Content = seen ? s + "   · seen this session" : s,
-                Tag = s,
-            });
-        if (BuffSetMatches.Items.Count == 0)
-            BuffSetMatches.Items.Add(new ListBoxItem
-            {
-                Content = "No buff in the catalog matches — check the spelling?",
-                IsEnabled = false,
-            });
-        BuffSetPopup.IsOpen = true;
-    }
-
-    private void OnBuffSetMatchPicked(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_ready || BuffSetMatches.SelectedItem is not ListBoxItem { Tag: string spell }) return;
-        BuffSetPopup.IsOpen = false;
-        BuffSetMatches.SelectedItem = null;
-        var key = _main.BuffSetKey;
-        if (key.Length == 0) return;
-        BuffSetStore.Add(_main.Settings.BuffSetsByClass, key, SelectedBuffSetClass, spell);
-        _main.Settings.Save();
-        BuffSetAddBox.Text = "";   // TextChanged with an empty box closes the popup
-        _main.OnBuffSetEdited();   // repaints card + breakout + this panel
     }
 
     // ---- tabs (1.67.0, David: "a wall of options... needs serious reorganization") ----
@@ -593,75 +414,13 @@ public partial class OptionsWindow : Window
     }
 
     /// <summary>Called back by MainWindow.SetTrackSpawns so closing the Spawns window
-    /// (or toggling the menu) updates this checkbox while Options sits open.</summary>
-    internal void SyncTrackSpawns(bool on)
-    {
-        var wasReady = _ready;
-        _ready = false;
-        TrackSpawnsCheck.IsChecked = on;
-        _ready = wasReady;
-    }
-
-    private void OnTrackSpawnsToggled(object sender, RoutedEventArgs e)
-    {
-        // Routed through MainWindow, not the view model: the setting, the right-click
-        // menu check, and the window itself all have to move together.
-        if (_ready) _main.SetTrackSpawns(TrackSpawnsCheck.IsChecked == true);
-    }
+    /// (or toggling the menu) updates the box while Options sits open. Forwarded to the
+    /// block that owns it.</summary>
+    internal void SyncTrackSpawns(bool on) => _alerts?.SyncTrackSpawns(on);
 
     private void OnPinChipsChanged(object sender, RoutedEventArgs e)
     {
         if (_ready) _vm.PinWatchChips = PinChipsCheck.IsChecked == true;
-    }
-
-    /// <summary>Show or hide the worked examples, remembering the choice. Content is built on
-    /// first expand rather than at construction — most people never open it.</summary>
-    private void OnGuideToggled(object sender, RoutedEventArgs e) =>
-        ApplyGuideOpen(GuidePanel.Visibility != Visibility.Visible, persist: true);
-
-    private void ApplyGuideOpen(bool open, bool persist)
-    {
-        GuideToggle.Content = open ? "▾ Hide examples" : "▸ Show examples";
-        GuidePanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
-        if (open && GuideContent.Children.Count == 0) BuildGuide();
-        if (persist)
-        {
-            _main.Settings.ShowWatchGuide = open;
-            _vm.Persist();
-        }
-    }
-
-    private void BuildGuide()
-    {
-        System.Windows.Controls.TextBlock Line(
-            string text, double size, System.Windows.Media.Brush brush, double top, bool bold = false) => new()
-        {
-            Text = text, FontSize = size, Foreground = brush,
-            TextWrapping = System.Windows.TextWrapping.Wrap,
-            Margin = new Thickness(0, top, 0, 0),
-            FontWeight = bold ? System.Windows.FontWeights.SemiBold : System.Windows.FontWeights.Normal,
-        };
-
-        var accent = (System.Windows.Media.Brush)FindResource("AccentBrush");
-        var text = (System.Windows.Media.Brush)FindResource("TextBrush");
-        var dim = (System.Windows.Media.Brush)FindResource("DimBrush");
-
-        GuideContent.Children.Add(Line("How matching works", 11, accent, 0, bold: true));
-        foreach (var basic in WatchGuide.Basics)
-            GuideContent.Children.Add(Line("• " + basic, 11, dim, 2));
-
-        GuideContent.Children.Add(Line("Examples", 11, accent, 8, bold: true));
-        foreach (var ex in WatchGuide.Examples)
-        {
-            // Kind · name · what to type, then what it gets you. Two lines per example reads
-            // better than a table in a panel this narrow.
-            var match = ex.Match.Length > 0 ? $"Match \"{ex.Match}\"" : "no match text";
-            var delay = ex.Delay.Length > 0 ? $" · Delay {ex.Delay}" : "";
-            GuideContent.Children.Add(Line(
-                $"{OptionsViewModel.KindNames[(int)ex.Kind]} · \"{ex.Name}\" · {match}{delay}",
-                11, text, 8));
-            GuideContent.Children.Add(Line(ex.What, 11, dim, 1));
-        }
     }
 
     private void OnWindowChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -758,77 +517,6 @@ public partial class OptionsWindow : Window
         return row;
     }
 
-    private void OnSoundChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (!_ready) return;
-        if (!_vm.IsCustomSoundIndex(SoundCombo.SelectedIndex))
-        {
-            _vm.SelectNamedSound(SoundCombo.SelectedIndex);
-        }
-        else
-        {
-            var dlg = new Microsoft.Win32.OpenFileDialog
-            {
-                Title = "Choose an alert sound",
-                Filter = EQBuddy.UI.Shared.AlertSoundFormats.WpfFilter,
-            };
-            if (dlg.ShowDialog(this) == true)
-                _vm.SetCustomSound(dlg.FileName);
-            else if (!_vm.IsCustomSoundIndex(_vm.SoundIndex))
-            {
-                _ready = false; SoundCombo.SelectedIndex = _vm.SoundIndex; _ready = true;   // cancelled — revert
-            }
-        }
-        UpdateSoundFileNote();
-        _main.PlayAlertSound();   // instant feedback on the new choice
-    }
-
-    private void OnSoundTest(object sender, RoutedEventArgs e) => _main.PlayAlertSound();
-
-    private IReadOnlyList<string> _installedVoices = [];
-
-    private void OnVoiceChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (!_ready || VoiceCombo.SelectedIndex < 0) return;
-        _vm.SelectVoice(_installedVoices, VoiceCombo.SelectedIndex);
-        SpeakSample();   // a voice choice you can hear, like the sound picker's instant play
-    }
-
-    private void OnVoiceTest(object sender, RoutedEventArgs e) => SpeakSample();
-
-    // Real alert text, × and all, so the sample demonstrates exactly what an alert
-    // will sound like (SpokenAlerts.Speakable rewrites the × for the voice).
-    private static void SpeakSample() =>
-        EQBuddy.UI.Shared.SpokenAlerts.SpeakSample("Rusty Sword ×3");
-
-    private void OnSpeechRateChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.SpeechRate = (int)Math.Round(SpeechRateSlider.Value);
-        SpeechRateLabel.Text = _vm.SpeechRateLabel;
-    }
-
-    private void OnSpeechVolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.SpeechVolume = (int)Math.Round(SpeechVolumeSlider.Value);
-        SpeechVolumeLabel.Text = _vm.SpeechVolumeLabel;
-    }
-
-    private void OnAlertVolumeChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.Settings.AlertVolume = AlertVolumeSlider.Value;
-        _main.PersistSettings();
-        AlertVolumeLabel.Text = $"{AlertVolumeSlider.Value:P0}";
-    }
-
-    private void UpdateSoundFileNote()
-    {
-        SoundFileNote.Text = _vm.SoundFileNote;
-        SoundFileNote.Visibility = _vm.SoundFileNote.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-    }
-
     // Resize state captured at drag start. Deriving each frame from the cursor's absolute
     // position rather than accumulating DragDelta avoids the feedback jitter you get when
     // the thumb moves with the window (which the left grip does).
@@ -921,570 +609,6 @@ public partial class OptionsWindow : Window
         public static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
     }
 
-    private void OnAddRule(object sender, RoutedEventArgs e)
-    {
-        _vm.AddRule();
-        BuildRulesEditor();
-    }
-
-    /// <summary>"That thing that just happened — alert on it." The picker lists the
-    /// last few log lines; clicking one mints a Text rule with the line as its match,
-    /// ready to trim. Nobody should have to remember a log line to watch for it
-    /// (Companion-parity idea, our picker).</summary>
-    private void OnAddRuleFromLog(object sender, RoutedEventArgs e)
-    {
-        RecentLinesChrome.SetResourceReference(System.Windows.Controls.Border.BackgroundProperty, "PopupBrush");
-        RecentLinesChrome.SetResourceReference(System.Windows.Controls.Border.BorderBrushProperty, "AccentBrush");
-        RecentLinesList.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "PopupBrush");
-        RecentLinesList.SetResourceReference(System.Windows.Controls.Control.ForegroundProperty, "TextBrush");
-
-        RecentLinesHideChat.IsChecked = _main.Settings.RecentLinesHideChat;
-        FillRecentLines();
-        RecentLinesPopup.IsOpen = true;
-    }
-
-    private void FillRecentLines()
-    {
-        var lines = _main.RecentLogLines();
-        RecentLinesList.Items.Clear();
-        var hideChat = RecentLinesHideChat.IsChecked == true;
-        // Newest first: "just happened" is the whole point of the picker.
-        for (var i = lines.Count - 1; i >= 0; i--)
-        {
-            var (time, message) = lines[i];
-            // Chat lines quote their body (", '") — a busy General channel drowns the
-            // combat lines the picker exists for (David's field note), but chat stays
-            // one untick away: a "WTS" watch is a legitimate rule too.
-            if (hideChat && message.Contains(", '", StringComparison.Ordinal)) continue;
-            RecentLinesList.Items.Add(new System.Windows.Controls.ListBoxItem
-            {
-                Content = $"{time:HH:mm:ss}  {(message.Length <= 96 ? message : message[..95] + "…")}",
-                Tag = message,
-                ToolTip = message,
-            });
-        }
-        if (RecentLinesList.Items.Count == 0)
-            RecentLinesList.Items.Add(new System.Windows.Controls.ListBoxItem
-            {
-                Content = hideChat ? "Nothing but chat seen lately — untick the filter."
-                    : "No log lines seen yet — play a little first.",
-                IsEnabled = false,
-            });
-    }
-
-    private void OnRecentLinesFilterChanged(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.RecentLinesHideChat = RecentLinesHideChat.IsChecked == true;
-        _main.Settings.Save();
-        FillRecentLines();
-    }
-
-    private void OnRecentLinePicked(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (!_ready || RecentLinesList.SelectedItem is not System.Windows.Controls.ListBoxItem
-            { Tag: string message }) return;
-        RecentLinesPopup.IsOpen = false;
-        RecentLinesList.SelectedItem = null;
-        var rule = _vm.AddRule();
-        rule.Kind = EQBuddy.Core.WatchKind.Text;
-        rule.Pattern = message;
-        rule.Name = message.Length <= 28 ? message : message[..27] + "…";
-        _vm.Persist();
-        BuildRulesEditor();
-    }
-
-    /// <summary>
-    /// Column layout for both the header and every rule row. Auto columns are matched by
-    /// SharedSizeGroup (the panel is a shared-size scope) so the header labels stay lined
-    /// up with the controls no matter how wide the combo boxes render.
-    /// </summary>
-    private static System.Windows.Controls.Grid RuleGrid()
-    {
-        var grid = new System.Windows.Controls.Grid();
-        void Auto(string group) => grid.ColumnDefinitions.Add(
-            new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto, SharedSizeGroup = group });
-        void Star(double w) => grid.ColumnDefinitions.Add(
-            new System.Windows.Controls.ColumnDefinition { Width = new GridLength(w, GridUnitType.Star) });
-
-        // Kind and name were fixed at 58/60 px, which clipped their content even before
-        // the spell-class picker existed. Name and match text share the free width, so
-        // widening the window grows the fields that actually hold free text.
-        Auto("RuleKind");
-        Star(1);
-        Star(1.4);
-        Auto("RulePin");
-        Auto("RuleBanner");
-        Auto("RuleColor");
-        Auto("RuleSpeech");
-        Auto("RulePhrase");
-        Auto("RuleSound");
-        Auto("RuleDelay");
-        Auto("RuleShare");
-        Auto("RuleDelete");
-        Auto("RuleArrange");
-        return grid;
-    }
-
-    private void BuildRulesEditor()
-    {
-        RulesPanel.Children.Clear();
-
-        var header = RuleGrid();
-        header.Margin = new Thickness(0, 2, 0, 2);
-        var headings = new[] { ("Watch", 0), ("Name", 1), ("Match", 2), ("Delay", 9) };
-        foreach (var (text, column) in headings)
-        {
-            var label = new System.Windows.Controls.TextBlock
-            {
-                Text = text,
-                FontSize = 10,
-                Opacity = 0.7,
-                Margin = new Thickness(column == 0 ? 0 : 6, 0, 0, 0),
-            };
-            System.Windows.Controls.Grid.SetColumn(label, column);
-            header.Children.Add(label);
-        }
-        RulesPanel.Children.Add(header);
-
-        foreach (var rule in _vm.Rules)
-        {
-            var row = RuleGrid();
-            row.Margin = new Thickness(0, 3, 0, 0);
-
-            var kind = new System.Windows.Controls.ComboBox { FontSize = 11, ToolTip = "What this rule watches" };
-            foreach (var k in OptionsViewModel.KindNames) kind.Items.Add(k);
-            kind.SelectedIndex = (int)rule.Kind;
-            row.Children.Add(kind);
-
-            var name = DarkBox(rule.Name, "name");
-            name.Margin = new Thickness(4, 0, 0, 0);
-            name.LostFocus += (_, _) => { rule.Name = name.Text.Trim(); _vm.Persist(); };
-            System.Windows.Controls.Grid.SetColumn(name, 1);
-            row.Children.Add(name);
-
-            // Column 2 holds the match text, preceded (for Spell fade rules) by a class
-            // picker: one named spell, or a whole class that keeps working as the
-            // character levels into new spells and ranks.
-            var matchArea = new System.Windows.Controls.Grid();
-            matchArea.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
-            matchArea.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            System.Windows.Controls.Grid.SetColumn(matchArea, 2);
-            row.Children.Add(matchArea);
-
-            var spellFilter = new System.Windows.Controls.ComboBox
-            {
-                FontSize = 11,
-                MinWidth = 104,
-                Margin = new Thickness(4, 0, 0, 0),
-                // chaosrah (Reddit): the unlabeled dropdown read as a mystery — say
-                // plainly that it's the spell CLASS and that it replaces match text.
-                ToolTip = "Spell class: watch one named spell (\"By name\" + match text), " +
-                    "or a whole class — Charm, Mez, HoT… — with no match text needed",
-            };
-            foreach (var f in OptionsViewModel.SpellFilterNames) spellFilter.Items.Add(f);
-            spellFilter.SelectedIndex = (int)rule.SpellFilter;
-            matchArea.Children.Add(spellFilter);
-
-            const string patternTip = "match text (uses the name if left empty; optional for Death/Milestone)";
-            var pattern = DarkBox(rule.Pattern, patternTip);
-            pattern.Margin = new Thickness(4, 0, 0, 0);
-            System.Windows.Controls.Grid.SetColumn(pattern, 1);
-            matchArea.Children.Add(pattern);
-
-            // Regex mode (#83, KentCarmine): the same Match box, upgraded. Invalid
-            // patterns match nothing and say why on the box's own tooltip.
-            void ShowRegexState() => pattern.ToolTip =
-                rule.RegexError is { } err ? $"Regex error: {err}" : patternTip;
-            matchArea.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = GridLength.Auto });
-            var regexToggle = RuleToggle(".*",
-                "Treat Match as a regular expression (.NET syntax, case-insensitive). " +
-                "An invalid pattern matches nothing — the Match box's tooltip shows the error.",
-                2, rule.UseRegex, v => { rule.UseRegex = v; ShowRegexState(); });
-            matchArea.Children.Add(regexToggle);
-            pattern.LostFocus += (_, _) => { rule.Pattern = pattern.Text.Trim(); ShowRegexState(); _vm.Persist(); };
-            ShowRegexState();
-
-            var buffChoices = EQBuddy.Core.FadeMessageCatalog.Default.BuffSpellChoices.ToArray();
-            var spellName = DarkBox(rule.Pattern,
-                "Start typing a known buff/spell fade, then pick one. Free typing still works.");
-            spellName.Margin = new Thickness(4, 0, 0, 0);
-            var spellMatches = new System.Windows.Controls.ListBox
-            {
-                MaxHeight = 260,
-                MinWidth = 220,
-                FontSize = 12,
-            };
-            spellMatches.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "PopupBrush");
-            spellMatches.SetResourceReference(System.Windows.Controls.Control.ForegroundProperty, "TextBrush");
-            var spellPopup = new System.Windows.Controls.Primitives.Popup
-            {
-                PlacementTarget = spellName,
-                Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom,
-                StaysOpen = false,
-                AllowsTransparency = true,
-                Child = new System.Windows.Controls.Border
-                {
-                    BorderThickness = new Thickness(1),
-                    Padding = new Thickness(2),
-                    Child = spellMatches,
-                },
-            };
-            ((System.Windows.Controls.Border)spellPopup.Child).SetResourceReference(
-                System.Windows.Controls.Control.BorderBrushProperty, "AccentBrush");
-            ((System.Windows.Controls.Border)spellPopup.Child).SetResourceReference(
-                System.Windows.Controls.Control.BackgroundProperty, "PopupBrush");
-            matchArea.Children.Add(spellPopup);
-
-            var choosingSpell = false;
-            void UpdateSpellChoices(string text, bool open)
-            {
-                var q = (text ?? "").Trim();
-                spellMatches.ItemsSource = q.Length == 0
-                    ? buffChoices
-                    : buffChoices
-                        .Where(s => s.Contains(q, StringComparison.OrdinalIgnoreCase))
-                        .ToArray();
-                spellPopup.IsOpen = open && spellMatches.Items.Count > 0;
-            }
-            void PickSpell(string picked)
-            {
-                choosingSpell = true;
-                rule.Pattern = picked;
-                spellName.Text = picked;
-                pattern.Text = picked;
-                spellName.CaretIndex = spellName.Text.Length;
-                spellPopup.IsOpen = false;
-                _vm.Persist();
-                choosingSpell = false;
-            }
-            UpdateSpellChoices(rule.Pattern, open: false);
-            spellName.TextChanged += (_, _) =>
-            {
-                if (choosingSpell) return;
-                rule.Pattern = spellName.Text.Trim();
-                pattern.Text = rule.Pattern;
-                UpdateSpellChoices(spellName.Text, spellName.IsKeyboardFocusWithin);
-            };
-            spellName.GotKeyboardFocus += (_, _) => UpdateSpellChoices(spellName.Text, open: true);
-            spellName.LostKeyboardFocus += (_, _) =>
-            {
-                rule.Pattern = (spellName.Text ?? "").Trim();
-                pattern.Text = rule.Pattern;
-                _vm.Persist();
-            };
-            spellName.PreviewKeyDown += (_, e) =>
-            {
-                if (e.Key == Key.Escape)
-                {
-                    spellPopup.IsOpen = false;
-                    e.Handled = true;
-                }
-                else if (e.Key == Key.Enter && spellPopup.IsOpen
-                    && spellMatches.Items.Count > 0)
-                {
-                    PickSpell((spellMatches.SelectedItem as string) ?? (string)spellMatches.Items[0]!);
-                    e.Handled = true;
-                }
-            };
-            spellMatches.SelectionChanged += (_, _) =>
-            {
-                if (!_ready || spellMatches.SelectedItem is not string picked) return;
-                PickSpell(picked);
-            };
-            System.Windows.Controls.Grid.SetColumn(spellName, 1);
-            matchArea.Children.Add(spellName);
-
-            // A class filter needs no match text, so the box goes away rather than sitting
-            // there inviting input that would be ignored.
-            void SyncMatchArea()
-            {
-                var isFade = rule.Kind == EQBuddy.Core.WatchKind.SpellFade;
-                var byName = rule.SpellFilter == EQBuddy.Core.SpellFilter.ByName;
-                spellFilter.Visibility = isFade ? Visibility.Visible : Visibility.Collapsed;
-                pattern.Visibility = !isFade ? Visibility.Visible : Visibility.Collapsed;
-                // Regex pairs with the free-text Match box; the fade picker flow has
-                // its own exact-name semantics.
-                regexToggle.Visibility = !isFade ? Visibility.Visible : Visibility.Collapsed;
-                spellName.Visibility = isFade && byName ? Visibility.Visible : Visibility.Collapsed;
-                // With no match box beside it the combo takes the whole cell, so its text
-                // and drop arrow stay inside the row instead of running under the toggles.
-                System.Windows.Controls.Grid.SetColumnSpan(spellFilter, isFade && !byName ? 2 : 1);
-                if (isFade && byName) spellName.Text = rule.Pattern;
-                else pattern.Text = rule.Pattern;
-            }
-            SyncMatchArea();
-
-            kind.SelectionChanged += (_, _) =>
-            {
-                if (!_ready || kind.SelectedIndex < 0) return;
-                rule.Kind = (EQBuddy.Core.WatchKind)kind.SelectedIndex;
-                SyncMatchArea();
-                _vm.Persist();
-            };
-            spellFilter.SelectionChanged += (_, _) =>
-            {
-                if (!_ready || spellFilter.SelectedIndex < 0) return;
-                rule.SpellFilter = (EQBuddy.Core.SpellFilter)spellFilter.SelectedIndex;
-                SyncMatchArea();
-                _vm.Persist();
-            };
-
-            row.Children.Add(RuleToggle("📌", "Show this rule as a chip in the mini dashboard", 3,
-                rule.Pinned, v => rule.Pinned = v));
-
-            row.Children.Add(RuleToggle("🔔", "Banner alert on match", 4, rule.AlertBanner,
-                v => rule.AlertBanner = v));
-
-            // Banner color: one small dot cycling the palette on click (Chaosrah's
-            // color-coded alerts) — a combo box would not fit the row.
-            var colorDot = new System.Windows.Controls.Button
-            {
-                Padding = new Thickness(2, 0, 2, 0),
-                Margin = new Thickness(2, 0, 0, 0),
-                Background = System.Windows.Media.Brushes.Transparent,
-                BorderThickness = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand,
-            };
-            void PaintDot()
-            {
-                var hex = EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor);
-                var choiceName = EQBuddy.UI.Shared.AlertColors
-                    .Choices[EQBuddy.UI.Shared.AlertColors.IndexOf(rule.AlertColor)].Name;
-                colorDot.Content = new System.Windows.Controls.TextBlock
-                {
-                    Text = "●",
-                    FontSize = 12,
-                    Foreground = hex.Length > 0
-                        ? new System.Windows.Media.SolidColorBrush(
-                            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex))
-                        : (System.Windows.Media.Brush)FindResource("AccentBrush"),
-                };
-                colorDot.ToolTip = $"Banner color: {choiceName} — click to change";
-            }
-            PaintDot();
-            colorDot.Click += (_, _) =>
-            {
-                var next = (EQBuddy.UI.Shared.AlertColors.IndexOf(rule.AlertColor) + 1)
-                    % EQBuddy.UI.Shared.AlertColors.Choices.Length;
-                var picked = EQBuddy.UI.Shared.AlertColors.Choices[next].Name;
-                rule.AlertColor = picked == "Default" ? "" : picked;
-                PaintDot();
-                _vm.Persist();
-            };
-            System.Windows.Controls.Grid.SetColumn(colorDot, 5);
-            row.Children.Add(colorDot);
-
-            // Custom spoken phrase, beside the S toggle and only while it's on — a
-            // phrase box on a rule that never speaks is dead weight in a tight row.
-            // Empty speaks the alert's own label, exactly as before the box existed.
-            var phrase = DarkBox(rule.SpokenPhrase,
-                "What the voice says for this rule (empty = the alert text itself).\n" +
-                "Say the instruction, not the event: \"Recast charm now\" instead of\n" +
-                "\"Befriend Animal faded off a bear\".");
-            phrase.Width = 76;
-            phrase.FontSize = 11;
-            phrase.Margin = new Thickness(4, 0, 0, 0);
-            phrase.Visibility = rule.AlertSpeech ? Visibility.Visible : Visibility.Collapsed;
-            phrase.LostFocus += (_, _) => { rule.SpokenPhrase = phrase.Text.Trim(); _vm.Persist(); };
-            System.Windows.Controls.Grid.SetColumn(phrase, 7);
-
-            row.Children.Add(RuleToggle("S", "Speak this alert with the Windows voice", 6,
-                rule.AlertSpeech, v =>
-                {
-                    rule.AlertSpeech = v;
-                    phrase.Visibility = v ? Visibility.Visible : Visibility.Collapsed;
-                }));
-            row.Children.Add(phrase);
-
-            // Per-rule sound, so you can tell what happened from the audio alone.
-            // Replaces the old on/off toggle: "Off" mutes, "Default" follows the shared
-            // choice below, anything else is this rule's own sound.
-            var sound = new System.Windows.Controls.ComboBox
-            {
-                FontSize = 11,
-                MinWidth = 76,
-                Margin = new Thickness(4, 0, 0, 0),
-                ToolTip = "Sound for this rule — pick a different one per rule to tell them apart by ear",
-            };
-            foreach (var s in AlertSoundCatalog.RuleChoices) sound.Items.Add(s);
-            sound.SelectedIndex = AlertSoundCatalog.RuleChoiceIndex(rule);
-            if (AlertSoundCatalog.IsCustom(rule.AlertSoundName) && rule.AlertSoundName.Length > 0)
-                sound.ToolTip = $"Custom: {rule.AlertSoundName}";
-            sound.SelectionChanged += (_, _) =>
-            {
-                if (!_ready || sound.SelectedIndex < 0) return;
-                if (AlertSoundCatalog.ApplyRuleChoice(rule, sound.SelectedIndex))
-                {
-                    var dlg = new Microsoft.Win32.OpenFileDialog
-                    {
-                        Title = $"Choose a sound for \"{(rule.Name.Length > 0 ? rule.Name : rule.Pattern)}\"",
-                        Filter = EQBuddy.UI.Shared.AlertSoundFormats.WpfFilter,
-                    };
-                    if (dlg.ShowDialog(this) == true)
-                    {
-                        rule.AlertSoundName = dlg.FileName;
-                        sound.ToolTip = $"Custom: {dlg.FileName}";
-                    }
-                    else
-                    {
-                        // Cancelled — snap back to whatever the rule already had.
-                        _ready = false;
-                        sound.SelectedIndex = AlertSoundCatalog.RuleChoiceIndex(rule);
-                        _ready = true;
-                        return;
-                    }
-                }
-                _vm.Persist();
-                // Play it straight away so picking a sound is a decision you can hear.
-                if (AlertSoundCatalog.Resolve(rule, _main.Settings.AlertSound) is { } preview)
-                    _main.PlayAlertSound(preview);
-            };
-            System.Windows.Controls.Grid.SetColumn(sound, 8);
-            row.Children.Add(sound);
-
-            // Seconds to hold the alert back — 0 (or empty) is the immediate behaviour.
-            // Turns a rule into a cue: sound 2.5 s after a heal-chain call to say "cast
-            // now", or 25 s after a mez to say "recast before it breaks".
-            var delay = DarkBox(DelayText.Format(rule.AlertDelaySeconds),
-                "Wait this long before alerting (empty = at once, up to 30 minutes).\n" +
-                "Seconds by default; add m for minutes — 2.5, 25, 8m, 1:30.\n" +
-                "Use it as a cue: 2.5 after a heal-chain call, 25 into a 30s mez,\n" +
-                "or 8m for a respawn. The count updates immediately either way.");
-            delay.Width = 40;
-            delay.Margin = new Thickness(4, 0, 0, 0);
-            delay.TextAlignment = TextAlignment.Right;
-            delay.LostFocus += (_, _) =>
-            {
-                // Unparseable means 0 rather than an error: the box is a few characters wide
-                // and the failure is obvious the moment it snaps back.
-                rule.AlertDelaySeconds = DelayText.Parse(delay.Text);
-                delay.Text = DelayText.Format(rule.AlertDelaySeconds);   // shows any clamp
-                _vm.Persist();
-            };
-            System.Windows.Controls.Grid.SetColumn(delay, 9);
-            row.Children.Add(delay);
-
-            // Share: the rule as a guild-chat string (WatchRuleShare). The ✓ flash is
-            // the only feedback a clipboard write can honestly give.
-            var share = new System.Windows.Controls.Button
-            {
-                Content = "⤴", Style = (Style)FindResource("IconButton"), FontSize = 11,
-                ToolTip = "Copy this rule as a share string — paste it in guild chat or Discord,\n" +
-                          "and any EQBuddy imports it from the box below the rule list",
-            };
-            share.Click += (_, _) =>
-            {
-                try { Clipboard.SetText(WatchRuleShare.Encode([rule])); }
-                catch (Exception ex) { CoreLog.Error(ex); return; }
-                share.Content = "✓";
-                var revert = new System.Windows.Threading.DispatcherTimer
-                {
-                    Interval = TimeSpan.FromSeconds(1.5),
-                };
-                revert.Tick += (_, _) => { share.Content = "⤴"; revert.Stop(); };
-                revert.Start();
-            };
-            System.Windows.Controls.Grid.SetColumn(share, 10);
-            row.Children.Add(share);
-
-            var del = new System.Windows.Controls.Button
-            {
-                Content = "✕", Style = (Style)FindResource("IconButton"), FontSize = 11,
-            };
-            del.Click += (_, _) =>
-            {
-                _vm.RemoveRule(rule);
-                BuildRulesEditor();
-            };
-            System.Windows.Controls.Grid.SetColumn(del, 11);
-            row.Children.Add(del);
-
-            // Arrange (#105, wizen): this order IS the Tracked card's "manual" sort.
-            // Stacked ▲▼ in one cell — precise where drag would fight the text boxes.
-            var arrange = new System.Windows.Controls.StackPanel { Margin = new Thickness(2, 0, 0, 0) };
-            foreach (var (glyph, delta) in new[] { ("▲", -1), ("▼", +1) })
-            {
-                var move = new System.Windows.Controls.Button
-                {
-                    Content = glyph, Style = (Style)FindResource("IconButton"),
-                    FontSize = 7, Padding = new Thickness(2, 0, 2, 0),
-                    ToolTip = "Move this rule " + (delta < 0 ? "up" : "down") +
-                              " — the watch display's \"manual\" sort follows this order",
-                };
-                var d = delta;
-                move.Click += (_, _) => { _vm.MoveRule(rule, d); BuildRulesEditor(); };
-                arrange.Children.Add(move);
-            }
-            System.Windows.Controls.Grid.SetColumn(arrange, 12);
-            row.Children.Add(arrange);
-
-            RulesPanel.Children.Add(row);
-        }
-    }
-
-    // ---- share-string import: paste → preview → confirm (nothing lands unseen) ----
-
-    private List<TrackedRule>? _pendingImport;
-
-    private void OnImportShare(object sender, RoutedEventArgs e)
-    {
-        _pendingImport = WatchRuleShare.TryDecode(ImportBox.Text, out var error);
-        ImportPreview.Visibility = Visibility.Visible;
-        if (_pendingImport is null)
-        {
-            ImportPreview.Text = error;
-            ImportConfirmBtn.Visibility = Visibility.Collapsed;
-            return;
-        }
-        ImportPreview.Text = "This will add:\n" +
-            string.Join("\n", _pendingImport.Select(r => "  • " + WatchRuleShare.Describe(r)));
-        ImportConfirmBtn.Content = _pendingImport.Count == 1
-            ? "✔ Add this rule" : $"✔ Add these {_pendingImport.Count} rules";
-        ImportConfirmBtn.Visibility = Visibility.Visible;
-    }
-
-    private void OnImportConfirm(object sender, RoutedEventArgs e)
-    {
-        if (_pendingImport is null) return;
-        _vm.ImportRules(_pendingImport);
-        _pendingImport = null;
-        ImportBox.Text = "";
-        ImportPreview.Visibility = Visibility.Collapsed;
-        ImportConfirmBtn.Visibility = Visibility.Collapsed;
-        BuildRulesEditor();
-    }
-
-    private System.Windows.Controls.Primitives.ToggleButton RuleToggle(
-        string glyph, string tip, int column, bool initial, Action<bool> apply)
-    {
-        var t = new System.Windows.Controls.Primitives.ToggleButton
-        {
-            Content = glyph, ToolTip = tip, IsChecked = initial, FontSize = 11,
-            Style = (Style)FindResource("IconToggle"),
-        };
-        t.Checked += (_, _) => { apply(true); _vm.Persist(); };
-        t.Unchecked += (_, _) => { apply(false); _vm.Persist(); };
-        System.Windows.Controls.Grid.SetColumn(t, column);
-        return t;
-    }
-
-    private System.Windows.Controls.TextBox DarkBox(string text, string tip)
-    {
-        var box = new System.Windows.Controls.TextBox
-        {
-            Text = text, ToolTip = tip, FontSize = 12,
-            Padding = new Thickness(4, 2, 4, 2),
-        };
-        // SetResourceReference (not FindResource) so an in-place theme switch repaints
-        // these rows too, not just the chrome built from XAML.
-        box.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "ComboBoxBrush");
-        box.SetResourceReference(System.Windows.Controls.Control.ForegroundProperty, "TextBrush");
-        box.SetResourceReference(System.Windows.Controls.Control.BorderBrushProperty, "BorderBrush");
-        return box;
-    }
-
-
     private void UpdateGearImportStatus()
     {
         var total = _main.Settings.GearChecklist.Count;
@@ -1558,10 +682,6 @@ public partial class OptionsWindow : Window
     /// <summary>The Cards &amp; windows editors, lifted into their own file for the same
     /// reason as the mez one below.</summary>
     private OptionsCardsView? _cardsView;
-
-    /// <summary>The mez-duration editor, lifted into its own file — OptionsWindow is a
-    /// ratchet hotspot and that surface touches nothing else in this window.</summary>
-    private MezDurationsView? _mezDurations;
 
     private void OnSecondScreen(object sender, RoutedEventArgs e) => _main.OpenCompanionWindow();
 

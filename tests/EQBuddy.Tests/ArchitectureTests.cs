@@ -233,7 +233,15 @@ public class ArchitectureTests
         // behaviour-preserving by replaying all seven of bjstrange's #135 logs and
         // diffing every charm-state transition — byte for byte identical.
         (@"EQBuddy.Core/SessionStats*.cs", 2375),
-        (@"EQBuddy/OptionsWindow.xaml.cs", 1547),
+        // Lowered 1547 → 689 on 2026-09-05 with SR-4, in the same commit as the lift, which
+        // is the standing rule — room that is freed and not claimed quietly refills. The four
+        // alert blocks (the rules editor, the buff-set builder, the mez and spawn boxes and
+        // the shared sound/voice header) left for SettingsAlertsView.cs, host-neutral, so the
+        // Evolved shell's Settings room can compose the SAME controls instead of growing a
+        // second copy of forty wirings to drift against this one. What is left here is window
+        // chrome — width persistence, monitor clamping, the tab links — plus the Look,
+        // Behavior and Cards tabs, which SR-1 and SR-3 take next.
+        (@"EQBuddy/OptionsWindow.xaml.cs", 689),
         (@"EQBuddy.Core/LogParser.cs", 853),
         // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
         // in E-2 (2026-09-04). It was the largest file in the repo and it carried the
