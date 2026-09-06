@@ -1,3 +1,54 @@
+## 2026-09-05 (F3 / SR-3 — the HUD block leaves OptionsWindow)
+
+- **`OptionsCardsView` was RENAMED to `SettingsHudView`, not wrapped by one** · the item
+  offered either ("it, or a thin `SettingsHudView` around it") and a wrapper keeps the git
+  history of the inner class cleanly separate · renamed, because a wrapper is two classes for
+  one screen with the three strays outside and the three editors inside, and every SA-R PR
+  that empties this block would have had to pick a side of that seam. `git mv`, and the name
+  now matches `SettingsLookView` / `SettingsAlertsView` / `SettingsBehaviorView`.
+- **"Overlay cards" → "What EQBuddy shows"** · the shorter "On the HUD" was the first draft
+  and reads better as a heading · rejected, because v1 copy uses "the HUD" for the MINIMISED
+  bar in three places on this same tab ("Which stats show on the HUD while EQBuddy is
+  minimised"), and one word meaning two things one heading apart is worse than a longer
+  heading. Bevel §5 named the hit; the replacement is the executor's.
+- **"Breakout windows" → "Floating windows"** · could have been "Pop-out windows" or dropped
+  to just "Windows" · "Floating windows" because it is the blurb's OWN first two words
+  (`BreakoutPresentation.Blurb`), so the heading and the sentence under it were already
+  agreeing before anyone renamed anything.
+- **"Mini dashboard" was NOT renamed, although both headings beside it were** · consistency
+  argues for finishing the sweep · left alone, because it is not on the §4 ban list, item 3
+  says this PR adds nothing beyond what re-hosting needs, and the v1 `PinWatchChips` row that
+  STAYS on the Watch tab still says "mini dashboard" — renaming here would have split one
+  vocabulary across two tabs for no player benefit. Pinned by a test so a later sweep does not
+  "finish the job" without re-deciding.
+- **The two row-button tooltips ("Show card" / "Hide card (data still collected)") were
+  reworded too, though Bevel §5 did not name them** · §5's list was the brief and stopping
+  there is defensible · reworded to "panel", because the scanner reaches every literal in the
+  file once it joins `ShellStringSources` and a hover text is a string a player reads. §5
+  grepped the XAML; these two were already in code, which is why its grep could not see them.
+- **`OverlaySections`' retired copy is NOT swept and `OptionsViewModel.cs` has no scanner
+  row** · the SR-1 precedent (a module the block PRINTS joins the list) points the other way ·
+  excluded, because #335 signed that copy as-is hours earlier and the SR out-list says "no
+  re-opening #335". The reason is written INTO the guard's row; a row that would be red on
+  arrival on somebody else's signature is trap 54's "guard that cries wolf" bought with
+  someone else's authority. Flagged to Bevel as theirs to resolve before SR-5 renders it.
+- **The re-enable ROUTE was centralised in `BreakoutPresentation` rather than fixed in place
+  three times** · three one-line string edits are smaller and touch fewer files · centralised,
+  because the ✕ tooltip, the alert banner and the error line all name a heading that only the
+  Settings block can see, and three hand-maintained copies of one sentence is exactly how they
+  agreed yesterday and would disagree tomorrow (trap 4). Asserted as DERIVED, not as equal.
+- **`MainWindow.xaml.cs` was touched, in a lane told to stay off lane W's files** · the
+  alternative was leaving two sentences pointing at a heading that no longer exists · touched,
+  two lines for two lines, because a stale re-enable path is #219's mechanism and SR-3's own
+  rename created it. Zero net growth was mandatory, not tidiness: that file sits one line under
+  a zero-headroom ratchet, and a four-line explanatory comment put it three over on the first
+  try. The reasoning lives on the const instead.
+- **`MiniBarPresentation.cs` joined the scanner although it is vacuous today** · a row that
+  cannot fail reads as coverage (trap 39/34) and arguably should not be written · added anyway,
+  and said so out loud in the feedback: it supplies the LABEL beside every tick box in the
+  block, so it is in scope by the same rule `AltTabPolicy` is, and the row costs nothing while
+  covering the next label somebody adds. The honesty is in the disclosure, not in the omission.
+
 ## 2026-09-05 (F2 / SA-4 — Edit mode: Place, Mute, Dismiss on the one row)
 
 - **A family the stored `HudChipOrder` OMITS is appended, never dropped** · `Merge`'s own

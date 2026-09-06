@@ -572,24 +572,55 @@ this.**
 - **Owed and NOT done here:** the `gearloot-gear` and `options-window`-family re-shoots.
   The gear E2E ran and passed (7/7); gates green at 3,377 unit.
 
-### SR-3 — HUD block (D lane; after SR-2; deliberately NOT gated on SA-R)
+### SR-3 — TAKEN 2026-09-05, built and green (Claude, lane D)
 
-1. The `cards` tab's surviving content becomes host-neutral: `OptionsCardsView` already owns
-   the three editors and the Retired list; this PR gives it (or a thin `SettingsHudView`
-   around it) the ability to build its own panels instead of rendering into XAML-declared
-   ones, and folds in the tab's strays (double-click-chip toggle, target-drops toggle,
-   recent-rate picker).
-2. Strings: "Overlay cards" / "Breakout windows" headings and the "mini-pill" tooltip
-   reworded ban-compliant ONCE, serving both hosts (Bevel §5's hits; #326 already banned
-   that tooltip's sentence in shell scope).
-3. **No SA-R gate, by design:** the tab is transitional per the sign and shrinks as SA-R
-   retires keys — each SA-R PR edits this ONE block and both hosts follow, which is the
-   entire argument for the shared module. Gating on SA-R would park the room behind a
-   multi-month per-card series; building extra structure "as if it will stay this size" is
-   what the sign warns against, so this PR adds nothing beyond what re-hosting needs.
-4. In the shell this block renders under the tab name **"HUD"** (signed item 2); in v1
-   `OptionsWindow` the tab keeps its current label — the ban's own scope line exempts v1,
-   and renaming shipped v1 copy for no player benefit is the #228 class.
+Its four steps are struck rather than left to be re-read as pending — the take-then-delete
+contract, SR-1's, SR-2's and SR-4's precedent. **SR-5's gate is now fully discharged: SR-1,
+SR-3 and SR-4 are all landed, and SR-2 was independent.**
+
+**What landed** (`EQBuddy/SettingsHudView.cs`, 530 lines, from the 298-line
+`OptionsCardsView.cs` it replaces; `OptionsWindow.xaml` 219 → 173 and `OptionsWindow.xaml.cs`
+337 → 326, baseline lowered in the same commit):
+
+- The panel list and its "no longer on the widget" companion, the mini-dashboard tick boxes,
+  the floating-window tick boxes, and all three strays — host-neutral, taking
+  `(MainWindow, OptionsViewModel, ready-gate, resource-resolver)`, the same four as Look and
+  Behavior. **`OptionsWindow` now declares no settings at all**: four bare hosts, a tab strip,
+  the resize grips and the monitor clamp.
+- **`OptionsCardsView` was RENAMED rather than wrapped.** Item 1 offered either; a wrapper is
+  two classes for one screen with the strays outside and the editors inside, and every SA-R PR
+  that empties this block would have had to pick a side of that seam.
+- **The three strays are the rows that mattered, for a reason specific to this tab.** Their
+  handlers were XAML ATTRIBUTES (`Checked="OnTargetDropsToggled"`), the one kind of wiring a
+  control does not carry when it is rebuilt in code — trap 20's polarity arriving through a
+  lift. `SettingsHudBlockTests` asserts each one's write, its persist and its ready gate
+  separately, because all three can be lost independently.
+- **Item 2's three strings were nine**, and the useful half is that the SCANNER found the rest
+  the moment the file joined `ShellTerminologyTests.ShellStringSources`. `BreakoutPresentation`
+  and `MiniBarPresentation` joined it too (SR-1's `AltTabPolicy` precedent: a const the block
+  PRINTS is a string the block shows); three of `BreakoutPresentation`'s player consts said
+  "while the widget is minimised" and were reworded at their source.
+- **The rename made three OTHER surfaces stale, which item 2 has no line for.** The ✕ tooltip
+  on every floating window, the alert banner when one is dismissed and the `CoreLog.Error`
+  beside it all said *"Options → Breakout windows"* — #219's mechanism inside one sentence, the
+  same defect SR-2 caught in `GearChecklistPresentation.EmptyRoute` one PR earlier. The route is
+  DERIVED now (`BreakoutPresentation.Heading` / `ReEnableRoute` / `DismissTip`). It cost two
+  lines in `MainWindow.xaml.cs` — zero net, mandatory: that file is one line under a
+  zero-headroom ratchet.
+- **`OverlaySections`' retired copy is deliberately NOT swept**, on #335's sign and this
+  series' own "no re-opening #335"; the reason is written into the guard's row rather than left
+  as silence, and it is flagged to Bevel as a live tension between two of its own rulings that
+  SR-5 will render.
+- Item 4 applied: the v1 tab keeps "Cards & windows", asserted; the block declares no tab name
+  of its own, so **SR-5 still owes the word "HUD"** with `SettingsSurface`.
+- **Prove-fails run.** 47 of 49 `SettingsHudBlockTests` assertions fail against the pre-lift
+  tree; the two that pass are negatives and are named as such rather than counted. 2 of the 3
+  new `ShellTerminologyTests` rows fail there — `MiniBarPresentation` was already clean, so its
+  row is vacuous today and guards those labels going forward.
+- **Owed and NOT done here:** the `options-window` family and `options-cards` re-shoots — both
+  need the screen and lane W holds it (trap 61). **No E2E facts are owed, and that is checked
+  rather than deferred:** `tests/EQBuddy.E2E` never opens Options and this change adds no dump
+  key. Gates green at 3,448 unit.
 
 ### SR-4 — TAKEN 2026-09-05, built and green (Claude, lane D)
 
