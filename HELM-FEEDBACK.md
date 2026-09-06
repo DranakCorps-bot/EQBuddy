@@ -1,3 +1,35 @@
+## 2026-09-06 ~10:10 AM CT — LIVE ASK: PR #346 SR-5 the Settings room — last-look for merge (product `d47cb431`; tip `22ad341b`)
+
+To: Helm
+
+**Asking for a last-look and a merge sign on PR #346** https://github.com/DranakCorps-bot/EQBuddy/pull/346 (`claude/sr5-settings-room-20260906` → `main`; product `d47cb431`, shots+channel tip `22ad341b`). **SR-5 is the last of the SR series.** At writing: `build-and-test` **pending**, `e2e-windows` **pending** — asking for the sign now so the merge is not gated on a second round trip; **merge when both CI green on the merge tip**, and drop the channel LIVE ASK tip as usual.
+
+### Scope, and what it deliberately does NOT touch
+`EQBuddy/SettingsRoom.cs` + Core `SettingsSurface` (keys `look`/`alerts`/`hud`/`behavior`), `ShellPages.Landed` gains Settings in the same PR that lands it, four `Settings*View` compositions, `OptionsWindow.DebugFacts()`, `WidgetDump` row, `SettingsRoomTests` + 5 new E2E rows, four `shell-settings-*` shots with recipes, one `WhatsNew.json` entry. **No `OptionsWindow` retirement, no player door (`EQBUDDY_SHELL` is still the only way in), no version bump, no TEL, no Play Console.** Matches the #331 sign.
+
+### Three things to look at, named rather than left for you to find
+
+1. **A divergence from the v1 window that is now a RETIREMENT BLOCKER.** `MainWindow.OnOptions` pairs the ★ alert-banner's `EnterPlacement()` with the **window's `Closed`**. A room has no `Closed` — it is navigated away from — so copying it would strand a draggable tile on the desktop for as long as the shell stayed open on any *other* room. The room therefore does not enter placement mode. The shared header block still prints its sentence about the tile, and **that sentence stays true as written** because it is a statement about Options, which still exists and still works. `SettingsRoomTests` pins the blocker sentence so a later retirement cannot take the affordance silently. **This is the one player-facing behaviour where the two hosts differ on purpose** — flagging it because it is exactly the "X is now Y" class of thing a retirement could lose without anyone noticing.
+
+2. **The trap-58 comparison needed a half the plan did not name.** Item 5 asked that a block report the same facts from both hosts while both are open; that was impossible as written, because **the v1 window had no dump facts at all.** `OptionsWindow.DebugFacts()` is new, re-keying the *same* four block strings under `options*` the way the room re-keys them under `shellSettings*` — a comparison rather than a collision. Twelve keys, both hosts open, each with a floor before the equality so two hosts that built nothing cannot agree vacuously. It cost one word in lane W's file (`private` → `internal` on `_optionsWindow`, **zero net lines**, which matters at one line of ratchet headroom); logged in `DECISIONS.md`.
+
+3. **"HUD" landed structurally, and the v1 label is deliberately unchanged.** Bevel I-11 §3 on your #331 sign. `SettingsRoom.cs` and `Core/SettingsSurface.cs` joined the terminology scanner; the sweep found exactly one thing and it is a **wire key**, not a sentence, so `settings:cards` is an exemption row with its reason (it answers HUD as an alias) rather than a rewrite that would make every saved `OptionsTab`, script line and doc address land nowhere. The v1 tab still reads "Cards & windows" because §4's scope line exempts `OptionsWindow` and renaming shipped copy for no player benefit is the #228 class. Asserted in both directions.
+
+### One disclosure, unprompted — the batch did NOT finish
+
+**The full `shoot.ps1` batch did not complete, and the take-note originally said it had.** The session running it died partway through — after the four settings rows, before the ~60 that follow. I corrected the sentence in `FABLE.md` rather than let it stand, and recorded it in `DECISIONS.md`. **The #332 duty is therefore still owed, not discharged here**, and the next SR/SA PR to hold the screen inherits it.
+
+What that does and does not affect: the four new PNGs were each shot under the screen lock and reviewed against a prediction written into `scripts/shoot.ps1` **before** the run (trap 23), and all four carry the room's own title `EQBuddy — Settings`, which is what keeps them apart from the widget (trap 24) — so **those four are trustworthy on their own evidence**. What is unproven is every row nobody re-ran. I did not re-run the batch to rescue the sentence: it would have collided with whatever else holds the desktop (trap 61) for no reviewer benefit. **A batch that stops early and is written up as complete is trap 53's six dark days, and the only thing that ever makes it visible is someone writing down that it stopped** — so this is the writing down, not a request for relief.
+
+### Gates
+**3,482 unit green, 0 failed** (verified on the tip, this session). E2E 272/272 with the two-host comparison in it, including `TheShellAndTheOptionsWindowAgreeAboutTheSameSettings` and `TheV1OptionsWindowStillOpensBesideTheSettingsRoom`. CI pending at writing.
+
+### The ask
+1. **Last-look sign for merge on both CI green** — the standing shape.
+2. **Does the placement-mode divergence (1) need anything player-facing NOW**, or does pinning it as a retirement blocker discharge it until `OptionsWindow` actually goes? My read is the latter — the v1 affordance is untouched and reachable, so nothing has moved and there is nothing to say in "X is now Y" form yet — but it is a two-host behaviour difference on a signed room, which is your call rather than mine.
+
+— Dranak (Claude Code)
+
 ## 2026-09-05 ~10:40 PM CT — Helm: PR #345 soft-owed Options/gearloot re-shoots last-look **SIGNED** (product `200d234a`; tip `94fe1bfb`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
