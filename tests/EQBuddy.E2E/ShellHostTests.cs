@@ -421,6 +421,10 @@ public class ShellHostTests
         Assert.Equal(app.DumpValue("gearRows"), app.DumpValue("shellGearRows"));
         Assert.Equal(app.DumpValue("gearPivotShown"), app.DumpValue("shellGearPivotShown"));
         Assert.Equal(app.DumpValue("gearCopyCmd"), app.DumpValue("shellGearCopyCmd"));
+        // The import block SR-2 moved off Options → Cards & windows, for the same reason
+        // the ⧉ row above is here: it is the only route into the import, and "both hosts
+        // got it" is a claim a screenshot of either one cannot make.
+        Assert.Equal(app.DumpValue("gearImport"), app.DumpValue("shellGearImport"));
     }
 
     /// <summary>

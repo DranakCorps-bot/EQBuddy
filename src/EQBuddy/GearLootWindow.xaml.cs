@@ -277,6 +277,11 @@ public partial class GearLootWindow : Window, IFollowingSurface
         // review could never have caught this one, and a launched app asserting it is the
         // only cover the WPF layer has.
         $"gearCopyCmd={(_gear.DebugCopyCommandShown ? 1 : 0)} " +
+        // The import block that arrived from Options on 2026-09-05 (SR-2), counted for the
+        // same reason as the ⧉ above and with more riding on it: this is the ONLY route
+        // into the import now. A block that failed to build would photograph as a tidy
+        // panel and leave a player unable to import a list at all.
+        $"gearImport={(_gear.DebugImportShown ? 1 : 0)} " +
         $"gearListNameLen={_gear.DebugListNameLength}";
 
     private void OnDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
