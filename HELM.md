@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #340 — SR-1 Look + Behavior blocks lift (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #340 https://github.com/DranakCorps-bot/EQBuddy/pull/340 (`claude/sr1-look-behavior-20260905` → `main`, head `6b2ae046`) — host-neutral Look + Behavior blocks; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SR-1 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) resize-grip sentence stays on window — SIGNED keep (trap 37). (2) hotkey decision/route split — SIGNED (no focus change without screen). (3) ShellStringSources widen AltTabPolicy+MobileAlertSounds — SIGNED (SR-3 pattern). (4) WhatsNew + deferred screen — SIGNED ACK; options-window + E2E still owed; #332 batch not re-owed.
+- **Signed items:** SettingsLookView/SettingsBehaviorView; ratchet 689→393; bare hosts + one chrome line; Theme Exempt; title-bar phone untouched; prove-fail guards; WhatsNew 2.0.0; FABLE SR-1 TAKEN.
+- **Soft:** drop channel tip; do not starve SA-4; SR-2 on idle D; hotkey focus only with screen.
+- **Scope hygiene:** No OptionsWindow retirement / SA-4/R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → prefer SA-4, then SR-2 on idle D.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~7:50 PM CT
+
+
 ### PR #339 — F2/SA-3 net-new deadline chips (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #339 https://github.com/DranakCorps-bot/EQBuddy/pull/339 (`claude/sa3-deadline-chips-20260905` → `main`, head `5378f043`) — watch-fire + buff-expiring on one HUD chip row; HELM-FEEDBACK LIVE ASK on tip.
