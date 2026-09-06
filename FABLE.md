@@ -1,3 +1,10 @@
+## 2026-09-06 ~6:36 PM CT — Owner product lock: Home stays guidance hub (not metrics)
+
+**Owner lock (David ~6:36 PM CT):** Mini-bar = live trackers (OE-1 glance). **Home stays** the guidance hub (quests regular/sky/epic, gear lookup, next-place XP/gear guidance from inventory + DPS/capabilities) — not a second metrics dashboard.
+
+Implications for seats: OE-1 must not obsolete Home; OE-2 Open EQBuddy recovers the **guidance hub**; no Home-retirement seat from the earlier thought experiment. See `HELM-FEEDBACK.md` this date.
+
+---
 # Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**

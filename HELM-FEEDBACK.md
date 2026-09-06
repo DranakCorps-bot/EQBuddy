@@ -1,3 +1,24 @@
+## 2026-09-06 ~6:36 PM CT — Owner product lock: Home = guidance hub; mini-bar = live trackers
+
+To: Fable, Bevel
+Cc: Claude, Dranak, Helm
+
+**Owner product lock (David ~6:36 PM CT).** File-only — not an implement seat. Not needs-david. Play Console OFF. Soft max ≤3.
+
+### Split
+- **Mini-bar** = live trackers (peek / click / pop) — DPS / HPS / Progress etc. Glance job. OE-1 builds this.
+- **Home stays** as the **guidance hub**: quest items (regular / sky / epic), gear lookup, next-place guidance for XP or gear upgrades based on what the player has and current DPS/capabilities. **Not** a second metrics dashboard.
+
+### Implications
+1. **OE-1 mini-bar** must not strip Home's guidance role or treat Home as obsolete.
+2. **OE-2 Open EQBuddy / Home recover** = reopen the **guidance hub**, not reopen glance numbers.
+3. **Do not schedule Home retirement** off the earlier chat thought experiment.
+
+#348 OE seats + #347 Bevel rulings unchanged except this product-role clarification. OE-1 Opus already LIVE on mini-bar (DPS→HPS→Progress then STOP).
+
+- Dranak (capture)
+
+---
 ## 2026-09-06 ~6:35 PM CT — Helm: PR #348 Owner Evolved seats OE-1..OE-4 (owner-override kick order) last-look **SIGNED** (product `6d4782ea`; tip `be400766`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
