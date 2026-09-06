@@ -274,25 +274,36 @@ landed, so SA-4 does not have to re-derive it:
 Feedback, including the trap this round earned (a negative E2E assertion that passed with
 the feature deleted) and one filed-not-fixed defect, is in `FABLE-FEEDBACK.md`.
 
-### SA-4 — Edit mode: Place / Mute / Dismiss on the one row
+### SA-4 — TAKEN 2026-09-05, built and green (Claude, lane W)
 
-1. **Entry:** an "Edit HUD…" row in the widget context menu, and while active the HUD
-   carries the edit affordances — `AlertWindow._placement`'s shape (edit only while the
-   mode is on, normal and click-through otherwise), which B3 itself named as the precedent
-   worth reusing.
-2. **Place** = family order: new setting `HudChipOrder` (list; default mez, spawn,
-   watch-fire, buff — urgency order). Edit UI is per-family nudge left/right — cheap,
-   testable; drag-reorder is gold-plating this pass.
-3. **Mute** = new setting `MutedChipFamilies` — a *sibling* of `DisabledBreakouts`' shape,
-   never a repurposing of it (B3 §3's explicit line: breakouts and HUD chips are different
-   objects). **Mute is on-screen presence only** — spec §3 splits the jobs: Settings →
-   Alerts owns volume/sound/what-fires; the HUD owns what is on screen right now. A muted
-   family's sounds are untouched by SA-4.
-4. **Dismiss** — already exists (click-away), carries over unchanged; it is a live-mode
-   gesture, not an Edit-mode one.
-5. Both settings ship with writer + reader in the same PR (`DeadSettingTests` posture); no
-   migration (new keys, defaults). Unit tests in `HudChipRow` for order + mute
-   application; E2E `hudChipOrder=` / `hudMuted=` facts.
+Struck rather than left to be re-read as pending — the take-then-delete contract. All five
+steps landed as written. What SA-R and I-11 need to know:
+
+- **Two new settings, `HudChipOrder` and `MutedChipFamilies`**, both with writer AND reader in
+  this PR and no migration. `HudChipRow.ResolveOrder` / `IsMuted` / `VisibleOrder` /
+  `Nudge` / `SetOrder` / `SetMuted` are the whole surface, framework-free and unit-tested;
+  `Build` applies both as ONE argument (`order: VisibleOrder(settings)`), which is the seam
+  SA-2 built the order argument for.
+- **A family the stored order OMITS is APPENDED, not dropped** — the one place the plan's
+  letter had to be read against `Merge`'s contract. An unrepaired omission would have been a
+  permanent invisible mute; mute is the only subtraction, and it has its own key.
+- **Edit mode is a placeholder per FAMILY, not affordances on live chips**, and the row is on
+  screen with nothing running. `HudChipRowWindow.ToggleEdit` + `EQBuddy/HudEditChip.cs`.
+  Entry is the `Edit HUD…` context-menu row; `EQBUDDY_HUDEDIT=1` is the hook, `hud-edit` the
+  shot.
+- **The mute toggle is a TICK, not a bell** — this app's bell is its SOUND vocabulary and mute
+  is presence only, so a bell would have been a control contradicting its own tooltip. It also
+  collided with the watch-fire family's emblem.
+- **`hudChipOrder=` is read off the ROW** (families in the order drawn), `hudMuted=` off the
+  setting, `hudEdit=` off the mode. All three prove-failed. **`MainWindow` ends at 4,283
+  against the 4,284.5 ceiling — no baseline bump**, so SA-R inherits the same one line of
+  headroom the last three passes did.
+- **`PinWatchChips` is still the one switch SR-4 left for this lane, and SA-4 did NOT
+  reconcile it** — checked rather than assumed. It is the master switch for watch chips in the
+  MINI DASHBOARD (per-rule via `TrackedRule.Pinned`), read by `HudBarView` and the
+  minimized-breakout gate; a HUD chip FAMILY is a different object, so folding it into
+  `MutedChipFamilies` would be exactly the repurposing B3 §3 forbids. It retires with the mini
+  bar under SA-R, not here.
 
 ### SA-R — per-key star retirement: a template, NOT an authorization
 

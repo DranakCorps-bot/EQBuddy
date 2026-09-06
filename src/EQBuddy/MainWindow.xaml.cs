@@ -1777,11 +1777,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             && ww3.CurrentTab == WorldTab.Camps;
         var row = HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
             _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now);
-        if (row.Count == 0) { _hudChips?.Hide(); return; }
-        _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
-        if (!_hudChips.IsVisible) _hudChips.Show();
-        _hudChips.Follow(row);
+        // An empty row goes away — unless Edit HUD is open, which is for editing families
+        // that have nothing running right now (SA-4).
+        if (row.Count == 0 && _hudChips is not { Editing: true }) { _hudChips?.Hide(); return; }
+        var chips = EnsureHudChips();
+        if (!chips.IsVisible) chips.Show();
+        chips.Follow(row);
     }
+
+    /// <summary>The row window, made on first need — a chip arriving, or Edit HUD.</summary>
+    private HudChipRowWindow EnsureHudChips() => _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
+
+    /// <summary>"Edit HUD…" (SA-4): Place and Mute, on the row itself. The mode, the
+    /// affordances and the writes live in <see cref="HudChipRowWindow"/>; this is the door.</summary>
+    internal void OnEditHud(object sender, RoutedEventArgs e) => EnsureHudChips().ToggleEdit();
 
     /// <summary>
     /// A slow landed on the player, straight off the ingest thread. Speaks once per

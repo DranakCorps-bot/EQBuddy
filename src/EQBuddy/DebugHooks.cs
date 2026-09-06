@@ -172,6 +172,17 @@ internal static class DebugHooks
                 () => new TutorialWindow(w, int.TryParse(tourPage, out var n) ? n : 1).Show(),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        // Edit HUD mode (Surface A / SA-4). Same family, same reason as the rest: the mode
+        // is reached only by a human opening the widget's context menu and clicking a row,
+        // so without this the four Place/Mute chicklets could not be photographed or
+        // asserted at all — trap 22, a surface with no way to reach its state reading as
+        // reviewed anyway. It is deliberately NOT staged from a setting: "the profile says
+        // edit mode" and "the affordances are on screen" are different claims (trap 42).
+        if (Environment.GetEnvironmentVariable("EQBUDDY_HUDEDIT") == "1")
+            w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(
+                () => w.OnEditHud(w, new RoutedEventArgs()),
+                System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             w.Loaded += (_, _) =>
             {

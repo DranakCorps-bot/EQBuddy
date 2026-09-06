@@ -58,6 +58,18 @@ internal sealed class HudChipRowWindow : Window
     public int BuffChips { get; private set; }
     public int DueChips { get; private set; }
 
+    /// <summary>The families actually on the row, in the order they were drawn, as one
+    /// space-free token — the <c>hudChipOrder</c> dump fact. Read off the ROW rather than off
+    /// the setting on purpose: "the order is in the profile" and "the order reached the
+    /// screen" are different claims and only the second one is the feature (trap 42).
+    /// <see cref="HudChipRow.OrderKey"/> answers "-" for an empty row.</summary>
+    public string RowOrderKey { get; private set; } = "-";
+
+    /// <summary>Edit mode is on — the row is showing one Place/Mute placeholder per family
+    /// instead of live chicklets (SA-4). <c>AlertWindow._placement</c>'s shape: a flag the
+    /// live path checks, set by entering the mode and cleared by leaving it.</summary>
+    public bool Editing { get; private set; }
+
     public HudChipRowWindow(MainWindow main, SpawnsViewModel spawns)
     {
         _main = main;
@@ -102,6 +114,15 @@ internal sealed class HudChipRowWindow : Window
         WatchChips = HudChipRow.CountOf(_row, HudChipFamily.WatchFire);
         BuffChips = HudChipRow.CountOf(_row, HudChipFamily.Buff);
         DueChips = HudChipRow.DueCount(_row);
+        // Consecutive chicklets of one family are one entry: this is the FAMILY order that
+        // reached the screen, not a chip census — the counts above are the census.
+        RowOrderKey = HudChipRow.OrderKey(
+            _row.Select(e => e.Family).Where((f, i) => i == 0 || _row[i - 1].Family != f));
+
+        // Edit mode owns the panel while it is on. The counts above still describe the live
+        // row the player is editing — they are what the tick computed, and a dump that went
+        // blank the moment the mode opened could not assert that a mute took effect.
+        if (Editing) { Park(); return; }
 
         var signature = HudChipRow.Signature(_row);
         if (signature != _signature)
@@ -115,6 +136,15 @@ internal sealed class HudChipRowWindow : Window
                 HudChip.Tick(_live[i], _row[i]);
         }
 
+        Park();
+    }
+
+    /// <summary>Recompute where the slaved companion sits, from the widget, this tick. Shared
+    /// by the live path and the edit path: the row follows the HUD in both, because a row you
+    /// are reordering that stopped following the window it belongs to would be a fifth
+    /// independently-placed float for as long as the mode is open.</summary>
+    private void Park()
+    {
         // The row may not run off the monitor the widget is on. MaxWidth makes the
         // WrapPanel wrap instead of growing a window wider than the screen; the arithmetic
         // for WHERE it goes is HudChipRow.Placement's, tested without a window.
@@ -125,6 +155,65 @@ internal sealed class HudChipRowWindow : Window
             _main.Left, _main.Top, _main.ActualHeight, ActualHeight, area.Top, area.Bottom);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
+    }
+
+    /// <summary>
+    /// "Edit HUD…" — turn the row into its own editor, or turn it back.
+    ///
+    /// **<c>AlertWindow.EnterPlacement</c>/<c>ExitPlacement</c>'s shape**, which B3 named as
+    /// the precedent worth reusing: a mode the player switches on, affordances that exist
+    /// only while it is on, and the ordinary surface back the moment it is off. Two
+    /// differences, both because this row is not that tile:
+    ///
+    /// <list type="bullet">
+    /// <item>**No click-through to restore.** The alert tile is permanently click-through and
+    /// has to stop being so to be dragged; the chip row has always taken clicks (a chip
+    /// dismisses on one), so entering the mode changes what is drawn and nothing else.</item>
+    /// <item>**Every change is persisted as it is made**, rather than on the way out.
+    /// <c>ExitPlacement</c> can save on exit because a drag has one end; a nudge has no end,
+    /// and a mode whose work is lost if the app closes while it is open would be a worse
+    /// bargain than the file write a tick box already costs.</item>
+    /// </list>
+    /// </summary>
+    public void ToggleEdit()
+    {
+        Editing = !Editing;
+        _signature = HudChipRow.DismissedSignature;   // force a real rebuild either way
+        if (Editing) { RebuildEdit(); Park(); if (!IsVisible) Show(); }
+        // Straight back to the live row — including hiding it, if the families the player
+        // was editing have nothing running.
+        _main.RefreshHudChips();
+    }
+
+    /// <summary>One Place/Mute placeholder per family, in the stored order — muted ones
+    /// included, dimmed, because a mute you cannot see is a mute you cannot undo.</summary>
+    private void RebuildEdit()
+    {
+        _panel.Children.Clear();
+        _live.Clear();
+        var order = HudChipRow.ResolveOrder(_main.Settings);
+        for (var i = 0; i < order.Count; i++)
+        {
+            var family = order[i];
+            _panel.Children.Add(HudEditChip.Build(family,
+                muted: HudChipRow.IsMuted(_main.Settings, family),
+                canLeft: i > 0, canRight: i < order.Count - 1,
+                onNudge: delta => Apply(() => HudChipRow.SetOrder(
+                    _main.Settings, HudChipRow.Nudge(HudChipRow.ResolveOrder(_main.Settings), family, delta))),
+                onMute: () => Apply(() => HudChipRow.SetMuted(
+                    _main.Settings, family, !HudChipRow.IsMuted(_main.Settings, family)))));
+        }
+        _panel.Children.Add(HudEditChip.Hint());
+    }
+
+    /// <summary>An edit: write it, persist it, redraw the editor. The redraw is what moves the
+    /// chicklet the player just nudged, so the preview of the order IS the order.</summary>
+    private void Apply(Action edit)
+    {
+        edit();
+        _main.PersistSettings();
+        RebuildEdit();
+        Park();
     }
 
     private void Rebuild()
