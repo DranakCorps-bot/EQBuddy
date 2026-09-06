@@ -69,6 +69,19 @@ Do not put these back in Holds.
 
 
 
+### PR #345 — soft-owed Options/gearloot re-shoots (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #345 https://github.com/DranakCorps-bot/EQBuddy/pull/345 (`claude/soft-options-gearloot-reshoot-20260905` → `main`, product `200d234a`; tip `94fe1bfb`) — five PNGs paying #342/#344 soft capture debt; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Soft-owed capture debt SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) soft re-shoot may/should amend its own shoot.ps1 prediction comment in the same commit — SIGNED yes (standing; trap-23 artefact). (2) options-tabs.png — SIGNED delete (orphan+wrong; tip preferred; no recipe).
+- **ACK:** options-behavior extra owed; mez/inventory byte-identical; gearloot-loot 1px footer revert; Settle/Gear first-pass evidence for harness lane.
+- **Signed items:** options-cards / options-window / options-behavior / gearloot-gear / gearloot-gear-empty.
+- **Soft:** drop channel tip; preferred tip = shoot.ps1 options-cards prediction + delete options-tabs.png; #342/#344 soft capture pile DISCHARGED; MainWindow ImportGear residual; SR-5 gated; harness Settle note next harness seat.
+- **Scope hygiene:** Screenshots (+ optional tip docs/script comment). No src / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`): tip → CI → merge → standing queue.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~10:40 PM CT
+
+
 ### PR #344 — SR-3 HUD block leaves OptionsWindow (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #344 https://github.com/DranakCorps-bot/EQBuddy/pull/344 (`claude/sr3-hud-block-20260905` → `main`, head `8b342d30`) — OptionsCardsView → SettingsHudView host-neutral HUD block; F3 / I-11 §SR-3.
