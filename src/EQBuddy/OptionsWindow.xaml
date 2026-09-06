@@ -134,220 +134,29 @@
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,8,0,0"/>
         </StackPanel>
 
-        <!-- ======================= ALERTS &amp; CHIPS ======================= -->
-        <StackPanel x:Name="TabAlertsPanel" Visibility="Collapsed">
-            <Grid>
-                <TextBlock Text="Alert sound" FontSize="12" VerticalAlignment="Center"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ComboBox x:Name="SoundCombo" Width="120" FontSize="12"
-                              SelectionChanged="OnSoundChanged"/>
-                    <Button Content="&#x25B6;" Style="{StaticResource IconButton}" FontSize="11"
-                            ToolTip="Play the alert sound" Click="OnSoundTest" Margin="4,0,0,0"/>
-                </StackPanel>
-            </Grid>
-            <Grid Margin="0,6,0,0">
-                <TextBlock Text="Alert volume" FontSize="12"/>
-                <TextBlock x:Name="AlertVolumeLabel" Text="100%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="AlertVolumeSlider" Minimum="0.1" Maximum="1.0" TickFrequency="0.05"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,4"
-                    ValueChanged="OnAlertVolumeChanged"/>
-            <TextBlock x:Name="SoundFileNote" Style="{StaticResource Dim}" TextWrapping="Wrap"
-                       Visibility="Collapsed"/>
-            <TextBlock Text="While Options is open, the ★ alert banner tile is visible — drag it to where alerts should appear. During play it's click-through and never steals focus."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+        <!-- ======================= ALERTS &amp; CHIPS =======================
+             EMPTY BY DESIGN since SR-4. The shared sound/voice/volume/rate header and
+             the Buffs, Spawns and Crowd blocks are built by SettingsAlertsView and
+             added here in code, in AlertSurface's order — the arrangement players
+             already have, from blocks the Evolved shell's Settings room will compose
+             under the four AlertSurface tabs.
 
-            <!-- Speech gets its own volume: the slider above drives only the MediaPlayer
-                 that plays sound files — SAPI never saw it, so one slider claiming both
-                 would be a lie in whichever direction it didn't reach. -->
-            <Grid Margin="0,12,0,0">
-                <TextBlock Text="Alert voice" FontSize="12" VerticalAlignment="Center"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <ComboBox x:Name="VoiceCombo" Width="164" FontSize="12"
-                              SelectionChanged="OnVoiceChanged"/>
-                    <Button Content="&#x25B6;" Style="{StaticResource IconButton}" FontSize="11"
-                            ToolTip="Hear a sample with the current voice, rate and volume"
-                            Click="OnVoiceTest" Margin="4,0,0,0"/>
-                </StackPanel>
-            </Grid>
-            <TextBlock Text="Used wherever EQBuddy speaks — watch rules with the S toggle, and the slow alert."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,0"/>
-            <Grid Margin="0,6,0,0">
-                <TextBlock Text="Speech rate" FontSize="12"/>
-                <TextBlock x:Name="SpeechRateLabel" Text="normal" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="SpeechRateSlider" Minimum="-5" Maximum="5" TickFrequency="1"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,4"
-                    ValueChanged="OnSpeechRateChanged"/>
-            <Grid>
-                <TextBlock Text="Speech volume" FontSize="12"/>
-                <TextBlock x:Name="SpeechVolumeLabel" Text="100%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="SpeechVolumeSlider" Minimum="0" Maximum="100" TickFrequency="5"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,4"
-                    ValueChanged="OnSpeechVolumeChanged"/>
+             The host carries no Margin and no state of its own (trap 15): the
+             Visibility below belongs to this window's tab machinery, which SelectTab
+             drives and no block knows about. Every control that used to be declared
+             here now lives in that file, and the trap-26 enumeration of where each one
+             went rides the PR. -->
+        <StackPanel x:Name="TabAlertsPanel" Visibility="Collapsed"/>
 
-            <CheckBox x:Name="SlowAlertCheck" Margin="0,12,0,0"
-                      Checked="OnSlowAlertToggled" Unchecked="OnSlowAlertToggled">
-                <TextBlock Text="Slow alert (an attack-speed debuff lands on you)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="A 🐌 chip shows the slow's % and its counters; hover it for the cure line. A silent 40% slow quietly doubles a fight."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-            <CheckBox x:Name="SlowSpokenCheck" Margin="20,6,0,0"
-                      Checked="OnSlowAlertToggled" Unchecked="OnSlowAlertToggled">
-                <TextBlock Text="Speak it when it lands (&quot;Slowed 40 percent&quot;)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <CheckBox x:Name="SlowRaidOnlyCheck" Margin="20,6,0,0"
-                      Checked="OnSlowAlertToggled" Unchecked="OnSlowAlertToggled">
-                <TextBlock Text="Only during raids" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Raids are detected from raid-channel chat — the log's only raid signal. A raid nobody has typed in for 10 minutes counts as over."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="40,2,0,0"/>
-
-            <CheckBox x:Name="BuffExpiringOnlyCheck" Margin="0,12,0,0"
-                      Checked="OnBuffDisplayChanged" Unchecked="OnBuffDisplayChanged">
-                <TextBlock Text="Buff timers: only show buffs about to fade" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <StackPanel Orientation="Horizontal" Margin="20,4,0,0">
-                <TextBlock Text="warn at" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextBrush}"/>
-                <TextBox x:Name="BuffWarnBox" Width="44" Margin="6,0,6,0" FontSize="12"
-                         TextAlignment="Right" LostFocus="OnBuffDisplayChanged"
-                         Background="{DynamicResource PanelBrush}" Foreground="{DynamicResource TextBrush}"
-                         BorderBrush="{DynamicResource BorderBrush}"/>
-                <TextBlock Text="seconds left" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </StackPanel>
-            <TextBlock Text="Unticked, the Buffs card counts down everything that's running. Ticked, it stays quiet (with an honest count) until a buff is inside the warning window — tell me when it matters. Your own casts already include your Spell Casting Reinforcement rank; a buff's first natural fade teaches its exact duration either way."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <TextBlock Text="Buff set — the missing line" FontSize="12" FontWeight="SemiBold"
-                       Foreground="{DynamicResource AccentBrush}" Margin="0,14,0,2"/>
-            <TextBlock Text="Pick the buffs this character never camps without — per class: each pick lands in a class bucket, and the live set assembles from the classes you're running plus (any class), so swapping one class keeps the other classes' picks. The ⏳ Buffs card grows one line ONLY when something's off: missing (seen fading, or its timer ran out), expiring (inside the warn window above), or not seen (no landing line this session — it may be up from before EQBuddy was watching; the log can't tell, so it's shown as its own honest state). Everything up = no line at all. You build the list yourself; nothing is ever added for you."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap"/>
-            <TextBlock x:Name="BuffSetCharNote" Style="{StaticResource Dim}" TextWrapping="Wrap"
-                       Margin="0,2,0,0"/>
-            <StackPanel x:Name="BuffSetPanel" Margin="0,4,0,0"/>
-            <!-- Stage 2 (#120): the add box targets a class bucket. The FULL class list
-                 is offered here (unlike the breakout's active-only list) so a swap can
-                 be configured in advance. -->
-            <Grid Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <ComboBox x:Name="BuffSetClassBox" MinWidth="110" Margin="0,0,6,0" FontSize="12"
-                          VerticalAlignment="Center"
-                          ToolTip="Which class bucket the next pick goes into — (any class) applies whatever combination you run"/>
-                <TextBox Grid.Column="1" x:Name="BuffSetAddBox" Style="{StaticResource InputBox}"
-                         TextChanged="OnBuffSetSearchChanged"
-                         ToolTip="Type a few letters of a buff's name — buffs you've been seen casting list first, then the whole buff catalog"/>
-            </Grid>
-            <Popup x:Name="BuffSetPopup" PlacementTarget="{Binding ElementName=BuffSetAddBox}"
-                   Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
-                <Border x:Name="BuffSetChrome" BorderThickness="1" Padding="2" CornerRadius="6">
-                    <ListBox x:Name="BuffSetMatches" MaxHeight="240" MaxWidth="480" FontSize="11.5"
-                             SelectionChanged="OnBuffSetMatchPicked"/>
-                </Border>
-            </Popup>
-
-            <CheckBox x:Name="MezChipsCheck" Margin="0,12,0,0"
-                      Checked="OnMezChipsToggled" Unchecked="OnMezChipsToggled">
-                <TextBlock Text="Mez countdown chips (who's asleep, wake-up timers)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Untick if your class never mezzes — mez chips stop appearing entirely."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <!-- Mez durations, the same contract spawn durations have: your number
-                 outranks anything EQBuddy works out. Asked for on Reddit (relayed by
-                 David, 2026-08-20) by a player whose only cure for a wrong learned value
-                 was deleting a file by hand. Settings live in Options (CLAUDE.md), and
-                 this sits under the mez chips box because that is where someone whose
-                 mez chip is wrong already goes. -->
-            <TextBlock Text="Mez durations" FontSize="12" FontWeight="SemiBold" Margin="20,12,0,0"
-                       Foreground="{DynamicResource AccentBrush}"/>
-            <TextBlock x:Name="MezDurationsBlurb" Style="{StaticResource Dim}"
-                       TextWrapping="Wrap" Margin="20,2,0,4"/>
-            <ContentControl x:Name="MezDurationList" Margin="20,0,0,0"/>
-
-            <CheckBox x:Name="TrackSpawnsCheck" Margin="0,10,0,0"
-                      Checked="OnTrackSpawnsToggled" Unchecked="OnTrackSpawnsToggled">
-                <TextBlock Text="🕒 Track spawns (named respawn timers)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Kill a named — or its placeholder — and a small countdown chicklet appears (⏳ Asaka L`Rei 3:12). Chicklets sit in one row under the widget and move with it, show every timer you have running in any zone, and flip to DUE for a minute (click to dismiss sooner). Double-click one (or right-click → Spawn timers…) for the full zone list, which follows you zone to zone. We captured the respawn times we could from community sources — if you notice a discrepancy in game, type over the duration: your number wins and survives updates."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <!-- The two "grow upward" tick-boxes retired here in Surface A / SA-2, with the
-                 two separately-placed stacks they arbitrated between (#95: "park boss timers
-                 above mez timers and each grows away from the other"). Spawn and mez chips
-                 are ONE row now, under the widget, so there is no second stack to grow away
-                 from and no saved position for either. -->
-        </StackPanel>
-
-        <!-- ========================= WATCH RULES ========================= -->
+        <!-- ========================= WATCH RULES =========================
+             The rules editor itself is SettingsAlertsView's Watch block, built into
+             the bare host below. What stays declared here is the ONE row that does not
+             lift: PinWatchChips is presence ("does this chip show"), not what-fires,
+             and it is the named collision with SA-4's MutedChipFamilies — so it stays
+             a v1-only row and the shell's Alerts tab carries no presence switch at
+             all. Whoever lands SA-4 reconciles one switch, not two. -->
         <StackPanel x:Name="TabWatchPanel" Visibility="Collapsed">
-            <TextBlock Text="Watch loot, kills, skill-ups, deaths, milestones, your spells wearing off, or any text in the log. Match is a case-insensitive substring, e.g. 'mote'. Spell fade rules can pick a whole class (Any crowd control, Charm, Mez, Root, Lull, Stun, HoT) instead of a named spell, needing no match text. Delay holds the alert back that many seconds so it lands as a cue. 🔔 shows a banner; the sound box picks this rule's own sound, so you can tell what happened by ear — 'Default' follows the shared choice on the Alerts tab, 'Off' stays silent, 'Custom…' takes your own .wav/.mp3."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap"/>
-            <!-- Collapsed by default: the examples answer the questions people actually ask
-                 (is "Mote" enough? why isn't my rule matching?) but they're a wall of text
-                 for anyone who already knows. -->
-            <Button x:Name="GuideToggle" HorizontalAlignment="Left" Margin="0,4,0,0"
-                    Style="{StaticResource IconButton}" FontSize="11"
-                    Content="▸ Show examples"
-                    ToolTip="Worked examples for every rule kind"
-                    Click="OnGuideToggled"/>
-            <Border x:Name="GuidePanel" Visibility="Collapsed" Margin="0,4,0,2"
-                    Background="{DynamicResource PanelBrush}" CornerRadius="6" Padding="8,6">
-                <StackPanel x:Name="GuideContent"/>
-            </Border>
-            <!-- Shared-size scope so the header row's Auto columns track the rule rows'. -->
-            <StackPanel x:Name="RulesPanel" Margin="0,4,0,0" Grid.IsSharedSizeScope="True"/>
-            <StackPanel Orientation="Horizontal">
-                <Button x:Name="AddRuleBtn" Content="+ Add watch rule" Style="{StaticResource ActionButton}"
-                        HorizontalAlignment="Left" FontSize="12" Click="OnAddRule"/>
-                <Button x:Name="AddFromLogBtn" Content="+ From a recent log line…" Style="{StaticResource ActionButton}"
-                        HorizontalAlignment="Left" FontSize="12" Margin="8,0,0,0" Click="OnAddRuleFromLog"
-                        ToolTip="Pick a line that just happened in your log — it becomes a Text rule, no typing. Edit the match afterward to taste."/>
-            </StackPanel>
-            <Popup x:Name="RecentLinesPopup" PlacementTarget="{Binding ElementName=AddFromLogBtn}"
-                   Placement="Top" StaysOpen="False" AllowsTransparency="True">
-                <Border x:Name="RecentLinesChrome" BorderThickness="1" Padding="2" CornerRadius="6">
-                    <StackPanel>
-                        <CheckBox x:Name="RecentLinesHideChat" Margin="4,3,4,3"
-                                  Checked="OnRecentLinesFilterChanged" Unchecked="OnRecentLinesFilterChanged">
-                            <TextBlock Text="Hide chat (say/tell/channels) — combat and system lines only" FontSize="11"
-                                       Foreground="{DynamicResource DimBrush}"/>
-                        </CheckBox>
-                        <ListBox x:Name="RecentLinesList" MaxHeight="300" MaxWidth="560" FontSize="11.5"
-                                 SelectionChanged="OnRecentLinePicked"/>
-                    </StackPanel>
-                </Border>
-            </Popup>
-            <Grid Margin="0,6,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox x:Name="ImportBox" Style="{StaticResource InputBox}"
-                         ToolTip="Paste a shared watch rule (EQB1.…) from guild chat or Discord — the ⤴ on any rule row makes one"/>
-                <Button x:Name="ImportBtn" Grid.Column="1" Content="Import…" Style="{StaticResource ActionButton}"
-                        Margin="6,0,0,0" Padding="8,3" Click="OnImportShare"
-                        ToolTip="Preview what the pasted share string would add — nothing is added until you confirm"/>
-            </Grid>
-            <TextBlock x:Name="ImportPreview" Style="{StaticResource Dim}" TextWrapping="Wrap"
-                       Margin="0,4,0,0" Visibility="Collapsed"/>
-            <Button x:Name="ImportConfirmBtn" Style="{StaticResource ActionButton}"
-                    HorizontalAlignment="Left" FontSize="12" Margin="0,4,0,0"
-                    Visibility="Collapsed" Click="OnImportConfirm"/>
+            <StackPanel x:Name="WatchBlockHost"/>
             <CheckBox x:Name="PinChipsCheck" Margin="0,6,0,0"
                       Checked="OnPinChipsChanged" Unchecked="OnPinChipsChanged">
                 <TextBlock Text="📌 Show watch chips in the mini dashboard" FontSize="12"

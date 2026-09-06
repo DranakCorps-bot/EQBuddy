@@ -267,6 +267,15 @@ public class ShellTerminologyTests
         ("EQBuddy/GearRoom.cs", "bags, wishlist, loot"),
         ("EQBuddy/QuestsRoom.cs", "the tracker, Epic and Sky"),
         ("EQBuddy/WorldRoom.cs", "map, camps, path, travels, drops"),
+        // NOT a shell file — a SETTINGS BLOCK, and the first row of its kind. The ban's own
+        // scope line exempts v1 `OptionsWindow`, but a block that serves two hosts has ONE
+        // string set and it has to pass in shell scope: the Evolved shell's Settings room
+        // composes these same four blocks, so lifting a block IS that block's vocab sweep
+        // (Fable's SR series, signed). Four sentences were reworded on the way through —
+        // two "Buffs card" (the buff list), one "under the widget" (under EQBuddy), and the
+        // per-rule pin tooltip's "mini dashboard" (the HUD).
+        ("EQBuddy/SettingsAlertsView.cs",
+            "the four alert blocks — every string Settings → Alerts can show, on both hosts"),
         ("EQBuddy.UI.Shared/ShellPages.cs", "the rail's labels, descriptions and addresses"),
         ("EQBuddy.UI.Shared/ShellLayout.cs", "the two degrade axes — any text they name"),
         ("EQBuddy.UI.Shared/ShellRoomEmpty.cs", "the four data rooms' whole-room empties"),

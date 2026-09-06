@@ -134,8 +134,19 @@ the lift came first, and the baseline came down in the same commit.**
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 1,547 | 1,585 | 1,702 | 117 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 689 | 689 | 757 | 68 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
+
+**Lowered 1,547 → 689 on 2026-09-05 (E-3 lane D, SR-4), in the same commit as the lift.**
+`OptionsWindow` had been the tight one on this table for weeks. The four alert blocks — the
+watch-rules editor, the buff-set builder, the mez and spawn boxes, and the shared
+sound/voice/volume/rate header above them — left for `EQBuddy/SettingsAlertsView.cs`, which
+is host-neutral: it builds its own controls, takes `(MainWindow, OptionsViewModel, ready-gate)`
+and knows nothing about the window it hangs in. That is what lets the Evolved shell's Settings
+room compose the SAME blocks under the four `AlertSurface` tabs instead of growing a second
+copy of forty control wirings to drift against this one — #210's mechanism with a bigger
+surface. The baseline came down to the post-lift count rather than to something with slack in
+it, per the rule two paragraphs up: **room that is freed and not claimed quietly refills.**
 
 **Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
 the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any

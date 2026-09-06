@@ -103,6 +103,12 @@ public class SurfaceOwnershipTests
     [InlineData("LiveRoom.cs")]
     [InlineData("CareerHistoryView.cs")]
     [InlineData("LiveSessionPanes.cs")]
+    // E-3 lane D, SR-4: the four alert blocks. `SettingsAlertsView.Block(tab)` is deliberately
+    // NOT this shape even though it reads like it — it is a factory's output, owned by the
+    // instance that built it, and each host constructs its own instance (asserted below). The
+    // row is here because this file is exactly where somebody would write the real thing: one
+    // body slot, four tabs to fill it from, and a second host arriving in SR-5.
+    [InlineData("SettingsAlertsView.cs")]
     public void NoHostInterfaceHandsOutATabBody(string file)
     {
         var path = Path.Combine(Src, "EQBuddy", file);
@@ -180,6 +186,12 @@ public class SurfaceOwnershipTests
     // in a diff, a build and a screenshot. No factory: nothing else in the codebase holds a
     // DropsCardView, so constructing it outright is as fresh as calling one.
     [InlineData("WorldRoom.cs", "new DropsCardView(main)")]
+    // E-3 lane D, SR-4: the alert blocks have their first host. The shell's Settings room is
+    // the second one (SR-5), and a block shared between them would be torn out of whichever
+    // painted it last — on WPF that is a surface silently vanishing rather than an exception,
+    // which is harder to notice, not easier. This is the positive half: the window builds its
+    // own, in its own constructor, before it hands anything to a panel.
+    [InlineData("OptionsWindow.xaml.cs", "new SettingsAlertsView(")]
 // E-3 PR 5: the Live room builds the widget's two Live surfaces through the factory and
     // its own four panes outright — never the breakout's or the widget's instances.
     [InlineData("LiveRoom.cs", "main.NewLiveSurfaces()")]

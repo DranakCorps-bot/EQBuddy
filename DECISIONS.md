@@ -17,6 +17,39 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 lane D / SR-4 — the alert blocks lift)
+
+- **The slow alert's three checks went with the SHARED HEADER, not with Watch** · the plan
+  named both and left it to the executor · it is a built-in, not a rule the player wrote —
+  there is nothing to add, reorder, share or delete — and the header's own helper line already
+  names it ("Used wherever EQBuddy speaks — watch rules with the S toggle, and the slow
+  alert"). Filing it under Watch would put a fixed, undeletable row in the middle of an editor
+  whose entire grammar is "these are yours". `SettingsAlertsView.BuildHeader`, with the
+  enumeration row in `SettingsAlertsBlockTests`.
+- **SR-4 builds NO tab strip control** · the plan's item 6 asks for trap 25 on "the strip" ·
+  item 5 fixes the v1 arrangement as five tabs with the blocks stacked, so a strip built here
+  would have had no consumer until SR-5 — a producer with no reader, which is trap 43's exact
+  shape and the thing SR-3's own text warns against ("this PR adds nothing beyond what
+  re-hosting needs"). What IS spent is the definition: `AlertSurface.Tabs()` with real counts
+  drives the stacking order and the three section headings, and the trap-25 obligation is
+  written onto `SettingsAlertsView.Tabs()` where whoever renders it as a strip will read it.
+- **The Alerts tab's blocks are stacked in `AlertSurface` order, which swaps Spawns and
+  Crowd** · keeping the old hand-written order · one definition of what the tabs are is the
+  whole point of the surface, and two hosts disagreeing about their order is #122/#152's shape.
+  Named in the 2.0.0 What's-new entry rather than left for someone to find.
+- **The vocab sweep ran over the lifted block, and four v1 sentences changed** · the ban
+  exempts v1 `OptionsWindow` · a block serving two hosts has ONE string set and it has to pass
+  in shell scope, which is the plan's own clamp. Two "Buffs card" → "buff list", one "under the
+  widget" → "under EQBuddy", and the per-rule pin tooltip's "mini dashboard" → "the HUD".
+  `SettingsAlertsView.cs` joins `ShellTerminologyTests.ShellStringSources`, prove-failed.
+- **No `EQBUDDY_EXPAND` facts and no re-shot `options-window` in this PR** · CLAUDE.md's
+  standing move is to pin window behaviour in E2E before a move · both need the screen, and
+  SA-3 holds it (trap 61: two seats fail a random row of each other's batch and both failures
+  read as a defect in whatever was under review). The lift is covered by 43 source-level
+  assertions instead, all 39 enumeration rows prove-failed against the pre-lift tree. **The
+  `options-window`-family re-shoot is OWED** and belongs to the first SR PR that holds the
+  screen, together with the #332 full-batch duty the plan already names.
+
 ## 2026-09-05 (F2 / SA-2 — one HUD chip row)
 
 - **The Options-open PLACEMENT PREVIEW and its draggable placeholder were deleted, not
