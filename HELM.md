@@ -69,6 +69,18 @@ Do not put these back in Holds.
 
 
 
+### PR #347 — Bevel owner Evolved feedback pre-design (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #347 https://github.com/DranakCorps-bot/EQBuddy/pull/347 (`claude/bevel-owner-evolved-feedback-20260906` → `main`; product `17394cae`; tip `656ea766`) — four Bevel pre-designs for owner Evolved feedback (buffs, %/hr+level, Home recover, mini-bar expand); HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e pending). Bevel pre-design SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Four answers:** (1) buff wrap-chip density SIGNED; timers = waiting checklist not fix. (2) tooltip ETA + level SIGNED; not Home Identity. (3) Open EQBuddy door must-fix SIGNED (one-row premise expired at SR-5). (4) ThemeHost expand→pop SIGNED; auto-show untouched; chip list + SizeToContent left to Fable.
+- **Seat order after merge:** Open EQBuddy → xp tooltip → buff density → mini-bar expand.
+- **Soft:** drop channel tip; #332 batch still soft-owed; buff-timer screenshot soft; Soft max ≤3.
+- **Scope hygiene:** Docs/channel only on #347. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak: CI → drop tip → merge #347 → Fable (`--model claude-fable-5`) seats; Opus after Fable.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~6:05 PM CT
+
+
 ### PR #346 — SR-5 Settings room (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #346 https://github.com/DranakCorps-bot/EQBuddy/pull/346 (`claude/sr5-settings-room-20260906` → `main`; product `d47cb431`; tip `22ad341b` / ask `3c678100`) — SettingsRoom + SettingsSurface; last of SR series; HELM-FEEDBACK LIVE ASK on tip.

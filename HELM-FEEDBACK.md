@@ -1,3 +1,35 @@
+## 2026-09-06 ~6:05 PM CT — Helm: PR #347 Bevel owner Evolved feedback pre-design last-look **SIGNED** (product `17394cae`; tip `656ea766`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #347 https://github.com/DranakCorps-bot/EQBuddy/pull/347 (`claude/bevel-owner-evolved-feedback-20260906` → `main`; product `17394cae`; LIVE ASK tip `656ea766`). Docs/channel only — `BEVEL.md` four pre-designs + HELM-FEEDBACK ask. Spot-checked against main `75faf324` (SR-5 merged): `ShellPages.Landed` is the whole seven-room enum; `ShellHost.Show` still only from `ApplyEnvHook`; `HudGlance.ThirdText` is `%/hr` only (no ETA); `ThemeHost` Collapsed/Inline/Window + `ToggleCard`/`PopOut`/`WindowClosed` intact; `DoubleClickChipsToggleBreakouts` defaults false (no initializer); buff settings are still only `BuffTimersExpiringOnly` + `BuffWarnSeconds`. At look: `build-and-test` **SUCCESS**; `e2e-windows` **PENDING**. **Signed as Bevel pre-design for owner Evolved feedback. Merge when both CI green on the merge tip** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Four pre-designs — answered
+1. **Buffs density + timers** — **SIGNED density IA** (wrap-chip / `WrapPanel` roster reusing `HudChipRow` visual language; trap-25 safe; do not invent a second chip style). **SIGNED timers = waiting checklist, not a fix** — no reproduction, no screenshot, four bisect sources named. Soft: one owner screenshot (buff name + shown countdown + actual remaining if knowable) before any timer code. Do not ship a timer "fix" from memory.
+2. **%/hr + level** — **SIGNED.** ETA already in `SessionStats`/`ProgressPresentation`; put it on the xp chip **tooltip** (cheap, no gesture, no shared-toggle default change). Surface tracked level (`LevelFor ?? LastLevel`) on the **same tooltip** (or Progress Experience header) — **not** Home Identity (zone-over-level stays). Double-click default flip stays a soft named decision, not this seat.
+3. **Home / shell recovery — `must-fix`** — **SIGNED.** Closing ✕ the `ShellWindow` is the real gap; Home room itself is rail-reachable while the shell is open. Premise for withholding the HUD **"Open EQBuddy"** door (`ShellHost`/`DECISIONS`) was "rail has one row" — expired at SR-5. Build that already-named door now. Exact control (button vs hotkey vs tray) left to Fable/Claude — do not re-defer on the old one-row reasoning.
+4. **Mini-bar expand → breakout** — **SIGNED** owner-locked shape. Reuse `ThemeHost` Collapsed→Inline→Window; primary **click** (not double-click); auto-show-while-minimized untouched. Which chips beyond pet/loot (Damage/DPS is new wiring) + SizeToContent anchoring (trap 12) need a screenshot pass before build — Fable/Claude, not Bevel re-litigation.
+
+### Seat order (Fable after merge)
+1. **Open EQBuddy / shell recover** (`must-fix`) first.
+2. xp-chip tooltip ETA + level (cheap visibility).
+3. buff wrap-chip density (timers stay waiting).
+4. mini-bar ThemeHost expand→pop (after screenshot pass).
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- Soft max ≤3. **#332** full `shoot.ps1` batch still soft-owed (unchanged).
+- Buff-timer screenshot request rides soft — not a Helm door this turn.
+
+### Scope hygiene
+Docs/channel on #347 only. No `src/` in this PR. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Building the already-named Open EQBuddy door is in-scope for the *next* Fable seat, not invented here. Not a hold. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+**Claude kick via Dranak:** wait both CI green → drop ask tip → merge #347 (brings `BEVEL.md` pre-designs) → kick **Fable** (`--model claude-fable-5`) to name seats in the order above. Opus build seats only after Fable names them. Soft max ≤3.
+
+— Helm
+
+---
+
 ## 2026-09-06 ~10:25 AM CT — Helm: PR #346 SR-5 Settings room last-look **SIGNED** (product `d47cb431`; tip `22ad341b` / ask `3c678100`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
