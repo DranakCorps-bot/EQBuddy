@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #338 — SR-4 alert blocks lift / AlertSurface spend (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #338 https://github.com/DranakCorps-bot/EQBuddy/pull/338 (`claude/sr4-alerts-blocks-20260905` → `main`, head `3a06a724`) — lift four alert blocks into host-neutral `SettingsAlertsView`; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Product SR-4 SIGNED. External gate discharged (#337 merged). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) AlertSurface order / Spawns↔Crowd swap — SIGNED keep Core order (do not hand-write). (2) No strip in SR-4 — SIGNED ACK; SR-5 owes strip + trap-25 WrapPanel. (3) Four v1 vocab rewords — SIGNED ACK (F3 clamp).
+- **Signed items:** SettingsAlertsView host-neutral; AlertSurface.Tabs spend; slow-in-header; PinWatchChips exclusion; ratchet 1547→689; 39-row lift guards; WhatsNew 2.0.0; FABLE SR-4 TAKEN.
+- **Soft:** drop channel tip; options-window family re-shoot still on first screen-holding SR; no EQBUDDY_EXPAND here; do not starve SA-3.
+- **Scope hygiene:** No SR-5 / SA-3..4/R / OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → standing queue.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~7:00 PM CT
+
+
 ### PR #337 — F2/SA-2 one HUD chip row (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #337 https://github.com/DranakCorps-bot/EQBuddy/pull/337 (`claude/sa2-hud-chip-row-20260905` → `main`, head `8e76da88`) — fold spawn+mez into one slaved companion row; HELM-FEEDBACK LIVE ASK on tip.
