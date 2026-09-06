@@ -3475,8 +3475,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // (David lost his DPS breakout to exactly that, 2026-08-08). A
                         // permanent, hard-to-reverse state change must announce itself.
                         if (_settings.DoubleClickChipsToggleBreakouts) return;
-                        AlertTile.ShowAlert($"{k} breakout hidden — re-enable in Options → Breakout windows");
-                        CoreLog.Error($"{k} breakout hidden via its close button (re-enable: Options → Breakout windows)");
+                        AlertTile.ShowAlert($"{k} breakout hidden — re-enable in {BreakoutPresentation.ReEnableRoute}");
+                        CoreLog.Error($"{k} breakout hidden via its close button (re-enable: {BreakoutPresentation.ReEnableRoute})");
                     };
                 }
                 if (!w.IsVisible) w.Show();

@@ -99,7 +99,30 @@ public static class BreakoutPresentation
     /// "tick box that lies" this screen already had to fix once.</summary>
     public static bool NeedsPinnedRule(string kind) => kind == Watch;
 
-    /// <summary>The row's hover text on Options → Cards &amp; windows, keyed on the kind
+    /// <summary>
+    /// **The heading this list sits under, said once for both hosts.** It read "Breakout
+    /// windows" until 2026-09-05 (SR-3): `\bbreakouts?\b` is a row of the signed terminology
+    /// ban, and the Settings block that renders this list serves the Evolved shell as well as
+    /// v1 <c>OptionsWindow</c>, so it has ONE string set and that set has to pass in shell
+    /// scope. "Floating windows" is the blurb's own first two words.
+    ///
+    /// It is a const rather than a literal in the block because it is also a ROUTE: three
+    /// other surfaces tell a player where to re-enable a window they dismissed, and a heading
+    /// renamed without them is #219's mechanism inside a sentence (SR-2 caught the identical
+    /// thing in <c>GearChecklistPresentation.EmptyRoute</c>). See <see cref="ReEnableRoute"/>.
+    /// </summary>
+    public const string Heading = "Floating windows";
+
+    /// <summary>Where a ✕-dismissed window comes back from, in the words the screen actually
+    /// shows. Named from <see cref="Heading"/> so the two cannot drift: the alert banner, the
+    /// error log and the ✕ tooltip all print this, and none of them can see the heading.</summary>
+    public const string ReEnableRoute = "Options → " + Heading;
+
+    /// <summary>The ✕'s own tooltip, on every one of these windows.</summary>
+    public const string DismissTip =
+        "Hide this window for good (its star chip stays; re-enable under " + ReEnableRoute + ")";
+
+    /// <summary>The row's hover text on the Settings HUD block, keyed on the kind
     /// rather than inferred from whether a star exists (see
     /// <see cref="NeedsPinnedRule"/>).</summary>
     public static string Note(string kind) => kind switch
@@ -112,13 +135,13 @@ public static class BreakoutPresentation
     /// <summary>For a kind that still has a ★. Says the second thing the tick does, since
     /// it is doing it on the player's behalf.</summary>
     public const string StarNote =
-        "Opens while the widget is minimised. Ticking this also stars the stat, so it "
+        "Opens while EQBuddy is minimised. Ticking this also stars the stat, so it "
         + "shows on the HUD too.";
 
     /// <summary>For Damage and Healing, whose stats are on the HUD whatever this says.
     /// Naming the removed toggle rather than only the replacement is the #233 rule.</summary>
     public const string PromotedNote =
-        "Opens while the widget is minimised. DPS and HPS are always-on HUD numbers now, "
+        "Opens while EQBuddy is minimised. DPS and HPS are always-on HUD numbers now, "
         + "so there is no star to set and this tick is the whole switch.";
 
     /// <summary>The kind for a <c>BreakoutKind</c> member, whichever UI's enum it came
@@ -133,7 +156,7 @@ public static class BreakoutPresentation
     /// for you, rather than the old blanket "each still needs its ⭐ star" — which was
     /// true of every row and therefore explained none of them.</summary>
     public const string Blurb =
-        "Floating windows that open while the widget is minimised. Ticking one turns it "
+        "Floating windows that open while EQBuddy is minimised. Ticking one turns it "
         + "on — where the stat still has a star, it sets that too, so it appears on the "
         + "HUD as well. Untick to stop the window opening; the star stays, so anything "
         + "you keep on the HUD stays put.";

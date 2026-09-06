@@ -134,7 +134,7 @@ the lift came first, and the baseline came down in the same commit.**
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 337 | 337 | 370 | 33 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 326 | 326 | 358 | 32 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
 
 **Lowered 1,547 → 689 on 2026-09-05 (E-3 lane D, SR-4), in the same commit as the lift.**
@@ -170,6 +170,23 @@ Gear & Loot window and the shell's Gear room) build their own instance, so both 
 commit. The mutations went further, into `Core/GearChecklistImporter.Apply`/`.Clear`, where the
 clause that separates a re-import from a wipe — *your ticks survive* — is finally executable by
 a test instead of being asserted about a window.
+
+**Lowered again, 337 → 326 on 2026-09-05 (E-3 lane D, SR-3), and the last tenant left with it.**
+The `cards` tab's whole body — the panel list and the "no longer on the widget" companion under
+it, the mini-dashboard tick boxes, the floating-window tick boxes, and the three switches that
+had accumulated beneath them (double-click-a-chip, target drops, the recent-rate picker) — is
+`EQBuddy/SettingsHudView.cs` now, host-neutral like the other three blocks. The eleven-line net
+understates it and is worth reading rather than glossing: **this tab was mostly XAML**, so 46
+lines left `OptionsWindow.xaml` (219 → 173) and only the three stray handlers left the
+code-behind, against which the block's construction and its doc block are charged back.
+**`OptionsWindow` now declares no settings at all** — four bare hosts, a tab strip, the resize
+grips and the monitor clamp. The Evolved shell's Settings room composes the same four blocks
+under Look / Alerts / HUD / Behavior, which is SR-5.
+
+**This block is transitional and is deliberately not built as though it will stay this size.**
+Surface A's SA-R star-retirement empties the mini-dashboard grid and the floating-window list a
+card at a time; each of those PRs edits this ONE block and both hosts follow, which is the whole
+argument for it being a module rather than two screens.
 
 **Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
 the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any

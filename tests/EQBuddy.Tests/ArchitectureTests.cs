@@ -255,7 +255,16 @@ public class ArchitectureTests
         // import (the website link, the file picker, Clear and the status line) left Options
         // ENTIRELY for GearCardView, the surface its result appears on. An import workflow is
         // a domain action, not a setting.
-        (@"EQBuddy/OptionsWindow.xaml.cs", 337),
+        //
+        // Lowered 337 → 326 on 2026-09-05 with SR-3, in the same commit as the lift, by the
+        // same standing rule — and this row is the one that shows why the ratchet counts
+        // `.xaml.cs` and not the surface. The `cards` tab was almost all XAML: 46 lines of it
+        // left `OptionsWindow.xaml` for `SettingsHudView.cs` along with the three stray
+        // handlers here, and the eleven-line net is what remains after the block's own
+        // construction and its doc block arrived. **The last tenant is gone**: what is left in
+        // this file is window chrome — width persistence, the monitor clamp, the tab links, the
+        // resize grips — plus the four block constructions and the one key-press route.
+        (@"EQBuddy/OptionsWindow.xaml.cs", 326),
         (@"EQBuddy.Core/LogParser.cs", 853),
         // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
         // in E-2 (2026-09-04). It was the largest file in the repo and it carried the

@@ -184,7 +184,8 @@ Mini dashboard:
 - Click **–** in the title bar to minimize: only your starred stats remain, in a tiny
   always-on-top pill (e.g. `💀 12  ⚔ 34 dps`). Great while actually fighting.
 - Double-click the pill (or click ⤢) to expand back to the full view.
-- **Breakout windows**: while minimized, the ⚔ dps, ✚ hps, and
+- **Floating windows** (⚙ Options → Cards & windows; the heading read "Breakout windows"
+  until 2.0.0): while minimized, the ⚔ dps, ✚ hps, and
   🐾 pet stars each open a small floating bar chart — your damage, your healing, and
   your pet's damage by ability — switchable between the **current fight** and the
   **whole session**. Drag them anywhere (positions are remembered); ✕ hides one until
@@ -483,8 +484,9 @@ Click-through, overlays & window control:
   machine — a player caught it, and the right fix was removal. Everything they did is
   reachable from the widget itself: **–** for mini mode, the right-click menu for
   click-through and camp markers.
-- ⚙ Options → **Overlay cards**: reorder cards and hide the ones you don't want —
-  hidden cards keep collecting data.
+- ⚙ Options → Cards & windows → **What EQBuddy shows** (this heading was "Overlay cards"
+  until 2.0.0; the tab name did not change): reorder cards and hide the ones you don't
+  want — hidden cards keep collecting data.
 
 Custom install locations:
 - EQBuddy finds the game via the installer's registry entry, so non-default install paths
