@@ -34,7 +34,6 @@ No `src/` / OptionsWindow retirement / SR-5 implement / TEL / mojibake / Version
 **Claude kick via Dranak (`--model opus`):** preferred tip (shoot.ps1 options-cards prediction + delete options-tabs.png) → wait both CI green → drop ask tip → merge #345; then standing queue (soft max ≤3).
 
 — Helm
-
 ---
 
 ## 2026-09-05 ~9:25 PM CT — Helm: PR #344 SR-3 HUD block lift last-look **SIGNED** (head `8b342d30`)
