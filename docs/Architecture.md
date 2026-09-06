@@ -180,8 +180,17 @@ understates it and is worth reading rather than glossing: **this tab was mostly 
 lines left `OptionsWindow.xaml` (219 → 173) and only the three stray handlers left the
 code-behind, against which the block's construction and its doc block are charged back.
 **`OptionsWindow` now declares no settings at all** — four bare hosts, a tab strip, the resize
-grips and the monitor clamp. The Evolved shell's Settings room composes the same four blocks
-under Look / Alerts / HUD / Behavior, which is SR-5.
+grips and the monitor clamp.
+
+**SR-5 spent all four blocks: `EQBuddy/SettingsRoom.cs` is the Evolved shell's seventh room,
+composing the SAME instances-per-host under Look / Alerts / HUD / Behavior** (`Core/SettingsSurface.cs`
+is the tab definition, so `ShellPages.Rooms` maps it and the address grammar reaches it like
+every other room). It is neither a move nor a lift nor a build — it is a COMPOSITION, which is
+the whole reason the four blocks came out first: the rejected alternative, a room built fresh
+beside a live `OptionsWindow`, is two copies of ~40 control wirings drifting until retirement
+day, which is #210's mechanism with a bigger surface. Four tabs here against the window's five
+(Bevel §2: *"Watch and Alerts were never two subjects"*), and **`OptionsWindow` is not retired,
+not renamed and not reshaped** — I-9's standing rule, so the two strips differ on purpose.
 
 **This block is transitional and is deliberately not built as though it will stay this size.**
 Surface A's SA-R star-retirement empties the mini-dashboard grid and the floating-window list a

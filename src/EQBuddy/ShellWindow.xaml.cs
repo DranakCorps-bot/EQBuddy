@@ -315,6 +315,11 @@ public partial class ShellWindow : Window, IFollowingSurface
             // relationship the rail has to the shell, and two ways to land on a room is
             // trap 33 lifted into navigation.
             ShellPage.Home => new HomeRoom(_main, a => Navigate(a)),
+            // SR-5, the last row of the rail. It is the most expensive room to build — four
+            // blocks, ~40 control wirings, the whole of what opening Options costs — which
+            // is precisely the argument the lazy dictionary above is built on: a shell opened
+            // to look at experience must not pay for it.
+            ShellPage.Settings => new SettingsRoom(_main),
             _ => null,
         };
         if (room is null) return null;
@@ -346,6 +351,24 @@ public partial class ShellWindow : Window, IFollowingSurface
 
     private void OnShellKey(object sender, KeyEventArgs e)
     {
+        // **Window chrome the Behavior block cannot own: ROUTING a key press to an armed
+        // hotkey recorder** (SR-1's two lines, in the second host). The block rebuilds its
+        // rows on every click, so the button that was clicked no longer exists and nothing
+        // inside that panel has focus when the gesture arrives — the press reaches the
+        // WINDOW, and the shell IS the window here. The decision stays the block's; only the
+        // route is ours, which is why nothing about gestures is parsed in this file.
+        //
+        // FIRST, ahead of Ctrl+K and Escape: while a recorder is armed those two keys are
+        // part of the gesture being recorded (Escape cancels it), and a palette that opened
+        // instead would eat the one key that gets the player out. It answers false unless a
+        // recorder is actually armed, so it is inert the rest of the time.
+        if (_rooms.TryGetValue(ShellPage.Settings, out var settings)
+            && ((SettingsRoom)settings).HandleRecordingKey(e))
+        {
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key == Key.K && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
         {
             OpenPalette();

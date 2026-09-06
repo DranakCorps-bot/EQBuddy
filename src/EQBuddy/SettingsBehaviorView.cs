@@ -68,6 +68,21 @@ internal sealed class SettingsBehaviorView
     /// than re-building, so a half-typed regen number survives a tab switch.</summary>
     public UIElement Block => _block ??= Build();
 
+    /// <summary>
+    /// This instance's facts for the <c>EQBUDDY_EXPAND</c> dump, in the block's OWN
+    /// vocabulary — see <see cref="SettingsLookView.DebugFacts"/> for why the host, not the
+    /// block, adds the prefix (trap 58) and why these are counted off BUILT controls.
+    ///
+    /// <c>behaviorHotkeys</c> is the row worth having here: the hotkey rows are the one
+    /// piece of this block a host has to help with (the key ROUTE below), so a host that
+    /// composed the block and forgot the route would have rows on screen that silently never
+    /// record — and an absent behaviour photographs as a perfectly ordinary list (trap 29).
+    /// </summary>
+    public string DebugFacts() => _block is null
+        ? ""
+        : $"behaviorHotkeys={_hotkeysPanel.Children.Count} " +
+          $"behaviorRecording={(_recordingAction is null ? 0 : 1)}";
+
     private CheckBox _mobileSounds = null!, _hideUnfocused = null!, _hideNotRunning = null!;
     private CheckBox _hideAltTab = null!, _keepAbove = null!;
     private CheckBox _truncate = null!, _archive = null!, _tutorial = null!, _perfStats = null!;

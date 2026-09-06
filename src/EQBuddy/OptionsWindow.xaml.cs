@@ -315,6 +315,29 @@ public partial class OptionsWindow : Window
     // `_main.Settings.GearChecklist` and called two `MainWindow` methods; every one of
     // those readings is on the card, which was already holding the same settings object.
 
+    /// <summary>
+    /// This window's facts for the <c>EQBUDDY_EXPAND</c> dump — the four blocks' own strings,
+    /// re-keyed mechanically under <c>options*</c>.
+    ///
+    /// **Added at SR-5, and it is the half that makes the shell's Settings room checkable at
+    /// all.** The room asks the same four blocks for the same four strings and re-keys them
+    /// under <c>shellSettings*</c>; what the E2E suite asserts is that the two agree while
+    /// both hosts are open, which is the comparison trap 58's per-host prefixing exists to
+    /// keep possible instead of colliding. It could not have been written if either side
+    /// hand-wrote its own copy of the numbers (trap 33 one level up), and a hand-written list
+    /// would stop covering a block the day it gains a fifth fact (trap 30).
+    ///
+    /// **The window prefixes too, rather than reporting the bare keys.** The blocks' keys
+    /// carry no host name, and a bare <c>hudPanels</c> would land beside the HUD bar's own
+    /// <c>hudCells</c> in a namespace that is one flat list.
+    /// </summary>
+    internal string DebugFacts() =>
+        $"optionsTab={_main.Settings.OptionsTab} " +
+        ShellDumpFacts.Prefixed("options", _look?.DebugFacts() ?? "") + " " +
+        ShellDumpFacts.Prefixed("options", _alerts?.DebugFacts() ?? "") + " " +
+        ShellDumpFacts.Prefixed("options", _hud?.DebugFacts() ?? "") + " " +
+        ShellDumpFacts.Prefixed("options", _behavior?.DebugFacts() ?? "");
+
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton == MouseButton.Left) DragMove();
