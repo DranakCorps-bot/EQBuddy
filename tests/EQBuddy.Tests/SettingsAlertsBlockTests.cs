@@ -113,18 +113,30 @@ public class SettingsAlertsBlockTests
     }
 
     /// <summary>
-    /// **`PinWatchChips` is the one that does NOT move**, and it is a deliberate non-action
-    /// rather than an oversight. "Show watch chips on the HUD" is PRESENCE, and it is the
-    /// named collision with SA-4's `MutedChipFamilies` — two switches converging on "does this
-    /// chip show". The signed split gives Settings → Alerts what-fires/sound/volume and leaves
-    /// on-screen presence to the HUD, so the shell's Alerts tab carries no presence switch at
-    /// all and whoever lands SA-4 finds ONE switch to reconcile, not two.
+    /// **`PinWatchChips` was the one control this lift did NOT move, and it is now RETIRED**
+    /// (Surface A / SA-R, Helm #341). It was left behind on purpose: "Show watch chips in the
+    /// mini dashboard" is PRESENCE, not what-fires, and it collided with the per-rule 📌 a few
+    /// pixels below it — two switches converging on "does this chip show". The reconciliation
+    /// asked for ONE, and the pin is the survivor, so the master left the v1 window rather
+    /// than arriving here.
+    ///
+    /// **This test used to assert the row STAYED, and inverting it is the point.** A guard
+    /// that says "the switch is still in the window" cannot tell a deliberate retirement from
+    /// a lift that dropped a control on the floor — which is #204/#210/#212's shape and the
+    /// thing the enumeration above exists to catch.
+    ///
+    /// The other half — that no file in `src` reads the setting except its declaration and
+    /// its one-time translation — is asserted by `WatchPinMigrationTests`, which is where the
+    /// retirement lives and which is already in the settings-file collection.
     /// </summary>
     [Fact]
-    public void ThePresenceSwitchStaysAV1OnlyRow()
+    public void ThePresenceSwitchIsRetiredFromTheWatchTab()
     {
-        Assert.Contains("x:Name=\"PinChipsCheck\"", Read("OptionsWindow.xaml"), StringComparison.Ordinal);
-        Assert.Contains("OnPinChipsChanged", Read("OptionsWindow.xaml.cs"), StringComparison.Ordinal);
+        // The DECLARATIONS, not the word: the comments those two files now carry name the
+        // retired control on purpose, because a tombstone that cannot say what it buries is
+        // not a tombstone (trap 2's precedent for recording a guard leaving with its subject).
+        Assert.DoesNotContain("x:Name=\"PinChipsCheck\"", Read("OptionsWindow.xaml"), StringComparison.Ordinal);
+        Assert.DoesNotContain("void OnPinChipsChanged", Read("OptionsWindow.xaml.cs"), StringComparison.Ordinal);
 
         var view = Read("SettingsAlertsView.cs");
         Assert.DoesNotContain("_vm.PinWatchChips", view, StringComparison.Ordinal);

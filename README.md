@@ -233,7 +233,8 @@ Watch rules & alerts — see the **[full Watch List guide](docs/WatchListGuide.m
 screenshots and a use-case cookbook for every rule kind:
 - ⚙ Options → **Watch rules**: add simple match texts (e.g. `mote`) — the 🎯 Tracked
   card shows every matching item name, quantities, and per-hour rates (wall-clock and
-  active-play). 📌 pins a chip to the mini dashboard; 🔔 and the sound box fire a
+  active-play). 📌 pins a chip to the mini dashboard, and it is the whole switch for that;
+  🔔 and the sound box fire a
   focus-safe banner and/or sound the moment a matching item drops. A rule has a short *name* and a
   *match text* — if you only fill in the name, it doubles as the match text, so
   typing just `Ghoul` on a Kill rule works. The alert banner is a **floating tile**

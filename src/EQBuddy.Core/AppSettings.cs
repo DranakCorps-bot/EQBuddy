@@ -316,14 +316,35 @@ public sealed class AppSettings
     /// <summary>Position of the floating alert tile; NaN = above the widget.</summary>
     public double AlertLeft { get; set; } = double.NaN;
     public double AlertTop { get; set; } = double.NaN;
-    /// <summary>Master switch for watch chips in the mini dashboard. Which rules appear is
-    /// then per-rule (<see cref="TrackedRule.Pinned"/>): showing every enabled rule was
-    /// all-or-nothing, and a mini bar with eight chips on it isn't a mini bar.</summary>
+    /// <summary>
+    /// RETIRED (Surface A / SA-R, 2026-09-05) — the master switch for watch chips in the
+    /// mini dashboard. It answered "does this chip show" and so did
+    /// <see cref="TrackedRule.Pinned"/> beside it, which is the two-switches-one-question
+    /// shape Helm's #341 sign told this lane to reduce to one. The pin is the one that
+    /// survived: it is per-rule, it is already on the rule row in Options → Watch rules, and
+    /// it is the switch the Evolved shell's Alerts tab carries.
+    ///
+    /// <b>Kept as a property because the retirement has to READ it once.</b> Deleting it
+    /// outright would drop the value out of every existing <c>settings.json</c> on the next
+    /// parse, and a player who had unticked the box would get their chips back with nothing
+    /// having asked them — the SA-1 lesson (<see cref="MigratePromotedHudStats"/>: read the
+    /// switch BEFORE stripping it). <c>UI.Shared.WatchPinMigration</c> is the last reader;
+    /// after its one-time pass this value is inert and nothing on any surface consults it,
+    /// the same "left inert" treatment <c>SpawnLeft</c>/<c>SpawnTop</c> got at the World fold.
+    /// </summary>
     public bool PinWatchChips { get; set; }
     /// <summary>Whether the one-time "pin everything you were already seeing" pass has run.
     /// A flag rather than inferring it from "nothing is pinned", so deliberately unpinning
     /// every rule isn't undone at the next launch.</summary>
     public bool WatchPinsMigrated { get; set; }
+    /// <summary>Has the one-time pass that translates <see cref="PinWatchChips"/> into
+    /// per-rule <see cref="TrackedRule.Pinned"/> state run? (Surface A / SA-R.)
+    ///
+    /// <b>A flag rather than inferring it from the value</b>, for the reason
+    /// <see cref="HudStatsPromoted"/> gives at length: the pass writes the very state it
+    /// would have to read to decide whether it had already run, so a second run would read
+    /// its own output as a player's choice. Trap 55 in one sentence.</summary>
+    public bool WatchChipMasterRetired { get; set; }
     /// <summary>Has the one-time <see cref="MigrateWindowHeights"/> clear run? See there
     /// for why every stored window height written before 2026-08-25 is discarded.</summary>
     public bool WindowHeightsReset { get; set; }

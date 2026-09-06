@@ -105,7 +105,9 @@ More Log-text patterns:
 - **Per-rule sounds** are the point: learn what happened *by ear*. "Default" follows
   the shared sound, "Off" is silent, "Custom…" takes your .wav/.mp3. Check the
   **Alert volume** slider if things seem quiet.
-- **📌 pin** puts the rule's count in the mini dashboard; **🔔** controls the banner.
+- **📌 pin** puts the rule's count in the mini dashboard, and it is the only switch for
+  that — the master "Show watch chips in the mini dashboard" checkbox retired into it.
+  **🔔** controls the banner.
 - Counts are **per session** (a session ends after 60 quiet minutes); history keeps
   old sessions' totals.
 - Alerts have a short cooldown so a loot flurry doesn't machine-gun you; counts always
