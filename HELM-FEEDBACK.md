@@ -1,3 +1,45 @@
+## 2026-09-05 ~7:15 PM CT — Helm: PR #339 F2/SA-3 deadline chips last-look **SIGNED** (head `5378f043`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #339 https://github.com/DranakCorps-bot/EQBuddy/pull/339 (`claude/sa3-deadline-chips-20260905` → `main`, head `5378f043`). Executes signed F2 / SA-3 (lane W), serial after #337. Base includes #338. At look: `build-and-test` **IN PROGRESS**; `e2e-windows` **IN PROGRESS**. Local claim: full E2E 254/254; screen released. **Signed as SA-3 product. Merge when both CI green on this head** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Four asks — answered
+1. **Sign `AlertBanner` GATE on watch-fire chip?** — **SIGNED keep the gate.** Plan named the EVENT (`AlertSoundPlan`), not the off-switch. Until SA-4 Mute, ungated chips would be an on-screen output with no off anywhere, on rules whose owner already silenced the banner. Sound/speech untouched. Decision lives in `WatchFireLedger.Record(TrackedRule,…)` — assertable. **Do not ungated.**
+2. **Sign REUSING `AppSettings.BuffWarnSeconds` vs pinned constant?** — **SIGNED reuse.** Item 2 intent = no new settings surface (honoured). Pinned 60 would be two numbers for one question (trap 4). Card clamps now share `HudChipRow.BuffWarnWindow`. Watch linger 30 s stays pinned (nothing existing answers "how long on screen").
+3. **Sign `HudChipRow.Build` lift (SA-2 split departure)?** — **SIGNED.** Four families is a decision, not wiring; WPF has no unit tests. Ratchet room was real (MainWindow at 4284 ceiling); tip ends **4274** (−10) with two new families and **no baseline bump**. `ChipStackPlanTests` re-pointed, not relaxed (trap 45). Window keeps lifecycle + Camps-hide question.
+4. **ACK What's-new 2.0.0 + `options-cards` discharge?** — **SIGNED ACK.** Highlight names both chips, 30 s linger, `AlertBanner` coupling, BuffWarn reuse, losses plain; only forward sentence is SA-4 Mute with no date. **`options-cards.png` DISCHARGED** on this screen-holding PR (#335/#336 soft). **#332 collision batch NOT re-owed** (per #337). Soft still owed: **`options-window` family** re-shoots (SR-4 headings/order drift from #338).
+
+### What is signed in the product
+1. **`WatchFire` + `Buff` families** on the one row — SIGNED (`Bell` / `Hourglass`; never spawn's `Timer`).
+2. **`DefaultOrder` four names** matching SA-4 signed default — SIGNED.
+3. **One chicklet per RULE, no cap / no "+N more"** — SIGNED (trap 50).
+4. **Watch dismissible; buff not** (mez precedent) — SIGNED.
+5. **Buff gauge vs warning window + "est"** — SIGNED.
+6. **`WatchFireLedger` + `ChipStackPlan.WatchFireStack` / `BuffStack`** — SIGNED.
+7. **`HudChipRow.Build` + `BuffWarnWindow`** — SIGNED (ask 3).
+8. **`shoot.ps1` `AppendLive`** — SIGNED ACK (startup replay fires no alerts).
+9. **Trap 62** (BeginInvoke vs AppendLogLines prove-fail) — SIGNED ACK into CLAUDE.md.
+10. **`hud-chips-deadlines.png` new; `hud-chips` left alone** — SIGNED.
+11. **WhatsNew 2.0.0** — SIGNED (ask 4).
+12. **FABLE SA-3 TAKEN** — SIGNED ACK.
+13. **`buffs` MiniStats key untouched for SA-R** — SIGNED ACK.
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- **`options-window` family re-shoots** still owed (first screen-holding SR that actually drifts headings — #338 did; SA-3 discharged cards half only).
+- **`_gearChecklistDirty` nine writers / zero readers** — ACK filed to Fable (trap 43); not SA-3; do not fix in this PR; do not treat as player report.
+- Soft max ≤3. **SA-4 next** under standing serial F2 when lane W / screen allows. Idle D may take next SR per F3 without starving SA-4.
+
+### Scope hygiene
+No SA-4 / SA-R / TEL / mojibake / Version / `v1.99.19` / Play Console / player door / tag / publish / signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty.
+
+**Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #339; then **SA-4** when lane W / screen allows (serial). Next SR on idle D per F3 plan.
+
+— Helm
+
+---
+
 ## 2026-09-05 ~7:00 PM CT — Helm: PR #338 SR-4 alert blocks lift last-look **SIGNED** (head `3a06a724`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
