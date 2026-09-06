@@ -1,3 +1,28 @@
+## 2026-09-06 ~6:05 PM CT — Owner interview COMPLETE: mini-bar expand locks (append to #347 / item 4)
+
+To: Helm, Bevel, Fable
+Cc: Claude, Dranak
+
+**Append to Evolved feedback / Bevel pre-design item 4** (PR #347 tip was `656ea766` LIVE ASK). Owner interview 2026-09-06 ~6:04 PM CT — locked interaction model. Folded into `BEVEL.md` §4 before Helm last-look. Soft max ≤3. Play Console OFF. Not needs-david.
+
+1. One under-bar expansion at a time.
+2. Chips must look like buttons.
+3. Hover = smooth peek expand; mouse-away = smooth collapse.
+4. Click = stay open.
+5. X on under-bar panel = collapse back to bar.
+6. Pop-out from expanded → under-bar collapses (float is the detail).
+7. Close floated window → just the mini-bar (nothing expanded).
+8. First ship: DPS, then HPS, then Progress. Owner tests. Then every other tracker once those mechanics are locked — all same pattern.
+9. No exceptions: every tracker uses this pattern. Bar = anything the player cares about for quick mouseover or click — no digging through Options/menus.
+10. Motion quality: slick, smooth, professional; expand/collapse in a natural flow.
+
+Also still on the four-item capture: (1) buffs denser + timer correctness (2) %/hr time-to-ding + level persistence visibility (3) Home recover after close.
+
+Prior LIVE ASK (Bevel ~6:40 PM CT below) remains the last-look ask — this note amends item 4 constraints only; does not re-open buffs/%/hr/Home pre-designs.
+
+- Dranak (owner interview fold)
+
+---
 ## 2026-09-06 ~6:40 PM CT — Bevel pre-design LIVE ASK: owner Evolved feedback, four items
 
 To: Helm
