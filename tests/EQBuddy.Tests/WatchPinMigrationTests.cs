@@ -24,9 +24,22 @@ namespace EQBuddy.Tests;
 [Collection(SettingsFileCollection.Name)]
 public class WatchPinMigrationTests
 {
-    private static AppSettings Settings(bool migrated, bool groupPin, params TrackedRule[] rules)
+    /// <param name="retired">Whether the SA-R retirement pass has already run. Defaults to
+    /// TRUE for the #253 tests below, which are about the promotion pass alone: leaving it
+    /// false would let the retirement unpin every rule underneath their assertions, and a
+    /// test that quietly exercises two passes proves neither.</param>
+    private static AppSettings Settings(bool migrated, bool groupPin, params TrackedRule[] rules) =>
+        Settings(migrated, groupPin, retired: true, rules);
+
+    private static AppSettings Settings(
+        bool migrated, bool groupPin, bool retired, params TrackedRule[] rules)
     {
-        var s = new AppSettings { WatchPinsMigrated = migrated, PinWatchChips = groupPin };
+        var s = new AppSettings
+        {
+            WatchPinsMigrated = migrated,
+            PinWatchChips = groupPin,
+            WatchChipMasterRetired = retired,
+        };
         s.TrackedRules.AddRange(rules);
         return s;
     }
@@ -91,6 +104,117 @@ public class WatchPinMigrationTests
         Assert.False(s.PinWatchChips);
     }
 
+    // ---- Surface A / SA-R: the group pin's retirement ----
+
+    /// <summary>
+    /// THE RETIREMENT ITSELF: a player who had the master unticked keeps an empty bar, and
+    /// the way that survives the switch's removal is per-rule unpins.
+    ///
+    /// Without this the setting's disappearance would hand every one of those players their
+    /// chips back with nothing having asked them — the SA-1 lesson (read the switch before
+    /// stripping it) with a bool instead of a list.
+    /// </summary>
+    [Fact]
+    public void AnUntickedMasterBecomesPerRuleUnpins()
+    {
+        var s = Settings(migrated: true, groupPin: false, retired: false,
+            new TrackedRule { Name = "mine", Enabled = true, Pinned = true },
+            new TrackedRule { Name = "also mine", Enabled = false, Pinned = true });
+
+        WatchPinMigration.Apply(s);
+
+        Assert.True(s.WatchChipMasterRetired);
+        Assert.All(s.TrackedRules, r => Assert.False(r.Pinned));
+    }
+
+    /// <summary>A TICKED master changes nothing at all: those rules keep the pins they had,
+    /// so the bar the launch after the upgrade is the bar from the launch before.</summary>
+    [Fact]
+    public void ATickedMasterLeavesEveryPinAlone()
+    {
+        var s = Settings(migrated: true, groupPin: true, retired: false,
+            new TrackedRule { Name = "shown", Enabled = true, Pinned = true },
+            new TrackedRule { Name = "hidden", Enabled = true, Pinned = false });
+
+        WatchPinMigration.Apply(s);
+
+        Assert.True(s.TrackedRules[0].Pinned);
+        Assert.False(s.TrackedRules[1].Pinned);
+    }
+
+    /// <summary>
+    /// **ORDER, and it is the whole correctness argument.** A profile that has never run the
+    /// #253 promotion is about to have its master turned ON by it — a brand-new one included,
+    /// since <c>ApplyDefaultRules</c> has just added the pinned CC-broke rule — so the
+    /// <c>false</c> sitting in <c>PinWatchChips</c> at that moment is a DEFAULT, not a choice.
+    /// Retiring first would read it as a choice and empty the mini bar of every fresh install.
+    /// </summary>
+    [Fact]
+    public void AProfileThatNeverMigratedIsPromotedBeforeItIsRetired()
+    {
+        var s = Settings(migrated: false, groupPin: false, retired: false,
+            new TrackedRule { Name = "CC broke", Enabled = true, Pinned = true },
+            new TrackedRule { Name = "user's own", Enabled = true, Pinned = false });
+
+        WatchPinMigration.Apply(s);
+
+        Assert.True(s.PinWatchChips, "the promotion ran first and turned the master on");
+        Assert.All(s.TrackedRules, r => Assert.True(r.Pinned));
+    }
+
+    /// <summary>Running it twice is running it once — for the retirement as much as for the
+    /// promotion, and the flag is what makes that true. Re-pinning a rule after the pass must
+    /// stick: a second run that re-read <c>PinWatchChips</c> would unpin it again, forever,
+    /// which is trap 55's migration-re-deciding-on-its-own-output shape.</summary>
+    [Fact]
+    public void ASecondRunDoesNotUndoAPinTheRetirementJustCleared()
+    {
+        var s = Settings(migrated: true, groupPin: false, retired: false,
+            new TrackedRule { Name = "r", Enabled = true, Pinned = true });
+        WatchPinMigration.Apply(s);
+        s.TrackedRules[0].Pinned = true;   // the player pins it again afterwards
+
+        WatchPinMigration.Apply(s);
+
+        Assert.True(s.TrackedRules[0].Pinned);
+    }
+
+    /// <summary>
+    /// **The setting is retired, so nothing outside these two files may read it.** The
+    /// property survives on <c>AppSettings</c> for exactly one reason — this migration has to
+    /// read it once — and a setting that outlives its retirement is precisely how a second
+    /// switch grows back on the question the retirement existed to leave with one answer.
+    ///
+    /// **Comment lines are skipped, deliberately.** Four files carry a tombstone naming what
+    /// left them and where it went; that is the trap-26 bookkeeping a fold owes, and a scan
+    /// that forbade the NAME would make writing one impossible (trap 2's tombstone had to
+    /// un-backtick its dead files for the same reason).
+    /// </summary>
+    [Fact]
+    public void NothingOutsideTheMigrationReadsTheRetiredMasterSwitch()
+    {
+        var src = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
+        var mine = Path.GetFileName(typeof(WatchPinMigration).Name) + ".cs";
+
+        var offenders = Directory
+            .EnumerateFiles(src, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
+                     && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}"))
+            .Where(f => Path.GetFileName(f) != mine
+                     && Path.GetFileName(f) != $"{nameof(AppSettings)}.cs")
+            .Where(f => File.ReadAllLines(f).Any(line =>
+                line.Contains(nameof(AppSettings.PinWatchChips), StringComparison.Ordinal)
+                && !line.TrimStart().StartsWith("//", StringComparison.Ordinal)))
+            .Select(Path.GetFileName)
+            .ToList();
+
+        Assert.True(offenders.Count == 0,
+            "PinWatchChips retired in Surface A / SA-R. Only its declaration and this "
+            + "migration's one-time translation may read it; these files read it in code, "
+            + "which is the second switch coming back: " + string.Join(", ", offenders));
+    }
+
     /// <summary>The widget must CALL the shared migration and may not keep its own copy.
     ///
     /// **Two hand copies of one migration is the condition that produced #253 — and with
@@ -109,5 +233,8 @@ public class WatchPinMigrationTests
 
         Assert.Contains("WatchPinMigration.Apply(", text);
         Assert.DoesNotContain("WatchPinsMigrated", text);
+        // Same rule for SA-R's flag: an inlined retirement would be invisible to every test
+        // above for exactly the same reason.
+        Assert.DoesNotContain("WatchChipMasterRetired", text);
     }
 }

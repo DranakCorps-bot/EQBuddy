@@ -3453,9 +3453,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                        !_settings.DisabledBreakouts.Contains(kind.ToString())
                        && (BreakoutPresentation.StarKey(name) is not { } star
                            || _settings.MiniStats.Contains(star))
+                       // A pinned rule is the WHOLE Watch condition since SA-R — see WatchPinMigration.
                        && (!BreakoutPresentation.NeedsPinnedRule(name)
-                           || (_settings.PinWatchChips
-                               && _settings.TrackedRules.Any(r => r.Enabled && r.Pinned)));
+                           || _settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
             _breakouts.TryGetValue(kind, out var w);
             if (want)
             {

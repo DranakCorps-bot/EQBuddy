@@ -35,11 +35,15 @@ namespace EQBuddy;
 /// never loads settings for itself, because a second snapshot would clobber the first one
 /// wholesale on its next save.
 ///
-/// **What is deliberately NOT here: <c>PinWatchChips</c>.** "Show watch chips on the HUD" is
-/// presence, not what-fires, and it is the named collision with SA-4's `MutedChipFamilies` —
-/// two switches converging on "does this chip show". The signed split gives Settings → Alerts
-/// what-fires/sound/volume and leaves on-screen presence to the HUD, so that row stays a
-/// v1-`OptionsWindow`-only control and whoever lands SA-4 reconciles ONE switch, not two.
+/// **<c>PinWatchChips</c> was the one control this lift deliberately left behind, and it is
+/// now RETIRED rather than pending** (Surface A / SA-R, Helm #341). "Show watch chips in the
+/// mini dashboard" was presence, not what-fires — and so is the per-rule 📌 sitting a few
+/// pixels away on every rule row in the Watch block below. Two switches, one question, which
+/// is what the reconciliation asked to reduce to one; the pin is the survivor, because it is
+/// the finer-grained of the two and the only one BOTH hosts can carry. So this file gained no
+/// presence switch: the master left the v1 window instead, and
+/// <c>UI.Shared.WatchPinMigration</c> translates an unticked master into per-rule unpins once
+/// so nobody's HUD changes under them.
 /// </summary>
 internal sealed class SettingsAlertsView
 {

@@ -1091,7 +1091,7 @@ $Shots = [ordered]@{
     # chips, Motes and Ghouls. Seven cells; a bar with a dps reading TWICE on it is the
     # failure this names in advance.
     #
-    # THE PIN IS SEEDED EXPLICITLY, and it had to be. This shot's chips were being
+    # THE PINS ARE SEEDED EXPLICITLY, and they had to be. This shot's chips were once being
     # produced by a BUG, not by its staging: `Write-Settings` sets `WatchPinsMigrated`,
     # so `WatchPinMigration` skips and `PinWatchChips` stays at its default false — but
     # until 2026-08-31 the "any per-rule pin turns on the group pin" line sat ABOVE that
@@ -1100,12 +1100,21 @@ $Shots = [ordered]@{
     # noticed, because the committed PNG was last taken on 2026-08-24. Trap 22 exactly:
     # a surface with no fixture state photographs as an unremarkable bar, and the
     # sentence beside it in the tour goes on promising chips.
+    #
+    # `PinWatchChips = $true` left this staging in Surface A / SA-R: the master retired and
+    # the per-rule 📌 below is the whole switch, so the two `Pinned = $true` lines are now the
+    # entire reason the two chips are on the bar. The PREDICTION is unchanged at seven cells —
+    # which is the point, because that master was ON here.
+    # RE-SHOT 2026-09-05, 705x40: BYTE-IDENTICAL to the committed PNG (md5 725584fc…), which
+    # is the finding rather than a formality. Seven cells exactly as predicted — Testchar,
+    # 13 dps, 14.5%/hr, then 82 (kills) and 39 (loot), then "Motes 1" and "Ghouls 2" — with
+    # dps read ONCE. The two chips now reach the bar through the 📌 alone, and the picture
+    # cannot tell, which is what the retirement promised players.
     'mini-tour'       = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','loot')
-                                    PinWatchChips = $true
                                     TrackedRules = @(
                                         @{ Id = 'shot-mote'; Name = 'Motes'
                                            Pattern = 'mote'; Kind = 0; Pinned = $true }
@@ -1791,6 +1800,12 @@ function Write-Settings([hashtable]$extra) {
         ShowTutorial = $false
         LastSeenVersion = $version
         WatchPinsMigrated = $true
+        # BOTH one-time watch-pin passes marked done, for the same reason. SA-R's retirement
+        # translates an unticked master into per-rule unpins, and a seeded profile leaves
+        # PinWatchChips at its default false — so without this every shot's seeded 📌 would be
+        # cleared before the bar rendered, and the picture would be of a real state that is
+        # not the state the shot is about (trap 23).
+        WatchChipMasterRetired = $true
         # No chip windows floating over the capture, and no log rewriting under it.
         TrackSpawns  = $false
         TruncateLogs = $false

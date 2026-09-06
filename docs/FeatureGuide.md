@@ -321,10 +321,11 @@ original immediate behaviour, so nothing changes for rules that don't set it.
 - The duration has to come from you: EQ Legends never logs how long a spell lasts, so a
   25 s reminder will be wrong once the spell is upgraded.
 
-**📌 per rule** puts that rule on the mini dashboard. The Options checkbox is the master
-switch for chips; the pin on each rule row decides which ones appear, so a busy rule list
-doesn't turn the mini bar into a wall. Installs that had chips on before this was per-rule
-get every enabled rule pinned, matching what they already saw.
+**📌 per rule** puts that rule on the mini dashboard, and it is the whole switch — the pin
+on each rule row decides which rules appear, so a busy rule list doesn't turn the mini bar
+into a wall. There used to be an "Show watch chips in the mini dashboard" checkbox under
+the rule list as well; it retired, because it and the pin answered the same question. If
+you had it unticked, your rules were unpinned once to match, so nothing changed on screen.
 
 **Alerts:** 🔔 banner + a **per-rule sound**, 5 s per-rule cooldown. Each rule's sound box
 offers `Off` (silent), `Default` (follow the shared choice), any built-in, or `Custom…`

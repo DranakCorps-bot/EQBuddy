@@ -293,11 +293,15 @@ internal sealed class HudBarView
         }
 
         // Per-rule pins: only the rules you picked (📌 in Options), not every enabled one.
-        // The master toggle still gates the lot, so turning chips off is one click.
+        //
+        // THE MASTER TOGGLE IS GONE (Surface A / SA-R). `AppSettings.PinWatchChips` gated
+        // this loop as well, which made two switches answer one question — "does this chip
+        // show" — with the pin already on the rule row and already the only one the Evolved
+        // shell's Alerts tab carries. Helm's #341 sign was to reduce them to one, and the
+        // pin is the survivor. `WatchPinMigration.RetireGroupPin` translates an unticked
+        // master into per-rule unpins once, so nobody's bar changes under them.
         var due = _cuesDue(DateTime.Now);
-        foreach (var rule in _settings.PinWatchChips
-                     ? _settings.TrackedRules.Where(r => r.Enabled && r.Pinned)
-                     : [])
+        foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
         {
             var name = rule.Name.Length > 0 ? rule.Name : rule.Pattern;
             var result = s.Tracked.FirstOrDefault(t => t.Id == rule.Id);

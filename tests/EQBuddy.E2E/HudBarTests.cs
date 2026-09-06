@@ -23,11 +23,12 @@ public sealed class HudBarTests
     /// One cell per starred stat, and one per PINNED watch rule — the two things the bar
     /// is built from.
     ///
-    /// Trap 22 governs the staging: the built-in rules ship pinned, so leaving
-    /// <c>PinWatchChips</c> at its default would make the count depend on how many
-    /// built-ins the current version happens to ship. Both halves are seeded explicitly
-    /// instead, and the pinned rule is seeded ON so the watch-chip arm is exercised
-    /// rather than merely not contradicted.
+    /// Trap 22 governs the staging: the built-in rules ship pinned, so letting
+    /// <c>ApplyDefaultRules</c> run would make the count depend on how many built-ins the
+    /// current version happens to ship. Both halves are seeded explicitly instead, and the
+    /// rule is seeded PINNED so the watch-chip arm is exercised rather than merely not
+    /// contradicted. **The 📌 is the whole switch since Surface A / SA-R** — the
+    /// <c>PinWatchChips</c> master that used to gate it beside the pin has retired.
     ///
     /// Every breakout kind is disabled: starring dps/loot while minimized is exactly
     /// what opens those windows, and the point here is the bar, not its satellites.
@@ -41,7 +42,6 @@ public sealed class HudBarTests
             settings.MiniStats = ["kills", "dps", "loot"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
-            settings.PinWatchChips = true;
             // The built-in "CC broke" rule ships PINNED, so a profile that lets
             // ApplyDefaultRules run would put a chip on the bar this test never asked
             // for — and the count would then track however many built-ins the current
@@ -64,7 +64,13 @@ public sealed class HudBarTests
     }
 
     /// <summary>Un-pinning is the other direction, and it is the one a refactor drops
-    /// silently: the stars keep drawing, so the bar still looks right.</summary>
+    /// silently: the stars keep drawing, so the bar still looks right.
+    ///
+    /// **It reaches the bar through the 📌 now, not through the retired master.** Until
+    /// Surface A / SA-R this seeded an ENABLED, PINNED rule and a <c>PinWatchChips</c> of
+    /// false, so it proved the master's arm and never the pin's — the assertion is the same
+    /// number for a different reason, which is the thing to say out loud rather than leave
+    /// for the next reader to work out from a diff.</summary>
     [Fact]
     public void UnpinnedWatchRulesPutNothingOnTheBar()
     {
@@ -74,13 +80,12 @@ public sealed class HudBarTests
             settings.MiniStats = ["kills"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
-            settings.PinWatchChips = false;
             settings.DefaultRulesVersion = int.MaxValue;   // see the note above
             settings.TrackedRules.Clear();
             settings.TrackedRules.Add(new TrackedRule
             {
                 Id = "hud-bar-unpinned", Name = "Harness Unpinned", Kind = WatchKind.Loot,
-                Pattern = "Harness Test Widget", Pinned = true, AlertBanner = false,
+                Pattern = "Harness Test Widget", Pinned = false, AlertBanner = false,
             });
         });
         app.Launch();
@@ -110,7 +115,6 @@ public sealed class HudBarTests
             settings.MiniStats = ["kills"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
-            settings.PinWatchChips = false;
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();
         });

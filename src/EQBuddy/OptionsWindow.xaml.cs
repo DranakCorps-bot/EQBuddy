@@ -31,7 +31,6 @@ public partial class OptionsWindow : Window
         SourceInitialized += (_, _) => ClampToMonitor();
         LocationChanged += (_, _) => ClampToMonitor();
 
-        PinChipsCheck.IsChecked = _vm.PinWatchChips;
         TargetDropsCheck.IsChecked = _vm.ShowTargetDrops;
         DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
         SelectTab(_main.Settings.OptionsTab);
@@ -91,9 +90,10 @@ public partial class OptionsWindow : Window
     private SettingsAlertsView? _alerts;
 
     /// <summary>
-    /// The v1 arrangement, rebuilt from the lifted blocks: Watch keeps its own tab (with the
-    /// <c>PinWatchChips</c> row XAML still declares beneath it), and the Alerts tab stacks the
-    /// shared sound header over Buffs, Spawns and Crowd.
+    /// The v1 arrangement, rebuilt from the lifted blocks: Watch keeps its own tab — and since
+    /// Surface A / SA-R that tab is nothing BUT the block, the <c>PinWatchChips</c> row having
+    /// retired — and the Alerts tab stacks the shared sound header over Buffs, Spawns and
+    /// Crowd.
     ///
     /// **Order and headings come from <see cref="AlertSurface"/>, not from this file** — the
     /// first spend of a definition that has been sitting unused since before the pivot, and
@@ -212,10 +212,8 @@ public partial class OptionsWindow : Window
     /// block that owns it.</summary>
     internal void SyncTrackSpawns(bool on) => _alerts?.SyncTrackSpawns(on);
 
-    private void OnPinChipsChanged(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.PinWatchChips = PinChipsCheck.IsChecked == true;
-    }
+    // OnPinChipsChanged retired with PinChipsCheck in Surface A / SA-R — see the Watch tab's
+    // comment in OptionsWindow.xaml for where that switch went.
 
     private void OnWindowChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
