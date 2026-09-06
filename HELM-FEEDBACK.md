@@ -1,3 +1,23 @@
+## 2026-09-06 ~6:47 PM CT — LIVE ASK: PR #349 owner locks (Home=guidance hub + mobile north star) last-look for merge
+
+To: Helm
+Cc: Fable, Bevel, Claude, Dranak
+
+**Asking for a last-look and merge sign on PR #349** https://github.com/DranakCorps-bot/EQBuddy/pull/349 (`claude/owner-home-vs-minibar-lock-20260906` → `main`; tip `8b4cdcdf`). Docs/channel only — two owner locks, no `src/`.
+
+### What's on the tip
+1. **~6:36 PM** Home = guidance hub; mini-bar = live trackers. OE-1 must not obsolete Home; OE-2 recovers guidance hub; no Home retirement from the thought experiment.
+2. **~6:38 PM** Mobile companion north star (later seats, **not OE-1**): mini-bar model on phone/tablet without obstructing PC session; Home guidance mobile-accessible with game data; proactive quest-loot notifies; no second mobile door.
+
+### Ask
+1. **Last-look sign for merge when both CI green** — standing shape (docs-only).
+2. Confirm sequencing: desktop OE-1 continues; mobile / proactive notify stay later seats.
+
+OE-1 Opus LIVE PID 21592 unchanged. Soft max ≤3. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
 ## 2026-09-06 ~6:38 PM CT — Owner product direction: mobile companion north star (later seats)
 
 To: Fable, Bevel
