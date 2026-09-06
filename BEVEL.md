@@ -1,5 +1,224 @@
-﻿# Bevel inbox
+# Bevel inbox
 
+## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — four pre-designs (Bevel)
+
+**Priority:** (3) Home/shell recovery = `must-fix`; (1) buff density = `approved` IA, (1) timer
+correctness = `waiting` (no reproduction yet); (2) `approved`; (4) `approved` (owner-locked
+intent, IA below is the shape, not a re-litigation).
+**Source:** David via Helm, Sun 2026-09-06 ~5:49 PM CT (`HELM-FEEDBACK.md` this date). Evolved
+local shell, Play Console off. Verified against tip `75faf324` + this branch's own capture
+commit `ae806b13` — no product code on this branch, so "verified" below means read-from-source,
+not run-and-observed.
+**Checked:** full source read of `BuffTracker.cs`, `MainWindow.xaml.cs` (buff/xp/breakout
+paths), `HudChipRow.cs`, `HudGlance.cs`, `HudBarView.cs`, `SessionStats.cs`,
+`ProgressPresentation.cs`, `QuestLedgerStore.cs`, `LogParser.cs`, `HomeReadout.cs`,
+`HomeRoom.cs`, `IShellRoom.cs`, `ShellWindow.xaml.cs`, `ShellHost.cs`, `ShellPages.cs`,
+`ThemeHost.cs`, `BreakoutWindow.xaml.cs`, `AppSettings.cs`, `DECISIONS.md`. Not run against the
+live app this pass — no screenshot for item 1's timer complaint either; that half stays a
+reproduction request, not a diagnosis.
+**Out (confirmed honored below):** no OptionsWindow retirement, no TEL, no Play Console, no
+player-door code, no seats invented for Fable.
+
+---
+
+### 1. Buffs — density IA + a timer-correctness checklist (not a fix, because there's nothing to reproduce yet)
+
+**Place:** `src/EQBuddy/MainWindow.xaml.cs:1406-1519` (`RenderBuffs`) is the surface the owner
+means — a `Grid` per buff, two columns (name `Star`, clock `Auto`), `Margin(0,1,0,1)`, **no
+icon**. This is a different surface from the HUD's buff-*expiring* chip
+(`src/EQBuddy.UI.Shared/HudChipRow.cs:513-578`, `BuffChips`), which already carries an icon +
+draining gauge but only appears once a buff enters `BuffWarnWindow` — it is not the always-on
+list. Do not fold these into one recommendation; they solve different jobs (glance-while-fading
+vs. full roster).
+
+**Density — verified, there is no compact mode today.** `AppSettings.cs:175-204,597-625` has
+exactly two buff-adjacent settings — `BuffTimersExpiringOnly`, `BuffWarnSeconds` — neither
+touches row height or layout. The row is already tight (1px margin, no icon) and still reads as
+"needs to be far more compact" to the owner, so the lever isn't margin — it's **shape**. The
+current list is one column, one buff per row, full width. Recommend: **wrap the roster into a
+multi-column chip grid** (name + timer as one compact chip, `WrapPanel`-based per trap 25 —
+never a horizontal `StackPanel`, which clips silently) so N buffs fill the card's width before
+they grow its height. This is the same move the HUD chip family already uses for a *different*
+buff surface; reusing `HudChipRow`'s visual language (without its warn-window gate) gives the
+full list a consistent, already-compact building block instead of inventing a second chip style.
+**Hypothesis, not yet designed in full:** whether the "est" suffix and duration source (below)
+still fit inside a chip at that density, or need to move to a tooltip — flag for the follow-up
+pass once a screenshot exists to measure against.
+
+**Timers — do not change anything yet; get the reproduction first.** No trap entry, no
+`CLAUDE.md` line, and no test names a buff-timer bug — this is a first report, from memory, with
+no screenshot. What IS verified, so the next report can be triaged fast: `BuffState.ExpiresAt`
+is set **once**, at landing (`BuffTracker.cs:203-230`), from (in order) a per-character *learned*
+duration persisted from a past natural fade, else the wiki `BuffDurations.json` base times the
+player's Spell Casting Reinforcement AA bonus (own casts only), else — if the spell can't be
+resolved to one candidate — the **longest** matching candidate, marked `Estimated = true` ("est"
+suffix). Every render just re-evaluates `(ExpiresAt - now)`; it never re-derives the duration.
+So a "wrong" timer has exactly four possible sources, and the report needs to say which:
+(a) an `Estimated` duration picked the wrong (longest) candidate for an ambiguous spell name,
+(b) the Reinforcement AA rank read for that character is wrong, inflating every one of that
+character's own-cast buffs by a fixed ratio, (c) a *learned* duration from a previous fade was
+captured off a laggy fade event and is now systematically short/long, (d) a **refresh before
+expiry** (recasting a buff that's still up) doesn't reset `ExpiresAt` correctly — worth checking
+`OnLanding`'s re-entry behavior specifically, since that's the one path this reading did not
+trace end-to-end.
+**Recommend:** ask David for one screenshot with the buff name, the shown countdown, and — if
+knowable — the actual remaining time, before any code changes. This is exactly the shape
+`SCRIBE.md`/`BEVEL.md`'s own rule already states: a hypothesis is a place to look, not a fact,
+and here there isn't even a hypothesis to test yet, only four candidate mechanisms.
+
+---
+
+### 2. %/hr + level — the ETA already exists and isn't on the surface the owner is looking at; level tracking exists and is invisible by design
+
+**Place:** `SessionStats.cs:1937-1940` (`XpPerHour`, `HoursToLevel`), rendered as prose in
+`ProgressPresentation.cs:20,43,62-66` (`"Next level in ~2h 15m at this pace"`). The mini-bar/HUD
+glance chip is a *different* file — `src/EQBuddy.UI.Shared/HudGlance.cs` — and its `ThirdText`
+(line 152) shows only `"{XpPerHour:0.0}%/hr"`, no ETA. **Verified: the calculation the owner is
+asking for is not missing from the codebase — it's missing from the compact surface they're
+reading.** The full sentence already lives one hop away, in the Progress room/window.
+
+**The reachability gap, verified, is why it reads as absent.** `HudBarView.cs:249-259` wires the
+xp chip's *double-click* to open Progress, but that gesture is gated on
+`AppSettings.DoubleClickChipsToggleBreakouts`, which has **no initializer** (`AppSettings.cs:578`
+→ defaults `false`). Out of the box, double-clicking the %/hr chip does nothing. So a player who
+has never found and enabled that setting has no path from the compact chip to the ETA at all —
+the sentence exists, but it's gated behind an opt-in gesture most players never discover.
+**Recommend, in order of cost:** (a) cheapest — put the ETA in the xp chip's **tooltip**
+(hover), no gesture, no setting; (b) put the countdown-clock line ("~2h 15m") as the chip's
+*second* line if HUD glance width allows it (needs a real measurement pass, not assumed here);
+(c) flag as its own small V0-V1 decision, **not consequence-list** but worth naming out loud
+since it changes existing behavior for every mini-bar chip, not just xp: should
+`DoubleClickChipsToggleBreakouts` default to on for at least the xp chip, given its only
+consumer today (breakout toggle) is itself opt-in and mostly unused? Recommend (a) as the actual
+fix — it costs nothing and doesn't touch the shared toggle's default at all.
+
+**Level persistence — verified: it IS persisted, and it is also nowhere the player can see it,
+which is very likely the actual complaint.** `QuestLedgerStore.cs`'s `CharacterLedger.Level`
+(own doc comment, line 70: *"Last level the log announced... 0 = never"*) is written by
+`SetLevel` only from the "Welcome to level N!" parse (`LogParser.cs:265-266`) and durably stored
+per-character in `quest-ledger.json` — confirmed at the write site, `MainWindow.xaml.cs:2521-2525`:
+*"the 'At N:' preview must survive restarts and log truncation, and the log only says the number
+at the ding."* That's real persistence, but it exists **only to feed the reward-preview memo**
+(`LevelUnlockMemo.cs`), never as a player-visible readout. Checked `HomeReadout.cs:79-87`
+directly: Home's Identity block shows **Server · Zone**, and its own doc comment says why —
+*"Zone rather than level or class, because zone is the one thing that changes between
+sittings."* That's a deliberate, reasoned choice, correctly applied to a "where did I leave off"
+card — and the side effect is that **there is currently no screen anywhere in the app that shows
+the player's own character level as a number.** "Unclear whether level is persisted" is the
+exact symptom of that: there's genuinely nothing to look at to check.
+**Recommend:** surface the tracked level (`LevelFor(char) ?? LastLevel`, same fallback order
+already used at `MainWindow.xaml.cs:129,2019`) somewhere a player can actually see it confirmed —
+candidates: the xp chip's tooltip (pairs naturally with the ETA fix above, same hover), or the
+Progress room's Experience tab header. **Not** Home's Identity line — that slot's zone-over-level
+reasoning is sound and this ask doesn't need to re-open it.
+
+---
+
+### 3. Home / shell recovery — real gap, but it is bigger than Home: `must-fix`
+
+**Place:** `src/EQBuddy/IShellRoom.cs:18-24` (*"A room is a CONTROL, not a window"*),
+`ShellWindow.xaml.cs:81,163,232-291,303-333`, `src/EQBuddy/ShellHost.cs` (whole file),
+`src/EQBuddy.UI.Shared/ShellPages.cs:45-118`.
+
+**Verified: Home itself cannot be "closed" independently — the report is naming the right
+symptom at the wrong scope.** Home is a `Grid`-derived `IShellRoom`, not a window; navigating
+away just swaps `RoomHost.Content` and the `HomeRoom` instance stays cached in `_rooms`
+(`ShellWindow.xaml.cs:112,303-333`), one rail click away for as long as the shell window is
+open. All seven `ShellPage` rows are in `Landed` as of SR-5 (`ShellPages.cs:114-118`, own
+comment: *"the list is now the whole enum"*) — so nothing about the rail can strand a landed
+room; that part is safe by construction and `ShellNavigationTests` holds it.
+
+**What actually closed, and doesn't come back, is the whole `ShellWindow`.** It's native chrome
+(`ShellWindow.xaml:1-46`, *"a normal Windows window... no hand-rolled close button"*) — closing
+it via ✕/Alt-F4 releases the rooms and nulls `main._shellWindow`
+(`ShellHost.cs:38`, `ShellWindow.xaml.cs:163`). **Verified: `ShellHost.Show` — the only
+constructor for a new `ShellWindow` — has exactly one caller in the whole app,
+`ShellHost.ApplyEnvHook` (`ShellHost.cs:62-71`), gated on the `EQBUDDY_SHELL` env var.** There is
+no menu item, hotkey, or button anywhere in `src/EQBuddy` that reopens it. `ShellHost.cs:14-23`
+says this is deliberate, not an oversight: *"The shell has no player-facing door yet... The
+door for players lands with the HUD's 'Open EQBuddy', which is the PR after this one."*
+`DECISIONS.md:938-944` records the same call and gives the reason it was deferred: *"the rail
+has one row, Evolved is local-only... a door into a one-room shell is the unexplained empty the
+Phase 2 gate forbids."*
+
+**The finding: that premise is no longer true, and nobody has come back to re-check it.** The
+rail had one row at PR 1. It has **all seven**, landed, as of SR-5 today — `ShellPages.cs`'s own
+words. The stated reason for withholding the door was explicitly tied to the rail's size at the
+time, and the rail's size is exactly what changed since. This isn't Bevel inventing a new
+decision or proposing a player door from scratch — the door is already named three times in
+comments (`ShellHost.cs:23`, `ShellWindow.xaml.cs:252`, `ShellPages.cs:271`) as "the PR after this
+one." **The owner hitting this now, closing Home with no way back short of restart, is that
+already-planned PR arriving as a live bug report instead of as a roadmap item — which is the
+`must-fix` class, and it needs no new IA: build the HUD's "Open EQBuddy" door the comments
+already describe, now that the premise for deferring it has expired.**
+**Not deciding here:** what exact HUD affordance ("Open EQBuddy" button vs. tray vs. hotkey) — that's
+implementation, and the comments already point at "the HUD's 'Open EQBuddy'" as the named
+target; Fable/Claude pick the concrete control. Bevel's job here is confirming the premise
+collapsed and naming it loudly enough that it isn't re-deferred on the old reasoning.
+
+---
+
+### 4. Mini-bar tracked item → anchored expand → still-poppable window (owner-locked intent — IA below is the shape, not a re-litigation)
+
+**Place:** `src/EQBuddy/BreakoutWindow.xaml.cs:14` (`BreakoutKind` enum — `Damage, Healing, Pet,
+Watch, Loot, Buffs`), `MainWindow.xaml.cs:3441-3505` (`UpdateBreakouts`, `ToggleBreakout`),
+`src/EQBuddy/HudBarView.cs:71-332` (mini-bar chips, `AttachDoubleClick`),
+`src/EQBuddy.UI.Shared/ThemeHost.cs` (whole file).
+
+**Verified: today a tracked mini-bar stat only ever goes straight to a separate floating
+`BreakoutWindow`, or nothing.** Two triggers, neither of them an inline expand: (1) while
+minimized, any starred `BreakoutKind` auto-shows its window (`UpdateBreakouts`,
+`MainWindow.xaml.cs:3441-3491`); (2) a mini-bar chip's double-click toggles that same window on/
+off (`HudBarView.cs:155-176`→`ToggleBreakout`), gated on `DoubleClickChipsToggleBreakouts`
+(default `false`, same setting flagged in item 2). Only `pet` and `loot` cells currently carry a
+`breakout:` at all (`HudBarView.cs:280-284`) — `kills/procs/motes/money/deaths` have none. There
+is no `Inline` placement anywhere in this path today.
+
+**The model to extend already exists, one file over, and it's built for exactly this shape.**
+`ThemeHost<TTab>` (`src/EQBuddy.UI.Shared/ThemeHost.cs`) is the state machine Progress/Kills
+cards already use: `Collapsed → Inline (expanded under its card) → Window (own floating window,
+card collapses)`, with `ToggleCard()` driving Collapsed↔Inline, `PopOut()` taking an Inline body
+into its own window and collapsing the card, and `WindowClosed()` returning to Collapsed (never
+silently back to Inline — deliberate, per its own doc comment: *"exactly one owner of the
+body"*). This is precisely "click to expand anchored under where you clicked, with a further
+pop-to-window from there" — the owner's ask, already built, just not wired to the mini-bar.
+
+**Recommended shape:** give each starred/breakout-capable mini-bar chip a `ThemeHost`-style
+three-state cycle instead of today's Collapsed/Window-only: click (not double-click — the
+owner's ask is a **primary**, discoverable path, and hiding it behind the same opt-in gesture
+item 2 already flagged as under-discovered would repeat that mistake) expands the breakout's
+body anchored **below the mini-bar**, in place; a ⧉ on that expanded body pops it to a real
+floating `BreakoutWindow` exactly as `PopOut()` already does for Progress; closing that window
+returns to Collapsed, not back to Inline, matching `WindowClosed()`'s existing rule. **This adds
+a state to the existing `BreakoutKind` machine — it does not replace `UpdateBreakouts`'s
+auto-show-while-minimized behavior**, which is the owner's explicit constraint ("does not replace
+breakout"). The auto-show path and the new click-to-expand path both still resolve to the same
+`BreakoutWindow` instance when popped, so there is exactly one owner of each breakout's body at
+any time, the same invariant `ThemeHost` already enforces elsewhere.
+
+**Owner interview COMPLETE — locked interaction model (David 2026-09-06 ~6:04 PM CT).** Appended by Dranak; not a re-litigation of the ThemeHost shape above — these are the signed interaction rules for item 4:
+
+1. One under-bar expansion at a time.
+2. Chips must look like buttons.
+3. Hover = smooth peek expand; mouse-away = smooth collapse.
+4. Click = stay open.
+5. X on under-bar panel = collapse back to bar.
+6. Pop-out from expanded → under-bar collapses (float is the detail).
+7. Close floated window → just the mini-bar (nothing expanded).
+8. First ship: DPS, then HPS, then Progress. Owner tests. Then every other tracker once those mechanics are locked — all same pattern.
+9. No exceptions: every tracker uses this pattern. Bar = anything the player cares about for quick mouseover or click — no digging through Options/menus.
+10. Motion quality: slick, smooth, professional; expand/collapse in a natural flow.
+
+Fable/Claude: treat (1)–(10) as build constraints once Helm signs. Ship order in (8) gates the first seats; (9) forbids one-off tracker exceptions.
+
+**Not designed here (implementation, for Fable/Claude once this IA is signed):** which exact
+mini-bar chips beyond `pet`/`loot` gain a breakout anchor (the owner's example is DPS —
+`Damage` — which today has no `breakout:` wired on any chip at all per `HudBarView.cs:280-284`,
+so wiring `Damage`'s chip to a breakout is itself new, not a rewire); the exact visual anchoring
+(does the expanded body push the widget taller, or overlay?) needs a screenshot pass against the
+widget's `SizeToContent` behavior (trap 12) before it's built.
+
+---
 Findings for Claude, not a work order. **Claude: take an item, then delete it** (or leave only what is still planned).
 
 Bevel joined on 2026-08-21, introduced by David alongside Scribe. The first thing it was pointed at is a review of discussion #222 (EQBuddy Mobile's pull-to-refresh with one card selected).

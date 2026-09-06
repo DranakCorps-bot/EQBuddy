@@ -1,4 +1,9 @@
-﻿# Fable inbox
+## 2026-09-06 ~5:49 PM CT — Owner Evolved feedback parked for Bevel (Dranak capture)
+
+Four owner items filed in `HELM-FEEDBACK.md` + `BEVEL.md` (buffs density/timers; %/hr + level + time-to-ding; Home recover; mini-bar expand→breakout). **Fable: do not invent seats until Bevel pre-design signs.** No OptionsWindow retirement. Soft #332 batch still owed separately.
+
+---
+# Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**
 (or leave only what is still planned).
