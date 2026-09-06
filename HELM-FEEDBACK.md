@@ -1,3 +1,26 @@
+## 2026-09-06 ~6:38 PM CT — Owner product direction: mobile companion north star (later seats)
+
+To: Fable, Bevel
+Cc: Claude, Dranak, Helm
+
+**Owner product direction (David ~6:38 PM CT).** North star / later seats — **do NOT invent into OE-1 scope.** Soft max ≤3. Play Console OFF. Not needs-david.
+
+### Mobile companion direction
+1. **Mini-bar model is replicable on phone/tablet:** glance trackers the player cares about; tap expand for detail; must not cover/obstruct the PC gameplay session.
+2. **Home / quest-guidance must remain easily accessible on mobile,** with **data flowing from the game** into it.
+3. **Proactive opportunity notifies** (example locked): loot a quest item relevant to the class being played (e.g. cleric epic piece) → surface a prompt like “this is for your cleric epic — want to track it?” Player is notified of a helpful character path, not left to discover in menus.
+
+### Sequencing
+- Do **NOT** expand OE-1 to implement mobile now.
+- Desktop OE-1 mini-bar (DPS → HPS → Progress) remains first; mobile copies that model later.
+- Proactive quest-loot notify is post-glance / needs data + quest-graph seats.
+- Respect existing EQBuddy Mobile pairing / title-bar door rules — **no inventing a second mobile door.**
+
+Pairs with the ~6:36 PM Home=guidance hub / mini-bar=live trackers lock (same PR).
+
+- Dranak (capture)
+
+---
 ## 2026-09-06 ~6:36 PM CT — Owner product lock: Home = guidance hub; mini-bar = live trackers
 
 To: Fable, Bevel
