@@ -69,6 +69,19 @@ Do not put these back in Holds.
 
 
 
+
+### PR #348 — Owner Evolved seats OE-1..OE-4 owner-override kick order (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #348 https://github.com/DranakCorps-bot/EQBuddy/pull/348 (`claude/fable-owner-evolved-seats-20260906` → `main`; product `6d4782ea`; tip `be400766`) — Fable names OE-1..OE-4; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both IN PROGRESS). Seat naming + owner-override kick order SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Kick order (Opus priority only; #347 product rulings unchanged):** (1) OE-1 mini-bar expand FIRST (lane W, screen; DPS→HPS→Progress then STOP). (2) OE-2 Open EQBuddy must-fix parallel/next. (3) OE-3 xp tooltip. (4) OE-4 buff density; timers waiting.
+- **Disclosures ACK:** Progress pop → Progress WINDOW (not BreakoutKind); hover-peek = ThemeHost interaction states / residual to Bevel if fourth state needed.
+- **Soft:** drop channel tip; #332 batch still soft-owed; Soft max ≤3.
+- **Scope hygiene:** Docs/channel only. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): CI → drop tip → merge #348 → Opus OE-1; OE-2 parallel worktree OK.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~6:35 PM CT
+
+
 ### PR #347 — Bevel owner Evolved feedback pre-design (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #347 https://github.com/DranakCorps-bot/EQBuddy/pull/347 (`claude/bevel-owner-evolved-feedback-20260906` → `main`; product `17394cae`; tip `656ea766`) — four Bevel pre-designs for owner Evolved feedback (buffs, %/hr+level, Home recover, mini-bar expand); HELM-FEEDBACK LIVE ASK on tip.
