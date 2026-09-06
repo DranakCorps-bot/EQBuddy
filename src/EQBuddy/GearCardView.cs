@@ -45,6 +45,12 @@ internal sealed class GearCardView : IWidgetCard
     private readonly ImportReportView _importReport;
     private readonly ScrollViewer _listScroll;
 
+    // ---- the import block, moved off Options → Cards & windows on 2026-09-05 (SR-2) ----
+    private readonly Button _openTools;
+    private readonly Button _import;
+    private readonly Button _clear;
+    private readonly TextBlock _importStatus;
+
     /// <summary>Asked for the list's cap, given what this surface keeps PINNED beside
     /// it. The HOST answers, because the host is the only one that knows how much body
     /// there is — the widget's theme card and the Gear &amp; Loot window give different
@@ -104,9 +110,40 @@ internal sealed class GearCardView : IWidgetCard
         _copyCmd.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         _copyCmd.ToolTip = GearChecklistPresentation.AutoTickTip;
 
+        // WRAPS, never a horizontal StackPanel (trap 25): three buttons of unfixed label
+        // width, and the Gear room degrades to a narrow single column — `shell-gear-narrow`
+        // shoots that floor. A stack measures with infinite width in its own direction, so
+        // "Clear" would simply not be on screen, with no ellipsis and no error.
+        var importRow = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+        importRow.Children.Add(_openTools = ActionButton(
+            GearChecklistPresentation.OpenToolsButton,
+            GearChecklistPresentation.OpenToolsTip, OpenTools));
+        importRow.Children.Add(_import = ActionButton(
+            GearChecklistPresentation.ImportButton,
+            GearChecklistPresentation.ImportTip, ImportList));
+        importRow.Children.Add(_clear = ActionButton(
+            GearChecklistPresentation.ClearButton,
+            GearChecklistPresentation.ClearTip, ClearList));
+
+        // Silent until it has something to say. What the steady state would have said —
+        // "Harness list: 3/12 checked" — is what `_listName` says two lines above, and
+        // carrying the sentence across would have shipped one fact twice on one surface
+        // (SR-1's log-archive paragraph, same call). What only THIS line can say is the
+        // outcome of the last action: a file with nothing in it, a browser that would not
+        // open, an import that worked.
+        _importStatus = Dim("");
+        _importStatus.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+        _importStatus.Visibility = Visibility.Collapsed;
+
         var panel = new StackPanel();
         panel.Children.Add(_byZone);
         panel.Children.Add(_listName);
+        // ABOVE the scroller, deliberately (trap 44: a report about something that just
+        // happened, appended after the rows, is below the fold). It is also where the
+        // route line points — `EmptyRoute` says "below", and on an empty surface that line
+        // and these buttons are the whole card.
+        panel.Children.Add(importRow);
+        panel.Children.Add(_importStatus);
         panel.Children.Add(_listScroll = new ScrollViewer
         {
             // Starts at the design opening height and follows the HOST from the first
@@ -155,6 +192,15 @@ internal sealed class GearCardView : IWidgetCard
     internal bool DebugCopyCommandShown =>
         _copyCmd.Visibility == Visibility.Visible && _copyCmd.Parent is not null;
 
+    /// <summary>1 when the import block — the website link and the file picker — is on
+    /// screen, for exactly the reason above and with more at stake: this is the ONLY route
+    /// into the feature now that Options no longer carries one. A block that failed to
+    /// build here would leave a player with no way to import a list at all, and it would
+    /// photograph as an unremarkable panel.</summary>
+    internal bool DebugImportShown =>
+        _import.Visibility == Visibility.Visible && _import.Parent is not null
+        && _openTools.Visibility == Visibility.Visible;
+
     /// <summary>The card's header badge — "3/12", or an em dash with nothing imported.
     /// The STRING comes from <see cref="LootTheme"/>, because the widget's card header and
     /// the theme window's tab badge must not be two different answers (#210).</summary>
@@ -199,6 +245,11 @@ internal sealed class GearCardView : IWidgetCard
         var total = _settings.GearChecklist.Count;
         // No list, no view to pivot — the toggle would be a silent no-op.
         _byZone.Visibility = total > 0 ? Visibility.Visible : Visibility.Collapsed;
+        // Nothing to clear, no Clear button. It was `IsEnabled = false` in Options, and
+        // this app's CheckBox/Button styles carry no disabled visual — a dead control that
+        // renders exactly like a live one and swallows the click (trap 17). Hidden says the
+        // same thing in a way the player can see, and the two live buttons keep the row.
+        _clear.Visibility = total > 0 ? Visibility.Visible : Visibility.Collapsed;
         if (total == 0)
         {
             // The route line above IS the empty state now, so the list stays empty. It
@@ -331,6 +382,126 @@ internal sealed class GearCardView : IWidgetCard
         // The zone view excludes acquired rows and repeats a multi-zone item under each
         // zone it drops in — its checkbox twins must repaint, next tick.
         if (_settings.GearGroupByZone) _markDirty();
+    }
+
+    // =====================================================================================
+    // The import block. It was Options → Cards & windows until 2026-09-05 (SR-2): three
+    // buttons and a status line, two windows away from the only surface their result ever
+    // appears on. An import workflow is a domain action, not a setting.
+    //
+    // It does the mutation ITSELF rather than calling back into the widget, exactly as
+    // `Toggled` below already does for a tick box: the decisions that touch the player's
+    // data live in `GearChecklistImporter` (Core, tested), and what is left here is Save,
+    // mark-dirty and repaint. The other hosts follow within a tick — each one renders this
+    // same card on the widget's clock — which is the arrangement a checked box has had
+    // since the surface was lifted.
+    // =====================================================================================
+
+    private Button ActionButton(string label, string tip, Action onClick)
+    {
+        var button = Theming.Button(label);
+        button.FontSize = Tok.Spec(Tok.TypeRole.Caption).Size;
+        button.Margin = new Thickness(0, 0, Tok.SpaceXs, Tok.SpaceXxs);
+        button.ToolTip = tip;
+        button.Click += (_, _) => onClick();
+        return button;
+    }
+
+    /// <summary>The one window-shaped thing this block needs: an owner for a modal. Asked
+    /// of the TREE rather than held, because this card has three hosts (the widget, the
+    /// Gear &amp; Loot window and the shell's Gear room) and a constructor argument would
+    /// have had to be threaded through <c>MainWindow.NewGearCard</c> to all of them.
+    /// <c>MapView</c>'s confirmation does the same.</summary>
+    private Window? Host() => Body is FrameworkElement fe ? Window.GetWindow(fe) : null;
+
+    private void Say(string message)
+    {
+        _importStatus.Text = message;
+        _importStatus.Visibility = message.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void ImportList()
+    {
+        var dlg = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = GearChecklistPresentation.ImportDialogTitle,
+            Filter = GearChecklistPresentation.ImportDialogFilter,
+        };
+        var host = Host();
+        if ((host is not null ? dlg.ShowDialog(host) : dlg.ShowDialog()) != true) return;
+
+        try
+        {
+            var import = GearChecklistImporter.ImportFile(dlg.FileName);
+            if (import.Items.Count == 0)
+            {
+                // A well-formed page with nothing on it is the one failure that is not an
+                // exception, and it is the likeliest one: the wrong HTML file.
+                Say(GearChecklistPresentation.NoItemsFound);
+                return;
+            }
+
+            GearChecklistImporter.Apply(_settings, import);
+            _settings.Save();
+            Say(GearChecklistPresentation.Imported(_settings.GearChecklistName, import.Items.Count));
+            Render();
+            // Same three lines a tick box runs (`Toggled`): save, repaint here, mark. The
+            // OTHER hosts repaint off the widget's own clock — each of them renders its own
+            // instance of this card every tick — so the list a player is not looking at
+            // catches up within a second, exactly as it does when a box is ticked.
+            _markDirty();
+        }
+        catch (Exception ex)
+        {
+            Say(GearChecklistPresentation.ImportFailed(ex.Message));
+        }
+    }
+
+    /// <summary>
+    /// Clear, and it asks first — which Options did not.
+    ///
+    /// That is a consequence of the MOVE rather than a change of mind: in Options this
+    /// button sat two clicks deep on a screen nobody keeps open, and here it is beside a
+    /// list the player reads every session. What a mis-click destroys is not the export —
+    /// that is still on the website — but every box ticked since, which is the part
+    /// EQBuddy holds and the website has never heard of.
+    /// </summary>
+    private void ClearList()
+    {
+        var total = _settings.GearChecklist.Count;
+        if (total == 0) return;
+
+        var prompt = GearChecklistPresentation.ClearConfirm(_settings.GearChecklistName, total);
+        var host = Host();
+        var answer = host is not null
+            ? MessageBox.Show(host, prompt, GearChecklistPresentation.ClearConfirmTitle,
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning)
+            : MessageBox.Show(prompt, GearChecklistPresentation.ClearConfirmTitle,
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+        if (answer != MessageBoxResult.OK) return;
+
+        GearChecklistImporter.Clear(_settings);
+        _settings.Save();
+        // The route line coming back IS the report — it says there is nothing on the list
+        // and how to put something there, which is more than "cleared." would have.
+        Say("");
+        Render();
+        _markDirty();
+    }
+
+    private void OpenTools()
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                GearChecklistPresentation.ToolsUrl) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            // A browser that would not open has to say so: a button that does nothing at
+            // all is indistinguishable from a broken feature.
+            Say(GearChecklistPresentation.CouldNotOpenTools(ex.Message));
+        }
     }
 
     /// <summary>The by-zone toggle, owned by the card now that the checkbox is its own.

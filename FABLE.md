@@ -527,18 +527,50 @@ lowered in the same commit):
   the screen and lane W's SA-4 held it — the E2E run refused the lock by name (pid 45284), which
   is trap 61's interlock working rather than a failure. 37 source-level assertions stand in.
 
-### SR-2 — Gear checklist import leaves Settings (D lane; independent; before SR-3 so the HUD block never carries it)
+### SR-2 — TAKEN 2026-09-05, built and green (Claude, lane D)
 
-1. The import block (`OptionsWindow.xaml:371–385`, handlers `:1497–1558` — import button,
-   EQ Legends Tools link, `GearImportStatus` line) leaves Options entirely — signed item 3.
-2. Destination: **`GearCardView`**, the surface whose data the import produces, beside the
-   `/outputfile inventory` ⧉ and the achievements report — and because both hosts
-   (`GearLootWindow`, `GearRoom`) already build their own instances of that view, both get
-   the affordance in one commit. Placement above the fold (trap 44: read on arrival).
-3. Duties: the trap-26 enumeration (every control, where it went); the import-report row
-   check/add from the must-list bullet, prove-failed where added.
-4. What's-new: a player-noticeable MOVE — the unreleased 2.0.0 entry says "X is now Y"
-   naming BOTH ends, per the rule that is not up for renegotiation.
+Its four steps are struck rather than left to be re-read as pending — the take-then-delete
+contract, SR-1's and SR-4's precedent. **SR-3 is next in the serial and carries no part of
+this.**
+
+**What landed** (`GearCardView.cs` 348 → 515, `GearChecklistPresentation.cs` +87,
+`GearChecklistImporter.cs` +26; `OptionsWindow.xaml.cs` 393 → 337 and `OptionsWindow.xaml`
+226 → 219, baseline lowered in the same commit):
+
+- The three buttons, their handlers and the status line are above the list on
+  `GearCardView`, beside the ⧉ copy of `/outputfile inventory` and the import report — one
+  card, three hosts, one commit. `gearImport` / `shellGearImport` are in the dump and E2E
+  asserts both states and the two hosts' agreement.
+- **The mutations went further than the plan asked, into Core** —
+  `GearChecklistImporter.Apply`/`.Clear`. The plan's route was `MainWindow`'s two methods,
+  and this kick's lane is file-disjoint from `MainWindow*`; Core is the better home
+  regardless, because the clause that separates a re-import from a wipe (*your ticks
+  survive*) is now executed by a test rather than asserted about a window. **Residual,
+  disclosed: `MainWindow.ImportGearChecklist` and `ClearGearChecklist` are callerless now
+  and owe a deletion from the next lane-W-safe change.**
+- **The live defect the move would have created, found by following the plan's own trap-26
+  duty:** `GearChecklistPresentation.EmptyRoute` — the empty state, the surface's whole
+  route — named "Options → Cards & windows → Import gear list…" and would have gone on
+  naming a screen the buttons had left. #219's mechanism inside one string. It names the
+  buttons beneath it now, off the same consts they are labelled from, and a test pins that.
+- **Item 3's hypothesis, answered: NO row is owed, to either list, and both reasons are
+  written down rather than left as silence.** `ImportReportReachesASurfaceTests` guards
+  `AutoImportOutcome`s — dumps EQBuddy reads BY ITSELF and could act on silently — and this
+  import is a file the player picked in a dialog, reporting in the line beside the button
+  they pressed; inventing a property to satisfy the guard is trap 52's premise-first
+  mistake. `GameCommandsTests`' Gear row is about an IN-GAME command and is untouched. The
+  affordance the move DOES put at risk had no must-list, so `GearImportBlockMoveTests` is
+  it: 13 enumeration rows, both halves, all 13 prove-failing on the pre-move tree.
+- Four executor calls, logged in `DECISIONS.md`: Clear asks first (the move changed the
+  risk, not our minds — a mis-click costs the ticks, which only EQBuddy holds); Clear is
+  hidden rather than disabled (trap 17 — no disabled visual in this style); the heading and
+  blurb did not travel (the destination says both, better); the status line kept only the
+  outcomes (its steady state is what `_listName` already says).
+- What's-new: the 2.0.0 entry names BOTH ends. It also **narrowed the SR-1 entry's "nothing
+  has moved"** to the two tabs it was about, which stopped being true the moment this
+  landed.
+- **Owed and NOT done here:** the `gearloot-gear` and `options-window`-family re-shoots.
+  The gear E2E ran and passed (7/7); gates green at 3,377 unit.
 
 ### SR-3 — HUD block (D lane; after SR-2; deliberately NOT gated on SA-R)
 

@@ -79,6 +79,12 @@ public sealed class EndToEndTests
         // whose import has gone stale, which is RaidsCardView's own rule.
         app.WaitForDump("gearCopyCmd", 1,
             "the ⧉ copy of /outputfile inventory to survive a populated list");
+        // And the import block, POPULATED — same rule, and the reason it is on this state
+        // too is the same one: the player likeliest to want a fresh export is the one whose
+        // list has gone stale. It is the only route into the import since SR-2 moved it off
+        // Options → Cards & windows (2026-09-05), so an absent one is not a cosmetic loss.
+        app.WaitForDump("gearImport", 1,
+            "the Import gear list… / Open EQ Legends Tools row on a populated list");
         // The named list is what tells you WHICH shopping list this is; a lift that
         // dropped the line would still render every row.
         // "Harness list - 1/4": the name AND the progress count, which is the line
@@ -157,15 +163,22 @@ public sealed class EndToEndTests
         app.Launch();
 
         app.WaitForDump("gearTotal", 0, "no gear list on the shared fixture");
-        // 0, not 1. The empty state is the LIST NAME line — "export one from EQ Legends
-        // Tools, then Options → …" — and the row that used to sit under it said the same
-        // thing again in less useful words (David, 2026-08-20).
+        // 0, not 1. The empty state is the LIST NAME line — the route to a gear list — and
+        // the row that used to sit under it said the same thing again in less useful words
+        // (David, 2026-08-20). Since SR-2 that line points at the buttons directly beneath
+        // it rather than at Options, which is the assertion below.
         app.WaitForDump("gearRows", 0, "no rows under the route line");
         app.WaitForDump("gearPivotShown", 0, "no list, so nothing to pivot");
         // The state a new player meets is the state the complaint was about (David,
         // 2026-08-20): the tab named an import and handed over no way to run it.
         app.WaitForDump("gearCopyCmd", 1,
             "the ⧉ copy of /outputfile inventory to be on the EMPTY tab");
+        // The empty state is the ONLY state a new player sees, and it is the one the whole
+        // complaint was about — so the import block has to be on it, not only on a
+        // populated list. Nothing else can say so: an absent control photographs as an
+        // unremarkable panel (trap 29).
+        app.WaitForDump("gearImport", 1,
+            "the import row to be on the EMPTY tab, where the route line points at it");
     }
 
     /// <summary>The DROPS surface draws its creatures, its item rows and the filter that

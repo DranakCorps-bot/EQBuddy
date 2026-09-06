@@ -38,7 +38,6 @@ public partial class OptionsWindow : Window
         foreach (var choice in OptionsViewModel.WindowChoices) WindowCombo.Items.Add(choice);
         WindowCombo.SelectedIndex = _vm.RecentWindowIndex;
 
-        UpdateGearImportStatus();
         // The Cards & windows tab's three editors, lifted into OptionsCardsView.cs when
         // the mini-dashboard list pushed this file past its ratchet — CLAUDE.md's rule is
         // to lift a surface, never to raise the ceiling.
@@ -313,70 +312,15 @@ public partial class OptionsWindow : Window
         public static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
     }
 
-    private void UpdateGearImportStatus()
-    {
-        var total = _main.Settings.GearChecklist.Count;
-        if (total == 0)
-        {
-            GearImportStatus.Text = "No gear list imported.";
-            GearClearBtn.IsEnabled = false;
-            return;
-        }
-
-        var done = _main.Settings.GearChecklist.Count(i => i.Acquired);
-        var name = _main.Settings.GearChecklistName.Length > 0
-            ? _main.Settings.GearChecklistName
-            : "Imported gear list";
-        GearImportStatus.Text = $"{name}: {done}/{total} checked.";
-        GearClearBtn.IsEnabled = true;
-    }
-
-    private void OnImportGearChecklist(object sender, RoutedEventArgs e)
-    {
-        var dlg = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = "Import EQ Legends Tools shopping list",
-            Filter = "HTML files (*.html;*.htm)|*.html;*.htm|All files (*.*)|*.*",
-        };
-        if (dlg.ShowDialog(this) != true) return;
-
-        try
-        {
-            var import = GearChecklistImporter.ImportFile(dlg.FileName);
-            if (import.Items.Count == 0)
-            {
-                GearImportStatus.Text = "No gear items found in that file.";
-                return;
-            }
-
-            _main.ImportGearChecklist(import);
-            UpdateGearImportStatus();
-        }
-        catch (Exception ex)
-        {
-            GearImportStatus.Text = $"Import failed: {ex.Message}";
-        }
-    }
-
-    private void OnOpenGearTools(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
-                "https://eqlegendstools.com/char-sheet/") { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            GearImportStatus.Text = $"Could not open EQ Legends Tools: {ex.Message}";
-        }
-    }
-
-    private void OnClearGearChecklist(object sender, RoutedEventArgs e)
-    {
-        _main.ClearGearChecklist();
-        UpdateGearImportStatus();
-    }
-
+    // THE GEAR CHECKLIST IMPORT HANDLERS WENT WITH THEIR CONTROLS on 2026-09-05 (SR-2).
+    // The status line, the file picker, the website link and Clear are `GearCardView`'s
+    // now — the surface the import produces — and the mutation itself is
+    // `GearChecklistImporter.Apply`/`.Clear` in Core, where the "a re-import keeps your
+    // ticks" rule can be tested rather than asserted about a window.
+    //
+    // What this window no longer needs, and did: nothing. The block read
+    // `_main.Settings.GearChecklist` and called two `MainWindow` methods; every one of
+    // those readings is on the card, which was already holding the same settings object.
 
     private void OnDrag(object sender, MouseButtonEventArgs e)
     {

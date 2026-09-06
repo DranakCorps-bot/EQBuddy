@@ -362,10 +362,14 @@ Append `Your Chords of Dissonance spell has worn off of a giant spider.` → no 
 **Wishlist**, not Gear. `LootSurface.LabelFor(LootTab.Gear)` is the source of that word. The
 old Gear Locker and Inventory windows both live on the Inventory tab beside it.*
 
-Import an EQ Legends Tools shopping-list HTML file from **Options → Cards & windows
-→ Import gear list…**. The Wishlist tab is a persistent manual checklist: each row
-includes its slot, target item, drop/quest source, wiki/item URL on hover, and a
-checkbox. Re-importing replaces the complete list; *Clear* removes it.
+Import an EQ Legends Tools shopping-list HTML file with **Import gear list…**, which is
+on the Wishlist tab itself, directly above the list — *"Options → Cards & windows →
+Import gear list…" until 2026-09-05 (SR-2), when the whole block moved to the surface it
+fills.* *Open EQ Legends Tools* beside it goes to the page you build the list on. The
+Wishlist tab is a persistent manual checklist: each row includes its slot, target item,
+drop/quest source, wiki/item URL on hover, and a checkbox. Re-importing replaces the
+complete list and keeps every box already ticked; *Clear* removes it, and asks first —
+the export is still on the website, but the ticks are not.
 
 Imports separate equipped items under a *Gear* heading from socketed entries under
 an *Exaltations* heading. An exaltation that supplies an effect name displays it in

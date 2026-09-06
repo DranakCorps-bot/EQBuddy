@@ -251,6 +251,10 @@ internal sealed class GearRoom : Grid, IShellRoom
         // room could never say whether the command survived the host change. This is the
         // only thing that can.
         $"shellGearCopyCmd={(_gear.DebugCopyCommandShown ? 1 : 0)} " +
+        // And the import block (SR-2), for the same reason and re-keyed the same way: two
+        // hosts of one surface writing one flat namespace is trap 58, and the assertion
+        // worth having is that the two agree.
+        $"shellGearImport={(_gear.DebugImportShown ? 1 : 0)} " +
         // The list cap beside the body it is derived FROM, so E2E can assert the
         // relationship rather than a number off the desk it was written on.
         $"shellGearListCap={_gear.DebugListCap:0} " +

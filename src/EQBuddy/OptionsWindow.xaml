@@ -112,21 +112,14 @@
                        Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,2"/>
             <TextBlock Text="Every card you leave visible shows on the widget — one with nothing yet says so in a line and fills in as it happens."
                        Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,0,0,2"/>
-            <TextBlock Text="Gear checklist" FontSize="12" FontWeight="SemiBold"
-                       Foreground="{DynamicResource AccentBrush}" Margin="0,12,0,2"/>
-            <TextBlock Text="Import the exported shopping-list HTML from EQ Legends Tools, then show it as a checklist in the Gear overlay card."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap"/>
-            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                <Button x:Name="GearToolsBtn" Content="Open EQ Legends Tools" Style="{StaticResource ActionButton}"
-                        FontSize="12" Click="OnOpenGearTools"
-                        ToolTip="Open the EQ Legends Tools character sheet/shopping-list page"/>
-                <Button x:Name="GearImportBtn" Content="Import gear list..." Style="{StaticResource ActionButton}"
-                        FontSize="12" Margin="6,0,0,0" Click="OnImportGearChecklist"/>
-                <Button x:Name="GearClearBtn" Content="Clear" Style="{StaticResource ActionButton}"
-                        FontSize="12" Margin="6,0,0,0" Click="OnClearGearChecklist"/>
-            </StackPanel>
-            <TextBlock x:Name="GearImportStatus" Style="{StaticResource Dim}" TextWrapping="Wrap"
-                       Margin="0,4,0,0"/>
+            <!-- THE GEAR CHECKLIST IMPORT BLOCK LEFT THIS TAB on 2026-09-05 (SR-2). Its
+                 heading, its explanation, the three buttons (Open EQ Legends Tools /
+                 Import gear list… / Clear) and the status line are all on the GEAR &
+                 LOOT card's Wishlist tab now — above the list, beside the ⧉ copy of
+                 /outputfile inventory and the import report, in both of that surface's
+                 hosts. An import workflow is a domain action, not a setting, and this
+                 screen was two windows away from the only place its result ever showed.
+                 Named in 2.0.0's What's-new in the "X is now Y" form, both ends. -->
             <StackPanel x:Name="CardsPanel"/>
             <!-- The mini dashboard's contents, listed for the first time on 2026-08-21.
                  A stat's only switch used to be the star on its card header, so when the

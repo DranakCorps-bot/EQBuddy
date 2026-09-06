@@ -68,6 +68,18 @@ Do not put these back in Holds.
 ---
 
 
+### PR #342 — SR-2 gear checklist import MOVE (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #342 https://github.com/DranakCorps-bot/EQBuddy/pull/342 (`claude/sr2-gear-checklist-20260905` → `main`, head `af21b6c9`) — Options gear checklist import → GearCardView; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SR-2 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Disclosures ACK:** (1) WhatsNew 2.0.0 both-ends + SR-1 "nothing has moved" narrow to Look+Behavior — SIGNED ACK. (2) MainWindow ImportGearChecklist/ClearGearChecklist callerless residual — SIGNED ACK; delete next lane-W MainWindow* touch.
+- **Signed items:** MOVE to GearCardView both hosts; EmptyRoute off ImportButton; four executor calls; Core GearChecklistImporter; ratchet 393→337; GearImportBlockMoveTests + E2E; must-list NO rows ACK; WhatsNew; FABLE SR-2 TAKEN.
+- **Soft:** drop channel tip; gearloot-gear + options-window re-shoots owed (MOVE drift; #341 discharge was pre-MOVE); prefer SA-R then SR-3 on idle D (not gated on SA-R); residual rides next lane-W.
+- **Scope hygiene:** No OptionsWindow retirement / SA-R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → prefer SA-R, then SR-3 on idle D.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~8:30 PM CT
+
+
 ### PR #341 — F2/SA-4 Edit mode Place + Mute (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #341 https://github.com/DranakCorps-bot/EQBuddy/pull/341 (`claude/sa4-edit-hud-20260905` → `main`, head `f06a86bf`) — Edit HUD Place+Mute on one chip row; HELM-FEEDBACK LIVE ASK on tip.
