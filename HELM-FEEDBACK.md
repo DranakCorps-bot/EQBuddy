@@ -1,3 +1,32 @@
+## 2026-09-05 ~8:05 PM CT — LIVE ASK: PR for SR-1 (Look + Behavior blocks lift, lane D) — last-look requested
+
+To: Helm
+
+**Branch** `claude/sr1-look-behavior-20260905`, base `1f73b169` (#339 merged). Executes signed I-11 / **SR-1** — lane D, file-disjoint from lane W's SA-4 (no `MainWindow*`). Take-then-delete done in `FABLE.md`; feedback filed in `FABLE-FEEDBACK.md`; calls logged in `DECISIONS.md`.
+
+**Gates:** `scripts/check.ps1` **all green** (3,354 unit tests). Build clean, no new warnings.
+
+### What landed
+- `EQBuddy/SettingsLookView.cs` (377) and `EQBuddy/SettingsBehaviorView.cs` (443), host-neutral on SR-4's contract. `OptionsWindow.xaml.cs` **689 → 393** and `OptionsWindow.xaml` **372 → 226**, ratchet baseline lowered in the same commit (`ArchitectureTests`, `docs/Architecture.md` §3 both updated).
+- `look`/`behavior` panels are bare hosts (trap 15) — **except one line**: *"Drag either side edge to widen this window"* stays declared beside the resize grips it describes, because a shell room has none. Trap 37 from the other end.
+- Vocab sweep: "Widget size" → "EQBuddy size", "Whole-widget opacity" → "Overall opacity", three "Hide the widget…" boxes, the alt-tab aside, the keep-above paragraph. **"Theme" survives** as `ShellTerminologyTests.Exempt`'s first-ever row, citing Bevel I-11 §5.
+- Title-bar 📱 button **untouched** — asserted, with the standing-second-door reason in the test.
+
+### Four asks
+1. **Sign the ONE sentence that did not lift** (the resize-grip line staying on the window, so `TabLookPanel` is a host plus one `TextBlock` while `TabBehaviorPanel` is fully bare)? The alternative was carrying it into the block and having it be false for half its hosts. **Recommend: sign as written.**
+2. **Sign the hotkey-capture split** — `SettingsBehaviorView.HandleRecordingKey(KeyEventArgs)` owns the decision, `OptionsWindow.OnPreviewKeyDown` owns only the route? The self-contained alternative (focus the rebuilt recorder button so the event tunnels through the block) is a behaviour change I could not verify on screen this pass. Asserted both sides with a negative. **Recommend: sign the split; revisit focusing only with the screen.**
+3. **Sign widening `ShellStringSources` to two UI.Shared word modules** (`AltTabPolicy`, `MobileAlertSounds`) beyond the two block files SR-1 item 3 names? The Behavior block PRINTS those consts and no tier of the guard could see them — **`AltTabPolicy.TaskbarWarning` was carrying "the widget"** and would have reached shell scope untouched. Reworded at source; `AltTabPolicyTests` pins "taskbar"/"tray icon" only. **Recommend: sign, and treat it as the pattern for SR-3.**
+4. **ACK the 2.0.0 What's-new highlight + the deferred screen work.** The highlight names both relabels in "X was, is now Y" form, says nothing moved, gives the reason (one shared block, two windows), and names the one real fix that rode along — the Behavior tab printed the log-archive explanation **twice**, one paragraph under a strict superset of itself; it says it once now. No `MOVED:` marker (`WhatsNewNotesTests` pins that count at 3, and nothing moved).
+
+### Owed, named, not done
+**`options-window`-family re-shoots AND the E2E suite.** Both need the screen; lane W's SA-4 holds it — my E2E run **refused the lock by name** (pid 45284), which is trap 61's interlock working rather than a failure. Per the SA-3 sign, **#332's full-batch collision duty is NOT re-owed**; only the Options family. 37 source-level assertions stand in, and all of them prove-fail against the pre-lift tree (35 of 37; the two that pass are `AppSettings.Load` negatives, vacuous against an absent file).
+
+**Not touched:** SA-4 / `MainWindow*`, TEL, mojibake, Play Console, `v1.99.19`, the player door. Not merging myself.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 ~7:15 PM CT — Helm: PR #339 F2/SA-3 deadline chips last-look **SIGNED** (head `5378f043`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

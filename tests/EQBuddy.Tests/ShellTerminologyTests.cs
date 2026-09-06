@@ -276,6 +276,24 @@ public class ShellTerminologyTests
         // per-rule pin tooltip's "mini dashboard" (the HUD).
         ("EQBuddy/SettingsAlertsView.cs",
             "the four alert blocks — every string Settings → Alerts can show, on both hosts"),
+        // SR-1's two blocks, joining for the same reason on the day they land. Look's sweep
+        // was two labels ("Widget size", "Whole-widget opacity" → EQBuddy's own name);
+        // Behavior's was the three "hide the widget" checkboxes, the alt-tab note's aside
+        // about chips and breakout windows, and the keep-above paragraph's two "widget"s.
+        // **"Theme" survives** — see the Exempt row below, which is a ruling rather than a
+        // hole (Bevel I-11 §5 flagged the collision before anyone could rewrite it away).
+        ("EQBuddy/SettingsLookView.cs",
+            "the Look block — the palette picker, the sliders, the grid and the cursor ring"),
+        ("EQBuddy/SettingsBehaviorView.cs",
+            "the Behavior block — pairing, the hide-when rules, hotkeys, logs, the tutorial"),
+        // NOT a shell file and not a block either: two UI.Shared word modules the Behavior
+        // block PRINTS. A const a block shows is a string the block shows, wherever it is
+        // declared, and neither module was reachable by any other tier — the block's own
+        // scan sees `MobileAlertSounds.Label`, an identifier, and learns nothing.
+        ("EQBuddy.UI.Shared/AltTabPolicy.cs",
+            "the Alt+Tab tick-box's cost sentence and its not-available note"),
+        ("EQBuddy.UI.Shared/MobileAlertSounds.cs",
+            "the mobile-sounds switch's label, helper line and scope note"),
         ("EQBuddy.UI.Shared/ShellPages.cs", "the rail's labels, descriptions and addresses"),
         ("EQBuddy.UI.Shared/ShellLayout.cs", "the two degrade axes — any text they name"),
         ("EQBuddy.UI.Shared/ShellRoomEmpty.cs", "the four data rooms' whole-room empties"),
@@ -314,14 +332,28 @@ public class ShellTerminologyTests
 
     /// <summary>
     /// The escape hatch, and it is deliberately narrow: a literal in a shell file that a
-    /// player never reads, which the two heuristics below cannot recognise. Empty today.
+    /// player never reads — or, as of SR-1, one that a player DOES read and is right to,
+    /// because the ban's pattern and the string's meaning are two different words wearing
+    /// one spelling.
     ///
     /// **An exemption nobody can see is a blind spot rather than an exemption** — the reason
     /// `SurfaceOwnershipTests` writes its two down with the PR that removes each. Adding a
-    /// row means saying, in the row, why the string never reaches a player; the assertion
+    /// row means saying, in the row, why the string is not the banned sense; the assertion
     /// underneath means a row that stops matching anything fails instead of rotting.
     /// </summary>
-    public static readonly (string File, string Literal, string Why)[] Exempt = [];
+    public static readonly (string File, string Literal, string Why)[] Exempt =
+    [
+        // **"Theme" is the COLOUR theme picker, not the banned window grouping.** The ban's
+        // `\bthemes?\b` is written against the v1 sense — "the Progress theme", "the Gear &
+        // Loot theme", a folded window grouping and therefore implementation vocabulary.
+        // This label sits above `ThemeCatalog`'s palette list (Parchment & Brass, Solarized,
+        // Turquoise…), which is a real, player-facing, David-ruled feature. Bevel flagged
+        // exactly this collision in its I-11 pre-design (§5, 2026-09-05) BEFORE anyone could
+        // run a mechanical rewrite over it, naming trap 34's shape: a guard misfiring on the
+        // wrong token. One row, one word, and no other string in either block needs it.
+        ("EQBuddy/SettingsLookView.cs", "Theme",
+            "the colour-palette picker's label, not the v1 window-grouping sense of the word"),
+    ];
 
     [Fact]
     public void EveryExemptionStillMatchesSomethingReal()
