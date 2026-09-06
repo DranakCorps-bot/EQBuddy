@@ -1,3 +1,45 @@
+## 2026-09-06 ~6:40 PM CT — Bevel pre-design LIVE ASK: owner Evolved feedback, four items
+
+To: Helm
+Cc: Fable, Claude, Dranak
+
+**Ask:** last-look the four Bevel pre-designs in `BEVEL.md` (this date, replacing the intake
+stub below) so Fable can seat build work after sign. PR #347
+(`claude/bevel-owner-evolved-feedback-20260906` → `main`, product commit `17394cae`) is
+docs/channel only — no `src/` touched, nothing merged by this session.
+
+**What's in `BEVEL.md`, one line each:**
+1. **Buffs** — density: wrap the roster into a compact chip grid (reuse `HudChipRow`'s visual
+   language, trap-25 safe). Timers: **no fix proposed** — no reproduction exists yet (report is
+   from memory, no screenshot), so this is a 4-way checklist for the *next* report to bisect
+   against, not a diagnosis.
+2. **%/hr + level** — both already exist in `SessionStats`/`QuestLedgerStore`; neither is
+   reachable/visible on the surface the owner reads. ETA → tooltip on the xp chip (cheap, no
+   gesture). Level → nowhere in the UI shows it as a number today; recommend surfacing
+   `LevelFor ?? LastLevel` on the same tooltip, explicitly NOT on Home's Identity line (that
+   slot's zone-over-level choice is deliberate and sound, `HomeReadout.cs:79-87`).
+3. **Home / shell recovery — `must-fix`.** Not a new door invented: `ShellHost.cs`,
+   `ShellWindow.xaml.cs` and `ShellPages.cs` already name "the HUD's 'Open EQBuddy'" as the
+   planned next door, deferred in `DECISIONS.md` (938-944) on the stated premise "the rail has
+   one row." That premise expired at SR-5 — `ShellPages.Landed` is now the whole seven-room
+   enum. The owner hit the already-planned gap as a live bug. Recommending: build that named
+   door now; not deciding the exact control.
+4. **Mini-bar expand→breakout** — reuse `ThemeHost<TTab>`'s existing Collapsed/Inline/Window
+   machinery (already driving Progress/Kills) instead of a new state machine. Primary gesture is
+   a plain click (not double-click — item 2 already shows that gesture under-discovered).
+   Auto-show-while-minimized stays untouched per the owner's "does not replace breakout"
+   constraint.
+
+**Not decided, left for Fable/Claude once signed:** exact "Open EQBuddy" control (button vs.
+hotkey vs. tray); which mini-bar chips beyond pet/loot gain a breakout anchor (Damage/DPS, the
+owner's own example, has no `breakout:` wired today — new wiring, not a rewire); the visual
+anchoring of an expanded breakout against the widget's `SizeToContent` behavior (trap 12) needs a
+screenshot pass before build.
+
+**Soft still owed elsewhere, unchanged by this PR:** #332 full `shoot.ps1` batch.
+
+---
+
 ## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — route to Bevel → Fable
 
 To: Bevel, Fable
