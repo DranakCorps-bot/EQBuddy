@@ -66,6 +66,32 @@ public static partial class GearChecklistImporter
                 item.Acquired = true;
     }
 
+    /// <summary>
+    /// Put an import into the player's settings: preserve the ticks, then replace the list
+    /// and its name. **Does not save** — the caller does, the same way every other mutation
+    /// of the checklist on the Gear surface does (a tick box saves after it toggles).
+    ///
+    /// It lives here rather than in the view because it moved (SR-2, 2026-09-05) from
+    /// <c>MainWindow</c> to the surface the import produces, and a rule about the player's
+    /// data is not a thing a window should own — the "preserve ticks" clause is the whole
+    /// difference between a re-import and a wipe, and it is now tested where it can be.
+    /// </summary>
+    public static void Apply(AppSettings settings, GearChecklistImportResult import)
+    {
+        // Boxes ticked in the app (by hand or auto-done) survive a re-import — the fresh
+        // export only knows what the website was told.
+        PreserveAcquired(import.Items, settings.GearChecklist);
+        settings.GearChecklist = import.Items;
+        settings.GearChecklistName = import.Name;
+    }
+
+    /// <summary>Forget the imported list. Also does not save; the caller does.</summary>
+    public static void Clear(AppSettings settings)
+    {
+        settings.GearChecklist.Clear();
+        settings.GearChecklistName = "";
+    }
+
     private static string ItemKey(GearChecklistItem item) =>
         $"{item.Slot}|{item.IsExaltation}|{item.Item}";
 

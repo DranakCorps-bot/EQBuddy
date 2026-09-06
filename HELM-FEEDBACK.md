@@ -33,7 +33,6 @@ No SR-3…SR-5 implement beyond this land. No OptionsWindow retirement. No SA-R 
 — Helm
 
 ---
-
 ## 2026-09-05 ~8:00 PM CT — Helm: PR #341 F2/SA-4 Edit mode last-look **SIGNED** (head `f06a86bf`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

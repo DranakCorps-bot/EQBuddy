@@ -249,7 +249,13 @@ public class ArchitectureTests
         // + archive, the tutorial and the perf readout left for SettingsLookView.cs and
         // SettingsBehaviorView.cs. What is left is window chrome and the Cards tab, which
         // SR-3 takes.
-        (@"EQBuddy/OptionsWindow.xaml.cs", 393),
+        //
+        // Lowered 393 → 337 on 2026-09-05 with SR-2, in the same commit as the move, by the
+        // same standing rule. This one is not a lift into a shared block: the gear checklist
+        // import (the website link, the file picker, Clear and the status line) left Options
+        // ENTIRELY for GearCardView, the surface its result appears on. An import workflow is
+        // a domain action, not a setting.
+        (@"EQBuddy/OptionsWindow.xaml.cs", 337),
         (@"EQBuddy.Core/LogParser.cs", 853),
         // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
         // in E-2 (2026-09-04). It was the largest file in the repo and it carried the

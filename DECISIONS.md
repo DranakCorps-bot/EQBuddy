@@ -38,6 +38,34 @@
 
 ---
 
+## 2026-09-05 (E-3 lane D / SR-2 — the gear checklist import leaves Options)
+
+- **`Clear` now ASKS before it wipes an imported gear list** · could have carried the button
+  across unchanged, as Options had it · the move is what changed the risk: the button went from
+  two clicks deep on a screen nobody keeps open to sitting beside a list read every session, and
+  what a mis-click destroys is not the export (still on the website) but every box ticked since,
+  which only EQBuddy holds. `GearChecklistPresentation.ClearConfirm` says exactly that.
+- **`Clear` is HIDDEN with nothing to clear, not disabled** · could have kept `IsEnabled = false`
+  · this app's button style carries no disabled visual (trap 17), so the Options version rendered
+  identically to a live button and silently swallowed the click. Hidden says the same thing in a
+  way a player can see, and the row keeps its two live buttons.
+- **The block's heading and blurb did NOT travel** · could have carried “Gear checklist” + “Import
+  the exported shopping-list HTML…” verbatim · the destination already says both, and says them
+  better: the tab IS the gear checklist, and `EmptyRoute` is the explanation David made us rewrite
+  twice on 2026-08-20. Carrying them would have shipped one fact twice on one surface — SR-1's
+  log-archive paragraph, same call.
+- **The status line kept only the OUTCOMES** · could have kept printing “{name}: {done}/{total}
+  checked.” · that is what `_listName` says two lines above it on this surface; what only the
+  status line can say is what the last action did, so it says that (including on success) and is
+  collapsed until there is something to report.
+- **The mutation went to Core rather than calling back into `MainWindow`** · could have threaded
+  two delegates through `MainWindow.NewGearCard` to all three hosts · lane D is file-disjoint from
+  lane W by this kick's scope, and `GearChecklistImporter.Apply`/`.Clear` is the better home
+  anyway: the clause that separates a re-import from a wipe is now executed by a test instead of
+  asserted about a window. **Residual, disclosed:** `MainWindow.ImportGearChecklist` and
+  `ClearGearChecklist` are now callerless and owe a deletion from the next lane-W-safe change.
+
+---
 ## 2026-09-05 (E-3 lane D / SR-1 — the Look and Behavior blocks leave OptionsWindow)
 
 - **The Behavior tab's duplicated log-archive paragraph says it ONCE now** · could have been

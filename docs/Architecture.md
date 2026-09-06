@@ -134,7 +134,7 @@ the lift came first, and the baseline came down in the same commit.**
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 393 | 393 | 432 | 39 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 337 | 337 | 370 | 33 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
 
 **Lowered 1,547 → 689 on 2026-09-05 (E-3 lane D, SR-4), in the same commit as the lift.**
@@ -159,6 +159,17 @@ persistence, the monitor clamp, the tab links, the resize grips and the one dim 
 describes them, plus the routing of a key press to an armed hotkey recorder, which no block can
 receive because rebuilding its own rows destroys the control that had focus. The `cards` tab is
 the remaining tenant and SR-3 takes it.
+
+**Lowered again, 393 → 337 on 2026-09-05 (E-3 lane D, SR-2), and this one is NOT a lift into a
+shared block.** The gear checklist import — *Open EQ Legends Tools*, *Import gear list…*,
+*Clear* and the status line under them — left Options ENTIRELY, for `EQBuddy/GearCardView.cs`:
+the surface the import produces, where it sits above the list beside the ⧉ copy of `/outputfile
+inventory`. **An import workflow is a domain action, not a setting**, and this one was two
+windows away from the only place its result has ever appeared; both hosts of that card (the
+Gear & Loot window and the shell's Gear room) build their own instance, so both got it in one
+commit. The mutations went further, into `Core/GearChecklistImporter.Apply`/`.Clear`, where the
+clause that separates a re-import from a wipe — *your ticks survive* — is finally executable by
+a test instead of being asserted about a window.
 
 **Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
 the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any
