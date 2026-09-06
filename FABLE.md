@@ -246,21 +246,33 @@ Feedback, including the one plan defect and what it cost, is in `FABLE-FEEDBACK.
    `docs/screenshots/` and the docs first — trap 21) with spawn timers + a mez chip
    seeded and the picture predicted in writing before it runs.
 
-### SA-3 — Net-new deadline chips: Watch-fire and buff-expiring
+### SA-3 — TAKEN 2026-09-05, built and green (Claude, lane W)
 
-1. Two new families on the row SA-2 built, per §3's earn table (both are deadlines with
-   actions). **Watch-fire:** chip appears when a tracked rule fires — same event that
-   drives `AlertSoundPlan` — lingers a fixed short window or until dismissed. **Buff
-   expiring:** chip appears at a fixed T-minus threshold from the buff timer data the
-   Buffs surface already draws (hypothesis to verify in-PR: that data is on the snapshot;
-   the Buffs breakout implies it, not read this pass).
-2. **Defaults are pinned constants, not new Options rows.** Threshold tuning is a later
-   ask if players ask; SA-3 ships no settings surface (mute arrives with SA-4).
-3. The `buffs` `MiniStats` key does NOT retire here — it retires with the Buffs card cut
-   under the per-item gate (SA-R). SA-3 merely builds the destination that unblocks that
-   row's gate.
-4. E2E facts + staged shot with a rule-fire and an expiring buff in the fixture window;
-   predictions first.
+Struck rather than left to be re-read as pending — the take-then-delete contract. What
+landed, so SA-4 does not have to re-derive it:
+
+- **`HudChipFamily` is four**: `Mez, Spawn, WatchFire, Buff`, and `DefaultOrder` is already
+  exactly the list SA-4's signed `HudChipOrder` default names. `Merge` takes the two new
+  lists as optional arguments; `order` is now a NAMED argument (two SA-2 test call sites
+  moved to `order:`).
+- **`UI.Shared/WatchFireLedger.cs`** — one chicklet per RULE (not per firing), 30 s linger,
+  dismiss, and **the `AlertBanner` gate lives there** as `Record(TrackedRule, …) → bool`, so
+  it is assertable. `HudChipRow.WatchChips` / `BuffChips` are the two builders.
+- **The buff threshold is `AppSettings.BuffWarnSeconds`, not a pinned constant** — still no
+  new Options row, and `HudChipRow.BuffWarnWindow` is now the single source the Buffs card's
+  three inline clamps also call. **Hypothesis (1) resolved, with a correction: the buff data
+  is NOT on the snapshot.** It is on `MainWindow._buffTracker`, the same shape `_mezTracker`
+  and `_slowTracker` take — which is better for this, since the row already asks trackers.
+- **`HudChipRow.Build` is new and is where the ratchet room came from.** The four families'
+  gates, probes and thresholds left `MainWindow`, which ends the PR **10 lines smaller than
+  it started** having gained two families. `ChipStackPlanTests`' source scan was re-pointed
+  (the widget must now name `ChipStackPlan` *nowhere*), not relaxed.
+- `hudChipsWatch=` / `hudChipsBuff=` / `buffsActive=` in `EQBUDDY_EXPAND`; `hud-chips`
+  untouched and a new `hud-chips-deadlines` shot carries all four families.
+- The `buffs` `MiniStats` key is untouched, as scoped — it retires with the card under SA-R.
+
+Feedback, including the trap this round earned (a negative E2E assertion that passed with
+the feature deleted) and one filed-not-fixed defect, is in `FABLE-FEEDBACK.md`.
 
 ### SA-4 — Edit mode: Place / Mute / Dismiss on the one row
 

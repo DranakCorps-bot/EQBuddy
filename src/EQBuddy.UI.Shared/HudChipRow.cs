@@ -24,6 +24,17 @@ public enum HudChipFamily
     /// <summary>Spawn countdowns: ambient camp furniture, every running timer on the
     /// server regardless of zone.</summary>
     Spawn,
+
+    /// <summary>A watch rule that has just fired and is still lingering (SA-3). Net-new UI —
+    /// nothing visual existed for this before the row; the only on-screen form a firing rule
+    /// had was <c>AlertWindow</c>'s six-second banner. See <see cref="WatchFireLedger"/>.
+    /// </summary>
+    WatchFire,
+
+    /// <summary>A buff on you that is inside its expiry warning window (SA-3). Also net-new:
+    /// the Buffs card has drawn these countdowns since #120, but only where a player has to
+    /// look away from the game to read them.</summary>
+    Buff,
 }
 
 /// <summary>One chicklet on the row, with the family it came from. The family is carried
@@ -67,20 +78,30 @@ public static class HudChipRow
     /// <summary>Family order on the row, left to right. Mez first: combat-urgent before
     /// ambient. SA-4 makes this a stored <c>HudChipOrder</c> the player can nudge; until
     /// then <see cref="Merge"/>'s optional order argument is the seam that will read it, so
-    /// the setting arrives without reshaping this file.</summary>
+    /// the setting arrives without reshaping this file.
+    ///
+    /// **The four names are the ones SA-4's signed default order already spells** — "mez,
+    /// spawn, watch-fire, buff, urgency order" — so SA-3 extends this list to exactly the
+    /// shape the setting will ship with rather than inventing an order an executor would have
+    /// to reconcile later.</summary>
     public static readonly IReadOnlyList<HudChipFamily> DefaultOrder =
-        [HudChipFamily.Mez, HudChipFamily.Spawn];
+        [HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire, HudChipFamily.Buff];
 
     /// <summary>Does a due chip in this family replace its countdown with "DUE"?
     /// Spawn does (the camp has popped and the chip has said its piece — click it away);
-    /// the fight family does not (a mez at 0:04 is still counting toward a wake-up, and
-    /// the last-tick warning tint is the whole signal).</summary>
+    /// nothing else does. A mez at 0:04 is still counting toward a wake-up and the last-tick
+    /// warning tint is the whole signal; a buff at 0:04 is the same sentence about a recast;
+    /// and a watch-fire chip's countdown is its own linger, which is not a deadline the
+    /// player acts on at all.</summary>
     public static bool FlipsToDue(HudChipFamily family) => family == HudChipFamily.Spawn;
 
-    /// <summary>Does this family's gauge drain rather than fill? The fight family draws the
-    /// REMAINING share, shrinking, like a buff bar; spawn draws elapsed progress toward the
-    /// respawn. <see cref="SpawnChip.Fraction"/> is the elapsed share in both cases.</summary>
-    public static bool GaugeDrains(HudChipFamily family) => family == HudChipFamily.Mez;
+    /// <summary>Does this family's gauge drain rather than fill? Spawn is the only family
+    /// that FILLS — it draws elapsed progress toward a respawn, which is a thing arriving.
+    /// Every other family draws the REMAINING share, shrinking, like a buff bar: a mez, a
+    /// slow, a warned buff and a lingering alert are all things going away.
+    /// <see cref="SpawnChip.Fraction"/> is the elapsed share in every case, so the one
+    /// subtraction lives here rather than in four builders.</summary>
+    public static bool GaugeDrains(HudChipFamily family) => family != HudChipFamily.Spawn;
 
     /// <summary>The chicklet's countdown face. The one place the DUE flip is decided, so a
     /// second host of the row cannot answer it differently (trap 58's shape).</summary>
@@ -112,12 +133,15 @@ public static class HudChipRow
     /// family is not showing.</param>
     /// <param name="spawn">Spawn countdowns. Empty when
     /// <see cref="ChipStackPlan.SpawnStack"/> says the family is not showing.</param>
+    /// <param name="watchFire">Watch rules still lingering after they fired (SA-3).</param>
+    /// <param name="buff">Buffs inside their expiry warning window (SA-3).</param>
     /// <param name="order">Family order; <see cref="DefaultOrder"/> when null. A family
     /// missing from a supplied order is DROPPED rather than appended — SA-4's Mute is a
     /// per-family absence, and an order that silently re-adds what mute removed would be
     /// two answers to one question.</param>
     public static List<HudChipEntry> Merge(
         IReadOnlyList<SpawnChip> mez, IReadOnlyList<SpawnChip> spawn,
+        IReadOnlyList<SpawnChip>? watchFire = null, IReadOnlyList<SpawnChip>? buff = null,
         IReadOnlyList<HudChipFamily>? order = null)
     {
         var row = new List<HudChipEntry>();
@@ -127,11 +151,61 @@ public static class HudChipRow
             {
                 HudChipFamily.Mez => mez,
                 HudChipFamily.Spawn => spawn,
+                HudChipFamily.WatchFire => watchFire ?? [],
+                HudChipFamily.Buff => buff ?? [],
                 _ => [],
             };
             foreach (var chip in chips) row.Add(new HudChipEntry(family, chip));
         }
         return row;
+    }
+
+    /// <summary>
+    /// THE WHOLE ROW FOR ONE TICK: ask every family's gate, ask the families that pass, merge.
+    ///
+    /// **This came out of `MainWindow.RefreshHudChips` in SA-3, and the reason is coverage.**
+    /// SA-2 left "which trackers to ask" in the window on the grounds that it was the window's
+    /// own business, and with two families it was — the whole body was two gate calls. With
+    /// four it is a decision: four gates, four probes, three settings and a threshold, none of
+    /// which the WPF layer can test (docs/TestPlan.md §5). The window keeps what is genuinely
+    /// its own — the row window's lifecycle, and whether the World window is showing Camps,
+    /// which is a question about a <c>Window</c>.
+    ///
+    /// Every argument is a Core or UI.Shared type, so this stays framework-free.
+    ///
+    /// **The emptiness probes are not an optimisation, they are the contract.** Each family is
+    /// asked "have you got anything" before its full list is built, so the row does not build
+    /// four lists once a second to learn they were empty.
+    /// </summary>
+    /// <param name="hiddenForFocus">The widget is hidden because the game lost focus. Every
+    /// family goes with it — a chip row over someone's browser is the thing focus-hide
+    /// exists to prevent.</param>
+    /// <param name="worldOnCamps">The World window is up AND showing Camps, so the spawn
+    /// family's timers are already on screen there (the Bevel-signed hide-rule).</param>
+    public static List<HudChipEntry> Build(
+        AppSettings settings, bool hiddenForFocus, bool worldOnCamps,
+        SpawnsViewModel spawns, MezTracker mez, SlowTracker slow,
+        WatchFireLedger fires, BuffTracker buffs, DateTime now)
+    {
+        var spawnChips = ChipStackPlan.SpawnStack(settings.TrackSpawns, hiddenForFocus,
+            worldOnCamps, spawns.HasActiveTimers(now))
+            ? spawns.Chips(now) : [];
+
+        var mezOn = settings.MezChipsEnabled;
+        var slowOn = settings.SlowAlertEnabled
+            && (!settings.SlowAlertRaidOnly || slow.InRaid(now));
+        var fightChips = ChipStackPlan.FightStack(hiddenForFocus,
+            mezHasChips: mezOn && mez.Any(now),
+            slowHasChips: slowOn && slow.Any(now))
+            ? [.. mezOn ? MezChips(mez, now) : [], .. slowOn ? SlowChips(slow, now) : []]
+            : new List<SpawnChip>();
+
+        var watchChips = ChipStackPlan.WatchFireStack(hiddenForFocus, fires.Any(now))
+            ? WatchChips(fires, now) : [];
+        var buffChips = ChipStackPlan.BuffStack(hiddenForFocus, buffs.ActiveCount > 0)
+            ? BuffChips(buffs, now, settings.BuffWarnSeconds) : [];
+
+        return Merge(fightChips, spawnChips, watchChips, buffChips);
     }
 
     /// <summary>How many chips this family put on the row — the <c>hudChips</c> dump's
@@ -272,4 +346,108 @@ public static class HudChipRow
                 OnDismiss = () => tracker.Dismiss(s.Message),
             };
         }).ToList();
+
+    /// <summary>
+    /// The watch-fire family (SA-3): one chicklet per rule that has fired and is still inside
+    /// its <see cref="WatchFireLedger.Linger"/>.
+    ///
+    /// **The face is the rule's NAME and the countdown is the chip's own linger** — not the
+    /// match. A Text rule's label is a trimmed log line of up to eighty characters, and the
+    /// chicklet's name column trims at 180px with no ellipsis budget to spare, so putting the
+    /// match on the face would clip the one thing it was carrying. The label goes in the
+    /// tooltip, where it has room, beside the time the rule fired.
+    ///
+    /// **The countdown is honest about what it counts.** It is the linger, not a deadline the
+    /// player acts on — which is why this family does not flip to "DUE" (there is no moment)
+    /// and why the gauge drains: the chicklet is visibly on its way out, so a player can tell
+    /// "this is about to stop reminding me" from "this is about to happen".
+    ///
+    /// <c>Bell</c>, not the Watch card's <c>Target</c>: on this row the icon says what kind of
+    /// EVENT a chicklet is, the way <c>Moon</c> and <c>Timer</c> do, and the card's icon
+    /// belongs to a different object (B3 §3 — breakouts and cards are not HUD chips). Reusing
+    /// <c>Timer</c> would have made a watch chip and a spawn chip the same shape at a glance,
+    /// which is #148/#166's three-identical-boxes failure with vectors instead of emoji.
+    /// </summary>
+    public static List<SpawnChip> WatchChips(WatchFireLedger ledger, DateTime now) =>
+        ledger.Snapshot(now).Select(f =>
+        {
+            var left = WatchFireLedger.Remaining(f, now);
+            return new SpawnChip(
+                Zone: "", Name: f.RuleName,
+                CountdownText: $"{(int)left / 60}:{(int)left % 60:00}",
+                IsDue: false,
+                Detail: $"{f.Label}\nfired {f.FiredAt:h:mm:ss tt}",
+                Icon: "Bell")
+            {
+                Fraction = WatchFireLedger.Spent(f, now),
+                OnDismiss = () => ledger.Dismiss(f.RuleId),
+            };
+        }).ToList();
+
+    /// <summary>
+    /// The buff-expiring family (SA-3): every buff believed active on you whose countdown has
+    /// come inside <paramref name="warnSeconds"/>, soonest-fading first — the order
+    /// <see cref="BuffTracker.Snapshot"/> already hands over.
+    ///
+    /// **The threshold is <c>AppSettings.BuffWarnSeconds</c>, not a new constant.** SA-3 ships
+    /// no settings surface, and the player already answered "when does a buff become urgent"
+    /// for the Buffs card — asking them again in a second place, or answering it differently
+    /// here, is one fact with two sources (trap 4). <see cref="BuffWarnWindow"/> is that one
+    /// source, floor included.
+    ///
+    /// **A buff with no known duration gets no chicklet.** <see cref="BuffState.ExpiresAt"/> is
+    /// null when the landing could not be attributed at all, and a deadline chip with no
+    /// deadline is a chip that can never leave.
+    ///
+    /// **"est" rides on the face, exactly as it does on the card.** A wiki-base duration is a
+    /// floor — ranks and AAs lengthen buffs — and a chicklet reading a bare "0:45" for a
+    /// number that might be two minutes out is the chip claiming a precision the tracker does
+    /// not have. It costs four characters and it is the same word the card uses, so the two
+    /// surfaces cannot be read as disagreeing.
+    ///
+    /// **The gauge is the share of the WARNING WINDOW left, not of the buff.** A 27-minute
+    /// Clarity that only earns a chicklet for its last minute would otherwise draw a bar
+    /// frozen at 99% for the whole of that chicklet's life — technically the elapsed share of
+    /// the spell, and useless. Measured against the window the chip exists inside, the gauge
+    /// empties as the chip's own reason to be there does. (<see cref="SpawnChip.Fraction"/>
+    /// stays the ELAPSED share, as it is for every other family;
+    /// <see cref="GaugeDrains"/> does the subtraction.)
+    ///
+    /// **Not dismissible**, following the mez precedent: it clears itself when the buff fades
+    /// or is recast, and a per-instance dismissal would need state that outlives a re-landing
+    /// to mean anything. SA-4's per-family Mute is the answer to "I never want these".
+    /// </summary>
+    public static List<SpawnChip> BuffChips(BuffTracker tracker, DateTime now, double warnSeconds)
+    {
+        var warn = BuffWarnWindow(warnSeconds);
+        return tracker.Snapshot(now)
+            .Where(b => b.RemainingSeconds(now) is { } r && r <= warn)
+            .Select(b =>
+            {
+                var left = b.RemainingSeconds(now) ?? 0;
+                return new SpawnChip(
+                    Zone: "", Name: b.Label,
+                    CountdownText: $"{(int)left / 60}:{(int)left % 60:00}{(b.Estimated ? " est" : "")}",
+                    // The last server tick, the same window a mez chip takes its warning
+                    // tint in. BuffTracker.ServerTickSeconds is where six comes from.
+                    IsDue: left <= BuffTracker.ServerTickSeconds,
+                    Detail: string.Join(" · ", new[]
+                    {
+                        b.Candidates.Length > 1 ? "One of: " + string.Join(", ", b.Candidates) : "",
+                        b.Caster.Length > 0 ? $"cast by {b.Caster}" : "",
+                        $"landed {b.LandedAt:h:mm:ss tt}",
+                        b.Estimated ? "est = wiki base; a natural fade teaches your real duration" : "",
+                    }.Where(part => part.Length > 0)),
+                    Icon: "Hourglass")
+                {
+                    Fraction = Math.Clamp(1 - left / warn, 0, 1),
+                };
+            }).ToList();
+    }
+
+    /// <summary>The buff-expiring family's T-minus threshold, in seconds: the player's own
+    /// <c>AppSettings.BuffWarnSeconds</c> with the same ten-second floor the Buffs card has
+    /// always applied. One place, because the card and the chip must not be able to disagree
+    /// about when a buff has become urgent.</summary>
+    public static double BuffWarnWindow(double warnSeconds) => Math.Max(10, warnSeconds);
 }

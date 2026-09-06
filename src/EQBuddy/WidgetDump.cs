@@ -315,7 +315,20 @@ internal static class WidgetDump
                     $"hudChipsRow={(w._hudChips is { IsVisible: true } ? 1 : 0)} " +
                     $"hudChipsMez={w._hudChips?.MezChips ?? 0} " +
                     $"hudChipsSpawn={w._hudChips?.SpawnChips ?? 0} " +
+                    // SA-3's two net-new families. Separate keys rather than a total for the
+                    // reason above: "the buff family stopped contributing" and "the row is
+                    // empty" are different failures and a sum tells them apart never.
+                    $"hudChipsWatch={w._hudChips?.WatchChips ?? 0} " +
+                    $"hudChipsBuff={w._hudChips?.BuffChips ?? 0} " +
                     $"hudChipsDue={w._hudChips?.DueChips ?? 0} " +
+                    // The DATA behind the buff family, beside the family's rendered count —
+                    // so "no chip because nothing is expiring" and "no chip because nothing
+                    // landed" are two readings rather than one absence. Without it the
+                    // negative assertion (a buff outside its warning window earns no chip)
+                    // passes just as well against a tracker that never saw the landing at
+                    // all, which is trap 56's lesson about a wait needing a liveness question
+                    // as well as a value one.
+                    $"buffsActive={w._buffTracker.ActiveCount} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +

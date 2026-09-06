@@ -1294,6 +1294,59 @@ $Shots = [ordered]@{
                            )
                            Append = @('You begin casting Mesmerization.'
                                       'a skeleton has been mesmerized.') }
+    # SA-3's TWO NET-NEW FAMILIES on that same row — a watch rule that has just fired, and a
+    # buff inside its expiry warning window. A NEW name, checked first (trap 21): nothing
+    # embeds 'hud-chips-deadlines', and 'hud-chips' stays exactly as SA-2 shot it — that
+    # picture is a reviewed record of the FOLD, and superseding it with a busier one would
+    # spend a signed illustration to save a PNG.
+    #
+    # This is the only shot in the file that needs lines read while the app is RUNNING
+    # (AppendLive, added with it). A watch rule staged the ordinary way is a rule that
+    # correctly does nothing: the startup replay fires no banners, on purpose.
+    #
+    # PREDICTION, written BEFORE the shot (trap 23). ONE horizontal row of FIVE chicklets,
+    # left to right, in HudChipRow.DefaultOrder — which is the first picture there has ever
+    # been of all four families at once, and is the order SA-4's setting will default to:
+    #   1. MEZ, moon: "Skeleton", counting mm:ss, gauge DRAINING.
+    #   2. SPAWN, timer: "Bones Brackins" reading the word DUE in warn ink, warn border,
+    #      gauge SOLID in the bad ink. Spawn chips are soonest-first, so the overdue one
+    #      leads (the correction SA-2's own prediction earned).
+    #   3. SPAWN, timer: "Kizdean Gix" near 28:5x, gauge FILLING and barely started.
+    #   4. WATCH-FIRE, bell: "Assist call" — the RULE'S name, not the line it matched —
+    #      counting its 30 s linger down, so about 0:21-0:23 at an 8 s settle, gauge
+    #      DRAINING. The matched line is in the tooltip, which a capture cannot show.
+    #   5. BUFF, hourglass: "Stalwart Regeneration" reading about "0:52 est" — the shortest
+    #      buff in the shipped catalog is 60 s, so it lands INSIDE the DEFAULT 60 s warning
+    #      window and this needs no cranked setting to exist. Gauge DRAINING, nearly full:
+    #      it is measured against the WARNING WINDOW, not the spell. Cast by Sanctari rather
+    #      than by You, so Spell Casting Reinforcement cannot lengthen the estimate and make
+    #      the number here depend on the fixture's AAs.
+    # Two chicklets reading DUE, or a bell and a timer drawn as the same shape, is the
+    # net-new half failing exactly where #148/#166 says it fails — and no diff shows it.
+    # SHOT 2026-09-05, 694x32: five chicklets, five DISTINCT vectors, in the predicted order
+    # and with every number inside its predicted range — "Skeleton 0:13", "Bones Brackins
+    # DUE" (warn ink, warn border), "Kizdean Gix 28:50", "Assist call 0:22", "Stalwart
+    # Regeneration 0:51 est". The prediction is recorded unamended because nothing needed
+    # amending, which has not been true of the last three shots added to this file.
+    'hud-chips-deadlines' = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{}
+                           Set = @{ TrackSpawns = $true; MezChipsEnabled = $true
+                                    TrackedRules = @(
+                                        @{ Id = 'shot-assist'; Name = 'Assist call'
+                                           Pattern = 'assist on'; Kind = 6; AlertBanner = $true }
+                                    ) }
+                           Timers = @(
+                               @{ Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix'
+                                  KilledSecondsAgo = 60; DurationSeconds = 1800 }
+                               @{ Zone = 'Befallen'; Name = 'Bones Brackins'
+                                  KilledSecondsAgo = 30; DurationSeconds = 10 }
+                           )
+                           Append = @('You begin casting Mesmerization.'
+                                      'a skeleton has been mesmerized.')
+                           AppendLive = @(
+                               'Sanctari begins casting Stalwart Regeneration.'
+                               'Your feet anchor to the ground as you begin to regenerate.'
+                               "Sanctari tells the group, 'assist on a froglok tad shaman'") }
     'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:
     # 'spawns-window' is embedded by the docs and stays Runnyeye. PREDICTION, written
@@ -1336,6 +1389,17 @@ $Shots = [ordered]@{
     # what the two cuts cost: someone hunting for any of those six names finds no row here
     # at all. Recorded in HELM-FEEDBACK.md rather than papered over - and cut 2's half is
     # the bigger one, four names against two.
+    #
+    # AMENDED SA-3 (2026-09-05), and the amendment IS the re-shoot that was owed. The two
+    # paragraphs above describe a gap that has been CLOSED: #335/#336 landed Bevel's
+    # Options-gap ruling (I-11 section 4), so the six names are on this screen again, under a
+    # "No longer on the widget" heading below the card rows - "Sky Quests / Epics ... are
+    # tabs in the Quest tracker now", "Travels & Deaths / Zone map / Travel route / Spawn
+    # timers ... are tabs in the World window". The committed PNG predated that and could not
+    # show it, which is precisely why the re-shoot was owed rather than optional.
+    # SHOT 2026-09-05, 420x490: eight card rows exactly as predicted (Combat, Healing, Kills &
+    # Drops, Gear & Loot, Watch, Buffs, Progress, Motes), no Quests row, no World row, and the
+    # retired list present with both sentences. The rest of the tab is unchanged.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
@@ -1649,16 +1713,22 @@ Copy-Item $pristineLog.FullName $pristineCopy -Force
 # CANNOT simply gain one: tests/EQBuddy.E2E replays the same file, and one E2E case
 # asserts that the ding list is absent BEFORE it appends its own level-up. Per-shot
 # appends give a shot the state it needs without making the fixture lie to a test.
+function Add-LogLines([string[]]$lines) {
+    if (-not $lines -or $lines.Count -eq 0) { return }
+    $log = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
+    if (-not $log) { throw "No fixture log to append to in $($logsDir.FullName)" }
+    # The game's own stamp shape, e.g. [Mon Jul 20 19:03:34 2026].
+    $stamp = (Get-Date).ToString("[ddd MMM d HH:mm:ss yyyy]", [Globalization.CultureInfo]::InvariantCulture)
+    foreach ($line in $lines) { Add-Content -Path $log.FullName -Value "$stamp $line" -Encoding utf8 }
+}
+
 function Append-Log([string[]]$lines) {
     $log = Get-ChildItem -Path $logsDir.FullName -Filter 'eqlog_*.txt' | Select-Object -First 1
     if (-not $log) { throw "No fixture log to append to in $($logsDir.FullName)" }
     # Unconditional, and BEFORE the early return: a shot with no appends of its own must
     # still be given a clean log, or it inherits the previous shot's level-ups.
     Copy-Item $pristineCopy $log.FullName -Force
-    if (-not $lines -or $lines.Count -eq 0) { return }
-    # The game's own stamp shape, e.g. [Mon Jul 20 19:03:34 2026].
-    $stamp = (Get-Date).ToString("[ddd MMM d HH:mm:ss yyyy]", [Globalization.CultureInfo]::InvariantCulture)
-    foreach ($line in $lines) { Add-Content -Path $log.FullName -Value "$stamp $line" -Encoding utf8 }
+    Add-LogLines $lines
 }
 
 
@@ -2310,6 +2380,23 @@ try {
                     "Visible windows of that process: $what. Capturing anyway so shot.ps1 " +
                     "reports the same failure it always did.")
             }
+            # LINES THE APP MUST READ WHILE IT IS RUNNING, not during its startup replay.
+            #
+            # `Append` writes before launch, which is right for anything whose effect is
+            # STATE — a level-up the Progress card lists, a mez the tracker is still holding.
+            # It is useless for anything whose effect is an ALERT: replaying today's log at
+            # startup deliberately fires no banners, because nobody wants a burst of them for
+            # things that happened an hour ago. So a watch rule staged through `Append` is a
+            # rule that correctly does nothing, and the shot would be a picture of an empty
+            # row that looks exactly like a broken feature (trap 23's shape, arriving through
+            # the harness like trap 51's).
+            #
+            # Written AFTER the target window is up and BEFORE the settle, so the tail's
+            # 150 ms poll and the widget's 1 s tick both land inside the settle budget.
+            # Append-only, deliberately: the restore-then-append that `Append` does would
+            # rewrite the file underneath a running tail.
+            if ($spec.AppendLive) { Add-LogLines $spec.AppendLive }
+
             $backdropForm.Refresh()
             # PARK THE POINTER OFF EVERY WINDOW BEFORE THE SETTLE, or the capture is a
             # picture of where the mouse happened to be. WPF paints :hover from the real

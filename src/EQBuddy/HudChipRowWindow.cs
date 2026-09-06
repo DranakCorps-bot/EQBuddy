@@ -51,6 +51,11 @@ internal sealed class HudChipRowWindow : Window
     /// are chicklet borders and a future separator would quietly join the count.</summary>
     public int MezChips { get; private set; }
     public int SpawnChips { get; private set; }
+    /// <summary>SA-3's two net-new families, counted the same way and for the same reason:
+    /// a family that silently stops contributing is a 0 beside a live row rather than an
+    /// absence nothing names.</summary>
+    public int WatchChips { get; private set; }
+    public int BuffChips { get; private set; }
     public int DueChips { get; private set; }
 
     public HudChipRowWindow(MainWindow main, SpawnsViewModel spawns)
@@ -94,6 +99,8 @@ internal sealed class HudChipRowWindow : Window
         _row = [.. row];
         MezChips = HudChipRow.CountOf(_row, HudChipFamily.Mez);
         SpawnChips = HudChipRow.CountOf(_row, HudChipFamily.Spawn);
+        WatchChips = HudChipRow.CountOf(_row, HudChipFamily.WatchFire);
+        BuffChips = HudChipRow.CountOf(_row, HudChipFamily.Buff);
         DueChips = HudChipRow.DueCount(_row);
 
         var signature = HudChipRow.Signature(_row);

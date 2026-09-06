@@ -17,38 +17,46 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
-## 2026-09-05 (E-3 lane D / SR-4 — the alert blocks lift)
+## 2026-09-05 (F2 / SA-3 — net-new deadline chips: watch-fire and buff-expiring)
 
-- **The slow alert's three checks went with the SHARED HEADER, not with Watch** · the plan
-  named both and left it to the executor · it is a built-in, not a rule the player wrote —
-  there is nothing to add, reorder, share or delete — and the header's own helper line already
-  names it ("Used wherever EQBuddy speaks — watch rules with the S toggle, and the slow
-  alert"). Filing it under Watch would put a fixed, undeletable row in the middle of an editor
-  whose entire grammar is "these are yours". `SettingsAlertsView.BuildHeader`, with the
-  enumeration row in `SettingsAlertsBlockTests`.
-- **SR-4 builds NO tab strip control** · the plan's item 6 asks for trap 25 on "the strip" ·
-  item 5 fixes the v1 arrangement as five tabs with the blocks stacked, so a strip built here
-  would have had no consumer until SR-5 — a producer with no reader, which is trap 43's exact
-  shape and the thing SR-3's own text warns against ("this PR adds nothing beyond what
-  re-hosting needs"). What IS spent is the definition: `AlertSurface.Tabs()` with real counts
-  drives the stacking order and the three section headings, and the trap-25 obligation is
-  written onto `SettingsAlertsView.Tabs()` where whoever renders it as a strip will read it.
-- **The Alerts tab's blocks are stacked in `AlertSurface` order, which swaps Spawns and
-  Crowd** · keeping the old hand-written order · one definition of what the tabs are is the
-  whole point of the surface, and two hosts disagreeing about their order is #122/#152's shape.
-  Named in the 2.0.0 What's-new entry rather than left for someone to find.
-- **The vocab sweep ran over the lifted block, and four v1 sentences changed** · the ban
-  exempts v1 `OptionsWindow` · a block serving two hosts has ONE string set and it has to pass
-  in shell scope, which is the plan's own clamp. Two "Buffs card" → "buff list", one "under the
-  widget" → "under EQBuddy", and the per-rule pin tooltip's "mini dashboard" → "the HUD".
-  `SettingsAlertsView.cs` joins `ShellTerminologyTests.ShellStringSources`, prove-failed.
-- **No `EQBUDDY_EXPAND` facts and no re-shot `options-window` in this PR** · CLAUDE.md's
-  standing move is to pin window behaviour in E2E before a move · both need the screen, and
-  SA-3 holds it (trap 61: two seats fail a random row of each other's batch and both failures
-  read as a defect in whatever was under review). The lift is covered by 43 source-level
-  assertions instead, all 39 enumeration rows prove-failed against the pre-lift tree. **The
-  `options-window`-family re-shoot is OWED** and belongs to the first SR PR that holds the
-  screen, together with the #332 full-batch duty the plan already names.
+- **The watch-fire chip is gated on the rule's own `AlertBanner`** · could have fired on every
+  rule that reaches `FireAlert`, which is the literal reading of "the same event that drives
+  `AlertSoundPlan`" · gated, because SA-4 brings per-family Mute and until then an ungated chip
+  is an on-screen output with no off-switch anywhere, added to rules that already have one.
+  Sound and speech untouched either way. `UI.Shared/WatchFireLedger.Record(TrackedRule,…)`,
+  asserted by `HudDeadlineChipTests`.
+- **The buff threshold REUSES `AppSettings.BuffWarnSeconds`** rather than the pinned constant
+  the plan called for · a pinned 60 s would have satisfied SA-3 item 2 literally · reused,
+  because it is still "no new Options row" and it is the answer the player already gave the
+  Buffs card — two numbers for one question is trap 4. The card's three inline
+  `Math.Max(10, …)` clamps now call `HudChipRow.BuffWarnWindow` for the same reason.
+- **The watch-fire linger is 30 s, pinned** · could have been any number, or a setting · 30 s
+  is five times `AlertWindow`'s six-second banner: the toast answers "did something just
+  happen", the chip answers "what did I miss" after you look up. No cap on how many rules can
+  be lingering — trap 50 says a hidden truncation is worse than a long row.
+- **A buff chip is NOT dismissible** · could have carried a per-instance dismissal like a slow
+  chip · followed the mez precedent (it clears itself on fade or recast), because a dismissal
+  that has to survive a re-landing is state SA-3 does not need and SA-4's Mute answers better.
+- **The row's whole assembly moved from `MainWindow` into `HudChipRow.Build`** · SA-2 had
+  deliberately left "which trackers to ask" in the window, and this departs from that · moved,
+  because four families made it a decision rather than wiring (four gates, four probes, three
+  settings, a threshold) and the WPF layer has no unit tests. It is also where the ratchet room
+  came from: **`MainWindow` ends this PR 10 lines SMALLER than it started**, having gained two
+  chip families. `ChipStackPlanTests`' source scan was re-pointed, not relaxed.
+- **`hud-chips-deadlines` is a NEW shot; `hud-chips` was left alone** · could have extended the
+  SA-2 picture to six chicklets · new one, because `hud-chips` is a reviewed record of the fold
+  and spending a signed illustration to save a PNG is a bad trade. The new shot carries all
+  four families, so the row's family order is photographed for the first time.
+- **`shoot.ps1` gained `AppendLive`** (lines written after the target window is up) · could
+  have used a debug hook, or left the watch family unphotographed · added, because a watch rule
+  staged the ordinary way is a rule that correctly does nothing — the startup replay fires no
+  alerts — and the picture would have looked like a broken feature.
+- **NOT FIXED, filed instead: `MainWindow._gearChecklistDirty` has nine writers and no
+  readers** — trap 43's exact shape, and the compiler says so (`warning CS0414`). The Gear
+  checklist's "rebuild only when a box changed" optimisation has lost its reader, presumably
+  when `GearCardView` was lifted out. Left alone because the fix is ambiguous (restore the
+  reader vs delete the field), it touches nine Gear sites, and it is not SA-3's subject. Filed
+  to Fable in `FABLE-FEEDBACK.md`.
 
 ## 2026-09-05 (F2 / SA-2 — one HUD chip row)
 

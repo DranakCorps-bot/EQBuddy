@@ -71,25 +71,48 @@ public class ChipStackPlanTests
     private static string Src => Path.GetFullPath(Path.Combine(
         AppContext.BaseDirectory, "..", "..", "..", "..", "..", "src"));
 
-    /// <summary>The widget asks the plan and keeps no copy of its own.
+    /// <summary>The widget asks for the row and keeps no copy of any of it.
     ///
     /// **This scanned two lanes until E-2 (2026-09-04), and losing the second one does not
     /// make it pointless — it changes what it is for.** The old reason was drift between
     /// hand-copied twins; the reason now is that the decision must stay LIFTED. A widget
     /// that grows its own `if (timers.Count > 0)` passes every unit test in this file —
     /// `ChipStackPlan` would still be correct and simply not consulted — and only a scan
-    /// can see that.</summary>
+    /// can see that.
+    ///
+    /// **RE-POINTED in SA-3, not relaxed.** It used to require the two gate CALLS in
+    /// `MainWindow`; SA-3 moved the whole assembly into `HudChipRow.Build`, so that
+    /// assertion would have failed against a tree where the decision is more lifted than
+    /// before — the shape trap 45 names, where a scan outlives the arrangement it was
+    /// written over. The two halves are now asserted in the two places they actually live,
+    /// and the widget's half became a NEGATIVE: it must not consult the plan at all, because
+    /// there is no longer any reason for it to.</summary>
     [Theory]
     [InlineData("EQBuddy", "MainWindow.xaml.cs")]
-    public void TheWidgetAsksThePlanAndKeepsNoCopyOfItsOwn(string project, string file)
+    public void TheWidgetAsksForTheWholeRowAndDecidesNoneOfItItself(string project, string file)
     {
         var text = File.ReadAllText(Path.Combine(Src, project, file));
 
-        Assert.Contains("ChipStackPlan.SpawnStack(", text);
-        Assert.Contains("ChipStackPlan.FightStack(", text);
-        // …and the row it feeds is the shared one, not a second merge grown in the window.
-        Assert.Contains("HudChipRow.Merge(", text);
+        // One seam, and it is the shared one — not a merge or a gate grown in the window.
+        Assert.Contains("HudChipRow.Build(", text);
+        Assert.DoesNotContain("ChipStackPlan.", text);
+        Assert.DoesNotContain("HudChipRow.Merge(", text);
         // The retired placement preview's wording must not come back as a literal here.
         Assert.DoesNotContain("drag me — chips appear here", text);
+    }
+
+    /// <summary>…and the module the widget delegates to asks the plan for EVERY family. A
+    /// fifth family whose gate is inlined into `Build` is the same defect one level in, and
+    /// the count is asserted so adding one without its gate fails here rather than shipping.
+    /// </summary>
+    [Fact]
+    public void TheRowBuilderAsksThePlanForEveryFamily()
+    {
+        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy.UI.Shared", "HudChipRow.cs"));
+
+        Assert.Contains("ChipStackPlan.SpawnStack(", text);
+        Assert.Contains("ChipStackPlan.FightStack(", text);
+        Assert.Contains("ChipStackPlan.WatchFireStack(", text);
+        Assert.Contains("ChipStackPlan.BuffStack(", text);
     }
 }

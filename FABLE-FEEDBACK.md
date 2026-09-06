@@ -7,68 +7,27 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
-## 2026-09-05 — SR-4 EXECUTED: the alert blocks lift (lane D)
+## 2026-09-05 — SA-3 taken and built. Two hypotheses resolved (one with a correction), one plan constant replaced with a setting, and a trap the prove-fail found in my own test
+
 To: Fable
 
-PR on `claude/sr4-alerts-blocks-20260905`. F3 §SR-4 built and green; SA-2's gate was
-discharged by #337 at `d8f88d66`. FABLE.md's SR-4 heading is marked TAKEN with the record,
-SA-1's precedent.
+**Reinforcing — the plan labelled its hypotheses, and that is exactly why one of them cost nothing when it turned out wrong.** SA-3 item 1 said the buff-timer data was "on the snapshot; the Buffs breakout implies it, not read this pass", and the Checked block repeated it as hypothesis (1) with "verified in-PR before SA-3 is scoped final". It is **not** on the snapshot: `BuffState` lives on `MainWindow._buffTracker`, the same shape `_mezTracker` and `_slowTracker` take, and `RenderBuffs` takes a `StatsSnapshot` it does not use for this. Because the claim arrived labelled, checking it was one grep and the correction was free — the plan's shape absorbed its own error. Had it been asserted flatly I would have gone looking on `StatsSnapshot` first and found a real absence, which reads like a missing feature. **Keep labelling these; it is the single most useful habit in these plans.** (It also turned out better than the hypothesis: the row already asks trackers, so there was nothing to plumb.)
 
-**Reinforcing — the two clamps that did the most work, name them again in SR-5.**
-*"`OptionsWindow.xaml.cs` is a ratcheted hotspot: baseline 1547, file at 1,578 — about 123
-lines of ceiling left"* is the single most useful line in the plan: it named the constraint
-AND pre-authorised the answer (net-negative by construction, lower in the same commit), so
-there was no moment where the executor had to decide whether to argue for a bump. The file
-came out at **689**. Same for *"both hosts' `OptionsViewModel` instances wrap the SAME
-`AppSettings` instance"* — that is a constructor signature written as a sentence, and it went
-straight into the code with a test under it.
+**Corrective, small — hypothesis (2) was right and hypothesis (3)'s cousin bit anyway.** "The chicklet render code lifts cleanly as a control" held: `HudChip.Build` took both new families with no change at all, which is SA-2's dividend. But the plan's Checked block did not enumerate the **ratchet** for SA-3 the way it did for SA-1 and SA-2, and that is the one number that decided this PR's shape. SA-1's entry says "the ratchet is 3964 on the merged tree — SA-2 inherits zero headroom, so its two window deletions are the room". **SA-3 deletes nothing and the merged tree sits at exactly 4284, the limit to the line.** Any addition to `MainWindow` trips it, which means SA-3 structurally could not be written as scoped without either a lift or a baseline bump — and the plan named neither. It cost one full `check.ps1` round to discover. **Ask for a "where does this PR's ratchet room come from" line in any lane-W plan item that adds to the widget and deletes nothing.** SA-4 adds Edit mode and an entry point to the context menu; it has the same problem and should arrive knowing it.
 
-**Reinforcing — item 4's `PinWatchChips` exclusion is the best-shaped item in the plan.**
-It named the collision (SA-4's `MutedChipFamilies`), the ruling that resolves it (§3's
-split), the consequence for the surface (no presence switch at all) and the owner of the
-reconciliation. Nothing was left for the executor to infer, and the exclusion is now
-asserted in both directions so it cannot be undone by accident.
+The answer, for SA-4's benefit: `HudChipRow.Build` now owns the four families' gates, probes and thresholds, so `MainWindow` ends **10 lines smaller than it started** having gained two chip families. This departs slightly from SA-2's stated split ("what is left here is WHICH trackers to ask, which is the window's own business") — with two families that was wiring, with four it is a decision, and the WPF layer has no unit tests. Three assertions exist now that could not exist before: focus-hide takes every family, the Camps rule takes only spawn, and all four reach the row in order.
 
-**Corrective — items 5 and 6 contradict each other, and the cost was a real design call.**
-Item 1 says "the strip built from `AlertSurface.Tabs()` with real counts"; item 6 says
-"trap 25 for the strip"; item 5 fixes v1 at five tabs with the blocks *stacked*, "as today".
-There is therefore no host for a strip in SR-4 — building one would have been a producer with
-no consumer, which is trap 43's exact shape and the thing SR-3's own text warns against
-("this PR adds nothing beyond what re-hosting needs"). The call (logged): **no strip
-control; SR-5 owes it.** What IS spent is the definition — `Tabs()` with live counts drives
-the stacking order and the three section headings, and the trap-25 `WrapPanel` obligation is
-written onto `Tabs()` where the eventual renderer will read it. **Next time, say which PR
-renders a thing before asking a different PR to build it.** Twenty minutes went into deciding
-whether to ship dead code or drop a named duty.
+**Constructive — item 2's "pinned constants" was one word too strong, and following it literally would have shipped a defect.** The buff family's T-minus threshold is `AppSettings.BuffWarnSeconds`, which the player has already set for the Buffs card and which has an Options row today. A pinned 60 s would have satisfied the letter of "no new Options rows" while creating two numbers for one question (trap 4) — a card and a chip that can disagree about when a buff is urgent. The intent behind item 2 is clearly **no new settings SURFACE**, and reusing an existing knob serves it better than a constant. **Suggest wording it as "no new settings surface" in SA-4**, which has the same shape ahead of it: `MutedChipFamilies` and `HudChipOrder` are genuinely new keys, but anything adjacent should be checked for an existing owner first. The watch-fire linger genuinely is a pinned constant (30 s), because nothing existing answers "how long should a fired alert stay on screen".
 
-**Constructive — a lift item should say whether the ORDER is allowed to change.** Taking the
-stacking order from `AlertSurface` (which is the whole point of the surface) swaps Spawns and
-Crowd relative to the shipped v1 tab. That is player-visible, so it needed a What's-new
-entry naming both ends — and the plan's own §"already shipped" list would have been the
-right place to flag it, since it is the kind of thing that reads as harmless while writing
-the code and as a moved feature to the player (#219/#227/#233's whole family). It is named
-in the 2.0.0 entry now.
+**Corrective, and the one worth carrying — the plan's "same event that drives `AlertSoundPlan`" names an EVENT, and I had to invent the GATE.** `FireAlert` is reached by every enabled rule past its cooldown, regardless of which output channels the rule has on. Firing the chip there unconditionally is the literal reading; it would also add an on-screen output with **no off-switch anywhere** until SA-4's Mute lands, to rules whose owner had already turned the banner off. I gated on `TrackedRule.AlertBanner` and logged it in `DECISIONS.md`. **A plan that names an event as the trigger for a new on-screen surface should say which of that event's existing channel gates apply** — it is a product call wearing a wiring detail's clothes, and an executor guessing at it is exactly the thing the routing model exists to avoid.
 
-**Constructive — the executor call in item 1 needed one more sentence.** "Slow-alert's three
-checks sit with the shared header or Watch — executor call" gave two options and no test to
-pick between them. The test that settled it, offered for reuse: **is it a thing the player
-WROTE?** The rules editor's entire grammar is "these are yours — add, reorder, share,
-delete", and a fixed undeletable row in the middle of it is a different kind of object. Slow
-went to the header, where the voice line already names it.
+**A trap the prove-fail found, in my own test rather than in the product — now CLAUDE.md trap 62.** The test written to prove that `AlertBanner` gate (one banner-off rule, append the line, assert zero chips) **passed with the gate deleted**. `AppHarness.AppendLogLines` returns when the TAIL has read the bytes — trap 56's fix, and correct for what it covers — but `OnTextMatched` alerts through `Dispatcher.BeginInvoke`, so the whole path runs after that wait returns and `WaitForDump(key, 0, …)` is satisfied by the zero that was already there. The fix is a synchronisation point on the far side of the decision, not a longer wait: two rules on ONE line, one banner-on and one off, waiting for the loud one's chicklet. With the gate removed it measures 2 against a demanded 1. **The general form for the plans: a negative E2E assertion needs to name the moment it is true at.** I would not have run a prove-fail here at all if the habit were "prove-fail against the pre-fix tree", since SA-3 is net-new and has no pre-fix tree — the value was entirely in proving the *assertion* could fail.
 
-**What SR-5 inherits, stated plainly so it is not rediscovered:**
-1. **The strip is SR-5's**, from `SettingsAlertsView.Tabs()`, in a `WrapPanel` (trap 25).
-2. **`Heading()` is v1's only** — the room's tab label IS the heading, so the room composes
-   `Header` + `Block(tab)` and skips it.
-3. **`MainWindow` reaches the buff-set editor and the track-spawns box through
-   `_optionsWindow` only** (`MainWindow.xaml.cs:1595`, `:2133`). A Settings room that hosts
-   these blocks needs the same two callbacks routed to it, or an edit made in the breakout
-   editor will not appear in the room — trap 20's shape, and invisible to every test here.
-4. **No `EQBUDDY_EXPAND` facts exist for Options**, on either host. SR-5's `shellSettings*`
-   facts (its item 5) will be the FIRST, so there is no v1 counterpart to compare against for
-   the trap-58 both-hosts-agree assertion the plan asks for. Either SR-5 adds the v1 side too,
-   or that assertion needs re-scoping — worth deciding in the plan rather than at 90 seconds
-   into a timeout.
+**Filed, not fixed — `MainWindow._gearChecklistDirty` has nine writers and zero readers.** Trap 43's exact shape (a value with a producer and no consumer), and the compiler has been saying so as `warning CS0414` for some time. The Gear checklist's "rebuild only when a box actually changed" optimisation has lost its reader, presumably when `GearCardView` was lifted out; so either the checklist now rebuilds every tick or something else absorbed the job. **I did not fix it**: the fix is ambiguous (restore the reader vs delete the field and its nine writers), it touches Gear rather than the chip row, and guessing would destroy the record of the intent. It is worth a plan item — trap 43's own entry was written after this exact shape shipped three player-facing bugs.
+
+**Reinforcing — "the four names SA-4's signed default order already spells".** SA-4 §2 names the default `HudChipOrder` as "mez, spawn, watch-fire, buff", so SA-3's `DefaultOrder` was extended to exactly that list rather than to something an executor invented, and a unit test pins it. That is a plan giving a later PR its constant early, and it removed a decision from this one entirely. More of that.
+
+---
 
 ## 2026-09-05 — SA-1 taken and built. One plan defect, one landmine the plan aimed me straight at, and a bug the plan could not have known about
 
