@@ -49,6 +49,14 @@
                 <Separator/>
                 <MenuItem x:Name="ClickThroughItem" Header="Click-through (game clicks pass through)"
                           IsCheckable="True" Click="OnClickThrough"/>
+                <!-- Surface A / SA-4. It sits with click-through rather than with the
+                     windows above because it is the same kind of thing: an in-play switch
+                     for what the HUD is doing right now, not a settings visit. The mode
+                     lives on the chip row itself (HudChipRowWindow.ToggleEdit) — there is
+                     no dialog, which is why this row is the only door and why the row
+                     carries its own "choose Edit HUD… again when you are done" line. -->
+                <MenuItem Header="Edit HUD…" Click="OnEditHud"
+                          ToolTip="Reorder the chip row under the widget, or mute a whole kind of chip — mez and slow, spawn timers, watch alerts, buffs. Sounds and alerts are not affected; those stay in Options → Alerts &amp; chips."/>
                 <Separator/>
                 <MenuItem Header="Data &amp; imports">
                     <MenuItem Header="Wiki contribution pack…" Click="OnWikiPackWindow"

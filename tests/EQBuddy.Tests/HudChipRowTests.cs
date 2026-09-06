@@ -514,9 +514,11 @@ public class HudChipRowTests
     // per family" could only ever be checked by launching the app.
 
     /// <summary>Every family the fixture can produce, all four on one row, in order.</summary>
-    private static List<HudChipEntry> BuildAll(bool hiddenForFocus = false, bool worldOnCamps = false)
+    private static List<HudChipEntry> BuildAll(bool hiddenForFocus = false, bool worldOnCamps = false,
+        Action<AppSettings>? profile = null)
     {
         var settings = new AppSettings { TrackSpawns = true, MezChipsEnabled = true, BuffWarnSeconds = 7200 };
+        profile?.Invoke(settings);
         var catalog = new SpawnCatalog
         {
             Zones =
@@ -567,5 +569,246 @@ public class HudChipRowTests
         Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Mez));
         Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.WatchFire));
         Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Buff));
+    }
+
+    // ---- SA-4: PLACE and MUTE ----
+    //
+    // Two settings, two verbs, and the reconciliation between them is the only place this
+    // could go wrong quietly: an order that could also REMOVE a family would be a mute with
+    // no switch naming it, which is trap 20's shape and #219's mechanism.
+
+    private static AppSettings Profile(string[]? order = null, string[]? muted = null)
+    {
+        var settings = new AppSettings();
+        if (order is not null) settings.HudChipOrder = [.. order];
+        if (muted is not null) settings.MutedChipFamilies = [.. muted];
+        return settings;
+    }
+
+    // -- Place --
+
+    /// <summary>The shipped default IS the signed order, read through the resolver rather
+    /// than asserted against the constant: a default that disagreed with `DefaultOrder`
+    /// would be a fresh profile whose row was not the one the sign describes.</summary>
+    [Fact]
+    public void AFreshProfileResolvesToTheSignedDefaultOrder()
+        => Assert.Equal(HudChipRow.DefaultOrder, HudChipRow.ResolveOrder(new AppSettings()));
+
+    [Fact]
+    public void TheStoredOrderIsWhatThePlayerGets()
+        => Assert.Equal(
+            [HudChipFamily.Buff, HudChipFamily.WatchFire, HudChipFamily.Spawn, HudChipFamily.Mez],
+            HudChipRow.ResolveOrder(Profile(order: ["Buff", "WatchFire", "Spawn", "Mez"])));
+
+    /// <summary>**A family the setting omits is APPENDED, never dropped.** `Merge` drops a
+    /// family missing from the order it is handed, so an unrepaired omission would be a
+    /// permanent invisible mute — a hand-edited file, or a profile written before a family
+    /// existed, losing chips forever with nothing naming the loss. Mute is the only thing
+    /// that removes a family, and it has its own key.</summary>
+    [Fact]
+    public void AFamilyMissingFromTheStoredOrderIsAppendedNotDropped()
+    {
+        var order = HudChipRow.ResolveOrder(Profile(order: ["Buff", "Mez"]));
+
+        Assert.Equal(
+            [HudChipFamily.Buff, HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire],
+            order);
+        Assert.Equal(Enum.GetValues<HudChipFamily>().Length, order.Count);
+    }
+
+    /// <summary>An empty list is the same case, and it is the one a hand-edited profile
+    /// reaches most easily: every family, in the default order, rather than a blank row.
+    /// </summary>
+    [Fact]
+    public void AnEmptyStoredOrderFallsBackToTheDefaultRatherThanToAnEmptyRow()
+        => Assert.Equal(HudChipRow.DefaultOrder, HudChipRow.ResolveOrder(Profile(order: [])));
+
+    /// <summary>A name no family answers to is ignored, and a duplicate collapses to its
+    /// first appearance — a typed-in file cannot make one family render twice.</summary>
+    [Fact]
+    public void UnknownNamesAreIgnoredAndDuplicatesCollapse()
+        => Assert.Equal(
+            [HudChipFamily.Spawn, HudChipFamily.Mez, HudChipFamily.WatchFire, HudChipFamily.Buff],
+            HudChipRow.ResolveOrder(Profile(order: ["Spawn", "Pets", "spawn", "Mez", "SPAWN"])));
+
+    /// <summary>The names are case-insensitive on the way in, because they are a file a
+    /// player may type into, and exact on the way out (`SetOrder` writes `ToString`).
+    /// </summary>
+    [Fact]
+    public void StoredNamesAreReadCaseInsensitively()
+        => Assert.Equal([HudChipFamily.WatchFire, HudChipFamily.Mez],
+            HudChipRow.ResolveOrder(Profile(order: ["watchfire", "MEZ"])).Take(2));
+
+    /// <summary>Nudge moves one family one place, and the ends are NO-OPS rather than
+    /// wrap-arounds: a ◀ on the leftmost chicklet that sent it to the far right would be a
+    /// gesture nobody asked for, on a row whose whole point is that it stops surprising you.
+    /// </summary>
+    [Fact]
+    public void NudgeMovesOneStepAndStopsAtTheEnds()
+    {
+        var order = HudChipRow.DefaultOrder;   // Mez, Spawn, WatchFire, Buff
+
+        Assert.Equal([HudChipFamily.Spawn, HudChipFamily.Mez, HudChipFamily.WatchFire, HudChipFamily.Buff],
+            HudChipRow.Nudge(order, HudChipFamily.Mez, +1));
+        Assert.Equal([HudChipFamily.Mez, HudChipFamily.WatchFire, HudChipFamily.Spawn, HudChipFamily.Buff],
+            HudChipRow.Nudge(order, HudChipFamily.WatchFire, -1));
+        Assert.Equal(order, HudChipRow.Nudge(order, HudChipFamily.Mez, -1));
+        Assert.Equal(order, HudChipRow.Nudge(order, HudChipFamily.Buff, +1));
+    }
+
+    /// <summary>Nudging is a WRITE, and the write and the read are the same PR — the
+    /// `DeadSettingTests` posture. A round trip through the profile is what proves the pair,
+    /// because three player-facing bugs came from data that survived a move and a write path
+    /// that did not (#204, #210, #212).</summary>
+    [Fact]
+    public void APlaceEditRoundTripsThroughTheProfile()
+    {
+        var settings = new AppSettings();
+
+        HudChipRow.SetOrder(settings,
+            HudChipRow.Nudge(HudChipRow.ResolveOrder(settings), HudChipFamily.Buff, -1));
+
+        Assert.Equal(["Mez", "Spawn", "Buff", "WatchFire"], settings.HudChipOrder);
+        Assert.Equal(
+            [HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.Buff, HudChipFamily.WatchFire],
+            HudChipRow.ResolveOrder(settings));
+    }
+
+    /// <summary>The order reaches the ROW, which is the half none of the above proves: the
+    /// setting could resolve perfectly and never be handed to `Merge`.</summary>
+    [Fact]
+    public void TheStoredOrderReachesTheBuiltRow()
+        => Assert.Equal(
+            [HudChipFamily.Buff, HudChipFamily.Spawn, HudChipFamily.WatchFire, HudChipFamily.Mez],
+            BuildAll(profile: s => s.HudChipOrder = ["Buff", "Spawn", "WatchFire", "Mez"])
+                .Select(e => e.Family));
+
+    // -- Mute --
+
+    [Fact]
+    public void NothingIsMutedOnAFreshProfile()
+    {
+        foreach (var family in Enum.GetValues<HudChipFamily>())
+            Assert.False(HudChipRow.IsMuted(new AppSettings(), family));
+    }
+
+    /// <summary>A muted family is off the row and NOTHING ELSE MOVES. This is the assertion
+    /// the sibling-not-repurposing ruling is made of: mute is per family, and a mute that
+    /// took the row down with it would be the switch doing a different job.</summary>
+    [Fact]
+    public void AMutedFamilyLeavesTheRowAndTheOthersStay()
+    {
+        var row = BuildAll(profile: s => s.MutedChipFamilies = ["Buff"]);
+
+        Assert.Equal(0, HudChipRow.CountOf(row, HudChipFamily.Buff));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Mez));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Spawn));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.WatchFire));
+    }
+
+    /// <summary>Mute every family and the row is empty — which is the state the host reads to
+    /// decide the companion window is not on screen at all. A player who mutes everything has
+    /// asked for no row, not for an empty one hovering under the widget.</summary>
+    [Fact]
+    public void MutingEveryFamilyEmptiesTheRow()
+        => Assert.Empty(BuildAll(profile: s =>
+            s.MutedChipFamilies = [.. Enum.GetValues<HudChipFamily>().Select(f => f.ToString())]));
+
+    /// <summary>Muting does not REORDER. A family keeps its place while it is muted, so
+    /// unmuting puts it back where the player left it rather than at the end of the row.
+    /// </summary>
+    [Fact]
+    public void AMutedFamilyKeepsItsPlaceForWhenItComesBack()
+    {
+        var settings = Profile(order: ["Buff", "Mez", "Spawn", "WatchFire"], muted: ["Mez"]);
+
+        Assert.Equal([HudChipFamily.Buff, HudChipFamily.Spawn, HudChipFamily.WatchFire],
+            HudChipRow.VisibleOrder(settings));
+
+        HudChipRow.SetMuted(settings, HudChipFamily.Mez, false);
+        Assert.Equal([HudChipFamily.Buff, HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire],
+            HudChipRow.VisibleOrder(settings));
+    }
+
+    /// <summary>The mute WRITER, round-tripped like the order's, and asserted for the
+    /// idempotence a toggle needs: muting twice must not put two copies in the file, or the
+    /// list grows every click and unmute has to remove them all.</summary>
+    [Fact]
+    public void AMuteEditRoundTripsThroughTheProfileAndDoesNotAccumulate()
+    {
+        var settings = new AppSettings();
+
+        HudChipRow.SetMuted(settings, HudChipFamily.Spawn, true);
+        HudChipRow.SetMuted(settings, HudChipFamily.Spawn, true);
+        Assert.Equal(["Spawn"], settings.MutedChipFamilies);
+        Assert.True(HudChipRow.IsMuted(settings, HudChipFamily.Spawn));
+
+        HudChipRow.SetMuted(settings, HudChipFamily.Spawn, false);
+        Assert.Empty(settings.MutedChipFamilies);
+        Assert.False(HudChipRow.IsMuted(settings, HudChipFamily.Spawn));
+    }
+
+    /// <summary>Unmuting clears a hand-typed name whatever its case, so a file that says
+    /// "spawn" is not a mute the button cannot lift.</summary>
+    [Fact]
+    public void UnmutingClearsANameWhateverItsCase()
+    {
+        var settings = Profile(muted: ["spawn"]);
+        Assert.True(HudChipRow.IsMuted(settings, HudChipFamily.Spawn));
+
+        HudChipRow.SetMuted(settings, HudChipFamily.Spawn, false);
+        Assert.False(HudChipRow.IsMuted(settings, HudChipFamily.Spawn));
+    }
+
+    /// <summary>Mute is presence, and it is the ONLY thing that subtracts a family — the
+    /// order never does. Asserted together because the two settings are one row's worth of
+    /// state and the failure worth catching is them disagreeing.</summary>
+    [Fact]
+    public void OrderAndMuteAreTheOnlyTwoAnswersAndMuteIsTheOneThatSubtracts()
+    {
+        var settings = Profile(order: ["Spawn", "Mez"], muted: ["WatchFire"]);
+
+        Assert.Equal(
+            [HudChipFamily.Spawn, HudChipFamily.Mez, HudChipFamily.WatchFire, HudChipFamily.Buff],
+            HudChipRow.ResolveOrder(settings));
+        Assert.Equal([HudChipFamily.Spawn, HudChipFamily.Mez, HudChipFamily.Buff],
+            HudChipRow.VisibleOrder(settings));
+    }
+
+    // -- What the edit chicklets say --
+
+    /// <summary>Every family has a name and an emblem, and no two share either. "Mez & slow"
+    /// names BOTH halves of the fight family: a mute button labelled "Mez" that also silences
+    /// slow chips is a tick box that lies.</summary>
+    [Fact]
+    public void EveryFamilyHasItsOwnLabelAndEmblem()
+    {
+        var families = Enum.GetValues<HudChipFamily>();
+
+        Assert.Equal(families.Length, families.Select(HudChipRow.Label).Distinct().Count());
+        Assert.Equal(families.Length, families.Select(HudChipRow.Emblem).Distinct().Count());
+        Assert.Contains("slow", HudChipRow.Label(HudChipFamily.Mez), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The emblems are `IconPaths` NAMES, and every one of them resolves — a name
+    /// with no vector behind it draws nothing at all, which photographs as a chicklet that
+    /// happens to have no icon (#148/#166's failure with the box removed).</summary>
+    [Fact]
+    public void EveryEmblemIsARealVector()
+    {
+        foreach (var family in Enum.GetValues<HudChipFamily>())
+            Assert.True(IconPaths.All.ContainsKey(HudChipRow.Emblem(family)),
+                $"{family}'s emblem '{HudChipRow.Emblem(family)}' is not in IconPaths.");
+    }
+
+    /// <summary>The dump token: comma-separated, never a space (the dump is space-separated
+    /// key=value, so a space would silently become a second key), and "-" for nothing rather
+    /// than "" (a key with an empty value is a key no wait can be written against).</summary>
+    [Fact]
+    public void TheDumpTokenIsSpaceFreeAndSaysSomethingWhenEmpty()
+    {
+        Assert.Equal("Mez,Buff", HudChipRow.OrderKey([HudChipFamily.Mez, HudChipFamily.Buff]));
+        Assert.Equal("-", HudChipRow.OrderKey([]));
+        Assert.DoesNotContain(' ', HudChipRow.OrderKey(HudChipRow.DefaultOrder));
     }
 }

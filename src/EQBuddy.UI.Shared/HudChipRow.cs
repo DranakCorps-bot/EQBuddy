@@ -87,6 +87,36 @@ public static class HudChipRow
     public static readonly IReadOnlyList<HudChipFamily> DefaultOrder =
         [HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire, HudChipFamily.Buff];
 
+    /// <summary>What the player calls this family in "Edit HUD…" — the only place a family
+    /// has ever needed a name of its own, because until SA-4 nothing addressed one.
+    ///
+    /// **"Mez &amp; slow" says both halves out loud.** <see cref="HudChipFamily.Mez"/> is the
+    /// whole fight family and a label reading "Mez" would be a mute switch that silently
+    /// takes slow chips too — the tick box that lies, with the switch on the other side.
+    /// </summary>
+    public static string Label(HudChipFamily family) => family switch
+    {
+        HudChipFamily.Mez => "Mez & slow",
+        HudChipFamily.Spawn => "Spawn timers",
+        HudChipFamily.WatchFire => "Watch alerts",
+        _ => "Buffs",
+    };
+
+    /// <summary>The family's emblem on an Edit-mode chicklet — an <c>IconPaths</c> name, never
+    /// a glyph (#148/#166), and the same vector its chips wear so the edit row and the live
+    /// row cannot be read as describing different things.
+    ///
+    /// The fight family draws its MEZ half's Moon: its two halves genuinely wear two icons
+    /// (Moon and ChevronsDown) and one of them has to stand for the pair, so the name says
+    /// what the emblem cannot.</summary>
+    public static string Emblem(HudChipFamily family) => family switch
+    {
+        HudChipFamily.Mez => "Moon",
+        HudChipFamily.Spawn => "Timer",
+        HudChipFamily.WatchFire => "Bell",
+        _ => "Hourglass",
+    };
+
     /// <summary>Does a due chip in this family replace its countdown with "DUE"?
     /// Spawn does (the camp has popped and the chip has said its piece — click it away);
     /// nothing else does. A mez at 0:04 is still counting toward a wake-up and the last-tick
@@ -160,6 +190,96 @@ public static class HudChipRow
         return row;
     }
 
+    // ---- PLACE and MUTE (Surface A / SA-4) ----
+    //
+    // Two settings, two verbs, one reconciliation. `HudChipOrder` says what order the
+    // families sit in; `MutedChipFamilies` says which ones are not on the row at all. They
+    // are separate keys on purpose: an order that could also REMOVE a family would be two
+    // answers to one question, which is the sentence Merge's own doc has carried since SA-2.
+
+    /// <summary>
+    /// The player's family order — every family, exactly once, in the order they chose.
+    ///
+    /// **A family the setting omits is APPENDED in its default position, never dropped.**
+    /// <see cref="Merge"/> drops a family missing from the order it is handed, so an omission
+    /// reaching it unrepaired would be a permanent, invisible mute nothing could undo: a
+    /// hand-edited file, a profile written by a release before a family existed, or a fifth
+    /// family added later would all silently lose chips with no switch naming the loss (trap
+    /// 20's shape, and #219's mechanism). Muting is the ONLY thing that removes a family, and
+    /// it says so in its own key.
+    ///
+    /// Unknown names are ignored and duplicates collapse to their first appearance, so a
+    /// typed-in file cannot produce a row that renders a family twice.
+    /// </summary>
+    public static IReadOnlyList<HudChipFamily> ResolveOrder(AppSettings settings)
+    {
+        var order = new List<HudChipFamily>();
+        foreach (var name in settings.HudChipOrder)
+            if (Enum.TryParse<HudChipFamily>(name, ignoreCase: true, out var family)
+                && !order.Contains(family))
+                order.Add(family);
+        foreach (var family in DefaultOrder)
+            if (!order.Contains(family)) order.Add(family);
+        return order;
+    }
+
+    /// <summary>Is this family muted — off the row, sounds and trackers untouched?</summary>
+    public static bool IsMuted(AppSettings settings, HudChipFamily family) =>
+        settings.MutedChipFamilies.Any(
+            name => Enum.TryParse<HudChipFamily>(name, ignoreCase: true, out var m) && m == family);
+
+    /// <summary>The families that actually reach the row, in the player's order: their order
+    /// minus their mutes. This is what <see cref="Build"/> hands <see cref="Merge"/>, and it
+    /// is the single place the two settings are combined.</summary>
+    public static IReadOnlyList<HudChipFamily> VisibleOrder(AppSettings settings) =>
+        [.. ResolveOrder(settings).Where(family => !IsMuted(settings, family))];
+
+    /// <summary>
+    /// PLACE: move one family one step left (<paramref name="delta"/> -1) or right (+1).
+    ///
+    /// Nudge rather than drag — cheap, testable, and reachable with a click on a row that has
+    /// no position of its own to drag within. At either end it is a NO-OP that still returns a
+    /// list, so the caller has one path rather than a guard at every call site; the button that
+    /// would do nothing is disabled rather than silently swallowing the click (trap 17's other
+    /// half — a control that looks live and is not).
+    ///
+    /// Mute is not consulted here. A muted family keeps its place in the order, so unmuting
+    /// puts it back where the player left it instead of at the end.
+    /// </summary>
+    public static List<HudChipFamily> Nudge(
+        IReadOnlyList<HudChipFamily> order, HudChipFamily family, int delta)
+    {
+        var moved = new List<HudChipFamily>(order);
+        var from = moved.IndexOf(family);
+        var to = from + Math.Sign(delta);
+        if (from < 0 || to < 0 || to >= moved.Count) return moved;
+        (moved[from], moved[to]) = (moved[to], moved[from]);
+        return moved;
+    }
+
+    /// <summary>Writes a new family order into the profile. The WRITER half of
+    /// <c>AppSettings.HudChipOrder</c>, shipping in the same PR as its reader — the
+    /// <c>DeadSettingTests</c> posture, which exists because three player-facing bugs came
+    /// from data that survived a move and a write path that did not.</summary>
+    public static void SetOrder(AppSettings settings, IReadOnlyList<HudChipFamily> order) =>
+        settings.HudChipOrder = [.. order.Select(family => family.ToString())];
+
+    /// <summary>Mutes or unmutes one family. The WRITER for
+    /// <c>AppSettings.MutedChipFamilies</c>, for the same reason.</summary>
+    public static void SetMuted(AppSettings settings, HudChipFamily family, bool muted)
+    {
+        settings.MutedChipFamilies.RemoveAll(
+            name => Enum.TryParse<HudChipFamily>(name, ignoreCase: true, out var m) && m == family);
+        if (muted) settings.MutedChipFamilies.Add(family.ToString());
+    }
+
+    /// <summary>A family list as one space-free token for the <c>EQBUDDY_EXPAND</c> dump
+    /// ("Spawn,Mez,WatchFire,Buff"), or "-" when there is nothing in it. The dump is
+    /// space-separated key=value, so a value with a space in it would silently become two
+    /// keys; "-" rather than "" because a key with an empty value cannot be waited on.</summary>
+    public static string OrderKey(IEnumerable<HudChipFamily> families) =>
+        string.Join(",", families) is { Length: > 0 } key ? key : "-";
+
     /// <summary>
     /// THE WHOLE ROW FOR ONE TICK: ask every family's gate, ask the families that pass, merge.
     ///
@@ -205,7 +325,13 @@ public static class HudChipRow
         var buffChips = ChipStackPlan.BuffStack(hiddenForFocus, buffs.ActiveCount > 0)
             ? BuffChips(buffs, now, settings.BuffWarnSeconds) : [];
 
-        return Merge(fightChips, spawnChips, watchChips, buffChips);
+        // PLACE and MUTE, in ONE argument (SA-4). A muted family is absent from this list and
+        // Merge drops it — which is the seam SA-2 built the order argument for, rather than a
+        // second gate beside the four above. The probes still run for a muted family and that
+        // is deliberate: skipping them would be a second answer to "is this family on the
+        // row", and they are four cheap emptiness questions.
+        return Merge(fightChips, spawnChips, watchChips, buffChips,
+            order: VisibleOrder(settings));
     }
 
     /// <summary>How many chips this family put on the row — the <c>hudChips</c> dump's

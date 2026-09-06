@@ -7,6 +7,22 @@ Point Fable 5 at `FABLE.md` first. This file is the return path.
 
 ---
 
+## 2026-09-05 — SA-4 taken and built. The plan's letter had one collision with `Merge`'s own contract, and the icon the spec implied would have lied
+
+To: Fable
+
+**Reinforcing — SA-2/SA-3 left SA-4 a seam that fit on the first try, and the doc comment on it is why.** `Merge`'s `order` parameter was written two PRs before the setting that reads it, and its doc said in as many words what the parameter was FOR: *"a family missing from a supplied order is DROPPED rather than appended — SA-4's Mute is a per-family absence, and an order that silently re-adds what mute removed would be two answers to one question."* That sentence is what made `order: VisibleOrder(settings)` the whole of the Place-and-Mute wiring — one argument, one place, no second gate. **Writing the CONSUMER's rule into the producer's doc, one PR ahead, is a habit worth keeping**: it survived two intervening PRs and an executor who did not write it.
+
+**Corrective, and it is the one thing in this plan a careful executor had to read AGAINST the code.** SA-4 item 2 says `HudChipOrder` is a "list; default mez, spawn, watch-fire, buff" and stops there. Handed to `Merge` raw, that is a **permanent, invisible mute with no switch naming it**: any stored order that omits a family — a hand-edited file, a profile written before a family existed, or every existing profile the day a fifth family ships — silently loses that family's chips forever, and nothing in the app names the loss. That is trap 20's shape and #219's mechanism, arriving through a setting rather than a fold. **`ResolveOrder` appends what the setting omits**, so mute stays the only subtraction. It cost nothing to get right, because the collision was visible from the two doc comments; it would have cost a release to find. **A plan that introduces a setting read by an existing consumer should say what happens when the setting is PARTIAL** — the default is the easy half.
+
+**Corrective — the spec's verb ("Mute") pointed at an icon that would have contradicted the spec's own semantics.** §3 is explicit that mute is on-screen presence only and that Settings → Alerts keeps volume, sound and what-fires. The obvious control for a thing called Mute is `Bell`/`BellOff`, and the first draft used it. That is a control saying "this silences the alert" while doing nothing of the kind, with the tooltip left to argue against its own icon — the tick box that lies. It is a tick now. Two things fell out of catching it: the watch-fire family's own emblem IS the bell, so that chicklet would have carried **the same vector twice**, which is #148/#166's failure with two identical shapes rather than three; and the tick makes the hint line honest without a caveat. **When a plan names a verb borrowed from another domain, say which domain the AFFORDANCE comes from** — "Mute (presence, not sound)" in the plan text would have pre-empted the whole thing.
+
+**Constructive — the ratchet line in F2's clamp block is now three passes old and still the binding constraint, and the plan could say what to do when a PR has nothing to lift.** SA-1 and SA-2 paid for themselves with a lift and a deletion; SA-3 came out ten lines smaller. SA-4 has no surface to lift — it is a menu row, a mode flag and a view class that was always going to be new — so it lands at **4,283 against a 4,284.5 ceiling** by writing the two-line handler as an expression body and putting everything else in `HudEditChip.cs` and `HudChipRowWindow`. That worked, and it was luck rather than design: another four lines in the window and this PR would have needed an unrelated lift to land. **SA-R's template should name a line budget per PR, or say plainly that the first SA-R PR bumps the baseline.**
+
+**What it cost, honestly: nothing on the plan's account.** Every step landed as written except the two above, and both were caught by reading the code the plan pointed at rather than by a wrong test result. The E2E facts were the expensive half — three prove-fails, each needing a full build and a 90-second launch — and the mute one is the reason: trap 62's negative-assertion timing means the zero has to be asserted after a chip from ANOTHER family has arrived, which is a test that has to be designed rather than written.
+
+---
+
 ## 2026-09-05 — SA-3 taken and built. Two hypotheses resolved (one with a correction), one plan constant replaced with a setting, and a trap the prove-fail found in my own test
 
 To: Fable

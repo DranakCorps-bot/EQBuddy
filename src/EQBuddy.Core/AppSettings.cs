@@ -32,6 +32,35 @@ public sealed class AppSettings
     /// <summary>Scale for the small floating windows — spawn/mez chips and the alert
     /// banner — independent of UiScale so 4K players can grow just those (discussion #47).</summary>
     public double ChipScale { get; set; } = 1.0;
+
+    /// <summary>Family order on the HUD chip row, left to right — Surface A / SA-4's
+    /// PLACE verb, edited by nudging a family left or right in "Edit HUD…".
+    ///
+    /// The values are <c>HudChipFamily</c> names ("Mez", "Spawn", "WatchFire", "Buff"),
+    /// the same way <see cref="DisabledBreakouts"/> carries <c>BreakoutKind</c> names, and
+    /// the default is the urgency order Helm signed on 2026-09-05: the fight family first,
+    /// then ambient spawn countdowns, then a rule that just fired, then a fading buff.
+    ///
+    /// **A family this list OMITS is appended, never dropped.** Omission here is a stale
+    /// file or a family a later release added, and a family with no way back would be a
+    /// capability lost with nothing naming it (trap 20's shape). Removing a family from
+    /// the row is <see cref="MutedChipFamilies"/>' job and only its job —
+    /// <c>HudChipRow.ResolveOrder</c> is the one place that reconciles the two.</summary>
+    public List<string> HudChipOrder { get; set; } = ["Mez", "Spawn", "WatchFire", "Buff"];
+
+    /// <summary>Chip families the player has MUTED — Surface A / SA-4's Mute verb, toggled
+    /// per family in "Edit HUD…". <c>HudChipFamily</c> names, empty by default.
+    ///
+    /// **A SIBLING of <see cref="DisabledBreakouts"/>, never a repurposing of it** (B3 §3,
+    /// Helm-signed): a breakout window and a HUD chip family are different objects, and one
+    /// list switching both would make "I never want the Damage window" and "I never want
+    /// buff chips over the game" the same sentence.
+    ///
+    /// **Mute is ON-SCREEN PRESENCE ONLY.** Options → Alerts still owns volume, sound and
+    /// what fires at all; a muted family's sounds, spoken alerts and banners are untouched,
+    /// and its trackers keep running — unmute mid-linger and the chip is there. The HUD owns
+    /// what is on screen right now, which is the split the signed spec draws.</summary>
+    public List<string> MutedChipFamilies { get; set; } = [];
     public double QuestsLeft { get; set; } = double.NaN;
     public double QuestsTop { get; set; } = double.NaN;
     /// <summary>The Progress window's saved spot (the PROGRESS THEME, docs/Themes.md).

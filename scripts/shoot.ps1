@@ -1347,6 +1347,36 @@ $Shots = [ordered]@{
                                'Sanctari begins casting Stalwart Regeneration.'
                                'Your feet anchor to the ground as you begin to regenerate.'
                                "Sanctari tells the group, 'assist on a froglok tad shaman'") }
+    # SA-4's EDIT MODE on that same row — Place (nudge left/right) and Mute (per family), the
+    # two verbs the signed spec gives the one row. A NEW name, checked first (trap 21):
+    # nothing embeds 'hud-edit', and 'hud-chips'/'hud-chips-deadlines' are the LIVE row and
+    # stay exactly as they were shot.
+    #
+    # It is the purest trap 22 case in the file: the mode is reached only by a human opening
+    # the widget's context menu and clicking a row, and the four editors exist on a profile
+    # with NOTHING running — which is the state the mode is for and the one nothing else can
+    # photograph. EQBUDDY_HUDEDIT is the hook.
+    #
+    # One family is MUTED in the seeded profile on purpose, so this single capture carries
+    # both states. The default state is this picture minus the dim.
+    #
+    # PREDICTION, written BEFORE the shot (trap 23). ONE horizontal row of FOUR editor
+    # chicklets in HudChipOrder order, each with an ACCENT border (the mode's one visual
+    # difference from a live chicklet), then a dim wrapped hint line with no border:
+    #   1. "Mez & slow", moon emblem, ◀ DIMMED and disabled (it is leftmost), ✓ in accent, ▶ live.
+    #   2. "Spawn timers", timer emblem, MUTED: emblem and label in DimBrush, the toggle an
+    #      ✕ in warn ink. Both arrows live.
+    #   3. "Watch alerts", BELL emblem beside a ✓ toggle — two DIFFERENT vectors, which is the
+    #      whole reason the toggle is not itself a bell.
+    #   4. "Buffs", hourglass emblem, ▶ DIMMED and disabled (it is rightmost), ✓ in accent.
+    # No live chip anywhere: the fixture profile has no timer, no mez, no fired rule and no
+    # buff, and the row is up regardless — that is the capability the mode adds.
+    # Two chicklets reading as the same shape, or an end arrow drawn as though it were live
+    # (trap 17 — IsEnabled has no disabled visual in this app's styles), is what this picture
+    # exists to catch and what no diff shows.
+    'hud-edit'        = @{ Title = 'EQBuddy HUD Chips'
+                           Env = @{ EQBUDDY_HUDEDIT = '1' }
+                           Set = @{ MutedChipFamilies = @('Spawn') } }
     'spawns-window'   = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Runnyeye Citadel' }; Set = @{ TrackSpawns = $true } }
     # Plane of Sky's triggered spawns (#109 follow-up; FABLE.md). A NEW name — trap 21:
     # 'spawns-window' is embedded by the docs and stays Runnyeye. PREDICTION, written
