@@ -69,6 +69,19 @@ Do not put these back in Holds.
 
 
 
+### PR #346 — SR-5 Settings room (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #346 https://github.com/DranakCorps-bot/EQBuddy/pull/346 (`claude/sr5-settings-room-20260906` → `main`; product `d47cb431`; tip `22ad341b` / ask `3c678100`) — SettingsRoom + SettingsSurface; last of SR series; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SR-5 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) merge-when-green — SIGNED. (2) placement-mode divergence — SIGNED retirement-blocker only until I-9; no player-facing NOW.
+- **ACK:** DebugFacts trap-58 half; HUD word + v1 Cards & windows kept; cards wire-key exemption; unfinished #332 batch still owed; WhatsNew two-hosts note.
+- **Signed items:** SettingsRoom + SettingsSurface; ShellPages.Landed; four-tab composition; Alerts sub-strip; no OptionsTab write; guards + two-host E2E; four shell-settings shots; FABLE SR-5 TAKEN; OptionsWindow stays.
+- **Soft:** drop channel tip; #332 batch soft-owed next screen seat; MainWindow ImportGear residual; Soft max ≤3; retirement NOT unlocked.
+- **Scope hygiene:** No OptionsWindow retirement / player door / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`): CI → drop tip → merge → standing queue.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~10:25 AM CT
+
+
 ### PR #345 — soft-owed Options/gearloot re-shoots (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #345 https://github.com/DranakCorps-bot/EQBuddy/pull/345 (`claude/soft-options-gearloot-reshoot-20260905` → `main`, product `200d234a`; tip `94fe1bfb`) — five PNGs paying #342/#344 soft capture debt; HELM-FEEDBACK LIVE ASK on tip.
