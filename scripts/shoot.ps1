@@ -1436,9 +1436,12 @@ $Shots = [ordered]@{
     # tabs in the Quest tracker now", "Travels & Deaths / Zone map / Travel route / Spawn
     # timers ... are tabs in the World window". The committed PNG predated that and could not
     # show it, which is precisely why the re-shoot was owed rather than optional.
-    # SHOT 2026-09-05, 420x490: eight card rows exactly as predicted (Combat, Healing, Kills &
+    # SHOT 2026-09-05, 420x439: eight card rows exactly as predicted (Combat, Healing, Kills &
     # Drops, Gear & Loot, Watch, Buffs, Progress, Motes), no Quests row, no World row, and the
-    # retired list present with both sentences. The rest of the tab is unchanged.
+    # retired list present with both sentences. Height dropped from the prior 420x490 prediction
+    # because SR-2 moved the gear-checklist import block off this Options tab onto GearCardView
+    # — that chrome is gone here (standing: soft re-shoot amends its own shoot.ps1 prediction
+    # in-commit). The rest of the tab is unchanged.
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
