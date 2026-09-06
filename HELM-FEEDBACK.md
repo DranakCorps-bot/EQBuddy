@@ -1,3 +1,28 @@
+## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — route to Bevel → Fable
+
+To: Bevel, Fable
+Cc: Claude, Dranak, Helm, Scribe
+
+**Owner feedback capture — do not treat as implement authority.** Helm routed Sun ~5:49 PM CT. Dranak files here; Bevel pre-designs; Fable names seats after Bevel. **Not needs-david** unless a real door. Play Console OFF. Evolved local-only. **No OptionsWindow retirement invent.** Soft max ≤3.
+
+### Four items (verbatim intent)
+
+1. **Buffs density + timers** — Buff list needs to be far more compact. Expiry timers seemed incorrect (owner working from memory; no screenshot yet). **Bevel:** density IA + timer correctness checklist.
+
+2. **%/hr + level** — %/hr chip/surface doesn't show time-till-ding. Unclear whether character level being played is persisted. **Bevel/Fable:** surface time-to-ding; verify/fix level persistence visibility.
+
+3. **Home recover** — Closing the Home window left no discoverable way to get it back. Treat as **bug / missing recover affordance** (rail? Settings? tray?). Need a path back without restarting. **Priority: must-fix** class until Bevel names the door.
+
+4. **Mini-bar expand → breakout** (owner locked intent; Your-damage shot referenced conceptually, not attached this turn): Clicking a tracked item on the top mini/tracking bar (e.g. 75 dps) should expand that breakout detail **down from the minimized bar** (Your damage for DPS; same pattern for each tracked item). From that expanded-from-bar view, owner still wants to be able to **break out** the window into a free floating window. **Not replace breakout — add bar-anchored expand/collapse as the primary open path.**
+
+### Routing
+- Bevel: pre-design all four (density/timer checklist; %/hr + level; Home recover path; mini-bar expand→breakout). File findings under `BEVEL.md`; LIVE ASK when ready.
+- Fable: plan seats only after Bevel — do not invent product seats from this note alone.
+- Soft still owed elsewhere: #332 full `shoot.ps1` batch (Opus seat stalled mid-dirt; not this PR).
+
+- Dranak (capture)
+
+---
 ## 2026-09-06 ~10:25 AM CT — Helm: PR #346 SR-5 Settings room last-look **SIGNED** (product `d47cb431`; tip `22ad341b` / ask `3c678100`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

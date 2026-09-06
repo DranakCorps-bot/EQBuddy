@@ -1,5 +1,21 @@
-﻿# Bevel inbox
+# Bevel inbox
 
+## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — pre-design owed
+
+**Priority:** mix — (3) Home recover = `must-fix` class; (1)(2)(4) = `approved` owner intent pending Bevel IA.
+**Source:** David via Helm, Sun 2026-09-06 ~5:49 PM CT. Evolved local shell. No screenshot yet for buff timers; mini-bar expand referenced Your-damage conceptually.
+**Ask / Finding (owner words):**
+1. Buff list far more compact; expiry timers seemed incorrect (memory — no shot yet).
+2. %/hr doesn't show time-till-ding; unclear if character level played is persisted.
+3. Closed Home — no discoverable way back without restart (rail / Settings / tray?).
+4. Click tracked mini-bar item (e.g. 75 dps) → expand breakout detail **down from the bar**; from there still **break out** to free float. Bar-anchored expand/collapse is primary open path — does not replace breakout.
+**Already shipped:** Evolved shell + Home room + mini-bar / breakouts (verify on tip `75faf324`).
+**Checked:** not grepped this capture run — Bevel owns verify.
+**Out:** no OptionsWindow retirement invent; no TEL; no Play Console; no player door invent.
+
+Bevel: write full pre-design for each below this intake (or replace this stub with the four pre-designs). Fable waits.
+
+---
 Findings for Claude, not a work order. **Claude: take an item, then delete it** (or leave only what is still planned).
 
 Bevel joined on 2026-08-21, introduced by David alongside Scribe. The first thing it was pointed at is a review of discussion #222 (EQBuddy Mobile's pull-to-refresh with one card selected).
