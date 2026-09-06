@@ -286,6 +286,31 @@ public class ShellTerminologyTests
             "the Look block — the palette picker, the sliders, the grid and the cursor ring"),
         ("EQBuddy/SettingsBehaviorView.cs",
             "the Behavior block — pairing, the hide-when rules, hotkeys, logs, the tutorial"),
+        // SR-3's block, and the one where the ban and the subject genuinely collide: this
+        // screen's whole job is configuring the things §4 calls "cards" and "breakouts". Six
+        // sentences were reworded once, for both hosts — the two headings ("Overlay cards" →
+        // "What EQBuddy shows", "Breakout windows" → BreakoutPresentation.Heading), the
+        // panel-list blurb, the HUD-stat tooltip (the exact "mini pill" sentence #326 banned)
+        // and its blurb, and the double-click and target-drops pairs.
+        //
+        // **What is NOT swept, named rather than left silent:** `OverlaySections`' retired
+        // list and fold notes, which this block PRINTS and which say "card" and "widget" on
+        // purpose. That copy was signed as-is at #335, hours before this lift, and Fable's SR
+        // series carries an explicit "no re-opening #335 — the Retired list is consumed as-is".
+        // A row for `OptionsViewModel.cs` would be red on arrival on a ruling that is younger
+        // than this test file, which is trap 54's "guard that cries wolf" bought with someone
+        // else's signature. Whoever lands the Settings room re-asks it with #335's author.
+        ("EQBuddy/SettingsHudView.cs",
+            "the HUD block — every string Settings' panel/HUD/window editors can show, both hosts"),
+        // NOT shell files and not blocks: two UI.Shared word modules the HUD block PRINTS,
+        // joining for exactly the reason AltTabPolicy did in SR-1. BreakoutPresentation is the
+        // one that had hits — three player consts said "while the widget is minimised" — and
+        // it is also where the renamed heading and its re-enable ROUTE now live, so the alert
+        // banner, the error log and the ✕ tooltip cannot drift from the screen they point at.
+        ("EQBuddy.UI.Shared/BreakoutPresentation.cs",
+            "the floating-window list's heading, blurb, per-row notes and re-enable route"),
+        ("EQBuddy.UI.Shared/MiniBarPresentation.cs",
+            "what each HUD cell is CALLED, which is the label beside every tick box in the block"),
         // NOT a shell file and not a block either: two UI.Shared word modules the Behavior
         // block PRINTS. A const a block shows is a string the block shows, wherever it is
         // declared, and neither module was reachable by any other tier — the block's own

@@ -31,19 +31,9 @@ public partial class OptionsWindow : Window
         SourceInitialized += (_, _) => ClampToMonitor();
         LocationChanged += (_, _) => ClampToMonitor();
 
-        TargetDropsCheck.IsChecked = _vm.ShowTargetDrops;
-        DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
         SelectTab(_main.Settings.OptionsTab);
 
-        foreach (var choice in OptionsViewModel.WindowChoices) WindowCombo.Items.Add(choice);
-        WindowCombo.SelectedIndex = _vm.RecentWindowIndex;
-
-        // The Cards & windows tab's three editors, lifted into OptionsCardsView.cs when
-        // the mini-dashboard list pushed this file past its ratchet — CLAUDE.md's rule is
-        // to lift a surface, never to raise the ceiling.
-        _cardsView = new OptionsCardsView(_main, _vm, () => _ready,
-            CardsPanel, MiniStatsPanel, BreakoutsPanel, BreakoutsBlurb, FindResource);
-        _cardsView.RenderAll();
+        BuildHudTab();
         BuildAlertsTabs();
         BuildLookAndBehaviour();
 
@@ -63,17 +53,11 @@ public partial class OptionsWindow : Window
         };
     }
 
-    private void OnTargetDropsToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.ShowTargetDrops = TargetDropsCheck.IsChecked == true;
-    }
-
-    private void OnDoubleClickChipsToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.DoubleClickChipsToggleBreakouts = DoubleClickChipsCheck.IsChecked == true;
-        _main.Settings.Save();
-    }
+    // THE CARDS TAB'S THREE STRAY SWITCHES WENT WITH THEIR CONTROLS on 2026-09-05 (SR-3).
+    // Target drops, double-click-a-chip and the recent-rate picker are `SettingsHudView`'s
+    // now, wired inside the block that draws them, gated on the same host-ready callback
+    // this window used to gate them with — so the shell's Settings room gets three working
+    // switches rather than three that render and do nothing.
 
     /// <summary>MainWindow calls this when the breakout editor writes the same storage,
     /// so an edit made there appears here immediately too. Forwarded: the editor is
@@ -90,10 +74,9 @@ public partial class OptionsWindow : Window
     private SettingsAlertsView? _alerts;
 
     /// <summary>
-    /// The v1 arrangement, rebuilt from the lifted blocks: Watch keeps its own tab — and since
-    /// Surface A / SA-R that tab is nothing BUT the block, the <c>PinWatchChips</c> row having
-    /// retired — and the Alerts tab stacks the shared sound header over Buffs, Spawns and
-    /// Crowd.
+    /// The v1 arrangement, rebuilt from the lifted blocks: Watch keeps its own tab (with the
+    /// <c>PinWatchChips</c> row XAML still declares beneath it), and the Alerts tab stacks the
+    /// shared sound header over Buffs, Spawns and Crowd.
     ///
     /// **Order and headings come from <see cref="AlertSurface"/>, not from this file** — the
     /// first spend of a definition that has been sitting unused since before the pivot, and
@@ -116,6 +99,31 @@ public partial class OptionsWindow : Window
             TabAlertsPanel.Children.Add(_alerts.Heading(tab));
             TabAlertsPanel.Children.Add(_alerts.Block(tab.Tab));
         }
+    }
+
+    // ---- the HUD block (SR-3) ----
+
+    /// <summary>
+    /// This window's own instance of the HUD block — never a shared one. A WPF
+    /// <c>UIElement</c> has exactly one parent, so a block borrowed from another host would be
+    /// torn out of whichever painted it last, silently (trap 45). The shell's Settings room is
+    /// the second host, and it builds its own.
+    /// </summary>
+    private SettingsHudView? _hud;
+
+    /// <summary>
+    /// The v1 arrangement, rebuilt from the lifted block. The host is bare: every heading,
+    /// blurb, tick box and picker the `cards` tab used to declare is inside
+    /// <see cref="SettingsHudView"/> now, in the order players already have.
+    ///
+    /// **The tab LINK above keeps saying "Cards &amp; windows"** — that label is this window's,
+    /// it is shipped v1 copy, and the terminology ban's scope line exempts it (Bevel I-11 §3).
+    /// The shell calls the same block "HUD".
+    /// </summary>
+    private void BuildHudTab()
+    {
+        _hud = new SettingsHudView(_main, _vm, () => _ready, FindResource);
+        TabCardsPanel.Children.Add(_hud.Block);
     }
 
     // ---- tabs (1.67.0, David: "a wall of options... needs serious reorganization") ----
@@ -169,11 +177,11 @@ public partial class OptionsWindow : Window
     /// </summary>
     private void BuildLookAndBehaviour()
     {
-        // The Cards editors resolve their row Foreground with FindResource at construction time
+        // The HUD block's panel rows resolve their Foreground with FindResource at build time
         // rather than through a DynamicResource, so a palette swap has to rebuild them. That is
         // the host's business, not the block's, which is why the block asks instead of reaching.
         _look = new SettingsLookView(_main, _vm, () => _ready, FindResource,
-            () => _cardsView?.BuildCards());
+            () => _hud?.BuildCards());
         LookBlockHost.Children.Add(_look.Block);
 
         _behavior = new SettingsBehaviorView(_main, _vm, () => _ready, FindResource);
@@ -192,33 +200,18 @@ public partial class OptionsWindow : Window
         base.OnPreviewKeyDown(e);
     }
 
-    /// <summary>
-    /// One checkbox per breakout kind, and ticking one now actually TURNS IT ON.
-    ///
-    /// It used to only clear the ✕-dismissal (discussion #45), while the switch that
-    /// decides whether the window ever opens was the ★ on a card — so someone who came
-    /// here, found "🐾 Pet", ticked it and saw nothing had to go and ask. That question
-    /// kept coming back on Reddit (David, 2026-08-20), and the answer was always "yes,
-    /// but also star it somewhere else", which is a tick box that lies.
-    ///
-    /// Unticking is deliberately NOT symmetric: it stops the window and leaves the star
-    /// alone. For every kind but Buffs that same key is also a cell in the minimised
-    /// pill, and quietly removing someone's pill cell because they closed a window would
-    /// be a second silent surprise in the opposite direction.
-    /// </summary>
+    // A member-less doc comment about the breakout tick boxes stood here until SR-3. It had
+    // been orphaned by the OptionsCardsView lift long before this one — the paragraph it
+    // documents is on SettingsHudView.BuildBreakouts, which is now the only copy.
 
     /// <summary>Called back by MainWindow.SetTrackSpawns so closing the Spawns window
     /// (or toggling the menu) updates the box while Options sits open. Forwarded to the
     /// block that owns it.</summary>
     internal void SyncTrackSpawns(bool on) => _alerts?.SyncTrackSpawns(on);
 
+
     // OnPinChipsChanged retired with PinChipsCheck in Surface A / SA-R — see the Watch tab's
     // comment in OptionsWindow.xaml for where that switch went.
-
-    private void OnWindowChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (_ready) _vm.RecentWindowIndex = WindowCombo.SelectedIndex;
-    }
 
     // Resize state captured at drag start. Deriving each frame from the cursor's absolute
     // position rather than accumulating DragDelta avoids the feedback jitter you get when
@@ -326,10 +319,6 @@ public partial class OptionsWindow : Window
     {
         if (e.ChangedButton == MouseButton.Left) DragMove();
     }
-
-    /// <summary>The Cards &amp; windows editors, lifted into their own file for the same
-    /// reason as the mez one below.</summary>
-    private OptionsCardsView? _cardsView;
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
 }

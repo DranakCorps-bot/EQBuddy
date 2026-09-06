@@ -58,8 +58,8 @@ internal sealed class SettingsLookView
     private bool Ready => _hostReady();
 
     /// <param name="repaintHost">The host's chance to rebuild anything that resolved a brush
-    /// at CONSTRUCTION time rather than through a <c>DynamicResource</c> — the card rows in
-    /// <see cref="OptionsCardsView"/> are the live example. Everything this block builds
+    /// at CONSTRUCTION time rather than through a <c>DynamicResource</c> — the panel rows in
+    /// <see cref="SettingsHudView"/> are the live example. Everything this block builds
     /// repaints itself on a theme swap; the host's siblings are not this block's to know
     /// about, so it asks rather than reaching.</param>
     public SettingsLookView(MainWindow main, OptionsViewModel vm, Func<bool> ready,

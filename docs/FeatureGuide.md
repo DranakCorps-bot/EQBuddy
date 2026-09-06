@@ -598,8 +598,17 @@ Sliders: widget size (80–160 %, scales fonts), background see-through (panel o
 text stays opaque), whole-widget opacity. Auto-empty toggle (see Log hygiene).
 Recent-rate window (5/15/30 min). Watch-rule editor (kind dropdown, name, spell-class
 picker for Spell fade rules, match text, 🔔/🔊 toggles, delete, add). Alert sound picker
-+ ▶ test. Overlay cards: per-card up/down reorder and hide/show — hidden cards keep
-collecting; layout persists.
++ ▶ test. "What EQBuddy shows" (the heading read "Overlay cards" until 2.0.0): per-card
+up/down reorder and hide/show — hidden cards keep collecting; layout persists.
+
+**Since 2.0.0 the tab declares none of this.** Every heading, blurb, tick box and picker on
+Look, Alerts & chips, Watch rules, Cards & windows and Behavior is built by one of four
+host-neutral blocks — `SettingsLookView`, `SettingsAlertsView`, `SettingsHudView`,
+`SettingsBehaviorView` — and `OptionsWindow` is four bare hosts, a tab strip and its own
+chrome. The Evolved shell's Settings room composes the same four, which is the point: one
+copy of forty control wirings rather than two that drift. The `cards` tab's block is the
+transitional one, and it renders under the name **HUD** in the shell while v1 keeps its
+shipped "Cards & windows" label.
 
 **Width is draggable from either side.** The window has custom chrome (`WindowStyle=None`
 + `AllowsTransparency`), so there is no native resize border; transparent `Thumb`s on the

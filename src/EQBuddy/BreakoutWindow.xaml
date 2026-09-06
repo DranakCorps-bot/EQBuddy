@@ -55,9 +55,13 @@
                         Margin="{DynamicResource FlankS}" VerticalAlignment="Center">
                     <StackPanel x:Name="ScopeHost" Orientation="Horizontal"/>
                 </Border>
-                <local:EqIcon Grid.Column="5" Glyph="Close" Size="11" VerticalAlignment="Center"
-                           Cursor="Hand" Margin="{DynamicResource FlankXxs}" MouseLeftButtonDown="OnDismiss"
-                           ToolTip="Hide this window for good (its star chip stays; re-enable under Options → Breakout windows)"/>
+                <!-- The tooltip names a ROUTE, so it is BreakoutPresentation.DismissTip
+                     rather than a literal here: the Settings heading it points at was
+                     renamed in SR-3, and a re-enable path that names a heading nobody can
+                     find is #219's mechanism inside one sentence. Set in the ctor because
+                     XAML cannot concatenate a const. -->
+                <local:EqIcon x:Name="DismissIcon" Grid.Column="5" Glyph="Close" Size="11" VerticalAlignment="Center"
+                           Cursor="Hand" Margin="{DynamicResource FlankXxs}" MouseLeftButtonDown="OnDismiss"/>
             </Grid>
             <TextBlock Grid.Row="1" x:Name="SubText" FontSize="{DynamicResource FontMetadata}" Margin="{DynamicResource RowTightLeft}"
                        TextTrimming="CharacterEllipsis"/>

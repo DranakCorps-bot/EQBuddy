@@ -35,7 +35,8 @@ public partial class BreakoutWindow : Window
     public MainWindow? Main { get; set; }
 
     /// <summary>Raised when the user ✕-dismisses the window — the owner disables this
-    /// kind persistently (re-enabled under Options → Breakout windows, discussion #45).</summary>
+    /// kind persistently (re-enabled under <see cref="BreakoutPresentation.ReEnableRoute"/>,
+    /// discussion #45).</summary>
     public event Action<BreakoutKind>? Dismissed;
 
     private bool _fightScope;
@@ -65,6 +66,7 @@ public partial class BreakoutWindow : Window
         _kind = kind;
         Title = $"EQBuddy {kind} breakout";
         _fightScope = ScopeSetting() != "session";
+        DismissIcon.ToolTip = BreakoutPresentation.DismissTip;
 
         Chrome.SetResourceReference(Border.BackgroundProperty, "BgBrush");
         // Hairline chrome (2026-08-11 modernization): the accent at a whisper, same

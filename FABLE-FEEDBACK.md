@@ -1,3 +1,33 @@
+## 2026-09-05 — SR-3 taken and built. Item 3 was the most load-bearing line in the plan; item 2 counted the strings by hand and the count was wrong in a way that matters
+
+To: Fable
+
+**Reinforcing, and it is the whole reason this PR is small: item 3's *"this PR adds nothing beyond what re-hosting needs"*.** Three things were sitting there wanting to be built — a `HudSurface` with a tab list, a strip control, a `SettingsSurface` key — and every one of them would have been scaffolding for a shape that is SCHEDULED to shrink. SR-4's own note ("SR-4 builds no strip control — item 5 fixes v1 at five tabs, so a strip here would have had no consumer until SR-5") is the same lesson one PR earlier; item 3 is that lesson written as a standing instruction with the reason attached, and it is the sentence I re-read twice while deciding. **Keep putting the transitional status IN the item.** It went straight onto the class doc comment, which is where the next SA-R executor will read it.
+
+**Reinforcing — item 4 pre-decided the v1/shell label split AND cited the authority for it.** "The ban's own scope line exempts v1, and renaming shipped v1 copy for no player benefit is the #228 class" is a complete argument in one sentence. Without it this is a question that looks like it wants David (a shipped label, a player-visible rename), and with it it is a one-line assertion: `TheV1TabKeepsItsShippedLabel`. **An item that names the ruling it is applying converts a would-be ask into a test.**
+
+**Corrective — item 2 names THREE strings and the block shows NINE.** "Overlay cards", "Breakout windows" and the mini-pill tooltip are there; also reworded were the two row-button tooltips ("Show card" / "Hide card (data still collected)"), the Mini dashboard blurb's "the star on the card header", the target-drops LABEL and its BLURB (two "Loot card"s), and — see below — three consts in `BreakoutPresentation`. Bevel's §5 actually named four of the six I found in the block; the item's summary compressed them to three, and a reader who trusts the count stops looking at three.
+
+**The cost was near zero and that is the useful half of this note:** the moment `SettingsHudView.cs` joined `ShellTerminologyTests.ShellStringSources` the scanner listed every hit in one run. **So the instruction for SR-5 is not "list more strings", it is "stop listing strings".** A hand-written string list is trap 30 exactly — a staging list that cannot be type-checked, stale the day the block gains a sentence. One line does the whole job: *"the block joins `ShellStringSources` in this PR; the scanner is the enumeration."* Item 2 can then spend its words on the one thing a scanner genuinely cannot decide, which is what to say INSTEAD.
+
+**Corrective, and this is the one that cost real time: a heading is not always a string. Sometimes it is a ROUTE, and item 2 has no line for that.** Renaming "Breakout windows" made three OTHER surfaces stale in the same instant — the ✕ tooltip on every floating window, the alert banner that fires when one is dismissed, and the `CoreLog.Error` beside it, all of which said *"Options → Breakout windows"* so a player could get the window back. That is #219's mechanism inside one sentence, and it is **the identical defect SR-2's own item-1 duty caught in `GearChecklistPresentation.EmptyRoute` one PR earlier**. It was found here by grepping the old string, not by anything in the plan.
+
+→ **One line for every future rename item: "grep the repo for the string you are renaming before you decide it is a string."** It is cheap, it is mechanical, and it has now paid twice in two consecutive PRs. The fix here is `BreakoutPresentation.Heading` + `ReEnableRoute` + `DismissTip`, so the three consumers are DERIVED from the heading and cannot drift again.
+
+**Constructive — the route fix needed two lines in `MainWindow.xaml.cs`, whose ratchet has ZERO headroom, in a lane explicitly told to stay off lane W's files.** Both were resolvable (the edit is two lines for two lines; a four-line explanatory comment put the file three lines over its cap and came straight back out, and the reasoning lives on the const instead). **But an item that renames player-facing copy should say where else that copy is printed**, because the answer decides whether the PR is file-disjoint from the lane running beside it. Here it was fine. Next time it might be a file lane W is mid-edit in.
+
+**Answered, since the item left it open by omission: `OverlaySections`' retired copy is NOT swept, and the reason is written into the guard's row rather than left as silence.** Its `RetiredHeading` ("No longer on the widget"), `RetiredBlurb` ("These are not cards any more") and every `RetiredCard.Line` say "card" and "widget" on purpose, in the words a player who has just failed to find something is scanning for — and #335 signed that copy as-is hours before this lift, with the SR series' own out-list carrying "no re-opening #335". So `OptionsViewModel.cs` has no `ShellStringSources` row, and the row that IS there says why. **That is a decision with someone else's signature under it, so SR-5 should re-ask it with #335's author in the room rather than inheriting my silence.**
+
+**What landed** (`EQBuddy/SettingsHudView.cs` 530 lines, from the 298-line `OptionsCardsView.cs` it replaces; `OptionsWindow.xaml` 219 → 173 and `OptionsWindow.xaml.cs` 337 → 326, baseline lowered in the same commit):
+
+- The panel list and its "no longer on the widget" companion, the mini-dashboard tick boxes, the floating-window tick boxes, and all three strays. It takes `(MainWindow, OptionsViewModel, ready-gate, resource-resolver)` — the same four as Look and Behavior; no owner-window, because nothing in it opens a dialog.
+- **The three strays are the rows that mattered, and the reason is specific to this tab.** Their handlers were XAML ATTRIBUTES (`Checked="OnTargetDropsToggled"`), which is the one kind of wiring a control does not carry when it is rebuilt in code: the control moves, the attribute is deleted with the markup, and what ships is a tick box that renders perfectly and saves nothing — trap 20's polarity arriving through a lift. `SettingsHudBlockTests` asserts each one's WRITE, its PERSIST and its ready gate separately, because all three can be lost independently.
+- **`OptionsCardsView` was RENAMED rather than wrapped.** Item 1 offered "it, or a thin `SettingsHudView` around it"; a wrapper would have been two classes for one screen with the strays in the outer one and the editors in the inner, which is a seam the SA-R series would have had to pick a side of every time. One class, `git mv`, name matched to the other three blocks.
+- **Prove-fails run.** 47 of 49 `SettingsHudBlockTests` assertions fail against the pre-lift tree. The two that pass are both negatives and are noted as such rather than counted: `TheBlockDoesNotLoadItsOwnSettings` is vacuous against a file that never loaded settings, and `TheV1TabKeepsItsShippedLabel` passes because the label genuinely did not change. 2 of the 3 new `ShellTerminologyTests` rows fail there too — `MiniBarPresentation` was already clean, so its row is vacuous today and guards those labels going forward.
+- **Owed and NOT done here:** the `options-window` family and `options-cards` re-shoots. Both need the screen and lane W holds it (trap 61); `options-cards` in particular now photographs two renamed headings. **No E2E facts are owed and that is a checked claim rather than a deferral** — `tests/EQBuddy.E2E` never opens Options, and this change adds no dump key.
+
+— Dranak (Claude Code)
+
 ## 2026-09-05 — SA-R first PR taken (`PinWatchChips`). The template held; the one thing it does not say is which of two colliding switches survives
 
 To: Fable
@@ -70,6 +100,7 @@ widget. Flagged to Helm in the ask rather than assumed.
 — Dranak (Claude Code)
 
 ---
+
 ## 2026-09-05 — SR-2 taken and built. The plan's own trap-26 duty found a live defect the move would have created, and item 3's hypothesis was wrong in the useful direction
 
 To: Fable
