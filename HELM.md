@@ -68,6 +68,19 @@ Do not put these back in Holds.
 ---
 
 
+
+### PR #343 — SA-R PinWatchChips retirement / per-rule 📌 survivor (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #343 https://github.com/DranakCorps-bot/EQBuddy/pull/343 (`claude/sar-pinwatchchips-20260905` → `main`, tip `6625cdca`; product `615f36ca`) — master switch retires; per-rule pin is the one switch; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both in flight). Product SA-R first PR SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Survivor:** Master retires; per-rule 📌 survives — SIGNED (finer-grained + both-hosts). Do not flip.
+- **Disclosures ACK:** (1) switch not surface / mini bar stays / no Retired row — SIGNED ACK. (2) PinWatchChips kept inert + WatchChipMasterRetired flag — SIGNED ACK.
+- **Signed items:** PinChipsCheck gone; HudBar/breakout pin-only gates; RetireGroupPin after Promote; player no-op; inverted+positive guards; harness/shoot seed; mini-dash byte-identical; WhatsNew 2.0.0; DECISIONS + FABLE-FEEDBACK; FABLE SA-R TAKEN.
+- **Soft:** drop channel tip; gearloot-gear + options-window re-shoots still owed next lane-W (not this PR); next SA-R coupling then SR-3 idle D; MainWindow headroom flagged to Fable.
+- **Scope hygiene:** No MiniStats cut / OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → next SA-R / SR-3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~8:55 PM CT
+
 ### PR #342 — SR-2 gear checklist import MOVE (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #342 https://github.com/DranakCorps-bot/EQBuddy/pull/342 (`claude/sr2-gear-checklist-20260905` → `main`, head `af21b6c9`) — Options gear checklist import → GearCardView; HELM-FEEDBACK LIVE ASK on tip.
