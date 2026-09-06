@@ -69,6 +69,18 @@ Do not put these back in Holds.
 
 
 
+### PR #344 — SR-3 HUD block leaves OptionsWindow (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #344 https://github.com/DranakCorps-bot/EQBuddy/pull/344 (`claude/sr3-hud-block-20260905` → `main`, head `8b342d30`) — OptionsCardsView → SettingsHudView host-neutral HUD block; F3 / I-11 §SR-3.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both SUCCESS). Product SR-3 SIGNED. Land HELM SSC on main (UTF-8 prepend).
+- **Disclosures ACK:** (1) MainWindow two-line zero-net route fix — SIGNED ACK. (2) OverlaySections retired not swept (#335) — SIGNED ACK. (3) MiniBarPresentation vacuous scanner — SIGNED ACK. (4) #343 merge order — DISCHARGED.
+- **Signed items:** rename not wrap; host-neutral block; three strays write/persist/ready; string rewords + ShellStringSources; derived Breakout re-enable route; v1 tab label kept / SR-5 owes HUD; ratchet; SettingsHudBlockTests + terminology; WhatsNew; FABLE SR-3 TAKEN.
+- **Soft:** options-window + options-cards (+ gearloot-gear) re-shoots owed when screen/lane W free; SR-5 next gated land after this merge; MainWindow ImportGear residual still owed.
+- **Scope hygiene:** No OptionsWindow retirement / SR-5 implement / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak: merge #344 → re-shoots when screen free.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~9:25 PM CT
+
+
 ### PR #343 — SA-R PinWatchChips retirement / per-rule 📌 survivor (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #343 https://github.com/DranakCorps-bot/EQBuddy/pull/343 (`claude/sar-pinwatchchips-20260905` → `main`, tip `6625cdca`; product `615f36ca`) — master switch retires; per-rule pin is the one switch; HELM-FEEDBACK LIVE ASK on tip.
