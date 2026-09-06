@@ -39,4 +39,32 @@ public static class ChipStackPlan
     /// learn it was empty.</summary>
     public static bool FightStack(bool hiddenForFocus, bool mezHasChips, bool slowHasChips)
         => !hiddenForFocus && (mezHasChips || slowHasChips);
+
+    /// <summary>Should the watch-fire family be on the row this tick (SA-3)?
+    ///
+    /// Focus-hide and nothing else. The two SA-2 families each carry an Options toggle of
+    /// their own; this one does not, on purpose — a watch rule is already switched on per rule
+    /// (<c>TrackedRule.Enabled</c>) and already chooses its on-screen presence per rule
+    /// (<c>AlertBanner</c>), so a third global switch would be a fourth answer to a question
+    /// the player has answered twice. SA-4's per-family Mute is the one that is coming.
+    ///
+    /// It lives here rather than inline for the reason the file exists: WHETHER a family shows
+    /// has one home, so a later rule (a raid-only gate, say) lands beside its siblings instead
+    /// of drifting back into the window.</summary>
+    public static bool WatchFireStack(bool hiddenForFocus, bool hasFires)
+        => !hiddenForFocus && hasFires;
+
+    /// <summary>Should the buff-expiring family be on the row this tick (SA-3)?
+    ///
+    /// <paramref name="hasActiveBuffs"/> is the cheap probe — "is anything up at all" — so the
+    /// full list is not built twice a second just to learn it was empty. Whether any of those
+    /// buffs is actually inside the warning window is <see cref="HudChipRow.BuffChips"/>'
+    /// filter, which is where the threshold lives.
+    ///
+    /// **Hiding the Buffs CARD does not hide these.** A card is a desktop surface and a chip is
+    /// an overlay deadline; folding one away is not a statement about the other (B3 §3), and
+    /// the `buffs` card key is untouched by SA-3 in any case — it retires with the card, under
+    /// the per-item gate (SA-R).</summary>
+    public static bool BuffStack(bool hiddenForFocus, bool hasActiveBuffs)
+        => !hiddenForFocus && hasActiveBuffs;
 }

@@ -67,10 +67,10 @@ public class HudChipRowTests
         var spawn = new[] { Chip("Asaka L`Rei") };
 
         Assert.Equal([HudChipFamily.Spawn, HudChipFamily.Mez],
-            HudChipRow.Merge(mez, spawn, [HudChipFamily.Spawn, HudChipFamily.Mez])
+            HudChipRow.Merge(mez, spawn, order: [HudChipFamily.Spawn, HudChipFamily.Mez])
                 .Select(e => e.Family));
 
-        var spawnOnly = HudChipRow.Merge(mez, spawn, [HudChipFamily.Spawn]);
+        var spawnOnly = HudChipRow.Merge(mez, spawn, order: [HudChipFamily.Spawn]);
         Assert.Single(spawnOnly);
         Assert.Equal(HudChipFamily.Spawn, spawnOnly[0].Family);
     }
@@ -293,5 +293,279 @@ public class HudChipRowTests
         Assert.Equal("?", chip.CountdownText);
         Assert.Null(chip.Fraction);
         Assert.Null(HudChipRow.GaugeShare(new HudChipEntry(HudChipFamily.Mez, chip)));
+    }
+
+    // ---- SA-3: the two net-new deadline families ----
+
+    /// <summary>The four families come out in the order SA-4's signed default already names —
+    /// "mez, spawn, watch-fire, buff", urgency order — so the setting that arrives next
+    /// reads a list this file has already pinned rather than one an executor invented.
+    /// </summary>
+    [Fact]
+    public void TheFourFamiliesLandInTheSignedDefaultOrder()
+    {
+        var row = HudChipRow.Merge(
+            [Chip("a skeleton")], [Chip("Asaka L`Rei")],
+            [Chip("Rares")], [Chip("Clarity")]);
+
+        Assert.Equal(
+            [HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire, HudChipFamily.Buff],
+            row.Select(e => e.Family));
+        Assert.Equal(HudChipRow.DefaultOrder, row.Select(e => e.Family));
+    }
+
+    /// <summary>SPAWN is the only family whose gauge fills. Everything else on the row is a
+    /// thing going away — a mez, a slow, a warned buff, a lingering alert — and draws the
+    /// share it has LEFT. Asserted as a table rather than per family so a fifth member of the
+    /// enum cannot quietly get the wrong half (trap 30's shape).</summary>
+    [Fact]
+    public void OnlyTheSpawnFamilyFillsItsGauge()
+    {
+        foreach (var family in Enum.GetValues<HudChipFamily>())
+            Assert.Equal(family != HudChipFamily.Spawn, HudChipRow.GaugeDrains(family));
+    }
+
+    /// <summary>…and SPAWN is the only family that flips a due chip to the word "DUE". A buff
+    /// inside its last tick is still counting toward a recast, and a watch-fire chip has no
+    /// due moment at all — its countdown is its own linger.</summary>
+    [Fact]
+    public void OnlyTheSpawnFamilyFlipsToDue()
+    {
+        foreach (var family in Enum.GetValues<HudChipFamily>())
+            Assert.Equal(family == HudChipFamily.Spawn, HudChipRow.FlipsToDue(family));
+    }
+
+    // -- Watch-fire --
+
+    private static WatchFireLedger Fired(DateTime at, params (string Id, string Name)[] rules)
+    {
+        var ledger = new WatchFireLedger();
+        foreach (var (id, name) in rules) ledger.Record(id, name, $"{name} matched", at);
+        return ledger;
+    }
+
+    /// <summary>
+    /// A fired rule's chicklet: the RULE'S NAME on the face, the linger as the countdown, the
+    /// match in the tooltip where it has room, and a Bell.
+    ///
+    /// PREDICTION, written before it ran: five seconds into a thirty-second linger the face
+    /// reads "0:25", the elapsed fraction is 5/30, and the drained gauge share is 25/30.
+    /// </summary>
+    [Fact]
+    public void AFiredRuleWearsItsNameAndCountsItsLingerDown()
+    {
+        var chip = Assert.Single(HudChipRow.WatchChips(
+            Fired(T0, ("r1", "Rares")), T0.AddSeconds(5)));
+
+        Assert.Equal("Rares", chip.Name);
+        Assert.Equal("0:25", chip.CountdownText);
+        Assert.Equal("Bell", chip.Icon);
+        Assert.Contains("Rares matched", chip.Detail);
+        Assert.False(chip.IsDue);
+        Assert.Equal(5 / 30d, chip.Fraction!.Value, 3);
+        Assert.Equal(25 / 30d, HudChipRow.GaugeShare(
+            new HudChipEntry(HudChipFamily.WatchFire, chip))!.Value, 3);
+    }
+
+    /// <summary>A rule that fires again refreshes its own chicklet rather than adding a
+    /// second one. A Text rule on a busy channel fires repeatedly, and a ledger keyed on the
+    /// firing would put a dozen identical chicklets on the row inside one pull.</summary>
+    [Fact]
+    public void ReFiringOneRuleRefreshesItsChipInsteadOfAddingAnother()
+    {
+        var ledger = Fired(T0, ("r1", "Rares"));
+        ledger.Record("r1", "Rares", "a second match", T0.AddSeconds(20));
+
+        var chip = Assert.Single(HudChipRow.WatchChips(ledger, T0.AddSeconds(25)));
+        Assert.Equal("0:25", chip.CountdownText);       // 25 s after the SECOND firing
+        Assert.Contains("a second match", chip.Detail);  // and the newer label
+    }
+
+    /// <summary>Two rules are two chicklets, newest first: the freshest alert is the one you
+    /// are most likely to be looking for.</summary>
+    [Fact]
+    public void SeveralRulesAreSeveralChipsNewestFirst()
+    {
+        var ledger = Fired(T0, ("r1", "Rares"));
+        ledger.Record("r2", "Named up", "Frenzied Ghoul", T0.AddSeconds(10));
+
+        Assert.Equal(["Named up", "Rares"],
+            HudChipRow.WatchChips(ledger, T0.AddSeconds(11)).Select(c => c.Name));
+    }
+
+    /// <summary>The linger runs out and the chicklet goes — with the boundary asserted on
+    /// both sides, because "still there at 29 s" and "gone at 30 s" are the two claims and a
+    /// one-sided test would pass with the constant doubled.</summary>
+    [Fact]
+    public void AChipLeavesWhenItsLingerRunsOut()
+    {
+        var ledger = Fired(T0, ("r1", "Rares"));
+
+        Assert.Single(HudChipRow.WatchChips(ledger, T0.AddSeconds(29)));
+        Assert.Empty(HudChipRow.WatchChips(ledger, T0.AddSeconds(30)));
+        Assert.False(ledger.Any(T0.AddSeconds(30)));
+    }
+
+    /// <summary>Right-click dismisses this screen's chicklet, never the rule: the next firing
+    /// brings it straight back, exactly as a dismissed slow chip does.</summary>
+    [Fact]
+    public void DismissingAWatchChipDropsItAndTheNextFiringBringsItBack()
+    {
+        var ledger = Fired(T0, ("r1", "Rares"));
+        Assert.Single(HudChipRow.WatchChips(ledger, T0.AddSeconds(1))).OnDismiss!();
+
+        Assert.Empty(HudChipRow.WatchChips(ledger, T0.AddSeconds(2)));
+        ledger.Record("r1", "Rares", "matched again", T0.AddSeconds(3));
+        Assert.Single(HudChipRow.WatchChips(ledger, T0.AddSeconds(4)));
+    }
+
+    // -- Buff expiring --
+
+    /// <summary>"Armor of Faith" is 3,780 s in the shipped catalog and lands at +3 s — the
+    /// same pair `BuffTrackerTests` uses, through the real parser and the real tracker.
+    /// </summary>
+    private static BuffTracker Buffed()
+    {
+        var t = new BuffTracker();
+        t.Apply(Ev(0, "You begin casting Armor of Faith."));
+        t.Apply(Ev(3, "You feel the favor of the gods upon you."));
+        return t;
+    }
+
+    /// <summary>
+    /// A buff only earns a chicklet once it is inside the warning window, and the window is
+    /// the player's own `BuffWarnSeconds` — the answer they already gave the Buffs card.
+    ///
+    /// PREDICTION: with the default 60 s window, a 3,780 s buff landed at +3 s has no chip an
+    /// hour in (3,183 s left) and one chip at +3,750 s (33 s left).
+    /// </summary>
+    [Fact]
+    public void ABuffGetsNoChipUntilItIsInsideTheWarningWindow()
+    {
+        var t = Buffed();
+
+        Assert.Empty(HudChipRow.BuffChips(t, T0.AddSeconds(600), warnSeconds: 60));
+        Assert.Single(HudChipRow.BuffChips(t, T0.AddSeconds(3750), warnSeconds: 60));
+    }
+
+    /// <summary>Widen the player's window and the same buff earns its chip earlier. This is
+    /// the assertion that the threshold is READ rather than pinned: a hard-coded 60 would
+    /// pass every test above and fail this one.</summary>
+    [Fact]
+    public void AWiderWarningWindowBringsTheChipOutSooner()
+        => Assert.Single(HudChipRow.BuffChips(Buffed(), T0.AddSeconds(600), warnSeconds: 3600));
+
+    /// <summary>
+    /// The chicklet itself.
+    ///
+    /// PREDICTION: at +3,750 s the buff has 33 s left, so the face reads "0:33 est" — "est"
+    /// because a wiki-base duration is a floor until a natural fade teaches the real number,
+    /// which is the same word the card uses. The gauge is measured against the WINDOW, not
+    /// the spell: 33 of 60 seconds left, so 45% elapsed and 55% painted. Against the spell it
+    /// would be a bar frozen at 99% for the chip's whole life.
+    /// </summary>
+    [Fact]
+    public void TheBuffChipReadsItsRemainingTimeAndDrainsAcrossTheWarningWindow()
+    {
+        var chip = Assert.Single(HudChipRow.BuffChips(Buffed(), T0.AddSeconds(3750), 60));
+
+        Assert.Equal("Armor of Faith", chip.Name);
+        Assert.Equal("0:33 est", chip.CountdownText);
+        Assert.Equal("Hourglass", chip.Icon);
+        Assert.False(chip.IsDue);
+        Assert.Equal(1 - 33 / 60d, chip.Fraction!.Value, 2);
+        Assert.Equal(33 / 60d, HudChipRow.GaugeShare(
+            new HudChipEntry(HudChipFamily.Buff, chip))!.Value, 2);
+    }
+
+    /// <summary>Inside the last server tick it takes the warning tint — and keeps counting,
+    /// because unlike a spawn there is no "it happened" moment to flip to.</summary>
+    [Fact]
+    public void ABuffInsideItsLastServerTickIsDueButStillCounting()
+    {
+        var chip = Assert.Single(HudChipRow.BuffChips(Buffed(), T0.AddSeconds(3779), 60));
+
+        Assert.True(chip.IsDue);
+        Assert.Equal("0:04 est", HudChipRow.FaceText(new HudChipEntry(HudChipFamily.Buff, chip)));
+    }
+
+    /// <summary>A buff chip is not dismissible: it clears itself when the buff fades or is
+    /// recast, exactly as a mez chip clears off the log. The tooltip only offers gestures a
+    /// chicklet actually has, so this is also what stops it advertising one it hasn't.
+    /// </summary>
+    [Fact]
+    public void ABuffChipIsNotDismissible()
+        => Assert.Null(Assert.Single(HudChipRow.BuffChips(Buffed(), T0.AddSeconds(3750), 60)).OnDismiss);
+
+    /// <summary>The ten-second floor is the Buffs card's, and it lives in one place so the
+    /// card and the chip cannot disagree about when a buff has become urgent.</summary>
+    [Theory]
+    [InlineData(0d, 10d)]
+    [InlineData(9d, 10d)]
+    [InlineData(60d, 60d)]
+    [InlineData(3600d, 3600d)]
+    public void TheWarningWindowKeepsTheCardsTenSecondFloor(double setting, double expected)
+        => Assert.Equal(expected, HudChipRow.BuffWarnWindow(setting));
+
+    // ---- Build: the whole row for one tick, lifted out of MainWindow in SA-3 ----
+    //
+    // None of this was assertable before the lift. The four gates lived in the window, where
+    // the WPF layer has no unit tests, so "focus-hide takes the row" and "the Camps rule is
+    // per family" could only ever be checked by launching the app.
+
+    /// <summary>Every family the fixture can produce, all four on one row, in order.</summary>
+    private static List<HudChipEntry> BuildAll(bool hiddenForFocus = false, bool worldOnCamps = false)
+    {
+        var settings = new AppSettings { TrackSpawns = true, MezChipsEnabled = true, BuffWarnSeconds = 7200 };
+        var catalog = new SpawnCatalog
+        {
+            Zones =
+            [
+                new SpawnZone
+                {
+                    Zone = "Lower Guk", LogZoneName = "The Ruins of Old Guk",
+                    Named = [new SpawnEntry { Name = "a froglok ghoul lord", RespawnSeconds = 1620 }],
+                },
+            ],
+        };
+        var overrides = new SpawnOverrides();
+        var timers = new SpawnTimers(catalog, overrides) { Server = "test" };
+        timers.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        timers.Apply(new KillEvent(T0, "froglok ghoul lord", "You"));
+        var spawns = new SpawnsViewModel(catalog, overrides, timers);
+
+        var fires = new WatchFireLedger();
+        fires.Record("r1", "Rares", "Fungi Tunic", T0);
+
+        return HudChipRow.Build(settings, hiddenForFocus, worldOnCamps, spawns,
+            Mezzed("a skeleton"), new SlowTracker(), fires, Buffed(), T0.AddSeconds(5));
+    }
+
+    /// <summary>All four families reach the row through one call, in the default order.
+    /// PREDICTION: mez, spawn, watch-fire, buff — one chicklet each.</summary>
+    [Fact]
+    public void BuildPutsEveryLiveFamilyOnTheRow()
+        => Assert.Equal(
+            [HudChipFamily.Mez, HudChipFamily.Spawn, HudChipFamily.WatchFire, HudChipFamily.Buff],
+            BuildAll().Select(e => e.Family));
+
+    /// <summary>Focus-hide takes the WHOLE row, every family with it — a chip row over
+    /// someone's browser is the thing focus-hide exists to prevent, and a family that
+    /// forgot to ask would be the one left floating there.</summary>
+    [Fact]
+    public void FocusHideTakesEveryFamilyOffTheRow()
+        => Assert.Empty(BuildAll(hiddenForFocus: true));
+
+    /// <summary>The Bevel-signed Camps hide-rule is PER FAMILY: the spawn chips leave because
+    /// the same timers are on screen in the World window, and nothing else moves.</summary>
+    [Fact]
+    public void TheCampsRuleTakesOnlyTheSpawnFamily()
+    {
+        var row = BuildAll(worldOnCamps: true);
+
+        Assert.Equal(0, HudChipRow.CountOf(row, HudChipFamily.Spawn));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Mez));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.WatchFire));
+        Assert.Equal(1, HudChipRow.CountOf(row, HudChipFamily.Buff));
     }
 }

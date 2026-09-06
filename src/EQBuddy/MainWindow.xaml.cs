@@ -869,7 +869,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal MezTracker MezTracker => _mezTracker;
     internal MezOverrides MezDurations => _mezDurations;
     private readonly SlowTracker _slowTracker = new();
-    private readonly BuffTracker _buffTracker = new();
+    internal readonly BuffTracker _buffTracker = new();   // internal: WidgetDump's buffsActive
     private readonly BuffLossLog _buffLossLog = new();
     internal readonly RaidKillLedger _raidLedger;
 
@@ -1444,7 +1444,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         var quiet = 0;
         if (_settings.BuffTimersExpiringOnly && buffs.Count > 0)
         {
-            var warn = Math.Max(10, _settings.BuffWarnSeconds);
+            var warn = HudChipRow.BuffWarnWindow(_settings.BuffWarnSeconds);
             var urgent = buffs.Where(b => b.RemainingSeconds(now) is { } r && r <= warn).ToList();
             quiet = buffs.Count - urgent.Count;
             buffs = urgent;
@@ -1473,7 +1473,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (buffs.Count == 0)
         {
             BuffsPanel.Children.Add(EmptyCardLine(_settings.BuffTimersExpiringOnly && quiet > 0
-                ? $"{quiet} running quietly — timers appear at {Math.Max(10, _settings.BuffWarnSeconds):0}s left."
+                ? $"{quiet} running quietly — timers appear at {HudChipRow.BuffWarnWindow(_settings.BuffWarnSeconds):0}s left."
                 : "Nothing running — a buff landing on you starts its countdown here."));
             AddBuffSetLine(setMissing, setNotSeen, setExpiring);
             AddBuffSuggestionRows(suggestions);
@@ -1612,7 +1612,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         var sights = _buffTracker.SetSights();
         // Reuses the Buffs card's existing warn threshold — stage 1 adds no second knob.
         return BuffSetEvaluator.Evaluate(set, active, sights.Landings, sights.Fades,
-            now, Math.Max(10, _settings.BuffWarnSeconds));
+            now, HudChipRow.BuffWarnWindow(_settings.BuffWarnSeconds));
     }
 
     // ---- stage 3 (#120, Frankthetankk): suggestions + the lost-buff history ----
@@ -1763,38 +1763,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>
     /// THE ONE CHIP ROW, once per tick (Surface A / SA-2).
     ///
-    /// **Two questions, two homes.** <see cref="ChipStackPlan"/> answers "should this family
-    /// be on screen at all" — the Bevel-signed Camps hide-rule, focus-hide, the two Options
-    /// toggles — and is unit-tested; <see cref="HudChipRow"/> answers what the row looks
-    /// like once they have, and is unit-tested too. What is left here is WHICH trackers to
-    /// ask, which is the window's own business (trap 15).
+    /// **Every question about WHAT is on the row moved to <see cref="HudChipRow.Build"/> in
+    /// SA-3** — four families' gates, probes and thresholds, unit-tested with no window. What
+    /// is left here is the row window's lifecycle and the one question that is genuinely about
+    /// a <c>Window</c>: whether World is up on its Camps tab.
     ///
     /// Also the row's only door: it is created on the first tick that has a chip and hidden
     /// on the first that has none, with nothing saved either way.
     /// </summary>
     internal void RefreshHudChips()
     {
-        var now = DateTime.Now;
-        // The spawn family's hide-rule and its one exception live in ChipStackPlan.
         var worldOnCamps = _worldWindow is { IsLoaded: true, IsVisible: true } ww3
             && ww3.CurrentTab == WorldTab.Camps;
-        var spawn = ChipStackPlan.SpawnStack(_settings.TrackSpawns, _hiddenForFocus,
-            worldOnCamps, _spawnsVm.HasActiveTimers(now))
-            ? _spawnsVm.Chips(now) : [];
-
-        var mezOn = _settings.MezChipsEnabled;
-        var slowOn = _settings.SlowAlertEnabled
-            && (!_settings.SlowAlertRaidOnly || _slowTracker.InRaid(now));
-        // Emptiness is probed cheaply first so the full chip list isn't built twice a
-        // second just to learn it was empty.
-        var fight = ChipStackPlan.FightStack(_hiddenForFocus,
-            mezHasChips: mezOn && _mezTracker.Any(now),
-            slowHasChips: slowOn && _slowTracker.Any(now))
-            ? [.. mezOn ? HudChipRow.MezChips(_mezTracker, now) : [],
-               .. slowOn ? HudChipRow.SlowChips(_slowTracker, now) : []]
-            : new List<SpawnChip>();
-
-        var row = HudChipRow.Merge(fight, spawn);
+        var row = HudChipRow.Build(_settings, _hiddenForFocus, worldOnCamps, _spawnsVm,
+            _mezTracker, _slowTracker, _watchFires, _buffTracker, DateTime.Now);
         if (row.Count == 0) { _hudChips?.Hide(); return; }
         _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
         if (!_hudChips.IsVisible) _hudChips.Show();
@@ -3044,6 +3026,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         timer.Start();
     }
 
+    /// <summary>Watch rules that have fired and are still on the HUD chip row (SA-3).</summary>
+    private readonly EQBuddy.UI.Shared.WatchFireLedger _watchFires = new();
+
     private void FireAlert(TrackedRule rule, string ruleName, string label, TimeSpan cooldown)
     {
         if (!_ruleCooldowns.ShouldFire(rule, label, cooldown, DateTime.Now)) return;
@@ -3055,6 +3040,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // rule's own colour (Chaosrah, 2026-08-06) and by naming the rule.
             AlertTile.ShowAlert($"{ruleName}: {label}",
                 EQBuddy.UI.Shared.AlertColors.Hex(rule.AlertColor));
+        // AND the HUD chip, the same banner's second chance — the toast is gone in six
+        // seconds whether or not anyone was looking. WatchFireLedger owns whether a firing
+        // reaches the row; the repaint is immediate rather than on the next tick because
+        // watch alerts are the one rule kind that is about reacting in time.
+        if (_watchFires.Record(rule, ruleName, label, DateTime.Now)) RefreshHudChips();
         if (EQBuddy.UI.Shared.AlertSoundCatalog.Resolve(rule, _settings.AlertSound) is { } sound)
             { PlayAlertSound(sound, coalesce: true); _companion.RaiseAlert(); }   // + phone, #208
         if (rule.AlertSpeech)

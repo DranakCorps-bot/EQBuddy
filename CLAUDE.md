@@ -1766,6 +1766,31 @@ Read this list before touching the areas it names. Every entry cost a release.
     exactly**, found by asking what the lock would be worth if the holder ran two, and fixed
     the way that trap says: `[assembly: CollectionBehavior(DisableTestParallelization = true)]`.
 
+62. **`AppendLogLines` RETURNS WHEN THE TAIL HAS READ THE BYTES, NOT WHEN THE APP HAS ACTED ON
+    THEM — so an E2E assertion that something did NOT happen, made straight after an append,
+    is asserting against an app that has not decided anything yet.** The harness waits for
+    `logPending` to reach 0, which is trap 56's fix and is exactly right for what it covers: a
+    stalled tail names itself at the append instead of surfacing as a wrong row count ninety
+    seconds later. But `MainWindow.OnTextMatched` alerts through `Dispatcher.BeginInvoke`, so
+    the whole watch-rule path runs *after* that wait returns. `WaitForDump(key, 0, …)` is then
+    satisfied by the zero that was already there.
+    → **It reads as a passing test of the thing you just built.** SA-3's watch-fire chip is
+    gated on `TrackedRule.AlertBanner`, and the test written to prove that gate — one
+    banner-off rule, append, assert zero chips — **passed with the gate deleted**. Caught only
+    by running the prove-fail, which is the entire argument for doing that step on a NEGATIVE
+    assertion even when the feature is new and there is no "pre-fix tree" to run against.
+    → **The fix is a synchronisation point on the far side of the decision, not a longer
+    wait.** `HudDeadlineChipTests` puts TWO rules on ONE line — one banner-on, one banner-off —
+    and waits for the loud one's chicklet: both are handled inside a single dispatcher
+    callback, so a chip on the row proves the other rule has been asked and refused. With the
+    gate removed the value is 2 against a demanded 1. A `Thread.Sleep` would have been a guess
+    about the machine, which is the mistake trap 56 spent four rounds on.
+    → **The general shape: every "and nothing happened" assertion needs to name the moment it
+    is true AT.** Trap 34 says a guard that forbids the wrong thing reads as coverage; this is
+    the timing version — a guard that asks the right question one moment too early. When you
+    write `Assert…(0)` in E2E, ask what positive event you could wait for that can only occur
+    after the code under test has run, and wait for that instead.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

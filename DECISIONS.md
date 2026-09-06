@@ -17,6 +17,47 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (F2 / SA-3 — net-new deadline chips: watch-fire and buff-expiring)
+
+- **The watch-fire chip is gated on the rule's own `AlertBanner`** · could have fired on every
+  rule that reaches `FireAlert`, which is the literal reading of "the same event that drives
+  `AlertSoundPlan`" · gated, because SA-4 brings per-family Mute and until then an ungated chip
+  is an on-screen output with no off-switch anywhere, added to rules that already have one.
+  Sound and speech untouched either way. `UI.Shared/WatchFireLedger.Record(TrackedRule,…)`,
+  asserted by `HudDeadlineChipTests`.
+- **The buff threshold REUSES `AppSettings.BuffWarnSeconds`** rather than the pinned constant
+  the plan called for · a pinned 60 s would have satisfied SA-3 item 2 literally · reused,
+  because it is still "no new Options row" and it is the answer the player already gave the
+  Buffs card — two numbers for one question is trap 4. The card's three inline
+  `Math.Max(10, …)` clamps now call `HudChipRow.BuffWarnWindow` for the same reason.
+- **The watch-fire linger is 30 s, pinned** · could have been any number, or a setting · 30 s
+  is five times `AlertWindow`'s six-second banner: the toast answers "did something just
+  happen", the chip answers "what did I miss" after you look up. No cap on how many rules can
+  be lingering — trap 50 says a hidden truncation is worse than a long row.
+- **A buff chip is NOT dismissible** · could have carried a per-instance dismissal like a slow
+  chip · followed the mez precedent (it clears itself on fade or recast), because a dismissal
+  that has to survive a re-landing is state SA-3 does not need and SA-4's Mute answers better.
+- **The row's whole assembly moved from `MainWindow` into `HudChipRow.Build`** · SA-2 had
+  deliberately left "which trackers to ask" in the window, and this departs from that · moved,
+  because four families made it a decision rather than wiring (four gates, four probes, three
+  settings, a threshold) and the WPF layer has no unit tests. It is also where the ratchet room
+  came from: **`MainWindow` ends this PR 10 lines SMALLER than it started**, having gained two
+  chip families. `ChipStackPlanTests`' source scan was re-pointed, not relaxed.
+- **`hud-chips-deadlines` is a NEW shot; `hud-chips` was left alone** · could have extended the
+  SA-2 picture to six chicklets · new one, because `hud-chips` is a reviewed record of the fold
+  and spending a signed illustration to save a PNG is a bad trade. The new shot carries all
+  four families, so the row's family order is photographed for the first time.
+- **`shoot.ps1` gained `AppendLive`** (lines written after the target window is up) · could
+  have used a debug hook, or left the watch family unphotographed · added, because a watch rule
+  staged the ordinary way is a rule that correctly does nothing — the startup replay fires no
+  alerts — and the picture would have looked like a broken feature.
+- **NOT FIXED, filed instead: `MainWindow._gearChecklistDirty` has nine writers and no
+  readers** — trap 43's exact shape, and the compiler says so (`warning CS0414`). The Gear
+  checklist's "rebuild only when a box changed" optimisation has lost its reader, presumably
+  when `GearCardView` was lifted out. Left alone because the fix is ambiguous (restore the
+  reader vs delete the field), it touches nine Gear sites, and it is not SA-3's subject. Filed
+  to Fable in `FABLE-FEEDBACK.md`.
+
 ## 2026-09-05 (F2 / SA-2 — one HUD chip row)
 
 - **The Options-open PLACEMENT PREVIEW and its draggable placeholder were deleted, not
