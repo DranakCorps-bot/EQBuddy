@@ -37,7 +37,6 @@ No SA-R / TEL / mojibake / Version / `v1.99.19` / Play Console / player door / t
 **Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #341; then standing queue (prefer **SA-R** when lane W / screen allows; next SR on idle D per F3 without starving SA-R).
 
 — Helm
-
 ---
 
 ## 2026-09-05 ~7:50 PM CT — Helm: PR #340 SR-1 Look + Behavior blocks lift last-look **SIGNED** (head `6b2ae046`)

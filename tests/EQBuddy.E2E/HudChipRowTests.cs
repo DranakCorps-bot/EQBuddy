@@ -110,4 +110,131 @@ public sealed class HudChipRowTests
         app.WaitForDump("hudChipsRow", 1,
             "the row itself to stay up — the hide-rule is per family, not per row");
     }
+
+    // ---- SA-4: PLACE, MUTE, and the Edit mode that sets them ----
+    //
+    // `HudChipRowTests` in EQBuddy.Tests proves the two settings resolve; these prove they
+    // reach the screen. That gap is the whole point of this file — the SA-1 promotion and the
+    // trap 42 pair both cost builds to the difference between "in the profile" and "in
+    // effect" — and it is wider than usual here, because BOTH settings could resolve
+    // perfectly and never be handed to Merge.
+
+    /// <summary>
+    /// PLACE: the stored order is the order on screen.
+    ///
+    /// Two families, one profile that names them backwards. `hudChipOrder` is read off the
+    /// ROW — the families in the order they were actually drawn — so it can only say
+    /// "Spawn,Mez" if the setting travelled all the way through `HudChipRow.Build`.
+    ///
+    /// THE PREDICTION, written before it ran (trap 23): `hudChipOrder=Spawn,Mez`, with
+    /// `hudChipsSpawn=1` and `hudChipsMez=1` beside it so the token is a statement about a
+    /// row that actually has both families on it rather than about an empty one.
+    /// </summary>
+    [Fact]
+    public void TheStoredFamilyOrderIsTheOrderTheRowIsDrawnIn()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.TrackSpawns = true;
+            settings.HudChipOrder = ["Spawn", "Mez", "WatchFire", "Buff"];
+        });
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+
+        app.AppendLogLines(
+            "You begin casting Mesmerization.",
+            "a skeleton has been mesmerized.");
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
+
+        app.WaitForDump("hudChipsSpawn", 1, "the seeded countdown to be on it too");
+        app.WaitForDump("hudChipOrder", "Spawn,Mez",
+            "the spawn family to be drawn FIRST, which is the order this profile asks for");
+    }
+
+    /// <summary>
+    /// The same two families with the DEFAULT profile, which is the negative this pair needs:
+    /// without it, an implementation that ignored the setting and always drew mez first would
+    /// fail the test above and one that always drew spawn first would pass it.
+    ///
+    /// THE PREDICTION: `hudChipOrder=Mez,Spawn` — the signed default, combat-urgent first.
+    /// </summary>
+    [Fact]
+    public void TheDefaultProfileDrawsTheFightFamilyFirst()
+    {
+        using var app = new AppHarness(settings => settings.TrackSpawns = true);
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+
+        app.AppendLogLines(
+            "You begin casting Mesmerization.",
+            "a skeleton has been mesmerized.");
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
+
+        app.WaitForDump("hudChipOrder", "Mez,Spawn", "the default order to be mez then spawn");
+    }
+
+    /// <summary>
+    /// MUTE: a muted family leaves the row, the row stays up, and nothing else moves.
+    ///
+    /// **The zero is asserted at a moment it can be WRONG at** (trap 62). A negative
+    /// assertion made straight after `AppendLogLines` proves nothing — the harness waits for
+    /// the tail to READ the bytes, not for the app to have decided anything — so this waits
+    /// for the MEZ chip first. Both families are answered inside one `HudChipRow.Build` call,
+    /// so a mez chip on the row is proof that the spawn family was asked on that same tick
+    /// and refused. With the mute deleted the value is 1 against a demanded 0.
+    ///
+    /// THE PREDICTION: `hudMuted=Spawn`, `hudChipsSpawn=0` with a seeded timer running,
+    /// `hudChipsMez=1`, `hudChipsRow=1`.
+    /// </summary>
+    [Fact]
+    public void AMutedFamilyLeavesTheRowAndTheRestOfItStaysUp()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.TrackSpawns = true;
+            settings.MutedChipFamilies = ["Spawn"];
+        });
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+
+        app.AppendLogLines(
+            "You begin casting Mesmerization.",
+            "a skeleton has been mesmerized.");
+        app.WaitForDump("hudChipsMez", 1, "the mez chip to arrive on the row");
+
+        app.WaitForDump("hudMuted", "Spawn", "the profile's mute to be the one the row read");
+        app.WaitForDump("hudChipsSpawn", 0,
+            "the muted family to be off the row even though its timer is running");
+        app.WaitForDump("hudChipsRow", 1,
+            "the row itself to stay up — mute is per family, not a switch for the row");
+        app.WaitForDump("hudChipOrder", "Mez", "the drawn row to be the fight family alone");
+    }
+
+    /// <summary>
+    /// EDIT MODE, on a profile with NOTHING on the row — which is the state that makes the
+    /// mode worth having and the one a live-chip implementation would get wrong.
+    ///
+    /// The verbs are per FAMILY, and a family with nothing running has no chicklet to hang
+    /// them on: so the two families a player most wants to mute — the ones that keep
+    /// interrupting — would be un-editable at exactly the moment they were quiet. Edit mode
+    /// puts all four on screen regardless, which means the row window must be UP with an
+    /// empty live row, and that is the assertion `hudChipsRow=1` makes here.
+    ///
+    /// THE PREDICTION: `hudEdit=1`, `hudChipsRow=1`, and every family count 0 — the counts
+    /// keep describing the LIVE row while the mode is on, so they are all zero on a profile
+    /// with no timers, no mez, no fired rule and no buff.
+    /// </summary>
+    [Fact]
+    public void EditModePutsTheRowOnScreenWithNoChipsOnIt()
+    {
+        using var app = new AppHarness(null,
+            new Dictionary<string, string> { ["EQBUDDY_HUDEDIT"] = "1" });
+        app.Launch();
+
+        app.WaitForDump("hudEdit", 1, "Edit HUD to be the mode the row is in");
+        app.WaitForDump("hudChipsRow", 1,
+            "the row to be on screen carrying the four family editors, with no live chip on it");
+        app.WaitForDump("hudChipsSpawn", 0, "no spawn chip to exist on this profile");
+        app.WaitForDump("hudChipsMez", 0, "and no mez chip either");
+    }
 }

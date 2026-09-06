@@ -321,6 +321,19 @@ internal static class WidgetDump
                     $"hudChipsWatch={w._hudChips?.WatchChips ?? 0} " +
                     $"hudChipsBuff={w._hudChips?.BuffChips ?? 0} " +
                     $"hudChipsDue={w._hudChips?.DueChips ?? 0} " +
+                    // PLACE and MUTE (SA-4). hudChipOrder is read off the ROW — the families
+                    // in the order they were actually drawn — and not off HudChipOrder,
+                    // because "the order is in the profile" and "the order reached the
+                    // screen" are different claims and only the second is the feature
+                    // (trap 42). hudMuted is the setting, since a muted family has nothing
+                    // on screen to read the fact off; the two together let a test say "Buff
+                    // is muted AND the row it produced has no buff in it", which is the
+                    // whole assertion.
+                    $"hudChipOrder={w._hudChips?.RowOrderKey ?? "-"} " +
+                    $"hudMuted={MutedKey(w)} " +
+                    // The MODE, not the setting behind it: Edit HUD has no setting at all,
+                    // it is a live state of the row window.
+                    $"hudEdit={(w._hudChips is { Editing: true } ? 1 : 0)} " +
                     // The DATA behind the buff family, beside the family's rendered count —
                     // so "no chip because nothing is expiring" and "no chip because nothing
                     // landed" are two readings rather than one absence. Without it the
@@ -441,4 +454,12 @@ internal static class WidgetDump
             catch { }
         }
     }
+
+    /// <summary>The muted chip families as one space-free token, through the SAME reader the
+    /// row itself uses (SA-4). Not a re-read of <c>MutedChipFamilies</c>: a dump that parsed
+    /// the setting its own way could report a mute the row never applied, which is one fact
+    /// with two sources (trap 4).</summary>
+    private static string MutedKey(MainWindow w) => UI.Shared.HudChipRow.OrderKey(
+        UI.Shared.HudChipRow.ResolveOrder(w._settings)
+            .Where(family => UI.Shared.HudChipRow.IsMuted(w._settings, family)));
 }

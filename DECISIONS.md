@@ -1,19 +1,40 @@
-# Decisions made without asking
+## 2026-09-05 (F2 / SA-4 — Edit mode: Place, Mute, Dismiss on the one row)
 
-**For David to skim, not to approve.** Every line here is a call an agent made under the
-pre-authorization in `CLAUDE.md` ("What needs David, and what does not"): a decision that
-could plausibly have gone another way, did not touch the consequence list, and was made
-rather than asked. David vetoes from here; a veto while the work is unreleased is cheap,
-which is why the release gate is the only hard one.
-
-**One line each, newest first.** *What was decided · the other way it could have gone · where
-it landed (commit, file, or thread).* If a line needs a paragraph, it was probably a question.
-
-**A veto goes in the same line**, prefixed `VETOED (David, date):` with the replacement, so the
-history of the call stays readable. If vetoes become common, the consequence list in
-`CLAUDE.md` is too short; if there are never any, it is too long.
-
----
+- **A family the stored `HudChipOrder` OMITS is appended, never dropped** · `Merge`'s own
+  contract drops a family missing from the order it is handed, so passing the setting through
+  raw was the literal reading · appended, because an omission is a stale file or a family a
+  later release added, and a family with no way back is a permanent invisible mute with no
+  switch naming it (trap 20's shape, #219's mechanism). Mute is the only thing that subtracts,
+  and it says so in its own key. `HudChipRow.ResolveOrder`.
+- **Mute is applied ONLY as the `order:` argument to `Merge`** · could also have short-circuited
+  each family's probe, which is cheaper · one place, because two gates for one question is
+  trap 4 and the probes are four emptiness reads. The cost is a muted family building a list
+  nobody uses, once a second.
+- **The mute toggle draws a TICK, not a bell** · `Bell`/`BellOff` is the obvious icon and the
+  one the first draft used · a tick, because this mute does not touch sound at all and a bell
+  would be a control that says one thing and does another, with the tooltip left to contradict
+  it. It also collided: the watch-fire family's own emblem IS the bell, so that chicklet would
+  have carried the same vector twice (#148/#166's failure).
+- **Edit mode shows a placeholder per FAMILY, and the row is on screen with nothing running** ·
+  could have hung the verbs on the live chips, which is less code · placeholders, because the
+  verbs are per family and the families a player most wants to mute are the ones that are quiet
+  at the moment they think of it. `AlertWindow.EnterPlacement`'s shape, as B3 named.
+- **Every edit is persisted as it is made**, not on the way out of the mode · `ExitPlacement`
+  saves on exit and was the precedent · per edit, because a drag has one end and a nudge has
+  none, and losing a mode's work if the app closes while it is open is a worse bargain than the
+  file write a tick box already costs.
+- **Nudge-reorder, not drag** · as the plan decided; recorded here because the alternative is
+  live · nudge, and the arrows at the ends are DISABLED with an explicit dim, since
+  `IsEnabled=false` has no visual in this app's styles (trap 17).
+- **`hud-edit` is a NEW shot with one family already muted** · could have shot the default state
+  · muted, so one capture carries both states; the default is this picture minus the dim.
+- **The owed `options-window` family was re-shot here** rather than deferred again · it is soft,
+  not a merge gate · re-shot while the screen was held: `options-mez` had genuinely gone stale
+  on SR-4's alert-block lift and is updated; `options-window` and `options-cards` came back
+  byte-identical, which is the finding.
+- **No Options row for either setting** · could have added two · none, because Edit HUD is the
+  surface for them and Settings IA is I-11's; `MutedChipFamilies` is a sibling of
+  `DisabledBreakouts` and never a repurposing (B3 §3).
 
 ---
 
@@ -71,7 +92,6 @@ history of the call stays readable. If vetoes become common, the consequence lis
   because the Behavior block PRINTS those consts and no tier of that guard could see them: the
   block's own scan reads an identifier and learns nothing. One of the two was carrying a banned
   word at its source.
-
 
 ## 2026-09-05 (F2 / SA-3 — net-new deadline chips: watch-fire and buff-expiring)
 
