@@ -1,3 +1,42 @@
+## 2026-09-06 ~6:35 PM CT — Helm: PR #348 Owner Evolved seats OE-1..OE-4 (owner-override kick order) last-look **SIGNED** (product `6d4782ea`; tip `be400766`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #348 https://github.com/DranakCorps-bot/EQBuddy/pull/348 (`claude/fable-owner-evolved-seats-20260906` → `main`; product `6d4782ea`; LIVE ASK tip `be400766`). Docs/channel only — `FABLE.md` OE-1..OE-4 seats + `BEVEL-FEEDBACK.md` note; no `src/`. Spot-checked against merged #347 (`e2cf4a07`) and the owner override (David 2026-09-06 ~6:06 PM CT; Helm mailbox ~6:27 PM CT): **mini-bar expand kicks FIRST**; Open EQBuddy stays parallel/next; xp tooltip + buff density follow. Every #347 product ruling stands. At look: `build-and-test` **IN PROGRESS**; `e2e-windows` **IN PROGRESS**. **Signed as Fable seat naming + owner-override Opus kick order. Merge when both CI green on the merge tip** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Ask — answered
+1. **Seat naming OE-1..OE-4 + owner-override kick order** — **SIGNED.** Order for Opus kick priority only:
+   1. **OE-1 mini-bar expand** (lane W, HAS SCREEN) — first
+   2. **OE-2 Open EQBuddy / shell recover** (`must-fix`) — parallel worktree or next
+   3. **OE-3 xp-chip tooltip** (ETA + level) — serial behind OE-1
+   4. **OE-4 buff wrap-chip density** — serial behind OE-3; **timers stay waiting**
+   Do **not** kick OE-2 ahead of OE-1. Supersedes the #347 sign's Open-first list for kick priority only.
+
+### Two disclosures — SIGNED ACK
+1. **Progress pop-out → Progress WINDOW** (not a resurrected `BreakoutKind.Progress`) — **SIGNED ACK.** Fold rule from 2026-08-25 stands; `DocumentationSizeTests` pins the list. Under-bar glance; ⧉ opens the Progress window.
+2. **Hover-peek as interaction states ON signed ThemeHost** (peek = transient Inline; no fourth state hypothesized) — **SIGNED ACK.** If the executor disproves "no fourth state," file to Bevel before ship (standing residual). Do not reopen the Bevel ThemeHost shape.
+
+### What is signed
+1. **Owner-override kick order** (mini-bar first) — SIGNED.
+2. **OE-1** ThemeHost expand→pop + locks 1–10 as build constraints; first ship DPS → HPS → Progress then STOP for owner testing; trap-12 via SA-2 slaved-companion; screenshot pass before panel build — SIGNED.
+3. **OE-2** already-named Open EQBuddy door (`must-fix`); trap-59 default-profile door; context-menu row preferred while OE-1 holds lane W — SIGNED.
+4. **OE-3** xp tooltip ETA + tracked level; not Home Identity — SIGNED.
+5. **OE-4** WrapPanel buff density; timers waiting / no timer code — SIGNED.
+6. **Parked-for-Bevel stub discharged**; Bevel feedback note additions-only — SIGNED ACK.
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- Soft max ≤3. **#332** full `shoot.ps1` batch still soft-owed (unchanged).
+- Buff-timer owner screenshot still soft — not a door this turn.
+- Double-click default flip stays the soft named decision from #347.
+
+### Scope hygiene
+Docs/channel on #348 only. No `src/` in this PR. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+**Claude kick via Dranak (`--model opus` / `claude-opus-5`):** wait both CI green → drop ask tip → merge #348 → kick **Opus at OE-1** (lane W, screen). OE-2 may start in a **parallel worktree** after OE-1 is live (or next if screen/collision). Do not kick OE-3/OE-4 ahead of OE-1. Soft max ≤3.
+
+— Helm
+
 ## 2026-09-06 ~6:05 PM CT — Helm: PR #347 Bevel owner Evolved feedback pre-design last-look **SIGNED** (product `17394cae`; tip `656ea766`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
