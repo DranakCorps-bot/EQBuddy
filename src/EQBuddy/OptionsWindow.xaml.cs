@@ -31,7 +31,6 @@ public partial class OptionsWindow : Window
         SourceInitialized += (_, _) => ClampToMonitor();
         LocationChanged += (_, _) => ClampToMonitor();
 
-        PinChipsCheck.IsChecked = _vm.PinWatchChips;
         SelectTab(_main.Settings.OptionsTab);
 
         BuildHudTab();
@@ -210,10 +209,9 @@ public partial class OptionsWindow : Window
     /// block that owns it.</summary>
     internal void SyncTrackSpawns(bool on) => _alerts?.SyncTrackSpawns(on);
 
-    private void OnPinChipsChanged(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.PinWatchChips = PinChipsCheck.IsChecked == true;
-    }
+
+    // OnPinChipsChanged retired with PinChipsCheck in Surface A / SA-R — see the Watch tab's
+    // comment in OptionsWindow.xaml for where that switch went.
 
     // Resize state captured at drag start. Deriving each frame from the cursor's absolute
     // position rather than accumulating DragDelta avoids the feedback jitter you get when

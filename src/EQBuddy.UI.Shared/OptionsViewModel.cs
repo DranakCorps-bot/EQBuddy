@@ -457,11 +457,10 @@ public sealed class OptionsViewModel : INotifyPropertyChanged
         get => _settings.TruncateLogs;
         set { _settings.TruncateLogs = value; PersistAnd(); }
     }
-    public bool PinWatchChips
-    {
-        get => _settings.PinWatchChips;
-        set { _settings.PinWatchChips = value; PersistAnd(); }
-    }
+    // PinWatchChips had a property here until Surface A / SA-R. The master switch for watch
+    // chips retired: it and the per-rule 📌 both answered "does this chip show", and the pin
+    // is the one that survived (Helm #341 — one switch, not two). The setting itself is left
+    // inert on AppSettings so `WatchPinMigration` can read it once; nothing binds to it.
     public bool ShowTutorial
     {
         get => _settings.ShowTutorial;

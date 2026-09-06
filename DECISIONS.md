@@ -49,6 +49,51 @@
   block, so it is in scope by the same rule `AltTabPolicy` is, and the row costs nothing while
   covering the next label somebody adds. The honesty is in the disclosure, not in the omission.
 
+## 2026-09-05 (SA-R — PinWatchChips retires; the per-rule 📌 is the one switch)
+
+- **The MASTER retires and the PIN survives**, not the other way round · Helm #341 said
+  "one switch, not two" and named neither · the pin, because it is the finer-grained of the
+  two (a master can only ever be expressed as "pin everything" or "pin nothing", so retiring
+  the pin would LOSE a capability) and because it is the only one both hosts can carry —
+  `SettingsAlertsView`'s Watch block already draws it, and the Evolved shell's Alerts tab
+  composes that same block.
+- **The mini-bar watch chips STAY** · "it retires with the mini bar" could be read as
+  retiring the chips too · stayed, because the mini bar itself is not retired (SA-1 lifted it
+  and the starred cells empty per card cut, per the SA-R table) and nothing in #341 authorises
+  a chip cut. This PR removes a SWITCH, not a surface — no `OverlaySections.Retired` row is
+  owed, because no card left the widget.
+- **`AppSettings.PinWatchChips` is KEPT as an inert property** rather than deleted · SA-2's
+  eight chip-geometry fields were removed outright, which is the live precedent · kept,
+  because those fields positioned surfaces that no longer existed and this one carries a
+  CHOICE a player made: deleting it drops the value out of every `settings.json` on the next
+  parse, and the retirement has to read it once to honour an unticked box.
+  `MigratePromotedHudStats` is the shape — read the switch before stripping it.
+- **The retirement lives in `UI.Shared/WatchPinMigration`, not in `AppSettings.ApplyMigrations`**
+  · the migration chain is the obvious home and gets `SectionFoldIdempotenceTests` for free ·
+  `WatchPinMigration`, because the #253 promotion is already there for a stated reason (it must
+  `Save()`, and `Load` has a `persistMigrations: false` caller — trap 13), the two passes have
+  to run in a fixed ORDER, and putting them in one file is what makes that order assertable.
+- **Ordering buys the `hadFile` guard**, so the retirement takes no such parameter · could
+  have threaded `hadFile` through `Apply` to match `MigratePromotedHudStats` · ordering,
+  because the #253 promotion running first already turns the master ON for every profile that
+  has one to turn on, fresh installs included — so a `false` that survives it is a choice by
+  construction. Written into the doc comment and asserted, not left implicit.
+- **A second flag (`WatchChipMasterRetired`) rather than inferring from the value** · setting
+  `PinWatchChips = true` at the end would be self-idempotent and cost no field · a flag,
+  because that is a migration re-deciding on state its own previous run produced, which is
+  trap 55 and is what `HudStatsPromoted`'s comment already spells out at length.
+- **`SettingsAlertsBlockTests.ThePresenceSwitchStaysAV1OnlyRow` was INVERTED, not deleted** ·
+  a retired guard could just go · inverted, because the old assertion being green on the
+  pre-change tree IS this change's prove-fail, and a guard that says "the switch is still
+  there" cannot tell a deliberate retirement from a lift that dropped a control on the floor.
+  The src-wide reader scan moved to `WatchPinMigrationTests` — `SettingsFileCollectionTests`
+  scans test sources for writer NAMES, so naming the migration in a string literal put the
+  block file in a serial collection it does not belong in.
+- **`WatchChipMasterRetired = true` joins the E2E harness and `shoot.ps1` seeds** · could have
+  left staging to the migration · seeded, because a seeded profile leaves `PinWatchChips` at
+  its default false, so the retirement would unpin every seeded rule before the bar rendered —
+  a picture and an assertion about a real state that is not the state under test (trap 23).
+
 ## 2026-09-05 (F2 / SA-4 — Edit mode: Place, Mute, Dismiss on the one row)
 
 - **A family the stored `HudChipOrder` OMITS is appended, never dropped** · `Merge`'s own

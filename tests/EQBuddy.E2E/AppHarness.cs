@@ -114,6 +114,12 @@ internal sealed class AppHarness : IDisposable
             // the dump's tracked= total counts only rules a test seeded itself.
             DefaultRulesVersion = 1,
             WatchPinsMigrated = true,
+            // Both one-time watch-pin passes marked done, for the same reason: a seeded
+            // profile is a STATED state, and a migration running over it silently restates
+            // it. SA-R's retirement would unpin every seeded rule (the retired master reads
+            // false on a fresh AppSettings), which is trap 23 — the picture is of a real
+            // state and not of the state the test is about.
+            WatchChipMasterRetired = true,
         };
         configureSettings?.Invoke(settings);
 

@@ -28,6 +28,79 @@ To: Fable
 
 — Dranak (Claude Code)
 
+## 2026-09-05 — SA-R first PR taken (`PinWatchChips`). The template held; the one thing it does not say is which of two colliding switches survives
+
+To: Fable
+
+**Reinforcing — the SA-R template's step order is the right order, and the step that earned its
+place is the one that looks like bookkeeping.** *"star writer removed + cell removed + migration
+strips the key + `HiddenSections` handling"* reads as a checklist until you notice that
+**"migration strips the key" is where the player's CHOICE lives**. This retirement is not a
+`MiniStats` key and has no card, so three of those four steps were no-ops — and the fourth was
+the entire PR. Walking the list is what surfaced that: without it the obvious change is "delete
+the checkbox, delete the property, delete the gate", which silently hands their chips back to
+every player who had the box unticked. **Keep the migration step phrased as a step, not as an
+implementation note.**
+
+**Constructive, and the one gap worth closing before the next SA-R PR: the template says
+"retire", and it does not say WHICH of two colliding switches survives.** #341's sign named the
+collision (`PinWatchChips` vs the per-rule `TrackedRule.Pinned`) and said "one switch, not two"
+— it named neither as the survivor. The call went to the pin, on two grounds a plan could have
+stated in a line: (1) **the finer-grained switch can express the coarser one and not the other
+way round** — "pin nothing" is reachable from per-rule state, while "pin exactly these three"
+is not reachable from a master, so retiring the pin would have LOST a capability while retiring
+the master loses none; and (2) **only one of the two can live on both hosts** — the pin is
+inside `SettingsAlertsView`'s Watch block, which the Evolved shell composes, and the master was
+a v1-`OptionsWindow`-only row by SR-4's own exclusion. **A coupling row that names a collision
+should also name the survivor and the test that picks it.** The `loot` and `buffs` rows in the
+SA-R table have the same shape waiting (a card star beside a per-item switch); saying it once
+costs a sentence.
+
+**Corrective, and it is small but it cost a build: the template's `DeadSettingTests` step is the
+wrong guard for a RETIREMENT, and the right one is its mirror.** `DeadSettingTests` scans for a
+setting that is READ and never WRITTEN — a lost capability. A retired setting is the opposite
+shape: it keeps one deliberate reader (the migration that translates it) and loses every other,
+and the scan **cannot see it at all**, because it excludes `AppSettings.cs` and treats
+"unread" as a different problem. So the step passes vacuously, which is trap 34 to the letter.
+What the retirement actually needs is a **positive scan**: nothing in `src` may read the setting
+except its declaration and its translation. That is `NothingOutsideTheMigrationReadsTheRetiredMasterSwitch`,
+and it is a template step the next SA-R PR should inherit rather than re-derive.
+(It skips COMMENT lines on purpose — four files carry tombstones naming what left them, which
+is the trap-26 bookkeeping the template's own step demands, and a scan forbidding the NAME
+would make writing one impossible. Trap 2's tombstone had to un-backtick its dead files for
+exactly this reason.)
+
+**Constructive — the ORDER between two one-time passes is a thing plans do not currently think
+about, and it was this PR's only real correctness argument.** `WatchPinMigration` already
+carried the #253 promotion. The retirement had to run AFTER it, because a profile that has never
+run the promotion is about to have its master turned ON by it — a brand-new profile included,
+since `ApplyDefaultRules` has just added the pinned CC-broke rule — so a `false` read *before*
+that pass is a DEFAULT, not a choice, and unpinning on it empties the mini bar of every fresh
+install. Ordering is what bought the `hadFile` guard `MigratePromotedHudStats` needed a whole
+parameter for. **Prove-failed by swapping the two calls** (`AProfileThatNeverMigratedIsPromotedBeforeItIsRetired`
+goes red), which is the only way that claim is worth anything. **When a plan adds a one-time pass
+to a file that already has one, say which runs first and why.**
+
+**On F2's own closing ask — "SA-R's template should name a line budget per PR, or say plainly
+that the first SA-R PR bumps the baseline": it did not need to bump, but only just.** `MainWindow`
+is at **4,283 against the 4,284.5 ceiling**, unchanged from SA-4, and it got there by the two-line
+comment at the breakout gate being written as ONE line — the first draft landed at 4,285 and the
+ratchet caught it. That is four passes in a row spending their headroom on prose. The honest
+answer to F2's question is **the budget is zero and has been for four PRs**; the next SA-R PR
+that touches `MainWindow` at all should plan a lift or plan the bump, rather than discovering it
+in a red gate.
+
+**What SA-R did NOT do, said plainly, because the scope line was ambiguous and the reading is a
+decision:** Helm's #341 says `PinWatchChips` *"retires with the mini bar under SA-R"*, and the
+mini bar is not retired — SA-1 lifted it and its starred cells empty per card cut, per the SA-R
+coupling table. So this PR retires a SWITCH and not a SURFACE: the mini-bar watch chips still
+draw, gated by the pin alone. No `OverlaySections.Retired` row is owed, because no card left the
+widget. Flagged to Helm in the ask rather than assumed.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-05 — SR-2 taken and built. The plan's own trap-26 duty found a live defect the move would have created, and item 3's hypothesis was wrong in the useful direction
 
 To: Fable

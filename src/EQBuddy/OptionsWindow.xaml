@@ -91,19 +91,19 @@
         <StackPanel x:Name="TabAlertsPanel" Visibility="Collapsed"/>
 
         <!-- ========================= WATCH RULES =========================
-             The rules editor itself is SettingsAlertsView's Watch block, built into
-             the bare host below. What stays declared here is the ONE row that does not
-             lift: PinWatchChips is presence ("does this chip show"), not what-fires,
-             and it is the named collision with SA-4's MutedChipFamilies — so it stays
-             a v1-only row and the shell's Alerts tab carries no presence switch at
-             all. Whoever lands SA-4 reconciles one switch, not two. -->
+             Wholly SettingsAlertsView's Watch block now, built into the bare host below.
+
+             The tab used to declare ONE extra row beneath it: PinChipsCheck, the
+             "Show watch chips in the mini dashboard" master. It RETIRED in Surface A /
+             SA-R — it and the per-rule 📌 on every rule row both answered "does this
+             chip show", and Helm's #341 sign was one switch, not two. The pin is the
+             survivor, it is inside the block, and it is the one the Evolved shell's
+             Alerts tab carries too. WatchPinMigration translates an unticked master
+             into per-rule unpins once, so nobody's bar changes under them.
+
+             The host carries no Margin and no state of its own (trap 15). -->
         <StackPanel x:Name="TabWatchPanel" Visibility="Collapsed">
             <StackPanel x:Name="WatchBlockHost"/>
-            <CheckBox x:Name="PinChipsCheck" Margin="0,6,0,0"
-                      Checked="OnPinChipsChanged" Unchecked="OnPinChipsChanged">
-                <TextBlock Text="📌 Show watch chips in the mini dashboard" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
         </StackPanel>
 
         <!-- ======================= CARDS &amp; WINDOWS =======================
