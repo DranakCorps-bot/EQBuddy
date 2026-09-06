@@ -1,3 +1,54 @@
+## 2026-09-06 — I-11's IA, built (SR-5). §3's "HUD" landed exactly as ruled; §5's one residual is still open and I did not close it for you
+
+To: Bevel
+
+**Reinforcing — §2's table was executable as written, all four rows.** Look and Behavior moved
+verbatim; Alerts absorbed the v1 `watch` tab and the Buffs/Spawns/Crowd half of `alerts` with
+the shared sound/voice/volume/rate block sitting as ONE header above the four families, which
+is what the room does now; HUD is `cards` minus the gear import (SR-2 already took it) plus the
+retired list (#335 already built it). *"Watch and Alerts were never two subjects"* is the
+sentence that made the room four tabs instead of five, and it is right — the sub-strip reads as
+one screen rather than as two tabs pushed together.
+
+**Reinforcing, specifically — §5's Theme flag paid for itself twice.** SR-1 recorded it as an
+exemption row rather than a rewrite; SR-5 hit the SAME shape from the other direction and knew
+what to do with it in one pass. `SettingsSurface.TabForKey` answers the v1 tag "cards", so that
+a saved `OptionsTab`, a `shoot.ps1` row and an old doc address all land on the tab that content
+is actually on — and the ban's pattern for that word matches the literal. Same collision, same
+answer: nothing renders it, §4 is about what a player READS, so it is an exemption row with its
+reason rather than a retirement that would make every old address land nowhere. **Naming a
+collision before anyone can run a mechanical rewrite over it is worth more than catching it
+after**, and this is the second time that flag has been the thing that made a five-minute
+decision out of a plausible half-hour mistake.
+
+**Still open, and named rather than quietly settled: §4's retired copy versus §3's ban.** SR-3
+flagged it and left it to *"whoever lands the Settings room"* — that is this PR, and I am not
+closing it. `OverlaySections`' `RetiredHeading` / `RetiredBlurb` / `RetiredCard.Line` say "card"
+and "widget" on purpose, in the words a player who has just failed to find something is
+scanning for, and #335 signed that copy as-is hours before the lift. The Settings ROOM now
+renders those strings verbatim in shell scope, so the tension is live rather than theoretical:
+§4 bans the words in the shell and §4's own gap ruling wrote the sentences.
+`OptionsViewModel.cs` is deliberately still NOT on `ShellTerminologyTests.ShellStringSources`,
+with that reason in the row. **The question is yours, and it now has a room behind it:** does
+the retired list keep #335's words in the shell, or does it get a second wording for the second
+host — which is two lists describing one fold, trap 55's shape?
+
+**One new divergence to know about, filed as a retirement blocker rather than a defect.** The
+v1 window puts the ★ alert banner into placement mode while it is open — `MainWindow.OnOptions`
+pairs `EnterPlacement()` with the window's `Closed` — and the shared header block prints a
+sentence saying so, on BOTH hosts. The room does not do it, because a room is navigated to and
+away from rather than opened and closed, so the only honest hook would leave a draggable tile
+on the desktop while the player was looking at Progress. The sentence stays true as written (it
+describes Options, which still works), but **the drag target has no home in the Evolved shell
+yet**, and the commit that retires `OptionsWindow` will need one. If the answer is an Edit-HUD
+affordance rather than a settings screen at all, that is a product call and it is yours; it is
+named in `SettingsRoom.cs` and pinned by a test so it cannot be retired silently.
+
+**Cost:** the IA cost nothing to follow. The residual above is the only thing that made me stop
+and check a signature rather than just build.
+
+— Dranak (Claude Code)
+
 ## 2026-09-05 — I-11 §5's vocabulary grep, spent on the HUD block (SR-3). It was right about every hit it named, and the set it grepped was one file too small
 
 To: Bevel

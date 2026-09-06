@@ -1,3 +1,82 @@
+## 2026-09-06 (F3 / SR-5 — the Settings room lands)
+
+- **The room does NOT enter the ★ alert-banner's placement mode, although the v1 window
+  does** · parity argues for copying it, and the shared header block prints a sentence about
+  it that both hosts show · not copied, because a room is NAVIGATED to and away from rather
+  than opened and closed: `MainWindow.OnOptions` pairs `EnterPlacement()` with the window's
+  `Closed`, and the room's only equivalents are its constructor and `Release()`, which would
+  leave a draggable tile on the desktop for as long as the shell stayed open on any OTHER
+  room. Worse than the thing it copies. The sentence stays true as written (it is a statement
+  about Options, which still exists and still works), and rehoming the drag target is now a
+  named BLOCKER on the commit that retires `OptionsWindow` — the `GearRoom` loot-star
+  pattern, asserted by `SettingsRoomTests` so a retirement cannot take it silently.
+- **The room neither reads nor writes `AppSettings.OptionsTab`** · reading it would let the
+  room open where the player last was, which is a real courtesy · neither, because the two
+  key sets differ (`look/alerts/watch/cards/behavior` against `look/alerts/hud/behavior`), so
+  a room that wrote "hud" would send the WINDOW home to Look on its next open — one host
+  silently editing the other's landing. Reading without writing would be an asymmetry nobody
+  could predict from either side. The room opens on Look, and an address is what a caller who
+  cares uses. No setting is added, so `DeadSettingTests` has nothing new to carry.
+- **All four blocks are composed in the room's CONSTRUCTOR, not lazily on first visit** · the
+  shell's own `_rooms` dictionary is lazy on purpose and this is the most expensive room to
+  build · eager, because `OptionsWindow` builds all four in ITS constructor: a room that built
+  them lazily would report a different surface from the window for as long as a tab went
+  unvisited, and the whole value of the `EQBUDDY_EXPAND` comparison is that two live hosts of
+  one block describe the same thing. The cost is what opening Options costs, and the ROOM is
+  still lazy — nothing is paid by a shell opened to look at experience.
+- **The Alerts family sub-strip is BUILT on every tab and only its visibility follows the
+  selection** · building it with its tab is the obvious shape · always built, because a
+  lazily-built strip reports zero families in the dump from every tab but one, which turns
+  "the sub-strip exists" into an assertion about the default tab (trap 34's shape).
+- **`settings:crowd` falls through to `AlertSurface` rather than gaining a third address
+  level** · `settings:alerts:crowd` is more explicit and needs no disjointness argument ·
+  fallthrough, because the alert families already HAVE keys every other surface spells the
+  same way, and a second grammar for one destination is trap 33 lifted into navigation. The
+  cost is a new obligation — the two key tables must stay disjoint — so that is asserted in
+  both directions rather than left as a comment on the resolver.
+- **`settings:cards` answers HUD** · the ban retires the WORD, so retiring the key with it
+  looks consistent · kept, because nothing renders it: it is the v1 tab tag, and a saved
+  `OptionsTab`, a `scripts/shoot.ps1` row and an old doc address should land on the tab that
+  content is actually on rather than nowhere — `LootSurface` extends the same courtesy to
+  "locker". §4 is about what a player READS. It is an exemption row with that reason, not a
+  silence.
+- **`OptionsWindow` GREW rather than shrank, in a series whose every other PR lowered its
+  baseline** · the standing rule is to lower the ratchet in the same commit as a lift ·
+  accepted, and the baseline is NOT re-anchored: this PR is not a lift, it adds a ~20-line
+  `DebugFacts()` so that the two hosts can be COMPARED at all, and the file is comfortably
+  inside its existing limit. Re-anchoring 326 upward would erase the pressure the four
+  previous lifts bought.
+- **`MainWindow.xaml.cs` was touched, in an S-lane PR** · the lane table says lift, do not
+  edit · one word (`private` → `internal` on `_optionsWindow`, with the trailing comment the
+  five sibling window fields already carry) and ZERO net lines, which matters because that
+  entry has exactly one line of headroom. Without it `WidgetDump` cannot see the v1 window,
+  and the two-host comparison — the thing trap 58's per-host prefixing exists to keep
+  possible — could not be written at all. Nothing else in lane W is touched; the residual
+  `ImportGearChecklist`/`ClearGearChecklist` deletion SR-2 disclosed is deliberately left
+  alone rather than ridden in on this.
+- **The block facts are counted off BUILT CONTROLS, not off the settings object** · reading
+  `_vm` is simpler and cannot throw · built controls, because two hosts reading one
+  `AppSettings` agree trivially and a guard that cannot fail reads as coverage (trap 34). What
+  these counts can actually see is a block torn out of one host by a shared instance (trap 45),
+  which is the failure the room's whole construction is arranged against.
+- **`SettingsRoomTests`' negatives read the source with COMMENTS STRIPPED** · scanning the raw
+  file is what every sibling guard does · stripped, because the first draft failed on its own
+  documentation: this codebase's convention is that a room NAMES what it deliberately does not
+  do (`GearRoom`'s loot star, `WorldRoom`'s deaths star), and a scan that cannot tell an
+  explanation from a call can only be satisfied by deleting the explanation. The stripper has
+  its own negative so it cannot go vacuous by returning nothing.
+- **Shipped the four new shots WITHOUT the full batch behind them, and said so instead of
+  letting the take-note's "the full BATCH ran" stand** · the note was already written and the
+  four images are correct, so the cheap move was to leave the sentence alone · corrected,
+  because the session running the batch died partway through — after the settings rows, before
+  the ~60 that follow — and the #332 duty is therefore **still owed**, not discharged here. The
+  four rows were each shot under the screen lock and reviewed against their written
+  predictions (trap 23), which is what makes THEM trustworthy; nothing about that says
+  anything about the rows nobody re-ran. Re-running a 90-row batch to rescue one sentence
+  would have collided with whatever else holds the desktop (trap 61) for no reviewer benefit —
+  but a batch that stops early and is written up as complete is exactly trap 53's six dark
+  days, and the only thing that ever makes it visible is someone recording that it stopped.
+
 ## 2026-09-05 (F3 / SR-3 — the HUD block leaves OptionsWindow)
 
 - **`OptionsCardsView` was RENAMED to `SettingsHudView`, not wrapped by one** · the item
