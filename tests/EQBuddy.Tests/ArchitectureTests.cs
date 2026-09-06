@@ -241,7 +241,15 @@ public class ArchitectureTests
         // second copy of forty wirings to drift against this one. What is left here is window
         // chrome — width persistence, monitor clamping, the tab links — plus the Look,
         // Behavior and Cards tabs, which SR-1 and SR-3 take next.
-        (@"EQBuddy/OptionsWindow.xaml.cs", 689),
+        //
+        // Lowered 689 → 393 on 2026-09-05 with SR-1, in the same commit as the lift, by the
+        // same standing rule. The palette picker and its Custom rows, the four size/opacity
+        // sliders, the alignment grid, the cursor ring, EQBuddy Mobile's pairing panel, the
+        // three hide-when rules, keep-above, the hotkey rows, the regen override, auto-empty
+        // + archive, the tutorial and the perf readout left for SettingsLookView.cs and
+        // SettingsBehaviorView.cs. What is left is window chrome and the Cards tab, which
+        // SR-3 takes.
+        (@"EQBuddy/OptionsWindow.xaml.cs", 393),
         (@"EQBuddy.Core/LogParser.cs", 853),
         // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
         // in E-2 (2026-09-04). It was the largest file in the repo and it carried the

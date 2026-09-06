@@ -478,24 +478,54 @@ host constructs its own instances (trap 45 — no control ever crosses hosts), b
 the room fresh beside a live `OptionsWindow` — is two copies of ~40 control wirings drifting
 until retirement day: #210's mechanism with a bigger surface.
 
-### SR-1 — Look + Behavior blocks lift (D lane; startable on sign, no SA dependency)
+### SR-1 — TAKEN 2026-09-05, built and green (Claude, lane D)
 
-1. New `EQBuddy/SettingsLookView.cs` and `EQBuddy/SettingsBehaviorView.cs` (the executor may
-   split finer; the boundary that matters is host-neutrality). Look: theme picker + custom
-   colors, widget-size/chip-size/opacity×2 sliders, grid overlay + spacing, cursor ring.
-   Behavior: EQBuddy Mobile pairing + mobile sounds, the hide-when rules + alt-tab note,
-   keep-above, hotkeys, regen override, auto-empty + archive, tutorial, perf stats.
-2. `OptionsWindow`'s `look`/`behavior` panels become bare hosts — no `Visibility`, no
-   `Margin` of their own (trap 15). Window chrome (WindowZoom, width persistence, monitor
-   clamping, `SelectTab`/`OptionsTab`) stays with the window; the trap-26 enumeration of
-   what the window did for each block rides the PR description.
-3. Ban sweep of both blocks' strings — Behavior is where "hide the widget" ×3 and the
-   "Overlay apps…" paragraph live (Bevel §5's verified hits); **the "Theme" label survives**
-   (color picker, not the banned window-grouping sense). Both files join the
-   `ShellTerminologyTests` curated list with reasons.
-4. Mobile: the pairing panel moves with the block; **the title-bar 📱 button is untouched
-   and stays the standing second door** (CLAUDE.md's own carve-out — Settings must never
-   become the only path in).
+Its four steps are struck rather than left to be re-read as pending — the take-then-delete
+contract, SA-1's and SR-4's precedent.
+
+**What landed** (`EQBuddy/SettingsLookView.cs` 377 lines, `EQBuddy/SettingsBehaviorView.cs`
+443 lines; `OptionsWindow.xaml.cs` 689 → 393 and `OptionsWindow.xaml` 372 → 226, baseline
+lowered in the same commit):
+
+- **Look** — the colour theme picker and its Custom rows (hex boxes + 16 swatches), the four
+  size/opacity sliders and their live values, the alignment grid + spacing, the cursor ring.
+  **Behavior** — EQBuddy Mobile pairing + the sounds switch, the three hide-when rules and the
+  Alt+Tab note, keep-above, the hotkey rows, the regen override, auto-empty + archive, the
+  tutorial toggle, the perf readout. Both take `(MainWindow, OptionsViewModel, ready-gate,
+  resource-resolver)`; Look also takes a `repaintHost` callback, because a palette swap has to
+  rebuild `OptionsCardsView`'s rows and that is the HOST's sibling, not the block's business.
+- **One sentence did not lift, deliberately:** *"Drag either side edge to widen this window"*
+  is about `OptionsWindow`'s resize grips, which a shell room does not have. It stays declared
+  beside them, so `TabLookPanel` hosts `LookBlockHost` plus that line while `TabBehaviorPanel`
+  is bare. Trap 37 from the other end.
+- **One thing the window still does for a block, and it is named in both files:** ROUTING a key
+  press to an armed hotkey recorder. `BuildHotkeyRows` replaces the button that was clicked, so
+  nothing inside the panel has focus when the gesture lands — the press reaches the WINDOW.
+  `SettingsBehaviorView.HandleRecordingKey(KeyEventArgs)` owns every decision; `OnPreviewKeyDown`
+  owns only the route, and `SR-5` needs the same two lines in the room. Asserted on BOTH sides,
+  with a negative (`HotkeyManager.Parse(` must not appear in the host) so a second copy of the
+  gesture rule cannot grow back.
+- **The vocab sweep ran and "Theme" survived, as an EXEMPTION ROW rather than as silence.**
+  `ShellTerminologyTests.Exempt` was empty; it now has exactly one row, naming Bevel I-11 §5 and
+  why the ban's `\bthemes?\b` is the wrong sense here. Reworded: "Widget size" → "EQBuddy size",
+  "Whole-widget opacity" → "Overall opacity", the three "Hide the widget…" boxes, the alt-tab
+  note's aside about chips and breakout windows, and the keep-above paragraph's two "widget"s.
+- **Two UI.Shared word modules joined `ShellStringSources` too**, which the plan did not
+  anticipate: `AltTabPolicy` and `MobileAlertSounds` are consts the Behavior block PRINTS, and
+  no tier could see them — the block's own scan reads `MobileAlertSounds.Label`, an identifier,
+  and learns nothing. `AltTabPolicy.TaskbarWarning` was reworded at its source ("the widget" →
+  "EQBuddy"); `AltTabPolicyTests` pins "taskbar" and "tray icon" only, so nothing broke.
+- **One executor call, logged in `DECISIONS.md`:** the Behavior tab declared the log-archive
+  explanation TWICE, one dim paragraph directly under a strict superset of itself. Carried into
+  a block that serves two hosts it would have shipped twice in two places, so it says it once.
+  Named in the 2.0.0 What's-new entry, which also names the relabels.
+- **Prove-fails run, both directions.** All 31 enumeration rows and all 4 named facts of
+  `SettingsLookBehaviorBlockTests` fail against the pre-lift tree (35 of 37; the two that pass
+  are the `AppSettings.Load` negatives, vacuous against an absent file and noted as such). All
+  4 new `ShellTerminologyTests` rows fail against a seeded violation each.
+- **Owed and NOT done here:** the `options-window`-family re-shoot and the E2E suite. Both need
+  the screen and lane W's SA-4 held it — the E2E run refused the lock by name (pid 45284), which
+  is trap 61's interlock working rather than a failure. 37 source-level assertions stand in.
 
 ### SR-2 — Gear checklist import leaves Settings (D lane; independent; before SR-3 so the HUD block never carries it)
 
