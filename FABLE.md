@@ -1,8 +1,3 @@
-## 2026-09-06 ~5:49 PM CT — Owner Evolved feedback parked for Bevel (Dranak capture)
-
-Four owner items filed in `HELM-FEEDBACK.md` + `BEVEL.md` (buffs density/timers; %/hr + level + time-to-ding; Home recover; mini-bar expand→breakout). **Fable: do not invent seats until Bevel pre-design signs.** No OptionsWindow retirement. Soft #332 batch still owed separately.
-
----
 # Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**
@@ -97,6 +92,157 @@ for David to carry the ask.
 After Claude takes an item, write a short note in `FABLE-FEEDBACK.md`. Fable last-looks the
 executed diff (H4) and answers in the same file; a defect found there is a V1 item for the
 next loop, not a reopening of the plan.
+
+---
+
+## Owner Evolved seats — OE-1…OE-4 (Fable, 2026-09-06 ~11:30 PM CT, on `e2cf4a07`) — OWNER-OVERRIDE kick order
+
+**This list SUPERSEDES the #347 sign's "Seat order (Fable after merge)"**
+(`HELM-FEEDBACK.md` 2026-09-06 ~6:05 PM CT: Open EQBuddy → xp tooltip → buff density →
+mini-bar) **for Opus kick priority only.** Owner override, David 2026-09-06 ~6:06 PM CT,
+confirmed by Helm ~6:27 PM CT: **mini-bar expand kicks FIRST.** Every product ruling in the
+#347 sign stands unchanged — only the order Opus is kicked in moves. The four seats, in kick
+order:
+
+1. **OE-1 — mini-bar expand** (Opus, lane W, HAS SCREEN) — first ship DPS → HPS → Progress.
+2. **OE-2 — Open EQBuddy / shell recover** (`must-fix`) — parallel lane or next.
+3. **OE-3 — xp-chip tooltip** (ETA + level).
+4. **OE-4 — buff wrap-chip density** (timers stay `waiting`).
+
+Do NOT kick OE-2 ahead of OE-1. OE-3 and OE-4 are serial in lane W behind OE-1 (shared
+files, shared ratchet); OE-2 is the one that may run in parallel in its own worktree.
+
+### OE-1 — Mini-bar tracked-chip expand → under-bar panel → still-poppable window
+
+- **Priority:** `ready` — **the FIRST / NEXT Opus kick.** Helm signed the shape at #347
+  (item 4); the owner interview locks below are signed build constraints.
+- **Class:** `V2` — cross-cutting (HudBarView + ThemeHost + BreakoutWindow + a new under-bar
+  host + trap-12 geometry), and the obvious reading ("expand inside the widget") is the one
+  trap 12/#173 forbids. Not V0–V1 because the hosting decision is a whole-system call.
+- **Source:** `BEVEL.md` §4 (Helm-signed #347 item 4) + the **owner interview locks 1–10**
+  (David 2026-09-06 ~6:04 PM CT, appended to that item) + the owner override above.
+- **The locks, folded in as build constraints (do NOT reopen the signed Bevel ThemeHost
+  shape — these are interaction rules ON it, not a new state machine):**
+  1. One under-bar expansion at a time — opening another chip's panel collapses the first.
+  2. Chips must look like **buttons** — restyle via `ChipStyle`/`DesignSystem`, never a
+     hand-built toggle (the standing pill rule).
+  3. Hover = smooth **peek** expand; mouse-away = smooth collapse. Peek is a transient
+     Inline, not a new ThemeHost state.
+  4. Click = stay open (pins the peek).
+  5. X on the under-bar panel = collapse back to bar.
+  6. Pop-out from expanded → under-bar collapses; the float carries the detail
+     (`ThemeHost.PopOut()`'s existing rule).
+  7. Close floated window → just the mini-bar, nothing expanded
+     (`ThemeHost.WindowClosed()` → Collapsed, never silently back to Inline).
+  8. **First ship: DPS, then HPS, then Progress — and the PR STOPS there.** Owner tests;
+     every other tracker follows in later PRs, same pattern.
+  9. No exceptions: every tracker uses this pattern. Bar = quick peek/click for anything
+     tracked — no Options dig.
+  10. Motion quality: slick, smooth, professional; expand/collapse in a natural flow
+      (easing/storyboards in the view layer; no logic in the animation).
+- **Hosting — the trap-12 constraint that shapes the whole build:** the widget is
+  `SizeToContent`, so the under-bar panel must NOT change the widget's measured size on a
+  hover or a timer (#173's exact mechanism). **SA-2's precedent is the model:**
+  a position-slaved companion (`HudChipRowWindow`'s shape — no geometry of its own, nothing
+  persisted, slaved to the bar every tick). Bevel's own flag stands: a screenshot pass
+  against the widget's real behavior BEFORE the panel is built, prediction written first
+  (trap 23), batch run not `-Shot` (trap 53).
+- **What is NEW wiring, named so nobody assumes a rewire:** no chip carries a `breakout:`
+  for Damage or Healing today (`HudBarView.cs:280-284` — only `pet`/`loot` do), so the
+  DPS/HPS chips' expand targets are new wiring, not a re-route. **And Progress's pop-out
+  target is the Progress WINDOW, not a Progress breakout** — `Progress` left `BreakoutKind`
+  deliberately on 2026-08-25 ("reuse the existing theme window on its current tab" is the
+  fold rule), `DocumentationSizeTests` pins that list, and re-adding it would revert a
+  signed fold. The under-bar panel for Progress shows the glance; ⧉ opens the Progress
+  window.
+- **Auto-show-while-minimized is untouched** (`UpdateBreakouts`) — the owner's explicit
+  constraint, restated from the #347 sign: this adds states, it does not replace breakouts.
+- **What clamps it:** `MainWindow` is at 4,283 against a 4,284.5 ceiling — the work lives in
+  `HudBarView`/`UI.Shared`, or lifts a surface out; no net-positive `MainWindow*` edits.
+  `DoubleClickChipsToggleBreakouts` stays untouched (primary path is single click, per the
+  sign); the double-click default flip stays the soft named decision from #347.
+- **Verification:** E2E facts for the new states (`hudExpand=` family or similar) prove-failed
+  first (trap 62 — any "nothing expanded" assertion needs a positive event to wait on);
+  staged shots for peek/pinned/popped; eight consecutive greens; `WhatsNew.json` entry.
+- **Out:** every tracker beyond DPS/HPS/Progress (later PRs, after owner tests); buff timer
+  code; TEL; Play Console; OptionsWindow retirement; reopening the Bevel shape.
+
+### OE-2 — Open EQBuddy / shell recover: build the already-named door (`must-fix`)
+
+- **Priority:** `ready` — parallel with OE-1 in its own worktree, or the next kick after.
+- **Class:** `V1` — named here for kick order per the owner override, not because it needs a
+  V2 plan: the door is already named three times in source comments (`ShellHost.cs:23`,
+  `ShellWindow.xaml.cs:252`, `ShellPages.cs:271`) as "the PR after this one."
+- **Source:** `BEVEL.md` item 3, Helm-signed #347 item 3: the one-row premise for deferring
+  the door expired at SR-5 (rail is all seven rooms); closing ✕ the `ShellWindow` currently
+  strands the player until restart (`ShellHost.Show`'s only caller is `ApplyEnvHook`,
+  gated on `EQBUDDY_SHELL`).
+- **The trap-59 floor:** the door must exist on a DEFAULT profile — a context-menu row at
+  minimum (a hotkey is not a door; an env var is not a door). Exact control (button vs tray
+  vs row) is the executor's per the sign; if the chosen control lands on the HUD bar itself,
+  coordinate with lane W (OE-1 owns `HudBarView` while it runs) — the context-menu row
+  avoids that collision entirely.
+- **Verification:** E2E fact that the door reopens a closed shell; `WhatsNew.json` entry.
+  No screen needed for the build (CI e2e answers); screenshots ride a later batch or borrow
+  the screen after OE-1 releases it.
+- **Out:** any new shell room work; OptionsWindow retirement; `EQBUDDY_SHELL` removal (the
+  debug hook stays).
+
+### OE-3 — xp-chip tooltip: ETA + level
+
+- **Priority:** `ready` — after OE-1 in lane W (touches the same `HudBarView`/`HudGlance`).
+- **Class:** `V0–V1.`
+- **Source:** `BEVEL.md` item 2, Helm-signed #347 item 2.
+- **Scope:** the xp chip's tooltip carries the ETA sentence (already computed —
+  `SessionStats.XpPerHour`/`HoursToLevel`, worded by `ProgressPresentation`; reuse the
+  wording source, don't re-derive) plus the tracked level (`LevelFor(char) ?? LastLevel`,
+  the fallback order `MainWindow.xaml.cs:129,2019` already uses). No gesture, no setting,
+  no `DoubleClickChipsToggleBreakouts` default change, **not** Home's Identity line
+  (zone-over-level stays, per the sign).
+- **Out:** the double-click default flip (stays a soft named decision); Progress-window
+  header level readout (the sign allows it as an alternative — tooltip is the pick; log the
+  call in `DECISIONS.md`).
+
+### OE-4 — Buff roster wrap-chip density
+
+- **Priority:** `ready` — after OE-3 in lane W (touches `MainWindow`'s `RenderBuffs`).
+- **Class:** `V1.`
+- **Source:** `BEVEL.md` item 1, Helm-signed #347 item 1 (density IA SIGNED; **timers =
+  waiting checklist, NOT a fix**).
+- **Scope:** wrap the always-on buff roster (`RenderBuffs`, `MainWindow.xaml.cs:1406-1519`)
+  into a multi-column chip grid — `WrapPanel` per trap 25, never a horizontal `StackPanel` —
+  reusing `HudChipRow`'s visual language WITHOUT its warn-window gate; do not invent a
+  second chip style. Whether "est" and the duration source still fit at that density or move
+  to the tooltip: measure against a real screenshot, don't assume (Bevel's own flag).
+- **What clamps it:** the `MainWindow*` ratchet (one line of headroom) — lift the roster
+  render out (a view class or `UI.Shared` presentation, the standing move) rather than
+  editing in place if the diff is net-positive.
+- **Out:** ANY buff-timer code — the timer complaint stays `waiting` on the owner's
+  screenshot (buff name + shown countdown + actual remaining), per the sign. The four-source
+  bisect checklist lives in `BEVEL.md` item 1 for when it arrives.
+
+### Checked — what Fable actually read on this tip
+
+`BEVEL.md` items 1–4 in full including the owner interview locks 1–10; `HELM.md` through the
+#347 sign (Live Holds empty; "Seat order after merge" line); `HELM-FEEDBACK.md` #347 sign in
+full (the superseded seat order, the four answered items, scope hygiene);
+this file's SA-1…SA-4 struck notes (ratchet 4,283/4,284.5; `HudChipRowWindow` precedent;
+`HudChipFamily`); CLAUDE.md's breakout-fold rule (Progress left `BreakoutKind` 2026-08-25,
+pinned by `DocumentationSizeTests`) and traps 12/23/25/53/59/62. **Hypotheses, labelled:**
+(1) the peek/pin interaction fits as transient-Inline on `ThemeHost` without a new state —
+if the executor finds it needs a fourth state, that is a Bevel question before it ships, not
+after; (2) `HudChipRowWindow`'s slaving is reusable as-is for the under-bar panel —
+verified in-PR before OE-1's hosting is final.
+
+### Decided without asking — for `DECISIONS.md` when taken
+
+- **OE-3's level readout goes on the tooltip, not the Progress header** — the sign allowed
+  either; the tooltip pairs it with the ETA in one hover.
+- **OE-2's recommended control is the context-menu row** — it is the only choice that is a
+  trap-59 door on a default profile AND avoids a lane-W file collision while OE-1 runs.
+- **OE-3/OE-4 serial behind OE-1 in lane W** — could have been parallel worktrees; they
+  share `HudBarView`/`MainWindow` and the ratchet, so parallelism there is merge-conflict
+  spend, not speed.
 
 ---
 
