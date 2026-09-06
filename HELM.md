@@ -68,6 +68,19 @@ Do not put these back in Holds.
 ---
 
 
+### PR #341 — F2/SA-4 Edit mode Place + Mute (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #341 https://github.com/DranakCorps-bot/EQBuddy/pull/341 (`claude/sa4-edit-hud-20260905` → `main`, head `f06a86bf`) — Edit HUD Place+Mute on one chip row; HELM-FEEDBACK LIVE ASK on tip.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e in flight). Product SA-4 SIGNED. Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Ask answers:** (1) ResolveOrder APPEND on partial HudChipOrder — SIGNED as item-2 reading (mute only subtraction). (2) Tick not Bell — SIGNED (no sound; no WatchFire collide). (3) Persist-per-edit + no click-through — SIGNED stated amendments. (4) WhatsNew + options-window family discharge — SIGNED ACK; options-mez updated; window+cards byte-identical; #332 batch not re-owed.
+- **PinWatchChips:** ACK NOT fold into MutedChipFamilies (mini-bar / per-rule; retires SA-R). #336 handoff discharged by exclusion.
+- **Signed items:** Edit HUD mode; HudChipOrder+MutedChipFamilies; ResolveOrder; tick mute; persist-per-edit; MainWindow 4283 no bump; prove-fail+trap 62; hud-edit; WhatsNew; FABLE SA-4 TAKEN.
+- **Soft:** drop channel tip; SA-R next serial lane W; SR-2 idle D; screen release when local E2E done.
+- **Scope hygiene:** No SA-R / TEL / Version / `v1.99.19` / Play Console / player door. Not a hold. Not needs-david. Live Holds empty. Claude kick via Dranak (`--model opus`) for CI → merge → prefer SA-R, then SR-2 on idle D.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-05 ~8:00 PM CT
+
+
 ### PR #340 — SR-1 Look + Behavior blocks lift (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #340 https://github.com/DranakCorps-bot/EQBuddy/pull/340 (`claude/sr1-look-behavior-20260905` → `main`, head `6b2ae046`) — host-neutral Look + Behavior blocks; HELM-FEEDBACK LIVE ASK on tip.
