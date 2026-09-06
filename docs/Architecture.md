@@ -134,7 +134,7 @@ the lift came first, and the baseline came down in the same commit.**
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 689 | 689 | 757 | 68 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 393 | 393 | 432 | 39 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
 
 **Lowered 1,547 → 689 on 2026-09-05 (E-3 lane D, SR-4), in the same commit as the lift.**
@@ -147,6 +147,18 @@ room compose the SAME blocks under the four `AlertSurface` tabs instead of growi
 copy of forty control wirings to drift against this one — #210's mechanism with a bigger
 surface. The baseline came down to the post-lift count rather than to something with slack in
 it, per the rule two paragraphs up: **room that is freed and not claimed quietly refills.**
+
+**Lowered again, 689 → 393 on 2026-09-05 (E-3 lane D, SR-1), in the same commit as the lift.**
+Two more blocks left by the same contract: `EQBuddy/SettingsLookView.cs` (the colour theme
+picker and its Custom rows, the four size/opacity sliders, the alignment grid and its spacing,
+the cursor ring) and `EQBuddy/SettingsBehaviorView.cs` (EQBuddy Mobile pairing and its sounds
+switch, the three hide-when rules and the Alt+Tab note, keep-above, the global hotkey rows, the
+regen override, auto-empty and its archive, the tutorial toggle, the perf readout). **What
+stayed is the part that is about the WINDOW rather than about the settings** — width
+persistence, the monitor clamp, the tab links, the resize grips and the one dim sentence that
+describes them, plus the routing of a key press to an armed hotkey recorder, which no block can
+receive because rebuilding its own rows destroys the control that had focus. The `cards` tab is
+the remaining tenant and SR-3 takes it.
 
 **Raised 4,214 → 4,273 on 2026-09-04 (P0-2 / LEGACY-002, #275), and the argument is that
 the ratchet was already full.** `main` stood at 4,635 lines against a 4,635 limit, so any

@@ -31,47 +31,15 @@ public partial class OptionsWindow : Window
         SourceInitialized += (_, _) => ClampToMonitor();
         LocationChanged += (_, _) => ClampToMonitor();
 
-        foreach (var label in OptionsViewModel.ThemeLabels) ThemeCombo.Items.Add(label);
-        ThemeCombo.SelectedIndex = _vm.ThemeIndex;
-
-        ScaleSlider.Value = _vm.UiScale;
-        ChipScaleSlider.Value = Math.Clamp(_vm.ChipScale, ChipScaleSlider.Minimum, ChipScaleSlider.Maximum);
-        OpacitySlider.Value = _vm.Opacity;
-        BgOpacitySlider.Value = _vm.BackgroundOpacity;
-        TruncateCheck.IsChecked = _vm.TruncateLogs;
-        ArchiveCheck.IsChecked = _vm.ArchiveLogs;
         PinChipsCheck.IsChecked = _vm.PinWatchChips;
-        TutorialCheck.IsChecked = _vm.ShowTutorial;
-        GridOverlayCheck.IsChecked = _main.Settings.ShowGridOverlay;
-        GridSpacingSlider.Value = Math.Clamp(_main.Settings.GridSpacing,
-            GridSpacingSlider.Minimum, GridSpacingSlider.Maximum);
-        GridSpacingLabel.Text = $"{GridSpacingSlider.Value:0} px";
         TargetDropsCheck.IsChecked = _vm.ShowTargetDrops;
-        MobileSoundsCheck.IsChecked = _vm.MobileSounds;
-        MobileSoundsLabel.Text = EQBuddy.UI.Shared.MobileAlertSounds.Label;
-        MobileSoundsNote.Text = EQBuddy.UI.Shared.MobileAlertSounds.HelperText
-            + " " + EQBuddy.UI.Shared.MobileAlertSounds.ScopeNote;
-        HideUnfocusedCheck.IsChecked = _vm.HideWhenGameUnfocused;
-        HideNotRunningCheck.IsChecked = _vm.HideWhenGameNotRunning;
-        HideAltTabCheck.IsChecked = _vm.HideFromAltTab;
-        // The cost is stated where the choice is made: one flag, both effects.
-        HideAltTabNote.Text = string.Join(" ",
-            new[] { EQBuddy.UI.Shared.AltTabPolicy.TaskbarWarning,
-                    EQBuddy.UI.Shared.AltTabPolicy.UnavailableNote }
-                .Where(s => s.Length > 0));
-        KeepAboveCheck.IsChecked = _vm.KeepAboveOverlays;
         DoubleClickChipsCheck.IsChecked = _main.Settings.DoubleClickChipsToggleBreakouts;
-        CursorRingCheck.IsChecked = _main.Settings.ShowCursorRing;
-        PerfStatsCheck.IsChecked = _main.Settings.ShowPerfStats;
         SelectTab(_main.Settings.OptionsTab);
-        BuildHotkeyRows();
-        RegenPerTickBox.Text = _vm.RegenPerTickOverride > 0 ? _vm.RegenPerTickOverride.ToString() : "";
 
         foreach (var choice in OptionsViewModel.WindowChoices) WindowCombo.Items.Add(choice);
         WindowCombo.SelectedIndex = _vm.RecentWindowIndex;
 
         UpdateGearImportStatus();
-        UpdateCustomColorsPanel();
         // The Cards & windows tab's three editors, lifted into OptionsCardsView.cs when
         // the mini-dashboard list pushed this file past its ratchet — CLAUDE.md's rule is
         // to lift a surface, never to raise the ceiling.
@@ -79,8 +47,8 @@ public partial class OptionsWindow : Window
             CardsPanel, MiniStatsPanel, BreakoutsPanel, BreakoutsBlurb, FindResource);
         _cardsView.RenderAll();
         BuildAlertsTabs();
+        BuildLookAndBehaviour();
 
-        UpdateLabels();
         _ready = true;
 
         // CenterOwner + SizeToContent positions before the size is known and can land
@@ -97,101 +65,15 @@ public partial class OptionsWindow : Window
         };
     }
 
-    private void UpdateLabels()
-    {
-        ScaleLabel.Text = _vm.ScaleLabel;
-        ChipScaleLabel.Text = _vm.ChipScaleLabel;
-        OpacityLabel.Text = _vm.OpacityLabel;
-        BgOpacityLabel.Text = _vm.BackgroundOpacityLabel;
-    }
-
-    private void OnChipScaleChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.ChipScale = ChipScaleSlider.Value;
-        _main.SetChipScale(_vm.ChipScale);
-        UpdateLabels();
-    }
-
-    private void OnScaleChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.UiScale = ScaleSlider.Value;
-        _main.SetUiScale(_vm.UiScale);
-        UpdateLabels();
-    }
-
-    private void OnOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.Opacity = OpacitySlider.Value;
-        _main.SetWindowOpacity(_vm.Opacity);
-        UpdateLabels();
-    }
-
-    private void OnBgOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _vm.BackgroundOpacity = BgOpacitySlider.Value;
-        _main.SetBackgroundOpacity(_vm.BackgroundOpacity);
-        UpdateLabels();
-    }
-
-    private void OnTruncateChanged(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.TruncateLogs = TruncateCheck.IsChecked == true;
-    }
-
-    private void OnArchiveChanged(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.ArchiveLogs = ArchiveCheck.IsChecked == true;
-    }
-
-    private void OnTutorialToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.ShowTutorial = TutorialCheck.IsChecked == true;
-    }
-
     private void OnTargetDropsToggled(object sender, RoutedEventArgs e)
     {
         if (_ready) _vm.ShowTargetDrops = TargetDropsCheck.IsChecked == true;
-    }
-
-    private void OnGridOverlayToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _main.SetGridOverlay(GridOverlayCheck.IsChecked == true);
-    }
-
-    private void OnGridSpacingChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_ready) return;
-        _main.Settings.GridSpacing = GridSpacingSlider.Value;
-        GridSpacingLabel.Text = $"{GridSpacingSlider.Value:0} px";
-        _vm.Persist();
-        _main.RefreshGridSpacing();   // live while the grid is up
-    }
-
-    private void OnKeepAboveToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.KeepAboveOverlays = KeepAboveCheck.IsChecked == true;
     }
 
     private void OnDoubleClickChipsToggled(object sender, RoutedEventArgs e)
     {
         if (!_ready) return;
         _main.Settings.DoubleClickChipsToggleBreakouts = DoubleClickChipsCheck.IsChecked == true;
-        _main.Settings.Save();
-    }
-
-    private void OnCursorRingToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _main.SetCursorRing(CursorRingCheck.IsChecked == true);
-    }
-
-    private void OnPerfStatsToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _main.Settings.ShowPerfStats = PerfStatsCheck.IsChecked == true;
         _main.Settings.Save();
     }
 
@@ -266,128 +148,49 @@ public partial class OptionsWindow : Window
         }
     }
 
-    // ---- global hotkeys, opt-in only (#100 — see HotkeyManager) ----
+    // ---- the Look and Behavior blocks (SR-1) ----
 
-    private string? _recordingAction;
+    /// <summary>
+    /// This window's own instances of the two lifted blocks — never shared ones. A WPF
+    /// <c>UIElement</c> has exactly one parent, so a block borrowed from another host would be
+    /// torn out of whichever painted it last, silently (trap 45). The shell's Settings room is
+    /// the second host, and it builds its own pair.
+    /// </summary>
+    private SettingsLookView? _look;
+    private SettingsBehaviorView? _behavior;
 
-    private void BuildHotkeyRows()
+    /// <summary>
+    /// The v1 arrangement, rebuilt from the lifted blocks. Look hangs in a host that also keeps
+    /// ONE window-chrome sentence declared beside it (the resize grips are this window's, not a
+    /// block's); Behavior's host is bare.
+    ///
+    /// The blocks read their own values out of the shared <see cref="OptionsViewModel"/> as they
+    /// build, so nothing here assigns a control — the long construction list this window used to
+    /// carry for both tabs went with them.
+    /// </summary>
+    private void BuildLookAndBehaviour()
     {
-        HotkeysPanel.Children.Clear();
-        foreach (var (key, label) in HotkeyManager.Actions)
-        {
-            var row = new Grid { Margin = new Thickness(0, 3, 0, 0) };
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var name = new TextBlock { Text = label, FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
-            name.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
-            row.Children.Add(name);
+        // The Cards editors resolve their row Foreground with FindResource at construction time
+        // rather than through a DynamicResource, so a palette swap has to rebuild them. That is
+        // the host's business, not the block's, which is why the block asks instead of reaching.
+        _look = new SettingsLookView(_main, _vm, () => _ready, FindResource,
+            () => _cardsView?.BuildCards());
+        LookBlockHost.Children.Add(_look.Block);
 
-            var bound = _main.Settings.Hotkeys.GetValueOrDefault(key, "");
-            var recorder = new Button
-            {
-                Style = (Style)FindResource("ActionButton"), FontSize = 11,
-                // The recording prompt names the rule instead of hiding it: a bare key
-                // is rejected on purpose (a global "G" would eat chat typing), and the
-                // 1.66 field test proved silent rejection reads as a dead recorder.
-                Content = _recordingAction == key
-                    ? _recordingHint ?? "press Ctrl/Alt/Shift + a key…"
-                    : bound.Length > 0 ? bound : "not bound — click to set",
-                Tag = key,
-            };
-            recorder.Click += (_, _) =>
-            {
-                _recordingAction = _recordingAction == key ? null : key;
-                _recordingHint = null;
-                BuildHotkeyRows();
-            };
-            Grid.SetColumn(recorder, 1);
-            row.Children.Add(recorder);
-
-            var clear = new Button
-            {
-                Style = (Style)FindResource("IconButton"), Content = "✕", FontSize = 11,
-                Margin = new Thickness(4, 0, 0, 0), ToolTip = "Unbind",
-                Visibility = bound.Length > 0 ? Visibility.Visible : Visibility.Hidden,
-            };
-            clear.Click += (_, _) =>
-            {
-                _main.Settings.Hotkeys.Remove(key);
-                _main.Settings.Save();
-                _main.ApplyHotkeys();
-                _recordingAction = null;
-                BuildHotkeyRows();
-            };
-            Grid.SetColumn(clear, 2);
-            row.Children.Add(clear);
-            HotkeysPanel.Children.Add(row);
-        }
+        _behavior = new SettingsBehaviorView(_main, _vm, () => _ready, FindResource);
+        TabBehaviorPanel.Children.Add(_behavior.Block);
     }
 
+    /// <summary>
+    /// Window chrome the Behavior block cannot own: ROUTING a key press to an armed hotkey
+    /// recorder. The block rebuilds its rows on every click, so the button that was clicked no
+    /// longer exists and nothing inside that panel has focus when the gesture arrives — the
+    /// press reaches the WINDOW. The decision stays the block's; only the route is ours.
+    /// </summary>
     protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
     {
-        if (_recordingAction is not { } action) { base.OnPreviewKeyDown(e); return; }
-        e.Handled = true;
-        var key = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
-        if (key == System.Windows.Input.Key.Escape) { _recordingAction = null; BuildHotkeyRows(); return; }
-        // A bare modifier press isn't a gesture yet — wait for the real key.
-        if (key is System.Windows.Input.Key.LeftCtrl or System.Windows.Input.Key.RightCtrl
-            or System.Windows.Input.Key.LeftAlt or System.Windows.Input.Key.RightAlt
-            or System.Windows.Input.Key.LeftShift or System.Windows.Input.Key.RightShift
-            or System.Windows.Input.Key.LWin or System.Windows.Input.Key.RWin) return;
-        var mods = System.Windows.Input.Keyboard.Modifiers;
-        var parts = new List<string>();
-        if (mods.HasFlag(System.Windows.Input.ModifierKeys.Control)) parts.Add("Ctrl");
-        if (mods.HasFlag(System.Windows.Input.ModifierKeys.Alt)) parts.Add("Alt");
-        if (mods.HasFlag(System.Windows.Input.ModifierKeys.Shift)) parts.Add("Shift");
-        if (mods.HasFlag(System.Windows.Input.ModifierKeys.Windows)) parts.Add("Win");
-        parts.Add(key.ToString());
-        var gesture = string.Join("+", parts);
-        // Modifier required — a bare global letter would eat the game's chat typing.
-        // Say so on the button itself: a silent return looks like a dead recorder.
-        if (HotkeyManager.Parse(gesture) is null)
-        {
-            _recordingHint = $"{key} alone won't do — add Ctrl, Alt or Shift";
-            BuildHotkeyRows();
-            return;
-        }
-        _main.Settings.Hotkeys[action] = gesture;
-        _main.Settings.Save();
-        _main.ApplyHotkeys();
-        _recordingAction = null;
-        _recordingHint = null;
-        BuildHotkeyRows();
-    }
-
-    /// <summary>Transient message shown in the recording button after a rejected press.</summary>
-    private string? _recordingHint;
-
-    /// <summary>#208. No sample plays on the flip — Bevel's lock is explicit about that,
-    /// and a demo noise from a PC while the phone is the surface under discussion would be
-    /// answering a different question.</summary>
-    private void OnMobileSoundsToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.MobileSounds = MobileSoundsCheck.IsChecked == true;
-    }
-
-    private void OnHideUnfocusedToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.HideWhenGameUnfocused = HideUnfocusedCheck.IsChecked == true;
-    }
-
-    private void OnHideNotRunningToggled(object sender, RoutedEventArgs e)
-    {
-        if (_ready) _vm.HideWhenGameNotRunning = HideNotRunningCheck.IsChecked == true;
-    }
-
-    /// <summary>Applied to every open window immediately, not on the next launch — a
-    /// tick-box whose effect waits for a relaunch is indistinguishable from a broken
-    /// one, and this one has a visible answer the moment it lands.</summary>
-    private void OnHideAltTabToggled(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        _vm.HideFromAltTab = HideAltTabCheck.IsChecked == true;
-        _main.ApplyAltTabStyle();
+        if (_behavior?.HandleRecordingKey(e) == true) { e.Handled = true; return; }
+        base.OnPreviewKeyDown(e);
     }
 
     /// <summary>
@@ -405,14 +208,6 @@ public partial class OptionsWindow : Window
     /// be a second silent surprise in the opposite direction.
     /// </summary>
 
-    private void OnRegenPerTickChanged(object sender, RoutedEventArgs e)
-    {
-        if (!_ready) return;
-        // Blank or unparseable = back to the wiki base; the box shows any clamp.
-        _vm.RegenPerTickOverride = int.TryParse(RegenPerTickBox.Text.Trim(), out var v) ? v : 0;
-        RegenPerTickBox.Text = _vm.RegenPerTickOverride > 0 ? _vm.RegenPerTickOverride.ToString() : "";
-    }
-
     /// <summary>Called back by MainWindow.SetTrackSpawns so closing the Spawns window
     /// (or toggling the menu) updates the box while Options sits open. Forwarded to the
     /// block that owns it.</summary>
@@ -426,95 +221,6 @@ public partial class OptionsWindow : Window
     private void OnWindowChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
         if (_ready) _vm.RecentWindowIndex = WindowCombo.SelectedIndex;
-    }
-
-    private void OnThemeChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-    {
-        if (!_ready) return;
-        _vm.ThemeIndex = ThemeCombo.SelectedIndex;
-        ThemeManager.Apply(_vm.Settings);
-        // The card rows pick Foreground (dim vs. normal) via FindResource at construction
-        // time rather than a binding, so they need an explicit rebuild to pick up the new
-        // palette — everything else in the window repaints on its own via DynamicResource.
-        _cardsView?.BuildCards();
-        UpdateCustomColorsPanel();
-        _main.RefreshTheme();
-    }
-
-    /// <summary>Preset swatches for the Custom theme rows: the built-in themes'
-    /// backgrounds and accents plus a few brights — hex entry covers everything else.</summary>
-    private static readonly string[] SwatchColors =
-    [
-        "#000000", "#1A1A1A", "#20242B", "#26211A", "#002B36", "#FDF6E3", "#FFFFFF",
-        "#EAEAEA", "#E3B341", "#FFD24D", "#5FA8D3", "#3FCFBE", "#7FBF5F", "#E0654A",
-        "#C080D0", "#9C9C9C",
-    ];
-
-    private void UpdateCustomColorsPanel()
-    {
-        var custom = _vm.Settings.Theme == CustomTheme.Key;
-        CustomColorsPanel.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
-        if (!custom) return;
-        CustomColorsPanel.Children.Clear();
-        CustomColorsPanel.Children.Add(ColorRow("Background",
-            _vm.Settings.CustomThemeBg ?? CustomTheme.DefaultBg, v => _vm.Settings.CustomThemeBg = v));
-        CustomColorsPanel.Children.Add(ColorRow("Text",
-            _vm.Settings.CustomThemeText ?? CustomTheme.DefaultText, v => _vm.Settings.CustomThemeText = v));
-        CustomColorsPanel.Children.Add(ColorRow("Accent",
-            _vm.Settings.CustomThemeAccent ?? CustomTheme.DefaultAccent, v => _vm.Settings.CustomThemeAccent = v));
-    }
-
-    private System.Windows.Controls.DockPanel ColorRow(string label, string current, Action<string> store)
-    {
-        var row = new System.Windows.Controls.DockPanel { Margin = new Thickness(0, 3, 0, 3) };
-        var name = new System.Windows.Controls.TextBlock
-        { Text = label, FontSize = 11, Width = 72, VerticalAlignment = VerticalAlignment.Center };
-        System.Windows.Controls.DockPanel.SetDock(name, System.Windows.Controls.Dock.Left);
-        row.Children.Add(name);
-
-        var hexBox = new System.Windows.Controls.TextBox
-        { Text = current, FontSize = 11, Width = 64, VerticalAlignment = VerticalAlignment.Center };
-        System.Windows.Controls.DockPanel.SetDock(hexBox, System.Windows.Controls.Dock.Right);
-
-        void Commit(string value)
-        {
-            // Invalid hex is simply not committed — the palette keeps its last good color.
-            if (CustomTheme.Valid(value) is not { } hex) { hexBox.Text = current; return; }
-            current = hex;
-            store(hex);
-            _main.PersistSettings();
-            hexBox.Text = hex;
-            ThemeManager.Apply(_vm.Settings);
-            _cardsView?.BuildCards();
-            _main.RefreshTheme();
-        }
-
-        hexBox.LostFocus += (_, _) => Commit(hexBox.Text);
-        hexBox.KeyDown += (_, e) => { if (e.Key == Key.Enter) Commit(hexBox.Text); };
-        row.Children.Add(hexBox);
-
-        var swatches = new System.Windows.Controls.WrapPanel
-        { Margin = new Thickness(6, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center };
-        foreach (var hex in SwatchColors)
-        {
-            var swatch = new System.Windows.Controls.Border
-            {
-                Width = 14,
-                Height = 14,
-                Margin = new Thickness(1),
-                CornerRadius = new CornerRadius(2),
-                BorderThickness = new Thickness(1),
-                BorderBrush = System.Windows.Media.Brushes.Gray,
-                Background = new System.Windows.Media.SolidColorBrush(
-                    (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex)!),
-                Cursor = Cursors.Hand,
-                ToolTip = hex,
-            };
-            swatch.MouseLeftButtonUp += (_, _) => Commit(hex);
-            swatches.Children.Add(swatch);
-        }
-        row.Children.Add(swatches);
-        return row;
     }
 
     // Resize state captured at drag start. Deriving each frame from the cursor's absolute
@@ -682,8 +388,6 @@ public partial class OptionsWindow : Window
     /// <summary>The Cards &amp; windows editors, lifted into their own file for the same
     /// reason as the mez one below.</summary>
     private OptionsCardsView? _cardsView;
-
-    private void OnSecondScreen(object sender, RoutedEventArgs e) => _main.OpenCompanionWindow();
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
 }

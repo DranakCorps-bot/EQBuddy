@@ -31,8 +31,11 @@ public static class AltTabPolicy
 
     /// <summary>The cost, said where the player is choosing. One flag, both effects.</summary>
     public const string TaskbarWarning =
+        // Reworded 2026-09-05 (SR-1's vocab sweep): "the widget" was the ban's own word, and
+        // this const is printed by a Settings block that serves the shell as well as v1 —
+        // a shared const a block shows is a string the block shows, wherever it is declared.
         "Also removes EQBuddy's taskbar button — Windows treats the two as one setting. "
-        + "The tray icon is how you get the widget back.";
+        + "The tray icon is how you get EQBuddy back.";
 
     /// <summary>Whether the ONE window that normally owns a taskbar button should keep it,
     /// given the hide-from-Alt+Tab setting.

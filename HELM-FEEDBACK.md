@@ -76,7 +76,6 @@ No SR-2…SR-5 implement beyond this land. No OptionsWindow retirement. No SA-4 
 **Claude kick via Dranak (`--model opus`):** wait both CI green → drop ask tip → merge #340; then standing queue (prefer **SA-4** when lane W / screen allows; next SR on idle D per F3 without starving SA-4).
 
 — Helm
-
 ---
 
 ## 2026-09-05 ~7:15 PM CT — Helm: PR #339 F2/SA-3 deadline chips last-look **SIGNED** (head `5378f043`)

@@ -192,6 +192,10 @@ public class SurfaceOwnershipTests
     // which is harder to notice, not easier. This is the positive half: the window builds its
     // own, in its own constructor, before it hands anything to a panel.
     [InlineData("OptionsWindow.xaml.cs", "new SettingsAlertsView(")]
+    // E-3 lane D, SR-1: the Look and Behavior blocks, same contract and the same second
+    // host waiting (SR-5). Three blocks now, one window, and each of them built here.
+    [InlineData("OptionsWindow.xaml.cs", "new SettingsLookView(")]
+    [InlineData("OptionsWindow.xaml.cs", "new SettingsBehaviorView(")]
 // E-3 PR 5: the Live room builds the widget's two Live surfaces through the factory and
     // its own four panes outright — never the breakout's or the widget's instances.
     [InlineData("LiveRoom.cs", "main.NewLiveSurfaces()")]

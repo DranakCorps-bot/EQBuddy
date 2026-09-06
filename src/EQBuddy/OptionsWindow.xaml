@@ -55,83 +55,25 @@
                       HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
         <Grid Margin="16,0,16,16">
 
-        <!-- ============================ LOOK ============================ -->
+        <!-- ============================ LOOK ============================
+             EMPTY BY DESIGN since SR-1, but for one line. The theme picker, the Custom
+             colour rows, the four size/opacity sliders, the alignment grid and the cursor
+             ring are built by SettingsLookView and added to the bare host below, in the
+             arrangement players already have, from a block the Evolved shell's Settings
+             room will compose under its own Look tab.
+
+             The host carries no Margin and no state of its own (trap 15): the Visibility
+             on this panel belongs to this window's tab machinery, which SelectTab drives
+             and no block knows about.
+
+             THE ONE SENTENCE THAT DID NOT LIFT is the last one — it is about THIS window's
+             resize grips, which a shell room does not have, so it stays declared beside
+             them rather than travelling to a host where it would be false (trap 37: when
+             you lift a view out, list what each row of the grid was buying). -->
         <StackPanel x:Name="TabLookPanel">
-            <Grid>
-                <TextBlock Text="Theme" FontSize="12"/>
-                <ComboBox x:Name="ThemeCombo" HorizontalAlignment="Right" Width="130" FontSize="12"
-                          SelectionChanged="OnThemeChanged"/>
-            </Grid>
-
-            <!-- Rows are built in code (UpdateCustomColorsPanel); visible only while the
-                 Custom theme is selected. -->
-            <StackPanel x:Name="CustomColorsPanel" Visibility="Collapsed" Margin="0,8,0,0"/>
-
-            <Grid Margin="0,12,0,0">
-                <TextBlock Text="Widget size" FontSize="12"/>
-                <TextBlock x:Name="ScaleLabel" Text="100%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="ScaleSlider" Minimum="0.8" Maximum="1.6" TickFrequency="0.05"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,12"
-                    ValueChanged="OnScaleChanged"/>
-
-            <Grid>
-                <TextBlock Text="Chips &amp; alerts size" FontSize="12"
-                           ToolTip="Spawn timer chips, mez chips, and the alert banner"/>
-                <TextBlock x:Name="ChipScaleLabel" Text="100%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="ChipScaleSlider" Minimum="0.8" Maximum="2.0" TickFrequency="0.05"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,12"
-                    ValueChanged="OnChipScaleChanged"/>
-
-            <Grid>
-                <TextBlock Text="Background see-through" FontSize="12"/>
-                <TextBlock x:Name="BgOpacityLabel" Text="95%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <TextBlock Text="Only the dark panel fades — text stays sharp." Style="{StaticResource Dim}"/>
-            <Slider x:Name="BgOpacitySlider" Minimum="0.15" Maximum="1.0" TickFrequency="0.05"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,12"
-                    ValueChanged="OnBgOpacityChanged"/>
-
-            <Grid>
-                <TextBlock Text="Whole-widget opacity" FontSize="12"/>
-                <TextBlock x:Name="OpacityLabel" Text="96%" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <TextBlock Text="Fades everything, text included." Style="{StaticResource Dim}"/>
-            <Slider x:Name="OpacitySlider" Minimum="0.5" Maximum="1.0" TickFrequency="0.02"
-                    IsSnapToTickEnabled="True" Margin="0,4,0,4"
-                    ValueChanged="OnOpacityChanged"/>
-
-            <CheckBox x:Name="GridOverlayCheck" Margin="0,10,0,0"
-                      Checked="OnGridOverlayToggled" Unchecked="OnGridOverlayToggled">
-                <TextBlock Text="▦ Grid overlay for aligning your game UI" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="A faint click-through grid over the whole desk — line up your game windows, then toggle it off here or in the right-click menu. Stronger lines every fourth square."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-            <Grid Margin="20,4,0,0">
-                <TextBlock Text="Grid spacing" FontSize="12"/>
-                <TextBlock x:Name="GridSpacingLabel" Text="32 px" FontSize="12" HorizontalAlignment="Right"
-                           Foreground="{DynamicResource AccentBrush}"/>
-            </Grid>
-            <Slider x:Name="GridSpacingSlider" Minimum="16" Maximum="128" TickFrequency="8"
-                    IsSnapToTickEnabled="True" Margin="20,4,0,4"
-                    ValueChanged="OnGridSpacingChanged"/>
-
-            <CheckBox x:Name="CursorRingCheck" Margin="0,10,0,0"
-                      Checked="OnCursorRingToggled" Unchecked="OnCursorRingToggled">
-                <TextBlock Text="Cursor ring (never lose your pointer)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="A soft ring follows your mouse everywhere — click-through, over the game too. Drag its edge to resize it."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <TextBlock Text="Size also scales all text. Changes apply instantly and are saved. Drag either side edge to widen this window."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+            <StackPanel x:Name="LookBlockHost"/>
+            <TextBlock Text="Drag either side edge to widen this window."
+                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,0"/>
         </StackPanel>
 
         <!-- ======================= ALERTS &amp; CHIPS =======================
@@ -236,111 +178,23 @@
                        Style="{StaticResource Dim}" TextWrapping="Wrap"/>
         </StackPanel>
 
-        <!-- ========================== BEHAVIOR ========================== -->
-        <StackPanel x:Name="TabBehaviorPanel" Visibility="Collapsed">
-            <!-- FIRST in the tab, not buried at the bottom — the primary way in is the
-                 title-bar 📱 button; this is the explanation that sits beside it. -->
-            <StackPanel x:Name="SecondScreenBlock" Margin="0,0,0,14">
-                <TextBlock Text="EQBuddy Mobile (Beta)" FontSize="12" FontWeight="SemiBold"
-                           Foreground="{DynamicResource AccentBrush}"/>
-                <TextBlock Text="Show EQBuddy on a phone or tablet on your Wi-Fi: scan the code once, then pick which windows that device shows. LAN-only and off by default — nothing leaves your network. The 📱 button in the title bar opens it any time."
-                           Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,4"/>
-                <Button x:Name="SecondScreenBtn" Content="EQBuddy Mobile…" Style="{StaticResource ActionButton}"
-                        HorizontalAlignment="Left" Click="OnSecondScreen"/>
-                <!-- #208: adjacent to pairing on purpose — it is a property of the phone,
-                     and the player who wants it is the player who just paired one. Label
-                     and both notes come from UI.Shared/MobileAlertSounds so the two
-                     Options windows cannot drift (#122, #152). -->
-                <CheckBox x:Name="MobileSoundsCheck" Margin="0,10,0,0"
-                          Checked="OnMobileSoundsToggled" Unchecked="OnMobileSoundsToggled">
-                    <TextBlock x:Name="MobileSoundsLabel" FontSize="12"
-                               Foreground="{DynamicResource TextBrush}"/>
-                </CheckBox>
-                <TextBlock x:Name="MobileSoundsNote" Style="{StaticResource Dim}"
-                           TextWrapping="Wrap" Margin="20,2,0,0"/>
-            </StackPanel>
-            <CheckBox x:Name="HideUnfocusedCheck"
-                      Checked="OnHideUnfocusedToggled" Unchecked="OnHideUnfocusedToggled">
-                <TextBlock Text="Hide the widget while the game is running but not focused" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Alt-tab to a browser and the widget (and its chips and breakout windows) gets out of the way; alt-tab back to the game and everything returns. This one always shows the widget when the game isn't running — the next box covers that."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+        <!-- ========================== BEHAVIOR ==========================
+             EMPTY BY DESIGN since SR-1. EQBuddy Mobile's pairing panel and its sounds
+             switch, the three hide-when rules and the Alt+Tab note, keep-above, the
+             global hotkey rows, the regen override, auto-empty + archive, the tutorial
+             toggle and the perf readout are all built by SettingsBehaviorView and added
+             to this bare host in code — the arrangement players already have, from a
+             block the Evolved shell's Settings room will compose under its own Behavior
+             tab.
 
-            <CheckBox x:Name="HideNotRunningCheck" Margin="0,8,0,0"
-                      Checked="OnHideNotRunningToggled" Unchecked="OnHideNotRunningToggled">
-                <TextBlock Text="Hide the widget while the game isn't running at all" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="The overlay exists only while you play: quit the game and everything disappears, launch it and everything returns (within a few seconds). Need it back without the game — say, to browse session history? Launch EQBuddy again from the Start menu: the running copy surfaces, and stays visible while any of its windows has focus."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
+             The host carries no Margin and no state of its own (trap 15): the Visibility
+             below belongs to this window's tab machinery, which SelectTab drives and no
+             block knows about.
 
-            <CheckBox x:Name="HideAltTabCheck" Margin="0,8,0,0"
-                      Checked="OnHideAltTabToggled" Unchecked="OnHideAltTabToggled">
-                <TextBlock Text="Keep EQBuddy out of the Alt+Tab switcher" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock x:Name="HideAltTabNote" Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <CheckBox x:Name="KeepAboveCheck" Margin="0,10,0,0"
-                      Checked="OnKeepAboveToggled" Unchecked="OnKeepAboveToggled">
-                <TextBlock Text="Keep EQBuddy above fullscreen overlays (Lossless Scaling and kin)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Overlay apps created after EQBuddy land above it in Windows' always-on-top pile, hiding the widget; this quietly re-lifts every EQBuddy window every few seconds. Untick if your screen-capture setup shows the widget twice (a real copy plus the captured one)."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <TextBlock Text="Global hotkeys" FontSize="12" FontWeight="SemiBold" Margin="0,14,0,0"
-                       Foreground="{DynamicResource TextBrush}"/>
-            <TextBlock Text="Nothing is bound until you bind it. A bound key is claimed system-wide while EQBuddy runs — it will stop reaching the game and every other app — so pick combos nothing else uses (Ctrl+Alt+… is usually safe). Click a box, press your keys; ✕ unbinds."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="0,2,0,4"/>
-            <StackPanel x:Name="HotkeysPanel" Margin="0,2,0,0"/>
-
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <TextBlock Text="Regen heals about" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextBrush}"/>
-                <TextBox x:Name="RegenPerTickBox" Width="48" Margin="6,0,6,0" FontSize="12"
-                         TextAlignment="Right" LostFocus="OnRegenPerTickChanged"
-                         Background="{DynamicResource PanelBrush}" Foreground="{DynamicResource TextBrush}"
-                         BorderBrush="{DynamicResource BorderBrush}"/>
-                <TextBlock Text="hp per tick (blank = wiki base)" FontSize="12" VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </StackPanel>
-            <TextBlock Text="Hymn of Restoration and similar regen ticks never log an amount, so their healing is estimated. The wiki knows the unamplified base (Hymn: 9), but instruments and ranks raise the real number — read yours off the heal text over your head and type it here. Your number wins."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-            <CheckBox x:Name="TruncateCheck" Margin="0,12,0,0"
-                      Checked="OnTruncateChanged" Unchecked="OnTruncateChanged">
-                <TextBlock Text="Auto-empty finished-session logs" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="Turn off if you use GINA/GamParse or upload your log files elsewhere — they will grow forever, so clean them up yourself occasionally. (Cleanup already stands down whenever the game, GINA, or GamParse is running.)"
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-            <CheckBox x:Name="ArchiveCheck" Margin="20,6,0,0"
-                      Checked="OnArchiveChanged" Unchecked="OnArchiveChanged">
-                <TextBlock Text="Keep a timestamped copy before emptying (Logs\archive)" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="On by default: each finished session is saved as eqlog_name_server_YYYYMMDDHHMMSS.txt — the stamp is when the session ended — and Reset session splits the log here rather than letting it run on. Archives are yours to keep or clean up; EQBuddy never deletes them. Untick if you would rather have the disk space back."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="40,2,0,0"/>
-            <TextBlock Text="Each finished session is saved as eqlog_name_server_YYYYMMDDHHMMSS.txt — the stamp is when the session ended. Archives are yours to keep or clean up; EQBuddy never deletes them."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="40,2,0,0"/>
-
-            <CheckBox x:Name="TutorialCheck" Margin="0,10,0,0"
-                      Checked="OnTutorialToggled" Unchecked="OnTutorialToggled">
-                <TextBlock Text="Show quick tutorial at launch" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-
-            <CheckBox x:Name="PerfStatsCheck" Margin="0,10,0,0"
-                      Checked="OnPerfStatsToggled" Unchecked="OnPerfStatsToggled">
-                <TextBlock Text="Show EQBuddy's own CPU &amp; memory in the title bar" FontSize="12"
-                           Foreground="{DynamicResource TextBrush}"/>
-            </CheckBox>
-            <TextBlock Text="A small dim readout (&quot;0.3% · 84 MB&quot;) refreshed every few seconds — CPU is the share of ALL cores. Diagnostic honesty: if EQBuddy ever hogs your machine, this is how you catch it and tell us."
-                       Style="{StaticResource Dim}" TextWrapping="Wrap" Margin="20,2,0,0"/>
-
-        </StackPanel>
+             The one thing the WINDOW still does for this block is ROUTE a key press to
+             it — see OnPreviewKeyDown. A recorder rebuilds its own row on click, so
+             nothing inside this panel has focus when the gesture arrives. -->
+        <StackPanel x:Name="TabBehaviorPanel" Visibility="Collapsed"/>
 
         </Grid>
         </ScrollViewer>

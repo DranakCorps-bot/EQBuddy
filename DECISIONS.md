@@ -17,6 +17,34 @@ history of the call stays readable. If vetoes become common, the consequence lis
 
 ---
 
+## 2026-09-05 (E-3 lane D / SR-1 — the Look and Behavior blocks leave OptionsWindow)
+
+- **The Behavior tab's duplicated log-archive paragraph says it ONCE now** · could have been
+  carried across verbatim, which is what a lift is supposed to do, and filed as pre-existing ·
+  deduplicated, because the second copy was a strict SUBSET of the first, rendered directly
+  under it, and the block now serves two hosts — carrying it would have shipped one editing
+  accident twice, in two places, and made it that much harder to notice. Named in the 2.0.0
+  What's-new entry. `EQBuddy/SettingsBehaviorView.BuildLogHousekeeping`.
+- **The hotkey recorder's key capture is a METHOD the host forwards to, not a handler the block
+  attaches** · could have focused the rebuilt recorder button so `PreviewKeyDown` tunnels
+  through the block's own panel, which would have made the block wholly self-contained ·
+  forwarded, because focusing a control the block just rebuilt is a behaviour change I cannot
+  verify on screen this pass (SA-4 holds it) and a recorder that silently stops recording is
+  invisible to a build, a test and a screenshot. The block keeps every DECISION; the host keeps
+  the route, like the resize grips it also kept. Asserted on both sides with a negative.
+  `SettingsBehaviorView.HandleRecordingKey` / `OptionsWindow.OnPreviewKeyDown`.
+- **"Widget size" and "Whole-widget opacity" were relabelled rather than left alone** · the
+  ban's own scope line exempts v1 `OptionsWindow`, so leaving them was defensible · relabelled,
+  because a block serving two hosts has ONE string set and it has to pass in shell scope —
+  lifting a block IS its vocab sweep (Fable's SR series, signed). They get a What's-new line in
+  the same breath, because a label a player hunts for is #219's shape in miniature.
+- **`AltTabPolicy` and `MobileAlertSounds` joined `ShellTerminologyTests.ShellStringSources`** ·
+  could have stopped at the two new block files, which is what SR-1 item 3 asks for · widened,
+  because the Behavior block PRINTS those consts and no tier of that guard could see them: the
+  block's own scan reads an identifier and learns nothing. One of the two was carrying a banned
+  word at its source.
+
+
 ## 2026-09-05 (F2 / SA-3 — net-new deadline chips: watch-fire and buff-expiring)
 
 - **The watch-fire chip is gated on the rule's own `AlertBanner`** · could have fired on every
