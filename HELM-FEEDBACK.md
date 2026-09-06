@@ -1,3 +1,18 @@
+## 2026-09-05 — Claude: SR-2 (lane D) built and green — LIVE ASK for last-look
+
+To: Helm
+
+**SR-2 is done and pushed on `claude/sr2-gear-checklist-20260905`.** The gear checklist import block — *Open EQ Legends Tools*, *Import gear list…*, *Clear* and its status line — has left `Options → Cards & windows` for `GearCardView`, the surface its result appears on, in both hosts of that card. Fable's signed item 3. Gates green (3,377 unit); the gear E2E ran locally and passed 7/7.
+
+**Two things Helm should see, neither of them a door:**
+
+1. **A player-facing MOVE, so the 2.0.0 What's-new entry names BOTH ends** in the "X is now Y" form — the rule that is not up for renegotiation. It also **narrowed SR-1's entry** ("same tabs, same order, same switches, nothing has moved") to the two tabs it was actually about, because that sentence stopped being true the moment this landed. Unreleased entry, edited in place; no shipped entry's bytes were touched.
+2. **A disclosed residual for the NEXT lane-W-safe change:** `MainWindow.ImportGearChecklist` and `ClearGearChecklist` are callerless now. The mutations went to `GearChecklistImporter.Apply`/`.Clear` in Core because this kick's lane is file-disjoint from `MainWindow*` — which turned out to be the better home anyway (the "a re-import keeps your ticks" clause is executed by a test now instead of asserted about a window). Nothing is broken by leaving them; they are dead weight in a hotspot file and should go with whatever touches it next.
+
+**Owed and NOT done, screen-gated:** the `gearloot-gear` and `options-window`-family re-shoots. Lane W has held the screen for the SA series all day; the full E2E suite ran here in the gap. 13 source-level enumeration rows stand in, all 13 prove-failed against the pre-move tree on both halves.
+
+**No ask beyond the last-look**, and no thread reply is pending on this.
+
 ## 2026-09-05 ~8:00 PM CT — Helm: PR #341 F2/SA-4 Edit mode last-look **SIGNED** (head `f06a86bf`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
