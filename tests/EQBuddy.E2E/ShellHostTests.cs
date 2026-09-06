@@ -297,6 +297,17 @@ public class ShellHostTests
     // inside it (`ShellPages.Rooms(Home)` is empty — four blocks on one page IS the room),
     // so there is no tab key to land on and `shellPage` is what there is to check.
     [InlineData("home", "shellPage", "home")]
+    // SR-5's room, and the last row of the rail. The four keys are `SettingsSurface`'s;
+    // `settings:cards` is the v1 Options tab TAG kept as an alias, so a saved `OptionsTab`,
+    // an old script line and an old habit all land on the tab that content is actually on
+    // rather than nowhere — the same courtesy `gear:wishlist` and `world:misc` already carry,
+    // and the reason those two rows above look like typos and are not.
+    [InlineData("settings", "shellSettingsTab", "look")]
+    [InlineData("settings:look", "shellSettingsTab", "look")]
+    [InlineData("settings:alerts", "shellSettingsTab", "alerts")]
+    [InlineData("settings:hud", "shellSettingsTab", "hud")]
+    [InlineData("settings:cards", "shellSettingsTab", "hud")]
+    [InlineData("settings:behavior", "shellSettingsTab", "behavior")]
     public void EveryLandedRoomIsReachableByItsOwnAddress(string address, string key, string room)
     {
         using var app = new AppHarness(environment: OpenOn(address));
@@ -1096,5 +1107,182 @@ public class ShellHostTests
         app.WaitForDump("shellRoomFills", "1",
             $"the {address} room to fill the cell the host gave it");
         Assert.Equal(0, app.DumpValue(emptyKey));
+    }
+
+    // ---- SR-5: the Settings room --------------------------------------------------
+
+    /// <summary>
+    /// **The seventh room, and the only one with NO whole-room empty — which is why it gets
+    /// its own row rather than joining the theory above.**
+    ///
+    /// Every other room can be about nothing (no character, no session, no bags) and
+    /// collapses to an explanation; Settings configures the tool rather than the character,
+    /// so every control on it is meaningful on a profile that has never seen a log line. A
+    /// `shell*Empty` key would have nothing to report, and asserting a key that does not
+    /// exist is `Assert.Equal(0, 0)` wearing a room's name (trap 39).
+    ///
+    /// `shellRoomFills` still applies and is the half worth keeping: it is asked against the
+    /// shell's CELL rather than the room's own host, so it is a relationship rather than a
+    /// number and holds on a 1024×768 runner as readily as on a desk.
+    /// </summary>
+    [Fact]
+    public void TheSettingsRoomFillsItsCellAndDrawsAllFourTabsWithTheAlertFamiliesUnderThem()
+    {
+        using var app = new AppHarness(environment: OpenOn("settings"));
+        app.Launch();
+
+        app.WaitForDump("shellSettingsTab", "look", "the shell to land on the Settings room");
+        app.WaitForDump("shellRoomFills", "1",
+            "the Settings room to fill the cell the host gave it");
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        Assert.Equal(SettingsSurface.Tabs().Count, app.DumpValue("shellSettingsTabs"));
+        // **The sub-strip is BUILT from a tab that is not showing it**, which is the
+        // assertion that says it exists rather than that Alerts happened to be selected. A
+        // strip built lazily would report 0 here and 4 one address later, and only the
+        // second number would ever be looked at.
+        Assert.Equal(AlertSurface.Tabs().Count, app.DumpValue("shellSettingsFamilies"));
+        // ONE room built, not seven — the lazy dictionary's own claim, and it matters most
+        // for this room: it is the most expensive to construct (four blocks, the whole of
+        // what opening Options costs).
+        Assert.Equal(1, app.DumpValue("shellRooms"));
+    }
+
+    /// <summary>
+    /// **The two-level address, walked**: `settings:crowd` is an `AlertSurface` key, not a
+    /// `SettingsSurface` one, and it has to land on the Alerts tab AND on the Crowd family.
+    ///
+    /// That reuse — rather than a third address level (`settings:alerts:crowd`) — is only
+    /// sound while the two key tables are disjoint, which `ShellNavigationTests` asserts
+    /// without an app. What only a launched app can say is that the ROOM did it: "the tables
+    /// do not collide" and "the fallthrough is wired" are different claims, and the gap
+    /// between them is trap 42, which cost two builds to learn once already.
+    ///
+    /// The failure it catches photographs perfectly — a room on the right tab showing the
+    /// wrong family looks exactly like a room on the right tab.
+    /// </summary>
+    [Theory]
+    [InlineData("settings:crowd", "crowd")]
+    [InlineData("settings:buffs", "buffs")]
+    [InlineData("settings:spawns", "spawns")]
+    // `tracked` is the Watch family's key and is NOT a typo: it is the settings key the
+    // Watch card has always used, kept so the fold that made it a tab needed no migration.
+    [InlineData("settings:tracked", "tracked")]
+    [InlineData("settings:watch", "tracked")]
+    public void AnAlertFamilyKeyLandsOnTheAlertsTabAndInsideIt(string address, string family)
+    {
+        using var app = new AppHarness(environment: OpenOn(address));
+        app.Launch();
+
+        app.WaitForDump("shellSettingsFamily", family, $"the shell to land on {address}");
+        // The page half AND the tab half: an address that set the family without moving to
+        // Alerts would leave the player looking at Look.
+        Assert.Equal("settings", app.DumpText("shellPage"));
+        Assert.Equal("alerts", app.DumpText("shellSettingsTab"));
+    }
+
+    /// <summary>
+    /// **Two hosts of one settings surface must report the same numbers — and this pair is
+    /// the reason the SR series lifted blocks instead of building a room beside a live
+    /// window.**
+    ///
+    /// `OptionsWindow` and the Settings room compose the SAME four blocks. Every key below is
+    /// the SAME string those blocks hand both hosts, re-keyed mechanically
+    /// (`ShellDumpFacts.Prefixed`) under `options*` and `shellSettings*` — so this comparison
+    /// could not have been written at all if either side reported hand-written copies of the
+    /// numbers (trap 58, and trap 33 one level up). The alternative the plan rejected — two
+    /// copies of roughly forty control wirings — would render perfectly on both hosts and
+    /// drift from the first commit that touched one of them, which is #210's mechanism with a
+    /// bigger surface.
+    ///
+    /// **Both are open at once, on purpose.** That is trap 45's condition: a WPF `UIElement`
+    /// has exactly one parent, so a block shared between the two would be torn out of
+    /// whichever painted it last — silently, with no exception to point at — and one side of
+    /// each equality below would go to zero.
+    ///
+    /// A floor before the equalities, per trap 39: two hosts that both built NOTHING would
+    /// agree perfectly and prove nothing, and zero is precisely what a lost block reports.
+    /// </summary>
+    [Fact]
+    public void TheShellAndTheOptionsWindowAgreeAboutTheSameSettings()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "settings:hud",
+            ["EQBUDDY_OPTIONS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellSettingsTab", "hud", "the shell to land on the HUD tab");
+        app.WaitForDumpAtLeast("optionsHudPanels", 1,
+            "the v1 Options window to build its own copy of the same block");
+
+        // The HUD block: the panel list, the "no longer on the widget" companion, the mini
+        // dashboard and the floating-window list.
+        Assert.Equal(app.DumpValue("optionsHudPanels"), app.DumpValue("shellSettingsHudPanels"));
+        Assert.Equal(app.DumpValue("optionsHudStats"), app.DumpValue("shellSettingsHudStats"));
+        Assert.Equal(app.DumpValue("optionsHudWindows"), app.DumpValue("shellSettingsHudWindows"));
+        // **`hudRetired` is the row a screenshot could never supply.** #335's "no longer on
+        // the widget" list is the ONLY thing on either host naming the six surfaces that left
+        // the HUD, and an absent panel photographs as an unremarkable list (trap 29/34). It
+        // is counted as DRAWN on both sides, not read off a static, so two hosts that had
+        // both failed to render it would disagree with the floor rather than with each other.
+        Assert.True(app.DumpValue("shellSettingsHudRetired") >= 1,
+            $"the room drew no retired rows; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("optionsHudRetired"),
+            app.DumpValue("shellSettingsHudRetired"));
+
+        // The Look block.
+        Assert.True(app.DumpValue("shellSettingsLookPalettes") >= 1,
+            $"the room's palette picker is empty; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("optionsLookPalettes"),
+            app.DumpValue("shellSettingsLookPalettes"));
+        Assert.Equal(app.DumpValue("optionsLookSwatches"),
+            app.DumpValue("shellSettingsLookSwatches"));
+
+        // The Behavior block — and `behaviorHotkeys` is the one with a wiring behind it: the
+        // hotkey rows are the only piece of this surface a HOST has to help with (the key
+        // route), so a host that composed the block and forgot the route would have rows on
+        // screen that silently never record.
+        Assert.True(app.DumpValue("shellSettingsBehaviorHotkeys") >= 1,
+            $"the room drew no hotkey rows; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("optionsBehaviorHotkeys"),
+            app.DumpValue("shellSettingsBehaviorHotkeys"));
+
+        // The Alerts block, all four families built on both hosts — the window stacks them
+        // across two tabs and the room pages them behind one sub-strip, and they agree on
+        // the COUNT because both compose the whole surface up front.
+        Assert.Equal(AlertSurface.Tabs().Count, app.DumpValue("shellSettingsAlertsBlocks"));
+        Assert.Equal(app.DumpValue("optionsAlertsBlocks"),
+            app.DumpValue("shellSettingsAlertsBlocks"));
+        Assert.Equal(app.DumpValue("optionsAlertsRuleRows"),
+            app.DumpValue("shellSettingsAlertsRuleRows"));
+        Assert.Equal(app.DumpValue("optionsAlertsRules"),
+            app.DumpValue("shellSettingsAlertsRules"));
+    }
+
+    /// <summary>
+    /// **`OptionsWindow` is not retired by this PR, and its door still works** — the signed
+    /// out-list, asserted rather than assumed, and the same row the History studio already
+    /// carries beside the Progress room's career tab. I-9's standing rule is that landing a
+    /// room is separate from, and earlier than, retiring the surface it replaces; a PR that
+    /// quietly broke the v1 window would take every player's only real settings screen with
+    /// it, because the shell has no player door at all (`EQBUDDY_SHELL` is the only way in).
+    /// </summary>
+    [Fact]
+    public void TheV1OptionsWindowStillOpensBesideTheSettingsRoom()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "settings:behavior",
+            ["EQBUDDY_OPTIONS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellSettingsTab", "behavior", "the room to land on Behavior");
+        // The window opened and is on its own saved tab, which the room neither reads nor
+        // writes: the v1 keys are look/alerts/watch/cards/behavior and the room's are
+        // look/alerts/hud/behavior, so a room that persisted "hud" would send the WINDOW home
+        // to Look on its next open — one host silently editing the other's landing.
+        app.WaitForDump("optionsTab", "look", "the v1 window on its own untouched saved tab");
     }
 }

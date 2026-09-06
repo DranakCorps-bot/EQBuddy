@@ -83,6 +83,24 @@ internal sealed class SettingsHudView
     /// switch.</summary>
     public UIElement Block => _block ??= Build();
 
+    /// <summary>
+    /// This instance's facts for the <c>EQBUDDY_EXPAND</c> dump, in the block's OWN
+    /// vocabulary — see <see cref="SettingsLookView.DebugFacts"/> for why the host, not the
+    /// block, adds the prefix (trap 58) and why these are counted off BUILT controls.
+    ///
+    /// <c>hudRetired</c> is the row with the most behind it: the "no longer on the widget"
+    /// companion is #335's answer to the Options gap, it is the ONLY thing on either host
+    /// naming six surfaces that left the HUD, and an absent panel photographs as an
+    /// unremarkable list (trap 29/34). A comparison of the two hosts is what says the room
+    /// kept it.
+    /// </summary>
+    public string DebugFacts() => _block is null
+        ? ""
+        : $"hudPanels={_cards.Children.Count} " +
+          $"hudRetired={_retiredRows} " +
+          $"hudStats={_miniStats.Children.Count} " +
+          $"hudWindows={_breakouts.Children.Count}";
+
     private StackPanel _cards = null!;
     private WrapPanel _miniStats = null!;
     private WrapPanel _breakouts = null!;
@@ -319,6 +337,10 @@ internal sealed class SettingsHudView
     /// </summary>
     private void BuildRetired()
     {
+        // Counted as DRAWN, not as `OverlaySections.Retired.Count` — a fact read off a
+        // static list would be the same number from both hosts whether either of them had
+        // rendered a row or not, which is a guard that cannot fail (trap 34/39).
+        _retiredRows = 0;
         if (OverlaySections.Retired.Count == 0) return;
 
         var heading = new TextBlock
@@ -332,8 +354,15 @@ internal sealed class SettingsHudView
         _cards.Children.Add(Meta(OverlaySections.RetiredBlurb, top: 0));
 
         foreach (var gone in OverlaySections.Retired)
+        {
             _cards.Children.Add(Meta(gone.Line, top: 2));
+            _retiredRows++;
+        }
     }
+
+    /// <summary>How many "no longer on the widget" rows this instance last DREW. See
+    /// <see cref="DebugFacts"/>.</summary>
+    private int _retiredRows;
 
     private static TextBlock Meta(string text, double top)
     {

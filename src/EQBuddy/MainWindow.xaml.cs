@@ -849,7 +849,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         RefreshUi();
     }
 
-    private OptionsWindow? _optionsWindow;
+    internal OptionsWindow? _optionsWindow;   // internal: WidgetDump reads DebugFacts() off this
 
     /// <summary>For pre-feature installs with no baseline: pretend they saw everything
     /// before the running version, so they get exactly one version's worth of notes.</summary>

@@ -141,6 +141,25 @@ internal sealed class SettingsAlertsView
         _ => throw new ArgumentOutOfRangeException(nameof(tab), tab, "Not an alert tab."),
     };
 
+    /// <summary>
+    /// This instance's facts for the <c>EQBUDDY_EXPAND</c> dump, in the block's OWN
+    /// vocabulary — see <see cref="SettingsLookView.DebugFacts"/> for why the host, not the
+    /// block, adds the prefix (trap 58) and why the counts come off BUILT controls.
+    ///
+    /// <c>alertsBlocks</c> is how many of the four families this instance has actually
+    /// built, which is the honest way to compare two hosts that arrange them differently:
+    /// <c>OptionsWindow</c> stacks all four across two tabs and the shell's Settings room
+    /// pages them behind one sub-strip, so the two agree on this number only once both have
+    /// composed the whole surface — and disagreeing is the finding, not the bug.
+    /// </summary>
+    public string DebugFacts() => _header is null
+        ? ""
+        : $"alertsTabs={Tabs().Count} " +
+          $"alertsBlocks={new[] { _watch, _buffs, _spawns, _crowd }.Count(b => b is not null)} " +
+          $"alertsRuleRows={(_watch is null ? 0 : _rulesPanel.Children.Count)} " +
+          $"alertsRules={_vm.Rules.Count} " +
+          $"alertsBuffSets={BuffSetBucketCount()}";
+
     // ================================================================ shared header ====
 
     private ComboBox _soundCombo = null!;

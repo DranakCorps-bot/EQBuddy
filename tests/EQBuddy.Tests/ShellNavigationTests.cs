@@ -99,25 +99,37 @@ public class ShellNavigationTests
     /// **PR 5 landed Live, and it slotted itself SECOND for the same reason.** `RailOrder`
     /// has had Live between Home and Progress since PR 1, so nothing about the rail was
     /// edited to place it — a build that appended Live at the bottom would be identical to a
-    /// healthy one everywhere except this line and the `shell-live` screenshot.</summary>
+    /// healthy one everywhere except this line and the `shell-live` screenshot.
+    ///
+    /// **SR-5 landed Settings, LAST and below the gap, and it too placed itself.**
+    /// `RailOrder` has had it in that position since PR 1 and `BelowTheGap` has answered
+    /// true for it just as long, so the room joining this list put its row under the rail's
+    /// divider with nothing about the rail edited.</summary>
     [Fact]
-    public void SixRoomsHaveLandedSoFar() =>
+    public void SevenRoomsHaveLandedSoFar() =>
         Assert.Equal(
             [ShellPage.Home, ShellPage.Live, ShellPage.Progress,
-             ShellPage.Gear, ShellPage.Quests, ShellPage.World],
+             ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings],
             ShellPages.Landed);
 
-    /// <summary>The one that has NOT landed, named — because "which rooms are missing"
-    /// is the question a reader of `Landed` actually has, and a positive list cannot
-    /// answer it. It is held back by a decision rather than by effort: Settings is a room
-    /// whose whole job is not being a launcher.
+    /// <summary>
+    /// **Every room in the enum has landed, as of SR-5 — and this replaces the row that used
+    /// to name the one that had not.**
     ///
-    /// **Live left this list in PR 5**, which is exactly what it was written to make into a
-    /// deliberate edit rather than a line someone slid in.</summary>
-    [Theory]
-    [InlineData(ShellPage.Settings)]
-    public void TheRoomsThatHaveNotLandedDrawNoRailRow(ShellPage page) =>
-        Assert.DoesNotContain(page, ShellPages.Landed);
+    /// That row was a `[Theory]` with a single `InlineData(ShellPage.Settings)`, written so
+    /// that a room leaving the "not landed" list would be a deliberate edit rather than a
+    /// line someone slid in. Deleting it outright would have taken the QUESTION with it, and
+    /// "which rooms are missing" is what a reader of `Landed` actually wants to know — so it
+    /// is inverted rather than dropped: the answer today is "none", asserted, and the day a
+    /// NEW page joins `ShellPage` without a room this fails and says which.
+    ///
+    /// `Landed` therefore stops being a filter and is kept anyway. It is what `BuildRail`
+    /// and Home's deep-links block both read, and a list that happens to be complete is not
+    /// the same as one nobody has to maintain.
+    /// </summary>
+    [Fact]
+    public void NoRoomIsMissingAnyMore() =>
+        Assert.Equal(ShellPages.RailOrder, ShellPages.Landed);
 
     /// <summary>Settings is the one page under the rail's gap, at every width.</summary>
     [Fact]
@@ -185,6 +197,14 @@ public class ShellNavigationTests
                         ? QuestSurface.KeyFor(t) : null,
                     ShellPage.World => WorldSurface.TabForKey(key) is { } t
                         ? WorldSurface.KeyFor(t) : null,
+                    // SR-5. Three of these four keys are the v1 Options tab tags on purpose
+                    // (`look`, `alerts`, `behavior`) — they are already in players' saved
+                    // `OptionsTab`, in `scripts/shoot.ps1` and in docs — and the fourth is
+                    // `hud`, the signed replacement for a name the ban retires. Same rule as
+                    // every row above: the shell maps the surface's spelling and never
+                    // invents one.
+                    ShellPage.Settings => SettingsSurface.TabForKey(key) is { } t
+                        ? SettingsSurface.KeyFor(t) : null,
                     _ => null,
                 };
                 Assert.Equal(key, resolved);
@@ -197,10 +217,16 @@ public class ShellNavigationTests
     }
 
     /// <summary>The negative that keeps the row above from going vacuous (trap 39): a
-    /// page with no room list answers empty rather than answering something.</summary>
+    /// page with no room list answers empty rather than answering something.
+    ///
+    /// **It asked about Settings until SR-5**, when Settings gained four rooms of its own —
+    /// so it now asks about Home, which is the page that genuinely has none: four blocks on
+    /// one page IS the room, and there is nothing for an address's room half to name. The
+    /// loop above skips Home for exactly that reason, so without this row that skip would be
+    /// the only thing asserting it.</summary>
     [Fact]
     public void APageWithNoRoomsInsideItAnswersEmpty() =>
-        Assert.Empty(ShellPages.Rooms(ShellPage.Settings));
+        Assert.Empty(ShellPages.Rooms(ShellPage.Home));
 
     /// <summary>The room list is the surface's, not a copy of it — asserted against the
     /// COUNT each Core definition reports, so a room added to a surface reaches the
@@ -212,7 +238,63 @@ public class ShellNavigationTests
         Assert.Equal(LootSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Gear).Count);
         Assert.Equal(QuestSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Quests).Count);
         Assert.Equal(WorldSurface.Tabs().Count, ShellPages.Rooms(ShellPage.World).Count);
+        Assert.Equal(SettingsSurface.Tabs().Count, ShellPages.Rooms(ShellPage.Settings).Count);
     }
+
+    // ---- 2d. the Settings room's two-level address (SR-5) -----------------------
+
+    /// <summary>
+    /// **`settings:crowd` has to land on Alerts → Crowd, and the only thing that makes that
+    /// possible is the two key tables being DISJOINT.**
+    ///
+    /// The room resolves an address through `SettingsSurface.TabForKey` first and falls
+    /// through to `AlertSurface.TabForKey`, reusing the key grammar the alert families
+    /// already have rather than inventing a third address level (`settings:alerts:crowd`).
+    /// That reuse is only sound while no key is claimed on both sides: a `SettingsSurface`
+    /// row that answered "crowd" would swallow the sub-tab half of the address silently, and
+    /// the symptom is a room that lands on the right tab showing the wrong family — which
+    /// photographs perfectly.
+    ///
+    /// Asserted rather than left as a comment on the resolver, and in both directions.
+    /// </summary>
+    [Fact]
+    public void NoAlertFamilyKeyIsAlsoASettingsTabKey()
+    {
+        foreach (var family in AlertSurface.Tabs())
+        {
+            Assert.Null(SettingsSurface.TabForKey(family.Key));
+            // And the fallthrough half: the family key still resolves on its own side, so
+            // the room has something to fall through TO.
+            Assert.Equal(family.Tab, AlertSurface.TabForKey(family.Key));
+        }
+
+        foreach (var tab in SettingsSurface.Tabs())
+            Assert.Null(AlertSurface.TabForKey(tab.Key));
+    }
+
+    /// <summary>The v1 Options tab tags still land somewhere true. Three of the four ARE the
+    /// room's own keys; `cards` is the one that changed name, and an old saved `OptionsTab`,
+    /// an old script or an old doc line reaching for it should reach the tab that content is
+    /// on rather than nowhere — the same rule `LootSurface` follows for "locker".</summary>
+    [Theory]
+    [InlineData("look", SettingsTab.Look)]
+    [InlineData("alerts", SettingsTab.Alerts)]
+    [InlineData("cards", SettingsTab.Hud)]
+    [InlineData("hud", SettingsTab.Hud)]
+    [InlineData("behavior", SettingsTab.Behavior)]
+    public void TheOldOptionsTabTagsStillResolve(string key, SettingsTab tab) =>
+        Assert.Equal(tab, SettingsSurface.TabForKey(key));
+
+    /// <summary>And the negative, so the row above cannot go vacuous: an unknown key
+    /// answers null rather than the default tab. A resolver that snapped to Look would make
+    /// every typo a silent navigation to somewhere the caller did not ask for.</summary>
+    [Theory]
+    [InlineData("")]
+    [InlineData("  ")]
+    [InlineData("nowhere")]
+    [InlineData(null)]
+    public void AnUnknownSettingsKeyResolvesToNothing(string? key) =>
+        Assert.Null(SettingsSurface.TabForKey(key));
 
     /// <summary>
     /// **Progress is the ONE room whose list is not a straight read of its surface**, and it

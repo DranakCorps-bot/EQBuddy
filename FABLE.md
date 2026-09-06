@@ -652,35 +652,65 @@ contract, SA-1's precedent. **The SA-2 gate is discharged: #337 merged at `d8f88
   facts. Both need the screen and SA-3 holds it (trap 61). 43 source-level assertions stand
   in; all 39 trap-26 enumeration rows prove-fail against the pre-lift tree.
 
-### SR-5 — the Settings room lands (S lane; after SR-1/SR-3/SR-4; SR-2 independent)
+### SR-5 — TAKEN 2026-09-06, built and green (Claude, lane S)
 
-1. New `EQBuddy/SettingsRoom.cs : IShellRoom`, built with `_main` like every room; composes
-   FRESH instances of the four tabs' blocks under Look / Alerts / HUD / Behavior. New Core
-   `SettingsSurface` (labels/keys `look`/`alerts`/`hud`/`behavior`) so `ShellPages.Rooms`
-   maps and does not translate; `ShellNavigationTests` round-trips it like every other room.
-2. **`ShellPages.Landed` gains Settings in this same PR** — the registry's own rule ("a room
-   joins this list in the same PR that lands it"). `Describe`, icon and the below-the-gap
-   row already exist.
-3. The `IShellRoom` contract answered explicitly: `Release()` empty-with-reason unless a
-   lifted block holds something (the hotkey-capture rows are the ones to check);
-   `ApplyLayout` empty-with-reason (single-column); the room-level empty wrapper
-   deliberately NOT used — Settings always has content, stated on the implementation.
-4. `SetTab` resolves the four `SettingsSurface` keys, with `AlertSurface.TabForKey` as a
-   fallthrough that lands `settings:crowd` on Alerts → Crowd — reusing the existing key
-   grammar rather than inventing a third address level.
-5. Facts: `ShellDumpFacts.Prefixed("shellSettings", …)` (trap 58); E2E asserts room
-   presence, tab landing, and — the comparison trap 58 exists for — that a block reports
-   the same facts from both hosts while both are open.
-6. **Terminology: this is where the signed "vocab sweep before shell land" lands
-   structurally.** `SettingsRoom.cs` + `SettingsSurface` join the curated list; the scanner
-   over everything the room composes is the sweep, in the gate PR rather than as a separate
-   pass — every string the room can show has passed the ban by construction of SR-1/3/4.
-7. Shots: new `shell-settings-<tab>` names checked against `docs/screenshots/` and a docs
-   grep first (trap 21); staged states seeded — rules for Watch (the `tracked-card` staging
-   already matches the fixture log), a buff set, a gear checklist (trap 22); predictions in
-   writing (trap 23); the BATCH runs under the screen lock.
-8. `OptionsWindow` stays unretired, unrenamed, fully working beside the room — retirement
-   is I-9-shaped, later, with its own gates.
+Its eight steps are struck rather than left to be re-read as pending — the take-then-delete
+contract, SR-1's, SR-2's, SR-3's and SR-4's precedent. **The SR series is complete**; what is
+left in the arc is `OptionsWindow`'s retirement, which is I-9-shaped and has its own gates.
+
+**What landed** (`EQBuddy/SettingsRoom.cs` 331 lines, `EQBuddy.Core/SettingsSurface.cs` 124;
+`ShellPages` gains Settings in `Landed` and a `Rooms` row; `OptionsWindow.xaml.cs` 326 → 348;
+`tests/EQBuddy.Tests/SettingsRoomTests.cs` and 5 new E2E rows):
+
+- **It is a COMPOSITION, not a move, a lift, a build or a merge** — the first room of its kind,
+  and the reason the four blocks came out first. Four tabs against the window's five (Bevel §2:
+  Watch and Alerts were never two subjects), so the alert families arrive as ONE tab with a
+  sub-strip under the shared sound header they all override. Both hosts build their own
+  instances (trap 45) over the widget's ONE `AppSettings` (trap 13), asserted on both sides.
+- **Item 5 needed a half the plan did not name, and it is the half that made the comparison
+  possible at all: the v1 window had NO dump facts.** `OptionsWindow.DebugFacts()` is new,
+  re-keying the SAME four block strings under `options*` the way the room re-keys them under
+  `shellSettings*` — so `optionsHudPanels` beside `shellSettingsHudPanels` is a comparison
+  rather than a collision (trap 58). It cost one word in lane W's file
+  (`private` → `internal` on `_optionsWindow`, ZERO net lines, which matters at one line of
+  headroom) plus a `WidgetDump` row; logged in `DECISIONS.md`. Twelve keys are compared with
+  both hosts open, each with a floor first so two hosts that built nothing cannot agree.
+- **Item 3's check found one thing that is NOT nothing, and it is now a retirement blocker.**
+  `Release()` is empty (the blocks hold no timer, token or watcher — the armed hotkey recorder
+  is a string field and the ⤴ "✓" revert is a self-stopping one-shot). But `MainWindow.OnOptions`
+  pairs `AlertTile.EnterPlacement()` with the WINDOW's `Closed`, and a room has no `Closed` —
+  it is navigated away from. Copying it would strand a draggable tile on the desktop; so the
+  room does not, the divergence is named IN the room the way `GearRoom` names the Loot star,
+  and `SettingsRoomTests` pins the blocker sentence so a retirement cannot take the affordance
+  silently.
+- **Item 4's fallthrough created an obligation the plan did not state, so it is asserted:**
+  reusing `AlertSurface`'s keys is only sound while the two tables are DISJOINT, in both
+  directions. A key claimed on both sides would swallow the sub-tab half of `settings:crowd`
+  silently, and a room on the right tab showing the wrong family photographs perfectly.
+  `settings:cards` answers HUD as an alias (the v1 tab tag — nothing renders it, and an old
+  saved `OptionsTab` should land where that content is).
+- **Item 6 landed the word "HUD" structurally**, which SR-3 recorded as still owed.
+  `SettingsRoom.cs` and `EQBuddy.Core/SettingsSurface.cs` joined `ShellStringSources`; the
+  sweep found ONE thing, and it is a wire key rather than a sentence, so it is an exemption row
+  with its reason instead of a rewrite that would break every saved tab choice. **SR-3's
+  flagged tension is unresolved and stays that way on purpose**: `OverlaySections`' retired copy
+  is still not swept, still on #335's sign, and the room renders it verbatim — it is Bevel's to
+  re-ask, not this PR's to settle.
+- **Item 7's staging was smaller than the plan expected, and the reason is SR-2**: the gear
+  checklist import left Options entirely one PR earlier, so there is nothing to seed for it
+  here. Four shots, predictions written first, `shell-settings-{look,alerts,hud,behavior}`.
+  **The four new rows were shot under the screen lock and each was reviewed against its
+  written prediction; the FULL batch did NOT complete** — the session running it died partway
+  through, after the settings rows and before the ~60 that follow them. So **the #332 duty is
+  still owed**, not discharged here, and the next SR/SA PR to hold the screen inherits it.
+  Recorded rather than quietly assumed: a batch that stops early is exactly trap 53's six dark
+  days, and the only thing that makes it visible is someone writing down that it stopped.
+- One executor call worth naming beside the rest: `SettingsRoomTests`' negatives read the
+  source with COMMENTS STRIPPED, because the first draft failed on its own documentation. A
+  room that names what it deliberately does not do is this codebase's convention, and a scan
+  that cannot tell an explanation from a call can only be satisfied by deleting the
+  explanation. The stripper carries its own negative.
+- Gates green at 3,482 unit; E2E 272/272 with the two-host comparison in it.
 
 ### Sequencing, lanes, screen
 

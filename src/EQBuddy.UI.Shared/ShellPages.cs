@@ -97,13 +97,24 @@ public static class ShellPages
     /// Progress, which had been waiting on a room to move INTO since PR 1
     /// (<see cref="ProgressSurface.MovedToLive"/>).
     ///
-    /// **The one still missing is held back by a decision**: Settings is a room whose whole
-    /// job is not being a launcher.
+    /// **SR-5 added Settings, and the list is now the whole enum.** It was the last one
+    /// held back by a decision rather than by effort — *"a room whose whole job is not being
+    /// a launcher"* — and the decision arrived as Bevel's I-11 IA (four tabs: Look, Alerts,
+    /// HUD, Behavior; Helm-signed at #331) with Fable's SR series lifting the v1 tabs into
+    /// host-neutral blocks first, so the room COMPOSES what <c>OptionsWindow</c> composes
+    /// rather than growing a second copy of forty control wirings to drift against it.
+    ///
+    /// **The list stops being a filter today and it is kept anyway**, because it is the
+    /// thing `BuildRail` and Home's deep links both read: the day a NEW room is added to
+    /// <see cref="ShellPage"/> it must not draw a row before it has a room, and a list that
+    /// happens to be complete is not the same as one nobody has to maintain.
+    /// <c>ShellNavigationTests</c> asserts the equality out loud rather than deleting the
+    /// row that used to name what was missing.
     /// </summary>
     public static readonly IReadOnlyList<ShellPage> Landed =
     [
         ShellPage.Home, ShellPage.Live, ShellPage.Progress,
-        ShellPage.Gear, ShellPage.Quests, ShellPage.World,
+        ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings,
     ];
 
     /// <summary>
@@ -159,6 +170,14 @@ public static class ShellPages
         // would be unreachable to exactly the player who most needs to find it.
         ShellPage.Quests => [.. QuestSurface.Tabs().Select(h => (h.Label, h.Key))],
         ShellPage.World => [.. WorldSurface.Tabs().Select(h => (h.Label, h.Key))],
+        // SR-5. A straight read like the four above, and the point of `SettingsSurface`
+        // existing at all: four labels spelled inside the room's WPF file would have made
+        // Settings the one room the palette could not offer and the address grammar could
+        // not reach. The sub-tab half — `settings:crowd` landing on Alerts → Crowd — is NOT
+        // listed here on purpose: that is `AlertSurface`'s own key grammar, resolved by the
+        // room as a fallthrough, and enumerating it here would put four more rows in the
+        // palette that name a place inside a place.
+        ShellPage.Settings => [.. SettingsSurface.Tabs().Select(h => (h.Label, h.Key))],
         _ => [],
     };
 
@@ -225,7 +244,12 @@ public static class ShellPages
         // a room that quietly stops describing itself.
         ShellPage.World =>
             "The zone's map, your camps, spawn timers, how to get there and what drops there.",
-        ShellPage.Settings => "Configure EQBuddy.",
+        // Four clauses for four tabs since SR-5, the same rule World's row above follows:
+        // the rail's tooltip is the room's only copy once the rail collapses to icons, so a
+        // tab that arrives and is not named here is a room that quietly stops describing
+        // itself. It replaced a bare "Configure EQBuddy." the day the room landed.
+        ShellPage.Settings =>
+            "How EQBuddy looks, when it alerts you, what the HUD shows, and how it behaves.",
         _ => "",
     };
 

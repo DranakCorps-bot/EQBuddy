@@ -620,6 +620,110 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_SHELL = 'world:drops'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{}
                            Wiki = $DropsFixtureWiki }
+    # ---- E-3 / SR-5: the SETTINGS room, the seventh and last row of the rail -----------
+    #
+    # NEW names, per trap 21: 'options-window', 'options-cards', 'options-mez' and
+    # 'options-behavior' are all committed, all embedded in docs, and every one of them means
+    # the v1 WINDOW — which this PR does not retire, rename or reshape. Checked
+    # docs/screenshots/ and grepped docs/ for 'shell-settings' first: nothing.
+    #
+    # The illustration lock: a room's shots land in the PR that lands the room, and these are
+    # the four the rail can reach. Nothing here fetches the wiki, and every staged state is
+    # settings-driven, so all four are shot offline.
+    #
+    # PREDICTIONS, written before the run (trap 23/51) — the SHAPE and only the literals the
+    # staging actually pins:
+    #
+    #   All four — a native title bar reading "EQBuddy — Settings" (not "Options", and not a
+    #     bare "EQBuddy": the room is in the title because that is the only thing that tells
+    #     this window from the widget, trap 24 inside one process). The rail shows SEVEN rows
+    #     with labels — Home · Live · Progress · Gear · Quests · World, then a VISIBLE GAP,
+    #     then Settings, lit. That gap is the picture's own assertion: `BelowTheGap` has
+    #     answered true for Settings since PR 1 and until now there was no room to see it
+    #     with. A four-chip strip under the title: Look · Alerts · HUD · Behavior. **The
+    #     third chip must read "HUD" and not "Cards & windows"** — the signed word (Bevel
+    #     I-11 §3) landing structurally, and the one thing in these four pictures that a
+    #     reader should check first.
+    #
+    #   'shell-settings-look' — Look lit, and NO second strip under the main one (the Alerts
+    #     family sub-strip is collapsed on every other tab). Body: "Theme" over a combo
+    #     reading the palette this run was shot in, then four labelled sliders with live
+    #     percentages beside them, the alignment grid and its spacing, the cursor ring.
+    #     **What must NOT be here is the sentence "Drag either side edge to widen this
+    #     window"** — that is about `OptionsWindow`'s resize grips, a room does not have
+    #     them, and SR-1 left it declared beside them in the window's own XAML for exactly
+    #     this moment. Its absence is the only thing in this shot that can disprove that.
+    #
+    #   'shell-settings-alerts' — Alerts lit, and a SECOND strip appears under the first:
+    #     Watch rules · Buffs · Spawns · Crowd control. Badges from `AlertSurface.Tabs()`
+    #     with this profile's real counts, so: Watch rules "3" (the three rules staged
+    #     below, the same three 'tracked-card' seeds), Buffs "0", Spawns "0" (TrackSpawns is
+    #     off in every shot profile), and **Crowd control with NO badge at all** — null means
+    #     "not applicable" where 0 means "none yet, and that is actionable", and a "0" beside
+    #     a tab that configures a switch would read as failure rather than as a default.
+    #     Body: the shared sound/voice/volume/rate header, THEN the Watch rules editor with
+    #     three rows. The header is above the sub-strip's content and drawn once — Bevel §2's
+    #     cross-cutting default, not one family's content — so a second copy of it inside the
+    #     Watch block would be the thing this picture disproves.
+    #     Both strips WRAP (trap 25): the second one carries badges, so its chip widths depend
+    #     on content, and a horizontal StackPanel would clip "Crowd control" off the end with
+    #     no ellipsis. If the fourth chip is missing, that is the bug, not the shot.
+    #
+    #   'shell-settings-hud' — HUD lit, no sub-strip. Body: "What EQBuddy shows" over the
+    #     EIGHT panel rows the widget has since the two HUD cuts (Combat, Healing, Kills &
+    #     Drops, Gear & Loot, Watch, Buffs, Progress, Motes), then "No longer on the widget"
+    #     with the six retired names under it, then "Mini dashboard" and the floating-window
+    #     list. **This is the same body 'options-cards' photographs, in a second host** —
+    #     shot at 100% here rather than that shot's 0.55 zoom, because the shell window is
+    #     tall enough not to need it. The two pictures side by side are the parity claim.
+    #
+    #   'shell-settings-behavior' — Behavior lit, no sub-strip. Body: "EQBuddy Mobile (Beta)"
+    #     and its button first (NOT buried at the bottom), the three hide-when rules with the
+    #     Alt+Tab note, keep-above, the hotkey rows, the regen override, auto-empty +
+    #     archive, the tutorial toggle and the perf readout. **The log-archive explanation
+    #     appears ONCE** — the v1 tab declared it twice, one dim paragraph under a strict
+    #     superset of itself, and SR-1 collapsed it for both hosts; a second copy here would
+    #     mean the collapse did not travel.
+    #
+    # SHOT 2026-09-06, all four 946x633. Every prediction above held: the title, the seven-row
+    # rail with the gap above Settings, the four chips with "HUD" third, the sub-strip on
+    # Alerts alone with badges 3 / 0 / 0 / none, the sound header above the rules editor, the
+    # eight panel rows, and no resize sentence on Look. Two amendments, both to the
+    # PREDICTION rather than to the app:
+    #
+    #   * 'shell-settings-hud' — the retired list is TWO ROWS naming six surfaces ("Quests is
+    #     now the Quest Tracker window — Sky Quest · Epics are tabs in it…", "World is now the
+    #     World window — Travels & Deaths · Zone map · Travel route · Spawn timers are tabs in
+    #     it…"), not six rows. The block was predicted as "the six retired names", which is
+    #     what the LIST says and not what it is SHAPED like; `OverlaySections.Retired` is
+    #     keyed by the cut, one row per cut. The dump agrees (`shellSettingsHudRetired=2`), so
+    #     the number the E2E compares across the two hosts is rows, deliberately.
+    #   * 'shell-settings-alerts' — **the shared header's sentence reads "While Options is
+    #     open, the ★ alert banner tile is visible", on this host too, and that is the KNOWN
+    #     divergence rather than a stale string.** `MainWindow.OnOptions` pairs
+    #     `AlertTile.EnterPlacement()` with the v1 window's `Closed`; a room is navigated to
+    #     and away from rather than opened and closed, so the room does not enter placement
+    #     and the tile is not draggable while you are here. The sentence is true as written —
+    #     it describes Options, which still exists and still works — and rehoming the drag
+    #     target is a named blocker on the commit that retires `OptionsWindow`
+    #     (`SettingsRoom.cs`, `SettingsRoomTests`, flagged to Bevel). If a later pass gives
+    #     the shell a placement affordance, this sentence and this shot both change with it.
+    'shell-settings-look' = @{ Title = 'EQBuddy — Settings'
+                           Env = @{ EQBUDDY_SHELL = 'settings:look' }; Set = @{} }
+    'shell-settings-alerts' = @{ Title = 'EQBuddy — Settings'
+                           Env = @{ EQBUDDY_SHELL = 'settings:alerts' }
+                           Set = @{ TrackedRules = @(
+                                   @{ Id = 'shot-spider'; Name = 'Spider parts'
+                                      Pattern = 'Spider'; Kind = 0 }
+                                   @{ Id = 'shot-bone'; Name = 'Bone chips'
+                                      Pattern = 'Bone Chips'; Kind = 0 }
+                                   @{ Id = 'shot-kills'; Name = 'Giant spiders'
+                                      Pattern = 'giant spider'; Kind = 1 }
+                               ) } }
+    'shell-settings-hud' = @{ Title = 'EQBuddy — Settings'
+                           Env = @{ EQBUDDY_SHELL = 'settings:hud' }; Set = @{} }
+    'shell-settings-behavior' = @{ Title = 'EQBuddy — Settings'
+                           Env = @{ EQBUDDY_SHELL = 'settings:behavior' }; Set = @{} }
     # The PROGRESS theme EXPANDED IN PLACE (Inline themes PR 1). Title is 'EQBuddy' — this
     # is the widget, not the window, which is the whole point of the change. A NEW name,
     # per trap 21: 'progress-card' and 'section-progress' are both embedded in the docs and

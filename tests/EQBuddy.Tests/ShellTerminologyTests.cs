@@ -267,6 +267,19 @@ public class ShellTerminologyTests
         ("EQBuddy/GearRoom.cs", "bags, wishlist, loot"),
         ("EQBuddy/QuestsRoom.cs", "the tracker, Epic and Sky"),
         ("EQBuddy/WorldRoom.cs", "map, camps, path, travels, drops"),
+        // SR-5's room, joining on the day it lands — the rule every row above follows. It
+        // composes the four blocks below rather than declaring copy of its own, which is why
+        // this row is thin: the sweep that matters for this room already ran, block by block,
+        // in SR-1/SR-3/SR-4. This is what stops a sentence being ADDED to it later.
+        ("EQBuddy/SettingsRoom.cs", "the Settings room — its strip, its sub-strip, its empties"),
+        // NOT a shell file — a CORE surface, and the first of its kind on this list for the
+        // same reason `AltTabPolicy` was in SR-1: the four tab labels the Settings room shows
+        // are declared here, and **this is where the signed word "HUD" lands** (Bevel I-11 §3,
+        // the replacement for the "Cards & windows (as a finder)" the ban retires). Tier 1
+        // already reads the LABELS through `ShellPages.Rooms`; this row covers everything
+        // else the file could put on screen tomorrow.
+        ("EQBuddy.Core/SettingsSurface.cs",
+            "the Settings room's four tab labels — Look, Alerts, HUD, Behavior"),
         // NOT a shell file — a SETTINGS BLOCK, and the first row of its kind. The ban's own
         // scope line exempts v1 `OptionsWindow`, but a block that serves two hosts has ONE
         // string set and it has to pass in shell scope: the Evolved shell's Settings room
@@ -378,6 +391,16 @@ public class ShellTerminologyTests
         // wrong token. One row, one word, and no other string in either block needs it.
         ("EQBuddy/SettingsLookView.cs", "Theme",
             "the colour-palette picker's label, not the v1 window-grouping sense of the word"),
+        // **"cards" here is a WIRE KEY, not a sentence.** `SettingsSurface.TabForKey` answers
+        // the v1 Options tab tag so that a saved `OptionsTab`, a `scripts/shoot.ps1` row and
+        // an `EQBUDDY_SHELL=settings:cards` address all land on the tab that content is
+        // actually on — the same courtesy `LootSurface` extends to "locker". Retiring the key
+        // with the label would make every one of those land nowhere, which is the cost the
+        // ban was never asking anyone to pay: §4 is about what a player READS, and nothing
+        // renders this string. The label it resolves TO is "HUD", which is the signed answer.
+        ("EQBuddy.Core/SettingsSurface.cs", "cards",
+            "the v1 Options tab tag kept as an address key; nothing renders it, and it "
+            + "resolves to the tab labelled HUD"),
     ];
 
     [Fact]

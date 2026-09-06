@@ -432,6 +432,14 @@ internal static class WidgetDump
                     // window's progress* keys on purpose: two hosts of one room is
                     // exactly where a silent divergence would live.
                     (w._shellWindow is { IsLoaded: true } shwin ? shwin.DebugFacts() + " " : "") +
+                    // The v1 OPTIONS window, when EQBUDDY_OPTIONS opened one. Added at SR-5,
+                    // the PR that landed the shell's Settings room, and it exists for exactly
+                    // one reason: the room composes the SAME four blocks this window
+                    // composes, so `optionsHudPanels` beside `shellSettingsHudPanels` is what
+                    // lets the E2E suite ask whether two live hosts of one block describe the
+                    // same thing (trap 58). Both sides re-key mechanically off one string, so
+                    // neither can report a number the other cannot.
+                    (w._optionsWindow is { IsLoaded: true } owin ? owin.DebugFacts() + " " : "") +
                     // EQBuddy Mobile's pump: it should be running, and it should be
                     // doing nothing, because this profile has no paired device.
                     $"companionPumpTicks={w._companionPumpTicks} " +

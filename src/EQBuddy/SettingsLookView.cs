@@ -78,6 +78,29 @@ internal sealed class SettingsLookView
     /// rather than re-building, so a half-dragged slider survives a tab switch.</summary>
     public UIElement Block => _block ??= Build();
 
+    /// <summary>
+    /// This instance's facts for the <c>EQBUDDY_EXPAND</c> dump, in the block's OWN
+    /// vocabulary and with no host name in them — each host re-keys them mechanically
+    /// (<c>ShellDumpFacts.Prefixed</c>), so <c>OptionsWindow</c> reports
+    /// <c>optionsLookPalettes</c> and the shell's Settings room reports
+    /// <c>shellSettingsLookPalettes</c> off ONE string (trap 58). The comparison of the two
+    /// is the only thing that can say two live hosts of one block agree, and it could not be
+    /// written at all if either side hand-wrote its own copy of the numbers.
+    ///
+    /// **Counted off the BUILT controls rather than off the settings object**, which is what
+    /// gives the comparison teeth: two hosts reading one <see cref="AppSettings"/> agree
+    /// trivially, and a guard that cannot fail reads as coverage (trap 34). A block torn out
+    /// of one host by a shared instance (trap 45) is what these counts can actually see.
+    ///
+    /// An unbuilt block reports NOTHING rather than zeros — an absent key is "" to the E2E
+    /// reader and a zero is a claim.
+    /// </summary>
+    public string DebugFacts() => _block is null
+        ? ""
+        : $"lookPalettes={_themeCombo.Items.Count} " +
+          $"lookCustomShown={(_customColors.Visibility == Visibility.Visible ? 1 : 0)} " +
+          $"lookSwatches={_customColors.Children.Count}";
+
     private ComboBox _themeCombo = null!;
     private StackPanel _customColors = null!;
     private Slider _scaleSlider = null!, _chipScaleSlider = null!;

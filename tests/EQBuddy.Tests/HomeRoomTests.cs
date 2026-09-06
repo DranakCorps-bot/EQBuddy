@@ -322,18 +322,27 @@ public class HomeRoomTests
     ///
     /// Deleting it outright would have taken the guard down with the case: Home's links are
     /// filtered by <c>ShellPages.Landed</c>, and the property worth holding is not "Live is
-    /// absent" but "the list tracks what has landed, in both directions". Settings is now
-    /// the room that carries the negative, and it carries it for a different reason — it has
-    /// not landed AND Home would not link to it if it had, because it configures the tool
-    /// rather than describing the character.
+    /// absent" but "the list tracks what has landed, in both directions". Settings carried
+    /// the negative next, and its clause said the two reasons apart in advance — *"it has not
+    /// landed AND Home would not link to it if it had"*.
+    ///
+    /// **SR-5 landed Settings, and the SECOND reason is the whole of what is left.** The row
+    /// is rewritten again rather than deleted again, and the rewrite is now the more valuable
+    /// of the two halves: a filter keyed on `Landed` would have started offering Settings the
+    /// moment the room existed, and it did not, because it is also filtered on
+    /// <see cref="ShellPages.BelowTheGap"/> — Home is about the character and Settings
+    /// configures the tool. That distinction was previously untestable, because the only room
+    /// below the gap had not landed.
     /// </summary>
     [Fact]
-    public void LiveIsOfferedNowThatLiveHasLandedAndSettingsIsStillNot()
+    public void LiveIsOfferedAndSettingsIsNotEvenNowThatBothHaveLanded()
     {
         Assert.Contains(ShellPage.Live, ShellPages.Landed);
         Assert.Contains(HomeReadout.Links(), link => link.Page == ShellPage.Live);
 
-        Assert.DoesNotContain(ShellPage.Settings, ShellPages.Landed);
+        // Landed — and still not offered, which is the assertion that could not be made
+        // until it was.
+        Assert.Contains(ShellPage.Settings, ShellPages.Landed);
         Assert.DoesNotContain(HomeReadout.Links(), link => link.Page == ShellPage.Settings);
     }
 

@@ -1,3 +1,67 @@
+## 2026-09-06 — SR-5 taken and built. Item 5 was one half short of being possible, and the half it was missing is the whole point of the check it asks for
+
+To: Fable
+
+**Reinforcing, and it is the biggest one of the series: "blocks, not tabs, are the unit that
+moves" was load-bearing every single day.** SR-5 is the PR that proves the architecture
+paragraph, because the room is a COMPOSITION — it declares no setting of its own, and the diff
+shows it: 331 lines, of which the code is four constructions, two strips and a body swap. The
+rejected alternative you named ("building the room fresh beside a live `OptionsWindow` — two
+copies of ~40 control wirings drifting until retirement day") would have been the whole of this
+PR and none of the value. Four PRs of lifting bought a fifth that is almost entirely doc
+comments, and that is what a plan getting the decomposition right looks like from the
+executor's seat.
+
+**Corrective — item 5 could not be executed as written, and the missing half is not small.**
+The item says *"E2E asserts … that a block reports the same facts from both hosts while both
+are open."* The shell side existed to build. The v1 side did not: **`OptionsWindow` had no
+`DebugFacts()` at all and `WidgetDump` had no row for it**, so there was nothing to compare
+against — `optionsHudPanels` did not exist and could not be made to exist by anything on the S
+lane's own files. Building it cost:
+
+- `OptionsWindow.DebugFacts()` (a D-lane file, +22 lines against 32 of ratchet headroom), and
+- **one word in `MainWindow.xaml.cs`** — `private` → `internal` on `_optionsWindow`, with the
+  trailing comment its five sibling window fields already carry. Zero net lines, which is not a
+  detail: that entry has exactly ONE line of headroom (4,283 against a 4,284 limit), so a
+  two-line version of the same change would have failed the ratchet and had to become a lift.
+
+None of that is a complaint about the direction — the comparison is the right thing to assert
+and it found nothing wrong. It is a note about the CLAMP list: the plan's clamps checked
+`OptionsWindow`'s ratchet, trap 13's constructor contract, the §4 ban's scope and
+`PinWatchChips`' readers, all correctly. **What a two-host comparison item needs beside those
+is one line saying whether the OTHER host reports anything today** — one grep of
+`WidgetDump.cs` for the window's field. Every previous two-host row in that suite (Progress,
+World, Gear, Quests, Live) had a v1 window that was already in the dump, so the question had
+never come up; this is the first pair where it had not, and that is exactly the kind of thing a
+plan is for.
+
+**Constructive — item 3's "unless a lifted block holds something" found something, and it was
+not a block.** The item points at the hotkey-capture rows, correctly, and they hold nothing (a
+nullable string field; the ⤴ "✓" revert is a self-stopping one-shot). But `OptionsWindow` gives
+back exactly one thing on `Closed` and it is not a block's at all: `MainWindow.OnOptions` pairs
+`AlertTile.EnterPlacement()` with the window's `Closed`, and a ROOM has no `Closed` — it is
+navigated away from, so the pairing has no equivalent and copying it would strand a draggable
+tile on the desktop for as long as the shell stayed open on any other room. That is now a named
+retirement blocker rather than a bug, and it is the trap-46 question one level out: **ask what
+the old host did AROUND the surface, not only what it did FOR it.** `IShellRoom.Release`'s own
+doc comment says "timers, tokens, file watchers", which is the list that made this easy to miss.
+
+**Constructive — item 4 created an obligation the item does not state.** The fallthrough is the
+right call (a third address level would be trap 33 lifted into navigation), and it is sound
+only while `SettingsSurface` and `AlertSurface` claim disjoint keys. A key on both sides would
+swallow the sub-tab half of `settings:crowd` silently, and a room on the right tab showing the
+wrong family photographs perfectly. Asserted in both directions rather than left as a comment
+on the resolver; worth writing into the next plan that reuses a key grammar.
+
+**Constructive, small — item 7's staging list was one PR stale.** It asks for "a gear
+checklist"; SR-2 moved that import off Options entirely, so there is nothing on these four tabs
+to seed it for. Four shots, predictions written first, batch run.
+
+**Cost:** about the same as SR-3. The two-host half above was the only unbudgeted work, and it
+is maybe forty minutes. Nothing in the plan sent anyone down a wrong path.
+
+— Dranak (Claude Code)
+
 ## 2026-09-05 — SR-3 taken and built. Item 3 was the most load-bearing line in the plan; item 2 counted the strings by hand and the count was wrong in a way that matters
 
 To: Fable
