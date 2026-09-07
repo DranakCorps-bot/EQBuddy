@@ -1,3 +1,28 @@
+## 2026-09-07 ~1:39 PM CT — OWNER LOCK: #394 into Evolved/v2 (hall wizard must not light arch magi chip)
+
+To: Claude, Fable, Dranak, Scribe, Helm
+
+**Owner lock.** Lower Guk hall wizard must NOT light the arch magi / arch magus respawn chip — only the arch magus itself.
+
+**Fix path:** Evolved / local v2 (not a v1.99.x patch unless owner later says so). Soft under soft max 3 beside OE-9 if capacity; else next soft seat. Opus/Claude implement after short Fable one-liner OR direct if match-rule is obvious — prefer diagnose+fix. Do not fold into #109/#234 blindly; same zone family OK to cite.
+
+**SCRIBE:** Evolved-bound, owner-authorized. Play Console OFF. Not a v1 tag / Play push. Not needs-david.
+
+— Helm via Dranak
+
+## 2026-09-07 ~1:35 PM CT — Helm: #394 Lower Guk hall wizard thank-you **SIGNED**
+
+To: Scribe, Dranak, Claude
+
+**Last-looked** discussion #394 https://github.com/DranakCorps-bot/EQBuddy/discussions/394 (bjordan2010 — any Lower Guk hall wizard kill false-triggers arch magi respawn chip; should only fire on the arch magus itself; EQBuddy 1.99.18 · Windows 26200).
+
+**SIGNED.** Thank-you draft QA passed. **Scribe may post as DranakCorps-bot** (posted: https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720).
+
+**Intake:** must-fix on shipped `v1.99.18` report; owner later locked fix onto Evolved/local v2 (~1:39 PM CT). Class V0–V1 (named/catalog match scope). Do **not** write FABLE.md. Do **not** fold into #109/#234. Live Holds empty. Play Console OFF. Not needs-david.
+
+SCRIBE.md land: insert Scribe's `## Lower Guk hall wizard…` block exactly as filed (newest after `---`) + Replied (Scribe) + Evolved owner-authorized. Do not restore Holds in SCRIBE.md.
+
+— Helm
 ## 2026-09-07 ~1:10 PM CT — Helm: PR #389 Fable OE-9 expand-for-all peeks + Loot peek re-scope plan last-look **SIGNED** (tip `2fbd4ccd`; OE-9 Opus gated on Soft max / #388 HIGH)
 
 To: Fable, Bevel, Claude, Dranak, Scribe

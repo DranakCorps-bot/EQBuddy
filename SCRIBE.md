@@ -16,6 +16,28 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+## Lower Guk hall wizard kill false-triggers arch magi respawn chip
+- **Priority:** must-fix (player-facing false positive on shipped `v1.99.18`)
+- **Place:** spawn/respawn chip trigger matching — Lower Guk named (arch magus / arch magi). Player-session alert surface. Not shared game truth / eqlwiki-first (false chip on kill lines, not missing wiki copy). Nearby #109 spawn timers and #234 Guk named farming — same zone family, different asks; do not fold. Not #208 mobile sounds.
+- **Source:** #394 bjordan2010 Sep 7 ~1:16 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/394 New thread. Category: Q&A. 0 comments. Footer: EQBuddy 1.99.18 · Windows 26200.
+- **Ask (verbatim, the whole entry):** "Any wizard kill in Lower Guk hall triggers an arch magi respawn chip. It should only trigger if you kill the arch magus itself." Single claim + client footer.
+- **Already shipped:** respawn/named chips fire in `v1.99.18` (reporter sees the chip). Exact match rule tying hall wizards to "arch magi" — **not grepped this pass** (rg hung on PC; treat as unchecked).
+- **Hypothesis, unchecked:** chip/catalog match is too wide (class "wizard", name substring, or hall-wide spawn id) so ordinary Lower Guk hall wizard kills light the arch magus respawn chip.
+- **Checked:** DISCUSSION body via GraphQL (author `bjordan2010`, created 2026-09-07T18:16:29Z, comments empty). WINDOW/WIDGET/PHONE — no. Source match rule — not grepped.
+- **Class:** V0–V1 (named/catalog match scope). Do not write FABLE.md.
+- **Holds re-read (HELM.md origin/main):** Live Holds empty. #208 Retired for final v1 cut only. Talking to bjordan2010 is fine; opening unrelated #208 work is not this item.
+- **Scribe 2026-09-07 ~1:30 PM CT:** New intake. Player-facing false positive on current release. Not authorized by Scribe. Do not implement. Do not write FABLE.md. Do not fold into #109/#234. Thank-you drafted for Helm's sign-off — NOT posted.
+
+- **Thank-you draft (for Helm's sign-off — DRAFT, NOT POSTED):**
+  > Hi bjordan2010 — thanks for catching this one. A Lower Guk hall wizard lighting the arch magi respawn chip when it should only fire on the arch magus itself is exactly the kind of false positive we want filed. I've captured it and sent it along for review. I can't promise a date on a fix, but it's logged and in front of us. Thanks for naming the zone and the expected vs actual trigger so clearly.
+  >
+  > — Scribe (Grok Bot)
+
+- **Owner LOCK 2026-09-07 ~1:39 PM CT:** Evolved / local v2 path — **owner-authorized**. Lower Guk hall wizard must NOT light arch magi/arch magus respawn chip (only the arch magus itself). Not a v1.99.x patch / not a v1 tag / Play Console OFF. Do not fold into #109/#234 blindly (same zone family OK to cite). Soft Opus diagnose+fix under ≤3.
+- **Helm 2026-09-07 ~1:35 PM CT:** Thank-you **SIGNED**. Scribe may post as DranakCorps-bot. must-fix V0–V1. Do not implement on v1. Do not write FABLE.md. Do not fold into #109/#234. Play Console OFF.
+- **Replied (Scribe):** 2026-09-07 ~1:35 PM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720
+
+
 ### mobile pairing link uses ethernet IP, not Wi-Fi
 - **Priority:** **FIXED-shipped 2026-09-04** in `v1.99.18` (PR #286 `3b6fff2f`; tag `dbcfb3a1`). Wi-Fi tiebreak + pairing address picker. Item was taken/deleted at build; re-noted here for the shipped-status loop only.
 - **Source:** #264 brhanson2-cyber. https://github.com/DranakCorps-bot/EQBuddy/discussions/264
