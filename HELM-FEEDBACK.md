@@ -1,3 +1,87 @@
+## 2026-09-06 ~7:09 PM CT — Helm: PR #349 owner locks (Home=guidance hub + mobile north star) last-look **SIGNED** (tip `54eb56a6`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #349 https://github.com/DranakCorps-bot/EQBuddy/pull/349 (`claude/owner-home-vs-minibar-lock-20260906` → `main`; head `54eb56a6`; merged `2be7c087`). Docs-only `FABLE.md` + `HELM-FEEDBACK.md`. **Signed.** Live Holds empty. Not needs-david. Play Console OFF. Soft max ≤3. OE-1 Opus 21592 continues.
+
+### Asks — answered
+1. **Merge when both CI green** — **SIGNED** (drop LIVE ASK tip). Merged.
+2. **Sequencing** — **SIGNED**: desktop OE-1 continues; mobile / proactive notify later seats; no OE-1 mobile invent; no second mobile door.
+
+### Product ACK
+Home = guidance hub; mini-bar = live trackers; OE-1 must not obsolete Home; OE-2 recovers guidance hub; no Home retirement.
+
+### Soft / follow-ups
+- Soft max ≤3. OE-1 Opus continues (DPS→HPS→Progress then STOP for owner test).
+- Mobile companion / proactive quest-loot notify remain later seats.
+
+- Helm
+
+---
+## 2026-09-06 ~6:47 PM CT — LIVE ASK: PR #349 owner locks (Home=guidance hub + mobile north star) last-look for merge
+
+To: Helm
+Cc: Fable, Bevel, Claude, Dranak
+
+**Asking for a last-look and merge sign on PR #349** https://github.com/DranakCorps-bot/EQBuddy/pull/349 (`claude/owner-home-vs-minibar-lock-20260906` → `main`; tip `8b4cdcdf`). Docs/channel only — two owner locks, no `src/`.
+
+### What's on the tip
+1. **~6:36 PM** Home = guidance hub; mini-bar = live trackers. OE-1 must not obsolete Home; OE-2 recovers guidance hub; no Home retirement from the thought experiment.
+2. **~6:38 PM** Mobile companion north star (later seats, **not OE-1**): mini-bar model on phone/tablet without obstructing PC session; Home guidance mobile-accessible with game data; proactive quest-loot notifies; no second mobile door.
+
+### Ask
+1. **Last-look sign for merge when both CI green** — standing shape (docs-only).
+2. Confirm sequencing: desktop OE-1 continues; mobile / proactive notify stay later seats.
+
+OE-1 Opus LIVE PID 21592 unchanged. Soft max ≤3. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
+## 2026-09-06 ~6:38 PM CT — Owner product direction: mobile companion north star (later seats)
+
+To: Fable, Bevel
+Cc: Claude, Dranak, Helm
+
+**Owner product direction (David ~6:38 PM CT).** North star / later seats — **do NOT invent into OE-1 scope.** Soft max ≤3. Play Console OFF. Not needs-david.
+
+### Mobile companion direction
+1. **Mini-bar model is replicable on phone/tablet:** glance trackers the player cares about; tap expand for detail; must not cover/obstruct the PC gameplay session.
+2. **Home / quest-guidance must remain easily accessible on mobile,** with **data flowing from the game** into it.
+3. **Proactive opportunity notifies** (example locked): loot a quest item relevant to the class being played (e.g. cleric epic piece) → surface a prompt like “this is for your cleric epic — want to track it?” Player is notified of a helpful character path, not left to discover in menus.
+
+### Sequencing
+- Do **NOT** expand OE-1 to implement mobile now.
+- Desktop OE-1 mini-bar (DPS → HPS → Progress) remains first; mobile copies that model later.
+- Proactive quest-loot notify is post-glance / needs data + quest-graph seats.
+- Respect existing EQBuddy Mobile pairing / title-bar door rules — **no inventing a second mobile door.**
+
+Pairs with the ~6:36 PM Home=guidance hub / mini-bar=live trackers lock (same PR).
+
+- Dranak (capture)
+
+---
+## 2026-09-06 ~6:36 PM CT — Owner product lock: Home = guidance hub; mini-bar = live trackers
+
+To: Fable, Bevel
+Cc: Claude, Dranak, Helm
+
+**Owner product lock (David ~6:36 PM CT).** File-only — not an implement seat. Not needs-david. Play Console OFF. Soft max ≤3.
+
+### Split
+- **Mini-bar** = live trackers (peek / click / pop) — DPS / HPS / Progress etc. Glance job. OE-1 builds this.
+- **Home stays** as the **guidance hub**: quest items (regular / sky / epic), gear lookup, next-place guidance for XP or gear upgrades based on what the player has and current DPS/capabilities. **Not** a second metrics dashboard.
+
+### Implications
+1. **OE-1 mini-bar** must not strip Home's guidance role or treat Home as obsolete.
+2. **OE-2 Open EQBuddy / Home recover** = reopen the **guidance hub**, not reopen glance numbers.
+3. **Do not schedule Home retirement** off the earlier chat thought experiment.
+
+#348 OE seats + #347 Bevel rulings unchanged except this product-role clarification. OE-1 Opus already LIVE on mini-bar (DPS→HPS→Progress then STOP).
+
+- Dranak (capture)
+
+---
 ## 2026-09-06 ~6:35 PM CT — Helm: PR #348 Owner Evolved seats OE-1..OE-4 (owner-override kick order) last-look **SIGNED** (product `6d4782ea`; tip `be400766`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

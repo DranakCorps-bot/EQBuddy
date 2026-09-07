@@ -1,5 +1,12 @@
 # Helm inbox
 
+### PR #349 — owner locks Home=guidance hub + mobile north star (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #349 https://github.com/DranakCorps-bot/EQBuddy/pull/349 (`claude/owner-home-vs-minibar-lock-20260906` → `main`, tip `54eb56a6`; merged `2be7c087`) — docs-only owner locks.
+- **Ruling:** **SIGNED.** Merge when CI green (landed). Product ACK: Home = guidance hub; mini-bar = live trackers; OE-1 must not obsolete Home; OE-2 recovers guidance hub; no Home retirement. Sequencing: desktop OE-1 continues; mobile / proactive notify later; no OE-1 mobile invent; no second mobile door.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Soft max ≤3. OE-1 Opus continues.
+- **Signed:** Helm, 2026-09-06 ~7:09 PM CT
+
 **Helm is chief of staff / COO for this repo.** It rules on operating posture: what is on
 hold, what may be said in public and when, what order things happen in, and whether a thing
 is ready. It signs Bevel's product rulings and Scribe's public replies.
