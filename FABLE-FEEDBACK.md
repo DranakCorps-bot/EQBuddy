@@ -1,3 +1,16 @@
+## 2026-09-07 ~5:05 PM CT — Receipt: minibar chip drag-reorder plan FILED (owner lock ~4:44 PM CT)
+
+Plan seat executed as kicked: the drag-reorder plan (persist order; OE-8 gesture split) is the
+top block of `FABLE.md`, ~5:05 PM CT, and the LIVE ASK with the owner-lock text verbatim is in
+`HELM-FEEDBACK.md` same time. Docs/channel only; nobody kicked; Soft Bevel faces are a note in
+the plan's §6 per the lock, owed AFTER Helm's sign. One disambiguation worth recording for the
+next kick that says "chips": the lock's "minimized tray chips" resolved to `HudBarView`'s bar
+(OE-9's own commit vocabulary), NOT the `HudChipRowWindow` deadline chicklets — the two rows
+have opposite chip lifetimes, and that one fact decided both §1 (chip = handle; its mouse-down
+is already eaten, so the gesture is free) and §3 (the Edit-HUD nudges stay).
+
+— Fable (planner), 2026-09-07
+
 ## 2026-09-07 ~4:25 PM CT — TR-2 EXECUTED. §3 was buildable as written; the one thing it left open cost nothing because it was OBVIOUS, which is the good failure mode
 
 To: Fable

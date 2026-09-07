@@ -1,3 +1,164 @@
+## 2026-09-07 ~5:05 PM CT — Fable: MINIBAR CHIP DRAG-REORDER PLAN (persist order; OE-8 gesture split) — owner LOCK ~4:44 PM CT
+
+To: Helm (last-look/sign), Bevel (faces one-liner AFTER sign — noted, not kicked), Claude (implement on sign + slot)
+
+- **Priority:** plan for Helm sign; **the Opus implement kick is gated on Helm's last-look of
+  THIS plan AND a Soft slot** (Soft max ≤3 — in flight right now: Money Share #410 with SSC
+  #411/#412 open, OE-9 follow-up #409, and the R5 minimal-fix #408 authorized and possibly
+  live; count before any kick). Nothing is kicked from this PR. Play Console OFF.
+- **Class:** V1 — the direction is owner-locked (~4:44 PM CT: *minimized tray chips — drag to
+  reorder, persist order*); what follows is execution shape against machinery named by file.
+- **Source:** owner lock ~4:44 PM CT (`HELM-FEEDBACK.md` this date, verbatim); OE-8 SHIPPED —
+  #381 free placement (NaN=slaved, drag-end writes), Helm sign #382, Bevel faces #383
+  (cursor+tooltip drag tell); OE-9 #400 (every tray chip peeks/pops — the owner's ~1:29 PM CT
+  amend) + #404 (peek anchor under the hovered chip) + #409 in flight (Deaths peek OUT,
+  signed); SA-1/SA-2/SA-4 (`HudChipOrder` + Edit-HUD nudges); `UI.Shared/MiniBarPresentation.cs`,
+  `EQBuddy/HudBarView.cs`, `EQBuddy/HudEditChip.cs`, `Core/AppSettings.cs`.
+
+### §0 The surface, named precisely — and the one it is NOT
+
+**"Minimized tray chips" is the minimized bar `HudBarView` draws** — OE-9's own commit calls
+these "tray chips" — and its order today is the hard-coded `MiniBarPresentation.Order`
+(kills, pet, procs, loot, motes, money, deaths), whose own doc says "not the order the player
+picked" and points at #191 (TheMegaSage) for the day it becomes configurable. That day is this
+lock. It is **not** the HUD chip-row window (`HudChipRowWindow` — the mez/spawn/watch-fire/buff
+deadline chicklets): that row has had a persisted `HudChipOrder` and Edit-HUD ◀▶ nudges since
+SA-4 and is untouched here beyond §3's stay-or-unify answer.
+
+What reorders, on the bar, left to right:
+
+- **The starred stat cells + the buffs chip — YES.** The core of the lock. "buffs" is a
+  first-class chip since OE-7 and participates in the order; its canonical slot is where it
+  draws today (after "deaths").
+- **The SA-1 trio (name, DPS, XP/HPS) — NO, fixed leftmost.** The third slot swaps identity
+  (XP↔HPS with hysteresis, `HudGlance`) — a drag target that changes meaning mid-session —
+  and the name slot is a label, not a metric. The trio was promoted OUT of MiniStats for
+  being always-on; it stays out of the order for the same reason.
+- **Pinned watch chips — move as one BLOCK after the cells this pass** (today's layout);
+  internal order stays rule-list order. *Stated assumption, adjustable at sign:* per-rule
+  drag widens the same setting by rule id later; the seam is named here so the implement PR
+  does not guess at it.
+
+### §1 Gesture separation — the OE-8 split (owner bullet 2)
+
+**The vocabulary is one sentence: a drag that starts on a CHIP is about the chip; a drag that
+starts on GROUND is about the window.** OE-8 taught ground-drag = place the window (the chip
+row and under-bar panel park; the tooltip says "drag anywhere on this row to place it"), and
+the bar's ground already drags the WIDGET (`OnDrag`'s modal `DragMove`). The chip is therefore
+the HANDLE, and it is free by construction: `HudBarView.AttachGestures` sets `Handled` on chip
+mouse-down precisely to keep clicks out of `DragMove`, so press-and-move on a chip is a DEAD
+gesture today. Reorder claims dead space and collides with nothing OE-8 shipped — no
+window-level threshold against free-drag is needed at all.
+
+The threshold that IS needed is **click-vs-drag on the chip**, and it moves the click:
+`AttachGestures` fires the single click on mouse-DOWN today. Reorder means press→arm; move
+past `SystemParameters.MinimumHorizontalDragDistance` → capture and reorder; release inside
+the threshold → the click. The two conspiracies its own doc comment records must survive the
+change: `Handled` stays set on down (the `DragMove` suppression is why it exists), and the
+view-level `(key, time)` double-click stays (the 1 s rebuild resets `ClickCount`). Named hard
+edges for the implement PR:
+
+- **The 1 s `Render` rebuild vs a live capture.** The row must not replace elements under a
+  captured drag (the chip-row's own "no re-sort under the cursor" rule, one gesture deeper).
+  Recommend: a live reorder drag defers the bar rebuild until drop; everything else ticks.
+- **Mostly-vertical movement on a chip stays DEAD** — neither reorder nor widget move. It
+  means nothing today; inventing a meaning is not this lock's to spend.
+- **Hover-peek interplay:** drag start suppresses `Hover` and closes an unpinned peek (a
+  panel flickering under a moving chip); a PINNED panel stays and re-anchors on the next
+  render — `AnchorOf` already recomputes per render (#404).
+- **Trap 1:** hit-testing and drop-index math go through the framework's transforms
+  (`TransformToAncestor`, the `AnchorOf` precedent) and the drop decision is a SUM in
+  UI.Shared — never inline window arithmetic. **Trap 12:** the insertion indicator is
+  ink/adorner, never a layout spacer — both widgets are `SizeToContent` over a fullscreen
+  game, and a drag must not measure the bar wider.
+- **Failure mode if confused with widget-move:** a player drags a chip meaning to move the
+  bar and reorders instead. Mitigations: the threshold; persistence at drop only; the
+  canonical-order way back (§3); and Bevel's face pass owns the drag TELL (cursor + tooltip
+  sentence — the #383 precedent verbatim).
+
+### §2 Persist order in settings (owner bullet 3)
+
+- **New `AppSettings.MiniBarOrder` (`List<string>`, default EMPTY).** Empty = canonical
+  `MiniBarPresentation.Order` (+ "buffs" in its current slot) — an untouched profile gets
+  exactly today's bar. The floor IS the default: OE-8 §0's NaN=slaved rule, restated for a
+  list.
+- **NOT MiniStats order.** Membership and order stay two settings with two verbs —
+  `HudChipRow`'s own comment states the rule ("an order that could also REMOVE a family would
+  be two switches for one state") — and making MiniStats order-bearing would make toggling a
+  star reshuffle the bar, the exact re-read cost `MiniBarPresentation.Order`'s doc forbids.
+  MiniStats and its migrations are untouched.
+- **Reconcile in UI.Shared:** `MiniBarPresentation.ResolveOrder(settings)`, mirroring
+  `HudChipRow.ResolveOrder`: the setting's known keys in player order, deduped; keys absent
+  from the setting append in canonical order (a later version's new stat lands ON the bar,
+  not in a hole); unknown keys skipped (`Cells` already does). `Cells` takes the resolved
+  order; the bar stays a pure consumer.
+- **Writes at DROP, and nowhere else** — OE-8 §0 verbatim: of the actors only the player's
+  drag has an end, so only the player reaches the write. No per-move writes, nothing in
+  `Closed` (trap 2).
+- **DeadSettingTests / migration notes:** reader and writer land in the same implement PR →
+  silent by construction, no exemption row. NO `ApplyMigrations` entry, no migration — a
+  profile reset restores canonical order by construction, and "zero settings writes on an
+  untouched launch" stays true (trap 55's tell). If the lock is ever cut, the cut PR deletes
+  the field — the retired-stack-fields precedent.
+- Watch pins are OUT of the setting this pass (§0); the widening seam (rule ids in the same
+  list) is named, not built.
+
+### §3 Edit-HUD nudges — STAY, unchanged; unify the vocabulary, not the control (owner bullet 4)
+
+The ◀▶ nudges order a DIFFERENT row: `HudChipOrder`'s four deadline families on the chip-row
+window, via always-present edit chicklets. **Recommendation: they stay.** The chicklets exist
+because chip-row families are EPHEMERAL — a quiet or muted family has no live chip to drag,
+so drag-reorder there can never replace the nudges without losing the control at exactly the
+moment a player wants it (`HudEditChip`'s own rationale; the kick's "findability when row
+empty / muted"). The mini bar has the opposite lifetime — a starred cell is always drawn and
+the bar is never empty since SA-1 — so live drag works there and placeholders are unneeded.
+
+- **Unify at the vocabulary level:** chips drag to reorder where they are permanent (the
+  bar); arrows reorder where they are ephemeral (Edit-HUD chicklets). One sentence, two
+  correct controls.
+- **Do NOT add a second mini-bar order control into Edit-HUD this pass** — two surfaces
+  writing one brand-new setting on day one is the two-writers shape to avoid until asked.
+- **Optional later rider, named for Bevel, not built:** the Edit-HUD chicklets themselves
+  become drag-reorderable BESIDE the arrows — additive, deletes no findability.
+- **Findability of an invisible gesture:** tooltips gain the drag sentence under the
+  one-gesture-sentence rule (`PeekTip`'s "same words for every chip" — lock 9 in a tooltip);
+  cursor tell at threshold. **Way back from a bad order:** a "Default order" restore —
+  cheapest honest home is the Options → HUD stats block (`SettingsHudView.BuildMiniStats`
+  keeps listing in canonical order; the checklist is a catalog, not a mirror of the bar).
+  Bevel places both faces after sign.
+
+### §4 Scope
+
+Mini bar only. NOT the OE-9 panel interiors; NOT the chip-row window's families (§3); no
+Options invent beyond the restore-row question (Bevel's); no enum/BreakoutKind change; no
+`src/` in this PR.
+
+### §5 Verification, named before the diff
+
+- `ResolveOrder` + the drop-index sum: UI.Shared, unit-tested (dedup, unknown keys, missing
+  keys append, drop at both ends), one negative each (trap 39).
+- E2E: new dump fact `hudCellOrder` — the DRAWN keys in order, the EFFECT beside the setting
+  (trap 42), next to the existing `hudCells` count. A seeded `MiniBarOrder` asserts the bar
+  obeys it; a default profile asserts canonical order (the floor). Prove-fail per traps 62/64
+  (build `EQBuddy.slnx -c Release` first; every negative paired with a positive event).
+- Driving a real chip drag: `drag-verify.ps1` is window-level precedent; a UIA chip-drag is a
+  new harness ask. Recommend: the write half proven by unit tests on the sum + E2E seeding
+  the setting (reader half); one harness drag phase only if cheap — the ship does not gate on
+  inventing UIA chip-drags.
+- `shoot.ps1`: the `mini-bar` shot is unaffected (default order); any reorder shot seeds the
+  setting and predicts its picture first (trap 23).
+- `WhatsNew.json` (player-visible): the minimized bar's chips can be dragged into your own
+  order; nothing moves unless you drag (no #233 relocation sentence owed).
+
+### §6 Sequencing — Soft ≤3; Bevel faces AFTER sign, not kicked here
+
+This PR is docs/channel only and kicks nobody. After Helm signs: **Soft Bevel faces
+one-liner** (drag tell wording, restore-row placement, and a check on §0's watch-pin-block
+assumption) — noted per the owner lock, NOT kicked from this PR; then the Opus implement
+when a Soft slot frees (Money Share / R5 counted first). LIVE ASK in `HELM-FEEDBACK.md`
+~5:05 PM CT with the owner-lock text verbatim.
+
+---
 ## 2026-09-07 ~2:00 PM CT — Fable: V1 (MIT) → EQBUDDY EVOLVED (Windows) TRANSITION PRODUCT plan (owner ask ~1:44 PM CT / PR #397)
 
 To: Helm (last-look), Claude (TR-1/TR-2 on sign), Bevel (follow-on one-pager), David (§6 doors only)
