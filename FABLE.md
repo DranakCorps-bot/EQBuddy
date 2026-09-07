@@ -116,68 +116,22 @@ confirmed by Helm ~6:27 PM CT: **mini-bar expand kicks FIRST.** Every product ru
 #347 sign stands unchanged — only the order Opus is kicked in moves. The four seats, in kick
 order:
 
-1. **OE-1 — mini-bar expand** (Opus, lane W, HAS SCREEN) — first ship DPS → HPS → Progress.
+1. ~~**OE-1 — mini-bar expand** (Opus, lane W, HAS SCREEN) — first ship DPS → HPS →
+   Progress.~~ **TAKEN 2026-09-06 and built** (`claude/oe1-minibar-expand-20260906`). The
+   item is deleted per the take-then-delete contract; what it planned is now
+   `UI.Shared/HudExpand.cs` + `HudExpandBar`/`HudExpandWindow`, with `UpdateBreakouts`
+   lifted to `BreakoutHost.cs` to pay the ratchet. Both of its labelled hypotheses held —
+   **no Bevel question is owed on a fourth state.** Feedback in `FABLE-FEEDBACK.md`.
 2. **OE-2 — Open EQBuddy / shell recover** (`must-fix`) — parallel lane or next.
 3. **OE-3 — xp-chip tooltip** (ETA + level).
 4. **OE-4 — buff wrap-chip density** (timers stay `waiting`).
 
-Do NOT kick OE-2 ahead of OE-1. OE-3 and OE-4 are serial in lane W behind OE-1 (shared
-files, shared ratchet); OE-2 is the one that may run in parallel in its own worktree.
-
-### OE-1 — Mini-bar tracked-chip expand → under-bar panel → still-poppable window
-
-- **Priority:** `ready` — **the FIRST / NEXT Opus kick.** Helm signed the shape at #347
-  (item 4); the owner interview locks below are signed build constraints.
-- **Class:** `V2` — cross-cutting (HudBarView + ThemeHost + BreakoutWindow + a new under-bar
-  host + trap-12 geometry), and the obvious reading ("expand inside the widget") is the one
-  trap 12/#173 forbids. Not V0–V1 because the hosting decision is a whole-system call.
-- **Source:** `BEVEL.md` §4 (Helm-signed #347 item 4) + the **owner interview locks 1–10**
-  (David 2026-09-06 ~6:04 PM CT, appended to that item) + the owner override above.
-- **The locks, folded in as build constraints (do NOT reopen the signed Bevel ThemeHost
-  shape — these are interaction rules ON it, not a new state machine):**
-  1. One under-bar expansion at a time — opening another chip's panel collapses the first.
-  2. Chips must look like **buttons** — restyle via `ChipStyle`/`DesignSystem`, never a
-     hand-built toggle (the standing pill rule).
-  3. Hover = smooth **peek** expand; mouse-away = smooth collapse. Peek is a transient
-     Inline, not a new ThemeHost state.
-  4. Click = stay open (pins the peek).
-  5. X on the under-bar panel = collapse back to bar.
-  6. Pop-out from expanded → under-bar collapses; the float carries the detail
-     (`ThemeHost.PopOut()`'s existing rule).
-  7. Close floated window → just the mini-bar, nothing expanded
-     (`ThemeHost.WindowClosed()` → Collapsed, never silently back to Inline).
-  8. **First ship: DPS, then HPS, then Progress — and the PR STOPS there.** Owner tests;
-     every other tracker follows in later PRs, same pattern.
-  9. No exceptions: every tracker uses this pattern. Bar = quick peek/click for anything
-     tracked — no Options dig.
-  10. Motion quality: slick, smooth, professional; expand/collapse in a natural flow
-      (easing/storyboards in the view layer; no logic in the animation).
-- **Hosting — the trap-12 constraint that shapes the whole build:** the widget is
-  `SizeToContent`, so the under-bar panel must NOT change the widget's measured size on a
-  hover or a timer (#173's exact mechanism). **SA-2's precedent is the model:**
-  a position-slaved companion (`HudChipRowWindow`'s shape — no geometry of its own, nothing
-  persisted, slaved to the bar every tick). Bevel's own flag stands: a screenshot pass
-  against the widget's real behavior BEFORE the panel is built, prediction written first
-  (trap 23), batch run not `-Shot` (trap 53).
-- **What is NEW wiring, named so nobody assumes a rewire:** no chip carries a `breakout:`
-  for Damage or Healing today (`HudBarView.cs:280-284` — only `pet`/`loot` do), so the
-  DPS/HPS chips' expand targets are new wiring, not a re-route. **And Progress's pop-out
-  target is the Progress WINDOW, not a Progress breakout** — `Progress` left `BreakoutKind`
-  deliberately on 2026-08-25 ("reuse the existing theme window on its current tab" is the
-  fold rule), `DocumentationSizeTests` pins that list, and re-adding it would revert a
-  signed fold. The under-bar panel for Progress shows the glance; ⧉ opens the Progress
-  window.
-- **Auto-show-while-minimized is untouched** (`UpdateBreakouts`) — the owner's explicit
-  constraint, restated from the #347 sign: this adds states, it does not replace breakouts.
-- **What clamps it:** `MainWindow` is at 4,283 against a 4,284.5 ceiling — the work lives in
-  `HudBarView`/`UI.Shared`, or lifts a surface out; no net-positive `MainWindow*` edits.
-  `DoubleClickChipsToggleBreakouts` stays untouched (primary path is single click, per the
-  sign); the double-click default flip stays the soft named decision from #347.
-- **Verification:** E2E facts for the new states (`hudExpand=` family or similar) prove-failed
-  first (trap 62 — any "nothing expanded" assertion needs a positive event to wait on);
-  staged shots for peek/pinned/popped; eight consecutive greens; `WhatsNew.json` entry.
-- **Out:** every tracker beyond DPS/HPS/Progress (later PRs, after owner tests); buff timer
-  code; TEL; Play Console; OptionsWindow retirement; reopening the Bevel shape.
+~~Do NOT kick OE-2 ahead of OE-1.~~ **Spent — OE-1 is built.** OE-3 and OE-4 are serial in
+lane W behind it (shared files, shared ratchet) and are now clear to kick; OE-2 may run in
+parallel in its own worktree as it always could. **Note for whoever takes OE-3 or OE-4:** the
+`MainWindow*` ratchet came down to **3,839** with OE-1’s lift and again has ZERO headroom
+(4,222 of 4,222), so OE-4’s roster lift is not optional and OE-3’s tooltip has to land in
+`HudBarView`/`UI.Shared` rather than in the widget.
 
 ### OE-2 — Open EQBuddy / shell recover: build the already-named door (`must-fix`)
 

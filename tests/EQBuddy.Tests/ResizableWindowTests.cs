@@ -137,7 +137,11 @@ public class ResizableWindowTests
         var furniture = new HashSet<string>(StringComparer.Ordinal)
         {
             "AlertWindow", "ClickThroughChip", "CursorRingWindow", "GridOverlayWindow",
-            "HudChipRowWindow", "MainWindow", "TutorialWindow",
+            // HudExpandWindow is HudChipRowWindow's sibling (OE-1): a companion
+            // slaved to the HUD's position with no geometry of its own and nothing
+            // persisted, so there is no size for a player to choose or for the app
+            // to remember.
+            "HudChipRowWindow", "HudExpandWindow", "MainWindow", "TutorialWindow",
             "WhatsNewWindow", "FeedbackWindow", "CompanionWindow", "TextProbeWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",

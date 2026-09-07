@@ -44,10 +44,10 @@ re-measures rots without anyone touching it.
 
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 98 | 22,626 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
-| `EQBuddy.UI.Shared` | 102 | 11,526 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Core` | 98 | 22,986 | Parsing, aggregation, settings, catalogs, wiki. No UI. |
+| `EQBuddy.UI.Shared` | 105 | 12,965 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
 | `EQBuddy.Companion` | 16 | 4,357 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
-| `EQBuddy` | 91 | 27,863 | The WPF widget and its windows. Now the largest project in the repo. |
+| `EQBuddy` | 97 | 31,007 | The WPF widget and its windows. Now the largest project in the repo. |
 
 ## 2. Load-bearing invariants
 
@@ -132,7 +132,7 @@ the lift came first, and the baseline came down in the same commit.**
 
 | File | Baseline | Now | Fails at | Headroom |
 |---|---:|---:|---:|---:|
-| `EQBuddy/MainWindow*.xaml.cs` | 3,895 | 4,284 | 4,284 | 0 |
+| `EQBuddy/MainWindow*.xaml.cs` | 3,839 | 4,222 | 4,222 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
 | `EQBuddy/OptionsWindow.xaml.cs` | 326 | 326 | 358 | 32 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |

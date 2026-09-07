@@ -183,6 +183,26 @@ internal static class DebugHooks
                 () => w.OnEditHud(w, new RoutedEventArgs()),
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        // THE MINI-BAR EXPANSION (OE-1), and this one is not a convenience — it is the only
+        // way the feature can be asserted or photographed at all. Every state it has is
+        // reached by a POINTER on a chip, and there is nothing in the E2E dump channel or in
+        // `shoot.ps1` that moves a mouse. Without it the peek, the pin and the ✕ would be
+        // trap 22 exactly: a surface with no way to reach its state, reading as reviewed.
+        //
+        // `dps` / `hps` / `progress` PIN the panel (the click, lock 4); a `:peek` suffix
+        // hovers instead (lock 3). The two are spelled apart on purpose — they render the
+        // identical panel, so a hook that could only do one of them would make every
+        // screenshot of the pair a picture of the same state.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_HUDEXPAND") is { Length: > 0 } expandKey)
+            w.Loaded += (_, _) => w.Dispatcher.BeginInvoke(() =>
+            {
+                var parts = expandKey.Split(':');
+                if (UI.Shared.HudExpand.TargetForKey(parts[0]) is not { } target) return;
+                if (parts.Length > 1 && parts[1].Equals("peek", StringComparison.OrdinalIgnoreCase))
+                    w._hudExpandBar.Hover(target);
+                else w._hudExpandBar.Click(target);
+            }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             w.Loaded += (_, _) =>
             {

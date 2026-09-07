@@ -243,7 +243,12 @@ public class SettingsHudBlockTests
         Assert.Contains(BreakoutPresentation.ReEnableRoute, BreakoutPresentation.DismissTip,
             StringComparison.Ordinal);
 
-        foreach (var file in new[] { "MainWindow.xaml.cs", "BreakoutWindow.xaml.cs" })
+        // `BreakoutHost.cs`, not `MainWindow.xaml.cs`, since OE-1 (2026-09-06): the gate,
+        // the ✕'s nag and the chip's toggle lifted out of the widget to pay for the mini-bar
+        // expand's ratchet. Same three printers of the route, one file over — and the guard
+        // follows the surface rather than the filename, or it would go vacuous the moment
+        // the thing it guards moves (trap 53's shape with a class name instead of a title).
+        foreach (var file in new[] { "BreakoutHost.cs", "BreakoutWindow.xaml.cs" })
             Assert.Contains("BreakoutPresentation.", Read(file), StringComparison.Ordinal);
 
         // The negative that keeps it from growing back: nothing may spell the old heading, in

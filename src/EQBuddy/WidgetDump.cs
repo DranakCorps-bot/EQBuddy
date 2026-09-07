@@ -296,6 +296,30 @@ internal static class WidgetDump
                     // with no window; this proves the decision reaches the control, which
                     // is the half a unit test cannot see (trap 42).
                     $"hudGlance={w._hudBar.GlanceKey} " +
+                    // THE MINI-BAR EXPANSION (OE-1). Four keys, because the owner's locks
+                    // have four separable ways to go wrong and a single "is something
+                    // expanded" could tell none of them apart:
+                    //
+                    //   hudExpand      WHICH tracker (dps/hps/progress), or "none".
+                    //   hudExpandMode  collapsed / peek / pinned / window. **This is the one
+                    //                  a screenshot can never settle** — a peek and a pin
+                    //                  render the identical panel, and the difference IS
+                    //                  lock 4. A picture proves one of them drew; only the
+                    //                  app can say which rule put it there (trap 42).
+                    //   hudExpandPanel The companion window's own visibility, which a mode
+                    //                  cannot claim: "in the model" and "on screen" are
+                    //                  different claims, and this panel is a second window.
+                    //   hudExpandRows  What the body drew, so an empty state and a drawn row
+                    //                  are two readings rather than one absence (trap 20).
+                    //
+                    // Emitted whether or not a panel exists: a key that disappears with its
+                    // window is a key a test cannot assert is ZERO, and "the ✕ collapsed it"
+                    // is exactly that assertion (trap 62 — every negative needs a moment it
+                    // is true at, and these ride the same tick as the totals above).
+                    $"hudExpand={w._hudExpandBar.TargetKey} " +
+                    $"hudExpandMode={w._hudExpandBar.ModeKey} " +
+                    $"hudExpandPanel={(w._hudExpandBar.PanelVisible ? 1 : 0)} " +
+                    $"hudExpandRows={w._hudExpandBar.RowCount} " +
                     // THE ONE CHIP ROW (Surface A / SA-2). Four keys, because the fold has
                     // four separable ways to go wrong and a single "is the row up" could
                     // not tell them apart: the row's presence, each family's contribution,

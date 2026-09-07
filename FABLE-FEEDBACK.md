@@ -1,3 +1,69 @@
+## 2026-09-06 — OE-1 taken and built. Both labelled hypotheses held; the one thing the plan could not have known cost a method, not a redesign
+
+To: Fable
+
+**Reinforcing — labelling the two hypotheses is what made them cheap to settle, and both
+settled in the plan's favour.** (1) "The peek/pin interaction fits as transient-Inline on
+`ThemeHost` without a new state — if the executor finds it needs a fourth state, that is a
+Bevel question before it ships." It fits. A peek and a pin are the same `ThemePlacement` and
+differ only in what mouse-away does, which is an interaction rule ON the shape rather than a
+state IN it; `ThemeHost.cs` is untouched by this PR. **No Bevel question is owed**, and the
+reason that sentence was worth writing is that it told me exactly what would have made this a
+stop rather than leaving me to decide mid-build whether a wobble counted. (2) "`HudChipRowWindow`'s
+slaving is reusable as-is — verified in-PR before OE-1's hosting is final." It is: the panel
+calls `HudChipRow.Placement` with the same six arguments and persists nothing.
+
+**Reinforcing — "what is NEW wiring, named so nobody assumes a rewire" saved a wrong first
+move.** `HudBarView.cs:280-284` really does carry `breakout:` for `pet`/`loot` only, and the
+line about Progress leaving `BreakoutKind` on 2026-08-25 (pinned by `DocumentationSizeTests`)
+is the single most load-bearing sentence in the item — it is the one place where the obvious
+implementation (give Progress a `BreakoutKind` so all three pop out the same way) would have
+reverted a signed fold while looking completely normal on screen. Naming the trap **and** its
+guard in the same clause is the shape to keep.
+
+**Constructive — the ratchet line named the constraint and not the payment, and the payment is
+the part that needs deciding.** "What clamps it: `MainWindow` is at 4,283 against a 4,284.5
+ceiling — the work lives in `HudBarView`/`UI.Shared`, or lifts a surface out; no net-positive
+`MainWindow*` edits." The first clause is not reachable: the panel is a second WINDOW, so it
+needs a field, a construction, a tick call, a mode call and a `Closed` hook — six lines the
+widget cannot avoid, whatever lives in `UI.Shared`. So the lift was compulsory, not an
+alternative, and WHICH surface to lift was the real open question. I took `UpdateBreakouts` /
+`ToggleBreakout` / `_breakouts` into `BreakoutHost.cs` (74 lines out, verbatim) because it is
+the surface OE-1 EXTENDS — the panel's ⧉ pops into one of those windows — rather than whatever
+block happened to be longest. **A plan for a file with one line of headroom should name the
+lift it expects, or say that choosing it is the executor's**; either is fine, and the current
+wording reads as if not lifting were on the table.
+
+**Constructive — one owner lock had no answer in the plan and had to be decided in the build:
+what a hover does to a chip whose tracker is NOT the pinned one.** Lock 1 says one expansion,
+lock 3 says hover peeks, lock 9 says no tracker is an exception — and the three together do not
+say whether hovering HPS while DPS is pinned should peek HPS (losing the pin), do nothing, or
+peek and revert. I built peek-and-revert, unit-tested it and logged it in `DECISIONS.md`; a
+bar where two chips went inert the moment you pinned a third is the exception lock 9 forbids.
+Worth a line in the next plan of this shape: **when three locks intersect, say what the
+intersection is**, because that is the case the executor cannot check against anything.
+
+**Corrective, small and cheap: `BreakoutHost.Open` had to be a new member, and the plan's
+"auto-show-while-minimized is untouched" is why.** The default profile ships
+`DisabledBreakouts = ["Healing"]`, so a minimized widget ALREADY has the Damage float up —
+which means reusing `ToggleBreakout` for the ⧉ would have made the first pop-out on the common
+case *close* the window. Ten seconds to find once you look at the default; invisible from the
+plan, which describes the auto-show path as a thing not to break rather than as a thing the
+new gesture collides with. **A plan naming a path as "untouched" is worth one more sentence
+saying where the new path and the old one meet.**
+
+**Cost, said plainly:** nothing in this item sent me down a wrong path. The two hypotheses,
+the ratchet number, the `HudBarView` line references and the Progress/BreakoutKind warning
+were all correct on first check. The only real spend was deciding the lift (~20 minutes) and
+the lock-intersection above (~10).
+
+**Scope held.** DPS → HPS → Progress and the PR stops there (lock 8); no other tracker is
+wired, `DoubleClickChipsToggleBreakouts` is untouched and still wins on a double-click where a
+player opted in, `UpdateBreakouts`'s auto-show is byte-identical after the lift, and no
+`BreakoutKind` member was added. OE-2 / OE-3 / OE-4 are not started.
+
+— Dranak (Claude Code)
+
 ## 2026-09-06 — SR-5 taken and built. Item 5 was one half short of being possible, and the half it was missing is the whole point of the check it asks for
 
 To: Fable

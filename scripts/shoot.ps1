@@ -1092,6 +1092,43 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
+    # THE UNDER-BAR PANEL (OE-1). Its own window, so it is shot by its own title: the bar
+    # ABOVE it is `mini-bar`'s picture and the two are separate windows on purpose — a panel
+    # drawn inside the widget would resize a SizeToContent always-on-top window on a hover,
+    # which is trap 12 / #173's exact mechanism.
+    #
+    # **Only the two TARGETS are shot, not the four MODES.** A peek and a pin render the
+    # identical panel — that is what makes lock 4 a state rather than a look — so a
+    # `hud-expand-peek` beside a `hud-expand-pinned` would be two committed PNGs of one
+    # picture, which is worse than none: it reads as coverage of a distinction neither can
+    # see. The mode is asserted from the dump instead (`hudExpandMode`, HudExpandTests).
+    #
+    # PREDICTION, written before the shot (trap 23):
+    #   * `hud-expand-dps` — a rounded panel with a hairline edge: Swords vector, "Your
+    #     damage", ⧉ and ✕ on the header row; a dim "Session · Nm in combat · N dps"
+    #     subtext; then up to FIVE damage bar rows off the melee fixture, each "total ·
+    #     rate dps", and a dim "…and N more — ⧉ for the full list" if the session has more
+    #     than five sources.
+    #   * `hud-expand-progress` — a Chart vector, "Progress", and the Progress LAUNCHER
+    #     line as the subtext (xp %, coin, motes/hr where there are motes); then the
+    #     Experience room's own summary lines. Not bar rows: the glance, because the ⧉ here
+    #     opens the Progress WINDOW and rebuilding its rooms in a panel is the tab-less
+    #     float the 2026-08-25 fold retired.
+    # A panel that is all empty-state text on either shot is a staging bug until proven
+    # otherwise, not a feature — the fixture has both damage and experience in it.
+    'hud-expand-dps'  = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'dps' }
+                           # Every breakout OFF for the same reason `mini-bar` does it: a
+                           # float auto-shows while minimized and would sit over the panel.
+                           # The list has to grow with BreakoutKind (trap 30).
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') } }
+    'hud-expand-progress' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'progress' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') } }
     # The Watch card with rules that the fixture session actually matches — without them
     # the card is a one-line empty state and its sort strip does not exist at all (it
     # appears only above two or more rules). "Spider parts" is deliberately a rule with

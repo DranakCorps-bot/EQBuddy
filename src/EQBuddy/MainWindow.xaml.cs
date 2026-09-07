@@ -87,6 +87,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // answer from a snapshot — the cue map, and the two windows a chip double-click
     // opens — is handed in, and it is not a card so it takes no ICardContext.
     internal HudBarView _hudBar = null!;
+    // The six floating stat windows, and the mini bar's under-bar expansion (OE-1). Both
+    // are lifted views for the same reason _hudBar is: this file cannot be unit-tested.
+    internal BreakoutHost _breakoutHost = null!;
+    internal HudExpandBar _hudExpandBar = null!;
 
     // ---- ICardContext ----
     //
@@ -131,8 +135,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         TrackedBody.Content = _watch.Body;
         // The collapsed HUD bar (SA-1). It fills a panel this window owns and shows or
         // hides nothing — WHEN the bar is on screen stays here (trap 15).
+        _breakoutHost = new BreakoutHost(this, _settings);
+        _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
-            ToggleBreakout, () => ShowProgressWindow());
+            _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar);
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -680,7 +686,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// snapshot per tick). Snapshots are immutable, so sharing one instance is
     /// safe; it is at most one tick (~1 s) old, which is already the cadence the
     /// satellites polled at. Null only before the first tick.</summary>
-    private StatsSnapshot? _latestSnapshot;
+    internal StatsSnapshot? _latestSnapshot;   // internal: BreakoutHost re-applies its gate against it
 
     /// <summary>The current stats snapshot for windows that refresh on their own
     /// cadence: this tick's shared instance, or a fresh build when a window opens
@@ -1593,8 +1599,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     {
         RepaintBuffs();
         if (_optionsWindow is { IsLoaded: true } ow) ow.RefreshBuffSetEditor();
-        if (_breakouts.TryGetValue(BreakoutKind.Buffs, out var b) && b.IsVisible)
-            b.RefreshBuffSet(CurrentSnapshot());
+        _breakoutHost.Visible(BreakoutKind.Buffs)?.RefreshBuffSet(CurrentSnapshot());
     }
 
     /// <summary>The set editor's seen-first ranking: buffs YOU were seen casting this
@@ -1984,6 +1989,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 // re-growing the widget in its place is the opposite of what they asked
                 // for (ThemeHost's rule; Bevel's "close leaves collapsed").
                 _progressHost.WindowClosed();
+                _hudExpandBar.ProgressWindowClosed();   // OE-1 lock 7
                 _progressCard?.Sync();
             };
             _progressWindow.Show();
@@ -2081,7 +2087,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _settings.MiniStats.Remove(key);
         }
         _settings.Save();
-        UpdateBreakouts(CurrentSnapshot());
+        _breakoutHost.Update(CurrentSnapshot());
     }
 
     private void OnQuestsWindow(object sender, RoutedEventArgs e) => ShowQuestsWindow();
@@ -2451,12 +2457,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
         if (MiniRoot.Visibility == Visibility.Visible)
             _hudBar.Render(s, _stats.CharacterName);
+        _hudExpandBar.Follow(s);   // OE-1's under-bar panel, off this same snapshot
         // BEFORE the breakouts and the focus-hide gate: loss transitions must be
         // detected every tick, whatever's visible — a hidden Buffs card must not
         // mean a blind history (#120 stage 3) — and the Buffs breakout should show
         // this tick's losses, not last tick's.
         ObserveBuffLosses(s);
-        UpdateBreakouts(s);
+        _breakoutHost.Update(s);
 
         // EQBuddy Mobile rides the same shared snapshot as every desktop card, and
         // must keep flowing while the widget hides for focus (the phone is exactly the
@@ -3417,8 +3424,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         HeightGrip.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
         _settings.Save();
         var snap = _stats.Snapshot();
+        _hudExpandBar.SetBarVisible(mini);   // OE-1: no bar, no under-bar panel
         if (mini) _hudBar.Render(snap, _stats.CharacterName);
-        UpdateBreakouts(snap);
+        _breakoutHost.Update(snap);
         // AFTER the chips: the mini bar's width IS its chips (an empty bar measures
         // ~87, a starred one 300+), so anchoring before the bar renders computes
         // against a width the player never sees — the first harness run did exactly
@@ -3429,81 +3437,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         Left = WidgetMetrics.RightAnchoredLeft(Left, oldWidth, ActualWidth);
     }
 
-    // ---- breakout stat windows (BREAKOUT-*) ----
-
-    private readonly Dictionary<BreakoutKind, BreakoutWindow> _breakouts = new();
-
-    /// <summary>Open/refresh/hide the breakout windows: each shows while the widget is
-    /// minimized and its condition holds — a star for the stat kinds, any 📌-pinned rule
-    /// for the Watch list — unless ✕-disabled (persistent, re-enable in Options: the old
-    /// until-next-minimize dismissal made the window whack-a-mole, discussion #45) or
-    /// hidden with the game unfocused.</summary>
-    private void UpdateBreakouts(StatsSnapshot s)
-    {
-        foreach (var kind in Enum.GetValues<BreakoutKind>())
-        {
-            // Which star opens which window comes from UI.Shared, not from a switch here.
-            // It was a switch here, and Options grew a tick box for the same question that
-            // could not answer it — so a player ticking "Pet" changed nothing and went to
-            // ask on Reddit. Since SA-1 the two halves are separate conditions rather than
-            // one ternary: Damage and Healing have no star (dps/hps are always-on HUD
-            // numbers), so "no star" and "needs a pinned rule" stopped being one case.
-            var name = BreakoutPresentation.Kind(kind);
-            var want = _settings.Minimized && !_hiddenForFocus &&
-                       !_settings.DisabledBreakouts.Contains(kind.ToString())
-                       && (BreakoutPresentation.StarKey(name) is not { } star
-                           || _settings.MiniStats.Contains(star))
-                       // A pinned rule is the WHOLE Watch condition since SA-R — see WatchPinMigration.
-                       && (!BreakoutPresentation.NeedsPinnedRule(name)
-                           || _settings.TrackedRules.Any(r => r.Enabled && r.Pinned));
-            _breakouts.TryGetValue(kind, out var w);
-            if (want)
-            {
-                if (w is not { IsLoaded: true })
-                {
-                    _breakouts[kind] = w = new BreakoutWindow(_settings, kind) { Main = this };
-                    w.Dismissed += k =>
-                    {
-                        if (!_settings.DisabledBreakouts.Contains(k.ToString()))
-                            _settings.DisabledBreakouts.Add(k.ToString());
-                        _settings.Save();
-                        // With double-click-toggle on, the ✕ is no longer a one-way trap —
-                        // a double-click on the chip brings the window straight back — so the
-                        // nag and its log entry would just be noise. Off, they stay: the ✕ is
-                        // a small target over a game screen, and until the alert existed the
-                        // only trace of hitting it was a window that quietly never came back
-                        // (David lost his DPS breakout to exactly that, 2026-08-08). A
-                        // permanent, hard-to-reverse state change must announce itself.
-                        if (_settings.DoubleClickChipsToggleBreakouts) return;
-                        AlertTile.ShowAlert($"{k} breakout hidden — re-enable in {BreakoutPresentation.ReEnableRoute}");
-                        CoreLog.Error($"{k} breakout hidden via its close button (re-enable: {BreakoutPresentation.ReEnableRoute})");
-                    };
-                }
-                if (!w.IsVisible) w.Show();
-                w.Update(s);
-            }
-            else if (w is { IsVisible: true })
-            {
-                w.SavePosition();
-                w.Hide();
-            }
-        }
-    }
-
-    /// <summary>Toggle a stat's breakout window from its mini chip: show it if hidden,
-    /// hide it if showing. Rides the same persistent DisabledBreakouts flag the ✕ uses,
-    /// so the choice sticks and UpdateBreakouts applies it on the spot — a
-    /// double-click is just a friendlier reach for it than the ✕ or Options
-    /// (asked for: "let me pop the DPS or Loot window up only when I want it").</summary>
-    private void ToggleBreakout(BreakoutKind kind)
-    {
-        var name = kind.ToString();
-        if (!_settings.DisabledBreakouts.Remove(name))
-            _settings.DisabledBreakouts.Add(name);
-        _settings.Save();
-        if (_latestSnapshot is { } snap) UpdateBreakouts(snap);
-    }
-
+    // The SIX FLOATING STAT WINDOWS' lifecycle — the gate, the ✕'s nag and the chip's
+    // toggle — moved to EQBuddy/BreakoutHost.cs (OE-1). A view class, not another
+    // MainWindow partial: ArchitectureTests SUMS the glob's matches on purpose. The lift is
+    // what paid for the mini-bar expand, which had one line of headroom, and it is the
+    // honest surface to take because it is the one the expand's ⧉ pops into.
+    //
     // The COLLAPSED HUD BAR's render path — the chip builder, the divider trim and the
     // per-tick rebuild — moved to EQBuddy/HudBarView.cs (Surface A / SA-1). A view class,
     // not another MainWindow partial: ArchitectureTests SUMS the glob's matches on
@@ -3801,7 +3740,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     // ---- hide while the game is unfocused (FOCUS-*, discussion #41) ----
 
-    private bool _hiddenForFocus;
+    internal bool _hiddenForFocus;   // internal: BreakoutHost's gate reads it
 
     // Where the constructor placed the window and whether that was the SAVED spot —
     // OnClosed's PositionToPersist call needs both (#117).
@@ -4263,7 +4202,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _restoredSavedPosition, _placedLeft, _placedTop, Left, Top,
             _settings.WindowLeft, _settings.WindowTop);
         _settings.Save();
-        foreach (var w in _breakouts.Values) w.Close();   // each persists its spot on Closed
+        _breakoutHost.CloseAll();   // each persists its spot on Closed
         _stats.QuestStore?.Flush();   // debounced writers get their last word (audit #3)
         _stats.AaStore?.Flush();
         _stats.StackingStore?.Flush();

@@ -151,8 +151,14 @@ internal sealed class HudChipRowWindow : Window
         var area = SystemParameters.WorkArea;
         MaxWidth = Math.Max(120, area.Width);
         UpdateLayout();
+        // THE UNDER-BAR PANEL IS SLAVED TO THE SAME EDGE (OE-1), so the row parks below it
+        // rather than on top of it. Handed to Placement as part of the HUD's own height
+        // because that is exactly what it is to a chicklet: the widget and whatever is
+        // hanging off it are one block, and the flip-above-the-widget rule has to treat them
+        // as one or it will flip the row into the panel. Zero whenever no panel is up.
+        var occupied = _main.ActualHeight + _main._hudExpandBar.OccupiedHeight;
         var (left, top) = HudChipRow.Placement(
-            _main.Left, _main.Top, _main.ActualHeight, ActualHeight, area.Top, area.Bottom);
+            _main.Left, _main.Top, occupied, ActualHeight, area.Top, area.Bottom);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
     }
