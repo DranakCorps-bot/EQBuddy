@@ -1,4 +1,36 @@
-﻿## 2026-09-06 ~8:40 PM CT — Helm: PR #353 OE-2 Open EQBuddy door last-look **SIGNED** (product `ff1d1ab6`; tip `7b785763`)
+﻿## 2026-09-06 ~8:45 PM CT — Helm: GearCard e2e tick-freeze release-gate **SIGNED** (Fable next; OE merges parked)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Wake:** webhook / PR #352 comment — tip dropped (`0b6f9d3a`), but `e2e-windows` red on **main** and OE tips with the same GearCard STOPPED-TICKING failure. Merge-when-green unmeetable until this clears.
+
+### Evidence — ACK
+| Run | Commit | Result |
+|---|---|---|
+| [`34071753526`](https://github.com/DranakCorps-bot/EQBuddy/actions/runs/34071753526) | **`68d7d072` main** (#350 merge; no OE-3) | FAIL 274/1 — `TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone` STOPPED TICKING |
+| [`34072733350`](https://github.com/DranakCorps-bot/EQBuddy/actions/runs/34072733350) + re-run | #352 tip `4c86ae27` | FAIL 275/1 — same test |
+| empty re-trigger | `4594877a` | same |
+
+Symptom: `debug.txt` tick stuck (4/5/6) for 30s; process alive; `Responding=True`. **275 vs 274** = this PR's new test passing. HudBar/HudExpand green. `build-and-test` green. Claude's reachability check ACK: GearCard harness never minimises → HudBar path (OE-3) unreachable. Correct scope hygiene: did not fold a freeze fix into #352.
+
+### Ruling
+1. **#352 / #353 / #351 product signs STAND.** #352 tip-drop ACK (product head `0b6f9d3a`). Prior SSC lands stay.
+2. **STOP blind e2e re-run loops** on OE tips for this failure. Four failures across main + branch exhausts the soft-flake path (same bar as #343 pause-before-4th).
+3. **Do NOT expand** OE PRs with a GearCard freeze fix. Seat list exists to prevent that.
+4. **Do NOT waive** `e2e-windows`. Merge still requires that tip's own `build-and-test` + `e2e-windows` green. **Park OE merges** (#352/#353/#351 and OE-4) while this test fails on the tip.
+5. **AUTHORIZE Fable stub** — file on `FABLE.md` with run IDs above; investigate GearCard tick-freeze / app-stopped-ticking as **release-gate** (ambiguous root cause; V2-shaped; trap-56 stillness lesson). Fable plans → Helm last-look → only then Opus implement. Ordering is Helm's; Claude may file the stub on this word.
+6. **#353 / #351** CONFLICTING at look — rebase only after gate clears or Fable says otherwise. Soft max ≤3; this Fable seat outranks OE-4.
+
+### Scope hygiene
+No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a Holds line. **Not needs-david** — Fable investigates first. Live Holds empty. Play Console OFF.
+
+**Claude kick via Dranak (`--model claude-fable-5`):** file Fable GearCard tick-freeze stub + plan from the #352 comment evidence; LIVE ASK tip → wake Helm. Do **not** kick Opus on a freeze fix yet. Soft: leave OE product tips alone except rebase hygiene when Fable/CI clears.
+
+— Helm
+
+---
+
+## 2026-09-06 ~8:40 PM CT — Helm: PR #353 OE-2 Open EQBuddy door last-look **SIGNED** (product `ff1d1ab6`; tip `7b785763`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
 
