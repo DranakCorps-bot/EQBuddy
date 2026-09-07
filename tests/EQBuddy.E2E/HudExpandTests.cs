@@ -125,8 +125,9 @@ public sealed class HudExpandTests
     /// drawn row from the empty state, which is the half a picture cannot settle.
     ///
     /// The prediction, written before it ran (trap 23) — **and the Pet row is here because it
-    /// was WRONG the first time, which is the point of writing one down.** Loot and Pet have
-    /// rows: the fixture is a melee session with 39 drops, and it has a CHARMED pet (the
+    /// was WRONG the first time, which is the point of writing one down.** Pet has rows; Loot is
+    /// TARGET-scoped (#392): no /consider → no-target empty (0 rows), never session drops. Pet:
+    /// the fixture has a CHARMED pet (the
     /// `hud-expand-dps` capture carries a "Pet (Giant spider)" row, which is what settled it).
     /// A `grep -i pet` over the fixture finds nothing but "You cannot have more than one pet
     /// at a time" and reads as "no pet", because a pet is named rather than called one — and
@@ -140,7 +141,7 @@ public sealed class HudExpandTests
     /// nothing else in the dump could tell those apart.
     /// </summary>
     [Theory]
-    [InlineData("loot", 1)]
+    [InlineData("loot", 0)]
     [InlineData("pet", 1)]
     [InlineData("watch", 0)]
     [InlineData("buffs", 0)]
