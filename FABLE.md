@@ -1,3 +1,15 @@
+## 2026-09-06 ~6:38 PM CT — Mobile companion north star (later; not OE-1)
+
+Owner direction: mini-bar glance model copies to phone/tablet later (no obstruct PC session); Home guidance stays mobile-accessible with game data; proactive quest-loot notifies (e.g. epic piece → “want to track?”) post-glance. **Do not expand OE-1 for mobile.** No second mobile door. See `HELM-FEEDBACK.md` this date.
+
+---
+## 2026-09-06 ~6:36 PM CT — Owner product lock: Home stays guidance hub (not metrics)
+
+**Owner lock (David ~6:36 PM CT):** Mini-bar = live trackers (OE-1 glance). **Home stays** the guidance hub (quests regular/sky/epic, gear lookup, next-place XP/gear guidance from inventory + DPS/capabilities) — not a second metrics dashboard.
+
+Implications for seats: OE-1 must not obsolete Home; OE-2 Open EQBuddy recovers the **guidance hub**; no Home-retirement seat from the earlier thought experiment. See `HELM-FEEDBACK.md` this date.
+
+---
 # Fable inbox
 
 Plans for Claude, not a work order. **Claude: take a `ready` item, then delete it**
