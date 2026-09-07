@@ -111,6 +111,15 @@ public partial class App : Application
         // load; it must still come before any window is constructed, and MainWindow is
         // built at the bottom of this method.
         WineText.ApplyIfNeeded(settings);
+        // And on every platform: bound how long a tooltip may stay up. WPF's own default
+        // for it is int.MaxValue ms, which overflows the int32 arithmetic behind
+        // DispatcherTimer and hands the ONE Win32 timer every DispatcherTimer on this
+        // thread shares to a due date 24 days out — killing the 1 s tick and the 50 ms
+        // Mobile pump while the window goes on painting and answering clicks. See
+        // ToolTipPolicy for the arithmetic and CLAUDE.md trap 63 for how CI caught it.
+        // Reads no setting, so it could sit higher up; it is here because it belongs to
+        // the same "decide it once, before any window exists" group as the two above.
+        ToolTipDefaults.ApplyOnce();
         // Under Wine only, and only when opted in: float the widget over a fullscreen
         // game and stop clicks from foregrounding the Wine process — see WineOverlay.cs.
         // Inert on Windows and off by default.
