@@ -178,6 +178,83 @@ public partial class ShellWindow : Window, IFollowingSurface
         // asked for nothing or asked for somewhere that does not exist — the same refusal
         // Navigate already makes, read back rather than re-implemented here.
         if (!Navigate(address)) Navigate(ShellPages.Address(_page));
+
+        // AFTER the room is on screen, so Setup is drawn over something rather than over an
+        // empty content cell — and so a player who closes it is already where they were
+        // going. The decision itself is made HERE, in the constructor, which is what makes
+        // `shellSetupAuto` a fact about this open rather than about whichever tick happened
+        // to read it (trap 62: an assertion that nothing happened has to name the moment it
+        // is true at).
+        MaybeAutoShowSetup();
+    }
+
+    // ---- first-run Setup (OE-6) ------------------------------------------------
+
+    /// <summary>The screen, built on first ask and kept — the same lazy-and-keep rule the
+    /// rooms follow. Null until something asks for it, because a shell opened by a player
+    /// who is already set up must not pay to build it.</summary>
+    private SetupView? _setup;
+
+    /// <summary>Whether the auto-launch predicate came out TRUE when this window opened.
+    /// A fact about the decision rather than about the layer's current visibility, so it
+    /// survives the player closing the screen and is answerable at any tick.</summary>
+    private bool _setupAuto;
+
+    /// <summary>
+    /// Open Setup by itself, or do nothing — and the predicate is
+    /// <see cref="SetupReadout.ShouldAutoShow"/>'s, which is unit-tested, rather than a
+    /// condition spelled here where nothing can reach it.
+    ///
+    /// **Both inputs are read fresh.** The rows come from the same
+    /// <see cref="ReadinessRows.Read"/> Home uses, so "empty profile" is a fact about the
+    /// dumps on disk; the dismissal comes from the widget's own settings instance (trap 13
+    /// — never a second snapshot).
+    /// </summary>
+    private void MaybeAutoShowSetup()
+    {
+        if (!SetupReadout.ShouldAutoShow(ReadinessRows.Read(_main), _main.Settings.SetupDismissed))
+            return;
+        _setupAuto = true;
+        ShowSetup();
+    }
+
+    /// <summary>
+    /// Show the first-run Setup screen over the active room.
+    ///
+    /// **Public because Settings' Behavior block re-opens it**, which is the entry Bevel's
+    /// ruling puts inside <c>SettingsTab.Behavior</c> rather than in a fifth tab — and
+    /// because <c>ShellHost</c>'s <c>EQBUDDY_SETUP</c> hook is the only way a capture or an
+    /// E2E can reach the screen at all on a profile that has already dismissed it (trap 22).
+    /// Neither of those is an auto-show, so neither sets <see cref="_setupAuto"/>.
+    /// </summary>
+    public void ShowSetup()
+    {
+        // Navigating away from Setup closes it first: a link into Gear that left the screen
+        // sitting over the room it just opened would be an affordance that appears not to
+        // work. It goes through THIS window's Navigate, never a second dispatch (trap 33
+        // lifted into navigation).
+        _setup ??= new SetupView(_main, address => { HideSetup(); Navigate(address); }, DismissSetup);
+        SetupHost.Content = _setup.Body;
+        SetupLayer.Visibility = Visibility.Visible;
+    }
+
+    private void HideSetup() => SetupLayer.Visibility = Visibility.Collapsed;
+
+    /// <summary>
+    /// The ONE close, and it persists.
+    ///
+    /// **Two paths must not decide a question this shape** — trap 47 is what it cost when a
+    /// consented path and an unconsented one disagreed about a destructive job, and the
+    /// milder version here is a "not now" that quietly turns an onboarding screen into
+    /// something a player meets at every launch. So the button and the Escape key are the
+    /// same act, the screen says what that act does
+    /// (<see cref="SetupReadout.ReopenNote"/>), and Settings → Behavior brings it back.
+    /// </summary>
+    private void DismissSetup()
+    {
+        _main.Settings.SetupDismissed = true;
+        _main.Settings.Save();
+        HideSetup();
     }
 
     // ---- chrome ----------------------------------------------------------------
@@ -345,6 +422,11 @@ public partial class ShellWindow : Window, IFollowingSurface
         // nothing" reading, on the room a new player is most likely to be looking at. It
         // caches its disk reads on a timer, so this is what makes the answer immediate.
         if (_rooms.TryGetValue(ShellPage.Home, out var home)) ((HomeRoom)home).Refreshed();
+        // And the first-run screen, which is the surface most likely to be ON SCREEN at the
+        // moment the dump lands — it is the thing that just told the player to run the
+        // command. A row still reading "Not run yet" here is the same "EQBuddy did nothing"
+        // reading, on the one screen where it is unmissable.
+        if (SetupLayer.Visibility == Visibility.Visible) _setup?.Refreshed();
     }
 
     // ---- Ctrl+K palette --------------------------------------------------------
@@ -374,6 +456,15 @@ public partial class ShellWindow : Window, IFollowingSurface
             OpenPalette();
             _searchInput.Focus();
             _searchInput.SelectAll();
+            e.Handled = true;
+        }
+        // Setup is checked BEFORE the palette: it is drawn over the palette, so Escape has
+        // to close the thing the player can actually see. And it is the SAME act as the
+        // screen's own button — a second close that did not persist would be two paths
+        // deciding one question (see DismissSetup).
+        else if (e.Key == Key.Escape && SetupLayer.Visibility == Visibility.Visible)
+        {
+            DismissSetup();
             e.Handled = true;
         }
         else if (e.Key == Key.Escape && PaletteLayer.Visibility == Visibility.Visible)
@@ -589,5 +680,18 @@ public partial class ShellWindow : Window, IFollowingSurface
         $"shellRoomFills={(RoomFills() ? 1 : 0)} " +
         $"shellSearch={(SearchBox.IsVisible ? 1 : 0)} " +
         $"shellPalette={(PaletteLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // **THE THREE FACTS OE-6 IS, and they are three because the states they separate
+        // look identical from outside.** `shellSetup` is what is on screen NOW;
+        // `shellSetupAuto` is whether the predicate opened it, which is the only thing that
+        // can tell an auto-launch from a hook or a Settings re-open; `shellSetupDismissed`
+        // is the persisted answer, which separates "the predicate said no because the dumps
+        // are satisfied" from "because the player said stop". A single visibility bit would
+        // have made every one of those the same number.
+        $"shellSetup={(SetupLayer.Visibility == Visibility.Visible ? 1 : 0)} " +
+        $"shellSetupAuto={(_setupAuto ? 1 : 0)} " +
+        $"shellSetupDismissed={(_main.Settings.SetupDismissed ? 1 : 0)} " +
+        // The screen's own facts, re-keyed mechanically rather than restated (trap 58) — so
+        // a fact it gains tomorrow arrives here without anyone editing this line.
+        (_setup is { } setup ? ShellDumpFacts.Prefixed("shell", setup.DebugFacts()) + " " : "") +
         (_rooms.TryGetValue(_page, out var shown) ? shown.DebugFacts() : "");
 }

@@ -377,6 +377,23 @@ public sealed class AppSettings
     /// "Never show again" button or the Options checkbox. While on, the startup
     /// janitor defers log truncation — the tour's first page is its consent question.</summary>
     public bool ShowTutorial { get; set; } = true;
+    /// <summary>
+    /// The Evolved shell's first-run Setup has been closed by the player (OE-6).
+    ///
+    /// **It is the only half of the auto-launch answer that is a SETTING, deliberately.**
+    /// Whether Setup is still needed is a fact about the dumps — every readiness row never
+    /// scanned — read off the disk each time rather than remembered, so a player who
+    /// reinstalls or who has run EQBuddy for a week without ever typing an
+    /// <c>/outputfile</c> command gets the same answer as a brand-new one. What only the
+    /// player can tell us is "stop offering", and that is this flag.
+    ///
+    /// Written by the screen's own button and read by
+    /// <c>SetupReadout.ShouldAutoShow</c> — both in the change that added it, which is trap
+    /// 20's rule in the polarity that costs a capability. Settings → Behavior → Setup
+    /// re-opens the screen without clearing it: a re-open is not a request to be nagged
+    /// again.
+    /// </summary>
+    public bool SetupDismissed { get; set; }
     /// <summary>Overlay card order (section keys); missing keys append in default order.</summary>
     public List<string> SectionOrder { get; set; } = [];
     /// <summary>Hidden overlay cards (still collect data — OVERLAY acceptance).</summary>

@@ -174,9 +174,11 @@ internal sealed class HomeRoom : Grid, IShellRoom
     {
         if (DateTime.Now - _readAt < SourceCacheFor) return;
         _readAt = DateTime.Now;
-        var logFolder = _main.Settings.LogFolder;
-        _readiness = HomeReadout.Readiness(identity,
-            kind => OutputfileAutoImport.WrittenAt(logFolder, identity.Character, kind));
+        // ONE read for two hosts (OE-6). `ReadinessRows.Read` is what the first-run Setup
+        // screen asks as well — a second host that assembled the identity and the dump
+        // timestamps itself could disagree with this one about which character it was even
+        // looking at, which is trap 33 with the two producers being two surfaces.
+        _readiness = ReadinessRows.Read(_main);
         // Scoped by the ARCHIVER's identity inside MainWindow.StoredSessions — the strings
         // the rows were written under, which is not always the same pair the log filename
         // gives `Identity`. See LevelHistory.Stored for what a "close enough" identity costs.
@@ -253,84 +255,22 @@ internal sealed class HomeRoom : Grid, IShellRoom
             block.Children.Add(Line(HomeReadout.EmptyReadiness, Role.BodySecondary));
             return;
         }
-        foreach (var row in _readiness) block.Children.Add(ReadinessRowView(row));
-    }
-
-    /// <summary>
-    /// One readiness row: what the dump feeds, when it last landed, and — only when it
-    /// never has — the ⧉ copy of the command that produces it.
-    ///
-    /// **The copy button is the row's whole point in its empty state.** A surface that asks
-    /// the player for an output file and hands them no way to run it is the defect David
-    /// reported on 2026-08-20, and it is worse in the empty state, which is the only state a
-    /// new player sees. <c>GameCommandsTests.SurfacesNeedingACommand</c> carries three rows
-    /// for this file because a missing control is invisible to a diff, a build and a
-    /// screenshot alike (trap 34) — and <c>shellHomeCopyCmd</c> counts them from a launched
-    /// app, which is the only thing that can see the control exists.
-    /// </summary>
-    private FrameworkElement ReadinessRowView(ReadinessRow row)
-    {
-        var stack = new StackPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
-
-        // A GRID and never a horizontal StackPanel: a stack measures its children with
-        // infinite width, so the answer would be pushed off the edge with no ellipsis and
-        // the row would simply be cut (trap 14, and trap 25 with chips).
-        var head = new Grid();
-        head.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-        head.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-        var name = DesignSystem.Text(Role.Body, row.Name);
-        name.TextWrapping = TextWrapping.Wrap;
-        head.Children.Add(name);
-
-        var answer = DesignSystem.Text(Role.Caption, HomeReadout.ReadinessAnswer(row));
-        answer.Ink(row.State == ReadinessState.NeverScanned ? "AccentBrush" : "DimBrush");
-        answer.Margin = new Thickness(Tok.SpaceM, 0, 0, 0);
-        Grid.SetColumn(answer, 1);
-        head.Children.Add(answer);
-        stack.Children.Add(head);
-
-        stack.Children.Add(Line(row.Feeds, Role.Metadata));
-
-        if (row.State == ReadinessState.NeverScanned)
+        // **The row and its ⧉ are built by `ReadinessRows`, which is a SHARED builder as of
+        // OE-6 — the first-run Setup screen hosts the same rows.** It moved out of this file
+        // rather than being copied into that one: a hand-rolled second copy of the treatment
+        // is trap 33's shape with the two producers being two hosts, and it stops agreeing
+        // the day `HomeReadout.Readiness` gains a fourth row (OE-5 PR-1's spellbook row is
+        // already on the board). The three `GameCommandsTests.SurfacesNeedingACommand` rows
+        // moved with it, the same way they followed `MapView` and `QuestsView` before.
+        // `shellHomeCopyCmd` still counts what THIS host built, because only a launched app
+        // can say a control exists (trap 29) and two hosts need two counts.
+        foreach (var row in _readiness)
         {
-            var copy = Theming.WireCopyCommand(Theming.Button(""), CommandFor(row.Kind));
-            copy.FontSize = Tok.Spec(Role.Caption).Size;
-            copy.HorizontalAlignment = HorizontalAlignment.Left;
-            copy.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-            copy.ToolTip = "Copies the command — paste it into the game's chat. The game "
-                + "writes the file beside its own folders and EQBuddy reads it by itself.";
-            stack.Children.Add(copy);
-            _copyCommands++;
+            var (view, copies) = ReadinessRows.Row(row, _navigate);
+            _copyCommands += copies;
+            block.Children.Add(view);
         }
-        else if (row.Address.Length > 0)
-        {
-            // A row whose dump HAS landed is a way into the surface that uses it — through
-            // the same Navigate the rail calls, never a second dispatch (trap 33 lifted into
-            // navigation). Filtered by Landed in HomeReadout, so this cannot offer a room
-            // that does not exist.
-            stack.Children.Add(LinkLine("Open", row.Address));
-        }
-
-        return stack;
     }
-
-    /// <summary>
-    /// The command a dump needs, named as the constant rather than as a literal — the whole
-    /// point of centralising them, and what
-    /// <c>GameCommandsTests.NoCopySurfaceCarriesItsOwnCommandLiteral</c> forbids the other
-    /// way round.
-    ///
-    /// The switch is HERE rather than on <c>GameCommands</c> on purpose: the must-list scan
-    /// asserts that a surface which needs a command NAMES it, and a helper in UI.Shared
-    /// would satisfy the compiler while making this file's three rows unverifiable.
-    /// </summary>
-    private static string CommandFor(OutputfileKind kind) => kind switch
-    {
-        OutputfileKind.Achievements => GameCommands.OutputfileAchievements,
-        OutputfileKind.Factions => GameCommands.OutputfileFaction,
-        _ => GameCommands.OutputfileInventory,
-    };
 
     private void BuildRecentSession()
     {
@@ -388,16 +328,6 @@ internal sealed class HomeRoom : Grid, IShellRoom
         block.TextWrapping = TextWrapping.Wrap;
         block.Ink(role == Role.Body ? "TextBrush" : "DimBrush");
         return block;
-    }
-
-    private FrameworkElement LinkLine(string label, string address)
-    {
-        var text = DesignSystem.Text(Role.Caption, label);
-        text.Ink("AccentBrush");
-        text.HorizontalAlignment = HorizontalAlignment.Left;
-        text.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
-        DesignSystem.WireClick(text, () => _navigate(address));
-        return text;
     }
 
     /// <summary>

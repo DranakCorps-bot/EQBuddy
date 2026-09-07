@@ -61,6 +61,58 @@
   severity call · reported to Helm only, because "what players are told" and the release go are
   consequence-list decisions, and Phase 3 has not been scoped.
 
+## 2026-09-06 (OE-6 — the first-run Setup / `/outputfile` guide)
+
+Bevel's #356 pre-design left three residuals as executor calls ("exact modal chrome; precise
+dismiss-flag name and its default; whether the Behavior-tab re-open entry is a button or a
+row"), and Fable's #358 seat says a departure from the no-fifth-tab or one-source rulings is
+a Bevel question BEFORE ship. Nothing below departs from either; these are the residuals and
+the two calls the work itself turned up.
+
+- **The chrome is an opaque LAYER over the room cell, stretched on both axes** · a dialog
+  window, a slide-over and a room-shaped overlay were the three Bevel named · the layer,
+  because it is what the shell already knows how to draw (`PaletteLayer` is the same shape),
+  it inherits the room's degrade for free, and it keeps the rail and the title bar visible —
+  so the screen reads as EQBuddy asking something rather than as a modal that has taken the
+  app over. A dialog window would also have been a second always-on-top surface at exactly
+  the moment a new player has never seen the first one.
+- **`SetupDismissed`, defaulting FALSE** · `SetupShown`, `SetupSeen` and a nullable date were
+  the alternatives · dismissed-and-false, because the DEFAULT is what a fresh install gets
+  and false is the only default that makes the screen appear for the player it exists for.
+  A "shown" flag would have been the first-run boolean the pre-design rules out — the ask
+  stops because the dumps are satisfied, not because it has been shown once.
+- **The Behavior entry is a BUTTON, not a tick box** · the tour beside it is a checkbox and
+  copying it was the obvious move · a button, because there is nothing to configure: the
+  auto-launch answer is a fact about the dumps plus one "stop offering", and a tick box would
+  invite somebody to re-arm the nag. It sits directly under the tour, which is the block's own
+  onboarding territory.
+- **ONE close, and it persists — the button and Escape are the same act** · a "not now" beside
+  a "never" was the obvious two-button shape · one, because two paths deciding one question is
+  trap 47's shape (with a nag rather than a deletion for a consequence), and the "not now" path
+  is the one that turns an onboarding screen into something a player meets every launch. What
+  makes that honest is that the screen SAYS so, in a line under the button naming both ways
+  back (Home keeps asking; Settings → Behavior re-opens).
+- **The readiness ROW BUILDER moved out of `HomeRoom.cs` into `ReadinessRows.cs`, and the
+  three `GameCommandsTests` rows moved with it** · the alternative was a second copy of the
+  treatment in `SetupView` plus three more must-list rows keyed on that file · the move,
+  because Bevel's ruling is explicit that Setup reuses `CommandFor(OutputfileKind)` rather
+  than growing a second switch, and a must-list row keyed on `SetupView.cs` would be asking a
+  file that correctly names no command to name three. **What it costs, said out loud:** the
+  count of HOSTS is no longer in that list. It never was what trap 34 guards — that rule is
+  about a surface with NO copy source at all, and a host rendering these rows structurally
+  cannot have one — and the per-host claim moved to where controls can be seen
+  (`shellHomeCopyCmd` and `shellSetupCopyCmd`, off two launched surfaces).
+- **`SetupDismissed = $true` is seeded in `scripts/shoot.ps1`'s base settings and in
+  `AppHarness`** · neither was in the seat's scope · seeded, because the batch profile and the
+  E2E profile both have a character and NO dumps, which is precisely the state the auto-launch
+  predicate opens for — Fable's seat note assumed the opposite ("the batch's seeded profile has
+  dumps imported"), and `shell-home`'s own prediction says three ⧉ buttons *"because the shoot
+  profile has no dumps"*. Left alone, every shell shot and every shell E2E would have run with
+  a screen over the surface it is about: trap 23 arriving through the harness. The
+  `setup-screen` shot reaches the screen through `EQBUDDY_SETUP=1` instead, which is a forced
+  open rather than a re-run of the predicate, so the picture stays evidence about the screen on
+  the day the fixture gains a dump.
+
 ## 2026-09-06 (OE-3 — the xp-chip tooltip: ETA + level)
 
 - **The level readout goes on the TOOLTIP, not on the Progress window's Experience header**

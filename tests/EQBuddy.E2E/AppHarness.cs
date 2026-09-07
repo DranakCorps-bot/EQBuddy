@@ -106,6 +106,14 @@ internal sealed class AppHarness : IDisposable
             WindowTop = widgetTop,
             Minimized = false,
             ShowTutorial = false,
+            // **The first-run Setup screen, off by default here for the same reason the tour
+            // is** (OE-6). This profile has a character and no dumps, which is EXACTLY the
+            // state Setup's auto-launch predicate opens for — so without this line every
+            // shell test in the suite would be run with a screen over the room it is about,
+            // and the failures would read as defects in whatever was being asserted. A
+            // seeded profile is a STATED state; the two tests that are about the auto-launch
+            // set it back to false themselves, which is what makes them about it.
+            SetupDismissed = true,
             LastSeenVersion = $"{v.Major}.{v.Minor}.{Math.Max(v.Build, 0)}",
             // No satellite windows and no log rewriting under the test's feet.
             TrackSpawns = false,

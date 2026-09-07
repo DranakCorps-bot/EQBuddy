@@ -125,6 +125,34 @@
                         Margin="{DynamicResource PadCard}">
                     <StackPanel x:Name="PaletteBody" Margin="{DynamicResource PadCard}"/>
                 </Border>
+
+                <!-- FIRST-RUN SETUP (OE-6), over the active room and over the palette,
+                     because it is the one surface that is asking the player to go and do
+                     something before anything else here is worth reading.
+
+                     It covers the room rather than replacing it: navigating to Setup would
+                     have made it a room, and Bevel's ruling is explicit that the lock's
+                     "Settings / Setup room" means HOSTED FROM Settings and not a fifth
+                     SettingsTab (four is signed, I-11/#331). Stretched on both axes and
+                     opaque, so it is modal within the room without a scrim brush nobody
+                     else needs.
+
+                     The scroller is HERE and not in SetupView (trap 36): a lifted view
+                     brings its content and leaves the chrome behind, and a child scroller
+                     measured with infinite height would never overflow, never scroll, and
+                     still swallow the wheel. The body carries no Visibility and no outer
+                     Margin of its own (trap 15) — this Border owns both. -->
+                <Border x:Name="SetupLayer" Visibility="Collapsed"
+                        Background="{DynamicResource BgBrush}"
+                        BorderBrush="{DynamicResource HairlineBrush}" BorderThickness="1"
+                        CornerRadius="{DynamicResource CornerPanel}"
+                        Margin="{DynamicResource PadCard}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  PanningMode="VerticalOnly">
+                        <ContentControl x:Name="SetupHost" Margin="{DynamicResource PadCard}"/>
+                    </ScrollViewer>
+                </Border>
             </Grid>
         </Grid>
     </Grid>

@@ -208,7 +208,10 @@ public class ShellTerminologyTests
     public void EveryShellStringConstantIsPlayerVocabulary()
     {
         Type[] wordModules =
-            [typeof(HomeReadout), typeof(LivePresentation), typeof(ShellRoomEmpty), typeof(ShellPages)];
+        [
+            typeof(HomeReadout), typeof(LivePresentation), typeof(ShellRoomEmpty),
+            typeof(ShellPages), typeof(SetupReadout),
+        ];
 
         var seen = 0;
         foreach (var type in wordModules)
@@ -261,6 +264,14 @@ public class ShellTerminologyTests
         ("EQBuddy/ShellRoomIdentity.cs", "who the shell says it is following"),
         ("EQBuddy/IShellRoom.cs", "the room contract every room's chrome is built against"),
         ("EQBuddy/HomeRoom.cs", "identity, readiness and the ⧉ tooltips — the most prose in the shell"),
+        // OE-6's two files. `ReadinessRows` carries the ⧉ tooltip that used to sit in
+        // HomeRoom — the row moved and its sweep moved with it — and `SetupView` is the
+        // first-run screen, which is the only surface in the shell a player meets BEFORE
+        // they have used anything: the one place a v1 word would be read by somebody with no
+        // context at all for what it used to mean.
+        ("EQBuddy/ReadinessRows.cs",
+            "one readiness row for both hosts — the ⧉ tooltip and the Open link"),
+        ("EQBuddy/SetupView.cs", "the first-run screen's own chrome around the shared rows"),
         ("EQBuddy/LiveRoom.cs", "eight tabs of session surfaces"),
         ("EQBuddy/LiveSessionPanes.cs", "the Pace and Encounters panes Live brought from History"),
         ("EQBuddy/ProgressRoom.cs", "experience, wealth, faction, raids"),
@@ -336,6 +347,8 @@ public class ShellTerminologyTests
         ("EQBuddy.UI.Shared/ShellLayout.cs", "the two degrade axes — any text they name"),
         ("EQBuddy.UI.Shared/ShellRoomEmpty.cs", "the four data rooms' whole-room empties"),
         ("EQBuddy.UI.Shared/HomeReadout.cs", "identity, readiness and deep-link sentences"),
+        ("EQBuddy.UI.Shared/SetupReadout.cs",
+            "the first-run screen's headline, lead, close and its Behavior-tab row"),
         ("EQBuddy.UI.Shared/LivePresentation.cs", "Live's words, badge and captions"),
     ];
 

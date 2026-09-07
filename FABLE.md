@@ -204,45 +204,17 @@ neighborhood — whichever of OE-6 / any Settings seat lands second rebases, not
   four-source bisect checklist stays the diagnostic for when that screenshot arrives; this
   seat improves the estimate and claims no fix for a complaint that has no evidence yet.
 
-### OE-6 — First-run Setup / `/outputfile` guide (LOCK B)
+### OE-6 — First-run Setup / `/outputfile` guide (LOCK B) — **TAKEN 2026-09-06**
 
-- **Priority:** `ready`.
-- **Class:** `V1` — named here because the owner lock routed seat-naming through Fable, not
-  because it needs a V2 plan: Bevel's PR #356 pre-design IS the design pass, and execution
-  is localized (a second host of an existing list).
-- **Source:** owner lock via Helm, #355 (B); Bevel pre-design (PR #356 tip `52981085`),
-  **adopted in full — all three IA tensions are plan constraints:**
-  - **One data source.** `HomeReadout.Readiness()` stays the source of truth; Setup is a
-    second HOST of the same `ReadinessRow` list with the `ReadinessRowView` treatment
-    (⧉ copy via `CommandFor(row.Kind)` on `NeverScanned`, "Open <room>" on `Scanned`).
-    Zero new enums or switches over `OutputfileKind` (traps 20/30/33).
-  - **No fifth `SettingsTab`** (four is Helm-signed I-11/#331; `SettingsRoomTests` pins
-    it). Auto-launch is a modal the shell shows over the active room; the re-open entry is
-    a row in `SettingsTab.Behavior`'s block (its doc comment already claims onboarding).
-  - **Auto-launch predicate is a fact about the dumps**, not a new first-run boolean:
-    every Readiness row `NeverScanned`. Stops when satisfied (count 0) or dismissed —
-    dismiss flag persisted with writer AND reader in the same PR (`DeadSettingTests`).
-- **Must-list rows:** Setup names `/outputfile` commands ⇒ its
-  `GameCommandsTests.SurfacesNeedingACommand` row lands in the same PR (trap 34).
-- **Shot offline: yes** — but the batch's seeded profile has dumps imported, so Setup will
-  never auto-show there: the shot needs a dedicated UNSEEDED-dumps staging variant, with
-  the prediction written before shooting (trap 23) and the BATCH run after (trap 53). The
-  illustration lock binds it.
-- **Verification:** E2E facts (`EQBUDDY_EXPAND`/shell dump): auto-shows once on an
-  empty-dumps profile; does not re-show after dismiss (assert at a moment on the far side
-  of the decision, trap 62); Behavior-tab row reopens it.
-- **What clamps it:** nothing on `MainWindow` (Bevel verified, re-verified this pass —
-  pieces are `HomeReadout`/`SettingsRoom`/a new modal class). Settings-neighborhood rebase
-  note only.
-- **Bevel pre-design: yes** — PR #356. Residuals Bevel left open (modal chrome; dismiss
-  flag name; button vs row on Behavior) are executor calls logged in `DECISIONS.md`; a
-  departure from the no-fifth-tab or one-source rulings is a Bevel question BEFORE ship.
-- **Decided without asking:** seats continue the OE series (OE-5/OE-6) rather than opening
-  a new one; Setup is a modal, not a `page:room` address (adopting Bevel's placement as the
-  plan — a navigable room was the plausible other reading of the lock's "Setup room").
-- **Out:** anything OptionsWindow (the lock says Evolved Settings; OptionsWindow stays per
-  the SR-5 sign); inventing the spellbook Readiness row here (that is OE-5 PR-1's single
-  place); removing or demoting Home's Readiness block.
+Executed by Claude/Opus on `claude/oe6-first-run-setup-20260906`. The item is deleted per
+the take-then-delete contract; what it asked for is in `docs/TestPlan.md` (five rows) and
+the calls it left to the executor are in `DECISIONS.md`. **Bevel's three IA constraints
+shipped unchanged** — one data source (`ReadinessRows`, shared with Home), no fifth
+`SettingsTab`, auto-launch as a fact about the dumps. **One correction to the seat, filed
+in `FABLE-FEEDBACK.md`:** the shot note has the batch profile backwards — it stages NO
+dumps, so Setup would have auto-shown over all twenty shell shots.
+
+**OE-5 above is untouched and still `ready`.**
 
 **Kick-order recommendation (Helm's call to confirm):** Phase-2 diagnose keeps the
 priority kick. Then OE-6 and OE-5 PR-1 in parallel worktrees under soft max ≤3 — OE-6

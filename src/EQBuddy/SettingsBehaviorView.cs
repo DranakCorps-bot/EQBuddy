@@ -51,15 +51,34 @@ internal sealed class SettingsBehaviorView
     private readonly Func<bool> _hostReady;
     private readonly Func<object, object> _resource;
 
+    /// <summary>
+    /// **How a host re-opens the Evolved shell's first-run Setup screen (OE-6) — and the
+    /// one row of this block that a host may legitimately not have.**
+    ///
+    /// Setup is a layer of <see cref="ShellWindow"/>: it is drawn over the active room, and
+    /// <c>OptionsWindow</c> — which is not the shell, has no room, and is explicitly out of
+    /// the owner's lock ("Evolved Settings, not OptionsWindow") — has nowhere to put it. A
+    /// button that opened nothing there would be "silent no-ops are broken" with the switch
+    /// on the other side, and the honest alternative to that is not to draw it.
+    ///
+    /// So it is a CAPABILITY the host supplies rather than a flag the block reads: null
+    /// means "this host cannot show Setup", which is a fact about the host, and the default
+    /// keeps <c>OptionsWindow</c>'s construction untouched. <c>behaviorSetup</c> in the
+    /// <c>EQBUDDY_EXPAND</c> dump is what says which host got the row, from a launched app —
+    /// an absent control photographs as an unremarkable list (trap 29).
+    /// </summary>
+    private readonly Action? _openSetup;
+
     private bool Ready => _hostReady();
 
     public SettingsBehaviorView(MainWindow main, OptionsViewModel vm, Func<bool> ready,
-        Func<object, object> resource)
+        Func<object, object> resource, Action? openSetup = null)
     {
         _main = main;
         _vm = vm;
         _hostReady = ready;
         _resource = resource;
+        _openSetup = openSetup;
     }
 
     private UIElement? _block;
@@ -81,7 +100,12 @@ internal sealed class SettingsBehaviorView
     public string DebugFacts() => _block is null
         ? ""
         : $"behaviorHotkeys={_hotkeysPanel.Children.Count} " +
-          $"behaviorRecording={(_recordingAction is null ? 0 : 1)}";
+          $"behaviorRecording={(_recordingAction is null ? 0 : 1)} " +
+          // Counted off the BUILT control, not off the callback: "the host supplied a way
+          // to open Setup" and "the row is on screen" are different claims, and only the
+          // second one is the feature (trap 42). It is the one row of this block a host may
+          // legitimately not have, so it is also the one worth reporting.
+          $"behaviorSetup={(_setupBtn is null ? 0 : 1)}";
 
     private CheckBox _mobileSounds = null!, _hideUnfocused = null!, _hideNotRunning = null!;
     private CheckBox _hideAltTab = null!, _keepAbove = null!;
@@ -104,6 +128,12 @@ internal sealed class SettingsBehaviorView
             () => { if (Ready) _vm.ShowTutorial = _tutorial.IsChecked == true; });
         panel.Children.Add(_tutorial);
 
+        // Directly under the launch tour, because it is the same job for a different gap:
+        // this block's own doc comment already claims onboarding as its territory, which is
+        // why Bevel's ruling puts the re-open here rather than in a fifth tab (four is
+        // signed — I-11/#331, pinned by SettingsRoomTests).
+        if (_openSetup is not null) panel.Children.Add(BuildSetupReopen());
+
         _perfStats = Check("Show EQBuddy's own CPU & memory in the title bar",
             _main.Settings.ShowPerfStats, new Thickness(0, 10, 0, 0),
             () =>
@@ -119,6 +149,29 @@ internal sealed class SettingsBehaviorView
             + "is how you catch it and tell us.",
             new Thickness(20, 2, 0, 0)));
 
+        return panel;
+    }
+
+    // ================================================================ Setup (OE-6) ====
+
+    private Button? _setupBtn;
+
+    /// <summary>The way back into the first-run screen. A BUTTON rather than a tick box:
+    /// there is nothing to configure here — the auto-launch answer is a fact about the
+    /// dumps plus the player's one "stop offering", and a checkbox would invite somebody to
+    /// re-arm the nag. The words are <see cref="SetupReadout"/>'s, so this row and the
+    /// screen it opens cannot come to different ideas about what it is for.</summary>
+    private UIElement BuildSetupReopen()
+    {
+        var panel = new StackPanel { Margin = new Thickness(0, 10, 0, 0) };
+        _setupBtn = new Button
+        {
+            Content = SetupReadout.BehaviorLabel, Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left,
+        };
+        _setupBtn.Click += (_, _) => _openSetup?.Invoke();
+        panel.Children.Add(_setupBtn);
+        panel.Children.Add(Dim(SetupReadout.BehaviorNote, new Thickness(0, 2, 0, 0)));
         return panel;
     }
 
