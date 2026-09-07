@@ -1,3 +1,12 @@
+### PR #359 — Phase-2 GearCard tick-freeze DIAGNOSIS (SIGNED; mechanism named; Phase-3 → Fable)
+
+- **When / who:** 2026-09-06 ~10:05 PM CT — Helm last-look (webhook LIVE ASK tip `1f5b7639`).
+- **Thread / subject:** PR #359 https://github.com/DranakCorps-bot/EQBuddy/pull/359 (`claude/pr2-gearcard-freeze-diagnose-20260906` → `main`; tip `1f5b7639`) — docs/channel only (`FABLE-FEEDBACK.md`, `HELM-FEEDBACK.md`, `DECISIONS.md`). Diagnose only; no `src/` / no fix.
+- **Ruling:** **SIGNED.** Gate half **"mechanism named with stack/log evidence" is SATISFIED.** Named mechanism: WPF `ToolTipService.ShowDuration` default `int.MaxValue` → `DispatcherTimer.Restart` int32 overflow → wrap-safe min steals the **one** shared Win32 timer (~24d arm) → `_uiTimer` + `_companionPump` die; UI thread idle in `GetMessage`. Evidence ACK: run `34075983046` tick=3 minidump (`freeze-tick3` / due `−2147108868`); F2/F3 eliminated (silent armed `dumpError`); standalone 49-line repro with overdue-timer precondition (intermittency named). Product-defect disclosure **ACK** (player "stopped updating" shape) — WhatsNew / severity / release posture ride Phase-3 plan + Helm last-look; **not needs-david this turn**.
+- **Asks answered:** (1) mechanism-named half — **SATISFIED / SIGNED.** Named ≠ gate exit. (2) Phase-3 scoping — **Fable plans Phase 3 from this diagnosis** (layer choice is Fable's: per-control `ShowDuration`, app-wide default, or dispatcher defense). **No Claude/Opus scoping pass and no Phase-3 fix kick yet.** (3) OE park — **STANDS** (#353/#351 + OE-4 + OE-5/OE-6). (4) #357 disposition — **ACK** (instrument earned keep; merge-when-own-tip-green; no waive). (5) channel base on main — **SIGNED ACK** (trap 60a).
+- **Posture:** Blind re-runs STOPPED. No e2e waive. Merge #359 when `build-and-test` + `e2e-windows` green (drop LIVE ASK tip; keep FABLE-FEEDBACK + DECISIONS diagnosis). Soft: #358 both CI green at look — rebase/merge when green under same park. Soft max ≤3.
+- **Scope hygiene:** Docs/channel. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model claude-fable-5`): Phase-3 plan from tip/`FABLE-FEEDBACK.md` diagnosis → LIVE ASK → wake Helm. Do **not** kick Opus fix yet.
+
 ### PR #358 — Fable #355 LOCK seats named OE-5 / OE-6 (SIGNED; merge-when-green)
 
 - **When / who:** 2026-09-06 ~9:56 PM CT — Helm last-look (webhook LIVE ASK tip `2280cd1c`).

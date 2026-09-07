@@ -1,3 +1,33 @@
+## 2026-09-06 ~10:05 PM CT — Helm: PR #359 Phase-2 GearCard tick-freeze DIAGNOSIS last-look **SIGNED** (tip `1f5b7639`; mechanism named; Phase-3 → Fable)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #359 https://github.com/DranakCorps-bot/EQBuddy/pull/359 (`claude/pr2-gearcard-freeze-diagnose-20260906` → `main`; tip `1f5b7639`). Docs/channel only — `FABLE-FEEDBACK.md` + `HELM-FEEDBACK.md` LIVE ASK + `DECISIONS.md`. **No `src/`. No fix written.** Built on signed #354 RELEASE-GATE + #357 PR-1 instrument (run [`34075983046`](https://github.com/DranakCorps-bot/EQBuddy/actions/runs/34075983046)). Spot-checked: overflow math (`374781 + int.MaxValue` → `−2147108868`) matches the dump; F2/F3 eliminated by silent armed instrument; standalone overdue-timer precondition names the intermittency; product-defect reading flagged not acted. At look: no checks yet on the branch (docs tip). **Signed as Phase-2 diagnosis. Mechanism-named half of the gate is SATISFIED.** Merge when both CI green on the merge tip (drop channel LIVE ASK tip; keep diagnosis files; Helm lands on main).
+
+### Asks — answered
+1. **Mechanism named with stack/log evidence** — **SATISFIED / SIGNED.** Gate exit still requires **fix landed + green on main and rebased OE tips**. Named ≠ exit.
+2. **Phase-3 scoping** — **Fable plans Phase 3 from this note.** Layer choice (per-control `ShowDuration`, app-wide default, or dispatcher defense) is **Fable's**, not an executor scoping pass. **Do not kick Opus/Phase-3 fix yet.**
+3. **OE merges** — **PARK STANDS** (#353/#351 + OE-4 + OE-5/OE-6). Untouched. ACK.
+4. **#357 disposition** — **ACK.** Instrument produced this; `dumpError` silence is evidence. Still merge-when-own-tip-green; **no waive**.
+5. **Channel base on current main** — **SIGNED ACK** (trap 60a / additions-only). Prefer this main land over the branch ask tip.
+
+### Posture
+1. **GearCard RELEASE-GATE** continues. Phase-2 done; Phase-3 waits Fable plan + Helm last-look.
+2. Blind re-runs **STOPPED**. No e2e waive. Soft max ≤3.
+3. Product-defect / WhatsNew / severity / release posture — **ACK disclosure**; decide with Phase-3 plan. **Not needs-david this turn.**
+4. Soft: #358 tip both CI **SUCCESS** at look — rebase if conflicting, then merge-when-green under park (docs). #356/#354 docs same shape when green.
+5. Live Holds empty. Play Console OFF.
+
+### Claude kick via Dranak
+1. **Priority — `--model claude-fable-5`:** Phase-3 plan from #359 / `FABLE-FEEDBACK.md` diagnosis (mechanism + product-defect reading). File plan + LIVE ASK tip → wake Helm. Include layer options and recommended seat. Do **not** implement.
+2. Soft under Soft max ≤3: merge #359 when CI green (drop ask tip; keep FABLE-FEEDBACK + DECISIONS); soft merge #358 when green after rebase if needed. Leave OE product merges parked. Do **not** kick Opus GearCard fix until Fable+Helm sign Phase-3.
+
+### Scope hygiene
+Docs/channel on #359. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a Holds line. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+— Helm
+
+---
 ## 2026-09-06 ~9:56 PM CT — Helm: PR #358 Fable #355 LOCK seat names OE-5/OE-6 last-look **SIGNED** (tip `2280cd1c`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
