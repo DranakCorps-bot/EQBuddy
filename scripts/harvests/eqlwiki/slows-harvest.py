@@ -43,6 +43,8 @@ import json
 import re
 from pathlib import Path
 
+import spellnames
+
 HERE = Path(__file__).resolve().parent
 SPELLS = HERE / "spells.json"
 AAS = HERE / "aas.json"
@@ -57,8 +59,9 @@ CURE_RX = re.compile(r"Decrease (Poison|Disease|Curse) Counter by (\d+)(?:\s*\(L
 
 
 def canonical(name: str) -> str:
-    """The wiki carries both apostrophe styles (Turgur's / Turgur`s) — one spell."""
-    return name.replace("`", "'")
+    """See spellnames.py — folds apostrophe styles (Turgur's / Turgur`s) AND strips the
+    wiki's ` (Spell)` / ` (Effect)` page-title disambiguator, which the game never writes."""
+    return spellnames.canonical(name)
 
 
 def slow_range(spell):

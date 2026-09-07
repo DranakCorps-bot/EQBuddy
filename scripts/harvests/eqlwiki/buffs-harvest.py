@@ -22,6 +22,8 @@ Outputs:
 import json
 from pathlib import Path
 
+import spellnames
+
 HERE = Path(__file__).resolve().parent
 SPELLS = HERE / "spells.json"
 FADES = HERE.parents[2] / "src" / "EQBuddy.Core" / "Data" / "FadeMessages.json"
@@ -57,7 +59,9 @@ def beneficial(s) -> bool:
 
 
 def canonical(name: str) -> str:
-    return name.replace("`", "'")
+    """See spellnames.py — folds apostrophe styles AND strips the wiki's
+    ` (Spell)` / ` (Effect)` page-title disambiguator, which the game never writes."""
+    return spellnames.canonical(name)
 
 
 def main():

@@ -365,6 +365,30 @@ public sealed partial class SpellCatalog
         return stripped.Length > 0 ? stripped : spell;
     }
 
+    /// <summary>
+    /// Is this a spell name the GAME could ever put on a log line?
+    ///
+    /// A catalog spell NAME is a token the game writes; a catalog LABEL is prose we
+    /// write ("Thorns damage shield", "Tash line (MR debuff)"), and labels are exempt.
+    /// eqlwiki page TITLES are neither: the wiki disambiguates a title whenever it also
+    /// holds an item or a proc of that name — <c>Shield of Thorns (Spell)</c>,
+    /// <c>Firestrike (Effect)</c> — and the game writes no such thing.
+    ///
+    /// <see cref="BaseName"/> strips a trailing roman rank and nothing else, so a
+    /// disambiguated name can never meet the log's "Shield of Thorns V". PR #407's audit
+    /// measured what that one unreachable row cost: the landing never resolved, so Spell
+    /// Casting Reinforcement never reached the spell, the learned-duration lookup could
+    /// not key on it, and fade-learn — the mechanism that had already taught Shield of
+    /// Brambles and Shield of Spikes from the owner's own log — could never fire. The chip
+    /// showed 15:00 for a damage shield his log measures at ~24 minutes, on 28 landings.
+    ///
+    /// The rule is the CHARACTER SET, not the exact disambiguator (trap 48's move): the
+    /// harvest strips the two shapes we have seen, and this refuses every parenthetical,
+    /// so a third shape fails <c>SpellNameHygieneTests</c> instead of shipping quietly.
+    /// </summary>
+    public static bool IsLogWritableName(string spell) =>
+        !string.IsNullOrWhiteSpace(spell) && !spell.Contains('(') && !spell.Contains(')');
+
     public SpellCategory Classify(string spell)
     {
         var name = BaseName(spell);

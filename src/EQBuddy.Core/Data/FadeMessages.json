@@ -1153,7 +1153,7 @@
       "Shield of Brambles",
       "Shield of Spikes",
       "Shield of Thistles",
-      "Shield of Thorns (Spell)",
+      "Shield of Thorns",
       "Thorny Shield"
     ],
     "label": "The brambles fall away",
@@ -4217,7 +4217,7 @@
   {
     "message": "Your skin cools down.",
     "spells": [
-      "Kilva's Skin of Flame (Spell)",
+      "Kilva's Skin of Flame",
       "Scorching Skin"
     ],
     "label": "Your skin cools down",

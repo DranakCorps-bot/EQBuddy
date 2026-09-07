@@ -346,6 +346,20 @@ public sealed class BuffTracker
     private string[]? NarrowBySpellbook(string[] candidates)
     {
         if (candidates.Length < 2) return null;
+        // A candidate the dump could never have MATCHED is not evidence about the
+        // character, and dropping it is the dump overruling the log on a catalog defect.
+        // `exact.Length > 0` below reads as "the dump recognised these names"; that was
+        // only ever true while every candidate WAS a name a spellbook can carry, and a
+        // wiki page title is not (see SpellCatalog.IsLogWritableName). Measured on the
+        // owner's real dump in PR #407: it knows five of the six thorns candidates, so it
+        // narrowed to those five and dropped `Shield of Thorns (Spell)` — the only one he
+        // casts — because his book says "Shield of Thorns" and no book says "(Spell)".
+        //
+        // So a partially-matching set narrows NOTHING. This is trap 64's shape (a gate
+        // written as a proxy stops being that proxy when a second producer arrives) and
+        // trap 49's fix (name the fact, not a length). The format guard keeps the shipped
+        // catalogs clean; this keeps a future one from silently costing a spell.
+        if (Array.Exists(candidates, c => !SpellCatalog.IsLogWritableName(c))) return null;
         SpellbookFile.Snapshot? book;
         lock (_lock) book = _spellbook;
         if (book is null) return null;
