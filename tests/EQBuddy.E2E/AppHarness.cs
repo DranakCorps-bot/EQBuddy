@@ -628,6 +628,33 @@ internal sealed class AppHarness : IDisposable
         return -1;
     }
 
+    /// <summary>
+    /// Several values off ONE read of the dump — because two <see cref="DumpValue"/> calls
+    /// are two moments, and a comparison between two moments is a question a passing app can
+    /// answer wrongly (trap 56: "one dump is ONE MOMENT", which is what the app-side
+    /// `PaintOneMoment` exists to make true).
+    ///
+    /// Any key the dump does not carry answers -1, exactly as <see cref="DumpValue"/> does,
+    /// so a missing key fails an assertion rather than silently comparing against a stale
+    /// number from a different read.
+    /// </summary>
+    public int[] DumpValues(params string[] keys)
+    {
+        var text = "";
+        try { text = File.ReadAllText(DebugDumpPath); }
+        catch (IOException) { }
+        var pairs = text.Split(' ');
+        return [.. keys.Select(key =>
+        {
+            foreach (var pair in pairs)
+                if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
+                    int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
+                        CultureInfo.InvariantCulture, out var value))
+                    return value;
+            return -1;
+        })];
+    }
+
     /// <summary>Wait until a key EXISTS in the dump.
     ///
     /// A theme window opens at ApplicationIdle AFTER Launch() returns, so for a tick

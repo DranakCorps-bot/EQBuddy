@@ -107,6 +107,12 @@ internal static class WidgetDump
     /// reached) is exactly that, so it is spelled -1 rather than "NaN".</summary>
     private static double Dumpable(double value) => double.IsFinite(value) ? value : -1;
 
+    /// <summary>An offset in whole units, off <see cref="Dumpable"/> so "absent" is spelled
+    /// the one way. <c>DumpValue</c> parses integers, so a fractional DIP would read as -1
+    /// (its "the key is not there") and a wrong assertion would look like a missing key.
+    /// </summary>
+    private static double Offset(double value) => Math.Round(Dumpable(value));
+
     /// <summary>Write the dump when the EXPAND gate is up. Same guard, same file, same
     /// keys as the block always had — the E2E suite's assertions are the contract.
     ///
@@ -416,6 +422,28 @@ internal static class WidgetDump
                     $"hudPanelPark={w._hudExpandBar.ParkKey} " +
                     $"hudPanelParkSaved={w._hudExpandBar.ParkSavedKey} " +
                     $"hudPanelWidth={Math.Round(w._hudExpandBar.DrawnWidth)} " +
+                    // THE ANCHOR (owner repro, 2026-09-07 ~3:50 PM CT: the panel docked under
+                    // the LEFTMOST chip whichever one was hovered). THREE keys, and the third
+                    // is the one that makes the other two an assertion rather than a reading:
+                    //
+                    //   hudChipAnchor       the INPUT — where the hovered target's chip is,
+                    //                       measured off the bar.
+                    //   hudPanelAnchor      the EFFECT — where the panel actually sits,
+                    //                       measured off the window. "The chip is at 312" and
+                    //                       "the panel is at 312" are different claims and the
+                    //                       monitor clamp sits between them (trap 42).
+                    //   hudChipAnchorFirst  the LEFTMOST expansion chip — the answer the bug
+                    //                       gave for every target. Without it a test knows
+                    //                       where the panel is and cannot say it is not still
+                    //                       docking under the first chip, which is trap 20's
+                    //                       shape: what is being asserted is what is NOT there.
+                    //
+                    // All three are offsets from the WIDGET's left edge, so no assertion built
+                    // on them is a claim about the desk (a hosted runner is 1024×768). -1 for
+                    // "no panel / no chip", a value an anchored panel cannot reach.
+                    $"hudChipAnchor={Offset(w._hudExpandBar.ChipAnchor)} " +
+                    $"hudPanelAnchor={Offset(w._hudExpandBar.AnchorOffset)} " +
+                    $"hudChipAnchorFirst={Offset(w._hudBar.FirstAnchor)} " +
                     // The GRIP's own count of presses seen and drags finished, "P,D" per
                     // window. Three failures look identical from outside the app — the
                     // pointer never reached the window, the press arrived and never became a

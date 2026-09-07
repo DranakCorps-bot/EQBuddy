@@ -121,6 +121,13 @@ internal sealed class HudExpandBar
     public double DrawnWidth => _panel?.DrawnWidth ?? 0;
     public string GripKey => _panel?.GripKey ?? "0,0";
 
+    /// <summary>The <c>hudPanelAnchor</c> / <c>hudChipAnchor</c> dump facts — where the panel
+    /// sits relative to the widget, and the chip offset it was placed from. NaN with no panel
+    /// on screen; the dump reports that as -1, which is a state no anchored panel can reach
+    /// (a chip is always right of the widget's own edge).</summary>
+    public double AnchorOffset => _panel?.AnchorOffset ?? double.NaN;
+    public double ChipAnchor => _panel?.ChipAnchor ?? double.NaN;
+
     /// <summary>Is the panel parked — read by Edit HUD's "Follow the HUD again" to decide
     /// whether it has anything to undo. **The SETTING, not the window, when no panel exists
     /// yet**: the pair outlives every panel instance, and an un-park control that went dead

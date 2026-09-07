@@ -421,12 +421,29 @@ internal sealed class HudExpandWindow : Window
         Park();
     }
 
-    /// <summary>Where the panel goes this tick — <see cref="HudChipRow.Placement"/> verbatim
-    /// while slaved, so the panel and the chip row cannot disagree about what "under the HUD"
-    /// means or about when there is no room below it; and
-    /// <see cref="HudChipRow.ParkedPlacement"/> at the player's own corner once it has been
-    /// dragged, read against THAT point's monitor rather than the primary (the plan's §2.2
-    /// implement check).</summary>
+    /// <summary>
+    /// Where the panel goes this tick — <see cref="HudChipRow.Placement"/> for the VERTICAL
+    /// question while slaved, so the panel and the chip row cannot disagree about when there
+    /// is no room below the widget; <see cref="HudChipRow.AnchoredLeft"/> for the horizontal
+    /// one; and <see cref="HudChipRow.ParkedPlacement"/> at the player's own corner once it
+    /// has been dragged, read against THAT point's monitor rather than the primary (the
+    /// plan's §2.2 implement check).
+    ///
+    /// **THE HORIZONTAL HALF IS THE ~3:50 PM CT FIX.** It was <c>Placement</c>'s too, which
+    /// answers with the WIDGET's left edge — so the panel docked under the leftmost tray chip
+    /// whichever chip the pointer was on, and OE-9 (every cell peeks) is what turned that from
+    /// exact into wrong: with one expandable chip "under the bar" and "under the chip" are the
+    /// same place, and with twelve they are not. The row still uses <c>Placement</c> for both
+    /// halves, because a row of chicklets hangs off the whole bar and has no chip to anchor
+    /// to. Trap 64's shape — a proxy that stops being one when a second producer arrives, here
+    /// the eleven chips that joined the first.
+    ///
+    /// The chip offset comes from <see cref="HudBarView.AnchorOf"/>, asked for the target the
+    /// panel is DRAWING (<see cref="_drawn"/>) rather than for whatever the pointer is over
+    /// now: the panel and its anchor must describe one tracker, and a peek that survives the
+    /// trip from chip to panel has no pointer on a chip at all while the player reaches for
+    /// its ⧉.
+    /// </summary>
     private void Park()
     {
         // A drag or a resize in progress owns the window: the follower re-placing it
@@ -445,11 +462,35 @@ internal sealed class HudExpandWindow : Window
             return;
         }
         var area = SystemParameters.WorkArea;
-        var (left, top) = HudChipRow.Placement(
+        var (_, top) = HudChipRow.Placement(
             _main.Left, _main.Top, _main.ActualHeight, ActualHeight, area.Top, area.Bottom);
+        // The WIDGET's monitor, not the primary one: the clamp that keeps a right-hand chip's
+        // panel on screen must not be the thing that yanks a secondary-monitor panel onto the
+        // primary (OE-8's §2.2 check, the same reason the parked branch above asks).
+        var monitor = ScreenGuard.WorkAreaAt(this, _main.Left, _main.Top);
+        var left = HudChipRow.AnchoredLeft(_main.Left, ChipAnchor, ActualWidth,
+            monitor.Left, monitor.Right);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
     }
+
+    /// <summary>The offset of the chip this panel is hanging from, or NaN before the bar has
+    /// drawn one — the <c>hudChipAnchor</c> dump fact and <see cref="Park"/>'s input.</summary>
+    public double ChipAnchor => _drawn is { } target ? _main._hudBar.AnchorOf(target) : double.NaN;
+
+    /// <summary>
+    /// How far right of the widget's left edge the panel actually IS — the
+    /// <c>hudPanelAnchor</c> dump fact, and the EFFECT beside <see cref="ChipAnchor"/>'s
+    /// input (trap 42: "the chip is at 312" and "the panel is at 312" are different claims,
+    /// and the monitor clamp sits between them).
+    ///
+    /// NaN while the panel is hidden or PARKED: a panel at the player's own corner is not
+    /// anchored to a chip at all, and reporting its distance from the widget as an anchor
+    /// would be a number that means something else.
+    /// </summary>
+    public double AnchorOffset =>
+        IsVisible && !_closing && !IsParked && double.IsFinite(Left) && double.IsFinite(_main.Left)
+            ? Left - _main.Left : double.NaN;
 
     /// <summary>The panel's own height plus its gap, for the chip row to park BELOW rather
     /// than on top of. Zero while the panel is hidden or mid-collapse, so the row goes
