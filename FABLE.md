@@ -1,3 +1,160 @@
+## 2026-09-07 ~1:05 PM CT — Fable: OE-9 EXPAND-FOR-ALL PEEKS + Loot peek re-scope — implement plan from the owner's ~12:54 PM CT content locks (PR #385)
+
+- **Priority:** `ready` on Helm's sign — **no OE-9 Opus kick until Helm signs this plan**, which
+  is the owner's own gate (PR #385 soft seats: *"No OE-9 Opus until Fable signed"*). LIVE ASK in
+  `HELM-FEEDBACK.md`, same time. Soft max ≤3 respected: nothing is kicked from this PR, and the
+  settings-reset-on-publish diagnose (HIGH, #385 §1) outranks OE-9 for the next Opus slot.
+- **Class:** V1 — every content decision is the owner's (locks 2 and 3, ~12:54 PM CT, PR #385)
+  and the machinery is OE-1/OE-7's, shipped and tested (`HudExpand`, `HudExpandPeek`,
+  `HudExpandWindow`, `HudExpandTests`). It is a plan because the owner's seat named one, and
+  because the survey below found one real design fork (Procs' ⧉ destination, §3) and one latent
+  trap-64 proxy an implement diff would otherwise walk into (§3's first paragraph).
+- **Source:** owner feedback ~12:54 PM CT on Desktop `2.0.0+3a1e8654` (PR #385,
+  `channel/owner-feedback-1254-evolved-20260907`); Bevel #371 carve-outs as amended by that
+  lock; OE-7 (#374) as the worked example of growing `HudExpandTarget` by four in one PR;
+  OE-8 (#381) for the panel these peeks land in.
+
+### §0 What exists and what grows
+
+The peek model is COMPLETE — OE-9 adds no interaction rules. `HudExpand` owns the seven verbs
+(hover/peek, click/pin, ✕, ⧉, closed float, reset), `HudExpandWindow` draws any `PeekBody`
+with the row cap and the trap-50 *"…and N more — ↗ for the full list"* line already built, and
+OE-7 grew the enum from three to seven on exactly this pattern. OE-9 is therefore four
+additions and one fix: **`HudExpandTarget` grows by Motes, Kills, Procs and Money; four peek
+builders join `HudExpandPeek`; four mini-tray cells become expand chips; and the ⧉ destination
+stops being a proxy** (§3) — plus the Loot re-scope (§1), a content fix inside the existing
+Loot target. DPS/HPS/Progress working is the owner's ACK; nothing touches them.
+
+### §1 Loot peek re-scope (lock 2) — target, not session, and the empty state says so
+
+Today `HudExpandPeek.Loot(s.Loot, s.LootTotal)` is the SESSION top slice, documented as a
+deliberate density call. The lock overrides the premise: the peek shows **target drops, the
+same scope the float defaults to**, and with no target it says a target is needed — never
+session. A fallback to session would be trap 10's second product wearing loot rows: same
+surface, different scope, no switch on screen to say which you got.
+
+- **One producer.** The float's Target view reads `MainWindow.TargetDropsContent(s)` (what the
+  creature you're fighting or last /considered can drop) and `TargetEmptyNote(s)`. The peek
+  reads the SAME two methods through its host — `HudExpandWindow` holds `_main` already. The
+  builder (`HudExpandPeek.LootTarget`) stays framework-free and takes that content as data,
+  so the decision keeps living in one place (trap 33).
+- **No toggle on the peek.** The float carries Target|Session; the peek is fixed to target.
+  An axis you can see but not change is a state with no switch — the sentence the session
+  peek used to justify itself, now pointing the other way.
+- **Two empty states, not one:** no target (*"Select a target — /consider a creature to see
+  its drops here"* — copy is Bevel's to adjust under #385 soft seat 2) vs target with no known
+  drops (reuse `TargetEmptyNote`). The signature keys on target names + rows.
+
+### §2 The four new targets and what each peek holds (lock 3, verbatim)
+
+`HudExpandTarget` += `Motes, Kills, Procs, Money`, with `Key`/`TargetForKey` rows ("motes",
+"kills", "procs", "money"). **`TargetForKey` IS the cell-key bridge**: `MiniBarPresentation.
+Order`'s keys match the target keys exactly, so `HudBarView`'s hand switch (`"pet" => …,
+"loot" => …`) collapses into one lookup and the chip, the panel and the ⧉ all read one table
+(trap 4). Titles and icons come from `MiniBarPresentation.Names`/`Icons` (Motes/Sparkle,
+Kills/Skull, Procs/Bolt, Coin/Coin) rather than a third naming table; `Title`/`Icon` go total
+over the enum with a test iterating every member.
+
+- **Motes:** one row per tier from `Motes.Summarize(…).Tiers` — count AND per-hr each (count ÷
+  elapsed hours, the summary's own denominator); subtext = total · /hr · potency/hr (#154's
+  weighting stays visible). Signature = tier counts only — the shipped Watch-peek precedent:
+  /hr lives in the VALUES, events in the KEY, so nothing in the gate ticks (trap 8).
+- **Kills:** rows = `StatsSnapshot.YourKills` (kills per mob, already ordered) — "same as
+  main/expanded widget" is literal, it is the list the expanded Kills card fills. Subtext =
+  total · /hr. The row cap already says so when it trims (trap 50, built).
+- **Procs:** rows = per proc: count · /min (combat-minute denominator, #85 — the one the card
+  and the Live room already use) · damage. Subtext = totals. **The source check Bevel's #371
+  asked for:** `StatsSnapshot.Procs` is `(Name, Count, Damage)` — no separate healing field
+  exists, so "damage/healing/pertinent stats" ships as the stats the app tracks today, which
+  is exactly what the Procs card shows. If the log distinguishes healing procs, teaching Core
+  that is its own later item, never a silent OE-9 ride-along.
+- **Money:** rows = the Wealth Coin facts — looted coin, vendor coin, total, per/hr — from the
+  same `StatsSnapshot` fields `MoneyCardView` reads (`Copper`, `VendorCopper`,
+  `CopperPerHour`, `FormatCoin`). The per-item `SoldItems` breakdown stays in the window: the
+  peek is row-capped and the ⧉ is one click from the full Wealth tab, which is what "same
+  content" can honestly mean at peek density — flagged in the ask rather than assumed.
+- **Deaths stays OUT — stated assumption.** The lock names four and Deaths is the fifth tray
+  cell; Bevel #371 carved Kills AND Deaths out and the owner pulled back only Kills. One line
+  from Helm or the owner adds it later as one enum row + one builder on this exact pattern.
+
+### §3 ⧉ destinations — the trap-64 proxy this plan exists to catch
+
+`HudExpandBar.PopOut` (and `BringForward`) reads `BreakoutFor(target) is not { } kind →
+ShowProgressWindow()`. **"Null breakout" is a proxy for "goes to the Progress window"** —
+exact while Progress was the only non-float destination, and wrong the day Kills arrives,
+which would silently route to the Progress window with no line of that method changing. It is
+the same file whose own doc comment tells the trap-64 story about the ternary it replaced; the
+third proxy in that lineage does not get written.
+
+- **Name the fact:** one total map in UI.Shared — `HudExpand.DestinationOf(target)` →
+  float-by-name | Progress window (tab key or null) | Kills & Drops window (tab). Tested
+  total over the enum; `TargetForBreakout` retires into it (its only consumer is the close
+  handler, which goes destination-keyed below).
+- **The routes.** Dps/Hps/Pet/Watch/Loot/Buffs → their floats, unchanged. Progress → Progress
+  WINDOW on its current tab (the 2026-08-25 fold, untouched). **Motes and Money → Progress
+  WINDOW at "wealth"** (`ShowProgressWindow("wealth")`; `ProgressSurface.TabForKey` already
+  maps "money" and "motes" to Wealth — the app agreeing with this routing before it was
+  asked). **Kills → the Kills & Drops window** (`ShowCreatureWindow(CreatureTab.Kills)` —
+  exists, takes the tab). **Procs → the Damage float, which GAINS the procs block** the Live
+  room already renders inside the damage surface (`LiveRoom`'s `_damage.Extras` "Procs") —
+  RECOMMENDED over a new `BreakoutKind.Procs` float: procs are a damage-surface fact
+  everywhere else in the app, the float carrying the detail is lock 6 verbatim, and a tenth
+  always-on-top window for five rows is the proliferation SA-2 was signed to end. The owner's
+  own lock reads Money's breakout as *"Wealth section of Progress"*, so a destination that is
+  a section of an existing window is inside the lock's vocabulary. The alternative (its own
+  float) is named for Helm/Bevel, not built. The float's new procs block reads the same
+  `HudExpandPeek.Procs` rows — the card and the Live room each build proc rows inline today,
+  two producers already; the peek builder becomes the one.
+- **Lock 7 goes destination-keyed.** Two targets can now share a destination (Dps+Procs → the
+  Damage float; Progress+Money+Motes → the Progress window), so "which close collapses the
+  model" cannot key on the breakout kind alone. `HudExpandBar` translates every close —
+  `BreakoutHost.Dismissed(kind)`, `ProgressWindowClosed`, and a NEW Kills & Drops closed hook
+  — into: model has a window open AND `DestinationOf(model.Target)` matches the window that
+  closed → `WindowClosed(model.Target)`. The model's target-keyed guard stays;
+  `ProgressWindowClosed()` stops hard-coding `HudExpandTarget.Progress`.
+
+### §4 Chips and faces
+
+- Cells kills/procs/motes/money become `ExpandChip`s (lock 2's button look, lit-from-model,
+  the one shared gesture handler — all existing machinery). Deaths stays a plain cell per §2.
+- `PopOutTip` names the destination in words — "Open the Progress window (Wealth)", "Open the
+  Kills & Drops window", "Open the floating Damage window" — the #233 "X is now Y" rule inside
+  a hover, which matters MORE here because three of the four do not go to a float named after
+  the chip.
+- Faces stay Bevel's at implement review (the OE-8 precedent — not a re-gate). The Options/cog
+  IA pass (#385 §4) is Bevel's; the implement PR must not pre-empt it with new Options rows.
+
+### §5 Verification, named before the diff
+
+- All builders framework-free in `HudExpandPeek`, unit-tested with one negative each
+  (trap 39): Kills asserts a mob NOT in `YourKills` is absent; Motes asserts a named
+  non-Potential mote does not appear; Loot-target asserts session loot does NOT leak into the
+  no-target empty state — the lock's own sentence as a test name.
+- `HudExpandTests` totality: every enum member has a Key, a `TargetForKey` inverse, a Title,
+  an Icon and a Destination; the destination map asserted against `BreakoutName` where both
+  exist (the OE-7 both-directions rule).
+- E2E: `hudExpandBody` for at least one new target through `EQBUDDY_HUDEXPAND`; the Loot
+  re-scope asserts the no-target empty TEXT (a positive assertion — no trap-62 zero-wait);
+  trap 64's build-the-app-first before any prove-fail run.
+- Trap 30: `scripts/shoot.ps1` stages `EQBUDDY_HUDEXPAND` per key (~lines 1234–1325) — the
+  four new keys get shots, or the block's comment says why not, in the same PR. "Grep
+  `scripts/` for the enum's siblings" is an implement-checklist line, not an afterthought.
+- Docs: `docs/TestPlan.md`; `WhatsNew.json` (player-noticeable: every tray stat now peeks and
+  pops out; the Loot peek now shows your target's drops).
+
+### §6 Seat map and sequencing
+
+**Recommendation: ONE implement seat — `OE-9` (Opus) — with the Loot re-scope (§1) as its own
+first commit**, so Helm can split it out by cherry-pick if the settings-reset HIGH occupies
+the slot and a fast Loot fix is wanted. Same files, same tests, same reviewer; a second seat
+spends a slot #385 §1 needs. The alternative — `OE-9a` Loot-only (small, fast) then `OE-9b`
+the four targets — is named, not recommended.
+
+No expand-direction enum: the panel is ONE window shared by every target, so OE-9 adds
+content, not geometry — OE-8 §3's direction seam stays exactly where that plan left it,
+unneeded here. No new settings, no migration, `DeadSettingTests` silent by construction.
+
+---
 ## 2026-09-07 ~9:10 AM CT — Fable: OE-8 free-drag PERSISTENCE/REOPEN PLAN (the trap-2 / SA-2 reopen) — discharges the plan #372 owes before any Opus kick
 
 - **Priority:** `ready` — **OE-8's Opus implement kick stays gated on Helm last-look of THIS
