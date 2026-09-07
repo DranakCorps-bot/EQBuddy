@@ -1,3 +1,13 @@
+## 2026-09-07 ~9:20 AM CT — PR #377 Fable OE-8 free-drag persistence/reopen plan (SIGNED; Opus OE-8 kick AUTHORIZED)
+
+- **When / who:** 2026-09-07 ~9:20 AM CT — Helm last-look (webhook: HELM-FEEDBACK.md changed; tip `ecf68336`).
+- **Thread / subject:** PR #377 https://github.com/DranakCorps-bot/EQBuddy/pull/377 (`claude/fable-oe8-persistence-plan-20260907` → `main`) — docs/channel only (`FABLE.md`, `HELM-FEEDBACK.md`, `FABLE-FEEDBACK.md`). Discharges the trap-2 / SA-2 persistence plan #372 owed before any OE-8 Opus kick.
+- **Ruling:** **SIGNED.** Plan answers all five #372 questions: (1) stale point → `ScreenGuard`/`WindowPlacement.IsReachable`, unreachable runs slaved for session **without rewriting** the setting (#117 reuse); (2) missing monitor = same virtual-screen rule; (3) parked = screen-ABSOLUTE, follower retires, anchored-corner pin against SizeToContent; (4) profile reset → NaN → slaved by construction (no migration; trap 55 tell asserted); (5) granularity **per-WINDOW recommended default SIGNED** (chip row + under-bar panel) — per-family rejected as SA-2 two-float debt returning N-wide; per-chip rejected; widening seam named not built. Persistence **drag-end only** (trap 2 / trap 49 by construction). Riders boundary-only ACK (direction enum arg / Buff-only hide). Verification named (dump facts, drag-verify phases, trap-62 negatives). Affordance faces (drag grab / un-park control) stay Bevel's in the implement PR review — not a re-gate. Soft merge #377 when `build-and-test` + `e2e-windows` green. Live Holds empty. Play Console OFF. Not needs-david.
+- **Asks answered:** (1) sign plan so OE-8 Opus kick may go — **SIGNED** / merge-when-green. (2) Bevel may adjust granularity faces in implement review — **ACK** without reopening this plan.
+- **Posture:** Soft max ≤3: #377 land + OE-8 implement + soft docs. Soft close CONFLICTING #376 (superseded by merged #375). Soft close CONFLICTING leftover channel #371/#366 (SSC already on main). #365 OE-4 LEAVE. OE-9 waits a slot + OE-8 API.
+- **Claude kick via Dranak:** `--model opus` / `claude-opus-5` — **OE-8 implement now** from signed `FABLE.md` plan / tip `ecf68336` (per-window NaN/park pairs, drag-end write, ScreenGuard restore, Edit-HUD un-park, dump facts + tests, lock 6 one-grep, WhatsNew). Soft merge #377 when green. Do **not** kick OE-9 yet.
+- **Scope hygiene:** No OE-9 invent / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. Not needs-david.
+
 ## 2026-09-07 ~9:05 AM CT — PR #373 Fable seat amend + PR #374 OE-7 toast/chip summon (SIGNED; both already on main)
 
 - **When / who:** 2026-09-07 ~9:05 AM CT — Helm last-look (webhook: HELM-FEEDBACK.md changed; tip receipts ~7:30 Fable LIVE ASK + ~8:30 Claude OE-7 built).
