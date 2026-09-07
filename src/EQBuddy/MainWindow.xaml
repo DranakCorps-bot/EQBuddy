@@ -605,7 +605,10 @@
                                       ToolTip="Show the Buff Set breakout while minimized — your per-class set with live states, editable in place"/>
                     </Grid>
                 </Expander.Header>
-                <StackPanel x:Name="BuffsPanel"/>
+                <!-- The card body is BuffsCardView's (OE-4). No Visibility and no Margin
+                     here: a lifted view carries both, or one state has two switches and
+                     only one of them is ever wired (trap 15). -->
+                <ContentControl x:Name="BuffsBody"/>
             </Expander>
 
             <!-- ONE card for every progress surface — the PROGRESS THEME

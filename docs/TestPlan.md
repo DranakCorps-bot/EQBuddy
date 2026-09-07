@@ -247,6 +247,18 @@ where each of its assertions went.
 | **A bare number in a mez box is SECONDS** ("44" = 44s), while a bare number in a spawn box is still MINUTES — the two parsers mean different things on purpose | **Auto** — `MezDurationOverrideTests` |
 | The editor exists, from one row builder, with the provenance line | **Auto** — `SpellTrackingTests` (the rows); **Shot** — `shoot.ps1 -Shot options-mez` |
 
+### The Buffs card's roster (OE-4)
+
+| Expectation | Held by |
+|---|---|
+| **The roster is a WRAPPING GRID of chips, one per buff, never a horizontal stack** — N buffs fill the card's width before they grow its height. The chips are `HudChipEntry` values in the buff family drawn by the HUD row's own renderer, so the two buff surfaces cannot drift into two visual languages; what they do not share is the warn-window GATE | **Auto** — `BuffRosterPresentationTests`; **E2E** — `BuffRosterTests` reads `buffWrapped` off the live tree (prove-failed by swapping the container for the horizontal `StackPanel` trap 25 describes: `buffChips=3` with `buffWrapped=0`); **Shot** — `buffs-card`, prediction written first |
+| **A roster chip's gauge is the share of the BUFF left; a HUD chicklet's is the share of the WARNING WINDOW.** Same buff, same instant, two honest numbers — a roster chip is on screen for the buff's whole life, so the window measure would be meaningless across a full list | **Auto** — `BuffRosterPresentationTests` (the pair asserted together, so a "consolidation" of the two cannot pass) |
+| **The roster's face carries no "est"; the HUD chicklet's still does.** Measured, not assumed (Bevel's own flag): the same eight staged buffs wrap to five rows with the suffix and four without, and the tracker marks nearly every duration estimated, so on this surface it was most of the density and marked nothing. The claim survives in full on the chip's hover, which opens with the full (possibly trimmed) name | **Auto** — `BuffRosterPresentationTests` (the divergence asserted on purpose, HUD face included); **Shot** — `buffs-card`, shot twice to measure it |
+| Warn ink and a warn border come on at the player's own `BuffWarnSeconds` (ten-second floor), not a hard-coded minute — the card used to tint at 60 while the setting said otherwise | **Auto** — `BuffRosterPresentationTests` |
+| Expiring-only mode still shows nothing until a buff is inside the window, and still SAYS how many are running quietly, naming the threshold | **Auto** — `BuffRosterPresentationTests`; **E2E** — `BuffRosterTests` (the negative half: `buffsActive=3` beside `buffChips=0`, so "quiet" cannot read as "nothing landed") |
+| A tick that changes only the clocks moves text and gauge in place; the SET of buffs, the quiet count, the set line and the suggestions are what rebuild it | **Auto** — `BuffRosterPresentationTests` (the signature, including that a duration becoming learned rebuilds — the hover is built once) |
+| The buff-set line and the level-up suggestion rows are unchanged, and hang under the chip grid | **E2E** — `BuffRosterTests` (`buffRows`); the surface moved to `BuffsCardView` with the roster, and `MainWindow` kept only the card's visibility and header count (trap 15) |
+
 ## 4b. The widget's geometry
 
 | Expectation | Held by |

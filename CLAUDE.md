@@ -722,6 +722,7 @@ busier.
 | The selectable pill (tabs, lenses, filter and sort strips) | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip` in each UI's `DesignSystem.cs`. **Never hand-build another one** â€” there are 8 `ToggleButton`s left in `MainWindow.xaml`/`BreakoutWindow.xaml` waiting to be converted |
 | What a Loot surface shows (slice, order, strips, empty wording) | `UI.Shared/LootPresentation.cs` â€” rows from `LootRows`, everything around them from here. Read by `EQBuddy/LootCardView.cs`, `EQBuddy/LootBreakoutView.cs` and `MainWindow` |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
+| What the Buffs card's roster shows (which buffs, each chip's face, its hover, its gauge) | `UI.Shared/BuffRosterPresentation.cs` — drawn by `EQBuddy/BuffsCardView.cs` as a `WrapPanel` of `HudChip`s. The HUD's expiring-buff chicklet is a DIFFERENT surface (`HudChipRow.BuffChips`) and the two deliberately differ on the gauge's meaning and on "est" |
 | Anything shared by both UIs | `UI.Shared/` â€” must stay framework-free (a test enforces it) |
 
 ## Traps that have already caused real bugs

@@ -230,6 +230,16 @@ public class ArchitectureTests
         // behind this in the same lane and both touch this file — so they inherit zero
         // headroom on purpose, and OE-4's plan already names the roster lift that pays for
         // it. A baseline left high is headroom nobody argued for.
+        //
+        // **OE-4 paid it, and the baseline deliberately does NOT move.** The Buffs card's
+        // roster, its buff-set line and its suggestion rows left for BuffsCardView.cs, so
+        // this file went 4,221 → 4,039 while GAINING a wrapped chip grid — which is the
+        // KEEP-IF-IT-FITS convention working exactly as the v1.99.12 review wrote it: a lift
+        // banks into the old baseline unless the post-lift sum still exceeds the old cap, and
+        // 4,039 is comfortably inside 4,222. Re-anchoring to 4,039 here would have been the
+        // mirror mistake of raising the ceiling — it would spend the earned room on nothing
+        // and force the NEXT change to argue for a bump it does not need. The 85% slack floor
+        // (3,263) is what will ask for a lower baseline when enough of these have landed.
         (@"EQBuddy/MainWindow*.xaml.cs", 3839),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so

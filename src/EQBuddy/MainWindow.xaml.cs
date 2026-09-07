@@ -81,6 +81,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // is due. That is scheduled by the alert path, not by the session, so it is handed
     // in rather than reached for — and ICardContext stays six methods wide.
     internal WatchCardView _watch = null!;
+    // The Buffs card (OE-4), lifted with the density change it could not have landed
+    // without: this file had ONE line of ratchet headroom. Same shape as _watch — what a
+    // snapshot cannot answer (the per-character buff SET and its suggestions) is handed in
+    // as BuffCardServices rather than reached for, so ICardContext stays six methods wide.
+    internal BuffsCardView _buffs = null!;
     // The widget's own TravelsView was here (World PR 1) and went with the World card on
     // 2026-09-05 (cut 2). NewTravelsView() below is untouched: two hosts, two instances.
     // The collapsed HUD bar's contents (SA-1). Same shape as _watch: what it cannot
@@ -131,6 +136,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _unlocks = new LevelUnlockMemo(s => BuffSetClassSource(s).Classes, () => TrackedLevel);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
+        _buffs = new BuffsCardView(_settings, _buffTracker, new BuffCardServices(
+            s => AssembledBuffSet(BuffSetClassSource(s).Classes),
+            EvaluateBuffSet, BuffSuggestionsFor, AcceptBuffSuggestion, DismissBuffSuggestion));
+        BuffsBody.Content = _buffs.Body;
         // The collapsed HUD bar (SA-1). It fills a panel this window owns and shows or
         // hides nothing — WHEN the bar is on screen stays here (trap 15).
         _breakoutHost = new BreakoutHost(this, _settings);
@@ -1412,118 +1421,21 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             "https://github.com/DranakCorps-bot/EQBuddy") { UseShellExecute = true });
 
     /// <summary>
-    /// The Buffs card: every buff believed active on you, soonest-fading first, with
-    /// a countdown. "est" marks a wiki-base duration (ranks and AAs lengthen buffs;
-    /// a natural fade teaches the real number and the label drops). Unresolved
-    /// landings ("You feel different." with nobody seen casting) show the line
-    /// itself and the longest candidate duration — honest range, never a guess.
+    /// The Buffs card's CHROME — the card's visibility and its header count. The body is
+    /// <see cref="BuffsCardView"/>'s (OE-4), which is where the roster, the buff-set line and
+    /// the suggestion rows went when the roster became a wrapped chip grid: this file had one
+    /// line of ratchet headroom, so the density change was only ever available as a lift.
+    ///
+    /// The header needs a NUMBER, not a list, so it is read straight off the tracker and
+    /// costs nothing while the card is collapsed.
     /// </summary>
-    /// <summary>Per-tick clock TextBlocks + their buff labels, so a tick with an
-    /// unchanged buff SET updates text in place instead of rebuilding rows (the mez
-    /// window's signature idiom — 2026-08-12 tuning pass).</summary>
-    private readonly List<(TextBlock Clock, string Label)> _buffClocks = [];
-    private string _buffsSignature = "";
-
     private void RenderBuffs(StatsSnapshot snap)
     {
         if (_settings.HiddenSections.Contains("buffs")) return;   // layout collapsed it
         BuffsSection.Visibility = Visibility.Visible;
-        var count = _buffTracker.ActiveCount;   // header needs a number, not a list
-        BuffsHeader.Text = count.ToString();
+        BuffsHeader.Text = _buffTracker.ActiveCount.ToString();
         if (!BuffsSection.IsExpanded) return;
-        var now = DateTime.Now;
-        var buffs = count > 0 ? _buffTracker.Snapshot(now) : [];
-
-        // The buff set's honesty line (#120): evaluated against the FULL active list,
-        // before the expiring-only filter — the set cares what's up, not what's shown.
-        // Stage 2: the set is ASSEMBLED per class combination; the line itself is
-        // unchanged in look.
-        var set = AssembledBuffSet(BuffSetClassSource(snap).Classes);
-        List<BuffSetEntryState> setStates = set.Count > 0 ? EvaluateBuffSet(set, buffs, now) : [];
-        var setMissing = setStates.Where(s => s.Status == BuffSetStatus.Missing).Select(s => s.Spell).ToList();
-        var setNotSeen = setStates.Where(s => s.Status == BuffSetStatus.NotSeen).Select(s => s.Spell).ToList();
-        var setExpiring = setStates.Where(s => s.Status == BuffSetStatus.Expiring).Select(s => s.Spell).ToList();
-        // Stage 3 (#120): new-buff-unlock suggestions ride the same card — rows only
-        // while suggestions exist, never a popup (David's UX rules).
-        var suggestions = BuffSuggestionsFor(snap, set);
-
-        // Expiring-only mode (David): the card stays quiet until a buff is inside the
-        // warning window — "tell me when it matters", with the rest counted honestly.
-        var quiet = 0;
-        if (_settings.BuffTimersExpiringOnly && buffs.Count > 0)
-        {
-            var warn = HudChipRow.BuffWarnWindow(_settings.BuffWarnSeconds);
-            var urgent = buffs.Where(b => b.RemainingSeconds(now) is { } r && r <= warn).ToList();
-            quiet = buffs.Count - urgent.Count;
-            buffs = urgent;
-        }
-
-        var signature = string.Join("|", buffs.Select(b => b.Label + (b.Estimated ? "~" : ""))) + "·" + quiet
-            + "§" + string.Join(",", setMissing) + "§" + string.Join(",", setNotSeen)
-            + "§" + string.Join(",", setExpiring)
-            + "§" + string.Join(",", suggestions.Select(x => x.Spell + "@" + x.Class));
-        if (signature == _buffsSignature)
-        {
-            // Same rows, newer clocks: update text and urgency tint in place.
-            for (var i = 0; i < _buffClocks.Count && i < buffs.Count; i++)
-            {
-                var remaining = buffs[i].RemainingSeconds(now);
-                _buffClocks[i].Clock.Text = ClockText(remaining, buffs[i].Estimated);
-                _buffClocks[i].Clock.SetResourceReference(TextBlock.ForegroundProperty,
-                    remaining is < 60 ? "WarnBrush" : "DimBrush");
-            }
-            return;
-        }
-        _buffsSignature = signature;
-        _buffClocks.Clear();
-
-        BuffsPanel.Children.Clear();
-        if (buffs.Count == 0)
-        {
-            BuffsPanel.Children.Add(EmptyCardLine(_settings.BuffTimersExpiringOnly && quiet > 0
-                ? $"{quiet} running quietly — timers appear at {HudChipRow.BuffWarnWindow(_settings.BuffWarnSeconds):0}s left."
-                : "Nothing running — a buff landing on you starts its countdown here."));
-            AddBuffSetLine(setMissing, setNotSeen, setExpiring);
-            AddBuffSuggestionRows(suggestions);
-            return;
-        }
-        foreach (var b in buffs)
-        {
-            var row = new Grid { Margin = new Thickness(0, 1, 0, 1) };
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var name = new TextBlock
-            {
-                Text = b.Label, FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
-                Foreground = (Brush)FindResource("TextBrush"),
-                TextTrimming = TextTrimming.CharacterEllipsis,
-                ToolTip = (b.Candidates.Length > 1
-                              ? "One of: " + string.Join(", ", b.Candidates) + " · "
-                              : "")
-                          + (b.Caster.Length > 0 ? $"cast by {b.Caster} · " : "")
-                          + $"landed {b.LandedAt:h:mm:ss tt}"
-                          + (b.Estimated ? " · est = wiki base; a natural fade teaches your real duration" : ""),
-            };
-            row.Children.Add(name);
-            var remaining = b.RemainingSeconds(now);
-            var clock = new TextBlock
-            {
-                Text = ClockText(remaining, b.Estimated),
-                FontSize = Tok.Spec(Tok.TypeRole.Body).Size,
-            };
-            clock.SetResourceReference(TextBlock.ForegroundProperty,
-                remaining is < 60 ? "WarnBrush" : "DimBrush");
-            Grid.SetColumn(clock, 1);
-            row.Children.Add(clock);
-            BuffsPanel.Children.Add(row);
-            _buffClocks.Add((clock, b.Label));
-        }
-        AddBuffSetLine(setMissing, setNotSeen, setExpiring);
-        AddBuffSuggestionRows(suggestions);
-
-        static string ClockText(double? remaining, bool estimated) => remaining is { } r
-            ? $"{(int)r / 60}:{(int)r % 60:00}{(estimated ? " est" : "")}"
-            : "?";
+        _buffs.Render(snap);
     }
 
     // ---- buff set (#120, Frankthetankk; see BuffSetEvaluator for the honesty rules) ----
@@ -1590,7 +1502,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// next tick reads as a silent no-op, and silent no-ops read as broken.</summary>
     internal void RepaintBuffs()
     {
-        _buffsSignature = "";
+        _buffs.Invalidate();
         RenderBuffs(CurrentSnapshot());
     }
 
@@ -1671,100 +1583,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (BuffSuggestions.Dismiss(_settings.BuffSuggestionDismissed, key, sug.Spell))
             _settings.Save();
         OnBuffSetEdited();
-    }
-
-    /// <summary>The "missing:" line (#120): appears ONLY when a set buff isn't cleanly
-    /// up, and disappears entirely when everything is. Three visibly different claims:
-    /// missing (seen fading, or timer ran out), expiring (inside the warn window), and
-    /// not seen (no landing line this session — it may be up from before the log was
-    /// watched; we can't know, and never pretend to).</summary>
-    private void AddBuffSetLine(List<string> missing, List<string> notSeen, List<string> expiring)
-    {
-        if (missing.Count == 0 && notSeen.Count == 0 && expiring.Count == 0) return;
-        var line = new TextBlock
-        {
-            FontSize = Tok.Spec(Tok.TypeRole.Caption).Size, TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
-            ToolTip = "Your buff set. missing = EQBuddy saw it fade this session (or its timer ran out). "
-                + "expiring = still up, inside the warn window. "
-                + "not seen = no landing line this session — it may still be up from before "
-                + "EQBuddy was watching; the log can't tell, so this stays a separate state. "
-                + "The set is assembled from your active classes' picks plus (any class). "
-                + "Edit it in Options → Alerts & chips, or in the Buff set breakout.",
-        };
-        void Add(string label, List<string> names, string brush, bool italic = false)
-        {
-            if (names.Count == 0) return;
-            if (line.Inlines.Count > 0)
-            {
-                var sep = new Run(" · ");
-                sep.SetResourceReference(TextElement.ForegroundProperty, "DimBrush");
-                line.Inlines.Add(sep);
-            }
-            var run = new Run(label + string.Join(", ", names));
-            if (italic) run.FontStyle = FontStyles.Italic;
-            run.SetResourceReference(TextElement.ForegroundProperty, brush);
-            line.Inlines.Add(run);
-        }
-        // No warning sign in front of "missing". The three labels are parallel states of
-        // one line and only this one wore a glyph, so it read as a fourth channel that
-        // said nothing the word and the warn ink did not already say — and it is a box on
-        // a Wine prefix. An InlineUIContainer could carry a vector here, but not one that
-        // stays aligned through a wrap.
-        Add("missing: ", missing, "WarnBrush");
-        Add("expiring: ", expiring, "AccentBrush");
-        Add("not seen: ", notSeen, "DimBrush", italic: true);
-        BuffsPanel.Children.Add(line);
-    }
-
-    /// <summary>New-buff-unlock suggestion rows (#120 stage 3, Frankthetankk): one dim
-    /// row per genuinely new buff line the ding made available — ✓ adds it to the
-    /// gaining class's bucket, ✕ dismisses for good (per character). Present only
-    /// while suggestions exist; never auto-added — the player decides everything.</summary>
-    private void AddBuffSuggestionRows(List<BuffSuggestion> suggestions)
-    {
-        foreach (var sug in suggestions)
-        {
-            var row = new Grid { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            var text = new TextBlock
-            {
-                Text = $"new buff at your level — add {sug.Spell} to {sug.Class}?",
-                FontSize = Tok.Spec(Tok.TypeRole.Caption).Size,
-                FontStyle = FontStyles.Italic, TextWrapping = TextWrapping.Wrap,
-                VerticalAlignment = VerticalAlignment.Center,
-                ToolTip = "Your level-up made this buff available (the Progress card's "
-                    + "\"New at level\" list). The tick adds it to that class's set bucket; "
-                    + "the cross never asks again for this character. A new RANK of a buff "
-                    + "already in your set folds into the same slot and is never "
-                    + "suggested — only genuinely new lines appear here.",
-            };
-            text.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
-            row.Children.Add(text);
-            row.Children.Add(SuggestionTick("Check", "GoodBrush",
-                $"Add {sug.Spell} to your {sug.Class} set", 1, () => AcceptBuffSuggestion(sug)));
-            row.Children.Add(SuggestionTick("Close", "DimBrush",
-                "Dismiss — never suggest this buff for this character again", 2,
-                () => DismissBuffSuggestion(sug)));
-            BuffsPanel.Children.Add(row);
-        }
-    }
-
-    /// <summary>Accept / dismiss on a buff-suggestion row.
-    ///
-    /// A real <see cref="DesignSystem.InlineIconButton"/> rather than a click-handled
-    /// glyph: the tick and the cross were TextBlocks, which hit-test across their whole
-    /// layout rect, and the drawn strokes of a vector do not — that is #211 exactly, on a
-    /// pair of controls where a missed click either adds a buff you didn't want or fails
-    /// to silence a suggestion you're tired of. The button also makes them
-    /// keyboard-reachable, which the TextBlocks never were.</summary>
-    private static Button SuggestionTick(string icon, string brush, string tip, int column, Action act)
-    {
-        var button = DesignSystem.InlineIconButton(icon, tip, (_, _) => act(), brush);
-        Grid.SetColumn(button, column);
-        return button;
     }
 
     /// <summary>

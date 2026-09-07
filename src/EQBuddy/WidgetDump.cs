@@ -409,6 +409,17 @@ internal static class WidgetDump
                     // all, which is trap 56's lesson about a wait needing a liveness question
                     // as well as a value one.
                     $"buffsActive={w._buffTracker.ActiveCount} " +
+                    // The Buffs CARD's rendered shape, pinned for the same reason the watch
+                    // and gear numbers below it are: OE-4 lifted the roster into
+                    // BuffsCardView and re-shaped it in the same change, and the WPF layer
+                    // has no unit tests (docs/TestPlan.md §5), so an assertion from a
+                    // launched app is the only thing standing between that move and a silent
+                    // regression. buffWrapped is the trap-25 claim itself — the chips are in
+                    // a WrapPanel and not a horizontal StackPanel — read off the live tree,
+                    // because that is exactly the property a later refactor drops in silence.
+                    $"buffChips={w._buffs.ChipCount} " +
+                    $"buffRows={w._buffs.RowCount} " +
+                    $"buffWrapped={(w._buffs.Wrapped ? 1 : 0)} " +
                     $"watchRows={w._watch.RowCount} " +
                     $"watchStrip={(w._watch.SortStripShown ? 1 : 0)} " +
                     $"watchSort={w._settings.WatchSortMode} " +
