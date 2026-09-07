@@ -18,6 +18,21 @@
 - **Claude kick via Dranak:** `--model opus` / `claude-opus-5`: **R5 minimal fix** from this signed shape (harvest strip + format guard + NarrowBySpellbook defence + four-name surgical correct or cached regenerate) → local prove (Thorns resolves; fade-learn can fire; SCR1 applies when resolved) → LIVE ASK → wake Helm. Soft: merge #407 when green; soft merge #405/#406 when green; soft merge #404 when idle. Probe `claude models` first. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish / live eqlwiki harvest blast.
 - **Scope hygiene:** Audit docs now; fix seat next. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
 
+## 2026-09-07 ~4:35 PM CT — PR #405 Opus TR-2 installer identity split (SIGNED; soft merge-when-green)
+
+- **When / who:** 2026-09-07 ~4:35 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md changed — TR-2 loop-close, PR #405 filed; tip channel `4ba9ead7`).
+- **Thread / subject:** PR #405 https://github.com/DranakCorps-bot/EQBuddy/pull/405 (`claude/opus-tr2-installer-identity-20260907` → `main`) — TR-2 implement from Helm-signed #399 `FABLE.md` §3 + §7, after TR-1/#403 on `main` (`0e48e356` underneath). Product + channel tip + Fable feedback. Tip MERGEABLE; at look `build-and-test` + `e2e-windows` **IN PROGRESS** (run 34163279650).
+- **Ruling:** **SIGNED.** Spot-checked against signed #399 §3: `installer/EQBuddyEvolved.iss` carries AppId `{B3D71F58-…-EQBUDDY20000}`, `{autopf}\EQBuddy Evolved`, Start-menu `EQBuddy Evolved`, `OutputBaseFilename=EQBuddyEvolvedSetup`; v1 `installer/EQBuddy.iss` **removed from mainline** (v1 keeps its copy on `legacy-v1` / `v1.99.18` — LEGACY-004 shape; **ACK / SIGNED** the open call the kick did not name). `release.ps1 -EvolvedLocal` compiles/signs/hashes under that identity **outside** the guarded publish region; `$setupExe` carries `EQBuddyEvolvedSetup.exe` into the still-unreachable publish block. `evolved-channel-guard.ps1` **check 5** asserts both ends (negative: no producer of reserved `EQBuddySetup.exe` / no v1 AppId under any `.iss`; positive: compile exists, names Evolved `.iss`, four identity directives present). Channel closed (checks 1–3 / `-EvolvedLocal` refusals). TR-3 = PR-body checklist only — **not run**. `install-local -Evolved` stays portable (daily-driver install is David's). Soft merge when both CI green. Live Holds empty. Play Console OFF. **Not needs-david** (D1 channel-open door stays David's; not asked here).
+- **Asks answered:**
+  1. Last-look / soft-merge — **SIGNED** / merge-when-green (`build-and-test` + `e2e-windows` on tip).
+  2. Merge order TR-1 under TR-2 — **ACK** (satisfied; #403 already on `main`).
+  3. v1 `.iss` removed from mainline — **SIGNED ACK** (reserved-name hazard; v1 builds from its own tree).
+  4. Local E2E deliberately skipped (scripts/installer/docs; screen lock / peek-anchor seat) — **ACK**; CI e2e bar **STANDS** (no waive).
+  5. Soft peek-anchor #404 pid 33284 — **ACK / LEAVE** (do not kill / do not enter that worktree).
+- **Posture / Soft max ≤3:** (1) soft merge #405 when both CI green (drop LIVE ASK tip; prefer this Helm land / companion for SSC). (2) soft merge this SSC. (3) Soft LEAVE #404 peek-anchor; Soft LEAVE #400 Deaths-gate path if still open as prior seat. Soft LEAVE #380/#356. **Do not** open channel / run TR-3 / OneDrive copy / tag / GitHub release / Play Console / TEL / Azure remint / v1 change / Evolved wide publish.
+- **Claude kick via Dranak:** Soft: **merge #405 when `build-and-test` + `e2e-windows` green**; soft merge this SSC when green. Soft: leave #404 peek-anchor LIVE. No new Opus/Fable/Bevel kick from this ruling. Probe `claude models` only if a later seat needs a kick. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets.
+- **Scope hygiene:** Scripts + installer + docs/channel. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~2:25 PM CT — PR #400 OE-9 every-tray peek/pop-out implement (SIGNED with Deaths gate; rebase then merge-when-green)
 
 - **When / who:** 2026-09-07 ~2:25 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: OE-9 PR #400 tip `3f50d660` needs last-look; one open question — the ~1:30 DPS lock read as DPS only). Corrects the ~2:20 SSC draft that treated Deaths IN as already-signed.
