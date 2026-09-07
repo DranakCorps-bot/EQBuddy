@@ -50,11 +50,11 @@ public sealed class SpawnCycleLedger
     public SpawnCycleLedger(string? path = null)
     {
         _path = path;
-        if (path is null || !File.Exists(path)) return;
+        if (path is null) return;
         try
         {
-            var loaded = JsonSerializer.Deserialize<Dictionary<string, List<SpawnCycle>>>(
-                File.ReadAllText(path), JsonOpts);
+            // ProfileJson, so a file killed mid-write falls back to the previous good copy.
+            ProfileJson.Read<Dictionary<string, List<SpawnCycle>>>(path, JsonOpts, out var loaded);
             if (loaded is not null)
                 foreach (var (k, v) in loaded)
                     _byKey[k] = v;
@@ -88,7 +88,7 @@ public sealed class SpawnCycleLedger
     private void Save()
     {
         if (_path is null) return;
-        try { File.WriteAllText(_path, JsonSerializer.Serialize(_byKey, JsonOpts)); }
+        try { ProfileJson.Write(_path, JsonSerializer.Serialize(_byKey, JsonOpts)); }
         catch (Exception ex) { CoreLog.Error(ex); }
     }
 }

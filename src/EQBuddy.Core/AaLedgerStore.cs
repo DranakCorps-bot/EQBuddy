@@ -28,9 +28,13 @@ public sealed class AaLedgerStore
     {
         try
         {
-            if (File.Exists(path) &&
-                JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Entry>>>(
-                    File.ReadAllText(path)) is { } stored)
+            // Through ProfileJson so a file killed mid-write falls back to the previous
+            // good copy instead of starting over — this store was one of the five that
+            // came back as NUL bytes on 2026-09-07 (see ProfileJson).
+            if (ProfileJson.Read<Dictionary<string, Dictionary<string, Entry>>>(
+                    path, null, out var stored) is
+                ProfileReadOutcome.Loaded or ProfileReadOutcome.RecoveredFromBackup &&
+                stored is not null)
                 return new(stored, StringComparer.OrdinalIgnoreCase);
         }
         catch (Exception ex) { CoreLog.Error(ex); }   // corrupt store: start over, don't crash
@@ -84,7 +88,7 @@ public sealed class AaLedgerStore
             string json;
             lock (_lock)
                 json = JsonSerializer.Serialize(_byCharacter, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_path, json);
+            ProfileJson.Write(_path, json);
         }
         catch (Exception ex) { CoreLog.Error(ex); }
     }

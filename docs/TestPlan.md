@@ -535,6 +535,23 @@ and it was silent with two, which is what made #169 so hard to place.
 | …and says it once per process, not once per save | **Auto** — `SettingsClobberTests` |
 | The two hide-the-widget tick-boxes survive a real click, a reopened Options window, and a restart | **Auto** — `SettingsClobberTests` (the save that reverted them, #169); **Manual** — §6. *(Held by the Avalonia render suite until E-2c; see [v2/avalonia-test-disposition.md](v2/avalonia-test-disposition.md).)* for the real click |
 
+**And a save must survive the app being killed in the middle of it.** Every JSON file in
+the player's profile goes through `Core/ProfileJson`: the new copy is flushed to the DISK
+before it replaces the old one, and the outgoing copy is kept as `.bak`. Before that,
+`File.WriteAllText` left a file of the right length full of zeros when the process died
+mid-write — and `install-local.ps1 -Evolved` force-kills the running copy after 15 seconds,
+so **a republish was the reliable way to trigger it**. `Load` then read the profile as brand
+new and saved defaults over it: theme, watch rules and hidden cards all reset at once.
+
+| Expectation | Held by |
+|---|---|
+| A settings.json torn into zeros by a kill does not reset the theme, re-seed the built-in Watch rule, or unhide cards | **Auto** — `ProfileJsonTornWriteTests` (#385) |
+| A profile recovered from `.bak` is treated as a REAL profile, so the migrations do not re-seed over it | **Auto** — `ProfileJsonTornWriteTests` |
+| The unreadable file is set aside as `.corrupt`, never silently overwritten — one fixed name, so a launch loop cannot fill the profile with copies | **Auto** — `ProfileJsonTornWriteTests` |
+| A MISSING file is a fresh profile and never recovers from `.bak`; only a file that is present and unparseable does | **Auto** — `ProfileJsonTornWriteTests`, `HudStatPromotionLoadTests` |
+| A write leaves no `.new` behind, and is UTF-8 with no BOM | **Auto** — `ProfileJsonTornWriteTests` |
+| The AA, quest, stacking, spawn-cycle and buff-duration ledgers are written the same way — all five were corrupted alongside settings.json in the reported incident | **Auto** — covered by their own store tests through `ProfileJson`; **Manual** — republish while the app is running and check `error.log` for `0x00` |
+
 ## 4c. Alert sounds
 
 Which clip an alert plays, and at what volume, is decided in `UI.Shared/AlertSoundPlan.cs`
