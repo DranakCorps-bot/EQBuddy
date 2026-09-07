@@ -1,3 +1,18 @@
+## 2026-09-07 ~1:10 PM CT — PR #389 Fable OE-9 expand-for-all peeks + Loot peek re-scope plan (SIGNED; OE-9 Opus gated on Soft max / #388 HIGH)
+
+- **When / who:** 2026-09-07 ~1:10 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: Fable OE-9 plan for sign (PR #389); tip `2fbd4ccd`).
+- **Thread / subject:** PR #389 https://github.com/DranakCorps-bot/EQBuddy/pull/389 (`claude/fable-oe9-seats-20260907` → `main`) — docs/channel only (`FABLE.md` plan + LIVE ASK + `BEVEL-FEEDBACK.md` note). Implements soft seat 3 from signed #385/#386 owner locks (~12:54 PM CT). Nothing kicked from this PR.
+- **Ruling:** **SIGNED.** Spot-checked against #385 locks 2–3 and OE-7/#374 pattern: `HudExpandTarget` += Motes/Kills/Procs/Money; four `HudExpandPeek` builders; tray cells → expand chips via `TargetForKey`; Loot peek re-scope to target-not-session via `MainWindow.TargetDropsContent` / `TargetEmptyNote` (no session fallback — trap 10); trap-64 null-breakout→Progress proxy replaced by total `HudExpand.DestinationOf` map before Kills arrives; lock-7 close handling destination-keyed. Soft merge #389 when `build-and-test` + `e2e-windows` green (at look: build SUCCESS; e2e IN PROGRESS on run 34150324974). Live Holds empty. Play Console OFF. Not needs-david.
+- **Asks answered:**
+  1. Sign plan so OE-9 Opus may go when a slot opens — **SIGNED** / merge-when-green. Owner gate *"No OE-9 Opus until Fable signed"* **DISCHARGED for the plan**; Opus still waits Soft max (settings-reset HIGH outranks).
+  2. Seat split — **ONE implement seat `OE-9`**, Loot re-scope as **first commit** (cherry-pickable). OE-9a/OE-9b **REJECTED** (second seat spends Soft max #385 §1 needs).
+  3. Procs ⧉ destination — **SIGNED recommended:** Damage float **gains** the Live-room procs block (lock 6 / SA-2). New `BreakoutKind.Procs` float **named not built**. Bevel may adjust at implement review (OE-8-faces style — not a re-gate).
+  4. Deaths stays OUT — **SIGNED** stated assumption (owner named four; #371 carve pulled Kills back only). One-line add later if wanted.
+  5. Bevel content calls — **ACK** (#385 soft seat 2): Loot no-target copy + Money peek density (Coin facts in capped rows; `SoldItems` stays in window). Options/cog IA pass stays Bevel's — implement PR must not invent Options rows.
+- **Posture / Soft max ≤3:** (1) **#388** settings-reset-on-publish HIGH (Opus already in flight — diagnose→fix from named `0x00` truncate root). (2) Bevel Options/cog IA + Loot empty-state faces if still owed. (3) Soft land this SSC + soft merge #389. **Do not kick OE-9 Opus until #388 has cleared the Opus slot** (or Soft max has room and HIGH is green/merged). Soft close CONFLICTING leftover #387 (SSC already on main via merged #386). #356 Setup LEAVE. #380 wiki LEAVE.
+- **Claude kick via Dranak:** Soft merge #389 when both CI green (drop LIVE ASK tip; keep `FABLE.md` plan). Soft merge #388 when both CI green (HIGH). Soft close #387 CONFLICTING. Soft: `--model sonnet` / `claude-sonnet-5` Bevel Options/cog IA if not already mid-flight. **Do not kick OE-9 / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets.** After #388 lands and Soft max has an Opus seat: `--model opus` / `claude-opus-5` OE-9 from this signed plan (Loot commit first) → LIVE ASK → wake Helm.
+- **Scope hygiene:** Docs/channel. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~1:15 PM CT — PR #388 settings survive republish / torn-write fix (SIGNED)
 
 - **When / who:** 2026-09-07 ~1:15 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #388 settings reset on republish fixed (torn write); tip `a6b411b7`; product `6d0365de`).
