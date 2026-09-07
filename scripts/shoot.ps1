@@ -152,6 +152,73 @@ $Shots = [ordered]@{
                                       Pattern = 'giant spider'; Kind = 1 }
                                ) } }
     'healing-card'    = @{ Title = 'EQBuddy'; Env = @{ EQBUDDY_EXPAND = 'healing' }; Set = @{} }
+    # THE BUFF ROSTER (OE-4). A NEW name, checked first (trap 21): nothing in docs/ or
+    # README embeds 'buffs-card', and docs/screenshots holds no picture of this surface at
+    # all — the card is Collapsed on a default profile and has never been staged, so until
+    # this shot it was trap 22 exactly: a surface with no fixture state, which reads as
+    # reviewed anyway.
+    #
+    # It exists to MEASURE, not only to illustrate. Bevel's item 1 flagged one thing it
+    # could not answer from source — whether "est" and the duration source still fit inside
+    # a chip at this density or have to move to the tooltip — and said to measure it against
+    # a real screenshot rather than assume. This is that screenshot.
+    #
+    # Eight buffs, cast by SANCTARI rather than by You, so Spell Casting Reinforcement
+    # cannot lengthen the estimates and make the numbers depend on the fixture's AAs. Names
+    # deliberately span the range that decides the wrap: "Valor" (5) to "Riftwind's
+    # Protection" (21), which is past the 104-unit trim.
+    #
+    # PREDICTION, written BEFORE the shot (trap 23):
+    #   * Header "8". No set line and no suggestion rows — the fixture profile has no buff
+    #     set, and the set line only appears when a SET buff is not cleanly up.
+    #   * A WRAPPING GRID of eight chips, NOT eight full-width rows. No icon on any chip:
+    #     every chip in this card is one family, so the emblem carried no information.
+    #   * Chips in fade order (the tracker's own): Insight 40:00, Brilliance 40:00, Spirit
+    #     of Ox 45:00, Symbol of Pinzarn 45:00, Valor 54:00, Health 54:00, Riftwind's
+    #     Protection 60:00, Aegolism 150:00 — every one of them with " est" on the face and
+    #     a gauge painted nearly full (they have just landed and these chips DRAIN).
+    #   * "Riftwind's Protection" trims with an ellipsis; its full name is in the hover,
+    #     which a capture cannot show.
+    #   * Accent ink on every countdown and no warn borders: nothing is inside the 60 s
+    #     warning window, which is what makes this the ROSTER rather than the HUD row.
+    # Eight chips that came back as eight full-width rows is the trap-25 failure this
+    # picture exists to catch, and no diff, test or build can see it.
+    #
+    # SHOT 2026-09-07, 338x546. Every element of the prediction held — eight chips in a
+    # wrapping grid, no icons, in the predicted fade order, "Riftwind's Protecti…" trimmed,
+    # no set line, no suggestions, accent ink throughout — with the clocks nine seconds
+    # further on than predicted (39:51 rather than 40:00), which is the settle and not a
+    # defect.
+    #
+    # WHAT IT MEASURED, which is why it was taken twice. With " est" on every face the eight
+    # chips wrap to FIVE rows; without it, to FOUR. The suffix is ~22 of the card's ~306
+    # usable units, and at five rows the wrap is roughly a WASH against the eight full-width
+    # rows it replaced — so on this surface the marker was not a four-character cost, it was
+    # most of the density the change exists to deliver. Bevel's item 1 flagged exactly this
+    # as unanswerable from source, and the answer went the way the picture pointed:
+    # BuffRosterPresentation.RosterFace drops it, the hover keeps the whole sentence, and the
+    # HUD chicklet — one or two at a time, in a window that measures to its own contents —
+    # still carries it on the face. THIS PICTURE IS THE FOUR-ROW ONE.
+    'buffs-card'      = @{ Title = 'EQBuddy'
+                           Env = @{ EQBUDDY_EXPAND = 'buffs' }
+                           Set = @{}
+                           AppendLive = @(
+                               'Sanctari begins casting Insight.'
+                               'Your mind fills with wisdom.'
+                               'Sanctari begins casting Brilliance.'
+                               'Your mind clears.'
+                               'Sanctari begins casting Spirit of Ox.'
+                               'You feel the spirit of ox enter you.'
+                               'Sanctari begins casting Symbol of Pinzarn.'
+                               'The symbol of Pinzarn flashes before your eyes.'
+                               'Sanctari begins casting Valor.'
+                               'You feel valorous.'
+                               'Sanctari begins casting Health.'
+                               'You feel healthy.'
+                               "Sanctari begins casting Riftwind's Protection."
+                               'Your skin glows with a pale greenish tint.'
+                               'Sanctari begins casting Aegolism.'
+                               'You are filled with the power of Aegolism.') }
     # The PROGRESS THEME's four tabs (docs/Themes.md). These replaced 'value-cards'
     # (motes,money,faction) and the widget half of 'raids-card': those five cards are one
     # launcher now, and their bodies live in the Progress window, which only EQBUDDY_PROGRESS

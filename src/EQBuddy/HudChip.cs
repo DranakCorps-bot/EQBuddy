@@ -37,15 +37,37 @@ internal static class HudChip
     /// used.</summary>
     private const double NameMaxWidth = 180;
 
+    /// <summary>What differs between the HOSTS of this renderer — and nothing else does.
+    ///
+    /// OE-4 gave the Buffs card a chip roster, and a card is not a row: it hangs inside a
+    /// 320-unit widget rather than in a window as wide as its own contents, and every chip on
+    /// it is the same family, so the emblem is a constant that costs 16 units per chip and
+    /// carries no information. Both are HOSTING facts, which is why they are a parameter
+    /// rather than a second renderer — a near-copy of this file is exactly the mechanism the
+    /// class comment above names for #122 and #152.</summary>
+    /// <param name="NameMaxWidth">Trim width for the name, in pre-scale units.</param>
+    /// <param name="ShowIcon">Draw the family emblem. False only where every chip in the
+    /// host belongs to one family, so the vector is not telling two kinds apart (#148/#166
+    /// is about a chip that must say WHICH kind it is).</param>
+    internal sealed record Look(double NameMaxWidth = HudChip.NameMaxWidth, bool ShowIcon = true)
+    {
+        /// <summary>The HUD chip row: four families side by side, in a window that measures
+        /// to its contents.</summary>
+        public static readonly Look Row = new();
+    }
+
     /// <param name="onClick">Left-click. Null leaves the chicklet inert to a single click,
     /// which is what a fight chip is: the DRAG the two windows carried here died with free
     /// placement (the row is slaved to the HUD and has no position of its own).</param>
     /// <param name="onDoubleClick">Left double-click, when the family has one.</param>
     /// <param name="onDismiss">Right-click. Null means this chip is not dismissible.</param>
+    /// <param name="look">Host differences; <see cref="Look.Row"/> when null.</param>
     public static Border Build(HudChipEntry entry, out Live live,
-        Action? onClick = null, Action? onDoubleClick = null, Action? onDismiss = null)
+        Action? onClick = null, Action? onDoubleClick = null, Action? onDismiss = null,
+        Look? look = null)
     {
         var chip = entry.Chip;
+        look ??= Look.Row;
 
         var row = new Grid { Margin = new Thickness(0, 1, 0, 1) };
         row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -55,15 +77,18 @@ internal static class HudChip
         // chip.Icon is an IconPaths NAME, not a glyph: this is the one surface a player
         // watches mid-pull, and on the Wine prefixes where "⏳"/"💤"/"🐌" do not render it
         // told its three kinds apart with three identical boxes (#148, #166).
-        var kind = DesignSystem.Icon(chip.Icon, "TextBrush", size: Tok.IconInline);
-        kind.Margin = new Thickness(0, 0, Tok.SpaceXs, 0);
-        row.Children.Add(kind);
+        if (look.ShowIcon)
+        {
+            var kind = DesignSystem.Icon(chip.Icon, "TextBrush", size: Tok.IconInline);
+            kind.Margin = new Thickness(0, 0, Tok.SpaceXs, 0);
+            row.Children.Add(kind);
+        }
 
         var name = new TextBlock
         {
             Text = chip.Name, FontSize = 11, FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 8, 0), VerticalAlignment = VerticalAlignment.Center,
-            TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = NameMaxWidth,
+            TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = look.NameMaxWidth,
         };
         name.SetResourceReference(TextBlock.ForegroundProperty, "TextBrush");
         Grid.SetColumn(name, 1);

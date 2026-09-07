@@ -553,17 +553,15 @@ public static class HudChipRow
                 var left = b.RemainingSeconds(now) ?? 0;
                 return new SpawnChip(
                     Zone: "", Name: b.Label,
-                    CountdownText: $"{(int)left / 60}:{(int)left % 60:00}{(b.Estimated ? " est" : "")}",
+                    // The face and the hover are BuffRosterPresentation's, not this file's:
+                    // the Buffs card draws the same buff and used to spell both strings out
+                    // itself, which is one fact with two sources (trap 4) waiting for one of
+                    // them to be edited.
+                    CountdownText: BuffRosterPresentation.Clock(left, b.Estimated),
                     // The last server tick, the same window a mez chip takes its warning
                     // tint in. BuffTracker.ServerTickSeconds is where six comes from.
                     IsDue: left <= BuffTracker.ServerTickSeconds,
-                    Detail: string.Join(" · ", new[]
-                    {
-                        b.Candidates.Length > 1 ? "One of: " + string.Join(", ", b.Candidates) : "",
-                        b.Caster.Length > 0 ? $"cast by {b.Caster}" : "",
-                        $"landed {b.LandedAt:h:mm:ss tt}",
-                        b.Estimated ? "est = wiki base; a natural fade teaches your real duration" : "",
-                    }.Where(part => part.Length > 0)),
+                    Detail: BuffRosterPresentation.Detail(b),
                     Icon: "Hourglass")
                 {
                     Fraction = Math.Clamp(1 - left / warn, 0, 1),
