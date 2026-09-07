@@ -1,3 +1,26 @@
+## 2026-09-07 ~2:25 PM CT — PR #400 OE-9 every-tray peek/pop-out implement (SIGNED with Deaths gate; rebase then merge-when-green)
+
+- **When / who:** 2026-09-07 ~2:25 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: OE-9 PR #400 tip `3f50d660` needs last-look; one open question — the ~1:30 DPS lock read as DPS only). Corrects the ~2:20 SSC draft that treated Deaths IN as already-signed.
+- **Thread / subject:** PR #400 https://github.com/DranakCorps-bot/EQBuddy/pull/400 (`claude/oe9-expand-peeks-20260907` → `main`) — OE-9 implement from signed #389. Tip stamp `3f50d660` (channel); product tip `602d114c`. Rebased onto #392 mid-build (Bevel Loot kept; parallel Loot half dropped). At look: tip **CONFLICTING / behind `main`** (`#398` arch-magus fix); CI re-running on stamp tip. SSC companion: PR #401 (`helm/ssc-400-oe9-20260907`).
+- **Ruling:** **SIGNED for the signed #389 seat + DPS fight-scope confirm**, with an explicit **Deaths gate** (below). Soft merge #400 after **rebase onto current `main`**, when `build-and-test` + `e2e-windows` green on the rebased head **and** the Deaths gate is cleared. Drop LIVE ASK tip at merge (prefer this Helm land / #401 for SSC). Live Holds empty. Play Console OFF. Not needs-david for the DPS question; Deaths gate is channel-evidence, not a new door.
+- **Asks answered:**
+  1. Last-look OE-9 implement — **SIGNED** for Motes/Kills/Procs/Money + DestinationOf + Procs→Damage + DPS fight peek, merge-when-green after rebase + Deaths gate.
+  2. **~1:30 DPS lock read as DPS only** — **CONFIRM / SIGNED as written.** Peek fight-scope is **DPS only**; Healing and Pet stay session-scoped. Do **not** widen in this PR. Soft follow-up one-liner later if Bevel/owner want HPS/Pet peeks on current fight — **not a merge gate**.
+  3. #392 Loot takeover mid-build — **ACK / no ruling needed** (Bevel's `HudExpandPeek.Loot` ships).
+  4. Surviving `hudExpandEmpty` dump fact + staged no-target E2E — **ACK / KEEP** (distinguishes select-a-target vs no-known-drops; trap 39). Soft Bevel eye OK, not a merge gate.
+  5. Bevel article-dedupe ("A Spider Venom Sac" vs "Spider Venom Sac") — **ACK** as filed soft item; predates OE-9/#392; **not this PR**.
+  6. Worktree `reset --hard` / mid-session rebase note — **ACK** process signal to Dranak; not a product hold.
+  7. **Deaths IN / full-tray claim from "~1:29 / ~1:30 owner amends"** — **NOT SIGNED as supersession of #389.** Tip and `main` `HELM-FEEDBACK.md` have **no** newest-first `## … ~1:29` / `~1:30` OWNER amend section (only LIVE ASK prose citing them). Signed #389 ask 4 (**Deaths stays OUT**) **STANDS** until an owner amend lands newest-first on the channel **or** David confirms in chat. **Deaths gate (clear one):** (a) strip `HudExpandTarget.Deaths` + peek/pop/DestinationOf/World Travels wiring + shots/E2E/WhatsNew for Deaths from #400 before merge, **or** (b) land the missing owner amend newest-first on `HELM-FEEDBACK.md` (Deaths IN + every-cell + DPS=current fight) then keep Deaths. Do **not** invent the amend from the LIVE ASK citation.
+- **Spot-check (product `602d114c`):**
+  - `HudExpandTarget` += Motes/Kills/Procs/Money/**Deaths** (twelve) — Deaths present in tip **under gate above**.
+  - Total `HudExpand.DestinationOf` (four hosts: float / Progress / Creature / World); Procs→Damage float; Motes+Money→Progress Wealth; Kills→Creature; Deaths→World Travels; lock-7 destination-keyed.
+  - DPS peek: `fight = target == HudExpandTarget.Dps` → `LivePresentation.Meter(..., fight)` — current fight; HPS/Pet session (**matches confirm**).
+  - Damage float gains procs block off shared `HudExpandPeek.Procs` (lock 6 / SA-2).
+  - #392 Loot target-scope kept; `hudExpandEmpty` on top.
+- **Posture / Soft max ≤3:** (1) clear Deaths gate + rebase + merge #400 when both CI green. (2) Soft merge this SSC (#401). (3) Soft Bevel loot article-dedupe + optional HPS/Pet fight-peek one-liner if wanted. Owner v1→Evolved transition ask (~1:44 / #399 Fable) stays when Soft has room — **not** ahead of #400 land. Soft LEAVE #380/#356.
+- **Claude kick via Dranak:** `--model opus` / `claude-opus-5`: **clear Deaths gate (strip Deaths OR land real owner amend)** → **rebase #400 onto `main`** → CI → **merge when `build-and-test` + `e2e-windows` green**. Soft merge #401 when green. Soft: do not invent Healing/Pet fight-scope. Soft Bevel article-dedupe only if Soft max has room after #400. Probe `claude models` first. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish.
+- **Scope hygiene:** Not a hold. Not needs-david for DPS confirm. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~1:10 PM CT — PR #389 Fable OE-9 expand-for-all peeks + Loot peek re-scope plan (SIGNED; OE-9 Opus gated on Soft max / #388 HIGH)
 
 - **When / who:** 2026-09-07 ~1:10 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: Fable OE-9 plan for sign (PR #389); tip `2fbd4ccd`).
