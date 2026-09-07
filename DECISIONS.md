@@ -1,3 +1,36 @@
+## 2026-09-07 (PR-3 — the tick-freeze fix: a bounded tooltip duration)
+
+- **The bounded duration is 30 000 ms** · Helm's sign recommended 30 000 and allowed
+  15 000–60 000 · 30 000, because nothing in the mechanism cares about the exact number —
+  anything far below `int.MaxValue` is safe by construction — so the only real question is
+  how long someone needs to READ a tooltip. The xp chip's three-line hover (OE-3) is the
+  longest text in the app and is comfortable inside 30 s; 15 s would snatch it from a slow
+  reader and 60 s is indistinguishable from the accidental "forever" for anyone who has
+  walked away. Recorded because the sign explicitly left the choice to the executor.
+- **The prove-fail is NOT committed as a `[Fact]`** · the obvious move was to commit the
+  negative beside the positive, which is what trap 39 asks for elsewhere · run locally and
+  reported instead (exactly ZERO fast ticks, eight runs), because a committed test asserting
+  that WPF's overflow still reproduces goes RED the day a .NET update fixes it, and this
+  suite gates the release. The arithmetic half of the same negative IS committed
+  (`ToolTipPolicyTests`), so the guard is not one that can never fail.
+- **The dump reads the duration off a fresh control, not off `ToolTipPolicy`** · a cached
+  probe or the constant itself would have been cheaper · fresh control, because the whole
+  point of the fact is trap 42: an `OverrideMetadata`-shaped fix has shipped in this repo,
+  been present in the binary, and changed nothing at runtime. A dump reporting our own
+  constant would report the fix working on a tree where the call never ran.
+- **The override is on `DependencyObject`, not on `FrameworkElement` + `FrameworkContentElement`** ·
+  both would work and the pair is the more conventional shape · the root, because
+  `ShowDuration` is read straight off the owning element and metadata lookup walks to the
+  root, so one override answers for everything WPF can hang a tooltip on — and two overrides
+  is the beginning of a list (trap 30). Verified rather than assumed: a scratch probe on this
+  runtime returned 2147483647 before and 30000 after, for `Button`, `TextBlock` and `Border`.
+- **The trap-42 effect assertion was NOT run locally against a launched app** · the honest
+  alternative was to stand down the other seat's fixture app and run it · left to CI, because
+  another worktree's EQBuddy was running out of `bin\Release` on this desktop and closing
+  another harness's app is precisely the damage the screen lock exists to prevent (trap 61).
+  The underlying claim was verified another way (the scratch probe above), and `e2e-windows`
+  runs the assertion itself on PR-3's own tip.
+
 ## 2026-09-06 (Phase-2 — GearCard tick-freeze diagnosis)
 
 - **The local ×20 repro loop was SKIPPED** · Fable's Phase-2 plan offers it first ("Local repro

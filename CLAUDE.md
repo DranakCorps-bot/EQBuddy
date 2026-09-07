@@ -1791,6 +1791,47 @@ Read this list before touching the areas it names. Every entry cost a release.
     write `Assert…(0)` in E2E, ask what positive event you could wait for that can only occur
     after the code under test has run, and wait for that instead.
 
+63. **A FRAMEWORK DEFAULT OF `int.MaxValue` IS NOT "OFF" — IT IS AN OVERFLOWING OPERAND, AND
+    IT TOOK THE WHOLE APP'S CLOCK WITH IT.** WPF's `ToolTipService.ShowDuration` defaults to
+    `int.MaxValue` ms, which reads as "leave the tooltip up" and is arithmetic everywhere it
+    is actually used. `PopupControlService` arms a `DispatcherTimer` with it;
+    `DispatcherTimer.Restart` computes `Environment.TickCount + interval` in **int32** and
+    overflows negative; `Dispatcher.UpdateWin32Timer` takes the wrap-safe MINIMUM due time,
+    so the overflowed value reads as ~24 days in the *past* and wins; `SetWin32Timer`
+    overflows the other way and arms the **one Win32 timer WPF shares across every
+    `DispatcherTimer` on the thread** 24 days out. `_uiTimer` and `_companionPump` die
+    together, permanently, and the thread returns to `GetMessage` — so the window still
+    paints, still answers clicks, and `Process.Responding` stays **True** while every number
+    in EQBuddy has stopped. The player shape is *"EQBuddy stopped updating but I can still
+    use it"*, which nobody files as a freeze. **We set `ShowDuration` nowhere, so every
+    tooltip in the app was the same loaded gun** — and there are dozens.
+    → **THE TRIGGER IS A SECOND TIMER BEING LATE, WHICH IS WHY IT IS INTERMITTENT AND WHY
+    THE FIRST REPRO "DISPROVED" IT.** The overflowed due time only wins the minimum when
+    another registered timer is already ≥ 1 ms overdue (`interval + δ` has to wrap). A
+    tooltip opening on an idle thread does nothing at all; one opening while the tick is
+    running late is fatal. The diagnosis nearly shipped without that term — the standalone
+    repro did not fire until the thread was blocked 300 ms first. **When an overflow theory
+    fails to reproduce, ask what has to be true for the wrapped value to be SELECTED**, not
+    just computed.
+    → **Five red CI runs of pure reasoning produced three families; one minidump produced
+    the answer** (`freeze-tick3`, run 34075983046: `_dueTimeInTicks = -2147108868` against
+    `PopupControlService._currentToolTipTimer`, and `374781 + int.MaxValue` is that number
+    exactly). Trap 33/49's "ship the instrument before the third theory", earning itself a
+    fourth time.
+    → **Now guarded:** `UI.Shared/ToolTipPolicy` holds the bounded default (30 s) *and the
+    arithmetic*, so the constant cannot be tidied back up by someone who only sees a
+    duration; `ToolTipDefaults.ApplyOnce` is one `OverrideMetadata` on `DependencyObject`
+    from `App.OnStartup`; `ToolTipPolicyTests` states the mechanism as arithmetic with WPF's
+    own default as its committed negative; and `ToolTipTimerTests` (E2E) holds both halves —
+    the dispatcher mechanism (prove-failed at exactly **zero** ticks, eight runs) and the
+    trap-42 EFFECT, read off a launched app's control rather than off our constant.
+    → **The general shape, and it is why this is a trap and not a bug report: a "no limit"
+    sentinel is a number that some layer will do sums with.** Before accepting a framework
+    default that means "forever", "never" or "unlimited", find the arithmetic it feeds. And
+    prefer removing the poisoned operand to defending against its consequence — the defence
+    here would have been a watchdog, which is a `DispatcherTimer` too and dies with the very
+    timer it is guarding.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

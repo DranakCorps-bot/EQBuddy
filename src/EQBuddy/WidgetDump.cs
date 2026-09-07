@@ -492,6 +492,18 @@ internal static class WidgetDump
                     // build" and "in effect at runtime" are different claims and trap 42
                     // cost two builds to learn it. The setting is beside it so a
                     // disagreement between the two is visible rather than inferable.
+                    // THE TOOLTIP DURATION ACTUALLY IN FORCE (PR-3), read the way WPF's own
+                    // PopupControlService reads it — off a control, not off ToolTipPolicy.
+                    // A dump that reported the constant would report the fix working on a
+                    // tree where the OverrideMetadata call never ran, which is trap 42
+                    // exactly: an OverrideMetadata-shaped fix has shipped here before,
+                    // been present in the binary, and changed nothing at runtime.
+                    //
+                    // int.MaxValue here is the pre-fix value and the whole defect: it
+                    // overflows DispatcherTimer's int32 due-time arithmetic and steals the
+                    // one shared Win32 timer, stopping the tick and the Mobile pump with
+                    // the window still painting. ToolTipPolicy carries the arithmetic.
+                    $"tooltipShowDurationMs={ToolTipDefaults.InForce()} " +
                     $"altTabWanted={(w._settings.HideFromAltTab ? 1 : 0)} " +
                     $"altTabStyle={(NoActivate.IsToolWindow(w) ? 1 : 0)} " +
                     // The bit that defeated the one above for a week (Hateborne,
