@@ -175,7 +175,13 @@ internal sealed class SettingsRoom : Grid, IShellRoom
         // That is the host's business, not the Look block's, which is why it asks instead of
         // reaching — the same callback `OptionsWindow` passes.
         _look = new SettingsLookView(_main, _vm, () => _ready, FindResource, () => _hud.BuildCards());
-        _behavior = new SettingsBehaviorView(_main, _vm, () => _ready, FindResource);
+        // The Behavior block gets ONE thing this host can do and `OptionsWindow` cannot:
+        // re-open the first-run Setup screen (OE-6), which is a layer of the shell window.
+        // Resolved LATE for the same reason the Alerts block's dialog owner is — a room is
+        // not a window and has no parent at all while its constructor runs, so a `this`-
+        // shaped answer captured here would be null forever.
+        _behavior = new SettingsBehaviorView(_main, _vm, () => _ready, FindResource,
+            () => (Window.GetWindow(this) as ShellWindow)?.ShowSetup());
         // The owner for the block's file dialogs, resolved LATE: a room is not a window and
         // has no parent at all while its constructor runs, so a `this`-shaped answer captured
         // here would be null forever. `Window.GetWindow` asks at the moment a dialog opens,

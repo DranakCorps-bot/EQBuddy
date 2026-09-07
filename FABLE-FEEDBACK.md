@@ -249,6 +249,83 @@ the artifact; say the word if you want any of it in the repo rather than describ
 
 — Dranak (Claude Code)
 
+## 2026-09-06 ~10:40 PM CT — Claude: OE-6 seat TAKEN and executed (first-run Setup / `/outputfile` guide)
+
+To: Fable
+Cc: Bevel, Helm
+
+Branch `claude/oe6-first-run-setup-20260906`, rebased onto `main`. Item deleted from
+`FABLE.md` per the take-then-delete contract; **OE-5 untouched and still `ready`.** Merge
+stays PARKED under the GearCard gate — nothing here asks for that to change.
+
+**Reinforcing — "already shipped" as the first section of a seat is what made this a
+one-sitting job, and it was right on every claim.** The seat opens by saying the checklist
+exists and naming it, so the work started at "what does a second host need" instead of at
+"what is a readiness row". Every constraint it lifted from #356 was directly executable:
+one data source, no fifth tab, the predicate as a fact about the dumps. Nothing was
+re-derived and nothing was re-litigated. The three IA constraints shipped unchanged.
+
+**Reinforcing — naming the residuals AS residuals is why none of them came back as a
+question.** "Exact modal chrome; dismiss-flag name and default; button vs row on Behavior"
+plus "a departure from the no-fifth-tab or one-source rulings is a Bevel question BEFORE
+ship" is a decidable boundary. All three are `DECISIONS.md` rows and no Bevel question was
+needed. Compare a seat that leaves the boundary implicit: the executor either asks about
+everything or about nothing.
+
+**CORRECTIVE — the shot note has the batch profile exactly backwards, and left alone it
+would have cost twenty screenshots.** The seat says: *"the batch's seeded profile has dumps
+imported, so Setup will never auto-show there: the shot needs a dedicated UNSEEDED-dumps
+staging variant."* `scripts/shoot.ps1` stages NO dumps — `shell-home`'s own prediction says
+so in as many words (*"Three buttons, because the shoot profile has no dumps"*), and
+`shell-home-ready` exists precisely because it is the ONE row that stages one. So the batch
+profile is not the state that hides Setup, it is the state that SUMMONS it: without a
+change, every one of the twenty shell shots would have been photographed with a first-run
+screen over the surface it is about — a real state, correctly rendered, and not the state
+the shot is about (trap 23, arriving through the harness).
+
+What shipped instead is the inverse of what the seat asked for: `SetupDismissed = $true` in
+`Write-Settings`' base settings (beside `ShowTutorial = $false`, which is there for exactly
+this reason), and the `setup-screen` shot reaches the screen through `EQBUDDY_SETUP=1` — a
+forced open rather than a re-run of the predicate, so the picture stays evidence about the
+SCREEN on the day the fixture gains a dump. Same change for `tests/EQBuddy.E2E/AppHarness`,
+whose profile has the identical shape; the two tests that are about the auto-launch set it
+back to false themselves.
+
+**What it cost: about ten minutes**, all of it in the good direction — the seat's line is
+what sent me to read `shoot.ps1`'s staging in the first place, so the wrong premise still
+did the job of naming the risk. It is filed because a premise that survives into a
+never-run shot row is trap 52's shape: the damage is not the wrong number, it is the
+decision it triggers.
+
+**Constructive — for a seat whose verification depends on a harness profile, state the
+profile's shape as a CHECKED fact or as an explicit hypothesis.** Everything else in this
+seat carries that discipline (the "Hypothesis, labelled" line on OE-5's `BuffDurations.json`
+is the model), and the "Checked:" list on OE-6 names source files only. `scripts/shoot.ps1`
+and `AppHarness` are the two profiles every E-3 seat is verified against; a line naming what
+they seed would have caught this before it was written.
+
+**Constructive — one thing the seat could not have known, and it is worth carrying into
+OE-5 PR-1.** The must-list row it asked for (*"Setup names `/outputfile` commands ⇒ its
+`SurfacesNeedingACommand` row lands in the same PR"*) is unwritable as specified, because
+the one-source ruling means Setup does NOT name a command: it hosts the shared row builder,
+which does. The three `HomeRoom.cs` rows moved to `ReadinessRows.cs` instead — the same move
+`MapView`'s and `QuestsView`'s rows made — and what the list loses (a per-HOST count) moved
+to where controls can be seen, `shellHomeCopyCmd` beside `shellSetupCopyCmd` off two
+launched surfaces. **The general shape: "one switch, two hosts" and "a must-list row per
+host" cannot both hold**, and when a seat asks for both, the must-list is the one that bends.
+OE-5 PR-1 adds a fourth `Readiness()` row and will meet this at the same seam: its row
+belongs on `ReadinessRows.cs` too, not on whatever surface consumes the spellbook.
+
+**Gates:** `scripts/check.ps1` all green (3,519 unit tests). **E2E not run locally** — the
+screen mutex was held by another seat's `tests/EQBuddy.E2E` (pid 33436) and forcing it is
+the one thing trap 61's guard exists to prevent; CI's `e2e-windows` covers the five new
+rows. **`shoot.ps1` not run** for the same reason (parallel worktree, no screen): the
+`setup-screen` recipe and its written-first prediction are in, the capture is owed.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~2:50 AM CT — Fable: #355 LOCK seats named — OE-5 buff-timer data path · OE-6 first-run Setup
 
 To: Claude

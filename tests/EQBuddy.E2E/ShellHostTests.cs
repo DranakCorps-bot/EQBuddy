@@ -1285,4 +1285,146 @@ public class ShellHostTests
         // to Look on its next open — one host silently editing the other's landing.
         app.WaitForDump("optionsTab", "look", "the v1 window on its own untouched saved tab");
     }
+
+    // ---- OE-6: the first-run Setup screen ---------------------------------------
+
+    /// <summary>
+    /// **The auto-launch, on the profile it exists for.** The harness seeds a character and
+    /// no dumps, so every readiness row is never-scanned — the state Bevel's predicate names
+    /// — and `SetupDismissed` is put back to the default a fresh install has.
+    ///
+    /// **Three assertions and none of them is redundant.** `shellSetup` says a screen is on
+    /// screen; `shellSetupAuto` says the PREDICATE is what opened it, which is the only
+    /// thing that separates an auto-launch from the `EQBUDDY_SETUP` hook below; and
+    /// `shellSetupCopyCmd` says the ⧉ buttons are actually there, which is the half no
+    /// source scan can reach — an absent control photographs as an unremarkable panel (trap
+    /// 29) and `GameCommandsTests` can only prove the file NAMES the commands.
+    /// `shellSetupRows` beside the count is the floor that stops it going vacuous: a screen
+    /// that drew nothing would report zero buttons and satisfy a "greater than zero" reading
+    /// of nothing at all (trap 39).
+    /// </summary>
+    [Fact]
+    public void SetupOpensByItselfOnAProfileThatHasRunNoneOfTheCommands()
+    {
+        using var app = new AppHarness(
+            configureSettings: s => s.SetupDismissed = false, environment: OpenOn("1"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to open");
+        Assert.Equal(1, app.DumpValue("shellSetup"));
+        Assert.Equal(1, app.DumpValue("shellSetupAuto"));
+        Assert.Equal(3, app.DumpValue("shellSetupRows"));
+        Assert.Equal(3, app.DumpValue("shellSetupCopyCmd"));
+        // The room underneath is still the room: Setup is a layer over it, not a navigation.
+        app.WaitForDump("shellPage", "home", "the room under the screen to be untouched");
+    }
+
+    /// <summary>
+    /// **One dump is enough to stop it**, which is the "every row, not any row" half of the
+    /// predicate reaching a running app. The inventory dump is staged in the game's own
+    /// tab-separated shape so it goes through the real finder and the real parser (trap 23).
+    ///
+    /// **The negative is asserted at a moment on the far side of the decision** (trap 62):
+    /// `shellSetup` only exists in the dump once the shell window has been constructed, and
+    /// the auto-show decision is made by that constructor — so a `shellPage` that has
+    /// arrived is proof the question has already been asked and answered. A `Thread.Sleep`
+    /// here would have been a guess about the machine.
+    ///
+    /// `shellHomeReadinessWaiting` is the floor: it proves the staged dump was actually SEEN
+    /// rather than that the app failed to start, which is the reading a bare "no screen"
+    /// assertion could never tell apart.
+    /// </summary>
+    [Fact]
+    public void SetupStaysAwayOnceAnyOneOfTheDumpsHasLanded()
+    {
+        using var app = new AppHarness(
+            configureSettings: s => s.SetupDismissed = false, environment: OpenOn("1"));
+        app.WriteInventoryDump(("General1", "Bone Chips", 12));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to open");
+        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 2,
+            $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("shellSetupAuto"));
+        Assert.Equal(0, app.DumpValue("shellSetup"));
+    }
+
+    /// <summary>
+    /// **Dismissed means dismissed** — the persisted answer, read by the same predicate on
+    /// the next launch. Same trap-62 timing as above, and the floor here is
+    /// `shellSetupDismissed`: without it, an app that had failed to load the profile at all
+    /// would report no screen and pass.
+    /// </summary>
+    [Fact]
+    public void SetupDoesNotComeBackAfterItHasBeenClosed()
+    {
+        using var app = new AppHarness(
+            configureSettings: s => s.SetupDismissed = true, environment: OpenOn("1"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to open");
+        Assert.Equal(1, app.DumpValue("shellSetupDismissed"));
+        Assert.Equal(0, app.DumpValue("shellSetupAuto"));
+        Assert.Equal(0, app.DumpValue("shellSetup"));
+    }
+
+    /// <summary>
+    /// **The way back, on a profile that has already said stop** — which is the state the
+    /// re-open exists for and the state the auto-launch predicate correctly refuses. Without
+    /// `EQBUDDY_SETUP` the screen could not be reached by a test or a capture at all once
+    /// dismissed, which is trap 22 exactly: a surface with no way to reach its state reads
+    /// as reviewed anyway.
+    ///
+    /// **`shellSetupAuto=0` beside `shellSetup=1` is the assertion**, and it is what makes
+    /// the two tests above mean anything: a hook that had accidentally cleared the dismissal
+    /// (or an auto-show that fired regardless) would report 1 here, and every "it did not
+    /// come back" row would be passing against a screen that comes back for a different
+    /// reason. The dismissal is untouched — a re-open is not a request to be nagged again.
+    /// </summary>
+    [Fact]
+    public void TheHookReopensSetupWithoutClearingTheDismissal()
+    {
+        using var app = new AppHarness(
+            configureSettings: s => s.SetupDismissed = true,
+            environment: new Dictionary<string, string>
+            {
+                ["EQBUDDY_SHELL"] = "1",
+                ["EQBUDDY_SETUP"] = "1",
+            });
+        app.Launch();
+
+        app.WaitForDump("shellSetup", 1, "the hook to open the first-run screen");
+        Assert.Equal(0, app.DumpValue("shellSetupAuto"));
+        Assert.Equal(1, app.DumpValue("shellSetupDismissed"));
+        Assert.Equal(3, app.DumpValue("shellSetupCopyCmd"));
+    }
+
+    /// <summary>
+    /// **The re-open ROW is on the shell's Behavior tab and not on the v1 window's**, from a
+    /// launched app — the runtime half of `SettingsRoomTests.OnlyTheShellHostOffersTheFirstRunScreenAgain`.
+    ///
+    /// Setup is a layer of `ShellWindow`; `OptionsWindow` has no room to draw it over and is
+    /// explicitly out of the owner's lock, so a button there would open nothing. That is a
+    /// claim about a CONTROL, and a control that is absent photographs as an unremarkable
+    /// list (trap 29) — which is why both hosts are opened at once and asked the same
+    /// question under their own prefixes (trap 58).
+    /// </summary>
+    [Fact]
+    public void OnlyTheShellsBehaviorTabCarriesTheWayBackIntoSetup()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "settings:behavior",
+            ["EQBUDDY_OPTIONS"] = "1",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellSettingsTab", "behavior", "the room to land on Behavior");
+        Assert.Equal(1, app.DumpValue("shellSettingsBehaviorSetup"));
+        Assert.Equal(0, app.DumpValue("optionsBehaviorSetup"));
+        // The floor: both hosts really did build the block, so the 0 above is a missing ROW
+        // and not a missing window.
+        Assert.True(app.DumpValue("optionsBehaviorHotkeys") > 0,
+            $"the v1 window's Behavior block was never built; dump was: {app.Artifacts()}");
+    }
 }

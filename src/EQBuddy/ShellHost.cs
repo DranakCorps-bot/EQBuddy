@@ -61,12 +61,23 @@ internal static class ShellHost
     /// </summary>
     public static void ApplyEnvHook(MainWindow main)
     {
-        if (Environment.GetEnvironmentVariable("EQBUDDY_SHELL") is not { Length: > 0 } address)
-            return;
+        var address = Environment.GetEnvironmentVariable("EQBUDDY_SHELL");
+        // **`EQBUDDY_SETUP=1` — the first-run Setup screen (OE-6), and it OPENS THE SHELL on
+        // its own** rather than requiring both names. Setup is not a room and has no
+        // address, so there is nothing for `EQBUDDY_SHELL` to point at; and on a profile
+        // that has already run a dump, or already dismissed it, the auto-launch predicate
+        // correctly says no — which would leave the screen with no way to be photographed or
+        // asserted at all (trap 22, and trap 29: an absent screen photographs as an ordinary
+        // room). Set both when the room UNDER the screen matters to the picture.
+        var setup = Environment.GetEnvironmentVariable("EQBUDDY_SETUP") == "1";
+        if (address is not { Length: > 0 } && !setup) return;
         main.Loaded += (_, _) => main.Dispatcher.BeginInvoke(() =>
         {
-            Show(main, address == "1" ? null : address);
+            Show(main, address is { Length: > 0 } && address != "1" ? address : null);
             ApplySizeHook(main);
+            // AFTER Show, and it is a forced open rather than a re-run of the predicate:
+            // the hook's whole job is reaching a state the predicate would refuse.
+            if (setup) main._shellWindow?.ShowSetup();
         }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
     }
 

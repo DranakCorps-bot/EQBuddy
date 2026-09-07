@@ -269,6 +269,37 @@ public class SettingsRoomTests
     }
 
     /// <summary>
+    /// **The first-run Setup screen re-opens from Behavior, on the host that can show it —
+    /// and NOT from the host that cannot** (OE-6).
+    ///
+    /// Setup is a layer of <c>ShellWindow</c>, drawn over the active room. <c>OptionsWindow</c>
+    /// has no room and is explicitly out of the owner's lock ("Evolved Settings, not
+    /// OptionsWindow"), so a button there would open nothing — "silent no-ops are broken"
+    /// with the switch on the other side, which is why the block takes the re-open as a
+    /// CAPABILITY (null = this host cannot) rather than reading a flag.
+    ///
+    /// **The negative is the half with teeth.** A block that grew the row unconditionally
+    /// would compile, render and photograph perfectly in Options, and the defect would only
+    /// exist for the player who pressed it. `behaviorSetup` in the dump is the runtime half
+    /// — a source scan can prove the wiring and only a launched app can prove the control.
+    /// </summary>
+    [Fact]
+    public void OnlyTheShellHostOffersTheFirstRunScreenAgain()
+    {
+        Assert.Contains("as ShellWindow)?.ShowSetup()", Room, StringComparison.Ordinal);
+        Assert.DoesNotContain("ShowSetup", CodeOnly(Window), StringComparison.Ordinal);
+
+        // The block draws it only when a host supplied one, and reports which host got it.
+        var block = Read("EQBuddy", "SettingsBehaviorView.cs");
+        Assert.Contains("if (_openSetup is not null)", block, StringComparison.Ordinal);
+        Assert.Contains("behaviorSetup=", block, StringComparison.Ordinal);
+        // Its words are SetupReadout's, so the row and the screen it opens cannot come to
+        // different ideas about what it is for.
+        Assert.Contains("SetupReadout.BehaviorLabel", block, StringComparison.Ordinal);
+        Assert.Contains("SetupReadout.BehaviorNote", block, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// **The dump facts come from the blocks and are re-keyed mechanically, on both hosts**
     /// (trap 58). The dump is one flat namespace, so two live hosts of one block would
     /// otherwise write over each other and every assertion on those keys would quietly start

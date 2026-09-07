@@ -95,11 +95,26 @@ public class GameCommandsTests
         // This is the room a brand-new player's shell OPENS on, so it is the surface where
         // an ask with no ⧉ beside it costs the most: the empty state is the only state a new
         // player sees, and it is the whole state of this block on a fresh profile.
-        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileInventory),
+        //
+        // **All three moved from EQBuddy/HomeRoom.cs to ReadinessRows.cs in OE-6**, when the
+        // first-run Setup screen became a SECOND host of the same rows — the same move
+        // MapView's row made in World PR 1 and QuestsView's three made in E-3 PR 3, and this
+        // list following the surface is exactly the notice it exists to give. The surface
+        // that ASKS is the shared row builder now: Bevel's signed ruling has Setup reuse
+        // `CommandFor(OutputfileKind)` rather than grow a second switch (trap 33 with the
+        // two producers being two hosts), so a copy of these rows keyed on `SetupView.cs`
+        // would be asking a file that correctly names no command to name three.
+        //
+        // **What the move costs, said out loud: the count of HOSTS is no longer in this
+        // list.** It never was the thing this rule guards — trap 34 is about a surface with
+        // NO copy source at all, and a host that renders these rows structurally cannot have
+        // one. The per-host claim is where controls can be seen: `shellHomeCopyCmd` and
+        // `shellSetupCopyCmd` in `tests/EQBuddy.E2E`, counted off two launched surfaces.
+        ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileInventory),
             "the Bags readiness row asks for the dump the wishlist and quest turn-ins read"),
-        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileAchievements),
+        ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileAchievements),
             "the Achievements readiness row asks for what Sky turn-ins and raid clears read"),
-        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileFaction),
+        ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileFaction),
             "the Factions readiness row asks for standings the log can never see"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),

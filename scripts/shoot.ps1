@@ -437,6 +437,43 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_SHELL = 'live:raids' }; Set = @{} }
     'shell-live-timeline' = @{ Title = 'EQBuddy — Live'
                            Env = @{ EQBUDDY_SHELL = 'live:timeline' }; Set = @{} }
+    # ---- OE-6: the first-run Setup screen --------------------------------------------
+    #
+    # **The staging is the whole shot, and it is INVERTED from every row above it.** The
+    # batch profile now carries `SetupDismissed = $true` (see Write-Settings) precisely
+    # because it is otherwise the profile Setup opens for — so this row is the one place
+    # that has to put the screen BACK. It does it through `EQBUDDY_SETUP=1`, a forced open,
+    # rather than by seeding `SetupDismissed = $false` and relying on the predicate: the
+    # picture is then evidence about the SCREEN rather than about whether the dumps
+    # happened to be absent this run, and it keeps working on the day the fixture gains one.
+    # (The predicate itself is asserted where an assertion belongs — `SetupReadoutTests` for
+    # the rule, `ShellHostTests` for the auto-launch reaching a running app.)
+    #
+    # Title is 'EQBuddy — Home': Setup is a LAYER over the active room and not a room, so
+    # the window's title is the room underneath — which is itself half of what this picture
+    # proves. Trap 53 applies as it does to every row here: if a rename makes this title
+    # stale the row fails rather than photographing something else.
+    #
+    # PREDICTION, written before the shot (trap 23):
+    #   'setup-screen' — a native title bar reading "EQBuddy — Home" and the rail on the
+    #     left with Home lit, both UNCHANGED and both visible: the screen covers the ROOM
+    #     cell only. Where the four Home blocks would be, an opaque panel with a hairline
+    #     border and rounded corners, inset by one card pad, holding:
+    #       "Set EQBuddy up" in accent ink at window-title size, one wrapped paragraph under
+    #       it, then the small-caps heading "What EQBuddy is waiting for" and THREE rows —
+    #       Bags, Achievements, Factions — each with "Not run yet" in accent ink on the
+    #       right, a dim line saying what it feeds, and a ⧉ copy button under it.
+    #       **Three buttons. Not two, not zero** — the batch profile stages no dumps, and a
+    #       screen that asked for output files without handing over the commands is the
+    #       defect David reported on 2026-08-20 (trap 34), which nothing but a picture or a
+    #       must-list can see.
+    #     Then a "Got it" button and, under it, one dim line naming BOTH ways back (Home
+    #     keeps asking; Settings → Behavior → Setup re-opens this). If that line is missing,
+    #     the one close on this screen is a permanent one with nothing saying so.
+    #     The column is capped at MinRoomWidth and pinned LEFT, the same cap Home's blocks
+    #     take — if the paragraph runs the full width of a wide window, the cap has come off.
+    'setup-screen'    = @{ Title = 'EQBuddy — Home'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SETUP = '1' }; Set = @{} }
     # E-3 S3 — HistoryWindow's this-session half, the two rooms it brings.
     #
     # PREDICTIONS, written before the shots (trap 23):
@@ -1942,6 +1979,17 @@ function Write-Settings([hashtable]$extra) {
         Minimized    = $false
         # Every popup that would cover a shot, pre-answered.
         ShowTutorial = $false
+        # **The first-run Setup screen (OE-6), and this line is load-bearing rather than
+        # tidy.** This profile has a character and NO dumps — which is exactly the state
+        # Setup's auto-launch predicate opens for (every readiness row never scanned; see
+        # 'shell-home', whose own prediction says "three buttons, because the shoot profile
+        # has no dumps"). Without this, every one of the twenty shell shots would be
+        # photographed with a screen over the room it is about: a real state, correctly
+        # rendered, and not the state the shot is about (trap 23). The 'setup-screen' shot
+        # below reaches it through EQBUDDY_SETUP, which is a forced open rather than a
+        # re-run of the predicate — so the picture is of the screen and every other picture
+        # is of the room.
+        SetupDismissed = $true
         LastSeenVersion = $version
         WatchPinsMigrated = $true
         # BOTH one-time watch-pin passes marked done, for the same reason. SA-R's retirement
