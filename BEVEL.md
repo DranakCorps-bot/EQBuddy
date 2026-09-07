@@ -68,49 +68,25 @@ and here there isn't even a hypothesis to test yet, only four candidate mechanis
 
 ---
 
-### 2. %/hr + level — the ETA already exists and isn't on the surface the owner is looking at; level tracking exists and is invisible by design
+### ~~2. %/hr + level — the ETA already exists and isn't on the surface the owner is looking at~~ — TAKEN 2026-09-06 (OE-3)
 
-**Place:** `SessionStats.cs:1937-1940` (`XpPerHour`, `HoursToLevel`), rendered as prose in
-`ProgressPresentation.cs:20,43,62-66` (`"Next level in ~2h 15m at this pace"`). The mini-bar/HUD
-glance chip is a *different* file — `src/EQBuddy.UI.Shared/HudGlance.cs` — and its `ThirdText`
-(line 152) shows only `"{XpPerHour:0.0}%/hr"`, no ETA. **Verified: the calculation the owner is
-asking for is not missing from the codebase — it's missing from the compact surface they're
-reading.** The full sentence already lives one hop away, in the Progress room/window.
+Built on `claude/oe3-xp-tooltip-20260906`, and **your recommendation (a) is what shipped, at
+the cost you predicted**: the xp chip's hover now reads the gesture line, then `Level 27`,
+then `Next level in ~2h 15m at this pace`. Both verified places were exactly where you said
+they were, and the `DoubleClickChipsToggleBreakouts` reachability finding was the load-bearing
+half — it is what made "put the sentence one hover away" a fix rather than a nicety. The
+shared-toggle default is untouched, as you recommended.
 
-**The reachability gap, verified, is why it reads as absent.** `HudBarView.cs:249-259` wires the
-xp chip's *double-click* to open Progress, but that gesture is gated on
-`AppSettings.DoubleClickChipsToggleBreakouts`, which has **no initializer** (`AppSettings.cs:578`
-→ defaults `false`). Out of the box, double-clicking the %/hr chip does nothing. So a player who
-has never found and enabled that setting has no path from the compact chip to the ETA at all —
-the sentence exists, but it's gated behind an opt-in gesture most players never discover.
-**Recommend, in order of cost:** (a) cheapest — put the ETA in the xp chip's **tooltip**
-(hover), no gesture, no setting; (b) put the countdown-clock line ("~2h 15m") as the chip's
-*second* line if HUD glance width allows it (needs a real measurement pass, not assumed here);
-(c) flag as its own small V0-V1 decision, **not consequence-list** but worth naming out loud
-since it changes existing behavior for every mini-bar chip, not just xp: should
-`DoubleClickChipsToggleBreakouts` default to on for at least the xp chip, given its only
-consumer today (breakout toggle) is itself opt-in and mostly unused? Recommend (a) as the actual
-fix — it costs nothing and doesn't touch the shared toggle's default at all.
+The level went on the **same tooltip** rather than the Progress Experience header (the
+alternative the sign allowed), logged in `DECISIONS.md`: answering "where is my level" with
+"one window away" is the shape of the gap, not a fix for it. Home's Identity line is
+untouched — your zone-over-level reasoning stands and was not re-opened.
 
-**Level persistence — verified: it IS persisted, and it is also nowhere the player can see it,
-which is very likely the actual complaint.** `QuestLedgerStore.cs`'s `CharacterLedger.Level`
-(own doc comment, line 70: *"Last level the log announced... 0 = never"*) is written by
-`SetLevel` only from the "Welcome to level N!" parse (`LogParser.cs:265-266`) and durably stored
-per-character in `quest-ledger.json` — confirmed at the write site, `MainWindow.xaml.cs:2521-2525`:
-*"the 'At N:' preview must survive restarts and log truncation, and the log only says the number
-at the ding."* That's real persistence, but it exists **only to feed the reward-preview memo**
-(`LevelUnlockMemo.cs`), never as a player-visible readout. Checked `HomeReadout.cs:79-87`
-directly: Home's Identity block shows **Server · Zone**, and its own doc comment says why —
-*"Zone rather than level or class, because zone is the one thing that changes between
-sittings."* That's a deliberate, reasoned choice, correctly applied to a "where did I leave off"
-card — and the side effect is that **there is currently no screen anywhere in the app that shows
-the player's own character level as a number.** "Unclear whether level is persisted" is the
-exact symptom of that: there's genuinely nothing to look at to check.
-**Recommend:** surface the tracked level (`LevelFor(char) ?? LastLevel`, same fallback order
-already used at `MainWindow.xaml.cs:129,2019`) somewhere a player can actually see it confirmed —
-candidates: the xp chip's tooltip (pairs naturally with the ETA fix above, same hover), or the
-Progress room's Experience tab header. **Not** Home's Identity line — that slot's zone-over-level
-reasoning is sound and this ask doesn't need to re-open it.
+**One thing your item did not call and the build had to:** both empty states are SPOKEN
+rather than omitted. `ProgressPresentation` drops its ETA line when there is nothing to
+forecast, which is right for a tally list and wrong for a hover whose whole job this turn is
+to answer "is my level even tracked" — omitting the line would have shipped the complaint
+back as the fix. Noted in `BEVEL-FEEDBACK.md`.
 
 ---
 

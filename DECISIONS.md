@@ -1,3 +1,35 @@
+## 2026-09-06 (OE-3 — the xp-chip tooltip: ETA + level)
+
+- **The level readout goes on the TOOLTIP, not on the Progress window's Experience header**
+  · the #347 sign allowed either and named the header as the alternative · the tooltip,
+  because it pairs the level with the ETA in ONE hover on the surface the owner was actually
+  reading. The header would have put the level on the window the forecast already lives in —
+  answering "where is my level" with "one window away", which is the same shape as the gap
+  being fixed. Fable's plan pre-decided this; it is recorded here because the sign left the
+  choice open and the alternative was a real one.
+- **Both empty states are SPOKEN rather than omitted** · `ProgressPresentation` omits its ETA
+  line when there is nothing to forecast, and the obvious move was to copy that · spoken,
+  because the two surfaces are answering different questions. A tally list that drops a line
+  is reading as "nothing yet"; a HOVER that drops its level line is indistinguishable from an
+  app that does not track levels — which is the exact report this item exists to answer.
+  Omitting it would have shipped the complaint back as the fix.
+- **The ETA is a shared SENTENCE, not a shared formatter** ·
+  `ProgressPresentation.FormatEta` was already public, so the tooltip could have composed its
+  own prose around it · the sentence, because two hosts wording one forecast by hand is trap
+  4 and the plan said "reuse the wording source, don't re-derive". `NextLevelSentence` is now
+  the one place; the Progress card calls it too.
+- **The gesture line stays FIRST on the hover** · trap 44 says a notification goes where the
+  eye lands, which argues for the new facts on top · first, because it is the only place the
+  peek/pin interaction is explained at all and a hover opening on a bare "Level 27" over a
+  chip reading "12.4%/hr" has stopped identifying itself. Line 2 of a 3-line tooltip is not
+  below any fold — trap 44 was about a report behind 21 rows and a scrollbar.
+- **The widget paid for the wiring by de-duplicating `TrackedLevel`, not by a ratchet bump** ·
+  the `MainWindow*` entry was at 4,222 of 4,222 and one argument was needed · the file had
+  written `QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null` out by hand
+  twice and was about to do it a third time, so one named member pays for the new argument and
+  leaves the count where it was. The baseline is untouched at 3,839 and OE-4 still inherits
+  zero headroom, which is what its roster lift is for.
+
 ## 2026-09-06 (OE-1 — the mini-bar tracked-chip expand)
 
 - **The under-bar panel is a SLAVED COMPANION WINDOW, not a panel inside the widget** · the

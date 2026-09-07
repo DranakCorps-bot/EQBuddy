@@ -296,6 +296,25 @@ internal static class WidgetDump
                     // with no window; this proves the decision reaches the control, which
                     // is the half a unit test cannot see (trap 42).
                     $"hudGlance={w._hudBar.GlanceKey} " +
+                    // THE XP CHIP'S HOVER (OE-3). Two keys, because the tooltip carries two
+                    // facts that fail independently — the level can be right while the ETA
+                    // is missing, and either alone is the whole feature to the player who
+                    // asked for it:
+                    //
+                    //   hudXpLevel  the level the tooltip STATES. 0 = it says none is known
+                    //               yet, which is a drawn sentence and not an absence; -1 =
+                    //               the third slot is HPS right now, so there is no xp chip
+                    //               to hover at all. Three readings, not two (trap 20).
+                    //   hudXpEta    whether the forecast sentence is on it. False is real —
+                    //               HoursToLevel is null below 0.05%/hr — so this separates
+                    //               "too early to say" from "the line got dropped".
+                    //
+                    // Read off what was DRAWN rather than recomputed here: the numbers have
+                    // existed in SessionStats all along and the whole item is that they
+                    // never reached a surface, so a dump that asked the session again would
+                    // report the feature working on the tree that has it missing (trap 42).
+                    $"hudXpLevel={w._hudBar.XpTip?.Level ?? -1} " +
+                    $"hudXpEta={(w._hudBar.XpTip?.HasEta == true ? 1 : 0)} " +
                     // THE MINI-BAR EXPANSION (OE-1). Four keys, because the owner's locks
                     // have four separable ways to go wrong and a single "is something
                     // expanded" could tell none of them apart:

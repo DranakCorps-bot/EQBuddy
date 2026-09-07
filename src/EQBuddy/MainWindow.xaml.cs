@@ -128,9 +128,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // 1.84.0, leaving a process with no window (#158, twidget76). Anything the
         // XAML can call must exist before the XAML is touched.
         _quests = new QuestChecklistView(this, _settings, () => _raidLedger);
-        _unlocks = new LevelUnlockMemo(
-            s => BuffSetClassSource(s).Classes,
-            () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null);
+        _unlocks = new LevelUnlockMemo(s => BuffSetClassSource(s).Classes, () => TrackedLevel);
         _watch = new WatchCardView(this, _settings, _delayedAlerts.NextDueByRule);
         TrackedBody.Content = _watch.Body;
         // The collapsed HUD bar (SA-1). It fills a panel this window owns and shows or
@@ -138,7 +136,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _breakoutHost = new BreakoutHost(this, _settings);
         _hudExpandBar = new HudExpandBar(this, _settings, _breakoutHost);
         _hudBar = new HudBarView(MiniChips, _settings, _delayedAlerts.NextDueByRule,
-            _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar);
+            _breakoutHost.Toggle, () => ShowProgressWindow(), _hudExpandBar, () => TrackedLevel);
         // The widget's OWN Motes card (back as a card 2026-08-21, hidden by default).
         // The Progress window builds a second instance from NewProgressSurfaces: a
         // UIElement has one parent, so two hosts mean two instances — the rule
@@ -671,6 +669,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
+    /// <summary>The ledger's durable level, or null when it has never recorded one. ONE
+    /// member: three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and
+    /// three hand-copied fallback orders is how they stop agreeing (trap 4).</summary>
+    private int? TrackedLevel => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null;
 
     /// <summary>The zone the log last put us in — the Quest Tracker measures distances
     /// from here.</summary>
@@ -2020,10 +2022,8 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         var money = new MoneyCardView(this); money.Attach();
         var faction = new FactionCardView(); faction.Attach();
         return new ProgressSurfaceSet(
-            Experience: new ProgressCardView(this, _settings,
-                s => BuffSetClassSource(s).Classes,
-                () => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null,
-                StoredLevelDings, () => QuestCharacterKey),
+            Experience: new ProgressCardView(this, _settings, s => BuffSetClassSource(s).Classes,
+                () => TrackedLevel, StoredLevelDings, () => QuestCharacterKey),
             Money: money,
             Motes: motes,
             Faction: faction,
