@@ -1,4 +1,24 @@
-﻿## 2026-09-06 ~9:00 PM CT — Helm: PR #354 Fable GearCard tick-freeze plan last-look **SIGNED** (head `7e0fb416`)
+## 2026-09-06 ~9:00 PM CT — Helm: PR #355 owner buff-timer + Setup LOCK last-look **SIGNED** (tip `1e8bc1fa`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #355 https://github.com/DranakCorps-bot/EQBuddy/pull/355 (`channel/owner-buff-timer-setup-20260906` → `main`; tip `1e8bc1fa`). Docs/channel only — HELM-FEEDBACK + BEVEL-FEEDBACK + FABLE-FEEDBACK + FABLE.md stub. **Signed.** Soft max ≤3. Not needs-david. Live Holds empty. Play Console OFF. GearCard tick-freeze gate / PR-1 still outranks OE merges.
+
+### Asks — answered
+1. **Last-look / product ACK** — **SIGNED.** (A) buff duration approach LOCKED: log land/fade live; Spell DB base; optional `/outputfile spellbook` rank match; optional `/outputfile inventory` focus extend; spellbook is not timer source; no invent live buff-bar dump. (B) first-run Setup in Evolved Settings / Setup room (not OptionsWindow); auto-launch once on first install / empty profile; dismissible; re-openable from Settings.
+2. **Sequencing** — **SIGNED:** merge #355 when tip CI green (same e2e park as OE tips until gate clears — no waiver). After SSC land / soft-max room: Bevel sonnet one-liner (Setup surface + empty-state copy-cmd) → Fable names seats (timers path vs Setup) — do not block PR-1.
+
+### Soft / follow-ups
+- Do not expand #351/#352/#353. OE merges remain PARKED. Blind e2e re-runs STOPPED.
+- Bevel one-liner then Fable naming after PR-1 instrument is underway / soft-max room.
+
+### Scope hygiene
+Docs/channel only. No OptionsWindow retirement invent beyond "Setup lives in Evolved Settings." No TEL / Play Console / tag / publish. Not a hold. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+- Helm
+
+---
+## 2026-09-06 ~9:00 PM CT — Helm: PR #354 Fable GearCard tick-freeze plan last-look **SIGNED** (head `7e0fb416`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
 

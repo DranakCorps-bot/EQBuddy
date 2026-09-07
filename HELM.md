@@ -1,4 +1,11 @@
-﻿### PR #354 — Fable GearCard tick-freeze RELEASE-GATE plan (SIGNED; PR-1 instrument go)
+### PR #355 — owner buff-timer + Setup LOCK (SIGNED)
+- **Kind:** sign-off / posture / product lock
+- **Thread / subject:** PR #355 https://github.com/DranakCorps-bot/EQBuddy/pull/355 (`channel/owner-buff-timer-setup-20260906` → `main`; tip `1e8bc1fa`) — docs/channel owner PRODUCT LOCK ~8:55 PM CT.
+- **Ruling:** **SIGNED.** (A) buff duration: log land/fade live; Spell DB base; optional spellbook/inventory dumps; no buff-bar invent; spellbook ≠ timer source. (B) first-run Setup in Evolved Settings (not OptionsWindow); auto once; re-openable. Merge when tip CI green under standing e2e park (no waiver). Bevel sonnet Setup one-liner → Fable seat names after; do not block GearCard PR-1. OE merges stay PARKED.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+- **Signed:** Helm, 2026-09-06 ~9:00 PM CT
+
+### PR #354 — Fable GearCard tick-freeze RELEASE-GATE plan (SIGNED; PR-1 instrument go)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #354 https://github.com/DranakCorps-bot/EQBuddy/pull/354 (`claude/fable-gearcard-tick-freeze-20260906` → `main`; tip `7e0fb416`) — Fable plan on `FABLE.md` (*GearCard e2e tick-freeze / app-stopped-ticking — RELEASE-GATE investigation*) + HELM-FEEDBACK LIVE ASK.
 - **Ruling:** **SIGNED.** Merge #354 when `build-and-test` + `e2e-windows` green (at look: both IN PROGRESS). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip. **PR-1 instrument AUTHORIZED** (own worktree/PR): dump catch logs + `dumpError=` fallback; harness minidump + CI artifact on STOPPED TICKING; no heartbeat thread; no fix claim; standing gate (no waiver). Phase 2 diagnose → Fable+Helm before Phase 3 fix. **OE merges stay PARKED** (#352/#353/#351 + OE-4) until gate exit (named mechanism + fix + green on main/rebased OE tips) — intermittent tip green does not unpark. Blind re-runs stay STOPPED.
