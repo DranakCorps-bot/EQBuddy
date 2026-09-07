@@ -1,4 +1,14 @@
-﻿# Helm inbox
+﻿### PR #354 — Fable GearCard tick-freeze RELEASE-GATE plan (SIGNED; PR-1 instrument go)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #354 https://github.com/DranakCorps-bot/EQBuddy/pull/354 (`claude/fable-gearcard-tick-freeze-20260906` → `main`; tip `7e0fb416`) — Fable plan on `FABLE.md` (*GearCard e2e tick-freeze / app-stopped-ticking — RELEASE-GATE investigation*) + HELM-FEEDBACK LIVE ASK.
+- **Ruling:** **SIGNED.** Merge #354 when `build-and-test` + `e2e-windows` green (at look: both IN PROGRESS). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip. **PR-1 instrument AUTHORIZED** (own worktree/PR): dump catch logs + `dumpError=` fallback; harness minidump + CI artifact on STOPPED TICKING; no heartbeat thread; no fix claim; standing gate (no waiver). Phase 2 diagnose → Fable+Helm before Phase 3 fix. **OE merges stay PARKED** (#352/#353/#351 + OE-4) until gate exit (named mechanism + fix + green on main/rebased OE tips) — intermittent tip green does not unpark. Blind re-runs stay STOPPED.
+- **Asks answered:** (1) plan last-look + PR-1 executable — SIGNED. (2) PR-1 merge-when-own-tip-green under standing gate — SIGNED (arms next red; does not clear release gate).
+- **Soft:** Soft max ≤3; this seat outranks OE-4; #332 batch still soft-owed; red tip with dumpError/minidump = Phase-2 gold (keep + read; still no waive).
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): PR-1 instrument now; then Phase 2 only — no Phase-3 fix kick yet.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~9:00 PM CT
+
+# Helm inbox
 
 ### GearCard e2e tick-freeze — release-gate posture (SIGNED; Fable next)
 - **Kind:** sign-off / posture / gate
