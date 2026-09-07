@@ -47,6 +47,93 @@ public static class MiniBarPresentation
     public static readonly IReadOnlyList<string> Order =
         ["kills", "pet", "procs", "loot", "motes", "money", "deaths"];
 
+    /// <summary>The key the buff set's chip draws under. A <see cref="AppSettings.MiniStats"/>
+    /// member since long before it drew anything, and deliberately absent from
+    /// <see cref="Order"/> — see <see cref="CanonicalOrder"/> for why it has a PLACE here
+    /// without having a row in any table above.</summary>
+    public const string BuffsKey = "buffs";
+
+    /// <summary>
+    /// Every key that can sit on the bar, in the order an untouched profile draws them —
+    /// the floor <see cref="AppSettings.MiniBarOrder"/> means by "empty".
+    ///
+    /// **It is <see cref="Order"/> plus "buffs", and the difference between the two lists is
+    /// the point.** <see cref="Order"/> is a FORMATTING table: which stats this class can
+    /// turn into an icon and a string. "buffs" is not one of them and cannot be — there is
+    /// no buff state on <see cref="StatsSnapshot"/> at all, so <c>HudBarView</c> builds that
+    /// chip's face from the buff tracker's own count (OE-7). But it is a chip on the bar
+    /// like any other, so it has a PLACE, and a place is what an order is about. Its
+    /// canonical slot is where it has always drawn: after "deaths".
+    ///
+    /// The trio (name, DPS, XP%/HPS) is absent for the reason SA-1 promoted it: those three
+    /// are drawn unconditionally ahead of every cell here, and the third slot swaps identity
+    /// mid-session (<see cref="HudGlance"/>), so a drag target there would change meaning
+    /// under the cursor. Pinned watch chips are absent too — they are a BLOCK after the
+    /// cells, one per rule, and per-rule placement would widen this list by rule id rather
+    /// than by stat key. Both seams are named rather than built.
+    /// </summary>
+    public static readonly IReadOnlyList<string> CanonicalOrder = [.. Order, BuffsKey];
+
+    /// <summary>
+    /// The player's chip order — every key of <see cref="CanonicalOrder"/>, exactly once.
+    ///
+    /// A key the setting omits is APPENDED in its canonical position rather than dropped, so
+    /// a later release's new stat lands ON the bar instead of in a hole, and a stale file
+    /// cannot silently lose a cell (trap 20's shape). Unknown names are skipped and
+    /// duplicates collapse to their first appearance, so a hand-edited file cannot produce a
+    /// bar that draws one chip twice. This is <c>HudChipRow.ResolveOrder</c>'s rule, stated
+    /// once more for a list of stat keys rather than of families.
+    /// </summary>
+    public static IReadOnlyList<string> ResolveOrder(AppSettings settings)
+    {
+        var order = new List<string>();
+        foreach (var name in settings.MiniBarOrder)
+        {
+            var key = CanonicalOrder.FirstOrDefault(
+                k => string.Equals(k, name, StringComparison.OrdinalIgnoreCase));
+            if (key is not null && !order.Contains(key)) order.Add(key);
+        }
+        foreach (var key in CanonicalOrder)
+            if (!order.Contains(key)) order.Add(key);
+        return order;
+    }
+
+    /// <summary>Writes a new chip order into the profile. The WRITER half of
+    /// <see cref="AppSettings.MiniBarOrder"/>, shipping in the same PR as its reader — the
+    /// <c>DeadSettingTests</c> posture, which exists because three player-facing bugs came
+    /// from data that survived a move and a write path that did not.
+    ///
+    /// The one caller is the mini bar's DROP. There is deliberately no second writer: two
+    /// surfaces editing a brand-new setting on day one is the shape that produced #252.</summary>
+    public static void SetOrder(AppSettings settings, IEnumerable<string> order) =>
+        settings.MiniBarOrder = [.. order];
+
+    /// <summary>
+    /// The keys the bar actually DRAWS, in the player's order: <see cref="ResolveOrder"/>
+    /// minus the stats with no ★, minus anything this class cannot put a face on.
+    ///
+    /// **The one membership decision, so the bar cannot draw a chip the order does not
+    /// know about** (trap 4). <c>HudBarView</c> walks this list and asks <see cref="Cell"/>
+    /// for each face, except <see cref="BuffsKey"/>, whose face it builds itself.
+    /// </summary>
+    public static IReadOnlyList<string> DrawnKeys(AppSettings settings)
+    {
+        var on = new HashSet<string>(settings.MiniStats, StringComparer.Ordinal);
+        return
+        [
+            .. ResolveOrder(settings)
+                .Where(on.Contains)
+                .Where(key => key == BuffsKey || Icons.ContainsKey(key)),
+        ];
+    }
+
+    /// <summary>A key list as one space-free token for the <c>EQBUDDY_EXPAND</c> dump
+    /// ("money,kills,loot"), or "-" when the bar has no chips at all. The dump is
+    /// space-separated key=value, so a value with a space in it would silently become two
+    /// keys; "-" rather than "" because a key with an empty value cannot be waited on.</summary>
+    public static string OrderKey(IEnumerable<string> keys) =>
+        string.Join(",", keys) is { Length: > 0 } key ? key : "-";
+
     /// <summary>What each cell is CALLED, for the one screen that lists them.
     ///
     /// It had no such screen until 2026-08-21, and that was the hole. A stat's only switch
@@ -82,19 +169,15 @@ public static class MiniBarPresentation
             ["deaths"] = "Skull",
         };
 
-    /// <summary>The cells to draw, in <see cref="Order"/>, for the stats switched on.
-    /// An unknown key is skipped rather than drawn blank — a settings file from a later
-    /// version must not leave a hole in the bar.</summary>
-    public static IReadOnlyList<MiniBarCell> Cells(StatsSnapshot s, IEnumerable<string> enabled)
-    {
-        var on = new HashSet<string>(enabled, StringComparer.Ordinal);
-        return
-        [
-            .. Order.Where(on.Contains)
-                .Where(Icons.ContainsKey)
-                .Select(key => new MiniBarCell(key, Icons[key], Text(s, key))),
-        ];
-    }
+    /// <summary>One cell's face — its icon and what it currently reads — or null when this
+    /// table cannot format the key.
+    ///
+    /// Null is a real answer and has two readings, both of which the caller handles the same
+    /// way: a settings file from a LATER version naming a stat this release has never heard
+    /// of (which must be skipped rather than drawn blank — a hole in the bar), and
+    /// <see cref="BuffsKey"/>, which is a chip the bar builds for itself.</summary>
+    public static MiniBarCell? Cell(StatsSnapshot s, string key) =>
+        Icons.TryGetValue(key, out var icon) ? new MiniBarCell(key, icon, Text(s, key)) : null;
 
     /// <summary>What one cell reads. Every format here was already agreed by both
     /// widgets; the point is that it is now agreed in one place.</summary>

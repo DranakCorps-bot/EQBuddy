@@ -105,6 +105,7 @@ internal sealed class SettingsHudView
     private WrapPanel _miniStats = null!;
     private WrapPanel _breakouts = null!;
     private TextBlock _breakoutsBlurb = null!;
+    private Button _restoreOrder = null!;
     private CheckBox _doubleClickChips = null!;
     private CheckBox _targetDrops = null!;
     private ComboBox _recentWindow = null!;
@@ -139,6 +140,17 @@ internal sealed class SettingsHudView
         + "collapsed bar shows your name, your DPS and your XP%/hr whatever you pick here, "
         + "and the third number becomes HPS while healing is the weight of the last "
         + "half-minute. Their stars are gone; there is nothing left to switch off.";
+
+    /// <summary>The undo for #191's chip drag. It says what it RESTORES rather than what it
+    /// erases, because "clear your order" describes the implementation and "back to the
+    /// order EQBuddy shipped" describes the bar the player is looking at.</summary>
+    internal const string RestoreOrderLabel = "Restore default order";
+
+    internal const string RestoreOrderTip =
+        "Put the minimised bar's chips back in the order EQBuddy ships with — kills, pet "
+        + "damage, weapon procs, loot, motes, coin, deaths, then the buff set. Only the "
+        + "chips you have starred are drawn, and your character name, DPS and XP%/hr stay "
+        + "first whatever you do. Off unless you have dragged a chip somewhere else.";
 
     /// <summary>Was "Show this in the minimised pill. Same switch as the star on the card
     /// header." — "mini pill" is the sentence #326 banned by name and "card" is a ban row of
@@ -206,6 +218,40 @@ internal sealed class SettingsHudView
         _miniStats = new WrapPanel();
         panel.Children.Add(_miniStats);
         panel.Children.Add(Dim(PromotedStatsNote, new Thickness(0, 4, 0, 2)));
+        // THE WAY BACK FROM A DRAG (#191; Bevel's face, Helm-signed 2026-09-07 ~5:58 PM CT).
+        // The order is set by carrying a chip on the bar, which is a gesture with nothing on
+        // screen to say it happened — so the undo lives on the one screen that LISTS these
+        // stats, under the checklist that keeps listing them canonically whatever the bar is
+        // doing. It is drawn ALWAYS and DISABLED when there is nothing to restore, the same
+        // rule "Follow the HUD again" follows: a control that only exists once you are lost
+        // is a control nobody has seen before they need it (trap 17's other half — it is
+        // dimmed, not merely inert).
+        _restoreOrder = new Button
+        {
+            Content = RestoreOrderLabel,
+            ToolTip = RestoreOrderTip,
+            // ActionButton rather than the link style Bevel's note suggested: `SectionLink`
+            // is a full-width navigation panel with an ↗ on it (it would read as a way OUT
+            // of this screen), and — the half that decides it — it carries no `IsEnabled`
+            // visual at all, so a disabled restore would render exactly like a live one and
+            // swallow the click (trap 17). `ActionButton` is the light weight Bevel asked
+            // for AND dims itself when it has nothing to do.
+            Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(0, 4, 0, 2),
+        };
+        _restoreOrder.Click += (_, _) =>
+        {
+            if (!Ready) return;
+            // The one write that is not a drop, and it is a CLEAR rather than a second
+            // author of an order: empty means canonical, so this restores the floor by
+            // deleting the player's list instead of writing a copy of the default into it
+            // (a literal here would be a second table to keep in step — trap 30).
+            _main.Settings.MiniBarOrder.Clear();
+            _main.Settings.Save();
+            BuildMiniStats();
+        };
+        panel.Children.Add(_restoreOrder);
 
         panel.Children.Add(Heading(BreakoutPresentation.Heading, new Thickness(0, 14, 0, 2)));
         _breakoutsBlurb = Dim("", new Thickness(0, 0, 0, 2));
@@ -437,6 +483,15 @@ internal sealed class SettingsHudView
             check.Unchecked += (_, _) => Set(key, false);
             _miniStats.Children.Add(check);
         }
+        // The checklist above stays in CANONICAL order whatever the bar is doing — it is a
+        // catalog of what can be starred, not a mirror of the row — so this is the only thing
+        // on the screen that knows the two can differ. Asked of the resolved order rather
+        // than of "is the list empty": a saved order that has been dragged back to canonical
+        // by hand is nothing to restore, and a button that would do nothing is disabled
+        // rather than silently swallowing the click.
+        if (_restoreOrder is not null)
+            _restoreOrder.IsEnabled = !MiniBarPresentation.ResolveOrder(_main.Settings)
+                .SequenceEqual(MiniBarPresentation.CanonicalOrder);
 
         void Set(string key, bool on)
         {
