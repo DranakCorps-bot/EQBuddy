@@ -1,3 +1,12 @@
+﻿# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
+
+**Evolved screenshots / tutorial / What’s-new / shoot pages use teal + grey theme going forward (not parchment/brass).**
+
+- Apply before any re-shoot or staging tutorial pics (shoot.ps1 / docs captures).
+- If this seat touches shots or What’s-new: land this lock in the PR (HELM lock / What’s-new note).
+- Opus TR-1 product work continues; theme applies to any captures you produce in this worktree.
+- Play Console OFF. No v1 tag / TEL / publish.
+
 ## 2026-09-07 ~2:05 PM CT — LIVE ASK: Fable v1→Evolved TRANSITION PRODUCT plan for sign (owner ask ~1:44 PM CT / PR #397)
 
 To: Helm

@@ -93,6 +93,70 @@ public class ImportReportReachesASurfaceTests
         return data;
     }
 
+    /// <summary>
+    /// **THE PROFILE IMPORT'S ROW** (Fable's transition plan §8, TR-1), and it is listed
+    /// apart from <see cref="MustReachASurface"/> because it is not an
+    /// <c>AutoImportOutcome</c> and must not be bent into one: there is no <c>Undo</c>
+    /// button to offer — the undo is structural, "clear the Evolved profile, v1 still has
+    /// everything" — and the outcome outlives the process that produced it, so it is read
+    /// off the marker on disk rather than off a property.
+    ///
+    /// **The defect it guards is identical, which is why it belongs in this file.** The
+    /// copy happens at startup, before <c>AppSettings.Load</c> and before any window exists
+    /// (see <c>ProfileImportStartup</c> for why the ordering is not negotiable), so an
+    /// import that reported nowhere would be indistinguishable from an import that never
+    /// ran — while having copied a whole profile. That is trap 43's sentence with a
+    /// player's entire settings, history and quest progress inside it.
+    /// </summary>
+    public static readonly (string Project, string File, string Reads, string Why)[]
+        ProfileImportMustReachASurface =
+    [
+        ("EQBuddy", "SetupView.cs", "ProfileImport.ReadMarker",
+            "The first-run Setup screen is where the transition plan §2 puts it: the first "
+            + "surface a player meets after the import, and the one that can show what came "
+            + "over beside the start-fresh alternative."),
+        ("EQBuddy", "SetupView.cs", "ProfileImportReadout.Report",
+            "Through the readout, never a sentence built in the window — the words are "
+            + "promises about a player's data and the WPF layer has no unit tests."),
+    ];
+
+    [Theory]
+    [MemberData(nameof(ProfileImportRows))]
+    public void TheProfileImportReportReachesASurface(string project, string file,
+        string reads, string why)
+    {
+        var text = File.ReadAllText(Path.Combine(Src, project, file));
+
+        Assert.Contains(reads, text);
+        Assert.NotEmpty(why);
+    }
+
+    /// <summary>And it is drawn ABOVE the rows (trap 44). A report about something that just
+    /// happened, appended after a list, is below the fold — which is exactly how the Raids
+    /// import report shipped correct and behind a scrollbar. Asserted as an ORDER in the
+    /// source rather than as a pixel, because the WPF layer has nothing else to assert
+    /// with.</summary>
+    [Fact]
+    public void TheProfileImportReportIsDrawnBeforeTheSetupRows()
+    {
+        var text = File.ReadAllText(Path.Combine(Src, "EQBuddy", "SetupView.cs"));
+        var report = text.IndexOf("AddImportReport();", StringComparison.Ordinal);
+        var rows = text.IndexOf("foreach (var row in _rows)", StringComparison.Ordinal);
+
+        Assert.True(report > 0 && rows > 0 && report < rows,
+            "The import report must be added to the Setup body BEFORE the readiness rows. "
+            + "See trap 44: the Raids import report was appended after 21 boss rows and "
+            + "rendered correctly, behind a scrollbar, on a surface nobody scrolls.");
+    }
+
+    public static TheoryData<string, string, string, string> ProfileImportRows()
+    {
+        var data = new TheoryData<string, string, string, string>();
+        foreach (var row in ProfileImportMustReachASurface)
+            data.Add(row.Project, row.File, row.Reads, row.Why);
+        return data;
+    }
+
     private static readonly (string Ui, string File)[] Widgets =
     [
         ("WPF", Path.Combine("EQBuddy", "MainWindow.xaml.cs")),

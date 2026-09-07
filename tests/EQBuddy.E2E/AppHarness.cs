@@ -142,6 +142,60 @@ internal sealed class AppHarness : IDisposable
             }));
     }
 
+    /// <summary>The fake EQBuddy 1.x profile this scenario imports FROM, once
+    /// <see cref="StageV1Profile"/> has made one. Never <c>%AppData%\EQBuddy</c>: a suite
+    /// that read a real v1 profile would be reading a real player's data, which is the
+    /// whole reason the source is overridable at all.</summary>
+    public string V1ProfileDir => Path.Combine(_root, "v1");
+
+    /// <summary>
+    /// Stages the one-time EQBuddy 1.x profile import (TR-1) so this launch actually
+    /// performs it — and does it by MOVING this harness's own seeded settings.json into the
+    /// fake v1 profile.
+    ///
+    /// **That move is the whole trick, and it is what makes the assertion mean something.**
+    /// The import refuses a non-empty target (there is no merge path, ever), so a scenario
+    /// that left the seeded settings where they are would be staging the REFUSAL. Putting
+    /// them in the source instead leaves the Evolved profile genuinely empty AND makes the
+    /// app's ordinary behaviour the proof: the fixture replays, the log folder is found and
+    /// the cards fill, all of which are impossible unless the imported settings.json is the
+    /// one the app loaded.
+    ///
+    /// <paramref name="consent"/> is what the player would have clicked. There is nothing
+    /// to click from out here — this suite asserts on a state dump — and a startup modal
+    /// with no answer would hang every test rather than fail one. The hook that supplies it
+    /// is inert unless the SOURCE is overridden, which no player's machine ever is; see
+    /// <c>ProfileImportStartup</c>.
+    ///
+    /// Call before <see cref="Launch"/>.
+    /// </summary>
+    public void StageV1Profile(string consent)
+    {
+        Directory.CreateDirectory(V1ProfileDir);
+        File.Move(Path.Combine(ProfileDir, "settings.json"),
+            Path.Combine(V1ProfileDir, "settings.json"), overwrite: true);
+        // A second, non-settings file, so "the whole profile came across" is not a claim
+        // about one file. The quest ledger is the right one to pick: it is the file whose
+        // silent loss was #212's shape, and it is not something the app would recreate.
+        File.WriteAllText(Path.Combine(V1ProfileDir, "quest-ledger.json"),
+            JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                [$"{Character.ToLowerInvariant()}_{Server}"] = new { Classes = new[] { "Bard" } },
+            }));
+        _environment["EQBUDDY_V1_APPDATA"] = V1ProfileDir;
+        _environment["EQBUDDY_IMPORT_CONSENT"] = consent;
+    }
+
+    /// <summary>A fake v1 profile beside an Evolved profile that ALREADY has this
+    /// harness's settings in it — the refusal scenario, and the one that needs no consent
+    /// hook at all because the question is never reached.</summary>
+    public void StageV1ProfileBesideAnOccupiedOne()
+    {
+        Directory.CreateDirectory(V1ProfileDir);
+        File.WriteAllText(Path.Combine(V1ProfileDir, "settings.json"), "{}");
+        _environment["EQBUDDY_V1_APPDATA"] = V1ProfileDir;
+    }
+
     /// <summary>An `/outputfile inventory` dump sitting where the game writes it, in the
     /// game's own tab-separated shape (Location / Name / ID / Count / Slots) so it goes
     /// through the real <c>InventoryFile.ParseEntries</c> rather than a fixture-shaped

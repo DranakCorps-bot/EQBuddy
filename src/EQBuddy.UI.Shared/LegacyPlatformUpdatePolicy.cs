@@ -73,8 +73,15 @@ public static class LegacyPlatformUpdatePolicy
 
     /// <summary>The major version at which EQBuddy stops being cross-platform. Named
     /// rather than inlined because the widgets must never test it themselves — a lane
-    /// that knows this number is a lane that can drift from the other one.</summary>
-    public const int WindowsOnlyMajor = 2;
+    /// that knows this number is a lane that can drift from the other one.
+    ///
+    /// **DEFINED as <see cref="AppPaths.EvolvedMajor"/> since TR-1, not spelled again.**
+    /// The major at which EQBuddy becomes Windows-only and the major at which it takes its
+    /// own profile directory are the same event, and two constants for one event is trap 4
+    /// with a version number in it: they agree today and disagree the first time one of
+    /// them moves. Core is the home because UI.Shared references it and not the other way
+    /// round.</summary>
+    public const int WindowsOnlyMajor = AppPaths.EvolvedMajor;
 
     /// <summary>
     /// The whole rule, as a pure function.

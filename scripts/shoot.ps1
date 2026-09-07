@@ -30,7 +30,19 @@ param(
     # Behind every window, so a transparent corner lands on one flat colour. Neutral and
     # deliberately not a palette colour, so "outside the window" reads as outside.
     [string]$Backdrop = '#202225',
-    [string]$Theme = 'ParchmentBrass',
+    # OWNER LOCK, ~3:45 PM CT 2026-09-07 (standing, through HELM-FEEDBACK.md): Evolved
+    # screenshots, tutorial pictures and What's-new captures use the TEAL + GREY theme going
+    # forward, not parchment/brass. `Turquoise` is that palette — a teal accent (#3FCFBE) on
+    # a dark teal-grey ground — and it is landed HERE, as the default, rather than as a
+    # sentence somebody has to remember: a convention with no mechanism is honoured until the
+    # first person who has not read it.
+    #
+    # **The 105 captures already committed are PRE-LOCK and were deliberately not re-shot in
+    # the change that landed this** (TR-1, #399). A theme pass over all of them belongs in a
+    # change of its own: every re-shoot needs its prediction read against the picture (traps
+    # 23/51), and a hundred PNGs inside a profile-import PR is a diff nobody can review. So
+    # docs/screenshots/ is mixed until that pass runs — see DECISIONS.md, where it is named.
+    [string]$Theme = 'Turquoise',
     # Seconds to let the startup replay land after the window appears. There is no
     # readiness signal without EQBUDDY_EXPAND (which changes what the widget looks like,
     # so it cannot be forced on every shot) — this is a settle, not a handshake.
@@ -542,6 +554,55 @@ $Shots = [ordered]@{
     #     take — if the paragraph runs the full width of a wide window, the cap has come off.
     'setup-screen'    = @{ Title = 'EQBuddy — Home'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SETUP = '1' }; Set = @{} }
+    # ---- TR-1: the one-time EQBuddy 1.x profile import question ------------------------
+    #
+    # The illustration lock: an illustration of our own UI is a capture with a recipe, and
+    # this surface lands in the PR that lands it. Checked docs/screenshots/ and grepped docs/
+    # for 'import-consent' first (trap 21): nothing.
+    #
+    # It is the ONLY shot in this file whose window is not the widget, a satellite or a
+    # room — it is a startup MODAL, asked before AppSettings.Load and therefore before
+    # anything else in the app exists (ProfileImportStartup says why that ordering is not
+    # negotiable). So the capture waits for a window nothing else will have opened, and the
+    # teardown is the batch's own Stop-Hard rather than a WM_CLOSE to a widget that was
+    # never built.
+    #
+    # `V1Profile` is what makes the question reachable at all — see Write-V1Profile: it
+    # moves this batch's settings.json into a FAKE v1 profile and empties the Evolved one,
+    # because the import refuses a non-empty target and would otherwise stage the refusal
+    # instead of the offer (trap 23). EQBUDDY_IMPORT_CONSENT is deliberately NOT set: with
+    # it set there would be no dialog to photograph.
+    #
+    # PREDICTION, written before the shot (trap 23/51): a NATIVE title bar reading "EQBuddy
+    # — Import from EQBuddy 1.x" (not a bare "EQBuddy" — trap 24 inside one process, and not
+    # a frameless widget-style box, which is the least trustworthy frame for "may I copy
+    # your profile"). Headline "You already have EQBuddy 1.x" in the accent ink, the lead
+    # under it, then a TICKED box reading "Bring my EQBuddy 1.x settings and history over"
+    # — ticked is door D2's stated assumption and the one thing in this picture a reader
+    # should check first. Two dim lines under it: "copied, never moved … EQBuddy 1.x keeps
+    # working" and the start-fresh sentence. Then "What would come over", a volume line
+    # reading "2 files · <a few KB>", and exactly TWO manifest rows — quest-ledger.json and
+    # settings.json — because that is what Write-V1Profile stages and nothing else. One
+    # button, "Continue", left-aligned. **What must NOT be there: any widget, any shell
+    # window, and any second EQBuddy in the taskbar** — the app has not got that far.
+    #
+    # SHOT 2026-09-07, 506x307. Every prediction above held, including the two manifest rows
+    # and the ticked box.
+    #
+    # ONE THING THE FIRST TAKE SHOWED THAT NO PREDICTION HAD ASKED FOR, and it changed the
+    # app rather than the note: the dialog came back in ParchmentBrass whatever -Theme said,
+    # because it is drawn before any settings exist to read a theme OUT of (which is the
+    # ordering this whole change is about), so App.OnStartup was applying AppSettings'
+    # DEFAULT palette. It now reads the palette from the SOURCE v1 profile — the player's
+    # own EQBuddy, which is the only honest answer available at that moment and the right one
+    # on a screen whose job is to say "you already have EQBuddy 1.x". So -Theme reaches this
+    # shot through the staged v1 settings.json, and the owner's ~3:45 PM CT teal+grey lock
+    # applies to it like every other row. Re-shot under it; teal accent, dark grey ground,
+    # nothing else moved.
+    'import-consent'  = @{ Title = 'EQBuddy — Import from EQBuddy 1.x'
+                           Env = @{}
+                           Set = @{}
+                           V1Profile = @{} }
     # E-3 S3 — HistoryWindow's this-session half, the two rooms it brings.
     #
     # PREDICTIONS, written before the shots (trap 23):
@@ -2396,6 +2457,35 @@ function Write-Settings([hashtable]$extra) {
     $s | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $profileDir 'settings.json') -Encoding UTF8
 }
 
+# THE ONE-TIME EQBuddy 1.x PROFILE IMPORT QUESTION (TR-1), staged for the one shot that is
+# about it — and the staging is the whole reason that shot can exist at all.
+#
+# Two things have to be true before the app will ask, and this function arranges both by
+# MOVING the settings this batch just wrote into the fake v1 profile:
+#
+#   1. THE EVOLVED PROFILE MUST BE EMPTY. There is no merge path, ever, so a target with a
+#      settings.json in it stages the REFUSAL rather than the question — a real state,
+#      correctly rendered, and not the state the shot is about (trap 23). Everything the
+#      batch left behind goes, which the next shot's Write-Settings puts back.
+#   2. THE SOURCE MUST BE OVERRIDABLE. EQBUDDY_V1_APPDATA points at a FAKE v1 profile under
+#      this run's temp root. It must never be %AppData%\EQBuddy: photographing a real v1
+#      profile is the capture-surface failure this repo already paid for once, and here it
+#      would be a whole-directory copy rather than a picture.
+#
+# Consent is NOT scripted for the shot: EQBUDDY_IMPORT_CONSENT stays unset, which is what
+# makes the real dialog open and therefore what there is to photograph.
+function Write-V1Profile([hashtable]$spec) {
+    if ($null -eq $spec) { return $null }
+    $v1 = New-Item -ItemType Directory -Force (Join-Path $root 'v1')
+    Move-Item (Join-Path $profileDir 'settings.json') (Join-Path $v1.FullName 'settings.json') -Force
+    # A second, non-settings file so the manifest in the picture is more than one row —
+    # the same reason the E2E stages a quest ledger.
+    @{ 'testchar_test' = @{ Classes = @('Bard') } } | ConvertTo-Json -Depth 6 |
+        Set-Content (Join-Path $v1.FullName 'quest-ledger.json') -Encoding UTF8
+    Get-ChildItem $profileDir -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    return $v1.FullName
+}
+
 # The class picker lives in quest-ledger.json, NOT settings.json, so a shot that needs
 # more than the one class the log infers has to seed it here. Key is the ledger's own
 # "{character}_{server}" lowercased, which for the fixture session is fixed.
@@ -2904,6 +2994,10 @@ try {
         Write-WikiCache $spec.Wiki
         Write-Cycles $spec.Cycles
         Write-Timers $spec.Timers
+        # LAST of the settings staging, because it MOVES what Write-Settings just wrote and
+        # empties the profile behind it — anything staged after this would be staged into a
+        # directory that is about to be cleared.
+        $v1Profile = Write-V1Profile $spec.V1Profile
         # AFTER the prime runs, not before. A prime for the fixture's own character
         # overwrites the very log an append had just been written into, so staging the
         # live session first and the stored history second silently discarded the first
@@ -2951,6 +3045,7 @@ try {
         $psi.EnvironmentVariables['EQBUDDY_SHELL'] = '1'
         foreach ($k in $spec.Env.Keys) { $psi.EnvironmentVariables[$k] = $spec.Env[$k] }
         if ($reviewLog) { $psi.EnvironmentVariables['EQBUDDY_REVIEW'] = $reviewLog }
+        if ($v1Profile) { $psi.EnvironmentVariables['EQBUDDY_V1_APPDATA'] = $v1Profile }
         $proc = [Diagnostics.Process]::Start($psi)
         try {
             # WAIT FOR THE WINDOW THIS SHOT IS ABOUT — which is not what this loop used to do.

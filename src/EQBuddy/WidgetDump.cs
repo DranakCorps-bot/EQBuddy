@@ -275,6 +275,14 @@ internal static class WidgetDump
                     // from "this APP is no longer moving" — two failures that look
                     // identical from outside and cost a whole round apart.
                     $"tick={w._uiTicks} " +
+                    // THE ONE-TIME EQBuddy 1.x PROFILE IMPORT (TR-1). Three facts, because
+                    // the states they separate look identical from out here: whether the
+                    // player was asked at all, whether a copy completed, and — when
+                    // neither — WHICH rule said no. A single "did it import" bit would make
+                    // "no v1 profile on this machine", "this is a test profile" and "1.x is
+                    // running" the same number. Decided once at startup, before any window
+                    // exists, so these are constant for the life of the process.
+                    ProfileImportStartup.DebugFacts() + " " +
                     // …and whether the tail has anything left to read. See
                     // LogWatcher.PendingBytes: a total that will not move with bytes
                     // pending is a stalled TAIL; the same total with 0 pending is a line
