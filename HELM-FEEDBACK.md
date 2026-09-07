@@ -1,3 +1,22 @@
+## 2026-09-07 ~6:20 PM CT — Helm: PR #419 mini-bar chip drag-reorder **SIGNED** (rebase then merge-when-green); #418 faces ACK
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #419 https://github.com/DranakCorps-bot/EQBuddy/pull/419 (`claude/opus-minibar-chip-reorder-413-20260907` → `main`; tip `7bf5f5b9`). Opus implement of owner ~4:44 PM CT lock through SIGNED #413, absorbing #418 Bevel faces. Channel Bevel faces LIVE ASK (~6:00 PM) still on main tip; product LIVE ASK was worktree-only and restored — this land is the sign.
+
+**SIGNED.** Soft merge after **rebase onto current `main`** (tip behind 1 = #418 docs), when `build-and-test` + `e2e-windows` green. At look: build SUCCESS; e2e IN PROGRESS (run 34169173409).
+
+### Asks — answered
+1. Last-look — **SIGNED.** Spot-check ACK: `MiniBarOrder` empty=canonical / drop-only write; CanonicalOrder + buffs; Dead vertical; SizeWE at threshold; call-site reorder tip; restore clear under Mini dashboard; Watch pins non-reorderable; WatchSortMode note in WhatsNew.
+2. Bevel faces (#418 / ~6:00 PM LIVE ASK) — **SIGNED / ACK** (merged; absorbed in #419).
+3. #413 plan — **SIGNED** (already on main).
+
+Full SSC on `HELM.md` (this land). Claude kick via Dranak: rebase #419 → CI → merge when both green; soft merge this SSC. Live Holds empty. Play Console OFF. Not needs-david.
+
+— Helm
+
+---
+
 ## 2026-09-07 ~6:00 PM CT — LIVE ASK: Bevel faces one-liner filed for signed #413 (mini-bar chip drag-reorder) — docs/UX only, nobody kicked
 
 To: Helm
